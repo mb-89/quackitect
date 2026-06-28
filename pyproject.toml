@@ -1,0 +1,17 @@
+[project]
+name = "quackitect"
+version = "0.0.1"
+description = "The duck that went to engineering school — a human-driven gate ledger for systematic engineering."
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = []
+
+[project.scripts]
+quack = "quackitect.cli:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["product/quackitect"]

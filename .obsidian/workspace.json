@@ -1,0 +1,220 @@
+{
+  "main": {
+    "id": "5ee62630a1de474d",
+    "type": "split",
+    "children": [
+      {
+        "id": "9c0405eafb52ee52",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "29b1ea7507c919dd",
+            "type": "leaf",
+            "state": {
+              "type": "empty",
+              "state": {},
+              "icon": "lucide-file",
+              "title": "New tab"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "9a30ae437c84c296",
+    "type": "split",
+    "children": [
+      {
+        "id": "ade2b5284888c870",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "81e99913a957c682",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical",
+                "autoReveal": false
+              },
+              "icon": "lucide-folder-closed",
+              "title": "Files"
+            }
+          },
+          {
+            "id": "073f33020d11ad38",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              },
+              "icon": "lucide-search",
+              "title": "Search"
+            }
+          },
+          {
+            "id": "cafd17e77047685a",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {},
+              "icon": "lucide-bookmark",
+              "title": "Bookmarks"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "right": {
+    "id": "e2f76632a21c7067",
+    "type": "split",
+    "children": [
+      {
+        "id": "c095425fd003479b",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "e2c0d8e925722918",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-coming-in",
+              "title": "Backlinks"
+            }
+          },
+          {
+            "id": "d83bea74270f98ee",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-going-out",
+              "title": "Outgoing links"
+            }
+          },
+          {
+            "id": "fa38d5f47003c697",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-tags",
+              "title": "Tags"
+            }
+          },
+          {
+            "id": "f57d4417dd7b4f74",
+            "type": "leaf",
+            "state": {
+              "type": "all-properties",
+              "state": {
+                "sortOrder": "frequency",
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-archive",
+              "title": "All properties"
+            }
+          },
+          {
+            "id": "1a250dc4fa9db0a7",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "file": "ckecklists.excalidraw.md",
+                "followCursor": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-list",
+              "title": "Outline of ckecklists.excalidraw"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:Open quick switcher": false,
+      "graph:Open graph view": false,
+      "canvas:Create new canvas": false,
+      "daily-notes:Open today's daily note": false,
+      "templates:Insert template": false,
+      "command-palette:Open command palette": false,
+      "bases:Create new base": false,
+      "obsidian-excalidraw-plugin:New drawing": false
+    }
+  },
+  "active": "81e99913a957c682",
+  "lastOpenFiles": [
+    "spec/decisions/composition.md",
+    "spec/decisions/composition.md.tmp.6152.5dbda21300a6",
+    "product/quackitect/__pycache__/cli.cpython-310.pyc.138151083311312",
+    "product/quackitect/sedUWMiKS",
+    "spec/decisions/refine-track.md",
+    "product/quackitect/method/rigor/lean/checklist.md",
+    "product/quackitect/method/rigor/vibe/checklist.md",
+    "product/quackitect/method/rigor/systematic/checklist.md",
+    "spec/iterations/v1",
+    "spec/iterations",
+    "product/quackitect/__pycache__/engine.cpython-310.pyc.139921404689616",
+    "product/quackitect/project_types/default/README.md",
+    "product/quackitect/project_types/default/guides/evidence-and-suspect.md",
+    "product/quackitect/project_types/default/guides/writing-killer-checks.md",
+    "product/quackitect/project_types/default/guides",
+    "product/quackitect/project_types/default",
+    "product/quackitect/project_types",
+    "spec/iterations/_demo/09-dogfood-runs.md",
+    "spec/iterations/_demo/08-extension-seam.md",
+    "spec/iterations/_demo/07-docs-match.md",
+    "spec/iterations/_demo/06-installs-clean.md",
+    "spec/iterations/_demo/05-tests-green.md",
+    "spec/iterations/_demo/04-build.md",
+    "spec/iterations/_demo/03-design.md",
+    "spec/iterations/_demo/02-requirements.md",
+    "spec/iterations/_demo/01-problem-frame.md",
+    "spec/iterations/_demo",
+    "product/quackitect/method/types/tool/framework/checklist/09-dogfood-runs.md",
+    "product/quackitect/method/types/tool/framework/checklist/08-extension-seam.md",
+    "product/quackitect/method/types/tool/checklist/07-docs-match.md",
+    "product/quackitect/method/types/tool/checklist/06-installs-clean.md",
+    "product/quackitect/method/types/tool/checklist/05-tests-green.md",
+    "product/quackitect/method/types/tool/checklist/04-build.md",
+    "product/quackitect/method/types/tool/checklist/03-design.md",
+    "product/quackitect/method/types/tool/checklist/02-requirements.md",
+    "product/quackitect/method/types/tool/checklist/01-problem-frame.md"
+  ]
+}

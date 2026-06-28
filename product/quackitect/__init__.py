@@ -1,0 +1,1 @@
+"""quackitect — minimal bootstrap engine."""

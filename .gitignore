@@ -1,0 +1,14 @@
+# rebuildable caches — never the source of truth
+.quack/index*
+.quack/evidence/
+.quack/out/
+# reference session logs (research data, hidden, not part of the project)
+.quack/logs/
+__pycache__/
+*.pyc
+
+.venv/
+# throwaway exploration scratch (refine)
+.quack/spikes/
+# gathered source bundles (derived)
+.quack/gather/

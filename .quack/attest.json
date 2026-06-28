@@ -1,0 +1,120 @@
+{
+  "evidence-model": {
+    "hash": "ec49d85a04de",
+    "statement_hash": "25b1f74d7403",
+    "deps": {
+      "fill-adjudicate": "d08a1b6ad55e"
+    }
+  },
+  "fill-adjudicate": {
+    "hash": "d08a1b6ad55e",
+    "statement_hash": "8deb4d0ddd78",
+    "deps": {
+      "pivot": "b74277a094b2"
+    }
+  },
+  "guidance": {
+    "hash": "624d7a80a665",
+    "statement_hash": "6efa6a7adad9",
+    "deps": {
+      "planning": "74c3d511cb30"
+    }
+  },
+  "index": {
+    "hash": "2279e298ac7c",
+    "statement_hash": "ad6a17493a96",
+    "deps": {
+      "state-model": "c5b872ce65f1"
+    }
+  },
+  "input-hashing": {
+    "hash": "8819102b9086",
+    "statement_hash": "6190d1eb196d",
+    "deps": {}
+  },
+  "merkle-dag": {
+    "hash": "a90e5a45f1b2",
+    "statement_hash": "334864af2628",
+    "deps": {
+      "input-hashing": "8819102b9086"
+    }
+  },
+  "notes-pipeline": {
+    "hash": "f63b9b4f56fe",
+    "statement_hash": "309b5c5bbe6a",
+    "deps": {
+      "structure": "2db709579e78"
+    }
+  },
+  "pivot": {
+    "hash": "b74277a094b2",
+    "statement_hash": "1db6219f03aa",
+    "deps": {}
+  },
+  "planning": {
+    "hash": "74c3d511cb30",
+    "statement_hash": "388731270d09",
+    "deps": {
+      "merkle-dag": "a90e5a45f1b2",
+      "suspect-bless": "e6277c65b4ad"
+    }
+  },
+  "state-model": {
+    "hash": "c5b872ce65f1",
+    "statement_hash": "4b168f1baa9e",
+    "deps": {
+      "evidence-model": "ec49d85a04de",
+      "suspect-bless": "e6277c65b4ad"
+    }
+  },
+  "structure": {
+    "hash": "2db709579e78",
+    "statement_hash": "e543fd47e418",
+    "deps": {}
+  },
+  "suspect-bless": {
+    "hash": "e6277c65b4ad",
+    "statement_hash": "b8a6bb01e836",
+    "deps": {
+      "input-hashing": "8819102b9086"
+    }
+  },
+  "versioning": {
+    "hash": "c1b501844aa3",
+    "statement_hash": "c01134f29aca",
+    "deps": {
+      "structure": "2db709579e78",
+      "notes-pipeline": "f63b9b4f56fe"
+    }
+  },
+  "command-surface": {
+    "hash": "08499cf601e1",
+    "statement_hash": "d32da55ba355",
+    "deps": {
+      "pivot": "b74277a094b2",
+      "notes-pipeline": "f63b9b4f56fe"
+    }
+  },
+  "problem-frame": {
+    "hash": "f17fc060d1b7",
+    "statement_hash": "7d8d2a172e86",
+    "deps": {}
+  },
+  "refine-track": {
+    "hash": "4779e49337fa",
+    "statement_hash": "cef8df34c7af",
+    "deps": {
+      "suspect-bless": "e6277c65b4ad",
+      "planning": "74c3d511cb30",
+      "command-surface": "08499cf601e1"
+    }
+  },
+  "composition": {
+    "hash": "8f164fddda25",
+    "statement_hash": "bbaa406ca70b",
+    "deps": {
+      "planning": "74c3d511cb30",
+      "command-surface": "08499cf601e1"
+    }
+  }
+}
