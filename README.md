@@ -18,11 +18,11 @@ Three intents — slash-commands; methods live in `product/quackitect/method/pro
 ```
 /note                      capture an idea
 /engage  start|next|ship   plan -> walk -> output an iteration  (reaches triage, defer, retire)
-/review  readout|retro     assess & look back  (retro opens with the field-feedback question)
+/review  readout|retro|report   assess & look back (retro opens with the field-feedback question; report renders the HTML)
 ```
 Determinizer lane — deterministic CLI:
 ```
-uv run quack status [id] | why <id> | bless [--all|<id>] | note "..." | ship
+uv run quack status [id] | why <id> | bless [--all|<id>] | note "..." | report [--out F] | ship
 ```
 `AGENTS.md` tells an AI how to drive it.
 

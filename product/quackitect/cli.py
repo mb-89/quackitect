@@ -73,14 +73,27 @@ def cmd_gather(a):
     print("  read it, open any flagged files / follow links, then COMPOSE the checklist")
     print("  as check nodes in spec/iterations/" + ver + "/ tailored to the idea, then bless.")
 
+def cmd_report(a):
+    out = "."
+    if "--out" in a:
+        out = a[a.index("--out") + 1]
+    else:
+        out = os.path.join(engine.QUACK, "out", "report.html")
+    from quackitect import report
+    path, model = report.write(out)
+    done = sum(1 for s in model["smap"].values() if s == "DONE")
+    print("report -> " + os.path.relpath(path, engine.ROOT)
+          + "  (" + str(done) + "/" + str(len(model["nodes"])) + " done, root " + model["root"][:12] + ")")
+
+
 CMDS = {"status": cmd_status, "why": cmd_why, "bless": cmd_bless, "note": cmd_note,
-        "ship": cmd_ship, "next": cmd_next, "gather": cmd_gather}
+        "ship": cmd_ship, "next": cmd_next, "gather": cmd_gather, "report": cmd_report}
 
 def main():
     cmd = sys.argv[1] if len(sys.argv) > 1 else "status"
     fn = CMDS.get(cmd)
     if not fn:
-        print('determinizer: status [id] | next | why <id> | bless [--all|<id>] | note "..." | gather <ver> | ship')
+        print('determinizer: status [id] | next | why <id> | bless [--all|<id>] | note "..." | gather <ver> | report [--out F] | ship')
         print("methods (slash-commands): /note | /engage [start|next|refine|ship] | /review [readout|retro]")
         return
     fn(sys.argv[2:])

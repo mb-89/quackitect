@@ -3,15 +3,20 @@
 Quackitect is a **human-driven gate ledger**. You (the agent) FILL checks; the human
 ADJUDICATES the ones that are gates. **Never bless on the human's behalf.**
 
+**Voice (always):** every output — chat and artifacts — follows `product/quackitect/project_types/default/guides/voice.md`.
+
 ## The loop (one iteration)
 - `/engage start` — plan: retro (field feedback) → triage → migration → bake the checklist
 - `/engage next`  — walk the next check: fill → propose adjudication → stop at gates
 - `/engage refine` — explore an idea in a spike, capture the keeper backward (the DEFAULT once a build exists)
 - `/engage ship`  — output the deliverable once the gates are green
 - `/note` — capture an idea anytime (frictionless)
-- `/review` — `readout` (where am I) or `retro` (look back)
+- `/review` — `readout` (where am I), `retro` (look back), or `report` (render the HTML snapshot)
 
 ## Determinizer tools (deterministic — call directly)
+> Invoke as `uv run python -m quackitect <cmd>`. The generated `uv run quack` exe is
+> blocked by Windows Smart App Control on this box (os error 4551); the module entry
+> point routes around it. (A `quack` PowerShell profile function can alias the short form.)
 ```
 uv run quack status [id]        # the board; with an id, why it's suspect (writes DASHBOARD.md)
 uv run quack next               # the next ready check to walk
@@ -19,6 +24,7 @@ uv run quack why <id>           # what input changed
 uv run quack bless [--all|<id>] # record a human adjudication — only when the human says yes
 uv run quack note "<text>"      # deterministic capture lane
 uv run quack gather <ver>       # collect all rigor+type source for an iteration
+uv run quack report [--out F]   # deterministic self-contained HTML snapshot of the ledger -> .quack/out/report.html
 uv run quack ship               # package product/ -> .quack/out/
 ```
 

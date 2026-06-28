@@ -1,4 +1,4 @@
-# review — assess & look back:  readout | retro
+# review — assess & look back:  readout | retro | report
 
 ## readout
 Summarize the board (`uv run quack status`): DONE / SUSPECT / OPEN, and the next gate.
@@ -11,3 +11,9 @@ Run at `engage start`, or on demand. Emit improvement notes only — adopt nothi
 2. Mine the record recency-weighted; tally the previous retro's improvements (promote wins;
    dismiss duds WITH their reason so they are never re-proposed).
 3. Weigh at least one quality signal, never cost alone. Route emitted notes to the inbox.
+
+## report
+Render the deterministic HTML snapshot: `uv run quack report [--out F]` (determinizer-owned, no
+judgment — writes `.quack/out/report.html` by default). You MAY add a short human-facing narrative
+("where we are / notable risks") as a clearly-separate, OPTIONAL layer on top; it is not part of
+the deterministic core and must not be mistaken for it.

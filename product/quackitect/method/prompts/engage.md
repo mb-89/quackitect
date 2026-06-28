@@ -4,9 +4,17 @@
 1. **retro** — run `/review retro`; it opens with the field-feedback question and emits notes.
 2. **triage** — process `.quack/notes/inbox/` (see triage.md).
 3. **migration** — walk the ready backlog: keep / drop / pull-into-this-iteration.
-4. **plan & bake**:
+4. **version planning** — assess what is NEW (retro notes, the drained backlog, field feedback)
+   and SUGGEST how to version it: things that go together belong in a common version. Create a
+   **planned** version by writing only `spec/iterations/<id>/iteration.md` (frontmatter
+   `status: planned`; body: a one-line motivation; type/rigor stay unset until activation) — from what the human tells you
+   or from a backlog drain. You MAY add to an already-planned version that has not started.
+   **Only `engage start` creates versions** — never mint them ad-hoc.
+5. **plan & bake** (for the version being started now):
    a. Confirm the project TYPE and RIGOR (`.quack/config.toml`). If the vision mismatches the
       type/rigor in either direction, run the plausibility check → re-confirm with the human.
+      Set `spec/iterations/<version>/iteration.md` to `status: active` with the motivation/vision
+      in the body — it surfaces in the report's iteration detail.
    b. `uv run quack gather <version>` — collects ALL of the rigor + type source (checklists,
       prose, prompts, spreadsheets, links) into `.quack/gather/<version>/source.md`.
    c. Read the WHOLE bundle — open any flagged non-text files, follow any links — then COMPOSE the
@@ -16,6 +24,10 @@
    d. On the human's approval, `uv run quack bless --all` to lock the plan.
 
 ## next  (walk the next forward check)
+0. **Pick the version.** Default to the **latest not-done version**; if every version is done,
+   **start the earliest planned** one (compose its checklist as in `start`). Announce which you
+   chose. If several versions are open and the human names one, **lock onto** that version for
+   this and following `next` calls until told otherwise.
 1. `uv run quack next` — the determinizer hands you the next ready check (upstreams satisfied).
 2. **FILL** it: do the work / produce the evidence (executed checks: make `verify` pass).
 3. **ADJUDICATE**: a GATE → present the evidence and ask the human to `uv run quack bless <id>`

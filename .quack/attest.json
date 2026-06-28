@@ -116,5 +116,45 @@
       "planning": "74c3d511cb30",
       "command-surface": "08499cf601e1"
     }
+  },
+  "report-frame": {
+    "hash": "486f9ab0c4e0",
+    "statement_hash": "9291338585f2",
+    "deps": {}
+  },
+  "report-requirements": {
+    "hash": "1b29a89735b0",
+    "statement_hash": "f099fd6264c7",
+    "deps": {
+      "report-frame": "486f9ab0c4e0"
+    }
+  },
+  "report-design": {
+    "hash": "08c6c086c18a",
+    "statement_hash": "198899a4eb87",
+    "deps": {
+      "report-requirements": "1b29a89735b0"
+    }
+  },
+  "report-impl": {
+    "hash": "dfe5ec21bc8e",
+    "statement_hash": "a87732367ed0",
+    "deps": {
+      "report-design": "08c6c086c18a"
+    }
+  },
+  "report-docs": {
+    "hash": "4e5745d1ac9e",
+    "statement_hash": "be13dce7d1b0",
+    "deps": {
+      "report-impl": "dfe5ec21bc8e"
+    }
+  },
+  "report-packaged": {
+    "hash": "e7e33a162050",
+    "statement_hash": "c6fb177d45ef",
+    "deps": {
+      "report-impl": "dfe5ec21bc8e"
+    }
   }
 }
