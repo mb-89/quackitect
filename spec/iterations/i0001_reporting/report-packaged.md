@@ -1,6 +1,6 @@
 ---
 id: report-packaged
-statement: `quack report` is wired into the command surface (CMDS in cli.py plus the `/review report` method seam) and runs end-to-end from a clean checkout, producing report.html with no network or Obsidian dependency to generate or open.
+statement: quack report is wired into the command surface: CMDS in cli.py, plus the /review report method seam. It runs end-to-end from a clean checkout. It produces report.html with no network or Obsidian dependency to generate or open.
 depends_on: [report-impl]
 class: review
 killer: false

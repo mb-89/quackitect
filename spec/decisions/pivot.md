@@ -1,6 +1,6 @@
 ---
 id: pivot
-statement: Quackitect is a human-driven gate ledger: the agent fills checks, a human adjudicates them; autonomy is a future knob, not the foundation.
+statement: Quackitect is a human-driven gate ledger. The agent fills checks. A human adjudicates them. Autonomy is a future knob, not the foundation.
 depends_on: []
 adjudicated_by: human
 killer: true

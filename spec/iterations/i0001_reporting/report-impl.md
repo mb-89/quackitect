@@ -1,6 +1,6 @@
 ---
 id: report-impl
-statement: `quack report` is implemented to internal quality — a determinizer command (no judgment) that computes the ReportModel and emits report.html into .quack/out/, computing the ledger-derivable metrics (trace-coverage, suspect-frontier, killer & executed coverage) and surfacing the history/actor metrics (reversal, rework, self-cert) as pending an attest event log, reusing the existing engine load/hash/attest functions rather than duplicating them.
+statement: quack report is implemented to internal quality. It is a determinizer command, with no judgment. It computes the ReportModel and emits report.html into .quack/out/. It computes the ledger-derivable metrics: trace-coverage, suspect-frontier, killer coverage, executed coverage. It surfaces the history metrics (reversal, rework, self-cert) as pending an attest event log. It reuses the existing engine load/hash/attest functions rather than duplicating them.
 depends_on: [report-design]
 class: review
 killer: false

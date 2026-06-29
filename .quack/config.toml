@@ -1,5 +1,5 @@
 # iteration breadcrumb — read only by the guidance resolver, never by the engine
 [iteration]
 type    = "default"
-rigor   = "lean"
-version = "i0001_reporting"
+rigor   = "systematic"
+version = "i0002_disentangle_trace"

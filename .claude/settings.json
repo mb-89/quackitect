@@ -1,0 +1,15 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "compact",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo [quackitect] context was compacted - re-read AGENTS.md and the active method prompt before continuing. AGENTS.md points to the always-on guides (voice, milestone-review, ...) in product/quackitect/project_types/default/guides/."
+          }
+        ]
+      }
+    ]
+  }
+}

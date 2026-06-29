@@ -1,7 +1,8 @@
 ---
 id: composition
-statement: The iteration checklist is composed by the agent from the FULL gathered content of the rigor and type folders (any format — checklist, prose, prompt, spreadsheet, links), not parsed from a fixed format; quack gather collects everything, the agent synthesises the check nodes, the human approves.
-depends_on: [planning, command-surface]
+statement: The agent composes the iteration checklist from the FULL gathered content of the rigor and type folders. Any format counts: checklist, prose, prompt, spreadsheet, links. Nothing is parsed from a fixed format. quack gather collects everything. The agent synthesises the check nodes. The human approves.
+type: requirement
+refines: [uc-engage-start]
 class: judgment
 killer: false
 ---

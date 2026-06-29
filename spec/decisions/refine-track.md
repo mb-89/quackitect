@@ -1,7 +1,8 @@
 ---
 id: refine-track
-statement: Refine is a track orthogonal to rigor — explore an idea in a gitignored spike, capture the keeper backward into a design-input check (which reopens the affected cone via suspect), then re-walk; it is the default working mode in late phases when no new iteration is started.
-depends_on: [suspect-bless, planning, command-surface]
+statement: Refine is a track, orthogonal to rigor. Explore an idea in a gitignored spike. Capture the keeper backward into a design-input check. That reopens the affected cone via suspect. Then re-walk. Refine is the default working mode in late phases, when no new iteration is started.
+type: requirement
+refines: [uc-engage-refine]
 class: judgment
 killer: false
 ---

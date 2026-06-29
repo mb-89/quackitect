@@ -1,6 +1,6 @@
 ---
 id: rigor-systematic
-statement: Full rigor — design derived before build; every concern gated; executed checks required where runnable; independent adjudication of killer checks.
+statement: Full rigor. Design is derived before build. Every concern is gated. Executed checks are required where runnable. Killer checks get independent adjudication.
 floor: gate-every-concern
 inherits: rigor-lean
 ---

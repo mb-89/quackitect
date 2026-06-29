@@ -1,7 +1,8 @@
 ---
 id: planning
-statement: quack start composes a nestable project TYPE with a RIGOR floor, tailors them to the idea (adding above the floor, never removing killer checks), runs a plausibility check, and bakes a self-contained checklist.
-depends_on: [merkle-dag, suspect-bless]
+statement: quack start composes a nestable project TYPE over a RIGOR floor. It tailors them to the idea. It may add above the floor. It never removes a killer check. It runs a plausibility check. Then it bakes a self-contained checklist.
+type: requirement
+refines: [uc-engage-start]
 adjudicated_by: human
 killer: true
 ---

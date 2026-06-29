@@ -1,7 +1,8 @@
 ---
 id: suspect-bless
-statement: On any input change a check is flagged SUSPECT; it returns to DONE only when a human re-attests it, and an explain-log records exactly what changed.
-depends_on: [input-hashing]
+statement: On any input change a check is flagged SUSPECT. It returns to DONE only when a human re-attests it. An explain-log records exactly what changed.
+type: requirement
+refines: [uc-engage-next]
 adjudicated_by: human
 killer: true
 ---

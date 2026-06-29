@@ -1,5 +1,7 @@
 ---
 iteration: i0002_disentangle_trace
-status: planned
+status: active
+type: default
+rigor: systematic
 ---
-Disentangle the two conflated artifacts: keep the trace graph to design input -> output only, and move per-iteration build steps into proper nested task-list checklists (sebot-canvas style). Untangles what i0001 mixed into the trace.
+Structural: split the trace (design input -> output) from per-iteration task-lists (nested steps + checks per step). Folds in tooling done early — version management (version-aware quack next + planned-version ops) and metrics (attest event log) — plus the ship-version-label fix.

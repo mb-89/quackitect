@@ -1,5 +1,7 @@
 ---
 id: report-determinism
+type: test
+verifies: [report-requirements]
 statement: `quack report` produces byte-identical HTML across two runs on an unchanged ledger.
 depends_on: [report-impl]
 class: executed

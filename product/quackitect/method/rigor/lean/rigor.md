@@ -1,6 +1,6 @@
 ---
 id: rigor-lean
-statement: Light structure — one grounded-review gate per concern; executed checks where cheap.
+statement: Light structure. One grounded-review gate per concern. Executed checks where cheap.
 floor: review-each-concern
 inherits: rigor-vibe
 ---

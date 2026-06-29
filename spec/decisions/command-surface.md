@@ -1,7 +1,8 @@
 ---
 id: command-surface
-statement: The surface is three default-closed intents — note (capture), engage (start/next/ship), review (readout/retro) — over a separate determinizer lane (status/why/bless); ship is engage's terminal output and field feedback is a retro question, not a milestone.
-depends_on: [pivot, notes-pipeline]
+statement: The surface is three default-closed intents: note (capture), engage (start/next/ship), and review (readout/retro). A separate determinizer lane runs status, why, and bless. Ship is engage's terminal output. Field feedback is a retro question, not a milestone.
+type: requirement
+refines: [uc-engage-start]
 class: judgment
 killer: false
 ---

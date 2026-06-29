@@ -1,7 +1,7 @@
 [project]
 name = "quackitect"
 version = "0.0.1"
-description = "The duck that went to engineering school — a human-driven gate ledger for systematic engineering."
+description = "The rubber duck that went to engineering school — a human-driven gate ledger for systematic engineering."
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = []

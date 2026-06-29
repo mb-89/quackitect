@@ -1,6 +1,6 @@
 ---
 id: report-docs
-statement: Docs match the actual surface — AGENTS.md (determinizer list) and README/HANDOVER describe `quack report` exactly as it behaves (flags, output path, the local-link caveat), with no command or behaviour documented that the CLI does not implement.
+statement: Docs match the actual surface. AGENTS.md (the determinizer list), README, and HANDOVER describe quack report exactly as it behaves: flags, output path, and the local-link caveat. No command or behaviour is documented that the CLI does not implement.
 depends_on: [report-impl]
 class: review
 killer: true

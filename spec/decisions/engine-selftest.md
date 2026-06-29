@@ -1,9 +1,10 @@
 ---
 id: engine-selftest
 statement: The product package imports cleanly.
-depends_on: [structure]
+type: test
+verifies: [state-model]
 class: executed
-verify: python3 -c "import sys; sys.path.insert(0, 'product'); import quackitect.engine"
+verify: uv run python -c "import sys; sys.path.insert(0, 'product'); import quackitect.engine"
 killer: false
 ---
 

@@ -1,160 +1,1415 @@
-{
-  "evidence-model": {
-    "hash": "ec49d85a04de",
-    "statement_hash": "25b1f74d7403",
+[
+  {
+    "check": "arch-adr",
+    "action": "bless",
+    "actor": "migrated",
+    "ts": 0,
+    "hash": "5d9aef62577c",
+    "statement_hash": "ab73ee921dcd",
     "deps": {
-      "fill-adjudicate": "d08a1b6ad55e"
-    }
+      "arch-candidates": "b20fb06f64dd"
+    },
+    "prev_hash": null
   },
-  "fill-adjudicate": {
-    "hash": "d08a1b6ad55e",
-    "statement_hash": "8deb4d0ddd78",
+  {
+    "check": "arch-candidates",
+    "action": "bless",
+    "actor": "migrated",
+    "ts": 0,
+    "hash": "b20fb06f64dd",
+    "statement_hash": "71d80c784a53",
     "deps": {
-      "pivot": "b74277a094b2"
-    }
+      "req-split": "6d66ffa643c8",
+      "req-version-mgmt": "d99769202226",
+      "req-metrics": "7a33c4642fec",
+      "req-tooling": "c9e61ed13aa2",
+      "req-review": "3e38b09dcd1f"
+    },
+    "prev_hash": null
   },
-  "guidance": {
-    "hash": "624d7a80a665",
-    "statement_hash": "6efa6a7adad9",
-    "deps": {
-      "planning": "74c3d511cb30"
-    }
-  },
-  "index": {
-    "hash": "2279e298ac7c",
-    "statement_hash": "ad6a17493a96",
-    "deps": {
-      "state-model": "c5b872ce65f1"
-    }
-  },
-  "input-hashing": {
-    "hash": "8819102b9086",
-    "statement_hash": "6190d1eb196d",
-    "deps": {}
-  },
-  "merkle-dag": {
-    "hash": "a90e5a45f1b2",
-    "statement_hash": "334864af2628",
-    "deps": {
-      "input-hashing": "8819102b9086"
-    }
-  },
-  "notes-pipeline": {
-    "hash": "f63b9b4f56fe",
-    "statement_hash": "309b5c5bbe6a",
-    "deps": {
-      "structure": "2db709579e78"
-    }
-  },
-  "pivot": {
-    "hash": "b74277a094b2",
-    "statement_hash": "1db6219f03aa",
-    "deps": {}
-  },
-  "planning": {
-    "hash": "74c3d511cb30",
-    "statement_hash": "388731270d09",
-    "deps": {
-      "merkle-dag": "a90e5a45f1b2",
-      "suspect-bless": "e6277c65b4ad"
-    }
-  },
-  "state-model": {
-    "hash": "c5b872ce65f1",
-    "statement_hash": "4b168f1baa9e",
-    "deps": {
-      "evidence-model": "ec49d85a04de",
-      "suspect-bless": "e6277c65b4ad"
-    }
-  },
-  "structure": {
-    "hash": "2db709579e78",
-    "statement_hash": "e543fd47e418",
-    "deps": {}
-  },
-  "suspect-bless": {
-    "hash": "e6277c65b4ad",
-    "statement_hash": "b8a6bb01e836",
-    "deps": {
-      "input-hashing": "8819102b9086"
-    }
-  },
-  "versioning": {
-    "hash": "c1b501844aa3",
-    "statement_hash": "c01134f29aca",
-    "deps": {
-      "structure": "2db709579e78",
-      "notes-pipeline": "f63b9b4f56fe"
-    }
-  },
-  "command-surface": {
+  {
+    "check": "command-surface",
+    "action": "bless",
+    "actor": "migrated",
+    "ts": 0,
     "hash": "08499cf601e1",
     "statement_hash": "d32da55ba355",
     "deps": {
       "pivot": "b74277a094b2",
       "notes-pipeline": "f63b9b4f56fe"
-    }
+    },
+    "prev_hash": null
   },
-  "problem-frame": {
+  {
+    "check": "composition",
+    "action": "bless",
+    "actor": "migrated",
+    "ts": 0,
+    "hash": "8f164fddda25",
+    "statement_hash": "bbaa406ca70b",
+    "deps": {
+      "planning": "74c3d511cb30",
+      "command-surface": "08499cf601e1"
+    },
+    "prev_hash": null
+  },
+  {
+    "check": "evidence-model",
+    "action": "bless",
+    "actor": "migrated",
+    "ts": 0,
+    "hash": "ec49d85a04de",
+    "statement_hash": "25b1f74d7403",
+    "deps": {
+      "fill-adjudicate": "d08a1b6ad55e"
+    },
+    "prev_hash": null
+  },
+  {
+    "check": "fill-adjudicate",
+    "action": "bless",
+    "actor": "migrated",
+    "ts": 0,
+    "hash": "d08a1b6ad55e",
+    "statement_hash": "8deb4d0ddd78",
+    "deps": {
+      "pivot": "b74277a094b2"
+    },
+    "prev_hash": null
+  },
+  {
+    "check": "frame",
+    "action": "bless",
+    "actor": "migrated",
+    "ts": 0,
+    "hash": "87c468a130d6",
+    "statement_hash": "b698c3b63514",
+    "deps": {},
+    "prev_hash": null
+  },
+  {
+    "check": "guidance",
+    "action": "bless",
+    "actor": "migrated",
+    "ts": 0,
+    "hash": "624d7a80a665",
+    "statement_hash": "6efa6a7adad9",
+    "deps": {
+      "planning": "74c3d511cb30"
+    },
+    "prev_hash": null
+  },
+  {
+    "check": "index",
+    "action": "bless",
+    "actor": "migrated",
+    "ts": 0,
+    "hash": "2279e298ac7c",
+    "statement_hash": "ad6a17493a96",
+    "deps": {
+      "state-model": "c5b872ce65f1"
+    },
+    "prev_hash": null
+  },
+  {
+    "check": "input-hashing",
+    "action": "bless",
+    "actor": "migrated",
+    "ts": 0,
+    "hash": "8819102b9086",
+    "statement_hash": "6190d1eb196d",
+    "deps": {},
+    "prev_hash": null
+  },
+  {
+    "check": "merkle-dag",
+    "action": "bless",
+    "actor": "migrated",
+    "ts": 0,
+    "hash": "a90e5a45f1b2",
+    "statement_hash": "334864af2628",
+    "deps": {
+      "input-hashing": "8819102b9086"
+    },
+    "prev_hash": null
+  },
+  {
+    "check": "notes-pipeline",
+    "action": "bless",
+    "actor": "migrated",
+    "ts": 0,
+    "hash": "f63b9b4f56fe",
+    "statement_hash": "309b5c5bbe6a",
+    "deps": {
+      "structure": "2db709579e78"
+    },
+    "prev_hash": null
+  },
+  {
+    "check": "pivot",
+    "action": "bless",
+    "actor": "migrated",
+    "ts": 0,
+    "hash": "b74277a094b2",
+    "statement_hash": "1db6219f03aa",
+    "deps": {},
+    "prev_hash": null
+  },
+  {
+    "check": "planning",
+    "action": "bless",
+    "actor": "migrated",
+    "ts": 0,
+    "hash": "74c3d511cb30",
+    "statement_hash": "388731270d09",
+    "deps": {
+      "merkle-dag": "a90e5a45f1b2",
+      "suspect-bless": "e6277c65b4ad"
+    },
+    "prev_hash": null
+  },
+  {
+    "check": "problem-frame",
+    "action": "bless",
+    "actor": "migrated",
+    "ts": 0,
     "hash": "f17fc060d1b7",
     "statement_hash": "7d8d2a172e86",
-    "deps": {}
+    "deps": {},
+    "prev_hash": null
   },
-  "refine-track": {
+  {
+    "check": "refine-track",
+    "action": "bless",
+    "actor": "migrated",
+    "ts": 0,
     "hash": "4779e49337fa",
     "statement_hash": "cef8df34c7af",
     "deps": {
       "suspect-bless": "e6277c65b4ad",
       "planning": "74c3d511cb30",
       "command-surface": "08499cf601e1"
-    }
+    },
+    "prev_hash": null
   },
-  "composition": {
-    "hash": "8f164fddda25",
-    "statement_hash": "bbaa406ca70b",
-    "deps": {
-      "planning": "74c3d511cb30",
-      "command-surface": "08499cf601e1"
-    }
-  },
-  "report-frame": {
-    "hash": "486f9ab0c4e0",
-    "statement_hash": "9291338585f2",
-    "deps": {}
-  },
-  "report-requirements": {
-    "hash": "1b29a89735b0",
-    "statement_hash": "f099fd6264c7",
-    "deps": {
-      "report-frame": "486f9ab0c4e0"
-    }
-  },
-  "report-design": {
+  {
+    "check": "report-design",
+    "action": "bless",
+    "actor": "migrated",
+    "ts": 0,
     "hash": "08c6c086c18a",
     "statement_hash": "198899a4eb87",
     "deps": {
       "report-requirements": "1b29a89735b0"
-    }
+    },
+    "prev_hash": null
   },
-  "report-impl": {
-    "hash": "dfe5ec21bc8e",
-    "statement_hash": "a87732367ed0",
-    "deps": {
-      "report-design": "08c6c086c18a"
-    }
-  },
-  "report-docs": {
+  {
+    "check": "report-docs",
+    "action": "bless",
+    "actor": "migrated",
+    "ts": 0,
     "hash": "4e5745d1ac9e",
     "statement_hash": "be13dce7d1b0",
     "deps": {
       "report-impl": "dfe5ec21bc8e"
-    }
+    },
+    "prev_hash": null
   },
-  "report-packaged": {
+  {
+    "check": "report-frame",
+    "action": "bless",
+    "actor": "migrated",
+    "ts": 0,
+    "hash": "486f9ab0c4e0",
+    "statement_hash": "9291338585f2",
+    "deps": {},
+    "prev_hash": null
+  },
+  {
+    "check": "report-impl",
+    "action": "bless",
+    "actor": "migrated",
+    "ts": 0,
+    "hash": "dfe5ec21bc8e",
+    "statement_hash": "a87732367ed0",
+    "deps": {
+      "report-design": "08c6c086c18a"
+    },
+    "prev_hash": null
+  },
+  {
+    "check": "report-packaged",
+    "action": "bless",
+    "actor": "migrated",
+    "ts": 0,
     "hash": "e7e33a162050",
     "statement_hash": "c6fb177d45ef",
     "deps": {
       "report-impl": "dfe5ec21bc8e"
-    }
+    },
+    "prev_hash": null
+  },
+  {
+    "check": "report-requirements",
+    "action": "bless",
+    "actor": "migrated",
+    "ts": 0,
+    "hash": "1b29a89735b0",
+    "statement_hash": "f099fd6264c7",
+    "deps": {
+      "report-frame": "486f9ab0c4e0"
+    },
+    "prev_hash": null
+  },
+  {
+    "check": "req-metrics",
+    "action": "bless",
+    "actor": "migrated",
+    "ts": 0,
+    "hash": "7a33c4642fec",
+    "statement_hash": "c1fe7c3cfcc1",
+    "deps": {
+      "success": "7aa16263c780"
+    },
+    "prev_hash": null
+  },
+  {
+    "check": "req-review",
+    "action": "bless",
+    "actor": "migrated",
+    "ts": 0,
+    "hash": "3e38b09dcd1f",
+    "statement_hash": "e9ebe6f5df4c",
+    "deps": {
+      "success": "7aa16263c780"
+    },
+    "prev_hash": null
+  },
+  {
+    "check": "req-split",
+    "action": "bless",
+    "actor": "migrated",
+    "ts": 0,
+    "hash": "6d66ffa643c8",
+    "statement_hash": "3d71346b6f02",
+    "deps": {
+      "success": "7aa16263c780"
+    },
+    "prev_hash": null
+  },
+  {
+    "check": "req-tooling",
+    "action": "bless",
+    "actor": "migrated",
+    "ts": 0,
+    "hash": "c9e61ed13aa2",
+    "statement_hash": "516557ab2796",
+    "deps": {
+      "success": "7aa16263c780"
+    },
+    "prev_hash": null
+  },
+  {
+    "check": "req-version-mgmt",
+    "action": "bless",
+    "actor": "migrated",
+    "ts": 0,
+    "hash": "d99769202226",
+    "statement_hash": "35f050cb02f3",
+    "deps": {
+      "success": "7aa16263c780"
+    },
+    "prev_hash": null
+  },
+  {
+    "check": "spike-risk",
+    "action": "bless",
+    "actor": "migrated",
+    "ts": 0,
+    "hash": "6ba0f02a96be",
+    "statement_hash": "710d0fe7fbbb",
+    "deps": {
+      "arch-adr": "5d9aef62577c"
+    },
+    "prev_hash": null
+  },
+  {
+    "check": "state-model",
+    "action": "bless",
+    "actor": "migrated",
+    "ts": 0,
+    "hash": "c5b872ce65f1",
+    "statement_hash": "4b168f1baa9e",
+    "deps": {
+      "evidence-model": "ec49d85a04de",
+      "suspect-bless": "e6277c65b4ad"
+    },
+    "prev_hash": null
+  },
+  {
+    "check": "structure",
+    "action": "bless",
+    "actor": "migrated",
+    "ts": 0,
+    "hash": "2db709579e78",
+    "statement_hash": "e543fd47e418",
+    "deps": {},
+    "prev_hash": null
+  },
+  {
+    "check": "success",
+    "action": "bless",
+    "actor": "migrated",
+    "ts": 0,
+    "hash": "7aa16263c780",
+    "statement_hash": "35a228b974fc",
+    "deps": {
+      "frame": "87c468a130d6"
+    },
+    "prev_hash": null
+  },
+  {
+    "check": "suspect-bless",
+    "action": "bless",
+    "actor": "migrated",
+    "ts": 0,
+    "hash": "e6277c65b4ad",
+    "statement_hash": "b8a6bb01e836",
+    "deps": {
+      "input-hashing": "8819102b9086"
+    },
+    "prev_hash": null
+  },
+  {
+    "check": "versioning",
+    "action": "bless",
+    "actor": "migrated",
+    "ts": 0,
+    "hash": "c1b501844aa3",
+    "statement_hash": "c01134f29aca",
+    "deps": {
+      "structure": "2db709579e78",
+      "notes-pipeline": "f63b9b4f56fe"
+    },
+    "prev_hash": null
+  },
+  {
+    "check": "build-metrics",
+    "action": "bless",
+    "actor": "human",
+    "ts": "2026-06-28T18:29:29.040041",
+    "hash": "3ee46aaaa330",
+    "statement_hash": "1e9b37919020",
+    "deps": {
+      "arch-adr": "5d9aef62577c",
+      "spike-risk": "6ba0f02a96be"
+    },
+    "prev_hash": null
+  },
+  {
+    "check": "req-split",
+    "action": "bless",
+    "actor": "human",
+    "ts": "2026-06-28T19:10:13.963120",
+    "hash": "e78fa1f7cc52",
+    "statement_hash": "1c4970a5af2c",
+    "deps": {
+      "success": "7aa16263c780"
+    },
+    "implements_hash": "",
+    "prev_hash": "6d66ffa643c8"
+  },
+  {
+    "check": "req-coverage",
+    "action": "bless",
+    "actor": "human",
+    "ts": "2026-06-28T19:10:14.068121",
+    "hash": "b79b1ac48393",
+    "statement_hash": "f52dd806b1c9",
+    "deps": {
+      "req-split": "e78fa1f7cc52"
+    },
+    "implements_hash": "",
+    "prev_hash": null
+  },
+  {
+    "check": "arch-candidates",
+    "action": "bless",
+    "actor": "human",
+    "ts": "2026-06-28T19:10:14.173726",
+    "hash": "b29a473454d6",
+    "statement_hash": "ecb2bcba5d4a",
+    "deps": {
+      "req-split": "e78fa1f7cc52",
+      "req-coverage": "b79b1ac48393",
+      "req-version-mgmt": "d99769202226",
+      "req-metrics": "7a33c4642fec",
+      "req-tooling": "c9e61ed13aa2",
+      "req-review": "3e38b09dcd1f"
+    },
+    "implements_hash": "",
+    "prev_hash": "b20fb06f64dd"
+  },
+  {
+    "check": "arch-adr",
+    "action": "bless",
+    "actor": "human",
+    "ts": "2026-06-28T19:10:14.278726",
+    "hash": "8ba8d4774b66",
+    "statement_hash": "923c4846c14b",
+    "deps": {
+      "arch-candidates": "b29a473454d6"
+    },
+    "implements_hash": "",
+    "prev_hash": "5d9aef62577c"
+  },
+  {
+    "check": "build-metrics",
+    "action": "bless",
+    "actor": "human",
+    "ts": "2026-06-28T19:10:14.383719",
+    "hash": "b78701ca1664",
+    "statement_hash": "1e9b37919020",
+    "deps": {
+      "arch-adr": "8ba8d4774b66",
+      "spike-risk": "e9c264a6b3a4"
+    },
+    "implements_hash": "",
+    "prev_hash": "3ee46aaaa330"
+  },
+  {
+    "check": "spike-risk",
+    "action": "bless",
+    "actor": "human",
+    "ts": "2026-06-28T19:13:24.636907",
+    "hash": "e9c264a6b3a4",
+    "statement_hash": "710d0fe7fbbb",
+    "deps": {
+      "arch-adr": "8ba8d4774b66"
+    },
+    "implements_hash": "",
+    "prev_hash": "6ba0f02a96be"
+  },
+  {
+    "check": "build-split-store",
+    "action": "bless",
+    "actor": "human",
+    "ts": "2026-06-28T19:20:12.389862",
+    "hash": "f117c925ca37",
+    "statement_hash": "24fbd6c6e8a4",
+    "deps": {
+      "build-metrics": "b78701ca1664"
+    },
+    "prev_hash": null
+  },
+  {
+    "check": "build-coverage",
+    "action": "bless",
+    "actor": "human",
+    "ts": "2026-06-28T19:23:19.091668",
+    "hash": "ac0791f13967",
+    "statement_hash": "84fb0faee7a4",
+    "deps": {
+      "build-split-store": "f117c925ca37"
+    },
+    "prev_hash": null
+  },
+  {
+    "check": "command-surface",
+    "action": "bless",
+    "actor": "human",
+    "ts": "2026-06-29T20:12:14.356275",
+    "hash": "d848435005f1",
+    "statement_hash": "db276883d6c5",
+    "deps": {
+      "uc-engage-start": "1c8e268423c4"
+    },
+    "prev_hash": "08499cf601e1"
+  },
+  {
+    "check": "composition",
+    "action": "bless",
+    "actor": "human",
+    "ts": "2026-06-29T20:12:14.357268",
+    "hash": "4df156abb6ec",
+    "statement_hash": "b5d2278173be",
+    "deps": {
+      "uc-engage-start": "1c8e268423c4"
+    },
+    "prev_hash": "8f164fddda25"
+  },
+  {
+    "check": "refine-track",
+    "action": "bless",
+    "actor": "human",
+    "ts": "2026-06-29T20:12:14.358269",
+    "hash": "c4961bf19348",
+    "statement_hash": "3dec5175ffca",
+    "deps": {
+      "uc-engage-refine": "2419090ac86c"
+    },
+    "prev_hash": "4779e49337fa"
+  },
+  {
+    "check": "evidence-model",
+    "action": "bless",
+    "actor": "human",
+    "ts": "2026-06-29T20:12:14.359268",
+    "hash": "13cae0fffafc",
+    "statement_hash": "55d31a535b66",
+    "deps": {
+      "state-model": "f7bdf0efa7dd"
+    },
+    "prev_hash": "ec49d85a04de"
+  },
+  {
+    "check": "input-hashing",
+    "action": "bless",
+    "actor": "human",
+    "ts": "2026-06-29T20:12:14.360267",
+    "hash": "eb14a9fcb595",
+    "statement_hash": "9848f81974de",
+    "deps": {
+      "suspect-bless": "37cbe8909027"
+    },
+    "prev_hash": "8819102b9086"
+  },
+  {
+    "check": "merkle-dag",
+    "action": "bless",
+    "actor": "human",
+    "ts": "2026-06-29T20:12:14.362270",
+    "hash": "3270db83bada",
+    "statement_hash": "ce6b4d283d9f",
+    "deps": {
+      "suspect-bless": "37cbe8909027"
+    },
+    "prev_hash": "a90e5a45f1b2"
+  },
+  {
+    "check": "command-surface-impl",
+    "action": "bless",
+    "actor": "human",
+    "ts": "2026-06-29T20:12:14.363270",
+    "hash": "a4b61dbfe002",
+    "statement_hash": "f5ccb915cde4",
+    "deps": {
+      "command-surface": "d848435005f1"
+    },
+    "prev_hash": null
+  },
+  {
+    "check": "gather",
+    "action": "bless",
+    "actor": "human",
+    "ts": "2026-06-29T20:12:14.364269",
+    "hash": "b394acb00c00",
+    "statement_hash": "404882fa665b",
+    "deps": {
+      "composition": "4df156abb6ec"
+    },
+    "prev_hash": null
+  },
+  {
+    "check": "notes-capture",
+    "action": "bless",
+    "actor": "human",
+    "ts": "2026-06-29T20:12:14.365268",
+    "hash": "09639371eca7",
+    "statement_hash": "0ed194bab049",
+    "deps": {
+      "notes-pipeline": "fdfde5fa0406"
+    },
+    "prev_hash": null
+  },
+  {
+    "check": "need-engage",
+    "action": "bless",
+    "actor": "human",
+    "ts": "2026-06-29T20:12:14.366268",
+    "hash": "9e77c5a26971",
+    "statement_hash": "db028e16bc2a",
+    "deps": {},
+    "prev_hash": null
+  },
+  {
+    "check": "need-note",
+    "action": "bless",
+    "actor": "human",
+    "ts": "2026-06-29T20:12:14.367270",
+    "hash": "6b7b566bfc32",
+    "statement_hash": "2fbd96108191",
+    "deps": {},
+    "prev_hash": null
+  },
+  {
+    "check": "need-review",
+    "action": "bless",
+    "actor": "human",
+    "ts": "2026-06-29T20:12:14.368270",
+    "hash": "f9b31b4b63dd",
+    "statement_hash": "26b6e4bfc669",
+    "deps": {},
+    "prev_hash": null
+  },
+  {
+    "check": "uc-engage-next",
+    "action": "bless",
+    "actor": "human",
+    "ts": "2026-06-29T20:12:14.370268",
+    "hash": "d74ec15056b3",
+    "statement_hash": "51e7b3f4c8bf",
+    "deps": {
+      "need-engage": "9e77c5a26971"
+    },
+    "prev_hash": null
+  },
+  {
+    "check": "uc-engage-refine",
+    "action": "bless",
+    "actor": "human",
+    "ts": "2026-06-29T20:12:14.371269",
+    "hash": "2419090ac86c",
+    "statement_hash": "a13a8a136bdd",
+    "deps": {
+      "need-engage": "9e77c5a26971"
+    },
+    "prev_hash": null
+  },
+  {
+    "check": "uc-engage-ship",
+    "action": "bless",
+    "actor": "human",
+    "ts": "2026-06-29T20:12:14.372270",
+    "hash": "6e24a35290f9",
+    "statement_hash": "3d6c35d134f7",
+    "deps": {
+      "need-engage": "9e77c5a26971"
+    },
+    "prev_hash": null
+  },
+  {
+    "check": "uc-engage-start",
+    "action": "bless",
+    "actor": "human",
+    "ts": "2026-06-29T20:12:14.373270",
+    "hash": "1c8e268423c4",
+    "statement_hash": "7d11d17de1ca",
+    "deps": {
+      "need-engage": "9e77c5a26971"
+    },
+    "prev_hash": null
+  },
+  {
+    "check": "uc-note-capture",
+    "action": "bless",
+    "actor": "human",
+    "ts": "2026-06-29T20:12:14.374269",
+    "hash": "6b5f2988c035",
+    "statement_hash": "8c1f004bafe3",
+    "deps": {
+      "need-note": "6b7b566bfc32"
+    },
+    "prev_hash": null
+  },
+  {
+    "check": "uc-review-readout",
+    "action": "bless",
+    "actor": "human",
+    "ts": "2026-06-29T20:12:14.376271",
+    "hash": "7545fd4243f2",
+    "statement_hash": "5a3754b715a1",
+    "deps": {
+      "need-review": "f9b31b4b63dd"
+    },
+    "prev_hash": null
+  },
+  {
+    "check": "uc-review-report",
+    "action": "bless",
+    "actor": "human",
+    "ts": "2026-06-29T20:12:14.377268",
+    "hash": "e85c84abd49e",
+    "statement_hash": "5a921e880293",
+    "deps": {
+      "need-review": "f9b31b4b63dd"
+    },
+    "prev_hash": null
+  },
+  {
+    "check": "uc-review-retro",
+    "action": "bless",
+    "actor": "human",
+    "ts": "2026-06-29T20:12:14.378268",
+    "hash": "0d1844376098",
+    "statement_hash": "3837bbd39b79",
+    "deps": {
+      "need-review": "f9b31b4b63dd"
+    },
+    "prev_hash": null
+  },
+  {
+    "check": "report-design",
+    "action": "bless",
+    "actor": "human",
+    "ts": "2026-06-29T20:12:14.380268",
+    "hash": "7bc3c0594189",
+    "statement_hash": "5daba695d263",
+    "deps": {
+      "report-requirements": "dc4062fad2b4"
+    },
+    "prev_hash": "08c6c086c18a"
+  },
+  {
+    "check": "report-impl",
+    "action": "bless",
+    "actor": "human",
+    "ts": "2026-06-29T20:12:14.381275",
+    "hash": "accc1a7f7550",
+    "statement_hash": "c124254c24ab",
+    "deps": {
+      "report-design": "7bc3c0594189"
+    },
+    "prev_hash": "dfe5ec21bc8e"
+  },
+  {
+    "check": "report-packaged",
+    "action": "bless",
+    "actor": "human",
+    "ts": "2026-06-29T20:12:14.382268",
+    "hash": "7afdb594288d",
+    "statement_hash": "58507f1f40a0",
+    "deps": {
+      "report-impl": "accc1a7f7550"
+    },
+    "prev_hash": "e7e33a162050"
+  },
+  {
+    "check": "report-model",
+    "action": "bless",
+    "actor": "human",
+    "ts": "2026-06-29T20:12:14.383267",
+    "hash": "8ded1c4d8f42",
+    "statement_hash": "16752903bde3",
+    "deps": {
+      "report-requirements": "dc4062fad2b4"
+    },
+    "prev_hash": null
+  },
+  {
+    "check": "req-coverage",
+    "action": "bless",
+    "actor": "human",
+    "ts": "2026-06-29T20:12:14.385269",
+    "hash": "b53ca1e517a1",
+    "statement_hash": "01ce2090b2e1",
+    "deps": {
+      "req-split": "fc81eb22b4b0",
+      "uc-review-readout": "7545fd4243f2"
+    },
+    "prev_hash": "b79b1ac48393"
+  },
+  {
+    "check": "req-metrics",
+    "action": "bless",
+    "actor": "human",
+    "ts": "2026-06-29T20:12:14.386271",
+    "hash": "df19ef9e9bec",
+    "statement_hash": "b65ac59056a0",
+    "deps": {
+      "uc-review-report": "e85c84abd49e"
+    },
+    "prev_hash": "7a33c4642fec"
+  },
+  {
+    "check": "req-review",
+    "action": "bless",
+    "actor": "human",
+    "ts": "2026-06-29T20:12:14.388268",
+    "hash": "861dbeb42ef0",
+    "statement_hash": "15e6643f538c",
+    "deps": {
+      "uc-review-readout": "7545fd4243f2",
+      "uc-review-retro": "0d1844376098"
+    },
+    "prev_hash": "3e38b09dcd1f"
+  },
+  {
+    "check": "typed-trace",
+    "action": "bless",
+    "actor": "human",
+    "ts": "2026-06-29T20:12:14.389270",
+    "hash": "fcfe7da89fc4",
+    "statement_hash": "59d6180bd0bd",
+    "deps": {
+      "req-split": "fc81eb22b4b0"
+    },
+    "prev_hash": null
+  },
+  {
+    "check": "metrics",
+    "action": "bless",
+    "actor": "human",
+    "ts": "2026-06-29T20:12:14.390270",
+    "hash": "1d313bbf93ae",
+    "statement_hash": "a3d795d3a9a3",
+    "deps": {
+      "req-metrics": "df19ef9e9bec"
+    },
+    "prev_hash": null
+  },
+  {
+    "check": "coverage-lint",
+    "action": "bless",
+    "actor": "human",
+    "ts": "2026-06-29T20:12:14.392270",
+    "hash": "dba2d21c6fb2",
+    "statement_hash": "d56e95ed7c7e",
+    "deps": {
+      "req-coverage": "b53ca1e517a1"
+    },
+    "prev_hash": null
+  },
+  {
+    "check": "iteration-tasklist",
+    "action": "bless",
+    "actor": "human",
+    "ts": "2026-06-29T20:12:14.393270",
+    "hash": "aa078f346bcc",
+    "statement_hash": "ca368198a718",
+    "deps": {
+      "req-split": "fc81eb22b4b0"
+    },
+    "prev_hash": null
+  },
+  {
+    "check": "pivot",
+    "action": "bless",
+    "actor": "human",
+    "ts": "2026-06-29T20:13:59.793632",
+    "hash": "d6578028a328",
+    "statement_hash": "4c97a94ad7e6",
+    "deps": {},
+    "prev_hash": "b74277a094b2"
+  },
+  {
+    "check": "structure",
+    "action": "bless",
+    "actor": "human",
+    "ts": "2026-06-29T20:13:59.794631",
+    "hash": "6c78827f9713",
+    "statement_hash": "cd992a9b6a0f",
+    "deps": {
+      "command-surface": "d848435005f1"
+    },
+    "prev_hash": "2db709579e78"
+  },
+  {
+    "check": "state-model",
+    "action": "bless",
+    "actor": "human",
+    "ts": "2026-06-29T20:13:59.796631",
+    "hash": "f7bdf0efa7dd",
+    "statement_hash": "6f6dcadf2381",
+    "deps": {
+      "uc-engage-next": "d74ec15056b3"
+    },
+    "prev_hash": "c5b872ce65f1"
+  },
+  {
+    "check": "suspect-bless",
+    "action": "bless",
+    "actor": "human",
+    "ts": "2026-06-29T20:13:59.797638",
+    "hash": "37cbe8909027",
+    "statement_hash": "23c9f3254623",
+    "deps": {
+      "uc-engage-next": "d74ec15056b3"
+    },
+    "prev_hash": "e6277c65b4ad"
+  },
+  {
+    "check": "versioning",
+    "action": "bless",
+    "actor": "human",
+    "ts": "2026-06-29T20:13:59.798631",
+    "hash": "64b29bd8668f",
+    "statement_hash": "318982aa3999",
+    "deps": {
+      "uc-engage-start": "1c8e268423c4"
+    },
+    "prev_hash": "c1b501844aa3"
+  },
+  {
+    "check": "notes-pipeline",
+    "action": "bless",
+    "actor": "human",
+    "ts": "2026-06-29T20:13:59.800631",
+    "hash": "fdfde5fa0406",
+    "statement_hash": "481e4af0b33a",
+    "deps": {
+      "uc-note-capture": "6b5f2988c035"
+    },
+    "prev_hash": "f63b9b4f56fe"
+  },
+  {
+    "check": "planning",
+    "action": "bless",
+    "actor": "human",
+    "ts": "2026-06-29T20:13:59.801631",
+    "hash": "26ed423181d6",
+    "statement_hash": "4c25e81dd34b",
+    "deps": {
+      "uc-engage-start": "1c8e268423c4"
+    },
+    "prev_hash": "74c3d511cb30"
+  },
+  {
+    "check": "fill-adjudicate",
+    "action": "bless",
+    "actor": "human",
+    "ts": "2026-06-29T20:13:59.803631",
+    "hash": "e7fc915801ef",
+    "statement_hash": "85a2f4965d1b",
+    "deps": {
+      "uc-engage-next": "d74ec15056b3"
+    },
+    "prev_hash": "d08a1b6ad55e"
+  },
+  {
+    "check": "guidance",
+    "action": "bless",
+    "actor": "human",
+    "ts": "2026-06-29T20:13:59.804631",
+    "hash": "9c27c8304eb8",
+    "statement_hash": "2e3a9c2945af",
+    "deps": {
+      "uc-engage-start": "1c8e268423c4"
+    },
+    "prev_hash": "624d7a80a665"
+  },
+  {
+    "check": "report-docs",
+    "action": "bless",
+    "actor": "human",
+    "ts": "2026-06-29T20:13:59.807132",
+    "hash": "d659d6d1f88c",
+    "statement_hash": "d8270660545d",
+    "deps": {
+      "report-impl": "accc1a7f7550"
+    },
+    "prev_hash": "4e5745d1ac9e"
+  },
+  {
+    "check": "report-frame",
+    "action": "bless",
+    "actor": "human",
+    "ts": "2026-06-29T20:13:59.809131",
+    "hash": "75527783aed8",
+    "statement_hash": "8fb5a9b5f230",
+    "deps": {},
+    "prev_hash": "486f9ab0c4e0"
+  },
+  {
+    "check": "report-requirements",
+    "action": "bless",
+    "actor": "human",
+    "ts": "2026-06-29T20:13:59.810132",
+    "hash": "dc4062fad2b4",
+    "statement_hash": "f6dfeb988201",
+    "deps": {
+      "report-frame": "75527783aed8",
+      "uc-review-report": "e85c84abd49e"
+    },
+    "prev_hash": "1b29a89735b0"
+  },
+  {
+    "check": "req-split",
+    "action": "bless",
+    "actor": "human",
+    "ts": "2026-06-29T20:13:59.812131",
+    "hash": "fc81eb22b4b0",
+    "statement_hash": "2abfb486d841",
+    "deps": {
+      "uc-review-report": "e85c84abd49e"
+    },
+    "prev_hash": "e78fa1f7cc52"
+  },
+  {
+    "check": "arch-candidates",
+    "action": "bless",
+    "actor": "human",
+    "ts": "2026-06-29T20:13:59.813139",
+    "hash": "f8bcd14eb28b",
+    "statement_hash": "79f84984f09f",
+    "deps": {
+      "req-split": "fc81eb22b4b0",
+      "req-coverage": "b53ca1e517a1",
+      "req-version-mgmt": "6adc3bf688b4",
+      "req-metrics": "df19ef9e9bec",
+      "req-tooling": "d7d4fac31b56",
+      "req-review": "861dbeb42ef0"
+    },
+    "prev_hash": "b29a473454d6"
+  },
+  {
+    "check": "arch-adr",
+    "action": "bless",
+    "actor": "human",
+    "ts": "2026-06-29T20:13:59.815132",
+    "hash": "8aba9799f299",
+    "statement_hash": "dc06954157ef",
+    "deps": {
+      "arch-candidates": "f8bcd14eb28b",
+      "req-split": "fc81eb22b4b0"
+    },
+    "prev_hash": "8ba8d4774b66"
+  },
+  {
+    "check": "m1-problem-agreed",
+    "action": "bless",
+    "actor": "human",
+    "ts": "2026-06-29T21:08:37.166111",
+    "hash": "5572c50a14b0",
+    "statement_hash": "1336306aabdf",
+    "deps": {},
+    "prev_hash": null
+  },
+  {
+    "check": "m1-success-measurable",
+    "action": "bless",
+    "actor": "human",
+    "ts": "2026-06-29T21:08:37.168105",
+    "hash": "8db4f4ef2303",
+    "statement_hash": "2405a5c3633d",
+    "deps": {},
+    "prev_hash": null
+  },
+  {
+    "check": "m1-top-risks-logged",
+    "action": "bless",
+    "actor": "human",
+    "ts": "2026-06-29T21:08:37.169104",
+    "hash": "d4cef320eb32",
+    "statement_hash": "dcdd8514ad62",
+    "deps": {},
+    "prev_hash": null
+  },
+  {
+    "check": "m1-vision-scope-stated",
+    "action": "bless",
+    "actor": "human",
+    "ts": "2026-06-29T21:08:37.171611",
+    "hash": "036c250240e3",
+    "statement_hash": "3bc858f88498",
+    "deps": {},
+    "prev_hash": null
+  },
+  {
+    "check": "m2-inputs-captured",
+    "action": "bless",
+    "actor": "human",
+    "ts": "2026-06-29T21:08:37.172610",
+    "hash": "89f3e8c48ab7",
+    "statement_hash": "9568e870d984",
+    "deps": {},
+    "prev_hash": null
+  },
+  {
+    "check": "m2-stakeholder-coverage",
+    "action": "bless",
+    "actor": "human",
+    "ts": "2026-06-29T21:08:37.174612",
+    "hash": "e241992e7a67",
+    "statement_hash": "8ea6a3614784",
+    "deps": {},
+    "prev_hash": null
+  },
+  {
+    "check": "m3-alternatives-elaborated",
+    "action": "bless",
+    "actor": "human",
+    "ts": "2026-06-29T21:08:37.176611",
+    "hash": "fb3d68f6aa84",
+    "statement_hash": "bd2837c40b1a",
+    "deps": {},
+    "prev_hash": null
+  },
+  {
+    "check": "m3-criteria-weighted",
+    "action": "bless",
+    "actor": "human",
+    "ts": "2026-06-29T21:08:37.178613",
+    "hash": "9238fa91a677",
+    "statement_hash": "69cd3d0f36b4",
+    "deps": {},
+    "prev_hash": null
+  },
+  {
+    "check": "m3-feasibility-checked",
+    "action": "bless",
+    "actor": "human",
+    "ts": "2026-06-29T21:08:37.179611",
+    "hash": "e133bf0d57d3",
+    "statement_hash": "9712ecad0fbe",
+    "deps": {},
+    "prev_hash": null
+  },
+  {
+    "check": "m4-architecture-stated",
+    "action": "bless",
+    "actor": "human",
+    "ts": "2026-06-29T21:08:37.181116",
+    "hash": "05cb91a43c90",
+    "statement_hash": "38d16168e86d",
+    "deps": {},
+    "prev_hash": null
+  },
+  {
+    "check": "m4-choice-traced",
+    "action": "bless",
+    "actor": "human",
+    "ts": "2026-06-29T21:08:37.183118",
+    "hash": "e52c7b041fb7",
+    "statement_hash": "aba6fe7448c7",
+    "deps": {},
+    "prev_hash": null
+  },
+  {
+    "check": "m5-design-buildable",
+    "action": "bless",
+    "actor": "human",
+    "ts": "2026-06-29T21:08:37.185118",
+    "hash": "a85040870497",
+    "statement_hash": "b370fdefc0a8",
+    "deps": {},
+    "prev_hash": null
+  },
+  {
+    "check": "m5-riskiest-validated",
+    "action": "bless",
+    "actor": "human",
+    "ts": "2026-06-29T21:08:37.186118",
+    "hash": "e276ca16ebcc",
+    "statement_hash": "ab983157e012",
+    "deps": {},
+    "prev_hash": null
+  },
+  {
+    "check": "m5-spike-recorded",
+    "action": "bless",
+    "actor": "human",
+    "ts": "2026-06-29T21:08:37.188126",
+    "hash": "101ad5f83a28",
+    "statement_hash": "47fa52f9e763",
+    "deps": {},
+    "prev_hash": null
+  },
+  {
+    "check": "m6-impl-risks-acceptable",
+    "action": "bless",
+    "actor": "human",
+    "ts": "2026-06-29T21:08:37.190117",
+    "hash": "d1514ee4d0b2",
+    "statement_hash": "cc483eda207b",
+    "deps": {},
+    "prev_hash": null
+  },
+  {
+    "check": "m6-internal-quality-ok",
+    "action": "bless",
+    "actor": "human",
+    "ts": "2026-06-29T21:08:37.191626",
+    "hash": "1da82c0fd034",
+    "statement_hash": "20dcc841d190",
+    "deps": {},
+    "prev_hash": null
+  },
+  {
+    "check": "m7-acceptance-obtained",
+    "action": "bless",
+    "actor": "human",
+    "ts": "2026-06-29T21:08:37.193626",
+    "hash": "992698f32b59",
+    "statement_hash": "673c2b0de0a2",
+    "deps": {},
+    "prev_hash": null
+  },
+  {
+    "check": "m7-meets-need",
+    "action": "bless",
+    "actor": "human",
+    "ts": "2026-06-29T21:08:37.194627",
+    "hash": "ed83b1246627",
+    "statement_hash": "1f369881fd5f",
+    "deps": {},
+    "prev_hash": null
+  },
+  {
+    "check": "m7-validation-gaps",
+    "action": "bless",
+    "actor": "human",
+    "ts": "2026-06-29T21:08:37.196626",
+    "hash": "977a570f658a",
+    "statement_hash": "6d33b85cf264",
+    "deps": {},
+    "prev_hash": null
+  },
+  {
+    "check": "m8-config-baselined",
+    "action": "bless",
+    "actor": "human",
+    "ts": "2026-06-29T21:08:37.198628",
+    "hash": "8307a25a0073",
+    "statement_hash": "6b214ebeb8a5",
+    "deps": {},
+    "prev_hash": null
+  },
+  {
+    "check": "m8-docs-complete",
+    "action": "bless",
+    "actor": "human",
+    "ts": "2026-06-29T21:08:37.199626",
+    "hash": "16061c249b5f",
+    "statement_hash": "b93d15f54da5",
+    "deps": {},
+    "prev_hash": null
+  },
+  {
+    "check": "m8-handover-accepted",
+    "action": "bless",
+    "actor": "human",
+    "ts": "2026-06-29T21:08:37.201132",
+    "hash": "f737f31e8833",
+    "statement_hash": "9e1ed23169fe",
+    "deps": {},
+    "prev_hash": null
+  },
+  {
+    "check": "m8-packaged-versioned",
+    "action": "bless",
+    "actor": "human",
+    "ts": "2026-06-29T21:08:37.203137",
+    "hash": "baeb02d5fd27",
+    "statement_hash": "a73f7ea67964",
+    "deps": {},
+    "prev_hash": null
+  },
+  {
+    "check": "m1-gate",
+    "action": "bless",
+    "actor": "human",
+    "ts": "2026-06-29T21:08:37.205141",
+    "hash": "249b8f7fbae6",
+    "statement_hash": "325bdbfa06fb",
+    "deps": {
+      "m1-vision-scope-stated": "036c250240e3",
+      "m1-problem-agreed": "5572c50a14b0",
+      "m1-success-measurable": "8db4f4ef2303",
+      "m1-top-risks-logged": "d4cef320eb32"
+    },
+    "prev_hash": null
+  },
+  {
+    "check": "m2-gate",
+    "action": "bless",
+    "actor": "human",
+    "ts": "2026-06-29T21:08:37.206144",
+    "hash": "d08bad3e6290",
+    "statement_hash": "dee47589fa11",
+    "deps": {
+      "m2-inputs-captured": "89f3e8c48ab7",
+      "m2-stakeholder-coverage": "e241992e7a67",
+      "m2-requirements-traced": "0ec09b5ea36b",
+      "m2-requirements-verifiable": "3c43adb6ed42"
+    },
+    "prev_hash": null
+  },
+  {
+    "check": "m3-gate",
+    "action": "bless",
+    "actor": "human",
+    "ts": "2026-06-29T21:08:37.208142",
+    "hash": "3bc5c9dc7955",
+    "statement_hash": "dfc01a914cb8",
+    "deps": {
+      "m3-alternatives-elaborated": "fb3d68f6aa84",
+      "m3-criteria-weighted": "9238fa91a677",
+      "m3-feasibility-checked": "e133bf0d57d3"
+    },
+    "prev_hash": null
+  },
+  {
+    "check": "m4-gate",
+    "action": "bless",
+    "actor": "human",
+    "ts": "2026-06-29T21:08:37.210645",
+    "hash": "8b53c85b0eb5",
+    "statement_hash": "d63783627cc1",
+    "deps": {
+      "m4-architecture-stated": "05cb91a43c90",
+      "m4-choice-traced": "e52c7b041fb7",
+      "m4-adr-recorded": "50a5edf4707b"
+    },
+    "prev_hash": null
+  },
+  {
+    "check": "m5-gate",
+    "action": "bless",
+    "actor": "human",
+    "ts": "2026-06-29T21:08:37.212648",
+    "hash": "12befc518087",
+    "statement_hash": "e377f661c614",
+    "deps": {
+      "m5-riskiest-validated": "e276ca16ebcc",
+      "m5-design-buildable": "a85040870497",
+      "m5-spike-recorded": "101ad5f83a28"
+    },
+    "prev_hash": null
+  },
+  {
+    "check": "m6-gate",
+    "action": "bless",
+    "actor": "human",
+    "ts": "2026-06-29T21:08:37.213648",
+    "hash": "e58149781fe9",
+    "statement_hash": "8f483692a1b8",
+    "deps": {
+      "m6-detailed-design-complete": "da93b811a57c",
+      "m6-internal-quality-ok": "1da82c0fd034",
+      "m6-verification-green": "6b31800de0d5",
+      "m6-impl-risks-acceptable": "d1514ee4d0b2"
+    },
+    "prev_hash": null
+  },
+  {
+    "check": "m7-gate",
+    "action": "bless",
+    "actor": "human",
+    "ts": "2026-06-29T21:08:37.215650",
+    "hash": "8a15c2b14e17",
+    "statement_hash": "b723e8dfabbd",
+    "deps": {
+      "m7-meets-need": "ed83b1246627",
+      "m7-acceptance-obtained": "992698f32b59",
+      "m7-validation-gaps": "977a570f658a"
+    },
+    "prev_hash": null
+  },
+  {
+    "check": "m8-gate",
+    "action": "bless",
+    "actor": "human",
+    "ts": "2026-06-29T21:08:37.217649",
+    "hash": "2fe298d58dd9",
+    "statement_hash": "9f00325abff0",
+    "deps": {
+      "m8-docs-complete": "16061c249b5f",
+      "m8-packaged-versioned": "baeb02d5fd27",
+      "m8-config-baselined": "8307a25a0073",
+      "m8-handover-accepted": "f737f31e8833"
+    },
+    "prev_hash": null
   }
-}
+]
