@@ -7,6 +7,8 @@
 .quack/logs/
 # personal working notes — kept locally, never published
 .quack/notes/
+# any captured note, wherever it lands — never published
+NOTE-*
 __pycache__/
 *.pyc
 
