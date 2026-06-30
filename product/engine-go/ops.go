@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"regexp"
 	"sort"
@@ -190,7 +191,7 @@ func cmdNext(args []string) {
 		fmt.Println("  verify:", n.Verify)
 		fmt.Println("  -> fill it; executed -> passes on re-run")
 	} else {
-		fmt.Println("  -> fill it; gate -> ask the human to `quack bless " + n.ID + "`")
+		fmt.Println("  -> fill it; gate -> ask the human to `" + brand() + " bless " + n.ID + "`")
 	}
 }
 
@@ -218,6 +219,10 @@ func setConfigVersion(vid string) {
 }
 
 func cmdStart(args []string) {
+	if len(args) > 0 && args[0] == "init" {
+		cmdStartInit(args[1:])
+		return
+	}
 	plan := false
 	var rest []string
 	for _, a := range args {
@@ -228,7 +233,7 @@ func cmdStart(args []string) {
 		}
 	}
 	if len(rest) == 0 {
-		fmt.Println("usage: quack start <id> [--plan] [motivation...]")
+		fmt.Println("usage: " + brand() + " start <id> [--plan] [motivation...]")
 		return
 	}
 	vid := rest[0]
@@ -274,7 +279,7 @@ func cmdNote(args []string) {
 		}
 	}
 	if text == "" {
-		fmt.Println("usage: quack note \"...\" [--origin X]")
+		fmt.Println("usage: " + brand() + " note \"...\" [--origin X]")
 		return
 	}
 	ts := time.Now().Format("20060102-150405")
@@ -304,18 +309,25 @@ func cmdGather(args []string) {
 		ver = args[0]
 	}
 	var chains []string
+	addFromLayers := func(rel string) { // route through the overlay chain (vehicle overlay -> engine defaults)
+		for _, layer := range overlayLayers() {
+			d := filepath.Join(layer, filepath.FromSlash(rel))
+			if st, err := os.Stat(d); err == nil && st.IsDir() {
+				chains = append(chains, d)
+			}
+		}
+	}
 	ladder := []string{"vibe", "lean", "systematic"}
-	for i, r := range ladder {
-		chains = append(chains, filepath.Join(EngineDir(), "method", "rigor", r))
+	for _, r := range ladder {
+		addFromLayers("method/rigor/" + r)
 		if r == cfg.Rigor {
-			_ = i
 			break
 		}
 	}
-	cur := filepath.Join(EngineDir(), "project_types")
+	cur := "project_types"
 	for _, part := range strings.Split(cfg.Type, "/") {
-		cur = filepath.Join(cur, part)
-		chains = append(chains, cur)
+		cur = cur + "/" + part
+		addFromLayers(cur)
 	}
 	out := []string{"# Source bundle for iteration " + ver,
 		"_type=" + cfg.Type + " | rigor=" + cfg.Rigor + " - compose the checklist from ALL of this._", ""}
@@ -352,7 +364,7 @@ func cmdShip(args []string) {
 	cfg := ReadConfig(filepath.Join(QUACK, "config.toml"))
 	dest := filepath.Join(QUACK, "out")
 	os.MkdirAll(dest, 0o755)
-	zp := filepath.Join(dest, "quackitect-"+cfg.Version+".zip")
+	zp := filepath.Join(dest, brand()+"-"+cfg.Version+".zip")
 	f, err := os.Create(zp)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "ship error:", err)
@@ -378,6 +390,176 @@ func cmdShip(args []string) {
 }
 
 // enddesign
+
+// design: go-build  implements: req-quack-build
+// quack build compiles the engine from its source (EngineSrc: vendored, else dogfood) to
+// .quack/engine/<brand>.exe AND re-baselines the determinism golden in one step — closing the
+// stale-golden footgun where a hand-run build forgot to re-baseline and produced false milestone FAILs.
+func cmdBuild(args []string) {
+	src := EngineSrc()
+	out := filepath.Join(QUACK, "engine", brand()+".exe")
+	os.MkdirAll(filepath.Dir(out), 0o755)
+	cmd := exec.Command("go", "build", "-o", out, ".")
+	cmd.Dir = src
+	cmd.Stdout, cmd.Stderr = os.Stdout, os.Stderr
+	if err := cmd.Run(); err != nil {
+		fmt.Fprintln(os.Stderr, "build error:", err, "(need the Go toolchain — see dependencies.md)")
+		os.Exit(1)
+	}
+	root := MerkleRoot(LoadAll())
+	gp := filepath.Join(QUACK, "engine", "golden-root.txt")
+	os.WriteFile(gp, []byte(root+"\n"), 0o644)
+	rel, _ := filepath.Rel(ROOT, out)
+	fmt.Println("built ->", filepath.ToSlash(rel), "| golden re-baselined to", root[:12])
+}
+
+// enddesign
+
+// design: go-start-init  implements: req-integrate, req-vehicle-scaffold, req-claude-vendor
+// `quack start init <target>` is run FROM a quackitect checkout and sets up a NEW vehicle at <target>:
+// it vendors the engine (this repo's product/ -> the vehicle's .quack/vendor/, mirroring the layout, so
+// EngineDir/EngineSrc resolve it), writes the config + launcher + an AGENTS pointer, and lays down the
+// vehicle's own empty product/ + spec/. It deliberately does NOT mint an iteration or write any spec —
+// the human drives that. Only meaningful from a quackitect checkout (where product/quackitect exists).
+func cmdStartInit(args []string) {
+	src := filepath.Join(ROOT, "product")
+	if st, err := os.Stat(filepath.Join(src, "quackitect", "method")); err != nil || !st.IsDir() {
+		fmt.Println("start init must be run from a quackitect checkout (no product/quackitect here).")
+		return
+	}
+	if len(args) == 0 || strings.TrimSpace(args[0]) == "" {
+		fmt.Println("usage: " + brand() + " start init <target-dir>")
+		fmt.Println("  where <target-dir> is the path of the new vehicle to create. Provide a path.")
+		return
+	}
+	target := args[0]
+	if abs, err := filepath.Abs(target); err == nil {
+		target = abs
+	}
+	if _, err := os.Stat(filepath.Join(target, ".quack", "vendor")); err == nil {
+		fmt.Println("refusing: " + target + " already has .quack/vendor (already a vehicle).")
+		return
+	}
+
+	// 1. vendor the engine: product/ -> <target>/.quack/vendor/ (engine-go + quackitect resources).
+	vendor := filepath.Join(target, ".quack", "vendor")
+	if err := copyTree(src, vendor); err != nil {
+		fmt.Println("vendor error:", err)
+		return
+	}
+	// the vehicle is branded after its directory name — its launcher and binary take that name, so
+	// nothing user-facing says "quack". The engine self-identifies from the invoked name (see brand()).
+	proj := filepath.Base(target)
+	exe := proj + ".exe" // the vendored binary's name in this vehicle
+
+	// 2. best-effort: copy the already-built binary, named after the project, so it runs immediately.
+	binDir := filepath.Join(target, ".quack", "engine")
+	os.MkdirAll(binDir, 0o755)
+	if raw, err := os.ReadFile(filepath.Join(QUACK, "engine", "quack.exe")); err == nil {
+		os.WriteFile(filepath.Join(binDir, exe), raw, 0o755)
+	}
+	// 3. config, launcher (project-named), AGENTS, the vehicle's own EMPTY product/ + spec/, gitignore.
+	os.MkdirAll(filepath.Join(target, "product"), 0o755)
+	os.MkdirAll(filepath.Join(target, "spec"), 0o755)
+	// seed the vehicle's brand from the engine's generic design-language templates (placeholders +
+	// generic voice/palette). The vehicle replaces these by name; the design-language spec stays in the engine.
+	bsrc := filepath.Join(src, "quackitect", "design")
+	bdst := filepath.Join(target, "product", "brand")
+	os.MkdirAll(bdst, 0o755)
+	filepath.Walk(bsrc, func(p string, fi os.FileInfo, err error) error {
+		if err != nil || fi.IsDir() || filepath.Base(p) == "design-language.md" {
+			return nil
+		}
+		if raw, e := os.ReadFile(p); e == nil {
+			writeIfAbsent(filepath.Join(bdst, filepath.Base(p)), string(raw))
+		}
+		return nil
+	})
+	os.MkdirAll(filepath.Join(target, ".quack", "overlay"), 0o755)
+	writeIfAbsent(filepath.Join(target, ".quack", "config.toml"),
+		"# iteration breadcrumb — type/rigor/version for this project\n[iteration]\ntype    = \"default\"\nrigor   = \"systematic\"\nversion = \"\"\n")
+	writeIfAbsent(filepath.Join(target, proj+".cmd"),
+		"@echo off\r\nrem "+proj+" launcher: forwards to the vendored engine binary.\r\nrem Rebuild if missing: cd .quack\\vendor\\engine-go ^&^& go build -o ..\\..\\engine\\"+exe+" .\r\n\"%~dp0.quack\\engine\\"+exe+"\" %*\r\n")
+	writeIfAbsent(filepath.Join(target, "AGENTS.md"),
+		"# AGENTS.md — "+proj+"\n"+
+			proj+" is built with a vendored engine (under .quack/). Drive it with `.\\"+proj+" <cmd>`\n"+
+			"(status | next | start | bless | gather | report | lint | ship | selftest).\n"+
+			"To author the spec, load the method prompts under `.quack/vendor/quackitect/method/prompts/`\n"+
+			"(start with integrate.md, then engage.md). `product/` and `spec/` are "+proj+"'s own — your tool.\n"+
+			"The human adjudicates gates; never bless on their behalf.\n")
+	writeIfAbsent(filepath.Join(target, ".gitignore"),
+		"# built binary + caches — rebuildable, not the source of truth\n.quack/engine/\n.quack/evidence/\n.quack/out/\n.quack/gather/\n.quack/state.json\n.quack/index*\n.quack/vendor/engine-go/.gotmp/\n.quack/vendor/engine-go/*.exe\n# commit .quack/vendor/ — it IS this project's engine.\n")
+
+	// 4. vendor the .claude slash commands (/engage, /note, /review) so the agent drives the vehicle
+	//    the same way. Rewrite the dogfood method path to the vendored one so the pointers resolve.
+	claudeSrc := filepath.Join(ROOT, ".claude")
+	rewrite := rewriteVendorPath
+	if cmds := filepath.Join(claudeSrc, "commands"); dirExists(cmds) {
+		filepath.Walk(cmds, func(p string, fi os.FileInfo, err error) error {
+			if err != nil || fi.IsDir() || !strings.HasSuffix(p, ".md") {
+				return nil
+			}
+			if raw, e := os.ReadFile(p); e == nil {
+				rel, _ := filepath.Rel(claudeSrc, p)
+				writeIfAbsent(filepath.Join(target, ".claude", rel), rewrite(string(raw)))
+			}
+			return nil
+		})
+		if raw, err := os.ReadFile(filepath.Join(claudeSrc, "settings.json")); err == nil {
+			writeIfAbsent(filepath.Join(target, ".claude", "settings.json"), rewrite(string(raw)))
+		}
+	}
+
+	fmt.Println(proj + " scaffolded -> " + target)
+	fmt.Println("  vendored the engine -> .quack/vendor/ ; .claude/ commands ; wrote config.toml, " + proj + ".cmd, AGENTS.md, empty product/ + spec/.")
+	fmt.Println("  next: cd into it, rebuild (cd .quack/vendor/engine-go && go build -o ../../engine/" + exe + " .),")
+	fmt.Println("        set [iteration].version, then `." + string(filepath.Separator) + proj + " start <version>` and compose your spec.")
+}
+
+// copyTree recursively copies src -> dst, skipping build junk (caches, binaries, __pycache__).
+func copyTree(src, dst string) error {
+	return filepath.Walk(src, func(p string, fi os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+		rel, _ := filepath.Rel(src, p)
+		base := filepath.Base(p)
+		if fi.IsDir() {
+			if base == ".gotmp" || base == "__pycache__" {
+				return filepath.SkipDir
+			}
+			return os.MkdirAll(filepath.Join(dst, rel), 0o755)
+		}
+		if strings.HasSuffix(base, ".exe") || strings.HasSuffix(base, ".pyc") {
+			return nil
+		}
+		raw, e := os.ReadFile(p)
+		if e != nil {
+			return e
+		}
+		return os.WriteFile(filepath.Join(dst, rel), raw, 0o644)
+	})
+}
+
+// rewriteVendorPath rewrites a dogfood method path to the vendored one (used vendoring .claude commands).
+func rewriteVendorPath(s string) string {
+	return strings.ReplaceAll(s, "product/quackitect/", ".quack/vendor/quackitect/")
+}
+
+// dirExists reports whether path is an existing directory.
+func dirExists(path string) bool {
+	st, err := os.Stat(path)
+	return err == nil && st.IsDir()
+}
+
+// writeIfAbsent writes content only if the file does not already exist (idempotent scaffolding).
+func writeIfAbsent(path, content string) {
+	if _, err := os.Stat(path); err == nil {
+		return
+	}
+	os.MkdirAll(filepath.Dir(path), 0o755)
+	os.WriteFile(path, []byte(content), 0o644)
+}
 
 // design: go-metrics  implements: req-metrics
 // Health metrics from the append-only attest log: rework, reversal, self-cert. Gates only.
@@ -425,7 +607,7 @@ func metricsReport() map[string][2]int {
 
 func cmdVerify(args []string) {
 	if len(args) == 0 {
-		fmt.Println("usage: quack verify <id>")
+		fmt.Println("usage: " + brand() + " verify <id>")
 		return
 	}
 	nodes := LoadAll()

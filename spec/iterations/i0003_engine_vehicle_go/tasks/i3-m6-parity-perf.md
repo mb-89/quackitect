@@ -2,6 +2,7 @@
 id: i3-m6-parity-perf
 statement: Golden parity suite over the real spec and rendered report plus a perf harness; writes the evidence markers and the built binary, turning the executed tests green.
 milestone: M6
+parent: i3-m6-build
 class: review
 killer: false
 depends_on: [i3-m6-deps-prompt]

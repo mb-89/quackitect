@@ -12,9 +12,30 @@ import (
 )
 
 // Roots, discovered by walking up to a .quack or pyproject.toml (mirrors engine.find_root).
-var ROOT, SPEC, QUACK, ATTEST, NOTES string
+var ROOT, SPEC, QUACK, ATTEST, NOTES, ENGINE string
+
+// design: go-workspace-base  implements: req-workspace-split
+// The engine operates on a selectable WORKSPACE, separate from the ENGINE install. ROOT (and all state
+// — SPEC/QUACK/ATTEST/NOTES) is the cwd walk-up by default, or an explicit --base/-C target, so one
+// engine drives its own or ANOTHER project's workspace (sebot base-style; like git -C). ENGINE (the
+// binary + vendored resources) resolves from the executable's own location, independent of the
+// workspace. In self mode the two roots coincide and behaviour is unchanged.
+func baseFromArgs() string {
+	for i := 1; i < len(os.Args)-1; i++ {
+		if os.Args[i] == "--base" || os.Args[i] == "-C" {
+			return os.Args[i+1]
+		}
+	}
+	return ""
+}
 
 func findRoot() string {
+	if b := baseFromArgs(); b != "" { // drive a different project's workspace
+		if abs, err := filepath.Abs(b); err == nil {
+			return abs
+		}
+		return b
+	}
 	d, _ := os.Getwd()
 	for {
 		if st, err := os.Stat(filepath.Join(d, ".quack")); err == nil && st.IsDir() {
@@ -32,12 +53,30 @@ func findRoot() string {
 	}
 }
 
+// engineRoot resolves the engine install (the dir holding .quack/engine/<binary> + vendored resources)
+// from the executable path, independent of the workspace. Falls back to ROOT (self / dogfood).
+func engineRoot() string {
+	if exe, err := os.Executable(); err == nil {
+		d := filepath.Dir(exe)
+		for i := 0; i < 4 && d != filepath.Dir(d); i++ {
+			if filepath.Base(d) == ".quack" {
+				return filepath.Dir(d)
+			}
+			d = filepath.Dir(d)
+		}
+	}
+	return ROOT
+}
+
+// enddesign
+
 func init() {
 	ROOT = findRoot()
 	SPEC = filepath.Join(ROOT, "spec")
 	QUACK = filepath.Join(ROOT, ".quack")
 	ATTEST = filepath.Join(QUACK, "attest.json")
 	NOTES = filepath.Join(QUACK, "notes")
+	ENGINE = engineRoot()
 }
 
 // design: go-engine-core  implements: req-behavior-parity, req-split, req-review
@@ -77,9 +116,29 @@ func fullHash(id string, nodes map[string]Node, memo map[string]string) string {
 		parts = append(parts, fullHash(d, nodes, memo))
 	}
 	seed := norm(n.Statement) + "|" + n.Verify + "|" + strings.Join(parts, ",") + "|" + h12(n.RegionBody)
+	if n.Validates == "needs" {
+		// global validation, made structural: fold the digest of EVERY need into this gate's identity,
+		// so adding/changing/removing any need (in any iteration) reopens it (SUSPECT). Fixes the gap
+		// where "validated against all needs" was prose, not a wired input. The verification analogue
+		// (coverage:tests-pass) is already live-computed; this gives validation the same reach.
+		seed += "|needs:" + needsDigest(nodes)
+	}
 	hh := h12(seed)
 	memo[id] = hh
 	return hh
+}
+
+// needsDigest is a stable fingerprint of the whole need-set: sorted "id:stmtHash" of every need node.
+// Independent of the node it is folded into (needs are roots), so no recursion.
+func needsDigest(nodes map[string]Node) string {
+	parts := []string{}
+	for id, n := range nodes {
+		if n.Type == "need" {
+			parts = append(parts, id+":"+stmtHash(n))
+		}
+	}
+	sort.Strings(parts)
+	return h12(strings.Join(parts, ";"))
 }
 
 // LoadAll walks spec/**/*.md plus the in-code design markers under product/.
@@ -103,10 +162,16 @@ func LoadAll() map[string]Node {
 
 var designRe = regexp.MustCompile(`design:\s*(\S+)\s+implements:\s*([^>]+)`)
 
-// scanCodeDesigns finds '# design: id implements: reqs' (or // for Go) ... enddesign regions in product/.
+// scanCodeDesigns finds '# design: id implements: reqs' (or // for Go) ... enddesign regions in the
+// vehicle's own product/ (its tool). Engine-internal markers live under the engine layer; scan those
+// with scanDesignsUnder(EngineDir()/...) when needed (e.g. the method self-test).
 func scanCodeDesigns() map[string]Node {
+	return scanDesignsUnder(filepath.Join(ROOT, "product"))
+}
+
+// scanDesignsUnder walks one base dir for design/enddesign regions and returns them keyed by id.
+func scanDesignsUnder(base string) map[string]Node {
 	out := map[string]Node{}
-	base := filepath.Join(ROOT, "product")
 	filepath.Walk(base, func(path string, fi os.FileInfo, err error) error {
 		if err != nil || fi.IsDir() {
 			return nil
@@ -168,11 +233,20 @@ func scanCodeDesigns() map[string]Node {
 
 var traceContent = map[string]bool{"need": true, "usecase": true, "requirement": true, "design": true, "adr": true, "test": true}
 
+// design: go-no-trace-gate  implements: req-no-trace-gate
+// Trace-typed nodes (need/usecase/requirement/design/test/adr) are content, never task gates —
+// isGate excludes them; selftest:no-trace-gate guards the invariant so it cannot regress.
+// enddesign
 func isGate(n Node) bool {
+	// Trace work-products are content, never task-tree gates — even tests, which are executed but
+	// belong to the trace (they verify requirements). The verification gate rolls the tests up.
+	if traceContent[n.Type] {
+		return false
+	}
 	if n.Class == "executed" {
 		return true
 	}
-	return !traceContent[n.Type]
+	return true
 }
 
 func iterOf(path string) string {
@@ -294,7 +368,55 @@ func StatusMap(nodes map[string]Node) map[string]string {
 	for id := range nodes {
 		resolve(id, map[string]bool{})
 	}
+	persistSnapshot(eff)
 	return eff
 }
 
 // enddesign
+
+// --- status snapshot: the report is a display, it does not re-run checks ---
+// StatusMap persists its effective map here; RenderReport shows this snapshot and only
+// recomputes when an input (spec, product design regions, attest ledger) is newer than it.
+// This keeps the report stable (no perf/parity flicker), fast, and free of render-time runs.
+
+func snapPath() string { return filepath.Join(QUACK, "state.json") }
+
+func persistSnapshot(eff map[string]string) {
+	if out, err := json.MarshalIndent(eff, "", "  "); err == nil {
+		os.WriteFile(snapPath(), out, 0o644)
+	}
+}
+
+func loadSnapshot() map[string]string {
+	raw, err := os.ReadFile(snapPath())
+	if err != nil {
+		return nil
+	}
+	m := map[string]string{}
+	if json.Unmarshal(raw, &m) != nil {
+		return nil
+	}
+	return m
+}
+
+// snapshotFresh reports whether the snapshot is newer than every input that could change a state.
+func snapshotFresh() bool {
+	si, err := os.Stat(snapPath())
+	if err != nil {
+		return false
+	}
+	snapT := si.ModTime()
+	fresh := true
+	if ai, err := os.Stat(ATTEST); err == nil && ai.ModTime().After(snapT) {
+		fresh = false
+	}
+	for _, p := range []string{SPEC, filepath.Join(ROOT, "product")} {
+		filepath.Walk(p, func(_ string, fi os.FileInfo, e error) error {
+			if e == nil && !fi.IsDir() && fi.ModTime().After(snapT) {
+				fresh = false
+			}
+			return nil
+		})
+	}
+	return fresh
+}

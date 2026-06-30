@@ -17,4 +17,5 @@ Run it at `engage start`, or on demand. Emit improvement notes only. Adopt nothi
 
 ## report
 Render the deterministic HTML snapshot: `quack report`. With no args it renders AND opens the report. Pass `--out F` to render only, no open. The determinizer owns it. No judgment. It writes `.quack/out/report.html` by default.
+The report is a **display**: it shows the last status snapshot and never re-runs checks, so it is stable and fast and two renders of the same state are byte-identical. If you changed the spec or rebuilt the engine, run `quack status` first to refresh the snapshot.
 You MAY add a short human-facing narrative ("where we are / notable risks"). Keep it a separate, OPTIONAL layer on top. It is not part of the deterministic core. Do not let it be mistaken for it.

@@ -28,9 +28,31 @@ func hasFlag(args []string, flag string) bool {
 
 const version = "0.0.1-go"
 
-const usage = `quack — the determinizer lane (deterministic; no judgment).
-usage: quack status [id] | next | start <id> [--plan] | why <id> | bless [--all|<id>]
-       | note "..." | gather <ver> | report [--out F] | ship | lint | verify <id>`
+// design: go-brand  implements: req-white-label
+// brand is the invoked program name (argv[0] without dir or extension). A vehicle launched via its
+// own <project>.exe reads as "<project>"; the dogfood quack.exe reads as "quack". This is the
+// white-label hook — the engine never hardcodes its own name in user-facing output. Defaults to "quack".
+func brand() string { return brandOf(os.Args[0]) }
+
+// brandOf derives the brand from a program path (testable; brand() applies it to os.Args[0]).
+func brandOf(arg0 string) string {
+	b := filepath.Base(arg0)
+	b = strings.TrimSuffix(b, filepath.Ext(b))
+	if b == "" || strings.HasPrefix(b, ".") {
+		return "quack"
+	}
+	return b
+}
+
+// usageText is the command surface, branded to the invoked name.
+func usageText() string {
+	b := brand()
+	return b + ` — the determinizer lane (deterministic; no judgment).
+usage: ` + b + ` status [id] | next | start <id> [--plan] | why <id> | bless [--all|<id>]
+       | note "..." | gather <ver> | report [--out F] | ship | build | lint | verify <id>`
+}
+
+// enddesign
 
 // helpRequested reports whether any argument asks for help.
 func helpRequested(args []string) bool {
@@ -63,7 +85,7 @@ func badIDArg(cmd string, rest []string) (string, bool) {
 // structural fix for 'quack start --help' once activating a stray version named '--help'.
 func Dispatch(args []string) {
 	if len(args) == 0 || helpRequested(args) {
-		fmt.Println(usage)
+		fmt.Println(usageText())
 		return
 	}
 	cmd, rest := args[0], args[1:]
@@ -90,6 +112,8 @@ func Dispatch(args []string) {
 		cmdGather(rest)
 	case "ship":
 		cmdShip(rest)
+	case "build":
+		cmdBuild(rest)
 	case "verify":
 		cmdVerify(rest)
 	case "report":
@@ -108,7 +132,7 @@ func Dispatch(args []string) {
 		}
 	case "resolve":
 		if len(rest) == 0 {
-			fmt.Println(usage)
+			fmt.Println(usageText())
 			return
 		}
 		if p := Resolve(rest[0]); p != "" {
@@ -143,10 +167,10 @@ func Dispatch(args []string) {
 			fmt.Println(id + "\t" + fullHash(id, nodes, memo))
 		}
 	case "version", "--version":
-		fmt.Println("quack", version)
+		fmt.Println(brand(), version)
 	default:
-		fmt.Println("quack: '" + cmd + "' is not ported to the Go engine yet")
-		fmt.Println(usage)
+		fmt.Println(brand() + ": '" + cmd + "' is not ported to the Go engine yet")
+		fmt.Println(usageText())
 	}
 }
 
@@ -195,7 +219,7 @@ func cmdStatus(rest []string) {
 
 func cmdWhy(rest []string) {
 	if len(rest) == 0 {
-		fmt.Println(usage)
+		fmt.Println(usageText())
 		return
 	}
 	for _, r := range why(LoadAll(), rest[0]) {

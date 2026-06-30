@@ -2,4 +2,4 @@
 [iteration]
 type    = "default"
 rigor   = "systematic"
-version = "i0003_engine_vehicle_go"
+version = "i0004_vendoring_out"

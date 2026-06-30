@@ -38,5 +38,6 @@ Nine typed requirements, each refining a use-case (so each traces up to `need-en
 | req-unique-ids *(killer)* | uc-vendor-engine | test-unique-ids |
 | req-trace-filter | uc-review-report | test-trace-filter |
 | req-responsiveness *(NFR)* | uc-run-dep-free + uc-review-report | test-responsiveness |
+| req-integrate *(killer)* | uc-vendor-engine | test-integrate |
 
 The two derived subtasks evaluate this table live: **traced** (every requirement refines a use-case that refines a need) and **verifiable** (every requirement has a test). Both pass.

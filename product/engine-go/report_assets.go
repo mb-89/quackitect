@@ -14,7 +14,8 @@ const reportLegend = `<div class=legend>` +
 
 const reportCSS = `
 *{box-sizing:border-box} body{margin:0;font:14px/1.45 system-ui,Segoe UI,sans-serif;color:#1e1e1e;background:#fafafa}
-header{display:flex;gap:18px;align-items:baseline;padding:14px 20px;background:#fff;border-bottom:1px solid #e3e3e3;flex-wrap:wrap}
+header{display:flex;gap:13px;align-items:center;height:50px;padding:0 20px;background:#fff;border-bottom:1px solid #e3e3e3}
+.brandlogo{height:80%;display:flex;align-items:center} .brandlogo svg{height:100%;width:auto;display:block}
 .h1{font-size:20px;font-weight:600;cursor:pointer} .ver{color:#777;font-weight:400;font-size:15px}
 .meta{color:#777} .hash{font-family:ui-monospace,Consolas,monospace;color:#999;font-size:12px;margin-left:auto}
 .stamp{font-family:ui-monospace,Consolas,monospace;color:#bbb;font-size:12px}
@@ -48,6 +49,7 @@ h2{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:#999;margi
 .nolane{border-left:none;padding-left:0;margin-left:0}
 a.task{display:flex;align-items:center;gap:8px;padding:3px 6px;text-decoration:none;color:#333;border-radius:4px}
 a.task.leaf{padding-left:23px}
+.task.par>summary .rid{font-weight:600;color:#222}
 .mk{display:inline-flex;align-items:center;justify-content:center;width:15px;height:15px;font-size:12px;font-weight:700;line-height:1;flex:none}
 .mk.done{color:#2e8b2e}.mk.sus{color:#e0a400}.mk.fail{color:#d23b3b}
 .mscount.empty{color:#cbcbcb}
@@ -140,15 +142,17 @@ const reportJS = `
     var el = document.getElementById('detail');
     var verify = d.verify ? '<div class=dv><b>verify</b> <code>'+esc(d.verify)+'</code></div>' : '';
     var edges = (d.edges && d.edges.length) ? esc(d.edges.join(', ')) : '—';
+    var vlink = d.verdict_href ? ' · <a class=dlink data-vh="'+esc(d.verdict_href)+'" href="#">verdict ↗</a>' : '';
     el.innerHTML =
       '<div class=dhead><span class=did>'+esc(d.id)+'</span>'
       + (d.type ? '<span class="dchip ty-'+d.type+'">'+esc(d.type)+'</span>' : '') + '</div>'
       + '<div class=dstmt>'+esc(d.stmt)+'</div>'
       + '<div class=dmeta><b>traces</b> '+edges+'</div>'
       + verify
-      + '<a class=dlink href="#">details ↗</a>'
+      + '<a class=dlink data-h="src" href="#">details ↗</a>' + vlink
       + '<div class=dfall hidden>original source not present on this machine. details unavailable.</div>';
-    el.querySelector('.dlink').onclick = function(ev){ ev.preventDefault(); openSource(d.href, el); };
+    el.querySelector('[data-h=src]').onclick = function(ev){ ev.preventDefault(); openSource(d.href, el); };
+    var vl=el.querySelector('[data-vh]'); if(vl){ vl.onclick=function(ev){ ev.preventDefault(); openSource(vl.getAttribute('data-vh'), el); }; }
   }
   function showIterDetail(m){
     var el=document.getElementById('detail');
@@ -245,6 +249,8 @@ const reportJS = `
   for(var k=0;k<leaves.length;k++){ wireTask(leaves[k], true); }
   var par=document.querySelectorAll('details.ms > summary[data-nid]');
   for(var p2=0;p2<par.length;p2++){ wireTask(par[p2], false); }
+  var tpar=document.querySelectorAll('details.task.par > summary[data-nid]');
+  for(var p3=0;p3<tpar.length;p3++){ wireTask(tpar[p3], false); }
   var brs=document.querySelectorAll('[data-bracket]');
   for(var b2=0;b2<brs.length;b2++){ (function(bd){ bd.addEventListener('click', function(){
     showBracket(bd.getAttribute('data-bracket')); }); })(brs[b2]); }

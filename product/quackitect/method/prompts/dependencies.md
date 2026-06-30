@@ -10,7 +10,10 @@ runtime. When a tool is missing, ask the user to install it with the winget comm
 - **Go** — builds the engine binary from source. Every vehicle needs it.
   - `winget install GoLang.Go`
   - Verify: `go version`
-  - Build + run: `cd product/engine-go && go build -o ..\..\.quack\engine\quack.exe .`
+  - Build (dogfood): from `product\engine-go`, run `go build -o ..\..\.quack\engine\quack.exe .`
+  - Build (vehicle): from `.quack\vendor\engine-go`, run `go build -o ..\..\engine\quack.exe .`
+  - Build **inside** the module dir — the `go.mod` is there; `go build` from the repo root fails with "cannot find main module".
+  - Run: `.\quack <cmd>` via the `quack.cmd` launcher at the project root (or put `.quack\engine` on PATH).
 
 ## Optional
 

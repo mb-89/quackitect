@@ -17,7 +17,8 @@ import (
 // trips AV heuristics. The report inlines cytoscape + dagre + cytoscape-dagre.
 func assetJS(name string) string {
 	for _, p := range []string{
-		filepath.Join(QUACK, "engine", "assets", name),
+		filepath.Join(EngineDir(), "assets", name),               // vendored (vehicle) or dogfood
+		filepath.Join(EngineSrc(), "assets", name),               // engine-go/assets fallback
 		filepath.Join(ROOT, "product", "quackitect", "assets", name),
 		filepath.Join(ROOT, "product", "engine-go", "assets", name),
 	} {
@@ -27,6 +28,23 @@ func assetJS(name string) string {
 	}
 	return "/* " + name + " not found */"
 }
+
+// design: go-report-logo  implements: req-design-language
+// brandLogoInline inlines the resolved brand mark (overlay -> engine default placeholder) into the
+// report titlebar, left of the project name, sized by CSS to ~90% of the titlebar height.
+func brandLogoInline() string {
+	p := resolveBrand("logo-mark.svg")
+	if p == "" {
+		return ""
+	}
+	raw, err := os.ReadFile(p)
+	if err != nil {
+		return ""
+	}
+	return "<span class=brandlogo>" + string(raw) + "</span>"
+}
+
+// enddesign
 
 func esc(s string) string {
 	s = strings.ReplaceAll(s, "&", "&amp;")
@@ -302,8 +320,24 @@ func checksMap(nodes map[string]Node, sm map[string]string, outDir string) map[s
 		if n.Killer {
 			k = "1"
 		}
+		// design: go-verdict-link  implements: req-verdict-link
+		// the "verdict" link: a DONE check links to its evidence — the milestone doc where the reason it
+		// passed is written (the bless rationale). selftest:report-verdict guards the wiring.
+		// enddesign
+		// Only DONE items have a verdict; a failed/open item has no reason-it-passed, even if an old doc exists.
+		verdictHref := ""
+		if sm[id] == "DONE" && n.Milestone > 0 {
+			it := iterationOfNode(n, nodes, nil)
+			for _, pat := range []string{fmt.Sprintf("M%d-*.md", n.Milestone), filepath.Join("design", fmt.Sprintf("M%d*.md", n.Milestone))} {
+				if m, _ := filepath.Glob(filepath.Join(SPEC, "iterations", it, pat)); len(m) > 0 {
+					rel, _ := filepath.Rel(outDir, m[0])
+					verdictHref = filepath.ToSlash(rel)
+					break
+				}
+			}
+		}
 		out[id] = map[string]interface{}{"id": id, "type": n.Type, "state": sm[id], "killer": k,
-			"stmt": n.Statement, "edges": edges, "verify": n.Verify, "href": href}
+			"stmt": n.Statement, "edges": edges, "verify": n.Verify, "href": href, "verdict_href": verdictHref}
 	}
 	return out
 }
@@ -317,15 +351,87 @@ func milestoneOf(n Node) (int, bool) {
 	return 0, false
 }
 
+// design: go-trace-nesting  implements: req-trace-nesting
+// renderSubs nests subtasks: children (parent: <id>) render beneath their parent, collapsible; leaves
+// render flat. The third level (build/test parents) reflects real hierarchy; selftest:report-nesting guards it.
+// enddesign
+// renderSubs renders a milestone's subtasks as a tree: a node's children (parent: <id>)
+// nest beneath it. A parent (e.g. a generic "build" task) groups its planned steps; leaves
+// render flat. Trace nodes (tests, etc.) are content and never appear here — only gates.
 func renderSubs(ids []string, nodes map[string]Node, sm map[string]string) string {
-	sort.Strings(ids)
-	var b strings.Builder
+	set := map[string]bool{}
 	for _, id := range ids {
+		set[id] = true
+	}
+	// Topological rank within this set (longest in-set depends_on chain), so steps render in
+	// dependency order — e.g. "build planned" before "build", a step before the next.
+	rank := map[string]int{}
+	inprog := map[string]bool{}
+	var rk func(id string) int
+	rk = func(id string) int {
+		if r, ok := rank[id]; ok {
+			return r
+		}
+		if inprog[id] {
+			return 0
+		}
+		inprog[id] = true
+		m := -1
+		for _, d := range nodes[id].DependsOn {
+			if set[d] && d != id {
+				if dr := rk(d); dr > m {
+					m = dr
+				}
+			}
+		}
+		inprog[id] = false
+		rank[id] = m + 1
+		return rank[id]
+	}
+	for _, id := range ids {
+		rk(id)
+	}
+	ordered := func(xs []string) {
+		sort.Slice(xs, func(i, j int) bool {
+			if rank[xs[i]] != rank[xs[j]] {
+				return rank[xs[i]] < rank[xs[j]]
+			}
+			return xs[i] < xs[j]
+		})
+	}
+	kids := map[string][]string{}
+	var roots []string
+	for _, id := range ids {
+		if p := nodes[id].Parent; p != "" && p != id && set[p] {
+			kids[p] = append(kids[p], id)
+		} else {
+			roots = append(roots, id)
+		}
+	}
+	ordered(roots)
+	var b strings.Builder
+	var emit func(id string)
+	emit = func(id string) {
 		auto := ""
 		if strings.HasPrefix(nodes[id].Verify, "coverage:") {
 			auto = " <span class=\"auto\" title=\"derived from the trace\">auto</span>"
 		}
-		b.WriteString("<a class=\"task leaf\" href=\"#\" data-nid=\"" + esc(id) + "\">" + mark(sm[id]) + "<span class=\"rid\">" + esc(id) + "</span>" + auto + "</a>")
+		row := mark(sm[id]) + "<span class=\"rid\">" + esc(id) + "</span>" + auto
+		ks := kids[id]
+		if len(ks) > 0 {
+			ordered(ks)
+			// a parent with children is a collapsible group (open by default)
+			b.WriteString("<details class=\"task par\" open><summary data-nid=\"" + esc(id) + "\">" + row + "</summary><div class=\"kids\">")
+			for _, k := range ks {
+				emit(k)
+			}
+			b.WriteString("</div></details>")
+		} else {
+			b.WriteString("<a class=\"task leaf\" href=\"#\" data-nid=\"" + esc(id) + "\">" + row + "</a>")
+		}
+	}
+	for _, r := range roots {
+		emit(r)
 	}
 	return b.String()
 }
@@ -522,7 +628,15 @@ func RenderReport(outPath string) error {
 	}
 	outDir := filepath.Dir(outPath)
 	nodes := LoadAll()
-	sm := StatusMap(nodes)
+	// The report is a display: show the persisted status snapshot, never re-run checks here.
+	// Recompute only when an input (spec, product, attest) is newer than the snapshot.
+	var sm map[string]string
+	if snapshotFresh() {
+		sm = loadSnapshot()
+	}
+	if sm == nil {
+		sm = StatusMap(nodes)
+	}
 	root := MerkleRoot(nodes)
 	cfg := ReadConfig(filepath.Join(QUACK, "config.toml"))
 
@@ -579,8 +693,8 @@ func RenderReport(outPath string) error {
 	H.WriteString("<meta name=viewport content='width=device-width,initial-scale=1'>")
 	H.WriteString("<title>" + esc(filepath.Base(ROOT)) + " — report</title>")
 	H.WriteString("<style>" + reportCSS + "</style></head><body>")
-	H.WriteString(fmt.Sprintf("<header><div class=h1 id=ptitle title='click for project info'>%s</div><div class=hash>⛓ %s</div><div class=stamp>%s</div></header>",
-		esc(filepath.Base(ROOT)), root[:12], esc(gitStamp())))
+	H.WriteString(fmt.Sprintf("<header>%s<div class=h1 id=ptitle title='click for project info'>%s</div><div class=hash>⛓ %s</div><div class=stamp>%s</div></header>",
+		brandLogoInline(), esc(filepath.Base(ROOT)), root[:12], esc(gitStamp())))
 	H.WriteString("<main class=grid>")
 	H.WriteString("<section class=col><h2>Iterations</h2>" + iterationsPanel(nodes, sm, iters, cfg) + "</section>")
 	H.WriteString("<section class=col mid><h2>Trace graph</h2>" +

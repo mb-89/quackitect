@@ -15,6 +15,7 @@ type Node struct {
 	Killer     bool
 	Type       string
 	DependsOn  []string
+	Parent     string
 	Refines    []string
 	Implements []string
 	Verifies   []string
@@ -23,6 +24,8 @@ type Node struct {
 	RegionBody string
 	Line       int
 	Milestone  int
+	Validates  string // "needs": this gate validates the whole need-set; its hash folds the digest of
+	// all needs, so adding/changing/removing any need reopens it (global validation, structurally).
 }
 
 // Config is the iteration breadcrumb from .quack/config.toml.
@@ -63,6 +66,8 @@ func ParseNode(path string) Node {
 			n.Statement = v
 		case "depends_on":
 			n.DependsOn = splitIDs(v)
+		case "parent":
+			n.Parent = v
 		case "class":
 			n.Class = v
 		case "verify":
@@ -83,6 +88,8 @@ func ParseNode(path string) Node {
 			if v != "" {
 				n.ID = v
 			}
+		case "validates":
+			n.Validates = v
 		case "milestone":
 			m := 0
 			for _, c := range strings.TrimPrefix(v, "M") {

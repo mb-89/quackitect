@@ -52,20 +52,28 @@ stamp). The rest are human-judged (`class: review`). The trace itself is content
   - [ ] spike results recorded — design advanced as needed
 
 - **M6 — Build & verify** · *gate: implementation*
-  - method: FIRST plan the build. Decompose it into small, resumable build subtasks and seed them
-    under M6 with iteration-unique ids. A monolithic build is lost on interruption; small seeded steps
-    make progress durable. Then implement to the detailed design (arc42/C4, black/grey-box each block).
-    Build the qualities in; do not bolt them on. Every requirement has a passing `verified_by`.
-  - [ ] build planned — decomposed into small, resumable subtasks seeded under M6 *(killer)*
+  - method: FIRST plan the build. Decompose it into small, resumable steps and seed them as CHILDREN
+    of a generic **build** task (`parent: <the build task>`), in dependency order, with iteration-unique
+    ids — a monolithic build is lost on interruption; small nested steps make progress durable. If the
+    plan is a nested list, mirror it 1:1 with `parent:` at any depth (an item's parent is the item it
+    sits under). Then
+    implement to the detailed design (arc42/C4, black/grey-box each block). Build the qualities in; do
+    not bolt them on. Every requirement has a passing `verified_by`. Verification runs EVERY test
+    (all iterations, not just this one) so regressions in earlier work are caught. Tests live in the
+    trace (they verify requirements); they are not task-tree subtasks — the verification task rolls them up.
+  - [ ] build planned — decomposed into small, resumable steps seeded as children of the build task *(killer)*
+  - [ ] build — the planned steps nested beneath it are realized
   - [ ] detailed design complete — every requirement has a realized design *(derived: coverage:designs-realized)*
   - [ ] internal quality ok (review)
-  - [ ] verification green — the executed tests pass *(derived: coverage:tests-pass)*
+  - [ ] verification green — every test passes, across all iterations *(derived: coverage:tests-pass)*
   - [ ] implementation risks acceptable
 
 - **M7 — Validate & accept** · *gate: validation*
-  - method: Validate against the original need and use cases (Ch1 success criteria). Obtain
+  - method: Validate against the original need and use cases (Ch1 success criteria) AND against every
+    need across all iterations, so shipping new work cannot silently break an old need. Obtain
     stakeholder sign-off. Log gaps as RAID.
-  - [ ] meets the need — demonstrated against Ch1 success criteria *(killer)*
+  - [ ] meets the need — validated against all needs (every iteration), demonstrated by Ch1 criteria *(killer)*
+  - [ ] killer use-cases demonstrated end-to-end — each killer use case is exercised for real, not merely "tests green" (a green suite can still miss a whole capability)
   - [ ] acceptance obtained — sign-off evidence recorded
   - [ ] validation gaps captured (RAID)
 

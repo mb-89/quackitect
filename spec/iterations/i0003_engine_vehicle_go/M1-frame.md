@@ -31,6 +31,7 @@ Each criterion maps to an executed test (the acceptance contract):
 5. Every subcommand answers `-h` / `--help` / `-?` with usage and no side effects; ids starting with a dash are rejected. → `test-cli-help`
 6. A dependency-check prompt lists each build dependency with its winget path. → `test-dep-prompt`
 7. The report trace graph filters live (one box: iteration + text/regex, AND/OR) and relayouts, without changing the committed HTML. → `test-trace-filter`
+8. An external vehicle can integrate quackitect as an engine via a documented path (vendor → build → configure → overlay → run); a vehicle's `quack gather` resolves the engine's resources through the overlay chain. → `test-integrate` *(added at M7: the integration was wrongly deferred; captured backward as `req-integrate`)*
 
 ## Top risks logged — RAID  → i3-m1-top-risks-logged
 

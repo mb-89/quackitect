@@ -1,0 +1,21 @@
+<svg width="300" height="300" viewBox="0 0 300 300" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="quackitect mark (dark)">
+  <!-- dark-mode: light ink on transparent, no parchment fill. For dark backgrounds. -->
+  <circle cx="152" cy="156" r="132" fill="none" stroke="#E7D5AE" stroke-width="3.5"/>
+  <circle cx="152" cy="156" r="124" fill="none" stroke="#E7D5AE" stroke-width="1" opacity="0.35"/>
+  <g clip-path="url(#c)" stroke="#9C865E" fill="none" opacity="0.8">
+    <line x1="152" y1="50" x2="152" y2="40" stroke-width="3.4"/>
+    <circle cx="152" cy="56" r="5.5" stroke-width="2.2"/>
+    <path d="M150 60 L100 232" stroke-width="2.6" stroke-linecap="round"/>
+    <path d="M154 60 L206 230" stroke-width="2.6" stroke-linecap="round"/>
+    <path d="M137 98 A 30 30 0 0 0 167 98" stroke-width="1.5"/>
+  </g>
+  <clipPath id="c"><circle cx="152" cy="156" r="130"/></clipPath>
+  <g stroke="#E7D5AE" fill="none" stroke-width="4.6" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M72 150 C70 138 80 132 92 136 C108 130 126 142 140 150 C150 118 162 92 184 88
+             C205 86 221 99 224 119 L256 131 L221 147 C219 158 214 165 208 172
+             C224 190 226 208 208 220 C186 230 146 232 116 227 C92 223 74 208 70 189
+             C68 178 68 162 72 150 Z"/>
+    <path d="M110 184 C132 172 158 174 174 186" stroke-width="3.4"/>
+  </g>
+  <circle cx="196" cy="112" r="6.4" fill="#E7D5AE"/>
+</svg>

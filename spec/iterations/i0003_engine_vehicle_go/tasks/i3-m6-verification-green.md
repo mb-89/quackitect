@@ -5,7 +5,7 @@ milestone: M6
 class: executed
 killer: true
 verify: coverage:tests-pass
-depends_on: [i3-m6-parity-perf]
+depends_on: [i3-m6-build]
 ---
 
 ## Rationale (not load-bearing)

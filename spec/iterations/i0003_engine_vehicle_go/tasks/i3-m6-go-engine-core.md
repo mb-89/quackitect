@@ -2,6 +2,7 @@
 id: i3-m6-go-engine-core
 statement: Engine core ported to Go: node model, load_all, norm, stmt_hash, full_hash merkle fold, suspect and bless, gate_state.
 milestone: M6
+parent: i3-m6-build
 class: review
 killer: false
 depends_on: [i3-m6-go-parser]

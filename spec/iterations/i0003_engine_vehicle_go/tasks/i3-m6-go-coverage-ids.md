@@ -2,6 +2,7 @@
 id: i3-m6-go-coverage-ids
 statement: Coverage rules, derived gates, mint_id, and the duplicate-id guard ported to Go.
 milestone: M6
+parent: i3-m6-build
 class: review
 killer: false
 depends_on: [i3-m6-go-engine-core]

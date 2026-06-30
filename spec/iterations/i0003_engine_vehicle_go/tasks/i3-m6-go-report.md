@@ -2,6 +2,7 @@
 id: i3-m6-go-report
 statement: Report shell ported to Go html template with a deterministic server-baked layout and a byte-identical integrity root.
 milestone: M6
+parent: i3-m6-build
 class: review
 killer: false
 depends_on: [i3-m6-go-cli-help]

@@ -2,6 +2,7 @@
 id: i3-m6-go-cli-help
 statement: Command surface ported with a shared help preamble: every subcommand answers -h and --help and -? with no side effects, and ids starting with a dash are rejected.
 milestone: M6
+parent: i3-m6-build
 class: review
 killer: false
 depends_on: [i3-m6-go-coverage-ids]

@@ -1,5 +1,6 @@
 # rebuildable caches — never the source of truth
 .quack/index*
+.quack/state.json
 .quack/evidence/
 .quack/out/
 # reference session logs (research data, hidden, not part of the project)

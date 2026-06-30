@@ -102,10 +102,16 @@ func coverageRule(nodes map[string]Node, rule, scope string) bool {
 			}
 		}
 		return true
+	// design: go-tests-pass-eval  implements: req-tests-pass-unify
+	// tests-pass evaluates selftest: tests in-process (runSelftest) — the SAME evaluator the gate state
+	// machine uses — not a divergent shell path; selftest:tests-pass-eval guards the unification.
+	// enddesign
 	case "tests-pass":
+		// Verification runs EVERY test, across all iterations — not scope-limited — so a change
+		// anywhere is checked against the whole suite and regressions in old work are caught.
 		var ts []Node
 		for _, n := range nodes {
-			if n.Class == "executed" && !strings.HasPrefix(n.Verify, "coverage:") && inscope(n) {
+			if n.Class == "executed" && !strings.HasPrefix(n.Verify, "coverage:") {
 				ts = append(ts, n)
 			}
 		}
@@ -114,7 +120,11 @@ func coverageRule(nodes map[string]Node, rule, scope string) bool {
 		}
 		memo := map[string]string{}
 		for _, t := range ts {
-			if runExecuted(t, fullHash(t.ID, nodes, memo)) != "pass" {
+			if strings.HasPrefix(t.Verify, "selftest:") { // in-process, like gateState — not a shell run
+				if !runSelftest(strings.TrimSpace(t.Verify[len("selftest:"):])) {
+					return false
+				}
+			} else if runExecuted(t, fullHash(t.ID, nodes, memo)) != "pass" {
 				return false
 			}
 		}

@@ -2,6 +2,7 @@
 id: i3-m6-overlay-resolver
 statement: One vehicle-to-engine overlay resolver; the command surface, guides, report shell, and gather route through it; the engine stays read-only.
 milestone: M6
+parent: i3-m6-build
 class: review
 killer: false
 depends_on: [i3-m6-go-trace-filter]

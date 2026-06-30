@@ -2,6 +2,7 @@
 id: i3-m6-go-parser
 statement: Hand-rolled frontmatter and config.toml parser ported to Go over the trivial subset in use.
 milestone: M6
+parent: i3-m6-build
 class: review
 killer: false
 depends_on: [i3-m6-go-scaffold]

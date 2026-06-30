@@ -28,6 +28,18 @@
 <!-- enddesign -->
 
 ## next  (walk the next forward check)
+
+> **TRUST THE PROCESS — do not over-check (a known, costly failure mode).** Concentrate ONLY on the
+> check in your hand. Do exactly what it asks, produce its evidence, and move to the next. **Do NOT run
+> `status` / `lint` / `why` / `selftest` between steps "to see if anything broke", and do NOT re-inspect
+> the trace outside a milestone review.** The engine already does the checking for you: derived gates
+> compute coverage live, executed checks re-run themselves, and a change ripples to SUSPECT
+> automatically. **Verification belongs at the milestone gate — nowhere else.** Mid-build, transient
+> OPEN/SUSPECT is NORMAL (global V&V stays red until the build's tests all exist and pass); do not chase
+> it, do not narrate impact analysis, do not re-derive what the ledger already tracks. Checking traces
+> between milestones is wasted motion that breaks your concentration and burns the user's trust. Build
+> heads-down; review only when you reach a `…-m<n>-gate`.
+
 0. **Pick the version.** Default to the latest not-done version. If every version is done, start the earliest planned one. Compose its checklist as in `start`. Announce which you chose. If several versions are open and the human names one, lock onto that version. Hold it for this and the following `next` calls until told otherwise.
 1. `quack next` — the determinizer hands you the next ready check. Its upstreams are satisfied.
 2. **FILL** it. Do the work. Produce the evidence. For executed checks, make `verify` pass.
@@ -41,7 +53,8 @@
      The engine scans `product/` for these markers. `quack lint` surfaces a requirement with no design. It folds the region's hash into the design. So editing the code reopens the design SUSPECT. Architectural **decisions** stay as ADRs in `spec/`. Only **realized code** gets a `design:` marker. A requirement with no realized code is an honest design-hole. Leave it.
 3. **ADJUDICATE.** A gate → present the evidence. Ask the human to run `quack bless <id>`. Never bless on their behalf. An executed check passes on re-run. Then run `quack next` again.
    - **Stop at every milestone gate.** A milestone gate (`…-m<n>-gate`) is a hand-off to the human, not a step you walk past. Before you stop, render and SHOW the report (`quack report`) so the human reviews the board. Then run the increasing-scrutiny review (`guides/milestone-review.md`) and ask them to bless. Always show the report whenever you stop for the human at a milestone.
-   - **Entering M6, plan the build FIRST.** The first M6 step is `build planned`: decompose the build into small, resumable subtasks and seed them under M6 with iteration-unique ids (mint them so they never collide — see the compose step). A monolithic build is lost on interruption; small seeded steps make progress durable.
+   - **Entering M6, plan the build FIRST.** The first M6 step is `build planned`: decompose the build into small, resumable steps and seed them as CHILDREN of a generic **build** task (`parent: <itag>-m6-build`), in dependency order, with iteration-unique ids (mint them so they never collide — see the compose step). A monolithic build is lost on interruption; small nested steps make progress durable. **If your plan is a nested list, mirror that hierarchy 1:1 with `parent:` at any depth** — each item's `parent` is the item it sits under; the report nests and collapses the tree accordingly. The steps nest under the build task in the report; the **verification** task rolls up the tests. Tests stay in the trace (they verify requirements) — they are never task-tree subtasks.
+   - **V&V is global.** Verification (`coverage:tests-pass`) runs EVERY test across all iterations; validation (`meets the need`) checks EVERY need across all iterations. New work is always re-checked against the whole suite so a regression in earlier work is caught.
 Repeat until `next` reports "done".
 
 <!-- design: refine-method  implements: refine-track :: Refine is a track orthogonal to rigor: explore an idea in a gitignored spike, capture the keeper backward into a design-input check (which reopens the affected cone via suspect), then re-walk. It is the default working mode in late phases. -->

@@ -2,6 +2,7 @@
 id: i3-m6-deps-prompt
 statement: Author method prompts dependencies file listing build dependencies with their winget paths.
 milestone: M6
+parent: i3-m6-build
 class: review
 killer: false
 depends_on: [i3-m6-overlay-resolver]
