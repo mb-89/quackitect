@@ -52,8 +52,11 @@ stamp). The rest are human-judged (`class: review`). The trace itself is content
   - [ ] spike results recorded — design advanced as needed
 
 - **M6 — Build & verify** · *gate: implementation*
-  - method: Implement to the detailed design (arc42/C4, black/grey-box each block). Build the
-    qualities in; do not bolt them on. Every requirement has a passing `verified_by`.
+  - method: FIRST plan the build. Decompose it into small, resumable build subtasks and seed them
+    under M6 with iteration-unique ids. A monolithic build is lost on interruption; small seeded steps
+    make progress durable. Then implement to the detailed design (arc42/C4, black/grey-box each block).
+    Build the qualities in; do not bolt them on. Every requirement has a passing `verified_by`.
+  - [ ] build planned — decomposed into small, resumable subtasks seeded under M6 *(killer)*
   - [ ] detailed design complete — every requirement has a realized design *(derived: coverage:designs-realized)*
   - [ ] internal quality ok (review)
   - [ ] verification green — the executed tests pass *(derived: coverage:tests-pass)*

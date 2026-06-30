@@ -77,7 +77,7 @@ def scan_code_designs():
     for base in CODE_DIRS:
         for dp, _, files in os.walk(base):
             for f in sorted(files):
-                if not (f.endswith(".py") or f.endswith(".md")):
+                if not (f.endswith(".py") or f.endswith(".md") or f.endswith(".go")):
                     continue
                 fp = os.path.join(dp, f)
                 lines = open(fp, encoding="utf-8").read().splitlines()
@@ -91,8 +91,8 @@ def scan_code_designs():
                     impl, _, inline = impl.partition("::")       # optional inline statement: 'implements: r :: text'
                     reqs = [x.strip() for x in impl.split(",") if x.strip()]
                     j = i + 1; desc = [inline.strip()] if inline.strip() else []
-                    while j < len(lines) and lines[j].lstrip().startswith("#") and "enddesign" not in lines[j]:
-                        desc.append(lines[j].lstrip("# ").rstrip()); j += 1
+                    while j < len(lines) and lines[j].lstrip().startswith(("#", "//")) and "enddesign" not in lines[j]:
+                        desc.append(lines[j].lstrip("#/ ").rstrip()); j += 1
                     end = j
                     while end < len(lines) and "enddesign" not in lines[end]:
                         end += 1
@@ -152,8 +152,14 @@ def run_executed(node, h):
     if os.path.exists(cf):
         return json.load(open(cf))["result"]
     os.makedirs(cdir, exist_ok=True)
+    cmd = node["verify"]
+    if cmd.startswith("selftest:"):                          # transition bridge (deleted at cutover): shell to the Go binary
+        binp = os.path.join(QUACK, "engine", "quack.exe")
+        if not os.path.exists(binp):
+            binp = os.path.join(QUACK, "engine", "quack")
+        cmd = '"%s" selftest %s' % (binp, cmd.split(":", 1)[1].strip())
     try:
-        r = subprocess.run(node["verify"], shell=True, cwd=ROOT, capture_output=True, text=True, timeout=120)
+        r = subprocess.run(cmd, shell=True, cwd=ROOT, capture_output=True, text=True, timeout=120)
         result = "pass" if r.returncode == 0 else "fail"
         json.dump({"result": result, "exit": r.returncode, "cmd": node["verify"],
                    "ran": datetime.datetime.now().isoformat()}, open(cf, "w"), indent=2)
@@ -450,6 +456,44 @@ def coverage_rule(nodes, rule, scope=None):
         memo = {}
         return bool(ts) and all(run_executed(t, full_hash(t["id"], nodes, memo)) == "pass" for t in ts)
     return False
+# enddesign
+
+# design: unique-ids  implements: req-unique-ids
+# Node ids share one global keyspace, so two iterations that reuse a name (m1-gate) would silently
+# shadow each other on load (nodes[id] = d overwrites). Guard it deterministically. mint_id creates a
+# globally-unique id by namespacing a local name with its iteration tag (i0003 -> i3-). duplicate_ids
+# re-scans the spec and reports every collision, so a clash fails loudly instead of eating data.
+def _scan_ids():
+    "Every declared id -> the file(s) that declare it (raw scan, before the load-time dedup)."
+    seen = {}
+    for dp, _, files in os.walk(SPEC):
+        for f in sorted(files):
+            if not f.endswith(".md"):
+                continue
+            d = parse(os.path.join(dp, f))
+            if d["statement"] and not d["id"].startswith(("TASK-", "MARK-")):
+                seen.setdefault(d["id"], []).append(os.path.relpath(d["path"], ROOT))
+    return seen
+
+def duplicate_ids():
+    "Ids declared in more than one file. Non-empty = a collision that silently shadows data."
+    return {i: ps for i, ps in _scan_ids().items() if len(ps) > 1}
+
+def itag(version=None):
+    "Iteration tag for id namespacing: i0003_engine_vehicle_go -> i3. Falls back to the raw version."
+    version = version or config()["version"]
+    m = re.match(r"i0*([0-9]+)", version or "")
+    return ("i" + m.group(1)) if m else (version or "ix")
+
+def mint_id(local, version=None):
+    "Create a globally-unique node id from a local name, namespaced by the iteration tag (i3-m1-gate)."
+    tag = itag(version)
+    base = local if local.startswith(tag + "-") else tag + "-" + local
+    existing = _scan_ids()
+    cand, k = base, 2
+    while cand in existing:
+        cand, k = base + "-" + str(k), k + 1
+    return cand
 # enddesign
 
 # design: guidance-resolver  implements: guidance

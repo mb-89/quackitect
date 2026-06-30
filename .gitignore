@@ -12,3 +12,8 @@ __pycache__/
 .quack/spikes/
 # gathered source bundles (derived)
 .quack/gather/
+
+# Go build artifacts
+product/engine-go/quack.exe
+product/engine-go/quack
+product/engine-go/quack-*

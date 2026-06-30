@@ -157,6 +157,11 @@ def cmd_report(a):
 
 
 def cmd_lint(a):
+    dups = engine.duplicate_ids()
+    if dups:
+        print("DUPLICATE IDS - " + str(len(dups)) + " (a reused id silently shadows another file; fix first):")
+        for i, ps in sorted(dups.items()):
+            print("  - " + i + ": " + ", ".join(ps))
     holes = engine.coverage(engine.load_all())
     if not holes:
         print("coverage: clean (no holes)")
@@ -164,6 +169,8 @@ def cmd_lint(a):
         print("coverage: " + str(len(holes)) + " hole(s):")
         for h in holes:
             print("  - " + h)
+    if dups:
+        sys.exit(1)                                          # deterministic gate: a collision fails the lint
 
 
 # design: command-surface-impl  implements: command-surface

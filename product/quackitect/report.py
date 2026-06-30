@@ -314,7 +314,8 @@ def _iterations_panel(model, out_dir):
                    % html.escape(it))
         for ms in sorted(set(_policy_milestones(_rigor_of(it, cfg))) | set(lanes)):
             members = lanes.get(ms, [])
-            gate = next((m for m in members if m == "m%d-gate" % ms), None)
+            gate = next((m for m in members if m == "m%d-gate" % ms          # bare (i0001/i0002)
+                         or m.endswith("-m%d-gate" % ms)), None)              # iteration-namespaced (i3-m1-gate)
             subs = [m for m in members if m != gate]
             d = sum(1 for x in subs if smap[x] == "DONE")
             attr = (' data-nid="%s"' % html.escape(gate)) if gate else ''

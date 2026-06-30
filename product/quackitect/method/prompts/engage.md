@@ -18,8 +18,8 @@
    b. `uv run quack gather <version>` — collect ALL the rigor and type source into `.quack/gather/<version>/source.md`. That is checklists, prose, prompts, spreadsheets, and links.
    c. Read the WHOLE bundle. Open any flagged file. Follow any link. Then COMPOSE the plan as two separate layers in `spec/iterations/<version>/`:
       - **Trace** (content) — the typed design nodes: need, use-case, requirement, design, test, ADR. Use semantic edges only: refines, implements, verifies, addresses. The trace is content, not gates. It is never blessed and carries no DONE/SUSPECT/OPEN. It only ripples change downstream.
-      - **Gates** — SEED every milestone of the rigor checklist into `tasks/` as a GATE plus its subtasks:
-        - **Milestone gate** — id `m<n>-gate`, `class: review`, `killer: true`, `milestone: M<n>`, `depends_on` its subtasks. It is the increasing-scrutiny review (`guides/milestone-review.md`).
+      - **Gates** — SEED every milestone of the rigor checklist into `tasks/` as a GATE plus its subtasks. Give every gate and subtask an **iteration-unique id**: namespace the local name by the iteration tag (`m1-gate` → `i3-m1-gate`). Ids share one global keyspace, so a reused id silently shadows the other iteration's node on load. `quack lint` fails on any duplicate. Seed each milestone's subtasks `depends_on` the prior milestone gate (milestone-monotonic) so `next` cannot jump a later milestone ahead.
+        - **Milestone gate** — id `<itag>-m<n>-gate`, `class: review`, `killer: true`, `milestone: M<n>`, `depends_on` its subtasks plus the prior milestone gate. It is the increasing-scrutiny review (`guides/milestone-review.md`).
         - **Subtask** — one per acceptance item, `milestone: M<n>`. A subtask that checks the TRACE is **derived**: `class: executed`, `verify: coverage:<rule>` — the engine computes it live, no human stamp. The rest are **judgment**: `class: review`.
         - **Coverage rules**: `req-traced`, `req-has-test`, `req-has-design`, `adr-traced`, `designs-realized`, `tests-pass`.
         No milestone may be empty.
@@ -40,6 +40,8 @@
      ```
      The engine scans `product/` for these markers. `quack lint` surfaces a requirement with no design. It folds the region's hash into the design. So editing the code reopens the design SUSPECT. Architectural **decisions** stay as ADRs in `spec/`. Only **realized code** gets a `design:` marker. A requirement with no realized code is an honest design-hole. Leave it.
 3. **ADJUDICATE.** A gate → present the evidence. Ask the human to run `uv run quack bless <id>`. Never bless on their behalf. An executed check passes on re-run. Then run `uv run quack next` again.
+   - **Stop at every milestone gate.** A milestone gate (`…-m<n>-gate`) is a hand-off to the human, not a step you walk past. Before you stop, render and SHOW the report (`uv run quack report`) so the human reviews the board. Then run the increasing-scrutiny review (`guides/milestone-review.md`) and ask them to bless. Always show the report whenever you stop for the human at a milestone.
+   - **Entering M6, plan the build FIRST.** The first M6 step is `build planned`: decompose the build into small, resumable subtasks and seed them under M6 with iteration-unique ids (mint them so they never collide — see the compose step). A monolithic build is lost on interruption; small seeded steps make progress durable.
 Repeat until `next` reports "done".
 
 <!-- design: refine-method  implements: refine-track :: Refine is a track orthogonal to rigor: explore an idea in a gitignored spike, capture the keeper backward into a design-input check (which reopens the affected cone via suspect), then re-walk. It is the default working mode in late phases. -->
