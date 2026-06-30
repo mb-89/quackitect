@@ -5,6 +5,8 @@
 .quack/out/
 # reference session logs (research data, hidden, not part of the project)
 .quack/logs/
+# personal working notes — kept locally, never published
+.quack/notes/
 __pycache__/
 *.pyc
 
