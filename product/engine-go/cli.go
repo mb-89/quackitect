@@ -3,9 +3,28 @@ package main
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 	"sort"
 	"strings"
 )
+
+func flagVal(args []string, flag string) string {
+	for i := 0; i < len(args)-1; i++ {
+		if args[i] == flag {
+			return args[i+1]
+		}
+	}
+	return ""
+}
+
+func hasFlag(args []string, flag string) bool {
+	for _, a := range args {
+		if a == flag {
+			return true
+		}
+	}
+	return false
+}
 
 const version = "0.0.1-go"
 
@@ -59,6 +78,55 @@ func Dispatch(args []string) {
 		cmdWhy(rest)
 	case "lint":
 		cmdLint()
+	case "bless":
+		cmdBless(rest)
+	case "next":
+		cmdNext(rest)
+	case "start":
+		cmdStart(rest)
+	case "note":
+		cmdNote(rest)
+	case "gather":
+		cmdGather(rest)
+	case "ship":
+		cmdShip(rest)
+	case "verify":
+		cmdVerify(rest)
+	case "report":
+		out := flagVal(rest, "--out")
+		if err := RenderReport(out); err != nil {
+			fmt.Fprintln(os.Stderr, "report error:", err)
+			os.Exit(1)
+		}
+		rp := out
+		if rp == "" {
+			rp = filepath.Join(QUACK, "out", "report.html")
+		}
+		fmt.Println("report ->", rp)
+		if out == "" && !hasFlag(rest, "--no-open") { // bare `quack report` opens; --out renders only
+			openFile(rp)
+		}
+	case "resolve":
+		if len(rest) == 0 {
+			fmt.Println(usage)
+			return
+		}
+		if p := Resolve(rest[0]); p != "" {
+			fmt.Println(p)
+		} else {
+			fmt.Fprintln(os.Stderr, "unresolved:", rest[0])
+			os.Exit(1)
+		}
+	case "guides":
+		g := ResolveGuides()
+		keys := make([]string, 0, len(g))
+		for k := range g {
+			keys = append(keys, k)
+		}
+		sort.Strings(keys)
+		for _, k := range keys {
+			fmt.Println(k + "\t" + g[k])
+		}
 	case "selftest":
 		os.Exit(RunSelftestCLI(rest))
 	case "root":

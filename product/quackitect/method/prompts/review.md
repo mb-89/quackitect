@@ -1,7 +1,7 @@
 # review — assess & look back:  readout | retro | report
 
 ## readout
-Summarize the board (`uv run quack status`). Show DONE, SUSPECT, and OPEN counts. Name the next gate.
+Summarize the board (`quack status`). Show DONE, SUSPECT, and OPEN counts. Name the next gate.
 For a SUSPECT check, run `quack why <id>`. Report what input changed.
 
 ## retro
@@ -16,5 +16,5 @@ Run it at `engage start`, or on demand. Emit improvement notes only. Adopt nothi
 6. **Spot determinizer candidates.** Read the logs. Which scripts did the AI write that the determinizer could own? A script that failed a few times is a strong lead. The fix may be a new tool. It may be better guidance.
 
 ## report
-Render the deterministic HTML snapshot: `uv run quack report`. With no args it renders AND opens the report. Pass `--out F` to render only, no open. The determinizer owns it. No judgment. It writes `.quack/out/report.html` by default.
+Render the deterministic HTML snapshot: `quack report`. With no args it renders AND opens the report. Pass `--out F` to render only, no open. The determinizer owns it. No judgment. It writes `.quack/out/report.html` by default.
 You MAY add a short human-facing narrative ("where we are / notable risks"). Keep it a separate, OPTIONAL layer on top. It is not part of the deterministic core. Do not let it be mistaken for it.

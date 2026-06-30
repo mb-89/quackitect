@@ -22,7 +22,7 @@ Three intents. Each is a slash-command. The methods live in `product/quackitect/
 ```
 A deterministic CLI runs alongside them:
 ```
-uv run quack status [id] | why <id> | bless [--all|<id>] | note "..." | report [--out F] | ship
+quack status [id] | why <id> | bless [--all|<id>] | note "..." | report [--out F] | ship
 ```
 `AGENTS.md` tells an AI how to drive it.
 
@@ -39,4 +39,4 @@ Each version is an iteration. An iteration is a git branch or worktree. `.quack/
 **Run `git init` once on your machine.** The `.gitignore` is ready.
 
 ## Use it on itself
-Run `uv run quack status`. That is the design board. Edit a decision's `statement`. Watch the cone go suspect. Run `bless` to re-attest. Run `/engage start` to plan the next iteration.
+Run `quack status`. That is the design board. Edit a decision's `statement`. Watch the cone go suspect. Run `bless` to re-attest. Run `/engage start` to plan the next iteration.

@@ -1744,5 +1744,70 @@
       "i3-m6-go-coverage-ids": "ed2ac927d20e"
     },
     "prev_hash": null
+  },
+  {
+    "check": "i3-m6-go-report",
+    "action": "bless",
+    "actor": "human",
+    "filled_by": "agent",
+    "ts": "2026-06-30T11:37:05.014450",
+    "hash": "8fa3a89898aa",
+    "statement_hash": "b671acc09c5d",
+    "deps": {
+      "i3-m6-go-cli-help": "a915aa64de6c"
+    },
+    "prev_hash": null
+  },
+  {
+    "check": "i3-m6-go-trace-filter",
+    "action": "bless",
+    "actor": "human",
+    "filled_by": "agent",
+    "ts": "2026-06-30T11:37:05.127450",
+    "hash": "c8926c58f5d0",
+    "statement_hash": "744bfe65102f",
+    "deps": {
+      "i3-m6-go-report": "8fa3a89898aa"
+    },
+    "prev_hash": null
+  },
+  {
+    "check": "i3-m6-overlay-resolver",
+    "action": "bless",
+    "actor": "human",
+    "filled_by": "agent",
+    "ts": "2026-06-30T12:02:06.944241",
+    "hash": "b469e87306a3",
+    "statement_hash": "f999993c820d",
+    "deps": {
+      "i3-m6-go-trace-filter": "c8926c58f5d0"
+    },
+    "prev_hash": null
+  },
+  {
+    "check": "i3-m6-deps-prompt",
+    "action": "bless",
+    "actor": "human",
+    "filled_by": "agent",
+    "ts": "2026-06-30T12:02:07.080801",
+    "hash": "a64bf590f4c3",
+    "statement_hash": "2c2836a785c0",
+    "deps": {
+      "i3-m6-overlay-resolver": "b469e87306a3"
+    },
+    "prev_hash": null
+  },
+  {
+    "check": "i3-m6-parity-perf",
+    "action": "bless",
+    "actor": "human",
+    "filled_by": "agent",
+    "ts": "2026-06-30T12:02:07.216654",
+    "hash": "ad79406c745e",
+    "statement_hash": "5d00cd7c6160",
+    "deps": {
+      "i3-m6-deps-prompt": "a64bf590f4c3"
+    },
+    "prev_hash": null
   }
 ]

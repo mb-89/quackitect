@@ -12,7 +12,7 @@ import (
 	"time"
 )
 
-// design: go-coverage-ids  implements: req-behavior-parity, req-unique-ids
+// design: go-coverage-ids  implements: req-behavior-parity, req-unique-ids, req-coverage
 // The derived coverage rules over the typed trace, the executed-check runner with its
 // cache, and the id-integrity guard (mint_id + duplicate_ids). Coverage is cumulative
 // through a version (no grandfathering); ids are namespaced so a reuse can never shadow.

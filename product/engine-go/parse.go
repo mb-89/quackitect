@@ -22,6 +22,7 @@ type Node struct {
 	Path       string
 	RegionBody string
 	Line       int
+	Milestone  int
 }
 
 // Config is the iteration breadcrumb from .quack/config.toml.
@@ -82,6 +83,16 @@ func ParseNode(path string) Node {
 			if v != "" {
 				n.ID = v
 			}
+		case "milestone":
+			m := 0
+			for _, c := range strings.TrimPrefix(v, "M") {
+				if c >= '0' && c <= '9' {
+					m = m*10 + int(c-'0')
+				} else {
+					break
+				}
+			}
+			n.Milestone = m
 		}
 	}
 	return n

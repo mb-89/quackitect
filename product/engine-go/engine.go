@@ -12,7 +12,7 @@ import (
 )
 
 // Roots, discovered by walking up to a .quack or pyproject.toml (mirrors engine.find_root).
-var ROOT, SPEC, QUACK, ATTEST string
+var ROOT, SPEC, QUACK, ATTEST, NOTES string
 
 func findRoot() string {
 	d, _ := os.Getwd()
@@ -37,9 +37,10 @@ func init() {
 	SPEC = filepath.Join(ROOT, "spec")
 	QUACK = filepath.Join(ROOT, ".quack")
 	ATTEST = filepath.Join(QUACK, "attest.json")
+	NOTES = filepath.Join(QUACK, "notes")
 }
 
-// design: go-engine-core  implements: req-behavior-parity
+// design: go-engine-core  implements: req-behavior-parity, req-split, req-review
 // The engine core in Go: the node load, the hashing primitive and merkle fold, the
 // suspect/bless attestation, and the gate-state machine — observably identical to
 // engine.py. norm + full_hash were proven byte-identical to Python in the M5 spike.

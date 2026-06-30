@@ -13,21 +13,25 @@ Quackitect is a **human-driven gate ledger**. You, the agent, FILL checks. The h
 - `/review` — `readout` (where am I), `retro` (look back), or `report` (render the HTML).
 
 ## Determinizer tools (deterministic — call directly)
-> Invoke them as `uv run python -m quackitect <cmd>`. The generated `uv run quack` exe is blocked by Windows Smart App Control on this box (os error 4551). The module entry point routes around it. A `quack` PowerShell profile function can alias the short form.
+> The engine is a single static **Go binary**, shipped as source and built locally. Build it with
+> `go build -o .quack/engine/quack.exe ./product/engine-go` (deps: `method/prompts/dependencies.md`),
+> then invoke `quack <cmd>` (the binary on PATH, or `.quack/engine/quack`). No Python, no uv.
 ```
-uv run quack status [id]        # the text board to stdout; with an id, why it's suspect
-uv run quack next               # the next ready check to walk
-uv run quack start <id> [--plan]# activate a version (--plan registers a future one); replaces hand-written iteration.md
-uv run quack why <id>           # what input changed
-uv run quack bless [--all|<id>] # record a human adjudication — only when the human says yes
-uv run quack note "<text>"      # deterministic capture lane
-uv run quack gather <ver>       # collect all rigor+type source for an iteration
-uv run quack report             # render the HTML snapshot AND open it (--out F renders only, no open)
-uv run quack ship               # package product/ -> .quack/out/
+quack status [id]        # the text board to stdout; with an id, why it's suspect
+quack next               # the next ready check to walk
+quack start <id> [--plan]# activate a version (--plan registers a future one)
+quack why <id>           # what input changed
+quack bless [--all|<id>] # record a human adjudication — only when the human says yes
+quack note "<text>"      # deterministic capture lane
+quack gather <ver>       # collect all rigor+type source for an iteration
+quack report             # render the HTML snapshot AND open it (--out F renders only, no open)
+quack ship               # package product/ -> .quack/out/
+quack lint               # coverage holes + the duplicate-id guard
+quack selftest           # the engine's own dependency-free self-test (no toolchain)
 ```
 
 ## Rules
-- **Designs live in code, not `spec/`.** When you implement a requirement, mark the code inline. Use `# design: <id>  implements: <req-id>` … `# enddesign` (see `method/prompts/engage.md` → next/FILL). The engine scans `product/` for these. `quack lint` flags a requirement with no design. ADRs — the *decisions* — stay as `.md` in `spec/`.
+- **Designs live in code, not `spec/`.** When you implement a requirement, mark the code inline. Use `# design: <id>  implements: <req-id>` … `# enddesign` (or `//` in Go; see `method/prompts/engage.md` → next/FILL). The engine scans `product/` (`.go`/`.py`/`.md`) for these. `quack lint` flags a requirement with no design. ADRs — the *decisions* — stay as `.md` in `spec/`.
 - A check goes **SUSPECT**, not open, when an input changes. A human `bless` returns it to DONE.
 - **Killer checks** are always human-adjudicated gates. Never auto-pass them.
 - The surface is **default-closed**. Triage, defer, retire, retro, and ship are sub-ops. Reach them through `engage` and `review`, not as new top-level commands.

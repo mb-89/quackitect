@@ -5,7 +5,7 @@ verifies: [report-requirements]
 statement: `quack report` produces byte-identical HTML across two runs on an unchanged ledger.
 depends_on: [report-impl]
 class: executed
-verify: uv run python -m quackitect report --out .quack/out/_a.html && uv run python -m quackitect report --out .quack/out/_b.html && uv run python -c "import sys;sys.exit(0 if open('.quack/out/_a.html','rb').read()==open('.quack/out/_b.html','rb').read() else 1)"
+verify: selftest:report
 killer: true
 ---
 

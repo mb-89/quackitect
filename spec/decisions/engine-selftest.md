@@ -4,7 +4,7 @@ statement: The product package imports cleanly.
 type: test
 verifies: [state-model]
 class: executed
-verify: uv run python -c "import sys; sys.path.insert(0, 'product'); import quackitect.engine"
+verify: selftest:engine
 killer: false
 ---
 

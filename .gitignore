@@ -17,3 +17,10 @@ __pycache__/
 product/engine-go/quack.exe
 product/engine-go/quack
 product/engine-go/quack-*
+
+# Go engine build output (ship source; built locally)
+.quack/engine/
+product/engine-go/.gotmp/
+product/engine-go/*.exe
+product/engine-go/quack-*
+product/engine-go/assets/
