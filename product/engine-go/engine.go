@@ -368,55 +368,10 @@ func StatusMap(nodes map[string]Node) map[string]string {
 	for id := range nodes {
 		resolve(id, map[string]bool{})
 	}
-	persistSnapshot(eff)
 	return eff
 }
 
 // enddesign
 
-// --- status snapshot: the report is a display, it does not re-run checks ---
-// StatusMap persists its effective map here; RenderReport shows this snapshot and only
-// recomputes when an input (spec, product design regions, attest ledger) is newer than it.
-// This keeps the report stable (no perf/parity flicker), fast, and free of render-time runs.
-
-func snapPath() string { return filepath.Join(QUACK, "state.json") }
-
-func persistSnapshot(eff map[string]string) {
-	if out, err := json.MarshalIndent(eff, "", "  "); err == nil {
-		os.WriteFile(snapPath(), out, 0o644)
-	}
-}
-
-func loadSnapshot() map[string]string {
-	raw, err := os.ReadFile(snapPath())
-	if err != nil {
-		return nil
-	}
-	m := map[string]string{}
-	if json.Unmarshal(raw, &m) != nil {
-		return nil
-	}
-	return m
-}
-
-// snapshotFresh reports whether the snapshot is newer than every input that could change a state.
-func snapshotFresh() bool {
-	si, err := os.Stat(snapPath())
-	if err != nil {
-		return false
-	}
-	snapT := si.ModTime()
-	fresh := true
-	if ai, err := os.Stat(ATTEST); err == nil && ai.ModTime().After(snapT) {
-		fresh = false
-	}
-	for _, p := range []string{SPEC, filepath.Join(ROOT, "product")} {
-		filepath.Walk(p, func(_ string, fi os.FileInfo, e error) error {
-			if e == nil && !fi.IsDir() && fi.ModTime().After(snapT) {
-				fresh = false
-			}
-			return nil
-		})
-	}
-	return fresh
-}
+// The report always recomputes StatusMap live (no cached snapshot) — a stale snapshot could show a
+// cached pass. See RenderReport and go-report-watch.

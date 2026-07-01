@@ -89,6 +89,16 @@ func runSelftest(name string) bool {
 		return selftestValidationGlobal()
 	case "stubs":
 		return selftestStubs()
+	case "readout":
+		return selftestReadout()
+	case "contract":
+		return selftestContract()
+	case "bootstrap":
+		return selftestBootstrap()
+	case "correctness":
+		return selftestCorrectness()
+	case "report-live":
+		return selftestReportLive()
 	}
 	return false // unknown / not-yet-built check -> OPEN
 }
@@ -196,6 +206,105 @@ func selftestTestsPassEval() bool {
 	return coverageRule(syn, "tests-pass", "")
 }
 
+func readFileStr(p string) string { b, _ := os.ReadFile(p); return string(b) }
+
+func selftestWidthOK(s string) bool {
+	for _, ln := range strings.Split(s, "\n") {
+		if dispWidth(ln) > readoutMax {
+			return false
+		}
+	}
+	return true
+}
+
+// selftestReadout: the progress bar and handover pager render deterministically, contain their
+// required sections, and never exceed readoutW columns (req-progress-bar/-handover-pager/-readout-width).
+func selftestReadout() bool {
+	nodes := LoadAll()
+	sm := StatusMap(nodes)
+	cfg := ReadConfig(filepath.Join(QUACK, "config.toml"))
+	it := cfg.Version
+	b1 := ProgressBar(it, nodes, sm, cfg, false)
+	b2 := ProgressBar(it, nodes, sm, cfg, false)
+	if b1 != b2 || !strings.Contains(b1, "START") || !strings.Contains(b1, "END") || !selftestWidthOK(b1) {
+		return false
+	}
+	gate := ""
+	for id, n := range nodes {
+		if n.Milestone > 0 && strings.HasSuffix(id, "-gate") && iterOf(n.Path) == it {
+			gate = id
+			break
+		}
+	}
+	if gate == "" {
+		return true // no gate to hand over yet; bar checks suffice
+	}
+	p := HandoverPager(gate, it, nodes, sm, cfg, false)
+	return strings.Contains(p, "HANDOVER") && strings.Contains(p, "READINESS") &&
+		strings.Contains(p, "Bless") && selftestWidthOK(p)
+}
+
+// selftestContract: the contract and entry surfaces carry the required clauses — the active
+// read/paraphrase/confirm imperative, the actor stamps, the y=console-bless rule, and the existence of
+// the Copilot native channel (req-confirm-back/-active-imperative/-bless-y-console/-copilot-instructions).
+func selftestContract() bool {
+	c := readFileStr(filepath.Join(EngineDir(), "method", "prompts", "contract.md"))
+	for _, s := range []string{"paraphrase", "actor=agent", "actor=human", "handover pager"} {
+		if !strings.Contains(c, s) {
+			return false
+		}
+	}
+	a := readFileStr(filepath.Join(ROOT, "AGENTS.md"))
+	if !strings.Contains(strings.ToLower(a), "paraphrase") {
+		return false
+	}
+	ci := readFileStr(filepath.Join(ROOT, ".github", "copilot-instructions.md"))
+	return strings.Contains(strings.ToLower(ci), "paraphrase") && strings.Contains(ci, "contract")
+}
+
+// selftestBootstrap: the onboarding flow + empty-spec rule are on the entry surface and the README
+// leads with the conversational onboarding (req-bootstrap-flow/-empty-spec-autostart/-readme-onboarding).
+func selftestBootstrap() bool {
+	ig := readFileStr(filepath.Join(EngineDir(), "method", "prompts", "integrate.md"))
+	if !strings.Contains(ig, "Start a new project") || !strings.Contains(strings.ToLower(ig), "zero iterations") {
+		return false
+	}
+	rm := strings.ToLower(readFileStr(filepath.Join(ROOT, "README.md")))
+	return strings.Contains(rm, "start a new project") || strings.Contains(rm, "start your project")
+}
+
+// selftestCorrectness: lean rigor carries the derived coverage checks that enforce the trace
+// (req-lean-enforces-trace); the two prior correctness invariants still hold (i0004).
+func selftestCorrectness() bool {
+	lc := readFileStr(filepath.Join(EngineDir(), "method", "rigor", "lean", "checklist.md"))
+	for _, r := range []string{"coverage:req-traced", "coverage:req-has-test", "coverage:adr-traced", "coverage:designs-realized"} {
+		if !strings.Contains(lc, r) {
+			return false
+		}
+	}
+	return selftestNoTraceGate() && selftestTestsPassEval()
+}
+
+// selftestReportLive: the report carries the live-reload hook and renders without the removed snapshot
+// machinery (req-report-live-reload).
+func selftestReportLive() bool {
+	dir, err := os.MkdirTemp("", "qrl-*")
+	if err != nil {
+		return false
+	}
+	defer os.RemoveAll(dir)
+	out := filepath.Join(dir, "r.html")
+	if RenderReport(out) != nil {
+		return false
+	}
+	raw, err := os.ReadFile(out)
+	if err != nil {
+		return false
+	}
+	s := string(raw)
+	return strings.Contains(s, "__reload") && strings.Contains(s, "EventSource")
+}
+
 // selftestWorkspace: the engine resolves a workspace (ROOT) separate from the ENGINE install, and the
 // engine resources resolve from ENGINE independent of the workspace (req-workspace-split). It then
 // DRIVES a bare workspace FROM INSIDE via the emitted stub launcher, resolving the engine at runtime
@@ -237,9 +346,14 @@ func driveFromInside() bool {
 	os.WriteFile(filepath.Join(dir, ".quack", "engine.local"), []byte(exe), 0o644) // path B, gitignored
 	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
 	defer cancel()
-	cmd := exec.CommandContext(ctx, "cmd", "/c", "probe.cmd status")
+	// Invoke the launcher by ABSOLUTE path — not the bare name "probe.cmd". cmd.exe only finds a bare
+	// batch name by searching the current directory, which Windows hardening
+	// (NoDefaultCurrentDirectoryInExePath) can disable — making the test spuriously fail. The absolute
+	// path resolves regardless, and %~dp0 inside the launcher still points at the workspace dir.
+	launcher := filepath.Join(dir, "probe.cmd")
+	cmd := exec.CommandContext(ctx, "cmd", "/c", launcher, "status")
 	cmd.Dir = dir // drive FROM INSIDE the bare workspace
-	out, err := cmd.Output()
+	out, err := cmd.CombinedOutput()
 	return err == nil && strings.Contains(string(out), "gates |")
 }
 
@@ -369,7 +483,7 @@ func selftestStubs() bool {
 
 // RunSelftestCLI runs one named check (or all) and returns an exit code.
 func RunSelftestCLI(args []string) int {
-	all := []string{"deps", "parser", "determinism", "ids", "help", "parity", "perf", "deps-prompt", "report", "split", "integrate", "engine", "method", "surface", "build", "no-trace-gate", "tests-pass-eval", "workspace", "brand", "claude-vendor", "report-verdict", "report-nesting", "brand-resolves", "validation-global", "stubs"}
+	all := []string{"deps", "parser", "determinism", "ids", "help", "parity", "perf", "deps-prompt", "report", "split", "integrate", "engine", "method", "surface", "build", "no-trace-gate", "tests-pass-eval", "workspace", "brand", "claude-vendor", "report-verdict", "report-nesting", "brand-resolves", "validation-global", "stubs", "readout", "contract", "bootstrap", "correctness", "report-live"}
 	names := args
 	if len(names) == 0 {
 		names = all

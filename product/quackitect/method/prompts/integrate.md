@@ -106,3 +106,16 @@ quack report                                        # your report (assets resolv
 ```
 Nestable: a vehicle can itself be an engine for another (the chain just grows).
 <!-- enddesign -->
+
+## Start a new project (conversational bootstrap)
+<!-- design: method-bootstrap  implements: req-bootstrap-flow, req-empty-spec-autostart, req-readme-onboarding :: On "start a new project" the agent runs a fixed onboarding — confirm intent to start an iteration, ask the target folder, ask vendor-engine vs drive-from-inside stubs — then scaffolds (start init / start stubs), lands in the workspace, and immediately opens the first iteration's M1 vision interview. A workspace with zero iterations auto-triggers this framing instead of dead-ending on a status board. The README leads with this flow; the raw clone/build CLI is a slim "get the engine" step beneath it. -->
+When a user says **"start a new project"**, do NOT dump CLI steps. Run this flow:
+
+1. **Confirm** they want to start a new project iteration now.
+2. **Ask the target folder** — where the new workspace lives.
+3. **Ask how to link the engine:** *vendor* it (`quack start init <folder>` — a self-contained copy under `.quack/vendor/`) or *drive-from-inside stubs* (`quack start stubs <folder>` — a runtime-linked engine, nothing vendored).
+4. **Scaffold** with that command, then land in the new workspace.
+5. **Immediately open the first iteration** — run `engage start` and begin the **M1 vision interview** (problem, who has it, what "done well" means, top risks). Do not stop at a status board.
+
+**Empty-spec rule:** a workspace with **zero iterations**, when driven, opens this M1 vision interview immediately — a fresh vehicle drops straight into framing.
+<!-- enddesign -->

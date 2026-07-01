@@ -49,7 +49,8 @@ func usageText() string {
 	b := brand()
 	return b + ` — the determinizer lane (deterministic; no judgment).
 usage: ` + b + ` status [id] | next | start <id> [--plan] | why <id> | bless [--all|<id>]
-       | note "..." | gather <ver> | report [--out F] | ship | build | lint | verify <id>`
+       | note "..." | gather <ver> | report [--out F] | ship | build | lint | verify <id>
+       | progress [--pager <gate>]`
 }
 
 // enddesign
@@ -116,7 +117,13 @@ func Dispatch(args []string) {
 		cmdBuild(rest)
 	case "verify":
 		cmdVerify(rest)
+	case "progress":
+		cmdProgress(rest)
 	case "report":
+		if hasFlag(rest, "--watch") {
+			serveWatch(flagVal(rest, "--port"))
+			return
+		}
 		out := flagVal(rest, "--out")
 		if err := RenderReport(out); err != nil {
 			fmt.Fprintln(os.Stderr, "report error:", err)

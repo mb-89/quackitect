@@ -16,6 +16,6 @@ Run it at `engage start`, or on demand. Emit improvement notes only. Adopt nothi
 6. **Spot determinizer candidates.** Read the logs. Which scripts did the AI write that the determinizer could own? A script that failed a few times is a strong lead. The fix may be a new tool. It may be better guidance.
 
 ## report
-Render the deterministic HTML snapshot: `quack report`. With no args it renders AND opens the report. Pass `--out F` to render only, no open. The determinizer owns it. No judgment. It writes `.quack/out/report.html` by default.
-The report is a **display**: it shows the last status snapshot and never re-runs checks, so it is stable and fast and two renders of the same state are byte-identical. If you changed the spec or rebuilt the engine, run `quack status` first to refresh the snapshot.
+Render the deterministic HTML board: `quack report`. With no args it renders AND opens the report. Pass `--out F` to render only, no open; `--watch` serves it and auto-reloads when the source changes. The determinizer owns it. No judgment. It writes `.quack/out/report.html` by default.
+The report is a **display**: it recomputes the status **live** on every render (no cached snapshot), so it can never show a stale or cached pass, and two renders of the same state are byte-identical.
 You MAY add a short human-facing narrative ("where we are / notable risks"). Keep it a separate, OPTIONAL layer on top. It is not part of the deterministic core. Do not let it be mistaken for it.

@@ -1,7 +1,11 @@
 # AGENTS.md — how to drive Quackitect
 
-> **READ FIRST — BINDING.** Before you act on this project, read and obey
-> `product/quackitect/method/prompts/contract.md`. It governs every move.
+> **READ FIRST — BINDING.** Your FIRST action, before anything else: open
+> `product/quackitect/method/prompts/contract.md`, **read it in full, paraphrase
+> its specifics back** to the human (name rule 3's `actor=agent` killer-bless
+> exception, to prove you actually read it), and **confirm you will obey**. Do
+> not act until you have. A passive skim is not enough — no paraphrase means the
+> rules never loaded, and the human should stop you. It governs every move.
 
 Quackitect is a **human-driven gate ledger**. You, the agent, FILL checks. The human ADJUDICATES the ones that are gates. **Never bless on the human's behalf.**
 
@@ -30,7 +34,8 @@ quack why <id>           # what input changed
 quack bless [--all|<id>] # record a human adjudication — only when the human says yes
 quack note "<text>"      # deterministic capture lane
 quack gather <ver>       # collect all rigor+type source for an iteration
-quack report             # render the HTML snapshot AND open it (--out F renders only, no open)
+quack report [--watch]   # render+open the live HTML board (recomputed fresh; --watch auto-reloads on change; --out F renders only)
+quack progress [--pager <gate>] # the readout: the progress bar, or the handover pager for a killer/milestone gate
 quack ship               # package product/ -> .quack/out/
 quack build              # compile the engine AND re-baseline golden-root in one step
 quack lint               # coverage holes + the duplicate-id guard

@@ -3372,5 +3372,375 @@
       "i5-m8-packaged-versioned": "bd85a3d63061"
     },
     "prev_hash": null
+  },
+  {
+    "check": "i6-m1-problem-success",
+    "action": "bless",
+    "actor": "agent",
+    "filled_by": "agent",
+    "ts": "2026-07-01T21:18:16+01:00",
+    "hash": "bbe5dc9d2aa7",
+    "statement_hash": "ac3e2c5f04da",
+    "deps": {},
+    "prev_hash": null
+  },
+  {
+    "check": "i6-m1-gate",
+    "action": "bless",
+    "actor": "agent",
+    "filled_by": "agent",
+    "ts": "2026-07-01T21:18:18+01:00",
+    "hash": "3e196b682107",
+    "statement_hash": "d55364712722",
+    "deps": {
+      "i6-m1-problem-success": "bbe5dc9d2aa7"
+    },
+    "prev_hash": null
+  },
+  {
+    "check": "i6-m2-requirements-stated",
+    "action": "bless",
+    "actor": "agent",
+    "filled_by": "agent",
+    "ts": "2026-07-01T21:18:20+01:00",
+    "hash": "2dc96ae14575",
+    "statement_hash": "9645b18c9fcd",
+    "deps": {
+      "i6-m1-gate": "3e196b682107"
+    },
+    "prev_hash": null
+  },
+  {
+    "check": "i6-m2-gate",
+    "action": "bless",
+    "actor": "agent",
+    "filled_by": "agent",
+    "ts": "2026-07-01T21:18:22+01:00",
+    "hash": "033f052f454e",
+    "statement_hash": "dee47589fa11",
+    "deps": {
+      "i6-m2-req-has-test": "9331200a20dc",
+      "i6-m2-req-traced": "b1505eb4c00b",
+      "i6-m2-requirements-stated": "2dc96ae14575"
+    },
+    "prev_hash": null
+  },
+  {
+    "check": "i6-m3-approach-chosen",
+    "action": "bless",
+    "actor": "agent",
+    "filled_by": "agent",
+    "ts": "2026-07-01T21:18:23+01:00",
+    "hash": "1257668dd367",
+    "statement_hash": "afc70b205f4d",
+    "deps": {
+      "i6-m2-gate": "033f052f454e"
+    },
+    "prev_hash": null
+  },
+  {
+    "check": "i6-m3-gate",
+    "action": "bless",
+    "actor": "agent",
+    "filled_by": "agent",
+    "ts": "2026-07-01T21:18:25+01:00",
+    "hash": "0a08102352ca",
+    "statement_hash": "a8a2e4f35178",
+    "deps": {
+      "i6-m3-adr-traced": "fe00485b0350",
+      "i6-m3-approach-chosen": "1257668dd367"
+    },
+    "prev_hash": null
+  },
+  {
+    "check": "i6-m4-build-planned",
+    "action": "bless",
+    "actor": "agent",
+    "filled_by": "agent",
+    "ts": "2026-07-01T21:18:27+01:00",
+    "hash": "170c105d3fdb",
+    "statement_hash": "0f24719e0c18",
+    "deps": {
+      "i6-m3-gate": "0a08102352ca"
+    },
+    "prev_hash": null
+  },
+  {
+    "check": "i6-m4-build",
+    "action": "bless",
+    "actor": "agent",
+    "filled_by": "agent",
+    "ts": "2026-07-01T21:18:29+01:00",
+    "hash": "3f7d0ea449d3",
+    "statement_hash": "0aa928aa946e",
+    "deps": {
+      "i6-m4-build-planned": "170c105d3fdb"
+    },
+    "prev_hash": null
+  },
+  {
+    "check": "i6-m4-internal-quality",
+    "action": "bless",
+    "actor": "agent",
+    "filled_by": "agent",
+    "ts": "2026-07-01T21:18:31+01:00",
+    "hash": "301a1abcc2e4",
+    "statement_hash": "2b31406bdb77",
+    "deps": {
+      "i6-m4-build": "3f7d0ea449d3"
+    },
+    "prev_hash": null
+  },
+  {
+    "check": "i6-m4-gate",
+    "action": "bless",
+    "actor": "human",
+    "filled_by": "agent",
+    "ts": "2026-07-01T21:21:26+01:00",
+    "hash": "d2a1bda9fe41",
+    "statement_hash": "e439e91e36c0",
+    "deps": {
+      "i6-m4-build": "3f7d0ea449d3",
+      "i6-m4-build-planned": "170c105d3fdb",
+      "i6-m4-designs-realized": "52a207354722",
+      "i6-m4-internal-quality": "301a1abcc2e4",
+      "i6-m4-tests-pass": "e05a7d3735f8"
+    },
+    "prev_hash": null
+  },
+  {
+    "check": "i6-m5-docs-match",
+    "action": "bless",
+    "actor": "agent",
+    "filled_by": "agent",
+    "ts": "2026-07-01T21:26:15+01:00",
+    "hash": "cf283b8197c6",
+    "statement_hash": "dd7c82573da8",
+    "deps": {
+      "i6-m4-gate": "d2a1bda9fe41"
+    },
+    "prev_hash": null
+  },
+  {
+    "check": "i6-m5-packaged",
+    "action": "bless",
+    "actor": "agent",
+    "filled_by": "agent",
+    "ts": "2026-07-01T21:26:17+01:00",
+    "hash": "2c4a3020d201",
+    "statement_hash": "535a98e9d380",
+    "deps": {
+      "i6-m5-docs-match": "cf283b8197c6"
+    },
+    "prev_hash": null
+  },
+  {
+    "check": "i6-m5-gate",
+    "action": "bless",
+    "actor": "human",
+    "filled_by": "agent",
+    "ts": "2026-07-01T21:27:38+01:00",
+    "hash": "b1b958124b24",
+    "statement_hash": "bd283d47f62e",
+    "deps": {
+      "i6-m5-docs-match": "cf283b8197c6",
+      "i6-m5-packaged": "2c4a3020d201"
+    },
+    "prev_hash": null
+  },
+  {
+    "check": "i3-m7-meets-need",
+    "action": "bless",
+    "actor": "human",
+    "filled_by": "agent",
+    "ts": "2026-07-01T21:29:35+01:00",
+    "hash": "15151ffd49ff",
+    "statement_hash": "e16badd089ef",
+    "deps": {
+      "i3-m6-gate": "9f62d660016c"
+    },
+    "prev_hash": "041c35f01807"
+  },
+  {
+    "check": "i3-m7-gate",
+    "action": "bless",
+    "actor": "human",
+    "filled_by": "agent",
+    "ts": "2026-07-01T21:29:37+01:00",
+    "hash": "1f4a84d8709c",
+    "statement_hash": "d98edd11232b",
+    "deps": {
+      "i3-m6-gate": "9f62d660016c",
+      "i3-m7-acceptance-obtained": "22a1c173e181",
+      "i3-m7-meets-need": "15151ffd49ff",
+      "i3-m7-validation-gaps": "d3bf03adbccf"
+    },
+    "prev_hash": "67c3029ad10a"
+  },
+  {
+    "check": "i3-m8-docs-complete",
+    "action": "bless",
+    "actor": "human",
+    "filled_by": "agent",
+    "ts": "2026-07-01T21:29:38+01:00",
+    "hash": "020c98ae0cc8",
+    "statement_hash": "b93d15f54da5",
+    "deps": {
+      "i3-m7-gate": "1f4a84d8709c"
+    },
+    "prev_hash": "13be9acb943f"
+  },
+  {
+    "check": "i3-m8-config-baselined",
+    "action": "bless",
+    "actor": "human",
+    "filled_by": "agent",
+    "ts": "2026-07-01T21:29:40+01:00",
+    "hash": "71a181143ce2",
+    "statement_hash": "6b214ebeb8a5",
+    "deps": {
+      "i3-m7-gate": "1f4a84d8709c"
+    },
+    "prev_hash": "fb2dfed2c0a7"
+  },
+  {
+    "check": "i3-m8-packaged-versioned",
+    "action": "bless",
+    "actor": "human",
+    "filled_by": "agent",
+    "ts": "2026-07-01T21:29:42+01:00",
+    "hash": "c864a2734ae7",
+    "statement_hash": "a73f7ea67964",
+    "deps": {
+      "i3-m7-gate": "1f4a84d8709c"
+    },
+    "prev_hash": "122e0dda47e2"
+  },
+  {
+    "check": "i3-m8-handover-accepted",
+    "action": "bless",
+    "actor": "human",
+    "filled_by": "agent",
+    "ts": "2026-07-01T21:29:44+01:00",
+    "hash": "19439cec292f",
+    "statement_hash": "9e1ed23169fe",
+    "deps": {
+      "i3-m7-gate": "1f4a84d8709c"
+    },
+    "prev_hash": "52cee89fa1ec"
+  },
+  {
+    "check": "i3-m8-gate",
+    "action": "bless",
+    "actor": "human",
+    "filled_by": "agent",
+    "ts": "2026-07-01T21:29:45+01:00",
+    "hash": "37d1c67ce8c4",
+    "statement_hash": "397f79f63643",
+    "deps": {
+      "i3-m7-gate": "1f4a84d8709c",
+      "i3-m8-config-baselined": "71a181143ce2",
+      "i3-m8-docs-complete": "020c98ae0cc8",
+      "i3-m8-handover-accepted": "19439cec292f",
+      "i3-m8-packaged-versioned": "c864a2734ae7"
+    },
+    "prev_hash": "b9a49374cd4a"
+  },
+  {
+    "check": "i4-m7-meets-need",
+    "action": "bless",
+    "actor": "human",
+    "filled_by": "agent",
+    "ts": "2026-07-01T21:29:47+01:00",
+    "hash": "bfd2f36d6e8e",
+    "statement_hash": "e16badd089ef",
+    "deps": {
+      "i4-m6-gate": "d758dff5dad3"
+    },
+    "prev_hash": "4c07af37ecdc"
+  },
+  {
+    "check": "i4-m7-gate",
+    "action": "bless",
+    "actor": "human",
+    "filled_by": "agent",
+    "ts": "2026-07-01T21:29:49+01:00",
+    "hash": "7cea8203574d",
+    "statement_hash": "d98edd11232b",
+    "deps": {
+      "i4-m7-acceptance-obtained": "81ff4d5401df",
+      "i4-m7-killer-ucs-demonstrated": "466f7cc30b94",
+      "i4-m7-meets-need": "bfd2f36d6e8e",
+      "i4-m7-validation-gaps": "29c65f876371"
+    },
+    "prev_hash": "c64a6bef43cd"
+  },
+  {
+    "check": "i4-m8-docs-complete",
+    "action": "bless",
+    "actor": "human",
+    "filled_by": "agent",
+    "ts": "2026-07-01T21:29:51+01:00",
+    "hash": "848740d053b1",
+    "statement_hash": "987e547283e1",
+    "deps": {
+      "i4-m7-gate": "7cea8203574d"
+    },
+    "prev_hash": "b0a7d97001b3"
+  },
+  {
+    "check": "i4-m8-config-baselined",
+    "action": "bless",
+    "actor": "human",
+    "filled_by": "agent",
+    "ts": "2026-07-01T21:29:53+01:00",
+    "hash": "8b138f97990d",
+    "statement_hash": "583f2b3c3f85",
+    "deps": {
+      "i4-m7-gate": "7cea8203574d"
+    },
+    "prev_hash": "9048520df6ec"
+  },
+  {
+    "check": "i4-m8-packaged-versioned",
+    "action": "bless",
+    "actor": "human",
+    "filled_by": "agent",
+    "ts": "2026-07-01T21:29:54+01:00",
+    "hash": "e5318e374980",
+    "statement_hash": "8e3a7a61e8eb",
+    "deps": {
+      "i4-m7-gate": "7cea8203574d"
+    },
+    "prev_hash": "ef0dbd70d911"
+  },
+  {
+    "check": "i4-m8-handover-accepted",
+    "action": "bless",
+    "actor": "human",
+    "filled_by": "agent",
+    "ts": "2026-07-01T21:29:56+01:00",
+    "hash": "80942e84ba47",
+    "statement_hash": "a0cd41f5bb83",
+    "deps": {
+      "i4-m7-gate": "7cea8203574d"
+    },
+    "prev_hash": "c9a1af0c2762"
+  },
+  {
+    "check": "i4-m8-gate",
+    "action": "bless",
+    "actor": "human",
+    "filled_by": "agent",
+    "ts": "2026-07-01T21:29:58+01:00",
+    "hash": "3dfed86a1659",
+    "statement_hash": "397f79f63643",
+    "deps": {
+      "i4-m8-config-baselined": "8b138f97990d",
+      "i4-m8-docs-complete": "848740d053b1",
+      "i4-m8-handover-accepted": "80942e84ba47",
+      "i4-m8-packaged-versioned": "e5318e374980"
+    },
+    "prev_hash": "c3fdd3b4c16d"
   }
 ]

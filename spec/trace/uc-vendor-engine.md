@@ -2,7 +2,7 @@
 id: uc-vendor-engine
 type: usecase
 statement: Vendor the engine into a vehicle's .quack/ and run every quack command through the vehicle, resolving guidance, templates, and the report shell along a vehicle-to-engine chain.
-refines: [need-engine-reuse]
+refines: [need-workspace-drive]
 class: review
 killer: false
 ---

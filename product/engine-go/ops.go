@@ -72,6 +72,16 @@ func cmdBless(args []string) {
 	}
 	saveEvents(events)
 	fmt.Println("blessed", target)
+	// trigger (go-report-live-reload): refresh the report after a killer or milestone bless so the
+	// board — and any open --watch page — reflects the adjudication without a manual re-render.
+	for _, nid := range ids {
+		if n, ok := nodes[nid]; ok && (n.Killer || n.Milestone > 0) {
+			if RenderReport("") == nil {
+				fmt.Println("report refreshed")
+			}
+			break
+		}
+	}
 }
 
 // enddesign

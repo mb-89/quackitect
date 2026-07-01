@@ -1,5 +1,5 @@
 # iteration breadcrumb — read only by the guidance resolver, never by the engine
 [iteration]
 type    = "default"
-rigor   = "systematic"
-version = "i0005_workspace_stubs"
+rigor   = "lean"
+version = "i0006_harness_and_readout"

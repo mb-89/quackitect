@@ -639,15 +639,10 @@ func RenderReport(outPath string) error {
 	}
 	outDir := reportOutDir(outPath)
 	nodes := LoadAll()
-	// The report is a display: show the persisted status snapshot, never re-run checks here.
-	// Recompute only when an input (spec, product, attest) is newer than the snapshot.
-	var sm map[string]string
-	if snapshotFresh() {
-		sm = loadSnapshot()
-	}
-	if sm == nil {
-		sm = StatusMap(nodes)
-	}
+	// The report always recomputes live — no cached snapshot. A stale snapshot could show a cached
+	// pass (a green that a live re-run would fail); computing fresh every render makes the board
+	// always truthful. Cheap now that checks are fast + deterministic. Pairs with --watch live-reload.
+	sm := StatusMap(nodes)
 	root := MerkleRoot(nodes)
 	cfg := ReadConfig(filepath.Join(QUACK, "config.toml"))
 
@@ -721,6 +716,9 @@ func RenderReport(outPath string) error {
 	H.WriteString("<script>" + assetJS("dagre.min.js") + "</script>")
 	H.WriteString("<script>" + assetJS("cytoscape-dagre.js") + "</script>")
 	H.WriteString("<script>" + reportJS + "</script>")
+	// live-reload hook: when served by `quack report --watch`, the SSE endpoint pushes on source
+	// change and the page reloads. Harmless as a standalone file:// report (EventSource silently fails).
+	H.WriteString("<script>try{new EventSource('/__reload').onmessage=function(){location.reload()}}catch(e){}</script>")
 	H.WriteString("</body></html>")
 
 	os.MkdirAll(outDir, 0o755)

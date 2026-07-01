@@ -15,7 +15,7 @@
    - **Only `engage start` creates versions.** Never mint them ad-hoc. Ids are `i<NNNN>_<name>`, four-digit zero-padded.
 <!-- enddesign -->
 <!-- design: planning-method  implements: planning :: quack start composes the project type over a rigor floor, tailors it to the idea (above the floor, never removing a killer), runs a plausibility check, and bakes a self-contained checklist of gates+subtasks. -->
-5. **plan & bake** (for the version being started now):
+5. **plan & bake** (for the version being started now):  → **load `compose-reference.md`** for the exact node/gate frontmatter, edge directions, coverage-rule names, rigor→milestone mapping, and plan-lock semantics. Do not re-derive them by reading example files.
    a. Confirm the project TYPE and RIGOR (`.quack/config.toml`). If the vision mismatches either, run the plausibility check. Re-confirm with the human. Then `quack start <version> "<motivation>"` — it activates the version (status active, type/rigor inherited) and points config at it. A planned version flips to active. The motivation surfaces in the report's iteration detail.
    b. `quack gather <version>` — collect ALL the rigor and type source into `.quack/gather/<version>/source.md`. That is checklists, prose, prompts, spreadsheets, and links.
    c. Read the WHOLE bundle. Open any flagged file. Follow any link. Then COMPOSE the plan as two separate layers in `spec/iterations/<version>/`:
@@ -26,7 +26,7 @@
         - **Coverage rules**: `req-traced`, `req-has-test`, `req-has-design`, `adr-traced`, `designs-realized`, `tests-pass`.
         No milestone may be empty.
       Then tailor the statements to THIS idea. Add subtasks above the rigor floor. Never remove a killer gate.
-   d. On the human's approval, run `quack bless --all` to lock the plan.
+   d. On the human's approval, the plan is set — its gates start **OPEN**, to be walked. **Do NOT `quack bless --all`.** Blessing at plan time marks every milestone DONE, makes `next` a no-op, and shows a falsely-green board (the exact trap that lets an un-built M5 read green). Executed/derived checks compute live; each **review gate is blessed one milestone at a time as you genuinely complete it**, via its handover pager (see next → ADJUDICATE).
 <!-- enddesign -->
 
 ## next  (walk the next forward check)
@@ -53,7 +53,7 @@
      # enddesign
      ```
      The engine scans `product/` for these markers. `quack lint` surfaces a requirement with no design. It folds the region's hash into the design. So editing the code reopens the design SUSPECT. Architectural **decisions** stay as ADRs in `spec/`. Only **realized code** gets a `design:` marker. A requirement with no realized code is an honest design-hole. Leave it.
-3. **ADJUDICATE.** A gate → present the evidence. Ask the human to run `quack bless <id>`. Never bless on their behalf. An executed check passes on re-run. Then run `quack next` again.
+3. **ADJUDICATE.** A gate → present the evidence. **For a killer OR milestone gate, ALWAYS render and SHOW the handover pager — `quack progress --pager <gate>` — as the hand-off (bar + decisions + risks + readiness + the y/n question). Never hand off a killer/milestone with a bare prose ask.** Ask the human to bless. Do not bless a killer on their behalf unless they explicitly tell you to bless that specific gate — a blanket "continue" is not permission; a human "y" to the presented pager IS that explicit bless (stamp `actor=human`). An executed check passes on re-run. Then run `quack next` again.
    - **Tag the adjudicator honestly.** `quack bless` stamps `actor=human` by default. When YOU (the agent) run a bless — a non-killer review you adjudicate, or one a human explicitly delegates to you — record it as agent: PowerShell `$env:QUACK_ACTOR='agent'; .\quack bless <id>; $env:QUACK_ACTOR=$null`. Leaving the default stamps an agent bless as human and blinds the self-cert metric (agent-blessed killers ÷ killers). A human's own bless keeps the default. Never tag a human bless as agent or vice-versa.
    - **Stop at every milestone gate.** A milestone gate (`…-m<n>-gate`) is a hand-off to the human, not a step you walk past. Before you stop, **write the milestone's evidence doc** (below), then render and SHOW the report (`quack report`) so the human reviews the board. Then run the increasing-scrutiny review (`guides/milestone-review.md`) and ask them to bless. Always show the report whenever you stop for the human at a milestone.
    - **Write the evidence doc — the verdict referent.** For each milestone, persist the FILLed evidence and the increasing-scrutiny review into `spec/iterations/<iteration>/M<n>-<slug>.md` (plain markdown, no frontmatter — it is evidence, not a node). One `## <heading>  → <check-id>` section per subtask, capturing what satisfied it; end with the review rounds and the verdict. The report's `verdict ↗` link on every DONE check in that milestone globs `M<n>-*.md` and opens this doc — **no doc, no verdict link.** Use the canonical slugs: `M1-frame`, `M2-inputs`, `M3-candidates`, `M4-decision`, `M5-spike-findings`, `M6-build-plan`, `M7-validation`, `M8-handover`. Write/extend it as you FILL the milestone's checks, and finalize it with the verdict before you ask for the gate bless.
