@@ -14,13 +14,13 @@ Plus a committed **`AGENTS.md` stub** (drive via `.\quack`, load prompts via `qu
 
 ## Choice traced  → i5-m4-choice-traced
 
-| Criterion | How the choice satisfies it |
-|---|---|
-| Out of VC | Location only in gitignored `.quack/engine.local` or `QUACK_ENGINE`. |
-| Drives from inside | Committed root `quack.cmd`; no `--base`. |
-| No engine copied in | Launcher resolves; nothing binary committed. |
-| Portability | Plain `.cmd`, no symlinks. |
-| Simplicity | Reuses the existing launcher shape; one optional pointer file + one gitignore rule. |
+| Criterion           | How the choice satisfies it                                                         |
+| ------------------- | ----------------------------------------------------------------------------------- |
+| Out of VC           | Location only in gitignored `.quack/engine.local` or `QUACK_ENGINE`.                |
+| Drives from inside  | Committed root `quack.cmd`; no `--base`.                                            |
+| No engine copied in | Launcher resolves; nothing binary committed.                                        |
+| Portability         | Plain `.cmd`, no symlinks.                                                          |
+| Simplicity          | Reuses the existing launcher shape; one optional pointer file + one gitignore rule. |
 
 Internal → B → A dominates the rejected C/D on the High criteria.
 

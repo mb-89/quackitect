@@ -13,13 +13,13 @@ How a bare workspace reaches its engine:
 
 ## Criteria weighted  → i5-m3-criteria-weighted
 
-| Criterion | Weight |
-|---|---|
-| Engine path out of version control | High |
-| Drives from inside (no `--base`) | High |
-| No engine copied in | High |
-| Portability (Windows-first) | Medium |
-| Simplicity / low setup | Medium |
+| Criterion                          | Weight |
+| ---------------------------------- | ------ |
+| Engine path out of version control | High   |
+| Drives from inside (no `--base`)   | High   |
+| No engine copied in                | High   |
+| Portability (Windows-first)        | Medium |
+| Simplicity / low setup             | Medium |
 
 ## Feasibility checked  → i5-m3-feasibility-checked
 
