@@ -82,6 +82,20 @@ resources resolve from your vehicle, all state writes under `<path>`. So one ven
 many workspaces (its own and others') without vendoring a second engine. Rebuild with `quack build`
 (compile + re-baseline golden in one step).
 
+## Drive a BARE workspace from INSIDE (no engine copied in)
+A bare workspace (product+spec+`.quack/`, no engine) can be made drivable from *inside* its own folder,
+without vendoring an engine and without committing the engine's location:
+```
+quack start stubs [target]     # default target: the current workspace
+```
+This emits three committed stubs: a launcher (`<proj>.cmd`), an `AGENTS.md` entry surface, and a
+`.gitignore`. The launcher resolves an engine at runtime, in order: **internal** `.quack\engine\quack.exe`
+→ **gitignored pointer** `.quack\engine.local` (a line = path to a `quack.exe`) → **env** `QUACK_ENGINE`;
+if none resolve it exits with a clear message. Point it once per machine (`echo <path>\quack.exe >
+.quack\engine.local`, gitignored), then `.\<proj> status` drives the workspace from inside. The engine
+location never enters version control. Use this instead of `--base` when you want the workspace to be
+self-driving on its own.
+
 ## Worked example
 ```
 cd myproj

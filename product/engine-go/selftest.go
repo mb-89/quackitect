@@ -1,11 +1,14 @@
 package main
 
 import (
+	"context"
 	"crypto/sha256"
 	"encoding/hex"
 	"fmt"
 	"os"
+	"os/exec"
 	"path/filepath"
+	"runtime"
 	"sort"
 	"strings"
 	"time"
@@ -84,6 +87,8 @@ func runSelftest(name string) bool {
 		return selftestBrandResolves()
 	case "validation-global":
 		return selftestValidationGlobal()
+	case "stubs":
+		return selftestStubs()
 	}
 	return false // unknown / not-yet-built check -> OPEN
 }
@@ -192,14 +197,50 @@ func selftestTestsPassEval() bool {
 }
 
 // selftestWorkspace: the engine resolves a workspace (ROOT) separate from the ENGINE install, and the
-// engine resources resolve from ENGINE independent of the workspace (req-workspace-split). The full
-// vehicle->dummy-workspace->iteration machinery is demonstrated end-to-end at M7 (test-machinery-e2e).
+// engine resources resolve from ENGINE independent of the workspace (req-workspace-split). It then
+// DRIVES a bare workspace FROM INSIDE via the emitted stub launcher, resolving the engine at runtime
+// (req-drive-from-inside) — the roundtrip the feature exists for.
 func selftestWorkspace() bool {
 	if ENGINE == "" {
 		return false
 	}
-	st, err := os.Stat(filepath.Join(EngineDir(), "method"))
-	return err == nil && st.IsDir()
+	if st, err := os.Stat(filepath.Join(EngineDir(), "method")); err != nil || !st.IsDir() {
+		return false
+	}
+	return driveFromInside()
+}
+
+// driveFromInside emits the stub set into a throwaway BARE workspace, points the gitignored engine
+// pointer at THIS engine binary, and drives it FROM INSIDE via the emitted launcher — proving a bare
+// workspace resolves an engine at runtime and runs with ROOT = itself. Time-boxed so it can NEVER hang;
+// the temp workspace has no test nodes, so its own tests-pass is vacuous (no recursion into this hook).
+func driveFromInside() bool {
+	if runtime.GOOS != "windows" {
+		return true // the .cmd launcher is Windows-first; skip the drive elsewhere (lightweight check stands)
+	}
+	exe, err := os.Executable()
+	if err != nil {
+		return false
+	}
+	dir, err := os.MkdirTemp("", "quack-inside-*")
+	if err != nil {
+		return false
+	}
+	defer os.RemoveAll(dir)
+	os.MkdirAll(filepath.Join(dir, ".quack"), 0o755)
+	os.MkdirAll(filepath.Join(dir, "product"), 0o755)
+	os.MkdirAll(filepath.Join(dir, "spec"), 0o755)
+	os.WriteFile(filepath.Join(dir, ".quack", "config.toml"), []byte("[iteration]\ntype = \"default\"\nrigor = \"systematic\"\nversion = \"\"\n"), 0o644)
+	for name, body := range insideStubFiles("probe") { // launcher + AGENTS.md + .gitignore
+		os.WriteFile(filepath.Join(dir, name), []byte(body), 0o644)
+	}
+	os.WriteFile(filepath.Join(dir, ".quack", "engine.local"), []byte(exe), 0o644) // path B, gitignored
+	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
+	defer cancel()
+	cmd := exec.CommandContext(ctx, "cmd", "/c", "probe.cmd status")
+	cmd.Dir = dir // drive FROM INSIDE the bare workspace
+	out, err := cmd.Output()
+	return err == nil && strings.Contains(string(out), "gates |")
 }
 
 // selftestBrand: user-facing output is branded from the invoked binary name (req-white-label).
@@ -214,8 +255,22 @@ func selftestClaudeVendor() bool {
 }
 
 // selftestReportVerdict: the report wires a DONE check to its verdict/evidence link (req-verdict-link).
+// Also a regression guard: rendering with a RELATIVE --out must still resolve links. Node paths are
+// absolute, so a relative outDir once made filepath.Rel error and blank every href + verdict link.
+// This tests the outDir primitive PURELY — it must never call RenderReport, which computes StatusMap
+// (→ coverage:tests-pass → this selftest) and would recurse forever.
 func selftestReportVerdict() bool {
-	return strings.Contains(reportCSS+reportJS, "verdict")
+	if !strings.Contains(reportCSS+reportJS, "verdict") {
+		return false
+	}
+	// The exact regression: a relative outPath must yield an ABSOLUTE outDir, so filepath.Rel against
+	// absolute node paths succeeds instead of erroring to "".
+	if !filepath.IsAbs(reportOutDir(filepath.Join(".quack", "out", "report.html"))) {
+		return false
+	}
+	// And Rel from that outDir into an absolute spec path must produce a non-empty relative href.
+	rel, err := filepath.Rel(reportOutDir("report.html"), filepath.Join(SPEC, "iterations"))
+	return err == nil && rel != ""
 }
 
 // selftestReportNesting: the report renders a nested, collapsible subtask tree (req-trace-nesting).
@@ -284,9 +339,37 @@ func selftestReport() bool {
 	return strings.Contains(blob, "trace-filter") && strings.Contains(reportJS, "RegExp") && strings.Contains(reportJS, "dagre")
 }
 
+// selftestStubs: the drive-from-inside stub set (req-inside-launcher, req-inside-entry-surface,
+// req-engine-loc-untracked). Verifies the launcher resolves internal -> pointer -> env in order with a
+// clear failure, the AGENTS.md entry surface is self-contained (no hard checkout path), and the
+// .gitignore excludes the engine pointer. Wires test-inside-launcher/entry-surface/engine-loc-untracked.
+func selftestStubs() bool {
+	f := insideStubFiles("probe")
+	launcher, agents, ignore := f["probe.cmd"], f["AGENTS.md"], f[".gitignore"]
+	// launcher: three resolution branches in order + a clear failure, CRLF for cmd.exe.
+	iInternal := strings.Index(launcher, `.quack\engine\quack.exe`)
+	iPointer := strings.Index(launcher, `.quack\engine.local`)
+	iEnv := strings.Index(launcher, "QUACK_ENGINE")
+	if iInternal < 0 || iPointer < 0 || iEnv < 0 || !(iInternal < iPointer && iPointer < iEnv) {
+		return false
+	}
+	if !strings.Contains(launcher, "no engine found") || !strings.Contains(launcher, "\r\n") {
+		return false
+	}
+	// entry surface: names the launcher + path-free prompt loading; NO hard checkout path.
+	if !strings.Contains(agents, `.\probe`) || !strings.Contains(agents, "resolve method/prompts") || !strings.Contains(agents, "guides") {
+		return false
+	}
+	if strings.Contains(agents, "product/quackitect") {
+		return false
+	}
+	// engine location out of VC.
+	return strings.Contains(ignore, ".quack/engine.local")
+}
+
 // RunSelftestCLI runs one named check (or all) and returns an exit code.
 func RunSelftestCLI(args []string) int {
-	all := []string{"deps", "parser", "determinism", "ids", "help", "parity", "perf", "deps-prompt", "report", "split", "integrate", "engine", "method", "surface", "build", "no-trace-gate", "tests-pass-eval", "workspace", "brand", "claude-vendor", "report-verdict", "report-nesting", "brand-resolves", "validation-global"}
+	all := []string{"deps", "parser", "determinism", "ids", "help", "parity", "perf", "deps-prompt", "report", "split", "integrate", "engine", "method", "surface", "build", "no-trace-gate", "tests-pass-eval", "workspace", "brand", "claude-vendor", "report-verdict", "report-nesting", "brand-resolves", "validation-global", "stubs"}
 	names := args
 	if len(names) == 0 {
 		names = all

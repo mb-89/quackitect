@@ -1,0 +1,12 @@
+---
+id: i5-m6-detailed-design-complete
+statement: Detailed design complete — every requirement has a realized design.
+milestone: M6
+class: executed
+killer: false
+verify: coverage:designs-realized
+depends_on: [i5-m6-build]
+---
+
+## Rationale (not load-bearing)
+Subtask of milestone M6. Derived from the trace (coverage:designs-realized).

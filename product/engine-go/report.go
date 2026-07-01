@@ -621,12 +621,23 @@ func projectDesc() string {
 // and metric cards + a detail panel). Pure display: rendering never runs checks (the engine guard).
 // Plus one filter box over the graph: iteration predicates (0001, <=0002, >=0001), text or /regex/,
 // combined with AND/OR, on-focus help; on change a breadthfirst relayout of the visible subgraph.
+// reportOutDir returns the directory that report links are made relative to. Node paths are absolute
+// (walked from an absolute SPEC), so outDir must be absolute too — otherwise filepath.Rel(outDir, path)
+// errors and yields "", blanking every href and verdict link when rendered with a RELATIVE --out.
+func reportOutDir(outPath string) string {
+	d := filepath.Dir(outPath)
+	if abs, err := filepath.Abs(d); err == nil {
+		return abs
+	}
+	return d
+}
+
 // View-only: it never changes the committed HTML or the determinism root.
 func RenderReport(outPath string) error {
 	if outPath == "" {
 		outPath = filepath.Join(QUACK, "out", "report.html")
 	}
-	outDir := filepath.Dir(outPath)
+	outDir := reportOutDir(outPath)
 	nodes := LoadAll()
 	// The report is a display: show the persisted status snapshot, never re-run checks here.
 	// Recompute only when an input (spec, product, attest) is newer than the snapshot.

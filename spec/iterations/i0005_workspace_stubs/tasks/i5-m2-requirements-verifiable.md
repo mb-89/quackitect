@@ -1,0 +1,12 @@
+---
+id: i5-m2-requirements-verifiable
+statement: Requirements verifiable. Every requirement has a test.
+milestone: M2
+class: executed
+killer: false
+verify: coverage:req-has-test
+depends_on: [i5-m1-gate]
+---
+
+## Rationale (not load-bearing)
+Subtask of milestone M2. Derived from the trace (coverage:req-has-test).

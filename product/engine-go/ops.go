@@ -223,6 +223,10 @@ func cmdStart(args []string) {
 		cmdStartInit(args[1:])
 		return
 	}
+	if len(args) > 0 && args[0] == "stubs" {
+		cmdStartStubs(args[1:])
+		return
+	}
 	plan := false
 	var rest []string
 	for _, a := range args {
@@ -514,6 +518,125 @@ func cmdStartInit(args []string) {
 	fmt.Println("  vendored the engine -> .quack/vendor/ ; .claude/ commands ; wrote config.toml, " + proj + ".cmd, AGENTS.md, empty product/ + spec/.")
 	fmt.Println("  next: cd into it, rebuild (cd .quack/vendor/engine-go && go build -o ../../engine/" + exe + " .),")
 	fmt.Println("        set [iteration].version, then `." + string(filepath.Separator) + proj + " start <version>` and compose your spec.")
+}
+
+// --- drive-from-inside stubs (i0005): make a bare workspace drivable from within, engine linked at runtime ---
+
+// design: go-inside-launcher  implements: req-inside-launcher
+// The committed root launcher for a bare workspace. It resolves an engine at runtime — internal build,
+// then the gitignored pointer file, then the env var — and forwards; with none set it fails clearly.
+// No engine binary is committed. The label-goto resolution order was validated in the i5 M5 spike.
+const insideLauncherTmpl = `@echo off
+rem {{PROJ}} launcher: resolve an engine (internal -> gitignored pointer -> env) and forward. No engine path committed.
+setlocal enabledelayedexpansion
+set "SELF=%~dp0"
+if exist "%SELF%.quack\engine\quack.exe" set "ENGINE=%SELF%.quack\engine\quack.exe" & goto run
+if exist "%SELF%.quack\engine.local" ( set /p ENGINE=<"%SELF%.quack\engine.local" & goto run )
+if defined QUACK_ENGINE set "ENGINE=%QUACK_ENGINE%" & goto run
+echo no engine found: create .quack\engine.local (a line = path to quack.exe) or set QUACK_ENGINE 1>&2
+exit /b 1
+:run
+"%ENGINE%" %*
+exit /b %errorlevel%
+`
+
+// enddesign
+
+// design: go-inside-agents  implements: req-inside-entry-surface
+// The committed AGENTS.md entry surface for a bare workspace: tells an AI to drive via the launcher and
+// load method prompts path-free through `quack resolve` / `quack guides`. Self-contained — no hard link
+// to a quackitect checkout.
+const insideAgentsTmpl = `# AGENTS.md — {{PROJ}}
+
+{{PROJ}} is a quackitect workspace with no engine of its own. Drive it from INSIDE this folder:
+
+    .\{{PROJ}} <cmd>        (status | next | start | bless | note | gather | report | lint | ship)
+
+The launcher resolves an engine at runtime (internal .quack\engine, then .quack\engine.local, then
+%QUACK_ENGINE%). The engine's location is never committed.
+
+Load the method prompts path-free through the linked engine — do NOT hard-code a quackitect path:
+
+    .\{{PROJ}} guides                              # list the available guides
+    .\{{PROJ}} resolve method/prompts/engage.md    # resolve a prompt to drive the loop
+
+The human adjudicates gates; never bless on their behalf.
+`
+
+// enddesign
+
+// design: go-inside-gitignore  implements: req-engine-loc-untracked
+// The .gitignore lines that keep the engine location out of version control: the machine-local pointer
+// and any vendored engine binary. A clone carries no absolute path and no engine.
+const insideGitignoreTmpl = `# the engine location is machine-local, never committed
+.quack/engine.local
+.quack/engine/
+# engine-managed caches / outputs
+.quack/out/
+.quack/gather/
+.quack/spikes/
+`
+
+// enddesign
+
+// insideStubFiles returns the drive-from-inside stub set (relative path -> content) for project name
+// proj. The launcher is named <proj>.cmd (CRLF for cmd.exe). Consumed by the emit step (cmdInitStubs).
+func insideStubFiles(proj string) map[string]string {
+	sub := func(s string) string { return strings.ReplaceAll(s, "{{PROJ}}", proj) }
+	return map[string]string{
+		proj + ".cmd": strings.ReplaceAll(sub(insideLauncherTmpl), "\n", "\r\n"),
+		"AGENTS.md":   sub(insideAgentsTmpl),
+		".gitignore":  insideGitignoreTmpl,
+	}
+}
+
+// design: go-init-stubs  implements: req-drive-from-inside
+// `quack start stubs [target]` makes a workspace drivable from INSIDE: it writes the launcher, AGENTS.md,
+// and .gitignore stubs (insideStubFiles) into target (default: the current workspace ROOT). The launcher
+// resolves an engine at runtime with no engine path committed. Idempotent — existing files are kept; the
+// critical .gitignore lines are ensured present so the engine pointer can never be committed.
+func cmdStartStubs(args []string) {
+	target := ROOT
+	if len(args) > 0 && strings.TrimSpace(args[0]) != "" {
+		if abs, err := filepath.Abs(args[0]); err == nil {
+			target = abs
+		}
+	}
+	proj := filepath.Base(target)
+	for rel, content := range insideStubFiles(proj) {
+		dst := filepath.Join(target, rel)
+		writeIfAbsent(dst, content)
+		if rel == ".gitignore" {
+			ensureLines(dst, ".quack/engine.local", ".quack/engine/")
+		}
+	}
+	fmt.Println("stubs -> " + target)
+	fmt.Println("  wrote " + proj + ".cmd, AGENTS.md, .gitignore (kept any existing).")
+	fmt.Println("  point the engine: create .quack/engine.local (a line = path to quack.exe) or set QUACK_ENGINE.")
+}
+
+// enddesign
+
+// ensureLines appends any of lines not already present in the file at path (idempotent gitignore merge).
+func ensureLines(path string, lines ...string) {
+	raw, err := os.ReadFile(path)
+	if err != nil {
+		return
+	}
+	s := string(raw)
+	add := ""
+	for _, ln := range lines {
+		if !strings.Contains(s, ln) {
+			add += ln + "\n"
+		}
+	}
+	if add == "" {
+		return
+	}
+	if len(s) > 0 && !strings.HasSuffix(s, "\n") {
+		add = "\n" + add
+	}
+	os.WriteFile(path, []byte(s+add), 0o644)
 }
 
 // copyTree recursively copies src -> dst, skipping build junk (caches, binaries, __pycache__).

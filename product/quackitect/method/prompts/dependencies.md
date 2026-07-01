@@ -15,6 +15,20 @@ runtime. When a tool is missing, ask the user to install it with the winget comm
   - Build **inside** the module dir — the `go.mod` is there; `go build` from the repo root fails with "cannot find main module".
   - Run: `.\quack <cmd>` via the `quack.cmd` launcher at the project root (or put `.quack\engine` on PATH).
 
+### Fallback when Go can't be installed (blocked download / no admin)
+
+Some environments block the Go SDK download (go.dev/dl, dl.google.com) or forbid installs. If
+`uv` is available, fetch the **real Go toolchain from PyPI** via the `go-bin` package — no native
+Go install, no proxy fight (it comes from PyPI, which is typically reachable):
+
+- Verify: `uvx --from go-bin go version`  (e.g. `go version go1.26.4 windows/amd64`)
+- Build directly: from `product\engine-go`, run `uvx --from go-bin go build -o ..\..\.quack\engine\quack.exe .`
+- Make `quack build` work too: the repo ships a shim at `.quack\tools\go.cmd` that forwards to
+  `uvx --from go-bin go`. `quack.cmd` appends `.quack\tools\` to PATH (last), so the engine's internal
+  `go build` resolves the shim as a **fallback** while a real Go install still takes precedence.
+  For a plain `go build` in your own shell, either call `.quack\tools\go build ...` or add `.quack\tools\` to PATH.
+- Same trick for other toolchains: `ziglang` on PyPI provides `zig` / `zig cc`.
+
 ## Optional
 
 - **git** — only the report's commit stamp uses it; the engine runs fine without it.

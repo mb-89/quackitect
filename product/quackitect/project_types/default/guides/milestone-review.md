@@ -17,3 +17,5 @@ Each review covers two sets of checks. The milestone's own checks. And every inp
 **Scale to size.** Match the review to the gate's risk. Do not red-team a trivial gate.
 
 **Verdict.** End with a clear verdict. Either pass, and proceed to bless. Or reopen the named checks with reasons. No silent pass.
+
+**Persist it.** Write the rounds and the verdict into the milestone's evidence doc `spec/iterations/<iteration>/M<n>-<slug>.md` (one `## heading → check-id` section per subtask; canonical slugs `M1-frame` … `M8-handover`). This doc is the referent the report's `verdict ↗` link opens for every DONE check in the milestone — if it is missing, the verdict link is blank. Write it before you ask the human to bless the gate.

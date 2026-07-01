@@ -2,4 +2,4 @@
 [iteration]
 type    = "default"
 rigor   = "systematic"
-version = "i0004_vendoring_out"
+version = "i0005_workspace_stubs"

@@ -1,5 +1,8 @@
 # AGENTS.md — how to drive Quackitect
 
+> **READ FIRST — BINDING.** Before you act on this project, read and obey
+> `product/quackitect/method/prompts/contract.md`. It governs every move.
+
 Quackitect is a **human-driven gate ledger**. You, the agent, FILL checks. The human ADJUDICATES the ones that are gates. **Never bless on the human's behalf.**
 
 **Voice (always).** Every output follows `product/brand/voice.md`. This holds for chat and for artifacts.
@@ -22,6 +25,7 @@ Quackitect is a **human-driven gate ledger**. You, the agent, FILL checks. The h
 quack status [id]        # the text board to stdout; with an id, why it's suspect
 quack next               # the next ready check to walk
 quack start <id> [--plan]# activate a version (--plan registers a future one)
+quack start stubs [path] # emit drive-from-inside stubs (launcher+AGENTS+gitignore) into a bare workspace
 quack why <id>           # what input changed
 quack bless [--all|<id>] # record a human adjudication — only when the human says yes
 quack note "<text>"      # deterministic capture lane
