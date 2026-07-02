@@ -1,0 +1,7 @@
+# eol policy — LF in repo and working tree; prevents CRLF churn (added post-i7, markus-approved)
+* text=auto eol=lf
+*.cmd text eol=crlf
+*.ps1 text eol=crlf
+*.png binary
+*.exe binary
+*.zip binary
