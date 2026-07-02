@@ -29,6 +29,15 @@
    d. On the human's approval, the plan is set — its gates start **OPEN**, to be walked. **Do NOT `quack bless --all`.** Blessing at plan time marks every milestone DONE, makes `next` a no-op, and shows a falsely-green board (the exact trap that lets an un-built M5 read green). Executed/derived checks compute live; each **review gate is blessed one milestone at a time as you genuinely complete it**, via its handover pager (see next → ADJUDICATE).
 <!-- enddesign -->
 
+## research  (a referenced, pluggable capability)
+<!-- design: method-research-ref  implements: req-research-pluggable :: Research (prior-art at M3, field/retro scans at start) is a REFERENCED capability, never vendored. Claude Code delegates to the built-in deep-research skill (parallel fan-out + adversarial verification); any other harness runs the SAME method inline. Do NOT copy a harness's research implementation into the repo. -->
+When a step needs multi-source research — `start` (retro/triage field scans) or M3 (candidate
+prior-art) — **Claude Code** invokes the built-in `deep-research` skill; **any other harness** runs the
+same method inline: decompose into search angles → search each → fetch sources → adversarially
+cross-check → synthesize with citations, using whatever web tools it has. **Never vendor** a harness's
+research skill into the repo — reference it.
+<!-- enddesign -->
+
 ## next  (walk the next forward check)
 
 > **TRUST THE PROCESS — do not over-check (a known, costly failure mode).** Concentrate ONLY on the

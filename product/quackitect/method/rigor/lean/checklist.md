@@ -33,8 +33,11 @@ without restructuring. `(killer)` means mandatory. `(executed)`/`(derived)` mean
   - [ ] approach chosen with a recorded reason
   - [ ] ADRs traced — every ADR addresses a requirement *(derived: coverage:adr-traced)*
 
-- **L4 — Build & test** · *gate: review* — maps to M6
-  - method: Implement to the design, marking each realized design inline in the code. Run the cheap checks.
+- **L4 — Build & test** · *gate: review* — maps to M6 — **imports `../\_shared/implementation.md`**
+  - method: **Import the shared implementation fragment at LEAN density** — the test-first sequence
+    (author tests → observe RED → implement GREEN) under ONE review gate; roles default to inline.
+    Mark each realized design inline in the code; run the cheap checks.
+  - [ ] suite observed RED — new tests failed before the build *(derived: coverage:tests-red)*
   - [ ] tests pass *(killer, executed)*
   - [ ] designs realized — every requirement has a realized design *(derived: coverage:designs-realized)*
   - [ ] internal quality ok — a quick self or peer review

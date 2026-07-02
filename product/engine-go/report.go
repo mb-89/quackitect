@@ -304,6 +304,7 @@ func graphTabs(nodes map[string]Node, sm map[string]string) []gtab {
 
 func checksMap(nodes map[string]Node, sm map[string]string, outDir string) map[string]map[string]interface{} {
 	out := map[string]map[string]interface{}{}
+	bl := latestBless()
 	for id, n := range nodes {
 		var edges []string
 		for _, e := range edgesOf(n) {
@@ -321,23 +322,39 @@ func checksMap(nodes map[string]Node, sm map[string]string, outDir string) map[s
 			k = "1"
 		}
 		// design: go-verdict-link  implements: req-verdict-link
-		// the "verdict" link: a DONE check links to its evidence — the milestone doc where the reason it
-		// passed is written (the bless rationale). selftest:report-verdict guards the wiring.
-		// enddesign
-		// Only DONE items have a verdict; a failed/open item has no reason-it-passed, even if an old doc exists.
-		verdictHref := ""
-		if sm[id] == "DONE" && n.Milestone > 0 {
-			it := iterationOfNode(n, nodes, nil)
-			for _, pat := range []string{fmt.Sprintf("M%d-*.md", n.Milestone), filepath.Join("design", fmt.Sprintf("M%d*.md", n.Milestone))} {
-				if m, _ := filepath.Glob(filepath.Join(SPEC, "iterations", it, pat)); len(m) > 0 {
-					rel, _ := filepath.Rel(outDir, m[0])
-					verdictHref = filepath.ToSlash(rel)
-					break
+		// Every DONE check surfaces its VERDICT: the bless attestation (actor · short-hash) for a review
+		// check, or "self-certified" for an executed check — read from the attest log — so a DONE check
+		// shows WHY it passed even when NO milestone evidence doc exists (the i6 field gap). The optional
+		// verdict_href deep-links the M<n>-*.md doc when one is present. selftest:report-verdict guards it.
+		verdict, verdictHref := "", ""
+		if sm[id] == "DONE" {
+			if n.Class == "executed" {
+				verdict = "self-certified · executed"
+			} else if e, ok := bl[id]; ok {
+				actor := e.Actor
+				if actor == "" {
+					actor = "human"
+				}
+				h := e.Hash
+				if len(h) > 8 {
+					h = h[:8]
+				}
+				verdict = "blessed · " + actor + " · " + h
+			}
+			if n.Milestone > 0 {
+				it := iterationOfNode(n, nodes, nil)
+				for _, pat := range []string{fmt.Sprintf("M%d-*.md", n.Milestone), filepath.Join("design", fmt.Sprintf("M%d*.md", n.Milestone))} {
+					if m, _ := filepath.Glob(filepath.Join(SPEC, "iterations", it, pat)); len(m) > 0 {
+						rel, _ := filepath.Rel(outDir, m[0])
+						verdictHref = filepath.ToSlash(rel)
+						break
+					}
 				}
 			}
 		}
+		// enddesign
 		out[id] = map[string]interface{}{"id": id, "type": n.Type, "state": sm[id], "killer": k,
-			"stmt": n.Statement, "edges": edges, "verify": n.Verify, "href": href, "verdict_href": verdictHref}
+			"stmt": n.Statement, "edges": edges, "verify": n.Verify, "href": href, "verdict": verdict, "verdict_href": verdictHref}
 	}
 	return out
 }
@@ -351,7 +368,7 @@ func milestoneOf(n Node) (int, bool) {
 	return 0, false
 }
 
-// design: go-trace-nesting  implements: req-trace-nesting
+// design: go-trace-nesting  implements: req-trace-nesting, req-build-test-nesting
 // renderSubs nests subtasks: children (parent: <id>) render beneath their parent, collapsible; leaves
 // render flat. The third level (build/test parents) reflects real hierarchy; selftest:report-nesting guards it.
 // enddesign

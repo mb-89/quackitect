@@ -12,7 +12,8 @@ The cheatsheet so you never re-derive formats by reading example files. Load thi
 - ADR  `addresses: [req-…]`
 
 Derived coverage rules (used as `verify: coverage:<rule>` on executed subtasks):
-`req-traced`, `req-has-test`, `req-has-design`, `adr-traced`, `designs-realized`, `tests-pass`.
+`req-traced`, `req-has-test`, `req-has-design`, `adr-traced`, `designs-realized`, `tests-pass`, `tests-red`.
+`tests-red` = every executed test carries a `red-observed` attestation (via `quack observe-red <test>`) at its current hash — test-first RED before the build.
 
 ## Trace node frontmatter — in `spec/iterations/<iter>/`
 ```
@@ -66,3 +67,15 @@ handover pager (`quack progress --pager <gate>`). `quack lint` "requirement has 
 ## Where needs live
 Cross-cutting / dogfood needs: `spec/trace/` (`need-engage`, `need-note`, `need-review`, `need-workspace-drive`).
 Iteration-specific needs: the iteration dir. **Fold new work under existing needs — do not sprawl new ones.**
+
+## Roles (the implementation seam) — `method/roles/README.md`
+The implementation milestone's testdesigner / implementer / tester are **pluggable** (file-based Strategy).
+Default binding is **inline** (the driving agent) — omit and behaviour is unchanged. To swap, add a
+`roles:` block to `iteration.md` (resolves `iteration.roles` ▸ `type.roles` ▸ `default`):
+```
+roles:
+  testdesigner: default   # | subagent:<name> | tool:spec-kit | tool:openspec
+  implementer:  default
+  tester:       default
+```
+The engine never runs a role; it only gates the output (`tests-red`, `designs-realized`, `tests-pass`).

@@ -51,7 +51,7 @@ stamp). The rest are human-judged (`class: review`). The trace itself is content
   - [ ] design is buildable
   - [ ] spike results recorded — design advanced as needed
 
-- **M6 — Build & verify** · *gate: implementation*
+- **M6 — Build & verify** · *gate: implementation* — **imports `../_shared/implementation.md`** at full sub-gate density
   - method: FIRST plan the build. Decompose it into small, resumable steps and seed them as CHILDREN
     of a generic **build** task (`parent: <the build task>`), in dependency order, with iteration-unique
     ids — a monolithic build is lost on interruption; small nested steps make progress durable. If the
@@ -62,6 +62,7 @@ stamp). The rest are human-judged (`class: review`). The trace itself is content
     (all iterations, not just this one) so regressions in earlier work are caught. Tests live in the
     trace (they verify requirements); they are not task-tree subtasks — the verification task rolls them up.
   - [ ] build planned — decomposed into small, resumable steps seeded as children of the build task *(killer)*
+  - [ ] suite observed RED — every new test ran and failed before the build *(derived: coverage:tests-red)*
   - [ ] build — the planned steps nested beneath it are realized
   - [ ] detailed design complete — every requirement has a realized design *(derived: coverage:designs-realized)*
   - [ ] internal quality ok (review)

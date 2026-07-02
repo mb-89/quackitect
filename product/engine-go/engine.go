@@ -297,6 +297,31 @@ func attestLoad() map[string]attestState {
 	return st
 }
 
+// latestBless maps each check to its most recent bless event (actor/hash) — the report verdict source.
+func latestBless() map[string]Event {
+	m := map[string]Event{}
+	for _, e := range attestEvents() {
+		if e.Action == "bless" {
+			m[e.Check] = e
+		}
+	}
+	return m
+}
+
+// redObservedFrom maps each check to the hash at which it was last observed FAILING (tests-red).
+// Split from redObserved so the rule is hermetically testable without touching the real attest log.
+func redObservedFrom(events []Event) map[string]string {
+	m := map[string]string{}
+	for _, e := range events {
+		if e.Action == "red-observed" {
+			m[e.Check] = e.Hash
+		}
+	}
+	return m
+}
+
+func redObserved() map[string]string { return redObservedFrom(attestEvents()) }
+
 // GateState: CONTENT for trace work-products, else DONE/SUSPECT/OPEN. Executed checks
 // compute live (coverage rule or cached run); review checks compare the blessed hash.
 func gateState(id string, nodes map[string]Node, a map[string]attestState, memo map[string]string) string {

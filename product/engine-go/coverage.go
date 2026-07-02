@@ -102,6 +102,21 @@ func coverageRule(nodes map[string]Node, rule, scope string) bool {
 			}
 		}
 		return true
+	case "tests-red":
+		// Test-first: every executed test must carry a red-observed attestation at its CURRENT hash
+		// (a run-once record; an edited test's hash changes and must be re-observed). Per the M5 spike.
+		ro := redObserved()
+		memo := map[string]string{}
+		seen := false
+		for _, n := range nodes {
+			if n.Type == "test" && n.Class == "executed" && strings.HasPrefix(n.Verify, "selftest:") {
+				seen = true
+				if ro[n.ID] != fullHash(n.ID, nodes, memo) {
+					return false
+				}
+			}
+		}
+		return seen
 	// design: go-tests-pass-eval  implements: req-tests-pass-unify
 	// tests-pass evaluates selftest: tests in-process (runSelftest) — the SAME evaluator the gate state
 	// machine uses — not a divergent shell path; selftest:tests-pass-eval guards the unification.
@@ -133,6 +148,12 @@ func coverageRule(nodes map[string]Node, rule, scope string) bool {
 	return false
 }
 
+// design: go-evidence-honesty  implements: req-evidence-honesty
+// Evidence honesty (#8): a check's cached pass/fail is keyed by the FULL input hash
+// (evidence/<id>/<h>.json), so any change to a hashed input yields a new key and a cache MISS ->
+// re-run, never a stale pass. Selftest and coverage checks bypass this cache entirely (evaluated
+// live in gateState/coverageRule), and an unknown selftest returns false -> OPEN, so a live-red or
+// unbuilt check is never masked as DONE.
 // runExecuted runs a check's verify command (shell), caching the pass/fail by hash.
 func runExecuted(n Node, h string) string {
 	cdir := filepath.Join(QUACK, "evidence", n.ID)
@@ -161,6 +182,8 @@ func runExecuted(n Node, h string) string {
 	os.WriteFile(cf, out, 0o644)
 	return result
 }
+
+// enddesign
 
 // --- id integrity (req-unique-ids) ---
 

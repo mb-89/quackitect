@@ -142,7 +142,8 @@ const reportJS = `
     var el = document.getElementById('detail');
     var verify = d.verify ? '<div class=dv><b>verify</b> <code>'+esc(d.verify)+'</code></div>' : '';
     var edges = (d.edges && d.edges.length) ? esc(d.edges.join(', ')) : '—';
-    var vlink = d.verdict_href ? ' · <a class=dlink data-vh="'+esc(d.verdict_href)+'" href="#">verdict ↗</a>' : '';
+    var vdoc = d.verdict_href ? ' <a class=dlink data-vh="'+esc(d.verdict_href)+'" href="#">↗</a>' : '';
+    var vlink = d.verdict ? ' · <span class=verdict>'+esc(d.verdict)+'</span>'+vdoc : (d.verdict_href ? ' · <a class=dlink data-vh="'+esc(d.verdict_href)+'" href="#">verdict ↗</a>' : '');
     el.innerHTML =
       '<div class=dhead><span class=did>'+esc(d.id)+'</span>'
       + (d.type ? '<span class="dchip ty-'+d.type+'">'+esc(d.type)+'</span>' : '') + '</div>'

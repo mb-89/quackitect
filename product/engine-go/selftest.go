@@ -99,8 +99,62 @@ func runSelftest(name string) bool {
 		return selftestCorrectness()
 	case "report-live":
 		return selftestReportLive()
+	case "evidence-honesty":
+		return selftestEvidenceHonesty()
+	case "tests-red":
+		return selftestTestsRed()
 	}
 	return false // unknown / not-yet-built check -> OPEN
+}
+
+// selftestEvidenceHonesty verifies req-evidence-honesty: a live-red or unbuilt check is never
+// reported passing from stale/vacuous evidence. (1) an unknown selftest resolves to false (OPEN),
+// not a masked pass; (2) runExecuted's shell-cache is keyed by the full input hash, so a different
+// hash is a cache MISS with its own slot — a changed input cannot be served a stale pass.
+func selftestEvidenceHonesty() bool {
+	if runSelftest("__no_such_selftest__") {
+		return false // an unbuilt/unknown check must be OPEN, never a masked pass
+	}
+	base := filepath.Join(QUACK, "evidence", "__honesty_probe__")
+	os.RemoveAll(base)
+	defer os.RemoveAll(base)
+	probe := Node{ID: "__honesty_probe__", Verify: "exit 0"}
+	if runExecuted(probe, "h1") != "pass" {
+		return false
+	}
+	if _, err := os.Stat(filepath.Join(base, "h1.json")); err != nil {
+		return false // evidence must be written under its hash key
+	}
+	if _, err := os.Stat(filepath.Join(base, "h2.json")); err == nil {
+		return false // a different hash must NOT already be cached (no cross-hash reuse)
+	}
+	runExecuted(probe, "h2")
+	if _, err := os.Stat(filepath.Join(base, "h2.json")); err != nil {
+		return false // the second hash gets its own slot -> re-run, never a stale serve
+	}
+	return true
+}
+
+// selftestTestsRed verifies req-tdd-sequence: a red-observed attestation satisfies tests-red only at
+// the hash it was recorded for; an edited test (new hash) is NOT satisfied until re-observed; and only
+// a red-observed event counts (a bless does not). Hermetic — exercises redObservedFrom on a fixture log.
+func selftestTestsRed() bool {
+	log := []Event{{Check: "t", Action: "red-observed", Hash: "H1"}}
+	ro := redObservedFrom(log)
+	if ro["t"] != "H1" {
+		return false // observed red at H1 -> satisfied at H1
+	}
+	if ro["t"] == "H2" {
+		return false // edited to H2 -> not satisfied until re-observed (re-suspect on change)
+	}
+	log = append(log, Event{Check: "t", Action: "red-observed", Hash: "H2"})
+	if redObservedFrom(log)["t"] != "H2" {
+		return false // re-observed at H2 -> satisfied again
+	}
+	if _, ok := redObservedFrom([]Event{{Check: "t", Action: "bless", Hash: "H1"}})["t"]; ok {
+		return false // a bless is NOT a red-observation
+	}
+	return true
 }
 
 func selftestParser() bool {
@@ -377,6 +431,11 @@ func selftestReportVerdict() bool {
 	if !strings.Contains(reportCSS+reportJS, "verdict") {
 		return false
 	}
+	// req-verdict-link: a DONE check must surface its verdict from the attestation even with NO doc,
+	// so the JS must render d.verdict (the bless record), not only d.verdict_href. Guards the i6 gap.
+	if !strings.Contains(reportJS, "d.verdict") {
+		return false
+	}
 	// The exact regression: a relative outPath must yield an ABSOLUTE outDir, so filepath.Rel against
 	// absolute node paths succeeds instead of erroring to "".
 	if !filepath.IsAbs(reportOutDir(filepath.Join(".quack", "out", "report.html"))) {
@@ -390,7 +449,18 @@ func selftestReportVerdict() bool {
 // selftestReportNesting: the report renders a nested, collapsible subtask tree (req-trace-nesting).
 func selftestReportNesting() bool {
 	blob := reportCSS + reportJS
-	return strings.Contains(blob, "children") || strings.Contains(blob, "collaps") || strings.Contains(blob, "kids")
+	if !strings.Contains(blob, "children") && !strings.Contains(blob, "collaps") && !strings.Contains(blob, "kids") {
+		return false
+	}
+	// req-build-test-nesting: a parent with a child renders the child INSIDE a collapsible "kids"
+	// group, not flat — the third nesting level (build steps under the build task).
+	nodes := map[string]Node{
+		"bs-parent": {ID: "bs-parent", Milestone: 6},
+		"bs-child":  {ID: "bs-child", Milestone: 6, Parent: "bs-parent"},
+	}
+	sm := map[string]string{"bs-parent": "DONE", "bs-child": "DONE"}
+	html := renderSubs([]string{"bs-parent", "bs-child"}, nodes, sm)
+	return strings.Contains(html, "class=\"kids\"") && strings.Contains(html, "data-nid=\"bs-parent\"") && strings.Contains(html, "bs-child")
 }
 
 // selftestBrandResolves: the design language resolves through the overlay chain (req-design-language) —
@@ -483,7 +553,7 @@ func selftestStubs() bool {
 
 // RunSelftestCLI runs one named check (or all) and returns an exit code.
 func RunSelftestCLI(args []string) int {
-	all := []string{"deps", "parser", "determinism", "ids", "help", "parity", "perf", "deps-prompt", "report", "split", "integrate", "engine", "method", "surface", "build", "no-trace-gate", "tests-pass-eval", "workspace", "brand", "claude-vendor", "report-verdict", "report-nesting", "brand-resolves", "validation-global", "stubs", "readout", "contract", "bootstrap", "correctness", "report-live"}
+	all := []string{"deps", "parser", "determinism", "ids", "help", "parity", "perf", "deps-prompt", "report", "split", "integrate", "engine", "method", "surface", "build", "no-trace-gate", "tests-pass-eval", "workspace", "brand", "claude-vendor", "report-verdict", "report-nesting", "brand-resolves", "validation-global", "stubs", "readout", "contract", "bootstrap", "correctness", "report-live", "evidence-honesty", "tests-red"}
 	names := args
 	if len(names) == 0 {
 		names = all

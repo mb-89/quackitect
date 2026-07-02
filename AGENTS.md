@@ -33,6 +33,7 @@ quack start stubs [path] # emit drive-from-inside stubs (launcher+AGENTS+gitigno
 quack why <id>           # what input changed
 quack bless [--all|<id>] # record a human adjudication — only when the human says yes
 quack note "<text>"      # deterministic capture lane
+quack observe-red <test> # record a test observed FAILING at its current hash (test-first RED gate; coverage:tests-red)
 quack gather <ver>       # collect all rigor+type source for an iteration
 quack report [--watch]   # render+open the live HTML board (recomputed fresh; --watch auto-reloads on change; --out F renders only)
 quack progress [--pager <gate>] # the readout: the progress bar, or the handover pager for a killer/milestone gate

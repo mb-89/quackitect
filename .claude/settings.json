@@ -2,6 +2,15 @@
   "hooks": {
     "SessionStart": [
       {
+        "matcher": "startup|resume|clear",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo [quackitect] BINDING FIRST ACTION: before you read, reason about, or change the ledger, open product/quackitect/method/prompts/contract.md, read it in FULL, paraphrase its specifics back to the human (name rule 3's actor=agent killer-bless exception, to prove you read it), and confirm you will obey. Route all work through /engage. No paraphrase means the rules never loaded - the human should stop you."
+          }
+        ]
+      },
+      {
         "matcher": "compact",
         "hooks": [
           {

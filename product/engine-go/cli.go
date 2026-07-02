@@ -109,6 +109,8 @@ func Dispatch(args []string) {
 		cmdStart(rest)
 	case "note":
 		cmdNote(rest)
+	case "observe-red":
+		cmdObserveRed(rest)
 	case "gather":
 		cmdGather(rest)
 	case "ship":

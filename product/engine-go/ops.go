@@ -86,6 +86,34 @@ func cmdBless(args []string) {
 
 // enddesign
 
+// design: go-tests-red  implements: req-tdd-sequence
+// tests-red enforces test-first: `observe-red <test>` records that a test was seen FAILING at its
+// CURRENT full-hash — a run-once attestation on the Event log, mirroring a bless. The coverage:tests-red
+// rule is satisfied only when every executed test carries a red-observed attestation at its current
+// hash, so a test never run-red, or edited since (hash changed), fails the rule until re-observed.
+// Reuses the hash-fold/suspect machinery — a now-green test needs no re-run to prove it was once red.
+func cmdObserveRed(args []string) {
+	if len(args) == 0 {
+		fmt.Println("usage: observe-red <test-id>")
+		return
+	}
+	nodes := LoadAll()
+	memo := map[string]string{}
+	id := args[0]
+	n, ok := nodes[id]
+	if !ok {
+		fmt.Println("no such check:", id)
+		return
+	}
+	h := fullHash(id, nodes, memo)
+	events := append(attestEvents(), Event{Check: id, Action: "red-observed", Actor: env("QUACK_ACTOR", "tester"),
+		TS: time.Now().Format(time.RFC3339), Hash: h, StatementHash: stmtHash(n)})
+	saveEvents(events)
+	fmt.Println("red-observed", id, "@", h[:8])
+}
+
+// enddesign
+
 // design: go-walk  implements: command-surface
 // next walks the determinizer: pick the version (named, else latest-not-done, else earliest planned),
 // then the next ready gate whose upstream gates are all DONE. The trace is content and never blocks.
@@ -338,6 +366,8 @@ func cmdGather(args []string) {
 			break
 		}
 	}
+	addFromLayers("method/rigor/_shared") // the shared implementation fragment, imported by lean+systematic
+	addFromLayers("method/roles")         // the pluggable role seam (bindings default to inline)
 	cur := "project_types"
 	for _, part := range strings.Split(cfg.Type, "/") {
 		cur = cur + "/" + part
