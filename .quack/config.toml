@@ -2,4 +2,6 @@
 [iteration]
 type    = "default"
 rigor   = "systematic"
-version = "i0007_tdd_implementation"
+version = "i0008_trust_hardening"
+
+# logs_dir = "D:\\somewhere"   # optional override; default = %LOCALAPPDATA%\quackitect\logs\<workspace-slug> (see 'quack version')

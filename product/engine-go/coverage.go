@@ -105,11 +105,17 @@ func coverageRule(nodes map[string]Node, rule, scope string) bool {
 	case "tests-red":
 		// Test-first: every executed test must carry a red-observed attestation at its CURRENT hash
 		// (a run-once record; an edited test's hash changes and must be re-observed). Per the M5 spike.
+		// FORWARD-ONLY from i0008 (the first iteration WALKED under this gate; i0007 built the
+		// mechanism): tests authored before observe-red existed can never have been honestly observed
+		// red — recording one today would FABRICATE an attestation, the exact lie the ledger refuses.
 		ro := redObserved()
 		memo := map[string]string{}
 		seen := false
 		for _, n := range nodes {
 			if n.Type == "test" && n.Class == "executed" && strings.HasPrefix(n.Verify, "selftest:") {
+				if iterOf(n.Path) < testsRedSince {
+					continue // pre-mechanism test; grandfathered, never retro-attested
+				}
 				seen = true
 				if ro[n.ID] != fullHash(n.ID, nodes, memo) {
 					return false
@@ -192,6 +198,9 @@ func scanIDs() map[string][]string {
 	filepath.Walk(SPEC, func(path string, fi os.FileInfo, err error) error {
 		if err != nil || fi.IsDir() || !strings.HasSuffix(path, ".md") {
 			return nil
+		}
+		if raw, e := os.ReadFile(path); e != nil || !nodeFence(raw) {
+			return nil // same recognition rule as LoadAll/strictGuard (nodeFence)
 		}
 		n := ParseNode(path)
 		if n.Statement != "" && !strings.HasPrefix(n.ID, "TASK-") && !strings.HasPrefix(n.ID, "MARK-") {

@@ -26,10 +26,11 @@ type Node struct {
 	Milestone  int
 	Validates  string // "needs": this gate validates the whole need-set; its hash folds the digest of
 	// all needs, so adding/changing/removing any need reopens it (global validation, structurally).
+	Ears string // "" | "exempt - <reason>": EARS-lint exemption with its required reason (req-ears-lint)
 }
 
 // Config is the iteration breadcrumb from .quack/config.toml.
-type Config struct{ Type, Rigor, Version string }
+type Config struct{ Type, Rigor, Version, LogsDir string }
 
 // design: go-parse  implements: req-zero-dep-parse
 // Hand-rolled frontmatter and config.toml parsing over the trivial subset in use
@@ -90,6 +91,8 @@ func ParseNode(path string) Node {
 			}
 		case "validates":
 			n.Validates = v
+		case "ears":
+			n.Ears = v
 		case "milestone":
 			m := 0
 			for _, c := range strings.TrimPrefix(v, "M") {
@@ -113,7 +116,7 @@ func ReadConfig(path string) Config {
 		return c
 	}
 	for _, line := range strings.Split(string(txt), "\n") {
-		for _, k := range []string{"type", "rigor", "version"} {
+		for _, k := range []string{"type", "rigor", "version", "logs_dir"} {
 			if v, ok := tomlString(line, k); ok {
 				switch k {
 				case "type":
@@ -122,6 +125,8 @@ func ReadConfig(path string) Config {
 					c.Rigor = v
 				case "version":
 					c.Version = v
+				case "logs_dir":
+					c.LogsDir = v // optional override of the engine's user-dir log resolution (go-logs-dir)
 				}
 			}
 		}

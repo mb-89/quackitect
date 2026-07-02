@@ -103,6 +103,30 @@ func runSelftest(name string) bool {
 		return selftestEvidenceHonesty()
 	case "tests-red":
 		return selftestTestsRed()
+	case "parser-strict":
+		return selftestParserStrict()
+	case "ref-integrity":
+		return selftestRefIntegrity()
+	case "actor-channels":
+		return selftestActorChannels()
+	case "design-hash-norm":
+		return selftestDesignHashNorm()
+	case "kernel-vectors":
+		return selftestKernelVectors()
+	case "kernel-cone":
+		return selftestKernelCone()
+	case "kernel-gatewalk":
+		return selftestKernelGatewalk()
+	case "kernel-attest":
+		return selftestKernelAttest()
+	case "logs-dir":
+		return selftestLogsDir()
+	case "ears-lint":
+		return selftestEarsLint()
+	case "ears-method":
+		return selftestEarsMethod()
+	case "monotonic-lint":
+		return selftestMonotonicLint()
 	}
 	return false // unknown / not-yet-built check -> OPEN
 }
@@ -553,7 +577,7 @@ func selftestStubs() bool {
 
 // RunSelftestCLI runs one named check (or all) and returns an exit code.
 func RunSelftestCLI(args []string) int {
-	all := []string{"deps", "parser", "determinism", "ids", "help", "parity", "perf", "deps-prompt", "report", "split", "integrate", "engine", "method", "surface", "build", "no-trace-gate", "tests-pass-eval", "workspace", "brand", "claude-vendor", "report-verdict", "report-nesting", "brand-resolves", "validation-global", "stubs", "readout", "contract", "bootstrap", "correctness", "report-live", "evidence-honesty", "tests-red"}
+	all := []string{"deps", "parser", "determinism", "ids", "help", "parity", "perf", "deps-prompt", "report", "split", "integrate", "engine", "method", "surface", "build", "no-trace-gate", "tests-pass-eval", "workspace", "brand", "claude-vendor", "report-verdict", "report-nesting", "brand-resolves", "validation-global", "stubs", "readout", "contract", "bootstrap", "correctness", "report-live", "evidence-honesty", "tests-red", "parser-strict", "ref-integrity", "actor-channels", "design-hash-norm", "kernel-vectors", "kernel-cone", "kernel-gatewalk", "kernel-attest", "logs-dir", "ears-lint", "ears-method", "monotonic-lint"}
 	names := args
 	if len(names) == 0 {
 		names = all

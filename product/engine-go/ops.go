@@ -31,13 +31,19 @@ func saveEvents(events []Event) {
 // bless appends an attestation event (adjudicated_by actor + filled_by, recorded separately). Only
 // gates are blessable; content and executed checks are never blessed. The event stores the full_hash
 // and dep hashes, so any later input change makes the check SUSPECT (the suspect/bless mechanism).
+// The actor is stamped per channel with a --by override (go-actor-channels); QUACK_ACTOR is retired.
 func cmdBless(args []string) {
 	nodes := LoadAll()
 	memo := map[string]string{}
-	actor, filler := env("QUACK_ACTOR", "human"), env("QUACK_FILLER", "agent")
+	actor, filler := resolveActor(args, channelInteractive()), env("QUACK_FILLER", "agent")
 	target := "--all"
-	if len(args) > 0 {
-		target = args[0]
+	for i := 0; i < len(args); i++ {
+		if args[i] == "--by" {
+			i++ // skip the actor value
+			continue
+		}
+		target = args[i]
+		break
 	}
 	var ids []string
 	if target == "--all" {
@@ -99,14 +105,26 @@ func cmdObserveRed(args []string) {
 	}
 	nodes := LoadAll()
 	memo := map[string]string{}
-	id := args[0]
+	id := ""
+	for i := 0; i < len(args); i++ {
+		if args[i] == "--by" {
+			i++
+			continue
+		}
+		id = args[i]
+		break
+	}
 	n, ok := nodes[id]
 	if !ok {
 		fmt.Println("no such check:", id)
 		return
 	}
 	h := fullHash(id, nodes, memo)
-	events := append(attestEvents(), Event{Check: id, Action: "red-observed", Actor: env("QUACK_ACTOR", "tester"),
+	actor := "tester" // channel-independent default; --by overrides (QUACK_ACTOR retired)
+	if by := flagVal(args, "--by"); by != "" {
+		actor = by
+	}
+	events := append(attestEvents(), Event{Check: id, Action: "red-observed", Actor: actor,
 		TS: time.Now().Format(time.RFC3339), Hash: h, StatementHash: stmtHash(n)})
 	saveEvents(events)
 	fmt.Println("red-observed", id, "@", h[:8])

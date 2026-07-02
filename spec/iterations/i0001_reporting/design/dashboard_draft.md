@@ -1,9 +1,7 @@
----
+# dashboard_draft (Excalidraw sketch — not a spec node)
 
-excalidraw-plugin: parsed
-tags: [excalidraw]
-
----
+<!-- Obsidian/Excalidraw frontmatter (excalidraw-plugin, tags) stripped in i0008: the strict
+     parser rejects unknown node keys, and this file is a drawing, not a graph node. -->
 ==⚠  Switch to EXCALIDRAW VIEW in the MORE OPTIONS menu of this document. ⚠== You can decompress Drawing data with the command palette: 'Decompress current Excalidraw file'. For more info check in plugin settings under 'Saving'
 
 

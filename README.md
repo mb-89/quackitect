@@ -34,7 +34,7 @@ onboarding for you.
 Quackitect will walk you through all steps up to your first milestone.
 Need more details, or a list of all functions? Ask it.
 
-<p align="center"><img src="docs/report.png" width="860" alt="The quackitect report — gated milestones (left), the trace graph as a Merkle-DAG (center), and coverage metrics (right)."></p>
+<p align="center"><img src=".quack/out/report.png" width="860" alt="The quackitect report — gated milestones (left), the trace graph as a Merkle-DAG (center), and coverage metrics (right)."></p>
 
 You're looking at quackitect's own design, tracked and build by quackitect. It **dogfoods itself.**
 

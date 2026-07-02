@@ -13,7 +13,7 @@ Run it at `engage start`, or on demand. Emit improvement notes only. Adopt nothi
 3. **Mine the record, recency-weighted.** Tally the previous retro's improvements. Promote the wins. Dismiss the duds. Record each dud's reason, so it is never re-proposed.
 4. **Aim each improvement at a durable home.** A prompt, a checklist, a guide, or a tool. Every iteration should make the system cheaper and better — not just this project.
 5. **Weigh at least one quality signal.** Never cost alone. Emit only the few highest-leverage notes. Make each one specific and checkable. A concrete change, not "improve X". Route them to the inbox.
-6. **Spot determinizer candidates.** Read the logs. Which scripts did the AI write that the determinizer could own? A script that failed a few times is a strong lead. The fix may be a new tool. It may be better guidance.
+6. **Spot determinizer candidates.** Read the logs — they live in the engine-resolved user dir, NOT in the repo: `%LOCALAPPDATA%\quackitect\logs\<workspace>\` on Windows (`$XDG_DATA_HOME/quackitect/logs/<workspace>` elsewhere); `quack version` prints the exact path, and a `logs_dir` key in `.quack/config.toml` overrides it. Which scripts did the AI write that the determinizer could own? A script that failed a few times is a strong lead. The fix may be a new tool. It may be better guidance.
 
 ## report
 Render the deterministic HTML board: `quack report`. With no args it renders AND opens the report. Pass `--out F` to render only, no open; `--watch` serves it and auto-reloads when the source changes. The determinizer owns it. No judgment. It writes `.quack/out/report.html` by default.

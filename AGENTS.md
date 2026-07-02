@@ -31,7 +31,8 @@ quack next               # the next ready check to walk
 quack start <id> [--plan]# activate a version (--plan registers a future one)
 quack start stubs [path] # emit drive-from-inside stubs (launcher+AGENTS+gitignore) into a bare workspace
 quack why <id>           # what input changed
-quack bless [--all|<id>] # record a human adjudication — only when the human says yes
+quack bless [--all|<id>] [--by human|agent] # record an adjudication; the actor defaults by CHANNEL
+                         #   (console=human, harness/pipe=agent) — pass --by human for a delegated human bless
 quack note "<text>"      # deterministic capture lane
 quack observe-red <test> # record a test observed FAILING at its current hash (test-first RED gate; coverage:tests-red)
 quack gather <ver>       # collect all rigor+type source for an iteration
@@ -39,8 +40,10 @@ quack report [--watch]   # render+open the live HTML board (recomputed fresh; --
 quack progress [--pager <gate>] # the readout: the progress bar, or the handover pager for a killer/milestone gate
 quack ship               # package product/ -> .quack/out/
 quack build              # compile the engine AND re-baseline golden-root in one step
-quack lint               # coverage holes + the duplicate-id guard
+quack lint [--ears-baseline] # coverage holes, duplicate ids, EARS statement lint (forward-only), milestone-monotonic wiring
 quack selftest           # the engine's own dependency-free self-test (no toolchain)
+quack version            # engine version + the resolved LOG DIR (session/research logs live OUTSIDE the repo:
+                         #   %LOCALAPPDATA%\quackitect\logs\<workspace>\ on Windows, XDG data dir elsewhere)
 ```
 **Workspaces.** The engine drives a selectable workspace (product+spec+state). Default is the cwd
 walk-up (self); add `--base <path>` (or `-C <path>`) to ANY command to drive a different project's

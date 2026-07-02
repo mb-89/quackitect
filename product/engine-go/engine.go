@@ -115,7 +115,9 @@ func fullHash(id string, nodes map[string]Node, memo map[string]string) string {
 	for _, d := range deps {
 		parts = append(parts, fullHash(d, nodes, memo))
 	}
-	seed := norm(n.Statement) + "|" + n.Verify + "|" + strings.Join(parts, ",") + "|" + h12(n.RegionBody)
+	// region content folds through normWS (go-region-hash-norm): whitespace-collapse only, case and
+	// comments retained — reformat churn never reopens a design; content edits always do.
+	seed := norm(n.Statement) + "|" + n.Verify + "|" + strings.Join(parts, ",") + "|" + h12(normWS(n.RegionBody))
 	if n.Validates == "needs" {
 		// global validation, made structural: fold the digest of EVERY need into this gate's identity,
 		// so adding/changing/removing any need (in any iteration) reopens it (SUSPECT). Fixes the gap
@@ -142,11 +144,17 @@ func needsDigest(nodes map[string]Node) string {
 }
 
 // LoadAll walks spec/**/*.md plus the in-code design markers under product/.
+// It refuses a malformed graph first (strictGuard, go-strict-load) — batched
+// findings + nonzero exit instead of a silently-shrunk suspect cone.
 func LoadAll() map[string]Node {
+	strictGuard()
 	nodes := map[string]Node{}
 	filepath.Walk(SPEC, func(path string, fi os.FileInfo, err error) error {
 		if err != nil || fi.IsDir() || !strings.HasSuffix(path, ".md") {
 			return nil
+		}
+		if raw, e := os.ReadFile(path); e != nil || !nodeFence(raw) {
+			return nil // only recognized node candidates load — the guard checked exactly this set
 		}
 		n := ParseNode(path)
 		if n.Statement != "" && !strings.HasPrefix(n.ID, "TASK-") && !strings.HasPrefix(n.ID, "MARK-") {

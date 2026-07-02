@@ -48,9 +48,9 @@ func brandOf(arg0 string) string {
 func usageText() string {
 	b := brand()
 	return b + ` — the determinizer lane (deterministic; no judgment).
-usage: ` + b + ` status [id] | next | start <id> [--plan] | why <id> | bless [--all|<id>]
-       | note "..." | gather <ver> | report [--out F] | ship | build | lint | verify <id>
-       | progress [--pager <gate>]`
+usage: ` + b + ` status [id] | next | start <id> [--plan] | why <id> | bless [--all|<id>] [--by A]
+       | note "..." | gather <ver> | report [--out F] | ship | build | lint [--ears-baseline]
+       | verify <id> | progress [--pager <gate>] | version`
 }
 
 // enddesign
@@ -67,7 +67,7 @@ func helpRequested(args []string) bool {
 
 // idCmds take an id positionally; a '-'-prefixed value there is an error (not a flag).
 var idCmds = map[string]bool{"why": true, "bless": true, "start": true, "verify": true, "status": true}
-var okFlags = map[string]bool{"--all": true, "--plan": true}
+var okFlags = map[string]bool{"--all": true, "--plan": true, "--by": true}
 
 // badIDArg returns the offending arg if a command that expects an id got a '-'-prefixed one.
 func badIDArg(cmd string, rest []string) (string, bool) {
@@ -100,7 +100,7 @@ func Dispatch(args []string) {
 	case "why":
 		cmdWhy(rest)
 	case "lint":
-		cmdLint()
+		cmdLint(rest)
 	case "bless":
 		cmdBless(rest)
 	case "next":
@@ -177,6 +177,8 @@ func Dispatch(args []string) {
 		}
 	case "version", "--version":
 		fmt.Println(brand(), version)
+		// the canonical, engine-owned log location (go-logs-dir) — discoverable from the binary
+		fmt.Println("logs:", logsDir(ReadConfig(filepath.Join(QUACK, "config.toml"))))
 	default:
 		fmt.Println(brand() + ": '" + cmd + "' is not ported to the Go engine yet")
 		fmt.Println(usageText())
@@ -274,7 +276,7 @@ func why(nodes map[string]Node, id string) []string {
 	return reasons
 }
 
-func cmdLint() {
+func cmdLint(rest []string) {
 	dups := DuplicateIDs()
 	if len(dups) > 0 {
 		fmt.Printf("DUPLICATE IDS - %d (a reused id silently shadows another file; fix first):\n", len(dups))
@@ -287,7 +289,8 @@ func cmdLint() {
 			fmt.Println("  - " + id + ": " + strings.Join(dups[id], ", "))
 		}
 	}
-	holes := CoverageHoles(LoadAll(), "")
+	nodes := LoadAll()
+	holes := CoverageHoles(nodes, "")
 	if len(holes) == 0 {
 		fmt.Println("coverage: clean (no holes)")
 	} else {
@@ -296,7 +299,35 @@ func cmdLint() {
 			fmt.Println("  - " + h)
 		}
 	}
-	if len(dups) > 0 {
+	// EARS enforcement (go-ears-lint): --ears-baseline records the feature-land set; with a baseline
+	// present and systematic rigor, new/re-stated requirement statements are checked, exemptions counted.
+	earsBad := 0
+	if hasFlag(rest, "--ears-baseline") {
+		n := earsWriteBaseline(nodes)
+		fmt.Printf("ears: baseline written (%d requirement statement hashes)\n", n)
+	} else if cfg := ReadConfig(filepath.Join(QUACK, "config.toml")); cfg.Rigor == "systematic" {
+		if baseline := earsBaseline(); len(baseline) > 0 {
+			findings, exempt := earsFindings(nodes, baseline)
+			earsBad = len(findings)
+			if earsBad == 0 {
+				fmt.Printf("ears: clean (%d exemption(s))\n", exempt)
+			} else {
+				fmt.Printf("ears: %d finding(s), %d exemption(s):\n", earsBad, exempt)
+				for _, f := range findings {
+					fmt.Println("  - " + f)
+				}
+			}
+		}
+	}
+	// milestone-monotonic wiring (go-monotonic-lint): a subtask must chain through the prior gate.
+	mono := monotonicFindings(nodes)
+	if len(mono) > 0 {
+		fmt.Printf("monotonic: %d finding(s):\n", len(mono))
+		for _, f := range mono {
+			fmt.Println("  - " + f)
+		}
+	}
+	if len(dups) > 0 || earsBad > 0 || len(mono) > 0 {
 		os.Exit(1)
 	}
 }

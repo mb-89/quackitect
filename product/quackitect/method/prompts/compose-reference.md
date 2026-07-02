@@ -56,6 +56,23 @@ depends_on: [<ids>]
 - lean's derived coverage per milestone (see `rigor/lean/checklist.md`):
   M2 `{req-traced, req-has-test}` · M3 `{adr-traced}` · M4 `{designs-realized, tests-pass}`.
 
+<!-- design: method-ears-block  implements: req-ears-method :: The compose reference carries the five EARS pattern shapes and the authoring instruction, integrated with the i7 tests-red and roles content; new requirement statements at systematic rigor are authored EARS-shaped at compose time and checked forward-only by quack lint against the committed baseline. -->
+## EARS — requirement statements (systematic rigor)
+Author every NEW `type: requirement` statement in one of the **five EARS shapes**, with **shall**:
+- **Ubiquitous** — `The <system> shall <response>.`
+- **Event-driven** — `When <trigger>, the <system> shall <response>.`
+- **State-driven** — `While <state>, the <system> shall <response>.`
+- **Unwanted behaviour** — `If <condition>, then the <system> shall <response>.`
+- **Optional feature** — `Where <feature>, the <system> shall <response>.`
+
+No **weasel words** (should, may, appropriate, quickly, user-friendly, robust, flexible, …) — state
+the checkable claim. `quack lint` enforces this **forward-only**: only statements not in the committed
+baseline (`.quack/ears-baseline.json`) are checked — blessed history is never retrofitted or re-blessed.
+A genuinely non-EARS requirement carries `ears: exempt - <reason>` in its frontmatter (the reason is
+required; lint counts exemptions). This applies to requirement statements only — tests keep verifying
+(`verifies:`, tests-red discipline) and roles keep binding exactly as above.
+<!-- enddesign -->
+
 ## No plan-lock bless (step 5d)
 **Do NOT `quack bless --all` at plan time.** It marks every milestone gate DONE, makes `next` a no-op,
 and shows a falsely-green board (an un-built M5 reads green). After composing, gates start **OPEN**.
