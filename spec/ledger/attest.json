@@ -6255,5 +6255,25 @@
       "i9-m8-packaged-versioned": "0f3ab2aae701"
     },
     "prev_hash": null
+  },
+  {
+    "check": "test-verify-cache",
+    "action": "red-observed",
+    "actor": "tester",
+    "ts": "2026-07-04T13:02:59+01:00",
+    "hash": "4ce1398f63df",
+    "statement_hash": "99793c25752e",
+    "deps": null,
+    "prev_hash": null
+  },
+  {
+    "check": "test-verify-feedback",
+    "action": "red-observed",
+    "actor": "tester",
+    "ts": "2026-07-04T13:02:59+01:00",
+    "hash": "2cb5bf863c10",
+    "statement_hash": "d23a0985233a",
+    "deps": null,
+    "prev_hash": null
   }
 ]
