@@ -13,7 +13,7 @@ Evidence for the M2 gate. Context, stakeholders, use cases, and the EARS require
 
 ## Stakeholder coverage  → i8-m2-stakeholder-coverage
 No role left out:
-- **Adjudicating human (markus)** — gates and stamps must mean what they say: `req-actor-channels`, `req-design-hash-norm` (no rubber-stamp training), `req-ears-lint` (blessable statements).
+- **The adjudicator (owner)** — gates and stamps must mean what they say: `req-actor-channels`, `req-design-hash-norm` (no rubber-stamp training), `req-ears-lint` (blessable statements).
 - **Driving agent** — needs loud refusal over silent acceptance (`req-strict-frontmatter`, `req-ref-integrity`), a `next` that cannot jump milestones (`req-monotonic-lint`), and safe help flags (`req-cli-help`).
 - **Auditor / record reader** — a verifiable chain and honest self-cert metric: `req-kernel-selftest` (attest battery), `req-actor-channels`.
 - **Other-machine / field user** — the kernel proves itself locally with no toolchain: `req-kernel-selftest`, and logs land in a predictable per-user place: `req-logs-out-of-repo`.

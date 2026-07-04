@@ -57,6 +57,8 @@ a.task.leaf{padding-left:23px}
 .auto{font-size:9px;color:#5a7a5a;background:#eef4ec;border:1px solid #d8e6d4;border-radius:8px;padding:0 5px;margin-left:auto;text-transform:uppercase;letter-spacing:.04em}
 .legendrow{display:flex;align-items:center;gap:10px;margin-bottom:4px}
 #trace-filter{width:180px;flex:none;padding:3px 7px;border:1px solid #ccd;border-radius:5px;font:11px ui-monospace,Consolas,monospace}
+#filter-clear{flex:none;margin-left:2px;padding:3px 8px;border:1px solid #ccd;border-radius:5px;background:#fff;cursor:pointer;font-size:11px;color:#666}
+#filter-clear:hover{background:#f2f2f2}
 #tabbar{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:6px}
 .tab{cursor:pointer;font-size:12px;padding:3px 10px;border:1px solid #ddd;border-radius:14px;background:#fff;font-family:ui-monospace,monospace}
 .tab.active{background:#1e1e1e;color:#fff;border-color:#1e1e1e}
@@ -86,6 +88,12 @@ a.task.leaf{padding-left:23px}
 .dfall{font-size:12px;color:#b00;margin-top:6px}.dfall[hidden]{display:none}
 `
 
+// design: go-report-filter-ux  implements: req-filter-clear, req-filter-descendants, req-filter-dblclick, req-filter-help
+// The filter gains: a clear control (one click back to the full graph), a descendants:<id> predicate
+// (the node plus everything tracing into it — successors over the parent->child edges, the same cone
+// the suspect ripple walks), a double-click gesture applying that predicate for the tapped node, and
+// on-focus help documenting every form including these. JS only filters/toggles — content stays
+// server-baked (the report remains a pure display).
 const reportJS = `
 (function(){
   var D = window.QUACK_DATA, tabs = D.tabs, host = document.getElementById('graph'),
@@ -141,6 +149,7 @@ const reportJS = `
   function showDetail(d){
     var el = document.getElementById('detail');
     var verify = d.verify ? '<div class=dv><b>verify</b> <code>'+esc(d.verify)+'</code></div>' : '';
+    var cause = d.cause ? '<div class=dv><b>why not green</b> '+esc(d.cause)+'</div>' : '';
     var edges = (d.edges && d.edges.length) ? esc(d.edges.join(', ')) : '—';
     var vdoc = d.verdict_href ? ' <a class=dlink data-vh="'+esc(d.verdict_href)+'" href="#">↗</a>' : '';
     var vlink = d.verdict ? ' · <span class=verdict>'+esc(d.verdict)+'</span>'+vdoc : (d.verdict_href ? ' · <a class=dlink data-vh="'+esc(d.verdict_href)+'" href="#">verdict ↗</a>' : '');
@@ -149,7 +158,7 @@ const reportJS = `
       + (d.type ? '<span class="dchip ty-'+d.type+'">'+esc(d.type)+'</span>' : '') + '</div>'
       + '<div class=dstmt>'+esc(d.stmt)+'</div>'
       + '<div class=dmeta><b>traces</b> '+edges+'</div>'
-      + verify
+      + verify + cause
       + '<a class=dlink data-h="src" href="#">details ↗</a>' + vlink
       + '<div class=dfall hidden>original source not present on this machine. details unavailable.</div>';
     el.querySelector('[data-h=src]').onclick = function(ev){ ev.preventDefault(); openSource(d.href, el); };
@@ -193,11 +202,26 @@ const reportJS = `
       +'<div class=dstmt>Filter the trace graph as you type.</div>'
       +'<div class=dmeta><b>Iteration</b> — <code>0001</code> (only that one), <code>&lt;=0002</code>, <code>&gt;=0001</code>, <code>&lt;</code>, <code>&gt;</code></div>'
       +'<div class=dmeta><b>Text</b> — any word matches id + statement; or <code>/regex/</code> (RegExp)</div>'
-      +'<div class=dmeta><b>Combine</b> — <code>AND</code> / <code>OR</code> · e.g. <code>&gt;=0002 AND auth</code></div>';
+      +'<div class=dmeta><b>Combine</b> — <code>AND</code> / <code>OR</code> · e.g. <code>&gt;=0002 AND auth</code></div>'
+      +'<div class=dmeta><b>Descendants</b> — <code>descendants:&lt;id&gt;</code> shows only that node and everything that traces into it (refines / implements / verifies / addresses, transitively). Double-click a node to apply it for that node.</div>'
+      +'<div class=dmeta><b>Clear</b> — the &#215; button (or emptying the box) restores the full graph.</div>';
   }
   function iterNum(s){var m=(s||'').match(/i0*(\d+)/);return m?parseInt(m[1],10):0;}
+  var dsets={};
+  function descSet(id){
+    var set={}; if(!cy){return set;}
+    var root=cy.getElementById(id); if(!root||root.empty()){return set;}
+    set[id]=true;
+    root.successors('node').forEach(function(n){set[n.id()]=true;});
+    return set;
+  }
   function ftTerm(d,t){
     if(!t)return true;
+    if(t.toLowerCase().indexOf('descendants:')===0){
+      var did=t.slice(12).trim();
+      if(!dsets[did]){dsets[did]=descSet(did);}
+      return !!dsets[did][d.id];
+    }
     var m=t.match(/^(<=|>=|<|>)?\s*(\d{3,4})$/);
     if(m){var op=m[1]||'==',w=parseInt(m[2],10),h=iterNum(d.iter);
       if(op=='==')return h==w;if(op=='<=')return h<=w;if(op=='>=')return h>=w;if(op=='<')return h<w;return h>w;}
@@ -215,6 +239,7 @@ const reportJS = `
   }
   function applyFilter(){
     if(!cy){return;}
+    dsets={};
     var q=(document.getElementById('trace-filter').value||'').trim();
     var typeOn={}; var bs=document.querySelectorAll('.tytog');
     for(var i=0;i<bs.length;i++){typeOn[bs[i].getAttribute('data-type')]=bs[i].checked;}
@@ -230,6 +255,10 @@ const reportJS = `
     cy = cytoscape({container:host, elements:tabs[i].elements, style:STYLE,
       layout:{name:'preset'}, wheelSensitivity:0.2});
     cy.on('tap','node',function(e){showDetail(D.checks[e.target.id()]);});
+    cy.on('dbltap','node',function(e){ // dblclick on a node applies the descendants filter for it
+      var f=document.getElementById('trace-filter');
+      if(f){f.value='descendants:'+e.target.id(); applyFilter();}
+    });
     cy.on('tap',function(e){if(e.target===cy){renderEmpty();}});
     applyFilter();
     for(var j=0;j<bar.children.length;j++){bar.children[j].className=(j===i)?'tab active':'tab';}
@@ -241,6 +270,8 @@ const reportJS = `
   var tboxes=document.querySelectorAll('.tytog'); for(var ti=0;ti<tboxes.length;ti++){tboxes[ti].onchange=applyFilter;}
   var fi=document.getElementById('trace-filter');
   if(fi){ fi.addEventListener('input',applyFilter); fi.addEventListener('focus',showFilterHelp); }
+  var fc=document.getElementById('filter-clear');
+  if(fc){ fc.onclick=function(){ if(fi){fi.value='';} applyFilter(); }; }
   if(tabs.length){show(0);}
   function wireTask(r, prevent){
     r.addEventListener('click', function(ev){ if(prevent){ev.preventDefault();}
@@ -265,3 +296,5 @@ const reportJS = `
   if(pt){ pt.style.cursor='pointer'; pt.onclick=function(){ if(D.project){showProjectDetail(D.project);} }; }
 })();
 `
+
+// enddesign

@@ -1,0 +1,6 @@
+# the workspace root marker + iteration breadcrumb (adr-no-quack-data-home, go-truth-in-spec).
+# Machine-local overrides (logs_dir, ...) live in the GLOBAL user config, never here.
+[iteration]
+type    = "default"
+rigor   = "systematic"
+version = "i0009_contract_attestation"

@@ -27,6 +27,8 @@ type Node struct {
 	Validates  string // "needs": this gate validates the whole need-set; its hash folds the digest of
 	// all needs, so adding/changing/removing any need reopens it (global validation, structurally).
 	Ears string // "" | "exempt - <reason>": EARS-lint exemption with its required reason (req-ears-lint)
+	ReadyWhen  string   // defer condition (go-decisions): write-once; scrap edge + ready_when = defer
+	Supersedes []string // decision exit (go-decisions): an incoming supersedes edge = superseded
 }
 
 // Config is the iteration breadcrumb from .quack/config.toml.
@@ -83,6 +85,10 @@ func ParseNode(path string) Node {
 			n.Implements = splitIDs(v)
 		case "verifies":
 			n.Verifies = splitIDs(v)
+		case "supersedes":
+			n.Supersedes = splitIDs(v)
+		case "ready_when":
+			n.ReadyWhen = v
 		case "addresses":
 			n.Addresses = splitIDs(v)
 		case "id":

@@ -20,7 +20,7 @@ Engineers and teams driving work with AI agents who need an **auditable design /
 |  | Spec Kit · Kiro · OpenSpec | **quackitect** |
 |---|---|---|
 | Job | spec → plan → **generate code** | spec → **gated ledger + deliverable** |
-| Output | source code | an auditable Merkle-DAG of blessed decisions |
+| Output | source code | auditable trace + deliverable |
 | On input change | re-generate | the affected cone goes **SUSPECT** → re-bless |
 | Human role | review the diff | **adjudicate the gates** (never auto-passed) |
 | Runtime | varies | one **dependency-free Go binary** |
@@ -34,7 +34,9 @@ onboarding for you.
 Quackitect will walk you through all steps up to your first milestone.
 Need more details, or a list of all functions? Ask it.
 
-<p align="center"><img src=".quack/out/report.png" width="860" alt="The quackitect report — gated milestones (left), the trace graph as a Merkle-DAG (center), and coverage metrics (right)."></p>
+<p align="center"><img src=".github/report.png" width="860" alt="The quackitect report — gated milestones (left), the trace graph as a Merkle-DAG (center), and coverage metrics (right)."></p>
+
+<!-- This image is a committed snapshot (.github/report.png). The LIVE board: run `quack report`. -->
 
 You're looking at quackitect's own design, tracked and build by quackitect. It **dogfoods itself.**
 

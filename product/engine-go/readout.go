@@ -363,7 +363,7 @@ func joinN(xs []string, n int) string {
 func cmdProgress(rest []string) {
 	nodes := LoadAll()
 	sm := StatusMap(nodes)
-	cfg := ReadConfig(filepath.Join(QUACK, "config.toml"))
+	cfg := readProjectConfig()
 	iter := cfg.Version
 	if v := flagVal(rest, "--iter"); v != "" {
 		iter = v

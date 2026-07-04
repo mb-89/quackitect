@@ -90,11 +90,23 @@ func Dispatch(args []string) {
 		return
 	}
 	cmd, rest := args[0], args[1:]
+	rest = attestGuard(cmd, rest) // the contract gate: agent-channel ledger commands need a key
 	if bad, isBad := badIDArg(cmd, rest); isBad {
 		fmt.Println("error: id cannot start with '-': " + bad)
 		os.Exit(2)
 	}
 	switch cmd {
+	case "attest":
+		cmdAttest(rest)
+	case "decisions":
+		cmdDecisions(rest)
+	case "mint":
+		cmdMint(rest)
+	case "render-entry":
+		if err := writeEntryFiles(); err != nil {
+			fmt.Fprintln(os.Stderr, "render-entry:", err)
+			os.Exit(1)
+		}
 	case "status":
 		cmdStatus(rest)
 	case "why":
@@ -133,7 +145,7 @@ func Dispatch(args []string) {
 		}
 		rp := out
 		if rp == "" {
-			rp = filepath.Join(QUACK, "out", "report.html")
+			rp = filepath.Join(dataDirFor("out"), "report.html")
 		}
 		fmt.Println("report ->", rp)
 		if out == "" && !hasFlag(rest, "--no-open") { // bare `quack report` opens; --out renders only
@@ -178,7 +190,7 @@ func Dispatch(args []string) {
 	case "version", "--version":
 		fmt.Println(brand(), version)
 		// the canonical, engine-owned log location (go-logs-dir) — discoverable from the binary
-		fmt.Println("logs:", logsDir(ReadConfig(filepath.Join(QUACK, "config.toml"))))
+		fmt.Println("logs:", logsDir(readProjectConfig()))
 	default:
 		fmt.Println(brand() + ": '" + cmd + "' is not ported to the Go engine yet")
 		fmt.Println(usageText())
@@ -305,7 +317,7 @@ func cmdLint(rest []string) {
 	if hasFlag(rest, "--ears-baseline") {
 		n := earsWriteBaseline(nodes)
 		fmt.Printf("ears: baseline written (%d requirement statement hashes)\n", n)
-	} else if cfg := ReadConfig(filepath.Join(QUACK, "config.toml")); cfg.Rigor == "systematic" {
+	} else if cfg := readProjectConfig(); cfg.Rigor == "systematic" {
 		if baseline := earsBaseline(); len(baseline) > 0 {
 			findings, exempt := earsFindings(nodes, baseline)
 			earsBad = len(findings)
@@ -327,7 +339,31 @@ func cmdLint(rest []string) {
 			fmt.Println("  - " + f)
 		}
 	}
-	if len(dups) > 0 || earsBad > 0 || len(mono) > 0 {
+	// decision hygiene (go-decisions): forward-only placement (fatal) + unrealized adoptions (advisory).
+	placement, unrealized := decisionFindings(nodes)
+	if len(placement) > 0 {
+		fmt.Printf("decisions: %d placement finding(s):\n", len(placement))
+		for _, f := range placement {
+			fmt.Println("  - " + f)
+		}
+	}
+	if len(unrealized) > 0 {
+		fmt.Printf("decisions: %d adoption(s) not yet realized (advisory):\n", len(unrealized))
+		for _, f := range unrealized {
+			fmt.Println("  - " + f)
+		}
+	}
+	// entry-file drift (go-entry-render): a generated entry file must equal a fresh render.
+	drift, derr := entryDrift()
+	if derr != nil {
+		fmt.Println("entry: " + derr.Error())
+	} else if len(drift) > 0 {
+		fmt.Printf("entry: %d file(s) drifted from the contract render (run render-entry):\n", len(drift))
+		for _, d := range drift {
+			fmt.Println("  - " + d)
+		}
+	}
+	if len(dups) > 0 || earsBad > 0 || len(mono) > 0 || len(drift) > 0 || len(placement) > 0 {
 		os.Exit(1)
 	}
 }

@@ -54,3 +54,18 @@ commit. The place to change the process is a retro or a review — not the walk.
 During `engage` you execute. You do not question, ruminate, or philosophize.
 Bring every doubt to the retro, where it becomes a note that can move the
 process. Mid-walk, a doubt is just drag.
+
+## attest — how a blocked agent proceeds
+A BLOCKED ledger command means this channel has no attested session. The ritual, in order:
+1. You have just re-read this contract (rule zero of every engage). Paraphrase it to the
+   adjudicator as always.
+2. Ask the adjudicator for a grant: they run `quack attest --grant` at their console and
+   hand you the one-time code.
+3. Fetch your challenge: `quack attest --challenge <code>` — it names a word of a rule above.
+4. Redeem: `quack attest <code> --answer "<word>"`. The reply is your SESSION KEY. It exists
+   only in this conversation — it is never stored in plaintext anywhere.
+5. Carry it: append `--key <key>` to every ledger-advancing command (next, start, bless,
+   ship, observe-red). Each use spends one of the key's command budget.
+6. When the budget runs out, renew WITHOUT the adjudicator: `quack attest --challenge <key>`,
+   re-read the contract, then `quack attest --renew <key> --answer "<word>"` for a fresh key.
+A new session has no key and cannot recover one from disk: the ritual restarts at step 1.

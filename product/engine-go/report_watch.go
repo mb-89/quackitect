@@ -19,7 +19,7 @@ func serveWatch(port string) {
 	if port == "" {
 		port = "8899"
 	}
-	out := filepath.Join(QUACK, "out", "report.html")
+	out := filepath.Join(dataDirFor("out"), "report.html")
 	var mu sync.Mutex
 	clients := map[chan struct{}]bool{}
 

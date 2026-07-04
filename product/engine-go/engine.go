@@ -12,7 +12,7 @@ import (
 )
 
 // Roots, discovered by walking up to a .quack or pyproject.toml (mirrors engine.find_root).
-var ROOT, SPEC, QUACK, ATTEST, NOTES, ENGINE string
+var ROOT, SPEC, QUACK, ATTEST, ENGINE string // NOTES retired: the note lane resolves notesHome() live
 
 // design: go-workspace-base  implements: req-workspace-split
 // The engine operates on a selectable WORKSPACE, separate from the ENGINE install. ROOT (and all state
@@ -38,8 +38,11 @@ func findRoot() string {
 	}
 	d, _ := os.Getwd()
 	for {
+		if _, err := os.Stat(filepath.Join(d, "spec", "project.toml")); err == nil {
+			return d // the committed root marker (go-truth-in-spec)
+		}
 		if st, err := os.Stat(filepath.Join(d, ".quack")); err == nil && st.IsDir() {
-			return d
+			return d // legacy marker: not-yet-migrated workspaces and vehicles
 		}
 		if _, err := os.Stat(filepath.Join(d, "pyproject.toml")); err == nil {
 			return d
@@ -74,8 +77,12 @@ func init() {
 	ROOT = findRoot()
 	SPEC = filepath.Join(ROOT, "spec")
 	QUACK = filepath.Join(ROOT, ".quack")
-	ATTEST = filepath.Join(QUACK, "attest.json")
-	NOTES = filepath.Join(QUACK, "notes")
+	ATTEST = filepath.Join(SPEC, "ledger", "attest.json") // truth lives under spec/ (go-truth-in-spec)
+	if _, err := os.Stat(ATTEST); err != nil {
+		if _, lerr := os.Stat(filepath.Join(QUACK, "attest.json")); lerr == nil {
+			ATTEST = filepath.Join(QUACK, "attest.json") // not-yet-migrated workspace
+		}
+	}
 	ENGINE = engineRoot()
 }
 
@@ -119,11 +126,11 @@ func fullHash(id string, nodes map[string]Node, memo map[string]string) string {
 	// comments retained — reformat churn never reopens a design; content edits always do.
 	seed := norm(n.Statement) + "|" + n.Verify + "|" + strings.Join(parts, ",") + "|" + h12(normWS(n.RegionBody))
 	if n.Validates == "needs" {
-		// global validation, made structural: fold the digest of EVERY need into this gate's identity,
-		// so adding/changing/removing any need (in any iteration) reopens it (SUSPECT). Fixes the gap
-		// where "validated against all needs" was prose, not a wired input. The verification analogue
-		// (coverage:tests-pass) is already live-computed; this gives validation the same reach.
-		seed += "|needs:" + needsDigest(nodes)
+		// validation, made structural AND backward-cumulative (go-vv-time-scope): fold the digest of
+		// every need UP TO THE CHECK'S OWN ITERATION into its identity — changing/removing a need the
+		// check actually validated reopens it (SUSPECT), while a need added in a later iteration never
+		// reaches back. The verification analogue (coverage:tests-pass) carries the same scope.
+		seed += "|needs:" + needsDigestAsOf(iterOf(n.Path), nodes)
 	}
 	hh := h12(seed)
 	memo[id] = hh

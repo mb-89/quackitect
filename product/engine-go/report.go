@@ -247,9 +247,14 @@ func buildTab(label string, idset map[string]bool, nodes map[string]Node, sm map
 func graphTabs(nodes map[string]Node, sm map[string]string) []gtab {
 	tnodes := map[string]Node{}
 	for id, n := range nodes {
-		if traceTypes[n.Type] {
-			tnodes[id] = n
+		if !traceTypes[n.Type] {
+			continue
 		}
+		if n.Type == "adr" && addressesSink(n) {
+			continue // graveyard/parked decisions live OUTSIDE the requirement trace by design
+			// (go-decisions); their read paths are `decisions --parked` and the archive, not the graph.
+		}
+		tnodes[id] = n
 	}
 	children := map[string][]string{}
 	for id, n := range tnodes {
@@ -354,7 +359,8 @@ func checksMap(nodes map[string]Node, sm map[string]string, outDir string) map[s
 		}
 		// enddesign
 		out[id] = map[string]interface{}{"id": id, "type": n.Type, "state": sm[id], "killer": k,
-			"stmt": n.Statement, "edges": edges, "verify": n.Verify, "href": href, "verdict": verdict, "verdict_href": verdictHref}
+			"stmt": n.Statement, "edges": edges, "verify": n.Verify, "href": href, "verdict": verdict, "verdict_href": verdictHref,
+			"cause": checkCause(id, n, nodes, sm, bl)}
 	}
 	return out
 }
@@ -621,15 +627,46 @@ func metricCards(nodes map[string]Node, sm map[string]string, cfg Config) string
 
 func projectDesc() string {
 	raw, err := os.ReadFile(filepath.Join(ROOT, "README.md"))
-	if err == nil {
-		for _, line := range strings.Split(string(raw), "\n") {
-			t := strings.TrimSpace(line)
-			if t != "" && !strings.HasPrefix(t, "#") {
-				return t
-			}
+	if err != nil {
+		return ""
+	}
+	// The leading text paragraphs: skip structural lines (headings, HTML, blockquotes,
+	// tables, images, rules, fences); collect consecutive text paragraphs and stop at the
+	// first structural line after text began.
+	var paras []string
+	var cur []string
+	collecting := false
+	flush := func() {
+		if len(cur) > 0 {
+			paras = append(paras, strings.Join(cur, " "))
+			cur = nil
 		}
 	}
-	return ""
+	for _, line := range strings.Split(string(raw), "\n") {
+		t := strings.TrimSpace(line)
+		if t == "" {
+			flush()
+			continue
+		}
+		structural := strings.HasPrefix(t, "#") || strings.HasPrefix(t, "<") ||
+			strings.HasPrefix(t, ">") || strings.HasPrefix(t, "|") ||
+			strings.HasPrefix(t, "![") || strings.HasPrefix(t, "---") ||
+			strings.HasPrefix(t, "```")
+		if structural {
+			if collecting {
+				break
+			}
+			continue
+		}
+		collecting = true
+		cur = append(cur, t)
+	}
+	flush()
+	text := strings.Join(paras, "\n\n")
+	for _, m := range []string{"**", "*", "`"} {
+		text = strings.ReplaceAll(text, m, "")
+	}
+	return strings.TrimSpace(text)
 }
 
 // design: go-report  implements: report-requirements, req-behavior-parity, req-trace-filter
@@ -649,10 +686,14 @@ func reportOutDir(outPath string) string {
 	return d
 }
 
+var renderBusy bool // see renderingTests (coverage.go): bounds battery re-entry from renders
+
 // View-only: it never changes the committed HTML or the determinism root.
 func RenderReport(outPath string) error {
+	renderBusy = true
+	defer func() { renderBusy = false }()
 	if outPath == "" {
-		outPath = filepath.Join(QUACK, "out", "report.html")
+		outPath = filepath.Join(dataDirFor("out"), "report.html")
 	}
 	outDir := reportOutDir(outPath)
 	nodes := LoadAll()
@@ -661,7 +702,7 @@ func RenderReport(outPath string) error {
 	// always truthful. Cheap now that checks are fast + deterministic. Pairs with --watch live-reload.
 	sm := StatusMap(nodes)
 	root := MerkleRoot(nodes)
-	cfg := ReadConfig(filepath.Join(QUACK, "config.toml"))
+	cfg := readProjectConfig()
 
 	iters := map[string][]string{}
 	for id, n := range nodes {
@@ -723,7 +764,7 @@ func RenderReport(outPath string) error {
 	H.WriteString("<section class=col mid><h2>Trace graph</h2>" +
 		"<div id=tabbar class=tabbar></div>" +
 		"<div class=legendrow>" + reportLegend +
-		"<input id=trace-filter placeholder='filter… (click for help)' title='filter the graph' autocomplete=off></div>" +
+		"<input id=trace-filter placeholder='filter… (click for help)' title='filter the graph' autocomplete=off><button id=filter-clear title='clear the filter'>&#215;</button></div>" +
 		"<div id=graph></div><noscript><p class=ns>Enable scripts for the interactive graph.</p></noscript></section>")
 	H.WriteString("<section class='col right'><h2>Metrics</h2><div class=cards>" + metricCards(nodes, sm, cfg) + "</div>" +
 		"<h2 class=push>Details</h2><div id=detail class=detail><div class=dempty>click an element to show detail</div></div></section>")
@@ -740,6 +781,51 @@ func RenderReport(outPath string) error {
 
 	os.MkdirAll(outDir, 0o755)
 	return os.WriteFile(outPath, []byte(H.String()), 0o644)
+}
+
+// enddesign
+
+// design: go-report-why  implements: req-report-why
+// Every check's detail entry carries its CAUSE when not green, baked at render (the report stays a
+// pure display; nothing is computed client-side): a SUSPECT review names the changed inputs — its own
+// re-stated statement, upstream checks currently reopened, or the scoped need-set — and an OPEN
+// derived check names the coverage rule that computes false. This is the report-side answer to
+// "quack why says nothing changed" for coverage-driven suspects.
+func suspectCauseText(changedInputs []string, flippedRule string) string {
+	if flippedRule != "" {
+		return "coverage rule " + flippedRule + " computes false over its scope"
+	}
+	if len(changedInputs) > 0 {
+		return "inputs changed since the bless: " + strings.Join(changedInputs, ", ")
+	}
+	return ""
+}
+
+func checkCause(id string, n Node, nodes map[string]Node, sm map[string]string, bl map[string]Event) string {
+	switch sm[id] {
+	case "SUSPECT":
+		var changed []string
+		if e, ok := bl[id]; ok && e.StatementHash != "" && e.StatementHash != stmtHash(n) {
+			changed = append(changed, "its own statement")
+		}
+		for _, d := range parents(n) {
+			if _, ok := nodes[d]; ok && (sm[d] == "SUSPECT" || sm[d] == "OPEN") {
+				changed = append(changed, d+" ("+strings.ToLower(sm[d])+")")
+			}
+		}
+		if n.Validates == "needs" && len(changed) == 0 {
+			changed = append(changed, "the validated need-set (a need in scope changed)")
+		}
+		if len(changed) == 0 {
+			changed = append(changed, "an upstream content edit (input hash moved; the inputs themselves read DONE)")
+		}
+		return suspectCauseText(changed, "")
+	case "OPEN":
+		if strings.HasPrefix(n.Verify, "coverage:") {
+			return suspectCauseText(nil, strings.TrimPrefix(n.Verify, "coverage:"))
+		}
+	}
+	return ""
 }
 
 // enddesign

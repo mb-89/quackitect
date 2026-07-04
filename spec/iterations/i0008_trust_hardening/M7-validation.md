@@ -23,7 +23,7 @@ Each exercised against the SHIPPED binary on the LIVE repo, not merely "tests gr
 **Validation discovery (the demo doing its job).** Demo 1's first run used PowerShell's default BOM'd UTF-8 — and the BOM slipped the file past the strict guard's recognition while the lenient loader still parsed it: guard and loader disagreed on what a node IS. Fixed test-first at M7: a BOM fixture case added to `selftest:parser-strict` (red), then `nodeFence` — ONE recognition rule (BOM-tolerant first-line fence) now shared by guard, `LoadAll`, and `scanIDs` — nothing loads unchecked. Battery re-run green; the original failing scenario re-demonstrated refused.
 
 ## Acceptance obtained  → i8-m7-acceptance-obtained
-markus adjudicated every milestone gate M1–M6 in person this session (attest: `actor=human` on each gate and killer subtask), pulled two backlog items in at M1, amended the report-PNG target at M3, ordered the log-location prompt pointer at M4, and ran the console half of the M5 channel spike himself. The M7 gate bless below completes acceptance; sign-off is the attest record itself.
+The owner adjudicated every milestone gate M1–M6 in person this session (attest: `actor=human` on each gate and killer subtask), pulled two backlog items in at M1, amended the report-PNG target at M3, ordered the log-location prompt pointer at M4, and ran the console half of the M5 channel spike themselves. The M7 gate bless below completes acceptance; sign-off is the attest record itself.
 
 ## Validation gaps captured (RAID)  → i8-m7-validation-gaps
 - **R (accepted): the EARS baseline is diffable, not tamper-proof** — attest-grade protection belongs to the deferred evidence-into-merkle work (recorded in `adr-ears-baseline`).

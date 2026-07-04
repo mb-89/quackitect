@@ -6,9 +6,9 @@ Evidence for the M8 gate. Docs match the surface, the artifact is packaged, the 
 - **AGENTS.md**: the command list now shows `bless [--by]` with the channel-default semantics, `lint [--ears-baseline]` with its three lint lanes, and `quack version` with the out-of-repo log location.
 - **engage.md**: the adjudicator-tagging instruction rewritten from the retired `QUACK_ACTOR` env dance to the channel-default + `--by human` reality (the walk that shipped this feature already followed it).
 - **compose-reference.md**: the five-shape EARS block with the forward-only + exemption instruction, i7 content intact (mechanized by `selftest:ears-method`).
-- **review.md**: the retro's log-reading step names the log location and `quack version` as the finder (markus's M4-gate instruction).
+- **review.md**: the retro's log-reading step names the log location and `quack version` as the finder (the owner's M4-gate instruction).
 - **usageText**: `--by`, `--ears-baseline`, `version` on the built-in surface (`selftest:surface` green).
-- **README**: the report image reference resolves — `.quack/out/report.png` regenerated fresh from the live board this session (markus's M3-gate instruction: PNG under `.quack/out`). Note for the GitHub rendering: `.quack/out` is gitignored; publishing the image is a GitHub-side call and stays markus's (hands-off).
+- **README**: the report image reference resolves — `.quack/out/report.png` regenerated fresh from the live board this session (the owner's M3-gate instruction: PNG under `.quack/out`). Note for the GitHub rendering: `.quack/out` is gitignored; publishing the image is a GitHub-side call and stays the owner's (hands-off).
 
 ## Packaged & versioned  → i8-m8-packaged-versioned
 Final `quack build`: engine compiled, golden re-baselined (`f40b28014507`). Full battery from the shipped binary: **44/44 ok, zero FAIL**. `quack lint`: **coverage clean (no holes), ears clean, monotonic clean, exit 0**. Stray `quack.exe~` deleted. The ship zip is `engage ship`'s output at the very end, per method.
@@ -30,6 +30,6 @@ The iteration record is self-explaining: eight evidence docs (M1–M8) with revi
 
 **Round 2 — Validate.** Nothing in the frame is left un-handed-over: every M1 Ch1 criterion traces to a demonstrated behavior (M7) and a doc that tells the next session how to use it (M8). The record a future auditor needs — why each decision holds, who blessed what, as whom — is in the ledger, not in this conversation.
 
-**Round 3 — Red-team.** (i) "The README image is gitignored — docs-complete with an unpublishable image?" The reference resolves in every checkout that runs `quack report` + screenshot, the criterion (reference resolves or dropped) is met as amended by markus, and publishing is deliberately his. (ii) "The board in the PNG shows M8 open" — correct and honest: it was rendered mid-M8; a green-M8 PNG can only exist after this gate, and re-rendering it post-bless is a one-liner if wanted. (iii) No undocumented surface remains: `resolve`/`guides`/`dump`/`root` predate i8 and are unchanged.
+**Round 3 — Red-team.** (i) "The README image is gitignored — docs-complete with an unpublishable image?" The reference resolves in every checkout that runs `quack report` + screenshot, the criterion (reference resolves or dropped) is met as amended by the owner, and publishing is deliberately the owner's. (ii) "The board in the PNG shows M8 open" — correct and honest: it was rendered mid-M8; a green-M8 PNG can only exist after this gate, and re-rendering it post-bless is a one-liner if wanted. (iii) No undocumented surface remains: `resolve`/`guides`/`dump`/`root` predate i8 and are unchanged.
 
 **Verdict: PASS.** Proceed to the human bless of `i8-m8-docs-complete` (killer) and `i8-m8-gate` — then `engage ship`.

@@ -127,6 +127,58 @@ func runSelftest(name string) bool {
 		return selftestEarsMethod()
 	case "monotonic-lint":
 		return selftestMonotonicLint()
+	case "attest-block":
+		return selftestAttestBlock()
+	case "attest-console":
+		return selftestAttestConsole()
+	case "attest-challenge":
+		return selftestAttestChallenge()
+	case "attest-grant":
+		return selftestAttestGrant()
+	case "attest-renewal":
+		return selftestAttestRenewal()
+	case "attest-keys":
+		return selftestAttestKeys()
+	case "attest-expiry":
+		return selftestAttestExpiry()
+	case "contract-render":
+		return selftestContractRender()
+	case "render-drift":
+		return selftestRenderDrift()
+	case "logs-canonical":
+		return selftestLogsCanonical()
+	case "data-dir-caches":
+		return selftestDataDirCaches()
+	case "truth-in-spec":
+		return selftestTruthInSpec()
+	case "root-marker":
+		return selftestRootMarker()
+	case "clean-status":
+		return selftestCleanStatus()
+	case "global-config":
+		return selftestGlobalConfig()
+	case "global-binary":
+		return selftestGlobalBinary()
+	case "engine-ratchet":
+		return selftestEngineRatchet()
+	case "notes-out":
+		return selftestNotesOut()
+	case "decisions-folder":
+		return selftestDecisionsFolder()
+	case "decision-classes":
+		return selftestDecisionClasses()
+	case "parked-list":
+		return selftestParkedList()
+	case "decision-realized":
+		return selftestDecisionRealized()
+	case "mint":
+		return selftestMint()
+	case "report-why":
+		return selftestReportWhy()
+	case "report-filter-ux":
+		return selftestReportFilterUX()
+	case "vv-time-scope":
+		return selftestVVTimeScope()
 	}
 	return false // unknown / not-yet-built check -> OPEN
 }
@@ -139,7 +191,7 @@ func selftestEvidenceHonesty() bool {
 	if runSelftest("__no_such_selftest__") {
 		return false // an unbuilt/unknown check must be OPEN, never a masked pass
 	}
-	base := filepath.Join(QUACK, "evidence", "__honesty_probe__")
+	base := filepath.Join(dataDirFor("evidence"), "__honesty_probe__")
 	os.RemoveAll(base)
 	defer os.RemoveAll(base)
 	probe := Node{ID: "__honesty_probe__", Verify: "exit 0"}
@@ -194,7 +246,7 @@ func selftestParser() bool {
 // (from the verified-parity moment) and then enforced forever — even after Python is gone.
 func selftestParity() bool {
 	root := MerkleRoot(LoadAll())
-	gp := filepath.Join(QUACK, "engine", "golden-root.txt")
+	gp := goldenRootPath()
 	if raw, err := os.ReadFile(gp); err == nil {
 		return strings.TrimSpace(string(raw)) == root
 	}
@@ -300,7 +352,7 @@ func selftestWidthOK(s string) bool {
 func selftestReadout() bool {
 	nodes := LoadAll()
 	sm := StatusMap(nodes)
-	cfg := ReadConfig(filepath.Join(QUACK, "config.toml"))
+	cfg := readProjectConfig()
 	it := cfg.Version
 	b1 := ProgressBar(it, nodes, sm, cfg, false)
 	b2 := ProgressBar(it, nodes, sm, cfg, false)
@@ -577,7 +629,8 @@ func selftestStubs() bool {
 
 // RunSelftestCLI runs one named check (or all) and returns an exit code.
 func RunSelftestCLI(args []string) int {
-	all := []string{"deps", "parser", "determinism", "ids", "help", "parity", "perf", "deps-prompt", "report", "split", "integrate", "engine", "method", "surface", "build", "no-trace-gate", "tests-pass-eval", "workspace", "brand", "claude-vendor", "report-verdict", "report-nesting", "brand-resolves", "validation-global", "stubs", "readout", "contract", "bootstrap", "correctness", "report-live", "evidence-honesty", "tests-red", "parser-strict", "ref-integrity", "actor-channels", "design-hash-norm", "kernel-vectors", "kernel-cone", "kernel-gatewalk", "kernel-attest", "logs-dir", "ears-lint", "ears-method", "monotonic-lint"}
+	all := []string{"deps", "parser", "determinism", "ids", "help", "parity", "perf", "deps-prompt", "report", "split", "integrate", "engine", "method", "surface", "build", "no-trace-gate", "tests-pass-eval", "workspace", "brand", "claude-vendor", "report-verdict", "report-nesting", "brand-resolves", "validation-global", "stubs", "readout", "contract", "bootstrap", "correctness", "report-live", "evidence-honesty", "tests-red", "parser-strict", "ref-integrity", "actor-channels", "design-hash-norm", "kernel-vectors", "kernel-cone", "kernel-gatewalk", "kernel-attest", "logs-dir", "ears-lint", "ears-method", "monotonic-lint",
+		"attest-block", "attest-console", "attest-challenge", "attest-grant", "attest-renewal", "attest-keys", "attest-expiry", "contract-render", "render-drift", "logs-canonical", "data-dir-caches", "truth-in-spec", "root-marker", "clean-status", "global-config", "global-binary", "engine-ratchet", "notes-out", "decisions-folder", "decision-classes", "parked-list", "decision-realized", "mint", "report-why", "report-filter-ux", "vv-time-scope"}
 	names := args
 	if len(names) == 0 {
 		names = all

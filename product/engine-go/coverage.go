@@ -16,7 +16,28 @@ import (
 // The derived coverage rules over the typed trace, the executed-check runner with its
 // cache, and the id-integrity guard (mint_id + duplicate_ids). Coverage is cumulative
 // through a version (no grandfathering); ids are namespaced so a reuse can never shadow.
+// renderingTests names battery members that RENDER a report. A render recomputes states, which
+// runs this battery again — so inside a render (renderBusy) these are skipped, bounding the
+// recursion the selftestReport comment documents. Top-level evaluation stays exact and complete.
+var renderingTests = map[string]bool{"selftest:report-live": true}
+
+// coverageMemo: one CLI invocation is one process over one immutable graph load — a computed
+// (rule, scope) answer stays valid for the whole run. The tests-pass battery in particular is
+// expensive (it runs every selftest); seven iterations asking the same scoped question must not
+// pay seven batteries (responsiveness guide: visible feedback within a second).
+var coverageMemo = map[string]bool{}
+
 func coverageRule(nodes map[string]Node, rule, scope string) bool {
+	key := rule + "|" + scope
+	if v, ok := coverageMemo[key]; ok {
+		return v
+	}
+	v := coverageRuleUncached(nodes, rule, scope)
+	coverageMemo[key] = v
+	return v
+}
+
+func coverageRuleUncached(nodes map[string]Node, rule, scope string) bool {
 	inscope := func(n Node) bool { return scope == "" || iterOf(n.Path) <= scope }
 	impl := map[string][]Node{}
 	veri := map[string][]Node{}
@@ -83,6 +104,9 @@ func coverageRule(nodes map[string]Node, rule, scope string) bool {
 				return false
 			}
 			for _, p := range a.Addresses {
+				if p == scrapSink {
+					continue // a veto/defer is traced TO THE SINK by design (go-decisions)
+				}
 				if nodes[p].Type != "requirement" {
 					return false
 				}
@@ -128,11 +152,16 @@ func coverageRule(nodes map[string]Node, rule, scope string) bool {
 	// machine uses — not a divergent shell path; selftest:tests-pass-eval guards the unification.
 	// enddesign
 	case "tests-pass":
-		// Verification runs EVERY test, across all iterations — not scope-limited — so a change
-		// anywhere is checked against the whole suite and regressions in old work are caught.
+		// Verification is backward-cumulative (go-vv-time-scope): it runs every test up to and
+		// including the CHECK'S OWN iteration. The latest iteration still re-runs the whole suite
+		// (regressions in old work are caught where the causing change lives), but a test added in a
+		// LATER iteration can never reopen an earlier iteration's verification.
 		var ts []Node
 		for _, n := range nodes {
-			if n.Class == "executed" && !strings.HasPrefix(n.Verify, "coverage:") {
+			if n.Class == "executed" && !strings.HasPrefix(n.Verify, "coverage:") && inscope(n) {
+				if renderBusy && renderingTests[n.Verify] {
+					continue // bounded: a render never re-runs the test that triggered it
+				}
 				ts = append(ts, n)
 			}
 		}
@@ -162,7 +191,7 @@ func coverageRule(nodes map[string]Node, rule, scope string) bool {
 // unbuilt check is never masked as DONE.
 // runExecuted runs a check's verify command (shell), caching the pass/fail by hash.
 func runExecuted(n Node, h string) string {
-	cdir := filepath.Join(QUACK, "evidence", n.ID)
+	cdir := filepath.Join(dataDirFor("evidence"), n.ID)
 	cf := filepath.Join(cdir, h+".json")
 	if raw, err := os.ReadFile(cf); err == nil {
 		var m map[string]interface{}
@@ -334,13 +363,58 @@ func CoverageHoles(nodes map[string]Node, scope string) []string {
 				holes = append(holes, "test '"+n.ID+"' orphan (verifies no requirement)")
 			}
 		case "adr":
-			if !ptypeOK(n, n.Addresses, "requirement") {
+			scrapOnly := len(n.Addresses) > 0
+			for _, a := range n.Addresses {
+				if a != scrapSink {
+					scrapOnly = false
+				}
+			}
+			if scrapOnly {
+				break // a veto/defer addressing only the sink is traced by construction (go-decisions)
+			}
+			var real []string
+			for _, a := range n.Addresses {
+				if a != scrapSink {
+					real = append(real, a)
+				}
+			}
+			if !ptypeOK(n, real, "requirement") {
 				holes = append(holes, "adr '"+n.ID+"' orphan (addresses no requirement)")
 			}
 		}
 	}
 	sort.Strings(holes)
 	return holes
+}
+
+// enddesign
+
+// design: go-vv-time-scope  implements: req-vv-time-scope
+// Derived V&V looks backward only: a check computes over trace nodes from its own iteration and
+// earlier (iteration ids are ordered; non-iteration nodes count as baseline, always in scope).
+// tests-pass filters its suite by inscope above, and the validates-needs digest folds needsDigestAsOf
+// — so mere ADDITION in a later iteration never reopens an earlier verdict, while a genuinely failing
+// old test still flips its own iteration red (an honest regression signal, kept).
+func iterationOf(id string, nodes map[string]Node) string {
+	n, ok := nodes[id]
+	if !ok {
+		return ""
+	}
+	return iterOf(n.Path)
+}
+
+func nodesAsOf(iter string, nodes map[string]Node) map[string]Node {
+	out := map[string]Node{}
+	for id, n := range nodes {
+		if iterOf(n.Path) <= iter {
+			out[id] = n
+		}
+	}
+	return out
+}
+
+func needsDigestAsOf(iter string, nodes map[string]Node) string {
+	return needsDigest(nodesAsOf(iter, nodes))
 }
 
 // enddesign

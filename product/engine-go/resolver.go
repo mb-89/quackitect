@@ -11,10 +11,12 @@ import (
 // resource is inherited from the engine. The engine layer is READ-ONLY: a vehicle overrides by
 // placing a file in its overlay, never by editing the engine. guides() routes through this.
 func overlayLayers() []string {
-	// most-specific first: the vehicle's overlay, then the engine's default resources.
+	// most-specific first: the workspace's overlay in the DATA HOME (adr-no-quack-data-home), the
+	// legacy in-repo vehicle overlay (not-yet-migrated vehicles), then the engine's default resources.
 	return []string{
-		filepath.Join(ENGINE, ".quack", "overlay"), // vehicle overrides (engine/brand layer)
-		EngineDir(),                                 // engine defaults (vendored, else dogfood product/)
+		dataDirFor("overlay"),
+		filepath.Join(ENGINE, ".quack", "overlay"), // legacy vehicle overrides
+		EngineDir(),                                // engine defaults (vendored, else dogfood product/)
 	}
 }
 
@@ -100,7 +102,7 @@ func selftestSplit() bool {
 	}
 	// 2. a vehicle overlay wins. Use a temp overlay file, then clean it up.
 	rel := "project_types/default/guides/milestone-review.md"
-	ov := filepath.Join(ENGINE, ".quack", "overlay", filepath.FromSlash(rel))
+	ov := filepath.Join(dataDirFor("overlay"), filepath.FromSlash(rel))
 	if err := os.MkdirAll(filepath.Dir(ov), 0o755); err != nil {
 		return false
 	}

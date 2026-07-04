@@ -10,7 +10,6 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"runtime"
 	"sort"
 	"strings"
 )
@@ -39,6 +38,7 @@ var nodeKeysAllow = map[string]bool{
 	"id": true, "type": true, "statement": true, "class": true, "verify": true, "killer": true,
 	"milestone": true, "parent": true, "depends_on": true, "refines": true, "implements": true,
 	"verifies": true, "addresses": true, "validates": true, "ears": true, "adjudicated_by": true,
+	"ready_when": true, "supersedes": true,
 }
 var iterKeysAllow = map[string]bool{
 	"iteration": true, "status": true, "type": true, "rigor": true,
@@ -46,6 +46,7 @@ var iterKeysAllow = map[string]bool{
 }
 var refFields = map[string]bool{
 	"depends_on": true, "refines": true, "implements": true, "verifies": true, "addresses": true,
+	"supersedes": true,
 }
 
 // nodeFence is THE single recognition rule, shared by the strict guard and the loader (LoadAll,
@@ -141,6 +142,9 @@ func StrictIssues(specDir string) []ParseIssue {
 		return nil
 	})
 	for _, r := range refs {
+		if r.to == scrapSink {
+			continue // the built-in sink (go-decisions) is always recognized; it has no file
+		}
 		if _, ok := ids[r.to]; !ok {
 			issues = append(issues, ParseIssue{r.path, r.field,
 				"dangling reference: '" + r.from + "' --" + r.field + "--> '" + r.to + "' (no such node)"})
@@ -274,17 +278,10 @@ func logsDir(cfg Config) string {
 	if cfg.LogsDir != "" {
 		return cfg.LogsDir
 	}
-	base := os.Getenv("LOCALAPPDATA")
-	if runtime.GOOS != "windows" || base == "" {
-		if x := os.Getenv("XDG_DATA_HOME"); x != "" {
-			base = x
-		} else {
-			home, _ := os.UserHomeDir()
-			base = filepath.Join(home, ".local", "share")
-		}
-	}
-	slug := filepath.Base(ROOT) + "-" + h12(ROOT)[:6]
-	return filepath.Join(base, "quackitect", "logs", slug)
+	// workspace-first since i9 (adr-no-quack-data-home): logs are one kind-folder inside the ONE
+	// data home per workspace, and the slug hashes the CANONICAL path — the i9 retro found the same
+	// workspace split across two homes by invoking-shell casing (c5212d vs 9cb46b).
+	return dataDirFor("logs")
 }
 
 // enddesign
@@ -369,8 +366,19 @@ func earsFindings(nodes map[string]Node, baseline map[string]bool) ([]string, in
 }
 
 // earsBaseline loads the committed baseline; empty result = enforcement disarmed.
+func earsBaselinePath() string {
+	p := filepath.Join(ledgerDir(), "ears-baseline.json")
+	if _, err := os.Stat(p); err == nil {
+		return p
+	}
+	if _, err := os.Stat(filepath.Join(QUACK, "ears-baseline.json")); err == nil {
+		return filepath.Join(QUACK, "ears-baseline.json") // not-yet-migrated
+	}
+	return p
+}
+
 func earsBaseline() map[string]bool {
-	raw, err := os.ReadFile(filepath.Join(QUACK, "ears-baseline.json"))
+	raw, err := os.ReadFile(earsBaselinePath())
 	if err != nil {
 		return nil
 	}
@@ -395,7 +403,7 @@ func earsWriteBaseline(nodes map[string]Node) int {
 	}
 	sort.Strings(hashes)
 	out, _ := json.MarshalIndent(hashes, "", " ")
-	os.WriteFile(filepath.Join(QUACK, "ears-baseline.json"), out, 0o644)
+	os.WriteFile(earsBaselinePath(), out, 0o644)
 	return len(hashes)
 }
 

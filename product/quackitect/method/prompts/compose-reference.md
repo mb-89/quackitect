@@ -67,7 +67,7 @@ Author every NEW `type: requirement` statement in one of the **five EARS shapes*
 
 No **weasel words** (should, may, appropriate, quickly, user-friendly, robust, flexible, …) — state
 the checkable claim. `quack lint` enforces this **forward-only**: only statements not in the committed
-baseline (`.quack/ears-baseline.json`) are checked — blessed history is never retrofitted or re-blessed.
+baseline (`spec/ledger/ears-baseline.json`) are checked — blessed history is never retrofitted or re-blessed.
 A genuinely non-EARS requirement carries `ears: exempt - <reason>` in its frontmatter (the reason is
 required; lint counts exemptions). This applies to requirement statements only — tests keep verifying
 (`verifies:`, tests-red discipline) and roles keep binding exactly as above.

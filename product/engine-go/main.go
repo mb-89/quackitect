@@ -6,7 +6,10 @@ import "os"
 // design: go-binary  implements: req-go-engine
 // The engine is one statically-linked Go binary (CGO disabled), built from this module and
 // cross-compiled from a single machine. Zero runtime dependencies; nothing fetched at run time.
-func main() { Dispatch(stripBase(os.Args[1:])) }
+func main() {
+	ratchetMaybe() // forward-only self-update against the workspace's vendored source (go-global-ratchet)
+	Dispatch(stripBase(os.Args[1:]))
+}
 
 // stripBase removes the --base/-C <path> workspace selector from the args before command dispatch
 // (it is consumed by findRoot at init, not a command). Everything else passes through untouched.

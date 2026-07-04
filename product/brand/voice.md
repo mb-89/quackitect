@@ -27,6 +27,10 @@ Write plainly. These are rules, not suggestions. They bind every output: chat, d
 - If two places show the same thing, delete one. A detail view should not echo what its parent already shows.
 - Repeat only when strongly advised. Then say why.
 
+### People & privacy
+- No personal data in anything stored or published. That covers spec, evidence docs, trace nodes, reports, and entry files. Use the stakeholder ROLE instead: the owner, the adjudicator, the driving agent, the maintainer.
+- Do not write "human vs agent" in prose. Say "people" or "persons", or name the role. The engine's actor stamp is a recorded metric with fixed vocabulary. Prose is not.
+
 ### Structure
 - Progressive disclosure. Give the whole picture first. Then the detail. The reader stops when they have enough.
 - Diátaxis (diataxis.fr) for docs. Keep the four modes apart: tutorial, how-to, reference, explanation. Do not blend them in one place.

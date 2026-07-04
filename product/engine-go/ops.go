@@ -22,7 +22,7 @@ func env(k, def string) string {
 }
 
 func saveEvents(events []Event) {
-	os.MkdirAll(QUACK, 0o755)
+	os.MkdirAll(filepath.Dir(ATTEST), 0o755)
 	out, _ := json.MarshalIndent(events, "", "  ")
 	os.WriteFile(ATTEST, out, 0o644)
 }
@@ -258,7 +258,10 @@ func cmdNext(args []string) {
 // points config at it) or, with --plan, registers a future one. Ids are i_NNNN_name; only start mints
 // versions. Rejects an id starting with '-' (the help-flag bug).
 func setConfigVersion(vid string) {
-	p := filepath.Join(QUACK, "config.toml")
+	p := projectTomlPath() // truth pointer (go-truth-in-spec); legacy config until migrated
+	if _, err := os.Stat(p); err != nil {
+		p = filepath.Join(QUACK, "config.toml")
+	}
 	raw, _ := os.ReadFile(p)
 	lines := strings.Split(string(raw), "\n")
 	seen := false
@@ -301,7 +304,7 @@ func cmdStart(args []string) {
 	d := filepath.Join(SPEC, "iterations", vid)
 	os.MkdirAll(d, 0o755)
 	p := filepath.Join(d, "iteration.md")
-	cfg := ReadConfig(filepath.Join(QUACK, "config.toml"))
+	cfg := readProjectConfig()
 	status := "active"
 	if plan {
 		status = "planned"
@@ -327,6 +330,14 @@ func cmdStart(args []string) {
 
 // design: go-note  implements: notes-pipeline
 // One-file-per-note capture under .quack/notes/inbox, recording provenance (origin, timestamp, status).
+// design: go-notes-out  implements: req-notes-out, req-note-lane
+// Notes live OUTSIDE the repository (adr-no-quack-data-home): the capture lane writes beneath the
+// workspace's notes home in the user data dir — raw notes carry personal data and never belong in a
+// published checkout. The lane is the ONLY minting path (adr-deterministic-mint): a multi-line body
+// arrives via --file <path> or --file - (stdin), so the note skill CALLS the engine instead of
+// hand-writing files; id, timestamp, slug and frontmatter stay engine-stamped.
+func notesHome() string { return dataDirFor("notes") }
+
 func cmdNote(args []string) {
 	text := ""
 	origin := "commandline"
@@ -334,22 +345,40 @@ func cmdNote(args []string) {
 		if args[i] == "--origin" && i+1 < len(args) {
 			origin = args[i+1]
 			i++
+		} else if args[i] == "--file" && i+1 < len(args) {
+			var raw []byte
+			var err error
+			if args[i+1] == "-" {
+				raw, err = io.ReadAll(os.Stdin)
+			} else {
+				raw, err = os.ReadFile(args[i+1])
+			}
+			if err != nil {
+				fmt.Fprintln(os.Stderr, "note:", err)
+				os.Exit(1)
+			}
+			text = strings.TrimSpace(string(raw))
+			i++
 		} else if !strings.HasPrefix(args[i], "--") && text == "" {
 			text = args[i]
 		}
 	}
 	if text == "" {
-		fmt.Println("usage: " + brand() + " note \"...\" [--origin X]")
+		fmt.Println("usage: " + brand() + " note \"...\" | note --file <path|-> [--origin X]")
 		return
 	}
 	ts := time.Now().Format("20060102-150405")
-	slug := regexp.MustCompile(`[^a-z0-9]+`).ReplaceAllString(strings.ToLower(text), "-")
+	firstLine := text
+	if i := strings.IndexByte(firstLine, '\n'); i >= 0 {
+		firstLine = firstLine[:i]
+	}
+	slug := regexp.MustCompile(`[^a-z0-9]+`).ReplaceAllString(strings.ToLower(firstLine), "-")
 	if len(slug) > 32 {
 		slug = slug[:32]
 	}
 	slug = strings.Trim(slug, "-")
 	nid := "NOTE-" + ts + "-" + slug
-	dir := filepath.Join(NOTES, "inbox")
+	dir := filepath.Join(notesHome(), "inbox")
 	os.MkdirAll(dir, 0o755)
 	body := "---\nid: " + nid + "\ncreated: " + time.Now().Format(time.RFC3339) +
 		"\norigin: " + origin + "\nstatus: inbox\n---\n\n" + text + "\n"
@@ -363,7 +392,7 @@ func cmdNote(args []string) {
 // gather collects the rigor floors (vibe<lean<systematic) and the project-type guides for the active
 // version into one bundle the agent composes the iteration checklist from. Resolved via the overlay.
 func cmdGather(args []string) {
-	cfg := ReadConfig(filepath.Join(QUACK, "config.toml"))
+	cfg := readProjectConfig()
 	ver := cfg.Version
 	if len(args) > 0 {
 		ver = args[0]
@@ -409,7 +438,7 @@ func cmdGather(args []string) {
 			return nil
 		})
 	}
-	dest := filepath.Join(QUACK, "gather", ver)
+	dest := filepath.Join(dataDirFor("gather"), ver)
 	os.MkdirAll(dest, 0o755)
 	path := filepath.Join(dest, "source.md")
 	os.WriteFile(path, []byte(strings.Join(out, "\n")), 0o644)
@@ -423,8 +452,8 @@ func cmdGather(args []string) {
 // design: go-ship  implements: req-tooling
 // ship packages product/ into a versioned zip under .quack/out/. The zip is ephemeral output.
 func cmdShip(args []string) {
-	cfg := ReadConfig(filepath.Join(QUACK, "config.toml"))
-	dest := filepath.Join(QUACK, "out")
+	cfg := readProjectConfig()
+	dest := dataDirFor("out")
 	os.MkdirAll(dest, 0o755)
 	zp := filepath.Join(dest, brand()+"-"+cfg.Version+".zip")
 	f, err := os.Create(zp)
@@ -459,20 +488,28 @@ func cmdShip(args []string) {
 // stale-golden footgun where a hand-run build forgot to re-baseline and produced false milestone FAILs.
 func cmdBuild(args []string) {
 	src := EngineSrc()
-	out := filepath.Join(QUACK, "engine", brand()+".exe")
+	out := globalBinPath() // the canonical home (go-global-ratchet); one binary serves every workspace
 	os.MkdirAll(filepath.Dir(out), 0o755)
-	cmd := exec.Command("go", "build", "-o", out, ".")
+	staged := out + ".staged"
+	cmd := exec.Command("go", "build", "-o", staged, ".")
 	cmd.Dir = src
 	cmd.Stdout, cmd.Stderr = os.Stdout, os.Stderr
 	if err := cmd.Run(); err != nil {
 		fmt.Fprintln(os.Stderr, "build error:", err, "(need the Go toolchain — see dependencies.md)")
 		os.Exit(1)
 	}
+	if err := replaceExe(out, staged); err != nil {
+		if os.Rename(staged, out) != nil { // fresh install: nothing to swap
+			fmt.Fprintln(os.Stderr, "build: swap blocked ("+err.Error()+") — staged; it lands on the next launch")
+		}
+	}
 	root := MerkleRoot(LoadAll())
-	gp := filepath.Join(QUACK, "engine", "golden-root.txt")
+	gp := goldenRootPath()
 	os.WriteFile(gp, []byte(root+"\n"), 0o644)
-	rel, _ := filepath.Rel(ROOT, out)
-	fmt.Println("built ->", filepath.ToSlash(rel), "| golden re-baselined to", root[:12])
+	fmt.Println("built ->", filepath.ToSlash(out), "| golden re-baselined to", root[:12])
+	if err := writeEntryFiles(); err != nil { // entry files are outputs of the build (go-entry-render)
+		fmt.Fprintln(os.Stderr, "render-entry:", err)
+	}
 }
 
 // enddesign
