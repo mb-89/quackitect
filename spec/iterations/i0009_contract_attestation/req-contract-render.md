@@ -2,10 +2,16 @@
 id: req-contract-render
 type: requirement
 refines: [uc-contract-delivery]
-statement: When entry-file rendering runs, the engine shall generate every harness entry file (AGENTS.md, .github/copilot-instructions.md) from contract.md as their single source.
+statement: The repository shall deliver the contract through an unbroken pointer chain with contract.md as its single copy — each harness's natively-loaded file (CLAUDE.md for Claude Code, .github/copilot-instructions.md for Copilot) commands following AGENTS.md without exception and to the letter, and AGENTS.md commands the enumerated read-understand-recite-honor ritual on contract.md.
 depends_on: []
 class: review
 killer: true
 ---
 ## Rationale (not load-bearing)
-Removes the pointer entirely: the maintainer runs the render; the agent only ever reads a static file that already contains the full contract. Per-harness framing (how each file wraps the contract) is template, the contract body is transcluded verbatim.
+Supersedes the verbatim-transclusion render (adr-entry-render, now superseded). Two field
+findings moved it: Claude Code auto-loads CLAUDE.md, not AGENTS.md — the "native channel"
+assumption was wrong for the primary harness; and a weak model with the full contract embedded
+in context still skipped the recital — embedding never was the enforcement. Enforcement is
+structural since i9: attest BLOCKS the ledger until the challenge is answered from the live
+contract text, so the chain's job is a clear, enumerated command sequence, not carrying the
+body. The body rides in exactly one file; entry files are hand-authored and small.

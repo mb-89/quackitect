@@ -353,7 +353,7 @@ func gateState(id string, nodes map[string]Node, a map[string]attestState, memo 
 			return "OPEN"
 		}
 		if strings.HasPrefix(n.Verify, "selftest:") {
-			if runSelftest(strings.TrimSpace(n.Verify[len("selftest:"):])) {
+			if runSelftestCached(id, strings.TrimSpace(n.Verify[len("selftest:"):]), h) {
 				return "DONE"
 			}
 			return "OPEN"

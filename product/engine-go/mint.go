@@ -1,4 +1,4 @@
-package main
+﻿package main
 
 import (
 	"fmt"
@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-// design: go-mint  implements: req-mint
+// design: go-mint  implements: req-mint, req-mint-dedupe, req-mint-rationale
 // Deterministic minting (adr-deterministic-mint): the engine emits every node skeleton — typed
 // frontmatter, engine-stamped id, placeholder statement — so a node is schema-valid at BIRTH; the
 // agent fills content, never authors shape (the strict parser guarded READ time since i8; mint moves
@@ -17,6 +17,15 @@ import (
 // spec/decisions/; other types land in the active iteration.
 var mintPrefix = map[string]string{
 	"need": "need-", "usecase": "uc-", "requirement": "req-", "test": "test-", "adr": "adr-",
+}
+
+// sugarAddresses stamps the decision edges for veto/defer: the target plus the sink — and never
+// the sink twice when the target IS the sink (i10 defect fix for addresses: [scrap, scrap]).
+func sugarAddresses(of string) string {
+	if of == "" || of == scrapSink {
+		return scrapSink
+	}
+	return of + ", " + scrapSink
 }
 
 func mintID(kind, slug string) string {
@@ -67,7 +76,11 @@ func mintBody(kind, id string, extra map[string]string) string {
 	} else {
 		b.WriteString("class: review\n")
 	}
-	b.WriteString("killer: false\n---\n## Rationale (not load-bearing)\nTODO\n")
+	rat := extra["rationale"]
+	if rat == "" {
+		rat = "TODO"
+	}
+	b.WriteString("killer: false\n---\n## Rationale (not load-bearing)\n" + rat + "\n")
 	return b.String()
 }
 
@@ -110,7 +123,7 @@ func mintDefaultDir(kind string) string {
 
 func cmdMint(args []string) {
 	if len(args) == 0 {
-		fmt.Println("usage: mint <need|usecase|requirement|test|adr> [--id slug] [--of id] [--statement \"...\"] [--dir path]")
+		fmt.Println("usage: mint <need|usecase|requirement|test|adr> [--id slug] [--of id] [--statement \"...\"] [--rationale \"...\"] [--dir path]")
 		fmt.Println("       mint veto --of <id> [--statement \"...\"]      (decision: scrapped, final)")
 		fmt.Println("       mint defer --of <id> --ready-when \"<cond>\"    (decision: parked until)")
 		fmt.Println("       mint supersede <old-id> [--statement \"...\"]  (decision: replaced by this)")
@@ -119,15 +132,12 @@ func cmdMint(args []string) {
 	kind := args[0]
 	extra := map[string]string{
 		"of": flagVal(args, "--of"), "statement": flagVal(args, "--statement"),
-		"ready_when": flagVal(args, "--ready-when"),
+		"ready_when": flagVal(args, "--ready-when"), "rationale": flagVal(args, "--rationale"),
 	}
 	switch kind {
 	case "veto":
 		kind = "adr"
-		extra["addresses"] = scrapSink
-		if extra["of"] != "" {
-			extra["addresses"] = extra["of"] + ", " + scrapSink
-		}
+		extra["addresses"] = sugarAddresses(extra["of"])
 		extra["of"] = ""
 	case "defer":
 		kind = "adr"
@@ -135,10 +145,7 @@ func cmdMint(args []string) {
 			fmt.Println("mint defer needs --ready-when \"<condition>\"")
 			return
 		}
-		extra["addresses"] = scrapSink
-		if extra["of"] != "" {
-			extra["addresses"] = extra["of"] + ", " + scrapSink
-		}
+		extra["addresses"] = sugarAddresses(extra["of"])
 		extra["of"] = ""
 	case "supersede":
 		kind = "adr"
@@ -155,7 +162,7 @@ func cmdMint(args []string) {
 	p, err := mintNodeAtX(dir, kind, flagVal(args, "--id"), extra)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
-		os.Exit(1)
+		quackExit(1)
 	}
 	rel, _ := filepath.Rel(ROOT, p)
 	fmt.Println("minted ->", filepath.ToSlash(rel))

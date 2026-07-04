@@ -1,18 +1,18 @@
----
+﻿---
 id: rigor-lean-checklist
 rigor: lean
 statement: The lean checklist. Light structure. One grounded-review gate per concern. Executed checks where cheap. It inherits vibe. Systematic inherits it.
 ---
 
-<!-- design: method-lean-trace  implements: req-lean-enforces-trace :: Lean rigor carries the derived coverage checks (req-traced, req-has-test, adr-traced, designs-realized) in addition to tests-pass, so even at the lean floor the trace is structurally enforced; only the human review-gate count is reduced (one review per concern). -->
+<!-- design: method-lean-trace  implements: req-lean-enforces-trace :: Lean rigor carries the derived coverage checks (req-traced, req-has-test, adr-traced, designs-realized) in addition to tests-pass, so even at the lean floor the trace is structurally enforced; only the user review-gate count is reduced (one review per concern). -->
 # Lean — checklist template
 
 A **condensed systematic walk**. Every concern gets ONE grounded-review gate. Point at the
 referent: a file, a line, a value. Not a bare "looks good". Cheap executed checks (tests,
 compile, lint) run where they are free. The **derived coverage checks that enforce the trace**
 (requirement→need, requirement→test, requirement→design, ADR→requirement) are free too —
-engine-computed, no human stamp — so lean keeps them: even at this floor the trace is
-structurally enforced, only the *human* gate count is reduced (one review per concern). The
+engine-computed, no user stamp — so lean keeps them: even at this floor the trace is
+structurally enforced, only the *user* gate count is reduced (one review per concern). The
 concerns map 1:1 onto the systematic milestones. So a project can step up to `systematic`
 without restructuring. `(killer)` means mandatory. `(executed)`/`(derived)` means a run decides.
 

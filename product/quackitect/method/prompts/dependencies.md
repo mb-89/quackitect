@@ -14,7 +14,7 @@ tool is missing, ask the user to install it with the winget command below.
   - Normal path: just run `.\quack <cmd>` — the launcher bootstraps the global binary from the
     vendored source when it is absent, and the engine RATCHETS itself forward at startup when
     this workspace's vendored source is newer. Deliberate rebuild: `quack build` (compiles,
-    installs globally, re-baselines the golden root, re-renders the entry files).
+    installs globally, writes the build stamp into the source, re-baselines the golden root).
   - Hand-build (rarely needed): from the vendored source dir (dogfood: `product\engine-go`),
     run `go build -o "%LOCALAPPDATA%\quackitect\bin\quack.exe" .` — build **inside** the module
     dir; `go build` from the repo root fails with "cannot find main module".

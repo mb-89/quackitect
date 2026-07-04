@@ -1,4 +1,4 @@
-package main
+﻿package main
 
 import (
 	"fmt"
@@ -49,8 +49,8 @@ func usageText() string {
 	b := brand()
 	return b + ` — the determinizer lane (deterministic; no judgment).
 usage: ` + b + ` status [id] | next | start <id> [--plan] | why <id> | bless [--all|<id>] [--by A]
-       | note "..." | gather <ver> | report [--out F] | ship | build | lint [--ears-baseline]
-       | verify <id> | progress [--pager <gate>] | version`
+       | note "..." | notes [--all] | gather <ver> | report [--out F] | ship | build
+       | lint [--ears-baseline] | verify <id> | progress [--pager <gate>] | version`
 }
 
 // enddesign
@@ -90,10 +90,12 @@ func Dispatch(args []string) {
 		return
 	}
 	cmd, rest := args[0], args[1:]
+	callLogStart(cmd, rest)       // one redacted line per dispatch (go-call-log)
+	defer func() { callLogWrite(0) }()
 	rest = attestGuard(cmd, rest) // the contract gate: agent-channel ledger commands need a key
 	if bad, isBad := badIDArg(cmd, rest); isBad {
 		fmt.Println("error: id cannot start with '-': " + bad)
-		os.Exit(2)
+		quackExit(2)
 	}
 	switch cmd {
 	case "attest":
@@ -102,11 +104,6 @@ func Dispatch(args []string) {
 		cmdDecisions(rest)
 	case "mint":
 		cmdMint(rest)
-	case "render-entry":
-		if err := writeEntryFiles(); err != nil {
-			fmt.Fprintln(os.Stderr, "render-entry:", err)
-			os.Exit(1)
-		}
 	case "status":
 		cmdStatus(rest)
 	case "why":
@@ -121,6 +118,8 @@ func Dispatch(args []string) {
 		cmdStart(rest)
 	case "note":
 		cmdNote(rest)
+	case "notes":
+		cmdNotes(rest)
 	case "observe-red":
 		cmdObserveRed(rest)
 	case "gather":
@@ -141,7 +140,7 @@ func Dispatch(args []string) {
 		out := flagVal(rest, "--out")
 		if err := RenderReport(out); err != nil {
 			fmt.Fprintln(os.Stderr, "report error:", err)
-			os.Exit(1)
+			quackExit(1)
 		}
 		rp := out
 		if rp == "" {
@@ -160,7 +159,7 @@ func Dispatch(args []string) {
 			fmt.Println(p)
 		} else {
 			fmt.Fprintln(os.Stderr, "unresolved:", rest[0])
-			os.Exit(1)
+			quackExit(1)
 		}
 	case "guides":
 		g := ResolveGuides()
@@ -173,7 +172,7 @@ func Dispatch(args []string) {
 			fmt.Println(k + "\t" + g[k])
 		}
 	case "selftest":
-		os.Exit(RunSelftestCLI(rest))
+		quackExit(RunSelftestCLI(rest))
 	case "root":
 		fmt.Println(MerkleRoot(LoadAll()))
 	case "dump":
@@ -260,10 +259,10 @@ func why(nodes map[string]Node, id string) []string {
 	}
 	memo := map[string]string{}
 	if n.Class == "executed" {
-		if strings.HasPrefix(n.Verify, "coverage:") {
-			return []string{"derived gate - computed live from the trace (" + n.Verify + ")"}
+		if strings.HasPrefix(n.Verify, "coverage:") { // named rule + delta (go-why-derived)
+			return whyCoverage(nodes, strings.TrimSpace(n.Verify[len("coverage:"):]), iterOf(n.Path))
 		}
-		return []string{"executed check - its run decides; see .quack/evidence/" + id}
+		return []string{"executed check - its run decides; evidence lives in the workspace data home"}
 	}
 	a := attestLoad()
 	s, ok := a[id]
@@ -353,17 +352,7 @@ func cmdLint(rest []string) {
 			fmt.Println("  - " + f)
 		}
 	}
-	// entry-file drift (go-entry-render): a generated entry file must equal a fresh render.
-	drift, derr := entryDrift()
-	if derr != nil {
-		fmt.Println("entry: " + derr.Error())
-	} else if len(drift) > 0 {
-		fmt.Printf("entry: %d file(s) drifted from the contract render (run render-entry):\n", len(drift))
-		for _, d := range drift {
-			fmt.Println("  - " + d)
-		}
-	}
-	if len(dups) > 0 || earsBad > 0 || len(mono) > 0 || len(drift) > 0 || len(placement) > 0 {
-		os.Exit(1)
+	if len(dups) > 0 || earsBad > 0 || len(mono) > 0 || len(placement) > 0 {
+		quackExit(1)
 	}
 }

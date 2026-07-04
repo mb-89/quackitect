@@ -2,7 +2,7 @@
 id: test-render-drift
 type: test
 verifies: [req-render-drift]
-statement: A hand-edited generated entry file, or a contract edit without re-render, makes quack lint flag drift; a fresh render clears it.
+statement: Every harness pointer file (CLAUDE.md, .github/copilot-instructions.md) exists and names AGENTS.md; a severed link turns the selftest red.
 class: executed
 verify: selftest:render-drift
 killer: false

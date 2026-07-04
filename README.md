@@ -1,18 +1,18 @@
-<p align="center"><img src="product/brand/logo-mark.svg" width="140" alt="quackitect"></p>
+﻿<p align="center"><img src="product/brand/logo-mark.svg" width="140" alt="quackitect"></p>
 
 # quackitect
 
 *The rubber duck that went to engineering school.*
 
-**A human-driven gate ledger for spec-driven, systematic engineering.** An AI agent fills the checks; a human adjudicates the gates. The result is an **auditable, change-aware record of a project's design** — a Merkle-DAG of decisions that goes **SUSPECT the moment an input changes**, so nothing silently drifts.
+**A user-driven gate ledger for spec-driven, systematic engineering.** An AI agent fills the checks; a user adjudicates the gates. The result is an **auditable, change-aware record of a project's design** — a Merkle-DAG of decisions that goes **SUSPECT the moment an input changes**, so nothing silently drifts.
 
 > 🚧 **Under construction.** Early and evolving — the commands, spec format, and structure may change without notice. Here to explore the idea, not (yet) for production. No stability promises.
 
 
 ## Who it's for
-Engineers and teams driving work with AI agents who need an **auditable design / decision record with human gates** — regulated or systematic engineering, requirements traceability, architecture decision records (ADRs), V-model walks, or anyone who wants the agent to *propose* and a human to *adjudicate*.
+Engineers and teams driving work with AI agents who need an **auditable design / decision record with user gates** — regulated or systematic engineering, requirements traceability, architecture decision records (ADRs), V-model walks, or anyone who wants the agent to *propose* and a user to *adjudicate*.
 
-> **Code isn't the focus — but it does fall out of it.** Spec-driven tools like Spec Kit, Kiro, and OpenSpec exist to turn a spec into code. quackitect aims a level up: the **oversight and traceability ledger** that records *why* each design decision holds, gates the load-bearing ones behind a human, and reopens them when their inputs change. 
+> **Code isn't the focus — but it does fall out of it.** Spec-driven tools like Spec Kit, Kiro, and OpenSpec exist to turn a spec into code. quackitect aims a level up: the **oversight and traceability ledger** that records *why* each design decision holds, gates the load-bearing ones behind a user, and reopens them when their inputs change. 
 
 > Code is one of many deliverables: quackitect's own Go engine is built exactly that way.
 
@@ -22,7 +22,7 @@ Engineers and teams driving work with AI agents who need an **auditable design /
 | Job | spec → plan → **generate code** | spec → **gated ledger + deliverable** |
 | Output | source code | auditable trace + deliverable |
 | On input change | re-generate | the affected cone goes **SUSPECT** → re-bless |
-| Human role | review the diff | **adjudicate the gates** (never auto-passed) |
+| User role | review the diff | **adjudicate the gates** (never auto-passed) |
 | Runtime | varies | one **dependency-free Go binary** |
 
 ## Start your project

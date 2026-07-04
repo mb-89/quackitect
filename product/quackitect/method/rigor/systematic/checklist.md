@@ -1,17 +1,17 @@
----
+﻿---
 id: rigor-systematic-checklist
 rigor: systematic
-statement: The systematic-architecting checklist, at full rigor. Each milestone is a human-adjudicated gate. Its checks are the acceptance. A project TYPE may override or extend any item. It may never go below this floor.
+statement: The systematic-architecting checklist, at full rigor. Each milestone is a user-adjudicated gate. Its checks are the acceptance. A project TYPE may override or extend any item. It may never go below this floor.
 ---
 
 # Systematic architecting — checklist template
 
 Condensed from the V-model and systematic-architecting method (sebot keel M1–M9).
 Rigor sets this **principle structure**. The project type overrides specifics.
-Each milestone is a **gate** — a `review` check, blessed by a human in increasing-scrutiny rounds
+Each milestone is a **gate** — a `review` check, blessed by a user in increasing-scrutiny rounds
 (`guides/milestone-review.md`). Its acceptance items become **subtasks**. A subtask tagged
-`(derived: coverage:<rule>)` is computed from the trace by the engine (`class: executed`, no human
-stamp). The rest are human-judged (`class: review`). The trace itself is content, never a gate.
+`(derived: coverage:<rule>)` is computed from the trace by the engine (`class: executed`, no user
+stamp). The rest are user-judged (`class: review`). The trace itself is content, never a gate.
 
 - **M1 — Frame the problem & vision** · *gate: motivation*
   - method: State goal, actual, and delta. Draft the vision (Moore: For/Who/The/That/Unlike).
@@ -24,7 +24,9 @@ stamp). The rest are human-judged (`class: review`). The trace itself is content
 - **M2 — Requirements** · *gate: requirements*
   - method: Draw a context diagram (system-in-focus plus environment, IN/OUT). List stakeholders by
     role. Build a function tree. Build an ISO 25010 quality tree with 6-part scenarios. Write
-    requirements in EARS.
+    requirements in EARS. Field-check every environment assumption a requirement builds on.
+    Probe the real channel (what a harness actually loads, what an API actually returns).
+    One probe settles what a datasheet claims.
   - [ ] inputs captured — context, stakeholders, use cases
   - [ ] stakeholder coverage — no role left out
   - [ ] requirements verifiable — every requirement has a test *(derived: coverage:req-has-test)*
@@ -38,8 +40,11 @@ stamp). The rest are human-judged (`class: review`). The trace itself is content
   - [ ] feasibility rough-checked per candidate
 
 - **M4 — Decide the architecture** · *gate: architecture*
-  - method: Score the candidates with a Pugh controlled-convergence matrix. Add a sensitivity check.
-    Record the deciding ADR(s).
+  - method: Score the candidates with a Pugh controlled-convergence matrix. The datum is the
+    STRONGEST viable rival — or the current design, when redesigning. A status-quo datum is allowed
+    only as a second run, to establish worth-doing-at-all. Iterate with the winner as the new datum.
+    That iteration is the controlled convergence. Record both runs when used. Add a sensitivity
+    check. Record the deciding ADR(s).
   - [ ] chosen architecture stated
   - [ ] choice traced to the weighted criteria
   - [ ] ADR recorded and traced — every ADR addresses a requirement *(derived: coverage:adr-traced)*

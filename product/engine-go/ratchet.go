@@ -25,18 +25,40 @@ func globalBinPath() string {
 
 func ratchetNeeded(binTime, srcTime int64) bool { return srcTime > binTime }
 
-func newestGoMtime(dir string) int64 {
-	var newest int64
-	filepath.Walk(dir, func(path string, fi os.FileInfo, err error) error {
-		if err == nil && !fi.IsDir() && strings.HasSuffix(path, ".go") {
-			if t := fi.ModTime().Unix(); t > newest {
-				newest = t
-			}
-		}
-		return nil
-	})
-	return newest
+// design: go-ratchet-stamp  implements: req-ratchet-semantic
+// The ratchet compares COMMITTED build-time stamps, never file mtimes (adr-ratchet-stamp; spike-
+// proven at i10 M5): a fresh clone stamps checkout-time mtimes on old source and used to rebuild
+// the global binary BACKWARD. `quack build` writes engine-stamp.txt into the source it compiles
+// (committed content — it survives every clone) and mirrors it beside the binary (<exe>.stamp).
+// Decision table: unstamped source is never newer (pre-stamp era); an unstamped binary defers to
+// any stamped source (one forward hop onto the stamp regime); otherwise strictly newer wins.
+func stampFile(srcDir string) string { return filepath.Join(srcDir, "engine-stamp.txt") }
+
+func readStampUnix(p string) (int64, bool) {
+	raw, err := os.ReadFile(p)
+	if err != nil {
+		return 0, false
+	}
+	t, err := time.Parse(time.RFC3339, strings.TrimSpace(string(raw)))
+	if err != nil {
+		return 0, false
+	}
+	return t.Unix(), true
 }
+
+func ratchetDecision(srcDir, exe string) bool {
+	vs, vok := readStampUnix(stampFile(srcDir))
+	if !vok {
+		return false // pre-stamp source is never newer
+	}
+	bs, bok := readStampUnix(exe + ".stamp")
+	if !bok {
+		return true // unstamped binary defers to a stamped source
+	}
+	return ratchetNeeded(bs, vs) // forward only
+}
+
+// enddesign
 
 // replaceExe swaps target with staged via the rename dance; the parked .old stays for a later sweep.
 // Retried briefly: a freshly-written binary is often held for a moment by AV scanning (seen live at
@@ -103,8 +125,7 @@ func ratchetMaybe() {
 	if st, err := os.Stat(src); err != nil || !st.IsDir() {
 		return // no vendored source in reach — nothing to ratchet against
 	}
-	fi, err := os.Stat(exe)
-	if err != nil || !ratchetNeeded(fi.ModTime().Unix(), newestGoMtime(src)) {
+	if !ratchetDecision(src, exe) { // committed stamps, never mtimes (go-ratchet-stamp)
 		return
 	}
 	staged := exe + ".staged"
@@ -121,6 +142,9 @@ func ratchetMaybe() {
 		os.Remove(staged)
 		fmt.Fprintln(os.Stderr, "ratchet: swap failed —", err)
 		return
+	}
+	if raw, err := os.ReadFile(stampFile(src)); err == nil {
+		os.WriteFile(exe+".stamp", raw, 0o644) // the binary now carries its source's stamp
 	}
 	re := exec.Command(exe, os.Args[1:]...)
 	re.Stdin, re.Stdout, re.Stderr = os.Stdin, os.Stdout, os.Stderr

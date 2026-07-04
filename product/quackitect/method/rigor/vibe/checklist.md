@@ -1,4 +1,4 @@
----
+﻿---
 id: rigor-vibe-checklist
 rigor: vibe
 statement: The vibe checklist. No gates. Build it and leave a one-line rationale. For throwaways only. If it will be kept or maintained, step up to lean.
@@ -6,7 +6,7 @@ statement: The vibe checklist. No gates. Build it and leave a one-line rationale
 
 # Vibe — checklist template
 
-The bare floor. **No human gates.** For throwaway or exploratory work, where speed beats
+The bare floor. **No user-adjudicated gates.** For throwaway or exploratory work, where speed beats
 rigor. The plausibility check at `engage start` should push back if the vision sounds like
 it will be kept or maintained. That is not a vibe project.
 

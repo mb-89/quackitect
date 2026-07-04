@@ -17,9 +17,13 @@ Write plainly. These are rules, not suggestions. They bind every output: chat, d
 
 ### Lists
 - Use a list for three or more items. Do not bury them in a sentence.
+- Every enumeration is a Markdown list. Always. Not prose, not comma chains.
 - One item per line. In Markdown, one `-` per line.
+- No compound sentences inside an item. Short simple sentences only.
+- If an item grows, split it. Make two items, or a sub-list.
 - Never collapse a list onto one line. This holds everywhere it renders: chat, HTML, tooltips, table cells.
 - Lead each item with its key word.
+- Link the referent. An item that points at a file, note, or URL carries it as a link.
 
 ### Do not repeat (DRY)
 - Single source of truth. Each fact lives in one place. Everything else points to it.

@@ -1,4 +1,4 @@
----
+﻿---
 id: writing-killer-checks
 scope: always
 statement: How to write killer checks. The steps most dangerous to skip. Few, exact, placed at real pause points.
@@ -12,4 +12,4 @@ Rules:
 - Place each at a real pause point.
 - Revise a check whenever it misses something.
 
-Killer checks are always human-adjudicated gates. You cannot tailor them away. You can only reword them.
+Killer checks are always user-adjudicated gates. You cannot tailor them away. You can only reword them.

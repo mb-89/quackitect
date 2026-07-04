@@ -141,6 +141,30 @@ func runSelftest(name string) bool {
 		return selftestAttestKeys()
 	case "attest-expiry":
 		return selftestAttestExpiry()
+	case "verify-cache":
+		return selftestVerifyCache()
+	case "verify-feedback":
+		return selftestVerifyFeedback()
+	case "status-fast":
+		return selftestStatusFast()
+	case "why-derived":
+		return selftestWhyDerived()
+	case "notes-list":
+		return selftestNotesList()
+	case "call-log":
+		return selftestCallLog()
+	case "mint-dedupe":
+		return selftestMintDedupe()
+	case "mint-rationale":
+		return selftestMintRationale()
+	case "ratchet-semantic":
+		return selftestRatchetSemantic()
+	case "scaffold-modern":
+		return selftestScaffoldModern()
+	case "pager-merge":
+		return selftestPagerMerge()
+	case "user-wording":
+		return selftestUserWording()
 	case "contract-render":
 		return selftestContractRender()
 	case "render-drift":
@@ -495,7 +519,7 @@ func selftestBrand() bool {
 // selftestClaudeVendor: start init rewrites the dogfood method path to the vendored one (req-claude-vendor).
 func selftestClaudeVendor() bool {
 	return rewriteVendorPath("Follow product/quackitect/method/prompts/engage.md") ==
-		"Follow .quack/vendor/quackitect/method/prompts/engage.md"
+		"Follow tools/vendor/quackitect/method/prompts/engage.md"
 }
 
 // selftestReportVerdict: the report wires a DONE check to its verdict/evidence link (req-verdict-link).
@@ -630,7 +654,7 @@ func selftestStubs() bool {
 // RunSelftestCLI runs one named check (or all) and returns an exit code.
 func RunSelftestCLI(args []string) int {
 	all := []string{"deps", "parser", "determinism", "ids", "help", "parity", "perf", "deps-prompt", "report", "split", "integrate", "engine", "method", "surface", "build", "no-trace-gate", "tests-pass-eval", "workspace", "brand", "claude-vendor", "report-verdict", "report-nesting", "brand-resolves", "validation-global", "stubs", "readout", "contract", "bootstrap", "correctness", "report-live", "evidence-honesty", "tests-red", "parser-strict", "ref-integrity", "actor-channels", "design-hash-norm", "kernel-vectors", "kernel-cone", "kernel-gatewalk", "kernel-attest", "logs-dir", "ears-lint", "ears-method", "monotonic-lint",
-		"attest-block", "attest-console", "attest-challenge", "attest-grant", "attest-renewal", "attest-keys", "attest-expiry", "contract-render", "render-drift", "logs-canonical", "data-dir-caches", "truth-in-spec", "root-marker", "clean-status", "global-config", "global-binary", "engine-ratchet", "notes-out", "decisions-folder", "decision-classes", "parked-list", "decision-realized", "mint", "report-why", "report-filter-ux", "vv-time-scope"}
+		"attest-block", "attest-console", "attest-challenge", "attest-grant", "attest-renewal", "attest-keys", "attest-expiry", "contract-render", "render-drift", "logs-canonical", "data-dir-caches", "truth-in-spec", "root-marker", "clean-status", "global-config", "global-binary", "engine-ratchet", "notes-out", "decisions-folder", "decision-classes", "parked-list", "decision-realized", "mint", "report-why", "report-filter-ux", "vv-time-scope", "verify-cache", "verify-feedback", "status-fast", "why-derived", "notes-list", "call-log", "mint-dedupe", "mint-rationale", "ratchet-semantic", "scaffold-modern", "pager-merge", "user-wording"}
 	names := args
 	if len(names) == 0 {
 		names = all

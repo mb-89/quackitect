@@ -30,6 +30,7 @@ h2{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:#999;margi
 .iter{margin-bottom:6px;border:1px solid #eee;border-radius:6px;background:#fff}
 .iter>summary{cursor:pointer;padding:7px 10px;font-weight:600;list-style:none}
 .iter.current>summary{background:#eef6ff} .frac{float:right;color:#999;font-weight:400}
+.frac.ok{color:#2e8b2e;font-weight:600}
 .rid{font-family:ui-monospace,Consolas,monospace;font-size:12px}
 .tg{position:relative;margin:4px 0 8px;padding-left:12px}
 .tg:before{content:"";position:absolute;left:5px;top:12px;bottom:12px;width:2px;background:#e8e8e8}

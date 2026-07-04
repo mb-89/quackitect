@@ -47,8 +47,10 @@ depends_on: [<ids>]
 ---
 ```
 - Milestone gate: id `<itag>-m<n>-gate`, `class: review`, `killer: true`, `depends_on` = all its subtasks.
-- **Milestone-monotonic:** each milestone's FIRST subtask `depends_on` the prior milestone gate.
-- **Intra-milestone order = in-set depends_on chain** (a later subtask depends on the earlier one; build → its last step; quality/verification subtasks → build).
+- **Milestone-monotonic:** each milestone's subtasks `depends_on` the prior milestone gate.
+- **ORDER IS NOT DEPENDENCY (owner ruling, i10).** A `depends_on` edge states a real prerequisite — nothing else. Never inject an edge just to order parallel subtasks: it delays their readiness, forces false walk order, and blocks the merged hand-off. Subtasks that can be done at the same time all hang off the prior gate, flat. The report orders ties deterministically by ID; the walk serves ready checks by ID.
+- **Real prerequisites still chain:** a build step that builds ON another depends on it; `build` depends on its children's completion; a verification that consumes an artifact depends on the step that makes it.
+- **Killers ripen WITH the closing gate.** Do not chain filler subtasks BEHIND a killer — with flat wiring the agent-blessable fillers finish first, and the remaining ready killer(s) + gate arrive as ONE combined pager (adr-pager-handoff): one hand-off, one y, every bless recorded individually.
 - **ids are iteration-unique** (namespace by `<itag>`, e.g. `i6-m2-gate`). A reused id silently shadows; `quack lint` fails on duplicates.
 
 ## Rigor → milestones

@@ -1,4 +1,4 @@
-package main
+﻿package main
 
 import (
 	"crypto/rand"
@@ -274,7 +274,7 @@ func attestGuard(cmd string, rest []string) []string {
 		}
 		fmt.Fprintln(os.Stderr, "BLOCKED: "+reason+".")
 		fmt.Fprintln(os.Stderr, "Read product/quackitect/method/prompts/contract.md in full — it tells you how to proceed.")
-		os.Exit(3)
+		quackExit(3)
 	}
 	attestConsume(key)
 	return rest
@@ -299,33 +299,33 @@ func cmdAttest(args []string) {
 	case hasFlag(args, "--grant"):
 		if !channelInteractive() {
 			fmt.Fprintln(os.Stderr, "attest: --grant is minted at the interactive console only — ask the adjudicator.")
-			os.Exit(3)
+			quackExit(3)
 		}
 		code, err := attestMintGrant()
 		if err != nil {
 			fmt.Fprintln(os.Stderr, "attest:", err)
-			os.Exit(1)
+			quackExit(1)
 		}
 		fmt.Println("grant code (single-use, hand it to the agent):", code)
 	case flagVal(args, "--challenge") != "":
 		ch, err := attestChallenge(flagVal(args, "--challenge"))
 		if err != nil {
 			fmt.Fprintln(os.Stderr, "attest:", err)
-			os.Exit(1)
+			quackExit(1)
 		}
 		fmt.Println("challenge:", ch)
 	case flagVal(args, "--renew") != "":
 		key, err := attestRenew(flagVal(args, "--renew"), flagVal(args, "--answer"))
 		if err != nil {
 			fmt.Fprintln(os.Stderr, "attest:", err)
-			os.Exit(1)
+			quackExit(1)
 		}
 		fmt.Println("session key (renewed, budget "+fmt.Sprint(attestBudgetDefault)+"):", key)
 	case len(args) > 0 && !strings.HasPrefix(args[0], "-"):
 		key, err := attestRedeem(args[0], flagVal(args, "--answer"))
 		if err != nil {
 			fmt.Fprintln(os.Stderr, "attest:", err)
-			os.Exit(1)
+			quackExit(1)
 		}
 		fmt.Println("session key (budget "+fmt.Sprint(attestBudgetDefault)+"):", key)
 	default:

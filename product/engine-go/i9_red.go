@@ -165,41 +165,49 @@ func selftestAttestExpiry() bool {
 	return !attestKeyValid(key) // the budget exhausts the key
 }
 
+// design: go-entry-chain  implements: req-contract-render, req-render-drift
+// The contract has ONE copy: method/prompts/contract.md. Harness pointer files (CLAUDE.md,
+// .github/copilot-instructions.md) command following AGENTS.md without exception; AGENTS.md commands
+// the enumerated read -> understand -> recite -> honor ritual on the contract. These selftests keep
+// that chain deterministic: a broken link, a lost ritual, or a re-embedded contract body is a red
+// selftest, never a silent fork.
+
 // test-contract-render -> selftest:contract-render
 func selftestContractRender() bool {
-	contract, err := os.ReadFile(filepath.Join(EngineDir(), "method", "prompts", "contract.md"))
+	contract, err := os.ReadFile(attestContractPath())
+	if err != nil || len(contract) == 0 {
+		return false
+	}
+	agents, err := os.ReadFile(filepath.Join(ROOT, "AGENTS.md"))
 	if err != nil {
 		return false
 	}
-	body := strings.ReplaceAll(string(contract), "\r\n", "\n")
-	for _, harness := range []string{"agents", "copilot"} {
-		b1, err := renderEntry(harness)
-		if err != nil || len(b1) == 0 {
+	a := strings.ReplaceAll(string(agents), "\r\n", "\n")
+	// AGENTS.md names the contract's single copy and commands the full ritual on it...
+	if !strings.Contains(a, "product/quackitect/method/prompts/contract.md") {
+		return false
+	}
+	for _, word := range []string{"READ", "UNDERSTAND", "RECITE", "HONOR"} {
+		if !strings.Contains(a, word) {
 			return false
 		}
-		b2, _ := renderEntry(harness)
-		if string(b1) != string(b2) {
-			return false // two renders must be byte-identical
-		}
-		if !strings.Contains(strings.ReplaceAll(string(b1), "\r\n", "\n"), body) {
-			return false // the full contract body rides verbatim
+	}
+	// ...and never carries the body itself (rule 1's heading = proxy for an embedded copy).
+	return !strings.Contains(a, "## 1. engage is the only door")
+}
+
+// test-render-drift -> selftest:render-drift
+func selftestRenderDrift() bool {
+	for _, f := range []string{"CLAUDE.md", filepath.Join(".github", "copilot-instructions.md")} {
+		b, err := os.ReadFile(filepath.Join(ROOT, f))
+		if err != nil || !strings.Contains(string(b), "AGENTS.md") {
+			return false
 		}
 	}
 	return true
 }
 
-// test-render-drift -> selftest:render-drift
-func selftestRenderDrift() bool {
-	fresh, err := renderEntry("agents")
-	if err != nil || len(fresh) == 0 {
-		return false
-	}
-	if !entryUpToDate(fresh, fresh) || entryUpToDate(append(append([]byte{}, fresh...), 'x'), fresh) {
-		return false
-	}
-	drift, err := entryDrift() // the real targets are kept regenerated
-	return err == nil && len(drift) == 0
-}
+// enddesign
 
 // test-logs-canonical -> selftest:logs-canonical
 func selftestLogsCanonical() bool {

@@ -493,11 +493,14 @@ func iterationsPanel(nodes map[string]Node, sm map[string]string, iters map[stri
 		if it == cfg.Version {
 			op, cur = " open", " current"
 		}
-		frac := "planned"
+		frac, fracCls := "planned", "frac"
 		if len(gates) > 0 {
 			frac = fmt.Sprintf("%d/%d", done, len(gates))
+			if done == len(gates) {
+				fracCls = "frac ok" // a fully-done iteration wears its count green
+			}
 		}
-		b.WriteString(fmt.Sprintf("<details class=\"iter%s\"%s><summary data-iter=\"%s\">%s <span class=\"frac\">%s</span></summary>", cur, op, esc(it), esc(it), frac))
+		b.WriteString(fmt.Sprintf("<details class=\"iter%s\"%s><summary data-iter=\"%s\">%s <span class=\"%s\">%s</span></summary>", cur, op, esc(it), esc(it), fracCls, frac))
 		lanes := map[int][]string{}
 		var loose []string
 		for _, id := range gates {

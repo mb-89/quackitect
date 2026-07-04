@@ -258,11 +258,69 @@ func (d pagerData) ready() bool {
 	return d.subTotal > 0 && d.subDone == d.subTotal && d.suspectUp == 0 && d.evidence
 }
 
+// design: go-pager-merge  implements: req-pager-merge
+// Merge the HAND-OFF, never the nodes (adr-pager-handoff; widened by the i10 owner ruling "order
+// is not dependency"): when EVERY undone dependency of a milestone gate is a READY KILLER subtask
+// — i.e. no agent-blessable work remains between the user and the gate — the pager for the gate or
+// any of those killers presents them ALL as one hand-off. One y blesses the group (each bless
+// recorded individually); a split answer stays possible. The substance checks and the review gate
+// remain separate records; only the ceremony is merged.
+func pagerGroup(id string, nodes map[string]Node, sm map[string]string) ([]string, string) {
+	n, ok := nodes[id]
+	if !ok {
+		return nil, ""
+	}
+	gate := id
+	if !strings.HasSuffix(id, "-gate") {
+		gate = ""
+		for cid, c := range nodes {
+			if c.Milestone == n.Milestone && iterOf(c.Path) == iterOf(n.Path) && strings.HasSuffix(cid, "-gate") {
+				gate = cid
+				break
+			}
+		}
+	}
+	if gate == "" || sm[gate] == "DONE" {
+		return nil, ""
+	}
+	var killers []string
+	for _, d := range parents(nodes[gate]) {
+		c, ok := nodes[d]
+		if !ok || !isGate(c) || sm[d] == "DONE" {
+			continue
+		}
+		if !c.Killer || c.Class == "executed" || strings.HasSuffix(d, "-gate") {
+			return nil, "" // non-killer (or computed) work still open — nothing to merge yet
+		}
+		for _, u := range parents(c) {
+			if uc, ok := nodes[u]; ok && isGate(uc) && sm[u] != "DONE" {
+				return nil, "" // a killer not ready yet — the group is not complete
+			}
+		}
+		killers = append(killers, d)
+	}
+	if len(killers) == 0 {
+		return nil, ""
+	}
+	sort.Strings(killers)
+	return killers, gate
+}
+
+// enddesign
+
 // design: go-handover-pager  implements: req-handover-pager
 // The killer-gate hand-off readout, in one bordered <=80-col box: the emoji progress bar, biggest
 // decisions (the iteration's ADRs), biggest risks (M1 frame), deterministic readiness facts, and — LAST
 // — the bless question with 👍/👎 emojis. Decisions/risks point at their trace nodes, not restated.
 func HandoverPager(gateID, iter string, nodes map[string]Node, sm map[string]string, cfg Config, tty bool) string {
+	merged := ""
+	question := "❓ Bless " + gateID + "?    👍 y    /    👎 n"
+	if ks, g := pagerGroup(gateID, nodes, sm); len(ks) > 0 && g != "" {
+		all := strings.Join(append(append([]string{}, ks...), g), " + ")
+		merged = "   combined hand-off: " + all + "  (one y blesses all, recorded individually; a split answer names which)"
+		question = "❓ Bless " + all + "?    👍 y = all    /    ✂ split    /    👎 n"
+		gateID = g // readiness and focus follow the GATE of the group
+	}
 	d := gatherPager(gateID, iter, nodes, sm)
 	cells, _, doneMs := msData(iter, nodes, sm, cfg)
 	// the marker points at THIS gate's milestone (the one being adjudicated), not the global cursor —
@@ -277,7 +335,11 @@ func HandoverPager(gateID, iter string, nodes map[string]Node, sm map[string]str
 
 	var L []string
 	L = append(L, barLines(iter, cells, focus, doneMs)...)
-	L = append(L, "", "🏁 HANDOVER  "+gateID, "")
+	L = append(L, "", "🏁 HANDOVER  "+gateID)
+	if merged != "" {
+		L = append(L, merged)
+	}
+	L = append(L, "")
 
 	L = append(L, "📋 DECISIONS")
 	if len(d.decisions) == 0 {
@@ -308,7 +370,7 @@ func HandoverPager(gateID, iter string, nodes map[string]Node, sm map[string]str
 		"")
 
 	// the question — LAST — with emojis
-	L = append(L, "❓ Bless "+gateID+"?    👍 y    /    👎 n")
+	L = append(L, question)
 
 	return render(box(L), tty)
 }

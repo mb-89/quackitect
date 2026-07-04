@@ -1,4 +1,4 @@
-package main
+﻿package main
 
 // i0008 trust-hardening surface. Authored as stubs first (test-first walk):
 // the selftest_trust.go runners were observed RED against the stubs
@@ -164,7 +164,7 @@ func strictGuard() {
 		rel, _ := filepath.Rel(ROOT, is.Path)
 		fmt.Fprintf(os.Stderr, "  - %s [%s] %s\n", filepath.ToSlash(rel), is.Key, is.Msg)
 	}
-	os.Exit(1)
+	quackExit(1)
 }
 
 // enddesign

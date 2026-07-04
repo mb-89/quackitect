@@ -127,26 +127,43 @@ func coverageRuleUncached(nodes map[string]Node, rule, scope string) bool {
 		}
 		return true
 	case "tests-red":
-		// Test-first: every executed test must carry a red-observed attestation at its CURRENT hash
+		// Test-first: every NEW test must carry a red-observed attestation at its CURRENT hash
 		// (a run-once record; an edited test's hash changes and must be re-observed). Per the M5 spike.
+		// SCOPED to the check's own iteration (i10 defect fix, per the subtask statement "every NEW
+		// test"): a later iteration's unbuilt tests must not hold an earlier iteration's gate red.
 		// FORWARD-ONLY from i0008 (the first iteration WALKED under this gate; i0007 built the
 		// mechanism): tests authored before observe-red existed can never have been honestly observed
-		// red — recording one today would FABRICATE an attestation, the exact lie the ledger refuses.
+		// red — recording one today would FABRICATE an attestation, which observe-red now REFUSES
+		// (it runs the test; a pass records nothing).
 		ro := redObserved()
 		memo := map[string]string{}
+		active := readProjectConfig().Version
 		seen := false
 		for _, n := range nodes {
 			if n.Type == "test" && n.Class == "executed" && strings.HasPrefix(n.Verify, "selftest:") {
-				if iterOf(n.Path) < testsRedSince {
+				it := iterOf(n.Path)
+				if it < testsRedSince {
 					continue // pre-mechanism test; grandfathered, never retro-attested
 				}
+				if scope != "" && it != scope {
+					continue // another iteration's test owes ITS OWN gate a red, not this one
+				}
 				seen = true
+				if it != "" && it != active {
+					// Shipped-test-edit rule (i10, owner-ruled): a SHIPPED iteration keeps its BIRTH
+					// evidence — the red it was honestly observed at when the test was new. Only the
+					// ACTIVE iteration's tests owe a red at their CURRENT hash (the building discipline).
+					if _, ok := ro[n.ID]; !ok {
+						return false
+					}
+					continue
+				}
 				if ro[n.ID] != fullHash(n.ID, nodes, memo) {
 					return false
 				}
 			}
 		}
-		return seen
+		return seen || scope != "" // scoped + no new tests = vacuously satisfied
 	// design: go-tests-pass-eval  implements: req-tests-pass-unify
 	// tests-pass evaluates selftest: tests in-process (runSelftest) — the SAME evaluator the gate state
 	// machine uses — not a divergent shell path; selftest:tests-pass-eval guards the unification.
@@ -170,8 +187,8 @@ func coverageRuleUncached(nodes map[string]Node, rule, scope string) bool {
 		}
 		memo := map[string]string{}
 		for _, t := range ts {
-			if strings.HasPrefix(t.Verify, "selftest:") { // in-process, like gateState — not a shell run
-				if !runSelftest(strings.TrimSpace(t.Verify[len("selftest:"):])) {
+			if strings.HasPrefix(t.Verify, "selftest:") { // in-process, like gateState — cached by verdict (go-verdict-cache)
+				if !runSelftestCached(t.ID, strings.TrimSpace(t.Verify[len("selftest:"):]), fullHash(t.ID, nodes, memo)) {
 					return false
 				}
 			} else if runExecuted(t, fullHash(t.ID, nodes, memo)) != "pass" {

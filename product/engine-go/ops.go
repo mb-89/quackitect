@@ -1,4 +1,4 @@
-package main
+﻿package main
 
 import (
 	"archive/zip"
@@ -93,11 +93,14 @@ func cmdBless(args []string) {
 // enddesign
 
 // design: go-tests-red  implements: req-tdd-sequence
-// tests-red enforces test-first: `observe-red <test>` records that a test was seen FAILING at its
-// CURRENT full-hash — a run-once attestation on the Event log, mirroring a bless. The coverage:tests-red
-// rule is satisfied only when every executed test carries a red-observed attestation at its current
-// hash, so a test never run-red, or edited since (hash changed), fails the rule until re-observed.
-// Reuses the hash-fold/suspect machinery — a now-green test needs no re-run to prove it was once red.
+// tests-red enforces test-first: `observe-red <test>` RUNS the test and records that it was seen
+// FAILING at its CURRENT full-hash — a run-once attestation on the Event log, mirroring a bless.
+// The tool enforces the observation (i10 defect fix): a passing test is REFUSED, so a fabricated
+// red can never enter the ledger — the record is machine evidence, not an honor system. The
+// coverage:tests-red rule is satisfied only when every NEW test of the CHECK'S OWN iteration
+// carries a red-observed attestation at its current hash, so a test never run-red, or edited
+// since (hash changed), fails the rule until re-observed. A recorded observation stays valid
+// while the hash stands — a now-green test needs no re-run to prove it was once red.
 func cmdObserveRed(args []string) {
 	if len(args) == 0 {
 		fmt.Println("usage: observe-red <test-id>")
@@ -120,6 +123,12 @@ func cmdObserveRed(args []string) {
 		return
 	}
 	h := fullHash(id, nodes, memo)
+	if strings.HasPrefix(n.Verify, "selftest:") {
+		if runSelftest(strings.TrimSpace(n.Verify[len("selftest:"):])) {
+			fmt.Println("refused:", id, "PASSES at", h[:8], "— a red observation records a watched failure; run the test red first")
+			quackExit(1)
+		}
+	}
 	actor := "tester" // channel-independent default; --by overrides (QUACK_ACTOR retired)
 	if by := flagVal(args, "--by"); by != "" {
 		actor = by
@@ -242,12 +251,12 @@ func cmdNext(args []string) {
 	if n.Class == "executed" {
 		kind = "executed"
 	}
-	fmt.Printf("NEXT: %s  (%s%s)\n  %s\n", n.ID, kind, map[bool]string{true: ", GATE (human-adjudicated)"}[isGate(n) && n.Class != "executed"], n.Statement)
+	fmt.Printf("NEXT: %s  (%s%s)\n  %s\n", n.ID, kind, map[bool]string{true: ", GATE (user-adjudicated)"}[isGate(n) && n.Class != "executed"], n.Statement)
 	if n.Class == "executed" {
 		fmt.Println("  verify:", n.Verify)
 		fmt.Println("  -> fill it; executed -> passes on re-run")
 	} else {
-		fmt.Println("  -> fill it; gate -> ask the human to `" + brand() + " bless " + n.ID + "`")
+		fmt.Println("  -> fill it; gate -> ask the user to `" + brand() + " bless " + n.ID + "`")
 	}
 }
 
@@ -355,7 +364,7 @@ func cmdNote(args []string) {
 			}
 			if err != nil {
 				fmt.Fprintln(os.Stderr, "note:", err)
-				os.Exit(1)
+				quackExit(1)
 			}
 			text = strings.TrimSpace(string(raw))
 			i++
@@ -459,7 +468,7 @@ func cmdShip(args []string) {
 	f, err := os.Create(zp)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "ship error:", err)
-		os.Exit(1)
+		quackExit(1)
 	}
 	defer f.Close()
 	zw := zip.NewWriter(f)
@@ -490,78 +499,115 @@ func cmdBuild(args []string) {
 	src := EngineSrc()
 	out := globalBinPath() // the canonical home (go-global-ratchet); one binary serves every workspace
 	os.MkdirAll(filepath.Dir(out), 0o755)
+	stamp := time.Now().Format(time.RFC3339)
+	os.WriteFile(stampFile(src), []byte(stamp+"\n"), 0o644) // committed build-time stamp (go-ratchet-stamp)
 	staged := out + ".staged"
 	cmd := exec.Command("go", "build", "-o", staged, ".")
 	cmd.Dir = src
 	cmd.Stdout, cmd.Stderr = os.Stdout, os.Stderr
 	if err := cmd.Run(); err != nil {
 		fmt.Fprintln(os.Stderr, "build error:", err, "(need the Go toolchain — see dependencies.md)")
-		os.Exit(1)
+		quackExit(1)
 	}
 	if err := replaceExe(out, staged); err != nil {
 		if os.Rename(staged, out) != nil { // fresh install: nothing to swap
 			fmt.Fprintln(os.Stderr, "build: swap blocked ("+err.Error()+") — staged; it lands on the next launch")
 		}
 	}
+	os.WriteFile(out+".stamp", []byte(stamp+"\n"), 0o644) // the binary mirrors its source's stamp
 	root := MerkleRoot(LoadAll())
 	gp := goldenRootPath()
 	os.WriteFile(gp, []byte(root+"\n"), 0o644)
 	fmt.Println("built ->", filepath.ToSlash(out), "| golden re-baselined to", root[:12])
-	if err := writeEntryFiles(); err != nil { // entry files are outputs of the build (go-entry-render)
-		fmt.Fprintln(os.Stderr, "render-entry:", err)
-	}
 }
 
 // enddesign
 
-// design: go-start-init  implements: req-integrate, req-vehicle-scaffold, req-claude-vendor
-// `quack start init <target>` is run FROM a quackitect checkout and sets up a NEW vehicle at <target>:
-// it vendors the engine (this repo's product/ -> the vehicle's .quack/vendor/, mirroring the layout, so
-// EngineDir/EngineSrc resolve it), writes the config + launcher + an AGENTS pointer, and lays down the
-// vehicle's own empty product/ + spec/. It deliberately does NOT mint an iteration or write any spec —
-// the human drives that. Only meaningful from a quackitect checkout (where product/quackitect exists).
-func cmdStartInit(args []string) {
+// design: go-start-init  implements: req-integrate, req-vehicle-scaffold, req-claude-vendor, req-scaffold-modern
+// `quack start init <target>` is run FROM a quackitect checkout and sets up a NEW vehicle at <target>
+// in the CURRENT world (i10 modernization; adr-no-quack-data-home, adr-entry-chain, adr-ratchet-stamp):
+// it vendors the engine (product/ -> tools/vendor/, stamp included), writes spec/project.toml as the
+// root marker, a global-bin bootstrap launcher, and the pointer-chain entry files (CLAUDE.md ->
+// AGENTS.md -> the vendored contract). No .quack anywhere. It deliberately does NOT mint an iteration
+// or write any spec — the user drives that. Only meaningful from a quackitect checkout.
+const vehicleLauncherTmpl = `@echo off
+rem {{PROJ}} launcher: forwards to the ONE global engine binary; bootstraps it from the vendored source when absent.
+setlocal
+set "QBIN=%LOCALAPPDATA%\quackitect\bin\{{PROJ}}.exe"
+if exist "%QBIN%" goto run
+if defined QUACK_ENGINE set "QBIN=%QUACK_ENGINE%" & goto run
+echo {{PROJ}}: no global engine at %QBIN% - bootstrapping from vendored source...
+if not exist "%LOCALAPPDATA%\quackitect\bin" mkdir "%LOCALAPPDATA%\quackitect\bin"
+pushd "%~dp0tools\vendor\engine-go"
+go build -o "%QBIN%" .
+popd
+if not exist "%QBIN%" (
+  echo {{PROJ}}: bootstrap failed - install the Go toolchain, see tools/vendor/quackitect/method/prompts/dependencies.md
+  exit /b 1
+)
+:run
+"%QBIN%" %*
+`
+
+const vehicleAgentsTmpl = `# AGENTS.md — {{PROJ}}
+
+> Hand-authored entry hub. Every harness pointer file routes here (CLAUDE.md,
+> .github/copilot-instructions.md). The binding contract lives in ONE place:
+> tools/vendor/quackitect/method/prompts/contract.md.
+
+## FIRST — the ritual, in this exact order
+
+1. **READ** tools/vendor/quackitect/method/prompts/contract.md. The whole file, with your file-reading tool. No skimming. No summaries.
+2. **UNDERSTAND** it. It is binding. It overrides your defaults.
+3. **RECITE** it. Paraphrase its specifics back to the adjudicator. Use a standalone visible message. Name rule 3's actor=agent killer-bless exception. Confirm you will obey.
+4. **HONOR** every instruction in it. No exceptions. To the letter of each statement.
+5. **READ** product/brand/voice.md next. Every output follows it.
+
+Re-read the contract at the start of every engage.
+No recital means the rules never loaded. The adjudicator should stop you.
+
+---
+
+Drive {{PROJ}} from inside this folder: .\{{PROJ}} <cmd>
+(status | next | start | bless | note | notes | gather | report | lint | ship | selftest).
+Load method prompts path-free: .\{{PROJ}} resolve method/prompts/engage.md (start with integrate.md).
+product/ and spec/ are {{PROJ}}'s own. The user adjudicates gates; never bless on their behalf.
+`
+
+const vehicleClaudeTmpl = `# CLAUDE.md — entry for the Claude Code harness
+
+Claude Code auto-loads this file, not AGENTS.md.
+**Follow every instruction in AGENTS.md. No exceptions. To the letter of each statement.**
+It opens with the ritual. That ritual is your first action.
+The line below imports it.
+
+@AGENTS.md
+`
+
+const vehicleCopilotTmpl = `# GitHub Copilot instructions — {{PROJ}}
+
+Copilot auto-loads this file.
+The single source of the harness instructions is AGENTS.md at the repository root.
+
+1. **READ** AGENTS.md at the repository root. The whole file. Before anything else.
+2. **FOLLOW** every instruction in it. No exceptions. To the letter of each statement. It opens with the ritual: read the contract, understand it, recite it (paraphrase its specifics back to the adjudicator), honor it.
+`
+
+// initVehicleFiles is the silent emission core (selftest-drivable); cmdStartInit wraps it with guidance.
+func initVehicleFiles(target string) error {
 	src := filepath.Join(ROOT, "product")
-	if st, err := os.Stat(filepath.Join(src, "quackitect", "method")); err != nil || !st.IsDir() {
-		fmt.Println("start init must be run from a quackitect checkout (no product/quackitect here).")
-		return
-	}
-	if len(args) == 0 || strings.TrimSpace(args[0]) == "" {
-		fmt.Println("usage: " + brand() + " start init <target-dir>")
-		fmt.Println("  where <target-dir> is the path of the new vehicle to create. Provide a path.")
-		return
-	}
-	target := args[0]
-	if abs, err := filepath.Abs(target); err == nil {
-		target = abs
-	}
-	if _, err := os.Stat(filepath.Join(target, ".quack", "vendor")); err == nil {
-		fmt.Println("refusing: " + target + " already has .quack/vendor (already a vehicle).")
-		return
-	}
-
-	// 1. vendor the engine: product/ -> <target>/.quack/vendor/ (engine-go + quackitect resources).
-	vendor := filepath.Join(target, ".quack", "vendor")
-	if err := copyTree(src, vendor); err != nil {
-		fmt.Println("vendor error:", err)
-		return
-	}
-	// the vehicle is branded after its directory name — its launcher and binary take that name, so
-	// nothing user-facing says "quack". The engine self-identifies from the invoked name (see brand()).
 	proj := filepath.Base(target)
-	exe := proj + ".exe" // the vendored binary's name in this vehicle
+	sub := func(s string) string { return strings.ReplaceAll(s, "{{PROJ}}", proj) }
 
-	// 2. best-effort: copy the already-built binary, named after the project, so it runs immediately.
-	binDir := filepath.Join(target, ".quack", "engine")
-	os.MkdirAll(binDir, 0o755)
-	if raw, err := os.ReadFile(filepath.Join(QUACK, "engine", "quack.exe")); err == nil {
-		os.WriteFile(filepath.Join(binDir, exe), raw, 0o755)
+	// 1. vendor the engine: product/ -> <target>/tools/vendor/ (engine-go with its stamp + quackitect).
+	if err := copyTree(src, filepath.Join(target, "tools", "vendor")); err != nil {
+		return err
 	}
-	// 3. config, launcher (project-named), AGENTS, the vehicle's own EMPTY product/ + spec/, gitignore.
+	// 2. root marker + iteration breadcrumb — the no-.quack world's single committed config.
+	writeIfAbsent(filepath.Join(target, "spec", "project.toml"),
+		"# the workspace root marker + iteration breadcrumb (adr-no-quack-data-home).\n[iteration]\ntype    = \"default\"\nrigor   = \"systematic\"\nversion = \"\"\n")
+	// 3. the vehicle's own empty product/ + brand seeds from the engine's generic design templates.
 	os.MkdirAll(filepath.Join(target, "product"), 0o755)
-	os.MkdirAll(filepath.Join(target, "spec"), 0o755)
-	// seed the vehicle's brand from the engine's generic design-language templates (placeholders +
-	// generic voice/palette). The vehicle replaces these by name; the design-language spec stays in the engine.
 	bsrc := filepath.Join(src, "quackitect", "design")
 	bdst := filepath.Join(target, "product", "brand")
 	os.MkdirAll(bdst, 0o755)
@@ -574,25 +620,17 @@ func cmdStartInit(args []string) {
 		}
 		return nil
 	})
-	os.MkdirAll(filepath.Join(target, ".quack", "overlay"), 0o755)
-	writeIfAbsent(filepath.Join(target, ".quack", "config.toml"),
-		"# iteration breadcrumb — type/rigor/version for this project\n[iteration]\ntype    = \"default\"\nrigor   = \"systematic\"\nversion = \"\"\n")
-	writeIfAbsent(filepath.Join(target, proj+".cmd"),
-		"@echo off\r\nrem "+proj+" launcher: forwards to the vendored engine binary.\r\nrem Rebuild if missing: cd .quack\\vendor\\engine-go ^&^& go build -o ..\\..\\engine\\"+exe+" .\r\n\"%~dp0.quack\\engine\\"+exe+"\" %*\r\n")
-	writeIfAbsent(filepath.Join(target, "AGENTS.md"),
-		"# AGENTS.md — "+proj+"\n"+
-			proj+" is built with a vendored engine (under .quack/). Drive it with `.\\"+proj+" <cmd>`\n"+
-			"(status | next | start | bless | gather | report | lint | ship | selftest).\n"+
-			"To author the spec, load the method prompts under `.quack/vendor/quackitect/method/prompts/`\n"+
-			"(start with integrate.md, then engage.md). `product/` and `spec/` are "+proj+"'s own — your tool.\n"+
-			"The human adjudicates gates; never bless on their behalf.\n")
+	// 4. launcher + the pointer-chain entry files + gitignore.
+	writeIfAbsent(filepath.Join(target, proj+".cmd"), strings.ReplaceAll(sub(vehicleLauncherTmpl), "\n", "\r\n"))
+	writeIfAbsent(filepath.Join(target, "AGENTS.md"), sub(vehicleAgentsTmpl))
+	writeIfAbsent(filepath.Join(target, "CLAUDE.md"), sub(vehicleClaudeTmpl))
+	writeIfAbsent(filepath.Join(target, ".github", "copilot-instructions.md"), sub(vehicleCopilotTmpl))
 	writeIfAbsent(filepath.Join(target, ".gitignore"),
-		"# built binary + caches — rebuildable, not the source of truth\n.quack/engine/\n.quack/evidence/\n.quack/out/\n.quack/gather/\n.quack/state.json\n.quack/index*\n.quack/vendor/engine-go/.gotmp/\n.quack/vendor/engine-go/*.exe\n# commit .quack/vendor/ — it IS this project's engine.\n")
+		"# binaries never live in the repo (the engine is a global binary); caches live in the user data home.\n*.exe\n# commit tools/vendor/ — it IS this project's engine.\n")
 
-	// 4. vendor the .claude slash commands (/engage, /note, /review) so the agent drives the vehicle
-	//    the same way. Rewrite the dogfood method path to the vendored one so the pointers resolve.
+	// 5. vendor the .claude slash commands so the agent drives the vehicle the same way; rewrite the
+	//    dogfood method path to the vendored one so the pointers resolve.
 	claudeSrc := filepath.Join(ROOT, ".claude")
-	rewrite := rewriteVendorPath
 	if cmds := filepath.Join(claudeSrc, "commands"); dirExists(cmds) {
 		filepath.Walk(cmds, func(p string, fi os.FileInfo, err error) error {
 			if err != nil || fi.IsDir() || !strings.HasSuffix(p, ".md") {
@@ -600,19 +638,46 @@ func cmdStartInit(args []string) {
 			}
 			if raw, e := os.ReadFile(p); e == nil {
 				rel, _ := filepath.Rel(claudeSrc, p)
-				writeIfAbsent(filepath.Join(target, ".claude", rel), rewrite(string(raw)))
+				writeIfAbsent(filepath.Join(target, ".claude", rel), rewriteVendorPath(string(raw)))
 			}
 			return nil
 		})
 		if raw, err := os.ReadFile(filepath.Join(claudeSrc, "settings.json")); err == nil {
-			writeIfAbsent(filepath.Join(target, ".claude", "settings.json"), rewrite(string(raw)))
+			writeIfAbsent(filepath.Join(target, ".claude", "settings.json"), rewriteVendorPath(string(raw)))
 		}
 	}
+	return nil
+}
 
+func cmdStartInit(args []string) {
+	if st, err := os.Stat(filepath.Join(ROOT, "product", "quackitect", "method")); err != nil || !st.IsDir() {
+		fmt.Println("start init must be run from a quackitect checkout (no product/quackitect here).")
+		return
+	}
+	if len(args) == 0 || strings.TrimSpace(args[0]) == "" {
+		fmt.Println("usage: " + brand() + " start init <target-dir>")
+		fmt.Println("  where <target-dir> is the path of the new vehicle to create. Provide a path.")
+		return
+	}
+	target := args[0]
+	if abs, err := filepath.Abs(target); err == nil {
+		target = abs
+	}
+	for _, marker := range []string{filepath.Join(target, "spec", "project.toml"), filepath.Join(target, ".quack", "vendor")} {
+		if _, err := os.Stat(marker); err == nil {
+			fmt.Println("refusing: " + target + " is already a vehicle (" + marker + " exists).")
+			return
+		}
+	}
+	proj := filepath.Base(target)
+	if err := initVehicleFiles(target); err != nil {
+		fmt.Println("vendor error:", err)
+		return
+	}
 	fmt.Println(proj + " scaffolded -> " + target)
-	fmt.Println("  vendored the engine -> .quack/vendor/ ; .claude/ commands ; wrote config.toml, " + proj + ".cmd, AGENTS.md, empty product/ + spec/.")
-	fmt.Println("  next: cd into it, rebuild (cd .quack/vendor/engine-go && go build -o ../../engine/" + exe + " .),")
-	fmt.Println("        set [iteration].version, then `." + string(filepath.Separator) + proj + " start <version>` and compose your spec.")
+	fmt.Println("  vendored the engine -> tools/vendor/ ; wrote spec/project.toml, " + proj + ".cmd, the entry chain (CLAUDE.md -> AGENTS.md -> contract), .claude/ commands, empty product/.")
+	fmt.Println("  next: cd into it and run `.\\" + proj + " status` — the launcher bootstraps the global binary when absent.")
+	fmt.Println("        Then set [iteration].version and `.\\" + proj + " start <version>` to compose your spec.")
 }
 
 // --- drive-from-inside stubs (i0005): make a bare workspace drivable from within, engine linked at runtime ---
@@ -628,6 +693,7 @@ set "SELF=%~dp0"
 if exist "%SELF%.quack\engine\quack.exe" set "ENGINE=%SELF%.quack\engine\quack.exe" & goto run
 if exist "%SELF%.quack\engine.local" ( set /p ENGINE=<"%SELF%.quack\engine.local" & goto run )
 if defined QUACK_ENGINE set "ENGINE=%QUACK_ENGINE%" & goto run
+if exist "%LOCALAPPDATA%\quackitect\bin\quack.exe" set "ENGINE=%LOCALAPPDATA%\quackitect\bin\quack.exe" & goto run
 echo no engine found: create .quack\engine.local (a line = path to quack.exe) or set QUACK_ENGINE 1>&2
 exit /b 1
 :run
@@ -648,14 +714,33 @@ const insideAgentsTmpl = `# AGENTS.md — {{PROJ}}
     .\{{PROJ}} <cmd>        (status | next | start | bless | note | gather | report | lint | ship)
 
 The launcher resolves an engine at runtime (internal .quack\engine, then .quack\engine.local, then
-%QUACK_ENGINE%). The engine's location is never committed.
+%QUACK_ENGINE%, then the global binary). The engine's location is never committed.
+
+FIRST — the ritual: resolve and READ the contract in full, RECITE it back to the adjudicator in a
+standalone visible message, and HONOR it to the letter of each statement:
+
+    .\{{PROJ}} resolve method/prompts/contract.md  # the binding contract — read THAT file first
 
 Load the method prompts path-free through the linked engine — do NOT hard-code a quackitect path:
 
     .\{{PROJ}} guides                              # list the available guides
     .\{{PROJ}} resolve method/prompts/engage.md    # resolve a prompt to drive the loop
 
-The human adjudicates gates; never bless on their behalf.
+The user adjudicates gates; never bless on their behalf.
+`
+
+// enddesign
+
+// design: go-inside-claude  implements: req-scaffold-modern
+// The stub CLAUDE.md pointer: Claude Code auto-loads CLAUDE.md only (field-proven at i10), so a bare
+// workspace carries the same pointer chain as a full vehicle — CLAUDE.md commands AGENTS.md to the letter.
+const insideClaudeTmpl = `# CLAUDE.md — entry for the Claude Code harness
+
+Claude Code auto-loads this file, not AGENTS.md.
+**Follow every instruction in AGENTS.md. No exceptions. To the letter of each statement.**
+The line below imports it.
+
+@AGENTS.md
 `
 
 // enddesign
@@ -681,7 +766,9 @@ func insideStubFiles(proj string) map[string]string {
 	return map[string]string{
 		proj + ".cmd": strings.ReplaceAll(sub(insideLauncherTmpl), "\n", "\r\n"),
 		"AGENTS.md":   sub(insideAgentsTmpl),
+		"CLAUDE.md":   sub(insideClaudeTmpl),
 		".gitignore":  insideGitignoreTmpl,
+		filepath.Join("spec", "project.toml"): "# the workspace root marker + iteration breadcrumb (adr-no-quack-data-home).\n[iteration]\ntype    = \"default\"\nrigor   = \"systematic\"\nversion = \"\"\n",
 	}
 }
 
@@ -761,7 +848,7 @@ func copyTree(src, dst string) error {
 
 // rewriteVendorPath rewrites a dogfood method path to the vendored one (used vendoring .claude commands).
 func rewriteVendorPath(s string) string {
-	return strings.ReplaceAll(s, "product/quackitect/", ".quack/vendor/quackitect/")
+	return strings.ReplaceAll(s, "product/quackitect/", "tools/vendor/quackitect/")
 }
 
 // dirExists reports whether path is an existing directory.

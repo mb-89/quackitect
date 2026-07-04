@@ -1,4 +1,4 @@
-package main
+﻿package main
 
 import (
 	"fmt"
@@ -85,7 +85,7 @@ func serveWatch(port string) {
 	openFile(url)
 	if err := http.ListenAndServe(":"+port, nil); err != nil {
 		fmt.Fprintln(os.Stderr, "watch error:", err)
-		os.Exit(1)
+		quackExit(1)
 	}
 }
 
