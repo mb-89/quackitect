@@ -6,6 +6,7 @@ statement: The report trace graph has a single filter box that filters the graph
 depends_on: []
 class: review
 killer: false
+ears: exempt - historical statement, retrofit rejected (adr-grandfathers-historical)
 ---
 
 ## Rationale (not load-bearing)

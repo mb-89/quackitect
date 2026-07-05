@@ -6,6 +6,7 @@ statement: Selftest renders the report and asserts it carries the live-reload ho
 class: review
 verify: selftest:report-live
 killer: false
+tests_red: exempt - predates the red-observation mechanism (adr-grandfathers-historical)
 ---
 ## Rationale (not load-bearing)
 i0006 test for the live report.

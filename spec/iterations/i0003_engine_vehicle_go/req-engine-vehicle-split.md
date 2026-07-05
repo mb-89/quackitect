@@ -6,6 +6,7 @@ statement: product separates into a read-only ENGINE and a VEHICLE. The engine h
 depends_on: []
 class: review
 killer: true
+ears: exempt - historical statement, retrofit rejected (adr-grandfathers-historical)
 ---
 
 ## Rationale (not load-bearing)

@@ -6,6 +6,7 @@ statement: An invariant — no trace-typed node (need, usecase, requirement, des
 depends_on: []
 class: review
 killer: false
+ears: exempt - historical statement, retrofit rejected (adr-grandfathers-historical)
 ---
 ## Rationale (not load-bearing)
 From the retro: trace-typed class:executed tests were once treated as task gates and dangled (fixed in isGate); make it a standing invariant.

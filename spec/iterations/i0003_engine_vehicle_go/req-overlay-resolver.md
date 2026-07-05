@@ -6,6 +6,7 @@ statement: One resolver walks the vehicle-to-engine chain. The most-specific lay
 depends_on: [req-engine-vehicle-split]
 class: review
 killer: true
+ears: exempt - historical statement, retrofit rejected (adr-grandfathers-historical)
 ---
 
 ## Rationale (not load-bearing)

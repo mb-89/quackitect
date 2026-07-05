@@ -6,6 +6,7 @@ statement: Build steps nest under a single build parent and tests under a generi
 depends_on: []
 class: review
 killer: false
+ears: exempt - historical statement, retrofit rejected (adr-grandfathers-historical)
 ---
 ## Rationale (not load-bearing)
 From the inbox: reflects the real hierarchy; improves readability. Partially present (i3 build parent); this completes the render + seeding.

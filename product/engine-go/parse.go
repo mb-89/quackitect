@@ -26,7 +26,9 @@ type Node struct {
 	Milestone  int
 	Validates  string // "needs": this gate validates the whole need-set; its hash folds the digest of
 	// all needs, so adding/changing/removing any need reopens it (global validation, structurally).
-	Ears string // "" | "exempt - <reason>": EARS-lint exemption with its required reason (req-ears-lint)
+	Suite    string // "" | "standalone": not a member of the verification suites; own board entry (adr-standalone-suite)
+	Ears     string // "" | "exempt - <reason>": EARS-lint exemption with its required reason (req-ears-lint)
+	TestsRed string // "" | "exempt - <reason>": pre-mechanism tests-red exemption, recorded ON the node (req-testsred-exempt)
 	ReadyWhen  string   // defer condition (go-decisions): write-once; scrap edge + ready_when = defer
 	Supersedes []string // decision exit (go-decisions): an incoming supersedes edge = superseded
 }
@@ -99,6 +101,10 @@ func ParseNode(path string) Node {
 			n.Validates = v
 		case "ears":
 			n.Ears = v
+		case "tests_red":
+			n.TestsRed = v
+		case "suite":
+			n.Suite = v
 		case "milestone":
 			m := 0
 			for _, c := range strings.TrimPrefix(v, "M") {

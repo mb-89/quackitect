@@ -1,4 +1,4 @@
-﻿package main
+package main
 
 import (
 	"archive/zip"
@@ -682,19 +682,17 @@ func cmdStartInit(args []string) {
 
 // --- drive-from-inside stubs (i0005): make a bare workspace drivable from within, engine linked at runtime ---
 
-// design: go-inside-launcher  implements: req-inside-launcher
-// The committed root launcher for a bare workspace. It resolves an engine at runtime — internal build,
-// then the gitignored pointer file, then the env var — and forwards; with none set it fails clearly.
-// No engine binary is committed. The label-goto resolution order was validated in the i5 M5 spike.
+// design: go-inside-launcher  implements: req-inside-launcher, req-engine-loc-untracked
+// The committed root launcher for a bare workspace. It resolves an engine at runtime — the global
+// binary, then the env var — and forwards; with neither present it fails clearly. No engine binary
+// and no engine path is ever committed, so a clone carries no machine-local state (the .quack
+// internal/pointer lanes retired at i11, adr-retire-legacy-lanes).
 const insideLauncherTmpl = `@echo off
-rem {{PROJ}} launcher: resolve an engine (internal -> gitignored pointer -> env) and forward. No engine path committed.
+rem {{PROJ}} launcher: resolve an engine (global binary -> env) and forward. No engine path committed.
 setlocal enabledelayedexpansion
-set "SELF=%~dp0"
-if exist "%SELF%.quack\engine\quack.exe" set "ENGINE=%SELF%.quack\engine\quack.exe" & goto run
-if exist "%SELF%.quack\engine.local" ( set /p ENGINE=<"%SELF%.quack\engine.local" & goto run )
-if defined QUACK_ENGINE set "ENGINE=%QUACK_ENGINE%" & goto run
 if exist "%LOCALAPPDATA%\quackitect\bin\quack.exe" set "ENGINE=%LOCALAPPDATA%\quackitect\bin\quack.exe" & goto run
-echo no engine found: create .quack\engine.local (a line = path to quack.exe) or set QUACK_ENGINE 1>&2
+if defined QUACK_ENGINE set "ENGINE=%QUACK_ENGINE%" & goto run
+echo no engine found: install the global engine or set QUACK_ENGINE 1>&2
 exit /b 1
 :run
 "%ENGINE%" %*
@@ -713,8 +711,8 @@ const insideAgentsTmpl = `# AGENTS.md — {{PROJ}}
 
     .\{{PROJ}} <cmd>        (status | next | start | bless | note | gather | report | lint | ship)
 
-The launcher resolves an engine at runtime (internal .quack\engine, then .quack\engine.local, then
-%QUACK_ENGINE%, then the global binary). The engine's location is never committed.
+The launcher resolves an engine at runtime (the global binary, then %QUACK_ENGINE%). The engine's
+location is never committed.
 
 FIRST — the ritual: resolve and READ the contract in full, RECITE it back to the adjudicator in a
 standalone visible message, and HONOR it to the letter of each statement:
@@ -745,38 +743,25 @@ The line below imports it.
 
 // enddesign
 
-// design: go-inside-gitignore  implements: req-engine-loc-untracked
-// The .gitignore lines that keep the engine location out of version control: the machine-local pointer
-// and any vendored engine binary. A clone carries no absolute path and no engine.
-const insideGitignoreTmpl = `# the engine location is machine-local, never committed
-.quack/engine.local
-.quack/engine/
-# engine-managed caches / outputs
-.quack/out/
-.quack/gather/
-.quack/spikes/
-`
-
-// enddesign
-
 // insideStubFiles returns the drive-from-inside stub set (relative path -> content) for project name
 // proj. The launcher is named <proj>.cmd (CRLF for cmd.exe). Consumed by the emit step (cmdInitStubs).
+// The .gitignore stub retired with the .quack lanes (adr-retire-legacy-lanes): the stubs commit no
+// machine-local state, so there is nothing to ignore.
 func insideStubFiles(proj string) map[string]string {
 	sub := func(s string) string { return strings.ReplaceAll(s, "{{PROJ}}", proj) }
 	return map[string]string{
 		proj + ".cmd": strings.ReplaceAll(sub(insideLauncherTmpl), "\n", "\r\n"),
 		"AGENTS.md":   sub(insideAgentsTmpl),
 		"CLAUDE.md":   sub(insideClaudeTmpl),
-		".gitignore":  insideGitignoreTmpl,
 		filepath.Join("spec", "project.toml"): "# the workspace root marker + iteration breadcrumb (adr-no-quack-data-home).\n[iteration]\ntype    = \"default\"\nrigor   = \"systematic\"\nversion = \"\"\n",
 	}
 }
 
 // design: go-init-stubs  implements: req-drive-from-inside
-// `quack start stubs [target]` makes a workspace drivable from INSIDE: it writes the launcher, AGENTS.md,
-// and .gitignore stubs (insideStubFiles) into target (default: the current workspace ROOT). The launcher
-// resolves an engine at runtime with no engine path committed. Idempotent — existing files are kept; the
-// critical .gitignore lines are ensured present so the engine pointer can never be committed.
+// `quack start stubs [target]` makes a workspace drivable from INSIDE: it writes the launcher,
+// AGENTS.md/CLAUDE.md, and spec/project.toml stubs (insideStubFiles) into target (default: the
+// current workspace ROOT). The launcher resolves an engine at runtime with no engine path
+// committed. Idempotent — existing files are kept.
 func cmdStartStubs(args []string) {
 	target := ROOT
 	if len(args) > 0 && strings.TrimSpace(args[0]) != "" {
@@ -788,38 +773,13 @@ func cmdStartStubs(args []string) {
 	for rel, content := range insideStubFiles(proj) {
 		dst := filepath.Join(target, rel)
 		writeIfAbsent(dst, content)
-		if rel == ".gitignore" {
-			ensureLines(dst, ".quack/engine.local", ".quack/engine/")
-		}
 	}
 	fmt.Println("stubs -> " + target)
-	fmt.Println("  wrote " + proj + ".cmd, AGENTS.md, .gitignore (kept any existing).")
-	fmt.Println("  point the engine: create .quack/engine.local (a line = path to quack.exe) or set QUACK_ENGINE.")
+	fmt.Println("  wrote " + proj + ".cmd, AGENTS.md, CLAUDE.md, spec/project.toml (kept any existing).")
+	fmt.Println("  the launcher resolves the global engine binary, or set QUACK_ENGINE.")
 }
 
 // enddesign
-
-// ensureLines appends any of lines not already present in the file at path (idempotent gitignore merge).
-func ensureLines(path string, lines ...string) {
-	raw, err := os.ReadFile(path)
-	if err != nil {
-		return
-	}
-	s := string(raw)
-	add := ""
-	for _, ln := range lines {
-		if !strings.Contains(s, ln) {
-			add += ln + "\n"
-		}
-	}
-	if add == "" {
-		return
-	}
-	if len(s) > 0 && !strings.HasSuffix(s, "\n") {
-		add = "\n" + add
-	}
-	os.WriteFile(path, []byte(s+add), 0o644)
-}
 
 // copyTree recursively copies src -> dst, skipping build junk (caches, binaries, __pycache__).
 func copyTree(src, dst string) error {
@@ -868,8 +828,13 @@ func writeIfAbsent(path, content string) {
 
 // design: go-metrics  implements: req-metrics
 // Health metrics from the append-only attest log: rework, reversal, self-cert. Gates only.
+// Self-cert counts agent versus non-agent, so it spans the human and user actor eras as one
+// (go-stamp-user). metricsFrom is the pure core, fixture-testable without the real ledger.
 func metricsReport() map[string][2]int {
-	nodes := LoadAll()
+	return metricsFrom(LoadAll(), attestEvents())
+}
+
+func metricsFrom(nodes map[string]Node, events []Event) map[string][2]int {
 	gates := map[string]bool{}
 	for id, n := range nodes {
 		if isGate(n) {
@@ -877,7 +842,7 @@ func metricsReport() map[string][2]int {
 		}
 	}
 	var blesses []Event
-	for _, e := range attestEvents() {
+	for _, e := range events {
 		if e.Action == "bless" && gates[e.Check] {
 			blesses = append(blesses, e)
 		}
@@ -909,6 +874,58 @@ func metricsReport() map[string][2]int {
 	}
 	return map[string][2]int{"rework": {reworked, len(counts)}, "reversal": {reversals, len(blesses)}, "selfcert": {selfcert, killers}}
 }
+
+// design: go-stamp-user  implements: req-stamp-user
+// The ledger says `user` (adr-actor-user-migration). New records write user (resolveActor);
+// `quack migrate-actors` rewrites historical human stamps to user in ONE audited pass — the
+// migration event records the count and timestamp, bless hashes and the prev_hash chain stay
+// untouched, and a second run is a no-op. Readers treat human and user as one value forever
+// (normActor), so an unmigrated clone still computes; the self-cert metric counts agent versus
+// non-agent and therefore spans both eras unchanged.
+
+// normActor folds the pre-i11 recorded vocabulary into the current one: human IS user.
+func normActor(a string) string {
+	if a == "human" || a == "" {
+		return "user"
+	}
+	return a
+}
+
+// migrateActorsFrom is the pure one-pass rewrite: every human actor/filler stamp becomes user;
+// when anything changed, ONE audit event (action migrate-actors) records how many events moved.
+func migrateActorsFrom(events []Event, ts string) ([]Event, int) {
+	n := 0
+	for i := range events {
+		touched := false
+		if events[i].Actor == "human" {
+			events[i].Actor = "user"
+			touched = true
+		}
+		if events[i].FilledBy == "human" {
+			events[i].FilledBy = "user"
+			touched = true
+		}
+		if touched {
+			n++
+		}
+	}
+	if n > 0 {
+		events = append(events, Event{Check: "ledger", Action: "migrate-actors", Actor: "user", TS: ts, Count: n})
+	}
+	return events, n
+}
+
+func cmdMigrateActors() {
+	events, n := migrateActorsFrom(attestEvents(), time.Now().Format(time.RFC3339))
+	if n == 0 {
+		fmt.Println("migrate-actors: nothing to migrate — the ledger already says user")
+		return
+	}
+	saveEvents(events)
+	fmt.Printf("migrate-actors: %d event(s) rewritten human -> user, audited in the ledger\n", n)
+}
+
+// enddesign
 
 func cmdVerify(args []string) {
 	if len(args) == 0 {

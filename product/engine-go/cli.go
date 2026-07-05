@@ -1,4 +1,4 @@
-﻿package main
+package main
 
 import (
 	"fmt"
@@ -50,7 +50,7 @@ func usageText() string {
 	return b + ` — the determinizer lane (deterministic; no judgment).
 usage: ` + b + ` status [id] | next | start <id> [--plan] | why <id> | bless [--all|<id>] [--by A]
        | note "..." | notes [--all] | gather <ver> | report [--out F] | ship | build
-       | lint [--ears-baseline] | verify <id> | progress [--pager <gate>] | version`
+       | lint | verify <id> | progress [--pager <gate>] | migrate-actors | version`
 }
 
 // enddesign
@@ -122,6 +122,8 @@ func Dispatch(args []string) {
 		cmdNotes(rest)
 	case "observe-red":
 		cmdObserveRed(rest)
+	case "migrate-actors":
+		cmdMigrateActors()
 	case "gather":
 		cmdGather(rest)
 	case "ship":
@@ -229,14 +231,39 @@ func cmdStatus(rest []string) {
 		return gates[i].id < gates[j].id
 	})
 	mark := map[string]string{"DONE": "[x]", "SUSPECT": "[~]", "OPEN": "[ ]"}
+	raw := RawStates(nodes)
 	susp := 0
 	for _, g := range gates {
+		tail := ""
 		if g.st == "SUSPECT" {
 			susp++
+			tail = suspectSuffix(g.id, nodes, raw) // propagated cones name their root (go-suspect-root)
 		}
-		fmt.Println(mark[g.st] + " " + ljust(g.st, 8) + " " + g.id + "  (" + g.cls + ")")
+		fmt.Println(mark[g.st] + " " + ljust(g.st, 8) + " " + g.id + "  (" + g.cls + ")" + tail)
+	}
+	// standalone checks: workspace-state watchers outside every verification suite (adr-standalone-suite).
+	// Evaluated LIVE, never cached: their subject is workspace state, which no input hash captures —
+	// a cached verdict would freeze the tripwire.
+	for _, n := range standaloneChecks(nodes) {
+		m, st := "[x]", "OK"
+		if !runSelftest(strings.TrimSpace(n.Verify[len("selftest:"):])) {
+			m, st = "[!]", "RED"
+		}
+		fmt.Println(m + " " + ljust(st, 8) + " " + n.ID + "  (standalone)")
 	}
 	fmt.Printf("\n%d gates | %d suspect | %d trace-content\n", len(gates), susp, len(nodes)-len(gates))
+}
+
+// standaloneChecks returns the suite: standalone tests, ID-sorted (go-standalone-suite).
+func standaloneChecks(nodes map[string]Node) []Node {
+	var out []Node
+	for _, n := range nodes {
+		if n.Suite == "standalone" && n.Class == "executed" && strings.HasPrefix(n.Verify, "selftest:") {
+			out = append(out, n)
+		}
+	}
+	sort.Slice(out, func(i, j int) bool { return out[i].ID < out[j].ID })
+	return out
 }
 
 func cmdWhy(rest []string) {
@@ -282,6 +309,14 @@ func why(nodes map[string]Node, id string) []string {
 		reasons = append(reasons, "definition changed - re-bless")
 	}
 	if len(reasons) == 0 {
+		raw := RawStates(nodes)
+		if StatusMap(nodes)[id] == "SUSPECT" && raw[id] == "DONE" { // propagated, not fresh (go-suspect-root)
+			roots := SuspectRoots(id, nodes, raw)
+			if len(roots) > 0 {
+				return []string{"propagated suspect - own inputs unchanged; the cone is dragged by: " + strings.Join(roots, ", "),
+					"clear the root(s) and this check returns to DONE by itself"}
+			}
+		}
 		return []string{"fresh - nothing changed"}
 	}
 	return reasons
@@ -310,23 +345,18 @@ func cmdLint(rest []string) {
 			fmt.Println("  - " + h)
 		}
 	}
-	// EARS enforcement (go-ears-lint): --ears-baseline records the feature-land set; with a baseline
-	// present and systematic rigor, new/re-stated requirement statements are checked, exemptions counted.
+	// EARS enforcement (go-ears-lint): at systematic rigor every requirement statement is checked;
+	// historical grandfathers carry explicit exempt markers (adr-grandfathers-historical), counted.
 	earsBad := 0
-	if hasFlag(rest, "--ears-baseline") {
-		n := earsWriteBaseline(nodes)
-		fmt.Printf("ears: baseline written (%d requirement statement hashes)\n", n)
-	} else if cfg := readProjectConfig(); cfg.Rigor == "systematic" {
-		if baseline := earsBaseline(); len(baseline) > 0 {
-			findings, exempt := earsFindings(nodes, baseline)
-			earsBad = len(findings)
-			if earsBad == 0 {
-				fmt.Printf("ears: clean (%d exemption(s))\n", exempt)
-			} else {
-				fmt.Printf("ears: %d finding(s), %d exemption(s):\n", earsBad, exempt)
-				for _, f := range findings {
-					fmt.Println("  - " + f)
-				}
+	if cfg := readProjectConfig(); cfg.Rigor == "systematic" {
+		findings, exempt := earsFindings(nodes)
+		earsBad = len(findings)
+		if earsBad == 0 {
+			fmt.Printf("ears: clean (%d exemption(s))\n", exempt)
+		} else {
+			fmt.Printf("ears: %d finding(s), %d exemption(s):\n", earsBad, exempt)
+			for _, f := range findings {
+				fmt.Println("  - " + f)
 			}
 		}
 	}

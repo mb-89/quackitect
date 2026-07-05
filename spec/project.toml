@@ -2,5 +2,5 @@
 # Machine-local overrides (logs_dir, ...) live in the GLOBAL user config, never here.
 [iteration]
 type    = "default"
-rigor   = "systematic"
-version = "i0010_engine_workshop"
+rigor   = "lean"
+version = "i0011_geronticide"

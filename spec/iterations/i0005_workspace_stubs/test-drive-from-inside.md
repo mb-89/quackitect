@@ -6,6 +6,7 @@ verifies: [req-drive-from-inside]
 class: review
 verify: selftest:workspace
 killer: true
+tests_red: exempt - predates the red-observation mechanism (adr-grandfathers-historical)
 ---
 ## Rationale (not load-bearing)
 The i5 killer end-to-end demonstration. Extends test-machinery-e2e / selftest:workspace rather than adding a parallel harness; the full inside-drive is demonstrated live at M7.

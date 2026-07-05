@@ -1,4 +1,4 @@
-﻿---
+---
 id: adr-pager-handoff
 type: adr
 addresses: [req-pager-merge]

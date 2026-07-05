@@ -6,6 +6,7 @@ statement: quack next picks the latest not-done version, else the earliest plann
 depends_on: []
 class: review
 killer: false
+ears: exempt - historical statement, retrofit rejected (adr-grandfathers-historical)
 ---
 
 ## Rationale (not load-bearing)

@@ -1,4 +1,4 @@
-﻿---
+---
 id: evidence-and-suspect
 scope: always
 statement: Pick a verifier class. Executed, grounded-review, or judgment. Plus how suspect and bless work.

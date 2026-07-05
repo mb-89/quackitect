@@ -7,6 +7,7 @@ depends_on: [report-impl]
 class: executed
 verify: selftest:report
 killer: true
+tests_red: exempt - predates the red-observation mechanism (adr-grandfathers-historical)
 ---
 
 ## Rationale (not load-bearing)

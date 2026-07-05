@@ -165,6 +165,24 @@ func runSelftest(name string) bool {
 		return selftestPagerMerge()
 	case "user-wording":
 		return selftestUserWording()
+	case "parity-standalone":
+		return selftestParityStandalone()
+	case "pager-scope":
+		return selftestPagerScope()
+	case "suspect-root":
+		return selftestSuspectRoot()
+	case "evidence-cache-cap":
+		return selftestEvidenceCacheCap()
+	case "evidence-hashed":
+		return selftestEvidenceHashed()
+	case "grandfathers-decided":
+		return selftestGrandfathersDecided()
+	case "legacy-lanes-retired":
+		return selftestLegacyLanesRetired()
+	case "stamp-user":
+		return selftestStampUser()
+	case "testsred-exempt":
+		return selftestTestsredExempt()
 	case "contract-render":
 		return selftestContractRender()
 	case "render-drift":
@@ -403,7 +421,7 @@ func selftestReadout() bool {
 // the Copilot native channel (req-confirm-back/-active-imperative/-bless-y-console/-copilot-instructions).
 func selftestContract() bool {
 	c := readFileStr(filepath.Join(EngineDir(), "method", "prompts", "contract.md"))
-	for _, s := range []string{"paraphrase", "actor=agent", "actor=human", "handover pager"} {
+	for _, s := range []string{"paraphrase", "actor=agent", "actor=user", "handover pager"} {
 		if !strings.Contains(c, s) {
 			return false
 		}
@@ -473,10 +491,11 @@ func selftestWorkspace() bool {
 	return driveFromInside()
 }
 
-// driveFromInside emits the stub set into a throwaway BARE workspace, points the gitignored engine
-// pointer at THIS engine binary, and drives it FROM INSIDE via the emitted launcher — proving a bare
-// workspace resolves an engine at runtime and runs with ROOT = itself. Time-boxed so it can NEVER hang;
-// the temp workspace has no test nodes, so its own tests-pass is vacuous (no recursion into this hook).
+// driveFromInside emits the stub set into a throwaway BARE workspace and drives it FROM INSIDE via
+// the emitted launcher — proving a bare workspace resolves an engine at runtime (global binary, with
+// QUACK_ENGINE pointing at THIS binary as the fallback) and runs with ROOT = itself. Time-boxed so it
+// can NEVER hang; the temp workspace has no test nodes, so its own tests-pass is vacuous (no
+// recursion into this hook).
 func driveFromInside() bool {
 	if runtime.GOOS != "windows" {
 		return true // the .cmd launcher is Windows-first; skip the drive elsewhere (lightweight check stands)
@@ -490,14 +509,11 @@ func driveFromInside() bool {
 		return false
 	}
 	defer os.RemoveAll(dir)
-	os.MkdirAll(filepath.Join(dir, ".quack"), 0o755)
 	os.MkdirAll(filepath.Join(dir, "product"), 0o755)
 	os.MkdirAll(filepath.Join(dir, "spec"), 0o755)
-	os.WriteFile(filepath.Join(dir, ".quack", "config.toml"), []byte("[iteration]\ntype = \"default\"\nrigor = \"systematic\"\nversion = \"\"\n"), 0o644)
-	for name, body := range insideStubFiles("probe") { // launcher + AGENTS.md + .gitignore
+	for name, body := range insideStubFiles("probe") { // launcher + entry chain + spec/project.toml
 		os.WriteFile(filepath.Join(dir, name), []byte(body), 0o644)
 	}
-	os.WriteFile(filepath.Join(dir, ".quack", "engine.local"), []byte(exe), 0o644) // path B, gitignored
 	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
 	defer cancel()
 	// Invoke the launcher by ABSOLUTE path — not the bare name "probe.cmd". cmd.exe only finds a bare
@@ -507,6 +523,7 @@ func driveFromInside() bool {
 	launcher := filepath.Join(dir, "probe.cmd")
 	cmd := exec.CommandContext(ctx, "cmd", "/c", launcher, "status")
 	cmd.Dir = dir // drive FROM INSIDE the bare workspace
+	cmd.Env = append(os.Environ(), "QUACK_ENGINE="+exe) // the env fallback resolves THIS binary when no global install exists
 	out, err := cmd.CombinedOutput()
 	return err == nil && strings.Contains(string(out), "gates |")
 }
@@ -624,18 +641,21 @@ func selftestReport() bool {
 }
 
 // selftestStubs: the drive-from-inside stub set (req-inside-launcher, req-inside-entry-surface,
-// req-engine-loc-untracked). Verifies the launcher resolves internal -> pointer -> env in order with a
-// clear failure, the AGENTS.md entry surface is self-contained (no hard checkout path), and the
-// .gitignore excludes the engine pointer. Wires test-inside-launcher/entry-surface/engine-loc-untracked.
+// req-engine-loc-untracked). Verifies the launcher resolves global binary -> QUACK_ENGINE in order
+// with a clear failure, carries no retired .quack lane (adr-retire-legacy-lanes), and the AGENTS.md
+// entry surface is self-contained (no hard checkout path). Wires test-inside-launcher/entry-surface/
+// engine-loc-untracked.
 func selftestStubs() bool {
 	f := insideStubFiles("probe")
-	launcher, agents, ignore := f["probe.cmd"], f["AGENTS.md"], f[".gitignore"]
-	// launcher: three resolution branches in order + a clear failure, CRLF for cmd.exe.
-	iInternal := strings.Index(launcher, `.quack\engine\quack.exe`)
-	iPointer := strings.Index(launcher, `.quack\engine.local`)
+	launcher, agents := f["probe.cmd"], f["AGENTS.md"]
+	// launcher: global binary then env, a clear failure, CRLF for cmd.exe — and no legacy lane.
+	iGlobal := strings.Index(launcher, `%LOCALAPPDATA%\quackitect\bin\quack.exe`)
 	iEnv := strings.Index(launcher, "QUACK_ENGINE")
-	if iInternal < 0 || iPointer < 0 || iEnv < 0 || !(iInternal < iPointer && iPointer < iEnv) {
+	if iGlobal < 0 || iEnv < 0 || iGlobal > iEnv {
 		return false
+	}
+	if strings.Contains(launcher, "engine.local") || strings.Contains(launcher, `.quack`) {
+		return false // the retired lanes stay dead
 	}
 	if !strings.Contains(launcher, "no engine found") || !strings.Contains(launcher, "\r\n") {
 		return false
@@ -647,14 +667,15 @@ func selftestStubs() bool {
 	if strings.Contains(agents, "product/quackitect") {
 		return false
 	}
-	// engine location out of VC.
-	return strings.Contains(ignore, ".quack/engine.local")
+	// engine location out of VC: the stub set commits no machine-local state at all.
+	_, hasIgnore := f[".gitignore"]
+	return !hasIgnore
 }
 
 // RunSelftestCLI runs one named check (or all) and returns an exit code.
 func RunSelftestCLI(args []string) int {
 	all := []string{"deps", "parser", "determinism", "ids", "help", "parity", "perf", "deps-prompt", "report", "split", "integrate", "engine", "method", "surface", "build", "no-trace-gate", "tests-pass-eval", "workspace", "brand", "claude-vendor", "report-verdict", "report-nesting", "brand-resolves", "validation-global", "stubs", "readout", "contract", "bootstrap", "correctness", "report-live", "evidence-honesty", "tests-red", "parser-strict", "ref-integrity", "actor-channels", "design-hash-norm", "kernel-vectors", "kernel-cone", "kernel-gatewalk", "kernel-attest", "logs-dir", "ears-lint", "ears-method", "monotonic-lint",
-		"attest-block", "attest-console", "attest-challenge", "attest-grant", "attest-renewal", "attest-keys", "attest-expiry", "contract-render", "render-drift", "logs-canonical", "data-dir-caches", "truth-in-spec", "root-marker", "clean-status", "global-config", "global-binary", "engine-ratchet", "notes-out", "decisions-folder", "decision-classes", "parked-list", "decision-realized", "mint", "report-why", "report-filter-ux", "vv-time-scope", "verify-cache", "verify-feedback", "status-fast", "why-derived", "notes-list", "call-log", "mint-dedupe", "mint-rationale", "ratchet-semantic", "scaffold-modern", "pager-merge", "user-wording"}
+		"attest-block", "attest-console", "attest-challenge", "attest-grant", "attest-renewal", "attest-keys", "attest-expiry", "contract-render", "render-drift", "logs-canonical", "data-dir-caches", "truth-in-spec", "root-marker", "clean-status", "global-config", "global-binary", "engine-ratchet", "notes-out", "decisions-folder", "decision-classes", "parked-list", "decision-realized", "mint", "report-why", "report-filter-ux", "vv-time-scope", "verify-cache", "verify-feedback", "status-fast", "why-derived", "notes-list", "call-log", "mint-dedupe", "mint-rationale", "ratchet-semantic", "scaffold-modern", "pager-merge", "user-wording", "parity-standalone", "pager-scope", "suspect-root", "evidence-cache-cap", "evidence-hashed", "grandfathers-decided", "legacy-lanes-retired", "stamp-user", "testsred-exempt"}
 	names := args
 	if len(names) == 0 {
 		names = all

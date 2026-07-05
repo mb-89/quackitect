@@ -1,4 +1,4 @@
-﻿---
+---
 id: milestone-review
 scope: always
 statement: How to review a milestone gate before bless. Increasing-scrutiny rounds over the milestone's own checks and all its input checks.

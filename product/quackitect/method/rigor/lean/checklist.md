@@ -1,4 +1,4 @@
-﻿---
+---
 id: rigor-lean-checklist
 rigor: lean
 statement: The lean checklist. Light structure. One grounded-review gate per concern. Executed checks where cheap. It inherits vibe. Systematic inherits it.

@@ -5,7 +5,9 @@ statement: A golden-output suite runs each command on a fixture vehicle. The Go 
 verifies: [req-behavior-parity, req-zero-dep-parse]
 class: executed
 verify: selftest:parity
+suite: standalone
 killer: false
+tests_red: exempt - predates the red-observation mechanism (adr-grandfathers-historical)
 ---
 
 ## Rationale (not load-bearing)

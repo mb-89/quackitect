@@ -308,6 +308,34 @@ func pagerGroup(id string, nodes map[string]Node, sm map[string]string) ([]strin
 
 // enddesign
 
+// design: go-pager-scope  implements: req-pager-scope
+// A pager for a killer SUBTASK reports the readiness of THAT CHECK — its own upstreams and the
+// evidence doc — never the whole milestone (i10's false "ready: NO" alarms: a milestone's first
+// killer always read 0/N). Gate pagers keep the milestone scope; the merge path resolves to the
+// gate before readiness is computed, so merged hand-offs stay milestone-scoped too.
+func checkScopedReadiness(id string, nodes map[string]Node, sm map[string]string, evidence bool) []string {
+	own, ownDone := 0, 0
+	for _, dep := range parents(nodes[id]) {
+		if c, ok := nodes[dep]; ok && isGate(c) {
+			own++
+			if sm[dep] == "DONE" {
+				ownDone++
+			}
+		}
+	}
+	readyMark := "❌ NO — see gaps"
+	if ownDone == own && evidence {
+		readyMark = "✅ yes"
+	}
+	return []string{"📊 READINESS (check-scoped)",
+		fmt.Sprintf("   upstreams %d/%d done · evidence %s", ownDone, own,
+			map[bool]string{true: "present", false: "missing"}[evidence]),
+		"   ready: " + readyMark,
+		""}
+}
+
+// enddesign
+
 // design: go-handover-pager  implements: req-handover-pager
 // The killer-gate hand-off readout, in one bordered <=80-col box: the emoji progress bar, biggest
 // decisions (the iteration's ADRs), biggest risks (M1 frame), deterministic readiness facts, and — LAST
@@ -359,15 +387,19 @@ func HandoverPager(gateID, iter string, nodes map[string]Node, sm map[string]str
 	}
 	L = append(L, "")
 
-	readyMark := "❌ NO — see gaps"
-	if d.ready() {
-		readyMark = "✅ yes"
+	if !strings.HasSuffix(gateID, "-gate") { // a killer subtask answers for ITSELF (go-pager-scope)
+		L = append(L, checkScopedReadiness(gateID, nodes, sm, d.evidence)...)
+	} else {
+		readyMark := "❌ NO — see gaps"
+		if d.ready() {
+			readyMark = "✅ yes"
+		}
+		L = append(L, "📊 READINESS",
+			fmt.Sprintf("   subtasks %d/%d · upstream %d suspect · evidence %s",
+				d.subDone, d.subTotal, d.suspectUp, map[bool]string{true: "present", false: "missing"}[d.evidence]),
+			"   ready: "+readyMark,
+			"")
 	}
-	L = append(L, "📊 READINESS",
-		fmt.Sprintf("   subtasks %d/%d · upstream %d suspect · evidence %s",
-			d.subDone, d.subTotal, d.suspectUp, map[bool]string{true: "present", false: "missing"}[d.evidence]),
-		"   ready: "+readyMark,
-		"")
 
 	// the question — LAST — with emojis
 	L = append(L, question)
@@ -389,16 +421,33 @@ func computeRisks(iter string, nodes map[string]Node, sm map[string]string) []st
 	// Risks are things to REACT TO, not normal forward work. Open future milestones are expected and
 	// NOT risks; only regressions (SUSPECT — an input changed under a blessed check) and coverage holes
 	// (a requirement missing its design/test) qualify.
-	var susp []string
+	raw := RawStates(nodes)
+	var direct, propagated []string
+	rootSet := map[string]bool{}
 	for id, n := range nodes {
 		if iterOf(n.Path) == iter && sm[id] == "SUSPECT" {
-			susp = append(susp, id)
+			if raw[id] == "DONE" { // propagated: the cone is dragged, not broken (go-suspect-root)
+				propagated = append(propagated, id)
+				for _, r := range SuspectRoots(id, nodes, raw) {
+					rootSet[r] = true
+				}
+			} else {
+				direct = append(direct, id)
+			}
 		}
 	}
-	sort.Strings(susp)
+	sort.Strings(direct)
+	var roots []string
+	for r := range rootSet {
+		roots = append(roots, r)
+	}
+	sort.Strings(roots)
 	var out []string
-	if len(susp) > 0 {
-		out = append(out, fmt.Sprintf("%d SUSPECT — input changed, re-bless: %s", len(susp), joinN(susp, 3)))
+	if len(direct) > 0 {
+		out = append(out, fmt.Sprintf("%d SUSPECT — input changed, re-bless: %s", len(direct), joinN(direct, 3)))
+	}
+	if len(propagated) > 0 {
+		out = append(out, fmt.Sprintf("%d propagated — clear the root(s): %s", len(propagated), joinN(roots, 3)))
 	}
 	if holes := CoverageHoles(nodes, iter); len(holes) > 0 {
 		out = append(out, fmt.Sprintf("%d coverage hole(s): %s", len(holes), joinN(holes, 2)))

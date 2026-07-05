@@ -6,6 +6,7 @@ statement: The tests-pass coverage rule evaluates executed checks through the SA
 depends_on: []
 class: review
 killer: false
+ears: exempt - historical statement, retrofit rejected (adr-grandfathers-historical)
 ---
 ## Rationale (not load-bearing)
 From the retro: tests-pass used runExecuted (shell) while gateState ran selftest: in-process; a selftest:-test was always-fail, masked by stale evidence, surfacing only on an uncached test.

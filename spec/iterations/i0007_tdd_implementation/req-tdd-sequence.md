@@ -6,4 +6,5 @@ statement: The implementation fragment enforces the order author-tests -> plan-b
 depends_on: [req-shared-impl-fragment]
 class: review
 killer: true
+ears: exempt - historical statement, retrofit rejected (adr-grandfathers-historical)
 ---

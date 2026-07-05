@@ -7,6 +7,7 @@ depends_on: []
 class: executed
 verify: selftest:parity
 killer: true
+tests_red: exempt - predates the red-observation mechanism (adr-grandfathers-historical)
 ---
 
 ## Rationale (not load-bearing)

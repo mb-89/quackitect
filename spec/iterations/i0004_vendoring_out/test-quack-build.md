@@ -6,6 +6,7 @@ verifies: [req-quack-build]
 class: executed
 verify: selftest:build
 killer: false
+tests_red: exempt - predates the red-observation mechanism (adr-grandfathers-historical)
 ---
 ## Rationale (not load-bearing)
 New self-test asserting the build determinizer wiring (re-baseline path).

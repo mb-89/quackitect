@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 	"regexp"
 	"sort"
+	"strconv"
 	"strings"
 )
 
@@ -132,6 +133,9 @@ func fullHash(id string, nodes map[string]Node, memo map[string]string) string {
 		// reaches back. The verification analogue (coverage:tests-pass) carries the same scope.
 		seed += "|needs:" + needsDigestAsOf(iterOf(n.Path), nodes)
 	}
+	if n.Milestone > 0 && strings.HasSuffix(id, "-gate") {
+		seed += evidenceDocSeed(iterOf(n.Path), n.Milestone) // the gate folds its evidence docs (go-evidence-hash)
+	}
 	hh := h12(seed)
 	memo[id] = hh
 	return hh
@@ -246,6 +250,38 @@ func scanDesignsUnder(base string) map[string]Node {
 	return out
 }
 
+// design: go-evidence-hash  implements: req-evidence-hashed
+// A milestone gate folds its evidence doc set (M<n>-*.md in the iteration dir) into its full
+// hash (adr-evidence-hash): editing blessed evidence flips the gate SUSPECT, so the verdict
+// referent can never mutate silently under its report link. Content-hashed through normWS —
+// reformat churn moves nothing, content edits always do. Gate-only by the ADR (subtasks never
+// fold docs). No docs -> no seed component, so doc-less history stays stable.
+var evidenceBaseOverride string // test seam: redirects where the docs are read from
+
+// evidenceDocSeed returns the seed component for milestone ms of iteration iter ("" if no docs).
+func evidenceDocSeed(iter string, ms int) string {
+	base := evidenceBaseOverride
+	if base == "" {
+		base = filepath.Join(SPEC, "iterations")
+	}
+	m, _ := filepath.Glob(filepath.Join(base, iter, "M"+strconv.Itoa(ms)+"-*.md"))
+	if len(m) == 0 {
+		return ""
+	}
+	sort.Strings(m)
+	parts := make([]string, 0, len(m))
+	for _, p := range m {
+		raw, err := os.ReadFile(p)
+		if err != nil {
+			continue
+		}
+		parts = append(parts, filepath.Base(p)+":"+h12(normWS(string(raw))))
+	}
+	return "|evidence:" + h12(strings.Join(parts, ";"))
+}
+
+// enddesign
+
 var traceContent = map[string]bool{"need": true, "usecase": true, "requirement": true, "design": true, "adr": true, "test": true}
 
 // design: go-no-trace-gate  implements: req-no-trace-gate
@@ -285,6 +321,7 @@ type Event struct {
 	StatementHash string            `json:"statement_hash"`
 	Deps          map[string]string `json:"deps"`
 	PrevHash      *string           `json:"prev_hash"`
+	Count         int               `json:"count,omitempty"` // migrate-actors audit: events rewritten (go-stamp-user)
 }
 
 func attestEvents() []Event {
@@ -409,6 +446,80 @@ func StatusMap(nodes map[string]Node) map[string]string {
 		resolve(id, map[string]bool{})
 	}
 	return eff
+}
+
+// enddesign
+
+// design: go-suspect-root  implements: req-suspect-root
+// A PROPAGATED suspect (raw DONE, effective SUSPECT — some upstream drags the cone) is a different
+// fact than a DIRECT one (own inputs changed), and the board must say so with the ROOT named: at
+// i10 one OPEN executed check read as 30 anonymous suspects and cost 28 wasted re-blesses. Roots
+// are the minimal upstream culprits: checks whose RAW state is not DONE and whose own upstreams
+// are all raw-DONE. RawStates exposes the pre-propagation pass; SuspectRoots walks to the culprits.
+func RawStates(nodes map[string]Node) map[string]string {
+	a := attestLoad()
+	memo := map[string]string{}
+	raw := map[string]string{}
+	for id := range nodes {
+		raw[id] = gateState(id, nodes, a, memo)
+	}
+	return raw
+}
+
+// suspectSuffix renders the propagation tail for a SUSPECT row: empty for a direct suspect (its
+// own inputs changed), else the named roots dragging the cone.
+func suspectSuffix(id string, nodes map[string]Node, raw map[string]string) string {
+	if raw[id] != "DONE" {
+		return "" // direct: the check itself is not clean at its recorded hash
+	}
+	roots := SuspectRoots(id, nodes, raw)
+	if len(roots) == 0 {
+		return ""
+	}
+	return "  <- propagated from: " + strings.Join(roots, ", ")
+}
+
+// SuspectRoots returns the minimal upstream culprits for id, given the raw state map.
+func SuspectRoots(id string, nodes map[string]Node, raw map[string]string) []string {
+	seen := map[string]bool{}
+	rootSet := map[string]bool{}
+	var walk func(string)
+	walk = func(cur string) {
+		if seen[cur] {
+			return
+		}
+		seen[cur] = true
+		for _, d := range parents(nodes[cur]) {
+			n, ok := nodes[d]
+			if !ok || raw[d] == "CONTENT" {
+				continue
+			}
+			_ = n
+			if raw[d] != "DONE" {
+				deeper := false
+				for _, dd := range parents(nodes[d]) {
+					if _, ok := nodes[dd]; ok && raw[dd] != "CONTENT" && raw[dd] != "DONE" {
+						deeper = true
+						break
+					}
+				}
+				if deeper {
+					walk(d) // the culprit has its own culprit — keep walking up
+				} else {
+					rootSet[d] = true
+				}
+			} else {
+				walk(d) // clean link; the drag may come from further up
+			}
+		}
+	}
+	walk(id)
+	var roots []string
+	for r := range rootSet {
+		roots = append(roots, r)
+	}
+	sort.Strings(roots)
+	return roots
 }
 
 // enddesign

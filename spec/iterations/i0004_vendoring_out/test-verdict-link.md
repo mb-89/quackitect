@@ -6,6 +6,7 @@ verifies: [req-verdict-link]
 class: executed
 verify: selftest:report-verdict
 killer: false
+tests_red: exempt - predates the red-observation mechanism (adr-grandfathers-historical)
 ---
 ## Rationale (not load-bearing)
 New self-test over the report shell.

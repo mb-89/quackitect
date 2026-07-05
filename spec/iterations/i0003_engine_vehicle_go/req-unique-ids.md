@@ -6,6 +6,7 @@ statement: Every node id is globally unique across the whole spec. The engine pr
 depends_on: []
 class: review
 killer: true
+ears: exempt - historical statement, retrofit rejected (adr-grandfathers-historical)
 ---
 
 ## Rationale (not load-bearing)

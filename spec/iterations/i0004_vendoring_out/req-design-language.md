@@ -6,6 +6,7 @@ statement: A design-language resource defines the brand as ONE bundle — voice,
 depends_on: []
 class: review
 killer: true
+ears: exempt - historical statement, retrofit rejected (adr-grandfathers-historical)
 ---
 ## Rationale (not load-bearing)
 Per the brand discussion: the design language rides the i4 overlay chain (no ship-time transform). quackitect's duck lives in quackitect's .quack/overlay, so quack ship packages a brand-neutral engine. Voice is part of the design language.

@@ -6,4 +6,5 @@ statement: selftest:workspace forced to FAIL on a live re-run is reflected as no
 class: executed
 verify: selftest:evidence-honesty
 killer: false
+tests_red: exempt - predates the red-observation mechanism (adr-grandfathers-historical)
 ---

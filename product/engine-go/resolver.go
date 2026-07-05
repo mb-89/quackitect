@@ -11,22 +11,23 @@ import (
 // resource is inherited from the engine. The engine layer is READ-ONLY: a vehicle overrides by
 // placing a file in its overlay, never by editing the engine. guides() routes through this.
 func overlayLayers() []string {
-	// most-specific first: the workspace's overlay in the DATA HOME (adr-no-quack-data-home), the
-	// legacy in-repo vehicle overlay (not-yet-migrated vehicles), then the engine's default resources.
+	// most-specific first: the workspace's overlay in the DATA HOME (adr-no-quack-data-home),
+	// then the engine's default resources. The legacy .quack/overlay lane retired at i11
+	// (adr-retire-legacy-lanes).
 	return []string{
 		dataDirFor("overlay"),
-		filepath.Join(ENGINE, ".quack", "overlay"), // legacy vehicle overrides
-		EngineDir(),                                // engine defaults (vendored, else dogfood product/)
+		EngineDir(), // engine defaults (vendored, else dogfood product/)
 	}
 }
 
 // EngineDir resolves the read-only engine layer (its default method/ + project_types/). A vehicle
-// vendors the engine under .quack/vendor/quackitect, so that wins; the dogfood repo has no vendor
+// vendors the engine under tools/vendor/quackitect, so that wins; the dogfood repo has no vendor
 // dir and falls back to its own product/quackitect. So gather, guides, and the report resolve engine
 // resources without a hardcoded dogfood path. Never written to. The word "product" is the engine's
-// own — a vehicle's product/ is its tool, never the engine.
+// own — a vehicle's product/ is its tool, never the engine. The .quack/vendor lane retired at i11
+// (adr-retire-legacy-lanes).
 func EngineDir() string {
-	for _, l := range []string{filepath.Join(ENGINE, "tools", "vendor", "quackitect"), filepath.Join(ENGINE, ".quack", "vendor", "quackitect"), filepath.Join(ENGINE, "product", "quackitect")} {
+	for _, l := range []string{filepath.Join(ENGINE, "tools", "vendor", "quackitect"), filepath.Join(ENGINE, "product", "quackitect")} {
 		if st, err := os.Stat(filepath.Join(l, "method")); err == nil && st.IsDir() {
 			return l
 		}
@@ -35,10 +36,10 @@ func EngineDir() string {
 }
 
 // EngineSrc resolves the engine's Go source: vendored under tools/vendor/engine-go in a modern
-// vehicle (i10; .quack/vendor kept as the legacy fallback), else the dogfood product/engine-go.
-// Used for asset fallback, the ratchet, and `start init` vendoring.
+// vehicle (i10), else the dogfood product/engine-go. Used for asset fallback, the ratchet, and
+// `start init` vendoring.
 func EngineSrc() string {
-	for _, l := range []string{filepath.Join(ENGINE, "tools", "vendor", "engine-go"), filepath.Join(ENGINE, ".quack", "vendor", "engine-go"), filepath.Join(ENGINE, "product", "engine-go")} {
+	for _, l := range []string{filepath.Join(ENGINE, "tools", "vendor", "engine-go"), filepath.Join(ENGINE, "product", "engine-go")} {
 		if st, err := os.Stat(l); err == nil && st.IsDir() {
 			return l
 		}

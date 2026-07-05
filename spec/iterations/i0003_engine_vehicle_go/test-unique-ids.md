@@ -6,6 +6,7 @@ verifies: [req-unique-ids]
 class: executed
 verify: selftest:ids
 killer: false
+tests_red: exempt - predates the red-observation mechanism (adr-grandfathers-historical)
 ---
 
 ## Rationale (not load-bearing)

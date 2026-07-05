@@ -1,4 +1,4 @@
-﻿---
+---
 id: test-pager-merge
 type: test
 verifies: [req-pager-merge]

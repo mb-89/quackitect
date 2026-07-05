@@ -6,6 +6,7 @@ verifies: [req-design-language]
 class: executed
 verify: selftest:brand-resolves
 killer: false
+tests_red: exempt - predates the red-observation mechanism (adr-grandfathers-historical)
 ---
 ## Rationale (not load-bearing)
 Guards the overlay resolution of brand assets + the placeholder convention. New self-test (built next).

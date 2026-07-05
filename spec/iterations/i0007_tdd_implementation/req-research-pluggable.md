@@ -6,4 +6,5 @@ statement: Research is a referenced, pluggable capability — Claude Code delega
 depends_on: []
 class: review
 killer: false
+ears: exempt - historical statement, retrofit rejected (adr-grandfathers-historical)
 ---

@@ -6,6 +6,7 @@ verifies: [req-tests-pass-unify]
 class: executed
 verify: selftest:tests-pass-eval
 killer: false
+tests_red: exempt - predates the red-observation mechanism (adr-grandfathers-historical)
 ---
 ## Rationale (not load-bearing)
 New self-test guarding against the two-path divergence.

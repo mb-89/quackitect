@@ -58,7 +58,7 @@ depends_on: [<ids>]
 - lean's derived coverage per milestone (see `rigor/lean/checklist.md`):
   M2 `{req-traced, req-has-test}` · M3 `{adr-traced}` · M4 `{designs-realized, tests-pass}`.
 
-<!-- design: method-ears-block  implements: req-ears-method :: The compose reference carries the five EARS pattern shapes and the authoring instruction, integrated with the i7 tests-red and roles content; new requirement statements at systematic rigor are authored EARS-shaped at compose time and checked forward-only by quack lint against the committed baseline. -->
+<!-- design: method-ears-block  implements: req-ears-method :: The compose reference carries the five EARS pattern shapes and the authoring instruction, integrated with the i7 tests-red and roles content; new requirement statements at systematic rigor are authored EARS-shaped at compose time and checked by quack lint; historical non-EARS statements carry explicit ears exempt markers citing adr-grandfathers-historical (the committed baseline died at i11). -->
 ## EARS — requirement statements (systematic rigor)
 Author every NEW `type: requirement` statement in one of the **five EARS shapes**, with **shall**:
 - **Ubiquitous** — `The <system> shall <response>.`
@@ -68,11 +68,13 @@ Author every NEW `type: requirement` statement in one of the **five EARS shapes*
 - **Optional feature** — `Where <feature>, the <system> shall <response>.`
 
 No **weasel words** (should, may, appropriate, quickly, user-friendly, robust, flexible, …) — state
-the checkable claim. `quack lint` enforces this **forward-only**: only statements not in the committed
-baseline (`spec/ledger/ears-baseline.json`) are checked — blessed history is never retrofitted or re-blessed.
-A genuinely non-EARS requirement carries `ears: exempt - <reason>` in its frontmatter (the reason is
-required; lint counts exemptions). This applies to requirement statements only — tests keep verifying
-(`verifies:`, tests-red discipline) and roles keep binding exactly as above.
+the checkable claim. `quack lint` checks **every** requirement statement. Historical non-EARS
+statements carry an explicit `ears: exempt - <reason>` marker citing their retire-or-retrofit ADR
+(adr-grandfathers-historical) — blessed history is never retrofitted, and no exemption survives
+without its recorded decision. A genuinely non-EARS requirement carries `ears: exempt - <reason>`
+in its frontmatter (the reason is required; lint counts exemptions). This applies to requirement
+statements only — tests keep verifying (`verifies:`, tests-red discipline) and roles keep binding
+exactly as above.
 <!-- enddesign -->
 
 ## No plan-lock bless (step 5d)

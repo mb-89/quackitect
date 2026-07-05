@@ -1,4 +1,4 @@
-﻿# roles — the pluggable implementation seam
+# roles — the pluggable implementation seam
 
 <!-- design: method-role-seam  implements: req-role-seam :: A role is a strategy behind a stable FILE-BASED interface. Default binding for every role is INLINE (the driving agent performs it, today's behaviour). Bindings resolve at seed: iteration.roles ▸ type.roles ▸ default(inline). The engine never runs a role — it only gates the output (tests-red, designs-realized, tests-pass). -->
 A role is a strategy behind a stable, **file-based** interface. Swap it per project type or per

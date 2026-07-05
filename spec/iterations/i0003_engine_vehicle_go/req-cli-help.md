@@ -6,6 +6,7 @@ statement: Every subcommand reacts to -h and --help and -? by printing its usage
 depends_on: []
 class: review
 killer: false
+ears: exempt - historical statement, retrofit rejected (adr-grandfathers-historical)
 ---
 
 ## Rationale (not load-bearing)

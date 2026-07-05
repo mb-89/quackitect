@@ -6,6 +6,7 @@ statement: A milestone gate is reviewed in increasing-scrutiny rounds before it 
 depends_on: []
 class: review
 killer: false
+ears: exempt - historical statement, retrofit rejected (adr-grandfathers-historical)
 ---
 
 ## Rationale (not load-bearing)

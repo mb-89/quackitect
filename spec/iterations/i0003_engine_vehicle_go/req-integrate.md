@@ -6,6 +6,7 @@ statement: An external vehicle can integrate quackitect as an engine with a docu
 depends_on: [req-overlay-resolver]
 class: review
 killer: true
+ears: exempt - historical statement, retrofit rejected (adr-grandfathers-historical)
 ---
 
 ## Rationale (not load-bearing)

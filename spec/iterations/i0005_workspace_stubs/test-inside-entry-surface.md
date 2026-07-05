@@ -6,6 +6,7 @@ verifies: [req-inside-entry-surface]
 class: executed
 verify: selftest:stubs
 killer: false
+tests_red: exempt - predates the red-observation mechanism (adr-grandfathers-historical)
 ---
 ## Rationale (not load-bearing)
 selftest:stubs asserts the entry-surface file exists and is self-contained.

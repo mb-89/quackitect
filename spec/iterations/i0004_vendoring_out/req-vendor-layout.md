@@ -6,6 +6,7 @@ statement: The engine is vendored under .quack/vendor/ mirroring quackitect's pr
 depends_on: []
 class: review
 killer: false
+ears: exempt - historical statement, retrofit rejected (adr-grandfathers-historical)
 ---
 ## Rationale (not load-bearing)
 Grandfathered. Closes the ship->integrate loop (ship zips product/; unzip into .quack/vendor/).

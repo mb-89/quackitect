@@ -1,4 +1,4 @@
-﻿---
+---
 id: req-pager-merge
 type: requirement
 refines: [uc-single-handoff]

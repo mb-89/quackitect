@@ -223,7 +223,7 @@ func coverageDelta(nodes map[string]Node, rule, scope string) []string {
 			}
 		case "tests-red":
 			if n.Type == "test" && n.Class == "executed" && strings.HasPrefix(n.Verify, "selftest:") &&
-				iterOf(n.Path) >= testsRedSince && (scope == "" || iterOf(n.Path) == scope) {
+				!testsRedExempt(n) && (scope == "" || iterOf(n.Path) == scope) {
 				if it := iterOf(n.Path); it != "" && it != readProjectConfig().Version {
 					if _, ok := redObserved()[n.ID]; !ok {
 						out = append(out, "test "+n.ID+" carries no red observation (birth evidence missing)")

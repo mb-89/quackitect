@@ -1,4 +1,4 @@
-﻿<p align="center"><img src="product/brand/logo-mark.svg" width="140" alt="quackitect"></p>
+<p align="center"><img src="product/brand/logo-mark.svg" width="140" alt="quackitect"></p>
 
 # quackitect
 

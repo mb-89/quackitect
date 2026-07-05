@@ -1,4 +1,4 @@
-﻿---
+---
 id: rigor-systematic-checklist
 rigor: systematic
 statement: The systematic-architecting checklist, at full rigor. Each milestone is a user-adjudicated gate. Its checks are the acceptance. A project TYPE may override or extend any item. It may never go below this floor.

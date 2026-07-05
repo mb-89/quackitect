@@ -6,6 +6,7 @@ statement: `quack start init <target>`, run from a quackitect checkout, scaffold
 depends_on: [req-vendor-layout]
 class: review
 killer: true
+ears: exempt - historical statement, retrofit rejected (adr-grandfathers-historical)
 ---
 ## Rationale (not load-bearing)
 Grandfathered. The one-command onboarding the i3 handover carried forward.

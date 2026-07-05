@@ -131,10 +131,10 @@ func coverageRuleUncached(nodes map[string]Node, rule, scope string) bool {
 		// (a run-once record; an edited test's hash changes and must be re-observed). Per the M5 spike.
 		// SCOPED to the check's own iteration (i10 defect fix, per the subtask statement "every NEW
 		// test"): a later iteration's unbuilt tests must not hold an earlier iteration's gate red.
-		// FORWARD-ONLY from i0008 (the first iteration WALKED under this gate; i0007 built the
-		// mechanism): tests authored before observe-red existed can never have been honestly observed
-		// red — recording one today would FABRICATE an attestation, which observe-red now REFUSES
-		// (it runs the test; a pass records nothing).
+		// Tests authored before observe-red existed can never have been honestly observed red —
+		// recording one today would FABRICATE an attestation, which observe-red REFUSES (it runs the
+		// test; a pass records nothing). Each such test carries an explicit `tests_red: exempt`
+		// marker citing its ADR (req-testsred-exempt) — the i0008 date constant is dead.
 		ro := redObserved()
 		memo := map[string]string{}
 		active := readProjectConfig().Version
@@ -142,8 +142,8 @@ func coverageRuleUncached(nodes map[string]Node, rule, scope string) bool {
 		for _, n := range nodes {
 			if n.Type == "test" && n.Class == "executed" && strings.HasPrefix(n.Verify, "selftest:") {
 				it := iterOf(n.Path)
-				if it < testsRedSince {
-					continue // pre-mechanism test; grandfathered, never retro-attested
+				if testsRedExempt(n) {
+					continue // pre-mechanism test; its exemption is a recorded marker, never retro-attested
 				}
 				if scope != "" && it != scope {
 					continue // another iteration's test owes ITS OWN gate a red, not this one
@@ -176,6 +176,9 @@ func coverageRuleUncached(nodes map[string]Node, rule, scope string) bool {
 		var ts []Node
 		for _, n := range nodes {
 			if n.Class == "executed" && !strings.HasPrefix(n.Verify, "coverage:") && inscope(n) {
+				if n.Suite == "standalone" {
+					continue // not a suite member: watches workspace state, not iteration correctness (adr-standalone-suite)
+				}
 				if renderBusy && renderingTests[n.Verify] {
 					continue // bounded: a render never re-runs the test that triggered it
 				}
@@ -199,6 +202,18 @@ func coverageRuleUncached(nodes map[string]Node, rule, scope string) bool {
 	}
 	return false
 }
+
+// design: go-testsred-marker  implements: req-testsred-exempt
+// A test that predates the red-observation mechanism carries its exemption as an EXPLICIT
+// frontmatter marker on the node — `tests_red: exempt - <reason citing its ADR>`
+// (adr-grandfathers-historical) — never a source-code date constant. A bare exempt without a
+// reason is not honored: the test owes its red like any other.
+func testsRedExempt(n Node) bool {
+	e := strings.TrimSpace(n.TestsRed)
+	return strings.HasPrefix(e, "exempt") && len(strings.TrimLeft(strings.TrimPrefix(e, "exempt"), " -–—:")) > 0
+}
+
+// enddesign
 
 // design: go-evidence-honesty  implements: req-evidence-honesty
 // Evidence honesty (#8): a check's cached pass/fail is keyed by the FULL input hash
@@ -232,7 +247,52 @@ func runExecuted(n Node, h string) string {
 	}
 	out, _ := json.MarshalIndent(map[string]interface{}{"result": result, "cmd": n.Verify, "ran": time.Now().Format(time.RFC3339)}, "", "  ")
 	os.WriteFile(cf, out, 0o644)
+	pruneEvidenceCache(cdir)
 	return result
+}
+
+// enddesign
+
+// design: go-evidence-cache-cap  implements: req-evidence-cache-cap
+// A check's verdict cache is bounded: every write keeps the newest evidenceCacheCap
+// .json files in evidence/<id>/ and deletes the rest, oldest first (mtime, then name
+// for a deterministic tie-break). Each changed input hash adds a file, so without the
+// cap a long-lived check grows its evidence dir forever.
+const evidenceCacheCap = 8
+
+// pruneEvidenceCache deletes the oldest verdict files beyond evidenceCacheCap in cdir.
+func pruneEvidenceCache(cdir string) {
+	ents, err := os.ReadDir(cdir)
+	if err != nil {
+		return
+	}
+	type vf struct {
+		name string
+		mod  time.Time
+	}
+	var files []vf
+	for _, e := range ents {
+		if e.IsDir() || !strings.HasSuffix(e.Name(), ".json") {
+			continue
+		}
+		fi, err := e.Info()
+		if err != nil {
+			continue
+		}
+		files = append(files, vf{e.Name(), fi.ModTime()})
+	}
+	if len(files) <= evidenceCacheCap {
+		return
+	}
+	sort.Slice(files, func(i, j int) bool {
+		if !files[i].mod.Equal(files[j].mod) {
+			return files[i].mod.Before(files[j].mod)
+		}
+		return files[i].name < files[j].name
+	})
+	for _, f := range files[:len(files)-evidenceCacheCap] {
+		os.Remove(filepath.Join(cdir, f.name))
+	}
 }
 
 // enddesign

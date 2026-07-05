@@ -6,4 +6,5 @@ statement: A role is a strategy behind a file-based interface (testdesigner reqs
 depends_on: []
 class: review
 killer: false
+ears: exempt - historical statement, retrofit rejected (adr-grandfathers-historical)
 ---

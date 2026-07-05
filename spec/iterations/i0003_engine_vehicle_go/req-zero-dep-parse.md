@@ -6,6 +6,7 @@ statement: The engine parses config.toml and node frontmatter with hand-rolled r
 depends_on: [req-go-engine]
 class: review
 killer: false
+ears: exempt - historical statement, retrofit rejected (adr-grandfathers-historical)
 ---
 
 ## Rationale (not load-bearing)

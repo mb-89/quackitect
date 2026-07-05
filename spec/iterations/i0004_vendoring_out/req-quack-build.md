@@ -6,6 +6,7 @@ statement: A `quack build` determinizer compiles the Go engine AND re-baselines 
 depends_on: []
 class: review
 killer: false
+ears: exempt - historical statement, retrofit rejected (adr-grandfathers-historical)
 ---
 ## Rationale (not load-bearing)
 From the retro: the sequence was hand-run ~8x this session; forgetting re-baseline caused false 'not green' reports. Strongest determinizer candidate.

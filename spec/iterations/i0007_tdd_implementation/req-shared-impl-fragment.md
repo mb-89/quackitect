@@ -6,4 +6,5 @@ statement: Lean and systematic both import ONE shared implementation checklist f
 depends_on: []
 class: review
 killer: false
+ears: exempt - historical statement, retrofit rejected (adr-grandfathers-historical)
 ---

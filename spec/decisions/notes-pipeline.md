@@ -5,6 +5,7 @@ type: requirement
 refines: [uc-note-capture]
 adjudicated_by: human
 killer: true
+ears: exempt - historical statement, retrofit rejected (adr-grandfathers-historical)
 ---
 
 ## Rationale (not load-bearing)

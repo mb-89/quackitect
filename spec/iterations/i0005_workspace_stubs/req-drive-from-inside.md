@@ -6,6 +6,7 @@ statement: From inside a bare workspace, `.\quack status` (and `next`, `bless`) 
 depends_on: [req-inside-launcher, req-inside-entry-surface, req-engine-loc-untracked]
 class: review
 killer: true
+ears: exempt - historical statement, retrofit rejected (adr-grandfathers-historical)
 ---
 ## Rationale (not load-bearing)
 The end-to-end proof and the M7 killer demonstration. Reuses the machinery test (per the user's explicit ask that the roundtrip exercise this feature).

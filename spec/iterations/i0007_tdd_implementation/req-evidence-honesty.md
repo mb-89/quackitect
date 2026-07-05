@@ -6,4 +6,5 @@ statement: A test that fails on a live re-run must never display DONE from cache
 depends_on: []
 class: review
 killer: true
+ears: exempt - historical statement, retrofit rejected (adr-grandfathers-historical)
 ---

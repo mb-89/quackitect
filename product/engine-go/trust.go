@@ -1,4 +1,4 @@
-﻿package main
+package main
 
 // i0008 trust-hardening surface. Authored as stubs first (test-first walk):
 // the selftest_trust.go runners were observed RED against the stubs
@@ -6,7 +6,6 @@
 // build step, where its design: marker lands.
 
 import (
-	"encoding/json"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -38,7 +37,7 @@ var nodeKeysAllow = map[string]bool{
 	"id": true, "type": true, "statement": true, "class": true, "verify": true, "killer": true,
 	"milestone": true, "parent": true, "depends_on": true, "refines": true, "implements": true,
 	"verifies": true, "addresses": true, "validates": true, "ears": true, "adjudicated_by": true,
-	"ready_when": true, "supersedes": true,
+	"ready_when": true, "supersedes": true, "suite": true, "tests_red": true,
 }
 var iterKeysAllow = map[string]bool{
 	"iteration": true, "status": true, "type": true, "rigor": true,
@@ -171,18 +170,19 @@ func strictGuard() {
 
 // design: go-actor-channels  implements: req-actor-channels
 // The bless actor defaults per CHANNEL (adr-actor-channel-stat): an interactive console (BOTH stdin
-// and stdout are char-devices — this harness proves stdin alone lies) defaults to human; any piped /
-// harness-invoked channel defaults to agent, so omission under-claims human oversight (the harmless
-// direction). An explicit `--by <actor>` overrides either. QUACK_ACTOR is retired — env state stamped
-// agent blesses as human when forgotten, blinding the self-cert metric.
+// and stdout are char-devices — this harness proves stdin alone lies) defaults to the user; any
+// piped / harness-invoked channel defaults to agent, so omission under-claims adjudicator oversight
+// (the harmless direction). An explicit `--by <actor>` overrides either, normalized through
+// normActor so new records always write `user` (go-stamp-user). QUACK_ACTOR is retired — env state
+// stamped agent blesses as the user when forgotten, blinding the self-cert metric.
 func resolveActor(args []string, interactive bool) string {
 	for i := 0; i < len(args)-1; i++ {
 		if args[i] == "--by" {
-			return args[i+1]
+			return normActor(args[i+1])
 		}
 	}
 	if interactive {
-		return "human"
+		return "user"
 	}
 	return "agent"
 }
@@ -287,14 +287,13 @@ func logsDir(cfg Config) string {
 // enddesign
 
 // design: go-ears-lint  implements: req-ears-lint
-// Forward-only EARS enforcement (adr-ears-baseline). The committed baseline (.quack/ears-baseline.json,
-// generated once via `lint --ears-baseline`) holds the stmtHash of every requirement existing at
-// feature-land: lint checks ONLY requirements whose current stmtHash is absent — new statements and
-// genuinely re-stated ones — so blessed history is structurally unflaggable, and a MISSING baseline
-// disarms enforcement entirely (fail-safe: never a surprise retrofit). A checked statement must match
-// one of the five EARS shapes and contain "shall"; blocklisted weasel words are flagged;
-// `ears: exempt - <reason>` skips the check and is COUNTED, while a bare exempt without a reason is
-// itself a finding. Applies to type:requirement at systematic rigor (gated at the lint call site).
+// EARS enforcement over EVERY requirement. The anonymous forward-only baseline died at i11
+// (adr-grandfathers-historical): each historical non-EARS statement now carries an explicit
+// `ears: exempt - <reason citing its ADR>` marker, so blessed history stays unflaggable by
+// RECORD, not by a silent set-membership file. A checked statement must match one of the five
+// EARS shapes and contain "shall"; blocklisted weasel words are flagged; `ears: exempt - <reason>`
+// skips the check and is COUNTED, while a bare exempt without a reason is itself a finding.
+// Applies to type:requirement at systematic rigor (gated at the lint call site).
 var earsPrefixes = []string{"the ", "when ", "while ", "if ", "where "}
 var weaselWords = []string{"should", "would", "could", "may", "might", "appropriate", "adequate",
 	"sufficient", "quickly", "easy", "user-friendly", "robust", "flexible", "seamless", "efficient",
@@ -334,7 +333,7 @@ func earsWeasels(stmt string) []string {
 }
 
 // earsFindings returns the findings and the count of honored exemptions.
-func earsFindings(nodes map[string]Node, baseline map[string]bool) ([]string, int) {
+func earsFindings(nodes map[string]Node) ([]string, int) {
 	var findings []string
 	exempt := 0
 	ids := make([]string, 0, len(nodes))
@@ -344,7 +343,7 @@ func earsFindings(nodes map[string]Node, baseline map[string]bool) ([]string, in
 	sort.Strings(ids)
 	for _, id := range ids {
 		n := nodes[id]
-		if n.Type != "requirement" || baseline[stmtHash(n)] {
+		if n.Type != "requirement" {
 			continue
 		}
 		if e := strings.TrimSpace(n.Ears); strings.HasPrefix(e, "exempt") {
@@ -365,48 +364,6 @@ func earsFindings(nodes map[string]Node, baseline map[string]bool) ([]string, in
 	return findings, exempt
 }
 
-// earsBaseline loads the committed baseline; empty result = enforcement disarmed.
-func earsBaselinePath() string {
-	p := filepath.Join(ledgerDir(), "ears-baseline.json")
-	if _, err := os.Stat(p); err == nil {
-		return p
-	}
-	if _, err := os.Stat(filepath.Join(QUACK, "ears-baseline.json")); err == nil {
-		return filepath.Join(QUACK, "ears-baseline.json") // not-yet-migrated
-	}
-	return p
-}
-
-func earsBaseline() map[string]bool {
-	raw, err := os.ReadFile(earsBaselinePath())
-	if err != nil {
-		return nil
-	}
-	var hashes []string
-	if json.Unmarshal(raw, &hashes) != nil {
-		return nil
-	}
-	out := map[string]bool{}
-	for _, h := range hashes {
-		out[h] = true
-	}
-	return out
-}
-
-// earsWriteBaseline records the stmtHash of every CURRENT requirement (the feature-land set).
-func earsWriteBaseline(nodes map[string]Node) int {
-	var hashes []string
-	for _, n := range nodes {
-		if n.Type == "requirement" {
-			hashes = append(hashes, stmtHash(n))
-		}
-	}
-	sort.Strings(hashes)
-	out, _ := json.MarshalIndent(hashes, "", " ")
-	os.WriteFile(earsBaselinePath(), out, 0o644)
-	return len(hashes)
-}
-
 // enddesign
 
 // design: go-monotonic-lint  implements: req-monotonic-lint
@@ -418,10 +375,6 @@ func earsWriteBaseline(nodes map[string]Node) int {
 // i0002 — where the escape was discovered and whose flat wiring is exactly the recorded bug) are
 // grandfathered — rewiring blessed history would mass-suspect gates for zero new safety.
 const monotonicSince = "i0003"
-
-// testsRedSince: the first iteration walked WITH the tests-red gate (i0007 built observe-red;
-// i0008 first consumed it). Earlier tests are grandfathered — see coverage.go tests-red.
-const testsRedSince = "i0008"
 
 func monotonicFindings(nodes map[string]Node) []string {
 	var findings []string

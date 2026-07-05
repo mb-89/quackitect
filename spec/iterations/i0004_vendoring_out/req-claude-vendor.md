@@ -6,6 +6,7 @@ statement: `start init` vendors the .claude/ slash commands (engage, note, revie
 depends_on: [req-vehicle-scaffold]
 class: review
 killer: false
+ears: exempt - historical statement, retrofit rejected (adr-grandfathers-historical)
 ---
 ## Rationale (not load-bearing)
 Grandfathered. Without it the agent can't drive the vehicle with /engage etc.

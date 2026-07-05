@@ -6,6 +6,7 @@ statement: In the report, a DONE check links to its VERDICT — the bless attest
 depends_on: []
 class: review
 killer: false
+ears: exempt - historical statement, retrofit rejected (adr-grandfathers-historical)
 ---
 ## Rationale (not load-bearing)
 From the inbox: report enhancement (uc-review-board).

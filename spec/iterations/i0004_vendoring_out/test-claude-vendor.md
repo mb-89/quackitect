@@ -6,6 +6,7 @@ verifies: [req-claude-vendor]
 class: executed
 verify: selftest:claude-vendor
 killer: false
+tests_red: exempt - predates the red-observation mechanism (adr-grandfathers-historical)
 ---
 ## Rationale (not load-bearing)
 New self-test over the rewrite.

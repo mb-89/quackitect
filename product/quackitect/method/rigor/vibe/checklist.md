@@ -1,4 +1,4 @@
-﻿---
+---
 id: rigor-vibe-checklist
 rigor: vibe
 statement: The vibe checklist. No gates. Build it and leave a one-line rationale. For throwaways only. If it will be kept or maintained, step up to lean.

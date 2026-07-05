@@ -6,6 +6,7 @@ statement: Two small tooling fixes. quack ship names the artifact by the current
 depends_on: []
 class: review
 killer: false
+ears: exempt - historical statement, retrofit rejected (adr-grandfathers-historical)
 ---
 
 ## Rationale (not load-bearing)

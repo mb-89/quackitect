@@ -6,6 +6,7 @@ statement: Milestones are DERIVED coverage gates over the typed trace, not hand-
 depends_on: [req-split]
 class: review
 killer: false
+ears: exempt - historical statement, retrofit rejected (adr-grandfathers-historical)
 ---
 
 ## Rationale (not load-bearing)

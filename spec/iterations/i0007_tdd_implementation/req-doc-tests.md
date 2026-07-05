@@ -6,4 +6,5 @@ statement: For non-code deliverables the test-designer pushes each acceptance cr
 depends_on: []
 class: review
 killer: false
+ears: exempt - historical statement, retrofit rejected (adr-grandfathers-historical)
 ---

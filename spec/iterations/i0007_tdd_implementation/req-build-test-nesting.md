@@ -6,4 +6,5 @@ statement: The report nests generated build steps under a single build parent (a
 depends_on: []
 class: review
 killer: false
+ears: exempt - historical statement, retrofit rejected (adr-grandfathers-historical)
 ---

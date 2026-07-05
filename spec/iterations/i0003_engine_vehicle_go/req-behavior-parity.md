@@ -6,6 +6,7 @@ statement: The Go engine preserves the exact observable behavior of the Python e
 depends_on: [req-go-engine]
 class: review
 killer: true
+ears: exempt - historical statement, retrofit rejected (adr-grandfathers-historical)
 ---
 
 ## Rationale (not load-bearing)

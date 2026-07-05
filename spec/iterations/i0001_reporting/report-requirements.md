@@ -6,6 +6,7 @@ statement: The report's requirements, each checkable. (a) Deterministic byte-ide
 depends_on: [report-frame]
 class: review
 killer: true
+ears: exempt - historical statement, retrofit rejected (adr-grandfathers-historical)
 ---
 
 ## Rationale (not load-bearing)

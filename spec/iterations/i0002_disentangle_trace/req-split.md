@@ -6,6 +6,7 @@ statement: The trace is a FIXED 5-layer V-model of typed nodes: need, use-case (
 depends_on: []
 class: review
 killer: true
+ears: exempt - historical statement, retrofit rejected (adr-grandfathers-historical)
 ---
 
 ## Rationale (not load-bearing)

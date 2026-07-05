@@ -6,6 +6,7 @@ verifies: [req-no-trace-gate]
 class: executed
 verify: selftest:no-trace-gate
 killer: false
+tests_red: exempt - predates the red-observation mechanism (adr-grandfathers-historical)
 ---
 ## Rationale (not load-bearing)
 New invariant self-test.

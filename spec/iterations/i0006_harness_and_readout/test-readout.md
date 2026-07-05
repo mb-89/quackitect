@@ -6,6 +6,7 @@ statement: Selftest asserts the progress bar and handover one-pager render deter
 class: review
 verify: selftest:readout
 killer: false
+tests_red: exempt - predates the red-observation mechanism (adr-grandfathers-historical)
 ---
 ## Rationale (not load-bearing)
 i0006 test. Selftest built in M4; RED until then.

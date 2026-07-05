@@ -6,4 +6,5 @@ statement: coverage:tests-red exists as an engine rule; a fixture requirement wi
 class: executed
 verify: selftest:tests-red
 killer: false
+tests_red: exempt - predates the red-observation mechanism (adr-grandfathers-historical)
 ---

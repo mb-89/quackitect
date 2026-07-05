@@ -6,6 +6,7 @@ statement: Every user interaction produces visible feedback within 1 second on a
 depends_on: []
 class: review
 killer: false
+ears: exempt - historical statement, retrofit rejected (adr-grandfathers-historical)
 ---
 
 ## Rationale (not load-bearing)

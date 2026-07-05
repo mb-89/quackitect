@@ -6,6 +6,7 @@ statement: The engine is a single statically-linked Go binary. It has zero runti
 depends_on: []
 class: review
 killer: true
+ears: exempt - historical statement, retrofit rejected (adr-grandfathers-historical)
 ---
 
 ## Rationale (not load-bearing)

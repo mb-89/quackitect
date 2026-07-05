@@ -336,10 +336,7 @@ func checksMap(nodes map[string]Node, sm map[string]string, outDir string) map[s
 			if n.Class == "executed" {
 				verdict = "self-certified · executed"
 			} else if e, ok := bl[id]; ok {
-				actor := e.Actor
-				if actor == "" {
-					actor = "human"
-				}
+				actor := normActor(e.Actor) // pre-i11 records read as user (go-stamp-user)
 				h := e.Hash
 				if len(h) > 8 {
 					h = h[:8]
@@ -620,6 +617,15 @@ func metricCards(nodes map[string]Node, sm map[string]string, cfg Config) string
 		{"Rework rate", fmt.Sprintf("%d / %d", mx["rework"][0], mx["rework"][1]), "checks re-blessed ÷ blessed checks"},
 		{"Self-cert ratio", fmt.Sprintf("%d / %d", mx["selfcert"][0], mx["selfcert"][1]), "agent-blessed killers ÷ killer checks"},
 	}
+	// standalone checks: one card each, evaluated LIVE (adr-standalone-suite — workspace-state
+	// watchers; a cached verdict would freeze the tripwire).
+	for _, n := range standaloneChecks(nodes) {
+		v := "OK ✓"
+		if !runSelftest(strings.TrimSpace(n.Verify[len("selftest:"):])) {
+			v = "RED ✗"
+		}
+		cards = append(cards, card{"Workspace check: " + n.ID, v, "standalone — live, outside every verification suite"})
+	}
 	var b strings.Builder
 	for _, c := range cards {
 		b.WriteString(fmt.Sprintf("<div class=\"card\" data-mlabel=\"%s\" data-mval=\"%s\" data-mform=\"%s\"><div class=\"cval\">%s</div><div class=\"clabel\">%s</div></div>",
@@ -633,9 +639,10 @@ func projectDesc() string {
 	if err != nil {
 		return ""
 	}
-	// The leading text paragraphs: skip structural lines (headings, HTML, blockquotes,
+	// The FIRST TWO text paragraphs: skip structural lines (headings, HTML, blockquotes,
 	// tables, images, rules, fences); collect consecutive text paragraphs and stop at the
-	// first structural line after text began.
+	// first structural line after text began, capped at two. BOM-stripped per line — a
+	// BOM'd README once smuggled its logo markup past the '<' check (caught live at i11).
 	var paras []string
 	var cur []string
 	collecting := false
@@ -645,8 +652,8 @@ func projectDesc() string {
 			cur = nil
 		}
 	}
-	for _, line := range strings.Split(string(raw), "\n") {
-		t := strings.TrimSpace(line)
+	for _, line := range strings.Split(strings.TrimPrefix(string(raw), "\ufeff"), "\n") {
+		t := strings.TrimSpace(strings.TrimPrefix(line, "\ufeff"))
 		if t == "" {
 			flush()
 			continue
@@ -665,6 +672,9 @@ func projectDesc() string {
 		cur = append(cur, t)
 	}
 	flush()
+	if len(paras) > 2 {
+		paras = paras[:2] // the card carries the first TWO text paragraphs, no more
+	}
 	text := strings.Join(paras, "\n\n")
 	for _, m := range []string{"**", "*", "`"} {
 		text = strings.ReplaceAll(text, m, "")

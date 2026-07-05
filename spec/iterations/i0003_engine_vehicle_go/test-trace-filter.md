@@ -6,6 +6,7 @@ verifies: [req-trace-filter]
 class: executed
 verify: selftest:report
 killer: false
+tests_red: exempt - predates the red-observation mechanism (adr-grandfathers-historical)
 ---
 
 ## Rationale (not load-bearing)

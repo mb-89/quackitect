@@ -1,4 +1,4 @@
-﻿---
+---
 id: writing-killer-checks
 scope: always
 statement: How to write killer checks. The steps most dangerous to skip. Few, exact, placed at real pause points.

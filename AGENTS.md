@@ -1,4 +1,4 @@
-﻿# AGENTS.md — how to drive Quackitect
+# AGENTS.md — how to drive Quackitect
 
 > Hand-authored entry hub. Every harness pointer file routes here
 > (`CLAUDE.md`, `.github/copilot-instructions.md`). The binding contract lives
@@ -47,7 +47,8 @@ quack next               # the next ready check to walk
 quack start <id> [--plan]# activate a version (--plan registers a future one)
 quack start stubs [path] # emit drive-from-inside stubs into a bare workspace
 quack why <id>           # what input changed
-quack bless [--all|<id>] [--by human|agent] # record an adjudication; actor defaults by CHANNEL
+quack bless [--all|<id>] [--by user|agent] # record an adjudication; actor defaults by CHANNEL
+quack migrate-actors     # one-shot: rewrite pre-i11 actor stamps to user (audited; no-op when done)
 quack note "<text>"      # deterministic capture lane
 quack notes [--all]      # list open inbox notes (--all adds backlog + archive)
 quack observe-red <test> # run a test and record it FAILING at its current hash (a pass is refused)
@@ -56,7 +57,7 @@ quack report [--watch]   # render+open the live HTML board (--out F renders only
 quack progress [--pager <gate>] # the readout, or the handover pager for a killer/milestone gate
 quack ship               # package product/ -> the workspace data home (out/)
 quack build              # compile the engine, write the build stamp, re-baseline golden-root
-quack lint [--ears-baseline] # coverage holes, duplicate ids, EARS lint, monotonic wiring
+quack lint               # coverage holes, duplicate ids, EARS lint, monotonic wiring
 quack selftest           # the engine's own dependency-free self-test
 quack version            # engine version + the resolved data locations
 ```

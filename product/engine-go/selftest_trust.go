@@ -110,8 +110,8 @@ func selftestActorChannels() bool {
 	os.Setenv("QUACK_ACTOR", "human") // must have NO effect anymore
 	defer os.Setenv("QUACK_ACTOR", old)
 	return resolveActor(nil, false) == "agent" &&
-		resolveActor(nil, true) == "human" &&
-		resolveActor([]string{"--by", "human"}, false) == "human" &&
+		resolveActor(nil, true) == "user" && // the console channel stamps the user (go-stamp-user)
+		resolveActor([]string{"--by", "human"}, false) == "user" && // delegated blesses write the current vocabulary
 		resolveActor([]string{"--by", "agent"}, true) == "agent"
 }
 
@@ -369,9 +369,9 @@ func selftestLogsDir() bool {
 }
 
 // selftestEarsLint — test-ears-lint: the five shapes + shall pass, weasel words
-// and shapeless prose are flagged; a baselined (pre-existing blessed) statement
-// is NEVER flagged; ears:exempt with a reason is counted, not flagged; exempt
-// without a reason IS flagged.
+// and shapeless prose are flagged; a historical statement carrying its explicit
+// exempt marker (the baseline died — adr-grandfathers-historical) is counted,
+// not flagged; exempt without a reason IS flagged.
 func selftestEarsLint() bool {
 	for _, ok := range []string{
 		"The engine shall exit nonzero on a malformed node.",
@@ -403,17 +403,17 @@ func selftestEarsLint() bool {
 		return Node{ID: id, Type: "requirement", Statement: stmt, Ears: ears,
 			Path: filepath.Join(SPEC, "iterations", "ix", id+".md")}
 	}
-	oldBad := mkReq("req-old", "Old prose statement without shape.", "")
+	oldBad := mkReq("req-old", "Old prose statement without shape.",
+		"exempt - historical statement, retrofit rejected (adr-grandfathers-historical)")
 	newBad := mkReq("req-new", "New prose statement without shape.", "")
 	newGood := mkReq("req-good", "The engine shall be verified.", "")
 	exemptOK := mkReq("req-ex", "Free-form by design.", "exempt - narrative requirement, reason recorded")
 	exemptBare := mkReq("req-exbare", "Free-form without reason.", "exempt")
 	nodes := map[string]Node{"req-old": oldBad, "req-new": newBad, "req-good": newGood,
 		"req-ex": exemptOK, "req-exbare": exemptBare}
-	baseline := map[string]bool{stmtHash(oldBad): true} // pre-existing blessed → grandfathered
-	findings, exempt := earsFindings(nodes, baseline)
-	if exempt != 1 {
-		return false
+	findings, exempt := earsFindings(nodes)
+	if exempt != 2 {
+		return false // the marked historical statement + the narrative exemption both count
 	}
 	hit := func(id string) bool {
 		for _, f := range findings {

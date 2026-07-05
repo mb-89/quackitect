@@ -6,6 +6,7 @@ statement: A dependency-check prompt lists each build and development dependency
 depends_on: []
 class: review
 killer: false
+ears: exempt - historical statement, retrofit rejected (adr-grandfathers-historical)
 ---
 
 ## Rationale (not load-bearing)

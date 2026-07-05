@@ -6,6 +6,7 @@ verifies: [req-dep-prompt]
 class: executed
 verify: selftest:deps-prompt
 killer: false
+tests_red: exempt - predates the red-observation mechanism (adr-grandfathers-historical)
 ---
 
 ## Rationale (not load-bearing)

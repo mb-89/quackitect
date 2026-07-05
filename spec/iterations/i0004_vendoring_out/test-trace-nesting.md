@@ -6,6 +6,7 @@ verifies: [req-trace-nesting]
 class: executed
 verify: selftest:report-nesting
 killer: false
+tests_red: exempt - predates the red-observation mechanism (adr-grandfathers-historical)
 ---
 ## Rationale (not load-bearing)
 New self-test over the render hierarchy.

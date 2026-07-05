@@ -1,4 +1,4 @@
-﻿package main
+package main
 
 import (
 	"crypto/rand"
@@ -250,7 +250,7 @@ func attestRedeem(code, answer string) (string, error) {
 // contract.md and NOTHING else — the unlock instructions live only inside the contract, so the sole
 // path to a key runs through the file. The interactive console (a person, i8 channel stat) is never
 // gated by its own machinery.
-var attestGatedCmds = map[string]bool{"next": true, "start": true, "bless": true, "ship": true, "observe-red": true}
+var attestGatedCmds = map[string]bool{"next": true, "start": true, "bless": true, "ship": true, "observe-red": true, "migrate-actors": true}
 
 func attestRequired(cmd string, interactive bool) bool {
 	return !interactive && attestGatedCmds[cmd]

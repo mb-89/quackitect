@@ -6,6 +6,7 @@ statement: The engine is brand-agnostic in all user-facing output — the brand 
 depends_on: [req-vehicle-scaffold]
 class: review
 killer: false
+ears: exempt - historical statement, retrofit rejected (adr-grandfathers-historical)
 ---
 ## Rationale (not load-bearing)
 Grandfathered. White-label via argv[0]; user chose to keep .quack/ like .git/.

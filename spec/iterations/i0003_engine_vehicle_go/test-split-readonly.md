@@ -6,6 +6,7 @@ verifies: [req-engine-vehicle-split, req-overlay-resolver]
 class: executed
 verify: selftest:split
 killer: false
+tests_red: exempt - predates the red-observation mechanism (adr-grandfathers-historical)
 ---
 
 ## Rationale (not load-bearing)

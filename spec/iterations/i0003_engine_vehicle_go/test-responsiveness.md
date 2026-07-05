@@ -6,6 +6,7 @@ verifies: [req-responsiveness]
 class: executed
 verify: selftest:perf
 killer: false
+tests_red: exempt - predates the red-observation mechanism (adr-grandfathers-historical)
 ---
 
 ## Rationale (not load-bearing)

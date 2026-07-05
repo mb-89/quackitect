@@ -6,6 +6,7 @@ verifies: [guidance, planning, refine-track]
 class: executed
 verify: selftest:method
 killer: false
+tests_red: exempt - predates the red-observation mechanism (adr-grandfathers-historical)
 ---
 
 ## Rationale (not load-bearing)

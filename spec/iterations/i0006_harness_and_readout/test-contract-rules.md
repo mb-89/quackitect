@@ -6,6 +6,7 @@ statement: Selftest asserts the contract and entry surfaces carry the required c
 class: review
 verify: selftest:contract
 killer: false
+tests_red: exempt - predates the red-observation mechanism (adr-grandfathers-historical)
 ---
 ## Rationale (not load-bearing)
 i0006 test. Selftest built in M4; RED until then.

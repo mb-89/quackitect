@@ -6,6 +6,7 @@ verifies: [command-surface, composition, notes-pipeline]
 class: executed
 verify: selftest:surface
 killer: false
+tests_red: exempt - predates the red-observation mechanism (adr-grandfathers-historical)
 ---
 
 ## Rationale (not load-bearing)

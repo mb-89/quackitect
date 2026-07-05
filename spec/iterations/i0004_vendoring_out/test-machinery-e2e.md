@@ -6,6 +6,7 @@ verifies: [req-workspace-split]
 class: review
 verify: selftest:workspace
 killer: true
+tests_red: exempt - predates the red-observation mechanism (adr-grandfathers-historical)
 ---
 ## Rationale (not load-bearing)
 The i4 killer end-to-end demonstration (the user's acceptance bar). selftest:workspace exercises the machinery non-interactively where possible; the full bless walk is demonstrated live at M7. Empty trace -> coverage vacuously green; review gates blessed with machinery-test rationale.

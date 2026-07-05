@@ -1,4 +1,4 @@
-﻿# review — assess & look back:  readout | retro | report
+# review — assess & look back:  readout | retro | report
 
 ## readout
 Summarize the board (`quack status`). Show DONE, SUSPECT, and OPEN counts. Name the next gate.
@@ -16,6 +16,6 @@ Run it at `engage start`, or on demand. Emit improvement notes only. Adopt nothi
 6. **Spot determinizer candidates.** Start with the engine call log: `<data-home>/logs/calls.jsonl` (one redacted line per dispatch). Aggregate it — top commands by count, failure rate (`exit != 0`), slow calls (`ms`), channel mix. React when a command is called too often or keeps failing. Then DELETE the file — retention is retro-bound (adr-call-log); it has served its purpose. Then read the session logs — they live in the workspace DATA HOME, never the repo: `<data-home>/logs/` (`quack version` prints the exact path; a `logs_dir` key in the GLOBAL user config overrides it). Which scripts did the AI write that the determinizer could own? A script that failed a few times is a strong lead. The fix may be a new tool. It may be better guidance.
 
 ## report
-Render the deterministic HTML board: `quack report`. With no args it renders AND opens the report. Pass `--out F` to render only, no open; `--watch` serves it and auto-reloads when the source changes. The determinizer owns it. No judgment. It writes `.quack/out/report.html` by default.
+Render the deterministic HTML board: `quack report`. With no args it renders AND opens the report. Pass `--out F` to render only, no open; `--watch` serves it and auto-reloads when the source changes. The determinizer owns it. No judgment. It writes `report.html` into the workspace data home's `out/` by default (`quack version` prints the location).
 The report is a **display**: it recomputes the status **live** on every render (no cached snapshot), so it can never show a stale or cached pass, and two renders of the same state are byte-identical.
 You MAY add a short user-facing narrative ("where we are / notable risks"). Keep it a separate, OPTIONAL layer on top. It is not part of the deterministic core. Do not let it be mistaken for it.

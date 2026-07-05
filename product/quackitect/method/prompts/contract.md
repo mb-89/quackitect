@@ -1,4 +1,4 @@
-﻿# contract — the binding rules of the loop
+# contract — the binding rules of the loop
 
 <!-- design: method-contract-delivery  implements: req-confirm-back, req-active-imperative, req-copilot-instructions :: The contract reaches the agent through each harness's native, auto-loaded channel (CLAUDE.md for Claude Code; .github/copilot-instructions.md for Copilot) as an unbroken chain of ACTIVE, enumerated imperatives: the pointer file commands following AGENTS.md to the letter; AGENTS.md commands read this file in full, paraphrase its specifics back, confirm you will obey. Never a passive pointer — every link is a command. The paraphrase is the detectable proof the rules loaded; attest is the structural backstop when it doesn't. -->
 You are bound by these rules the moment you act on this project. They are not
@@ -25,7 +25,7 @@ evidence. Move on. Do not look ahead. Do not refactor. Do not "improve" code
 the check did not name. Do not check `status`, `lint`, or `selftest` between
 steps. The engine does the checking.
 
-<!-- design: method-adjudication  implements: req-bless-y-console, req-contract-killer-relax :: Rule 3, adjudication: FILL vs ADJUDICATE; the agent may bless a killer only on the user's explicit, gate-specific authorization (actor=agent); a user "y" to a presented handover pager IS that authorization, recorded actor=human as a console bless. -->
+<!-- design: method-adjudication  implements: req-bless-y-console, req-contract-killer-relax :: Rule 3, adjudication: FILL vs ADJUDICATE; the agent may bless a killer only on the user's explicit, gate-specific authorization (actor=agent); a user "y" to a presented handover pager IS that authorization, recorded actor=user as a console bless. -->
 ## 3. The user adjudicates the gates
 You FILL. The user ADJUDICATES. By default, do not run `bless` on a killer
 gate for the user — ALWAYS present the handover pager (`quack progress --pager
@@ -36,7 +36,7 @@ direct instruction naming that bless; a blanket "keep going" or "continue" is
 not permission to bless a killer.
 
 A user **"y" / "yes" / "bless"** in reply to a presented handover pager IS an
-explicit bless of that gate — run it stamped `actor=human` (as if they typed it
+explicit bless of that gate — run it stamped `actor=user` (as if they typed it
 at the console). Any ambiguous reply is not a bless; the gate stays open.
 
 You may bless a non-killer review yourself, stamped `actor=agent`.

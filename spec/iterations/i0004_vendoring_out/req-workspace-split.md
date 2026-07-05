@@ -6,6 +6,7 @@ statement: The engine operates on a selectable WORKSPACE separate from itself. A
 depends_on: [req-vendor-layout]
 class: review
 killer: true
+ears: exempt - historical statement, retrofit rejected (adr-grandfathers-historical)
 ---
 ## Rationale (not load-bearing)
 sebot `base`-style: tools operate against a target root, all project state under it; the engine is stateless w.r.t. the project. Lets quack and vehicles drive many projects from one engine. The machinery-test acceptance (create vehicle -> dummy workspace -> full max-rigor iteration -> all milestones green) is the end-to-end proof and the M7 killer demonstration.

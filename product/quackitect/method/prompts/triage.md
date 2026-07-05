@@ -1,9 +1,10 @@
 # quack triage — process the inbox
 
-For each note in `.quack/notes/inbox/`, route it to exactly one home. Then move the file.
+For each note in the workspace data home's `notes/inbox/` (`quack version` prints the data home;
+`quack notes` lists them), route it to exactly one home. Then move the file.
 
 - **this iteration** — only if it is in scope and the iteration is unlocked. Rare. Usually defer.
-- **backlog** — future scope. Move it to `.quack/notes/backlog/`. Add a one-line "ready when…".
+- **backlog** — future scope. Move it to `<data-home>/notes/backlog/`. Add a one-line "ready when…".
 - **method** — a process or checklist improvement. Harvest it into the relevant type/rigor template.
 - **archive** — done, or a durable rejection WITH its reason. So it is never re-litigated.
 

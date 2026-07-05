@@ -6,6 +6,7 @@ statement: Selftest asserts the lean checklist template carries the derived cove
 class: review
 verify: selftest:correctness
 killer: false
+tests_red: exempt - predates the red-observation mechanism (adr-grandfathers-historical)
 ---
 ## Rationale (not load-bearing)
 i0006. Only req-lean-enforces-trace is new; the other two retro notes were already realized in i0004.

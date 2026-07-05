@@ -5,6 +5,7 @@ type: requirement
 refines: [uc-engage-start]
 class: judgment
 killer: false
+ears: exempt - historical statement, retrofit rejected (adr-grandfathers-historical)
 ---
 
 ## Rationale (not load-bearing)

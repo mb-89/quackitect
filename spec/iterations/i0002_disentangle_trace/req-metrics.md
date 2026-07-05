@@ -6,6 +6,7 @@ statement: Attest becomes an append-only event log of bless, reopen, and reverse
 depends_on: []
 class: review
 killer: false
+ears: exempt - historical statement, retrofit rejected (adr-grandfathers-historical)
 ---
 
 ## Rationale (not load-bearing)
