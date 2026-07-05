@@ -1,0 +1,8 @@
+filters:
+  and:
+    - 'type == "adr"'
+    - 'kind == "project"'
+views:
+  - type: table
+    name: Project decisions
+    order: [file.name, statement]

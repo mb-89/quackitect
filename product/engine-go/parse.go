@@ -29,8 +29,27 @@ type Node struct {
 	Suite    string // "" | "standalone": not a member of the verification suites; own board entry (adr-standalone-suite)
 	Ears     string // "" | "exempt - <reason>": EARS-lint exemption with its required reason (req-ears-lint)
 	TestsRed string // "" | "exempt - <reason>": pre-mechanism tests-red exemption, recorded ON the node (req-testsred-exempt)
+	Guidance string // "" | <slug>: points at the guidance doc holding this node's internals (req-guidance-split)
+	Mode     string // manifest nodes only: chapter | preset | deck | exclude (req-book-manifests)
 	ReadyWhen  string   // defer condition (go-decisions): write-once; scrap edge + ready_when = defer
 	Supersedes []string // decision exit (go-decisions): an incoming supersedes edge = superseded
+	// design: go-ratings-map  implements: req-ratings-map
+	// One-level frontmatter maps (a key with an empty value followed by indented sub: value
+	// lines), exposed generically to views. One level only - a deeper nest refuses at strict load.
+	Maps map[string]map[string]string // e.g. ratings: {criterion: score}
+	// enddesign
+	// design: go-items  implements: req-decision-kinds, req-candidates
+	// The item machinery (owner walk 2026-07-05): ONE decision type with a kind
+	// (architecture | project | waiver; empty = architecture for blessed history) rendered
+	// in its owning chapter's view; candidate nodes carry an axis and 0..1 ratings, and
+	// DECISIONS choose or reject them through links - candidate status derives from the
+	// links, never stored; rejected candidates stay referenced so history survives.
+	Kind     string   // decision kind | requirement kind (functional|quality|constraint|interface)
+	Axis     string   // candidate: the decision axis it answers
+	Chosen   []string // decision: the candidate(s) it picks
+	Rejected []string // decision: the candidate(s) it turns down, reasons in the body
+	Refers   []string // rationale: the clause keys it explains (node ids or id#heading anchors)
+	// enddesign
 }
 
 // Config is the iteration breadcrumb from .quack/config.toml.
@@ -60,12 +79,31 @@ func ParseNode(path string) Node {
 	if len(parts) >= 3 {
 		fm = parts[1]
 	}
+	curMap := "" // design: go-ratings-map (continued): the open map key while its indented entries run
 	for _, line := range strings.Split(fm, "\n") {
 		if !strings.Contains(line, ":") {
 			continue
 		}
+		indented := len(line) > 0 && (line[0] == ' ' || line[0] == '\t')
 		kv := strings.SplitN(line, ":", 2)
 		k, v := strings.TrimSpace(kv[0]), strings.TrimSpace(kv[1])
+		if indented && curMap != "" {
+			if v != "" {
+				if n.Maps == nil {
+					n.Maps = map[string]map[string]string{}
+				}
+				if n.Maps[curMap] == nil {
+					n.Maps[curMap] = map[string]string{}
+				}
+				n.Maps[curMap][k] = v
+			}
+			continue
+		}
+		if v == "" {
+			curMap = k
+			continue
+		}
+		curMap = ""
 		switch k {
 		case "statement":
 			n.Statement = v
@@ -103,6 +141,20 @@ func ParseNode(path string) Node {
 			n.Ears = v
 		case "tests_red":
 			n.TestsRed = v
+		case "guidance":
+			n.Guidance = v
+		case "mode":
+			n.Mode = v
+		case "kind":
+			n.Kind = v
+		case "axis":
+			n.Axis = v
+		case "chosen":
+			n.Chosen = splitIDs(v)
+		case "rejected":
+			n.Rejected = splitIDs(v)
+		case "refers":
+			n.Refers = splitIDs(v)
 		case "suite":
 			n.Suite = v
 		case "milestone":

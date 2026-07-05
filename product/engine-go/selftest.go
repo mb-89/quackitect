@@ -183,6 +183,90 @@ func runSelftest(name string) bool {
 		return selftestStampUser()
 	case "testsred-exempt":
 		return selftestTestsredExempt()
+	case "authoring-cheap":
+		return selftestAuthoringCheap()
+	case "ai-drafting":
+		return selftestAiDrafting()
+	case "guidance-split":
+		return selftestGuidanceSplit()
+	case "method-map":
+		return selftestMethodMap()
+	case "template-system":
+		return selftestTemplateSystem()
+	case "evidence-templates":
+		return selftestEvidenceTemplates()
+	case "mint-skeleton":
+		return selftestMintSkeleton()
+	case "type-stakeholders":
+		return selftestTypeStakeholders()
+	case "book-manifests":
+		return selftestBookManifests()
+	case "book-orphan-lint":
+		return selftestBookOrphans()
+	case "book-single-file":
+		return selftestBookSingleFile()
+	case "book-depth":
+		return selftestBookDepth()
+	case "book-dom-static":
+		return selftestBookDomStatic()
+	case "chapter-tldr":
+		return selftestChapterTldr()
+	case "book-identity":
+		return selftestBookIdentity()
+	case "llm-digestible":
+		return selftestLlmDigestible()
+	case "book-figures":
+		return selftestBookFigures()
+	case "glossary-shared":
+		return selftestGlossaryShared()
+	case "meta-quarantine":
+		return selftestMetaQuarantine()
+	case "book-honesty":
+		return selftestBookHonesty()
+	case "provenance-icons":
+		return selftestProvenanceIcons()
+	case "agents-emit":
+		return selftestAgentsEmit()
+	case "book-drift":
+		return selftestBookDrift()
+	case "register-advisory":
+		return selftestRegisterAdvisory()
+	case "book-a11y":
+		return selftestBookA11y()
+	case "deck-mode":
+		return selftestDeckMode()
+	case "ratings-map":
+		return selftestRatingsMap()
+	case "base-views":
+		return selftestBaseViews()
+	case "spec-content-roots":
+		return selftestSpecContentRoots()
+	case "auto-link":
+		return selftestAutoLink()
+	case "ch2-derived":
+		return selftestCh2Derived()
+	case "fig-tables":
+		return selftestFigTables()
+	case "decision-kinds":
+		return selftestDecisionKinds()
+	case "candidates":
+		return selftestCandidates()
+	case "facet-board":
+		return selftestFacetBoard()
+	case "external-links":
+		return selftestExternalLinks()
+	case "residue-lint":
+		return selftestResidueLint()
+	case "anchor-refers":
+		return selftestAnchorRefers()
+	case "quarantine-scope":
+		return selftestQuarantineScope()
+	case "item-templates":
+		return selftestItemTemplates()
+	case "spec-template-set":
+		return selftestSpecTemplateSet()
+	case "stub-spec":
+		return selftestStubSpec()
 	case "contract-render":
 		return selftestContractRender()
 	case "render-drift":
@@ -675,7 +759,7 @@ func selftestStubs() bool {
 // RunSelftestCLI runs one named check (or all) and returns an exit code.
 func RunSelftestCLI(args []string) int {
 	all := []string{"deps", "parser", "determinism", "ids", "help", "parity", "perf", "deps-prompt", "report", "split", "integrate", "engine", "method", "surface", "build", "no-trace-gate", "tests-pass-eval", "workspace", "brand", "claude-vendor", "report-verdict", "report-nesting", "brand-resolves", "validation-global", "stubs", "readout", "contract", "bootstrap", "correctness", "report-live", "evidence-honesty", "tests-red", "parser-strict", "ref-integrity", "actor-channels", "design-hash-norm", "kernel-vectors", "kernel-cone", "kernel-gatewalk", "kernel-attest", "logs-dir", "ears-lint", "ears-method", "monotonic-lint",
-		"attest-block", "attest-console", "attest-challenge", "attest-grant", "attest-renewal", "attest-keys", "attest-expiry", "contract-render", "render-drift", "logs-canonical", "data-dir-caches", "truth-in-spec", "root-marker", "clean-status", "global-config", "global-binary", "engine-ratchet", "notes-out", "decisions-folder", "decision-classes", "parked-list", "decision-realized", "mint", "report-why", "report-filter-ux", "vv-time-scope", "verify-cache", "verify-feedback", "status-fast", "why-derived", "notes-list", "call-log", "mint-dedupe", "mint-rationale", "ratchet-semantic", "scaffold-modern", "pager-merge", "user-wording", "parity-standalone", "pager-scope", "suspect-root", "evidence-cache-cap", "evidence-hashed", "grandfathers-decided", "legacy-lanes-retired", "stamp-user", "testsred-exempt"}
+		"attest-block", "attest-console", "attest-challenge", "attest-grant", "attest-renewal", "attest-keys", "attest-expiry", "contract-render", "render-drift", "logs-canonical", "data-dir-caches", "truth-in-spec", "root-marker", "clean-status", "global-config", "global-binary", "engine-ratchet", "notes-out", "decisions-folder", "decision-classes", "parked-list", "decision-realized", "mint", "report-why", "report-filter-ux", "vv-time-scope", "verify-cache", "verify-feedback", "status-fast", "why-derived", "notes-list", "call-log", "mint-dedupe", "mint-rationale", "ratchet-semantic", "scaffold-modern", "pager-merge", "user-wording", "parity-standalone", "pager-scope", "suspect-root", "evidence-cache-cap", "evidence-hashed", "grandfathers-decided", "legacy-lanes-retired", "stamp-user", "testsred-exempt", "authoring-cheap", "ai-drafting", "guidance-split", "method-map", "template-system", "evidence-templates", "mint-skeleton", "type-stakeholders", "book-manifests", "book-orphan-lint", "book-single-file", "book-depth", "book-dom-static", "chapter-tldr", "book-identity", "llm-digestible", "book-figures", "glossary-shared", "meta-quarantine", "book-honesty", "provenance-icons", "agents-emit", "book-drift", "register-advisory", "book-a11y", "deck-mode", "ratings-map", "base-views", "spec-content-roots", "auto-link", "ch2-derived", "fig-tables", "decision-kinds", "candidates", "facet-board", "external-links", "residue-lint", "anchor-refers", "quarantine-scope", "item-templates", "spec-template-set", "stub-spec"}
 	names := args
 	if len(names) == 0 {
 		names = all

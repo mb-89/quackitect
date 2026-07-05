@@ -1,0 +1,11 @@
+filters:
+  and:
+    - 'type == "requirement"'
+views:
+  - type: table
+    name: Requirements register
+    order: [file.name, statement, kind, must_wish, weight, source, verify]
+    sort:
+      - property: weight
+        direction: DESC
+    groupBy: kind

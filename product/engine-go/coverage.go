@@ -305,6 +305,9 @@ func scanIDs() map[string][]string {
 		if err != nil || fi.IsDir() || !strings.HasSuffix(path, ".md") {
 			return nil
 		}
+		if isSpecContent(SPEC, path) {
+			return nil // project-content notes (go-spec-content) are not graph nodes
+		}
 		if raw, e := os.ReadFile(path); e != nil || !nodeFence(raw) {
 			return nil // same recognition rule as LoadAll/strictGuard (nodeFence)
 		}

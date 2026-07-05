@@ -515,10 +515,35 @@ func cmdBuild(args []string) {
 		}
 	}
 	os.WriteFile(out+".stamp", []byte(stamp+"\n"), 0o644) // the binary mirrors its source's stamp
-	root := MerkleRoot(LoadAll())
-	gp := goldenRootPath()
-	os.WriteFile(gp, []byte(root+"\n"), 0o644)
+	fresh := out
+	if _, err := os.Stat(staged); err == nil {
+		fresh = staged // swap blocked: the NEW code lives in the staged file
+	}
+	root := buildRebaseline(fresh)
 	fmt.Println("built ->", filepath.ToSlash(out), "| golden re-baselined to", root[:12])
+}
+
+// enddesign
+
+// design: go-authoring-cheap  implements: req-authoring-cheap
+// One build restores an honest board. The re-baseline runs in the FRESHLY BUILT binary — never
+// only the old process, which refuses spec keys it predates (the i11 self-wedge: a build died on
+// its own new frontmatter key until run twice). And the verdict cache dies with the old baseline:
+// a parity FAIL recorded before the re-baseline shares the old binary's buildID and node hash, so
+// it would be served as a stale FAIL forever (the i11 wedge); flushing at re-baseline kills it.
+// buildRebaseline computes the root via the fresh exe, writes the golden, flushes verdicts.
+func buildRebaseline(freshExe string) string {
+	root := ""
+	if outBytes, err := exec.Command(freshExe, "root", "--base", ROOT).Output(); err == nil {
+		root = strings.TrimSpace(string(outBytes))
+	}
+	if len(root) < 12 {
+		root = MerkleRoot(LoadAll()) // fallback: the running process (a malformed graph still fails loudly here)
+	}
+	os.WriteFile(goldenRootPath(), []byte(root+"\n"), 0o644)
+	os.Remove(verdictPath()) // stale verdicts die with the old baseline
+	verdictsMemo = nil
+	return root
 }
 
 // enddesign
@@ -774,8 +799,43 @@ func cmdStartStubs(args []string) {
 		dst := filepath.Join(target, rel)
 		writeIfAbsent(dst, content)
 	}
+	// design: go-stub-spec  implements: req-stub-spec
+	// The instantiation path: the shipped spec template set (README, nine chapter
+	// skeletons, the canned queries) lands in spec/trace and spec/queries of the bare
+	// workspace. Existing files are KEPT - a second run refuses to overwrite.
+	tplDir := filepath.Join(EngineDir(), "method", "templates", "documents", "spec")
+	if ents, err := os.ReadDir(tplDir); err == nil {
+		for _, e := range ents {
+			if e.IsDir() || !strings.HasSuffix(e.Name(), ".md") {
+				continue
+			}
+			raw, rerr := os.ReadFile(filepath.Join(tplDir, e.Name()))
+			if rerr != nil {
+				continue
+			}
+			dst := filepath.Join(target, "spec", "trace", e.Name())
+			if e.Name() == "README.md" {
+				dst = filepath.Join(target, "spec", "trace", "SPEC-README.md")
+			}
+			writeIfAbsent(dst, string(raw))
+		}
+	}
+	if qents, err := os.ReadDir(filepath.Join(tplDir, "queries")); err == nil {
+		for _, e := range qents {
+			if e.IsDir() {
+				continue
+			}
+			raw, rerr := os.ReadFile(filepath.Join(tplDir, "queries", e.Name()))
+			if rerr != nil {
+				continue
+			}
+			writeIfAbsent(filepath.Join(target, "spec", "queries", e.Name()), string(raw))
+		}
+	}
+	// enddesign
 	fmt.Println("stubs -> " + target)
 	fmt.Println("  wrote " + proj + ".cmd, AGENTS.md, CLAUDE.md, spec/project.toml (kept any existing).")
+	fmt.Println("  wrote the spec template skeleton (spec/trace, spec/queries; kept any existing).")
 	fmt.Println("  the launcher resolves the global engine binary, or set QUACK_ENGINE.")
 }
 

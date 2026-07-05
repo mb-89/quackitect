@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strings"
 )
 
@@ -124,6 +125,7 @@ func mintDefaultDir(kind string) string {
 func cmdMint(args []string) {
 	if len(args) == 0 {
 		fmt.Println("usage: mint <need|usecase|requirement|test|adr> [--id slug] [--of id] [--statement \"...\"] [--rationale \"...\"] [--dir path]")
+		fmt.Println("       mint evidence --milestone M<n> [--dir path]           (stamp the milestone's evidence-doc skeleton)")
 		fmt.Println("       mint veto --of <id> [--statement \"...\"]      (decision: scrapped, final)")
 		fmt.Println("       mint defer --of <id> --ready-when \"<cond>\"    (decision: parked until)")
 		fmt.Println("       mint supersede <old-id> [--statement \"...\"]  (decision: replaced by this)")
@@ -155,6 +157,16 @@ func cmdMint(args []string) {
 		}
 		extra["supersedes"] = args[1]
 	}
+	if kind == "evidence" {
+		p, err := mintEvidence(flagVal(args, "--milestone"), flagVal(args, "--dir"))
+		if err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			quackExit(1)
+		}
+		rel, _ := filepath.Rel(ROOT, p)
+		fmt.Println("minted ->", filepath.ToSlash(rel))
+		return
+	}
 	dir := flagVal(args, "--dir")
 	if dir == "" {
 		dir = mintDefaultDir(kind)
@@ -166,6 +178,57 @@ func cmdMint(args []string) {
 	}
 	rel, _ := filepath.Rel(ROOT, p)
 	fmt.Println("minted ->", filepath.ToSlash(rel))
+}
+
+// enddesign
+
+// design: go-mint-skeleton  implements: req-mint-skeleton
+// `quack mint evidence --milestone M<n>` stamps the milestone's evidence-doc skeleton from its
+// template (method/templates/<slug>.md): the template frontmatter is stripped (evidence docs are
+// prose, never nodes), the placeholders substitute (iteration, rigor, itag), and an EXISTING doc
+// is refused - the skeleton never overwrites evidence.
+var evidenceSlugs = map[string]string{
+	"M1": "M1-frame", "M2": "M2-inputs", "M3": "M3-candidates", "M4": "M4-decision",
+	"M5": "M5-spike-findings", "M6": "M6-build-plan", "M7": "M7-validation", "M8": "M8-handover",
+}
+
+func mintEvidence(ms, dir string) (string, error) {
+	slug, ok := evidenceSlugs[strings.ToUpper(strings.TrimSpace(ms))]
+	if !ok {
+		return "", fmt.Errorf("mint evidence needs --milestone M1..M8")
+	}
+	tpl, err := os.ReadFile(filepath.Join(EngineDir(), "method", "templates", slug+".md"))
+	if err != nil {
+		return "", err
+	}
+	cfg := readProjectConfig()
+	if dir == "" {
+		dir = filepath.Join(SPEC, "iterations", cfg.Version)
+	}
+	target := filepath.Join(dir, slug+".md")
+	if _, err := os.Stat(target); err == nil {
+		return "", fmt.Errorf("refusing: %s.md exists - the skeleton never overwrites evidence", slug)
+	}
+	body := string(tpl)
+	if strings.HasPrefix(body, "---") {
+		if i := strings.Index(body[3:], "---"); i >= 0 {
+			body = strings.TrimLeft(body[3+i+3:], "\r\n")
+		}
+	}
+	body = strings.NewReplacer("<iteration>", cfg.Version, "<rigor>", cfg.Rigor, "<itag>", iterTag(cfg.Version)).Replace(body)
+	os.MkdirAll(dir, 0o755)
+	if err := os.WriteFile(target, []byte(body), 0o644); err != nil {
+		return "", err
+	}
+	return target, nil
+}
+
+// iterTag shortens a version id to its task-id tag: i0012_spec_book -> i12.
+func iterTag(v string) string {
+	if m := regexp.MustCompile(`^i0*(\d+)`).FindStringSubmatch(v); m != nil {
+		return "i" + m[1]
+	}
+	return v
 }
 
 // enddesign

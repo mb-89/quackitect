@@ -172,7 +172,9 @@ func iterationOfNode(n Node, nodes map[string]Node, seen map[string]bool) string
 	return "i0000_baseline"
 }
 
-var traceTypes = map[string]bool{"need": true, "usecase": true, "requirement": true, "design": true, "test": true, "adr": true}
+var traceTypes = map[string]bool{"need": true, "usecase": true, "requirement": true, "design": true, "test": true, "adr": true,
+	// the item types of the spec-template walk (go-items): trace content on the graph
+	"candidate": true, "stakeholder": true, "raid": true, "rationale": true, "record": true}
 
 func traceEdges(n Node) [][2]string {
 	var e [][2]string
@@ -631,6 +633,10 @@ func metricCards(nodes map[string]Node, sm map[string]string, cfg Config) string
 		b.WriteString(fmt.Sprintf("<div class=\"card\" data-mlabel=\"%s\" data-mval=\"%s\" data-mform=\"%s\"><div class=\"cval\">%s</div><div class=\"clabel\">%s</div></div>",
 			esc(c.label), esc(c.val), esc(c.form), esc(c.val), esc(c.label)))
 	}
+	// the spec-book card (owner-directed, i12): clickable, opens the docu rendered beside this
+	// report (quack book writes book.html into the same out dir). Later enhancement recorded in
+	// the notes: the card shows which spec state the docu represents (its identity stamp).
+	b.WriteString("<a class=\"card\" href=\"book.html\" target=\"_blank\" rel=\"noopener\" style=\"text-decoration:none;color:inherit\" title=\"open the spec book in a new tab (render it with: quack book)\"><div class=\"cval\">📖 👆</div><div class=\"clabel\">The spec book — click to open</div></a>")
 	return b.String()
 }
 

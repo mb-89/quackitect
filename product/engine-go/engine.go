@@ -164,6 +164,9 @@ func LoadAll() map[string]Node {
 		if err != nil || fi.IsDir() || !strings.HasSuffix(path, ".md") {
 			return nil
 		}
+		if isSpecContent(SPEC, path) {
+			return nil // project-content notes (go-spec-content) load via their own readers
+		}
 		if raw, e := os.ReadFile(path); e != nil || !nodeFence(raw) {
 			return nil // only recognized node candidates load — the guard checked exactly this set
 		}
@@ -282,7 +285,9 @@ func evidenceDocSeed(iter string, ms int) string {
 
 // enddesign
 
-var traceContent = map[string]bool{"need": true, "usecase": true, "requirement": true, "design": true, "adr": true, "test": true}
+var traceContent = map[string]bool{"need": true, "usecase": true, "requirement": true, "design": true, "adr": true, "test": true, "manifest": true,
+	// the item types of the spec-template walk (go-items): content, never gates
+	"candidate": true, "stakeholder": true, "raid": true, "rationale": true, "record": true}
 
 // design: go-no-trace-gate  implements: req-no-trace-gate
 // Trace-typed nodes (need/usecase/requirement/design/test/adr) are content, never task gates —

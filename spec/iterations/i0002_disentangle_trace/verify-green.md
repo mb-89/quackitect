@@ -5,7 +5,7 @@ verifies: [req-split, req-coverage, req-metrics, req-version-mgmt, req-tooling, 
 statement: The i0002 integration suite is green. Report determinism holds. The three metrics compute, with no deferred placeholders. Version selection picks correctly. The trace/task split holds (trace is content, gates carry state). Coverage rules evaluate. The milestone-review guide exists. Suspect/bless is unchanged.
 depends_on: []
 class: executed
-verify: selftest:parity
+verify: selftest:determinism
 killer: true
 tests_red: exempt - predates the red-observation mechanism (adr-grandfathers-historical)
 ---

@@ -10,6 +10,7 @@ import (
 	"os"
 	"path/filepath"
 	"sort"
+	"strconv"
 	"strings"
 )
 
@@ -37,7 +38,17 @@ var nodeKeysAllow = map[string]bool{
 	"id": true, "type": true, "statement": true, "class": true, "verify": true, "killer": true,
 	"milestone": true, "parent": true, "depends_on": true, "refines": true, "implements": true,
 	"verifies": true, "addresses": true, "validates": true, "ears": true, "adjudicated_by": true,
-	"ready_when": true, "supersedes": true, "suite": true, "tests_red": true,
+	"ready_when": true, "supersedes": true, "suite": true, "tests_red": true, "guidance": true, "mode": true,
+	"ratings": true, // one-level map key (go-ratings-map, req-ratings-map)
+	// the item fields (go-items + the item templates, owner walk 2026-07-05); every field's
+	// semantics and value range live in its item template (method/templates)
+	"kind": true, "axis": true, "chosen": true, "rejected": true, "refers": true, "role": true,
+	"phase": true, "discipline": true, "quality": true, "must_wish": true, "weight": true,
+	"source": true, "responsible": true, "interest": true, "influence": true,
+	"probability": true, "impact": true, "mitigation": true, "owner": true, "status": true,
+	"actors": true, "trigger": true, "method": true, "level": true, "acceptance": true,
+	"record_of": true, "equipment": true, "conditions": true, "result": true,
+	"applies_chapters": true, "applies_type": true, "applies_rigor": true,
 }
 var iterKeysAllow = map[string]bool{
 	"iteration": true, "status": true, "type": true, "rigor": true,
@@ -46,6 +57,9 @@ var iterKeysAllow = map[string]bool{
 var refFields = map[string]bool{
 	"depends_on": true, "refines": true, "implements": true, "verifies": true, "addresses": true,
 	"supersedes": true,
+	// decision-over-candidate links (go-items): dangling chosen/rejected refuse like any edge.
+	// refers is NOT here - it may carry id#heading anchors, checked by the anchor lint instead.
+	"chosen": true, "rejected": true,
 }
 
 // nodeFence is THE single recognition rule, shared by the strict guard and the loader (LoadAll,
@@ -76,6 +90,9 @@ func StrictIssues(specDir string) []ParseIssue {
 		if fi.IsDir() || !strings.HasSuffix(path, ".md") {
 			return nil
 		}
+		if isSpecContent(specDir, path) {
+			return nil // project-content notes (go-spec-content) have their own loaders, not node grammar
+		}
 		raw, rerr := os.ReadFile(path)
 		if rerr != nil {
 			issues = append(issues, ParseIssue{path, "", "unreadable: " + rerr.Error()})
@@ -102,27 +119,52 @@ func StrictIssues(specDir string) []ParseIssue {
 			return nil
 		}
 		id := strings.TrimSuffix(filepath.Base(path), ".md")
+		curMap := "" // design: go-ratings-map (strict side): the open one-level map key
+		typeVal, kindVal := "", ""
 		for i := 1; i < end; i++ {
 			l := lines[i]
 			if strings.TrimSpace(l) == "" {
 				continue
 			}
+			indented := l[0] == ' ' || l[0] == '\t'
 			kv := strings.SplitN(l, ":", 2)
 			if len(kv) < 2 {
 				issues = append(issues, ParseIssue{path, strings.TrimSpace(l), "frontmatter line is not key: value"})
 				continue
 			}
 			k, v := strings.TrimSpace(kv[0]), strings.TrimSpace(kv[1])
+			if indented {
+				if curMap == "" {
+					issues = append(issues, ParseIssue{path, k, "indented entry outside a map key"})
+				} else if v == "" {
+					issues = append(issues, ParseIssue{path, curMap + "." + k, "nested map refused (one level only)"})
+				} else if curMap == "ratings" { // go-items: scales are 0..1 everywhere (owner ruling)
+					if f, err := strconv.ParseFloat(v, 64); err != nil || f < 0 || f > 1 {
+						issues = append(issues, ParseIssue{path, curMap + "." + k, "rating outside 0..1: " + v})
+					}
+				}
+				continue
+			}
 			if !keys[k] {
+				curMap = ""
 				issues = append(issues, ParseIssue{path, k, "unknown frontmatter key"})
 				continue
 			}
+			if v == "" {
+				curMap = k
+				continue
+			}
+			curMap = ""
 			if isIter {
 				continue // breadcrumb, not a graph node
 			}
 			switch {
 			case k == "id" && v != "":
 				id = v
+			case k == "type":
+				typeVal = v
+			case k == "kind":
+				kindVal = v
 			case refFields[k]:
 				for _, t := range splitIDs(v) {
 					refs = append(refs, ref{id, path, k, t})
@@ -130,6 +172,10 @@ func StrictIssues(specDir string) []ParseIssue {
 			case k == "parent" && v != "":
 				refs = append(refs, ref{id, path, k, v})
 			}
+		}
+		// go-items: ONE decision type, three kinds; empty = architecture (blessed history).
+		if typeVal == "adr" && kindVal != "" && kindVal != "architecture" && kindVal != "project" && kindVal != "waiver" {
+			issues = append(issues, ParseIssue{path, kindVal, "unknown decision kind (architecture | project | waiver)"})
 		}
 		if !isIter {
 			if prev, dup := ids[id]; dup {

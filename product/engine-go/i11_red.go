@@ -114,11 +114,15 @@ func selftestTestsredExempt() bool {
 	// a red observation or a marker whose reason cites a resolvable ADR.
 	nodes := LoadAll()
 	ro := redObserved()
+	active := readProjectConfig().Version
 	adrRe := regexp.MustCompile(`adr-[a-z0-9-]+`)
 	marked := 0
 	for id, n := range nodes {
 		if n.Type != "test" || n.Class != "executed" || !strings.HasPrefix(n.Verify, "selftest:") {
 			continue
+		}
+		if it := iterOf(n.Path); active != "" && it >= active {
+			continue // a not-yet-shipped iteration's tests owe their red to ITS OWN tests-red gate, never this sweep
 		}
 		if testsRedExempt(n) {
 			if cited := adrRe.FindString(n.TestsRed); cited == "" || nodes[cited].Type != "adr" {

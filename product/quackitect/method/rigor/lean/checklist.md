@@ -18,11 +18,13 @@ without restructuring. `(killer)` means mandatory. `(executed)`/`(derived)` mean
 
 - **L1 — Frame** · *gate: review* — maps to M1
   - method: State the problem. Name who has it. Say what "done well" means. A sentence or two.
+    Check the state of the art briefly — name the closest prior art and why this is still worth doing.
   - [ ] problem & success stated *(killer)*
 
 - **L2 — Requirements** · *gate: review* — maps to M2
   - method: List what it must do. State each item so it is checkable. Note the main constraints.
-    Trace each requirement back to a need; give each a test.
+    Trace each requirement back to a need; give each a test. Check the set briefly against the
+    standard checklist for this kind of deliverable — add or record what it misses.
   - [ ] requirements stated, each checkable *(killer)*
   - [ ] requirements traced — every requirement back to a need *(derived: coverage:req-traced)*
   - [ ] requirements verifiable — every requirement has a test *(derived: coverage:req-has-test)*

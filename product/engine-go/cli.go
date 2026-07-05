@@ -104,6 +104,8 @@ func Dispatch(args []string) {
 		cmdDecisions(rest)
 	case "mint":
 		cmdMint(rest)
+	case "book":
+		cmdBook(rest)
 	case "status":
 		cmdStatus(rest)
 	case "why":
@@ -382,7 +384,36 @@ func cmdLint(rest []string) {
 			fmt.Println("  - " + f)
 		}
 	}
-	if len(dups) > 0 || earsBad > 0 || len(mono) > 0 || len(placement) > 0 {
+	// book curation (go-book-manifests): every content node reaches a manifest or its exclusion record.
+	orphans := bookOrphanFindings(nodes)
+	if len(orphans) > 0 {
+		fmt.Printf("book: %d orphan(s):\n", len(orphans))
+		for _, f := range orphans {
+			fmt.Println("  - " + f)
+		}
+	}
+	// meta quarantine (go-book-glossary): meta vocabulary stays out of the reader chapters.
+	metaQ := metaQuarantineFindings(nodes, readGlossary())
+	if len(metaQ) > 0 {
+		fmt.Printf("book: %d meta-quarantine finding(s):\n", len(metaQ))
+		for _, f := range metaQ {
+			fmt.Println("  - " + f)
+		}
+	}
+	// book drift (go-book-drift): the committed book equals a fresh render, or it flags.
+	drift := bookDriftFindingAt(committedBookPath(), nodes)
+	for _, f := range drift {
+		fmt.Println("book: " + f)
+	}
+	// spec-content lints (go-spec-lints): external links, slot residue, dangling anchors.
+	external, residue, anchors := specLintFindings(nodes)
+	for _, group := range [][]string{external, residue, anchors} {
+		for _, f := range group {
+			fmt.Println("spec: " + f)
+		}
+	}
+	if len(dups) > 0 || earsBad > 0 || len(mono) > 0 || len(placement) > 0 || len(orphans) > 0 || len(metaQ) > 0 || len(drift) > 0 ||
+		len(external) > 0 || len(residue) > 0 || len(anchors) > 0 {
 		quackExit(1)
 	}
 }

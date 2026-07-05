@@ -19,11 +19,22 @@ Write plainly. These are rules, not suggestions. They bind every output: chat, d
 - Use a list for three or more items. Do not bury them in a sentence.
 - Every enumeration is a Markdown list. Always. Not prose, not comma chains.
 - One item per line. In Markdown, one `-` per line.
+- Never chain several things with commas inside one item. Nest a sub-list instead.
 - No compound sentences inside an item. Short simple sentences only.
 - If an item grows, split it. Make two items, or a sub-list.
 - Never collapse a list onto one line. This holds everywhere it renders: chat, HTML, tooltips, table cells.
 - Lead each item with its key word.
 - Link the referent. An item that points at a file, note, or URL carries it as a link.
+
+### AI involvement
+- The AI-involvement marks measure involvement. Never quality. Never trust.
+- The author owns all published content, whatever the AI share. "The AI wrote it, I did not review it" is unacceptable.
+- Quality with AI ratchets up. Never trade quality for speed or comfort. That trade ends in slop.
+
+### Figures
+- Prefer a diagram over prose when it transports the information better. Use figures generously.
+- Author every figure in a text-based form: inline SVG with real text, Mermaid, or ASCII. A machine must be able to read it.
+- Give each figure one line saying what to see in it.
 
 ### Do not repeat (DRY)
 - Single source of truth. Each fact lives in one place. Everything else points to it.

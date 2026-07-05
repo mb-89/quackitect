@@ -1,0 +1,8 @@
+filters:
+  and:
+    - 'type == "adr"'
+    - 'kind == "waiver"'
+views:
+  - type: table
+    name: Accepted deviations
+    order: [file.name, statement, addresses]

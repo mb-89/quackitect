@@ -15,9 +15,12 @@ stamp). The rest are user-judged (`class: review`). The trace itself is content,
 
 - **M1 — Frame the problem & vision** · *gate: motivation*
   - method: State goal, actual, and delta. Draft the vision (Moore: For/Who/The/That/Unlike).
-    Pressure-test it with a Working-Backwards PR-FAQ.
+    Pressure-test it with a Working-Backwards PR-FAQ. Check the state of the art: run the
+    referenced research capability (engage.md) on the idea itself — what exists, what failed,
+    where this differs. The scan positions the idea; M3 later scans the candidate architectures.
   - [ ] vision & scope stated
   - [ ] problem agreed — the delta is real and worth solving *(killer)*
+  - [ ] state of the art checked — prior art scanned; the idea positioned against it
   - [ ] success is measurable — Ch1 success criteria defined
   - [ ] top risks logged (RAID)
 
@@ -26,9 +29,13 @@ stamp). The rest are user-judged (`class: review`). The trace itself is content,
     role. Build a function tree. Build an ISO 25010 quality tree with 6-part scenarios. Write
     requirements in EARS. Field-check every environment assumption a requirement builds on.
     Probe the real channel (what a harness actually loads, what an API actually returns).
-    One probe settles what a datasheet claims.
+    One probe settles what a datasheet claims. Check the CONCRETE requirement set against prior
+    art and best practice (the research capability, engage.md): what does the standard checklist
+    for this kind of deliverable demand that the set is missing? M1 scanned the idea; this scans
+    the requirements.
   - [ ] inputs captured — context, stakeholders, use cases
   - [ ] stakeholder coverage — no role left out
+  - [ ] prior art checked — the requirement set positioned against best practice; misses added or recorded
   - [ ] requirements verifiable — every requirement has a test *(derived: coverage:req-has-test)*
   - [ ] requirements traced — every requirement back to a need *(derived: coverage:req-traced)*
 
@@ -44,7 +51,10 @@ stamp). The rest are user-judged (`class: review`). The trace itself is content,
     STRONGEST viable rival — or the current design, when redesigning. A status-quo datum is allowed
     only as a second run, to establish worth-doing-at-all. Iterate with the winner as the new datum.
     That iteration is the controlled convergence. Record both runs when used. Add a sensitivity
-    check. Record the deciding ADR(s).
+    check — and REVERSE it: find the FIRST plausible combination of weight changes and rival
+    variants under which the winner LOSES, within reason. Judge that world's credibility out loud.
+    A credible flip becomes a recorded tripwire (watch-item with its fallback), never a silent
+    dismissal. Record the deciding ADR(s).
   - [ ] chosen architecture stated
   - [ ] choice traced to the weighted criteria
   - [ ] ADR recorded and traced — every ADR addresses a requirement *(derived: coverage:adr-traced)*

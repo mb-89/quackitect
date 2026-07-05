@@ -21,8 +21,6 @@ Do this before anything else on this project:
 Re-read the contract at the start of every `engage`.
 No recital means the rules never loaded. The adjudicator should stop you.
 
----
-
 Quackitect is a **user-driven gate ledger**. You, the agent, FILL checks. The adjudicator
 ADJUDICATES the ones that are gates. **Never bless on their behalf.**
 

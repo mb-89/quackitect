@@ -32,8 +32,10 @@
 
 ## research  (a referenced, pluggable capability)
 <!-- design: method-research-ref  implements: req-research-pluggable :: Research (prior-art at M3, field/retro scans at start) is a REFERENCED capability, never vendored. Claude Code delegates to the built-in deep-research skill (parallel fan-out + adversarial verification); any other harness runs the SAME method inline. Do NOT copy a harness's research implementation into the repo. -->
-When a step needs multi-source research — `start` (retro/triage field scans) or M3 (candidate
-prior-art) — **Claude Code** invokes the built-in `deep-research` skill; **any other harness** runs the
+When a step needs multi-source research — `start` (retro/triage field scans), M1 (the
+state-of-the-art check of the idea), M2 (the requirement set against prior art and best
+practice), or M3 (candidate prior-art) — **Claude Code** invokes the
+built-in `deep-research` skill; **any other harness** runs the
 same method inline: decompose into search angles → search each → fetch sources → adversarially
 cross-check → synthesize with citations, using whatever web tools it has. **Never vendor** a harness's
 research skill into the repo — reference it.

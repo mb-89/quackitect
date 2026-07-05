@@ -1,0 +1,14 @@
+---
+id: adr-book-two-stage
+type: adr
+kind: architecture
+chosen: [cand-emit-two-stage]
+rejected: [cand-emit-one-pass]
+addresses: [req-book-manifests]
+adjudicated_by: human
+statement: Truth lives only in the spec sources - nodes, manifests, prose units with their marks - and all judgment happens there; everything downstream is deterministic. The emitter renders truth to one self-contained HTML with transclusion at emit time; it MAY materialize assembled chapter markdown as an EPHEMERAL review surface in the data home - regenerated every emit, never committed, never a source of truth. View-time assembly stays excluded (req-book-dom-static).
+class: review
+killer: false
+---
+## Rationale (not load-bearing)
+Owner-refined at M4: the intermediate markdown is useful only as a review surface - the reader corrects the SPEC sources, never the projection, and the next emit proves the correction took. This is the substrate thesis applied to the emitter itself (judgment upstream, deterministic downstream). Whether the intermediate stage materializes files is an M6 implementation call, not architecture; the recorded tripwire (collapse to one-pass if assembly eats schedule) is trivially cheap because nothing depends on the intermediates existing.
