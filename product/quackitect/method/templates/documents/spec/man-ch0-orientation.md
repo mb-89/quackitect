@@ -10,7 +10,7 @@ Contents: what the system is, who this document serves, that nobody reads all of
 Motivation: a mis-landed reader is served fastest by knowing what the system is.
 Form: two to four sentences. System first, document second. No motivation creep -
   the why lives in ch1. No method talk - ch8 owns it.
-Sources: tech-dok-grundlagen digest (least-qualified-reader rule).
+Sources: least-qualified-reader rule @[[ref-tech-dok-grundlagen]].
 -->
 <!-- ai:3 -->
 {{lede}}
@@ -18,42 +18,32 @@ Sources: tech-dok-grundlagen digest (least-qualified-reader rule).
 fig: context-star
 ---
 ## Who reads this document
-<!-- fill [mandatory]
-Contents: the who-does-what matrix - the stakeholder rows below map roles to
-  their entry points; one line of prose above the table naming the entry presets.
-Motivation: the matrix is GENERATIVE - the least-qualified reader of a chapter
-  sets its detail level; readers find their row, then their button.
-Form: one short prose line, then the derived table. The row set derives from the
-  project types; a class with zero stakeholder notes renders as a TBD row.
-Sources: tech-dok-grundlagen digest (who-does-what matrix); tech-dok digest
-  (Was-macht-Wer, one document per circled cluster - here: one PRESET per cluster).
+<!-- tailor: shipped text - the mechanics are the same in every project. Adjust the
+  preset naming if this project's presets differ; the rows derive from the
+  stakeholder notes.
+Sources: who-does-what matrix @[[ref-tech-dok-grundlagen]]; Was-macht-Wer,
+  one PRESET per reader cluster @[[ref-tech-dok]].
 -->
 <!-- ai:3 -->
-{{reader-matrix-lede}}
+Find your row below, then open the view preset it names. The preset narrows this document to the chapters that serve your role, at the depth your role needs.
 
-```base
-filters:
-  and:
-    - 'type == "stakeholder"'
-views:
-  - type: table
-    name: Stakeholders
-    order: [file.name, role, interest, influence, weight]
-    sort:
-      - property: role
-        direction: ASC
-```
+![[stakeholder-matrix.base]]
 ---
 ## How to read this document
-<!-- fill [mandatory]
-Contents: the three layers (normative binds, informative explains, evidence
-  records); the presets; the depth mechanic (statement, rationale, children,
-  evidence - each one link away); term links and the glossary behavior.
-  Close with three links: rationales live in ch7, the tailoring record in ch6,
-  how the document is made in ch8 (sibling artifacts included).
-Motivation: the reader's contract, folded into reading mechanics - a standalone
-  contract unit reads as ceremony.
-Form: short prose, one list for the layers. Links, no repetition.
+<!-- tailor: shipped text - the reading mechanics are the same in every project.
+  Tailor only if this project adds or removes a layer or a mechanic.
 -->
 <!-- ai:3 -->
-{{how-to-read}}
+Everything here sits in one of three layers:
+
+- Normative - binds. Requirements, constraints, decisions, and design rules.
+- Informative - explains. Ledes, rationales, references, and fundamentals.
+- Evidence - records. Verification results and the gate states.
+
+Every unit starts shallow. The statement comes first. The rationale, the children, and the evidence each sit one link away. Stop when you have enough. A term links to its glossary entry on first use.
+
+Three pointers for later:
+
+- Deep whys live in [rationales](man-ch7-rationales.md).
+- What was skipped, and why, is in the [tailoring record](man-ch6-project.md).
+- How this document is made - and how to correct it - is in [guidance](man-ch8-guidance.md).

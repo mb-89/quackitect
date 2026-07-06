@@ -24,8 +24,8 @@ Motivation: written compliance did not stop a receiver failing in orbit -
   inspection-method verification is a review, and the ledger's adjudications
   are that evidence.
 Form: prose plus a short mapping list.
-Sources: systementwurf-mechatronik digest (model-first); se-thinking-learning
-  digest (the orbit lesson).
+Sources: model-first @[[ref-systementwurf-mechatronik]]; the orbit lesson
+  @[[ref-se-thinking-learning]].
 -->
 <!-- ai:3 -->
 {{strategy}}
@@ -39,7 +39,7 @@ Contents: one line introducing the records - physical tests wrap their measured
 Motivation: a result without its uncertainty is not a result. Software's
   analogue - the run log - is already machinery.
 Form: one prose line; the records link from the matrix.
-Sources: mess-pruef-dok digest (the six-part record, the result contract).
+Sources: the six-part record, the result contract @[[ref-mess-pruef-dok]].
 -->
 <!-- ai:3 -->
 {{records-lede}}
@@ -50,21 +50,12 @@ Contents: one line introducing the derived matrix - every requirement against
   its verifying evidence, cumulative across iterations.
 Motivation: an empty row is a mechanically visible unverified requirement.
 Form: one prose line; the matrix renders derived.
-Sources: generic-se digest (the empty-row check).
+Sources: the empty-row check @[[ref-generic-se]].
 -->
 <!-- ai:3 -->
 {{matrix-lede}}
 
-```base
-filters:
-  and:
-    - 'type == "test"'
-views:
-  - type: table
-    name: Verification matrix
-    order: [file.name, verifies, verify]
-    groupBy: verifies
-```
+![[vv-matrix.base]]
 ---
 ## Results and discussion
 <!-- fill [mandatory]
@@ -73,6 +64,7 @@ Contents: rendered BY EXCEPTION - derived counts summarize the green mass;
 Motivation: error discussion is mandatory (the lab rule); evidence that can be
   retold as a story is evidence that gets believed.
 Form: short prose per failure or deviation, on the test item's body, linked here.
+Sources: the lab rule @[[ref-mess-pruef-dok]].
 -->
 <!-- ai:3 -->
 {{results-by-exception}}
@@ -98,13 +90,4 @@ Form: one prose line; the view renders derived.
 <!-- ai:3 -->
 {{waivers-lede}}
 
-```base
-filters:
-  and:
-    - 'type == "adr"'
-    - 'kind == "waiver"'
-views:
-  - type: table
-    name: Accepted deviations
-    order: [file.name, statement, addresses]
-```
+![[decisions-waiver.base]]

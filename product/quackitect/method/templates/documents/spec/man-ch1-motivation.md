@@ -23,8 +23,8 @@ Motivation: the goal is the reader's stop-or-continue filter. A reader who does
 Form: prose, two to four paragraphs, then the pitch as a blockquote. Name goal
   conflicts openly - hiding them poisons the ch4 trade-offs. Philosophy belongs
   in ch7: write it as a why- note and link it.
-Sources: methodische-entwicklung digest (goal system); sebot_v1 Motivation
-  (worked example of the pitch).
+Sources: goal system @[[ref-methodische-entwicklung]]; the pitch template
+  @[[ref-crossing-the-chasm]].
 -->
 <!-- ai:3 -->
 {{where-we-want-to-be}}
@@ -47,7 +47,7 @@ Motivation: the success criteria written here are exactly what the validation
   chapter checks against - the V-model's outer arc. A criterion nothing will
   ever test is not a criterion.
 Form: prose for the first two moves, a list for the criteria.
-Sources: systementwurf-mechatronik digest (V-model pairing).
+Sources: V-model pairing @[[ref-systementwurf-mechatronik]].
 -->
 <!-- ai:3 -->
 {{delta-and-proof}}
@@ -63,21 +63,12 @@ Form: short. Skip with a recorded reason where no acquirer exists.
 {{business-case}}
 ---
 ## Needs
-<!-- fill [mandatory]
-Contents: one line introducing the register - every need carries its source
-  stakeholder and an acceptance criterion.
-Motivation: a goal without a traceable stakeholder is a wish (the RE rule).
-Form: one prose line, then the derived register.
+<!-- tailor: shipped text - the register derives from the need notes; the intro
+  line is the same in every project.
+Sources: the RE rule, a goal without a traceable stakeholder is a wish
+  @[[ref-sya-re]].
 -->
 <!-- ai:3 -->
-{{needs-lede}}
+Each need below names the stakeholder it serves and the criterion that accepts it. The register derives from the need notes - a row without a stakeholder is a wish, not a need.
 
-```base
-filters:
-  and:
-    - 'type == "need"'
-views:
-  - type: table
-    name: Needs
-    order: [file.name, statement]
-```
+![[needs.base]]

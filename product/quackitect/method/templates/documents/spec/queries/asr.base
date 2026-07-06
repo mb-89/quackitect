@@ -1,0 +1,11 @@
+filters:
+  and:
+    - 'type == "requirement"'
+    - 'weight >= 0.7'
+views:
+  - type: table
+    name: Architecturally significant requirements
+    order: [file.name, statement, weight]
+    sort:
+      - property: weight
+        direction: DESC

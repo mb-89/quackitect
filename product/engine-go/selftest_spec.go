@@ -232,11 +232,15 @@ func selftestAutoLink() bool {
 	return len(errs) == 1 && strings.Contains(errs[0], "shared")
 }
 
-// selftestCh2Derived — test-ch2-derived: used references and fundamentals render in the
-// derived lists (normative apart from informative); unused entries do not render.
+// selftestCh2Derived — test-ch2-derived: the pull law as pooled queries. Used references
+// and fundamentals render through the `referenced` predicate (deferred until the link
+// graph is complete): normative apart from (and before) informative, the one-liner list
+// in the ch2 view, the full bodies in the ch8 view. Unused entries do not render, and
+// `referenced` outside the emitter refuses loudly.
 func selftestCh2Derived() bool {
-	root, _ := os.MkdirTemp("", "qst-ch2")
-	defer os.RemoveAll(root)
+	tmp, _ := os.MkdirTemp("", "qst-ch2")
+	defer os.RemoveAll(tmp)
+	root := filepath.Join(tmp, "spec") // paths must sit under spec/ for the shipped inFolder filters
 	os.MkdirAll(filepath.Join(root, "references"), 0o755)
 	os.MkdirAll(filepath.Join(root, "fundamentals"), 0o755)
 	os.WriteFile(filepath.Join(root, "references", "ref-a.md"),
@@ -252,28 +256,63 @@ func selftestCh2Derived() bool {
 	oldRoot := contentRootOverride
 	contentRootOverride = root
 	defer func() { contentRootOverride = oldRoot }()
-	// a chapter whose prose LINKS ref-a, ref-b, and fund-x (authored links = usage)
+	// the SHIPPED queries pool into the fixture's spec/queries
+	qsrc := filepath.Join(EngineDir(), "method", "templates", "documents", "spec", "queries")
+	pool := filepath.Join(root, "queries")
+	os.MkdirAll(pool, 0o755)
+	var refsQuery string
+	for _, q := range []string{"fundamentals.base", "references.base"} {
+		raw, err := os.ReadFile(filepath.Join(qsrc, q))
+		if err != nil {
+			return false
+		}
+		if q == "references.base" {
+			refsQuery = string(raw)
+		}
+		os.WriteFile(filepath.Join(pool, q), raw, 0o644)
+	}
+	oldPool := queriesDirOverride
+	queriesDirOverride = pool
+	defer func() { queriesDirOverride = oldPool }()
+	// a chapter whose prose LINKS ref-a, ref-b, and fund-x (authored links = usage),
+	// embedding the ch2 views; a second chapter embeds the ch8 full-body view.
 	dir, _ := os.MkdirTemp("", "qst-ch2b")
 	defer os.RemoveAll(dir)
 	nodes := bookFixture(dir, 1, true)
 	man := "---\nid: man-fix\ntype: manifest\nmode: chapter\nstatement: Fixture chapter.\n---\n" +
-		"<!-- ai:3 -->\nThe lede: bound by [Norm A](ref-a) and [Paper B](ref-b), see [X](fund-x).\n---\n[req-fix](req-fix.md)\n"
-	manPath := filepath.Join(dir, "man-fix.md")
-	os.WriteFile(manPath, []byte(man), 0o644)
+		"<!-- ai:3 -->\nThe lede: bound by [Norm A](ref-a) and [Paper B](ref-b), see [X](fund-x).\n---\n" +
+		"![[fundamentals.base#Fundamentals]]\n---\n![[references.base]]\n---\n[req-fix](req-fix.md)\n"
+	os.WriteFile(filepath.Join(dir, "man-fix.md"), []byte(man), 0o644)
+	man2 := "---\nid: man-fix2\ntype: manifest\nmode: chapter\nstatement: Guidance fixture.\n---\n" +
+		"<!-- ai:3 -->\nThe guidance lede.\n---\n![[fundamentals.base#Fundamentals in full]]\n"
+	mp2 := filepath.Join(dir, "man-fix2.md")
+	os.WriteFile(mp2, []byte(man2), 0o644)
+	nodes["man-fix2"] = Node{ID: "man-fix2", Type: "manifest", Mode: "chapter", Statement: "Guidance fixture.", Path: mp2}
 	html, findings, _ := renderBookHTML(nodes)
 	if len(findings) != 0 {
 		return false
 	}
-	// used entries render; the groups render apart; unused entries are absent
-	if !strings.Contains(html, "Norm A") || !strings.Contains(html, "Paper B") ||
-		!strings.Contains(html, "<h2>Normative</h2>") || !strings.Contains(html, "<h2>Informative</h2>") {
+	// used entries render; normative renders apart from AND before informative
+	ni, ii := strings.Index(html, "<h2>Normative</h2>"), strings.Index(html, "<h2>Informative</h2>")
+	if !strings.Contains(html, "Norm A") || !strings.Contains(html, "Paper B") || ni < 0 || ii < ni {
 		return false
 	}
+	// the reference prints its pin and its only-legal URL as a live link
+	if !strings.Contains(html, `href="https://example.org/a"`) || !strings.Contains(html, ", 2011") {
+		return false
+	}
+	// the pull law holds: unused entries are absent
 	if strings.Contains(html, "Unused C") || strings.Contains(html, "Unused Y") {
 		return false
 	}
-	// the fundamentals list carries the one-liner and the full body renders as its anchor
-	return strings.Contains(html, "The one-liner of X.") && strings.Contains(html, "The full body of X explains at length.")
+	// the ch2 view carries the one-liner; the ch8 view renders the full body at its anchor
+	if !strings.Contains(html, "The one-liner of X.") || !strings.Contains(html, "The full body of X explains at length.") ||
+		!strings.Contains(html, `<section id="fund-x"`) {
+		return false
+	}
+	// `referenced` outside the emitter refuses loudly - never a silent superset
+	_, err := EvalBase(refsQuery, []string{filepath.Join(root, "references", "ref-a.md")}, nil)
+	return err != nil && strings.Contains(err.Error(), "referenced")
 }
 
 // selftestFigTables — test-fig-tables: the verification matrix and the stakeholder matrix
@@ -293,16 +332,22 @@ func selftestFigTables() bool {
 	sp := filepath.Join(dir, "stk-user.md")
 	os.WriteFile(sp, []byte("---\nid: stk-user\ntype: stakeholder\nstatement: the user role.\nrole: user\ninterest: 0.8\ninfluence: 0.5\nweight: 0.7\n---\n"), 0o644)
 	nodes["stk-user"] = Node{ID: "stk-user", Type: "stakeholder", Statement: "the user role.", Class: "review", Path: sp}
-	// the shipped queries exist
+	// the shipped queries exist and pool into a fixture spec/queries (owner ruling: central pool)
 	qdir := filepath.Join(EngineDir(), "method", "templates", "documents", "spec", "queries")
 	vv, err1 := os.ReadFile(filepath.Join(qdir, "vv-matrix.base"))
 	stk, err2 := os.ReadFile(filepath.Join(qdir, "stakeholder-matrix.base"))
 	if err1 != nil || err2 != nil {
 		return false
 	}
-	// the chapter embeds both canned queries
+	pool := filepath.Join(dir, "queries")
+	os.MkdirAll(pool, 0o755)
+	os.WriteFile(filepath.Join(pool, "vv-matrix.base"), vv, 0o644)
+	oldPool := queriesDirOverride
+	queriesDirOverride = pool
+	defer func() { queriesDirOverride = oldPool }()
+	// the chapter references one pooled query (![[..]]) and authors one inline block
 	man := "---\nid: man-fix\ntype: manifest\nmode: chapter\nstatement: Fixture chapter.\n---\n" +
-		"<!-- ai:3 -->\nThe lede of the fixture chapter.\n---\n```base\n" + string(vv) + "```\n---\n```base\n" + string(stk) + "```\n---\n[req-fix](req-fix.md)\n"
+		"<!-- ai:3 -->\nThe lede of the fixture chapter.\n---\n![[vv-matrix.base]]\n---\n```base\n" + string(stk) + "```\n---\n[req-fix](req-fix.md)\n"
 	os.WriteFile(filepath.Join(dir, "man-fix.md"), []byte(man), 0o644)
 	html, findings, _ := renderBookHTML(nodes)
 	if len(findings) != 0 {
@@ -314,6 +359,20 @@ func selftestFigTables() bool {
 	}
 	// the stakeholder matrix renders the item row
 	if !strings.Contains(html, "Stakeholders") || !strings.Contains(html, "<td>stk-user</td>") {
+		return false
+	}
+	// a missing pooled query is a render-failing finding, never a silent skip
+	manMiss := "---\nid: man-fix\ntype: manifest\nmode: chapter\nstatement: Fixture chapter.\n---\n" +
+		"<!-- ai:3 -->\nThe lede of the fixture chapter.\n---\n![[no-such.base]]\n---\n[req-fix](req-fix.md)\n"
+	os.WriteFile(filepath.Join(dir, "man-fix.md"), []byte(manMiss), 0o644)
+	_, findingsMiss, _ := renderBookHTML(nodes)
+	missFound := false
+	for _, f := range findingsMiss {
+		if strings.Contains(f, "no-such.base") {
+			missFound = true
+		}
+	}
+	if !missFound {
 		return false
 	}
 	// a retired fig kind refuses with the pointer
@@ -622,12 +681,24 @@ func selftestSpecTemplateSet() bool {
 			}
 		}
 	}
-	// the canned queries ship beside the skeletons
+	// the canned queries ship beside the skeletons (pooled centrally - no inline blocks)
 	for _, q := range []string{"stakeholder-matrix", "vv-matrix", "needs", "requirements",
-		"decisions-architecture", "decisions-project", "decisions-waiver"} {
+		"decisions-architecture", "decisions-project", "decisions-waiver",
+		"assumptions", "asr", "raid", "rationales"} {
 		if _, err := os.Stat(filepath.Join(dir, "queries", q+".base")); err != nil {
 			return false
 		}
+	}
+	// the skeletons reference pooled queries; an authored inline block is the smell the ruling bans
+	for _, ch := range chapters {
+		raw, _ := os.ReadFile(filepath.Join(dir, ch+".md"))
+		if strings.Contains(string(raw), "```base") {
+			return false
+		}
+	}
+	// the method-source reference notes ship beside the skeletons
+	if _, err := os.Stat(filepath.Join(dir, "references", "ref-tech-dok-grundlagen.md")); err != nil {
+		return false
 	}
 	return true
 }
@@ -643,6 +714,8 @@ func selftestStubSpec() bool {
 		filepath.Join(dir, "spec", "trace", "man-ch0-orientation.md"),
 		filepath.Join(dir, "spec", "trace", "man-ch8-guidance.md"),
 		filepath.Join(dir, "spec", "queries", "vv-matrix.base"),
+		filepath.Join(dir, "spec", "references", "ref-tech-dok-grundlagen.md"),
+		filepath.Join(dir, "spec", "fundamentals", "README.md"),
 	} {
 		if _, err := os.Stat(f); err != nil {
 			return false

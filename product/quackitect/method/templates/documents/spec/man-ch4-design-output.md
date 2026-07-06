@@ -11,7 +11,7 @@ Contents: the chapter in one breath - part A derives the architecture, part B
 Form: two to four sentences. The sorting rule for everything here: a decision is
   ARCHITECTURAL if it has system-wide impact or affects an important quality -
   otherwise it is detailed design (Bass).
-Sources: sya architecting digest (architecture vs design table).
+Sources: architecture vs design table @[[ref-sya-architecting]].
 -->
 <!-- ai:3 -->
 {{lede}}
@@ -24,24 +24,12 @@ Contents: the architecturally significant requirements (the high-weight and
 Motivation: strategy answers drivers - each strategic choice names the goal or
   quality it serves and links the decision that fixed it.
 Form: short prose plus the derived ASR view below.
-Sources: sya architecting digest (drivers, approach styles).
+Sources: drivers, approach styles @[[ref-sya-architecting]].
 -->
 <!-- ai:3 -->
 {{drivers-and-strategy}}
 
-```base
-filters:
-  and:
-    - 'type == "requirement"'
-    - 'weight >= 0.7'
-views:
-  - type: table
-    name: Architecturally significant requirements
-    order: [file.name, statement, weight]
-    sort:
-      - property: weight
-        direction: DESC
-```
+![[asr.base]]
 ---
 ## The solution space
 <!-- fill [mandatory]
@@ -53,7 +41,7 @@ Form: short prose, then the derived matrix. Anti-bias discipline lives in the
   decision records: weights fixed BEFORE options are scored; a question mark is
   a legal verdict meaning information gap. Methods: morphological analysis,
   design-space exploration, set-based design - in the methods view.
-Sources: methodische-entwicklung digest (anti-bias); sya tactics digest (FRAME).
+Sources: anti-bias @[[ref-methodische-entwicklung]]; FRAME @[[ref-sya-tactics]].
 -->
 <!-- ai:3 -->
 {{solution-space}}
@@ -71,7 +59,7 @@ Form: fig block-tree plus prose. Element descriptions follow per block: name,
   reuse, or buy - early supplier involvement flagged), allocated requirements.
   Software blocks DERIVE from the design markers in code; physical artifacts get
   design notes wrapping the artifact.
-Sources: sya architecting digest (partitioning forces, block description).
+Sources: partitioning forces, block description @[[ref-sya-architecting]].
 -->
 <!-- ai:3 -->
 {{partitioning}}
@@ -85,7 +73,7 @@ Contents: the requirement-to-metric-to-budget chain - each system budget with
 Motivation: suppliers game rss summation to hide overruns - the rule is part of
   the budget or the budget is theater.
 Form: one table per budget; the rule named beside it.
-Sources: systementwurf-mechatronik digest (budgets, summation rules).
+Sources: budgets, summation rules @[[ref-systementwurf-mechatronik]].
 -->
 <!-- ai:3 -->
 {{budgets}}
@@ -97,20 +85,12 @@ Motivation: without decisions there is no architecture - and every decision
   names the requirement it addresses.
 Form: one prose line; the view renders derived. Waivers render in verification
   and validation; project decisions in the project chapter.
+Sources: every decision names the requirement it addresses @[[ref-sya-architecting]].
 -->
 <!-- ai:3 -->
 {{decisions-lede}}
 
-```base
-filters:
-  and:
-    - 'type == "adr"'
-    - 'kind == "architecture"'
-views:
-  - type: table
-    name: Architecture decisions
-    order: [file.name, statement, addresses]
-```
+![[decisions-architecture.base]]
 ---
 ## Design rules
 <!-- fill [judgment]
@@ -118,7 +98,7 @@ Contents: the binding rules detailed design must honor - interface rules,
   patterns to use, guidelines.
 Motivation: governance is what makes drift detectable later. Normative layer.
 Form: a short list. Skip with a recorded reason where one team holds everything.
-Sources: sya architecting digest (governance).
+Sources: governance @[[ref-sya-architecting]].
 -->
 <!-- ai:3 -->
 {{design-rules}}

@@ -1,0 +1,15 @@
+# The pull law as a query: `referenced` is the emitter's link graph - only entries a
+# chapter actually links render in the book. Obsidian does not know the property, so the
+# preview shows ALL fundamentals (the superset); the book stays the truth.
+filters:
+  and:
+    - 'file.inFolder("spec/fundamentals")'
+    - 'referenced != false'
+views:
+  - type: table
+    name: Fundamentals
+    order: [file.name, statement]
+  - type: table
+    name: Fundamentals in full
+    render: full
+    order: [statement]

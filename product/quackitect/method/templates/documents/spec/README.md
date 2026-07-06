@@ -36,6 +36,10 @@ The authored source is truth. Any assembled form is ephemeral.
 - Every enumeration is a markdown list. Items referencing files carry links.
 - External links live ONLY in reference notes (`spec/references/`). The lint
   refuses them anywhere else.
+- A fill comment's `Sources:` line links its reference notes:
+  `<claim> @[[ref-...]]`. The notes live in `spec/references/`; the
+  method-source set ships in `references/` beside the skeletons and
+  instantiates with the stubs.
 - Methods are notes (`spec/methods/`), routed by `applies_chapters` slugs.
   Chapters render "methods that apply here" — nothing hard-codes a method.
 - Item shapes live in `../../items/` — one template per kind, fields declared
@@ -45,6 +49,23 @@ The authored source is truth. Any assembled form is ephemeral.
 
 `queries/` ships the canned base views the chapters embed: the stakeholder
 matrix, the needs register, the requirements register, the decision views, the
-verification matrix. Standard Obsidian Bases syntax — the pinned subset — so the
-authoring preview works live in Obsidian and the engine renders the same result.
+verification matrix, the assumption, RAID, ASR, and rationale views. Standard
+Obsidian Bases syntax — the pinned subset — so the authoring preview works live
+in Obsidian and the engine renders the same result.
+
+Queries pool centrally. Every query lives as a `.base` file in `spec/queries/`,
+and a manifest references it with the Obsidian embed `![[name.base]]` — or one
+view of it with `![[name.base#View Name]]`. An inline ` ```base ` block in a
+manifest is a smell — pool it and reference it.
+
+Two pinned extensions carry the pull law into the queries:
+
+- `referenced` — true only for items the rendered chapters link. Obsidian does
+  not know the property, so a preview shows the superset; the book is the truth.
+- `render: full` — the view renders sections with full note bodies instead of a
+  table. Obsidian ignores the key and previews the same rows as a plain table.
+
+The fundamentals and references lists (ch2, ch8) ride on both. Notation and the
+glossary stay emitter-derived — their term anchors and first-use expansion live
+in the emitter.
 <!-- enddesign -->

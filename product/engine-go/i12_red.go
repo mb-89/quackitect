@@ -50,6 +50,9 @@ func proseUnitsMarked(body string) bool {
 		if strings.HasPrefix(t, "#") || strings.HasPrefix(t, "<") {
 			continue // headings and markup are not prose units
 		}
+		if baseEmbedRe.MatchString(t) && strings.TrimSpace(baseEmbedRe.ReplaceAllString(t, "")) == "" {
+			continue // a pooled-query embed renders as a derived table, never prose
+		}
 		if !marked {
 			return false // a prose paragraph with no mark above it
 		}

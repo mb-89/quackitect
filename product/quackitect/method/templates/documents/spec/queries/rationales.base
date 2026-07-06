@@ -1,0 +1,10 @@
+filters:
+  and:
+    - 'type == "rationale"'
+views:
+  - type: table
+    name: Rationales
+    order: [file.name, refers, statement]
+    sort:
+      - property: refers
+        direction: ASC

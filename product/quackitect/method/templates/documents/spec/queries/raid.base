@@ -1,0 +1,10 @@
+filters:
+  and:
+    - 'type == "raid"'
+views:
+  - type: table
+    name: RAID register
+    order: [file.name, kind, statement, probability, impact, status]
+    sort:
+      - property: kind
+        direction: ASC

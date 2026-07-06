@@ -12,6 +12,15 @@ package main
 // regeneration is the contract (req-book-identity). Everything else: "out-of-subset" error
 // naming the construct. Growth only on template demand (adr lineage: the coverage board
 // brought groupBy+count).
+// Grown 2026-07-06 (owner ruling: ch2/ch8 lists join the query system): the view key
+// `render: full` renders results as full sections (statement + body) instead of a table -
+// Obsidian ignores the unknown key and previews the same rows as a plain table (the
+// understandable fallback). The bare property `referenced` is the pull law as a predicate:
+// true iff the emitter's link graph marks the item used. It exists ONLY where the emitter
+// injects that graph (EvalBaseUsed); anywhere else it refuses loudly. In Obsidian the
+// property is absent, so `referenced != false` previews the SUPERSET (all rows) - the book
+// stays the truth. A sort entry on the groupBy property orders the GROUPS (DESC puts
+// normative before informative, ISO clause-2 style).
 
 import (
 	"fmt"
@@ -216,6 +225,7 @@ type baseView struct {
 	limit   int
 	groupBy string
 	filter  *baseFilter
+	full    bool // render: full - sections with bodies instead of a table
 }
 
 type baseFilter struct {
@@ -287,6 +297,14 @@ func ParseBase(text string) (*baseDef, error) {
 					case "type":
 						if val.scalar != "table" {
 							return nil, fmt.Errorf("base: out-of-subset view type %q (table only)", val.scalar)
+						}
+					case "render":
+						switch val.scalar {
+						case "full":
+							bv.full = true
+						case "table", "":
+						default:
+							return nil, fmt.Errorf("base: out-of-subset render mode %q (table or full)", val.scalar)
 						}
 					case "name":
 						bv.name = val.scalar
@@ -406,6 +424,7 @@ func baseLex(s string) ([]baseTok, error) {
 type baseEvalCtx struct {
 	p     baseProps
 	nodes map[string]Node
+	used  map[string]bool // the emitter's link graph; nil where the emitter is absent
 }
 
 type baseParser struct {
@@ -530,6 +549,12 @@ func (bp *baseParser) parsePrimary() (string, error) {
 		}
 		if t.s == "true" || t.s == "false" {
 			return t.s, nil
+		}
+		if t.s == "referenced" || t.s == "note.referenced" {
+			if bp.ctx.used == nil {
+				return "", fmt.Errorf("base: 'referenced' is only available in the book render (the emitter owns the link graph)")
+			}
+			return strconv.FormatBool(bp.ctx.used[bp.ctx.p.id]), nil
 		}
 		return bp.resolve(t.s), nil
 	}
@@ -684,6 +709,8 @@ type BaseRow struct {
 	ID     string
 	Cells  []string
 	Facets []string // f-<facet>-<value> classes for the board's CSS filter (go-facet-board)
+	Head   string   // full render: the section headline (statement, else title, else id)
+	Body   string   // full render: the note body markdown
 }
 
 type BaseGroup struct {
@@ -696,10 +723,17 @@ type BaseResult struct {
 	Name    string
 	Columns []string
 	Groups  []BaseGroup
+	Full    bool // render as sections with bodies instead of a table
 }
 
 // EvalBase evaluates a base block over the given note files, deterministically.
 func EvalBase(text string, paths []string, nodes map[string]Node) ([]BaseResult, error) {
+	return EvalBaseUsed(text, paths, nodes, nil)
+}
+
+// EvalBaseUsed is EvalBase with the emitter's link graph injected - the home of the
+// `referenced` predicate (the pull law as a filter).
+func EvalBaseUsed(text string, paths []string, nodes map[string]Node, used map[string]bool) ([]BaseResult, error) {
 	def, err := ParseBase(text)
 	if err != nil {
 		return nil, err
@@ -713,7 +747,7 @@ func EvalBase(text string, paths []string, nodes map[string]Node) ([]BaseResult,
 		}
 		for _, path := range sorted {
 			p := basePropsOf(path)
-			ctx := baseEvalCtx{p: p, nodes: nodes}
+			ctx := baseEvalCtx{p: p, nodes: nodes, used: used}
 			ok, err := baseEvalFilter(def.filter, ctx)
 			if err != nil {
 				return nil, err
@@ -733,8 +767,8 @@ func EvalBase(text string, paths []string, nodes map[string]Node) ([]BaseResult,
 		// sort: declared specs first, id tie-break
 		sort.SliceStable(rows, func(a, b int) bool {
 			for _, s := range view.sorts {
-				ctxA := baseEvalCtx{p: rows[a].p, nodes: nodes}
-				ctxB := baseEvalCtx{p: rows[b].p, nodes: nodes}
+				ctxA := baseEvalCtx{p: rows[a].p, nodes: nodes, used: used}
+				ctxB := baseEvalCtx{p: rows[b].p, nodes: nodes, used: used}
 				va := (&baseParser{ctx: ctxA}).resolve(s.prop)
 				vb := (&baseParser{ctx: ctxB}).resolve(s.prop)
 				c := baseCmp(va, vb)
@@ -757,16 +791,26 @@ func EvalBase(text string, paths []string, nodes map[string]Node) ([]BaseResult,
 		mkRow := func(p baseProps) BaseRow {
 			r := BaseRow{ID: p.id}
 			for _, c := range cols {
-				r.Cells = append(r.Cells, (&baseParser{ctx: baseEvalCtx{p: p, nodes: nodes}}).resolve(c))
+				r.Cells = append(r.Cells, (&baseParser{ctx: baseEvalCtx{p: p, nodes: nodes, used: used}}).resolve(c))
 			}
 			for _, f := range facetNames { // filter hooks for the coverage board
 				for _, v := range p.lists[f] {
 					r.Facets = append(r.Facets, "f-"+f+"-"+v)
 				}
 			}
+			if view.full {
+				r.Head = p.scalars["statement"]
+				if r.Head == "" {
+					r.Head = p.scalars["title"]
+				}
+				if r.Head == "" {
+					r.Head = p.id
+				}
+				r.Body = strings.TrimSpace(p.body)
+			}
 			return r
 		}
-		res := BaseResult{Name: view.name, Columns: cols}
+		res := BaseResult{Name: view.name, Columns: cols, Full: view.full}
 		if view.groupBy == "" {
 			g := BaseGroup{Key: "", Count: len(rows)}
 			for _, r := range rows {
@@ -800,6 +844,13 @@ func EvalBase(text string, paths []string, nodes map[string]Node) ([]BaseResult,
 				}
 			}
 			sort.Strings(keys)
+			for _, s := range view.sorts { // a sort entry on the groupBy property orders the groups
+				if strings.TrimPrefix(s.prop, "note.") == prop && s.desc {
+					for i, j := 0, len(keys)-1; i < j; i, j = i+1, j-1 {
+						keys[i], keys[j] = keys[j], keys[i]
+					}
+				}
+			}
 			for _, k := range keys {
 				res.Groups = append(res.Groups, *groups[k])
 			}

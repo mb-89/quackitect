@@ -22,22 +22,13 @@ Motivation: documentation right-sized ON PURPOSE, reason recorded - the field
   lesson. Roles appear as roles, never persons.
 Form: one paragraph, then the derived view. Rigor and type derive from the
   iterations - state nothing derivable.
-Sources: se-thinking-learning digest (right-sizing); generic-se digest (fixed
-  skeleton, plug-in tailoring).
+Sources: right-sizing @[[ref-se-thinking-learning]]; fixed skeleton, plug-in
+  tailoring @[[ref-generic-se]].
 -->
 <!-- ai:3 -->
 {{approach}}
 
-```base
-filters:
-  and:
-    - 'type == "adr"'
-    - 'kind == "project"'
-views:
-  - type: table
-    name: Project decisions
-    order: [file.name, statement]
-```
+![[decisions-project.base]]
 ---
 ## Milestones and timeline
 <!-- fill [mandatory]
@@ -59,23 +50,12 @@ Contents: one line introducing the register. Items carry probability and impact
 Motivation: an unrecorded assumption is how orbits get lost.
 Form: one prose line; the register renders derived. Deeper scoring is a method
   note for projects that need it.
-Sources: methodische-entwicklung digest (reduction order, triple scoring).
+Sources: reduction order, triple scoring @[[ref-methodische-entwicklung]].
 -->
 <!-- ai:3 -->
 {{raid-lede}}
 
-```base
-filters:
-  and:
-    - 'type == "raid"'
-views:
-  - type: table
-    name: RAID register
-    order: [file.name, kind, statement, probability, impact, status]
-    sort:
-      - property: kind
-        direction: ASC
-```
+![[raid.base]]
 ---
 ## Baselines and change control
 <!-- fill [mandatory]
@@ -84,7 +64,7 @@ Contents: one short prose unit - which baseline this rendering represents (the
   the change history lives (the ledger renders it, this section never restates it).
 Motivation: strike-through-never-delete is a PROPERTY the ledger enforces, not a
   discipline the reader must trust - stated once, here.
-Sources: modellbasierte-pe digest (baselines); pahl-beitz digest (change discipline).
+Sources: baselines @[[ref-modellbasierte-pe]]; change discipline @[[ref-pahl-beitz]].
 -->
 <!-- ai:3 -->
 {{baselines}}

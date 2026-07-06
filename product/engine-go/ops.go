@@ -801,8 +801,9 @@ func cmdStartStubs(args []string) {
 	}
 	// design: go-stub-spec  implements: req-stub-spec
 	// The instantiation path: the shipped spec template set (README, nine chapter
-	// skeletons, the canned queries) lands in spec/trace and spec/queries of the bare
-	// workspace. Existing files are KEPT - a second run refuses to overwrite.
+	// skeletons, the canned queries, the method-source reference notes) lands in
+	// spec/trace, spec/queries, and spec/references of the bare workspace. Existing
+	// files are KEPT - a second run refuses to overwrite.
 	tplDir := filepath.Join(EngineDir(), "method", "templates", "documents", "spec")
 	if ents, err := os.ReadDir(tplDir); err == nil {
 		for _, e := range ents {
@@ -820,22 +821,26 @@ func cmdStartStubs(args []string) {
 			writeIfAbsent(dst, string(raw))
 		}
 	}
-	if qents, err := os.ReadDir(filepath.Join(tplDir, "queries")); err == nil {
-		for _, e := range qents {
+	for _, sub := range []string{"queries", "references", "fundamentals"} {
+		ents, err := os.ReadDir(filepath.Join(tplDir, sub))
+		if err != nil {
+			continue
+		}
+		for _, e := range ents {
 			if e.IsDir() {
 				continue
 			}
-			raw, rerr := os.ReadFile(filepath.Join(tplDir, "queries", e.Name()))
+			raw, rerr := os.ReadFile(filepath.Join(tplDir, sub, e.Name()))
 			if rerr != nil {
 				continue
 			}
-			writeIfAbsent(filepath.Join(target, "spec", "queries", e.Name()), string(raw))
+			writeIfAbsent(filepath.Join(target, "spec", sub, e.Name()), string(raw))
 		}
 	}
 	// enddesign
 	fmt.Println("stubs -> " + target)
 	fmt.Println("  wrote " + proj + ".cmd, AGENTS.md, CLAUDE.md, spec/project.toml (kept any existing).")
-	fmt.Println("  wrote the spec template skeleton (spec/trace, spec/queries; kept any existing).")
+	fmt.Println("  wrote the spec template skeleton (spec/trace, spec/queries, spec/references; kept any existing).")
 	fmt.Println("  the launcher resolves the global engine binary, or set QUACK_ENGINE.")
 }
 

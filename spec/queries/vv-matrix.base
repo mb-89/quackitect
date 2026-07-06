@@ -1,0 +1,8 @@
+filters:
+  and:
+    - 'type == "test"'
+views:
+  - type: table
+    name: Verification matrix
+    order: [file.name, verifies, verify]
+    groupBy: verifies

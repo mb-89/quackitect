@@ -24,21 +24,12 @@ Motivation: ch0's star orients; this one BINDS. The does-not-do list is the
 Form: prose plus the interface list. The methods view below carries the analysis
   tools (the 9-window among them). Design-relevant ASSUMPTIONS render from the
   raid register - record them there, never inline.
-Sources: sya architecting digest (context views); the methods notes.
+Sources: context views @[[ref-sya-architecting]]; the methods notes.
 -->
 <!-- ai:3 -->
 {{context-and-scope}}
 
-```base
-filters:
-  and:
-    - 'type == "raid"'
-    - 'kind == "assumption"'
-views:
-  - type: table
-    name: Design-relevant assumptions
-    order: [file.name, statement, status]
-```
+![[assumptions.base]]
 ---
 ## Stakeholders and their concerns
 <!-- fill [mandatory]
@@ -49,7 +40,7 @@ Motivation: every requirement's source traces to a row here. Boundary against
 Form: short prose per stakeholder, or the derived table plus exceptions. The
   pipeline (identify and prioritize, elicit, dedupe and surface conflicts,
   weight) lives in the methods view.
-Sources: generic-se digest (the four-step pipeline).
+Sources: the four-step pipeline @[[ref-generic-se]].
 -->
 <!-- ai:3 -->
 {{stakeholder-concerns}}
@@ -59,6 +50,7 @@ Sources: generic-se digest (the four-step pipeline).
 Contents: ref units at depth 2 - one per use case, actors and trigger in the
   item, success scenario in its body.
 Form: replace the slot with ref units, one per line, depth:2.
+Sources: Cockburn use-case fields @[[ref-sya-re]].
 -->
 <!-- ai:3 -->
 {{usecase-refs}}
@@ -69,7 +61,7 @@ Contents: the functional structure - verb plus noun, solution-neutral.
 Motivation: physical types decompose by function before form (Pahl/Beitz).
 Form: a tree or list. SKIP where the use cases already carry the functional
   story - record the skip in the tailoring row.
-Sources: pahl-beitz digest (functional decomposition).
+Sources: functional decomposition @[[ref-pahl-beitz]].
 -->
 <!-- ai:3 -->
 {{functions}}
@@ -83,8 +75,8 @@ Motivation: every quality names the experiment and metric that will verify it
 Form: one scenario block per quality, kind quality rows in the register carry
   the facets. The ISO 25010 tree is the elicitation checklist - in the methods
   view, not here.
-Sources: systementwurf-mechatronik digest (metric rule); sya NFR digest
-  (six-part scenarios).
+Sources: metric rule @[[ref-systementwurf-mechatronik]]; six-part scenarios
+  @[[ref-sya-nfr]]; the elicitation tree @[[ref-iso-25010]].
 -->
 <!-- ai:3 -->
 {{qualities}}
@@ -112,25 +104,13 @@ Form: one prose line; the board and register render derived. Statements are
   EARS-shaped, values carry tolerances IN the statement. Facet tagging (phase,
   discipline, quality) is expected work - the zero-count holes on the board are
   the completeness check (the Hauptmerkmalliste, live).
-Sources: pahl-beitz digest (four core areas, Hauptmerkmalliste, staging);
-  methodische-entwicklung digest (row schema); modellbasierte-pe digest
-  (attribute discipline); ISO 29148 set criteria.
+Sources: four core areas, Hauptmerkmalliste, staging @[[ref-pahl-beitz]];
+  row schema @[[ref-methodische-entwicklung]]; attribute discipline
+  @[[ref-modellbasierte-pe]]; set criteria @[[ref-iso-29148]].
 -->
 <!-- ai:3 -->
 {{register-lede}}
 
 fig: coverage-board
 ---
-```base
-filters:
-  and:
-    - 'type == "requirement"'
-views:
-  - type: table
-    name: Requirements register
-    order: [file.name, statement, kind, must_wish, weight, source, verify]
-    sort:
-      - property: weight
-        direction: DESC
-    groupBy: kind
-```
+![[requirements.base]]

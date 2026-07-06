@@ -15,13 +15,13 @@ Form: two sentences. Everything self-referential lives here and nowhere else -
 {{guidance-lede}}
 ---
 ## Fundamentals
-<!-- fill [mandatory]
-Contents: one line - the full bodies of every fundamental the book uses render
-  here, one link away from where the flow needed them.
-Form: one prose line; the bodies render derived (the pull law).
+<!-- tailor: shipped text - the bodies render from the pooled query (the pull
+  law); the intro line is the same in every project.
 -->
 <!-- ai:3 -->
-{{fundamentals-lede}}
+The full body of every fundamental the document uses renders here - one link away from where the flow needed it.
+
+![[fundamentals.base#Fundamentals in full]]
 ---
 ## Guides
 <!-- fill [judgment]
@@ -33,6 +33,7 @@ Motivation: guides are the how-to mode; fundamentals the explanation mode; the
   spec chapters stay pure reference - the modes never blend (Diataxis).
 Form: authored guide notes, linked or hosted here. The agent guide stays its own
   manifest (it emits the repo entry file) and renders as the final section.
+Sources: the four modes @[[ref-diataxis]].
 -->
 <!-- ai:3 -->
 {{guides}}

@@ -16,6 +16,8 @@ The AI writes every first draft. The user improves it. No exceptions, no unmarke
 - Big ideas first, details later. A non-native professional of average competence must land it.
 - Prefer a figure where it transports better. Author it as inline SVG or ASCII (machine-readable).
 - Meta-quarantine: chapters one to six speak only about the system. Process talk goes to the agent guide.
+- Queries pool centrally. A table view is a `.base` file in `spec/queries/`, referenced with `![[name.base]]`. Never author an inline base block in a manifest.
+- Sources are notes. A claim that leans on an external source links its `ref-` note in `spec/references/`. A source without a note gets one first. A raw URL outside a reference note is refused by the lint.
 
 ## Mark (the involvement stamp - structural, at write time)
 

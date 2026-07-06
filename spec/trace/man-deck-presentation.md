@@ -14,17 +14,7 @@ Note: the problem in one sentence - hand-written docs do not happen.
 fig: block-tree
 Note: one emitter, one file, everything deterministic downstream.
 ---
-```base
-filters:
-  and:
-    - 'type == "test"'
-views:
-  - type: table
-    name: Verification matrix
-    order: [file.name, verifies]
-    groupBy: verifies
-    limit: 12
-```
+![[vv-deck.base]]
 Note: the trust slide - every requirement against its tests, live from the ledger.
 ---
 <!-- ai:3 -->

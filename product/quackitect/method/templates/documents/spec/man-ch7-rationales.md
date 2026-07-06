@@ -21,15 +21,4 @@ Form: two sentences, then the derived view, then one link line to the method
 <!-- ai:3 -->
 {{rationales-lede}}
 
-```base
-filters:
-  and:
-    - 'type == "rationale"'
-views:
-  - type: table
-    name: Rationales
-    order: [file.name, refers, statement]
-    sort:
-      - property: refers
-        direction: ASC
-```
+![[rationales.base]]

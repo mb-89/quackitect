@@ -1,0 +1,7 @@
+filters:
+  and:
+    - 'type == "need"'
+views:
+  - type: table
+    name: Needs
+    order: [file.name, statement]

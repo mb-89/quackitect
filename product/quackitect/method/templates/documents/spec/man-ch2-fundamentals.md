@@ -5,32 +5,31 @@ mode: chapter
 statement: Fundamentals - the concepts, references, and notation this document stands on.
 ---
 ## What this chapter is
-<!-- fill [mandatory]
-Contents: two sentences on how these lists came to be - everything here exists
-  because something downstream required it (the pull law); nothing is authored
-  into these lists by hand.
-Motivation: the acceptable self-reference - a reader should know the lists are
-  derived and demand-driven.
-Form: two sentences. The lists below render themselves.
+<!-- tailor: shipped text - the pull law is the same in every project. Tailor only
+  if this project adds a list kind.
 Sources: the LaTeX model (cite builds the bibliography, gls builds the glossary);
-  ISO norm structure (clause 2 references, clause 3 terms, clause 4 symbols).
+  clause structure, references apart from terms, normative apart from
+  informative @[[ref-iso-29148]].
 -->
 <!-- ai:3 -->
-{{pull-law-lede}}
+This chapter contains knowledge needed to understand the rest of the document.
+Nothing in it is authored by hand. A reference, a term, or a fundamental appears below because a chapter uses it - never by decree (the pull law). Each entry is a link. Follow it when you want the depth - the full fundamental bodies live in [guidance](man-ch8-guidance.md).
 ---
 ## Key concepts
-<!-- fill [mandatory]
-Contents: the handful of concepts a reader must hold before design input makes
-  sense - each a linked fundamental or glossary term, detail one link away.
-Motivation: if a newcomer cannot follow ch3 after this unit, it is incomplete;
-  if it explains things ch3 never uses, it is padding.
-Form: short prose with heavy term links. Domain teaching beyond the minimum
-  belongs in references; deeper whys in ch7. The full fundamental bodies render
-  in ch8 - here only the guided tour.
+<!-- tailor: shipped machinery - the fundamentals list IS the key-concepts view:
+  one-liner per concept here, the full body one link away in ch8. The pull law
+  (`referenced`) filters to concepts the chapters actually use; the Obsidian
+  preview shows the superset.
 -->
-<!-- ai:3 -->
-{{key-concepts}}
+![[fundamentals.base#Fundamentals]]
+---
+## References
+<!-- tailor: shipped machinery - the sources this document cites, normative apart
+  from informative (ISO clause-2 style), each with its pin and its only-legal URL.
+  The pull law filters to cited sources; the Obsidian preview shows the superset.
+-->
+![[references.base]]
 
-<!-- The derived lists (references normative apart from informative, notation
-     with units, fundamentals with one-liners) and the glossary append
-     themselves after the chapters. No slots - the pull law renders them. -->
+<!-- Notation and the glossary stay emitter-derived and append after the chapters:
+     their term anchors and first-use expansion live in the emitter, not in a
+     query. Everything else in this chapter is the two pooled queries above. -->

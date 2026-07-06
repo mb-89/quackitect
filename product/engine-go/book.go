@@ -297,6 +297,7 @@ func renderBookHTML(nodes map[string]Node) (string, []string, []string) {
 	}
 	// facet validation (go-facet-board): a value outside the vocabulary is loud.
 	findings = append(findings, facetFindings(nodes)...)
+	var deferredQ []baseDeferred // referenced-queries await the complete link graph
 	var body strings.Builder
 	for _, ch := range chapters {
 		raw := manifestBody(ch.Path)
@@ -328,18 +329,16 @@ func renderBookHTML(nodes map[string]Node) (string, []string, []string) {
 				if !proseUnitsMarked(u.Body) {
 					findings = append(findings, "chapter "+ch.ID+" unit "+itoa(idx+1)+" carries unmarked prose - no unmarked path into the book (req-ai-drafting)")
 				}
-				chb.WriteString(`<div id="` + anchor + `" data-layer="` + layer + `">` + "\n" + renderUnitBody(u.Body, nodes, aliasIdx, &findings) + "</div>\n")
+				chb.WriteString(`<div id="` + anchor + `" data-layer="` + layer + `">` + "\n" + renderUnitBody(u.Body, nodes, aliasIdx, &findings, &deferredQ) + "</div>\n")
 			}
 		}
 		chb.WriteString("</article>\n")
 		body.WriteString(expandTermLinks(ch.ID, chb.String(), gloss, used, &findings))
 		advisories = append(advisories, unlinkedTermAdvisories(ch.ID, raw, gloss)...)
 	}
-	chaptersHTML := body.String() // usage referent for the derived lists (go-ch2-derived)
+	chaptersHTML := body.String() // usage referent for the pull law (go-ch2-derived)
 	body.WriteString(renderGlossaryChapter(gloss, used))
 	body.WriteString(renderNotationList(gloss, used))
-	body.WriteString(renderReferencesList(chaptersHTML))
-	body.WriteString(renderFundamentals(chaptersHTML))
 	// design: go-deck-mode  implements: req-deck-mode
 	// Deck manifests render in the SAME file: one unit per slide; `Note:` lines become the
 	// presenter's aside (hidden on screen outside present mode, printed in the handout); the
@@ -371,7 +370,7 @@ func renderBookHTML(nodes map[string]Node) (string, []string, []string) {
 				if !proseUnitsMarked(u.Body) {
 					findings = append(findings, "deck "+dk.ID+" slide "+itoa(idx+1)+" carries unmarked prose (req-ai-drafting)")
 				}
-				body.WriteString(renderUnitBody(u.Body, nodes, aliasIdx, &findings))
+				body.WriteString(renderUnitBody(u.Body, nodes, aliasIdx, &findings, &deferredQ))
 			}
 			if u.Notes != "" {
 				body.WriteString(`<aside class="notes">` + htmlEscape(u.Notes) + "</aside>\n")
@@ -396,7 +395,24 @@ func renderBookHTML(nodes map[string]Node) (string, []string, []string) {
 		doc.WriteString(`<button id="expand-all">expand all</button><input id="filter" type="search" placeholder="filter sections"></nav>` + "\n")
 	}
 	doc.WriteString("</header>\n<main>\n")
-	doc.WriteString(body.String())
+	bodyHTML := body.String()
+	if len(deferredQ) > 0 {
+		// the pull law as data: the link graph over the RENDERED chapters feeds the
+		// deferred referenced-queries (same referent the derived lists always used).
+		usedSet := map[string]bool{}
+		for s := range used {
+			usedSet[s] = true
+		}
+		for _, kind := range []string{"references", "fundamentals", "methods"} {
+			for _, c := range usedContentSlugs(kind, chaptersHTML) {
+				usedSet[c.Slug] = true
+			}
+		}
+		for _, d := range deferredQ {
+			bodyHTML = strings.Replace(bodyHTML, d.token, renderBaseHTML(d.text, d.view, nodes, &findings, usedSet), 1)
+		}
+	}
+	doc.WriteString(bodyHTML)
 	doc.WriteString(`</main>
 <script>/* filters and toggles only - this script never creates content */
 (function(){
@@ -684,22 +700,79 @@ func svgMatrix(rows []string, cells map[string][]string) string {
 // whose selection is topological (context star, block tree, timeline). A retired kind is a
 // FINDING with the pointer to its canned query; a base block in any unit body evaluates
 // through the pinned evaluator (go-base-eval) into a semantic table.
+// Queries pool centrally (owner ruling 2026-07-05 evening): an inline block in a manifest
+// is a smell - the canonical home is spec/queries/, and a unit references a pooled query
+// with the Obsidian-native embed ![[name.base]] (Obsidian previews it live; the emitter
+// inlines the file and evaluates it exactly like an authored block). A missing pooled
+// query is a render-failing finding, never a silent skip.
 var retiredFigKinds = map[string]bool{"vv-table": true, "stakeholder-matrix": true}
 
-// renderUnitBody renders a unit's markdown, evaluating embedded base blocks to tables.
-func renderUnitBody(body string, nodes map[string]Node, aliasIdx map[string]string, findings *[]string) string {
-	blocks := baseBlockRe.FindAllStringSubmatchIndex(body, -1)
-	if len(blocks) == 0 {
+var queriesDirOverride string // test seam: an alternate pooled-query dir for fixtures
+
+func queriesDir() string {
+	if queriesDirOverride != "" {
+		return queriesDirOverride
+	}
+	return filepath.Join(SPEC, "queries")
+}
+
+// baseEmbedRe matches an Obsidian embed of a pooled query: ![[name.base]] or
+// ![[name.base#View Name]] (an optional |alias is tolerated and ignored; a path
+// prefix resolves by its basename).
+var baseEmbedRe = regexp.MustCompile(`!\[\[([^\]|#]+\.base)(?:#([^\]|]+))?(?:\|[^\]]*)?\]\]`)
+
+// baseUseRe matches one base usage in a unit body: an authored inline block (group 1)
+// or a pooled-query embed (groups 2+3, the file and the optional view).
+var baseUseRe = regexp.MustCompile("(?s)```base\\s*\\n(.*?)```|!\\[\\[([^\\]|#]+\\.base)(?:#([^\\]|]+))?(?:\\|[^\\]]*)?\\]\\]")
+
+// baseRefdRe spots the `referenced` predicate - those queries defer until the whole
+// chapter pass has built the link graph.
+var baseRefdRe = regexp.MustCompile(`\breferenced\b`)
+
+// baseDeferred is one referenced-query awaiting the post-chapter evaluation pass.
+type baseDeferred struct {
+	token string
+	text  string
+	view  string
+}
+
+// renderUnitBody renders a unit's markdown, evaluating base usages (inline blocks and
+// pooled-query embeds) to tables or full sections. A `referenced` query defers via a
+// placeholder token; the post-chapter pass evaluates it with the complete link graph.
+func renderUnitBody(body string, nodes map[string]Node, aliasIdx map[string]string, findings *[]string, deferred *[]baseDeferred) string {
+	uses := baseUseRe.FindAllStringSubmatchIndex(body, -1)
+	if len(uses) == 0 {
 		return mdLite(AutoLink(body, aliasIdx))
 	}
 	var out strings.Builder
 	last := 0
-	for _, m := range blocks {
+	for _, m := range uses {
 		if seg := body[last:m[0]]; strings.TrimSpace(seg) != "" {
 			out.WriteString(mdLite(AutoLink(seg, aliasIdx)))
 		}
-		out.WriteString(renderBaseHTML(body[m[2]:m[3]], nodes, findings))
 		last = m[1]
+		text, view := "", ""
+		if m[2] >= 0 { // authored inline block
+			text = body[m[2]:m[3]]
+		} else { // pooled-query embed
+			name := filepath.Base(strings.TrimSpace(body[m[4]:m[5]]))
+			if m[6] >= 0 {
+				view = strings.TrimSpace(body[m[6]:m[7]])
+			}
+			raw, err := os.ReadFile(filepath.Join(queriesDir(), name))
+			if err != nil {
+				*findings = append(*findings, "base: pooled query "+name+" not found in spec/queries")
+				continue
+			}
+			text = string(raw)
+		}
+		if deferred != nil && baseRefdRe.MatchString(text) {
+			token := "<!--base-deferred-" + itoa(len(*deferred)) + "-->"
+			*deferred = append(*deferred, baseDeferred{token: token, text: text, view: view})
+			out.WriteString(token + "\n")
+			continue
+		}
+		out.WriteString(renderBaseHTML(text, view, nodes, findings, nil))
 	}
 	if seg := body[last:]; strings.TrimSpace(seg) != "" {
 		out.WriteString(mdLite(AutoLink(seg, aliasIdx)))
@@ -707,8 +780,9 @@ func renderUnitBody(body string, nodes map[string]Node, aliasIdx map[string]stri
 	return out.String()
 }
 
-// renderBaseHTML evaluates one base block over the workspace's node files.
-func renderBaseHTML(text string, nodes map[string]Node, findings *[]string) string {
+// renderBaseHTML evaluates one base query over the workspace's node files and content
+// notes. A named view renders alone; the pull-law link graph arrives via used.
+func renderBaseHTML(text string, viewName string, nodes map[string]Node, findings *[]string, used map[string]bool) string {
 	seen := map[string]bool{}
 	var paths []string
 	for _, n := range nodes {
@@ -717,18 +791,45 @@ func renderBaseHTML(text string, nodes map[string]Node, findings *[]string) stri
 			paths = append(paths, n.Path)
 		}
 	}
-	results, err := EvalBase(text, paths, nodes)
+	for _, kind := range []string{"glossary", "references", "fundamentals", "methods"} {
+		for _, c := range ReadContentNotes(kind) {
+			if !seen[c.Path] {
+				seen[c.Path] = true
+				paths = append(paths, c.Path)
+			}
+		}
+	}
+	results, err := EvalBaseUsed(text, paths, nodes, used)
 	if err != nil {
 		*findings = append(*findings, "base: "+err.Error())
 		return `<p class="missing">base query error (see findings)</p>` + "\n"
 	}
+	if viewName != "" {
+		var picked []BaseResult
+		for _, r := range results {
+			if r.Name == viewName {
+				picked = append(picked, r)
+			}
+		}
+		if len(picked) == 0 {
+			*findings = append(*findings, "base: view "+viewName+" not found in the embedded query")
+			return `<p class="missing">base query error (see findings)</p>` + "\n"
+		}
+		results = picked
+	}
 	return baseResultHTML(results)
 }
 
-// baseResultHTML renders evaluation results as semantic tables (WCAG: real th headers).
+// baseResultHTML renders evaluation results: semantic tables (WCAG: real th headers),
+// or - for render: full views - sections with the note bodies, the section id being the
+// note slug so authored and auto-links land on it.
 func baseResultHTML(rs []BaseResult) string {
 	var b strings.Builder
 	for _, r := range rs {
+		if r.Full {
+			b.WriteString(renderBaseFull(r))
+			continue
+		}
 		b.WriteString(`<table data-layer="derived">` + "\n")
 		if r.Name != "" {
 			b.WriteString(`<caption>` + htmlEscape(r.Name) + `</caption>` + "\n")
@@ -760,6 +861,42 @@ func baseResultHTML(rs []BaseResult) string {
 		if empty {
 			b.WriteString(`<p class="meta">no rows yet — the query renders as items arrive</p>` + "\n")
 		}
+	}
+	return b.String()
+}
+
+// renderBaseFull renders one full view: a section per row (headline, meta cells, body).
+// Group keys become headings, capitalized (Normative before Informative rides on the
+// groupBy sort entry).
+func renderBaseFull(r BaseResult) string {
+	var b strings.Builder
+	empty := true
+	for _, g := range r.Groups {
+		if g.Key != "" {
+			b.WriteString(`<h2>` + htmlEscape(strings.ToUpper(g.Key[:1])+g.Key[1:]) + `</h2>` + "\n")
+		}
+		for _, row := range g.Rows {
+			empty = false
+			meta := ""
+			for i, cell := range row.Cells {
+				if cell == "" || cell == row.Head || (i < len(r.Columns) && r.Columns[i] == "file.name") {
+					continue
+				}
+				if strings.HasPrefix(cell, "http://") || strings.HasPrefix(cell, "https://") {
+					meta += ` — <a href="` + htmlEscape(cell) + `">` + htmlEscape(cell) + `</a>`
+				} else {
+					meta += `, ` + htmlEscape(cell)
+				}
+			}
+			b.WriteString(`<section id="` + htmlEscape(row.ID) + `" data-layer="informative"><p class="stmt"><strong>` + htmlEscape(row.Head) + `</strong>` + meta + "</p>\n")
+			if row.Body != "" {
+				b.WriteString(mdLite(row.Body))
+			}
+			b.WriteString("</section>\n")
+		}
+	}
+	if empty {
+		b.WriteString(`<p class="meta">no entries yet — the pull law renders them as chapters use them</p>` + "\n")
 	}
 	return b.String()
 }
@@ -996,13 +1133,15 @@ func renderGlossaryChapter(gloss map[string]GlossTerm, used map[string][]string)
 }
 
 // design: go-ch2-derived  implements: req-ch2-derived
-// The pull law of the fundamentals chapter (owner ruling 2026-07-05): everything renders
-// from USAGE alone - references (normative apart from informative, ISO clause-2 style),
-// notation (used notation-class terms with their units), fundamentals (slug + one-liner;
-// the FULL bodies render one link away for the guidance chapter to reference). An entry
-// nothing links does not render. Usage = a link in the rendered chapters - authored or
-// auto-linked (go-auto-link); references are the ONLY legal home of an external URL
-// (req-external-links), so the URL prints here and nowhere else.
+// The pull law of the fundamentals chapter (owner rulings 2026-07-05 + 2026-07-06):
+// everything renders from USAGE alone - an entry nothing links does not render. Usage =
+// a link in the rendered chapters, authored or auto-linked (go-auto-link). Since the
+// 2026-07-06 ruling the references and fundamentals lists are POOLED QUERIES the ch2/ch8
+// manifests embed (`referenced != false`, evaluated deferred over the emitter's link
+// graph; full bodies via `render: full` - go-base-eval); references are the ONLY legal
+// home of an external URL (req-external-links), so the URL prints in that view and
+// nowhere else. Notation and the glossary stay emitter-derived below: their term-anchor
+// (`term-<slug>`) and first-use-expansion machinery is inherently the emitter's.
 
 // renderNotationList emits the used notation-class terms with units.
 func renderNotationList(gloss map[string]GlossTerm, used map[string][]string) string {
@@ -1045,65 +1184,6 @@ func usedContentSlugs(kind, chaptersHTML string) []ContentNote {
 		}
 	}
 	return out
-}
-
-// renderReferencesList emits the used references, normative apart from informative.
-func renderReferencesList(chaptersHTML string) string {
-	refs := usedContentSlugs("references", chaptersHTML)
-	if len(refs) == 0 {
-		return ""
-	}
-	var b strings.Builder
-	b.WriteString(`<article id="references"><h1>References</h1>` + "\n")
-	for _, group := range []string{"normative", "informative"} {
-		var members []ContentNote
-		for _, r := range refs {
-			k := r.RefKind
-			if k == "" {
-				k = "informative"
-			}
-			if k == group {
-				members = append(members, r)
-			}
-		}
-		if len(members) == 0 {
-			continue
-		}
-		b.WriteString(`<section data-layer="informative"><h2>` + strings.ToUpper(group[:1]) + group[1:] + `</h2>` + "\n")
-		for _, r := range members {
-			pin := ""
-			if r.Version != "" {
-				pin = ", " + htmlEscape(r.Version)
-			}
-			b.WriteString(`<p class="stmt" id="` + r.Slug + `"><strong>` + htmlEscape(r.Title) + `</strong>` + pin + ` — <a href="` + htmlEscape(r.URL) + `">` + htmlEscape(r.URL) + `</a></p>` + "\n")
-			if r.Body != "" {
-				b.WriteString(mdLite(r.Body))
-			}
-		}
-		b.WriteString("</section>\n")
-	}
-	b.WriteString("</article>\n")
-	return b.String()
-}
-
-// renderFundamentals emits the used fundamentals: the ch2 list (one-liner) plus the
-// full bodies as the sections the list and the auto-link pass anchor to.
-func renderFundamentals(chaptersHTML string) string {
-	funds := usedContentSlugs("fundamentals", chaptersHTML)
-	if len(funds) == 0 {
-		return ""
-	}
-	var b strings.Builder
-	b.WriteString(`<article id="fundamentals"><h1>Fundamentals</h1>` + "\n<ul>\n")
-	for _, f := range funds {
-		b.WriteString(`<li><a href="#` + f.Slug + `">` + htmlEscape(f.Statement) + `</a></li>` + "\n")
-	}
-	b.WriteString("</ul>\n")
-	for _, f := range funds {
-		b.WriteString(`<section id="` + f.Slug + `" data-layer="informative"><p class="stmt">` + htmlEscape(f.Statement) + "</p>\n" + mdLite(f.Body) + "</section>\n")
-	}
-	b.WriteString("</article>\n")
-	return b.String()
 }
 
 // enddesign
