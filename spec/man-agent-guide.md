@@ -66,13 +66,15 @@ quack bless [--all|<id>] [--by user|agent] # record an adjudication; actor defau
 quack migrate-actors     # one-shot: rewrite pre-i11 actor stamps to user (audited; no-op when done)
 quack migrate-layout     # one-shot: move a pre-i12 spec to the template-mirroring layout (no-op when done)
 quack note "<text>"      # deterministic capture lane
+quack note --file2list <copy.html> # list a commented book copy as note candidates (roles, never names)
 quack notes [--all]      # list open inbox notes (--all adds backlog + archive)
-quack observe-red <test> # run a test and record it FAILING at its current hash (a pass is refused)
+quack observe-red <test> [--refresh] # run a test and record it FAILING at its current hash (a pass is refused; --refresh re-attests an amended, still-failing test)
 quack gather <ver>       # collect all rigor+type source for an iteration
 quack report [--watch]   # render+open the live HTML board (--out F renders only)
 quack progress [--pager <gate>] # the readout, or the handover pager for a killer/milestone gate
+quack calls --summary    # print the call-log aggregate, then delete the log (the retro's log step)
 quack ship               # package product/ -> the workspace data home (out/)
-quack build              # compile the engine, write the build stamp, re-baseline golden-root
+quack build              # compile the engine, write the build stamp, re-baseline golden-root (skips the compile when no engine source changed)
 quack lint               # coverage holes, duplicate ids, EARS lint, monotonic wiring
 quack selftest           # the engine's own dependency-free self-test
 quack version            # engine version + the resolved data locations

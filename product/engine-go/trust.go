@@ -211,6 +211,16 @@ func StrictIssues(specDir string) []ParseIssue {
 				"dangling reference: '" + r.from + "' --" + r.field + "--> '" + r.to + "' (no such node)"})
 		}
 	}
+	// design: go-conn-code-endpoints  implements: req-conn-code-designs
+	// Connection endpoints resolve against code-derived designs too: ch4's interface story
+	// (an interface between two design elements) was impossible on a software project while
+	// the guard knew only spec-file ids (the i12 dogfood gap).
+	for id, n := range scanCodeDesigns() {
+		if _, dup := ids[id]; !dup {
+			ids[id] = n.Path
+		}
+	}
+	// enddesign
 	// the connections home (go-conn-lanes): kinds, lanes, endpoints, and the one-lane rule
 	issues = append(issues, connectionIssues(specDir, ids)...)
 	return issues

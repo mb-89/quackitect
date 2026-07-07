@@ -48,7 +48,46 @@ func mintID(kind, slug string) string {
 	return p + slug
 }
 
-func mintBody(kind, id string, extra map[string]string) string {
+// design: go-mint-edge-aware  implements: req-mint-edge-mode
+// In connections mode a minted node carries NO legacy edge key — the strict referee would
+// refuse it on the very next load (the i12 dogfood defect: mint broke every migrated
+// workspace). mintBody omits the keys when lanes=true; mintNodeAtX writes the same edges
+// into the connection lanes instead. depends_on and the non-legacy keys stay in frontmatter
+// in both modes (adr-edges-scope).
+type mintEdge struct{ kind, dst string }
+
+func mintLaneEdges(kind string, extra map[string]string) []mintEdge {
+	var out []mintEdge
+	add := func(k, v string) {
+		for _, d := range strings.Split(v, ",") {
+			if d = strings.TrimSpace(d); d != "" {
+				out = append(out, mintEdge{k, d})
+			}
+		}
+	}
+	switch kind {
+	case "usecase", "requirement":
+		add("refines", extra["of"])
+	case "test":
+		add("verifies", extra["of"])
+	case "adr":
+		addr := extra["addresses"]
+		if addr == "" {
+			addr = extra["of"]
+		}
+		add("addresses", addr)
+		add("supersedes", extra["supersedes"])
+	case "rationale", "rule":
+		add("refers", extra["of"])
+	case "budget":
+		add("addresses", extra["of"])
+	}
+	return out
+}
+
+// enddesign
+
+func mintBody(kind, id string, extra map[string]string, lanes bool) string {
 	var b strings.Builder
 	b.WriteString("---\n")
 	b.WriteString("id: " + id + "\n")
@@ -58,23 +97,31 @@ func mintBody(kind, id string, extra map[string]string) string {
 		b.WriteString("source: stk-TODO\n")
 		b.WriteString("acceptance: TODO — the checkable condition that accepts the need\n")
 	case "usecase":
-		b.WriteString("refines: [" + extra["of"] + "]\n")
+		if !lanes {
+			b.WriteString("refines: [" + extra["of"] + "]\n")
+		}
 	case "requirement":
-		b.WriteString("refines: [" + extra["of"] + "]\n")
+		if !lanes {
+			b.WriteString("refines: [" + extra["of"] + "]\n")
+		}
 		b.WriteString("depends_on: []\n")
 	case "test":
-		b.WriteString("verifies: [" + extra["of"] + "]\n")
+		if !lanes {
+			b.WriteString("verifies: [" + extra["of"] + "]\n")
+		}
 	case "adr":
 		addr := extra["addresses"]
 		if addr == "" {
 			addr = extra["of"]
 		}
-		b.WriteString("addresses: [" + addr + "]\n")
+		if !lanes {
+			b.WriteString("addresses: [" + addr + "]\n")
+		}
 		b.WriteString("adjudicated_by: user\n")
 		if extra["ready_when"] != "" {
 			b.WriteString("ready_when: " + extra["ready_when"] + "\n")
 		}
-		if extra["supersedes"] != "" {
+		if extra["supersedes"] != "" && !lanes {
 			b.WriteString("supersedes: [" + extra["supersedes"] + "]\n")
 		}
 	case "stakeholder":
@@ -84,15 +131,24 @@ func mintBody(kind, id string, extra map[string]string) string {
 	case "raid":
 		b.WriteString("kind: risk\nprobability: 0.5\nimpact: 0.5\nmitigation: TODO\nowner: TODO\nstatus: open\n")
 	case "rationale":
-		b.WriteString("refers: [" + extra["of"] + "]\n")
+		if !lanes {
+			b.WriteString("refers: [" + extra["of"] + "]\n")
+		}
 	case "record":
 		b.WriteString("record_of: [" + extra["of"] + "]\nresult: TODO — value plus-minus uncertainty against the pre-fixed rule\n")
 	case "criterion":
 		b.WriteString("metric: TODO\ntarget: TODO\n")
 	case "rule":
-		b.WriteString("scope: TODO\nrefers: [" + extra["of"] + "]\n")
+		b.WriteString("scope: TODO\n")
+		if !lanes {
+			b.WriteString("refers: [" + extra["of"] + "]\n")
+		}
 	case "budget":
-		b.WriteString("metric: TODO\nunit: TODO\naddresses: [" + extra["of"] + "]\nrule: sum\nmargin: 0.2\nallocations:\n  des-TODO: 0\n")
+		b.WriteString("metric: TODO\nunit: TODO\n")
+		if !lanes {
+			b.WriteString("addresses: [" + extra["of"] + "]\n")
+		}
+		b.WriteString("rule: sum\nmargin: 0.2\nallocations:\n  des-TODO: 0\n")
 	case "guide":
 		b.WriteString("audience: TODO\n")
 	case "design":
@@ -180,8 +236,33 @@ func mintNodeAtX(dir, kind, id string, extra map[string]string) (string, error) 
 		full = mintID(kind, "") // auto ids retry on the rare collision
 		path = filepath.Join(dir, full+".md")
 	}
-	if err := os.WriteFile(path, []byte(mintBody(kind, full, extra)), 0o644); err != nil {
+	// the TARGET's workspace owns the edge mode: walk up from the mint dir to its
+	// project.toml (a bare temp dir has none -> frontmatter, the default)
+	specDir := ""
+	for d := dir; ; {
+		if _, err := os.Stat(filepath.Join(d, "project.toml")); err == nil {
+			specDir = d
+			break
+		}
+		parent := filepath.Dir(d)
+		if parent == d {
+			break
+		}
+		d = parent
+	}
+	lanes := specDir != "" && edgesModeOf(specDir) == "connections"
+	if err := os.WriteFile(path, []byte(mintBody(kind, full, extra, lanes)), 0o644); err != nil {
 		return "", err
+	}
+	if lanes {
+		// the same edges land in the connection lanes instead (go-mint-edge-aware);
+		// a failed edge write UNDOES the mint - a node must never lose its edge silently
+		for _, e := range mintLaneEdges(kind, extra) {
+			if _, err := mintConnection(specDir, e.kind, full, e.dst, "", ""); err != nil {
+				os.Remove(path)
+				return "", fmt.Errorf("mint: edge %s->%s: %v (node not written)", full, e.dst, err)
+			}
+		}
 	}
 	return path, nil
 }

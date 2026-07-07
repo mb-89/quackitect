@@ -1190,11 +1190,18 @@ func selftestBookShell() bool {
 	if !strings.Contains(html, "<header") || !strings.Contains(html, "<main") {
 		return false
 	}
-	// the dom-static law extends to the shell: the script toggles, never creates
-	si, se := strings.Index(html, "<script>"), strings.LastIndex(html, "</script>")
-	if si < 0 || se < si {
+	// the dom-static law extends to the shell: the SHELL script toggles, never creates.
+	// Scoped to the first script block since i13: the comment layer that follows creates
+	// its OWN root outside <main> by design (req-comment-dom-static); the layer's law is
+	// checked by selftest:comment-dom-static (no innerHTML, no artifacts inside content).
+	si := strings.Index(html, "<script>")
+	if si < 0 {
 		return false
 	}
-	script := html[si:se]
+	se := strings.Index(html[si:], "</script>")
+	if se < 0 {
+		return false
+	}
+	script := html[si : si+se]
 	return !strings.Contains(script, "createElement") && !strings.Contains(script, "innerHTML")
 }

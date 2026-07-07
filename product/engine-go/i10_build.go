@@ -407,8 +407,9 @@ func callLogWrite(exit int) {
 	if err != nil {
 		return
 	}
-	defer f.Close()
 	f.Write(append(b, '\n'))
+	f.Close()
+	capCallLog(callLogPath(), callLogCapBytes) // retention safety net (go-call-log-cap)
 }
 
 // quackExit is the exit funnel: the call line lands with its REAL exit code, then the process ends.

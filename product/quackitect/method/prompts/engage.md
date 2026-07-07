@@ -57,6 +57,7 @@ research skill into the repo — reference it.
 0. **Pick the version.** Default to the latest not-done version. If every version is done, start the earliest planned one. Compose its checklist as in `start`. Announce which you chose. If several versions are open and the user names one, lock onto that version. Hold it for this and the following `next` calls until told otherwise.
 1. `quack next` — the determinizer hands you the next ready check. Its upstreams are satisfied.
 2. **FILL** it. Do the work. Produce the evidence. For executed checks, make `verify` pass.
+   - **Amend, then re-observe, then build.** Amending a requirement or test statement AFTER `quack observe-red` moves the hash and strands the red record. Fix the statement first, re-run `observe-red`, then build.
    - **Code that realizes a requirement IS its design node.** Declare it inline where the code lives, never in a `.md`:
      ```
      # design: <id>  implements: <req-id>

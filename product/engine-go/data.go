@@ -45,10 +45,28 @@ func userDataBase() string {
 	return base
 }
 
+// design: go-home-marker  implements: req-selftest-home-sweep
+// Every data home records its workspace (workspace.txt), so a sweep can map a home back to
+// the directory it serves. 241 fixture homes had leaked by i13 - a home whose workspace no
+// longer exists is an orphan the selftest battery removes (sweepOrphanHomes).
+var homeStamped bool
+
 func dataHome() string {
 	slug := filepath.Base(ROOT) + "-" + h12(canonicalWorkspacePath(ROOT))[:6]
-	return filepath.Join(userDataBase(), "quackitect", slug)
+	home := filepath.Join(userDataBase(), "quackitect", slug)
+	if !homeStamped {
+		mp := filepath.Join(home, "workspace.txt")
+		if _, err := os.Stat(mp); err == nil {
+			homeStamped = true
+		} else if os.MkdirAll(home, 0o755) == nil &&
+			os.WriteFile(mp, []byte(canonicalWorkspacePath(ROOT)+"\n"), 0o644) == nil {
+			homeStamped = true
+		}
+	}
+	return home
 }
+
+// enddesign
 
 func dataDirFor(kind string) string {
 	return filepath.Join(dataHome(), kind)

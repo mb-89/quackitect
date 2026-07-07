@@ -8,3 +8,10 @@
 {"src":"adr-glossary-discipline","dst":"cand-gloss-one-file"}
 {"src":"adr-provenance-involvement","dst":"cand-marks-sidecar"}
 {"src":"adr-vale-autopull","dst":"cand-register-handrolled"}
+{"src":"adr-comment-storage-island","dst":"cand-store-dom"}
+{"src":"adr-comment-storage-island","dst":"cand-store-sidecar"}
+{"src":"adr-comment-anchoring","dst":"cand-anchor-offsets"}
+{"src":"adr-comment-anchoring","dst":"cand-anchor-xpath"}
+{"src":"adr-comment-highlight-api","dst":"cand-hl-span-wrap"}
+{"src":"adr-comment-save-path","dst":"cand-save-download-only"}
+{"src":"adr-comment-readback-lister","dst":"cand-read-notes-import"}

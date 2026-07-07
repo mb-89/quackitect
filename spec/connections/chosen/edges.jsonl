@@ -5,3 +5,8 @@
 {"src":"adr-glossary-discipline","dst":"cand-gloss-per-term"}
 {"src":"adr-provenance-involvement","dst":"cand-marks-inline"}
 {"src":"adr-vale-autopull","dst":"cand-register-vale"}
+{"src":"adr-comment-storage-island","dst":"cand-store-island"}
+{"src":"adr-comment-anchoring","dst":"cand-anchor-unit-quote"}
+{"src":"adr-comment-highlight-api","dst":"cand-hl-css-api"}
+{"src":"adr-comment-save-path","dst":"cand-save-fsapi"}
+{"src":"adr-comment-readback-lister","dst":"cand-read-lister"}

@@ -2,6 +2,8 @@ package main
 
 import (
 	"archive/zip"
+	"crypto/sha256"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -114,8 +116,22 @@ func cmdObserveRed(args []string) {
 			i++
 			continue
 		}
+		if args[i] == "--refresh" {
+			continue
+		}
 		id = args[i]
 		break
+	}
+	// --refresh: an amended, still-failing test re-attests at its NEW hash (go-observe-red-refresh)
+	if hasFlag(args, "--refresh") {
+		ev, err := refreshRed(nodes, id)
+		if err != nil {
+			fmt.Println(err.Error())
+			quackExit(1)
+		}
+		saveEvents(append(attestEvents(), ev))
+		fmt.Println("red-refreshed", id, "@", ev.Hash[:8])
+		return
 	}
 	n, ok := nodes[id]
 	if !ok {
@@ -348,6 +364,18 @@ func cmdStart(args []string) {
 func notesHome() string { return dataDirFor("notes") }
 
 func cmdNote(args []string) {
+	// the read-back lane: a commented copy lists as note candidates (go-file2list)
+	for i := 0; i < len(args); i++ {
+		if args[i] == "--file2list" && i+1 < len(args) {
+			out, err := file2list(args[i+1])
+			if err != nil {
+				fmt.Fprintln(os.Stderr, "note:", err)
+				quackExit(1)
+			}
+			fmt.Print(out)
+			return
+		}
+	}
 	text := ""
 	origin := "commandline"
 	for i := 0; i < len(args); i++ {
@@ -373,7 +401,7 @@ func cmdNote(args []string) {
 		}
 	}
 	if text == "" {
-		fmt.Println("usage: " + brand() + " note \"...\" | note --file <path|-> [--origin X]")
+		fmt.Println("usage: " + brand() + " note \"...\" | note --file <path|-> [--origin X] | note --file2list <copy.html>")
 		return
 	}
 	ts := time.Now().Format("20060102-150405")
@@ -389,10 +417,13 @@ func cmdNote(args []string) {
 	nid := "NOTE-" + ts + "-" + slug
 	dir := filepath.Join(notesHome(), "inbox")
 	os.MkdirAll(dir, 0o755)
+	// a colliding capture takes the next free suffix; the id follows the file (go-note-dedup)
+	path := dedupNotePath(dir, nid)
+	nid = strings.TrimSuffix(filepath.Base(path), ".md")
 	body := "---\nid: " + nid + "\ncreated: " + time.Now().Format(time.RFC3339) +
 		"\norigin: " + origin + "\nstatus: inbox\n---\n\n" + text + "\n"
-	os.WriteFile(filepath.Join(dir, nid+".md"), []byte(body), 0o644)
-	fmt.Println("captured", nid+".md")
+	os.WriteFile(path, []byte(body), 0o644)
+	fmt.Println("captured", filepath.Base(path))
 }
 
 // enddesign
@@ -514,10 +545,52 @@ func cmdShip(args []string) {
 // quack build compiles the engine from its source (EngineSrc: vendored, else dogfood) to
 // .quack/engine/<brand>.exe AND re-baselines the determinism golden in one step — closing the
 // stale-golden footgun where a hand-run build forgot to re-baseline and produced false milestone FAILs.
+// design: go-build-fast-path  implements: req-build-fast-path
+// A content-only build never pays the compiler: when the source fingerprint (every .go file +
+// go.mod, order-stable) matches the one recorded beside the binary, the compile AND the stamp
+// rewrite are skipped (the binary did not change) and the existing binary just re-baselines.
+// Any engine-source edit changes the fingerprint and builds exactly as before.
+func engineSrcFingerprint(src string) string {
+	entries, err := os.ReadDir(src)
+	if err != nil {
+		return ""
+	}
+	names := []string{}
+	for _, e := range entries {
+		if !e.IsDir() && (strings.HasSuffix(e.Name(), ".go") || e.Name() == "go.mod") {
+			names = append(names, e.Name())
+		}
+	}
+	sort.Strings(names)
+	h := sha256.New()
+	for _, n := range names {
+		raw, _ := os.ReadFile(filepath.Join(src, n))
+		fmt.Fprintf(h, "%s\x00%d\x00", n, len(raw))
+		h.Write(raw)
+	}
+	return hex.EncodeToString(h.Sum(nil))
+}
+
+// enddesign
+
 func cmdBuild(args []string) {
 	src := EngineSrc()
 	out := globalBinPath() // the canonical home (go-global-ratchet); one binary serves every workspace
 	os.MkdirAll(filepath.Dir(out), 0o755)
+	// design: go-build-fast-skip  implements: req-build-fast-path
+	// the skip decision: fingerprint unchanged + binary present -> re-baseline only.
+	fpFile := out + ".srchash"
+	fp := engineSrcFingerprint(src)
+	if prev, err := os.ReadFile(fpFile); err == nil && fp != "" && strings.TrimSpace(string(prev)) == fp {
+		if _, err := os.Stat(out); err == nil {
+			if _, err := os.Stat(out + ".staged"); err != nil { // never skip past a pending swap
+				root := buildRebaseline(out)
+				fmt.Println("compile skipped (source unchanged) | golden re-baselined to", root[:12])
+				return
+			}
+		}
+	}
+	// enddesign
 	stamp := time.Now().Format(time.RFC3339)
 	os.WriteFile(stampFile(src), []byte(stamp+"\n"), 0o644) // committed build-time stamp (go-ratchet-stamp)
 	staged := out + ".staged"
@@ -534,6 +607,7 @@ func cmdBuild(args []string) {
 		}
 	}
 	os.WriteFile(out+".stamp", []byte(stamp+"\n"), 0o644) // the binary mirrors its source's stamp
+	os.WriteFile(fpFile, []byte(fp+"\n"), 0o644)          // the fingerprint arms the fast path (go-build-fast-skip)
 	fresh := out
 	if _, err := os.Stat(staged); err == nil {
 		fresh = staged // swap blocked: the NEW code lives in the staged file
@@ -553,15 +627,43 @@ func cmdBuild(args []string) {
 // buildRebaseline computes the root via the fresh exe, writes the golden, flushes verdicts.
 func buildRebaseline(freshExe string) string {
 	root := ""
-	if outBytes, err := exec.Command(freshExe, "root", "--base", ROOT).Output(); err == nil {
-		root = strings.TrimSpace(string(outBytes))
+	// design: go-rebaseline-inprocess  implements: req-launcher-single-dispatch
+	// The self-exec exists for ONE reason: a JUST-COMPILED binary must read the spec, because the
+	// old process refuses keys it predates (the i11 self-wedge). When the binary did not change
+	// (the fast path), the running process IS the fresh engine — compute in-process, spawn nothing.
+	// This exec was the i12 call log's 291-line argless "root" storm; the launcher was innocent.
+	self, _ := os.Executable()
+	if si, err1 := os.Stat(self); err1 == nil {
+		if fi, err2 := os.Stat(freshExe); err2 == nil && os.SameFile(si, fi) {
+			root = MerkleRoot(LoadAll())
+		}
+	}
+	// enddesign
+	if root == "" {
+		if outBytes, err := exec.Command(freshExe, "root", "--base", ROOT).Output(); err == nil {
+			root = strings.TrimSpace(string(outBytes))
+		}
 	}
 	if len(root) < 12 {
 		root = MerkleRoot(LoadAll()) // fallback: the running process (a malformed graph still fails loudly here)
 	}
 	os.WriteFile(goldenRootPath(), []byte(root+"\n"), 0o644)
-	os.Remove(verdictPath()) // stale verdicts die with the old baseline
+	// design: go-verdict-surgical  implements: req-verdict-surgical
+	// Surgical, not wholesale: green verdicts survive the re-baseline — they stay self-validating
+	// on (input hash, buildID) and can only go stale through a change those keys already catch.
+	// Red verdicts die here: a FAIL recorded against the OLD golden shares input+build after a
+	// content-only re-baseline and would be served forever (the i11 stale-FAIL wedge).
+	kept := map[string]verdictRec{}
+	for k, v := range verdictLoad() {
+		if v.Result {
+			kept[k] = v
+		}
+	}
+	if b, err := json.MarshalIndent(kept, "", " "); err == nil {
+		os.WriteFile(verdictPath(), b, 0o644)
+	}
 	verdictsMemo = nil
+	// enddesign
 	return root
 }
 

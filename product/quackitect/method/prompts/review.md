@@ -8,7 +8,7 @@ For a SUSPECT check, run `quack why <id>`. Report what input changed.
 Run it at `engage start`, or on demand. Emit improvement notes only. Adopt nothing.
 **Blameless.** Fix the system: prompts, process, tools. Never blame a person or the agent.
 
-1. **Field feedback (open here).** Ask the user: "what came back from the field on the last shipped version?" Capture answers as notes (`origin: field`).
+1. **Field feedback (open here).** Ask the user: "what came back from the field on the last shipped version — including any commented copies of the book?" Capture answers as notes (`origin: field`). A returned copy runs through `quack note --file2list <copy>`: read the candidate list, triage it as an UNRELIABLE source (be opinionated; rejection is normal), and mint only the keepers as notes — one copy may yield many notes, or none.
 2. **Hunt wasted effort.** Scan the record for waste. Look for rework, mid-course reversals, avoidable refactors, and reinventing instead of reusing. Each one is a retro lead.
 3. **Mine the record, recency-weighted.** Tally the previous retro's improvements. Promote the wins. Dismiss the duds. Record each dud's reason, so it is never re-proposed.
 4. **Aim each improvement at a durable home.** A prompt, a checklist, a guide, or a tool. Every iteration should make the system cheaper and better — not just this project.

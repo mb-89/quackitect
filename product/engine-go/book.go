@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-// design: go-book-manifests  implements: req-book-manifests, req-book-orphans
+// design: go-book-manifests  implements: req-book-manifests, req-book-orphans, req-orphan-render-refs
 // The manifest node type (adr-book-two-stage lineage; one mechanism, settled at design): a manifest
 // is trace CONTENT whose body lists UNITS separated by `---` lines. A unit is either a node
 // reference (a plain markdown link to a node id, optional `depth:N`) or inline markdown (ledes,
@@ -294,6 +294,7 @@ func renderNodeAtDepth(id string, depth int, nodes map[string]Node, sm map[strin
 // renderBookHTML emits the whole book. findings are curation ERRORS (missing lede, unknown term);
 // advisories are soft signals (unlinked term usages) that never fail a render.
 func renderBookHTML(nodes map[string]Node) (string, []string, []string) {
+	figSeq = 0 // figure ids restart per render: regeneration stays byte-identical (go-fig-elem-ids)
 	sm := StatusMap(nodes)
 	bl := latestBless()
 	cfg := readProjectConfig()
@@ -482,7 +483,19 @@ func renderBookHTML(nodes map[string]Node) (string, []string, []string) {
 		"aside.notes{display:none;border-left:3px solid #ccc;padding-left:.6rem;font-size:.85rem}" +
 		"body[data-present] .slide{display:none}body[data-present] .slide.current{display:block;position:fixed;inset:0;background:" + bookColors["bg"] + ";padding:8vh 10vw;overflow:auto;z-index:9}" +
 		"@media(max-width:900px){body{flex-direction:column}#sidebar{position:static;width:auto;height:auto}}" +
-		"@media print{aside.notes{display:block}.slide{page-break-after:always}#sidebar{display:none}}" + facetFilterCSS() + "</style>\n")
+		"@media print{aside.notes{display:block}.slide{page-break-after:always}#sidebar{display:none}}" +
+		"::highlight(quack-comments){background:#ffdf80}" +
+		"#quack-sb{position:fixed;right:0;top:0;height:100vh;width:280px;background:#fffdf6;border-left:1px solid #e4dcc6;overflow:auto;padding:10px;font-size:13px;z-index:8;box-sizing:border-box}" +
+		"body[data-qc=\"min\"] #quack-sb{display:none}#quack-sb .qc-head{display:flex;justify-content:space-between;align-items:center;font-weight:600;margin-bottom:6px}" +
+		".qc-card{border:1px solid #e8e2d0;border-radius:6px;padding:6px;margin:6px 0;background:#fff}.qc-closed{opacity:.55}" +
+		".qc-quote{font-style:italic;color:#555;cursor:pointer;margin-bottom:4px}.qc-msg{margin:2px 0}.qc-suggest{color:#365f8a;margin:2px 0}" +
+		".qc-mark{display:inline-block;width:1em;margin-right:4px}.qc-mark.agree{color:#2a8a4a}.qc-mark.reject{color:#b33}" +
+		".qc-row{display:flex;gap:4px;margin-top:4px}.qc-inp{flex:1;min-width:0}" +
+		"#quack-fab{position:absolute;z-index:9}#quack-sb-toggle{position:fixed;right:12px;bottom:12px;z-index:9;border-radius:14px;padding:4px 10px}" +
+		"#qc-name{width:100%;box-sizing:border-box;margin-bottom:6px;font:inherit;font-size:12px;padding:3px 6px}" +
+		"textarea.qc-inp{width:100%;box-sizing:border-box;font:inherit;font-size:12px;margin-top:4px}" +
+		"#qc-toast{position:fixed;left:12px;bottom:12px;z-index:10;background:#2d3a2f;color:#fff;padding:8px 12px;border-radius:8px;font-size:12px;max-width:60ch}" +
+		"@media print{#quack-sb,#quack-sb-toggle,#quack-fab{display:none}}" + facetFilterCSS() + "</style>\n")
 	doc.WriteString("</head><body>\n")
 	doc.WriteString(`<nav id="sidebar" aria-label="views">` + "\n")
 	doc.WriteString(`<p class="sb-brand">` + htmlEscape(brand()) + ` — the spec book</p>` + "\n")
@@ -601,8 +614,254 @@ func renderBookHTML(nodes map[string]Node) (string, []string, []string) {
  apply();
 })();
 </script>
+`)
+	// design: go-annotator-core  implements: req-comment-mark-prose, req-comment-figure-target, req-comment-figure-fallback, req-comment-dom-static, req-comment-escape, req-comment-sidebar, req-comment-threads, req-comment-close, req-comment-author, req-comment-save, req-comment-save-fallback, req-comment-suggest
+	// The comment layer's core, emitted OUTSIDE <main>: one empty island slot plus the
+	// quack-annotator script. Anchors = unit id + quote/prefix/suffix + position (W3C shape);
+	// figure marks target <g id> elements, falling back to the whole figure's unit; paint goes
+	// through the CSS Custom Highlight API, so the content DOM is NEVER mutated; every comment
+	// string renders via textContent (no innerHTML anywhere in the layer); the island rewrite
+	// escapes angle brackets so stored text can never close the script tag (M5 spike finding).
+	doc.WriteString(`<script type="application/json" id="quack-comments">{"version":1,"annotations":[]}</script>
+<script>
+/* quack-annotator core */
+(function(){
+'use strict';
+var island=document.getElementById('quack-comments');
+var data;try{data=JSON.parse(island.textContent||'{}');}catch(e){data=null;}
+if(!data||!Array.isArray(data.annotations))data={version:1,annotations:[]};
+function unitOf(node){var el=node&&node.nodeType===1?node:(node?node.parentElement:null);
+ while(el&&el!==document.body){if(el.id&&!el.closest('svg'))return el;el=el.parentElement;}
+ return null;}
+function textWalk(unit,fn){var w=document.createTreeWalker(unit,NodeFilter.SHOW_TEXT),n,pos=0;
+ while((n=w.nextNode())){var len=n.textContent.length;if(fn(n,pos,pos+len))return;pos+=len;}}
+function anchorFromSelection(){var sel=window.getSelection();
+ if(!sel||sel.isCollapsed||sel.rangeCount===0)return null;
+ var r=sel.getRangeAt(0),unit=unitOf(r.startContainer);
+ if(!unit)return null;
+ var full=unit.textContent,quote=r.toString();
+ if(!quote)return null;
+ var start=-1;
+ textWalk(unit,function(n,s,e){if(n===r.startContainer){start=s+r.startOffset;return true;}return false;});
+ if(start<0||full.slice(start,start+quote.length)!==quote)start=full.indexOf(quote);
+ if(start<0)return null;
+ return {unit:unit.id,quote:quote,prefix:full.slice(Math.max(0,start-16),start),
+  suffix:full.slice(start+quote.length,start+quote.length+16),start:start,end:start+quote.length};}
+function anchorFromElement(el){
+ var g=el;
+ while(g&&g!==document.body){
+  if(g.id&&g.closest&&g.closest('svg')&&g.tagName.toLowerCase()!=='svg'){
+   var su=unitOf(g.closest('svg').parentElement);
+   return {unit:su?su.id:'',el:g.id};}
+  if(g.tagName&&g.tagName.toLowerCase()==='svg'){var u=unitOf(g.parentElement);return u?{unit:u.id}:null;}
+  g=g.parentElement;}
+ var u2=unitOf(el);return u2?{unit:u2.id}:null;}
+function resolveRange(t){var unit=document.getElementById(t.unit);
+ if(!unit||!t.quote)return null;
+ var full=unit.textContent,idx=-1;
+ if(typeof t.start==='number'&&full.slice(t.start,t.end)===t.quote)idx=t.start;
+ if(idx<0)idx=full.indexOf(t.quote);
+ if(idx<0)return null;
+ var range=new Range(),sN=null,sO=0,eN=null,eO=0,endAt=idx+t.quote.length;
+ textWalk(unit,function(n,s,e){if(sN===null&&idx<e){sN=n;sO=idx-s;}
+  if(sN!==null&&endAt<=e){eN=n;eO=endAt-s;return true;}return false;});
+ if(!sN||!eN)return null;
+ range.setStart(sN,Math.max(0,sO));range.setEnd(eN,Math.max(0,eO));return range;}
+var canPaint=(typeof Highlight!=='undefined')&&window.CSS&&CSS.highlights;
+function repaint(){if(!canPaint)return;
+ var hl=new Highlight(),count=0;
+ data.annotations.forEach(function(a){if(a.status==='closed'||!a.target)return;
+  if(a.target.quote){var r=resolveRange(a.target);if(r){hl.add(r);count++;}}});
+ if(count>0)CSS.highlights.set('quack-comments',hl);else CSS.highlights.delete('quack-comments');}
+function persist(){island.textContent=JSON.stringify(data).replace(/</g,'\\u003c');}
+function mintId(){var n=data.annotations.length+1,id='c'+n;
+ while(data.annotations.some(function(a){return a.id===id;})){n++;id='c'+n;}
+ return id;}
+window.quackComments={data:data,
+ anchorFromSelection:anchorFromSelection,
+ anchorFromElement:anchorFromElement,
+ resolveRange:resolveRange,repaint:repaint,persist:persist,
+ setText:function(el,s){el.textContent=s;},
+ add:function(target,author,text){
+  var a={id:mintId(),target:target,author:author||'',status:'open',
+   thread:text?[{author:author||'',mark:'neutral',text:text,ts:new Date().toISOString()}]:[]};
+  data.annotations.push(a);persist();repaint();return a;}};
+repaint();
+})();
+</script>
+<script>
+/* quack-annotator sidebar: threads, marks, close/reopen, changeable name field, no popups
+   (owner field feedback, M7). */
+(function(){
+'use strict';
+var QC=window.quackComments;if(!QC)return;
+function el(tag,cls,text){var e=document.createElement(tag);if(cls)e.className=cls;
+ if(text!==undefined)QC.setText(e,text);return e;}
+function author(){var f=document.getElementById('qc-name');
+ var a=f?f.value.trim():(localStorage.getItem('quack-comment-author')||'');
+ if(a)localStorage.setItem('quack-comment-author',a);
+ return a;}
+var unitOrder={};
+Array.prototype.forEach.call(document.querySelectorAll('main [id]'),function(n,i){unitOrder[n.id]=i;});
+function orderKey(a){if(!a.target||!(a.target.unit in unitOrder))return 1e12;
+ return unitOrder[a.target.unit]*1e6+(a.target.start||0);}
+var sb=el('aside','',undefined);sb.id='quack-sb';
+var head=el('div','qc-head',undefined);
+var title=el('span','','Comments');
+var min=el('button','','minimize');
+head.appendChild(title);head.appendChild(min);sb.appendChild(head);
+var nameInp=el('input','',undefined);nameInp.id='qc-name';
+nameInp.placeholder='your name (changeable)';
+nameInp.value=localStorage.getItem('quack-comment-author')||'';
+nameInp.addEventListener('input',function(){localStorage.setItem('quack-comment-author',nameInp.value.trim());});
+sb.appendChild(nameInp);
+var list=el('div','qc-list',undefined);sb.appendChild(list);
+document.body.appendChild(sb);
+var toggle=el('button','','');toggle.id='quack-sb-toggle';toggle.hidden=true;
+document.body.appendChild(toggle);
+function setOpen(open){document.body.setAttribute('data-qc',open?'open':'min');toggle.hidden=open;}
+min.addEventListener('click',function(){setOpen(false);});
+toggle.addEventListener('click',function(){setOpen(true);});
+function panTo(a){var t=a.target||{};
+ if(t.el){var g=document.getElementById(t.el);
+  if(g){g.scrollIntoView({behavior:'smooth',block:'center'});return;}}
+ if(t.quote){var r=QC.resolveRange(t);
+  if(r){var rect=r.getBoundingClientRect();
+   if(rect.height>0||rect.width>0){
+    window.scrollTo({top:rect.top+window.scrollY-window.innerHeight/3,behavior:'smooth'});return;}}}
+ var u=document.getElementById(t.unit);
+ if(u)u.scrollIntoView({behavior:'smooth',block:'center'});}
+function card(a){var c=el('div','qc-card'+(a.status==='closed'?' qc-closed':''),undefined);
+ c.setAttribute('data-qcid',a.id);
+ var label=a.target&&a.target.quote?a.target.quote:
+  (a.target&&a.target.el?'[figure: '+a.target.el+']':'[section]');
+ if(label.length>80)label=label.slice(0,77)+'...';
+ c.appendChild(el('div','qc-quote',label));
+ c.addEventListener('click',function(e){
+  var tn=e.target.tagName;
+  if(tn==='BUTTON'||tn==='TEXTAREA'||tn==='SELECT'||tn==='INPUT'||tn==='OPTION')return;
+  panTo(a);});
+ (a.thread||[]).forEach(function(m){var row=el('div','qc-msg',undefined);
+  var sym=m.mark==='agree'?'+':(m.mark==='reject'?'x':'-');
+  row.appendChild(el('span','qc-mark '+(m.mark||'neutral'),sym));
+  row.appendChild(el('span','',(m.author?m.author+': ':'')+m.text));
+  c.appendChild(row);});
+ if(a.suggest)c.appendChild(el('div','qc-suggest','suggested: '+a.suggest.proposed));
+ if(a.status!=='closed'){
+  var inp=el('textarea','qc-inp',undefined);inp.placeholder='write...';inp.rows=2;
+  c.appendChild(inp);
+  var sel=el('select','qc-sel',undefined);
+  ['neutral','agree','reject'].forEach(function(v){var o=el('option','',v);o.value=v;sel.appendChild(o);});
+  var post=el('button','','post');
+  post.addEventListener('click',function(){var v=inp.value.trim();if(!v)return;
+   a.thread.push({author:author(),mark:sel.value,text:v,ts:new Date().toISOString()});
+   QC.persist();render();});
+  var cls=el('button','','close');
+  cls.addEventListener('click',function(){a.status='closed';QC.persist();QC.repaint();render();});
+  var row2=el('div','qc-row',undefined);
+  row2.appendChild(sel);row2.appendChild(post);row2.appendChild(cls);row2.appendChild(delBtn());
+  c.appendChild(row2);
+ }else{
+  var row3=el('div','qc-row',undefined);
+  var reo=el('button','','reopen');
+  reo.addEventListener('click',function(){a.status='open';QC.persist();QC.repaint();render();});
+  row3.appendChild(reo);row3.appendChild(delBtn());
+  c.appendChild(row3);}
+ function delBtn(){var d=el('button','','delete');
+  d.addEventListener('click',function(){
+   var i=QC.data.annotations.indexOf(a);
+   if(i>=0)QC.data.annotations.splice(i,1);
+   QC.persist();QC.repaint();render();});
+  return d;}
+ return c;}
+function render(focusId){while(list.firstChild)list.removeChild(list.firstChild);
+ var anns=QC.data.annotations.slice().sort(function(x,y){return orderKey(x)-orderKey(y);});
+ var openN=0;
+ anns.forEach(function(a){if(a.status!=='closed')openN++;list.appendChild(card(a));});
+ QC.setText(title,'Comments ('+openN+')');
+ QC.setText(toggle,'comments ('+openN+')');
+ if(focusId){setOpen(true);
+  var tc=list.querySelector('[data-qcid="'+focusId+'"] textarea');
+  if(tc){tc.scrollIntoView({block:'nearest'});tc.focus();}}
+ else setOpen(document.body.getAttribute('data-qc')!=='min');}
+var fab=el('button','','comment');fab.id='quack-fab';fab.hidden=true;
+document.body.appendChild(fab);
+document.addEventListener('mouseup',function(e){
+ if(sb.contains(e.target)||e.target===fab)return;
+ setTimeout(function(){var s=window.getSelection();
+  if(s&&!s.isCollapsed&&String(s).trim()){fab.hidden=false;
+   fab.style.left=(e.pageX+8)+'px';fab.style.top=(e.pageY-34)+'px';}
+  else fab.hidden=true;},0);});
+fab.addEventListener('click',function(){
+ var t=QC.anchorFromSelection();fab.hidden=true;if(!t)return;
+ var a=QC.add(t,author(),'');
+ render(a.id);});
+document.addEventListener('dblclick',function(e){
+ var svg=e.target&&e.target.closest?e.target.closest('svg'):null;
+ if(!svg)return;
+ var t=QC.anchorFromElement(e.target);if(!t)return;
+ var a=QC.add(t,author(),'');
+ render(a.id);});
+window.quackCommentsUI={render:render};
+render();
+setOpen(QC.data.annotations.length>0);
+})();
+</script>
+<script>
+/* quack-annotator save: in-place via the File System Access API (one pick, then reused),
+   download fallback elsewhere. Serializes the document with the layer's own UI stripped -
+   the island is the only content that changes. */
+(function(){
+'use strict';
+var QC=window.quackComments;if(!QC)return;
+var handle=null;
+function serialize(){
+ var clone=document.documentElement.cloneNode(true);
+ ['quack-sb','quack-fab','quack-sb-toggle'].forEach(function(id){
+  var n=clone.querySelector('#'+id);if(n&&n.parentNode)n.parentNode.removeChild(n);});
+ var body=clone.querySelector('body');if(body)body.removeAttribute('data-qc');
+ var isl=clone.querySelector('#quack-comments');
+ if(isl)isl.textContent=JSON.stringify(QC.data).replace(/</g,'\\u003c');
+ return '<!doctype html>\n'+clone.outerHTML;}
+var btn=document.createElement('button');QC.setText(btn,'save');
+var head=document.querySelector('#quack-sb .qc-head');
+if(head)head.insertBefore(btn,head.lastChild);
+function toast(t){var x=document.getElementById('qc-toast');
+ if(!x){x=document.createElement('div');x.id='qc-toast';document.body.appendChild(x);}
+ QC.setText(x,t);x.hidden=false;
+ clearTimeout(x._t);x._t=setTimeout(function(){x.hidden=true;},5000);}
+function proposedName(){
+ var base=decodeURIComponent(location.pathname.split('/').pop()||'book.html').replace(/\.html?$/,'');
+ var who=(localStorage.getItem('quack-comment-author')||'reader').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'')||'reader';
+ var d=new Date(),p=function(n){return (n<10?'0':'')+n;};
+ var ts=''+d.getFullYear()+p(d.getMonth()+1)+p(d.getDate())+'-'+p(d.getHours())+p(d.getMinutes());
+ return base+'_'+who+'_comments_'+ts+'.html';}
+function writeTo(h){h.createWritable().then(function(w){
+  return w.write(serialize()).then(function(){return w.close();});})
+ .then(function(){toast('saved: '+(h.name||'file')+' (a browser cannot show the folder; you picked it)');},
+  function(e){toast('save failed: '+e.message+' - downloading a copy instead');download();});}
+function saveInPlace(){
+ if(!window.showSaveFilePicker)return false;
+ if(handle){writeTo(handle);return true;}
+ window.showSaveFilePicker({suggestedName:proposedName(),startIn:'desktop',
+  types:[{description:'HTML',accept:{'text/html':['.html']}}]})
+  .then(function(h){handle=h;writeTo(h);},function(){});
+ return true;}
+function download(){
+ var blob=new Blob([serialize()],{type:'text/html'});
+ var a=document.createElement('a');
+ a.href=URL.createObjectURL(blob);
+ a.download=proposedName();
+ document.body.appendChild(a);a.click();
+ if(a.parentNode)a.parentNode.removeChild(a);
+ setTimeout(function(){URL.revokeObjectURL(a.href);},2000);
+ toast('downloaded: '+a.download+' (browser Downloads folder)');}
+btn.addEventListener('click',function(){if(!saveInPlace())download();});
+})();
+</script>
 </body></html>
 `)
+	// enddesign
 	return doc.String(), findings, advisories
 }
 
@@ -762,15 +1021,37 @@ func cmdBook(args []string) {
 // through mdLite as ordinary (provenance-marked) content - the generous release valve.
 var figRefRe = regexp.MustCompile(`^fig:\s*([a-z-]+)\s*$`)
 
-func svgBox(x, y, w, h int, label string) string {
+// design: go-fig-elem-ids  implements: req-comment-figure-target
+// Figure sub-elements carry stable ids (the M5 spike's P3 failure: the book had none, so
+// figure part-marking had nothing to grab). Each figure takes the next ordinal at render
+// (reset per emit - regeneration stays byte-identical); each element wraps in a <g> whose
+// id slugs its label: fig<N>-<label-slug>. The comment layer anchors to these ids.
+var figSeq int
+
+func figNext() int { figSeq++; return figSeq }
+
+var figSlugRe = regexp.MustCompile(`[^a-z0-9]+`)
+
+func figElemID(fig int, label string) string {
+	s := strings.Trim(figSlugRe.ReplaceAllString(strings.ToLower(label), "-"), "-")
+	if len(s) > 24 {
+		s = s[:24]
+	}
+	return fmt.Sprintf("fig%d-%s", fig, s)
+}
+
+// enddesign
+
+func svgBox(x, y, w, h int, label, id string) string {
 	cx := x + w/2
-	return fmt.Sprintf(`<rect x="%d" y="%d" width="%d" height="%d" rx="6" fill="#f6f8fa" stroke="#888"/><text x="%d" y="%d" text-anchor="middle">%s</text>`, x, y, w, h, cx, y+h/2+5, htmlEscape(label))
+	return fmt.Sprintf(`<g id="%s"><rect x="%d" y="%d" width="%d" height="%d" rx="6" fill="#f6f8fa" stroke="#888"/><text x="%d" y="%d" text-anchor="middle">%s</text></g>`, id, x, y, w, h, cx, y+h/2+5, htmlEscape(label))
 }
 
 func svgContextStar(center string, actors []string) string {
+	fig := figNext()
 	var b strings.Builder
 	b.WriteString(`<svg viewBox="0 0 640 420" font-family="system-ui" font-size="13" role="img" aria-label="context diagram">`)
-	b.WriteString(fmt.Sprintf(`<rect x="250" y="180" width="140" height="60" rx="8" fill="#e8f0fe" stroke="#4a6fa5"/><text x="320" y="215" text-anchor="middle">%s</text>`, htmlEscape(center)))
+	b.WriteString(fmt.Sprintf(`<g id="%s"><rect x="250" y="180" width="140" height="60" rx="8" fill="#e8f0fe" stroke="#4a6fa5"/><text x="320" y="215" text-anchor="middle">%s</text></g>`, figElemID(fig, center), htmlEscape(center)))
 	n := len(actors)
 	if n > 8 {
 		actors, n = actors[:8], 8
@@ -780,7 +1061,7 @@ func svgContextStar(center string, actors []string) string {
 		x := 320 + int(210*cosApprox(ang))
 		y := 210 + int(150*sinApprox(ang))
 		b.WriteString(fmt.Sprintf(`<line x1="320" y1="210" x2="%d" y2="%d" stroke="#999"/>`, x, y))
-		b.WriteString(fmt.Sprintf(`<rect x="%d" y="%d" width="110" height="30" rx="15" fill="#fff" stroke="#888"/><text x="%d" y="%d" text-anchor="middle">%s</text>`, x-55, y-15, x, y+5, htmlEscape(a)))
+		b.WriteString(fmt.Sprintf(`<g id="%s"><rect x="%d" y="%d" width="110" height="30" rx="15" fill="#fff" stroke="#888"/><text x="%d" y="%d" text-anchor="middle">%s</text></g>`, figElemID(fig, a), x-55, y-15, x, y+5, htmlEscape(a)))
 	}
 	b.WriteString(`</svg>`)
 	return b.String()
@@ -807,6 +1088,7 @@ func sinApprox(x float64) float64 {
 }
 
 func svgBlockTree(title string, blocks []string) string {
+	fig := figNext()
 	var b strings.Builder
 	rows := (len(blocks) + 2) / 3
 	h := 90 + rows*100
@@ -815,26 +1097,28 @@ func svgBlockTree(title string, blocks []string) string {
 	for i, bl := range blocks {
 		x := 34 + (i%3)*200
 		y := 56 + (i/3)*100
-		b.WriteString(svgBox(x, y, 180, 70, bl))
+		b.WriteString(svgBox(x, y, 180, 70, bl, figElemID(fig, bl)))
 	}
 	b.WriteString(`</svg>`)
 	return b.String()
 }
 
 func svgTimeline(items []string) string {
+	fig := figNext()
 	var b strings.Builder
 	w := 80 + len(items)*130
 	b.WriteString(fmt.Sprintf(`<svg viewBox="0 0 %d 120" font-family="system-ui" font-size="12" role="img" aria-label="timeline">`, w))
 	b.WriteString(fmt.Sprintf(`<line x1="40" y1="60" x2="%d" y2="60" stroke="#4a6fa5" stroke-width="2"/>`, w-40))
 	for i, it := range items {
 		x := 80 + i*130
-		b.WriteString(fmt.Sprintf(`<circle cx="%d" cy="60" r="6" fill="#4a6fa5"/><text x="%d" y="92" text-anchor="middle">%s</text>`, x, x, htmlEscape(it)))
+		b.WriteString(fmt.Sprintf(`<g id="%s"><circle cx="%d" cy="60" r="6" fill="#4a6fa5"/><text x="%d" y="92" text-anchor="middle">%s</text></g>`, figElemID(fig, it), x, x, htmlEscape(it)))
 	}
 	b.WriteString(`</svg>`)
 	return b.String()
 }
 
 func svgMatrix(rows []string, cells map[string][]string) string {
+	fig := figNext()
 	var b strings.Builder
 	h := 60 + len(rows)*44
 	b.WriteString(fmt.Sprintf(`<svg viewBox="0 0 640 %d" font-family="system-ui" font-size="12" role="img" aria-label="stakeholder matrix">`, h))
@@ -845,7 +1129,7 @@ func svgMatrix(rows []string, cells map[string][]string) string {
 		if len(joined) > 60 {
 			joined = joined[:57] + "..."
 		}
-		b.WriteString(fmt.Sprintf(`<text x="20" y="%d">%s</text><text x="220" y="%d">%s</text>`, y, htmlEscape(r), y, htmlEscape(joined)))
+		b.WriteString(fmt.Sprintf(`<g id="%s"><text x="20" y="%d">%s</text><text x="220" y="%d">%s</text></g>`, figElemID(fig, r), y, htmlEscape(r), y, htmlEscape(joined)))
 	}
 	b.WriteString(`</svg>`)
 	return b.String()

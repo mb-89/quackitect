@@ -192,6 +192,8 @@ func Dispatch(args []string) {
 		for _, k := range keys {
 			fmt.Println(k + "\t" + g[k])
 		}
+	case "calls":
+		cmdCalls(rest)
 	case "selftest":
 		quackExit(RunSelftestCLI(rest))
 	case "root":

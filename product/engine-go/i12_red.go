@@ -10,7 +10,7 @@ import (
 // i0012 spec-book test hooks. Authored against the RED-observed test nodes; each build step
 // implements its hooks to green (test-first walk, shared implementation fragment).
 
-// design: go-ai-marks  implements: req-ai-drafting
+// design: go-ai-marks  implements: req-ai-drafting, req-prose-marks-comments
 // The mechanical half of the drafting rule: the mark syntax (`<!-- ai:N -->`, N 0..3, own line
 // above the paragraph) and the refusal predicate - a prose unit without a mark has NO path into
 // the book. ai:0 is explicit pure-human, so "unmarked" never means anything.
@@ -855,7 +855,9 @@ func selftestAuthoringCheap() bool {
 	if len(root1) < 12 {
 		return false // the fresh-exe path must yield a real root
 	}
-	if _, err := os.Stat(verdictPathOverride); err == nil {
+	// since i13 (req-verdict-surgical) the re-baseline is surgical: the store file survives
+	// with the green verdicts; the stale FAIL still dies - the i11 wedge stays dead either way.
+	if raw0, err := os.ReadFile(verdictPathOverride); err == nil && strings.Contains(string(raw0), "__wedge_probe__") {
 		return false // the stale FAIL must die with the re-baseline
 	}
 	raw, err := os.ReadFile(goldenRootPath())

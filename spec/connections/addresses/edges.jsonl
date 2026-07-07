@@ -87,3 +87,12 @@
 {"src":"report-design","dst":"report-requirements"}
 {"src":"spike-risk","dst":"req-metrics"}
 {"src":"structure","dst":"command-surface"}
+{"src":"adr-comment-storage-island","dst":"req-comment-island"}
+{"src":"adr-comment-storage-island","dst":"req-comment-dom-static"}
+{"src":"adr-comment-anchoring","dst":"req-comment-mark-prose"}
+{"src":"adr-comment-anchoring","dst":"req-comment-premark-open"}
+{"src":"adr-comment-highlight-api","dst":"req-comment-dom-static"}
+{"src":"adr-comment-save-path","dst":"req-comment-save"}
+{"src":"adr-comment-save-path","dst":"req-comment-save-fallback"}
+{"src":"adr-comment-readback-lister","dst":"req-comment-readback"}
+{"src":"adr-comment-readback-lister","dst":"req-comment-privacy"}

@@ -185,17 +185,17 @@ func selftestMintDedupe() bool {
 	if sugarAddresses("req-x") != "req-x, "+scrapSink {
 		return false
 	}
-	body := mintBody("adr", "adr-t", map[string]string{"addresses": sugarAddresses(scrapSink)})
+	body := mintBody("adr", "adr-t", map[string]string{"addresses": sugarAddresses(scrapSink)}, false)
 	return strings.Count(body, scrapSink) == 1
 }
 
 // test-mint-rationale -> selftest:mint-rationale
 func selftestMintRationale() bool {
-	with := mintBody("adr", "adr-t", map[string]string{"addresses": "req-x", "rationale": "because the spike proved it"})
+	with := mintBody("adr", "adr-t", map[string]string{"addresses": "req-x", "rationale": "because the spike proved it"}, false)
 	if !strings.Contains(with, "## Rationale (not load-bearing)\nbecause the spike proved it") {
 		return false
 	}
-	without := mintBody("adr", "adr-t", map[string]string{"addresses": "req-x"})
+	without := mintBody("adr", "adr-t", map[string]string{"addresses": "req-x"}, false)
 	return strings.Contains(without, "## Rationale (not load-bearing)\nTODO")
 }
 
