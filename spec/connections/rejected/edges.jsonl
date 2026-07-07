@@ -1,0 +1,10 @@
+{"src":"adr-book-two-stage","dst":"cand-emit-one-pass"}
+{"src":"adr-connection-lanes","dst":"cand-conn-central-jsonl"}
+{"src":"adr-connection-lanes","dst":"cand-conn-fileper"}
+{"src":"adr-connection-lanes","dst":"cand-conn-frontmatter"}
+{"src":"adr-edges-scope","dst":"cand-impl-derive"}
+{"src":"adr-figures-derived-set","dst":"cand-fig-committed-assets"}
+{"src":"adr-figures-derived-set","dst":"cand-fig-viewtime-js"}
+{"src":"adr-glossary-discipline","dst":"cand-gloss-one-file"}
+{"src":"adr-provenance-involvement","dst":"cand-marks-sidecar"}
+{"src":"adr-vale-autopull","dst":"cand-register-handrolled"}

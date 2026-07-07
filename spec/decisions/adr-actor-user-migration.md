@@ -1,7 +1,6 @@
 ---
 id: adr-actor-user-migration
 type: adr
-addresses: [req-stamp-user]
 adjudicated_by: human
 statement: Actor stamps migrate human to user in one audited pass: an explicit quack migrate-actors command rewrites the actor fields and appends a migration event recording count and timestamp; readers treat human and user as one value forever (an unmigrated clone still computes); the self-cert metric counts agent versus non-agent and spans both eras. New records write user.
 class: review

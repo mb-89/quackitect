@@ -1,7 +1,6 @@
 ---
 id: uc-spec-template
 type: usecase
-refines: [need-docu]
 statement: The owner drives the specification from a template set - skeleton chapter manifests with permanent fill guidance, typed item notes, and derived views - authored in Obsidian, projected deterministically.
 class: review
 killer: false

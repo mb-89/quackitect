@@ -1,0 +1,11 @@
+# The binding design rules - internally chosen governance, each linking its decision.
+filters:
+  and:
+    - 'type == "rule"'
+views:
+  - type: table
+    name: Design rules
+    order: [file.name, statement, scope, refers]
+    sort:
+      - property: scope
+        direction: ASC

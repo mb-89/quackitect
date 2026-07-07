@@ -172,9 +172,12 @@ func iterationOfNode(n Node, nodes map[string]Node, seen map[string]bool) string
 	return "i0000_baseline"
 }
 
-var traceTypes = map[string]bool{"need": true, "usecase": true, "requirement": true, "design": true, "test": true, "adr": true,
-	// the item types of the spec-template walk (go-items): trace content on the graph
-	"candidate": true, "stakeholder": true, "raid": true, "rationale": true, "record": true}
+// The graph whitelist holds the SIX core types with toggles (owner ruling 2026-07-05,
+// applied at the i12 extension walk, i12-bs21 rider): the item types - candidate,
+// stakeholder, raid, rationale, record, and the extension kinds - are content, never
+// graph nodes; the engine's traceContent classification keeps them counted and off
+// the walkable board.
+var traceTypes = map[string]bool{"need": true, "usecase": true, "requirement": true, "design": true, "test": true, "adr": true}
 
 func traceEdges(n Node) [][2]string {
 	var e [][2]string

@@ -2,7 +2,6 @@
 id: adr-selftest
 type: adr
 statement: The end state has ZERO Python. The dependency-free engine carries its own native self-test in Go. Every executed test check invokes the quack binary (quack selftest NAME), never an external toolchain like uv or python, because none exists in a just-unzipped vehicle. The binary already contains the parser, hashing, coverage, and CLI logic, so it verifies them in-process. Parity after cutover means the engine reproduces a baselined golden integrity root (a determinism regression check the binary performs), not a live comparison against Python. At cutover the Python engine and ALL of its uv-run-python executed checks are deleted or retired, including the earlier iterations checks that tested the Python engine itself; their Go equivalents live in quack selftest. The go test files remain only as an optional dev and CI convenience (Go, not Python); the shipped binary needs nothing external to verify itself.
-addresses: [req-go-engine, req-behavior-parity]
 adjudicated_by: human
 killer: false
 ---

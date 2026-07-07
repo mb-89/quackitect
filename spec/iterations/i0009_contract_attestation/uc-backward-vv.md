@@ -1,7 +1,6 @@
 ---
 id: uc-backward-vv
 type: usecase
-refines: [need-qualities]
 statement: An iteration's verification and validation look backward only — they re-check everything up to and including their own iteration; later iterations never reopen an earlier iteration's verdicts by mere addition.
 class: review
 killer: false

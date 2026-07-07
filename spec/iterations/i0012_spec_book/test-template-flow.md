@@ -1,7 +1,6 @@
 ---
 id: test-template-flow
 type: test
-verifies: [req-template-flow]
 statement: At the docs-complete review, every document that strayed from its template carries a recorded reason, and every harvested document improvement landed in its template.
 class: review
 killer: false

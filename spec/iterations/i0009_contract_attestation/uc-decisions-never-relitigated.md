@@ -1,7 +1,6 @@
 ---
 id: uc-decisions-never-relitigated
 type: usecase
-refines: [need-engage]
 statement: Every decision — adopt, veto, defer — is an immutable node in spec/decisions/ classified purely from graph facts; the graveyard and parked panels are the read path that prevents re-raising a settled idea.
 class: review
 killer: false

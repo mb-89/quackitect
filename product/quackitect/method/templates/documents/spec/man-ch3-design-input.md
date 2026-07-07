@@ -4,14 +4,12 @@ type: manifest
 mode: chapter
 statement: Design input - context, stakeholders, and every checkable claim on the system.
 ---
+<!-- design: method-ch3-mech  implements: req-ch3-mech :: ch3 mechanized (owner walk 2026-07-06): canned units with pooled views for stakeholders (statement = concern), tensions (conflicts-with connections), use cases (render refs, state-aware), qualities (six scenario fields grouped by facet), constraints, and the register; the authored residue is the context prose and the deferred functions unit. -->
 ## What the system must do
-<!-- fill [mandatory]
-Contents: the chapter in one breath - the binding input: context, stakes,
-  use, qualities, constraints, the register.
-Form: two to four sentences.
+<!-- tailor: shipped text - the chapter's anatomy is the same in every project.
 -->
 <!-- ai:3 -->
-{{lede}}
+This chapter is the binding input: the context and its boundary, the stakes, the intended use, the qualities with their measures, the constraints, and the requirements register. Everything below either binds the design or names who it binds for.
 ---
 ## Context and scope
 <!-- fill [mandatory]
@@ -32,28 +30,28 @@ Sources: context views @[[ref-sya-architecting]]; the methods notes.
 ![[assumptions.base]]
 ---
 ## Stakeholders and their concerns
-<!-- fill [mandatory]
-Contents: one concern line per stakeholder note; conflicts named.
-Motivation: every requirement's source traces to a row here. Boundary against
-  ch0: readers of the DOCUMENT there, stakes in the SYSTEM here - same notes,
-  different question.
-Form: short prose per stakeholder, or the derived table plus exceptions. The
-  pipeline (identify and prioritize, elicit, dedupe and surface conflicts,
-  weight) lives in the methods view.
+<!-- tailor: shipped machinery - the same notes feed ch0 (who reads the DOCUMENT)
+  and this table (who has stakes in the SYSTEM); the statement column is the
+  concern. Conflicts are conflicts-with connection notes - the tensions table
+  surfaces them here, the full why one click away.
 Sources: the four-step pipeline @[[ref-generic-se]].
 -->
 <!-- ai:3 -->
-{{stakeholder-concerns}}
+Every requirement's source traces to a row below; the statement column carries the concern. Where two rows pull against each other, the tension renders beneath the table - the reasoning is one click away.
+
+![[stakeholder-matrix.base]]
+
+![[tensions.base]]
 ---
 ## Use cases
-<!-- fill [mandatory]
-Contents: ref units at depth 2 - one per use case, actors and trigger in the
-  item, success scenario in its body.
-Form: replace the slot with ref units, one per line, depth:2.
+<!-- tailor: shipped machinery - the view renders every use case state-aware at
+  depth 2 (statement, gate state, rationale one disclosure away).
 Sources: Cockburn use-case fields @[[ref-sya-re]].
 -->
 <!-- ai:3 -->
-{{usecase-refs}}
+One section per use case, live from the graph - actors and trigger on the item, the success scenario in its body.
+
+![[usecases.base]]
 ---
 ## Functions
 <!-- fill [judgment]
@@ -67,50 +65,45 @@ Sources: functional decomposition @[[ref-pahl-beitz]].
 {{functions}}
 ---
 ## Qualities
-<!-- fill [mandatory]
-Contents: one six-part scenario per quality - source of stimulus, stimulus,
-  artifact, environment, response, response MEASURE.
-Motivation: every quality names the experiment and metric that will verify it
-  (the golden rule). A quality without a measure is a mood.
-Form: one scenario block per quality, kind quality rows in the register carry
-  the facets. The ISO 25010 tree is the elicitation checklist - in the methods
-  view, not here.
+<!-- tailor: shipped machinery - the six scenario fields live ON the quality
+  requirements; the view renders them grouped by quality facet. The ISO 25010
+  tree is the elicitation checklist, in the methods view.
 Sources: metric rule @[[ref-systementwurf-mechatronik]]; six-part scenarios
   @[[ref-sya-nfr]]; the elicitation tree @[[ref-iso-25010]].
 -->
 <!-- ai:3 -->
-{{qualities}}
+Every quality below carries its six-part scenario, and the response measure is its pass line - a quality without a measure is a mood.
+
+![[qualities.base]]
 ---
 ## Constraints
-<!-- fill [judgment]
-Contents: the binding standards and non-negotiables - each a kind constraint
-  requirement LINKING its normative reference note.
-Motivation: a binding norm is a constraint with a citation; the reference note
-  carries the pin (version), the fundamentals chapter derives the list.
-Form: short prose plus the constraint rows. Type-gated regulatory sets (the
-  medical, machinery, radio lists) come from the type layer's guidance.
+<!-- tailor: shipped machinery - constraints are kind-constraint requirements,
+  each linking its normative reference note (the pin lives there, the
+  fundamentals chapter derives the list). Type-gated regulatory sets come from
+  the type layer's guidance.
 -->
 <!-- ai:3 -->
-{{constraints}}
+A constraint is externally imposed - a binding norm with a citation, never a choice. Each row links the reference that binds it.
+
+![[constraints.base]]
 ---
 ## The requirements register
-<!-- fill [mandatory]
-Contents: one line introducing the register and the coverage board.
-Motivation: needs are the user level; requirements are the system level; deeper
-  tiers hang off refines. Initial requirements suffice to START concepting;
-  detail requirements gate the RELEASE - and no TBD survives the detail gate.
-  The set criteria bind too: complete, consistent, affordable, bounded.
-Form: one prose line; the board and register render derived. Statements are
-  EARS-shaped, values carry tolerances IN the statement. Facet tagging (phase,
-  discipline, quality) is expected work - the zero-count holes on the board are
-  the completeness check (the Hauptmerkmalliste, live).
+<!-- tailor: shipped text - the board and register derive; initial requirements
+  suffice to START concepting, detail requirements gate the RELEASE; the set
+  criteria bind: complete, consistent, affordable, bounded.
 Sources: four core areas, Hauptmerkmalliste, staging @[[ref-pahl-beitz]];
   row schema @[[ref-methodische-entwicklung]]; attribute discipline
   @[[ref-modellbasierte-pe]]; set criteria @[[ref-iso-29148]].
 -->
 <!-- ai:3 -->
-{{register-lede}}
-
+Needs are the user level; requirements are the system level; deeper tiers hang off refines. The board below shows the facet coverage - a zero-count hole is the completeness check, live. Statements are EARS-shaped and carry their tolerances; no TBD survives the detail gate.
+---
 fig: coverage-board
 ---
 ![[requirements.base]]
+---
+## Methods that apply here
+<!-- tailor: shipped machinery - method notes route themselves by applies_chapters.
+-->
+![[methods.base#Methods for design-input]]
+<!-- enddesign -->

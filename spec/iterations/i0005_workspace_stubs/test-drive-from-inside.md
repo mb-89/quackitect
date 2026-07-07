@@ -2,7 +2,6 @@
 id: test-drive-from-inside
 type: test
 statement: The roundtrip/machinery test is extended so that after creating a bare workspace it drives that workspace FROM INSIDE via the committed launcher stub (resolving the engine at runtime) — status, next, a bless, report — and all steps succeed. State resolves under the workspace.
-verifies: [req-drive-from-inside]
 class: review
 verify: selftest:workspace
 killer: true

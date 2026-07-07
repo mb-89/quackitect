@@ -1,7 +1,6 @@
 ---
 id: uc-bless-readout
 type: usecase
-refines: [need-engage]
 statement: When the agent adjudicates a gate it shows a deterministic at-a-glance readout. On a self-bless — a horizontal progress bar of where the iteration stands (START · milestones · END, current position marked). On handing a killer gate to the human — the bar plus a one-pager (biggest decisions, biggest risks, readiness facts, a bless recommendation), where a human "y" is taken as the bless. Blessing a killer is permitted only with the human's explicit authorization.
 class: review
 killer: false

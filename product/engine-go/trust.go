@@ -49,6 +49,17 @@ var nodeKeysAllow = map[string]bool{
 	"actors": true, "trigger": true, "method": true, "level": true, "acceptance": true,
 	"record_of": true, "equipment": true, "conditions": true, "result": true,
 	"applies_chapters": true, "applies_type": true, "applies_rigor": true,
+	// the i12 extension fields (owner walk 2026-07-06); semantics and ranges live in the
+	// item templates: tags (rationale/decision filtering), the six quality-scenario
+	// fields, criterion metric/target, budget metric/unit/rule/margin + allocations map,
+	// rule scope, guide audience, design-element responsibility/realization, stakeholder
+	// preset/guide links, connection src/dst/q
+	"tags": true, "stimulus_source": true, "stimulus": true, "artifact": true,
+	"environment": true, "response": true, "response_measure": true,
+	"metric": true, "target": true, "unit": true, "rule": true, "margin": true,
+	"allocations": true, "scope": true, "audience": true, "responsibility": true,
+	"realization": true, "preset": true, "guide": true, "src": true, "dst": true, "q": true,
+	"verify_method": true, // the requirement item's method field - the bare verify key stays the executed-check referent
 }
 var iterKeysAllow = map[string]bool{
 	"iteration": true, "status": true, "type": true, "rigor": true,
@@ -77,6 +88,7 @@ func nodeFence(raw []byte) bool {
 // StrictIssues walks one directory tree and returns every strict-load finding, batched.
 func StrictIssues(specDir string) []ParseIssue {
 	var issues []ParseIssue
+	edgeMode := edgesModeOf(specDir) // frontmatter | connections (go-edge-mode)
 	ids := map[string]string{}          // id -> first file
 	type ref struct{ from, path, field, to string }
 	var refs []ref
@@ -107,6 +119,7 @@ func StrictIssues(specDir string) []ParseIssue {
 		if isIter {
 			keys = iterKeysAllow
 		}
+		inConnHome := strings.Contains(filepath.ToSlash(path), "/connections/")
 		end := -1
 		for i := 1; i < len(lines); i++ {
 			if strings.TrimSpace(lines[i]) == "---" {
@@ -165,6 +178,9 @@ func StrictIssues(specDir string) []ParseIssue {
 				typeVal = v
 			case k == "kind":
 				kindVal = v
+			case edgeMode == "connections" && legacyEdgeKeys[k] && !isIter && !inConnHome:
+				issues = append(issues, ParseIssue{path, k,
+					"legacy edge key in connections mode - the edge belongs in spec/connections (go-edge-mode)"})
 			case refFields[k]:
 				for _, t := range splitIDs(v) {
 					refs = append(refs, ref{id, path, k, t})
@@ -195,6 +211,8 @@ func StrictIssues(specDir string) []ParseIssue {
 				"dangling reference: '" + r.from + "' --" + r.field + "--> '" + r.to + "' (no such node)"})
 		}
 	}
+	// the connections home (go-conn-lanes): kinds, lanes, endpoints, and the one-lane rule
+	issues = append(issues, connectionIssues(specDir, ids)...)
 	return issues
 }
 

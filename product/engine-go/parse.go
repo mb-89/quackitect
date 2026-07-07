@@ -169,6 +169,14 @@ func ParseNode(path string) Node {
 			n.Milestone = m
 		}
 	}
+	// design: go-conn-prose-hash  implements: req-conn-root
+	// A connection's prose IS edge rationale - it folds into the node hash via the
+	// RegionBody seam (the design-marker precedent), so a body edit moves the root
+	// and flips the cone; edge reasoning can never mutate trust-invisibly.
+	if n.Type == "connection" && len(parts) >= 3 {
+		n.RegionBody = strings.TrimSpace(strings.Join(parts[2:], "---"))
+	}
+	// enddesign
 	return n
 }
 

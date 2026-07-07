@@ -23,7 +23,7 @@ type: usecase | requirement | test | adr | need
 refines:  [need-y]        # usecase; (requirement uses refines: [uc-…])
 verifies: [req-…]         # test only
 addresses:[req-…]         # adr only
-adjudicated_by: human     # adr only
+adjudicated_by: user      # adr only (the i11 stamp vocabulary)
 statement: one line — this IS the spec
 class: review
 verify: selftest:<name>   # test only, optional

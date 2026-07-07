@@ -1,6 +1,8 @@
 ---
 id: need-docu
 type: need
+source: stk-newcomer
+acceptance: crit-book-standalone
 statement: Stakeholders consume the spec - readable, portable, trustworthy - without needing an AI, the repo, or the engine.
 class: review
 killer: false

@@ -25,9 +25,27 @@ func parseAIMark(line string) int {
 	return int(m[1][0] - '0')
 }
 
+// fillCommentRe matches one whole HTML comment span, across lines.
+var fillCommentRe = regexp.MustCompile(`(?s)<!--.*?-->`)
+
+// stripFillComments removes every comment that is not an AI mark — the templates' PERMANENT
+// fill guidance ('the comment stays in the source and never renders'). Marks stay: they are
+// the involvement record, consumed line-wise by the predicate and the renderer.
+func stripFillComments(s string) string {
+	return fillCommentRe.ReplaceAllStringFunc(s, func(m string) string {
+		if aiMarkRe.MatchString(m) {
+			return m
+		}
+		return ""
+	})
+}
+
 // proseUnitsMarked verifies every prose paragraph in a markdown body carries a mark line.
 // A paragraph is a blank-line-delimited block that is not itself a mark, heading, or fence.
+// Fill comments are canon, never prose: the predicate reads the comment-stripped body — the
+// SAME referent the renderer emits, so 'accepted' and 'rendered' can never diverge.
 func proseUnitsMarked(body string) bool {
+	body = stripFillComments(body)
 	marked := false
 	inFence := false
 	for _, line := range strings.Split(strings.ReplaceAll(body, "\r\n", "\n"), "\n") {
@@ -82,6 +100,19 @@ func selftestAiDrafting() bool {
 	}
 	if proseUnitsMarked("An unmarked paragraph sneaking in.\n") {
 		return false // no unmarked path
+	}
+	// the template's PERMANENT fill comment (multi-line) is canon, never prose: the predicate
+	// accepts it and the renderer drops it ('the comment stays in the source and never renders').
+	fill := "## A heading\n<!-- fill [mandatory]\nContents: guidance the template keeps in the source.\nForm: FILLPROBE never renders.\n-->\n<!-- ai:3 -->\nA filled paragraph.\n"
+	if !proseUnitsMarked(fill) {
+		return false // a fill comment interior is not unmarked prose (the ch1 dogfood defect)
+	}
+	rendered := mdLite(fill)
+	if strings.Contains(rendered, "FILLPROBE") || !strings.Contains(rendered, "A filled paragraph.") {
+		return false // the comment never renders; the marked prose does
+	}
+	if proseUnitsMarked("<!-- fill [mandatory]\nGuidance.\n-->\nAn unmarked paragraph after a fill.\n") {
+		return false // stripping the comment must not launder genuinely unmarked prose
 	}
 	return true
 }
@@ -500,10 +531,20 @@ func selftestBookDrift() bool {
 	}
 	defer os.RemoveAll(dir)
 	fx := bookFixture(dir, 2, true)
+	// TWO presets over one chapter: unsorted preset classes flip order between renders
+	// (map iteration) - the shipped-book drift of 2026-07-07; determinism must not depend
+	// on how many presets reference a chapter.
+	for _, p := range []string{"man-preset-pa", "man-preset-pb"} {
+		pp := filepath.Join(dir, p+".md")
+		os.WriteFile(pp, []byte("---\nid: "+p+"\ntype: manifest\nmode: preset\nstatement: P.\n---\n[man-fix](man-fix.md)\n"), 0o644)
+		fx[p] = Node{ID: p, Type: "manifest", Mode: "preset", Statement: "P.", Path: pp}
+	}
 	h1, _, _ := renderBookHTML(fx)
-	h2, _, _ := renderBookHTML(fx)
-	if h1 != h2 {
-		return false // regeneration over an unchanged spec is a byte-identical no-op
+	for i := 0; i < 8; i++ { // map order varies per run - eight renders make a flip loud
+		h2, _, _ := renderBookHTML(fx)
+		if h1 != h2 {
+			return false // regeneration over an unchanged spec is a byte-identical no-op
+		}
 	}
 	p := filepath.Join(dir, "book.html")
 	os.WriteFile(p, []byte(h1), 0o644)

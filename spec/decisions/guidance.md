@@ -2,7 +2,6 @@
 id: guidance
 statement: Guides load lazily through a description catalog. A guide body loads by trigger: always, by-type cascade, by-rigor ladder, browse, or check-recommended. The trigger resolves live off a type/rigor breadcrumb.
 type: requirement
-refines: [uc-engage-start]
 adjudicated_by: human
 killer: true
 ears: exempt - historical statement, retrofit rejected (adr-grandfathers-historical)

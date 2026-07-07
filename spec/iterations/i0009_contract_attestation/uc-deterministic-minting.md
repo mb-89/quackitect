@@ -1,7 +1,6 @@
 ---
 id: uc-deterministic-minting
 type: usecase
-refines: [need-qualities]
 statement: Every note and trace node is born engine-stamped with schema-valid frontmatter; the agent fills content, never authors shape — no invalid node ever exists.
 class: review
 killer: false

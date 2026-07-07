@@ -2,7 +2,6 @@
 id: test-responsiveness
 type: test
 statement: On the reference machine, each interactive command gives feedback within 1 second (an acknowledgement if the work runs longer), and long tasks report progress at least once per minute.
-verifies: [req-responsiveness]
 class: executed
 verify: selftest:perf
 killer: false

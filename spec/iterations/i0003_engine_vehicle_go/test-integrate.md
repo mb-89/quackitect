@@ -2,7 +2,6 @@
 id: test-integrate
 type: test
 statement: The engine resolves its rigor/type resources through the overlay chain (not a hardcoded path), and the integrate prompt with a worked example exists.
-verifies: [req-integrate]
 class: executed
 verify: selftest:integrate
 killer: false

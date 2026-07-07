@@ -1,6 +1,7 @@
 ---
 id: need-workspace-drive
 type: need
+source: stk-integrator
 statement: One reusable, dependency-free engine drives many projects. A project's product, spec, and all its state live in a selectable WORKSPACE; the engine (binary + resources) is separate and can point at its own workspace or a different project's, the way a tool operates on a target repo. Other projects vendor and overlay the engine without forking, running it as a self-contained artifact with no runtime or web-downloaded dependencies.
 class: judgment
 killer: true

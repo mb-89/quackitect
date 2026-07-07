@@ -23,6 +23,8 @@ row). Bass sorts the kinds: system-wide or quality impact = architecture.
   by the user. A WAIVER is ALWAYS a user-adjudicated gate — the agent never
   blesses a failure acceptance.
 - `supersedes` (list of decision ids): the record this one replaces.
+- `tags` (list of slugs, optional): query hooks — the ch4 strategy view filters
+  decisions tagged `strategy` via `file.hasTag`.
 - `statement` (one sentence): the call, stated as a claim.
 
 ## Body
@@ -41,7 +43,7 @@ kind: architecture
 addresses: [req-{{slug}}]
 chosen: [cand-{{slug}}]
 rejected: [cand-{{slug}}]
-adjudicated_by: human
+adjudicated_by: user
 statement: {{the-call}}
 class: review
 killer: false

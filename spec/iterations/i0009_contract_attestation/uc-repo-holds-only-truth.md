@@ -1,7 +1,6 @@
 ---
 id: uc-repo-holds-only-truth
 type: usecase
-refines: [need-qualities]
 statement: A checkout contains only recorded truth (spec/) and product; every cache is regenerable in the user data directory, so deleting the data dir loses nothing adjudicated and a fresh clone renders the same board on any machine.
 class: review
 killer: false

@@ -1,6 +1,7 @@
 ---
 id: need-qualities
 type: need
+source: stk-assessor
 statement: The system exhibits cross-cutting QUALITY attributes (NFRs) that no single functional use-case owns — they constrain the whole. This need is the home for those qualities: first the brand design-language (voice, logos, palette, typography), and, as they migrate here, responsiveness, determinism, and the like.
 class: judgment
 killer: true

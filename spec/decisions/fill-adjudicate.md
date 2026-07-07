@@ -2,7 +2,6 @@
 id: fill-adjudicate
 statement: Every check records filled_by and adjudicated_by separately. A gate is a check whose adjudicator must be human. Killer checks are always gates.
 type: requirement
-refines: [uc-engage-next]
 adjudicated_by: human
 killer: true
 ears: exempt - historical statement, retrofit rejected (adr-grandfathers-historical)

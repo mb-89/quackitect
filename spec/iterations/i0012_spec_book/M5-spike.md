@@ -35,3 +35,22 @@ Verdict: buildable within the guard.
 ## Milestone review  → i12-m5-gate
 
 **Verify:** every named unknown from M3 feasibility met evidence - two by construction and sight, one by the adjudicator's live probe. **Validate:** the spike answered exactly the questions the composite depends on, nothing speculative was built, the scratch stays scratch. **Red-team:** the probe ran in one browser family - Chromium's until-found is the mechanism's home; Firefox/Safari degrade to the same pre-agreed expanded fallback per feature detection, so the single-browser probe bounds the risk instead of hiding it. **Verdict: PASS - pending the adjudicator's probe result and bless.**
+
+---
+
+# M5 extension — the riskiest unknown of the extension (2026-07-06)
+
+## Riskiest assumptions validated by evidence (extension)  → i12-m5-riskiest-validated
+
+The extension's riskiest assumption is **hash-neutrality**: reconstructing adjacency from the connections home without moving a single node hash. Validation evidence, in lieu of a browser-style probe:
+
+- The trust red-team anchored the exact mechanics in code (parents feeding fullHash, bless events storing per-parent deps) and measured the live workspace (1096 spec files; 169 verifies, 228 refines, 78 addresses, 963 depends_on edges; zero duplicate list entries; zero ids containing consecutive hyphens) - the migration surface is fully characterized before a line is written.
+- The proof is constructive and rides the walk: test-conn-hash-neutral (observed RED first) asserts byte-identical node hashes and identical check states across the two storages - the spike IS the red test's fixture.
+- The failure modes are each fenced by a requirement: silent edge loss (req-conn-notes refuses), duplicate collapse (req-migrate-edges refuses), interim ambiguity (req-edge-mode), id ambiguity (req-id-charset, shipped first).
+
+## Design is buildable (extension)  → i12-m5-design-buildable
+
+The scope guard grows CONSCIOUSLY, each surface owner-ruled: the connections home with its two lanes, three determinizers (mint, promote, adjacency), one migration command, two render modes (full shipped, refs planned), seven item templates, and the mechanized chapter set. The relief valve stands: if the build proves too big, the template-mechanization half (bs16-bs23) defers to a fresh version as a first-class move while the connection core lands.
+
+## Milestone review (extension)  → i12-m5-gate
+**Verify:** the riskiest unknown carries measured, code-anchored evidence and a constructive red test. **Validate:** nothing speculative - every fence is a composed requirement. **Red-team:** analysis is not execution; answered: the red-observed test converts the analysis into an executable claim before any build step touches the loader. **Verdict: PASS - pending the adjudicator's bless.**

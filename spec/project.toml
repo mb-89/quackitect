@@ -4,3 +4,4 @@
 type    = "default"
 rigor   = "systematic"
 version = "i0012_spec_book"
+edges = "connections"

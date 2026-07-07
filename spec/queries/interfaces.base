@@ -1,0 +1,12 @@
+# Interface connections between design elements - the prose lane of kind interface.
+filters:
+  and:
+    - 'type == "connection"'
+    - 'kind == "interface"'
+views:
+  - type: table
+    name: Interfaces
+    order: [src, dst, statement]
+    sort:
+      - property: src
+        direction: ASC

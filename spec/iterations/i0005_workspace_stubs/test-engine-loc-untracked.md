@@ -2,7 +2,6 @@
 id: test-engine-loc-untracked
 type: test
 statement: The committed stub set carries no absolute engine path, no engine binary, and no machine-local state; engine resolution lives only in the launcher's runtime order.
-verifies: [req-engine-loc-untracked]
 class: executed
 verify: selftest:stubs
 killer: false

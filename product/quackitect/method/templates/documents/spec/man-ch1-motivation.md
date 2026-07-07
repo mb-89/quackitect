@@ -4,6 +4,7 @@ type: manifest
 mode: chapter
 statement: Motivation - where we want to be, and why we can get there.
 ---
+<!-- design: method-criteria-items  implements: req-criteria-validation :: Success criteria are crit- items (metric, target): the delta unit renders them as the criteria view, and the ch5 validation view traces the same rows to their outcomes - the V-model's outer arc as data. -->
 ## The big idea
 <!-- fill [mandatory]
 Contents: why this system exists, in one breath, standalone-readable.
@@ -40,17 +41,19 @@ Form: prose, present tense, one paragraph per pain.
 ---
 ## The delta, and what proves it closed
 <!-- fill [mandatory]
-Contents: three moves - the gap as a claim (what every existing alternative
-  sheds); why it is closable now (the why-now pattern); measurable success
-  criteria, each checkable.
-Motivation: the success criteria written here are exactly what the validation
-  chapter checks against - the V-model's outer arc. A criterion nothing will
-  ever test is not a criterion.
-Form: prose for the first two moves, a list for the criteria.
+Contents: two authored moves - the gap as a claim (what every existing
+  alternative sheds) and why it is closable now (the why-now pattern). The
+  success criteria are crit- ITEMS - the derived table below renders them.
+Motivation: the criteria are exactly what the validation chapter checks against
+  - the V-model's outer arc, as data. A criterion nothing will ever check is
+  not a criterion.
+Form: prose for the two moves; the criteria table renders derived.
 Sources: V-model pairing @[[ref-systementwurf-mechatronik]].
 -->
 <!-- ai:3 -->
 {{delta-and-proof}}
+
+![[criteria.base]]
 ---
 ## Business case
 <!-- fill [judgment]
@@ -72,3 +75,4 @@ Sources: the RE rule, a goal without a traceable stakeholder is a wish
 Each need below names the stakeholder it serves and the criterion that accepts it. The register derives from the need notes - a row without a stakeholder is a wish, not a need.
 
 ![[needs.base]]
+<!-- enddesign -->

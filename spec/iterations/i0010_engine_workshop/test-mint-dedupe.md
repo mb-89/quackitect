@@ -1,7 +1,6 @@
 ---
 id: test-mint-dedupe
 type: test
-verifies: [req-mint-dedupe]
 statement: mint veto --of scrap yields addresses with the sink exactly once.
 class: executed
 verify: selftest:mint-dedupe

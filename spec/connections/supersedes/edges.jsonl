@@ -1,0 +1,4 @@
+{"src":"adr-entry-chain","dst":"adr-entry-render"}
+{"src":"adr-pointer-entry-unveto","dst":"adr-veto-pointer-entry"}
+{"src":"adr-scaffold-realized","dst":"adr-defer-vehicle-scaffold"}
+{"src":"req-quarantine-scope","dst":"req-meta-quarantine"}

@@ -1,7 +1,6 @@
 ---
 id: uc-harness-portability
 type: usecase
-refines: [need-qualities]
 statement: ISO/IEC 25010 Portability/Compatibility — the binding method reaches the agent reliably regardless of harness. A thin harness that will not follow a file pointer (e.g. GitHub Copilot) still receives the contract through its native instruction channel with an active read→paraphrase→confirm imperative, so it can engage the loop.
 class: review
 killer: false

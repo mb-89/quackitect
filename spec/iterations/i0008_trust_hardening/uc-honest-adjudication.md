@@ -1,7 +1,6 @@
 ---
 id: uc-honest-adjudication
 type: usecase
-refines: [need-qualities]
 statement: The attest record names the true adjudicator — channel defaults match reality (interactive console = human, harness-invoked = agent) and an explicit flag overrides both, so omission errs toward under-claiming human oversight.
 class: review
 killer: false

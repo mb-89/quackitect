@@ -1,4 +1,4 @@
-<!-- design: method-item-templates  implements: req-item-templates :: Thirteen item templates, one per kind (term, reference, fundamental, method, stakeholder, requirement, usecase, candidate, decision, test-case, verification-record, raid, rationale); every field declared with its name, semantics, and value range (the Attributierungsschema duty); scales are 0..1 floats everywhere; kind-specific guidance rides one template where kinds exist. -->
+<!-- design: method-item-templates  implements: req-item-templates, req-new-item-kinds, req-need-item :: Twenty item templates, one per kind (term, reference, fundamental, method, stakeholder, requirement, usecase, candidate, decision, test-case, verification-record, raid, rationale, need, connection, rule, budget, criterion, design-element, guide); every field declared with its name, semantics, and value range (the Attributierungsschema duty); scales are 0..1 floats everywhere; budget carries margin so the summation lint flags erosion; kind-specific guidance rides one template where kinds exist. -->
 # item templates — one shape per kind
 
 Every item note the spec template consumes has its shape declared here. The

@@ -2,7 +2,6 @@
 id: state-model
 statement: A check's completion state is derived from its evidence. It is never stored as a verdict.
 type: requirement
-refines: [uc-engage-next]
 adjudicated_by: human
 killer: true
 ears: exempt - historical statement, retrofit rejected (adr-grandfathers-historical)

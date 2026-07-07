@@ -1,12 +1,14 @@
 ---
 id: req-integrate
 type: requirement
-refines: [uc-vendor-engine]
 statement: An external vehicle can integrate quackitect as an engine with a documented path. There is an integrate prompt with a worked example (vendor the engine source + resources, build, configure, overlay, run). The engine's resource lookup (gather, guides, the report shell) routes through the overlay chain, so a vendored vehicle resolves the engine's rigor and type resources without any hardcoded dogfood path. Saying to a vehicle "run on quackitect as an engine, integrate it" works.
 depends_on: [req-overlay-resolver]
 class: review
 killer: true
 ears: exempt - historical statement, retrofit rejected (adr-grandfathers-historical)
+phase: [engineering]
+discipline: [software]
+quality: [functionality]
 ---
 
 ## Rationale (not load-bearing)

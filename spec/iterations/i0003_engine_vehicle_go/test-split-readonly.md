@@ -2,7 +2,6 @@
 id: test-split-readonly
 type: test
 statement: A vehicle run resolves engine and vehicle resources correctly and never writes under the engine directory.
-verifies: [req-engine-vehicle-split, req-overlay-resolver]
 class: executed
 verify: selftest:split
 killer: false

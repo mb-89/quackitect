@@ -1,7 +1,6 @@
 ---
 id: uc-book-agent
 type: usecase
-refines: [need-docu]
 statement: An agent retrieves layered spec content from the same artifact and can tell normative from informative and verified from suspect.
 class: review
 killer: false

@@ -4,11 +4,12 @@ artifact: node
 applies_rigor: [lean, systematic]
 applies_type: [default]
 ---
-# stakeholder — one project stakeholder of a derived class
+<!-- design: method-stakeholder-links  implements: req-stakeholder-links :: Stakeholder notes carry preset and guide links (no reverse join exists in the pinned subset), and the matrix renders concern, preset, and guide columns - one note feeds the ch0 reader matrix and the ch3 concerns table. -->
+# stakeholder â€” one project stakeholder of a derived class
 
 Lives in the iteration or `spec/trace/` (interim home, spec-folder discussion
 pending). The derived class set fixes the ROW SET of the stakeholder table; these
-notes fill the content — a class with zero notes renders as a visible TBD row.
+notes fill the content â€” a class with zero notes renders as a visible TBD row.
 More than one note per class is legal (two user groups). ROLES, never persons
 (the privacy ruling). Id prefix `stk-`.
 
@@ -19,7 +20,11 @@ More than one note per class is legal (two user groups). ROLES, never persons
 - `interest` (0..1): how much the outcome matters to them.
 - `influence` (0..1): how much they can change the outcome.
 - `weight` (0..1): the project's weighting of their concerns.
-- `statement` (one sentence): who this role is, in this project.
+- `preset` (a man-preset- id, optional): the view preset serving this reader row â€”
+  ch0's canned text sends the reader to it.
+- `guide` (a guide- id, optional): this audience's how-to guide â€” the ch8 link.
+- `statement` (one sentence): who this role is, in this project. The ch3 concern
+  column renders exactly this.
 
 ## Body
 Their concerns, as prose or a short list. Every requirement they source cites this note.
@@ -36,3 +41,4 @@ statement: {{who-this-role-is}}
 ---
 {{concerns}}
 ```
+<!-- enddesign -->

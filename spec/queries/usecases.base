@@ -1,0 +1,13 @@
+# Use cases, rendered state-aware through the node renderer (render: refs),
+# grouped by the need each one refines - click a need to see its use cases.
+# Obsidian previews the same rows as a plain table.
+filters:
+  and:
+    - 'type == "usecase"'
+views:
+  - type: table
+    name: Use cases
+    render: refs
+    depth: 2
+    groupBy: refines
+    order: [file.name, statement]

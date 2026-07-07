@@ -54,3 +54,36 @@ All fourteen extension steps realized in stage order (bs6 substrate, bs7 machine
 ## Milestone review  → i12-m6-gate
 
 **Verify:** every planned step is individually blessed with its selftest green at bless time; the derived checks compute; the book artifact exists and regenerates byte-identically. **Validate:** the build honors every owner ruling of this walk - the mark law with surface-versus-core, margin robots, Vale-not-hand-rolled, generous machine-readable figures, one-source AGENTS.md, truth only in spec. **Red-team:** the largest risk was scope under deadline; answered: the relief valve was never needed - all five stages landed, and the two soft spots (Vale dependency, browser-specific disclosure) are ADR-recorded trades with fallbacks, not surprises. **Extension review:** verify - 34 steps total realized, 42 tests birth-red and green at their hashes, coverage clean, lint clean, full battery green. Validate - every 2026-07-05 owner ruling is realized or recorded: two markdowns, pull law, items and views, facets as expected work, decision kinds, the quarantine, the anchors. Red-team - the biggest exposure is the unproven authoring loop (no dogfood chapter has been drafted through the template yet); answered: the redraft is deliberately the refine track, with the owner in the review loop where judgment belongs. **Verdict: PASS - pending the adjudicator's bless.**
+
+## Dogfood-redraft record (2026-07-07) - the gate condition worked off  → i12-m6-gate
+
+Three engine defects surfaced by the redraft, each walked test-first (amend, observe red, fix, green):
+
+- Fill comments (owner note, 07:56): proseUnitsMarked had no multi-line comment state - the shared stripFillComments helper now strips non-mark comments in the predicate, the renderer, and the AGENTS.md emitter. Red at b56741bc.
+- Orphan lint vs live views (owner ruling): bookOrphanFindings now counts nodes a chapter's embedded base view matches as reached; pull-law (`referenced`) queries are excluded - they follow references, never create them. Red at ca0bc4a5.
+- Grouped refs views (owner ruling): a groupBy refs view renders each group as a disclosure whose summary carries the key node's statement - usecases.base groups by the refined need. Red at 13ef4183.
+
+The redraft itself, template-faithful (canned units verbatim, fills authored):
+
+- ch0 orientation: lede fill; per-paragraph marks (a TEMPLATE defect the instantiation exposed - fixed in the template first, mirrored here; the ch8 about-unit likewise).
+- ch1 motivation: the owner-driven morning draft, rendering since the fill-comment fix.
+- ch2 fundamentals: instantiated, pull-law views.
+- ch3 design input: context-and-scope and functions fills authored; the views carry the rest.
+- ch4 design output: canned machinery; budgets skipped (type-gated, software).
+- ch5 verification-validation: the validation fill traces the five criteria; records skipped (type-gated); the abbreviated man-ch5-vv id retired for the template's spelled-out id.
+- ch6 project: the approach fill with the tailoring record (the two type-gated skips named).
+- ch7 rationales, ch8 guidance: instantiated; the guides fill records the demand-driven state.
+- Facets: all 187 requirements tagged phase/discipline/quality from the type-layer vocabularies (hash-neutral; the coverage board and register filters are live).
+- Needs: the two i0004 needs gained their source stakeholders.
+
+Internal quality: full selftest ALL OK; quack lint fully clean; the book renders finding-free with all ten chapters; zero suspects throughout - the facet and needs edits proved hash-neutral as designed.
+
+**Review of the redraft:** verify - the book renders every chapter through the template; the three fixes carry red-observed tests now green. Validate - the gate condition (the dogfood spec redrafted through the template) is MET in structure; the owner's full-book read is the remaining judgment; the ELI5 rule the owner set mid-walk is baked into the voice. Red-team - the weakest spots are the empty views (methods, rules, interfaces, force-rationales - no such notes exist yet), the pattern-based facet tags (bulk judgment, owner sampling advised), and the long need statements heading the grouped use-case views; none blocks the review, all are visible in the artifact. **Verdict: redraft COMPLETE - the pager and the owner's read of the full book decide the gate.**
+
+## Owner-directed second wave (2026-07-07, afternoon)  → i12-m6-gate
+
+- Layout mirror (owner ruling): the spec now mirrors the template - manifests at the spec ROOT, stakeholders/usecases/raid in their item homes; `start stubs` seeds the root (test-first: test-stub-spec red at e3760119, test-stubs-folders red at 38a16b90); existing workspaces convert through the ENGINE determinizer `quack migrate-layout` (test-migrate-layout red at 4888eac1; an interim PowerShell script did this workspace's move and was retired the same day - migrations live in the one binary, owner correction); 41 files moved hash-neutrally.
+- Book shell (owner ruling): mdbook-style - ONE sidebar carries the chapter TOC (unit headings linked), the GLOBAL search, the view presets, and the details card; every filter control compiles into one hand-editable expression (`preset: phase: discipline: quality: state:` plus free text); the report's visual language carries over; the script stays toggle-only. req-book-shell minted, test-book-shell red at 1f6ea55a, now green.
+- Empty views (owner ruling): clearly-marked EXAMPLE notes ship for methods and force-rationales (template + workspace) and rules (workspace); the interface example was REFUSED by the strict guard - a connection note cannot reference a code-derived design (noted, a real gap).
+- Two determinizer defects noted for triage: mint writes frontmatter edges in connections mode (refused nodes); the interface-endpoint gap above.
+- Battery: selftest ALL OK, lint fully clean, book renders finding-free, zero suspects.

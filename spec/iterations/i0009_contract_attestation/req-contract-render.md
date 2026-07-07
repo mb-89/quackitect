@@ -1,11 +1,13 @@
 ---
 id: req-contract-render
 type: requirement
-refines: [uc-contract-delivery]
 statement: The repository shall deliver the contract through an unbroken pointer chain with contract.md as its single copy — each harness's natively-loaded file (CLAUDE.md for Claude Code, .github/copilot-instructions.md for Copilot) commands following AGENTS.md without exception and to the letter, and AGENTS.md commands the enumerated read-understand-recite-honor ritual on contract.md.
 depends_on: []
 class: review
 killer: true
+phase: [engineering]
+discipline: [process]
+quality: [functionality]
 ---
 ## Rationale (not load-bearing)
 Supersedes the verbatim-transclusion render (adr-entry-render, now superseded). Two field

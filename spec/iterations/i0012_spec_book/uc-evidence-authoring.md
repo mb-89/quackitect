@@ -1,7 +1,6 @@
 ---
 id: uc-evidence-authoring
 type: usecase
-refines: [need-review]
 statement: The walker authors milestone evidence cheaply from templates, and the adjudicator reads it without decoding ad-hoc structure.
 class: review
 killer: false

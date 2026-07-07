@@ -1,6 +1,8 @@
 ---
 id: need-engage
 type: need
+source: stk-project-owner
+acceptance: crit-killer-user-adjudicated
 statement: As a builder I need to advance an iteration from plan through build to delivery, with the work and its checks visible.
 class: review
 killer: false

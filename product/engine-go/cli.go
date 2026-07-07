@@ -50,7 +50,7 @@ func usageText() string {
 	return b + ` — the determinizer lane (deterministic; no judgment).
 usage: ` + b + ` status [id] | next | start <id> [--plan] | why <id> | bless [--all|<id>] [--by A]
        | note "..." | notes [--all] | gather <ver> | report [--out F] | ship | build
-       | lint | verify <id> | progress [--pager <gate>] | migrate-actors | version`
+       | lint | verify <id> | progress [--pager <gate>] | migrate-actors | migrate-layout | version`
 }
 
 // enddesign
@@ -122,10 +122,27 @@ func Dispatch(args []string) {
 		cmdNote(rest)
 	case "notes":
 		cmdNotes(rest)
+	case "connections":
+		cmdConnections(rest)
+	case "promote":
+		if len(rest) >= 4 && rest[0] == "connection" {
+			out, err := promoteConnection(SPEC, rest[1], rest[2], rest[3], flagVal(rest, "--q"))
+			if err != nil {
+				fmt.Fprintln(os.Stderr, err)
+				quackExit(1)
+			}
+			fmt.Println("promoted ->", out)
+		} else {
+			fmt.Println("usage: promote connection <kind> <src> <dst> [--q qualifier]")
+		}
 	case "observe-red":
 		cmdObserveRed(rest)
+	case "migrate-edges":
+		cmdMigrateEdges(rest)
 	case "migrate-actors":
 		cmdMigrateActors()
+	case "migrate-layout":
+		cmdMigrateLayout()
 	case "gather":
 		cmdGather(rest)
 	case "ship":
@@ -367,6 +384,20 @@ func cmdLint(rest []string) {
 	if len(mono) > 0 {
 		fmt.Printf("monotonic: %d finding(s):\n", len(mono))
 		for _, f := range mono {
+			fmt.Println("  - " + f)
+		}
+	}
+	// id charset (go-id-charset): the separator and case rules, shipped before any migration.
+	if idf := idCharsetFindings(nodes); len(idf) > 0 {
+		fmt.Printf("ids: %d charset finding(s):\n", len(idf))
+		for _, f := range idf {
+			fmt.Println("  - " + f)
+		}
+	}
+	// double-claimed candidates (go-verdict-order): two decisions claiming one candidate.
+	if claims := candidateClaimFindings(nodes); len(claims) > 0 {
+		fmt.Printf("candidates: %d double claim(s):\n", len(claims))
+		for _, f := range claims {
 			fmt.Println("  - " + f)
 		}
 	}

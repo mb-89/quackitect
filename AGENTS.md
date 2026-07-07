@@ -47,6 +47,7 @@ quack start stubs [path] # emit drive-from-inside stubs into a bare workspace
 quack why <id>           # what input changed
 quack bless [--all|<id>] [--by user|agent] # record an adjudication; actor defaults by CHANNEL
 quack migrate-actors     # one-shot: rewrite pre-i11 actor stamps to user (audited; no-op when done)
+quack migrate-layout     # one-shot: move a pre-i12 spec to the template-mirroring layout (no-op when done)
 quack note "<text>"      # deterministic capture lane
 quack notes [--all]      # list open inbox notes (--all adds backlog + archive)
 quack observe-red <test> # run a test and record it FAILING at its current hash (a pass is refused)

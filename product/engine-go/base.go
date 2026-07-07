@@ -226,6 +226,8 @@ type baseView struct {
 	groupBy string
 	filter  *baseFilter
 	full    bool // render: full - sections with bodies instead of a table
+	refs    bool // render: refs - rows render through the state-aware node renderer
+	depth   int  // refs depth (statement / +rationale / +children); default 1
 }
 
 type baseFilter struct {
@@ -302,10 +304,18 @@ func ParseBase(text string) (*baseDef, error) {
 						switch val.scalar {
 						case "full":
 							bv.full = true
+						case "refs":
+							bv.refs = true
 						case "table", "":
 						default:
-							return nil, fmt.Errorf("base: out-of-subset render mode %q (table or full)", val.scalar)
+							return nil, fmt.Errorf("base: out-of-subset render mode %q (table, full, or refs)", val.scalar)
 						}
+					case "depth":
+						n, err := strconv.Atoi(val.scalar)
+						if err != nil {
+							return nil, fmt.Errorf("base: depth is not a number: %q", val.scalar)
+						}
+						bv.depth = n
 					case "name":
 						bv.name = val.scalar
 					case "order":
@@ -594,7 +604,11 @@ func (bp *baseParser) parseCall(name string) (string, error) {
 	case strings.HasSuffix(name, ".contains") && len(args) == 1:
 		prop := strings.TrimSuffix(name, ".contains")
 		prop = strings.TrimPrefix(prop, "note.")
-		for _, e := range bp.ctx.p.lists[prop] {
+		lst := bp.ctx.p.lists[prop]
+		if len(lst) == 0 && edgeProps[prop] {
+			lst = bp.edgeList(prop) // graph-resolved edges (go-virtual-edges)
+		}
+		for _, e := range lst {
 			if e == args[0] {
 				return "true", nil
 			}
@@ -621,6 +635,49 @@ func (bp *baseParser) hasLink(target string) bool {
 		strings.Contains(bp.ctx.p.body, "[["+target)
 }
 
+// design: go-virtual-edges  implements: req-virtual-edges
+// Edge properties resolve from the GRAPH when the file lacks them: after migration the
+// frontmatter no longer carries verifies/refines/..., but the loader reconstructed the
+// adjacency - so a query sees exactly what frontmatter storage showed. Obsidian previews
+// of edge-driven views go empty post-migration (the named, owner-accepted cost); the
+// book is the truth.
+func (bp *baseParser) edgeList(prop string) []string {
+	if l, ok := bp.ctx.p.lists[prop]; ok && len(l) > 0 {
+		return l
+	}
+	n, ok := bp.ctx.nodes[bp.ctx.p.id]
+	if !ok {
+		return nil
+	}
+	switch prop {
+	case "verifies":
+		return n.Verifies
+	case "refines":
+		return n.Refines
+	case "addresses":
+		return n.Addresses
+	case "supersedes":
+		return n.Supersedes
+	case "chosen":
+		return n.Chosen
+	case "rejected":
+		return n.Rejected
+	case "refers":
+		return n.Refers
+	case "depends_on":
+		return n.DependsOn
+	case "implements":
+		return n.Implements
+	}
+	return nil
+}
+
+var edgeProps = map[string]bool{"verifies": true, "refines": true, "addresses": true,
+	"supersedes": true, "chosen": true, "rejected": true, "refers": true,
+	"depends_on": true, "implements": true}
+
+// enddesign
+
 func (bp *baseParser) resolve(name string) string {
 	n := strings.TrimPrefix(name, "note.")
 	switch n {
@@ -640,6 +697,9 @@ func (bp *baseParser) resolve(name string) string {
 	}
 	if l, ok := bp.ctx.p.lists[n]; ok {
 		return strings.Join(l, ", ")
+	}
+	if edgeProps[n] { // graph-resolved edge properties (go-virtual-edges)
+		return strings.Join(bp.edgeList(n), ", ")
 	}
 	return ""
 }
@@ -724,6 +784,8 @@ type BaseResult struct {
 	Columns []string
 	Groups  []BaseGroup
 	Full    bool // render as sections with bodies instead of a table
+	Refs    bool // render rows through the state-aware node renderer
+	Depth   int  // refs depth; default 1
 }
 
 // EvalBase evaluates a base block over the given note files, deterministically.
@@ -810,7 +872,7 @@ func EvalBaseUsed(text string, paths []string, nodes map[string]Node, used map[s
 			}
 			return r
 		}
-		res := BaseResult{Name: view.name, Columns: cols, Full: view.full}
+		res := BaseResult{Name: view.name, Columns: cols, Full: view.full, Refs: view.refs, Depth: view.depth}
 		if view.groupBy == "" {
 			g := BaseGroup{Key: "", Count: len(rows)}
 			for _, r := range rows {
@@ -835,7 +897,11 @@ func EvalBaseUsed(text string, paths []string, nodes map[string]Node, used map[s
 				g.Rows = append(g.Rows, mkRow(p))
 			}
 			for _, r := range rows {
-				if l, ok := r.p.lists[prop]; ok && len(l) > 0 {
+				l := r.p.lists[prop]
+				if len(l) == 0 && edgeProps[prop] { // graph-resolved edges (go-virtual-edges)
+					l = (&baseParser{ctx: baseEvalCtx{p: r.p, nodes: nodes, used: used}}).edgeList(prop)
+				}
+				if len(l) > 0 {
 					for _, v := range l { // multi-valued: the row counts in every group it carries
 						add(v, r.p)
 					}

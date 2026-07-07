@@ -1,7 +1,6 @@
 ---
 id: adr-stamp-vocabulary
 type: adr
-addresses: [req-user-wording]
 adjudicated_by: human
 statement: Prose, prompts, and CLI display strings say user (or the role). The recorded actor stamps (actor=human, --by human) are a FROZEN metric vocabulary: records are historical facts and the self-cert metric needs one vocabulary across all history. The allowlist is exactly these recorded tokens.
 class: review

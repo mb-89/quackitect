@@ -1,0 +1,12 @@
+# Stakeholder tensions - conflicts-with connections; the full why one click away.
+filters:
+  and:
+    - 'type == "connection"'
+    - 'kind == "conflicts-with"'
+views:
+  - type: table
+    name: Tensions
+    order: [src, dst, statement]
+    sort:
+      - property: src
+        direction: ASC

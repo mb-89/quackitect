@@ -1,7 +1,6 @@
 ---
 id: uc-global-engine
 type: usecase
-refines: [need-workspace-drive]
 statement: One global quack binary serves every repo; a repo carries vendored engine source and can rebuild the global binary, ratcheting it forward — a newer global binary is used as-is, an older one is rebuilt.
 class: review
 killer: false

@@ -79,18 +79,54 @@ func parseManifestUnits(body string) []ManifestUnit {
 // Tests and designs render through the DERIVED chapters (V&V, realization map) - auto-reachable.
 var bookContent = map[string]bool{"need": true, "usecase": true, "requirement": true, "adr": true}
 
-// bookOrphanFindings flags book-content nodes no manifest references. Disarmed with zero manifests.
+// bookOrphanFindings flags book-content nodes no manifest reaches. Disarmed with zero manifests.
+// A node is reached by a DIRECT unit ref, or by a LIVE VIEW that matches it (owner ruling
+// 2026-07-07): the book shows a view's rows, so the lint counts them. Pull-law queries
+// (`referenced`) follow references and can never create one - they are skipped. A broken
+// query counts nothing here; the render channel already reports it as a finding.
 func bookOrphanFindings(nodes map[string]Node) []string {
 	referenced := map[string]bool{}
 	manifests := 0
+	var evalPaths []string // built once, on the first live view
 	for _, n := range nodes {
 		if n.Type != "manifest" {
 			continue
 		}
 		manifests++
-		for _, u := range parseManifestUnits(manifestBody(n.Path)) {
+		body := manifestBody(n.Path)
+		for _, u := range parseManifestUnits(body) {
 			if u.Ref != "" {
 				referenced[u.Ref] = true
+			}
+		}
+		for _, m := range baseUseRe.FindAllStringSubmatch(body, -1) {
+			text, viewName := m[1], ""
+			if text == "" { // pooled-query embed
+				raw, err := os.ReadFile(filepath.Join(queriesDir(), filepath.Base(strings.TrimSpace(m[2]))))
+				if err != nil {
+					continue
+				}
+				text, viewName = string(raw), strings.TrimSpace(m[3])
+			}
+			if baseRefdRe.MatchString(text) {
+				continue
+			}
+			if evalPaths == nil {
+				evalPaths = baseEvalPaths(nodes)
+			}
+			results, err := EvalBase(text, evalPaths, nodes)
+			if err != nil {
+				continue
+			}
+			for _, r := range results {
+				if viewName != "" && r.Name != viewName {
+					continue
+				}
+				for _, g := range r.Groups {
+					for _, row := range g.Rows {
+						referenced[row.ID] = true
+					}
+				}
 			}
 		}
 	}
@@ -127,6 +163,7 @@ func sortStrings(s []string) {
 // engine version); each node renders a visible meta line (id, type, ledger state) so trust
 // metadata survives plain-text extraction. No timestamps anywhere - same state, same bytes.
 func mdLite(md string) string {
+	md = stripFillComments(md) // template fill guidance stays in the source, never in the book
 	var out strings.Builder
 	for _, para := range strings.Split(strings.ReplaceAll(md, "\r\n", "\n"), "\n\n") {
 		p := strings.TrimSpace(para)
@@ -298,15 +335,43 @@ func renderBookHTML(nodes map[string]Node) (string, []string, []string) {
 	// facet validation (go-facet-board): a value outside the vocabulary is loud.
 	findings = append(findings, facetFindings(nodes)...)
 	var deferredQ []baseDeferred // referenced-queries await the complete link graph
+	// the shell's TOC data: one entry per chapter, one link per unit heading (req-book-shell)
+	type tocSec struct{ anchor, title string }
+	type tocEntry struct {
+		id, title string
+		secs      []tocSec
+	}
+	var toc []tocEntry
 	var body strings.Builder
 	for _, ch := range chapters {
 		raw := manifestBody(ch.Path)
 		units := parseManifestUnits(raw)
+		ent := tocEntry{id: ch.ID, title: ch.Statement}
+		for idx, u := range units {
+			if u.Body == "" {
+				continue
+			}
+			for _, ln := range strings.Split(stripFillComments(u.Body), "\n") {
+				t := strings.TrimSpace(ln)
+				if strings.HasPrefix(t, "## ") {
+					ent.secs = append(ent.secs, tocSec{anchor: ch.ID + "-u" + itoa(idx+1), title: strings.TrimPrefix(t, "## ")})
+					break
+				}
+				if t != "" && !strings.HasPrefix(t, "<") {
+					break // the unit opens with prose, not a heading
+				}
+			}
+		}
+		toc = append(toc, ent)
 		if len(units) == 0 || units[0].Ref != "" {
 			findings = append(findings, "chapter "+ch.ID+" does not open with its lede (req-chapter-tldr)")
 		}
+		// sorted: presetOf accumulates in map order - unsorted, a chapter in TWO presets
+		// flips its class order between renders and breaks same-state-same-bytes
+		pcs := append([]string{}, presetOf[ch.ID]...)
+		sortStrings(pcs)
 		classes := ""
-		for _, p := range presetOf[ch.ID] {
+		for _, p := range pcs {
 			classes += " in-" + p
 		}
 		var chb strings.Builder
@@ -329,7 +394,7 @@ func renderBookHTML(nodes map[string]Node) (string, []string, []string) {
 				if !proseUnitsMarked(u.Body) {
 					findings = append(findings, "chapter "+ch.ID+" unit "+itoa(idx+1)+" carries unmarked prose - no unmarked path into the book (req-ai-drafting)")
 				}
-				chb.WriteString(`<div id="` + anchor + `" data-layer="` + layer + `">` + "\n" + renderUnitBody(u.Body, nodes, aliasIdx, &findings, &deferredQ) + "</div>\n")
+				chb.WriteString(`<div id="` + anchor + `" data-layer="` + layer + `">` + "\n" + renderUnitBody(u.Body, nodes, aliasIdx, &findings, &deferredQ, sm, bl, anchor) + "</div>\n")
 			}
 		}
 		chb.WriteString("</article>\n")
@@ -337,7 +402,10 @@ func renderBookHTML(nodes map[string]Node) (string, []string, []string) {
 		advisories = append(advisories, unlinkedTermAdvisories(ch.ID, raw, gloss)...)
 	}
 	chaptersHTML := body.String() // usage referent for the pull law (go-ch2-derived)
-	body.WriteString(renderGlossaryChapter(gloss, used))
+	if g := renderGlossaryChapter(gloss, used); g != "" {
+		body.WriteString(g)
+		toc = append(toc, tocEntry{id: "glossary", title: "Glossary"})
+	}
 	body.WriteString(renderNotationList(gloss, used))
 	// design: go-deck-mode  implements: req-deck-mode
 	// Deck manifests render in the SAME file: one unit per slide; `Note:` lines become the
@@ -370,7 +438,7 @@ func renderBookHTML(nodes map[string]Node) (string, []string, []string) {
 				if !proseUnitsMarked(u.Body) {
 					findings = append(findings, "deck "+dk.ID+" slide "+itoa(idx+1)+" carries unmarked prose (req-ai-drafting)")
 				}
-				body.WriteString(renderUnitBody(u.Body, nodes, aliasIdx, &findings, &deferredQ))
+				body.WriteString(renderUnitBody(u.Body, nodes, aliasIdx, &findings, &deferredQ, sm, bl, dk.ID+"-s"+itoa(idx+1)))
 			}
 			if u.Notes != "" {
 				body.WriteString(`<aside class="notes">` + htmlEscape(u.Notes) + "</aside>\n")
@@ -378,23 +446,74 @@ func renderBookHTML(nodes map[string]Node) (string, []string, []string) {
 			body.WriteString("</section>\n")
 		}
 		body.WriteString("</article>\n")
+		toc = append(toc, tocEntry{id: dk.ID, title: dk.Statement})
 	}
 	// enddesign
+	// design: go-book-shell  implements: req-book-shell
+	// The mdbook-style shell (owner ruling 2026-07-07): one fixed sidebar carries the whole
+	// apparatus - the chapter TOC (collected above, static DOM), the GLOBAL search, the view
+	// presets, the facet counts, ONE hand-editable filter expression every control compiles
+	// into, and the details card (the report's right-panel pattern). The content column stays
+	// clean. The report's visual language carries over (#fafafa chrome, white panels, the
+	// uppercase small labels, the ▸/▾ disclosure trees). The script stays toggle-only.
 	var doc strings.Builder
 	doc.WriteString("<!doctype html>\n<html lang=\"en\"><head><meta charset=\"utf-8\">\n")
+	doc.WriteString("<meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">\n")
 	doc.WriteString("<title>" + htmlEscape(brand()) + " — the spec book</title>\n")
-	doc.WriteString("<style>body{font-family:system-ui;max-width:760px;margin:2rem auto 2rem 4rem;line-height:1.5;color:" + bookColors["text"] + ";background:" + bookColors["bg"] + "}.meta{font-size:.8rem;color:" + bookColors["meta"] + "}.stmt{margin-bottom:.2rem}.missing{color:#b00}.marked{position:relative}.ai-marks{position:absolute;left:-1.6rem;top:.15rem;display:flex;flex-direction:column;gap:2px}.state-suspect{color:" + bookColors["suspect"] + "}#presets button{margin-right:.4rem}aside.notes{display:none;border-left:3px solid #ccc;padding-left:.6rem;font-size:.85rem}body[data-present] .slide{display:none}body[data-present] .slide.current{display:block;position:fixed;inset:0;background:" + bookColors["bg"] + ";padding:8vh 10vw;overflow:auto;z-index:9}@media print{aside.notes{display:block}.slide{page-break-after:always}}" + facetFilterCSS() + "</style>\n")
+	doc.WriteString("<style>*{box-sizing:border-box}body{font-family:system-ui,Segoe UI,sans-serif;margin:0;line-height:1.5;color:" + bookColors["text"] + ";background:" + bookColors["bg"] + ";display:flex}" +
+		"#sidebar{width:300px;flex:none;height:100vh;position:sticky;top:0;overflow:auto;background:#fafafa;border-right:1px solid #e3e3e3;padding:14px 16px;display:flex;flex-direction:column;gap:10px}" +
+		".sb-brand{font-weight:600;font-size:15px;margin:0}" +
+		".sb-h{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:#7d7d7d;margin:8px 0 2px}" +
+		"#sidebar input{width:100%;padding:5px 8px;border:1px solid #ddd;border-radius:5px;font:inherit;font-size:13px;background:" + bookColors["bg"] + "}" +
+		"#toc{font-size:13px}#toc details{margin:1px 0}#toc summary{list-style:none;cursor:pointer;padding:3px 6px;border-radius:4px;display:flex;gap:6px;align-items:baseline}" +
+		"#toc summary::-webkit-details-marker{display:none}#toc summary:before{content:\"▸\";font-size:10px;color:#bcc6d6;flex:none}#toc details[open]>summary:before{content:\"▾\"}" +
+		"#toc summary:hover,#toc a:hover{background:#f0f0f0}#toc a{display:block;color:#333;text-decoration:none;padding:2px 6px;border-radius:4px}" +
+		"#toc .toc-sec{padding-left:22px;font-size:12px;color:#555}#toc .off{color:#bbb}" +
+		"#filters button{font:inherit;font-size:12px;margin:0 4px 4px 0;padding:3px 9px;border:1px solid #ddd;border-radius:12px;background:" + bookColors["bg"] + ";cursor:pointer}" +
+		"#filters button:hover{background:#f0f0f0}" +
+		"#details-card{margin-top:auto;border-top:1px solid #e3e3e3;padding-top:8px;font-size:12px}" +
+		"#details-card dl{margin:4px 0;display:grid;grid-template-columns:52px 1fr;gap:2px 8px}#details-card dt{color:#999}#details-card dd{margin:0;word-break:break-word}" +
+		"#dc-id{font-family:ui-monospace,Consolas,monospace}" +
+		"#page{flex:1;min-width:0}#page>header{padding:10px 20px;background:#fafafa;border-bottom:1px solid #e3e3e3}" +
+		"main{max-width:760px;margin:0 auto;padding:1rem 2rem 3rem 4rem}" +
+		".meta{font-size:.8rem;color:" + bookColors["meta"] + "}.stmt{margin-bottom:.2rem}.missing{color:#b00}" +
+		".marked{position:relative}.ai-marks{position:absolute;left:-1.6rem;top:.15rem;display:flex;flex-direction:column;gap:2px}" +
+		".state-suspect{color:" + bookColors["suspect"] + "}" +
+		"aside.notes{display:none;border-left:3px solid #ccc;padding-left:.6rem;font-size:.85rem}" +
+		"body[data-present] .slide{display:none}body[data-present] .slide.current{display:block;position:fixed;inset:0;background:" + bookColors["bg"] + ";padding:8vh 10vw;overflow:auto;z-index:9}" +
+		"@media(max-width:900px){body{flex-direction:column}#sidebar{position:static;width:auto;height:auto}}" +
+		"@media print{aside.notes{display:block}.slide{page-break-after:always}#sidebar{display:none}}" + facetFilterCSS() + "</style>\n")
 	doc.WriteString("</head><body>\n")
+	doc.WriteString(`<nav id="sidebar" aria-label="views">` + "\n")
+	doc.WriteString(`<p class="sb-brand">` + htmlEscape(brand()) + ` — the spec book</p>` + "\n")
+	doc.WriteString(`<input id="search" type="search" placeholder="search the whole book">` + "\n")
+	doc.WriteString(`<p class="sb-h">contents</p><div id="toc">` + "\n")
+	for _, e := range toc {
+		if len(e.secs) == 0 {
+			doc.WriteString(`<a href="#` + htmlEscape(e.id) + `" data-ch="` + htmlEscape(e.id) + `">` + htmlEscape(e.title) + `</a>` + "\n")
+			continue
+		}
+		doc.WriteString(`<details><summary><a href="#` + htmlEscape(e.id) + `" data-ch="` + htmlEscape(e.id) + `">` + htmlEscape(e.title) + `</a></summary>` + "\n")
+		for _, s := range e.secs {
+			doc.WriteString(`<a class="toc-sec" href="#` + htmlEscape(s.anchor) + `">` + htmlEscape(s.title) + `</a>` + "\n")
+		}
+		doc.WriteString("</details>\n")
+	}
+	doc.WriteString("</div>\n")
+	doc.WriteString(`<div id="filters"><p class="sb-h">views</p><button data-view="">all</button>`)
+	for _, p := range presetIDs {
+		doc.WriteString(`<button data-view="` + htmlEscape(p) + `">` + htmlEscape(strings.TrimPrefix(p, "man-preset-")) + `</button>`)
+	}
+	doc.WriteString(`<button id="expand-all">expand all</button>` + "\n")
+	doc.WriteString(`<p class="sb-h">filter expression</p><input id="filter-expr" type="text" placeholder="preset:auditor phase:operation free text" title="tokens: preset:<name> phase:<v> discipline:<v> quality:<v> state:<suspect|verified> - anything else filters as text">` + "\n")
+	doc.WriteString("</div>\n")
+	doc.WriteString(`<div id="details-card"><p class="sb-h">details</p><p class="dempty meta">click a section for details</p><dl hidden><dt>id</dt><dd id="dc-id"> </dd><dt>type</dt><dd id="dc-type"> </dd><dt>state</dt><dd id="dc-state"> </dd><dt>says</dt><dd id="dc-stmt"> </dd></dl></div>` + "\n")
+	doc.WriteString("</nav>\n")
+	doc.WriteString(`<div id="page">` + "\n")
 	doc.WriteString(`<header data-root="` + root + `"><p class="meta">rendered from spec state ` + root + " · iteration " + htmlEscape(cfg.Version) + " · engine " + htmlEscape(version) + "</p>\n")
 	doc.WriteString("<p class=\"meta\">reader's contract: normative statements are binding; informative layers explain; a suspect state means unverified since its last change; depth is a summarization level, never missing content.</p>\n")
-	if len(presetIDs) > 0 {
-		doc.WriteString(`<nav id="presets" aria-label="views"><button data-view="">all</button>`)
-		for _, p := range presetIDs {
-			doc.WriteString(`<button data-view="` + htmlEscape(p) + `">` + htmlEscape(strings.TrimPrefix(p, "man-preset-")) + `</button>`)
-		}
-		doc.WriteString(`<button id="expand-all">expand all</button><input id="filter" type="search" placeholder="filter sections"></nav>` + "\n")
-	}
 	doc.WriteString("</header>\n<main>\n")
+	// enddesign
 	bodyHTML := body.String()
 	if len(deferredQ) > 0 {
 		// the pull law as data: the link graph over the RENDERED chapters feeds the
@@ -409,25 +528,65 @@ func renderBookHTML(nodes map[string]Node) (string, []string, []string) {
 			}
 		}
 		for _, d := range deferredQ {
-			bodyHTML = strings.Replace(bodyHTML, d.token, renderBaseHTML(d.text, d.view, nodes, &findings, usedSet), 1)
+			bodyHTML = strings.Replace(bodyHTML, d.token, renderBaseHTML(d.text, d.view, nodes, &findings, usedSet, sm, bl, d.anchor), 1)
 		}
 	}
 	doc.WriteString(bodyHTML)
 	doc.WriteString(`</main>
-<script>/* filters and toggles only - this script never creates content */
+</div>
+<script>/* filters and toggles only - this script never creates content (go-book-shell) */
 (function(){
- var b=document.body;
- function apply(){var h=new URLSearchParams(location.hash.slice(1));var v=h.get('view')||'';b.setAttribute('data-view',v);
-  document.querySelectorAll('article.ch').forEach(function(a){a.hidden=(v!=='')&&!a.classList.contains('in-'+v);});}
- document.querySelectorAll('#presets button[data-view]').forEach(function(btn){btn.addEventListener('click',function(){location.hash='view='+btn.getAttribute('data-view');});});
+ var b=document.body,fe=document.getElementById('filter-expr'),se=document.getElementById('search');
+ function setTok(key,val,toggle){var t=(fe.value||'').split(/\s+/).filter(function(x){return x&&x.indexOf(key+':')!==0;});
+  var had=(fe.value||'').split(/\s+/).indexOf(key+':'+val)>=0;
+  if(val&&!(toggle&&had))t.push(key+':'+val);fe.value=t.join(' ');apply();}
+ function apply(){
+  var toks=(fe.value||'').trim().split(/\s+/).filter(Boolean),preset='',state='',facets=[],words=[];
+  toks.forEach(function(t){var i=t.indexOf(':'),k=i<0?'':t.slice(0,i),v=t.slice(i+1);
+   if(k==='preset')preset=v;else if(k==='state')state=v;
+   else if(k==='phase'||k==='discipline'||k==='quality')facets.push('f-'+k+'-'+v);
+   else words.push(t.toLowerCase());});
+  var q=(se.value||'').toLowerCase();
+  document.querySelectorAll('article.ch').forEach(function(a){
+   var hid=(preset!=='')&&!a.classList.contains('in-man-preset-'+preset);
+   if(!hid&&(q||words.length)){var txt=a.textContent.toLowerCase();
+    if(q&&txt.indexOf(q)<0)hid=true;
+    words.forEach(function(w){if(txt.indexOf(w)<0)hid=true;});}
+   a.hidden=hid;});
+  document.querySelectorAll('main section[data-node]').forEach(function(s){
+   var hid=false;
+   if(state&&s.getAttribute('data-state')!==state)hid=true;
+   if(!hid&&(q||words.length)){var txt=s.textContent.toLowerCase();
+    if(q&&txt.indexOf(q)<0)hid=true;
+    words.forEach(function(w){if(txt.indexOf(w)<0)hid=true;});}
+   s.hidden=hid;});
+  document.querySelectorAll('tr.rowf').forEach(function(r){
+   var ok=facets.every(function(f){return r.classList.contains(f);});
+   r.hidden=facets.length>0&&!ok;});
+  document.querySelectorAll('#toc a[data-ch]').forEach(function(l){
+   var a=document.getElementById(l.getAttribute('data-ch'));
+   l.classList.toggle('off',!!(a&&a.hidden));});}
+ if(fe)fe.addEventListener('input',apply);
+ if(se)se.addEventListener('input',apply);
+ document.querySelectorAll('#filters button[data-view]').forEach(function(btn){btn.addEventListener('click',function(){
+  setTok('preset',btn.getAttribute('data-view').replace(/^man-preset-/,''),true);});});
+ document.querySelectorAll('button.facet-count').forEach(function(btn){btn.addEventListener('click',function(){
+  var t=btn.getAttribute('data-target')||'',m=t.match(/^f-([a-z]+)-(.+)$/);
+  if(m)setTok(m[1],m[2],true);});});
  var xa=document.getElementById('expand-all');
  if(xa){xa.addEventListener('click',function(){var open=b.getAttribute('data-expanded')!=='1';b.setAttribute('data-expanded',open?'1':'0');
   document.querySelectorAll('details.disc').forEach(function(d){d.open=open;});});}
- var f=document.getElementById('filter');
- if(f){f.addEventListener('input',function(){var q=f.value.toLowerCase();
-  document.querySelectorAll('main section').forEach(function(s){s.hidden=q!==''&&s.textContent.toLowerCase().indexOf(q)<0;});});}
- document.querySelectorAll('button.facet-count').forEach(function(btn){btn.addEventListener('click',function(){
-  var t=btn.getAttribute('data-target');b.getAttribute('data-facet')===t?b.removeAttribute('data-facet'):b.setAttribute('data-facet',t);});});
+ var card=document.getElementById('details-card');
+ if(card){var empty=card.querySelector('.dempty'),list=card.querySelector('dl');
+  document.querySelector('main').addEventListener('click',function(e){
+   var s=e.target.closest('section[data-node]');if(!s)return;
+   /* the card only ECHOES text already in the DOM - no content is created */
+   document.getElementById('dc-id').textContent=s.getAttribute('data-node')||'';
+   document.getElementById('dc-type').textContent=s.getAttribute('data-type')||'';
+   document.getElementById('dc-state').textContent=s.getAttribute('data-state')||'';
+   var st=s.querySelector('.stmt');
+   document.getElementById('dc-stmt').textContent=st?st.textContent:'';
+   empty.hidden=true;list.hidden=false;});}
  var cur=-1,slides=[];
  function show(i){if(!slides.length)return;cur=(i+slides.length)%slides.length;
   slides.forEach(function(s,j){s.classList.toggle('current',j===cur);});}
@@ -439,7 +598,7 @@ func renderBookHTML(nodes map[string]Node) (string, []string, []string) {
   if(e.key==='ArrowRight'||e.key==='PageDown')show(cur+1);
   if(e.key==='ArrowLeft'||e.key==='PageUp')show(cur-1);
   if(e.key==='Escape'){b.removeAttribute('data-present');slides.forEach(function(s){s.classList.remove('current');});slides=[];cur=-1;}});
- window.addEventListener('hashchange',apply);apply();
+ apply();
 })();
 </script>
 </body></html>
@@ -465,7 +624,7 @@ func buildAgentsMD(nodes map[string]Node) (string, bool) {
 				if i == 0 && len(units) > 1 {
 					continue // the chapter lede belongs to the BOOK; the emitted file starts at the hub
 				}
-				for _, line := range strings.Split(u.Body, "\n") {
+				for _, line := range strings.Split(stripFillComments(u.Body), "\n") {
 					if parseAIMark(line) >= 0 {
 						continue // the entry surface stays mark-free; the book keeps the marks
 					}
@@ -731,15 +890,17 @@ var baseRefdRe = regexp.MustCompile(`\breferenced\b`)
 
 // baseDeferred is one referenced-query awaiting the post-chapter evaluation pass.
 type baseDeferred struct {
-	token string
-	text  string
-	view  string
+	token  string
+	text   string
+	view   string
+	anchor string
 }
 
 // renderUnitBody renders a unit's markdown, evaluating base usages (inline blocks and
-// pooled-query embeds) to tables or full sections. A `referenced` query defers via a
-// placeholder token; the post-chapter pass evaluates it with the complete link graph.
-func renderUnitBody(body string, nodes map[string]Node, aliasIdx map[string]string, findings *[]string, deferred *[]baseDeferred) string {
+// pooled-query embeds) to tables, full sections, or state-aware ref sections. A
+// `referenced` query defers via a placeholder token; the post-chapter pass evaluates it
+// with the complete link graph.
+func renderUnitBody(body string, nodes map[string]Node, aliasIdx map[string]string, findings *[]string, deferred *[]baseDeferred, sm map[string]string, bl map[string]Event, anchor string) string {
 	uses := baseUseRe.FindAllStringSubmatchIndex(body, -1)
 	if len(uses) == 0 {
 		return mdLite(AutoLink(body, aliasIdx))
@@ -768,11 +929,11 @@ func renderUnitBody(body string, nodes map[string]Node, aliasIdx map[string]stri
 		}
 		if deferred != nil && baseRefdRe.MatchString(text) {
 			token := "<!--base-deferred-" + itoa(len(*deferred)) + "-->"
-			*deferred = append(*deferred, baseDeferred{token: token, text: text, view: view})
+			*deferred = append(*deferred, baseDeferred{token: token, text: text, view: view, anchor: anchor + "-d" + itoa(len(*deferred))})
 			out.WriteString(token + "\n")
 			continue
 		}
-		out.WriteString(renderBaseHTML(text, view, nodes, findings, nil))
+		out.WriteString(renderBaseHTML(text, view, nodes, findings, nil, sm, bl, anchor))
 	}
 	if seg := body[last:]; strings.TrimSpace(seg) != "" {
 		out.WriteString(mdLite(AutoLink(seg, aliasIdx)))
@@ -780,9 +941,9 @@ func renderUnitBody(body string, nodes map[string]Node, aliasIdx map[string]stri
 	return out.String()
 }
 
-// renderBaseHTML evaluates one base query over the workspace's node files and content
-// notes. A named view renders alone; the pull-law link graph arrives via used.
-func renderBaseHTML(text string, viewName string, nodes map[string]Node, findings *[]string, used map[string]bool) string {
+// baseEvalPaths collects the note files a base query evaluates over: every node file plus
+// the content notes. ONE referent for the renderer and the orphan lint - they must agree.
+func baseEvalPaths(nodes map[string]Node) []string {
 	seen := map[string]bool{}
 	var paths []string
 	for _, n := range nodes {
@@ -799,7 +960,14 @@ func renderBaseHTML(text string, viewName string, nodes map[string]Node, finding
 			}
 		}
 	}
-	results, err := EvalBaseUsed(text, paths, nodes, used)
+	return paths
+}
+
+// renderBaseHTML evaluates one base query over the workspace's node files and content
+// notes. A named view renders alone; the pull-law link graph arrives via used; sm/bl and
+// the anchor base serve the refs render mode.
+func renderBaseHTML(text string, viewName string, nodes map[string]Node, findings *[]string, used map[string]bool, sm map[string]string, bl map[string]Event, anchorBase string) string {
+	results, err := EvalBaseUsed(text, baseEvalPaths(nodes), nodes, used)
 	if err != nil {
 		*findings = append(*findings, "base: "+err.Error())
 		return `<p class="missing">base query error (see findings)</p>` + "\n"
@@ -817,17 +985,57 @@ func renderBaseHTML(text string, viewName string, nodes map[string]Node, finding
 		}
 		results = picked
 	}
-	return baseResultHTML(results)
+	return baseResultHTML(results, nodes, sm, bl, anchorBase)
 }
 
 // baseResultHTML renders evaluation results: semantic tables (WCAG: real th headers),
-// or - for render: full views - sections with the note bodies, the section id being the
-// note slug so authored and auto-links land on it.
-func baseResultHTML(rs []BaseResult) string {
+// full sections with note bodies (render: full, section id = the note slug), or
+// state-aware node sections (render: refs - each row through renderNodeAtDepth).
+func baseResultHTML(rs []BaseResult, nodes map[string]Node, sm map[string]string, bl map[string]Event, anchorBase string) string {
 	var b strings.Builder
-	for _, r := range rs {
+	for ri, r := range rs {
 		if r.Full {
 			b.WriteString(renderBaseFull(r))
+			continue
+		}
+		if r.Refs {
+			// design: go-render-refs  implements: req-render-refs
+			// A refs view hands its rows to the SAME renderer ref units use - gate state,
+			// verdict links, and depth mechanics ride along; Obsidian previews the rows as
+			// a plain table (the render key is ignored there).
+			depth := r.Depth
+			if depth < 1 {
+				depth = 1
+			}
+			empty := true
+			rn := 0
+			for _, g := range r.Groups {
+				grouped := g.Key != ""
+				if grouped {
+					// a grouped refs view discloses per group (owner ruling 2026-07-07): when the
+					// key is a node id, the summary carries that node's statement - click the need
+					// to see its use cases. Same disc markup as depth layers: until-found and
+					// EXPAND ALL keep working.
+					label := strings.ToUpper(g.Key[:1]) + g.Key[1:]
+					if kn, ok := nodes[g.Key]; ok && kn.Statement != "" {
+						label = kn.Statement
+					}
+					b.WriteString(`<details class="disc" data-dl="0"><summary>` + htmlEscape(label) +
+						` <span class="meta">(` + itoa(g.Count) + `)</span></summary><div hidden="until-found">` + "\n")
+				}
+				for _, row := range g.Rows {
+					empty = false
+					b.WriteString(renderNodeAtDepth(row.ID, depth, nodes, sm, bl, anchorBase+"-q"+itoa(ri)+"r"+itoa(rn)))
+					rn++
+				}
+				if grouped {
+					b.WriteString("</div></details>\n")
+				}
+			}
+			if empty {
+				b.WriteString(`<p class="meta">no rows yet — the query renders as items arrive</p>` + "\n")
+			}
+			// enddesign
 			continue
 		}
 		b.WriteString(`<table data-layer="derived">` + "\n")
@@ -915,14 +1123,74 @@ func renderFigure(kind string, nodes map[string]Node) string {
 	case "timeline":
 		return svgTimeline(versions())
 	case "block-tree":
-		var chapters []string
+		// design: go-block-tree-design  implements: req-block-tree-design
+		// The block tree draws the SYSTEM's design elements (code-marker designs and des-
+		// notes), never the book's own chapters - every project got a picture of its
+		// document structure in its architecture chapter (template red-team, 2026-07-06).
+		var blocks []string
 		for id, n := range nodes {
-			if n.Type == "manifest" && n.Mode == "chapter" {
-				chapters = append(chapters, id)
+			if n.Type == "design" {
+				blocks = append(blocks, id)
 			}
 		}
-		sortStrings(chapters)
-		return svgBlockTree(brand()+" — the book", chapters)
+		sortStrings(blocks)
+		if len(blocks) == 0 {
+			return `<p class="meta">no design elements yet — the tree renders as designs arrive</p>`
+		}
+		return svgBlockTree(brand()+" — the system", blocks)
+		// enddesign
+	case "results-exception":
+		// design: go-results-exception  implements: req-results-exception
+		// Ledger-state views are FIG kinds, never base queries - state lives in the
+		// ledger, not frontmatter. The green mass summarizes as a count; failures and
+		// accepted deviations render prominently, by exception (the lab rule).
+		sm := StatusMap(nodes)
+		var ids []string
+		for id := range nodes {
+			ids = append(ids, id)
+		}
+		sortStrings(ids)
+		pass, total := 0, 0
+		var bad []string
+		for _, id := range ids {
+			st := strings.ToLower(sm[id])
+			if st == "" || st == "content" {
+				continue
+			}
+			total++
+			if st == "done" || st == "ok" {
+				pass++
+				continue
+			}
+			bad = append(bad, id+" — "+stateTag(st))
+		}
+		var b strings.Builder
+		b.WriteString(`<div data-layer="derived" aria-label="results by exception">` + "\n")
+		b.WriteString(`<p class="meta">` + itoa(pass) + ` of ` + itoa(total) + ` checks verified — what follows renders by exception</p>` + "\n")
+		if len(bad) == 0 {
+			b.WriteString(`<p>No failing or unverified check on this board.</p>` + "\n")
+		} else {
+			b.WriteString("<ul>\n")
+			for _, f := range bad {
+				b.WriteString(`<li class="state-suspect">` + htmlEscape(f) + "</li>\n")
+			}
+			b.WriteString("</ul>\n")
+		}
+		b.WriteString(`<h2>Accepted deviations</h2>` + "\n")
+		wv := 0
+		for _, id := range ids {
+			n := nodes[id]
+			if n.Type == "adr" && n.Kind == "waiver" {
+				wv++
+				b.WriteString(`<p class="stmt"><strong>` + htmlEscape(n.Statement) + `</strong> <span class="meta">(` + htmlEscape(id) + `)</span></p>` + "\n")
+			}
+		}
+		if wv == 0 {
+			b.WriteString(`<p class="meta">none — no failure has been accepted</p>` + "\n")
+		}
+		b.WriteString("</div>\n")
+		return b.String()
+		// enddesign
 	case "coverage-board":
 		return renderCoverageBoard(nodes)
 	case "candidates-matrix":
@@ -953,11 +1221,20 @@ func renderFigure(kind string, nodes map[string]Node) string {
 			crits = append(crits, c)
 		}
 		sortStrings(crits)
+		// design: go-verdict-order  implements: req-verdict-order
+		// The verdict scan walks adr ids SORTED - a map-order walk rendered a double-claimed
+		// candidate nondeterministically (red-team find, 2026-07-06). The double claim itself
+		// is a lint finding (candidateClaimFindings); the render stays deterministic either way.
+		var adrIDs []string
+		for id, n := range nodes {
+			if n.Type == "adr" {
+				adrIDs = append(adrIDs, id)
+			}
+		}
+		sortStrings(adrIDs)
 		verdict := func(id string) string {
-			for _, n := range nodes {
-				if n.Type != "adr" {
-					continue
-				}
+			for _, aid := range adrIDs {
+				n := nodes[aid]
 				for _, c := range n.Chosen {
 					if c == id {
 						return "chosen by " + n.ID
@@ -971,6 +1248,7 @@ func renderFigure(kind string, nodes map[string]Node) string {
 			}
 			return "open"
 		}
+		// enddesign
 		var b strings.Builder
 		b.WriteString(`<table data-layer="derived"><tr><th scope="col">axis</th><th scope="col">candidate</th>`)
 		for _, c := range crits {
@@ -1345,6 +1623,25 @@ func selftestBookOrphans() bool {
 	found := bookOrphanFindings(syn)
 	if len(found) != 1 || !strings.Contains(found[0], "req-b") {
 		return false // the unreferenced node is flagged; the excluded one is covered
+	}
+	// a live view REACHES its matched nodes (owner ruling 2026-07-07): the book shows them,
+	// so the lint must count them - req-b matches the inline query below; req-d matches nothing.
+	rb := filepath.Join(dir, "req-b.md")
+	os.WriteFile(rb, []byte("---\nid: req-b\ntype: requirement\nstatement: B.\n---\n"), 0o644)
+	mv := filepath.Join(dir, "man-view.md")
+	viewMan := "---\nid: man-view\ntype: manifest\nmode: chapter\nstatement: View.\n---\n```base\nfilters:\n  and:\n    - 'type == \"requirement\"'\nviews:\n  - type: table\n    name: R\n```\n"
+	os.WriteFile(mv, []byte(viewMan), 0o644)
+	syn["req-b"] = Node{ID: "req-b", Type: "requirement", Path: rb}
+	syn["req-d"] = Node{ID: "req-d", Type: "requirement", Path: iterPath}
+	syn["man-view"] = Node{ID: "man-view", Type: "manifest", Mode: "chapter", Path: mv}
+	found = bookOrphanFindings(syn)
+	if len(found) != 1 || !strings.Contains(found[0], "req-d") {
+		return false // the view-matched node is reached; the truly unshown one still flags
+	}
+	// a pull-law query (`referenced`) FOLLOWS references and can never create one.
+	os.WriteFile(mv, []byte(strings.Replace(viewMan, "- 'type == \"requirement\"'", "- 'type == \"requirement\"'\n    - 'referenced'", 1)), 0o644)
+	if len(bookOrphanFindings(syn)) != 2 {
+		return false // with only the pull-law view, req-b and req-d both stay orphans
 	}
 	noman := map[string]Node{"req-x": {ID: "req-x", Type: "requirement", Path: iterPath}}
 	return bookOrphanFindings(noman) == nil // zero manifests -> disarmed

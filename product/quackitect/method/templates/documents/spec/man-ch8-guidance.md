@@ -5,14 +5,10 @@ mode: guidance
 statement: Guidance - fundamentals in full, the guides, and how this document is made.
 ---
 ## Who this chapter serves
-<!-- fill [mandatory]
-Contents: the curious reader, the maintainer, the agent - the one place the
-  document may speak about itself.
-Form: two sentences. Everything self-referential lives here and nowhere else -
-  the quarantine is mechanical.
+<!-- tailor: shipped text - the quarantine is mechanical and identical everywhere.
 -->
 <!-- ai:3 -->
-{{guidance-lede}}
+This chapter serves the curious reader, the maintainer, and the agent. It is the one place the document may speak about itself - everything self-referential lives here and nowhere else, and the quarantine is checked mechanically.
 ---
 ## Fundamentals
 <!-- tailor: shipped text - the bodies render from the pooled query (the pull
@@ -39,18 +35,14 @@ Sources: the four modes @[[ref-diataxis]].
 {{guides}}
 ---
 ## About this document
-<!-- fill [mandatory]
-Contents: how it is made (the authored source is truth, projections are
-  deterministic, the identity stamp names the state); what the provenance marks
-  mean (count = AI involvement, three at draft, only user edits reduce, honor
-  system stated plainly); HOW TO CORRECT IT (corrections go to the SOURCE notes,
-  never the projection - regenerate, and the correction either took or the
-  source needs another pass); the process that produced the spec, one paragraph
-  with links.
-Motivation: the correction loop is the document's warranty. The per-unit anchors
-  are the future comment hooks.
-Form: generic method content is REFERENCED from the method layer's guidance
-  docs - instance specifics added in place, never copied.
+<!-- tailor: shipped text - the making, the marks, and the correction loop are
+  the same in every project; the identity stamp carries the instance specifics.
 -->
 <!-- ai:3 -->
-{{about-this-document}}
+The authored source notes are the truth; every projection - this document included - is deterministic and disposable. The identity stamp in the header names the exact source state rendered.
+
+<!-- ai:3 -->
+The margin marks measure AI involvement and nothing else: three at a full draft, fewer only where a person reworked the core. They are never a statement about quality or review - the author owns everything published, whatever the AI share.
+
+<!-- ai:3 -->
+To correct this document, correct the SOURCE note - never the projection. Regenerate, and the correction either took or the source needs another pass. That loop is the document's warranty.

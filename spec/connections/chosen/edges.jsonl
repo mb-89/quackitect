@@ -1,0 +1,7 @@
+{"src":"adr-book-two-stage","dst":"cand-emit-two-stage"}
+{"src":"adr-connection-lanes","dst":"cand-conn-two-lane"}
+{"src":"adr-edges-scope","dst":"cand-impl-code"}
+{"src":"adr-figures-derived-set","dst":"cand-fig-engine-svg"}
+{"src":"adr-glossary-discipline","dst":"cand-gloss-per-term"}
+{"src":"adr-provenance-involvement","dst":"cand-marks-inline"}
+{"src":"adr-vale-autopull","dst":"cand-register-vale"}

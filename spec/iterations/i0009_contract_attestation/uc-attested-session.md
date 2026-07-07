@@ -1,7 +1,6 @@
 ---
 id: uc-attested-session
 type: usecase
-refines: [need-qualities]
 statement: A fresh agent context cannot advance the ledger until the contract has entered its context and the adjudicator has granted once; within the session, key renewals are autonomous so unattended runs never stall on a person.
 class: review
 killer: false

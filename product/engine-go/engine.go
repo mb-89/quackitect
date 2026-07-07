@@ -179,6 +179,31 @@ func LoadAll() map[string]Node {
 	for id, d := range scanCodeDesigns() {
 		nodes[id] = d
 	}
+	// design: go-conn-lane-root  implements: req-conn-root
+	// Each edges.jsonl joins the identity root as one synthetic lane node whose
+	// RegionBody is the file's bytes - an edge-line edit moves the root exactly like
+	// a frontmatter edit always did. Lane nodes are content (off the graph whitelist).
+	if kdirs, err := os.ReadDir(filepath.Join(SPEC, "connections")); err == nil {
+		for _, kd := range kdirs {
+			if !kd.IsDir() {
+				continue
+			}
+			jp := filepath.Join(SPEC, "connections", kd.Name(), "edges.jsonl")
+			raw, rerr := os.ReadFile(jp)
+			if rerr != nil {
+				continue
+			}
+			id := "con-lane-" + kd.Name()
+			nodes[id] = Node{ID: id, Type: "connection", Class: "review",
+				Statement: "the " + kd.Name() + " bulk lane (edges.jsonl)",
+				Path:      jp, RegionBody: strings.ReplaceAll(string(raw), "\r\n", "\n")}
+		}
+	}
+	// enddesign
+	// connection-stored edges fold into node adjacency, hash-neutrally (go-conn-loader)
+	if edges, cerr := LoadConnections(SPEC); cerr == nil {
+		applyConnEdges(nodes, edges)
+	}
 	return nodes
 }
 
@@ -286,8 +311,10 @@ func evidenceDocSeed(iter string, ms int) string {
 // enddesign
 
 var traceContent = map[string]bool{"need": true, "usecase": true, "requirement": true, "design": true, "adr": true, "test": true, "manifest": true,
-	// the item types of the spec-template walk (go-items): content, never gates
-	"candidate": true, "stakeholder": true, "raid": true, "rationale": true, "record": true}
+	// the item types of the spec-template walk (go-items) and the i12x extension kinds
+	// (go-conn-lanes): content, never gates
+	"candidate": true, "stakeholder": true, "raid": true, "rationale": true, "record": true,
+	"connection": true, "rule": true, "budget": true, "criterion": true, "guide": true}
 
 // design: go-no-trace-gate  implements: req-no-trace-gate
 // Trace-typed nodes (need/usecase/requirement/design/test/adr) are content, never task gates —

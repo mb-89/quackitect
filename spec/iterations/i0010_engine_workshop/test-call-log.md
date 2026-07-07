@@ -1,7 +1,6 @@
 ---
 id: test-call-log
 type: test
-verifies: [req-call-log]
 statement: A dispatched command appends one calls.jsonl line. Key, answer, and grant values appear only redacted.
 class: executed
 verify: selftest:call-log

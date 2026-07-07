@@ -96,3 +96,35 @@ Every preferred pick above wins on the 5-weights first; the two picks that trade
 ## Milestone review  → i12-m3-gate
 
 **Verify:** every open axis carries at least two elaborated candidates with pro and con; every settled axis names the requirement or ruling that settled it; the criteria derive from blessed requirements and the picks trace to them. **Validate:** the preferred set honors the frame - static substrate, AI-first drafting surface (markdown intermediates), the owner's provenance ladder preserved inside the synthesis, scope guard enforced by capping, not by dropping. **Red-team:** strongest counter - axis 8 adds real engine surface under a deadline; answered: spike-gated at M5, ASCII fallback recorded, and the AI-drawn inline SVG release valve carries one-off figures with zero engine surface. Second counter - axis 7 introduces the first soft runtime dependency; answered: never linked, pulled once, loud graceful degradation, and the alternative is maintaining a prose linter forever. Third counter - the AI judging its own involvement marks could drift self-servingly; answered: the criterion is the recorded surface-versus-core line, doubt leans higher by rule, and every mark change is reviewable in the same diff as the edit it claims to describe. **Verdict: PASS - pending the adjudicator's bless.**
+
+---
+
+# M3 extension — the connection axes (2026-07-06)
+
+## Alternatives elaborated (extension)  → i12-m3-alternatives
+
+### Axis 9 — Connection storage
+Context: where reified relations live. Four candidates, ratings in the notes ([cand-conn-frontmatter](cand-conn-frontmatter.md), [cand-conn-fileper](cand-conn-fileper.md), [cand-conn-central-jsonl](cand-conn-central-jsonl.md), [cand-conn-two-lane](cand-conn-two-lane.md)).
+- **A — frontmatter status quo.** Pro: zero migration, Obsidian-native. Con: no prose, no symmetric home, the two-system smell.
+- **B — one note per edge.** Pro: everything addressable. Con: measured 1.5x-2.6x file explosion; the status feel dies.
+- **C — central jsonl with details pointers.** Pro: one machine index. Con: the human-facing kinds lose Obsidian preview or duplicate display frontmatter.
+- **D — two lanes per kind (owner option A). Preferred.** Machine edges as jsonl lines, human edges as real notes, one edge one lane, the adjacency determinizer merges.
+
+### Axis 10 — The implements lane
+Context: implements edges are declared in code design markers ([cand-impl-derive](cand-impl-derive.md), [cand-impl-code](cand-impl-code.md)).
+- **A — derive connection notes from code.** Con: every failure mode is silent-drift-shaped (stale generated files, orphan connections bricking the strict guard).
+- **B — stay code-declared, merge at read time. Preferred.** Code regions already hash; DRY holds by deriving the view.
+
+Task wiring (depends_on, parent) is the recorded open sub-question: joining is jsonl-cheap; the recommendation (stay frontmatter this iteration) goes to the adjudicator at M4.
+
+## Criteria weighted (extension)  → i12-m3-criteria-weighted
+The M3 weights carry unchanged; workspace bloat and Obsidian-preview fidelity score under authoring cost (4) and audience register fit (3). The candidate ratings encode them per option.
+
+## Feasibility rough-checked (extension)  → i12-m3-feasibility
+- Two-lane loader: frontmatter parsing and JSONL reading both exist in-house (ledger events). FEASIBLE.
+- Hash-neutral adjacency: parents/fullHash mechanics are pure functions over reconstructed adjacency - the red-team anchored the exact code paths (engine.go). FEASIBLE, spike-grade proof rides the red-observed test.
+- Determinizers: mint/promote/adjacency are file operations plus the existing graph. FEASIBLE.
+- Virtual edge properties: the evaluator already injects computed context (referenced). FEASIBLE.
+
+## Milestone review (extension)  → i12-m3-gate
+**Verify:** both new axes carry elaborated candidates with recorded ratings; the preferred picks name their killing reasons. **Validate:** the picks honor the owner's one-system intent within the trust constraints. **Red-team:** the strongest rival (central jsonl) is genuinely stronger on uniformity - answered: its uniformity survives in the merging determinizer while its preview cost does not. **Verdict: PASS - pending the adjudicator's bless.**

@@ -1,7 +1,6 @@
 ---
 id: test-stamp-user
 type: test
-verifies: [req-stamp-user]
 statement: New blesses record actor=user; migrated history reads user; the self-cert metric counts both eras as one.
 class: executed
 verify: selftest:stamp-user

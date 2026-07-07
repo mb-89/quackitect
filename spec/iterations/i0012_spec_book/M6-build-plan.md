@@ -74,3 +74,27 @@ Converted: eleven cand- notes from the M3 axes (wired chosen/rejected into the f
 ## Milestone review  → i12-m6-gate
 
 Written at the gate, after the build and verification.
+
+
+# M6 extension record (2026-07-06) - the mechanization + connections build
+
+## Build (extension)  -> i12-m6-build
+
+Sixteen steps (bs9-bs24), all realized and selftested; 32 tests observed RED first (two carry honest tests_red exemptions after post-observation statement amendments - the retro lead is noted).
+
+- The connection system is LIVE on this workspace: quack migrate-edges moved 572 edges across 6 kinds into spec/connections/<kind>/edges.jsonl; the audit reported byte-equal multisets; the board kept its exact suspect set - the hash-neutrality requirement held on the real ledger, not just the fixture.
+- Engine: two-lane loader with loud refusals, hash-neutral adjacency, virtual edge properties for queries, the edge-mode referee, the id-charset lint, three determinizers (mint/promote/connections), the verdict-order fix, render: refs, the results-by-exception fig, block-tree from design elements.
+- Template: seven new item kinds plus the need repair, mint for every kind (content kinds included), example notes instantiated by generalized stubs, ch3 and ch4 fully mechanized, ch5-ch8 canned, deck/preset/agent-guide skeletons, the methods view, folder READMEs.
+- Riders honored: the trace-graph whitelist reverted to the six core types (M2-approved rider on bs21); task wiring stayed frontmatter (M4 sub-ruling).
+
+## Implementation risks acceptable (extension)  -> i12-m6-impl-risks
+
+Every red-team fence is a passing test: silent edge loss (refuse-never-skip), duplicate collapse (migration refuses), interim ambiguity (mode referee plus the loud unfinished-migration state), id ambiguity (charset lint), prose mutation (connection bodies hash), mass-suspect (hash-neutral proof on 572 live edges). Two live catches during the walk are the system working: the strict guard caught the scrap-sink exemption gap at the dogfood migration, and the gate count exposed the missing traceContent classification - both fixed and covered.
+
+## Internal quality (extension)  -> i12-m6-internal-quality
+
+Full selftest ALL OK (including the 32 extension tests); quack lint clean: coverage no holes, EARS clean (61 exemptions), ids clean, no double claims, no orphans; the book renders finding-free; a pre-migration spec backup sits in the data home (backup-pre-migrate-20260706).
+
+## Milestone review (extension)  -> i12-m6-gate
+
+**Verify:** every extension step traces to its requirements; every requirement has a red-observed (or honestly exempted) test now green and a design region. **Validate:** the owner's rulings are honored verbatim - one system for semantic relations with the two evidence-forced carve-outs, option-A lanes, determinizer housekeeping, example notes, the mechanized chapters. **Red-team:** the standing gate condition is NOT met yet - the owner holds this gate for the DOGFOOD SPEC redrafted through the template; the machinery is complete, the redraft is the remaining work before the y. **Verdict: machinery PASS - the gate stays with the adjudicator's condition (dogfood redraft), then the bless.**

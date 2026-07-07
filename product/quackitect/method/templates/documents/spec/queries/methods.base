@@ -1,0 +1,22 @@
+# Methods route themselves: a method note names its chapters in applies_chapters;
+# each chapter embeds its own view. Demand-driven - no chapter hard-codes a method.
+filters:
+  and:
+    - 'file.inFolder("methods")'
+views:
+  - type: table
+    name: Methods for design-input
+    filters: 'applies_chapters.contains("design-input")'
+    order: [file.name, statement, source]
+  - type: table
+    name: Methods for design-output
+    filters: 'applies_chapters.contains("design-output")'
+    order: [file.name, statement, source]
+  - type: table
+    name: Methods for verification-validation
+    filters: 'applies_chapters.contains("verification-validation")'
+    order: [file.name, statement, source]
+  - type: table
+    name: Methods for project
+    filters: 'applies_chapters.contains("project")'
+    order: [file.name, statement, source]

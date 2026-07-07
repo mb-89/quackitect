@@ -1,0 +1,8 @@
+# Success criteria - the ch1 delta's pass lines, traced by the ch5 validation view.
+filters:
+  and:
+    - 'type == "criterion"'
+views:
+  - type: table
+    name: Success criteria
+    order: [file.name, statement, metric, target]

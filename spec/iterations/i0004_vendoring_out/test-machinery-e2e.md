@@ -2,7 +2,6 @@
 id: test-machinery-e2e
 type: test
 statement: A vehicle (from start init) creates a dummy workspace, and the engine drives that workspace through a FULL systematic iteration with empty content (a machinery test) — start, gather, compose, every milestone gate M1-M8, coverage rules, report, ship — and all gates pass. State resolves under the workspace, not the engine.
-verifies: [req-workspace-split]
 class: review
 verify: selftest:workspace
 killer: true

@@ -4,5 +4,5 @@ filters:
 views:
   - type: table
     name: Verification matrix
-    order: [file.name, verifies, verify]
+    order: [file.name, verifies, method, level, verify]
     groupBy: verifies

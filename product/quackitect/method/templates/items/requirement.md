@@ -4,11 +4,12 @@ artifact: node
 applies_rigor: [lean, systematic]
 applies_type: [default]
 ---
-# requirement — one checkable claim on the system
+<!-- design: method-quality-scenarios  implements: req-quality-scenarios :: Quality requirements declare the six-part scenario as FIELDS (stimulus_source, stimulus, artifact, environment, response, response_measure) so the qualities view renders them grouped by quality facet - a quality without a measure is a mood. -->
+# requirement â€” one checkable claim on the system
 
 Lives in its birth iteration. EARS-shaped statement (quack lint checks). Needs are
 the user level; requirements are the system level; deeper tiers hang off `refines`.
-Facet tagging is expected work — downstream designers filter by these. Id prefix `req-`.
+Facet tagging is expected work â€” downstream designers filter by these. Id prefix `req-`.
 
 ## Fields
 - `type` (requirement): fixed.
@@ -23,16 +24,25 @@ Facet tagging is expected work — downstream designers filter by these. Id pref
 - `weight` (0..1): importance for trade-offs and register sorting.
 - `source` (a stk- note id): the stakeholder this requirement traces to.
 - `responsible` (a role name): who owns it. A role, never a person.
-- `verify` (test | analysis | inspection | demonstration): the verification method,
-  assigned at WRITE time — it feeds the ch5 matrix.
+- `verify_method` (test | analysis | inspection | demonstration): the verification
+  method, assigned at WRITE time â€” it feeds the ch5 matrix. Named verify_method
+  because the bare `verify` key is the executed-check referent (selftest:/coverage:)
+  and must never collide.
 - `ears` (exempt - reason, only when genuinely non-EARS): the recorded exemption.
+- Quality kinds declare the six-part scenario as FIELDS (the qualities view
+  renders them; a quality without a measure is a mood):
+  - `stimulus_source` (short phrase): who or what produces the stimulus.
+  - `stimulus` (short phrase): the arriving condition or event.
+  - `artifact` (short phrase): the part of the system stimulated.
+  - `environment` (short phrase): the operating condition during the stimulus.
+  - `response` (short phrase): the required reaction.
+  - `response_measure` (value with unit or checkable condition): the measure that
+    verifies the response â€” the scenario's pass line.
 
 ## Body
-The rationale (depth 2 renders it). Quality kinds add the six-part scenario:
-source of stimulus / stimulus / artifact / environment / response / response measure.
-Values carry tolerances IN the statement (explicit fields wait for the first
-physical project). TBD is a legal value — the register counts them; none may
-survive the detail gate.
+The rationale (depth 2 renders it). Values carry tolerances IN the statement
+(explicit tolerance fields wait for the first physical project). TBD is a legal
+value â€” the register counts them; none may survive the detail gate.
 
 ```
 ---
@@ -54,3 +64,4 @@ killer: false
 ## Rationale (not load-bearing)
 {{why}}
 ```
+<!-- enddesign -->

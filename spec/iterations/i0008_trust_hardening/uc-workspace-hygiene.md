@@ -1,7 +1,6 @@
 ---
 id: uc-workspace-hygiene
 type: usecase
-refines: [need-workspace-drive]
 statement: Engine session logs live in a stable user-scoped directory outside the repo — no repo bloat, no foreign personal data under version control, cross-project searchable, never OS-purged.
 class: review
 killer: false

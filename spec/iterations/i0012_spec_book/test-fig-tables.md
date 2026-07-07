@@ -1,7 +1,6 @@
 ---
 id: test-fig-tables
 type: test
-verifies: [req-fig-tables]
 statement: The verification matrix and the stakeholder matrix render from the shipped base queries; the retired figure kinds refuse with a pointer to the query.
 class: executed
 verify: selftest:fig-tables

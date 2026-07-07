@@ -1,12 +1,14 @@
 ---
 id: req-unique-ids
 type: requirement
-refines: [uc-vendor-engine]
 statement: Every node id is globally unique across the whole spec. The engine provides a deterministic id creator that namespaces a local name by its iteration tag, and a duplicate-id check that reports any collision. A reused id can never silently shadow another iteration's data.
 depends_on: []
 class: review
 killer: true
 ears: exempt - historical statement, retrofit rejected (adr-grandfathers-historical)
+phase: [engineering]
+discipline: [software]
+quality: [functionality]
 ---
 
 ## Rationale (not load-bearing)

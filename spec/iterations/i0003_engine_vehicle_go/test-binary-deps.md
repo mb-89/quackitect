@@ -2,7 +2,6 @@
 id: test-binary-deps
 type: test
 statement: A built engine binary exists and is self-contained. It runs from an unzipped folder with no Python, no uv, and no web download.
-verifies: [req-go-engine]
 class: executed
 verify: selftest:deps
 killer: false

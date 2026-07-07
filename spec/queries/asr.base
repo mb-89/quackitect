@@ -1,11 +1,14 @@
+# Architecturally significant requirements: the high-weight rows AND the quality rows.
 filters:
   and:
     - 'type == "requirement"'
-    - 'weight >= 0.7'
+    - or:
+        - 'weight >= 0.7'
+        - 'kind == "quality"'
 views:
   - type: table
     name: Architecturally significant requirements
-    order: [file.name, statement, weight]
+    order: [file.name, statement, kind, weight]
     sort:
       - property: weight
         direction: DESC

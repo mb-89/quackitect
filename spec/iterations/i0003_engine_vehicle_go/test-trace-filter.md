@@ -2,7 +2,6 @@
 id: test-trace-filter
 type: test
 statement: The rendered report exposes one filter box that accepts iteration predicates and text-or-regex terms combined with AND and OR, shows help on focus, and re-layouts the visible subgraph on change. The determinism root is unchanged by any filter interaction.
-verifies: [req-trace-filter]
 class: executed
 verify: selftest:report
 killer: false

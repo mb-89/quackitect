@@ -4,31 +4,22 @@ type: manifest
 mode: chapter
 statement: Verification and validation - thing built right, right thing built.
 ---
+<!-- design: method-chapter-canning  implements: req-chapter-canning :: ch5-ch8 generic ledes ship canned (owner walk 2026-07-06): the V&V split, the strategy fields, the matrix and waiver intros, the ch6 ledger prose, the ch7 annex lede, the ch8 quarantine and about-text; the authored residue is exactly the approach paragraph, the guides, the validation tracing, and the type-gated units. -->
 ## How we know it works
-<!-- fill [mandatory]
-Contents: the chapter in one breath - verification pairs with the requirements,
-  validation pairs with the needs and success criteria.
-Form: two to four sentences. Spell the title out - beginners do not know V&V.
+<!-- tailor: shipped text - the V&V split is the same in every project.
 -->
 <!-- ai:3 -->
-{{lede}}
+Verification checks the thing was built right - every requirement against its evidence. Validation checks the right thing was built - the outcome against the needs and the success criteria. Both derive from the ledger below; the book can never claim more than the gate states.
 ---
 ## Strategy
-<!-- fill [mandatory]
-Contents: what gets verified how - the method per requirement (test, analysis,
-  inspection, demonstration) JUSTIFIED; the level per requirement (unit,
-  integration, system, acceptance); the model-first rule (verify on models
-  early - an analytic reference case is the cheapest experiment).
-Motivation: written compliance did not stop a receiver failing in orbit -
-  integration-level evidence outweighs paper compliance. Reviews count: an
-  inspection-method verification is a review, and the ledger's adjudications
-  are that evidence.
-Form: prose plus a short mapping list.
+<!-- tailor: shipped text - the method and level per test are FIELDS on the test
+  items, rendered in the matrix below; a method or level choice that needs a why
+  gets a rationale note. Tailor only if this project adds a strategy dimension.
 Sources: model-first @[[ref-systementwurf-mechatronik]]; the orbit lesson
   @[[ref-se-thinking-learning]].
 -->
 <!-- ai:3 -->
-{{strategy}}
+Each test declares its method (test, analysis, inspection, demonstration) and its level (unit, integration, system, acceptance) - the matrix renders both. Verify on models early: an analytic reference case is the cheapest experiment. Integration-level evidence outweighs paper compliance - written compliance did not stop a receiver failing in orbit.
 ---
 ## Verification records
 <!-- fill [type: manufactured_good, cyber_physical]
@@ -45,49 +36,48 @@ Sources: the six-part record, the result contract @[[ref-mess-pruef-dok]].
 {{records-lede}}
 ---
 ## The verification matrix
-<!-- fill [mandatory]
-Contents: one line introducing the derived matrix - every requirement against
-  its verifying evidence, cumulative across iterations.
-Motivation: an empty row is a mechanically visible unverified requirement.
-Form: one prose line; the matrix renders derived.
+<!-- tailor: shipped text - the matrix derives; an empty row IS the finding.
 Sources: the empty-row check @[[ref-generic-se]].
 -->
 <!-- ai:3 -->
-{{matrix-lede}}
+Every requirement below stands against its verifying evidence, cumulative across iterations. An empty row is a mechanically visible unverified requirement - the matrix cannot hide one.
 
 ![[vv-matrix.base]]
 ---
 ## Results and discussion
-<!-- fill [mandatory]
-Contents: rendered BY EXCEPTION - derived counts summarize the green mass;
-  failures and deviations render prominently with their discussion.
-Motivation: error discussion is mandatory (the lab rule); evidence that can be
-  retold as a story is evidence that gets believed.
-Form: short prose per failure or deviation, on the test item's body, linked here.
+<!-- tailor: shipped machinery - the ledger renders results BY EXCEPTION: the
+  green mass as a count, failures and accepted deviations prominently. The
+  discussion prose per failure lives on the failing test item's body.
 Sources: the lab rule @[[ref-mess-pruef-dok]].
 -->
 <!-- ai:3 -->
-{{results-by-exception}}
+The count below summarizes what passed. Everything else renders by name - a failure without its discussion is not a result.
+---
+fig: results-exception
 ---
 ## Validation
 <!-- fill [mandatory]
-Contents: the right-thing check - against the ch1 needs and success criteria,
-  closing the V. Acceptance state derives from the gates, never restated.
-Form: prose tracing each success criterion to its demonstrated outcome.
+Contents: the right-thing check - against the ch1 needs and the criteria table
+  below, closing the V. Acceptance state derives from the gates, never restated.
+Form: prose tracing each criterion row to its demonstrated outcome; the table
+  renders derived.
 -->
 <!-- ai:3 -->
 {{validation}}
+
+![[criteria.base]]
 ---
 ## Accepted deviations
-<!-- fill [mandatory]
-Contents: one line introducing the waiver view - a failed check the project
-  accepted anyway, each a wvr- decision addressing the failed requirement and
-  linking the evidence.
-Motivation: a waiver blesses a FAILURE - always a user-adjudicated gate. An
-  undecided deviation stays loudly visible above.
-Form: one prose line; the view renders derived.
+<!-- tailor: shipped text - the waiver view derives; a waiver is ALWAYS a
+  user-adjudicated gate.
 -->
 <!-- ai:3 -->
-{{waivers-lede}}
+A row below is a failed check the project accepted anyway - a wvr- decision addressing the failed requirement and linking the evidence. An undecided deviation never lands here; it stays loudly visible above.
 
 ![[decisions-waiver.base]]
+---
+## Methods that apply here
+<!-- tailor: shipped machinery - method notes route themselves by applies_chapters.
+-->
+![[methods.base#Methods for verification-validation]]
+<!-- enddesign -->

@@ -1,6 +1,8 @@
 ---
 id: need-note
 type: need
+source: stk-project-owner
+acceptance: crit-capture-one-command
 statement: As a builder I need to capture an idea the moment it occurs, without friction or losing flow.
 class: review
 killer: false

@@ -84,6 +84,10 @@ Discard the spike when done. A rejected idea → archive a note WITH its reason.
 <!-- enddesign -->
 
 ## ship  (output the iteration)
-`quack ship` packages `product/` into the data home (`<data-home>/out/`). Ship is the END of a forward iteration. The zip is ephemeral output. Do not commit it.
+`quack ship` packages `product/` into the data home (`<data-home>/out/`), with the freshly
+regenerated BOOK and REPORT at the zip root; the committed `spec/book.html` refreshes in the
+same move. Ship is the END of a forward iteration. **Run it immediately after the M8 gate's
+bless - never wait for a separate ask (owner ruling 2026-07-07).** The zip is ephemeral
+output. Do not commit it.
 
 Reaches: `defer` (push a check to a later iteration), `retire` (drop one).

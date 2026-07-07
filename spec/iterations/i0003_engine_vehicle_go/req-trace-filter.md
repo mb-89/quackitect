@@ -1,12 +1,14 @@
 ---
 id: req-trace-filter
 type: requirement
-refines: [uc-review-report]
 statement: The report trace graph has a single filter box that filters the graph live in the browser. The box accepts one unified expression. An iteration term filters by iteration: a bare iteration id (0001 means only that iteration) and the comparisons <= and >= and < and > against an iteration. Any other term matches a node id and statement, as plain text or as a /regex/. Terms combine with AND and OR. Focusing or clicking the box reveals help that explains both the iteration and the text syntax. On any change the visible subgraph re-layouts automatically on the client so it re-packs. The committed report keeps its deterministic server-baked layout as the initial state. Filtering and relayout are runtime view interactions and never change the determinism root.
 depends_on: []
 class: review
 killer: false
 ears: exempt - historical statement, retrofit rejected (adr-grandfathers-historical)
+phase: [operation]
+discipline: [software]
+quality: [usability]
 ---
 
 ## Rationale (not load-bearing)

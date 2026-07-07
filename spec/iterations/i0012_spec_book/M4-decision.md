@@ -46,3 +46,36 @@ Derived, computes live: five ADRs minted this milestone, each addressing a requi
 ## Milestone review  → i12-m4-gate
 
 **Verify:** each axis card carries Decision, Because, and Rejected with reasons; the Pugh datum is the strongest rival, not a strawman - report-reuse would genuinely ship faster; the sensitivity flip is recorded. **Validate:** the composite honors every owner ruling from M2/M3 verbatim - involvement-only marks with the refined touch rule, auto-pull Vale with the loud warning, generous figures through the release valve, emit-time everything. **Red-team:** the deadline criterion lost to the trust criteria - is that right under a real presentation date? Answered: the rival's speed buys a book that extractors cannot read and that renders figures only with script - it fails two blessed requirements outright; speed that fails requirements is not speed. Kill-criterion carried forward: if the M5 spike shows the derived-SVG set or the disclosure mechanism infeasible, the affected axis falls back (ASCII figures, always-expanded details) WITHOUT reopening this composite. **Verdict: PASS - pending the adjudicator's bless.**
+
+---
+
+# M4 extension — the connection decisions (2026-07-06)
+
+## Chosen architecture stated (extension)  → i12-m4-architecture-stated
+
+- **Reification** — Decision: semantic relations become first-class connections in spec/connections/<kind>/, hash-neutral loading, content in the root, kinds SysML2-aligned, off the report whitelist ([adr-connections-reified](../../decisions/adr-connections-reified.md)). Because: relations gain address, prose, and query - what frontmatter lists structurally cannot. Rejected: reify-everything (the RDF lesson: bookkeeping drowns the graph).
+- **Storage** — Decision: two lanes per kind, one edge one lane, determinizers own mint, promote, and the merged adjacency answer ([adr-connection-lanes](../../decisions/adr-connection-lanes.md)). Because: storage aligns with audience; the rival's single-index benefit survives in the determinizer. Rejected: status quo, one-file-per-edge, central jsonl - each with its named killer (see Axis 9).
+- **Scope** — Decision: the semantic edges migrate; implements stays code-declared; task wiring stays frontmatter this iteration ([adr-edges-scope](../../decisions/adr-edges-scope.md)). Because: silent drift is the failure class this engine exists to kill; wiring is walk machinery, not content. OPEN to the adjudicator at this gate: ratify task wiring staying, or rule it into the migration now (jsonl makes either cheap).
+
+**Pugh, extension run.** Datum = the strongest rival, central jsonl (uniformity champion). Criteria and weights from M3.
+
+| Criterion (weight) | Rival (datum) | Chosen two-lane |
+|---|---|---|
+| Trust & honesty (5) | 0 | **+** (human edges hash as notes with prose; no display-frontmatter duplication to lint) |
+| Zero-dep (5) | 0 | **=** (both are files and string work) |
+| LLM digestibility (5) | 0 | **=** (the book renders identically) |
+| Authoring cost (4) | 0 | **+** (prose kinds author as normal notes; no id indirection) |
+| Scope guard (4) | 0 | **=** (loader complexity comparable: details-resolution vs two-lane read) |
+| Register/preview fit (3) | 0 | **+** (tensions and interfaces preview live in Obsidian) |
+| Reversibility (2) | 0 | **=** (promote/demote moves lanes; both reversible) |
+
+Weighted: chosen = +5 +4 +3 = **+12** against the strongest rival. Sensitivity: drop preview fit to zero weight - still +9; the win rests on trust and authoring, not on the preview alone.
+
+## Choice traced (extension)  → i12-m4-choice-traced
+Every Because names its criterion or red-team finding; the three ADRs address their requirements; chosen and rejected candidates carry the verdict edges; the losing options live in the Axis 9/10 cards with their killing reasons.
+
+## ADRs recorded and traced (extension)  → i12-m4-adr-traced
+Derived, computes live: three ADRs added this extension (eight total), each addressing requirements of the extension set.
+
+## Milestone review (extension)  → i12-m4-gate
+**Verify:** each decision card carries Decision, Because, Rejected; the Pugh datum is the strongest rival, not a strawman; the sensitivity flip is recorded. **Validate:** every 2026-07-06 owner ruling is honored verbatim - one system for semantic relations, option A lanes, determinizer housekeeping, example notes. **Red-team:** the two carve-outs (implements, task wiring) dent the one-system slogan - answered: both are evidence-forced, both are recorded decisions with named reversal paths, and the adjacency determinizer makes the seams invisible to every consumer. **Verdict: PASS - pending the adjudicator's bless, including the task-wiring sub-ruling.**

@@ -2,7 +2,6 @@
 id: engine-selftest
 statement: The product package imports cleanly.
 type: test
-verifies: [state-model]
 class: executed
 verify: selftest:engine
 killer: false

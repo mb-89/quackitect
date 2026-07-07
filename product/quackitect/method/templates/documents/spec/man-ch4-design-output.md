@@ -4,104 +4,93 @@ type: manifest
 mode: chapter
 statement: Design output - the architecture derived, then the design deep down.
 ---
+<!-- design: method-ch4-mech  implements: req-ch4-mech :: ch4 mechanized (owner walk 2026-07-06): canned ledes, every figure line its own unit, the ASR view grown to weight-or-quality, strategy choices as tagged decisions, the solution space from candidates and verdict edges, partitioning from design elements with interface connections and tagged force-rationales, the design rules view; the authored residue is the type-gated budgets unit. -->
 ## What we built, and how we chose it
-<!-- fill [mandatory]
-Contents: the chapter in one breath - part A derives the architecture, part B
-  carries the detailed design and its specs.
-Form: two to four sentences. The sorting rule for everything here: a decision is
-  ARCHITECTURAL if it has system-wide impact or affects an important quality -
-  otherwise it is detailed design (Bass).
+<!-- tailor: shipped text - the chapter mechanics are the same in every project.
 Sources: architecture vs design table @[[ref-sya-architecting]].
 -->
 <!-- ai:3 -->
-{{lede}}
+This chapter derives from the decisions, candidates, and design elements - part A is the architecture and how it was chosen, part B the detailed design. The sorting rule for everything here: a decision is ARCHITECTURAL if it has system-wide impact or affects an important quality - otherwise it is detailed design.
 ---
 ## Drivers and strategy
-<!-- fill [mandatory]
-Contents: the architecturally significant requirements (the high-weight and
-  quality rows); the driver groups (business, cost and time, solution levers);
-  the approach style (top-down, middle-out, bottom-up) with one line of why.
-Motivation: strategy answers drivers - each strategic choice names the goal or
-  quality it serves and links the decision that fixed it.
-Form: short prose plus the derived ASR view below.
+<!-- tailor: shipped machinery - the ASR view derives the drivers (high-weight rows
+  AND quality rows); the strategy choices are decisions tagged strategy, the
+  approach style among them (one dec- note).
 Sources: drivers, approach styles @[[ref-sya-architecting]].
 -->
 <!-- ai:3 -->
-{{drivers-and-strategy}}
+The rows below drove the architecture. Each strategic choice is a decision naming the goal or quality it serves.
 
 ![[asr.base]]
+
+![[decisions-strategy.base]]
 ---
 ## The solution space
-<!-- fill [mandatory]
-Contents: one line per decision axis - what it decides, which candidates ran.
-Motivation: the derivation is VISIBLE: candidates are items, the matrix renders
-  them against the criteria, the deciding records own the verdicts. This view
-  replaces hand-written Pugh tables - in the book AND the milestone evidence.
-Form: short prose, then the derived matrix. Anti-bias discipline lives in the
-  decision records: weights fixed BEFORE options are scored; a question mark is
-  a legal verdict meaning information gap. Methods: morphological analysis,
-  design-space exploration, set-based design - in the methods view.
+<!-- tailor: shipped machinery - candidates are items, the matrix renders them
+  against the criteria, the deciding records own the verdicts. This view replaces
+  hand-written Pugh tables. Anti-bias discipline lives in the decision records:
+  weights fixed BEFORE options are scored; a question mark is a legal verdict.
 Sources: anti-bias @[[ref-methodische-entwicklung]]; FRAME @[[ref-sya-tactics]].
 -->
 <!-- ai:3 -->
-{{solution-space}}
-
+Every decision axis ran its candidates against the weighted criteria. The matrix derives from the candidate notes; the verdicts derive from the deciding records.
+---
 fig: candidates-matrix
 ---
 ## Partitioning and interfaces
-<!-- fill [mandatory]
-Contents: the element tree; the interfaces; a short prose unit on the
-  partitioning forces that won (volatility separation, reuse, discipline
-  boundaries).
-Motivation: partitioning defines the system's cost. Deep why goes to ch7.
-Form: fig block-tree plus prose. Element descriptions follow per block: name,
-  responsibility, behavior and states, interfaces, realization concept (make,
-  reuse, or buy - early supplier involvement flagged), allocated requirements.
-  Software blocks DERIVE from the design markers in code; physical artifacts get
-  design notes wrapping the artifact.
+<!-- tailor: shipped machinery - the tree derives from the design elements (code
+  markers and des- notes), interfaces are connection notes of kind interface, the
+  winning forces are rationale notes tagged partitioning-force.
 Sources: partitioning forces, block description @[[ref-sya-architecting]].
 -->
 <!-- ai:3 -->
-{{partitioning}}
-
+The element tree below derives from the design elements. Each interface is a connection with its contract one click away; the forces that shaped the cut render beneath it.
+---
 fig: block-tree
+---
+![[interfaces.base]]
+
+![[force-rationales.base]]
 ---
 ## Budgets
 <!-- fill [type: manufactured_good, cyber_physical]
-Contents: the requirement-to-metric-to-budget chain - each system budget with
-  its AGREED summation rule recorded.
+Contents: one line introducing the budget items - each bud- note carries the
+  metric, unit, the requirement it serves, the AGREED summation rule, the margin,
+  and the allocations map; the engine checks the arithmetic.
 Motivation: suppliers game rss summation to hide overruns - the rule is part of
-  the budget or the budget is theater.
-Form: one table per budget; the rule named beside it.
+  the budget or the budget is theater. Margin erosion flags before overrun does.
+Form: one prose line; the budget tables render derived.
 Sources: budgets, summation rules @[[ref-systementwurf-mechatronik]].
 -->
 <!-- ai:3 -->
 {{budgets}}
 ---
 ## Decisions
-<!-- fill [mandatory]
-Contents: one line introducing the architecture decisions view.
-Motivation: without decisions there is no architecture - and every decision
-  names the requirement it addresses.
-Form: one prose line; the view renders derived. Waivers render in verification
-  and validation; project decisions in the project chapter.
+<!-- tailor: shipped machinery - the architecture decisions view; waivers render
+  in verification and validation, project decisions in the project chapter.
 Sources: every decision names the requirement it addresses @[[ref-sya-architecting]].
 -->
 <!-- ai:3 -->
-{{decisions-lede}}
+Without decisions there is no architecture. Every decision below names the requirement it addresses; the rejected candidates keep their reasons.
 
 ![[decisions-architecture.base]]
 ---
 ## Design rules
-<!-- fill [judgment]
-Contents: the binding rules detailed design must honor - interface rules,
-  patterns to use, guidelines.
-Motivation: governance is what makes drift detectable later. Normative layer.
-Form: a short list. Skip with a recorded reason where one team holds everything.
+<!-- tailor: shipped machinery - the rules view; each rule is a note in spec/rules
+  linking the decision that established it.
 Sources: governance @[[ref-sya-architecting]].
 -->
 <!-- ai:3 -->
-{{design-rules}}
+Detailed design honors the rules below. A rule is internally chosen governance - drift against it is detectable because it is written.
+
+![[rules.base]]
+
+---
+## Methods that apply here
+<!-- tailor: shipped machinery - method notes route themselves by applies_chapters.
+-->
+![[methods.base#Methods for design-output]]
 
 <!-- Trace coverage (requirement x implementing design, empty row = hole) renders
      from the graph - quack lint computes it; no authored unit. -->
+<!-- enddesign -->

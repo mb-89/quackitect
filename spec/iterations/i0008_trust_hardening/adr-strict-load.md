@@ -1,7 +1,6 @@
 ---
 id: adr-strict-load
 type: adr
-addresses: [req-strict-frontmatter, req-ref-integrity]
 adjudicated_by: human
 statement: Strictness applies at EVERY graph load, with all findings batched (file, key, direction) and nonzero exit — chosen over write-path-only or lint-only strictness, because a status rendered from a misparsed graph IS the silently-shrunk cone. A node file is recognized by a first-line frontmatter fence; iteration.md is its own strict key class; evidence docs are excluded naturally.
 depends_on: []

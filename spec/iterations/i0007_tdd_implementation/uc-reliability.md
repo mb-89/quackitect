@@ -1,7 +1,6 @@
 ---
 id: uc-reliability
 type: usecase
-refines: [need-qualities]
 statement: ISO/IEC 25010 Reliability — the ledger's recorded evidence never shows green when a live re-run is red; a stale cache cannot mask a failing self-test.
 class: review
 killer: false

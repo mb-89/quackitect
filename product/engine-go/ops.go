@@ -459,7 +459,11 @@ func cmdGather(args []string) {
 // enddesign
 
 // design: go-ship  implements: req-tooling
-// ship packages product/ into a versioned zip under .quack/out/. The zip is ephemeral output.
+// ship packages product/ into a versioned zip under the data home's out/. The zip is
+// ephemeral output. The BOOK and the REPORT regenerate at ship and ride the ZIP ROOT
+// (owner ruling 2026-07-07) - a recipient opens the deliverable and the two reading
+// surfaces sit on top; the committed spec/book.html refreshes in the same move, so the
+// drift lint is green at the shipped state.
 func cmdShip(args []string) {
 	cfg := readProjectConfig()
 	dest := dataDirFor("out")
@@ -484,9 +488,24 @@ func cmdShip(args []string) {
 		io.Copy(w, src)
 		return nil
 	})
+	nodes := LoadAll()
+	if html, findings, _ := renderBookHTML(nodes); len(findings) == 0 {
+		os.WriteFile(committedBookPath(), []byte(html), 0o644)
+		w, _ := zw.Create("book.html")
+		io.Copy(w, strings.NewReader(html))
+	} else {
+		fmt.Fprintln(os.Stderr, "ship: the book has findings and was NOT packaged - run quack book")
+	}
+	rp := filepath.Join(dest, "report.html")
+	if err := RenderReport(rp); err == nil {
+		if raw, rerr := os.ReadFile(rp); rerr == nil {
+			w, _ := zw.Create("report.html")
+			io.Copy(w, strings.NewReader(string(raw)))
+		}
+	}
 	zw.Close()
 	rel, _ := filepath.Rel(ROOT, zp)
-	fmt.Println("shipped ->", filepath.ToSlash(rel))
+	fmt.Println("shipped ->", filepath.ToSlash(rel), "(book.html + report.html at the zip root)")
 }
 
 // enddesign
@@ -782,6 +801,74 @@ func insideStubFiles(proj string) map[string]string {
 	}
 }
 
+// design: go-migrate-layout  implements: req-migrate-layout
+// The layout determinizer (owner ruling 2026-07-07): the spec MIRRORS the template.
+// New workspaces seed the mirrored layout through start stubs; an EXISTING workspace
+// converts through this one-shot - manifests (man-*, SPEC-README) to the spec root,
+// stakeholders/usecases/raid notes to their item homes. Needs, criteria, and
+// rationales stay in spec/trace (their template home). Idempotent; an existing
+// destination is KEPT and warned about, never overwritten. Engine-resident on
+// purpose: migrations are determinizers in the one zero-dependency binary, never
+// shell scripts beside it.
+func migrateLayout(spec string) (int, error) {
+	trace := filepath.Join(spec, "trace")
+	ents, err := os.ReadDir(trace)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return 0, nil
+		}
+		return 0, err
+	}
+	dest := func(name string) string {
+		switch {
+		case strings.HasPrefix(name, "man-") || name == "SPEC-README.md":
+			return spec
+		case strings.HasPrefix(name, "stk-"):
+			return filepath.Join(spec, "stakeholders")
+		case strings.HasPrefix(name, "uc-"):
+			return filepath.Join(spec, "usecases")
+		case strings.HasPrefix(name, "raid-"):
+			return filepath.Join(spec, "raid")
+		}
+		return "" // needs, criteria, rationales, and everything else stay put
+	}
+	moved := 0
+	for _, e := range ents {
+		if e.IsDir() || !strings.HasSuffix(e.Name(), ".md") {
+			continue
+		}
+		d := dest(e.Name())
+		if d == "" {
+			continue
+		}
+		dst := filepath.Join(d, e.Name())
+		if _, serr := os.Stat(dst); serr == nil {
+			fmt.Println("kept both, resolve by hand:", dst, "already exists")
+			continue
+		}
+		if merr := os.MkdirAll(d, 0o755); merr != nil {
+			return moved, merr
+		}
+		if rerr := os.Rename(filepath.Join(trace, e.Name()), dst); rerr != nil {
+			return moved, rerr
+		}
+		fmt.Println("moved " + e.Name() + " -> " + filepath.Base(d))
+		moved++
+	}
+	return moved, nil
+}
+
+func cmdMigrateLayout() {
+	n, err := migrateLayout(SPEC)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, "migrate-layout:", err)
+		quackExit(1)
+	}
+	fmt.Printf("migrate-layout: %d file(s) moved\n", n)
+}
+
+// enddesign
+
 // design: go-init-stubs  implements: req-drive-from-inside
 // `quack start stubs [target]` makes a workspace drivable from INSIDE: it writes the launcher,
 // AGENTS.md/CLAUDE.md, and spec/project.toml stubs (insideStubFiles) into target (default: the
@@ -799,10 +886,11 @@ func cmdStartStubs(args []string) {
 		dst := filepath.Join(target, rel)
 		writeIfAbsent(dst, content)
 	}
-	// design: go-stub-spec  implements: req-stub-spec
-	// The instantiation path: the shipped spec template set (README, nine chapter
-	// skeletons, the canned queries, the method-source reference notes) lands in
-	// spec/trace, spec/queries, and spec/references of the bare workspace. Existing
+	// design: go-stub-spec  implements: req-stub-spec, req-stubs-folders, req-example-notes
+	// The instantiation path: the spec MIRRORS the template (owner ruling 2026-07-07) -
+	// top-level files land at the spec ROOT (README renamed SPEC-README), and EVERY
+	// template subfolder mirrored 1:1 under spec/ (queries, references, fundamentals, the
+	// global item homes with their ex- example notes, the connections kinds). Existing
 	// files are KEPT - a second run refuses to overwrite.
 	tplDir := filepath.Join(EngineDir(), "method", "templates", "documents", "spec")
 	if ents, err := os.ReadDir(tplDir); err == nil {
@@ -814,33 +902,42 @@ func cmdStartStubs(args []string) {
 			if rerr != nil {
 				continue
 			}
-			dst := filepath.Join(target, "spec", "trace", e.Name())
+			dst := filepath.Join(target, "spec", e.Name())
 			if e.Name() == "README.md" {
-				dst = filepath.Join(target, "spec", "trace", "SPEC-README.md")
+				dst = filepath.Join(target, "spec", "SPEC-README.md")
 			}
 			writeIfAbsent(dst, string(raw))
 		}
 	}
-	for _, sub := range []string{"queries", "references", "fundamentals"} {
-		ents, err := os.ReadDir(filepath.Join(tplDir, sub))
+	var stubTree func(src, dst string)
+	stubTree = func(src, dst string) {
+		ents, err := os.ReadDir(src)
 		if err != nil {
-			continue
+			return
 		}
 		for _, e := range ents {
 			if e.IsDir() {
+				stubTree(filepath.Join(src, e.Name()), filepath.Join(dst, e.Name()))
 				continue
 			}
-			raw, rerr := os.ReadFile(filepath.Join(tplDir, sub, e.Name()))
+			raw, rerr := os.ReadFile(filepath.Join(src, e.Name()))
 			if rerr != nil {
 				continue
 			}
-			writeIfAbsent(filepath.Join(target, "spec", sub, e.Name()), string(raw))
+			writeIfAbsent(filepath.Join(dst, e.Name()), string(raw))
+		}
+	}
+	if ents, err := os.ReadDir(tplDir); err == nil {
+		for _, e := range ents {
+			if e.IsDir() {
+				stubTree(filepath.Join(tplDir, e.Name()), filepath.Join(target, "spec", e.Name()))
+			}
 		}
 	}
 	// enddesign
 	fmt.Println("stubs -> " + target)
 	fmt.Println("  wrote " + proj + ".cmd, AGENTS.md, CLAUDE.md, spec/project.toml (kept any existing).")
-	fmt.Println("  wrote the spec template skeleton (spec/trace, spec/queries, spec/references; kept any existing).")
+	fmt.Println("  wrote the spec template skeleton (the spec root + every template folder; kept any existing).")
 	fmt.Println("  the launcher resolves the global engine binary, or set QUACK_ENGINE.")
 }
 

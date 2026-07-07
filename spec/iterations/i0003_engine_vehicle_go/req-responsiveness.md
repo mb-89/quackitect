@@ -1,12 +1,14 @@
 ---
 id: req-responsiveness
 type: requirement
-refines: [uc-run-dep-free, uc-review-report]
 statement: Every user interaction produces visible feedback within 1 second on a 2025 mid-range laptop. If the work takes longer, an acknowledgement appears first within that second (for example started computing). A long-running task reports progress at least once per minute. The more frequent and interactive an interaction, the more it overachieves this bound, where that needs no major architecture rework and degrades no other design goal. This binds the engine and the output it produces.
 depends_on: []
 class: review
 killer: false
 ears: exempt - historical statement, retrofit rejected (adr-grandfathers-historical)
+phase: [engineering]
+discipline: [software]
+quality: [functionality]
 ---
 
 ## Rationale (not load-bearing)

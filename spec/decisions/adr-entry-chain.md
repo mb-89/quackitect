@@ -1,9 +1,7 @@
 ---
 id: adr-entry-chain
 type: adr
-addresses: [req-contract-render]
 adjudicated_by: human
-supersedes: [adr-entry-render]
 statement: Entry files are hand-authored pointers, not renders: CLAUDE.md and .github/copilot-instructions.md command following AGENTS.md without exception and to the letter; AGENTS.md commands the enumerated read-understand-recite-honor ritual on contract.md, the contract single copy. The render pipeline (templates, render-entry, drift lint) is removed; quack selftest guards the chain instead.
 class: review
 killer: false

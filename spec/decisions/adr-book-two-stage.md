@@ -2,9 +2,6 @@
 id: adr-book-two-stage
 type: adr
 kind: architecture
-chosen: [cand-emit-two-stage]
-rejected: [cand-emit-one-pass]
-addresses: [req-book-manifests]
 adjudicated_by: human
 statement: Truth lives only in the spec sources - nodes, manifests, prose units with their marks - and all judgment happens there; everything downstream is deterministic. The emitter renders truth to one self-contained HTML with transclusion at emit time; it MAY materialize assembled chapter markdown as an EPHEMERAL review surface in the data home - regenerated every emit, never committed, never a source of truth. View-time assembly stays excluded (req-book-dom-static).
 class: review

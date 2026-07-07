@@ -2,7 +2,6 @@
 id: command-surface
 statement: The surface is three default-closed intents: note (capture), engage (start/next/ship), and review (readout/retro). A separate determinizer lane runs status, why, and bless. Ship is engage's terminal output. Field feedback is a retro question, not a milestone.
 type: requirement
-refines: [uc-engage-start]
 class: judgment
 killer: false
 ears: exempt - historical statement, retrofit rejected (adr-grandfathers-historical)

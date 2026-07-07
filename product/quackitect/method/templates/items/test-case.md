@@ -4,7 +4,8 @@ artifact: node
 applies_rigor: [lean, systematic]
 applies_type: [default]
 ---
-# test-case — one verification or validation check
+<!-- design: method-verify-method  implements: req-verify-method :: Method and level are declared FIELDS on test items rendered in the verification matrix's columns; the requirement item's field is named verify_method because the bare verify key is the executed-check referent and must never collide. -->
+# test-case â€” one verification or validation check
 
 Lives in its birth iteration. Observed RED before the build (`quack observe-red`).
 Id prefix `test-`.
@@ -19,7 +20,7 @@ Id prefix `test-`.
 - `kind` (verification | validation): thing-right or right-thing.
 - `verify` (selftest:name, executed tests): the mechanized referent.
 - `acceptance` (rule string): the pass rule, with value and tolerance, fixed at
-  WRITE time — before any result exists.
+  WRITE time â€” before any result exists.
 - `statement` (one sentence): what passing proves.
 
 ## Body
@@ -42,3 +43,4 @@ killer: false
 ## Given / when / then
 {{gwt}}
 ```
+<!-- enddesign -->

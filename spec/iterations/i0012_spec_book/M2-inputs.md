@@ -142,3 +142,29 @@ Derived, compute live: 27 requirements, each with a test node; every requirement
 **Red-team:** weakest point probed - the requirement set grew mid-milestone (16 → 27); is it still coherent? Checked: all five additions trace to recorded owner rulings from this walk, none is speculative scope. Second probe - the substrate thesis has no external validation; answered: recorded honestly in the thesis section with a named revisit trigger, and the M7 legibility probe tests the machine-consumption half empirically. Scope guard intact: no new engine surface was promised beyond the capped set (emitter, manifest type, two lints) plus the owner-ruled type/class notes, which are method-layer data, not engine.
 
 **Verdict: PASS - pending the adjudicator's bless.**
+
+---
+
+# M2 extension — mechanization + connections design input (2026-07-06)
+
+## Inputs captured (extension)  → i12-m2-inputs-captured
+
+**Owner directive:** fold the full mechanization survey into i12. Template chapters become machinery wherever text is project-independent; relations become first-class connections; housekeeping goes to determinizers. No new needs - everything traces to [need-docu](need-docu.md) through [uc-spec-template](uc-spec-template.md), [uc-book-read](uc-book-read.md), and the new [uc-connections](uc-connections.md).
+
+**The captured input, by source (full texts in the notes archive, 2026-07-06):**
+
+- Owner rulings: the connection system (one system for semantic relations); storage option A (two lanes per kind); ch8 guides as notes, one subchapter per type; example notes per derived kind; the ch3 mechanization set (functions deferred); the extension scope itself, with the scope complaint pre-acknowledged as a retro lead.
+- Red-team, trust lens: hash-neutral loading is the hard requirement; migration self-audits or bakes its own bugs into the golden; the id-charset lint ships first; the edge-mode key is the migration's commit point; connection prose must hash; one pre-existing nondeterminism found (candidate verdict scans map order).
+- Red-team, standards lens: the item-kind set is standards-complete at this scale; SysML2-aligned kind vocabulary; budget gains margin; mode/state and function deferred; concern, view/viewpoint, ConOps, change-request, and actor consciously rejected.
+- Red-team, template lens: four shipped defects (fig lines render as prose, block-tree draws the book's chapters, the methods view does not exist, the need kind is half-born); mint covers 5 of 13 kinds against its own principle.
+
+**Requirement growth:** 27 → 59, all EARS-shaped, each with a test; both derived rules compute green on this board.
+
+**Scope items flagged to the adjudicator at this gate:**
+
+- Trace-graph whitelist revert (owner ruling 2026-07-05, still unimplemented): the item types must stay OFF the report graph's node whitelist. One-line report.go correction - proposed as a rider on i12-bs21-ch4.
+- The wider trust gap (.base files and content notes outside the identity root): BACKLOGGED to the next engine iteration with its ready-when; req-conn-root covers connection content only.
+
+## Milestone review (extension)  → i12-m2-gate
+
+**Verify:** all 32 additions trace to recorded rulings or red-team findings; none is speculative; the derived rules compute green over the grown set. **Validate:** the owner's one-system intent survives with two evidence-forced carve-outs (implements stays code-declared; task wiring at the owner's discretion) - honesty over slogan. **Red-team:** the iteration doubled mid-flight; answered: the owner weighed a split i13 and ruled to extend, the complaint is recorded as a retro lead, and every addition rode the same M2 discipline as the original set. **Verdict: PASS - pending the adjudicator's bless.**

@@ -16,9 +16,17 @@ import (
 // `mint veto --of <id>`, `mint defer --of <id> --ready-when "<cond>"`, `mint supersede <old>` — so a
 // veto/defer/supersession can never be misspelled into the wrong class. Decisions land in
 // spec/decisions/; other types land in the active iteration.
+// design: go-mint-kinds  implements: req-mint-all-kinds
+// Every item kind mints (owner walk 2026-07-06): the agent fills content, never authors
+// shape - hand-copying a skeleton under the strict whitelist punished every typo with a
+// refused graph. adjudicated_by says user (the i11 vocabulary; human retired).
 var mintPrefix = map[string]string{
 	"need": "need-", "usecase": "uc-", "requirement": "req-", "test": "test-", "adr": "adr-",
+	"stakeholder": "stk-", "candidate": "cand-", "raid": "raid-", "rationale": "why-",
+	"record": "rec-", "criterion": "crit-", "rule": "rule-", "budget": "bud-",
+	"guide": "guide-", "design": "des-", "connection": "con-",
 }
+// enddesign
 
 // sugarAddresses stamps the decision edges for veto/defer: the target plus the sink — and never
 // the sink twice when the target IS the sink (i10 defect fix for addresses: [scrap, scrap]).
@@ -46,6 +54,9 @@ func mintBody(kind, id string, extra map[string]string) string {
 	b.WriteString("id: " + id + "\n")
 	b.WriteString("type: " + kind + "\n")
 	switch kind {
+	case "need":
+		b.WriteString("source: stk-TODO\n")
+		b.WriteString("acceptance: TODO — the checkable condition that accepts the need\n")
 	case "usecase":
 		b.WriteString("refines: [" + extra["of"] + "]\n")
 	case "requirement":
@@ -59,13 +70,35 @@ func mintBody(kind, id string, extra map[string]string) string {
 			addr = extra["of"]
 		}
 		b.WriteString("addresses: [" + addr + "]\n")
-		b.WriteString("adjudicated_by: human\n")
+		b.WriteString("adjudicated_by: user\n")
 		if extra["ready_when"] != "" {
 			b.WriteString("ready_when: " + extra["ready_when"] + "\n")
 		}
 		if extra["supersedes"] != "" {
 			b.WriteString("supersedes: [" + extra["supersedes"] + "]\n")
 		}
+	case "stakeholder":
+		b.WriteString("role: TODO\ninterest: 0.5\ninfluence: 0.5\nweight: 0.5\n")
+	case "candidate":
+		b.WriteString("axis: TODO\nratings:\n  crit-TODO: 0.5\n")
+	case "raid":
+		b.WriteString("kind: risk\nprobability: 0.5\nimpact: 0.5\nmitigation: TODO\nowner: TODO\nstatus: open\n")
+	case "rationale":
+		b.WriteString("refers: [" + extra["of"] + "]\n")
+	case "record":
+		b.WriteString("record_of: [" + extra["of"] + "]\nresult: TODO — value plus-minus uncertainty against the pre-fixed rule\n")
+	case "criterion":
+		b.WriteString("metric: TODO\ntarget: TODO\n")
+	case "rule":
+		b.WriteString("scope: TODO\nrefers: [" + extra["of"] + "]\n")
+	case "budget":
+		b.WriteString("metric: TODO\nunit: TODO\naddresses: [" + extra["of"] + "]\nrule: sum\nmargin: 0.2\nallocations:\n  des-TODO: 0\n")
+	case "guide":
+		b.WriteString("audience: TODO\n")
+	case "design":
+		b.WriteString("responsibility: TODO\nimplements: [" + extra["of"] + "]\nrealization: make\n")
+	case "connection":
+		b.WriteString("kind: TODO\nsrc: TODO\ndst: TODO\n")
 	}
 	stmt := extra["statement"]
 	if stmt == "" {
@@ -88,6 +121,48 @@ func mintBody(kind, id string, extra map[string]string) string {
 func mintNodeAt(dir, kind, id string) (string, error) {
 	return mintNodeAtX(dir, kind, id, map[string]string{})
 }
+
+// design: go-mint-content  implements: req-mint-all-kinds
+// The four content kinds mint their own shapes into the spec content homes - they are
+// notes with dedicated loaders, never node grammar. A content mint requires --id (the
+// filename IS the slug; there is no engine-stamped prefix).
+var contentMintDir = map[string]string{
+	"term": "glossary", "reference": "references", "fundamental": "fundamentals", "method": "methods",
+}
+
+func mintContentBody(kind string) string {
+	switch kind {
+	case "term":
+		return "---\nterm: TODO\nlong: TODO — the long form, first use renders it\nclass: domain\naliases: []\n---\nTODO — one-line definition\n"
+	case "reference":
+		return "---\ntitle: TODO\nurl: https://TODO\nkind: informative\nversion: TODO\naccessed: TODO\naliases: []\n---\nTODO — what it is, why this project leans on it, which parts matter\n"
+	case "fundamental":
+		return "---\nstatement: TODO — the one-liner for the fundamentals list\naliases: []\n---\nTODO — the full body; renders in the guidance chapter, one link away\n"
+	case "method":
+		return "---\nstatement: TODO — the purpose\napplies_chapters: []\napplies_type: [default]\napplies_rigor: [lean, systematic]\nsource: ref-TODO\naliases: []\n---\n## Situation\nTODO\n## Effect\nTODO\n## Procedure\nTODO\n## Tools\nTODO\n"
+	}
+	return ""
+}
+
+func mintContentAt(kind, slug string) (string, error) {
+	if slug == "" {
+		return "", fmt.Errorf("mint %s needs --id <slug> (the filename is the slug)", kind)
+	}
+	dir := filepath.Join(SPEC, contentMintDir[kind])
+	if err := os.MkdirAll(dir, 0o755); err != nil {
+		return "", err
+	}
+	path := filepath.Join(dir, slug+".md")
+	if _, err := os.Stat(path); err == nil {
+		return "", fmt.Errorf("mint: %s exists", path)
+	}
+	if err := os.WriteFile(path, []byte(mintContentBody(kind)), 0o644); err != nil {
+		return "", err
+	}
+	return path, nil
+}
+
+// enddesign
 
 func mintNodeAtX(dir, kind, id string, extra map[string]string) (string, error) {
 	if _, ok := mintPrefix[kind]; !ok {
@@ -112,8 +187,23 @@ func mintNodeAtX(dir, kind, id string, extra map[string]string) (string, error) 
 }
 
 func mintDefaultDir(kind string) string {
-	if kind == "adr" {
+	switch kind {
+	case "adr":
 		return filepath.Join(SPEC, "decisions")
+	// the global item homes (owner folders ruling 2026-07-06): long-lived kinds live
+	// beside the iterations, not inside them
+	case "stakeholder":
+		return filepath.Join(SPEC, "stakeholders")
+	case "usecase":
+		return filepath.Join(SPEC, "usecases")
+	case "raid":
+		return filepath.Join(SPEC, "raid")
+	case "rule":
+		return filepath.Join(SPEC, "rules")
+	case "guide":
+		return filepath.Join(SPEC, "guides")
+	case "connection":
+		return filepath.Join(SPEC, "connections")
 	}
 	cfg := readProjectConfig()
 	if cfg.Version != "" {
@@ -124,7 +214,8 @@ func mintDefaultDir(kind string) string {
 
 func cmdMint(args []string) {
 	if len(args) == 0 {
-		fmt.Println("usage: mint <need|usecase|requirement|test|adr> [--id slug] [--of id] [--statement \"...\"] [--rationale \"...\"] [--dir path]")
+		fmt.Println("usage: mint <kind> [--id slug] [--of id] [--statement \"...\"] [--rationale \"...\"] [--dir path]")
+		fmt.Println("       kinds: need usecase requirement test adr stakeholder candidate raid rationale record criterion rule budget guide design connection")
 		fmt.Println("       mint evidence --milestone M<n> [--dir path]           (stamp the milestone's evidence-doc skeleton)")
 		fmt.Println("       mint veto --of <id> [--statement \"...\"]      (decision: scrapped, final)")
 		fmt.Println("       mint defer --of <id> --ready-when \"<cond>\"    (decision: parked until)")
@@ -159,6 +250,26 @@ func cmdMint(args []string) {
 	}
 	if kind == "evidence" {
 		p, err := mintEvidence(flagVal(args, "--milestone"), flagVal(args, "--dir"))
+		if err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			quackExit(1)
+		}
+		rel, _ := filepath.Rel(ROOT, p)
+		fmt.Println("minted ->", filepath.ToSlash(rel))
+		return
+	}
+	if kind == "connection" && len(args) >= 4 && !strings.HasPrefix(args[1], "-") {
+		// the connection sugar (go-conn-tools): mint connection <kind> <src> <dst>
+		out, err := mintConnection(SPEC, args[1], args[2], args[3], flagVal(args, "--q"), flagVal(args, "--statement"))
+		if err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			quackExit(1)
+		}
+		fmt.Println("minted ->", out)
+		return
+	}
+	if _, ok := contentMintDir[kind]; ok {
+		p, err := mintContentAt(kind, flagVal(args, "--id"))
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			quackExit(1)

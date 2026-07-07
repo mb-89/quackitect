@@ -1,7 +1,6 @@
 ---
 id: uc-contract-delivery
 type: usecase
-refines: [need-engage]
 statement: Every harness receives the full contract through its natively auto-loaded entry file, generated from the single contract source — no pointer-following required of the agent.
 class: review
 killer: false

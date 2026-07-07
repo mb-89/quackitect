@@ -1,7 +1,6 @@
 ---
 id: adr-ears-baseline
 type: adr
-addresses: [req-ears-lint]
 adjudicated_by: human
 statement: Forward-only EARS discrimination uses a committed baseline corpus — the stmtHash of every requirement existing at feature-land; lint checks only requirements whose current stmtHash is absent from the baseline (new or genuinely re-stated), so blessed history is structurally unflaggable — chosen over attest-lineage reconstruction (complex, indirect) and iteration-order scoping (misses edited old statements).
 depends_on: []

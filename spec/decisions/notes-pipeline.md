@@ -2,7 +2,6 @@
 id: notes-pipeline
 statement: Capture is frictionless: one file per note. It records provenance and asks once. Triage routes or rejects each note. Migration at quack start pulls scope. Retro runs at start, seeded by an end-of-iteration friction dump. A note is not a check.
 type: requirement
-refines: [uc-note-capture]
 adjudicated_by: human
 killer: true
 ears: exempt - historical statement, retrofit rejected (adr-grandfathers-historical)
