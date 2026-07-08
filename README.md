@@ -2,11 +2,26 @@
 
 # quackitect
 
+
+## Has this ever happened to you?
+
+- You had a bright idea. You pushed the project for two months, drowned in tech debt, and now it collects dust.
+- You're two years into a product. There is this one thing. The thing the customer said he didnt need it. The thing you warned him would blow up the budget and the timeline if he ever changed his mind. Well. He changed his mind. There goes your architecture.
+- New colleagues join the team. The old zombie discussions claw their way out of the grave. *"Why is this done this way?"*. Its been like that for twenty years. Nobody wrote it down.
+- Your agent vibe-coded a thing. It looked great. Now it doesn't work, nobody can fix it, nothing's documented. And the bot just runs in circles.
+
+Been there. Done that. Can't recommend.
+
+But brother, do I have a bridge to sell you.
+
+**quackitect**  
 *The rubber duck that went to engineering school.*
 
-Your AI agent just did a week of work in an afternoon. **How much of it can you honestly vouch for?**
+quackitect is an LLM Harness. It knows how to properly architect. It's trained on forty years of engineering method: requirements engineering, architecture decision records, the V-model, verification and validation, the whole canon. You want to shoot a rocket at the moon? quackitect knows how they did it.
 
-quackitect makes that question answerable. It is a **user-driven gate ledger** for spec-driven, systematic engineering: the agent fills the checks, **you adjudicate the gates**, and a deterministic engine keeps the record honest. What comes out is an **auditable, change-aware record of your project's design** — a Merkle-DAG of decisions that goes **SUSPECT the moment an input changes**, so nothing silently drifts. And the record compiles into a book any stakeholder can read.
+It asks the right questions, at the right time. It pushes back where you need it. It sharpens your ideas, writes down your decisions, understands your requirements and traces them into your design. It designs the deliverable, tests it, documents it. Once you plan changes, it tells you the impact.
+
+All you bring is the big ideas — and your judgement.
 
 > 🚧 **Under construction.** Early and evolving — the commands, spec format, and structure may change without notice. Here to explore the idea, not (yet) for production. No stability promises.
 
