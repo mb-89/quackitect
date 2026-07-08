@@ -7,4 +7,8 @@ class: review
 killer: false
 ---
 ## Rationale (not load-bearing)
-TODO
+The global binary ratchets itself forward from vendored source.
+The first design compared file mtimes.
+A fresh clone stamps checkout-time on old source, so the engine rebuilt itself backward.
+A committed stamp fixes this, because committed content keeps its value across every clone.
+The launcher rebuilds only when the source stamp is strictly newer, so the binary only moves forward.

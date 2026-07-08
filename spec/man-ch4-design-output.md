@@ -2,64 +2,46 @@
 id: man-ch4-design-output
 type: manifest
 mode: chapter
+order: 40
 statement: Design output - the architecture derived, then the design deep down.
 ---
-## What we built, and how we chose it
+## What we built
 <!-- tailor: shipped text - the chapter mechanics are the same in every project.
 Sources: architecture vs design table @[[ref-sya-architecting]].
 -->
 <!-- ai:3 -->
-This chapter derives from the decisions, candidates, and design elements - part A is the architecture and how it was chosen, part B the detailed design. The sorting rule for everything here: a decision is ARCHITECTURAL if it has system-wide impact or affects an important quality - otherwise it is detailed design.
+This chapter documents the architecture as it stands - part A the architecture and its drivers, part B the detailed design. How each choice was made - the deciding records and the candidates they weighed - lives with the [project chapter](man-ch6-project); every element here links there. The sorting rule for everything here: a decision is ARCHITECTURAL if it has system-wide impact or affects an important quality - otherwise it is detailed design.
 ---
-## Drivers and strategy
+## Drivers
 <!-- tailor: shipped machinery - the ASR view derives the drivers (high-weight rows
-  AND quality rows); the strategy choices are decisions tagged strategy, the
-  approach style among them (one dec- note).
-Sources: drivers, approach styles @[[ref-sya-architecting]].
+  AND quality rows); the strategy and architecture decision tables render in the
+  project chapter (bs20 ruling: current state here, the record there).
+Sources: drivers @[[ref-sya-architecting]].
 -->
 <!-- ai:3 -->
-The rows below drove the architecture. Each strategic choice is a decision naming the goal or quality it serves.
+The rows below drove the architecture. The strategic choices they led to are decisions, recorded with the project chapter's timeline.
 
 ![[asr.base]]
-
-![[decisions-strategy.base]]
----
-## The solution space
-<!-- tailor: shipped machinery - candidates are items, the matrix renders them
-  against the criteria, the deciding records own the verdicts. This view replaces
-  hand-written Pugh tables. Anti-bias discipline lives in the decision records:
-  weights fixed BEFORE options are scored; a question mark is a legal verdict.
-Sources: anti-bias @[[ref-methodische-entwicklung]]; FRAME @[[ref-sya-tactics]].
--->
-<!-- ai:3 -->
-Every decision axis ran its candidates against the weighted criteria. The matrix derives from the candidate notes; the verdicts derive from the deciding records.
----
-fig: candidates-matrix
 ---
 ## Partitioning and interfaces
-<!-- tailor: shipped machinery - the tree derives from the design elements (code
-  markers and des- notes), interfaces are connection notes of kind interface, the
-  winning forces are rationale notes tagged partitioning-force.
+<!-- tailor: shipped machinery - the onion derives from the design elements (code
+  markers and des- notes) plus the project's layer map (design-layers.md: the one
+  judgment input - inputs enter, travel through the layers, outputs leave; the
+  blocks sit on the rings they work in; iteration files stay excluded - the book
+  documents the current design). A reader clicks a block to enter it, breadcrumbs
+  lead back up, each leaf links to its trace item. Interfaces are connection notes
+  of kind interface, the winning forces are rationale notes tagged
+  partitioning-force.
 Sources: partitioning forces, block description @[[ref-sya-architecting]].
 -->
 <!-- ai:3 -->
-The element tree below derives from the design elements. Each interface is a connection with its contract one click away; the forces that shaped the cut render beneath it.
+The layered figure below derives from the design elements and the layer map. Enter a layer by clicking it; the breadcrumbs lead back; every leaf links to its trace item. Each interface is a connection with its contract one click away; the forces that shaped the cut render beneath it.
 ---
-fig: block-tree
+fig: onion
 ---
 ![[interfaces.base]]
 
 ![[force-rationales.base]]
----
-## Decisions
-<!-- tailor: shipped machinery - the architecture decisions view; waivers render
-  in verification and validation, project decisions in the project chapter.
-Sources: every decision names the requirement it addresses @[[ref-sya-architecting]].
--->
-<!-- ai:3 -->
-Without decisions there is no architecture. Every decision below names the requirement it addresses; the rejected candidates keep their reasons.
-
-![[decisions-architecture.base]]
 ---
 ## Design rules
 <!-- tailor: shipped machinery - the rules view; each rule is a note in spec/rules

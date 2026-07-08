@@ -2,6 +2,7 @@
 id: man-ch6-project
 type: manifest
 mode: chapter
+order: 60
 statement: Project - the approach, the record, and the risks, mostly derived.
 ---
 ## How this project runs
@@ -29,15 +30,29 @@ The project runs in short iterations, each walked through its [milestone](term:m
 ![[decisions-project.base]]
 ---
 ## Milestones and timeline
-<!-- tailor: shipped text - the timeline draws the iterations; the project table
-  beneath it carries each iteration's gate tally. The walk is the truth.
+<!-- tailor: shipped text - the project table carries each iteration's gate tally.
+  The walk is the truth; the table says it without a graph (DRY, field c41). Since
+  the bs20 ruling (2026-07-08) each iteration row expands to its decisions and the
+  candidates they weighed - the record of how the architecture came to be lives
+  HERE; the design chapter shows only what stands.
 -->
 <!-- ai:3 -->
-Each dot below is an iteration - history and planned. The table beneath carries every iteration's gate tally, live from the ledger.
----
-fig: timeline
+The table carries every iteration - history and planned - with its gate tally, live from the ledger. Expand an iteration to reach its decisions and the candidates they weighed.
 ---
 fig: project-table
+---
+## Design decisions
+<!-- tailor: shipped machinery - the strategy and architecture decision views moved
+  here from the design chapter (bs20 ruling: current state there, the record here);
+  waivers stay with verification and validation.
+Sources: every decision names the requirement it addresses @[[ref-sya-architecting]].
+-->
+<!-- ai:3 -->
+Without decisions there is no architecture. Every decision below names the requirement it addresses; the rejected candidates keep their reasons, reachable from the timeline above.
+
+![[decisions-strategy.base]]
+
+![[decisions-architecture.base]]
 ---
 ## Risks, assumptions, issues, dependencies
 <!-- tailor: shipped text - the register derives from the raid notes; the context

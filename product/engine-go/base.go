@@ -681,6 +681,8 @@ var edgeProps = map[string]bool{"verifies": true, "refines": true, "addresses": 
 func (bp *baseParser) resolve(name string) string {
 	n := strings.TrimPrefix(name, "note.")
 	switch n {
+	case "name": // reader-facing (req-reader-columns): humanized id
+		return humanizeID(bp.ctx.p.id)
 	case "file.name":
 		return bp.ctx.p.id
 	case "file.folder":
@@ -860,16 +862,16 @@ func EvalBaseUsed(text string, paths []string, nodes map[string]Node, used map[s
 					r.Facets = append(r.Facets, "f-"+f+"-"+v)
 				}
 			}
-			if view.full {
-				r.Head = p.scalars["statement"]
-				if r.Head == "" {
-					r.Head = p.scalars["title"]
-				}
-				if r.Head == "" {
-					r.Head = p.id
-				}
-				r.Body = strings.TrimSpace(p.body)
+			// Head/Body fill for EVERY view since bs20 (req-table-expand): the table's
+			// detail rows render them; full views used them all along.
+			r.Head = p.scalars["statement"]
+			if r.Head == "" {
+				r.Head = p.scalars["title"]
 			}
+			if r.Head == "" {
+				r.Head = p.id
+			}
+			r.Body = strings.TrimSpace(p.body)
 			return r
 		}
 		res := BaseResult{Name: view.name, Columns: cols, Full: view.full, Refs: view.refs, Depth: view.depth}

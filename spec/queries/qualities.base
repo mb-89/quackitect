@@ -7,5 +7,5 @@ filters:
 views:
   - type: table
     name: Qualities
-    order: [file.name, statement, stimulus, response, response_measure]
+    order: [name, statement, stimulus, response, response_measure]
     groupBy: quality

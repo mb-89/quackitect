@@ -6,4 +6,4 @@ filters:
 views:
   - type: table
     name: Constraints
-    order: [file.name, statement, source]
+    order: [name, statement]

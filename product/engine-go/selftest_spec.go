@@ -354,11 +354,12 @@ func selftestFigTables() bool {
 		return false
 	}
 	// the verification matrix groups by requirement and carries the test row
-	if !strings.Contains(html, "Verification matrix") || !strings.Contains(html, "req-fix (1)") || !strings.Contains(html, "<td>test-fix</td>") {
+	// (reader NAME since i14, req-reader-columns: ids render humanized)
+	if !strings.Contains(html, "Verification matrix") || !strings.Contains(html, "req-fix (1)") || !strings.Contains(html, "<td>fix</td>") {
 		return false
 	}
 	// the stakeholder matrix renders the item row
-	if !strings.Contains(html, "Stakeholders") || !strings.Contains(html, "<td>stk-user</td>") {
+	if !strings.Contains(html, "Stakeholders") || !strings.Contains(html, "<td>user</td>") {
 		return false
 	}
 	// a missing pooled query is a render-failing finding, never a silent skip
@@ -485,8 +486,8 @@ func selftestFacetBoard() bool {
 		!strings.Contains(html, ">safety (1)<") {
 		return false
 	}
-	// a zero-count vocabulary value renders as a visible hole
-	if !strings.Contains(html, `class="facet-count hole" data-target="f-phase-misuse">misuse (0)<`) {
+	// a zero-count vocabulary value renders as a visible hole (muted since i14, field c30)
+	if !strings.Contains(html, `class="facet-count fb-zero" data-target="f-phase-misuse">misuse (0)<`) {
 		return false
 	}
 	// the buttons carry the filter hooks the register rows answer to

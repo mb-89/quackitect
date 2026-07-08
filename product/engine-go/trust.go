@@ -39,6 +39,7 @@ var nodeKeysAllow = map[string]bool{
 	"milestone": true, "parent": true, "depends_on": true, "refines": true, "implements": true,
 	"verifies": true, "addresses": true, "validates": true, "ears": true, "adjudicated_by": true,
 	"ready_when": true, "supersedes": true, "suite": true, "tests_red": true, "guidance": true, "mode": true,
+	"order": true, // manifest chapter order (req-system-overview)
 	"ratings": true, // one-level map key (go-ratings-map, req-ratings-map)
 	// the item fields (go-items + the item templates, owner walk 2026-07-05); every field's
 	// semantics and value range live in its item template (method/templates)
@@ -60,6 +61,7 @@ var nodeKeysAllow = map[string]bool{
 	"allocations": true, "scope": true, "audience": true, "responsibility": true,
 	"realization": true, "preset": true, "guide": true, "src": true, "dst": true, "q": true,
 	"verify_method": true, // the requirement item's method field - the bare verify key stays the executed-check referent
+	"functions":     true, // the need item's functional structure (i14, field c25; semantics in the need item template)
 }
 var iterKeysAllow = map[string]bool{
 	"iteration": true, "status": true, "type": true, "rigor": true,

@@ -7,16 +7,16 @@ views:
   - type: table
     name: Methods for design-input
     filters: 'applies_chapters.contains("design-input")'
-    order: [file.name, statement, source]
+    order: [name, statement]
   - type: table
     name: Methods for design-output
     filters: 'applies_chapters.contains("design-output")'
-    order: [file.name, statement, source]
+    order: [name, statement]
   - type: table
     name: Methods for verification-validation
     filters: 'applies_chapters.contains("verification-validation")'
-    order: [file.name, statement, source]
+    order: [name, statement]
   - type: table
     name: Methods for project
     filters: 'applies_chapters.contains("project")'
-    order: [file.name, statement, source]
+    order: [name, statement]

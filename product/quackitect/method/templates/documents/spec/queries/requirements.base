@@ -4,7 +4,7 @@ filters:
 views:
   - type: table
     name: Requirements register
-    order: [file.name, statement, kind, must_wish, weight, source, verify]
+    order: [name, statement, kind]
     sort:
       - property: weight
         direction: DESC

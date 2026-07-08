@@ -2,6 +2,7 @@
 id: man-ch3-design-input
 type: manifest
 mode: chapter
+order: 30
 statement: Design input - context, stakeholders, and every checkable claim on the system.
 ---
 <!-- design: method-ch3-mech  implements: req-ch3-mech :: ch3 mechanized (owner walk 2026-07-06): canned units with pooled views for stakeholders (statement = concern), tensions (conflicts-with connections), use cases (render refs, state-aware), qualities (six scenario fields grouped by facet), constraints, and the register; the authored residue is the context prose and the deferred functions unit. -->
@@ -39,30 +40,18 @@ Sources: the four-step pipeline @[[ref-generic-se]].
 <!-- ai:3 -->
 Every requirement's source traces to a row below; the statement column carries the concern. Where two rows pull against each other, the tension renders beneath the table - the reasoning is one click away.
 
-![[stakeholder-matrix.base]]
-
 ![[tensions.base]]
 ---
-## Use cases
-<!-- tailor: shipped machinery - the view renders every use case state-aware at
-  depth 2 (statement, gate state, rationale one disclosure away).
-Sources: Cockburn use-case fields @[[ref-sya-re]].
+## Use cases and functions
+<!-- tailor: shipped machinery - ONE deterministic per-need board (field c25): a need
+  row expands into its functions (the need item's `functions:` list, verb plus noun,
+  solution-neutral) and its use cases (the refines edges). Never authored prose.
+Sources: Cockburn use-case fields @[[ref-sya-re]]; functional decomposition @[[ref-pahl-beitz]].
 -->
 <!-- ai:3 -->
-One section per use case, live from the graph - actors and trigger on the item, the success scenario in its body.
-
-![[usecases.base]]
+One row per need, live from the graph. Expand a need to see its functions and its use cases side by side.
 ---
-## Functions
-<!-- fill [judgment]
-Contents: the functional structure - verb plus noun, solution-neutral.
-Motivation: physical types decompose by function before form (Pahl/Beitz).
-Form: a tree or list. SKIP where the use cases already carry the functional
-  story - record the skip in the tailoring row.
-Sources: functional decomposition @[[ref-pahl-beitz]].
--->
-<!-- ai:3 -->
-{{functions}}
+fig: ucfn-board
 ---
 ## Qualities
 <!-- tailor: shipped machinery - the six scenario fields live ON the quality

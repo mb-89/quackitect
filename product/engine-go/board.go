@@ -128,7 +128,7 @@ func renderCoverageBoard(nodes map[string]Node) string {
 		for _, v := range vocab[f] {
 			cls, n := "facet-count", counts[f][v]
 			if n == 0 {
-				cls += " hole" // a zero count IS the finding the board exists for
+				cls += " fb-zero" // a zero count IS the finding - shown muted, never colored (field c30)
 			}
 			b.WriteString(`<li><button class="` + cls + `" data-target="f-` + f + `-` + htmlEscape(v) + `">` + htmlEscape(v) + ` (` + itoa(n) + `)</button></li>` + "\n")
 		}
@@ -148,7 +148,7 @@ func facetFilterCSS() string {
 			b.WriteString(`body[data-facet="` + key + `"] tr.rowf:not(.` + key + `){display:none}`)
 		}
 	}
-	b.WriteString(`.facet-count.hole{color:` + bookColors["suspect"] + `;font-weight:bold}`)
+	b.WriteString(`.facet-count.fb-zero{color:#999}`)
 	b.WriteString(`.board{display:flex;gap:2rem}.board ul{list-style:none;padding:0}`)
 	return b.String()
 }

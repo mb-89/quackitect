@@ -7,4 +7,8 @@ class: review
 killer: false
 ---
 ## Rationale (not load-bearing)
-TODO
+A milestone gate often waits on nothing but ready killer subtasks.
+Two separate hand-offs for that one moment add ceremony without adding a decision.
+Merging the trace nodes was rejected, because the substance check and the review gate must stay separate records.
+So only the ceremony merges.
+One y blesses the group, each bless recorded on its own, and a split answer stays possible.

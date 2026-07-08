@@ -27,13 +27,14 @@ Do this before anything else on this project:
 <!-- ai:2 -->
 1. **READ** `product/quackitect/method/prompts/contract.md`. The whole file, with your file-reading tool. No skimming. No summaries. No memory of a past session.
 2. **UNDERSTAND** it. It is binding. It overrides your defaults. It governs every move you make here.
-3. **RECITE** it. Paraphrase its specifics back to the adjudicator. Use a standalone visible message. Name rule 3's `actor=agent` killer-bless exception. That proves you read it. Confirm you will obey.
+3. **RECITE** it. STOP whatever you were asked to do. Paraphrase its specifics back to the adjudicator in a message that ENDS your turn — no tool call after the recital, or the harness may swallow it. Name rule 3's `actor=agent` killer-bless exception. That proves you read it. Confirm you will obey. Resume only after the recital is out.
 4. **HONOR** every instruction in it. No exceptions. To the letter of each statement.
 5. **READ** `product/brand/voice.md` next. Every output follows it. Chat and artifacts alike.
 
 <!-- ai:2 -->
-Re-read the contract at the start of every `engage`.
-No recital means the rules never loaded. The adjudicator should stop you.
+Re-read the contract at the start of every `engage`. One VISIBLE recital
+carries over the whole session; a new session always recites anew.
+No visible recital means the rules never loaded. The adjudicator should stop you.
 
 <!-- ai:2 -->
 Quackitect is a **user-driven gate ledger**. You, the agent, FILL checks. The adjudicator

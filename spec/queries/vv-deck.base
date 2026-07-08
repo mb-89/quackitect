@@ -4,6 +4,6 @@ filters:
 views:
   - type: table
     name: Verification matrix
-    order: [file.name, verifies]
+    order: [name, verifies]
     groupBy: verifies
     limit: 12

@@ -49,7 +49,7 @@ func usageText() string {
 	b := brand()
 	return b + ` — the determinizer lane (deterministic; no judgment).
 usage: ` + b + ` status [id] | next | start <id> [--plan] | why <id> | bless [--all|<id>] [--by A]
-       | note "..." | notes [--all] | gather <ver> | report [--out F] | ship | build
+       | note "..." | notes [--all] | gather <ver> | report [book] [--out F] | ship | build
        | lint | verify <id> | progress [--pager <gate>] | migrate-actors | migrate-layout | version`
 }
 
@@ -104,8 +104,6 @@ func Dispatch(args []string) {
 		cmdDecisions(rest)
 	case "mint":
 		cmdMint(rest)
-	case "book":
-		cmdBook(rest)
 	case "status":
 		cmdStatus(rest)
 	case "why":
@@ -154,6 +152,12 @@ func Dispatch(args []string) {
 	case "progress":
 		cmdProgress(rest)
 	case "report":
+		// `report book` renders the BOOK projection (owner ruling 2026-07-08: the book is a
+		// report sub-op, never a top-level command - one render surface, two projections).
+		if len(rest) > 0 && rest[0] == "book" {
+			cmdBook(rest[1:])
+			return
+		}
 		if hasFlag(rest, "--watch") {
 			serveWatch(flagVal(rest, "--port"))
 			return

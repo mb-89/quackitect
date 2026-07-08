@@ -637,9 +637,9 @@ func metricCards(nodes map[string]Node, sm map[string]string, cfg Config) string
 			esc(c.label), esc(c.val), esc(c.form), esc(c.val), esc(c.label)))
 	}
 	// the spec-book card (owner-directed, i12): clickable, opens the docu rendered beside this
-	// report (quack book writes book.html into the same out dir). Later enhancement recorded in
-	// the notes: the card shows which spec state the docu represents (its identity stamp).
-	b.WriteString("<a class=\"card\" href=\"book.html\" target=\"_blank\" rel=\"noopener\" style=\"text-decoration:none;color:inherit\" title=\"open the spec book in a new tab (render it with: quack book)\"><div class=\"cval\">📖 👆</div><div class=\"clabel\">The spec book — click to open</div></a>")
+	// report (quack report book writes book.html into the same out dir). Later enhancement
+	// recorded in the notes: the card shows which spec state the docu represents (its stamp).
+	b.WriteString("<a class=\"card\" href=\"book.html\" target=\"_blank\" rel=\"noopener\" style=\"text-decoration:none;color:inherit\" title=\"open the spec book in a new tab (render it with: quack report book)\"><div class=\"cval\">📖 👆</div><div class=\"clabel\">The spec book — click to open</div></a>")
 	return b.String()
 }
 

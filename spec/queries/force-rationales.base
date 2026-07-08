@@ -6,4 +6,4 @@ filters:
 views:
   - type: table
     name: Partitioning forces
-    order: [file.name, statement, refers]
+    order: [name, statement, refers]

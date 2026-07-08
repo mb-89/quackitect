@@ -327,6 +327,44 @@ func runSelftest(name string) bool {
 		return selftestLogRetention()
 	case "observe-red-refresh":
 		return selftestObserveRedRefresh()
+	case "shell-title-card":
+		return selftestShellTitleCard()
+	case "sidebar-order":
+		return selftestSidebarOrder()
+	case "section-paging":
+		return selftestSectionPaging()
+	case "search-hitlist":
+		return selftestSearchHitlist()
+	case "reader-columns":
+		return selftestReaderColumns()
+	case "table-render":
+		return selftestTableRender()
+	case "table-noise":
+		return selftestTableNoise()
+	case "table-interact":
+		return selftestTableInteract()
+	case "glossary-table":
+		return selftestGlossaryTable()
+	case "ref-tooltips":
+		return selftestRefTooltips()
+	case "ch6-no-graph":
+		return selftestCh6NoGraph()
+	case "icon-density":
+		return selftestIconDensity()
+	case "agent-guide-ch8":
+		return selftestAgentGuideCh8()
+	case "ch8-audience-subchapters":
+		return selftestCh8AudienceSubchapters()
+	case "ch3-ucfn-merge":
+		return selftestCh3UcfnMerge()
+	case "need-expand":
+		return selftestNeedExpand()
+	case "system-overview":
+		return selftestSystemOverview()
+	case "comment-persist":
+		return selftestCommentPersist()
+	case "deck-views-section":
+		return selftestDeckViewsSection()
 	case "ch4-mech":
 		return selftestCh4Mech()
 	case "verify-method":
@@ -865,7 +903,8 @@ func selftestStubs() bool {
 // RunSelftestCLI runs one named check (or all) and returns an exit code.
 func RunSelftestCLI(args []string) int {
 	all := []string{"deps", "parser", "determinism", "ids", "help", "parity", "perf", "deps-prompt", "report", "split", "integrate", "engine", "method", "surface", "build", "no-trace-gate", "tests-pass-eval", "workspace", "brand", "claude-vendor", "report-verdict", "report-nesting", "brand-resolves", "validation-global", "stubs", "readout", "contract", "bootstrap", "correctness", "report-live", "evidence-honesty", "tests-red", "parser-strict", "ref-integrity", "actor-channels", "design-hash-norm", "kernel-vectors", "kernel-cone", "kernel-gatewalk", "kernel-attest", "logs-dir", "ears-lint", "ears-method", "monotonic-lint",
-		"attest-block", "attest-console", "attest-challenge", "attest-grant", "attest-renewal", "attest-keys", "attest-expiry", "contract-render", "render-drift", "logs-canonical", "data-dir-caches", "truth-in-spec", "root-marker", "clean-status", "global-config", "global-binary", "engine-ratchet", "notes-out", "decisions-folder", "decision-classes", "parked-list", "decision-realized", "mint", "report-why", "report-filter-ux", "vv-time-scope", "verify-cache", "verify-feedback", "status-fast", "why-derived", "notes-list", "call-log", "mint-dedupe", "mint-rationale", "ratchet-semantic", "scaffold-modern", "pager-merge", "user-wording", "parity-standalone", "pager-scope", "suspect-root", "evidence-cache-cap", "evidence-hashed", "grandfathers-decided", "legacy-lanes-retired", "stamp-user", "testsred-exempt", "authoring-cheap", "ai-drafting", "guidance-split", "method-map", "template-system", "evidence-templates", "mint-skeleton", "type-stakeholders", "book-manifests", "book-orphan-lint", "book-single-file", "book-depth", "book-dom-static", "chapter-tldr", "book-identity", "llm-digestible", "book-figures", "glossary-shared", "meta-quarantine", "book-honesty", "provenance-icons", "agents-emit", "book-drift", "register-advisory", "book-a11y", "deck-mode", "ratings-map", "base-views", "spec-content-roots", "auto-link", "ch2-derived", "fig-tables", "decision-kinds", "candidates", "facet-board", "external-links", "residue-lint", "anchor-refers", "quarantine-scope", "item-templates", "spec-template-set", "stub-spec", "verdict-order", "render-refs", "need-item", "new-item-kinds", "note-tags", "quality-scenarios", "stakeholder-links", "mint-all-kinds", "example-notes", "ch4-mech", "block-tree-design", "verify-method", "results-exception", "criteria-validation", "chapter-canning", "doc-skeletons", "methods-view", "stubs-folders", "id-charset", "conn-notes", "conn-jsonl", "conn-one-lane", "conn-kinds", "conn-root", "conn-hash-neutral", "virtual-edges", "mint-connection", "promote-connection", "conn-adjacency", "edge-mode", "migrate-edges", "ch3-mech", "book-shell", "migrate-layout", "comment-island", "comment-suggest", "comment-privacy", "comment-readback", "comment-premark", "comment-escape", "comment-dom-static", "note-collision", "mint-edge-mode", "prose-marks-comments", "orphan-render-refs", "conn-code-designs", "launcher-single-dispatch", "build-fast-path", "verdict-surgical", "calls-summary", "selftest-home-sweep", "log-retention", "observe-red-refresh"}
+		"attest-block", "attest-console", "attest-challenge", "attest-grant", "attest-renewal", "attest-keys", "attest-expiry", "contract-render", "render-drift", "logs-canonical", "data-dir-caches", "truth-in-spec", "root-marker", "clean-status", "global-config", "global-binary", "engine-ratchet", "notes-out", "decisions-folder", "decision-classes", "parked-list", "decision-realized", "mint", "report-why", "report-filter-ux", "vv-time-scope", "verify-cache", "verify-feedback", "status-fast", "why-derived", "notes-list", "call-log", "mint-dedupe", "mint-rationale", "ratchet-semantic", "scaffold-modern", "pager-merge", "user-wording", "parity-standalone", "pager-scope", "suspect-root", "evidence-cache-cap", "evidence-hashed", "grandfathers-decided", "legacy-lanes-retired", "stamp-user", "testsred-exempt", "authoring-cheap", "ai-drafting", "guidance-split", "method-map", "template-system", "evidence-templates", "mint-skeleton", "type-stakeholders", "book-manifests", "book-orphan-lint", "book-single-file", "book-depth", "book-dom-static", "chapter-tldr", "book-identity", "llm-digestible", "book-figures", "glossary-shared", "meta-quarantine", "book-honesty", "provenance-icons", "agents-emit", "book-drift", "register-advisory", "book-a11y", "deck-mode", "ratings-map", "base-views", "spec-content-roots", "auto-link", "ch2-derived", "fig-tables", "decision-kinds", "candidates", "facet-board", "external-links", "residue-lint", "anchor-refers", "quarantine-scope", "item-templates", "spec-template-set", "stub-spec", "verdict-order", "render-refs", "need-item", "new-item-kinds", "note-tags", "quality-scenarios", "stakeholder-links", "mint-all-kinds", "example-notes", "ch4-mech", "block-tree-design", "verify-method", "results-exception", "criteria-validation", "chapter-canning", "doc-skeletons", "methods-view", "stubs-folders", "id-charset", "conn-notes", "conn-jsonl", "conn-one-lane", "conn-kinds", "conn-root", "conn-hash-neutral", "virtual-edges", "mint-connection", "promote-connection", "conn-adjacency", "edge-mode", "migrate-edges", "ch3-mech", "book-shell", "migrate-layout", "comment-island", "comment-suggest", "comment-privacy", "comment-readback", "comment-premark", "comment-escape", "comment-dom-static", "note-collision", "mint-edge-mode", "prose-marks-comments", "orphan-render-refs", "conn-code-designs", "launcher-single-dispatch", "build-fast-path", "verdict-surgical", "calls-summary", "selftest-home-sweep", "log-retention", "observe-red-refresh",
+		"shell-title-card", "sidebar-order", "section-paging", "search-hitlist", "reader-columns", "table-render", "table-noise", "table-interact", "glossary-table", "ref-tooltips", "ch6-no-graph", "icon-density", "agent-guide-ch8", "ch8-audience-subchapters", "ch3-ucfn-merge", "need-expand", "system-overview", "comment-persist", "deck-views-section"}
 	names := args
 	if len(names) == 0 {
 		names = all

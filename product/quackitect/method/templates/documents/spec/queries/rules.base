@@ -5,7 +5,7 @@ filters:
 views:
   - type: table
     name: Design rules
-    order: [file.name, statement, scope, refers]
+    order: [name, statement, scope, refers]
     sort:
       - property: scope
         direction: ASC

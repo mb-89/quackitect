@@ -4,4 +4,4 @@ filters:
 views:
   - type: table
     name: Needs
-    order: [file.name, statement, source, acceptance]
+    order: [name, statement]

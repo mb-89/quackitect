@@ -8,7 +8,7 @@ filters:
 views:
   - type: table
     name: Fundamentals
-    order: [file.name, statement]
+    order: [name, statement]
   - type: table
     name: Fundamentals in full
     render: full

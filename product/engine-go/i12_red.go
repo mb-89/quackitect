@@ -322,7 +322,8 @@ func selftestLlmDigestible() bool {
 	html, _, _ := renderBookHTML(bookFixture(dir, 2, true))
 	html = regexp.MustCompile(`(?s)<script>.*?</script>`).ReplaceAllString(html, "")
 	text := regexp.MustCompile(`<[^>]+>`).ReplaceAllString(html, " ")
-	for _, want := range []string{"The fixture shall be rendered.", "req-fix", "requirement", "reader's contract", "RATIONALEPROBE"} {
+	// the reader's-contract line died with the page header (i14, field c1)
+	for _, want := range []string{"The fixture shall be rendered.", "req-fix", "requirement", "RATIONALEPROBE"} {
 		if !strings.Contains(text, want) {
 			return false // statements, trust metadata, and layer labels survive extraction
 		}
@@ -467,19 +468,22 @@ func selftestBookHonesty() bool {
 
 // test-provenance-icons -> selftest:provenance-icons
 func selftestProvenanceIcons() bool {
+	// per-paragraph icon columns died at i14 (field c14): the paragraph keeps its
+	// data-ai RECORD; the visible column renders once per unit via unitAIColumn.
 	three := mdLite("<!-- ai:3 -->\nA fully drafted paragraph.\n")
-	if strings.Count(three, `aria-label="AI mark"`) != 3 {
-		return false // an AI draft renders with three marks
+	if strings.Contains(three, "ai-marks") || !strings.Contains(three, `data-ai="3"`) {
+		return false // the record stays, the inline column is gone
 	}
-	if !strings.Contains(three, "AI involvement: 3 of 3") {
-		return false // the machine-readable label rides the column
+	col := unitAIColumn(three)
+	if strings.Count(col, `aria-label="AI mark"`) != 3 || !strings.Contains(col, "AI involvement: 3 of 3") {
+		return false // the unit column carries the max with its machine-readable label
 	}
 	one := mdLite("<!-- ai:1 -->\nA reduced paragraph.\n")
-	if strings.Count(one, `aria-label="AI mark"`) != 1 {
+	if strings.Count(unitAIColumn(one), `aria-label="AI mark"`) != 1 {
 		return false // a user-reduced value renders reduced
 	}
 	zero := mdLite("<!-- ai:0 -->\nThe user's own words.\n")
-	if strings.Count(zero, `aria-label="AI mark"`) != 0 || !strings.Contains(zero, `data-ai="0"`) {
+	if unitAIColumn(zero) != "" || !strings.Contains(zero, `data-ai="0"`) {
 		return false // explicit pure-human renders no marks and keeps the record
 	}
 	if strings.Count(aiMarkColumn(7), `aria-label="AI mark"`) > 3 {
@@ -598,7 +602,8 @@ func selftestBookA11y() bool {
 	os.WriteFile(pp, []byte("---\nid: man-preset-x\ntype: manifest\nmode: preset\nstatement: X.\n---\n[man-fix](man-fix.md)\n"), 0o644)
 	fx["man-preset-x"] = Node{ID: "man-preset-x", Type: "manifest", Mode: "preset", Statement: "X.", Path: pp}
 	html, _, _ := renderBookHTML(fx)
-	for _, want := range []string{"<header", "<main", `aria-label="views"`, "<h1>", "<summary>"} {
+	// the header landmark died with the page header (i14, field c1); nav+main carry the structure
+	for _, want := range []string{"<main", `aria-label="views"`, "<h1>", "<summary>"} {
 		if !strings.Contains(html, want) {
 			return false // landmarks and heading structure
 		}

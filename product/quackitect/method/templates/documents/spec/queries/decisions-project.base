@@ -5,4 +5,4 @@ filters:
 views:
   - type: table
     name: Project decisions
-    order: [file.name, statement]
+    order: [name, statement]

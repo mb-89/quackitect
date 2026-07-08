@@ -14,12 +14,13 @@ Do this before anything else on this project:
 
 1. **READ** `product/quackitect/method/prompts/contract.md`. The whole file, with your file-reading tool. No skimming. No summaries. No memory of a past session.
 2. **UNDERSTAND** it. It is binding. It overrides your defaults. It governs every move you make here.
-3. **RECITE** it. Paraphrase its specifics back to the adjudicator. Use a standalone visible message. Name rule 3's `actor=agent` killer-bless exception. That proves you read it. Confirm you will obey.
+3. **RECITE** it. STOP whatever you were asked to do. Paraphrase its specifics back to the adjudicator in a message that ENDS your turn — no tool call after the recital, or the harness may swallow it. Name rule 3's `actor=agent` killer-bless exception. That proves you read it. Confirm you will obey. Resume only after the recital is out.
 4. **HONOR** every instruction in it. No exceptions. To the letter of each statement.
 5. **READ** `product/brand/voice.md` next. Every output follows it. Chat and artifacts alike.
 
-Re-read the contract at the start of every `engage`.
-No recital means the rules never loaded. The adjudicator should stop you.
+Re-read the contract at the start of every `engage`. One VISIBLE recital
+carries over the whole session; a new session always recites anew.
+No visible recital means the rules never loaded. The adjudicator should stop you.
 
 Quackitect is a **user-driven gate ledger**. You, the agent, FILL checks. The adjudicator
 ADJUDICATES the ones that are gates. **Never bless on their behalf.**
@@ -49,13 +50,15 @@ quack bless [--all|<id>] [--by user|agent] # record an adjudication; actor defau
 quack migrate-actors     # one-shot: rewrite pre-i11 actor stamps to user (audited; no-op when done)
 quack migrate-layout     # one-shot: move a pre-i12 spec to the template-mirroring layout (no-op when done)
 quack note "<text>"      # deterministic capture lane
+quack note --file2list <copy.html> # list a commented book copy as note candidates (roles, never names)
 quack notes [--all]      # list open inbox notes (--all adds backlog + archive)
-quack observe-red <test> # run a test and record it FAILING at its current hash (a pass is refused)
+quack observe-red <test> [--refresh] # run a test and record it FAILING at its current hash (a pass is refused; --refresh re-attests an amended, still-failing test)
 quack gather <ver>       # collect all rigor+type source for an iteration
 quack report [--watch]   # render+open the live HTML board (--out F renders only)
 quack progress [--pager <gate>] # the readout, or the handover pager for a killer/milestone gate
+quack calls --summary    # print the call-log aggregate, then delete the log (the retro's log step)
 quack ship               # package product/ -> the workspace data home (out/)
-quack build              # compile the engine, write the build stamp, re-baseline golden-root
+quack build              # compile the engine, write the build stamp, re-baseline golden-root (skips the compile when no engine source changed)
 quack lint               # coverage holes, duplicate ids, EARS lint, monotonic wiring
 quack selftest           # the engine's own dependency-free self-test
 quack version            # engine version + the resolved data locations

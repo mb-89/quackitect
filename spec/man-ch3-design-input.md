@@ -2,6 +2,7 @@
 id: man-ch3-design-input
 type: manifest
 mode: chapter
+order: 30
 statement: Design input - context, stakeholders, and every checkable claim on the system.
 ---
 ## What the system must do
@@ -60,55 +61,20 @@ The context moves with time, and the system plans for it. The engine ratchets fo
 Sources: the four-step pipeline @[[ref-generic-se]].
 -->
 <!-- ai:3 -->
-Every requirement's source traces to a row below; the statement column carries the concern. Where two rows pull against each other, the tension renders beneath the table - the reasoning is one click away.
-
-![[stakeholder-matrix.base]]
+The stakeholder table lives in the [orientation chapter](man-ch0-orientation.md); every requirement's source traces to one of its rows (c29: one table, not two). Where two stakeholders pull against each other, the tension renders below - the reasoning is one click away.
 
 ![[tensions.base]]
 ---
-## Use cases
-<!-- tailor: shipped machinery - the view renders every use case state-aware at
-  depth 2 (statement, gate state, rationale one disclosure away).
-Sources: Cockburn use-case fields @[[ref-sya-re]].
+## Use cases and functions
+<!-- tailor: shipped machinery - ONE deterministic per-need board (field c25): a need
+  row expands into its functions (the need item's `functions:` list, verb plus noun,
+  solution-neutral) and its use cases (the refines edges). Never authored prose.
+Sources: Cockburn use-case fields @[[ref-sya-re]]; functional decomposition @[[ref-pahl-beitz]].
 -->
 <!-- ai:3 -->
-One section per use case, live from the graph - actors and trigger on the item, the success scenario in its body.
-
-![[usecases.base]]
+One row per need, live from the graph. Expand a need to see its functions and its use cases side by side.
 ---
-## Functions
-<!-- fill [judgment]
-Contents: the functional structure - verb plus noun, solution-neutral.
-Motivation: physical types decompose by function before form (Pahl/Beitz).
-Form: a tree or list. SKIP where the use cases already carry the functional
-  story - record the skip in the tailoring row.
-Sources: functional decomposition @[[ref-pahl-beitz]].
--->
-<!-- ai:3 -->
-The functional structure, one verb plus one noun per function, solution-neutral:
-
-<!-- ai:3 -->
-- Capture input
-  - capture a note
-  - mint an item
-  - record a connection
-- Advance the walk
-  - pick the next check
-  - record an adjudication
-  - reopen a changed check
-- Guard honesty
-  - hash every input
-  - attest a session
-  - observe a test failing
-- Derive output
-  - render the book
-  - emit the entry files
-  - evaluate a query
-  - compute coverage
-- Sustain itself
-  - rebuild the engine
-  - migrate a workspace
-  - test itself
+fig: ucfn-board
 ---
 ## Qualities
 <!-- tailor: shipped machinery - the six scenario fields live ON the quality
@@ -121,6 +87,8 @@ Sources: metric rule @[[ref-systementwurf-mechatronik]]; six-part scenarios
 Every quality below carries its six-part scenario, and the response measure is its pass line - a quality without a measure is a mood.
 
 ![[qualities.base]]
+---
+[req-responsive-status](req-responsive-status.md) depth:2
 ---
 ## Constraints
 <!-- tailor: shipped machinery - constraints are kind-constraint requirements,

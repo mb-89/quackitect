@@ -5,4 +5,4 @@ filters:
 views:
   - type: table
     name: Architecture decisions
-    order: [file.name, statement, addresses]
+    order: [name, statement, addresses]

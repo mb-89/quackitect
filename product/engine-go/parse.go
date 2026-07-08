@@ -31,6 +31,7 @@ type Node struct {
 	TestsRed string // "" | "exempt - <reason>": pre-mechanism tests-red exemption, recorded ON the node (req-testsred-exempt)
 	Guidance string // "" | <slug>: points at the guidance doc holding this node's internals (req-guidance-split)
 	Mode     string // manifest nodes only: chapter | preset | deck | exclude (req-book-manifests)
+	Order    int    // manifest chapter order (req-system-overview): explicit render slot; 0 = fall back to id sort
 	ReadyWhen  string   // defer condition (go-decisions): write-once; scrap edge + ready_when = defer
 	Supersedes []string // decision exit (go-decisions): an incoming supersedes edge = superseded
 	// design: go-ratings-map  implements: req-ratings-map
@@ -145,6 +146,20 @@ func ParseNode(path string) Node {
 			n.Guidance = v
 		case "mode":
 			n.Mode = v
+		case "order":
+			o := 0
+			neg := strings.HasPrefix(v, "-")
+			for _, c := range strings.TrimPrefix(v, "-") {
+				if c >= '0' && c <= '9' {
+					o = o*10 + int(c-'0')
+				} else {
+					break
+				}
+			}
+			if neg {
+				o = -o
+			}
+			n.Order = o
 		case "kind":
 			n.Kind = v
 		case "axis":

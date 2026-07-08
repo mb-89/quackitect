@@ -13,7 +13,7 @@ import (
 	"time"
 )
 
-// design: go-verdict-cache  implements: req-verify-cache, req-status-fast
+// design: go-verdict-cache  implements: req-verify-cache, req-status-fast, req-responsive-status
 // One JSON verdict map in the data home (adr-verdict-cache): test id -> {input hash, build id,
 // result, ms}. The build identity is the sha256 self-hash of the running binary
 // (adr-build-identity) — a rebuild always invalidates; a forgotten version bump cannot lie. The

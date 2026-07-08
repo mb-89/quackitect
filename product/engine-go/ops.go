@@ -525,7 +525,7 @@ func cmdShip(args []string) {
 		w, _ := zw.Create("book.html")
 		io.Copy(w, strings.NewReader(html))
 	} else {
-		fmt.Fprintln(os.Stderr, "ship: the book has findings and was NOT packaged - run quack book")
+		fmt.Fprintln(os.Stderr, "ship: the book has findings and was NOT packaged - run quack report book")
 	}
 	rp := filepath.Join(dest, "report.html")
 	if err := RenderReport(rp); err == nil {

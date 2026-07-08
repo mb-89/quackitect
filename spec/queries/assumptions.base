@@ -5,4 +5,4 @@ filters:
 views:
   - type: table
     name: Design-relevant assumptions
-    order: [file.name, statement, status]
+    order: [name, statement, status]

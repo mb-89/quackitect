@@ -15,6 +15,9 @@ is a wish (the RE rule) - every need names its source. Id prefix `need-`.
 - `source` (stk- id): the stakeholder this need comes from.
 - `acceptance` (one checkable sentence, or a crit- id): what accepts the need
   as met - the validation chapter checks exactly this.
+- `functions` (list, optional): the need's functional structure - one verb plus
+  one noun per entry, solution-neutral (Pahl/Beitz). The ch3 use-cases-and-
+  functions board renders it beside the need's use cases (i14, field c25).
 
 ## Body
 Context and elicitation notes. Use cases refine the need via `refines`.

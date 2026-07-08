@@ -7,4 +7,8 @@ class: review
 killer: false
 ---
 ## Rationale (not load-bearing)
-TODO
+A decision could carry a status field with its own lifecycle.
+That lifecycle would duplicate the gate ledger's state machine.
+The ledger already tracks proposed, accepted, and retired states through blesses.
+Decision model v2 derives the class from graph facts instead: an edge to the scrap sink is a veto or defer, an incoming supersedes edge is superseded.
+A hand-set status would be a second source of truth that could drift from the graph.

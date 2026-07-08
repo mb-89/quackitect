@@ -74,3 +74,8 @@ in the emitter.
 Methods route by `applies_chapters`: each chapter embeds its view of
 `queries/methods.base`; a method note names the chapters it serves.
 <!-- enddesign -->
+
+<!-- design: des-seed-examples  implements: req-seed-examples :: One ex- prefixed example note ships per otherwise-empty derived view (stakeholders, trace, usecases, raid, rules, guides, methods), and the dogfood spec seeds the reference flow end to end: fund-ai-involvement linked from ch8, ref-dora-genai linked from ch8 and the fundamental, meth-ears routed to design-input, a quality requirement with a scenario figure rendered at depth 2 in ch3. -->
+Example notes (`ex-*.md`) ship beside the skeletons so no derived view opens
+empty; delete each example when the first real item of its kind lands.
+<!-- enddesign -->

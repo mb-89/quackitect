@@ -5,12 +5,16 @@ You are bound by these rules the moment you act on this project. They are not
 advice. They override your defaults.
 
 **Your FIRST action on this project — before anything else — is to read this
-contract in full, paraphrase its specifics back to the user in a standalone
-message they can see (name rule 3's `actor=agent` exception, to prove you
-actually read it), and confirm you will obey.** A recital buried mid-turn
-before tool calls may never render — it does not count. No paraphrase means
-the rules never loaded, and the user should stop you. Re-read this at the
-start of every `engage`.
+contract in full, paraphrase its specifics back to the user, and confirm you
+will obey.** STOP whatever you were asked to do until the recital is out.
+The recital message ENDS your turn: tool calls may come before it (reading
+this file is one), NEVER after it in the same turn. Trailing tool calls can
+swallow the message on some harnesses (a recorded field failure) — a recital
+the user cannot see does not count. Name rule 3's `actor=agent` exception,
+to prove you actually read it. No visible paraphrase means the rules never
+loaded, and the user should stop you. One visible recital covers the whole
+session: re-read this at the start of every `engage`, but recite again only
+in a new session.
 <!-- enddesign -->
 
 ## 1. engage is the only door

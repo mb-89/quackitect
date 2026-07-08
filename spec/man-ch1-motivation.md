@@ -2,6 +2,7 @@
 id: man-ch1-motivation
 type: manifest
 mode: chapter
+order: 10
 statement: Motivation - where we want to be, and why we can get there.
 ---
 ## The big idea
@@ -11,7 +12,7 @@ Motivation: a newcomer may read only this chapter - the lede must carry it.
 Form: two to four sentences.
 -->
 <!-- ai:3 -->
-AI agents produce work faster than any person can check line by line. Quackitect keeps the person in charge anyway: the agent fills checks, a person adjudicates the [gates](term:gate), and a deterministic [engine](term:engine) keeps the record honest. This chapter holds the goal, the starting point, and what proves the gap closed.
+The bottleneck of AI-driven work has moved. It is no longer how fast the agent produces - it is how much of the result a person can honestly vouch for. Quackitect moves that limit: the agent fills checks, a person adjudicates the [gates](term:gate), and a deterministic [engine](term:engine) keeps the record honest - so one person can stand behind far more work than they could ever read. This chapter holds the goal, the starting point, and what proves the gap closed.
 ---
 ## Where we want to be
 <!-- fill [mandatory]
@@ -59,7 +60,7 @@ Documentation does not get written. Hand-written documents fall behind the work 
 <!-- fill [mandatory]
 Contents: two authored moves - the gap as a claim (what every existing
   alternative sheds) and why it is closable now (the why-now pattern). The
-  success criteria are crit- ITEMS - the derived table below renders them.
+  success criteria live on the needs - each need carries its pass lines; the view below renders them.
 Motivation: the criteria are exactly what the validation chapter checks against
   - the V-model's outer arc, as data. A criterion nothing will ever check is
   not a criterion.

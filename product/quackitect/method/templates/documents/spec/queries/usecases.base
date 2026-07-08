@@ -10,4 +10,4 @@ views:
     render: refs
     depth: 2
     groupBy: refines
-    order: [file.name, statement]
+    order: [name, statement]

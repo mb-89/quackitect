@@ -7,4 +7,8 @@ class: review
 killer: false
 ---
 ## Rationale (not load-bearing)
-TODO
+An early idea let the agent pass a flag to say a person had authorized a step.
+A flag set by the agent proves nothing about a person.
+The attestation gate exists to give a structural proof that a person acted.
+A relayed grant reopens the exact gap the gate was built to close.
+So authorization must come through the grant-challenge-key ritual, never a chat-relayed flag.

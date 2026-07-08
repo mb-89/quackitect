@@ -2,6 +2,7 @@
 id: man-ch1-motivation
 type: manifest
 mode: chapter
+order: 10
 statement: Motivation - where we want to be, and why we can get there.
 ---
 <!-- design: method-criteria-items  implements: req-criteria-validation :: Success criteria are crit- items (metric, target): the delta unit renders them as the criteria view, and the ch5 validation view traces the same rows to their outcomes - the V-model's outer arc as data. -->
@@ -43,7 +44,7 @@ Form: prose, present tense, one paragraph per pain.
 <!-- fill [mandatory]
 Contents: two authored moves - the gap as a claim (what every existing
   alternative sheds) and why it is closable now (the why-now pattern). The
-  success criteria are crit- ITEMS - the derived table below renders them.
+  success criteria live on the needs - each need carries its pass lines; the view below renders them.
 Motivation: the criteria are exactly what the validation chapter checks against
   - the V-model's outer arc, as data. A criterion nothing will ever check is
   not a criterion.

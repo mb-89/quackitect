@@ -2,7 +2,8 @@
 id: man-ch8-guidance
 type: manifest
 mode: guidance
-statement: Guidance - fundamentals in full, the guides, and how this document is made.
+order: 80
+statement: Appendix - internals, rationales, and how this document is made.
 ---
 ## Who this chapter serves
 <!-- tailor: shipped text - the quarantine is mechanical and identical everywhere.
@@ -20,24 +21,15 @@ The full body of every fundamental the document uses renders here - one link awa
 ![[fundamentals.base#Fundamentals in full]]
 ---
 ## Guides
-<!-- fill [judgment]
-Contents: one subchapter per audience that needs one - User, Developer,
-  Maintainer, Agent. Each guide is a note tagged to its stakeholder class; the
-  reader-matrix row links its guide. Demand-driven - a guide exists where an
-  audience needs one, not one per class by decree.
+<!-- tailor: shipped machinery since i14 (field c42) - the audience subchapters render
+  mechanically, one per stakeholder class of the project type, empty ones included; the
+  agent class hosts the agent-guide manifest (it also emits the repo entry file).
 Motivation: guides are the how-to mode; fundamentals the explanation mode; the
   spec chapters stay pure reference - the modes never blend (Diataxis).
-Form: authored guide notes, linked or hosted here. The agent guide stays its own
-  manifest (it emits the repo entry file) and renders as the final section.
 Sources: the four modes @[[ref-diataxis]].
 -->
 <!-- ai:3 -->
-Guides exist where an audience demanded one:
-
-<!-- ai:3 -->
-- The agent guide is its own manifest and renders as the final section of this document. It is also the source of the repository's entry file - one source, two projections.
-- The owner drives the loop from the console. The board comes from `quack status`, the next check from `quack next`, an adjudication through `quack bless`, and this book through `quack report`. The contract in the method layer binds the agent, never the owner.
-- No separate user or developer guide exists yet. The demand has not appeared: the console surface serves the owner, and the engine's self-test names document its internals. A guide lands here the day an audience asks - the skip is deliberate and recorded.
+One subchapter per audience follows, rendered even where no guide exists yet - an honest hole beats a hidden one. This document follows three laws throughout. Derived over authored: where a section can be computed from the items, it renders as a query; authored prose appears only where judgment adds something a query cannot, and a derivable section written by hand is a defect. No green ocean: failing or missing items render prominently and easily reachable; passing masses collapse into counts. One screen by default: every derived view fits one screen in its default state, with full detail one interaction away - the reading flow is as deep or shallow as the reader wants.
 ---
 ## About this document
 <!-- tailor: shipped text - the making, the marks, and the correction loop are
@@ -47,7 +39,15 @@ Guides exist where an audience demanded one:
 The authored source notes are the truth; every projection - this document included - is deterministic and disposable. The identity stamp in the header names the exact source state rendered.
 
 <!-- ai:3 -->
-The margin marks measure AI involvement and nothing else: three at a full draft, fewer only where a person reworked the core. They are never a statement about quality or review - the author owns everything published, whatever the AI share.
+The margin marks measure [AI involvement](fund-ai-involvement) and nothing else: three at a full draft, fewer only where a person reworked the core (field evidence: [DORA on gen-AI](ref-dora-genai)). They are never a statement about quality or review - the author owns everything published, whatever the AI share.
 
 <!-- ai:3 -->
 To correct this document, correct the SOURCE note - never the projection. Regenerate, and the correction either took or the source needs another pass. That loop is the document's warranty.
+---
+## Rationales
+<!-- tailor: shipped text - the rationale view derives in referent order (annex style),
+  folded into the appendix (owner 2026-07-08: the standalone chapter was too empty). -->
+<!-- ai:3 -->
+The deep whys live here, each keyed to the clause or item it explains, in referent order. Navigate from the thing to its why.
+
+![[rationales.base]]

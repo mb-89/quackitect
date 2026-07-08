@@ -2,6 +2,7 @@
 id: man-ch2-fundamentals
 type: manifest
 mode: chapter
+order: 20
 statement: Fundamentals - the concepts, references, and notation this document stands on.
 ---
 ## What this chapter is

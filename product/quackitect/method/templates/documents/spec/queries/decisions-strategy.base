@@ -6,4 +6,4 @@ filters:
 views:
   - type: table
     name: Strategy decisions
-    order: [file.name, statement, addresses]
+    order: [name, statement, addresses]

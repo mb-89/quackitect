@@ -2,6 +2,7 @@
 id: man-ch5-verification-validation
 type: manifest
 mode: chapter
+order: 50
 statement: Verification and validation - thing built right, right thing built.
 ---
 ## How we know it works
@@ -9,6 +10,18 @@ statement: Verification and validation - thing built right, right thing built.
 -->
 <!-- ai:3 -->
 Verification checks the thing was built right - every requirement against its evidence. Validation checks the right thing was built - the outcome against the needs and the success criteria. Both derive from the ledger below; the book can never claim more than the [gate](term:gate) states.
+---
+## The verdict first
+<!-- tailor: shipped machinery - the exceptions view opens the chapter (bs20 ruling,
+  2026-07-08, the no-green-ocean law): the verified mass as one derived count, every
+  unverified requirement rendered prominently by name. With zero exceptions the block
+  is one green sentence. The full matrix follows further down for the deep reader.
+Sources: the empty-row check @[[ref-generic-se]]; the lab rule @[[ref-mess-pruef-dok]].
+-->
+<!-- ai:3 -->
+The count below says how much is verified. Anything unverified renders here by name, before everything else - a hole never hides on page nine of a green table.
+---
+fig: vv-exceptions
 ---
 ## Strategy
 <!-- tailor: shipped text - the method and level per test are FIELDS on the test
@@ -21,24 +34,16 @@ Sources: model-first @[[ref-systementwurf-mechatronik]]; the orbit lesson
 Each test declares its method (test, analysis, inspection, demonstration) and its level (unit, integration, system, acceptance) - the matrix renders both. Verify on models early: an analytic reference case is the cheapest experiment. Integration-level evidence outweighs paper compliance - written compliance did not stop a receiver failing in orbit.
 ---
 ## The verification matrix
-<!-- tailor: shipped text - the matrix derives; an empty row IS the finding.
+<!-- tailor: shipped text - the matrix derives; an empty row IS the finding, and it
+  ALSO renders in the verdict-first block above (bs20 ruling: the exceptions lead,
+  the full matrix serves the deep reader - paged by need, rows collapsed to names,
+  expandable).
 Sources: the empty-row check @[[ref-generic-se]].
 -->
 <!-- ai:3 -->
-Every requirement below stands against its verifying evidence, cumulative across iterations. An empty row is a mechanically visible unverified requirement - the matrix cannot hide one. A [bless](term:bless) turns a row verified; a changed input turns it [suspect](term:suspect).
+Every requirement below stands against its verifying evidence, cumulative across iterations. An empty row is a mechanically visible unverified requirement - the matrix cannot hide one, and the verdict block above renders every such row by name. A [bless](term:bless) turns a row verified; a changed input turns it [suspect](term:suspect).
 
 ![[vv-matrix.base]]
----
-## Results and discussion
-<!-- tailor: shipped machinery - the ledger renders results BY EXCEPTION: the
-  green mass as a count, failures and accepted deviations prominently. The
-  discussion prose per failure lives on the failing test item's body.
-Sources: the lab rule @[[ref-mess-pruef-dok]].
--->
-<!-- ai:3 -->
-The count below summarizes what passed. Everything else renders by name - a failure without its discussion is not a result.
----
-fig: results-exception
 ---
 ## Validation
 <!-- fill [mandatory]

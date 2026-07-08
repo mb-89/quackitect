@@ -255,7 +255,10 @@ const reportJS = `
     if(cy){cy.destroy();}
     cy = cytoscape({container:host, elements:tabs[i].elements, style:STYLE,
       layout:{name:'preset'}, wheelSensitivity:0.2});
-    cy.on('tap','node',function(e){showDetail(D.checks[e.target.id()]);});
+    // the node tap is the ONE behaviour a host overrides (the book transports to the item's
+    // table row instead of opening the report's detail panel); unset, the report is unchanged.
+    window.__quackGraphRefit=function(){ if(cy){ cy.resize(); relayout(); } };
+    cy.on('tap','node',function(e){ if(window.QUACK_NODE_TAP){ window.QUACK_NODE_TAP(e.target.id()); return; } showDetail(D.checks[e.target.id()]);});
     cy.on('dbltap','node',function(e){ // dblclick on a node applies the descendants filter for it
       var f=document.getElementById('trace-filter');
       if(f){f.value='descendants:'+e.target.id(); applyFilter();}

@@ -7,4 +7,8 @@ class: review
 killer: false
 ---
 ## Rationale (not load-bearing)
-TODO
+A session key could be cached to disk for convenience.
+Key hygiene requires that holding the key proves the ritual was done.
+A file on disk outlives the session that earned it.
+Anyone who reads the file could then act without the ritual.
+So only sha256 hashes are stored, and the plaintext key lives in exactly one place: the conversation that received it.

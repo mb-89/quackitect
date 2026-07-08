@@ -2,6 +2,6 @@
 # Machine-local overrides (logs_dir, ...) live in the GLOBAL user config, never here.
 [iteration]
 type    = "default"
-rigor   = "systematic"
-version = "i0013_comments"
+rigor   = "lean"
+version = "i0014_doc_review"
 edges = "connections"

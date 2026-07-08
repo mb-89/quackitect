@@ -1,6 +1,6 @@
 # engage — advance the iteration:  start | next | refine | ship
 
-> **Re-read the contract.** Load `product/quackitect/method/prompts/contract.md` before you touch the ledger. It binds every step below.
+> **Re-read the contract.** Load `product/quackitect/method/prompts/contract.md` before you touch the ledger. It binds every step below. If this session has NO visible recital out yet, recite NOW — as a message that ends your turn, no tool call after it. A session's visible recital carries over between engages.
 
 ## start  (plan + begin an iteration)
 0. **health check** — a sound workspace before any planning: `git status` clean (expected strays only) and `git fsck --no-dangling` quiet; then `quack build` and `quack selftest` all green. A corrupt git index (`rm .git/index; git reset`) is recoverable while the objects are intact — external agents with filesystem access have silently truncated files here before. Do not plan on a sick workspace.

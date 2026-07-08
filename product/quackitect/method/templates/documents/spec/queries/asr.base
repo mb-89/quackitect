@@ -8,7 +8,7 @@ filters:
 views:
   - type: table
     name: Architecturally significant requirements
-    order: [file.name, statement, kind, weight]
+    order: [name, statement, kind]
     sort:
       - property: weight
         direction: DESC

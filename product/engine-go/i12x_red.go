@@ -650,8 +650,10 @@ func selftestNeedItem() bool {
 	if !strings.Contains(t, "## Fields") || !strings.Contains(t, "`source`") || !strings.Contains(t, "`acceptance`") {
 		return false
 	}
+	// source and acceptance stay ITEM fields; the reader view shows name+statement
+	// only since i14 (field c18, req-reader-columns)
 	q, err := os.ReadFile(filepath.Join(specQueryDir(), "needs.base"))
-	if err != nil || !strings.Contains(string(q), "source") || !strings.Contains(string(q), "acceptance") {
+	if err != nil || !strings.Contains(string(q), "[name, statement]") {
 		return false
 	}
 	// a fixture need renders both columns
@@ -664,7 +666,7 @@ func selftestNeedItem() bool {
 		return false
 	}
 	cells := strings.Join(rs[0].Groups[0].Rows[0].Cells, "|")
-	return strings.Contains(cells, "stk-owner") && strings.Contains(cells, "the board renders green")
+	return strings.Contains(cells, "The owner needs a green board.") && strings.Contains(cells, "x")
 }
 
 // test-new-item-kinds -> selftest:new-item-kinds
@@ -990,8 +992,8 @@ func selftestCh3Mech() bool {
 			return false
 		}
 	}
-	// the mechanized views embed
-	for _, want := range []string{"![[stakeholder-matrix.base]]", "![[tensions.base]]", "![[usecases.base]]",
+	// the mechanized views embed (use cases merged into the ucfn board at i14, field c25)
+	for _, want := range []string{"![[stakeholder-matrix.base]]", "![[tensions.base]]", "fig: ucfn-board",
 		"![[qualities.base]]", "![[constraints.base]]", "![[requirements.base]]", "![[assumptions.base]]",
 		"![[methods.base#Methods for design-input]]"} {
 		if !strings.Contains(t, want) {
@@ -1186,8 +1188,9 @@ func selftestBookShell() bool {
 			return false
 		}
 	}
-	// the identity header and the content column survive the shell
-	if !strings.Contains(html, "<header") || !strings.Contains(html, "<main") {
+	// the identity (title card since i14, field c1 - the page header is gone) and the
+	// content column survive the shell
+	if !strings.Contains(html, `id="book-info"`) || !strings.Contains(html, "<main") {
 		return false
 	}
 	// the dom-static law extends to the shell: the SHELL script toggles, never creates.
