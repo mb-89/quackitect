@@ -265,3 +265,5 @@
 {"src":"test-comment-ux","dst":"req-comment-ux"}
 {"src":"test-criteria-in-needs","dst":"req-criteria-in-needs"}
 {"src":"test-table-facets","dst":"req-table-facets"}
+{"src":"test-fig-fullscreen","dst":"req-fig-fullscreen"}
+{"src":"test-external-engine-root","dst":"req-workspace-split"}

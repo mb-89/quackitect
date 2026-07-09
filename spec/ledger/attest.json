@@ -21368,5 +21368,128 @@
       "i14-m4-tests-red": "f29e295548ef"
     },
     "prev_hash": null
+  },
+  {
+    "check": "test-context-diagram",
+    "action": "red-observed",
+    "actor": "tester",
+    "ts": "2026-07-09T10:56:54+01:00",
+    "hash": "4b987e5822af",
+    "statement_hash": "5373aa86c22c",
+    "deps": null,
+    "prev_hash": null
+  },
+  {
+    "check": "i14-m4-internal-quality",
+    "action": "bless",
+    "actor": "agent",
+    "filled_by": "agent",
+    "ts": "2026-07-09T11:02:17+01:00",
+    "hash": "417f8c76f5c2",
+    "statement_hash": "2e63a76a9c86",
+    "deps": {
+      "i14-m3-gate": "0da55777ba49"
+    },
+    "prev_hash": null
+  },
+  {
+    "check": "i14-m4-build",
+    "action": "bless",
+    "actor": "agent",
+    "filled_by": "agent",
+    "ts": "2026-07-09T12:13:28+01:00",
+    "hash": "d0dcc1a39d29",
+    "statement_hash": "a1c7357a429c",
+    "deps": {
+      "i14-bs01-shell-card": "4145eb60844e",
+      "i14-bs02-sidebar-order": "2a9f9b025acd",
+      "i14-bs03-section-paging": "9f4c00e9b2fb",
+      "i14-bs04-search-hitlist": "33aa1c082eba",
+      "i14-bs05-reader-columns": "978aa4eb2fbb",
+      "i14-bs06-table-render": "38aef9659c37",
+      "i14-bs07-table-interact": "a4c66ee2a6c8",
+      "i14-bs08-ref-tooltips": "3a2980caafaf",
+      "i14-bs09-icon-density": "47921f686529",
+      "i14-bs10-ch6-no-graph": "0183f53ecda0",
+      "i14-bs11-guide-ch8": "2346ea5b7d88",
+      "i14-bs12-ucfn-merge": "012d60fd7b1d",
+      "i14-bs13-system-overview": "0272735d61a4",
+      "i14-bs14-deck-views": "bc0762e70d39",
+      "i14-bs15-comment-persist": "deb7bdd55602",
+      "i14-bs16-seed-examples": "f4b24a3ff272",
+      "i14-bs17-prose-rework": "1c92e8164c93",
+      "i14-bs18-derived-prose": "f743a1209457",
+      "i14-bs19-lint-probe": "5962a5a4abae",
+      "i14-bs20-compact-renders": "496f8b4a18b9",
+      "i14-m4-tests-red": "f29e295548ef"
+    },
+    "prev_hash": null
+  },
+  {
+    "check": "i14-m4-gate",
+    "action": "bless",
+    "actor": "user",
+    "filled_by": "agent",
+    "ts": "2026-07-09T13:17:53+01:00",
+    "hash": "de475ea2caae",
+    "statement_hash": "85f912375460",
+    "deps": {
+      "i14-m4-build": "d0dcc1a39d29",
+      "i14-m4-designs-realized": "69e0303bb95b",
+      "i14-m4-internal-quality": "417f8c76f5c2",
+      "i14-m4-tests-pass": "968073769faa",
+      "i14-m4-tests-red": "f29e295548ef"
+    },
+    "prev_hash": null
+  },
+  {
+    "check": "i14-m5-docs-match",
+    "action": "bless",
+    "actor": "user",
+    "filled_by": "agent",
+    "ts": "2026-07-09T13:24:02+01:00",
+    "hash": "1b22fa99412d",
+    "statement_hash": "ccea65c7e256",
+    "deps": {
+      "i14-m4-gate": "de475ea2caae"
+    },
+    "prev_hash": null
+  },
+  {
+    "check": "i14-m5-packaged",
+    "action": "bless",
+    "actor": "agent",
+    "filled_by": "agent",
+    "ts": "2026-07-09T13:26:01+01:00",
+    "hash": "4b7f9772dc22",
+    "statement_hash": "042baefe970b",
+    "deps": {
+      "i14-m4-gate": "de475ea2caae"
+    },
+    "prev_hash": null
+  },
+  {
+    "check": "i14-m5-gate",
+    "action": "bless",
+    "actor": "user",
+    "filled_by": "agent",
+    "ts": "2026-07-09T13:34:50+01:00",
+    "hash": "30e493420b82",
+    "statement_hash": "f94e4173d6ec",
+    "deps": {
+      "i14-m5-docs-match": "1b22fa99412d",
+      "i14-m5-packaged": "4b7f9772dc22"
+    },
+    "prev_hash": null
+  },
+  {
+    "check": "test-external-engine-root",
+    "action": "red-observed",
+    "actor": "tester",
+    "ts": "2026-07-09T13:47:55+01:00",
+    "hash": "6fcfaa12ee32",
+    "statement_hash": "d82ba75bb752",
+    "deps": null,
+    "prev_hash": null
   }
 ]

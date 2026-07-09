@@ -24,7 +24,7 @@ var mintPrefix = map[string]string{
 	"need": "need-", "usecase": "uc-", "requirement": "req-", "test": "test-", "adr": "adr-",
 	"stakeholder": "stk-", "candidate": "cand-", "raid": "raid-", "rationale": "why-",
 	"record": "rec-", "criterion": "crit-", "rule": "rule-", "budget": "bud-",
-	"guide": "guide-", "design": "des-", "connection": "con-",
+	"guide": "guide-", "design": "des-", "connection": "con-", "neighbour": "nbr-",
 }
 // enddesign
 

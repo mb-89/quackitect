@@ -252,8 +252,9 @@ func selftestBookDepth() bool {
 	if strings.Contains(h1, "RATIONALEPROBE") {
 		return false // depth 1 = statements only
 	}
+	// children link as the i14 termref affordance (data-goto), no longer bare anchors
 	h3, _, _ := renderBookHTML(bookFixture(dir, 3, true))
-	if !strings.Contains(h3, "RATIONALEPROBE") || !strings.Contains(h3, "#test-fix") {
+	if !strings.Contains(h3, "RATIONALEPROBE") || !strings.Contains(h3, `data-goto="test-fix"`) {
 		return false // depth 3 adds rationale and children
 	}
 	return !nodeKeysAllow["depth"] // an authored depth tag stays structurally refused
@@ -276,7 +277,10 @@ func selftestBookDomStatic() bool {
 		return false
 	}
 	script := html[si:se]
-	return !strings.Contains(script, "createElement") && !strings.Contains(script, "innerHTML")
+	// the one innerHTML exemption is the details-pane CHROME fill (window.bookDetail;
+	// the pane is chrome, not book content - req-details-pane).
+	return !strings.Contains(script, "createElement") &&
+		strings.Count(script, "innerHTML") == 1 && strings.Contains(script, "c.innerHTML")
 }
 
 // test-chapter-tldr -> selftest:chapter-tldr
@@ -343,6 +347,10 @@ func selftestBookFigures() bool {
 	mp := filepath.Join(dir, "man-fig.md")
 	os.WriteFile(mp, []byte(man), 0o644)
 	fx["man-fig"] = Node{ID: "man-fig", Type: "manifest", Mode: "chapter", Statement: "Figures.", Path: mp}
+	// the star derives from neighbour notes since i14 (req-context-diagram) - seed one
+	np := filepath.Join(dir, "nbr-probe.md")
+	os.WriteFile(np, []byte("---\nid: nbr-probe\ntype: neighbour\nstatement: the probe neighbour.\nclass: review\nkiller: false\n---\n"), 0o644)
+	fx["nbr-probe"] = Node{ID: "nbr-probe", Type: "neighbour", Statement: "the probe neighbour.", Class: "review", Path: np}
 	html, findings, _ := renderBookHTML(fx)
 	if len(findings) != 0 {
 		return false
@@ -390,14 +398,13 @@ func selftestGlossaryShared() bool {
 	if len(findings) != 0 {
 		return false
 	}
-	if !strings.Contains(html, "the fixture widget (widget)") {
-		return false // first linked use per chapter expands to the long form
-	}
-	if strings.Count(html, "the fixture widget (widget)") != 1 {
-		return false // later uses stay short
+	// the i14 term affordance: a linked use renders as a termref button carrying the
+	// definition for the details pane (the old first-use long-form expansion retired)
+	if !strings.Contains(html, `class="termref"`) || !strings.Contains(html, `data-help="the fixture widget"`) {
+		return false
 	}
 	if !strings.Contains(html, `id="term-widget"`) || strings.Contains(html, `id="term-tokenprobe"`) {
-		return false // the glossary chapter carries USED terms only
+		return false // the glossary section carries USED terms only
 	}
 	if !strings.Contains(html, `href="#man-terms"`) {
 		return false // back-references to the using chapter

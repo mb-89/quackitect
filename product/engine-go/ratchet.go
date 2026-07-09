@@ -23,6 +23,30 @@ func globalBinPath() string {
 	return filepath.Join(userDataBase(), "quackitect", "bin", brand()+".exe")
 }
 
+// engineSrcPointer is the file beside the global binary recording WHERE the engine home
+// (the repo carrying the resource layer) lives. Resources resolve LIVE from there — never
+// a copy, never drift (owner ruling 2026-07-09): editing the repo's resources changes them
+// for every stub workspace on the machine. Build and the ratchet re-record it.
+func engineSrcPointer() string { return globalBinPath() + ".src" }
+
+func recordEngineHome(root string) error {
+	if !hasEngineLayer(root) {
+		return fmt.Errorf("no resource layer at %s", root)
+	}
+	if err := os.MkdirAll(filepath.Dir(engineSrcPointer()), 0o755); err != nil {
+		return err
+	}
+	return os.WriteFile(engineSrcPointer(), []byte(root+"\n"), 0o644)
+}
+
+func recordedEngineHome() string {
+	raw, err := os.ReadFile(engineSrcPointer())
+	if err != nil {
+		return ""
+	}
+	return strings.TrimSpace(string(raw))
+}
+
 func ratchetNeeded(binTime, srcTime int64) bool { return srcTime > binTime }
 
 // design: go-ratchet-stamp  implements: req-ratchet-semantic
@@ -145,6 +169,11 @@ func ratchetMaybe() {
 	}
 	if raw, err := os.ReadFile(stampFile(src)); err == nil {
 		os.WriteFile(exe+".stamp", raw, 0o644) // the binary now carries its source's stamp
+	}
+	// the pointer ratchets forward WITH the binary (req-workspace-split): the engine home
+	// is the workspace whose vendored source just won the ratchet
+	if recordEngineHome(ENGINE) != nil {
+		fmt.Fprintln(os.Stderr, "ratchet: engine-home record failed — external workspaces may miss the type layer.")
 	}
 	re := exec.Command(exe, os.Args[1:]...)
 	re.Stdin, re.Stdout, re.Stderr = os.Stdin, os.Stdout, os.Stderr

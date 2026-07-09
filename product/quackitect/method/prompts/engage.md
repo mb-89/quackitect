@@ -57,7 +57,8 @@ research skill into the repo — reference it.
 0. **Pick the version.** Default to the latest not-done version. If every version is done, start the earliest planned one. Compose its checklist as in `start`. Announce which you chose. If several versions are open and the user names one, lock onto that version. Hold it for this and the following `next` calls until told otherwise.
 1. `quack next` — the determinizer hands you the next ready check. Its upstreams are satisfied.
 2. **FILL** it. Do the work. Produce the evidence. For executed checks, make `verify` pass.
-   - **Amend, then re-observe, then build.** Amending a requirement or test statement AFTER `quack observe-red` moves the hash and strands the red record. Fix the statement first, re-run `observe-red`, then build.
+   - **Amend, then re-observe, then build.** Amending a requirement or test statement AFTER `quack observe-red` moves the hash and strands the red record. Fix the statement first, re-run `observe-red`, then build. Amending a test to behavior ALREADY built leaves no observable red: mark it `tests_red: exempt - <reason> (adr-red-unobservable)` instead - the citation is mandatory, the sweep checks it.
+   - **A ruling that changes rendered behavior owes its test sweep IN THE SAME walk.** Cached verdicts mask tests asserting the OLD behavior until the next rebuild flushes them; sweep and amend the affected tests when the behavior changes, not when the cache betrays you (i14 lesson: fifteen stale tests surfaced at once).
    - **Code that realizes a requirement IS its design node.** Declare it inline where the code lives, never in a `.md`:
      ```
      # design: <id>  implements: <req-id>
@@ -77,12 +78,29 @@ Repeat until `next` reports "done".
 <!-- design: refine-method  implements: refine-track :: Refine is a track orthogonal to rigor: explore an idea in a gitignored spike, capture the keeper backward into a design-input check (which reopens the affected cone via suspect), then re-walk. It is the default working mode in late phases. -->
 ## refine  (explore an idea, capture the keeper backward)  ← default in late phases
 Once a build exists (post-M6) and you are NOT starting a new iteration, refine is the default working mode. It is M5's spike, turned into a cycle.
+
+> **Opinionated visuals (owner law, i14):** never blind-iterate a figure's look. Get the DATA
+> derived and pinned first; render ONE first cut; the owner reviews and rules, round by round.
+> When the figure is a dense GRAPH (tens of edges), reach for the inlined graph library over a
+> hand-laid SVG - routing is its job, and the owner traded print-friendliness away (i14 ruling).
+> Capture every visual ruling backward into the requirement in the same round.
 1. Take the user's **idea and their motivation**. Run a light coherence check. Does it fit the frame and vision? This is a quick judgment, not a gate. If it clearly does not fit, capture it as a note and stop.
 2. **SPIKE** it in the data home (`<data-home>/spikes/<id>/`). This is throwaway scratch space, outside the repo entirely. Do NOT touch `product/` or any gated check yet. Iterate fast. Keep or discard.
 3. On a **keeper**, **capture backward**. Write what you learned into the right design-input check (M1, M2, or M3 — the requirement or design it really was). That edit reopens the affected checks SUSPECT.
 4. `quack next` then walks exactly the reopened cone. A contained change reopens little. An architecture-break steps back to M3. Re-walk. Then keep refining, or `ship`.
 Discard the spike when done. A rejected idea → archive a note WITH its reason. That makes the rejection durable.
 <!-- enddesign -->
+
+## bugfix  (a reported defect; no dedicated iteration)
+Bugfixes ride the ACTIVE iteration (owner rule 2026-07-09) — never mint one for them.
+1. REPRODUCE the report exactly, first. No fix before the failure is observed live.
+2. **Guard the CLASS, not the instance (owner rule 2026-07-09, every bugreport):** one
+   executed test that covers the whole class of bug — the unit semantics AND the
+   end-to-end lane the bug traveled (the external-stub bug hid because the e2e tests
+   drove a BARE stub and version-only commands; the guard drives the FULL skeleton).
+3. The red ritual holds: test red → `observe-red` → fix → green. The test node verifies
+   the EXISTING requirement the bug violated; a bug rarely needs a new requirement.
+4. Re-verify the original repro against the fixed binary, not only the test.
 
 ## ship  (output the iteration)
 `quack ship` packages `product/` into the data home (`<data-home>/out/`), with the freshly

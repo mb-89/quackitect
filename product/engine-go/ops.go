@@ -584,6 +584,11 @@ func cmdBuild(args []string) {
 	if prev, err := os.ReadFile(fpFile); err == nil && fp != "" && strings.TrimSpace(string(prev)) == fp {
 		if _, err := os.Stat(out); err == nil {
 			if _, err := os.Stat(out + ".staged"); err != nil { // never skip past a pending swap
+				// the pointer beside the binary names THIS repo as the live engine home
+				// (req-workspace-split: external workspaces resolve resources from it)
+				if err := recordEngineHome(ENGINE); err != nil {
+					fmt.Fprintln(os.Stderr, "build: engine-home record failed —", err)
+				}
 				root := buildRebaseline(out)
 				fmt.Println("compile skipped (source unchanged) | golden re-baselined to", root[:12])
 				return
@@ -608,6 +613,11 @@ func cmdBuild(args []string) {
 	}
 	os.WriteFile(out+".stamp", []byte(stamp+"\n"), 0o644) // the binary mirrors its source's stamp
 	os.WriteFile(fpFile, []byte(fp+"\n"), 0o644)          // the fingerprint arms the fast path (go-build-fast-skip)
+	// the pointer beside the binary names THIS repo as the live engine home
+	// (req-workspace-split): external workspaces resolve resources from it, never a copy
+	if err := recordEngineHome(ENGINE); err != nil {
+		fmt.Fprintln(os.Stderr, "build: engine-home record failed —", err)
+	}
 	fresh := out
 	if _, err := os.Stat(staged); err == nil {
 		fresh = staged // swap blocked: the NEW code lives in the staged file

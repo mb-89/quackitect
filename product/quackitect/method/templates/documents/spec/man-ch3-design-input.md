@@ -14,19 +14,26 @@ This chapter is the binding input: the context and its boundary, the stakes, the
 ---
 ## Context and scope
 <!-- fill [mandatory]
-Contents: the working context - the boundary, every external interface, the
-  neighbor systems; the explicit does-NOT-do list; the context's time dimension
-  where it matters (interworking, upgrade and replacement strategy).
+Contents: the working context - the boundary prose, the explicit does-NOT-do
+  list, the context's time dimension where it matters (interworking, upgrade
+  and replacement strategy). The neighbours themselves are nbr- notes - the
+  star and the view below derive from them; never hand-author the interface
+  list into prose.
 Motivation: ch0's star orients; this one BINDS. The does-not-do list is the
   scope-creep guard. Most specs forget the future row - what this system must
   coexist with and what replaces it.
-Form: prose plus the interface list. The methods view below carries the analysis
-  tools (the 9-window among them). Design-relevant ASSUMPTIONS render from the
-  raid register - record them there, never inline.
+Form: boundary prose, then the derived star + neighbours view, then the
+  does-not-do list. The methods view below carries the analysis tools (the
+  9-window among them). Design-relevant ASSUMPTIONS render from the raid
+  register - record them there, never inline.
 Sources: context views @[[ref-sya-architecting]]; the methods notes.
 -->
 <!-- ai:3 -->
 {{context-and-scope}}
+---
+fig: context-star
+---
+![[neighbours.base]]
 
 ![[assumptions.base]]
 ---

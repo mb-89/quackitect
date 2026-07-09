@@ -45,8 +45,9 @@ type Node struct {
 	// in its owning chapter's view; candidate nodes carry an axis and 0..1 ratings, and
 	// DECISIONS choose or reject them through links - candidate status derives from the
 	// links, never stored; rejected candidates stay referenced so history survives.
-	Kind     string   // decision kind | requirement kind (functional|quality|constraint|interface)
-	Axis     string   // candidate: the decision axis it answers
+	Kind      string   // decision kind | requirement kind (functional|quality|constraint|interface)
+	Axis      string   // candidate: the decision axis it answers
+	Direction string   // neighbour: in (feeds the system, left flank) | out (consumes from it, right flank)
 	Chosen   []string // decision: the candidate(s) it picks
 	Rejected []string // decision: the candidate(s) it turns down, reasons in the body
 	Refers   []string // rationale: the clause keys it explains (node ids or id#heading anchors)
@@ -172,6 +173,8 @@ func ParseNode(path string) Node {
 			n.Refers = splitIDs(v)
 		case "suite":
 			n.Suite = v
+		case "direction":
+			n.Direction = v
 		case "milestone":
 			m := 0
 			for _, c := range strings.TrimPrefix(v, "M") {

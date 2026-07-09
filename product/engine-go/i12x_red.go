@@ -532,10 +532,17 @@ func selftestVirtualEdges() bool {
 
 // test-verdict-order -> selftest:verdict-order
 func selftestVerdictOrder() bool {
+	// the candidates render in the PROJECT chapter since i14 (req-candidates-timeline):
+	// synthetic nodes ride a real iteration's path so the per-iteration walk picks them up
+	vs := versions()
+	if len(vs) == 0 {
+		return false
+	}
+	ip := filepath.Join(SPEC, "iterations", vs[0], "syn.md")
 	nodes := map[string]Node{
-		"cand-x": {ID: "cand-x", Type: "candidate", Axis: "ax", Statement: "x", Maps: map[string]map[string]string{"ratings": {"crit": "0.5"}}},
-		"adr-b":  {ID: "adr-b", Type: "adr", Statement: "b", Chosen: []string{"cand-x"}},
-		"adr-a":  {ID: "adr-a", Type: "adr", Statement: "a", Rejected: []string{"cand-x"}},
+		"cand-x": {ID: "cand-x", Type: "candidate", Axis: "ax", Statement: "x", Path: ip, Maps: map[string]map[string]string{"ratings": {"crit": "0.5"}}},
+		"adr-b":  {ID: "adr-b", Type: "adr", Statement: "b", Path: ip, Chosen: []string{"cand-x"}},
+		"adr-a":  {ID: "adr-a", Type: "adr", Statement: "a", Path: ip, Rejected: []string{"cand-x"}},
 	}
 	// the double claim is a finding naming both decisions, deterministically ordered
 	claims := candidateClaimFindings(nodes)
@@ -544,9 +551,9 @@ func selftestVerdictOrder() bool {
 		return false
 	}
 	// the rendered verdict is identical across repeated renders (sorted walk, not map order)
-	h1 := renderFigure("candidates-matrix", nodes)
+	h1 := renderFigure("project-table", nodes)
 	for i := 0; i < 8; i++ {
-		if renderFigure("candidates-matrix", nodes) != h1 {
+		if renderFigure("project-table", nodes) != h1 {
 			return false
 		}
 	}
@@ -556,8 +563,8 @@ func selftestVerdictOrder() bool {
 	}
 	// a single-claim candidate is clean
 	single := map[string]Node{
-		"cand-y": {ID: "cand-y", Type: "candidate", Axis: "ax", Statement: "y", Maps: map[string]map[string]string{"ratings": {"crit": "1"}}},
-		"adr-a":  {ID: "adr-a", Type: "adr", Statement: "a", Chosen: []string{"cand-y"}},
+		"cand-y": {ID: "cand-y", Type: "candidate", Axis: "ax", Statement: "y", Path: ip, Maps: map[string]map[string]string{"ratings": {"crit": "1"}}},
+		"adr-a":  {ID: "adr-a", Type: "adr", Statement: "a", Path: ip, Chosen: []string{"cand-y"}},
 	}
 	return len(candidateClaimFindings(single)) == 0
 }
@@ -793,10 +800,10 @@ func selftestMintAllKinds() bool {
 // test-chapter-canning -> selftest:chapter-canning
 func selftestChapterCanning() bool {
 	slotRe := regexp.MustCompile(`\{\{([a-z-]+)`)
+	// ch7 died at i14 (rationales folded into the ch8 Appendix, owner ruling 2026-07-08)
 	allowed := map[string]map[string]bool{
 		"man-ch5-verification-validation": {"records-lede": true, "validation": true},
 		"man-ch6-project":                 {"approach": true},
-		"man-ch7-rationales":              {},
 		"man-ch8-guidance":                {"guides": true},
 	}
 	base := filepath.Join(EngineDir(), "method", "templates", "documents", "spec")
@@ -964,17 +971,18 @@ func selftestCriteriaValidation() bool {
 	if !strings.Contains(string(ch1), "![[criteria.base]]") || !strings.Contains(string(ch5), "![[criteria.base]]") {
 		return false
 	}
-	// a fixture criterion renders with metric and target
+	// success criteria live ON the need since the 2026-07-08 folding (req-criteria-in-needs):
+	// the view renders every need in full, its `## Success criteria` pass lines included
 	dir, _ := os.MkdirTemp("", "qst-crit")
 	defer os.RemoveAll(dir)
-	p := filepath.Join(dir, "crit-x.md")
-	os.WriteFile(p, []byte("---\nid: crit-x\ntype: criterion\nmetric: render time\ntarget: under 1 second\nstatement: The board renders under one second.\nclass: review\nkiller: false\n---\n"), 0o644)
+	p := filepath.Join(dir, "need-x.md")
+	os.WriteFile(p, []byte("---\nid: need-x\ntype: need\nstatement: The board renders fast.\nclass: review\nkiller: false\n---\n## Success criteria\n- render time under 1 second\n"), 0o644)
 	rs, err := EvalBase(string(q), []string{p}, nil)
 	if err != nil || len(rs) != 1 || len(rs[0].Groups[0].Rows) != 1 {
 		return false
 	}
-	cells := strings.Join(rs[0].Groups[0].Rows[0].Cells, "|")
-	return strings.Contains(cells, "render time") && strings.Contains(cells, "under 1 second")
+	row := rs[0].Groups[0].Rows[0]
+	return strings.Contains(row.Body, "Success criteria") && strings.Contains(row.Body, "under 1 second")
 }
 
 // test-ch3-mech -> selftest:ch3-mech
@@ -992,8 +1000,10 @@ func selftestCh3Mech() bool {
 			return false
 		}
 	}
-	// the mechanized views embed (use cases merged into the ucfn board at i14, field c25)
-	for _, want := range []string{"![[stakeholder-matrix.base]]", "![[tensions.base]]", "fig: ucfn-board",
+	// the mechanized views embed (use cases merged into the ucfn board at i14 field c25;
+	// the stakeholder table folded into the unified reader machinery at i14; the context
+	// star + neighbours view derive from nbr- notes since the 2026-07-09 owner ruling)
+	for _, want := range []string{"fig: context-star", "![[neighbours.base]]", "![[tensions.base]]", "fig: ucfn-board",
 		"![[qualities.base]]", "![[constraints.base]]", "![[requirements.base]]", "![[assumptions.base]]",
 		"![[methods.base#Methods for design-input]]"} {
 		if !strings.Contains(t, want) {
@@ -1031,9 +1041,10 @@ func selftestCh4Mech() bool {
 	if strings.Count(t, "{{") != 1 || !strings.Contains(t, "{{budgets}}") {
 		return false
 	}
-	// the mechanized views embed
-	for _, want := range []string{"![[asr.base]]", "![[decisions-strategy.base]]", "![[interfaces.base]]",
-		"![[force-rationales.base]]", "![[rules.base]]", "![[decisions-architecture.base]]"} {
+	// the mechanized views embed (the decision views moved to the project chapter with the
+	// candidates record, owner ruling 2026-07-08 - ch4 documents only the architecture in use)
+	for _, want := range []string{"![[asr.base]]", "![[interfaces.base]]",
+		"![[force-rationales.base]]", "![[rules.base]]"} {
 		if !strings.Contains(t, want) {
 			return false
 		}
@@ -1053,7 +1064,7 @@ func selftestCh4Mech() bool {
 			figs++
 		}
 	}
-	return figs == 2 // candidates-matrix and block-tree
+	return figs == 1 // the onion drill-down (candidates-matrix retired to the project chapter)
 }
 
 // test-block-tree-design -> selftest:block-tree-design
@@ -1123,8 +1134,10 @@ func selftestStakeholderLinks() bool {
 	if err != nil || len(rs) != 1 || len(rs[0].Groups[0].Rows) != 1 {
 		return false
 	}
+	// the i14 unified table slims the cells to name/role/statement; the preset and guide
+	// links ride the full item, one expand away (req-table-expand)
 	cells := strings.Join(rs[0].Groups[0].Rows[0].Cells, "|")
-	return strings.Contains(cells, "wants tasks done") && strings.Contains(cells, "man-preset-user") && strings.Contains(cells, "guide-user")
+	return strings.Contains(cells, "wants tasks done") && strings.Contains(cells, "user")
 }
 
 // test-migrate-layout -> selftest:migrate-layout
@@ -1182,8 +1195,9 @@ func selftestBookShell() bool {
 	}
 	// the sidebar shell is static DOM at emit time: the TOC (a link per chapter), the
 	// global search, the hand-editable filter expression, and the details card.
+	// the details card became the always-visible details PANE at i14 (req-details-pane)
 	for _, want := range []string{`<nav id="sidebar"`, `id="toc"`, `href="#man-fix"`,
-		`id="search"`, `id="filter-expr"`, `id="details-card"`} {
+		`id="search"`, `id="filter-expr"`, `id="details"`, `id="dpane-content"`} {
 		if !strings.Contains(html, want) {
 			return false
 		}
@@ -1206,5 +1220,8 @@ func selftestBookShell() bool {
 		return false
 	}
 	script := html[si : si+se]
-	return !strings.Contains(script, "createElement") && !strings.Contains(script, "innerHTML")
+	// exactly ONE innerHTML lives in the shell: the details-pane CHROME fill
+	// (window.bookDetail; the pane is chrome, not book content - req-details-pane).
+	return !strings.Contains(script, "createElement") &&
+		strings.Count(script, "innerHTML") == 1 && strings.Contains(script, "c.innerHTML")
 }

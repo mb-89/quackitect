@@ -168,8 +168,10 @@ func sortStrings(s []string) {
 
 // enddesign
 
-// design: go-book-emitter  implements: req-book-single-file, req-book-depth, req-book-dom-static, req-chapter-tldr, req-book-identity, req-llm-digestible
+// design: go-book-emitter  implements: req-book-single-file, req-book-depth, req-book-dom-static, req-chapter-tldr, req-book-identity, req-llm-digestible, req-readme-chapter
 // The deterministic emitter core. Truth (nodes + manifests) renders to ONE self-contained HTML:
+// the project README opens the book as its own first chapter — the reader's starting point —
+// through the zero-dep renderReadme projection (headings, tables, lists, inline images);
 // every layer is real text in a semantic DOM at emit time (script never creates content); depth
 // derives from node anatomy (1 statement, 2 +rationale, 3 +children, 4 +evidence) - never an
 // authored tag (the strict allowlist refuses a `depth:` key on nodes); every chapter OPENS with
@@ -647,11 +649,18 @@ func renderBookHTML(nodes map[string]Node) (string, []string, []string) {
 		if u.Ref != "" {
 			chb.WriteString(renderNodeAtDepth(u.Ref, u.Depth, nodes, sm, bl, anchor))
 		} else if m := figRefRe.FindStringSubmatch(strings.TrimSpace(u.Body)); m != nil {
+			// design: go-fig-fullscreen  implements: req-fig-fullscreen
+			// Every chapter figure wraps with the ⛶ button (owner ruling 2026-07-09): a click
+			// flips the fig-full class on THIS existing element (a fixed-inset modal), Escape
+			// closes, and the embedded graphs refit on toggle - the script creates nothing.
 			if msg, retired := retiredFigKinds[m[1]]; retired {
 				findings = append(findings, "fig kind '"+m[1]+"' retired "+msg)
 			} else {
-				chb.WriteString(`<figure id="` + anchor + `" data-layer="figure">` + "\n" + renderFigure(m[1], nodes) + "\n</figure>\n")
+				chb.WriteString(`<figure id="` + anchor + `" data-layer="figure">` + "\n" +
+					`<button type="button" class="fig-fs" data-figfs title="fullscreen (Esc closes)">⛶</button>` + "\n" +
+					renderFigure(m[1], nodes) + "\n</figure>\n")
 			}
+			// enddesign
 		} else {
 			layer := "informative"
 			if idx == 0 {
@@ -803,14 +812,18 @@ func renderBookHTML(nodes map[string]Node) (string, []string, []string) {
 			body.WriteString("</section>\n")
 		}
 		body.WriteString("</article>\n")
-		toc = append(toc, tocEntry{id: dk.ID, title: dk.Statement})
+		// NO toc entry (owner 2026-07-09): the deck is out of the reading flow entirely -
+		// the details pane's deck list is its one entry point
 	}
 	// enddesign
-	// design: go-book-shell  implements: req-book-shell, req-sidebar-order, req-section-paging, req-search-hitlist, req-deck-views-section
+	// design: go-book-shell  implements: req-book-shell, req-sidebar-order, req-section-paging, req-search-hitlist, req-deck-views-section, req-details-pane
 	// The mdbook-style shell (owner ruling 2026-07-07): one fixed sidebar carries the whole
 	// apparatus - the chapter TOC (collected above, static DOM), the GLOBAL search, the view
 	// presets, the facet counts, ONE hand-editable filter expression every control compiles
-	// into, and the details card (the report's right-panel pattern). The content column stays
+	// into, and the DETAILS PANE - an always-visible bar at the sidebar bottom that expands
+	// UPWARD over the sidebar as the one context-help surface (window.bookDetail fills it for
+	// a clicked term, link, filter, search, or graph node), hosts the views and the baseline
+	// hash, and collapses back to a bar. The content column stays
 	// clean. The report's visual language carries over (#fafafa chrome, white panels, the
 	// uppercase small labels, the ▸/▾ disclosure trees). The script stays toggle-only.
 	var doc strings.Builder
@@ -862,6 +875,9 @@ func renderBookHTML(nodes map[string]Node) (string, []string, []string) {
 		".ucontrols button{font:inherit;font-size:.75rem;padding:2px 8px;border:1px solid #ddd;border-radius:5px;background:#fff;cursor:pointer}.ucontrols button:hover{background:#f0f0f0}" +
 		".ucontrols input,.ucontrols select{font:inherit;font-size:.78rem;padding:2px 6px;border:1px solid #ddd;border-radius:5px}.qt-pos{color:#555;min-width:8ch;text-align:center;display:inline-block}" +
 		".onion .oview[hidden]{display:none}.onion [data-onion-go]{cursor:pointer}.onion-flow{overflow-x:auto;max-width:100%}.onion-flow svg{display:block}.onion svg{cursor:grab;touch-action:none;max-width:100%}.onion a[data-node-link]{cursor:pointer}" +
+		".ograph{height:640px;border:1px solid #e3e3e3;border-radius:6px;background:#fff}figure.fig-full .ograph{height:calc(100vh - 150px)}.ograph .og-fallback{padding:1rem}" +
+		"figure[data-layer=\"figure\"]{position:relative;margin:1rem 0}.fig-fs{position:absolute;top:4px;right:4px;z-index:2;font:inherit;font-size:13px;padding:2px 8px;border:1px solid #d5d5d5;border-radius:6px;background:#fff;cursor:pointer;opacity:.55}.fig-fs:hover{opacity:1}" +
+		"figure.fig-full{position:fixed;inset:0;z-index:50;background:#fff;overflow:auto;margin:0;padding:26px;box-shadow:0 0 0 100vmax rgba(0,0,0,.35)}figure.fig-full svg{max-height:92vh}" +
 		".onion-infra{display:flex;flex-wrap:wrap;gap:5px;align-items:center;margin:.3rem 0;font-size:.78rem}.onion-infra .il{color:#888;margin-right:4px}.onion-infra button{font:inherit;font-size:.75rem;padding:2px 9px;border:1px solid #d5d5d5;border-radius:12px;background:#fff;cursor:pointer}" +
 		".tgraph #graph{height:675px;border:1px solid #e3e3e3;border-radius:6px;background:#fff}" +
 		".tgraph .tabbar{display:flex;flex-wrap:wrap;gap:4px;margin:.4rem 0}.tgraph .tab{font:inherit;font-size:.78rem;padding:3px 9px;border:1px solid #ddd;border-radius:12px;background:#fff;cursor:pointer}.tgraph .tab.active{background:#eaf0fb;border-color:#9db6e0}" +
@@ -1045,7 +1061,7 @@ func renderBookHTML(nodes map[string]Node) (string, []string, []string) {
  if(xa){xa.addEventListener('click',function(){var open=b.getAttribute('data-expanded')!=='1';b.setAttribute('data-expanded',open?'1':'0');
   document.querySelectorAll('details.disc').forEach(function(d){d.open=open;});});}
  /* the ONE entry point that shows context help. This pane is chrome, not book content,
-    so innerHTML is acceptable (as the old card was) - escaping is the caller's job. */
+    so filling it with markup is acceptable (as the old card was) - escaping is the caller's job. */
  window.bookDetail=function(title,html){var c=document.getElementById('dpane-content');if(!c)return;c.innerHTML='<div class="dh">'+(title||'')+'</div>'+(html||'');document.getElementById('details').classList.remove('collapsed');};
  var dbar=document.getElementById('dpane-bar');
  if(dbar)dbar.addEventListener('click',function(){var dp=document.getElementById('details');if(dp)dp.classList.toggle('collapsed');});
@@ -1117,7 +1133,8 @@ func renderBookHTML(nodes map[string]Node) (string, []string, []string) {
     and onion popstate handlers from fighting. */
  window.__quackNav=window.__quackNav||[];
  var __onionStack=[];
- function __onionShow(host,t){Array.prototype.forEach.call(host.querySelectorAll('.oview'),function(v){v.hidden=true;});t.hidden=false;}
+ function __onionShow(host,t){Array.prototype.forEach.call(host.querySelectorAll('.oview'),function(v){v.hidden=true;});t.hidden=false;
+  if(window.__ogRefit)window.__ogRefit(t);}
  document.querySelectorAll('.onion [data-onion-go]').forEach(function(el){el.addEventListener('click',function(ev){
   ev.preventDefault();
   var t=document.getElementById(el.getAttribute('data-onion-go'));
@@ -1152,6 +1169,62 @@ func renderBookHTML(nodes map[string]Node) (string, []string, []string) {
   svg.addEventListener('pointerup',function(){drag=null;svg.style.cursor='';});
   svg.addEventListener('dblclick',function(){st.x=base[0];st.y=base[1];st.w=base[2];st.h=base[3];apply();});
  });
+ /* per-layer cytoscape graphs (owner ruling 2026-07-09): dagre left-to-right over the
+    baked JSON islands; the assets are the ones the trace chapter inlines. A node tap
+    transports to the trace row; the lower-levels node drills; hovering a node isolates
+    its neighborhood. */
+ function __ogInit(host){
+  if(host.__og||!window.cytoscape)return;
+  if(!host.getBoundingClientRect().width)return; /* hidden view: init on first show */
+  var de=host.parentElement.querySelector('.og-data');if(!de)return;
+  var d;try{d=JSON.parse(de.textContent||'{}');}catch(e){return;}
+  var fb=host.querySelector('.og-fallback');if(fb)fb.hidden=true;
+  var els=[];
+  (d.nodes||[]).forEach(function(n){els.push({data:{id:n.id,label:n.label,kind:n.kind}});});
+  (d.edges||[]).forEach(function(e,i){els.push({data:{id:'og'+i,source:e.s,target:e.t,kind:e.kind}});});
+  var cy=cytoscape({container:host,elements:els,wheelSensitivity:0.2,
+   layout:{name:'dagre',rankDir:'LR',nodeSep:12,rankSep:110},
+   style:[
+    {selector:'node',style:{'label':'data(label)','font-size':11,'text-valign':'center','text-halign':'center','shape':'round-rectangle','width':'label','height':24,'padding':'7px','background-color':'#fff','border-width':1,'border-color':'#4a6fa5','color':'#333'}},
+    {selector:'node[kind="in"]',style:{'border-color':'#2f8f4e','background-color':'#eef7f0'}},
+    {selector:'node[kind="out"]',style:{'border-color':'#b5651d','background-color':'#fbf2ea'}},
+    {selector:'node[kind="xin"],node[kind="xout"]',style:{'border-color':'#8aa0c4','background-color':'#f3f7fc','color':'#5b7fa6'}},
+    {selector:'node[kind="lower"]',style:{'shape':'ellipse','width':150,'height':90,'background-color':'#dce9f8','font-weight':'bold'}},
+    {selector:'edge',style:{'curve-style':'bezier','width':1.4,'line-color':'#9db6e0','target-arrow-shape':'triangle','target-arrow-color':'#9db6e0','arrow-scale':0.9}},
+    {selector:'edge[kind="in"]',style:{'line-color':'#2f8f4e','target-arrow-color':'#2f8f4e'}},
+    {selector:'edge[kind="out"]',style:{'line-color':'#b5651d','target-arrow-color':'#b5651d'}},
+    {selector:'edge[kind="lower"]',style:{'line-style':'dashed'}},
+    {selector:'.ogdim',style:{'opacity':0.12}}
+   ]});
+  cy.on('tap','node',function(ev){var n=ev.target,k=n.data('kind');
+   if(k==='lower'){
+    var hostView=host.closest('.onion'),t=document.getElementById(host.getAttribute('data-oglower'));
+    if(t&&hostView){var cur=hostView.querySelector('.oview:not([hidden])');
+     if(cur&&cur!==t){__onionStack.push({host:hostView,id:cur.id});window.__quackNav.push('onion');try{history.pushState({nav:'onion'},'');}catch(_){}}
+     __onionShow(hostView,t);}
+    return;}
+   if(k!=='el')return;
+   var s=document.querySelector('[data-node="'+n.id()+'"]');if(!s)return;
+   if(window.bookPageTo)window.bookPageTo(s);
+   var dd=s.closest('details');if(dd)dd.open=true;
+   s.scrollIntoView({block:'center'});});
+  cy.on('mouseover','node',function(ev){cy.elements().addClass('ogdim');ev.target.closedNeighborhood().removeClass('ogdim');});
+  cy.on('mouseout','node',function(){cy.elements().removeClass('ogdim');});
+  host.__og=cy;
+ }
+ function __ogRefit(scope){Array.prototype.forEach.call((scope||document).querySelectorAll('.ograph'),function(h){
+  __ogInit(h);if(h.__og){h.__og.resize();h.__og.fit(undefined,30);}});}
+ window.__ogRefit=__ogRefit;
+ __ogRefit(document);
+ /* figure fullscreen (owner 2026-07-09): the button flips a class on its own figure */
+ document.querySelectorAll('[data-figfs]').forEach(function(btn){btn.addEventListener('click',function(){
+  var f=btn.closest('figure');if(!f)return;
+  f.classList.toggle('fig-full');
+  __ogRefit(f);
+  btn.textContent=f.classList.contains('fig-full')?'✕':'⛶';});});
+ document.addEventListener('keydown',function(e){if(e.key!=='Escape')return;
+  document.querySelectorAll('figure.fig-full').forEach(function(f){f.classList.remove('fig-full');
+   var b=f.querySelector('[data-figfs]');if(b)b.textContent='⛶';});});
  /* trace-item links: scroll to the section already carrying the node, wherever it renders */
  document.querySelectorAll('[data-node-link]').forEach(function(a){a.addEventListener('click',function(ev){
   ev.preventDefault();
@@ -1198,7 +1271,9 @@ func renderBookHTML(nodes map[string]Node) (string, []string, []string) {
 })();
 </script>
 `)
-	// design: go-annotator-core  implements: req-comment-mark-prose, req-comment-figure-target, req-comment-figure-fallback, req-comment-dom-static, req-comment-escape, req-comment-sidebar, req-comment-threads, req-comment-close, req-comment-author, req-comment-save, req-comment-save-fallback, req-comment-suggest, req-comment-persist
+	// design: go-annotator-core  implements: req-comment-mark-prose, req-comment-figure-target, req-comment-figure-fallback, req-comment-dom-static, req-comment-escape, req-comment-sidebar, req-comment-threads, req-comment-close, req-comment-author, req-comment-save, req-comment-save-fallback, req-comment-suggest, req-comment-persist, req-comment-ux
+	// While a comment is unsaved the layer warns before the copy closes (beforeunload), keeps
+	// the comment and minimize controls in one place, and never shifts the bar when a post lands.
 	// The comment layer's core, emitted OUTSIDE <main>: one empty island slot plus the
 	// quack-annotator script. Anchors = unit id + quote/prefix/suffix + position (W3C shape);
 	// figure marks target <g id> elements, falling back to the whole figure's unit; paint goes
@@ -1682,27 +1757,39 @@ func rectBorder(cx, cy, hw, hh int, dx, dy float64) (int, int) {
 	return cx + int(t*dx), cy + int(t*dy)
 }
 
-func svgContextStar(center string, actors []string) string {
+// svgContextStar draws the derived context diagram. Actors split by flank (owner ruling
+// 2026-07-09): direction `in` feeds the system and sits LEFT, direction `out` consumes
+// from it and sits RIGHT; an actor without a direction joins the left flank. Each flank
+// fans out vertically from the middle.
+func svgContextStar(center string, ins, outs []string) string {
 	fig := figNext()
 	var b strings.Builder
 	b.WriteString(`<svg viewBox="0 0 640 420" font-family="system-ui" font-size="13" role="img" aria-label="context diagram">`)
 	b.WriteString(fmt.Sprintf(`<g id="%s"><rect x="250" y="180" width="140" height="60" rx="8" fill="#e8f0fe" stroke="#4a6fa5"/><text x="320" y="215" text-anchor="middle">%s</text></g>`, figElemID(fig, center), htmlEscape(center)))
-	n := len(actors)
-	if n > 8 {
-		actors, n = actors[:8], 8
+	flank := func(actors []string, side int) { // side -1 = left (in), +1 = right (out)
+		n := len(actors)
+		if n > 8 {
+			actors, n = actors[:8], 8
+		}
+		gap := 46
+		y0 := 210 - (n-1)*gap/2
+		for i, a := range actors {
+			x := 320 + side*250
+			y := y0 + i*gap
+			// the connector ends at each node's BORDER, never crossing into the boxes (owner Q5):
+			// centre node is 140x60 (half 70x30), each actor node 110x30 (half 55x15).
+			dx, dy := float64(x-320)/250, float64(y-210)/250 // any proportional direction works for rectBorder
+			sx, sy := rectBorder(320, 210, 70, 30, dx, dy)
+			ex, ey := rectBorder(x, y, 55, 15, -dx, -dy)
+			if side < 0 { // flow reads left→right: in-arrows point AT the system
+				sx, sy, ex, ey = ex, ey, sx, sy
+			}
+			b.WriteString(fmt.Sprintf(`<line x1="%d" y1="%d" x2="%d" y2="%d" stroke="#999"/>`, sx, sy, ex, ey))
+			b.WriteString(fmt.Sprintf(`<g id="%s"><rect x="%d" y="%d" width="110" height="30" rx="15" fill="#fff" stroke="#888"/><text x="%d" y="%d" text-anchor="middle">%s</text></g>`, figElemID(fig, a), x-55, y-15, x, y+5, htmlEscape(a)))
+		}
 	}
-	for i, a := range actors {
-		ang := 2*3.141592653589793*float64(i)/float64(n) - 3.141592653589793/2
-		dx, dy := cosApprox(ang), sinApprox(ang)
-		x := 320 + int(210*dx)
-		y := 210 + int(150*dy)
-		// the connector ends at each node's BORDER, never crossing into the boxes (owner Q5):
-		// centre node is 140x60 (half 70x30), each actor node 110x30 (half 55x15).
-		sx, sy := rectBorder(320, 210, 70, 30, dx, dy)
-		ex, ey := rectBorder(x, y, 55, 15, -dx, -dy)
-		b.WriteString(fmt.Sprintf(`<line x1="%d" y1="%d" x2="%d" y2="%d" stroke="#999"/>`, sx, sy, ex, ey))
-		b.WriteString(fmt.Sprintf(`<g id="%s"><rect x="%d" y="%d" width="110" height="30" rx="15" fill="#fff" stroke="#888"/><text x="%d" y="%d" text-anchor="middle">%s</text></g>`, figElemID(fig, a), x-55, y-15, x, y+5, htmlEscape(a)))
-	}
+	flank(ins, -1)
+	flank(outs, +1)
 	b.WriteString(`</svg>`)
 	return b.String()
 }
@@ -1744,28 +1831,31 @@ func svgBlockTree(title string, blocks []string) string {
 }
 
 // design: go-onion-figure  implements: req-figure-drilldown, req-compact-renders
-// The onion figure (bs20 ruling, owner c35 redesign): a two-tier drill-down over the DESIGN
-// ELEMENTS (marked code regions), grouped by the layer of their file per the project's layer map
-// (spec/design-layers.md, innermost first; the ONE judgment input). The intra/inter-element flow
-// is the REAL call graph derived by deriveDesignFlow (a static AST pass): consumes[A] = design
-// ids A calls into, reads[A]/writes[A] = A does external input/output. Level 0 is an OVERVIEW
-// ONLY — concentric layer rings, one per SURVIVING layer, each labelled `name · N elements`, with
-// `inputs:` entering from the LEFT and `outputs:` leaving to the RIGHT as external boxes with dashed
-// connectors. No element cards here; clicking a ring drills into THAT layer. A layer with NO flow at
-// all (every element is off-flow infrastructure) is SKIPPED — no ring, no view — and its elements
-// sink INWARD into the next surviving layer's infrastructure pills (owner c37). Level 1 is one ROUND
-// view per surviving layer: a big ring (the layer boundary) with a small CORE disc. Input drops in
-// from the outer rim (top) for elements that read externally or take input from an outer layer; the
-// layer's design elements ride the annular band (spread over the top arc, bottom kept clear); flow
-// bound INWARD sinks to the CORE (which drills to the inner layer, or IS the kernel when innermost);
-// flow bound OUTWARD leaves to the RIGHT (a `▲ outer` exit stub, clickable to the outer layer /
-// overview). Intra-layer `consumes` edges draw as light arcs between the two boxes; `reads` gets an
-// `in ▸` marker, `writes` a `▸ out` marker. Design elements OFF the flow entirely render as
-// `infrastructure:` pills below the svg, each linking to its trace item; every flow box links to
-// its trace item too, and the outer ring boundary is itself clickable to drill OUT. EVERY view is
-// pre-rendered static DOM with its own breadcrumbs and ▲/▼ layer nav — the script only toggles which
-// view shows, it never creates content. Excluded patterns (iteration files) stay out; a file no
-// layer claims falls into an outermost `unmapped` ring, so the map cannot rot silently.
+// The onion figure (bs20 ruling; owner excalidraw draft 2026-07-09): a two-tier drill-down over
+// the DESIGN ELEMENTS (marked code regions), grouped by the layer of their file per the project's
+// layer map (spec/design-layers.md, innermost first; the ONE judgment input). The intra/inter-
+// element flow is the REAL call graph derived by deriveDesignFlow (a static AST pass): consumes[A]
+// = design ids A calls into, reads[A]/writes[A] = A does external input/output. Level 0 is an
+// OVERVIEW ONLY — concentric layer rings, one per SURVIVING layer, each labelled `name · N
+// elements`, with `inputs:` entering from the LEFT and `outputs:` leaving to the RIGHT as external
+// boxes with dashed connectors. No element cards here; clicking a ring drills into THAT layer. A
+// layer with NO flow at all (every element is off-flow infrastructure) is SKIPPED — no ring, no
+// view — and its elements sink INWARD into the next surviving layer's infrastructure pills (owner
+// c37). Level 1 is the NESTED ONION per surviving layer (owner draft 2026-07-09): one true CIRCLE
+// — never an oval — filling the full width minus a margin for the PORTS (input boxes outside on
+// the LEFT, output boxes outside on the RIGHT). The centre holds a smaller `lower levels` circle:
+// plain, a click drills to the next layer (the kernel view has none). Nodes in the input flow sit
+// in the LEFT half, nodes on the output path in the RIGHT half; a direct-throughput node sits in
+// the MIDDLE as ONE box (the two-box duplication died). Inner-bound flow draws to the centre
+// circle; a dotted vertical divider splits the halves. Vertically, nodes start at the middle and
+// fan out from there, wrapping into inward columns when a half overflows. Intra-layer `consumes`
+// edges draw as light arcs; `reads` gets an `in ▸` marker, `writes` a `▸ out` marker. Design
+// elements OFF the flow entirely render as `infrastructure:` pills below the svg, each linking to
+// its trace item; every flow box links to its trace item too. EVERY view is pre-rendered static
+// DOM with its own breadcrumbs and ▲/▼ layer nav — the script only toggles which view shows, it
+// never creates content. Sectors (same-topic pie wedges) are deferred by the owner. Excluded
+// patterns (iteration files) stay out; a file no layer claims falls into an outermost `unmapped`
+// ring, so the map cannot rot silently.
 type onionLayer struct {
 	name string
 	pats []string
@@ -2192,13 +2282,6 @@ func renderOnion(nodes map[string]Node) string {
 		}
 		return s
 	}
-	shortLayer := func(nm string) string {
-		if len(nm) > 12 {
-			return nm[:11] + "…"
-		}
-		return nm
-	}
-
 	var b strings.Builder
 	b.WriteString(`<div class="onion">` + "\n")
 	fills := []string{"#eef3fa", "#dde8f5"}
@@ -2267,20 +2350,19 @@ func renderOnion(nodes map[string]Node) string {
 		b.WriteString("</svg>\n</div>\n")
 	}
 
-	// --- level 1 (owner c37): per SURVIVING layer, a WIDE ellipse directional view that reads
-	// LEFT→RIGHT. Named inputs enter as merged, labelled arrows on the LEFT → incoming elements
-	// cluster in the left half → the CORE (drills to the inner layer, or IS the kernel) sits at the
-	// centre → outgoing elements cluster in the right half → named outputs and a single "→ outer"
-	// cross-layer arrow leave on the RIGHT. A both-facing element renders twice (once per half).
-	// Intra-layer consumes draw as light arcs; off-flow elements drop to infrastructure pills. Every
-	// view is pre-rendered; JS only toggles visibility. No click-up on the ring — breadcrumbs only. ---
-	const pi = 3.141592653589793
+	// --- level 1 (owner excalidraw draft 2026-07-09): per SURVIVING layer, a NESTED-ONION
+	// round view. One true CIRCLE fills the width minus the port margins; input port boxes sit
+	// outside LEFT, output port boxes outside RIGHT. The centre holds the smaller `lower levels`
+	// circle (click drills; none on the kernel view). Input-flow nodes sit in the LEFT half,
+	// output-path nodes in the RIGHT half, direct-throughput nodes in the MIDDLE as ONE box.
+	// Since the owner's cytoscape ruling (2026-07-09) the layer body is a dagre LR graph;
+	// the halves survive as flow DIRECTION (ports left/right, `lower levels` a node).
+	// Breadcrumbs navigate up; every view's DATA is pre-baked. ---
 	for si, s := range survivors {
 		L := s.name
-		mk := base + "fa" + itoa(si)
 		// cross-layer relations of THIS layer's flow elements, by SURVIVING position (inner = higher)
 		consumesOuter := map[string]bool{} // takes input from an outer layer
-		consumesInner := map[string]bool{} // feeds an inner layer (→ core)
+		consumesInner := map[string]bool{} // feeds or draws on an inner layer (→ centre)
 		for _, a := range s.flow {
 			for _, bb := range consumes[a] {
 				if p, ok := svPos[layerOf[bb]]; ok {
@@ -2303,109 +2385,13 @@ func renderOnion(nodes map[string]Node) string {
 				}
 			}
 		}
-		// geometry (owner c37 redesign): a WIDE ellipse fills the row width. Node boxes ride an inner
-		// elliptical band around a core disc. Layout reads LEFT→RIGHT: INCOMING flow clusters in the
-		// LEFT half, OUTGOING flow in the RIGHT half, the "neither" set fills the top/bottom gaps, and
-		// inner-bound flow sinks to the CORE. An element that is BOTH incoming and outgoing renders as
-		// TWO boxes (one per half), each linking to the same trace row.
-		W := 1200
-		rx, rCore := 540, 55
-		bw, bh := 150, 30
-		lgut, rgut := 20, W-20 // left input gutter x, right output gutter x
-		// classify: incoming = external read OR pulls from an outer layer; outgoing = external write
-		// OR consumed by an outer layer OR feeds an inner layer (on the return path).
-		var left, right, mid []string
-		for _, id := range s.flow {
-			inc := reads[id] || consumesOuter[id]
-			out := writes[id] || consumedByOuter[id] || consumesInner[id]
-			if inc {
-				left = append(left, id)
-			}
-			if out {
-				right = append(right, id)
-			}
-			if !inc && !out {
-				mid = append(mid, id)
-			}
-		}
-		var top, bot []string // the "neither" set splits evenly into the top and bottom gaps
-		for i, id := range mid {
-			if i%2 == 0 {
-				top = append(top, id)
-			} else {
-				bot = append(bot, id)
-			}
-		}
-		// height GROWS with the busiest half so nodes never cram (heuristic ry ≈ perSide*34)
-		perSide := len(left)
-		for _, n := range []int{len(right), len(top), len(bot)} {
-			if n > perSide {
-				perSide = n
-			}
-		}
-		ry := 200
-		if v := perSide * 34; v > ry {
-			ry = v
-		}
-		H := 2*ry + 90
-		cx, cy := W/2, H/2
-		rxBand, ryBand := rx-110, ry-40 // node-centre band, kept inside the ellipse
-		if ryBand < 60 {
-			ryBand = 60
-		}
-		type placed struct {
-			id   string
-			x, y int
-			deg  float64
-		}
-		place := func(ids []string, center, halfspan float64) []placed {
-			out := make([]placed, 0, len(ids))
-			n := len(ids)
-			for i, id := range ids {
-				deg := center
-				if n > 1 {
-					deg = center - halfspan + 2*halfspan*float64(i)/float64(n-1)
-				}
-				rad := deg * pi / 180
-				out = append(out, placed{
-					id:  id,
-					x:   cx + int(float64(rxBand)*cosApprox(rad)),
-					y:   cy - int(float64(ryBand)*sinApprox(rad)),
-					deg: deg,
-				})
-			}
-			return out
-		}
-		leftP := place(left, 180, 62) // left half, centred on 180°, fanned up/down
-		rightP := place(right, 0, 62) // right half, centred on 0°
-		topP := place(top, 90, 34)    // top gap
-		botP := place(bot, 270, 34)   // bottom gap
-		allP := append(append(append(append([]placed{}, leftP...), rightP...), topP...), botP...)
-		prim := map[string]placed{} // one representative box per id, for intra-layer arcs
-		for _, p := range allP {
-			if _, ok := prim[p.id]; !ok {
-				prim[p.id] = p
-			}
-		}
-		anyReads, anyWrites, anyCross := false, false, false
-		for _, id := range s.flow {
-			if reads[id] {
-				anyReads = true
-			}
-			if writes[id] {
-				anyWrites = true
-			}
-			if consumedByOuter[id] || consumesOuter[id] {
-				anyCross = true
-			}
-		}
+		isKernel := si == ns-1
 
-		// adjacent surviving layers for the breadcrumb nav / core / exit labels
+		// adjacent surviving layers for the breadcrumb nav / centre / exit labels
 		outerName := "overview"
 		if si > 0 {
 			outerName = survivors[si-1].name
 		}
-		isKernel := si == ns-1
 		innerView, innerName := "", ""
 		if !isKernel {
 			innerView, innerName = viewID(si+1), survivors[si+1].name
@@ -2424,114 +2410,108 @@ func renderOnion(nodes map[string]Node) string {
 			b.WriteString(`<button type="button" data-onion-go="` + viewID(si+1) + `">▼ ` + htmlEscape(innerName) + `</button>`)
 		}
 		b.WriteString(`</nav>` + "\n")
-		b.WriteString(`<div class="onion-flow">`)
-		b.WriteString(fmt.Sprintf(`<svg viewBox="0 0 %d %d" font-family="system-ui" font-size="12" role="img" aria-label="%s layer">`, W, H, htmlEscape(L)))
-		b.WriteString(`<defs><marker id="` + mk + `" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0L10,5L0,10z" fill="#9db6e0"/></marker>`)
-		b.WriteString(`<marker id="` + mk + `in" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0L10,5L0,10z" fill="#2f8f4e"/></marker>`)
-		b.WriteString(`<marker id="` + mk + `out" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0L10,5L0,10z" fill="#b5651d"/></marker></defs>`)
-		// gutter labels — inputs on the left, outputs on the right
-		b.WriteString(fmt.Sprintf(`<text x="%d" y="26" text-anchor="middle" font-size="12" fill="#2f8f4e" pointer-events="none">inputs ▸</text>`, lgut+50))
-		b.WriteString(fmt.Sprintf(`<text x="%d" y="26" text-anchor="middle" font-size="12" fill="#b5651d" pointer-events="none">▸ outputs</text>`, rgut-50))
-		// the layer boundary — a WIDE, passive ellipse (owner: NO click-up on the graph; only the
-		// breadcrumbs navigate up). The faint label just names what sits outside this layer.
-		b.WriteString(fmt.Sprintf(`<ellipse cx="%d" cy="%d" rx="%d" ry="%d" fill="#f3f7fc" stroke="#4a6fa5"/>`, cx, cy, rx, ry))
-		b.WriteString(fmt.Sprintf(`<text x="%d" y="%d" text-anchor="middle" font-size="10" fill="#8aa0c4" pointer-events="none">outside: %s</text>`, cx, cy-ry+16, htmlEscape(shortLayer(outerName))))
-		// intra-layer consume arcs (both endpoints in THIS layer), between representative boxes
-		for _, a := range s.flow {
-			pa, oka := prim[a]
-			if !oka {
-				continue
-			}
-			for _, bb := range consumes[a] {
-				if layerOf[bb] != L {
-					continue
-				}
-				pb, okb := prim[bb]
-				if !okb {
-					continue
-				}
-				mx, my := (pa.x+pb.x)/2, (pa.y+pb.y)/2
-				b.WriteString(fmt.Sprintf(`<path d="M%d,%d Q%d,%d %d,%d" fill="none" stroke="#cbd6ea" stroke-width="1" marker-end="url(#%s)"/>`,
-					pa.x, pa.y, (mx+cx)/2, (my+cy)/2, pb.x, pb.y, mk))
-			}
+		// graph data (owner ruling 2026-07-09, the cytoscape swap): the layer renders as a
+		// dagre LEFT→RIGHT graph — real edge routing beats the hand-laid circle at 40+ edges,
+		// and print-friendliness was explicitly traded away (the trace chapter set the
+		// precedent). Ports and the outer-layer exchange are typed NODES; `lower levels`
+		// drills down. The data bakes into a JSON island; the script instantiates the canvas
+		// over the assets the trace chapter inlines.
+		type gnode struct {
+			ID    string `json:"id"`
+			Label string `json:"label"`
+			Kind  string `json:"kind"`
 		}
-		// inner-bound flow (consumesInner) sinks from its RIGHT box to the CORE
-		for _, p := range rightP {
-			if !consumesInner[p.id] {
-				continue
-			}
-			rad := p.deg * pi / 180
-			ex := cx + int(float64(rCore)*cosApprox(rad))
-			ey := cy - int(float64(rCore)*sinApprox(rad))
-			b.WriteString(fmt.Sprintf(`<line x1="%d" y1="%d" x2="%d" y2="%d" stroke="#9db6e0" stroke-width="1" marker-end="url(#%s)"/>`,
-				p.x-bw/2, p.y, ex, ey, mk))
+		type gedge struct {
+			S    string `json:"s"`
+			T    string `json:"t"`
+			Kind string `json:"kind"`
 		}
-		// LEFT edge — ONE merged, labelled arrow per NAMED input, converging on the left cluster
-		// (only where this layer actually reads external input)
-		if anyReads && len(inputs) > 0 {
-			ax := cx - rxBand - bw/2 - 14
-			gap := 46
-			y0 := cy - (len(inputs)-1)*gap/2
-			for i, in := range inputs {
-				sy := y0 + i*gap
-				b.WriteString(fmt.Sprintf(`<text x="%d" y="%d" text-anchor="start" font-size="10" fill="#2f8f4e" pointer-events="none">%s</text>`,
-					lgut, sy-6, htmlEscape(in)))
-				b.WriteString(fmt.Sprintf(`<line x1="%d" y1="%d" x2="%d" y2="%d" stroke="#2f8f4e" stroke-width="1.5" marker-end="url(#%sin)"/>`,
-					lgut, sy, ax, cy, mk))
-			}
+		var gnodes []gnode
+		var gedges []gedge
+		for _, id := range s.flow {
+			gnodes = append(gnodes, gnode{ID: id, Label: shortID(id), Kind: "el"})
 		}
-		// RIGHT edge — ONE merged, labelled arrow per NAMED output, fanning from the right cluster
-		bottomLane := cy + 60
-		if anyWrites && len(outputs) > 0 {
-			bx := cx + rxBand + bw/2 + 14
-			gap := 46
-			y0 := cy - (len(outputs)-1)*gap/2
-			for i, out := range outputs {
-				ey := y0 + i*gap
-				b.WriteString(fmt.Sprintf(`<line x1="%d" y1="%d" x2="%d" y2="%d" stroke="#b5651d" stroke-width="1.5" marker-end="url(#%sout)"/>`,
-					bx, cy, rgut, ey, mk))
-				b.WriteString(fmt.Sprintf(`<text x="%d" y="%d" text-anchor="end" font-size="10" fill="#b5651d" pointer-events="none">%s</text>`,
-					rgut, ey-6, htmlEscape(out)))
-			}
-			if v := y0 + (len(outputs)-1)*gap + 46; v > bottomLane {
-				bottomLane = v
-			}
-		}
-		// CROSS-LAYER outward flow — a SINGLE merged arrow to the right edge, naming the outer layer
-		if anyCross {
-			bx := cx + rxBand + bw/2 + 14
-			b.WriteString(fmt.Sprintf(`<line x1="%d" y1="%d" x2="%d" y2="%d" stroke="#9db6e0" stroke-width="1.5" marker-end="url(#%s)"/>`,
-				bx, bottomLane, rgut, bottomLane, mk))
-			b.WriteString(fmt.Sprintf(`<text x="%d" y="%d" text-anchor="end" font-size="10" fill="#4a6fa5" pointer-events="none">→ %s</text>`,
-				rgut, bottomLane-6, htmlEscape(shortLayer(outerName))))
-		}
-		// the CORE: inner-bound flow lands here; drills to the inner layer (or IS the kernel)
-		if isKernel {
-			b.WriteString(fmt.Sprintf(`<circle cx="%d" cy="%d" r="%d" fill="#dce9f8" stroke="#4a6fa5"/>`, cx, cy, rCore))
-			b.WriteString(fmt.Sprintf(`<text x="%d" y="%d" text-anchor="middle" font-size="9" fill="#555" pointer-events="none">kernel</text>`, cx, cy+3))
-		} else {
-			b.WriteString(`<g data-onion-go="` + innerView + `">`)
-			b.WriteString(fmt.Sprintf(`<circle cx="%d" cy="%d" r="%d" fill="#dce9f8" stroke="#4a6fa5"/>`, cx, cy, rCore))
-			b.WriteString(fmt.Sprintf(`<text x="%d" y="%d" text-anchor="middle" font-size="8" fill="#4a6fa5" pointer-events="none">▼ %s</text>`, cx, cy+3, htmlEscape(shortLayer(innerName))))
-			b.WriteString(`</g>`)
-		}
-		// element boxes — one per PLACED instance (a both-facing element appears in both halves),
-		// each linking to its trace row, with external read/write markers
-		for _, p := range allP {
-			id := p.id
-			x, y := p.x-bw/2, p.y-bh/2
+		var readers, writers, inner []string
+		for _, id := range s.flow {
 			if reads[id] {
-				b.WriteString(fmt.Sprintf(`<text x="%d" y="%d" text-anchor="middle" fill="#2f8f4e" font-size="8" pointer-events="none">in ▸</text>`, p.x, y-2))
+				readers = append(readers, id)
 			}
-			b.WriteString(`<a href="#" data-node-link="` + htmlEscape(id) + `">`)
-			b.WriteString(fmt.Sprintf(`<rect x="%d" y="%d" width="%d" height="%d" rx="5" fill="#ffffff" stroke="#4a6fa5"/><text x="%d" y="%d" text-anchor="middle" fill="#333">%s</text>`,
-				x, y, bw, bh, p.x, p.y+3, htmlEscape(shortID(id))))
-			b.WriteString(`</a>`)
 			if writes[id] {
-				b.WriteString(fmt.Sprintf(`<text x="%d" y="%d" fill="#b5651d" font-size="8" pointer-events="none">▸ out</text>`, x+bw+2, p.y+3))
+				writers = append(writers, id)
+			}
+			if consumesInner[id] {
+				inner = append(inner, id)
 			}
 		}
-		b.WriteString("</svg></div>\n")
+		if len(readers) > 0 || !isKernel {
+			for _, in := range inputs {
+				gnodes = append(gnodes, gnode{ID: "in:" + in, Label: in, Kind: "in"})
+				if len(readers) == 0 {
+					gedges = append(gedges, gedge{S: "in:" + in, T: "lower:", Kind: "in"})
+					continue
+				}
+				for _, r := range readers {
+					gedges = append(gedges, gedge{S: "in:" + in, T: r, Kind: "in"})
+				}
+			}
+		}
+		if len(writers) > 0 {
+			for _, out := range outputs {
+				gnodes = append(gnodes, gnode{ID: "out:" + out, Label: out, Kind: "out"})
+				for _, w := range writers {
+					gedges = append(gedges, gedge{S: w, T: "out:" + out, Kind: "out"})
+				}
+			}
+		}
+		// the outer layer as explicit exchange nodes
+		hasXin, hasXout := false, false
+		for _, id := range s.flow {
+			if consumesOuter[id] {
+				hasXin = true
+			}
+			if consumedByOuter[id] {
+				hasXout = true
+			}
+		}
+		if hasXin {
+			gnodes = append(gnodes, gnode{ID: "xin:", Label: "from " + outerName, Kind: "xin"})
+			for _, id := range s.flow {
+				if consumesOuter[id] {
+					gedges = append(gedges, gedge{S: "xin:", T: id, Kind: "in"})
+				}
+			}
+		}
+		if hasXout {
+			gnodes = append(gnodes, gnode{ID: "xout:", Label: "→ " + outerName, Kind: "xout"})
+			for _, id := range s.flow {
+				if consumedByOuter[id] {
+					gedges = append(gedges, gedge{S: id, T: "xout:", Kind: "out"})
+				}
+			}
+		}
+		if !isKernel {
+			gnodes = append(gnodes, gnode{ID: "lower:", Label: "lower levels · " + innerName, Kind: "lower"})
+			for _, id := range inner {
+				// out-ish elements DRAW ON the lowers; the rest FEED them (left-to-right flow)
+				if writes[id] || consumedByOuter[id] {
+					gedges = append(gedges, gedge{S: "lower:", T: id, Kind: "lower"})
+				} else {
+					gedges = append(gedges, gedge{S: id, T: "lower:", Kind: "lower"})
+				}
+			}
+		}
+		for _, a := range s.flow {
+			for _, bb := range consumes[a] {
+				if layerOf[bb] == L {
+					gedges = append(gedges, gedge{S: a, T: bb, Kind: "uses"})
+				}
+			}
+		}
+		gj, _ := json.Marshal(map[string]interface{}{"nodes": gnodes, "edges": gedges})
+		b.WriteString(`<div class="onion-flow">`)
+		b.WriteString(`<script type="application/json" class="og-data">` + string(gj) + `</script>`)
+		b.WriteString(`<div class="ograph" data-oglower="` + innerView + `" aria-label="` + htmlEscape(L) + ` layer"><p class="meta og-fallback">the layer graph renders over the inlined graph library (it ships with the trace chapter)</p></div>`)
+		b.WriteString(`</div>` + "\n")
 		// off-flow design elements (own + pushed down from skipped outer layers): infrastructure pills
 		if len(s.infra) > 0 {
 			b.WriteString(`<div class="onion-infra"><span class="il">infrastructure:</span>`)
@@ -2874,7 +2854,10 @@ func baseResultHTML(rs []BaseResult, nodes map[string]Node, sm map[string]string
 			// enddesign
 			continue
 		}
-		// design: go-q-table  implements: req-table-render, req-table-noise, req-table-interact, req-table-expand, req-compact-renders
+		// design: go-q-table  implements: req-table-render, req-table-noise, req-table-interact, req-table-expand, req-compact-renders, req-table-facets
+		// Combinable pill FACETS ride above the table (AND across facets, OR within one): a
+		// universal need facet for trace items plus one facet per small-enum column - never a
+		// pill per item.
 		// The universal query table (field c10/c21/c27/c30/c40): a real thead with a clear
 		// header row, separated cells, rendered even with zero rows; the empty-value
 		// "(none)" bucket header never renders (its rows still do). Interactivity is
@@ -3142,12 +3125,31 @@ func renderBaseFull(r BaseResult) string {
 func renderFigure(kind string, nodes map[string]Node) string {
 	switch kind {
 	case "context-star":
-		var actors []string
-		for c := range projectClasses() {
-			actors = append(actors, c)
+		// design: go-context-neighbours  implements: req-context-diagram
+		// The context star derives from the modeled neighbour notes (type: neighbour, id
+		// nbr-<name>): one border-connected node per note, sorted for determinism - never
+		// an invented actor (the class-derived star died with the owner's 2026-07-09 ruling).
+		// direction `in` (or none) feeds the system and sits LEFT; `out` consumes from it
+		// and sits RIGHT. With no neighbour notes the figure says so. rectBorder ends every
+		// connector at the node's border, so no line crosses the centre node.
+		var ins, outs []string
+		for id, n := range nodes {
+			if n.Type != "neighbour" {
+				continue
+			}
+			if n.Direction == "out" {
+				outs = append(outs, strings.TrimPrefix(id, "nbr-"))
+			} else {
+				ins = append(ins, strings.TrimPrefix(id, "nbr-"))
+			}
 		}
-		sortStrings(actors)
-		return svgContextStar(brand(), actors)
+		if len(ins)+len(outs) == 0 {
+			return `<p class="meta">no neighbour notes yet — the context star renders as nbr- notes arrive</p>`
+		}
+		sortStrings(ins)
+		sortStrings(outs)
+		return svgContextStar(brand(), ins, outs)
+		// enddesign
 	case "timeline":
 		return svgTimeline(versions())
 	case "ucfn-board":
@@ -3601,7 +3603,8 @@ func usedContentSlugs(kind, chaptersHTML string) []ContentNote {
 	}
 	sortStrings(slugs)
 	for _, s := range slugs {
-		if strings.Contains(chaptersHTML, `href="#`+s+`"`) {
+		// usage = an anchor OR an i14 termref affordance (buttons carry data-goto, not href)
+		if strings.Contains(chaptersHTML, `href="#`+s+`"`) || strings.Contains(chaptersHTML, `data-goto="`+s+`"`) {
 			out = append(out, notes[s])
 		}
 	}

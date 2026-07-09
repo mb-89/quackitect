@@ -17,7 +17,7 @@ But brother, do I have a bridge to sell you.
 **quackitect**  
 *The rubber duck that went to engineering school.*
 
-quackitect is an LLM Harness. It knows how to properly architect. It's trained on forty years of engineering method: requirements engineering, architecture decision records, the V-model, verification and validation, the whole canon. You want to shoot a rocket at the moon? quackitect knows how they did it.
+quackitect is an LLM Harness. It knows how to properly architect. It's trained on forty years of engineering method: requirements engineering, architecture decision records, the V-model, verification and validation, the whole canon. You want to shoot a rocket to the moon? quackitect knows how they did it.
 
 It asks the right questions, at the right time. It pushes back where you need it. It sharpens your ideas, writes down your decisions, understands your requirements and traces them into your design. It designs the deliverable, tests it, documents it. Once you plan changes, it tells you the impact.
 
@@ -29,7 +29,7 @@ All you bring is the big ideas — and your judgement.
 ## Who it's for
 Engineers and teams driving work with AI agents who need an **auditable design / decision record with user gates** — regulated or systematic engineering, requirements traceability, architecture decision records (ADRs), V-model walks, or anyone who wants the agent to *propose* and a user to *adjudicate*.
 
-> Spec-driven tools like Spec Kit, Kiro, and OpenSpec exist to turn a spec into code. quackitect aims a level up: It produces any engineering deliverable (code, CAD-files, plans, documents, concepts in general, ...) and the **oversight and traceability ledger** that records *why* each design decision holds. This pays off when project and teams get big or changes ripple through the whole architecture. Quackitect itself is built using quackitect.
+> Spec-driven tools like Spec Kit, Kiro, and OpenSpec exist to turn a spec into code. quackitect aims a level up: It produces engineering deliverables (code, CAD-files, plans, documents, concepts in general, ...) and the **oversight and traceability ledger** that records *why* each design decision holds. This pays off when project and teams get big or changes ripple through the whole architecture. Quackitect itself is built using quackitect.
 
 ## vs other spec-driven tools
 |  | Spec Kit · Kiro · OpenSpec | **quackitect** |
@@ -44,7 +44,7 @@ Engineers and teams driving work with AI agents who need an **auditable design /
 The primary way to use quackitect is to **tell your AI agent what you need**. It runs the
 onboarding for you.
 
-> Say to your agent: **“let's start a new project.”**
+> Say to your agent: **“clone https://github.com/mb-89/quackitect, and lets start an new project”**
 
 Quackitect will walk you through all steps up to your first milestone.
 Need more details, or a list of all functions? Ask it.

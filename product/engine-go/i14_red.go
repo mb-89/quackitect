@@ -46,6 +46,8 @@ func selftestShellTitleCard() bool {
 }
 
 // test-sidebar-order -> selftest:sidebar-order
+// Since the details-pane rework the views block lives INSIDE the pane (dpane-views);
+// the nav reads search, filter expression, then the toc.
 func selftestSidebarOrder() bool {
 	html, live := i14Book()
 	if !live {
@@ -60,38 +62,46 @@ func selftestSidebarOrder() bool {
 	}
 	iSearch := strings.Index(nav, `id="search"`)
 	iExpr := strings.Index(nav, `id="filter-expr"`)
-	iViews := strings.Index(nav, `<details id="views"`)
 	iToc := strings.Index(nav, `id="toc"`)
-	return iSearch >= 0 && iExpr > iSearch && iViews > iExpr && iToc > iViews
+	return iSearch >= 0 && iExpr > iSearch && iToc > iExpr &&
+		strings.Contains(nav, `id="dpane-views"`)
 }
 
 // test-section-paging -> selftest:section-paging
+// The top pager bar died (owner c1): paging flows through the toc, hash, and arrow
+// keys - one top-level section per page, toggled by the pg-hide class.
 func selftestSectionPaging() bool {
 	html, live := i14Book()
 	if !live {
 		return true
 	}
-	return strings.Contains(html, `data-paged="1"`) && strings.Contains(html, `id="book-pager"`)
+	return strings.Contains(html, `data-paged="1"`) && strings.Contains(html, "pg-hide") &&
+		strings.Contains(html, "bookPageTo")
 }
 
 // test-search-hitlist -> selftest:search-hitlist
+// The hit list died in the 2026-07-08 sidebar rework: a search steps through the
+// matches with a previous/next counter; the full-yellow highlight stays.
 func selftestSearchHitlist() bool {
 	html, live := i14Book()
 	if !live {
 		return true
 	}
-	return strings.Contains(html, `id="search-hits"`) &&
-		strings.Contains(html, `data-hits-page="20"`) &&
+	return strings.Contains(html, `id="search-nav"`) &&
+		strings.Contains(html, `id="hits-pos"`) &&
+		strings.Contains(html, `id="hits-prev"`) && strings.Contains(html, `id="hits-next"`) &&
 		strings.Contains(html, "::highlight(book-hits){background:#ffff00}")
 }
 
 // test-reader-columns -> selftest:reader-columns
+// Scoped to rendered CELLS (>x<): guidance prose may legitimately NAME file.name
+// when documenting the query subset (it reaches the book via the pull law).
 func selftestReaderColumns() bool {
 	html, live := i14Book()
 	if !live {
 		return true
 	}
-	return !strings.Contains(html, "file.name") && !strings.Contains(html, ">weight<")
+	return !strings.Contains(html, ">file.name<") && !strings.Contains(html, ">weight<")
 }
 
 // test-table-render -> selftest:table-render
@@ -113,13 +123,14 @@ func selftestTableNoise() bool {
 }
 
 // test-table-interact -> selftest:table-interact
+// The enum selects died for combinable pill facets (req-table-facets, i14).
 func selftestTableInteract() bool {
 	html, live := i14Book()
 	if !live {
 		return true
 	}
 	return strings.Contains(html, "data-sortable") &&
-		strings.Contains(html, "data-enum-filter") &&
+		strings.Contains(html, `data-facet=`) &&
 		strings.Contains(html, `class="q-filter"`)
 }
 
@@ -141,12 +152,14 @@ func selftestGlossaryTable() bool {
 }
 
 // test-ref-tooltips -> selftest:ref-tooltips
+// The (?) ref-tip markers died for the termref affordance: dashed-underlined words
+// carry their definition into the details pane (data-help + data-goto).
 func selftestRefTooltips() bool {
 	html, live := i14Book()
 	if !live {
 		return true
 	}
-	return strings.Contains(html, `class="ref-tip"`) && strings.Contains(html, `data-def="`)
+	return strings.Contains(html, `class="termref"`) && strings.Contains(html, `data-help="`)
 }
 
 // test-ch6-no-graph -> selftest:ch6-no-graph
@@ -255,4 +268,20 @@ func selftestDeckViewsSection() bool {
 		return true
 	}
 	return strings.Contains(html, `id="deck-list"`)
+}
+
+// test-context-diagram -> selftest:context-star-derived
+// The star derives from neighbour NOTES, never from invented actors: each nbr- node
+// renders as one border-connected box, direction `in` on the left flank and `out` on
+// the right (owner ruling 2026-07-09); an empty neighbour set says so out loud.
+func selftestContextStarDerived() bool {
+	nodes := map[string]Node{
+		"nbr-console": {ID: "nbr-console", Type: "neighbour", Statement: "The console. Commands and blesses.", Direction: "in"},
+		"nbr-reader":  {ID: "nbr-reader", Type: "neighbour", Statement: "The reader's browser.", Direction: "out"},
+	}
+	svg := renderFigure("context-star", nodes)
+	empty := renderFigure("context-star", map[string]Node{})
+	return strings.Contains(svg, `x="70" y="215" text-anchor="middle">console<`) && // in = left flank
+		strings.Contains(svg, `x="570" y="215" text-anchor="middle">reader<`) && // out = right flank
+		strings.Contains(svg, "<line ") && strings.Contains(empty, "no neighbour")
 }

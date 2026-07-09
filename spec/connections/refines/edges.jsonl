@@ -333,3 +333,4 @@
 {"src":"req-comment-ux","dst":"uc-comment-annotate"}
 {"src":"req-criteria-in-needs","dst":"uc-book-content"}
 {"src":"req-table-facets","dst":"uc-book-tables"}
+{"src":"req-fig-fullscreen","dst":"uc-book-navigate"}

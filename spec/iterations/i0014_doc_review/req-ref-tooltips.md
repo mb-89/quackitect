@@ -1,8 +1,8 @@
-﻿---
+---
 id: req-ref-tooltips
 type: requirement
 depends_on: []
-statement: A term or ledger reference shall render as a small marker that shows a tooltip on hover and jumps to the definition on click.
+statement: A term or ledger reference shall render as a dashed-underlined affordance that shows its definition in the details pane on click, with a jump link to the full entry.
 class: review
 killer: false
 phase: [operation]

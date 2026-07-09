@@ -102,3 +102,4 @@
 {"src":"adr-table-interact","dst":"req-table-interact"}
 {"src":"adr-template-first","dst":"req-reader-columns"}
 {"src":"adr-derived-prose","dst":"req-ch3-ucfn-merge"}
+{"src":"adr-red-unobservable","dst":"req-testsred-exempt"}

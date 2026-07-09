@@ -1,0 +1,9 @@
+# The context neighbours - one nbr- note per external system or actor on the
+# boundary (owner ruling 2026-07-09). The star above derives from the same notes.
+filters:
+  and:
+    - 'type == "neighbour"'
+views:
+  - type: table
+    name: The neighbours
+    order: [name, statement]

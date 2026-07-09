@@ -1,4 +1,4 @@
-<!-- design: method-spec-template  implements: req-spec-template-set :: The spec template set: nine chapter manifests whose units open with a stable heading and carry a permanent fill comment (Contents/Motivation/Form/Sources + a machine-readable gating tag), a pre-seeded provenance mark, and a slot placeholder; the canned base queries ship beside them; start stubs instantiates the set into a bare workspace. -->
+<!-- design: method-spec-template  implements: req-spec-template-set, req-example-content :: The spec template set: nine chapter manifests whose units open with a stable heading and carry a permanent fill comment (Contents/Motivation/Form/Sources + a machine-readable gating tag), a pre-seeded provenance mark, and a slot placeholder; the canned base queries ship beside them; start stubs instantiates the set into a bare workspace. Where a reader-facing view would otherwise render empty, the set ships a clearly-marked ex- example seed (statement opens EXAMPLE, body says delete me) the author replaces or deletes. -->
 # the spec template — nine chapters that drive a specification
 
 One manifest per chapter, content in notes, every projection deterministic.

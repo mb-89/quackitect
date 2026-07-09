@@ -57,11 +57,28 @@ func findRoot() string {
 	}
 }
 
-// engineRoot resolves the engine install (the dir holding .quack/engine/<binary> + vendored resources)
-// from the executable path, independent of the workspace. Falls back to ROOT (self / dogfood).
-func engineRoot() string {
-	if exe, err := os.Executable(); err == nil {
-		d := filepath.Dir(exe)
+// hasEngineLayer reports whether dir carries the engine resource layer (either layout).
+func hasEngineLayer(dir string) bool {
+	if dir == "" {
+		return false
+	}
+	for _, l := range []string{filepath.Join(dir, "tools", "vendor", "quackitect"), filepath.Join(dir, "product", "quackitect")} {
+		if st, err := os.Stat(filepath.Join(l, "method")); err == nil && st.IsDir() {
+			return true
+		}
+	}
+	return false
+}
+
+// resolveEngineRoot is engineRoot's pure core, seamed for the selftest. Order (the i14 bugfix,
+// bugreport-external-stub-engineroot; owner ruling: LIVE resolution, never a copy): a legacy
+// .quack ancestor of the executable; the WORKSPACE when it carries the resource layer itself
+// (dogfood and vendored vehicles stay live-first); the RECORDED engine home — the quackitect
+// repo the binary was last built or ratcheted from, so a resource edit there changes every
+// stub workspace immediately; else the workspace (the old fallback: strict names the real gap).
+func resolveEngineRoot(exeDir, root, recordedHome string) string {
+	if exeDir != "" {
+		d := exeDir
 		for i := 0; i < 4 && d != filepath.Dir(d); i++ {
 			if filepath.Base(d) == ".quack" {
 				return filepath.Dir(d)
@@ -69,7 +86,23 @@ func engineRoot() string {
 			d = filepath.Dir(d)
 		}
 	}
-	return ROOT
+	if hasEngineLayer(root) {
+		return root
+	}
+	if hasEngineLayer(recordedHome) {
+		return recordedHome
+	}
+	return root
+}
+
+// engineRoot resolves the engine install (the resource layer's home) from the executable
+// path, independent of the workspace (req-workspace-split).
+func engineRoot() string {
+	exeDir := ""
+	if exe, err := os.Executable(); err == nil {
+		exeDir = filepath.Dir(exe)
+	}
+	return resolveEngineRoot(exeDir, ROOT, recordedEngineHome())
 }
 
 // enddesign
@@ -85,6 +118,15 @@ func init() {
 		}
 	}
 	ENGINE = engineRoot()
+	// self-heal the recorded engine home (owner 2026-07-09, the cross-machine case): any run
+	// whose workspace IS an engine repo (dogfood layout) re-records the pointer, so a fresh
+	// clone on a new machine fixes every stub with one command run inside the repo. Vehicles
+	// (vendored layout) never steal the pointer.
+	if st, err := os.Stat(filepath.Join(ROOT, "product", "quackitect", "method")); err == nil && st.IsDir() {
+		if recordedEngineHome() != ROOT {
+			recordEngineHome(ROOT)
+		}
+	}
 }
 
 // design: go-engine-core  implements: req-behavior-parity, req-split, req-review
@@ -314,7 +356,7 @@ var traceContent = map[string]bool{"need": true, "usecase": true, "requirement":
 	// the item types of the spec-template walk (go-items) and the i12x extension kinds
 	// (go-conn-lanes): content, never gates
 	"candidate": true, "stakeholder": true, "raid": true, "rationale": true, "record": true,
-	"connection": true, "rule": true, "budget": true, "criterion": true, "guide": true}
+	"connection": true, "rule": true, "budget": true, "criterion": true, "guide": true, "neighbour": true}
 
 // design: go-no-trace-gate  implements: req-no-trace-gate
 // Trace-typed nodes (need/usecase/requirement/design/test/adr) are content, never task gates —

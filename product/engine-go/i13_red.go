@@ -47,7 +47,9 @@ func bookAnnotatorFindings() []string {
 		return append(f, "no main content region")
 	}
 	content := html[mainStart:mainEnd]
-	if strings.Contains(content, "quack-comments") || strings.Contains(content, "quack-annotator") {
+	// artifact SIGNATURES, not vocabulary: design statements rendered in the reading flow
+	// may legitimately NAME the island and the script (they document the layer).
+	if strings.Contains(content, `id="quack-comments"`) || strings.Contains(content, "/* quack-annotator") {
 		f = append(f, "comment-layer artifacts inside the content region")
 	}
 	tail := html[mainEnd:]
@@ -394,16 +396,18 @@ func selftestOrphanRenderRefs() bool {
 			return false // view-rendered nodes are not orphans (owner ruling, i13 M2)
 		}
 	}
-	// a node no manifest and no view reaches still flags
+	// a node no manifest and no view reaches still flags. Since the i14 ucfn merge the
+	// board blanket-reaches every need and use case, so the synthetic is a REQUIREMENT:
+	// no file on disk, no view row returns it, the orphan lint must flag it.
 	syn := map[string]Node{}
 	for k, v := range nodes {
 		syn[k] = v
 	}
-	syn["uc-i13-truly-unreachable"] = Node{ID: "uc-i13-truly-unreachable", Type: "usecase",
+	syn["req-i13-truly-unreachable"] = Node{ID: "req-i13-truly-unreachable", Type: "requirement",
 		Path: filepath.Join(SPEC, "iterations", "i0001_syn", "u.md"), Statement: "synthetic orphan"}
 	found := false
 	for _, f := range bookOrphanFindings(syn) {
-		if strings.Contains(f, "uc-i13-truly-unreachable") {
+		if strings.Contains(f, "req-i13-truly-unreachable") {
 			found = true
 		}
 	}

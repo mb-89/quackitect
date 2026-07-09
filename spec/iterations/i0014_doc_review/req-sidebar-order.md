@@ -1,8 +1,8 @@
-﻿---
+---
 id: req-sidebar-order
 type: requirement
 depends_on: []
-statement: The book sidebar shall order its blocks: search, then the filter expression, then collapsible views, then the toc; the toc shall show each chapter's number.
+statement: The book sidebar shall order its blocks: search, then the filter expression, then the toc; the views live in the details pane; the toc shall show each chapter's number and shall not list the deck.
 class: review
 killer: false
 phase: [operation]

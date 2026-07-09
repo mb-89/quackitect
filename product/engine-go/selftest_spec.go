@@ -293,7 +293,9 @@ func selftestCh2Derived() bool {
 		return false
 	}
 	// used entries render; normative renders apart from AND before informative
-	ni, ii := strings.Index(html, "<h2>Normative</h2>"), strings.Index(html, "<h2>Informative</h2>")
+	// (h3 group headings since owner review c22). Usage counts the i14 termref
+	// affordance (data-goto), not only anchors - the pull-law fix of 2026-07-09.
+	ni, ii := strings.Index(html, "<h3>Normative</h3>"), strings.Index(html, "<h3>Informative</h3>")
 	if !strings.Contains(html, "Norm A") || !strings.Contains(html, "Paper B") || ni < 0 || ii < ni {
 		return false
 	}
@@ -353,13 +355,18 @@ func selftestFigTables() bool {
 	if len(findings) != 0 {
 		return false
 	}
-	// the verification matrix groups by requirement and carries the test row
-	// (reader NAME since i14, req-reader-columns: ids render humanized)
-	if !strings.Contains(html, "Verification matrix") || !strings.Contains(html, "req-fix (1)") || !strings.Contains(html, "<td>fix</td>") {
+	// the verification matrix carries the test row in the i14 unified reader table:
+	// name + brief columns, the requirement grouping stamped as the row's data-gp,
+	// the full item one expand away (req-reader-columns, req-table-expand)
+	if !strings.Contains(html, "Verification matrix") ||
+		!strings.Contains(html, `data-gp="req-fix"`) ||
+		!strings.Contains(html, `data-node="test-fix"`) ||
+		!strings.Contains(html, "verifies the fixture.") {
 		return false
 	}
-	// the stakeholder matrix renders the item row
-	if !strings.Contains(html, "Stakeholders") || !strings.Contains(html, "<td>user</td>") {
+	// the stakeholder matrix renders the item row (same unified anatomy)
+	if !strings.Contains(html, "Stakeholders") || !strings.Contains(html, `data-node="stk-user"`) ||
+		!strings.Contains(html, "the user role.") {
 		return false
 	}
 	// a missing pooled query is a render-failing finding, never a silent skip
@@ -443,12 +450,21 @@ func selftestCandidates() bool {
 		os.WriteFile(p, []byte("---\nid: "+id+"\ntype: candidate\naxis: "+axis+"\nstatement: option "+id+".\nratings:\n  crit-speed: "+speed+"\n  crit-cost: "+cost+"\n---\npros and cons.\n"), 0o644)
 		return ParseNode(p)
 	}
+	// the candidates render in the PROJECT chapter since i14 (req-candidates-timeline):
+	// parsed nodes ride a real iteration's path so the per-iteration walk picks them up
+	vs := versions()
+	if len(vs) == 0 {
+		return false
+	}
+	ip := filepath.Join(SPEC, "iterations", vs[0], "syn.md")
 	nodes := map[string]Node{}
-	nodes["cand-a"] = mkCand("cand-a", "storage", "0.8", "0.3")
-	nodes["cand-b"] = mkCand("cand-b", "storage", "0.4", "0.9")
-	nodes["adr-pick"] = Node{ID: "adr-pick", Type: "adr", Kind: "architecture",
+	ca := mkCand("cand-a", "storage", "0.8", "0.3")
+	cb := mkCand("cand-b", "storage", "0.4", "0.9")
+	ca.Path, cb.Path = ip, ip
+	nodes["cand-a"], nodes["cand-b"] = ca, cb
+	nodes["adr-pick"] = Node{ID: "adr-pick", Type: "adr", Kind: "architecture", Path: ip,
 		Chosen: []string{"cand-a"}, Rejected: []string{"cand-b"}, Statement: "picks a.", Class: "review"}
-	html := renderFigure("candidates-matrix", nodes)
+	html := renderFigure("project-table", nodes)
 	// dynamic criteria columns, axis grouping, and the derived statuses
 	if !strings.Contains(html, "crit-speed") || !strings.Contains(html, "crit-cost") ||
 		!strings.Contains(html, "storage") {
@@ -659,9 +675,10 @@ func selftestSpecTemplateSet() bool {
 	if _, err := os.Stat(filepath.Join(dir, "README.md")); err != nil {
 		return false
 	}
+	// ch7 died at i14 (rationales folded into the ch8 Appendix, owner ruling 2026-07-08)
 	chapters := []string{"man-ch0-orientation", "man-ch1-motivation", "man-ch2-fundamentals",
 		"man-ch3-design-input", "man-ch4-design-output", "man-ch5-verification-validation",
-		"man-ch6-project", "man-ch7-rationales", "man-ch8-guidance"}
+		"man-ch6-project", "man-ch8-guidance"}
 	gateRe := regexp.MustCompile(`\[(mandatory|judgment|type: [^\]]+)\]`)
 	for _, ch := range chapters {
 		raw, err := os.ReadFile(filepath.Join(dir, ch+".md"))

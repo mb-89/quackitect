@@ -43,7 +43,7 @@ var nodeKeysAllow = map[string]bool{
 	"ratings": true, // one-level map key (go-ratings-map, req-ratings-map)
 	// the item fields (go-items + the item templates, owner walk 2026-07-05); every field's
 	// semantics and value range live in its item template (method/templates)
-	"kind": true, "axis": true, "chosen": true, "rejected": true, "refers": true, "role": true,
+	"kind": true, "axis": true, "chosen": true, "rejected": true, "refers": true, "role": true, "direction": true,
 	"phase": true, "discipline": true, "quality": true, "must_wish": true, "weight": true,
 	"source": true, "responsible": true, "interest": true, "influence": true,
 	"probability": true, "impact": true, "mitigation": true, "owner": true, "status": true,
