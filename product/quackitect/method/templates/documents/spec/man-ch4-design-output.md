@@ -5,7 +5,7 @@ mode: chapter
 order: 40
 statement: Design output - the architecture derived, then the design deep down.
 ---
-<!-- design: method-ch4-mech  implements: req-ch4-mech, req-candidates-timeline :: ch4 mechanized (owner walk 2026-07-06), current-state only since the bs20 ruling (2026-07-08): canned ledes, every figure line its own unit, the ASR view grown to weight-or-quality, partitioning as the layered onion figure with interface connections and tagged force-rationales, the design rules view; the candidates matrix and the decision tables live with the project chapter (the design chapter documents what IS, the project chapter how it came to be); the authored residue is the type-gated budgets unit. -->
+<!-- design: method-ch4-mech  implements: req-chapters-canned.3, req-decision-rendering.2 :: ch4 mechanized, current-state only: canned ledes, every figure line its own unit, the ASR list GENERATED from the architecturally-significant tag as links back to design input (never copied quality text), partitioning as the layered onion figure with interface connections and tagged force-rationales, the design rules view; the candidates matrix and the decision tables live with the project chapter (the design chapter documents what IS, the project chapter how it came to be); the authored residue is the type-gated budgets unit. -->
 ## What we built
 <!-- tailor: shipped text - the chapter mechanics are the same in every project.
 Sources: architecture vs design table @[[ref-sya-architecting]].
@@ -14,15 +14,17 @@ Sources: architecture vs design table @[[ref-sya-architecting]].
 This chapter documents the architecture as it stands - part A the architecture and its drivers, part B the detailed design. How each choice was made - the deciding records and the candidates they weighed - lives with the [project chapter](man-ch6-project); every element here links there. The sorting rule for everything here: a decision is ARCHITECTURAL if it has system-wide impact or affects an important quality - otherwise it is detailed design.
 ---
 ## Drivers
-<!-- tailor: shipped machinery - the ASR view derives the drivers (high-weight rows
-  AND quality rows); the strategy and architecture decision tables render in the
-  project chapter (bs20 ruling: current state here, the record there).
+<!-- tailor: shipped machinery - the architecturally-significant list GENERATES from
+  the `architecturally-significant` tag on requirement nodes: each entry is a LINK
+  back to design input, never a copy; tagging is
+  owner curation. The strategy and architecture decision tables render in the
+  project chapter (current state here, the record there).
 Sources: drivers @[[ref-sya-architecting]].
 -->
 <!-- ai:3 -->
-The rows below drove the architecture. The strategic choices they led to are decisions, recorded with the project chapter's timeline.
-
-![[asr.base]]
+The requirements below drove the architecture - each entry links back to its register row. The strategic choices they led to are decisions, recorded with the project chapter's timeline.
+---
+fig: asr-list
 ---
 ## Partitioning and interfaces
 <!-- tailor: shipped machinery - the onion derives from the design elements (code
@@ -67,12 +69,9 @@ Detailed design honors the rules below. A rule is internally chosen governance -
 
 ![[rules.base]]
 
----
-## Methods that apply here
-<!-- tailor: shipped machinery - method notes route themselves by applies_chapters.
--->
-![[methods.base#Methods for design-output]]
-
+<!-- No "methods that apply here" section:
+     mention an applicable method in the PROSE as a link - the full
+     methods consolidate in the appendix. -->
 <!-- Trace coverage (requirement x implementing design, empty row = hole) renders
      from the graph - quack lint computes it; no authored unit. -->
 <!-- enddesign -->

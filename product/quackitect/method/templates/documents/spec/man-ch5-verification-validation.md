@@ -3,9 +3,9 @@ id: man-ch5-verification-validation
 type: manifest
 mode: chapter
 order: 50
-statement: Verification and validation - thing built right, right thing built.
+statement: V&V - verification and validation: thing built right, right thing built.
 ---
-<!-- design: method-chapter-canning  implements: req-chapter-canning :: ch5-ch8 generic ledes ship canned (owner walk 2026-07-06): the V&V split, the strategy fields, the matrix and waiver intros, the ch6 ledger prose, the ch7 annex lede, the ch8 quarantine and about-text; the authored residue is exactly the approach paragraph, the guides, the validation tracing, and the type-gated units. -->
+<!-- design: method-chapter-canning  implements: req-chapters-canned.4 :: ch5-ch8 generic ledes ship canned: the V&V split, the strategy fields, the matrix and waiver intros, the ch6 ledger prose, the annex lede, the ch8 quarantine and about-text; the authored residue is exactly the approach paragraph, the guides, the validation tracing, and the type-gated units. -->
 ## How we know it works
 <!-- tailor: shipped text - the V&V split is the same in every project.
 -->
@@ -13,8 +13,8 @@ statement: Verification and validation - thing built right, right thing built.
 Verification checks the thing was built right - every requirement against its evidence. Validation checks the right thing was built - the outcome against the needs and the success criteria. Both derive from the ledger below; the book can never claim more than the gate states.
 ---
 ## The verdict first
-<!-- tailor: shipped machinery - the exceptions view opens the chapter (bs20 ruling,
-  2026-07-08, the no-green-ocean law): the verified mass as one derived count, every
+<!-- tailor: shipped machinery - the exceptions view opens the chapter (the
+  no-green-ocean law): the verified mass as one derived count, every
   unverified requirement rendered prominently by name. With zero exceptions the block
   is one green sentence. The full matrix follows further down for the deep reader.
 Sources: the empty-row check @[[ref-generic-se]]; the lab rule @[[ref-mess-pruef-dok]].
@@ -50,7 +50,7 @@ Sources: the six-part record, the result contract @[[ref-mess-pruef-dok]].
 ---
 ## The verification matrix
 <!-- tailor: shipped text - the matrix derives; an empty row IS the finding, and it
-  ALSO renders in the verdict-first block above (bs20 ruling: the exceptions lead,
+  ALSO renders in the verdict-first block above (the exceptions lead,
   the full matrix serves the deep reader - paged by need, rows collapsed to names,
   expandable).
 Sources: the empty-row check @[[ref-generic-se]].
@@ -64,8 +64,9 @@ Every requirement below stands against its verifying evidence, cumulative across
 <!-- fill [mandatory]
 Contents: the right-thing check - against the ch1 needs and the criteria table
   below, closing the V. Acceptance state derives from the gates, never restated.
-Form: prose tracing each criterion row to its demonstrated outcome; the table
-  renders derived.
+Form: ONE short paragraph saying what the table IS
+  (no per-criterion "traces to a demonstrated behavior" prose - a hand-restated
+  demonstration is derivable content); the table renders derived.
 -->
 <!-- ai:3 -->
 {{validation}}
@@ -80,9 +81,8 @@ Form: prose tracing each criterion row to its demonstrated outcome; the table
 A row below is a failed check the project accepted anyway - a wvr- decision addressing the failed requirement and linking the evidence. An undecided deviation never lands here; it stays loudly visible above.
 
 ![[decisions-waiver.base]]
----
-## Methods that apply here
-<!-- tailor: shipped machinery - method notes route themselves by applies_chapters.
--->
-![[methods.base#Methods for verification-validation]]
+
+<!-- No "methods that apply here" section:
+     mention an applicable method in the PROSE as a link - the full
+     methods consolidate in the appendix. -->
 <!-- enddesign -->

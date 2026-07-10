@@ -11,10 +11,12 @@
             "id": "389d8bfde2c5d415",
             "type": "leaf",
             "state": {
-              "type": "empty",
-              "state": {},
-              "icon": "lucide-file",
-              "title": "New tab"
+              "type": "excalidraw",
+              "state": {
+                "file": "Drawing 2026-07-10 18.58.58.excalidraw.md"
+              },
+              "icon": "excalidraw-icon",
+              "title": "Drawing 2026-07-10 18.58.58.excalidraw"
             }
           }
         ]
@@ -180,6 +182,8 @@
   },
   "active": "389d8bfde2c5d415",
   "lastOpenFiles": [
+    "product/engine-go/book.go.tmp.3980.db1a898ecb98",
+    "Drawing 2026-07-10 18.58.58.excalidraw.md",
     "README.md",
     "CLAUDE.md",
     "AGENTS.md",
@@ -204,8 +208,6 @@
     "spec/iterations/i0015_mobile_adapter/test-pairing.md",
     "spec/iterations/i0015_mobile_adapter/test-multi-ask.md",
     "spec/iterations/i0015_mobile_adapter/test-ask-timeout.md",
-    "spec/iterations/i0015_mobile_adapter/test-answer-idempotent.md",
-    "spec/iterations/i0015_mobile_adapter/test-mobile-actor.md",
     "spec/iterations/i0015_mobile_adapter/tasks",
     "product/quackitect/method/prompts/engage.md.tmp.7820.81b06df4b5f1",
     "spec/iterations/i0014_doc_review/test-external-engine-root.md.tmp.7820.200d925e6d8b",

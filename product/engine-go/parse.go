@@ -27,21 +27,23 @@ type Node struct {
 	Milestone  int
 	Validates  string // "needs": this gate validates the whole need-set; its hash folds the digest of
 	// all needs, so adding/changing/removing any need reopens it (global validation, structurally).
-	Suite    string // "" | "standalone": not a member of the verification suites; own board entry (adr-standalone-suite)
-	Ears     string // "" | "exempt - <reason>": EARS-lint exemption with its required reason (req-ears-lint)
-	TestsRed string // "" | "exempt - <reason>": pre-mechanism tests-red exemption, recorded ON the node (req-testsred-exempt)
-	Guidance string // "" | <slug>: points at the guidance doc holding this node's internals (req-guidance-split)
-	Mode     string // manifest nodes only: chapter | preset | deck | exclude (req-book-manifests)
-	Order    int    // manifest chapter order (req-system-overview): explicit render slot; 0 = fall back to id sort
+	Suite      string   // "" | "standalone": not a member of the verification suites; own board entry (adr-standalone-suite)
+	Ears       string   // "" | "exempt - <reason>": EARS-lint exemption with its required reason (req-ears-authoring.1)
+	TestsRed   string   // "" | "exempt - <reason>": pre-mechanism tests-red exemption, recorded ON the node (req-legacy-decided.2)
+	Guidance   string   // "" | <slug>: points at the guidance doc holding this node's internals (req-reader-structure.2)
+	Mode       string   // manifest nodes only: chapter | preset | deck | exclude (req-manifest-render.1)
+	Order      int      // manifest chapter order (req-system-overview): explicit render slot; 0 = fall back to id sort
 	ReadyWhen  string   // defer condition (go-decisions): write-once; scrap edge + ready_when = defer
 	Supersedes []string // decision exit (go-decisions): an incoming supersedes edge = superseded
-	// design: go-ratings-map  implements: req-ratings-map
+	State      string   // question nodes only (go-question-nodes): open | proposed | decided
+	DecidedVia string   // question nodes only (go-question-nodes): how a decided question was decided
+	// design: go-ratings-map  implements: req-base-view-queries.2
 	// One-level frontmatter maps (a key with an empty value followed by indented sub: value
 	// lines), exposed generically to views. One level only - a deeper nest refuses at strict load.
 	Maps map[string]map[string]string // e.g. ratings: {criterion: score}
 	// enddesign
-	// design: go-items  implements: req-decision-kinds, req-candidates
-	// The item machinery (owner walk 2026-07-05): ONE decision type with a kind
+	// design: go-items  implements: req-candidate-decisions.3, req-candidate-decisions.1
+	// The item machinery: ONE decision type with a kind
 	// (architecture | project | waiver; empty = architecture for blessed history) rendered
 	// in its owning chapter's view; candidate nodes carry an axis and 0..1 ratings, and
 	// DECISIONS choose or reject them through links - candidate status derives from the
@@ -49,16 +51,16 @@ type Node struct {
 	Kind      string   // decision kind | requirement kind (functional|quality|constraint|interface)
 	Axis      string   // candidate: the decision axis it answers
 	Direction string   // neighbour: in (feeds the system, left flank) | out (consumes from it, right flank)
-	Chosen   []string // decision: the candidate(s) it picks
-	Rejected []string // decision: the candidate(s) it turns down, reasons in the body
-	Refers   []string // rationale: the clause keys it explains (node ids or id#heading anchors)
+	Chosen    []string // decision: the candidate(s) it picks
+	Rejected  []string // decision: the candidate(s) it turns down, reasons in the body
+	Refers    []string // rationale: the clause keys it explains (node ids or id#heading anchors)
 	// enddesign
 }
 
 // Config is the iteration breadcrumb from .quack/config.toml.
 type Config struct{ Type, Rigor, Version, LogsDir string }
 
-// design: go-parse  implements: req-zero-dep-parse
+// design: go-parse  implements: req-go-port.3
 // Hand-rolled frontmatter and config.toml parsing over the trivial subset in use
 // (key: value lines plus simple [a, b] lists). No third-party TOML or YAML library.
 func splitIDs(v string) []string {
@@ -72,10 +74,19 @@ func splitIDs(v string) []string {
 	return out
 }
 
-// ParseNode reads a markdown file's frontmatter into a Node. Splits on '---' and
-// reads key: value lines, exactly like engine.parse (split(":", 1), trimmed).
+// ParseNode reads a markdown file's frontmatter into a Node. It reads the file and
+// delegates to ParseNodeBytes — archive entries (go-compact) parse the same core
+// without a file of their own.
 func ParseNode(path string) Node {
 	txt, _ := os.ReadFile(path)
+	return ParseNodeBytes(path, txt)
+}
+
+// ParseNodeBytes parses raw node bytes into a Node. Splits on '---' and reads
+// key: value lines, exactly like engine.parse (split(":", 1), trimmed). The path
+// names the node's home — a real file, or an archive entry's synthetic ORIGINAL
+// path — and feeds the id fallback and iterOf.
+func ParseNodeBytes(path string, txt []byte) Node {
 	n := Node{ID: strings.TrimSuffix(filepath.Base(path), ".md"), Class: "judgment", Path: path}
 	parts := strings.Split(string(txt), "---")
 	fm := ""
@@ -132,6 +143,10 @@ func ParseNode(path string) Node {
 			n.Supersedes = splitIDs(v)
 		case "ready_when":
 			n.ReadyWhen = v
+		case "state":
+			n.State = v
+		case "decided_via":
+			n.DecidedVia = v
 		case "addresses":
 			n.Addresses = splitIDs(v)
 		case "id":
@@ -188,7 +203,7 @@ func ParseNode(path string) Node {
 			n.Milestone = m
 		}
 	}
-	// design: go-conn-prose-hash  implements: req-conn-root
+	// design: go-conn-prose-hash  implements: req-connections-lanes.7
 	// A connection's prose IS edge rationale - it folds into the node hash via the
 	// RegionBody seam (the design-marker precedent), so a body edit moves the root
 	// and flips the cone; edge reasoning can never mutate trust-invisibly.
@@ -198,7 +213,7 @@ func ParseNode(path string) Node {
 	// enddesign
 	if n.Type == "model" {
 		// the graph hash computes ONCE at load (band work) - the kernel's fullHash
-		// folds this field and never touches the file (i16-b12, adr-onion-physics)
+		// folds this field and never touches the file (adr-onion-physics)
 		g, _ := extractModelGraph(string(txt))
 		n.ModelHash = g.CanonicalHash()
 	}

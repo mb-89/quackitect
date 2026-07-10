@@ -3,12 +3,12 @@ id: man-sys-overview
 type: manifest
 mode: chapter
 order: 25
-statement: System overview - the whole system on one page.
+statement: Overview - the whole system on one page.
 ---
-<!-- design: des-system-overview  implements: req-system-overview :: The man-sys-overview chapter manifest (template and spec) renders the trace as its own chapter: the ucfn board plus the block tree, both derived. Amended bounds (bs20, 2026-07-08) pending their re-walk: numbered chapter before design input, one page per need, all nodes by default, graph-to-table transport. -->
+<!-- design: des-system-overview  implements: req-system-overview :: The man-sys-overview chapter manifest (template and spec) renders the trace as its own chapter: the ucfn board plus the block tree, both derived. Amended bounds pending their re-walk: numbered chapter before design input, one page per need, all nodes by default, graph-to-table transport. -->
 ## The system at a glance
-<!-- tailor: shipped machinery - the trace renders as its own chapter (field c35, bs13
-  ruling 2026-07-08): one page per need, every node shown, each node a click away from
+<!-- tailor: shipped machinery - the trace renders as its own chapter:
+  one page per need, every node shown, each node a click away from
   its table row in the chapter that owns it (the [ch N] badge names that chapter). The
   per-need grouping is the SAME the report bakes - reused, not re-derived.
 -->

@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 )
 
-// design: go-truth-in-spec  implements: req-truth-in-spec, req-root-marker, req-clean-status
+// design: go-truth-in-spec  implements: req-state-layout.4, req-state-layout.5, req-state-layout.1
 // Recorded truth lives in the repository, under spec/ (adr-no-quack-data-home): the attest ledger
 // and the EARS baseline in spec/ledger/, the iteration settings in spec/project.toml — which is
 // also the workspace ROOT MARKER (committed, present in every quackitect repo by construction; the

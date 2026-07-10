@@ -1,7 +1,7 @@
 package main
 
-// design: go-spec-content  implements: req-spec-content-roots
-// Content notes are PROJECT content, not method machinery (owner ruling 2026-07-05):
+// design: go-spec-content  implements: req-project-content-roots.2
+// Content notes are PROJECT content, not method machinery:
 // glossary terms, reference notes, fundamentals, and method notes live under the
 // workspace spec - spec/glossary, spec/references, spec/fundamentals, spec/methods -
 // for every project including quackitect itself. They are NOT trace nodes: the strict

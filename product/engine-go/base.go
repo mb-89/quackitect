@@ -1,6 +1,6 @@
 package main
 
-// design: go-base-eval  implements: req-base-views
+// design: go-base-eval  implements: req-base-view-queries.1
 // The pinned-subset Obsidian-Bases evaluator. The authoring surface is standard Bases YAML
 // (obsidian.md/help/bases/syntax) so the owner previews queries live in Obsidian; the engine
 // is the authoritative evaluator. The subset is PINNED and fails loudly: top-level keys
@@ -9,10 +9,9 @@ package main
 // map entries), the file predicates hasLink/inFolder/hasTag, and <list>.contains(). order,
 // sort (property+direction, id tie-break), limit, groupBy (multi-valued properties fan out,
 // count per group). Volatile functions (now, today) refuse by name - byte-identical
-// regeneration is the contract (req-book-identity). Everything else: "out-of-subset" error
-// naming the construct. Growth only on template demand (adr lineage: the coverage board
-// brought groupBy+count).
-// Grown 2026-07-06 (owner ruling: ch2/ch8 lists join the query system): the view key
+// regeneration is the contract (req-book-trust.2). Everything else: "out-of-subset" error
+// naming the construct. Growth only on template demand.
+// The view key
 // `render: full` renders results as full sections (statement + body) instead of a table -
 // Obsidian ignores the unknown key and previews the same rows as a plain table (the
 // understandable fallback). The bare property `referenced` is the pull law as a predicate:
@@ -231,9 +230,9 @@ type baseView struct {
 }
 
 type baseFilter struct {
-	op    string // "and" | "or" | "not" | "" (leaf)
-	kids  []*baseFilter
-	expr  string
+	op   string // "and" | "or" | "not" | "" (leaf)
+	kids []*baseFilter
+	expr string
 }
 
 type baseDef struct {
@@ -637,7 +636,7 @@ func (bp *baseParser) hasLink(target string) bool {
 
 // enddesign
 
-// design: go-virtual-edges  implements: req-virtual-edges
+// design: go-virtual-edges  implements: req-connections-lanes.9
 // Edge properties resolve from the GRAPH when the file lacks them: after migration the
 // frontmatter no longer carries verifies/refines/..., but the loader reconstructed the
 // adjacency - so a query sees exactly what frontmatter storage showed. Obsidian previews
@@ -683,7 +682,7 @@ var edgeProps = map[string]bool{"verifies": true, "refines": true, "addresses": 
 func (bp *baseParser) resolve(name string) string {
 	n := strings.TrimPrefix(name, "note.")
 	switch n {
-	case "name": // reader-facing (req-reader-columns): humanized id
+	case "name": // reader-facing (req-reader-tables.6): humanized id
 		return humanizeID(bp.ctx.p.id)
 	case "file.name":
 		return bp.ctx.p.id
@@ -864,7 +863,7 @@ func EvalBaseUsed(text string, paths []string, nodes map[string]Node, used map[s
 					r.Facets = append(r.Facets, "f-"+f+"-"+v)
 				}
 			}
-			// Head/Body fill for EVERY view since bs20 (req-table-expand): the table's
+			// Head/Body fill for EVERY view (req-reader-tables.3): the table's
 			// detail rows render them; full views used them all along.
 			r.Head = p.scalars["statement"]
 			if r.Head == "" {

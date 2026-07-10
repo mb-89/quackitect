@@ -7,7 +7,7 @@ smells: no-flow-layer, sky-fall, rank-mixed-region
 ---
 # layers-flow
 
-The onion (owner physics, settled 2026-07-09). Rank = ABSTRACTION GRADIENT:
+The onion (owner physics). Rank = ABSTRACTION GRADIENT:
 the outermost layer (the rim) touches the real world and is mechanical; the
 innermost (the kernel) holds the core algorithms - the most complicated part,
 ignorant of the periphery. Swap a rim element (an IO board, a fieldbus, a UI)

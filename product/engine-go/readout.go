@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-// design: go-readout-width  implements: req-readout-width
+// design: go-readout-width  implements: req-deterministic-readout.3
 // The readout is a bordered box a fixed 80 columns wide (76 content + border), so it never mangles.
 // The engine never probes chat/terminal width (impossible — output is captured, not a TTY); it renders
 // plain inside a code fence when captured (chat/file) and with ANSI color when isTTY(stdout). Width is
@@ -202,7 +202,7 @@ func barLines(iter string, cells []mcell, curIdx, doneMs int) []string {
 	}
 }
 
-// design: go-progress-bar  implements: req-progress-bar
+// design: go-progress-bar  implements: req-deterministic-readout.2
 // A deterministic bordered emoji bar for one iteration: START, each milestone, END, current marked 📍.
 // Shown when the agent self-blesses. Colored when a TTY, plain-fenced when captured.
 func ProgressBar(iter string, nodes map[string]Node, sm map[string]string, cfg Config, tty bool) string {
@@ -272,8 +272,8 @@ func (d pagerData) ready() bool {
 }
 
 // design: go-pager-merge  implements: req-pager-merge
-// Merge the HAND-OFF, never the nodes (adr-pager-handoff; widened by the i10 owner ruling "order
-// is not dependency"): when EVERY undone dependency of a milestone gate is a READY KILLER subtask
+// Merge the HAND-OFF, never the nodes (adr-pager-handoff; order
+// is not dependency): when EVERY undone dependency of a milestone gate is a READY KILLER subtask
 // — i.e. no agent-blessable work remains between the user and the gate — the pager for the gate or
 // any of those killers presents them ALL as one hand-off. One y blesses the group (each bless
 // recorded individually); a split answer stays possible. The substance checks and the review gate
@@ -321,10 +321,10 @@ func pagerGroup(id string, nodes map[string]Node, sm map[string]string) ([]strin
 
 // enddesign
 
-// design: go-pager-scope  implements: req-pager-scope
+// design: go-pager-scope  implements: req-suspicion-attribution.2
 // A pager for a killer SUBTASK reports the readiness of THAT CHECK — its own upstreams and the
-// evidence doc — never the whole milestone (i10's false "ready: NO" alarms: a milestone's first
-// killer always read 0/N). Gate pagers keep the milestone scope; the merge path resolves to the
+// evidence doc — never the whole milestone (milestone scope gives false "ready: NO" alarms: a
+// milestone's first killer always reads 0/N). Gate pagers keep the milestone scope; the merge path resolves to the
 // gate before readiness is computed, so merged hand-offs stay milestone-scoped too.
 func checkScopedReadiness(id string, nodes map[string]Node, sm map[string]string, evidence bool) []string {
 	own, ownDone := 0, 0
@@ -349,7 +349,7 @@ func checkScopedReadiness(id string, nodes map[string]Node, sm map[string]string
 
 // enddesign
 
-// design: go-handover-pager  implements: req-handover-pager
+// design: go-handover-pager  implements: req-deterministic-readout.1
 // The killer-gate hand-off readout, in one bordered <=80-col box: the emoji progress bar, biggest
 // decisions (the iteration's ADRs), biggest risks (M1 frame), deterministic readiness facts, and — LAST
 // — the bless question with 👍/👎 emojis. Decisions/risks point at their trace nodes, not restated.
@@ -358,7 +358,7 @@ func HandoverPager(gateID, iter string, nodes map[string]Node, sm map[string]str
 }
 
 // pagerLines builds the pager CONTENT — the console boxes it, and a mobile ask carries
-// the SAME lines as its one-pager body (owner 2026-07-09: the phone gets the full card).
+// the SAME lines as its one-pager body (the phone gets the full card).
 func pagerLines(gateID, iter string, nodes map[string]Node, sm map[string]string, cfg Config) []string {
 	merged := ""
 	question := "❓ Bless " + gateID + "?    👍 y    /    👎 n"
@@ -491,7 +491,7 @@ func joinN(xs []string, n int) string {
 
 // enddesign
 
-// design: go-progress-cmd  implements: req-progress-bar, req-handover-pager
+// design: go-progress-cmd  implements: req-deterministic-readout.2, req-deterministic-readout.1
 // quack progress [--iter <v>] [--pager <gate>] [--color|--plain] — the deterministic readout: the bar
 // alone (self-bless) or bar + handover pager (killer hand-off). Colored on a TTY, plain-fenced when
 // captured; --color/--plain force a mode. Pure display — never mutates state.

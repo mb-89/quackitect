@@ -17,7 +17,7 @@ is a wish (the RE rule) - every need names its source. Id prefix `need-`.
   as met - the validation chapter checks exactly this.
 - `functions` (list, optional): the need's functional structure - one verb plus
   one noun per entry, solution-neutral (Pahl/Beitz). The ch3 use-cases-and-
-  functions board renders it beside the need's use cases (i14, field c25).
+  functions board renders it beside the need's use cases.
 
 ## Body
 Context and elicitation notes. Use cases refine the need via `refines`.
@@ -31,4 +31,12 @@ acceptance: {{checkable-acceptance}}
 statement: {{the-need}}
 ---
 {{context}}
+```
+
+## Mint skeleton
+`quack mint` seeds these fields from this fence, verbatim. The engine owns every other key.
+
+```skeleton
+source: stk-TODO
+acceptance: TODO — the checkable condition that accepts the need
 ```

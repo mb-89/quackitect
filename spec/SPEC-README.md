@@ -1,4 +1,4 @@
-<!-- design: method-spec-template  implements: req-spec-template-set :: The spec template set: nine chapter manifests whose units open with a stable heading and carry a permanent fill comment (Contents/Motivation/Form/Sources + a machine-readable gating tag), a pre-seeded provenance mark, and a slot placeholder; the canned base queries ship beside them; start stubs instantiates the set into a bare workspace. -->
+<!-- design: method-spec-template  implements: req-template-home.7 :: The spec template set: nine chapter manifests whose units open with a stable heading and carry a permanent fill comment (Contents/Motivation/Form/Sources + a machine-readable gating tag), a pre-seeded provenance mark, and a slot placeholder; the canned base queries ship beside them; start stubs instantiates the set into a bare workspace. -->
 # the spec template — nine chapters that drive a specification
 
 One manifest per chapter, content in notes, every projection deterministic.
@@ -70,7 +70,7 @@ glossary stay emitter-derived — their term anchors and first-use expansion liv
 in the emitter.
 <!-- enddesign -->
 
-<!-- design: method-methods-view  implements: req-methods-view :: Methods route themselves: a method note names its chapters in applies_chapters, and each chapter embeds its own view of the pooled methods.base - demand-driven, no chapter hard-codes a method. -->
+<!-- design: method-methods-view  implements: req-method-catalog.2 :: Methods route themselves: a method note names its chapters in applies_chapters, and each chapter embeds its own view of the pooled methods.base - demand-driven, no chapter hard-codes a method. -->
 Methods route by `applies_chapters`: each chapter embeds its view of
 `queries/methods.base`; a method note names the chapters it serves.
 <!-- enddesign -->

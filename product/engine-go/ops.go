@@ -49,10 +49,12 @@ func cmdBless(args []string) {
 	}
 	var ids []string
 	if target == "--all" {
-		for id := range nodes {
-			ids = append(ids, id)
-		}
-		sort.Strings(ids)
+		// the wave filter (go-cone-triage, the b7-incident fix): a wave touches
+		// SUSPECT gates only. OPEN gates are refused by name - their first
+		// adjudication is their own walk (individual `bless <id>` stays legal).
+		var refusedOpen []string
+		ids, refusedOpen = waveBlessSelect(nodes, StatusMap(nodes))
+		refuseOpenGates(refusedOpen)
 	} else {
 		ids = []string{target}
 	}
@@ -80,7 +82,7 @@ func cmdBless(args []string) {
 	}
 	saveEvents(events)
 	fmt.Println("blessed", target)
-	// first-wins across lanes (req-first-wins-lanes): the pairing read and the feedback
+	// first-wins across lanes (req-ask-loop.7): the pairing read and the feedback
 	// print stay HERE at the command surface; the resolution rule lives inward.
 	if _, paired := loadPairConfig(); paired {
 		if n := blessResolvesAsks(ids); n > 0 {
@@ -88,11 +90,15 @@ func cmdBless(args []string) {
 		}
 	}
 	// trigger (go-report-live-reload): refresh the report after a killer or milestone bless so the
-	// board — and any open --watch page — reflects the adjudication without a manual re-render.
+	// board — and any open --watch page — reflects the adjudication. DETACHED
+	// (bless never waits on a render) — a fire-and-forget self-exec carries the render.
 	for _, nid := range ids {
 		if n, ok := nodes[nid]; ok && (n.Killer || n.Milestone > 0) {
-			if RenderReport("") == nil {
-				fmt.Println("report refreshed")
+			if exe, err := os.Executable(); err == nil {
+				c := exec.Command(exe, "report", "--no-open", "--out", filepath.Join(dataDirFor("out"), "report.html"))
+				if c.Start() == nil {
+					fmt.Println("report refresh started (background)")
+				}
 			}
 			break
 		}
@@ -101,10 +107,10 @@ func cmdBless(args []string) {
 
 // enddesign
 
-// design: go-tests-red  implements: req-tdd-sequence
+// design: go-tests-red  implements: req-impl-fragment-tdd.2
 // tests-red enforces test-first: `observe-red <test>` RUNS the test and records that it was seen
 // FAILING at its CURRENT full-hash — a run-once attestation on the Event log, mirroring a bless.
-// The tool enforces the observation (i10 defect fix): a passing test is REFUSED, so a fabricated
+// The tool enforces the observation: a passing test is REFUSED, so a fabricated
 // red can never enter the ledger — the record is machine evidence, not an honor system. The
 // coverage:tests-red rule is satisfied only when every NEW test of the CHECK'S OWN iteration
 // carries a red-observed attestation at its current hash, so a test never run-red, or edited
@@ -367,7 +373,7 @@ func notesHome() string { return dataDirFor("notes") }
 
 // enddesign
 
-// design: go-notes-out  implements: req-notes-out, req-note-lane
+// design: go-notes-out  implements: req-note-capture-lane.2, req-note-capture-lane.1
 // Notes live OUTSIDE the repository (adr-no-quack-data-home): the capture lane writes beneath the
 // workspace's notes home in the user data dir — raw notes carry personal data and never belong in a
 // published checkout. The lane is the ONLY minting path (adr-deterministic-mint): a multi-line body
@@ -501,8 +507,8 @@ func cmdGather(args []string) {
 
 // design: go-ship  implements: req-tooling
 // ship packages product/ into a versioned zip under the data home's out/. The zip is
-// ephemeral output. The BOOK and the REPORT regenerate at ship and ride the ZIP ROOT
-// (owner ruling 2026-07-07) - a recipient opens the deliverable and the two reading
+// ephemeral output. The BOOK and the REPORT regenerate at ship and ride the ZIP
+// ROOT - a recipient opens the deliverable and the two reading
 // surfaces sit on top; the committed spec/book.html refreshes in the same move, so the
 // drift lint is green at the shipped state.
 func cmdShip(args []string) {
@@ -551,13 +557,13 @@ func cmdShip(args []string) {
 
 // enddesign
 
-// design: go-build  implements: req-quack-build
+// design: go-build  implements: req-gate-eval-integrity.3
 // quack build compiles the engine from its source (EngineSrc: vendored, else dogfood) to
 // .quack/engine/<brand>.exe AND re-baselines the determinism golden in one step — closing the
 // stale-golden footgun where a hand-run build forgot to re-baseline and produced false milestone FAILs.
 // enddesign
 
-// design: go-build-fast-path  implements: req-build-fast-path
+// design: go-build-fast-path  implements: req-build-cheap.1
 // A content-only build never pays the compiler: when the source fingerprint (every .go file +
 // go.mod, order-stable) matches the one recorded beside the binary, the compile AND the stamp
 // rewrite are skipped (the binary did not change) and the existing binary just re-baselines.
@@ -589,7 +595,7 @@ func cmdBuild(args []string) {
 	src := EngineSrc()
 	out := globalBinPath() // the canonical home (go-global-ratchet); one binary serves every workspace
 	os.MkdirAll(filepath.Dir(out), 0o755)
-	// design: go-build-fast-skip  implements: req-build-fast-path
+	// design: go-build-fast-skip  implements: req-build-cheap.1
 	// the skip decision: fingerprint unchanged + binary present -> re-baseline only.
 	fpFile := out + ".srchash"
 	fp := engineSrcFingerprint(src)
@@ -597,7 +603,7 @@ func cmdBuild(args []string) {
 		if _, err := os.Stat(out); err == nil {
 			if _, err := os.Stat(out + ".staged"); err != nil { // never skip past a pending swap
 				// the pointer beside the binary names THIS repo as the live engine home
-				// (req-workspace-split: external workspaces resolve resources from it)
+				// (req-vendor-workspace.5: external workspaces resolve resources from it)
 				if err := recordEngineHome(ENGINE); err != nil {
 					fmt.Fprintln(os.Stderr, "build: engine-home record failed —", err)
 				}
@@ -608,10 +614,21 @@ func cmdBuild(args []string) {
 		}
 	}
 	// enddesign
+	// the analysis gate (go-build-analysis, adr-go-analysis-stdlib-first): gofmt,
+	// vet, and grab-if-present staticcheck must be clean before the compile
+	if finds := buildAnalysisFindings(src); len(finds) > 0 {
+		for _, f := range finds {
+			fmt.Fprintln(os.Stderr, "analysis: "+f)
+		}
+		fmt.Fprintln(os.Stderr, "build refused:", len(finds), "static-analysis finding(s)")
+		quackExit(1)
+	}
 	stamp := time.Now().Format(time.RFC3339)
 	os.WriteFile(stampFile(src), []byte(stamp+"\n"), 0o644) // committed build-time stamp (go-ratchet-stamp)
 	staged := out + ".staged"
-	cmd := exec.Command("go", "build", "-o", staged, ".")
+	// -s -w strips debugger metadata the shipped binary never uses (panic traces
+	// survive); it cuts the exe ~27%, and with it the per-launch AV scan surface.
+	cmd := exec.Command("go", "build", "-ldflags", "-s -w", "-o", staged, ".")
 	cmd.Dir = src
 	cmd.Stdout, cmd.Stderr = os.Stdout, os.Stderr
 	if err := cmd.Run(); err != nil {
@@ -626,7 +643,7 @@ func cmdBuild(args []string) {
 	os.WriteFile(out+".stamp", []byte(stamp+"\n"), 0o644) // the binary mirrors its source's stamp
 	os.WriteFile(fpFile, []byte(fp+"\n"), 0o644)          // the fingerprint arms the fast path (go-build-fast-skip)
 	// the pointer beside the binary names THIS repo as the live engine home
-	// (req-workspace-split): external workspaces resolve resources from it, never a copy
+	// (req-vendor-workspace.5): external workspaces resolve resources from it, never a copy
 	if err := recordEngineHome(ENGINE); err != nil {
 		fmt.Fprintln(os.Stderr, "build: engine-home record failed —", err)
 	}
@@ -649,7 +666,7 @@ func cmdBuild(args []string) {
 // buildRebaseline computes the root via the fresh exe, writes the golden, flushes verdicts.
 func buildRebaseline(freshExe string) string {
 	root := ""
-	// design: go-rebaseline-inprocess  implements: req-launcher-single-dispatch
+	// design: go-rebaseline-inprocess  implements: req-build-cheap.3
 	// The self-exec exists for ONE reason: a JUST-COMPILED binary must read the spec, because the
 	// old process refuses keys it predates (the i11 self-wedge). When the binary did not change
 	// (the fast path), the running process IS the fresh engine — compute in-process, spawn nothing.
@@ -670,7 +687,7 @@ func buildRebaseline(freshExe string) string {
 		root = MerkleRoot(LoadAll()) // fallback: the running process (a malformed graph still fails loudly here)
 	}
 	os.WriteFile(goldenRootPath(), []byte(root+"\n"), 0o644)
-	// design: go-verdict-surgical  implements: req-verdict-surgical
+	// design: go-verdict-surgical  implements: req-build-cheap.2
 	// Surgical, not wholesale: green verdicts survive the re-baseline — they stay self-validating
 	// on (input hash, buildID) and can only go stale through a change those keys already catch.
 	// Red verdicts die here: a FAIL recorded against the OLD golden shares input+build after a
@@ -691,9 +708,9 @@ func buildRebaseline(freshExe string) string {
 
 // enddesign
 
-// design: go-start-init  implements: req-integrate, req-vehicle-scaffold, req-claude-vendor, req-scaffold-modern
+// design: go-start-init  implements: req-engine-vehicle-overlay.3, req-vendor-workspace.2, req-vendor-workspace.1, req-scaffold-modern
 // `quack start init <target>` is run FROM a quackitect checkout and sets up a NEW vehicle at <target>
-// in the CURRENT world (i10 modernization; adr-no-quack-data-home, adr-entry-chain, adr-ratchet-stamp):
+// in the CURRENT world (adr-no-quack-data-home, adr-entry-chain, adr-ratchet-stamp):
 // it vendors the engine (product/ -> tools/vendor/, stamp included), writes spec/project.toml as the
 // root marker, a global-bin bootstrap launcher, and the pointer-chain entry files (CLAUDE.md ->
 // AGENTS.md -> the vendored contract). No .quack anywhere. It deliberately does NOT mint an iteration
@@ -850,13 +867,13 @@ func cmdStartInit(args []string) {
 
 // enddesign
 
-// --- drive-from-inside stubs (i0005): make a bare workspace drivable from within, engine linked at runtime ---
+// --- drive-from-inside stubs: make a bare workspace drivable from within, engine linked at runtime ---
 
-// design: go-inside-launcher  implements: req-inside-launcher, req-engine-loc-untracked
+// design: go-inside-launcher  implements: req-workspace-stubs.4, req-workspace-stubs.2
 // The committed root launcher for a bare workspace. It resolves an engine at runtime — the global
 // binary, then the env var — and forwards; with neither present it fails clearly. No engine binary
-// and no engine path is ever committed, so a clone carries no machine-local state (the .quack
-// internal/pointer lanes retired at i11, adr-retire-legacy-lanes).
+// and no engine path is ever committed, so a clone carries no machine-local state (no .quack
+// internal/pointer lanes - adr-retire-legacy-lanes).
 const insideLauncherTmpl = `@echo off
 rem {{PROJ}} launcher: resolve an engine (global binary -> env) and forward. No engine path committed.
 setlocal enabledelayedexpansion
@@ -871,7 +888,7 @@ exit /b %errorlevel%
 
 // enddesign
 
-// design: go-inside-agents  implements: req-inside-entry-surface
+// design: go-inside-agents  implements: req-workspace-stubs.3
 // The committed AGENTS.md entry surface for a bare workspace: tells an AI to drive via the launcher and
 // load method prompts path-free through `quack resolve` / `quack guides`. Self-contained — no hard link
 // to a quackitect checkout.
@@ -900,7 +917,7 @@ The user adjudicates gates; never bless on their behalf.
 // enddesign
 
 // design: go-inside-claude  implements: req-scaffold-modern
-// The stub CLAUDE.md pointer: Claude Code auto-loads CLAUDE.md only (field-proven at i10), so a bare
+// The stub CLAUDE.md pointer: Claude Code auto-loads CLAUDE.md only, so a bare
 // workspace carries the same pointer chain as a full vehicle — CLAUDE.md commands AGENTS.md to the letter.
 const insideClaudeTmpl = `# CLAUDE.md — entry for the Claude Code harness
 
@@ -920,15 +937,15 @@ The line below imports it.
 func insideStubFiles(proj string) map[string]string {
 	sub := func(s string) string { return strings.ReplaceAll(s, "{{PROJ}}", proj) }
 	return map[string]string{
-		proj + ".cmd": strings.ReplaceAll(sub(insideLauncherTmpl), "\n", "\r\n"),
-		"AGENTS.md":   sub(insideAgentsTmpl),
-		"CLAUDE.md":   sub(insideClaudeTmpl),
+		proj + ".cmd":                         strings.ReplaceAll(sub(insideLauncherTmpl), "\n", "\r\n"),
+		"AGENTS.md":                           sub(insideAgentsTmpl),
+		"CLAUDE.md":                           sub(insideClaudeTmpl),
 		filepath.Join("spec", "project.toml"): "# the workspace root marker + iteration breadcrumb (adr-no-quack-data-home).\n[iteration]\ntype    = \"default\"\nrigor   = \"systematic\"\nversion = \"\"\n",
 	}
 }
 
 // design: go-migrate-layout  implements: req-migrate-layout
-// The layout determinizer (owner ruling 2026-07-07): the spec MIRRORS the template.
+// The layout determinizer: the spec MIRRORS the template.
 // New workspaces seed the mirrored layout through start stubs; an EXISTING workspace
 // converts through this one-shot - manifests (man-*, SPEC-README) to the spec root,
 // stakeholders/usecases/raid notes to their item homes. Needs, criteria, and
@@ -995,7 +1012,7 @@ func cmdMigrateLayout() {
 
 // enddesign
 
-// design: go-init-stubs  implements: req-drive-from-inside
+// design: go-init-stubs  implements: req-workspace-stubs.1
 // `quack start stubs [target]` makes a workspace drivable from INSIDE: it writes the launcher,
 // AGENTS.md/CLAUDE.md, and spec/project.toml stubs (insideStubFiles) into target (default: the
 // current workspace ROOT). The launcher resolves an engine at runtime with no engine path
@@ -1012,8 +1029,8 @@ func cmdStartStubs(args []string) {
 		dst := filepath.Join(target, rel)
 		writeIfAbsent(dst, content)
 	}
-	// design: go-stub-spec  implements: req-stub-spec, req-stubs-folders, req-example-notes
-	// The instantiation path: the spec MIRRORS the template (owner ruling 2026-07-07) -
+	// design: go-stub-spec  implements: req-stub-templates.2, req-stub-templates.1, req-template-home.8
+	// The instantiation path: the spec MIRRORS the template -
 	// top-level files land at the spec ROOT (README renamed SPEC-README), and EVERY
 	// template subfolder mirrored 1:1 under spec/ (queries, references, fundamentals, the
 	// global item homes with their ex- example notes, the connections kinds). Existing
@@ -1114,55 +1131,11 @@ func writeIfAbsent(path, content string) {
 	os.WriteFile(path, []byte(content), 0o644)
 }
 
-// design: go-metrics  implements: req-metrics
-// Health metrics from the append-only attest log: rework, reversal, self-cert. Gates only.
-// Self-cert counts agent versus non-agent, so it spans the human and user actor eras as one
-// (go-stamp-user). metricsFrom is the pure core, fixture-testable without the real ledger.
-func metricsReport() map[string][2]int {
-	return metricsFrom(LoadAll(), attestEvents())
-}
-
-func metricsFrom(nodes map[string]Node, events []Event) map[string][2]int {
-	gates := map[string]bool{}
-	for id, n := range nodes {
-		if isGate(n) {
-			gates[id] = true
-		}
-	}
-	var blesses []Event
-	for _, e := range events {
-		if e.Action == "bless" && gates[e.Check] {
-			blesses = append(blesses, e)
-		}
-	}
-	counts := map[string]int{}
-	latest := map[string]Event{}
-	reversals := 0
-	for _, e := range blesses {
-		counts[e.Check]++
-		latest[e.Check] = e
-		if e.PrevHash != nil && *e.PrevHash != e.Hash {
-			reversals++
-		}
-	}
-	reworked := 0
-	for _, c := range counts {
-		if c > 1 {
-			reworked++
-		}
-	}
-	killers, selfcert := 0, 0
-	for id := range gates {
-		if nodes[id].Killer {
-			killers++
-			if e, ok := latest[id]; ok && e.Actor == "agent" {
-				selfcert++
-			}
-		}
-	}
-	return map[string][2]int{"rework": {reworked, len(counts)}, "reversal": {reversals, len(blesses)}, "selfcert": {selfcert, killers}}
-}
-
+// design: go-metrics-removed  implements: req-metrics-removed
+// The attest-log ratio metrics (go-metrics) are removed: never consulted
+// (the veto decision records the testimony).
+// A removal's design IS its tombstone: this region marks where the computation
+// lived, the report cards died with it, and git history is the archive.
 // enddesign
 
 // design: go-stamp-user  implements: req-stamp-user
@@ -1170,8 +1143,7 @@ func metricsFrom(nodes map[string]Node, events []Event) map[string][2]int {
 // `quack migrate-actors` rewrites historical human stamps to user in ONE audited pass — the
 // migration event records the count and timestamp, bless hashes and the prev_hash chain stay
 // untouched, and a second run is a no-op. Readers treat human and user as one value forever
-// (normActor, beside resolveActor in go-actor-channels), so an unmigrated clone still computes;
-// the self-cert metric counts agent versus non-agent and therefore spans both eras unchanged.
+// (normActor, beside resolveActor in go-actor-channels), so an unmigrated clone still computes.
 
 // migrateActorsFrom is the pure one-pass rewrite: every human actor/filler stamp becomes user;
 // when anything changed, ONE audit event (action migrate-actors) records how many events moved.

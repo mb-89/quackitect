@@ -30,3 +30,10 @@ statement: {{the-imperative}}
 ---
 {{why-and-cost}}
 ```
+
+## Mint skeleton
+`quack mint` seeds these fields from this fence, verbatim. The engine owns every other key. The `refers` edge lands after the fence.
+
+```skeleton
+scope: TODO
+```

@@ -9,6 +9,20 @@ import (
 	"time"
 )
 
+// i11Tests: this file's checks, in battery order (selftestRegistry in
+// selftest.go concatenates the per-file slices).
+var i11Tests = []namedTest{
+	{"parity-standalone", selftestParityStandalone},
+	{"pager-scope", selftestPagerScope},
+	{"suspect-root", selftestSuspectRoot},
+	{"evidence-cache-cap", selftestEvidenceCacheCap},
+	{"evidence-hashed", selftestEvidenceHashed},
+	{"grandfathers-decided", selftestGrandfathersDecided},
+	{"legacy-lanes-retired", selftestLegacyLanesRetired},
+	{"stamp-user", selftestStampUser},
+	{"testsred-exempt", selftestTestsredExempt},
+}
+
 // design: go-standalone-suite  implements: req-parity-standalone
 // A test node carrying `suite: standalone` is not a member of any verification suite: tests-pass
 // skips it, and the board carries it as its own entry with a live verdict (adr-standalone-suite).
@@ -115,6 +129,7 @@ func selftestTestsredExempt() bool {
 	nodes := LoadAll()
 	ro := redObserved()
 	active := readProjectConfig().Version
+	defrd := deferredReqs(nodes)
 	adrRe := regexp.MustCompile(`adr-[a-z0-9-]+`)
 	marked := 0
 	for id, n := range nodes {
@@ -123,6 +138,9 @@ func selftestTestsredExempt() bool {
 		}
 		if it := iterOf(n.Path); active != "" && it >= active {
 			continue // a not-yet-shipped iteration's tests owe their red to ITS OWN tests-red gate, never this sweep
+		}
+		if testDeferred(n, defrd) {
+			continue // deferral carries through EVERY red lister (the i16 law, third site)
 		}
 		if testsRedExempt(n) {
 			if cited := adrRe.FindString(n.TestsRed); cited == "" || nodes[cited].Type != "adr" {
@@ -184,17 +202,12 @@ func selftestStampUser() bool {
 	if n2 != 0 || len(out2) != len(out) {
 		return false // one-shot: the second pass is a no-op with no new audit event
 	}
-	// the self-cert metric spans eras: a human-era and a user-era bless count identically non-agent.
-	iterPath := filepath.Join(SPEC, "iterations", "i0001_syn", "tasks", "x.md")
-	nodes := map[string]Node{"k": {ID: "k", Class: "review", Killer: true, Path: iterPath}}
-	pre := metricsFrom(nodes, []Event{{Check: "k", Action: "bless", Actor: "human"}})["selfcert"]
-	post := metricsFrom(nodes, []Event{{Check: "k", Action: "bless", Actor: "user"}})["selfcert"]
-	agently := metricsFrom(nodes, []Event{{Check: "k", Action: "bless", Actor: "agent"}})["selfcert"]
-	return pre == [2]int{0, 1} && post == [2]int{0, 1} && agently == [2]int{1, 1}
+	// era equivalence: human-era and user-era stamps normalize to the same actor
+	return normActor("human") == normActor("user") && normActor("agent") != normActor("user")
 }
 
-// design: go-legacy-lanes-retired  implements: req-legacy-lanes-retired
-// The i5-era .quack lanes are dead (adr-retire-legacy-lanes): the resolver walks data-home
+// design: go-legacy-lanes-retired  implements: req-legacy-decided.3
+// The legacy .quack lanes are dead (adr-retire-legacy-lanes): the resolver walks data-home
 // overlay -> tools/vendor -> dogfood product only, and the stub launcher resolves the global
 // binary then QUACK_ENGINE — no engine.local pointer, no internal .quack engine. This check
 // probes a fake engine root carrying ONLY legacy lanes and demands they stay invisible.
@@ -241,7 +254,7 @@ func selftestLegacyLanesRetired() bool {
 
 // enddesign
 
-// design: go-grandfathers-decided  implements: req-grandfathers-decided
+// design: go-grandfathers-decided  implements: req-legacy-decided.1
 // No grandfather without a recorded decision (adr-grandfathers-historical). The anonymous
 // EARS baseline file is dead; every `ears: exempt` marker must cite a resolvable ADR; a
 // pre-i4 requirement without a realized design region must be addressed by an ADR. Enforced

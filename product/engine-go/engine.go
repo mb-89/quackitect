@@ -15,7 +15,7 @@ import (
 // Roots, discovered by walking up to a .quack or pyproject.toml (mirrors engine.find_root).
 var ROOT, SPEC, QUACK, ATTEST, ENGINE string // NOTES retired: the note lane resolves notesHome() live
 
-// design: go-workspace-base  implements: req-workspace-split
+// design: go-workspace-base  implements: req-vendor-workspace.5
 // The engine operates on a selectable WORKSPACE, separate from the ENGINE install. ROOT (and all state
 // — SPEC/QUACK/ATTEST/NOTES) is the cwd walk-up by default, or an explicit --base/-C target, so one
 // engine drives its own or ANOTHER project's workspace (sebot base-style; like git -C). ENGINE (the
@@ -70,8 +70,8 @@ func hasEngineLayer(dir string) bool {
 	return false
 }
 
-// resolveEngineRoot is engineRoot's pure core, seamed for the selftest. Order (the i14 bugfix,
-// bugreport-external-stub-engineroot; owner ruling: LIVE resolution, never a copy): a legacy
+// resolveEngineRoot is engineRoot's pure core, seamed for the selftest. Order (LIVE
+// resolution, never a copy): a legacy
 // .quack ancestor of the executable; the WORKSPACE when it carries the resource layer itself
 // (dogfood and vendored vehicles stay live-first); the RECORDED engine home — the quackitect
 // repo the binary was last built or ratcheted from, so a resource edit there changes every
@@ -96,7 +96,7 @@ func resolveEngineRoot(exeDir, root, recordedHome string) string {
 }
 
 // engineRoot resolves the engine install (the resource layer's home) from the executable
-// path, independent of the workspace (req-workspace-split).
+// path, independent of the workspace (req-vendor-workspace.5).
 func engineRoot() string {
 	exeDir := ""
 	if exe, err := os.Executable(); err == nil {
@@ -118,7 +118,7 @@ func init() {
 		}
 	}
 	ENGINE = engineRoot()
-	// self-heal the recorded engine home (owner 2026-07-09, the cross-machine case): any run
+	// self-heal the recorded engine home (the cross-machine case): any run
 	// whose workspace IS an engine repo (dogfood layout) re-records the pointer, so a fresh
 	// clone on a new machine fixes every stub with one command run inside the repo. Vehicles
 	// (vendored layout) never steal the pointer.
@@ -129,11 +129,11 @@ func init() {
 	}
 }
 
-// design: go-engine-core  implements: req-behavior-parity, req-split, req-review
+// design: go-engine-core  implements: req-go-port.1, req-trace-model.1, req-review
 // The identity kernel: the hashing primitive and merkle fold over the typed node
 // graph — pure functions, no file or directory I/O; every disk read of the load
-// belongs to go-graph-load. norm + full_hash were proven byte-identical to Python
-// in the M5 spike.
+// belongs to go-graph-load. norm + full_hash are byte-identical to the Python
+// original.
 var wsRe = regexp.MustCompile(`\s+`)
 
 func norm(s string) string { return strings.ToLower(strings.TrimSpace(wsRe.ReplaceAllString(s, " "))) }
@@ -145,6 +145,11 @@ func parents(n Node) []string {
 	out = append(out, n.Implements...)
 	out = append(out, n.Verifies...)
 	out = append(out, n.Addresses...)
+	for i, p := range out {
+		// sub-addressed refs (req-x.2) fold to their cluster base so the dep
+		// hash chain never drops a clustered parent (go-sub-addressing)
+		out[i] = subAddrBase(p)
+	}
 	return out
 }
 
@@ -181,6 +186,11 @@ func fullHash(id string, nodes map[string]Node, memo map[string]string) string {
 		// cosmetic file churn never moves it, a meaning change always does. The hash
 		// was computed at load - a pure field fold, no I/O here (kernel purity).
 		seed += "|model:" + n.ModelHash
+	}
+	if n.Type == "question" {
+		// a question's ruling state and provenance are identity (go-question-nodes):
+		// deciding a question ripples its dependents like any content edit
+		seed += "|question:" + n.State + "|" + n.DecidedVia
 	}
 	if n.Milestone > 0 && strings.HasSuffix(id, "-gate") {
 		seed += evidenceDocSeed(iterOf(n.Path), n.Milestone) // the gate folds its evidence docs (go-evidence-hash)
@@ -234,6 +244,9 @@ func LoadAll() map[string]Node {
 		if isSpecContent(SPEC, path) {
 			return nil // project-content notes (go-spec-content) load via their own readers
 		}
+		if filepath.Base(path) == archiveName && loadArchiveNodes(path, nodes) {
+			return nil // a compacted iteration's container (go-compact)
+		}
 		if raw, e := os.ReadFile(path); e != nil || !nodeFence(raw) {
 			return nil // only recognized node candidates load — the guard checked exactly this set
 		}
@@ -246,7 +259,7 @@ func LoadAll() map[string]Node {
 	for id, d := range scanCodeDesigns() {
 		nodes[id] = d
 	}
-	// design: go-conn-lane-root  implements: req-conn-root
+	// design: go-conn-lane-root  implements: req-connections-lanes.7
 	// Each edges.jsonl joins the identity root as one synthetic lane node whose
 	// RegionBody is the file's bytes - an edge-line edit moves the root exactly like
 	// a frontmatter edit always did. Lane nodes are content (off the graph whitelist).
@@ -338,7 +351,7 @@ func scanDesignsUnder(base string) map[string]Node {
 	return out
 }
 
-// design: go-evidence-hash  implements: req-evidence-hashed
+// design: go-evidence-hash  implements: req-evidence-ledger.1
 // A milestone gate folds its evidence doc set (M<n>-*.md in the iteration dir) into its full
 // hash (adr-evidence-hash): editing blessed evidence flips the gate SUSPECT, so the verdict
 // referent can never mutate silently under its report link. Content-hashed through normWS —
@@ -371,14 +384,17 @@ func evidenceDocSeed(iter string, ms int) string {
 // enddesign
 
 var traceContent = map[string]bool{"need": true, "usecase": true, "requirement": true, "design": true, "adr": true, "test": true, "manifest": true,
-	// the item types of the spec-template walk (go-items) and the i12x extension kinds
+	// the item types (go-items) and the connection-lane kinds
 	// (go-conn-lanes): content, never gates
 	"candidate": true, "stakeholder": true, "raid": true, "rationale": true, "record": true,
 	"connection": true, "rule": true, "budget": true, "criterion": true, "guide": true, "neighbour": true,
-	// structural models (i16): content that ripples via its extracted graph, never a gate
-	"model": true}
+	// structural models: content that ripples via its extracted graph, never a gate
+	"model": true,
+	// open unknowns (go-question-nodes, adr-question-nodes-provenance): first-class trace
+	// content with a decision state and provenance, never a gate
+	"question": true}
 
-// design: go-no-trace-gate  implements: req-no-trace-gate
+// design: go-no-trace-gate  implements: req-gate-eval-integrity.1
 // Trace-typed nodes (need/usecase/requirement/design/test/adr) are content, never task gates —
 // isGate excludes them; selftest:no-trace-gate guards the invariant so it cannot regress.
 // enddesign
@@ -416,7 +432,7 @@ type Event struct {
 	Deps          map[string]string `json:"deps"`
 	PrevHash      *string           `json:"prev_hash"`
 	Count         int               `json:"count,omitempty"`   // migrate-actors audit: events rewritten (go-stamp-user)
-	Channel       string            `json:"channel,omitempty"` // a mobile answer notes its channel (req-mobile-actor)
+	Channel       string            `json:"channel,omitempty"` // a mobile answer notes its channel (req-ask-loop.9)
 }
 
 func attestEvents() []Event {
@@ -545,7 +561,7 @@ func StatusMap(nodes map[string]Node) map[string]string {
 
 // enddesign
 
-// design: go-suspect-root  implements: req-suspect-root
+// design: go-suspect-root  implements: req-suspicion-attribution.1
 // A PROPAGATED suspect (raw DONE, effective SUSPECT — some upstream drags the cone) is a different
 // fact than a DIRECT one (own inputs changed), and the board must say so with the ROOT named: at
 // i10 one OPEN executed check read as 30 anonymous suspects and cost 28 wasted re-blesses. Roots

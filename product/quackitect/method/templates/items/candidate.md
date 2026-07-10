@@ -36,3 +36,12 @@ killer: false
 ---
 {{description, pros, cons}}
 ```
+
+## Mint skeleton
+`quack mint` seeds these fields from this fence, verbatim. The engine owns every other key.
+
+```skeleton
+axis: TODO
+ratings:
+  crit-TODO: 0.5
+```

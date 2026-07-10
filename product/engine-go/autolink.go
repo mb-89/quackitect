@@ -1,6 +1,6 @@
 package main
 
-// design: go-auto-link  implements: req-auto-link
+// design: go-auto-link  implements: req-manifest-render.5
 // The deterministic auto-link emit pass: plain-text occurrences of a content-note name or
 // alias (go-spec-content) link to their note. Rules, in order: authored links and inline
 // code stay untouched (protected spans); code fences, headings, and comment lines are

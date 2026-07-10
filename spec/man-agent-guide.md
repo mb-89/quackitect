@@ -64,8 +64,8 @@ quack start <id> [--plan]# activate a version (--plan registers a future one)
 quack start stubs [path] # emit drive-from-inside stubs into a bare workspace
 quack why <id>           # what input changed
 quack bless [--all|<id>] [--by user|agent] # record an adjudication; actor defaults by CHANNEL
-quack migrate-actors     # one-shot: rewrite pre-i11 actor stamps to user (audited; no-op when done)
-quack migrate-layout     # one-shot: move a pre-i12 spec to the template-mirroring layout (no-op when done)
+quack migrate-actors     # one-shot: rewrite legacy actor stamps to user (audited; no-op when done)
+quack migrate-layout     # one-shot: move a legacy-layout spec to the template-mirroring layout (no-op when done)
 quack note "<text>"      # deterministic capture lane
 quack note --file2list <copy.html> # list a commented book copy as note candidates (roles, never names)
 quack notes [--all]      # list open inbox notes (--all adds backlog + archive)

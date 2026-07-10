@@ -11,7 +11,7 @@ import (
 	"strings"
 )
 
-// design: go-comment-island  implements: req-comment-island, req-comment-premark-open
+// design: go-comment-island  implements: req-comment-layer.7, req-comment-layer.9
 // The island: ONE <script type="application/json" id="quack-comments"> block per copy — the
 // single source the sidebar renders from and the read-back reads. The schema follows the W3C
 // Web Annotation vocabulary in compact keys: target carries the unit anchor + TextQuoteSelector
@@ -75,7 +75,7 @@ func parseCommentIsland(html string) (*commentIsland, error) {
 
 // enddesign
 
-// design: go-island-serialize  implements: req-comment-escape
+// design: go-island-serialize  implements: req-comment-layer.4
 // The serializer half of the escape rule (spike finding 2, proven live: the M5 probe itself
 // broke on a comment containing a script-closing sequence). Marshal with HTML escaping: every
 // angle bracket lands as its unicode escape, so island content can never close its own script
@@ -91,7 +91,7 @@ func islandSerialize(raw []byte) (string, error) {
 
 // enddesign
 
-// design: go-file2list  implements: req-comment-readback, req-comment-privacy
+// design: go-file2list  implements: req-comment-file2list.1, req-comment-file2list.2
 // quack note --file2list <copy> — the pure lister (adr-comment-readback-lister): a commented
 // copy becomes a deterministic list of NOTE CANDIDATES the agent triages in context, minting
 // keepers as ordinary notes. It reads the island, never the DOM; two runs are byte-identical;
@@ -149,7 +149,7 @@ func file2list(path string) (string, error) {
 
 // enddesign
 
-// design: go-calls-summary  implements: req-calls-summary
+// design: go-calls-summary  implements: req-call-log-lifecycle.1
 // quack calls --summary IS the retro's log step (review.md step 6): print the aggregate the
 // method asks for — per-command counts, failure rate, slow calls, channel mix — then delete
 // the log in the same move (retention is retro-bound, adr-call-log). One deterministic command

@@ -13,6 +13,26 @@ import (
 	"strings"
 )
 
+// i15Tests: this file's checks, in battery order (selftestRegistry in
+// selftest.go concatenates the per-file slices).
+var i15Tests = []namedTest{
+	{"ask-format", selftestI15AskFormat},
+	{"ask-dispatch", selftestI15AskDispatch},
+	{"answer-apply", selftestI15AnswerApply},
+	{"mobile-actor", selftestI15MobileActor},
+	{"answer-idempotent", selftestI15AnswerIdempotent},
+	{"ask-timeout", selftestI15AskTimeout},
+	{"multi-ask", selftestI15MultiAsk},
+	{"pairing", selftestI15Pairing},
+	{"gate-distinct", selftestI15GateDistinct},
+	{"channel-seam", selftestI15ChannelSeam},
+	{"ntfy-channel", selftestI15NtfyChannel},
+	{"adapter-zero-dep", selftestI15AdapterZeroDep},
+	{"defer-excludes-coverage", selftestDeferExcludesCoverage},
+	{"first-wins-lanes", selftestI15FirstWinsLanes},
+	{"pair-qr", selftestI15PairQR},
+}
+
 // captureStdout runs f with os.Stdout swapped to a pipe and returns what it printed.
 func captureStdout(f func()) string {
 	old := os.Stdout
@@ -106,8 +126,8 @@ func selftestI15AnswerApply() bool {
 	if intent == nil || intent.Check != "i15-demo-gate" || intent.Verdict != "y" {
 		return false
 	}
-	// a COMBINED ask carries its whole group: one tap returns every member (owner
-	// ruling 2026-07-09: never two cards, one answer adjudicates all), and a pending
+	// a COMBINED ask carries its whole group: one tap returns every member
+	// (never two cards, one answer adjudicates all), and a pending
 	// twin covering a member is superseded
 	grp := i15Ask("gate")
 	grp.ID, grp.CID = "ask-3", "cid-003"
@@ -260,7 +280,7 @@ func selftestI15NtfyChannel() bool {
 }
 
 // test-first-wins-lanes -> selftest:first-wins-lanes
-// Mobile is the DEFAULT lane when paired (owner 2026-07-09): the pager shows at the desk
+// Mobile is the DEFAULT lane when paired: the pager shows at the desk
 // AND the ask rides the channel; the first answer from ANY lane wins and resolves the
 // ask everywhere else — a later tap cannot double-apply.
 func selftestI15FirstWinsLanes() bool {
@@ -274,9 +294,9 @@ func selftestI15FirstWinsLanes() bool {
 }
 
 // test-pair-qr -> selftest:pair-qr
-// The pairing link renders as a hand-rolled QR (owner 2026-07-09: no typing topics; the
+// The pairing link renders as a hand-rolled QR (no typing topics; the
 // topic is a CREDENTIAL, so no external encoder). Structural validity here; the real
-// phone scan is the M7 demo.
+// phone scan is the live demo.
 func selftestI15PairQR() bool {
 	m := qrMatrix("https://ntfy.sh/quack-ask-0123456789abcdef0123456789abcdef")
 	if m == nil {
@@ -324,7 +344,7 @@ func selftestI15PairQR() bool {
 }
 
 // test-defer-excludes-coverage -> selftest:defer-excludes-coverage
-// The defer-mechanism class-guard (bugfix law, found live at i15 b8): a requirement a
+// The defer-mechanism class-guard: a requirement a
 // defer/veto decision scrap-addresses owes NOTHING to the coverage rules until its
 // ready_when - no design, no test, no trace edge. Without the exclusion a deferral
 // holes designs-realized forever.
@@ -344,7 +364,7 @@ func selftestDeferExcludesCoverage() bool {
 		coverageRuleUncached(nodes, "req-traced", "")) {
 		return false
 	}
-	// the TEST side of the same law (i16): a test verifying ONLY deferred requirements
+	// the TEST side of the same law: a test verifying ONLY deferred requirements
 	// owes neither a red record nor a pass until ready_when
 	nodes["test-gone"] = Node{ID: "test-gone", Type: "test", Class: "executed",
 		Verify: "selftest:no-such-selftest", Path: ip, Verifies: []string{"req-gone"}}

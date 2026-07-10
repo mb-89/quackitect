@@ -1,12 +1,12 @@
 package main
 
-// qr.go — a hand-rolled QR encoder (i0015_mobile_adapter, req-pair-qr). Byte mode,
+// qr.go — a hand-rolled QR encoder (i0015_mobile_adapter, req-device-pairing.2). Byte mode,
 // ECC level L, versions 1..5 (all SINGLE-BLOCK at L, which keeps the codeword layout
 // trivial), fixed mask 0. Zero-dep by law — and by necessity: the encoded payload is
 // the pairing CREDENTIAL, so it must never reach an external encoder. The format-info
 // bits are COMPUTED (BCH over generator 0x537, XOR 0x5412), never a memorized table.
 
-// design: go-pair-qr  implements: req-pair-qr
+// design: go-pair-qr  implements: req-device-pairing.2
 // GF(256) arithmetic over the QR polynomial 0x11D drives the Reed-Solomon parity;
 // the matrix builder places finders, timing, alignment, the dark module, the two
 // format copies, and the zigzag data stream under mask 0. The console render draws

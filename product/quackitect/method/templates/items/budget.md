@@ -42,3 +42,16 @@ statement: {{what-it-bounds}}
 ---
 {{derivation}}
 ```
+
+## Mint skeleton
+`quack mint` seeds these fields from this fence, verbatim. The engine owns every other key. The `{{edges}}` marker is the spot where mint places the `addresses` edge in frontmatter mode.
+
+```skeleton
+metric: TODO
+unit: TODO
+{{edges}}
+rule: sum
+margin: 0.2
+allocations:
+  des-TODO: 0
+```

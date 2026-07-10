@@ -1,6 +1,6 @@
 package main
 
-// design: go-conn-lanes  implements: req-conn-notes, req-conn-jsonl, req-conn-one-lane, req-conn-kinds
+// design: go-conn-lanes  implements: req-connections-lanes.5, req-connections-lanes.3, req-connections-lanes.6, req-connections-lanes.4
 // The connections home (adr-connections-reified + adr-connection-lanes): one subfolder per
 // kind under spec/connections/, two lanes per kind - edges.jsonl carries trivial edges one
 // JSON line each ({"src","dst"[,"q"]}), con- notes carry the prose-bearing ones. An edge
@@ -8,7 +8,7 @@ package main
 // is TYPE-LAYER data (project_types/*/type.md `connections:` map: "<direction> <lane>"),
 // unioned like the facet vocabularies; an unknown kind refuses. Every refusal is loud and
 // names its file - the empty-statement guard silently dropping a note is the trap this
-// loader exists to avoid (red-team finding 2, 2026-07-06).
+// loader exists to avoid.
 
 import (
 	"encoding/json"
@@ -160,8 +160,11 @@ func connectionIssues(specDir string, ids map[string]string) []ParseIssue {
 		if id == scrapSink {
 			return true // the built-in sink (go-decisions) is always recognized; it has no file
 		}
-		_, ok := ids[id]
-		return ok
+		if _, ok := ids[id]; ok {
+			return true
+		}
+		_, ok := ids[subAddrBase(id)]
+		return ok // a numbered sub-statement resolves against its base node (go-sub-addressing)
 	}
 	mode := edgesModeOf(specDir)
 	sort.Slice(kdirs, func(a, b int) bool { return kdirs[a].Name() < kdirs[b].Name() })
@@ -250,11 +253,11 @@ func connectionIssues(specDir string, ids map[string]string) []ParseIssue {
 	return issues
 }
 
-// design: go-conn-loader  implements: req-conn-hash-neutral
+// design: go-conn-loader  implements: req-connections-lanes.2
 // Adjacency reconstruction, HASH-NEUTRAL by construction: a connection-stored edge lands
 // in exactly the Node field its frontmatter twin used, and fullHash sorts deps - so with
 // unchanged membership the node hashes are byte-identical across the two storages, and
-// blessed history never mass-suspects at migration (red-team finding 1, 2026-07-06).
+// blessed history never mass-suspects at migration.
 // Kinds without a legacy adjacency field (interface, conflicts-with, ...) reconstruct
 // nothing - they are queryable connections only.
 var connKindField = map[string]string{
@@ -268,6 +271,16 @@ func applyConnEdges(nodes map[string]Node, edges []ConnEdge) {
 		field, ok := connKindField[e.Kind]
 		if !ok {
 			continue
+		}
+		// go-sub-addressing: a numbered target (req-x.2) folds onto its base node AT
+		// MERGE TIME, and only when the raw id resolves nowhere — downstream lookups
+		// (parents, fullHash, the coverage walks) then never see a dotted ref.
+		if _, ok := nodes[e.Dst]; !ok {
+			if base := subAddrBase(e.Dst); base != e.Dst {
+				if _, ok := nodes[base]; ok {
+					e.Dst = base
+				}
+			}
 		}
 		n, ok := nodes[e.Src]
 		if !ok {
@@ -295,15 +308,15 @@ func applyConnEdges(nodes map[string]Node, edges []ConnEdge) {
 
 // enddesign
 
-// design: go-conn-tools  implements: req-mint-connection, req-promote-connection, req-conn-adjacency
-// The connection determinizers own the housekeeping (owner ruling: no AI reasoning in the
+// design: go-conn-tools  implements: req-connections-lanes.10, req-connections-lanes.11, req-connections-lanes.1
+// The connection determinizers own the housekeeping (no AI reasoning in the
 // loop). mint places an edge ONCE in its kind's default lane with the deterministic id and
 // canonical symmetric order; promote moves a jsonl edge into a note skeleton; connections
 // answers adjacency across ALL THREE lanes (jsonl, notes, code-derived implements) so no
 // consumer ever knows which lane an edge sits in - the view never lies.
 
-// design: go-edge-mode  implements: req-edge-mode
-// The two-source interim gets a referee (red-team finding 7): spec/project.toml declares
+// design: go-edge-mode  implements: req-connections-lanes.8
+// The two-source interim gets a referee: spec/project.toml declares
 // edges = "frontmatter" (default) | "connections". In connections mode a legacy edge key
 // in node frontmatter REFUSES naming file and key - a leftover cannot silently double-count
 // or mask an edit. migrate-edges writes the flag LAST, as its commit point. depends_on and
@@ -516,11 +529,11 @@ func connectionsFor(id string, nodes map[string]Node, edges []ConnEdge) []string
 	return out
 }
 
-// design: go-migrate-edges  implements: req-migrate-edges
-// The audited one-shot (migrate-actors precedent): every frontmatter edge of the seven
+// design: go-migrate-edges  implements: req-connections-lanes.12
+// The audited one-shot: every frontmatter edge of the seven
 // legacy kinds moves into the connections home's jsonl lanes. It REFUSES on a duplicate
-// list entry (dups are hash-load-bearing; a lane cannot represent them - red-team finding
-// 4) and on a before-and-after adjacency mismatch (finding 3: the golden re-baseline at
+// list entry (dups are hash-load-bearing; a lane cannot represent them)
+// and on a before-and-after adjacency mismatch (the golden re-baseline at
 // migration would bake a migration bug invisibly - so the migration proves itself before
 // the flag). The mode flag writes LAST, as the commit point; a crash mid-way leaves the
 // loud unfinished-migration state, and a re-run resumes idempotently.

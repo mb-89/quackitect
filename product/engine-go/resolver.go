@@ -6,13 +6,13 @@ import (
 	"strings"
 )
 
-// design: go-overlay-resolver  implements: req-engine-vehicle-split, req-overlay-resolver, guidance, req-integrate, req-vendor-layout
+// design: go-overlay-resolver  implements: req-engine-vehicle-overlay.1, req-engine-vehicle-overlay.2, guidance, req-engine-vehicle-overlay.3, req-vendor-workspace.3
 // One resolver walks the vehicle->engine chain. The most-specific layer wins; an un-overridden
 // resource is inherited from the engine. The engine layer is READ-ONLY: a vehicle overrides by
 // placing a file in its overlay, never by editing the engine. guides() routes through this.
 func overlayLayers() []string {
 	// most-specific first: the workspace's overlay in the DATA HOME (adr-no-quack-data-home),
-	// then the engine's default resources. The legacy .quack/overlay lane retired at i11
+	// then the engine's default resources. No legacy .quack/overlay lane
 	// (adr-retire-legacy-lanes).
 	return []string{
 		dataDirFor("overlay"),
@@ -24,7 +24,7 @@ func overlayLayers() []string {
 // vendors the engine under tools/vendor/quackitect, so that wins; the dogfood repo has no vendor
 // dir and falls back to its own product/quackitect. So gather, guides, and the report resolve engine
 // resources without a hardcoded dogfood path. Never written to. The word "product" is the engine's
-// own — a vehicle's product/ is its tool, never the engine. The .quack/vendor lane retired at i11
+// own — a vehicle's product/ is its tool, never the engine. No .quack/vendor lane
 // (adr-retire-legacy-lanes).
 func EngineDir() string {
 	for _, l := range []string{filepath.Join(ENGINE, "tools", "vendor", "quackitect"), filepath.Join(ENGINE, "product", "quackitect")} {
@@ -36,7 +36,7 @@ func EngineDir() string {
 }
 
 // EngineSrc resolves the engine's Go source: vendored under tools/vendor/engine-go in a modern
-// vehicle (i10), else the dogfood product/engine-go. Used for asset fallback, the ratchet, and
+// vehicle, else the dogfood product/engine-go. Used for asset fallback, the ratchet, and
 // `start init` vendoring.
 func EngineSrc() string {
 	for _, l := range []string{filepath.Join(ENGINE, "tools", "vendor", "engine-go"), filepath.Join(ENGINE, "product", "engine-go")} {

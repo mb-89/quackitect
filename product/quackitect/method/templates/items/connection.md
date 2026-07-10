@@ -35,3 +35,12 @@ statement: {{readable-relation}}
 ---
 {{prose}}
 ```
+
+## Mint skeleton
+`quack mint` seeds these fields from this fence, verbatim. The engine owns every other key.
+
+```skeleton
+kind: TODO
+src: TODO
+dst: TODO
+```

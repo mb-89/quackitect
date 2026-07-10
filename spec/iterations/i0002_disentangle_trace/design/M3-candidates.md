@@ -26,7 +26,7 @@ store**, milestone-grouped, with completion derived from the **append-only marks
 
 | Criterion (source) | Weight | B1 | B2 |
 |---|---|---|---|
-| No-regression to suspect/bless (`req-split`, killer) | 5 | ok | ok |
+| No-regression to suspect/bless (`req-trace-model.1`, killer) | 5 | ok | ok |
 | Reuse append-only marks (`req-metrics`) | 4 | ok | ok |
 | Traceability guaranteed (field RTM) | 3 | good (authored link) | best (inherent) |
 | Flexibility — tasks the design doesn't imply (i0002 has them: migration, ship-fix) | 5 | **best** | weak (needs escape hatch) |

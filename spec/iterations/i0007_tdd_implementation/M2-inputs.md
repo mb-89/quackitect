@@ -14,7 +14,7 @@ Sources folded into the requirements:
 
 ## Stakeholder coverage  → i7-m2-stakeholder-coverage
 - **Builder** — drives the loop; needs a structured, test-first build. (need-implementation)
-- **Maintainer** — renders the per-harness entry files at build. (req-contract-render)
+- **Maintainer** — renders the per-harness entry files at build. (req-contract-chain.1)
 - **Reader/auditor** — reads the report; needs verdicts + honest hierarchy. (need-review)
 - **Thin-harness agent (Copilot)** — must be bound and unable to bypass. (uc-reliability)
 No role left out.
@@ -23,4 +23,4 @@ No role left out.
 Every requirement has a test node (9/9): each `req-*` is paired with a `test-*` that `verifies:` it. `quack lint` reports no `req-has-test` hole.
 
 ## Requirements traced  → i7-m2-requirements-traced  *(derived: coverage:req-traced)*
-Every requirement traces to a need via a use-case: implementation reqs → `uc-test-first-build`/`uc-pluggable-roles` → `need-implementation`; reliability reqs → `uc-reliability` → `need-qualities`; `req-research-pluggable` → `uc-engage-start` → `need-engage`; `req-build-test-nesting` → `uc-review-report` → `need-review`. `quack lint` reports no `req-traced` hole.
+Every requirement traces to a need via a use-case: implementation reqs → `uc-test-first-build`/`uc-pluggable-roles` → `need-implementation`; reliability reqs → `uc-reliability` → `need-qualities`; `req-pluggable-capabilities.2` → `uc-engage-start` → `need-engage`; `req-build-test-nesting` → `uc-review-report` → `need-review`. `quack lint` reports no `req-traced` hole.

@@ -1,7 +1,7 @@
 package main
 
-// design: go-spec-lints  implements: req-external-links, req-residue-lint, req-anchor-refers
-// Three spec-content lints (owner walk 2026-07-05), all over the node-fenced sources plus
+// design: go-spec-lints  implements: req-spec-content-lint.3, req-spec-content-lint.4, req-spec-content-lint.1
+// Three spec-content lints, all over the node-fenced sources plus
 // the content notes - evidence docs are history and stay exempt:
 // - external links: an http(s) URL may live ONLY inside a reference note (spec/references);
 //   the body links the note, the fundamentals chapter derives the list (the pull law).

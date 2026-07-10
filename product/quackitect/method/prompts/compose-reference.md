@@ -23,7 +23,7 @@ type: usecase | requirement | test | adr | need
 refines:  [need-y]        # usecase; (requirement uses refines: [uc-…])
 verifies: [req-…]         # test only
 addresses:[req-…]         # adr only
-adjudicated_by: user      # adr only (the i11 stamp vocabulary)
+adjudicated_by: user      # adr only (the stamp vocabulary)
 statement: one line — this IS the spec
 class: review
 verify: selftest:<name>   # test only, optional
@@ -48,7 +48,7 @@ depends_on: [<ids>]
 ```
 - Milestone gate: id `<itag>-m<n>-gate`, `class: review`, `killer: true`, `depends_on` = all its subtasks.
 - **Milestone-monotonic:** each milestone's subtasks `depends_on` the prior milestone gate.
-- **ORDER IS NOT DEPENDENCY (owner ruling, i10).** A `depends_on` edge states a real prerequisite — nothing else. Never inject an edge just to order parallel subtasks: it delays their readiness, forces false walk order, and blocks the merged hand-off. Subtasks that can be done at the same time all hang off the prior gate, flat. The report orders ties deterministically by ID; the walk serves ready checks by ID.
+- **ORDER IS NOT DEPENDENCY (owner law).** A `depends_on` edge states a real prerequisite — nothing else. Never inject an edge just to order parallel subtasks: it delays their readiness, forces false walk order, and blocks the merged hand-off. Subtasks that can be done at the same time all hang off the prior gate, flat. The report orders ties deterministically by ID; the walk serves ready checks by ID.
 - **Real prerequisites still chain:** a build step that builds ON another depends on it; `build` depends on its children's completion; a verification that consumes an artifact depends on the step that makes it.
 - **Killers ripen WITH the closing gate.** Do not chain filler subtasks BEHIND a killer — with flat wiring the agent-blessable fillers finish first, and the remaining ready killer(s) + gate arrive as ONE combined pager (adr-pager-handoff): one hand-off, one y, every bless recorded individually.
 - **ids are iteration-unique** (namespace by `<itag>`, e.g. `i6-m2-gate`). A reused id silently shadows; `quack lint` fails on duplicates.
@@ -58,7 +58,7 @@ depends_on: [<ids>]
 - lean's derived coverage per milestone (see `rigor/lean/checklist.md`):
   M2 `{req-traced, req-has-test}` · M3 `{adr-traced}` · M4 `{designs-realized, tests-pass}`.
 
-<!-- design: method-ears-block  implements: req-ears-method :: The compose reference carries the five EARS pattern shapes and the authoring instruction, integrated with the i7 tests-red and roles content; new requirement statements at systematic rigor are authored EARS-shaped at compose time and checked by quack lint; historical non-EARS statements carry explicit ears exempt markers citing adr-grandfathers-historical (the committed baseline died at i11). -->
+<!-- design: method-ears-block  implements: req-ears-authoring.2 :: The compose reference carries the five EARS pattern shapes and the authoring instruction, integrated with the tests-red and roles content; new requirement statements at systematic rigor are authored EARS-shaped at compose time and checked by quack lint; historical non-EARS statements carry explicit ears exempt markers citing adr-grandfathers-historical. -->
 ## EARS — requirement statements (systematic rigor)
 Author every NEW `type: requirement` statement in one of the **five EARS shapes**, with **shall**:
 - **Ubiquitous** — `The <system> shall <response>.`
@@ -85,7 +85,7 @@ Walk with `next`; **bless each milestone gate one at a time as you genuinely com
 handover pager (`quack progress --pager <gate>`). `quack lint` "requirement has no design" holes are
 **expected** pre-build; don't chase them.
 
-## Model nodes (structural models, i16)
+## Model nodes (structural models)
 Project-global, in `spec/models/` (like decisions). `quack mint model --kind <kind>` seeds the
 skeleton from the registry (`method/models/*.md` — the file IS the registration). Frontmatter:
 `id: model-…`, `type: model`, `kind: <registry kind>`, `statement: <the question it answers>`.
@@ -93,6 +93,13 @@ The body is the fenced ```mermaid block — the authored file IS the checked tru
 hashes the EXTRACTED graph (cosmetic churn never ripples). Elements are allocated AHEAD of code;
 the design-marker id is the join; a realized region no model allocates is the sky-fall lint.
 Models are trace CONTENT — never blessed, never a gate.
+
+## Book render laws (owner law)
+Structural learnings land in the TEMPLATE layer (method/templates + the pooled views) BEFORE
+or WITH any renderer change - template↔book drift is forbidden. The renderer decides
+table-vs-prose deterministically: a homogeneous set of typed nodes is a TABLE (never authored
+prose); a statement renders once (row brief; the expand adds only what the row lacks); section
+numbers derive at render time; cross-references are links (name + brief), never copies.
 
 ## Where needs live
 Cross-cutting / dogfood needs: `spec/trace/` (`need-engage`, `need-note`, `need-review`, `need-workspace-drive`).

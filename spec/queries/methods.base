@@ -1,22 +1,15 @@
-# Methods route themselves: a method note names its chapters in applies_chapters;
-# each chapter embeds its own view. Demand-driven - no chapter hard-codes a method.
+# Methods consolidate in the APPENDIX:
+# no per-chapter "methods that apply here" views - a chapter
+# mentions an applicable method in its PROSE as a link (the details pane shows the
+# brief, the link lands here on the full method). The pull law filters to methods
+# the chapters actually mention; Obsidian does not know the property, so the
+# preview shows ALL methods (the superset).
 filters:
   and:
     - 'file.inFolder("methods")'
+    - 'referenced != false'
 views:
   - type: table
-    name: Methods for design-input
-    filters: 'applies_chapters.contains("design-input")'
-    order: [name, statement]
-  - type: table
-    name: Methods for design-output
-    filters: 'applies_chapters.contains("design-output")'
-    order: [name, statement]
-  - type: table
-    name: Methods for verification-validation
-    filters: 'applies_chapters.contains("verification-validation")'
-    order: [name, statement]
-  - type: table
-    name: Methods for project
-    filters: 'applies_chapters.contains("project")'
-    order: [name, statement]
+    name: Methods in full
+    render: full
+    order: [statement]

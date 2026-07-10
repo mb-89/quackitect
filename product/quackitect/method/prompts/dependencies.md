@@ -1,4 +1,4 @@
-<!-- design: dep-prompt  implements: req-dep-prompt :: A dependency-check prompt lists each build dependency with its winget install path; the agent consults it when a tool is missing and asks the user to install. -->
+<!-- design: dep-prompt  implements: req-go-port.5 :: A dependency-check prompt lists each build dependency with its winget install path; the agent consults it when a tool is missing and asks the user to install. -->
 # dependencies — what to install, and how
 
 The engine is shipped as **Go source** and built locally (see `adr-ship-source`) into ONE global

@@ -8,31 +8,34 @@ import (
 	"strings"
 )
 
-// design: go-mint  implements: req-mint, req-mint-dedupe, req-mint-rationale
+// design: go-mint  implements: req-mint, req-mint-sugar.1, req-mint-sugar.2
 // Deterministic minting (adr-deterministic-mint): the engine emits every node skeleton — typed
 // frontmatter, engine-stamped id, placeholder statement — so a node is schema-valid at BIRTH; the
-// agent fills content, never authors shape (the strict parser guarded READ time since i8; mint moves
+// agent fills content, never authors shape (the strict parser guards READ time; mint moves
 // the guarantee to creation). Sugar forms stamp the decision edges the classifier derives from:
 // `mint veto --of <id>`, `mint defer --of <id> --ready-when "<cond>"`, `mint supersede <old>` — so a
 // veto/defer/supersession can never be misspelled into the wrong class. Decisions land in
 // spec/decisions/; other types land in the active iteration.
-// design: go-mint-kinds  implements: req-mint-all-kinds
-// Every item kind mints (owner walk 2026-07-06): the agent fills content, never authors
-// shape - hand-copying a skeleton under the strict whitelist punished every typo with a
-// refused graph. adjudicated_by says user (the i11 vocabulary; human retired).
+// design: go-mint-kinds  implements: req-mint-from-templates.1
+// Every item kind mints: the agent fills content, never authors
+// shape - hand-copying a skeleton under the strict whitelist punishes every typo with a
+// refused graph. adjudicated_by says user (human is retired vocabulary).
 var mintPrefix = map[string]string{
 	"need": "need-", "usecase": "uc-", "requirement": "req-", "test": "test-", "adr": "adr-",
 	"stakeholder": "stk-", "candidate": "cand-", "raid": "raid-", "rationale": "why-",
 	"record": "rec-", "criterion": "crit-", "rule": "rule-", "budget": "bud-",
 	"guide": "guide-", "design": "des-", "connection": "con-", "neighbour": "nbr-",
-	// structural models (i16): the node body carries the fenced diagram, seeded from
+	// structural models: the node body carries the fenced diagram, seeded from
 	// the kind registry's example (go-model-registry)
 	"model": "model-",
+	// open unknowns (go-question-nodes): first-class trace content, born `state: open`
+	"question": "q-",
 }
+
 // enddesign
 
 // sugarAddresses stamps the decision edges for veto/defer: the target plus the sink — and never
-// the sink twice when the target IS the sink (i10 defect fix for addresses: [scrap, scrap]).
+// the sink twice when the target IS the sink (addresses: [scrap, scrap]).
 func sugarAddresses(of string) string {
 	if of == "" || of == scrapSink {
 		return scrapSink
@@ -51,7 +54,7 @@ func mintID(kind, slug string) string {
 	return p + slug
 }
 
-// design: go-mint-edge-aware  implements: req-mint-edge-mode
+// design: go-mint-edge-aware  implements: req-connections-code.2
 // In connections mode a minted node carries NO legacy edge key — the strict referee would
 // refuse it on the very next load (the i12 dogfood defect: mint broke every migrated
 // workspace). mintBody omits the keys when lanes=true; mintNodeAtX writes the same edges
@@ -90,6 +93,40 @@ func mintLaneEdges(kind string, extra map[string]string) []mintEdge {
 
 // enddesign
 
+// design: go-mint-templates  implements: req-config-split
+// Skeletons come FROM the item templates (adr-rules-as-config, tier b): a kind's
+// static frontmatter extras load from the fenced `skeleton` block in
+// method/templates/items/<kind>.md - the template file IS the registry (the
+// modelStubFor pattern). The code keeps only what a file cannot carry: edge keys,
+// per-call interpolation, and the hardcoded fallback for template-less stub
+// workspaces. A `{{edges}}` marker line names where the frontmatter-mode edge
+// lands when it sits mid-skeleton (budget).
+func mintSkeletonFor(kind string) string {
+	raw, err := os.ReadFile(filepath.Join(EngineDir(), "method", "templates", "items", kind+".md"))
+	if err != nil {
+		return ""
+	}
+	src := strings.ReplaceAll(string(raw), "\r\n", "\n")
+	if i := strings.Index(src, "```skeleton\n"); i >= 0 {
+		rest := src[i+len("```skeleton\n"):]
+		if j := strings.Index(rest, "```"); j >= 0 {
+			if s := strings.TrimRight(rest[:j], "\n"); s != "" {
+				return s + "\n"
+			}
+		}
+	}
+	return ""
+}
+
+func mintSkel(kind, fallback string) string {
+	if s := mintSkeletonFor(kind); s != "" {
+		return s
+	}
+	return fallback
+}
+
+// enddesign
+
 func mintBody(kind, id string, extra map[string]string, lanes bool) string {
 	var b strings.Builder
 	b.WriteString("---\n")
@@ -97,8 +134,7 @@ func mintBody(kind, id string, extra map[string]string, lanes bool) string {
 	b.WriteString("type: " + kind + "\n")
 	switch kind {
 	case "need":
-		b.WriteString("source: stk-TODO\n")
-		b.WriteString("acceptance: TODO — the checkable condition that accepts the need\n")
+		b.WriteString(mintSkel("need", "source: stk-TODO\nacceptance: TODO — the checkable condition that accepts the need\n"))
 	case "usecase":
 		if !lanes {
 			b.WriteString("refines: [" + extra["of"] + "]\n")
@@ -128,11 +164,11 @@ func mintBody(kind, id string, extra map[string]string, lanes bool) string {
 			b.WriteString("supersedes: [" + extra["supersedes"] + "]\n")
 		}
 	case "stakeholder":
-		b.WriteString("role: TODO\ninterest: 0.5\ninfluence: 0.5\nweight: 0.5\n")
+		b.WriteString(mintSkel("stakeholder", "role: TODO\ninterest: 0.5\ninfluence: 0.5\nweight: 0.5\n"))
 	case "candidate":
-		b.WriteString("axis: TODO\nratings:\n  crit-TODO: 0.5\n")
+		b.WriteString(mintSkel("candidate", "axis: TODO\nratings:\n  crit-TODO: 0.5\n"))
 	case "raid":
-		b.WriteString("kind: risk\nprobability: 0.5\nimpact: 0.5\nmitigation: TODO\nowner: TODO\nstatus: open\n")
+		b.WriteString(mintSkel("raid", "kind: risk\nprobability: 0.5\nimpact: 0.5\nmitigation: TODO\nowner: TODO\nstatus: open\n"))
 	case "rationale":
 		if !lanes {
 			b.WriteString("refers: [" + extra["of"] + "]\n")
@@ -140,20 +176,25 @@ func mintBody(kind, id string, extra map[string]string, lanes bool) string {
 	case "record":
 		b.WriteString("record_of: [" + extra["of"] + "]\nresult: TODO — value plus-minus uncertainty against the pre-fixed rule\n")
 	case "criterion":
-		b.WriteString("metric: TODO\ntarget: TODO\n")
+		b.WriteString(mintSkel("criterion", "metric: TODO\ntarget: TODO\n"))
 	case "rule":
-		b.WriteString("scope: TODO\n")
+		b.WriteString(mintSkel("rule", "scope: TODO\n"))
 		if !lanes {
 			b.WriteString("refers: [" + extra["of"] + "]\n")
 		}
 	case "budget":
-		b.WriteString("metric: TODO\nunit: TODO\n")
+		sk := mintSkel("budget", "metric: TODO\nunit: TODO\n{{edges}}\nrule: sum\nmargin: 0.2\nallocations:\n  des-TODO: 0\n")
+		pre, post := sk, ""
+		if i := strings.Index(sk, "{{edges}}\n"); i >= 0 {
+			pre, post = sk[:i], sk[i+len("{{edges}}\n"):]
+		}
+		b.WriteString(pre)
 		if !lanes {
 			b.WriteString("addresses: [" + extra["of"] + "]\n")
 		}
-		b.WriteString("rule: sum\nmargin: 0.2\nallocations:\n  des-TODO: 0\n")
+		b.WriteString(post)
 	case "guide":
-		b.WriteString("audience: TODO\n")
+		b.WriteString(mintSkel("guide", "audience: TODO\n"))
 	case "model":
 		mk := extra["kind"]
 		if mk == "" {
@@ -163,7 +204,10 @@ func mintBody(kind, id string, extra map[string]string, lanes bool) string {
 	case "design":
 		b.WriteString("responsibility: TODO\nimplements: [" + extra["of"] + "]\nrealization: make\n")
 	case "connection":
-		b.WriteString("kind: TODO\nsrc: TODO\ndst: TODO\n")
+		b.WriteString(mintSkel("connection", "kind: TODO\nsrc: TODO\ndst: TODO\n"))
+	case "question":
+		// a question is born open (go-question-nodes); decided_via lands with the ruling
+		b.WriteString(mintSkel("question", "state: open\n"))
 	}
 	stmt := extra["statement"]
 	if stmt == "" {
@@ -199,7 +243,7 @@ func mintNodeAt(dir, kind, id string) (string, error) {
 	return mintNodeAtX(dir, kind, id, map[string]string{})
 }
 
-// design: go-mint-content  implements: req-mint-all-kinds
+// design: go-mint-content  implements: req-mint-from-templates.1
 // The four content kinds mint their own shapes into the spec content homes - they are
 // notes with dedicated loaders, never node grammar. A content mint requires --id (the
 // filename IS the slug; there is no engine-stamped prefix).
@@ -292,7 +336,7 @@ func mintDefaultDir(kind string) string {
 	switch kind {
 	case "adr":
 		return filepath.Join(SPEC, "decisions")
-	// the global item homes (owner folders ruling 2026-07-06): long-lived kinds live
+	// the global item homes: long-lived kinds live
 	// beside the iterations, not inside them
 	case "stakeholder":
 		return filepath.Join(SPEC, "stakeholders")
@@ -317,7 +361,7 @@ func mintDefaultDir(kind string) string {
 func cmdMint(args []string) {
 	if len(args) == 0 {
 		fmt.Println("usage: mint <kind> [--id slug] [--of id] [--statement \"...\"] [--rationale \"...\"] [--dir path]")
-		fmt.Println("       kinds: need usecase requirement test adr stakeholder candidate raid rationale record criterion rule budget guide design connection")
+		fmt.Println("       kinds: need usecase requirement test adr stakeholder candidate raid rationale record criterion rule budget guide design connection question")
 		fmt.Println("       mint evidence --milestone M<n> [--dir path]           (stamp the milestone's evidence-doc skeleton)")
 		fmt.Println("       mint veto --of <id> [--statement \"...\"]      (decision: scrapped, final)")
 		fmt.Println("       mint defer --of <id> --ready-when \"<cond>\"    (decision: parked until)")
@@ -396,7 +440,7 @@ func cmdMint(args []string) {
 
 // enddesign
 
-// design: go-mint-skeleton  implements: req-mint-skeleton
+// design: go-mint-skeleton  implements: req-mint-from-templates.2
 // `quack mint evidence --milestone M<n>` stamps the milestone's evidence-doc skeleton from its
 // template (method/templates/<slug>.md): the template frontmatter is stripped (evidence docs are
 // prose, never nodes), the placeholders substitute (iteration, rigor, itag), and an EXISTING doc

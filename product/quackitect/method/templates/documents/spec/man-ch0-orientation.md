@@ -3,21 +3,25 @@ id: man-ch0-orientation
 type: manifest
 mode: chapter
 order: 0
-statement: The document at a glance - what this book is and how to read it.
+statement: Introduction - what this book is and how to read it.
 ---
-<!-- design: des-prose-rework  implements: req-prose-rework :: ch0 opens with the vouching question and no diagram (c9); ch1 leads with the moved bottleneck; the README opens story-first and closes on the dogfood claim - all reader-first per the voice rules. -->
-## The document at a glance
+<!-- design: des-prose-rework  implements: req-prose-rework :: ch0 opens with the views home; ch1 leads with the moved bottleneck; the README opens story-first and closes on the dogfood claim - all reader-first per the voice rules. -->
+## Views
 <!-- fill [mandatory]
-Contents: what THIS BOOK is, who it serves, that nobody reads all of it. The system
-  itself is introduced on the README home page; this chapter is about the document.
-Motivation: a mis-landed reader is served fastest by knowing what the book is and how
-  to move through it. No method talk - ch8 owns it.
-Form: two to four sentences. Document first. Point at the README for the system.
+Contents: the views home - nobody reads all of this book, so the reader narrows it
+  here. The view buttons and the derived documents render from the figure below;
+  this unit only says how they work. The system itself is introduced on the README
+  home page.
+Motivation: a mis-landed reader is served fastest by one place that narrows the
+  document. No method talk - ch8 owns it.
+Form: two to four short sentences, then the derived figure.
 Sources: least-qualified-reader rule @[[ref-tech-dok-grundlagen]].
 -->
 <!-- ai:3 -->
 {{lede}}
 <!-- enddesign -->
+---
+fig: views-home
 ---
 ## Who reads this document
 <!-- tailor: shipped text - the mechanics are the same in every project. Adjust the

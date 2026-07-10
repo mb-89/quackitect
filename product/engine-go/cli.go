@@ -28,7 +28,7 @@ func hasFlag(args []string, flag string) bool {
 
 const version = "0.0.1-go"
 
-// design: go-brand  implements: req-white-label
+// design: go-brand  implements: req-vendor-workspace.4
 // brand is the invoked program name (argv[0] without dir or extension). A vehicle launched via its
 // own <project>.exe reads as "<project>"; the dogfood quack.exe reads as "quack". This is the
 // white-label hook — the engine never hardcodes its own name in user-facing output. Defaults to "quack".
@@ -50,7 +50,8 @@ func usageText() string {
 	return b + ` — the determinizer lane (deterministic; no judgment).
 usage: ` + b + ` status [id] | next | start <id> [--plan] | why <id> | bless [--all|<id>] [--by A]
        | note "..." | notes [--all] | gather <ver> | report [book] [--out F] | ship | build
-       | pair [ntfy] | ask <gate> [--timeout s] | await [--timeout s]
+       | pair [ntfy] | ask <gate> [--timeout s] | await [--timeout s] | triage | compact <iter>
+       | apply <manifest>
        | lint | verify <id> | progress [--pager <gate>] | migrate-actors | migrate-layout | version`
 }
 
@@ -65,6 +66,14 @@ func helpRequested(args []string) bool {
 	}
 	return false
 }
+
+// registeredCmds are late-bound verbs a feature file wires in via init
+// (go-cone-triage's `triage` is one). Dispatch consults the registry before
+// the unknown-command fallback; probes like triageAvailable read it, so a
+// removed registration breaks its selftest with it.
+var registeredCmds = map[string]func([]string){}
+
+func registerCmd(name string, fn func([]string)) { registeredCmds[name] = fn }
 
 // idCmds take an id positionally; a '-'-prefixed value there is an error (not a flag).
 var idCmds = map[string]bool{"why": true, "bless": true, "start": true, "verify": true, "status": true}
@@ -81,7 +90,7 @@ func badIDArg(cmd string, rest []string) (string, bool) {
 	return "", false
 }
 
-// design: go-cli-help  implements: req-cli-help
+// design: go-cli-help  implements: req-go-port.4
 // One command surface with a shared help preamble. Every subcommand answers -h, --help,
 // and -? with usage and NO side effect, and an id that starts with '-' is rejected — the
 // structural fix for 'quack start --help' once activating a stray version named '--help'.
@@ -91,7 +100,7 @@ func Dispatch(args []string) {
 		return
 	}
 	cmd, rest := args[0], args[1:]
-	callLogStart(cmd, rest)       // one redacted line per dispatch (go-call-log)
+	callLogStart(cmd, rest) // one redacted line per dispatch (go-call-log)
 	defer func() { callLogWrite(0) }()
 	rest = attestGuard(cmd, rest) // the contract gate: agent-channel ledger commands need a key
 	askDrainMaybe()               // the fallback lane: every run applies answers already on the channel (go-ask-loop)
@@ -115,6 +124,8 @@ func Dispatch(args []string) {
 		cmdDecisions(rest)
 	case "mint":
 		cmdMint(rest)
+	case "cluster":
+		cmdCluster(rest)
 	case "status":
 		cmdStatus(rest)
 	case "why":
@@ -163,7 +174,7 @@ func Dispatch(args []string) {
 	case "progress":
 		cmdProgress(rest)
 	case "report":
-		// `report book` renders the BOOK projection (owner ruling 2026-07-08: the book is a
+		// `report book` renders the BOOK projection (the book is a
 		// report sub-op, never a top-level command - one render surface, two projections).
 		if len(rest) > 0 && rest[0] == "book" {
 			cmdBook(rest[1:])
@@ -229,6 +240,10 @@ func Dispatch(args []string) {
 		// the canonical, engine-owned log location (go-logs-dir) — discoverable from the binary
 		fmt.Println("logs:", logsDir(readProjectConfig()))
 	default:
+		if fn, ok := registeredCmds[cmd]; ok {
+			fn(rest)
+			return
+		}
 		fmt.Println(brand() + ": '" + cmd + "' is not ported to the Go engine yet")
 		fmt.Println(usageText())
 	}
@@ -268,12 +283,19 @@ func cmdStatus(rest []string) {
 	})
 	mark := map[string]string{"DONE": "[x]", "SUSPECT": "[~]", "OPEN": "[ ]"}
 	raw := RawStates(nodes)
-	susp := 0
+	susp, done := 0, 0
+	all := hasFlag(rest, "--all")
 	for _, g := range gates {
 		tail := ""
 		if g.st == "SUSPECT" {
 			susp++
 			tail = suspectSuffix(g.id, nodes, raw) // propagated cones name their root (go-suspect-root)
+		}
+		if g.st == "DONE" {
+			done++
+			if !all {
+				continue // the board shows EXCEPTIONS by default; --all restores every row
+			}
 		}
 		fmt.Println(mark[g.st] + " " + ljust(g.st, 8) + " " + g.id + "  (" + g.cls + ")" + tail)
 	}
@@ -287,7 +309,7 @@ func cmdStatus(rest []string) {
 		}
 		fmt.Println(m + " " + ljust(st, 8) + " " + n.ID + "  (standalone)")
 	}
-	fmt.Printf("\n%d gates | %d suspect | %d trace-content\n", len(gates), susp, len(nodes)-len(gates))
+	fmt.Printf("\n%d gates | %d done | %d suspect | %d trace-content\n", len(gates), done, susp, len(nodes)-len(gates))
 }
 
 // standaloneChecks returns the suite: standalone tests, ID-sorted (go-standalone-suite).
@@ -396,6 +418,14 @@ func cmdLint(rest []string) {
 			}
 		}
 	}
+	// question hygiene (go-question-nodes): state vocabulary + decision provenance.
+	qf := questionFindings(nodes)
+	if len(qf) > 0 {
+		fmt.Printf("questions: %d finding(s):\n", len(qf))
+		for _, f := range qf {
+			fmt.Println("  - " + f)
+		}
+	}
 	// milestone-monotonic wiring (go-monotonic-lint): a subtask must chain through the prior gate.
 	mono := monotonicFindings(nodes)
 	if len(mono) > 0 {
@@ -499,7 +529,7 @@ func cmdLint(rest []string) {
 			fmt.Println("spec: " + f)
 		}
 	}
-	if len(dups) > 0 || earsBad > 0 || len(mono) > 0 || len(placement) > 0 || len(orphans) > 0 || len(metaQ) > 0 || len(drift) > 0 ||
+	if len(dups) > 0 || earsBad > 0 || len(qf) > 0 || len(mono) > 0 || len(placement) > 0 || len(orphans) > 0 || len(metaQ) > 0 || len(drift) > 0 ||
 		len(external) > 0 || len(residue) > 0 || len(anchors) > 0 {
 		quackExit(1)
 	}

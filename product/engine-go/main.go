@@ -3,7 +3,7 @@ package main
 
 import "os"
 
-// design: go-binary  implements: req-go-engine
+// design: go-binary  implements: req-go-port.2
 // The engine is one statically-linked Go binary (CGO disabled), built from this module and
 // cross-compiled from a single machine. Zero runtime dependencies; nothing fetched at run time.
 func main() {

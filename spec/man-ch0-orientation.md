@@ -3,19 +3,23 @@ id: man-ch0-orientation
 type: manifest
 mode: chapter
 order: 0
-statement: The document at a glance - what this book is and how to read it.
+statement: Introduction - what this book is and how to read it.
 ---
-## The document at a glance
+## Views
 <!-- fill [mandatory]
-Contents: what THIS BOOK is, who it serves, that nobody reads all of it. The system
-  itself is introduced on the README home page; this chapter is about the document.
-Motivation: a mis-landed reader is served fastest by knowing what the book is and
-  how to move through it. No method talk - ch8 owns it.
-Form: two to four sentences. Document first. Point at the README for the system.
+Contents: the views home - nobody reads all of this book, so the reader narrows it
+  here. The view buttons and the derived documents render from the figure below;
+  this unit only says how they work. The system itself is introduced on the README
+  home page.
+Motivation: a mis-landed reader is served fastest by one place that narrows the
+  document. No method talk - ch8 owns it.
+Form: two to four short sentences, then the derived figure.
 Sources: least-qualified-reader rule @[[ref-tech-dok-grundlagen]].
 -->
 <!-- ai:3 -->
-This book is the project's record, compiled: a user-driven gate [ledger](term:ledger) where the AI fills the checks, a person adjudicates the [gates](term:gate), and a deterministic [engine](term:engine) keeps it honest. What the system IS lives on the [README](man-readme.md) home page. This chapter is about the book itself - nobody reads all of it, so pick your view below and stop when you have enough.
+Nobody reads all of this book. Pick a view below and stop when you have enough. A click on a view enters it into the book filter. A second click clears it. The derived documents below the views are presentations compiled from this book. They add no new content. What the system IS lives on the [README](man-readme.md) home page.
+---
+fig: views-home
 ---
 ## Who reads this document
 <!-- tailor: shipped text - the mechanics are the same in every project. Adjust the

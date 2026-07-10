@@ -11,6 +11,23 @@ import (
 	"strings"
 )
 
+// trustTests: this file's checks, in battery order (selftestRegistry in
+// selftest.go concatenates the per-file slices).
+var trustTests = []namedTest{
+	{"parser-strict", selftestParserStrict},
+	{"ref-integrity", selftestRefIntegrity},
+	{"actor-channels", selftestActorChannels},
+	{"design-hash-norm", selftestDesignHashNorm},
+	{"kernel-vectors", selftestKernelVectors},
+	{"kernel-cone", selftestKernelCone},
+	{"kernel-gatewalk", selftestKernelGatewalk},
+	{"kernel-attest", selftestKernelAttest},
+	{"logs-dir", selftestLogsDir},
+	{"ears-lint", selftestEarsLint},
+	{"ears-method", selftestEarsMethod},
+	{"monotonic-lint", selftestMonotonicLint},
+}
+
 func issueWith(issues []ParseIssue, pathPart, keyPart string) bool {
 	for _, is := range issues {
 		if strings.Contains(is.Path, pathPart) && strings.Contains(is.Key, keyPart) {
@@ -385,9 +402,9 @@ func selftestEarsLint() bool {
 		}
 	}
 	for _, bad := range []string{
-		"Parse errors are handled gracefully.",     // no shall, no shape
-		"the engine handles bad input",             // no shall
-		"Shall we begin?",                          // shall, but no EARS shape
+		"Parse errors are handled gracefully.", // no shall, no shape
+		"the engine handles bad input",         // no shall
+		"Shall we begin?",                      // shall, but no EARS shape
 	} {
 		if earsShapeOK(bad) {
 			return false

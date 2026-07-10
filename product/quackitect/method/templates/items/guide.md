@@ -29,3 +29,10 @@ statement: {{who-and-what-for}}
 ---
 {{the-guide}}
 ```
+
+## Mint skeleton
+`quack mint` seeds these fields from this fence, verbatim. The engine owns every other key.
+
+```skeleton
+audience: TODO
+```

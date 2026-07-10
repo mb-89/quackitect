@@ -12,7 +12,7 @@ import (
 	"time"
 )
 
-// design: go-coverage-ids  implements: req-behavior-parity, req-unique-ids, req-coverage
+// design: go-coverage-ids  implements: req-go-port.1, req-unique-ids, req-trace-model.2
 // The derived coverage rules over the typed trace, the executed-check runner with its
 // cache, and the id-integrity guard (mint_id + duplicate_ids). Coverage is cumulative
 // through a version (no grandfathering); ids are namespaced so a reuse can never shadow.
@@ -38,8 +38,8 @@ func coverageRule(nodes map[string]Node, rule, scope string) bool {
 }
 
 // deferredReqs: the requirements a defer/veto decision scrap-addresses — they owe
-// NOTHING to the coverage rules until their ready_when (the parked list carries them;
-// found live at i15 b8). The rule, the delta lister, and the hole lister all use THIS.
+// NOTHING to the coverage rules until their ready_when (the parked list carries
+// them). The rule, the delta lister, and the hole lister all use THIS.
 func deferredReqs(nodes map[string]Node) map[string]bool {
 	deferred := map[string]bool{}
 	for _, n := range nodes {
@@ -70,10 +70,11 @@ func coverageRuleUncached(nodes map[string]Node, rule, scope string) bool {
 	veri := map[string][]Node{}
 	for _, n := range nodes {
 		for _, p := range n.Implements {
-			impl[p] = append(impl[p], n)
+			// a sub-addressed target (req-x.2) credits its cluster base (go-sub-addressing)
+			impl[subAddrBase(p)] = append(impl[subAddrBase(p)], n)
 		}
 		for _, p := range n.Verifies {
-			veri[p] = append(veri[p], n)
+			veri[subAddrBase(p)] = append(veri[subAddrBase(p)], n)
 		}
 	}
 	deferred := deferredReqs(nodes)
@@ -156,13 +157,13 @@ func coverageRuleUncached(nodes map[string]Node, rule, scope string) bool {
 		return true
 	case "tests-red":
 		// Test-first: every NEW test must carry a red-observed attestation at its CURRENT hash
-		// (a run-once record; an edited test's hash changes and must be re-observed). Per the M5 spike.
-		// SCOPED to the check's own iteration (i10 defect fix, per the subtask statement "every NEW
-		// test"): a later iteration's unbuilt tests must not hold an earlier iteration's gate red.
+		// (a run-once record; an edited test's hash changes and must be re-observed).
+		// SCOPED to the check's own iteration: a later iteration's unbuilt tests must not
+		// hold an earlier iteration's gate red.
 		// Tests authored before observe-red existed can never have been honestly observed red —
 		// recording one today would FABRICATE an attestation, which observe-red REFUSES (it runs the
 		// test; a pass records nothing). Each such test carries an explicit `tests_red: exempt`
-		// marker citing its ADR (req-testsred-exempt) — the i0008 date constant is dead.
+		// marker citing its ADR (req-legacy-decided.2).
 		ro := redObserved()
 		memo := map[string]string{}
 		active := readProjectConfig().Version
@@ -175,14 +176,14 @@ func coverageRuleUncached(nodes map[string]Node, rule, scope string) bool {
 					continue // pre-mechanism test; its exemption is a recorded marker, never retro-attested
 				}
 				if testDeferred(n, defrd) {
-					continue // deferral carries through the TEST side too (i16): no red owed until ready_when
+					continue // deferral carries through the TEST side too: no red owed until ready_when
 				}
 				if scope != "" && it != scope {
 					continue // another iteration's test owes ITS OWN gate a red, not this one
 				}
 				seen = true
 				if it != "" && it != active {
-					// Shipped-test-edit rule (i10, owner-ruled): a SHIPPED iteration keeps its BIRTH
+					// Shipped-test-edit rule: a SHIPPED iteration keeps its BIRTH
 					// evidence — the red it was honestly observed at when the test was new. Only the
 					// ACTIVE iteration's tests owe a red at their CURRENT hash (the building discipline).
 					if _, ok := ro[n.ID]; !ok {
@@ -196,7 +197,7 @@ func coverageRuleUncached(nodes map[string]Node, rule, scope string) bool {
 			}
 		}
 		return seen || scope != "" // scoped + no new tests = vacuously satisfied
-	// design: go-tests-pass-eval  implements: req-tests-pass-unify
+	// design: go-tests-pass-eval  implements: req-gate-eval-integrity.2
 	// tests-pass evaluates selftest: tests in-process (runSelftest) — the SAME evaluator the gate state
 	// machine uses — not a divergent shell path; selftest:tests-pass-eval guards the unification.
 	// enddesign
@@ -213,7 +214,7 @@ func coverageRuleUncached(nodes map[string]Node, rule, scope string) bool {
 					continue // not a suite member: watches workspace state, not iteration correctness (adr-standalone-suite)
 				}
 				if testDeferred(n, defrdP) {
-					continue // a test verifying only DEFERRED requirements owes no pass until ready_when (i16)
+					continue // a test verifying only DEFERRED requirements owes no pass until ready_when
 				}
 				if renderBusy && renderingTests[n.Verify] {
 					continue // bounded: a render never re-runs the test that triggered it
@@ -239,13 +240,13 @@ func coverageRuleUncached(nodes map[string]Node, rule, scope string) bool {
 	return false
 }
 
-// design: go-testsred-marker  implements: req-testsred-exempt
+// design: go-testsred-marker  implements: req-legacy-decided.2
 // A test that predates the red-observation mechanism carries its exemption as an EXPLICIT
 // frontmatter marker on the node — `tests_red: exempt - <reason citing its ADR>`
 // (adr-grandfathers-historical) — never a source-code date constant. A bare exempt without a
 // reason is not honored: the test owes its red like any other.
 // testDeferred: a test whose EVERY verified requirement is scrap-deferred owes
-// nothing until ready_when - the i15 deferral law extended to the test side (i16).
+// nothing until ready_when - the deferral law extended to the test side.
 func testDeferred(n Node, deferred map[string]bool) bool {
 	if n.Type != "test" || len(n.Verifies) == 0 {
 		return false
@@ -303,7 +304,7 @@ func runExecuted(n Node, h string) string {
 
 // enddesign
 
-// design: go-evidence-cache-cap  implements: req-evidence-cache-cap
+// design: go-evidence-cache-cap  implements: req-evidence-ledger.2
 // A check's verdict cache is bounded: every write keeps the newest evidenceCacheCap
 // .json files in evidence/<id>/ and deletes the rest, oldest first (mtime, then name
 // for a deterministic tie-break). Each changed input hash adds a file, so without the
@@ -440,10 +441,10 @@ func CoverageHoles(nodes map[string]Node, scope string) []string {
 			refiners[p] = append(refiners[p], n.ID)
 		}
 		for _, p := range n.Implements {
-			impl[p] = append(impl[p], n.ID)
+			impl[subAddrBase(p)] = append(impl[subAddrBase(p)], n.ID)
 		}
 		for _, p := range n.Verifies {
-			veri[p] = append(veri[p], n.ID)
+			veri[subAddrBase(p)] = append(veri[subAddrBase(p)], n.ID)
 		}
 	}
 	holes := []string{}
@@ -452,7 +453,8 @@ func CoverageHoles(nodes map[string]Node, scope string) []string {
 			return false
 		}
 		for _, p := range field {
-			if nodes[p].Type != ptype {
+			// a sub-addressed target (req-x.2) types as its cluster base (go-sub-addressing)
+			if nodes[subAddrBase(p)].Type != ptype {
 				return false
 			}
 		}

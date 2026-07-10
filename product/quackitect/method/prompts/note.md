@@ -10,3 +10,12 @@ Frictionless. Capture exactly one note THROUGH THE ENGINE. Then stop.
 - Confirm tersely. Then stop.
 
 A note is never a check. It becomes one only when `engage start` bakes it. Later sub-op: `comment`.
+
+**Owner feedback carries a second question (owner law):** when the note IS
+owner feedback on an artifact (a review item, a comment, a correction), also ask what
+the GENERAL pattern is — and route that pattern into the durable layer (the templates,
+these prompts, the methods), template-first, in the same move or the same session. The
+goal is standing: documents come out of the templates needing as little owner review
+as possible. Fixing only the instance is half the job. And the ladder has a third rung:
+a baked rule that CAN be enforced mechanically becomes a DETERMINIZER (engine behavior,
+test-first) — prompts keep only what needs judgment.

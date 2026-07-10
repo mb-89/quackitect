@@ -6,6 +6,7 @@ statement: When the user runs a status or report command, the engine shall answe
 class: review
 killer: false
 kind: quality
+tags: [architecturally-significant]
 phase: [operation]
 discipline: [software]
 quality: [efficiency, usability]

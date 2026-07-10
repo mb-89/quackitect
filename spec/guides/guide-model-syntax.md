@@ -97,4 +97,4 @@ sequenceDiagram
 - Adding a new function later: add its element line to its layer, add its flows, then implement the design region with the same id. The model leads; the code follows.
 
 ## Rationale (not load-bearing)
-Decided at i16 M4 (adr-element-major-format, adr-text-first-models): element-major TikZ discipline in a lint-pinned Mermaid subset - constrained mainstream, no owned grammar (the ownership law). Documented by example at the owner's instruction, 2026-07-09.
+Decided in adr-element-major-format and adr-text-first-models: element-major TikZ discipline in a lint-pinned Mermaid subset - constrained mainstream, no owned grammar (the ownership law). Documented by example.

@@ -13,7 +13,7 @@ import (
 	"time"
 )
 
-// design: go-verdict-cache  implements: req-verify-cache, req-status-fast, req-responsive-status
+// design: go-verdict-cache  implements: req-verdict-machinery.1, req-verdict-machinery.3, req-responsive-status
 // One JSON verdict map in the data home (adr-verdict-cache): test id -> {input hash, build id,
 // result, ms}. The build identity is the sha256 self-hash of the running binary
 // (adr-build-identity) — a rebuild always invalidates; a forgotten version bump cannot lie. The
@@ -108,13 +108,13 @@ func runSelftestCached(id, name, input string) bool {
 
 // enddesign
 
-// design: go-verify-feedback  implements: req-verify-feedback
+// design: go-verify-feedback  implements: req-verdict-machinery.2
 // A re-running battery announces itself once on stderr BEFORE the first test, and names each test
 // that runs longer than one second (responsiveness guide: visible feedback within a second). A
 // fully cached run stays silent — silence means nothing ran. feedbackW is the selftest seam.
 var (
-	feedbackW       io.Writer = os.Stderr
-	rerunAnnounced  bool
+	feedbackW      io.Writer = os.Stderr
+	rerunAnnounced bool
 )
 
 func announceRerun() {
@@ -133,7 +133,7 @@ func announceSlow(id string, d time.Duration) {
 
 // enddesign
 
-// design: go-why-derived  implements: req-why-derived
+// design: go-why-derived  implements: req-verdict-machinery.4
 // `why` on a coverage-verified check names the RULE, its computed answer over the check's scope,
 // and the DELTA: exactly which counted inputs fail it. The delta collector mirrors each rule's
 // evaluation but gathers offenders instead of failing fast. tests-pass consults ONLY the verdict
@@ -165,13 +165,13 @@ func coverageDelta(nodes map[string]Node, rule, scope string) []string {
 	regionless := map[string][]string{}
 	for _, n := range nodes {
 		for _, p := range n.Implements {
-			impl[p]++
+			impl[subAddrBase(p)]++
 			if n.RegionBody == "" {
-				regionless[p] = append(regionless[p], n.ID)
+				regionless[subAddrBase(p)] = append(regionless[subAddrBase(p)], n.ID)
 			}
 		}
 		for _, p := range n.Verifies {
-			veri[p]++
+			veri[subAddrBase(p)]++
 		}
 	}
 	up := func(n Node, want string) bool {
@@ -238,7 +238,7 @@ func coverageDelta(nodes map[string]Node, rule, scope string) []string {
 			}
 		case "tests-pass":
 			if n.Class == "executed" && !strings.HasPrefix(n.Verify, "coverage:") && inscope(n) && n.Verify != "" &&
-				n.Suite != "standalone" { // the RULE skips standalone members; the delta must agree (i11 cosmetic fix)
+				n.Suite != "standalone" { // the RULE skips standalone members; the delta must agree
 				if strings.HasPrefix(n.Verify, "selftest:") {
 					if pass, ok := verdictLookup(n.ID, fullHash(n.ID, nodes, memo)); !ok {
 						out = append(out, "test "+n.ID+" unverified at this build (verdict-cache miss)")

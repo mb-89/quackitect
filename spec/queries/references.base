@@ -1,8 +1,10 @@
 # The pull law as a query: `referenced` is the emitter's link graph - only sources a
 # chapter actually cites render in the book. Obsidian does not know the property, so the
 # preview shows ALL references (the superset); the book stays the truth.
-# The DESC sort on the groupBy property puts Normative before Informative (ISO clause-2
-# style). Render full: title, pin, URL, and the annotation body per entry.
+# ONE table for all references: the normative-vs-informative
+# kind is a rendered, pill-filterable column; the DESC sort puts Normative first (ISO
+# clause-2 style). Pin, URL, and the annotation body live in the row expand - the
+# reference note stays the only legal home of an external URL.
 filters:
   and:
     - 'file.inFolder("spec/references")'
@@ -10,9 +12,9 @@ filters:
 views:
   - type: table
     name: References
-    render: full
-    order: [title, version, url]
-    groupBy: kind
+    order: [title, kind, version, url, accessed]
     sort:
       - property: kind
         direction: DESC
+      - property: title
+        direction: ASC

@@ -1,4 +1,4 @@
-<!-- design: method-templates  implements: req-template-system, req-evidence-templates, req-template-flow :: One method/templates home for ALL templates; frontmatter metadata (applies_rigor/applies_type) is the lower bound, judgment reaches beyond it with a retro mention; the eight milestone evidence templates are the first population; straying is questioned at the docs-complete review and improvements flow both ways, template to document and back. -->
+<!-- design: method-templates  implements: req-template-home.1, req-template-home.5, req-template-home.2 :: One method/templates home for ALL templates; frontmatter metadata (applies_rigor/applies_type) is the lower bound, judgment reaches beyond it with a retro mention; the eight milestone evidence templates are the first population; straying is questioned at the docs-complete review and improvements flow both ways, template to document and back. -->
 # templates - one home for all of them
 
 Every template lives here, whatever the artifact kind: prose, evidence docs, code shapes.
@@ -10,7 +10,7 @@ Every template lives here, whatever the artifact kind: prose, evidence docs, cod
 - The flow is bidirectional: template improvements reach documents; document improvements teach templates.
 
 The eight milestone evidence templates are the first population. The M3 and M4 card shapes
-are field-tested (i0009/i0010 findings); the other six are AI-drafted from the i0011/i0012
-walks and awaiting owner correction at first use. (req-template-system, req-evidence-templates,
-req-template-flow, adr - none; the owner rulings are recorded at i0012 M2.)
+are field-tested; the other six are AI-drafted
+and awaiting owner correction at first use. (req-template-home.1, req-template-home.5,
+req-template-home.2.)
 <!-- enddesign -->

@@ -2,6 +2,6 @@
 # Machine-local overrides (logs_dir, ...) live in the GLOBAL user config, never here.
 [iteration]
 type    = "default"
-rigor   = "systematic"
-version = "i0016_structural_models"
+rigor   = "lean"
+version = "i0017_pruning"
 edges = "connections"

@@ -7,10 +7,43 @@ import (
 	"strings"
 )
 
+// i12Tests: this file's checks, in battery order (selftestRegistry in
+// selftest.go concatenates the per-file slices). book-manifests and
+// book-orphan-lint are implemented in book.go; the battery order keeps
+// their slots here.
+var i12Tests = []namedTest{
+	{"authoring-cheap", selftestAuthoringCheap},
+	{"ai-drafting", selftestAiDrafting},
+	{"guidance-split", selftestGuidanceSplit},
+	{"method-map", selftestMethodMap},
+	{"template-system", selftestTemplateSystem},
+	{"evidence-templates", selftestEvidenceTemplates},
+	{"mint-skeleton", selftestMintSkeleton},
+	{"type-stakeholders", selftestTypeStakeholders},
+	{"book-manifests", selftestBookManifests},
+	{"book-orphan-lint", selftestBookOrphans},
+	{"book-single-file", selftestBookSingleFile},
+	{"book-depth", selftestBookDepth},
+	{"book-dom-static", selftestBookDomStatic},
+	{"chapter-tldr", selftestChapterTldr},
+	{"book-identity", selftestBookIdentity},
+	{"llm-digestible", selftestLlmDigestible},
+	{"book-figures", selftestBookFigures},
+	{"glossary-shared", selftestGlossaryShared},
+	{"meta-quarantine", selftestMetaQuarantine},
+	{"book-honesty", selftestBookHonesty},
+	{"provenance-icons", selftestProvenanceIcons},
+	{"agents-emit", selftestAgentsEmit},
+	{"book-drift", selftestBookDrift},
+	{"register-advisory", selftestRegisterAdvisory},
+	{"book-a11y", selftestBookA11y},
+	{"deck-mode", selftestDeckMode},
+}
+
 // i0012 spec-book test hooks. Authored against the RED-observed test nodes; each build step
 // implements its hooks to green (test-first walk, shared implementation fragment).
 
-// design: go-ai-marks  implements: req-ai-drafting, req-prose-marks-comments
+// design: go-ai-marks  implements: req-ai-provenance.1, req-lint-classification.1
 // The mechanical half of the drafting rule: the mark syntax (`<!-- ai:N -->`, N 0..3, own line
 // above the paragraph) and the refusal predicate - a prose unit without a mark has NO path into
 // the book. ai:0 is explicit pure-human, so "unmarked" never means anything.
@@ -117,18 +150,18 @@ func selftestAiDrafting() bool {
 	return true
 }
 
-// design: go-guidance-split  implements: req-guidance-split
+// design: go-guidance-split  implements: req-reader-structure.2
 // Audience prose apart from internals: internals live as guidance docs (method/guidance/<slug>.md);
 // a content node points at its internals through the `guidance:` frontmatter tag; the tag must
 // RESOLVE (a dangling guidance pointer is a failure); the book renders guidance only in the
-// agent-guide chapter (the emitter's quarantine, guarded with meta-quarantine at bs3).
+// agent-guide chapter (the emitter's quarantine, guarded by meta-quarantine).
 func guidanceDocPath(slug string) string {
 	return filepath.Join(EngineDir(), "method", "guidance", slug+".md")
 }
 
 // enddesign
 
-// design: go-type-stakeholders  implements: req-type-stakeholders
+// design: go-type-stakeholders  implements: req-derived-boards.4
 // Stakeholder classes are one-note-per-class (project_types/classes/); each project TYPE links the
 // classes it adds (markdown links - the lower bound); the project's class set derives as default's
 // set plus the union over its ITERATIONS' types. Never a stored flag: a doc-only iteration cannot
@@ -278,7 +311,7 @@ func selftestBookDomStatic() bool {
 	}
 	script := html[si:se]
 	// the one innerHTML exemption is the details-pane CHROME fill (window.bookDetail;
-	// the pane is chrome, not book content - req-details-pane).
+	// the pane is chrome, not book content - req-details-context.1).
 	return !strings.Contains(script, "createElement") &&
 		strings.Count(script, "innerHTML") == 1 && strings.Contains(script, "c.innerHTML")
 }
@@ -326,7 +359,7 @@ func selftestLlmDigestible() bool {
 	html, _, _ := renderBookHTML(bookFixture(dir, 2, true))
 	html = regexp.MustCompile(`(?s)<script>.*?</script>`).ReplaceAllString(html, "")
 	text := regexp.MustCompile(`<[^>]+>`).ReplaceAllString(html, " ")
-	// the reader's-contract line died with the page header (i14, field c1)
+	// no reader's-contract line: the book has no page header
 	for _, want := range []string{"The fixture shall be rendered.", "req-fix", "requirement", "RATIONALEPROBE"} {
 		if !strings.Contains(text, want) {
 			return false // statements, trust metadata, and layer labels survive extraction
@@ -347,7 +380,7 @@ func selftestBookFigures() bool {
 	mp := filepath.Join(dir, "man-fig.md")
 	os.WriteFile(mp, []byte(man), 0o644)
 	fx["man-fig"] = Node{ID: "man-fig", Type: "manifest", Mode: "chapter", Statement: "Figures.", Path: mp}
-	// the star derives from neighbour notes since i14 (req-context-diagram) - seed one
+	// the star derives from neighbour notes (req-interactive-figures.3) - seed one
 	np := filepath.Join(dir, "nbr-probe.md")
 	os.WriteFile(np, []byte("---\nid: nbr-probe\ntype: neighbour\nstatement: the probe neighbour.\nclass: review\nkiller: false\n---\n"), 0o644)
 	fx["nbr-probe"] = Node{ID: "nbr-probe", Type: "neighbour", Statement: "the probe neighbour.", Class: "review", Path: np}
@@ -365,7 +398,7 @@ func selftestBookFigures() bool {
 	if !strings.Contains(text, "i0012_spec_book") {
 		return false // the figure's text content survives plain-text extraction
 	}
-	// stakeholder-matrix and vv-table retired to canned base queries (req-fig-tables, selftest:fig-tables)
+	// stakeholder-matrix and vv-table retired to canned base queries (req-derived-boards.2, selftest:fig-tables)
 	return strings.Contains(renderFigure("no-such-kind", fx), "unknown figure kind")
 }
 
@@ -475,7 +508,7 @@ func selftestBookHonesty() bool {
 
 // test-provenance-icons -> selftest:provenance-icons
 func selftestProvenanceIcons() bool {
-	// per-paragraph icon columns died at i14 (field c14): the paragraph keeps its
+	// no per-paragraph icon columns: the paragraph keeps its
 	// data-ai RECORD; the visible column renders once per unit via unitAIColumn.
 	three := mdLite("<!-- ai:3 -->\nA fully drafted paragraph.\n")
 	if strings.Contains(three, "ai-marks") || !strings.Contains(three, `data-ai="3"`) {
@@ -543,7 +576,7 @@ func selftestBookDrift() bool {
 	defer os.RemoveAll(dir)
 	fx := bookFixture(dir, 2, true)
 	// TWO presets over one chapter: unsorted preset classes flip order between renders
-	// (map iteration) - the shipped-book drift of 2026-07-07; determinism must not depend
+	// (map iteration); determinism must not depend
 	// on how many presets reference a chapter.
 	for _, p := range []string{"man-preset-pa", "man-preset-pb"} {
 		pp := filepath.Join(dir, p+".md")
@@ -609,7 +642,7 @@ func selftestBookA11y() bool {
 	os.WriteFile(pp, []byte("---\nid: man-preset-x\ntype: manifest\nmode: preset\nstatement: X.\n---\n[man-fix](man-fix.md)\n"), 0o644)
 	fx["man-preset-x"] = Node{ID: "man-preset-x", Type: "manifest", Mode: "preset", Statement: "X.", Path: pp}
 	html, _, _ := renderBookHTML(fx)
-	// the header landmark died with the page header (i14, field c1); nav+main carry the structure
+	// no header landmark (the book has no page header); nav+main carry the structure
 	for _, want := range []string{"<main", `aria-label="views"`, "<h1>", "<summary>"} {
 		if !strings.Contains(html, want) {
 			return false // landmarks and heading structure
@@ -649,8 +682,13 @@ func selftestDeckMode() bool {
 	if strings.Count(html, `class="slide"`) != 3 {
 		return false // one unit, one slide
 	}
-	if !strings.Contains(html, `class="present"`) || !strings.Contains(html, "data-present") || !strings.Contains(html, "ArrowRight") {
+	// the deck-list present buttons are NOT in the details pane
+	// (q-views-placement open) - the present-mode machinery itself stays baked in.
+	if !strings.Contains(html, "data-present") || !strings.Contains(html, "ArrowRight") {
 		return false // the present mode lives in the SAME html, keyboard-driven
+	}
+	if !strings.Contains(html, `id="slide-pos"`) {
+		return false // the visible slide number (current/total) rides present mode
 	}
 	if !strings.Contains(html, `<aside class="notes">opening words</aside>`) {
 		return false // speaker notes carry the informative layer
@@ -867,8 +905,8 @@ func selftestAuthoringCheap() bool {
 	if len(root1) < 12 {
 		return false // the fresh-exe path must yield a real root
 	}
-	// since i13 (req-verdict-surgical) the re-baseline is surgical: the store file survives
-	// with the green verdicts; the stale FAIL still dies - the i11 wedge stays dead either way.
+	// the re-baseline is surgical (req-build-cheap.2): the store file survives
+	// with the green verdicts; the stale FAIL still dies - the wedge stays dead either way.
 	if raw0, err := os.ReadFile(verdictPathOverride); err == nil && strings.Contains(string(raw0), "__wedge_probe__") {
 		return false // the stale FAIL must die with the re-baseline
 	}

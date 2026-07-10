@@ -17,7 +17,14 @@ import (
 )
 
 // asks live in the DATA HOME (runtime state, never the ledger/truth)
-func askStorePath() string { return filepath.Join(dataDirFor("asks"), "asks.json") }
+var askStoreOverride string // test seam: the selftests point the store at a fixture dir
+
+func askStorePath() string {
+	if askStoreOverride != "" {
+		return filepath.Join(askStoreOverride, "asks.json")
+	}
+	return filepath.Join(dataDirFor("asks"), "asks.json")
+}
 
 func loadAskStore() *AskStore {
 	s := &AskStore{}
@@ -28,18 +35,167 @@ func loadAskStore() *AskStore {
 	return s
 }
 
+// design: go-ask-hardening  implements: req-ask-hardening
+// Hardening the ask loop: every save MERGES with the on-disk store instead of
+// clobbering a concurrent writer (union by ask id, the newest state-change stamp wins,
+// swapped in atomically via temp+rename); `await` reloads the store from disk on every
+// loop pass and exits cleanly when nothing pends anymore; an answer stamped BEFORE its
+// ask's creation belongs to a previous ask generation and is refused at apply time.
+
+// askStampOf is an ask's freshness for the merge: the last state-change stamp,
+// falling back to the creation stamp for pre-hardening records.
+func askStampOf(a Ask) int64 {
+	if a.Updated > a.Created {
+		return a.Updated
+	}
+	return a.Created
+}
+
+// mergeAskStores unions two stores by ask id. For the same id the newest stamp wins; on
+// a tie a state-progressed copy (non-pending) beats a pending one, and the writer's copy
+// (b) beats the disk's. Order: a's order first, b's new asks appended.
+func mergeAskStores(a, b *AskStore) *AskStore {
+	pick := map[string]Ask{}
+	var order []string
+	add := func(x Ask) {
+		cur, seen := pick[x.ID]
+		if !seen {
+			pick[x.ID] = x
+			order = append(order, x.ID)
+			return
+		}
+		if askStampOf(x) > askStampOf(cur) {
+			pick[x.ID] = x
+			return
+		}
+		if askStampOf(x) == askStampOf(cur) && !(x.State == "pending" && cur.State != "pending") {
+			pick[x.ID] = x // the tie: state progression first, then the writer, wins
+		}
+	}
+	for _, x := range a.Asks {
+		add(x)
+	}
+	for _, x := range b.Asks {
+		add(x)
+	}
+	out := &AskStore{}
+	for _, id := range order {
+		out.Asks = append(out.Asks, pick[id])
+	}
+	return out
+}
+
+// saveAskStore is READ-MERGE-WRITE: load the current on-disk state, merge (an `ask`
+// fired while an `await` or drain is mid-flight never clobbers it), and swap the file
+// in atomically (temp + rename), so a reader never sees a torn write.
 func saveAskStore(s *AskStore) error {
-	raw, err := json.MarshalIndent(s, "", "  ")
+	merged := mergeAskStores(loadAskStore(), s)
+	raw, err := json.MarshalIndent(merged, "", "  ")
 	if err != nil {
 		return err
 	}
 	if err := os.MkdirAll(filepath.Dir(askStorePath()), 0o755); err != nil {
 		return err
 	}
-	return os.WriteFile(askStorePath(), raw, 0o644)
+	tmp := askStorePath() + ".tmp"
+	if err := os.WriteFile(tmp, raw, 0o644); err != nil {
+		return err
+	}
+	return os.Rename(tmp, askStorePath())
 }
 
-// design: go-first-wins-lanes  implements: req-first-wins-lanes
+// answerStale is THE apply-time comparison: an answer stamped strictly before its ask's
+// creation is a leftover from a previous ask generation (a re-sent gate question) and
+// must not apply. An unstamped answer (At==0 - the exec lane may omit the stamp) cannot
+// be judged and passes through to the option validation.
+func answerStale(askCreated, ansAt int64) bool {
+	return ansAt > 0 && ansAt < askCreated
+}
+
+// awaitLoopReload is cmdAwait's per-pass reload: another process (an `ask`, a drain, a
+// console bless) may have moved the store while the stream was open, so every loop pass
+// starts from the disk state, never a stale in-memory copy.
+func awaitLoopReload() *AskStore { return loadAskStore() }
+
+// askStoreHasPending reports whether any ask still pends - await's clean-exit test.
+func askStoreHasPending(s *AskStore) bool {
+	for _, a := range s.Asks {
+		if a.State == "pending" {
+			return true
+		}
+	}
+	return false
+}
+
+// askStoreMergeIDs (selftest probe): the ids left after a REAL mergeAskStores union -
+// a thin wrapper over the merge the save path runs, never a parallel reimplementation.
+func askStoreMergeIDs(a, b []string) []string {
+	sa, sb := &AskStore{}, &AskStore{}
+	for _, id := range a {
+		sa.Asks = append(sa.Asks, Ask{ID: id})
+	}
+	for _, id := range b {
+		sb.Asks = append(sb.Asks, Ask{ID: id})
+	}
+	var out []string
+	for _, x := range mergeAskStores(sa, sb).Asks {
+		out = append(out, x.ID)
+	}
+	return out
+}
+
+// answerStaleRefused (selftest probe): the REAL apply-time comparison (answerStale, the
+// one askApplyAnswer calls) over RFC3339 stamps.
+func answerStaleRefused(askStamp, ansStamp string) bool {
+	at, err1 := time.Parse(time.RFC3339, askStamp)
+	an, err2 := time.Parse(time.RFC3339, ansStamp)
+	if err1 != nil || err2 != nil {
+		return false
+	}
+	return answerStale(at.Unix(), an.Unix())
+}
+
+// awaitReloadsPerLoop (selftest probe): BEHAVIORAL - point the store at a fixture dir,
+// move the file on disk between two awaitLoopReload calls (the exact function cmdAwait's
+// loop runs each pass), and observe the second call pick the disk change up.
+func awaitReloadsPerLoop() bool {
+	dir, err := os.MkdirTemp("", "q17await")
+	if err != nil {
+		return false
+	}
+	defer os.RemoveAll(dir)
+	old := askStoreOverride
+	askStoreOverride = dir
+	defer func() { askStoreOverride = old }()
+	if saveAskStore(&AskStore{Asks: []Ask{{ID: "ask-r1", CID: "ask-r1", State: "pending", Created: 1000}}}) != nil {
+		return false
+	}
+	s1 := awaitLoopReload()
+	if len(s1.Asks) != 1 || !askStoreHasPending(s1) {
+		return false
+	}
+	// another process answers the first ask and adds a second one between the passes
+	if saveAskStore(&AskStore{Asks: []Ask{
+		{ID: "ask-r1", CID: "ask-r1", State: "resolved", Created: 1000, Updated: 2000},
+		{ID: "ask-r2", CID: "ask-r2", State: "pending", Created: 1500},
+	}}) != nil {
+		return false
+	}
+	s2 := awaitLoopReload()
+	if len(s2.Asks) != 2 {
+		return false // the second pass re-read the disk (the merge kept both asks)
+	}
+	for _, a := range s2.Asks {
+		if a.ID == "ask-r1" && a.State != "resolved" {
+			return false // the newest stamp won the merge
+		}
+	}
+	return askStoreHasPending(s2) // the flag cmdAwait's loop exits on when it turns false
+}
+
+// enddesign
+
+// design: go-first-wins-lanes  implements: req-ask-loop.7
 // Mobile is the DEFAULT lane when paired: the pager shows at the desk AND the ask rides
 // the channel; the FIRST answer from any lane wins. A console bless resolves the pending
 // mobile asks for the same checks (blessResolvesAsks, hooked into cmdBless), and the
@@ -51,6 +207,7 @@ func askResolveForCheck(s *AskStore, check, lane string) int {
 		if a.State == "pending" && a.Check == check {
 			a.State = "resolved"
 			a.Answer = lane
+			a.Updated = time.Now().Unix() // the merge keeps the resolution over a concurrent pending copy
 			n++
 		}
 	}
@@ -138,10 +295,11 @@ func pairedAdapters() []AskAdapter {
 	return []AskAdapter{askAdapterFor(cfg)}
 }
 
-// cmdAsk sends a check's question to the paired device: `quack ask <check-id> [--timeout s]`.
+// cmdAsk sends a check's question to the paired device:
+// `quack ask <check-id> [--timeout s] [--context "<text>"]`.
 func cmdAsk(args []string) {
 	if len(args) == 0 {
-		fmt.Println("usage: ask <check-id> [--timeout <seconds>]")
+		fmt.Println("usage: ask <check-id> [--timeout <seconds>] [--context <text>]")
 		return
 	}
 	adapters := pairedAdapters()
@@ -168,7 +326,7 @@ func cmdAsk(args []string) {
 	if n.Killer || n.Milestone > 0 {
 		kind = "gate"
 	}
-	// the phone gets the FULL one-pager (owner 2026-07-09): the same lines the console
+	// the phone gets the FULL one-pager: the same lines the console
 	// pager boxes — bar, decisions, risks, readiness — minus the mobile hint, capped
 	// under ntfy's 4KB message ceiling
 	sm := StatusMap(nodes)
@@ -179,11 +337,24 @@ func cmdAsk(args []string) {
 		}
 		body = append(body, ln)
 	}
-	question := strings.Join(body, "\n")
+	card := strings.Join(body, "\n")
+	// the hand-off narrative rides BELOW the card, one text on both lanes;
+	// the card always renders first
+	context := flagVal(args, "--context")
+	question := askComposeBody(card, context)
+	if len(question) > 3300 && context != "" {
+		// the ntfy ceiling caps the COMPOSED body; the narrative yields first —
+		// the card never truncates in favor of the context
+		question = card
+		room := 3300 - len(card) - len("\n\n") - len("\n…")
+		if room > 0 {
+			question = askComposeBody(card, context[:room]+"\n…")
+		}
+	}
 	if len(question) > 3300 {
 		question = question[:3300] + "\n…"
 	}
-	// asking a GATE asks the whole COMBINED group (owner ruling: never two cards about
+	// asking a GATE asks the whole COMBINED group (never two cards about
 	// the same thing) - the ripened killers travel WITH it, one tap blesses all
 	group := []string{id}
 	if ks, g := pagerGroup(id, nodes, sm); g == id && len(ks) > 0 {
@@ -211,12 +382,19 @@ func cmdAsk(args []string) {
 }
 
 // askDrainMaybe applies any answers already sitting on the channel — the fallback lane:
-// EVERY engine run drains, so a tap never waits longer than the next command. It executes
-// the USER's recorded tap (authorized by possession of the paired credential), so it does
-// not ride the agent-session key.
+// engine runs drain, so a tap never waits long. It executes the USER's recorded tap
+// (authorized by possession of the paired credential), so it does not ride the
+// agent-session key. THROTTLED: the poll is a live HTTP roundtrip that would
+// tax EVERY command ~0.5s while an ask pends — it runs at most once per 20s
+// (a timestamp file in the data home); `await` streams and cmdBless resolves directly,
+// so the throttle only delays the pure-fallback lane by seconds.
 func askDrainMaybe() {
 	cfg, ok := loadPairConfig()
 	if !ok {
+		return
+	}
+	stampP := filepath.Join(dataDirFor("asks"), "last-drain")
+	if fi, err := os.Stat(stampP); err == nil && time.Since(fi.ModTime()) < 20*time.Second {
 		return
 	}
 	s := loadAskStore()
@@ -230,6 +408,7 @@ func askDrainMaybe() {
 	if !pending {
 		return
 	}
+	os.WriteFile(stampP, []byte(time.Now().Format(time.RFC3339)), 0o644) // arm the throttle
 	now := time.Now().Unix()
 	for _, a := range askExpire(s, now) {
 		fmt.Println("ask expired:", a.CID, "->", a.Check)
@@ -282,27 +461,24 @@ func cmdAwait(args []string) {
 	end := time.Now().Unix() + deadline
 	ad := askAdapterFor(cfg)
 	for time.Now().Unix() < end {
-		applied := awaitStreamOnce(ad, s, end)
-		if applied {
-			saveAskStore(s)
-			return
-		}
+		// hardening: every pass starts from the DISK state - another process may have
+		// asked, drained, or console-blessed while the stream was open (go-ask-hardening)
+		s = awaitLoopReload()
 		for _, a := range askExpire(s, time.Now().Unix()) {
 			fmt.Println("ask expired:", a.CID, "->", a.Check)
 		}
-		stillPending := false
-		for _, a := range s.Asks {
-			if a.State == "pending" {
-				stillPending = true
-			}
-		}
-		if !stillPending {
+		if !askStoreHasPending(s) {
 			saveAskStore(s)
+			fmt.Println("await: nothing pending anymore - resolved elsewhere")
+			return
+		}
+		applied := awaitStreamOnce(ad, s, end)
+		saveAskStore(s)
+		if applied {
 			return
 		}
 		time.Sleep(2 * time.Second) // reconnect pause after a dropped stream
 	}
-	saveAskStore(s)
 	fmt.Println("await: deadline passed - pending answers drain on the next run")
 	quackExit(2)
 }

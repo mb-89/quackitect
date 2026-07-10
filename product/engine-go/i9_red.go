@@ -12,6 +12,37 @@ import (
 	"unicode"
 )
 
+// i9Tests: this file's checks, in battery order (selftestRegistry in
+// selftest.go concatenates the per-file slices).
+var i9Tests = []namedTest{
+	{"attest-block", selftestAttestBlock},
+	{"attest-console", selftestAttestConsole},
+	{"attest-challenge", selftestAttestChallenge},
+	{"attest-grant", selftestAttestGrant},
+	{"attest-renewal", selftestAttestRenewal},
+	{"attest-keys", selftestAttestKeys},
+	{"attest-expiry", selftestAttestExpiry},
+	{"contract-render", selftestContractRender},
+	{"render-drift", selftestRenderDrift},
+	{"logs-canonical", selftestLogsCanonical},
+	{"data-dir-caches", selftestDataDirCaches},
+	{"truth-in-spec", selftestTruthInSpec},
+	{"root-marker", selftestRootMarker},
+	{"clean-status", selftestCleanStatus},
+	{"global-config", selftestGlobalConfig},
+	{"global-binary", selftestGlobalBinary},
+	{"engine-ratchet", selftestEngineRatchet},
+	{"notes-out", selftestNotesOut},
+	{"decisions-folder", selftestDecisionsFolder},
+	{"decision-classes", selftestDecisionClasses},
+	{"parked-list", selftestParkedList},
+	{"decision-realized", selftestDecisionRealized},
+	{"mint", selftestMint},
+	{"report-why", selftestReportWhy},
+	{"report-filter-ux", selftestReportFilterUX},
+	{"vv-time-scope", selftestVVTimeScope},
+}
+
 var attestStateOverride string // selftests point this at a temp dir; empty = real home
 
 // ---------------------------------------------------------------------------
@@ -165,7 +196,7 @@ func selftestAttestExpiry() bool {
 	return !attestKeyValid(key) // the budget exhausts the key
 }
 
-// design: go-entry-chain  implements: req-contract-render, req-render-drift
+// design: go-entry-chain  implements: req-contract-chain.1, req-contract-chain.2
 // The contract has ONE copy: method/prompts/contract.md. Harness pointer files (CLAUDE.md,
 // .github/copilot-instructions.md) command following AGENTS.md without exception; AGENTS.md commands
 // the enumerated read -> understand -> recite -> honor ritual on the contract. These selftests keep
@@ -405,14 +436,16 @@ func selftestReportFilterUX() bool {
 // test-vv-time-scope -> selftest:vv-time-scope
 func selftestVVTimeScope() bool {
 	nodes := LoadAll()
-	if iterationOf("test-strict-frontmatter", nodes) != "i0008_trust_hardening" {
+	// the probe rides a surviving i0008 test (test-strict-frontmatter merged into
+	// test-structural-strictness at the i17 clustering)
+	if iterationOf("test-structural-strictness", nodes) != "i0008_trust_hardening" {
 		return false
 	}
 	sub := nodesAsOf("i0003_engine_vehicle_go", nodes)
 	if sub == nil {
 		return false
 	}
-	if _, hasLater := sub["test-strict-frontmatter"]; hasLater {
+	if _, hasLater := sub["test-structural-strictness"]; hasLater {
 		return false // an i0008 test must not enter an i0003 computation
 	}
 	if _, hasBase := sub["fill-adjudicate"]; !hasBase {

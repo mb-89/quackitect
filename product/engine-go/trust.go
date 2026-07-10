@@ -26,7 +26,7 @@ func normWS(s string) string { return strings.TrimSpace(wsRe.ReplaceAllString(s,
 
 // enddesign
 
-// design: go-strict-load  implements: req-strict-frontmatter, req-ref-integrity
+// design: go-strict-load  implements: req-structural-strictness.1, req-structural-strictness.2
 // Strictness at EVERY graph load (adr-strict-load). A first-line '---' fence marks a node candidate
 // (evidence docs' mid-document hrules are excluded naturally); iteration.md is its own breadcrumb
 // key class. Malformed lines, keys outside the complete allowlist (incl. the i7 additions), duplicate
@@ -39,9 +39,9 @@ var nodeKeysAllow = map[string]bool{
 	"milestone": true, "parent": true, "depends_on": true, "refines": true, "implements": true,
 	"verifies": true, "addresses": true, "validates": true, "ears": true, "adjudicated_by": true,
 	"ready_when": true, "supersedes": true, "suite": true, "tests_red": true, "guidance": true, "mode": true,
-	"order": true, // manifest chapter order (req-system-overview)
-	"ratings": true, // one-level map key (go-ratings-map, req-ratings-map)
-	// the item fields (go-items + the item templates, owner walk 2026-07-05); every field's
+	"order":   true, // manifest chapter order (req-system-overview)
+	"ratings": true, // one-level map key (go-ratings-map, req-base-view-queries.2)
+	// the item fields (go-items + the item templates); every field's
 	// semantics and value range live in its item template (method/templates)
 	"kind": true, "axis": true, "chosen": true, "rejected": true, "refers": true, "role": true, "direction": true,
 	"phase": true, "discipline": true, "quality": true, "must_wish": true, "weight": true,
@@ -50,7 +50,7 @@ var nodeKeysAllow = map[string]bool{
 	"actors": true, "trigger": true, "method": true, "level": true, "acceptance": true,
 	"record_of": true, "equipment": true, "conditions": true, "result": true,
 	"applies_chapters": true, "applies_type": true, "applies_rigor": true,
-	// the i12 extension fields (owner walk 2026-07-06); semantics and ranges live in the
+	// further item fields; semantics and ranges live in the
 	// item templates: tags (rationale/decision filtering), the six quality-scenario
 	// fields, criterion metric/target, budget metric/unit/rule/margin + allocations map,
 	// rule scope, guide audience, design-element responsibility/realization, stakeholder
@@ -61,8 +61,11 @@ var nodeKeysAllow = map[string]bool{
 	"allocations": true, "scope": true, "audience": true, "responsibility": true,
 	"realization": true, "preset": true, "guide": true, "src": true, "dst": true, "q": true,
 	"verify_method": true, // the requirement item's method field - the bare verify key stays the executed-check referent
-	"functions":     true, // the need item's functional structure (i14, field c25; semantics in the need item template)
-	"question":      true, // the model node's question field (i16; the statement may carry it instead)
+	"functions":     true, // the need item's functional structure (semantics in the need item template)
+	"question":      true, // the model node's question field (the statement may carry it instead)
+	// the question-node fields (go-question-nodes, adr-question-nodes-provenance):
+	// decision state (open | proposed | decided) and, once decided, its provenance
+	"state": true, "decided_via": true,
 }
 var iterKeysAllow = map[string]bool{
 	"iteration": true, "status": true, "type": true, "rigor": true,
@@ -76,10 +79,33 @@ var refFields = map[string]bool{
 	"chosen": true, "rejected": true,
 }
 
+// design: go-sub-addressing  implements: req-trace-clustered
+// A clustered requirement carries NUMBERED shall-statements (req-x.2,
+// adr-cluster-numbered-statements). An edge may target the number; the graph
+// resolves it against the base node (req-x). ONE helper strips the trailing .N.
+// It applies at exactly two resolution points — the strict referee's dangling
+// checks (here and connectionIssues) and the lane merge (applyConnEdges) — and
+// ONLY when the raw id resolves nowhere, so a literal dotted node id still wins.
+// Downstream lookups (parents, fullHash, the coverage walks) then see plain ids.
+func subAddrBase(ref string) string {
+	i := strings.LastIndex(ref, ".")
+	if i <= 0 || i == len(ref)-1 {
+		return ref
+	}
+	for _, r := range ref[i+1:] {
+		if r < '0' || r > '9' {
+			return ref
+		}
+	}
+	return ref[:i]
+}
+
+// enddesign
+
 // nodeFence is THE single recognition rule, shared by the strict guard and the loader (LoadAll,
 // scanIDs): a file is a node candidate iff its first line (UTF-8 BOM stripped) is the '---' fence.
-// One rule means nothing can be loaded unchecked — a BOM'd file once slipped past the guard while
-// the lenient loader still parsed it (caught live at i8 M7 validation).
+// One rule means nothing can be loaded unchecked — a BOM'd file can slip past the guard while
+// the lenient loader still parses it.
 func nodeFence(raw []byte) bool {
 	s := strings.TrimPrefix(string(raw), "\ufeff")
 	if i := strings.IndexByte(s, '\n'); i >= 0 {
@@ -92,7 +118,7 @@ func nodeFence(raw []byte) bool {
 func StrictIssues(specDir string) []ParseIssue {
 	var issues []ParseIssue
 	edgeMode := edgesModeOf(specDir) // frontmatter | connections (go-edge-mode)
-	ids := map[string]string{}          // id -> first file
+	ids := map[string]string{}       // id -> first file
 	type ref struct{ from, path, field, to string }
 	var refs []ref
 	filepath.Walk(specDir, func(path string, fi os.FileInfo, err error) error {
@@ -111,6 +137,28 @@ func StrictIssues(specDir string) []ParseIssue {
 		raw, rerr := os.ReadFile(path)
 		if rerr != nil {
 			issues = append(issues, ParseIssue{path, "", "unreadable: " + rerr.Error()})
+			return nil
+		}
+		if filepath.Base(path) == archiveName && isArchiveFile(raw) {
+			// design: go-compact-cmd (referee side) implements: req-iterations-compacted ::
+			// archived ids join the id universe, so live lanes referencing shipped-then-
+			// compacted nodes never read dangling (the loader parses archives natively;
+			// the referee must recognize the same ids). Entry payloads were strict-checked
+			// before their compaction and are verbatim-immutable — only ids register here.
+			for _, e := range splitArchive(raw) {
+				if !nodeFence(e.raw) {
+					continue
+				}
+				if filepath.Base(filepath.FromSlash(e.rel)) == "iteration.md" {
+					continue // mirrors the plain-file walk: iteration.md never joins the id universe
+				}
+				aid := strings.TrimSuffix(filepath.Base(filepath.FromSlash(e.rel)), ".md")
+				if prev, dup := ids[aid]; dup {
+					issues = append(issues, ParseIssue{path, aid, "duplicate id (silently shadows " + prev + ")"})
+				} else {
+					ids[aid] = path
+				}
+			}
 			return nil
 		}
 		if !nodeFence(raw) {
@@ -154,7 +202,7 @@ func StrictIssues(specDir string) []ParseIssue {
 					issues = append(issues, ParseIssue{path, k, "indented entry outside a map key"})
 				} else if v == "" {
 					issues = append(issues, ParseIssue{path, curMap + "." + k, "nested map refused (one level only)"})
-				} else if curMap == "ratings" { // go-items: scales are 0..1 everywhere (owner ruling)
+				} else if curMap == "ratings" { // go-items: scales are 0..1 everywhere
 					if f, err := strconv.ParseFloat(v, 64); err != nil || f < 0 || f > 1 {
 						issues = append(issues, ParseIssue{path, curMap + "." + k, "rating outside 0..1: " + v})
 					}
@@ -210,11 +258,14 @@ func StrictIssues(specDir string) []ParseIssue {
 			continue // the built-in sink (go-decisions) is always recognized; it has no file
 		}
 		if _, ok := ids[r.to]; !ok {
+			if _, sub := ids[subAddrBase(r.to)]; sub {
+				continue // a numbered sub-statement resolves against its base node (go-sub-addressing)
+			}
 			issues = append(issues, ParseIssue{r.path, r.field,
 				"dangling reference: '" + r.from + "' --" + r.field + "--> '" + r.to + "' (no such node)"})
 		}
 	}
-	// design: go-conn-code-endpoints  implements: req-conn-code-designs
+	// design: go-conn-code-endpoints  implements: req-connections-code.1
 	// Connection endpoints resolve against code-derived designs too: ch4's interface story
 	// (an interface between two design elements) was impossible on a software project while
 	// the guard knew only spec-file ids (the i12 dogfood gap).
@@ -264,7 +315,7 @@ func resolveActor(args []string, interactive bool) string {
 	return "agent"
 }
 
-// normActor folds the pre-i11 recorded vocabulary into the current one: human IS user
+// normActor folds the legacy recorded vocabulary into the current one: human IS user
 // (go-stamp-user records the migration; this is the reader's view of the vocabulary).
 func normActor(a string) string {
 	if a == "human" || a == "" {
@@ -348,29 +399,33 @@ func xorshift(seed uint64) func() uint64 {
 // (default ~/.local/share)/quackitect/logs/<slug> elsewhere — never in the repo (bloat + foreign
 // personal data) and never in a temp dir (OS-purged; these are durable, cross-project-searchable).
 // slug = workspace dir name + h12(abs path) prefix (readable AND collision-proof). A config.toml
-// `logs_dir = "..."` override wins verbatim. Surfaced via `quack version`; the one-time migration of
-// the legacy .quack/logs content (foreign folders included) was performed and verified at i8 M6.
+// `logs_dir = "..."` override wins verbatim. Surfaced via `quack version`.
 func logsDir(cfg Config) string {
 	if cfg.LogsDir != "" {
 		return cfg.LogsDir
 	}
-	// workspace-first since i9 (adr-no-quack-data-home): logs are one kind-folder inside the ONE
-	// data home per workspace, and the slug hashes the CANONICAL path — the i9 retro found the same
-	// workspace split across two homes by invoking-shell casing (c5212d vs 9cb46b).
+	// workspace-first (adr-no-quack-data-home): logs are one kind-folder inside the ONE
+	// data home per workspace, and the slug hashes the CANONICAL path — otherwise the same
+	// workspace splits across two homes by invoking-shell casing.
 	return dataDirFor("logs")
 }
 
 // enddesign
 
-// design: go-ears-lint  implements: req-ears-lint
-// EARS enforcement over EVERY requirement. The anonymous forward-only baseline died at i11
-// (adr-grandfathers-historical): each historical non-EARS statement now carries an explicit
+// design: go-ears-lint  implements: req-ears-authoring.1
+// EARS enforcement over EVERY requirement. There is no anonymous forward-only baseline
+// (adr-grandfathers-historical): each historical non-EARS statement carries an explicit
 // `ears: exempt - <reason citing its ADR>` marker, so blessed history stays unflaggable by
 // RECORD, not by a silent set-membership file. A checked statement must match one of the five
 // EARS shapes and contain "shall"; blocklisted weasel words are flagged; `ears: exempt - <reason>`
 // skips the check and is COUNTED, while a bare exempt without a reason is itself a finding.
 // Applies to type:requirement at systematic rigor (gated at the lint call site).
 var earsPrefixes = []string{"the ", "when ", "while ", "if ", "where "}
+
+// weaselWords is the compiled FALLBACK only. The living list is config
+// (method/config/weasel-words.json, go-rules-config); the lint reads it through
+// weaselWordsFromConfig. This copy exists because a stub workspace carries no
+// config home, and the lint must stay alive there.
 var weaselWords = []string{"should", "would", "could", "may", "might", "appropriate", "adequate",
 	"sufficient", "quickly", "easy", "user-friendly", "robust", "flexible", "seamless", "efficient",
 	"optimal", "reasonable", "gracefully"}
@@ -400,7 +455,11 @@ func earsWeasels(stmt string) []string {
 	for _, w := range words {
 		seen[w] = true
 	}
-	for _, weasel := range weaselWords {
+	list := weaselWordsFromConfig()
+	if len(list) == 0 {
+		list = weaselWords // config file missing (a stub workspace) — the compiled fallback
+	}
+	for _, weasel := range list {
 		if seen[weasel] {
 			hits = append(hits, weasel)
 		}
@@ -442,13 +501,12 @@ func earsFindings(nodes map[string]Node) ([]string, int) {
 
 // enddesign
 
-// design: go-monotonic-lint  implements: req-monotonic-lint
-// Milestone-monotonic wiring, enforced mechanically (the i0002 escape: M6 build steps were ready
-// before the M5 spike). Every task in milestone n≥2 must reach the SAME iteration's milestone-(n-1)
+// design: go-monotonic-lint  implements: req-structural-strictness.3
+// Milestone-monotonic wiring, enforced mechanically (the escape class: build steps ready
+// before their prior gate). Every task in milestone n≥2 must reach the SAME iteration's milestone-(n-1)
 // gate through its transitive depends_on chain — else `next` could schedule a later milestone ahead
 // of an unblessed gate. Composer discipline stays in engage.md; this makes the engine catch the miss.
-// FORWARD-ONLY like the EARS lint: iterations BEFORE the convention landed (i0000 baseline, i0001,
-// i0002 — where the escape was discovered and whose flat wiring is exactly the recorded bug) are
+// FORWARD-ONLY like the EARS lint: iterations before monotonicSince are
 // grandfathered — rewiring blessed history would mass-suspect gates for zero new safety.
 const monotonicSince = "i0003"
 

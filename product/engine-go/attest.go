@@ -17,14 +17,15 @@ import (
 	"unicode"
 )
 
-// design: go-attest-state  implements: req-attest-key-hygiene, req-attest-expiry
+// design: go-attest-state  implements: req-attest-ritual.5, req-attest-ritual.3
 // The attestation state (adr-attest-ritual) is a small JSON file in the workspace data home —
 // machine-local cache, never the repo. It stores only sha256 HASHES of the grant code and the key
 // chain: the plaintext key exists in exactly one place, the conversation that received it. The
-// current key carries a command budget (default 20); each gated command consumes one; at zero the
-// key expires and only a renewal (old key + fresh challenge) issues a successor. The previous key's
-// hash is kept solely to refuse a stale renew.
-const attestBudgetDefault = 20
+// current key carries a command budget (default 100 - sized so the renewal ritual still
+// fires on long sessions, just not several times a day); each gated command consumes one; at zero the key expires and only a
+// renewal (old key + fresh challenge) issues a successor. The previous key's hash is kept
+// solely to refuse a stale renew.
+const attestBudgetDefault = 100
 
 type akState struct {
 	GrantHash   string `json:"grant_hash,omitempty"`
@@ -85,11 +86,11 @@ func attestConsume(key string) error {
 
 // enddesign
 
-// design: go-attest-ritual  implements: req-attest-grant, req-attest-challenge, req-attest-renewal
+// design: go-attest-ritual  implements: req-attest-ritual.4, req-attest-ritual.2, req-attest-ritual.6
 // The ritual (adr-attest-ritual): a one-time grant code is minted for the interactive console
 // (channel enforcement at the CLI layer); redeeming it — or renewing with the current key — requires
 // answering a CHALLENGE derived from the live contract: sha256(nonce+text) picks rule K and word N
-// among the rule's LETTER-BEARING words (the M5 spike found raw positions can land on punctuation).
+// among the rule's LETTER-BEARING words (raw positions can land on punctuation).
 // The nonce is the code/key being redeemed, so every attest step binds to its own fresh question and
 // the only way to answer is to have the contract text at hand. A successor key supersedes the old
 // one; a superseded key can neither act nor renew.
@@ -245,7 +246,7 @@ func attestRedeem(code, answer string) (string, error) {
 
 // enddesign
 
-// design: go-attest-gate  implements: req-attest-block, req-console-exempt
+// design: go-attest-gate  implements: req-attest-ritual.1, req-attest-ritual.7
 // The gate (adr-attest-ritual): ledger-ADVANCING commands (next, start, bless, ship, observe-red)
 // on the agent channel refuse to run without a valid session key (--key flag, QUACK_KEY env as the
 // second read path); read-only commands stay open so debugging is never hostage. The refusal names

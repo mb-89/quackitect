@@ -322,6 +322,48 @@ func modelStubFor(kind string) string {
 
 // enddesign
 
+// design: go-models-complete-book  implements: req-models-complete-book
+// The kind-example figure (`fig: model-kinds`): ONE compact example per supported
+// model kind, derived at render time from the registry files themselves
+// (modelKindFiles) - the book carries no hand-authored duplicate. Each example
+// wraps in a section marked data-kind-example="<kind>" (<kind> = the registry
+// file's base name); its caption is the kind's own question, its figure the
+// kind's by-example stub run through the normal extractor and renderer. A
+// derived kind (no authored stub - the context star computes from live spec
+// data) says so instead of faking an authored example.
+func renderModelKindExamples() string {
+	files := modelKindFiles()
+	if len(files) == 0 {
+		return `<p class="meta">no model kinds yet — the registry (method/models/) is empty</p>`
+	}
+	var b strings.Builder
+	for _, f := range files {
+		kind := strings.TrimSuffix(filepath.Base(f), filepath.Ext(f))
+		raw, err := os.ReadFile(f)
+		if err != nil {
+			continue
+		}
+		question := ""
+		for _, ln := range strings.Split(string(raw), "\n") {
+			if strings.HasPrefix(ln, "question:") {
+				question = strings.TrimSpace(strings.TrimPrefix(ln, "question:"))
+				break
+			}
+		}
+		b.WriteString(`<section data-kind-example="` + kind + `" data-layer="informative"><p class="stmt"><strong>` + kind + `</strong> — ` + htmlEscape(question) + "</p>\n")
+		if stub := modelStubFor(kind); stub != "" {
+			g, _ := extractModelGraph(stub)
+			b.WriteString(svgModelGraph(g))
+		} else {
+			b.WriteString(`<p class="meta">derived kind — its figure computes from live spec data; no authored example exists</p>`)
+		}
+		b.WriteString("</section>\n")
+	}
+	return b.String()
+}
+
+// enddesign
+
 // design: go-model-asbuilt  implements: req-conformance
 // The as-built side of the engine's own onion: deriveDesignFlow's region call
 // graph becomes a modelGraph - elements are the regions the code actually

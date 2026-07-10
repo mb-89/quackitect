@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-// design: go-data-home  implements: req-logs-canonical, req-global-config, req-no-quack-state
+// design: go-data-home  implements: req-state-layout.3, req-state-layout.6, req-state-layout.2
 // One user-scoped data home per WORKSPACE (adr-no-quack-data-home): <base>/quackitect/<slug>/<kind>
 // with kind subfolders (logs, notes, evidence, gather, overlay, out, golden, spikes) — one deletable
 // dir per workspace, so the amnesia test is a single rm -rf. The slug hashes the CANONICAL workspace
@@ -17,7 +17,7 @@ import (
 // Machine-local overrides live in ONE global user config (<base>/quackitect/config.toml), never
 // per-repo — a per-repo override stored in the directory it overrides was the chicken-egg.
 // Every regenerable artifact routes through dataDirFor (evidence, gather, overlay, out, golden,
-// spikes, logs, notes): the repo carries NO cache state and .quack is gone (req-no-quack-state);
+// spikes, logs, notes): the repo carries NO cache state and .quack is gone (req-state-layout.2);
 // selftest:clean-status holds the invariant.
 func canonicalWorkspacePath(p string) string {
 	if abs, err := filepath.Abs(p); err == nil {
@@ -54,7 +54,7 @@ func globalBinPath() string {
 
 // engineSrcPointer is the file beside the global binary recording WHERE the engine home
 // (the repo carrying the resource layer) lives. Resources resolve LIVE from there — never
-// a copy, never drift (owner ruling 2026-07-09): editing the repo's resources changes them
+// a copy, never drift: editing the repo's resources changes them
 // for every stub workspace on the machine. Build and the ratchet re-record it.
 func engineSrcPointer() string { return globalBinPath() + ".src" }
 

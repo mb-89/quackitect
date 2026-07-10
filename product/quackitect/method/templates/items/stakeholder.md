@@ -4,7 +4,7 @@ artifact: node
 applies_rigor: [lean, systematic]
 applies_type: [default]
 ---
-<!-- design: method-stakeholder-links  implements: req-stakeholder-links :: Stakeholder notes carry preset and guide links (no reverse join exists in the pinned subset), and the matrix renders concern, preset, and guide columns - one note feeds the ch0 reader matrix and the ch3 concerns table. -->
+<!-- design: method-stakeholder-links  implements: req-item-domain-fields.3 :: Stakeholder notes carry preset and guide links (no reverse join exists in the pinned subset), and the matrix renders concern, preset, and guide columns - one note feeds the ch0 reader matrix and the ch3 concerns table. -->
 # stakeholder â€” one project stakeholder of a derived class
 
 Lives in the iteration or `spec/trace/` (interim home, spec-folder discussion
@@ -40,5 +40,15 @@ weight: {{0..1}}
 statement: {{who-this-role-is}}
 ---
 {{concerns}}
+```
+
+## Mint skeleton
+`quack mint` seeds these fields from this fence, verbatim. The engine owns every other key.
+
+```skeleton
+role: TODO
+interest: 0.5
+influence: 0.5
+weight: 0.5
 ```
 <!-- enddesign -->

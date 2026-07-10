@@ -12,6 +12,25 @@ import (
 	"strings"
 )
 
+// i16Tests: this file's checks, in battery order (selftestRegistry in
+// selftest.go concatenates the per-file slices).
+var i16Tests = []namedTest{
+	{"model-nodes", selftestModelNodes},
+	{"draft-is-truth", selftestDraftIsTruth},
+	{"semantic-hash", selftestSemanticHash},
+	{"model-lint", selftestModelLint},
+	{"model-consistency", selftestModelConsistency},
+	{"conformance", selftestConformance},
+	{"divergence-suspect", selftestDivergenceSuspect},
+	{"no-flow-smell", selftestNoFlowSmell},
+	{"model-kinds", selftestModelKinds},
+	{"model-stubs", selftestModelStubs},
+	{"views-chosen", selftestViewsChosen},
+	{"models-gate-build", selftestModelsGateBuild},
+	{"models-in-book", selftestModelsInBook},
+	{"answer-validated", selftestAnswerValidated},
+}
+
 const i16FixtureModel = `flowchart TD
   subgraph inner
     el-a["does a"]
@@ -230,7 +249,7 @@ func selftestModelsInBook() bool {
 }
 
 // test-answer-validated -> selftest:answer-validated
-// Class guard for the external report 2026-07-10: an answer token outside the
+// Class guard: an answer token outside the
 // ask's declared options must not resolve the ask (uncontrolled input would
 // otherwise land in a.Answer and later renders).
 func selftestAnswerValidated() bool {

@@ -5,7 +5,7 @@ mode: chapter
 order: 30
 statement: Design input - context, stakeholders, and every checkable claim on the system.
 ---
-<!-- design: method-ch3-mech  implements: req-ch3-mech :: ch3 mechanized (owner walk 2026-07-06): canned units with pooled views for stakeholders (statement = concern), tensions (conflicts-with connections), use cases (render refs, state-aware), qualities (six scenario fields grouped by facet), constraints, and the register; the authored residue is the context prose and the deferred functions unit. -->
+<!-- design: method-ch3-mech  implements: req-chapters-canned.2 :: ch3 mechanized: canned units with pooled views for stakeholders (statement = concern), tensions (conflicts-with connections), use cases (render refs, state-aware), qualities (six scenario fields grouped by facet), constraints, and the register; the authored residue is the context prose and the deferred functions unit. -->
 ## What the system must do
 <!-- tailor: shipped text - the chapter's anatomy is the same in every project.
 -->
@@ -23,9 +23,10 @@ Motivation: ch0's star orients; this one BINDS. The does-not-do list is the
   scope-creep guard. Most specs forget the future row - what this system must
   coexist with and what replaces it.
 Form: boundary prose, then the derived star + neighbours view, then the
-  does-not-do list. The methods view below carries the analysis tools (the
-  9-window among them). Design-relevant ASSUMPTIONS render from the raid
-  register - record them there, never inline.
+  does-not-do list. Mention analysis methods (the 9-window among them) in the
+  prose as links - the full methods live in the appendix.
+  Design-relevant ASSUMPTIONS render from the raid register - record them
+  there, never inline.
 Sources: context views @[[ref-sya-architecting]]; the methods notes.
 -->
 <!-- ai:3 -->
@@ -50,13 +51,15 @@ Every requirement's source traces to a row below; the statement column carries t
 ![[tensions.base]]
 ---
 ## Use cases and functions
-<!-- tailor: shipped machinery - ONE deterministic per-need board (field c25): a need
-  row expands into its functions (the need item's `functions:` list, verb plus noun,
-  solution-neutral) and its use cases (the refines edges). Never authored prose.
+<!-- tailor: shipped machinery - ONE merged section, rendered as
+  TWO reader tables: one for the use
+  cases (expand = the definition), one for the functions (the need item's `functions:`
+  list, verb plus noun, solution-neutral - each row names its need). Never authored
+  prose.
 Sources: Cockburn use-case fields @[[ref-sya-re]]; functional decomposition @[[ref-pahl-beitz]].
 -->
 <!-- ai:3 -->
-One row per need, live from the graph. Expand a need to see its functions and its use cases side by side.
+Two tables, live from the graph: the use cases and the solution-neutral functions, each traced to its need. Expand a use case to read its definition; filter either table by need.
 ---
 fig: ucfn-board
 ---
@@ -86,20 +89,21 @@ A constraint is externally imposed - a binding norm with a citation, never a cho
 ## The requirements register
 <!-- tailor: shipped text - the board and register derive; initial requirements
   suffice to START concepting, detail requirements gate the RELEASE; the set
-  criteria bind: complete, consistent, affordable, bounded.
+  criteria bind: complete, consistent, affordable, bounded. The board doubles
+  as the register's filter row (the recorded
+  exemption from the pills rule) - click values to filter, several combine.
 Sources: four core areas, Hauptmerkmalliste, staging @[[ref-pahl-beitz]];
   row schema @[[ref-methodische-entwicklung]]; attribute discipline
   @[[ref-modellbasierte-pe]]; set criteria @[[ref-iso-29148]].
 -->
 <!-- ai:3 -->
-Needs are the user level; requirements are the system level; deeper tiers hang off refines. The board below shows the facet coverage - a zero-count hole is the completeness check, live. Statements are EARS-shaped and carry their tolerances; no TBD survives the detail gate.
+Needs are the user level; requirements are the system level; deeper tiers hang off refines. The board below shows the facet coverage - a zero-count hole is the completeness check, live. The board is also the register's filter: click a value to filter the table, several values combine. Statements are EARS-shaped and carry their tolerances; no TBD survives the detail gate.
 ---
 fig: coverage-board
 ---
 ![[requirements.base]]
----
-## Methods that apply here
-<!-- tailor: shipped machinery - method notes route themselves by applies_chapters.
--->
-![[methods.base#Methods for design-input]]
+
+<!-- No "methods that apply here" section:
+     mention an applicable method in the PROSE as a link - the full
+     methods consolidate in the appendix. -->
 <!-- enddesign -->

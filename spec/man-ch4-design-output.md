@@ -13,15 +13,17 @@ Sources: architecture vs design table @[[ref-sya-architecting]].
 This chapter documents the architecture as it stands - part A the architecture and its drivers, part B the detailed design. How each choice was made - the deciding records and the candidates they weighed - lives with the [project chapter](man-ch6-project); every element here links there. The sorting rule for everything here: a decision is ARCHITECTURAL if it has system-wide impact or affects an important quality - otherwise it is detailed design.
 ---
 ## Drivers
-<!-- tailor: shipped machinery - the ASR view derives the drivers (high-weight rows
-  AND quality rows); the strategy and architecture decision tables render in the
-  project chapter (bs20 ruling: current state here, the record there).
+<!-- tailor: shipped machinery - the architecturally-significant list GENERATES from
+  the `architecturally-significant` tag on requirement nodes: each entry is a LINK
+  back to design input, never a copy; tagging is
+  owner curation. The strategy and architecture decision tables render in the
+  project chapter (current state here, the record there).
 Sources: drivers @[[ref-sya-architecting]].
 -->
 <!-- ai:3 -->
-The rows below drove the architecture. The strategic choices they led to are decisions, recorded with the project chapter's timeline.
-
-![[asr.base]]
+The requirements below drove the architecture - each entry links back to its register row. The strategic choices they led to are decisions, recorded with the project chapter's timeline.
+---
+fig: asr-list
 ---
 ## Partitioning and interfaces
 <!-- tailor: shipped machinery - the onion derives from the design elements (code
@@ -43,6 +45,19 @@ fig: onion
 
 ![[force-rationales.base]]
 ---
+## Structural models
+<!-- tailor: shipped machinery - every declared model renders from its extracted
+  graph (one `fig: model <id>` line per model; the onion above is the
+  layers-flow model's own drill-down render). The kind examples derive from the
+  method's kind registry at render time - no hand-authored duplicates.
+-->
+<!-- ai:3 -->
+The onion above is one declared model - the layered dependency view. The part-of composition of the shipped product below is another; each declared model renders here from its authored truth. The compact examples that close the section show every supported model kind, derived from the kind registry.
+---
+fig: model model-product-tree
+---
+fig: model-kinds
+---
 ## Design rules
 <!-- tailor: shipped machinery - the rules view; each rule is a note in spec/rules
   linking the decision that established it.
@@ -53,12 +68,9 @@ Detailed design honors the rules below. A rule is internally chosen governance -
 
 ![[rules.base]]
 
----
-## Methods that apply here
-<!-- tailor: shipped machinery - method notes route themselves by applies_chapters.
--->
-![[methods.base#Methods for design-output]]
-
+<!-- No "methods that apply here" section:
+     mention an applicable method in the PROSE as a link - the full
+     methods consolidate in the appendix. -->
 <!-- Budgets skipped: the unit is gated [type: manufactured_good, cyber_physical]
      and this deliverable is software - the ch6 tailoring row records the skip. -->
 <!-- Trace coverage (requirement x implementing design, empty row = hole) renders

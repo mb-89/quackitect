@@ -4,7 +4,7 @@ artifact: node
 applies_rigor: [lean, systematic]
 applies_type: [default]
 ---
-<!-- design: method-quality-scenarios  implements: req-quality-scenarios :: Quality requirements declare the six-part scenario as FIELDS (stimulus_source, stimulus, artifact, environment, response, response_measure) so the qualities view renders them grouped by quality facet - a quality without a measure is a mood. -->
+<!-- design: method-quality-scenarios  implements: req-item-domain-fields.2 :: Quality requirements declare the six-part scenario as FIELDS (stimulus_source, stimulus, artifact, environment, response, response_measure) so the qualities view renders them grouped by quality facet - a quality without a measure is a mood. -->
 # requirement â€” one checkable claim on the system
 
 Lives in its birth iteration. EARS-shaped statement (quack lint checks). Needs are

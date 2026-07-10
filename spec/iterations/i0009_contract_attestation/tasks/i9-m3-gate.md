@@ -1,8 +1,0 @@
----
-id: i9-m3-gate
-statement: Milestone M3 (Candidate architectures) passed its review.
-milestone: M3
-class: review
-killer: true
-depends_on: [i9-m3-alternatives-elaborated,i9-m3-criteria-weighted,i9-m3-feasibility-checked]
----

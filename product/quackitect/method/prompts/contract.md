@@ -1,6 +1,6 @@
 # contract — the binding rules of the loop
 
-<!-- design: method-contract-delivery  implements: req-confirm-back, req-active-imperative, req-copilot-instructions :: The contract reaches the agent through each harness's native, auto-loaded channel (CLAUDE.md for Claude Code; .github/copilot-instructions.md for Copilot) as an unbroken chain of ACTIVE, enumerated imperatives: the pointer file commands following AGENTS.md to the letter; AGENTS.md commands read this file in full, paraphrase its specifics back, confirm you will obey. Never a passive pointer — every link is a command. The paraphrase is the detectable proof the rules loaded; attest is the structural backstop when it doesn't. -->
+<!-- design: method-contract-delivery  implements: req-contract-delivery.2, req-contract-delivery.1, req-contract-delivery.3 :: The contract reaches the agent through each harness's native, auto-loaded channel (CLAUDE.md for Claude Code; .github/copilot-instructions.md for Copilot) as an unbroken chain of ACTIVE, enumerated imperatives: the pointer file commands following AGENTS.md to the letter; AGENTS.md commands read this file in full, paraphrase its specifics back, confirm you will obey. Never a passive pointer — every link is a command. The paraphrase is the detectable proof the rules loaded; attest is the structural backstop when it doesn't. -->
 You are bound by these rules the moment you act on this project. They are not
 advice. They override your defaults.
 
@@ -9,7 +9,7 @@ contract in full, paraphrase its specifics back to the user, and confirm you
 will obey.** STOP whatever you were asked to do until the recital is out.
 The recital message ENDS your turn: tool calls may come before it (reading
 this file is one), NEVER after it in the same turn. Trailing tool calls can
-swallow the message on some harnesses (a recorded field failure) — a recital
+swallow the message on some harnesses — a recital
 the user cannot see does not count. Name rule 3's `actor=agent` exception,
 to prove you actually read it. No visible paraphrase means the rules never
 loaded, and the user should stop you. One visible recital covers the whole
@@ -29,7 +29,7 @@ evidence. Move on. Do not look ahead. Do not refactor. Do not "improve" code
 the check did not name. Do not check `status`, `lint`, or `selftest` between
 steps. The engine does the checking.
 
-<!-- design: method-adjudication  implements: req-bless-y-console, req-contract-killer-relax :: Rule 3, adjudication: FILL vs ADJUDICATE; the agent may bless a killer only on the user's explicit, gate-specific authorization (actor=agent); a user "y" to a presented handover pager IS that authorization, recorded actor=user as a console bless. -->
+<!-- design: method-adjudication  implements: req-killer-adjudication.1, req-killer-adjudication.2 :: Rule 3, adjudication: FILL vs ADJUDICATE; the agent may bless a killer only on the user's explicit, gate-specific authorization (actor=agent); a user "y" to a presented handover pager IS that authorization, recorded actor=user as a console bless. -->
 ## 3. The user adjudicates the gates
 You FILL. The user ADJUDICATES. By default, do not run `bless` on a killer
 gate for the user — ALWAYS present the handover pager (`quack progress --pager

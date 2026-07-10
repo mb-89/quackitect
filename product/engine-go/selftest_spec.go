@@ -1,6 +1,6 @@
 package main
 
-// The i0012 spec-template extension selftest battery (owner-directed 2026-07-05).
+// The spec-template selftest battery.
 // Authored BEFORE the build (test-first): each case was observed RED against the
 // unbuilt machinery and recorded via `quack observe-red` on its trace test node.
 
@@ -10,6 +10,27 @@ import (
 	"regexp"
 	"strings"
 )
+
+// specTests: this file's checks, in battery order (selftestRegistry in
+// selftest.go concatenates the per-file slices).
+var specTests = []namedTest{
+	{"ratings-map", selftestRatingsMap},
+	{"base-views", selftestBaseViews},
+	{"spec-content-roots", selftestSpecContentRoots},
+	{"auto-link", selftestAutoLink},
+	{"ch2-derived", selftestCh2Derived},
+	{"fig-tables", selftestFigTables},
+	{"decision-kinds", selftestDecisionKinds},
+	{"candidates", selftestCandidates},
+	{"facet-board", selftestFacetBoard},
+	{"external-links", selftestExternalLinks},
+	{"residue-lint", selftestResidueLint},
+	{"anchor-refers", selftestAnchorRefers},
+	{"quarantine-scope", selftestQuarantineScope},
+	{"item-templates", selftestItemTemplates},
+	{"spec-template-set", selftestSpecTemplateSet},
+	{"stub-spec", selftestStubSpec},
+}
 
 // selftestRatingsMap — test-ratings-map: a node with a one-level frontmatter map
 // parses and its entries are readable; a two-level map refuses; unknown top-level
@@ -190,9 +211,9 @@ func selftestSpecContentRoots() bool {
 // untouched; two notes claiming one alias refuse with an error.
 func selftestAutoLink() bool {
 	idx := map[string]string{
-		"gate":         "glossary:gate",
-		"gates":        "glossary:gate",
-		"quality gate": "glossary:gate",
+		"gate":              "glossary:gate",
+		"gates":             "glossary:gate",
+		"quality gate":      "glossary:gate",
 		"suspect mechanism": "fundamentals:fund-suspect",
 	}
 	out := AutoLink("The gates open now.", idx)
@@ -292,24 +313,30 @@ func selftestCh2Derived() bool {
 	if len(findings) != 0 {
 		return false
 	}
-	// used entries render; normative renders apart from AND before informative
-	// (h3 group headings since owner review c22). Usage counts the i14 termref
-	// affordance (data-goto), not only anchors - the pull-law fix of 2026-07-09.
-	ni, ii := strings.Index(html, "<h3>Normative</h3>"), strings.Index(html, "<h3>Informative</h3>")
-	if !strings.Contains(html, "Norm A") || !strings.Contains(html, "Paper B") || ni < 0 || ii < ni {
+	// used entries render in ONE references table (no h3
+	// group pair): the normative-vs-informative kind is a visible enum column and
+	// the DESC sort keeps the normative row first. Usage counts the termref
+	// affordance (data-goto), not only anchors.
+	na, pb := strings.Index(html, "Norm A"), strings.Index(html, "Paper B")
+	if na < 0 || pb < na || strings.Contains(html, "<h3>Normative</h3>") {
 		return false
 	}
-	// the reference prints its pin and its only-legal URL as a live link
-	if !strings.Contains(html, `href="https://example.org/a"`) || !strings.Contains(html, ", 2011") {
+	if !strings.Contains(html, `<td class="uenum">normative</td>`) ||
+		!strings.Contains(html, `<td class="uenum">informative</td>`) {
+		return false
+	}
+	// the reference's pin and its only-legal URL render in the expand - the URL live
+	if !strings.Contains(html, `href="https://example.org/a"`) || !strings.Contains(html, "2011") {
 		return false
 	}
 	// the pull law holds: unused entries are absent
 	if strings.Contains(html, "Unused C") || strings.Contains(html, "Unused Y") {
 		return false
 	}
-	// the ch2 view carries the one-liner; the ch8 view renders the full body at its anchor
+	// the ch2 view carries the one-liner; the ch8 view is a TABLE
+	// - the full body one expand away, the row addressable by data-node
 	if !strings.Contains(html, "The one-liner of X.") || !strings.Contains(html, "The full body of X explains at length.") ||
-		!strings.Contains(html, `<section id="fund-x"`) {
+		!strings.Contains(html, `data-node="fund-x"`) {
 		return false
 	}
 	// `referenced` outside the emitter refuses loudly - never a silent superset
@@ -323,9 +350,10 @@ func selftestFigTables() bool {
 	dir, _ := os.MkdirTemp("", "qst-figt")
 	defer os.RemoveAll(dir)
 	nodes := bookFixture(dir, 1, true)
-	// a test node file so the canned verification query has a row
+	// a test node file so the canned verification query has a row; TWO verifies edges
+	// prove the one-row-per-test law (the old groupBy fanned this into two rows)
 	tp := filepath.Join(dir, "test-fix.md")
-	os.WriteFile(tp, []byte("---\nid: test-fix\ntype: test\nstatement: verifies the fixture.\nverifies: [req-fix]\nverify: selftest:x\n---\n"), 0o644)
+	os.WriteFile(tp, []byte("---\nid: test-fix\ntype: test\nstatement: verifies the fixture.\nverifies: [req-fix, req-fix2]\nverify: selftest:x\n---\n"), 0o644)
 	n := nodes["test-fix"]
 	n.Path = tp
 	n.Statement = "verifies the fixture."
@@ -334,7 +362,7 @@ func selftestFigTables() bool {
 	sp := filepath.Join(dir, "stk-user.md")
 	os.WriteFile(sp, []byte("---\nid: stk-user\ntype: stakeholder\nstatement: the user role.\nrole: user\ninterest: 0.8\ninfluence: 0.5\nweight: 0.7\n---\n"), 0o644)
 	nodes["stk-user"] = Node{ID: "stk-user", Type: "stakeholder", Statement: "the user role.", Class: "review", Path: sp}
-	// the shipped queries exist and pool into a fixture spec/queries (owner ruling: central pool)
+	// the shipped queries exist and pool into a fixture spec/queries (central pool)
 	qdir := filepath.Join(EngineDir(), "method", "templates", "documents", "spec", "queries")
 	vv, err1 := os.ReadFile(filepath.Join(qdir, "vv-matrix.base"))
 	stk, err2 := os.ReadFile(filepath.Join(qdir, "stakeholder-matrix.base"))
@@ -355,12 +383,12 @@ func selftestFigTables() bool {
 	if len(findings) != 0 {
 		return false
 	}
-	// the verification matrix carries the test row in the i14 unified reader table:
-	// name + brief columns, the requirement grouping stamped as the row's data-gp,
-	// the full item one expand away (req-reader-columns, req-table-expand)
+	// the verification matrix carries the test row ONCE in the unified reader
+	// table (no groupBy fan-out duplicating a
+	// multi-requirement test); the verifies column reaches the expand, the full
+	// item one expand away (req-reader-tables.6, req-reader-tables.3)
 	if !strings.Contains(html, "Verification matrix") ||
-		!strings.Contains(html, `data-gp="req-fix"`) ||
-		!strings.Contains(html, `data-node="test-fix"`) ||
+		strings.Count(html, `data-node="test-fix"`) != 1 ||
 		!strings.Contains(html, "verifies the fixture.") {
 		return false
 	}
@@ -450,8 +478,9 @@ func selftestCandidates() bool {
 		os.WriteFile(p, []byte("---\nid: "+id+"\ntype: candidate\naxis: "+axis+"\nstatement: option "+id+".\nratings:\n  crit-speed: "+speed+"\n  crit-cost: "+cost+"\n---\npros and cons.\n"), 0o644)
 		return ParseNode(p)
 	}
-	// the candidates render in the PROJECT chapter since i14 (req-candidates-timeline):
-	// parsed nodes ride a real iteration's path so the per-iteration walk picks them up
+	// the candidates render as the EXPAND of their decision's row in the ONE decisions
+	// table (q-candidates-placement, decided);
+	// parsed nodes ride a real iteration's path so the iteration facet derives
 	vs := versions()
 	if len(vs) == 0 {
 		return false
@@ -464,13 +493,22 @@ func selftestCandidates() bool {
 	nodes["cand-a"], nodes["cand-b"] = ca, cb
 	nodes["adr-pick"] = Node{ID: "adr-pick", Type: "adr", Kind: "architecture", Path: ip,
 		Chosen: []string{"cand-a"}, Rejected: []string{"cand-b"}, Statement: "picks a.", Class: "review"}
-	html := renderFigure("project-table", nodes)
+	html := renderFigure("decisions-table", nodes)
 	// dynamic criteria columns, axis grouping, and the derived statuses
 	if !strings.Contains(html, "crit-speed") || !strings.Contains(html, "crit-cost") ||
 		!strings.Contains(html, "storage") {
 		return false
 	}
 	if !strings.Contains(html, "chosen by adr-pick") || !strings.Contains(html, "rejected by adr-pick") {
+		return false
+	}
+	// the row carries the human statement and the derived type/iteration facets;
+	// the slim milestones table renders no candidates
+	if !strings.Contains(html, "picks a.") || !strings.Contains(html, `data-dtype="architecture"`) ||
+		!strings.Contains(html, `data-diter="`+vs[0]+`"`) {
+		return false
+	}
+	if strings.Contains(renderFigure("project-table", nodes), "crit-speed") {
 		return false
 	}
 	// the ratings parse through the one-level map
@@ -502,7 +540,7 @@ func selftestFacetBoard() bool {
 		!strings.Contains(html, ">safety (1)<") {
 		return false
 	}
-	// a zero-count vocabulary value renders as a visible hole (muted since i14, field c30)
+	// a zero-count vocabulary value renders as a visible, muted hole
 	if !strings.Contains(html, `class="facet-count fb-zero" data-target="f-phase-misuse">misuse (0)<`) {
 		return false
 	}
@@ -675,7 +713,7 @@ func selftestSpecTemplateSet() bool {
 	if _, err := os.Stat(filepath.Join(dir, "README.md")); err != nil {
 		return false
 	}
-	// ch7 died at i14 (rationales folded into the ch8 Appendix, owner ruling 2026-07-08)
+	// no ch7: rationales fold into the ch8 Appendix
 	chapters := []string{"man-ch0-orientation", "man-ch1-motivation", "man-ch2-fundamentals",
 		"man-ch3-design-input", "man-ch4-design-output", "man-ch5-verification-validation",
 		"man-ch6-project", "man-ch8-guidance"}
@@ -699,10 +737,12 @@ func selftestSpecTemplateSet() bool {
 			}
 		}
 	}
-	// the canned queries ship beside the skeletons (pooled centrally - no inline blocks)
+	// the canned queries ship beside the skeletons (pooled centrally - no inline
+	// blocks); no asr.base (the ASR
+	// list generates from the architecturally-significant tag - fig: asr-list)
 	for _, q := range []string{"stakeholder-matrix", "vv-matrix", "needs", "requirements",
 		"decisions-architecture", "decisions-project", "decisions-waiver",
-		"assumptions", "asr", "raid", "rationales"} {
+		"assumptions", "raid", "rationales"} {
 		if _, err := os.Stat(filepath.Join(dir, "queries", q+".base")); err != nil {
 			return false
 		}
@@ -727,7 +767,7 @@ func selftestStubSpec() bool {
 	dir, _ := os.MkdirTemp("", "qst-stub")
 	defer os.RemoveAll(dir)
 	cmdStartStubs([]string{dir})
-	// the spec MIRRORS the template (owner ruling 2026-07-07): top-level files land at
+	// the spec MIRRORS the template: top-level files land at
 	// the spec ROOT, exactly where the template keeps them; subfolders mirror 1:1.
 	for _, f := range []string{
 		filepath.Join(dir, "spec", "SPEC-README.md"),

@@ -14,7 +14,7 @@ import (
 )
 
 // design: go-register-vale  implements: req-register-advisory
-// The register lane (adr-vale-autopull, owner-ruled): Vale - one static MIT Go binary - is
+// The register lane (adr-vale-autopull): Vale - one static MIT Go binary - is
 // AUTO-PULLED once per OS into the data home (pinned version, the global-binary bootstrap
 // pattern), run as a subprocess, never linked and never hand-rolled. When the binary is absent
 // and the pull fails, the engine prints ONE loud warning - "prose linter missing; prose quality

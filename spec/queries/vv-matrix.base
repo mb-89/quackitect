@@ -1,3 +1,7 @@
+# One row per test: a groupBy over `verifies`
+# fans a multi-requirement test into duplicate rows - a render
+# error. The verifies column lists the covered requirements; the need facet pills
+# carry the per-need view; unverified requirements render in the verdict-first block.
 filters:
   and:
     - 'type == "test"'
@@ -5,4 +9,3 @@ views:
   - type: table
     name: Verification matrix
     order: [name, verifies, method, level]
-    groupBy: verifies

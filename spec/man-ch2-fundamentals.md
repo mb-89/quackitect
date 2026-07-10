@@ -25,12 +25,15 @@ Nothing in it is authored by hand. A reference, a term, or a fundamental appears
 ![[fundamentals.base#Fundamentals]]
 ---
 ## References
-<!-- tailor: shipped machinery - the sources this document cites, normative apart
-  from informative (ISO clause-2 style), each with its pin and its only-legal URL.
-  The pull law filters to cited sources; the Obsidian preview shows the superset.
+<!-- tailor: shipped machinery - ONE table for every source this document cites,
+  the normative-vs-informative kind a rendered,
+  filterable column, sorted normative first (ISO clause-2 style); pin, URL, and
+  annotation one expand away - the URL's only legal home. The pull law filters
+  to cited sources; the Obsidian preview shows the superset.
 -->
 ![[references.base]]
 
-<!-- Notation and the glossary stay emitter-derived and append after the chapters:
-     their term anchors and first-use expansion live in the emitter, not in a
-     query. Everything else in this chapter is the two pooled queries above. -->
+<!-- Notation stays emitter-derived and appends after the chapters. The ONE
+     glossary of the book splices in at the END of this chapter:
+     a name+brief table, full definition and usage one expand away;
+     its term anchors live in the emitter, not in a query. -->

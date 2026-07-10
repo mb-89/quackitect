@@ -18,7 +18,7 @@ Every winner wins on **record fidelity** first — the criterion the directive w
 - All other margins ≥3 and stable under ±1 weight perturbation on any single criterion.
 
 ## ADRs recorded and traced  → i8-m4-adr-recorded  *(derived: coverage:adr-traced)*
-Computed live by the engine: six ADRs, each `addresses:` its requirement(s) — `adr-strict-load` → `req-strict-frontmatter`+`req-ref-integrity`; `adr-actor-channel-stat` → `req-actor-channels`; `adr-ears-baseline` → `req-ears-lint`; `adr-logs-user-dir` → `req-logs-out-of-repo`; `adr-kernel-corpus` → `req-kernel-selftest`; `adr-region-hash-ws` → `req-design-hash-norm`. (The pulled item `req-monotonic-lint` and the method item `req-ears-method` are direct realizations of an already-recorded convention or instruction — no architectural decision to record; deliberately no filler ADRs. `req-cli-help` dissolved at M5 — already realized in i0003.)
+Computed live by the engine: six ADRs, each `addresses:` its requirement(s) — `adr-strict-load` → `req-structural-strictness.1`+`req-structural-strictness.2`; `adr-actor-channel-stat` → `req-actor-channels`; `adr-ears-baseline` → `req-ears-authoring.1`; `adr-logs-user-dir` → `req-logs-out-of-repo`; `adr-kernel-corpus` → `req-kernel-selftest`; `adr-region-hash-ws` → `req-design-hash-norm`. (The pulled item `req-structural-strictness.3` and the method item `req-ears-authoring.2` are direct realizations of an already-recorded convention or instruction — no architectural decision to record; deliberately no filler ADRs. `req-go-port.4` dissolved at M5 — already realized in i0003.)
 
 ---
 

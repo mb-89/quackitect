@@ -47,8 +47,8 @@ quack start <id> [--plan]# activate a version (--plan registers a future one)
 quack start stubs [path] # emit drive-from-inside stubs into a bare workspace
 quack why <id>           # what input changed
 quack bless [--all|<id>] [--by user|agent] # record an adjudication; actor defaults by CHANNEL
-quack migrate-actors     # one-shot: rewrite pre-i11 actor stamps to user (audited; no-op when done)
-quack migrate-layout     # one-shot: move a pre-i12 spec to the template-mirroring layout (no-op when done)
+quack migrate-actors     # one-shot: rewrite legacy actor stamps to user (audited; no-op when done)
+quack migrate-layout     # one-shot: move a legacy-layout spec to the template-mirroring layout (no-op when done)
 quack note "<text>"      # deterministic capture lane
 quack note --file2list <copy.html> # list a commented book copy as note candidates (roles, never names)
 quack notes [--all]      # list open inbox notes (--all adds backlog + archive)
@@ -72,9 +72,25 @@ to ANY command to drive a different project's workspace. After editing engine `.
 **`quack build`** (never hand-run `go build` + re-baseline separately).
 
 ## Rules
+- **The repo is self-sufficient.** Everything an agent needs to work well here lives IN THIS
+  REPO — contract, method prompts, templates, guides. Harness memory is a convenience layer
+  only: personal data stays there (never in the repo), but no working rule may exist ONLY in
+  a harness's memory. When you learn a durable rule, bake it here.
+- **Learning escalates: instance → prompt → determinizer.** A lesson fixed only in the instance
+  is half-done; bake the pattern into the prompts/methods/templates. A baked rule that CAN be
+  enforced mechanically climbs further: it becomes ENGINE behavior (test-first), and the prompt
+  keeps only what genuinely needs judgment. Ask at every baked rule: "could `quack` enforce this?"
+- **After ANY content change, `quack build` before `status`/`report`.** Engine `.go`, mints,
+  evidence docs, method prose — every content edit moves hashes and the build re-baselines the
+  golden root; skipping it flashes every verification green as red.
+- **Method operations are determinizers.** Anything the PROCESS depends on — or that will ever
+  run again (migrations, captures, checks) — is a `quack <cmd>` in the Go engine, test-first,
+  never a loose script the method quietly depends on. Throwaway scripts for one-time mechanical
+  work are FINE and often the efficient choice; they just never become a dependency, never live
+  in the repo, and must honor the byte-safe edit rule below.
 - **Designs live in code, not `spec/`.** Mark realized code inline: `# design: <id>  implements: <req-id>` … `# enddesign` (`//` in Go). `quack lint` flags a requirement with no design. ADRs — the *decisions* — are `.md` nodes in `spec/decisions/`.
 - A check goes **SUSPECT**, not open, when an input changes. A `bless` returns it to DONE.
 - **Killer checks** are always adjudicated gates. Never auto-pass them.
 - The surface is **default-closed**. Triage, defer, retire, retro, and ship are sub-ops reached through `engage` and `review`.
 - The methods live in `product/quackitect/method/prompts/`. Load the one named by the command.
-- **Edit source files with your editor tooling, never shell string surgery.** Shell rewrites corrupted UTF-8 twice in one session (mojibake, a clobbered file). The shell is for probes and commands; edits go through the file-editing tools.
+- **Edits must be byte-safe.** Editor tooling by default. A scripted bulk edit is allowed when it uses explicit BOM-less UTF-8 IO (Go, or .NET `[IO.File]` calls) and touches only the intended bytes. What stays banned is the careless lane: PowerShell 5.1 default `Get-Content|Set-Content` round-trips and `-Encoding utf8` (BOM in 5.1) re-encode every line they pass — that exact reach corrupted UTF-8 twice (mojibake, a clobbered file). Verify a scripted edit's diff before moving on.

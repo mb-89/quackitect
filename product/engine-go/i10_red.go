@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"context"
+	"encoding/json"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -10,6 +11,23 @@ import (
 	"strings"
 	"time"
 )
+
+// i10Tests: this file's checks, in battery order (selftestRegistry in
+// selftest.go concatenates the per-file slices).
+var i10Tests = []namedTest{
+	{"verify-cache", selftestVerifyCache},
+	{"verify-feedback", selftestVerifyFeedback},
+	{"status-fast", selftestStatusFast},
+	{"why-derived", selftestWhyDerived},
+	{"notes-list", selftestNotesList},
+	{"call-log", selftestCallLog},
+	{"mint-dedupe", selftestMintDedupe},
+	{"mint-rationale", selftestMintRationale},
+	{"ratchet-semantic", selftestRatchetSemantic},
+	{"scaffold-modern", selftestScaffoldModern},
+	{"pager-merge", selftestPagerMerge},
+	{"user-wording", selftestUserWording},
+}
 
 // test-verify-cache -> selftest:verify-cache
 func selftestVerifyCache() bool {
@@ -391,9 +409,37 @@ func selftestStatusFast() bool {
 	statusFastBusy = true
 	defer func() { statusFastBusy = false }()
 	nodes := LoadAll()
-	StatusMap(nodes) // warm the disk cache (may re-run tests)
-	coverageMemo = map[string]bool{}
-	verdictsMemo = nil // fresh-process simulation: warm disk cache, cold in-process memos
+	// The property: with a WARM verdict cache, status completes within the one-second
+	// bound. The warm cache is built BY CONSTRUCTION into a temp store — every executed
+	// selftest check present at its current input hash and build — never by re-running
+	// the battery: a warm-up call would re-run every cache-missed sibling and pay ~14s
+	// inside this one check. The timed run still walks the honest warm path
+	// of a fresh process: load the verdicts from disk, hash every check, compute every
+	// gate state and coverage rule. Verdict VALUES are irrelevant to the timing; the
+	// fabricated greens live only in the throwaway override store.
+	memo := map[string]string{}
+	warm := map[string]verdictRec{}
+	for id, n := range nodes {
+		if n.Class == "executed" && strings.HasPrefix(n.Verify, "selftest:") {
+			warm[id] = verdictRec{Input: fullHash(id, nodes, memo), Build: buildID(), Result: true}
+		}
+	}
+	dir, err := os.MkdirTemp("", "qsf")
+	if err != nil {
+		return false
+	}
+	defer os.RemoveAll(dir)
+	b, err := json.MarshalIndent(warm, "", " ")
+	if err != nil {
+		return false
+	}
+	vp := filepath.Join(dir, "verdicts.json")
+	if os.WriteFile(vp, b, 0o644) != nil {
+		return false
+	}
+	oldPath, oldMemo, oldCov := verdictPathOverride, verdictsMemo, coverageMemo
+	verdictPathOverride, verdictsMemo, coverageMemo = vp, nil, map[string]bool{}
+	defer func() { verdictPathOverride, verdictsMemo, coverageMemo = oldPath, oldMemo, oldCov }()
 	t0 := time.Now()
 	StatusMap(nodes)
 	return time.Since(t0) < time.Second

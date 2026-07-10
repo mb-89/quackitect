@@ -1,9 +1,9 @@
 package main
 
-// ask.go — the mobile ask loop (i0015_mobile_adapter): a gate or decision ask travels to a
+// ask.go — the mobile ask loop: a gate or decision ask travels to a
 // paired device over a channel adapter; the answer comes back by polling and records as
 // the adjudication. No daemon: `await` is a bounded foreground command, and every engine
-// run drains pending answers as the fallback (owner rulings, 2026-07-09).
+// run drains pending answers as the fallback.
 
 import (
 	"bufio"
@@ -19,7 +19,7 @@ import (
 	"time"
 )
 
-// design: go-ask-core  implements: req-ask-format, req-answer-idempotent, req-ask-timeout, req-multi-ask
+// design: go-ask-core  implements: req-ask-loop.1, req-ask-loop.5, req-ask-loop.3, req-ask-loop.6
 // The ask model: one pending question with a correlation id, 1..n id-labelled options
 // (buttons cap at three — the body always lists ALL options), an injectable-clock
 // timeout, and FIRST-WINS resolution: the first well-formed answer on a pending
@@ -30,11 +30,12 @@ type Ask struct {
 	CID      string   // correlation id carried by every answer
 	Kind     string   // "gate" | "decision"
 	Check    string   // the primary check id a gate ask blesses
-	Checks   []string // a COMBINED hand-off's full group (owner ruling: one card, one tap blesses all)
+	Checks   []string // a COMBINED hand-off's full group (one card, one tap blesses all)
 	Question string
 	Options  []AskOption
-	Created  int64 // unix seconds (injectable clock everywhere)
-	Timeout  int64 // seconds until expiry
+	Created  int64  // unix seconds (injectable clock everywhere)
+	Updated  int64  // last state-change stamp, unix seconds (merge-on-save picks the newest; go-ask-hardening)
+	Timeout  int64  // seconds until expiry
 	State    string // "pending" | "resolved" | "expired"
 	Answer   string // the winning option id, once resolved
 	Sent     bool   // dispatched to the paired adapters already
@@ -89,8 +90,14 @@ func askApplyAnswer(s *AskStore, ans AskAnswer, channel string, now int64) (*Ble
 		if a.CID != ans.CID || a.State != "pending" {
 			continue
 		}
+		// an answer stamped BEFORE the ask was created belongs to a previous ask
+		// generation (a re-sent gate question) - refused, never applied (go-ask-hardening)
+		if answerStale(a.Created, ans.At) {
+			fmt.Fprintln(os.Stderr, "ask: stale answer dropped for "+a.CID+" (answer predates the ask)")
+			return nil, false
+		}
 		// the token must be one of the ask's DECLARED options - anything else is
-		// uncontrolled input and never lands in a.Answer (class guard, 2026-07-10)
+		// uncontrolled input and never lands in a.Answer
 		fields := strings.Fields(ans.Body)
 		if len(fields) == 0 {
 			return nil, false
@@ -107,6 +114,7 @@ func askApplyAnswer(s *AskStore, ans AskAnswer, channel string, now int64) (*Ble
 		}
 		a.State = "resolved"
 		a.Answer = fields[0]
+		a.Updated = now
 		if a.Kind == "gate" {
 			group := a.Checks
 			if len(group) == 0 {
@@ -126,6 +134,7 @@ func askApplyAnswer(s *AskStore, ans AskAnswer, channel string, now int64) (*Ble
 				if covered[b.Check] {
 					b.State = "resolved"
 					b.Answer = "superseded"
+					b.Updated = now
 				}
 			}
 			v := "n"
@@ -147,6 +156,7 @@ func askExpire(s *AskStore, now int64) []Ask {
 		a := &s.Asks[i]
 		if a.State == "pending" && now > a.Created+a.Timeout {
 			a.State = "expired"
+			a.Updated = now
 			out = append(out, *a)
 		}
 	}
@@ -155,10 +165,10 @@ func askExpire(s *AskStore, now int64) []Ask {
 
 // enddesign
 
-// design: go-ask-loop  implements: req-ask-dispatch, req-answer-apply, req-mobile-actor
+// design: go-ask-loop  implements: req-ask-loop.2, req-ask-loop.4, req-ask-loop.9
 // The loop: dispatch every pending, unsent ask through EVERY paired adapter; poll the
 // adapters; correlate and apply. A resolved GATE answer becomes a bless with actor=user
-// — the paired device IS the adjudicator (owner ruling: paired = trustworthy) — and the
+// — the paired device IS the adjudicator (paired = trustworthy) — and the
 // answering channel is noted in the record. Applying rides the EXISTING bless path; the
 // asks themselves never enter the ledger (BlessIntent, the pure answer model,
 // rides in go-ask-core).
@@ -203,7 +213,20 @@ func askDispatch(s *AskStore, adapters []AskAdapter) (int, error) {
 
 // enddesign
 
-// design: go-ask-pairing  implements: req-pairing
+// design: go-ask-context  implements: req-ask-context
+// The hand-off narrative is generated ONCE (adr-ask-context-once). The ask carries it
+// below the pager card, one blank line between. Both lanes show the identical text.
+// The card always comes first. An empty narrative returns the card untouched.
+func askComposeBody(card, context string) string {
+	if context == "" {
+		return card
+	}
+	return card + "\n\n" + context
+}
+
+// enddesign
+
+// design: go-ask-pairing  implements: req-device-pairing.1
 // `quack pair ntfy`: ONE operation mints the high-entropy topic pair (the credential —
 // answer authenticity equals its possession, adr-answer-authenticity), writes the
 // machine-local pairing config (data home, never the repo), and prints the transit
@@ -265,8 +288,8 @@ func cmdPair(args []string) error {
 	return nil
 }
 
-// printPairing renders the subscribe QR (the ntfy:// DEEP LINK - owner 2026-07-09: the
-// https QR opened the browser; the app registers the scheme and stores the channel) plus
+// printPairing renders the subscribe QR (the ntfy:// DEEP LINK - an https QR only
+// opens the browser; the app registers the scheme and stores the channel) plus
 // the plain https link as the manual/desktop fallback, and the two safety instructions.
 func printPairing(cfg pairConfig) {
 	deep := "ntfy://" + strings.TrimPrefix(strings.TrimPrefix(cfg.Base, "https://"), "http://") + "/" + cfg.Ask
@@ -293,7 +316,7 @@ func loadPairConfig() (pairConfig, bool) {
 
 // enddesign
 
-// design: go-ask-seam  implements: req-channel-seam, req-adapter-zero-dep
+// design: go-ask-seam  implements: req-channel-adapters.1, req-channel-adapters.2
 // Adding a channel = one AskAdapter behind the seam; the loop never changes. Everything
 // is stdlib-only. The EXEC LANE (adr-ask-seam-exec-lane) drives an external process over
 // a file contract, so the deferred corporate adapters (PowerShell/Outlook-COM, Teams
@@ -338,7 +361,7 @@ func (e *execAdapter) PollAnswers(since string) ([]AskAnswer, string, error) {
 
 // enddesign
 
-// design: go-ntfy-adapter  implements: req-ntfy-channel, req-gate-distinct
+// design: go-ntfy-adapter  implements: req-channel-adapters.3, req-ask-loop.8
 // The ntfy adapter: send = one HTTP PUT with the ask body and headers; poll = one GET
 // with `since=` (json lines). A GATE ask renders visibly distinct (high priority,
 // bangbang tag) from a decision ask (default, question tag). Up to three X-Actions

@@ -12,7 +12,7 @@ render the scores next to each candidate's derived verdict. A criterion nothing
 ever rates against is dead weight. Id prefix `crit-`.
 
 Success criteria are NOT criterion items: each need carries its own
-`## Success criteria` pass lines (owner ruling 2026-07-08); the ch1 delta and
+`## Success criteria` pass lines; the ch1 delta and
 ch5 validation views render those from the needs.
 
 ## Fields
@@ -32,4 +32,12 @@ metric: {{what-is-measured}}
 statement: {{the-axis-claim}}
 ---
 {{how-scored}}
+```
+
+## Mint skeleton
+`quack mint` seeds these fields from this fence, verbatim. The engine owns every other key.
+
+```skeleton
+metric: TODO
+target: TODO
 ```

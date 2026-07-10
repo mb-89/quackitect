@@ -16,27 +16,46 @@ import (
 	"time"
 )
 
+// i13Tests: this file's checks, in battery order (selftestRegistry in
+// selftest.go concatenates the per-file slices).
+var i13Tests = []namedTest{
+	{"comment-island", selftestCommentIsland},
+	{"comment-suggest", selftestCommentSuggest},
+	{"comment-privacy", selftestCommentPrivacy},
+	{"comment-readback", selftestCommentReadback},
+	{"comment-premark", selftestCommentPremark},
+	{"comment-escape", selftestCommentEscape},
+	{"comment-dom-static", selftestCommentDomStatic},
+	{"note-collision", selftestNoteCollision},
+	{"mint-edge-mode", selftestMintEdgeMode},
+	{"prose-marks-comments", selftestProseMarksComments},
+	{"orphan-render-refs", selftestOrphanRenderRefs},
+	{"conn-code-designs", selftestConnCodeDesigns},
+	{"launcher-single-dispatch", selftestLauncherSingleDispatch},
+	{"build-fast-path", selftestBuildFastPath},
+	{"verdict-surgical", selftestVerdictSurgical},
+	{"calls-summary", selftestCallsSummary},
+	{"selftest-home-sweep", selftestSelftestHomeSweep},
+	{"log-retention", selftestLogRetention},
+	{"observe-red-refresh", selftestObserveRedRefresh},
+}
+
 // ---------- stub seams (implemented during the i13 build; stubs FAIL) ----------
 
-
-
-// design: go-annotator-static-checks  implements: req-comment-dom-static
+// design: go-annotator-static-checks  implements: req-comment-layer.3
 // bookAnnotatorFindings statically checks the emitted book: exactly one island slot and the
 // annotator script, BOTH outside the content region; no markup injection anywhere in the
 // layer's source. Empty findings = the layer holds the dom-static and escape rules.
-var annotatorCheckBusy bool
-
 func bookAnnotatorFindings() []string {
 	// renderBookHTML computes StatusMap, whose coverage evaluation runs THIS test again —
-	// the same self-recursion class statusFastBusy guards (found live at the i13 M6 gate:
-	// an unguarded run ballooned to 10 GB, one book render per recursion lap). A nested
-	// probe reports vacuously clean; the outer run decides.
-	if annotatorCheckBusy {
+	// the same self-recursion class statusFastBusy guards (an unguarded run
+	// balloons to 10 GB, one book render per recursion lap). The
+	// shared memo carries the guard: a nested probe reads ("", false) and reports
+	// vacuously clean; the outer run decides.
+	html, live := bookOnceHTML()
+	if !live {
 		return nil
 	}
-	annotatorCheckBusy = true
-	defer func() { annotatorCheckBusy = false }()
-	html, _, _ := renderBookHTML(LoadAll())
 	var f []string
 	if strings.Count(html, `id="quack-comments"`) != 1 {
 		f = append(f, "island slot: want exactly one")
@@ -135,7 +154,7 @@ func sweepOrphanHomes() int {
 
 // enddesign
 
-// design: go-call-log-cap  implements: req-log-retention
+// design: go-call-log-cap  implements: req-call-log-lifecycle.2
 // capCallLog trims the call log to capBytes, dropping the OLDEST lines. Retention stays
 // retro-bound (adr-call-log deletes at every retro); the cap is the safety net for the case
 // the retro never comes — the real project's logs dir had grown to 122 MB before i13.
@@ -393,10 +412,10 @@ func selftestOrphanRenderRefs() bool {
 	nodes := LoadAll()
 	for _, f := range bookOrphanFindings(nodes) {
 		if strings.Contains(f, "uc-book-") {
-			return false // view-rendered nodes are not orphans (owner ruling, i13 M2)
+			return false // view-rendered nodes are not orphans
 		}
 	}
-	// a node no manifest and no view reaches still flags. Since the i14 ucfn merge the
+	// a node no manifest and no view reaches still flags. The ucfn
 	// board blanket-reaches every need and use case, so the synthetic is a REQUIREMENT:
 	// no file on disk, no view row returns it, the orphan lint must flag it.
 	syn := map[string]Node{}
@@ -494,7 +513,7 @@ func selftestVerdictSurgical() bool {
 	// seed one green and one red verdict, then re-baseline with unchanged content:
 	// the green survives (self-validating on input+build); the red dies (the i11 wedge class)
 	seed := map[string]verdictRec{
-		"test-green-kept": {Input: "h1", Build: buildID(), Result: true, Ms: 5},
+		"test-green-kept":  {Input: "h1", Build: buildID(), Result: true, Ms: 5},
 		"test-red-dropped": {Input: "h2", Build: buildID(), Result: false, Ms: 5},
 	}
 	b, _ := json.MarshalIndent(seed, "", " ")

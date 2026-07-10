@@ -2,22 +2,22 @@ package main
 
 import (
 	"fmt"
-	"time"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"strings"
+	"time"
 )
 
-// design: go-global-ratchet  implements: req-global-binary, req-engine-ratchet
+// design: go-global-ratchet  implements: req-engine-distribution.2, req-engine-distribution.1
 // ONE global binary serves every workspace (adr-global-ratchet): it lives at
 // <userDataBase>/quackitect/bin/<brand>.exe; the launcher stays dumb — fixed path, existence check,
 // bootstrap build from the workspace's vendored engine source when absent. The RATCHET is the
 // engine's own startup self-check: if the workspace's vendored .go source is newer than the running
 // binary, the engine rebuilds the global binary from that source, swaps itself via the rename dance
-// (spiked at i9 M5: rename the running exe aside — legal on NTFS — move the fresh build in, sweep
+// (rename the running exe aside — legal on NTFS — move the fresh build in, sweep
 // the parked .old on a later run) and re-execs. Newer binary than source: runs as-is, forward-only,
-// no versioned slots, no downgrade path (the owner's ratchet rule, 2026-07-04). A missing Go
+// no versioned slots, no downgrade path (the ratchet rule). A missing Go
 // toolchain degrades gracefully: warn and run the current binary.
 // The binary and pointer PATHS (globalBinPath, engineSrcPointer, recordEngineHome,
 // recordedEngineHome) live in go-data-home: they are machine-home path helpers the
@@ -27,8 +27,8 @@ func ratchetNeeded(binTime, srcTime int64) bool { return srcTime > binTime }
 // enddesign
 
 // design: go-ratchet-stamp  implements: req-ratchet-semantic
-// The ratchet compares COMMITTED build-time stamps, never file mtimes (adr-ratchet-stamp; spike-
-// proven at i10 M5): a fresh clone stamps checkout-time mtimes on old source and used to rebuild
+// The ratchet compares COMMITTED build-time stamps, never file mtimes (adr-ratchet-stamp):
+// a fresh clone stamps checkout-time mtimes on old source and would rebuild
 // the global binary BACKWARD. `quack build` writes engine-stamp.txt into the source it compiles
 // (committed content — it survives every clone) and mirrors it beside the binary (<exe>.stamp).
 // Decision table: unstamped source is never newer (pre-stamp era); an unstamped binary defers to
@@ -147,7 +147,7 @@ func ratchetMaybe() {
 	if raw, err := os.ReadFile(stampFile(src)); err == nil {
 		os.WriteFile(exe+".stamp", raw, 0o644) // the binary now carries its source's stamp
 	}
-	// the pointer ratchets forward WITH the binary (req-workspace-split): the engine home
+	// the pointer ratchets forward WITH the binary (req-vendor-workspace.5): the engine home
 	// is the workspace whose vendored source just won the ratchet
 	if recordEngineHome(ENGINE) != nil {
 		fmt.Fprintln(os.Stderr, "ratchet: engine-home record failed — external workspaces may miss the type layer.")

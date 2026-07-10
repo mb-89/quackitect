@@ -3,7 +3,7 @@ id: man-ch5-verification-validation
 type: manifest
 mode: chapter
 order: 50
-statement: Verification and validation - thing built right, right thing built.
+statement: V&V - verification and validation: thing built right, right thing built.
 ---
 ## How we know it works
 <!-- tailor: shipped text - the V&V split is the same in every project.
@@ -11,9 +11,11 @@ statement: Verification and validation - thing built right, right thing built.
 <!-- ai:3 -->
 Verification checks the thing was built right - every requirement against its evidence. Validation checks the right thing was built - the outcome against the needs and the success criteria. Both derive from the ledger below; the book can never claim more than the [gate](term:gate) states.
 ---
+fig: model model-check-states
+---
 ## The verdict first
-<!-- tailor: shipped machinery - the exceptions view opens the chapter (bs20 ruling,
-  2026-07-08, the no-green-ocean law): the verified mass as one derived count, every
+<!-- tailor: shipped machinery - the exceptions view opens the chapter (the
+  no-green-ocean law): the verified mass as one derived count, every
   unverified requirement rendered prominently by name. With zero exceptions the block
   is one green sentence. The full matrix follows further down for the deep reader.
 Sources: the empty-row check @[[ref-generic-se]]; the lab rule @[[ref-mess-pruef-dok]].
@@ -35,7 +37,7 @@ Each test declares its method (test, analysis, inspection, demonstration) and it
 ---
 ## The verification matrix
 <!-- tailor: shipped text - the matrix derives; an empty row IS the finding, and it
-  ALSO renders in the verdict-first block above (bs20 ruling: the exceptions lead,
+  ALSO renders in the verdict-first block above (the exceptions lead,
   the full matrix serves the deep reader - paged by need, rows collapsed to names,
   expandable).
 Sources: the empty-row check @[[ref-generic-se]].
@@ -49,21 +51,12 @@ Every requirement below stands against its verifying evidence, cumulative across
 <!-- fill [mandatory]
 Contents: the right-thing check - against the ch1 needs and the criteria table
   below, closing the V. Acceptance state derives from the gates, never restated.
-Form: prose tracing each criterion row to its demonstrated outcome; the table
-  renders derived.
+Form: ONE short paragraph saying what the table IS
+  (no per-criterion "traces to a demonstrated behavior" prose - a hand-restated
+  demonstration is derivable content); the table renders derived.
 -->
 <!-- ai:3 -->
-Validation closes the V: the outcome stands against the needs of chapter 1 and the criteria below. Each criterion traces to a demonstrated behavior:
-
-<!-- ai:3 -->
-- The board is live. Every status and report call recomputes from the [ledger](term:ledger). No snapshot exists to go stale.
-- The book stands alone. One file, no external requests. It reads without the repository, the [engine](term:engine), or an AI.
-- Capture costs one command. A note lands in the inbox from the console and the agent channel alike.
-- Killer checks are adjudicated by a person. The engine stamps the actor by channel, and the self-certification metric stays visible.
-- Tests are born red. The failing run is recorded before the implementation exists. A fabricated red is refused.
-
-<!-- ai:3 -->
-Acceptance state derives from the gates. The validation [milestone](term:milestone) carries the adjudication; this chapter never restates it.
+Validation closes the V: the outcome stands against the needs of chapter 1. The table below carries one row per need; expand a row for its pass lines. Acceptance state derives from the gates - the validation [milestone](term:milestone) carries the adjudication, and this chapter never restates it.
 
 ![[criteria.base]]
 ---
@@ -75,12 +68,10 @@ Acceptance state derives from the gates. The validation [milestone](term:milesto
 A row below is a failed check the project accepted anyway - a wvr- decision addressing the failed requirement and linking the evidence. An undecided deviation never lands here; it stays loudly visible above.
 
 ![[decisions-waiver.base]]
----
-## Methods that apply here
-<!-- tailor: shipped machinery - method notes route themselves by applies_chapters.
--->
-![[methods.base#Methods for verification-validation]]
 
+<!-- No "methods that apply here" section:
+     mention an applicable method in the PROSE as a link - the full
+     methods consolidate in the appendix. -->
 <!-- Verification records skipped: the unit is gated [type: manufactured_good,
      cyber_physical] and this deliverable is software - the run log is already
      machinery; the ch6 tailoring row records the skip. -->

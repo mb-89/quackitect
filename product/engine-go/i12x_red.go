@@ -1,7 +1,7 @@
 package main
 
-// The i12 extension (2026-07-06): connection system, mechanized chapters, and their
-// selftests. Implementation grows here step by step (bs9-bs24); each selftest below
+// Connection system, mechanized chapters, and their
+// selftests. Each selftest below
 // was observed RED before its build step.
 
 import (
@@ -12,7 +12,46 @@ import (
 	"strings"
 )
 
-// design: go-verdict-order  implements: req-verdict-order
+// i12xTests: this file's checks, in battery order (selftestRegistry in
+// selftest.go concatenates the per-file slices).
+var i12xTests = []namedTest{
+	{"verdict-order", selftestVerdictOrder},
+	{"render-refs", selftestRenderRefs},
+	{"need-item", selftestNeedItem},
+	{"new-item-kinds", selftestNewItemKinds},
+	{"note-tags", selftestNoteTags},
+	{"quality-scenarios", selftestQualityScenarios},
+	{"stakeholder-links", selftestStakeholderLinks},
+	{"mint-all-kinds", selftestMintAllKinds},
+	{"example-notes", selftestExampleNotes},
+	{"ch4-mech", selftestCh4Mech},
+	{"block-tree-design", selftestBlockTreeDesign},
+	{"verify-method", selftestVerifyMethod},
+	{"results-exception", selftestResultsException},
+	{"criteria-validation", selftestCriteriaValidation},
+	{"chapter-canning", selftestChapterCanning},
+	{"doc-skeletons", selftestDocSkeletons},
+	{"methods-view", selftestMethodsView},
+	{"stubs-folders", selftestStubsFolders},
+	{"id-charset", selftestIDCharset},
+	{"conn-notes", selftestConnNotes},
+	{"conn-jsonl", selftestConnJsonl},
+	{"conn-one-lane", selftestConnOneLane},
+	{"conn-kinds", selftestConnKinds},
+	{"conn-root", selftestConnRoot},
+	{"conn-hash-neutral", selftestConnHashNeutral},
+	{"virtual-edges", selftestVirtualEdges},
+	{"mint-connection", selftestMintConnection},
+	{"promote-connection", selftestPromoteConnection},
+	{"conn-adjacency", selftestConnAdjacency},
+	{"edge-mode", selftestEdgeMode},
+	{"migrate-edges", selftestMigrateEdges},
+	{"ch3-mech", selftestCh3Mech},
+	{"book-shell", selftestBookShell},
+	{"migrate-layout", selftestMigrateLayout},
+}
+
+// design: go-verdict-order  implements: req-candidate-decisions.2
 // candidateClaimFindings: a candidate chosen or rejected by more than one decision is a
 // finding - the render stays deterministic (sorted adr walk), but a double claim is a
 // content error the owner must resolve, never a silent first-wins.
@@ -45,11 +84,11 @@ func candidateClaimFindings(nodes map[string]Node) []string {
 
 // enddesign
 
-// design: go-id-charset  implements: req-id-charset
+// design: go-id-charset  implements: req-spec-content-lint.5
 // The id-charset lint ships BEFORE any edge migration: '--' is the connection-id
 // separator and Windows folds filename case, so an id outside lowercase [a-z0-9-]
-// (or with stray consecutive hyphens) can collide or parse ambiguously (red-team
-// findings 8/9, 2026-07-06). Connection ids carry '--' BY GRAMMAR - their segments
+// (or with stray consecutive hyphens) can collide or parse
+// ambiguously. Connection ids carry '--' BY GRAMMAR - their segments
 // are checked, not the separators.
 var idCharRe = regexp.MustCompile(`^[a-z0-9-]+$`)
 
@@ -532,7 +571,7 @@ func selftestVirtualEdges() bool {
 
 // test-verdict-order -> selftest:verdict-order
 func selftestVerdictOrder() bool {
-	// the candidates render in the PROJECT chapter since i14 (req-candidates-timeline):
+	// the candidates render in the PROJECT chapter (req-decision-rendering.2):
 	// synthetic nodes ride a real iteration's path so the per-iteration walk picks them up
 	vs := versions()
 	if len(vs) == 0 {
@@ -550,10 +589,11 @@ func selftestVerdictOrder() bool {
 		!strings.Contains(claims[0], "adr-a, adr-b") {
 		return false
 	}
-	// the rendered verdict is identical across repeated renders (sorted walk, not map order)
-	h1 := renderFigure("project-table", nodes)
+	// the rendered verdict is identical across repeated renders (sorted walk, not map
+	// order); the candidates live in the decisions table
+	h1 := renderFigure("decisions-table", nodes)
 	for i := 0; i < 8; i++ {
-		if renderFigure("project-table", nodes) != h1 {
+		if renderFigure("decisions-table", nodes) != h1 {
 			return false
 		}
 	}
@@ -597,7 +637,7 @@ func selftestRenderRefs() bool {
 	if html != html2 {
 		return false
 	}
-	// a GROUPED refs view discloses per group (owner ruling 2026-07-07): the group key is a
+	// a GROUPED refs view discloses per group: the group key is a
 	// node id, the summary carries that node's STATEMENT, the rows sit collapsed beneath it.
 	np := filepath.Join(dir, "need-g.md")
 	os.WriteFile(np, []byte("---\nid: need-g\ntype: need\nstatement: The grouped need.\n---\n"), 0o644)
@@ -658,7 +698,7 @@ func selftestNeedItem() bool {
 		return false
 	}
 	// source and acceptance stay ITEM fields; the reader view shows name+statement
-	// only since i14 (field c18, req-reader-columns)
+	// only (req-reader-tables.6)
 	q, err := os.ReadFile(filepath.Join(specQueryDir(), "needs.base"))
 	if err != nil || !strings.Contains(string(q), "[name, statement]") {
 		return false
@@ -800,7 +840,7 @@ func selftestMintAllKinds() bool {
 // test-chapter-canning -> selftest:chapter-canning
 func selftestChapterCanning() bool {
 	slotRe := regexp.MustCompile(`\{\{([a-z-]+)`)
-	// ch7 died at i14 (rationales folded into the ch8 Appendix, owner ruling 2026-07-08)
+	// no ch7: rationales fold into the ch8 Appendix
 	allowed := map[string]map[string]bool{
 		"man-ch5-verification-validation": {"records-lede": true, "validation": true},
 		"man-ch6-project":                 {"approach": true},
@@ -842,47 +882,39 @@ func selftestDocSkeletons() bool {
 }
 
 // test-methods-view -> selftest:methods-view
+// No per-chapter
+// "methods that apply here" views - a chapter mentions a method in PROSE as a
+// link, and the full methods consolidate in the appendix behind the pull law.
 func selftestMethodsView() bool {
+	q, err := os.ReadFile(filepath.Join(specQueryDir(), "methods.base"))
+	if err != nil {
+		return false
+	}
+	// the one appendix view ships full-bodied behind the pull law
+	if !strings.Contains(string(q), "Methods in full") || !strings.Contains(string(q), "render: full") ||
+		!strings.Contains(string(q), "referenced != false") {
+		return false
+	}
+	// `referenced` binds it to the emitter's link graph - outside it refuses loudly
 	dir, _ := os.MkdirTemp("", "qst-mview")
 	defer os.RemoveAll(dir)
 	md := filepath.Join(dir, "methods")
 	os.MkdirAll(md, 0o755)
 	p := filepath.Join(md, "method-pugh.md")
 	os.WriteFile(p, []byte("---\nstatement: Score candidates against a datum.\napplies_chapters: [design-output]\nsource: ref-methodische-entwicklung\naliases: []\n---\n## Situation\nx\n"), 0o644)
-	q, err := os.ReadFile(filepath.Join(specQueryDir(), "methods.base"))
-	if err != nil {
+	if _, err := EvalBase(string(q), []string{p}, nil); err == nil || !strings.Contains(err.Error(), "referenced") {
 		return false
 	}
-	rs, err := EvalBase(string(q), []string{p}, nil)
-	if err != nil {
-		return false
-	}
-	inOut, inIn := false, false
-	for _, r := range rs {
-		rows := 0
-		for _, g := range r.Groups {
-			rows += len(g.Rows)
-		}
-		if r.Name == "Methods for design-output" && rows == 1 {
-			inOut = true
-		}
-		if r.Name == "Methods for design-input" && rows != 0 {
-			inIn = true
-		}
-	}
-	if !inOut || inIn { // routes to its chapter and to no other
-		return false
-	}
-	// the chapters embed their views
+	// the appendix embeds the view; no reader chapter embeds a methods view anymore
 	base := filepath.Join(EngineDir(), "method", "templates", "documents", "spec")
-	for ch, view := range map[string]string{
-		"man-ch3-design-input":             "Methods for design-input",
-		"man-ch4-design-output":            "Methods for design-output",
-		"man-ch5-verification-validation":  "Methods for verification-validation",
-		"man-ch6-project":                  "Methods for project",
-	} {
+	ch8, err := os.ReadFile(filepath.Join(base, "man-ch8-guidance.md"))
+	if err != nil || !strings.Contains(string(ch8), "![[methods.base#Methods in full]]") {
+		return false
+	}
+	for _, ch := range []string{"man-ch3-design-input", "man-ch4-design-output",
+		"man-ch5-verification-validation", "man-ch6-project"} {
 		raw, err := os.ReadFile(filepath.Join(base, ch+".md"))
-		if err != nil || !strings.Contains(string(raw), "![[methods.base#"+view+"]]") {
+		if err != nil || strings.Contains(string(raw), "![[methods.base#") {
 			return false
 		}
 	}
@@ -901,7 +933,6 @@ func selftestStubsFolders() bool {
 		}
 	}
 	// the skeleton manifests land at the spec ROOT - the spec mirrors the template
-	// (owner ruling 2026-07-07)
 	for _, f := range []string{"man-deck.md", "man-preset-newcomer.md", "man-agent-guide.md"} {
 		if _, err := os.Stat(filepath.Join(dir, "spec", f)); err != nil {
 			return false
@@ -941,8 +972,8 @@ func selftestVerifyMethod() bool {
 // test-results-exception -> selftest:results-exception
 func selftestResultsException() bool {
 	nodes := map[string]Node{
-		"req-x": {ID: "req-x", Type: "requirement", Statement: "the claim.", Class: "review"},
-		"wvr-x": {ID: "wvr-x", Type: "adr", Kind: "waiver", Statement: "the failure of req-x is accepted for this release.", Class: "review"},
+		"req-x":    {ID: "req-x", Type: "requirement", Statement: "the claim.", Class: "review"},
+		"wvr-x":    {ID: "wvr-x", Type: "adr", Kind: "waiver", Statement: "the failure of req-x is accepted for this release.", Class: "review"},
 		"i0-check": {ID: "i0-check", Statement: "an unverified check.", Class: "review"},
 	}
 	h := renderFigure("results-exception", nodes)
@@ -971,7 +1002,7 @@ func selftestCriteriaValidation() bool {
 	if !strings.Contains(string(ch1), "![[criteria.base]]") || !strings.Contains(string(ch5), "![[criteria.base]]") {
 		return false
 	}
-	// success criteria live ON the need since the 2026-07-08 folding (req-criteria-in-needs):
+	// success criteria live ON the need (req-criteria-in-needs):
 	// the view renders every need in full, its `## Success criteria` pass lines included
 	dir, _ := os.MkdirTemp("", "qst-crit")
 	defer os.RemoveAll(dir)
@@ -1000,12 +1031,12 @@ func selftestCh3Mech() bool {
 			return false
 		}
 	}
-	// the mechanized views embed (use cases merged into the ucfn board at i14 field c25;
-	// the stakeholder table folded into the unified reader machinery at i14; the context
-	// star + neighbours view derive from nbr- notes since the 2026-07-09 owner ruling)
+	// the mechanized views embed (use cases merged into the ucfn board;
+	// the stakeholder table folded into the unified reader machinery; the context
+	// star + neighbours view derive from nbr- notes;
+	// the methods view lives in the appendix)
 	for _, want := range []string{"fig: context-star", "![[neighbours.base]]", "![[tensions.base]]", "fig: ucfn-board",
-		"![[qualities.base]]", "![[constraints.base]]", "![[requirements.base]]", "![[assumptions.base]]",
-		"![[methods.base#Methods for design-input]]"} {
+		"![[qualities.base]]", "![[constraints.base]]", "![[requirements.base]]", "![[assumptions.base]]"} {
 		if !strings.Contains(t, want) {
 			return false
 		}
@@ -1041,13 +1072,17 @@ func selftestCh4Mech() bool {
 	if strings.Count(t, "{{") != 1 || !strings.Contains(t, "{{budgets}}") {
 		return false
 	}
-	// the mechanized views embed (the decision views moved to the project chapter with the
-	// candidates record, owner ruling 2026-07-08 - ch4 documents only the architecture in use)
-	for _, want := range []string{"![[asr.base]]", "![[interfaces.base]]",
+	// the mechanized views embed (the decision views live in the project chapter with the
+	// candidates record - ch4 documents only the architecture in
+	// use; the ASR list generates from the tag)
+	for _, want := range []string{"fig: asr-list", "![[interfaces.base]]",
 		"![[force-rationales.base]]", "![[rules.base]]"} {
 		if !strings.Contains(t, want) {
 			return false
 		}
+	}
+	if strings.Contains(t, "asr.base") {
+		return false // the copied-content view is dead
 	}
 	// every fig line is its own unit - a trailing fig line in a prose unit renders as text
 	body := t
@@ -1064,7 +1099,7 @@ func selftestCh4Mech() bool {
 			figs++
 		}
 	}
-	return figs == 1 // the onion drill-down (candidates-matrix retired to the project chapter)
+	return figs == 2 // the ASR link list + the onion drill-down (candidates-matrix retired to the project chapter)
 }
 
 // test-block-tree-design -> selftest:block-tree-design
@@ -1135,7 +1170,7 @@ func selftestStakeholderLinks() bool {
 		return false
 	}
 	// the i14 unified table slims the cells to name/role/statement; the preset and guide
-	// links ride the full item, one expand away (req-table-expand)
+	// links ride the full item, one expand away (req-reader-tables.3)
 	cells := strings.Join(rs[0].Groups[0].Rows[0].Cells, "|")
 	return strings.Contains(cells, "wants tasks done") && strings.Contains(cells, "user")
 }
@@ -1195,21 +1230,22 @@ func selftestBookShell() bool {
 	}
 	// the sidebar shell is static DOM at emit time: the TOC (a link per chapter), the
 	// global search, the hand-editable filter expression, and the details card.
-	// the details card became the always-visible details PANE at i14 (req-details-pane)
+	// the details card is the always-visible details PANE (req-details-context.1)
 	for _, want := range []string{`<nav id="sidebar"`, `id="toc"`, `href="#man-fix"`,
 		`id="search"`, `id="filter-expr"`, `id="details"`, `id="dpane-content"`} {
 		if !strings.Contains(html, want) {
 			return false
 		}
 	}
-	// the identity (title card since i14, field c1 - the page header is gone) and the
+	// the identity (title-button data attributes - no
+	// standing #book-info block; a title click feeds the details pane) and the
 	// content column survive the shell
-	if !strings.Contains(html, `id="book-info"`) || !strings.Contains(html, "<main") {
+	if !strings.Contains(html, `data-root="`) || !strings.Contains(html, "<main") {
 		return false
 	}
 	// the dom-static law extends to the shell: the SHELL script toggles, never creates.
-	// Scoped to the first script block since i13: the comment layer that follows creates
-	// its OWN root outside <main> by design (req-comment-dom-static); the layer's law is
+	// Scoped to the first script block: the comment layer that follows creates
+	// its OWN root outside <main> by design (req-comment-layer.3); the layer's law is
 	// checked by selftest:comment-dom-static (no innerHTML, no artifacts inside content).
 	si := strings.Index(html, "<script>")
 	if si < 0 {
@@ -1221,7 +1257,7 @@ func selftestBookShell() bool {
 	}
 	script := html[si : si+se]
 	// exactly ONE innerHTML lives in the shell: the details-pane CHROME fill
-	// (window.bookDetail; the pane is chrome, not book content - req-details-pane).
+	// (window.bookDetail; the pane is chrome, not book content - req-details-context.1).
 	return !strings.Contains(script, "createElement") &&
 		strings.Count(script, "innerHTML") == 1 && strings.Contains(script, "c.innerHTML")
 }

@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-// design: go-decisions  implements: req-decision-classes, req-decisions-folder, req-decision-realized-lint, req-parked-list
+// design: go-decisions  implements: req-decision-model.1, req-decision-model.3, req-decision-model.2, req-decision-model.4
 // Decision model v2 (adr-decision-model-v2): a decision is born made and never edited; ALL
 // classification derives from graph facts — an edge to the built-in `scrap` sink without ready_when
 // is a VETO, with ready_when a DEFER, an incoming supersedes edge means SUPERSEDED, anything else is

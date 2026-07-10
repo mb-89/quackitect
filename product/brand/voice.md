@@ -42,6 +42,13 @@ Write plainly. These are rules, not suggestions. They bind every output: chat, d
 - If two places show the same thing, delete one. A detail view should not echo what its parent already shows.
 - Repeat only when strongly advised. Then say why.
 
+### Comments & provenance
+- Write comments the way people write them: only where a reader would be surprised.
+- A comment states a constraint the artifact cannot show itself. Nothing else.
+- Never comment that a rule was followed, who ruled it, or when. No dates. No step numbers. No law citations at application sites.
+- The why lives ONCE, in its designated home: an ADR, a `decided_via`, an evidence doc, a note, the ledger. Everywhere else, the artifact just IS the consequence.
+- A deliberate choice that must survive future edits gets a TEST or a LINT, not a comment. A comment is the weakest guard.
+
 ### People & privacy
 - No personal data in anything stored or published. That covers spec, evidence docs, trace nodes, reports, and entry files. Use the stakeholder ROLE instead: the owner, the adjudicator, the driving agent, the maintainer.
 - Do not write "human vs agent" in prose. Say "people" or "persons", or name the role. The engine's actor stamp is a recorded metric with fixed vocabulary. Prose is not.

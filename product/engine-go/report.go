@@ -17,8 +17,8 @@ import (
 // trips AV heuristics. The report inlines cytoscape + dagre + cytoscape-dagre.
 func assetJS(name string) string {
 	for _, p := range []string{
-		filepath.Join(EngineDir(), "assets", name),               // vendored (vehicle) or dogfood
-		filepath.Join(EngineSrc(), "assets", name),               // engine-go/assets fallback
+		filepath.Join(EngineDir(), "assets", name), // vendored (vehicle) or dogfood
+		filepath.Join(EngineSrc(), "assets", name), // engine-go/assets fallback
 		filepath.Join(ROOT, "product", "quackitect", "assets", name),
 		filepath.Join(ROOT, "product", "engine-go", "assets", name),
 	} {
@@ -172,8 +172,7 @@ func iterationOfNode(n Node, nodes map[string]Node, seen map[string]bool) string
 	return "i0000_baseline"
 }
 
-// The graph whitelist holds the SIX core types with toggles (owner ruling 2026-07-05,
-// applied at the i12 extension walk, i12-bs21 rider): the item types - candidate,
+// The graph whitelist holds the SIX core types with toggles: the item types - candidate,
 // stakeholder, raid, rationale, record, and the extension kinds - are content, never
 // graph nodes; the engine's traceContent classification keeps them counted and off
 // the walkable board.
@@ -222,14 +221,199 @@ type gtab struct {
 	Elements []gel  `json:"elements"`
 }
 
+// design: go-render-folds  implements: req-trace-clustered
+// The trace renders fold, RENDER-ONLY (adr-cluster-numbered-statements). The data never changes.
+// Two folds:
+//   1. The fan fold. A regular fan collapses to ONE box. The canonical case: a usecase
+//      whose requirement children each carry exactly their own tests and designs. No edge
+//      leaves the group, except the parent's own upward edge and ADRs addressing a member.
+//      External edges draw to the box boundary. An ADR edge names its member as the label.
+//   2. The age fold. Everything older than the last FIVE iterations folds behind a click:
+//      one summary box per old iteration (id, node count, gate light).
+// A click expands a box to the group's full pre-baked view. The dom-static law holds:
+// every member node, every internal edge, and every boundary variant bakes here, server-side.
+// The browser only flips node visibility; cytoscape hides an edge when an endpoint hides.
+// Both full-trace renders share this path (graphTabs -> buildTab): the report's trace view
+// and the book's trace chapter. Milestone and board views never fold.
+
+// recentIterations names the iterations that stay unfolded: the last five of the sorted
+// iteration list, plus the active one (readProjectConfig).
+func recentIterations() map[string]bool {
+	vers := versions()
+	recent := map[string]bool{}
+	start := len(vers) - 5
+	if start < 0 {
+		start = 0
+	}
+	for _, v := range vers[start:] {
+		recent[v] = true
+	}
+	if v := readProjectConfig().Version; v != "" {
+		recent[v] = true
+	}
+	return recent
+}
+
+// foldPlan assigns one tab's members to fold groups and carries one collapsed box per group.
+type foldPlan struct {
+	groupOf map[string]string // member id -> its fold group ("" = loose)
+	kindOf  map[string]string // group id -> "age" | "fan"
+	boxes   []gel             // the collapsed boxes, in deterministic order
+}
+
+// planFolds computes both folds over one tab. The age fold claims first; a fan candidate
+// never captures an already-folded member.
+func planFolds(ids []string, idset map[string]bool, nodes map[string]Node, sm map[string]string, recent map[string]bool) foldPlan {
+	fp := foldPlan{groupOf: map[string]string{}, kindOf: map[string]string{}}
+	// the age fold: one box per iteration outside the recent window
+	byIter := map[string][]string{}
+	for _, id := range ids {
+		it := iterationOfNode(nodes[id], nodes, nil)
+		if !recent[it] {
+			byIter[it] = append(byIter[it], id)
+		}
+	}
+	var oldIts []string
+	for it := range byIter {
+		oldIts = append(oldIts, it)
+	}
+	sort.Strings(oldIts)
+	for _, it := range oldIts {
+		gid := "fold::age::" + it
+		light := "🟢" // green until a member gate reads OPEN or SUSPECT
+		for _, id := range byIter[it] {
+			fp.groupOf[id] = gid
+			if sm[id] == "OPEN" || sm[id] == "SUSPECT" {
+				light = "🔴"
+			}
+		}
+		unit := " nodes"
+		if len(byIter[it]) == 1 {
+			unit = " node"
+		}
+		fp.kindOf[gid] = "age"
+		fp.boxes = append(fp.boxes, gel{Data: map[string]string{
+			"id": gid, "label": it + " · " + itoa(len(byIter[it])) + unit + " · " + light,
+			"foldbox": gid, "kind": "age", "type": "iterfold"}})
+	}
+	// the fan fold: candidates walk in type order (usecase before requirement), then by id,
+	// so an outer fan claims its members before an inner sub-fan can
+	kids := map[string][]string{}
+	for _, id := range ids {
+		for _, e := range traceEdges(nodes[id]) {
+			if idset[e[0]] {
+				kids[e[0]] = append(kids[e[0]], id)
+			}
+		}
+	}
+	cands := append([]string{}, ids...)
+	sort.Slice(cands, func(i, j int) bool {
+		ti, tj := typeRank[nodes[cands[i]].Type], typeRank[nodes[cands[j]].Type]
+		if ti != tj {
+			return ti < tj
+		}
+		return cands[i] < cands[j]
+	})
+	for _, p := range cands {
+		if t := nodes[p].Type; t != "usecase" && t != "requirement" {
+			continue
+		}
+		if fp.groupOf[p] != "" {
+			continue
+		}
+		group := fanGroup(p, kids, nodes, fp.groupOf)
+		if len(group) < 4 { // a fold below parent + three members compacts nothing
+			continue
+		}
+		if !fanIsClosed(p, group, ids, idset, nodes) {
+			continue
+		}
+		gid := "fold::fan::" + p
+		counts := map[string]int{}
+		for id := range group {
+			fp.groupOf[id] = gid
+			if id != p {
+				counts[nodes[id].Type]++
+			}
+		}
+		fp.kindOf[gid] = "fan"
+		fp.boxes = append(fp.boxes, gel{Data: map[string]string{
+			"id": gid, "label": p + ": " + fanCounts(counts),
+			"foldbox": gid, "kind": "fan", "type": nodes[p].Type}})
+	}
+	return fp
+}
+
+// fanGroup collects p plus every in-tab descendant. ADR nodes stay outside: decisions are
+// boundary neighbours, never members. nil when a member already belongs to another fold.
+func fanGroup(p string, kids map[string][]string, nodes map[string]Node, groupOf map[string]string) map[string]bool {
+	group := map[string]bool{p: true}
+	stack := []string{p}
+	for len(stack) > 0 {
+		x := stack[len(stack)-1]
+		stack = stack[:len(stack)-1]
+		for _, k := range kids[x] {
+			if group[k] || nodes[k].Type == "adr" {
+				continue
+			}
+			if groupOf[k] != "" {
+				return nil
+			}
+			group[k] = true
+			stack = append(stack, k)
+		}
+	}
+	return group
+}
+
+// fanIsClosed verifies the fan touches nothing outside. Only two edge kinds may cross the
+// boundary: an outside edge entering at the parent, and a member edge leaving toward an ADR.
+func fanIsClosed(p string, group map[string]bool, ids []string, idset map[string]bool, nodes map[string]Node) bool {
+	for _, id := range ids {
+		for _, e := range traceEdges(nodes[id]) {
+			if !idset[e[0]] {
+				continue
+			}
+			inS, inT := group[e[0]], group[id]
+			if inS == inT {
+				continue
+			}
+			if !inS && id != p {
+				return false // an outside edge enters a non-parent member
+			}
+			if inS && nodes[id].Type != "adr" {
+				return false // a member edge leaves toward a non-ADR node
+			}
+		}
+	}
+	return true
+}
+
+// fanCounts renders the box tally, e.g. "5 reqs · 5 tests · 5 designs" (types present only).
+func fanCounts(counts map[string]int) string {
+	names := []struct{ t, s string }{{"usecase", "ucs"}, {"requirement", "reqs"}, {"test", "tests"}, {"design", "designs"}}
+	var parts []string
+	for _, n := range names {
+		if c := counts[n.t]; c > 0 {
+			parts = append(parts, itoa(c)+" "+n.s)
+		}
+	}
+	if len(parts) == 0 {
+		return "empty fan"
+	}
+	return strings.Join(parts, " · ")
+}
+
 // buildTab emits one need's subtree as cytoscape elements (nodes + V-model edges). No positions:
 // the browser lays it out with the breadthfirst hierarchical layout (the same algo the filter uses).
-func buildTab(label string, idset map[string]bool, nodes map[string]Node, sm map[string]string) gtab {
+// Fold membership bakes into the element data (go-render-folds); the browser only toggles it.
+func buildTab(label string, idset map[string]bool, nodes map[string]Node, sm map[string]string, recent map[string]bool) gtab {
 	ids := []string{}
 	for id := range idset {
 		ids = append(ids, id)
 	}
 	sort.Strings(ids)
+	fp := planFolds(ids, idset, nodes, sm, recent)
 	var els []gel
 	for _, id := range ids {
 		n := nodes[id]
@@ -237,17 +421,80 @@ func buildTab(label string, idset map[string]bool, nodes map[string]Node, sm map
 		if n.Killer {
 			k = "1"
 		}
-		els = append(els, gel{Data: map[string]string{"id": id, "label": id, "type": n.Type, "state": sm[id], "killer": k, "iter": iterationOfNode(n, nodes, nil)}})
+		d := map[string]string{"id": id, "label": id, "type": n.Type, "state": sm[id], "killer": k, "iter": iterationOfNode(n, nodes, nil)}
+		if g := fp.groupOf[id]; g != "" {
+			d["fold"] = g // pre-baked membership: the member hides while its box shows
+		}
+		els = append(els, gel{Data: d})
+	}
+	els = append(els, fp.boxes...)
+	// boundary edges: every variant a collapse can need bakes here, deduplicated. A fan
+	// box's edge toward an ADR collects the addressed members as its label.
+	type bedge struct {
+		data    map[string]string
+		members map[string]bool
+	}
+	bmap := map[string]*bedge{}
+	addBoundary := func(src, dst, etype, member string) {
+		eid := "fold__" + src + "__" + dst + "__" + etype
+		be, ok := bmap[eid]
+		if !ok {
+			be = &bedge{data: map[string]string{"id": eid, "source": src, "target": dst, "etype": etype}}
+			bmap[eid] = be
+		}
+		if member != "" {
+			if be.members == nil {
+				be.members = map[string]bool{}
+			}
+			be.members[member] = true
+		}
 	}
 	for _, id := range ids {
 		for _, e := range traceEdges(nodes[id]) {
-			if idset[e[0]] {
-				els = append(els, gel{Data: map[string]string{"id": e[0] + "__" + id, "source": e[0], "target": id, "etype": e[1]}})
+			if !idset[e[0]] {
+				continue
+			}
+			els = append(els, gel{Data: map[string]string{"id": e[0] + "__" + id, "source": e[0], "target": id, "etype": e[1]}})
+			gs, gt := fp.groupOf[e[0]], fp.groupOf[id]
+			if gs == gt {
+				continue // both loose, or both inside the same group
+			}
+			mlabel := ""
+			if gs != "" && fp.kindOf[gs] == "fan" && nodes[id].Type == "adr" {
+				mlabel = e[0] // the ADR edge names which member it addresses
+			}
+			if gs != "" {
+				addBoundary(gs, id, e[1], mlabel)
+			}
+			if gt != "" {
+				addBoundary(e[0], gt, e[1], "")
+			}
+			if gs != "" && gt != "" {
+				addBoundary(gs, gt, e[1], "")
 			}
 		}
 	}
+	var beids []string
+	for eid := range bmap {
+		beids = append(beids, eid)
+	}
+	sort.Strings(beids)
+	for _, eid := range beids {
+		be := bmap[eid]
+		if len(be.members) > 0 {
+			var ms []string
+			for m := range be.members {
+				ms = append(ms, m)
+			}
+			sort.Strings(ms)
+			be.data["label"] = strings.Join(ms, ", ")
+		}
+		els = append(els, gel{Data: be.data})
+	}
 	return gtab{Label: label, Count: len(ids), Elements: els}
 }
+
+// enddesign
 
 func graphTabs(nodes map[string]Node, sm map[string]string) []gtab {
 	tnodes := map[string]Node{}
@@ -292,13 +539,14 @@ func graphTabs(nodes map[string]Node, sm map[string]string) []gtab {
 	}
 	sort.Strings(needs)
 	var tabs []gtab
+	recent := recentIterations() // the fold window (go-render-folds), computed once per render
 	rooted := map[string]bool{}
 	for _, need := range needs {
 		st := subtree(need)
 		for id := range st {
 			rooted[id] = true
 		}
-		tabs = append(tabs, buildTab(need, st, tnodes, sm))
+		tabs = append(tabs, buildTab(need, st, tnodes, sm, recent))
 	}
 	unrooted := map[string]bool{}
 	for id := range tnodes {
@@ -307,7 +555,7 @@ func graphTabs(nodes map[string]Node, sm map[string]string) []gtab {
 		}
 	}
 	if len(unrooted) > 0 {
-		tabs = append(tabs, buildTab("(unrooted)", unrooted, tnodes, sm))
+		tabs = append(tabs, buildTab("(unrooted)", unrooted, tnodes, sm, recent))
 	}
 	return tabs
 }
@@ -331,17 +579,17 @@ func checksMap(nodes map[string]Node, sm map[string]string, outDir string) map[s
 		if n.Killer {
 			k = "1"
 		}
-		// design: go-verdict-link  implements: req-verdict-link
+		// design: go-verdict-link  implements: req-report-check-display.2
 		// Every DONE check surfaces its VERDICT: the bless attestation (actor · short-hash) for a review
-		// check, or "self-certified" for an executed check — read from the attest log — so a DONE check
+		// check, or "engine-verified" for an executed check — read from the attest log — so a DONE check
 		// shows WHY it passed even when NO milestone evidence doc exists (the i6 field gap). The optional
 		// verdict_href deep-links the M<n>-*.md doc when one is present. selftest:report-verdict guards it.
 		verdict, verdictHref := "", ""
 		if sm[id] == "DONE" {
 			if n.Class == "executed" {
-				verdict = "self-certified · executed"
+				verdict = "engine-verified · executed"
 			} else if e, ok := bl[id]; ok {
-				actor := normActor(e.Actor) // pre-i11 records read as user (go-stamp-user)
+				actor := normActor(e.Actor) // legacy records read as user (go-stamp-user)
 				h := e.Hash
 				if len(h) > 8 {
 					h = h[:8]
@@ -376,7 +624,7 @@ func milestoneOf(n Node) (int, bool) {
 	return 0, false
 }
 
-// design: go-trace-nesting  implements: req-trace-nesting, req-build-test-nesting
+// design: go-trace-nesting  implements: req-report-check-display.1, req-build-test-nesting
 // renderSubs nests subtasks: children (parent: <id>) render beneath their parent, collapsible; leaves
 // render flat. The third level (build/test parents) reflects real hierarchy; selftest:report-nesting guards it.
 // enddesign
@@ -604,7 +852,6 @@ func metricCards(nodes map[string]Node, sm map[string]string, cfg Config) string
 			}
 		}
 	}
-	mx := metricsReport()
 	holes := CoverageHoles(nodes, cfg.Version)
 	vcov := "clean"
 	if len(holes) > 0 {
@@ -618,9 +865,8 @@ func metricCards(nodes map[string]Node, sm map[string]string, cfg Config) string
 		{"Derived gates", fmt.Sprintf("%d / %d", ddone, len(derived)), "coverage-derived subtasks passing ÷ total"},
 		{"Trace content", fmt.Sprintf("%d", content), "work-product nodes (need/uc/req/design/test/adr)"},
 		{"V-model coverage", vcov, "n>=1 over the full trace through this iteration (cumulative)"},
-		{"Reversal rate", fmt.Sprintf("%d / %d", mx["reversal"][0], mx["reversal"][1]), "re-attestations after a change ÷ blesses"},
-		{"Rework rate", fmt.Sprintf("%d / %d", mx["rework"][0], mx["rework"][1]), "checks re-blessed ÷ blessed checks"},
-		{"Self-cert ratio", fmt.Sprintf("%d / %d", mx["selfcert"][0], mx["selfcert"][1]), "agent-blessed killers ÷ killer checks"},
+		// the three attest-log ratios are removed (never consulted; the veto decision
+		// records the testimony) - git history is their archive
 	}
 	// standalone checks: one card each, evaluated LIVE (adr-standalone-suite — workspace-state
 	// watchers; a cached verdict would freeze the tripwire).
@@ -636,7 +882,7 @@ func metricCards(nodes map[string]Node, sm map[string]string, cfg Config) string
 		b.WriteString(fmt.Sprintf("<div class=\"card\" data-mlabel=\"%s\" data-mval=\"%s\" data-mform=\"%s\"><div class=\"cval\">%s</div><div class=\"clabel\">%s</div></div>",
 			esc(c.label), esc(c.val), esc(c.form), esc(c.val), esc(c.label)))
 	}
-	// the spec-book card (owner-directed, i12): clickable, opens the docu rendered beside this
+	// the spec-book card: clickable, opens the docu rendered beside this
 	// report (quack report book writes book.html into the same out dir). Later enhancement
 	// recorded in the notes: the card shows which spec state the docu represents (its stamp).
 	b.WriteString("<a class=\"card\" href=\"book.html\" target=\"_blank\" rel=\"noopener\" style=\"text-decoration:none;color:inherit\" title=\"open the spec book in a new tab (render it with: quack report book)\"><div class=\"cval\">📖 👆</div><div class=\"clabel\">The spec book — click to open</div></a>")
@@ -651,7 +897,7 @@ func projectDesc() string {
 	// The FIRST TWO text paragraphs: skip structural lines (headings, HTML, blockquotes,
 	// tables, images, rules, fences); collect consecutive text paragraphs and stop at the
 	// first structural line after text began, capped at two. BOM-stripped per line — a
-	// BOM'd README once smuggled its logo markup past the '<' check (caught live at i11).
+	// BOM'd README can smuggle its logo markup past the '<' check.
 	var paras []string
 	var cur []string
 	collecting := false
@@ -691,7 +937,7 @@ func projectDesc() string {
 	return strings.TrimSpace(text)
 }
 
-// design: go-report  implements: report-requirements, req-behavior-parity, req-trace-filter
+// design: go-report  implements: report-requirements, req-go-port.1, req-trace-filter
 // A faithful port of the deterministic report shell: a 3-column grid (iterations tree with
 // START/END brackets, a trace graph of per-need tabs with server-baked positions + a type legend,
 // and metric cards + a detail panel). Pure display: rendering never runs checks (the engine guard).

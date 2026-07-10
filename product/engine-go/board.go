@@ -1,15 +1,17 @@
 package main
 
-// design: go-facet-board  implements: req-facet-board
-// The faceted coverage board (owner screenshot 2026-07-05): requirements carry multi-valued
+// design: go-facet-board  implements: req-derived-boards.1
+// The faceted coverage board: requirements carry multi-valued
 // classification facets (phase, discipline, quality); the VOCABULARIES live in the type
 // layer and derive like the stakeholder classes - default plus the union of the iterations'
-// types - so the board stores no names (owner ruling). The board renders one count per
-// vocabulary value; a ZERO count is a visible hole (the Hauptmerkmalliste upgraded from a
-// checklist comment to live coverage). A facet value outside the vocabulary is a loud
-// finding. Click-through is a CSS filter over the once-rendered register rows (DOM-static:
-// the script toggles one body attribute, never creates content). Facet tagging is accepted,
-// expected work the AI does - no advisory valve (owner ruling).
+// types - so the board stores no names. The board renders one count per
+// vocabulary value; a ZERO count is a visible hole. A facet value outside the vocabulary is a loud
+// finding. The board IS the register's filter row (the recorded
+// exemption from the pills rule - the register's filters live here, not in a second pill
+// set): a click toggles a VISIBLY selected value and the shell filters the register table's
+// once-rendered rows by their baked f-… classes - OR within a facet, AND across facets,
+// multi-select. The script only toggles visibility, never creates content. Facet tagging is
+// accepted, expected work the AI does - no advisory valve.
 
 import (
 	"os"
@@ -128,7 +130,7 @@ func renderCoverageBoard(nodes map[string]Node) string {
 		for _, v := range vocab[f] {
 			cls, n := "facet-count", counts[f][v]
 			if n == 0 {
-				cls += " fb-zero" // a zero count IS the finding - shown muted, never colored (field c30)
+				cls += " fb-zero" // a zero count IS the finding - shown muted, never colored
 			}
 			b.WriteString(`<li><button class="` + cls + `" data-target="f-` + f + `-` + htmlEscape(v) + `">` + htmlEscape(v) + ` (` + itoa(n) + `)</button></li>` + "\n")
 		}
@@ -138,18 +140,16 @@ func renderCoverageBoard(nodes map[string]Node) string {
 	return b.String()
 }
 
-// facetFilterCSS emits one static rule per vocabulary value - the click-through filter.
+// facetFilterCSS styles the board's filter pills: a selected value is VISIBLY on;
+// the zero-count hole stays muted. No per-value body[data-facet]
+// rules (the pills-rule exemption) - the shell filters the rows directly.
 func facetFilterCSS() string {
-	vocab := FacetVocab()
 	var b strings.Builder
-	for _, f := range facetNames {
-		for _, v := range vocab[f] {
-			key := "f-" + f + "-" + v
-			b.WriteString(`body[data-facet="` + key + `"] tr.rowf:not(.` + key + `){display:none}`)
-		}
-	}
-	b.WriteString(`.facet-count.fb-zero{color:#999}`)
-	b.WriteString(`.board{display:flex;gap:2rem}.board ul{list-style:none;padding:0}`)
+	b.WriteString(`.facet-count{font:inherit;font-size:.78rem;padding:2px 10px;border:1px solid #d5d5d5;border-radius:13px;background:#fff;cursor:pointer;color:#555}`)
+	b.WriteString(`.facet-count:hover{background:#f0f0f0}`)
+	b.WriteString(`.facet-count.on{background:#2762c4;border-color:#2762c4;color:#fff}`)
+	b.WriteString(`.facet-count.fb-zero{color:#999}.facet-count.fb-zero.on{color:#fff}`)
+	b.WriteString(`.board{display:flex;gap:2rem}.board ul{list-style:none;padding:0}.board li{margin:2px 0}`)
 	return b.String()
 }
 

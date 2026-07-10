@@ -3,7 +3,7 @@ id: rigor-shared-implementation
 statement: The implementation milestone, shared by lean and systematic. A test-first walk — author tests → observe RED → implement to GREEN. The SEQUENCE is fixed; RIGOR sets gate density; the iteration's ROLE BINDINGS set who performs each step. Never below this floor.
 ---
 
-<!-- design: method-shared-implementation  implements: req-shared-impl-fragment :: ONE shared implementation fragment, imported by BOTH lean and systematic (single source, no duplication). It replaces the old lean L4 and systematic M6 build content. gather() bundles it with the rigor source; the composer inlines it at the importing milestone's gate density (lean = one review gate + derived checks; systematic = one sub-gate per acceptance item). -->
+<!-- design: method-shared-implementation  implements: req-impl-fragment-tdd.1 :: ONE shared implementation fragment, imported by BOTH lean and systematic (single source, no duplication). It replaces the old lean L4 and systematic M6 build content. gather() bundles it with the rigor source; the composer inlines it at the importing milestone's gate density (lean = one review gate + derived checks; systematic = one sub-gate per acceptance item). -->
 # Implementation — shared fragment (test-first)
 
 Imported by lean (as its build milestone) and systematic (as M6). Roles in «angle brackets» are

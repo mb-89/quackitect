@@ -1,0 +1,10 @@
+[
+  {"term": ".quack lane", "reason": "the .quack sidecar lanes are retired (adr-retire-legacy-lanes); truth lives in spec/ledger, caches in the data home"},
+  {"term": "QUACK_ACTOR", "reason": "the env-stamped actor is dead (adr-actor-channel-stat); the bless channel decides the default actor"},
+  {"term": "testsRedSince", "reason": "the anonymous red baseline is dead (adr-grandfathers-historical); explicit tests_red markers replaced it"},
+  {"term": "engine.local", "reason": "the repo-local engine copy is retired; one global ratcheting binary serves every workspace"},
+  {"term": "render the entry files", "reason": "entry-file rendering is removed; the entry files are a hand-authored pointer chain"},
+  {"term": "owner ruling 2026", "reason": "provenance smear: the why lives once in its designated home (voice.md Comments & provenance); prose states the rule, never its date or ruler"},
+  {"term": "owner rule 2026", "reason": "provenance smear: the why lives once in its designated home (voice.md Comments & provenance); prose states the rule, never its date or ruler"},
+  {"term": "owner law, 2026", "reason": "provenance smear: the why lives once in its designated home (voice.md Comments & provenance); prose states the rule, never its date or ruler"}
+]

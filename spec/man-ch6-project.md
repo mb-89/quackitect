@@ -12,47 +12,47 @@ statement: Project - the approach, the record, and the risks, mostly derived.
 <!-- ai:3 -->
 This chapter is mostly the [ledger](term:ledger), rendered: the decisions, the [iteration](term:iteration) timeline, the risk register, and the baseline identity. One authored paragraph states the approach; everything else derives - nothing here is restated by hand.
 ---
-## Approach and project decisions
+## Approach
 <!-- fill [mandatory]
 Contents: one authored strategy paragraph (cadence, approach); the TAILORING
-  RECORD is the anchor row of the decisions view - which rigor, which type, why
-  this much documentation, plus every skip-with-reason from the gating tags.
+  RECORD is a project-kind row of the ONE decisions table below - which rigor,
+  which type, why this much documentation, plus every skip-with-reason from the
+  gating tags.
 Motivation: documentation right-sized ON PURPOSE, reason recorded - the field
   lesson. Roles appear as roles, never persons.
-Form: one paragraph, then the derived view. Rigor and type derive from the
-  iterations - state nothing derivable.
+Form: one paragraph; the decisions render in the one table below. Rigor and
+  type derive from the iterations - state nothing derivable.
 Sources: right-sizing @[[ref-se-thinking-learning]]; fixed skeleton, plug-in
   tailoring @[[ref-generic-se]].
 -->
 <!-- ai:3 -->
-The project runs in short iterations, each walked through its [milestone](term:milestone) gates: the agent fills the checks, the owner adjudicates. Documentation is sized deliberately full: this book is the project's own product demonstration, so the whole spec template applies - anything less would leave the template unproven. Two type-gated units are skipped with their tags recorded: budgets and physical verification records serve manufactured and cyber-physical deliverables, not software.
-
-![[decisions-project.base]]
+The project runs in short iterations, each walked through its [milestone](term:milestone) gates: the agent fills the checks, the owner adjudicates. Documentation is sized deliberately full: this book is the project's own product demonstration, so the whole spec template applies - anything less would leave the template unproven. Two type-gated units are skipped with their tags recorded: budgets and physical verification records serve manufactured and cyber-physical deliverables, not software. The project-kind rows of the decisions table below carry that tailoring record.
 ---
 ## Milestones and timeline
-<!-- tailor: shipped text - the project table carries each iteration's gate tally.
-  The walk is the truth; the table says it without a graph (DRY, field c41). Since
-  the bs20 ruling (2026-07-08) each iteration row expands to its decisions and the
-  candidates they weighed - the record of how the architecture came to be lives
-  HERE; the design chapter shows only what stands.
+<!-- tailor: shipped text - the walk is the truth; the table says it without a graph
+  (DRY). Slim: timeline
+  order and the iteration name in the row, the expand a short introduction; the
+  decisions live OUT in the one decisions table below, reachable through its
+  iteration filter.
 -->
 <!-- ai:3 -->
-The table carries every iteration - history and planned - with its gate tally, live from the ledger. Expand an iteration to reach its decisions and the candidates they weighed.
+The table carries every iteration - history and planned - in timeline order, live from the ledger. Expand an iteration for its short introduction; its decisions live in the one table below, filtered by iteration.
 ---
 fig: project-table
 ---
-## Design decisions
-<!-- tailor: shipped machinery - the strategy and architecture decision views moved
-  here from the design chapter (bs20 ruling: current state there, the record here);
-  waivers stay with verification and validation.
+## Decisions
+<!-- tailor: shipped machinery - ONE table for every project, strategy, and
+  architecture decision: the TYPE a rendered
+  column, pill facets over type and iteration, readable titles - never slug ids. The
+  expand carries the rationale and the considered alternatives with their rejection
+  reasons (q-candidates-placement, decided); waivers stay with verification and
+  validation.
 Sources: every decision names the requirement it addresses @[[ref-sya-architecting]].
 -->
 <!-- ai:3 -->
-Without decisions there is no architecture. Every decision below names the requirement it addresses; the rejected candidates keep their reasons, reachable from the timeline above.
-
-![[decisions-strategy.base]]
-
-![[decisions-architecture.base]]
+Without decisions there is no architecture. One table carries every decision - filter by type or iteration. Expand a decision for its rationale, the requirement it addresses, and the alternatives it weighed with their rejection reasons.
+---
+fig: decisions-table
 ---
 ## Risks, assumptions, issues, dependencies
 <!-- tailor: shipped text - the register derives from the raid notes; the context
@@ -71,8 +71,7 @@ Sources: baselines @[[ref-modellbasierte-pe]]; change discipline @[[ref-pahl-bei
 -->
 <!-- ai:3 -->
 The identity stamp in this document's header names the exact baseline rendered: the source state, the iteration, the engine version. The change history lives in the ledger and renders from it - this section never restates it. Strike-through-never-delete is a property the ledger enforces, not a discipline the reader must trust.
----
-## Methods that apply here
-<!-- tailor: shipped machinery - method notes route themselves by applies_chapters.
--->
-![[methods.base#Methods for project]]
+
+<!-- No "methods that apply here" section:
+     mention an applicable method in the PROSE as a link - the full
+     methods consolidate in the appendix. -->

@@ -7,6 +7,7 @@ import (
 	"go/ast"
 	"go/parser"
 	"go/token"
+	"math"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -14,7 +15,7 @@ import (
 	"strings"
 )
 
-// design: go-book-manifests  implements: req-book-manifests, req-book-orphans, req-orphan-render-refs
+// design: go-book-manifests  implements: req-manifest-render.1, req-spec-content-lint.2, req-lint-classification.2
 // The manifest node type (adr-book-two-stage lineage; one mechanism, settled at design): a manifest
 // is trace CONTENT whose body lists UNITS separated by `---` lines. A unit is either a node
 // reference (a plain markdown link to a node id, optional `depth:N`) or inline markdown (ledes,
@@ -29,7 +30,9 @@ type ManifestUnit struct {
 	Notes string // speaker notes, `Note:` lines stripped from Body
 }
 
-var unitRefRe = regexp.MustCompile(`^\[([A-Za-z0-9_-]+)\]\([^)]*\)(?:\s+depth:([1-4]))?\s*$`)
+// a unit ref may carry a sub-address (req-x.2, i17 clustering) - the render folds
+// it to the base node and keeps the sub-number for the reader
+var unitRefRe = regexp.MustCompile(`^\[([A-Za-z0-9_-]+(?:\.[0-9]+)?)\]\([^)]*\)(?:\s+depth:([1-4]))?\s*$`)
 
 // manifestBody returns the content after the frontmatter fence of a manifest file.
 func manifestBody(path string) string {
@@ -86,8 +89,8 @@ func parseManifestUnits(body string) []ManifestUnit {
 var bookContent = map[string]bool{"need": true, "usecase": true, "requirement": true, "adr": true}
 
 // bookOrphanFindings flags book-content nodes no manifest reaches. Disarmed with zero manifests.
-// A node is reached by a DIRECT unit ref, or by a LIVE VIEW that matches it (owner ruling
-// 2026-07-07): the book shows a view's rows, so the lint counts them. Pull-law queries
+// A node is reached by a DIRECT unit ref, or by a LIVE VIEW that matches it:
+// the book shows a view's rows, so the lint counts them. Pull-law queries
 // (`referenced`) follow references and can never create one - they are skipped. A broken
 // query counts nothing here; the render channel already reports it as a finding.
 func bookOrphanFindings(nodes map[string]Node) []string {
@@ -105,11 +108,41 @@ func bookOrphanFindings(nodes map[string]Node) []string {
 				referenced[u.Ref] = true
 			}
 		}
-		// the ucfn board (i14, field c25) renders every need and use case - a manifest
+		// the ucfn board renders every need and use case - a manifest
 		// embedding it reaches them all
 		if strings.Contains(body, "fig: ucfn-board") {
 			for id, bn := range nodes {
 				if bn.Type == "need" || bn.Type == "usecase" {
+					referenced[id] = true
+				}
+			}
+		}
+		// the other fig kinds render node sets the same way:
+		// the one decisions table reaches every non-waiver decision, the
+		// generated ASR list its tagged requirements, the guides table
+		// every guide.
+		if strings.Contains(body, "fig: decisions-table") {
+			for id, bn := range nodes {
+				if bn.Type == "adr" && bn.Kind != "waiver" {
+					referenced[id] = true
+				}
+			}
+		}
+		if strings.Contains(body, "fig: asr-list") {
+			for id, bn := range nodes {
+				if bn.Type != "requirement" {
+					continue
+				}
+				for _, t := range basePropsOf(bn.Path).lists["tags"] {
+					if t == "architecturally-significant" {
+						referenced[id] = true
+					}
+				}
+			}
+		}
+		if strings.Contains(body, "fig: guides-table") {
+			for id, bn := range nodes {
+				if bn.Type == "guide" {
 					referenced[id] = true
 				}
 			}
@@ -168,7 +201,7 @@ func sortStrings(s []string) {
 
 // enddesign
 
-// design: go-book-emitter  implements: req-book-single-file, req-book-depth, req-book-dom-static, req-chapter-tldr, req-book-identity, req-llm-digestible, req-readme-chapter
+// design: go-book-emitter  implements: req-book-artifact.1, req-manifest-render.2, req-book-artifact.3, req-reader-structure.1, req-book-trust.2, req-book-artifact.6, req-chapter-placement.3
 // The deterministic emitter core. Truth (nodes + manifests) renders to ONE self-contained HTML:
 // the project README opens the book as its own first chapter — the reader's starting point —
 // through the zero-dep renderReadme projection (headings, tables, lists, inline images);
@@ -179,7 +212,14 @@ func sortStrings(s []string) {
 // future comment system's hook); the artifact stamps its source state (merkle root, iteration,
 // engine version); each node renders a visible meta line (id, type, ledger state) so trust
 // metadata survives plain-text extraction. No timestamps anywhere - same state, same bytes.
-func mdLite(md string) string {
+func mdLite(md string) string { return mdLiteAt(md, 2) }
+
+// mdLiteAt renders markdown-lite with a heading BASE level: a single `#` becomes
+// <h{base}>, each extra hash one level deeper, clamped to h2..h5. Unit bodies pass 1
+// (`## section` = h2, the level right under the chapter h1 - nesting consistent for the
+// render-time section numbering); item bodies inside expands pass 3 (`## Rationale` = h4,
+// a compact detail heading, never a book section).
+func mdLiteAt(md string, base int) string {
 	md = stripFillComments(md) // template fill guidance stays in the source, never in the book
 	// fenced code blocks (```lang ... ```) are pulled out before the paragraph split so a
 	// multi-line block (e.g. a command list) renders as one HTML-escaped <pre><code>, keeping
@@ -189,7 +229,7 @@ func mdLite(md string) string {
 	var buf []string
 	flush := func() {
 		if len(buf) > 0 {
-			fout.WriteString(mdLiteBlocks(strings.Join(buf, "\n")))
+			fout.WriteString(mdLiteBlocksAt(strings.Join(buf, "\n"), base))
 			buf = nil
 		}
 	}
@@ -211,7 +251,33 @@ func mdLite(md string) string {
 
 // mdLiteBlocks renders already-normalized markdown (fences already extracted) paragraph by
 // paragraph: headings, lists, marked SVG, and prose.
-func mdLiteBlocks(md string) string {
+func mdLiteBlocks(md string) string { return mdLiteBlocksAt(md, 2) }
+
+// mdHeadingLevel returns the hash count of a heading line (1..4), or 0 for non-headings.
+func mdHeadingLevel(l string) int {
+	n := 0
+	for n < len(l) && l[n] == '#' {
+		n++
+	}
+	if n >= 1 && n <= 4 && n < len(l) && l[n] == ' ' {
+		return n
+	}
+	return 0
+}
+
+// mdHeadingTag maps a hash count to its HTML level under the given base, clamped h2..h5.
+func mdHeadingTag(hashes, base int) string {
+	lvl := base + hashes - 1
+	if lvl < 2 {
+		lvl = 2
+	}
+	if lvl > 5 {
+		lvl = 5
+	}
+	return "h" + itoa(lvl)
+}
+
+func mdLiteBlocksAt(md string, base int) string {
 	var out strings.Builder
 	for _, para := range strings.Split(strings.ReplaceAll(md, "\r\n", "\n"), "\n\n") {
 		p := strings.TrimSpace(para)
@@ -231,19 +297,43 @@ func mdLiteBlocks(md string) string {
 		if p == "" {
 			continue
 		}
-		// the per-paragraph data-ai RECORD stays; the visible icon column moved to the
-		// unit level (i14, field c14, req-icon-density) - see unitAIColumn.
+		// the per-paragraph data-ai RECORD stays; the visible icon column lives at the
+		// unit level (req-icon-density) - see unitAIColumn.
 		attr := ""
 		if ai >= 0 {
 			attr = ` data-ai="` + string(rune('0'+ai)) + `"`
 		}
+		// a heading line binds only ITSELF (the i17 M5 expand fix): a paragraph that opens
+		// with `## x` directly followed by content lines emits the heading, then renders
+		// the rest as its own block - the heading never swallows the list or prose below.
+		for {
+			nl := strings.IndexByte(p, '\n')
+			first := p
+			if nl >= 0 {
+				first = p[:nl]
+			}
+			h := mdHeadingLevel(strings.TrimSpace(first))
+			if h == 0 {
+				break
+			}
+			tag := mdHeadingTag(h, base)
+			t := strings.TrimSpace(first)
+			out.WriteString("<" + tag + attr + ">" + htmlEscape(strings.TrimSpace(t[h:])) + "</" + tag + ">\n")
+			if nl < 0 {
+				p = ""
+				break
+			}
+			p = strings.TrimSpace(p[nl+1:])
+			if p == "" {
+				break
+			}
+		}
+		if p == "" {
+			continue
+		}
 		switch {
 		case strings.HasPrefix(p, "<svg"):
 			out.WriteString(p + "\n")
-		case strings.HasPrefix(p, "# "):
-			out.WriteString("<h2" + attr + ">" + htmlEscape(strings.TrimPrefix(p, "# ")) + "</h2>\n")
-		case strings.HasPrefix(p, "## "):
-			out.WriteString("<h3" + attr + ">" + htmlEscape(strings.TrimPrefix(p, "## ")) + "</h3>\n")
 		case strings.HasPrefix(p, "- "):
 			if attr != "" {
 				out.WriteString("<div" + attr + ">")
@@ -265,8 +355,36 @@ func mdLiteBlocks(md string) string {
 
 var mdLinkRe = regexp.MustCompile(`\[([^\]]+)\]\(([^)]+)\)`)
 
+// aiMarksTokenRe: the ((ai:N)) inline token renders N robot glyphs (the involvement
+// measure shows as the ROBOT icons the margins use,
+// never as the words "recorded measure 0-3" - the reader connects the robots to the
+// measure). Zero renders no glyph, by the same ladder the margin column obeys. The
+// syntax deliberately avoids {{...}} - that shape is the template SLOT the residue
+// lint and the canning check hunt.
+var aiMarksTokenRe = regexp.MustCompile(`\(\(ai:([0-3])\)\)`)
+
+func aiMarksInline(n int) string {
+	if n <= 0 {
+		return `<span class="ai-inline" role="img" aria-label="AI involvement: 0 of 3"></span>`
+	}
+	if n > 3 {
+		n = 3
+	}
+	var b strings.Builder
+	b.WriteString(`<span class="ai-inline" role="img" aria-label="AI involvement: ` + itoa(n) + ` of 3">`)
+	for i := 0; i < n; i++ {
+		b.WriteString(svgRobot)
+	}
+	b.WriteString(`</span>`)
+	return b.String()
+}
+
 func mdInline(s string) string {
 	s = htmlEscape(s)
+	s = aiMarksTokenRe.ReplaceAllStringFunc(s, func(m string) string {
+		g := aiMarksTokenRe.FindStringSubmatch(m)
+		return aiMarksInline(int(g[1][0] - '0'))
+	})
 	return mdLinkRe.ReplaceAllString(s, `<a href="#$2">$1</a>`)
 }
 
@@ -488,7 +606,13 @@ func nodeBodyProse(path string) string {
 func renderNodeAtDepth(id string, depth int, nodes map[string]Node, sm map[string]string, bl map[string]Event, anchor string) string {
 	n, ok := nodes[id]
 	if !ok {
-		return "<p class=\"missing\">missing node: " + htmlEscape(id) + "</p>\n"
+		// a sub-addressed ref (req-x.2) folds to its cluster node (go-sub-addressing)
+		if base := subAddrBase(id); base != id {
+			n, ok = nodes[base]
+		}
+		if !ok {
+			return "<p class=\"missing\">missing node: " + htmlEscape(id) + "</p>\n"
+		}
 	}
 	if depth < 1 {
 		depth = 1
@@ -502,13 +626,15 @@ func renderNodeAtDepth(id string, depth int, nodes map[string]Node, sm map[strin
 	b.WriteString("<p class=\"stmt\"><strong>" + htmlEscape(n.Statement) + "</strong></p>\n")
 	b.WriteString("<p class=\"meta state-" + state + "\">" + htmlEscape(id) + " · " + htmlEscape(n.Type) + " · " + stateTag(state) + "</p>\n")
 	disc := func(dl int, label, inner string) string {
-		// the M5-proven disclosure: collapsed by default, auto-opened by find-in-page (until-found),
-		// EXPAND ALL toggles every <details> - script and CSS only ever toggle, never create.
+		// the M5-proven disclosure: collapsed by default, auto-opened by find-in-page
+		// (until-found) - script and CSS only ever toggle, never create.
 		return `<details class="disc" data-dl="` + itoa(dl) + `"><summary>` + label + `</summary><div hidden="until-found">` + "\n" + inner + "</div></details>\n"
 	}
 	if depth >= 2 {
-		if prose := nodeBodyProse(n.Path); prose != "" {
-			b.WriteString(disc(2, "rationale", `<div data-layer="informative">`+"\n"+mdLite(prose)+"</div>"))
+		// statement-once: a body that opens by restating the statement loses that prefix;
+		// its headings render compact (base 3) - item detail, never a book section.
+		if prose := stripLeadingStatement(nodeBodyProse(n.Path), n.Statement); prose != "" {
+			b.WriteString(disc(2, "rationale", `<div data-layer="informative">`+"\n"+mdLiteAt(prose, 3)+"</div>"))
 		}
 	}
 	if depth >= 3 {
@@ -525,7 +651,8 @@ func renderNodeAtDepth(id string, depth int, nodes map[string]Node, sm map[strin
 			var ul strings.Builder
 			ul.WriteString(`<ul data-layer="children">` + "\n")
 			for _, k := range kids {
-				ul.WriteString("<li><a href=\"#" + htmlEscape(k) + "\">" + htmlEscape(k) + "</a></li>\n")
+				// links, never copies: the child renders as its name + brief link
+				ul.WriteString("<li>" + nodeLinkHTML(k, nodes) + "</li>\n")
 			}
 			ul.WriteString("</ul>")
 			b.WriteString(disc(3, "children", ul.String()))
@@ -544,42 +671,139 @@ func renderNodeAtDepth(id string, depth int, nodes map[string]Node, sm map[strin
 	return b.String()
 }
 
+// Render-time hierarchical section numbers: every section
+// heading in a numbered chapter gets its number derived from the book structure at emit
+// - h2 = N.s, h3 = N.s.t, h4 = N.s.t.u, where N is the chapter number the article's h1
+// already carries. Item content never numbers: headings inside tables, figures, and
+// disclosure details are detail text, not book sections. A sub-heading with no open
+// parent level is a NESTING break - it surfaces as an advisory and stays unnumbered.
+// The anchor map (unit/section id -> number) lets the toc reuse the same numbers.
+var secNumTokRe = regexp.MustCompile(`<article\b[^>]*>|</article>|<table\b|</table>|<figure\b|</figure>|<details\b|</details>|<h1[^>]*>|<h[2-4][^>]*>|<(?:div|section)\s+id="[^"]+"`)
+
+var secNumH1Re = regexp.MustCompile(`^([0-9]+)\. `)
+
+var secNumIDRe = regexp.MustCompile(`id="([^"]+)"`)
+
+func numberBookSections(html string) (string, map[string]string, []string) {
+	secNums := map[string]string{}
+	var advisories []string
+	var out strings.Builder
+	last := 0
+	chNum := 0   // 0 = an unnumbered article (back-matter, decks): no numbering
+	skip := 0    // table/figure/details nesting depth: item content, never numbered
+	anchor := "" // the last unit/section id seen - the toc mapping target
+	var sec, sub, sub2 int
+	for _, m := range secNumTokRe.FindAllStringIndex(html, -1) {
+		tok := html[m[0]:m[1]]
+		switch {
+		case strings.HasPrefix(tok, "<article"):
+			chNum, sec, sub, sub2, anchor = 0, 0, 0, 0, ""
+		case tok == "</article>":
+			chNum = 0
+		case strings.HasPrefix(tok, "<table") || strings.HasPrefix(tok, "<figure") || strings.HasPrefix(tok, "<details"):
+			skip++
+		case tok == "</table>" || tok == "</figure>" || tok == "</details>":
+			if skip > 0 {
+				skip--
+			}
+		case strings.HasPrefix(tok, "<h1"):
+			if skip == 0 {
+				if g := secNumH1Re.FindStringSubmatch(html[m[1]:]); g != nil {
+					chNum = atoiSafe(g[1])
+					sec, sub, sub2 = 0, 0, 0
+				}
+			}
+		case strings.HasPrefix(tok, "<div") || strings.HasPrefix(tok, "<section"):
+			if skip == 0 {
+				if g := secNumIDRe.FindStringSubmatch(tok); g != nil {
+					anchor = g[1]
+				}
+			}
+		default: // <h2..h4 ...>
+			if skip != 0 || chNum == 0 {
+				continue
+			}
+			lvl := int(tok[2] - '0')
+			num := ""
+			switch lvl {
+			case 2:
+				sec++
+				sub, sub2 = 0, 0
+				num = itoa(chNum) + "." + itoa(sec)
+			case 3:
+				if sec == 0 {
+					advisories = append(advisories, "numbering: h3 before any h2 in chapter "+itoa(chNum)+" - nesting is off")
+					continue
+				}
+				sub++
+				sub2 = 0
+				num = itoa(chNum) + "." + itoa(sec) + "." + itoa(sub)
+			case 4:
+				if sec == 0 || sub == 0 {
+					advisories = append(advisories, "numbering: h4 with no open parent section in chapter "+itoa(chNum)+" - nesting is off")
+					continue
+				}
+				sub2++
+				num = itoa(chNum) + "." + itoa(sec) + "." + itoa(sub) + "." + itoa(sub2)
+			}
+			out.WriteString(html[last:m[1]])
+			out.WriteString(`<span class="secnum">` + num + `</span> `)
+			last = m[1]
+			if anchor != "" {
+				if _, seen := secNums[anchor]; !seen {
+					secNums[anchor] = num
+				}
+				anchor = ""
+			}
+		}
+	}
+	out.WriteString(html[last:])
+	return out.String(), secNums, advisories
+}
+
+// splitChapterTitle splits a chapter statement at its first dash separator into the
+// short sidebar title and the subtitle. A statement with no separator stays whole.
+func splitChapterTitle(t string) (string, string) {
+	for _, d := range []string{" — ", " – ", " - "} {
+		if i := strings.Index(t, d); i > 0 {
+			return strings.TrimSpace(t[:i]), strings.TrimSpace(t[i+len(d):])
+		}
+	}
+	return t, ""
+}
+
 // renderBookHTML emits the whole book. findings are curation ERRORS (missing lede, unknown term);
 // advisories are soft signals (unlinked term usages) that never fail a render.
 func renderBookHTML(nodes map[string]Node) (string, []string, []string) {
-	figSeq = 0 // figure ids restart per render: regeneration stays byte-identical (go-fig-elem-ids)
+	// figure ids restart per render: regeneration stays byte-identical (go-fig-elem-ids).
+	// Re-entrancy guard (found at the i17 M5 sweep): StatusMap below can evaluate executed
+	// checks whose selftests render the book THROUGH this function - the inner render
+	// walked the global figSeq to its end, every id in the outer render shifted, and the
+	// bytes depended on the verdict-cache state. Each call restores its caller's counter.
+	prevFigSeq := figSeq
+	figSeq = 0
+	defer func() { figSeq = prevFigSeq }()
 	sm := StatusMap(nodes)
 	bl := latestBless()
 	cfg := readProjectConfig()
 	root := MerkleRoot(nodes)
 	gloss := readGlossary()
+	tips := contentTips() // content-note one-liners for the termref affordance
 	used := map[string][]string{}
 	var findings, advisories []string
-	// design: go-guide-ch8  implements: req-agent-guide-ch8, req-ch8-audience-subchapters
-	// The agent guide is no reader chapter (field c4/c5/c6): agent-mode manifests render
-	// INSIDE the guidance chapter, hosted by the agent audience subchapter. Guidance
-	// renders ONE subchapter per audience class of the project type, empty ones with an
-	// honest no-guide-yet line (the pull law: a guide lands when demand appears).
+	// design: go-guide-ch8  implements: req-chapter-placement.1, req-chapter-placement.2
+	// The agent guide is no reader chapter: agent-mode manifests render
+	// INSIDE the guidance chapter as one row of
+	// the guides TABLE (go-guides-table); no per-audience subchapters. Every
+	// audience class stays visible in that table, empty ones as an honest no-guide-yet
+	// row (the pull law: a guide lands when demand appears).
 	var chapters, agentGuides []Node
-	guidesByAud := map[string][]Node{} // guide notes route to their audience subchapter (req-example-content)
 	for _, n := range nodes {
 		if n.Type == "manifest" && (n.Mode == "chapter" || n.Mode == "guidance") {
 			chapters = append(chapters, n)
 		}
 		if n.Type == "manifest" && n.Mode == "agent" {
 			agentGuides = append(agentGuides, n)
-		}
-		if n.Type == "guide" {
-			aud := basePropsOf(n.Path).scalars["audience"]
-			guidesByAud[aud] = append(guidesByAud[aud], n)
-		}
-	}
-	for aud := range guidesByAud {
-		gs := guidesByAud[aud]
-		for i := 1; i < len(gs); i++ {
-			for j := i; j > 0 && gs[j].ID < gs[j-1].ID; j-- {
-				gs[j], gs[j-1] = gs[j-1], gs[j]
-			}
 		}
 	}
 	for i := 1; i < len(agentGuides); i++ {
@@ -595,13 +819,10 @@ func renderBookHTML(nodes map[string]Node) (string, []string, []string) {
 	}
 	if !hasGuidance {
 		// no guidance chapter to host it: the agent guide stays a chapter rather than
-		// silently vanishing (fail-safe)
+		// silently vanishing (fail-safe); with a guidance chapter present the agent
+		// guide renders as one row of the guides table (go-guides-table).
 		chapters = append(chapters, agentGuides...)
 		agentGuides = nil
-	}
-	guideClasses := typeClassSlugs(readProjectConfig().Type)
-	if len(guideClasses) == 0 {
-		guideClasses = typeClassSlugs("default")
 	}
 	// enddesign
 	// chapters sort by explicit Order, then id (req-system-overview): the trace chapter
@@ -635,27 +856,31 @@ func renderBookHTML(nodes map[string]Node) (string, []string, []string) {
 	// facet validation (go-facet-board): a value outside the vocabulary is loud.
 	findings = append(findings, facetFindings(nodes)...)
 	var deferredQ []baseDeferred // referenced-queries await the complete link graph
-	// the shell's TOC data: one entry per chapter, one link per unit heading (req-book-shell)
+	// the shell's TOC data: one entry per chapter, one link per unit heading (req-book-artifact.2)
 	type tocSec struct{ anchor, title string }
 	type tocEntry struct {
 		id, title string
-		num       int // chapter number (req-sidebar-order): 0 = back-matter, unnumbered
+		num       int // chapter number (req-book-shell-nav.1): 0 = back-matter, unnumbered
 		secs      []tocSec
 	}
 	var toc []tocEntry
 	var body strings.Builder
+	viewsHomeAnchor := "" // the views-home figure's anchor - the filter help links here
 	renderChapterUnit := func(chb *strings.Builder, chID string, idx int, u ManifestUnit) {
 		anchor := chID + "-u" + itoa(idx+1)
 		if u.Ref != "" {
 			chb.WriteString(renderNodeAtDepth(u.Ref, u.Depth, nodes, sm, bl, anchor))
 		} else if m := figRefRe.FindStringSubmatch(strings.TrimSpace(u.Body)); m != nil {
-			// design: go-fig-fullscreen  implements: req-fig-fullscreen
-			// Every chapter figure wraps with the ⛶ button (owner ruling 2026-07-09): a click
+			// design: go-fig-fullscreen  implements: req-interactive-figures.1
+			// Every chapter figure wraps with the ⛶ button: a click
 			// flips the fig-full class on THIS existing element (a fixed-inset modal), Escape
 			// closes, and the embedded graphs refit on toggle - the script creates nothing.
 			if msg, retired := retiredFigKinds[m[1]]; retired {
 				findings = append(findings, "fig kind '"+m[1]+"' retired "+msg)
 			} else {
+				if m[1] == "views-home" {
+					viewsHomeAnchor = anchor
+				}
 				chb.WriteString(`<figure id="` + anchor + `" data-layer="figure">` + "\n" +
 					`<button type="button" class="fig-fs" data-figfs title="fullscreen (Esc closes)">⛶</button>` + "\n" +
 					renderFigure(m[1], nodes) + "\n</figure>\n")
@@ -667,7 +892,7 @@ func renderBookHTML(nodes map[string]Node) (string, []string, []string) {
 				layer = "lede"
 			}
 			if !proseUnitsMarked(u.Body) {
-				findings = append(findings, "chapter "+chID+" unit "+itoa(idx+1)+" carries unmarked prose - no unmarked path into the book (req-ai-drafting)")
+				findings = append(findings, "chapter "+chID+" unit "+itoa(idx+1)+" carries unmarked prose - no unmarked path into the book (req-ai-provenance.1)")
 			}
 			ub := renderUnitBody(u.Body, nodes, aliasIdx, &findings, &deferredQ, sm, bl, anchor)
 			chb.WriteString(`<div id="` + anchor + `" data-layer="` + layer + `" class="unit marked` + shortUnitClass(ub) + `">` + "\n" + unitAIColumn(ub) + ub + "</div>\n")
@@ -694,14 +919,9 @@ func renderBookHTML(nodes map[string]Node) (string, []string, []string) {
 				}
 			}
 		}
-		if ch.Mode == "guidance" {
-			for _, cl := range guideClasses {
-				ent.secs = append(ent.secs, tocSec{anchor: "man-ch8-aud-" + cl, title: "Guide — " + cl})
-			}
-		}
 		toc = append(toc, ent)
 		if len(units) == 0 || units[0].Ref != "" {
-			findings = append(findings, "chapter "+ch.ID+" does not open with its lede (req-chapter-tldr)")
+			findings = append(findings, "chapter "+ch.ID+" does not open with its lede (req-reader-structure.1)")
 		}
 		// sorted: presetOf accumulates in map order - unsorted, a chapter in TWO presets
 		// flips its class order between renders and breaks same-state-same-bytes
@@ -712,52 +932,35 @@ func renderBookHTML(nodes map[string]Node) (string, []string, []string) {
 			classes += " in-" + p
 		}
 		var chb strings.Builder
-		chb.WriteString(`<article id="` + htmlEscape(ch.ID) + `" class="ch` + htmlEscape(classes) + `">` + "\n<h1>" + itoa(chNum) + ". " + htmlEscape(ch.Statement) + "</h1>\n")
+		// the chapter head keeps the full title, split: the short title heads the line,
+		// the remainder renders as a subtitle - never one long string.
+		chShort, chSub := splitChapterTitle(ch.Statement)
+		h1 := itoa(chNum) + ". " + htmlEscape(chShort)
+		if chSub != "" {
+			h1 += ` <span class="ch-sub">` + htmlEscape(chSub) + `</span>`
+		}
+		chb.WriteString(`<article id="` + htmlEscape(ch.ID) + `" class="ch` + htmlEscape(classes) + `">` + "\n<h1>" + h1 + "</h1>\n")
 		for idx, u := range units {
 			renderChapterUnit(&chb, ch.ID, idx, u)
 		}
-		if ch.Mode == "guidance" {
-			// the audience subchapters (req-ch8-audience-subchapters), agent class
-			// hosting the relocated agent guide (req-agent-guide-ch8)
-			for _, cl := range guideClasses {
-				chb.WriteString(`<section id="man-ch8-aud-` + htmlEscape(cl) + `" class="unit" data-layer="informative"><h2>Guide — ` + htmlEscape(cl) + `</h2>` + "\n")
-				if cl == "agent" && len(agentGuides) > 0 {
-					for _, ag := range agentGuides {
-						chb.WriteString(`<div id="` + htmlEscape(ag.ID) + `"><h3>` + htmlEscape(ag.Statement) + "</h3>\n")
-						for aidx, au := range parseManifestUnits(manifestBody(ag.Path)) {
-							renderChapterUnit(&chb, ag.ID, aidx, au)
-						}
-						chb.WriteString("</div>\n")
-					}
-				} else if gs := guidesByAud[cl]; len(gs) > 0 {
-					// guide notes for this audience render here (req-example-content): a marked
-					// example ships per empty view so the author sees the shape and deletes it.
-					for _, g := range gs {
-						chb.WriteString(`<div id="` + htmlEscape(g.ID) + `"><p class="stmt"><strong>` + htmlEscape(g.Statement) + `</strong></p>` + "\n")
-						if body := nodeBodyProse(g.Path); body != "" {
-							chb.WriteString(`<div data-layer="informative">` + mdLite(body) + "</div>\n")
-						}
-						chb.WriteString("</div>\n")
-					}
-				} else {
-					chb.WriteString(`<p class="meta">no guide yet — one lands the day this audience asks.</p>` + "\n")
-				}
-				chb.WriteString("</section>\n")
-			}
-		}
+		// no per-audience sibling subchapters: the guidance chapter renders its guides
+		// as ONE table where the
+		// manifest asks for it (fig: guides-table) - intro and guides merged, the agent
+		// guide one row embedding the emitted AGENTS.md verbatim.
 		chb.WriteString("</article>\n")
-		body.WriteString(refTooltips(expandTermLinks(ch.ID, chb.String(), gloss, used, &findings), nodes, gloss))
+		body.WriteString(refTooltips(expandTermLinks(ch.ID, chb.String(), gloss, used, &findings), nodes, gloss, tips))
 		advisories = append(advisories, unlinkedTermAdvisories(ch.ID, raw, gloss)...)
 	}
 	chaptersHTML := body.String() // usage referent for the pull law (go-ch2-derived)
 	if g := renderGlossaryChapter(gloss, used); g != "" {
-		// splice the glossary in at the END of ch3 (design input), not as its own
-		// back-matter chapter, and drop the standalone toc entry (owner review c13). The
-		// splice happens now - after the chapter loop - so `used` is complete across the book.
+		// ONE glossary, spliced in at the END of the FUNDAMENTALS chapter, never its own
+		// back-matter
+		// chapter. The splice happens now - after the chapter loop - so `used` is complete
+		// across the book.
 		full := body.String()
-		if i := strings.Index(full, `id="man-ch3-design-input"`); i >= 0 {
+		if i := strings.Index(full, `id="man-ch2-fundamentals"`); i >= 0 {
 			if e := strings.Index(full[i:], "</article>\n"); e >= 0 {
-				at := i + e // just before ch3's closing </article>
+				at := i + e // just before the fundamentals chapter's closing </article>
 				body.Reset()
 				body.WriteString(full[:at])
 				body.WriteString(g)
@@ -770,7 +973,7 @@ func renderBookHTML(nodes map[string]Node) (string, []string, []string) {
 		}
 	}
 	body.WriteString(renderNotationList(gloss, used))
-	// design: go-deck-mode  implements: req-deck-mode
+	// design: go-deck-mode  implements: req-manifest-render.4
 	// Deck manifests render in the SAME file: one unit per slide; `Note:` lines become the
 	// presenter's aside (hidden on screen outside present mode, printed in the handout); the
 	// present button flips paged fullscreen driven by arrow keys - CSS and class toggles only.
@@ -786,7 +989,7 @@ func renderBookHTML(nodes map[string]Node) (string, []string, []string) {
 		}
 	}
 	for _, dk := range decks {
-		// the deck stays OUT of the reading flow (owner c7/c12): no inline title or present button
+		// the deck stays OUT of the reading flow: no inline title or present button
 		// here - it is reachable only from the views' present button. The article sits off-screen
 		// (CSS), and present mode lifts the current slide to fullscreen via position:fixed.
 		body.WriteString(`<article class="deck" id="` + htmlEscape(dk.ID) + `" aria-hidden="true">` + "\n")
@@ -802,7 +1005,7 @@ func renderBookHTML(nodes map[string]Node) (string, []string, []string) {
 				}
 			} else {
 				if !proseUnitsMarked(u.Body) {
-					findings = append(findings, "deck "+dk.ID+" slide "+itoa(idx+1)+" carries unmarked prose (req-ai-drafting)")
+					findings = append(findings, "deck "+dk.ID+" slide "+itoa(idx+1)+" carries unmarked prose (req-ai-provenance.1)")
 				}
 				body.WriteString(renderUnitBody(u.Body, nodes, aliasIdx, &findings, &deferredQ, sm, bl, dk.ID+"-s"+itoa(idx+1)))
 			}
@@ -812,48 +1015,77 @@ func renderBookHTML(nodes map[string]Node) (string, []string, []string) {
 			body.WriteString("</section>\n")
 		}
 		body.WriteString("</article>\n")
-		// NO toc entry (owner 2026-07-09): the deck is out of the reading flow entirely -
-		// the details pane's deck list is its one entry point
+		// NO toc entry: the deck is out of the reading flow entirely.
+		// Its one entry point is the views home (go-views-home): the derived-documents
+		// table's present button opens it. The baked articles and the present-mode
+		// machinery live here.
 	}
 	// enddesign
-	// design: go-book-shell  implements: req-book-shell, req-sidebar-order, req-section-paging, req-search-hitlist, req-deck-views-section, req-details-pane
-	// The mdbook-style shell (owner ruling 2026-07-07): one fixed sidebar carries the whole
-	// apparatus - the chapter TOC (collected above, static DOM), the GLOBAL search, the view
-	// presets, the facet counts, ONE hand-editable filter expression every control compiles
-	// into, and the DETAILS PANE - an always-visible bar at the sidebar bottom that expands
-	// UPWARD over the sidebar as the one context-help surface (window.bookDetail fills it for
-	// a clicked term, link, filter, search, or graph node), hosts the views and the baseline
-	// hash, and collapses back to a bar. The content column stays
-	// clean. The report's visual language carries over (#fafafa chrome, white panels, the
-	// uppercase small labels, the ▸/▾ disclosure trees). The script stays toggle-only.
+	bodyHTML := body.String()
+	if len(deferredQ) > 0 {
+		// the pull law as data: the link graph over the RENDERED chapters feeds the
+		// deferred referenced-queries (same referent the derived lists always used).
+		// Resolved BEFORE the section numbering so deferred headings number too.
+		usedSet := map[string]bool{}
+		for s := range used {
+			usedSet[s] = true
+		}
+		for _, kind := range []string{"references", "fundamentals", "methods"} {
+			for _, c := range usedContentSlugs(kind, chaptersHTML) {
+				usedSet[c.Slug] = true
+			}
+		}
+		for _, d := range deferredQ {
+			bodyHTML = strings.Replace(bodyHTML, d.token, renderBaseHTML(d.text, d.view, nodes, &findings, usedSet, sm, bl, d.anchor), 1)
+		}
+	}
+	// render-time section numbering: every section heading gets
+	// its hierarchical number derived from the book structure; nesting breaks surface as
+	// advisories; the toc reuses the same numbers via the anchor map.
+	bodyHTML, secNums, numAdvisories := numberBookSections(bodyHTML)
+	advisories = append(advisories, numAdvisories...)
+	// design: go-book-shell  implements: req-book-artifact.2, req-book-shell-nav.1, req-book-shell-nav.4, req-book-shell-nav.5, req-book-shell-nav.3, req-details-context.1
+	// The mdbook-style shell: one fixed sidebar carries the whole
+	// apparatus - the chapter TOC (collected above, static DOM, its own scrollbar), the
+	// GLOBAL search, ONE hand-editable filter expression every control compiles into, and
+	// the DETAILS PANE - a bar at the sidebar bottom that expands as the one context-help
+	// surface (window.bookDetail fills it for a clicked term, link, node, filter, search,
+	// graph node, or the book title). The pane is COMPLETELY context-sensitive:
+	// it shows only the clicked thing - the views and slide decks
+	// live in the views home as book content (go-views-home); the baseline controls'
+	// placement stays deliberately undecided (q-views-placement).
+	// Single-click on a node/term reference opens the pane; NAVIGATION runs through the
+	// pane's link (window.bookGoto) - never a single-click jump. In-page anchors (the toc)
+	// keep navigating directly. The content column stays clean. The report's visual
+	// language carries over (#fafafa chrome, white panels, the uppercase small labels,
+	// the ▸/▾ disclosure trees). The script stays toggle-only.
 	var doc strings.Builder
 	doc.WriteString("<!doctype html>\n<html lang=\"en\"><head><meta charset=\"utf-8\">\n")
 	doc.WriteString("<meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">\n")
 	doc.WriteString("<title>" + htmlEscape(brand()) + " — the spec book</title>\n")
 	doc.WriteString("<style>*{box-sizing:border-box}body{font-family:system-ui,Segoe UI,sans-serif;margin:0;line-height:1.5;color:" + bookColors["text"] + ";background:" + bookColors["bg"] + ";display:flex}" +
-		"#sidebar{width:300px;flex:none;height:100vh;position:sticky;top:0;overflow:auto;background:#fafafa;border-right:1px solid #e3e3e3;padding:14px 16px;display:flex;flex-direction:column;gap:10px}" +
+		"#sidebar{width:300px;flex:none;height:100vh;position:sticky;top:0;overflow:hidden;background:#fafafa;border-right:1px solid #e3e3e3;padding:14px 16px;display:flex;flex-direction:column;gap:10px}" +
 		".sb-brand{font-weight:600;font-size:15px;margin:0;cursor:pointer;background:none;border:0;padding:0;text-align:left;font-family:inherit;color:inherit}" +
-		"#book-info dl{margin:4px 0;display:grid;grid-template-columns:64px 1fr;gap:2px 8px;font-size:11px}#book-info dt{color:#999}#book-info dd{margin:0;font-family:ui-monospace,Consolas,monospace;word-break:break-all}" +
 		".sb-h{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:#7d7d7d;margin:8px 0 2px}" +
 		"#sidebar input{width:100%;padding:5px 8px;border:1px solid #ddd;border-radius:5px;font:inherit;font-size:13px;background:" + bookColors["bg"] + "}" +
-		"#toc{font-size:13px}#toc details{margin:1px 0}#toc summary{list-style:none;cursor:pointer;padding:3px 6px;border-radius:4px;display:flex;gap:6px;align-items:baseline}" +
+		// the contents area owns its scrollbar: the toc flexes to the
+		// remaining height and scrolls on its own, so it stays scrollable while the
+		// details pane below claims space.
+		"#toc{font-size:13px;flex:1 1 auto;min-height:0;overflow:auto}#toc details{margin:1px 0}#toc summary{list-style:none;cursor:pointer;padding:3px 6px;border-radius:4px;display:flex;gap:6px;align-items:baseline}" +
 		"#toc summary::-webkit-details-marker{display:none}#toc summary:before{content:\"▸\";font-size:10px;color:#bcc6d6;flex:none}#toc details[open]>summary:before{content:\"▾\"}" +
 		"#toc summary:hover,#toc a:hover{background:#f0f0f0}#toc a{display:block;color:#333;text-decoration:none;padding:2px 6px;border-radius:4px}" +
 		"#toc .toc-sec{padding-left:22px;font-size:12px;color:#555}#toc .off{color:#bbb}" +
 		"#toc .toc-num{display:inline-block;min-width:1.1em;color:#8a93a3;font-variant-numeric:tabular-nums}" +
-		"#views>summary{cursor:pointer;list-style:none}#views>summary::-webkit-details-marker{display:none}#views>summary:before{content:\"▸ \";font-size:10px;color:#bcc6d6}#views[open]>summary:before{content:\"▾ \"}" +
-		"#filters button{font:inherit;font-size:12px;margin:0 4px 4px 0;padding:3px 9px;border:1px solid #ddd;border-radius:12px;background:" + bookColors["bg"] + ";cursor:pointer}" +
-		"#filters button:hover{background:#f0f0f0}" +
-		// context-help pane: an always-visible bottom overlay inside the (sticky) sidebar.
-		// sidebar is already position:sticky, which is a valid containing block for the
-		// absolute pane AND keeps it pinned to the viewport bottom (the point of the pane).
-		"#details.dpane{position:absolute;left:0;right:0;bottom:0;z-index:6;background:#fafafa;border-top:1px solid #d8d8d8;box-shadow:0 -4px 10px rgba(0,0,0,.06)}" +
+		"h1 .ch-sub{display:block;font-size:.55em;font-weight:400;color:" + bookColors["meta"] + ";margin-top:.15em;line-height:1.4}" +
+		// context-help pane: a flex child pinned to the sidebar bottom. It claims space
+		// from the contents area when it expands; the toc keeps its own scrollbar above.
+		"#details.dpane{flex:none;margin:auto -16px -14px;background:#fafafa;border-top:1px solid #d8d8d8;box-shadow:0 -4px 10px rgba(0,0,0,.06)}" +
 		"#dpane-bar{width:100%;text-align:left;font:inherit;font-size:12px;font-weight:600;color:#555;background:#f0f0f0;border:0;border-top:1px solid #ddd;padding:5px 12px;cursor:pointer}" +
 		"#dpane-body{max-height:60vh;overflow:auto;padding:6px 12px}" +
 		"#details.collapsed #dpane-body{display:none}" +
 		"#dpane-caret{float:right;transition:transform .1s}#details.collapsed #dpane-caret{transform:rotate(180deg)}" +
 		".dh{font-weight:600;margin-bottom:3px}" +
-		"#toc{padding-bottom:2.2rem}" +
+		"#dpane-content ul{margin:.2rem 0;padding-left:1.2rem}#dpane-content button[data-view]{font:inherit;font-size:12px;padding:1px 8px;border:1px solid #ddd;border-radius:12px;background:" + bookColors["bg"] + ";cursor:pointer}" +
 		"#page{flex:1;min-width:0}#page>header{padding:10px 20px;background:#fafafa;border-bottom:1px solid #e3e3e3}" +
 		"main{max-width:1040px;margin:0 auto;padding:1rem 2rem 3rem 4rem}" +
 		".ref-tip{display:inline-block;font-size:.7em;vertical-align:super;background:#e8eef7;color:#365f8a;border-radius:50%;width:1.4em;height:1.4em;line-height:1.4em;text-align:center;text-decoration:none;margin-left:2px}.ref-tip:hover{background:#d5e2f3}" +
@@ -871,11 +1103,18 @@ func renderBookHTML(nodes map[string]Node) (string, []string, []string) {
 		".u-table tr.urow>td{padding:5px 8px 5px 6px;border:0;border-bottom:1px solid #eee;cursor:pointer;vertical-align:top}.u-table tr.urow:hover>td{background:#f6f8fb}.u-table td.ubrief{color:#555;font-size:.85rem}" +
 		".utri{display:inline-block;width:.8em;color:#9aa4b2;transition:transform .1s}.utri:before{content:\"\\25B8\"}tr.urow.open .utri{transform:rotate(90deg)}" +
 		".u-table tr.udetail>td{padding:2px 8px 10px 24px;border:0;border-bottom:1px solid #eee;background:#fbfbfe}.u-table .ufield{margin:.15rem 0;font-size:.85rem}.ufl{color:#8a93a3}" +
+		".u-table td.uenum{font-size:.78rem;color:#555;white-space:nowrap}" +
+		".ai-inline{display:inline-flex;gap:1px;vertical-align:text-bottom}" +
+		"pre.uverb{background:#fafafa;border:1px solid #e3e3e3;border-radius:6px;padding:8px 10px;overflow-x:auto;font-size:.78rem;max-width:100%}" +
+		/* item-body headings inside expands render compact - detail labels, not sections */
+		".u-table tr.udetail h4,.u-table tr.udetail h5,.disc h4,.disc h5{margin:.4rem 0 .15rem;font-size:.8rem;text-transform:uppercase;letter-spacing:.04em;color:#7d7d7d}" +
+		/* render-time section numbers */
+		".secnum{color:#8a93a3;margin-right:.45em;font-variant-numeric:tabular-nums}" +
+		".views-home button{font:inherit;font-size:.78rem;padding:2px 10px;border:1px solid #d5d5d5;border-radius:13px;background:#fff;cursor:pointer;color:#555}.views-home button:hover{background:#f0f0f0}" +
 		".ucontrols{display:flex;flex-wrap:wrap;gap:6px;justify-content:flex-end;align-items:center;margin:.3rem 0;font-size:.8rem}" +
 		".ucontrols button{font:inherit;font-size:.75rem;padding:2px 8px;border:1px solid #ddd;border-radius:5px;background:#fff;cursor:pointer}.ucontrols button:hover{background:#f0f0f0}" +
 		".ucontrols input,.ucontrols select{font:inherit;font-size:.78rem;padding:2px 6px;border:1px solid #ddd;border-radius:5px}.qt-pos{color:#555;min-width:8ch;text-align:center;display:inline-block}" +
-		".onion .oview[hidden]{display:none}.onion [data-onion-go]{cursor:pointer}.onion-flow{overflow-x:auto;max-width:100%}.onion-flow svg{display:block}.onion svg{cursor:grab;touch-action:none;max-width:100%}.onion a[data-node-link]{cursor:pointer}" +
-		".ograph{height:640px;border:1px solid #e3e3e3;border-radius:6px;background:#fff}figure.fig-full .ograph{height:calc(100vh - 150px)}.ograph .og-fallback{padding:1rem}" +
+		".onion .oview[hidden]{display:none}.onion [data-onion-go]{cursor:pointer}.onion-flow{overflow-x:auto;max-width:100%}.onion-flow svg{display:block}.onion svg{cursor:grab;touch-action:none;max-width:100%}.onion [data-node-link]{cursor:pointer}" +
 		"figure[data-layer=\"figure\"]{position:relative;margin:1rem 0}.fig-fs{position:absolute;top:4px;right:4px;z-index:2;font:inherit;font-size:13px;padding:2px 8px;border:1px solid #d5d5d5;border-radius:6px;background:#fff;cursor:pointer;opacity:.55}.fig-fs:hover{opacity:1}" +
 		"figure.fig-full{position:fixed;inset:0;z-index:50;background:#fff;overflow:auto;margin:0;padding:26px;box-shadow:0 0 0 100vmax rgba(0,0,0,.35)}figure.fig-full svg{max-height:92vh}" +
 		".onion-infra{display:flex;flex-wrap:wrap;gap:5px;align-items:center;margin:.3rem 0;font-size:.78rem}.onion-infra .il{color:#888;margin-right:4px}.onion-infra button{font:inherit;font-size:.75rem;padding:2px 9px;border:1px solid #d5d5d5;border-radius:12px;background:#fff;cursor:pointer}" +
@@ -890,103 +1129,90 @@ func renderBookHTML(nodes map[string]Node) (string, []string, []string) {
 		".meta{font-size:.8rem;color:" + bookColors["meta"] + "}.stmt{margin-bottom:.2rem}.missing{color:#b00}" +
 		".marked{position:relative}.ai-marks{position:absolute;left:-1.6rem;top:.15rem;display:flex;flex-direction:column;gap:2px}" +
 		".qpad-short{padding-bottom:2.2rem}" +
-		".ucfn-cols{display:flex;gap:2rem;padding:.4rem 0 .4rem 1rem}.ucfn-cols h4{margin:.2rem 0;font-size:.8rem;text-transform:uppercase;letter-spacing:.05em;color:#7d7d7d}.ucfn-cols ul{margin:.2rem 0;padding-left:1.1rem}" +
 		".state-suspect{color:" + bookColors["suspect"] + "}.state-ok{color:#1c7c33}" +
 		"aside.notes{display:none;border-left:3px solid #ccc;padding-left:.6rem;font-size:.85rem}" +
 		"article.deck{position:absolute;left:-9999px;top:0;width:1px;height:1px;overflow:hidden}" +
 		"body[data-present] .slide{display:none}body[data-present] .slide.current{display:block;position:fixed;inset:0;background:" + bookColors["bg"] + ";padding:8vh 10vw;overflow:auto;z-index:9}" +
+		// the slide counter: baked chrome the present script fills; hidden outside present mode
+		"#slide-pos{display:none}body[data-present] #slide-pos{display:block;position:fixed;right:16px;bottom:12px;z-index:10;font-size:13px;color:" + bookColors["meta"] + ";background:" + bookColors["bg"] + ";border:1px solid #ddd;border-radius:12px;padding:2px 10px;font-variant-numeric:tabular-nums}" +
 		"@media(max-width:900px){body{flex-direction:column}#sidebar{position:static;width:auto;height:auto}}" +
 		"@media print{aside.notes{display:block}.slide{page-break-after:always}#sidebar{display:none}}" +
 		"::highlight(quack-comments){background:#ffdf80}" +
 		"::highlight(book-hits){background:#ffff00}" +
 		"#search-nav{white-space:nowrap}#hits-pos{font-size:.8rem;color:#555;margin:0 4px}" +
 		"#search-nav button{font:inherit;font-size:11px;border:1px solid #ddd;border-radius:4px;background:#fff;cursor:pointer;padding:1px 7px}" +
-		"#quack-sb{position:fixed;right:0;top:0;height:100vh;width:280px;background:#fffdf6;border-left:1px solid #e4dcc6;overflow:auto;padding:10px;font-size:13px;z-index:8;box-sizing:border-box}" +
+		// the comment layer sits ABOVE the fullscreen slide (z 9): commenting works in present mode
+		"#quack-sb{position:fixed;right:0;top:0;height:100vh;width:280px;background:#fffdf6;border-left:1px solid #e4dcc6;overflow:auto;padding:10px;font-size:13px;z-index:11;box-sizing:border-box}" +
 		"body[data-qc=\"min\"] #quack-sb{display:none}#quack-sb .qc-head{display:flex;justify-content:space-between;align-items:center;font-weight:600;margin-bottom:6px}" +
 		".qc-card{border:1px solid #e8e2d0;border-radius:6px;padding:6px;margin:6px 0;background:#fff}.qc-closed{opacity:.55}" +
 		".qc-quote{font-style:italic;color:#555;cursor:pointer;margin-bottom:4px}.qc-msg{margin:2px 0}.qc-suggest{color:#365f8a;margin:2px 0}" +
 		".qc-mark{display:inline-block;width:1em;margin-right:4px}.qc-mark.agree{color:#2a8a4a}.qc-mark.reject{color:#b33}" +
 		".qc-row{display:flex;gap:4px;margin-top:4px}.qc-inp{flex:1;min-width:0}" +
-		"#quack-fab{position:absolute;z-index:9}#quack-sb-toggle{position:fixed;right:12px;bottom:12px;z-index:9;border-radius:14px;padding:4px 10px}" +
+		// ONE comments toggle look, upper-right: the closed-state opener
+		// and the open-state minimize share the .qc-toggle style and the same corner.
+		"#quack-fab{position:absolute;z-index:12}" +
+		".qc-toggle{font:inherit;font-size:12px;border:1px solid #e4dcc6;border-radius:14px;background:#fffdf6;cursor:pointer;padding:4px 10px}" +
+		"#quack-sb-toggle{position:fixed;right:12px;top:12px;z-index:11}" +
 		"#qc-name{width:100%;box-sizing:border-box;margin-bottom:6px;font:inherit;font-size:12px;padding:3px 6px}" +
 		"textarea.qc-inp{width:100%;box-sizing:border-box;font:inherit;font-size:12px;margin-top:4px}" +
-		"#qc-toast{position:fixed;left:12px;bottom:12px;z-index:10;background:#2d3a2f;color:#fff;padding:8px 12px;border-radius:8px;font-size:12px;max-width:60ch}" +
+		"#qc-toast{position:fixed;left:12px;bottom:12px;z-index:12;background:#2d3a2f;color:#fff;padding:8px 12px;border-radius:8px;font-size:12px;max-width:60ch}" +
 		"@media print{#quack-sb,#quack-sb-toggle,#quack-fab{display:none}}" +
 		".readme img,.readme svg{max-width:100%;height:auto;display:block;margin:.6rem auto}.readme blockquote{border-left:3px solid #dcdcdc;margin:.6rem 0;padding:.2rem .9rem;color:#555}.readme h1{margin-top:.2rem}.readme table{margin:.8rem 0}" + facetFilterCSS() + "</style>\n")
 	doc.WriteString("</head><body data-paged=\"1\">\n")
 	doc.WriteString(`<nav id="sidebar" aria-label="views">` + "\n")
-	doc.WriteString(`<button class="sb-brand" id="book-title" title="click for book info">` + htmlEscape(brand()) + ` — the spec book</button>` + "\n")
-	doc.WriteString(bookTitleCardHTML(root, cfg.Version, version))
-	// sidebar order (field c3, req-sidebar-order): search, filter expression,
-	// collapsible views, then the toc.
+	doc.WriteString(`<button class="sb-brand" id="book-title" title="click for book info"` + bookTitleAttrs(root, cfg.Version, version) + `>` + htmlEscape(brand()) + ` — the spec book</button>` + "\n")
+	// sidebar order (req-book-shell-nav.1): search, filter expression,
+	// then the toc.
 	doc.WriteString(`<input id="search" type="search" placeholder="search the whole book">` + "\n")
-	// inline match nav (owner c5, req-search-hitlist): prev / counter / next on one line,
+	// inline match nav (req-book-shell-nav.5): prev / counter / next on one line,
 	// the script steps a single highlighted match - no hit list, never created content.
 	doc.WriteString(`<span id="search-nav" hidden><button id="hits-prev" aria-label="previous match">&lsaquo;</button><span id="hits-pos"></span><button id="hits-next" aria-label="next match">&rsaquo;</button></span>` + "\n")
-	// filter is one line; help opens in the details pane on focus/click (owner c6)
-	doc.WriteString(`<input id="filter-expr" type="text" placeholder="filter: preset:… phase:… text" title="tokens: preset:<name> phase:<v> discipline:<v> quality:<v> state:<suspect|verified> - anything else filters as text">` + "\n")
+	// filter is one line; help opens in the details pane on focus/click.
+	// The facet tokens (phase/discipline/quality) are not in the expression: the register's
+	// coverage board carries those filters (the pills-rule exemption).
+	doc.WriteString(`<input id="filter-expr" type="text" placeholder="filter: preset:… text" title="tokens: preset:<name> state:<suspect|verified> - anything else filters as text">` + "\n")
 	doc.WriteString(`<p class="sb-h">contents</p><div id="toc">` + "\n")
 	for _, e := range toc {
-		// the chapter number leads its toc entry (req-sidebar-order); back-matter (num 0) stays bare
+		// the chapter number leads its toc entry (req-book-shell-nav.1); back-matter (num 0) stays bare
 		numPfx := ""
 		if e.num > 0 {
 			numPfx = `<span class="toc-num">` + itoa(e.num) + `</span> `
 		}
+		// the sidebar shows ONLY the short chapter title; the remainder renders as the
+		// subtitle at the chapter head, never here.
+		short, _ := splitChapterTitle(e.title)
+		label := numPfx + htmlEscape(short)
 		if len(e.secs) == 0 {
-			doc.WriteString(`<a href="#` + htmlEscape(e.id) + `" data-ch="` + htmlEscape(e.id) + `">` + numPfx + htmlEscape(e.title) + `</a>` + "\n")
+			doc.WriteString(`<a href="#` + htmlEscape(e.id) + `" data-ch="` + htmlEscape(e.id) + `">` + label + `</a>` + "\n")
 			continue
 		}
-		doc.WriteString(`<details><summary><a href="#` + htmlEscape(e.id) + `" data-ch="` + htmlEscape(e.id) + `">` + numPfx + htmlEscape(e.title) + `</a></summary>` + "\n")
+		doc.WriteString(`<details><summary><a href="#` + htmlEscape(e.id) + `" data-ch="` + htmlEscape(e.id) + `">` + label + `</a></summary>` + "\n")
 		for _, s := range e.secs {
-			doc.WriteString(`<a class="toc-sec" href="#` + htmlEscape(s.anchor) + `">` + htmlEscape(s.title) + `</a>` + "\n")
+			// the toc reuses the render-time section numbers
+			secPfx := ""
+			if n := secNums[s.anchor]; n != "" {
+				secPfx = `<span class="toc-num">` + n + `</span> `
+			}
+			doc.WriteString(`<a class="toc-sec" href="#` + htmlEscape(s.anchor) + `">` + secPfx + htmlEscape(s.title) + `</a>` + "\n")
 		}
 		doc.WriteString("</details>\n")
 	}
 	doc.WriteString("</div>\n")
-	// context-help pane (field: always-visible bottom overlay): the views block now lives
-	// here, keeping the SAME #filters/#expand-all/#deck-list/.present ids the script wires.
-	// window.bookDetail fills #dpane-content on demand; the baseline hash anchors the bottom.
-	doc.WriteString(`<div id="details" class="dpane collapsed"><button id="dpane-bar" type="button">Details <span id="dpane-caret">▴</span></button><div id="dpane-body"><div id="dpane-content"><p class="meta">Click a term, link, filter, or a graph node to see details here.</p></div><div id="dpane-views"><p class="sb-h">views</p>`)
-	doc.WriteString(`<div id="filters"><button data-view="">all</button>`)
-	for _, p := range presetIDs {
-		doc.WriteString(`<button data-view="` + htmlEscape(p) + `">` + htmlEscape(strings.TrimPrefix(p, "man-preset-")) + `</button>`)
-	}
-	doc.WriteString(`<button id="expand-all">expand all</button></div>`)
-	// slide decks are a TYPE of view (field c44, req-deck-views-section): the views
-	// section lists them; the shared present buttons drive the existing deck mode.
-	if len(decks) > 0 {
-		doc.WriteString(`<p class="sb-h">slide-decks</p><div id="deck-list">`)
-		for _, dk := range decks {
-			doc.WriteString(`<button class="present" data-deck="` + htmlEscape(dk.ID) + `">` + htmlEscape(strings.TrimPrefix(dk.ID, "man-deck-")) + `</button>`)
-		}
-		doc.WriteString(`</div>`)
-	}
-	doc.WriteString(`</div><p class="sb-h">baseline</p><p class="meta dpane-hash">&#9741; ` + htmlEscape(root[:12]) + `</p></div></div>` + "\n")
+	// context-help pane: COMPLETELY context-sensitive. The
+	// views and slide decks live in the views home (go-views-home); the baseline
+	// controls stay unplaced (q-views-placement stays open). window.bookDetail fills
+	// #dpane-content on demand; the book identity rides the title button's data
+	// attributes and shows on a title click like any other click target.
+	doc.WriteString(`<div id="details" class="dpane collapsed"><button id="dpane-bar" type="button">Details <span id="dpane-caret">▴</span></button><div id="dpane-body"><div id="dpane-content"><p class="meta">Click a term, link, filter, or a graph node to see details here.</p></div></div></div>` + "\n")
 	doc.WriteString("</nav>\n")
 	doc.WriteString(`<div id="page">` + "\n")
-	// one page per top-level section (field c7, req-section-paging, adr-section-paging):
-	// the top header bar is gone (owner c1); paging flows through the toc, hash and arrow keys.
+	// one page per top-level section (req-book-shell-nav.4, adr-section-paging):
+	// the top header bar is gone; paging flows through the toc, hash and arrow keys.
 	doc.WriteString("<main>\n")
 	// enddesign
-	bodyHTML := body.String()
-	if len(deferredQ) > 0 {
-		// the pull law as data: the link graph over the RENDERED chapters feeds the
-		// deferred referenced-queries (same referent the derived lists always used).
-		usedSet := map[string]bool{}
-		for s := range used {
-			usedSet[s] = true
-		}
-		for _, kind := range []string{"references", "fundamentals", "methods"} {
-			for _, c := range usedContentSlugs(kind, chaptersHTML) {
-				usedSet[c.Slug] = true
-			}
-		}
-		for _, d := range deferredQ {
-			bodyHTML = strings.Replace(bodyHTML, d.token, renderBaseHTML(d.text, d.view, nodes, &findings, usedSet, sm, bl, d.anchor), 1)
-		}
-	}
 	doc.WriteString(bodyHTML)
 	doc.WriteString(`</main>
+<div id="slide-pos" role="status"></div>
 </div>
 <script>/* filters and toggles only - this script never creates content (go-book-shell) */
 (function(){
@@ -995,10 +1221,9 @@ func renderBookHTML(nodes map[string]Node) (string, []string, []string) {
   var had=(fe.value||'').split(/\s+/).indexOf(key+':'+val)>=0;
   if(val&&!(toggle&&had))t.push(key+':'+val);fe.value=t.join(' ');apply();}
  function apply(){
-  var toks=(fe.value||'').trim().split(/\s+/).filter(Boolean),preset='',state='',facets=[],words=[];
+  var toks=(fe.value||'').trim().split(/\s+/).filter(Boolean),preset='',state='',words=[];
   toks.forEach(function(t){var i=t.indexOf(':'),k=i<0?'':t.slice(0,i),v=t.slice(i+1);
    if(k==='preset')preset=v;else if(k==='state')state=v;
-   else if(k==='phase'||k==='discipline'||k==='quality')facets.push('f-'+k+'-'+v);
    else words.push(t.toLowerCase());});
   document.querySelectorAll('article.ch').forEach(function(a){
    var hid=(preset!=='')&&!a.classList.contains('in-man-preset-'+preset);
@@ -1011,17 +1236,27 @@ func renderBookHTML(nodes map[string]Node) (string, []string, []string) {
    if(!hid&&words.length){var txt=s.textContent.toLowerCase();
     words.forEach(function(w){if(txt.indexOf(w)<0)hid=true;});}
    s.hidden=hid;});
-  document.querySelectorAll('tr.rowf').forEach(function(r){
-   var ok=facets.every(function(f){return r.classList.contains(f);});
-   r.hidden=facets.length>0&&!ok;});
   document.querySelectorAll('#toc a[data-ch]').forEach(function(l){
    var a=document.getElementById(l.getAttribute('data-ch'));
    l.classList.toggle('off',!!(a&&a.hidden));});}
  if(fe)fe.addEventListener('input',apply);
- /* filter help opens in the details pane (owner c6): chrome, not book content */
- if(fe){var fhelp=function(){window.bookDetail('Filter','<div class=meta>Filter the book as you type.</div><div class=meta><b>preset:</b>&lt;name&gt; · <b>phase:</b>&lt;v&gt; · <b>discipline:</b>&lt;v&gt; · <b>quality:</b>&lt;v&gt; · <b>state:</b>suspect|verified</div><div class=meta>Anything else filters as text. Combine with spaces.</div>');};
+ /* filter help opens in the details pane (owner c6): chrome, not book content.
+    The view list lives ONCE, in the views home - the help links there. A book
+    without a views home keeps the baked clickable preset list as the fallback. */
+ if(fe){var fhelp=function(){window.bookDetail('Filter','<div class=meta>Filter the book as you type. Combine tokens with spaces; anything else filters as text.</div><ul class=meta>`)
+	doc.WriteString(`<li><b>preset:</b>&lt;name&gt;`)
+	if viewsHomeAnchor != "" {
+		doc.WriteString(` — <a href="#` + htmlEscape(viewsHomeAnchor) + `" data-goto="` + htmlEscape(viewsHomeAnchor) + `">pick a view &#8599;</a>`)
+	} else if len(presetIDs) > 0 {
+		doc.WriteString(`<ul>`)
+		for _, p := range presetIDs {
+			doc.WriteString(`<li><button type="button" data-view="` + htmlEscape(p) + `">` + htmlEscape(strings.TrimPrefix(p, "man-preset-")) + `</button></li>`)
+		}
+		doc.WriteString(`</ul>`)
+	}
+	doc.WriteString(`</li><li><b>state:</b>suspect|verified</li></ul>');};
   fe.addEventListener('focus',fhelp);fe.addEventListener('click',fhelp);}
- /* search -> inline match nav (owner c5, req-search-hitlist): step one match at a time,
+ /* search -> inline match nav (owner c5, req-book-shell-nav.5): step one match at a time,
     ALL occurrences paint full yellow via the Highlight API */
  var hits=[],hcur=0,
      snav=document.getElementById('search-nav'),hpos=document.getElementById('hits-pos');
@@ -1049,36 +1284,88 @@ func renderBookHTML(nodes map[string]Node) (string, []string, []string) {
  if(hprev)hprev.addEventListener('click',function(){stepHit(-1);});
  if(hnext)hnext.addEventListener('click',function(){stepHit(1);});
  if(se)se.addEventListener('input',function(){collectHits((se.value||'').trim());paintHits();hcur=0;updateNav();if(hits.length)goHit(0);});
- document.querySelectorAll('#filters button[data-view]').forEach(function(btn){btn.addEventListener('click',function(){
-  setTok('preset',btn.getAttribute('data-view').replace(/^man-preset-/,''),true);});});
+ /* the coverage board IS the register's filter row: a facet-count click
+    toggles a VISIBLY selected pill and filters the
+    register table in the same chapter - OR within one facet, AND across facets,
+    multi-select by construction. The board stays the completeness check. */
  document.querySelectorAll('button.facet-count').forEach(function(btn){btn.addEventListener('click',function(){
-  var t=btn.getAttribute('data-target')||'',m=t.match(/^f-([a-z]+)-(.+)$/);
-  if(m)setTok(m[1],m[2],true);});});
+  btn.classList.toggle('on');
+  var art=btn.closest?btn.closest('article.ch'):null;if(!art)return;
+  var act={};
+  Array.prototype.forEach.call(art.querySelectorAll('button.facet-count.on'),function(x){
+   var t=x.getAttribute('data-target')||'',m=t.match(/^f-([a-z]+)-/);
+   if(!m)return;(act[m[1]]=act[m[1]]||{})[t]=true;});
+  Array.prototype.forEach.call(art.querySelectorAll('.utable'),function(ut){
+   if(ut.setBoardFacets)ut.setBoardFacets(act);});});});
  /* a disclosure's until-found content unhides on open (field c24: expand rendered nothing) */
  document.querySelectorAll('details.disc').forEach(function(d){d.addEventListener('toggle',function(){
   if(d.open)Array.prototype.forEach.call(d.children,function(c){if(c.hasAttribute&&c.hasAttribute('hidden'))c.removeAttribute('hidden');});});});
- var xa=document.getElementById('expand-all');
- if(xa){xa.addEventListener('click',function(){var open=b.getAttribute('data-expanded')!=='1';b.setAttribute('data-expanded',open?'1':'0');
-  document.querySelectorAll('details.disc').forEach(function(d){d.open=open;});});}
  /* the ONE entry point that shows context help. This pane is chrome, not book content,
     so filling it with markup is acceptable (as the old card was) - escaping is the caller's job. */
  window.bookDetail=function(title,html){var c=document.getElementById('dpane-content');if(!c)return;c.innerHTML='<div class="dh">'+(title||'')+'</div>'+(html||'');document.getElementById('details').classList.remove('collapsed');};
+ function esc(x){return String(x==null?'':x).replace(/&/g,'&amp;').replace(/</g,'&lt;');}
+ /* the click model, book-wide: a single click on a node/term
+    reference opens the DETAILS pane - name, brief, and the navigate link. The actual
+    NAVIGATION is bookGoto, reached ONLY through that link; it pushes a history entry
+    so the browser BACK returns to where the reader clicked. */
+ var __gotoStack=[];
+ window.bookGoto=function(id){
+  var t=document.getElementById(id)||document.querySelector('tr.urow[data-node="'+id+'"]')||document.querySelector('[data-node="'+id+'"]');
+  if(!t)return;
+  var from=document.querySelector('main article.ch:not(.pg-hide)');
+  __gotoStack.push({art:from,y:window.scrollY});
+  (window.__quackNav=window.__quackNav||[]).push('goto');
+  try{history.pushState({nav:'goto'},'');}catch(_){}
+  var ut=t.closest?t.closest('.utable'):null;
+  if(ut&&ut.revealRow){var rr=ut.revealRow(id);if(rr)t=rr;}
+  if(window.bookPageTo)window.bookPageTo(t);
+  var d=t.closest('details');if(d)d.open=true;
+  t.scrollIntoView({block:'center'});};
+ window.addEventListener('popstate',function(){
+  var nv=window.__quackNav||[];
+  if(nv.length===0||nv[nv.length-1]!=='goto')return;nv.pop();
+  var e=__gotoStack.pop();if(!e)return;
+  if(e.art&&window.bookPageTo)window.bookPageTo(e.art);
+  window.scrollTo(0,e.y);});
+ window.bookNodeDetail=function(id){
+  var s=document.querySelector('section[data-node="'+id+'"]')||document.querySelector('tr.urow[data-node="'+id+'"]')||document.querySelector('[data-node="'+id+'"]');
+  var meta='',stmt='';
+  if(s){meta=(s.getAttribute('data-type')||'')+((s.getAttribute('data-state'))?(' · '+s.getAttribute('data-state')):'');
+   var st=s.querySelector('.stmt');
+   if(!st&&s.nextElementSibling&&s.nextElementSibling.classList&&s.nextElementSibling.classList.contains('udetail'))st=s.nextElementSibling.querySelector('.stmt');
+   if(st)stmt=st.textContent;}
+  window.bookDetail(esc(id),(meta?('<div class=meta>'+esc(meta)+'</div>'):'')+(stmt?('<p>'+esc(stmt)+'</p>'):'')+'<a href="#'+esc(id)+'" data-goto="'+esc(id)+'">open the full entry &#8599;</a>');};
  var dbar=document.getElementById('dpane-bar');
  if(dbar)dbar.addEventListener('click',function(){var dp=document.getElementById('details');if(dp)dp.classList.toggle('collapsed');});
+ /* pane-internal affordances, delegated (the pane refills): the navigate link and the
+    preset buttons of the filter help */
+ var dcont=document.getElementById('dpane-content');
+ if(dcont)dcont.addEventListener('click',function(e){
+  var v=e.target.closest?e.target.closest('button[data-view]'):null;
+  if(v){setTok('preset',(v.getAttribute('data-view')||'').replace(/^man-preset-/,''),true);return;}
+  var g=e.target.closest?e.target.closest('a[data-goto]'):null;
+  if(g){e.preventDefault();window.bookGoto(g.getAttribute('data-goto'));}});
  var dmain=document.querySelector('main');
  if(dmain)dmain.addEventListener('click',function(e){
+  /* a views-home button enters its preset into the filter; a second click clears it */
+  var v=e.target.closest?e.target.closest('button[data-view]'):null;
+  if(v){setTok('preset',(v.getAttribute('data-view')||'').replace(/^man-preset-/,''),true);return;}
   var s=e.target.closest('section[data-node]');if(!s)return;
-  var st=s.querySelector('.stmt');
-  window.bookDetail(s.getAttribute('data-node')||'','<div class=meta>'+(s.getAttribute('data-type')||'')+' · '+(s.getAttribute('data-state')||'')+'</div>'+(st?('<p>'+st.textContent+'</p>'):''));});
- document.addEventListener('click',function(e){var t=e.target.closest?e.target.closest('.termref'):null;if(!t)return;e.preventDefault();var goto=t.getAttribute('data-goto'),help=t.getAttribute('data-help')||'';var link=goto?('<a href="#'+goto+'">open the full entry &#8599;</a>'):'';window.bookDetail(t.getAttribute('data-title')||t.textContent,'<p>'+help+'</p>'+link);});
- var bt=document.getElementById('book-title'),bi=document.getElementById('book-info');
- if(bt&&bi)bt.addEventListener('click',function(){bi.hidden=!bi.hidden;});
- /* unified reader table (owner review 2026-07-08): each .upills row is a filter facet (AND
+  window.bookNodeDetail(s.getAttribute('data-node')||'');});
+ document.addEventListener('click',function(e){var t=e.target.closest?e.target.closest('.termref'):null;if(!t)return;e.preventDefault();var goto=t.getAttribute('data-goto'),help=t.getAttribute('data-help')||'';var link=goto?('<a href="#'+goto+'" data-goto="'+goto+'">open the full entry &#8599;</a>'):'';window.bookDetail(t.getAttribute('data-title')||t.textContent,'<p>'+help+'</p>'+link);});
+ /* no standing title-card block: a title click feeds the details pane
+    like any other click target - the identity rides the button's data attributes */
+ var bt=document.getElementById('book-title');
+ if(bt)bt.addEventListener('click',function(){window.bookDetail(esc(bt.textContent),
+  '<div class=meta><b>state</b> '+esc(bt.getAttribute('data-root'))+'</div>'+
+  '<div class=meta><b>iteration</b> '+esc(bt.getAttribute('data-iteration'))+'</div>'+
+  '<div class=meta><b>engine</b> '+esc(bt.getAttribute('data-engine'))+'</div>');});
+ /* unified reader table: each .upills row is a filter facet (AND
     across facets, OR within one), the controls below the table filter and paginate the visible
     set, a row toggles its detail. The script only ever toggles visibility - never creates content. */
  document.querySelectorAll('.utable').forEach(function(ut){
   var tb=ut.querySelector('table.u-table'),body=tb?tb.tBodies[0]:null;if(!body)return;
-  var facets={},page=0;
+  var facets={},board={},page=0;
   Array.prototype.forEach.call(ut.querySelectorAll('.upills'),function(fe){var fn=fe.getAttribute('data-facet');if(fn)facets[fn]={};});
   function size(){var s=ut.querySelector('.qt-size');return s?+s.value:20;}
   function rows(){return Array.prototype.slice.call(body.querySelectorAll('tr.urow'));}
@@ -1089,7 +1376,15 @@ func renderBookHTML(nodes map[string]Node) (string, []string, []string) {
    for(var fn in facets){var act=facets[fn],any=false,k;
     for(k in act){if(act[k]){any=true;break;}}
     if(any&&!act[r.getAttribute('data-'+fn)||''])return false;}
+   /* board facets: the coverage board's selected values filter here -
+      OR within one facet, AND across facets, over the rows' baked f-… classes */
+   for(var bf in board){var bact=board[bf],bany=false,bk;
+    for(bk in bact){if(bact[bk]){bany=true;break;}}
+    if(!bany)continue;
+    var bok=false;for(bk in bact){if(bact[bk]&&r.classList.contains(bk)){bok=true;break;}}
+    if(!bok)return false;}
    return true;}
+  ut.setBoardFacets=function(act){board=act||{};page=0;apply();};
   function apply(){
    var vis=rows().filter(matches),sz=size(),pages=sz>0?Math.max(1,Math.ceil(vis.length/sz)):1;
    if(page>=pages)page=pages-1;if(page<0)page=0;
@@ -1120,6 +1415,9 @@ func renderBookHTML(nodes map[string]Node) (string, []string, []string) {
   var sz=ut.querySelector('.qt-size');if(sz)sz.addEventListener('change',function(){page=0;apply();});
   ut.revealRow=function(id){var r=body.querySelector('tr.urow[data-node="'+id+'"]');if(!r)return null;
    for(var fn in facets)facets[fn]={};
+   board={};
+   var art=ut.closest?ut.closest('article.ch'):null;
+   if(art)Array.prototype.forEach.call(art.querySelectorAll('button.facet-count.on'),function(x){x.classList.remove('on');});
    Array.prototype.forEach.call(ut.querySelectorAll('.upills'),function(fe){Array.prototype.forEach.call(fe.querySelectorAll('.upill'),function(x){x.classList.toggle('on',x.getAttribute('data-fv')==='*');});});
    var qs=ut.querySelector('.qt-search');if(qs)qs.value='';
    var vis=rows().filter(matches),idx=vis.indexOf(r),sz2=size();page=sz2>0?Math.floor(idx/sz2):0;
@@ -1127,14 +1425,13 @@ func renderBookHTML(nodes map[string]Node) (string, []string, []string) {
    apply();return r;};
   apply();
  });
- /* onion drill-down (req-figure-drilldown): every level is pre-rendered; clicks only
+ /* onion drill-down (req-interactive-figures.2): every level is pre-rendered; clicks only
     switch which view is visible. Each drill pushes a history entry so the browser BACK
     button returns to the previous onion view; a shared nav marker keeps the trace-graph
     and onion popstate handlers from fighting. */
  window.__quackNav=window.__quackNav||[];
  var __onionStack=[];
- function __onionShow(host,t){Array.prototype.forEach.call(host.querySelectorAll('.oview'),function(v){v.hidden=true;});t.hidden=false;
-  if(window.__ogRefit)window.__ogRefit(t);}
+ function __onionShow(host,t){Array.prototype.forEach.call(host.querySelectorAll('.oview'),function(v){v.hidden=true;});t.hidden=false;}
  document.querySelectorAll('.onion [data-onion-go]').forEach(function(el){el.addEventListener('click',function(ev){
   ev.preventDefault();
   var t=document.getElementById(el.getAttribute('data-onion-go'));
@@ -1169,82 +1466,20 @@ func renderBookHTML(nodes map[string]Node) (string, []string, []string) {
   svg.addEventListener('pointerup',function(){drag=null;svg.style.cursor='';});
   svg.addEventListener('dblclick',function(){st.x=base[0];st.y=base[1];st.w=base[2];st.h=base[3];apply();});
  });
- /* per-layer cytoscape graphs (owner ruling 2026-07-09): dagre left-to-right over the
-    baked JSON islands; the assets are the ones the trace chapter inlines. A region tap
-    transports to the trace row; theme clusters and the lower-levels node drill to their
-    PRE-RENDERED views (the script never creates content); hovering a node isolates its
-    neighborhood. A node subtitle (data "sub") bakes into the label's second line. */
- function __ogInit(host){
-  if(host.__og||!window.cytoscape)return;
-  if(!host.getBoundingClientRect().width)return; /* hidden view: init on first show */
-  var de=host.parentElement.querySelector('.og-data');if(!de)return;
-  var d;try{d=JSON.parse(de.textContent||'{}');}catch(e){return;}
-  var fb=host.querySelector('.og-fallback');if(fb)fb.hidden=true;
-  var els=[];
-  (d.nodes||[]).forEach(function(n){
-   var nd={id:n.id,label:n.sub?n.label+'\n'+n.sub:n.label,kind:n.kind};
-   if(n.go)nd.go=n.go;
-   els.push({data:nd});});
-  (d.edges||[]).forEach(function(e,i){
-   var ed={id:'og'+i,source:e.s,target:e.t,kind:e.kind};
-   if(e.label)ed.label=e.label;
-   els.push({data:ed});});
-  var cy=cytoscape({container:host,elements:els,wheelSensitivity:0.2,
-   layout:{name:'dagre',rankDir:'LR',nodeSep:12,rankSep:110},
-   style:[
-    {selector:'node',style:{'label':'data(label)','font-size':11,'text-valign':'center','text-halign':'center','text-wrap':'wrap','text-max-width':170,'shape':'round-rectangle','width':'label','height':'label','padding':'7px','background-color':'#fff','border-width':1,'border-color':'#4a6fa5','color':'#333'}},
-    {selector:'node[kind="in"]',style:{'border-color':'#2f8f4e','background-color':'#eef7f0'}},
-    {selector:'node[kind="out"]',style:{'border-color':'#b5651d','background-color':'#fbf2ea'}},
-    {selector:'node[kind="xin"],node[kind="xout"]',style:{'border-color':'#8aa0c4','background-color':'#f3f7fc','color':'#5b7fa6'}},
-    {selector:'node[kind="th"]',style:{'border-width':3,'border-style':'double','background-color':'#eef3fa','font-weight':'bold'}},
-    {selector:'node[kind="peer"]',style:{'border-style':'dashed','border-color':'#8aa0c4','background-color':'#f3f7fc','color':'#5b7fa6'}},
-    {selector:'node[kind="lower"]',style:{'shape':'ellipse','width':150,'height':90,'background-color':'#dce9f8','font-weight':'bold'}},
-    {selector:'edge',style:{'curve-style':'bezier','width':1.4,'line-color':'#9db6e0','target-arrow-shape':'triangle','target-arrow-color':'#9db6e0','arrow-scale':0.9}},
-    {selector:'edge[kind="in"]',style:{'line-color':'#2f8f4e','target-arrow-color':'#2f8f4e'}},
-    {selector:'edge[kind="out"]',style:{'line-color':'#b5651d','target-arrow-color':'#b5651d'}},
-    {selector:'edge[kind="lower"]',style:{'line-style':'dashed'}},
-    {selector:'edge[label]',style:{'label':'data(label)','font-size':9,'color':'#5b7fa6','text-background-color':'#fff','text-background-opacity':0.85}},
-    {selector:'.ogdim',style:{'opacity':0.12}}
-   ]});
-  cy.on('tap','node',function(ev){var n=ev.target,k=n.data('kind');
-   var go=(k==='lower')?host.getAttribute('data-oglower'):n.data('go');
-   if(go){
-    var hostView=host.closest('.onion'),t=document.getElementById(go);
-    if(t&&hostView){var cur=hostView.querySelector('.oview:not([hidden])');
-     if(cur&&cur!==t){__onionStack.push({host:hostView,id:cur.id});window.__quackNav.push('onion');try{history.pushState({nav:'onion'},'');}catch(_){}}
-     __onionShow(hostView,t);}
-    return;}
-   if(k!=='el')return;
-   var s=document.querySelector('[data-node="'+n.id()+'"]');if(!s)return;
-   if(window.bookPageTo)window.bookPageTo(s);
-   var dd=s.closest('details');if(dd)dd.open=true;
-   s.scrollIntoView({block:'center'});});
-  cy.on('mouseover','node',function(ev){cy.elements().addClass('ogdim');ev.target.closedNeighborhood().removeClass('ogdim');});
-  cy.on('mouseout','node',function(){cy.elements().removeClass('ogdim');});
-  host.__og=cy;
- }
- function __ogRefit(scope){Array.prototype.forEach.call((scope||document).querySelectorAll('.ograph'),function(h){
-  __ogInit(h);if(h.__og){h.__og.resize();h.__og.fit(undefined,30);}});}
- window.__ogRefit=__ogRefit;
- __ogRefit(document);
- /* figure fullscreen (owner 2026-07-09): the button flips a class on its own figure */
+ /* figure fullscreen: the button flips a class on its own figure */
  document.querySelectorAll('[data-figfs]').forEach(function(btn){btn.addEventListener('click',function(){
   var f=btn.closest('figure');if(!f)return;
   f.classList.toggle('fig-full');
-  __ogRefit(f);
   btn.textContent=f.classList.contains('fig-full')?'✕':'⛶';});});
  document.addEventListener('keydown',function(e){if(e.key!=='Escape')return;
   document.querySelectorAll('figure.fig-full').forEach(function(f){f.classList.remove('fig-full');
    var b=f.querySelector('[data-figfs]');if(b)b.textContent='⛶';});});
- /* trace-item links: scroll to the section already carrying the node, wherever it renders */
+ /* trace-item links: a single click opens the node in
+    the DETAILS pane; navigation runs through the pane's link, never the click itself */
  document.querySelectorAll('[data-node-link]').forEach(function(a){a.addEventListener('click',function(ev){
   ev.preventDefault();
-  var s=document.querySelector('[data-node="'+a.getAttribute('data-node-link')+'"]');
-  if(!s)return;
-  if(window.bookPageTo)window.bookPageTo(s);
-  var d=s.closest('details');if(d)d.open=true;
-  s.scrollIntoView({block:'center'});});});
- /* paging: one top-level section per page (req-section-paging); the pager text ECHOES the h1 */
+  window.bookNodeDetail(a.getAttribute('data-node-link'));});});
+ /* paging: one top-level section per page (req-book-shell-nav.4); the pager text ECHOES the h1 */
  var arts=Array.prototype.slice.call(document.querySelectorAll('main article.ch')),pg=0;
  function pageShow(i,scroll){if(!arts.length)return;pg=Math.max(0,Math.min(arts.length-1,i));
   arts.forEach(function(a,j){a.classList.toggle('pg-hide',j!==pg);});
@@ -1269,12 +1504,20 @@ func renderBookHTML(nodes map[string]Node) (string, []string, []string) {
  pageShow(0,false);
  var cur=-1,slides=[];
  function show(i){if(!slides.length)return;cur=(i+slides.length)%slides.length;
-  slides.forEach(function(s,j){s.classList.toggle('current',j===cur);});}
+  slides.forEach(function(s,j){s.classList.toggle('current',j===cur);});
+  var sp=document.getElementById('slide-pos');if(sp)sp.textContent=(cur+1)+'/'+slides.length;}
  document.querySelectorAll('button.present').forEach(function(btn){btn.addEventListener('click',function(){
   var d=document.getElementById(btn.getAttribute('data-deck'));
   slides=Array.prototype.slice.call(d.querySelectorAll('.slide'));
   b.setAttribute('data-present',btn.getAttribute('data-deck'));show(0);});});
+ /* an element inside a deck presents its slide - the comment layer pans to deck-anchored
+    comments through this; the deck DOM is off-screen outside present mode */
+ window.bookSlideTo=function(el){var s=el&&el.closest?el.closest('.slide'):null;if(!s)return false;
+  var d=s.closest('article.deck');if(!d)return false;
+  if(b.getAttribute('data-present')!==d.id){slides=Array.prototype.slice.call(d.querySelectorAll('.slide'));b.setAttribute('data-present',d.id);}
+  show(slides.indexOf(s));return true;};
  document.addEventListener('keydown',function(e){if(!b.hasAttribute('data-present'))return;
+  if(e.target&&e.target.matches&&e.target.matches('input,textarea,select'))return;
   if(e.key==='ArrowRight'||e.key==='PageDown')show(cur+1);
   if(e.key==='ArrowLeft'||e.key==='PageUp')show(cur-1);
   if(e.key==='Escape'){b.removeAttribute('data-present');slides.forEach(function(s){s.classList.remove('current');});slides=[];cur=-1;}});
@@ -1282,7 +1525,7 @@ func renderBookHTML(nodes map[string]Node) (string, []string, []string) {
 })();
 </script>
 `)
-	// design: go-annotator-core  implements: req-comment-mark-prose, req-comment-figure-target, req-comment-figure-fallback, req-comment-dom-static, req-comment-escape, req-comment-sidebar, req-comment-threads, req-comment-close, req-comment-author, req-comment-save, req-comment-save-fallback, req-comment-suggest, req-comment-persist, req-comment-ux
+	// design: go-annotator-core  implements: req-comment-layer.8, req-comment-layer.6, req-comment-layer.5, req-comment-layer.3, req-comment-layer.4, req-comment-layer.12, req-comment-layer.14, req-comment-layer.2, req-comment-layer.1, req-comment-layer.10, req-comment-layer.11, req-comment-layer.13, req-comment-ux-keep.1, req-comment-ux-keep.2
 	// While a comment is unsaved the layer warns before the copy closes (beforeunload), keeps
 	// the comment and minimize controls in one place, and never shifts the bar when a post lands.
 	// The comment layer's core, emitted OUTSIDE <main>: one empty island slot plus the
@@ -1290,7 +1533,7 @@ func renderBookHTML(nodes map[string]Node) (string, []string, []string) {
 	// figure marks target <g id> elements, falling back to the whole figure's unit; paint goes
 	// through the CSS Custom Highlight API, so the content DOM is NEVER mutated; every comment
 	// string renders via textContent (no innerHTML anywhere in the layer); the island rewrite
-	// escapes angle brackets so stored text can never close the script tag (M5 spike finding).
+	// escapes angle brackets so stored text can never close the script tag.
 	doc.WriteString(`<script type="application/json" id="quack-comments">{"version":1,"annotations":[]}</script>
 <script>
 /* quack-annotator core */
@@ -1379,7 +1622,9 @@ function orderKey(a){if(!a.target||!(a.target.unit in unitOrder))return 1e12;
 var sb=el('aside','',undefined);sb.id='quack-sb';
 var head=el('div','qc-head',undefined);
 var title=el('span','','Comments');
-var min=el('button','','minimize');
+/* one toggle, one corner: the open-state minimize and the closed-state
+   opener share the .qc-toggle look and the upper-right spot */
+var min=el('button','qc-toggle','minimize');
 head.appendChild(title);head.appendChild(min);sb.appendChild(head);
 var nameInp=el('input','',undefined);nameInp.id='qc-name';
 nameInp.placeholder='your name (changeable)';
@@ -1388,14 +1633,25 @@ nameInp.addEventListener('input',function(){localStorage.setItem('quack-comment-
 sb.appendChild(nameInp);
 var list=el('div','qc-list',undefined);sb.appendChild(list);
 document.body.appendChild(sb);
-var toggle=el('button','','');toggle.id='quack-sb-toggle';toggle.hidden=true;
+var toggle=el('button','qc-toggle','');toggle.id='quack-sb-toggle';toggle.hidden=true;
 document.body.appendChild(toggle);
 function setOpen(open){document.body.setAttribute('data-qc',open?'open':'min');toggle.hidden=open;}
+/* opening the panel fills the details pane with the how-it-works explainer - the
+   marking gesture is not self-explanatory */
+function explain(){if(!window.bookDetail)return;
+ window.bookDetail('Comments','<ul class=meta>'+
+  '<li>Select text anywhere in the book.</li>'+
+  '<li>Click the <b>comment</b> button that appears.</li>'+
+  '<li>Write in the panel card. Post it.</li>'+
+  '<li>Double-click a figure to comment it.</li>'+
+  '<li>Comments live inside this file. <b>save</b> writes them into your copy.</li>'+
+  '</ul>');}
 min.addEventListener('click',function(){setOpen(false);});
-toggle.addEventListener('click',function(){setOpen(true);});
+toggle.addEventListener('click',function(){setOpen(true);explain();});
 function panTo(a){var t=a.target||{};
- /* paged book (i14): flip to the target's page before scrolling */
+ /* paged book: flip to the target's page before scrolling */
  var tu=document.getElementById(t.el||t.unit||'');
+ if(tu&&window.bookSlideTo&&window.bookSlideTo(tu))return;
  if(tu&&window.bookPageTo)window.bookPageTo(tu);
  if(t.el){var g=document.getElementById(t.el);
   if(g){g.scrollIntoView({behavior:'smooth',block:'center'});return;}}
@@ -1430,7 +1686,7 @@ function card(a){var c=el('div','qc-card'+(a.status==='closed'?' qc-closed':''),
   c.appendChild(row);});
  if(a.suggest)c.appendChild(el('div','qc-suggest','suggested: '+a.suggest.proposed));
  if(a.status!=='closed'){
-  /* qc-draft (field c5, req-comment-persist): unposted text survives every re-render -
+  /* qc-draft (field c5, req-comment-ux-keep.1): unposted text survives every re-render -
      drafts live in a map keyed by annotation id and restore into the rebuilt textarea */
   var inp=el('textarea','qc-inp qc-draft',undefined);inp.placeholder='write...';inp.rows=2;
   inp.value=drafts[a.id]||'';
@@ -1443,7 +1699,7 @@ function card(a){var c=el('div','qc-card'+(a.status==='closed'?' qc-closed':''),
    a.thread.push({author:author(),mark:sel.value,text:v,ts:new Date().toISOString()});
    delete drafts[a.id];QC.persist();
    /* keep the composer bar anchored: hold the sidebar scroll across the re-render so a
-      posted comment does not shift the input bar (owner review c18) */
+      posted comment does not shift the input bar */
    var st=sb?sb.scrollTop:0;render();if(sb)sb.scrollTop=st;});
   var cls=el('button','','close');
   cls.addEventListener('click',function(){a.status='closed';QC.persist();QC.repaint();render();});
@@ -1479,7 +1735,12 @@ document.addEventListener('mouseup',function(e){
  if(sb.contains(e.target)||e.target===fab)return;
  setTimeout(function(){var s=window.getSelection();
   if(s&&!s.isCollapsed&&String(s).trim()){fab.hidden=false;
-   fab.style.left=(e.pageX+8)+'px';fab.style.top=(e.pageY-34)+'px';}
+   /* a presented slide is position:fixed - the button must pin to the viewport there,
+      or a scrolled book puts it off-screen */
+   var pres=document.body.hasAttribute('data-present');
+   fab.style.position=pres?'fixed':'absolute';
+   fab.style.left=((pres?e.clientX:e.pageX)+8)+'px';
+   fab.style.top=((pres?e.clientY:e.pageY)-34)+'px';}
   else fab.hidden=true;},0);});
 fab.addEventListener('click',function(){
  var t=QC.anchorFromSelection();fab.hidden=true;if(!t)return;
@@ -1493,8 +1754,9 @@ document.addEventListener('dblclick',function(e){
  render(a.id);});
 window.quackCommentsUI={render:render,postAllDrafts:postAllDrafts};
 render();
-setOpen(QC.data.annotations.length>0);
-/* warn before the copy is closed with an unsaved comment in a composer (owner review c2) */
+var boot=QC.data.annotations.length>0;
+setOpen(boot);if(boot)explain();
+/* warn before the copy is closed with an unsaved comment in a composer */
 window.addEventListener('beforeunload',function(e){
  var dirty=false;
  try{dirty=Object.keys(drafts).some(function(k){return (drafts[k]||'').trim();});}catch(_e){}
@@ -1515,7 +1777,11 @@ function serialize(){
  var clone=document.documentElement.cloneNode(true);
  ['quack-sb','quack-fab','quack-sb-toggle'].forEach(function(id){
   var n=clone.querySelector('#'+id);if(n&&n.parentNode)n.parentNode.removeChild(n);});
- var body=clone.querySelector('body');if(body)body.removeAttribute('data-qc');
+ /* a copy saved mid-presentation must reopen as the BOOK: the present state is
+    session chrome, not content */
+ var body=clone.querySelector('body');if(body){body.removeAttribute('data-qc');body.removeAttribute('data-present');}
+ Array.prototype.forEach.call(clone.querySelectorAll('.slide.current'),function(s){s.classList.remove('current');});
+ var sp=clone.querySelector('#slide-pos');if(sp)sp.textContent='';
  var isl=clone.querySelector('#quack-comments');
  if(isl)isl.textContent=JSON.stringify(QC.data).replace(/</g,'\\u003c');
  return '<!doctype html>\n'+clone.outerHTML;}
@@ -1553,7 +1819,7 @@ function download(){
  setTimeout(function(){URL.revokeObjectURL(a.href);},2000);
  toast('downloaded: '+a.download+' (browser Downloads folder)');}
 btn.addEventListener('click',function(){
- /* save auto-posts every unposted draft first (field c5, req-comment-persist) */
+ /* save auto-posts every unposted draft first (field c5, req-comment-ux-keep.1) */
  if(window.quackCommentsUI&&window.quackCommentsUI.postAllDrafts)window.quackCommentsUI.postAllDrafts();
  if(!saveInPlace())download();});
 })();
@@ -1564,12 +1830,11 @@ btn.addEventListener('click',function(){
 	return doc.String(), findings, advisories
 }
 
-// design: go-agents-emit  implements: req-agents-emit
-// One source, two projections (DRY, the design note's 7.4 rule): the agent-guide manifest
-// (mode `agent`) renders as the book's agent chapter AND emits the repo-root AGENTS.md - the
-// units' raw markdown joined, provenance marks stripped for the entry surface. The i9 entry-chain
-// invariants keep holding by CONTENT (the manifest carries the ritual and the contract pointer,
-// never the contract body) - guarded live by selftest:contract-render over the emitted file.
+// design: go-agents-emit  implements: req-manifest-render.6
+// Projects an agent-mode manifest into entry-surface markdown: units joined, the chapter
+// lede and provenance marks stripped. The repo-root AGENTS.md is HAND-AUTHORED and never
+// written here (adr-agents-hand-authored) - the book embeds that file verbatim instead,
+// and the entry-chain invariants hold over it by content (selftest:contract-render).
 func buildAgentsMD(nodes map[string]Node) (string, bool) {
 	for _, n := range nodes {
 		if n.Type == "manifest" && n.Mode == "agent" {
@@ -1598,7 +1863,7 @@ func buildAgentsMD(nodes map[string]Node) (string, bool) {
 
 // enddesign
 
-// design: go-book-a11y  implements: req-book-a11y
+// design: go-book-a11y  implements: req-book-artifact.4
 // WCAG 2 AA over every surface the views added (the prior-art check's miss, owner-added at M2):
 // landmarks (header, labeled nav, main), a real heading hierarchy, native focusable controls only
 // (button, input, summary, a - never a click-only div), and CONTRAST COMPUTED, not eyeballed: the
@@ -1661,7 +1926,7 @@ func contrastRatio(fg, bg string) float64 {
 
 // enddesign
 
-// design: go-book-drift  implements: req-book-drift
+// design: go-book-drift  implements: req-book-trust.3
 // The committed book (spec/book.html, written at ship) must equal a fresh render - the emitter is
 // deterministic by construction (no timestamps; identity = the merkle root), so same state means
 // same bytes, and a drifted committed book is a lint finding. No committed book = disarmed
@@ -1677,7 +1942,7 @@ func bookDriftFindingAt(path string, nodes map[string]Node) []string {
 	if string(committed) == fresh {
 		return nil
 	}
-	return []string{"the committed book differs from a fresh render - regenerate it at ship (req-book-drift)"}
+	return []string{"the committed book differs from a fresh render - regenerate it at ship (req-book-trust.3)"}
 }
 
 // enddesign
@@ -1701,10 +1966,6 @@ func cmdBook(args []string) {
 		quackExit(1)
 	}
 	fmt.Println("book ->", filepath.ToSlash(out))
-	if md, ok := buildAgentsMD(LoadAll()); ok {
-		os.WriteFile(filepath.Join(ROOT, "AGENTS.md"), []byte(md), 0o644)
-		fmt.Println("AGENTS.md emitted from the agent-guide manifest")
-	}
 	if len(findings) > 0 {
 		quackExit(1)
 	}
@@ -1712,18 +1973,18 @@ func cmdBook(args []string) {
 
 // enddesign
 
-// design: go-book-figures  implements: req-book-figures
-// The derived figure set (adr-figures-derived-set), spike-proven at M5: four diagram kinds whose
+// design: go-book-figures  implements: req-book-artifact.5
+// The derived figure set (adr-figures-derived-set): four diagram kinds whose
 // layout is trivial arithmetic render as inline SVG with REAL text - context star, building-block
 // tree, timeline, stakeholder matrix - each fed from live graph data, sorted for determinism.
 // A manifest unit references one with a single `fig: <kind>` line; authored inline SVG passes
 // through mdLite as ordinary (provenance-marked) content - the generous release valve.
-// fig: model takes an optional node-id argument (i16) — the group carries it through
+// fig: model takes an optional node-id argument — the group carries it through
 var figRefRe = regexp.MustCompile(`^fig:\s*([a-z-]+(?:\s+[a-z0-9-]+)?)\s*$`)
 
-// design: go-fig-elem-ids  implements: req-comment-figure-target
-// Figure sub-elements carry stable ids (the M5 spike's P3 failure: the book had none, so
-// figure part-marking had nothing to grab). Each figure takes the next ordinal at render
+// design: go-fig-elem-ids  implements: req-comment-layer.6
+// Figure sub-elements carry stable ids - without them, figure part-marking has
+// nothing to grab. Each figure takes the next ordinal at render
 // (reset per emit - regeneration stays byte-identical); each element wraps in a <g> whose
 // id slugs its label: fig<N>-<label-slug>. The comment layer anchors to these ids.
 var figSeq int
@@ -1769,8 +2030,8 @@ func rectBorder(cx, cy, hw, hh int, dx, dy float64) (int, int) {
 	return cx + int(t*dx), cy + int(t*dy)
 }
 
-// svgContextStar draws the derived context diagram. Actors split by flank (owner ruling
-// 2026-07-09): direction `in` feeds the system and sits LEFT, direction `out` consumes
+// svgContextStar draws the derived context diagram. Actors split by flank:
+// direction `in` feeds the system and sits LEFT, direction `out` consumes
 // from it and sits RIGHT; an actor without a direction joins the left flank. Each flank
 // fans out vertically from the middle.
 func svgContextStar(center string, ins, outs []string) string {
@@ -1842,11 +2103,11 @@ func svgBlockTree(title string, blocks []string) string {
 	return b.String()
 }
 
-// design: go-onion-figure  implements: req-figure-drilldown, req-compact-renders
-// The onion figure (bs20 ruling; owner excalidraw draft 2026-07-09): a drill-down over the
+// design: go-onion-figure  implements: req-interactive-figures.2, req-compact-derived.1
+// The onion figure: a drill-down over the
 // DESIGN ELEMENTS (marked code regions). The layer map comes from go-onion-model-source. In
 // MODEL mode ring membership is STRAIGHT from the model — elements are design regions, files
-// are THEMES (owner ruling, i16); a file never earns a ring and never renders as a block. In
+// are THEMES; a file never earns a ring and never renders as a block. In
 // FALLBACK mode (spec/design-layers.md, stub projects) an element takes the layer of its FILE
 // per the pattern map — the old behavior, untouched. The intra/inter-element flow is the REAL
 // call graph derived by deriveDesignFlow (a static AST pass): consumes[A] = design ids A calls
@@ -1855,20 +2116,30 @@ func svgBlockTree(title string, blocks []string) string {
 // `inputs:` entering from the LEFT and `outputs:` leaving to the RIGHT as external boxes with
 // dashed connectors. No element cards here; clicking a ring drills into THAT layer. A layer
 // with NO flow at all (every element is off-flow infrastructure) is SKIPPED — no ring, no view
-// — and its elements sink INWARD into the next surviving layer's infrastructure pills (owner
-// c37). Level 1 is the LAYER view: a dagre LR graph (owner cytoscape ruling 2026-07-09) of the
-// layer's BLOCKS between the ports (inputs LEFT, outputs RIGHT) and the `lower levels` node
-// (drills a layer down; the kernel view has none). In model mode a BLOCK is the THEME: one
-// cluster per file carrying SEVERAL of the layer's regions, labelled `file` + `N regions`; a
-// single-region theme renders the region itself — responsibility text as the label, `in file`
-// as the subtitle (the theme is secondary info, never the unit). Region arrows aggregate to
-// theme level, deduplicated; a collapsed multiplicity shows as `×N` on the edge. Clicking a
-// cluster opens LEVEL 2: that theme's regions in THIS layer as individual blocks (label = the
-// model's responsibility text, subtitle = the region id), with the region-level arrows within
-// the theme, outgoing to peer themes, and to the lower levels. Every region block transports
-// to its trace item on tap (the conn-code-designs surface). Intra-layer `consumes` edges draw
-// as arcs; `reads`/`writes` wire the port boxes. Design elements OFF the flow entirely render
-// as `infrastructure:` pills below the graph, each linking to its trace item; model-mode
+// — and its elements sink INWARD into the next surviving layer's infrastructure pills.
+// Level 1 is the LAYER view, an onion itself:
+// a ROUND disc inside a concentric ring naming the enclosing context (the outer layer;
+// `outside` on the outermost view; a ring click goes up). INPUTS are labeled BUS BARS at the
+// top-left, each extending a horizontal RAIL across the top; OUTPUTS mirror at the bottom-right,
+// rails across the bottom ending in labeled boxes. A module taps an input via a short vertical
+// DROP from that rail; a module's output drops down to its rail. Input propagation: a global
+// input consumed deeper never renders as a node in a sublevel — it returns as that level's
+// input bar (a level with no reader passes the bars straight to the centre). The cross-layer
+// exchange is one `from <outer>` input bar and one `→ <outer>` output bar, never fat nodes.
+// Modules sit INSIDE the disc: input-side modules lean LEFT, output-side RIGHT, both (and pure
+// intra-layer ones) sit in the MIDDLE rows; the centre holds the smaller `lower levels` circle
+// (click drills; none on the kernel view). The layout is a deterministic generated SVG
+// (go-onion-busbar) — real text, byte-stable, no canvas library. In model mode a BLOCK is the
+// THEME: one cluster per file carrying SEVERAL of the layer's regions, labelled `file` +
+// `N regions`; a single-region theme renders the region itself — responsibility text as the
+// label, `in file` as the subtitle (the theme is secondary info, never the unit). Region arrows
+// aggregate to theme level, deduplicated; a collapsed multiplicity shows as `×N` on the edge.
+// Clicking a cluster opens LEVEL 2, the same onion shape one level down: the disc is the theme,
+// the ring its layer, the blocks its regions (label = the model's responsibility text, subtitle
+// = the region id), with the region-level arrows within the theme, outgoing peers as output
+// bars, and the lower-levels centre. Every region block transports to its trace item on tap
+// (the conn-code-designs surface). Design elements OFF the flow entirely render as
+// `infrastructure:` pills below the figure, each linking to its trace item; model-mode
 // AMBIENT elements always render as those pills — they sit on no ring, flow or not. EVERY view
 // (levels 0, 1, and 2) is pre-rendered static DOM with its own breadcrumbs and layer nav — the
 // script only toggles which view shows, it never creates content. Sectors (same-topic pie
@@ -1963,7 +2234,35 @@ var flowWriteSel = map[string]bool{
 //
 // The engine is one Go package (package main), so a bare identifier resolves
 // unambiguously to its package-level declaration of the same name.
-func deriveDesignFlow() (consumes map[string][]string, reads map[string]bool, writes map[string]bool) {
+//
+// design: go-lint-ast-cache  implements: req-battery-lean
+// Derived ONCE per process: the engine source cannot change within a run, yet a
+// single lint asks for the flow more than once (the conformance pass, then every
+// model figure of the book-drift render) — each ask re-ran go/parser over the
+// whole engine source. The memo holds the derived facts for the process lifetime;
+// callers treat the returned maps as read-only. In-process only — nothing lands
+// on disk, so there is no staleness risk across runs.
+var designFlowMemo *struct {
+	consumes map[string][]string
+	reads    map[string]bool
+	writes   map[string]bool
+}
+
+func deriveDesignFlow() (map[string][]string, map[string]bool, map[string]bool) {
+	if designFlowMemo == nil {
+		c, r, w := deriveDesignFlowUncached()
+		designFlowMemo = &struct {
+			consumes map[string][]string
+			reads    map[string]bool
+			writes   map[string]bool
+		}{c, r, w}
+	}
+	return designFlowMemo.consumes, designFlowMemo.reads, designFlowMemo.writes
+}
+
+// enddesign
+
+func deriveDesignFlowUncached() (consumes map[string][]string, reads map[string]bool, writes map[string]bool) {
 	consumes = map[string][]string{}
 	reads = map[string]bool{}
 	writes = map[string]bool{}
@@ -1987,6 +2286,17 @@ func deriveDesignFlow() (consumes map[string][]string, reads map[string]bool, wr
 			nl = strings.Count(n.RegionBody, "\n") + 1
 		}
 		byFile[n.Path] = append(byFile[n.Path], span{id: id, start: n.Line, end: n.Line + nl + 1})
+	}
+	// sorted span order: adjacent region spans overlap by a line and inSpan takes the
+	// FIRST match - map-walk order made the attribution (so the flow/infra split and the
+	// derived edges) flip per process (found at the i17 M5 sweep).
+	for _, spans := range byFile {
+		sort.Slice(spans, func(i, j int) bool {
+			if spans[i].start != spans[j].start {
+				return spans[i].start < spans[j].start
+			}
+			return spans[i].id < spans[j].id
+		})
 	}
 	inSpan := func(spans []span, line int) string {
 		for _, s := range spans {
@@ -2032,7 +2342,16 @@ func deriveDesignFlow() (consumes map[string][]string, reads map[string]bool, wr
 			}
 		}
 	}
-	for path, spans := range byFile {
+	// sorted file order: symOf resolves name collisions (methods share bare names across
+	// types) by last-write-wins - map-order iteration made the winner flip per process and
+	// the derived edges (so the rendered book) nondeterministic (found at the i17 M5 sweep).
+	paths := make([]string, 0, len(byFile))
+	for path := range byFile {
+		paths = append(paths, path)
+	}
+	sort.Strings(paths)
+	for _, path := range paths {
+		spans := byFile[path]
 		fset := token.NewFileSet()
 		af, err := parser.ParseFile(fset, path, nil, 0)
 		if err != nil || af == nil {
@@ -2255,7 +2574,7 @@ func renderOnion(nodes map[string]Node) string {
 		return len(consumes[id]) == 0 && !consumedBy[id] && !reads[id] && !writes[id]
 	}
 
-	// (1) SKIP no-flow layers (owner c37): a layer with at least one ON-flow element (it consumes,
+	// (1) SKIP no-flow layers: a layer with at least one ON-flow element (it consumes,
 	// is consumed, or reads/writes) SURVIVES and keeps a ring + view; a layer where every element is
 	// off-flow infrastructure gets NEITHER. Rings run outermost→innermost, so "inner" = higher index;
 	// a skipped layer's elements sink INWARD into the next surviving layer's infrastructure pills.
@@ -2326,7 +2645,7 @@ func renderOnion(nodes map[string]Node) string {
 		}
 		return s
 	}
-	// theme = the FILE a region lives in (owner ruling: files are themes, secondary info only).
+	// theme = the FILE a region lives in (files are themes, secondary info only).
 	theme := func(id string) string {
 		rel := relOf[id]
 		return rel[strings.LastIndex(rel, "/")+1:]
@@ -2345,38 +2664,6 @@ func renderOnion(nodes map[string]Node) string {
 			lb = string(r[:47]) + "…"
 		}
 		return lb
-	}
-	// graph islands: nodes carry an optional subtitle (`sub`) and drill target (`go`);
-	// edges carry an optional `×N` label when region arrows collapse onto one theme arrow.
-	type gnode struct {
-		ID    string `json:"id"`
-		Label string `json:"label"`
-		Kind  string `json:"kind"`
-		Sub   string `json:"sub,omitempty"`
-		Go    string `json:"go,omitempty"`
-	}
-	type gedge struct {
-		S     string `json:"s"`
-		T     string `json:"t"`
-		Kind  string `json:"kind"`
-		Label string `json:"label,omitempty"`
-	}
-	// mkAdd returns a deduplicating edge appender: one edge per (s,t,kind); a counted
-	// edge that collapses several region arrows shows the multiplicity.
-	mkAdd := func(edges *[]gedge) func(s, t, kind string, counted bool) {
-		at, n := map[string]int{}, map[string]int{}
-		return func(s, t, kind string, counted bool) {
-			k := s + "|" + t + "|" + kind
-			if i, ok := at[k]; ok {
-				if counted {
-					n[k]++
-					(*edges)[i].Label = "×" + itoa(n[k]+1)
-				}
-				return
-			}
-			at[k] = len(*edges)
-			*edges = append(*edges, gedge{S: s, T: t, Kind: kind})
-		}
 	}
 	var b strings.Builder
 	b.WriteString(`<div class="onion">` + "\n")
@@ -2446,14 +2733,12 @@ func renderOnion(nodes map[string]Node) string {
 		b.WriteString("</svg>\n</div>\n")
 	}
 
-	// --- level 1 (owner excalidraw draft 2026-07-09): per SURVIVING layer, a NESTED-ONION
-	// round view. One true CIRCLE fills the width minus the port margins; input port boxes sit
-	// outside LEFT, output port boxes outside RIGHT. The centre holds the smaller `lower levels`
-	// circle (click drills; none on the kernel view). Input-flow nodes sit in the LEFT half,
-	// output-path nodes in the RIGHT half, direct-throughput nodes in the MIDDLE as ONE box.
-	// Since the owner's cytoscape ruling (2026-07-09) the layer body is a dagre LR graph;
-	// the halves survive as flow DIRECTION (ports left/right, `lower levels` a node).
-	// Breadcrumbs navigate up; every view's DATA is pre-baked. ---
+	// --- level 1 (the bus-bar scheme): per SURVIVING layer,
+	// a NESTED-ONION round view — a true circle inside the enclosing-context ring, input
+	// bus bars top-left with rails across the top, output bars bottom-right, vertical
+	// drops, the `lower levels` circle at the centre (click drills; none on the kernel
+	// view). Blocks lean by flow side: input-side LEFT, output-side RIGHT, both or pure
+	// intra-layer MIDDLE. Breadcrumbs navigate up; every view is pre-baked static SVG. ---
 	for si, s := range survivors {
 		L := s.name
 		// cross-layer relations of THIS layer's flow elements, by SURVIVING position (inner = higher)
@@ -2506,16 +2791,7 @@ func renderOnion(nodes map[string]Node) string {
 			b.WriteString(`<button type="button" data-onion-go="` + viewID(si+1) + `">▼ ` + htmlEscape(innerName) + `</button>`)
 		}
 		b.WriteString(`</nav>` + "\n")
-		// graph data (owner ruling 2026-07-09, the cytoscape swap): the layer renders as a
-		// dagre LEFT→RIGHT graph — real edge routing beats the hand-laid circle at 40+ edges,
-		// and print-friendliness was explicitly traded away (the trace chapter set the
-		// precedent). Ports and the outer-layer exchange are typed NODES; `lower levels`
-		// drills down. The data bakes into a JSON island; the script instantiates the canvas
-		// over the assets the trace chapter inlines.
-		var gnodes []gnode
-		var gedges []gedge
-		addEdge := mkAdd(&gedges)
-		// The layer's BLOCKS. Model mode clusters by THEME (owner mid-i16 ruling: 50+ flat
+		// The layer's BLOCKS. Model mode clusters by THEME (50+ flat
 		// region blocks do not render): a file with several regions in this layer is ONE
 		// cluster block that drills into a level-2 view; a single-region theme renders the
 		// region itself. nodeOf maps every flow region to its level-1 block.
@@ -2525,6 +2801,13 @@ func renderOnion(nodes map[string]Node) string {
 			ids        []string
 		}
 		var themes []themeView
+		var blocks []*obusBlock
+		blockOf := map[string]*obusBlock{}
+		addBlock := func(id, label, sub string, cluster bool, drill, link, full string) {
+			bl := &obusBlock{id: id, label: label, sub: sub, cluster: cluster, drill: drill, link: link, full: full}
+			blocks = append(blocks, bl)
+			blockOf[id] = bl
+		}
 		if model != nil {
 			byTheme := map[string][]string{}
 			var order []string
@@ -2540,7 +2823,11 @@ func renderOnion(nodes map[string]Node) string {
 				ids := byTheme[f]
 				if len(ids) == 1 {
 					nodeOf[ids[0]] = ids[0]
-					gnodes = append(gnodes, gnode{ID: ids[0], Label: respLabel(ids[0]), Kind: "el", Sub: "in " + f})
+					full := ids[0]
+					if lb := model.labelOf[ids[0]]; lb != "" {
+						full = ids[0] + " — " + lb
+					}
+					addBlock(ids[0], respLabel(ids[0]), "in "+f, false, "", ids[0], full)
 					continue
 				}
 				vid := viewID(si) + "f" + itoa(len(themes))
@@ -2548,12 +2835,12 @@ func renderOnion(nodes map[string]Node) string {
 				for _, id := range ids {
 					nodeOf[id] = "th:" + f
 				}
-				gnodes = append(gnodes, gnode{ID: "th:" + f, Label: f, Kind: "th", Sub: itoa(len(ids)) + " regions", Go: vid})
+				addBlock("th:"+f, f, itoa(len(ids))+" regions", true, vid, "", f+" — "+itoa(len(ids))+" regions in "+L)
 			}
 		} else {
 			for _, id := range s.flow {
 				nodeOf[id] = id
-				gnodes = append(gnodes, gnode{ID: id, Label: shortID(id), Kind: "el"})
+				addBlock(id, shortID(id), "", false, "", id, id)
 			}
 		}
 		var readers, writers, inner []string
@@ -2568,27 +2855,7 @@ func renderOnion(nodes map[string]Node) string {
 				inner = append(inner, id)
 			}
 		}
-		if len(readers) > 0 || !isKernel {
-			for _, in := range inputs {
-				gnodes = append(gnodes, gnode{ID: "in:" + in, Label: in, Kind: "in"})
-				if len(readers) == 0 {
-					addEdge("in:"+in, "lower:", "in", false)
-					continue
-				}
-				for _, r := range readers {
-					addEdge("in:"+in, nodeOf[r], "in", false)
-				}
-			}
-		}
-		if len(writers) > 0 {
-			for _, out := range outputs {
-				gnodes = append(gnodes, gnode{ID: "out:" + out, Label: out, Kind: "out"})
-				for _, w := range writers {
-					addEdge(nodeOf[w], "out:"+out, "out", false)
-				}
-			}
-		}
-		// the outer layer as explicit exchange nodes
+		// the outer-layer exchange
 		hasXin, hasXout := false, false
 		for _, id := range s.flow {
 			if consumesOuter[id] {
@@ -2598,36 +2865,67 @@ func renderOnion(nodes map[string]Node) string {
 				hasXout = true
 			}
 		}
+		// bus bars (the input-propagation rule): what comes from outside = input
+		// bars, what leaves = output bars — never nodes inside the view. A level with no
+		// reader passes the global bars straight to the centre (they are consumed deeper);
+		// the outer-layer exchange is one bar per direction.
+		var inBars, outBars []string
+		var centreIns []int
+		if len(readers) > 0 || !isKernel {
+			for _, in := range inputs {
+				k := len(inBars)
+				inBars = append(inBars, in)
+				if len(readers) == 0 {
+					centreIns = append(centreIns, k)
+					continue
+				}
+				for _, r := range readers {
+					blockOf[nodeOf[r]].tapIn(k)
+				}
+			}
+		}
 		if hasXin {
-			gnodes = append(gnodes, gnode{ID: "xin:", Label: "from " + outerName, Kind: "xin"})
+			k := len(inBars)
+			inBars = append(inBars, "from "+outerName)
 			for _, id := range s.flow {
 				if consumesOuter[id] {
-					addEdge("xin:", nodeOf[id], "in", false)
+					blockOf[nodeOf[id]].tapIn(k)
+				}
+			}
+		}
+		if len(writers) > 0 {
+			for _, out := range outputs {
+				j := len(outBars)
+				outBars = append(outBars, out)
+				for _, w := range writers {
+					blockOf[nodeOf[w]].tapOut(j)
 				}
 			}
 		}
 		if hasXout {
-			gnodes = append(gnodes, gnode{ID: "xout:", Label: "→ " + outerName, Kind: "xout"})
+			j := len(outBars)
+			outBars = append(outBars, "→ "+outerName)
 			for _, id := range s.flow {
 				if consumedByOuter[id] {
-					addEdge(nodeOf[id], "xout:", "out", false)
+					blockOf[nodeOf[id]].tapOut(j)
 				}
 			}
 		}
 		if !isKernel {
-			gnodes = append(gnodes, gnode{ID: "lower:", Label: "lower levels · " + innerName, Kind: "lower"})
 			for _, id := range inner {
-				// out-ish elements DRAW ON the lowers; the rest FEED them (left-to-right flow)
+				// out-ish elements DRAW ON the lowers; the rest FEED them
 				if writes[id] || consumedByOuter[id] {
-					addEdge("lower:", nodeOf[id], "lower", false)
+					blockOf[nodeOf[id]].fromLower = true
 				} else {
-					addEdge(nodeOf[id], "lower:", "lower", false)
+					blockOf[nodeOf[id]].toLower = true
 				}
 			}
 		}
 		// intra-layer calls, aggregated to the BLOCK level: a cluster's internal region
 		// arrows vanish here (level 2 shows them); parallel region arrows between two
 		// blocks collapse onto one counted edge.
+		ecount := map[[2]string]int{}
+		var eorder [][2]string
 		for _, a := range s.flow {
 			for _, bb := range consumes[a] {
 				if layerOf[bb] != L {
@@ -2640,14 +2938,28 @@ func renderOnion(nodes map[string]Node) string {
 				if nodeOf[a] == tn {
 					continue
 				}
-				addEdge(nodeOf[a], tn, "uses", true)
+				k := [2]string{nodeOf[a], tn}
+				if ecount[k] == 0 {
+					eorder = append(eorder, k)
+				}
+				ecount[k]++
 			}
 		}
-		gj, _ := json.Marshal(map[string]interface{}{"nodes": gnodes, "edges": gedges})
-		b.WriteString(`<div class="onion-flow">`)
-		b.WriteString(`<script type="application/json" class="og-data">` + string(gj) + `</script>`)
-		b.WriteString(`<div class="ograph" data-oglower="` + innerView + `" aria-label="` + htmlEscape(L) + ` layer"><p class="meta og-fallback">the layer graph renders over the inlined graph library (it ships with the trace chapter)</p></div>`)
-		b.WriteString(`</div>` + "\n")
+		var edges []obusEdge
+		for _, k := range eorder {
+			lb := ""
+			if ecount[k] > 1 {
+				lb = "×" + itoa(ecount[k])
+			}
+			edges = append(edges, obusEdge{s: k[0], t: k[1], label: lb})
+		}
+		ringLabel, ringGo := "outside", base+"0"
+		if si > 0 {
+			ringLabel, ringGo = outerName, viewID(si-1)
+		}
+		b.WriteString(`<div class="onion-flow">` +
+			onionBusSVG(L+" layer", L, ringLabel, ringGo, viewID(si), inBars, outBars, centreIns, blocks, edges, innerName, innerView) +
+			`</div>` + "\n")
 		// off-flow design elements (own + pushed down from skipped outer layers, plus
 		// model-mode ambient on the innermost view): infrastructure pills
 		if len(s.infra) > 0 {
@@ -2664,28 +2976,41 @@ func renderOnion(nodes map[string]Node) string {
 		}
 		b.WriteString("</div>\n")
 
-		// --- level 2 (owner mid-i16 ruling): a theme cluster opens into ITS regions in this
+		// --- level 2: a theme cluster opens into ITS regions in this
 		// layer — one pre-rendered view per cluster, the script only toggles (the dom-static
-		// law). Blocks = the theme's regions (responsibility text, region id as subtitle);
-		// arrows = the region-level calls within the theme, outgoing to peer themes
-		// (aggregated per file), and to the lower levels. ---
+		// law). The same onion shape one level down: the disc is the theme, the ring its
+		// layer. Blocks = the theme's regions (responsibility text, region id as subtitle);
+		// arrows = the region-level calls within the theme; outgoing peer themes are output
+		// bars; calls on deeper layers wire the lower-levels centre. ---
 		for _, th := range themes {
 			inTheme := map[string]bool{}
 			for _, id := range th.ids {
 				inTheme[id] = true
 			}
-			var tns []gnode
-			var tes []gedge
-			add2 := mkAdd(&tes)
+			var tblocks []*obusBlock
+			tBlockOf := map[string]*obusBlock{}
 			for _, id := range th.ids {
-				tns = append(tns, gnode{ID: id, Label: respLabel(id), Kind: "el", Sub: shortID(id)})
+				full := id
+				if lb := model.labelOf[id]; lb != "" {
+					full = id + " — " + lb
+				}
+				bl := &obusBlock{id: id, label: respLabel(id), sub: shortID(id), link: id, full: full}
+				tblocks = append(tblocks, bl)
+				tBlockOf[id] = bl
 			}
-			peers := map[string]bool{}
+			var peerOrder []string
+			peerSeen := map[string]bool{}
+			ec2 := map[[2]string]int{}
+			var eo2 [][2]string
 			lowerUsed := false
 			for _, a := range th.ids {
 				for _, bb := range consumes[a] {
 					if inTheme[bb] {
-						add2(a, bb, "uses", true)
+						k := [2]string{a, bb}
+						if ec2[k] == 0 {
+							eo2 = append(eo2, k)
+						}
+						ec2[k]++
 						continue
 					}
 					if layerOf[bb] == L {
@@ -2693,30 +3018,53 @@ func renderOnion(nodes map[string]Node) string {
 							continue // pills carry it, the flow does not
 						}
 						pf := theme(bb)
-						if !peers[pf] {
-							peers[pf] = true
-							tns = append(tns, gnode{ID: "peer:" + pf, Label: pf, Kind: "peer"})
+						if !peerSeen[pf] {
+							peerSeen[pf] = true
+							peerOrder = append(peerOrder, pf)
 						}
-						add2(a, "peer:"+pf, "uses", true)
 						continue
 					}
 					if p, ok := svPos[layerOf[bb]]; ok && p > si {
 						lowerUsed = true
-						add2(a, "lower:", "lower", false)
+						tBlockOf[a].toLower = true
 					}
 				}
 			}
+			sortStrings(peerOrder)
+			peerIdx := map[string]int{}
+			outBars2 := make([]string, 0, len(peerOrder))
+			for i, pf := range peerOrder {
+				peerIdx[pf] = i
+				outBars2 = append(outBars2, "→ "+pf)
+			}
+			for _, a := range th.ids {
+				for _, bb := range consumes[a] {
+					if inTheme[bb] || layerOf[bb] != L {
+						continue
+					}
+					if _, ok := nodeOf[bb]; ok {
+						tBlockOf[a].tapOut(peerIdx[theme(bb)])
+					}
+				}
+			}
+			var edges2 []obusEdge
+			for _, k := range eo2 {
+				lb := ""
+				if ec2[k] > 1 {
+					lb = "×" + itoa(ec2[k])
+				}
+				edges2 = append(edges2, obusEdge{s: k[0], t: k[1], label: lb})
+			}
+			lowerSub2, lowerGo2 := "", ""
 			if lowerUsed {
-				tns = append(tns, gnode{ID: "lower:", Label: "lower levels · " + innerName, Kind: "lower"})
+				lowerSub2, lowerGo2 = innerName, innerView
 			}
 			b.WriteString(`<div class="oview" id="` + th.view + `" hidden>` + "\n")
 			b.WriteString(`<nav class="crumbs"><button type="button" data-onion-go="` + base + `0">overview</button> ▸ <button type="button" data-onion-go="` + viewID(si) + `">` + htmlEscape(L) + `</button> ▸ <span>` + htmlEscape(th.file) + `</span></nav>` + "\n")
 			b.WriteString(`<nav class="crumbs"><button type="button" data-onion-go="` + viewID(si) + `">▲ ` + htmlEscape(L) + `</button></nav>` + "\n")
-			gj2, _ := json.Marshal(map[string]interface{}{"nodes": tns, "edges": tes})
-			b.WriteString(`<div class="onion-flow">`)
-			b.WriteString(`<script type="application/json" class="og-data">` + string(gj2) + `</script>`)
-			b.WriteString(`<div class="ograph" data-oglower="` + innerView + `" aria-label="` + htmlEscape(th.file) + ` regions in ` + htmlEscape(L) + `"><p class="meta og-fallback">the layer graph renders over the inlined graph library (it ships with the trace chapter)</p></div>`)
-			b.WriteString(`</div>` + "\n")
+			b.WriteString(`<div class="onion-flow">` +
+				onionBusSVG(th.file+" regions in "+L, th.file, L, viewID(si), th.view, nil, outBars2, nil, tblocks, edges2, lowerSub2, lowerGo2) +
+				`</div>` + "\n")
 			b.WriteString("</div>\n")
 		}
 	}
@@ -2726,13 +3074,443 @@ func renderOnion(nodes map[string]Node) string {
 
 // enddesign
 
+// design: go-onion-busbar  implements: req-interactive-figures.2
+// The drill-down level SVG (the bus-bar scheme): a
+// deterministic generated layout. The bus-bar scheme is regular enough that a layout
+// solver adds nothing, and generated SVG keeps the book byte-stable with real,
+// machine-readable text (the canvas library needed live scripts and rendered nothing
+// on paper). Geometry: input bars stack top-left, each extending its rail to the right
+// edge; output rails run from the left edge into their bottom-right boxes; the level is
+// a ROUND disc inside the enclosing-context ring (a ring click goes up); the `lower
+// levels` circle sits at the centre. Blocks pack by flow side — input-side LEFT,
+// output-side RIGHT, both or pure intra-layer MIDDLE (two-sided rows first). Columns
+// stagger so every block keeps a clear vertical lane: input drops land on the top-right
+// notch, output drops leave the bottom-left notch. Connector lines draw under the
+// boxes; arrowheads sit on the borders. The disc radius derives from the packed content
+// box, never hand-tuned. Each block group carries a stable id (the comment layer
+// anchors to it), a <title> with the full untruncated text, and either the drill
+// target (clusters) or the trace link (regions).
+
+type obusBlock struct {
+	id, label, sub, full string
+	cluster              bool
+	drill, link          string
+	ins, outs            []int
+	toLower, fromLower   bool
+	x, y, w, h           int
+	lines                []string
+}
+
+func (bl *obusBlock) tapIn(k int) {
+	for _, x := range bl.ins {
+		if x == k {
+			return
+		}
+	}
+	bl.ins = append(bl.ins, k)
+}
+
+func (bl *obusBlock) tapOut(j int) {
+	for _, x := range bl.outs {
+		if x == j {
+			return
+		}
+	}
+	bl.outs = append(bl.outs, j)
+}
+
+type obusEdge struct{ s, t, label string }
+
+// owrap greedily wraps s into at most maxLines lines of width runes; the last line
+// truncates with an ellipsis when the text does not fit.
+func owrap(s string, width, maxLines int) []string {
+	var lines []string
+	cur := ""
+	for _, w := range strings.Fields(s) {
+		cand := w
+		if cur != "" {
+			cand = cur + " " + w
+		}
+		if len([]rune(cand)) <= width {
+			cur = cand
+			continue
+		}
+		if cur != "" {
+			lines = append(lines, cur)
+		}
+		cur = w
+		for len([]rune(cur)) > width {
+			r := []rune(cur)
+			lines = append(lines, string(r[:width]))
+			cur = string(r[width:])
+		}
+	}
+	if cur != "" {
+		lines = append(lines, cur)
+	}
+	if len(lines) == 0 {
+		lines = []string{""}
+	}
+	if len(lines) > maxLines {
+		r := []rune(lines[maxLines-1])
+		if len(r) > width-1 {
+			r = r[:width-1]
+		}
+		lines = append(lines[:maxLines-1], string(r)+"…")
+	}
+	return lines
+}
+
+func onionBusSVG(aria, discLabel, ringLabel, ringGo, vid string, inBars, outBars []string, centreIns []int, blocks []*obusBlock, edges []obusEdge, lowerSub, lowerGo string) string {
+	const (
+		pad    = 10
+		barH   = 24
+		barGap = 8
+		blockW = 160
+		vGap   = 14
+		hGap   = 18
+		rowGap = 14
+		gapZ   = 40
+		ringW  = 30
+	)
+	centreR := 0
+	if lowerGo != "" {
+		centreR = 46
+	}
+	barW := 80
+	for _, s := range append(append([]string{}, inBars...), outBars...) {
+		if w := 20 + 6*len([]rune(s)); w > barW {
+			barW = w
+		}
+	}
+	if barW > 170 {
+		barW = 170
+	}
+	for _, bl := range blocks {
+		bl.lines = owrap(bl.label, 26, 2)
+		n := len(bl.lines)
+		if bl.sub != "" {
+			n++
+		}
+		bl.w, bl.h = blockW, 16+11*n
+	}
+	// zones by flow side
+	var left, mid, right []*obusBlock
+	for _, bl := range blocks {
+		in, out := len(bl.ins) > 0, len(bl.outs) > 0
+		switch {
+		case in && !out:
+			left = append(left, bl)
+		case out && !in:
+			right = append(right, bl)
+		default:
+			mid = append(mid, bl)
+		}
+	}
+	byID := func(v []*obusBlock) {
+		sort.Slice(v, func(i, j int) bool { return v[i].id < v[j].id })
+	}
+	byID(left)
+	byID(right)
+	// middle: two-sided blocks first (they tap the rails from the top rows)
+	sort.Slice(mid, func(i, j int) bool {
+		bi, bj := len(mid[i].ins) > 0, len(mid[j].ins) > 0
+		if bi != bj {
+			return bi
+		}
+		return mid[i].id < mid[j].id
+	})
+	stagger := 26
+	if n := 16 + 7*len(inBars); n > stagger {
+		stagger = n
+	}
+	if n := 16 + 7*len(outBars); n > stagger {
+		stagger = n
+	}
+	colSize := func(v []*obusBlock) (w, h int) {
+		if len(v) == 0 {
+			return 0, 0
+		}
+		w = blockW + (len(v)-1)*stagger
+		for _, bl := range v {
+			h += bl.h
+		}
+		h += vGap * (len(v) - 1)
+		return
+	}
+	leftW, leftH := colSize(left)
+	rightW, rightH := colSize(right)
+	var rows [][]*obusBlock
+	for i := 0; i < len(mid); i += 3 {
+		j := i + 3
+		if j > len(mid) {
+			j = len(mid)
+		}
+		rows = append(rows, mid[i:j])
+	}
+	midRowsH, midW := 0, 0
+	for _, r := range rows {
+		if rw := len(r)*blockW + (len(r)-1)*hGap; rw > midW {
+			midW = rw
+		}
+		rh := 0
+		for _, bl := range r {
+			if bl.h > rh {
+				rh = bl.h
+			}
+		}
+		midRowsH += rh + rowGap
+	}
+	if midRowsH > 0 {
+		midRowsH -= rowGap
+	}
+	if 2*centreR > midW {
+		midW = 2 * centreR
+	}
+	contentW := 0
+	for _, w := range []int{leftW, midW, rightW} {
+		if w == 0 {
+			continue
+		}
+		if contentW > 0 {
+			contentW += gapZ
+		}
+		contentW += w
+	}
+	if contentW == 0 {
+		contentW = 120
+	}
+	midNeedH := midRowsH
+	if centreR > 0 {
+		midNeedH = 2 * centreR
+		if midRowsH > 0 {
+			midNeedH = 2 * (centreR + 12 + midRowsH)
+		}
+	}
+	contentH := leftH
+	if rightH > contentH {
+		contentH = rightH
+	}
+	if midNeedH > contentH {
+		contentH = midNeedH
+	}
+	if contentH == 0 {
+		contentH = 60
+	}
+	R := int(math.Hypot(float64(contentW), float64(contentH))/2) + 16
+	if R < 150 {
+		R = 150
+	}
+	outerR := R + ringW
+	topZone := pad
+	if len(inBars) > 0 {
+		topZone = pad + len(inBars)*(barH+barGap) + 6
+	}
+	W := 760
+	if w := 2*outerR + 2*pad; w > W {
+		W = w
+	}
+	if len(inBars) > 0 || len(outBars) > 0 {
+		if w := 2*R + 2*(barW+pad+16); w > W {
+			W = w
+		}
+	}
+	cx := W / 2
+	cy := topZone + 8 + outerR
+	discBottom := cy + outerR
+	outStart := discBottom + 10
+	H := discBottom + pad
+	if len(outBars) > 0 {
+		H = outStart + len(outBars)*(barH+barGap) + 2
+	}
+	inRailY := func(k int) int { return pad + k*(barH+barGap) + barH/2 }
+	outRailY := func(j int) int { return outStart + j*(barH+barGap) + barH/2 }
+	// zone origins and block positions
+	zx := cx - contentW/2
+	leftX := zx
+	if leftW > 0 {
+		zx += leftW + gapZ
+	}
+	midX := zx
+	if midW > 0 {
+		zx += midW + gapZ
+	}
+	rightX := zx
+	midCx := midX + midW/2
+	if midW == 0 {
+		midCx = cx
+	}
+	y := cy - leftH/2
+	for i, bl := range left {
+		bl.x, bl.y = leftX+i*stagger, y
+		y += bl.h + vGap
+	}
+	y = cy - rightH/2
+	for i, bl := range right {
+		bl.x, bl.y = rightX+i*stagger, y
+		y += bl.h + vGap
+	}
+	rowsTop := cy - midRowsH/2
+	if centreR > 0 {
+		rowsTop = cy - centreR - 12 - midRowsH
+	}
+	y = rowsTop
+	for _, r := range rows {
+		rw := len(r)*blockW + (len(r)-1)*hGap
+		x := midCx - rw/2
+		rh := 0
+		for _, bl := range r {
+			bl.x, bl.y = x, y
+			x += blockW + hGap
+			if bl.h > rh {
+				rh = bl.h
+			}
+		}
+		y += rh + rowGap
+	}
+	bm := map[string]*obusBlock{}
+	for _, bl := range blocks {
+		bm[bl.id] = bl
+	}
+	slug := func(s string) string {
+		t := strings.Trim(figSlugRe.ReplaceAllString(strings.ToLower(s), "-"), "-")
+		if len(t) > 24 {
+			t = t[:24]
+		}
+		return t
+	}
+	var sb strings.Builder
+	sb.WriteString(fmt.Sprintf(`<svg viewBox="0 0 %d %d" font-family="system-ui" font-size="10" role="img" aria-label="%s">`, W, H, htmlEscape(aria)))
+	mark := func(id, color string) string {
+		return `<marker id="` + id + `" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0L10,5L0,10z" fill="` + color + `"/></marker>`
+	}
+	sb.WriteString(`<defs>` + mark(vid+"mi", "#2f8f4e") + mark(vid+"mo", "#b5651d") + mark(vid+"mu", "#9db6e0") + `</defs>`)
+	// the onion: enclosing-context ring (click goes up), then this level's disc
+	sb.WriteString(`<g data-onion-go="` + ringGo + `">` +
+		fmt.Sprintf(`<circle cx="%d" cy="%d" r="%d" fill="#dde8f5" stroke="#4a6fa5"/>`, cx, cy, outerR) + `</g>`)
+	sb.WriteString(fmt.Sprintf(`<text x="%d" y="%d" text-anchor="middle" fill="#555" pointer-events="none">%s</text>`, cx, cy-outerR+19, htmlEscape(ringLabel)))
+	sb.WriteString(fmt.Sprintf(`<circle cx="%d" cy="%d" r="%d" fill="#f4f8fd" stroke="#4a6fa5"/>`, cx, cy, R))
+	sb.WriteString(fmt.Sprintf(`<text x="%d" y="%d" text-anchor="middle" fill="#555" pointer-events="none">%s</text>`, cx, cy-R+12, htmlEscape(discLabel)))
+	// input bars top-left, rails across the top
+	for k, lb := range inBars {
+		by := pad + k*(barH+barGap)
+		ry := inRailY(k)
+		sb.WriteString(fmt.Sprintf(`<line x1="%d" y1="%d" x2="%d" y2="%d" stroke="#2f8f4e" stroke-width="1.3" opacity="0.75"/>`, pad+barW, ry, W-pad, ry))
+		sb.WriteString(fmt.Sprintf(`<rect x="%d" y="%d" width="%d" height="%d" rx="4" fill="#eef7f0" stroke="#2f8f4e"/><text x="%d" y="%d" text-anchor="middle">%s</text>`,
+			pad, by, barW, barH, pad+barW/2, by+barH/2+4, htmlEscape(lb)))
+	}
+	// output rails across the bottom, bars bottom-right
+	for j, lb := range outBars {
+		by := outStart + j*(barH+barGap)
+		ry := outRailY(j)
+		sb.WriteString(fmt.Sprintf(`<line x1="%d" y1="%d" x2="%d" y2="%d" stroke="#b5651d" stroke-width="1.3" opacity="0.75"/>`, pad, ry, W-pad-barW, ry))
+		sb.WriteString(fmt.Sprintf(`<rect x="%d" y="%d" width="%d" height="%d" rx="4" fill="#fbf2ea" stroke="#b5651d"/><text x="%d" y="%d" text-anchor="middle">%s</text>`,
+			W-pad-barW, by, barW, barH, W-pad-barW/2, by+barH/2+4, htmlEscape(lb)))
+	}
+	// vertical drops: rail -> block (top-right notch), block -> rail (bottom-left notch)
+	for _, bl := range blocks {
+		for _, k := range bl.ins {
+			x := bl.x + bl.w - 10 - k*7
+			sb.WriteString(fmt.Sprintf(`<line x1="%d" y1="%d" x2="%d" y2="%d" stroke="#2f8f4e" stroke-width="1.2" marker-end="url(#%smi)"/>`, x, inRailY(k), x, bl.y, vid))
+		}
+		for _, j := range bl.outs {
+			x := bl.x + 10 + j*7
+			sb.WriteString(fmt.Sprintf(`<line x1="%d" y1="%d" x2="%d" y2="%d" stroke="#b5651d" stroke-width="1.2" marker-end="url(#%smo)"/>`, x, bl.y+bl.h, x, outRailY(j), vid))
+		}
+	}
+	// pass-through: bars consumed only deeper drop straight to the centre
+	for i, k := range centreIns {
+		x := midCx - (len(centreIns)-1)*5 + i*10
+		sb.WriteString(fmt.Sprintf(`<line x1="%d" y1="%d" x2="%d" y2="%d" stroke="#2f8f4e" stroke-width="1.2" marker-end="url(#%smi)"/>`, x, inRailY(k), x, cy-centreR, vid))
+	}
+	// lower-levels exchange, dashed to and from the centre circle
+	if centreR > 0 {
+		for _, bl := range blocks {
+			bcx, bcy := bl.x+bl.w/2, bl.y+bl.h/2
+			dxf, dyf := float64(midCx-bcx), float64(cy-bcy)
+			n := math.Hypot(dxf, dyf)
+			if n < 1 {
+				continue
+			}
+			bx, by := rectBorder(bcx, bcy, bl.w/2, bl.h/2, dxf, dyf)
+			cxp := midCx - int(dxf/n*float64(centreR))
+			cyp := cy - int(dyf/n*float64(centreR))
+			if bl.toLower {
+				sb.WriteString(fmt.Sprintf(`<line x1="%d" y1="%d" x2="%d" y2="%d" stroke="#9db6e0" stroke-width="1.2" stroke-dasharray="4 3" marker-end="url(#%smu)"/>`, bx, by, cxp, cyp, vid))
+			}
+			if bl.fromLower {
+				sb.WriteString(fmt.Sprintf(`<line x1="%d" y1="%d" x2="%d" y2="%d" stroke="#9db6e0" stroke-width="1.2" stroke-dasharray="4 3" marker-end="url(#%smu)"/>`, cxp, cyp, bx, by, vid))
+			}
+		}
+	}
+	// module-to-module flow inside the disc
+	for _, e := range edges {
+		s, t := bm[e.s], bm[e.t]
+		if s == nil || t == nil {
+			continue
+		}
+		scx, scy := s.x+s.w/2, s.y+s.h/2
+		tcx, tcy := t.x+t.w/2, t.y+t.h/2
+		dxf, dyf := float64(tcx-scx), float64(tcy-scy)
+		if dxf == 0 && dyf == 0 {
+			continue
+		}
+		x1, y1 := rectBorder(scx, scy, s.w/2, s.h/2, dxf, dyf)
+		x2, y2 := rectBorder(tcx, tcy, t.w/2, t.h/2, -dxf, -dyf)
+		sb.WriteString(fmt.Sprintf(`<line x1="%d" y1="%d" x2="%d" y2="%d" stroke="#9db6e0" stroke-width="1.4" marker-end="url(#%smu)"/>`, x1, y1, x2, y2, vid))
+		if e.label != "" {
+			sb.WriteString(fmt.Sprintf(`<text x="%d" y="%d" text-anchor="middle" font-size="9" fill="#5b7fa6" paint-order="stroke" stroke="#fff" stroke-width="3">%s</text>`,
+				(x1+x2)/2, (y1+y2)/2-3, htmlEscape(e.label)))
+		}
+	}
+	if centreR > 0 {
+		sb.WriteString(`<g data-onion-go="` + lowerGo + `">` +
+			fmt.Sprintf(`<circle cx="%d" cy="%d" r="%d" fill="#dce9f8" stroke="#4a6fa5"/>`, midCx, cy, centreR) +
+			fmt.Sprintf(`<text x="%d" y="%d" text-anchor="middle" font-weight="bold">lower levels</text>`, midCx, cy-1) +
+			fmt.Sprintf(`<text x="%d" y="%d" text-anchor="middle" font-size="9" fill="#555">%s</text>`, midCx, cy+11, htmlEscape(lowerSub)) + `</g>`)
+	}
+	for _, bl := range blocks {
+		attr := ""
+		if bl.drill != "" {
+			attr = ` data-onion-go="` + bl.drill + `"`
+		} else if bl.link != "" {
+			attr = ` data-node-link="` + htmlEscape(bl.link) + `"`
+		}
+		sb.WriteString(`<g id="` + vid + `-e-` + slug(bl.id) + `"` + attr + `>`)
+		sb.WriteString(`<title>` + htmlEscape(bl.full) + `</title>`)
+		if bl.cluster {
+			sb.WriteString(fmt.Sprintf(`<rect x="%d" y="%d" width="%d" height="%d" rx="6" fill="#eef3fa" stroke="#4a6fa5"/>`, bl.x, bl.y, bl.w, bl.h))
+			sb.WriteString(fmt.Sprintf(`<rect x="%d" y="%d" width="%d" height="%d" rx="4" fill="none" stroke="#4a6fa5"/>`, bl.x+3, bl.y+3, bl.w-6, bl.h-6))
+		} else {
+			sb.WriteString(fmt.Sprintf(`<rect x="%d" y="%d" width="%d" height="%d" rx="6" fill="#fff" stroke="#4a6fa5"/>`, bl.x, bl.y, bl.w, bl.h))
+		}
+		bold := ""
+		if bl.cluster {
+			bold = ` font-weight="bold"`
+		}
+		ty := bl.y + 14
+		for _, ln := range bl.lines {
+			sb.WriteString(fmt.Sprintf(`<text x="%d" y="%d" text-anchor="middle"%s>%s</text>`, bl.x+bl.w/2, ty, bold, htmlEscape(ln)))
+			ty += 11
+		}
+		if bl.sub != "" {
+			sb.WriteString(fmt.Sprintf(`<text x="%d" y="%d" text-anchor="middle" font-size="9" fill="#777">%s</text>`, bl.x+bl.w/2, ty, htmlEscape(bl.sub)))
+		}
+		sb.WriteString(`</g>`)
+	}
+	sb.WriteString(`</svg>`)
+	return sb.String()
+}
+
+// enddesign
+
 // design: go-onion-model-source  implements: req-models-in-book
 // The onion's layer map derives from the engine-layers MODEL node
-// (spec/models/model-engine-layers.md) — the authored truth since i16;
+// (spec/models/model-engine-layers.md) — the authored truth;
 // spec/design-layers.md stays as the stub-project fallback. Rings = the model's
 // REAL layers in declared order (innermost first; bands and ambient are never
 // rings). The BLOCK unit is the model ELEMENT — a design region; files never
-// rank and never convert to patterns (owner ruling: elements are design
+// rank and never convert to patterns (elements are design
 // regions, files are themes). Allocation conventions:
 //   - a band's ("outer--inner") elements merge into the INNER of its two named
 //     rings — the transform feeds it
@@ -2811,14 +3589,15 @@ func onionLayerSource() (layers []onionLayer, excludes, inputs, outputs, infra [
 
 // enddesign
 
-// design: go-trace-graph  implements: req-system-overview, req-compact-renders
-// The trace chapter's per-need graph (bs13 ruling): it REUSES the report's per-need grouping
+// design: go-trace-graph  implements: req-system-overview, req-compact-derived.1
+// The trace chapter's per-need graph: it REUSES the report's per-need grouping
 // (graphTabs/subtree/buildTab) - the report bakes those tabs into a cytoscape canvas, which the
 // book cannot run under its zero-dependency CSP, so the SAME tab data renders here as a static
 // SVG per need. One page per need (a tab bar toggles which need's graph shows); ALL nodes show by
-// default (owner override of the report's collapse); each node is clickable and transports to its
-// table row (data-node-link, shared handler); each node carries a [ch N] badge naming the chapter
-// its item's table renders in, so a reader always knows where to read the detail.
+// default (overriding the report's collapse); each node is clickable and opens the details
+// pane (data-node-link, shared handler; the pane's link transports to the table row); each node
+// carries a [ch N] badge naming the chapter its item's table renders in, so a reader always
+// knows where to read the detail.
 
 // chapterNumbers maps each reader chapter's manifest id to its 1-based render number.
 func chapterNumbers(nodes map[string]Node) map[string]int {
@@ -2840,8 +3619,8 @@ func chapterNumbers(nodes map[string]Node) map[string]int {
 	return out
 }
 
-// typeChapterID names the chapter whose tables render each trace type (bs20 layout: decisions
-// moved to the project chapter).
+// typeChapterID names the chapter whose tables render each trace type (decisions
+// render in the project chapter).
 var typeChapterID = map[string]string{
 	"need": "man-ch3-design-input", "usecase": "man-ch3-design-input",
 	"requirement": "man-ch3-design-input", "design": "man-ch4-design-output",
@@ -2850,11 +3629,12 @@ var typeChapterID = map[string]string{
 
 func renderTraceGraph(nodes map[string]Node) string {
 	sm := StatusMap(nodes)
-	// REUSE the report trace graph verbatim (design go-trace-graph, bs13 ruling): the SAME per-need
+	// REUSE the report trace graph verbatim (design go-trace-graph): the SAME per-need
 	// tabs, cytoscape+dagre layout, styles, legend toggles, and filter as the report - only the node
-	// tap differs. The report opens its detail panel; here QUACK_NODE_TAP transports to the item table
-	// row in the chapter that owns it. The three drawing libraries inline (owner ruling 2026-07-08:
-	// CDN caching is per-site since ~2020 and unreliable for a file:// book, so inline is the only way
+	// tap differs. The report opens its detail panel; here QUACK_NODE_TAP opens the details pane
+	// whose link transports to the item table
+	// row in the chapter that owns it. The three drawing libraries inline (CDN
+	// caching is per-site since ~2020 and unreliable for a file:// book, so inline is the only way
 	// to KEEP the graph working offline after the book is received - the book stays fully self-contained,
 	// its "no external requests" property intact).
 	data := map[string]interface{}{
@@ -2869,7 +3649,7 @@ func renderTraceGraph(nodes map[string]Node) string {
 		}
 		return "?"
 	}
-	// the book legend defaults EVERY type on (owner c25: render all by default, incl design and adr) -
+	// the book legend defaults EVERY type on (render all by default, incl design and adr) -
 	// the report's own default (design/adr off) does not carry into the book.
 	bookLegend := `<div class=legend>` +
 		`<label class=lg><input type=checkbox class=tytog data-type=need checked><i class='sw need'></i>need</label>` +
@@ -2880,30 +3660,26 @@ func renderTraceGraph(nodes map[string]Node) string {
 		`<label class=lg><input type=checkbox class=tytog data-type=adr checked><i class='sw adr'></i>ADR</label></div>`
 	var b strings.Builder
 	b.WriteString(`<div class="tgraph">`)
-	// chapter marking lives OUTSIDE the 1:1 graph (owner c27: render it as a list): a node colour is
+	// chapter marking lives OUTSIDE the 1:1 graph (rendered as a list): a node colour is
 	// its type; this says which chapter each type's table sits in, and a click transports there.
 	b.WriteString(`<p class="meta">Click any node to open its row in the chapter that owns it:</p><ul class="meta tg-chmap">` +
 		`<li>needs, use-cases, and requirements — chapter ` + chcap("man-ch3-design-input") + `</li>` +
 		`<li>designs — chapter ` + chcap("man-ch4-design-output") + `</li>` +
 		`<li>tests — chapter ` + chcap("man-ch5-verification-validation") + `</li>` +
 		`<li>decisions — chapter ` + chcap("man-ch6-project") + `</li></ul>`)
+	// go-render-folds: the reader hint for the two render folds (fan + age); the folds
+	// themselves bake into the tab data in graphTabs and toggle in the shared reportJS.
+	b.WriteString(`<p class="meta">Dashed boxes are folds. A fold hides a regular fan, or an iteration older than the last five. Click a box to expand it. Any filter shows the full graph.</p>`)
 	b.WriteString(`<div id="tabbar" class="tabbar"></div>`)
 	b.WriteString(`<div class="legendrow">` + bookLegend +
 		`<input id="trace-filter" placeholder="filter… (click for help)" title="filter the graph" autocomplete="off"><button id="filter-clear" title="clear the filter">&#215;</button></div>`)
 	b.WriteString(`<div id="graph"></div>`)
 	b.WriteString(`<div id="detail" hidden></div>`)
-	// the ONE override: a node tap jumps to the item table row, expands it, pages to it, and pushes a
-	// history entry so the browser BACK returns to the graph (owner c23: on back, come back here).
+	// the ONE override: a node tap opens the DETAILS pane;
+	// the pane's link runs the transport through window.bookGoto, which pushes the history
+	// entry, so the browser BACK still returns to the graph.
 	b.WriteString(`<script>window.QUACK_DATA=` + string(gdata) + `;` +
-		`window.QUACK_NODE_TAP=function(id){var s=document.querySelector('.urow[data-node="'+id+'"]')||document.querySelector('[data-node="'+id+'"]');if(!s)return;` +
-		`window.__quackNav=window.__quackNav||[];window.__quackNav.push('trace');` +
-		`try{history.pushState({nav:'trace'},"");}catch(e){}` +
-		`var ut=s.closest?s.closest('.utable'):null;if(ut&&ut.revealRow){var rr=ut.revealRow(id);if(rr)s=rr;}` +
-		`if(window.bookPageTo)window.bookPageTo(s);var d=s.closest('details');if(d)d.open=true;` +
-		`s.scrollIntoView({block:"center"});};` +
-		`window.addEventListener('popstate',function(){var nv=window.__quackNav||[];` +
-		`if(nv.length===0||nv[nv.length-1]!=='trace')return;nv.pop();var g=document.getElementById('graph');` +
-		`if(g&&window.bookPageTo){window.bookPageTo(g);g.scrollIntoView({block:"start"});}});</script>`)
+		`window.QUACK_NODE_TAP=function(id){if(window.bookNodeDetail)window.bookNodeDetail(id);};</script>`)
 	b.WriteString(`<script>` + assetJS("cytoscape.min.js") + `</script>`)
 	b.WriteString(`<script>` + assetJS("dagre.min.js") + `</script>`)
 	b.WriteString(`<script>` + assetJS("cytoscape-dagre.js") + `</script>`)
@@ -2947,22 +3723,22 @@ func svgMatrix(rows []string, cells map[string][]string) string {
 }
 
 // renderFigure derives the named figure from live graph data, sorted for determinism.
-// design: go-fig-tables  implements: req-fig-tables
-// Tables are tables, figures are figures (owner ruling 2026-07-05): the tabular fig kinds
+// design: go-fig-tables  implements: req-derived-boards.2
+// Tables are tables, figures are figures: the tabular fig kinds
 // (vv-table, stakeholder-matrix) retire in favor of canned base queries the manifests embed
 // as ```base blocks - they gain live Obsidian preview. fig: keeps only spatial graphics
 // whose selection is topological (context star, block tree, timeline). A retired kind is a
 // FINDING with the pointer to its canned query; a base block in any unit body evaluates
 // through the pinned evaluator (go-base-eval) into a semantic table.
-// Queries pool centrally (owner ruling 2026-07-05 evening): an inline block in a manifest
+// Queries pool centrally: an inline block in a manifest
 // is a smell - the canonical home is spec/queries/, and a unit references a pooled query
 // with the Obsidian-native embed ![[name.base]] (Obsidian previews it live; the emitter
 // inlines the file and evaluates it exactly like an authored block). A missing pooled
 // query is a render-failing finding, never a silent skip.
 var retiredFigKinds = map[string]string{
-	"vv-table":           "(req-fig-tables) - embed its canned base query from method/templates/documents/spec/queries",
-	"stakeholder-matrix": "(req-fig-tables) - embed its canned base query from method/templates/documents/spec/queries",
-	"candidates-matrix":  "(req-candidates-timeline) - the record lives with the project chapter: the timeline reaches each iteration's candidates and decisions",
+	"vv-table":           "(req-derived-boards.2) - embed its canned base query from method/templates/documents/spec/queries",
+	"stakeholder-matrix": "(req-derived-boards.2) - embed its canned base query from method/templates/documents/spec/queries",
+	"candidates-matrix":  "(req-decision-rendering.2) - the record lives with the project chapter: the timeline reaches each iteration's candidates and decisions",
 }
 
 var queriesDirOverride string // test seam: an alternate pooled-query dir for fixtures
@@ -3000,15 +3776,17 @@ type baseDeferred struct {
 // `referenced` query defers via a placeholder token; the post-chapter pass evaluates it
 // with the complete link graph.
 func renderUnitBody(body string, nodes map[string]Node, aliasIdx map[string]string, findings *[]string, deferred *[]baseDeferred, sm map[string]string, bl map[string]Event, anchor string) string {
+	// unit prose renders at heading base 1: an authored `## section` is a real h2 book
+	// section (the chapter h1's direct child) - the render-time numbering counts it.
 	uses := baseUseRe.FindAllStringSubmatchIndex(body, -1)
 	if len(uses) == 0 {
-		return mdLite(AutoLink(body, aliasIdx))
+		return mdLiteAt(AutoLink(body, aliasIdx), 1)
 	}
 	var out strings.Builder
 	last := 0
 	for _, m := range uses {
 		if seg := body[last:m[0]]; strings.TrimSpace(seg) != "" {
-			out.WriteString(mdLite(AutoLink(seg, aliasIdx)))
+			out.WriteString(mdLiteAt(AutoLink(seg, aliasIdx), 1))
 		}
 		last = m[1]
 		text, view := "", ""
@@ -3035,7 +3813,7 @@ func renderUnitBody(body string, nodes map[string]Node, aliasIdx map[string]stri
 		out.WriteString(renderBaseHTML(text, view, nodes, findings, nil, sm, bl, anchor))
 	}
 	if seg := body[last:]; strings.TrimSpace(seg) != "" {
-		out.WriteString(mdLite(AutoLink(seg, aliasIdx)))
+		out.WriteString(mdLiteAt(AutoLink(seg, aliasIdx), 1))
 	}
 	return out.String()
 }
@@ -3087,18 +3865,80 @@ func renderBaseHTML(text string, viewName string, nodes map[string]Node, finding
 	return baseResultHTML(results, nodes, sm, bl, anchorBase)
 }
 
+// baseRowsNodeBacked reports whether a result's rows are a homogeneous set of typed
+// trace nodes: at least one row, every row id resolves in the graph, and all resolved
+// nodes share ONE type. This is the structural test the deterministic table law rests
+// on - it derives from node data, never from how content was authored.
+func baseRowsNodeBacked(r BaseResult, nodes map[string]Node) bool {
+	n := 0
+	typ := ""
+	for _, g := range r.Groups {
+		for _, row := range g.Rows {
+			nd, ok := nodes[row.ID]
+			if !ok {
+				nd, ok = nodes[subAddrBase(row.ID)]
+			}
+			if !ok {
+				return false
+			}
+			if typ == "" {
+				typ = nd.Type
+			} else if nd.Type != typ {
+				return false
+			}
+			n++
+		}
+	}
+	return n > 0
+}
+
+// nodeLinkHTML renders a LINK to a node - its human name plus the statement as the brief
+// - never a copy of the node's content (links, never copies). It
+// emits the established termref affordance directly (data-help + data-goto): a click
+// carries name, brief, and the jump link into the details pane.
+func nodeLinkHTML(id string, nodes map[string]Node) string {
+	label := humanizeID(subAddrBase(id))
+	n, ok := nodes[id]
+	if !ok {
+		n, ok = nodes[subAddrBase(id)]
+	}
+	if !ok || n.Statement == "" {
+		// no brief to carry: the plain anchor form - the chapter's refTooltips pass
+		// upgrades it to the same termref affordance with the default tip.
+		return `<a href="#` + htmlEscape(id) + `">` + htmlEscape(label) + `</a>`
+	}
+	return `<button type="button" class="termref" data-title="` + attesc(htmlEscape(label)) +
+		`" data-help="` + attesc(htmlEscape(n.Statement)) + `" data-goto="` + htmlEscape(id) + `">` +
+		htmlEscape(label) + `</button>`
+}
+
+// stripLeadingStatement drops a body's opening duplicate of the node statement (the
+// recurring i17 M5 defect): the expand shows only what the row does not already show.
+func stripLeadingStatement(body, stmt string) string {
+	body = strings.TrimSpace(body)
+	stmt = strings.TrimSpace(stmt)
+	if stmt == "" || !strings.HasPrefix(body, stmt) {
+		return body
+	}
+	return strings.TrimSpace(body[len(stmt):])
+}
+
 // baseResultHTML renders evaluation results: semantic tables (WCAG: real th headers),
 // full sections with note bodies (render: full, section id = the note slug), or
 // state-aware node sections (render: refs - each row through renderNodeAtDepth).
 func baseResultHTML(rs []BaseResult, nodes map[string]Node, sm map[string]string, bl map[string]Event, anchorBase string) string {
 	var b strings.Builder
 	for ri, r := range rs {
-		if r.Full {
+		if r.Full && !baseRowsNodeBacked(r, nodes) {
+			// the deterministic table law: a homogeneous set of
+			// typed trace nodes renders as a TABLE, decided here from node data - never by
+			// the authored render mode. `render: full` survives only for content notes
+			// (references, fundamentals, methods), which are not trace nodes.
 			b.WriteString(renderBaseFull(r))
 			continue
 		}
 		if r.Refs {
-			// design: go-render-refs  implements: req-render-refs
+			// design: go-render-refs  implements: req-manifest-render.3
 			// A refs view hands its rows to the SAME renderer ref units use - gate state,
 			// verdict links, and depth mechanics ride along; Obsidian previews the rows as
 			// a plain table (the render key is ignored there).
@@ -3111,7 +3951,7 @@ func baseResultHTML(rs []BaseResult, nodes map[string]Node, sm map[string]string
 			for _, g := range r.Groups {
 				grouped := g.Key != ""
 				if grouped {
-					// a grouped refs view discloses per group (owner ruling 2026-07-07): when the
+					// a grouped refs view discloses per group: when the
 					// key is a node id, the summary carries that node's statement - click the need
 					// to see its use cases. Same disc markup as depth layers: until-found and
 					// EXPAND ALL keep working.
@@ -3137,25 +3977,25 @@ func baseResultHTML(rs []BaseResult, nodes map[string]Node, sm map[string]string
 			// enddesign
 			continue
 		}
-		// design: go-q-table  implements: req-table-render, req-table-noise, req-table-interact, req-table-expand, req-compact-renders, req-table-facets
+		// design: go-q-table  implements: req-reader-tables.1, req-reader-tables.5, req-reader-tables.2, req-reader-tables.3, req-compact-derived.1, req-reader-tables.4
 		// Combinable pill FACETS ride above the table (AND across facets, OR within one): a
 		// universal need facet for trace items plus one facet per small-enum column - never a
 		// pill per item.
-		// The universal query table (field c10/c21/c27/c30/c40): a real thead with a clear
+		// The universal query table: a real thead with a clear
 		// header row, separated cells, rendered even with zero rows; the empty-value
 		// "(none)" bucket header never renders (its rows still do). Interactivity is
 		// STATIC DOM: a filter row with a text input plus one select per enum column
 		// (small distinct value set, derived from the rows at emit); ungrouped tables
 		// carry data-sortable and the shell script sorts by MOVING existing rows.
-		// Since bs20 every row with an id is EXPANDABLE (req-table-expand): a static
+		// Every row with an id is EXPANDABLE (req-reader-tables.3): a static
 		// detail row (statement, meta, body prose) follows it, hidden until toggled;
 		// expand-all/collapse-all buttons ride the filter row. A table beyond twenty
 		// rows pages BY NEED: each row is stamped with the first need its item traces
 		// up to (refines/verifies/implements walked upward, deterministic order),
 		// needless rows land on the last page, buckets chunk at twenty. Off-page rows
 		// carry hidden AT EMIT, so the no-script default is one bounded page
-		// (req-compact-renders); the pager only toggles visibility.
-		// The unified reader table (owner review 2026-07-08): ONE interactive pattern everywhere.
+		// (req-compact-derived.1); the pager only toggles visibility.
+		// The unified reader table: ONE interactive pattern everywhere.
 		// A row is the item NAME with a disclosure triangle; the expand carries the statement, the
 		// remaining fields, and the body. Combinable FILTER PILL facets ride above the table - a
 		// "need" facet plus one per small-distinct-value column. The controls below - filter box,
@@ -3170,7 +4010,9 @@ func baseResultHTML(rs []BaseResult, nodes map[string]Node, sm map[string]string
 					if ci >= len(row.Cells) || row.Cells[ci] == "" {
 						continue
 					}
-					if len(row.Cells[ci]) > 24 {
+					// a URL is never an enum value: it belongs in the expand as a live
+					// link, not in a pill or a column (the references table's url field)
+					if len(row.Cells[ci]) > 24 || strings.HasPrefix(row.Cells[ci], "http://") || strings.HasPrefix(row.Cells[ci], "https://") {
 						enum = false
 					}
 					distinct[row.Cells[ci]] = true
@@ -3274,7 +4116,14 @@ func baseResultHTML(rs []BaseResult, nodes map[string]Node, sm map[string]string
 			}
 			b.WriteString(`</div>`)
 		}
-		b.WriteString(`<table class="q-table u-table" data-layer="derived"><thead><tr><th scope="col">name</th><th scope="col">brief</th></tr></thead><tbody>`)
+		// enum facet columns render as VISIBLE columns too (references carry their
+		// normative/informative kind, decisions their type - a
+		// filterable value the reader cannot see per row is a hidden fact).
+		b.WriteString(`<table class="q-table u-table" data-layer="derived"><thead><tr><th scope="col">name</th><th scope="col">brief</th>`)
+		for _, ci := range enumCols {
+			b.WriteString(`<th scope="col">` + htmlEscape(r.Columns[ci]) + `</th>`)
+		}
+		b.WriteString(`</tr></thead><tbody>`)
 		empty := true
 		for _, g := range r.Groups {
 			for _, row := range g.Rows {
@@ -3308,15 +4157,17 @@ func baseResultHTML(rs []BaseResult, nodes map[string]Node, sm map[string]string
 				}
 				attr += ` data-need="` + htmlEscape(needOf(row.ID)) + `"`
 				// brief: a SHORT one-liner or empty. A description-like column wins (<=110 chars);
-				// else the statement only when it is itself short (<=80) and differs from the name;
+				// else the statement only when it is itself brief (<=110) and differs from the name;
 				// else empty (a long EARS statement is not a brief - it shows in the expand).
+				// Statement-once: whatever the row shows, the expand
+				// never repeats - see the detail row below.
 				brief := ""
 				if briefCol >= 0 && briefCol < len(row.Cells) {
 					if v := strings.TrimSpace(row.Cells[briefCol]); v != "" && len(v) <= 110 {
 						brief = v
 					}
 				}
-				if brief == "" && row.Head != "" && len(row.Head) <= 80 && row.Head != name {
+				if brief == "" && row.Head != "" && len(row.Head) <= 110 && row.Head != name {
 					brief = row.Head
 				}
 				tri := ""
@@ -3324,22 +4175,50 @@ func baseResultHTML(rs []BaseResult, nodes map[string]Node, sm map[string]string
 					cls += " qt-exp"
 					tri = `<span class="utri" aria-hidden="true"></span>`
 				}
-				b.WriteString(`<tr class="` + htmlEscape(cls) + `"` + attr + `><td>` + tri + htmlEscape(name) + `</td><td class="ubrief">` + htmlEscape(brief) + `</td></tr>`)
+				b.WriteString(`<tr class="` + htmlEscape(cls) + `"` + attr + `><td>` + tri + htmlEscape(name) + `</td><td class="ubrief">` + htmlEscape(brief) + `</td>`)
+				for _, ci := range enumCols {
+					v := ""
+					if ci < len(row.Cells) {
+						v = row.Cells[ci]
+					}
+					b.WriteString(`<td class="uenum">` + htmlEscape(v) + `</td>`)
+				}
+				b.WriteString(`</tr>`)
 				if expandable {
-					b.WriteString(`<tr class="udetail" hidden><td colspan="2">`)
-					// a statement that is not the brief (a long EARS sentence) still shows here.
+					// statement-once: the expand shows ONLY what the
+					// row does not show. The statement renders here exactly when the brief did
+					// not carry it; a cell repeating the statement, the brief, or the name is
+					// skipped; a body that opens by restating the statement loses that prefix.
+					b.WriteString(`<tr class="udetail" hidden><td colspan="` + itoa(2+len(enumCols)) + `">`)
 					if row.Head != "" && row.Head != name && row.Head != brief {
 						b.WriteString(`<p class="stmt">` + htmlEscape(row.Head) + `</p>`)
 					}
 					for ci := 1; ci < len(r.Columns) && ci < len(row.Cells); ci++ {
-						if strings.TrimSpace(row.Cells[ci]) == "" || row.Cells[ci] == brief {
+						v := strings.TrimSpace(row.Cells[ci])
+						if v == "" || v == brief || v == row.Head || v == name {
+							continue
+						}
+						shown := false // an enum value already renders as a visible column (statement-once)
+						for _, ec := range enumCols {
+							if ec == ci {
+								shown = true
+							}
+						}
+						if shown {
+							continue
+						}
+						// a URL value renders as a live link (references carry the only legal external URL)
+						if strings.HasPrefix(v, "http://") || strings.HasPrefix(v, "https://") {
+							b.WriteString(`<p class="ufield"><span class="ufl">` + htmlEscape(r.Columns[ci]) + `:</span> <a href="` + htmlEscape(v) + `">` + htmlEscape(v) + `</a></p>`)
 							continue
 						}
 						b.WriteString(`<p class="ufield"><span class="ufl">` + htmlEscape(r.Columns[ci]) + `:</span> ` + htmlEscape(row.Cells[ci]) + `</p>`)
 					}
 					b.WriteString(`<p class="meta">` + htmlEscape(row.ID) + `</p>`)
-					if row.Body != "" {
-						b.WriteString(`<div data-layer="informative">` + mdLite(row.Body) + `</div>`)
+					if bodyTxt := stripLeadingStatement(row.Body, row.Head); bodyTxt != "" {
+						// item-body headings render compact (base 3: `## x` = h4) - detail
+						// labels inside the expand, never book sections.
+						b.WriteString(`<div data-layer="informative">` + mdLiteAt(bodyTxt, 3) + `</div>`)
 					}
 					b.WriteString(`</td></tr>`)
 				}
@@ -3374,7 +4253,7 @@ func renderBaseFull(r BaseResult) string {
 		if g.Key != "" {
 			// a nested group divider (e.g. "Informative") must not out-size the section
 			// heading that introduces the query (a `##` -> h3); h3 keeps it consistent, never
-			// larger (owner review c22).
+			// larger.
 			b.WriteString(`<h3>` + htmlEscape(strings.ToUpper(g.Key[:1])+g.Key[1:]) + `</h3>` + "\n")
 		}
 		for _, row := range g.Rows {
@@ -3410,12 +4289,17 @@ func renderFigure(kind string, nodes map[string]Node) string {
 		// structural models in the design output chapter (go-model-render, i16)
 		return renderModelFigure(strings.TrimSpace(strings.TrimPrefix(kind, "model")), nodes)
 	}
+	if kind == "model-kinds" {
+		// one example per supported model kind, derived from the kind registry
+		// (go-models-complete-book, i17)
+		return renderModelKindExamples()
+	}
 	switch kind {
 	case "context-star":
-		// design: go-context-neighbours  implements: req-context-diagram
+		// design: go-context-neighbours  implements: req-interactive-figures.3
 		// The context star derives from the modeled neighbour notes (type: neighbour, id
 		// nbr-<name>): one border-connected node per note, sorted for determinism - never
-		// an invented actor (the class-derived star died with the owner's 2026-07-09 ruling).
+		// an invented actor.
 		// direction `in` (or none) feeds the system and sits LEFT; `out` consumes from it
 		// and sits RIGHT. With no neighbour notes the figure says so. rectBorder ends every
 		// connector at the node's border, so no line crosses the centre node.
@@ -3442,10 +4326,10 @@ func renderFigure(kind string, nodes map[string]Node) string {
 	case "ucfn-board":
 		return renderUcfnBoard(nodes)
 	case "block-tree":
-		// design: go-block-tree-design  implements: req-block-tree-design
+		// design: go-block-tree-design  implements: req-derived-boards.5
 		// The block tree draws the SYSTEM's design elements (code-marker designs and des-
-		// notes), never the book's own chapters - every project got a picture of its
-		// document structure in its architecture chapter (template red-team, 2026-07-06).
+		// notes), never the book's own chapters - otherwise every project gets a picture
+		// of its document structure in its architecture chapter.
 		var blocks []string
 		for id, n := range nodes {
 			if n.Type == "design" {
@@ -3459,7 +4343,7 @@ func renderFigure(kind string, nodes map[string]Node) string {
 		return svgBlockTree(brand()+" — the system", blocks)
 		// enddesign
 	case "results-exception":
-		// design: go-results-exception  implements: req-results-exception
+		// design: go-results-exception  implements: req-derived-boards.3
 		// Ledger-state views are FIG kinds, never base queries - state lives in the
 		// ledger, not frontmatter. The green mass summarizes as a count; failures and
 		// accepted deviations render prominently, by exception (the lab rule).
@@ -3515,7 +4399,7 @@ func renderFigure(kind string, nodes map[string]Node) string {
 	case "onion":
 		return renderOnion(nodes)
 	case "readme":
-		// the project README rendered as the home chapter (owner c14): the first page the reader
+		// the project README rendered as the home chapter: the first page the reader
 		// sees. Improve the README itself later; the book just projects it.
 		raw, err := os.ReadFile(filepath.Join(ROOT, "README.md"))
 		if err != nil || strings.TrimSpace(string(raw)) == "" {
@@ -3525,8 +4409,8 @@ func renderFigure(kind string, nodes map[string]Node) string {
 	case "trace-graph":
 		return renderTraceGraph(nodes)
 	case "vv-exceptions":
-		// design: go-vv-exceptions  implements: req-vv-exceptions, req-compact-renders
-		// The verdict-first block (bs20 ruling, the no-green-ocean law): the verified mass is
+		// design: go-vv-exceptions  implements: req-compact-derived.2, req-compact-derived.1
+		// The verdict-first block (the no-green-ocean law): the verified mass is
 		// ONE derived count; every requirement with no verifying test renders prominently by
 		// name before the full matrix. Zero exceptions collapse to one green sentence.
 		verified := map[string]bool{}
@@ -3551,7 +4435,7 @@ func renderFigure(kind string, nodes map[string]Node) string {
 		var b strings.Builder
 		b.WriteString(`<div data-layer="derived" aria-label="verification by exception">` + "\n")
 		if len(missing) == 0 {
-			// owner c36: read it as N/N and make it green
+			// read it as N/N and make it green
 			b.WriteString(`<p class="stmt state-ok"><strong>✓ ` + itoa(len(reqIDs)) + ` / ` + itoa(len(reqIDs)) + ` requirements verified.</strong></p>` + "\n")
 		} else {
 			b.WriteString(`<p class="stmt state-suspect"><strong>` + itoa(len(reqIDs)-len(missing)) + ` / ` + itoa(len(reqIDs)) +
@@ -3566,38 +4450,16 @@ func renderFigure(kind string, nodes map[string]Node) string {
 		return b.String()
 		// enddesign
 	case "project-table":
-		// design: go-project-record  implements: req-candidates-timeline, req-verdict-order
-		// The project view is the record of how the architecture came to be (bs20 ruling):
-		// every iteration with its gate tally, expandable to its decisions and the candidates
-		// they weighed - grouped per axis with that axis's own rating criteria (no sparse
-		// union table). The verdict scan walks adr ids SORTED - a map-order walk rendered a
-		// double-claimed candidate nondeterministically (red-team find, 2026-07-06); the
-		// double claim itself is a lint finding (candidateClaimFindings).
+		// design: go-project-record  implements: req-decision-rendering.2
+		// The milestones table is SLIM:
+		// timeline order and the iteration name in the row, the expand a short introduction
+		// only. The decisions and the candidate matrices live OUT in the one decisions
+		// table (fig: decisions-table); each iteration's record stays reachable through that
+		// table's iteration filter, linked from every expand.
 		sm := StatusMap(nodes)
-		var adrIDs []string
-		for id, n := range nodes {
-			if n.Type == "adr" {
-				adrIDs = append(adrIDs, id)
-			}
-		}
-		sortStrings(adrIDs)
-		verdict := func(id string) string {
-			for _, aid := range adrIDs {
-				n := nodes[aid]
-				for _, c := range n.Chosen {
-					if c == id {
-						return "chosen by " + n.ID
-					}
-				}
-				for _, c := range n.Rejected {
-					if c == id {
-						return "rejected by " + n.ID
-					}
-				}
-			}
-			return "open"
-		}
 		var b strings.Builder
+		b.WriteString(`<div class="utable" id="ut` + itoa(figNext()) + `">`)
+		b.WriteString(`<table class="q-table u-table" data-layer="derived"><thead><tr><th scope="col">iteration</th><th scope="col">gates</th></tr></thead><tbody>` + "\n")
 		for _, v := range versions() {
 			done, total := 0, 0
 			for id, n := range nodes {
@@ -3609,88 +4471,515 @@ func renderFigure(kind string, nodes map[string]Node) string {
 					done++
 				}
 			}
-			// the iteration's candidates (by path) and the decisions that claimed them
-			var cands []Node
-			for _, n := range nodes {
-				if n.Type == "candidate" && iterOf(n.Path) == v {
-					cands = append(cands, n)
-				}
+			b.WriteString(`<tr class="urow qt-exp" data-node="` + htmlEscape(v) + `" data-text="` + attesc(htmlEscape(strings.ToLower(v))) + `"><td><span class="utri" aria-hidden="true"></span>` + htmlEscape(v) + `</td><td class="ubrief">` + itoa(done) + `/` + itoa(total) + `</td></tr>` + "\n")
+			b.WriteString(`<tr class="udetail" hidden><td colspan="2">`)
+			if intro := iterationIntro(v); intro != "" {
+				b.WriteString(`<div data-layer="informative">` + mdLiteAt(intro, 3) + `</div>`)
+			} else {
+				b.WriteString(`<p class="meta">no introduction recorded</p>`)
 			}
-			for i := 1; i < len(cands); i++ {
-				for j := i; j > 0 && (cands[j].Axis < cands[j-1].Axis || (cands[j].Axis == cands[j-1].Axis && cands[j].ID < cands[j-1].ID)); j-- {
-					cands[j], cands[j-1] = cands[j-1], cands[j]
-				}
-			}
-			decs := map[string]bool{}
-			for _, aid := range adrIDs {
-				n := nodes[aid]
-				if iterOf(n.Path) == v {
-					decs[aid] = true
-				}
-				for _, c := range append(append([]string{}, n.Chosen...), n.Rejected...) {
-					if cn, ok := nodes[c]; ok && iterOf(cn.Path) == v {
-						decs[aid] = true
-					}
-				}
-			}
-			var decIDs []string
-			for id := range decs {
-				decIDs = append(decIDs, id)
-			}
-			sortStrings(decIDs)
-			b.WriteString(`<details class="disc" data-dl="0"><summary>` + htmlEscape(v) +
-				` <span class="meta">(gates ` + itoa(done) + `/` + itoa(total) + `, decisions ` + itoa(len(decIDs)) + `, candidates ` + itoa(len(cands)) + `)</span></summary><div hidden="until-found">` + "\n")
-			if len(decIDs) > 0 {
-				b.WriteString(`<table class="q-table" data-layer="derived"><thead><tr><th scope="col">decision</th><th scope="col">statement</th></tr></thead><tbody>` + "\n")
-				for _, id := range decIDs {
-					b.WriteString("<tr><td>" + htmlEscape(id) + "</td><td>" + htmlEscape(nodes[id].Statement) + "</td></tr>\n")
-				}
-				b.WriteString("</tbody></table>\n")
-			}
-			// one compact Pugh table PER AXIS: only that axis's criteria, no sparse union
-			for ai := 0; ai < len(cands); {
-				axis := cands[ai].Axis
-				aj := ai
-				critSet := map[string]bool{}
-				for ; aj < len(cands) && cands[aj].Axis == axis; aj++ {
-					for c := range cands[aj].Maps["ratings"] {
-						critSet[c] = true
-					}
-				}
-				var crits []string
-				for c := range critSet {
-					crits = append(crits, c)
-				}
-				sortStrings(crits)
-				b.WriteString(`<table class="q-table" data-layer="derived"><caption>` + htmlEscape(axis) + `</caption><thead><tr><th scope="col">candidate</th>`)
-				for _, c := range crits {
-					b.WriteString(`<th scope="col">` + htmlEscape(c) + `</th>`)
-				}
-				b.WriteString(`<th scope="col">decision</th></tr></thead><tbody>` + "\n")
-				for k := ai; k < aj; k++ {
-					b.WriteString("<tr><td>" + htmlEscape(cands[k].ID) + "</td>")
-					for _, c := range crits {
-						b.WriteString("<td>" + htmlEscape(cands[k].Maps["ratings"][c]) + "</td>")
-					}
-					b.WriteString("<td>" + htmlEscape(verdict(cands[k].ID)) + "</td></tr>\n")
-				}
-				b.WriteString("</tbody></table>\n")
-				ai = aj
-			}
-			if len(decIDs) == 0 && len(cands) == 0 {
-				b.WriteString(`<p class="meta">no recorded decisions or candidates in this iteration</p>` + "\n")
-			}
-			b.WriteString("</div></details>\n")
+			b.WriteString(`<p class="meta"><a href="#decisions-table">this iteration's decisions — the decisions table, filtered by iteration</a></p>`)
+			b.WriteString(`</td></tr>` + "\n")
 		}
+		b.WriteString("</tbody></table></div>\n")
 		return b.String()
 		// enddesign
+	case "decisions-table":
+		return renderDecisionsTable(nodes)
+	case "asr-list":
+		return renderAsrList(nodes)
+	case "guides-table":
+		return renderGuidesTable(nodes)
+	case "views-home":
+		return renderViewsHome(nodes)
 	}
 	return `<p class="missing">unknown figure kind: ` + htmlEscape(kind) + `</p>`
 }
 
+// archiveBodyMemo caches parsed archive containers for body lookups (one read per
+// archive per process; the render stays deterministic - the memo only avoids re-reads).
+var archiveBodyMemo = map[string]map[string]string{}
+
+// nodeBodyOf returns a node's body prose - from its file when it exists, else from
+// its compacted archive entry (the synthetic path names the original home).
+func nodeBodyOf(n Node) string {
+	if _, err := os.Stat(n.Path); err == nil {
+		return nodeBodyProse(n.Path)
+	}
+	iter := iterOf(n.Path)
+	ap := filepath.Join(SPEC, "iterations", iter, archiveName)
+	bodies, ok := archiveBodyMemo[ap]
+	if !ok {
+		bodies = map[string]string{}
+		if raw, err := os.ReadFile(ap); err == nil {
+			for _, e := range splitArchive(raw) {
+				parts := strings.SplitN(string(e.raw), "---", 3)
+				if len(parts) >= 3 {
+					bodies[e.rel] = strings.TrimSpace(parts[2])
+				}
+			}
+		}
+		archiveBodyMemo[ap] = bodies
+	}
+	if rel, err := filepath.Rel(filepath.Join(SPEC, "iterations", iter), n.Path); err == nil {
+		return bodies[filepath.ToSlash(rel)]
+	}
+	return ""
+}
+
+// iterationIntro reads an iteration's short introduction - the body prose of its
+// iteration.md, live or from the compacted archive entry.
+func iterationIntro(v string) string {
+	p := filepath.Join(SPEC, "iterations", v, "iteration.md")
+	if _, err := os.Stat(p); err == nil {
+		return strings.TrimSpace(nodeBodyProse(p))
+	}
+	raw, err := os.ReadFile(filepath.Join(SPEC, "iterations", v, archiveName))
+	if err != nil {
+		return ""
+	}
+	for _, e := range splitArchive(raw) {
+		if e.rel != "iteration.md" {
+			continue
+		}
+		parts := strings.SplitN(string(e.raw), "---", 3)
+		if len(parts) >= 3 {
+			return strings.TrimSpace(parts[2])
+		}
+	}
+	return ""
+}
+
+// mintedSlug reports whether an id's tail looks auto-minted (the b32 slug quack mint
+// stamps when no --id is given): one dash-free token, never a worded slug.
+func mintedSlug(id string) bool {
+	rest := id
+	if i := indexByte(id, '-'); i > 0 && readerKindPrefixes[id[:i]] {
+		rest = id[i+1:]
+	}
+	return !strings.Contains(rest, "-")
+}
+
+// decisionTitle renders the human title of a decision - never a hash slug.
+// A worded id humanizes; an auto-minted slug falls back to the
+// statement, the one human line every decision carries.
+func decisionTitle(n Node) string {
+	if mintedSlug(n.ID) {
+		return n.Statement
+	}
+	return humanizeID(n.ID)
+}
+
+// decisionType folds the recorded kind and the strategy tag into the rendered TYPE
+// column: project | strategy | architecture (an empty kind is architecture for
+// blessed history - go-items).
+func decisionType(n Node) string {
+	if n.Kind == "project" {
+		return "project"
+	}
+	for _, t := range basePropsOf(n.Path).lists["tags"] {
+		if t == "strategy" {
+			return "strategy"
+		}
+	}
+	return "architecture"
+}
+
+// decisionIteration derives the iteration a decision belongs to: its own archive
+// home when it was recorded inside one, else the iteration of the candidates it
+// claimed, else "-" (recorded outside any iteration).
+func decisionIteration(n Node, nodes map[string]Node) string {
+	if rel, err := filepath.Rel(SPEC, n.Path); err == nil {
+		parts := strings.Split(filepath.ToSlash(rel), "/")
+		if len(parts) > 1 && parts[0] == "iterations" {
+			return parts[1]
+		}
+	}
+	var iters []string
+	for _, c := range append(append([]string{}, n.Chosen...), n.Rejected...) {
+		if cn, ok := nodes[c]; ok {
+			if rel, err := filepath.Rel(SPEC, cn.Path); err == nil {
+				parts := strings.Split(filepath.ToSlash(rel), "/")
+				if len(parts) > 1 && parts[0] == "iterations" {
+					iters = append(iters, parts[1])
+				}
+			}
+		}
+	}
+	sortStrings(iters)
+	if len(iters) > 0 {
+		return iters[0]
+	}
+	return "-"
+}
+
+// design: go-decisions-table  implements: req-decision-rendering.2, req-decision-rendering.3, req-candidate-decisions.2
+// ONE decisions table: every project, strategy,
+// and architecture decision in one reader table - human titles, never hash-slug ids -
+// with the TYPE as a rendered column and pill facets over type AND iteration. The row
+// expand carries the rationale, the addressed requirements as links, and the
+// candidates the decision weighed: the per-axis rating matrix plus each rejected
+// candidate's reason (q-candidates-placement, decided). Waivers stay with V&V. The
+// verdict scan walks adr ids SORTED - a map-order walk renders a double-claimed
+// candidate nondeterministically; the double claim itself
+// is a lint finding (candidateClaimFindings).
+func renderDecisionsTable(nodes map[string]Node) string {
+	var adrIDs []string
+	for id, n := range nodes {
+		if n.Type == "adr" && n.Kind != "waiver" {
+			adrIDs = append(adrIDs, id)
+		}
+	}
+	sortStrings(adrIDs)
+	if len(adrIDs) == 0 {
+		return `<p class="meta">no recorded decisions yet — the table renders as they arrive</p>`
+	}
+	var allIDs []string
+	for id, n := range nodes {
+		if n.Type == "adr" {
+			allIDs = append(allIDs, id)
+		}
+	}
+	sortStrings(allIDs)
+	verdict := func(id string) string {
+		for _, aid := range allIDs {
+			n := nodes[aid]
+			for _, c := range n.Chosen {
+				if c == id {
+					return "chosen by " + n.ID
+				}
+			}
+			for _, c := range n.Rejected {
+				if c == id {
+					return "rejected by " + n.ID
+				}
+			}
+		}
+		return "open"
+	}
+	types := map[string]int{}
+	iters := map[string]int{}
+	for _, id := range adrIDs {
+		types[decisionType(nodes[id])]++
+		iters[decisionIteration(nodes[id], nodes)]++
+	}
+	var b strings.Builder
+	b.WriteString(`<div class="utable" id="decisions-table">`)
+	pills := func(facet, label string, cnt map[string]int) {
+		var vals []string
+		for k := range cnt {
+			vals = append(vals, k)
+		}
+		sortStrings(vals)
+		b.WriteString(`<div class="upills" data-facet="` + facet + `"><span class="pilllbl">` + label + `</span><button type="button" class="upill on" data-fv="*">all</button>`)
+		for _, v := range vals {
+			b.WriteString(` <button type="button" class="upill" data-fv="` + htmlEscape(v) + `">` + htmlEscape(v) + ` <span class="meta">(` + itoa(cnt[v]) + `)</span></button>`)
+		}
+		b.WriteString(`</div>`)
+	}
+	pills("dtype", "type", types)
+	if len(iters) >= 2 {
+		pills("diter", "iteration", iters)
+	}
+	b.WriteString(`<table class="q-table u-table" data-layer="derived"><thead><tr><th scope="col">decision</th><th scope="col">type</th><th scope="col">iteration</th></tr></thead><tbody>` + "\n")
+	for _, id := range adrIDs {
+		n := nodes[id]
+		dt, di := decisionType(n), decisionIteration(n, nodes)
+		title := decisionTitle(n)
+		b.WriteString(`<tr class="urow qt-exp" data-node="` + htmlEscape(id) + `" data-dtype="` + htmlEscape(dt) + `" data-diter="` + htmlEscape(di) + `" data-text="` + attesc(htmlEscape(strings.ToLower(title+" "+n.Statement+" "+id))) + `"><td><span class="utri" aria-hidden="true"></span>` + htmlEscape(title) + `</td><td class="uenum">` + htmlEscape(dt) + `</td><td class="uenum">` + htmlEscape(di) + `</td></tr>` + "\n")
+		b.WriteString(`<tr class="udetail" hidden><td colspan="3">`)
+		if n.Statement != title {
+			b.WriteString(`<p class="stmt">` + htmlEscape(n.Statement) + `</p>`)
+		}
+		if len(n.Addresses) > 0 {
+			b.WriteString(`<p class="ufield"><span class="ufl">addresses:</span> `)
+			for i, a := range n.Addresses {
+				if i > 0 {
+					b.WriteString(", ")
+				}
+				b.WriteString(nodeLinkHTML(a, nodes))
+			}
+			b.WriteString(`</p>`)
+		}
+		b.WriteString(`<p class="meta">` + htmlEscape(id) + `</p>`)
+		if bodyTxt := stripLeadingStatement(nodeBodyOf(n), n.Statement); bodyTxt != "" {
+			b.WriteString(`<div data-layer="informative">` + mdLiteAt(bodyTxt, 3) + `</div>`)
+		}
+		// the considered alternatives (q-candidates-placement, decided): the per-axis
+		// rating matrix over this decision's claimed candidates, then each rejected
+		// candidate's reason from its own note.
+		var cands []Node
+		for _, c := range append(append([]string{}, n.Chosen...), n.Rejected...) {
+			if cn, ok := nodes[c]; ok {
+				cands = append(cands, cn)
+			}
+		}
+		for i := 1; i < len(cands); i++ {
+			for j := i; j > 0 && (cands[j].Axis < cands[j-1].Axis || (cands[j].Axis == cands[j-1].Axis && cands[j].ID < cands[j-1].ID)); j-- {
+				cands[j], cands[j-1] = cands[j-1], cands[j]
+			}
+		}
+		for ai := 0; ai < len(cands); {
+			axis := cands[ai].Axis
+			aj := ai
+			critSet := map[string]bool{}
+			for ; aj < len(cands) && cands[aj].Axis == axis; aj++ {
+				for c := range cands[aj].Maps["ratings"] {
+					critSet[c] = true
+				}
+			}
+			var crits []string
+			for c := range critSet {
+				crits = append(crits, c)
+			}
+			sortStrings(crits)
+			b.WriteString(`<table class="q-table" data-layer="derived"><caption>considered alternatives — ` + htmlEscape(axis) + `</caption><thead><tr><th scope="col">candidate</th>`)
+			for _, c := range crits {
+				b.WriteString(`<th scope="col">` + htmlEscape(c) + `</th>`)
+			}
+			b.WriteString(`<th scope="col">verdict</th></tr></thead><tbody>` + "\n")
+			for k := ai; k < aj; k++ {
+				b.WriteString("<tr><td>" + htmlEscape(cands[k].Statement) + "</td>")
+				for _, c := range crits {
+					b.WriteString("<td>" + htmlEscape(cands[k].Maps["ratings"][c]) + "</td>")
+				}
+				b.WriteString("<td>" + htmlEscape(verdict(cands[k].ID)) + "</td></tr>\n")
+			}
+			b.WriteString("</tbody></table>\n")
+			ai = aj
+		}
+		for _, c := range n.Rejected {
+			cn, ok := nodes[c]
+			if !ok {
+				continue
+			}
+			if reason := strings.TrimSpace(nodeBodyOf(cn)); reason != "" {
+				b.WriteString(`<p class="ufield"><span class="ufl">rejected — ` + htmlEscape(cn.Statement) + `:</span></p><div data-layer="informative">` + mdLiteAt(reason, 3) + `</div>`)
+			}
+		}
+		b.WriteString(`</td></tr>` + "\n")
+	}
+	b.WriteString("</tbody></table>")
+	b.WriteString(`<div class="ucontrols">`)
+	b.WriteString(`<button type="button" class="qt-xall">expand all</button><button type="button" class="qt-call">collapse all</button>`)
+	b.WriteString(`<input class="qt-search" type="search" placeholder="filter…">`)
+	b.WriteString(`<label class="qt-sizel">show <select class="qt-size"><option>20</option><option>50</option><option value="0">all</option></select></label>`)
+	b.WriteString(`<span class="qt-pager"><button type="button" class="qt-prev" aria-label="previous page">&#8249;</button><span class="qt-pos"></span><button type="button" class="qt-next" aria-label="next page">&#8250;</button></span>`)
+	b.WriteString(`</div></div>` + "\n")
+	return b.String()
+}
+
 // enddesign
 
-// design: go-book-glossary  implements: req-glossary-shared, req-meta-quarantine, req-glossary-table
+// design: go-asr-list  implements: req-decision-rendering.2
+// The architecturally-significant list is GENERATED: a
+// requirement joins it by carrying the `architecturally-significant` tag, and each
+// entry is a LINK back to design input (nodeLinkHTML) - never a copy of the
+// requirement's content.
+// An empty list renders honestly: tagging is owner curation, not renderer guesswork.
+func renderAsrList(nodes map[string]Node) string {
+	var ids []string
+	for id, n := range nodes {
+		if n.Type != "requirement" {
+			continue
+		}
+		for _, t := range basePropsOf(n.Path).lists["tags"] {
+			if t == "architecturally-significant" {
+				ids = append(ids, id)
+			}
+		}
+	}
+	sortStrings(ids)
+	if len(ids) == 0 {
+		return `<p class="meta">no requirement carries the architecturally-significant tag yet — the list renders as the owner curates the tags</p>`
+	}
+	var b strings.Builder
+	b.WriteString(`<ul class="asr-list" data-layer="derived">` + "\n")
+	for _, id := range ids {
+		b.WriteString(`<li>` + nodeLinkHTML(id, nodes) + `</li>` + "\n")
+	}
+	b.WriteString("</ul>\n")
+	return b.String()
+}
+
+// enddesign
+
+// design: go-guides-table  implements: req-chapter-placement.1, req-chapter-placement.2
+// The guides render as ONE table: one row per guide with
+// the TARGET AUDIENCE as a rendered, pill-filterable column and the guide's full
+// content in the row expand - never per-audience sibling subchapters. Every
+// audience class of the project type stays visible: a class with no guide renders an
+// honest empty row (the pull law: a guide lands the day the audience asks). The agent
+// guide is ONE ROW (audience: agent) whose expand embeds the repo-root AGENTS.md
+// VERBATIM at render time - read, never regenerated - so the book shows exactly the
+// file an agent reads.
+func renderGuidesTable(nodes map[string]Node) string {
+	classes := typeClassSlugs(readProjectConfig().Type)
+	if len(classes) == 0 {
+		classes = typeClassSlugs("default")
+	}
+	byAud := map[string][]Node{}
+	var agents []Node
+	for _, n := range nodes {
+		if n.Type == "guide" {
+			aud := basePropsOf(n.Path).scalars["audience"]
+			byAud[aud] = append(byAud[aud], n)
+		}
+		if n.Type == "manifest" && n.Mode == "agent" {
+			agents = append(agents, n)
+		}
+	}
+	for aud := range byAud {
+		gs := byAud[aud]
+		for i := 1; i < len(gs); i++ {
+			for j := i; j > 0 && gs[j].ID < gs[j-1].ID; j-- {
+				gs[j], gs[j-1] = gs[j-1], gs[j]
+			}
+		}
+	}
+	for i := 1; i < len(agents); i++ {
+		for j := i; j > 0 && agents[j].ID < agents[j-1].ID; j-- {
+			agents[j], agents[j-1] = agents[j-1], agents[j]
+		}
+	}
+	seen := map[string]bool{}
+	for _, c := range classes {
+		seen[c] = true
+	}
+	// audiences outside the type's classes still render (never silently dropped)
+	var extra []string
+	for aud := range byAud {
+		if !seen[aud] && aud != "" {
+			extra = append(extra, aud)
+		}
+	}
+	sortStrings(extra)
+	order := append(append([]string{}, classes...), extra...)
+	cnt := map[string]int{}
+	for _, c := range order {
+		cnt[c] = len(byAud[c])
+		if c == "agent" {
+			cnt[c] += len(agents)
+		}
+		if cnt[c] == 0 {
+			cnt[c] = 1 // the honest empty row carries the class
+		}
+	}
+	var b strings.Builder
+	b.WriteString(`<div class="utable" id="guides-table">`)
+	b.WriteString(`<div class="upills" data-facet="aud"><span class="pilllbl">audience</span><button type="button" class="upill on" data-fv="*">all</button>`)
+	for _, c := range order {
+		b.WriteString(` <button type="button" class="upill" data-fv="` + htmlEscape(c) + `">` + htmlEscape(c) + ` <span class="meta">(` + itoa(cnt[c]) + `)</span></button>`)
+	}
+	b.WriteString(`</div>`)
+	b.WriteString(`<table class="q-table u-table" data-layer="derived"><thead><tr><th scope="col">guide</th><th scope="col">brief</th><th scope="col">target audience</th></tr></thead><tbody>` + "\n")
+	row := func(id, name, brief, aud, expand string) {
+		exp := expand != ""
+		cls := "urow"
+		tri := ""
+		if exp {
+			cls += " qt-exp"
+			tri = `<span class="utri" aria-hidden="true"></span>`
+		}
+		b.WriteString(`<tr class="` + cls + `" id="` + htmlEscape(id) + `" data-node="` + htmlEscape(id) + `" data-aud="` + htmlEscape(aud) + `" data-text="` + attesc(htmlEscape(strings.ToLower(name+" "+brief+" "+aud))) + `"><td>` + tri + htmlEscape(name) + `</td><td class="ubrief">` + htmlEscape(brief) + `</td><td class="uenum">` + htmlEscape(aud) + `</td></tr>` + "\n")
+		if exp {
+			b.WriteString(`<tr class="udetail" hidden><td colspan="3">` + expand + `</td></tr>` + "\n")
+		}
+	}
+	for _, c := range order {
+		for _, g := range byAud[c] {
+			expand := `<p class="meta">` + htmlEscape(g.ID) + `</p>`
+			if body := strings.TrimSpace(nodeBodyOf(g)); body != "" {
+				expand += `<div data-layer="informative">` + mdLiteAt(body, 3) + `</div>`
+			}
+			row(g.ID, humanizeID(g.ID), g.Statement, c, expand)
+		}
+		if c == "agent" {
+			for _, ag := range agents {
+				expand := `<p class="meta">embedded verbatim from the project root — the emitter writes this file from ` + htmlEscape(ag.ID) + `, the book never regenerates it</p>`
+				if raw, err := os.ReadFile(filepath.Join(ROOT, "AGENTS.md")); err == nil {
+					expand += `<pre class="uverb"><code>` + htmlEscape(string(raw)) + `</code></pre>`
+				} else {
+					expand += `<p class="meta">AGENTS.md not found at the project root yet</p>`
+				}
+				row(ag.ID, "AGENTS.md", ag.Statement, "agent", expand)
+			}
+		}
+		if len(byAud[c]) == 0 && !(c == "agent" && len(agents) > 0) {
+			row("guide-hole-"+c, "—", "no guide yet — one lands the day this audience asks.", c, "")
+		}
+	}
+	b.WriteString("</tbody></table></div>\n")
+	return b.String()
+}
+
+// enddesign
+
+// enddesign
+
+// design: go-views-home  implements: req-book-shell-nav.3
+// The views home is BOOK CONTENT (`fig: views-home` in the orientation chapter): the
+// reader presets as filter-entry buttons - a click enters `preset:<name>` into the
+// filter expression, a second click clears it - then the derived documents: the deck
+// manifests baked into this same file, compiled from book content only, one row each
+// with its present button. Both tables derive from the manifests; an empty population
+// says so out loud.
+func renderViewsHome(nodes map[string]Node) string {
+	var presets, decks []Node
+	for _, n := range nodes {
+		if n.Type != "manifest" {
+			continue
+		}
+		switch n.Mode {
+		case "preset":
+			presets = append(presets, n)
+		case "deck":
+			decks = append(decks, n)
+		}
+	}
+	for i := 1; i < len(presets); i++ {
+		for j := i; j > 0 && presets[j].ID < presets[j-1].ID; j-- {
+			presets[j], presets[j-1] = presets[j-1], presets[j]
+		}
+	}
+	for i := 1; i < len(decks); i++ {
+		for j := i; j > 0 && decks[j].ID < decks[j-1].ID; j-- {
+			decks[j], decks[j-1] = decks[j-1], decks[j]
+		}
+	}
+	var b strings.Builder
+	b.WriteString(`<div class="views-home">` + "\n")
+	if len(presets) == 0 {
+		b.WriteString(`<p class="meta">no reader views yet — the view list renders as presets arrive</p>` + "\n")
+	} else {
+		b.WriteString(`<table class="q-table"><caption>Reader views — click one to narrow this book</caption>` +
+			`<thead><tr><th>view</th><th>shows</th></tr></thead><tbody>` + "\n")
+		for _, p := range presets {
+			b.WriteString(`<tr><td><button type="button" data-view="` + htmlEscape(p.ID) + `">` +
+				htmlEscape(strings.TrimPrefix(p.ID, "man-preset-")) + `</button></td><td>` +
+				htmlEscape(p.Statement) + `</td></tr>` + "\n")
+		}
+		b.WriteString("</tbody></table>\n")
+	}
+	if len(decks) == 0 {
+		b.WriteString(`<p class="meta">no derived documents yet — the shipped decks render here as they arrive</p>` + "\n")
+	} else {
+		b.WriteString(`<table class="q-table"><caption>Derived documents — presentations compiled from this book</caption>` +
+			`<thead><tr><th>document</th><th>slides</th><th></th></tr></thead><tbody>` + "\n")
+		for _, d := range decks {
+			slides := len(parseManifestUnits(manifestBody(d.Path)))
+			b.WriteString(`<tr><td>` + htmlEscape(d.Statement) + `</td><td class="uenum">` + itoa(slides) +
+				`</td><td><button type="button" class="present" data-deck="` + htmlEscape(d.ID) + `">present</button></td></tr>` + "\n")
+		}
+		b.WriteString("</tbody></table>\n")
+	}
+	b.WriteString("</div>\n")
+	return b.String()
+}
+
+// enddesign
+
+// design: go-book-glossary  implements: req-project-content-roots.1, req-spec-content-lint.6, req-reader-tables.7
 // The LaTeX glossaries discipline (adr-glossary-discipline) over one shared source: per-term notes
 // in method/glossary (frontmatter: term, long, class). A USAGE is a marked link `[label](term:slug)`
 // - never trusted plain text. The emitter renders the used-terms-only glossary chapter with
@@ -3707,8 +4996,8 @@ type GlossTerm struct {
 
 var glossaryDirOverride string // test seam
 
-// glossaryDir: the glossary is PROJECT content under the workspace spec (req-spec-content-roots,
-// owner ruling 2026-07-05) - spec/glossary for every project, quackitect included.
+// glossaryDir: the glossary is PROJECT content under the workspace spec (req-project-content-roots.2)
+// - spec/glossary for every project, quackitect included.
 func glossaryDir() string {
 	if glossaryDirOverride != "" {
 		return glossaryDirOverride
@@ -3753,14 +5042,34 @@ func readGlossary() map[string]GlossTerm {
 	return out
 }
 
-// design: go-ref-tooltips  implements: req-ref-tooltips
-// In-book reference links in prose render as their plain label plus a small (?) marker
-// (field c39): the marker's title carries the referent's statement or long form as the
+// design: go-ref-tooltips  implements: req-details-context.2
+// In-book reference links in prose render as their plain label plus a small (?) marker:
+// the marker's title carries the referent's statement or long form as the
 // hover tooltip; a click jumps to the definition. External URLs stay real links; runs
-// per chapter AFTER term expansion, so the term machinery is untouched.
+// per chapter AFTER term expansion, so the term machinery is untouched. Content notes
+// (methods, fundamentals, references) carry their statement as the brief
+// (a method mention in prose is a dashed-underline link - the details pane shows
+// the brief plus the jump to the full method in the appendix).
 var refTipRe = regexp.MustCompile(`<a (?:class="term" )?href="#([^"]+)">([^<]+)</a>`)
 
-func refTooltips(html string, nodes map[string]Node, gloss map[string]GlossTerm) string {
+// contentTips maps every content-note slug to its one-liner - the termref brief.
+func contentTips() map[string]string {
+	out := map[string]string{}
+	for _, kind := range []string{"methods", "fundamentals", "references"} {
+		for s, c := range ReadContentNotes(kind) {
+			tip := c.Statement
+			if tip == "" {
+				tip = c.Title
+			}
+			if tip != "" {
+				out[s] = tip
+			}
+		}
+	}
+	return out
+}
+
+func refTooltips(html string, nodes map[string]Node, gloss map[string]GlossTerm, tips map[string]string) string {
 	return refTipRe.ReplaceAllStringFunc(html, func(m string) string {
 		g := refTipRe.FindStringSubmatch(m)
 		target, label := g[1], g[2]
@@ -3774,6 +5083,8 @@ func refTooltips(html string, nodes map[string]Node, gloss map[string]GlossTerm)
 			}
 		} else if n, ok := nodes[target]; ok {
 			tip = n.Statement
+		} else if t, ok := tips[target]; ok {
+			tip = t
 		}
 		if tip == "" {
 			tip = "go to definition"
@@ -3817,40 +5128,45 @@ func renderGlossaryChapter(gloss map[string]GlossTerm, used map[string][]string)
 		return ""
 	}
 	var b strings.Builder
-	// the glossary is the same interactive table as every query (field c43,
-	// req-glossary-table); the term-<slug> anchors ride on the rows.
-	// the glossary lives at the end of ch3 (design input), NOT as a standalone chapter
-	// (owner review c13): a <section> the emitter splices into the ch3 article; the
-	// term-<slug> row anchors stay so term links still jump here.
+	// ONE glossary for the whole book, spliced into the
+	// FUNDAMENTALS chapter.
+	// The unified reader-table anatomy: NAME plus
+	// BRIEF collapsed; the expand carries the full definition and where the
+	// term is used. The term-<slug> row anchors stay so term links still jump here.
 	b.WriteString(`<section id="glossary" data-layer="glossary"><h2>Glossary</h2>` + "\n")
-	b.WriteString(`<table class="q-table" data-sortable="1" data-layer="glossary"><thead><tr><th scope="col">term</th><th scope="col">definition</th><th scope="col">used in</th></tr>`)
-	b.WriteString(`<tr class="q-filter"><td colspan="3"><input class="qt-search" type="search" placeholder="filter rows"></td></tr></thead><tbody>` + "\n")
+	b.WriteString(`<div class="utable">`)
+	b.WriteString(`<table class="q-table u-table" data-sortable="1" data-layer="glossary"><thead><tr><th scope="col">name</th><th scope="col">brief</th></tr></thead><tbody>` + "\n")
 	for _, s := range slugs {
 		t := gloss[s]
 		if t.Class == "notation" {
 			continue // notation renders in its own derived list (go-ch2-derived)
 		}
-		b.WriteString(`<tr id="term-` + s + `"><td class="stmt"><strong>` + htmlEscape(t.Term) + `</strong> — ` + htmlEscape(t.Long) + `</td><td>` + mdLite(t.Def) + `</td><td class="meta">`)
+		b.WriteString(`<tr class="urow qt-exp" id="term-` + s + `" data-node="term-` + s + `" data-text="` + attesc(htmlEscape(strings.ToLower(t.Term+" "+t.Long))) + `"><td><span class="utri" aria-hidden="true"></span>` + htmlEscape(t.Term) + `</td><td class="ubrief">` + htmlEscape(t.Long) + `</td></tr>` + "\n")
+		b.WriteString(`<tr class="udetail" hidden><td colspan="2">`)
+		if d := strings.TrimSpace(t.Def); d != "" {
+			b.WriteString(`<div data-layer="informative">` + mdLiteAt(d, 3) + `</div>`)
+		}
+		b.WriteString(`<p class="ufield"><span class="ufl">used in:</span> `)
 		for i, ch := range used[s] {
 			if i > 0 {
 				b.WriteString(", ")
 			}
 			b.WriteString(`<a href="#` + htmlEscape(ch) + `">` + htmlEscape(ch) + `</a>`)
 		}
-		b.WriteString("</td></tr>\n")
+		b.WriteString("</p></td></tr>\n")
 	}
-	b.WriteString("</tbody></table></section>\n")
+	b.WriteString("</tbody></table></div></section>\n")
 	return b.String()
 }
 
-// design: go-ch2-derived  implements: req-ch2-derived
-// The pull law of the fundamentals chapter (owner rulings 2026-07-05 + 2026-07-06):
+// design: go-ch2-derived  implements: req-chapters-canned.1
+// The pull law of the fundamentals chapter:
 // everything renders from USAGE alone - an entry nothing links does not render. Usage =
-// a link in the rendered chapters, authored or auto-linked (go-auto-link). Since the
-// 2026-07-06 ruling the references and fundamentals lists are POOLED QUERIES the ch2/ch8
+// a link in the rendered chapters, authored or auto-linked (go-auto-link).
+// The references and fundamentals lists are POOLED QUERIES the ch2/ch8
 // manifests embed (`referenced != false`, evaluated deferred over the emitter's link
 // graph; full bodies via `render: full` - go-base-eval); references are the ONLY legal
-// home of an external URL (req-external-links), so the URL prints in that view and
+// home of an external URL (req-spec-content-lint.3), so the URL prints in that view and
 // nowhere else. Notation and the glossary stay emitter-derived below: their term-anchor
 // (`term-<slug>`) and first-use-expansion machinery is inherently the emitter's.
 
@@ -3918,8 +5234,8 @@ func unlinkedTermAdvisories(chapterID, body string, gloss map[string]GlossTerm) 
 
 // metaQuarantineFindings: a meta-classified term in a reader chapter's authored content is flagged.
 func metaQuarantineFindings(nodes map[string]Node, gloss map[string]GlossTerm) []string {
-	// design: go-quarantine-scope  implements: req-quarantine-scope
-	// The boundary since the nine-chapter walk (supersedes the chapters-1-6 wording): EVERY
+	// design: go-quarantine-scope  implements: req-spec-content-lint.7
+	// The boundary: EVERY
 	// chapter speaks only about the system - rationales included; the guidance chapter
 	// (mode `guidance`, renders as a chapter) and the agent guide (mode `agent`) are the
 	// only self-referential surfaces.
@@ -3945,12 +5261,12 @@ func metaQuarantineFindings(nodes map[string]Node, gloss map[string]GlossTerm) [
 
 // enddesign
 
-// design: go-book-honesty  implements: req-book-honesty, req-provenance-icons
-// The book never claims more than the gates (req-book-honesty): every transcluded node renders its
+// design: go-book-honesty  implements: req-book-trust.1, req-ai-provenance.2
+// The book never claims more than the gates (req-book-trust.1): every transcluded node renders its
 // LIVE ledger state as visible text and a data attribute; a SUSPECT or unverified state carries the
-// warning tag in the reading flow, never only styling. The provenance marks render as the owner's
-// drawn SVG robot column - small icons set vertically in the text margin (M5 spike, owner-decided:
-// no font dependency, machine-readable label "AI involvement: N of 3"). The count comes ONLY from
+// warning tag in the reading flow, never only styling. The provenance marks render as a
+// drawn SVG robot column - small icons set vertically in the text margin (no font
+// dependency, machine-readable label "AI involvement: N of 3"). The count comes ONLY from
 // the stored mark (write-time truth, adr-provenance-involvement); rendering can never show more
 // marks than recorded, and ai:0 renders none.
 const svgRobot = `<svg width="14" height="14" viewBox="0 0 18 18" role="img" aria-label="AI mark"><rect x="3" y="6" width="12" height="9" rx="2" fill="#5b7fa6"/><circle cx="7" cy="10.5" r="1.6" fill="#fff"/><circle cx="11" cy="10.5" r="1.6" fill="#fff"/><line x1="9" y1="3" x2="9" y2="6" stroke="#5b7fa6" stroke-width="1.5"/><circle cx="9" cy="2.5" r="1.2" fill="#5b7fa6"/></svg>`
@@ -3994,7 +5310,7 @@ func selftestBookManifests() bool {
 	}
 	defer os.RemoveAll(dir)
 	p := filepath.Join(dir, "man-probe.md")
-	body := "---\nid: man-probe\ntype: manifest\nmode: chapter\nstatement: Probe chapter.\n---\n<!-- ai:3 -->\nAn inline lede unit.\n---\n[req-book-honesty](req-book-honesty.md) depth:2\nNote: speak slowly here\n---\n[uc-book-read](uc-book-read.md)\n"
+	body := "---\nid: man-probe\ntype: manifest\nmode: chapter\nstatement: Probe chapter.\n---\n<!-- ai:3 -->\nAn inline lede unit.\n---\n[req-book-trust.1](req-book-trust.1.md) depth:2\nNote: speak slowly here\n---\n[uc-book-read](uc-book-read.md)\n"
 	if os.WriteFile(p, []byte(body), 0o644) != nil {
 		return false
 	}
@@ -4009,7 +5325,7 @@ func selftestBookManifests() bool {
 	if units[0].Ref != "" || !strings.Contains(units[0].Body, "inline lede") {
 		return false // inline markdown passes through
 	}
-	if units[1].Ref != "req-book-honesty" || units[1].Depth != 2 || units[1].Notes != "speak slowly here" {
+	if units[1].Ref != "req-book-trust.1" || units[1].Depth != 2 || units[1].Notes != "speak slowly here" {
 		return false // a ref unit carries id, declared depth, and its speaker notes
 	}
 	if units[2].Ref != "uc-book-read" || units[2].Depth != 0 {
@@ -4029,8 +5345,9 @@ func selftestBookManifests() bool {
 	if !strings.Contains(html, "in-man-preset-exec") || !strings.Contains(html, `data-view="man-preset-exec"`) {
 		return false // the preset reaches the article classes and the nav
 	}
-	if !strings.Contains(html, `hidden="until-found"`) || !strings.Contains(html, "expand-all") {
-		return false // the disclosure mechanism (depth 2 renders it) and its expand-all escape hatch
+	// no global expand-all pill; the disclosure mechanism itself stays.
+	if !strings.Contains(html, `hidden="until-found"`) || strings.Contains(html, `id="expand-all"`) {
+		return false // the disclosure mechanism (depth 2 renders it); no global expand-all pill
 	}
 	return true
 }
@@ -4058,7 +5375,7 @@ func selftestBookOrphans() bool {
 	if len(found) != 1 || !strings.Contains(found[0], "req-b") {
 		return false // the unreferenced node is flagged; the excluded one is covered
 	}
-	// a live view REACHES its matched nodes (owner ruling 2026-07-07): the book shows them,
+	// a live view REACHES its matched nodes: the book shows them,
 	// so the lint must count them - req-b matches the inline query below; req-d matches nothing.
 	rb := filepath.Join(dir, "req-b.md")
 	os.WriteFile(rb, []byte("---\nid: req-b\ntype: requirement\nstatement: B.\n---\n"), 0o644)

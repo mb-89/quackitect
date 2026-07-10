@@ -1,4 +1,4 @@
-<!-- design: method-ai-drafting  implements: req-ai-drafting :: The drafting method: the AI writes every first draft of book prose FROM injected context (the manifest's referenced nodes, the glossary terms, the audience row, the voice) and stamps every prose unit with its involvement mark at write time; unmarked prose has no path into the book (the emitter refuses it); later touches adjust the mark on the surface-versus-core line. -->
+<!-- design: method-ai-drafting  implements: req-ai-provenance.1 :: The drafting method: the AI writes every first draft of book prose FROM injected context (the manifest's referenced nodes, the glossary terms, the audience row, the voice) and stamps every prose unit with its involvement mark at write time; unmarked prose has no path into the book (the emitter refuses it); later touches adjust the mark on the surface-versus-core line. -->
 # draft — how book prose gets written
 
 The AI writes every first draft. The user improves it. No exceptions, no unmarked prose.
@@ -18,6 +18,13 @@ The AI writes every first draft. The user improves it. No exceptions, no unmarke
 - Meta-quarantine: chapters one to six speak only about the system. Process talk goes to the agent guide.
 - Queries pool centrally. A table view is a `.base` file in `spec/queries/`, referenced with `![[name.base]]`. Never author an inline base block in a manifest.
 - Sources are notes. A claim that leans on an external source links its `ref-` note in `spec/references/`. A source without a note gets one first. A raw URL outside a reference note is refused by the lint.
+
+## Render laws (owner law - the renderer enforces them; author accordingly)
+
+- Table vs prose is DETERMINISTIC. A homogeneous set of typed nodes renders as a TABLE, decided by the renderer from node data - never by how the prose was authored. Never hand-author a node set into prose: put it in nodes and embed the `.base` view.
+- Statement renders ONCE. The table row carries the brief; the expand shows only what the row does not show. Never restate a node's statement at the top of its body.
+- Section numbers derive at render time from the book structure. Never author numbers into headings.
+- Links, never copies. Where a passage shows another node, link it (name + brief into the details panel). Duplicated content is a defect, not emphasis.
 
 ## Mark (the involvement stamp - structural, at write time)
 

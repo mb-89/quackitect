@@ -40,3 +40,15 @@ killer: false
 ---
 {{description and reaction}}
 ```
+
+## Mint skeleton
+`quack mint` seeds these fields from this fence, verbatim. The engine owns every other key.
+
+```skeleton
+kind: risk
+probability: 0.5
+impact: 0.5
+mitigation: TODO
+owner: TODO
+status: open
+```

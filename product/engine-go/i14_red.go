@@ -9,31 +9,39 @@ import (
 	"strings"
 )
 
-// The shared render. Guarded against coverage self-recursion (the i13 lesson:
-// renderBookHTML computes StatusMap, whose coverage evaluation re-runs the asking
-// test). Cached, because nineteen doc-tests per battery would otherwise render
-// nineteen ~25MB books.
-var (
-	i14BookBusy   bool
-	i14BookCache  string
-	i14BookCached bool
-)
-
-func i14Book() (string, bool) {
-	if i14BookBusy {
-		return "", false // nested probe: vacuously ok; the outer run decides
-	}
-	if i14BookCached {
-		return i14BookCache, true
-	}
-	i14BookBusy = true
-	defer func() { i14BookBusy = false }()
-	html, _, _ := renderBookHTML(LoadAll())
-	i14BookCache, i14BookCached = html, true
-	return html, true
+// i14Tests: this file's checks, in battery order (selftestRegistry in
+// selftest.go concatenates the per-file slices).
+var i14Tests = []namedTest{
+	{"shell-title-card", selftestShellTitleCard},
+	{"sidebar-order", selftestSidebarOrder},
+	{"section-paging", selftestSectionPaging},
+	{"search-hitlist", selftestSearchHitlist},
+	{"reader-columns", selftestReaderColumns},
+	{"table-render", selftestTableRender},
+	{"table-noise", selftestTableNoise},
+	{"table-interact", selftestTableInteract},
+	{"glossary-table", selftestGlossaryTable},
+	{"ref-tooltips", selftestRefTooltips},
+	{"ch6-no-graph", selftestCh6NoGraph},
+	{"icon-density", selftestIconDensity},
+	{"agent-guide-ch8", selftestAgentGuideCh8},
+	{"ch8-audience-subchapters", selftestCh8AudienceSubchapters},
+	{"ch3-ucfn-merge", selftestCh3UcfnMerge},
+	{"need-expand", selftestNeedExpand},
+	{"system-overview", selftestSystemOverview},
+	{"comment-persist", selftestCommentPersist},
+	{"deck-views-section", selftestDeckViewsSection},
+	{"context-star-derived", selftestContextStarDerived},
 }
 
+// The shared render, THE process-global memo (bookOnceHTML in
+// book_once.go): one guarded, cached real-book render for the whole battery.
+func i14Book() (string, bool) { return bookOnceHTML() }
+
 // test-shell-title-card -> selftest:shell-title-card
+// No STANDING #book-info block - the
+// identity rides the title button's data attributes and a title click feeds the
+// details pane like any other click target.
 func selftestShellTitleCard() bool {
 	html, live := i14Book()
 	if !live {
@@ -41,13 +49,17 @@ func selftestShellTitleCard() bool {
 	}
 	return !strings.Contains(html, "reader's contract") &&
 		!strings.Contains(html, "<header data-root=") &&
-		strings.Contains(html, `id="dc-iteration"`) &&
-		strings.Contains(html, `id="dc-engine"`)
+		!strings.Contains(html, `id="book-info"`) &&
+		strings.Contains(html, `data-iteration="`) &&
+		strings.Contains(html, `data-engine="`)
 }
 
 // test-sidebar-order -> selftest:sidebar-order
-// Since the details-pane rework the views block lives INSIDE the pane (dpane-views);
-// the nav reads search, filter expression, then the toc.
+// No views block in the details pane - the pane
+// is context-sensitive only (q-views-placement holds the future home). The nav reads
+// search, filter expression, then the toc, then the pane.
+// The expand-all pill is gone; the toc shows the SHORT chapter title only,
+// the subtitle renders at the chapter head.
 func selftestSidebarOrder() bool {
 	html, live := i14Book()
 	if !live {
@@ -63,12 +75,17 @@ func selftestSidebarOrder() bool {
 	iSearch := strings.Index(nav, `id="search"`)
 	iExpr := strings.Index(nav, `id="filter-expr"`)
 	iToc := strings.Index(nav, `id="toc"`)
-	return iSearch >= 0 && iExpr > iSearch && iToc > iExpr &&
-		strings.Contains(nav, `id="dpane-views"`)
+	iPane := strings.Index(nav, `id="dpane-content"`)
+	return iSearch >= 0 && iExpr > iSearch && iToc > iExpr && iPane > iToc &&
+		!strings.Contains(nav, "dpane-views") &&
+		!strings.Contains(nav, `id="expand-all"`) &&
+		!strings.Contains(nav, "toc-sub") &&
+		strings.Contains(nav, " Introduction</a>") &&
+		strings.Contains(html, `class="ch-sub"`)
 }
 
 // test-section-paging -> selftest:section-paging
-// The top pager bar died (owner c1): paging flows through the toc, hash, and arrow
+// No top pager bar: paging flows through the toc, hash, and arrow
 // keys - one top-level section per page, toggled by the pg-hide class.
 func selftestSectionPaging() bool {
 	html, live := i14Book()
@@ -80,7 +97,7 @@ func selftestSectionPaging() bool {
 }
 
 // test-search-hitlist -> selftest:search-hitlist
-// The hit list died in the 2026-07-08 sidebar rework: a search steps through the
+// No hit list: a search steps through the
 // matches with a previous/next counter; the full-yellow highlight stays.
 func selftestSearchHitlist() bool {
 	html, live := i14Book()
@@ -123,7 +140,8 @@ func selftestTableNoise() bool {
 }
 
 // test-table-interact -> selftest:table-interact
-// The enum selects died for combinable pill facets (req-table-facets, i14).
+// Combinable pill facets replace enum selects (req-table-facets); no
+// per-table q-filter row - the text filter lives in the shared .qt-search control.
 func selftestTableInteract() bool {
 	html, live := i14Book()
 	if !live {
@@ -131,7 +149,7 @@ func selftestTableInteract() bool {
 	}
 	return strings.Contains(html, "data-sortable") &&
 		strings.Contains(html, `data-facet=`) &&
-		strings.Contains(html, `class="q-filter"`)
+		strings.Contains(html, `class="qt-search"`)
 }
 
 // test-glossary-table -> selftest:glossary-table
@@ -176,7 +194,7 @@ func selftestCh6NoGraph() bool {
 	if j := strings.Index(ch[1:], "<article "); j >= 0 {
 		ch = ch[:j+1]
 	}
-	// no timeline GRAPH in ch6 (field c41: the table carries it); the gate-tally table
+	// no timeline GRAPH in ch6 (the table carries it); the gate-tally table
 	// and the ai-mark icons stay
 	return strings.Contains(ch, `class="q-table`) && !strings.Contains(ch, `aria-label="timeline"`)
 }
@@ -203,17 +221,25 @@ func selftestAgentGuideCh8() bool {
 }
 
 // test-ch8-audience-subchapters -> selftest:ch8-audience-subchapters
+// No per-audience sibling
+// subchapters - ONE guides table; every audience class of the project type
+// must stay visible there, as a guide row or an honest empty row.
 func selftestCh8AudienceSubchapters() bool {
 	html, live := i14Book()
 	if !live {
 		return true
 	}
+	i := strings.Index(html, `id="guides-table"`)
+	if i < 0 {
+		return false
+	}
 	for _, c := range []string{"acquirer", "user", "newcomer", "communicator", "assessor", "project-owner", "agent"} {
-		if !strings.Contains(html, `id="man-ch8-aud-`+c+`"`) {
+		if !strings.Contains(html[i:], `data-aud="`+c+`"`) {
 			return false
 		}
 	}
-	return true
+	// the flattened sibling subchapters are gone
+	return !strings.Contains(html, `id="man-ch8-aud-`)
 }
 
 // test-ch3-ucfn-merge -> selftest:ch3-ucfn-merge
@@ -226,20 +252,22 @@ func selftestCh3UcfnMerge() bool {
 }
 
 // test-need-expand -> selftest:need-expand
+// No per-need disclosure
+// board - TWO reader tables inside the merged section: use cases (expand =
+// the definition) and functions (each row naming its need).
 func selftestNeedExpand() bool {
 	html, live := i14Book()
 	if !live {
 		return true
 	}
-	i := strings.Index(html, `class="need-ucs"`)
+	i := strings.Index(html, `id="ucfn-board"`)
 	if i < 0 {
 		return false
 	}
-	tail := html[i:]
-	if len(tail) > 2000 {
-		tail = tail[:2000]
-	}
-	return strings.Contains(tail, "<li")
+	board := html[i:]
+	// both captions render; a use-case row is expandable
+	return strings.Contains(board, ">Use cases</p>") && strings.Contains(board, ">Functions</p>") &&
+		strings.Contains(board, `data-node="uc-`) && strings.Contains(board, "urow qt-exp")
 }
 
 // test-system-overview -> selftest:system-overview
@@ -253,27 +281,40 @@ func selftestSystemOverview() bool {
 }
 
 // test-comment-persist -> selftest:comment-persist
+// The save serializer strips the present-mode
+// state so a copy saved mid-presentation reopens as the book, and opening the panel
+// fills the details pane with the how-it-works explainer.
 func selftestCommentPersist() bool {
 	html, live := i14Book()
 	if !live {
 		return true
 	}
-	return strings.Contains(html, "qc-draft") && strings.Contains(html, "postAllDrafts")
+	return strings.Contains(html, "qc-draft") && strings.Contains(html, "postAllDrafts") &&
+		strings.Contains(html, "body.removeAttribute('data-present')") &&
+		strings.Contains(html, "querySelectorAll('.slide.current')") &&
+		strings.Contains(html, "bookDetail('Comments'")
 }
 
 // test-deck-views-section -> selftest:deck-views-section
+// The decks
+// have ONE entry point - present buttons inside the views home block in the
+// introduction chapter. Never the details pane; no deck list rides the sidebar.
 func selftestDeckViewsSection() bool {
 	html, live := i14Book()
 	if !live {
 		return true
 	}
-	return strings.Contains(html, `id="deck-list"`)
+	return !strings.Contains(html, `id="deck-list"`) &&
+		!strings.Contains(html, "dpane-views") &&
+		strings.Contains(html, `class="views-home"`) &&
+		strings.Contains(html, `class="present" data-deck="`) &&
+		strings.Contains(html, `class="deck"`)
 }
 
 // test-context-diagram -> selftest:context-star-derived
 // The star derives from neighbour NOTES, never from invented actors: each nbr- node
 // renders as one border-connected box, direction `in` on the left flank and `out` on
-// the right (owner ruling 2026-07-09); an empty neighbour set says so out loud.
+// the right; an empty neighbour set says so out loud.
 func selftestContextStarDerived() bool {
 	nodes := map[string]Node{
 		"nbr-console": {ID: "nbr-console", Type: "neighbour", Statement: "The console. Commands and blesses.", Direction: "in"},

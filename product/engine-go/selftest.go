@@ -30,489 +30,52 @@ func MerkleRoot(nodes map[string]Node) string {
 	return hex.EncodeToString(x[:])
 }
 
-// design: go-selftest  implements: req-behavior-parity
+// design: go-selftest  implements: req-go-port.1
 // The engine verifies ITSELF, in Go, in-process, with zero external toolchain — no uv, no python,
 // no go test. Executed checks carry 'verify: selftest:<name>'; the engine runs the named check
 // directly. Parity = the merkle root equals the baselined golden root (a determinism regression).
+// A CLUSTERED test node names several checks in one verify value
+// (adr-cluster-numbered-statements): space-separated, ALL must pass — the node
+// is the ledger unit, the named checks are its runners.
 func runSelftest(name string) bool {
-	switch name {
-	case "parser":
-		return selftestParser()
-	case "determinism":
-		r1, r2 := MerkleRoot(LoadAll()), MerkleRoot(LoadAll())
-		return r1 != "" && r1 == r2
-	case "ids":
-		return len(DuplicateIDs()) == 0
-	case "help":
-		_, bad := badIDArg("start", []string{"-x"})
-		return helpRequested([]string{"start", "--help"}) && bad && !helpRequested([]string{"status", "an-id"})
-	case "parity":
-		return selftestParity()
-	case "perf":
-		return selftestPerf()
-	case "deps":
-		return true // this running at all proves the dependency-free binary works
-	case "deps-prompt":
-		_, err := os.Stat(filepath.Join(EngineDir(), "method", "prompts", "dependencies.md"))
-		return err == nil
-	case "report":
-		return selftestReport()
-	case "split":
-		return selftestSplit()
-	case "integrate":
-		return selftestIntegrate()
-	case "engine":
-		return selftestEngine()
-	case "method":
-		return selftestMethod()
-	case "surface":
-		return selftestSurface()
-	case "build":
-		return selftestBuild()
-	case "no-trace-gate":
-		return selftestNoTraceGate()
-	case "tests-pass-eval":
-		return selftestTestsPassEval()
-	case "workspace":
-		return selftestWorkspace()
-	case "brand":
-		return selftestBrand()
-	case "claude-vendor":
-		return selftestClaudeVendor()
-	case "report-verdict":
-		return selftestReportVerdict()
-	case "report-nesting":
-		return selftestReportNesting()
-	case "brand-resolves":
-		return selftestBrandResolves()
-	case "validation-global":
-		return selftestValidationGlobal()
-	case "stubs":
-		return selftestStubs()
-	case "readout":
-		return selftestReadout()
-	case "contract":
-		return selftestContract()
-	case "bootstrap":
-		return selftestBootstrap()
-	case "correctness":
-		return selftestCorrectness()
-	case "report-live":
-		return selftestReportLive()
-	case "evidence-honesty":
-		return selftestEvidenceHonesty()
-	case "tests-red":
-		return selftestTestsRed()
-	case "parser-strict":
-		return selftestParserStrict()
-	case "ref-integrity":
-		return selftestRefIntegrity()
-	case "actor-channels":
-		return selftestActorChannels()
-	case "design-hash-norm":
-		return selftestDesignHashNorm()
-	case "kernel-vectors":
-		return selftestKernelVectors()
-	case "kernel-cone":
-		return selftestKernelCone()
-	case "kernel-gatewalk":
-		return selftestKernelGatewalk()
-	case "kernel-attest":
-		return selftestKernelAttest()
-	case "logs-dir":
-		return selftestLogsDir()
-	case "ears-lint":
-		return selftestEarsLint()
-	case "ears-method":
-		return selftestEarsMethod()
-	case "monotonic-lint":
-		return selftestMonotonicLint()
-	case "attest-block":
-		return selftestAttestBlock()
-	case "attest-console":
-		return selftestAttestConsole()
-	case "attest-challenge":
-		return selftestAttestChallenge()
-	case "attest-grant":
-		return selftestAttestGrant()
-	case "attest-renewal":
-		return selftestAttestRenewal()
-	case "attest-keys":
-		return selftestAttestKeys()
-	case "attest-expiry":
-		return selftestAttestExpiry()
-	case "verify-cache":
-		return selftestVerifyCache()
-	case "verify-feedback":
-		return selftestVerifyFeedback()
-	case "status-fast":
-		return selftestStatusFast()
-	case "why-derived":
-		return selftestWhyDerived()
-	case "notes-list":
-		return selftestNotesList()
-	case "call-log":
-		return selftestCallLog()
-	case "mint-dedupe":
-		return selftestMintDedupe()
-	case "mint-rationale":
-		return selftestMintRationale()
-	case "ratchet-semantic":
-		return selftestRatchetSemantic()
-	case "scaffold-modern":
-		return selftestScaffoldModern()
-	case "pager-merge":
-		return selftestPagerMerge()
-	case "user-wording":
-		return selftestUserWording()
-	case "parity-standalone":
-		return selftestParityStandalone()
-	case "pager-scope":
-		return selftestPagerScope()
-	case "suspect-root":
-		return selftestSuspectRoot()
-	case "evidence-cache-cap":
-		return selftestEvidenceCacheCap()
-	case "evidence-hashed":
-		return selftestEvidenceHashed()
-	case "grandfathers-decided":
-		return selftestGrandfathersDecided()
-	case "legacy-lanes-retired":
-		return selftestLegacyLanesRetired()
-	case "stamp-user":
-		return selftestStampUser()
-	case "testsred-exempt":
-		return selftestTestsredExempt()
-	case "authoring-cheap":
-		return selftestAuthoringCheap()
-	case "ai-drafting":
-		return selftestAiDrafting()
-	case "guidance-split":
-		return selftestGuidanceSplit()
-	case "method-map":
-		return selftestMethodMap()
-	case "template-system":
-		return selftestTemplateSystem()
-	case "evidence-templates":
-		return selftestEvidenceTemplates()
-	case "mint-skeleton":
-		return selftestMintSkeleton()
-	case "type-stakeholders":
-		return selftestTypeStakeholders()
-	case "book-manifests":
-		return selftestBookManifests()
-	case "book-orphan-lint":
-		return selftestBookOrphans()
-	case "book-single-file":
-		return selftestBookSingleFile()
-	case "book-depth":
-		return selftestBookDepth()
-	case "book-dom-static":
-		return selftestBookDomStatic()
-	case "chapter-tldr":
-		return selftestChapterTldr()
-	case "book-identity":
-		return selftestBookIdentity()
-	case "llm-digestible":
-		return selftestLlmDigestible()
-	case "book-figures":
-		return selftestBookFigures()
-	case "glossary-shared":
-		return selftestGlossaryShared()
-	case "meta-quarantine":
-		return selftestMetaQuarantine()
-	case "book-honesty":
-		return selftestBookHonesty()
-	case "provenance-icons":
-		return selftestProvenanceIcons()
-	case "agents-emit":
-		return selftestAgentsEmit()
-	case "book-drift":
-		return selftestBookDrift()
-	case "register-advisory":
-		return selftestRegisterAdvisory()
-	case "book-a11y":
-		return selftestBookA11y()
-	case "deck-mode":
-		return selftestDeckMode()
-	case "ratings-map":
-		return selftestRatingsMap()
-	case "base-views":
-		return selftestBaseViews()
-	case "spec-content-roots":
-		return selftestSpecContentRoots()
-	case "auto-link":
-		return selftestAutoLink()
-	case "ch2-derived":
-		return selftestCh2Derived()
-	case "fig-tables":
-		return selftestFigTables()
-	case "verdict-order":
-		return selftestVerdictOrder()
-	case "id-charset":
-		return selftestIDCharset()
-	case "conn-notes":
-		return selftestConnNotes()
-	case "conn-jsonl":
-		return selftestConnJsonl()
-	case "conn-one-lane":
-		return selftestConnOneLane()
-	case "conn-kinds":
-		return selftestConnKinds()
-	case "conn-root":
-		return selftestConnRoot()
-	case "conn-hash-neutral":
-		return selftestConnHashNeutral()
-	case "mint-connection":
-		return selftestMintConnection()
-	case "promote-connection":
-		return selftestPromoteConnection()
-	case "conn-adjacency":
-		return selftestConnAdjacency()
-	case "edge-mode":
-		return selftestEdgeMode()
-	case "migrate-edges":
-		return selftestMigrateEdges()
-	case "virtual-edges":
-		return selftestVirtualEdges()
-	case "render-refs":
-		return selftestRenderRefs()
-	case "need-item":
-		return selftestNeedItem()
-	case "mint-all-kinds":
-		return selftestMintAllKinds()
-	case "example-notes":
-		return selftestExampleNotes()
-	case "ch3-mech":
-		return selftestCh3Mech()
-	case "book-shell":
-		return selftestBookShell()
-	case "migrate-layout":
-		return selftestMigrateLayout()
-	case "comment-island":
-		return selftestCommentIsland()
-	case "comment-suggest":
-		return selftestCommentSuggest()
-	case "comment-privacy":
-		return selftestCommentPrivacy()
-	case "comment-readback":
-		return selftestCommentReadback()
-	case "comment-premark":
-		return selftestCommentPremark()
-	case "comment-escape":
-		return selftestCommentEscape()
-	case "comment-dom-static":
-		return selftestCommentDomStatic()
-	case "note-collision":
-		return selftestNoteCollision()
-	case "mint-edge-mode":
-		return selftestMintEdgeMode()
-	case "prose-marks-comments":
-		return selftestProseMarksComments()
-	case "orphan-render-refs":
-		return selftestOrphanRenderRefs()
-	case "conn-code-designs":
-		return selftestConnCodeDesigns()
-	case "launcher-single-dispatch":
-		return selftestLauncherSingleDispatch()
-	case "build-fast-path":
-		return selftestBuildFastPath()
-	case "verdict-surgical":
-		return selftestVerdictSurgical()
-	case "calls-summary":
-		return selftestCallsSummary()
-	case "selftest-home-sweep":
-		return selftestSelftestHomeSweep()
-	case "log-retention":
-		return selftestLogRetention()
-	case "observe-red-refresh":
-		return selftestObserveRedRefresh()
-	case "shell-title-card":
-		return selftestShellTitleCard()
-	case "sidebar-order":
-		return selftestSidebarOrder()
-	case "section-paging":
-		return selftestSectionPaging()
-	case "search-hitlist":
-		return selftestSearchHitlist()
-	case "reader-columns":
-		return selftestReaderColumns()
-	case "table-render":
-		return selftestTableRender()
-	case "table-noise":
-		return selftestTableNoise()
-	case "table-interact":
-		return selftestTableInteract()
-	case "glossary-table":
-		return selftestGlossaryTable()
-	case "ref-tooltips":
-		return selftestRefTooltips()
-	case "ch6-no-graph":
-		return selftestCh6NoGraph()
-	case "icon-density":
-		return selftestIconDensity()
-	case "agent-guide-ch8":
-		return selftestAgentGuideCh8()
-	case "ch8-audience-subchapters":
-		return selftestCh8AudienceSubchapters()
-	case "ch3-ucfn-merge":
-		return selftestCh3UcfnMerge()
-	case "need-expand":
-		return selftestNeedExpand()
-	case "system-overview":
-		return selftestSystemOverview()
-	case "comment-persist":
-		return selftestCommentPersist()
-	case "deck-views-section":
-		return selftestDeckViewsSection()
-	case "context-star-derived":
-		return selftestContextStarDerived()
-	case "external-engine-root":
-		return selftestExternalEngineRoot()
-	case "ask-format":
-		return selftestI15AskFormat()
-	case "ask-dispatch":
-		return selftestI15AskDispatch()
-	case "answer-apply":
-		return selftestI15AnswerApply()
-	case "mobile-actor":
-		return selftestI15MobileActor()
-	case "answer-idempotent":
-		return selftestI15AnswerIdempotent()
-	case "ask-timeout":
-		return selftestI15AskTimeout()
-	case "multi-ask":
-		return selftestI15MultiAsk()
-	case "pairing":
-		return selftestI15Pairing()
-	case "gate-distinct":
-		return selftestI15GateDistinct()
-	case "channel-seam":
-		return selftestI15ChannelSeam()
-	case "ntfy-channel":
-		return selftestI15NtfyChannel()
-	case "adapter-zero-dep":
-		return selftestI15AdapterZeroDep()
-	case "defer-excludes-coverage":
-		return selftestDeferExcludesCoverage()
-	case "first-wins-lanes":
-		return selftestI15FirstWinsLanes()
-	case "pair-qr":
-		return selftestI15PairQR()
-	case "model-nodes":
-		return selftestModelNodes()
-	case "draft-is-truth":
-		return selftestDraftIsTruth()
-	case "semantic-hash":
-		return selftestSemanticHash()
-	case "model-lint":
-		return selftestModelLint()
-	case "model-consistency":
-		return selftestModelConsistency()
-	case "conformance":
-		return selftestConformance()
-	case "divergence-suspect":
-		return selftestDivergenceSuspect()
-	case "no-flow-smell":
-		return selftestNoFlowSmell()
-	case "model-kinds":
-		return selftestModelKinds()
-	case "model-stubs":
-		return selftestModelStubs()
-	case "views-chosen":
-		return selftestViewsChosen()
-	case "models-gate-build":
-		return selftestModelsGateBuild()
-	case "models-in-book":
-		return selftestModelsInBook()
-	case "answer-validated":
-		return selftestAnswerValidated()
-	case "ch4-mech":
-		return selftestCh4Mech()
-	case "verify-method":
-		return selftestVerifyMethod()
-	case "results-exception":
-		return selftestResultsException()
-	case "criteria-validation":
-		return selftestCriteriaValidation()
-	case "chapter-canning":
-		return selftestChapterCanning()
-	case "doc-skeletons":
-		return selftestDocSkeletons()
-	case "methods-view":
-		return selftestMethodsView()
-	case "stubs-folders":
-		return selftestStubsFolders()
-	case "block-tree-design":
-		return selftestBlockTreeDesign()
-	case "new-item-kinds":
-		return selftestNewItemKinds()
-	case "note-tags":
-		return selftestNoteTags()
-	case "quality-scenarios":
-		return selftestQualityScenarios()
-	case "stakeholder-links":
-		return selftestStakeholderLinks()
-	case "decision-kinds":
-		return selftestDecisionKinds()
-	case "candidates":
-		return selftestCandidates()
-	case "facet-board":
-		return selftestFacetBoard()
-	case "external-links":
-		return selftestExternalLinks()
-	case "residue-lint":
-		return selftestResidueLint()
-	case "anchor-refers":
-		return selftestAnchorRefers()
-	case "quarantine-scope":
-		return selftestQuarantineScope()
-	case "item-templates":
-		return selftestItemTemplates()
-	case "spec-template-set":
-		return selftestSpecTemplateSet()
-	case "stub-spec":
-		return selftestStubSpec()
-	case "contract-render":
-		return selftestContractRender()
-	case "render-drift":
-		return selftestRenderDrift()
-	case "logs-canonical":
-		return selftestLogsCanonical()
-	case "data-dir-caches":
-		return selftestDataDirCaches()
-	case "truth-in-spec":
-		return selftestTruthInSpec()
-	case "root-marker":
-		return selftestRootMarker()
-	case "clean-status":
-		return selftestCleanStatus()
-	case "global-config":
-		return selftestGlobalConfig()
-	case "global-binary":
-		return selftestGlobalBinary()
-	case "engine-ratchet":
-		return selftestEngineRatchet()
-	case "notes-out":
-		return selftestNotesOut()
-	case "decisions-folder":
-		return selftestDecisionsFolder()
-	case "decision-classes":
-		return selftestDecisionClasses()
-	case "parked-list":
-		return selftestParkedList()
-	case "decision-realized":
-		return selftestDecisionRealized()
-	case "mint":
-		return selftestMint()
-	case "report-why":
-		return selftestReportWhy()
-	case "report-filter-ux":
-		return selftestReportFilterUX()
-	case "vv-time-scope":
-		return selftestVVTimeScope()
+	if names := strings.Fields(name); len(names) > 1 {
+		for _, one := range names {
+			if !runSelftestOne(one) {
+				return false
+			}
+		}
+		return true
+	}
+	return runSelftestOne(name)
+}
+
+func runSelftestOne(name string) bool {
+	for _, t := range selftestRegistry {
+		if t.name == name {
+			return t.fn()
+		}
 	}
 	return false // unknown / not-yet-built check -> OPEN
+}
+
+// The smallest core checks, formerly inline in the dispatch switch.
+func selftestDeps() bool { return true } // this running at all proves the dependency-free binary works
+
+func selftestDeterminism() bool {
+	r1, r2 := MerkleRoot(LoadAll()), MerkleRoot(LoadAll())
+	return r1 != "" && r1 == r2
+}
+
+func selftestIDs() bool { return len(DuplicateIDs()) == 0 }
+
+func selftestHelp() bool {
+	_, bad := badIDArg("start", []string{"-x"})
+	return helpRequested([]string{"start", "--help"}) && bad && !helpRequested([]string{"status", "an-id"})
+}
+
+func selftestDepsPrompt() bool {
+	_, err := os.Stat(filepath.Join(EngineDir(), "method", "prompts", "dependencies.md"))
+	return err == nil
 }
 
 // selftestEvidenceHonesty verifies req-evidence-honesty: a live-red or unbuilt check is never
@@ -543,7 +106,7 @@ func selftestEvidenceHonesty() bool {
 	return true
 }
 
-// selftestTestsRed verifies req-tdd-sequence: a red-observed attestation satisfies tests-red only at
+// selftestTestsRed verifies req-impl-fragment-tdd.2: a red-observed attestation satisfies tests-red only at
 // the hash it was recorded for; an edited test (new hash) is NOT satisfied until re-observed; and only
 // a red-observed event counts (a bless does not). Hermetic — exercises redObservedFrom on a fixture log.
 func selftestTestsRed() bool {
@@ -651,7 +214,7 @@ func selftestBuild() bool {
 	return r1 == r2 && len(r1) == 64
 }
 
-// selftestNoTraceGate: the invariant — no trace-typed node is ever a task gate (req-no-trace-gate).
+// selftestNoTraceGate: the invariant — no trace-typed node is ever a task gate (req-gate-eval-integrity.1).
 func selftestNoTraceGate() bool {
 	for _, n := range LoadAll() {
 		if traceContent[n.Type] && isGate(n) {
@@ -662,7 +225,7 @@ func selftestNoTraceGate() bool {
 }
 
 // selftestTestsPassEval: tests-pass evaluates a selftest:-verified test through the in-process
-// evaluator (the same path the gate state machine uses), not a divergent shell run (req-tests-pass-unify).
+// evaluator (the same path the gate state machine uses), not a divergent shell run (req-gate-eval-integrity.2).
 func selftestTestsPassEval() bool {
 	syn := map[string]Node{"t": {ID: "t", Type: "test", Class: "executed", Verify: "selftest:determinism"}}
 	return coverageRule(syn, "tests-pass", "")
@@ -680,7 +243,7 @@ func selftestWidthOK(s string) bool {
 }
 
 // selftestReadout: the progress bar and handover pager render deterministically, contain their
-// required sections, and never exceed readoutW columns (req-progress-bar/-handover-pager/-readout-width).
+// required sections, and never exceed readoutW columns (req-deterministic-readout.2/-handover-pager/-readout-width).
 func selftestReadout() bool {
 	nodes := LoadAll()
 	sm := StatusMap(nodes)
@@ -708,7 +271,7 @@ func selftestReadout() bool {
 
 // selftestContract: the contract and entry surfaces carry the required clauses — the active
 // read/paraphrase/confirm imperative, the actor stamps, the y=console-bless rule, and the existence of
-// the Copilot native channel (req-confirm-back/-active-imperative/-bless-y-console/-copilot-instructions).
+// the Copilot native channel (req-contract-delivery.2/-active-imperative/-bless-y-console/-copilot-instructions).
 func selftestContract() bool {
 	c := readFileStr(filepath.Join(EngineDir(), "method", "prompts", "contract.md"))
 	for _, s := range []string{"paraphrase", "actor=agent", "actor=user", "handover pager"} {
@@ -725,7 +288,7 @@ func selftestContract() bool {
 }
 
 // selftestBootstrap: the onboarding flow + empty-spec rule are on the entry surface and the README
-// leads with the conversational onboarding (req-bootstrap-flow/-empty-spec-autostart/-readme-onboarding).
+// leads with the conversational onboarding (req-project-onboarding.1/-empty-spec-autostart/-readme-onboarding).
 func selftestBootstrap() bool {
 	ig := readFileStr(filepath.Join(EngineDir(), "method", "prompts", "integrate.md"))
 	if !strings.Contains(ig, "Start a new project") || !strings.Contains(strings.ToLower(ig), "zero iterations") {
@@ -768,9 +331,9 @@ func selftestReportLive() bool {
 }
 
 // selftestWorkspace: the engine resolves a workspace (ROOT) separate from the ENGINE install, and the
-// engine resources resolve from ENGINE independent of the workspace (req-workspace-split). It then
+// engine resources resolve from ENGINE independent of the workspace (req-vendor-workspace.5). It then
 // DRIVES a bare workspace FROM INSIDE via the emitted stub launcher, resolving the engine at runtime
-// (req-drive-from-inside) — the roundtrip the feature exists for.
+// (req-workspace-stubs.1) — the roundtrip the feature exists for.
 func selftestWorkspace() bool {
 	if ENGINE == "" {
 		return false
@@ -812,16 +375,16 @@ func driveFromInside() bool {
 	// path resolves regardless, and %~dp0 inside the launcher still points at the workspace dir.
 	launcher := filepath.Join(dir, "probe.cmd")
 	cmd := exec.CommandContext(ctx, "cmd", "/c", launcher, "status")
-	cmd.Dir = dir // drive FROM INSIDE the bare workspace
+	cmd.Dir = dir                                       // drive FROM INSIDE the bare workspace
 	cmd.Env = append(os.Environ(), "QUACK_ENGINE="+exe) // the env fallback resolves THIS binary when no global install exists
 	out, err := cmd.CombinedOutput()
 	return err == nil && strings.Contains(string(out), "gates |")
 }
 
 // test-external-engine-root -> selftest:external-engine-root
-// The bugreport class-guard (owner rule 2026-07-09: every bugreport guards its CLASS of bug
+// The bugreport class-guard (every bugreport guards its CLASS of bug
 // with a test): (1) the resolution matrix of resolveEngineRoot — the engine home resolves
-// LIVE, never a copy (owner ruling: a resource edit in the repo changes every stub);
+// LIVE, never a copy (a resource edit in the repo changes every stub);
 // (2) END-TO-END, the cross-machine chain: a hermetic install home with NO pointer, ONE
 // command run inside the engine repo records it (the init self-heal — what the other
 // machine was missing), and a COMPLETE external stub (start-stubs skeleton, example nodes
@@ -884,18 +447,18 @@ func selftestExternalEngineRoot() bool {
 	return err == nil && !strings.Contains(string(out), "STRICT") && strings.Contains(string(out), "gates |")
 }
 
-// selftestBrand: user-facing output is branded from the invoked binary name (req-white-label).
+// selftestBrand: user-facing output is branded from the invoked binary name (req-vendor-workspace.4).
 func selftestBrand() bool {
 	return brandOf("/x/duckpond.exe") == "duckpond" && brandOf("quack") == "quack" && brandOf("") == "quack"
 }
 
-// selftestClaudeVendor: start init rewrites the dogfood method path to the vendored one (req-claude-vendor).
+// selftestClaudeVendor: start init rewrites the dogfood method path to the vendored one (req-vendor-workspace.1).
 func selftestClaudeVendor() bool {
 	return rewriteVendorPath("Follow product/quackitect/method/prompts/engage.md") ==
 		"Follow tools/vendor/quackitect/method/prompts/engage.md"
 }
 
-// selftestReportVerdict: the report wires a DONE check to its verdict/evidence link (req-verdict-link).
+// selftestReportVerdict: the report wires a DONE check to its verdict/evidence link (req-report-check-display.2).
 // Also a regression guard: rendering with a RELATIVE --out must still resolve links. Node paths are
 // absolute, so a relative outDir once made filepath.Rel error and blank every href + verdict link.
 // This tests the outDir primitive PURELY — it must never call RenderReport, which computes StatusMap
@@ -904,7 +467,7 @@ func selftestReportVerdict() bool {
 	if !strings.Contains(reportCSS+reportJS, "verdict") {
 		return false
 	}
-	// req-verdict-link: a DONE check must surface its verdict from the attestation even with NO doc,
+	// req-report-check-display.2: a DONE check must surface its verdict from the attestation even with NO doc,
 	// so the JS must render d.verdict (the bless record), not only d.verdict_href. Guards the i6 gap.
 	if !strings.Contains(reportJS, "d.verdict") {
 		return false
@@ -919,7 +482,7 @@ func selftestReportVerdict() bool {
 	return err == nil && rel != ""
 }
 
-// selftestReportNesting: the report renders a nested, collapsible subtask tree (req-trace-nesting).
+// selftestReportNesting: the report renders a nested, collapsible subtask tree (req-report-check-display.1).
 func selftestReportNesting() bool {
 	blob := reportCSS + reportJS
 	if !strings.Contains(blob, "children") && !strings.Contains(blob, "collaps") && !strings.Contains(blob, "kids") {
@@ -996,8 +559,8 @@ func selftestReport() bool {
 	return strings.Contains(blob, "trace-filter") && strings.Contains(reportJS, "RegExp") && strings.Contains(reportJS, "dagre")
 }
 
-// selftestStubs: the drive-from-inside stub set (req-inside-launcher, req-inside-entry-surface,
-// req-engine-loc-untracked). Verifies the launcher resolves global binary -> QUACK_ENGINE in order
+// selftestStubs: the drive-from-inside stub set (req-workspace-stubs.4, req-workspace-stubs.3,
+// req-workspace-stubs.2). Verifies the launcher resolves global binary -> QUACK_ENGINE in order
 // with a clear failure, carries no retired .quack lane (adr-retire-legacy-lanes), and the AGENTS.md
 // entry surface is self-contained (no hard checkout path). Wires test-inside-launcher/entry-surface/
 // engine-loc-untracked.
@@ -1028,16 +591,110 @@ func selftestStubs() bool {
 	return !hasIgnore
 }
 
+// coreTests: the engine-core battery seed, in battery order. Implementations live
+// in this file, except "split" (resolver.go, beside the resolver it exercises).
+var coreTests = []namedTest{
+	{"deps", selftestDeps},
+	{"parser", selftestParser},
+	{"determinism", selftestDeterminism},
+	{"ids", selftestIDs},
+	{"help", selftestHelp},
+	{"parity", selftestParity},
+	{"perf", selftestPerf},
+	{"deps-prompt", selftestDepsPrompt},
+	{"report", selftestReport},
+	{"split", selftestSplit},
+	{"integrate", selftestIntegrate},
+	{"engine", selftestEngine},
+	{"method", selftestMethod},
+	{"surface", selftestSurface},
+	{"build", selftestBuild},
+	{"no-trace-gate", selftestNoTraceGate},
+	{"tests-pass-eval", selftestTestsPassEval},
+	{"workspace", selftestWorkspace},
+	{"brand", selftestBrand},
+	{"claude-vendor", selftestClaudeVendor},
+	{"report-verdict", selftestReportVerdict},
+	{"report-nesting", selftestReportNesting},
+	{"brand-resolves", selftestBrandResolves},
+	{"validation-global", selftestValidationGlobal},
+	{"stubs", selftestStubs},
+	{"readout", selftestReadout},
+	{"contract", selftestContract},
+	{"bootstrap", selftestBootstrap},
+	{"correctness", selftestCorrectness},
+	{"report-live", selftestReportLive},
+	{"evidence-honesty", selftestEvidenceHonesty},
+	{"tests-red", selftestTestsRed},
+}
+
+// externalRootTests: the cross-machine bugreport class-guard's battery slot (the
+// function lives above, beside driveFromInside).
+var externalRootTests = []namedTest{
+	{"external-engine-root", selftestExternalEngineRoot},
+}
+
+// design: go-selftest-registry  implements: req-battery-lean
+// ONE source for the selftest battery: each test-implementation file declares an
+// ordered []namedTest slice beside its functions, and the single init below
+// concatenates them EXPLICITLY, in battery order. The registry drives BOTH the
+// name->func dispatch (runSelftestOne) and the full-battery name list
+// (RunSelftestCLI), so the dispatch and the battery can never drift apart.
+//
+// Why an init assignment and not a var initializer: the battery is genuinely
+// recursive — verify-cache and evidence-honesty drive the evaluator, which
+// dispatches THROUGH the registry — so any var initializer that can reach the
+// slices is an initialization cycle (vet refuses it); the assignment in init is
+// the language's sanctioned break. The order still cannot depend on file names:
+// this is the ONLY init touching the registry, and the concatenation below is
+// the single, explicit order source (per-file inits appending their own slices
+// WOULD order the battery compiler-alphabetically — that shape stays banned).
+type namedTest struct {
+	name string
+	fn   func() bool
+}
+
+var selftestRegistry []namedTest
+
+func init() {
+	selftestRegistry = concatTests(
+		coreTests,         // selftest.go (+ "split" from resolver.go)
+		trustTests,        // selftest_trust.go
+		i9Tests,           // i9_red.go
+		i10Tests,          // i10_red.go
+		i11Tests,          // i11_red.go
+		i12Tests,          // i12_red.go (+ two book checks from book.go)
+		specTests,         // selftest_spec.go
+		i12xTests,         // i12x_red.go
+		i13Tests,          // i13_red.go
+		i14Tests,          // i14_red.go
+		externalRootTests, // selftest.go
+		i15Tests,          // i15_red.go
+		i16Tests,          // i16_red.go
+		i17Tests,          // i17_red.go
+		i17bTests,         // i17_red2.go
+		i17cTests,         // i17_red3.go
+	)
+}
+
+func concatTests(groups ...[]namedTest) []namedTest {
+	var out []namedTest
+	for _, g := range groups {
+		out = append(out, g...)
+	}
+	return out
+}
+
+// enddesign
+
 // RunSelftestCLI runs one named check (or all) and returns an exit code.
 func RunSelftestCLI(args []string) int {
-	all := []string{"deps", "parser", "determinism", "ids", "help", "parity", "perf", "deps-prompt", "report", "split", "integrate", "engine", "method", "surface", "build", "no-trace-gate", "tests-pass-eval", "workspace", "brand", "claude-vendor", "report-verdict", "report-nesting", "brand-resolves", "validation-global", "stubs", "readout", "contract", "bootstrap", "correctness", "report-live", "evidence-honesty", "tests-red", "parser-strict", "ref-integrity", "actor-channels", "design-hash-norm", "kernel-vectors", "kernel-cone", "kernel-gatewalk", "kernel-attest", "logs-dir", "ears-lint", "ears-method", "monotonic-lint",
-		"attest-block", "attest-console", "attest-challenge", "attest-grant", "attest-renewal", "attest-keys", "attest-expiry", "contract-render", "render-drift", "logs-canonical", "data-dir-caches", "truth-in-spec", "root-marker", "clean-status", "global-config", "global-binary", "engine-ratchet", "notes-out", "decisions-folder", "decision-classes", "parked-list", "decision-realized", "mint", "report-why", "report-filter-ux", "vv-time-scope", "verify-cache", "verify-feedback", "status-fast", "why-derived", "notes-list", "call-log", "mint-dedupe", "mint-rationale", "ratchet-semantic", "scaffold-modern", "pager-merge", "user-wording", "parity-standalone", "pager-scope", "suspect-root", "evidence-cache-cap", "evidence-hashed", "grandfathers-decided", "legacy-lanes-retired", "stamp-user", "testsred-exempt", "authoring-cheap", "ai-drafting", "guidance-split", "method-map", "template-system", "evidence-templates", "mint-skeleton", "type-stakeholders", "book-manifests", "book-orphan-lint", "book-single-file", "book-depth", "book-dom-static", "chapter-tldr", "book-identity", "llm-digestible", "book-figures", "glossary-shared", "meta-quarantine", "book-honesty", "provenance-icons", "agents-emit", "book-drift", "register-advisory", "book-a11y", "deck-mode", "ratings-map", "base-views", "spec-content-roots", "auto-link", "ch2-derived", "fig-tables", "decision-kinds", "candidates", "facet-board", "external-links", "residue-lint", "anchor-refers", "quarantine-scope", "item-templates", "spec-template-set", "stub-spec", "verdict-order", "render-refs", "need-item", "new-item-kinds", "note-tags", "quality-scenarios", "stakeholder-links", "mint-all-kinds", "example-notes", "ch4-mech", "block-tree-design", "verify-method", "results-exception", "criteria-validation", "chapter-canning", "doc-skeletons", "methods-view", "stubs-folders", "id-charset", "conn-notes", "conn-jsonl", "conn-one-lane", "conn-kinds", "conn-root", "conn-hash-neutral", "virtual-edges", "mint-connection", "promote-connection", "conn-adjacency", "edge-mode", "migrate-edges", "ch3-mech", "book-shell", "migrate-layout", "comment-island", "comment-suggest", "comment-privacy", "comment-readback", "comment-premark", "comment-escape", "comment-dom-static", "note-collision", "mint-edge-mode", "prose-marks-comments", "orphan-render-refs", "conn-code-designs", "launcher-single-dispatch", "build-fast-path", "verdict-surgical", "calls-summary", "selftest-home-sweep", "log-retention", "observe-red-refresh",
-		"shell-title-card", "sidebar-order", "section-paging", "search-hitlist", "reader-columns", "table-render", "table-noise", "table-interact", "glossary-table", "ref-tooltips", "ch6-no-graph", "icon-density", "agent-guide-ch8", "ch8-audience-subchapters", "ch3-ucfn-merge", "need-expand", "system-overview", "comment-persist", "deck-views-section", "context-star-derived", "external-engine-root",
-		"ask-format", "ask-dispatch", "answer-apply", "mobile-actor", "answer-idempotent", "ask-timeout", "multi-ask", "pairing", "gate-distinct", "channel-seam", "ntfy-channel", "adapter-zero-dep", "defer-excludes-coverage", "first-wins-lanes", "pair-qr",
-		"model-nodes", "draft-is-truth", "semantic-hash", "model-lint", "model-consistency", "conformance", "divergence-suspect", "no-flow-smell", "model-kinds", "model-stubs", "views-chosen", "models-gate-build", "models-in-book", "answer-validated"}
 	names := args
 	if len(names) == 0 {
-		names = all
+		names = make([]string, 0, len(selftestRegistry))
+		for _, t := range selftestRegistry {
+			names = append(names, t.name)
+		}
 	}
 	ok := true
 	for _, n := range names {
