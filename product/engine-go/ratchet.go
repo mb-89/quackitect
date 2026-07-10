@@ -19,35 +19,12 @@ import (
 // the parked .old on a later run) and re-execs. Newer binary than source: runs as-is, forward-only,
 // no versioned slots, no downgrade path (the owner's ratchet rule, 2026-07-04). A missing Go
 // toolchain degrades gracefully: warn and run the current binary.
-func globalBinPath() string {
-	return filepath.Join(userDataBase(), "quackitect", "bin", brand()+".exe")
-}
-
-// engineSrcPointer is the file beside the global binary recording WHERE the engine home
-// (the repo carrying the resource layer) lives. Resources resolve LIVE from there — never
-// a copy, never drift (owner ruling 2026-07-09): editing the repo's resources changes them
-// for every stub workspace on the machine. Build and the ratchet re-record it.
-func engineSrcPointer() string { return globalBinPath() + ".src" }
-
-func recordEngineHome(root string) error {
-	if !hasEngineLayer(root) {
-		return fmt.Errorf("no resource layer at %s", root)
-	}
-	if err := os.MkdirAll(filepath.Dir(engineSrcPointer()), 0o755); err != nil {
-		return err
-	}
-	return os.WriteFile(engineSrcPointer(), []byte(root+"\n"), 0o644)
-}
-
-func recordedEngineHome() string {
-	raw, err := os.ReadFile(engineSrcPointer())
-	if err != nil {
-		return ""
-	}
-	return strings.TrimSpace(string(raw))
-}
-
+// The binary and pointer PATHS (globalBinPath, engineSrcPointer, recordEngineHome,
+// recordedEngineHome) live in go-data-home: they are machine-home path helpers the
+// ambient layer may read without reaching outward.
 func ratchetNeeded(binTime, srcTime int64) bool { return srcTime > binTime }
+
+// enddesign
 
 // design: go-ratchet-stamp  implements: req-ratchet-semantic
 // The ratchet compares COMMITTED build-time stamps, never file mtimes (adr-ratchet-stamp; spike-

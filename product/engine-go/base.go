@@ -635,6 +635,8 @@ func (bp *baseParser) hasLink(target string) bool {
 		strings.Contains(bp.ctx.p.body, "[["+target)
 }
 
+// enddesign
+
 // design: go-virtual-edges  implements: req-virtual-edges
 // Edge properties resolve from the GRAPH when the file lacks them: after migration the
 // frontmatter no longer carries verifies/refines/..., but the loader reconstructed the

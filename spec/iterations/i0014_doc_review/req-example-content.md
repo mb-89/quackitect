@@ -5,6 +5,7 @@ depends_on: []
 statement: Where a reader-facing view would otherwise render empty, the book shall ship a clearly-marked example the author can replace or delete.
 class: review
 killer: false
+ears: exempt - authored and shipped at lean rigor (i14); blessed history, never retrofitted (adr-grandfathers-historical)
 phase: [operation]
 discipline: [software, design]
 quality: [usability]

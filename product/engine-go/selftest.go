@@ -369,6 +369,64 @@ func runSelftest(name string) bool {
 		return selftestContextStarDerived()
 	case "external-engine-root":
 		return selftestExternalEngineRoot()
+	case "ask-format":
+		return selftestI15AskFormat()
+	case "ask-dispatch":
+		return selftestI15AskDispatch()
+	case "answer-apply":
+		return selftestI15AnswerApply()
+	case "mobile-actor":
+		return selftestI15MobileActor()
+	case "answer-idempotent":
+		return selftestI15AnswerIdempotent()
+	case "ask-timeout":
+		return selftestI15AskTimeout()
+	case "multi-ask":
+		return selftestI15MultiAsk()
+	case "pairing":
+		return selftestI15Pairing()
+	case "gate-distinct":
+		return selftestI15GateDistinct()
+	case "channel-seam":
+		return selftestI15ChannelSeam()
+	case "ntfy-channel":
+		return selftestI15NtfyChannel()
+	case "adapter-zero-dep":
+		return selftestI15AdapterZeroDep()
+	case "defer-excludes-coverage":
+		return selftestDeferExcludesCoverage()
+	case "first-wins-lanes":
+		return selftestI15FirstWinsLanes()
+	case "pair-qr":
+		return selftestI15PairQR()
+	case "model-nodes":
+		return selftestModelNodes()
+	case "draft-is-truth":
+		return selftestDraftIsTruth()
+	case "semantic-hash":
+		return selftestSemanticHash()
+	case "model-lint":
+		return selftestModelLint()
+	case "model-consistency":
+		return selftestModelConsistency()
+	case "conformance":
+		return selftestConformance()
+	case "divergence-suspect":
+		return selftestDivergenceSuspect()
+	case "no-flow-smell":
+		return selftestNoFlowSmell()
+	case "model-kinds":
+		return selftestModelKinds()
+	case "model-stubs":
+		return selftestModelStubs()
+	case "views-chosen":
+		return selftestViewsChosen()
+	case "models-gate-build":
+		return selftestModelsGateBuild()
+	case "models-in-book":
+		return selftestModelsInBook()
+	case "answer-validated":
+		return selftestAnswerValidated()
 	case "ch4-mech":
 		return selftestCh4Mech()
 	case "verify-method":
@@ -974,7 +1032,9 @@ func selftestStubs() bool {
 func RunSelftestCLI(args []string) int {
 	all := []string{"deps", "parser", "determinism", "ids", "help", "parity", "perf", "deps-prompt", "report", "split", "integrate", "engine", "method", "surface", "build", "no-trace-gate", "tests-pass-eval", "workspace", "brand", "claude-vendor", "report-verdict", "report-nesting", "brand-resolves", "validation-global", "stubs", "readout", "contract", "bootstrap", "correctness", "report-live", "evidence-honesty", "tests-red", "parser-strict", "ref-integrity", "actor-channels", "design-hash-norm", "kernel-vectors", "kernel-cone", "kernel-gatewalk", "kernel-attest", "logs-dir", "ears-lint", "ears-method", "monotonic-lint",
 		"attest-block", "attest-console", "attest-challenge", "attest-grant", "attest-renewal", "attest-keys", "attest-expiry", "contract-render", "render-drift", "logs-canonical", "data-dir-caches", "truth-in-spec", "root-marker", "clean-status", "global-config", "global-binary", "engine-ratchet", "notes-out", "decisions-folder", "decision-classes", "parked-list", "decision-realized", "mint", "report-why", "report-filter-ux", "vv-time-scope", "verify-cache", "verify-feedback", "status-fast", "why-derived", "notes-list", "call-log", "mint-dedupe", "mint-rationale", "ratchet-semantic", "scaffold-modern", "pager-merge", "user-wording", "parity-standalone", "pager-scope", "suspect-root", "evidence-cache-cap", "evidence-hashed", "grandfathers-decided", "legacy-lanes-retired", "stamp-user", "testsred-exempt", "authoring-cheap", "ai-drafting", "guidance-split", "method-map", "template-system", "evidence-templates", "mint-skeleton", "type-stakeholders", "book-manifests", "book-orphan-lint", "book-single-file", "book-depth", "book-dom-static", "chapter-tldr", "book-identity", "llm-digestible", "book-figures", "glossary-shared", "meta-quarantine", "book-honesty", "provenance-icons", "agents-emit", "book-drift", "register-advisory", "book-a11y", "deck-mode", "ratings-map", "base-views", "spec-content-roots", "auto-link", "ch2-derived", "fig-tables", "decision-kinds", "candidates", "facet-board", "external-links", "residue-lint", "anchor-refers", "quarantine-scope", "item-templates", "spec-template-set", "stub-spec", "verdict-order", "render-refs", "need-item", "new-item-kinds", "note-tags", "quality-scenarios", "stakeholder-links", "mint-all-kinds", "example-notes", "ch4-mech", "block-tree-design", "verify-method", "results-exception", "criteria-validation", "chapter-canning", "doc-skeletons", "methods-view", "stubs-folders", "id-charset", "conn-notes", "conn-jsonl", "conn-one-lane", "conn-kinds", "conn-root", "conn-hash-neutral", "virtual-edges", "mint-connection", "promote-connection", "conn-adjacency", "edge-mode", "migrate-edges", "ch3-mech", "book-shell", "migrate-layout", "comment-island", "comment-suggest", "comment-privacy", "comment-readback", "comment-premark", "comment-escape", "comment-dom-static", "note-collision", "mint-edge-mode", "prose-marks-comments", "orphan-render-refs", "conn-code-designs", "launcher-single-dispatch", "build-fast-path", "verdict-surgical", "calls-summary", "selftest-home-sweep", "log-retention", "observe-red-refresh",
-		"shell-title-card", "sidebar-order", "section-paging", "search-hitlist", "reader-columns", "table-render", "table-noise", "table-interact", "glossary-table", "ref-tooltips", "ch6-no-graph", "icon-density", "agent-guide-ch8", "ch8-audience-subchapters", "ch3-ucfn-merge", "need-expand", "system-overview", "comment-persist", "deck-views-section", "context-star-derived", "external-engine-root"}
+		"shell-title-card", "sidebar-order", "section-paging", "search-hitlist", "reader-columns", "table-render", "table-noise", "table-interact", "glossary-table", "ref-tooltips", "ch6-no-graph", "icon-density", "agent-guide-ch8", "ch8-audience-subchapters", "ch3-ucfn-merge", "need-expand", "system-overview", "comment-persist", "deck-views-section", "context-star-derived", "external-engine-root",
+		"ask-format", "ask-dispatch", "answer-apply", "mobile-actor", "answer-idempotent", "ask-timeout", "multi-ask", "pairing", "gate-distinct", "channel-seam", "ntfy-channel", "adapter-zero-dep", "defer-excludes-coverage", "first-wins-lanes", "pair-qr",
+		"model-nodes", "draft-is-truth", "semantic-hash", "model-lint", "model-consistency", "conformance", "divergence-suspect", "no-flow-smell", "model-kinds", "model-stubs", "views-chosen", "models-gate-build", "models-in-book", "answer-validated"}
 	names := args
 	if len(names) == 0 {
 		names = all

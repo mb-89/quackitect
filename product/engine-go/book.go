@@ -1170,9 +1170,10 @@ func renderBookHTML(nodes map[string]Node) (string, []string, []string) {
   svg.addEventListener('dblclick',function(){st.x=base[0];st.y=base[1];st.w=base[2];st.h=base[3];apply();});
  });
  /* per-layer cytoscape graphs (owner ruling 2026-07-09): dagre left-to-right over the
-    baked JSON islands; the assets are the ones the trace chapter inlines. A node tap
-    transports to the trace row; the lower-levels node drills; hovering a node isolates
-    its neighborhood. */
+    baked JSON islands; the assets are the ones the trace chapter inlines. A region tap
+    transports to the trace row; theme clusters and the lower-levels node drill to their
+    PRE-RENDERED views (the script never creates content); hovering a node isolates its
+    neighborhood. A node subtitle (data "sub") bakes into the label's second line. */
  function __ogInit(host){
   if(host.__og||!window.cytoscape)return;
   if(!host.getBoundingClientRect().width)return; /* hidden view: init on first show */
@@ -1180,25 +1181,35 @@ func renderBookHTML(nodes map[string]Node) (string, []string, []string) {
   var d;try{d=JSON.parse(de.textContent||'{}');}catch(e){return;}
   var fb=host.querySelector('.og-fallback');if(fb)fb.hidden=true;
   var els=[];
-  (d.nodes||[]).forEach(function(n){els.push({data:{id:n.id,label:n.label,kind:n.kind}});});
-  (d.edges||[]).forEach(function(e,i){els.push({data:{id:'og'+i,source:e.s,target:e.t,kind:e.kind}});});
+  (d.nodes||[]).forEach(function(n){
+   var nd={id:n.id,label:n.sub?n.label+'\n'+n.sub:n.label,kind:n.kind};
+   if(n.go)nd.go=n.go;
+   els.push({data:nd});});
+  (d.edges||[]).forEach(function(e,i){
+   var ed={id:'og'+i,source:e.s,target:e.t,kind:e.kind};
+   if(e.label)ed.label=e.label;
+   els.push({data:ed});});
   var cy=cytoscape({container:host,elements:els,wheelSensitivity:0.2,
    layout:{name:'dagre',rankDir:'LR',nodeSep:12,rankSep:110},
    style:[
-    {selector:'node',style:{'label':'data(label)','font-size':11,'text-valign':'center','text-halign':'center','shape':'round-rectangle','width':'label','height':24,'padding':'7px','background-color':'#fff','border-width':1,'border-color':'#4a6fa5','color':'#333'}},
+    {selector:'node',style:{'label':'data(label)','font-size':11,'text-valign':'center','text-halign':'center','text-wrap':'wrap','text-max-width':170,'shape':'round-rectangle','width':'label','height':'label','padding':'7px','background-color':'#fff','border-width':1,'border-color':'#4a6fa5','color':'#333'}},
     {selector:'node[kind="in"]',style:{'border-color':'#2f8f4e','background-color':'#eef7f0'}},
     {selector:'node[kind="out"]',style:{'border-color':'#b5651d','background-color':'#fbf2ea'}},
     {selector:'node[kind="xin"],node[kind="xout"]',style:{'border-color':'#8aa0c4','background-color':'#f3f7fc','color':'#5b7fa6'}},
+    {selector:'node[kind="th"]',style:{'border-width':3,'border-style':'double','background-color':'#eef3fa','font-weight':'bold'}},
+    {selector:'node[kind="peer"]',style:{'border-style':'dashed','border-color':'#8aa0c4','background-color':'#f3f7fc','color':'#5b7fa6'}},
     {selector:'node[kind="lower"]',style:{'shape':'ellipse','width':150,'height':90,'background-color':'#dce9f8','font-weight':'bold'}},
     {selector:'edge',style:{'curve-style':'bezier','width':1.4,'line-color':'#9db6e0','target-arrow-shape':'triangle','target-arrow-color':'#9db6e0','arrow-scale':0.9}},
     {selector:'edge[kind="in"]',style:{'line-color':'#2f8f4e','target-arrow-color':'#2f8f4e'}},
     {selector:'edge[kind="out"]',style:{'line-color':'#b5651d','target-arrow-color':'#b5651d'}},
     {selector:'edge[kind="lower"]',style:{'line-style':'dashed'}},
+    {selector:'edge[label]',style:{'label':'data(label)','font-size':9,'color':'#5b7fa6','text-background-color':'#fff','text-background-opacity':0.85}},
     {selector:'.ogdim',style:{'opacity':0.12}}
    ]});
   cy.on('tap','node',function(ev){var n=ev.target,k=n.data('kind');
-   if(k==='lower'){
-    var hostView=host.closest('.onion'),t=document.getElementById(host.getAttribute('data-oglower'));
+   var go=(k==='lower')?host.getAttribute('data-oglower'):n.data('go');
+   if(go){
+    var hostView=host.closest('.onion'),t=document.getElementById(go);
     if(t&&hostView){var cur=hostView.querySelector('.oview:not([hidden])');
      if(cur&&cur!==t){__onionStack.push({host:hostView,id:cur.id});window.__quackNav.push('onion');try{history.pushState({nav:'onion'},'');}catch(_){}}
      __onionShow(hostView,t);}
@@ -1707,7 +1718,8 @@ func cmdBook(args []string) {
 // tree, timeline, stakeholder matrix - each fed from live graph data, sorted for determinism.
 // A manifest unit references one with a single `fig: <kind>` line; authored inline SVG passes
 // through mdLite as ordinary (provenance-marked) content - the generous release valve.
-var figRefRe = regexp.MustCompile(`^fig:\s*([a-z-]+)\s*$`)
+// fig: model takes an optional node-id argument (i16) — the group carries it through
+var figRefRe = regexp.MustCompile(`^fig:\s*([a-z-]+(?:\s+[a-z0-9-]+)?)\s*$`)
 
 // design: go-fig-elem-ids  implements: req-comment-figure-target
 // Figure sub-elements carry stable ids (the M5 spike's P3 failure: the book had none, so
@@ -1831,31 +1843,39 @@ func svgBlockTree(title string, blocks []string) string {
 }
 
 // design: go-onion-figure  implements: req-figure-drilldown, req-compact-renders
-// The onion figure (bs20 ruling; owner excalidraw draft 2026-07-09): a two-tier drill-down over
-// the DESIGN ELEMENTS (marked code regions), grouped by the layer of their file per the project's
-// layer map (spec/design-layers.md, innermost first; the ONE judgment input). The intra/inter-
-// element flow is the REAL call graph derived by deriveDesignFlow (a static AST pass): consumes[A]
-// = design ids A calls into, reads[A]/writes[A] = A does external input/output. Level 0 is an
-// OVERVIEW ONLY — concentric layer rings, one per SURVIVING layer, each labelled `name · N
-// elements`, with `inputs:` entering from the LEFT and `outputs:` leaving to the RIGHT as external
-// boxes with dashed connectors. No element cards here; clicking a ring drills into THAT layer. A
-// layer with NO flow at all (every element is off-flow infrastructure) is SKIPPED — no ring, no
-// view — and its elements sink INWARD into the next surviving layer's infrastructure pills (owner
-// c37). Level 1 is the NESTED ONION per surviving layer (owner draft 2026-07-09): one true CIRCLE
-// — never an oval — filling the full width minus a margin for the PORTS (input boxes outside on
-// the LEFT, output boxes outside on the RIGHT). The centre holds a smaller `lower levels` circle:
-// plain, a click drills to the next layer (the kernel view has none). Nodes in the input flow sit
-// in the LEFT half, nodes on the output path in the RIGHT half; a direct-throughput node sits in
-// the MIDDLE as ONE box (the two-box duplication died). Inner-bound flow draws to the centre
-// circle; a dotted vertical divider splits the halves. Vertically, nodes start at the middle and
-// fan out from there, wrapping into inward columns when a half overflows. Intra-layer `consumes`
-// edges draw as light arcs; `reads` gets an `in ▸` marker, `writes` a `▸ out` marker. Design
-// elements OFF the flow entirely render as `infrastructure:` pills below the svg, each linking to
-// its trace item; every flow box links to its trace item too. EVERY view is pre-rendered static
-// DOM with its own breadcrumbs and ▲/▼ layer nav — the script only toggles which view shows, it
-// never creates content. Sectors (same-topic pie wedges) are deferred by the owner. Excluded
-// patterns (iteration files) stay out; a file no layer claims falls into an outermost `unmapped`
-// ring, so the map cannot rot silently.
+// The onion figure (bs20 ruling; owner excalidraw draft 2026-07-09): a drill-down over the
+// DESIGN ELEMENTS (marked code regions). The layer map comes from go-onion-model-source. In
+// MODEL mode ring membership is STRAIGHT from the model — elements are design regions, files
+// are THEMES (owner ruling, i16); a file never earns a ring and never renders as a block. In
+// FALLBACK mode (spec/design-layers.md, stub projects) an element takes the layer of its FILE
+// per the pattern map — the old behavior, untouched. The intra/inter-element flow is the REAL
+// call graph derived by deriveDesignFlow (a static AST pass): consumes[A] = design ids A calls
+// into, reads[A]/writes[A] = A does external input/output. Level 0 is an OVERVIEW ONLY —
+// concentric layer rings, one per SURVIVING layer, each labelled `name · N elements`, with
+// `inputs:` entering from the LEFT and `outputs:` leaving to the RIGHT as external boxes with
+// dashed connectors. No element cards here; clicking a ring drills into THAT layer. A layer
+// with NO flow at all (every element is off-flow infrastructure) is SKIPPED — no ring, no view
+// — and its elements sink INWARD into the next surviving layer's infrastructure pills (owner
+// c37). Level 1 is the LAYER view: a dagre LR graph (owner cytoscape ruling 2026-07-09) of the
+// layer's BLOCKS between the ports (inputs LEFT, outputs RIGHT) and the `lower levels` node
+// (drills a layer down; the kernel view has none). In model mode a BLOCK is the THEME: one
+// cluster per file carrying SEVERAL of the layer's regions, labelled `file` + `N regions`; a
+// single-region theme renders the region itself — responsibility text as the label, `in file`
+// as the subtitle (the theme is secondary info, never the unit). Region arrows aggregate to
+// theme level, deduplicated; a collapsed multiplicity shows as `×N` on the edge. Clicking a
+// cluster opens LEVEL 2: that theme's regions in THIS layer as individual blocks (label = the
+// model's responsibility text, subtitle = the region id), with the region-level arrows within
+// the theme, outgoing to peer themes, and to the lower levels. Every region block transports
+// to its trace item on tap (the conn-code-designs surface). Intra-layer `consumes` edges draw
+// as arcs; `reads`/`writes` wire the port boxes. Design elements OFF the flow entirely render
+// as `infrastructure:` pills below the graph, each linking to its trace item; model-mode
+// AMBIENT elements always render as those pills — they sit on no ring, flow or not. EVERY view
+// (levels 0, 1, and 2) is pre-rendered static DOM with its own breadcrumbs and layer nav — the
+// script only toggles which view shows, it never creates content. Sectors (same-topic pie
+// wedges) are deferred by the owner. Excluded patterns (iteration files) stay out; in model
+// mode non-engine marker files (method/*.md) stay out too. An element no source claims falls
+// into an outermost `unmapped` ring, so the map cannot rot silently — in model mode that ring
+// holds regions the model does not allocate (the sky-fall lint keeps it empty).
 type onionLayer struct {
 	name string
 	pats []string
@@ -2122,9 +2142,9 @@ func debugDesignFlow() string {
 }
 
 func renderOnion(nodes map[string]Node) string {
-	layers, excludes, inputs, outputs, _ := readDesignLayers()
+	layers, excludes, inputs, outputs, _, model := onionLayerSource()
 	if len(layers) == 0 {
-		return `<p class="meta">no layer map yet — the onion renders once spec/design-layers.md names the layers</p>`
+		return `<p class="meta">no layer map yet — the onion renders once spec/models/model-engine-layers.md (or the spec/design-layers.md fallback) names the layers</p>`
 	}
 	// The REAL derived call graph between design elements (one AST pass; call once).
 	consumes, reads, writes := deriveDesignFlow()
@@ -2143,6 +2163,9 @@ func renderOnion(nodes map[string]Node) string {
 		} else {
 			rel = strings.TrimPrefix(rel, "product/")
 		}
+		if model != nil && !strings.HasSuffix(rel, ".go") {
+			continue // model mode maps ENGINE regions only — method marker files are no blocks
+		}
 		skip := false
 		for _, x := range excludes {
 			if layerPatMatch(x, rel) {
@@ -2158,8 +2181,10 @@ func renderOnion(nodes map[string]Node) string {
 	}
 	sortStrings(els) // each layer's slice inherits this sort order
 
-	// Each element's LAYER = the layer of its FILE (matched against the layer patterns); a file no
-	// layer claims falls into an outermost `unmapped` ring, so the map cannot rot silently.
+	// Each element's LAYER: model mode allocates STRAIGHT from the model (elements are design
+	// regions; files are themes — never a rank source). The fallback matches the element's FILE
+	// against the layer patterns. An element no source claims falls into an outermost `unmapped`
+	// ring, so the map cannot rot silently.
 	fileLayer := map[string]string{}
 	assign := func(f string) string {
 		if ln, ok := fileLayer[f]; ok {
@@ -2185,11 +2210,23 @@ func renderOnion(nodes map[string]Node) string {
 	}
 	layerOf := map[string]string{}
 	haveUnmapped := false
+	var ambientIDs []string // model-mode ambient: on NO ring, pinned to the innermost view's pills
 	for _, id := range els {
-		ln := assign(relOf[id])
+		var ln string
+		if model != nil {
+			ln = model.layerOf[id]
+			if ln == "" {
+				ln = "unmapped" // the model does not allocate it — the sky-fall lint's territory
+			}
+		} else {
+			ln = assign(relOf[id])
+		}
 		layerOf[id] = ln
 		if ln == "unmapped" {
 			haveUnmapped = true
+		}
+		if ln == "ambient" {
+			ambientIDs = append(ambientIDs, id)
 		}
 	}
 
@@ -2263,6 +2300,13 @@ func renderOnion(nodes map[string]Node) string {
 		last.infra = append(last.infra, carry...)
 		sortStrings(last.infra)
 	}
+	// model-mode ambient (meaning-free utilities): infrastructure pills on the innermost view,
+	// flow or not — ambient is never a ring member and never a flow block.
+	if len(ambientIDs) > 0 && len(survivors) > 0 {
+		last := &survivors[len(survivors)-1]
+		last.infra = append(last.infra, ambientIDs...)
+		sortStrings(last.infra)
+	}
 	ns := len(survivors)
 	if ns == 0 {
 		return `<p class="meta">no design flow yet — every mapped layer is pure infrastructure</p>`
@@ -2281,6 +2325,58 @@ func renderOnion(nodes map[string]Node) string {
 			s = s[:15] + "…"
 		}
 		return s
+	}
+	// theme = the FILE a region lives in (owner ruling: files are themes, secondary info only).
+	theme := func(id string) string {
+		rel := relOf[id]
+		return rel[strings.LastIndex(rel, "/")+1:]
+	}
+	// respLabel = a block's display text: the model's responsibility text in model mode
+	// (truncated for the canvas; the trace item carries the full text), the id otherwise.
+	respLabel := func(id string) string {
+		if model == nil {
+			return shortID(id)
+		}
+		lb := model.labelOf[id]
+		if lb == "" {
+			return shortID(id) // an unmapped region has no authored responsibility yet
+		}
+		if r := []rune(lb); len(r) > 48 {
+			lb = string(r[:47]) + "…"
+		}
+		return lb
+	}
+	// graph islands: nodes carry an optional subtitle (`sub`) and drill target (`go`);
+	// edges carry an optional `×N` label when region arrows collapse onto one theme arrow.
+	type gnode struct {
+		ID    string `json:"id"`
+		Label string `json:"label"`
+		Kind  string `json:"kind"`
+		Sub   string `json:"sub,omitempty"`
+		Go    string `json:"go,omitempty"`
+	}
+	type gedge struct {
+		S     string `json:"s"`
+		T     string `json:"t"`
+		Kind  string `json:"kind"`
+		Label string `json:"label,omitempty"`
+	}
+	// mkAdd returns a deduplicating edge appender: one edge per (s,t,kind); a counted
+	// edge that collapses several region arrows shows the multiplicity.
+	mkAdd := func(edges *[]gedge) func(s, t, kind string, counted bool) {
+		at, n := map[string]int{}, map[string]int{}
+		return func(s, t, kind string, counted bool) {
+			k := s + "|" + t + "|" + kind
+			if i, ok := at[k]; ok {
+				if counted {
+					n[k]++
+					(*edges)[i].Label = "×" + itoa(n[k]+1)
+				}
+				return
+			}
+			at[k] = len(*edges)
+			*edges = append(*edges, gedge{S: s, T: t, Kind: kind})
+		}
 	}
 	var b strings.Builder
 	b.WriteString(`<div class="onion">` + "\n")
@@ -2416,20 +2512,49 @@ func renderOnion(nodes map[string]Node) string {
 		// precedent). Ports and the outer-layer exchange are typed NODES; `lower levels`
 		// drills down. The data bakes into a JSON island; the script instantiates the canvas
 		// over the assets the trace chapter inlines.
-		type gnode struct {
-			ID    string `json:"id"`
-			Label string `json:"label"`
-			Kind  string `json:"kind"`
-		}
-		type gedge struct {
-			S    string `json:"s"`
-			T    string `json:"t"`
-			Kind string `json:"kind"`
-		}
 		var gnodes []gnode
 		var gedges []gedge
-		for _, id := range s.flow {
-			gnodes = append(gnodes, gnode{ID: id, Label: shortID(id), Kind: "el"})
+		addEdge := mkAdd(&gedges)
+		// The layer's BLOCKS. Model mode clusters by THEME (owner mid-i16 ruling: 50+ flat
+		// region blocks do not render): a file with several regions in this layer is ONE
+		// cluster block that drills into a level-2 view; a single-region theme renders the
+		// region itself. nodeOf maps every flow region to its level-1 block.
+		nodeOf := map[string]string{}
+		type themeView struct {
+			file, view string
+			ids        []string
+		}
+		var themes []themeView
+		if model != nil {
+			byTheme := map[string][]string{}
+			var order []string
+			for _, id := range s.flow {
+				f := theme(id)
+				if len(byTheme[f]) == 0 {
+					order = append(order, f)
+				}
+				byTheme[f] = append(byTheme[f], id)
+			}
+			sortStrings(order)
+			for _, f := range order {
+				ids := byTheme[f]
+				if len(ids) == 1 {
+					nodeOf[ids[0]] = ids[0]
+					gnodes = append(gnodes, gnode{ID: ids[0], Label: respLabel(ids[0]), Kind: "el", Sub: "in " + f})
+					continue
+				}
+				vid := viewID(si) + "f" + itoa(len(themes))
+				themes = append(themes, themeView{file: f, view: vid, ids: ids})
+				for _, id := range ids {
+					nodeOf[id] = "th:" + f
+				}
+				gnodes = append(gnodes, gnode{ID: "th:" + f, Label: f, Kind: "th", Sub: itoa(len(ids)) + " regions", Go: vid})
+			}
+		} else {
+			for _, id := range s.flow {
+				nodeOf[id] = id
+				gnodes = append(gnodes, gnode{ID: id, Label: shortID(id), Kind: "el"})
+			}
 		}
 		var readers, writers, inner []string
 		for _, id := range s.flow {
@@ -2447,11 +2572,11 @@ func renderOnion(nodes map[string]Node) string {
 			for _, in := range inputs {
 				gnodes = append(gnodes, gnode{ID: "in:" + in, Label: in, Kind: "in"})
 				if len(readers) == 0 {
-					gedges = append(gedges, gedge{S: "in:" + in, T: "lower:", Kind: "in"})
+					addEdge("in:"+in, "lower:", "in", false)
 					continue
 				}
 				for _, r := range readers {
-					gedges = append(gedges, gedge{S: "in:" + in, T: r, Kind: "in"})
+					addEdge("in:"+in, nodeOf[r], "in", false)
 				}
 			}
 		}
@@ -2459,7 +2584,7 @@ func renderOnion(nodes map[string]Node) string {
 			for _, out := range outputs {
 				gnodes = append(gnodes, gnode{ID: "out:" + out, Label: out, Kind: "out"})
 				for _, w := range writers {
-					gedges = append(gedges, gedge{S: w, T: "out:" + out, Kind: "out"})
+					addEdge(nodeOf[w], "out:"+out, "out", false)
 				}
 			}
 		}
@@ -2477,7 +2602,7 @@ func renderOnion(nodes map[string]Node) string {
 			gnodes = append(gnodes, gnode{ID: "xin:", Label: "from " + outerName, Kind: "xin"})
 			for _, id := range s.flow {
 				if consumesOuter[id] {
-					gedges = append(gedges, gedge{S: "xin:", T: id, Kind: "in"})
+					addEdge("xin:", nodeOf[id], "in", false)
 				}
 			}
 		}
@@ -2485,7 +2610,7 @@ func renderOnion(nodes map[string]Node) string {
 			gnodes = append(gnodes, gnode{ID: "xout:", Label: "→ " + outerName, Kind: "xout"})
 			for _, id := range s.flow {
 				if consumedByOuter[id] {
-					gedges = append(gedges, gedge{S: id, T: "xout:", Kind: "out"})
+					addEdge(nodeOf[id], "xout:", "out", false)
 				}
 			}
 		}
@@ -2494,17 +2619,28 @@ func renderOnion(nodes map[string]Node) string {
 			for _, id := range inner {
 				// out-ish elements DRAW ON the lowers; the rest FEED them (left-to-right flow)
 				if writes[id] || consumedByOuter[id] {
-					gedges = append(gedges, gedge{S: "lower:", T: id, Kind: "lower"})
+					addEdge("lower:", nodeOf[id], "lower", false)
 				} else {
-					gedges = append(gedges, gedge{S: id, T: "lower:", Kind: "lower"})
+					addEdge(nodeOf[id], "lower:", "lower", false)
 				}
 			}
 		}
+		// intra-layer calls, aggregated to the BLOCK level: a cluster's internal region
+		// arrows vanish here (level 2 shows them); parallel region arrows between two
+		// blocks collapse onto one counted edge.
 		for _, a := range s.flow {
 			for _, bb := range consumes[a] {
-				if layerOf[bb] == L {
-					gedges = append(gedges, gedge{S: a, T: bb, Kind: "uses"})
+				if layerOf[bb] != L {
+					continue
 				}
+				tn, ok := nodeOf[bb]
+				if !ok {
+					continue // the target sits in the pills, not on the flow
+				}
+				if nodeOf[a] == tn {
+					continue
+				}
+				addEdge(nodeOf[a], tn, "uses", true)
 			}
 		}
 		gj, _ := json.Marshal(map[string]interface{}{"nodes": gnodes, "edges": gedges})
@@ -2512,18 +2648,165 @@ func renderOnion(nodes map[string]Node) string {
 		b.WriteString(`<script type="application/json" class="og-data">` + string(gj) + `</script>`)
 		b.WriteString(`<div class="ograph" data-oglower="` + innerView + `" aria-label="` + htmlEscape(L) + ` layer"><p class="meta og-fallback">the layer graph renders over the inlined graph library (it ships with the trace chapter)</p></div>`)
 		b.WriteString(`</div>` + "\n")
-		// off-flow design elements (own + pushed down from skipped outer layers): infrastructure pills
+		// off-flow design elements (own + pushed down from skipped outer layers, plus
+		// model-mode ambient on the innermost view): infrastructure pills
 		if len(s.infra) > 0 {
 			b.WriteString(`<div class="onion-infra"><span class="il">infrastructure:</span>`)
 			for _, id := range s.infra {
+				if model != nil {
+					// responsibility text on the pill; id + theme in the title (full text)
+					b.WriteString(`<button type="button" data-node-link="` + htmlEscape(id) + `" title="` + htmlEscape(id+" — "+model.labelOf[id]+" (in "+theme(id)+")") + `">` + htmlEscape(respLabel(id)) + `</button>`)
+					continue
+				}
 				b.WriteString(`<button type="button" data-node-link="` + htmlEscape(id) + `">` + htmlEscape(shortID(id)) + `</button>`)
 			}
 			b.WriteString(`</div>`)
 		}
 		b.WriteString("</div>\n")
+
+		// --- level 2 (owner mid-i16 ruling): a theme cluster opens into ITS regions in this
+		// layer — one pre-rendered view per cluster, the script only toggles (the dom-static
+		// law). Blocks = the theme's regions (responsibility text, region id as subtitle);
+		// arrows = the region-level calls within the theme, outgoing to peer themes
+		// (aggregated per file), and to the lower levels. ---
+		for _, th := range themes {
+			inTheme := map[string]bool{}
+			for _, id := range th.ids {
+				inTheme[id] = true
+			}
+			var tns []gnode
+			var tes []gedge
+			add2 := mkAdd(&tes)
+			for _, id := range th.ids {
+				tns = append(tns, gnode{ID: id, Label: respLabel(id), Kind: "el", Sub: shortID(id)})
+			}
+			peers := map[string]bool{}
+			lowerUsed := false
+			for _, a := range th.ids {
+				for _, bb := range consumes[a] {
+					if inTheme[bb] {
+						add2(a, bb, "uses", true)
+						continue
+					}
+					if layerOf[bb] == L {
+						if _, ok := nodeOf[bb]; !ok {
+							continue // pills carry it, the flow does not
+						}
+						pf := theme(bb)
+						if !peers[pf] {
+							peers[pf] = true
+							tns = append(tns, gnode{ID: "peer:" + pf, Label: pf, Kind: "peer"})
+						}
+						add2(a, "peer:"+pf, "uses", true)
+						continue
+					}
+					if p, ok := svPos[layerOf[bb]]; ok && p > si {
+						lowerUsed = true
+						add2(a, "lower:", "lower", false)
+					}
+				}
+			}
+			if lowerUsed {
+				tns = append(tns, gnode{ID: "lower:", Label: "lower levels · " + innerName, Kind: "lower"})
+			}
+			b.WriteString(`<div class="oview" id="` + th.view + `" hidden>` + "\n")
+			b.WriteString(`<nav class="crumbs"><button type="button" data-onion-go="` + base + `0">overview</button> ▸ <button type="button" data-onion-go="` + viewID(si) + `">` + htmlEscape(L) + `</button> ▸ <span>` + htmlEscape(th.file) + `</span></nav>` + "\n")
+			b.WriteString(`<nav class="crumbs"><button type="button" data-onion-go="` + viewID(si) + `">▲ ` + htmlEscape(L) + `</button></nav>` + "\n")
+			gj2, _ := json.Marshal(map[string]interface{}{"nodes": tns, "edges": tes})
+			b.WriteString(`<div class="onion-flow">`)
+			b.WriteString(`<script type="application/json" class="og-data">` + string(gj2) + `</script>`)
+			b.WriteString(`<div class="ograph" data-oglower="` + innerView + `" aria-label="` + htmlEscape(th.file) + ` regions in ` + htmlEscape(L) + `"><p class="meta og-fallback">the layer graph renders over the inlined graph library (it ships with the trace chapter)</p></div>`)
+			b.WriteString(`</div>` + "\n")
+			b.WriteString("</div>\n")
+		}
 	}
 	b.WriteString("</div>\n")
 	return b.String()
+}
+
+// enddesign
+
+// design: go-onion-model-source  implements: req-models-in-book
+// The onion's layer map derives from the engine-layers MODEL node
+// (spec/models/model-engine-layers.md) — the authored truth since i16;
+// spec/design-layers.md stays as the stub-project fallback. Rings = the model's
+// REAL layers in declared order (innermost first; bands and ambient are never
+// rings). The BLOCK unit is the model ELEMENT — a design region; files never
+// rank and never convert to patterns (owner ruling: elements are design
+// regions, files are themes). Allocation conventions:
+//   - a band's ("outer--inner") elements merge into the INNER of its two named
+//     rings — the transform feeds it
+//   - ambient elements (and any unranked stray) map to "ambient": NO ring; the
+//     renderer pins them to the innermost view's infrastructure pills
+//   - a realized engine region the model does not allocate is ABSENT here; the
+//     renderer's `unmapped` ring catches it (the sky-fall lint keeps it empty)
+type modelOnion struct {
+	rings   []string          // ring names, innermost first
+	layerOf map[string]string // region id -> ring name ("ambient" = off the rings)
+	labelOf map[string]string // region id -> the model's responsibility text
+}
+
+func modelOnionRegions() *modelOnion {
+	raw, err := os.ReadFile(filepath.Join(SPEC, "models", "model-engine-layers.md"))
+	if err != nil {
+		return nil
+	}
+	g, _ := extractModelGraph(string(raw))
+	rl := realLayers(g.Layers)
+	if len(rl) == 0 || len(g.Elems) == 0 {
+		return nil
+	}
+	rank := map[string]int{}
+	for i, ly := range rl {
+		rank[ly] = i
+	}
+	ringName := func(layer string) string {
+		if _, ok := rank[layer]; ok {
+			return layer
+		}
+		if a, b, isBand := strings.Cut(layer, "--"); isBand {
+			ra, aok := rank[a]
+			rb, bok := rank[b]
+			switch {
+			case aok && bok:
+				if ra < rb {
+					return a // the band's INNER named layer
+				}
+				return b
+			case aok:
+				return a
+			case bok:
+				return b
+			}
+		}
+		return "ambient" // ambient, and any unranked stray, stays off the rings
+	}
+	mo := &modelOnion{rings: rl, layerOf: map[string]string{}, labelOf: map[string]string{}}
+	for id, e := range g.Elems {
+		mo.layerOf[id] = ringName(e.Layer)
+		mo.labelOf[id] = e.Label
+	}
+	return mo
+}
+
+// onionLayerSource picks the onion's layer map: the model node when it exists
+// (model non-nil — ring membership and labels come from it), spec/design-layers.md
+// otherwise. In model mode the design-layers file still contributes only its
+// exclude/inputs/outputs lines (the iteration-file excludes apply either way;
+// the hardcoded set covers projects without one).
+func onionLayerSource() (layers []onionLayer, excludes, inputs, outputs, infra []string, model *modelOnion) {
+	layers, excludes, inputs, outputs, infra = readDesignLayers()
+	if mo := modelOnionRegions(); mo != nil {
+		model = mo
+		layers = make([]onionLayer, len(mo.rings))
+		for i, ly := range mo.rings {
+			layers[i] = onionLayer{name: ly}
+		}
+		if len(excludes) == 0 {
+			excludes = []string{"i*_build.go", "i*_red.go", "*_test.go"} // no design-layers.md around — same set, hardcoded
+		}
+	}
+	return layers, excludes, inputs, outputs, infra, model
 }
 
 // enddesign
@@ -3123,6 +3406,10 @@ func renderBaseFull(r BaseResult) string {
 // enddesign
 
 func renderFigure(kind string, nodes map[string]Node) string {
+	if kind == "model" || strings.HasPrefix(kind, "model ") {
+		// structural models in the design output chapter (go-model-render, i16)
+		return renderModelFigure(strings.TrimSpace(strings.TrimPrefix(kind, "model")), nodes)
+	}
 	switch kind {
 	case "context-star":
 		// design: go-context-neighbours  implements: req-context-diagram

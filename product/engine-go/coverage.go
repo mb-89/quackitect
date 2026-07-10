@@ -37,6 +37,33 @@ func coverageRule(nodes map[string]Node, rule, scope string) bool {
 	return v
 }
 
+// deferredReqs: the requirements a defer/veto decision scrap-addresses — they owe
+// NOTHING to the coverage rules until their ready_when (the parked list carries them;
+// found live at i15 b8). The rule, the delta lister, and the hole lister all use THIS.
+func deferredReqs(nodes map[string]Node) map[string]bool {
+	deferred := map[string]bool{}
+	for _, n := range nodes {
+		if n.Type != "adr" {
+			continue
+		}
+		hasScrap := false
+		for _, a := range n.Addresses {
+			if a == scrapSink {
+				hasScrap = true
+			}
+		}
+		if !hasScrap {
+			continue
+		}
+		for _, a := range n.Addresses {
+			if a != scrapSink {
+				deferred[a] = true
+			}
+		}
+	}
+	return deferred
+}
+
 func coverageRuleUncached(nodes map[string]Node, rule, scope string) bool {
 	inscope := func(n Node) bool { return scope == "" || iterOf(n.Path) <= scope }
 	impl := map[string][]Node{}
@@ -49,9 +76,10 @@ func coverageRuleUncached(nodes map[string]Node, rule, scope string) bool {
 			veri[p] = append(veri[p], n)
 		}
 	}
+	deferred := deferredReqs(nodes)
 	var reqs, adrs, ucs []Node
 	for _, n := range nodes {
-		if !inscope(n) {
+		if !inscope(n) || deferred[n.ID] {
 			continue
 		}
 		switch n.Type {
@@ -138,12 +166,16 @@ func coverageRuleUncached(nodes map[string]Node, rule, scope string) bool {
 		ro := redObserved()
 		memo := map[string]string{}
 		active := readProjectConfig().Version
+		defrd := deferredReqs(nodes)
 		seen := false
 		for _, n := range nodes {
 			if n.Type == "test" && n.Class == "executed" && strings.HasPrefix(n.Verify, "selftest:") {
 				it := iterOf(n.Path)
 				if testsRedExempt(n) {
 					continue // pre-mechanism test; its exemption is a recorded marker, never retro-attested
+				}
+				if testDeferred(n, defrd) {
+					continue // deferral carries through the TEST side too (i16): no red owed until ready_when
 				}
 				if scope != "" && it != scope {
 					continue // another iteration's test owes ITS OWN gate a red, not this one
@@ -174,10 +206,14 @@ func coverageRuleUncached(nodes map[string]Node, rule, scope string) bool {
 		// (regressions in old work are caught where the causing change lives), but a test added in a
 		// LATER iteration can never reopen an earlier iteration's verification.
 		var ts []Node
+		defrdP := deferredReqs(nodes)
 		for _, n := range nodes {
 			if n.Class == "executed" && !strings.HasPrefix(n.Verify, "coverage:") && inscope(n) {
 				if n.Suite == "standalone" {
 					continue // not a suite member: watches workspace state, not iteration correctness (adr-standalone-suite)
+				}
+				if testDeferred(n, defrdP) {
+					continue // a test verifying only DEFERRED requirements owes no pass until ready_when (i16)
 				}
 				if renderBusy && renderingTests[n.Verify] {
 					continue // bounded: a render never re-runs the test that triggered it
@@ -208,6 +244,20 @@ func coverageRuleUncached(nodes map[string]Node, rule, scope string) bool {
 // frontmatter marker on the node — `tests_red: exempt - <reason citing its ADR>`
 // (adr-grandfathers-historical) — never a source-code date constant. A bare exempt without a
 // reason is not honored: the test owes its red like any other.
+// testDeferred: a test whose EVERY verified requirement is scrap-deferred owes
+// nothing until ready_when - the i15 deferral law extended to the test side (i16).
+func testDeferred(n Node, deferred map[string]bool) bool {
+	if n.Type != "test" || len(n.Verifies) == 0 {
+		return false
+	}
+	for _, r := range n.Verifies {
+		if !deferred[r] {
+			return false
+		}
+	}
+	return true
+}
+
 func testsRedExempt(n Node) bool {
 	e := strings.TrimSpace(n.TestsRed)
 	return strings.HasPrefix(e, "exempt") && len(strings.TrimLeft(strings.TrimPrefix(e, "exempt"), " -–—:")) > 0
@@ -408,8 +458,9 @@ func CoverageHoles(nodes map[string]Node, scope string) []string {
 		}
 		return true
 	}
+	deferred := deferredReqs(nodes)
 	for _, n := range nodes {
-		if !inscope(n) {
+		if !inscope(n) || deferred[n.ID] {
 			continue
 		}
 		switch n.Type {

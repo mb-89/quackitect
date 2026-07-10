@@ -22,6 +22,7 @@ type Node struct {
 	Addresses  []string
 	Path       string
 	RegionBody string
+	ModelHash  string // model nodes only: the extracted graph's canonical hash, computed at load (go-graph-load) so the kernel folds a field, never a file
 	Line       int
 	Milestone  int
 	Validates  string // "needs": this gate validates the whole need-set; its hash folds the digest of
@@ -195,6 +196,12 @@ func ParseNode(path string) Node {
 		n.RegionBody = strings.TrimSpace(strings.Join(parts[2:], "---"))
 	}
 	// enddesign
+	if n.Type == "model" {
+		// the graph hash computes ONCE at load (band work) - the kernel's fullHash
+		// folds this field and never touches the file (i16-b12, adr-onion-physics)
+		g, _ := extractModelGraph(string(txt))
+		n.ModelHash = g.CanonicalHash()
+	}
 	return n
 }
 

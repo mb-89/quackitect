@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -44,6 +45,38 @@ func userDataBase() string {
 	}
 	return base
 }
+
+// globalBinPath is the ONE global binary's home (adr-global-ratchet); the ratchet
+// machinery that swaps it lives in go-global-ratchet.
+func globalBinPath() string {
+	return filepath.Join(userDataBase(), "quackitect", "bin", brand()+".exe")
+}
+
+// engineSrcPointer is the file beside the global binary recording WHERE the engine home
+// (the repo carrying the resource layer) lives. Resources resolve LIVE from there — never
+// a copy, never drift (owner ruling 2026-07-09): editing the repo's resources changes them
+// for every stub workspace on the machine. Build and the ratchet re-record it.
+func engineSrcPointer() string { return globalBinPath() + ".src" }
+
+func recordEngineHome(root string) error {
+	if !hasEngineLayer(root) {
+		return fmt.Errorf("no resource layer at %s", root)
+	}
+	if err := os.MkdirAll(filepath.Dir(engineSrcPointer()), 0o755); err != nil {
+		return err
+	}
+	return os.WriteFile(engineSrcPointer(), []byte(root+"\n"), 0o644)
+}
+
+func recordedEngineHome() string {
+	raw, err := os.ReadFile(engineSrcPointer())
+	if err != nil {
+		return ""
+	}
+	return strings.TrimSpace(string(raw))
+}
+
+// enddesign
 
 // design: go-home-marker  implements: req-selftest-home-sweep
 // Every data home records its workspace (workspace.txt), so a sweep can map a home back to

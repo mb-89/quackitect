@@ -32,6 +32,8 @@ without restructuring. `(killer)` means mandatory. `(executed)`/`(derived)` mean
 - **L3 — Design** · *gate: review* — maps to M3–M5
   - method: State the approach in brief. Add one rationale line: why this, not the obvious
     alternative. Record the deciding ADR(s). Spike only the single riskiest unknown, if there is one.
+    Choose views from the model-kind registry (`method/models/`) — or record "none needed" with its
+    reason; an authored model gates the build like any input (i16).
   - [ ] approach chosen with a recorded reason
   - [ ] ADRs traced — every ADR addresses a requirement *(derived: coverage:adr-traced)*
 

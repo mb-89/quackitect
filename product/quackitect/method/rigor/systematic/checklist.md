@@ -57,6 +57,7 @@ stamp). The rest are user-judged (`class: review`). The trace itself is content,
     dismissal. Record the deciding ADR(s).
   - [ ] chosen architecture stated
   - [ ] choice traced to the weighted criteria
+  - [ ] views chosen — model kinds picked from the registry (`method/models/`), each with the question it answers; rejected kinds recorded; two models is the default budget (i16)
   - [ ] ADR recorded and traced — every ADR addresses a requirement *(derived: coverage:adr-traced)*
 
 - **M5 — Prove the riskiest unknowns** · *gate: prototype*
@@ -76,6 +77,7 @@ stamp). The rest are user-judged (`class: review`). The trace itself is content,
     not bolt them on. Every requirement has a passing `verified_by`. Verification runs EVERY test
     (all iterations, not just this one) so regressions in earlier work are caught. Tests live in the
     trace (they verify requirements); they are not task-tree subtasks — the verification task rolls them up.
+  - [ ] models authored — every kind chosen at views-chosen exists as a model node, lints clean, elements allocated AHEAD of the build; the build plan references the declared elements (i16)
   - [ ] build planned — decomposed into small, resumable steps seeded as children of the build task *(killer)*
   - [ ] suite observed RED — every new test ran and failed before the build *(derived: coverage:tests-red)*
   - [ ] build — the planned steps nested beneath it are realized

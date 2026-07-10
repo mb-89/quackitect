@@ -243,6 +243,8 @@ func attestRedeem(code, answer string) (string, error) {
 	return key, nil
 }
 
+// enddesign
+
 // design: go-attest-gate  implements: req-attest-block, req-console-exempt
 // The gate (adr-attest-ritual): ledger-ADVANCING commands (next, start, bless, ship, observe-red)
 // on the agent channel refuse to run without a valid session key (--key flag, QUACK_KEY env as the
@@ -250,7 +252,10 @@ func attestRedeem(code, answer string) (string, error) {
 // contract.md and NOTHING else — the unlock instructions live only inside the contract, so the sole
 // path to a key runs through the file. The interactive console (a person, i8 channel stat) is never
 // gated by its own machinery.
-var attestGatedCmds = map[string]bool{"next": true, "start": true, "bless": true, "ship": true, "observe-red": true, "migrate-actors": true}
+// `ask` and `await` advance the ledger too (an ask can end in a bless), so they ride the
+// gate; the drain-on-run fallback executes the USER's recorded tap and is deliberately
+// ungated (the paired credential IS its authorization — adr-answer-authenticity).
+var attestGatedCmds = map[string]bool{"next": true, "start": true, "bless": true, "ship": true, "observe-red": true, "migrate-actors": true, "ask": true, "await": true}
 
 func attestRequired(cmd string, interactive bool) bool {
 	return !interactive && attestGatedCmds[cmd]

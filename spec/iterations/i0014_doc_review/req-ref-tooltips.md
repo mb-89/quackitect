@@ -5,6 +5,7 @@ depends_on: []
 statement: A term or ledger reference shall render as a dashed-underlined affordance that shows its definition in the details pane on click, with a jump link to the full entry.
 class: review
 killer: false
+ears: exempt - authored and shipped at lean rigor (i14); blessed history, never retrofitted (adr-grandfathers-historical)
 phase: [operation]
 discipline: [software, design]
 quality: [usability]

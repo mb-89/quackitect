@@ -182,9 +182,13 @@ func coverageDelta(nodes map[string]Node, rule, scope string) []string {
 		}
 		return false
 	}
+	deferred := deferredReqs(nodes) // the i15 defer fix: all three listers agree
 	var out []string
 	memo := map[string]string{}
 	for _, n := range nodes {
+		if deferred[n.ID] {
+			continue
+		}
 		switch rule {
 		case "req-traced":
 			if n.Type == "requirement" && inscope(n) && !up(n, "usecase") {

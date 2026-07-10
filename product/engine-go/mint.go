@@ -25,6 +25,9 @@ var mintPrefix = map[string]string{
 	"stakeholder": "stk-", "candidate": "cand-", "raid": "raid-", "rationale": "why-",
 	"record": "rec-", "criterion": "crit-", "rule": "rule-", "budget": "bud-",
 	"guide": "guide-", "design": "des-", "connection": "con-", "neighbour": "nbr-",
+	// structural models (i16): the node body carries the fenced diagram, seeded from
+	// the kind registry's example (go-model-registry)
+	"model": "model-",
 }
 // enddesign
 
@@ -151,6 +154,12 @@ func mintBody(kind, id string, extra map[string]string, lanes bool) string {
 		b.WriteString("rule: sum\nmargin: 0.2\nallocations:\n  des-TODO: 0\n")
 	case "guide":
 		b.WriteString("audience: TODO\n")
+	case "model":
+		mk := extra["kind"]
+		if mk == "" {
+			mk = "layers-flow"
+		}
+		b.WriteString("kind: " + mk + "\n")
 	case "design":
 		b.WriteString("responsibility: TODO\nimplements: [" + extra["of"] + "]\nrealization: make\n")
 	case "connection":
@@ -170,7 +179,19 @@ func mintBody(kind, id string, extra map[string]string, lanes bool) string {
 	if rat == "" {
 		rat = "TODO"
 	}
-	b.WriteString("killer: false\n---\n## Rationale (not load-bearing)\n" + rat + "\n")
+	b.WriteString("killer: false\n---\n")
+	if kind == "model" {
+		mk := extra["kind"]
+		if mk == "" {
+			mk = "layers-flow"
+		}
+		if stub := modelStubFor(mk); stub != "" {
+			// the registry's example IS the skeleton (go-model-registry) - authored
+			// in place, draft==truth from the first line
+			b.WriteString("```mermaid\n" + stub + "```\n")
+		}
+	}
+	b.WriteString("## Rationale (not load-bearing)\n" + rat + "\n")
 	return b.String()
 }
 
@@ -307,6 +328,7 @@ func cmdMint(args []string) {
 	extra := map[string]string{
 		"of": flagVal(args, "--of"), "statement": flagVal(args, "--statement"),
 		"ready_when": flagVal(args, "--ready-when"), "rationale": flagVal(args, "--rationale"),
+		"kind": flagVal(args, "--kind"),
 	}
 	switch kind {
 	case "veto":

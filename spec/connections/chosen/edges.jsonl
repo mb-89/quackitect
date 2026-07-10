@@ -10,3 +10,6 @@
 {"src":"adr-comment-highlight-api","dst":"cand-hl-css-api"}
 {"src":"adr-comment-save-path","dst":"cand-save-fsapi"}
 {"src":"adr-comment-readback-lister","dst":"cand-read-lister"}
+{"src":"adr-slack-text-poll","dst":"cand-slack-text-poll"}
+{"src":"adr-ntfy-actions","dst":"cand-ntfy-actions"}
+{"src":"adr-ask-seam-exec-lane","dst":"cand-seam-exec-lane"}

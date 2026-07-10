@@ -22,6 +22,19 @@ func isTTY() bool {
 	return err == nil && fi.Mode()&os.ModeCharDevice != 0
 }
 
+// channelInteractive probes the console shape: BOTH stdin and stdout must be char-devices
+// (this harness proves stdin alone lies). A meaning-free probe, same family as isTTY —
+// the actor POLICY that consumes it lives in go-actor-channels.
+func channelInteractive() bool {
+	for _, f := range []*os.File{os.Stdin, os.Stdout} {
+		fi, err := f.Stat()
+		if err != nil || fi.Mode()&os.ModeCharDevice == 0 {
+			return false
+		}
+	}
+	return true
+}
+
 // dispWidth counts display columns, treating emoji (common ranges) as 2 and VS16 as 0.
 func dispWidth(s string) int {
 	w := 0
@@ -341,6 +354,12 @@ func checkScopedReadiness(id string, nodes map[string]Node, sm map[string]string
 // decisions (the iteration's ADRs), biggest risks (M1 frame), deterministic readiness facts, and — LAST
 // — the bless question with 👍/👎 emojis. Decisions/risks point at their trace nodes, not restated.
 func HandoverPager(gateID, iter string, nodes map[string]Node, sm map[string]string, cfg Config, tty bool) string {
+	return render(box(pagerLines(gateID, iter, nodes, sm, cfg)), tty)
+}
+
+// pagerLines builds the pager CONTENT — the console boxes it, and a mobile ask carries
+// the SAME lines as its one-pager body (owner 2026-07-09: the phone gets the full card).
+func pagerLines(gateID, iter string, nodes map[string]Node, sm map[string]string, cfg Config) []string {
 	merged := ""
 	question := "❓ Bless " + gateID + "?    👍 y    /    👎 n"
 	if ks, g := pagerGroup(gateID, nodes, sm); len(ks) > 0 && g != "" {
@@ -401,10 +420,15 @@ func HandoverPager(gateID, iter string, nodes map[string]Node, sm map[string]str
 			"")
 	}
 
+	// the mobile lane (go-ask-loop): a paired device can answer this hand-off remotely
+	if _, paired := loadPairConfig(); paired {
+		L = append(L, "📱 MOBILE   `ask "+gateID+"` sends this question to the paired phone; `await` blocks for the tap", "")
+	}
+
 	// the question — LAST — with emojis
 	L = append(L, question)
 
-	return render(box(L), tty)
+	return L
 }
 
 func firstSentence(s string) string {

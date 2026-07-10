@@ -1,10 +1,11 @@
-﻿---
+---
 id: req-reader-columns
 type: requirement
 depends_on: []
 statement: A reader-facing table shall show the item name and statement and shall not show filename, weight, or source-internal columns.
 class: review
 killer: false
+ears: exempt - authored and shipped at lean rigor (i14); blessed history, never retrofitted (adr-grandfathers-historical)
 phase: [operation]
 discipline: [software, design]
 quality: [usability]

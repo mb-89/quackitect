@@ -130,9 +130,10 @@ func init() {
 }
 
 // design: go-engine-core  implements: req-behavior-parity, req-split, req-review
-// The engine core in Go: the node load, the hashing primitive and merkle fold, the
-// suspect/bless attestation, and the gate-state machine — observably identical to
-// engine.py. norm + full_hash were proven byte-identical to Python in the M5 spike.
+// The identity kernel: the hashing primitive and merkle fold over the typed node
+// graph — pure functions, no file or directory I/O; every disk read of the load
+// belongs to go-graph-load. norm + full_hash were proven byte-identical to Python
+// in the M5 spike.
 var wsRe = regexp.MustCompile(`\s+`)
 
 func norm(s string) string { return strings.ToLower(strings.TrimSpace(wsRe.ReplaceAllString(s, " "))) }
@@ -175,6 +176,12 @@ func fullHash(id string, nodes map[string]Node, memo map[string]string) string {
 		// reaches back. The verification analogue (coverage:tests-pass) carries the same scope.
 		seed += "|needs:" + needsDigestAsOf(iterOf(n.Path), nodes)
 	}
+	if n.Type == "model" {
+		// a model node's identity IS its extracted semantic graph (go-model-nodes, i16):
+		// cosmetic file churn never moves it, a meaning change always does. The hash
+		// was computed at load - a pure field fold, no I/O here (kernel purity).
+		seed += "|model:" + n.ModelHash
+	}
 	if n.Milestone > 0 && strings.HasSuffix(id, "-gate") {
 		seed += evidenceDocSeed(iterOf(n.Path), n.Milestone) // the gate folds its evidence docs (go-evidence-hash)
 	}
@@ -194,6 +201,24 @@ func needsDigest(nodes map[string]Node) string {
 	}
 	sort.Strings(parts)
 	return h12(strings.Join(parts, ";"))
+}
+
+// enddesign
+
+// design: go-graph-load  implements: req-model-nodes
+// The load band (rim--graph): text on disk to the typed node map. LoadAll walks
+// spec/**/*.md plus the in-code design markers under product/ and assembles the
+// nodes; every file and directory read of the load lives here — the kernel takes
+// assembled nodes only.
+
+var designRe = regexp.MustCompile(`design:\s*(\S+)\s+implements:\s*([^>]+)`)
+
+// scanCodeDesigns finds the marked design regions ('#' or '//' comment markers,
+// opener through closer) in the vehicle's own product/ (its tool). Engine-internal
+// markers live under the engine layer; scan those with scanDesignsUnder(EngineDir()/...)
+// when needed (e.g. the method self-test).
+func scanCodeDesigns() map[string]Node {
+	return scanDesignsUnder(filepath.Join(ROOT, "product"))
 }
 
 // LoadAll walks spec/**/*.md plus the in-code design markers under product/.
@@ -249,16 +274,9 @@ func LoadAll() map[string]Node {
 	return nodes
 }
 
-var designRe = regexp.MustCompile(`design:\s*(\S+)\s+implements:\s*([^>]+)`)
-
-// scanCodeDesigns finds '# design: id implements: reqs' (or // for Go) ... enddesign regions in the
-// vehicle's own product/ (its tool). Engine-internal markers live under the engine layer; scan those
-// with scanDesignsUnder(EngineDir()/...) when needed (e.g. the method self-test).
-func scanCodeDesigns() map[string]Node {
-	return scanDesignsUnder(filepath.Join(ROOT, "product"))
-}
-
-// scanDesignsUnder walks one base dir for design/enddesign regions and returns them keyed by id.
+// scanDesignsUnder walks one base dir for marked design regions and returns them keyed by id.
+// It sits outside every region by constraint: its string literals spell the closing marker,
+// and any region containing them would terminate at the first literal.
 func scanDesignsUnder(base string) map[string]Node {
 	out := map[string]Node{}
 	filepath.Walk(base, func(path string, fi os.FileInfo, err error) error {
@@ -356,7 +374,9 @@ var traceContent = map[string]bool{"need": true, "usecase": true, "requirement":
 	// the item types of the spec-template walk (go-items) and the i12x extension kinds
 	// (go-conn-lanes): content, never gates
 	"candidate": true, "stakeholder": true, "raid": true, "rationale": true, "record": true,
-	"connection": true, "rule": true, "budget": true, "criterion": true, "guide": true, "neighbour": true}
+	"connection": true, "rule": true, "budget": true, "criterion": true, "guide": true, "neighbour": true,
+	// structural models (i16): content that ripples via its extracted graph, never a gate
+	"model": true}
 
 // design: go-no-trace-gate  implements: req-no-trace-gate
 // Trace-typed nodes (need/usecase/requirement/design/test/adr) are content, never task gates —
@@ -395,7 +415,8 @@ type Event struct {
 	StatementHash string            `json:"statement_hash"`
 	Deps          map[string]string `json:"deps"`
 	PrevHash      *string           `json:"prev_hash"`
-	Count         int               `json:"count,omitempty"` // migrate-actors audit: events rewritten (go-stamp-user)
+	Count         int               `json:"count,omitempty"`   // migrate-actors audit: events rewritten (go-stamp-user)
+	Channel       string            `json:"channel,omitempty"` // a mobile answer notes its channel (req-mobile-actor)
 }
 
 func attestEvents() []Event {

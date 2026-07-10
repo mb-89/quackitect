@@ -62,6 +62,7 @@ var nodeKeysAllow = map[string]bool{
 	"realization": true, "preset": true, "guide": true, "src": true, "dst": true, "q": true,
 	"verify_method": true, // the requirement item's method field - the bare verify key stays the executed-check referent
 	"functions":     true, // the need item's functional structure (i14, field c25; semantics in the need item template)
+	"question":      true, // the model node's question field (i16; the statement may carry it instead)
 }
 var iterKeysAllow = map[string]bool{
 	"iteration": true, "status": true, "type": true, "rigor": true,
@@ -263,14 +264,13 @@ func resolveActor(args []string, interactive bool) string {
 	return "agent"
 }
 
-func channelInteractive() bool {
-	for _, f := range []*os.File{os.Stdin, os.Stdout} {
-		fi, err := f.Stat()
-		if err != nil || fi.Mode()&os.ModeCharDevice == 0 {
-			return false
-		}
+// normActor folds the pre-i11 recorded vocabulary into the current one: human IS user
+// (go-stamp-user records the migration; this is the reader's view of the vocabulary).
+func normActor(a string) string {
+	if a == "human" || a == "" {
+		return "user"
 	}
-	return true
+	return a
 }
 
 // enddesign

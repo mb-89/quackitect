@@ -57,6 +57,10 @@ quack gather <ver>       # collect all rigor+type source for an iteration
 quack report [--watch]   # render+open the live HTML board (--out F renders only)
 quack progress [--pager <gate>] # the readout, or the handover pager for a killer/milestone gate
 quack calls --summary    # print the call-log aggregate, then delete the log (the retro's log step)
+quack pair [ntfy]        # one-time device pairing: mints the topic credential, renders the deep-link QR, prints the disclaimer + lockscreen instruction
+quack pair --show        # re-print the current pairing (QR + link) without re-minting - a second device subscribes with a scan
+quack ask <gate> [--timeout s] # send the gate's question to the paired phone (one-tap answer buttons)
+quack await [--timeout s]      # block until a pending ask is answered and APPLY it - a phone bless resumes the walk; every run also drains answers as the fallback
 quack ship               # package product/ -> the workspace data home (out/)
 quack build              # compile the engine, write the build stamp, re-baseline golden-root (skips the compile when no engine source changed)
 quack lint               # coverage holes, duplicate ids, EARS lint, monotonic wiring
@@ -73,3 +77,4 @@ to ANY command to drive a different project's workspace. After editing engine `.
 - **Killer checks** are always adjudicated gates. Never auto-pass them.
 - The surface is **default-closed**. Triage, defer, retire, retro, and ship are sub-ops reached through `engage` and `review`.
 - The methods live in `product/quackitect/method/prompts/`. Load the one named by the command.
+- **Edit source files with your editor tooling, never shell string surgery.** Shell rewrites corrupted UTF-8 twice in one session (mojibake, a clobbered file). The shell is for probes and commands; edits go through the file-editing tools.

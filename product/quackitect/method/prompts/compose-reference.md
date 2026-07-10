@@ -85,6 +85,15 @@ Walk with `next`; **bless each milestone gate one at a time as you genuinely com
 handover pager (`quack progress --pager <gate>`). `quack lint` "requirement has no design" holes are
 **expected** pre-build; don't chase them.
 
+## Model nodes (structural models, i16)
+Project-global, in `spec/models/` (like decisions). `quack mint model --kind <kind>` seeds the
+skeleton from the registry (`method/models/*.md` — the file IS the registration). Frontmatter:
+`id: model-…`, `type: model`, `kind: <registry kind>`, `statement: <the question it answers>`.
+The body is the fenced ```mermaid block — the authored file IS the checked truth; the ledger
+hashes the EXTRACTED graph (cosmetic churn never ripples). Elements are allocated AHEAD of code;
+the design-marker id is the join; a realized region no model allocates is the sky-fall lint.
+Models are trace CONTENT — never blessed, never a gate.
+
 ## Where needs live
 Cross-cutting / dogfood needs: `spec/trace/` (`need-engage`, `need-note`, `need-review`, `need-workspace-drive`).
 Iteration-specific needs: the iteration dir. **Fold new work under existing needs — do not sprawl new ones.**

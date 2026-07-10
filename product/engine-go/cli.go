@@ -50,6 +50,7 @@ func usageText() string {
 	return b + ` — the determinizer lane (deterministic; no judgment).
 usage: ` + b + ` status [id] | next | start <id> [--plan] | why <id> | bless [--all|<id>] [--by A]
        | note "..." | notes [--all] | gather <ver> | report [book] [--out F] | ship | build
+       | pair [ntfy] | ask <gate> [--timeout s] | await [--timeout s]
        | lint | verify <id> | progress [--pager <gate>] | migrate-actors | migrate-layout | version`
 }
 
@@ -93,6 +94,7 @@ func Dispatch(args []string) {
 	callLogStart(cmd, rest)       // one redacted line per dispatch (go-call-log)
 	defer func() { callLogWrite(0) }()
 	rest = attestGuard(cmd, rest) // the contract gate: agent-channel ledger commands need a key
+	askDrainMaybe()               // the fallback lane: every run applies answers already on the channel (go-ask-loop)
 	if bad, isBad := badIDArg(cmd, rest); isBad {
 		fmt.Println("error: id cannot start with '-': " + bad)
 		quackExit(2)
@@ -100,6 +102,15 @@ func Dispatch(args []string) {
 	switch cmd {
 	case "attest":
 		cmdAttest(rest)
+	case "pair":
+		if err := cmdPair(rest); err != nil {
+			fmt.Println("pair:", err)
+			quackExit(1)
+		}
+	case "ask":
+		cmdAsk(rest)
+	case "await":
+		cmdAwait(rest)
 	case "decisions":
 		cmdDecisions(rest)
 	case "mint":
@@ -397,6 +408,45 @@ func cmdLint(rest []string) {
 	if idf := idCharsetFindings(nodes); len(idf) > 0 {
 		fmt.Printf("ids: %d charset finding(s):\n", len(idf))
 		for _, f := range idf {
+			fmt.Println("  - " + f)
+		}
+	}
+	// structural models (go-model-lints): extraction ambiguity per model, dangling
+	// cross-model references, views-chosen coverage, unauthored models.
+	np := map[string]*Node{}
+	for id := range nodes {
+		n := nodes[id]
+		np[id] = &n
+	}
+	graphs := map[string]modelGraph{}
+	var modelFinds []string
+	for id, n := range nodes {
+		if n.Type != "model" {
+			continue
+		}
+		raw, rerr := os.ReadFile(n.Path)
+		if rerr != nil {
+			continue
+		}
+		g, lf := extractModelGraph(string(raw))
+		graphs[id] = g
+		for _, f := range lf {
+			modelFinds = append(modelFinds, id+": "+f)
+		}
+	}
+	if len(graphs) > 0 {
+		modelFinds = append(modelFinds, modelConsistencyFindings(graphs)...)
+	}
+	if eng, ok := graphs["model-engine-layers"]; ok {
+		// the dogfood reflexion diff (go-model-asbuilt): the engine's code vs its
+		// declared onion, on every lint
+		modelFinds = append(modelFinds, engineConformanceFindings(eng)...)
+	}
+	modelFinds = append(modelFinds, viewsChosenFindings(np)...)
+	modelFinds = append(modelFinds, modelsGateFindings(np)...)
+	if len(modelFinds) > 0 {
+		fmt.Printf("models: %d finding(s):\n", len(modelFinds))
+		for _, f := range modelFinds {
 			fmt.Println("  - " + f)
 		}
 	}

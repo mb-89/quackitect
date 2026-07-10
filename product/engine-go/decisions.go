@@ -136,6 +136,9 @@ func decisionFindings(nodes map[string]Node) (placement, unrealized []string) {
 	return placement, unrealized
 }
 
+// enddesign
+
+// cmdDecisions is the console shell over the decision classes: list, or --parked.
 func cmdDecisions(args []string) {
 	nodes := LoadAll()
 	if hasFlag(args, "--parked") {
@@ -161,5 +164,3 @@ func cmdDecisions(args []string) {
 		fmt.Println(id + "\t" + decisionClass(nodes[id], sup))
 	}
 }
-
-// enddesign

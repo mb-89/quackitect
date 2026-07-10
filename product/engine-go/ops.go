@@ -80,6 +80,13 @@ func cmdBless(args []string) {
 	}
 	saveEvents(events)
 	fmt.Println("blessed", target)
+	// first-wins across lanes (req-first-wins-lanes): the pairing read and the feedback
+	// print stay HERE at the command surface; the resolution rule lives inward.
+	if _, paired := loadPairConfig(); paired {
+		if n := blessResolvesAsks(ids); n > 0 {
+			fmt.Println("mobile ask(s) superseded by the console answer:", n)
+		}
+	}
 	// trigger (go-report-live-reload): refresh the report after a killer or milestone bless so the
 	// board — and any open --watch page — reflects the adjudication without a manual re-render.
 	for _, nid := range ids {
@@ -354,15 +361,18 @@ func cmdStart(args []string) {
 // enddesign
 
 // design: go-note  implements: notes-pipeline
-// One-file-per-note capture under .quack/notes/inbox, recording provenance (origin, timestamp, status).
+// One-file-per-note capture, recording provenance (origin, timestamp, status). The capture
+// POLICY: the notes home resolution rides here; the file lane itself is go-notes-out.
+func notesHome() string { return dataDirFor("notes") }
+
+// enddesign
+
 // design: go-notes-out  implements: req-notes-out, req-note-lane
 // Notes live OUTSIDE the repository (adr-no-quack-data-home): the capture lane writes beneath the
 // workspace's notes home in the user data dir — raw notes carry personal data and never belong in a
 // published checkout. The lane is the ONLY minting path (adr-deterministic-mint): a multi-line body
 // arrives via --file <path> or --file - (stdin), so the note skill CALLS the engine instead of
 // hand-writing files; id, timestamp, slug and frontmatter stay engine-stamped.
-func notesHome() string { return dataDirFor("notes") }
-
 func cmdNote(args []string) {
 	// the read-back lane: a commented copy lists as note candidates (go-file2list)
 	for i := 0; i < len(args); i++ {
@@ -545,6 +555,8 @@ func cmdShip(args []string) {
 // quack build compiles the engine from its source (EngineSrc: vendored, else dogfood) to
 // .quack/engine/<brand>.exe AND re-baselines the determinism golden in one step — closing the
 // stale-golden footgun where a hand-run build forgot to re-baseline and produced false milestone FAILs.
+// enddesign
+
 // design: go-build-fast-path  implements: req-build-fast-path
 // A content-only build never pays the compiler: when the source fingerprint (every .go file +
 // go.mod, order-stable) matches the one recorded beside the binary, the compile AND the stamp
@@ -835,6 +847,8 @@ func cmdStartInit(args []string) {
 	fmt.Println("  next: cd into it and run `.\\" + proj + " status` — the launcher bootstraps the global binary when absent.")
 	fmt.Println("        Then set [iteration].version and `.\\" + proj + " start <version>` to compose your spec.")
 }
+
+// enddesign
 
 // --- drive-from-inside stubs (i0005): make a bare workspace drivable from within, engine linked at runtime ---
 
@@ -1149,21 +1163,15 @@ func metricsFrom(nodes map[string]Node, events []Event) map[string][2]int {
 	return map[string][2]int{"rework": {reworked, len(counts)}, "reversal": {reversals, len(blesses)}, "selfcert": {selfcert, killers}}
 }
 
+// enddesign
+
 // design: go-stamp-user  implements: req-stamp-user
 // The ledger says `user` (adr-actor-user-migration). New records write user (resolveActor);
 // `quack migrate-actors` rewrites historical human stamps to user in ONE audited pass — the
 // migration event records the count and timestamp, bless hashes and the prev_hash chain stay
 // untouched, and a second run is a no-op. Readers treat human and user as one value forever
-// (normActor), so an unmigrated clone still computes; the self-cert metric counts agent versus
-// non-agent and therefore spans both eras unchanged.
-
-// normActor folds the pre-i11 recorded vocabulary into the current one: human IS user.
-func normActor(a string) string {
-	if a == "human" || a == "" {
-		return "user"
-	}
-	return a
-}
+// (normActor, beside resolveActor in go-actor-channels), so an unmigrated clone still computes;
+// the self-cert metric counts agent versus non-agent and therefore spans both eras unchanged.
 
 // migrateActorsFrom is the pure one-pass rewrite: every human actor/filler stamp becomes user;
 // when anything changed, ONE audit event (action migrate-actors) records how many events moved.
@@ -1189,6 +1197,9 @@ func migrateActorsFrom(events []Event, ts string) ([]Event, int) {
 	return events, n
 }
 
+// enddesign
+
+// cmdMigrateActors is the console shell over migrateActorsFrom: load, rewrite, report.
 func cmdMigrateActors() {
 	events, n := migrateActorsFrom(attestEvents(), time.Now().Format(time.RFC3339))
 	if n == 0 {
@@ -1198,8 +1209,6 @@ func cmdMigrateActors() {
 	saveEvents(events)
 	fmt.Printf("migrate-actors: %d event(s) rewritten human -> user, audited in the ledger\n", n)
 }
-
-// enddesign
 
 func cmdVerify(args []string) {
 	if len(args) == 0 {
