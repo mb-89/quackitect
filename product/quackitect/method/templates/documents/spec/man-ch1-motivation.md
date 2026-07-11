@@ -62,7 +62,7 @@ Sources: V-model pairing @[[ref-systementwurf-mechatronik]]; the RE rule, a
 {{delta-and-proof}}
 
 <!-- ai:3 -->
-Each need below names the stakeholder it serves. Expand a row for the pass lines that accept it. A row without a stakeholder is a wish, not a need.
+The idea above composes into a set of needs the system has to serve. They are listed below. Each need names the stakeholder it serves - a row without a stakeholder is a wish, not a need. Expand a row for the pass lines that accept it.
 
 ![[needs.base]]
 ---

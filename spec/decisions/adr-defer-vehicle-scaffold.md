@@ -1,5 +1,6 @@
 ---
 id: adr-defer-vehicle-scaffold
+decided_in: i0009_contract_attestation
 type: adr
 adjudicated_by: human
 ready_when: the first real vehicle needs re-scaffolding after i0009 (start init, integrate.md, stubs still scaffold the legacy .quack layout; the global-ratchet world needs tools/engine vendoring + spec/project.toml + global-bin launcher)

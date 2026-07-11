@@ -1,5 +1,6 @@
 ---
 id: adr-veto-chat-grant
+decided_in: i0009_contract_attestation
 type: adr
 adjudicated_by: human
 statement: Chat-relayed grants (an agent flag standing in for a person's authorization) are scrapped: no structural proof a person acted — the exact failure the attestation gate exists to close (i9 M3 axis A1b/c).

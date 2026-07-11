@@ -1,5 +1,6 @@
 ---
 id: adr-views-engine
+decided_in: i0016_structural_models
 type: adr
 adjudicated_by: user
 statement: Views chosen for the engine (i16 dogfood, owner rulings 2026-07-09/10) - THREE models, over the two-model default with reason: model-engine-layers (layers-flow, the onion on the owner physics), model-check-states (state, the check lifecycle), model-product-tree (element-tree, "flow doesn't catch all" - composition of the shipped product); sequence rejected for now (the i15 ask loop carries its diagram in the pairing guide); context derives as always.

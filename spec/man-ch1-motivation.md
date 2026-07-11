@@ -137,7 +137,7 @@ The two ends compose. Quackitect covers the design input; an output-side framewo
 Why the gap is closable now: two abilities matured together. Agents follow a written contract well enough to fill structured checks. A dependency-free [engine](term:engine) recomputes every verdict from the record alone. Together they make the [ledger](term:ledger) cheap enough to run on every move.
 
 <!-- ai:3 -->
-Each need below names the stakeholder it serves. Expand a row for the pass lines that accept it - the [validation chapter](man-ch5-verification-validation.md) traces each one to its outcome. A row without a stakeholder is a wish, not a need.
+The idea above composes into a set of needs quackitect has to serve. They are listed below. Each need names the stakeholder it serves - a row without a stakeholder is a wish, not a need. Expand a row for the pass lines that accept it; the [validation chapter](man-ch5-verification-validation.md) traces each one to its outcome.
 
 ![[needs.base]]
 ---
@@ -149,4 +149,4 @@ Motivation: the acquirer row of the reader matrix ends here.
 Form: short. Skip with a recorded reason where no acquirer exists.
 -->
 <!-- ai:3 -->
-The case is internal and strategic. Quackitect drives its own development and every project its owner runs with an agent. The learning compounds: each [iteration](term:iteration) makes the method cheaper and the record stronger. No paying acquirer exists today. The first quackitect-driven tool shipping to real users is the business case in the field.
+The case is internal and strategic. Quackitect drives its own development and every project its owner runs with an agent. The learning compounds: each [iteration](term:iteration) makes the method of working with AIs cheaper and the record stronger.

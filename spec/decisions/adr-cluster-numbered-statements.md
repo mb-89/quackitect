@@ -1,5 +1,6 @@
 ---
 id: adr-cluster-numbered-statements
+decided_in: i0017_pruning
 type: adr
 adjudicated_by: user
 statement: Clustering runs on TWO mechanisms - data-level, a requirement node carries an umbrella statement plus NUMBERED singular shall-statements (req-x.1) targetable by verifies edges; render-level, an easily-compactable subgraph (a regular fan whose internals touch nothing outside except through its inputs) collapses to one box with external edges drawn to the boundary, click to expand - and shipped iterations migrate toward materially fewer requirement nodes (292 baseline, ~120 the working target, never force-merging the semantically distinct).

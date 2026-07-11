@@ -1,5 +1,6 @@
 ---
 id: adr-call-log
+decided_in: i0010_engine_workshop
 type: adr
 adjudicated_by: human
 statement: Engine calls append one redacted line each to calls.jsonl in the logs home. Retention is retro-bound (owner ruling 2026-07-04) - the retro aggregates the log, then deletes it. No rotation machinery. Chosen over per-day files (retro aggregation reads one file) and SQLite (zero-dep).

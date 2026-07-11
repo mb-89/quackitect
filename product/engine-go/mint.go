@@ -155,6 +155,11 @@ func mintBody(kind, id string, extra map[string]string, lanes bool) string {
 		if !lanes {
 			b.WriteString("addresses: [" + addr + "]\n")
 		}
+		if extra["decided_in"] != "" {
+			// the decision's provenance: the active iteration it was decided in
+			// (stamped by mintNodeAtX from the TARGET workspace's breadcrumb)
+			b.WriteString("decided_in: " + extra["decided_in"] + "\n")
+		}
 		b.WriteString("adjudicated_by: user\n")
 		if extra["ready_when"] != "" {
 			b.WriteString("ready_when: " + extra["ready_when"] + "\n")
@@ -315,6 +320,13 @@ func mintNodeAtX(dir, kind, id string, extra map[string]string) (string, error) 
 		d = parent
 	}
 	lanes := specDir != "" && edgesModeOf(specDir) == "connections"
+	if kind == "adr" && extra["decided_in"] == "" && specDir != "" {
+		// decisions effectively never happen outside an iteration: stamp the TARGET
+		// workspace's active iteration as decided_in (v0 = no iteration yet, no stamp)
+		if v := ReadConfig(filepath.Join(specDir, "project.toml")).Version; v != "" && v != "v0" {
+			extra["decided_in"] = v
+		}
+	}
 	if err := os.WriteFile(path, []byte(mintBody(kind, full, extra, lanes)), 0o644); err != nil {
 		return "", err
 	}

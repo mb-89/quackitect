@@ -1,5 +1,6 @@
 ---
 id: adr-ntfy-actions
+decided_in: i0016_structural_models
 type: adr
 adjudicated_by: user
 statement: The ntfy ask renders X-Actions buttons publishing to the answer topic.

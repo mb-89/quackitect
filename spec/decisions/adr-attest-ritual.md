@@ -1,5 +1,6 @@
 ---
 id: adr-attest-ritual
+decided_in: i0009_contract_attestation
 type: adr
 adjudicated_by: human
 statement: The attestation ritual is console-grant + positional-word challenge + flag-carried chained keys — a one-time code minted by `quack attest --grant` on the interactive console, redeemed with a challenge answer (word N of rule K, nonce-seeded, verified against the live contract), yielding a session key passed as `--key` on ledger-advancing commands, hash-only at rest, expiring after a command budget and renewable autonomously with the prior key plus a fresh challenge — chosen over flag-relayed chat grants (no structural proof), contract-hash challenges (grep-able without reading), and key files (plaintext at rest).

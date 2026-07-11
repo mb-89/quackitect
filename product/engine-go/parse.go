@@ -37,6 +37,7 @@ type Node struct {
 	Supersedes []string // decision exit (go-decisions): an incoming supersedes edge = superseded
 	State      string   // question nodes only (go-question-nodes): open | proposed | decided
 	DecidedVia string   // question nodes only (go-question-nodes): how a decided question was decided
+	DecidedIn  string   // decision nodes: the iteration the decision was DECIDED in (optional; mint stamps it from the active iteration)
 	// design: go-ratings-map  implements: req-base-view-queries.2
 	// One-level frontmatter maps (a key with an empty value followed by indented sub: value
 	// lines), exposed generically to views. One level only - a deeper nest refuses at strict load.
@@ -147,6 +148,8 @@ func ParseNodeBytes(path string, txt []byte) Node {
 			n.State = v
 		case "decided_via":
 			n.DecidedVia = v
+		case "decided_in":
+			n.DecidedIn = v
 		case "addresses":
 			n.Addresses = splitIDs(v)
 		case "id":

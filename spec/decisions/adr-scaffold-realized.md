@@ -1,5 +1,6 @@
 ---
 id: adr-scaffold-realized
+decided_in: i0011_geronticide
 type: adr
 adjudicated_by: human
 statement: The vehicle-scaffold deferral is spent: i0010 realized the modernization (tools/vendor vendoring, spec/project.toml marker, pointer-chain entries, global-bin launcher, stamp ratchet) with the driveFromInside roundtrip green.

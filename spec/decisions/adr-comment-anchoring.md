@@ -1,5 +1,6 @@
 ---
 id: adr-comment-anchoring
+decided_in: i0013_comments
 type: adr
 kind: architecture
 adjudicated_by: user

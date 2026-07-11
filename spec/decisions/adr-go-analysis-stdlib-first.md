@@ -1,5 +1,6 @@
 ---
 id: adr-go-analysis-stdlib-first
+decided_in: i0017_pruning
 type: adr
 adjudicated_by: user
 statement: quack build always runs gofmt and go vet (the toolchain is already required) and fails on findings; staticcheck runs grab-if-present from the tools lane, never as a required dependency.

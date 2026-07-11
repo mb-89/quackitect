@@ -64,6 +64,9 @@ var nodeKeysAllow = map[string]bool{
 	// the question-node fields (go-question-nodes, adr-question-nodes-provenance):
 	// decision state (open | proposed | decided) and, once decided, its provenance
 	"state": true, "decided_via": true,
+	// the decision-node provenance field: the iteration the decision was DECIDED in
+	// (optional; quack mint stamps it from the active iteration)
+	"decided_in": true,
 }
 var iterKeysAllow = map[string]bool{
 	"iteration": true, "status": true, "type": true, "rigor": true,

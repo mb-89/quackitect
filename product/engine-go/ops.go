@@ -1206,16 +1206,19 @@ func originRemoteURL(dir string) string {
 	return ""
 }
 
-// furtherReadingSection builds a README's further-reading block: the relative
-// spec/book.html link plus the rendered GitHub Pages link. The Pages link derives
-// from target's git origin remote; without one, a marked placeholder stands in.
+// furtherReadingSection builds a README's further-reading block as a MARKDOWN TABLE
+// (one row per entry - it renders as a table on GitHub): the relative spec/book.html
+// link plus the rendered GitHub Pages link. The Pages link derives from target's git
+// origin remote; without one, a marked placeholder row stands in.
 func furtherReadingSection(target string) string {
-	pages := "- Rendered book: no git origin remote found yet. Once the project is on GitHub, the link is `https://<owner>.github.io/<repo>/book.html`. The owner enables Pages: Settings > Pages > branch main, folder `/docs`."
+	pages := "| Rendered book | no git origin remote found yet. Once the project is on GitHub: `https://<owner>.github.io/<repo>/book.html`. Enable Pages once: Settings > Pages > branch main, folder `/docs`. |"
 	if url, ok := pagesBookURL(originRemoteURL(target)); ok {
-		pages = "- [Read the book in the browser](" + url + ") - it renders without cloning. The owner enables Pages once: Settings > Pages > branch main, folder `/docs`."
+		pages = "| [Read the book in the browser](" + url + ") | Renders without cloning. Enable Pages once: Settings > Pages > branch main, folder `/docs`. |"
 	}
 	return "## Further reading\n\n" +
-		"- [The book](spec/book.html) - the whole spec as one page. Works locally and as a file view on GitHub.\n" +
+		"| Link | What it is |\n" +
+		"|---|---|\n" +
+		"| [The book](spec/book.html) | The whole spec as one page. Works locally and on GitHub. |\n" +
 		pages + "\n"
 }
 

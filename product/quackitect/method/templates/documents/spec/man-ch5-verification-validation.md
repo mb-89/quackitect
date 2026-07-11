@@ -55,7 +55,7 @@ Sources: the six-part record, the result contract @[[ref-mess-pruef-dok]].
 <!-- ai:3 -->
 {{records-lede}}
 ---
-## The verification matrix
+## Verification
 <!-- tailor: shipped text - the matrix derives; an empty row IS the finding, and it
   ALSO renders in the verdict-first block above (the exceptions lead,
   the full matrix serves the deep reader - paged by need, rows collapsed to names,

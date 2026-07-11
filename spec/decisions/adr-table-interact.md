@@ -1,5 +1,6 @@
 ---
 id: adr-table-interact
+decided_in: i0014_doc_review
 type: adr
 kind: architecture
 adjudicated_by: user

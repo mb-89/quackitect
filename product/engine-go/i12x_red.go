@@ -1043,11 +1043,17 @@ func selftestCh3Mech() bool {
 	// design input table (fig: input-register) - ch3 embeds neither
 	// requirements.base nor assumptions.base (assumptions read in the raid
 	// register); the methods view lives in the appendix)
+	// RE-POINTED at the post-ship feedback batch (owner note 5): the QUALITIES and
+	// CONSTRAINTS sections DIED - both are filterable TYPE values of the register
+	// now, so the two base embeds must be GONE from the chapter.
 	for _, want := range []string{"fig: context-star", "![[neighbours.base]]", "![[tensions.base]]", "fig: ucfn-board",
-		"![[qualities.base]]", "![[constraints.base]]", "fig: input-register"} {
+		"fig: input-register"} {
 		if !strings.Contains(t, want) {
 			return false
 		}
+	}
+	if strings.Contains(t, "![[qualities.base]]") || strings.Contains(t, "![[constraints.base]]") {
+		return false // the dead sections must not resurface
 	}
 	// the coverage board sits in its own unit
 	body := t
@@ -1083,10 +1089,13 @@ func selftestCh4Mech() bool {
 	// RE-POINTED at the round-2 book review (owner notes 32/33): ch4 carries the
 	// ARCHITECTURE and DETAILED DESIGN spine subchapters; the drivers list
 	// (fig: asr-list) and the kind examples moved to the appendix guidance.
+	// RE-POINTED again at the post-ship feedback batch (owner notes 6/7): the
+	// structural models render as ONE auto-generated table (fig: models-table)
+	// and the detailed design as the design-regions table (fig: design-regions).
 	// The mechanized views embed (the decision views live in the project chapter
 	// with the candidates record - ch4 documents only the design in use).
 	for _, want := range []string{"## Architecture", "## Detailed design",
-		"fig: onion", "fig: model", "![[interfaces.base]]",
+		"fig: onion", "fig: models-table", "fig: design-regions", "![[interfaces.base]]",
 		"![[force-rationales.base]]", "![[rules.base]]"} {
 		if !strings.Contains(t, want) {
 			return false
@@ -1115,7 +1124,10 @@ func selftestCh4Mech() bool {
 			figs++
 		}
 	}
-	return figs == 2 // the onion drill-down + the structural models (the ASR list retired to the appendix)
+	// post-ship re-point: three fig units now - the onion drill-down, the
+	// structural-models table, and the design-regions table (the ASR list stays
+	// retired to the appendix)
+	return figs == 3
 }
 
 // test-block-tree-design -> selftest:block-tree-design

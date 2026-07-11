@@ -1,5 +1,6 @@
 ---
 id: adr-veto-kind-first-data
+decided_in: i0009_contract_attestation
 type: adr
 adjudicated_by: human
 statement: A kind-first data layout (logs/<slug>, notes/<slug>) is scrapped: it scatters one workspace across kinds and breaks the one-delete amnesia test (i9 M3 axis A5b).

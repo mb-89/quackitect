@@ -1,5 +1,6 @@
 ---
 id: adr-pointer-entry-unveto
+decided_in: i0010_engine_workshop
 type: adr
 adjudicated_by: human
 statement: The pointer-entry scrap is lifted: field data showed Claude Code natively loads CLAUDE.md, not AGENTS.md, and a weak model with the full contract embedded still skipped the recital — transclusion never was the enforcement. Since i9, attest blocks the ledger structurally; pointers return as an enumerated command chain (adr-entry-chain).

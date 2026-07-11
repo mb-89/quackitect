@@ -1,5 +1,6 @@
 ---
 id: adr-fu55aja
+decided_in: i0016_structural_models
 type: adr
 adjudicated_by: user
 ready_when: a canvas format is admitted for an arrangement-authored kind at a views-chosen decision

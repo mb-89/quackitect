@@ -27,18 +27,18 @@ All you bring is the big ideas — and your judgement.
 
 
 ## Who it's for
-Engineers and teams driving work with AI agents who need an **auditable design / decision record with user gates** — regulated or systematic engineering, requirements traceability, architecture decision records (ADRs), V-model walks, or anyone who wants the agent to *propose* and a user to *adjudicate*.
+Engineers driving work with AI agents — software or any other discipline — who need to trust work they did not watch happen. An experienced developer reads between the lines. A model doesn't: where context is missing, it fills the gap with a plausible invention. So the intent has to be explicit *before* the build — the needs, the constraints that bind, the decisions and their reasons. quackitect governs that loop instead of trusting the run: the agent *proposes*, you *adjudicate* the gates, and a deterministic ledger keeps the record honest.
 
-> Spec-driven tools like Spec Kit, Kiro, and OpenSpec exist to turn a spec into code. quackitect aims a level up: It produces engineering deliverables (code, CAD-files, plans, documents, concepts in general, ...) and the **oversight and traceability ledger** that records *why* each design decision holds. This pays off when project and teams get big or changes ripple through the whole architecture. Quackitect itself is built using quackitect.
+> Spec-driven tools like Spec Kit, Kiro, and OpenSpec work the output end: turning a spec into code. quackitect bets on the opposite end. Models keep getting better at producing output — the decisive leverage moves to the design *input* and to keeping the decision history first-class. quackitect produces engineering deliverables (code, CAD-files, plans, documents, concepts in general, ...) plus the oversight and traceability ledger that records *why* each design decision holds. The two ends compose: quackitect for the input, your favorite coding harness for the output. Quackitect itself is built using quackitect.
 
 ## vs other spec-driven tools
-|  | Spec Kit · Kiro · OpenSpec | **quackitect** |
+|  | Spec Kit · Kiro · OpenSpec | quackitect |
 |---|---|---|
-| Job | spec → plan → **generate code** | spec → **gated ledger + deliverable** |
+| Job | spec → plan → generate code | spec → gated ledger + deliverable |
 | Output | source code | auditable trace + deliverable |
-| On input change | re-generate | the affected cone goes **SUSPECT** → re-bless |
-| User role | review the diff | **adjudicate the gates** (never auto-passed) |
-| Runtime | varies | one **dependency-free Go binary** |
+| On input change | re-generate | the affected cone goes SUSPECT → re-bless |
+| User role | review the diff | adjudicate the gates (never auto-passed) |
+| Runtime | varies | one dependency-free Go binary |
 
 ## Start your project
 The primary way to use quackitect is to **tell your AI agent what you need**. It runs the
@@ -57,8 +57,10 @@ You're looking at quackitect's own design, tracked and built by quackitect. It *
 
 ## Further reading
 
-- [The book](spec/book.html) — quackitect's whole spec as one page: requirements, designs, decisions, V&V. Works locally and as a file view on GitHub.
-- [Read it in your browser](https://mb-89.github.io/quackitect/book.html) — the same book, rendered on GitHub Pages. No clone needed.
+| Link | What it is |
+|---|---|
+| [The book](spec/book.html) | quackitect's whole spec as one page. Works locally and on GitHub. |
+| [Read the book in your browser](https://mb-89.github.io/quackitect/book.html) | The same book on GitHub Pages. No clone needed. |
 
 ---
 <sub>spec-driven development · requirements traceability · decision records · design-as-code · systems engineering · V-model · AGENTS.md · AI coding agents · audit trail · gate ledger · Merkle DAG</sub>

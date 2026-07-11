@@ -525,7 +525,7 @@ func traceTabs(nodes map[string]Node, sm map[string]string, book bool) []gtab {
 			continue // graveyard/parked decisions live OUTSIDE the requirement trace by design
 			// (go-decisions); their read paths are `decisions --parked` and the archive, not the graph.
 		}
-		if book && n.Type == "adr" && decisionType(n) != "architecture" {
+		if book && n.Type == "adr" && !decisionArchitectural(n) {
 			continue
 		}
 		tnodes[id] = n

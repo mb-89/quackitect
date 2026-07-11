@@ -66,26 +66,28 @@ Every method the chapters mention renders here as a table row - situation, effec
 ![[methods.base#Methods in full]]
 ---
 ## Drivers
-<!-- tailor: shipped machinery - the architecturally-significant list GENERATES from
-  the `architecturally-significant` tag on requirement nodes: each entry is a LINK
-  back to design input, never a copy; tagging is owner curation. Guidance, not a
+<!-- tailor: shipped machinery - the drivers TABLE generates from
+  the `architecturally-significant` tag on requirement nodes: one row per tagged
+  requirement, the expand a LINK back to design input, never a copy; tagging is
+  owner curation, a sparse table is an honest one. Guidance, not a
   design-output section: the reader meets the requirements in the register and the
-  choices in the decisions table - this list serves the curious reader.
+  choices in the decisions table - this table serves the curious reader.
 Sources: drivers @[[ref-sya-architecting]].
 -->
 <!-- ai:3 -->
-The requirements below drove the architecture - each entry links back to its register row. The strategic choices they led to are decisions, recorded with the project chapter's timeline.
+The requirements below drove the architecture - one row each, the register link in the expand. The strategic choices they led to are decisions, recorded with the project chapter's timeline.
 ---
 fig: asr-list
 ---
 ## Model kinds
-<!-- tailor: shipped machinery - the kind examples derive from the method's kind
-  registry at render time - no hand-authored duplicates. A project's OWN models
+<!-- tailor: shipped machinery - the kind TABLE derives from the method's kind
+  registry at render time - one row per supported kind, the compact example
+  graph in the row expand, no hand-authored duplicates. A project's OWN models
   render in the design output chapter; the examples here show every supported
   shape.
 -->
 <!-- ai:3 -->
-One compact example per supported model kind, derived from the kind registry. A project's own models render with the design output chapter; these examples show the shapes available.
+One table row per supported model kind, derived from the kind registry - expand a row for the compact example. A project's own models render with the design output chapter; these examples show the shapes available.
 ---
 fig: model-kinds
 ---

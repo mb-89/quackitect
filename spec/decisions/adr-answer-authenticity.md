@@ -1,5 +1,6 @@
 ---
 id: adr-answer-authenticity
+decided_in: i0016_structural_models
 type: adr
 adjudicated_by: user
 statement: Answer authenticity equals possession of the paired channel credential; the residual forgery risk is accepted.

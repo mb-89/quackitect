@@ -192,6 +192,11 @@ func fullHash(id string, nodes map[string]Node, memo map[string]string) string {
 		// deciding a question ripples its dependents like any content edit
 		seed += "|question:" + n.State + "|" + n.DecidedVia
 	}
+	if n.DecidedIn != "" {
+		// a decision's decided_in provenance is identity, folded exactly like the
+		// question fields: stamping or changing it ripples the dependents
+		seed += "|decided_in:" + n.DecidedIn
+	}
 	if n.Milestone > 0 && strings.HasSuffix(id, "-gate") {
 		seed += evidenceDocSeed(iterOf(n.Path), n.Milestone) // the gate folds its evidence docs (go-evidence-hash)
 	}

@@ -40,7 +40,7 @@ Each test declares two fields, and the matrix renders both:
 <!-- ai:3 -->
 Verify on models early: an analytic reference case is the cheapest experiment. Integration-level evidence outweighs paper compliance - written compliance did not stop a receiver failing in orbit.
 ---
-## The verification matrix
+## Verification
 <!-- tailor: shipped text - the matrix derives; an empty row IS the finding, and it
   ALSO renders in the verdict-first block above (the exceptions lead,
   the full matrix serves the deep reader - paged by need, rows collapsed to names,

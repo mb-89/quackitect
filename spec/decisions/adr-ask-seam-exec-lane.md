@@ -1,5 +1,6 @@
 ---
 id: adr-ask-seam-exec-lane
+decided_in: i0016_structural_models
 type: adr
 adjudicated_by: user
 statement: The ask seam is a Go adapter interface plus one exec adapter kind driving an external process over a file contract.

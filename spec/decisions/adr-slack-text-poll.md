@@ -1,5 +1,6 @@
 ---
 id: adr-slack-text-poll
+decided_in: i0016_structural_models
 type: adr
 adjudicated_by: user
 statement: The Slack adapter answers by text-reply polling, not Socket Mode.

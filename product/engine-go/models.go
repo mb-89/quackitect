@@ -188,9 +188,10 @@ func (g modelGraph) CanonicalHash() string {
 // graph — the derived view of the text truth. Rings for ranked (layers-flow)
 // models, a flow column for the rest; every arrow carries its payload name
 // (unlabeled arrows are useless). One figure line: `fig: model <id>`,
-// or bare `fig: model` for all models sorted.
-// Each ARCHITECTURAL (non-behavioral) model also carries its derived
-// "informed by" link list (modelInformedBy below).
+// or bare `fig: model` for all models sorted. The structural-models SECTION renders
+// as the auto-generated table below (`fig: models-table`, the same table law as
+// every other derived view): one row per declared model, the figure and its derived
+// "informed by" link list (modelInformedBy below) inside the row expand.
 func renderModelFigure(arg string, nodes map[string]Node) string {
 	var ids []string
 	for id, n := range nodes {
@@ -218,6 +219,57 @@ func renderModelFigure(arg string, nodes map[string]Node) string {
 		}
 		b.WriteString("</section>\n")
 	}
+	return b.String()
+}
+
+// renderModelsTable is the structural-models section body: one expandable row per
+// declared model node, sorted by id; the expand carries the extracted figure and
+// the informed-by links. An empty population says so honestly.
+func renderModelsTable(nodes map[string]Node) string {
+	var ids []string
+	for id, n := range nodes {
+		if n.Type == "model" {
+			ids = append(ids, id)
+		}
+	}
+	if len(ids) == 0 {
+		return `<p class="meta">no model nodes yet — the table renders as spec/models/ fills</p>`
+	}
+	sort.Strings(ids)
+	var b strings.Builder
+	b.WriteString(`<div class="utable" id="models-table" data-layer="derived">`)
+	b.WriteString(`<table class="q-table u-table" data-layer="derived"><thead><tr><th scope="col">model</th><th scope="col">brief</th><th scope="col">kind</th></tr></thead><tbody>` + "\n")
+	for _, id := range ids {
+		n := nodes[id]
+		name := strings.ReplaceAll(strings.TrimPrefix(id, "model-"), "-", " ")
+		brief := ""
+		if len(n.Statement) <= 110 {
+			brief = n.Statement
+		} else if lead, sub := splitChapterTitle(n.Statement); sub != "" && len(lead) <= 110 {
+			brief = lead
+		}
+		kind := n.Kind
+		if kind == "" {
+			kind = "-"
+		}
+		b.WriteString(`<tr class="urow qt-exp" data-node="` + htmlEscape(id) + `" data-text="` + attesc(htmlEscape(strings.ToLower(name+" "+n.Statement+" "+id))) + `"><td><span class="utri" aria-hidden="true"></span>` + htmlEscape(name) + `</td><td class="ubrief">` + htmlEscape(brief) + `</td><td class="uenum">` + htmlEscape(kind) + `</td></tr>` + "\n")
+		b.WriteString(`<tr class="udetail" hidden><td colspan="3">`)
+		if n.Statement != "" && n.Statement != brief {
+			b.WriteString(`<p class="stmt">` + htmlEscape(n.Statement) + `</p>`)
+		}
+		if raw, err := os.ReadFile(n.Path); err == nil {
+			src := string(raw)
+			g, _ := extractModelGraph(src)
+			b.WriteString(svgModelGraph(g))
+			if !strings.Contains(src, "stateDiagram-v2") && !strings.Contains(src, "sequenceDiagram") {
+				b.WriteString(renderModelInformed(id, src, nodes))
+			}
+		}
+		b.WriteString(`<p class="meta">` + htmlEscape(id) + `</p></td></tr>` + "\n")
+	}
+	b.WriteString("</tbody></table>")
+	b.WriteString(utableControls())
+	b.WriteString(`</div>` + "\n")
 	return b.String()
 }
 
@@ -251,7 +303,7 @@ func modelInformedBy(modelID, src string, nodes map[string]Node) []string {
 	tokens = append(tokens, elems...)
 	var out []string
 	for id, n := range nodes {
-		if n.Type != "adr" || n.Kind == "waiver" || decisionType(n) != "architecture" {
+		if n.Type != "adr" || n.Kind == "waiver" || !decisionArchitectural(n) {
 			continue
 		}
 		if nameMatchToken(src, id) {
@@ -421,12 +473,13 @@ func modelStubFor(kind string) string {
 // enddesign
 
 // design: go-models-complete-book  implements: req-models-complete-book
-// The kind-example figure (`fig: model-kinds`): ONE compact example per supported
-// model kind, derived at render time from the registry files themselves
-// (modelKindFiles) - the book carries no hand-authored duplicate. Each example
-// wraps in a section marked data-kind-example="<kind>" (<kind> = the registry
-// file's base name); its caption is the kind's own question, its figure the
-// kind's by-example stub run through the normal extractor and renderer. A
+// The kind-example figure (`fig: model-kinds`): ONE row per supported model kind
+// in the same expandable reader table as everything else, derived at render time
+// from the registry files themselves (modelKindFiles) - the book carries no
+// hand-authored duplicate. The row names the kind, the brief is the kind's own
+// question, and the expand holds the example: a section marked
+// data-kind-example="<kind>" (<kind> = the registry file's base name) whose figure
+// is the kind's by-example stub run through the normal extractor and renderer. A
 // derived kind (no authored stub - the context star computes from live spec
 // data) says so instead of faking an authored example.
 func renderModelKindExamples() string {
@@ -435,6 +488,8 @@ func renderModelKindExamples() string {
 		return `<p class="meta">no model kinds yet — the registry (method/models/) is empty</p>`
 	}
 	var b strings.Builder
+	b.WriteString(`<div class="utable" id="model-kinds-table" data-layer="derived">`)
+	b.WriteString(`<table class="q-table u-table" data-layer="derived"><thead><tr><th scope="col">kind</th><th scope="col">question</th></tr></thead><tbody>` + "\n")
 	for _, f := range files {
 		kind := strings.TrimSuffix(filepath.Base(f), filepath.Ext(f))
 		raw, err := os.ReadFile(f)
@@ -448,15 +503,21 @@ func renderModelKindExamples() string {
 				break
 			}
 		}
-		b.WriteString(`<section data-kind-example="` + kind + `" data-layer="informative"><p class="stmt"><strong>` + kind + `</strong> — ` + htmlEscape(question) + "</p>\n")
+		b.WriteString(`<tr class="urow qt-exp" data-text="` + attesc(htmlEscape(strings.ToLower(kind+" "+question))) + `"><td><span class="utri" aria-hidden="true"></span>` + htmlEscape(kind) + `</td><td class="ubrief">` + htmlEscape(question) + `</td></tr>` + "\n")
+		b.WriteString(`<tr class="udetail" hidden><td colspan="2">`)
+		b.WriteString(`<section data-kind-example="` + kind + `" data-layer="informative">` + "\n")
 		if stub := modelStubFor(kind); stub != "" {
 			g, _ := extractModelGraph(stub)
 			b.WriteString(svgModelGraph(g))
 		} else {
 			b.WriteString(`<p class="meta">derived kind — its figure computes from live spec data; no authored example exists</p>`)
 		}
-		b.WriteString("</section>\n")
+		b.WriteString("</section>")
+		b.WriteString(`</td></tr>` + "\n")
 	}
+	b.WriteString("</tbody></table>")
+	b.WriteString(utableControls())
+	b.WriteString(`</div>` + "\n")
 	return b.String()
 }
 

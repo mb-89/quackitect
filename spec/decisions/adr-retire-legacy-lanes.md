@@ -1,5 +1,6 @@
 ---
 id: adr-retire-legacy-lanes
+decided_in: i0011_geronticide
 type: adr
 adjudicated_by: human
 statement: The .quack vendor resolver lanes and the engine.local launcher branch retire: resolution is tools/vendor, then the dogfood product tree; stub launchers resolve global binary then QUACK_ENGINE. The i5-era pointer lanes had their last user in the pre-i9 world.

@@ -675,6 +675,7 @@ func init() {
 		i17bTests,         // i17_red2.go
 		i17cTests,         // i17_red3.go
 		i17dTests,         // i17_red4.go
+		i17eTests,         // i17_red5.go (the post-ship feedback batch)
 	)
 }
 

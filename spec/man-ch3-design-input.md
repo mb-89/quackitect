@@ -15,9 +15,7 @@ This chapter is the binding input:
 - the context and its boundary
 - the intended use, and what falls outside it
 - the use cases and functions
-- the qualities, with their measures
-- the constraints
-- the design input register
+- the design input register, qualities and constraints included
 - the stakeholder tensions
 
 <!-- ai:3 -->
@@ -73,47 +71,30 @@ fig: context-star
 Sources: Cockburn use-case fields @[[ref-sya-re]]; functional decomposition @[[ref-pahl-beitz]].
 -->
 <!-- ai:3 -->
-Two tables, live from the graph: the use cases and the solution-neutral functions, each traced to its need. Expand a use case to read its definition; filter either table by need.
+Two tables, live from the graph: the use cases and the solution-neutral functions, each traced to its need. Expand a use case to read its definition; filter either table by need. How the rows interconnect renders as the [trace](term:trace), one page per need, in the [overview chapter](man-sys-overview.md).
 ---
 fig: ucfn-board
 ---
-## Qualities
-<!-- tailor: shipped machinery - the six scenario fields live ON the quality
-  requirements; the view renders them grouped by quality facet. The ISO 25010
-  tree is the elicitation checklist, in the methods view.
-Sources: metric rule @[[ref-systementwurf-mechatronik]]; six-part scenarios
-  @[[ref-sya-nfr]]; the elicitation tree @[[ref-iso-25010]].
--->
-<!-- ai:3 -->
-Every quality below carries its six-part scenario, and the response measure is its pass line - a quality without a measure is a mood.
-
-![[qualities.base]]
----
-## Constraints
-<!-- tailor: shipped machinery - constraints are kind-constraint requirements,
-  each linking its normative reference note (the pin lives there, the
-  fundamentals chapter derives the list). Type-gated regulatory sets come from
-  the type layer's guidance.
--->
-<!-- ai:3 -->
-A constraint is externally imposed - a binding norm with a citation, never a choice. Each row links the reference that binds it.
-
-![[constraints.base]]
----
 ## The design input register
 <!-- tailor: shipped text - the register derives: ONE table over every use
-  case, function, constraint, and requirement, with a type facet beside the
-  board facets; the need is a facet, never a body column. Initial requirements
+  case, function, constraint, quality, and requirement, with a type facet
+  beside the board facets; the need is a facet, never a body column.
+  Qualities and constraints are register TYPES, never own sections: filter
+  the type facet to see either set; a quality row's expand carries its six
+  scenario fields (the response measure is its pass line - a quality without
+  a measure is a mood); a constraint row links the norm that binds it.
+  Initial requirements
   suffice to START concepting, detail requirements gate the RELEASE; the set
   criteria bind: complete, consistent, affordable, bounded. The board doubles
   as the register's filter row (the recorded
   exemption from the pills rule) - click values to filter, several combine.
 Sources: four core areas, Hauptmerkmalliste, staging @[[ref-pahl-beitz]];
   row schema @[[ref-methodische-entwicklung]]; attribute discipline
-  @[[ref-modellbasierte-pe]]; set criteria @[[ref-iso-29148]].
+  @[[ref-modellbasierte-pe]]; set criteria @[[ref-iso-29148]]; six-part
+  scenarios @[[ref-sya-nfr]]; the elicitation tree @[[ref-iso-25010]].
 -->
 <!-- ai:3 -->
-How the rows interconnect lives in one place: the [trace](term:trace), one page per need, in the [overview chapter](man-sys-overview.md). The register below is the flat index over every input type:
+How the rows interconnect lives in one place: the [trace](term:trace), one page per need, in the [overview chapter](man-sys-overview.md). The register below is the flat index over every input type; the type facet filters to the qualities or the constraints:
 
 <!-- ai:3 -->
 - A use case is one interaction that serves a need, told from the user's side.

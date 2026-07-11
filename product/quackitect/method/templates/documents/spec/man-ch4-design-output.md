@@ -5,7 +5,7 @@ mode: chapter
 order: 40
 statement: Design output - the architecture derived, then the design deep down.
 ---
-<!-- design: method-ch4-mech  implements: req-chapters-canned.3, req-decision-rendering.2 :: ch4 mechanized, current-state only, TWO spine subchapters: part A ARCHITECTURE (every declared structural model rendered from its authored truth, each carrying its derived informed-by decision links; the partitioning onion with interface connections and tagged force-rationales; the type-gated budgets), part B DETAILED DESIGN (the design rules view). Canned ledes, every figure line its own unit. The drivers list (the generated asr-list figure) and the kind examples render with the appendix guidance; the candidates matrix and the decision tables live with the project chapter (the design chapter documents what IS, the project chapter how it came to be); the authored residue is the type-gated budgets unit. -->
+<!-- design: method-ch4-mech  implements: req-chapters-canned.3, req-decision-rendering.2 :: ch4 mechanized, current-state only, TWO spine subchapters: part A ARCHITECTURE (the structural-models section as ONE auto-generated table - a row per declared model, the figure and its derived informed-by decision links in the row expand; the partitioning onion with interface connections and tagged force-rationales; the type-gated budgets), part B DETAILED DESIGN (the auto-generated design-regions table - a row per design element, responsibility brief-promoted, the expand with file and implements links - plus the design rules view). Canned ledes, every figure line its own unit. The drivers table (the generated asr-list figure) and the kind examples render with the appendix guidance; the candidates matrix and the decision tables live with the project chapter (the design chapter documents what IS, the project chapter how it came to be); the authored residue is the type-gated budgets unit. -->
 ## What we built
 <!-- tailor: shipped text - the chapter mechanics are the same in every project.
 Sources: architecture vs design table @[[ref-sya-architecting]].
@@ -45,15 +45,16 @@ fig: onion
 ![[force-rationales.base]]
 ---
 ### Structural models
-<!-- tailor: shipped machinery - every declared model renders from its extracted
-  graph (one model-figure unit per model id, or one bare model-figure unit for
-  all; the onion above is the layers-flow model's own drill-down render). The
-  kind registry's compact examples render with the appendix guidance.
+<!-- tailor: shipped machinery - the section is ONE auto-generated table
+  (the models-table figure unit): a row per declared model, the extracted figure and the
+  derived informed-by links inside the row expand (the onion above is the
+  layers-flow model's own drill-down render). The kind registry's compact
+  examples render with the appendix guidance.
 -->
 <!-- ai:3 -->
-The onion above is one declared model - the layered dependency view. Every other declared model renders below from its authored truth. The compact examples of every supported model kind live with the appendix guidance.
+Each declared model is one row below, rendered from its authored truth - expand a row for the figure and the decisions that informed it. The onion above is the layers-flow model's own drill-down render. The compact examples of every supported model kind live with the appendix guidance.
 ---
-fig: model
+fig: models-table
 ---
 ### Budgets
 <!-- fill [type: manufactured_good, cyber_physical]
@@ -69,12 +70,17 @@ Sources: budgets, summation rules @[[ref-systementwurf-mechatronik]].
 {{budgets}}
 ---
 ## Detailed design
-<!-- tailor: shipped text - part B: everything below the architectural line. The
-  trace items the onion links carry the per-element detail; this part carries the
-  governance those elements share.
+<!-- tailor: shipped machinery - part B: everything below the architectural line,
+  as the auto-generated design-regions table (the design-regions figure unit): a row per
+  design element - the code-derived regions and the des- notes - with the
+  responsibility brief-promoted into the row; the expand carries the full
+  responsibility, the file the region lives in, and the implements links. The
+  design rules stay prose-introduced below.
 -->
 <!-- ai:3 -->
-Below the architectural line sits the detailed design: choices with local reach, safe to revise inside one element. The onion's leaves link each element to its trace item; what remains here is the governance those elements share.
+Below the architectural line sits the detailed design: choices with local reach, safe to revise inside one element. Each design element is one row below - expand it for the responsibility, the file it lives in, and the requirements it implements.
+---
+fig: design-regions
 ---
 ### Design rules
 <!-- tailor: shipped machinery - the rules view; each rule is a note in spec/rules

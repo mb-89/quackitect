@@ -508,6 +508,12 @@ func readmeInline(s string) string {
 	s = reReadmeLink.ReplaceAllStringFunc(s, func(m string) string {
 		g := reReadmeLink.FindStringSubmatch(m)
 		label, url := g[1], g[2]
+		if url == "spec/book.html" {
+			// the book's own further-reading link: relative to the REPO root, it breaks
+			// wherever a published copy opens from (out/, docs/, the zip root). Inside
+			// the rendered book the target IS this document - an in-book no-op says so.
+			return `<span class="self-link">` + label + `</span> <span class="meta">(this document — you are reading it)</span>`
+		}
 		if strings.HasPrefix(url, "http://") || strings.HasPrefix(url, "https://") {
 			return `<a href="` + url + `" target="_blank" rel="noopener">` + label + `</a>`
 		}
@@ -1105,6 +1111,8 @@ func renderBookHTML(nodes map[string]Node) (string, []string, []string) {
 		".sb-brand{font-weight:600;font-size:15px;margin:0;cursor:pointer;background:none;border:0;padding:0;text-align:left;font-family:inherit;color:inherit}" +
 		".sb-h{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:#7d7d7d;margin:8px 0 2px}" +
 		"#sidebar input{width:100%;padding:5px 8px;border:1px solid #ddd;border-radius:5px;font:inherit;font-size:13px;background:" + bookColors["bg"] + "}" +
+		// an ACTIVE filter is unmistakable: the input line goes yellow while any token is live
+		"#filter-expr.flt-on{background:#ffe873;border-color:#c9a400;font-weight:bold}" +
 		// the contents area owns its scrollbar: the toc flexes to the
 		// remaining height and scrolls on its own, so it stays scrollable while the
 		// details pane below claims space.
@@ -1275,6 +1283,7 @@ func renderBookHTML(nodes map[string]Node) (string, []string, []string) {
   if(val&&!(toggle&&had))t.push(key+':'+val);fe.value=t.join(' ');apply();}
  function apply(){
   var toks=(fe.value||'').trim().split(/\s+/).filter(Boolean),preset='',state='',words=[];
+  fe.classList.toggle('flt-on',toks.length>0);
   toks.forEach(function(t){var i=t.indexOf(':'),k=i<0?'':t.slice(0,i),v=t.slice(i+1);
    if(k==='preset')preset=v;else if(k==='state')state=v;
    else words.push(t.toLowerCase());});
@@ -4100,6 +4109,17 @@ func promoteBrief(name, head, body string) (brief, outBody string) {
 	return "", body
 }
 
+// utableControls is the shared reader-table footer: expand/collapse-all, the text
+// filter, the page size, and the pager - ONE markup for every utable render site.
+func utableControls() string {
+	return `<div class="ucontrols">` +
+		`<button type="button" class="qt-xall">expand all</button><button type="button" class="qt-call">collapse all</button>` +
+		`<input class="qt-search" type="search" placeholder="filter…">` +
+		`<label class="qt-sizel">show <select class="qt-size"><option>20</option><option>50</option><option value="0">all</option></select></label>` +
+		`<span class="qt-pager"><button type="button" class="qt-prev" aria-label="previous page">&#8249;</button><span class="qt-pos"></span><button type="button" class="qt-next" aria-label="next page">&#8250;</button></span>` +
+		`</div>`
+}
+
 // baseResultHTML renders evaluation results: semantic tables (WCAG: real th headers),
 // full sections with note bodies (render: full, section id = the note slug), or
 // state-aware node sections (render: refs - each row through renderNodeAtDepth).
@@ -4283,8 +4303,10 @@ func baseResultHTML(rs []BaseResult, nodes map[string]Node, sm map[string]string
 			}
 		}
 		// stakeholder rows carry a VIEW pill: a click enters the reader's preset (the
-		// stakeholder's preset link, else its id) into the book filter - the same
-		// delegated data-view machinery the filter help uses.
+		// stakeholder's preset link, else the man-preset-<role> manifest its id names)
+		// into the book filter - the same delegated data-view machinery the filter help
+		// uses. A stakeholder with NO resolvable preset gets NO pill: a token no chapter
+		// carries would filter the whole book away (the post-ship preset incident).
 		viewTok := map[string]string{}
 		for _, fr := range frows {
 			n, ok := nodes[fr.row.ID]
@@ -4293,7 +4315,13 @@ func baseResultHTML(rs []BaseResult, nodes map[string]Node, sm map[string]string
 			}
 			tok := basePropsOf(n.Path).scalars["preset"]
 			if tok == "" {
-				tok = fr.row.ID
+				cand := "man-preset-" + strings.TrimPrefix(fr.row.ID, "stk-")
+				if pn, has := nodes[cand]; has && pn.Mode == "preset" {
+					tok = cand
+				}
+			}
+			if tok == "" {
+				continue
 			}
 			viewTok[fr.row.ID] = tok
 		}
@@ -4481,14 +4509,9 @@ func baseResultHTML(rs []BaseResult, nodes map[string]Node, sm map[string]string
 		if empty {
 			b.WriteString(`<p class="meta">no rows yet — the query renders as items arrive</p>`)
 		} else {
-			b.WriteString(`<div class="ucontrols">`)
-			b.WriteString(`<button type="button" class="qt-xall">expand all</button><button type="button" class="qt-call">collapse all</button>`)
-			b.WriteString(`<input class="qt-search" type="search" placeholder="filter…">`)
-			// the enum columns are pill facets above the table now; only the text filter, the
-			// page-size select, and the pager live below.
-			b.WriteString(`<label class="qt-sizel">show <select class="qt-size"><option>20</option><option>50</option><option value="0">all</option></select></label>`)
-			b.WriteString(`<span class="qt-pager"><button type="button" class="qt-prev" aria-label="previous page">&#8249;</button><span class="qt-pos"></span><button type="button" class="qt-next" aria-label="next page">&#8250;</button></span>`)
-			b.WriteString(`</div>`)
+			// the enum columns are pill facets above the table; only the shared
+			// controls footer lives below.
+			b.WriteString(utableControls())
 		}
 		b.WriteString(`</div>`)
 		// enddesign
@@ -4543,9 +4566,18 @@ func renderFigure(kind string, nodes map[string]Node) string {
 		return renderModelFigure(strings.TrimSpace(strings.TrimPrefix(kind, "model")), nodes)
 	}
 	if kind == "model-kinds" {
-		// one example per supported model kind, derived from the kind registry
-		// (go-models-complete-book)
+		// one table row per supported model kind, example in the expand, derived
+		// from the kind registry (go-models-complete-book)
 		return renderModelKindExamples()
+	}
+	if kind == "models-table" {
+		// the structural-models section table: one row per declared model,
+		// figure + informed-by in the expand (go-model-render)
+		return renderModelsTable(nodes)
+	}
+	if kind == "design-regions" {
+		// the detailed-design section table: one row per design element
+		return renderDesignRegions(nodes)
 	}
 	switch kind {
 	case "context-star":
@@ -4831,8 +4863,9 @@ func decisionTitle(n Node) string {
 }
 
 // decisionType folds the recorded kind and the strategy tag into the rendered TYPE
-// column: project | strategy | architecture (an empty kind is architecture for
-// blessed history - go-items).
+// column: project | strategy | architecture | general. A kind-less decision renders
+// honestly as "general" - display only, the node keeps its empty kind (the old fold
+// relabeled the everyday majority as architecture and hid it).
 func decisionType(n Node) string {
 	if n.Kind == "project" {
 		return "project"
@@ -4842,16 +4875,32 @@ func decisionType(n Node) string {
 			return "strategy"
 		}
 	}
-	return "architecture"
+	if n.Kind == "" {
+		return "general"
+	}
+	return n.Kind
 }
 
-// decisionIteration derives the iteration a decision belongs to: its own archive
-// home when it was recorded inside one, else the iteration of the candidates it
-// claimed, else the iteration of the nodes it ADDRESSES (a decision minted into
-// the global decisions folder belongs to the iteration whose inputs it decided;
-// the ledger cannot supply this - decisions are content, never blessed, so no
-// event carries their id), else "-" (nothing places it).
+// decisionArchitectural keeps the PRE-FOLD membership rule for the non-table surfaces
+// (the book trace graph, a model's informed-by list): kind architecture, and the
+// kind-less blessed history that always counted as architecture there. The ch9 TYPE
+// column is the only place the kind-less majority reads "general".
+func decisionArchitectural(n Node) bool {
+	dt := decisionType(n)
+	return dt == "architecture" || dt == "general"
+}
+
+// decisionIteration derives the iteration a decision belongs to: the recorded
+// decided_in field FIRST (mint stamps it; the one-time backfill filled history),
+// else its own archive home when it was recorded inside one, else the iteration
+// of the candidates it claimed, else the iteration of the nodes it ADDRESSES (a
+// decision minted into the global decisions folder belongs to the iteration whose
+// inputs it decided; the ledger cannot supply this - decisions are content, never
+// blessed, so no event carries their id), else "-" (nothing places it).
 func decisionIteration(n Node, nodes map[string]Node) string {
+	if n.DecidedIn != "" {
+		return n.DecidedIn
+	}
 	if rel, err := filepath.Rel(SPEC, n.Path); err == nil {
 		parts := strings.Split(filepath.ToSlash(rel), "/")
 		if len(parts) > 1 && parts[0] == "iterations" {
@@ -5038,23 +5087,19 @@ func renderDecisionsTable(nodes map[string]Node) string {
 		b.WriteString(`</td></tr>` + "\n")
 	}
 	b.WriteString("</tbody></table>")
-	b.WriteString(`<div class="ucontrols">`)
-	b.WriteString(`<button type="button" class="qt-xall">expand all</button><button type="button" class="qt-call">collapse all</button>`)
-	b.WriteString(`<input class="qt-search" type="search" placeholder="filter…">`)
-	b.WriteString(`<label class="qt-sizel">show <select class="qt-size"><option>20</option><option>50</option><option value="0">all</option></select></label>`)
-	b.WriteString(`<span class="qt-pager"><button type="button" class="qt-prev" aria-label="previous page">&#8249;</button><span class="qt-pos"></span><button type="button" class="qt-next" aria-label="next page">&#8250;</button></span>`)
-	b.WriteString(`</div></div>` + "\n")
+	b.WriteString(utableControls())
+	b.WriteString(`</div>` + "\n")
 	return b.String()
 }
 
 // enddesign
 
 // design: go-asr-list  implements: req-decision-rendering.2
-// The architecturally-significant list is GENERATED: a
-// requirement joins it by carrying the `architecturally-significant` tag, and each
-// entry is a LINK back to design input (nodeLinkHTML) - never a copy of the
-// requirement's content.
-// An empty list renders honestly: tagging is owner curation, not renderer guesswork.
+// The drivers section is GENERATED as a reader TABLE (the same table law as every
+// derived view): a requirement joins it by carrying the `architecturally-significant`
+// tag; the row shows the driver's name and statement, the expand links back to its
+// design-input register row (nodeLinkHTML) - never a copy of the requirement's content.
+// An empty table renders honestly: tagging is owner curation, not renderer guesswork.
 func renderAsrList(nodes map[string]Node) string {
 	var ids []string
 	for id, n := range nodes {
@@ -5069,18 +5114,96 @@ func renderAsrList(nodes map[string]Node) string {
 	}
 	sortStrings(ids)
 	if len(ids) == 0 {
-		return `<p class="meta">no requirement carries the architecturally-significant tag yet — the list renders as the owner curates the tags</p>`
+		return `<p class="meta">no requirement carries the architecturally-significant tag yet — the table renders as the owner curates the tags</p>`
 	}
 	var b strings.Builder
-	b.WriteString(`<ul class="asr-list" data-layer="derived">` + "\n")
+	b.WriteString(`<div class="utable" id="drivers-table" data-layer="derived">`)
+	b.WriteString(`<table class="q-table u-table" data-layer="derived"><thead><tr><th scope="col">driver</th><th scope="col">brief</th></tr></thead><tbody>` + "\n")
 	for _, id := range ids {
-		b.WriteString(`<li>` + nodeLinkHTML(id, nodes) + `</li>` + "\n")
+		n := nodes[id]
+		name := humanizeID(id)
+		brief := ""
+		if len(n.Statement) <= 110 {
+			brief = n.Statement
+		} else if lead, sub := splitChapterTitle(n.Statement); sub != "" && len(lead) <= 110 {
+			brief = lead
+		}
+		b.WriteString(`<tr class="urow qt-exp" data-node="` + htmlEscape(id) + `" data-text="` + attesc(htmlEscape(strings.ToLower(name+" "+n.Statement+" "+id))) + `"><td><span class="utri" aria-hidden="true"></span>` + htmlEscape(name) + `</td><td class="ubrief">` + htmlEscape(brief) + `</td></tr>` + "\n")
+		b.WriteString(`<tr class="udetail" hidden><td colspan="2">`)
+		if n.Statement != "" && n.Statement != brief {
+			b.WriteString(`<p class="stmt">` + htmlEscape(n.Statement) + `</p>`)
+		}
+		b.WriteString(`<p class="ufield"><span class="ufl">register row:</span> ` + nodeLinkHTML(id, nodes) + `</p>`)
+		b.WriteString(`<p class="meta">` + htmlEscape(id) + `</p></td></tr>` + "\n")
 	}
-	b.WriteString("</ul>\n")
+	b.WriteString("</tbody></table>")
+	b.WriteString(utableControls())
+	b.WriteString(`</div>` + "\n")
 	return b.String()
 }
 
 // enddesign
+
+// renderDesignRegions is the detailed-design section body (`fig: design-regions`):
+// one expandable row per design element of the loaded graph - the code-derived
+// design regions plus any authored des- notes - sorted by id. The row carries the
+// element's name and its responsibility (brief-promoted); the expand holds the full
+// responsibility, the file the region lives in (files are themes, secondary info),
+// and the implements links. Same table law as every other derived view.
+func renderDesignRegions(nodes map[string]Node) string {
+	var ids []string
+	for id, n := range nodes {
+		if n.Type == "design" {
+			ids = append(ids, id)
+		}
+	}
+	sortStrings(ids)
+	if len(ids) == 0 {
+		return `<p class="meta">no design elements yet — the table renders as design regions arrive</p>`
+	}
+	var b strings.Builder
+	b.WriteString(`<div class="utable" id="design-regions" data-layer="derived">`)
+	b.WriteString(`<table class="q-table u-table" data-layer="derived"><thead><tr><th scope="col">element</th><th scope="col">responsibility</th></tr></thead><tbody>` + "\n")
+	for _, id := range ids {
+		n := nodes[id]
+		resp := strings.TrimSpace(n.Statement)
+		brief := ""
+		if len(resp) <= 110 {
+			brief = resp
+		} else if lead, sub := splitChapterTitle(resp); sub != "" && len(lead) <= 110 {
+			brief = lead
+		}
+		file := n.Path
+		if rel, err := filepath.Rel(ROOT, n.Path); err == nil {
+			file = filepath.ToSlash(rel)
+		}
+		// visible text escapes QUOTES too (attesc on top of htmlEscape): a design
+		// statement may legitimately name an artifact signature like the comments
+		// island's id attribute - rendered with &quot; it reads the same and never
+		// counterfeits the artifact inside the content region (comment-dom-static).
+		b.WriteString(`<tr class="urow qt-exp" data-node="` + htmlEscape(id) + `" data-text="` + attesc(htmlEscape(strings.ToLower(id+" "+resp+" "+file))) + `"><td><span class="utri" aria-hidden="true"></span>` + htmlEscape(id) + `</td><td class="ubrief">` + attesc(htmlEscape(brief)) + `</td></tr>` + "\n")
+		b.WriteString(`<tr class="udetail" hidden><td colspan="2">`)
+		if resp != "" && resp != brief {
+			b.WriteString(`<p class="stmt">` + attesc(htmlEscape(resp)) + `</p>`)
+		}
+		b.WriteString(`<p class="ufield"><span class="ufl">file:</span> ` + htmlEscape(file) + `</p>`)
+		if len(n.Implements) > 0 {
+			b.WriteString(`<p class="ufield"><span class="ufl">implements:</span> `)
+			for i, r := range n.Implements {
+				if i > 0 {
+					b.WriteString(", ")
+				}
+				b.WriteString(nodeLinkHTML(r, nodes))
+			}
+			b.WriteString(`</p>`)
+		}
+		b.WriteString(`<p class="meta">` + htmlEscape(id) + `</p></td></tr>` + "\n")
+	}
+	b.WriteString("</tbody></table>")
+	b.WriteString(utableControls())
+	b.WriteString(`</div>` + "\n")
+	return b.String()
+}
 
 // design: go-guides-table  implements: req-chapter-placement.1, req-chapter-placement.2
 // The guides render as ONE table: one row per guide with

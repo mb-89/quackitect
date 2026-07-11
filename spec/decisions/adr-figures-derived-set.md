@@ -1,5 +1,6 @@
 ---
 id: adr-figures-derived-set
+decided_in: i0012_spec_book
 type: adr
 kind: architecture
 adjudicated_by: human

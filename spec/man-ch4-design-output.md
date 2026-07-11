@@ -44,23 +44,30 @@ fig: onion
 ![[force-rationales.base]]
 ---
 ### Structural models
-<!-- tailor: shipped machinery - every declared model renders from its extracted
-  graph (one model-figure unit per model id; the onion above is the layers-flow
-  model's own drill-down render). The kind registry's compact examples render
-  with the appendix guidance; the check-state lifecycle example lives there too.
+<!-- tailor: shipped machinery - the section is ONE auto-generated table
+  (the models-table figure unit): a row per declared model, the extracted figure and the
+  derived informed-by links inside the row expand (the onion above is the
+  layers-flow model's own drill-down render). The kind registry's compact
+  examples render with the appendix guidance; the check-state lifecycle example
+  lives there too.
 -->
 <!-- ai:3 -->
-The onion above is one declared model - the layered dependency view. The part-of composition of the shipped product below is another; each declared model renders here from its authored truth. The compact examples of every supported model kind live with the appendix guidance.
+Each declared model is one row below, rendered from its authored truth - expand a row for the figure and the decisions that informed it. The onion above is the layers-flow model's own drill-down render. The compact examples of every supported model kind live with the appendix guidance.
 ---
-fig: model model-product-tree
+fig: models-table
 ---
 ## Detailed design
-<!-- tailor: shipped text - part B: everything below the architectural line. The
-  trace items the onion links carry the per-element detail; this part carries the
-  governance those elements share.
+<!-- tailor: shipped machinery - part B: everything below the architectural line,
+  as the auto-generated design-regions table (the design-regions figure unit): a row per
+  design element - the code-derived regions and the des- notes - with the
+  responsibility brief-promoted into the row; the expand carries the full
+  responsibility, the file the region lives in, and the implements links. The
+  design rules stay prose-introduced below.
 -->
 <!-- ai:3 -->
-Below the architectural line sits the detailed design: choices with local reach, safe to revise inside one element. The onion's leaves link each element to its trace item; what remains here is the governance those elements share.
+Below the architectural line sits the detailed design: choices with local reach, safe to revise inside one element. Each design element is one row below - expand it for the responsibility, the file it lives in, and the requirements it implements.
+---
+fig: design-regions
 ---
 ### Design rules
 <!-- tailor: shipped machinery - the rules view; each rule is a note in spec/rules

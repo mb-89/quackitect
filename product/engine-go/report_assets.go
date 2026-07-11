@@ -282,9 +282,9 @@ const reportJS = `
       if(fb){ expanded[fb]=true; applyFilter(); return; }
       if(window.QUACK_NODE_TAP){ window.QUACK_NODE_TAP(e.target.id()); return; } showDetail(D.checks[e.target.id()]);});
     cy.on('dbltap','node',function(e){ // dblclick on a node applies the descendants filter for it
-      // the BOOK drops this (owner note 8: the double-click select was broken there;
-      // single-click-to-details is the book's one click model) - the report keeps it.
-      if(window.QUACK_NODE_TAP){ return; }
+      // book AND report alike: the filter relayout re-fits the view, so the
+      // double-click IS the zoom-in on that node's cone (post-ship restore - the
+      // reverted book keeps single-click-to-details AND this gesture).
       var f=document.getElementById('trace-filter');
       if(f){f.value='descendants:'+e.target.id(); applyFilter();}
     });

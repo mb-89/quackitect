@@ -175,11 +175,34 @@ func renderUcfnBoard(nodes map[string]Node) string {
 // need explicitly (BaseRow.Need). Rows emit in type order, then by id, so the
 // render stays byte-deterministic.
 func renderInputRegister(nodes map[string]Node) string {
+	// qualities and constraints are register TYPES, never own chapters (the
+	// post-ship ch6 consolidation): the type facet filters to either, and a
+	// quality row's expand carries its six-part scenario.
 	typeOf := func(n Node) string {
-		if n.Kind == "constraint" {
+		switch n.Kind {
+		case "constraint":
 			return "constraint"
+		case "quality":
+			return "quality"
 		}
 		return "requirement"
+	}
+	scenarioMD := func(props baseProps) string {
+		fields := []struct{ key, label string }{
+			{"stimulus_source", "stimulus source"}, {"stimulus", "stimulus"},
+			{"artifact", "artifact"}, {"environment", "environment"},
+			{"response", "response"}, {"response_measure", "response measure (the pass line)"},
+		}
+		var lines []string
+		for _, f := range fields {
+			if v := strings.TrimSpace(props.scalars[f.key]); v != "" {
+				lines = append(lines, "- "+f.label+": "+v)
+			}
+		}
+		if len(lines) == 0 {
+			return ""
+		}
+		return "## Quality scenario\n" + strings.Join(lines, "\n") + "\n"
 	}
 	// file-backed nodes only - the same population a base view evaluates, so the
 	// orphan lint keeps flagging a node no file and no view carries
@@ -222,7 +245,13 @@ func renderInputRegister(nodes map[string]Node) string {
 				fcs = append(fcs, "f-"+f+"-"+v)
 			}
 		}
-		row := BaseRow{ID: rq.ID, Cells: []string{humanizeID(rq.ID), typeOf(rq)}, Head: rq.Statement, Body: nodeBodyOf(rq), Facets: fcs}
+		body := nodeBodyOf(rq)
+		if typeOf(rq) == "quality" {
+			if sc := scenarioMD(props); sc != "" {
+				body = strings.TrimSpace(sc + "\n" + body)
+			}
+		}
+		row := BaseRow{ID: rq.ID, Cells: []string{humanizeID(rq.ID), typeOf(rq)}, Head: rq.Statement, Body: body, Facets: fcs}
 		if row.Cells[1] == "constraint" {
 			cons = append(cons, row)
 		} else {
