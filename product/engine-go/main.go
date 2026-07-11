@@ -1,4 +1,4 @@
-// quack — the determinizer engine, Go port (i0003). One static, dependency-free binary.
+// quack — the determinizer engine, Go port. One static, dependency-free binary.
 package main
 
 import "os"

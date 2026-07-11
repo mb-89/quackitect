@@ -1,6 +1,6 @@
 package main
 
-// ask_ops.go — the ask loop's surface (i0015_mobile_adapter b4+b8): the store, the ledger
+// ask_ops.go — the ask loop's surface: the store, the ledger
 // application, and the ops `quack pair | ask | await`, plus the drain-on-every-run
 // fallback. `await` is the residency answer: a bounded foreground command the driving
 // agent runs in the background at a hand-off, so a phone bless RESUMES the walk.

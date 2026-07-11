@@ -2,12 +2,12 @@
 id: guide-pruning
 type: guide
 audience: project-owner
-statement: How to prune the spec, the code, and the logs again - the i17 method, reusable.
+statement: How to prune the spec, the code, and the logs again - the reusable method.
 ---
 
-# Pruning - the reusable method (born at i0017)
+# Pruning - the reusable method
 
-Sixteen iterations grow weight: requirement sprawl, stale prose, dead metrics,
+Iterations grow weight: requirement sprawl, stale prose, dead metrics,
 heavy logs, unlinted code. Pruning is an iteration KIND - run it lean, light on
 features, agent-solo until the owner's docs round. This guide is the recipe.
 
@@ -20,10 +20,9 @@ features, agent-solo until the owner's docs round. This guide is the recipe.
   command run per judgment call (`cluster`, `cluster --tests`, `compact`) -
   the tool is mechanical, the GROUPING is authored.
 - **One re-baseline, one wave bless** per migration - and the wave bless must
-  target the migration's suspects, never sweep open gates (the i17 incident:
-  `bless --all` recorded agent blesses on unadjudicated killers; the derived
-  checks kept the board honest, but sweep with care until bless gains
-  --suspect-only).
+  target the migration's suspects, never sweep open gates (an unadjudicated
+  killer swept by `bless --all` is a falsified adjudication; the wave filter
+  refuses OPEN gates).
 
 ## Clustering the trace (data)
 

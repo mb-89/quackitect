@@ -55,5 +55,10 @@ Need more details, or a list of all functions? Ask it.
 
 You're looking at quackitect's own design, tracked and built by quackitect. It **dogfoods itself** — every claim above sits in its own ledger, behind its own gates.
 
+## Further reading
+
+- [The book](spec/book.html) — quackitect's whole spec as one page: requirements, designs, decisions, V&V. Works locally and as a file view on GitHub.
+- [Read it in your browser](https://mb-89.github.io/quackitect/book.html) — the same book, rendered on GitHub Pages. No clone needed.
+
 ---
 <sub>spec-driven development · requirements traceability · decision records · design-as-code · systems engineering · V-model · AGENTS.md · AI coding agents · audit trail · gate ledger · Merkle DAG</sub>

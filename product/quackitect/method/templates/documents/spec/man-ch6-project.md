@@ -10,7 +10,16 @@ statement: Project - the approach, the record, and the risks, mostly derived.
   approach paragraph below is authored.
 -->
 <!-- ai:3 -->
-This chapter is mostly the ledger, rendered: the decisions, the iteration timeline, the risk register, and the baseline identity. One authored paragraph states the approach; everything else derives - nothing here is restated by hand.
+This chapter is mostly the ledger, rendered:
+
+<!-- ai:3 -->
+- the decisions
+- the iteration timeline
+- the risk register
+- the baseline identity
+
+<!-- ai:3 -->
+One authored paragraph states the approach; everything else derives - nothing here is restated by hand.
 ---
 ## Approach
 <!-- fill [mandatory]
@@ -62,18 +71,22 @@ fig: decisions-table
 Sources: reduction order, triple scoring @[[ref-methodische-entwicklung]].
 -->
 <!-- ai:3 -->
-Every row carries probability and impact, a mitigation in avoid-then-detect-then-limit order, an owning role, and a status. An unrecorded assumption is how orbits get lost - record it, and the register cannot forget it.
+Every row carries:
+
+<!-- ai:3 -->
+- probability and impact
+- a mitigation, in avoid-then-detect-then-limit order
+- an owning role
+- a status
+
+<!-- ai:3 -->
+An unrecorded assumption is how orbits get lost - record it, and the register cannot forget it.
 
 ![[raid.base]]
----
-## Baselines and change control
-<!-- tailor: shipped text - the identity stamp and the ledger carry the specifics;
-  the prose is the same in every project.
-Sources: baselines @[[ref-modellbasierte-pe]]; change discipline @[[ref-pahl-beitz]].
--->
-<!-- ai:3 -->
-The identity stamp in this document's header names the exact baseline rendered: the source state, the iteration, the engine version. The change history lives in the ledger and renders from it - this section never restates it. Strike-through-never-delete is a property the ledger enforces, not a discipline the reader must trust.
 
 <!-- No "methods that apply here" section:
      mention an applicable method in the PROSE as a link - the full
      methods consolidate in the appendix. -->
+<!-- No "Baselines and change control" section: the identity stamp and the ledger
+     carry the specifics; the prose is maintainer guidance - a guides-table row
+     (guide-baselines-and-change-control), never a reader subchapter. -->

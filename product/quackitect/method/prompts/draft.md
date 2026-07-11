@@ -25,6 +25,10 @@ The AI writes every first draft. The user improves it. No exceptions, no unmarke
 - Statement renders ONCE. The table row carries the brief; the expand shows only what the row does not show. Never restate a node's statement at the top of its body.
 - Section numbers derive at render time from the book structure. Never author numbers into headings.
 - Links, never copies. Where a passage shows another node, link it (name + brief into the details panel). Duplicated content is a defect, not emphasis.
+- The brief promotes. A row with no short brief takes the expand's first fitting paragraph, or its lead before a dash. Open every body with a one-line gist.
+- Filters empty, never remove. A heading with nothing for the active filter stays visible as an empty section; the contents gray out but stay clickable.
+- Headers sort. Every derived table sorts on a column-header click, numeric-aware. Never author a pre-sorted duplicate view.
+- No filter over the row dimension. A table never offers a filter over what its rows already enumerate - a pill per row is a list, not a filter.
 
 ## Mark (the involvement stamp - structural, at write time)
 

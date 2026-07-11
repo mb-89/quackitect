@@ -4,6 +4,8 @@
 # brief, the link lands here on the full method). The pull law filters to methods
 # the chapters actually mention; Obsidian does not know the property, so the
 # preview shows ALL methods (the superset).
+# The appendix view is a TABLE like its siblings: one row per method
+# (name plus brief), the full body one expand away.
 filters:
   and:
     - 'file.inFolder("methods")'
@@ -11,5 +13,4 @@ filters:
 views:
   - type: table
     name: Methods in full
-    render: full
-    order: [statement]
+    order: [name, statement]

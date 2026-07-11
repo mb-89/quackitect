@@ -76,7 +76,7 @@ func parseCommentIsland(html string) (*commentIsland, error) {
 // enddesign
 
 // design: go-island-serialize  implements: req-comment-layer.4
-// The serializer half of the escape rule (spike finding 2, proven live: the M5 probe itself
+// The serializer half of the escape rule (proven live: a probe
 // broke on a comment containing a script-closing sequence). Marshal with HTML escaping: every
 // angle bracket lands as its unicode escape, so island content can never close its own script
 // tag — reversible, standard JSON.
@@ -150,10 +150,10 @@ func file2list(path string) (string, error) {
 // enddesign
 
 // design: go-calls-summary  implements: req-call-log-lifecycle.1
-// quack calls --summary IS the retro's log step (review.md step 6): print the aggregate the
+// quack calls --summary IS the retro's log step (review.md): print the aggregate the
 // method asks for — per-command counts, failure rate, slow calls, channel mix — then delete
-// the log in the same move (retention is retro-bound, adr-call-log). One deterministic command
-// replaces the hand-written aggregation script the agent rewrote every retro.
+// the log in the same move (retention is retro-bound, adr-call-log). One deterministic command,
+// never a hand-written aggregation script.
 func cmdCalls(args []string) {
 	if !hasFlag(args, "--summary") {
 		fmt.Println("usage: " + brand() + " calls --summary   (print the call-log aggregate, then delete the log)")

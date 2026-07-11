@@ -1,6 +1,6 @@
 package main
 
-// i17_red3.go — the b21 red probe. Test first, it FAILS until the build.
+// i17_red3.go — the apply-manifest red probe. Test first, it FAILS until the build.
 // test-apply-manifest -> selftest:apply-manifest
 
 import (

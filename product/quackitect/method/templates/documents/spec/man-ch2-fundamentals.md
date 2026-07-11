@@ -6,15 +6,22 @@ order: 20
 statement: Fundamentals - the concepts, references, and notation this document stands on.
 ---
 ## What this chapter is
-<!-- tailor: shipped text - the pull law is the same in every project. Tailor only
-  if this project adds a list kind.
+<!-- tailor: shipped text - the reader-facing line is the same in every project
+  (the pull law itself is internals - it lives in the design record, not here).
 Sources: the LaTeX model (cite builds the bibliography, gls builds the glossary);
   clause structure, references apart from terms, normative apart from
   informative @[[ref-iso-29148]].
 -->
 <!-- ai:3 -->
-This chapter contains knowledge needed to understand the rest of the document.
-Nothing in it is authored by hand. A reference, a term, or a fundamental appears below because a chapter uses it - never by decree (the pull law). Each entry is a link. Follow it when you want the depth - the full fundamental bodies live in [guidance](man-ch8-guidance.md).
+This chapter holds what the rest of the document stands on:
+
+<!-- ai:3 -->
+- the key concepts
+- the cited sources
+- the glossary terms
+
+<!-- ai:3 -->
+Every entry below is a link. Click one to open its full entry.
 ---
 ## Key concepts
 <!-- tailor: shipped machinery - the fundamentals list IS the key-concepts view:

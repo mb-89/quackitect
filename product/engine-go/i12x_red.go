@@ -815,7 +815,7 @@ func selftestMintAllKinds() bool {
 		}
 		raw, _ := os.ReadFile(p)
 		body := string(raw)
-		if strings.Contains(body, "human") { // the i11 vocabulary: user, never human
+		if strings.Contains(body, "human") { // the recorded vocabulary: user, never human
 			return false
 		}
 		for _, want := range append(spot[k], "statement:", "type: ") {
@@ -890,8 +890,11 @@ func selftestMethodsView() bool {
 	if err != nil {
 		return false
 	}
-	// the one appendix view ships full-bodied behind the pull law
-	if !strings.Contains(string(q), "Methods in full") || !strings.Contains(string(q), "render: full") ||
+	// RE-POINTED at the round-2 book review (owner note 36b): the one appendix
+	// view is a reader TABLE behind the pull law - name plus brief in the row,
+	// the full method one expand away; render: full is retired here.
+	if !strings.Contains(string(q), "Methods in full") || strings.Contains(string(q), "render: full") ||
+		!strings.Contains(string(q), "order: [name, statement]") ||
 		!strings.Contains(string(q), "referenced != false") {
 		return false
 	}
@@ -992,14 +995,17 @@ func selftestResultsException() bool {
 
 // test-criteria-validation -> selftest:criteria-validation
 func selftestCriteriaValidation() bool {
-	// the criteria query ships and both chapters embed it
+	// the criteria query ships; validation embeds it, and the motivation renders
+	// the needs register in its delta section (the criteria ride the need rows)
 	q, err := os.ReadFile(filepath.Join(specQueryDir(), "criteria.base"))
 	if err != nil {
 		return false
 	}
 	ch1, _ := os.ReadFile(filepath.Join(EngineDir(), "method", "templates", "documents", "spec", "man-ch1-motivation.md"))
 	ch5, _ := os.ReadFile(filepath.Join(EngineDir(), "method", "templates", "documents", "spec", "man-ch5-verification-validation.md"))
-	if !strings.Contains(string(ch1), "![[criteria.base]]") || !strings.Contains(string(ch5), "![[criteria.base]]") {
+	if !strings.Contains(string(ch1), "![[needs.base]]") || strings.Contains(string(ch1), "![[criteria.base]]") ||
+		!strings.Contains(string(ch1), "## The delta, and what closes it") ||
+		!strings.Contains(string(ch5), "![[criteria.base]]") {
 		return false
 	}
 	// success criteria live ON the need (req-criteria-in-needs):
@@ -1033,10 +1039,12 @@ func selftestCh3Mech() bool {
 	}
 	// the mechanized views embed (use cases merged into the ucfn board;
 	// the stakeholder table folded into the unified reader machinery; the context
-	// star + neighbours view derive from nbr- notes;
-	// the methods view lives in the appendix)
+	// star + neighbours view derive from nbr- notes; the register is the ONE
+	// design input table (fig: input-register) - ch3 embeds neither
+	// requirements.base nor assumptions.base (assumptions read in the raid
+	// register); the methods view lives in the appendix)
 	for _, want := range []string{"fig: context-star", "![[neighbours.base]]", "![[tensions.base]]", "fig: ucfn-board",
-		"![[qualities.base]]", "![[constraints.base]]", "![[requirements.base]]", "![[assumptions.base]]"} {
+		"![[qualities.base]]", "![[constraints.base]]", "fig: input-register"} {
 		if !strings.Contains(t, want) {
 			return false
 		}
@@ -1072,17 +1080,25 @@ func selftestCh4Mech() bool {
 	if strings.Count(t, "{{") != 1 || !strings.Contains(t, "{{budgets}}") {
 		return false
 	}
-	// the mechanized views embed (the decision views live in the project chapter with the
-	// candidates record - ch4 documents only the architecture in
-	// use; the ASR list generates from the tag)
-	for _, want := range []string{"fig: asr-list", "![[interfaces.base]]",
+	// RE-POINTED at the round-2 book review (owner notes 32/33): ch4 carries the
+	// ARCHITECTURE and DETAILED DESIGN spine subchapters; the drivers list
+	// (fig: asr-list) and the kind examples moved to the appendix guidance.
+	// The mechanized views embed (the decision views live in the project chapter
+	// with the candidates record - ch4 documents only the design in use).
+	for _, want := range []string{"## Architecture", "## Detailed design",
+		"fig: onion", "fig: model", "![[interfaces.base]]",
 		"![[force-rationales.base]]", "![[rules.base]]"} {
 		if !strings.Contains(t, want) {
 			return false
 		}
 	}
-	if strings.Contains(t, "asr.base") {
-		return false // the copied-content view is dead
+	if strings.Contains(t, "asr.base") || strings.Contains(t, "fig: asr-list") {
+		return false // the copied-content view is dead; the drivers list lives in the appendix
+	}
+	// the drivers landed in the appendix guidance beside the methods
+	ch8t, err := os.ReadFile(filepath.Join(EngineDir(), "method", "templates", "documents", "spec", "man-ch8-guidance.md"))
+	if err != nil || !strings.Contains(string(ch8t), "fig: asr-list") || !strings.Contains(string(ch8t), "fig: model-kinds") {
+		return false
 	}
 	// every fig line is its own unit - a trailing fig line in a prose unit renders as text
 	body := t
@@ -1099,7 +1115,7 @@ func selftestCh4Mech() bool {
 			figs++
 		}
 	}
-	return figs == 2 // the ASR link list + the onion drill-down (candidates-matrix retired to the project chapter)
+	return figs == 2 // the onion drill-down + the structural models (the ASR list retired to the appendix)
 }
 
 // test-block-tree-design -> selftest:block-tree-design
@@ -1169,7 +1185,7 @@ func selftestStakeholderLinks() bool {
 	if err != nil || len(rs) != 1 || len(rs[0].Groups[0].Rows) != 1 {
 		return false
 	}
-	// the i14 unified table slims the cells to name/role/statement; the preset and guide
+	// the unified table slims the cells to name/role/statement; the preset and guide
 	// links ride the full item, one expand away (req-reader-tables.3)
 	cells := strings.Join(rs[0].Groups[0].Rows[0].Cells, "|")
 	return strings.Contains(cells, "wants tasks done") && strings.Contains(cells, "user")

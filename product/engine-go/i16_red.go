@@ -69,7 +69,7 @@ func selftestDraftIsTruth() bool {
 	if len(g.Elems) != 3 || len(g.Flows) != 2 {
 		return false
 	}
-	// a BOM-prefixed source extracts identically (the M5 finding)
+	// a BOM-prefixed source extracts identically
 	bom := string([]byte{0xEF, 0xBB, 0xBF})
 	g2, lint := extractModelGraph(bom + raw)
 	return g2.CanonicalHash() == g.CanonicalHash() && len(lint) == 0
@@ -105,7 +105,7 @@ func selftestModelLint() bool {
 			unlabeled = true
 		}
 	}
-	// beyond-subset syntax lints AND the rest still parses (the M5 finding)
+	// beyond-subset syntax lints AND the rest still parses
 	g, lint2 := extractModelGraph("style weird\n" + i16FixtureModel)
 	return undeclared && unlabeled && len(lint2) > 0 && len(g.Elems) == 3
 }

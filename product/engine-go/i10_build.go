@@ -182,7 +182,7 @@ func coverageDelta(nodes map[string]Node, rule, scope string) []string {
 		}
 		return false
 	}
-	deferred := deferredReqs(nodes) // the i15 defer fix: all three listers agree
+	deferred := deferredReqs(nodes) // all three listers agree on deferral
 	var out []string
 	memo := map[string]string{}
 	for _, n := range nodes {
@@ -258,8 +258,8 @@ func coverageDelta(nodes map[string]Node, rule, scope string) []string {
 // design: go-notes-list  implements: req-notes-list
 // `quack notes [--all]` is the READ lane beside the `note` capture lane: it prints the notes
 // location and each open inbox note with id, age, and first body line; --all adds backlog and
-// archive. Read-only — nothing is created, moved, or deleted. Exists because the i9 data-home
-// move made the inbox invisible from the repo (uc-notes-visible).
+// archive. Read-only — nothing is created, moved, or deleted. Exists because the data home
+// makes the inbox invisible from the repo (uc-notes-visible).
 var notesHomeOverride string // selftest seam
 
 func notesHomeDir() string {
@@ -348,7 +348,7 @@ func cmdNotes(args []string) {
 // One redacted JSONL line per dispatch into <logs home>/calls.jsonl (adr-call-log): ts, command,
 // args, duration ms, exit code, channel. Secret VALUES never land at rest: --key/--answer values,
 // grant codes, and session keys are replaced by REDACTED at capture time. Exit paths funnel
-// through quackExit so the line carries the real exit code; the retro (review.md step 6)
+// through quackExit so the line carries the real exit code; the retro (review.md)
 // aggregates the file, then deletes it — retention is retro-bound, no rotation machinery.
 var (
 	callT0              time.Time

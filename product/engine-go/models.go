@@ -1,6 +1,6 @@
 package main
 
-// models.go — structural models (i0016_structural_models): the pinned Mermaid-subset
+// models.go — structural models: the pinned Mermaid-subset
 // extractor, the canonical semantic graph, and its hash. The truth is the authored
 // node file; the graph is derived, read-only, and the only thing the ledger hashes
 // (adr-element-major-format, adr-edit-paths-unique).
@@ -20,8 +20,8 @@ import (
 // design: go-model-extract  implements: req-draft-is-truth, req-semantic-hash, req-model-lint
 // The pinned flowchart subset: `subgraph <layer>` blocks in rank order (innermost
 // first), element declarations `id["responsibility"]` inside them, then flows
-// `a -->|payload| b` on declared names. A UTF-8 BOM is stripped (M5 finding); a
-// beyond-subset line is a lint FINDING and the rest still parses (M5 finding);
+// `a -->|payload| b` on declared names. A UTF-8 BOM is stripped; a
+// beyond-subset line is a lint FINDING and the rest still parses;
 // an undeclared flow endpoint or an empty payload lints (the TikZ discipline).
 // The canonical form keeps layer ORDER (semantic) and sorts elements and flows
 // (their line order is cosmetic) — so the hash moves only on meaning.
@@ -186,9 +186,11 @@ func (g modelGraph) CanonicalHash() string {
 // design: go-model-render  implements: req-models-in-book
 // The book's design output chapter renders every declared model from its extracted
 // graph — the derived view of the text truth. Rings for ranked (layers-flow)
-// models, a flow column for the rest; every arrow carries its payload name (the
-// i14 lesson: unlabeled arrows are useless). One figure line: `fig: model <id>`,
+// models, a flow column for the rest; every arrow carries its payload name
+// (unlabeled arrows are useless). One figure line: `fig: model <id>`,
 // or bare `fig: model` for all models sorted.
+// Each ARCHITECTURAL (non-behavioral) model also carries its derived
+// "informed by" link list (modelInformedBy below).
 func renderModelFigure(arg string, nodes map[string]Node) string {
 	var ids []string
 	for id, n := range nodes {
@@ -210,8 +212,104 @@ func renderModelFigure(arg string, nodes map[string]Node) string {
 		g, _ := extractModelGraph(string(raw))
 		b.WriteString(`<section id="` + id + `" data-layer="informative"><p class="stmt"><strong>` + id + `</strong> — ` + n.Statement + "</p>\n")
 		b.WriteString(svgModelGraph(g))
+		src := string(raw)
+		if !strings.Contains(src, "stateDiagram-v2") && !strings.Contains(src, "sequenceDiagram") {
+			b.WriteString(renderModelInformed(id, src, nodes))
+		}
 		b.WriteString("</section>\n")
 	}
+	return b.String()
+}
+
+// modelInformedBy derives the architecture decisions CURRENTLY informing a
+// structural model, from existing data only — no new model kind, no authored list:
+//   - the decisions the model's own authored file cites by id (the model says
+//     why it is the way it is), and
+//   - the decisions whose statement names the model, its kind, or one of its
+//     id-shaped (dash-carrying) elements.
+//
+// The addresses→implements→element chain was measured and rejected: a TOTAL
+// model (the engine onion covers every design region by construction) is
+// "informed" by nearly every decision through it — a list that discriminates
+// nothing is not an honest view. Plain-word element ids (a product tree's
+// `engine`, `method`) are skipped for the same reason: indistinguishable from
+// prose. Decisions not informing stay out — the full set lives with the
+// project chapter's one decisions table.
+func modelInformedBy(modelID, src string, nodes map[string]Node) []string {
+	tokens := []string{modelID}
+	if k := nodes[modelID].Kind; k != "" {
+		tokens = append(tokens, k)
+	}
+	g, _ := extractModelGraph(src)
+	var elems []string
+	for e := range g.Elems {
+		if strings.Contains(e, "-") {
+			elems = append(elems, e)
+		}
+	}
+	sort.Strings(elems)
+	tokens = append(tokens, elems...)
+	var out []string
+	for id, n := range nodes {
+		if n.Type != "adr" || n.Kind == "waiver" || decisionType(n) != "architecture" {
+			continue
+		}
+		if nameMatchToken(src, id) {
+			out = append(out, id)
+			continue
+		}
+		for _, t := range tokens {
+			if nameMatchToken(n.Statement, t) {
+				out = append(out, id)
+				break
+			}
+		}
+	}
+	sort.Strings(out)
+	return out
+}
+
+// nameMatchToken reports whether text carries tok as a whole id-shaped word:
+// the neighbours may not be id characters ([a-z0-9-]), so `state` never
+// matches `check-states` and `adr-x` never matches `adr-x-y`.
+func nameMatchToken(text, tok string) bool {
+	if tok == "" {
+		return false
+	}
+	isID := func(c byte) bool {
+		return c == '-' || (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9')
+	}
+	for i := 0; ; {
+		j := strings.Index(text[i:], tok)
+		if j < 0 {
+			return false
+		}
+		j += i
+		before := j == 0 || !isID(text[j-1])
+		after := j+len(tok) >= len(text) || !isID(text[j+len(tok)])
+		if before && after {
+			return true
+		}
+		i = j + 1
+	}
+}
+
+// renderModelInformed emits the compact informed-by link list for one model —
+// nodeLinkHTML affordances, sorted, honest when empty.
+func renderModelInformed(modelID, src string, nodes map[string]Node) string {
+	ids := modelInformedBy(modelID, src, nodes)
+	if len(ids) == 0 {
+		return `<p class="meta model-informed">no decision names this model yet — informing decisions link here as they arrive; the full set lives with the project chapter</p>` + "\n"
+	}
+	var b strings.Builder
+	b.WriteString(`<p class="meta model-informed">informed by: `)
+	for i, id := range ids {
+		if i > 0 {
+			b.WriteString(", ")
+		}
+		b.WriteString(nodeLinkHTML(id, nodes))
+	}
+	b.WriteString("</p>\n")
 	return b.String()
 }
 

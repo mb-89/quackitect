@@ -251,7 +251,7 @@ func attestRedeem(code, answer string) (string, error) {
 // on the agent channel refuse to run without a valid session key (--key flag, QUACK_KEY env as the
 // second read path); read-only commands stay open so debugging is never hostage. The refusal names
 // contract.md and NOTHING else — the unlock instructions live only inside the contract, so the sole
-// path to a key runs through the file. The interactive console (a person, i8 channel stat) is never
+// path to a key runs through the file. The interactive console (a person, by the channel stat) is never
 // gated by its own machinery.
 // `ask` and `await` advance the ledger too (an ask can end in a bless), so they ride the
 // gate; the drain-on-run fallback executes the USER's recorded tap and is deliberately

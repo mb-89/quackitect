@@ -40,7 +40,7 @@ var i13Tests = []namedTest{
 	{"observe-red-refresh", selftestObserveRedRefresh},
 }
 
-// ---------- stub seams (implemented during the i13 build; stubs FAIL) ----------
+// ---------- stub seams (implemented during the build; stubs FAIL) ----------
 
 // design: go-annotator-static-checks  implements: req-comment-layer.3
 // bookAnnotatorFindings statically checks the emitted book: exactly one island slot and the
@@ -91,8 +91,7 @@ func bookAnnotatorFindings() []string {
 // design: go-note-dedup  implements: req-note-collision
 // dedupNotePath returns a non-colliding path for a note capture: the plain name when free,
 // else -2, -3, … — a same-second, same-prefix capture never overwrites an earlier note
-// (a note was LOST live at the i13 retro; silent overwrite is the one unforgivable failure
-// of a capture lane).
+// (silent overwrite is the one unforgivable failure of a capture lane).
 func dedupNotePath(dir, base string) string {
 	p := filepath.Join(dir, base+".md")
 	if _, err := os.Stat(p); err != nil {
@@ -157,7 +156,7 @@ func sweepOrphanHomes() int {
 // design: go-call-log-cap  implements: req-call-log-lifecycle.2
 // capCallLog trims the call log to capBytes, dropping the OLDEST lines. Retention stays
 // retro-bound (adr-call-log deletes at every retro); the cap is the safety net for the case
-// the retro never comes — the real project's logs dir had grown to 122 MB before i13.
+// the retro never comes — an uncapped live logs dir once grew past 100 MB.
 const callLogCapBytes = 8 << 20 // ~50k calls; one retro cycle fits with room to spare
 
 func capCallLog(path string, capBytes int64) {
@@ -185,8 +184,8 @@ func capCallLog(path string, capBytes int64) {
 
 // design: go-observe-red-refresh  implements: req-observe-red-refresh
 // refreshRed builds the re-observation event for an AMENDED, still-failing test: the original
-// red was watched at the old hash; amending the statement moved the hash and stranded the record
-// (the i12 method lead). The refresh re-runs the test and re-attests at the CURRENT hash — a
+// red was watched at the old hash; amending the statement moved the hash and stranded the record.
+// The refresh re-runs the test and re-attests at the CURRENT hash — a
 // passing test errors, exactly like a first observation: no fabricated red enters the ledger.
 // The caller (observe-red --refresh) appends the event; this seam never writes the log itself.
 func refreshRed(nodes map[string]Node, id string) (Event, error) {
@@ -442,7 +441,7 @@ func selftestConnCodeDesigns() bool {
 	os.MkdirAll(kdir, 0o755)
 	os.WriteFile(filepath.Join(sp, "project.toml"),
 		[]byte("[iteration]\nversion = \"\"\nedges = \"connections\"\n"), 0o644)
-	// an interface note between two REAL code-derived designs (the i12 dogfood case)
+	// an interface note between two REAL code-derived designs
 	id := connID("interface", "go-verdict-cache", "go-walk", "", true)
 	note := "---\nid: " + id + "\nkind: interface\nsrc: go-verdict-cache\ndst: go-walk\nstatement: the cache serves the walk\n---\n"
 	os.WriteFile(filepath.Join(kdir, id+".md"), []byte(note), 0o644)
@@ -511,7 +510,7 @@ func selftestVerdictSurgical() bool {
 	verdictsMemo = nil
 	defer func() { verdictPathOverride, verdictsMemo = oldPath, oldMemo }()
 	// seed one green and one red verdict, then re-baseline with unchanged content:
-	// the green survives (self-validating on input+build); the red dies (the i11 wedge class)
+	// the green survives (self-validating on input+build); the red dies (the stale-FAIL wedge class)
 	seed := map[string]verdictRec{
 		"test-green-kept":  {Input: "h1", Build: buildID(), Result: true, Ms: 5},
 		"test-red-dropped": {Input: "h2", Build: buildID(), Result: false, Ms: 5},

@@ -182,7 +182,7 @@ func fullHash(id string, nodes map[string]Node, memo map[string]string) string {
 		seed += "|needs:" + needsDigestAsOf(iterOf(n.Path), nodes)
 	}
 	if n.Type == "model" {
-		// a model node's identity IS its extracted semantic graph (go-model-nodes, i16):
+		// a model node's identity IS its extracted semantic graph (go-model-nodes):
 		// cosmetic file churn never moves it, a meaning change always does. The hash
 		// was computed at load - a pure field fold, no I/O here (kernel purity).
 		seed += "|model:" + n.ModelHash
@@ -563,8 +563,8 @@ func StatusMap(nodes map[string]Node) map[string]string {
 
 // design: go-suspect-root  implements: req-suspicion-attribution.1
 // A PROPAGATED suspect (raw DONE, effective SUSPECT — some upstream drags the cone) is a different
-// fact than a DIRECT one (own inputs changed), and the board must say so with the ROOT named: at
-// i10 one OPEN executed check read as 30 anonymous suspects and cost 28 wasted re-blesses. Roots
+// fact than a DIRECT one (own inputs changed), and the board must say so with the ROOT named:
+// one OPEN executed check can read as dozens of anonymous suspects and cost wasted re-blesses. Roots
 // are the minimal upstream culprits: checks whose RAW state is not DONE and whose own upstreams
 // are all raw-DONE. RawStates exposes the pre-propagation pass; SuspectRoots walks to the culprits.
 func RawStates(nodes map[string]Node) map[string]string {

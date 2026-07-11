@@ -167,3 +167,74 @@ func renderUcfnBoard(nodes map[string]Node) string {
 }
 
 // enddesign
+
+// renderInputRegister bakes THE design input register: one table over every use
+// case, function, constraint, and requirement, with a `type` facet beside the
+// board facets and the universal need facet. The need never sits in the body -
+// node-backed rows resolve it through the trace, a function row carries its
+// need explicitly (BaseRow.Need). Rows emit in type order, then by id, so the
+// render stays byte-deterministic.
+func renderInputRegister(nodes map[string]Node) string {
+	typeOf := func(n Node) string {
+		if n.Kind == "constraint" {
+			return "constraint"
+		}
+		return "requirement"
+	}
+	// file-backed nodes only - the same population a base view evaluates, so the
+	// orphan lint keeps flagging a node no file and no view carries
+	collect := func(nodeType string) []Node {
+		var out []Node
+		for _, n := range nodes {
+			if n.Type != nodeType {
+				continue
+			}
+			if _, err := os.Stat(n.Path); err != nil {
+				continue
+			}
+			out = append(out, n)
+		}
+		for i := 1; i < len(out); i++ {
+			for j := i; j > 0 && out[j].ID < out[j-1].ID; j-- {
+				out[j], out[j-1] = out[j-1], out[j]
+			}
+		}
+		return out
+	}
+	reg := BaseResult{Name: "Design input register", Columns: []string{"name", "type"}}
+	var rows []BaseRow
+	for _, u := range collect("usecase") {
+		rows = append(rows, BaseRow{ID: u.ID, Cells: []string{humanizeID(u.ID), "use case"}, Head: u.Statement, Body: nodeBodyOf(u)})
+	}
+	for _, nd := range collect("need") {
+		for _, f := range needFunctions(nd.Path) {
+			rows = append(rows, BaseRow{Cells: []string{f, "function"}, Need: nd.ID})
+		}
+	}
+	var cons, reqs []BaseRow
+	for _, rq := range collect("requirement") {
+		// the same f-<facet>-<value> row classes EvalBase stamps, so the coverage
+		// board above keeps filtering this register
+		props := basePropsOf(rq.Path)
+		var fcs []string
+		for _, f := range facetNames {
+			for _, v := range props.lists[f] {
+				fcs = append(fcs, "f-"+f+"-"+v)
+			}
+		}
+		row := BaseRow{ID: rq.ID, Cells: []string{humanizeID(rq.ID), typeOf(rq)}, Head: rq.Statement, Body: nodeBodyOf(rq), Facets: fcs}
+		if row.Cells[1] == "constraint" {
+			cons = append(cons, row)
+		} else {
+			reqs = append(reqs, row)
+		}
+	}
+	rows = append(rows, cons...)
+	rows = append(rows, reqs...)
+	reg.Groups = []BaseGroup{{Rows: rows}}
+	var b strings.Builder
+	b.WriteString(`<div id="input-register" data-layer="derived">` + "\n")
+	b.WriteString(baseResultHTML([]BaseResult{reg}, nodes, nil, nil, "inreg"))
+	b.WriteString("</div>\n")
+	return b.String()
+}

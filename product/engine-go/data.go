@@ -13,7 +13,7 @@ import (
 // with kind subfolders (logs, notes, evidence, gather, overlay, out, golden, spikes) — one deletable
 // dir per workspace, so the amnesia test is a single rm -rf. The slug hashes the CANONICAL workspace
 // path — absolute, symlink-resolved where possible, separator-normalized, case-folded on Windows —
-// so PowerShell (C:\...) and git-bash (c:/...) resolve the SAME home (the i9 retro found the split).
+// so PowerShell (C:\...) and git-bash (c:/...) resolve the SAME home.
 // Machine-local overrides live in ONE global user config (<base>/quackitect/config.toml), never
 // per-repo — a per-repo override stored in the directory it overrides was the chicken-egg.
 // Every regenerable artifact routes through dataDirFor (evidence, gather, overlay, out, golden,
@@ -80,7 +80,7 @@ func recordedEngineHome() string {
 
 // design: go-home-marker  implements: req-selftest-home-sweep
 // Every data home records its workspace (workspace.txt), so a sweep can map a home back to
-// the directory it serves. 241 fixture homes had leaked by i13 - a home whose workspace no
+// the directory it serves. Fixture homes leak by the hundreds otherwise - a home whose workspace no
 // longer exists is an orphan the selftest battery removes (sweepOrphanHomes).
 var homeStamped bool
 

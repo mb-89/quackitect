@@ -49,7 +49,7 @@ func cmdBless(args []string) {
 	}
 	var ids []string
 	if target == "--all" {
-		// the wave filter (go-cone-triage, the b7-incident fix): a wave touches
+		// the wave filter (go-cone-triage): a wave touches
 		// SUSPECT gates only. OPEN gates are refused by name - their first
 		// adjudication is their own walk (individual `bless <id>` stays legal).
 		var refusedOpen []string
@@ -509,8 +509,9 @@ func cmdGather(args []string) {
 // ship packages product/ into a versioned zip under the data home's out/. The zip is
 // ephemeral output. The BOOK and the REPORT regenerate at ship and ride the ZIP
 // ROOT - a recipient opens the deliverable and the two reading
-// surfaces sit on top; the committed spec/book.html refreshes in the same move, so the
-// drift lint is green at the shipped state.
+// surfaces sit on top; every published book copy (spec/book.html + the Pages copy
+// docs/book.html, same bytes) refreshes in the same move, so the
+// drift lint is green at the shipped state. This works in ANY workspace, not just the dogfood repo.
 func cmdShip(args []string) {
 	cfg := readProjectConfig()
 	dest := dataDirFor("out")
@@ -537,7 +538,9 @@ func cmdShip(args []string) {
 	})
 	nodes := LoadAll()
 	if html, findings, _ := renderBookHTML(nodes); len(findings) == 0 {
-		os.WriteFile(committedBookPath(), []byte(html), 0o644)
+		if err := writeBookCopies(html, publishedBookPaths()); err != nil {
+			fmt.Fprintln(os.Stderr, "ship: book copy failed -", err)
+		}
 		w, _ := zw.Create("book.html")
 		io.Copy(w, strings.NewReader(html))
 	} else {
@@ -553,6 +556,20 @@ func cmdShip(args []string) {
 	zw.Close()
 	rel, _ := filepath.Rel(ROOT, zp)
 	fmt.Println("shipped ->", filepath.ToSlash(rel), "(book.html + report.html at the zip root)")
+}
+
+// writeBookCopies writes ONE rendered book to every published path, byte-identical,
+// creating a missing parent folder (docs/) on the way.
+func writeBookCopies(html string, paths []string) error {
+	for _, p := range paths {
+		if err := os.MkdirAll(filepath.Dir(p), 0o755); err != nil {
+			return err
+		}
+		if err := os.WriteFile(p, []byte(html), 0o644); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 // enddesign
@@ -659,18 +676,17 @@ func cmdBuild(args []string) {
 
 // design: go-authoring-cheap  implements: req-authoring-cheap
 // One build restores an honest board. The re-baseline runs in the FRESHLY BUILT binary — never
-// only the old process, which refuses spec keys it predates (the i11 self-wedge: a build died on
+// only the old process, which refuses spec keys it predates (the self-wedge: a build dies on
 // its own new frontmatter key until run twice). And the verdict cache dies with the old baseline:
 // a parity FAIL recorded before the re-baseline shares the old binary's buildID and node hash, so
-// it would be served as a stale FAIL forever (the i11 wedge); flushing at re-baseline kills it.
+// it would be served as a stale FAIL forever; flushing at re-baseline kills it.
 // buildRebaseline computes the root via the fresh exe, writes the golden, flushes verdicts.
 func buildRebaseline(freshExe string) string {
 	root := ""
 	// design: go-rebaseline-inprocess  implements: req-build-cheap.3
 	// The self-exec exists for ONE reason: a JUST-COMPILED binary must read the spec, because the
-	// old process refuses keys it predates (the i11 self-wedge). When the binary did not change
+	// old process refuses keys it predates (the self-wedge). When the binary did not change
 	// (the fast path), the running process IS the fresh engine — compute in-process, spawn nothing.
-	// This exec was the i12 call log's 291-line argless "root" storm; the launcher was innocent.
 	self, _ := os.Executable()
 	if si, err1 := os.Stat(self); err1 == nil {
 		if fi, err2 := os.Stat(freshExe); err2 == nil && os.SameFile(si, fi) {
@@ -691,7 +707,7 @@ func buildRebaseline(freshExe string) string {
 	// Surgical, not wholesale: green verdicts survive the re-baseline — they stay self-validating
 	// on (input hash, buildID) and can only go stale through a change those keys already catch.
 	// Red verdicts die here: a FAIL recorded against the OLD golden shares input+build after a
-	// content-only re-baseline and would be served forever (the i11 stale-FAIL wedge).
+	// content-only re-baseline and would be served forever (the stale-FAIL wedge).
 	kept := map[string]verdictRec{}
 	for k, v := range verdictLoad() {
 		if v.Result {
@@ -805,8 +821,9 @@ func initVehicleFiles(target string) error {
 		}
 		return nil
 	})
-	// 4. launcher + the pointer-chain entry files + gitignore.
+	// 4. launcher + the pointer-chain entry files + README + gitignore.
 	writeIfAbsent(filepath.Join(target, proj+".cmd"), strings.ReplaceAll(sub(vehicleLauncherTmpl), "\n", "\r\n"))
+	writeIfAbsent(filepath.Join(target, "README.md"), projectReadme(proj, target))
 	writeIfAbsent(filepath.Join(target, "AGENTS.md"), sub(vehicleAgentsTmpl))
 	writeIfAbsent(filepath.Join(target, "CLAUDE.md"), sub(vehicleClaudeTmpl))
 	writeIfAbsent(filepath.Join(target, ".github", "copilot-instructions.md"), sub(vehicleCopilotTmpl))
@@ -860,7 +877,7 @@ func cmdStartInit(args []string) {
 		return
 	}
 	fmt.Println(proj + " scaffolded -> " + target)
-	fmt.Println("  vendored the engine -> tools/vendor/ ; wrote spec/project.toml, " + proj + ".cmd, the entry chain (CLAUDE.md -> AGENTS.md -> contract), .claude/ commands, empty product/.")
+	fmt.Println("  vendored the engine -> tools/vendor/ ; wrote spec/project.toml, " + proj + ".cmd, README.md, the entry chain (CLAUDE.md -> AGENTS.md -> contract), .claude/ commands, empty product/.")
 	fmt.Println("  next: cd into it and run `.\\" + proj + " status` — the launcher bootstraps the global binary when absent.")
 	fmt.Println("        Then set [iteration].version and `.\\" + proj + " start <version>` to compose your spec.")
 }
@@ -1029,6 +1046,8 @@ func cmdStartStubs(args []string) {
 		dst := filepath.Join(target, rel)
 		writeIfAbsent(dst, content)
 	}
+	// the project README rides every scaffold: name, one orienting line, further reading.
+	writeIfAbsent(filepath.Join(target, "README.md"), projectReadme(proj, target))
 	// design: go-stub-spec  implements: req-stub-templates.2, req-stub-templates.1, req-template-home.8
 	// The instantiation path: the spec MIRRORS the template -
 	// top-level files land at the spec ROOT (README renamed SPEC-README), and EVERY
@@ -1079,7 +1098,7 @@ func cmdStartStubs(args []string) {
 	}
 	// enddesign
 	fmt.Println("stubs -> " + target)
-	fmt.Println("  wrote " + proj + ".cmd, AGENTS.md, CLAUDE.md, spec/project.toml (kept any existing).")
+	fmt.Println("  wrote " + proj + ".cmd, README.md, AGENTS.md, CLAUDE.md, spec/project.toml (kept any existing).")
 	fmt.Println("  wrote the spec template skeleton (the spec root + every template folder; kept any existing).")
 	fmt.Println("  the launcher resolves the global engine binary, or set QUACK_ENGINE.")
 }
@@ -1114,6 +1133,98 @@ func copyTree(src, dst string) error {
 // rewriteVendorPath rewrites a dogfood method path to the vendored one (used vendoring .claude commands).
 func rewriteVendorPath(s string) string {
 	return strings.ReplaceAll(s, "product/quackitect/", "tools/vendor/quackitect/")
+}
+
+// --- the further-reading seam: every scaffolded project READMEs its book ---
+
+// pagesBookURL derives the GitHub Pages URL of the published book from a git remote URL.
+// It accepts the github.com forms - https://github.com/owner/repo[.git],
+// git@github.com:owner/repo[.git], ssh://git@github.com/owner/repo[.git] - and returns
+// https://<owner>.github.io/<repo>/book.html. Any other shape returns ok=false.
+func pagesBookURL(remote string) (string, bool) {
+	r := strings.TrimSpace(remote)
+	var rest string
+	switch {
+	case strings.HasPrefix(r, "https://github.com/"):
+		rest = strings.TrimPrefix(r, "https://github.com/")
+	case strings.HasPrefix(r, "http://github.com/"):
+		rest = strings.TrimPrefix(r, "http://github.com/")
+	case strings.HasPrefix(r, "git@github.com:"):
+		rest = strings.TrimPrefix(r, "git@github.com:")
+	case strings.HasPrefix(r, "ssh://git@github.com/"):
+		rest = strings.TrimPrefix(r, "ssh://git@github.com/")
+	default:
+		return "", false
+	}
+	rest = strings.TrimSuffix(rest, "/")
+	rest = strings.TrimSuffix(rest, ".git")
+	parts := strings.Split(rest, "/")
+	if len(parts) != 2 || parts[0] == "" || parts[1] == "" {
+		return "", false
+	}
+	return "https://" + parts[0] + ".github.io/" + parts[1] + "/book.html", true
+}
+
+// originRemoteURL reads the origin remote URL from dir's .git/config, without running
+// git. A worktree's .git FILE (`gitdir: <path>`) is followed one hop. No readable
+// origin remote returns "".
+func originRemoteURL(dir string) string {
+	gitPath := filepath.Join(dir, ".git")
+	cfg := filepath.Join(gitPath, "config")
+	if st, err := os.Stat(gitPath); err == nil && !st.IsDir() {
+		raw, rerr := os.ReadFile(gitPath)
+		if rerr != nil {
+			return ""
+		}
+		first := strings.SplitN(strings.ReplaceAll(string(raw), "\r\n", "\n"), "\n", 2)[0]
+		if !strings.HasPrefix(strings.TrimSpace(first), "gitdir:") {
+			return ""
+		}
+		gd := strings.TrimSpace(strings.TrimPrefix(strings.TrimSpace(first), "gitdir:"))
+		if !filepath.IsAbs(gd) {
+			gd = filepath.Join(dir, gd)
+		}
+		cfg = filepath.Join(gd, "config")
+	}
+	raw, err := os.ReadFile(cfg)
+	if err != nil {
+		return ""
+	}
+	inOrigin := false
+	for _, ln := range strings.Split(strings.ReplaceAll(string(raw), "\r\n", "\n"), "\n") {
+		t := strings.TrimSpace(ln)
+		if strings.HasPrefix(t, "[") {
+			inOrigin = t == `[remote "origin"]`
+			continue
+		}
+		if inOrigin && strings.HasPrefix(t, "url") {
+			if i := strings.Index(t, "="); i >= 0 {
+				return strings.TrimSpace(t[i+1:])
+			}
+		}
+	}
+	return ""
+}
+
+// furtherReadingSection builds a README's further-reading block: the relative
+// spec/book.html link plus the rendered GitHub Pages link. The Pages link derives
+// from target's git origin remote; without one, a marked placeholder stands in.
+func furtherReadingSection(target string) string {
+	pages := "- Rendered book: no git origin remote found yet. Once the project is on GitHub, the link is `https://<owner>.github.io/<repo>/book.html`. The owner enables Pages: Settings > Pages > branch main, folder `/docs`."
+	if url, ok := pagesBookURL(originRemoteURL(target)); ok {
+		pages = "- [Read the book in the browser](" + url + ") - it renders without cloning. The owner enables Pages once: Settings > Pages > branch main, folder `/docs`."
+	}
+	return "## Further reading\n\n" +
+		"- [The book](spec/book.html) - the whole spec as one page. Works locally and as a file view on GitHub.\n" +
+		pages + "\n"
+}
+
+// projectReadme is the scaffolded README: the project's name, one orienting line, and
+// the further-reading block that links the book (every quackitect project carries both).
+func projectReadme(proj, target string) string {
+	return "# " + proj + "\n\n" +
+		"A quackitect project. The spec is the product's memory: requirements, designs, decisions, and their verification, rendered as one book.\n\n" +
+		furtherReadingSection(target)
 }
 
 // dirExists reports whether path is an existing directory.

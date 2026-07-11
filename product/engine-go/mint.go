@@ -56,8 +56,7 @@ func mintID(kind, slug string) string {
 
 // design: go-mint-edge-aware  implements: req-connections-code.2
 // In connections mode a minted node carries NO legacy edge key — the strict referee would
-// refuse it on the very next load (the i12 dogfood defect: mint broke every migrated
-// workspace). mintBody omits the keys when lanes=true; mintNodeAtX writes the same edges
+// refuse it on the very next load. mintBody omits the keys when lanes=true; mintNodeAtX writes the same edges
 // into the connection lanes instead. depends_on and the non-legacy keys stay in frontmatter
 // in both modes (adr-edges-scope).
 type mintEdge struct{ kind, dst string }

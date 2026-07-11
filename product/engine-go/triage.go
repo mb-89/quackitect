@@ -8,8 +8,8 @@ import (
 )
 
 // design: go-cone-triage  implements: req-cone-triage
-// The b7 incident's fix (M4-decision.md: a `bless --all` wave swept OPEN,
-// never-adjudicated gates alongside the SUSPECT ones). Two moves:
+// A `bless --all` wave must never sweep OPEN, never-adjudicated gates
+// alongside the SUSPECT ones. Two moves:
 //
 //  1. waveBlessFilter is THE filter cmdBless's --all path runs through: a wave
 //     may touch SUSPECT gates only. An OPEN gate (no prior adjudication at any

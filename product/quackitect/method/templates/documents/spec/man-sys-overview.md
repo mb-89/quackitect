@@ -13,7 +13,17 @@ statement: Overview - the whole system on one page.
   per-need grouping is the SAME the report bakes - reused, not re-derived.
 -->
 <!-- ai:3 -->
-This chapter is the trace, rendered one page per need. Pick a need above; its whole subtree shows - use cases, requirements, designs, tests, and decisions. Click any node to jump to its row in the chapter that owns it; the badge on each node names that chapter.
+This chapter is the trace, rendered one page per need. Pick a need above; its whole subtree shows:
+
+<!-- ai:3 -->
+- use cases
+- requirements
+- designs
+- tests
+- decisions
+
+<!-- ai:3 -->
+Click any node to jump to its row in the chapter that owns it; the badge on each node names that chapter.
 ---
 fig: trace-graph
 <!-- enddesign -->

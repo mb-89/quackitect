@@ -233,8 +233,9 @@ type gtab struct {
 // A click expands a box to the group's full pre-baked view. The dom-static law holds:
 // every member node, every internal edge, and every boundary variant bakes here, server-side.
 // The browser only flips node visibility; cytoscape hides an edge when an endpoint hides.
-// Both full-trace renders share this path (graphTabs -> buildTab): the report's trace view
-// and the book's trace chapter. Milestone and board views never fold.
+// The folds are REPORT-ONLY: the book's trace chapter shares the tab machinery
+// (traceTabs -> buildTab) but renders the clean unfolded per-need trace
+// (bookGraphTabs). Milestone and board views never fold.
 
 // recentIterations names the iterations that stay unfolded: the last five of the sorted
 // iteration list, plus the active one (readProjectConfig).
@@ -407,13 +408,17 @@ func fanCounts(counts map[string]int) string {
 // buildTab emits one need's subtree as cytoscape elements (nodes + V-model edges). No positions:
 // the browser lays it out with the breadthfirst hierarchical layout (the same algo the filter uses).
 // Fold membership bakes into the element data (go-render-folds); the browser only toggles it.
+// A nil recent window means NO folds at all: every node renders loose (the book's trace).
 func buildTab(label string, idset map[string]bool, nodes map[string]Node, sm map[string]string, recent map[string]bool) gtab {
 	ids := []string{}
 	for id := range idset {
 		ids = append(ids, id)
 	}
 	sort.Strings(ids)
-	fp := planFolds(ids, idset, nodes, sm, recent)
+	fp := foldPlan{groupOf: map[string]string{}, kindOf: map[string]string{}}
+	if recent != nil {
+		fp = planFolds(ids, idset, nodes, sm, recent)
+	}
 	var els []gel
 	for _, id := range ids {
 		n := nodes[id]
@@ -496,7 +501,21 @@ func buildTab(label string, idset map[string]bool, nodes map[string]Node, sm map
 
 // enddesign
 
+// graphTabs bakes the REPORT's trace tabs: folds on, every live decision, and the
+// (unrooted) leftovers tab for strays the operator must see.
 func graphTabs(nodes map[string]Node, sm map[string]string) []gtab {
+	return traceTabs(nodes, sm, false)
+}
+
+// bookGraphTabs bakes the BOOK's trace tabs: the clean per-need trace. No folds,
+// no (unrooted) tab (a node reaching no need root does not render), and decisions
+// only when architectural - project and strategy decisions read in the project
+// chapter's table, never in the trace graph.
+func bookGraphTabs(nodes map[string]Node, sm map[string]string) []gtab {
+	return traceTabs(nodes, sm, true)
+}
+
+func traceTabs(nodes map[string]Node, sm map[string]string, book bool) []gtab {
 	tnodes := map[string]Node{}
 	for id, n := range nodes {
 		if !traceTypes[n.Type] {
@@ -505,6 +524,9 @@ func graphTabs(nodes map[string]Node, sm map[string]string) []gtab {
 		if n.Type == "adr" && addressesSink(n) {
 			continue // graveyard/parked decisions live OUTSIDE the requirement trace by design
 			// (go-decisions); their read paths are `decisions --parked` and the archive, not the graph.
+		}
+		if book && n.Type == "adr" && decisionType(n) != "architecture" {
+			continue
 		}
 		tnodes[id] = n
 	}
@@ -539,7 +561,10 @@ func graphTabs(nodes map[string]Node, sm map[string]string) []gtab {
 	}
 	sort.Strings(needs)
 	var tabs []gtab
-	recent := recentIterations() // the fold window (go-render-folds), computed once per render
+	var recent map[string]bool // nil = no folds (the book)
+	if !book {
+		recent = recentIterations() // the fold window (go-render-folds), computed once per render
+	}
 	rooted := map[string]bool{}
 	for _, need := range needs {
 		st := subtree(need)
@@ -547,6 +572,9 @@ func graphTabs(nodes map[string]Node, sm map[string]string) []gtab {
 			rooted[id] = true
 		}
 		tabs = append(tabs, buildTab(need, st, tnodes, sm, recent))
+	}
+	if book {
+		return tabs
 	}
 	unrooted := map[string]bool{}
 	for id := range tnodes {
@@ -582,7 +610,7 @@ func checksMap(nodes map[string]Node, sm map[string]string, outDir string) map[s
 		// design: go-verdict-link  implements: req-report-check-display.2
 		// Every DONE check surfaces its VERDICT: the bless attestation (actor · short-hash) for a review
 		// check, or "engine-verified" for an executed check — read from the attest log — so a DONE check
-		// shows WHY it passed even when NO milestone evidence doc exists (the i6 field gap). The optional
+		// shows WHY it passed even when NO milestone evidence doc exists. The optional
 		// verdict_href deep-links the M<n>-*.md doc when one is present. selftest:report-verdict guards it.
 		verdict, verdictHref := "", ""
 		if sm[id] == "DONE" {

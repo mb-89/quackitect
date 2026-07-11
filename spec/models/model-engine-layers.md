@@ -8,7 +8,7 @@ killer: false
 ---
 ```mermaid
 flowchart TD
-  %% The engine's onion (owner physics, b9): rank = abstraction gradient,
+  %% The engine's onion (owner physics): rank = abstraction gradient,
   %% innermost first. Elements are design regions; files are themes (derived).
   %% Bands own the transforms; ambient holds meaning-free utilities.
   %% Allocations marked "%% ?" are agent judgment awaiting owner confirmation.
@@ -137,6 +137,7 @@ flowchart TD
     go-lint-ast-cache["design-flow derivation memo"]
     go-compact["iteration archive codec"]
     go-ask-hardening["ask-store merge and stale-answer serialization rules"]
+    go-ask-core["ask model and store serialization"]
   end
   subgraph services
     go-build["engine build orchestration"]
@@ -149,7 +150,6 @@ flowchart TD
     go-verdict-surgical["surgical verdicts"]
     go-verify-feedback["verify feedback"]
     go-why-derived["why for derived checks"]
-    go-ask-core["ask model and store"]
     go-first-wins-lanes["first answer wins"]
     go-mint["deterministic minting"]
     go-mint-content["mint bodies"]

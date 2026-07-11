@@ -40,8 +40,7 @@ var i12Tests = []namedTest{
 	{"deck-mode", selftestDeckMode},
 }
 
-// i0012 spec-book test hooks. Authored against the RED-observed test nodes; each build step
-// implements its hooks to green (test-first walk, shared implementation fragment).
+// i0012 spec-book test hooks.
 
 // design: go-ai-marks  implements: req-ai-provenance.1, req-lint-classification.1
 // The mechanical half of the drafting rule: the mark syntax (`<!-- ai:N -->`, N 0..3, own line
@@ -138,7 +137,7 @@ func selftestAiDrafting() bool {
 	// accepts it and the renderer drops it ('the comment stays in the source and never renders').
 	fill := "## A heading\n<!-- fill [mandatory]\nContents: guidance the template keeps in the source.\nForm: FILLPROBE never renders.\n-->\n<!-- ai:3 -->\nA filled paragraph.\n"
 	if !proseUnitsMarked(fill) {
-		return false // a fill comment interior is not unmarked prose (the ch1 dogfood defect)
+		return false // a fill comment interior is not unmarked prose
 	}
 	rendered := mdLite(fill)
 	if strings.Contains(rendered, "FILLPROBE") || !strings.Contains(rendered, "A filled paragraph.") {
@@ -285,7 +284,7 @@ func selftestBookDepth() bool {
 	if strings.Contains(h1, "RATIONALEPROBE") {
 		return false // depth 1 = statements only
 	}
-	// children link as the i14 termref affordance (data-goto), no longer bare anchors
+	// children link as the termref affordance (data-goto), never bare anchors
 	h3, _, _ := renderBookHTML(bookFixture(dir, 3, true))
 	if !strings.Contains(h3, "RATIONALEPROBE") || !strings.Contains(h3, `data-goto="test-fix"`) {
 		return false // depth 3 adds rationale and children
@@ -431,8 +430,8 @@ func selftestGlossaryShared() bool {
 	if len(findings) != 0 {
 		return false
 	}
-	// the i14 term affordance: a linked use renders as a termref button carrying the
-	// definition for the details pane (the old first-use long-form expansion retired)
+	// the term affordance: a linked use renders as a termref button carrying the
+	// definition for the details pane (never a first-use long-form expansion)
 	if !strings.Contains(html, `class="termref"`) || !strings.Contains(html, `data-help="the fixture widget"`) {
 		return false
 	}
@@ -896,7 +895,7 @@ func selftestAuthoringCheap() bool {
 	verdictPathOverride = filepath.Join(dir, "verdicts.json")
 	verdictsMemo = nil
 	defer func() { verdictPathOverride, verdictsMemo = oldPath, oldMemo }()
-	verdictRecord("__wedge_probe__", "h1", false, 0) // a stale FAIL on disk - the i11 wedge shape
+	verdictRecord("__wedge_probe__", "h1", false, 0) // a stale FAIL on disk - the wedge shape
 	exe, err := os.Executable()
 	if err != nil {
 		return false

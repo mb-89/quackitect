@@ -365,7 +365,7 @@ func (e *execAdapter) PollAnswers(since string) ([]AskAnswer, string, error) {
 // The ntfy adapter: send = one HTTP PUT with the ask body and headers; poll = one GET
 // with `since=` (json lines). A GATE ask renders visibly distinct (high priority,
 // bangbang tag) from a decision ask (default, question tag). Up to three X-Actions
-// buttons fire `PUT <option-id> <cid>` at the answer topic — the exact wire the M5
+// buttons fire `PUT <option-id> <cid>` at the answer topic — the exact wire the
 // spike proved, phone tap included.
 func ntfyHeaders(a Ask, answerTopic string) map[string]string {
 	h := map[string]string{}

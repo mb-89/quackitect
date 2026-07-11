@@ -16,7 +16,7 @@ import (
 )
 
 // design: go-book-manifests  implements: req-manifest-render.1, req-spec-content-lint.2, req-lint-classification.2
-// The manifest node type (adr-book-two-stage lineage; one mechanism, settled at design): a manifest
+// The manifest node type (adr-book-two-stage; one mechanism): a manifest
 // is trace CONTENT whose body lists UNITS separated by `---` lines. A unit is either a node
 // reference (a plain markdown link to a node id, optional `depth:N`) or inline markdown (ledes,
 // glue - provenance-marked like all prose). `Note:` lines carry speaker notes (deck mode). The
@@ -30,7 +30,7 @@ type ManifestUnit struct {
 	Notes string // speaker notes, `Note:` lines stripped from Body
 }
 
-// a unit ref may carry a sub-address (req-x.2, i17 clustering) - the render folds
+// a unit ref may carry a sub-address (req-x.2) - the render folds
 // it to the base node and keeps the sub-number for the reader
 var unitRefRe = regexp.MustCompile(`^\[([A-Za-z0-9_-]+(?:\.[0-9]+)?)\]\([^)]*\)(?:\s+depth:([1-4]))?\s*$`)
 
@@ -115,6 +115,20 @@ func bookOrphanFindings(nodes map[string]Node) []string {
 				if bn.Type == "need" || bn.Type == "usecase" {
 					referenced[id] = true
 				}
+			}
+		}
+		// the design input register renders every FILE-BACKED use case and
+		// requirement (the population a base view evaluates) - a node without a
+		// file stays an orphan finding
+		if strings.Contains(body, "fig: input-register") {
+			for id, bn := range nodes {
+				if bn.Type != "usecase" && bn.Type != "requirement" {
+					continue
+				}
+				if _, err := os.Stat(bn.Path); err != nil {
+					continue
+				}
+				referenced[id] = true
 			}
 		}
 		// the other fig kinds render node sets the same way:
@@ -303,7 +317,7 @@ func mdLiteBlocksAt(md string, base int) string {
 		if ai >= 0 {
 			attr = ` data-ai="` + string(rune('0'+ai)) + `"`
 		}
-		// a heading line binds only ITSELF (the i17 M5 expand fix): a paragraph that opens
+		// a heading line binds only ITSELF: a paragraph that opens
 		// with `## x` directly followed by content lines emits the heading, then renders
 		// the rest as its own block - the heading never swallows the list or prose below.
 		for {
@@ -331,23 +345,50 @@ func mdLiteBlocksAt(md string, base int) string {
 		if p == "" {
 			continue
 		}
-		switch {
-		case strings.HasPrefix(p, "<svg"):
+		if strings.HasPrefix(p, "<svg") {
 			out.WriteString(p + "\n")
-		case strings.HasPrefix(p, "- "):
-			if attr != "" {
-				out.WriteString("<div" + attr + ">")
+			continue
+		}
+		// the block renders as RUNS: list lines make a real <ul> and quote lines a real
+		// <blockquote> even when prose shares the block - an enumeration never renders
+		// as dashed prose inside a paragraph.
+		blines := strings.Split(p, "\n")
+		for li := 0; li < len(blines); {
+			t := strings.TrimSpace(blines[li])
+			switch {
+			case strings.HasPrefix(t, "- "):
+				if attr != "" {
+					out.WriteString("<div" + attr + ">")
+				}
+				out.WriteString("<ul>\n")
+				for ; li < len(blines) && strings.HasPrefix(strings.TrimSpace(blines[li]), "- "); li++ {
+					out.WriteString("<li>" + mdInline(strings.TrimPrefix(strings.TrimSpace(blines[li]), "- ")) + "</li>\n")
+				}
+				out.WriteString("</ul>\n")
+				if attr != "" {
+					out.WriteString("</div>\n")
+				}
+			case strings.HasPrefix(t, "> ") || t == ">":
+				var q []string
+				for ; li < len(blines); li++ {
+					qt := strings.TrimSpace(blines[li])
+					if !strings.HasPrefix(qt, ">") {
+						break
+					}
+					q = append(q, strings.TrimSpace(strings.TrimPrefix(qt, ">")))
+				}
+				out.WriteString("<blockquote" + attr + "><p>" + mdInline(strings.Join(q, " ")) + "</p></blockquote>\n")
+			default:
+				var pr []string
+				for ; li < len(blines); li++ {
+					pt := strings.TrimSpace(blines[li])
+					if strings.HasPrefix(pt, "- ") || strings.HasPrefix(pt, "> ") || pt == ">" {
+						break
+					}
+					pr = append(pr, blines[li])
+				}
+				out.WriteString("<p" + attr + ">" + mdInline(strings.Join(pr, "\n")) + "</p>\n")
 			}
-			out.WriteString("<ul>\n")
-			for _, li := range strings.Split(p, "\n") {
-				out.WriteString("<li>" + mdInline(strings.TrimPrefix(strings.TrimSpace(li), "- ")) + "</li>\n")
-			}
-			out.WriteString("</ul>\n")
-			if attr != "" {
-				out.WriteString("</div>\n")
-			}
-		default:
-			out.WriteString("<p" + attr + ">" + mdInline(p) + "</p>\n")
 		}
 	}
 	return out.String()
@@ -776,7 +817,7 @@ func splitChapterTitle(t string) (string, string) {
 // advisories are soft signals (unlinked term usages) that never fail a render.
 func renderBookHTML(nodes map[string]Node) (string, []string, []string) {
 	// figure ids restart per render: regeneration stays byte-identical (go-fig-elem-ids).
-	// Re-entrancy guard (found at the i17 M5 sweep): StatusMap below can evaluate executed
+	// Re-entrancy guard: StatusMap below can evaluate executed
 	// checks whose selftests render the book THROUGH this function - the inner render
 	// walked the global figSeq to its end, every id in the outer render shifted, and the
 	// bytes depended on the verdict-cache state. Each call restores its caller's counter.
@@ -865,7 +906,6 @@ func renderBookHTML(nodes map[string]Node) (string, []string, []string) {
 	}
 	var toc []tocEntry
 	var body strings.Builder
-	viewsHomeAnchor := "" // the views-home figure's anchor - the filter help links here
 	renderChapterUnit := func(chb *strings.Builder, chID string, idx int, u ManifestUnit) {
 		anchor := chID + "-u" + itoa(idx+1)
 		if u.Ref != "" {
@@ -878,9 +918,6 @@ func renderBookHTML(nodes map[string]Node) (string, []string, []string) {
 			if msg, retired := retiredFigKinds[m[1]]; retired {
 				findings = append(findings, "fig kind '"+m[1]+"' retired "+msg)
 			} else {
-				if m[1] == "views-home" {
-					viewsHomeAnchor = anchor
-				}
 				chb.WriteString(`<figure id="` + anchor + `" data-layer="figure">` + "\n" +
 					`<button type="button" class="fig-fs" data-figfs title="fullscreen (Esc closes)">⛶</button>` + "\n" +
 					renderFigure(m[1], nodes) + "\n</figure>\n")
@@ -1051,9 +1088,9 @@ func renderBookHTML(nodes map[string]Node) (string, []string, []string) {
 	// the DETAILS PANE - a bar at the sidebar bottom that expands as the one context-help
 	// surface (window.bookDetail fills it for a clicked term, link, node, filter, search,
 	// graph node, or the book title). The pane is COMPLETELY context-sensitive:
-	// it shows only the clicked thing - the views and slide decks
-	// live in the views home as book content (go-views-home); the baseline controls'
-	// placement stays deliberately undecided (q-views-placement).
+	// it shows only the clicked thing - the reader views ride the stakeholder rows
+	// as pills, the slide decks live in the views home (go-views-home); the baseline
+	// controls' placement stays deliberately undecided (q-views-placement).
 	// Single-click on a node/term reference opens the pane; NAVIGATION runs through the
 	// pane's link (window.bookGoto) - never a single-click jump. In-page anchors (the toc)
 	// keep navigating directly. The content column stays clean. The report's visual
@@ -1099,7 +1136,8 @@ func renderBookHTML(nodes map[string]Node) (string, []string, []string) {
 		".upills{display:flex;flex-wrap:wrap;gap:5px;margin:.3rem 0}" +
 		".upill{font:inherit;font-size:.75rem;padding:2px 10px;border:1px solid #d5d5d5;border-radius:13px;background:#fff;cursor:pointer;color:#555}.upill.on{background:#2762c4;border-color:#2762c4;color:#fff}.upill.on .meta{color:#dbe6fa}" +
 		".pilllbl{font-size:.72rem;color:#999;margin-right:2px;align-self:center}" +
-		".u-table{width:100%;border-collapse:collapse}.u-table thead th{background:#fafafa;font-size:.75rem;font-weight:600;color:#888;text-align:left;padding:4px 8px;border:0;border-bottom:2px solid #e3e3e3}" +
+		".u-table{width:100%;border-collapse:collapse}.u-table thead th{background:#fafafa;font-size:.75rem;font-weight:600;color:#888;text-align:left;padding:4px 8px;border:0;border-bottom:2px solid #e3e3e3;cursor:pointer}" +
+		".u-table thead th[aria-sort=ascending]:after{content:\" \\25B4\"}.u-table thead th[aria-sort=descending]:after{content:\" \\25BE\"}" +
 		".u-table tr.urow>td{padding:5px 8px 5px 6px;border:0;border-bottom:1px solid #eee;cursor:pointer;vertical-align:top}.u-table tr.urow:hover>td{background:#f6f8fb}.u-table td.ubrief{color:#555;font-size:.85rem}" +
 		".utri{display:inline-block;width:.8em;color:#9aa4b2;transition:transform .1s}.utri:before{content:\"\\25B8\"}tr.urow.open .utri{transform:rotate(90deg)}" +
 		".u-table tr.udetail>td{padding:2px 8px 10px 24px;border:0;border-bottom:1px solid #eee;background:#fbfbfe}.u-table .ufield{margin:.15rem 0;font-size:.85rem}.ufl{color:#8a93a3}" +
@@ -1115,8 +1153,16 @@ func renderBookHTML(nodes map[string]Node) (string, []string, []string) {
 		".ucontrols button{font:inherit;font-size:.75rem;padding:2px 8px;border:1px solid #ddd;border-radius:5px;background:#fff;cursor:pointer}.ucontrols button:hover{background:#f0f0f0}" +
 		".ucontrols input,.ucontrols select{font:inherit;font-size:.78rem;padding:2px 6px;border:1px solid #ddd;border-radius:5px}.qt-pos{color:#555;min-width:8ch;text-align:center;display:inline-block}" +
 		".onion .oview[hidden]{display:none}.onion [data-onion-go]{cursor:pointer}.onion-flow{overflow-x:auto;max-width:100%}.onion-flow svg{display:block}.onion svg{cursor:grab;touch-action:none;max-width:100%}.onion [data-node-link]{cursor:pointer}" +
-		"figure[data-layer=\"figure\"]{position:relative;margin:1rem 0}.fig-fs{position:absolute;top:4px;right:4px;z-index:2;font:inherit;font-size:13px;padding:2px 8px;border:1px solid #d5d5d5;border-radius:6px;background:#fff;cursor:pointer;opacity:.55}.fig-fs:hover{opacity:1}" +
-		"figure.fig-full{position:fixed;inset:0;z-index:50;background:#fff;overflow:auto;margin:0;padding:26px;box-shadow:0 0 0 100vmax rgba(0,0,0,.35)}figure.fig-full svg{max-height:92vh}" +
+		".ctx-star svg{display:block;max-width:560px}" +
+		/* the fullscreen button flows BELOW the figure's explanation paragraph (the prose
+		   unit above the figure), never floating over the graphic */
+		"figure[data-layer=\"figure\"]{position:relative;margin:1rem 0}.fig-fs{display:inline-block;margin:0 0 .35rem;font:inherit;font-size:13px;padding:2px 8px;border:1px solid #d5d5d5;border-radius:6px;background:#fff;cursor:pointer;opacity:.55}.fig-fs:hover{opacity:1}" +
+		/* fullscreen fills BOTH axes: the graphic gets the whole viewport box and scales
+		   into it (a wide figure uses the full width, a tall one the full height) */
+		"figure.fig-full{position:fixed;inset:0;z-index:50;background:#fff;overflow:auto;margin:0;padding:26px;box-shadow:0 0 0 100vmax rgba(0,0,0,.35)}" +
+		"figure.fig-full .fig-fs{position:sticky;top:0;z-index:2}" +
+		"figure.fig-full>svg,figure.fig-full .oview svg,figure.fig-full .onion-flow svg,figure.fig-full .ctx-star svg{width:100%;height:calc(100vh - 100px);max-height:none;max-width:none}" +
+		"figure.fig-full .tgraph #graph{height:calc(100vh - 170px)}" +
 		".onion-infra{display:flex;flex-wrap:wrap;gap:5px;align-items:center;margin:.3rem 0;font-size:.78rem}.onion-infra .il{color:#888;margin-right:4px}.onion-infra button{font:inherit;font-size:.75rem;padding:2px 9px;border:1px solid #d5d5d5;border-radius:12px;background:#fff;cursor:pointer}" +
 		".tgraph #graph{height:675px;border:1px solid #e3e3e3;border-radius:6px;background:#fff}" +
 		".tgraph .tabbar{display:flex;flex-wrap:wrap;gap:4px;margin:.4rem 0}.tgraph .tab{font:inherit;font-size:.78rem;padding:3px 9px;border:1px solid #ddd;border-radius:12px;background:#fff;cursor:pointer}.tgraph .tab.active{background:#eaf0fb;border-color:#9db6e0}" +
@@ -1126,6 +1172,11 @@ func renderBookHTML(nodes map[string]Node) (string, []string, []string) {
 		".crumbs{font-size:.85rem;margin:.3rem 0;color:#555}.crumbs button{background:none;border:none;color:#2762c4;cursor:pointer;padding:0;font:inherit;text-decoration:underline}" +
 		"article.ch.pg-hide{display:none}" +
 		"@media print{article.ch.pg-hide{display:block}}" +
+		/* an emptied chapter keeps every heading line visible; only the content hides */
+		"article.ch.flt-empty>*:not(h1){display:none}" +
+		"article.ch.flt-empty>*:has(h2,h3,h4){display:block}" +
+		"article.ch.flt-empty>*:has(h2,h3,h4)>*:not(h2):not(h3):not(h4){display:none}" +
+		"article.ch.flt-empty h1,article.ch.flt-empty h2,article.ch.flt-empty h3,article.ch.flt-empty h4{color:#a9b2bf}" +
 		".meta{font-size:.8rem;color:" + bookColors["meta"] + "}.stmt{margin-bottom:.2rem}.missing{color:#b00}" +
 		".marked{position:relative}.ai-marks{position:absolute;left:-1.6rem;top:.15rem;display:flex;flex-direction:column;gap:2px}" +
 		".qpad-short{padding-bottom:2.2rem}" +
@@ -1163,7 +1214,9 @@ func renderBookHTML(nodes map[string]Node) (string, []string, []string) {
 	doc.WriteString(`<button class="sb-brand" id="book-title" title="click for book info"` + bookTitleAttrs(root, cfg.Version, version) + `>` + htmlEscape(brand()) + ` — the spec book</button>` + "\n")
 	// sidebar order (req-book-shell-nav.1): search, filter expression,
 	// then the toc.
-	doc.WriteString(`<input id="search" type="search" placeholder="search the whole book">` + "\n")
+	// no browser input history on the search bar: the details pane explains the
+	// mechanics on focus instead - stored past queries would ride over it.
+	doc.WriteString(`<input id="search" type="search" placeholder="search the whole book" autocomplete="off" autocapitalize="off" spellcheck="false">` + "\n")
 	// inline match nav (req-book-shell-nav.5): prev / counter / next on one line,
 	// the script steps a single highlighted match - no hit list, never created content.
 	doc.WriteString(`<span id="search-nav" hidden><button id="hits-prev" aria-label="previous match">&lsaquo;</button><span id="hits-pos"></span><button id="hits-next" aria-label="next match">&rsaquo;</button></span>` + "\n")
@@ -1198,9 +1251,9 @@ func renderBookHTML(nodes map[string]Node) (string, []string, []string) {
 		doc.WriteString("</details>\n")
 	}
 	doc.WriteString("</div>\n")
-	// context-help pane: COMPLETELY context-sensitive. The
-	// views and slide decks live in the views home (go-views-home); the baseline
-	// controls stay unplaced (q-views-placement stays open). window.bookDetail fills
+	// context-help pane: COMPLETELY context-sensitive. The reader views ride the
+	// stakeholder rows, the slide decks live in the views home (go-views-home); the
+	// baseline controls stay unplaced (q-views-placement stays open). window.bookDetail fills
 	// #dpane-content on demand; the book identity rides the title button's data
 	// attributes and shows on a title click like any other click target.
 	doc.WriteString(`<div id="details" class="dpane collapsed"><button id="dpane-bar" type="button">Details <span id="dpane-caret">▴</span></button><div id="dpane-body"><div id="dpane-content"><p class="meta">Click a term, link, filter, or a graph node to see details here.</p></div></div></div>` + "\n")
@@ -1225,29 +1278,30 @@ func renderBookHTML(nodes map[string]Node) (string, []string, []string) {
   toks.forEach(function(t){var i=t.indexOf(':'),k=i<0?'':t.slice(0,i),v=t.slice(i+1);
    if(k==='preset')preset=v;else if(k==='state')state=v;
    else words.push(t.toLowerCase());});
+  /* a chapter with nothing for the active filter EMPTIES, never disappears:
+     the heading lines stay visible, only the content hides (CSS on flt-empty) */
   document.querySelectorAll('article.ch').forEach(function(a){
    var hid=(preset!=='')&&!a.classList.contains('in-man-preset-'+preset);
    if(!hid&&words.length){var txt=a.textContent.toLowerCase();
     words.forEach(function(w){if(txt.indexOf(w)<0)hid=true;});}
-   a.hidden=hid;});
+   a.classList.toggle('flt-empty',hid);});
   document.querySelectorAll('main section[data-node]').forEach(function(s){
    var hid=false;
    if(state&&s.getAttribute('data-state')!==state)hid=true;
    if(!hid&&words.length){var txt=s.textContent.toLowerCase();
     words.forEach(function(w){if(txt.indexOf(w)<0)hid=true;});}
    s.hidden=hid;});
+  /* the contents GRAY OUT an emptied chapter but keep it clickable */
   document.querySelectorAll('#toc a[data-ch]').forEach(function(l){
    var a=document.getElementById(l.getAttribute('data-ch'));
-   l.classList.toggle('off',!!(a&&a.hidden));});}
+   l.classList.toggle('off',!!(a&&a.classList.contains('flt-empty')));});}
  if(fe)fe.addEventListener('input',apply);
  /* filter help opens in the details pane (owner c6): chrome, not book content.
-    The view list lives ONCE, in the views home - the help links there. A book
-    without a views home keeps the baked clickable preset list as the fallback. */
+    The reader views live on the stakeholder rows as view pills; the help keeps
+    the baked clickable preset list so the tokens stay discoverable. */
  if(fe){var fhelp=function(){window.bookDetail('Filter','<div class=meta>Filter the book as you type. Combine tokens with spaces; anything else filters as text.</div><ul class=meta>`)
 	doc.WriteString(`<li><b>preset:</b>&lt;name&gt;`)
-	if viewsHomeAnchor != "" {
-		doc.WriteString(` — <a href="#` + htmlEscape(viewsHomeAnchor) + `" data-goto="` + htmlEscape(viewsHomeAnchor) + `">pick a view &#8599;</a>`)
-	} else if len(presetIDs) > 0 {
+	if len(presetIDs) > 0 {
 		doc.WriteString(`<ul>`)
 		for _, p := range presetIDs {
 			doc.WriteString(`<li><button type="button" data-view="` + htmlEscape(p) + `">` + htmlEscape(strings.TrimPrefix(p, "man-preset-")) + `</button></li>`)
@@ -1256,6 +1310,10 @@ func renderBookHTML(nodes map[string]Node) (string, []string, []string) {
 	}
 	doc.WriteString(`</li><li><b>state:</b>suspect|verified</li></ul>');};
   fe.addEventListener('focus',fhelp);fe.addEventListener('click',fhelp);}
+ /* search help mirrors the filter help: focus fills the details pane with the
+    how-search-works explainer */
+ if(se){var shelp=function(){window.bookDetail('Search','<div class=meta>Searches the text of the whole book as you type.</div><ul class=meta><li>Every match paints yellow.</li><li>The &lsaquo; &rsaquo; buttons step through the matches.</li><li>The counter shows which match you are on.</li><li>Clear the box to end the search.</li></ul>');};
+  se.addEventListener('focus',shelp);}
  /* search -> inline match nav (owner c5, req-book-shell-nav.5): step one match at a time,
     ALL occurrences paint full yellow via the Highlight API */
  var hits=[],hcur=0,
@@ -1350,6 +1408,16 @@ func renderBookHTML(nodes map[string]Node) (string, []string, []string) {
   /* a views-home button enters its preset into the filter; a second click clears it */
   var v=e.target.closest?e.target.closest('button[data-view]'):null;
   if(v){setTok('preset',(v.getAttribute('data-view')||'').replace(/^man-preset-/,''),true);return;}
+  /* a content link with data-goto transports through bookGoto; when it also
+     carries a facet (an iteration link), the target table SELECTS that value */
+  var g=e.target.closest?e.target.closest('a[data-goto]'):null;
+  if(g){e.preventDefault();
+   var gid=g.getAttribute('data-goto');window.bookGoto(gid);
+   var fn=g.getAttribute('data-facet'),fv=g.getAttribute('data-fv');
+   if(fn&&fv){var gt=document.getElementById(gid);
+    var gut=gt&&gt.closest?(gt.closest('.utable')||gt):null;
+    if(gut&&gut.setFacet)gut.setFacet(fn,fv);}
+   return;}
   var s=e.target.closest('section[data-node]');if(!s)return;
   window.bookNodeDetail(s.getAttribute('data-node')||'');});
  document.addEventListener('click',function(e){var t=e.target.closest?e.target.closest('.termref'):null;if(!t)return;e.preventDefault();var goto=t.getAttribute('data-goto'),help=t.getAttribute('data-help')||'';var link=goto?('<a href="#'+goto+'" data-goto="'+goto+'">open the full entry &#8599;</a>'):'';window.bookDetail(t.getAttribute('data-title')||t.textContent,'<p>'+help+'</p>'+link);});
@@ -1401,6 +1469,24 @@ func renderBookHTML(nodes map[string]Node) (string, []string, []string) {
      var any=false;for(var k in facets[fn]){if(facets[fn][k]){any=true;break;}}
      var all=fe.querySelector('.upill[data-fv="*"]');if(all)all.classList.toggle('on',!any);}
     page=0;apply();});});});
+  /* header click sorts: asc, then desc; numeric-aware when every filled cell parses
+     as a number; the sort MOVES the existing row pairs - it never creates content */
+  var hrow=tb.tHead?tb.tHead.rows[0]:null;
+  if(hrow)Array.prototype.forEach.call(hrow.cells,function(th,ci){
+   th.addEventListener('click',function(){
+    var dir=th.getAttribute('aria-sort')==='ascending'?'descending':'ascending';
+    Array.prototype.forEach.call(hrow.cells,function(x){x.removeAttribute('aria-sort');});
+    th.setAttribute('aria-sort',dir);
+    var pairs=rows().map(function(r){var c=r.cells[ci];
+     return {r:r,d:detailOf(r),k:c?c.textContent.trim():''};});
+    var num=pairs.some(function(p){return p.k!=='';})&&
+     pairs.every(function(p){return p.k===''||isFinite(parseFloat(p.k));});
+    pairs.sort(function(a,b){var x=a.k,y=b.k;
+     if(num){x=x===''?-Infinity:parseFloat(x);y=y===''?-Infinity:parseFloat(y);}
+     else{x=x.toLowerCase();y=y.toLowerCase();}
+     return x<y?(dir==='ascending'?-1:1):(x>y?(dir==='ascending'?1:-1):0);});
+    pairs.forEach(function(p){body.appendChild(p.r);if(p.d)body.appendChild(p.d);});
+    page=0;apply();});});
   body.addEventListener('click',function(e){var r=e.target.closest('tr.urow');if(!r||!r.classList.contains('qt-exp'))return;
    if(e.target.closest('a,button,input,select'))return;
    var d=detailOf(r);if(!d)return;var open=d.getAttribute('data-open')==='1';
@@ -1413,6 +1499,13 @@ func renderBookHTML(nodes map[string]Node) (string, []string, []string) {
   if(nx)nx.addEventListener('click',function(){page++;apply();});
   var qi=ut.querySelector('.qt-search');if(qi)qi.addEventListener('input',function(){page=0;apply();});
   var sz=ut.querySelector('.qt-size');if(sz)sz.addEventListener('change',function(){page=0;apply();});
+  /* setFacet: select exactly ONE value of a pill facet (an iteration link
+     selects its iteration in the decisions table) - state and pill classes stay in step */
+  ut.setFacet=function(fn,fv){if(!(fn in facets))return;
+   facets[fn]={};facets[fn][fv]=true;
+   Array.prototype.forEach.call(ut.querySelectorAll('.upills'),function(fe){if(fe.getAttribute('data-facet')!==fn)return;
+    Array.prototype.forEach.call(fe.querySelectorAll('.upill'),function(x){x.classList.toggle('on',x.getAttribute('data-fv')===fv);});});
+   page=0;apply();};
   ut.revealRow=function(id){var r=body.querySelector('tr.urow[data-node="'+id+'"]');if(!r)return null;
    for(var fn in facets)facets[fn]={};
    board={};
@@ -1466,11 +1559,13 @@ func renderBookHTML(nodes map[string]Node) (string, []string, []string) {
   svg.addEventListener('pointerup',function(){drag=null;svg.style.cursor='';});
   svg.addEventListener('dblclick',function(){st.x=base[0];st.y=base[1];st.w=base[2];st.h=base[3];apply();});
  });
- /* figure fullscreen: the button flips a class on its own figure */
+ /* figure fullscreen: the button flips a class on its own figure; an embedded
+    cytoscape canvas refits to the new box */
  document.querySelectorAll('[data-figfs]').forEach(function(btn){btn.addEventListener('click',function(){
   var f=btn.closest('figure');if(!f)return;
   f.classList.toggle('fig-full');
-  btn.textContent=f.classList.contains('fig-full')?'✕':'⛶';});});
+  btn.textContent=f.classList.contains('fig-full')?'✕':'⛶';
+  if(f.querySelector('#graph')&&window.__quackGraphRefit){setTimeout(window.__quackGraphRefit,0);}});});
  document.addEventListener('keydown',function(e){if(e.key!=='Escape')return;
   document.querySelectorAll('figure.fig-full').forEach(function(f){f.classList.remove('fig-full');
    var b=f.querySelector('[data-figfs]');if(b)b.textContent='⛶';});});
@@ -1927,11 +2022,18 @@ func contrastRatio(fg, bg string) float64 {
 // enddesign
 
 // design: go-book-drift  implements: req-book-trust.3
-// The committed book (spec/book.html, written at ship) must equal a fresh render - the emitter is
-// deterministic by construction (no timestamps; identity = the merkle root), so same state means
-// same bytes, and a drifted committed book is a lint finding. No committed book = disarmed
-// (day-to-day renders live in the data home).
+// Every published book copy (spec/book.html and the Pages copy docs/book.html, both written at
+// ship) must equal a fresh render - the emitter is deterministic by construction (no timestamps;
+// identity = the merkle root), so same state means same bytes, and a drifted copy is a lint
+// finding. An absent copy = disarmed (day-to-day renders live in the data home).
 func committedBookPath() string { return filepath.Join(SPEC, "book.html") }
+
+// docsBookPath is the GitHub-Pages copy of the book: <workspace-root>/docs/book.html.
+// Pages serves only the root or /docs, so this copy makes the book readable without cloning.
+func docsBookPath() string { return filepath.Join(ROOT, "docs", "book.html") }
+
+// publishedBookPaths lists every book copy the ship writes and the drift law covers.
+func publishedBookPaths() []string { return []string{committedBookPath(), docsBookPath()} }
 
 func bookDriftFindingAt(path string, nodes map[string]Node) []string {
 	committed, err := os.ReadFile(path)
@@ -1943,6 +2045,30 @@ func bookDriftFindingAt(path string, nodes map[string]Node) []string {
 		return nil
 	}
 	return []string{"the committed book differs from a fresh render - regenerate it at ship (req-book-trust.3)"}
+}
+
+// bookDriftFindings drift-checks every published copy against ONE fresh render.
+func bookDriftFindings(nodes map[string]Node) []string {
+	var out []string
+	fresh, rendered := "", false
+	for _, p := range publishedBookPaths() {
+		committed, err := os.ReadFile(p)
+		if err != nil {
+			continue // absent: disarmed
+		}
+		if !rendered {
+			fresh, _, _ = renderBookHTML(nodes)
+			rendered = true
+		}
+		if string(committed) != fresh {
+			rel, rerr := filepath.Rel(ROOT, p)
+			if rerr != nil {
+				rel = p
+			}
+			out = append(out, filepath.ToSlash(rel)+" differs from a fresh render - regenerate it at ship (req-book-trust.3)")
+		}
+	}
+	return out
 }
 
 // enddesign
@@ -2288,8 +2414,8 @@ func deriveDesignFlowUncached() (consumes map[string][]string, reads map[string]
 		byFile[n.Path] = append(byFile[n.Path], span{id: id, start: n.Line, end: n.Line + nl + 1})
 	}
 	// sorted span order: adjacent region spans overlap by a line and inSpan takes the
-	// FIRST match - map-walk order made the attribution (so the flow/infra split and the
-	// derived edges) flip per process (found at the i17 M5 sweep).
+	// FIRST match - map-walk order would make the attribution (so the flow/infra split and the
+	// derived edges) flip per process.
 	for _, spans := range byFile {
 		sort.Slice(spans, func(i, j int) bool {
 			if spans[i].start != spans[j].start {
@@ -2343,8 +2469,8 @@ func deriveDesignFlowUncached() (consumes map[string][]string, reads map[string]
 		}
 	}
 	// sorted file order: symOf resolves name collisions (methods share bare names across
-	// types) by last-write-wins - map-order iteration made the winner flip per process and
-	// the derived edges (so the rendered book) nondeterministic (found at the i17 M5 sweep).
+	// types) by last-write-wins - map-order iteration would make the winner flip per process and
+	// the derived edges (so the rendered book) nondeterministic.
 	paths := make([]string, 0, len(byFile))
 	for path := range byFile {
 		paths = append(paths, path)
@@ -3069,6 +3195,13 @@ func renderOnion(nodes map[string]Node) string {
 		}
 	}
 	b.WriteString("</div>\n")
+	if model != nil {
+		// the onion IS the layers-flow model's render: it carries the model's
+		// informed-by link list like every other architectural model figure
+		if raw, err := os.ReadFile(filepath.Join(SPEC, "models", "model-engine-layers.md")); err == nil {
+			b.WriteString(renderModelInformed("model-engine-layers", string(raw), nodes))
+		}
+	}
 	return b.String()
 }
 
@@ -3267,16 +3400,21 @@ func onionBusSVG(aria, discLabel, ringLabel, ringGo, vid string, inBars, outBars
 	if 2*centreR > midW {
 		midW = 2 * centreR
 	}
-	contentW := 0
-	for _, w := range []int{leftW, midW, rightW} {
-		if w == 0 {
-			continue
+	// the layout is SYMMETRIC around the disc centre: the middle zone (and the
+	// lower-levels core in it) sits at cx at every level, the side zones hang off
+	// it, and the disc radius covers the wider side - the core never drifts.
+	halfW := midW / 2
+	if leftW > 0 {
+		if h := midW/2 + gapZ + leftW; h > halfW {
+			halfW = h
 		}
-		if contentW > 0 {
-			contentW += gapZ
-		}
-		contentW += w
 	}
+	if rightW > 0 {
+		if h := midW/2 + gapZ + rightW; h > halfW {
+			halfW = h
+		}
+	}
+	contentW := 2 * halfW
 	if contentW == 0 {
 		contentW = 120
 	}
@@ -3325,21 +3463,12 @@ func onionBusSVG(aria, discLabel, ringLabel, ringGo, vid string, inBars, outBars
 	}
 	inRailY := func(k int) int { return pad + k*(barH+barGap) + barH/2 }
 	outRailY := func(j int) int { return outStart + j*(barH+barGap) + barH/2 }
-	// zone origins and block positions
-	zx := cx - contentW/2
-	leftX := zx
-	if leftW > 0 {
-		zx += leftW + gapZ
-	}
-	midX := zx
-	if midW > 0 {
-		zx += midW + gapZ
-	}
-	rightX := zx
-	midCx := midX + midW/2
-	if midW == 0 {
-		midCx = cx
-	}
+	// zone origins and block positions: the middle zone centres on cx, the side
+	// zones flank it
+	midX := cx - midW/2
+	leftX := midX - gapZ - leftW
+	rightX := midX + midW + gapZ
+	midCx := cx
 	y := cy - leftH/2
 	for i, bl := range left {
 		bl.x, bl.y = leftX+i*stagger, y
@@ -3591,10 +3720,10 @@ func onionLayerSource() (layers []onionLayer, excludes, inputs, outputs, infra [
 
 // design: go-trace-graph  implements: req-system-overview, req-compact-derived.1
 // The trace chapter's per-need graph: it REUSES the report's per-need grouping
-// (graphTabs/subtree/buildTab) - the report bakes those tabs into a cytoscape canvas, which the
-// book cannot run under its zero-dependency CSP, so the SAME tab data renders here as a static
-// SVG per need. One page per need (a tab bar toggles which need's graph shows); ALL nodes show by
-// default (overriding the report's collapse); each node is clickable and opens the details
+// (traceTabs/subtree/buildTab via bookGraphTabs) with the book's own tab bake - the CLEAN
+// per-need trace: no fold boxes, no (unrooted) tab (a node reaching no need root does not
+// render), and decisions only when architectural. One page per need (a tab bar toggles which
+// need's graph shows); each node is clickable and opens the details
 // pane (data-node-link, shared handler; the pane's link transports to the table row); each node
 // carries a [ch N] badge naming the chapter its item's table renders in, so a reader always
 // knows where to read the detail.
@@ -3638,7 +3767,7 @@ func renderTraceGraph(nodes map[string]Node) string {
 	// to KEEP the graph working offline after the book is received - the book stays fully self-contained,
 	// its "no external requests" property intact).
 	data := map[string]interface{}{
-		"tabs":   graphTabs(nodes, sm),
+		"tabs":   bookGraphTabs(nodes, sm),
 		"checks": checksMap(nodes, sm, dataDirFor("out")),
 	}
 	gdata, _ := json.Marshal(data)
@@ -3667,9 +3796,6 @@ func renderTraceGraph(nodes map[string]Node) string {
 		`<li>designs — chapter ` + chcap("man-ch4-design-output") + `</li>` +
 		`<li>tests — chapter ` + chcap("man-ch5-verification-validation") + `</li>` +
 		`<li>decisions — chapter ` + chcap("man-ch6-project") + `</li></ul>`)
-	// go-render-folds: the reader hint for the two render folds (fan + age); the folds
-	// themselves bake into the tab data in graphTabs and toggle in the shared reportJS.
-	b.WriteString(`<p class="meta">Dashed boxes are folds. A fold hides a regular fan, or an iteration older than the last five. Click a box to expand it. Any filter shows the full graph.</p>`)
 	b.WriteString(`<div id="tabbar" class="tabbar"></div>`)
 	b.WriteString(`<div class="legendrow">` + bookLegend +
 		`<input id="trace-filter" placeholder="filter… (click for help)" title="filter the graph" autocomplete="off"><button id="filter-clear" title="clear the filter">&#215;</button></div>`)
@@ -3912,8 +4038,8 @@ func nodeLinkHTML(id string, nodes map[string]Node) string {
 		htmlEscape(label) + `</button>`
 }
 
-// stripLeadingStatement drops a body's opening duplicate of the node statement (the
-// recurring i17 M5 defect): the expand shows only what the row does not already show.
+// stripLeadingStatement drops a body's opening duplicate of the node statement:
+// the expand shows only what the row does not already show.
 func stripLeadingStatement(body, stmt string) string {
 	body = strings.TrimSpace(body)
 	stmt = strings.TrimSpace(stmt)
@@ -3921,6 +4047,57 @@ func stripLeadingStatement(body, stmt string) string {
 		return body
 	}
 	return strings.TrimSpace(body[len(stmt):])
+}
+
+// leadPara peels a markdown body's opening plain-prose paragraph. Anything that is
+// not prose - a heading, a list, a table, code, or markup - yields nothing.
+func leadPara(body string) (para, rest string) {
+	body = strings.TrimSpace(strings.ReplaceAll(body, "\r\n", "\n"))
+	if body == "" {
+		return "", ""
+	}
+	cut := strings.Index(body, "\n\n")
+	if cut < 0 {
+		para, rest = body, ""
+	} else {
+		para, rest = body[:cut], strings.TrimSpace(body[cut+2:])
+	}
+	para = strings.Join(strings.Fields(para), " ")
+	for _, bad := range []string{"#", "- ", "* ", "|", "```", "<", ">", "!"} {
+		if strings.HasPrefix(para, bad) {
+			return "", body
+		}
+	}
+	if strings.ContainsAny(para, "<>[]`{}|") {
+		return "", body // markup or markdown syntax never promotes into a plain cell
+	}
+	return para, rest
+}
+
+// promoteBrief derives a missing row brief from the expand content. The expand's
+// opening paragraph - the statement when the row could not carry it, else the body's
+// lead paragraph - moves whole into the brief when it fits the line; a longer one
+// lends its lead before a dash. A whole-promoted body paragraph leaves the body.
+func promoteBrief(name, head, body string) (brief, outBody string) {
+	const fit = 110
+	if head != "" && head != name {
+		// the expand opens with the too-long statement: its dash lead gives the gist
+		if lead, sub := splitChapterTitle(head); sub != "" && len(lead) <= fit && lead != name {
+			return lead, body
+		}
+		return "", body
+	}
+	para, rest := leadPara(body)
+	if para == "" || para == name {
+		return "", body
+	}
+	if len(para) <= fit {
+		return para, rest
+	}
+	if lead, sub := splitChapterTitle(para); sub != "" && len(lead) <= fit && lead != name {
+		return lead, body
+	}
+	return "", body
 }
 
 // baseResultHTML renders evaluation results: semantic tables (WCAG: real th headers),
@@ -4001,22 +4178,41 @@ func baseResultHTML(rs []BaseResult, nodes map[string]Node, sm map[string]string
 		// "need" facet plus one per small-distinct-value column. The controls below - filter box,
 		// expand/collapse-all, page size, pager - sit right-aligned. Pagination is client-side,
 		// default 20, configurable. Rows keep data-node for trace-graph transport; the script only toggles.
+		// a row landing in SEVERAL groups (a multi-valued groupBy facet) renders ONCE:
+		// the flat reader table shows no group sections, so the duplicate would read
+		// as a defect, not a grouping. The first group's key wins for data-gp.
+		type flatRow struct {
+			row BaseRow
+			gp  string
+		}
+		var frows []flatRow
+		seenRow := map[string]bool{}
+		for _, g := range r.Groups {
+			for _, row := range g.Rows {
+				if row.ID != "" {
+					if seenRow[row.ID] {
+						continue
+					}
+					seenRow[row.ID] = true
+				}
+				frows = append(frows, flatRow{row, g.Key})
+			}
+		}
 		enumCols := []int{}
 		for ci := 1; ci < len(r.Columns); ci++ {
 			distinct := map[string]bool{}
 			enum := true
-			for _, g := range r.Groups {
-				for _, row := range g.Rows {
-					if ci >= len(row.Cells) || row.Cells[ci] == "" {
-						continue
-					}
-					// a URL is never an enum value: it belongs in the expand as a live
-					// link, not in a pill or a column (the references table's url field)
-					if len(row.Cells[ci]) > 24 || strings.HasPrefix(row.Cells[ci], "http://") || strings.HasPrefix(row.Cells[ci], "https://") {
-						enum = false
-					}
-					distinct[row.Cells[ci]] = true
+			for _, fr := range frows {
+				row := fr.row
+				if ci >= len(row.Cells) || row.Cells[ci] == "" {
+					continue
 				}
+				// a URL is never an enum value: it belongs in the expand as a live
+				// link, not in a pill or a column (the references table's url field)
+				if len(row.Cells[ci]) > 24 || strings.HasPrefix(row.Cells[ci], "http://") || strings.HasPrefix(row.Cells[ci], "https://") {
+					enum = false
+				}
+				distinct[row.Cells[ci]] = true
 			}
 			if enum && len(distinct) >= 2 && len(distinct) <= 8 {
 				enumCols = append(enumCols, ci)
@@ -4065,13 +4261,45 @@ func baseResultHTML(rs []BaseResult, nodes map[string]Node, sm map[string]string
 			needMemo[id] = best
 			return best
 		}
-		needCount := map[string]int{}
-		for _, g := range r.Groups {
-			for _, row := range g.Rows {
-				if nd := needOf(row.ID); nd != "" {
-					needCount[nd]++
-				}
+		// rowNeed: an authored Need (a row without a node id, e.g. a function) wins;
+		// every node-backed row resolves through the trace walk.
+		rowNeed := func(row BaseRow) string {
+			if row.Need != "" {
+				return row.Need
 			}
+			return needOf(row.ID)
+		}
+		needCount := map[string]int{}
+		// rowDim: the facet would enumerate the rows themselves (every row IS its
+		// need) - a pill per row is a list, not a filter, so the facet is skipped.
+		rowDim := true
+		for _, fr := range frows {
+			nd := rowNeed(fr.row)
+			if nd != "" {
+				needCount[nd]++
+			}
+			if nd != fr.row.ID {
+				rowDim = false
+			}
+		}
+		// stakeholder rows carry a VIEW pill: a click enters the reader's preset (the
+		// stakeholder's preset link, else its id) into the book filter - the same
+		// delegated data-view machinery the filter help uses.
+		viewTok := map[string]string{}
+		for _, fr := range frows {
+			n, ok := nodes[fr.row.ID]
+			if !ok || n.Type != "stakeholder" {
+				continue
+			}
+			tok := basePropsOf(n.Path).scalars["preset"]
+			if tok == "" {
+				tok = fr.row.ID
+			}
+			viewTok[fr.row.ID] = tok
+		}
+		viewCols := 0
+		if len(viewTok) > 0 {
+			viewCols = 1
 		}
 		tid := "ut" + itoa(figNext())
 		b.WriteString(`<div class="utable" id="` + tid + `">`)
@@ -4082,7 +4310,7 @@ func baseResultHTML(rs []BaseResult, nodes map[string]Node, sm map[string]string
 		// one). A pill facet per column of small distinct value set (the enumCols), plus a universal
 		// "need" facet (every trace item traces up to a need). Cap needs at ~16: beyond that it is
 		// one-per-item, not a filter.
-		if len(needCount) >= 2 && len(needCount) <= 16 {
+		if !rowDim && len(needCount) >= 2 && len(needCount) <= 16 {
 			needs := []string{}
 			for k := range needCount {
 				needs = append(needs, k)
@@ -4098,18 +4326,27 @@ func baseResultHTML(rs []BaseResult, nodes map[string]Node, sm map[string]string
 			vals := []string{}
 			seen := map[string]bool{}
 			cnt := map[string]int{}
-			for _, g := range r.Groups {
-				for _, row := range g.Rows {
-					if ci < len(row.Cells) && row.Cells[ci] != "" {
-						if !seen[row.Cells[ci]] {
-							seen[row.Cells[ci]] = true
-							vals = append(vals, row.Cells[ci])
-						}
-						cnt[row.Cells[ci]]++
+			for _, fr := range frows {
+				row := fr.row
+				if ci < len(row.Cells) && row.Cells[ci] != "" {
+					if !seen[row.Cells[ci]] {
+						seen[row.Cells[ci]] = true
+						vals = append(vals, row.Cells[ci])
 					}
+					cnt[row.Cells[ci]]++
 				}
 			}
 			sortStrings(vals)
+			// every value naming exactly one row is the row dimension again - skip the facet
+			singletons := true
+			for _, v := range vals {
+				if cnt[v] > 1 {
+					singletons = false
+				}
+			}
+			if singletons {
+				continue
+			}
 			b.WriteString(`<div class="upills" data-facet="e` + itoa(ci) + `"><span class="pilllbl">` + htmlEscape(r.Columns[ci]) + `</span><button type="button" class="upill on" data-fv="*">all</button>`)
 			for _, v := range vals {
 				b.WriteString(` <button type="button" class="upill" data-fv="` + htmlEscape(v) + `">` + htmlEscape(v) + ` <span class="meta">(` + itoa(cnt[v]) + `)</span></button>`)
@@ -4123,10 +4360,14 @@ func baseResultHTML(rs []BaseResult, nodes map[string]Node, sm map[string]string
 		for _, ci := range enumCols {
 			b.WriteString(`<th scope="col">` + htmlEscape(r.Columns[ci]) + `</th>`)
 		}
+		if viewCols > 0 {
+			b.WriteString(`<th scope="col">view</th>`)
+		}
 		b.WriteString(`</tr></thead><tbody>`)
 		empty := true
-		for _, g := range r.Groups {
-			for _, row := range g.Rows {
+		for _, fr := range frows {
+			row := fr.row
+			{
 				empty = false
 				name := row.ID
 				if len(row.Cells) > 0 && strings.TrimSpace(row.Cells[0]) != "" {
@@ -4141,8 +4382,8 @@ func baseResultHTML(rs []BaseResult, nodes map[string]Node, sm map[string]string
 				if row.ID != "" {
 					attr += ` data-node="` + htmlEscape(row.ID) + `"`
 				}
-				if g.Key != "" && g.Key != "(none)" {
-					attr += ` data-gp="` + htmlEscape(g.Key) + `"`
+				if fr.gp != "" && fr.gp != "(none)" {
+					attr += ` data-gp="` + htmlEscape(fr.gp) + `"`
 				}
 				var txt strings.Builder
 				for _, c := range row.Cells {
@@ -4155,7 +4396,7 @@ func baseResultHTML(rs []BaseResult, nodes map[string]Node, sm map[string]string
 						attr += ` data-e` + itoa(ci) + `="` + htmlEscape(row.Cells[ci]) + `"`
 					}
 				}
-				attr += ` data-need="` + htmlEscape(needOf(row.ID)) + `"`
+				attr += ` data-need="` + htmlEscape(rowNeed(row)) + `"`
 				// brief: a SHORT one-liner or empty. A description-like column wins (<=110 chars);
 				// else the statement only when it is itself brief (<=110) and differs from the name;
 				// else empty (a long EARS statement is not a brief - it shows in the expand).
@@ -4170,6 +4411,10 @@ func baseResultHTML(rs []BaseResult, nodes map[string]Node, sm map[string]string
 				if brief == "" && row.Head != "" && len(row.Head) <= 110 && row.Head != name {
 					brief = row.Head
 				}
+				bodyTxt := stripLeadingStatement(row.Body, row.Head)
+				if brief == "" {
+					brief, bodyTxt = promoteBrief(name, row.Head, bodyTxt)
+				}
 				tri := ""
 				if expandable {
 					cls += " qt-exp"
@@ -4183,13 +4428,21 @@ func baseResultHTML(rs []BaseResult, nodes map[string]Node, sm map[string]string
 					}
 					b.WriteString(`<td class="uenum">` + htmlEscape(v) + `</td>`)
 				}
+				if viewCols > 0 {
+					pill := ""
+					if tok := viewTok[row.ID]; tok != "" {
+						pill = `<button type="button" class="upill" data-view="` + htmlEscape(tok) + `">view</button>`
+					}
+					b.WriteString(`<td class="uview">` + pill + `</td>`)
+				}
 				b.WriteString(`</tr>`)
 				if expandable {
 					// statement-once: the expand shows ONLY what the
 					// row does not show. The statement renders here exactly when the brief did
 					// not carry it; a cell repeating the statement, the brief, or the name is
-					// skipped; a body that opens by restating the statement loses that prefix.
-					b.WriteString(`<tr class="udetail" hidden><td colspan="` + itoa(2+len(enumCols)) + `">`)
+					// skipped; a body that opens by restating the statement loses that prefix,
+					// and a body paragraph promoted into the brief leaves the body.
+					b.WriteString(`<tr class="udetail" hidden><td colspan="` + itoa(2+len(enumCols)+viewCols) + `">`)
 					if row.Head != "" && row.Head != name && row.Head != brief {
 						b.WriteString(`<p class="stmt">` + htmlEscape(row.Head) + `</p>`)
 					}
@@ -4215,7 +4468,7 @@ func baseResultHTML(rs []BaseResult, nodes map[string]Node, sm map[string]string
 						b.WriteString(`<p class="ufield"><span class="ufl">` + htmlEscape(r.Columns[ci]) + `:</span> ` + htmlEscape(row.Cells[ci]) + `</p>`)
 					}
 					b.WriteString(`<p class="meta">` + htmlEscape(row.ID) + `</p>`)
-					if bodyTxt := stripLeadingStatement(row.Body, row.Head); bodyTxt != "" {
+					if bodyTxt != "" {
 						// item-body headings render compact (base 3: `## x` = h4) - detail
 						// labels inside the expand, never book sections.
 						b.WriteString(`<div data-layer="informative">` + mdLiteAt(bodyTxt, 3) + `</div>`)
@@ -4286,12 +4539,12 @@ func renderBaseFull(r BaseResult) string {
 
 func renderFigure(kind string, nodes map[string]Node) string {
 	if kind == "model" || strings.HasPrefix(kind, "model ") {
-		// structural models in the design output chapter (go-model-render, i16)
+		// structural models in the design output chapter (go-model-render)
 		return renderModelFigure(strings.TrimSpace(strings.TrimPrefix(kind, "model")), nodes)
 	}
 	if kind == "model-kinds" {
 		// one example per supported model kind, derived from the kind registry
-		// (go-models-complete-book, i17)
+		// (go-models-complete-book)
 		return renderModelKindExamples()
 	}
 	switch kind {
@@ -4319,10 +4572,14 @@ func renderFigure(kind string, nodes map[string]Node) string {
 		}
 		sortStrings(ins)
 		sortStrings(outs)
-		return svgContextStar(brand(), ins, outs)
+		// the star is the familiar-but-secondary view: the neighbours table above
+		// carries the detail, so the graphic renders capped, not page-wide
+		return `<div class="ctx-star">` + svgContextStar(brand(), ins, outs) + `</div>`
 		// enddesign
 	case "timeline":
 		return svgTimeline(versions())
+	case "input-register":
+		return renderInputRegister(nodes)
 	case "ucfn-board":
 		return renderUcfnBoard(nodes)
 	case "block-tree":
@@ -4478,7 +4735,10 @@ func renderFigure(kind string, nodes map[string]Node) string {
 			} else {
 				b.WriteString(`<p class="meta">no introduction recorded</p>`)
 			}
-			b.WriteString(`<p class="meta"><a href="#decisions-table">this iteration's decisions — the decisions table, filtered by iteration</a></p>`)
+			// the iteration link SELECTS: it navigates to the one decisions table AND
+			// applies this iteration's facet pill (data-facet/data-fv ride the same
+			// upills machinery; the delegated main handler wires them).
+			b.WriteString(`<p class="meta"><a href="#decisions-table" data-goto="decisions-table" data-facet="diter" data-fv="` + htmlEscape(v) + `">this iteration's decisions — the decisions table, filtered to ` + htmlEscape(v) + `</a></p>`)
 			b.WriteString(`</td></tr>` + "\n")
 		}
 		b.WriteString("</tbody></table></div>\n")
@@ -4550,7 +4810,7 @@ func iterationIntro(v string) string {
 	return ""
 }
 
-// mintedSlug reports whether an id's tail looks auto-minted (the b32 slug quack mint
+// mintedSlug reports whether an id's tail looks auto-minted (the slug quack mint
 // stamps when no --id is given): one dash-free token, never a worded slug.
 func mintedSlug(id string) bool {
 	rest := id
@@ -4587,7 +4847,10 @@ func decisionType(n Node) string {
 
 // decisionIteration derives the iteration a decision belongs to: its own archive
 // home when it was recorded inside one, else the iteration of the candidates it
-// claimed, else "-" (recorded outside any iteration).
+// claimed, else the iteration of the nodes it ADDRESSES (a decision minted into
+// the global decisions folder belongs to the iteration whose inputs it decided;
+// the ledger cannot supply this - decisions are content, never blessed, so no
+// event carries their id), else "-" (nothing places it).
 func decisionIteration(n Node, nodes map[string]Node) string {
 	if rel, err := filepath.Rel(SPEC, n.Path); err == nil {
 		parts := strings.Split(filepath.ToSlash(rel), "/")
@@ -4595,20 +4858,35 @@ func decisionIteration(n Node, nodes map[string]Node) string {
 			return parts[1]
 		}
 	}
-	var iters []string
-	for _, c := range append(append([]string{}, n.Chosen...), n.Rejected...) {
-		if cn, ok := nodes[c]; ok {
-			if rel, err := filepath.Rel(SPEC, cn.Path); err == nil {
-				parts := strings.Split(filepath.ToSlash(rel), "/")
-				if len(parts) > 1 && parts[0] == "iterations" {
-					iters = append(iters, parts[1])
-				}
+	iterOfNode := func(id string) string {
+		cn, ok := nodes[id]
+		if !ok {
+			cn, ok = nodes[subAddrBase(id)]
+		}
+		if !ok {
+			return ""
+		}
+		rel, err := filepath.Rel(SPEC, cn.Path)
+		if err != nil {
+			return ""
+		}
+		parts := strings.Split(filepath.ToSlash(rel), "/")
+		if len(parts) > 1 && parts[0] == "iterations" {
+			return parts[1]
+		}
+		return ""
+	}
+	for _, refs := range [][]string{append(append([]string{}, n.Chosen...), n.Rejected...), n.Addresses} {
+		var iters []string
+		for _, c := range refs {
+			if it := iterOfNode(c); it != "" {
+				iters = append(iters, it)
 			}
 		}
-	}
-	sortStrings(iters)
-	if len(iters) > 0 {
-		return iters[0]
+		sortStrings(iters)
+		if len(iters) > 0 {
+			return iters[0]
+		}
 	}
 	return "-"
 }
@@ -4872,7 +5150,8 @@ func renderGuidesTable(nodes map[string]Node) string {
 		b.WriteString(` <button type="button" class="upill" data-fv="` + htmlEscape(c) + `">` + htmlEscape(c) + ` <span class="meta">(` + itoa(cnt[c]) + `)</span></button>`)
 	}
 	b.WriteString(`</div>`)
-	b.WriteString(`<table class="q-table u-table" data-layer="derived"><thead><tr><th scope="col">guide</th><th scope="col">brief</th><th scope="col">target audience</th></tr></thead><tbody>` + "\n")
+	// the TARGET AUDIENCE leads the row (the owner reads the table by audience first)
+	b.WriteString(`<table class="q-table u-table" data-layer="derived"><thead><tr><th scope="col">target audience</th><th scope="col">guide</th><th scope="col">brief</th></tr></thead><tbody>` + "\n")
 	row := func(id, name, brief, aud, expand string) {
 		exp := expand != ""
 		cls := "urow"
@@ -4881,7 +5160,7 @@ func renderGuidesTable(nodes map[string]Node) string {
 			cls += " qt-exp"
 			tri = `<span class="utri" aria-hidden="true"></span>`
 		}
-		b.WriteString(`<tr class="` + cls + `" id="` + htmlEscape(id) + `" data-node="` + htmlEscape(id) + `" data-aud="` + htmlEscape(aud) + `" data-text="` + attesc(htmlEscape(strings.ToLower(name+" "+brief+" "+aud))) + `"><td>` + tri + htmlEscape(name) + `</td><td class="ubrief">` + htmlEscape(brief) + `</td><td class="uenum">` + htmlEscape(aud) + `</td></tr>` + "\n")
+		b.WriteString(`<tr class="` + cls + `" id="` + htmlEscape(id) + `" data-node="` + htmlEscape(id) + `" data-aud="` + htmlEscape(aud) + `" data-text="` + attesc(htmlEscape(strings.ToLower(name+" "+brief+" "+aud))) + `"><td class="uenum">` + tri + htmlEscape(aud) + `</td><td>` + htmlEscape(name) + `</td><td class="ubrief">` + htmlEscape(brief) + `</td></tr>` + "\n")
 		if exp {
 			b.WriteString(`<tr class="udetail" hidden><td colspan="3">` + expand + `</td></tr>` + "\n")
 		}
@@ -4919,27 +5198,28 @@ func renderGuidesTable(nodes map[string]Node) string {
 
 // design: go-views-home  implements: req-book-shell-nav.3
 // The views home is BOOK CONTENT (`fig: views-home` in the orientation chapter): the
-// reader presets as filter-entry buttons - a click enters `preset:<name>` into the
-// filter expression, a second click clears it - then the derived documents: the deck
-// manifests baked into this same file, compiled from book content only, one row each
-// with its present button. Both tables derive from the manifests; an empty population
-// says so out loud.
+// DOCUMENT OVERVIEW - one line per chapter with its link, derived from the book
+// structure at render time (the same order and numbers the shell uses, never a
+// hand-maintained list) - then the derived documents: the deck manifests baked into
+// this same file, compiled from book content only, one row each with its present
+// button. The reader views moved to the stakeholder rows (a view pill per reader);
+// no preset table renders here. An empty population says so out loud.
 func renderViewsHome(nodes map[string]Node) string {
-	var presets, decks []Node
+	var chapters, decks []Node
 	for _, n := range nodes {
 		if n.Type != "manifest" {
 			continue
 		}
 		switch n.Mode {
-		case "preset":
-			presets = append(presets, n)
+		case "chapter", "guidance":
+			chapters = append(chapters, n)
 		case "deck":
 			decks = append(decks, n)
 		}
 	}
-	for i := 1; i < len(presets); i++ {
-		for j := i; j > 0 && presets[j].ID < presets[j-1].ID; j-- {
-			presets[j], presets[j-1] = presets[j-1], presets[j]
+	for i := 1; i < len(chapters); i++ {
+		for j := i; j > 0 && (chapters[j].Order < chapters[j-1].Order || (chapters[j].Order == chapters[j-1].Order && chapters[j].ID < chapters[j-1].ID)); j-- {
+			chapters[j], chapters[j-1] = chapters[j-1], chapters[j]
 		}
 	}
 	for i := 1; i < len(decks); i++ {
@@ -4949,17 +5229,19 @@ func renderViewsHome(nodes map[string]Node) string {
 	}
 	var b strings.Builder
 	b.WriteString(`<div class="views-home">` + "\n")
-	if len(presets) == 0 {
-		b.WriteString(`<p class="meta">no reader views yet — the view list renders as presets arrive</p>` + "\n")
+	if len(chapters) == 0 {
+		b.WriteString(`<p class="meta">no chapters yet — the overview renders as chapters arrive</p>` + "\n")
 	} else {
-		b.WriteString(`<table class="q-table"><caption>Reader views — click one to narrow this book</caption>` +
-			`<thead><tr><th>view</th><th>shows</th></tr></thead><tbody>` + "\n")
-		for _, p := range presets {
-			b.WriteString(`<tr><td><button type="button" data-view="` + htmlEscape(p.ID) + `">` +
-				htmlEscape(strings.TrimPrefix(p.ID, "man-preset-")) + `</button></td><td>` +
-				htmlEscape(p.Statement) + `</td></tr>` + "\n")
+		b.WriteString(`<ul class="ch-lines">` + "\n")
+		for i, ch := range chapters {
+			short, sub := splitChapterTitle(ch.Statement)
+			b.WriteString(`<li><a href="#` + htmlEscape(ch.ID) + `">` + itoa(i+1) + `. ` + htmlEscape(short) + `</a>`)
+			if sub != "" {
+				b.WriteString(` <span class="meta">— ` + htmlEscape(sub) + `</span>`)
+			}
+			b.WriteString(`</li>` + "\n")
 		}
-		b.WriteString("</tbody></table>\n")
+		b.WriteString("</ul>\n")
 	}
 	if len(decks) == 0 {
 		b.WriteString(`<p class="meta">no derived documents yet — the shipped decks render here as they arrive</p>` + "\n")
@@ -5206,7 +5488,7 @@ func usedContentSlugs(kind, chaptersHTML string) []ContentNote {
 	}
 	sortStrings(slugs)
 	for _, s := range slugs {
-		// usage = an anchor OR an i14 termref affordance (buttons carry data-goto, not href)
+		// usage = an anchor OR a termref affordance (buttons carry data-goto, not href)
 		if strings.Contains(chaptersHTML, `href="#`+s+`"`) || strings.Contains(chaptersHTML, `data-goto="`+s+`"`) {
 			out = append(out, notes[s])
 		}

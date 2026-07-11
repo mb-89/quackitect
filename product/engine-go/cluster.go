@@ -1,7 +1,7 @@
 package main
 
-// cluster.go — the requirement-clustering migration (i0017_pruning b7,
-// adr-cluster-numbered-statements). The TOOL is mechanical; the GROUPING is
+// cluster.go — the requirement-clustering migration
+// (adr-cluster-numbered-statements). The TOOL is mechanical; the GROUPING is
 // judgment, authored per call. One invocation merges named requirement nodes
 // into one cluster node with numbered singular statements; every inbound edge
 // and code marker rewrites to the sub-address; the members' files delete.

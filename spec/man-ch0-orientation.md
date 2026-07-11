@@ -5,33 +5,22 @@ mode: chapter
 order: 0
 statement: Introduction - what this book is and how to read it.
 ---
-## Views
+## Document overview
 <!-- fill [mandatory]
-Contents: the views home - nobody reads all of this book, so the reader narrows it
-  here. The view buttons and the derived documents render from the figure below;
-  this unit only says how they work. The system itself is introduced on the README
-  home page.
-Motivation: a mis-landed reader is served fastest by one place that narrows the
-  document. No method talk - ch8 owns it.
+Contents: what this document IS and why to read it. The chapter lines and the
+  derived documents render from the figure below - one line per chapter, derived
+  from the book structure at render time, never hand-maintained. The system
+  itself is introduced on the README home page.
+Motivation: a mis-landed reader is served fastest by one place that says what
+  this document is and where each question is answered. No method talk - ch8
+  owns it.
 Form: two to four short sentences, then the derived figure.
 Sources: least-qualified-reader rule @[[ref-tech-dok-grundlagen]].
 -->
 <!-- ai:3 -->
-Nobody reads all of this book. Pick a view below and stop when you have enough. A click on a view enters it into the book filter. A second click clears it. The derived documents below the views are presentations compiled from this book. They add no new content. What the system IS lives on the [README](man-readme.md) home page.
+This book is the full specification of quackitect. It holds the needs, the requirements, the design, and the proof, all generated from one trace. Read it when the README is not enough. The chapter lines below say where each question is answered. The derived documents are presentations compiled from this book. They add no new content. What the system IS lives on the [README](man-readme.md) home page.
 ---
 fig: views-home
----
-## Who reads this document
-<!-- tailor: shipped text - the mechanics are the same in every project. Adjust the
-  preset naming if this project's presets differ; the rows derive from the
-  stakeholder notes.
-Sources: who-does-what matrix @[[ref-tech-dok-grundlagen]]; Was-macht-Wer,
-  one PRESET per reader cluster @[[ref-tech-dok]].
--->
-<!-- ai:3 -->
-Find your row below, then open the view preset it names. The preset narrows this document to the chapters that serve your role, at the depth your role needs.
-
-![[stakeholder-matrix.base]]
 ---
 ## How to read this document
 <!-- tailor: shipped text - the reading mechanics are the same in every project.
@@ -55,3 +44,15 @@ Three pointers for later:
 - Deep whys live in [rationales](man-ch8-guidance.md).
 - What was skipped, and why, is in the [tailoring record](man-ch6-project.md).
 - How this document is made - and how to correct it - is in [guidance](man-ch8-guidance.md).
+---
+## Who reads this document
+<!-- tailor: shipped text - the mechanics are the same in every project. The view
+  pill on each row derives from the stakeholder's preset link (else its id); the
+  rows derive from the stakeholder notes.
+Sources: who-does-what matrix @[[ref-tech-dok-grundlagen]]; Was-macht-Wer,
+  one PRESET per reader cluster @[[ref-tech-dok]].
+-->
+<!-- ai:3 -->
+Find your row below. Click the view pill on your row. It narrows this document to the chapters that serve your role. A second click clears it.
+
+![[stakeholder-matrix.base]]

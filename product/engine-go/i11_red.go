@@ -140,7 +140,7 @@ func selftestTestsredExempt() bool {
 			continue // a not-yet-shipped iteration's tests owe their red to ITS OWN tests-red gate, never this sweep
 		}
 		if testDeferred(n, defrd) {
-			continue // deferral carries through EVERY red lister (the i16 law, third site)
+			continue // deferral carries through EVERY red lister
 		}
 		if testsRedExempt(n) {
 			if cited := adrRe.FindString(n.TestsRed); cited == "" || nodes[cited].Type != "adr" {
@@ -171,7 +171,7 @@ func selftestTestsredExempt() bool {
 }
 
 // test-stamp-user -> selftest:stamp-user
-// Fixture-proven BEFORE the real ledger is touched (the L3 spike, adr-actor-user-migration).
+// Fixture-proven BEFORE the real ledger is touched (adr-actor-user-migration).
 func selftestStampUser() bool {
 	if resolveActor(nil, true) != "user" || resolveActor(nil, false) != "agent" {
 		return false // new console records write user; the agent channel stays agent

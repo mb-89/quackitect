@@ -1,6 +1,6 @@
 package main
 
-// qr.go — a hand-rolled QR encoder (i0015_mobile_adapter, req-device-pairing.2). Byte mode,
+// qr.go — a hand-rolled QR encoder (req-device-pairing.2). Byte mode,
 // ECC level L, versions 1..5 (all SINGLE-BLOCK at L, which keeps the codeword layout
 // trivial), fixed mask 0. Zero-dep by law — and by necessity: the encoded payload is
 // the pairing CREDENTIAL, so it must never reach an external encoder. The format-info

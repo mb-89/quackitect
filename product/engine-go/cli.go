@@ -517,8 +517,8 @@ func cmdLint(rest []string) {
 			fmt.Println("  - " + f)
 		}
 	}
-	// book drift (go-book-drift): the committed book equals a fresh render, or it flags.
-	drift := bookDriftFindingAt(committedBookPath(), nodes)
+	// book drift (go-book-drift): every published book copy equals a fresh render, or it flags.
+	drift := bookDriftFindings(nodes)
 	for _, f := range drift {
 		fmt.Println("book: " + f)
 	}

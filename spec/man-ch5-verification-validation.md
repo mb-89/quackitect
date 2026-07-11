@@ -9,9 +9,7 @@ statement: V&V - verification and validation: thing built right, right thing bui
 <!-- tailor: shipped text - the V&V split is the same in every project.
 -->
 <!-- ai:3 -->
-Verification checks the thing was built right - every requirement against its evidence. Validation checks the right thing was built - the outcome against the needs and the success criteria. Both derive from the ledger below; the book can never claim more than the [gate](term:gate) states.
----
-fig: model model-check-states
+Verification checks the thing was built right - every requirement against its evidence. Validation checks the right thing was built - the outcome against the needs and the success criteria. Both derive from the ledger below; the book can never claim more than the [gate](term:gate) states. The check-state lifecycle behind every verdict renders as a model example with the appendix guidance.
 ---
 ## The verdict first
 <!-- tailor: shipped machinery - the exceptions view opens the chapter (the
@@ -33,7 +31,14 @@ Sources: model-first @[[ref-systementwurf-mechatronik]]; the orbit lesson
   @[[ref-se-thinking-learning]].
 -->
 <!-- ai:3 -->
-Each test declares its method (test, analysis, inspection, demonstration) and its level (unit, integration, system, acceptance) - the matrix renders both. Verify on models early: an analytic reference case is the cheapest experiment. Integration-level evidence outweighs paper compliance - written compliance did not stop a receiver failing in orbit.
+Each test declares two fields, and the matrix renders both:
+
+<!-- ai:3 -->
+- its method: test, analysis, inspection, or demonstration
+- its level: unit, integration, system, or acceptance
+
+<!-- ai:3 -->
+Verify on models early: an analytic reference case is the cheapest experiment. Integration-level evidence outweighs paper compliance - written compliance did not stop a receiver failing in orbit.
 ---
 ## The verification matrix
 <!-- tailor: shipped text - the matrix derives; an empty row IS the finding, and it
@@ -49,14 +54,15 @@ Every requirement below stands against its verifying evidence, cumulative across
 ---
 ## Validation
 <!-- fill [mandatory]
-Contents: the right-thing check - against the ch1 needs and the criteria table
-  below, closing the V. Acceptance state derives from the gates, never restated.
+Contents: the right-thing check - against the motivation chapter's needs and the
+  criteria table below, closing the V. Acceptance state derives from the gates,
+  never restated.
 Form: ONE short paragraph saying what the table IS
   (no per-criterion "traces to a demonstrated behavior" prose - a hand-restated
   demonstration is derivable content); the table renders derived.
 -->
 <!-- ai:3 -->
-Validation closes the V: the outcome stands against the needs of chapter 1. The table below carries one row per need; expand a row for its pass lines. Acceptance state derives from the gates - the validation [milestone](term:milestone) carries the adjudication, and this chapter never restates it.
+Validation closes the V: the outcome stands against the needs of the [motivation chapter](man-ch1-motivation.md). The table below carries one row per need; expand a row for its pass lines. Acceptance state derives from the gates - the validation [milestone](term:milestone) carries the adjudication, and this chapter never restates it.
 
 ![[criteria.base]]
 ---

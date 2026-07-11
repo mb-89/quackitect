@@ -299,7 +299,7 @@ func selftestBootstrap() bool {
 }
 
 // selftestCorrectness: lean rigor carries the derived coverage checks that enforce the trace
-// (req-lean-enforces-trace); the two prior correctness invariants still hold (i0004).
+// (req-lean-enforces-trace); the two prior correctness invariants still hold.
 func selftestCorrectness() bool {
 	lc := readFileStr(filepath.Join(EngineDir(), "method", "rigor", "lean", "checklist.md"))
 	for _, r := range []string{"coverage:req-traced", "coverage:req-has-test", "coverage:adr-traced", "coverage:designs-realized"} {
@@ -468,7 +468,7 @@ func selftestReportVerdict() bool {
 		return false
 	}
 	// req-report-check-display.2: a DONE check must surface its verdict from the attestation even with NO doc,
-	// so the JS must render d.verdict (the bless record), not only d.verdict_href. Guards the i6 gap.
+	// so the JS must render d.verdict (the bless record), not only d.verdict_href.
 	if !strings.Contains(reportJS, "d.verdict") {
 		return false
 	}
@@ -674,6 +674,7 @@ func init() {
 		i17Tests,          // i17_red.go
 		i17bTests,         // i17_red2.go
 		i17cTests,         // i17_red3.go
+		i17dTests,         // i17_red4.go
 	)
 }
 

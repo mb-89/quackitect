@@ -1,8 +1,6 @@
 package main
 
-// The i0008 trust-hardening selftest batteries. Authored BEFORE the build
-// (test-first): each was observed RED against the trust.go stubs and recorded
-// via `quack observe-red` on its trace test node.
+// The i0008 trust-hardening selftest batteries.
 
 import (
 	"os"
@@ -38,8 +36,8 @@ func issueWith(issues []ParseIssue, pathPart, keyPart string) bool {
 }
 
 // selftestParserStrict — test-strict-frontmatter: malformed frontmatter or an
-// unknown key is rejected naming file+key; the FULL allowlist (incl. the i7
-// additions) parses clean; a duplicate id is rejected; evidence-style docs
+// unknown key is rejected naming file+key; the FULL allowlist
+// parses clean; a duplicate id is rejected; evidence-style docs
 // (no first-line fence) and breadcrumb iteration.md files are handled.
 func selftestParserStrict() bool {
 	mk := func(files map[string]string) string {
@@ -444,7 +442,7 @@ func selftestEarsLint() bool {
 }
 
 // selftestEarsMethod — test-ears-method: compose-reference.md carries the five
-// EARS shapes and the authoring instruction, with the i7 tests-red and roles
+// EARS shapes and the authoring instruction, with the tests-red and roles
 // content intact (mechanized doc-test).
 func selftestEarsMethod() bool {
 	cr := strings.ToLower(readFileStr(filepath.Join(EngineDir(), "method", "prompts", "compose-reference.md")))
@@ -453,7 +451,7 @@ func selftestEarsMethod() bool {
 			return false
 		}
 	}
-	// the i7 content the block must integrate with, not clobber
+	// the existing content the block must integrate with, not clobber
 	return strings.Contains(cr, "tests-red") && strings.Contains(cr, "roles")
 }
 

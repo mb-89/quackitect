@@ -32858,5 +32858,388 @@
       "i17-m3-gate": "eb4791d97bec"
     },
     "prev_hash": "03bdad6a41bc"
+  },
+  {
+    "check": "i17-b1-red-suite",
+    "action": "bless",
+    "actor": "agent",
+    "filled_by": "agent",
+    "ts": "2026-07-11T11:50:29+01:00",
+    "hash": "f48c8bb8344a",
+    "statement_hash": "0a4e0d294364",
+    "deps": {
+      "i17-m3-gate": "eb4791d97bec"
+    },
+    "prev_hash": "f48c8bb8344a"
+  },
+  {
+    "check": "i17-b10-mint-templates",
+    "action": "bless",
+    "actor": "agent",
+    "filled_by": "agent",
+    "ts": "2026-07-11T11:50:30+01:00",
+    "hash": "cc05d500fbc2",
+    "statement_hash": "ff9c51715174",
+    "deps": {
+      "i17-b1-red-suite": "f48c8bb8344a"
+    },
+    "prev_hash": "cc05d500fbc2"
+  },
+  {
+    "check": "i17-b11-test-clustering",
+    "action": "bless",
+    "actor": "agent",
+    "filled_by": "agent",
+    "ts": "2026-07-11T11:50:30+01:00",
+    "hash": "7bab57b4131f",
+    "statement_hash": "c177f7480e73",
+    "deps": {
+      "i17-b7-cluster-migration": "8fe82df7c3da"
+    },
+    "prev_hash": "7bab57b4131f"
+  },
+  {
+    "check": "i17-b12-perf",
+    "action": "bless",
+    "actor": "agent",
+    "filled_by": "agent",
+    "ts": "2026-07-11T11:50:30+01:00",
+    "hash": "3fe4ff882494",
+    "statement_hash": "bfdba382d4a9",
+    "deps": {
+      "i17-b11-test-clustering": "7bab57b4131f"
+    },
+    "prev_hash": "3fe4ff882494"
+  },
+  {
+    "check": "i17-b13-perf-slice",
+    "action": "bless",
+    "actor": "agent",
+    "filled_by": "agent",
+    "ts": "2026-07-11T11:50:31+01:00",
+    "hash": "9a7ab86517cf",
+    "statement_hash": "f35b27006e81",
+    "deps": {
+      "i17-b12-perf": "3fe4ff882494"
+    },
+    "prev_hash": "9a7ab86517cf"
+  },
+  {
+    "check": "i17-b14-compact-run",
+    "action": "bless",
+    "actor": "agent",
+    "filled_by": "agent",
+    "ts": "2026-07-11T11:50:31+01:00",
+    "hash": "6ebf5ab2e2e7",
+    "statement_hash": "5c016ea2b8b7",
+    "deps": {
+      "i17-b13-perf-slice": "9a7ab86517cf"
+    },
+    "prev_hash": "6ebf5ab2e2e7"
+  },
+  {
+    "check": "i17-b15-ask-hardening",
+    "action": "bless",
+    "actor": "agent",
+    "filled_by": "agent",
+    "ts": "2026-07-11T11:50:31+01:00",
+    "hash": "0eb5436086c5",
+    "statement_hash": "dc8f4c8f351d",
+    "deps": {
+      "i17-b12-perf": "3fe4ff882494"
+    },
+    "prev_hash": "0eb5436086c5"
+  },
+  {
+    "check": "i17-b16-cone-triage",
+    "action": "bless",
+    "actor": "agent",
+    "filled_by": "agent",
+    "ts": "2026-07-11T11:50:31+01:00",
+    "hash": "19baa28f11c4",
+    "statement_hash": "51ad566f9e9f",
+    "deps": {
+      "i17-b15-ask-hardening": "0eb5436086c5"
+    },
+    "prev_hash": "19baa28f11c4"
+  },
+  {
+    "check": "i17-b17-question-nodes",
+    "action": "bless",
+    "actor": "agent",
+    "filled_by": "agent",
+    "ts": "2026-07-11T11:50:32+01:00",
+    "hash": "3f8474a5e318",
+    "statement_hash": "4bb98218764d",
+    "deps": {
+      "i17-b12-perf": "3fe4ff882494"
+    },
+    "prev_hash": "3f8474a5e318"
+  },
+  {
+    "check": "i17-b18-expedition",
+    "action": "bless",
+    "actor": "agent",
+    "filled_by": "agent",
+    "ts": "2026-07-11T11:50:32+01:00",
+    "hash": "2fa644a6d733",
+    "statement_hash": "91c7675fef62",
+    "deps": {
+      "i17-b17-question-nodes": "3f8474a5e318"
+    },
+    "prev_hash": "2fa644a6d733"
+  },
+  {
+    "check": "i17-b19-models-book",
+    "action": "bless",
+    "actor": "agent",
+    "filled_by": "agent",
+    "ts": "2026-07-11T11:50:32+01:00",
+    "hash": "7aebf447ae35",
+    "statement_hash": "2f71736614df",
+    "deps": {
+      "i17-b13-perf-slice": "9a7ab86517cf"
+    },
+    "prev_hash": "7aebf447ae35"
+  },
+  {
+    "check": "i17-b2-ask-context",
+    "action": "bless",
+    "actor": "agent",
+    "filled_by": "agent",
+    "ts": "2026-07-11T11:50:33+01:00",
+    "hash": "8d0ce207851c",
+    "statement_hash": "091a6e2b201f",
+    "deps": {
+      "i17-b1-red-suite": "f48c8bb8344a"
+    },
+    "prev_hash": "8d0ce207851c"
+  },
+  {
+    "check": "i17-b20-selftest-registry",
+    "action": "bless",
+    "actor": "agent",
+    "filled_by": "agent",
+    "ts": "2026-07-11T11:50:33+01:00",
+    "hash": "0f9b61b5a97f",
+    "statement_hash": "c0f97a6ef1f3",
+    "deps": {
+      "i17-b13-perf-slice": "9a7ab86517cf"
+    },
+    "prev_hash": "0f9b61b5a97f"
+  },
+  {
+    "check": "i17-b21-apply",
+    "action": "bless",
+    "actor": "agent",
+    "filled_by": "agent",
+    "ts": "2026-07-11T11:50:33+01:00",
+    "hash": "5507092f25b5",
+    "statement_hash": "083f626c0c28",
+    "deps": {
+      "i17-b14-compact-run": "6ebf5ab2e2e7"
+    },
+    "prev_hash": "5507092f25b5"
+  },
+  {
+    "check": "i17-b3-metrics-removal",
+    "action": "bless",
+    "actor": "agent",
+    "filled_by": "agent",
+    "ts": "2026-07-11T11:50:34+01:00",
+    "hash": "e06318c60bd8",
+    "statement_hash": "f67a4631afdd",
+    "deps": {
+      "i17-b1-red-suite": "f48c8bb8344a"
+    },
+    "prev_hash": "e06318c60bd8"
+  },
+  {
+    "check": "i17-b4-rules-as-config",
+    "action": "bless",
+    "actor": "agent",
+    "filled_by": "agent",
+    "ts": "2026-07-11T11:50:34+01:00",
+    "hash": "c02611c9f991",
+    "statement_hash": "10c8961f796d",
+    "deps": {
+      "i17-b1-red-suite": "f48c8bb8344a"
+    },
+    "prev_hash": "c02611c9f991"
+  },
+  {
+    "check": "i17-b5-go-analysis",
+    "action": "bless",
+    "actor": "agent",
+    "filled_by": "agent",
+    "ts": "2026-07-11T11:50:34+01:00",
+    "hash": "db3d34a33a27",
+    "statement_hash": "c7f066019de9",
+    "deps": {
+      "i17-b1-red-suite": "f48c8bb8344a"
+    },
+    "prev_hash": "db3d34a33a27"
+  },
+  {
+    "check": "i17-b6-sub-addressing",
+    "action": "bless",
+    "actor": "agent",
+    "filled_by": "agent",
+    "ts": "2026-07-11T11:50:35+01:00",
+    "hash": "51c96d981cbd",
+    "statement_hash": "5ef90a5df9b0",
+    "deps": {
+      "i17-b1-red-suite": "f48c8bb8344a"
+    },
+    "prev_hash": "51c96d981cbd"
+  },
+  {
+    "check": "i17-b7-cluster-migration",
+    "action": "bless",
+    "actor": "agent",
+    "filled_by": "agent",
+    "ts": "2026-07-11T11:50:35+01:00",
+    "hash": "8fe82df7c3da",
+    "statement_hash": "61959813d60d",
+    "deps": {
+      "i17-b6-sub-addressing": "51c96d981cbd"
+    },
+    "prev_hash": "8fe82df7c3da"
+  },
+  {
+    "check": "i17-b8-render-folds",
+    "action": "bless",
+    "actor": "agent",
+    "filled_by": "agent",
+    "ts": "2026-07-11T11:50:35+01:00",
+    "hash": "185571dbfe35",
+    "statement_hash": "4ca726788c94",
+    "deps": {
+      "i17-b1-red-suite": "f48c8bb8344a"
+    },
+    "prev_hash": "185571dbfe35"
+  },
+  {
+    "check": "i17-b9-compaction",
+    "action": "bless",
+    "actor": "agent",
+    "filled_by": "agent",
+    "ts": "2026-07-11T11:50:35+01:00",
+    "hash": "4d471d9f7809",
+    "statement_hash": "68090198f9b9",
+    "deps": {
+      "i17-b1-red-suite": "f48c8bb8344a"
+    },
+    "prev_hash": "4d471d9f7809"
+  },
+  {
+    "check": "i17-m4-build",
+    "action": "bless",
+    "actor": "agent",
+    "filled_by": "agent",
+    "ts": "2026-07-11T11:50:36+01:00",
+    "hash": "372ce74953f5",
+    "statement_hash": "aaa0e05c0150",
+    "deps": {
+      "i17-m3-gate": "eb4791d97bec"
+    },
+    "prev_hash": "372ce74953f5"
+  },
+  {
+    "check": "i17-m4-quality",
+    "action": "bless",
+    "actor": "agent",
+    "filled_by": "agent",
+    "ts": "2026-07-11T11:50:36+01:00",
+    "hash": "154001b29875",
+    "statement_hash": "f8b4cd629797",
+    "deps": {
+      "i17-m3-gate": "eb4791d97bec"
+    },
+    "prev_hash": "154001b29875"
+  },
+  {
+    "check": "i17-m5-packaged",
+    "action": "bless",
+    "actor": "agent",
+    "filled_by": "agent",
+    "ts": "2026-07-11T11:50:36+01:00",
+    "hash": "8639466a5fad",
+    "statement_hash": "eb3271dbc897",
+    "deps": {
+      "i17-m4-gate": "af1d4d9486d6"
+    },
+    "prev_hash": "123eeff8602e"
+  },
+  {
+    "check": "i17-b1-red-suite",
+    "action": "bless",
+    "actor": "agent",
+    "filled_by": "agent",
+    "ts": "2026-07-11T11:51:34+01:00",
+    "hash": "f48c8bb8344a",
+    "statement_hash": "0a4e0d294364",
+    "deps": {
+      "i17-m3-gate": "eb4791d97bec"
+    },
+    "prev_hash": "f48c8bb8344a"
+  },
+  {
+    "check": "i17-m3-gate",
+    "action": "bless",
+    "actor": "user",
+    "filled_by": "agent",
+    "ts": "2026-07-11T15:22:26+01:00",
+    "hash": "eb4791d97bec",
+    "statement_hash": "e46f3d2d3952",
+    "deps": {
+      "i17-m3-adr": "a76e7c9e457b",
+      "i17-m3-approach": "946a2907303c"
+    },
+    "prev_hash": "3b3b74996e5d"
+  },
+  {
+    "check": "i17-m4-gate",
+    "action": "bless",
+    "actor": "user",
+    "filled_by": "agent",
+    "ts": "2026-07-11T15:22:27+01:00",
+    "hash": "af1d4d9486d6",
+    "statement_hash": "85f912375460",
+    "deps": {
+      "i17-m4-build": "372ce74953f5",
+      "i17-m4-designs": "0c512a6db186",
+      "i17-m4-quality": "154001b29875",
+      "i17-m4-red": "b490eeb0277d",
+      "i17-m4-tests-pass": "1930841f9307"
+    },
+    "prev_hash": "484c8156a7a7"
+  },
+  {
+    "check": "i17-m5-docs",
+    "action": "bless",
+    "actor": "user",
+    "filled_by": "agent",
+    "ts": "2026-07-11T15:25:21+01:00",
+    "hash": "7793ce0cb2eb",
+    "statement_hash": "28eb5800685d",
+    "deps": {
+      "i17-m4-gate": "af1d4d9486d6"
+    },
+    "prev_hash": "be8e29840616"
+  },
+  {
+    "check": "i17-m5-gate",
+    "action": "bless",
+    "actor": "user",
+    "filled_by": "agent",
+    "ts": "2026-07-11T15:25:21+01:00",
+    "hash": "a948c340951b",
+    "statement_hash": "f94e4173d6ec",
+    "deps": {
+      "i17-m5-docs": "7793ce0cb2eb",
+      "i17-m5-packaged": "8639466a5fad"
+    },
+    "prev_hash": "1c09582e690a"
   }
 ]

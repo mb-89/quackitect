@@ -1,8 +1,6 @@
 package main
 
-// i9_red.go — the i0009 selftest probes (authored test-first at bs-runners; every probe was
-// observed RED against a not-built stub API before its feature landed, then the stubs dissolved
-// step by step — bs-cleanup removed the last). Stateful attest probes point attestStateOverride
+// i9_red.go — the i0009 selftest probes. Stateful attest probes point attestStateOverride
 // at a temp dir so they stay hermetic.
 
 import (
@@ -97,7 +95,7 @@ func selftestAttestChallenge() bool {
 	if !attestAnswerOK(c, ans) || attestAnswerOK(c, ans+"x") {
 		return false
 	}
-	hasLetter := false // M5 finding: only letter-bearing words are askable
+	hasLetter := false // only letter-bearing words are askable
 	for _, r := range ans {
 		if unicode.IsLetter(r) {
 			hasLetter = true
@@ -437,7 +435,7 @@ func selftestReportFilterUX() bool {
 func selftestVVTimeScope() bool {
 	nodes := LoadAll()
 	// the probe rides a surviving i0008 test (test-strict-frontmatter merged into
-	// test-structural-strictness at the i17 clustering)
+	// test-structural-strictness)
 	if iterationOf("test-structural-strictness", nodes) != "i0008_trust_hardening" {
 		return false
 	}

@@ -1,9 +1,7 @@
 package main
 
-// i0008 trust-hardening surface. Authored as stubs first (test-first walk):
-// the selftest_trust.go runners were observed RED against the stubs
-// (coverage:tests-red), then each function is implemented to green in its M6
-// build step, where its design: marker lands.
+// trust.go — the trust-hardening surface: strict graph load, region hashing,
+// actor resolution, and the lint gates. The selftest_trust.go runners verify it.
 
 import (
 	"fmt"
@@ -29,7 +27,7 @@ func normWS(s string) string { return strings.TrimSpace(wsRe.ReplaceAllString(s,
 // design: go-strict-load  implements: req-structural-strictness.1, req-structural-strictness.2
 // Strictness at EVERY graph load (adr-strict-load). A first-line '---' fence marks a node candidate
 // (evidence docs' mid-document hrules are excluded naturally); iteration.md is its own breadcrumb
-// key class. Malformed lines, keys outside the complete allowlist (incl. the i7 additions), duplicate
+// key class. Malformed lines, keys outside the complete allowlist, duplicate
 // ids, unterminated fences, and dangling references — every declared edge field, checked against the
 // full recognized id set, both directions of the trace — are collected as BATCHED issues naming file
 // and key. LoadAll refuses the graph with nonzero exit rather than compute a silently-shrunk suspect
@@ -267,8 +265,8 @@ func StrictIssues(specDir string) []ParseIssue {
 	}
 	// design: go-conn-code-endpoints  implements: req-connections-code.1
 	// Connection endpoints resolve against code-derived designs too: ch4's interface story
-	// (an interface between two design elements) was impossible on a software project while
-	// the guard knew only spec-file ids (the i12 dogfood gap).
+	// (an interface between two design elements) is impossible on a software project while
+	// the guard knows only spec-file ids.
 	for id, n := range scanCodeDesigns() {
 		if _, dup := ids[id]; !dup {
 			ids[id] = n.Path

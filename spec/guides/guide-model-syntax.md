@@ -88,7 +88,7 @@ sequenceDiagram
 
 - COSMETIC (hash unchanged, nothing goes SUSPECT): comments, whitespace, reordering element lines WITHIN a layer, reordering flow lines.
 - SEMANTIC (hash moves, dependents ripple): adding or removing an element or flow, renaming an id, changing a payload label or a responsibility, changing the LAYER ORDER.
-- Proven in the i16 M5 spike: the cosmetic variant hashed bit-identical; one added flow moved it.
+- Proven live: the cosmetic variant hashed bit-identical; one added flow moved it.
 
 ## Practical notes
 

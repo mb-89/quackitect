@@ -774,6 +774,7 @@ type BaseRow struct {
 	Facets []string // f-<facet>-<value> classes for the board's CSS filter (go-facet-board)
 	Head   string   // full render: the section headline (statement, else title, else id)
 	Body   string   // full render: the note body markdown
+	Need   string   // authored need for a row without a node id (a derived function row); node-backed rows resolve through the trace
 }
 
 type BaseGroup struct {

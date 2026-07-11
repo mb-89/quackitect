@@ -130,16 +130,4 @@ func selftestRenderOnce() bool {
 	return sites <= 1 // the battery pays for at most one real render (the shared memo)
 }
 
-// ---- build API surface (stubs, replaced at the green steps) ----
-
-// built: bookOnceHTML, THE one shared real-book memo every doc test uses
-// (book_once.go).
-
-// built: question-node state and decision provenance accessors
-// (question.go, design go-question-nodes).
-
-// built: the suspect-only wave filter and the triage command wiring
-// (triage.go, design go-cone-triage).
-
-// built: ask-store merge-on-save, stale-answer refusal, await per-loop reload
-// (ask_ops.go, design go-ask-hardening).
+// ---- build API surface: the stubs dissolved; the surface lives in its feature files ----

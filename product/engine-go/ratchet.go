@@ -62,8 +62,8 @@ func ratchetDecision(srcDir, exe string) bool {
 // enddesign
 
 // replaceExe swaps target with staged via the rename dance; the parked .old stays for a later sweep.
-// Retried briefly: a freshly-written binary is often held for a moment by AV scanning (seen live at
-// i9 M6); a persistent failure falls back to build-next-launch (the M4 kill-criterion's fallback) —
+// Retried briefly: a freshly-written binary is often held for a moment by AV scanning (seen
+// live); a persistent failure falls back to build-next-launch —
 // callers leave .staged in place and ratchetMaybe adopts it on the next start.
 func replaceExe(target, staged string) error {
 	var err error

@@ -8,7 +8,7 @@ import (
 )
 
 // design: go-compact-cmd  implements: req-iterations-compacted
-// The CLI verb for the b9 compactor: `quack compact <iteration>` folds ONE shipped
+// The CLI verb for the compactor: `quack compact <iteration>` folds ONE shipped
 // iteration into its archive.md (compactIteration does the work and enforces the
 // refusals). The ACTIVE iteration is refused outright — only shipped history
 // compacts. Ledger truth is untouched by construction (verbatim payloads), so the
