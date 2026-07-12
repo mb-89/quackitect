@@ -1,7 +1,6 @@
 ---
 id: why-ex-partitioning-force
 type: rationale
-refers: [man-ch4-design-output#partitioning-and-interfaces]
 tags: [partitioning-force]
 statement: EXAMPLE - the demo force that shaped the first cut; delete me when a real partitioning force lands.
 class: review

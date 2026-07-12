@@ -395,7 +395,7 @@ func svgModelGraph(g modelGraph) string {
 	if len(g.Layers) > 1 {
 		// ranked model: concentric rings, innermost first
 		cx, cy, gap := 400.0, 400.0, 320.0/float64(len(g.Layers))
-		b.WriteString(`<svg viewBox="0 0 800 800" role="img" style="max-width:640px">`)
+		b.WriteString(`<svg viewBox="0 0 800 800" role="img" aria-label="structural model: ` + itoa(len(g.Layers)) + ` layers, ` + itoa(len(ids)) + ` elements" style="max-width:640px">`)
 		for i := len(g.Layers) - 1; i >= 0; i-- {
 			r := gap * float64(i+1) * 1.15
 			b.WriteString(fmt.Sprintf(`<circle cx="%.0f" cy="%.0f" r="%.0f" fill="hsl(%d,40%%,%d%%)" stroke="#b8a888"/>`, cx, cy, r, 40+i*22, 92-i*4))
@@ -419,7 +419,7 @@ func svgModelGraph(g modelGraph) string {
 		}
 	} else {
 		// flat model (tree, state, sequence): a labeled column
-		b.WriteString(fmt.Sprintf(`<svg viewBox="0 0 800 %d" role="img" style="max-width:640px">`, 80+70*len(ids)))
+		b.WriteString(fmt.Sprintf(`<svg viewBox="0 0 800 %d" role="img" aria-label="structural model: %d elements" style="max-width:640px">`, 80+70*len(ids), len(ids)))
 		for i, id := range ids {
 			pos[id] = [2]float64{400, float64(60 + 70*i)}
 		}
@@ -477,12 +477,14 @@ func modelDeclaredElements(nodes map[string]Node) map[string]bool {
 }
 
 // addressFirstClass reports whether an addresses target traces first-class: a requirement, a
-// use-case, a need, a model node, or a declared model element. The coverage rules use it so a
-// decision informing an element is credited exactly like one addressing a requirement.
+// use-case, a need, a model node, a question, or a declared model element. The coverage rules use
+// it so a decision informing an element is credited exactly like one addressing a requirement.
+// question: a defer/decide decision legitimately addresses the question it rules on — the
+// engine's own `mint defer --of q-…` wires exactly that edge (found live at i19 M4).
 func addressFirstClass(id string, nodes map[string]Node, elems map[string]bool) bool {
 	if n, ok := nodes[id]; ok {
 		switch n.Type {
-		case "requirement", "usecase", "need", "model":
+		case "requirement", "usecase", "need", "model", "question":
 			return true
 		}
 	}

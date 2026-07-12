@@ -3,13 +3,18 @@
 The cheatsheet so you never re-derive formats by reading example files. Load this at
 `engage start` step 5 (plan & bake). All facts here are load-bearing.
 
-## Trace edge model (semantic direction)
-- use-case  `refines: [need-…]`
-- requirement  `refines: [uc-…]`  (optional `depends_on: [req-…]`)
+## Trace edge model (semantic direction) — CONNECTIONS MODE
+Edges live in `spec/connections/<kind>/edges.jsonl`, one `{"src":"<id>","dst":"<id>"}` line per
+edge (one line per dst for a multi-target relation). Frontmatter edge keys (`refines:`,
+`verifies:`, `addresses:` in the node file) are the LEGACY lane — the strict parser REFUSES them
+in connections mode (go-edge-mode). `depends_on:` stays frontmatter (it is wiring, not a
+semantic edge). The directions:
+- use-case  refines → need  (`spec/connections/refines/edges.jsonl`)
+- requirement  refines → use-case  (optional frontmatter `depends_on: [req-…]`)
 - design — **inline in code, never a .md** — `// design: <id>  implements: <req-id>` … `// enddesign`
   (engine scans product/ `.go`/`.py`/`.md`; the marked region's hash folds into the design node)
-- test  `verifies: [req-…]`
-- ADR  `addresses: [req-…]`
+- test  verifies → requirement (or `req-….<n>` for a numbered statement)  (`verifies/edges.jsonl`)
+- ADR  addresses → requirement | use-case | need | model | declared element  (`addresses/edges.jsonl`)
 
 Derived coverage rules (used as `verify: coverage:<rule>` on executed subtasks):
 `req-traced`, `req-has-test`, `req-has-design`, `adr-traced`, `designs-realized`, `tests-pass`, `tests-red`.

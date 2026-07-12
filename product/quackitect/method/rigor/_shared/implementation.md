@@ -19,6 +19,14 @@ resolved at seed from the project type + iteration overrides; the default bindin
 4. **GREEN** — «implementer» builds to the tests + requirements, emitting inline `# design:` markers,
    until the suite passes. Tidy-while-green here; a design-level refactor → `engage refine`.
 
+**Verify targeted while building, fully at the hand-back (owner law, 2026-07-12).** Mid-build,
+run ONLY the selftest(s) the change in hand touches (plus the build for the hash re-baseline).
+The FULL battery runs at exactly two places: once at a build slot's END as its hand-back
+verification, and at the verification gate — never between edits. Re-running everything after
+every change is the over-checking failure mode the walk warns against; the derived checks
+compute live and catch regressions at the gate where verification belongs. This binds
+DELEGATED build agents the same as the driving agent — a subagent's brief inherits it.
+
 **Acceptance** (systematic seeds each as a sub-gate; lean collapses to ONE review gate + the derived checks):
 - [ ] tests authored & executable — every requirement has a runnable test *(derived: coverage:req-has-test)*
 - [ ] build planned — small resumable steps under the build task *(killer)*

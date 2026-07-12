@@ -1,0 +1,94 @@
+<title>Pong</title>
+<style>
+  body { margin:0; background:#111; color:#eee; font-family:system-ui,sans-serif;
+         display:flex; flex-direction:column; align-items:center; gap:12px; padding:16px; }
+  #court { background:#000; border:2px solid #444; max-width:100%; display:none; }
+  #start { font-size:1.2rem; padding:10px 28px; cursor:pointer; border-radius:6px;
+           border:1px solid #666; background:#222; color:#eee; }
+  #msg { min-height:1.4em; }
+</style>
+<h1>Pong</h1>
+<p id="msg">First to 5 wins. W/S or the arrow keys move the left paddle.</p>
+<button id="start" onclick="startPong()">Start</button>
+<canvas id="court" width="800" height="500"></canvas>
+<script>
+// Lazy init: nothing below runs until the Start button is clicked.
+function startPong() {
+  var canvas = document.getElementById('court');
+  var msg = document.getElementById('msg');
+  var btn = document.getElementById('start');
+  var ctx = canvas.getContext('2d');
+  var W = canvas.width, H = canvas.height;
+  var PW = 12, PH = 90, R = 8, WIN = 5;
+  var keys = {};
+  var state;
+
+  function reset(dir) {
+    return { bx: W/2, by: H/2, vx: 5*dir, vy: 3*(Math.random()*2-1),
+             ly: state ? state.ly : (H-PH)/2, ry: state ? state.ry : (H-PH)/2,
+             ls: state ? state.ls : 0, rs: state ? state.rs : 0, over: false };
+  }
+
+  function step() {
+    // left paddle: player keys
+    if (keys['w'] || keys['ArrowUp'])   state.ly -= 7;
+    if (keys['s'] || keys['ArrowDown']) state.ly += 7;
+    state.ly = Math.max(0, Math.min(H-PH, state.ly));
+    // right paddle: simple AI follows the ball
+    var target = state.by - PH/2;
+    state.ry += Math.max(-5, Math.min(5, target - state.ry));
+    state.ry = Math.max(0, Math.min(H-PH, state.ry));
+    // ball
+    state.bx += state.vx; state.by += state.vy;
+    if (state.by < R)   { state.by = R;   state.vy = -state.vy; }
+    if (state.by > H-R) { state.by = H-R; state.vy = -state.vy; }
+    // paddle bounces (angle depends on where the ball hits the paddle)
+    if (state.vx < 0 && state.bx-R < PW && state.by > state.ly && state.by < state.ly+PH) {
+      state.bx = PW+R; state.vx = -state.vx*1.03;
+      state.vy += (state.by-(state.ly+PH/2))/12;
+    }
+    if (state.vx > 0 && state.bx+R > W-PW && state.by > state.ry && state.by < state.ry+PH) {
+      state.bx = W-PW-R; state.vx = -state.vx*1.03;
+      state.vy += (state.by-(state.ry+PH/2))/12;
+    }
+    // score
+    if (state.bx < -R)  { state.rs++; endRally(-1); }
+    if (state.bx > W+R) { state.ls++; endRally(1); }
+  }
+
+  function endRally(dir) {
+    if (state.ls >= WIN || state.rs >= WIN) {
+      state.over = true;
+      msg.textContent = (state.ls > state.rs ? 'You win!' : 'Computer wins!');
+      btn.textContent = 'Restart'; btn.style.display = '';
+    } else {
+      var keep = state; state = reset(dir); state.ls = keep.ls; state.rs = keep.rs;
+    }
+  }
+
+  function draw() {
+    ctx.fillStyle = '#000'; ctx.fillRect(0, 0, W, H);
+    ctx.strokeStyle = '#333'; ctx.setLineDash([8, 12]);
+    ctx.beginPath(); ctx.moveTo(W/2, 0); ctx.lineTo(W/2, H); ctx.stroke(); ctx.setLineDash([]);
+    ctx.fillStyle = '#eee';
+    ctx.fillRect(0, state.ly, PW, PH);
+    ctx.fillRect(W-PW, state.ry, PW, PH);
+    ctx.beginPath(); ctx.arc(state.bx, state.by, R, 0, 7); ctx.fill();
+    ctx.font = '40px monospace'; ctx.textAlign = 'center';
+    ctx.fillText(state.ls, W/2-60, 50); ctx.fillText(state.rs, W/2+60, 50);
+  }
+
+  function loop() {
+    if (!state.over) { step(); draw(); requestAnimationFrame(loop); }
+  }
+
+  document.addEventListener('keydown', function(e){ keys[e.key] = true; });
+  document.addEventListener('keyup',   function(e){ keys[e.key] = false; });
+  canvas.style.display = 'block';
+  btn.style.display = 'none';
+  msg.textContent = 'First to 5 wins.';
+  state = null; state = reset(1); state.ls = 0; state.rs = 0;
+  draw();
+  requestAnimationFrame(loop);
+}
+</script>

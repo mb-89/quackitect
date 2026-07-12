@@ -1,6 +1,8 @@
 ---
 iteration: i0019_strangers_book
-status: planned
+status: active
+type: default
+rigor: systematic
 ---
 
-The book survives first contact: the red-team findings, the real user guide, the Pong walkthrough, and the presentations round. Carries q-trace-graph-scaling: the trace-graph clarity-at-scale design discussion (expedition with rendered mockups before any rebuild - the fan-fold attempt is retired).
+The book survives first contact: ch 2.2 onboarding + the five-minutes-to-Pong deck (deep-linkable), the discoverability triangle, RUNME as pure install+orientation, the load-bearing-terms lint, the white-label vehicle book, and a clean lint baseline. Carries q-trace-graph-scaling.

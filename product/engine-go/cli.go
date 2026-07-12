@@ -576,7 +576,8 @@ func cmdLint(rest []string) {
 		}
 	}
 	// meta quarantine (go-book-glossary): meta vocabulary stays out of the reader chapters.
-	metaQ := metaQuarantineFindings(nodes, readGlossary())
+	gloss := readGlossary() // ONE glossary source for every term lane (adr-terms-source-glossary)
+	metaQ := metaQuarantineFindings(nodes, gloss)
 	if len(metaQ) > 0 {
 		fmt.Printf("book: %d meta-quarantine finding(s):\n", len(metaQ))
 		for _, f := range metaQ {
@@ -611,9 +612,18 @@ func cmdLint(rest []string) {
 			fmt.Println("spec: " + f)
 		}
 	}
+	// terms before use (go-terms-order-lint): ADVISORY — reading order is judgment; the
+	// lane's blocking contribution is pinned zero (termOrderBlocking), it never blocks.
+	tof := termOrderFindings(nodes, gloss)
+	if len(tof) > 0 {
+		fmt.Printf("terms: %d before-use finding(s) (advisory):\n", len(tof))
+		for _, f := range tof {
+			fmt.Println("  - " + f)
+		}
+	}
 	// the BLOCKING set (the three-code contract, go-lint-exit): structural findings that must not
 	// ship. Advisories — coverage holes, adoption advisories, model/field/schema notes — stay exit 0.
 	blocking := len(dups) + earsBad + len(qf) + len(mono) + len(placement) + len(orphans) +
-		len(metaQ) + len(drift) + len(external) + len(residue) + len(anchors)
+		len(metaQ) + len(drift) + len(external) + len(residue) + len(anchors) + termOrderBlocking(tof)
 	quackExit(lintExitCode(false, blocking))
 }

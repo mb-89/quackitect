@@ -103,6 +103,9 @@ func proseUnitsMarked(body string) bool {
 		if baseEmbedRe.MatchString(t) && strings.TrimSpace(baseEmbedRe.ReplaceAllString(t, "")) == "" {
 			continue // a pooled-query embed renders as a derived table, never prose
 		}
+		if t == "|||" || figRefRe.MatchString(t) {
+			continue // deck column markers and figure references render derived content, never prose
+		}
 		if !marked {
 			return false // a prose paragraph with no mark above it
 		}

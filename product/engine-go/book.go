@@ -12,6 +12,7 @@ import (
 	"path/filepath"
 	"regexp"
 	"sort"
+	"strconv"
 	"strings"
 )
 
@@ -24,10 +25,11 @@ import (
 // every book-content node (need, usecase, requirement, adr) must be referenced by SOME manifest -
 // an exclude-mode manifest is the explicit exclusion record, referenced-but-not-rendered.
 type ManifestUnit struct {
-	Ref   string // the referenced node id ("" for an inline unit)
-	Depth int    // declared depth 1..4; 0 = the mode's default
-	Body  string // inline markdown ("" for a ref unit)
-	Notes string // speaker notes, `Note:` lines stripped from Body
+	Ref     string // the referenced node id ("" for an inline unit)
+	Depth   int    // declared depth 1..4; 0 = the mode's default
+	Body    string // inline markdown ("" for a ref unit)
+	Notes   string // speaker notes, `Note:` lines stripped from Body
+	Minutes string // measured minutes this slide's step takes, `Minutes:` lines stripped from Body (deck timeline)
 }
 
 // a unit ref may carry a sub-address (req-x.2) - the render folds
@@ -62,14 +64,22 @@ func parseManifestUnits(body string) []ManifestUnit {
 			continue
 		}
 		var notes, content []string
+		minutes := ""
 		for _, l := range strings.Split(chunk, "\n") {
-			if strings.HasPrefix(strings.TrimSpace(l), "Note:") {
-				notes = append(notes, strings.TrimSpace(strings.TrimPrefix(strings.TrimSpace(l), "Note:")))
+			t := strings.TrimSpace(l)
+			if strings.HasPrefix(t, "Note:") {
+				notes = append(notes, strings.TrimSpace(strings.TrimPrefix(t, "Note:")))
+				continue
+			}
+			if strings.HasPrefix(t, "Minutes:") {
+				if minutes == "" {
+					minutes = strings.TrimSpace(strings.TrimPrefix(t, "Minutes:"))
+				}
 				continue
 			}
 			content = append(content, l)
 		}
-		u := ManifestUnit{Notes: strings.Join(notes, "\n")}
+		u := ManifestUnit{Notes: strings.Join(notes, "\n"), Minutes: minutes}
 		text := strings.TrimSpace(strings.Join(content, "\n"))
 		if m := unitRefRe.FindStringSubmatch(text); m != nil {
 			u.Ref = m[1]
@@ -345,7 +355,11 @@ func mdLiteBlocksAt(md string, base int) string {
 		if p == "" {
 			continue
 		}
-		if strings.HasPrefix(p, "<svg") {
+		if strings.HasPrefix(p, "<svg") || strings.HasPrefix(p, "<table") || strings.HasPrefix(p, `<div class="onion`) {
+			// authored block-level SVG figures and tables pass through raw - both are
+			// self-contained, text-based artifacts the figure/table laws already govern.
+			// The onion host div is the mermaid-fence lane's own emit (replaceModelFences
+			// runs before this pass): the interactive onion wraps its views in a div.
 			out.WriteString(p + "\n")
 			continue
 		}
@@ -420,13 +434,16 @@ func aiMarksInline(n int) string {
 	return b.String()
 }
 
+var mdBoldRe = regexp.MustCompile(`\*\*([^*]+)\*\*`)
+
 func mdInline(s string) string {
 	s = htmlEscape(s)
 	s = aiMarksTokenRe.ReplaceAllStringFunc(s, func(m string) string {
 		g := aiMarksTokenRe.FindStringSubmatch(m)
 		return aiMarksInline(int(g[1][0] - '0'))
 	})
-	return mdLinkRe.ReplaceAllString(s, `<a href="#$2">$1</a>`)
+	s = mdLinkRe.ReplaceAllString(s, `<a href="#$2">$1</a>`)
+	return mdBoldRe.ReplaceAllString(s, "<strong>$1</strong>")
 }
 
 func htmlEscape(s string) string {
@@ -496,6 +513,14 @@ func reReadmeGroup(re *regexp.Regexp, s string) string {
 	return ""
 }
 
+// readmeSelfBook is the workspace's own published-book URL prefix (derived live from
+// the origin remote, never hardcoded); renderReadme sets it for the render's duration.
+// A README link under this prefix is a SELF-reference: inside the book it rewrites to
+// its in-book form - the bare fragment - so it navigates in-document through the
+// existing rails (deck delegation included). The README file on disk keeps the
+// absolute URL: that one is right for GitHub.
+var readmeSelfBook string
+
 // readmeInline processes inline markdown on a text run: escape FIRST, then splice the
 // generated tags in (so author text can't inject HTML, but our tags survive).
 func readmeInline(s string) string {
@@ -508,6 +533,12 @@ func readmeInline(s string) string {
 	s = reReadmeLink.ReplaceAllStringFunc(s, func(m string) string {
 		g := reReadmeLink.FindStringSubmatch(m)
 		label, url := g[1], g[2]
+		if readmeSelfBook != "" && strings.HasPrefix(url, readmeSelfBook) {
+			if h := strings.Index(url, "#"); h >= 0 {
+				return `<a href="` + url[h:] + `">` + label + `</a>`
+			}
+			url = "spec/book.html" // the fragmentless self-URL folds to the no-op below
+		}
 		if url == "spec/book.html" {
 			// the book's own further-reading link: relative to the REPO root, it breaks
 			// wherever a published copy opens from (out/, docs/, the zip root). Inside
@@ -557,6 +588,10 @@ func readmeSplitRow(t string) []string {
 }
 
 func renderReadme(md string) string {
+	readmeSelfBook = ""
+	if url, ok := pagesBookURL(originRemoteURL(ROOT)); ok {
+		readmeSelfBook = url
+	}
 	lines := strings.Split(strings.ReplaceAll(md, "\r\n", "\n"), "\n")
 	var out strings.Builder
 	out.WriteString(`<div class="readme" data-layer="informative">` + "\n")
@@ -819,32 +854,17 @@ func splitChapterTitle(t string) (string, string) {
 	return t, ""
 }
 
-// renderBookHTML emits the whole book. findings are curation ERRORS (missing lede, unknown term);
-// advisories are soft signals (unlinked term usages) that never fail a render.
-func renderBookHTML(nodes map[string]Node) (string, []string, []string) {
-	// figure ids restart per render: regeneration stays byte-identical (go-fig-elem-ids).
-	// Re-entrancy guard: StatusMap below can evaluate executed
-	// checks whose selftests render the book THROUGH this function - the inner render
-	// walked the global figSeq to its end, every id in the outer render shifted, and the
-	// bytes depended on the verdict-cache state. Each call restores its caller's counter.
-	prevFigSeq := figSeq
-	figSeq = 0
-	defer func() { figSeq = prevFigSeq }()
-	sm := StatusMap(nodes)
-	bl := latestBless()
-	cfg := readProjectConfig()
-	root := MerkleRoot(nodes)
-	gloss := readGlossary()
-	tips := contentTips() // content-note one-liners for the termref affordance
-	used := map[string][]string{}
-	var findings, advisories []string
-	// design: go-guide-ch8  implements: req-chapter-placement.1, req-chapter-placement.2
-	// The agent guide is no reader chapter: agent-mode manifests render
-	// INSIDE the guidance chapter as one row of
-	// the guides TABLE (go-guides-table); no per-audience subchapters. Every
-	// audience class stays visible in that table, empty ones as an honest no-guide-yet
-	// row (the pull law: a guide lands when demand appears).
-	var chapters, agentGuides []Node
+// design: go-guide-ch8  implements: req-chapter-placement.1, req-chapter-placement.2
+// The agent guide is no reader chapter: agent-mode manifests render
+// INSIDE the guidance chapter as one row of
+// the guides TABLE (go-guides-table); no per-audience subchapters. Every
+// audience class stays visible in that table, empty ones as an honest no-guide-yet
+// row (the pull law: a guide lands when demand appears).
+//
+// readerChapters collects the reading-flow chapters plus the agent guides, in reading
+// order — explicit Order slot, then id (req-system-overview). The renderer and the
+// terms-order lint (go-terms-order-lint) walk this SAME list: one order source.
+func readerChapters(nodes map[string]Node) (chapters, agentGuides []Node) {
 	for _, n := range nodes {
 		if n.Type == "manifest" && (n.Mode == "chapter" || n.Mode == "guidance") {
 			chapters = append(chapters, n)
@@ -871,15 +891,36 @@ func renderBookHTML(nodes map[string]Node) (string, []string, []string) {
 		chapters = append(chapters, agentGuides...)
 		agentGuides = nil
 	}
-	// enddesign
-	// chapters sort by explicit Order, then id (req-system-overview): the trace chapter
-	// (man-sys-overview) declares an order slot BEFORE design input; a manifest with no
-	// order keeps the old id sort by falling to the tie-break.
 	for i := 1; i < len(chapters); i++ {
 		for j := i; j > 0 && (chapters[j].Order < chapters[j-1].Order || (chapters[j].Order == chapters[j-1].Order && chapters[j].ID < chapters[j-1].ID)); j-- {
 			chapters[j], chapters[j-1] = chapters[j-1], chapters[j]
 		}
 	}
+	return chapters, agentGuides
+}
+
+// enddesign
+
+// renderBookHTML emits the whole book. findings are curation ERRORS (missing lede, unknown term);
+// advisories are soft signals (unlinked term usages) that never fail a render.
+func renderBookHTML(nodes map[string]Node) (string, []string, []string) {
+	// figure ids restart per render: regeneration stays byte-identical (go-fig-elem-ids).
+	// Re-entrancy guard: StatusMap below can evaluate executed
+	// checks whose selftests render the book THROUGH this function - the inner render
+	// walked the global figSeq to its end, every id in the outer render shifted, and the
+	// bytes depended on the verdict-cache state. Each call restores its caller's counter.
+	prevFigSeq := figSeq
+	figSeq = 0
+	defer func() { figSeq = prevFigSeq }()
+	sm := StatusMap(nodes)
+	bl := latestBless()
+	cfg := readProjectConfig()
+	root := MerkleRoot(nodes)
+	gloss := readGlossary()
+	tips := contentTips() // content-note one-liners for the termref affordance
+	used := map[string][]string{}
+	var findings, advisories []string
+	chapters, _ := readerChapters(nodes)
 	// presets (mode preset): each lists chapter refs; articles get static per-preset classes so
 	// the view switch is pure CSS/class toggling over the complete DOM.
 	presetOf := map[string][]string{} // chapterID -> preset ids
@@ -991,31 +1032,10 @@ func renderBookHTML(nodes map[string]Node) (string, []string, []string) {
 		// manifest asks for it (fig: guides-table) - intro and guides merged, the agent
 		// guide one row embedding the emitted AGENTS.md verbatim.
 		chb.WriteString("</article>\n")
-		body.WriteString(refTooltips(expandTermLinks(ch.ID, chb.String(), gloss, used, &findings), nodes, gloss, tips))
+		body.WriteString(refTooltips(expandTermLinks(ch.ID, chb.String(), gloss, used, &findings, false), nodes, gloss, tips, false))
 		advisories = append(advisories, unlinkedTermAdvisories(ch.ID, raw, gloss)...)
 	}
 	chaptersHTML := body.String() // usage referent for the pull law (go-ch2-derived)
-	if g := renderGlossaryChapter(gloss, used); g != "" {
-		// ONE glossary, spliced in at the END of the FUNDAMENTALS chapter, never its own
-		// back-matter
-		// chapter. The splice happens now - after the chapter loop - so `used` is complete
-		// across the book.
-		full := body.String()
-		if i := strings.Index(full, `id="man-ch2-fundamentals"`); i >= 0 {
-			if e := strings.Index(full[i:], "</article>\n"); e >= 0 {
-				at := i + e // just before the fundamentals chapter's closing </article>
-				body.Reset()
-				body.WriteString(full[:at])
-				body.WriteString(g)
-				body.WriteString(full[at:])
-			} else {
-				body.WriteString(g)
-			}
-		} else {
-			body.WriteString(g)
-		}
-	}
-	body.WriteString(renderNotationList(gloss, used))
 	// design: go-deck-mode  implements: req-manifest-render.4
 	// Deck manifests render in the SAME file: one unit per slide; `Note:` lines become the
 	// presenter's aside (hidden on screen outside present mode, printed in the handout); the
@@ -1035,35 +1055,111 @@ func renderBookHTML(nodes map[string]Node) (string, []string, []string) {
 		// the deck stays OUT of the reading flow: no inline title or present button
 		// here - it is reachable only from the views' present button. The article sits off-screen
 		// (CSS), and present mode lifts the current slide to fullscreen via position:fixed.
-		body.WriteString(`<article class="deck" id="` + htmlEscape(dk.ID) + `" aria-hidden="true">` + "\n")
-		for idx, u := range parseManifestUnits(manifestBody(dk.Path)) {
-			body.WriteString(`<section class="slide" id="` + htmlEscape(dk.ID) + `-s` + itoa(idx+1) + `">` + "\n")
+		// The boundary/slide naming, the timeline, and the inert embed slots come from
+		// go-deck-anchors; the deck's anchor id IS the manifest's node id.
+		units := parseManifestUnits(manifestBody(dk.Path))
+		// the deck body assembles locally so it rides the SAME term-link + tooltip pass
+		// the chapters get: a slide's glossary term becomes a real termref (the present-mode
+		// toast reads its data-help), never a bare anchor.
+		var dkb strings.Builder
+		dkb.WriteString(`<article class="deck" id="` + htmlEscape(dk.ID) + `"` + deckRegionAttrs(dk) + ` aria-hidden="true">` + "\n")
+		for idx, u := range units {
+			sid := dk.ID + "-s" + itoa(idx+1)
+			var sb strings.Builder
 			if u.Ref != "" {
-				body.WriteString(renderNodeAtDepth(u.Ref, 1, nodes, sm, bl, dk.ID+"-s"+itoa(idx+1)+"-n"))
+				sb.WriteString(renderNodeAtDepth(u.Ref, 1, nodes, sm, bl, sid+"-n"))
 			} else if m := figRefRe.FindStringSubmatch(strings.TrimSpace(u.Body)); m != nil {
 				if msg, retired := retiredFigKinds[m[1]]; retired {
 					findings = append(findings, "fig kind '"+m[1]+"' retired "+msg)
 				} else {
-					body.WriteString(renderFigure(m[1], nodes))
+					sb.WriteString(renderFigure(m[1], nodes))
 				}
 			} else {
 				if !proseUnitsMarked(u.Body) {
 					findings = append(findings, "deck "+dk.ID+" slide "+itoa(idx+1)+" carries unmarked prose (req-ai-provenance.1)")
 				}
-				body.WriteString(renderUnitBody(u.Body, nodes, aliasIdx, &findings, &deferredQ, sm, bl, dk.ID+"-s"+itoa(idx+1)))
+				en := 0
+				// one segment: prose (with in-body fig: lines resolved to the book's own
+				// figure renders, id-scoped) followed by its inert embed slots.
+				renderSeg := func(seg string) string {
+					rest, embeds := splitEmbedFences(seg)
+					rest = replaceModelFences(rest, sid, dk.ID, &findings)
+					var s strings.Builder
+					last := 0
+					for _, fm := range deckFigLineRe.FindAllStringSubmatchIndex(rest, -1) {
+						if t := rest[last:fm[0]]; strings.TrimSpace(t) != "" {
+							s.WriteString(renderUnitBody(t, nodes, aliasIdx, &findings, &deferredQ, sm, bl, sid))
+						}
+						kind := strings.TrimSpace(rest[fm[2]:fm[3]])
+						if msg, retired := retiredFigKinds[kind]; retired {
+							findings = append(findings, "fig kind '"+kind+"' retired "+msg)
+						} else {
+							s.WriteString(deckScopeIDs(renderFigure(kind, nodes), sid))
+						}
+						last = fm[1]
+					}
+					if t := rest[last:]; strings.TrimSpace(t) != "" {
+						s.WriteString(renderUnitBody(t, nodes, aliasIdx, &findings, &deferredQ, sm, bl, sid))
+					}
+					s.WriteString(renderDeckEmbedSlots(sid, embeds, &en))
+					return s.String()
+				}
+				segs := splitDeckColumns(u.Body)
+				sb.WriteString(renderSeg(segs[0]))
+				if len(segs) > 1 {
+					sb.WriteString(`<div class="slide-cols">`)
+					for _, sg := range segs[1:] {
+						sb.WriteString(`<div class="scol">` + renderSeg(sg) + `</div>`)
+					}
+					sb.WriteString("</div>\n")
+				}
 			}
 			if u.Notes != "" {
-				body.WriteString(`<aside class="notes">` + htmlEscape(u.Notes) + "</aside>\n")
+				sb.WriteString(`<aside class="notes">` + htmlEscape(u.Notes) + "</aside>\n")
 			}
-			body.WriteString("</section>\n")
+			dkb.WriteString(`<section class="slide" id="` + htmlEscape(sid) + `"` + deckSlideAttrs(idx, len(units), sb.String()) + `>` + "\n")
+			dkb.WriteString(sb.String())
+			dkb.WriteString("</section>\n")
 		}
-		body.WriteString("</article>\n")
+		dkb.WriteString(renderDeckTimeline(dk.ID, units, &findings))
+		dkb.WriteString("</article>\n")
+		// the DECK lane carries the FULL definition in data-help: the present-mode toast
+		// is its only help surface, and the short form just repeats the name.
+		body.WriteString(refTooltips(expandTermLinks(dk.ID, dkb.String(), gloss, used, &findings, true), nodes, gloss, tips, true))
 		// NO toc entry: the deck is out of the reading flow entirely.
 		// Its one entry point is the views home (go-views-home): the derived-documents
 		// table's present button opens it. The baked articles and the present-mode
 		// machinery live here.
 	}
+	if len(decks) > 0 {
+		// the present-mode toast (rendered here, dom-static: the shell script only fills
+		// its text): a term link inside a slideshow explains instead of jumping out.
+		body.WriteString(`<div id="deck-toast" hidden><strong id="deck-toast-t"></strong> <span id="deck-toast-b"></span></div>` + "\n")
+	}
 	// enddesign
+	if g := renderGlossaryChapter(gloss, used); g != "" {
+		// ONE glossary, spliced in at the END of the FUNDAMENTALS chapter, never its own
+		// back-matter
+		// chapter. The splice happens now - after the chapter AND deck loops - so `used`
+		// is complete across the book (a deck-only term still enters the glossary); the
+		// splice inserts positionally into fundamentals, so the trailing deck articles
+		// stay untouched.
+		full := body.String()
+		if i := strings.Index(full, `id="`+fundamentalsChapterID+`"`); i >= 0 {
+			if e := strings.Index(full[i:], "</article>\n"); e >= 0 {
+				at := i + e // just before the fundamentals chapter's closing </article>
+				body.Reset()
+				body.WriteString(full[:at])
+				body.WriteString(g)
+				body.WriteString(full[at:])
+			} else {
+				body.WriteString(g)
+			}
+		} else {
+			body.WriteString(g)
+		}
+	}
+	body.WriteString(renderNotationList(gloss, used))
 	bodyHTML := body.String()
 	if len(deferredQ) > 0 {
 		// the pull law as data: the link graph over the RENDERED chapters feeds the
@@ -1103,9 +1199,12 @@ func renderBookHTML(nodes map[string]Node) (string, []string, []string) {
 	// language carries over (#fafafa chrome, white panels, the uppercase small labels,
 	// the ▸/▾ disclosure trees). The script stays toggle-only.
 	var doc strings.Builder
+	// the book's identity is the WORKSPACE's product (go-white-label-identity):
+	// a vehicle's book carries the vehicle's name, never the engine binary's.
+	product := workspaceProduct()
 	doc.WriteString("<!doctype html>\n<html lang=\"en\"><head><meta charset=\"utf-8\">\n")
 	doc.WriteString("<meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">\n")
-	doc.WriteString("<title>" + htmlEscape(brand()) + " — the spec book</title>\n")
+	doc.WriteString("<title>" + htmlEscape(product) + " — the spec book</title>\n")
 	doc.WriteString("<style>*{box-sizing:border-box}body{font-family:system-ui,Segoe UI,sans-serif;margin:0;line-height:1.5;color:" + bookColors["text"] + ";background:" + bookColors["bg"] + ";display:flex}" +
 		"#sidebar{width:300px;flex:none;height:100vh;position:sticky;top:0;overflow:hidden;background:#fafafa;border-right:1px solid #e3e3e3;padding:14px 16px;display:flex;flex-direction:column;gap:10px}" +
 		".sb-brand{font-weight:600;font-size:15px;margin:0;cursor:pointer;background:none;border:0;padding:0;text-align:left;font-family:inherit;color:inherit}" +
@@ -1161,6 +1260,10 @@ func renderBookHTML(nodes map[string]Node) (string, []string, []string) {
 		".ucontrols button{font:inherit;font-size:.75rem;padding:2px 8px;border:1px solid #ddd;border-radius:5px;background:#fff;cursor:pointer}.ucontrols button:hover{background:#f0f0f0}" +
 		".ucontrols input,.ucontrols select{font:inherit;font-size:.78rem;padding:2px 6px;border:1px solid #ddd;border-radius:5px}.qt-pos{color:#555;min-width:8ch;text-align:center;display:inline-block}" +
 		".onion .oview[hidden]{display:none}.onion [data-onion-go]{cursor:pointer}.onion-flow{overflow-x:auto;max-width:100%}.onion-flow svg{display:block}.onion svg{cursor:grab;touch-action:none;max-width:100%}.onion [data-node-link]{cursor:pointer}.onion .oblock{cursor:pointer}.onion .opill{cursor:pointer}.onion .osel>rect{stroke:#1b6fd6;stroke-width:2.6}.onion .oc-nb>rect{stroke:#1b6fd6;stroke-width:2}.onion .oc-on{stroke:#1b6fd6;stroke-width:2.6;opacity:1}" +
+		// the compact slide instance: the same interactive onion, sized to share a slide
+		// the slide onion FILLS the slide (owner rule): width up to the slide, height capped
+		// so the heading, bullets, and timeline stay on one screen with it
+		".onion-sm{width:100%;max-width:1100px;margin:0 auto}.onion-sm svg{max-height:62vh;width:auto;margin:0 auto;display:block}" +
 		".ctx-star svg{display:block;max-width:560px}" +
 		/* the fullscreen button flows BELOW the figure's explanation paragraph (the prose
 		   unit above the figure), never floating over the graphic */
@@ -1194,6 +1297,25 @@ func renderBookHTML(nodes map[string]Node) (string, []string, []string) {
 		"body[data-present] .slide{display:none}body[data-present] .slide.current{display:block;position:fixed;inset:0;background:" + bookColors["bg"] + ";padding:8vh 10vw;overflow:auto;z-index:9}" +
 		// the slide counter: baked chrome the present script fills; hidden outside present mode
 		"#slide-pos{display:none}body[data-present] #slide-pos{display:block;position:fixed;right:16px;bottom:12px;z-index:10;font-size:13px;color:" + bookColors["meta"] + ";background:" + bookColors["bg"] + ";border:1px solid #ddd;border-radius:12px;padding:2px 10px;font-variant-numeric:tabular-nums}" +
+		// the deck timeline: a slim measured-minutes bar across the presented deck's slides
+		".deck-timeline{display:none}" +
+		// prominent (owner rule): a visibly taller bar, a "time since start" caption above it,
+		// and the elapsed-minutes NUMBER under every tick - it must read as a timeline at a glance
+		"body[data-present] .deck-timeline.tl-on{display:block;position:fixed;left:10vw;right:18vw;bottom:34px;height:10px;background:#e3e3e3;border-radius:5px;z-index:10}" +
+		".deck-timeline .tl-cap{position:absolute;left:0;top:-22px;font-size:12px;color:" + bookColors["meta"] + ";white-space:nowrap}" +
+		".deck-timeline .tl-tick{position:absolute;top:-4px;width:5px;height:18px;background:#9db6e0;border-radius:2px}" +
+		".deck-timeline .tl-tick.cur{background:#1b6fd6;width:9px;margin-left:-2px}" +
+		".deck-timeline .tl-num{position:absolute;top:16px;transform:translateX(-50%);font-size:11px;color:" + bookColors["meta"] + ";white-space:nowrap}" +
+		// the total is a CAPTION after the bar, outside it - never bar-space beyond the last tick
+		".deck-timeline .tl-total{position:absolute;left:100%;margin-left:14px;top:-2px;font-size:12px;font-weight:bold;color:" + bookColors["meta"] + ";white-space:nowrap}" +
+		// the inert embed slot: its start button is the one lane that runs the baked script
+		".embed-slot{margin:.6rem 0}.embed-start{font:inherit;font-size:.9rem;padding:6px 18px;border:1px solid #d5d5d5;border-radius:6px;background:#fff;cursor:pointer}.embed-start:disabled{opacity:.45;cursor:default}" +
+		// the present-mode toast: a slide's term link explains in place instead of jumping out
+		"#deck-toast{position:fixed;bottom:78px;left:50%;transform:translateX(-50%);max-width:540px;background:#fff;border:1px solid #d5d5d5;border-radius:8px;padding:10px 16px;box-shadow:0 4px 16px rgba(0,0,0,.18);z-index:11;font-size:.9rem;cursor:pointer}" +
+		// slide columns (the ||| marker): side by side wide, stacked narrow
+		".slide-cols{display:flex;gap:2.2rem;align-items:flex-start;flex-wrap:wrap;margin-top:.4rem}.slide-cols>.scol{flex:1 1 320px;min-width:280px}" +
+		// a bold-only lead line before a block (the deck's option headers) breathes
+		".slide p:has(>strong:only-child){margin-top:1.5rem;font-size:1.05em}" +
 		"@media(max-width:900px){body{flex-direction:column}#sidebar{position:static;width:auto;height:auto}}" +
 		"@media print{aside.notes{display:block}.slide{page-break-after:always}#sidebar{display:none}}" +
 		"::highlight(quack-comments){background:#ffdf80}" +
@@ -1219,7 +1341,7 @@ func renderBookHTML(nodes map[string]Node) (string, []string, []string) {
 		".readme img,.readme svg{max-width:100%;height:auto;display:block;margin:.6rem auto}.readme blockquote{border-left:3px solid #dcdcdc;margin:.6rem 0;padding:.2rem .9rem;color:#555}.readme h1{margin-top:.2rem}.readme table{margin:.8rem 0}" + facetFilterCSS() + "</style>\n")
 	doc.WriteString("</head><body data-paged=\"1\">\n")
 	doc.WriteString(`<nav id="sidebar" aria-label="views">` + "\n")
-	doc.WriteString(`<button class="sb-brand" id="book-title" title="click for book info"` + bookTitleAttrs(root, cfg.Version, version) + `>` + htmlEscape(brand()) + ` — the spec book</button>` + "\n")
+	doc.WriteString(`<button class="sb-brand" id="book-title" title="click for book info"` + bookTitleAttrs(root, cfg.Version, version) + `>` + htmlEscape(product) + ` — the spec book</button>` + "\n")
 	// sidebar order (req-book-shell-nav.1): search, filter expression,
 	// then the toc.
 	// no browser input history on the search bar: the details pane explains the
@@ -1272,6 +1394,9 @@ func renderBookHTML(nodes map[string]Node) (string, []string, []string) {
 	doc.WriteString("<main>\n")
 	// enddesign
 	doc.WriteString(bodyHTML)
+	// the colophon credits the engine BY NAME in every book (req-vehicle-white-label.3):
+	// a vehicle's book references its engine honestly; the dogfood credits itself — uniform.
+	doc.WriteString(`<footer id="colophon" data-layer="informative"><p class="meta">` + htmlEscape(engineCredit) + `</p></footer>` + "\n")
 	doc.WriteString(`</main>
 <div id="slide-pos" role="status"></div>
 </div>
@@ -1378,7 +1503,10 @@ func renderBookHTML(nodes map[string]Node) (string, []string, []string) {
  var __gotoStack=[];
  window.bookGoto=function(id){
   var t=document.getElementById(id)||document.querySelector('tr.urow[data-node="'+id+'"]')||document.querySelector('[data-node="'+id+'"]');
-  if(!t)return;
+  if(!t){if(window.__facetJump)window.__facetJump(id);return;}
+  /* a DECK target enters present mode (go-deck-anchors): scrolling to a hidden
+     slide section reads as a dead link - the deck rail owns the navigation. */
+  if(window.__deckJump&&window.__deckJump(t))return;
   var from=document.querySelector('main article.ch:not(.pg-hide)');
   __gotoStack.push({art:from,y:window.scrollY});
   (window.__quackNav=window.__quackNav||[]).push('goto');
@@ -1508,13 +1636,17 @@ func renderBookHTML(nodes map[string]Node) (string, []string, []string) {
   if(nx)nx.addEventListener('click',function(){page++;apply();});
   var qi=ut.querySelector('.qt-search');if(qi)qi.addEventListener('input',function(){page=0;apply();});
   var sz=ut.querySelector('.qt-size');if(sz)sz.addEventListener('change',function(){page=0;apply();});
-  /* setFacet: select exactly ONE value of a pill facet (an iteration link
-     selects its iteration in the decisions table) - state and pill classes stay in step */
-  ut.setFacet=function(fn,fv){if(!(fn in facets))return;
-   facets[fn]={};facets[fn][fv]=true;
+  /* setFacetMulti: select a SET of values of one pill facet (the preset-fragment
+     router feeds it) - state and pill classes stay in step; an empty set resets to all */
+  ut.setFacetMulti=function(fn,fvs){if(!(fn in facets))return;
+   var on={};facets[fn]={};
+   fvs.forEach(function(v){facets[fn][v]=true;on[v]=true;});
    Array.prototype.forEach.call(ut.querySelectorAll('.upills'),function(fe){if(fe.getAttribute('data-facet')!==fn)return;
-    Array.prototype.forEach.call(fe.querySelectorAll('.upill'),function(x){x.classList.toggle('on',x.getAttribute('data-fv')===fv);});});
+    Array.prototype.forEach.call(fe.querySelectorAll('.upill'),function(x){var v=x.getAttribute('data-fv');
+     x.classList.toggle('on',v==='*'?fvs.length===0:!!on[v]);});});
    page=0;apply();};
+  /* setFacet: exactly ONE value (an iteration link selects its iteration) - the same lane */
+  ut.setFacet=function(fn,fv){ut.setFacetMulti(fn,[fv]);};
   ut.revealRow=function(id){var r=body.querySelector('tr.urow[data-node="'+id+'"]');if(!r)return null;
    for(var fn in facets)facets[fn]={};
    board={};
@@ -1617,7 +1749,8 @@ func renderBookHTML(nodes map[string]Node) (string, []string, []string) {
  if(pp)pp.addEventListener('click',function(){pageShow(pg-1,true);});
  if(pn)pn.addEventListener('click',function(){pageShow(pg+1,true);});
  window.addEventListener('hashchange',function(){var el=document.getElementById(location.hash.slice(1));
-  if(el){pageToEl(el);el.scrollIntoView();}});
+  if(el){if(window.__deckJump&&window.__deckJump(el))return;pageToEl(el);el.scrollIntoView();}
+  else if(window.__facetJump)window.__facetJump(location.hash.slice(1));});
  /* arrow keys page the book (owner c1) - inert in present mode and while typing */
  document.addEventListener('keydown',function(e){if(b.hasAttribute('data-present'))return;
   if(e.target&&e.target.matches&&e.target.matches('input,textarea,select'))return;
@@ -1627,26 +1760,31 @@ func renderBookHTML(nodes map[string]Node) (string, []string, []string) {
  var cur=-1,slides=[];
  function show(i){if(!slides.length)return;cur=(i+slides.length)%slides.length;
   slides.forEach(function(s,j){s.classList.toggle('current',j===cur);});
-  var sp=document.getElementById('slide-pos');if(sp)sp.textContent=(cur+1)+'/'+slides.length;}
+  var sp=document.getElementById('slide-pos');if(sp)sp.textContent=(cur+1)+'/'+slides.length;
+  if(window.__deckShown)window.__deckShown(slides[cur],cur);}
  document.querySelectorAll('button.present').forEach(function(btn){btn.addEventListener('click',function(){
   var d=document.getElementById(btn.getAttribute('data-deck'));
   slides=Array.prototype.slice.call(d.querySelectorAll('.slide'));
-  b.setAttribute('data-present',btn.getAttribute('data-deck'));show(0);});});
+  b.setAttribute('data-present',btn.getAttribute('data-deck'));
+  if(window.__deckEnter)window.__deckEnter(d);show(0);});});
  /* an element inside a deck presents its slide - the comment layer pans to deck-anchored
     comments through this; the deck DOM is off-screen outside present mode */
  window.bookSlideTo=function(el){var s=el&&el.closest?el.closest('.slide'):null;if(!s)return false;
   var d=s.closest('article.deck');if(!d)return false;
-  if(b.getAttribute('data-present')!==d.id){slides=Array.prototype.slice.call(d.querySelectorAll('.slide'));b.setAttribute('data-present',d.id);}
+  if(b.getAttribute('data-present')!==d.id){slides=Array.prototype.slice.call(d.querySelectorAll('.slide'));b.setAttribute('data-present',d.id);if(window.__deckEnter)window.__deckEnter(d);}
   show(slides.indexOf(s));return true;};
  document.addEventListener('keydown',function(e){if(!b.hasAttribute('data-present'))return;
   if(e.target&&e.target.matches&&e.target.matches('input,textarea,select'))return;
   if(e.key==='ArrowRight'||e.key==='PageDown')show(cur+1);
   if(e.key==='ArrowLeft'||e.key==='PageUp')show(cur-1);
-  if(e.key==='Escape'){b.removeAttribute('data-present');slides.forEach(function(s){s.classList.remove('current');});slides=[];cur=-1;}});
+  if(e.key==='Escape'){if(window.__deckExit)window.__deckExit();b.removeAttribute('data-present');slides.forEach(function(s){s.classList.remove('current');});slides=[];cur=-1;}});
  apply();
 })();
-</script>
 `)
+	// the deck half of the shell script rides the SAME script element: window-level hooks
+	// the present machinery above calls (go-deck-anchors owns the const).
+	doc.WriteString(deckAnchorsJS)
+	doc.WriteString("</script>\n")
 	// design: go-annotator-core  implements: req-comment-layer.8, req-comment-layer.6, req-comment-layer.5, req-comment-layer.3, req-comment-layer.4, req-comment-layer.12, req-comment-layer.14, req-comment-layer.2, req-comment-layer.1, req-comment-layer.10, req-comment-layer.11, req-comment-layer.13, req-comment-ux-keep.1, req-comment-ux-keep.2
 	// While a comment is unsaved the layer warns before the copy closes (beforeunload), keeps
 	// the comment and minimize controls in one place, and never shifts the bar when a post lands.
@@ -2602,6 +2740,30 @@ func renderOnion(nodes map[string]Node) string { return renderOnionOpt(nodes, ni
 // propagates a change-mark up the drill-down (element -> cluster -> ring), so a
 // marked block badges at every level. Every rev-gated line below emits nothing
 // when rev == nil, which is what keeps the book render byte-stable.
+// onionInput is the DATA SOURCE behind the interactive onion renderer: layers in
+// rank order, the elements (id -> layer via model, label via model, theme via relOf),
+// and the flow between them. Two bindings fill it. The ENGINE binding
+// (renderOnionOpt) keeps today's behavior exactly: onionLayerSource's model +
+// deriveDesignFlow's code-derived arrows, file themes as clusters, trace links on
+// blocks. The GRAPH binding (renderOnionFromGraph) adapts any extracted modelGraph:
+// bands from layers, blocks from elements, arrows from the authored flows only
+// (payload-labeled), no file-theme clusters — bands hold blocks directly.
+type onionInput struct {
+	layers          []onionLayer
+	inputs, outputs []string
+	model           *modelOnion
+	consumes        map[string][]string
+	reads, writes   map[string]bool
+	payload         map[[2]string]string // authored payload per src->dst edge; nil = count labels only
+	els             []string             // the block-earning element ids
+	relOf           map[string]string    // element -> its theme path ("" = none)
+	themes          bool                 // cluster a layer's blocks by FILE theme (the engine binding)
+	links           bool                 // blocks carry data-node-link to their trace items
+	crumb           string               // overview crumb text ("" = the brand's default)
+	idp             string               // instance id prefix; "" mints the fig-sequence default
+	sizeClass       string               // extra class on the .onion host (the compact slide instance)
+}
+
 func renderOnionOpt(nodes map[string]Node, rev *onionReview) string {
 	layers, excludes, inputs, outputs, _, model := onionLayerSource()
 	if len(layers) == 0 {
@@ -2679,6 +2841,62 @@ func renderOnionOpt(nodes map[string]Node, rev *onionReview) string {
 			rev.marked[id] = true // a planned element is a change, auto-marked
 		}
 	}
+	in := onionInput{layers: layers, inputs: inputs, outputs: outputs, model: model,
+		consumes: consumes, reads: reads, writes: writes, els: els, relOf: relOf,
+		themes: true, links: true}
+	out := renderOnionData(in, rev, nodes)
+	if model != nil && rev == nil {
+		// the onion IS the layers-flow model's render: it carries the model's
+		// informed-by link list like every other architectural model figure. The
+		// standalone review projection drops it — the trailer's references need the
+		// full book's tooltip machinery, and the review is just the drill-down.
+		if raw, err := os.ReadFile(filepath.Join(SPEC, "models", "model-engine-layers.md")); err == nil {
+			out += renderModelInformed("model-engine-layers", string(raw), nodes)
+		}
+	}
+	return out
+}
+
+// renderOnionFromGraph renders ANY extracted layered model through the SAME
+// interactive onion the engine's own model uses — the graph binding of onionInput.
+// A graph without ranked layers falls back to the flow figure (it is no onion).
+func renderOnionFromGraph(g modelGraph, idp string) string {
+	mo := modelOnionFromGraph(g)
+	if mo == nil {
+		return svgModelGraph(g)
+	}
+	layers := make([]onionLayer, len(mo.rings))
+	for i, ly := range mo.rings {
+		layers[i] = onionLayer{name: ly}
+	}
+	consumes := map[string][]string{}
+	payload := map[[2]string]string{}
+	for _, f := range g.Flows {
+		consumes[f.Src] = appendUniqStr(consumes[f.Src], f.Dst)
+		k := [2]string{f.Src, f.Dst}
+		if _, ok := payload[k]; !ok {
+			payload[k] = f.Payload
+		}
+	}
+	els := make([]string, 0, len(g.Elems))
+	relOf := map[string]string{}
+	for id := range g.Elems {
+		els = append(els, id)
+		relOf[id] = id
+	}
+	in := onionInput{layers: layers, model: mo, consumes: consumes,
+		reads: map[string]bool{}, writes: map[string]bool{}, payload: payload,
+		els: els, relOf: relOf, crumb: "layered overview", idp: idp, sizeClass: "onion-sm"}
+	return renderOnionData(in, nil, nil)
+}
+
+// renderOnionData is the ONE renderer behind every onion instance: it draws
+// whatever onionInput describes. nodes may be nil (the graph binding); it feeds
+// only the review projection's inspect data.
+func renderOnionData(in onionInput, rev *onionReview, nodes map[string]Node) string {
+	layers, inputs, outputs, model := in.layers, in.inputs, in.outputs, in.model
+	consumes, reads, writes := in.consumes, in.reads, in.writes
+	els, relOf := in.els, in.relOf
 	sortStrings(els) // each layer's slice inherits this sort order
 
 	// Each element's LAYER: model mode allocates STRAIGHT from the model (elements are design
@@ -2869,8 +3087,12 @@ func renderOnionOpt(nodes map[string]Node, rev *onionReview) string {
 	}
 	layerMarked := func(s survivor) bool { return anyMarked(s.flow) || anyMarked(s.infra) }
 
-	fig := figNext()
-	base := "fig" + itoa(fig) + "-o"
+	// the instance id root: a prefixed instance never touches the fig sequence, so
+	// N onions coexist on one page with disjoint view/element/marker ids.
+	base := in.idp + "-o"
+	if in.idp == "" {
+		base = "fig" + itoa(figNext()) + "-o"
+	}
 	viewID := func(si int) string { return base + "Lv" + itoa(si) }
 	shortID := func(id string) string {
 		s := strings.TrimPrefix(id, "go-")
@@ -2949,7 +3171,11 @@ func renderOnionOpt(nodes map[string]Node, rev *onionReview) string {
 		}
 	}
 	var b strings.Builder
-	b.WriteString(`<div class="onion">` + "\n")
+	cls := "onion"
+	if in.sizeClass != "" {
+		cls += " " + in.sizeClass
+	}
+	b.WriteString(`<div class="` + cls + `">` + "\n")
 	fills := []string{"#eef3fa", "#dde8f5"}
 
 	// --- level 0: the OVERVIEW only — concentric layer rings, one per layer, labelled name+count.
@@ -2967,8 +3193,12 @@ func renderOnionOpt(nodes map[string]Node, rev *onionReview) string {
 			return rMin + (rMax-rMin)*(n-1-k)/(n-1)
 		}
 		leftRim, rightRim := cx-radius(0), cx+radius(0)
+		crumb := in.crumb
+		if crumb == "" {
+			crumb = brand() + " — layered overview"
+		}
 		b.WriteString(`<div class="oview" id="` + base + `0">` + "\n")
-		b.WriteString(`<nav class="crumbs"><span>` + htmlEscape(brand()) + ` — layered overview</span></nav>` + "\n")
+		b.WriteString(`<nav class="crumbs"><span>` + htmlEscape(crumb) + `</span></nav>` + "\n")
 		b.WriteString(fmt.Sprintf(`<svg viewBox="0 0 %d %d" font-family="system-ui" font-size="10" role="img" aria-label="layered overview">`, W, H))
 		b.WriteString(`<defs><marker id="` + base + `arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0L10,5L0,10z" fill="#4a6fa5"/></marker></defs>`)
 		for si := range survivors {
@@ -3073,7 +3303,23 @@ func renderOnionOpt(nodes map[string]Node, rev *onionReview) string {
 			blocks = append(blocks, bl)
 			blockOf[id] = bl
 		}
-		if model != nil {
+		if model != nil && !in.themes {
+			// the graph binding: no file themes exist — the band holds its blocks
+			// directly, each element one block, the id as the subtitle.
+			for _, id := range s.flow {
+				nodeOf[id] = id
+				link := ""
+				if in.links {
+					link = id
+				}
+				full := id
+				if lb := model.labelOf[id]; lb != "" {
+					full = id + " — " + lb
+				}
+				addBlock(id, respLabel(id), shortID(id), false, "", link, full)
+				setInspect(blockOf[id], id)
+			}
+		} else if model != nil {
 			byTheme := map[string][]string{}
 			var order []string
 			for _, id := range s.flow {
@@ -3167,6 +3413,16 @@ func renderOnionOpt(nodes map[string]Node, rev *onionReview) string {
 		// isInner: a survivor band deeper than L (higher survivor index). Its edges route
 		// through the CORE, not a bus bar — the core IS the inner bands (owner's onion model).
 		isInner := func(name string) bool { p, ok := svPos[name]; return ok && p > si }
+		// withPayload: an authored model names its signals — the bar carries the payload
+		// beside the band key (the engine binding has no payloads; keys stay band-only).
+		withPayload := func(key, src, dst string) string {
+			if in.payload != nil {
+				if p := in.payload[[2]string{src, dst}]; p != "" {
+					return key + ": " + p
+				}
+			}
+			return key
+		}
 		var xin []xbar
 		for _, oa := range els {
 			if layerOf[oa] == L {
@@ -3188,7 +3444,7 @@ func renderOnionOpt(nodes map[string]Node, rev *onionReview) string {
 					}
 					continue
 				}
-				xin = append(xin, xbar{key: "from " + layerOf[oa], block: nodeOf[bb], sort: layerSort(layerOf[oa])})
+				xin = append(xin, xbar{key: withPayload("from "+layerOf[oa], oa, bb), block: nodeOf[bb], sort: layerSort(layerOf[oa])})
 			}
 		}
 		sort.Slice(xin, func(i, j int) bool {
@@ -3219,7 +3475,7 @@ func renderOnionOpt(nodes map[string]Node, rev *onionReview) string {
 					}
 					continue
 				}
-				xout = append(xout, xbar{key: "→ " + layerOf[bb], block: nodeOf[a], sort: layerSort(layerOf[bb])})
+				xout = append(xout, xbar{key: withPayload("→ "+layerOf[bb], a, bb), block: nodeOf[a], sort: layerSort(layerOf[bb])})
 			}
 		}
 		sort.Slice(xout, func(i, j int) bool {
@@ -3253,6 +3509,7 @@ func renderOnionOpt(nodes map[string]Node, rev *onionReview) string {
 		// arrows vanish here (level 2 shows them); parallel region arrows between two
 		// blocks collapse onto one counted edge.
 		ecount := map[[2]string]int{}
+		epay := map[[2]string]string{}
 		var eorder [][2]string
 		for _, a := range s.flow {
 			for _, bb := range consumes[a] {
@@ -3269,6 +3526,9 @@ func renderOnionOpt(nodes map[string]Node, rev *onionReview) string {
 				k := [2]string{nodeOf[a], tn}
 				if ecount[k] == 0 {
 					eorder = append(eorder, k)
+					if in.payload != nil {
+						epay[k] = in.payload[[2]string{a, bb}]
+					}
 				}
 				ecount[k]++
 			}
@@ -3278,6 +3538,13 @@ func renderOnionOpt(nodes map[string]Node, rev *onionReview) string {
 			lb := ""
 			if ecount[k] > 1 {
 				lb = "×" + itoa(ecount[k])
+			}
+			// an authored sibling arrow carries its payload name (the model's signal)
+			if p := epay[k]; p != "" {
+				lb = p
+				if ecount[k] > 1 {
+					lb = p + " ×" + itoa(ecount[k])
+				}
 			}
 			edges = append(edges, obusEdge{s: k[0], t: k[1], label: lb})
 		}
@@ -3310,7 +3577,15 @@ func renderOnionOpt(nodes map[string]Node, rev *onionReview) string {
 				}
 				if model != nil {
 					// responsibility text on the pill; id + theme in the title (full text)
-					b.WriteString(`<button type="button" data-node-link="` + htmlEscape(id) + `" title="` + htmlEscape(id+" — "+model.labelOf[id]+" (in "+theme(id)+")") + `">` + dot + htmlEscape(respLabel(id)) + `</button>`)
+					title := id + " — " + model.labelOf[id]
+					if in.themes {
+						title += " (in " + theme(id) + ")"
+					}
+					link := ""
+					if in.links {
+						link = ` data-node-link="` + htmlEscape(id) + `"`
+					}
+					b.WriteString(`<button type="button"` + link + ` title="` + htmlEscape(title) + `">` + dot + htmlEscape(respLabel(id)) + `</button>`)
 					continue
 				}
 				b.WriteString(`<button type="button" data-node-link="` + htmlEscape(id) + `">` + dot + htmlEscape(shortID(id)) + `</button>`)
@@ -3485,15 +3760,6 @@ func renderOnionOpt(nodes map[string]Node, rev *onionReview) string {
 		}
 	}
 	b.WriteString("</div>\n")
-	if model != nil && rev == nil {
-		// the onion IS the layers-flow model's render: it carries the model's
-		// informed-by link list like every other architectural model figure. The
-		// standalone review projection drops it — the trailer's references need the
-		// full book's tooltip machinery, and the review is just the drill-down.
-		if raw, err := os.ReadFile(filepath.Join(SPEC, "models", "model-engine-layers.md")); err == nil {
-			b.WriteString(renderModelInformed("model-engine-layers", string(raw), nodes))
-		}
-	}
 	return b.String()
 }
 
@@ -4170,6 +4436,12 @@ func modelOnionRegions() *modelOnion {
 		return nil
 	}
 	g, _ := extractModelGraph(string(raw))
+	return modelOnionFromGraph(g)
+}
+
+// modelOnionFromGraph binds ANY extracted layered graph to the onion's model
+// shape — the same ring/band/ambient allocation whatever file the graph came from.
+func modelOnionFromGraph(g modelGraph) *modelOnion {
 	rl := realLayers(g.Layers)
 	if len(rl) == 0 || len(g.Elems) == 0 {
 		return nil
@@ -5886,6 +6158,300 @@ func renderViewsHome(nodes map[string]Node) string {
 
 // enddesign
 
+// design: go-deck-anchors  implements: req-deck-links.1, req-deck-links.2, req-deck-links.3, req-deck-semantics.1, req-deck-semantics.2, req-onboarding-chapter.3, req-pong-deck.3
+// Deck citizenship (adr-deck-anchor-fragment). Every deck keeps ONE stable, human-readable
+// anchor: the manifest's own node id; each slide keeps `<deck>-s<n>`. The ids derive from the
+// manifest, never from render order, so links survive re-renders. The URL fragment rides the
+// EXISTING hash rail: present mode WRITES the current slide's anchor with history.replaceState
+// (a silent write - hashchange keeps its single reader), and the rail's reader routes a
+// fragment that lands inside a deck into present mode, on load and on change. The deck
+// boundary is machine-legible in the raw bytes: a named region landmark carrying the
+// slideshow roledescription. Slides are named groups - their first heading's text, else
+// their ordinal - groups, never landmarks, so a long deck cannot become landmark soup.
+// Decks stay OUT of the toc by construction: the toc collects chapter manifests only.
+// The timeline renders measured per-slide minutes (`Minutes:` unit lines) as a slim bar:
+// ticks mark slide STARTS and the bar ends exactly at the LAST slide's tick, so no
+// bar-space can read as a step after the final slide; the measured total is a text
+// caption after the bar, outside it. An ```embed``` fence bakes its script INERT inside
+// a <template>; two lanes turn the text into code, both lazy relative to page load: the
+// start button (the default), or - with the `auto` marker (```embed auto) - the deck's
+// show() on the slide's FIRST entry in present mode. One embed may add at most
+// deckEmbedBudget bytes to the book; over it, the executable lane is refused and a static
+// stand-in figure says so - the slide's authored figure carries the deliverable's picture.
+// A standalone `fig:` line INSIDE a slide body resolves to the book's own figure render -
+// the deck reuses figures, never duplicates them by hand; the copy's id attributes get a
+// slide prefix so the reading-flow copy keeps every anchor. A `|||` marker line splits a
+// slide body into columns (the first segment stays full-width - the heading lane).
+// FACET-PRESET fragments ride this same rail: an unknown-id fragment of the shape
+// `<base-id>--<facet>=<v1>,<v2>` scrolls to the base element and applies the named pill
+// facet MULTI-value (setFacetMulti). Every reader of the rail delegates to the ONE router
+// (__facetJump): the hashchange reader, the load-time jump, and bookGoto's miss lane.
+// The router writes the fragment with history.replaceState - never a push, so repeated
+// applications stay idempotent and spam no history, the deck rail's own discipline.
+
+var deckHeadingRe = regexp.MustCompile(`(?s)<h[1-6][^>]*>(.*?)</h[1-6]>`)
+var deckTagStripRe = regexp.MustCompile(`<[^>]*>`)
+var embedFenceRe = regexp.MustCompile("(?s)```embed([ \t]+auto)?[ \t]*\n(.*?)\n[ \t]*```")
+
+// deckFigLineRe matches a standalone fig: line inside a slide body - the same shape
+// figRefRe accepts for a whole unit, anchored per line.
+var deckFigLineRe = regexp.MustCompile(`(?m)^fig:\s*([a-z-]+(?:\s+[a-z0-9-]+)?)\s*$`)
+
+// deckRegionAttrs names the deck boundary: a region landmark with a slideshow roledescription.
+func deckRegionAttrs(dk Node) string {
+	return ` role="region" aria-roledescription="slideshow" aria-label="` + attesc(htmlEscape(dk.Statement)) + `"`
+}
+
+// deckSlideAttrs names one slide: a group (never a landmark), labelled by its first
+// heading when it has one, its ordinal otherwise.
+func deckSlideAttrs(idx, total int, inner string) string {
+	label := "slide " + itoa(idx+1) + " of " + itoa(total)
+	if m := deckHeadingRe.FindStringSubmatch(inner); m != nil {
+		if t := strings.TrimSpace(deckTagStripRe.ReplaceAllString(m[1], "")); t != "" {
+			label = t
+		}
+	}
+	return ` role="group" aria-roledescription="slide" aria-label="` + attesc(label) + `"`
+}
+
+// deckEmbed is one lifted ```embed fence: the script text, and whether the `auto`
+// marker asked for run-on-slide-entry instead of the start button.
+type deckEmbed struct {
+	Code string
+	Auto bool
+}
+
+// splitEmbedFences lifts every ```embed fence out of a slide body; the script texts return
+// separately so the render can bake them inert.
+func splitEmbedFences(body string) (string, []deckEmbed) {
+	var embeds []deckEmbed
+	rest := embedFenceRe.ReplaceAllStringFunc(body, func(m string) string {
+		g := embedFenceRe.FindStringSubmatch(m)
+		embeds = append(embeds, deckEmbed{Code: g[2], Auto: strings.TrimSpace(g[1]) != ""})
+		return ""
+	})
+	return rest, embeds
+}
+
+// splitDeckColumns splits a slide body at `|||` marker lines: the first segment renders
+// full-width (the heading lane), each further segment becomes one column.
+func splitDeckColumns(body string) []string {
+	var segs []string
+	var cur []string
+	for _, ln := range strings.Split(body, "\n") {
+		if strings.TrimSpace(ln) == "|||" {
+			segs = append(segs, strings.Join(cur, "\n"))
+			cur = nil
+			continue
+		}
+		cur = append(cur, ln)
+	}
+	return append(segs, strings.Join(cur, "\n"))
+}
+
+// deckScopeIDs prefixes every id attribute in a reused figure with the slide id, so the
+// deck's copy never shadows the reading-flow copy's anchors (getElementById, bookGoto,
+// and every url(#…) reference keep resolving to the chapter's copy).
+func deckScopeIDs(html, sid string) string {
+	return strings.ReplaceAll(html, ` id="`, ` id="`+sid+`-`)
+}
+
+// deckModelFenceRe lifts a ```mermaid fence out of a slide body: a slide may carry its
+// OWN small model (the walked project's architecture), rendered exactly the way the
+// book renders every declared model - same extractor, same onion/flow figure - without
+// the model entering the workspace's registry (a slide illustration, not a ledger node).
+var deckModelFenceRe = regexp.MustCompile("(?s)```mermaid[ \t]*\n(.*?)```")
+
+// replaceModelFences renders each mermaid fence in place through the model pipeline,
+// id-scoped to the slide; extraction lint surfaces as render findings. A layered graph
+// renders through the ONE interactive onion (owner rule: one renderer for every model,
+// everywhere) as a compact, instance-scoped slide instance — its ids and drill targets
+// are born scoped, so it never passes deckScopeIDs (rewriting only id= attributes
+// would tear the drill targets off their views).
+func replaceModelFences(seg, sid, dkID string, findings *[]string) string {
+	n := 0
+	return deckModelFenceRe.ReplaceAllStringFunc(seg, func(m string) string {
+		g, lint := extractModelGraph(deckModelFenceRe.FindStringSubmatch(m)[1])
+		for _, l := range lint {
+			*findings = append(*findings, "deck "+dkID+" slide model: "+l)
+		}
+		n++
+		if len(g.Layers) > 1 {
+			return strings.ReplaceAll(renderOnionFromGraph(g, sid+"m"+itoa(n)), "\n", " ")
+		}
+		return deckScopeIDs(strings.ReplaceAll(svgModelGraph(g), "\n", " "), sid)
+	})
+}
+
+// deckEmbedBudget is the size ceiling ONE embed may add to the book. The book is a
+// multi-megabyte single file; a slide's example must stay a rounding error in it.
+const deckEmbedBudget = 50 * 1024
+
+// renderDeckEmbedSlots bakes each embed inert: the script text lives HTML-escaped inside a
+// <template> (parsed, never executed). Two lanes turn it into code: the start button (the
+// default), or - for an `auto` embed - the deck's show() on the slide's first entry in
+// present mode. Both are zero work at page load. An embed over deckEmbedBudget gets NO
+// executable lane: a static stand-in figure names the refusal, and the slide's authored
+// figure carries the deliverable's picture instead. at numbers the slots across one slide.
+func renderDeckEmbedSlots(slideID string, embeds []deckEmbed, at *int) string {
+	if len(embeds) == 0 {
+		return ""
+	}
+	var b strings.Builder
+	for _, e := range embeds {
+		*at++
+		id := slideID + "-e" + itoa(*at)
+		if len(e.Code) > deckEmbedBudget {
+			b.WriteString(`<figure class="embed-fallback" id="` + id + `"><figcaption class="meta">this example is too big to embed playable (` +
+				itoa(len(e.Code)) + ` bytes; the budget is ` + itoa(deckEmbedBudget/1024) + ` KB) - the static figure stands in</figcaption></figure>` + "\n")
+			continue
+		}
+		if e.Auto {
+			b.WriteString(`<div class="embed-slot"><template id="` + id + `" data-auto="1">` + htmlEscape(e.Code) + `</template></div>` + "\n")
+			continue
+		}
+		b.WriteString(`<div class="embed-slot"><button type="button" class="embed-start" data-embed="` + id + `">start</button>` +
+			`<template id="` + id + `">` + htmlEscape(e.Code) + `</template></div>` + "\n")
+	}
+	return b.String()
+}
+
+// deckMinutes formats a minutes value the shortest exact way (5, 3.5). Authored
+// Minutes carry at most tenths; rounding to hundredths keeps a SUM of them from
+// printing float noise (5.6+1.7+2.4+0.7 must render 10.4, never 10.399999…).
+func deckMinutes(v float64) string {
+	return strconv.FormatFloat(math.Round(v*100)/100, 'f', -1, 64)
+}
+
+// renderDeckTimeline draws the slim elapsed-minutes bar: one tick per slide at its
+// cumulative START, the bar's right edge AT the last slide's tick, the measured total
+// as a caption after the bar; absent when no slide carries minutes.
+func renderDeckTimeline(dkID string, units []ManifestUnit, findings *[]string) string {
+	durs := make([]float64, len(units))
+	seen := false
+	for i, u := range units {
+		if u.Minutes == "" {
+			continue
+		}
+		v, err := strconv.ParseFloat(u.Minutes, 64)
+		if err != nil || v < 0 {
+			*findings = append(*findings, "deck "+dkID+" slide "+itoa(i+1)+" carries an unreadable Minutes value ('"+u.Minutes+"')")
+			continue
+		}
+		durs[i] = v
+		seen = true
+	}
+	if !seen {
+		return ""
+	}
+	total := 0.0
+	for _, d := range durs {
+		total += d
+	}
+	if total <= 0 {
+		return ""
+	}
+	// the bar spans [0, last slide's START]: the last tick sits at 100%, so nothing
+	// right of the final slide can read as another step. Each tick shows its
+	// elapsed-minutes NUMBER and the bar carries its "time since start" caption -
+	// the timeline must READ as a timeline at a glance (owner rule).
+	span := total - durs[len(durs)-1]
+	var b strings.Builder
+	b.WriteString(`<div class="deck-timeline" role="img" aria-label="deck timeline: ` + deckMinutes(total) + ` measured minutes">`)
+	b.WriteString(`<span class="tl-cap">time since start</span>`)
+	at := 0.0
+	for i := range units {
+		pct := 0.0
+		if span > 0 {
+			pct = at / span * 100
+		}
+		p := fmt.Sprintf("%.1f", pct)
+		b.WriteString(`<span class="tl-tick" style="left:` + p + `%" title="` + deckMinutes(at) + ` min"></span>`)
+		b.WriteString(`<span class="tl-num" style="left:` + p + `%">` + deckMinutes(at) + `</span>`)
+		at += durs[i]
+	}
+	b.WriteString(`<span class="tl-total">` + deckMinutes(total) + ` min</span></div>` + "\n")
+	return b.String()
+}
+
+// deckAnchorsJS: the deck half of the shell script - the window-level hooks the present
+// machinery calls (enter/exit/shown), the fragment router the hash rail delegates to, the
+// load-time jump, and the embed start handler.
+const deckAnchorsJS = `/* deck anchors: fragments ride the existing hash rail (adr-deck-anchor-fragment) */
+(function(){
+ 'use strict';
+ function park(){Array.prototype.forEach.call(document.querySelectorAll('article.deck'),function(a){
+  a.setAttribute('aria-hidden','true');
+  var t=a.querySelector('.deck-timeline');if(t)t.classList.remove('tl-on');});}
+ window.__deckEnter=function(d){if(!d)return;park();d.removeAttribute('aria-hidden');
+  var t=d.querySelector('.deck-timeline');if(t)t.classList.add('tl-on');};
+ window.__deckExit=function(){park();
+  try{history.replaceState(null,'',location.pathname+location.search);}catch(_){}};
+ /* leaving a slide STOPS its running embeds and re-arms their start buttons -
+    re-entering the slide asks for a fresh start (owner rule) */
+ function stopEmbeds(scope,except){Array.prototype.forEach.call(scope.querySelectorAll('.embed-slot'),function(sl){
+  if(except&&except.contains&&except.contains(sl))return;
+  if(sl.__stop){try{sl.__stop();}catch(_){}sl.__stop=null;}
+  var b=sl.querySelector('button.embed-start');if(b)b.disabled=false;});}
+ window.__deckShown=function(s,i){if(!s)return;
+  if(s.id){try{history.replaceState(null,'','#'+s.id);}catch(_){}}
+  /* an auto embed runs ONCE, on its slide's first entry - still zero work at page load */
+  Array.prototype.forEach.call(s.querySelectorAll('template[data-auto]:not([data-run])'),function(h){
+   h.setAttribute('data-run','1');
+   try{new Function(h.content?h.content.textContent:h.textContent)();}catch(_){}});
+  var d=s.closest?s.closest('article.deck'):null;if(!d)return;
+  stopEmbeds(d,s);
+  Array.prototype.forEach.call(d.querySelectorAll('.tl-tick'),function(t,j){t.classList.toggle('cur',j===i);});};
+ window.__deckJump=function(el){if(!el)return false;
+  var d=el.classList&&el.classList.contains('deck')?el:(el.closest?el.closest('article.deck'):null);
+  if(!d)return false;
+  var s=(el.closest&&el.closest('.slide'))||d.querySelector('.slide');
+  return !!(s&&window.bookSlideTo&&window.bookSlideTo(s));};
+ /* the embed stays inert in its template until the reader starts it */
+ document.addEventListener('click',function(e){
+  var t=e.target.closest?e.target.closest('button.embed-start'):null;if(!t||t.disabled)return;
+  var h=document.getElementById(t.getAttribute('data-embed'));if(!h)return;
+  t.disabled=true;
+  try{new Function(h.content?h.content.textContent:h.textContent)();}catch(_){t.disabled=false;}});
+ /* present mode never jumps out of the slideshow: a term link shows its explanation
+    as a TOAST instead (owner rule); the toast is rendered in the HTML, js only fills text */
+ var tlT=null;
+ document.addEventListener('click',function(e){
+  var el=document.getElementById('deck-toast');if(!el)return;
+  if(e.target.closest&&e.target.closest('#deck-toast')){el.hidden=true;if(tlT)clearTimeout(tlT);return;}
+  if(!document.body.hasAttribute('data-present'))return;
+  var t=e.target.closest?e.target.closest('.termref'):null;if(!t)return;
+  if(!(t.closest&&t.closest('article.deck')))return;
+  e.preventDefault();e.stopPropagation();
+  var ti=document.getElementById('deck-toast-t'),tb=document.getElementById('deck-toast-b');
+  if(ti)ti.textContent=t.getAttribute('data-title')||t.textContent;
+  if(tb)tb.textContent=t.getAttribute('data-help')||'';
+  el.hidden=false;
+  if(tlT)clearTimeout(tlT);tlT=setTimeout(function(){el.hidden=true;},7000);
+ },true);
+ /* the facet-preset router: an unknown-id fragment <base-id>--<facet>=<v1>,<v2> scrolls
+    to the base element and applies the pill preset multi-value. replaceState only -
+    repeated applications stay idempotent and push no history. */
+ window.__facetJump=function(frag){
+  if(!frag)return false;
+  var m=/^(.+)--([A-Za-z0-9_-]+)=(.*)$/.exec(frag);if(!m)return false;
+  var base=document.getElementById(m[1]);if(!base)return false;
+  var ut=base.classList&&base.classList.contains('utable')?base:(base.querySelector?base.querySelector('.utable'):null);
+  if(!ut&&base.closest)ut=base.closest('.utable');
+  var vals=m[3].split(',').filter(function(v){return v!=='';});
+  if(window.bookPageTo)window.bookPageTo(base);
+  if(ut&&ut.setFacetMulti)ut.setFacetMulti(m[2],vals);
+  base.scrollIntoView();
+  try{history.replaceState(null,'','#'+frag);}catch(_){}
+  return true;};
+ /* a fragment naming a deck or a slide opens the book AT that deck; an unknown id
+    routes through the facet-preset router */
+ if(location.hash){var el=document.getElementById(location.hash.slice(1));if(el)window.__deckJump(el);else window.__facetJump(location.hash.slice(1));}
+})();
+`
+
+// enddesign
+
 // design: go-book-glossary  implements: req-project-content-roots.1, req-spec-content-lint.6, req-reader-tables.7
 // The LaTeX glossaries discipline (adr-glossary-discipline) over one shared source: per-term notes
 // in method/glossary (frontmatter: term, long, class). A USAGE is a marked link `[label](term:slug)`
@@ -5976,7 +6542,39 @@ func contentTips() map[string]string {
 	return out
 }
 
-func refTooltips(html string, nodes map[string]Node, gloss map[string]GlossTerm, tips map[string]string) string {
+// glossHelp composes a term's data-help. The default is the short `long:` form.
+// full=true (the DECK lane) appends the whole definition body as plain text: a
+// present-mode toast is the reader's only surface — repeating the name helps nobody.
+func glossHelp(t GlossTerm, full bool) string {
+	help := t.Long
+	if help == "" {
+		help = t.Term
+	}
+	if !full {
+		return help
+	}
+	if d := plainProse(t.Def); d != "" {
+		if help != "" {
+			return help + " — " + d
+		}
+		return d
+	}
+	return help
+}
+
+var htmlCommentRe = regexp.MustCompile(`(?s)<!--.*?-->`)
+var mdLinkPlainRe = regexp.MustCompile(`\[([^\]]*)\]\([^)]*\)`)
+
+// plainProse flattens a markdown definition body to one attribute-safe text line:
+// comments out, links to their labels, emphasis markers dropped, whitespace collapsed.
+func plainProse(md string) string {
+	s := htmlCommentRe.ReplaceAllString(md, "")
+	s = mdLinkPlainRe.ReplaceAllString(s, "$1")
+	s = strings.NewReplacer("**", "", "`", "").Replace(s)
+	return strings.Join(strings.Fields(s), " ")
+}
+
+func refTooltips(html string, nodes map[string]Node, gloss map[string]GlossTerm, tips map[string]string, full bool) string {
 	return refTipRe.ReplaceAllStringFunc(html, func(m string) string {
 		g := refTipRe.FindStringSubmatch(m)
 		target, label := g[1], g[2]
@@ -5986,6 +6584,9 @@ func refTooltips(html string, nodes map[string]Node, gloss map[string]GlossTerm,
 				tip = t.Long
 				if tip == "" {
 					tip = t.Term
+				}
+				if full {
+					tip = glossHelp(t, true)
 				}
 			}
 		} else if n, ok := nodes[target]; ok {
@@ -6007,8 +6608,9 @@ func attesc(s string) string { return strings.ReplaceAll(s, "\"", "&quot;") }
 
 var termLinkRe = regexp.MustCompile(`<a href="#term:([a-z0-9-]+)">([^<]*)</a>`)
 
-// expandTermLinks rewrites term anchors, expands the first use per chapter, and collects usage.
-func expandTermLinks(chapterID, html string, gloss map[string]GlossTerm, used map[string][]string, findings *[]string) string {
+// expandTermLinks rewrites term anchors, expands the first use per chapter, and collects
+// usage. full=true is the DECK lane: data-help carries the whole definition (glossHelp).
+func expandTermLinks(chapterID, html string, gloss map[string]GlossTerm, used map[string][]string, findings *[]string, full bool) string {
 	return termLinkRe.ReplaceAllStringFunc(html, func(match string) string {
 		m := termLinkRe.FindStringSubmatch(match)
 		slug, label := m[1], m[2]
@@ -6020,7 +6622,11 @@ func expandTermLinks(chapterID, html string, gloss map[string]GlossTerm, used ma
 		if len(used[slug]) == 0 || used[slug][len(used[slug])-1] != chapterID {
 			used[slug] = append(used[slug], chapterID)
 		}
-		return `<button type="button" class="termref" data-title="` + attesc(htmlEscape(t.Term)) + `" data-help="` + attesc(htmlEscape(t.Long)) + `" data-goto="term-` + slug + `">` + label + `</button>`
+		help := t.Long
+		if full {
+			help = glossHelp(t, true)
+		}
+		return `<button type="button" class="termref" data-title="` + attesc(htmlEscape(t.Term)) + `" data-help="` + attesc(htmlEscape(help)) + `" data-goto="term-` + slug + `">` + label + `</button>`
 	})
 }
 

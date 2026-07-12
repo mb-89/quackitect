@@ -3,5 +3,5 @@
 [iteration]
 type    = "default"
 rigor   = "systematic"
-version = "i0018_mcp_apply"
+version = "i0019_strangers_book"
 edges = "connections"

@@ -35,7 +35,7 @@ Engineers driving work with AI agents — software or any other discipline — w
 |---|---|---|
 | Job | spec → plan → generate code | spec → gated ledger + deliverable |
 | Output | source code | auditable trace + deliverable |
-| On input change | re-generate | the affected cone goes SUSPECT → re-bless |
+| On input change | re-generate | every check the change touches reopens for review - you re-approve it |
 | User role | review the diff | adjudicate the gates (never auto-passed) |
 | Runtime | varies | one dependency-free Go binary |
 
@@ -64,6 +64,7 @@ You're looking at quackitect's own design, tracked and built by quackitect. It *
 |---|---|
 | [The book](spec/book.html) | quackitect's whole spec as one page. Works locally and on GitHub. |
 | [Read the book in your browser](https://mb-89.github.io/quackitect/book.html) | The same book on GitHub Pages. No clone needed. |
+| [The five-minutes walkthrough](https://mb-89.github.io/quackitect/book.html#man-deck-pong) | From an empty folder to a shipped Pong game, measured. Opens as slides; the last slide plays the game. |
 
 ---
 <sub>spec-driven development · requirements traceability · decision records · design-as-code · systems engineering · V-model · AGENTS.md · AI coding agents · audit trail · gate ledger · Merkle DAG</sub>

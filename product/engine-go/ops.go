@@ -577,12 +577,14 @@ func cmdShip(args []string) {
 		return nil
 	})
 	nodes := LoadAll()
+	var packed []string // the zip-root extras that actually went in — the summary's one truth
 	if html, findings, _ := renderBookHTML(nodes); len(findings) == 0 {
 		if err := writeBookCopies(html, publishedBookPaths()); err != nil {
 			fmt.Fprintln(os.Stderr, "ship: book copy failed -", err)
 		}
 		w, _ := zw.Create("book.html")
 		io.Copy(w, strings.NewReader(html))
+		packed = append(packed, "book.html")
 	} else {
 		fmt.Fprintln(os.Stderr, "ship: the book has findings and was NOT packaged - run quack report book")
 	}
@@ -591,19 +593,43 @@ func cmdShip(args []string) {
 		if raw, rerr := os.ReadFile(rp); rerr == nil {
 			w, _ := zw.Create("report.html")
 			io.Copy(w, strings.NewReader(string(raw)))
+			packed = append(packed, "report.html")
 		}
 	}
+	// the project's front door rides at the zip root: the README travels with the work.
+	if raw, rerr := os.ReadFile(filepath.Join(ROOT, "README.md")); rerr == nil {
+		w, _ := zw.Create("README.md")
+		io.Copy(w, strings.NewReader(string(raw)))
+		packed = append(packed, "README.md")
+	}
 	// the one-click install-and-demo scripts ride at the zip root beside the book and
-	// the report (adr-install-not-zero-dep: the ship includes RUNME.ps1 AND RUNME.sh).
+	// the report (adr-install-not-zero-dep: the ship includes RUNME.ps1 AND RUNME.sh) -
+	// from the workspace's own tools/, else the ENGINE's (a stub or vehicle ships the
+	// installer its receiver needs, sourced from the engine that drives it).
 	for _, rn := range []string{"RUNME.ps1", "RUNME.sh"} {
-		if raw, rerr := os.ReadFile(filepath.Join(ROOT, "tools", rn)); rerr == nil {
+		raw, rerr := os.ReadFile(filepath.Join(ROOT, "tools", rn))
+		if rerr != nil {
+			raw, rerr = os.ReadFile(filepath.Join(ENGINE, "tools", rn))
+		}
+		if rerr == nil {
 			w, _ := zw.Create(rn)
 			io.Copy(w, strings.NewReader(string(raw)))
+			packed = append(packed, rn)
 		}
 	}
 	zw.Close()
 	rel, _ := filepath.Rel(ROOT, zp)
-	fmt.Println("shipped ->", filepath.ToSlash(rel), "(book.html + report.html + RUNME at the zip root)")
+	fmt.Println(shipSummary(filepath.ToSlash(rel), packed))
+}
+
+// shipSummary prints ONE truth: the line enumerates exactly what landed at the zip root
+// beside the product/ tree. A skipped artifact (a book with findings, a missing RUNME)
+// is absent here — the summary never claims what the earlier lines refused.
+func shipSummary(rel string, packed []string) string {
+	if len(packed) == 0 {
+		return "shipped -> " + rel + " (the product/ tree only - nothing else was packaged)"
+	}
+	return "shipped -> " + rel + " (" + strings.Join(packed, " + ") + " at the zip root)"
 }
 
 // writeBookCopies writes ONE rendered book to every published path, byte-identical,
@@ -1009,10 +1035,12 @@ The line below imports it.
 func insideStubFiles(proj string) map[string]string {
 	sub := func(s string) string { return strings.ReplaceAll(s, "{{PROJ}}", proj) }
 	return map[string]string{
-		proj + ".cmd":                         strings.ReplaceAll(sub(insideLauncherTmpl), "\n", "\r\n"),
-		"AGENTS.md":                           sub(insideAgentsTmpl),
-		"CLAUDE.md":                           sub(insideClaudeTmpl),
-		filepath.Join("spec", "project.toml"): "# the workspace root marker + iteration breadcrumb (adr-no-quack-data-home).\n[iteration]\ntype    = \"default\"\nrigor   = \"systematic\"\nversion = \"\"\n",
+		proj + ".cmd": strings.ReplaceAll(sub(insideLauncherTmpl), "\n", "\r\n"),
+		"AGENTS.md":   sub(insideAgentsTmpl),
+		"CLAUDE.md":   sub(insideClaudeTmpl),
+		// a stub is born in connections mode (go-edge-mode): its edges live in the
+		// spec/connections lanes from the first minute — a fresh stub never needs migrate-edges.
+		filepath.Join("spec", "project.toml"): "# the workspace root marker + iteration breadcrumb (adr-no-quack-data-home).\n[iteration]\ntype    = \"default\"\nrigor   = \"systematic\"\nversion = \"\"\nedges = \"connections\"\n",
 	}
 }
 

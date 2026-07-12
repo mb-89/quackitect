@@ -573,7 +573,9 @@ func selftestFacetBoard() bool {
 }
 
 // selftestExternalLinks — test-external-links: an http link in a spec note flags;
-// the same link inside a reference note passes.
+// the same link inside a reference note passes. The ONE narrow exemption: a DECK
+// manifest may carry the repo's OWN clone URL (origin remote, ± .git); a foreign
+// URL in a deck, or the clone URL outside a deck, still flags.
 func selftestExternalLinks() bool {
 	root, _ := os.MkdirTemp("", "qst-ext")
 	defer os.RemoveAll(root)
@@ -590,7 +592,39 @@ func selftestExternalLinks() bool {
 	os.WriteFile(filepath.Join(root, "M6-evidence.md"),
 		[]byte("# evidence\n\nhistory cites https://example.org/old freely.\n"), 0o644)
 	ext2, _, _ := specLintFindingsAt(root, nil)
-	return len(ext2) == 1
+	if len(ext2) != 1 {
+		return false
+	}
+	// the deck-clone exemption: a repo whose origin remote is known
+	repo, _ := os.MkdirTemp("", "qst-extd")
+	defer os.RemoveAll(repo)
+	os.MkdirAll(filepath.Join(repo, ".git"), 0o755)
+	os.WriteFile(filepath.Join(repo, ".git", "config"),
+		[]byte("[remote \"origin\"]\n\turl = https://github.com/o/r.git\n"), 0o644)
+	sp := filepath.Join(repo, "spec")
+	os.MkdirAll(sp, 0o755)
+	deck := func(body string) {
+		os.WriteFile(filepath.Join(sp, "man-deck-fix.md"),
+			[]byte("---\nid: man-deck-fix\ntype: manifest\nmode: deck\nstatement: s\n---\n"+body), 0o644)
+	}
+	deck("Clone it:\n\n```\ngit clone https://github.com/o/r\n```\n")
+	if e, _, _ := specLintFindingsAt(sp, nil); len(e) != 0 {
+		return false // the deck's OWN clone URL is the one legal carry
+	}
+	deck("See https://example.org/other too.\n")
+	if e, _, _ := specLintFindingsAt(sp, nil); len(e) != 1 {
+		return false // a foreign URL in a deck still flags
+	}
+	// an inline SVG's xmlns is a namespace IDENTIFIER, not a link - it never counts
+	deck("<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 1 1\"></svg>\n")
+	if e, _, _ := specLintFindingsAt(sp, nil); len(e) != 0 {
+		return false
+	}
+	os.Remove(filepath.Join(sp, "man-deck-fix.md"))
+	os.WriteFile(filepath.Join(sp, "req-clone.md"),
+		[]byte("---\nid: req-clone\ntype: requirement\nstatement: s\n---\nClone https://github.com/o/r first.\n"), 0o644)
+	e, _, _ := specLintFindingsAt(sp, nil)
+	return len(e) == 1 // the clone URL outside a deck stays illegal
 }
 
 // selftestResidueLint — test-residue-lint: an unfilled slot placeholder flags;
@@ -763,6 +797,8 @@ func selftestSpecTemplateSet() bool {
 
 // selftestStubSpec — test-stub-spec: start stubs into a bare workspace emits the nine
 // chapter skeletons, the README, and the canned queries; a second run refuses to overwrite.
+// The scaffold is born in CONNECTIONS mode and strict-valid: a fresh stub loads clean with
+// NO migrate-edges, and its example edges ride the jsonl lanes.
 func selftestStubSpec() bool {
 	dir, _ := os.MkdirTemp("", "qst-stub")
 	defer os.RemoveAll(dir)
@@ -778,6 +814,26 @@ func selftestStubSpec() bool {
 		filepath.Join(dir, "spec", "fundamentals", "README.md"),
 	} {
 		if _, err := os.Stat(f); err != nil {
+			return false
+		}
+	}
+	// connections mode from birth — the workspace reads as connections-mode immediately…
+	sp := filepath.Join(dir, "spec")
+	if edgesModeOf(sp) != "connections" {
+		return false
+	}
+	// …and loads STRICT-clean (status exit 0): no legacy edge key survives in the template's
+	// example nodes, no dangling example edge refuses the graph, no migrate-edges needed.
+	if issues := StrictIssues(sp); len(issues) != 0 {
+		return false
+	}
+	// the example edges live AS jsonl in their kind lanes, never in node frontmatter.
+	for lane, frag := range map[string]string{
+		"refers":  `"src":"ex-rationale"`,
+		"refines": `"src":"ex-usecase"`,
+	} {
+		raw, err := os.ReadFile(filepath.Join(sp, "connections", lane, "edges.jsonl"))
+		if err != nil || !strings.Contains(string(raw), frag) {
 			return false
 		}
 	}

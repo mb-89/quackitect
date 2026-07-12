@@ -92,7 +92,7 @@ stamp). The rest are user-judged (`class: review`). The trace itself is content,
   - [ ] build planned — decomposed into small, resumable steps seeded as children of the build task *(killer)*
   - [ ] suite observed RED — every new test ran and failed before the build *(derived: coverage:tests-red)*
   - [ ] build — the planned steps nested beneath it are realized
-  - [ ] detailed design complete — every requirement has a realized design *(derived: coverage:designs-realized)*
+  - [ ] design realized in code — every requirement has a realized design *(derived: coverage:designs-realized)*; the DESIGNING happened at M4 (elements allocated, I/O wired) and binds the build through models-adhered-to above — this check confirms the build realized that design as `design:` markers in code; it never schedules designing after building
   - [ ] internal quality ok (review)
   - [ ] verification green — every test passes, across all iterations *(derived: coverage:tests-pass)*
   - [ ] implementation risks acceptable
@@ -103,6 +103,7 @@ stamp). The rest are user-judged (`class: review`). The trace itself is content,
     stakeholder sign-off. Log gaps as RAID.
   - [ ] meets the need — validated against all needs (every iteration), demonstrated by Ch1 criteria *(killer)*
   - [ ] killer use-cases demonstrated end-to-end — each killer use case is exercised for real, not merely "tests green" (a green suite can still miss a whole capability)
+  - [ ] consistency swept — everything this iteration CHANGED is re-documented where it is described: method prompts, reference sheets (compose-reference, dependencies), templates, checklists, and guides agree with the engine's actual behavior; a doc that still teaches the superseded way is a defect here, not a later surprise
   - [ ] acceptance obtained — sign-off evidence recorded
   - [ ] validation gaps captured (RAID)
 

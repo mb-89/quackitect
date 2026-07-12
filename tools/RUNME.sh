@@ -1,12 +1,15 @@
 #!/usr/bin/env bash
-# RUNME.sh - one-click install-and-demo, Linux/CI.
+# RUNME.sh - one-click install-and-verify, Linux/CI.
 # adr-install-not-zero-dep / uc-run-dep-free: a fresh machine (or a CI runner) with nothing but
-# its standard package manager ends at a working quackitect demo in one script run. Every
+# its standard package manager ends with a verified toolchain in one script run. Every
 # dependency is checked before it is installed, and every install line says why - each one is
 # an install step and a firewall risk (the Go-toolchain download blocked behind a proxy is the
 # lesson dependencies.md records for Windows; the tarball fallback below is the Linux analog).
 # HEADLESS: this script never opens a browser. It prints the generated paths so a CI log shows
 # them. It exits non-zero on the first failure (set -e) - CI-honest, no silent partial success.
+# This script installs and verifies only - it creates no workspace and no project
+# (req-runme-orientation.3). Starting a project is the orientation epilogue's job to point at,
+# never this script's job to do.
 
 set -euo pipefail
 
@@ -119,29 +122,19 @@ fi
 
 "$QBIN" version
 
-# --- demo: a throwaway workspace, driven end-to-end, on THIS fresh machine ---
-step "creating a throwaway demo workspace"
-DEMO_DIR="$(mktemp -d -t quackitect-demo-XXXXXX)"
-info "workspace: $DEMO_DIR"
-
-"$QBIN" start stubs "$DEMO_DIR"
-
-step "driving the demo workspace (status, then a rendered report)"
-"$QBIN" -C "$DEMO_DIR" status
-
-BOARD_PATH="$DEMO_DIR/board.html"
-"$QBIN" -C "$DEMO_DIR" report --out "$BOARD_PATH"
-[ -f "$BOARD_PATH" ] || fail "report claimed success but $BOARD_PATH is missing."
-
+# --- orientation: the toolchain is ready; hand off to starting a real project ---
 BOOK_PATH="$ROOT_DIR/spec/book.html"
 
 echo ""
-echo "runme: done. Go + quack are installed, and the demo workspace proved the round trip."
-echo "  demo workspace: $DEMO_DIR  (throwaway - delete any time)"
-echo "  demo board:     $BOARD_PATH"
+echo "runme: done. Go and quack are installed and verified."
+echo "  no workspace and no project were created - this script only installs and verifies."
+echo ""
+echo "Start your own project:"
+echo "  option A - open this folder with your AI agent, and use the starter prompt in README.md."
+echo "  option B - run: \"$QBIN\" start stubs <your-project-folder>, then work in that folder."
 if [ -f "$BOOK_PATH" ]; then
-    echo "  reference book: $BOOK_PATH"
+    echo "  the book's onboarding chapter is the five-minute walkthrough: $BOOK_PATH"
 else
-    echo "  reference book: none in this checkout (run 'quack report book' to render one)"
+    echo "  no spec/book.html in this checkout (run 'quack report book' to render one)."
 fi
-echo "  headless: nothing was opened in a browser - open the paths above yourself, or serve them in CI."
+echo "  headless: nothing is opened in a browser here - open the path above yourself, or serve it in CI."

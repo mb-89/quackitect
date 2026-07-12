@@ -1,12 +1,21 @@
-# RUNME.ps1 - one-click install-and-demo, Windows.
+# RUNME.ps1 - one-click install-and-verify, Windows.
 # adr-install-not-zero-dep / uc-run-dep-free: a fresh machine, nothing installed but Winget,
-# ends at a working quackitect demo in one script run. Every dependency is checked before it
+# ends with a verified toolchain in one script run. Every dependency is checked before it
 # is installed, and every install line says why - each one is a corporate-firewall risk (the
 # Go-toolchain download blocked behind a proxy is the lesson dependencies.md records).
+# This script installs and verifies only - it creates no workspace and no project
+# (req-runme-orientation.3). Starting a project is the orientation epilogue's job to point at,
+# never this script's job to do.
 #
 # Usage: open PowerShell anywhere in the cloned/unzipped repo, then run:  .\tools\RUNME.ps1
 # If Windows blocks the script as downloaded-from-the-internet, unblock it first:
 #   Unblock-File .\tools\RUNME.ps1
+# Pass -OpenBook to open the book (spec\book.html) at the end; without it, the script only
+# prints the path (explicit consent required to launch a browser).
+
+param(
+    [switch]$OpenBook
+)
 
 $ErrorActionPreference = "Stop"
 
@@ -71,39 +80,21 @@ if ($LASTEXITCODE -ne 0) {
     Fail "quack.cmd version failed (exit $LASTEXITCODE). See product/quackitect/method/prompts/dependencies.md."
 }
 
-# --- demo: a throwaway workspace, driven end-to-end, on THIS fresh machine ---
-Write-Step "creating a throwaway demo workspace"
-$DemoDir = Join-Path $env:TEMP ("quackitect-demo-" + [guid]::NewGuid().ToString("N").Substring(0, 8))
-New-Item -ItemType Directory -Path $DemoDir -Force | Out-Null
-Write-Info "workspace: $DemoDir"
+# --- orientation: the toolchain is ready; hand off to starting a real project ---
+Write-Host ""
+Write-Host "runme: done. Go and quack are installed and verified." -ForegroundColor Green
+Write-Info "no workspace and no project were created - this script only installs and verifies."
+Write-Host ""
+Write-Host "Start your own project:" -ForegroundColor Cyan
+Write-Info "option A - open this folder with your AI agent, and use the starter prompt in README.md."
+Write-Info "option B - run: .\quack start stubs <your-project-folder>, then work in that folder."
 
-& $QuackCmd start stubs $DemoDir
-if ($LASTEXITCODE -ne 0) { Fail "quack start stubs failed (exit $LASTEXITCODE)." }
-
-Write-Step "driving the demo workspace (status, then a rendered report)"
-& $QuackCmd -C $DemoDir status
-if ($LASTEXITCODE -ne 0) { Fail "quack status on the demo workspace failed (exit $LASTEXITCODE)." }
-
-$BoardPath = Join-Path $DemoDir "board.html"
-& $QuackCmd -C $DemoDir report --out $BoardPath
-if ($LASTEXITCODE -ne 0) { Fail "quack report on the demo workspace failed (exit $LASTEXITCODE)." }
-if (-not (Test-Path $BoardPath)) { Fail "report claimed success but $BoardPath is missing." }
-
-# --- show the result: the fresh (empty) demo board, and the real shipped book for reference ---
-Write-Step "opening the results"
 $BookPath = Join-Path $RepoRoot "spec\book.html"
 if (Test-Path $BookPath) {
-    Write-Info "opening the shipped book (the full quackitect project, as reference): $BookPath"
-    Start-Process $BookPath
+    Write-Info "the book's onboarding chapter is the five-minute walkthrough: $BookPath"
+    if ($OpenBook) {
+        Start-Process $BookPath
+    }
 } else {
-    Write-Info "no spec\book.html in this checkout - skipping (run 'quack report book' to render one)."
+    Write-Info "no spec\book.html in this checkout - run 'quack report book' to render one."
 }
-Write-Info "opening the demo board (this fresh workspace, just created): $BoardPath"
-Start-Process $BoardPath
-
-Write-Host ""
-Write-Host "runme: done. Go + quack are installed, and the demo workspace proved the round trip." -ForegroundColor Green
-Write-Host "  demo workspace: $DemoDir  (throwaway - delete any time)"
-Write-Host "  demo board:     $BoardPath"
-Write-Host "  reference book: $BookPath"
-Write-Host "  next: cd into this repo and tell your AI agent 'let's start a new project' (see README.md)."

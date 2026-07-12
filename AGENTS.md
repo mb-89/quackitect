@@ -99,4 +99,8 @@ to ANY command to drive a different project's workspace. After editing engine `.
 - **Killer checks** are always adjudicated gates. Never auto-pass them.
 - The surface is **default-closed**. Triage, defer, retire, retro, and ship are sub-ops reached through `engage` and `review`.
 - The methods live in `product/quackitect/method/prompts/`. Load the one named by the command.
+- **A delegated subagent is a ROLE, not a free thinker.** Its brief stays short — the step, the
+  statements, the files — plus a pointer to the role charter (`method/roles/README.md`): the walk
+  discipline (execute, don't ruminate; only the step in hand; targeted verify; strays to notes)
+  binds delegated roles exactly as it binds the driving agent.
 - **Edits must be byte-safe.** Editor tooling by default. For a mechanical bulk edit, `quack apply <manifest.json>` is the sanctioned lane: byte-exact old→new replacements, dry-run first, all-or-nothing. A scripted bulk edit is allowed when it uses explicit BOM-less UTF-8 IO (Go, or .NET `[IO.File]` calls) and touches only the intended bytes. What stays banned is the careless lane: PowerShell 5.1 default `Get-Content|Set-Content` round-trips and `-Encoding utf8` (BOM in 5.1) re-encode every line they pass — that exact reach corrupted UTF-8 twice (mojibake, a clobbered file). Verify a scripted edit's diff before moving on.

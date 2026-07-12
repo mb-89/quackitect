@@ -1,7 +1,6 @@
 ---
 id: ex-usecase
 type: usecase
-refines: [ex-need]
 statement: EXAMPLE — the user runs the demo task end to end; delete me when a real use case lands.
 class: review
 killer: false

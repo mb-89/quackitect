@@ -2,7 +2,6 @@
 id: ex-rule
 type: rule
 scope: everywhere
-refers: []
 statement: EXAMPLE — every public surface carries a usage line; delete me when a real rule lands.
 class: review
 killer: false

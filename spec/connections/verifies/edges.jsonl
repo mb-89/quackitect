@@ -220,3 +220,11 @@
 {"src":"test-diagram-review-render","dst":"req-diagram-review-render"}
 {"src":"test-dsm-cluster","dst":"req-dsm-cluster"}
 {"src":"test-vehicle-chain","dst":"req-vehicle-drives-stub"}
+{"src":"test-onboarding-surface","dst":"req-onboarding-chapter"}
+{"src":"test-onboarding-surface","dst":"req-deck-discoverable"}
+{"src":"test-deck-links","dst":"req-deck-links"}
+{"src":"test-deck-links","dst":"req-deck-semantics"}
+{"src":"test-pong-deck","dst":"req-pong-deck"}
+{"src":"test-runme-orientation","dst":"req-runme-orientation"}
+{"src":"test-terms-before-use","dst":"req-terms-before-use"}
+{"src":"test-white-label-book","dst":"req-vehicle-white-label"}

@@ -3,7 +3,8 @@ package main
 // design: go-auto-link  implements: req-manifest-render.5
 // The deterministic auto-link emit pass: plain-text occurrences of a content-note name or
 // alias (go-spec-content) link to their note. Rules, in order: authored links and inline
-// code stay untouched (protected spans); code fences, headings, and comment lines are
+// code stay untouched (protected spans); code fences, headings, comment lines, and
+// raw-HTML lines (inline SVG carries real text a link would corrupt) are
 // exempt whole; the LONGEST name wins at a given position (names are applied
 // longest-first and an inserted link becomes a protected span); matching is
 // case-insensitive on word boundaries. Glossary names link through the existing term
@@ -92,8 +93,8 @@ func AutoLink(md string, idx map[string]string) string {
 			inFence = !inFence
 			continue
 		}
-		if inFence || strings.HasPrefix(t, "#") || strings.HasPrefix(t, "<!--") {
-			continue // code, headings, and comments stay untouched
+		if inFence || strings.HasPrefix(t, "#") || strings.HasPrefix(t, "<") {
+			continue // code, headings, comments, and raw-HTML lines (inline SVG) stay untouched
 		}
 		for _, nt := range names {
 			line = autoLinkLine(line, nt)

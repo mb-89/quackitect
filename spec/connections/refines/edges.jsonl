@@ -257,3 +257,14 @@
 {"src":"req-dsm-cluster","dst":"uc-derive-structure"}
 {"src":"req-vehicle-drives-stub","dst":"uc-vehicle-extends"}
 {"src":"uc-vehicle-extends","dst":"need-workspace-drive"}
+{"src":"uc-onboard-newcomer","dst":"need-docu"}
+{"src":"uc-deck-deep-link","dst":"need-docu"}
+{"src":"uc-white-label-book","dst":"need-workspace-drive"}
+{"src":"req-onboarding-chapter","dst":"uc-onboard-newcomer"}
+{"src":"req-deck-links","dst":"uc-deck-deep-link"}
+{"src":"req-deck-discoverable","dst":"uc-onboard-newcomer"}
+{"src":"req-pong-deck","dst":"uc-onboard-newcomer"}
+{"src":"req-runme-orientation","dst":"uc-onboard-newcomer"}
+{"src":"req-terms-before-use","dst":"uc-onboard-newcomer"}
+{"src":"req-deck-semantics","dst":"uc-onboard-newcomer"}
+{"src":"req-vehicle-white-label","dst":"uc-white-label-book"}

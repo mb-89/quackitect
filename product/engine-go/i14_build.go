@@ -5,6 +5,7 @@ package main
 
 import (
 	"os"
+	"path/filepath"
 	"regexp"
 	"strings"
 )
@@ -18,6 +19,72 @@ func bookTitleAttrs(root, iteration, engineVersion string) string {
 	return ` data-root="` + htmlEscape(root) +
 		`" data-iteration="` + htmlEscape(iteration) +
 		`" data-engine="` + htmlEscape(engineVersion) + `"`
+}
+
+// enddesign
+
+// design: go-white-label-identity  implements: req-vehicle-white-label.1, req-vehicle-white-label.2, req-vehicle-white-label.3, req-vehicle-white-label.4
+// A rendered book's identity comes from the WORKSPACE, never from the binary's invocation
+// name: brand() is argv[0]-based — the right seam for console output, the wrong one for a
+// published artifact (a vehicle usually drives an engine binary named quack, and its book
+// must not present the engine as itself — adr-white-label-hybrid). The name source, most
+// explicit first:
+//   - product/brand/name.txt — the brand layer's name asset, WORKSPACE-ONLY. The engine
+//     design fallback is deliberately not consulted: an engine default here would BE the leak.
+//   - the overlay key's product/<name> — the vehicle's committed product home.
+//   - the workspace basename.
+// The engine's name renders as CREDIT: the colophon line every book carries, the dogfood
+// included. whiteLabelLeaks is the identity guard: it scans ONLY the identity surfaces
+// (title, wordmark). Mentions in prose and the colophon credit are legal — identity is
+// the bar, not occurrences.
+
+// engineCredit is the colophon line: the engine referenced honestly, by its own name.
+const engineCredit = "engine: quackitect " + version
+
+// productNameOf is the pure identity rule (testable): brand name asset, else the
+// overlay's product/<name>, else the workspace basename.
+func productNameOf(brandName, overlay, base string) string {
+	if n := strings.TrimSpace(brandName); n != "" {
+		return n
+	}
+	if ov := strings.TrimSpace(overlay); ov != "" {
+		return filepath.Base(filepath.FromSlash(ov))
+	}
+	return base
+}
+
+// workspaceProduct resolves the CURRENT workspace's product identity.
+func workspaceProduct() string {
+	name := ""
+	if raw, err := os.ReadFile(filepath.Join(ROOT, "product", "brand", "name.txt")); err == nil {
+		name = strings.TrimSpace(string(raw))
+	}
+	overlay := ReadConfig(filepath.Join(ROOT, "spec", "project.toml")).Overlay
+	return productNameOf(name, overlay, filepath.Base(ROOT))
+}
+
+var bookTitleIDRe = regexp.MustCompile(`<title>([^<]*) — the spec book</title>`)
+var bookWordmarkIDRe = regexp.MustCompile(`id="book-title"[^>]*>([^<]*) — the spec book</button>`)
+
+// whiteLabelLeaks names every identity surface of a rendered book that presents an
+// identity other than the workspace's product (req-vehicle-white-label.4).
+func whiteLabelLeaks(html, product string) []string {
+	want := htmlEscape(product)
+	var out []string
+	for _, s := range []struct {
+		surface string
+		re      *regexp.Regexp
+	}{{"title", bookTitleIDRe}, {"wordmark", bookWordmarkIDRe}} {
+		m := s.re.FindStringSubmatch(html)
+		if m == nil {
+			out = append(out, s.surface+": the identity surface is missing from the rendered book")
+			continue
+		}
+		if m[1] != want {
+			out = append(out, s.surface+" presents '"+m[1]+"' as the book's identity - the workspace product is '"+product+"'")
+		}
+	}
+	return out
 }
 
 // enddesign

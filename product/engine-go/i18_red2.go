@@ -108,6 +108,13 @@ func selftestInformedByEdges() bool {
 	if addressFirstClass("go-orphan", nodes, elems) {
 		return false
 	}
+	// a QUESTION is first-class too: `mint defer --of q-…` wires the defer decision to the
+	// question it rules on, and adr-traced must credit that edge (the i19-M4 live bug: the
+	// engine's own mint produced an edge its own coverage rule rejected).
+	nodes["q-fix"] = Node{ID: "q-fix", Type: "question", Statement: "open?"}
+	if !addressFirstClass("q-fix", nodes, elems) {
+		return false
+	}
 	// the first-class informing set is exactly the edge-holder
 	fc := firstClassInformedBy("model-x", []string{"el-one", "el-two"}, nodes)
 	if len(fc) != 1 || fc[0] != "adr-fc" {

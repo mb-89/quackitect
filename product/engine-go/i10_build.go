@@ -210,9 +210,13 @@ func coverageDelta(nodes map[string]Node, rule, scope string) []string {
 				if len(n.Addresses) == 0 {
 					out = append(out, "adr "+n.ID+" addresses nothing")
 				}
+				// mirror the RULE (addressFirstClass), never a private criterion — this explainer
+				// once said "no requirement" while the rule accepted first-class targets, so the
+				// why-delta lied about which edge failed (found live at i19 M4).
+				elems := modelDeclaredElements(nodes)
 				for _, p := range n.Addresses {
-					if p != scrapSink && nodes[p].Type != "requirement" {
-						out = append(out, "adr "+n.ID+" addresses '"+p+"', which is no requirement")
+					if p != scrapSink && !addressFirstClass(p, nodes, elems) {
+						out = append(out, "adr "+n.ID+" addresses '"+p+"', which is not first-class (requirement/use-case/need/model/question/element)")
 					}
 				}
 			}

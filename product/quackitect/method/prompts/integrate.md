@@ -75,6 +75,12 @@ The engine reads `product/brand/<asset>` first and **falls back** to its generic
 (`design/<asset>` in the vendored engine) if you delete one. The report renders your resolved
 `logo-mark` left of the project name. The vendored `design/design-language.md` documents the full set.
 
+**Your NAME (the white-label identity, i19):** the book's title, wordmark, and self-referential
+voice come from your workspace — in order: `product/brand/name.txt` (one line, your product's
+name), else the `overlay` key's `product/<name>` in spec/project.toml, else the workspace folder
+name. The engine appears only as CREDIT (the colophon: "engine: quackitect <version>") — your
+book presents YOU. Mentions of quackitect in method prose stay legal; only identity is yours.
+
 ## Run
 `quack status | next | start | bless | note | gather | report | lint | ship | build | selftest` — all
 resolve vehicle → engine. Point your `AGENTS.md` here.

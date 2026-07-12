@@ -687,6 +687,7 @@ func init() {
 		i18Tests,          // i18_red.go
 		i18bTests,         // i18_red2.go (the mechanical requirements)
 		i18cTests,         // i18_red3.go (the vehicle-drives-stub chain)
+		i19Tests,          // i19_red.go
 	)
 }
 

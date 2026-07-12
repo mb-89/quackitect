@@ -138,3 +138,11 @@
 {"src":"adr-mcp-attest","dst":"req-mcp-server"}
 {"src":"adr-iuwwmaa","dst":"req-metrics-removed"}
 {"src":"adr-install-not-zero-dep","dst":"uc-run-dep-free"}
+{"src":"adr-deck-anchor-fragment","dst":"req-deck-links"}
+{"src":"adr-deck-anchor-fragment","dst":"go-deck-anchors"}
+{"src":"adr-terms-source-glossary","dst":"req-terms-before-use"}
+{"src":"adr-terms-source-glossary","dst":"go-terms-order-lint"}
+{"src":"adr-white-label-hybrid","dst":"req-vehicle-white-label"}
+{"src":"adr-white-label-hybrid","dst":"go-white-label-identity"}
+{"src":"adr-ujav4ii","dst":"q-trace-graph-scaling"}
+{"src":"adr-ujav4ii","dst":"scrap"}
