@@ -68,10 +68,13 @@ flowchart TD
     go-migrate-layout["layout migration"]
     go-migrate-edges["edge migration"]
     go-cluster["cluster migration"]
+    go-dsm-cluster["design coupling clustering"]
     go-apply-manifest["judged bulk-edit applier"]
     go-mint-skeleton["mint skeletons"]
     go-mint-templates["mint bodies from template files"]
     go-rules-config["rule-sets from config files"]
+    go-field-schemas["per-field schemas: load, merge, validate"]
+    go-schema-tester["validate the schema set itself"]
     go-graph-load["spec loading and node assembly"]
     go-ratings-map["ratings map parsing"]
     go-conn-loader["lane files to edges"]
@@ -92,6 +95,8 @@ flowchart TD
     go-context-neighbours["context star from nbr notes"]
     go-onion-figure["the onion drill-down render"]
     go-onion-busbar["bus-bar level layout"]
+    go-model-standalone["standalone single-model render"]
+    go-onion-change-marks["review change-marks that propagate up"]
     go-block-tree-design["block tree render"]
     go-trace-graph["trace view render"]
     go-fig-elem-ids["stable figure element ids"]
@@ -103,6 +108,7 @@ flowchart TD
     go-results-exception["results exception render"]
     go-project-record["project record render"]
     go-decisions-table["one decisions table render"]
+    go-informed-by-edges["decision-to-model-element links + render"]
     go-asr-list["generated asr link list"]
     go-guides-table["guides table render"]
     go-views-home["views home render"]
@@ -138,6 +144,7 @@ flowchart TD
     go-compact["iteration archive codec"]
     go-ask-hardening["ask-store merge and stale-answer serialization rules"]
     go-ask-core["ask model and store serialization"]
+    go-first-wins-lanes["first answer wins"]
   end
   subgraph services
     go-build["engine build orchestration"]
@@ -145,17 +152,14 @@ flowchart TD
     go-rebaseline-inprocess["in-process re-baseline"]
     go-note["note capture"]
     go-note-dedup["note collision"]
-    go-metrics["dispatch metrics"]
     go-stamp-user["user stamp"]
     go-verdict-surgical["surgical verdicts"]
     go-verify-feedback["verify feedback"]
     go-why-derived["why for derived checks"]
-    go-first-wins-lanes["first answer wins"]
     go-mint["deterministic minting"]
     go-mint-content["mint bodies"]
     go-mint-kinds["mint kind set"]
     go-mint-edge-aware["mint edge mode"]
-    go-perf["perf checks"]
   end
   subgraph rim
     go-binary["process entry"]
@@ -175,6 +179,7 @@ flowchart TD
     go-observe-red-refresh["red re-attest"]
     go-selftest["selftest runner"]
     go-selftest-registry["per-file test registries"]
+    go-perf["perf checks"]
     go-compact-cmd["compact verb and referee archive ids"]
     go-cone-triage["triage verb and the suspects-only wave filter"]
     go-attest-gate["ledger commands need a key"]
@@ -183,6 +188,8 @@ flowchart TD
     go-global-ratchet["binary self-update"]
     go-ratchet-stamp["build stamps"]
     go-ask-loop["ask send, drain, await"]
+    go-mcp-server["hand-rolled stdio MCP transport + tool dispatch"]
+    go-mcp-session["per-session attest state + the ledger choke point"]
     go-ask-seam["adapter seam"]
     go-report-watch["watch server"]
     go-logs-dir["session logs"]
@@ -190,7 +197,6 @@ flowchart TD
     go-inside-launcher["launcher emission"]
     go-inside-agents["agents file emission"]
     go-inside-claude["claude pointer emission"]
-    go-agents-emit["agents emit"]
     go-init-stubs["stub workspaces"]
     go-stub-spec["spec template skeleton"]
     go-ntfy-adapter["ntfy transport"]
@@ -202,6 +208,7 @@ flowchart TD
   subgraph ambient
     go-data-home["data home paths"]
     go-call-log["telemetry - cross-cutting by decision (adr-logging-ambient)"]
+    go-call-log-cap["log retention cap - cross-cutting by decision (adr-logging-ambient)"]
     go-overlay-resolver["overlay resolution"]
     go-workspace-base["workspace base paths"]
     go-brand["brand name"]
@@ -225,6 +232,16 @@ flowchart TD
   go-report -->|html| go-report-watch
   go-book-emitter -->|book html| go-notes-out
   go-handover-pager -->|pager text| go-cli-help
+  %% i18 new-block flows (the developer's input/output contract per block)
+  go-mcp-server -->|tool call| go-mcp-session
+  go-mcp-session -->|attested call| go-walk
+  go-mcp-session -->|attested ledger op| go-bless
+  go-parse -->|parsed field values| go-field-schemas
+  go-field-schemas -->|field violations| go-spec-lints
+  go-schema-tester -->|contract test| go-field-schemas
+  go-decisions -->|architecture links| go-informed-by-edges
+  go-informed-by-edges -->|informed-by lists| go-model-render
+  go-informed-by-edges -->|type column| go-decisions-table
 ```
 ## Rationale (not load-bearing)
 The physics (owner physics): rank = abstraction gradient; elements = design regions; files = themes (derived Schlauch); bands own transforms; identity transit legal; a-to-b notation. Uncertain allocations for the owner's red pen: go-strict-load (band vs kernel - it referees DURING the load transform), go-book-drift and go-register-vale (kernel rules that read files), go-global-ratchet (services with heavy rim I/O), go-tests-pass-eval (kernel logic that shells out to run suites - an expected rim-only-I/O finding). The graph--kernel seam carries no dedicated band yet - transit is identity today. Rendering: rim--graph carries BOTH directions (parse a-to-b: rim-to-graph; render: graph-to-rim) - the codec pattern, one band. The onion render points here; design-layers.md retires when it does.
@@ -232,9 +249,12 @@ The physics (owner physics): rank = abstraction gradient; elements = design regi
 Allocation by essence:
 - To the band: every region whose essence is a coordinate transform on files. Spec-or-data readers and writers: go-strict-load, go-truth-in-spec (the ledger's CONTENT stays kernel memory; its file serialization is the band part - the region carries the serialization), go-evidence-hash, go-evidence-honesty, go-evidence-cache-cap, go-verdict-cache, go-base-eval, go-spec-content, go-conn-lanes, go-type-stakeholders. Raw-text lints (they work on the text coordinate, not the graph): go-spec-lints, go-model-lints, go-register-vale, go-user-wording, go-book-drift, go-entry-chain. One-shot spec rewrites and body emission: go-migrate-layout, go-migrate-edges, go-mint-skeleton. go-attest-ritual: the challenge IS a transform of the live contract text.
 - To the rim: the console command shells (they parse argv, call inward, print) - go-start, go-start-init, go-walk, go-bless, go-gather, go-ship, go-notes-list, go-calls-summary, go-tests-red, go-observe-red-refresh. The world-manipulating machinery: go-global-ratchet, go-ratchet-stamp, go-build-fast-path, go-authoring-cheap (binary, stamps, golden). The fixture-world batteries: go-selftest, go-grandfathers-decided, go-legacy-lanes-retired. The transport side of asks: go-ask-loop, go-ask-seam (adapters and their pump). go-attest-gate: its own design text names the CLI layer.
-- Orchestration RULES stay inward: go-first-wins-lanes, go-note, go-metrics, go-stamp-user (services); go-decisions, go-actor-channels, go-attest-state (kernel). Their console shells (cmdDecisions, cmdMigrateActors, cmdBuild-style) sit outside regions - the marked region is the rule, the shell is plumbing.
+- Orchestration RULES stay inward: go-note, go-stamp-user (services); go-decisions, go-actor-channels, go-attest-state (kernel). Their console shells (cmdDecisions, cmdMigrateActors, cmdBuild-style) sit outside regions - the marked region is the rule, the shell is plumbing.
 - go-readout-width (ambient) gained the console channel probe (channelInteractive) - console shape is a meaning-free utility, same family as isTTY.
+- go-call-log-cap (ambient) sits beside go-call-log - the retention cap is the same cross-cutting utility family, not a design transform.
 
 Further allocations by essence: go-cluster, go-mint-templates, go-rules-config, go-render-folds, go-apply-manifest -> all rim--graph, file-coordinate transforms every one; go-question-nodes -> graph (type vocabulary, beside go-items); go-book-once, go-lint-ast-cache (render/derivation memos), go-compact (the archive codec - file transform both directions) -> rim--graph; go-ask-hardening, go-cone-triage (orchestration RULES - store merge, stale refusal, wave filter) -> services, their console shells stay plumbing; go-selftest-registry (runner wiring), go-compact-cmd (console verb + the referee's archive-id recognition) -> rim.
 
-Render allocations by essence: go-decisions-table, go-asr-list, go-guides-table -> rim--graph, graph-to-html renders every one, the same family as go-q-table and go-project-record. go-views-home (the views-home figure: preset filter entries plus the derived-documents table) -> rim--graph, same family. go-onion-busbar (the drill-down's deterministic bus-bar SVG layout, split from go-onion-figure) -> rim--graph, a graph-to-svg transform.
+Allocated at i18 M4 AHEAD of the build (the diagram-first hard rule) - five new elements, UNREALIZED until M6 fills them: go-mcp-server + go-mcp-session -> rim (the new transport face and its per-session attest choke point, beside the ask lane); go-field-schemas + go-schema-tester -> rim--graph (per-field schema load/validate and the schema-set contract test, beside the config and text lints); go-informed-by-edges -> rim--graph (decision-to-element links and their render, beside the decisions table). The three MECHANICAL requirements are behavior changes to existing elements, not new blocks: await-console-exit modifies go-ask-loop; lint-exit-honest modifies the lint command; report-debounce removes render-on-bless from go-bless. The architecture ADRs (adr-mcp-transport, adr-schema-format, adr-mcp-attest, all kind:architecture) link to these elements via informed-by once go-informed-by-edges is built at M6 - the iteration documents its own architecture through the feature it ships.
+
+Render allocations by essence: go-decisions-table, go-asr-list, go-guides-table -> rim--graph, graph-to-html renders every one, the same family as go-q-table and go-project-record. go-views-home (the views-home figure: preset filter entries plus the derived-documents table) -> rim--graph, same family. go-onion-busbar (the drill-down's deterministic bus-bar SVG layout, split from go-onion-figure) -> rim--graph, a graph-to-svg transform. go-model-standalone (one model's onion as a small self-contained HTML review page) and go-onion-change-marks (the review's change-mark and its element->cluster->ring propagation) -> rim--graph, both graph-to-html transforms in the same render family.

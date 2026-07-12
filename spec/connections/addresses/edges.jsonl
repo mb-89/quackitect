@@ -133,3 +133,8 @@
 {"src":"adr-expedition-promotion-gate","dst":"req-expedition"}
 {"src":"adr-question-nodes-provenance","dst":"req-question-nodes"}
 {"src":"adr-agents-hand-authored","dst":"req-manifest-render"}
+{"src":"adr-mcp-transport","dst":"req-mcp-server"}
+{"src":"adr-schema-format","dst":"req-field-schemas"}
+{"src":"adr-mcp-attest","dst":"req-mcp-server"}
+{"src":"adr-iuwwmaa","dst":"req-metrics-removed"}
+{"src":"adr-install-not-zero-dep","dst":"uc-run-dep-free"}

@@ -29,11 +29,47 @@ func saveEvents(events []Event) {
 	os.WriteFile(ATTEST, out, 0o644)
 }
 
-// design: go-bless  implements: fill-adjudicate, suspect-bless, state-model
+// design: go-bless  implements: fill-adjudicate, suspect-bless, state-model, req-report-debounce
 // bless appends an attestation event (adjudicated_by actor + filled_by, recorded separately). Only
 // gates are blessable; content and executed checks are never blessed. The event stores the full_hash
 // and dep hashes, so any later input change makes the check SUSPECT (the suspect/bless mechanism).
 // The actor is stamped per channel with a --by override (go-actor-channels); QUACK_ACTOR is retired.
+//
+// report-debounce (req-report-debounce): a bless refreshes the board so any open --watch page
+// follows the adjudication, but a bless WAVE must not spawn dozens of identical renders (a static
+// output may be stale; the consumer regenerates). The refresh is debounced against the last render
+// time (a stamp in the data home): a refresh inside reportDebounceInterval of the last render is
+// SKIPPED, one outside it renders and re-arms the stamp — so a wave collapses to one render.
+
+const reportDebounceInterval = 3 * time.Second
+
+var reportDebounceStampOverride string // selftest seam; empty = the real data home
+
+func reportDebounceStampPath() string {
+	if reportDebounceStampOverride != "" {
+		return reportDebounceStampOverride
+	}
+	return filepath.Join(dataDirFor("out"), "last-render")
+}
+
+// reportRenderDue is the pure debounce rule: a render is due only when at least the debounce
+// interval separates it from the last render.
+func reportRenderDue(last, now time.Time) bool { return now.Sub(last) >= reportDebounceInterval }
+
+// blessReportRefreshDue reports whether a bless-triggered report refresh should run now, arming
+// the render stamp when it does. Inside the interval of the last render it returns false (the wave
+// collapses); a missing or unparsable stamp is a first render (due).
+func blessReportRefreshDue(now time.Time) bool {
+	p := reportDebounceStampPath()
+	if raw, err := os.ReadFile(p); err == nil {
+		if last, perr := time.Parse(time.RFC3339Nano, strings.TrimSpace(string(raw))); perr == nil && !reportRenderDue(last, now) {
+			return false
+		}
+	}
+	os.MkdirAll(filepath.Dir(p), 0o755)
+	os.WriteFile(p, []byte(now.Format(time.RFC3339Nano)), 0o644)
+	return true
+}
 func cmdBless(args []string) {
 	nodes := LoadAll()
 	memo := map[string]string{}
@@ -92,8 +128,12 @@ func cmdBless(args []string) {
 	// trigger (go-report-live-reload): refresh the report after a killer or milestone bless so the
 	// board — and any open --watch page — reflects the adjudication. DETACHED
 	// (bless never waits on a render) — a fire-and-forget self-exec carries the render.
+	// DEBOUNCED (req-report-debounce): a bless wave inside the interval collapses to one render.
 	for _, nid := range ids {
 		if n, ok := nodes[nid]; ok && (n.Killer || n.Milestone > 0) {
+			if !blessReportRefreshDue(time.Now()) {
+				break // a render fired within the debounce interval; skip this one
+			}
 			if exe, err := os.Executable(); err == nil {
 				c := exec.Command(exe, "report", "--no-open", "--out", filepath.Join(dataDirFor("out"), "report.html"))
 				if c.Start() == nil {
@@ -553,9 +593,17 @@ func cmdShip(args []string) {
 			io.Copy(w, strings.NewReader(string(raw)))
 		}
 	}
+	// the one-click install-and-demo scripts ride at the zip root beside the book and
+	// the report (adr-install-not-zero-dep: the ship includes RUNME.ps1 AND RUNME.sh).
+	for _, rn := range []string{"RUNME.ps1", "RUNME.sh"} {
+		if raw, rerr := os.ReadFile(filepath.Join(ROOT, "tools", rn)); rerr == nil {
+			w, _ := zw.Create(rn)
+			io.Copy(w, strings.NewReader(string(raw)))
+		}
+	}
 	zw.Close()
 	rel, _ := filepath.Rel(ROOT, zp)
-	fmt.Println("shipped ->", filepath.ToSlash(rel), "(book.html + report.html at the zip root)")
+	fmt.Println("shipped ->", filepath.ToSlash(rel), "(book.html + report.html + RUNME at the zip root)")
 }
 
 // writeBookCopies writes ONE rendered book to every published path, byte-identical,
@@ -724,7 +772,7 @@ func buildRebaseline(freshExe string) string {
 
 // enddesign
 
-// design: go-start-init  implements: req-engine-vehicle-overlay.3, req-vendor-workspace.2, req-vendor-workspace.1, req-scaffold-modern
+// design: go-start-init  implements: req-engine-vehicle-overlay.3, req-vendor-workspace.2, req-vendor-workspace.1, req-scaffold-modern, req-vehicle-drives-stub.1
 // `quack start init <target>` is run FROM a quackitect checkout and sets up a NEW vehicle at <target>
 // in the CURRENT world (adr-no-quack-data-home, adr-entry-chain, adr-ratchet-stamp):
 // it vendors the engine (product/ -> tools/vendor/, stamp included), writes spec/project.toml as the
@@ -805,10 +853,17 @@ func initVehicleFiles(target string) error {
 		return err
 	}
 	// 2. root marker + iteration breadcrumb — the no-.quack world's single committed config.
+	//    The overlay key declares the vehicle's COMMITTED method-overlay root: its method
+	//    extensions travel in the repository and merge over the vendored engine layer
+	//    (go-overlay-resolver), for the vehicle itself and for every stub it drives.
 	writeIfAbsent(filepath.Join(target, "spec", "project.toml"),
-		"# the workspace root marker + iteration breadcrumb (adr-no-quack-data-home).\n[iteration]\ntype    = \"default\"\nrigor   = \"systematic\"\nversion = \"\"\n")
-	// 3. the vehicle's own empty product/ + brand seeds from the engine's generic design templates.
+		"# the workspace root marker + iteration breadcrumb (adr-no-quack-data-home).\noverlay = \"product/"+proj+"\"\n[iteration]\ntype    = \"default\"\nrigor   = \"systematic\"\nversion = \"\"\n")
+	// 3. the vehicle's own empty product/ + brand seeds from the engine's generic design templates,
+	//    and the committed overlay home the overlay key points at.
 	os.MkdirAll(filepath.Join(target, "product"), 0o755)
+	os.MkdirAll(filepath.Join(target, "product", proj, "method"), 0o755)
+	writeIfAbsent(filepath.Join(target, "product", proj, "method", "README.md"),
+		"# "+proj+" method extensions\n\nYour committed method extensions live here - mirror the engine's method/ layout\n(prompts/, guides/, ...). The most-specific layer wins: a file here overrides the\nvendored engine copy of the same relative path, for this vehicle and for every\nstub it creates.\n")
 	bsrc := filepath.Join(src, "quackitect", "design")
 	bdst := filepath.Join(target, "product", "brand")
 	os.MkdirAll(bdst, 0o755)
@@ -1029,11 +1084,13 @@ func cmdMigrateLayout() {
 
 // enddesign
 
-// design: go-init-stubs  implements: req-workspace-stubs.1
+// design: go-init-stubs  implements: req-workspace-stubs.1, req-vehicle-drives-stub.2
 // `quack start stubs [target]` makes a workspace drivable from INSIDE: it writes the launcher,
 // AGENTS.md/CLAUDE.md, and spec/project.toml stubs (insideStubFiles) into target (default: the
 // current workspace ROOT). The launcher resolves an engine at runtime with no engine path
-// committed. Idempotent — existing files are kept.
+// committed. Idempotent — existing files are kept. The CREATING process's engine root is
+// recorded in the stub's data home (engine-home.txt), so a vehicle-created stub resolves
+// the vehicle's merged methods over any machine-global pointer.
 func cmdStartStubs(args []string) {
 	target := ROOT
 	if len(args) > 0 && strings.TrimSpace(args[0]) != "" {
@@ -1048,6 +1105,8 @@ func cmdStartStubs(args []string) {
 	}
 	// the project README rides every scaffold: name, one orienting line, further reading.
 	writeIfAbsent(filepath.Join(target, "README.md"), projectReadme(proj, target))
+	// the stub remembers its creator: a stale record self-ignores at resolution (hasEngineLayer).
+	recordWorkspaceEngineHome(target, ENGINE)
 	// design: go-stub-spec  implements: req-stub-templates.2, req-stub-templates.1, req-template-home.8
 	// The instantiation path: the spec MIRRORS the template -
 	// top-level files land at the spec ROOT (README renamed SPEC-README), and EVERY
@@ -1244,13 +1303,6 @@ func writeIfAbsent(path, content string) {
 	os.MkdirAll(filepath.Dir(path), 0o755)
 	os.WriteFile(path, []byte(content), 0o644)
 }
-
-// design: go-metrics-removed  implements: req-metrics-removed
-// The attest-log ratio metrics (go-metrics) are removed: never consulted
-// (the veto decision records the testimony).
-// A removal's design IS its tombstone: this region marks where the computation
-// lived, the report cards died with it, and git history is the archive.
-// enddesign
 
 // design: go-stamp-user  implements: req-stamp-user
 // The ledger says `user` (adr-actor-user-migration). New records write user (resolveActor);

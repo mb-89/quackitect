@@ -30,6 +30,13 @@ func cmdCluster(args []string) {
 		cmdClusterTests(args)
 		return
 	}
+	// `quack cluster <model-id>` (no --into) is the DSM coupling clustering
+	// (go-dsm-cluster) — distinct from the requirement-merge migration below,
+	// which always carries --into.
+	if !hasFlag(args, "--into") && len(args) > 0 && !strings.HasPrefix(args[0], "-") {
+		cmdClusterModel(args)
+		return
+	}
 	into := flagVal(args, "--into")
 	umbrella := flagVal(args, "--statement")
 	var members []string

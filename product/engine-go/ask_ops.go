@@ -278,9 +278,12 @@ func applyBlessIntent(in *BlessIntent) error {
 		fmt.Println("mobile bless recorded:", check, "(actor user, via "+in.Channel+")")
 	}
 	saveEvents(events)
+	// DEBOUNCED refresh (req-report-debounce): the same wave-collapse the console bless uses.
 	for _, check := range group {
 		if n, ok := nodes[check]; ok && (n.Killer || n.Milestone > 0) {
-			RenderReport("")
+			if blessReportRefreshDue(time.Now()) {
+				RenderReport("")
+			}
 			break
 		}
 	}
@@ -460,7 +463,15 @@ func cmdAwait(args []string) {
 	fmt.Println("await:", pending, "pending ask(s), streaming", cfg.Base+"/"+cfg.Answer, "( deadline", deadline, "s )")
 	end := time.Now().Unix() + deadline
 	ad := askAdapterFor(cfg)
+	// away-mode exit (req-await-console-exit): snapshot the call log; a line appended by
+	// ANOTHER process while the loop runs means someone is at the console — end the await
+	// and hand back to drain mode (go-ask-loop).
+	callBaseline := callLogLineCount()
 	for time.Now().Unix() < end {
+		if awaitForeignCall(callBaseline) {
+			fmt.Println(awaitHandbackMsg())
+			return
+		}
 		// hardening: every pass starts from the DISK state - another process may have
 		// asked, drained, or console-blessed while the stream was open (go-ask-hardening)
 		s = awaitLoopReload()

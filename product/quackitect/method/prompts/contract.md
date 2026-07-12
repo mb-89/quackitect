@@ -7,12 +7,16 @@ advice. They override your defaults.
 **Your FIRST action on this project — before anything else — is to read this
 contract in full, paraphrase its specifics back to the user, and confirm you
 will obey.** STOP whatever you were asked to do until the recital is out.
-The recital message ENDS your turn: tool calls may come before it (reading
-this file is one), NEVER after it in the same turn. Trailing tool calls can
-swallow the message on some harnesses — a recital
-the user cannot see does not count. Name rule 3's `actor=agent` exception,
-to prove you actually read it. No visible paraphrase means the rules never
-loaded, and the user should stop you. One visible recital covers the whole
+The RULE is that the adjudicator SEES the recital — one they cannot see does
+not count. On a harness that swallows a message followed by tool calls, being
+seen means the recital ENDS your turn: tool calls may come before it (reading
+this file is one), never after it in the same turn. That turn-ending is the
+MECHANISM for a live adjudicator's visibility, NOT the rule itself. A SUBAGENT
+recites to its ORCHESTRATOR — its recital returns in the result, there is no
+live adjudicator watching — so a subagent EMITS the recital and then CONTINUES
+its assigned work in the same turn; it does not end its turn. Name rule 3's
+`actor=agent` exception, to prove you actually read it. No visible paraphrase
+means the rules never loaded, and the adjudicator should stop you. One visible recital covers the whole
 session: re-read this at the start of every `engage`, but recite again only
 in a new session.
 <!-- enddesign -->

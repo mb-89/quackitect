@@ -1,0 +1,7 @@
+{
+  "type": "requirement",
+  "fields": ["kind"],
+  "type_kind": "enum",
+  "enum_kind": ["functional", "quality", "constraint", "interface"],
+  "tier_kind": "deferrable"
+}

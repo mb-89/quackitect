@@ -118,8 +118,9 @@ func nodeFence(raw []byte) bool {
 // StrictIssues walks one directory tree and returns every strict-load finding, batched.
 func StrictIssues(specDir string) []ParseIssue {
 	var issues []ParseIssue
-	edgeMode := edgesModeOf(specDir) // frontmatter | connections (go-edge-mode)
-	ids := map[string]string{}       // id -> first file
+	edgeMode := edgesModeOf(specDir)      // frontmatter | connections (go-edge-mode)
+	ids := map[string]string{}            // id -> first file
+	modelElemFiles := map[string]string{} // declared model element id -> the model file (go-informed-by-edges)
 	type ref struct{ from, path, field, to string }
 	var refs []ref
 	filepath.Walk(specDir, func(path string, fi os.FileInfo, err error) error {
@@ -245,6 +246,16 @@ func StrictIssues(specDir string) []ParseIssue {
 		if typeVal == "adr" && kindVal != "" && kindVal != "architecture" && kindVal != "project" && kindVal != "waiver" {
 			issues = append(issues, ParseIssue{path, kindVal, "unknown decision kind (architecture | project | waiver)"})
 		}
+		// go-informed-by-edges: a model's declared elements are first-class trace endpoints, so a
+		// decision addressing one never reads dangling — collect them for the id universe below.
+		if typeVal == "model" {
+			g, _ := extractModelGraph(string(raw))
+			for e := range g.Elems {
+				if _, dup := modelElemFiles[e]; !dup {
+					modelElemFiles[e] = path
+				}
+			}
+		}
 		if !isIter {
 			if prev, dup := ids[id]; dup {
 				issues = append(issues, ParseIssue{path, id, "duplicate id (silently shadows " + prev + ")"})
@@ -276,6 +287,13 @@ func StrictIssues(specDir string) []ParseIssue {
 		}
 	}
 	// enddesign
+	// a decision may address a DECLARED model element first-class (go-informed-by-edges); an element
+	// no model declares stays unrecognized and reads dangling like any other unknown endpoint.
+	for id, p := range modelElemFiles {
+		if _, dup := ids[id]; !dup {
+			ids[id] = p
+		}
+	}
 	// the connections home (go-conn-lanes): kinds, lanes, endpoints, and the one-lane rule
 	issues = append(issues, connectionIssues(specDir, ids)...)
 	return issues

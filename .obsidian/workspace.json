@@ -11,12 +11,10 @@
             "id": "389d8bfde2c5d415",
             "type": "leaf",
             "state": {
-              "type": "excalidraw",
-              "state": {
-                "file": "Drawing 2026-07-10 18.58.58.excalidraw.md"
-              },
-              "icon": "excalidraw-icon",
-              "title": "Drawing 2026-07-10 18.58.58.excalidraw"
+              "type": "empty",
+              "state": {},
+              "icon": "lucide-file",
+              "title": "New tab"
             }
           }
         ]
@@ -180,8 +178,10 @@
       "obsidian-excalidraw-plugin:New drawing": false
     }
   },
-  "active": "389d8bfde2c5d415",
+  "active": "81e99913a957c682",
   "lastOpenFiles": [
+    "product/engine-go/i18_red3.go",
+    "product/engine-go/i18_red3.go.tmp.20700.694b1559740f",
     "product/engine-go/book.go.tmp.3980.db1a898ecb98",
     "Drawing 2026-07-10 18.58.58.excalidraw.md",
     "README.md",
@@ -215,8 +215,6 @@
     "product/engine-go/ops.go.tmp.7820.54a09bf0477b",
     "product/engine-go/selftest.go.tmp.7820.e4b6fbd4b82e",
     "spec/iterations/i0014_doc_review/M5-handover.md.tmp.7820.ed127a64d891",
-    "spec/iterations/i0014_doc_review/M4-build.md.tmp.7820.85cc7723c99a",
-    "product/engine-go/book.go.tmp.7820.e8b585ce9eb2",
-    "product/engine-go/book.go.tmp.7820.81305981eaf0"
+    "spec/iterations/i0014_doc_review/M4-build.md.tmp.7820.85cc7723c99a"
   ]
 }

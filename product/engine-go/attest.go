@@ -256,6 +256,9 @@ func attestRedeem(code, answer string) (string, error) {
 // `ask` and `await` advance the ledger too (an ask can end in a bless), so they ride the
 // gate; the drain-on-run fallback executes the USER's recorded tap and is deliberately
 // ungated (the paired credential IS its authorization — adr-answer-authenticity).
+// One scope carve-out lives in attestGuard: `start stubs` and `start init` are workspace
+// CREATION, not ledger advancement — a fresh workspace cannot hold an attest session yet —
+// so those two subverbs bypass the gate while plain `start <version>` stays gated.
 var attestGatedCmds = map[string]bool{"next": true, "start": true, "bless": true, "ship": true, "observe-red": true, "migrate-actors": true, "ask": true, "await": true}
 
 func attestRequired(cmd string, interactive bool) bool {
@@ -266,6 +269,9 @@ func attestRequired(cmd string, interactive bool) bool {
 func attestGuard(cmd string, rest []string) []string {
 	key := flagVal(rest, "--key")
 	rest = stripFlagPair(rest, "--key")
+	if cmd == "start" && len(rest) > 0 && (rest[0] == "stubs" || rest[0] == "init") {
+		return rest // workspace creation, never ledger advancement — see the carve-out note above
+	}
 	if !attestRequired(cmd, channelInteractive()) {
 		return rest
 	}

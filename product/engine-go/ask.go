@@ -165,13 +165,46 @@ func askExpire(s *AskStore, now int64) []Ask {
 
 // enddesign
 
-// design: go-ask-loop  implements: req-ask-loop.2, req-ask-loop.4, req-ask-loop.9
+// design: go-ask-loop  implements: req-ask-loop.2, req-ask-loop.4, req-ask-loop.9, req-await-console-exit
 // The loop: dispatch every pending, unsent ask through EVERY paired adapter; poll the
 // adapters; correlate and apply. A resolved GATE answer becomes a bless with actor=user
 // — the paired device IS the adjudicator (paired = trustworthy) — and the
 // answering channel is noted in the record. Applying rides the EXISTING bless path; the
 // asks themselves never enter the ledger (BlessIntent, the pure answer model,
 // rides in go-ask-core).
+//
+// await-console-exit (req-await-console-exit): an await is AWAY-mode only. Every engine
+// dispatch appends one line to the workspace call log (go-call-log), and the awaiting
+// process writes its OWN line only at exit — so ANY line that lands while the loop runs is
+// a call from another process. awaitForeignCall watches for that growth and ends the await,
+// handing the walk back to drain mode (the next command drains the pending tap as the
+// fallback). The rule needs no PID: the awaiter's own line is not on disk until it exits.
+
+// callLogLineCount counts the non-empty lines currently in the workspace call log; a missing
+// log is zero. It is the baseline an await snapshots and re-reads to detect foreign activity.
+func callLogLineCount() int {
+	raw, err := os.ReadFile(callLogPath())
+	if err != nil {
+		return 0
+	}
+	n := 0
+	for _, ln := range strings.Split(string(raw), "\n") {
+		if strings.TrimSpace(ln) != "" {
+			n++
+		}
+	}
+	return n
+}
+
+// awaitForeignCall reports whether the call log has grown past the await's start baseline —
+// i.e. another process logged an engine call on this workspace while the await ran.
+func awaitForeignCall(baseline int) bool { return callLogLineCount() > baseline }
+
+// awaitHandbackMsg is the line an await prints when a foreign console call ends it: the walk
+// hands back to drain mode, where the next command applies any pending tap.
+func awaitHandbackMsg() string {
+	return "await: another process is driving this workspace - handing back to drain mode (the next command drains any pending tap)"
+}
 
 // AskAdapter is the channel seam: send an ask out, poll answers back.
 // The method is ChannelName, not Name: the engine's flow pass resolves bare

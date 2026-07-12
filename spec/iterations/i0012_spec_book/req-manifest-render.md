@@ -11,4 +11,4 @@ killer: false
 3. Where a base view declares render refs with a depth, the book shall render each result row through the node renderer at that depth. *(was req-render-refs)*
 4. Where a manifest declares deck mode, the engine shall render one unit per slide with a present mode in the same HTML file. *(was req-deck-mode)*
 5. When the book renders prose, the engine shall link plain-text occurrences of a note name or alias to that note - authored links win, the longest name wins, code and headings stay untouched - and shall refuse an alias claimed by two notes. *(was req-auto-link)*
-6. The engine shall emit the repo-root AGENTS.md and the book's agent-guide chapter from one manifest source. *(was req-agents-emit)*
+6. The engine shall render the book's agent-guide chapter from its manifest source and embed the hand-authored repo-root AGENTS.md into that chapter verbatim - the entry file is never generated (adr-agents-hand-authored). *(was req-agents-emit)*

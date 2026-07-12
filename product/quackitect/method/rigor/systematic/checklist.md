@@ -41,7 +41,10 @@ stamp). The rest are user-judged (`class: review`). The trace itself is content,
 
 - **M3 — Candidate architectures** · *gate: candidates*
   - method: Produce >=2 viable alternatives (morphological analysis, reference patterns). Derive the
-    vital-few decision criteria from the requirements. Weight them.
+    vital-few decision criteria from the requirements. Weight them. Structuring a candidate's
+    elements into modules MAY draw on a matrix-based structuring method from the register
+    (`spec/methods/meth-dsm*`: clustering groups by coupling) — a menu, not a mandate; skip it
+    when the grouping is already obvious.
   - [ ] ≥2 alternatives elaborated *(killer)*
   - [ ] criteria weighted — derived from the requirements
   - [ ] feasibility rough-checked per candidate
@@ -58,6 +61,14 @@ stamp). The rest are user-judged (`class: review`). The trace itself is content,
   - [ ] chosen architecture stated
   - [ ] choice traced to the weighted criteria
   - [ ] views chosen — model kinds picked from the registry (`method/models/`), each with the question it answers; rejected kinds recorded; two models is the default budget
+  - [ ] structuring method considered (optional) — the SAME way model kinds are chosen above, a
+    matrix-based structuring method MAY be picked from the register (`spec/methods/meth-dsm*`) to
+    ground the layout in data rather than eyeballing it: DSM clustering for grouping elements into
+    modules, DSM partitioning/tearing for ordering them into a layering, DSM banding for
+    within-layer parallelism, DMM/MDM for a cross-domain mapping (e.g. requirements x elements); a
+    menu, never mandatory — record which method (if any) was applied, or that the cut was obvious
+    enough to skip it
+  - [ ] **model authored — the DIAGRAM is the architecture deliverable** *(killer, HARD RULE)*: every chosen view exists as a model node with its ELEMENTS ALLOCATED (the blocks the build will fill, allocated ahead of any code — the conformance lint tolerates unrealized elements), the structure drawn, each element's INPUTS and OUTPUTS wired (the developer fills a block by its contract, not by re-deciding architecture), each element carrying a one-line PLACEMENT RATIONALE (why the architecture put it WHERE it is in this view — the onion's band, a tree's parent, a state group; placement is a judgment call, general to every model kind, not onion-specific), and each architecture ADR marked `kind: architecture` and linked to the element(s) it shapes (informed-by). The M4 gate is a DIAGRAM REVIEW — the architect (owner) reviews and approves the decomposition here; the M4 gate cannot bless without it. M6 then ADHERES to this model; the build never invents an element the diagram did not sanction (sky-fall lint).
   - [ ] ADR recorded and traced — every ADR addresses a requirement *(derived: coverage:adr-traced)*
 
 - **M5 — Prove the riskiest unknowns** · *gate: prototype*
@@ -77,7 +88,7 @@ stamp). The rest are user-judged (`class: review`). The trace itself is content,
     not bolt them on. Every requirement has a passing `verified_by`. Verification runs EVERY test
     (all iterations, not just this one) so regressions in earlier work are caught. Tests live in the
     trace (they verify requirements); they are not task-tree subtasks — the verification task rolls them up.
-  - [ ] models authored — every kind chosen at views-chosen exists as a model node, lints clean, elements allocated AHEAD of the build; the build plan references the declared elements
+  - [ ] models adhered-to — the build fills the M4-allocated elements; no new element the M4 diagram did not sanction (the conformance/sky-fall lint enforces it); a genuinely-needed new element goes back through an architecture review, not in silently
   - [ ] build planned — decomposed into small, resumable steps seeded as children of the build task *(killer)*
   - [ ] suite observed RED — every new test ran and failed before the build *(derived: coverage:tests-red)*
   - [ ] build — the planned steps nested beneath it are realized

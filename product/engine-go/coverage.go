@@ -128,6 +128,7 @@ func coverageRuleUncached(nodes map[string]Node, rule, scope string) bool {
 		}
 		return true
 	case "adr-traced":
+		elems := modelDeclaredElements(nodes) // an addresses edge may trace to a model/element first-class (go-informed-by-edges)
 		for _, a := range adrs {
 			if len(a.Addresses) == 0 {
 				return false
@@ -136,16 +137,22 @@ func coverageRuleUncached(nodes map[string]Node, rule, scope string) bool {
 				if p == scrapSink {
 					continue // a veto/defer is traced TO THE SINK by design (go-decisions)
 				}
-				if nodes[p].Type != "requirement" {
+				if !addressFirstClass(p, nodes, elems) {
 					return false
 				}
 			}
 		}
 		return true
 	case "designs-realized":
+		// A requirement is realized either by a design region carrying real body, OR — when its
+		// realization is a REMOVAL — by its veto decision. removalDecided lets a removal stand on
+		// its decision alone (the decision IS the realization), so a removal never owes a tombstone.
 		for _, r := range reqs {
 			ds := impl[r.ID]
 			if len(ds) == 0 {
+				if removalDecided(r.ID, nodes) {
+					continue
+				}
 				return false
 			}
 			for _, d := range ds {
@@ -461,6 +468,7 @@ func CoverageHoles(nodes map[string]Node, scope string) []string {
 		return true
 	}
 	deferred := deferredReqs(nodes)
+	elems := modelDeclaredElements(nodes) // first-class addresses targets (go-informed-by-edges)
 	for _, n := range nodes {
 		if !inscope(n) || deferred[n.ID] {
 			continue
@@ -478,8 +486,8 @@ func CoverageHoles(nodes map[string]Node, scope string) []string {
 				holes = append(holes, "use-case '"+n.ID+"' orphan (no need)")
 			}
 		case "requirement":
-			if len(impl[n.ID]) == 0 {
-				holes = append(holes, "requirement '"+n.ID+"' has no design")
+			if len(impl[n.ID]) == 0 && !removalDecided(n.ID, nodes) {
+				holes = append(holes, "requirement '"+n.ID+"' has no design") // a removal stands on its veto decision, not a tombstone
 			}
 			if len(veri[n.ID]) == 0 {
 				holes = append(holes, "requirement '"+n.ID+"' has no test")
@@ -511,8 +519,16 @@ func CoverageHoles(nodes map[string]Node, scope string) []string {
 					real = append(real, a)
 				}
 			}
-			if !ptypeOK(n, real, "requirement") {
-				holes = append(holes, "adr '"+n.ID+"' orphan (addresses no requirement)")
+			// a first-class target is a requirement OR a model/element (go-informed-by-edges)
+			tracedFC := len(real) > 0
+			for _, a := range real {
+				if !addressFirstClass(a, nodes, elems) {
+					tracedFC = false
+					break
+				}
+			}
+			if !tracedFC {
+				holes = append(holes, "adr '"+n.ID+"' orphan (addresses no requirement or model element)")
 			}
 		}
 	}

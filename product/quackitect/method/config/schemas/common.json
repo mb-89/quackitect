@@ -1,0 +1,11 @@
+{
+  "type": "common",
+  "fields": ["class", "killer"],
+  "type_class": "enum",
+  "enum_class": ["domain", "executed", "judgment", "meta", "review"],
+  "tier_class": "core",
+  "default_class": "review",
+  "type_killer": "bool",
+  "tier_killer": "core",
+  "default_killer": "false"
+}

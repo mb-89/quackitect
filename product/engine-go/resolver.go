@@ -6,18 +6,24 @@ import (
 	"strings"
 )
 
-// design: go-overlay-resolver  implements: req-engine-vehicle-overlay.1, req-engine-vehicle-overlay.2, guidance, req-engine-vehicle-overlay.3, req-vendor-workspace.3
+// design: go-overlay-resolver  implements: req-engine-vehicle-overlay.1, req-engine-vehicle-overlay.2, guidance, req-engine-vehicle-overlay.3, req-vendor-workspace.3, req-vehicle-drives-stub.1
 // One resolver walks the vehicle->engine chain. The most-specific layer wins; an un-overridden
 // resource is inherited from the engine. The engine layer is READ-ONLY: a vehicle overrides by
 // placing a file in its overlay, never by editing the engine. guides() routes through this.
 func overlayLayers() []string {
 	// most-specific first: the workspace's overlay in the DATA HOME (adr-no-quack-data-home),
-	// then the engine's default resources. No legacy .quack/overlay lane
+	// then the ENGINE's COMMITTED overlay (the `overlay` key in the engine workspace's
+	// spec/project.toml — a vehicle's method extensions travel in its repository and
+	// merge over the vendored layer, for itself AND for every stub it drives; no key,
+	// no layer), then the engine's default resources. No legacy .quack/overlay lane
 	// (adr-retire-legacy-lanes).
-	return []string{
-		dataDirFor("overlay"),
-		EngineDir(), // engine defaults (vendored, else dogfood product/)
+	layers := []string{dataDirFor("overlay")}
+	if ov := ReadConfig(filepath.Join(ENGINE, "spec", "project.toml")).Overlay; ov != "" {
+		layers = append(layers, filepath.Join(ENGINE, filepath.FromSlash(ov)))
 	}
+	return append(layers,
+		EngineDir(), // engine defaults (vendored, else dogfood product/)
+	)
 }
 
 // EngineDir resolves the read-only engine layer (its default method/ + project_types/). A vehicle

@@ -15,7 +15,7 @@ import (
 // Roots, discovered by walking up to a .quack or pyproject.toml (mirrors engine.find_root).
 var ROOT, SPEC, QUACK, ATTEST, ENGINE string // NOTES retired: the note lane resolves notesHome() live
 
-// design: go-workspace-base  implements: req-vendor-workspace.5
+// design: go-workspace-base  implements: req-vendor-workspace.5, req-vehicle-drives-stub.2, req-vehicle-drives-stub.3
 // The engine operates on a selectable WORKSPACE, separate from the ENGINE install. ROOT (and all state
 // — SPEC/QUACK/ATTEST/NOTES) is the cwd walk-up by default, or an explicit --base/-C target, so one
 // engine drives its own or ANOTHER project's workspace (sebot base-style; like git -C). ENGINE (the
@@ -73,10 +73,13 @@ func hasEngineLayer(dir string) bool {
 // resolveEngineRoot is engineRoot's pure core, seamed for the selftest. Order (LIVE
 // resolution, never a copy): a legacy
 // .quack ancestor of the executable; the WORKSPACE when it carries the resource layer itself
-// (dogfood and vendored vehicles stay live-first); the RECORDED engine home — the quackitect
+// (dogfood and vendored vehicles stay live-first); the workspace's OWN engine-home record —
+// start stubs wrote it, so a vehicle-created stub resolves the vehicle's merged methods;
+// the machine-global RECORDED engine home — the quackitect
 // repo the binary was last built or ratcheted from, so a resource edit there changes every
 // stub workspace immediately; else the workspace (the old fallback: strict names the real gap).
-func resolveEngineRoot(exeDir, root, recordedHome string) string {
+// A stale or layer-less record is ignored at its step, never trusted.
+func resolveEngineRoot(exeDir, root, workspaceRecord, recordedHome string) string {
 	if exeDir != "" {
 		d := exeDir
 		for i := 0; i < 4 && d != filepath.Dir(d); i++ {
@@ -89,23 +92,39 @@ func resolveEngineRoot(exeDir, root, recordedHome string) string {
 	if hasEngineLayer(root) {
 		return root
 	}
+	if hasEngineLayer(workspaceRecord) {
+		return workspaceRecord
+	}
 	if hasEngineLayer(recordedHome) {
 		return recordedHome
 	}
 	return root
 }
 
+// isEngineRepo reports whether dir is a REAL engine repo — the dogfood resource layer AND
+// the engine source. A vehicle with committed method overrides carries the layer shape but
+// never the source; only a real repo may re-record the machine-global pointer.
+func isEngineRepo(dir string) bool {
+	if st, err := os.Stat(filepath.Join(dir, "product", "quackitect", "method")); err != nil || !st.IsDir() {
+		return false
+	}
+	st, err := os.Stat(filepath.Join(dir, "product", "engine-go"))
+	return err == nil && st.IsDir()
+}
+
+// enddesign
+
 // engineRoot resolves the engine install (the resource layer's home) from the executable
-// path, independent of the workspace (req-vendor-workspace.5).
+// path, independent of the workspace (req-vendor-workspace.5). The plumbing shell: it
+// gathers the inputs (exe dir, the workspace's own record, the machine-global record)
+// and hands them to the pure core.
 func engineRoot() string {
 	exeDir := ""
 	if exe, err := os.Executable(); err == nil {
 		exeDir = filepath.Dir(exe)
 	}
-	return resolveEngineRoot(exeDir, ROOT, recordedEngineHome())
+	return resolveEngineRoot(exeDir, ROOT, workspaceEngineHome(ROOT), recordedEngineHome())
 }
-
-// enddesign
 
 func init() {
 	ROOT = findRoot()
@@ -119,10 +138,11 @@ func init() {
 	}
 	ENGINE = engineRoot()
 	// self-heal the recorded engine home (the cross-machine case): any run
-	// whose workspace IS an engine repo (dogfood layout) re-records the pointer, so a fresh
-	// clone on a new machine fixes every stub with one command run inside the repo. Vehicles
-	// (vendored layout) never steal the pointer.
-	if st, err := os.Stat(filepath.Join(ROOT, "product", "quackitect", "method")); err == nil && st.IsDir() {
+	// whose workspace IS a real engine repo (isEngineRepo: resource layer AND engine source)
+	// re-records the pointer, so a fresh clone on a new machine fixes every stub with one
+	// command run inside the repo. A vehicle — even one committing overrides under the
+	// engine's own method path — never steals the pointer.
+	if isEngineRepo(ROOT) {
 		if recordedEngineHome() != ROOT {
 			recordEngineHome(ROOT)
 		}

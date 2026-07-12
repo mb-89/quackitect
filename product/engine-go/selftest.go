@@ -407,21 +407,29 @@ func selftestExternalEngineRoot() bool {
 	ext := mk(tmp, "ext") // an external stub: no resource layer of its own
 	repoB := mk(tmp, "repoB")
 	mk(repoB, "product", "quackitect", "method")
+	vech := mk(tmp, "vech") // a vehicle: vendored layer, per-stub record target
+	mk(vech, "tools", "vendor", "quackitect", "method")
 	exeDir := mk(tmp, "bin")
-	if resolveEngineRoot(exeDir, dog, repoB) != dog {
+	if resolveEngineRoot(exeDir, dog, "", repoB) != dog {
 		return false // a workspace carrying the layer stays live-first (dogfood)
 	}
-	if resolveEngineRoot(exeDir, ext, repoB) != repoB {
+	if resolveEngineRoot(exeDir, ext, "", repoB) != repoB {
 		return false // THE bug: an external workspace resolves the RECORDED engine home, live
 	}
-	if resolveEngineRoot(exeDir, ext, filepath.Join(tmp, "absent")) != ext {
+	if resolveEngineRoot(exeDir, ext, vech, repoB) != vech {
+		return false // the stub's OWN record wins over the machine-global pointer
+	}
+	if resolveEngineRoot(exeDir, ext, filepath.Join(tmp, "gone"), repoB) != repoB {
+		return false // a stale per-stub record is ignored; the machine-global stands
+	}
+	if resolveEngineRoot(exeDir, ext, "", filepath.Join(tmp, "absent")) != ext {
 		return false // a dead pointer: the old fallback stands
 	}
-	if resolveEngineRoot(exeDir, ext, "") != ext {
+	if resolveEngineRoot(exeDir, ext, "", "") != ext {
 		return false // no pointer at all: the old fallback stands
 	}
 	legacyExe := mk(tmp, "legacy", ".quack", "engine")
-	if resolveEngineRoot(legacyExe, ext, repoB) != filepath.Join(tmp, "legacy") {
+	if resolveEngineRoot(legacyExe, ext, "", repoB) != filepath.Join(tmp, "legacy") {
 		return false // a .quack ancestor still wins
 	}
 	// (2) end-to-end, the cross-machine chain against a hermetic install home
@@ -676,6 +684,9 @@ func init() {
 		i17cTests,         // i17_red3.go
 		i17dTests,         // i17_red4.go
 		i17eTests,         // i17_red5.go (the post-ship feedback batch)
+		i18Tests,          // i18_red.go
+		i18bTests,         // i18_red2.go (the mechanical requirements)
+		i18cTests,         // i18_red3.go (the vehicle-drives-stub chain)
 	)
 }
 

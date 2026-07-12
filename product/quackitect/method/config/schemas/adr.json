@@ -1,0 +1,7 @@
+{
+  "type": "adr",
+  "fields": ["kind"],
+  "type_kind": "enum",
+  "enum_kind": ["architecture", "project", "waiver", "quality", "risk"],
+  "tier_kind": "deferrable"
+}

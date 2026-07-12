@@ -36,6 +36,9 @@ Sources: partitioning forces, block description @[[ref-sya-architecting]].
 -->
 <!-- ai:3 -->
 The layered figure below derives from the design elements and the layer map. Enter a layer by clicking it; the breadcrumbs lead back; every leaf links to its trace item. Each interface is a connection with its contract one click away; the forces that shaped the cut render beneath it.
+
+<!-- ai:3 -->
+Grouping elements into cohesive modules, or reordering them into a dependency layering, MAY draw on matrix-based structuring methods rather than eyeballing the cut alone: represent the coupling as a [DSM](meth-dsm), then [cluster](meth-dsm-clustering) it to find candidate modules, [partition](meth-dsm-partitioning) it to find a layering, [tear](meth-dsm-tearing) the residual feedback edges to prioritize them, and [band](meth-dsm-banding) the partitioned result to expose within-layer parallelism. Mapping this structure against another domain (e.g. requirements) reaches for a [DMM](meth-dmm); deriving one domain's structure from others already elicited reaches for an [MDM](meth-mdm). The catalog comes from [Structural Complexity Management](ref-structural-complexity-management) (Lindemann, Maurer, Braun), citing Pimmler & Eppinger's canonical clustering example and Thebeau's search heuristic.
 ---
 fig: onion
 ---

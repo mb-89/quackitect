@@ -94,6 +94,14 @@ hashes the EXTRACTED graph (cosmetic churn never ripples). Elements are allocate
 the design-marker id is the join; a realized region no model allocates is the sky-fall lint.
 Models are trace CONTENT — never blessed, never a gate.
 
+## Structuring methods (optional, M3/M4)
+The SAME way a model kind is picked from `method/models/`, a matrix-based structuring method MAY
+be picked from the method register (`spec/methods/meth-dsm*`, `meth-dmm`, `meth-mdm`) when
+grouping elements into modules or ordering them into a layering: DSM clustering for grouping,
+DSM partitioning/tearing for a layering, DSM banding for within-layer parallelism, a DMM/MDM for
+a cross-domain mapping. A menu, never a mandate — the systematic checklist's M3/M4 lines are
+where it is offered.
+
 ## Book render laws (owner law)
 Structural learnings land in the TEMPLATE layer (method/templates + the pooled views) BEFORE
 or WITH any renderer change - template↔book drift is forbidden. The renderer decides

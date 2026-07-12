@@ -44,7 +44,12 @@ ADJUDICATES the ones that are gates. **Never bless on their behalf.**
 quack status [id]        # the text board to stdout; with an id, why it's suspect
 quack next               # the next ready check to walk
 quack start <id> [--plan]# activate a version (--plan registers a future one)
-quack start stubs [path] # emit drive-from-inside stubs into a bare workspace
+quack start stubs [path] # emit drive-from-inside stubs into a bare workspace (ungated: creation, not ledger)
+quack start init <path>  # scaffold a full VEHICLE: vendored engine + committed method overlay (product/<name>/method, declared in spec/project.toml)
+quack mcp                # serve the command surface as MCP tools over stdio (agent-discoverable; per-session attest)
+quack render <model> --out <F> [--mark ids] # standalone architecture-review onion with change marks
+quack cluster <model>    # DSM structuring proposal: coupling clusters, layering, tears
+quack apply <manifest.json> [--dry] # judged bulk edits: byte-exact {file, old, new}, all-or-nothing
 quack why <id>           # what input changed
 quack bless [--all|<id>] [--by user|agent] # record an adjudication; actor defaults by CHANNEL
 quack migrate-actors     # one-shot: rewrite legacy actor stamps to user (audited; no-op when done)
@@ -88,6 +93,7 @@ to ANY command to drive a different project's workspace. After editing engine `.
   never a loose script the method quietly depends on. Throwaway scripts for one-time mechanical
   work are FINE and often the efficient choice; they just never become a dependency, never live
   in the repo, and must honor the byte-safe edit rule below.
+- **Static outputs may be stale; the consumer regenerates.** A generated artifact (the report, the book, any rendered output) is a snapshot. Expect its reader to know it can be stale and to re-render when they want it current — every render recomputes live. Do NOT add machinery to keep a static output eagerly fresh (no render-on-every-change); freshness comes from on-demand and `--watch` rendering, and from the ship refresh.
 - **Designs live in code, not `spec/`.** Mark realized code inline: `# design: <id>  implements: <req-id>` … `# enddesign` (`//` in Go). `quack lint` flags a requirement with no design. ADRs — the *decisions* — are `.md` nodes in `spec/decisions/`.
 - A check goes **SUSPECT**, not open, when an input changes. A `bless` returns it to DONE.
 - **Killer checks** are always adjudicated gates. Never auto-pass them.

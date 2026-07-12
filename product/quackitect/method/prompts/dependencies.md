@@ -38,4 +38,12 @@ Go install, no proxy fight (it comes from PyPI, which is typically reachable):
 - **git** — only the report's commit stamp uses it; the engine runs fine without it.
   - `winget install Git.Git`
   - Verify: `git --version`
+
+## Runtime dependencies: none — by decision
+
+The engine stays a single static binary with zero runtime dependencies. Even the MCP surface
+(`quack mcp`) is hand-rolled stdio JSON-RPC on the stdlib (adr-mcp-transport) — adopting the SDK
+would have been the engine's first runtime dependency. The distribution bar is one-click
+install-and-demo, dependencies minimized not forbidden (adr-install-not-zero-dep): the shipped
+RUNME scripts install the build toolchain above; the running engine needs nothing.
 <!-- enddesign -->

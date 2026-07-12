@@ -52,6 +52,24 @@ func addressesSink(n Node) bool {
 	return false
 }
 
+// removalDecided reports whether a requirement's realization is a REMOVAL testified by a
+// veto: some veto (a decision addressing the scrap sink, no ready_when) names the requirement
+// in its addresses. Such a requirement owes no realized design region — its decision IS the
+// realization and git history is the archive, so no tombstone design is ever needed.
+func removalDecided(reqID string, nodes map[string]Node) bool {
+	for _, n := range nodes {
+		if n.Type != "adr" || strings.TrimSpace(n.ReadyWhen) != "" || !addressesSink(n) {
+			continue
+		}
+		for _, a := range n.Addresses {
+			if a == reqID {
+				return true
+			}
+		}
+	}
+	return false
+}
+
 func decisionClass(n Node, superseded map[string]bool) string {
 	return decisionClassRaw(addressesSink(n), n.ReadyWhen, superseded[n.ID])
 }

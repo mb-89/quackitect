@@ -24,7 +24,19 @@ resolved at seed from the project type + iteration overrides; the default bindin
 - [ ] build planned — small resumable steps under the build task *(killer)*
 - [ ] suite observed RED — every new test ran and failed before the build *(derived: coverage:tests-red)*
 - [ ] designs realized — every requirement has a realized design *(derived: coverage:designs-realized)*
+  - A requirement whose realization is a REMOVAL is satisfied by its veto decision, not a design.
+  - The veto records the removal. Git history is the archive. No tombstone design is ever needed.
 - [ ] verification GREEN — every test passes, across all iterations *(derived: coverage:tests-pass)*
 - [ ] internal quality ok *(review)*
 - [ ] implementation risks acceptable *(review — systematic only)*
+<!-- enddesign -->
+
+<!-- design: method-apply-default-lane  implements: req-apply-default-lane :: The mechanical-edit lane, named in the method: quack apply is the DEFAULT lane for a mechanical bulk edit (byte-exact old->new, dry-run first, all-or-nothing); editor tooling is the lane for a single edit; a byte-safe scripted edit is the recorded exception, never the default. -->
+## Editing lane — how a change reaches the files
+
+Every edit travels one lane. Pick the lane by the edit's shape.
+
+- Single edit: use editor tooling. This is the default for one change.
+- Mechanical bulk edit: `quack apply <manifest.json>` is the default lane. It replaces byte-exact `old` with `new`. It dry-runs first. It is all-or-nothing.
+- Scripted bulk edit: this is the recorded exception, never the default. It must be byte-safe. It never becomes a dependency.
 <!-- enddesign -->

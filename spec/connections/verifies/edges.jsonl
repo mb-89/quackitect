@@ -209,3 +209,14 @@
 {"src":"test-models-complete-book","dst":"req-models-complete-book"}
 {"src":"test-render-once","dst":"req-battery-lean"}
 {"src":"test-apply-manifest","dst":"req-apply-manifest"}
+{"src":"test-mcp-serve","dst":"req-mcp-server"}
+{"src":"test-apply-default-lane","dst":"req-apply-default-lane"}
+{"src":"test-await-console-exit","dst":"req-await-console-exit"}
+{"src":"test-informed-by-edges","dst":"req-informed-by-edges"}
+{"src":"test-lint-exit-honest","dst":"req-lint-exit-honest"}
+{"src":"test-report-debounce","dst":"req-report-debounce"}
+{"src":"test-field-schemas","dst":"req-field-schemas"}
+{"src":"test-book-graph-membership","dst":"req-system-overview"}
+{"src":"test-diagram-review-render","dst":"req-diagram-review-render"}
+{"src":"test-dsm-cluster","dst":"req-dsm-cluster"}
+{"src":"test-vehicle-chain","dst":"req-vehicle-drives-stub"}

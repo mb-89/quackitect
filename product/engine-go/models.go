@@ -347,9 +347,28 @@ func nameMatchToken(text, tok string) bool {
 }
 
 // renderModelInformed emits the compact informed-by link list for one model —
-// nodeLinkHTML affordances, sorted, honest when empty.
+// nodeLinkHTML affordances, honest when empty. The list LEADS with the decisions holding a
+// FIRST-CLASS addresses edge to the model or one of its elements (go-informed-by-edges,
+// req-informed-by-edges.2), then keeps the name-derived citation only for a decision without
+// a first-class edge.
 func renderModelInformed(modelID, src string, nodes map[string]Node) string {
-	ids := modelInformedBy(modelID, src, nodes)
+	g, _ := extractModelGraph(src)
+	var elems []string
+	for e := range g.Elems {
+		elems = append(elems, e)
+	}
+	fc := firstClassInformedBy(modelID, elems, nodes)
+	seen := map[string]bool{}
+	for _, id := range fc {
+		seen[id] = true
+	}
+	var derived []string
+	for _, id := range modelInformedBy(modelID, src, nodes) {
+		if !seen[id] {
+			derived = append(derived, id) // name-derived citation only WITHOUT a first-class edge
+		}
+	}
+	ids := append(append([]string{}, fc...), derived...)
 	if len(ids) == 0 {
 		return `<p class="meta model-informed">no decision names this model yet — informing decisions link here as they arrive; the full set lives with the project chapter</p>` + "\n"
 	}
@@ -422,6 +441,100 @@ func svgModelGraph(g modelGraph) string {
 	}
 	b.WriteString(`</svg>`)
 	return b.String()
+}
+
+// enddesign
+
+// design: go-informed-by-edges  implements: req-informed-by-edges
+// A decision may address a MODEL or a model ELEMENT first-class, exactly as it addresses a
+// requirement (req-informed-by-edges.1): the trace rules (coverage:adr-traced and the hole
+// lister) accept such a target, and the strict referee recognizes every DECLARED model element
+// as a resolvable endpoint so a first-class edge never reads dangling. The book's informed-by
+// list then LEADS with the decisions holding a first-class edge to the model or its elements and
+// keeps the name-derived citation only for a decision without one (req-informed-by-edges.2). An
+// addresses edge naming an element-shaped target that NO model declares is a dangling model
+// target the lint flags (req-informed-by-edges.3). Elements ARE design regions (the onion
+// physics), so a realized region in a model resolves both ways; the set is derived, never authored.
+
+// modelDeclaredElements returns every element id declared across all model nodes' graphs — the
+// first-class trace endpoints, resolvable even before a design region realizes them.
+func modelDeclaredElements(nodes map[string]Node) map[string]bool {
+	out := map[string]bool{}
+	for _, n := range nodes {
+		if n.Type != "model" {
+			continue
+		}
+		raw, err := os.ReadFile(n.Path)
+		if err != nil {
+			continue
+		}
+		g, _ := extractModelGraph(string(raw))
+		for e := range g.Elems {
+			out[e] = true
+		}
+	}
+	return out
+}
+
+// addressFirstClass reports whether an addresses target traces first-class: a requirement, a
+// use-case, a need, a model node, or a declared model element. The coverage rules use it so a
+// decision informing an element is credited exactly like one addressing a requirement.
+func addressFirstClass(id string, nodes map[string]Node, elems map[string]bool) bool {
+	if n, ok := nodes[id]; ok {
+		switch n.Type {
+		case "requirement", "usecase", "need", "model":
+			return true
+		}
+	}
+	return elems[id]
+}
+
+// firstClassInformedBy returns the decisions holding a first-class addresses edge to the model
+// modelID or to one of its elements — the discriminating, authored informed-by set.
+func firstClassInformedBy(modelID string, elems []string, nodes map[string]Node) []string {
+	targets := map[string]bool{modelID: true}
+	for _, e := range elems {
+		targets[e] = true
+	}
+	var out []string
+	for id, n := range nodes {
+		if n.Type != "adr" {
+			continue
+		}
+		for _, a := range n.Addresses {
+			if targets[a] {
+				out = append(out, id)
+				break
+			}
+		}
+	}
+	sort.Strings(out)
+	return out
+}
+
+// informedByDanglingFindings flags an addresses edge whose target is element-shaped (it resolves
+// to a design region, or looks like one) yet NO model declares it — the dangling model target
+// (req-informed-by-edges.3). A requirement / use-case / need / model target traces normally and
+// is never flagged; an entirely unknown id is refused earlier by the strict referee.
+func informedByDanglingFindings(nodes map[string]Node) []string {
+	elems := modelDeclaredElements(nodes)
+	var finds []string
+	for id, n := range nodes {
+		if n.Type != "adr" {
+			continue
+		}
+		for _, a := range n.Addresses {
+			if a == scrapSink || elems[a] || addressFirstClass(a, nodes, elems) {
+				continue
+			}
+			tn, ok := nodes[a]
+			if ok && tn.Type == "design" {
+				finds = append(finds, id+": addresses '"+a+"' — a design region no model declares (dangling model target)")
+			}
+		}
+	}
+	sort.Strings(finds)
+	return finds
 }
 
 // enddesign

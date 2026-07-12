@@ -532,6 +532,9 @@ func selftestProvenanceIcons() bool {
 }
 
 // test-agents-emit -> selftest:agents-emit
+// The book renders its agent-guide chapter FROM a manifest source. The repo-root AGENTS.md is
+// HAND-AUTHORED and embedded verbatim, never generated (adr-agents-hand-authored) - so this
+// verifies the render path, not a file emission.
 func selftestAgentsEmit() bool {
 	dir, err := os.MkdirTemp("", "qae")
 	if err != nil {
@@ -539,29 +542,13 @@ func selftestAgentsEmit() bool {
 	}
 	defer os.RemoveAll(dir)
 	fx := bookFixture(dir, 1, true)
-	man := "---\nid: man-agent-guide\ntype: manifest\nmode: agent\nstatement: The agent guide.\n---\n<!-- ai:3 -->\nLEDEPROBE: the book chapter's opener, never the file's.\n---\n<!-- ai:0 -->\nAGENTPROBE. The ritual: READ the contract, RECITE it, HONOR it.\n"
+	man := "---\nid: man-agent-guide\ntype: manifest\nmode: agent\nstatement: The agent guide.\n---\n<!-- ai:0 -->\nAGENTPROBE. The ritual: READ the contract, RECITE it, HONOR it.\n"
 	mp := filepath.Join(dir, "man-agent-guide.md")
 	os.WriteFile(mp, []byte(man), 0o644)
 	fx["man-agent-guide"] = Node{ID: "man-agent-guide", Type: "manifest", Mode: "agent", Statement: "The agent guide.", Path: mp}
-	md, ok := buildAgentsMD(fx)
-	if !ok {
-		return false
-	}
-	if !strings.Contains(md, "AGENTPROBE") || !strings.Contains(md, "RECITE") {
-		return false // the emitted file carries the manifest's content
-	}
-	if strings.Contains(md, "LEDEPROBE") {
-		return false // the chapter lede stays in the book, out of the emitted file
-	}
-	if strings.Contains(md, "ai:3") {
-		return false // the entry surface stays mark-free
-	}
 	html, _, _ := renderBookHTML(fx)
 	if !strings.Contains(html, `id="man-agent-guide"`) || !strings.Contains(html, "AGENTPROBE") {
-		return false // the SAME source renders as the book's agent chapter - one source, matching
-	}
-	if _, ok := buildAgentsMD(bookFixture(dir, 1, true)); ok {
-		return false // no agent manifest, no emission (the dogfood flips only when the manifest lands)
+		return false // the agent-guide chapter renders from its manifest source
 	}
 	return true
 }

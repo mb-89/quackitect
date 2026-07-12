@@ -26,6 +26,37 @@ func hasFlag(args []string, flag string) bool {
 	return false
 }
 
+// cmdRender emits ONE model as a standalone, self-contained HTML review page with
+// change-marks. Plumbing only — the render transform is go-model-standalone. Auto-
+// marks the model's planned (unrealized) elements; --mark adds changed-but-existing
+// ids on top.
+func cmdRender(args []string) {
+	if len(args) == 0 {
+		fmt.Fprintln(os.Stderr, "usage: quack render <model-id> --out <file> [--mark <id,id,...>]")
+		quackExit(2)
+	}
+	modelID := args[0]
+	var marked []string
+	if m := flagVal(args, "--mark"); m != "" {
+		marked = strings.Split(m, ",")
+	}
+	html, err := renderStandaloneModel(modelID, marked)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		quackExit(1)
+	}
+	out := flagVal(args, "--out")
+	if out == "" {
+		fmt.Print(html)
+		return
+	}
+	if err := os.WriteFile(out, []byte(html), 0o644); err != nil {
+		fmt.Fprintln(os.Stderr, "render error:", err)
+		quackExit(1)
+	}
+	fmt.Println("render ->", out)
+}
+
 const version = "0.0.1-go"
 
 // design: go-brand  implements: req-vendor-workspace.4
@@ -51,7 +82,7 @@ func usageText() string {
 usage: ` + b + ` status [id] | next | start <id> [--plan] | why <id> | bless [--all|<id>] [--by A]
        | note "..." | notes [--all] | gather <ver> | report [book] [--out F] | ship | build
        | pair [ntfy] | ask <gate> [--timeout s] | await [--timeout s] | triage | compact <iter>
-       | apply <manifest>
+       | apply <manifest> | mcp
        | lint | verify <id> | progress [--pager <gate>] | migrate-actors | migrate-layout | version`
 }
 
@@ -111,6 +142,8 @@ func Dispatch(args []string) {
 	switch cmd {
 	case "attest":
 		cmdAttest(rest)
+	case "mcp", "serve":
+		cmdMCP(rest)
 	case "pair":
 		if err := cmdPair(rest); err != nil {
 			fmt.Println("pair:", err)
@@ -173,6 +206,8 @@ func Dispatch(args []string) {
 		cmdVerify(rest)
 	case "progress":
 		cmdProgress(rest)
+	case "render":
+		cmdRender(rest)
 	case "report":
 		// `report book` renders the BOOK projection (the book is a
 		// report sub-op, never a top-level command - one render surface, two projections).
@@ -380,7 +415,36 @@ func why(nodes map[string]Node, id string) []string {
 	return reasons
 }
 
+// design: go-lint-exit  implements: req-lint-exit-honest
+// The lint command's three-code exit contract (req-lint-exit-honest): exit 0 = clean OR
+// advisory-only (coverage holes, adoption advisories, model/field/schema notes — nothing
+// build-blocking), exit 1 = one or more BLOCKING findings present, exit 2 = the graph was refused
+// at load (a malformed node, detected before any finding is computed). A pure mapping so the
+// contract is stated once and gated by selftest:lint-exit-honest.
+func lintExitCode(refused bool, findings int) int {
+	switch {
+	case refused:
+		return 2
+	case findings > 0:
+		return 1
+	default:
+		return 0
+	}
+}
+
+// enddesign
+
 func cmdLint(rest []string) {
+	// three-code contract (go-lint-exit): a refused graph exits 2 BEFORE any finding is computed —
+	// checked here so lint reports the refusal itself rather than dying inside LoadAll's strict guard.
+	if issues := StrictIssues(SPEC); len(issues) > 0 {
+		fmt.Fprintf(os.Stderr, "STRICT: %d issue(s) — graph refused:\n", len(issues))
+		for _, is := range issues {
+			rel, _ := filepath.Rel(ROOT, is.Path)
+			fmt.Fprintf(os.Stderr, "  - %s [%s] %s\n", filepath.ToSlash(rel), is.Key, is.Msg)
+		}
+		quackExit(lintExitCode(true, 0))
+	}
 	dups := DuplicateIDs()
 	if len(dups) > 0 {
 		fmt.Printf("DUPLICATE IDS - %d (a reused id silently shadows another file; fix first):\n", len(dups))
@@ -474,6 +538,8 @@ func cmdLint(rest []string) {
 	}
 	modelFinds = append(modelFinds, viewsChosenFindings(np)...)
 	modelFinds = append(modelFinds, modelsGateFindings(np)...)
+	// dangling model targets (go-informed-by-edges): an addresses edge to an element no model declares.
+	modelFinds = append(modelFinds, informedByDanglingFindings(nodes)...)
 	if len(modelFinds) > 0 {
 		fmt.Printf("models: %d finding(s):\n", len(modelFinds))
 		for _, f := range modelFinds {
@@ -522,6 +588,22 @@ func cmdLint(rest []string) {
 	for _, f := range drift {
 		fmt.Println("book: " + f)
 	}
+	// field-schema shapes (go-field-schemas): a node field value breaking its per-field
+	// schema, named by node/field/rule. Field-shape only — referential integrity stays the
+	// referee's job. Report-only: the starter set is scoped to the current graph.
+	if fsf := fieldSchemaFindings(nodes); len(fsf) > 0 {
+		fmt.Printf("fields: %d finding(s):\n", len(fsf))
+		for _, f := range fsf {
+			fmt.Println("  - " + f)
+		}
+	}
+	// schema-set contract (go-schema-tester): the schema files themselves are well-formed.
+	if ssf := schemaSetFindings(schemaConfigDir()); len(ssf) > 0 {
+		fmt.Printf("schemas: %d finding(s):\n", len(ssf))
+		for _, f := range ssf {
+			fmt.Println("  - " + f)
+		}
+	}
 	// spec-content lints (go-spec-lints): external links, slot residue, dangling anchors.
 	external, residue, anchors := specLintFindings(nodes)
 	for _, group := range [][]string{external, residue, anchors} {
@@ -529,8 +611,9 @@ func cmdLint(rest []string) {
 			fmt.Println("spec: " + f)
 		}
 	}
-	if len(dups) > 0 || earsBad > 0 || len(qf) > 0 || len(mono) > 0 || len(placement) > 0 || len(orphans) > 0 || len(metaQ) > 0 || len(drift) > 0 ||
-		len(external) > 0 || len(residue) > 0 || len(anchors) > 0 {
-		quackExit(1)
-	}
+	// the BLOCKING set (the three-code contract, go-lint-exit): structural findings that must not
+	// ship. Advisories — coverage holes, adoption advisories, model/field/schema notes — stay exit 0.
+	blocking := len(dups) + earsBad + len(qf) + len(mono) + len(placement) + len(orphans) +
+		len(metaQ) + len(drift) + len(external) + len(residue) + len(anchors)
+	quackExit(lintExitCode(false, blocking))
 }

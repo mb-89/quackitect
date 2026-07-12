@@ -2,6 +2,6 @@
 # Machine-local overrides (logs_dir, ...) live in the GLOBAL user config, never here.
 [iteration]
 type    = "default"
-rigor   = "lean"
-version = "i0017_pruning"
+rigor   = "systematic"
+version = "i0018_mcp_apply"
 edges = "connections"

@@ -1,0 +1,12 @@
+---
+id: adr-mcp-attest
+type: adr
+kind: architecture
+decided_in: i0018_mcp_apply
+adjudicated_by: user
+statement: Attest over MCP is PER-SESSION - the owner attests ONCE when the connection opens (one console command or one phone tap over the ask lane), and the server holds the attestation in memory for the session, so no key is passed per tool call. Nothing is stored at rest (the session state dies with the process - stronger than a bearer token, which could leak or replay). On a build swap (req-mcp-server.5) the session ends and one re-attest is required (a single tap); if the dogfood rebuild friction proves real, the recorded mitigation is a re-exec handoff that carries the attestation across the exec IN MEMORY (never disk), keeping the session alive while serving only fresh code. Rejected: bearer-token-in-a-file (authenticates the transport, not the actor - sebot's model), and key-as-a-tool-argument (the conservative first draft - the session model is strictly simpler for the owner and loses nothing). The stateless CLI channel is unchanged (key-per-call).
+class: review
+killer: false
+---
+## Rationale (not load-bearing)
+The MCP server's resident session is the home the stateless CLI never had for attest state. Re-attest frequency: near-zero for normal project use (the binary ratchets only on engine updates), frequent only when developing the engine itself - the case the re-exec mitigation targets.

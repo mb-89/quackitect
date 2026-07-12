@@ -58,8 +58,9 @@ type Node struct {
 	// enddesign
 }
 
-// Config is the iteration breadcrumb from .quack/config.toml.
-type Config struct{ Type, Rigor, Version, LogsDir string }
+// Config is the iteration breadcrumb from .quack/config.toml. Overlay is the workspace's
+// COMMITTED method-overlay root, relative to the workspace (e.g. "product/<name>").
+type Config struct{ Type, Rigor, Version, LogsDir, Overlay string }
 
 // design: go-parse  implements: req-go-port.3
 // Hand-rolled frontmatter and config.toml parsing over the trivial subset in use
@@ -231,7 +232,7 @@ func ReadConfig(path string) Config {
 		return c
 	}
 	for _, line := range strings.Split(string(txt), "\n") {
-		for _, k := range []string{"type", "rigor", "version", "logs_dir"} {
+		for _, k := range []string{"type", "rigor", "version", "logs_dir", "overlay"} {
 			if v, ok := tomlString(line, k); ok {
 				switch k {
 				case "type":
@@ -242,6 +243,8 @@ func ReadConfig(path string) Config {
 					c.Version = v
 				case "logs_dir":
 					c.LogsDir = v // optional override of the engine's user-dir log resolution (go-logs-dir)
+				case "overlay":
+					c.Overlay = v // the committed method-overlay root (go-overlay-resolver)
 				}
 			}
 		}
