@@ -37,7 +37,8 @@ ADJUDICATES the ones that are gates. **Never bless on their behalf.**
 > The engine is ONE GLOBAL static **Go binary** (`%LOCALAPPDATA%\quackitect\bin`), ratcheting
 > itself forward from this repo's vendored source (`product\engine-go`; see
 > `method/prompts/dependencies.md`). Run it with the **`quack.cmd` launcher** at the project
-> root: `.\quack <cmd>` — it bootstraps the global binary when absent. Ledger-advancing
+> root: `.\quack <cmd>` — it bootstraps the global binary when absent (the go-bin shim at
+> `product\tools` rides last on PATH, so machines without native Go still build). Ledger-advancing
 > commands on the agent channel carry `--key <session-key>` (the contract's attest section
 > explains how a key is earned).
 ```

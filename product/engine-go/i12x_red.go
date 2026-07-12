@@ -1150,6 +1150,10 @@ func selftestBlockTreeDesign() bool {
 }
 
 // test-example-notes -> selftest:example-notes
+// The i0020 contract: NON-TRACE examples (stakeholders, raid, rules, guides) still teach the
+// shapes, but TRACE-ENTERING examples (ex-need, ex-usecase, trace criteria/rationales, example
+// edges) are GONE - they flipped a live board's coverage red and, once half-cleaned, hard-refused
+// the strict graph (the Benjamin field failure).
 func selftestExampleNotes() bool {
 	dir, _ := os.MkdirTemp("", "qst-exn")
 	defer os.RemoveAll(dir)
@@ -1158,16 +1162,22 @@ func selftestExampleNotes() bool {
 	for _, f := range []string{
 		filepath.Join(sp, "stakeholders", "ex-stakeholder.md"),
 		filepath.Join(sp, "stakeholders", "ex-stakeholder-b.md"),
+		filepath.Join(sp, "raid", "ex-assumption.md"),
+		filepath.Join(sp, "rules", "ex-rule.md"),
+		filepath.Join(sp, "guides", "ex-guide.md"),
+	} {
+		if _, err := os.Stat(f); err != nil {
+			return false
+		}
+	}
+	for _, dead := range []string{
 		filepath.Join(sp, "trace", "ex-need.md"),
 		filepath.Join(sp, "trace", "ex-criterion.md"),
 		filepath.Join(sp, "trace", "ex-rationale.md"),
 		filepath.Join(sp, "usecases", "ex-usecase.md"),
-		filepath.Join(sp, "raid", "ex-assumption.md"),
-		filepath.Join(sp, "rules", "ex-rule.md"),
-		filepath.Join(sp, "guides", "ex-guide.md"),
 		filepath.Join(sp, "connections", "conflicts-with", "con-conflicts-with--ex-stakeholder--ex-stakeholder-b.md"),
 	} {
-		if _, err := os.Stat(f); err != nil {
+		if _, err := os.Stat(dead); err == nil {
 			return false
 		}
 	}

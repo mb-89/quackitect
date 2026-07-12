@@ -827,13 +827,11 @@ func selftestStubSpec() bool {
 	if issues := StrictIssues(sp); len(issues) != 0 {
 		return false
 	}
-	// the example edges live AS jsonl in their kind lanes, never in node frontmatter.
-	for lane, frag := range map[string]string{
-		"refers":  `"src":"ex-rationale"`,
-		"refines": `"src":"ex-usecase"`,
-	} {
+	// the kind lanes exist as jsonl files and carry NO example edges: trace-entering
+	// examples polluted live boards and left the template (i0020 cold-run fix).
+	for _, lane := range []string{"refers", "refines"} {
 		raw, err := os.ReadFile(filepath.Join(sp, "connections", lane, "edges.jsonl"))
-		if err != nil || !strings.Contains(string(raw), frag) {
+		if err != nil || strings.Contains(string(raw), `"ex-`) {
 			return false
 		}
 	}

@@ -146,3 +146,5 @@
 {"src":"adr-white-label-hybrid","dst":"go-white-label-identity"}
 {"src":"adr-ujav4ii","dst":"q-trace-graph-scaling"}
 {"src":"adr-ujav4ii","dst":"scrap"}
+{"src":"adr-shim-product-tools","dst":"req-go-port"}
+{"src":"adr-scaffold-edges-connections","dst":"req-connections-lanes"}

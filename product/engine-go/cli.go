@@ -316,7 +316,7 @@ func cmdStatus(rest []string) {
 		}
 		return gates[i].id < gates[j].id
 	})
-	mark := map[string]string{"DONE": "[x]", "SUSPECT": "[~]", "OPEN": "[ ]"}
+	mark := map[string]string{"DONE": "[x]", "SUSPECT": "[~]", "OPEN": "[ ]", "DEFER": "[>]", "RETIRED": "[-]"}
 	raw := RawStates(nodes)
 	susp, done := 0, 0
 	all := hasFlag(rest, "--all")
@@ -597,6 +597,14 @@ func cmdLint(rest []string) {
 		for _, f := range fsf {
 			fmt.Println("  - " + f)
 		}
+	}
+	// vehicle-misuse guard (go-vehicle-misuse-guard, i0020): a VEHICLE whose spec/ holds
+	// iterations while its product/ is still empty is the signature of a driven project
+	// composed inside the vehicle's own spec (a recorded field failure - Benjamin lived in
+	// zwiftbot's spec). The vehicle's spec is for the VEHICLE's tool; a driven project gets
+	// its own workspace via `start stubs`.
+	if f := vehicleMisuseFinding(); f != "" {
+		fmt.Println("vehicle: " + f)
 	}
 	// schema-set contract (go-schema-tester): the schema files themselves are well-formed.
 	if ssf := schemaSetFindings(schemaConfigDir()); len(ssf) > 0 {

@@ -3,5 +3,5 @@
 [iteration]
 type    = "default"
 rigor   = "systematic"
-version = "i0019_strangers_book"
+version = "i0020_cold_run_fixes"
 edges = "connections"

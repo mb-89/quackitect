@@ -119,6 +119,11 @@ Nestable: a vehicle can itself be an engine for another (the chain just grows).
 <!-- design: method-bootstrap  implements: req-project-onboarding.1, req-project-onboarding.3, req-project-onboarding.2 :: On "start a new project" the agent runs a fixed onboarding — confirm intent to start an iteration, ask the target folder, ask vendor-engine vs drive-from-inside stubs — then scaffolds (start init / start stubs), lands in the workspace, and immediately opens the first iteration's M1 vision interview. A workspace with zero iterations auto-triggers this framing instead of dead-ending on a status board. The README leads with this flow; the raw clone/build CLI is a slim "get the engine" step beneath it. -->
 When a user says **"start a new project"**, do NOT dump CLI steps. Run this flow:
 
+> **⚠️ A vehicle's own spec/ is for the VEHICLE's tool — never for a project it drives.**
+> A driven project ALWAYS gets its own workspace (`start stubs <folder>`). Composing a
+> driven project's iterations inside the vehicle's spec is a recorded field failure —
+> `quack lint` warns on the signature (a vehicle with iterations and an empty product/).
+
 1. **Confirm** they want to start a new project iteration now.
 2. **Ask the target folder** — where the new workspace lives.
 3. **Ask how to link the engine:** *vendor* it (`quack start init <folder>` — a self-contained copy under `tools/vendor/`) or *drive-from-inside stubs* (`quack start stubs <folder>` — a runtime-linked engine, nothing vendored).

@@ -37,6 +37,7 @@ var nodeKeysAllow = map[string]bool{
 	"milestone": true, "parent": true, "depends_on": true, "refines": true, "implements": true,
 	"verifies": true, "addresses": true, "validates": true, "ears": true, "adjudicated_by": true,
 	"ready_when": true, "supersedes": true, "suite": true, "tests_red": true, "guidance": true, "mode": true,
+	"deferred": true, "retired": true, // the i0020 minimal defer/retire stamps (go-defer-retire)
 	"order":   true, // manifest chapter order (req-system-overview)
 	"ratings": true, // one-level map key (go-ratings-map, req-base-view-queries.2)
 	// the item fields (go-items + the item templates); every field's

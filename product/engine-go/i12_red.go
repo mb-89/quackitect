@@ -696,8 +696,8 @@ func selftestTypeStakeholders() bool {
 		return false // one note per class, the full population
 	}
 	for _, e := range ents {
-		if e.IsDir() || !strings.HasSuffix(e.Name(), ".md") {
-			continue
+		if e.IsDir() || !strings.HasSuffix(e.Name(), ".md") || e.Name() == "README.md" {
+			continue // README documents the dir (role classes, not a project type - i0020)
 		}
 		raw, err := os.ReadFile(filepath.Join(cl, e.Name()))
 		if err != nil || !strings.Contains(string(raw), "class:") {

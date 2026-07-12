@@ -250,7 +250,7 @@ func pickVersion(nodes map[string]Node, st map[string]string, prefer string) str
 		}
 		notDone := false
 		for _, id := range g {
-			if st[id] != "DONE" {
+			if !stateSatisfies(st[id]) {
 				notDone = true
 			}
 		}
@@ -291,7 +291,7 @@ func cmdNext(args []string) {
 		}
 		ok := true
 		for _, d := range parents(nodes[id]) {
-			if gates[d] && st[d] != "DONE" {
+			if gates[d] && !stateSatisfies(st[d]) {
 				ok = false
 				break
 			}
@@ -303,7 +303,7 @@ func cmdNext(args []string) {
 	if len(ready) == 0 {
 		done := true
 		for id := range gates {
-			if iterOf(nodes[id].Path) == v && st[id] != "DONE" {
+			if iterOf(nodes[id].Path) == v && !stateSatisfies(st[id]) {
 				done = false
 			}
 		}
@@ -808,6 +808,8 @@ func buildRebaseline(freshExe string) string {
 const vehicleLauncherTmpl = `@echo off
 rem {{PROJ}} launcher: forwards to the ONE global engine binary; bootstraps it from the vendored source when absent.
 setlocal
+rem the vendored go-bin shim rides LAST on PATH (adr-shim-product-tools): a real go wins; without one, bootstrap and the engine's ratchet still build.
+set "PATH=%PATH%;%~dp0tools\vendor\tools"
 set "QBIN=%LOCALAPPDATA%\quackitect\bin\{{PROJ}}.exe"
 if exist "%QBIN%" goto run
 if defined QUACK_ENGINE set "QBIN=%QUACK_ENGINE%" & goto run
@@ -868,6 +870,9 @@ The single source of the harness instructions is AGENTS.md at the repository roo
 2. **FOLLOW** every instruction in it. No exceptions. To the letter of each statement. It opens with the ritual: read the contract, understand it, recite it (paraphrase its specifics back to the adjudicator), honor it.
 `
 
+// vehicleTomlTmpl is the root marker `start init` writes ({{PROJ}} substituted).
+const vehicleTomlTmpl = "# the workspace root marker + iteration breadcrumb (adr-no-quack-data-home).\noverlay = \"product/{{PROJ}}\"\n[iteration]\ntype    = \"default\"\nrigor   = \"systematic\"\nversion = \"\"\nedges = \"connections\"\n"
+
 // initVehicleFiles is the silent emission core (selftest-drivable); cmdStartInit wraps it with guidance.
 func initVehicleFiles(target string) error {
 	src := filepath.Join(ROOT, "product")
@@ -882,8 +887,7 @@ func initVehicleFiles(target string) error {
 	//    The overlay key declares the vehicle's COMMITTED method-overlay root: its method
 	//    extensions travel in the repository and merge over the vendored engine layer
 	//    (go-overlay-resolver), for the vehicle itself and for every stub it drives.
-	writeIfAbsent(filepath.Join(target, "spec", "project.toml"),
-		"# the workspace root marker + iteration breadcrumb (adr-no-quack-data-home).\noverlay = \"product/"+proj+"\"\n[iteration]\ntype    = \"default\"\nrigor   = \"systematic\"\nversion = \"\"\n")
+	writeIfAbsent(filepath.Join(target, "spec", "project.toml"), sub(vehicleTomlTmpl))
 	// 3. the vehicle's own empty product/ + brand seeds from the engine's generic design templates,
 	//    and the committed overlay home the overlay key points at.
 	os.MkdirAll(filepath.Join(target, "product"), 0o755)

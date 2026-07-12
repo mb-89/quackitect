@@ -546,6 +546,25 @@ func gateState(id string, nodes map[string]Node, a map[string]attestState, memo 
 	return "SUSPECT"
 }
 
+// stateSatisfies reports whether a dependency in state s releases its dependents: DONE does,
+// and so do DEFER/RETIRED - a check pushed out of the iteration (or dropped with its reason)
+// must not hold the walk hostage (i0020 minimal defer/retire port).
+func stateSatisfies(s string) bool { return s == "DONE" || s == "DEFER" || s == "RETIRED" }
+
+// deferOverride maps a stamped check to its board state ("" when unstamped or content).
+func deferOverride(n Node, raw string) string {
+	if raw == "CONTENT" {
+		return ""
+	}
+	if n.Retired != "" {
+		return "RETIRED"
+	}
+	if n.Deferred != "" {
+		return "DEFER"
+	}
+	return ""
+}
+
 // StatusMap resolves effective states: a DONE gate whose dependency gates are not DONE is SUSPECT.
 func StatusMap(nodes map[string]Node) map[string]string {
 	a := attestLoad()
@@ -553,6 +572,9 @@ func StatusMap(nodes map[string]Node) map[string]string {
 	raw := map[string]string{}
 	for id := range nodes {
 		raw[id] = gateState(id, nodes, a, memo)
+		if ov := deferOverride(nodes[id], raw[id]); ov != "" {
+			raw[id] = ov
+		}
 	}
 	eff := map[string]string{}
 	var resolve func(id string, stack map[string]bool) string
@@ -568,7 +590,7 @@ func StatusMap(nodes map[string]Node) map[string]string {
 					for k := range stack {
 						st2[k] = true
 					}
-					if resolve(d, st2) != "DONE" {
+					if !stateSatisfies(resolve(d, st2)) {
 						s = "SUSPECT"
 						break
 					}

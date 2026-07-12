@@ -20,9 +20,11 @@ import (
 // - retired-vocabulary.json drives the prose-current check: every method prompt and
 //   workspace guide is scanned case-insensitively; a finding names file and term.
 
-// configDir resolves the engine's config home (the modelKindFiles pattern).
+// configDir resolves the engine's config home through the engine layer (EngineDir), so a
+// vehicle inherits the vendored config instead of probing its own product/quackitect —
+// the dogfood-path lint noise every vehicle saw (i0020 cold-run fix).
 func configDir() string {
-	return filepath.Join(engineRoot(), "product", "quackitect", "method", "config")
+	return filepath.Join(EngineDir(), "method", "config")
 }
 
 // loadJSONConfig fills out from one config file. A missing or malformed file

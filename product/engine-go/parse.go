@@ -28,6 +28,8 @@ type Node struct {
 	Validates  string // "needs": this gate validates the whole need-set; its hash folds the digest of
 	// all needs, so adding/changing/removing any need reopens it (global validation, structurally).
 	Suite      string   // "" | "standalone": not a member of the verification suites; own board entry (adr-standalone-suite)
+	Deferred   string   // "" | <reason>: pushed to a later iteration (i0020 minimal port) - never ready, satisfies dependents, not DONE
+	Retired    string   // "" | <reason>: dropped with its recorded reason (i0020 minimal port) - same board semantics as deferred
 	Ears       string   // "" | "exempt - <reason>": EARS-lint exemption with its required reason (req-ears-authoring.1)
 	TestsRed   string   // "" | "exempt - <reason>": pre-mechanism tests-red exemption, recorded ON the node (req-legacy-decided.2)
 	Guidance   string   // "" | <slug>: points at the guidance doc holding this node's internals (req-reader-structure.2)
@@ -191,6 +193,10 @@ func ParseNodeBytes(path string, txt []byte) Node {
 			n.Rejected = splitIDs(v)
 		case "refers":
 			n.Refers = splitIDs(v)
+		case "deferred":
+			n.Deferred = v
+		case "retired":
+			n.Retired = v
 		case "suite":
 			n.Suite = v
 		case "direction":

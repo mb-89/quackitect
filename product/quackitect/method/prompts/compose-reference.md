@@ -4,10 +4,14 @@ The cheatsheet so you never re-derive formats by reading example files. Load thi
 `engage start` step 5 (plan & bake). All facts here are load-bearing.
 
 ## Trace edge model (semantic direction) — CONNECTIONS MODE
+**JSONL connections is THE lane for new work.** Every scaffolded workspace (`start init`,
+`start stubs`) defaults `edges = "connections"` (adr-scaffold-edges-connections); frontmatter
+edge keys are the LEGACY lane for pre-migration workspaces pending `quack migrate-edges` —
+the engine's global default stays frontmatter solely so legacy boards keep loading.
 Edges live in `spec/connections/<kind>/edges.jsonl`, one `{"src":"<id>","dst":"<id>"}` line per
-edge (one line per dst for a multi-target relation). Frontmatter edge keys (`refines:`,
-`verifies:`, `addresses:` in the node file) are the LEGACY lane — the strict parser REFUSES them
-in connections mode (go-edge-mode). `depends_on:` stays frontmatter (it is wiring, not a
+edge (one line per dst for a multi-target relation). In connections mode the strict parser
+REFUSES frontmatter edge keys (`refines:`, `verifies:`, `addresses:` in the node file)
+(go-edge-mode). `depends_on:` stays frontmatter (it is wiring, not a
 semantic edge). The directions:
 - use-case  refines → need  (`spec/connections/refines/edges.jsonl`)
 - requirement  refines → use-case  (optional frontmatter `depends_on: [req-…]`)
@@ -113,6 +117,15 @@ or WITH any renderer change - template↔book drift is forbidden. The renderer d
 table-vs-prose deterministically: a homogeneous set of typed nodes is a TABLE (never authored
 prose); a statement renders once (row brief; the expand adds only what the row lacks); section
 numbers derive at render time; cross-references are links (name + brief), never copies.
+
+## Cross-cutting qualities (NFRs) — the owner's convention
+Reserve ONE need for qualities (e.g. `need-qualities`: "the system meets its cross-cutting
+quality attributes, ISO/IEC 25010"). Its USE-CASES are the ISO quality characteristics
+themselves (`uc-q-reliability`, `uc-q-security`, `uc-q-performance`, ...), and each quality
+requirement refines its quality use-case. This keeps `coverage:req-traced` exact — every
+requirement, functional or not, refines a use-case — with zero engine special-casing, and
+the qualities stay sorted instead of scattering across feature use-cases. (Canonized i0020;
+first applied in the Benjamin workspace.)
 
 ## Where needs live
 Cross-cutting / dogfood needs: `spec/trace/` (`need-engage`, `need-note`, `need-review`, `need-workspace-drive`).

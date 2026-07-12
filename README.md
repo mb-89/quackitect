@@ -49,6 +49,8 @@ onboarding for you.
 
 > Say to your agent: **“clone https://github.com/mb-89/quackitect, and lets start a new project”**
 
+**Not ready to hand over a repo yet?** Watch a **[5-minute walkthrough](https://mb-89.github.io/quackitect/book.html#man-deck-pong)** first — an empty folder to a shipped, playable Pong game, measured end to end.
+
 Quackitect will walk you through all steps up to your first milestone.
 Need more details, or a list of all functions? Ask it.
 

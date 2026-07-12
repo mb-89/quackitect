@@ -228,3 +228,5 @@
 {"src":"test-runme-orientation","dst":"req-runme-orientation"}
 {"src":"test-terms-before-use","dst":"req-terms-before-use"}
 {"src":"test-white-label-book","dst":"req-vehicle-white-label"}
+{"src":"test-cold-run-fixes","dst":"req-go-port"}
+{"src":"test-cold-run-fixes","dst":"req-connections-lanes"}
