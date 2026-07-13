@@ -33,12 +33,10 @@ func bookTitleAttrs(root, iteration, engineVersion string) string {
 //     design fallback is deliberately not consulted: an engine default here would BE the leak.
 //   - the overlay key's product/<name> — the vehicle's committed product home.
 //   - the workspace basename.
-// The engine's name renders as CREDIT: the colophon line every book carries, the dogfood
-// included. whiteLabelLeaks is the identity guard: it scans ONLY the identity surfaces
-// (title, wordmark). Mentions in prose and the colophon credit are legal — identity is
-// the bar, not occurrences.
+// whiteLabelLeaks is the identity guard: it scans ONLY the identity surfaces
+// (title, wordmark). Mentions in prose are legal — identity is the bar, not occurrences.
 
-// engineCredit is the colophon line: the engine referenced honestly, by its own name.
+// engineCredit is the retired colophon text. It remains only so tests can assert it is absent.
 const engineCredit = "engine: quackitect " + version
 
 // productNameOf is the pure identity rule (testable): brand name asset, else the

@@ -1,7 +1,6 @@
 ---
 id: model-engine-layers
 type: model
-kind: layers-flow
 statement: what may depend on what in the engine, and how do signals travel through it?
 class: review
 killer: false

@@ -47,12 +47,11 @@ fig: onion
 ### Structural models
 <!-- tailor: shipped machinery - the section is ONE auto-generated table
   (the models-table figure unit): a row per declared model, the extracted figure and the
-  derived informed-by links inside the row expand (the onion above is the
-  layers-flow model's own drill-down render). The kind registry's compact
+  derived informed-by links inside the row expand. The kind registry's compact
   examples render with the appendix guidance.
 -->
 <!-- ai:3 -->
-Each declared model is one row below, rendered from its authored truth - expand a row for the figure and the decisions that informed it. The onion above is the layers-flow model's own drill-down render. The compact examples of every supported model kind live with the appendix guidance.
+Each declared model is one row below, rendered from its authored truth - expand a row for the figure and the decisions that informed it. The onion above renders the layer map directly. The compact examples of every supported model kind live with the appendix guidance.
 ---
 fig: models-table
 ---

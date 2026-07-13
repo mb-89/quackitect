@@ -21,7 +21,7 @@ A structural model is a Mermaid file the engine checks. You edit the file; the e
   - allocated here, no realizing `design:` region yet -> an honest planned hole.
   - a `design:` region no model allocates -> the sky-fall lint ("no device falls from the sky").
 
-## The onion physics (layers-flow; adr-onion-physics)
+## The onion physics (adr-onion-physics)
 
 - Rank = ABSTRACTION GRADIENT, innermost first: the kernel holds the core algorithms; the rim touches the world and stays mechanical.
 - Dependencies point inward, at any depth. An inner element naming an outer one is a divergence.
@@ -30,7 +30,7 @@ A structural model is a Mermaid file the engine checks. You edit the file; the e
 - AMBIENT (`subgraph ambient`) holds meaning-free utilities: callable from every rank, may call only ambient.
 - Say movements A-TO-B (rim-to-graph, graph-to-rim), never "input/output" - those words flip meaning with the speaker's seat.
 
-## Layers + flow (kind: layers-flow)
+## Onion layer map
 
 ```mermaid
 flowchart TD
@@ -50,10 +50,11 @@ flowchart TD
   go-parse    -->|content hashes| go-hash-core
 ```
 
-- `subgraph <layer>` ... `end` - one block per layer. Declaration order IS the rank, innermost first.
-- `<element-id>["<responsibility>"]` - one line per element, inside its layer. The id joins the code's design marker; the label is the one-line responsibility.
-- `a -->|payload| b` - a flow. Dependencies must point inward; an outward or undeclared inter-layer code dependency is a conformance divergence.
-- A layer whose elements originate and terminate no flow is the NO-FLOW SMELL: push its infrastructure a level down.
+- One line per layer in `spec/design-layers.md`: `<layer>: <pattern>, <pattern>`.
+- Layer declaration order is innermost first.
+- Inputs and outputs are named in `inputs:` and `outputs:` lines.
+- Design elements matching layer patterns become the onion blocks.
+- A layer whose elements originate and terminate no flow is the NO-FLOW SMELL after implementation. During ideation, declared inputs and outputs keep the architecture onion visible.
 
 ## State machine (kind: state)
 

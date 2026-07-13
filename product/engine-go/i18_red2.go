@@ -85,13 +85,13 @@ func selftestInformedByEdges() bool {
 	}
 	defer os.RemoveAll(dir)
 	modelPath := filepath.Join(dir, "model-x.md")
-	modelSrc := "---\nid: model-x\ntype: model\nkind: layers-flow\nstatement: fixture\n---\n" +
+	modelSrc := "---\nid: model-x\ntype: model\nkind: element-tree\nstatement: fixture\n---\n" +
 		"```mermaid\nflowchart TD\n  el-one[\"first\"]\n  el-two[\"second\"]\n```\n"
 	if err := os.WriteFile(modelPath, []byte(modelSrc), 0o644); err != nil {
 		return false
 	}
 	nodes := map[string]Node{
-		"model-x":    {ID: "model-x", Type: "model", Kind: "layers-flow", Path: modelPath},
+		"model-x":    {ID: "model-x", Type: "model", Kind: "element-tree", Path: modelPath},
 		"adr-fc":     {ID: "adr-fc", Type: "adr", Kind: "architecture", Statement: "the transport shall stand.", Addresses: []string{"el-one"}},
 		"adr-name":   {ID: "adr-name", Type: "adr", Kind: "architecture", Statement: "the el-two element shall hold."},
 		"adr-dangle": {ID: "adr-dangle", Type: "adr", Kind: "architecture", Statement: "an orphan.", Addresses: []string{"go-orphan"}},

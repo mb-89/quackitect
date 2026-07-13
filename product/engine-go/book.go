@@ -1394,9 +1394,6 @@ func renderBookHTML(nodes map[string]Node) (string, []string, []string) {
 	doc.WriteString("<main>\n")
 	// enddesign
 	doc.WriteString(bodyHTML)
-	// the colophon credits the engine BY NAME in every book (req-vehicle-white-label.3):
-	// a vehicle's book references its engine honestly; the dogfood credits itself — uniform.
-	doc.WriteString(`<footer id="colophon" data-layer="informative"><p class="meta">` + htmlEscape(engineCredit) + `</p></footer>` + "\n")
 	doc.WriteString(`</main>
 <div id="slide-pos" role="status"></div>
 </div>
@@ -2846,7 +2843,7 @@ func renderOnionOpt(nodes map[string]Node, rev *onionReview) string {
 		themes: true, links: true}
 	out := renderOnionData(in, rev, nodes)
 	if model != nil && rev == nil {
-		// the onion IS the layers-flow model's render: it carries the model's
+		// the onion IS the engine layer model's render: it carries the model's
 		// informed-by link list like every other architectural model figure. The
 		// standalone review projection drops it — the trailer's references need the
 		// full book's tooltip machinery, and the review is just the drill-down.
@@ -3012,11 +3009,16 @@ func renderOnionData(in onionInput, rev *onionReview, nodes map[string]Node) str
 		return len(consumes[id]) == 0 && !consumedBy[id] && !reads[id] && !writes[id]
 	}
 
+	declaredOnly := len(consumes) == 0 && len(reads) == 0 && len(writes) == 0 && len(inputs)+len(outputs) > 0
+
 	// (1) SKIP no-flow layers: a layer with at least one ON-flow element (it consumes,
 	// is consumed, or reads/writes) SURVIVES and keeps a ring + view; a layer where every element is
 	// off-flow infrastructure gets NEITHER. Rings run outermost→innermost, so "inner" = higher index;
 	// a skipped layer's elements sink INWARD into the next surviving layer's infrastructure pills.
 	layerHasFlow := func(name string) bool {
+		if declaredOnly && len(elemsByLayer[name]) > 0 {
+			return true
+		}
 		for _, id := range elemsByLayer[name] {
 			if !offFlow(id) {
 				return true
@@ -3039,7 +3041,7 @@ func renderOnionData(in onionInput, rev *onionReview, nodes map[string]Node) str
 		}
 		var flow, offs []string
 		for _, id := range own {
-			if offFlow(id) {
+			if !declaredOnly && offFlow(id) {
 				offs = append(offs, id)
 			} else {
 				flow = append(flow, id)

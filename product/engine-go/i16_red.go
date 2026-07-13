@@ -50,7 +50,7 @@ func selftestModelNodes() bool {
 		return false
 	}
 	defer os.RemoveAll(dir)
-	raw := "---\nid: model-probe\ntype: model\nkind: layers-flow\nquestion: what depends on what?\nstatement: probe model\n---\n```mermaid\n" + i16FixtureModel + "```\n"
+	raw := "---\nid: model-probe\ntype: model\nkind: element-tree\nquestion: what depends on what?\nstatement: probe model\n---\n```mermaid\n" + i16FixtureModel + "```\n"
 	p := filepath.Join(dir, "model-probe.md")
 	os.WriteFile(p, []byte(raw), 0o644)
 	n := ParseNode(p)
@@ -64,7 +64,7 @@ func selftestModelNodes() bool {
 // test-draft-is-truth -> selftest:draft-is-truth
 func selftestDraftIsTruth() bool {
 	// the graph extracts from the NODE FILE itself - the fenced block, no sidecar
-	raw := "---\nid: model-x\ntype: model\nkind: layers-flow\nstatement: s\n---\nprose before\n```mermaid\n" + i16FixtureModel + "```\nprose after\n"
+	raw := "---\nid: model-x\ntype: model\nkind: element-tree\nstatement: s\n---\nprose before\n```mermaid\n" + i16FixtureModel + "```\nprose after\n"
 	g, _ := extractModelGraph(raw)
 	if len(g.Elems) != 3 || len(g.Flows) != 2 {
 		return false
@@ -168,8 +168,8 @@ func selftestNoFlowSmell() bool {
 // test-model-kinds -> selftest:model-kinds
 func selftestModelKinds() bool {
 	files := modelKindFiles()
-	if len(files) < 5 {
-		return false // the registry carries at least five kinds
+	if len(files) < 4 {
+		return false // the registry carries the shipped model kinds
 	}
 	for _, f := range files {
 		raw, err := os.ReadFile(f)
@@ -188,12 +188,12 @@ func selftestModelKinds() bool {
 
 // test-model-stubs -> selftest:model-stubs
 func selftestModelStubs() bool {
-	stub := modelStubFor("layers-flow")
+	stub := modelStubFor("element-tree")
 	if stub == "" {
 		return false
 	}
 	g, lint := extractModelGraph(stub)
-	return len(lint) == 0 && len(g.Layers) > 0 // the emitted skeleton parses clean
+	return len(lint) == 0 && len(g.Elems) > 0 // the emitted skeleton parses clean
 }
 
 // test-views-chosen -> selftest:views-chosen
@@ -218,9 +218,9 @@ func selftestModelsGateBuild() bool {
 	}
 	defer os.RemoveAll(dir)
 	authored := filepath.Join(dir, "model-full.md")
-	os.WriteFile(authored, []byte("---\nid: model-full\ntype: model\nkind: layers-flow\nstatement: s\n---\n```mermaid\n"+i16FixtureModel+"```\n"), 0o644)
+	os.WriteFile(authored, []byte("---\nid: model-full\ntype: model\nkind: element-tree\nstatement: s\n---\n```mermaid\n"+i16FixtureModel+"```\n"), 0o644)
 	empty := filepath.Join(dir, "model-hollow.md")
-	os.WriteFile(empty, []byte("---\nid: model-hollow\ntype: model\nkind: layers-flow\nstatement: s\n---\n"), 0o644)
+	os.WriteFile(empty, []byte("---\nid: model-hollow\ntype: model\nkind: element-tree\nstatement: s\n---\n"), 0o644)
 	nodes := map[string]*Node{
 		"model-full":   {ID: "model-full", Type: "model", Path: authored},
 		"model-hollow": {ID: "model-hollow", Type: "model", Path: empty},
@@ -238,7 +238,7 @@ func selftestModelsInBook() bool {
 	defer os.RemoveAll(dir)
 	fx := bookFixture(dir, 1, true)
 	mp := filepath.Join(dir, "model-probe.md")
-	os.WriteFile(mp, []byte("---\nid: model-probe\ntype: model\nkind: layers-flow\nstatement: probe\n---\n```mermaid\n"+i16FixtureModel+"```\n"), 0o644)
+	os.WriteFile(mp, []byte("---\nid: model-probe\ntype: model\nkind: element-tree\nstatement: probe\n---\n```mermaid\n"+i16FixtureModel+"```\n"), 0o644)
 	fx["model-probe"] = Node{ID: "model-probe", Type: "model", Statement: "probe", Path: mp}
 	man := "---\nid: man-mod\ntype: manifest\nmode: chapter\nstatement: Design output.\n---\n<!-- ai:3 -->\nThe lede for the model chapter.\n---\nfig: model model-probe\n"
 	mpn := filepath.Join(dir, "man-mod.md")

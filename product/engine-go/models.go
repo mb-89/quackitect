@@ -185,8 +185,7 @@ func (g modelGraph) CanonicalHash() string {
 
 // design: go-model-render  implements: req-models-in-book
 // The book's design output chapter renders every declared model from its extracted
-// graph — the derived view of the text truth. Rings for ranked (layers-flow)
-// models, a flow column for the rest; every arrow carries its payload name
+// graph — the derived view of the text truth. Every arrow carries its payload name
 // (unlabeled arrows are useless). One figure line: `fig: model <id>`,
 // or bare `fig: model` for all models sorted. The structural-models SECTION renders
 // as the auto-generated table below (`fig: models-table`, the same table law as

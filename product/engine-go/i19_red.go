@@ -197,7 +197,7 @@ func selftestTermsBeforeUse() bool {
 // (hermetic home, subprocessed binary):
 //  1. a fixture vehicle renders its book: title and wordmark carry the vehicle's
 //     name, zero engine-identity leaks (statements 1, 2);
-//  2. the colophon credits the engine by name (statement 3);
+//  2. no engine-credit footer is emitted;
 //  3. a PLANTED leak — the engine's name forced into the title — fails, named (statement 4);
 //  4. the identity rule: the overlay's product/<name> names the book; no overlay key
 //     falls to the workspace basename (the dogfood titles itself quackitect); the brand
@@ -237,8 +237,8 @@ func selftestWhiteLabelBook() bool {
 		!strings.Contains(html, ">vech — the spec book</button>") {
 		return false
 	}
-	// the engine is CREDIT, not identity: the colophon names it — in every book
-	if !strings.Contains(html, engineCredit) {
+	// the old engine-credit footer is gone; identity surfaces carry only the product.
+	if strings.Contains(html, `id="colophon"`) || strings.Contains(html, engineCredit) {
 		return false
 	}
 	// the leak guard enumerates the identity surfaces: this book is clean
