@@ -1,5 +1,6 @@
 ---
 id: req-compact-derived
+ears: exempt - historical pre-EARS statement, retire-or-retrofit recorded (adr-grandfathers-historical)
 type: requirement
 statement: Every mechanically derivable section shall render as a compact query with exceptions prominent and detail one interaction away - the numbered statements bind individually.
 class: review

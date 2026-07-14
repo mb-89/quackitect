@@ -8,6 +8,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"net"
 	"os"
 	"path/filepath"
 	"sort"
@@ -249,6 +250,26 @@ func applyBlessIntent(in *BlessIntent) error {
 	// a combined group blesses KILLERS FIRST, the gate last — one tap = the console
 	// pager's merged y, every member recorded individually
 	nodes := LoadAll()
+	// a y accepts everything the BRIEF states (adr-handoff-html): the open defaults
+	// become the user's rulings before the gate records — ONE home for page, phone
+	// and any future channel
+	if _, ok := nodes[in.Check]; ok {
+		fs, _ := handoffAccepts(in.Check, nodes, StatusMap(nodes))
+		if len(fs) > 0 {
+			ch := in.Channel
+			if !strings.HasPrefix(ch, "handoff") {
+				ch = "handoff " + ch
+			}
+			st := loadAskStore()
+			for _, f := range fs {
+				if err := registerAnswerApply(nodes, f.node, f.field, f.value, ch, st); err != nil {
+					return fmt.Errorf("bless stopped at %s.%s: %v", f.node, f.field, err)
+				}
+			}
+			saveAskStore(st)
+			nodes = LoadAll() // the rulings moved hashes; the bless records the fresh ones
+		}
+	}
 	memo := map[string]string{}
 	events := attestEvents()
 	cur := attestLoad()
@@ -325,25 +346,37 @@ func cmdAsk(args []string) {
 			timeout = t
 		}
 	}
+	cid, err := askSendForGate(id, timeout, flagVal(args, "--context"))
+	if err != nil {
+		fmt.Println("ask send failed:", err)
+		quackExit(1)
+		return
+	}
+	fmt.Println("ask sent:", cid, "->", id, "( answer from the phone, or `quack await` to block )")
+}
+
+// askSendForGate composes and dispatches a gate's DECISION BRIEF to every paired
+// channel — the same content the hand-off page shows, capped under ntfy's ceiling.
+// The pager calls it too: a hand-off rides BOTH channels when a phone is paired
+// (owner ruling). Returns the ask cid.
+func askSendForGate(id string, timeout int64, context string) (string, error) {
+	adapters := pairedAdapters()
+	if len(adapters) == 0 {
+		return "", fmt.Errorf("no paired channel")
+	}
+	nodes := LoadAll()
+	n, ok := nodes[id]
+	if !ok || !isGate(n) {
+		return "", fmt.Errorf("not a gate check: %s", id)
+	}
 	kind := "decision"
 	if n.Killer || n.Milestone > 0 {
 		kind = "gate"
 	}
-	// the phone gets the FULL one-pager: the same lines the console
-	// pager boxes — bar, decisions, risks, readiness — minus the mobile hint, capped
-	// under ntfy's 4KB message ceiling
 	sm := StatusMap(nodes)
-	var body []string
-	for _, ln := range pagerLines(id, iterOf(n.Path), nodes, sm, readProjectConfig()) {
-		if strings.HasPrefix(ln, "📱 MOBILE") {
-			continue
-		}
-		body = append(body, ln)
-	}
-	card := strings.Join(body, "\n")
+	card := handoffBriefText(id, nodes, sm)
 	// the hand-off narrative rides BELOW the card, one text on both lanes;
 	// the card always renders first
-	context := flagVal(args, "--context")
 	question := askComposeBody(card, context)
 	if len(question) > 3300 && context != "" {
 		// the ntfy ceiling caps the COMPOSED body; the narrative yields first —
@@ -374,14 +407,57 @@ func cmdAsk(args []string) {
 		Question: question,
 		Options:  []AskOption{{ID: "y", Label: "bless"}, {ID: "n", Label: "reject"}},
 		Created:  time.Now().Unix(), Timeout: timeout, State: "pending",
+		// no page link (owner ruling): it reaches only the same LAN — the brief itself is the card
 	})
 	if _, err := askDispatch(s, adapters); err != nil {
-		fmt.Println("ask send failed:", err)
-		quackExit(1)
-		return
+		return "", err
 	}
 	saveAskStore(s)
-	fmt.Println("ask sent:", cid, "->", id, "( answer from the phone, or `quack await` to block )")
+	return cid, nil
+}
+
+// handoffAsksClose ends a hand-off round's phone side: optionally drain a tap that
+// already arrived (an unanswered page close honors it), then expire what still pends
+// for the gate's group — a dead round leaves no answerable card behind (owner
+// ruling: nothing keeps waiting or polling).
+func handoffAsksClose(gate string, drain bool) {
+	if drain {
+		askDrainMaybe()
+	}
+	s := loadAskStore()
+	nodes := LoadAll()
+	group := []string{gate}
+	if ks, g := pagerGroup(gate, nodes, StatusMap(nodes)); g == gate && len(ks) > 0 {
+		group = append(append([]string{}, ks...), g)
+	}
+	n := 0
+	for _, c := range group {
+		n += askResolveForCheck(s, c, "expired")
+	}
+	if n > 0 {
+		saveAskStore(s)
+	}
+}
+
+// handoffPageURL names the LIVE hand-off page for the phone's view action: the watch
+// server on this machine's LAN address. Best-effort — no server listening (or no LAN
+// address) means no link; the notification's y/n buttons carry the answer regardless.
+func handoffPageURL(gate string) string {
+	c, err := net.DialTimeout("tcp", "localhost:8899", 300*time.Millisecond)
+	if err != nil {
+		return "" // no watch server: the ask travels without a view action
+	}
+	c.Close()
+	host := "localhost"
+	if addrs, err := net.InterfaceAddrs(); err == nil {
+		for _, a := range addrs {
+			if ip, ok := a.(*net.IPNet); ok && !ip.IP.IsLoopback() && ip.IP.To4() != nil {
+				host = ip.IP.String()
+				break
+			}
+		}
+	}
+	return "http://" + host + ":8899/handoff/" + gate
 }
 
 // askDrainMaybe applies any answers already sitting on the channel — the fallback lane:

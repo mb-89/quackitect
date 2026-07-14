@@ -33,6 +33,8 @@ flowchart TD
     go-conn-prose-hash["prose hashing for edges"]
     go-standalone-suite["standalone suite rule"]
     go-kernel-selftest["trust kernel vectors"]
+    go-field-tier["tier semantics: core blocks, deferrable defaults count"]
+    go-register-colors["provenance to traffic-light derivation"]
   end
   subgraph graph
     go-conn-tools["lane tooling"]
@@ -74,6 +76,10 @@ flowchart TD
     go-mint-templates["mint bodies from template files"]
     go-rules-config["rule-sets from config files"]
     go-field-schemas["per-field schemas: load, merge, validate"]
+    go-provenance-block["per-field provenance parse and hash"]
+    go-register-render["register rows: two greens, progressive disclosure"]
+    go-seed-skeleton["start seeds the rigor checklist skeleton"]
+    go-vehicle-misuse-guard["vehicle-spec misuse signature warning"]
     go-schema-tester["validate the schema set itself"]
     go-graph-load["spec loading and node assembly"]
     go-ratings-map["ratings map parsing"]
@@ -162,6 +168,7 @@ flowchart TD
     go-mint-content["mint bodies"]
     go-mint-kinds["mint kind set"]
     go-mint-edge-aware["mint edge mode"]
+    go-mint-prefill["mint pre-fills schema fields with proposals and provenance"]
   end
   subgraph rim
     go-binary["process entry"]
@@ -192,6 +199,8 @@ flowchart TD
     go-ask-loop["ask send, drain, await"]
     go-mcp-server["hand-rolled stdio MCP transport + tool dispatch"]
     go-mcp-session["per-session attest state + the ledger choke point"]
+    go-register-answer["watch-mode answer endpoint onto the ask path"]
+    go-defer-retire["defer and retire reaches"]
     go-ask-seam["adapter seam"]
     go-report-watch["watch server"]
     go-logs-dir["session logs"]
@@ -260,3 +269,5 @@ Further allocations by essence: go-cluster, go-mint-templates, go-rules-config, 
 Allocated at i18 M4 AHEAD of the build (the diagram-first hard rule) - five new elements, UNREALIZED until M6 fills them: go-mcp-server + go-mcp-session -> rim (the new transport face and its per-session attest choke point, beside the ask lane); go-field-schemas + go-schema-tester -> rim--graph (per-field schema load/validate and the schema-set contract test, beside the config and text lints); go-informed-by-edges -> rim--graph (decision-to-element links and their render, beside the decisions table). The three MECHANICAL requirements are behavior changes to existing elements, not new blocks: await-console-exit modifies go-ask-loop; lint-exit-honest modifies the lint command; report-debounce removes render-on-bless from go-bless. The architecture ADRs (adr-mcp-transport, adr-schema-format, adr-mcp-attest, all kind:architecture) link to these elements via informed-by once go-informed-by-edges is built at M6 - the iteration documents its own architecture through the feature it ships.
 
 Render allocations by essence: go-decisions-table, go-asr-list, go-guides-table -> rim--graph, graph-to-html renders every one, the same family as go-q-table and go-project-record. go-views-home (the views-home figure: preset filter entries plus the derived-documents table) -> rim--graph, same family. go-onion-busbar (the drill-down's deterministic bus-bar SVG layout, split from go-onion-figure) -> rim--graph, a graph-to-svg transform. go-model-standalone (one model's onion as a small self-contained HTML review page) and go-onion-change-marks (the review's change-mark and its element->cluster->ring propagation) -> rim--graph, both graph-to-html transforms in the same render family.
+
+Allocated at i21 M4 AHEAD of the build (the diagram-first hard rule) - eight new elements, UNREALIZED until M6 fills them. By essence: go-field-tier and go-register-colors -> kernel (completeness counting and the provenance-to-color derivation are trust RULES, the coverage family); go-mint-prefill -> services (a mint content rule beside go-mint-content); go-provenance-block, go-register-render, go-seed-skeleton -> rim--graph (frontmatter parse, graph-to-html render, and file emission from the rigor source - each a file/render transform in its named family); the apply generalization (create/write ops) extends go-apply-manifest IN PLACE - the build found no seam that earned a second element; go-register-answer -> rim (a transport face beside go-ask-loop and go-mcp-server). The ride-alongs are behavior changes to EXISTING elements, not new blocks: rigor-fit extends go-spec-lints, the drivers-table union extends go-asr-list, the README scope and jargon advisory extend go-terms-order-lint, battery tiers modify go-selftest and go-build-fast-path, the deck-goto fix modifies go-deck-anchors, and the EARS sweep is data. Two i20 regions allocated late (they were the sky-fall findings): go-defer-retire -> rim (a console verb doing external I/O and calling the triage machinery - the conformance checker corrected the first services placement), go-vehicle-misuse-guard -> rim--graph (a spec lint). The i21 architecture ADRs (adr-register-in-report, adr-register-watch-answers, adr-seed-from-rigor-source, adr-provenance-in-node, all kind:architecture) link to these elements via addresses edges (go-informed-by-edges).

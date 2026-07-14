@@ -14,7 +14,7 @@ Do this before anything else on this project:
 
 1. **READ** `product/quackitect/method/prompts/contract.md`. The whole file, with your file-reading tool. No skimming. No summaries. No memory of a past session.
 2. **UNDERSTAND** it. It is binding. It overrides your defaults. It governs every move you make here.
-3. **RECITE** it. STOP whatever you were asked to do. Paraphrase its specifics back to the adjudicator in a message that ENDS your turn — no tool call after the recital, or the harness may swallow it. Name rule 3's `actor=agent` killer-bless exception. That proves you read it. Confirm you will obey. Resume only after the recital is out.
+3. **RECITE** it. Paraphrase its specifics back to the adjudicator so they SEE it. With a command already in hand and an interactive question tool available: put the WHOLE recital inside the question and ask leave to continue — approval resumes the command in the same turn, no re-prompt. Otherwise: STOP, and end your turn with the recital — no tool call after it, or the harness may swallow it (mid-turn text does not render). Name rule 3's `actor=agent` killer-bless exception. That proves you read it. Confirm you will obey.
 4. **HONOR** every instruction in it. No exceptions. To the letter of each statement.
 5. **READ** `product/brand/voice.md` next. Every output follows it. Chat and artifacts alike.
 
@@ -40,7 +40,8 @@ ADJUDICATES the ones that are gates. **Never bless on their behalf.**
 > root: `.\quack <cmd>` — it bootstraps the global binary when absent (the go-bin shim at
 > `product\tools` rides last on PATH, so machines without native Go still build). Ledger-advancing
 > commands on the agent channel carry `--key <session-key>` (the contract's attest section
-> explains how a key is earned).
+> explains how a key is earned). A harness with MCP support auto-starts the command surface
+> from `.mcp.json` (`quack mcp`) — prefer those tools over shelling the CLI when they are up.
 ```
 quack status [id]        # the text board to stdout; with an id, why it's suspect
 quack next               # the next ready check to walk
@@ -60,7 +61,7 @@ quack note --file2list <copy.html> # list a commented book copy as note candidat
 quack notes [--all]      # list open inbox notes (--all adds backlog + archive)
 quack observe-red <test> [--refresh] # run a test and record it FAILING at its current hash (a pass is refused; --refresh re-attests an amended, still-failing test)
 quack gather <ver>       # collect all rigor+type source for an iteration
-quack report [--watch]   # render+open the live HTML board (--out F renders only)
+quack report [--watch]   # render the live HTML board (--open opens it; --out F renders elsewhere)
 quack progress [--pager <gate>] # the readout, or the handover pager for a killer/milestone gate
 quack calls --summary    # print the call-log aggregate, then delete the log (the retro's log step)
 quack pair [ntfy]        # one-time device pairing: mints the topic credential, renders the deep-link QR, prints the disclaimer + lockscreen instruction
@@ -68,6 +69,7 @@ quack pair --show        # re-print the current pairing (QR + link) without re-m
 quack ask <gate> [--timeout s] # send the gate's question to the paired phone (one-tap answer buttons)
 quack await [--timeout s]      # block until a pending ask is answered and APPLY it - a phone bless resumes the walk; every run also drains answers as the fallback
 quack ship               # package product/ -> the workspace data home (out/)
+quack verify <check>     # re-run one executed check eagerly - THE V&V battery lane, once per iteration, in its own visible console
 quack build              # compile the engine, write the build stamp, re-baseline golden-root (skips the compile when no engine source changed)
 quack lint               # coverage holes, duplicate ids, EARS lint, monotonic wiring
 quack selftest           # the engine's own dependency-free self-test
@@ -76,6 +78,11 @@ quack version            # engine version + the resolved data locations
 **Workspaces.** The engine drives a selectable workspace; add `--base <path>` (or `-C <path>`)
 to ANY command to drive a different project's workspace. After editing engine `.go`, run
 **`quack build`** (never hand-run `go build` + re-baseline separately).
+**Long deterministic runs get their own window.** A verification battery or report render is
+plain engine — no agent needed while it runs. Spawn it visibly (`Start-Process` a console
+running the command) so the user watches live progress; read the verdict from the cache after.
+The window closes ITSELF about a minute after the verdict (no `-NoExit`; end the command with
+a short announced sleep). Never hold the conversation behind a silent multi-minute tool call.
 
 ## Rules
 - **The repo is self-sufficient.** Everything an agent needs to work well here lives IN THIS
@@ -104,4 +111,4 @@ to ANY command to drive a different project's workspace. After editing engine `.
   statements, the files — plus a pointer to the role charter (`method/roles/README.md`): the walk
   discipline (execute, don't ruminate; only the step in hand; targeted verify; strays to notes)
   binds delegated roles exactly as it binds the driving agent.
-- **Edits must be byte-safe.** Editor tooling by default. For a mechanical bulk edit, `quack apply <manifest.json>` is the sanctioned lane: byte-exact old→new replacements, dry-run first, all-or-nothing. A scripted bulk edit is allowed when it uses explicit BOM-less UTF-8 IO (Go, or .NET `[IO.File]` calls) and touches only the intended bytes. What stays banned is the careless lane: PowerShell 5.1 default `Get-Content|Set-Content` round-trips and `-Encoding utf8` (BOM in 5.1) re-encode every line they pass — that exact reach corrupted UTF-8 twice (mojibake, a clobbered file). Verify a scripted edit's diff before moving on.
+- **Edits must be byte-safe, and the apply lane is the agent's DEFAULT** (adr-io-lane-default). `quack apply <manifest.json>` carries byte-exact replacements plus `op: create` / `op: write` — dry-run first, all-or-nothing, audited in the call log. Editor tooling stays the lane for a single interactive edit. A scripted bulk edit is the recorded exception: explicit BOM-less UTF-8 IO (Go, or .NET `[IO.File]` calls) touching only the intended bytes. What stays banned is the careless lane: PowerShell `Get-Content|Set-Content` round-trips (any `-Encoding`) re-encode every line they pass — that exact reach has corrupted UTF-8 three times. Verify a scripted edit's diff before moving on.

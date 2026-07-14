@@ -1,5 +1,6 @@
 ---
 id: req-spec-content-lint
+ears: exempt - historical pre-EARS statement, retire-or-retrofit recorded (adr-grandfathers-historical)
 type: requirement
 statement: quack lint shall flag spec-content violations - dangling anchors, orphans, external links, unfilled slots, bad ids, and meta-term leaks - the numbered statements bind individually.
 class: review

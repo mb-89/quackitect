@@ -38,8 +38,9 @@ var nodeKeysAllow = map[string]bool{
 	"verifies": true, "addresses": true, "validates": true, "ears": true, "adjudicated_by": true,
 	"ready_when": true, "supersedes": true, "suite": true, "tests_red": true, "guidance": true, "mode": true,
 	"deferred": true, "retired": true, // the i0020 minimal defer/retire stamps (go-defer-retire)
-	"order":   true, // manifest chapter order (req-system-overview)
-	"ratings": true, // one-level map key (go-ratings-map, req-base-view-queries.2)
+	"order":      true, // manifest chapter order (req-system-overview)
+	"ratings":    true, // one-level map key (go-ratings-map, req-base-view-queries.2)
+	"provenance": true, // one-level map key: per-field value sources (go-provenance-block, adr-provenance-in-node)
 	// the item fields (go-items + the item templates); every field's
 	// semantics and value range live in its item template (method/templates)
 	"kind": true, "axis": true, "chosen": true, "rejected": true, "refers": true, "role": true, "direction": true,
@@ -85,10 +86,12 @@ var refFields = map[string]bool{
 // A clustered requirement carries NUMBERED shall-statements (req-x.2,
 // adr-cluster-numbered-statements). An edge may target the number; the graph
 // resolves it against the base node (req-x). ONE helper strips the trailing .N.
-// It applies at exactly two resolution points — the strict referee's dangling
-// checks (here and connectionIssues) and the lane merge (applyConnEdges) — and
-// ONLY when the raw id resolves nowhere, so a literal dotted node id still wins.
-// Downstream lookups (parents, fullHash, the coverage walks) then see plain ids.
+// It applies at exactly three resolution points — the strict referee's dangling
+// checks (here and connectionIssues), the lane merge (applyConnEdges), and the
+// trace graph's edge builder (traceEdges; code-scanned design markers keep raw
+// suffixed targets, so the graph resolves them itself) — and ONLY when the raw
+// id resolves nowhere, so a literal dotted node id still wins. Downstream
+// lookups (parents, fullHash, the coverage walks) then see plain ids.
 func subAddrBase(ref string) string {
 	i := strings.LastIndex(ref, ".")
 	if i <= 0 || i == len(ref)-1 {
@@ -246,6 +249,12 @@ func StrictIssues(specDir string) []ParseIssue {
 		// go-items: ONE decision type, three kinds; empty = architecture (blessed history).
 		if typeVal == "adr" && kindVal != "" && kindVal != "architecture" && kindVal != "project" && kindVal != "waiver" {
 			issues = append(issues, ParseIssue{path, kindVal, "unknown decision kind (architecture | project | waiver)"})
+		}
+		// an unknown TYPE fails loud at the door: isGate defaults typeless strays to a
+		// blessable gate, so a stray type:note or a typo must never reach the board
+		// (the i19 spike's silent-misclassification finding).
+		if typeVal != "" && !traceContent[typeVal] {
+			issues = append(issues, ParseIssue{path, typeVal, "unknown type \"" + typeVal + "\" - not a known node type; a stray note belongs in the data home, a task carries no type"})
 		}
 		// go-informed-by-edges: a model's declared elements are first-class trace endpoints, so a
 		// decision addressing one never reads dangling — collect them for the id universe below.

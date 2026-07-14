@@ -1,0 +1,11 @@
+{
+  "type": "question",
+  "fields": ["state", "decided_via"],
+  "type_state": "enum",
+  "enum_state": ["open", "proposed", "decided", "suspect"],
+  "tier_state": "core",
+  "default_state": "open",
+  "type_decided_via": "string",
+  "tier_decided_via": "core",
+  "required": ["statement", "state"]
+}

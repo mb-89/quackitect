@@ -1,0 +1,5 @@
+{
+  "type": "usecase",
+  "fields": [],
+  "required": ["statement"]
+}

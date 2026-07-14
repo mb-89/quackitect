@@ -28,13 +28,13 @@ All you bring is the big ideas — and your judgement.
 
 
 ## Who it's for
-Engineers driving work with AI agents — software or any other discipline — who need to trust work they did not watch happen. An experienced developer reads between the lines. A model doesn't: where context is missing, it fills the gap with a plausible invention. So the intent has to be explicit *before* the build — the needs, the constraints that bind, the decisions and their reasons. quackitect governs that loop instead of trusting the run: the agent *proposes*, you *adjudicate* the gates, and a deterministic ledger keeps the record honest.
+Engineers driving work with AI agents — software or any other discipline — who need to trust work they did not watch happen. An experienced developer reads between the lines. A model doesn't: where context is missing, it fills the gap with a plausible invention. So the intent has to be explicit *before* the build — the needs, the constraints that bind, the decisions and their reasons. quackitect governs that loop instead of trusting the run: the agent *proposes*, you *adjudicate* the [gates](https://mb-89.github.io/quackitect/book.html#term-gate), and a deterministic [ledger](https://mb-89.github.io/quackitect/book.html#term-ledger) keeps the record honest.
 
 ## vs other spec-driven tools
 |  | Spec Kit · Kiro · OpenSpec | quackitect |
 |---|---|---|
 | Job | spec → plan → generate code | spec → gated ledger + deliverable |
-| Output | source code | auditable trace + deliverable |
+| Output | source code | auditable [trace](https://mb-89.github.io/quackitect/book.html#term-trace) + deliverable |
 | On input change | re-generate | every check the change touches reopens for review - you re-approve it |
 | User role | review the diff | adjudicate the gates (never auto-passed) |
 | Runtime | varies | one dependency-free Go binary |
@@ -51,7 +51,7 @@ onboarding for you.
 
 **Not ready to hand over a repo yet?** Watch a **[5-minute walkthrough](https://mb-89.github.io/quackitect/book.html#man-deck-pong)** first — an empty folder to a shipped, playable Pong game, measured end to end.
 
-Quackitect will walk you through all steps up to your first milestone.
+Quackitect will guide you through all steps up to your first [milestone](https://mb-89.github.io/quackitect/book.html#term-milestone).
 Need more details, or a list of all functions? Ask it.
 
 <p align="center"><img src=".github/report.png" width="860" alt="The quackitect report — gated milestones (left), the trace graph (center), and coverage metrics (right)."></p>
@@ -67,6 +67,3 @@ You're looking at quackitect's own design, tracked and built by quackitect. It *
 | [The book](spec/book.html) | quackitect's whole spec as one page. Works locally and on GitHub. |
 | [Read the book in your browser](https://mb-89.github.io/quackitect/book.html) | The same book on GitHub Pages. No clone needed. |
 | [The five-minutes walkthrough](https://mb-89.github.io/quackitect/book.html#man-deck-pong) | From an empty folder to a shipped Pong game, measured. Opens as slides; the last slide plays the game. |
-
----
-<sub>spec-driven development · requirements traceability · decision records · design-as-code · systems engineering · V-model · AGENTS.md · AI coding agents · audit trail · gate ledger · Merkle DAG</sub>

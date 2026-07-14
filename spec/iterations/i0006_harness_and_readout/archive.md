@@ -31,6 +31,7 @@ Bless-time readout (72-col fenced progress bar + handover one-pager), conversati
 <<<node: req-contract-delivery.md>>>
 ---
 id: req-contract-delivery
+ears: exempt - historical pre-EARS statement, retire-or-retrofit recorded (adr-grandfathers-historical)
 type: requirement
 statement: Every entry surface shall deliver the contract as an active read-paraphrase-confirm imperative through each harness's native channel - the numbered statements bind individually.
 class: review

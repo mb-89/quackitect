@@ -22,6 +22,7 @@ killer: false
 <<<node: req-legacy-decided.md>>>
 ---
 id: req-legacy-decided
+ears: exempt - historical pre-EARS statement, retire-or-retrofit recorded (adr-grandfathers-historical)
 type: requirement
 statement: No grandfathered legacy shall survive undecided - exemptions carry recorded markers and decisions, and retired lanes stay retired - the numbered statements bind individually.
 class: review

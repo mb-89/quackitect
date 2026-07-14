@@ -26,19 +26,21 @@ import (
 // correlation id resolves the ask; late, duplicate, or post-expiry answers are ignored
 // (the Home Assistant failure modes, engineered around).
 type Ask struct {
-	ID       string   // ask id (unique per ask)
-	CID      string   // correlation id carried by every answer
-	Kind     string   // "gate" | "decision"
-	Check    string   // the primary check id a gate ask blesses
-	Checks   []string // a COMBINED hand-off's full group (one card, one tap blesses all)
-	Question string
-	Options  []AskOption
-	Created  int64  // unix seconds (injectable clock everywhere)
-	Updated  int64  // last state-change stamp, unix seconds (merge-on-save picks the newest; go-ask-hardening)
-	Timeout  int64  // seconds until expiry
-	State    string // "pending" | "resolved" | "expired"
-	Answer   string // the winning option id, once resolved
-	Sent     bool   // dispatched to the paired adapters already
+	ID            string   // ask id (unique per ask)
+	CID           string   // correlation id carried by every answer
+	Kind          string   // "gate" | "decision"
+	Check         string   // the primary check id a gate ask blesses
+	Checks        []string // a COMBINED hand-off's full group (one card, one tap blesses all)
+	Question      string
+	Options       []AskOption
+	Created       int64  // unix seconds (injectable clock everywhere)
+	CreatedRemote int64  // the CHANNEL's own receive stamp for the sent card — staleness compares answers on ONE clock (a skewed pc clock must not eat fresh taps)
+	Updated       int64  // last state-change stamp, unix seconds (merge-on-save picks the newest; go-ask-hardening)
+	Timeout       int64  // seconds until expiry
+	State         string // "pending" | "resolved" | "expired"
+	Answer        string // the winning option id, once resolved
+	Sent          bool   // dispatched to the paired adapters already
+	Page          string // the hand-off page URL (adr-handoff-html): rides as the view action when a server serves it
 }
 
 // AskOption is one answer choice: a stable id and its label.
@@ -91,8 +93,14 @@ func askApplyAnswer(s *AskStore, ans AskAnswer, channel string, now int64) (*Ble
 			continue
 		}
 		// an answer stamped BEFORE the ask was created belongs to a previous ask
-		// generation (a re-sent gate question) - refused, never applied (go-ask-hardening)
-		if answerStale(a.Created, ans.At) {
+		// generation (a re-sent gate question) - refused, never applied (go-ask-hardening).
+		// The channel's own stamp wins when known: answers are stamped by the channel's
+		// clock, and a skewed pc clock must not eat fresh taps.
+		created := a.Created
+		if a.CreatedRemote > 0 {
+			created = a.CreatedRemote
+		}
+		if answerStale(created, ans.At) {
 			fmt.Fprintln(os.Stderr, "ask: stale answer dropped for "+a.CID+" (answer predates the ask)")
 			return nil, false
 		}
@@ -238,6 +246,12 @@ func askDispatch(s *AskStore, adapters []AskAdapter) (int, error) {
 				return sent, err
 			}
 			sent++
+			// stamp the ask with the channel's own clock when the adapter knows it
+			if rs, ok := ad.(interface{ LastSendTime() int64 }); ok {
+				if t := rs.LastSendTime(); t > 0 && (a.CreatedRemote == 0 || t < a.CreatedRemote) {
+					a.CreatedRemote = t
+				}
+			}
 		}
 		a.Sent = true
 	}
@@ -410,14 +424,21 @@ func ntfyHeaders(a Ask, answerTopic string) map[string]string {
 		h["X-Priority"] = "default"
 		h["X-Tags"] = "grey_question"
 	}
+	limit := 3
+	if a.Page != "" {
+		limit = 2 // the third action slot carries the hand-off page (adr-handoff-html)
+	}
 	n := len(a.Options)
-	if n > 3 {
-		n = 3
+	if n > limit {
+		n = limit
 	}
 	var acts []string
 	for _, o := range a.Options[:n] {
 		// the topic stays BARE here; SendAsk absolutizes it against the adapter's base
 		acts = append(acts, "http, "+o.ID+" "+o.Label+", "+answerTopic+", method=PUT, body="+o.ID+" "+a.CID)
+	}
+	if a.Page != "" {
+		acts = append(acts, "view, open hand-off, "+a.Page)
 	}
 	h["X-Actions"] = strings.Join(acts, "; ")
 	return h
@@ -426,7 +447,11 @@ func ntfyHeaders(a Ask, answerTopic string) map[string]string {
 type ntfyAdapter struct {
 	base, ask, answer string
 	client            *http.Client
+	lastSend          int64 // the server's receive stamp of the last sent card
 }
+
+// LastSendTime hands askDispatch the channel-clock stamp of the last send.
+func (n *ntfyAdapter) LastSendTime() int64 { return n.lastSend }
 
 func ntfyAdapterFor(base, askTopic, answerTopic string) AskAdapter {
 	return &ntfyAdapter{base: base, ask: askTopic, answer: answerTopic, client: &http.Client{Timeout: 30 * time.Second}}
@@ -459,6 +484,14 @@ func (n *ntfyAdapter) SendAsk(a Ask) error {
 	defer resp.Body.Close()
 	if resp.StatusCode != 200 {
 		return fmt.Errorf("ntfy send: %s", resp.Status)
+	}
+	// the publish echo carries the SERVER's receive time — the same clock that will
+	// stamp the answers; staleness must compare on one clock
+	if raw, err := io.ReadAll(resp.Body); err == nil {
+		var ev ntfyEvent
+		if json.Unmarshal(raw, &ev) == nil && ev.Time > 0 {
+			n.lastSend = ev.Time
+		}
 	}
 	return nil
 }

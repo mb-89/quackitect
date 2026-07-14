@@ -1,7 +1,11 @@
 {
   "type": "requirement",
-  "fields": ["kind"],
+  "fields": ["kind", "ears"],
   "type_kind": "enum",
   "enum_kind": ["functional", "quality", "constraint", "interface"],
-  "tier_kind": "deferrable"
+  "tier_kind": "deferrable",
+  "type_ears": "pattern",
+  "pattern_ears": "^exempt - .+$",
+  "tier_ears": "deferrable",
+  "required": ["statement"]
 }

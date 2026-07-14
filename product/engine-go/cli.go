@@ -133,6 +133,15 @@ func Dispatch(args []string) {
 	cmd, rest := args[0], args[1:]
 	callLogStart(cmd, rest) // one redacted line per dispatch (go-call-log)
 	defer func() { callLogWrite(0) }()
+	// design: go-lazy-verdicts  implements: req-lazy-verdicts
+	// lazy verdicts everywhere but the EXPLICIT verification surfaces: only selftest
+	// and verify re-run tests on a cache miss — the battery belongs to V&V, once per
+	// iteration (owner ruling). Every other command, renders included, answers from
+	// the cache and reads a moved hash as unverified.
+	verdictLazyMode = !map[string]bool{
+		"selftest": true, "verify": true,
+	}[cmd]
+	// enddesign
 	rest = attestGuard(cmd, rest) // the contract gate: agent-channel ledger commands need a key
 	askDrainMaybe()               // the fallback lane: every run applies answers already on the channel (go-ask-loop)
 	if bad, isBad := badIDArg(cmd, rest); isBad {
@@ -229,7 +238,7 @@ func Dispatch(args []string) {
 			rp = filepath.Join(dataDirFor("out"), "report.html")
 		}
 		fmt.Println("report ->", rp)
-		if out == "" && !hasFlag(rest, "--no-open") { // bare `quack report` opens; --out renders only
+		if out == "" && hasFlag(rest, "--open") { // report renders only; --open also opens (no auto-open)
 			openFile(rp)
 		}
 	case "resolve":
@@ -628,6 +637,39 @@ func cmdLint(rest []string) {
 		for _, f := range tof {
 			fmt.Println("  - " + f)
 		}
+	}
+	// the README joins the reading order first (go-readme-terms): bare uses only, advisory.
+	if rtf := readmeTermFindings(filepath.Join(filepath.Dir(SPEC), "README.md"), gloss); len(rtf) > 0 {
+		fmt.Printf("terms: %d README finding(s) (advisory):\n", len(rtf))
+		for _, f := range rtf {
+			fmt.Println("  - " + f)
+		}
+	}
+	// unregistered acronyms in reader prose (go-jargon-advisory): advisory.
+	var jf []string
+	if chs, _ := readerChapters(nodes); len(chs) > 0 {
+		var bodies []string
+		for _, ch := range chs {
+			for _, u := range parseManifestUnits(manifestBody(ch.Path)) {
+				bodies = append(bodies, u.Body)
+			}
+		}
+		vocab := jargonVocab(bodies) // the book's own prose filters emphasis caps
+		for _, ch := range chs {
+			for ui, u := range parseManifestUnits(manifestBody(ch.Path)) {
+				jf = append(jf, jargonFindings(u.Body, ch.ID+"-u"+itoa(ui+1), gloss, vocab)...)
+			}
+		}
+	}
+	if len(jf) > 0 {
+		fmt.Printf("jargon: %d advisory finding(s):\n", len(jf))
+		for _, f := range jf {
+			fmt.Println("  - " + f)
+		}
+	}
+	// rigor-fit (go-rigor-fit): the composed size against the rigor band, advisory.
+	for _, f := range rigorFitFindings(nodes) {
+		fmt.Println("  - " + f)
 	}
 	// the BLOCKING set (the three-code contract, go-lint-exit): structural findings that must not
 	// ship. Advisories — coverage holes, adoption advisories, model/field/schema notes — stay exit 0.

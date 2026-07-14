@@ -69,6 +69,7 @@ killer: false
 <<<node: req-pluggable-capabilities.md>>>
 ---
 id: req-pluggable-capabilities
+ears: exempt - historical pre-EARS statement, retire-or-retrofit recorded (adr-grandfathers-historical)
 type: requirement
 statement: Roles and research shall be pluggable strategies behind file-based seams, never vendored or hardcoded - the numbered statements bind individually.
 class: review

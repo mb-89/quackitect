@@ -217,7 +217,7 @@ func selftestWhiteLabelBook() bool {
 		return false
 	}
 	home := filepath.Join(tmp, "home")
-	env := append(os.Environ(), "QUACK_RATCHETED=1", "LOCALAPPDATA="+home, "XDG_DATA_HOME="+home)
+	env := append(os.Environ(), "QUACK_RATCHETED=1", "QUACK_NO_PULL=1", "LOCALAPPDATA="+home, "XDG_DATA_HOME="+home)
 	ctx, cancel := context.WithTimeout(context.Background(), 50*time.Second)
 	defer cancel()
 	out := filepath.Join(tmp, "book.html")

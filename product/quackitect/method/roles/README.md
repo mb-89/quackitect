@@ -26,7 +26,7 @@ iteration, all three resolve to the driving agent — behaviour is exactly as be
 
 <!-- enddesign -->
 
-## delegated agents — the role charter (owner law, 2026-07-12)
+## delegated agents — the role charter
 <!-- design: method-role-charter :: A delegated subagent is a ROLE FILLING ONE STEP of the walk, bound by the same discipline as the driving agent; the brief points HERE instead of restating it. -->
 A subagent is not an independent thinker with a task — it is a ROLE (implementer, tester,
 testdesigner, author) filling ONE step of a walk that is already planned. The method binds it

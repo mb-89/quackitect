@@ -13,3 +13,4 @@
 {"src":"adr-slack-text-poll","dst":"cand-slack-text-poll"}
 {"src":"adr-ntfy-actions","dst":"cand-ntfy-actions"}
 {"src":"adr-ask-seam-exec-lane","dst":"cand-seam-exec-lane"}
+{"src":"adr-register-watch-answers","dst":"model-register-ask-flow"}

@@ -9,6 +9,7 @@ import (
 	"regexp"
 	"runtime"
 	"sort"
+	"strconv"
 	"strings"
 )
 
@@ -154,7 +155,8 @@ func atoiSafe(s string) int {
 }
 
 // iterationOfNode: code-design nodes (path under product/) belong to the iteration of the
-// requirement they implement, not a phantom group.
+// requirement they implement, not a phantom group. A target may name a numbered
+// statement (req-x.2); the ONE suffix helper (go-sub-addressing) resolves it, raw id first.
 func iterationOfNode(n Node, nodes map[string]Node, seen map[string]bool) string {
 	rel, _ := filepath.Rel(SPEC, n.Path)
 	if !strings.HasPrefix(filepath.ToSlash(rel), "..") {
@@ -165,6 +167,13 @@ func iterationOfNode(n Node, nodes map[string]Node, seen map[string]bool) string
 	}
 	seen[n.ID] = true
 	for _, q := range append(append([]string{}, n.Implements...), n.Refines...) {
+		if _, ok := nodes[q]; !ok {
+			if b := subAddrBase(q); b != q {
+				if _, ok := nodes[b]; ok {
+					q = b
+				}
+			}
+		}
 		if qn, ok := nodes[q]; ok && !seen[q] {
 			return iterationOfNode(qn, nodes, seen)
 		}
@@ -178,25 +187,44 @@ func iterationOfNode(n Node, nodes map[string]Node, seen map[string]bool) string
 // the walkable board.
 var traceTypes = map[string]bool{"need": true, "usecase": true, "requirement": true, "design": true, "test": true, "adr": true}
 
-func traceEdges(n Node) [][2]string {
+// A semantic target may name a numbered statement (req-x.2). The graph resolves it
+// against the base node with the ONE suffix helper (go-sub-addressing); the raw id
+// wins when it names a node. Targets that collapse to one base keep one edge.
+func traceEdges(n Node, nodes map[string]Node) [][2]string {
 	var e [][2]string
+	seen := map[[2]string]bool{}
+	add := func(q, kind string) {
+		if _, ok := nodes[q]; !ok {
+			if b := subAddrBase(q); b != q {
+				if _, ok := nodes[b]; ok {
+					q = b
+				}
+			}
+		}
+		k := [2]string{q, kind}
+		if seen[k] {
+			return
+		}
+		seen[k] = true
+		e = append(e, k)
+	}
 	for _, q := range n.Refines {
-		e = append(e, [2]string{q, "refines"})
+		add(q, "refines")
 	}
 	for _, q := range n.Implements {
-		e = append(e, [2]string{q, "implements"})
+		add(q, "implements")
 	}
 	for _, q := range n.Verifies {
-		e = append(e, [2]string{q, "verifies"})
+		add(q, "verifies")
 	}
 	for _, q := range n.Addresses {
-		e = append(e, [2]string{q, "addresses"})
+		add(q, "addresses")
 	}
 	return e
 }
 
-func edgesOf(n Node) [][2]string {
-	e := traceEdges(n)
+func edgesOf(n Node, nodes map[string]Node) [][2]string {
+	e := traceEdges(n, nodes)
 	for _, q := range n.DependsOn {
 		e = append(e, [2]string{q, "depends_on"})
 	}
@@ -222,203 +250,22 @@ type gtab struct {
 }
 
 // design: go-render-folds  implements: req-trace-clustered
-// The trace renders fold, RENDER-ONLY (adr-cluster-numbered-statements). The data never changes.
-// Two folds:
-//   1. The fan fold. A regular fan collapses to ONE box. The canonical case: a usecase
-//      whose requirement children each carry exactly their own tests and designs. No edge
-//      leaves the group, except the parent's own upward edge and ADRs addressing a member.
-//      External edges draw to the box boundary. An ADR edge names its member as the label.
-//   2. The age fold. Everything older than the last FIVE iterations folds behind a click:
-//      one summary box per old iteration (id, node count, gate light).
-// A click expands a box to the group's full pre-baked view. The dom-static law holds:
-// every member node, every internal edge, and every boundary variant bakes here, server-side.
-// The browser only flips node visibility; cytoscape hides an edge when an endpoint hides.
-// The folds are REPORT-ONLY: the book's trace chapter shares the tab machinery
-// (traceTabs -> buildTab) but renders the clean unfolded per-need trace
-// (bookGraphTabs). Milestone and board views never fold.
-
-// recentIterations names the iterations that stay unfolded: the last five of the sorted
-// iteration list, plus the active one (readProjectConfig).
-func recentIterations() map[string]bool {
-	vers := versions()
-	recent := map[string]bool{}
-	start := len(vers) - 5
-	if start < 0 {
-		start = 0
-	}
-	for _, v := range vers[start:] {
-		recent[v] = true
-	}
-	if v := readProjectConfig().Version; v != "" {
-		recent[v] = true
-	}
-	return recent
-}
-
-// foldPlan assigns one tab's members to fold groups and carries one collapsed box per group.
-type foldPlan struct {
-	groupOf map[string]string // member id -> its fold group ("" = loose)
-	kindOf  map[string]string // group id -> "age" | "fan"
-	boxes   []gel             // the collapsed boxes, in deterministic order
-}
-
-// planFolds computes both folds over one tab. The age fold claims first; a fan candidate
-// never captures an already-folded member.
-func planFolds(ids []string, idset map[string]bool, nodes map[string]Node, sm map[string]string, recent map[string]bool) foldPlan {
-	fp := foldPlan{groupOf: map[string]string{}, kindOf: map[string]string{}}
-	// the age fold: one box per iteration outside the recent window
-	byIter := map[string][]string{}
-	for _, id := range ids {
-		it := iterationOfNode(nodes[id], nodes, nil)
-		if !recent[it] {
-			byIter[it] = append(byIter[it], id)
-		}
-	}
-	var oldIts []string
-	for it := range byIter {
-		oldIts = append(oldIts, it)
-	}
-	sort.Strings(oldIts)
-	for _, it := range oldIts {
-		gid := "fold::age::" + it
-		light := "🟢" // green until a member gate reads OPEN or SUSPECT
-		for _, id := range byIter[it] {
-			fp.groupOf[id] = gid
-			if sm[id] == "OPEN" || sm[id] == "SUSPECT" {
-				light = "🔴"
-			}
-		}
-		unit := " nodes"
-		if len(byIter[it]) == 1 {
-			unit = " node"
-		}
-		fp.kindOf[gid] = "age"
-		fp.boxes = append(fp.boxes, gel{Data: map[string]string{
-			"id": gid, "label": it + " · " + itoa(len(byIter[it])) + unit + " · " + light,
-			"foldbox": gid, "kind": "age", "type": "iterfold"}})
-	}
-	// the fan fold: candidates walk in type order (usecase before requirement), then by id,
-	// so an outer fan claims its members before an inner sub-fan can
-	kids := map[string][]string{}
-	for _, id := range ids {
-		for _, e := range traceEdges(nodes[id]) {
-			if idset[e[0]] {
-				kids[e[0]] = append(kids[e[0]], id)
-			}
-		}
-	}
-	cands := append([]string{}, ids...)
-	sort.Slice(cands, func(i, j int) bool {
-		ti, tj := typeRank[nodes[cands[i]].Type], typeRank[nodes[cands[j]].Type]
-		if ti != tj {
-			return ti < tj
-		}
-		return cands[i] < cands[j]
-	})
-	for _, p := range cands {
-		if t := nodes[p].Type; t != "usecase" && t != "requirement" {
-			continue
-		}
-		if fp.groupOf[p] != "" {
-			continue
-		}
-		group := fanGroup(p, kids, nodes, fp.groupOf)
-		if len(group) < 4 { // a fold below parent + three members compacts nothing
-			continue
-		}
-		if !fanIsClosed(p, group, ids, idset, nodes) {
-			continue
-		}
-		gid := "fold::fan::" + p
-		counts := map[string]int{}
-		for id := range group {
-			fp.groupOf[id] = gid
-			if id != p {
-				counts[nodes[id].Type]++
-			}
-		}
-		fp.kindOf[gid] = "fan"
-		fp.boxes = append(fp.boxes, gel{Data: map[string]string{
-			"id": gid, "label": p + ": " + fanCounts(counts),
-			"foldbox": gid, "kind": "fan", "type": nodes[p].Type}})
-	}
-	return fp
-}
-
-// fanGroup collects p plus every in-tab descendant. ADR nodes stay outside: decisions are
-// boundary neighbours, never members. nil when a member already belongs to another fold.
-func fanGroup(p string, kids map[string][]string, nodes map[string]Node, groupOf map[string]string) map[string]bool {
-	group := map[string]bool{p: true}
-	stack := []string{p}
-	for len(stack) > 0 {
-		x := stack[len(stack)-1]
-		stack = stack[:len(stack)-1]
-		for _, k := range kids[x] {
-			if group[k] || nodes[k].Type == "adr" {
-				continue
-			}
-			if groupOf[k] != "" {
-				return nil
-			}
-			group[k] = true
-			stack = append(stack, k)
-		}
-	}
-	return group
-}
-
-// fanIsClosed verifies the fan touches nothing outside. Only two edge kinds may cross the
-// boundary: an outside edge entering at the parent, and a member edge leaving toward an ADR.
-func fanIsClosed(p string, group map[string]bool, ids []string, idset map[string]bool, nodes map[string]Node) bool {
-	for _, id := range ids {
-		for _, e := range traceEdges(nodes[id]) {
-			if !idset[e[0]] {
-				continue
-			}
-			inS, inT := group[e[0]], group[id]
-			if inS == inT {
-				continue
-			}
-			if !inS && id != p {
-				return false // an outside edge enters a non-parent member
-			}
-			if inS && nodes[id].Type != "adr" {
-				return false // a member edge leaves toward a non-ADR node
-			}
-		}
-	}
-	return true
-}
-
-// fanCounts renders the box tally, e.g. "5 reqs · 5 tests · 5 designs" (types present only).
-func fanCounts(counts map[string]int) string {
-	names := []struct{ t, s string }{{"usecase", "ucs"}, {"requirement", "reqs"}, {"test", "tests"}, {"design", "designs"}}
-	var parts []string
-	for _, n := range names {
-		if c := counts[n.t]; c > 0 {
-			parts = append(parts, itoa(c)+" "+n.s)
-		}
-	}
-	if len(parts) == 0 {
-		return "empty fan"
-	}
-	return strings.Join(parts, " · ")
-}
+// The trace graph renders UNFOLDED, one tab per need, in the report and the book alike.
+// It carries the semantic design dimension ONLY - no fold boxes, no iteration or age
+// grouping (adr-trace-graph-unfolded): age is the iteration sidebar's concept, and each
+// node gel carries an "iter" attribute for filters. The report adds the (unrooted)
+// leftovers tab for strays the operator must see; the book renders per-need tabs only,
+// decisions only when architectural (bookGraphTabs). Render compaction for large tabs
+// is an open design discussion, deliberately NOT solved here.
 
 // buildTab emits one need's subtree as cytoscape elements (nodes + V-model edges). No positions:
 // the browser lays it out with the breadthfirst hierarchical layout (the same algo the filter uses).
-// Fold membership bakes into the element data (go-render-folds); the browser only toggles it.
-// A nil recent window means NO folds at all: every node renders loose (the book's trace).
-func buildTab(label string, idset map[string]bool, nodes map[string]Node, sm map[string]string, recent map[string]bool) gtab {
+func buildTab(label string, idset map[string]bool, nodes map[string]Node, sm map[string]string) gtab {
 	ids := []string{}
 	for id := range idset {
 		ids = append(ids, id)
 	}
 	sort.Strings(ids)
-	fp := foldPlan{groupOf: map[string]string{}, kindOf: map[string]string{}}
-	if recent != nil {
-		fp = planFolds(ids, idset, nodes, sm, recent)
-	}
 	var els []gel
 	for _, id := range ids {
 		n := nodes[id]
@@ -426,75 +273,16 @@ func buildTab(label string, idset map[string]bool, nodes map[string]Node, sm map
 		if n.Killer {
 			k = "1"
 		}
-		d := map[string]string{"id": id, "label": id, "type": n.Type, "state": sm[id], "killer": k, "iter": iterationOfNode(n, nodes, nil)}
-		if g := fp.groupOf[id]; g != "" {
-			d["fold"] = g // pre-baked membership: the member hides while its box shows
-		}
-		els = append(els, gel{Data: d})
-	}
-	els = append(els, fp.boxes...)
-	// boundary edges: every variant a collapse can need bakes here, deduplicated. A fan
-	// box's edge toward an ADR collects the addressed members as its label.
-	type bedge struct {
-		data    map[string]string
-		members map[string]bool
-	}
-	bmap := map[string]*bedge{}
-	addBoundary := func(src, dst, etype, member string) {
-		eid := "fold__" + src + "__" + dst + "__" + etype
-		be, ok := bmap[eid]
-		if !ok {
-			be = &bedge{data: map[string]string{"id": eid, "source": src, "target": dst, "etype": etype}}
-			bmap[eid] = be
-		}
-		if member != "" {
-			if be.members == nil {
-				be.members = map[string]bool{}
-			}
-			be.members[member] = true
-		}
+		els = append(els, gel{Data: map[string]string{"id": id, "label": id, "type": n.Type,
+			"state": sm[id], "killer": k, "iter": iterationOfNode(n, nodes, nil)}})
 	}
 	for _, id := range ids {
-		for _, e := range traceEdges(nodes[id]) {
+		for _, e := range traceEdges(nodes[id], nodes) {
 			if !idset[e[0]] {
 				continue
 			}
 			els = append(els, gel{Data: map[string]string{"id": e[0] + "__" + id, "source": e[0], "target": id, "etype": e[1]}})
-			gs, gt := fp.groupOf[e[0]], fp.groupOf[id]
-			if gs == gt {
-				continue // both loose, or both inside the same group
-			}
-			mlabel := ""
-			if gs != "" && fp.kindOf[gs] == "fan" && nodes[id].Type == "adr" {
-				mlabel = e[0] // the ADR edge names which member it addresses
-			}
-			if gs != "" {
-				addBoundary(gs, id, e[1], mlabel)
-			}
-			if gt != "" {
-				addBoundary(e[0], gt, e[1], "")
-			}
-			if gs != "" && gt != "" {
-				addBoundary(gs, gt, e[1], "")
-			}
 		}
-	}
-	var beids []string
-	for eid := range bmap {
-		beids = append(beids, eid)
-	}
-	sort.Strings(beids)
-	for _, eid := range beids {
-		be := bmap[eid]
-		if len(be.members) > 0 {
-			var ms []string
-			for m := range be.members {
-				ms = append(ms, m)
-			}
-			sort.Strings(ms)
-			be.data["label"] = strings.Join(ms, ", ")
-		}
-		els = append(els, gel{Data: be.data})
 	}
 	return gtab{Label: label, Count: len(ids), Elements: els}
 }
@@ -532,7 +320,7 @@ func traceTabs(nodes map[string]Node, sm map[string]string, book bool) []gtab {
 	}
 	children := map[string][]string{}
 	for id, n := range tnodes {
-		for _, e := range traceEdges(n) {
+		for _, e := range traceEdges(n, tnodes) {
 			if _, ok := tnodes[e[0]]; ok {
 				children[e[0]] = append(children[e[0]], id)
 			}
@@ -561,17 +349,13 @@ func traceTabs(nodes map[string]Node, sm map[string]string, book bool) []gtab {
 	}
 	sort.Strings(needs)
 	var tabs []gtab
-	var recent map[string]bool // nil = no folds (the book)
-	if !book {
-		recent = recentIterations() // the fold window (go-render-folds), computed once per render
-	}
 	rooted := map[string]bool{}
 	for _, need := range needs {
 		st := subtree(need)
 		for id := range st {
 			rooted[id] = true
 		}
-		tabs = append(tabs, buildTab(need, st, tnodes, sm, recent))
+		tabs = append(tabs, buildTab(need, st, tnodes, sm))
 	}
 	if book {
 		return tabs
@@ -583,7 +367,7 @@ func traceTabs(nodes map[string]Node, sm map[string]string, book bool) []gtab {
 		}
 	}
 	if len(unrooted) > 0 {
-		tabs = append(tabs, buildTab("(unrooted)", unrooted, tnodes, sm, recent))
+		tabs = append(tabs, buildTab("(unrooted)", unrooted, tnodes, sm))
 	}
 	return tabs
 }
@@ -593,7 +377,7 @@ func checksMap(nodes map[string]Node, sm map[string]string, outDir string) map[s
 	bl := latestBless()
 	for id, n := range nodes {
 		var edges []string
-		for _, e := range edgesOf(n) {
+		for _, e := range edgesOf(n, nodes) {
 			if _, ok := nodes[e[0]]; ok {
 				edges = append(edges, e[1]+" "+e[0])
 			}
@@ -1065,6 +849,8 @@ func RenderReport(outPath string) error {
 	H.WriteString("<section class='col right'><h2>Metrics</h2><div class=cards>" + metricCards(nodes, sm, cfg) + "</div>" +
 		"<h2 class=push>Details</h2><div id=detail class=detail><div class=dempty>click an element to show detail</div></div></section>")
 	H.WriteString("</main>")
+	// NO standing register (adr-handoff-html): provenance stays node data; colors
+	// render only on the per-gate hand-off page.
 	H.WriteString("<script>window.QUACK_DATA=" + string(gdata) + ";</script>")
 	H.WriteString("<script>" + assetJS("cytoscape.min.js") + "</script>")
 	H.WriteString("<script>" + assetJS("dagre.min.js") + "</script>")
@@ -1078,6 +864,679 @@ func RenderReport(outPath string) error {
 	os.MkdirAll(outDir, 0o755)
 	return os.WriteFile(outPath, []byte(H.String()), 0o644)
 }
+
+// enddesign
+
+// design: go-register-render  implements: req-register-render
+// The REGISTER: fill/adjudicate as UI (adr-register-in-report). One row per node whose
+// TYPE carries its own schema fields; the row collapses to statement + computed color
+// chip (go-register-colors), the first disclosure level shows the CORE fields, the
+// second every field with its provenance line. The two greens wear DISTINCT marks
+// (adjudicated = filled, agent-confident = outlined) so a proposal never reads as a
+// decision. A KILLER node's row carries the pager pointer and no answer affordance
+// (req-register-killer-guard); a red non-killer row carries the answer affordance the
+// watch lane activates (b7) and the static file leaves inert.
+// renderHandoffHTML is the adjudication page (adr-handoff-html): one gate as a DECISION
+// BRIEF on a single phone-sized card, centered unchanged on a desktop, no page scroll.
+// Top: gate id, the gate's question, a one-line BLUF wearing the striped agent chip (a
+// proposal, never a ruling). Middle: the summary lines — you-must-decide, settle
+// later, riding a default, done. Tests and walked steps appear NOWHERE: they are
+// state, never decisions, and the brief is only about decisions (owner ruling); a
+// killer DEMO settles at its own milestone and rides the "settle later" line; the
+// decide view deals the blockers ONE AT A TIME (‹ › deck) — every card states in
+// plain words WHAT A BLESS ACCEPTS (the agent's defaults become the ruling; a killer
+// gate is adjudicated individually in the user's name). Bottom: the page's ONLY two
+// actions, y/n — a y makes handoffBless record everything stated. The buttons POST to the
+// local watch server; on a stale file with no listener they no-op by design (the
+// owner's ruling). Self-contained: no external asset, ever.
+// handoffCone is the gate's adjudication material: its direct inputs plus every
+// register-eligible trace node of the gate's iteration.
+func handoffCone(gate Node, nodes map[string]Node) map[string]bool {
+	member := map[string]bool{}
+	for _, d := range gate.DependsOn {
+		member[d] = true
+	}
+	it := iterOf(gate.Path)
+	for id, n := range nodes {
+		if iterOf(n.Path) == it && traceContent[n.Type] && n.Type != "manifest" {
+			member[id] = true
+		}
+	}
+	return member
+}
+
+// handoffDefault is one stated consequence of a bless: this field of this node
+// gets recorded at this value, in the user's name.
+type handoffDefault struct{ node, field, value string }
+
+// handoffBriefText is the phone-lane rendering of the decision brief: the same
+// content the page shows — BLUF, each open decision with its options and the
+// letter a bless selects — as plain text under the ntfy ceiling.
+func handoffBriefText(gateID string, nodes map[string]Node, sm map[string]string) string {
+	gate, ok := nodes[gateID]
+	if !ok {
+		return ""
+	}
+	fs, killers := handoffAccepts(gateID, nodes, sm)
+	byNode := map[string][]handoffDefault{}
+	var order []string
+	for _, f := range fs {
+		if len(byNode[f.node]) == 0 {
+			order = append(order, f.node)
+		}
+		byNode[f.node] = append(byNode[f.node], f)
+	}
+	var b strings.Builder
+	b.WriteString(gateID + " — " + gate.Statement + "\n")
+	switch nd := len(order) + len(killers); {
+	case nd == 0:
+		b.WriteString("agent: recommend bless — nothing blocks\n")
+	case nd == 1:
+		b.WriteString("agent: recommend hold — 1 decision is open\n")
+	default:
+		b.WriteString("agent: recommend hold — " + strconv.Itoa(nd) + " decisions are open\n")
+	}
+	for _, id := range order {
+		n := nodes[id]
+		b.WriteString("\nDECIDE " + id + ": " + n.Statement + "\n")
+		for _, p := range nodeBodySection(n.Path, "Options") {
+			b.WriteString(p + "\n")
+		}
+		if v := frontmatterMap(n.Path)["decided_via"]; v != "" {
+			b.WriteString("Bless selects " + selLetter(v) + "\n")
+		} else {
+			var parts []string
+			for _, f := range byNode[id] {
+				parts = append(parts, f.field+" = "+f.value)
+			}
+			b.WriteString("Bless selects " + strings.Join(parts, "; ") + "\n")
+		}
+	}
+	for _, id := range killers {
+		b.WriteString("\nKILLER " + id + ": " + nodes[id].Statement + "\nBless adjudicates it, in your name.\n")
+	}
+	b.WriteString("\n👍 records the selections above and blesses " + gateID + ".")
+	return b.String()
+}
+
+// optHTML renders one Options paragraph; a leading "A) " letter goes bold.
+func optHTML(p string) string {
+	e := esc(p)
+	if len(e) > 3 && e[0] >= 'A' && e[0] <= 'Z' && e[1] == ')' && e[2] == ' ' {
+		return "<b>" + e[:2] + "</b>" + e[2:]
+	}
+	return e
+}
+
+// selLetter reduces a lettered ruling ("B (adr-x)", "B — ...") to its letter: "B)".
+func selLetter(v string) string {
+	if v != "" && v[0] >= 'A' && v[0] <= 'Z' && (len(v) == 1 || v[1] == ' ' || v[1] == ')') {
+		return string(v[0]) + ")"
+	}
+	return v
+}
+
+// nodeBodySection returns the paragraphs of one `## <title>` section of a node's
+// body — the authored prose a decision card shows (e.g. the Options block).
+func nodeBodySection(path, title string) []string {
+	raw, err := os.ReadFile(path)
+	if err != nil {
+		return nil
+	}
+	text := strings.ReplaceAll(string(raw), "\r\n", "\n")
+	parts := strings.SplitN(text, "\n## "+title, 2)
+	if len(parts) < 2 {
+		return nil
+	}
+	body := parts[1]
+	if i := strings.Index(body, "\n## "); i >= 0 {
+		body = body[:i]
+	}
+	if i := strings.Index(body, "\n"); i >= 0 {
+		body = body[i+1:]
+	}
+	var out []string
+	for _, p := range strings.Split(body, "\n\n") {
+		p = strings.TrimSpace(strings.ReplaceAll(p, "\n", " "))
+		if p != "" {
+			out = append(out, p)
+		}
+	}
+	return out
+}
+
+// handoffAccepts computes what a y on the gate's page records: every red
+// (unadjudicated) field default on a non-killer register node of the cone, plus
+// every ripe killer GATE in the cone — each blessed individually, actor=user.
+// A killer that is CONTENT (a demo use case) is never in the set: it settles at
+// its own milestone.
+func handoffAccepts(gateID string, nodes map[string]Node, sm map[string]string) ([]handoffDefault, []string) {
+	gate, ok := nodes[gateID]
+	if !ok {
+		return nil, nil
+	}
+	schemas := loadFieldSchemas(schemaConfigDir())
+	member := handoffCone(gate, nodes)
+	ids := make([]string, 0, len(member))
+	for id := range member {
+		if id != gateID {
+			ids = append(ids, id)
+		}
+	}
+	sort.Strings(ids)
+	var fs []handoffDefault
+	var killers []string
+	for _, id := range ids {
+		n, ok := nodes[id]
+		if !ok {
+			continue
+		}
+		if n.Killer && isGate(n) {
+			if sm[id] != "DONE" {
+				killers = append(killers, id)
+			}
+			continue
+		}
+		if n.Type == "test" || n.Type == "" {
+			continue
+		}
+		schema := mergedSchema(schemas, n.Type)
+		fm := frontmatterMap(n.Path)
+		if len(schema.fields) == 0 || fm["id"] != id {
+			continue
+		}
+		prov := n.Maps["provenance"]
+		names := make([]string, 0, len(schema.fields))
+		for name := range schema.fields {
+			names = append(names, name)
+		}
+		sort.Strings(names)
+		for _, name := range names {
+			fr := schema.fields[name]
+			if fieldColor(fr, fm[name], prov[name]) != "red" {
+				continue
+			}
+			val := fm[name]
+			if val == "" && fr.defSet {
+				val = fr.def
+			}
+			fs = append(fs, handoffDefault{node: id, field: name, value: val})
+		}
+	}
+	return fs, killers
+}
+
+func renderHandoffHTML(gateID string, nodes map[string]Node, sm map[string]string) string {
+	gate, ok := nodes[gateID]
+	if !ok {
+		return ""
+	}
+	// the cone: the material the bless accepts (shared with handoffAccepts)
+	member := handoffCone(gate, nodes)
+	schemas := loadFieldSchemas(schemaConfigDir())
+	var b strings.Builder
+	b.WriteString(`<!doctype html><html><head><meta charset="utf-8">` +
+		`<meta name="viewport" content="width=device-width, initial-scale=1">` +
+		`<title>` + esc(gateID) + ` — hand-off</title><style>` + handoffCSS + `</style></head><body>`)
+
+	// classify every cone row once: schema match, fields, computed color
+	type hoffRow struct {
+		id     string
+		n      Node
+		schema *typeSchema
+		fm     map[string]string
+		hasReg bool
+		color  string
+	}
+	ids := make([]string, 0, len(member))
+	for id := range member {
+		if id == gateID {
+			continue
+		}
+		if _, ok := nodes[id]; ok {
+			ids = append(ids, id)
+		}
+	}
+	sort.Strings(ids)
+	rows := make([]hoffRow, 0, len(ids))
+	for _, id := range ids {
+		n := nodes[id]
+		r := hoffRow{id: id, n: n, schema: mergedSchema(schemas, n.Type), fm: frontmatterMap(n.Path)}
+		r.hasReg = len(r.schema.fields) > 0 && r.fm["id"] == id
+		switch {
+		case r.hasReg:
+			r.color = "reg-" + nodeRegisterColor(r.schema, r.fm, n.Maps["provenance"])
+		case sm[id] == "DONE":
+			r.color = "reg-green-user"
+		case sm[id] == "OPEN" || sm[id] == "SUSPECT":
+			r.color = "reg-red"
+		default:
+			r.color = "reg-none"
+		}
+		rows = append(rows, r)
+	}
+
+	// the decision-brief buckets (owner rulings): the page is ONLY about decisions.
+	// Open ones (red registers, ripe killer gates) go to the deck. The audit line
+	// keeps only nodes where a RULING exists — a decided question, or a field ruled
+	// by the user or the agent; a node merely riding defaults decided nothing and
+	// appears nowhere. Tests and steps are state — the tasks panel's job.
+	hasRuling := func(r hoffRow) bool {
+		if r.fm["decided_via"] != "" {
+			return true
+		}
+		if !r.hasReg {
+			return false
+		}
+		prov := r.n.Maps["provenance"]
+		for name, fr := range r.schema.fields {
+			fc := fieldColor(fr, r.fm[name], prov[name])
+			if fc == "green-user" || fc == "green-agent" {
+				return true
+			}
+		}
+		return false
+	}
+	var blockers, doneRows []hoffRow
+	for _, r := range rows {
+		switch {
+		case r.n.Type == "test" || r.n.Type == "":
+			// state, not a decision
+		case r.color == "reg-red" || (r.n.Killer && isGate(r.n) && sm[r.id] != "DONE"):
+			blockers = append(blockers, r)
+		case hasRuling(r):
+			doneRows = append(doneRows, r)
+		}
+	}
+	doneOrder := map[string]int{"reg-green-user": 0, "reg-green-agent": 1, "reg-yellow": 2, "reg-none": 3}
+	sort.SliceStable(doneRows, func(i, j int) bool {
+		if doneOrder[doneRows[i].color] != doneOrder[doneRows[j].color] {
+			return doneOrder[doneRows[i].color] < doneOrder[doneRows[j].color]
+		}
+		return doneRows[i].id < doneRows[j].id
+	})
+	sort.SliceStable(blockers, func(i, j int) bool {
+		if blockers[i].n.Killer != blockers[j].n.Killer {
+			return !blockers[i].n.Killer // answerable cards first, killer pointers last
+		}
+		qi, qj := blockers[i].n.Type == "question", blockers[j].n.Type == "question"
+		if qi != qj {
+			return qi
+		}
+		return blockers[i].id < blockers[j].id
+	})
+	// shared field rendering: mode all|red. Every field carries its machine-readable
+	// proposal (data-field/data-value) so the card's accept-default can record it.
+	writeFields := func(r hoffRow, mode string) {
+		prov := r.n.Maps["provenance"]
+		names := make([]string, 0, len(r.schema.fields))
+		for name := range r.schema.fields {
+			names = append(names, name)
+		}
+		sort.Strings(names)
+		for _, name := range names {
+			fr := r.schema.fields[name]
+			fc := fieldColor(fr, r.fm[name], prov[name])
+			if mode == "red" && fc != "red" {
+				continue
+			}
+			raw := r.fm[name]
+			val := raw
+			if raw == "" && fr.defSet {
+				raw = fr.def
+				val = fr.def + " (default)"
+			}
+			red := ""
+			if fc == "red" {
+				red = ` data-red="1"`
+			}
+			b.WriteString(`<div class="hfield" data-tier="` + fr.tier + `" data-field="` + esc(name) + `" data-value="` + esc(raw) + `"` + red + `>` +
+				`<span class="regdot reg-` + fc + `"></span>` +
+				`<span class="hfn">` + esc(name) + `</span><span class="hfv">` + esc(val) + `</span>` +
+				`<span class="hfp">` + esc(prov[name]) + `</span></div>`)
+		}
+	}
+	writeRow := func(r hoffRow) {
+		b.WriteString(`<details class="hrow" data-node="` + esc(r.id) + `">`)
+		b.WriteString(`<summary><span class="regdot ` + r.color + `"></span><span class="hid">` + esc(r.id) + `</span>` +
+			`<span class="hstmt">` + esc(r.n.Statement) + `</span></summary>`)
+		// a decided decision reads like an open one: the options, then the letter
+		if opts := nodeBodySection(r.n.Path, "Options"); len(opts) > 0 {
+			for _, p := range opts {
+				b.WriteString(`<p class="dopt">` + optHTML(p) + `</p>`)
+			}
+			if v := r.fm["decided_via"]; v != "" {
+				b.WriteString(`<p class="dsel"><b>Decided:</b> ` + esc(selLetter(v)) + `</p>`)
+			}
+		}
+		if r.hasReg {
+			b.WriteString(`<details class="reg-all"><summary>fields</summary>`)
+			writeFields(r, "all")
+			b.WriteString(`</details>`)
+		} else if r.n.Statement != "" {
+			b.WriteString(`<p class="hbody">state: ` + esc(sm[r.id]) + `</p>`)
+		}
+		b.WriteString(`</details>` + "\n")
+	}
+
+	// blessSelects is the card's one plain line: the ruling a bless records.
+	blessSelects := func(r hoffRow) string {
+		if v := r.fm["decided_via"]; v != "" {
+			return v
+		}
+		prov := r.n.Maps["provenance"]
+		names := make([]string, 0, len(r.schema.fields))
+		for name := range r.schema.fields {
+			names = append(names, name)
+		}
+		sort.Strings(names)
+		var parts []string
+		for _, name := range names {
+			fr := r.schema.fields[name]
+			if fieldColor(fr, r.fm[name], prov[name]) != "red" {
+				continue
+			}
+			val := r.fm[name]
+			if val == "" && fr.defSet {
+				val = fr.def
+			}
+			parts = append(parts, name+" = "+val)
+		}
+		if len(parts) == 0 {
+			return "the recorded values (see fields)"
+		}
+		return strings.Join(parts, "; ")
+	}
+
+	// the brief: title, the gate's question, the BLUF line, the summary lines
+	bluf := "recommend bless — nothing blocks"
+	if len(blockers) == 1 {
+		bluf = "recommend hold — 1 decision is open"
+	} else if len(blockers) > 1 {
+		bluf = "recommend hold — " + strconv.Itoa(len(blockers)) + " decisions are open"
+	}
+	b.WriteString(`<div class="hcard">`)
+	b.WriteString(`<header class="hh"><p class="hg">` + esc(gateID) + `</p><h1>` + esc(gate.Statement) + `</h1>` +
+		`<p class="bluf"><span class="ag">agent</span>` + esc(bluf) + `</p></header>`)
+	// the tasks panel data: every check of the iteration, milestone-grouped
+	it := iterOf(gate.Path)
+	var taskIDs []string
+	tasksDone := 0
+	for id, n := range nodes {
+		if id != gateID && iterOf(n.Path) == it && isGate(n) {
+			taskIDs = append(taskIDs, id)
+			if sm[id] == "DONE" {
+				tasksDone++
+			}
+		}
+	}
+	sort.Strings(taskIDs)
+
+	// a MILESTONE gate carries its evidence doc on the page (owner ruling):
+	// one expandable section per `##` heading, markdown rendered
+	var verdictSecs [][2]string
+	if gate.Milestone > 0 {
+		pat := filepath.Join(SPEC, "iterations", it, fmt.Sprintf("M%d-*.md", gate.Milestone))
+		if ms, _ := filepath.Glob(pat); len(ms) > 0 {
+			if raw, err := os.ReadFile(ms[0]); err == nil {
+				for _, p := range strings.Split("\n"+strings.ReplaceAll(string(raw), "\r\n", "\n"), "\n## ")[1:] {
+					lines := strings.SplitN(p, "\n", 2)
+					body := ""
+					if len(lines) > 1 {
+						body = lines[1]
+					}
+					verdictSecs = append(verdictSecs, [2]string{strings.TrimSpace(lines[0]), mdLiteBlocks(body)})
+				}
+			}
+		}
+	}
+
+	b.WriteString(`<nav class="sum">`)
+	b.WriteString(`<button class="sline on" data-view="decide"><span class="regdot reg-red"></span><span class="n">` +
+		strconv.Itoa(len(blockers)) + `</span>&nbsp;you must decide<span class="chev">›</span></button>`)
+	if len(doneRows) > 0 {
+		b.WriteString(`<button class="sline" data-view="done"><span class="regdot reg-green-user"></span><span class="n">` +
+			strconv.Itoa(len(doneRows)) + `</span>&nbsp;decided already<span class="chev">›</span></button>`)
+	}
+	if len(verdictSecs) > 0 {
+		b.WriteString(`<button class="sline" data-view="verdict"><span class="regdot reg-none"></span>milestone verdict<span class="chev">›</span></button>`)
+	}
+	if len(taskIDs) > 0 {
+		b.WriteString(`<button class="sline" data-view="tasks"><span class="regdot reg-none"></span>tasks ` +
+			strconv.Itoa(tasksDone) + `/` + strconv.Itoa(len(taskIDs)) + `<span class="chev">›</span></button>`)
+	}
+	b.WriteString(`</nav>`)
+
+	// the middle: the one-at-a-time deck plus one list view per summary line
+	b.WriteString(`<main><section class="view on" id="view-decide">`)
+	if len(blockers) == 0 {
+		b.WriteString(`<p class="dempty">nothing to decide — bless when ready 👍</p>`)
+	} else {
+		b.WriteString(`<div class="dnav"><button class="dbtn" id="dprev">‹</button>` +
+			`<span class="dpos" id="dpos">1 / ` + strconv.Itoa(len(blockers)) + `</span>` +
+			`<button class="dbtn" id="dnext">›</button></div>`)
+		for i, r := range blockers {
+			on := ""
+			if i == 0 {
+				on = " on"
+			}
+			killer := ""
+			if r.n.Killer {
+				killer = ` data-killer="1"`
+			}
+			b.WriteString(`<article class="dcard` + on + `" data-node="` + esc(r.id) + `"` + killer + `>`)
+			b.WriteString(`<p class="did"><span class="regdot ` + r.color + `"></span>` + esc(r.id) + `</p>`)
+			b.WriteString(`<p class="dstmt">` + esc(r.n.Statement) + `</p>`)
+			for _, p := range nodeBodySection(r.n.Path, "Options") {
+				b.WriteString(`<p class="dopt">` + optHTML(p) + `</p>`)
+			}
+			switch {
+			case r.n.Killer:
+				b.WriteString(`<p class="dsel"><b>Bless</b> adjudicates this killer, in your name.</p>`)
+			case r.hasReg:
+				b.WriteString(`<p class="dsel"><b>Bless selects</b> ` + esc(selLetter(blessSelects(r))) + `</p>`)
+			default:
+				b.WriteString(`<p class="dsel"><b>Bless</b> accepts this as it stands.</p>`)
+			}
+			if r.hasReg {
+				b.WriteString(`<details class="reg-all"><summary>fields</summary>`)
+				writeFields(r, "all")
+				b.WriteString(`</details>`)
+			}
+			b.WriteString(`</article>`)
+		}
+	}
+	b.WriteString(`</section>`)
+	if len(doneRows) > 0 {
+		b.WriteString(`<section class="view" id="view-done"><p class="vlead">Decided already — solid green you, outlined the agent, yellow a schema default. Bless changes nothing here.</p>`)
+		for _, r := range doneRows {
+			writeRow(r)
+		}
+		b.WriteString(`</section>`)
+	}
+	if len(verdictSecs) > 0 {
+		b.WriteString(`<section class="view" id="view-verdict"><p class="vlead">The milestone's evidence, one section per heading.</p>`)
+		for _, s := range verdictSecs {
+			b.WriteString(`<details class="hrow"><summary><span class="hstmt">` + esc(s[0]) + `</span></summary>` +
+				`<div class="vmd">` + s[1] + `</div></details>`)
+		}
+		b.WriteString(`</section>`)
+	}
+	// the tasks panel: the report's own tree, milestone-grouped, current one open —
+	// the auditor sees where the iteration stands (owner ruling)
+	if len(taskIDs) > 0 {
+		b.WriteString(`<section class="view" id="view-tasks"><p class="vlead">Where the iteration stands. Bless changes only this gate.</p>`)
+		byMS := map[int][]string{}
+		for _, id := range taskIDs {
+			byMS[nodes[id].Milestone] = append(byMS[nodes[id].Milestone], id)
+		}
+		var mss []int
+		for ms := range byMS {
+			mss = append(mss, ms)
+		}
+		sort.Ints(mss)
+		for _, ms := range mss {
+			done := 0
+			for _, id := range byMS[ms] {
+				if sm[id] == "DONE" {
+					done++
+				}
+			}
+			label := "M" + strconv.Itoa(ms)
+			if ms == 0 {
+				label = "standalone"
+			}
+			open := ""
+			if ms == gate.Milestone {
+				open = " open"
+			}
+			b.WriteString(`<details class="hrow"` + open + `><summary><span class="hid">` + label + `</span>` +
+				`<span class="hstmt">` + strconv.Itoa(done) + ` / ` + strconv.Itoa(len(byMS[ms])) + ` done</span></summary>` +
+				`<div class="ttree">` + renderSubs(byMS[ms], nodes, sm) + `</div></details>`)
+		}
+		b.WriteString(`</section>`)
+	}
+	b.WriteString(`</main>`)
+
+	b.WriteString(`<footer class="hfoot"><button class="hb hy" data-bless="` + esc(gateID) + `" data-verdict="y">👍 bless</button>` +
+		`<button class="hb hn" data-bless="` + esc(gateID) + `" data-verdict="n">👎 reopen</button>` +
+		`<span class="hnote" id="hnote"></span></footer>`)
+	b.WriteString(`</div><script>` + handoffJS + `</script></body></html>`)
+	return b.String()
+}
+
+// handoffCSS: a decision brief on one phone-sized card, centered unchanged on a
+// desktop. No page scroll — only lists and the dealt card scroll, inside the middle
+// area. The brief block stays compact; the deck gets the room. The agent chip wears
+// stripes: a proposal, never a ruling.
+const handoffCSS = `
+:root{--red:#d6336c;--redb:#b02a5b;--yel:#f5c542;--yelb:#e0a800;--grn:#2f9e44;--mut:#e6e6e6;--mutb:#ccc}
+html,body{height:100%}
+body{margin:0;font:15px/1.4 system-ui,sans-serif;color:#1e1e1e;background:#dfe2e8;overflow:hidden;display:flex;justify-content:center}
+.hcard{width:min(430px,100vw);height:100%;display:flex;flex-direction:column;background:#fafafa;box-shadow:0 0 24px rgba(0,0,0,.18)}
+.hh{background:#fff;padding:8px 12px 6px}
+.hg{margin:0;font-family:ui-monospace,Consolas,monospace;font-size:11px;color:#777}
+h1{margin:2px 0 4px;font-size:15px;line-height:1.3;overflow-wrap:anywhere}
+.bluf{margin:0;font-size:12px;color:#333;display:flex;gap:6px;align-items:center}
+.ag{font-size:10px;font-weight:700;letter-spacing:.4px;color:#14531f;background:repeating-linear-gradient(135deg,#d9efdc 0 4px,#fff 4px 7px);border:1px solid var(--grn);border-radius:4px;padding:1px 5px;flex:none}
+.sum{display:flex;flex-direction:column;background:#fff;border-bottom:1px solid #ddd}
+.sline{display:flex;gap:8px;align-items:center;font:inherit;font-size:13px;padding:6px 12px;border:0;border-top:1px solid #f2f2f2;background:none;cursor:pointer;text-align:left;color:#1e1e1e}
+.sline.on{background:#eef2fb}
+.sline .n{font-weight:700}
+.chev{margin-left:auto;color:#aaa}
+main{flex:1;min-height:0;display:flex}
+.view{flex:1;min-width:0;overflow-y:auto;padding:4px 10px;display:none}
+.view.on{display:block}
+#view-decide{overflow:hidden;padding:6px 10px}
+#view-decide.on{display:flex;flex-direction:column}
+.dnav{display:flex;align-items:center;gap:12px;justify-content:center;padding:0 0 6px}
+.dbtn{font:inherit;font-size:17px;line-height:1;padding:5px 18px;border:1px solid #ccc;border-radius:8px;background:#fff;cursor:pointer}
+.dpos{font-size:12px;color:#666}
+.dcard{display:none;flex:1;min-height:0;overflow-y:auto;border:1px solid #ddd;border-radius:12px;background:#fff;padding:10px 12px}
+.dcard.on{display:block}
+.did{margin:0;font-family:ui-monospace,Consolas,monospace;font-size:12px;font-weight:700;display:flex;gap:6px;align-items:center}
+.dstmt{margin:6px 0;font-size:14px}
+.dopt{margin:6px 0;font-size:12px;color:#444}
+.dsel{margin:8px 0 4px;font-size:13px}
+.dempty{margin:auto;color:#39763f;font-size:14px;text-align:center}
+.hfoot{display:flex;gap:8px;padding:10px 12px;background:#fff;border-top:1px solid #ddd;align-items:center}
+.hb{font:inherit;font-weight:600;padding:10px 0;border-radius:10px;border:1px solid #bbb;cursor:pointer;flex:1 1 0}
+.hy{background:#e6f4e6}.hn{background:#fdeaea}
+.hnote{font-size:11px;color:#777}
+.regdot{width:12px;height:12px;border-radius:50%;flex:none;display:inline-block;vertical-align:-1px}
+.regdot.reg-green-user{background:var(--grn);border:2px solid var(--grn)}
+.regdot.reg-green-agent{background:#fff;border:2px solid var(--grn)}
+.regdot.reg-yellow{background:var(--yel);border:2px solid var(--yelb)}
+.regdot.reg-red{background:var(--red);border:2px solid var(--redb)}
+.regdot.reg-none{background:var(--mut);border:2px solid var(--mutb)}
+.hrow{border-top:1px solid #eee}
+.hrow>summary{display:flex;gap:8px;align-items:center;padding:8px 0;cursor:pointer;list-style:none;min-width:0}
+.hrow>summary::-webkit-details-marker{display:none}
+.hid{font-family:ui-monospace,Consolas,monospace;font-size:11px;font-weight:600;flex:none;max-width:45vw;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hstmt{font-size:12px;color:#555;flex:1 1 0;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hrow[open]>summary{flex-wrap:wrap}
+.hrow[open]>summary .hstmt{white-space:normal;overflow:visible;flex:1 1 100%}
+.hfield{display:flex;gap:6px;align-items:baseline;font-size:12px;padding:4px 0 4px 8px;flex-wrap:wrap}
+.hfn{font-weight:600;min-width:90px}.hfv{overflow-wrap:anywhere}.hfp{color:#888;font-style:italic;flex:1 1 100%;padding-left:20px}
+.reg-all{margin:4px 0 8px 8px;font-size:12px}.reg-all>summary{cursor:pointer;color:#666}
+.hbody{font-size:12px;color:#555;margin:4px 0 8px 8px}
+.vlead{margin:6px 2px;font-size:11px;color:#777;font-style:italic}
+.vmd{font-size:12px;color:#333;padding:2px 2px 10px}
+.vmd p{margin:6px 0}
+.vmd ul,.vmd ol{margin:6px 0;padding-left:18px}
+.vmd li{margin:3px 0}
+.vmd h1,.vmd h2,.vmd h3,.vmd h4{font-size:12px;margin:8px 0 4px}
+.vmd a{color:#2456b3;text-decoration:none;border-bottom:1px dotted #2456b3}
+.vmd code{font-family:ui-monospace,Consolas,monospace;font-size:11px;background:#f2f2f2;padding:0 3px;border-radius:3px}
+.ttree{font-size:12px;padding:2px 0 8px 4px}
+.ttree .task{display:block;padding:3px 0;color:inherit;text-decoration:none;cursor:default}
+.ttree details.task{padding:0}
+.ttree details.task>summary{cursor:pointer;list-style:none;padding:3px 0}
+.ttree details.task>summary::-webkit-details-marker{display:none}
+.ttree .kids{padding-left:14px;border-left:1px solid #eee}
+.ttree .rid{font-family:ui-monospace,Consolas,monospace;font-size:11px}
+.ttree .auto{font-size:10px;color:#999}
+.mk{display:inline-block;width:16px;font-weight:700}
+.mk.done{color:var(--grn)}
+.mk.fail{color:var(--red)}
+.mk.sus{color:var(--yelb)}
+`
+
+// handoffJS: the bless tap and the red-field ruling POST to the local watch server;
+// with no listener a tap no-ops (a stale page's dead button is fine - the owner's
+// ruling). Plus the brief's pure-display moves: summary-line view switch and the
+// one-at-a-time deck. A killer card never prompts (req-register-killer-guard).
+const handoffJS = `
+/* the watchdog's other half (req-handoff-lifecycle): heartbeat while open, a beacon on
+   close. Against a stale file both silently fail - dead buttons by ruling. */
+setInterval(function(){fetch('/hb',{method:'POST'}).catch(function(){});},3000);
+window.addEventListener('pagehide',function(){try{navigator.sendBeacon('/bye');}catch(_){}});
+function dgo(fwd){
+ var cards=document.querySelectorAll('.dcard'),i;if(!cards.length)return;
+ var cur=0;
+ for(i=0;i<cards.length;i++){if(cards[i].className.indexOf('on')>=0)cur=i;}
+ var nx=(cur+(fwd?1:cards.length-1))%cards.length;
+ for(i=0;i<cards.length;i++){cards[i].className=i===nx?'dcard on':'dcard';}
+ var pos=document.getElementById('dpos');if(pos)pos.textContent=(nx+1)+' / '+cards.length;
+}
+document.addEventListener('click',function(e){
+ var i;
+ var tk=e.target.closest?e.target.closest('a.task'):null;
+ if(tk){e.preventDefault();return;} /* the tasks tree is display-only here */
+ var t=e.target.closest?e.target.closest('button[data-bless]'):null;
+ if(t){
+  var note=document.getElementById('hnote');
+  fetch('/handoff-answer',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},
+   body:'gate='+encodeURIComponent(t.getAttribute('data-bless'))+'&verdict='+encodeURIComponent(t.getAttribute('data-verdict'))})
+   .then(function(r){if(note){note.textContent=r.ok?'recorded':'refused';}})
+   .catch(function(){if(note){note.textContent='';}});
+  return;
+ }
+ /* a summary line switches the middle view */
+ var s=e.target.closest?e.target.closest('.sline'):null;
+ if(s){
+  var v=s.getAttribute('data-view');
+  var lines=document.querySelectorAll('.sline'),views=document.querySelectorAll('.view');
+  for(i=0;i<lines.length;i++){lines[i].className=lines[i]===s?'sline on':'sline';}
+  for(i=0;i<views.length;i++){views[i].className=views[i].id==='view-'+v?'view on':'view';}
+  return;
+ }
+ /* the deck deals one decision at a time */
+ if(e.target.id==='dprev'){dgo(false);return;}
+ if(e.target.id==='dnext'){dgo(true);return;}
+ /* a red field row rules in place (req-register-ask): the custom-value path */
+ var f=e.target.closest?e.target.closest('.hfield'):null;if(!f)return;
+ var dot=f.querySelector('.regdot');if(!dot||dot.className.indexOf('reg-red')<0&&dot.className.indexOf('reg-yellow')<0)return;
+ var row=f.closest('[data-node]');if(!row)return;
+ var name=f.querySelector('.hfn').textContent,cur2=f.querySelector('.hfv').textContent;
+ var v2=window.prompt('rule '+row.getAttribute('data-node')+' · '+name,cur2);
+ if(v2==null||v2===''){return;}
+ fetch('/register-answer',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},
+  body:'node='+encodeURIComponent(row.getAttribute('data-node'))+'&field='+encodeURIComponent(name)+'&value='+encodeURIComponent(v2)})
+  .then(function(r){if(!r.ok){r.text().then(function(x){alert(x);});}else{location.reload();}})
+  .catch(function(){});
+});
+`
 
 // enddesign
 

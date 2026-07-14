@@ -134,10 +134,6 @@ const reportJS = `
     {selector:'node[type="test"]',style:{'background-color':'#e9d5f3'}},
     {selector:'node[type="adr"]',style:{'background-color':'#d7ccc8'}},
     {selector:'node[type="question"]',style:{'background-color':'#ffd6e0'}},  // go-question-nodes: open unknowns wear their own colour
-    // go-render-folds: a collapsed box wears a dashed border; an age box is grey
-    {selector:'node[foldbox]',style:{'width':190,'height':44,'text-max-width':170,
-      'border-style':'dashed','border-color':'#8a94a6','font-weight':'bold'}},
-    {selector:'node[kind="age"]',style:{'background-color':'#ececec'}},
     {selector:'edge',style:{'width':1.5,'line-color':'#c8ccd0','target-arrow-color':'#c8ccd0',
       'target-arrow-shape':'triangle','curve-style':'bezier','arrow-scale':0.9}},
     {selector:'edge[etype="implements"]',style:{'line-color':'#2f9e44','target-arrow-color':'#2f9e44'}},
@@ -213,14 +209,10 @@ const reportJS = `
       +'<div class=dmeta><b>Text</b> — any word matches id + statement; or <code>/regex/</code> (RegExp)</div>'
       +'<div class=dmeta><b>Combine</b> — <code>AND</code> / <code>OR</code> · e.g. <code>&gt;=0002 AND auth</code></div>'
       +'<div class=dmeta><b>Descendants</b> — <code>descendants:&lt;id&gt;</code> shows only that node and everything that traces into it (refines / implements / verifies / addresses, transitively). Double-click a node to apply it for that node.</div>'
-      +'<div class=dmeta><b>Folds</b> — a dashed box is a folded group: a regular fan, or an iteration older than the last five. Click the box to expand it. Any filter text shows the full graph.</div>'
       +'<div class=dmeta><b>Clear</b> — the &#215; button (or emptying the box) restores the full graph.</div>';
   }
   function iterNum(s){var m=(s||'').match(/i0*(\d+)/);return m?parseInt(m[1],10):0;}
   var dsets={};
-  // go-render-folds: which fold groups the reader expanded (per tab; show() resets it).
-  // The script never creates content - members and boxes are pre-baked, this only toggles.
-  var expanded={};
   function descSet(id){
     var set={}; if(!cy){return set;}
     var root=cy.getElementById(id); if(!root||root.empty()){return set;}
@@ -259,27 +251,18 @@ const reportJS = `
     cy.batch(function(){cy.nodes().forEach(function(n){
       var d=D.checks[n.id()]||{};
       var on=(typeOn[n.data('type')]!==false) && ftMatch({id:n.id(),stmt:d.stmt,iter:n.data('iter')}, q);
-      // go-render-folds: folds hold only in the unfiltered view; any query shows the full graph.
-      // Edges follow for free - cytoscape hides an edge when an endpoint hides.
-      var fb=n.data('foldbox'), fm=n.data('fold');
-      if(fb){ on = on && q==='' && !expanded[fb]; }
-      else if(fm && q===''){ on = on && !!expanded[fm]; }
       n.style('display', on?'element':'none');
     });});
     relayout();
   }
   function show(i){
     if(cy){cy.destroy();}
-    expanded={};   // go-render-folds: a fresh tab starts fully folded
     cy = cytoscape({container:host, elements:tabs[i].elements, style:STYLE,
       layout:{name:'preset'}, wheelSensitivity:0.2});
     // the node tap is the ONE behaviour a host overrides (the book transports to the item's
     // table row instead of opening the report's detail panel); unset, the report is unchanged.
     window.__quackGraphRefit=function(){ if(cy){ cy.resize(); relayout(); } };
     cy.on('tap','node',function(e){
-      // go-render-folds: a tap on a collapsed box expands its pre-baked group
-      var fb=e.target.data('foldbox');
-      if(fb){ expanded[fb]=true; applyFilter(); return; }
       if(window.QUACK_NODE_TAP){ window.QUACK_NODE_TAP(e.target.id()); return; } showDetail(D.checks[e.target.id()]);});
     cy.on('dbltap','node',function(e){ // dblclick on a node applies the descendants filter for it
       // book AND report alike: the filter relayout re-fits the view, so the

@@ -1,5 +1,6 @@
 ---
 id: req-seeded-examples
+ears: exempt - historical pre-EARS statement, retire-or-retrofit recorded (adr-grandfathers-historical)
 type: requirement
 statement: A reader-facing view shall never sit empty - clearly-marked replaceable examples ship seeded - the numbered statements bind individually.
 class: review

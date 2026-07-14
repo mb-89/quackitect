@@ -6,5 +6,6 @@ class: review
 parent: i20-m4-build
 killer: false
 depends_on: [i20-m3-gate]
-deferred: checklist seeding is i0021_field_ux's theme (filling becomes vetoing, not authoring); a rushed generator risks the working-tomorrow goal - adr-free defer per M3 decision 4
 ---
+Delivered by i0021_field_ux: the seeder (build step b8, mint prefill + seed skeleton)
+is the promised checklist-seeding slice — the deferral's reason is satisfied.

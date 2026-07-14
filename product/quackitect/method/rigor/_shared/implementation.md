@@ -19,7 +19,7 @@ resolved at seed from the project type + iteration overrides; the default bindin
 4. **GREEN** — «implementer» builds to the tests + requirements, emitting inline `# design:` markers,
    until the suite passes. Tidy-while-green here; a design-level refactor → `engage refine`.
 
-**Verify targeted while building, fully at the hand-back (owner law, 2026-07-12).** Mid-build,
+**Verify targeted while building, fully at the hand-back.** Mid-build,
 run ONLY the selftest(s) the change in hand touches (plus the build for the hash re-baseline).
 The FULL battery runs at exactly two places: once at a build slot's END as its hand-back
 verification, and at the verification gate — never between edits. Re-running everything after
@@ -42,9 +42,10 @@ DELEGATED build agents the same as the driving agent — a subagent's brief inhe
 <!-- design: method-apply-default-lane  implements: req-apply-default-lane :: The mechanical-edit lane, named in the method: quack apply is the DEFAULT lane for a mechanical bulk edit (byte-exact old->new, dry-run first, all-or-nothing); editor tooling is the lane for a single edit; a byte-safe scripted edit is the recorded exception, never the default. -->
 ## Editing lane — how a change reaches the files
 
-Every edit travels one lane. Pick the lane by the edit's shape.
+Every edit travels one lane. The apply lane is the agent's DEFAULT (adr-io-lane-default).
 
-- Single edit: use editor tooling. This is the default for one change.
-- Mechanical bulk edit: `quack apply <manifest.json>` is the default lane. It replaces byte-exact `old` with `new`. It dry-runs first. It is all-or-nothing.
-- Scripted bulk edit: this is the recorded exception, never the default. It must be byte-safe. It never becomes a dependency.
+- Agent default: `quack apply <manifest.json>` — byte-exact replace, `op: create`, `op: write`. It dry-runs first. It is all-or-nothing. Touched files and the outcome land in the call log.
+- Single interactive edit: editor tooling stays the lane for one change made in conversation.
+- Scripted bulk edit: the recorded exception, never a default. It must be byte-safe. It never becomes a dependency.
+- Named corrupter: a PowerShell content round-trip (`Get-Content | Set-Content`, any `-Encoding`). It re-encodes every line. It has mojibaked UTF-8 three times in this repo. A rename or rewrite goes through the apply lane or editor tooling, never through a shell round-trip.
 <!-- enddesign -->

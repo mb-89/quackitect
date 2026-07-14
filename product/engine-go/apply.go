@@ -9,7 +9,7 @@ import (
 	"strings"
 )
 
-// design: go-apply-manifest  implements: req-apply-manifest
+// design: go-apply-manifest  implements: req-apply-manifest, req-apply-general
 // The judged bulk-edit applier: `quack apply <manifest.json>` runs a JSON array of
 // {file, old, new} exact-string edits. Validate first, apply second — every edit's
 // old text must match its file exactly once (byte-level), or the WHOLE manifest is
@@ -17,11 +17,14 @@ import (
 // against the in-memory content. Bytes in, bytes out: no encoding pass, no BOM
 // handling. Writes are atomic per file (temp + rename).
 
-// manifestEdit is one exact-string replacement in an apply manifest.
+// manifestEdit is one operation in an apply manifest. Op "" is the byte-exact
+// replacement; "create" births a file that must not exist; "write" replaces a whole
+// file's content (req-apply-general.1). Every op validates before anything writes.
 type manifestEdit struct {
 	File string `json:"file"`
 	Old  string `json:"old"`
 	New  string `json:"new"`
+	Op   string `json:"op"`
 }
 
 // loadEditManifest parses the manifest file into its edit list.
@@ -40,52 +43,86 @@ func loadEditManifest(path string) ([]manifestEdit, error) {
 // applyManifest validates every edit against the (progressively edited) file
 // contents, then writes the results. With dry it validates and prints what
 // would change, writing nothing.
-func applyManifest(path string, dry bool) error {
+func applyManifest(path string, dry bool) ([]string, error) {
 	edits, err := loadEditManifest(path)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	contents := map[string][]byte{} // keyed by cleaned path
 	editCount := map[string]int{}
 	var order []string // first-seen file order, for stable output and writes
-	for i, e := range edits {
-		if e.File == "" {
-			return fmt.Errorf("apply: edit %d has no file", i)
-		}
-		if e.Old == "" {
-			return fmt.Errorf("apply: edit %d (%s): old text is empty", i, e.File)
-		}
-		key := filepath.Clean(e.File)
-		buf, ok := contents[key]
-		if !ok {
-			raw, rerr := os.ReadFile(key)
-			if rerr != nil {
-				return fmt.Errorf("apply: edit %d (%s): cannot read file: %v", i, e.File, rerr)
-			}
-			buf = raw
+	seenFile := func(key string) {
+		if _, ok := contents[key]; !ok {
 			order = append(order, key)
 		}
-		n := bytes.Count(buf, []byte(e.Old))
-		if n != 1 {
-			return fmt.Errorf("apply: edit %d (%s): old text matches %d times, need exactly 1 - manifest refused, nothing applied", i, e.File, n)
+	}
+	for i, e := range edits {
+		if e.File == "" {
+			return nil, fmt.Errorf("apply: edit %d has no file", i)
 		}
-		contents[key] = bytes.Replace(buf, []byte(e.Old), []byte(e.New), 1)
-		editCount[key]++
+		key := filepath.Clean(e.File)
+		switch e.Op {
+		case "create":
+			if e.New == "" {
+				return nil, fmt.Errorf("apply: edit %d (%s): create with no content", i, e.File)
+			}
+			if _, ok := contents[key]; ok {
+				return nil, fmt.Errorf("apply: edit %d (%s): create over an earlier edit - manifest refused", i, e.File)
+			}
+			if _, serr := os.Stat(key); serr == nil {
+				return nil, fmt.Errorf("apply: edit %d (%s): create refused, the file exists - manifest refused, nothing applied", i, e.File)
+			}
+			seenFile(key)
+			contents[key] = []byte(e.New)
+			editCount[key]++
+		case "write":
+			if e.New == "" {
+				return nil, fmt.Errorf("apply: edit %d (%s): write with no content", i, e.File)
+			}
+			seenFile(key)
+			contents[key] = []byte(e.New)
+			editCount[key]++
+		case "":
+			if e.Old == "" {
+				return nil, fmt.Errorf("apply: edit %d (%s): old text is empty (use op create/write for whole files)", i, e.File)
+			}
+			buf, ok := contents[key]
+			if !ok {
+				raw, rerr := os.ReadFile(key)
+				if rerr != nil {
+					return nil, fmt.Errorf("apply: edit %d (%s): cannot read file: %v", i, e.File, rerr)
+				}
+				buf = raw
+				seenFile(key)
+				contents[key] = raw
+			}
+			if !ok {
+				buf = contents[key]
+			}
+			n := bytes.Count(buf, []byte(e.Old))
+			if n != 1 {
+				return nil, fmt.Errorf("apply: edit %d (%s): old text matches %d times, need exactly 1 - manifest refused, nothing applied", i, e.File, n)
+			}
+			contents[key] = bytes.Replace(buf, []byte(e.Old), []byte(e.New), 1)
+			editCount[key]++
+		default:
+			return nil, fmt.Errorf("apply: edit %d (%s): unknown op %q", i, e.File, e.Op)
+		}
 	}
 	if dry {
 		for _, key := range order {
 			fmt.Printf("would edit %s: %d edit(s)\n", key, editCount[key])
 		}
 		fmt.Printf("dry run: %d file(s) validated, nothing written\n", len(order))
-		return nil
+		return order, nil
 	}
 	for _, key := range order {
 		if err := writeFileAtomic(key, contents[key]); err != nil {
-			return fmt.Errorf("apply: writing %s: %v", key, err)
+			return order, fmt.Errorf("apply: writing %s: %v", key, err)
 		}
 		fmt.Printf("edited %s: %d edit(s)\n", key, editCount[key])
 	}
-	return nil
+	return order, nil
 }
 
 // writeFileAtomic writes data via a temp file in the target's directory, then renames.
@@ -163,7 +200,19 @@ func cmdApply(rest []string) {
 			os.Exit(1)
 		}
 	}
-	if err := applyManifest(path, hasFlag(rest, "--dry")); err != nil {
+	files, err := applyManifest(path, hasFlag(rest, "--dry"))
+	// the audit trail (req-apply-general.2): touched files and the outcome ride the
+	// dispatch's call-log line
+	outcome := "applied"
+	if hasFlag(rest, "--dry") {
+		outcome = "dry-run"
+	}
+	if err != nil {
+		outcome = "refused"
+	}
+	callLogSetExtra("files", files)
+	callLogSetExtra("outcome", outcome)
+	if err != nil {
 		fmt.Fprintln(os.Stderr, err.Error())
 		os.Exit(1)
 	}

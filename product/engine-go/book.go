@@ -5870,27 +5870,59 @@ func renderDecisionsTable(nodes map[string]Node) string {
 
 // enddesign
 
-// design: go-asr-list  implements: req-decision-rendering.2
+// design: go-asr-list  implements: req-decision-rendering.2, req-drivers-derived
 // The drivers section is GENERATED as a reader TABLE (the same table law as every
-// derived view): a requirement joins it by carrying the `architecturally-significant`
-// tag; the row shows the driver's name and statement, the expand links back to its
-// design-input register row (nodeLinkHTML) - never a copy of the requirement's content.
-// An empty table renders honestly: tagging is owner curation, not renderer guesswork.
-func renderAsrList(nodes map[string]Node) string {
-	var ids []string
+// derived view): a requirement joins it as the DERIVED UNION - addressed by at least
+// one kind:architecture ADR (self-maintaining; the edges already exist), or carrying
+// the `architecturally-significant` hand tag (the judgment residue no ADR touched).
+// Each derived row's expand names its deciding ADR(s); the register-row link stays.
+// An empty table renders honestly: the union is derivation, never renderer guesswork.
+
+// driversUnion computes requirement -> deciding kind:architecture ADR ids. A hand-tagged
+// requirement joins with an empty list; a requirement with neither stays absent.
+func driversUnion(nodes map[string]Node) map[string][]string {
+	u := map[string][]string{}
+	for id, n := range nodes {
+		if n.Type != "adr" || decisionType(n) != "architecture" {
+			continue
+		}
+		for _, q := range n.Addresses {
+			t := q
+			if _, ok := nodes[t]; !ok {
+				t = subAddrBase(q)
+			}
+			if rn, ok := nodes[t]; ok && rn.Type == "requirement" {
+				u[t] = append(u[t], id)
+			}
+		}
+	}
 	for id, n := range nodes {
 		if n.Type != "requirement" {
 			continue
 		}
 		for _, t := range basePropsOf(n.Path).lists["tags"] {
 			if t == "architecturally-significant" {
-				ids = append(ids, id)
+				if _, ok := u[id]; !ok {
+					u[id] = []string{}
+				}
 			}
 		}
 	}
+	for _, adrs := range u {
+		sortStrings(adrs)
+	}
+	return u
+}
+
+func renderAsrList(nodes map[string]Node) string {
+	union := driversUnion(nodes)
+	ids := make([]string, 0, len(union))
+	for id := range union {
+		ids = append(ids, id)
+	}
 	sortStrings(ids)
 	if len(ids) == 0 {
-		return `<p class="meta">no requirement carries the architecturally-significant tag yet — the table renders as the owner curates the tags</p>`
+		return `<p class="meta">no driver derives yet — a requirement joins when a kind:architecture ADR addresses it, or the owner hand-tags it architecturally-significant</p>`
 	}
 	var b strings.Builder
 	b.WriteString(`<div class="utable" id="drivers-table" data-layer="derived">`)
@@ -5910,6 +5942,15 @@ func renderAsrList(nodes map[string]Node) string {
 			b.WriteString(`<p class="stmt">` + htmlEscape(n.Statement) + `</p>`)
 		}
 		b.WriteString(`<p class="ufield"><span class="ufl">register row:</span> ` + nodeLinkHTML(id, nodes) + `</p>`)
+		if adrs := union[id]; len(adrs) > 0 {
+			var links []string
+			for _, a := range adrs {
+				links = append(links, nodeLinkHTML(a, nodes))
+			}
+			b.WriteString(`<p class="ufield"><span class="ufl">decided by:</span> ` + strings.Join(links, ", ") + `</p>`)
+		} else {
+			b.WriteString(`<p class="ufield"><span class="ufl">decided by:</span> owner hand-tag (no ADR yet)</p>`)
+		}
 		b.WriteString(`<p class="meta">` + htmlEscape(id) + `</p></td></tr>` + "\n")
 	}
 	b.WriteString("</tbody></table>")

@@ -5,6 +5,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"sort"
 	"strings"
 )
 
@@ -240,8 +241,93 @@ func mintBody(kind, id string, extra map[string]string, lanes bool) string {
 		}
 	}
 	b.WriteString("## Rationale (not load-bearing)\n" + rat + "\n")
-	return b.String()
+	return applySchemaPrefill(b.String(), kind)
 }
+
+// design: go-mint-prefill  implements: req-mint-prefill
+// The no-blank drafting law at mint time: every schema field of the minted kind
+// reaches the user with a value — the schema default where one exists, an explicit
+// "TBD - propose or veto" marker where none does (the register counts TBDs) — and a
+// provenance block stamps each value's source (adr-provenance-in-node). Skeleton
+// TODOs on schema-covered fields are rewritten to the TBD convention so the tier
+// rollup (go-field-tier) sees them honestly.
+func applySchemaPrefill(body, kind string) string {
+	sc := mergedSchema(loadFieldSchemas(schemaConfigDir()), kind)
+	if len(sc.fields) == 0 {
+		return body
+	}
+	parts := strings.SplitN(body, "---", 3)
+	if len(parts) < 3 {
+		return body
+	}
+	lines := strings.Split(parts[1], "\n")
+	present := map[string]int{}
+	for i, l := range lines {
+		if l == "" || l[0] == ' ' || l[0] == '\t' {
+			continue
+		}
+		if k, _, ok := strings.Cut(l, ":"); ok {
+			present[strings.TrimSpace(k)] = i
+		}
+	}
+	names := make([]string, 0, len(sc.fields))
+	for name := range sc.fields {
+		names = append(names, name)
+	}
+	sort.Strings(names)
+	var added []string
+	prov := map[string]string{}
+	for _, name := range names {
+		r := sc.fields[name]
+		if li, ok := present[name]; ok {
+			_, v, _ := strings.Cut(lines[li], ":")
+			v = strings.TrimSpace(v)
+			switch {
+			case strings.HasPrefix(v, "TODO"):
+				lines[li] = name + ": TBD - propose or veto"
+				prov[name] = "tbd - no default, no derivation yet"
+			case r.defSet && v == r.def:
+				prov[name] = "schema-default (" + r.def + ")"
+			default:
+				prov[name] = "skeleton value"
+			}
+			continue
+		}
+		switch {
+		case r.defSet:
+			added = append(added, name+": "+r.def)
+			prov[name] = "schema-default (" + r.def + ")"
+		case r.valType == "enum" && len(r.enum) > 0:
+			// a TBD text would break the enum's own schema: propose the first option,
+			// marked as the assumption it is (red on a core field, by the color rules)
+			added = append(added, name+": "+r.enum[0])
+			prov[name] = "agent-proposal: first of " + strings.Join(r.enum, "|") + " - veto or confirm"
+		case r.valType == "string" || r.valType == "":
+			added = append(added, name+": TBD - propose or veto")
+			prov[name] = "tbd - no default, no derivation yet"
+		default:
+			// pattern/int/bool without a default: a TBD value would break the field's
+			// own rule - the absence is the honest state, counted via provenance
+			prov[name] = "tbd - no default, no derivation yet"
+		}
+	}
+	var provLines []string
+	for _, name := range names {
+		if p, ok := prov[name]; ok {
+			provLines = append(provLines, "  "+name+": "+p)
+		}
+	}
+	out := strings.TrimRight(strings.Join(lines, "\n"), "\n")
+	if len(added) > 0 {
+		out += "\n" + strings.Join(added, "\n")
+	}
+	if len(provLines) > 0 {
+		out += "\nprovenance:\n" + strings.Join(provLines, "\n")
+	}
+	return "---" + out + "\n---" + parts[2]
+}
+
+// enddesign
 
 func mintNodeAt(dir, kind, id string) (string, error) {
 	return mintNodeAtX(dir, kind, id, map[string]string{})

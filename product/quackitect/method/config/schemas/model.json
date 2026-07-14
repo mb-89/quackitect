@@ -1,0 +1,8 @@
+{
+  "type": "model",
+  "fields": ["kind"],
+  "type_kind": "enum",
+  "enum_kind": ["context", "element-tree", "sequence", "state"],
+  "tier_kind": "core",
+  "required": ["statement", "kind"]
+}

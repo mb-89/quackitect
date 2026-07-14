@@ -21,6 +21,7 @@ Drive a bare --base workspace from inside itself via linked-engine stubs (launch
 <<<node: req-workspace-stubs.md>>>
 ---
 id: req-workspace-stubs
+ears: exempt - historical pre-EARS statement, retire-or-retrofit recorded (adr-grandfathers-historical)
 type: requirement
 statement: A bare workspace shall drive its runtime-resolved engine from inside via committed stubs that carry no engine path - the numbered statements bind individually.
 class: review

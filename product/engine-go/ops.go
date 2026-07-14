@@ -400,6 +400,13 @@ func cmdStart(args []string) {
 		fmt.Println("planned " + vid + " - a future version (roadmap).")
 	} else {
 		setConfigVersion(vid)
+		// the skeleton seeds at activation (go-seed-skeleton): pre-filled from the
+		// rigor source, for the composer to TAILOR - never to re-author
+		if n, err := seedSkeleton(vid, cfg.Rigor, d); err != nil {
+			fmt.Fprintln(os.Stderr, "seed:", err)
+		} else if n > 0 {
+			fmt.Println("seeded " + fmt.Sprint(n) + " checklist checks from the " + cfg.Rigor + " template -> tasks/ (tailor the statements, then walk)")
+		}
 		fmt.Println("started " + vid + " - active. Now compose its checklist (/engage start), then bless.")
 	}
 }
@@ -654,7 +661,7 @@ func writeBookCopies(html string, paths []string) error {
 // stale-golden footgun where a hand-run build forgot to re-baseline and produced false milestone FAILs.
 // enddesign
 
-// design: go-build-fast-path  implements: req-build-cheap.1
+// design: go-build-fast-path  implements: req-build-cheap.1, req-selftest-tiers
 // A content-only build never pays the compiler: when the source fingerprint (every .go file +
 // go.mod, order-stable) matches the one recorded beside the binary, the compile AND the stamp
 // rewrite are skipped (the binary did not change) and the existing binary just re-baselines.
@@ -680,6 +687,26 @@ func engineSrcFingerprint(src string) string {
 	return hex.EncodeToString(h.Sum(nil))
 }
 
+// buildFastTier names the fast selftest tier the build runs after every re-baseline
+// (req-selftest-tiers.1): the build invariants only — deps, parser, determinism, ids,
+// parity. The full battery stays the explicit `quack selftest` call
+// (req-selftest-tiers.2).
+func buildFastTier() []string {
+	return []string{"deps", "parser", "determinism", "ids", "parity"}
+}
+
+// runBuildFastTier runs the tier quietly and reports the first failure. A failing
+// build invariant is a broken build, not an advisory.
+func runBuildFastTier() bool {
+	for _, n := range buildFastTier() {
+		if !runSelftest(n) {
+			fmt.Fprintln(os.Stderr, "build: fast-tier selftest FAILED —", n)
+			return false
+		}
+	}
+	return true
+}
+
 // enddesign
 
 func cmdBuild(args []string) {
@@ -699,6 +726,9 @@ func cmdBuild(args []string) {
 					fmt.Fprintln(os.Stderr, "build: engine-home record failed —", err)
 				}
 				root := buildRebaseline(out)
+				if !runBuildFastTier() { // the fast invariant tier rides every build (req-selftest-tiers.1)
+					quackExit(1)
+				}
 				fmt.Println("compile skipped (source unchanged) | golden re-baselined to", root[:12])
 				return
 			}
@@ -743,6 +773,9 @@ func cmdBuild(args []string) {
 		fresh = staged // swap blocked: the NEW code lives in the staged file
 	}
 	root := buildRebaseline(fresh)
+	if !runBuildFastTier() { // the fast invariant tier rides every build (req-selftest-tiers.1)
+		quackExit(1)
+	}
 	fmt.Println("built ->", filepath.ToSlash(out), "| golden re-baselined to", root[:12])
 }
 

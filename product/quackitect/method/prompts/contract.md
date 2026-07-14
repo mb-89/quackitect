@@ -11,7 +11,12 @@ The RULE is that the adjudicator SEES the recital — one they cannot see does
 not count. On a harness that swallows a message followed by tool calls, being
 seen means the recital ENDS your turn: tool calls may come before it (reading
 this file is one), never after it in the same turn. That turn-ending is the
-MECHANISM for a live adjudicator's visibility, NOT the rule itself. A SUBAGENT
+MECHANISM for a live adjudicator's visibility, NOT the rule itself. A harness
+with an interactive QUESTION tool has a better mechanism when the opening
+message already carries a command: put the WHOLE recital inside the question
+and ask leave to continue. The question box always renders. The tap proves the
+recital was seen. The command then resumes in the same turn, no re-prompt.
+A refusal or any other reply stops you. A SUBAGENT
 recites to its ORCHESTRATOR — its recital returns in the result, there is no
 live adjudicator watching — so a subagent EMITS the recital and then CONTINUES
 its assigned work in the same turn; it does not end its turn. Name rule 3's

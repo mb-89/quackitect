@@ -25,6 +25,7 @@ TODO
 <<<node: req-mint-sugar.md>>>
 ---
 id: req-mint-sugar
+ears: exempt - historical pre-EARS statement, retire-or-retrofit recorded (adr-grandfathers-historical)
 type: requirement
 statement: quack mint shall honor its sugar forms - rationale text and deduplicated sink addressing - the numbered statements bind individually.
 class: review

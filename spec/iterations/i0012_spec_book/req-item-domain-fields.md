@@ -1,5 +1,6 @@
 ---
 id: req-item-domain-fields
+ears: exempt - historical pre-EARS statement, retire-or-retrofit recorded (adr-grandfathers-historical)
 type: requirement
 statement: Each item kind shall declare its domain fields and the views shall render them - the numbered statements bind individually.
 class: review

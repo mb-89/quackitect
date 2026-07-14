@@ -28,13 +28,13 @@ func selftestApplyManifest() bool {
 
 	os.WriteFile(f, []byte("alpha beta gamma\n"), 0o644)
 	os.WriteFile(man, []byte(`[{"file":"`+esc+`","old":"beta","new":"BETA"}]`), 0o644)
-	if err := applyManifest(man, true); err != nil {
+	if _, err := applyManifest(man, true); err != nil {
 		return false // dry-run accepts a valid manifest...
 	}
 	if raw, _ := os.ReadFile(f); string(raw) != "alpha beta gamma\n" {
 		return false // ...and changes nothing
 	}
-	if err := applyManifest(man, false); err != nil {
+	if _, err := applyManifest(man, false); err != nil {
 		return false
 	}
 	if raw, _ := os.ReadFile(f); string(raw) != "alpha BETA gamma\n" {
@@ -43,7 +43,7 @@ func selftestApplyManifest() bool {
 
 	os.WriteFile(f, []byte("dup dup\n"), 0o644)
 	os.WriteFile(man, []byte(`[{"file":"`+esc+`","old":"dup","new":"one"}]`), 0o644)
-	if applyManifest(man, false) == nil {
+	if _, err := applyManifest(man, false); err == nil {
 		return false // two matches -> refused
 	}
 	if raw, _ := os.ReadFile(f); string(raw) != "dup dup\n" {
@@ -51,7 +51,7 @@ func selftestApplyManifest() bool {
 	}
 
 	os.WriteFile(man, []byte(`[{"file":"`+esc+`","old":"absent","new":"x"},{"file":"`+esc+`","old":"dup dup","new":"solo"}]`), 0o644)
-	if applyManifest(man, false) == nil {
+	if _, err := applyManifest(man, false); err == nil {
 		return false // one bad edit refuses the WHOLE manifest
 	}
 	if raw, _ := os.ReadFile(f); string(raw) != "dup dup\n" {

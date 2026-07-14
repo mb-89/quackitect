@@ -217,6 +217,21 @@ func fullHash(id string, nodes map[string]Node, memo map[string]string) string {
 		// question fields: stamping or changing it ripples the dependents
 		seed += "|decided_in:" + n.DecidedIn
 	}
+	// design: go-provenance-block  implements: req-mint-prefill.2
+	// per-field provenance is IDENTITY (adr-provenance-in-node): the block parses with
+	// the generic frontmatter maps and folds here deterministically, so a value edit and
+	// its provenance stamp travel under one hash — the register's colors can trust it.
+	if p := n.Maps["provenance"]; len(p) > 0 {
+		ks := make([]string, 0, len(p))
+		for k := range p {
+			ks = append(ks, k)
+		}
+		sort.Strings(ks)
+		for _, k := range ks {
+			seed += "|prov:" + k + "=" + norm(p[k])
+		}
+	}
+	// enddesign
 	if n.Milestone > 0 && strings.HasSuffix(id, "-gate") {
 		seed += evidenceDocSeed(iterOf(n.Path), n.Milestone) // the gate folds its evidence docs (go-evidence-hash)
 	}

@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -19,13 +20,20 @@ import (
 // renderingTests names battery members that RENDER a report. A render recomputes states, which
 // runs this battery again — so inside a render (renderBusy) these are skipped, bounding the
 // recursion the selftestReport comment documents. Top-level evaluation stays exact and complete.
-var renderingTests = map[string]bool{"selftest:report-live": true}
+var renderingTests = map[string]bool{"selftest:report-live": true,
+	// register-render renders a report itself: without the exclusion the nested
+	// battery re-runs it before its own verdict lands — infinite self-recursion
+	"selftest:register-render": true}
 
 // coverageMemo: one CLI invocation is one process over one immutable graph load — a computed
 // (rule, scope) answer stays valid for the whole run. The tests-pass battery in particular is
 // expensive (it runs every selftest); seven iterations asking the same scoped question must not
 // pay seven batteries (responsiveness guide: visible feedback within a second).
 var coverageMemo = map[string]bool{}
+
+// tpAnnouncing latches the OUTERMOST tests-pass evaluation as the only announcer:
+// one run, one stable 1..N sequence, a computable percentage.
+var tpAnnouncing bool
 
 func coverageRule(nodes map[string]Node, rule, scope string) bool {
 	key := rule + "|" + scope
@@ -232,8 +240,22 @@ func coverageRuleUncached(nodes map[string]Node, rule, scope string) bool {
 		if len(ts) == 0 {
 			return false
 		}
+		// deterministic order, and a live n/N line per test on the explicit
+		// verification surfaces — a watching console shows real progress. Only the
+		// OUTERMOST evaluation announces (tpAnnouncing): nested per-iteration and
+		// in-test re-entries would interleave their counters into nonsense; one run,
+		// one stable 1..N sequence, a computable percentage.
+		sort.Slice(ts, func(i, j int) bool { return ts[i].ID < ts[j].ID })
+		announce := !verdictLazyMode && !tpAnnouncing
+		if announce {
+			tpAnnouncing = true
+			defer func() { tpAnnouncing = false }()
+		}
 		memo := map[string]string{}
-		for _, t := range ts {
+		for i, t := range ts {
+			if announce {
+				fmt.Fprintf(feedbackW, "verification: %d/%d %s\n", i+1, len(ts), t.ID)
+			}
 			if strings.HasPrefix(t.Verify, "selftest:") { // in-process, like gateState — cached by verdict (go-verdict-cache)
 				if !runSelftestCached(t.ID, strings.TrimSpace(t.Verify[len("selftest:"):]), fullHash(t.ID, nodes, memo)) {
 					return false

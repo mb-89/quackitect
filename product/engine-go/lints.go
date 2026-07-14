@@ -18,6 +18,7 @@ package main
 //   silently orphan its rationales. Plain-id refers ride the normal ref integrity.
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -154,7 +155,7 @@ func specLintFindingsAt(specDir string, nodes map[string]Node) (external, residu
 
 // enddesign
 
-// design: go-terms-order-lint  implements: req-terms-before-use.1, req-terms-before-use.2, req-terms-before-use.3
+// design: go-terms-order-lint  implements: req-terms-before-use.1, req-terms-before-use.2, req-terms-before-use.3, req-terms-readme-scope, req-jargon-advisory
 // The terms-before-use ADVISORY: the rendered book's reading order (readerChapters — the
 // SAME chapter list the renderer walks) is scanned for glossary-term uses that precede the
 // term's definition point. The glossary IS the term set (adr-terms-source-glossary): the
@@ -277,6 +278,223 @@ func termOrderFindings(nodes map[string]Node, gloss map[string]GlossTerm) []stri
 	var out []string
 	for slug, loc := range firstUse {
 		out = append(out, "term '"+gloss[slug].Term+"' ("+slug+") is used at "+loc+" before its definition ("+defLoc+")")
+	}
+	sortStrings(out)
+	return out
+}
+
+// The README extension (req-terms-readme-scope): the README is the FIRST document of
+// the reading order and the one surface the manifest walk cannot reach (owner law:
+// entry documents carry no bare method jargon). A glossary-term use in the README is
+// fine when LINKED (its definition is one click away); a BARE use is a finding. Same
+// span discipline as the chapter walk, but linked spans drop WHOLE (label included) -
+// the link is exactly what legalizes the term. Advisory, like every terms lane.
+var termLinkWholeRe = regexp.MustCompile(`\[[^\]]*\]\([^)]*\)`)
+
+func readmeTermFindings(readmePath string, gloss map[string]GlossTerm) []string {
+	raw, err := os.ReadFile(readmePath)
+	if err != nil || len(gloss) == 0 {
+		return nil
+	}
+	type nameEntry struct{ name, slug string }
+	var names []nameEntry
+	for slug, t := range gloss {
+		for _, n := range append([]string{t.Term}, t.Aliases...) {
+			if strings.TrimSpace(n) != "" {
+				names = append(names, nameEntry{n, slug})
+			}
+		}
+	}
+	sort.Slice(names, func(a, b int) bool {
+		if len(names[a].name) != len(names[b].name) {
+			return len(names[a].name) > len(names[b].name)
+		}
+		return names[a].name < names[b].name
+	})
+	// define-before-use, README edition: the term's FIRST occurrence decides. A linked
+	// first use puts the definition one click away, so later plain uses read fine (the
+	// same reason a paper defines a term once). A bare first use is the finding.
+	var proseB strings.Builder
+	inFence, inComment := false, false
+	for _, line := range strings.Split(string(raw), "\n") {
+		t := strings.TrimSpace(line)
+		if inComment {
+			if strings.Contains(t, "-->") {
+				inComment = false
+			}
+			continue
+		}
+		if strings.HasPrefix(t, "```") {
+			inFence = !inFence
+			continue
+		}
+		if strings.HasPrefix(t, "<!--") {
+			if !strings.Contains(t, "-->") {
+				inComment = true
+			}
+			continue
+		}
+		if inFence || strings.HasPrefix(t, "#") {
+			continue
+		}
+		proseB.WriteString(termInlineCodeRe.ReplaceAllString(line, " ") + "\n")
+	}
+	text := proseB.String()
+	linkSpans := termLinkWholeRe.FindAllStringIndex(text, -1)
+	inLink := func(a, b int) bool {
+		for _, s := range linkSpans {
+			if a >= s[0] && b <= s[1] {
+				return true
+			}
+		}
+		return false
+	}
+	firstBare := map[string]bool{}
+	for _, n := range names {
+		if _, done := firstBare[n.slug]; done {
+			continue
+		}
+		if m := regexp.MustCompile(`(?i)\b` + regexp.QuoteMeta(n.name) + `\b`).FindStringIndex(text); m != nil {
+			firstBare[n.slug] = !inLink(m[0], m[1])
+		}
+	}
+	var out []string
+	for slug, bare := range firstBare {
+		if bare {
+			out = append(out, "term '"+gloss[slug].Term+"' ("+slug+") is used BARE in the README before any linked use - link the first use or reword")
+		}
+	}
+	sortStrings(out)
+	return out
+}
+
+// design: go-rigor-fit  implements: req-rigor-fit
+// The rigor-fit advisory: the ACTIVE iteration's composed trace size against the
+// rigor's fit band (fit_min/fit_max in the rigor definition — the band lives with the
+// rigor, one home). Below the band reads as ceremony overkill, above as a rigor too
+// thin. Advisory by law: the human confirms rigor at start (contract rule 5); the
+// engine only hints (req-rigor-fit.2).
+
+func rigorFitBand(rigor string) (int, int) {
+	raw, err := os.ReadFile(filepath.Join(EngineDir(), "method", "rigor", rigor, "rigor.md"))
+	if err != nil {
+		return 0, 0
+	}
+	lo, hi := 0, 0
+	for _, line := range strings.Split(string(raw), "\n") {
+		if k, v, ok := strings.Cut(line, ":"); ok {
+			n := 0
+			fmt.Sscanf(strings.TrimSpace(v), "%d", &n)
+			switch strings.TrimSpace(k) {
+			case "fit_min":
+				lo = n
+			case "fit_max":
+				hi = n
+			}
+		}
+	}
+	return lo, hi
+}
+
+// rigorFitAdvisory is the pure rule: a composed count against a band.
+func rigorFitAdvisory(count int, rigor string, lo, hi int) []string {
+	switch {
+	case lo > 0 && count < lo:
+		return []string{fmt.Sprintf("rigor-fit: %d trace nodes composed under %s (fit band starts at %d) - the ceremony may be overkill for this size; the rigor stays the human's call", count, rigor, lo)}
+	case hi > 0 && count > hi:
+		return []string{fmt.Sprintf("rigor-fit: %d trace nodes composed under %s (fit band ends at %d) - the work may deserve a step up in rigor; the call stays human", count, rigor, hi)}
+	}
+	return nil
+}
+
+func rigorFitFindings(nodes map[string]Node) []string {
+	cfg := readProjectConfig()
+	if cfg.Version == "" || cfg.Rigor == "" {
+		return nil
+	}
+	count := 0
+	for _, n := range nodes {
+		if iterOf(n.Path) != cfg.Version {
+			continue
+		}
+		switch n.Type {
+		case "requirement", "usecase", "test", "adr", "question", "model", "need":
+			count++
+		}
+	}
+	lo, hi := rigorFitBand(cfg.Rigor)
+	return rigorFitAdvisory(count, cfg.Rigor, lo, hi)
+}
+
+// enddesign
+
+// The jargon extension (req-jargon-advisory) pairs with the glossary's DRY law: the
+// glossary IS the term set, so an unregistered term is invisible to every term lane
+// by construction. This advisory catches the shape of the escape: an ALL-CAPS acronym
+// (2-8 letters) in reader-facing prose that no glossary name covers. Emphasis caps
+// self-calibrate away: a caps token whose lowercase form appears anywhere in the
+// book's own prose (the vocab) is an emphasized WORD, never an acronym. Register the
+// term or reword - the finding only points.
+var jargonAcronymRe = regexp.MustCompile(`\b[A-Z][A-Z0-9]{1,7}\b`)
+var jargonWordRe = regexp.MustCompile(`[a-z][a-z0-9-]*`)
+
+// jargonVocab collects the lowercase word set of reader prose - the emphasis filter.
+func jargonVocab(bodies []string) map[string]bool {
+	v := map[string]bool{}
+	for _, b := range bodies {
+		for _, w := range jargonWordRe.FindAllString(b, -1) {
+			v[w] = true
+		}
+	}
+	return v
+}
+
+func jargonFindings(body, loc string, gloss map[string]GlossTerm, vocab map[string]bool) []string {
+	known := map[string]bool{}
+	for _, t := range gloss {
+		for _, n := range append([]string{t.Term}, t.Aliases...) {
+			for _, w := range strings.Fields(strings.ToUpper(n)) {
+				known[w] = true
+			}
+		}
+	}
+	found := map[string]string{}
+	inFence, inComment := false, false
+	for _, line := range strings.Split(body, "\n") {
+		t := strings.TrimSpace(line)
+		if inComment {
+			if strings.Contains(t, "-->") {
+				inComment = false
+			}
+			continue
+		}
+		if strings.HasPrefix(t, "```") {
+			inFence = !inFence
+			continue
+		}
+		if strings.HasPrefix(t, "<!--") {
+			if !strings.Contains(t, "-->") {
+				inComment = true
+			}
+			continue
+		}
+		if inFence || strings.HasPrefix(t, "#") {
+			continue
+		}
+		prose := termInlineCodeRe.ReplaceAllString(line, " ")
+		prose = termLinkTargetRe.ReplaceAllString(prose, "] ")
+		for _, m := range jargonAcronymRe.FindAllString(prose, -1) {
+			if len(m) < 2 || known[m] || vocab[strings.ToLower(m)] {
+				continue // glossary term, or an emphasized word the prose also writes small
+			}
+			if _, seen := found[m]; !seen {
+				found[m] = loc
+			}
+		}
+	}
+	var out []string
+	for tok, l := range found {
+		out = append(out, "possible jargon '"+tok+"' at "+l+" is no glossary term - register it or reword")
 	}
 	sortStrings(out)
 	return out

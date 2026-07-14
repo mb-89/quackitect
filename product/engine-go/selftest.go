@@ -689,6 +689,7 @@ func init() {
 		i18cTests,         // i18_red3.go (the vehicle-drives-stub chain)
 		i19Tests,          // i19_red.go
 		i20Tests,          // i20_red.go (the cold-run fix batch)
+		i21Tests,          // i21_red.go
 	)
 }
 

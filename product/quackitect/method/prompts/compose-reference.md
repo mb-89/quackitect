@@ -62,6 +62,21 @@ depends_on: [<ids>]
 - **Killers ripen WITH the closing gate.** Do not chain filler subtasks BEHIND a killer — with flat wiring the agent-blessable fillers finish first, and the remaining ready killer(s) + gate arrive as ONE combined pager (adr-pager-handoff): one hand-off, one y, every bless recorded individually.
 - **ids are iteration-unique** (namespace by `<itag>`, e.g. `i6-m2-gate`). A reused id silently shadows; `quack lint` fails on duplicates.
 
+## Field prefill, provenance, and the hand-off brief
+Mint pre-fills every schema field (go-mint-prefill): the schema default where one exists, an
+explicit `TBD - propose or veto` marker where none does — no field reaches the user blank.
+Each value's source lives in the node's `provenance:` frontmatter block (one indented
+`field: source` line; adr-provenance-in-node) and is IDENTITY — a veto edit and its provenance
+move under one hash. There is NO standing register (adr-handoff-html): the gate's HAND-OFF
+BRIEF derives the colors from that provenance — open decisions (red, dealt one card at a
+time with the agent's default and the lettered options), decided-already (green: the
+adjudicated filled dot and the agent-confident outlined dot never mix), defaults riding
+(yellow, off the page). A decision node authors its alternatives as an `## Options` body
+section (`A) …` paragraphs) and its ruling as a lettered `decided_via` — the card then reads
+"Bless selects B)". A bless records every stated default in the user's name, on any channel
+(page tap or phone card); killer decisions resolve ONLY over a hand-off channel or a console
+bless — every other lane refuses.
+
 ## Rigor → milestones
 - **systematic** = M1–M8. **lean** = L1–L5 → seed as **M1–M5** (L1→M1 … L5→M5). **vibe** = no gates.
 - lean's derived coverage per milestone (see `rigor/lean/checklist.md`):

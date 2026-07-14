@@ -93,12 +93,22 @@ func verdictRecord(id, input string, result bool, d time.Duration) {
 }
 
 // runSelftestCached is the cached evaluator seam: consult the map, run only on a miss, record.
+// In LAZY mode (req-lazy-verdicts: the walk commands) a miss answers not-verified WITHOUT
+// running - the walk's no-over-checking law, baked. Eager consumers (report, selftest,
+// verify, the hand-off render) re-verify as before.
+var verdictLazyMode bool
+var selftestCacheRuns int // observable for the class guard: how many misses actually ran
+
 func runSelftestCached(id, name, input string) bool {
 	if pass, ok := verdictLookup(id, input); ok {
 		return pass
 	}
+	if verdictLazyMode {
+		return false // unverified at this build: conservative, silent, and FAST
+	}
 	announceRerun()
 	t0 := time.Now()
+	selftestCacheRuns++
 	pass := runSelftest(name)
 	d := time.Since(t0)
 	announceSlow(id, d)
@@ -360,7 +370,17 @@ var (
 	callArgs            []string
 	callLogged          bool
 	callLogPathOverride string // selftest seam
+	callLogExtras       map[string]interface{}
 )
+
+// callLogSetExtra rides an extra field on this dispatch's log line (the apply lane's
+// touched-files audit, req-apply-general.2). Secret values never belong here.
+func callLogSetExtra(k string, v interface{}) {
+	if callLogExtras == nil {
+		callLogExtras = map[string]interface{}{}
+	}
+	callLogExtras[k] = v
+}
 
 func callLogPath() string {
 	if callLogPathOverride != "" {
@@ -405,6 +425,9 @@ func callLogWrite(exit int) {
 	rec := map[string]interface{}{
 		"ts": callT0.Format(time.RFC3339), "cmd": callCmd, "args": callArgs,
 		"ms": time.Since(callT0).Milliseconds(), "exit": exit, "channel": channel,
+	}
+	for k, v := range callLogExtras {
+		rec[k] = v
 	}
 	b, err := json.Marshal(rec)
 	if err != nil {

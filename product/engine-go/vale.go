@@ -11,6 +11,7 @@ import (
 	"path/filepath"
 	"runtime"
 	"strings"
+	"time"
 )
 
 // design: go-register-vale  implements: req-register-advisory
@@ -34,14 +35,21 @@ func valeURL() string {
 }
 
 // ensureVale pulls the pinned binary once; a second call finds it cached. Returns "" on failure.
+// QUACK_NO_PULL skips the network entirely (fixture homes never download - the battery's
+// zero-network discipline; found live when a fresh-home fixture spent 45s pulling vale),
+// and the pull itself is bounded so a slow mirror can never hang a render.
 func ensureVale() string {
 	if _, err := os.Stat(valePath()); err == nil {
 		return valePath()
 	}
+	if os.Getenv("QUACK_NO_PULL") != "" {
+		return ""
+	}
 	if runtime.GOOS != "windows" {
 		return "" // the pull path is windows-first; other OS install vale on PATH themselves
 	}
-	resp, err := http.Get(valeURL())
+	client := &http.Client{Timeout: 20 * time.Second}
+	resp, err := client.Get(valeURL())
 	if err != nil || resp.StatusCode != 200 {
 		return ""
 	}

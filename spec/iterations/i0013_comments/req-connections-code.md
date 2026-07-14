@@ -1,5 +1,6 @@
 ---
 id: req-connections-code
+ears: exempt - historical pre-EARS statement, retire-or-retrofit recorded (adr-grandfathers-historical)
 type: requirement
 statement: Connections mode shall extend to code-derived designs and mint writes - the numbered statements bind individually.
 class: review

@@ -194,6 +194,126 @@ func frontmatterMap(path string) map[string]string {
 	return out
 }
 
+// design: go-field-tier  implements: req-field-tier
+// The tier rollup: a node's schema fields fold to ONE state. "undecided" while any
+// CORE field is missing or TBD (an unadjudicated core value blocks); "complete-with-
+// deferrals" when the only open fields are DEFERRABLE ones riding their defaults or
+// TBD (they default and count, never block); "complete" when every schema field holds
+// a value. The register's colors build on this (go-register-colors); the TBD marker
+// convention is a value starting "TBD" (req-mint-prefill.3).
+
+type tierState struct {
+	state     string   // undecided | complete-with-deferrals | complete
+	coreOpen  []string // core fields missing or TBD
+	deferrals []string // deferrable fields riding a default or TBD
+}
+
+func tbdValue(v string) bool {
+	return strings.HasPrefix(strings.ToUpper(strings.TrimSpace(v)), "TBD")
+}
+
+func nodeTierState(schema *typeSchema, fm map[string]string) tierState {
+	st := tierState{state: "complete"}
+	names := make([]string, 0, len(schema.fields))
+	for name := range schema.fields {
+		names = append(names, name)
+	}
+	sort.Strings(names)
+	for _, name := range names {
+		v, ok := fm[name]
+		open := !ok || strings.TrimSpace(v) == "" || tbdValue(v)
+		if !open {
+			continue
+		}
+		if schema.fields[name].tier == "core" {
+			st.coreOpen = append(st.coreOpen, name)
+		} else {
+			st.deferrals = append(st.deferrals, name)
+		}
+	}
+	switch {
+	case len(st.coreOpen) > 0:
+		st.state = "undecided"
+	case len(st.deferrals) > 0:
+		st.state = "complete-with-deferrals"
+	}
+	return st
+}
+
+// enddesign
+
+// design: go-register-colors  implements: req-register-colors
+// The traffic light derives from RECORDED PROVENANCE ONLY (adr-provenance-in-node):
+//   green-user  — the field's provenance records a user ruling (adjudicated)
+//   green-agent — mechanically derived: a schema default or a deterministic derivation
+//   yellow      — a DEFERRABLE field riding its default or TBD (counts, never blocks)
+//   red         — a CORE field holding an unadjudicated assumption: an agent proposal,
+//                 a skeleton value, a TBD, or no provenance at all
+// Self-reported confidence is NOT an input: no provenance vocabulary carries it, and
+// an unknown source reads as an assumption (red on core), never as trust.
+
+func fieldColor(r *fieldRule, value, source string) string {
+	src := strings.ToLower(strings.TrimSpace(source))
+	switch {
+	case strings.HasPrefix(src, "user-ruling"):
+		return "green-user"
+	case strings.HasPrefix(src, "schema-default"):
+		if r.tier == "deferrable" {
+			return "yellow" // riding the default IS the deferral (the seed's yellow)
+		}
+		return "green-agent"
+	case strings.HasPrefix(src, "derived"):
+		return "green-agent"
+	}
+	// no provenance recorded: a value EQUAL to its schema default — or ABSENT and
+	// riding it — is mechanically explainable (pre-register history stays readable);
+	// a diverging value is not.
+	if v := strings.TrimSpace(value); src == "" && r.defSet && (v == r.def || v == "") {
+		if r.tier == "deferrable" {
+			return "yellow"
+		}
+		return "green-agent"
+	}
+	if r.tier == "deferrable" {
+		return "yellow"
+	}
+	return "red"
+}
+
+// nodeRegisterColor rolls a node's schema fields to ONE row color: the worst field
+// wins (red > yellow > green); a green row is green-user only when every core field
+// is user-ruled — an agent-confident green never masquerades as an adjudication.
+func nodeRegisterColor(schema *typeSchema, fm map[string]string, prov map[string]string) string {
+	worst := ""
+	allCoreUser := true
+	names := make([]string, 0, len(schema.fields))
+	for name := range schema.fields {
+		names = append(names, name)
+	}
+	sort.Strings(names)
+	for _, name := range names {
+		c := fieldColor(schema.fields[name], fm[name], prov[name])
+		if schema.fields[name].tier == "core" && c != "green-user" {
+			allCoreUser = false
+		}
+		switch {
+		case c == "red":
+			worst = "red"
+		case c == "yellow" && worst != "red":
+			worst = "yellow"
+		}
+	}
+	if worst != "" {
+		return worst
+	}
+	if allCoreUser {
+		return "green-user"
+	}
+	return "green-agent"
+}
+
+// enddesign
+
 // fieldSchemaFindings reports every node field value that breaks its schema,
 // loading the schema set from the method layer.
 func fieldSchemaFindings(nodes map[string]Node) []string {

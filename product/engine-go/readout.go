@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 	"sort"
 	"strings"
+	"time"
 )
 
 // design: go-readout-width  implements: req-deterministic-readout.3
@@ -511,7 +512,55 @@ func cmdProgress(rest []string) {
 		tty = false
 	}
 	if g := flagVal(rest, "--pager"); g != "" {
-		fmt.Println(HandoverPager(g, iter, nodes, sm, cfg, tty))
+		// the hand-off IS a page now (adr-handoff-html): render it, open it, print the
+		// pointer - the prose-plus-card hand-off retired by the owner's ruling. The
+		// live route rides the watch server when one runs; a stale file's buttons
+		// no-op without a listener, also by ruling. The CARD text survives only as
+		// the phone ask's body (askComposeBody).
+		if _, ok := nodes[g]; !ok {
+			fmt.Println("no such gate: " + g)
+			return
+		}
+		out := filepath.Join(dataDirFor("out"), "handoff-"+g+".html")
+		os.MkdirAll(filepath.Dir(out), 0o755)
+		os.WriteFile(out, []byte(renderHandoffHTML(g, nodes, sm)), 0o644) // the findable artifact (dead buttons by ruling)
+		// the LIVE lane: a one-shot server whose life follows the page
+		// (req-handoff-lifecycle) - it opens the browser itself and reports how it ended.
+		render := func() string { ns := LoadAll(); return renderHandoffHTML(g, ns, StatusMap(ns)) }
+		started := make(chan string, 1)
+		res := make(chan string, 1)
+		go func() {
+			o, err := serveHandoffOnce(g, render, 90*time.Second, 12*time.Second, 15*time.Minute, handoffBless, started)
+			if err != nil {
+				o = "error: " + err.Error()
+			}
+			res <- o
+		}()
+		base := <-started
+		fmt.Println("hand-off -> " + base + "/handoff/" + g + "   (file: " + filepath.ToSlash(out) + ")")
+		fmt.Println("❓ Bless " + g + "?  the page's buttons record; closing the page keeps the gate open")
+		openFile(base + "/handoff/" + g)
+		// the SAME brief rides the phone when one is paired (owner ruling): both
+		// channels, first answer wins, the round's end kills the leftover card
+		if cid, err := askSendForGate(g, 900, ""); err == nil {
+			fmt.Println("📱 the brief rides the paired phone too (" + cid + ")")
+		}
+		o := <-res
+		switch o {
+		case "y":
+			fmt.Println("answered y — " + g + " blessed (actor=user, channel=handoff)")
+		case "n":
+			fmt.Println("answered n — dissent recorded, " + g + " stays open")
+		case "closed":
+			fmt.Println("page closed without an answer — " + g + " stays open, the server is gone")
+		case "unopened":
+			fmt.Println("no page opened — " + g + " stays open, the server is gone")
+		default:
+			fmt.Println("hand-off ended: " + o + " — " + g + " stays open")
+		}
+		// end the phone side of the round: an answered page invalidates the card
+		// outright; an unanswered close first honors a tap that already arrived
+		handoffAsksClose(g, o != "y" && o != "n")
 		return
 	}
 	fmt.Println(ProgressBar(iter, nodes, sm, cfg, tty))

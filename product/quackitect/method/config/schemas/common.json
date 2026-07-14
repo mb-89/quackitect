@@ -3,9 +3,9 @@
   "fields": ["class", "killer"],
   "type_class": "enum",
   "enum_class": ["domain", "executed", "judgment", "meta", "review"],
-  "tier_class": "core",
+  "tier_class": "deferrable",
   "default_class": "review",
   "type_killer": "bool",
-  "tier_killer": "core",
+  "tier_killer": "deferrable",
   "default_killer": "false"
 }
