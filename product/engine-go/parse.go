@@ -57,12 +57,22 @@ type Node struct {
 	Chosen    []string // decision: the candidate(s) it picks
 	Rejected  []string // decision: the candidate(s) it turns down, reasons in the body
 	Refers    []string // rationale: the clause keys it explains (node ids or id#heading anchors)
+	Module    string   // module ownership; empty at parse means assign workspace default after load
 	// enddesign
 }
 
+// design: go-module-config  implements: req-module-registry, req-module-dotted-ids
+// Module registry configuration lives in the workspace root marker. The parser keeps the
+// historical iteration fields and adds workspace/module metadata without a TOML dependency.
 // Config is the iteration breadcrumb from .quack/config.toml. Overlay is the workspace's
 // COMMITTED method-overlay root, relative to the workspace (e.g. "product/<name>").
-type Config struct{ Type, Rigor, Version, LogsDir, Overlay, AgentLane string }
+type Config struct {
+	Type, Rigor, Version, LogsDir, Overlay, AgentLane string
+	WorkspaceID, DefaultModule                        string
+	Modules                                           map[string]ModuleConfig
+}
+
+type ModuleConfig struct{ ID, Title, Kind, Path, Parent, From string }
 
 // design: go-parse  implements: req-go-port.3
 // Hand-rolled frontmatter and config.toml parsing over the trivial subset in use
@@ -201,6 +211,8 @@ func ParseNodeBytes(path string, txt []byte) Node {
 			n.Suite = v
 		case "direction":
 			n.Direction = v
+		case "module":
+			n.Module = v
 		case "milestone":
 			m := 0
 			for _, c := range strings.TrimPrefix(v, "M") {
@@ -230,14 +242,86 @@ func ParseNodeBytes(path string, txt []byte) Node {
 	return n
 }
 
-// ReadConfig parses .quack/config.toml's type/rigor/version. Defaults match engine.config.
+func (c Config) moduleDefault() string {
+	if c.DefaultModule != "" {
+		return c.DefaultModule
+	}
+	if len(c.Modules) == 1 {
+		for id := range c.Modules {
+			return id
+		}
+	}
+	return "default"
+}
+
+func moduleMatches(moduleID, selected string) bool {
+	selected = strings.TrimSpace(selected)
+	if selected == "" || selected == "all" || selected == "*" {
+		return true
+	}
+	return moduleID == selected || strings.HasPrefix(moduleID, selected+".")
+}
+
+// ReadConfig parses the project root marker: iteration settings, workspace identity,
+// and the module registry. Defaults match the historical single-module workspace.
 func ReadConfig(path string) Config {
-	c := Config{Type: "default", Rigor: "systematic", Version: "v0"}
+	c := Config{Type: "default", Rigor: "systematic", Version: "v0", DefaultModule: "default", Modules: map[string]ModuleConfig{"default": {ID: "default", Title: "default", Kind: "local"}}}
 	txt, err := os.ReadFile(path)
 	if err != nil {
 		return c
 	}
+	section, modID := "", ""
 	for _, line := range strings.Split(string(txt), "\n") {
+		trimmed := strings.TrimSpace(line)
+		if strings.HasPrefix(trimmed, "[") && strings.HasSuffix(trimmed, "]") {
+			section = strings.Trim(trimmed, "[]")
+			modID = ""
+			if strings.HasPrefix(section, "modules.") {
+				modID = strings.TrimPrefix(section, "modules.")
+				if c.Modules == nil {
+					c.Modules = map[string]ModuleConfig{}
+				}
+				m := c.Modules[modID]
+				m.ID = modID
+				c.Modules[modID] = m
+			}
+			continue
+		}
+		if section == "workspace" {
+			for _, k := range []string{"id", "default_module"} {
+				if v, ok := tomlString(line, k); ok {
+					switch k {
+					case "id":
+						c.WorkspaceID = v
+					case "default_module":
+						c.DefaultModule = v
+					}
+				}
+			}
+			continue
+		}
+		if modID != "" {
+			m := c.Modules[modID]
+			for _, k := range []string{"title", "kind", "path", "parent", "from"} {
+				if v, ok := tomlString(line, k); ok {
+					switch k {
+					case "title":
+						m.Title = v
+					case "kind":
+						m.Kind = v
+					case "path":
+						m.Path = v
+					case "parent":
+						m.Parent = v
+					case "from":
+						m.From = v
+					}
+				}
+			}
+			m.ID = modID
+			c.Modules[modID] = m
+			continue
+		}
 		for _, k := range []string{"type", "rigor", "version", "logs_dir", "overlay", "agent_lane"} {
 			if v, ok := tomlString(line, k); ok {
 				switch k {
@@ -257,8 +341,19 @@ func ReadConfig(path string) Config {
 			}
 		}
 	}
+	if c.Modules == nil {
+		c.Modules = map[string]ModuleConfig{}
+	}
+	if len(c.Modules) == 0 {
+		c.Modules["default"] = ModuleConfig{ID: "default", Title: "default", Kind: "local"}
+	}
+	if c.DefaultModule == "" {
+		c.DefaultModule = c.moduleDefault()
+	}
 	return c
 }
+
+// enddesign
 
 // tomlString matches a trivial `key = "value"` line (leading space and spaces around = allowed).
 func tomlString(line, key string) (string, bool) {

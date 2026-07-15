@@ -1,6 +1,6 @@
 ---
 id: model-engine-layers
-type: model
+type: guide
 statement: what may depend on what in the engine, and how do signals travel through it?
 class: review
 killer: false

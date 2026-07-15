@@ -32,6 +32,7 @@ var i21Tests = []namedTest{
 	{"unknown-type-refused", selftestUnknownTypeRefused},
 	{"lazy-verdicts", selftestLazyVerdicts},
 	{"handoff-lifecycle", selftestHandoffLifecycle},
+	{"handoff-milestone-title", selftestHandoffMilestoneTitle},
 }
 
 // selftest:lazy-verdicts — proves the walk's cache law (test-lazy-verdicts;
@@ -99,6 +100,29 @@ func selftestHandoffLifecycle() bool {
 		return false // the answer ends the server and fires the bless once
 	}
 	return true
+}
+
+func selftestHandoffMilestoneTitle() bool {
+	iterPath := filepath.Join(SPEC, "iterations", "i0001_syn", "tasks", "x.md")
+	nodes := map[string]Node{
+		"i1-m7-sign": {ID: "i1-m7-sign", Milestone: 7, Class: "review", Killer: true, Path: iterPath, Statement: "acceptance obtained — sign-off evidence recorded"},
+		"i1-m7-gate": {ID: "i1-m7-gate", Milestone: 7, Class: "review", Killer: true, Path: iterPath, Statement: "M7 Validate & accept reviewed and adjudicated.", DependsOn: []string{"i1-m7-sign"}},
+	}
+	sm := map[string]string{"i1-m7-sign": "OPEN", "i1-m7-gate": "OPEN"}
+	if milestoneDisplayTitle("i0001_syn", 7, nodes) != "M7 Validate & accept" {
+		return false
+	}
+	html := renderHandoffHTML("i1-m7-sign", nodes, sm)
+	if !strings.Contains(html, "<h1>M7 Validate &amp; accept</h1>") {
+		return false
+	}
+	if strings.Contains(html, "Action:") || strings.Contains(html, "Check:") || strings.Contains(html, "This page records") {
+		return false
+	}
+	if !strings.Contains(html, `data-nid="i1-m7-sign"`) {
+		return false
+	}
+	return strings.Contains(html, "👍 bless") && strings.Contains(html, "this page")
 }
 
 // selftest:unknown-type-refused — guards the silent-gate class (test-unknown-type;
@@ -357,8 +381,8 @@ func selftestRegisterRender() bool {
 	ruled := write("raid-ruled.md", "---\nid: raid-ruled\ntype: raid\nstatement: the ruled risk\nkind: risk\nprobability: 0.2\nimpact: 0.9\nmitigation: bounded by the spike\nowner: the maintainer\nstatus: open\nkiller: false\nprovenance:\n  kind: user-ruling via console\n  probability: user-ruling via console\n  impact: user-ruling via console\n  mitigation: user-ruling via console\n  owner: user-ruling via console\n  status: user-ruling via console\n---\n")
 	nodes := map[string]Node{"g1-gate": gate, "raid-open": red, "raid-ruled": ruled}
 	html := renderHandoffHTML("g1-gate", nodes, map[string]string{"g1-gate": "OPEN", "raid-open": "OPEN", "raid-ruled": "DONE"})
-	if !strings.Contains(html, "M1 reviewed and adjudicated.") {
-		return false // the page opens with the gate's own question
+	if !strings.Contains(html, "<h1>M1</h1>") || strings.Contains(html, "Action:") || strings.Contains(html, "Check:") {
+		return false // the page opens with the milestone title and no redundant labels
 	}
 	if !strings.Contains(html, "the open risk") || !strings.Contains(html, "reg-red") {
 		return false // cone rows: statement + computed color

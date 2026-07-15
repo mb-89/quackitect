@@ -68,7 +68,7 @@ stamp). The rest are user-judged (`class: review`). The trace itself is content,
     within-layer parallelism, DMM/MDM for a cross-domain mapping (e.g. requirements x elements); a
     menu, never mandatory — record which method (if any) was applied, or that the cut was obvious
     enough to skip it
-  - [ ] **model authored — the DIAGRAM is the architecture deliverable** *(killer, HARD RULE)*: every chosen view exists as a model node with its ELEMENTS ALLOCATED (the blocks the build will fill, allocated ahead of any code — the conformance lint tolerates unrealized elements), the structure drawn, each element's INPUTS and OUTPUTS wired (the developer fills a block by its contract, not by re-deciding architecture), each element carrying a one-line PLACEMENT RATIONALE (why the architecture put it WHERE it is in this view — the onion's band, a tree's parent, a state group; placement is a judgment call, general to every model kind, not onion-specific), and each architecture ADR marked `kind: architecture` and linked to the element(s) it shapes (informed-by). The M4 gate is a DIAGRAM REVIEW — the architect (owner) reviews and approves the decomposition here; the M4 gate cannot bless without it. M6 then ADHERES to this model; the build never invents an element the diagram did not sanction (sky-fall lint).
+  - [ ] architecture model ready for diagram review *(killer, HARD RULE)*: the chosen architecture view exists, names the blocks the build will fill, shows their relationships or boundaries, and records the placement rationale. The owner reviews that diagram here. M6 then builds inside it; a new block found during build returns to architecture review.
   - [ ] ADR recorded and traced — every ADR addresses a requirement *(derived: coverage:adr-traced)*
 
 - **M5 — Prove the riskiest unknowns** · *gate: prototype*
@@ -104,7 +104,7 @@ stamp). The rest are user-judged (`class: review`). The trace itself is content,
   - [ ] meets the need — validated against all needs (every iteration), demonstrated by Ch1 criteria *(killer)*
   - [ ] killer use-cases demonstrated end-to-end — each killer use case is exercised for real, not merely "tests green" (a green suite can still miss a whole capability)
   - [ ] consistency swept — everything this iteration CHANGED is re-documented where it is described: method prompts, reference sheets (compose-reference, dependencies), templates, checklists, and guides agree with the engine's actual behavior; a doc that still teaches the superseded way is a defect here, not a later surprise
-  - [ ] acceptance obtained — sign-off evidence recorded
+  - [ ] acceptance obtained — sign-off evidence recorded *(killer)*
   - [ ] validation gaps captured (RAID)
 
 - **M8 — Package & hand over** · *gate: release* → then `engage ship`
@@ -113,7 +113,7 @@ stamp). The rest are user-judged (`class: review`). The trace itself is content,
   - [ ] docs complete & match the actual surface *(killer)*
   - [ ] packaged & versioned
   - [ ] configuration baselined
-  - [ ] handover accepted
+  - [ ] handover accepted *(killer)*
 
 > **Field review is not a milestone.** The old M9 re-measured outcomes against the Ch1 criteria,
 > captured lessons, decided continue / iterate / retire, and harvested reusable assets. That work

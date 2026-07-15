@@ -237,6 +237,13 @@ func rewriteNodeField(path, field, value, source string) error {
 // channel=handoff). A "n" resolves the ask without a bless - the gate stays open,
 // the dissent is on the record.
 func handoffBless(gate, verdict string) error {
+	nodes := LoadAll()
+	sm := StatusMap(nodes)
+	checks := []string{gate}
+	if group, mergedGate := pagerGroup(gate, nodes, sm); len(group) > 0 && mergedGate != "" {
+		checks = append(append([]string{}, group...), mergedGate)
+		gate = mergedGate
+	}
 	s := loadAskStore()
 	now := time.Now().Unix()
 	s.Asks = append(s.Asks, Ask{
@@ -255,9 +262,16 @@ func handoffBless(gate, verdict string) error {
 	// a y accepts everything the page STATES: the defaults write-through lives in
 	// applyBlessIntent — ONE home for page, phone and any future channel — and the
 	// ripe killer gates travel in the checks group, blessed individually.
-	nodes := LoadAll()
 	_, killers := handoffAccepts(gate, nodes, StatusMap(nodes))
-	return applyBlessIntent(&BlessIntent{Check: gate, Checks: append(killers, gate), Verdict: "y", By: "user", Channel: "handoff"})
+	seen := map[string]bool{}
+	var all []string
+	for _, id := range append(checks, killers...) {
+		if !seen[id] {
+			seen[id] = true
+			all = append(all, id)
+		}
+	}
+	return applyBlessIntent(&BlessIntent{Check: gate, Checks: all, Verdict: "y", By: "user", Channel: "handoff"})
 }
 
 // design: go-handoff-lifecycle  implements: req-handoff-lifecycle

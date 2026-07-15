@@ -286,13 +286,13 @@ func cmdNext(args []string) {
 	fmt.Println("version:", v)
 	gates := map[string]bool{}
 	for id := range nodes {
-		if st[id] != "CONTENT" {
+		if st[id] != "CONTENT" && moduleSelected(nodes[id]) {
 			gates[id] = true
 		}
 	}
 	var ready []string
 	for id := range gates {
-		if iterOf(nodes[id].Path) != v || (st[id] != "OPEN" && st[id] != "SUSPECT") {
+		if iterOf(nodes[id].Path) != v || !moduleSelected(nodes[id]) || (st[id] != "OPEN" && st[id] != "SUSPECT") {
 			continue
 		}
 		ok := true
@@ -309,7 +309,7 @@ func cmdNext(args []string) {
 	if len(ready) == 0 {
 		done := true
 		for id := range gates {
-			if iterOf(nodes[id].Path) == v && !stateSatisfies(st[id]) {
+			if iterOf(nodes[id].Path) == v && moduleSelected(nodes[id]) && !stateSatisfies(st[id]) {
 				done = false
 			}
 		}
@@ -320,7 +320,13 @@ func cmdNext(args []string) {
 		}
 		return
 	}
-	sort.Strings(ready)
+	sort.Slice(ready, func(i, j int) bool {
+		ai, aj := userAdjudicated(nodes[ready[i]]), userAdjudicated(nodes[ready[j]])
+		if ai != aj {
+			return !ai
+		}
+		return ready[i] < ready[j]
+	})
 	n := nodes[ready[0]]
 	kind := "review"
 	if n.Class == "executed" {
@@ -837,7 +843,7 @@ func buildRebaseline(freshExe string) string {
 
 // enddesign
 
-// design: go-start-init  implements: req-engine-vehicle-overlay.3, req-vendor-workspace.2, req-vendor-workspace.1, req-scaffold-modern, req-vehicle-drives-stub.1
+// design: go-start-init  implements: req-engine-vehicle-overlay.3, req-vendor-workspace.2, req-vendor-workspace.1, req-scaffold-modern, req-vehicle-drives-stub.1, req-vehicle-module-setup
 // `quack start init <target>` is run FROM a quackitect checkout and sets up a NEW vehicle at <target>
 // in the CURRENT world (adr-no-quack-data-home, adr-entry-chain, adr-ratchet-stamp):
 // it vendors the engine (product/ -> tools/vendor/, stamp included), writes spec/project.toml as the
@@ -910,7 +916,7 @@ The single source of the harness instructions is AGENTS.md at the repository roo
 `
 
 // vehicleTomlTmpl is the root marker `start init` writes ({{PROJ}} substituted).
-const vehicleTomlTmpl = "# the workspace root marker + iteration breadcrumb (adr-no-quack-data-home).\noverlay = \"product/{{PROJ}}\"\n[iteration]\ntype    = \"default\"\nrigor   = \"systematic\"\nversion = \"\"\nedges = \"connections\"\n"
+const vehicleTomlTmpl = "# the workspace root marker + iteration breadcrumb (adr-no-quack-data-home).\noverlay = \"product/{{PROJ}}\"\n[workspace]\nid = \"{{PROJ}}\"\ndefault_module = \"default\"\n[modules.default]\ntitle = \"{{PROJ}}\"\nkind = \"local\"\npath = \"product/{{PROJ}}\"\n[iteration]\ntype    = \"default\"\nrigor   = \"systematic\"\nversion = \"\"\nedges = \"connections\"\n"
 
 // initVehicleFiles is the silent emission core (selftest-drivable); cmdStartInit wraps it with guidance.
 func initVehicleFiles(target string) error {

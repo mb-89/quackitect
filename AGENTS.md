@@ -94,6 +94,11 @@ a short announced sleep). Never hold the conversation behind a silent multi-minu
   is half-done; bake the pattern into the prompts/methods/templates. A baked rule that CAN be
   enforced mechanically climbs further: it becomes ENGINE behavior (test-first), and the prompt
   keeps only what genuinely needs judgment. Ask at every baked rule: "could `quack` enforce this?"
+- **No local shortcut rules.** Do not encode process behavior from a milestone number, iteration id,
+  check id, file name, or today-only circumstance. If behavior needs classification, use durable
+  metadata (`killer`, `class`, `verify`, schema fields), or add that metadata to the source template
+  and current nodes. A local exception that seems useful belongs first in the design input, then in a
+  general rule or engine check.
 - **After ANY content change, `quack build` before `status`/`report`.** Engine `.go`, mints,
   evidence docs, method prose — every content edit moves hashes and the build re-baselines the
   golden root; skipping it flashes every verification green as red.

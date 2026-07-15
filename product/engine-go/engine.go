@@ -271,12 +271,16 @@ func scanCodeDesigns() map[string]Node {
 	return scanDesignsUnder(filepath.Join(ROOT, "product"))
 }
 
+// design: go-node-module-default  implements: req-node-module
+// Loading assigns every graph node to a module. Historical nodes with no module frontmatter
+// inherit the workspace default module, so single-module workspaces keep working unchanged.
 // LoadAll walks spec/**/*.md plus the in-code design markers under product/.
 // It refuses a malformed graph first (strictGuard, go-strict-load) — batched
 // findings + nonzero exit instead of a silently-shrunk suspect cone.
 func LoadAll() map[string]Node {
 	strictGuard()
 	nodes := map[string]Node{}
+	cfg := readProjectConfig()
 	filepath.Walk(SPEC, func(path string, fi os.FileInfo, err error) error {
 		if err != nil || fi.IsDir() || !strings.HasSuffix(path, ".md") {
 			return nil
@@ -287,16 +291,23 @@ func LoadAll() map[string]Node {
 		if filepath.Base(path) == archiveName && loadArchiveNodes(path, nodes) {
 			return nil // a compacted iteration's container (go-compact)
 		}
-		if raw, e := os.ReadFile(path); e != nil || !nodeFence(raw) {
+		raw, e := os.ReadFile(path)
+		if e != nil || !nodeFence(raw) {
 			return nil // only recognized node candidates load — the guard checked exactly this set
 		}
-		n := ParseNode(path)
+		n := ParseNodeBytes(path, raw)
+		if n.Module == "" {
+			n.Module = cfg.moduleDefault()
+		}
 		if n.Statement != "" && !strings.HasPrefix(n.ID, "TASK-") && !strings.HasPrefix(n.ID, "MARK-") {
 			nodes[n.ID] = n
 		}
 		return nil
 	})
 	for id, d := range scanCodeDesigns() {
+		if d.Module == "" {
+			d.Module = cfg.moduleDefault()
+		}
 		nodes[id] = d
 	}
 	// design: go-conn-lane-root  implements: req-connections-lanes.7
@@ -315,6 +326,7 @@ func LoadAll() map[string]Node {
 			}
 			id := "con-lane-" + kd.Name()
 			nodes[id] = Node{ID: id, Type: "connection", Class: "review",
+				Module:    cfg.moduleDefault(),
 				Statement: "the " + kd.Name() + " bulk lane (edges.jsonl)",
 				Path:      jp, RegionBody: strings.ReplaceAll(string(raw), "\r\n", "\n")}
 		}
@@ -326,6 +338,8 @@ func LoadAll() map[string]Node {
 	}
 	return nodes
 }
+
+// enddesign
 
 // scanDesignsUnder walks one base dir for marked design regions and returns them keyed by id.
 // It sits outside every region by constraint: its string literals spell the closing marker,

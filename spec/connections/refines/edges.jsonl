@@ -301,3 +301,15 @@
 {"src":"req-battery-parallel","dst":"uc-battery-trust"}
 {"src":"req-voice-lint","dst":"uc-authoring-guard"}
 {"src":"req-recital-chain","dst":"uc-authoring-guard"}
+{"src":"uc-module-scoped-views","dst":"need-module-ownership"}
+{"src":"uc-module-import-update","dst":"need-vehicle-independence"}
+{"src":"uc-vehicle-se-doc","dst":"need-vehicle-independence"}
+{"src":"uc-module-nesting","dst":"need-module-ownership"}
+{"src":"req-module-registry","dst":"uc-module-scoped-views"}
+{"src":"req-module-dotted-ids","dst":"uc-module-nesting"}
+{"src":"req-node-module","dst":"uc-module-scoped-views"}
+{"src":"req-module-filter-first","dst":"uc-module-scoped-views"}
+{"src":"req-module-command-selector","dst":"uc-module-scoped-views"}
+{"src":"req-module-import","dst":"uc-module-import-update"}
+{"src":"req-module-update","dst":"uc-module-import-update"}
+{"src":"req-vehicle-module-setup","dst":"uc-vehicle-se-doc"}

@@ -109,6 +109,19 @@ func registerCmd(name string, fn func([]string)) { registeredCmds[name] = fn }
 // idCmds take an id positionally; a '-'-prefixed value there is an error (not a flag).
 var idCmds = map[string]bool{"why": true, "bless": true, "start": true, "verify": true, "status": true}
 var okFlags = map[string]bool{"--all": true, "--plan": true, "--by": true}
+var selectedModule string
+
+func selectModuleArg(args []string, cfg Config) (string, []string) {
+	if len(args) == 0 || len(cfg.Modules) <= 1 {
+		return "", args
+	}
+	if _, ok := cfg.Modules[args[0]]; ok {
+		return args[0], args[1:]
+	}
+	return "", args
+}
+
+func moduleSelected(n Node) bool { return moduleMatches(n.Module, selectedModule) }
 
 // badIDArg returns the offending arg if a command that expects an id got a '-'-prefixed one.
 func badIDArg(cmd string, rest []string) (string, bool) {
@@ -121,12 +134,20 @@ func badIDArg(cmd string, rest []string) (string, bool) {
 	return "", false
 }
 
+// design: go-module-command-selector  implements: req-module-command-selector
+// A leading module id selects that module subtree for module-aware commands. Single-module
+// workspaces hide the feature by leaving the command line unchanged.
 // design: go-cli-help  implements: req-go-port.4
 // One command surface with a shared help preamble. Every subcommand answers -h, --help,
 // and -? with usage and NO side effect, and an id that starts with '-' is rejected — the
 // structural fix for 'quack start --help' once activating a stray version named '--help'.
 func Dispatch(args []string) {
 	if len(args) == 0 || helpRequested(args) {
+		fmt.Println(usageText())
+		return
+	}
+	selectedModule, args = selectModuleArg(args, readProjectConfig())
+	if len(args) == 0 {
 		fmt.Println(usageText())
 		return
 	}
@@ -167,6 +188,8 @@ func Dispatch(args []string) {
 		cmdDecisions(rest)
 	case "mint":
 		cmdMint(rest)
+	case "module":
+		cmdModule(rest)
 	case "cluster":
 		cmdCluster(rest)
 	case "status":
@@ -317,7 +340,7 @@ func cmdStatus(rest []string) {
 	type row struct{ id, st, cls string }
 	var gates []row
 	for id, n := range nodes {
-		if sm[id] != "CONTENT" {
+		if sm[id] != "CONTENT" && moduleSelected(n) {
 			gates = append(gates, row{id, sm[id], n.Class})
 		}
 	}

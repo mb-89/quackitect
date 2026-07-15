@@ -29,6 +29,7 @@ Derived coverage rules (used as `verify: coverage:<rule>` on executed subtasks):
 ---
 id: uc-x
 type: usecase | requirement | test | adr | need
+module: <module-id>       # optional; missing means the workspace default module
 refines:  [need-y]        # usecase; (requirement uses refines: [uc-…])
 verifies: [req-…]         # test only
 addresses:[req-…]         # adr only
@@ -41,6 +42,12 @@ killer: true|false
 ## Rationale (not load-bearing)
 ```
 Trace nodes are **content** — never blessed, never DONE/OPEN; they only ripple SUSPECT downstream.
+
+## Modules
+Modules are ownership and filter scopes inside one workspace timeline. They do not create separate
+iterations or ledgers. Dotted ids roll up in views: selecting `doc` includes `doc.*`, while selecting
+`doc.review` selects that child only. In multi-module workspaces, every derived table filters by
+module first, then by need. In single-module workspaces, module controls stay hidden.
 
 ## Gate/subtask frontmatter — in `spec/iterations/<iter>/tasks/` — NO `type:` field
 ```

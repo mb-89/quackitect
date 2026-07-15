@@ -272,13 +272,31 @@ func (d pagerData) ready() bool {
 	return d.subTotal > 0 && d.subDone == d.subTotal && d.suspectUp == 0 && d.evidence
 }
 
+func userAdjudicated(n Node) bool {
+	return isGate(n) && n.Class != "executed" && n.Killer
+}
+
+func reviewEvidenceReady(id string, n Node) bool {
+	if strings.HasSuffix(id, "-gate") {
+		return true
+	}
+	if nodeBodySectionRaw(n.Path, "Handoff Evidence") != "" {
+		return true
+	}
+	if n.Milestone > 0 {
+		if m, _ := filepath.Glob(filepath.Join(SPEC, "iterations", iterOf(n.Path), fmt.Sprintf("M%d-*.md", n.Milestone))); len(m) > 0 {
+			return true
+		}
+	}
+	return false
+}
+
 // design: go-pager-merge  implements: req-pager-merge
 // Merge the HAND-OFF, never the nodes (adr-pager-handoff; order
-// is not dependency): when EVERY undone dependency of a milestone gate is a READY KILLER subtask
-// — i.e. no agent-blessable work remains between the user and the gate — the pager for the gate or
-// any of those killers presents them ALL as one hand-off. One y blesses the group (each bless
-// recorded individually); a split answer stays possible. The substance checks and the review gate
-// remain separate records; only the ceremony is merged.
+// is not dependency): when every undone dependency of a milestone gate is a ready review gate,
+// the pager for the gate or any of those ready rows presents them all as one hand-off. One y
+// blesses the group (each bless recorded individually); a split answer stays possible. The
+// substance checks and the review gate remain separate records; only the ceremony is merged.
 func pagerGroup(id string, nodes map[string]Node, sm map[string]string) ([]string, string) {
 	n, ok := nodes[id]
 	if !ok {
@@ -297,27 +315,36 @@ func pagerGroup(id string, nodes map[string]Node, sm map[string]string) ([]strin
 	if gate == "" || sm[gate] == "DONE" {
 		return nil, ""
 	}
-	var killers []string
+	var ready []string
 	for _, d := range parents(nodes[gate]) {
 		c, ok := nodes[d]
 		if !ok || !isGate(c) || sm[d] == "DONE" {
 			continue
 		}
-		if !c.Killer || c.Class == "executed" || strings.HasSuffix(d, "-gate") {
-			return nil, "" // non-killer (or computed) work still open — nothing to merge yet
+		if c.Class == "executed" || strings.HasSuffix(d, "-gate") || !userAdjudicated(c) {
+			return nil, "" // deterministic or agent-lane work still open - no user batch yet
 		}
+		if !reviewEvidenceReady(d, c) {
+			return nil, "" // a user-owned review still needs agent evidence before hand-off
+		}
+		upstreamGates := 0
 		for _, u := range parents(c) {
 			if uc, ok := nodes[u]; ok && isGate(uc) && sm[u] != "DONE" {
 				return nil, "" // a killer not ready yet — the group is not complete
+			} else if ok && isGate(uc) {
+				upstreamGates++
 			}
 		}
-		killers = append(killers, d)
+		if upstreamGates == 0 {
+			return nil, "" // a loose open row is not ready for a combined hand-off
+		}
+		ready = append(ready, d)
 	}
-	if len(killers) == 0 {
+	if len(ready) == 0 {
 		return nil, ""
 	}
-	sort.Strings(killers)
-	return killers, gate
+	sort.Strings(ready)
+	return ready, gate
 }
 
 // enddesign
@@ -358,6 +385,13 @@ func HandoverPager(gateID, iter string, nodes map[string]Node, sm map[string]str
 	return render(box(pagerLines(gateID, iter, nodes, sm, cfg)), tty)
 }
 
+func mergedPagerGate(id string, nodes map[string]Node, sm map[string]string) string {
+	if ks, g := pagerGroup(id, nodes, sm); len(ks) > 0 && g != "" {
+		return g
+	}
+	return id
+}
+
 // pagerLines builds the pager CONTENT — the console boxes it, and a mobile ask carries
 // the SAME lines as its one-pager body (the phone gets the full card).
 func pagerLines(gateID, iter string, nodes map[string]Node, sm map[string]string, cfg Config) []string {
@@ -383,7 +417,13 @@ func pagerLines(gateID, iter string, nodes map[string]Node, sm map[string]string
 
 	var L []string
 	L = append(L, barLines(iter, cells, focus, doneMs)...)
-	L = append(L, "", "🏁 HANDOVER  "+gateID)
+	handoffTitle := milestoneDisplayTitle(iter, nodes[gateID].Milestone, nodes)
+	L = append(L, "", "🏁 HANDOVER  "+handoffTitle)
+	if stmt := strings.TrimSpace(nodes[gateID].Statement); stmt != "" {
+		L = append(L, "   check: "+gateID+" — "+stmt)
+	} else {
+		L = append(L, "   check: "+gateID)
+	}
 	if merged != "" {
 		L = append(L, merged)
 	}
@@ -519,6 +559,14 @@ func cmdProgress(rest []string) {
 		// the phone ask's body (askComposeBody).
 		if _, ok := nodes[g]; !ok {
 			fmt.Println("no such gate: " + g)
+			return
+		}
+		if !userAdjudicated(nodes[g]) {
+			fmt.Println("handoff refused: " + g + " is agent-fillable or deterministic; fill it before asking the user")
+			return
+		}
+		if !reviewEvidenceReady(g, nodes[g]) {
+			fmt.Println("handoff refused: " + g + " has no review evidence yet")
 			return
 		}
 		out := filepath.Join(dataDirFor("out"), "handoff-"+g+".html")

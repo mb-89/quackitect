@@ -42,6 +42,38 @@ cd <path-to-new-vehicle>
 ```
 Set `[iteration].version` in `spec/project.toml`, then `.\<proj> start <version>` and compose your spec.
 
+## Modules inside a vehicle
+A workspace may declare modules in `spec/project.toml`. Modules share one iteration, one ledger,
+one report, and one book. They scope ownership and filtering only. A dotted id is a view rollup:
+selecting `doc` includes `doc.*`; selecting `doc.review` selects that child only.
+
+```toml
+[workspace]
+id = "myproj"
+default_module = "doc"
+
+[modules.se]
+title = "Systematic engineering"
+kind = "imported"
+path = "modules/se"
+from = "../quackitect"
+
+[modules.doc]
+title = "Documentation"
+kind = "local"
+path = "modules/doc"
+
+[modules.doc.review]
+title = "Document review"
+kind = "local"
+path = "modules/doc/review"
+parent = "doc"
+```
+
+Use `module import <id> --from <path> --dry` to preview an imported module. Use
+`module update <id> --dry` to refresh from recorded provenance. The command reports create,
+write, delete, and provenance operations and leaves module overlays untouched.
+
 ## One-time setup — by hand (if you can't run `start init`)
 1. **Vendor** quackitect's `product/` into the vehicle's `tools/vendor/` (engine-go + quackitect/).
    `quack ship` produces a zip of `product/`; unzip it into `tools/vendor/`.
@@ -50,6 +82,15 @@ Set `[iteration].version` in `spec/project.toml`, then `.\<proj> start <version>
    `go.mod` is in that dir; building from the repo root fails with "cannot find main module".
 3. **Configure** `spec/project.toml` (it is also the workspace root marker):
    ```toml
+  [workspace]
+  id = "myproj"
+  default_module = "default"
+
+  [modules.default]
+  title = "myproj"
+  kind = "local"
+  path = "product/myproj"
+
    [iteration]
    type    = "default"
    rigor   = "systematic"
@@ -78,8 +119,7 @@ The engine reads `product/brand/<asset>` first and **falls back** to its generic
 **Your NAME (the white-label identity, i19):** the book's title, wordmark, and self-referential
 voice come from your workspace — in order: `product/brand/name.txt` (one line, your product's
 name), else the `overlay` key's `product/<name>` in spec/project.toml, else the workspace folder
-name. The engine appears only as CREDIT (the colophon: "engine: quackitect <version>") — your
-book presents YOU. Mentions of quackitect in method prose stay legal; only identity is yours.
+name. Your book presents YOU. Mentions of quackitect in method prose stay legal; only identity is yours.
 
 ## Run
 `quack status | next | start | bless | note | gather | report | lint | ship | build | selftest` — all

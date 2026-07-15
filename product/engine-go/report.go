@@ -444,6 +444,18 @@ func milestoneOf(n Node) (int, bool) {
 // nest beneath it. A parent (e.g. a generic "build" task) groups its planned steps; leaves
 // render flat. Trace nodes (tests, etc.) are content and never appear here — only gates.
 func renderSubs(ids []string, nodes map[string]Node, sm map[string]string) string {
+	return renderSubsMarked(ids, nodes, sm, nil)
+}
+
+func renderSubsCurrent(ids []string, nodes map[string]Node, sm map[string]string, currentID string) string {
+	marked := map[string]bool{}
+	if currentID != "" {
+		marked[currentID] = true
+	}
+	return renderSubsMarked(ids, nodes, sm, marked)
+}
+
+func renderSubsMarked(ids []string, nodes map[string]Node, sm map[string]string, marked map[string]bool) string {
 	set := map[string]bool{}
 	for _, id := range ids {
 		set[id] = true
@@ -501,6 +513,9 @@ func renderSubs(ids []string, nodes map[string]Node, sm map[string]string) strin
 		if strings.HasPrefix(nodes[id].Verify, "coverage:") {
 			auto = " <span class=\"auto\" title=\"derived from the trace\">auto</span>"
 		}
+		if marked[id] {
+			auto += " <span class=\"auto current\" title=\"this page blesses this check\">this page</span>"
+		}
 		row := mark(sm[id]) + "<span class=\"rid\">" + esc(id) + "</span>" + auto
 		ks := kids[id]
 		if len(ks) > 0 {
@@ -529,6 +544,30 @@ func milestoneGate(members []string, ms int) string {
 		}
 	}
 	return ""
+}
+
+func milestoneDisplayTitle(iter string, ms int, nodes map[string]Node) string {
+	if ms <= 0 {
+		return "standalone"
+	}
+	label := "M" + strconv.Itoa(ms)
+	for id, n := range nodes {
+		if n.Milestone != ms || iterOf(n.Path) != iter || !strings.HasSuffix(id, "-gate") {
+			continue
+		}
+		title := strings.TrimSpace(n.Statement)
+		for _, suffix := range []string{" reviewed and adjudicated.", " reviewed and adjudicated"} {
+			title = strings.TrimSuffix(title, suffix)
+		}
+		if title == "" {
+			return label
+		}
+		if strings.HasPrefix(title, label) {
+			return title
+		}
+		return label + " " + title
+	}
+	return label
 }
 
 func iterationsPanel(nodes map[string]Node, sm map[string]string, iters map[string][]string, cfg Config) string {
@@ -616,8 +655,8 @@ func iterationsPanel(nodes map[string]Node, sm map[string]string, iters map[stri
 			if len(subs) > 0 {
 				openAttr = " open"
 			}
-			b.WriteString(fmt.Sprintf("<details class=\"ms%s\"><summary%s>%s<span class=\"mstag\">M%d</span><span class=\"mscount\">%d/%d</span></summary><div class=\"kids\">%s</div></details>",
-				openAttr, attr, gmark, ms, d, len(subs), body))
+			b.WriteString(fmt.Sprintf("<details class=\"ms%s\"><summary%s>%s<span class=\"mstag\">%s</span><span class=\"mscount\">%d/%d</span></summary><div class=\"kids\">%s</div></details>",
+				openAttr, attr, gmark, esc(milestoneDisplayTitle(it, ms, nodes)), d, len(subs), body))
 		}
 		if len(loose) > 0 {
 			b.WriteString("<div class=\"kids nolane\">" + renderSubs(loose, nodes, sm) + "</div>")
@@ -979,21 +1018,9 @@ func selLetter(v string) string {
 // nodeBodySection returns the paragraphs of one `## <title>` section of a node's
 // body — the authored prose a decision card shows (e.g. the Options block).
 func nodeBodySection(path, title string) []string {
-	raw, err := os.ReadFile(path)
-	if err != nil {
+	body := nodeBodySectionRaw(path, title)
+	if body == "" {
 		return nil
-	}
-	text := strings.ReplaceAll(string(raw), "\r\n", "\n")
-	parts := strings.SplitN(text, "\n## "+title, 2)
-	if len(parts) < 2 {
-		return nil
-	}
-	body := parts[1]
-	if i := strings.Index(body, "\n## "); i >= 0 {
-		body = body[:i]
-	}
-	if i := strings.Index(body, "\n"); i >= 0 {
-		body = body[i+1:]
 	}
 	var out []string
 	for _, p := range strings.Split(body, "\n\n") {
@@ -1003,6 +1030,69 @@ func nodeBodySection(path, title string) []string {
 		}
 	}
 	return out
+}
+
+func nodeBodySectionRaw(path, title string) string {
+	raw, err := os.ReadFile(path)
+	if err != nil {
+		return ""
+	}
+	text := strings.ReplaceAll(string(raw), "\r\n", "\n")
+	parts := strings.SplitN(text, "\n## "+title, 2)
+	if len(parts) < 2 {
+		return ""
+	}
+	body := parts[1]
+	if i := strings.Index(body, "\n## "); i >= 0 {
+		body = body[:i]
+	}
+	if i := strings.Index(body, "\n"); i >= 0 {
+		body = body[i+1:]
+	}
+	return strings.TrimSpace(body)
+}
+
+var handoffMermaidFenceRe = regexp.MustCompile("(?s)```mermaid[ \t]*\n(.*?)```")
+
+func handoffEvidenceHTML(body string, nodes map[string]Node) string {
+	body = strings.ReplaceAll(body, "\r\n", "\n")
+	var out strings.Builder
+	writeSegment := func(seg string) {
+		var buf []string
+		flush := func() {
+			if strings.TrimSpace(strings.Join(buf, "\n")) != "" {
+				out.WriteString(mdLite(strings.Join(buf, "\n")))
+			}
+			buf = nil
+		}
+		for _, line := range strings.Split(seg, "\n") {
+			if m := figRefRe.FindStringSubmatch(strings.TrimSpace(line)); m != nil {
+				flush()
+				out.WriteString(`<figure data-layer="figure">` + renderFigure(m[1], nodes) + `</figure>` + "\n")
+				continue
+			}
+			buf = append(buf, line)
+		}
+		flush()
+	}
+	last := 0
+	for _, m := range handoffMermaidFenceRe.FindAllStringSubmatchIndex(body, -1) {
+		if seg := body[last:m[0]]; strings.TrimSpace(seg) != "" {
+			writeSegment(seg)
+		}
+		src := body[m[2]:m[3]]
+		g, lint := extractModelGraph(src)
+		if len(lint) == 0 && len(g.Elems) > 0 {
+			out.WriteString(`<div class="handoff-model">` + svgModelGraph(g) + `</div>` + "\n")
+		} else {
+			out.WriteString("<pre><code>" + esc(src) + "</code></pre>\n")
+		}
+		last = m[1]
+	}
+	if seg := body[last:]; strings.TrimSpace(seg) != "" {
+		writeSegment(seg)
+	}
+	return out.String()
 }
 
 // handoffAccepts computes what a y on the gate's page records: every red
@@ -1071,13 +1161,33 @@ func renderHandoffHTML(gateID string, nodes map[string]Node, sm map[string]strin
 	if !ok {
 		return ""
 	}
+	it := iterOf(gate.Path)
+	milestoneTitle := milestoneDisplayTitle(it, gate.Milestone, nodes)
+	groupLabel := gateID
+	markedTasks := map[string]bool{gateID: true}
+	if group, mergedGate := pagerGroup(gateID, nodes, sm); len(group) > 0 && mergedGate != "" {
+		markedTasks[mergedGate] = true
+		others := 0
+		if mergedGate != gateID {
+			others++
+		}
+		for _, id := range group {
+			markedTasks[id] = true
+			if id != gateID {
+				others++
+			}
+		}
+		if others > 0 {
+			groupLabel = gateID + " + " + strconv.Itoa(others) + " others"
+		}
+	}
 	// the cone: the material the bless accepts (shared with handoffAccepts)
 	member := handoffCone(gate, nodes)
 	schemas := loadFieldSchemas(schemaConfigDir())
 	var b strings.Builder
 	b.WriteString(`<!doctype html><html><head><meta charset="utf-8">` +
 		`<meta name="viewport" content="width=device-width, initial-scale=1">` +
-		`<title>` + esc(gateID) + ` — hand-off</title><style>` + handoffCSS + `</style></head><body>`)
+		`<title>` + esc(milestoneTitle) + ` — hand-off</title><style>` + handoffCSS + `</style></head><body>`)
 
 	// classify every cone row once: schema match, fields, computed color
 	type hoffRow struct {
@@ -1256,14 +1366,13 @@ func renderHandoffHTML(gateID string, nodes map[string]Node, sm map[string]strin
 		bluf = "recommend hold — " + strconv.Itoa(len(blockers)) + " decisions are open"
 	}
 	b.WriteString(`<div class="hcard">`)
-	b.WriteString(`<header class="hh"><p class="hg">` + esc(gateID) + `</p><h1>` + esc(gate.Statement) + `</h1>` +
+	b.WriteString(`<header class="hh"><p class="hg">` + esc(groupLabel) + `</p><h1>` + esc(milestoneTitle) + `</h1>` +
 		`<p class="bluf"><span class="ag">agent</span>` + esc(bluf) + `</p></header>`)
 	// the tasks panel data: every check of the iteration, milestone-grouped
-	it := iterOf(gate.Path)
 	var taskIDs []string
 	tasksDone := 0
 	for id, n := range nodes {
-		if id != gateID && iterOf(n.Path) == it && isGate(n) {
+		if iterOf(n.Path) == it && isGate(n) {
 			taskIDs = append(taskIDs, id)
 			if sm[id] == "DONE" {
 				tasksDone++
@@ -1272,20 +1381,25 @@ func renderHandoffHTML(gateID string, nodes map[string]Node, sm map[string]strin
 	}
 	sort.Strings(taskIDs)
 
-	// a MILESTONE gate carries its evidence doc on the page (owner ruling):
-	// one expandable section per `##` heading, markdown rendered
-	var verdictSecs [][2]string
+	// Opt-in evidence rides the handoff when the check asks for it. Milestone gates
+	// also carry the whole milestone verdict.
+	var evidenceSecs, verdictSecs [][2]string
+	if raw := nodeBodySectionRaw(gate.Path, "Handoff Evidence"); raw != "" {
+		evidenceSecs = append(evidenceSecs, [2]string{"Evidence", handoffEvidenceHTML(raw, nodes)})
+	}
 	if gate.Milestone > 0 {
 		pat := filepath.Join(SPEC, "iterations", it, fmt.Sprintf("M%d-*.md", gate.Milestone))
 		if ms, _ := filepath.Glob(pat); len(ms) > 0 {
 			if raw, err := os.ReadFile(ms[0]); err == nil {
 				for _, p := range strings.Split("\n"+strings.ReplaceAll(string(raw), "\r\n", "\n"), "\n## ")[1:] {
 					lines := strings.SplitN(p, "\n", 2)
+					title := strings.TrimSpace(lines[0])
 					body := ""
 					if len(lines) > 1 {
 						body = lines[1]
 					}
-					verdictSecs = append(verdictSecs, [2]string{strings.TrimSpace(lines[0]), mdLiteBlocks(body)})
+					sec := [2]string{title, handoffEvidenceHTML(body, nodes)}
+					verdictSecs = append(verdictSecs, sec)
 				}
 			}
 		}
@@ -1297,6 +1411,9 @@ func renderHandoffHTML(gateID string, nodes map[string]Node, sm map[string]strin
 	if len(doneRows) > 0 {
 		b.WriteString(`<button class="sline" data-view="done"><span class="regdot reg-green-user"></span><span class="n">` +
 			strconv.Itoa(len(doneRows)) + `</span>&nbsp;decided already<span class="chev">›</span></button>`)
+	}
+	if len(evidenceSecs) > 0 {
+		b.WriteString(`<button class="sline" data-view="evidence"><span class="regdot reg-none"></span>evidence<span class="chev">›</span></button>`)
 	}
 	if len(verdictSecs) > 0 {
 		b.WriteString(`<button class="sline" data-view="verdict"><span class="regdot reg-none"></span>milestone verdict<span class="chev">›</span></button>`)
@@ -1354,6 +1471,14 @@ func renderHandoffHTML(gateID string, nodes map[string]Node, sm map[string]strin
 		}
 		b.WriteString(`</section>`)
 	}
+	if len(evidenceSecs) > 0 {
+		b.WriteString(`<section class="view" id="view-evidence"><p class="vlead">Evidence for this handoff.</p>`)
+		for _, s := range evidenceSecs {
+			b.WriteString(`<details class="hrow" open><summary><span class="hstmt">` + esc(s[0]) + `</span></summary>` +
+				`<div class="vmd">` + s[1] + `</div></details>`)
+		}
+		b.WriteString(`</section>`)
+	}
 	if len(verdictSecs) > 0 {
 		b.WriteString(`<section class="view" id="view-verdict"><p class="vlead">The milestone's evidence, one section per heading.</p>`)
 		for _, s := range verdictSecs {
@@ -1365,7 +1490,7 @@ func renderHandoffHTML(gateID string, nodes map[string]Node, sm map[string]strin
 	// the tasks panel: the report's own tree, milestone-grouped, current one open —
 	// the auditor sees where the iteration stands (owner ruling)
 	if len(taskIDs) > 0 {
-		b.WriteString(`<section class="view" id="view-tasks"><p class="vlead">Where the iteration stands. Bless changes only this gate.</p>`)
+		b.WriteString(`<section class="view" id="view-tasks">`)
 		byMS := map[int][]string{}
 		for _, id := range taskIDs {
 			byMS[nodes[id].Milestone] = append(byMS[nodes[id].Milestone], id)
@@ -1382,17 +1507,14 @@ func renderHandoffHTML(gateID string, nodes map[string]Node, sm map[string]strin
 					done++
 				}
 			}
-			label := "M" + strconv.Itoa(ms)
-			if ms == 0 {
-				label = "standalone"
-			}
+			label := milestoneDisplayTitle(it, ms, nodes)
 			open := ""
 			if ms == gate.Milestone {
 				open = " open"
 			}
 			b.WriteString(`<details class="hrow"` + open + `><summary><span class="hid">` + label + `</span>` +
 				`<span class="hstmt">` + strconv.Itoa(done) + ` / ` + strconv.Itoa(len(byMS[ms])) + ` done</span></summary>` +
-				`<div class="ttree">` + renderSubs(byMS[ms], nodes, sm) + `</div></details>`)
+				`<div class="ttree">` + renderSubsMarked(byMS[ms], nodes, sm, markedTasks) + `</div></details>`)
 		}
 		b.WriteString(`</section>`)
 	}
@@ -1417,6 +1539,7 @@ body{margin:0;font:15px/1.4 system-ui,sans-serif;color:#1e1e1e;background:#dfe2e
 .hh{background:#fff;padding:8px 12px 6px}
 .hg{margin:0;font-family:ui-monospace,Consolas,monospace;font-size:11px;color:#777}
 h1{margin:2px 0 4px;font-size:15px;line-height:1.3;overflow-wrap:anywhere}
+.hsub{margin:0 0 4px;font-size:12px;color:#555;line-height:1.25;overflow-wrap:anywhere}
 .bluf{margin:0;font-size:12px;color:#333;display:flex;gap:6px;align-items:center}
 .ag{font-size:10px;font-weight:700;letter-spacing:.4px;color:#14531f;background:repeating-linear-gradient(135deg,#d9efdc 0 4px,#fff 4px 7px);border:1px solid var(--grn);border-radius:4px;padding:1px 5px;flex:none}
 .sum{display:flex;flex-direction:column;background:#fff;border-bottom:1px solid #ddd}
@@ -1468,6 +1591,7 @@ main{flex:1;min-height:0;display:flex}
 .vmd h1,.vmd h2,.vmd h3,.vmd h4{font-size:12px;margin:8px 0 4px}
 .vmd a{color:#2456b3;text-decoration:none;border-bottom:1px dotted #2456b3}
 .vmd code{font-family:ui-monospace,Consolas,monospace;font-size:11px;background:#f2f2f2;padding:0 3px;border-radius:3px}
+.vmd figure{margin:6px 0}.vmd .onion .oview[hidden]{display:none}.vmd .onion [data-onion-go]{cursor:pointer}.vmd .onion-flow{overflow-x:auto;max-width:100%}.vmd .onion-flow svg{display:block}.vmd .onion svg{cursor:grab;touch-action:none;max-width:100%}.vmd .onion [data-node-link],.vmd .onion .oblock,.vmd .onion .opill{cursor:pointer}.vmd .onion .osel>rect{stroke:#1b6fd6;stroke-width:2.6}.vmd .onion .oc-nb>rect{stroke:#1b6fd6;stroke-width:2}.vmd .onion .oc-on{stroke:#1b6fd6;stroke-width:2.6;opacity:1}
 .ttree{font-size:12px;padding:2px 0 8px 4px}
 .ttree .task{display:block;padding:3px 0;color:inherit;text-decoration:none;cursor:default}
 .ttree details.task{padding:0}
@@ -1499,6 +1623,34 @@ function dgo(fwd){
  for(i=0;i<cards.length;i++){cards[i].className=i===nx?'dcard on':'dcard';}
  var pos=document.getElementById('dpos');if(pos)pos.textContent=(nx+1)+' / '+cards.length;
 }
+var __onionStack=[];
+function __onionShow(host,t){Array.prototype.forEach.call(host.querySelectorAll('.oview'),function(v){v.hidden=true;});t.hidden=false;}
+function __onionClear(host){Array.prototype.forEach.call(host.querySelectorAll('.osel,.oc-nb,.oc-on'),function(x){x.classList.remove('osel','oc-nb','oc-on');});}
+function __onionInspect(g){var host=g.closest('.onion');if(!host)return;__onionClear(host);g.classList.add('osel');
+ var id=g.getAttribute('data-oc-id')||'';
+ Array.prototype.forEach.call(host.querySelectorAll('[data-oc-block="'+id+'"]'),function(l){l.classList.add('oc-on');});
+ Array.prototype.forEach.call(host.querySelectorAll('[data-oc-src],[data-oc-dst]'),function(l){
+	var s=l.getAttribute('data-oc-src'),d=l.getAttribute('data-oc-dst');if(s!==id&&d!==id)return;
+	l.classList.add('oc-on');var o=host.querySelector('[data-oc-id="'+(s===id?d:s)+'"]');if(o)o.classList.add('oc-nb');});}
+function __onionPill(g){var host=g.closest('.onion');if(!host)return;__onionClear(host);g.classList.add('osel');
+ var flow=g.getAttribute('data-oc-pill');
+ (g.getAttribute('data-oc-blocks')||'').split(',').forEach(function(id){if(!id)return;
+	var o=host.querySelector('[data-oc-id="'+id+'"]');if(o)o.classList.add('oc-nb');
+	Array.prototype.forEach.call(host.querySelectorAll('[data-oc-block="'+id+'"][data-oc-flow="'+flow+'"]'),function(l){l.classList.add('oc-on');});});}
+function __onionDrill(el){var t=document.getElementById(el.getAttribute('data-onion-go'));var host=el.closest('.onion');if(!t||!host)return;var cur=host.querySelector('.oview:not([hidden])');if(cur&&cur!==t){__onionStack.push({host:host,id:cur.id});}__onionShow(host,t);}
+document.querySelectorAll('.onion [data-onion-go]').forEach(function(el){var ev=el.hasAttribute('data-oc-id')?'dblclick':'click';el.addEventListener(ev,function(e){e.preventDefault();e.stopPropagation();__onionDrill(el);});});
+document.querySelectorAll('.onion [data-oc-id]').forEach(function(el){el.addEventListener('click',function(ev){ev.preventDefault();__onionInspect(el);});});
+document.querySelectorAll('.onion [data-oc-pill]').forEach(function(el){el.addEventListener('click',function(ev){ev.preventDefault();ev.stopPropagation();__onionPill(el);});});
+document.querySelectorAll('.onion svg').forEach(function(svg){
+ var vb=(svg.getAttribute('viewBox')||'0 0 380 360').split(/\s+/).map(Number);
+ var base=vb.slice(),st={x:vb[0],y:vb[1],w:vb[2],h:vb[3]},drag=null;
+ function apply(){svg.setAttribute('viewBox',st.x+' '+st.y+' '+st.w+' '+st.h);}
+ svg.addEventListener('wheel',function(e){e.preventDefault();var r=svg.getBoundingClientRect();if(!r.width)return;var mx=st.x+(e.clientX-r.left)/r.width*st.w,my=st.y+(e.clientY-r.top)/r.height*st.h,f=e.deltaY<0?0.85:1.18;st.w*=f;st.h*=f;st.x=mx-(e.clientX-r.left)/r.width*st.w;st.y=my-(e.clientY-r.top)/r.height*st.h;apply();},{passive:false});
+ svg.addEventListener('pointerdown',function(e){if(e.target.closest&&e.target.closest('[data-onion-go],[data-node-link],[data-oc-id],[data-oc-pill]'))return;drag={x:e.clientX,y:e.clientY,sx:st.x,sy:st.y};try{svg.setPointerCapture(e.pointerId);}catch(_){}svg.style.cursor='grabbing';});
+ svg.addEventListener('pointermove',function(e){if(!drag)return;var r=svg.getBoundingClientRect();if(!r.width)return;st.x=drag.sx-(e.clientX-drag.x)/r.width*st.w;st.y=drag.sy-(e.clientY-drag.y)/r.height*st.h;apply();});
+ svg.addEventListener('pointerup',function(){drag=null;svg.style.cursor='';});
+ svg.addEventListener('dblclick',function(){st.x=base[0];st.y=base[1];st.w=base[2];st.h=base[3];apply();});
+});
 document.addEventListener('click',function(e){
  var i;
  var tk=e.target.closest?e.target.closest('a.task'):null;
@@ -1506,10 +1658,11 @@ document.addEventListener('click',function(e){
  var t=e.target.closest?e.target.closest('button[data-bless]'):null;
  if(t){
   var note=document.getElementById('hnote');
+	t.disabled=true;if(note){note.textContent='recording…';}
   fetch('/handoff-answer',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},
    body:'gate='+encodeURIComponent(t.getAttribute('data-bless'))+'&verdict='+encodeURIComponent(t.getAttribute('data-verdict'))})
-   .then(function(r){if(note){note.textContent=r.ok?'recorded':'refused';}})
-   .catch(function(){if(note){note.textContent='';}});
+	 .then(function(r){if(note){note.textContent=r.ok?'recorded':'refused';}if(!r.ok){t.disabled=false;}})
+	 .catch(function(){if(note){note.textContent='';}t.disabled=false;});
   return;
  }
  /* a summary line switches the middle view */

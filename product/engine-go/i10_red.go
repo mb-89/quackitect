@@ -306,7 +306,7 @@ func selftestScaffoldModern() bool {
 
 // test-pager-merge -> selftest:pager-merge
 func selftestPagerMerge() bool {
-	iterPath := filepath.Join(SPEC, "iterations", "i0001_syn", "tasks", "x.md")
+	iterPath := filepath.Join(SPEC, "iterations", "i0023_modules", "tasks", "x.md")
 	nodes := map[string]Node{
 		"i1-m6-done-a": {ID: "i1-m6-done-a", Milestone: 6, Class: "review", Path: iterPath},
 		"i1-m6-killer": {ID: "i1-m6-killer", Milestone: 6, Class: "review", Killer: true, Path: iterPath, DependsOn: []string{"i1-m6-done-a"}},
@@ -337,7 +337,37 @@ func selftestPagerMerge() bool {
 	delete(nodes, "i1-m6-killer2")
 	delete(sm, "i1-m6-killer2")
 	nodes["i1-m6-gate"] = Node{ID: "i1-m6-gate", Milestone: 6, Class: "review", Killer: true, Path: iterPath, DependsOn: []string{"i1-m6-done-a", "i1-m6-killer"}}
-	out := HandoverPager("i1-m6-killer", "i0001_syn", nodes, sm, Config{}, false)
+	html := renderHandoffHTML("i1-m6-killer", nodes, sm)
+	if !strings.Contains(html, "i1-m6-killer") || !strings.Contains(html, "this page") {
+		return false // the HTML page keeps the clicked row visible and marks the bundle
+	}
+	nodes["i1-m6-review"] = Node{ID: "i1-m6-review", Milestone: 6, Class: "review", Path: iterPath, DependsOn: []string{"i1-m6-done-a"}}
+	nodes["i1-m6-gate"] = Node{ID: "i1-m6-gate", Milestone: 6, Class: "review", Killer: true, Path: iterPath, DependsOn: []string{"i1-m6-done-a", "i1-m6-killer", "i1-m6-review"}}
+	sm["i1-m6-review"] = "OPEN"
+	if ks, _ := pagerGroup("i1-m6-killer", nodes, sm); len(ks) != 0 {
+		return false // agent-fillable review work is not bundled into a user hand-off
+	}
+	delete(nodes, "i1-m6-review")
+	delete(sm, "i1-m6-review")
+	valPath := filepath.Join(SPEC, "iterations", "i0022_engine_laws", "tasks", "m7.md")
+	nodes["i1-m7-a"] = Node{ID: "i1-m7-a", Milestone: 7, Class: "review", Killer: true, Path: valPath, DependsOn: []string{"i1-m6-done-a"}}
+	nodes["i1-m7-b"] = Node{ID: "i1-m7-b", Milestone: 7, Class: "review", Path: valPath, DependsOn: []string{"i1-m6-done-a"}}
+	nodes["i1-m7-gate"] = Node{ID: "i1-m7-gate", Milestone: 7, Class: "review", Killer: true, Path: valPath, DependsOn: []string{"i1-m7-a", "i1-m7-b", "i1-m6-done-a"}}
+	sm["i1-m7-a"], sm["i1-m7-b"], sm["i1-m7-gate"] = "OPEN", "OPEN", "OPEN"
+	ks, g = pagerGroup("i1-m7-a", nodes, sm)
+	if len(ks) != 0 || g != "" {
+		return false // non-killer validation rows stay agent-fillable and block the user batch
+	}
+	nodes["i1-m7-b"] = Node{ID: "i1-m7-b", Milestone: 7, Class: "review", Killer: true, Path: valPath, DependsOn: []string{"i1-m6-done-a"}}
+	ks, g = pagerGroup("i1-m7-a", nodes, sm)
+	if len(ks) != 2 || g != "i1-m7-gate" {
+		return false // killer validation rows batch as the user-adjudicated lane
+	}
+	html = renderHandoffHTML("i1-m7-a", nodes, sm)
+	if !strings.Contains(html, "i1-m7-a + 2 others") || !strings.Contains(html, "i1-m7-b") {
+		return false
+	}
+	out := HandoverPager("i1-m6-killer", "i0023_modules", nodes, sm, Config{}, false)
 	return strings.Contains(out, "i1-m6-killer + i1-m6-gate") && strings.Contains(out, "y = all")
 }
 

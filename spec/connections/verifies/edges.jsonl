@@ -261,3 +261,11 @@
 {"src":"test-battery-parallel","dst":"req-battery-parallel"}
 {"src":"test-voice-lint","dst":"req-voice-lint"}
 {"src":"test-recital-chain","dst":"req-recital-chain"}
+{"src":"test-module-registry","dst":"req-module-registry"}
+{"src":"test-node-module-default","dst":"req-node-module"}
+{"src":"test-module-subtree-filter","dst":"req-module-dotted-ids"}
+{"src":"test-module-table-filter","dst":"req-module-filter-first"}
+{"src":"test-module-command-selector","dst":"req-module-command-selector"}
+{"src":"test-module-import","dst":"req-module-import"}
+{"src":"test-module-update","dst":"req-module-update"}
+{"src":"test-vehicle-module-setup","dst":"req-vehicle-module-setup"}

@@ -225,7 +225,7 @@ func sortStrings(s []string) {
 
 // enddesign
 
-// design: go-book-emitter  implements: req-book-artifact.1, req-manifest-render.2, req-book-artifact.3, req-reader-structure.1, req-book-trust.2, req-book-artifact.6, req-chapter-placement.3
+// design: go-book-emitter  implements: req-book-artifact.1, req-manifest-render.2, req-book-artifact.3, req-reader-structure.1, req-book-trust.2, req-book-artifact.6, req-chapter-placement.3, req-module-filter-first
 // The deterministic emitter core. Truth (nodes + manifests) renders to ONE self-contained HTML:
 // the project README opens the book as its own first chapter — the reader's starting point —
 // through the zero-dep renderReadme projection (headings, tables, lists, inline images);
@@ -2841,17 +2841,7 @@ func renderOnionOpt(nodes map[string]Node, rev *onionReview) string {
 	in := onionInput{layers: layers, inputs: inputs, outputs: outputs, model: model,
 		consumes: consumes, reads: reads, writes: writes, els: els, relOf: relOf,
 		themes: true, links: true}
-	out := renderOnionData(in, rev, nodes)
-	if model != nil && rev == nil {
-		// the onion IS the engine layer model's render: it carries the model's
-		// informed-by link list like every other architectural model figure. The
-		// standalone review projection drops it — the trailer's references need the
-		// full book's tooltip machinery, and the review is just the drill-down.
-		if raw, err := os.ReadFile(filepath.Join(SPEC, "models", "model-engine-layers.md")); err == nil {
-			out += renderModelInformed("model-engine-layers", string(raw), nodes)
-		}
-	}
-	return out
+	return renderOnionData(in, rev, nodes)
 }
 
 // renderOnionFromGraph renders ANY extracted layered model through the SAME
@@ -5065,6 +5055,21 @@ func baseResultHTML(rs []BaseResult, nodes map[string]Node, sm map[string]string
 			}
 			return needOf(row.ID)
 		}
+		cfg := readProjectConfig()
+		rowModule := func(row BaseRow) string {
+			if row.ID != "" {
+				if n, ok := nodes[row.ID]; ok && n.Module != "" {
+					return n.Module
+				}
+			}
+			return cfg.moduleDefault()
+		}
+		moduleCount := map[string]int{}
+		for _, fr := range frows {
+			if m := rowModule(fr.row); m != "" {
+				moduleCount[m]++
+			}
+		}
 		needCount := map[string]int{}
 		// rowDim: the facet would enumerate the rows themselves (every row IS its
 		// need) - a pill per row is a list, not a filter, so the facet is skipped.
@@ -5114,6 +5119,18 @@ func baseResultHTML(rs []BaseResult, nodes map[string]Node, sm map[string]string
 		// one). A pill facet per column of small distinct value set (the enumCols), plus a universal
 		// "need" facet (every trace item traces up to a need). Cap needs at ~16: beyond that it is
 		// one-per-item, not a filter.
+		if len(cfg.Modules) > 1 && len(moduleCount) >= 2 {
+			mods := []string{}
+			for k := range moduleCount {
+				mods = append(mods, k)
+			}
+			sortStrings(mods)
+			b.WriteString(`<div class="upills" data-facet="mod"><span class="pilllbl">module</span><button type="button" class="upill on" data-fv="*">all</button>`)
+			for _, m := range mods {
+				b.WriteString(` <button type="button" class="upill" data-fv="` + htmlEscape(m) + `">` + htmlEscape(m) + ` <span class="meta">(` + itoa(moduleCount[m]) + `)</span></button>`)
+			}
+			b.WriteString(`</div>`)
+		}
 		if !rowDim && len(needCount) >= 2 && len(needCount) <= 16 {
 			needs := []string{}
 			for k := range needCount {
@@ -5189,6 +5206,7 @@ func baseResultHTML(rs []BaseResult, nodes map[string]Node, sm map[string]string
 				if fr.gp != "" && fr.gp != "(none)" {
 					attr += ` data-gp="` + htmlEscape(fr.gp) + `"`
 				}
+				attr += ` data-mod="` + htmlEscape(rowModule(row)) + `"`
 				var txt strings.Builder
 				for _, c := range row.Cells {
 					txt.WriteString(strings.ToLower(c) + " ")
@@ -5348,7 +5366,7 @@ func renderFigure(kind string, nodes map[string]Node) string {
 	}
 	if kind == "models-table" {
 		// the structural-models section table: one row per declared model,
-		// figure + informed-by in the expand (go-model-render)
+		// figure in the expand (go-model-render)
 		return renderModelsTable(nodes)
 	}
 	if kind == "design-regions" {

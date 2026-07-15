@@ -189,8 +189,8 @@ func (g modelGraph) CanonicalHash() string {
 // (unlabeled arrows are useless). One figure line: `fig: model <id>`,
 // or bare `fig: model` for all models sorted. The structural-models SECTION renders
 // as the auto-generated table below (`fig: models-table`, the same table law as
-// every other derived view): one row per declared model, the figure and its derived
-// "informed by" link list (modelInformedBy below) inside the row expand.
+// every other derived view): one row per declared model, with the figure inside
+// the row expand.
 func renderModelFigure(arg string, nodes map[string]Node) string {
 	var ids []string
 	for id, n := range nodes {
@@ -212,18 +212,14 @@ func renderModelFigure(arg string, nodes map[string]Node) string {
 		g, _ := extractModelGraph(string(raw))
 		b.WriteString(`<section id="` + id + `" data-layer="informative"><p class="stmt"><strong>` + id + `</strong> — ` + n.Statement + "</p>\n")
 		b.WriteString(svgModelGraph(g))
-		src := string(raw)
-		if !strings.Contains(src, "stateDiagram-v2") && !strings.Contains(src, "sequenceDiagram") {
-			b.WriteString(renderModelInformed(id, src, nodes))
-		}
 		b.WriteString("</section>\n")
 	}
 	return b.String()
 }
 
 // renderModelsTable is the structural-models section body: one expandable row per
-// declared model node, sorted by id; the expand carries the extracted figure and
-// the informed-by links. An empty population says so honestly.
+// declared model node, sorted by id; the expand carries the extracted figure.
+// An empty population says so honestly.
 func renderModelsTable(nodes map[string]Node) string {
 	var ids []string
 	for id, n := range nodes {
@@ -257,12 +253,8 @@ func renderModelsTable(nodes map[string]Node) string {
 			b.WriteString(`<p class="stmt">` + htmlEscape(n.Statement) + `</p>`)
 		}
 		if raw, err := os.ReadFile(n.Path); err == nil {
-			src := string(raw)
-			g, _ := extractModelGraph(src)
+			g, _ := extractModelGraph(string(raw))
 			b.WriteString(svgModelGraph(g))
-			if !strings.Contains(src, "stateDiagram-v2") && !strings.Contains(src, "sequenceDiagram") {
-				b.WriteString(renderModelInformed(id, src, nodes))
-			}
 		}
 		b.WriteString(`<p class="meta">` + htmlEscape(id) + `</p></td></tr>` + "\n")
 	}

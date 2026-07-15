@@ -139,11 +139,8 @@
 {"src":"adr-iuwwmaa","dst":"req-metrics-removed"}
 {"src":"adr-install-not-zero-dep","dst":"uc-run-dep-free"}
 {"src":"adr-deck-anchor-fragment","dst":"req-deck-links"}
-{"src":"adr-deck-anchor-fragment","dst":"go-deck-anchors"}
 {"src":"adr-terms-source-glossary","dst":"req-terms-before-use"}
-{"src":"adr-terms-source-glossary","dst":"go-terms-order-lint"}
 {"src":"adr-white-label-hybrid","dst":"req-vehicle-white-label"}
-{"src":"adr-white-label-hybrid","dst":"go-white-label-identity"}
 {"src":"adr-ujav4ii","dst":"q-trace-graph-scaling"}
 {"src":"adr-ujav4ii","dst":"scrap"}
 {"src":"adr-shim-product-tools","dst":"req-go-port"}
@@ -155,7 +152,6 @@
 {"src":"adr-register-watch-answers","dst":"req-register-killer-guard"}
 {"src":"adr-register-watch-answers","dst":"go-register-answer"}
 {"src":"adr-seed-from-rigor-source","dst":"req-seed-skeleton"}
-{"src":"adr-seed-from-rigor-source","dst":"go-seed-skeleton"}
 {"src":"adr-provenance-in-node","dst":"req-register-colors"}
 {"src":"adr-provenance-in-node","dst":"req-mint-prefill"}
 {"src":"adr-provenance-in-node","dst":"go-provenance-block"}
@@ -174,3 +170,13 @@
 {"src":"adr-battery-run-shape","dst":"req-battery-progress"}
 {"src":"adr-battery-run-shape","dst":"req-battery-batch"}
 {"src":"adr-battery-run-shape","dst":"req-battery-parallel"}
+{"src":"adr-one-ledger-modules","dst":"req-module-registry"}
+{"src":"adr-one-ledger-modules","dst":"req-node-module"}
+{"src":"adr-dotted-module-ids","dst":"req-module-dotted-ids"}
+{"src":"adr-dotted-module-ids","dst":"req-module-command-selector"}
+{"src":"adr-module-import-manifest","dst":"req-module-import"}
+{"src":"adr-module-import-manifest","dst":"req-module-update"}
+{"src":"adr-module-filter-first","dst":"req-module-filter-first"}
+{"src":"adr-vehicle-se-doc","dst":"req-vehicle-module-setup"}
+{"src":"adr-module-views","dst":"model-module-architecture"}
+{"src":"adr-module-views","dst":"req-module-registry"}
