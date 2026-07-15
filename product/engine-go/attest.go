@@ -259,7 +259,7 @@ func attestRedeem(code, answer string) (string, error) {
 // One scope carve-out lives in attestGuard: `start stubs` and `start init` are workspace
 // CREATION, not ledger advancement — a fresh workspace cannot hold an attest session yet —
 // so those two subverbs bypass the gate while plain `start <version>` stays gated.
-var attestGatedCmds = map[string]bool{"next": true, "start": true, "bless": true, "ship": true, "observe-red": true, "migrate-actors": true, "ask": true, "await": true}
+var attestGatedCmds = map[string]bool{"next": true, "start": true, "bless": true, "ship": true, "observe-red": true, "migrate-actors": true, "ask": true, "await": true, "grant": true}
 
 func attestRequired(cmd string, interactive bool) bool {
 	return !interactive && attestGatedCmds[cmd]

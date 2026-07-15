@@ -109,9 +109,20 @@ func runSelftestCached(id, name, input string) bool {
 	announceRerun()
 	t0 := time.Now()
 	selftestCacheRuns++
-	pass := runSelftest(name)
+	pass, busyTripped := runSelftestTracked(name)
 	d := time.Since(t0)
 	announceSlow(id, d)
+	// the verdict-write guards (go-verdict-guard): a run that CONSUMED a vacuous busy answer
+	// never records, and a first green with no red record is withheld - both at the ONE write
+	// point. Depth-scoped: a nested probe's trip discards the nested frame, not its parent.
+	if busyTripped {
+		fmt.Fprintf(feedbackW, "verdict discarded: %s consulted a busy guard - nothing recorded\n", id)
+		return pass
+	}
+	if firstGreenWithheld(id, pass) {
+		fmt.Fprintf(feedbackW, "verdict withheld: %s is first-green with no red record - observe-red it (or mark tests_red exempt)\n", id)
+		return false
+	}
 	verdictRecord(id, input, pass, d)
 	return pass
 }

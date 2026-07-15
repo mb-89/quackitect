@@ -97,10 +97,16 @@ func cmdBless(args []string) {
 	events := attestEvents()
 	cur := attestLoad()
 	ts := time.Now().Format(time.RFC3339)
+	grants := liveGrantsFrom(events, time.Now()) // the standing-grant rule (go-grant-store)
 	for _, nid := range ids {
 		n, ok := nodes[nid]
 		if !ok || n.Class == "executed" || !isGate(n) {
 			continue
+		}
+		gid, refused := blessGrantCheck(n.Killer, actor, grants, nid)
+		if refused {
+			fmt.Fprintln(os.Stderr, "refused: "+nid+" is a killer gate and no live grant covers it - present the pager (`progress --pager "+nid+"`), or the owner records a grant (`grant open`)")
+			quackExit(5)
 		}
 		var prev *string
 		if s, ok := cur[nid]; ok {
@@ -114,7 +120,7 @@ func cmdBless(args []string) {
 			}
 		}
 		events = append(events, Event{Check: nid, Action: "bless", Actor: actor, FilledBy: filler,
-			TS: ts, Hash: fullHash(nid, nodes, memo), StatementHash: stmtHash(n), Deps: deps, PrevHash: prev})
+			TS: ts, Hash: fullHash(nid, nodes, memo), StatementHash: stmtHash(n), Deps: deps, PrevHash: prev, Grant: gid})
 	}
 	saveEvents(events)
 	fmt.Println("blessed", target)

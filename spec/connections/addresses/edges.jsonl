@@ -164,3 +164,13 @@
 {"src":"adr-handoff-html","dst":"req-register-ask"}
 {"src":"adr-handoff-html","dst":"go-register-render"}
 {"src":"adr-handoff-html","dst":"go-register-answer"}
+{"src":"adr-guard-dispatch-layer","dst":"req-selftest-gate"}
+{"src":"adr-guard-dispatch-layer","dst":"req-cli-steer"}
+{"src":"adr-verdict-write-guard","dst":"req-busy-no-record"}
+{"src":"adr-verdict-write-guard","dst":"req-first-green-guard"}
+{"src":"adr-grant-ledger-events","dst":"req-standing-grant"}
+{"src":"adr-mcp-lane-declared","dst":"req-cli-steer"}
+{"src":"adr-mcp-lane-declared","dst":"req-mcp-discoverable"}
+{"src":"adr-battery-run-shape","dst":"req-battery-progress"}
+{"src":"adr-battery-run-shape","dst":"req-battery-batch"}
+{"src":"adr-battery-run-shape","dst":"req-battery-parallel"}

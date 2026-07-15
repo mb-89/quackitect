@@ -473,6 +473,9 @@ type Event struct {
 	PrevHash      *string           `json:"prev_hash"`
 	Count         int               `json:"count,omitempty"`   // migrate-actors audit: events rewritten (go-stamp-user)
 	Channel       string            `json:"channel,omitempty"` // a mobile answer notes its channel (req-ask-loop.9)
+	Grant         string            `json:"grant,omitempty"`   // a covered agent bless stamps its grant (go-grant-store)
+	Scope         string            `json:"scope,omitempty"`   // grant-open: which check ids the grant covers
+	Expiry        string            `json:"expiry,omitempty"`  // grant-open: RFC3339 end of the stretch
 }
 
 func attestEvents() []Event {

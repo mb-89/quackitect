@@ -48,6 +48,9 @@ flowchart TD
     go-question-nodes["question state and provenance"]
   end
   subgraph rim--graph
+    go-verdict-guard["verdict-write guards: busy discard, first-green withhold"]
+    go-voice-lint["voice lint over authored statements"]
+    go-recital-chain["recital wording-chain selftest"]
     go-parse["text to typed nodes"]
     go-strict-load["the strict referee"]
     go-truth-in-spec["truth lives in spec"]
@@ -171,6 +174,13 @@ flowchart TD
     go-mint-prefill["mint pre-fills schema fields with proposals and provenance"]
   end
   subgraph rim
+    go-guard-selftest["battery gating in dispatch"]
+    go-guard-cli["declared agent lane refusal"]
+    go-grant-store["standing grant events"]
+    go-grant-review["grant collection surface"]
+    go-battery-progress["battery progress line"]
+    go-battery-batch["battery batch cache"]
+    go-battery-parallel["battery worker pool"]
     go-binary["process entry"]
     go-cli-help["help surface"]
     go-start["version start"]
@@ -253,6 +263,11 @@ flowchart TD
   go-decisions -->|architecture links| go-informed-by-edges
   go-informed-by-edges -->|informed-by lists| go-model-render
   go-informed-by-edges -->|type column| go-decisions-table
+  %% i22 new-block flows (engine laws)
+  go-binary -->|command and channel| go-guard-selftest
+  go-guard-selftest -->|lawful battery request| go-selftest
+  go-grant-store -->|grant cover and stamp| go-bless
+  go-verdict-guard -->|guarded verdicts| go-verdict-cache
 ```
 ## Rationale (not load-bearing)
 The physics (owner physics): rank = abstraction gradient; elements = design regions; files = themes (derived Schlauch); bands own transforms; identity transit legal; a-to-b notation. Uncertain allocations for the owner's red pen: go-strict-load (band vs kernel - it referees DURING the load transform), go-book-drift and go-register-vale (kernel rules that read files), go-global-ratchet (services with heavy rim I/O), go-tests-pass-eval (kernel logic that shells out to run suites - an expected rim-only-I/O finding). The graph--kernel seam carries no dedicated band yet - transit is identity today. Rendering: rim--graph carries BOTH directions (parse a-to-b: rim-to-graph; render: graph-to-rim) - the codec pattern, one band. The onion render points here; design-layers.md retires when it does.
@@ -271,3 +286,5 @@ Allocated at i18 M4 AHEAD of the build (the diagram-first hard rule) - five new 
 Render allocations by essence: go-decisions-table, go-asr-list, go-guides-table -> rim--graph, graph-to-html renders every one, the same family as go-q-table and go-project-record. go-views-home (the views-home figure: preset filter entries plus the derived-documents table) -> rim--graph, same family. go-onion-busbar (the drill-down's deterministic bus-bar SVG layout, split from go-onion-figure) -> rim--graph, a graph-to-svg transform. go-model-standalone (one model's onion as a small self-contained HTML review page) and go-onion-change-marks (the review's change-mark and its element->cluster->ring propagation) -> rim--graph, both graph-to-html transforms in the same render family.
 
 Allocated at i21 M4 AHEAD of the build (the diagram-first hard rule) - eight new elements, UNREALIZED until M6 fills them. By essence: go-field-tier and go-register-colors -> kernel (completeness counting and the provenance-to-color derivation are trust RULES, the coverage family); go-mint-prefill -> services (a mint content rule beside go-mint-content); go-provenance-block, go-register-render, go-seed-skeleton -> rim--graph (frontmatter parse, graph-to-html render, and file emission from the rigor source - each a file/render transform in its named family); the apply generalization (create/write ops) extends go-apply-manifest IN PLACE - the build found no seam that earned a second element; go-register-answer -> rim (a transport face beside go-ask-loop and go-mcp-server). The ride-alongs are behavior changes to EXISTING elements, not new blocks: rigor-fit extends go-spec-lints, the drivers-table union extends go-asr-list, the README scope and jargon advisory extend go-terms-order-lint, battery tiers modify go-selftest and go-build-fast-path, the deck-goto fix modifies go-deck-anchors, and the EARS sweep is data. Two i20 regions allocated late (they were the sky-fall findings): go-defer-retire -> rim (a console verb doing external I/O and calling the triage machinery - the conformance checker corrected the first services placement), go-vehicle-misuse-guard -> rim--graph (a spec lint). The i21 architecture ADRs (adr-register-in-report, adr-register-watch-answers, adr-seed-from-rigor-source, adr-provenance-in-node, all kind:architecture) link to these elements via addresses edges (go-informed-by-edges).
+
+Allocated at i22 (engine laws), by essence. To the rim: go-guard-selftest and go-guard-cli (the dispatch guard layer - the same command-shell family as go-attest-gate), go-grant-store and go-grant-review (adjudication event verbs beside go-bless), go-battery-progress, go-battery-batch, and go-battery-parallel (battery runner shape beside go-selftest). To the band (rim--graph): go-verdict-guard (the verdict-file write rule beside go-verdict-cache and go-evidence-honesty), go-voice-lint (a raw-text lint beside go-register-vale), go-recital-chain (a text-chain rule beside go-entry-chain).

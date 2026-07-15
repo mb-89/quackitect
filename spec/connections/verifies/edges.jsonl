@@ -250,3 +250,14 @@
 {"src":"test-unknown-type","dst":"req-structural-strictness"}
 {"src":"test-lazy-verdicts","dst":"req-lazy-verdicts"}
 {"src":"test-handoff-lifecycle","dst":"req-handoff-lifecycle"}
+{"src":"test-selftest-gate","dst":"req-selftest-gate"}
+{"src":"test-cli-steer","dst":"req-cli-steer"}
+{"src":"test-mcp-discoverable","dst":"req-mcp-discoverable"}
+{"src":"test-standing-grant","dst":"req-standing-grant"}
+{"src":"test-first-green-guard","dst":"req-first-green-guard"}
+{"src":"test-busy-no-record","dst":"req-busy-no-record"}
+{"src":"test-battery-progress","dst":"req-battery-progress"}
+{"src":"test-battery-batch","dst":"req-battery-batch"}
+{"src":"test-battery-parallel","dst":"req-battery-parallel"}
+{"src":"test-voice-lint","dst":"req-voice-lint"}
+{"src":"test-recital-chain","dst":"req-recital-chain"}

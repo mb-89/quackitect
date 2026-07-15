@@ -101,6 +101,11 @@ statements only — tests keep verifying (`verifies:`, tests-red discipline) and
 exactly as above.
 <!-- enddesign -->
 
+## Voice binds authored nodes
+`product/brand/voice.md` binds every authored `statement:` field. A node is prose like chat and
+the book. Re-read voice.md before authoring any node batch. One thought per sentence. Aim for
+fifteen words. Define each term at first use. Never join clauses with dashes.
+
 ## No plan-lock bless (step 5d)
 **Do NOT `quack bless --all` at plan time.** It marks every milestone gate DONE, makes `next` a no-op,
 and shows a falsely-green board (an un-built M5 reads green). After composing, gates start **OPEN**.

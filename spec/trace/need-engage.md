@@ -12,5 +12,5 @@ functions: [pick the next check, record an adjudication, reopen a changed check]
 Dogfood: quackitect's own spec, typed.
 
 ## Success criteria
-- Every killer gate of a shipped iteration carries a user adjudication. Metric: the share of killer gates blessed by the agent rather than the user. Target: zero.
+- Every killer gate of a shipped iteration carries a user adjudication. Metric: the share of killer gates blessed by the agent rather than the user. Target: zero. A bless under a standing grant the owner confirms at its morning review counts as owner-authorized (q-grant-honesty, ruling A).
 - A stalled gate is answerable away from the desk. Metric: a gate ask reaches the paired phone and the answer records as the adjudication, end-to-end on a real gate. Target: demonstrated on ntfy (further channels demonstrate when their wave ships).

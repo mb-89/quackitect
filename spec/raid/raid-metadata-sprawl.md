@@ -6,7 +6,7 @@ probability: 0.4
 impact: 0.6
 mitigation: derive over store - no per-node audience tags
 owner: project-owner
-status: mitigated
+status: closed
 statement: DITA-style metadata sprawl was the recorded M1 risk.
 class: review
 killer: false

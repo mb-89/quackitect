@@ -17,6 +17,7 @@ var (
 
 func bookOnceHTML() (string, bool) {
 	if bookOnceBusy {
+		busyGuardTrip()  // a busy answer must never become a recorded verdict (go-verdict-guard)
 		return "", false // nested probe: vacuously ok; the outer run decides
 	}
 	if bookOnceCached {

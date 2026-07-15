@@ -14,3 +14,5 @@
 {"src":"adr-ntfy-actions","dst":"cand-ntfy-actions"}
 {"src":"adr-ask-seam-exec-lane","dst":"cand-seam-exec-lane"}
 {"src":"adr-register-watch-answers","dst":"model-register-ask-flow"}
+{"src":"adr-guard-dispatch-layer","dst":"model-guard-tree"}
+{"src":"adr-grant-ledger-events","dst":"model-grant-lifecycle"}

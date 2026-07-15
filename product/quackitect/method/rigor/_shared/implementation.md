@@ -19,13 +19,20 @@ resolved at seed from the project type + iteration overrides; the default bindin
 4. **GREEN** — «implementer» builds to the tests + requirements, emitting inline `# design:` markers,
    until the suite passes. Tidy-while-green here; a design-level refactor → `engage refine`.
 
-**Verify targeted while building, fully at the hand-back.** Mid-build,
+**Verify targeted while building; the battery belongs to the gate.** Mid-build,
 run ONLY the selftest(s) the change in hand touches (plus the build for the hash re-baseline).
-The FULL battery runs at exactly two places: once at a build slot's END as its hand-back
-verification, and at the verification gate — never between edits. Re-running everything after
-every change is the over-checking failure mode the walk warns against; the derived checks
-compute live and catch regressions at the gate where verification belongs. This binds
-DELEGATED build agents the same as the driving agent — a subagent's brief inherits it.
+The FULL battery runs at ONE place: the verification gate, through `verify <check>` in its own
+visible console — never between edits, never as a slot ritual. The engine enforces this on the
+agent channel: a full battery outside a milestone review is refused (go-guard-selftest).
+Re-running everything after every change is the over-checking failure mode the walk warns
+against; the derived checks compute live and catch regressions at the gate where verification
+belongs. This binds DELEGATED build agents the same as the driving agent — a subagent's brief
+inherits it.
+
+**Every build-step brief carries the ritual as one checklist line:** author the test →
+`observe-red` RECORDS the failure → implement to green. A step that lands its implementation
+before the red is recorded strands the test without an observable failure (i21 b13 slipped
+exactly this way). Run `observe-red` LAST before the build, and BEFORE the code lands.
 
 **Acceptance** (systematic seeds each as a sub-gate; lean collapses to ONE review gate + the derived checks):
 - [ ] tests authored & executable — every requirement has a runnable test *(derived: coverage:req-has-test)*

@@ -690,6 +690,7 @@ func init() {
 		i19Tests,          // i19_red.go
 		i20Tests,          // i20_red.go (the cold-run fix batch)
 		i21Tests,          // i21_red.go
+		i22Tests,          // i22_red.go (the engine-laws batch)
 	)
 }
 
@@ -703,16 +704,77 @@ func concatTests(groups ...[]namedTest) []namedTest {
 
 // enddesign
 
-// RunSelftestCLI runs one named check (or all) and returns an exit code.
+// RunSelftestCLI runs one named check (or all) and returns an exit code. The FULL battery
+// prints one numbered line per test (go-battery-progress), answers unchanged content from the
+// verdict cache under battery-scoped keys (go-battery-batch), and runs the SAFE set on a
+// bounded pool (go-battery-parallel) - every verdict write stays on the main goroutine.
 func RunSelftestCLI(args []string) int {
 	names := args
-	if len(names) == 0 {
+	full := len(args) == 0
+	if full {
 		names = make([]string, 0, len(selftestRegistry))
 		for _, t := range selftestRegistry {
 			names = append(names, t.name)
 		}
 	}
 	ok := true
+	if full {
+		nodes := LoadAll()
+		root := MerkleRoot(nodes)
+		// standalone workspace watchers stay LIVE, never batch-cached (adr-standalone-suite)
+		noCache := map[string]bool{}
+		for _, n := range standaloneChecks(nodes) {
+			for _, nm := range strings.Fields(strings.TrimSpace(strings.TrimPrefix(n.Verify, "selftest:"))) {
+				noCache[nm] = true
+			}
+		}
+		cached := batteryCachedNames(names, root)
+		for nm := range noCache {
+			delete(cached, nm)
+		}
+		poolResults := map[string]bool{}
+		var safe []namedTest
+		for _, t := range selftestRegistry {
+			if batteryParallelSafe[t.name] {
+				if _, hit := cached[t.name]; !hit {
+					safe = append(safe, t)
+				}
+			}
+		}
+		if len(safe) > 0 {
+			poolResults = batteryRunPool(safe, runtime.NumCPU()-1)
+		}
+		for i, n := range names {
+			pass, note := false, ""
+			if v, hit := cached[n]; hit {
+				pass, note = v, " (cached)"
+			} else if v, ran := poolResults[n]; ran {
+				pass = v
+				verdictRecord(batteryCacheKey(n), root, pass, 0)
+			} else {
+				t0 := time.Now()
+				var busyTripped bool
+				pass, busyTripped = runSelftestTracked(n)
+				if busyTripped { // a vacuous-consuming run never records (go-verdict-guard)
+					note = " (busy - not recorded)"
+				} else if !noCache[n] {
+					verdictRecord(batteryCacheKey(n), root, pass, time.Since(t0))
+				}
+			}
+			status := "ok"
+			if !pass {
+				status, ok = "FAIL", false
+			}
+			fmt.Println(batteryProgressLine(i+1, len(names), n, status) + note)
+		}
+		if n := sweepOrphanHomes(); n > 0 {
+			fmt.Printf("selftest homes: swept %d orphaned fixture home(s)\n", n)
+		}
+		if ok {
+			return 0
+		}
+		return 1
+	}
 	for _, n := range names {
 		pass := runSelftest(n)
 		status := "ok"

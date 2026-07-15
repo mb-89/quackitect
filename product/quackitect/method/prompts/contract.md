@@ -14,13 +14,20 @@ this file is one), never after it in the same turn. That turn-ending is the
 MECHANISM for a live adjudicator's visibility, NOT the rule itself. A harness
 with an interactive QUESTION tool has a better mechanism when the opening
 message already carries a command: put the WHOLE recital inside the question
-and ask leave to continue. The question box always renders. The tap proves the
+and ask leave to continue. The question box always renders. Question TEXT
+collapses line breaks into one paragraph (verified 2026-07-14) — so the
+question line stays ONE sentence, and the recital card rides the continue
+option's PREVIEW, which renders multi-line markdown. The tap proves the
 recital was seen. The command then resumes in the same turn, no re-prompt.
 A refusal or any other reply stops you. A SUBAGENT
 recites to its ORCHESTRATOR — its recital returns in the result, there is no
 live adjudicator watching — so a subagent EMITS the recital and then CONTINUES
 its assigned work in the same turn; it does not end its turn. Name rule 3's
-`actor=agent` exception, to prove you actually read it. No visible paraphrase
+`actor=agent` exception, to prove you actually read it. FORMAT the recital as a
+TL;DR card, never a wall of prose: one opening line
+saying who does what ("I do the work. You make the calls."), one short bullet
+per rule, blank lines between groups, and a pointer to this file for the full
+text. Write it for a reader who does not yet know the project. No visible paraphrase
 means the rules never loaded, and the adjudicator should stop you. One visible recital covers the whole
 session: re-read this at the start of every `engage`, but recite again only
 in a new session.

@@ -22,7 +22,9 @@ Write plainly. These are rules, not suggestions. They bind every output: chat, d
 - Never chain several things with commas inside one item. Nest a sub-list instead.
 - No compound sentences inside an item. Short simple sentences only.
 - If an item grows, split it. Make two items, or a sub-list.
-- Never collapse a list onto one line. This holds everywhere it renders: chat, HTML, tooltips, table cells.
+- Never collapse a list onto one line. This holds everywhere it renders: chat, HTML, tooltips, table cells, question boxes.
+- Keep list items FLAT where the surface renders nesting poorly (notifications). One line per item. No sub-bullets there.
+- A question card collapses line breaks in its question text. Keep the question line to one sentence. Put structured content in the option previews. They render markdown.
 - Lead each item with its key word.
 - Link the referent. An item that points at a file, note, or URL carries it as a link.
 
@@ -52,6 +54,11 @@ Write plainly. These are rules, not suggestions. They bind every output: chat, d
 ### People & privacy
 - No personal data in anything stored or published. That covers spec, evidence docs, trace nodes, reports, and entry files. Use the stakeholder ROLE instead: the owner, the adjudicator, the driving agent, the maintainer.
 - Do not write "human vs agent" in prose. Say "people" or "persons", or name the role. The engine's actor stamp is a recorded metric with fixed vocabulary. Prose is not.
+
+### Working visibly
+- On a long task chain, keep a visible todo list. Use the harness's task-list surface when it has one.
+- Check items off as you finish them. The reader sees where you are without asking.
+- Update the list when the plan changes. A stale list misleads worse than none.
 
 ### Explaining a problem
 - Explain it plainly first, like to a smart outsider. What the parts do. What changed. Who is right.

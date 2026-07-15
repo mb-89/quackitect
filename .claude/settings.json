@@ -1,4 +1,5 @@
 {
+  "enabledMcpjsonServers": ["quack"],
   "hooks": {
     "SessionStart": [
       {

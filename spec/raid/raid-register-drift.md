@@ -6,7 +6,7 @@ probability: 0.5
 impact: 0.5
 mitigation: voice rules + mandatory ledes + advisory register lint
 owner: project-owner
-status: mitigated
+status: closed
 statement: The default agent register is too dense for the book audience.
 class: review
 killer: false

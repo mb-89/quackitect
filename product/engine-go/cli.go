@@ -82,7 +82,7 @@ func usageText() string {
 usage: ` + b + ` status [id] | next | start <id> [--plan] | why <id> | bless [--all|<id>] [--by A]
        | note "..." | notes [--all] | gather <ver> | report [book] [--out F] | ship | build
        | pair [ntfy] | ask <gate> [--timeout s] | await [--timeout s] | triage | compact <iter>
-       | apply <manifest> | mcp
+       | apply <manifest> | mcp | grant open|close|review
        | lint | verify <id> | progress [--pager <gate>] | migrate-actors | migrate-layout | version`
 }
 
@@ -142,6 +142,7 @@ func Dispatch(args []string) {
 		"selftest": true, "verify": true,
 	}[cmd]
 	// enddesign
+	walkGuard(cmd, rest)          // the walk-law layer: battery gating + the declared agent lane (go-guard-selftest, go-guard-cli)
 	rest = attestGuard(cmd, rest) // the contract gate: agent-channel ledger commands need a key
 	askDrainMaybe()               // the fallback lane: every run applies answers already on the channel (go-ask-loop)
 	if bad, isBad := badIDArg(cmd, rest); isBad {
@@ -197,6 +198,8 @@ func Dispatch(args []string) {
 		} else {
 			fmt.Println("usage: promote connection <kind> <src> <dst> [--q qualifier]")
 		}
+	case "grant":
+		cmdGrant(rest)
 	case "observe-red":
 		cmdObserveRed(rest)
 	case "migrate-edges":
@@ -670,6 +673,17 @@ func cmdLint(rest []string) {
 	// rigor-fit (go-rigor-fit): the composed size against the rigor band, advisory.
 	for _, f := range rigorFitFindings(nodes) {
 		fmt.Println("  - " + f)
+	}
+	// voice over authored statements (go-voice-lint): ADVISORY, like the terms lane.
+	if vf := voiceStatementFindings(nodes); len(vf) > 0 {
+		fmt.Printf("voice: %d advisory finding(s):\n", len(vf))
+		for i, f := range vf {
+			if i == 20 {
+				fmt.Printf("  ... and %d more\n", len(vf)-20)
+				break
+			}
+			fmt.Println("  - " + f)
+		}
 	}
 	// the BLOCKING set (the three-code contract, go-lint-exit): structural findings that must not
 	// ship. Advisories — coverage holes, adoption advisories, model/field/schema notes — stay exit 0.

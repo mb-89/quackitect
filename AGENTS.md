@@ -14,7 +14,7 @@ Do this before anything else on this project:
 
 1. **READ** `product/quackitect/method/prompts/contract.md`. The whole file, with your file-reading tool. No skimming. No summaries. No memory of a past session.
 2. **UNDERSTAND** it. It is binding. It overrides your defaults. It governs every move you make here.
-3. **RECITE** it. Paraphrase its specifics back to the adjudicator so they SEE it. With a command already in hand and an interactive question tool available: put the WHOLE recital inside the question and ask leave to continue — approval resumes the command in the same turn, no re-prompt. Otherwise: STOP, and end your turn with the recital — no tool call after it, or the harness may swallow it (mid-turn text does not render). Name rule 3's `actor=agent` killer-bless exception. That proves you read it. Confirm you will obey.
+3. **RECITE** it. Paraphrase its specifics back to the adjudicator so they SEE it. With a command already in hand and an interactive question tool available: put the WHOLE recital inside the question and ask leave to continue — approval resumes the command in the same turn, no re-prompt. Question text collapses line breaks: keep the question line to ONE sentence and put the recital card in the continue option's PREVIEW (previews render markdown). Otherwise: STOP, and end your turn with the recital — no tool call after it, or the harness may swallow it (mid-turn text does not render). Name rule 3's `actor=agent` killer-bless exception. That proves you read it. Confirm you will obey.
 4. **HONOR** every instruction in it. No exceptions. To the letter of each statement.
 5. **READ** `product/brand/voice.md` next. Every output follows it. Chat and artifacts alike.
 
@@ -53,7 +53,8 @@ quack render <model> --out <F> [--mark ids] # standalone architecture-review oni
 quack cluster <model>    # DSM structuring proposal: coupling clusters, layering, tears
 quack apply <manifest.json> [--dry] # judged bulk edits: byte-exact {file, old, new}, all-or-nothing
 quack why <id>           # what input changed
-quack bless [--all|<id>] [--by user|agent] # record an adjudication; actor defaults by CHANNEL
+quack bless [--all|<id>] [--by user|agent] # record an adjudication; actor defaults by CHANNEL; an agent bless on a KILLER needs a live grant
+quack grant open|close|review # a recorded standing grant (scope, expiry); in-scope agent blesses stamp it; review lists the collection for confirmation
 quack migrate-actors     # one-shot: rewrite legacy actor stamps to user (audited; no-op when done)
 quack migrate-layout     # one-shot: move a legacy-layout spec to the template-mirroring layout (no-op when done)
 quack note "<text>"      # deterministic capture lane
@@ -72,7 +73,7 @@ quack ship               # package product/ -> the workspace data home (out/)
 quack verify <check>     # re-run one executed check eagerly - THE V&V battery lane, once per iteration, in its own visible console
 quack build              # compile the engine, write the build stamp, re-baseline golden-root (skips the compile when no engine source changed)
 quack lint               # coverage holes, duplicate ids, EARS lint, monotonic wiring
-quack selftest           # the engine's own dependency-free self-test
+quack selftest           # the engine's own dependency-free self-test (agent channel: the FULL battery only at a milestone review; single tests always)
 quack version            # engine version + the resolved data locations
 ```
 **Workspaces.** The engine drives a selectable workspace; add `--base <path>` (or `-C <path>`)
