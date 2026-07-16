@@ -1,7 +1,7 @@
 ---
 id: uc-comment-annotate
 type: usecase
-statement: A reader opens a shipped book copy, marks prose or a figure, writes a comment, and saves the commented copy - no server, no installed tool.
+statement: A reader opens a shipped book copy, marks prose or a figure, writes a comment, and saves the commented copy. This needs no server and no installed tool.
 class: review
 killer: true
 ---

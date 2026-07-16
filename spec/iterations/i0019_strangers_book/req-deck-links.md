@@ -1,7 +1,7 @@
 ---
 id: req-deck-links
 type: requirement
-statement: When a reader opens a slideshow, the book shall reflect it in the URL, and when a URL carries a deck anchor, the book shall open at that deck - the numbered statements bind individually.
+statement: When a reader opens a slideshow, the book shall reflect it in the URL. When a URL carries a deck anchor, the book shall open at that deck. The numbered statements bind individually.
 class: review
 killer: false
 ---

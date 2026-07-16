@@ -1,7 +1,7 @@
 ---
 id: test-runme-orientation
 type: test
-statement: Both RUNME scripts check, install, and verify the toolchain; both print the orientation naming the next steps; neither contains a workspace-creating call - asserted over the script contents on both platforms.
+statement: Both RUNME scripts check, install, and verify the toolchain. Both print the orientation naming the next steps. Neither contains a workspace-creating call. This is asserted over the script contents on both platforms.
 class: executed
 verify: selftest:runme-orientation
 killer: false

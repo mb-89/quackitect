@@ -1,7 +1,7 @@
 ---
 id: uc-mcp-drive
 type: usecase
-statement: An external program drives quack over MCP - each command a tool call with a structured result, no shell quoting or encoding seam, one resident server per client session.
+statement: An external program drives quack over MCP. Each command is a tool call with a structured result. There is no shell quoting or encoding seam, and one resident server serves per client session.
 class: review
 killer: false
 ---

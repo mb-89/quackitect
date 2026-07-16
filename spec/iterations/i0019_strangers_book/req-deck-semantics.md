@@ -1,7 +1,7 @@
 ---
 id: req-deck-semantics
 type: requirement
-statement: The book shall mark every deck section machine-legibly and keep decks out of the table of contents - the numbered statements bind individually.
+statement: The book shall mark every deck section machine-legibly and keep decks out of the table of contents. The numbered statements bind individually.
 class: review
 killer: false
 ---

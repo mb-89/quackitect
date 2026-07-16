@@ -6,7 +6,7 @@ ratings:
   reader-ux: 0.4
   portability: 1
   buildability: 1
-statement: Always download a fresh commented copy - no in-place save anywhere.
+statement: Always download a fresh commented copy. No in-place save anywhere.
 class: review
 killer: false
 ---

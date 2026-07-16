@@ -13,11 +13,7 @@ import (
 )
 
 // design: go-report-watch  implements: req-report-live-reload
-// `quack report --watch [--port N]` serves the report over a tiny zero-dep net/http server and pushes a
-// Server-Sent Event whenever a source input (spec, product, attest) changes — the page's reload hook
-// (injected by RenderReport) then reloads. So the open board auto-updates ONLY when the source actually
-// changes (not on a blind timer), preserving interactivity between real changes. Static `quack report`
-// is unaffected (the reload hook silently no-ops on file://).
+// `quack report --watch [--port N]` serves the report over a tiny zero-dep net/http server. It pushes a Server-Sent Event whenever a source input, spec, product, or attest, changes. The page's reload hook, injected by RenderReport, then reloads. So the open board auto-updates ONLY when the source actually changes, not on a blind timer, preserving interactivity between real changes. Static `quack report` is unaffected; the reload hook silently no-ops on file://.
 func serveWatch(port string) {
 	if port == "" {
 		port = "8899"
@@ -142,14 +138,7 @@ func serveWatch(port string) {
 }
 
 // design: go-register-answer  implements: req-register-ask, req-register-killer-guard
-// The register's answer lane (adr-register-watch-answers): a red row's ruling arrives
-// over the watch server and dispatches the SAME validated application a console edit
-// would make — the field value and its "user-ruling via <channel>" provenance rewrite
-// the node under one hash (adr-provenance-in-node), and the ruling records on the ask
-// store as a resolved DECISION ask carrying the channel (req-register-ask.2). A KILLER
-// row refuses every lane EXCEPT a hand-off channel (req-register-killer-guard): the
-// hand-off page IS the ceremony, so the user rules killer fields there directly. The
-// static render never reaches here: its rows carry the console route instead.
+// This is the register's answer lane (adr-register-watch-answers). A red row's ruling arrives over the watch server and dispatches the SAME validated application a console edit would make. The field value and its "user-ruling via <channel>" provenance rewrite the node under one hash (adr-provenance-in-node). The ruling records on the ask store as a resolved DECISION ask carrying the channel (req-register-ask.2). A KILLER row refuses every lane EXCEPT a hand-off channel (req-register-killer-guard). The hand-off page IS the ceremony, so the user rules killer fields there directly. The static render never reaches here; its rows carry the console route instead.
 func registerAnswerApply(nodes map[string]Node, id, field, value, channel string, store *AskStore) error {
 	n, ok := nodes[id]
 	if !ok {
@@ -275,13 +264,7 @@ func handoffBless(gate, verdict string) error {
 }
 
 // design: go-handoff-lifecycle  implements: req-handoff-lifecycle
-// serveHandoffOnce is the ONE-SHOT hand-off server: its life
-// follows the page. An ephemeral port serves the gate's page; the page heartbeats
-// while open (/hb every few seconds, /bye on close); the watchdog ends the server on
-// the first of: an answer (y -> the injected bless fires once), silence after a
-// connect ("closed" - the user simply closed the page, the gate stays open), no
-// connect within the bound ("unopened"), or the hard cap ("timeout"). started (a
-// test seam) receives the base URL once listening; nil skips it.
+// serveHandoffOnce is the ONE-SHOT hand-off server, and its life follows the page. An ephemeral port serves the gate's page. The page heartbeats while open, /hb every few seconds, /bye on close. The watchdog ends the server on the first of four events. An answer, y, makes the injected bless fire once. Silence after a connect, "closed", means the user simply closed the page, and the gate stays open. No connect within the bound reads as "unopened". The hard cap reads as "timeout". started, a test seam, receives the base URL once listening; nil skips it.
 func serveHandoffOnce(gate string, render func() string, connectWait, beatGap, hardCap time.Duration,
 	bless func(g, v string) error, started chan<- string) (string, error) {
 	ln, err := net.Listen("tcp", "127.0.0.1:0")

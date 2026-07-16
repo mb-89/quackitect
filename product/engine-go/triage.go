@@ -8,33 +8,7 @@ import (
 )
 
 // design: go-cone-triage  implements: req-cone-triage
-// A `bless --all` wave must never sweep OPEN, never-adjudicated gates
-// alongside the SUSPECT ones. Two moves:
-//
-//  1. waveBlessFilter is THE filter cmdBless's --all path runs through: a wave
-//     may touch SUSPECT gates only. An OPEN gate (no prior adjudication at any
-//     hash) is REFUSED with a stderr line naming it - its first adjudication
-//     must be its own walk (`quack next` -> individual `bless <id>`, which
-//     stays legal). A DONE gate is a no-op as before (skipped, no re-stamp).
-//
-//  2. `quack triage` (read-only, never key-gated - it advances nothing) lists
-//     the suspect cone grouped for honest bulk re-adjudication, one row per
-//     SUSPECT review gate with its why-delta reasons.
-//
-// The split rule - derived from what the why-delta already reports, never new
-// analysis - a gate lands in NEEDS RE-RULING when its own subject moved:
-//   - its own statement changed (recorded StatementHash vs stmtHash now), or
-//   - its own definition changed (verify / another own field - the recorded
-//     full hash moved with statement and deps unchanged), or
-//   - a direct dependency that is itself a blessed gate had ITS recorded
-//     statement hash move (the dep's subject changed under this ruling).
-// Everything else is a STILL-HOLDS CANDIDATE: every reported delta is
-// upstream content only (an evidence doc, prose, a dep's non-statement
-// fields) or pure propagation (own inputs unchanged, the cone dragged by a
-// named root). Honest limit: the ledger records statement baselines only for
-// blessed gates, so an unblessed content dep's change reads as upstream
-// content - the row still NAMES the changed dep, and the section says
-// "candidates": the owner rules, the triage only groups.
+// A `bless --all` wave must never sweep OPEN, never-adjudicated gates alongside the SUSPECT ones. There are two moves. First, waveBlessFilter is THE filter cmdBless's --all path runs through: a wave may touch SUSPECT gates only. An OPEN gate, one with no prior adjudication at any hash, is REFUSED with a stderr line naming it. Its first adjudication must be its own walk, `quack next` then individual `bless <id>`, which stays legal. A DONE gate is a no-op as before, skipped with no re-stamp. Second, `quack triage`, read-only and never key-gated since it advances nothing, lists the suspect cone grouped for honest bulk re-adjudication, one row per SUSPECT review gate with its why-delta reasons. The split rule is derived from what the why-delta already reports, never new analysis. A gate lands in NEEDS RE-RULING when its own subject moved. That happens in three cases. First, its own statement changed: the recorded StatementHash versus stmtHash now. Second, its own definition changed, verify or another own field, where the recorded full hash moved with statement and deps unchanged. Third, a direct dependency that is itself a blessed gate had ITS recorded statement hash move, meaning the dep's subject changed under this ruling. Everything else is a STILL-HOLDS CANDIDATE. Every reported delta is upstream content only, an evidence doc, prose, a dep's non-statement fields, or pure propagation, own inputs unchanged, the cone dragged by a named root. Honest limit: the ledger records statement baselines only for blessed gates, so an unblessed content dep's change reads as upstream content. The row still NAMES the changed dep, and the section says "candidates": the owner rules, and the triage only groups.
 
 // waveBlessFilter returns the ids a wave bless may touch: SUSPECT only,
 // sorted. OPEN gates (never adjudicated) and DONE gates never pass it.

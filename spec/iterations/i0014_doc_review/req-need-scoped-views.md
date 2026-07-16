@@ -1,7 +1,7 @@
 ---
 id: req-need-scoped-views
 type: requirement
-statement: The book shall render functions and use-cases per need, shown on the need's expand - the numbered statements bind individually.
+statement: The book shall render functions and use-cases per need, shown on the need's expand. The numbered statements bind individually.
 class: review
 killer: false
 ---

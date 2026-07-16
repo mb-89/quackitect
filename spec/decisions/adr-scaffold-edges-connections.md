@@ -3,7 +3,7 @@ id: adr-scaffold-edges-connections
 decided_in: i0020_cold_run_fixes
 type: adr
 adjudicated_by: human
-statement: New workspaces default to connections mode at SCAFFOLD time - start init writes edges="connections" exactly as start stubs already does - while the engine's global default stays frontmatter for legacy workspaces; compose-reference names JSONL connections as the lane for new work and frontmatter as the legacy lane pending migrate-edges.
+statement: New workspaces default to connections mode at SCAFFOLD time. start init writes edges="connections" exactly as start stubs already does. The engine's global default stays frontmatter for legacy workspaces. compose-reference names JSONL connections as the lane for new work and frontmatter as the legacy lane pending migrate-edges.
 class: review
 killer: false
 ---

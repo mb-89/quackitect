@@ -14,12 +14,7 @@ import (
 )
 
 // design: go-coverage-ids  implements: req-go-port.1, req-unique-ids, req-trace-model.2
-// The derived coverage rules over the typed trace, the executed-check runner with its
-// cache, and the id-integrity guard (mint_id + duplicate_ids). Coverage is cumulative
-// through a version (no grandfathering); ids are namespaced so a reuse can never shadow.
-// renderingTests names battery members that RENDER a report. A render recomputes states, which
-// runs this battery again — so inside a render (renderBusy) these are skipped, bounding the
-// recursion the selftestReport comment documents. Top-level evaluation stays exact and complete.
+// The derived coverage rules run over the typed trace, the executed-check runner with its cache, and the id-integrity guard, mint_id plus duplicate_ids. Coverage is cumulative through a version, with no grandfathering. Ids are namespaced so a reuse can never shadow. renderingTests names battery members that RENDER a report. A render recomputes states, which runs this battery again. So inside a render (renderBusy) these are skipped, bounding the recursion the selftestReport comment documents. Top-level evaluation stays exact and complete.
 var renderingTests = map[string]bool{"selftest:report-live": true,
 	// register-render renders a report itself: without the exclusion the nested
 	// battery re-runs it before its own verdict lands — infinite self-recursion
@@ -213,8 +208,7 @@ func coverageRuleUncached(nodes map[string]Node, rule, scope string) bool {
 		}
 		return seen || scope != "" // scoped + no new tests = vacuously satisfied
 	// design: go-tests-pass-eval  implements: req-gate-eval-integrity.2
-	// tests-pass evaluates selftest: tests in-process (runSelftest) — the SAME evaluator the gate state
-	// machine uses — not a divergent shell path; selftest:tests-pass-eval guards the unification.
+	// tests-pass evaluates selftest: tests in-process, via runSelftest. This is the SAME evaluator the gate state machine uses, not a divergent shell path. selftest:tests-pass-eval guards the unification.
 	// enddesign
 	case "tests-pass":
 		// Verification is backward-cumulative (go-vv-time-scope): it runs every test up to and
@@ -270,12 +264,7 @@ func coverageRuleUncached(nodes map[string]Node, rule, scope string) bool {
 }
 
 // design: go-testsred-marker  implements: req-legacy-decided.2
-// A test that predates the red-observation mechanism carries its exemption as an EXPLICIT
-// frontmatter marker on the node — `tests_red: exempt - <reason citing its ADR>`
-// (adr-grandfathers-historical) — never a source-code date constant. A bare exempt without a
-// reason is not honored: the test owes its red like any other.
-// testDeferred: a test whose EVERY verified requirement is scrap-deferred owes
-// nothing until ready_when - the deferral law extended to the test side.
+// A test that predates the red-observation mechanism carries its exemption as an EXPLICIT frontmatter marker on the node. That marker reads `tests_red: exempt - <reason citing its ADR>` (adr-grandfathers-historical), never a source-code date constant. A bare exempt without a reason is not honored. The test owes its red like any other. testDeferred applies when a test's EVERY verified requirement is scrap-deferred: it owes nothing until ready_when, the deferral law extended to the test side.
 func testDeferred(n Node, deferred map[string]bool) bool {
 	if n.Type != "test" || len(n.Verifies) == 0 {
 		return false
@@ -296,12 +285,7 @@ func testsRedExempt(n Node) bool {
 // enddesign
 
 // design: go-evidence-honesty  implements: req-evidence-honesty
-// Evidence honesty (#8): a check's cached pass/fail is keyed by the FULL input hash
-// (evidence/<id>/<h>.json), so any change to a hashed input yields a new key and a cache MISS ->
-// re-run, never a stale pass. Selftest and coverage checks bypass this cache entirely (evaluated
-// live in gateState/coverageRule), and an unknown selftest returns false -> OPEN, so a live-red or
-// unbuilt check is never masked as DONE.
-// runExecuted runs a check's verify command (shell), caching the pass/fail by hash.
+// Evidence honesty (#8): a check's cached pass/fail is keyed by the FULL input hash (evidence/<id>/<h>.json). So any change to a hashed input yields a new key and a cache MISS, meaning re-run, never a stale pass. Selftest and coverage checks bypass this cache entirely, evaluated live in gateState/coverageRule. An unknown selftest returns false, meaning OPEN, so a live-red or unbuilt check is never masked as DONE. runExecuted runs a check's verify command, shell, caching the pass/fail by hash.
 func runExecuted(n Node, h string) string {
 	cdir := filepath.Join(dataDirFor("evidence"), n.ID)
 	cf := filepath.Join(cdir, h+".json")
@@ -561,11 +545,7 @@ func CoverageHoles(nodes map[string]Node, scope string) []string {
 // enddesign
 
 // design: go-vv-time-scope  implements: req-vv-time-scope
-// Derived V&V looks backward only: a check computes over trace nodes from its own iteration and
-// earlier (iteration ids are ordered; non-iteration nodes count as baseline, always in scope).
-// tests-pass filters its suite by inscope above, and the validates-needs digest folds needsDigestAsOf
-// — so mere ADDITION in a later iteration never reopens an earlier verdict, while a genuinely failing
-// old test still flips its own iteration red (an honest regression signal, kept).
+// Derived V&V looks backward only. A check computes over trace nodes from its own iteration and earlier; iteration ids are ordered, and non-iteration nodes count as baseline, always in scope. tests-pass filters its suite by inscope above, and the validates-needs digest folds needsDigestAsOf. So mere ADDITION in a later iteration never reopens an earlier verdict. A genuinely failing old test still flips its own iteration red, an honest regression signal, kept.
 func iterationOf(id string, nodes map[string]Node) string {
 	n, ok := nodes[id]
 	if !ok {

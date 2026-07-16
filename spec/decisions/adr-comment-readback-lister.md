@@ -4,7 +4,7 @@ decided_in: i0013_comments
 type: adr
 kind: architecture
 adjudicated_by: user
-statement: The read-back is quack note --file2list <file> - no new top-level command. It turns a commented copy into a printed LIST of note candidates (anchor, quote, thread, marks, status), read-only and byte-stable, with author names already replaced by the reader role. The agent reads the list and mints the keepers as ordinary notes - one file, many notes, rejection normal. The retro's field-feedback question includes returned commented copies. A bulk importer stays rejected: nothing enters the ledger without judgment.
+statement: The read-back is quack note --file2list <file>, with no new top-level command. It turns a commented copy into a printed LIST of note candidates (anchor, quote, thread, marks, status). This list is read-only and byte-stable, with author names already replaced by the reader role. The agent reads the list and mints the keepers as ordinary notes. One file can yield many notes, and rejection is normal. The retro's field-feedback question includes returned commented copies. A bulk importer stays rejected, since nothing enters the ledger without judgment.
 class: review
 killer: false
 ---

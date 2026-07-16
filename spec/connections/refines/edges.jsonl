@@ -313,3 +313,14 @@
 {"src":"req-module-import","dst":"uc-module-import-update"}
 {"src":"req-module-update","dst":"uc-module-import-update"}
 {"src":"req-vehicle-module-setup","dst":"uc-vehicle-se-doc"}
+{"src":"req-query","dst":"uc-lawful-walk"}
+{"src":"req-voice-zero","dst":"uc-authoring-guard"}
+{"src":"req-root-content","dst":"uc-verdict-integrity"}
+{"src":"req-red-edit-guard","dst":"uc-battery-trust"}
+{"src":"req-mcp-birth","dst":"uc-lawful-walk"}
+{"src":"req-mcp-self-arm","dst":"uc-lawful-walk"}
+{"src":"req-empty-region-message","dst":"uc-bless-readout"}
+{"src":"req-mcp-reload","dst":"uc-lawful-walk"}
+{"src":"req-ledger-arg-guards","dst":"uc-lawful-walk"}
+{"src":"req-adopt-honest","dst":"uc-battery-trust"}
+{"src":"req-binary-budget","dst":"uc-run-dep-free"}

@@ -5,7 +5,7 @@ mode: chapter
 order: 30
 statement: Design input - context, stakeholders, and every checkable claim on the system.
 ---
-<!-- design: method-ch3-mech  implements: req-chapters-canned.2 :: ch3 mechanized: canned units with pooled views for the context (neighbours table, then the star), use cases and functions, the design input register (ONE faceted table over every input type - qualities and constraints are filterable TYPE values there, never own sections; a quality row's expand carries its six scenario fields), and the stakeholder tensions at the chapter bottom; the authored residue is the context prose and the deferred functions unit. -->
+<!-- design: method-ch3-mech  implements: req-chapters-canned.2 :: ch3 is mechanized, with canned units and pooled views for the context: a neighbours table, then the star, use cases and functions, and the design input register. That register is ONE faceted table over every input type. Qualities and constraints are filterable TYPE values there, never own sections. A quality row's expand carries its six scenario fields. The stakeholder tensions sit at the chapter bottom. The authored residue is the context prose and the deferred functions unit. What the system must do. -->
 ## What the system must do
 <!-- tailor: shipped text - the chapter's anatomy is the same in every project.
 -->

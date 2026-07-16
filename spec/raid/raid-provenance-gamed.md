@@ -7,7 +7,7 @@ impact: 0.7
 mitigation: colors derive from RECORDED provenance fields only (req-register-colors.4); an agent-favoring over-green is the named dangerous class (M1 prior-art obligation 2); killer rows never row-tap-resolve; the two greens stay visually distinct
 owner: driving agent
 status: open
-statement: Sloppy or self-serving agent proposals game the traffic lights - rows read green because the proposal SAYS it is grounded, not because the provenance holds.
+statement: Sloppy or self-serving agent proposals game the traffic lights. Rows read green because the proposal SAYS it is grounded, not because the provenance holds.
 class: review
 killer: false
 ---

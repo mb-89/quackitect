@@ -1,7 +1,7 @@
 ---
 id: req-register-ask
 type: requirement
-statement: When a red register row is worked, the engine shall raise a decision ask on the existing ask path and record the answer with its actor and channel - the numbered statements bind individually.
+statement: When a red register row is worked, the engine shall raise a decision ask on the existing ask path and record the answer with its actor and channel. The numbered statements bind individually.
 class: review
 killer: false
 ---

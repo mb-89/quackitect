@@ -4,7 +4,7 @@ artifact: node
 applies_rigor: [lean, systematic]
 applies_type: [default]
 ---
-<!-- design: method-note-tags  implements: req-item-domain-fields.5 :: Rationale and decision nodes accept a tags list (whitelisted key), and base queries filter on it via file.hasTag - the hook behind the tensions, force, and strategy views. -->
+<!-- design: method-note-tags  implements: req-item-domain-fields.5 :: Rationale and decision nodes accept a tags list, a whitelisted key. Base queries filter on it via file.hasTag. This is the hook behind the tensions, force, and strategy views. rationale: one cross-cutting why, keyed to its clause. -->
 # rationale â€” one cross-cutting why, keyed to its clause
 
 Lives in `spec/trace/` (interim home). The rationales chapter renders these in

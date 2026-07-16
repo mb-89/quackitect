@@ -1,7 +1,7 @@
 ---
 id: req-mint-prefill
 type: requirement
-statement: When a node is minted, the engine shall fill every schema field with a proposed value and a one-line justification, so no field reaches the user blank - the numbered statements bind individually.
+statement: When a node is minted, the engine shall fill every schema field with a proposed value and a one-line justification. No field reaches the user blank. The numbered statements bind individually.
 class: review
 killer: false
 ---

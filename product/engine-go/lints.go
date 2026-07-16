@@ -1,21 +1,7 @@
 package main
 
 // design: go-spec-lints  implements: req-spec-content-lint.3, req-spec-content-lint.4, req-spec-content-lint.1
-// Three spec-content lints, all over the node-fenced sources plus
-// the content notes - evidence docs are history and stay exempt:
-// - external links: an http(s) URL may live ONLY inside a reference note (spec/references);
-//   the body links the note, the fundamentals chapter derives the list (the pull law).
-//   ONE narrow exemption: a DECK manifest may carry the repo's OWN clone URL (the git
-//   origin remote, with or without .git) - the owner's self-containment rule: a walkthrough
-//   deck is a hand-out, and its get-it slide must carry the clone line verbatim, not a
-//   pointer to a pointer. Any OTHER external link in a deck still flags. An xmlns
-//   namespace declaration (authored inline SVG, the figures law) is an identifier,
-//   not a link, and never counts.
-// - slot residue: an unfilled {{slot}} placeholder means an undrafted unit shipped. Fill
-//   comments are permanent authoring guidance and are NOT residue.
-// - dangling anchors: a refers entry keyed to a heading (id#slug) must resolve - heading
-//   slugs are the stable referents rationale notes key to; a renamed heading must not
-//   silently orphan its rationales. Plain-id refers ride the normal ref integrity.
+// There are three spec-content lints, all over the node-fenced sources plus the content notes; evidence docs are history and stay exempt. The first is external links. An http(s) URL may live ONLY inside a reference note (spec/references). The body links the note, and the fundamentals chapter derives the list, the pull law. ONE narrow exemption applies: a DECK manifest may carry the repo's OWN clone URL, the git origin remote, with or without .git. This is the owner's self-containment rule. A walkthrough deck is a hand-out, and its get-it slide must carry the clone line verbatim, not a pointer to a pointer. Any OTHER external link in a deck still flags. An xmlns namespace declaration, authored inline SVG, the figures law, is an identifier, not a link, and never counts. The second is slot residue. An unfilled {{slot}} placeholder means an undrafted unit shipped. Fill comments are permanent authoring guidance and are NOT residue. The third is dangling anchors. A refers entry keyed to a heading (id#slug) must resolve. Heading slugs are the stable referents rationale notes key to, and a renamed heading must not silently orphan its rationales. Plain-id refers ride the normal ref integrity.
 
 import (
 	"fmt"
@@ -156,17 +142,7 @@ func specLintFindingsAt(specDir string, nodes map[string]Node) (external, residu
 // enddesign
 
 // design: go-terms-order-lint  implements: req-terms-before-use.1, req-terms-before-use.2, req-terms-before-use.3, req-terms-readme-scope, req-jargon-advisory
-// The terms-before-use ADVISORY: the rendered book's reading order (readerChapters — the
-// SAME chapter list the renderer walks) is scanned for glossary-term uses that precede the
-// term's definition point. The glossary IS the term set (adr-terms-source-glossary): the
-// function takes the renderer's own glossary map and consults no second list, so the check
-// follows the glossary's growth. The definition point is where the renderer splices the
-// glossary — the end of the fundamentals chapter, or the book end when no fundamentals
-// chapter exists. Matching mirrors go-auto-link's discipline: word boundaries,
-// case-insensitive, the LONGEST name wins a position (aliases count as the term's names);
-// code fences, headings, comment lines, inline code, and link targets are exempt. One
-// finding per term — the FIRST use — naming the using and the defining location. Reading
-// order is judgment: the class is advisory (termOrderBlocking pins it) and never blocks.
+// This is the terms-before-use ADVISORY. The rendered book's reading order, readerChapters, the SAME chapter list the renderer walks, is scanned for glossary-term uses that precede the term's definition point. The glossary IS the term set (adr-terms-source-glossary). The function takes the renderer's own glossary map and consults no second list, so the check follows the glossary's growth. The definition point is where the renderer splices the glossary: the end of the fundamentals chapter, or the book end when no fundamentals chapter exists. Matching mirrors go-auto-link's discipline: word boundaries, case-insensitive, and the LONGEST name wins a position, with aliases counting as the term's names. Code fences, headings, comment lines, inline code, and link targets are exempt. One finding appears per term, the FIRST use, naming the using and the defining location. Reading order is judgment. The class is advisory (termOrderBlocking pins it) and never blocks.
 
 // fundamentalsChapterID names the chapter the glossary splices into — one fact,
 // shared by the renderer's splice and this lint's definition point.
@@ -369,11 +345,7 @@ func readmeTermFindings(readmePath string, gloss map[string]GlossTerm) []string 
 }
 
 // design: go-rigor-fit  implements: req-rigor-fit
-// The rigor-fit advisory: the ACTIVE iteration's composed trace size against the
-// rigor's fit band (fit_min/fit_max in the rigor definition — the band lives with the
-// rigor, one home). Below the band reads as ceremony overkill, above as a rigor too
-// thin. Advisory by law: the human confirms rigor at start (contract rule 5); the
-// engine only hints (req-rigor-fit.2).
+// This is the rigor-fit advisory. It compares the ACTIVE iteration's composed trace size against the rigor's fit band (fit_min/fit_max in the rigor definition; the band lives with the rigor, one home). Below the band reads as ceremony overkill, and above reads as a rigor too thin. It is advisory by law. The human confirms rigor at start (contract rule 5), and the engine only hints (req-rigor-fit.2).
 
 func rigorFitBand(rigor string) (int, int) {
 	raw, err := os.ReadFile(filepath.Join(EngineDir(), "method", "rigor", rigor, "rigor.md"))

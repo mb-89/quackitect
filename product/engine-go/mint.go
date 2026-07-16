@@ -10,17 +10,9 @@ import (
 )
 
 // design: go-mint  implements: req-mint, req-mint-sugar.1, req-mint-sugar.2
-// Deterministic minting (adr-deterministic-mint): the engine emits every node skeleton — typed
-// frontmatter, engine-stamped id, placeholder statement — so a node is schema-valid at BIRTH; the
-// agent fills content, never authors shape (the strict parser guards READ time; mint moves
-// the guarantee to creation). Sugar forms stamp the decision edges the classifier derives from:
-// `mint veto --of <id>`, `mint defer --of <id> --ready-when "<cond>"`, `mint supersede <old>` — so a
-// veto/defer/supersession can never be misspelled into the wrong class. Decisions land in
-// spec/decisions/; other types land in the active iteration.
+// Deterministic minting (adr-deterministic-mint) has the engine emit every node skeleton: typed frontmatter, engine-stamped id, placeholder statement. So a node is schema-valid at BIRTH. The agent fills content and never authors shape. The strict parser guards READ time; mint moves the guarantee to creation. Sugar forms stamp the decision edges the classifier derives from: `mint veto --of <id>`, `mint defer --of <id> --ready-when "<cond>"`, `mint supersede <old>`. So a veto, defer, or supersession can never be misspelled into the wrong class. Decisions land in spec/decisions/; other types land in the active iteration.
 // design: go-mint-kinds  implements: req-mint-from-templates.1
-// Every item kind mints: the agent fills content, never authors
-// shape - hand-copying a skeleton under the strict whitelist punishes every typo with a
-// refused graph. adjudicated_by says user (human is retired vocabulary).
+// Every item kind mints. The agent fills content and never authors shape. Hand-copying a skeleton under the strict whitelist punishes every typo with a refused graph. adjudicated_by says user (human is retired vocabulary).
 var mintPrefix = map[string]string{
 	"need": "need-", "usecase": "uc-", "requirement": "req-", "test": "test-", "adr": "adr-",
 	"stakeholder": "stk-", "candidate": "cand-", "raid": "raid-", "rationale": "why-",
@@ -56,10 +48,7 @@ func mintID(kind, slug string) string {
 }
 
 // design: go-mint-edge-aware  implements: req-connections-code.2
-// In connections mode a minted node carries NO legacy edge key — the strict referee would
-// refuse it on the very next load. mintBody omits the keys when lanes=true; mintNodeAtX writes the same edges
-// into the connection lanes instead. depends_on and the non-legacy keys stay in frontmatter
-// in both modes (adr-edges-scope).
+// In connections mode a minted node carries NO legacy edge key. The strict referee would refuse it on the very next load. mintBody omits the keys when lanes=true. mintNodeAtX writes the same edges into the connection lanes instead. depends_on and the non-legacy keys stay in frontmatter in both modes (adr-edges-scope).
 type mintEdge struct{ kind, dst string }
 
 func mintLaneEdges(kind string, extra map[string]string) []mintEdge {
@@ -94,13 +83,7 @@ func mintLaneEdges(kind string, extra map[string]string) []mintEdge {
 // enddesign
 
 // design: go-mint-templates  implements: req-config-split
-// Skeletons come FROM the item templates (adr-rules-as-config, tier b): a kind's
-// static frontmatter extras load from the fenced `skeleton` block in
-// method/templates/items/<kind>.md - the template file IS the registry (the
-// modelStubFor pattern). The code keeps only what a file cannot carry: edge keys,
-// per-call interpolation, and the hardcoded fallback for template-less stub
-// workspaces. A `{{edges}}` marker line names where the frontmatter-mode edge
-// lands when it sits mid-skeleton (budget).
+// Skeletons come FROM the item templates (adr-rules-as-config, tier b). A kind's static frontmatter extras load from the fenced `skeleton` block in method/templates/items/<kind>.md. The template file IS the registry, the modelStubFor pattern. The code keeps only what a file cannot carry: edge keys, per-call interpolation, and the hardcoded fallback for template-less stub workspaces. A `{{edges}}` marker line names where the frontmatter-mode edge lands when it sits mid-skeleton (budget).
 func mintSkeletonFor(kind string) string {
 	raw, err := os.ReadFile(filepath.Join(EngineDir(), "method", "templates", "items", kind+".md"))
 	if err != nil {
@@ -245,12 +228,7 @@ func mintBody(kind, id string, extra map[string]string, lanes bool) string {
 }
 
 // design: go-mint-prefill  implements: req-mint-prefill
-// The no-blank drafting law at mint time: every schema field of the minted kind
-// reaches the user with a value — the schema default where one exists, an explicit
-// "TBD - propose or veto" marker where none does (the register counts TBDs) — and a
-// provenance block stamps each value's source (adr-provenance-in-node). Skeleton
-// TODOs on schema-covered fields are rewritten to the TBD convention so the tier
-// rollup (go-field-tier) sees them honestly.
+// The no-blank drafting law applies at mint time. Every schema field of the minted kind reaches the user with a value. That is the schema default where one exists, or an explicit `TBD - propose or veto` marker where none does (the register counts TBDs). A provenance block stamps each value's source (adr-provenance-in-node). Skeleton TODOs on schema-covered fields are rewritten to the TBD convention, so the tier rollup (go-field-tier) sees them honestly.
 func applySchemaPrefill(body, kind string) string {
 	sc := mergedSchema(loadFieldSchemas(schemaConfigDir()), kind)
 	if len(sc.fields) == 0 {
@@ -334,9 +312,7 @@ func mintNodeAt(dir, kind, id string) (string, error) {
 }
 
 // design: go-mint-content  implements: req-mint-from-templates.1
-// The four content kinds mint their own shapes into the spec content homes - they are
-// notes with dedicated loaders, never node grammar. A content mint requires --id (the
-// filename IS the slug; there is no engine-stamped prefix).
+// The four content kinds mint their own shapes into the spec content homes. They are notes with dedicated loaders, never node grammar. A content mint requires --id. The filename IS the slug; there is no engine-stamped prefix.
 var contentMintDir = map[string]string{
 	"term": "glossary", "reference": "references", "fundamental": "fundamentals", "method": "methods",
 }
@@ -538,10 +514,7 @@ func cmdMint(args []string) {
 // enddesign
 
 // design: go-mint-skeleton  implements: req-mint-from-templates.2
-// `quack mint evidence --milestone M<n>` stamps the milestone's evidence-doc skeleton from its
-// template (method/templates/<slug>.md): the template frontmatter is stripped (evidence docs are
-// prose, never nodes), the placeholders substitute (iteration, rigor, itag), and an EXISTING doc
-// is refused - the skeleton never overwrites evidence.
+// `quack mint evidence --milestone M<n>` stamps the milestone's evidence-doc skeleton from its template (method/templates/<slug>.md). The template frontmatter is stripped, since evidence docs are prose, never nodes. The placeholders substitute: iteration, rigor, itag. An EXISTING doc is refused. The skeleton never overwrites evidence.
 var evidenceSlugs = map[string]string{
 	"M1": "M1-frame", "M2": "M2-inputs", "M3": "M3-candidates", "M4": "M4-decision",
 	"M5": "M5-spike-findings", "M6": "M6-build-plan", "M7": "M7-validation", "M8": "M8-handover",

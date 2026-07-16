@@ -2,7 +2,7 @@
 id: guide-model-syntax
 type: guide
 audience: developer-maintainer
-statement: The pinned model syntax, documented by example - one section per authored kind, the lint rules, and the hash behavior.
+statement: The pinned model syntax, documented by example. One section per authored kind, the lint rules, and the hash behavior.
 ---
 
 # Structural models - the pinned syntax, by example

@@ -1,7 +1,7 @@
 ---
 id: req-derived-boards
 type: requirement
-statement: The book shall derive its boards, matrices, and figures from graph facts alone, rendering exceptions prominently - the numbered statements bind individually.
+statement: The book shall derive its boards, matrices, and figures from graph facts alone, rendering exceptions prominently. The numbered statements bind individually.
 class: review
 killer: false
 ---

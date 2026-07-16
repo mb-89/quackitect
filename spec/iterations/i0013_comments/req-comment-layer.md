@@ -1,7 +1,7 @@
 ---
 id: req-comment-layer
 type: requirement
-statement: The book's comment layer shall capture anchored, threaded reader feedback in an embedded annotation island and save it back safely - the numbered statements bind individually.
+statement: The book's comment layer shall capture anchored, threaded reader feedback in an embedded annotation island. It shall save it back safely. The numbered statements bind individually.
 class: review
 killer: false
 ---

@@ -2,7 +2,7 @@
 id: need-docu
 type: need
 source: stk-newcomer
-statement: Stakeholders consume the spec - readable, portable, trustworthy - without needing an AI, the repo, or the engine.
+statement: Stakeholders consume the spec: readable, portable, trustworthy. They need no AI, no repo, and no engine.
 class: review
 killer: false
 functions: [render the book, emit the entry files, evaluate a query]

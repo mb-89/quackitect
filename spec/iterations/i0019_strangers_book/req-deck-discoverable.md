@@ -2,7 +2,7 @@
 id: req-deck-discoverable
 type: requirement
 depends_on: [req-deck-links]
-statement: The walkthrough deck shall be reachable from the guides table and from the README - the numbered statements bind individually.
+statement: The walkthrough deck shall be reachable from the guides table and from the README. The numbered statements bind individually.
 class: review
 killer: false
 ---

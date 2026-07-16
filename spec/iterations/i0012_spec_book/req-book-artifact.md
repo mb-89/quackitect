@@ -1,7 +1,7 @@
 ---
 id: req-book-artifact
 type: requirement
-statement: The book shall compile to one self-contained, accessible, machine-digestible HTML artifact with an mdbook-style shell - the numbered statements bind individually.
+statement: The book shall compile to one self-contained, accessible, machine-digestible HTML artifact with an mdbook-style shell. The numbered statements bind individually.
 class: review
 killer: false
 ---

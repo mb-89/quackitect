@@ -1,7 +1,7 @@
 ---
 id: req-base-view-queries
 type: requirement
-statement: The engine shall evaluate deterministic base view queries over node data including map values - the numbered statements bind individually.
+statement: The engine shall evaluate deterministic base view queries over node data, including map values. The numbered statements bind individually.
 class: review
 killer: false
 ---

@@ -2,7 +2,7 @@
 id: guide-about-this-document
 type: guide
 audience: developer-maintainer
-statement: How this document is made - the source truth, the marks, and the correction loop.
+statement: How this document is made. The source truth, the marks, and the correction loop.
 class: review
 killer: false
 ---

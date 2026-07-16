@@ -4,7 +4,7 @@ artifact: node
 applies_rigor: [lean, systematic]
 applies_type: [default]
 ---
-<!-- design: method-stakeholder-links  implements: req-item-domain-fields.3 :: Stakeholder notes carry preset and guide links (no reverse join exists in the pinned subset), and the matrix renders concern, preset, and guide columns - one note feeds the ch0 reader matrix and the ch3 concerns table. -->
+<!-- design: method-stakeholder-links  implements: req-item-domain-fields.3 :: Stakeholder notes carry preset and guide links; no reverse join exists in the pinned subset. The matrix renders concern, preset, and guide columns. One note feeds the ch0 reader matrix and the ch3 concerns table. stakeholder: one project stakeholder of a derived class. -->
 # stakeholder â€” one project stakeholder of a derived class
 
 Lives in the iteration or `spec/trace/` (interim home, spec-folder discussion

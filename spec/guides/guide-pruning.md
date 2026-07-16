@@ -2,7 +2,7 @@
 id: guide-pruning
 type: guide
 audience: project-owner
-statement: How to prune the spec, the code, and the logs again - the reusable method.
+statement: How to prune the spec, the code, and the logs again. The reusable method.
 ---
 
 # Pruning - the reusable method

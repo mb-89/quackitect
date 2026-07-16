@@ -4,7 +4,7 @@ type: adr
 kind: architecture
 decided_in: i0019_strangers_book
 adjudicated_by: user
-statement: The deck deep-link mechanism is URL-fragment reflection riding the existing hash rail - opening a deck writes #deck-<slug> via history.replaceState, loading with the fragment opens the deck, per-slide depth reuses the existing slide ids. A router-owned deck route is rejected: two owners of location.hash contend, and the fragment mechanism reaches the same depth with a handful of lines.
+statement: The deck deep-link mechanism is URL-fragment reflection riding the existing hash rail. Opening a deck writes #deck-<slug> via history.replaceState. Loading with the fragment opens the deck. Per-slide depth reuses the existing slide ids. A router-owned deck route is rejected, since two owners of location.hash would contend, and the fragment mechanism reaches the same depth with a handful of lines.
 class: review
 killer: false
 ---

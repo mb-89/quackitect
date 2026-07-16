@@ -1,7 +1,7 @@
 ---
 id: test-mcp-serve
 type: test
-statement: The MCP server lists the command surface as tools over stdio, answers a call with the command's structured result read fresh from the workspace, refuses an unattested ledger-advancing call, and exits when its client closes the connection.
+statement: The MCP server lists the command surface as tools over stdio. It answers a call with the command's structured result read fresh from the workspace. It refuses an unattested ledger-advancing call. It exits when its client closes the connection.
 class: executed
 verify: selftest:mcp-serve
 killer: false

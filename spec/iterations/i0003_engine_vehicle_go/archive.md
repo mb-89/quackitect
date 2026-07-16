@@ -48,7 +48,7 @@ i0003. Vendoring a compiled-in library was the alternative. Rejected to keep the
 ---
 id: adr-selftest
 type: adr
-statement: The end state has ZERO Python. The dependency-free engine carries its own native self-test in Go. Every executed test check invokes the quack binary (quack selftest NAME), never an external toolchain like uv or python, because none exists in a just-unzipped vehicle. The binary already contains the parser, hashing, coverage, and CLI logic, so it verifies them in-process. Parity after cutover means the engine reproduces a baselined golden integrity root (a determinism regression check the binary performs), not a live comparison against Python. At cutover the Python engine and ALL of its uv-run-python executed checks are deleted or retired, including the earlier iterations checks that tested the Python engine itself; their Go equivalents live in quack selftest. The go test files remain only as an optional dev and CI convenience (Go, not Python); the shipped binary needs nothing external to verify itself.
+statement: The end state has ZERO Python. The dependency-free engine carries its own native self-test in Go. Every executed test check invokes the quack binary (quack selftest NAME), never an external toolchain like uv or python, because none exists in a just-unzipped vehicle. The binary already contains the parser, hashing, coverage, and CLI logic, so it verifies them in-process. Parity after cutover means the engine reproduces a baselined golden integrity root, a determinism regression check the binary performs, not a live comparison against Python. At cutover the Python engine and ALL of its uv-run-python executed checks are deleted or retired, including the earlier iterations checks that tested the Python engine itself. Their Go equivalents live in quack selftest. The go test files remain only as an optional dev and CI convenience, Go, not Python. The shipped binary needs nothing external to verify itself.
 adjudicated_by: human
 killer: false
 ---
@@ -59,7 +59,7 @@ Surfaced i0003 M6. The test nodes were written with uv-run-python placeholders, 
 ---
 id: adr-ship-source
 type: adr
-statement: Distribution ships the Go SOURCE of the engine, not a prebuilt binary. Each vehicle builds the engine locally with the Go toolchain; we do not distribute quack.exe. This keeps the engine rebuildable, so future features can determinize more code (generate code that is compiled into the engine on the next build). Consequence: the Go toolchain is a required BUILD dependency at every vehicle (one winget install), while the built binary stays dependency-free at RUNTIME. Because we ship source and rebuild locally, the Smart App Control / code-signing concern collapses to a local-dev setting (turn SAC off, or sign for local dev) and is NOT a distribution requirement.
+statement: Distribution ships the Go SOURCE of the engine, not a prebuilt binary. Each vehicle builds the engine locally with the Go toolchain. We do not distribute quack.exe. This keeps the engine rebuildable, so future features can determinize more code, generating code that is compiled into the engine on the next build. Consequence: the Go toolchain is a required BUILD dependency at every vehicle, one winget install, while the built binary stays dependency-free at RUNTIME. Because we ship source and rebuild locally, the Smart App Control and code-signing concern collapses to a local-dev setting: turn SAC off, or sign for local dev. It is NOT a distribution requirement.
 adjudicated_by: human
 killer: false
 ---
@@ -70,7 +70,7 @@ i0003 M6. The original "ship one self-contained binary" idea fought Smart App Co
 ---
 id: adr-unique-ids
 type: adr
-statement: Guarantee node-id uniqueness by namespacing task ids with the iteration tag at creation (mint_id, i0003 to i3-) plus a deterministic duplicate-id check that reports any collision. Adapted from the sebot determinizer mint tool (a shorthand plus a zero-padded counter); quackitect namespaces by iteration rather than by type, because the collision is iteration-scoped (generic milestone ids like m1-gate). Rejected the alternative of auto path-qualifying ids inside the resolver, a larger semantic change that is risky right before the Go port.
+statement: Guarantee node-id uniqueness by namespacing task ids with the iteration tag at creation, mint_id, i0003 to i3-, plus a deterministic duplicate-id check that reports any collision. This is adapted from the sebot determinizer mint tool, a shorthand plus a zero-padded counter. Quackitect namespaces by iteration rather than by type, because the collision is iteration-scoped, as with generic milestone ids like m1-gate. Rejected the alternative of auto path-qualifying ids inside the resolver, a larger semantic change that is risky right before the Go port.
 adjudicated_by: human
 killer: true
 ---
@@ -90,7 +90,7 @@ Re-establish the engine as a standalone, dependency-free Go binary, cleanly sepa
 ---
 id: req-engine-vehicle-overlay
 type: requirement
-statement: The engine shall separate from the vehicle behind one overlay resolver that an external vehicle integrates by a documented path - the numbered statements bind individually.
+statement: The engine shall separate from the vehicle behind one overlay resolver that an external vehicle integrates by a documented path. The numbered statements bind individually.
 class: review
 killer: false
 ---
@@ -102,7 +102,7 @@ killer: false
 ---
 id: req-go-port
 type: requirement
-statement: The engine shall ship as one zero-dependency Go binary that preserves the Python engine's observable behavior - the numbered statements bind individually.
+statement: The engine shall ship as one zero-dependency Go binary that preserves the Python engine's observable behavior. The numbered statements bind individually.
 class: review
 killer: false
 ---

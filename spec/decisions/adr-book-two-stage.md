@@ -4,7 +4,7 @@ decided_in: i0012_spec_book
 type: adr
 kind: architecture
 adjudicated_by: human
-statement: Truth lives only in the spec sources - nodes, manifests, prose units with their marks - and all judgment happens there; everything downstream is deterministic. The emitter renders truth to one self-contained HTML with transclusion at emit time; it MAY materialize assembled chapter markdown as an EPHEMERAL review surface in the data home - regenerated every emit, never committed, never a source of truth. View-time assembly stays excluded (req-book-dom-static).
+statement: Truth lives only in the spec sources: nodes, manifests, and prose units with their marks. All judgment happens there. Everything downstream is deterministic. The emitter renders truth to one self-contained HTML with transclusion at emit time. It MAY materialize assembled chapter markdown as an EPHEMERAL review surface in the data home. That surface is regenerated every emit, never committed, and never a source of truth. View-time assembly stays excluded (req-book-dom-static).
 class: review
 killer: false
 ---

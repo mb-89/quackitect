@@ -1,7 +1,7 @@
 ---
 id: req-handoff-lifecycle
 type: requirement
-statement: When a hand-off page opens, the engine shall serve it from a bounded one-shot server whose life follows the page - the numbered statements bind individually.
+statement: When a hand-off page opens, the engine shall serve it from a bounded one-shot server whose life follows the page. The numbered statements bind individually.
 class: review
 killer: false
 ---

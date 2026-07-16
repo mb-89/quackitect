@@ -1,7 +1,7 @@
 ---
 id: req-field-tier
 type: requirement
-statement: The field schema shall declare each field's tier - core or deferrable - and every schema consumer shall honor the tier - the numbered statements bind individually.
+statement: The field schema shall declare each field's tier, either core or deferrable. Every schema consumer shall honor the tier. The numbered statements bind individually.
 class: review
 killer: false
 ---

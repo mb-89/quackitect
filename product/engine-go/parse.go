@@ -41,16 +41,11 @@ type Node struct {
 	DecidedVia string   // question nodes only (go-question-nodes): how a decided question was decided
 	DecidedIn  string   // decision nodes: the iteration the decision was DECIDED in (optional; mint stamps it from the active iteration)
 	// design: go-ratings-map  implements: req-base-view-queries.2
-	// One-level frontmatter maps (a key with an empty value followed by indented sub: value
-	// lines), exposed generically to views. One level only - a deeper nest refuses at strict load.
+	// Frontmatter maps go one level deep: a key with an empty value, followed by indented sub: value lines. They expose generically to views. Only one level is allowed. A deeper nest refuses at strict load.
 	Maps map[string]map[string]string // e.g. ratings: {criterion: score}
 	// enddesign
 	// design: go-items  implements: req-candidate-decisions.3, req-candidate-decisions.1
-	// The item machinery: ONE decision type with a kind
-	// (architecture | project | waiver; empty = architecture for blessed history) rendered
-	// in its owning chapter's view; candidate nodes carry an axis and 0..1 ratings, and
-	// DECISIONS choose or reject them through links - candidate status derives from the
-	// links, never stored; rejected candidates stay referenced so history survives.
+	// The item machinery has ONE decision type with a kind (architecture | project | waiver; empty = architecture for blessed history). It renders in its owning chapter's view. Candidate nodes carry an axis and 0..1 ratings. DECISIONS choose or reject them through links. Candidate status derives from the links; it is never stored. Rejected candidates stay referenced, so history survives.
 	Kind      string   // decision kind | requirement kind (functional|quality|constraint|interface)
 	Axis      string   // candidate: the decision axis it answers
 	Direction string   // neighbour: in (feeds the system, left flank) | out (consumes from it, right flank)
@@ -226,9 +221,7 @@ func ParseNodeBytes(path string, txt []byte) Node {
 		}
 	}
 	// design: go-conn-prose-hash  implements: req-connections-lanes.7
-	// A connection's prose IS edge rationale - it folds into the node hash via the
-	// RegionBody seam (the design-marker precedent), so a body edit moves the root
-	// and flips the cone; edge reasoning can never mutate trust-invisibly.
+	// A connection's prose IS edge rationale. It folds into the node hash via the RegionBody seam, the design-marker precedent, so a body edit moves the root and flips the cone. Edge reasoning can never mutate trust-invisibly.
 	if n.Type == "connection" && len(parts) >= 3 {
 		n.RegionBody = strings.TrimSpace(strings.Join(parts[2:], "---"))
 	}

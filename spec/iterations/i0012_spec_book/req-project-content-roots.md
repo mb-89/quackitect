@@ -1,7 +1,7 @@
 ---
 id: req-project-content-roots
 type: requirement
-statement: The engine shall serve glossary and reference content from one workspace-spec source - the numbered statements bind individually.
+statement: The engine shall serve glossary and reference content from one workspace-spec source. The numbered statements bind individually.
 class: review
 killer: false
 ---

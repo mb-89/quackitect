@@ -10,7 +10,7 @@ ratings:
   crit-render-book: 0.5
   crit-diff-versioning: 1.0
   crit-spatial-meaning: 0.2
-statement: A project-owned model language designed for trivial parsing - the reference candidate the ownership law kills.
+statement: A project-owned model language designed for trivial parsing. This is the reference candidate the ownership law kills.
 class: review
 killer: false
 ---

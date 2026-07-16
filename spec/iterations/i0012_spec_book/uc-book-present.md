@@ -1,7 +1,7 @@
 ---
 id: uc-book-present
 type: usecase
-statement: The owner presents the project from a deck compiled out of the spec - hash-backed, none of it hand-written.
+statement: The owner presents the project from a deck compiled out of the spec. It is hash-backed. None of it is hand-written.
 class: review
 killer: false
 ---

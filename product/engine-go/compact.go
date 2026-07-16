@@ -10,36 +10,7 @@ import (
 )
 
 // design: go-compact  implements: req-iterations-compacted
-// A shipped iteration compacts into ONE container file, <iter>/archive.md, that the
-// loader reads natively (adr-compact-archive-loader). The container is line-oriented.
-// The first line is the header. Each entry is a marker line, then the ORIGINAL file
-// bytes verbatim. The marker names the file's path relative to the iteration dir.
-//
-//   <<<quackitect-archive v1>>>
-//   <<<node: req-a.md>>>
-//   ---
-//   id: req-a
-//   ...
-//   <<<node: tasks/f1-m1-gate.md>>>
-//   ...
-//
-// Verbatim payloads are the whole trick. The loader parses the same bytes as before,
-// so stmtHash and fullHash never move (the kill-criterion). A payload without a final
-// newline writes under <<<node+pad: ...>>>; the splitter strips the one padding
-// newline the writer added. A payload that itself carries a marker line refuses to
-// compact — the split would corrupt it.
-//
-// Recorded choices:
-// - Evidence docs (M<n>-*.md) are SKIPPED. They stay beside archive.md, because
-//   evidenceDocSeed (engine.go) resolves evidence by disk glob and stays
-//   archive-unaware. The selftest fixture has no evidence docs, so its <=1 file
-//   bound holds.
-// - The strict referee (StrictIssues, trust.go) never flags archive.md. Its first
-//   line is the header, not '---', so nodeFence refuses it as a node candidate.
-//   Verified: StrictIssues returns at !nodeFence; LoadAll's plain-file path checks
-//   the same fence. Known seam: the referee also does not INDEX archived ids, so a
-//   live node referencing an archived one would flag dangling. Acceptable while only
-//   shipped, self-contained iterations compact.
+// A shipped iteration compacts into ONE container file, <iter>/archive.md, that the loader reads natively (adr-compact-archive-loader). The container is line-oriented. The first line is the header. Each entry is a marker line, then the ORIGINAL file bytes verbatim. The marker names the file's path relative to the iteration dir. For example: <<<quackitect-archive v1>>> <<<node: req-a.md>>> --- id: req-a ... <<<node: tasks/f1-m1-gate.md>>> ... . Verbatim payloads are the whole trick. The loader parses the same bytes as before, so stmtHash and fullHash never move, the kill-criterion. A payload without a final newline writes under <<<node+pad: ...>>>. The splitter strips the one padding newline the writer added. A payload that itself carries a marker line refuses to compact, since the split would corrupt it. Recorded choices: evidence docs (M<n>-*.md) are SKIPPED. They stay beside archive.md, because evidenceDocSeed (engine.go) resolves evidence by disk glob and stays archive-unaware. The selftest fixture has no evidence docs, so its <=1 file bound holds. The strict referee (StrictIssues, trust.go) never flags archive.md. Its first line is the header, not '---', so nodeFence refuses it as a node candidate. Verified: StrictIssues returns at !nodeFence; LoadAll's plain-file path checks the same fence. Known seam: the referee also does not INDEX archived ids, so a live node referencing an archived one would flag dangling. Acceptable while only shipped, self-contained iterations compact.
 
 const (
 	archiveName      = "archive.md"

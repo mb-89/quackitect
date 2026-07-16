@@ -5,7 +5,7 @@ mode: chapter
 order: 0
 statement: Introduction - what this book is and how to read it.
 ---
-<!-- design: des-prose-rework  implements: req-prose-rework :: ch0 opens with the document overview - what the document is and why to read it, then the derived chapter lines and derived documents; the reading mechanics and the reader matrix close the chapter; ch1 leads with the moved bottleneck; the README opens story-first and closes on the dogfood claim - all reader-first per the voice rules. -->
+<!-- design: des-prose-rework  implements: req-prose-rework :: ch0 opens with the document overview: what the document is and why to read it, then the derived chapter lines and derived documents. The reading mechanics and the reader matrix close the chapter. ch1 leads with the moved bottleneck. The README opens story-first and closes on the dogfood claim. All of this is reader-first per the voice rules. Document overview. -->
 ## Document overview
 <!-- fill [mandatory]
 Contents: what this document IS and why to read it. The chapter lines and the

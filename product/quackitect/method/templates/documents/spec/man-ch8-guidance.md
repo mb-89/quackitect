@@ -29,7 +29,7 @@ Every fundamental the document uses renders here as a table row - the full expla
 
 ![[fundamentals.base#Fundamentals in full]]
 ---
-<!-- design: des-derived-prose  implements: req-compact-derived.3 :: The guidance chapter states the derived-over-authored law (joined by no-green-ocean and one-screen-by-default); the ch3 functions tree became the ucfn board; the ch8 guides render as ONE audience-filterable table (no sibling subchapters) - "About this document" and "Baselines and change control" are maintainer ROWS of that table, never subchapters; the one remaining authored-but-derivable list (ch3 interfaces) is recorded residue. -->
+<!-- design: des-derived-prose  implements: req-compact-derived.3 :: The guidance chapter states the derived-over-authored law, joined by no-green-ocean and one-screen-by-default. The ch3 functions tree became the ucfn board. The ch8 guides render as ONE audience-filterable table, with no sibling subchapters. "About this document" and "Baselines and change control" are maintainer ROWS of that table, never subchapters. The one remaining authored-but-derivable list, ch3 interfaces, is recorded residue. Guides. -->
 ## Guides
 <!-- tailor: shipped machinery - intro and guides are ONE subchapter:
   the table renders one row per guide with the TARGET AUDIENCE as the leading,

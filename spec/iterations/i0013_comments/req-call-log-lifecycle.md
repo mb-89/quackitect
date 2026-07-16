@@ -1,7 +1,7 @@
 ---
 id: req-call-log-lifecycle
 type: requirement
-statement: The engine shall retain a capped call log and surrender its aggregate at the retro - the numbered statements bind individually.
+statement: The engine shall retain a capped call log and surrender its aggregate at the retro. The numbered statements bind individually.
 class: review
 killer: false
 ---

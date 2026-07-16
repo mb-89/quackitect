@@ -7,7 +7,7 @@ impact: 0.3
 mitigation: replace each EXAMPLE note with a real one demand-driven; the examples say so on their face
 owner: project-owner
 status: open
-statement: The methods, rules, and force views render EXAMPLE notes; the interface view stays empty - real content pending.
+statement: The methods, rules, and force views render EXAMPLE notes. The interface view stays empty; real content is pending.
 class: review
 killer: false
 ---

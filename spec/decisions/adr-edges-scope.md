@@ -4,7 +4,7 @@ decided_in: i0012_spec_book
 type: adr
 kind: architecture
 adjudicated_by: user
-statement: The migration covers the semantic edges - verifies, refines, addresses, refers, chosen, rejected, supersedes. implements stays code-declared (designs live in code; regions already hash) and merges into adjacency views at read time. Task wiring - depends_on and parent - stays frontmatter this iteration; joining later is a cheap jsonl move if a need appears.
+statement: The migration covers the semantic edges: verifies, refines, addresses, refers, chosen, rejected, supersedes. implements stays code-declared, since designs live in code and regions already hash, and merges into adjacency views at read time. Task wiring, meaning depends_on and parent, stays frontmatter this iteration. Joining later is a cheap jsonl move if a need appears.
 class: review
 killer: false
 ---

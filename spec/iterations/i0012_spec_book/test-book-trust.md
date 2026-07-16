@@ -1,7 +1,7 @@
 ---
 id: test-book-trust
 type: test
-statement: The book renders its exact ledger truth - live state, stamped identity, drift flagged at ship.
+statement: The book renders its exact ledger truth: live state, stamped identity, drift flagged at ship.
 class: executed
 verify: selftest:book-drift book-honesty book-identity
 tests_red: exempt - clustered at i17; the birth reds stand in the ledger under the origin ids (adr-cluster-numbered-statements)

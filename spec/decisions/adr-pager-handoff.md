@@ -3,7 +3,7 @@ id: adr-pager-handoff
 decided_in: i0010_engine_workshop
 type: adr
 adjudicated_by: human
-statement: Merge the HAND-OFF, never the nodes: when every undone dependency of a milestone gate is a ready killer subtask, one combined pager presents those killers and the gate; blesses are recorded individually; a split answer stays possible. Substance and review remain separate records. Corollary (owner ruling, i10 M7) - order is not dependency: depends_on edges state real prerequisites only, never display order, so agent-blessable fillers never stand between the user and the gate.
+statement: Merge the HAND-OFF, never the nodes. When every undone dependency of a milestone gate is a ready killer subtask, one combined pager presents those killers and the gate. Blesses are recorded individually. A split answer stays possible. Substance and review remain separate records. Corollary (owner ruling, i10 M7): order is not dependency. depends_on edges state real prerequisites only, never display order, so agent-blessable fillers never stand between the user and the gate.
 class: review
 killer: false
 ---

@@ -7,7 +7,7 @@ impact: 0.5
 mitigation: hand the book to one outside stakeholder early in the next iteration; their read is the probe
 owner: project-owner
 status: open
-statement: The book has no outside-reader validation yet - only the owner and the driving agent have read it.
+statement: The book has no outside-reader validation yet. Only the owner and the driving agent have read it.
 class: review
 killer: false
 ---

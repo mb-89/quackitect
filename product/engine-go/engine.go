@@ -16,11 +16,7 @@ import (
 var ROOT, SPEC, QUACK, ATTEST, ENGINE string // NOTES retired: the note lane resolves notesHome() live
 
 // design: go-workspace-base  implements: req-vendor-workspace.5, req-vehicle-drives-stub.2, req-vehicle-drives-stub.3
-// The engine operates on a selectable WORKSPACE, separate from the ENGINE install. ROOT (and all state
-// — SPEC/QUACK/ATTEST/NOTES) is the cwd walk-up by default, or an explicit --base/-C target, so one
-// engine drives its own or ANOTHER project's workspace (sebot base-style; like git -C). ENGINE (the
-// binary + vendored resources) resolves from the executable's own location, independent of the
-// workspace. In self mode the two roots coincide and behaviour is unchanged.
+// The engine operates on a selectable WORKSPACE, separate from the ENGINE install. ROOT, and all state, SPEC/QUACK/ATTEST/NOTES, is the cwd walk-up by default, or an explicit --base/-C target. So one engine drives its own or ANOTHER project's workspace, sebot base-style, like git -C. ENGINE, the binary plus vendored resources, resolves from the executable's own location, independent of the workspace. In self mode the two roots coincide, and behaviour is unchanged.
 func baseFromArgs() string {
 	for i := 1; i < len(os.Args)-1; i++ {
 		if os.Args[i] == "--base" || os.Args[i] == "-C" {
@@ -150,10 +146,7 @@ func init() {
 }
 
 // design: go-engine-core  implements: req-go-port.1, req-trace-model.1, req-review
-// The identity kernel: the hashing primitive and merkle fold over the typed node
-// graph — pure functions, no file or directory I/O; every disk read of the load
-// belongs to go-graph-load. norm + full_hash are byte-identical to the Python
-// original.
+// This is the identity kernel: the hashing primitive and merkle fold over the typed node graph. These are pure functions, with no file or directory I/O. Every disk read of the load belongs to go-graph-load. norm and full_hash are byte-identical to the Python original.
 var wsRe = regexp.MustCompile(`\s+`)
 
 func norm(s string) string { return strings.ToLower(strings.TrimSpace(wsRe.ReplaceAllString(s, " "))) }
@@ -218,9 +211,7 @@ func fullHash(id string, nodes map[string]Node, memo map[string]string) string {
 		seed += "|decided_in:" + n.DecidedIn
 	}
 	// design: go-provenance-block  implements: req-mint-prefill.2
-	// per-field provenance is IDENTITY (adr-provenance-in-node): the block parses with
-	// the generic frontmatter maps and folds here deterministically, so a value edit and
-	// its provenance stamp travel under one hash — the register's colors can trust it.
+	// Per-field provenance is IDENTITY (adr-provenance-in-node). The block parses with the generic frontmatter maps and folds here deterministically. So a value edit and its provenance stamp travel under one hash. The register's colors can trust it.
 	if p := n.Maps["provenance"]; len(p) > 0 {
 		ks := make([]string, 0, len(p))
 		for k := range p {
@@ -256,10 +247,7 @@ func needsDigest(nodes map[string]Node) string {
 // enddesign
 
 // design: go-graph-load  implements: req-model-nodes
-// The load band (rim--graph): text on disk to the typed node map. LoadAll walks
-// spec/**/*.md plus the in-code design markers under product/ and assembles the
-// nodes; every file and directory read of the load lives here — the kernel takes
-// assembled nodes only.
+// This is the load band (rim to graph): text on disk to the typed node map. LoadAll walks spec/**/*.md plus the in-code design markers under product/ and assembles the nodes. Every file and directory read of the load lives here. The kernel takes assembled nodes only.
 
 var designRe = regexp.MustCompile(`design:\s*(\S+)\s+implements:\s*([^>]+)`)
 
@@ -272,11 +260,7 @@ func scanCodeDesigns() map[string]Node {
 }
 
 // design: go-node-module-default  implements: req-node-module
-// Loading assigns every graph node to a module. Historical nodes with no module frontmatter
-// inherit the workspace default module, so single-module workspaces keep working unchanged.
-// LoadAll walks spec/**/*.md plus the in-code design markers under product/.
-// It refuses a malformed graph first (strictGuard, go-strict-load) — batched
-// findings + nonzero exit instead of a silently-shrunk suspect cone.
+// Loading assigns every graph node to a module. Historical nodes with no module frontmatter inherit the workspace default module, so single-module workspaces keep working unchanged. LoadAll walks spec/**/*.md plus the in-code design markers under product/. It refuses a malformed graph first (strictGuard, go-strict-load): batched findings plus a nonzero exit, instead of a silently-shrunk suspect cone.
 func LoadAll() map[string]Node {
 	strictGuard()
 	nodes := map[string]Node{}
@@ -311,9 +295,7 @@ func LoadAll() map[string]Node {
 		nodes[id] = d
 	}
 	// design: go-conn-lane-root  implements: req-connections-lanes.7
-	// Each edges.jsonl joins the identity root as one synthetic lane node whose
-	// RegionBody is the file's bytes - an edge-line edit moves the root exactly like
-	// a frontmatter edit always did. Lane nodes are content (off the graph whitelist).
+	// Each edges.jsonl joins the identity root as one synthetic lane node whose RegionBody is the file's bytes. An edge-line edit moves the root exactly like a frontmatter edit always did. Lane nodes are content, off the graph whitelist.
 	if kdirs, err := os.ReadDir(filepath.Join(SPEC, "connections")); err == nil {
 		for _, kd := range kdirs {
 			if !kd.IsDir() {
@@ -406,11 +388,7 @@ func scanDesignsUnder(base string) map[string]Node {
 }
 
 // design: go-evidence-hash  implements: req-evidence-ledger.1
-// A milestone gate folds its evidence doc set (M<n>-*.md in the iteration dir) into its full
-// hash (adr-evidence-hash): editing blessed evidence flips the gate SUSPECT, so the verdict
-// referent can never mutate silently under its report link. Content-hashed through normWS —
-// reformat churn moves nothing, content edits always do. Gate-only by the ADR (subtasks never
-// fold docs). No docs -> no seed component, so doc-less history stays stable.
+// A milestone gate folds its evidence doc set (M<n>-*.md in the iteration dir) into its full hash (adr-evidence-hash). Editing blessed evidence flips the gate SUSPECT, so the verdict referent can never mutate silently under its report link. It is content-hashed through normWS: reformat churn moves nothing, content edits always do. This is gate-only by the ADR, since subtasks never fold docs. No docs means no seed component, so doc-less history stays stable.
 var evidenceBaseOverride string // test seam: redirects where the docs are read from
 
 // evidenceDocSeed returns the seed component for milestone ms of iteration iter ("" if no docs).
@@ -449,8 +427,7 @@ var traceContent = map[string]bool{"need": true, "usecase": true, "requirement":
 	"question": true}
 
 // design: go-no-trace-gate  implements: req-gate-eval-integrity.1
-// Trace-typed nodes (need/usecase/requirement/design/test/adr) are content, never task gates —
-// isGate excludes them; selftest:no-trace-gate guards the invariant so it cannot regress.
+// Trace-typed nodes (need/usecase/requirement/design/test/adr) are content, never task gates. isGate excludes them. selftest:no-trace-gate guards the invariant so it cannot regress.
 // enddesign
 func isGate(n Node) bool {
 	// Trace work-products are content, never task-tree gates — even tests, which are executed but
@@ -641,11 +618,7 @@ func StatusMap(nodes map[string]Node) map[string]string {
 // enddesign
 
 // design: go-suspect-root  implements: req-suspicion-attribution.1
-// A PROPAGATED suspect (raw DONE, effective SUSPECT — some upstream drags the cone) is a different
-// fact than a DIRECT one (own inputs changed), and the board must say so with the ROOT named:
-// one OPEN executed check can read as dozens of anonymous suspects and cost wasted re-blesses. Roots
-// are the minimal upstream culprits: checks whose RAW state is not DONE and whose own upstreams
-// are all raw-DONE. RawStates exposes the pre-propagation pass; SuspectRoots walks to the culprits.
+// A PROPAGATED suspect, raw DONE but effective SUSPECT because some upstream drags the cone, is a different fact than a DIRECT one, where its own inputs changed. The board must say so with the ROOT named. One OPEN executed check can read as dozens of anonymous suspects and cost wasted re-blesses. Roots are the minimal upstream culprits: checks whose RAW state is not DONE and whose own upstreams are all raw-DONE. RawStates exposes the pre-propagation pass. SuspectRoots walks to the culprits.
 func RawStates(nodes map[string]Node) map[string]string {
 	a := attestLoad()
 	memo := map[string]string{}

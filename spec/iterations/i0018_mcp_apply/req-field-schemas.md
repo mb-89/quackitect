@@ -2,7 +2,7 @@
 id: req-field-schemas
 type: requirement
 depends_on: []
-statement: The engine shall check node field values against per-field schemas declared in the method layer - the numbered statements bind individually.
+statement: The engine shall check node field values against per-field schemas declared in the method layer. The numbered statements bind individually.
 class: review
 killer: false
 ---

@@ -24,10 +24,7 @@ var i11Tests = []namedTest{
 }
 
 // design: go-standalone-suite  implements: req-parity-standalone
-// A test node carrying `suite: standalone` is not a member of any verification suite: tests-pass
-// skips it, and the board carries it as its own entry with a live verdict (adr-standalone-suite).
-// The parity tamper check moves to this suite, so legitimate authoring no longer reddens history —
-// a moved golden root reddens exactly one row, and that row says what it means.
+// A test node carrying `suite: standalone` is not a member of any verification suite. tests-pass skips it, and the board carries it as its own entry with a live verdict (adr-standalone-suite). The parity tamper check moves to this suite, so legitimate authoring no longer reddens history. A moved golden root reddens exactly one row, and that row says what it means.
 
 // test-parity-standalone -> selftest:parity-standalone
 func selftestParityStandalone() bool {
@@ -207,10 +204,7 @@ func selftestStampUser() bool {
 }
 
 // design: go-legacy-lanes-retired  implements: req-legacy-decided.3
-// The legacy .quack lanes are dead (adr-retire-legacy-lanes): the resolver walks data-home
-// overlay -> tools/vendor -> dogfood product only, and the stub launcher resolves the global
-// binary then QUACK_ENGINE — no engine.local pointer, no internal .quack engine. This check
-// probes a fake engine root carrying ONLY legacy lanes and demands they stay invisible.
+// The legacy .quack lanes are dead (adr-retire-legacy-lanes). The resolver walks data-home overlay -> tools/vendor -> dogfood product only. The stub launcher resolves the global binary, then QUACK_ENGINE. There is no engine.local pointer and no internal .quack engine. This check probes a fake engine root carrying ONLY legacy lanes and demands they stay invisible.
 
 // test-legacy-lanes-retired -> selftest:legacy-lanes-retired
 func selftestLegacyLanesRetired() bool {
@@ -255,11 +249,7 @@ func selftestLegacyLanesRetired() bool {
 // enddesign
 
 // design: go-grandfathers-decided  implements: req-legacy-decided.1
-// No grandfather without a recorded decision (adr-grandfathers-historical). The anonymous
-// EARS baseline file is dead; every `ears: exempt` marker must cite a resolvable ADR; a
-// pre-i4 requirement without a realized design region must be addressed by an ADR. Enforced
-// live over the real graph by selftest:grandfathers-decided — an exemption without its
-// decision fails the check.
+// No grandfather exists without a recorded decision (adr-grandfathers-historical). The anonymous EARS baseline file is dead. Every `ears: exempt` marker must cite a resolvable ADR. A pre-i4 requirement without a realized design region must be addressed by an ADR. This is enforced live over the real graph by selftest:grandfathers-decided. An exemption without its decision fails the check.
 
 // test-grandfathers-decided -> selftest:grandfathers-decided
 func selftestGrandfathersDecided() bool {

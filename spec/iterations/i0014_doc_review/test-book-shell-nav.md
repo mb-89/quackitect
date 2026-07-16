@@ -1,7 +1,7 @@
 ---
 id: test-book-shell-nav
 type: test
-statement: The book shell organizes navigation - section paging, the deck views listing, and the title card.
+statement: The book shell organizes navigation: section paging, the deck views listing, and the title card.
 class: executed
 verify: selftest:deck-views-section section-paging shell-title-card
 tests_red: exempt - clustered at i17; the birth reds stand in the ledger under the origin ids (adr-cluster-numbered-statements)

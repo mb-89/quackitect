@@ -1,7 +1,7 @@
 ---
 id: req-vehicle-white-label
 type: requirement
-statement: While rendering from a vehicle, the book shall present the vehicle's identity and credit the engine - the numbered statements bind individually.
+statement: While rendering from a vehicle, the book shall present the vehicle's identity and credit the engine. The numbered statements bind individually.
 class: review
 killer: false
 ---

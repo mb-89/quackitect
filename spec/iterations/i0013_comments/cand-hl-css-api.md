@@ -6,7 +6,7 @@ ratings:
   dom-static: 1
   reader-ux: 0.9
   buildability: 0.8
-statement: CSS Custom Highlight API - ranges painted by the browser, no DOM mutation.
+statement: CSS Custom Highlight API: ranges painted by the browser, no DOM mutation.
 class: review
 killer: false
 ---

@@ -2,7 +2,7 @@
 id: req-apply-default-lane
 type: requirement
 depends_on: []
-statement: The method prompts shall name quack apply the default lane for a mechanical bulk edit, with editor tooling for a single edit and the byte-safe scripted lane as the recorded exception.
+statement: The method prompts shall name quack apply the default lane for a mechanical bulk edit. Editor tooling stays the lane for a single edit. The byte-safe scripted lane is the recorded exception.
 class: review
 killer: false
 ---

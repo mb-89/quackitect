@@ -10,7 +10,7 @@ ratings:
   crit-render-book: 0.2
   crit-diff-versioning: 0.9
   crit-spatial-meaning: 0.1
-statement: SysML v2 textual notation carries every kind - the industry standard, rendered by external tooling.
+statement: SysML v2 textual notation carries every kind. This is the industry standard, rendered by external tooling.
 class: review
 killer: false
 ---

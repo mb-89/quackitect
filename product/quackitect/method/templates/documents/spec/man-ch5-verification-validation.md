@@ -5,7 +5,7 @@ mode: chapter
 order: 50
 statement: V&V - verification and validation: thing built right, right thing built.
 ---
-<!-- design: method-chapter-canning  implements: req-chapters-canned.4 :: ch5-ch8 generic ledes ship canned: the V&V split, the strategy fields, the matrix and waiver intros, the ch6 ledger prose, the annex lede, the ch8 quarantine and about-text; the authored residue is exactly the approach paragraph, the guides, the validation tracing, and the type-gated units. -->
+<!-- design: method-chapter-canning  implements: req-chapters-canned.4 :: ch5 through ch8 generic ledes ship canned: the V&V split, the strategy fields, the matrix and waiver intros, and the ch6 ledger prose. The annex lede and the ch8 quarantine and about-text ship canned too. The authored residue is exactly the approach paragraph, the guides, the validation tracing, and the type-gated units. How we know it works. -->
 ## How we know it works
 <!-- tailor: shipped text - the V&V split is the same in every project.
 -->

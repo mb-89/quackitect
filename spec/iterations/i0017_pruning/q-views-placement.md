@@ -2,7 +2,7 @@
 id: q-views-placement
 type: question
 state: proposed
-statement: Where do the views, slide decks, and baseline controls live after leaving the details panel - removed for now, the owner wants a detailed discussion before placing them.
+statement: Where do the views, slide decks, and baseline controls live after leaving the details panel? They are removed for now. The owner wants a detailed discussion before placing them.
 class: review
 killer: false
 ---

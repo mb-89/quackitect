@@ -37,7 +37,7 @@ Sources: right-sizing @[[ref-se-thinking-learning]]; fixed skeleton, plug-in
 <!-- ai:3 -->
 {{approach}}
 ---
-<!-- design: des-ch6-table-only  implements: req-decision-rendering.1 :: ch6 renders the milestones and the decisions as tables only, never a graph; the milestones are SLIM - timeline order and name, a short introduction one expand away - and every decision lives in the ONE decisions table below. -->
+<!-- design: des-ch6-table-only  implements: req-decision-rendering.1 :: ch6 renders the milestones and the decisions as tables only, never a graph. The milestones are SLIM: timeline order and name, with a short introduction one expand away. Every decision lives in the ONE decisions table below. Milestones and timeline. -->
 ## Milestones and timeline
 <!-- tailor: shipped text - the walk is the truth; the table says it without a graph
   (DRY). Slim: timeline

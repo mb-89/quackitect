@@ -18,13 +18,7 @@ import (
 )
 
 // design: go-model-extract  implements: req-draft-is-truth, req-semantic-hash, req-model-lint
-// The pinned flowchart subset: `subgraph <layer>` blocks in rank order (innermost
-// first), element declarations `id["responsibility"]` inside them, then flows
-// `a -->|payload| b` on declared names. A UTF-8 BOM is stripped; a
-// beyond-subset line is a lint FINDING and the rest still parses;
-// an undeclared flow endpoint or an empty payload lints (the TikZ discipline).
-// The canonical form keeps layer ORDER (semantic) and sorts elements and flows
-// (their line order is cosmetic) — so the hash moves only on meaning.
+// The pinned flowchart subset uses `subgraph <layer>` blocks in rank order, innermost first, with element declarations `id["responsibility"]` inside them, then flows `a -->|payload| b` on declared names. A UTF-8 BOM is stripped. A beyond-subset line is a lint FINDING, and the rest still parses. An undeclared flow endpoint or an empty payload lints (the TikZ discipline). The canonical form keeps layer ORDER, which is semantic, and sorts elements and flows, whose line order is cosmetic. So the hash moves only on meaning.
 
 type modelElem struct{ Layer, Label string }
 type modelFlow struct{ Src, Dst, Payload string }
@@ -56,10 +50,7 @@ func modelSource(src string) string {
 }
 
 // design: go-model-behavior  implements: req-draft-is-truth
-// The behavior kinds ride the SAME extractor with a header dispatch: a
-// stateDiagram-v2 file maps states to elements and labeled transitions to flows;
-// a sequenceDiagram maps participants to elements and messages to flows. One
-// graph shape, one hash rule, one lint discipline for every authored kind.
+// The behavior kinds ride the SAME extractor with a header dispatch. A stateDiagram-v2 file maps states to elements and labeled transitions to flows. A sequenceDiagram maps participants to elements and messages to flows. One graph shape, one hash rule, one lint discipline serve every authored kind.
 var (
 	modelStateRe = regexp.MustCompile(`^([A-Za-z0-9_\[\]*-]+)\s*-->\s*([A-Za-z0-9_\[\]*-]+)(?::\s*(.*))?$`)
 	modelSeqRe   = regexp.MustCompile(`^([A-Za-z0-9_-]+)\s*(?:->>|-->>)\s*([A-Za-z0-9_-]+):\s*(.*)$`)
@@ -184,13 +175,7 @@ func (g modelGraph) CanonicalHash() string {
 // enddesign
 
 // design: go-model-render  implements: req-models-in-book
-// The book's design output chapter renders every declared model from its extracted
-// graph — the derived view of the text truth. Every arrow carries its payload name
-// (unlabeled arrows are useless). One figure line: `fig: model <id>`,
-// or bare `fig: model` for all models sorted. The structural-models SECTION renders
-// as the auto-generated table below (`fig: models-table`, the same table law as
-// every other derived view): one row per declared model, with the figure inside
-// the row expand.
+// The book's design output chapter renders every declared model from its extracted graph, the derived view of the text truth. Every arrow carries its payload name; unlabeled arrows are useless. One figure line does it: `fig: model <id>`, or bare `fig: model` for all models sorted. The structural-models SECTION renders as the auto-generated table below (`fig: models-table`, the same table law as every other derived view). It carries one row per declared model, with the figure inside the row expand.
 func renderModelFigure(arg string, nodes map[string]Node) string {
 	var ids []string
 	for id, n := range nodes {
@@ -437,15 +422,7 @@ func svgModelGraph(g modelGraph) string {
 // enddesign
 
 // design: go-informed-by-edges  implements: req-informed-by-edges
-// A decision may address a MODEL or a model ELEMENT first-class, exactly as it addresses a
-// requirement (req-informed-by-edges.1): the trace rules (coverage:adr-traced and the hole
-// lister) accept such a target, and the strict referee recognizes every DECLARED model element
-// as a resolvable endpoint so a first-class edge never reads dangling. The book's informed-by
-// list then LEADS with the decisions holding a first-class edge to the model or its elements and
-// keeps the name-derived citation only for a decision without one (req-informed-by-edges.2). An
-// addresses edge naming an element-shaped target that NO model declares is a dangling model
-// target the lint flags (req-informed-by-edges.3). Elements ARE design regions (the onion
-// physics), so a realized region in a model resolves both ways; the set is derived, never authored.
+// A decision may address a MODEL or a model ELEMENT first-class, exactly as it addresses a requirement (req-informed-by-edges.1). The trace rules, coverage:adr-traced and the hole lister, accept such a target. The strict referee recognizes every DECLARED model element as a resolvable endpoint, so a first-class edge never reads dangling. The book's informed-by list then LEADS with the decisions holding a first-class edge to the model or its elements. It keeps the name-derived citation only for a decision without one (req-informed-by-edges.2). An addresses edge naming an element-shaped target that NO model declares is a dangling model target the lint flags (req-informed-by-edges.3). Elements ARE design regions, the onion physics, so a realized region in a model resolves both ways. The set is derived, never authored.
 
 // modelDeclaredElements returns every element id declared across all model nodes' graphs — the
 // first-class trace endpoints, resolvable even before a design region realizes them.
@@ -533,12 +510,7 @@ func informedByDanglingFindings(nodes map[string]Node) []string {
 // enddesign
 
 // design: go-model-registry  implements: req-model-kinds, req-model-stubs
-// The kind registry is a FOLDER, not a list: method/models/*.md, engine-scanned -
-// the file IS the registration (the rigor/project_types/roles pattern). Each kind
-// names its question, format, choose-when heuristic, and smells in frontmatter;
-// its fenced example doubles as the mint stub. Kinds are data, formats are code:
-// a kind reusing a built-in format subset is alive on arrival; a new grammar owes
-// an engine step.
+// The kind registry is a FOLDER, not a list: method/models/*.md, engine-scanned. The file IS the registration, the rigor/project_types/roles pattern. Each kind names its question, format, choose-when heuristic, and smells in frontmatter. Its fenced example doubles as the mint stub. Kinds are data, and formats are code. A kind reusing a built-in format subset is alive on arrival. A new grammar owes an engine step.
 func modelKindFiles() []string {
 	dir := filepath.Join(engineRoot(), "product", "quackitect", "method", "models")
 	ents, err := os.ReadDir(dir)
@@ -579,15 +551,7 @@ func modelStubFor(kind string) string {
 // enddesign
 
 // design: go-models-complete-book  implements: req-models-complete-book
-// The kind-example figure (`fig: model-kinds`): ONE row per supported model kind
-// in the same expandable reader table as everything else, derived at render time
-// from the registry files themselves (modelKindFiles) - the book carries no
-// hand-authored duplicate. The row names the kind, the brief is the kind's own
-// question, and the expand holds the example: a section marked
-// data-kind-example="<kind>" (<kind> = the registry file's base name) whose figure
-// is the kind's by-example stub run through the normal extractor and renderer. A
-// derived kind (no authored stub - the context star computes from live spec
-// data) says so instead of faking an authored example.
+// The kind-example figure (`fig: model-kinds`) carries ONE row per supported model kind, in the same expandable reader table as everything else. It derives at render time from the registry files themselves (modelKindFiles); the book carries no hand-authored duplicate. The row names the kind, and the brief is the kind's own question. The expand holds the example: a section marked data-kind-example="<kind>" (<kind> = the registry file's base name) whose figure is the kind's by-example stub run through the normal extractor and renderer. A derived kind, with no authored stub since the context star computes from live spec data, says so instead of faking an authored example.
 func renderModelKindExamples() string {
 	files := modelKindFiles()
 	if len(files) == 0 {
@@ -630,12 +594,7 @@ func renderModelKindExamples() string {
 // enddesign
 
 // design: go-model-asbuilt  implements: req-conformance
-// The as-built side of the engine's own onion: deriveDesignFlow's region call
-// graph becomes a modelGraph - elements are the regions the code actually
-// carries (their layer looked up from the DECLARED model, sky-falls empty),
-// flows are the real calls, and reads/writes mark world contact. The lint runs
-// the reflexion diff live: inward-only calls, rim-only I/O, kernel purity,
-// sky-fall - the code's answer to the declared intent, on every lint.
+// This is the as-built side of the engine's own onion. deriveDesignFlow's region call graph becomes a modelGraph. Elements are the regions the code actually carries, their layer looked up from the DECLARED model, sky-falls empty. Flows are the real calls, and reads/writes mark world contact. The lint runs the reflexion diff live: inward-only calls, rim-only I/O, kernel purity, sky-fall. This is the code's answer to the declared intent, on every lint.
 func engineAsBuiltGraph(declared modelGraph) modelGraph {
 	consumes, reads, writes := deriveDesignFlow()
 	g := modelGraph{Layers: declared.Layers, Elems: map[string]modelElem{}}
@@ -728,13 +687,7 @@ func engineConformanceFindings(declared modelGraph) []string {
 // enddesign
 
 // design: go-model-conformance  implements: req-conformance, req-divergence-suspect, req-no-flow-smell
-// Reflexion models, mechanized: the declared graph (the owner's intent) against
-// the as-built graph (derived from code), diffed into convergences (declared and
-// built), divergences (built, never declared - including outward dependencies),
-// absences (declared, never built), and sky-falls (elements realized that no model
-// allocates - "no device falls from the sky"). modelConforms is the executed
-// verdict: any divergence, sky-fall, or absence fails the check, and a failing
-// check is a red board - the SUSPECT flip rides the model node's graph hash.
+// Reflexion models are mechanized: the declared graph (the owner's intent) is diffed against the as-built graph (derived from code). The diff yields convergences: declared and built. It yields divergences: built, never declared, including outward dependencies. It yields absences: declared, never built. It yields sky-falls: elements realized that no model allocates; "no device falls from the sky". modelConforms is the executed verdict. Any divergence, sky-fall, or absence fails the check, and a failing check is a red board. The SUSPECT flip rides the model node's graph hash.
 type conformance struct{ Convergences, Divergences, Absences, SkyFalls []string }
 
 func conformanceReport(declared, asBuilt modelGraph) conformance {
@@ -908,9 +861,5 @@ func modelsGateFindings(nodes map[string]*Node) []string {
 // enddesign
 
 // design: go-model-nodes  implements: req-model-nodes
-// A model node (type: model) is trace content: never blessed, never a gate; it
-// ripples through the ledger via its EXTRACTED graph — the hash computes once
-// at load (ParseNode, band work) into Node.ModelHash, and the kernel's fullHash
-// folds the FIELD, so dependents reopen exactly when the model's meaning
-// changes and the kernel never reads a file for it.
+// A model node (type: model) is trace content. It is never blessed and never a gate. It ripples through the ledger via its EXTRACTED graph. The hash computes once at load (ParseNode, band work) into Node.ModelHash. The kernel's fullHash folds the FIELD. So dependents reopen exactly when the model's meaning changes, and the kernel never reads a file for it.
 // enddesign

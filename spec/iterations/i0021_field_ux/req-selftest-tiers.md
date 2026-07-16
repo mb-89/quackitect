@@ -1,7 +1,7 @@
 ---
 id: req-selftest-tiers
 type: requirement
-statement: Where the build fast-path runs, quack build shall execute a fast selftest tier only, and quack selftest shall keep running the full battery - the numbered statements bind individually.
+statement: Where the build fast-path runs, quack build shall execute a fast selftest tier only. quack selftest shall keep running the full battery. The numbered statements bind individually.
 class: review
 killer: false
 ---

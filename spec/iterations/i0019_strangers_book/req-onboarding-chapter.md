@@ -1,7 +1,7 @@
 ---
 id: req-onboarding-chapter
 type: requirement
-statement: The book shall carry an onboarding chapter as section 2.2 that routes a newcomer to the walkthrough deck and to the newcomer-filtered guides - the numbered statements bind individually.
+statement: The book shall carry an onboarding chapter as section 2.2 that routes a newcomer to the walkthrough deck and to the newcomer-filtered guides. The numbered statements bind individually.
 class: review
 killer: false
 ---

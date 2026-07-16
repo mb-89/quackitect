@@ -3,7 +3,7 @@ id: adr-veto-pointer-entry
 decided_in: i0009_contract_attestation
 type: adr
 adjudicated_by: human
-statement: Pointer-based entry files (AGENTS.md pointing at contract.md) are scrapped: thin harnesses do not follow pointers — field-proven at i6 (Copilot) and the origin of req-contract-render (i9 M3 axis A4b).
+statement: Pointer-based entry files, AGENTS.md pointing at contract.md, are scrapped. Thin harnesses do not follow pointers. This was field-proven at i6 (Copilot) and is the origin of req-contract-render (i9 M3 axis A4b).
 class: review
 killer: false
 ---

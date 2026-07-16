@@ -4,7 +4,7 @@ decided_in: i0012_spec_book
 type: adr
 kind: architecture
 adjudicated_by: user
-statement: Two lanes per kind - edges.jsonl holds trivial edges one line per edge, con- notes hold prose-bearing ones - an edge lives in exactly one lane, mint and promote are determinizers, and quack connections merges jsonl, notes, and code-derived implements into one deterministic adjacency answer.
+statement: There are two lanes per kind. edges.jsonl holds trivial edges, one line per edge. con- notes hold the prose-bearing ones. An edge lives in exactly one lane. Mint and promote are determinizers. quack connections merges jsonl, notes, and code-derived implements into one deterministic adjacency answer.
 class: review
 killer: false
 ---

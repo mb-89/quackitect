@@ -10,7 +10,7 @@ ratings:
   crit-render-book: 0.9
   crit-diff-versioning: 1.0
   crit-spatial-meaning: 0.7
-statement: Small text languages carry every kind - Mermaid for state, sequence, and trees, the layer list for rings; layout is always computed, spatial reading comes from derived renders.
+statement: Small text languages carry every kind: Mermaid for state, sequence, and trees, the layer list for rings. Layout is always computed. Spatial reading comes from derived renders.
 class: review
 killer: false
 ---

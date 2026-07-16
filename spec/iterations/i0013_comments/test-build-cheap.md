@@ -1,7 +1,7 @@
 ---
 id: test-build-cheap
 type: test
-statement: quack build and dispatch stay cheap - the compile skipped when unchanged, verdicts kept surgically.
+statement: quack build and dispatch stay cheap: the compile is skipped when unchanged, verdicts kept surgically.
 class: executed
 verify: selftest:build-fast-path verdict-surgical
 tests_red: exempt - clustered at i17; the birth reds stand in the ledger under the origin ids (adr-cluster-numbered-statements)

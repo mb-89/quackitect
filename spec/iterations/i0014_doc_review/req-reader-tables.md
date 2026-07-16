@@ -2,7 +2,7 @@
 id: req-reader-tables
 ears: exempt - historical pre-EARS statement, retire-or-retrofit recorded (adr-grandfathers-historical)
 type: requirement
-statement: Every reader-facing query shall render as a compact, in-place filterable, expandable table - the numbered statements bind individually.
+statement: Every reader-facing query shall render as a compact, in-place filterable, expandable table. The numbered statements bind individually.
 class: review
 killer: false
 ---

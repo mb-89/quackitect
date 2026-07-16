@@ -1,7 +1,7 @@
 ---
 id: req-decision-rendering
 type: requirement
-statement: The project chapter shall render decisions as a rationale-bearing table with each iteration's history reachable - the numbered statements bind individually.
+statement: The project chapter shall render decisions as a rationale-bearing table with each iteration's history reachable. The numbered statements bind individually.
 class: review
 killer: false
 ---

@@ -10,29 +10,13 @@ import (
 )
 
 // design: go-global-ratchet  implements: req-engine-distribution.2, req-engine-distribution.1
-// ONE global binary serves every workspace (adr-global-ratchet): it lives at
-// <userDataBase>/quackitect/bin/<brand>.exe; the launcher stays dumb — fixed path, existence check,
-// bootstrap build from the workspace's vendored engine source when absent. The RATCHET is the
-// engine's own startup self-check: if the workspace's vendored .go source is newer than the running
-// binary, the engine rebuilds the global binary from that source, swaps itself via the rename dance
-// (rename the running exe aside — legal on NTFS — move the fresh build in, sweep
-// the parked .old on a later run) and re-execs. Newer binary than source: runs as-is, forward-only,
-// no versioned slots, no downgrade path (the ratchet rule). A missing Go
-// toolchain degrades gracefully: warn and run the current binary.
-// The binary and pointer PATHS (globalBinPath, engineSrcPointer, recordEngineHome,
-// recordedEngineHome) live in go-data-home: they are machine-home path helpers the
-// ambient layer may read without reaching outward.
+// ONE global binary serves every workspace (adr-global-ratchet). It lives at <userDataBase>/quackitect/bin/<brand>.exe. The launcher stays dumb: fixed path, existence check, bootstrap build from the workspace's vendored engine source when absent. The RATCHET is the engine's own startup self-check. If the workspace's vendored .go source is newer than the running binary, the engine rebuilds the global binary from that source, swaps itself via the rename dance, and re-execs. The rename dance renames the running exe aside, legal on NTFS, moves the fresh build in, and sweeps the parked .old on a later run. If the binary is newer than the source, it runs as-is, forward-only, with no versioned slots and no downgrade path, the ratchet rule. A missing Go toolchain degrades gracefully: it warns and runs the current binary. The binary and pointer PATHS, globalBinPath, engineSrcPointer, recordEngineHome, recordedEngineHome, live in go-data-home. They are machine-home path helpers the ambient layer may read without reaching outward.
 func ratchetNeeded(binTime, srcTime int64) bool { return srcTime > binTime }
 
 // enddesign
 
 // design: go-ratchet-stamp  implements: req-ratchet-semantic
-// The ratchet compares COMMITTED build-time stamps, never file mtimes (adr-ratchet-stamp):
-// a fresh clone stamps checkout-time mtimes on old source and would rebuild
-// the global binary BACKWARD. `quack build` writes engine-stamp.txt into the source it compiles
-// (committed content — it survives every clone) and mirrors it beside the binary (<exe>.stamp).
-// Decision table: unstamped source is never newer (pre-stamp era); an unstamped binary defers to
-// any stamped source (one forward hop onto the stamp regime); otherwise strictly newer wins.
+// The ratchet compares COMMITTED build-time stamps, never file mtimes (adr-ratchet-stamp). A fresh clone stamps checkout-time mtimes on old source and would rebuild the global binary BACKWARD. `quack build` writes engine-stamp.txt into the source it compiles, committed content that survives every clone, and mirrors it beside the binary (<exe>.stamp). The decision table works like this. Unstamped source is never newer, the pre-stamp era. An unstamped binary defers to any stamped source, one forward hop onto the stamp regime. Otherwise strictly newer wins.
 func stampFile(srcDir string) string { return filepath.Join(srcDir, "engine-stamp.txt") }
 
 func readStampUnix(p string) (int64, bool) {
@@ -71,8 +55,13 @@ func replaceExe(target, staged string) error {
 		if attempt > 0 {
 			time.Sleep(120 * time.Millisecond)
 		}
-		old := target + ".old"
-		os.Remove(old)
+		// go-adopt-honest: a locked park slot never wedges the swap - park uniquely
+		old := adoptParkName(target+".old", func(n string) bool {
+			if e := os.Remove(n); e == nil || os.IsNotExist(e) {
+				return false // slot is free (or freed just now)
+			}
+			return true // locked by a running image - pick another name
+		})
 		if err = os.Rename(target, old); err != nil {
 			continue
 		}

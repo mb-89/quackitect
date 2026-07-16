@@ -2,7 +2,7 @@
 id: req-mcp-server
 type: requirement
 depends_on: []
-statement: The engine shall serve the command surface as MCP tools over standard input and output - the numbered statements bind individually.
+statement: The engine shall serve the command surface as MCP tools over standard input and output. The numbered statements bind individually.
 class: review
 killer: false
 ---

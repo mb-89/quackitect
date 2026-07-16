@@ -14,7 +14,7 @@ killer: true
 id: adr-tests-red-mechanism
 type: adr
 adjudicated_by: human
-statement: RED is observed durably by a run-once attestation — record the observed-failing test hashes before the build; a test-hash change re-suspects it — chosen over re-running the suite (which cannot see a past red once green). Reuses the existing attestation+suspect machinery. Full ADR + M5 spike.
+statement: RED is observed durably by a run-once attestation. The observed-failing test hashes are recorded before the build, and a test-hash change re-suspects it. This was chosen over re-running the suite, which cannot see a past red once green. It reuses the existing attestation-plus-suspect machinery. Full ADR plus M5 spike.
 depends_on: []
 class: review
 killer: true
@@ -32,7 +32,7 @@ Test-first (TDD) implementation checklist shared by lean+systematic, with plugga
 ---
 id: req-build-test-nesting
 type: requirement
-statement: The report nests generated build steps under a single build parent (a third nesting level, collapsible, in dependency order), reflecting the real hierarchy. (Tests are trace content rolled up by the verification task — the trace/task separation supersedes the original "testing parent" idea.)
+statement: The report nests generated build steps under a single build parent: a third nesting level, collapsible, in dependency order, reflecting the real hierarchy. Tests are trace content rolled up by the verification task. The trace/task separation supersedes the original "testing parent" idea.
 depends_on: []
 class: review
 killer: false
@@ -45,7 +45,7 @@ quality: [functionality]
 ---
 id: req-evidence-honesty
 type: requirement
-statement: A test that fails on a live re-run must never display DONE from cached tests-pass evidence; the evidence cache must not mask a red test (fixes the selftest:workspace red-but-DONE masking bug).
+statement: A test that fails on a live re-run must never display DONE from cached tests-pass evidence. The evidence cache must not mask a red test (fixes the selftest:workspace red-but-DONE masking bug).
 depends_on: []
 class: review
 killer: true
@@ -58,7 +58,7 @@ quality: [reliability]
 ---
 id: req-impl-fragment-tdd
 type: requirement
-statement: The implementation method shall be one shared fragment enforcing tests authored first, observed red, then realized - executed wherever mechanizable - the numbered statements bind individually.
+statement: The implementation method shall be one shared fragment enforcing tests authored first, observed red, then realized. It executes wherever mechanizable. The numbered statements bind individually.
 class: review
 killer: false
 ---
@@ -71,7 +71,7 @@ killer: false
 id: req-pluggable-capabilities
 ears: exempt - historical pre-EARS statement, retire-or-retrofit recorded (adr-grandfathers-historical)
 type: requirement
-statement: Roles and research shall be pluggable strategies behind file-based seams, never vendored or hardcoded - the numbered statements bind individually.
+statement: Roles and research shall be pluggable strategies behind file-based seams, never vendored or hardcoded. The numbered statements bind individually.
 class: review
 killer: false
 ---
@@ -508,7 +508,7 @@ depends_on: [i7-m7-gate]
 ---
 id: test-build-test-nesting
 type: test
-statement: A rendered report shows generated build steps nested under a build parent and test checks under a testing parent — three visible nesting levels — in dependency order.
+statement: A rendered report shows generated build steps nested under a build parent and test checks under a testing parent, in dependency order, with three visible nesting levels.
 class: review
 killer: false
 ---
@@ -524,7 +524,7 @@ killer: false
 ---
 id: test-evidence-honesty
 type: test
-statement: selftest:workspace forced to FAIL on a live re-run is reflected as not-DONE in status — cached tests-pass evidence does not mask the red.
+statement: selftest:workspace forced to FAIL on a live re-run is reflected as not-DONE in status. Cached tests-pass evidence does not mask the red.
 class: executed
 verify: selftest:evidence-honesty
 killer: false
@@ -568,7 +568,7 @@ tests_red: exempt - predates the red-observation mechanism (adr-grandfathers-his
 ---
 id: uc-pluggable-roles
 type: usecase
-statement: The test-designer, implementer, and tester are pluggable roles behind a stable file-based interface (prompt | subagent | tool | subtool); default binding is inline (todays behaviour), resolved at iteration seed from the project type and iteration overrides.
+statement: The test-designer, implementer, and tester are pluggable roles behind a stable file-based interface (prompt, subagent, tool, or subtool). Default binding is inline, today's behaviour, resolved at iteration seed from the project type and iteration overrides.
 class: review
 killer: false
 ---
@@ -576,7 +576,7 @@ killer: false
 ---
 id: uc-reliability
 type: usecase
-statement: ISO/IEC 25010 Reliability — the ledger's recorded evidence never shows green when a live re-run is red; a stale cache cannot mask a failing self-test.
+statement: ISO/IEC 25010 Reliability: the ledger's recorded evidence never shows green when a live re-run is red. A stale cache cannot mask a failing self-test.
 class: review
 killer: false
 ---

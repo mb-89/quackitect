@@ -2,7 +2,7 @@
 id: req-vehicle-drives-stub
 type: requirement
 depends_on: []
-statement: The engine shall let a vehicle carry committed method extensions and drive the stubs it creates with them - the numbered statements bind individually.
+statement: The engine shall let a vehicle carry committed method extensions and drive the stubs it creates with them. The numbered statements bind individually.
 class: review
 killer: false
 ---

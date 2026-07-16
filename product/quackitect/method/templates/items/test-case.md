@@ -4,7 +4,7 @@ artifact: node
 applies_rigor: [lean, systematic]
 applies_type: [default]
 ---
-<!-- design: method-verify-method  implements: req-item-domain-fields.4 :: Method and level are declared FIELDS on test items rendered in the verification matrix's columns; the requirement item's field is named verify_method because the bare verify key is the executed-check referent and must never collide. -->
+<!-- design: method-verify-method  implements: req-item-domain-fields.4 :: Method and level are declared FIELDS on test items, rendered in the verification matrix's columns. The requirement item's field is named verify_method, because the bare verify key is the executed-check referent and must never collide. test-case: one verification or validation check. -->
 # test-case â€” one verification or validation check
 
 Lives in its birth iteration. Observed RED before the build (`quack observe-red`).

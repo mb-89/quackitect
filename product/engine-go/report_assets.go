@@ -90,11 +90,7 @@ a.task.leaf{padding-left:23px}
 `
 
 // design: go-report-filter-ux  implements: req-report-filter-gestures.1, req-report-filter-gestures.3, req-report-filter-gestures.2, req-report-filter-gestures.4
-// The filter gains: a clear control (one click back to the full graph), a descendants:<id> predicate
-// (the node plus everything tracing into it — successors over the parent->child edges, the same cone
-// the suspect ripple walks), a double-click gesture applying that predicate for the tapped node, and
-// on-focus help documenting every form including these. JS only filters/toggles — content stays
-// server-baked (the report remains a pure display).
+// The filter gains four things. A clear control returns to the full graph in one click. A descendants:<id> predicate selects the node plus everything tracing into it, successors over the parent->child edges, the same cone the suspect ripple walks. A double-click gesture applies that predicate for the tapped node. On-focus help documents every form, including these. JS only filters and toggles. Content stays server-baked; the report remains a pure display.
 const reportJS = `
 (function(){
   var D = window.QUACK_DATA, tabs = D.tabs, host = document.getElementById('graph'),

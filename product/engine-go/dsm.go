@@ -18,12 +18,7 @@ import (
 )
 
 // design: go-dsm-cluster  implements: req-dsm-cluster
-// The DSM pipeline, stdlib-only and fully DETERMINISTIC (no RNG): a symmetric
-// coupling weight over the design regions, an IGTA-style bid/cost hill-climb with
-// fixed restarts for the clustering, then Tarjan SCC + weakest-edge tearing +
-// Kahn layering over the cluster digraph for the ordering. The same code runs the
-// real engine graph and the selftest's small known fixtures — reproducible by
-// construction, so a fixture assertion is a real regression guard.
+// The DSM pipeline is stdlib-only and fully DETERMINISTIC, no RNG. It computes a symmetric coupling weight over the design regions, then an IGTA-style bid/cost hill-climb with fixed restarts for the clustering. Then it runs Tarjan SCC plus weakest-edge tearing plus Kahn layering over the cluster digraph for the ordering. The same code runs the real engine graph and the selftest's small known fixtures. It is reproducible by construction, so a fixture assertion is a real regression guard.
 
 // dsmPowCC is the cluster-cost size exponent; dsmPowBid the bid + inter-cluster
 // exponent. Both default to 1 (documented in meth-dsm-clustering / the digest).

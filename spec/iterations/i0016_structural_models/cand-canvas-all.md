@@ -10,7 +10,7 @@ ratings:
   crit-render-book: 0.5
   crit-diff-versioning: 0.6
   crit-spatial-meaning: 1.0
-statement: Excalidraw carries every model kind under per-kind drawing contracts - one extractor, tray and groom assist the canvas.
+statement: Excalidraw carries every model kind under per-kind drawing contracts. One extractor, tray, and groom assist the canvas.
 class: review
 killer: false
 ---

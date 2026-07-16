@@ -1,7 +1,7 @@
 ---
 id: req-migrate-layout
 type: requirement
-statement: When migrate-layout runs on a workspace whose spec still carries manifests or item notes in spec/trace, the engine shall move each to its template-mirroring home, refusing to overwrite and reporting every move.
+statement: When migrate-layout runs on a workspace whose spec still carries manifests or item notes in spec/trace, the engine shall move each to its template-mirroring home. It refuses to overwrite and reports every move.
 class: review
 killer: false
 phase: [migration]

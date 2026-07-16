@@ -1,7 +1,7 @@
 ---
 id: test-provenance-block
 type: test
-statement: A provenance block parses from node frontmatter into the per-field map, and changing one provenance line moves the node's full hash - value and provenance travel under one identity.
+statement: A provenance block parses from node frontmatter into the per-field map. Changing one provenance line moves the node's full hash. Value and provenance travel under one identity.
 class: executed
 verify: selftest:provenance-block
 killer: false

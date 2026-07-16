@@ -3,7 +3,7 @@
 ---
 id: adr-engine-resolution
 type: adr
-statement: A bare workspace reaches its engine through a committed root launcher (`quack.cmd`) that resolves a `quack.exe` in a fixed order — internal `.quack\engine\quack.exe`, then the gitignored pointer `.quack\engine.local`, then the `QUACK_ENGINE` env var — and forwards all arguments; if none resolve it exits with a clear message. PATH lookup (candidate C) and a committed relative link (candidate D) are rejected: C mutates global state and is ambiguous, D leaks the engine location into version control. The engine location therefore lives only in gitignored/machine-local places, never in a tracked file.
+statement: A bare workspace reaches its engine through a committed root launcher (`quack.cmd`). It resolves a `quack.exe` in a fixed order: internal `.quack\engine\quack.exe`, then the gitignored pointer `.quack\engine.local`, then the `QUACK_ENGINE` env var. It forwards all arguments. If none resolve, it exits with a clear message. PATH lookup (candidate C) and a committed relative link (candidate D) are rejected. C mutates global state and is ambiguous. D leaks the engine location into version control. The engine location therefore lives only in gitignored or machine-local places, never in a tracked file.
 adjudicated_by: human
 killer: false
 ---
@@ -23,7 +23,7 @@ Drive a bare --base workspace from inside itself via linked-engine stubs (launch
 id: req-workspace-stubs
 ears: exempt - historical pre-EARS statement, retire-or-retrofit recorded (adr-grandfathers-historical)
 type: requirement
-statement: A bare workspace shall drive its runtime-resolved engine from inside via committed stubs that carry no engine path - the numbered statements bind individually.
+statement: A bare workspace shall drive its runtime-resolved engine from inside via committed stubs that carry no engine path. The numbered statements bind individually.
 class: review
 killer: false
 ---
@@ -561,7 +561,7 @@ Subtask of milestone M8. Human judgment.
 ---
 id: test-drive-from-inside
 type: test
-statement: The roundtrip/machinery test is extended so that after creating a bare workspace it drives that workspace FROM INSIDE via the committed launcher stub (resolving the engine at runtime) — status, next, a bless, report — and all steps succeed. State resolves under the workspace.
+statement: The roundtrip/machinery test is extended so that after creating a bare workspace, it drives that workspace FROM INSIDE via the committed launcher stub, resolving the engine at runtime. It runs status, next, a bless, and report, and all steps succeed. State resolves under the workspace.
 class: review
 verify: selftest:workspace
 killer: true
@@ -585,7 +585,7 @@ selftest:stubs checks the ignore rules and scans the committed set for leaked pa
 ---
 id: test-inside-entry-surface
 type: test
-statement: A bare workspace produced by the stub set contains a committed `AGENTS.md` that names `.\quack` as the drive command and references `quack resolve` / `quack guides` for path-free prompt loading, with no hard path to a quackitect checkout.
+statement: A bare workspace produced by the stub set contains a committed `AGENTS.md` naming `.\quack` as the drive command. It references `quack resolve` / `quack guides` for path-free prompt loading. No hard path to a quackitect checkout appears.
 class: executed
 verify: selftest:stubs
 killer: false
@@ -609,7 +609,7 @@ selftest:stubs exercises the resolution order non-interactively.
 ---
 id: uc-drive-from-inside
 type: usecase
-statement: A user opens a BARE workspace (product+spec+state, no engine present) on its own and drives it from INSIDE its own folder with `.\quack …`, via an engine linked at runtime — without copying the engine in and without committing the engine's location.
+statement: A user opens a BARE workspace (product+spec+state, no engine present) on its own. They drive it from INSIDE its own folder with `.\quack …`, via an engine linked at runtime. This happens without copying the engine in and without committing the engine's location.
 class: review
 killer: false
 ---

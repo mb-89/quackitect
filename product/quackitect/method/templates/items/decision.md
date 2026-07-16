@@ -6,7 +6,7 @@ applies_type: [default]
 ---
 # decision — one recorded call, of one kind
 
-<!-- design: method-decision-rationale  implements: req-decision-rendering.3 :: A recorded decision always carries its why: the skeleton mandates the MADR-shaped rationale body (context, options, decision, consequences), so the book renders reasoning, never a stub placeholder - a decision without its why is half a record. -->
+<!-- design: method-decision-rationale  implements: req-decision-rendering.3 :: A recorded decision always carries its why. The skeleton mandates the MADR-shaped rationale body: context, options, decision, consequences. So the book renders reasoning, never a stub placeholder. A decision without its why is half a record. -->
 
 Lives in `spec/decisions/` (all kinds). ONE type, three kinds; the prefix follows
 the kind: `adr-` architecture, `dec-` project, `wvr-` waiver. Each kind renders in

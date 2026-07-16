@@ -250,13 +250,7 @@ type gtab struct {
 }
 
 // design: go-render-folds  implements: req-trace-clustered
-// The trace graph renders UNFOLDED, one tab per need, in the report and the book alike.
-// It carries the semantic design dimension ONLY - no fold boxes, no iteration or age
-// grouping (adr-trace-graph-unfolded): age is the iteration sidebar's concept, and each
-// node gel carries an "iter" attribute for filters. The report adds the (unrooted)
-// leftovers tab for strays the operator must see; the book renders per-need tabs only,
-// decisions only when architectural (bookGraphTabs). Render compaction for large tabs
-// is an open design discussion, deliberately NOT solved here.
+// The trace graph renders UNFOLDED, one tab per need, in the report and the book alike. It carries the semantic design dimension ONLY. There are no fold boxes, and no iteration or age grouping (adr-trace-graph-unfolded). Age is the iteration sidebar's concept, and each node gel carries an "iter" attribute for filters. The report adds the (unrooted) leftovers tab for strays the operator must see. The book renders per-need tabs only, with decisions only when architectural (bookGraphTabs). Render compaction for large tabs is an open design discussion, deliberately NOT solved here.
 
 // buildTab emits one need's subtree as cytoscape elements (nodes + V-model edges). No positions:
 // the browser lays it out with the breadthfirst hierarchical layout (the same algo the filter uses).
@@ -392,10 +386,7 @@ func checksMap(nodes map[string]Node, sm map[string]string, outDir string) map[s
 			k = "1"
 		}
 		// design: go-verdict-link  implements: req-report-check-display.2
-		// Every DONE check surfaces its VERDICT: the bless attestation (actor · short-hash) for a review
-		// check, or "engine-verified" for an executed check — read from the attest log — so a DONE check
-		// shows WHY it passed even when NO milestone evidence doc exists. The optional
-		// verdict_href deep-links the M<n>-*.md doc when one is present. selftest:report-verdict guards it.
+		// Every DONE check surfaces its VERDICT: the bless attestation, actor · short-hash, for a review check, or "engine-verified" for an executed check, read from the attest log. So a DONE check shows WHY it passed, even when NO milestone evidence doc exists. The optional verdict_href deep-links the M<n>-*.md doc when one is present. selftest:report-verdict guards it.
 		verdict, verdictHref := "", ""
 		if sm[id] == "DONE" {
 			if n.Class == "executed" {
@@ -789,14 +780,7 @@ func projectDesc() string {
 }
 
 // design: go-report  implements: report-requirements, req-go-port.1, req-trace-filter
-// A faithful port of the deterministic report shell: a 3-column grid (iterations tree with
-// START/END brackets, a trace graph of per-need tabs with server-baked positions + a type legend,
-// and metric cards + a detail panel). Pure display: rendering never runs checks (the engine guard).
-// Plus one filter box over the graph: iteration predicates (0001, <=0002, >=0001), text or /regex/,
-// combined with AND/OR, on-focus help; on change a breadthfirst relayout of the visible subgraph.
-// reportOutDir returns the directory that report links are made relative to. Node paths are absolute
-// (walked from an absolute SPEC), so outDir must be absolute too — otherwise filepath.Rel(outDir, path)
-// errors and yields "", blanking every href and verdict link when rendered with a RELATIVE --out.
+// This is a faithful port of the deterministic report shell. It uses a 3-column grid. The grid holds an iterations tree with START/END brackets, a trace graph of per-need tabs with server-baked positions plus a type legend, and metric cards plus a detail panel. It is pure display; rendering never runs checks, the engine guard. It adds one filter box over the graph, with iteration predicates (0001, <=0002, >=0001), text or /regex/, combined with AND/OR, and on-focus help. On change it does a breadthfirst relayout of the visible subgraph. reportOutDir returns the directory that report links are made relative to. Node paths are absolute, walked from an absolute SPEC, so outDir must be absolute too. Otherwise filepath.Rel(outDir, path) errors and yields "", blanking every href and verdict link when rendered with a RELATIVE --out.
 func reportOutDir(outPath string) string {
 	d := filepath.Dir(outPath)
 	if abs, err := filepath.Abs(d); err == nil {
@@ -820,7 +804,7 @@ func RenderReport(outPath string) error {
 	// pass (a green that a live re-run would fail); computing fresh every render makes the board
 	// always truthful. Cheap now that checks are fast + deterministic. Pairs with --watch live-reload.
 	sm := StatusMap(nodes)
-	root := MerkleRoot(nodes)
+	root := workspaceRoot(nodes)
 	cfg := readProjectConfig()
 
 	iters := map[string][]string{}
@@ -907,29 +891,7 @@ func RenderReport(outPath string) error {
 // enddesign
 
 // design: go-register-render  implements: req-register-render
-// The REGISTER: fill/adjudicate as UI (adr-register-in-report). One row per node whose
-// TYPE carries its own schema fields; the row collapses to statement + computed color
-// chip (go-register-colors), the first disclosure level shows the CORE fields, the
-// second every field with its provenance line. The two greens wear DISTINCT marks
-// (adjudicated = filled, agent-confident = outlined) so a proposal never reads as a
-// decision. A KILLER node's row carries the pager pointer and no answer affordance
-// (req-register-killer-guard); a red non-killer row carries the answer affordance the
-// watch lane activates (b7) and the static file leaves inert.
-// renderHandoffHTML is the adjudication page (adr-handoff-html): one gate as a DECISION
-// BRIEF on a single phone-sized card, centered unchanged on a desktop, no page scroll.
-// Top: gate id, the gate's question, a one-line BLUF wearing the striped agent chip (a
-// proposal, never a ruling). Middle: the summary lines — you-must-decide, settle
-// later, riding a default, done. Tests and walked steps appear NOWHERE: they are
-// state, never decisions, and the brief is only about decisions (owner ruling); a
-// killer DEMO settles at its own milestone and rides the "settle later" line; the
-// decide view deals the blockers ONE AT A TIME (‹ › deck) — every card states in
-// plain words WHAT A BLESS ACCEPTS (the agent's defaults become the ruling; a killer
-// gate is adjudicated individually in the user's name). Bottom: the page's ONLY two
-// actions, y/n — a y makes handoffBless record everything stated. The buttons POST to the
-// local watch server; on a stale file with no listener they no-op by design (the
-// owner's ruling). Self-contained: no external asset, ever.
-// handoffCone is the gate's adjudication material: its direct inputs plus every
-// register-eligible trace node of the gate's iteration.
+// The REGISTER treats fill and adjudicate as UI (adr-register-in-report). One row appears per node, whose TYPE carries its own schema fields. The row collapses to statement plus a computed color chip (go-register-colors). The first disclosure level shows the CORE fields. The second shows every field with its provenance line. The two greens wear DISTINCT marks: adjudicated is filled, and agent-confident is outlined. So a proposal never reads as a decision. A KILLER node's row carries the pager pointer and no answer affordance (req-register-killer-guard). A red non-killer row carries the answer affordance the watch lane activates (b7), and the static file leaves it inert. renderHandoffHTML is the adjudication page (adr-handoff-html): one gate as a DECISION BRIEF on a single phone-sized card, centered unchanged on a desktop, with no page scroll. At the top sit the gate id, the gate's question, and a one-line BLUF wearing the striped agent chip, a proposal, never a ruling. The middle holds the summary lines: you-must-decide, settle later, riding a default, done. Tests and walked steps appear NOWHERE, since they are state, never decisions, and the brief is only about decisions (owner ruling). A killer DEMO settles at its own milestone and rides the "settle later" line. The decide view deals the blockers ONE AT A TIME (‹ › deck). Every card states in plain words WHAT A BLESS ACCEPTS: the agent's defaults become the ruling, and a killer gate is adjudicated individually in the user's name. The bottom carries the page's ONLY two actions, y/n. A y makes handoffBless record everything stated. The buttons POST to the local watch server. On a stale file with no listener they no-op by design (the owner's ruling). It is self-contained: no external asset, ever. handoffCone is the gate's adjudication material: its direct inputs plus every register-eligible trace node of the gate's iteration.
 func handoffCone(gate Node, nodes map[string]Node) map[string]bool {
 	member := map[string]bool{}
 	for _, d := range gate.DependsOn {
@@ -981,15 +943,12 @@ func handoffBriefText(gateID string, nodes map[string]Node, sm map[string]string
 		for _, p := range nodeBodySection(n.Path, "Options") {
 			b.WriteString(p + "\n")
 		}
-		if v := frontmatterMap(n.Path)["decided_via"]; v != "" {
-			b.WriteString("Bless selects " + selLetter(v) + "\n")
-		} else {
-			var parts []string
-			for _, f := range byNode[id] {
-				parts = append(parts, f.field+" = "+f.value)
-			}
-			b.WriteString("Bless selects " + strings.Join(parts, "; ") + "\n")
+		var parts []string
+		for _, f := range byNode[id] {
+			parts = append(parts, f.field+" = "+f.value)
 		}
+		hasOpts := len(nodeBodySection(n.Path, "Options")) > 0
+		b.WriteString("Bless selects " + cardSelectLine(frontmatterMap(n.Path)["decided_via"], parts, hasOpts) + "\n")
 	}
 	for _, id := range killers {
 		b.WriteString("\nKILLER " + id + ": " + nodes[id].Statement + "\nBless adjudicates it, in your name.\n")
@@ -1329,11 +1288,9 @@ func renderHandoffHTML(gateID string, nodes map[string]Node, sm map[string]strin
 		b.WriteString(`</details>` + "\n")
 	}
 
-	// blessSelects is the card's one plain line: the ruling a bless records.
+	// blessSelects is the card's one plain line: the ruling a bless records. It routes
+	// through cardSelectLine (go-card-guard) so an empty register never dumps bare fields.
 	blessSelects := func(r hoffRow) string {
-		if v := r.fm["decided_via"]; v != "" {
-			return v
-		}
 		prov := r.n.Maps["provenance"]
 		names := make([]string, 0, len(r.schema.fields))
 		for name := range r.schema.fields {
@@ -1352,10 +1309,11 @@ func renderHandoffHTML(gateID string, nodes map[string]Node, sm map[string]strin
 			}
 			parts = append(parts, name+" = "+val)
 		}
-		if len(parts) == 0 {
+		hasOpts := len(nodeBodySection(r.n.Path, "Options")) > 0
+		if r.fm["decided_via"] == "" && len(parts) == 0 && hasOpts {
 			return "the recorded values (see fields)"
 		}
-		return strings.Join(parts, "; ")
+		return cardSelectLine(r.fm["decided_via"], parts, hasOpts)
 	}
 
 	// the brief: title, the gate's question, the BLUF line, the summary lines
@@ -1451,7 +1409,7 @@ func renderHandoffHTML(gateID string, nodes map[string]Node, sm map[string]strin
 			case r.n.Killer:
 				b.WriteString(`<p class="dsel"><b>Bless</b> adjudicates this killer, in your name.</p>`)
 			case r.hasReg:
-				b.WriteString(`<p class="dsel"><b>Bless selects</b> ` + esc(selLetter(blessSelects(r))) + `</p>`)
+				b.WriteString(`<p class="dsel"><b>Bless selects</b> ` + esc(blessSelects(r)) + `</p>`)
 			default:
 				b.WriteString(`<p class="dsel"><b>Bless</b> accepts this as it stands.</p>`)
 			}
@@ -1694,11 +1652,7 @@ document.addEventListener('click',function(e){
 // enddesign
 
 // design: go-report-why  implements: req-report-why
-// Every check's detail entry carries its CAUSE when not green, baked at render (the report stays a
-// pure display; nothing is computed client-side): a SUSPECT review names the changed inputs — its own
-// re-stated statement, upstream checks currently reopened, or the scoped need-set — and an OPEN
-// derived check names the coverage rule that computes false. This is the report-side answer to
-// "quack why says nothing changed" for coverage-driven suspects.
+// Every check's detail entry carries its CAUSE when not green, baked at render. The report stays a pure display; nothing is computed client-side. A SUSPECT review names the changed inputs: its own re-stated statement, upstream checks currently reopened, or the scoped need-set. An OPEN derived check names the coverage rule that computes false. This is the report-side answer to "quack why says nothing changed" for coverage-driven suspects.
 func suspectCauseText(changedInputs []string, flippedRule string) string {
 	if flippedRule != "" {
 		return "coverage rule " + flippedRule + " computes false over its scope"

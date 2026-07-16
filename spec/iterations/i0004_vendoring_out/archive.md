@@ -3,7 +3,7 @@
 ---
 id: adr-brand-overlay
 type: adr
-statement: Brand (the design language — voice + logos + palette + type) is an OVERLAY-resolved resource, not a ship-time transform. The engine's default brand is generic (generic voice + logo placeholders) under product/; quackitect's own brand (duck + voice) lives in quackitect's .quack/overlay, so quack ship naturally packages a brand-neutral engine. Deleting a vehicle's brand files falls back to the engine default through the normal resolver.
+statement: Brand, the design language of voice, logos, palette, and type, is an OVERLAY-resolved resource, not a ship-time transform. The engine's default brand is generic, with generic voice and logo placeholders, under product/. Quackitect's own brand, duck plus voice, lives in quackitect's .quack/overlay. So quack ship naturally packages a brand-neutral engine. Deleting a vehicle's brand files falls back to the engine default through the normal resolver.
 adjudicated_by: human
 killer: false
 ---
@@ -23,7 +23,7 @@ Zero-config white-label; the engine never hardcodes its own name. User decided t
 ---
 id: adr-workspace-base
 type: adr
-statement: Separate the engine from the workspace. The engine (binary + vendored resources) is stateless w.r.t. any project; a WORKSPACE holds product+spec+all state and is selected by a target base (default = the local workspace, override to drive another). Prior art — sebot tools take a `base` and write all state under it; git's binary operates on the repo at cwd or -C. The hidden .quack/ stays the engine/state home marker.
+statement: Separate the engine from the workspace. The engine, binary plus vendored resources, is stateless with respect to any project. A WORKSPACE holds product, spec, and all state, and is selected by a target base, default the local workspace, with an override to drive another. Prior art: sebot tools take a `base` and write all state under it; git's binary operates on the repo at cwd or -C. The hidden .quack/ stays the engine and state home marker.
 adjudicated_by: human
 killer: true
 ---
@@ -43,7 +43,7 @@ Separate engine from workspace (product+spec+state) so one engine drives its own
 id: need-qualities
 type: need
 source: stk-assessor
-statement: The system exhibits cross-cutting QUALITY attributes (NFRs) that no single functional use-case owns — they constrain the whole. This need is the home for those qualities: first the brand design-language (voice, logos, palette, typography), and, as they migrate here, responsiveness, determinism, and the like.
+statement: The system exhibits cross-cutting QUALITY attributes (NFRs) that no single functional use-case owns. They constrain the whole. This need is the home for those qualities. First is the brand design-language: voice, logos, palette, typography. Others migrate here over time: responsiveness, determinism, and the like.
 class: judgment
 killer: true
 functions: [hash every input, attest a session, observe a test failing]
@@ -55,7 +55,7 @@ NFRs / quality-attributes are cross-cutting; they do not refine a functional nee
 id: need-workspace-drive
 type: need
 source: stk-integrator
-statement: One reusable, dependency-free engine drives many projects. A project's product, spec, and all its state live in a selectable WORKSPACE; the engine (binary + resources) is separate and can point at its own workspace or a different project's, the way a tool operates on a target repo. Other projects vendor and overlay the engine without forking, running it as a self-contained artifact with no runtime or web-downloaded dependencies.
+statement: One reusable, dependency-free engine drives many projects. A project's product, spec, and all its state live in a selectable WORKSPACE. The engine, binary plus resources, is separate. It can point at its own workspace or a different project's, the way a tool operates on a target repo. Other projects vendor and overlay the engine without forking. It runs as a self-contained artifact with no runtime or web-downloaded dependencies.
 class: judgment
 killer: true
 functions: [rebuild the engine, migrate a workspace, test itself]
@@ -66,7 +66,7 @@ i0006 consolidation: absorbs the former need-engine-reuse (reusable, dependency-
 ---
 id: req-design-language
 type: requirement
-statement: A design-language resource defines the brand as ONE bundle — voice, logo set (hero + mark), colour palette, typography — and every output resolves brand assets through the overlay chain. The engine default is GENERIC (a neutral voice + [LOGO GOES HERE] placeholders); a vehicle overrides in its overlay; deleting the vehicle's files falls back to the engine default. The report renders the resolved logo to the left of the project name.
+statement: A design-language resource defines the brand as ONE bundle: voice, logo set (hero + mark), colour palette, and typography. Every output resolves brand assets through the overlay chain. The engine default is GENERIC, a neutral voice with [LOGO GOES HERE] placeholders. A vehicle overrides in its overlay. Deleting the vehicle's files falls back to the engine default. The report renders the resolved logo to the left of the project name.
 depends_on: []
 class: review
 killer: true
@@ -81,7 +81,7 @@ Per the brand discussion: the design language rides the i4 overlay chain (no shi
 ---
 id: req-gate-eval-integrity
 type: requirement
-statement: The engine shall keep gate evaluation honest - one evaluator, a tool-owned build re-baseline, no trace node as a task gate - the numbered statements bind individually.
+statement: The engine shall keep gate evaluation honest: one evaluator, a tool-owned build re-baseline, and no trace node as a task gate. The numbered statements bind individually.
 class: review
 killer: false
 ---
@@ -93,7 +93,7 @@ killer: false
 ---
 id: req-report-check-display
 type: requirement
-statement: The report shall render checks in their real hierarchy with each DONE check linking its verdict - the numbered statements bind individually.
+statement: The report shall render checks in their real hierarchy with each DONE check linking its verdict. The numbered statements bind individually.
 class: review
 killer: false
 ---
@@ -104,7 +104,7 @@ killer: false
 ---
 id: req-vendor-workspace
 type: requirement
-statement: The engine shall scaffold a brand-agnostic vehicle whose vendored engine drives a selectable workspace - the numbered statements bind individually.
+statement: The engine shall scaffold a brand-agnostic vehicle whose vendored engine drives a selectable workspace. The numbered statements bind individually.
 class: review
 killer: false
 ---
@@ -708,7 +708,7 @@ New self-test over the rewrite.
 ---
 id: test-design-language
 type: test
-statement: Brand assets resolve through the overlay chain — the engine default (generic voice + a logo placeholder) is present and resolvable, a vehicle override wins, and the report embeds the resolved logo left of the project name.
+statement: Brand assets resolve through the overlay chain. The engine default (generic voice plus a logo placeholder) is present and resolvable. A vehicle override wins. The report embeds the resolved logo left of the project name.
 class: executed
 verify: selftest:brand-resolves
 killer: false
@@ -720,7 +720,7 @@ Guards the overlay resolution of brand assets + the placeholder convention. New 
 ---
 id: test-machinery-e2e
 type: test
-statement: A vehicle (from start init) creates a dummy workspace, and the engine drives that workspace through a FULL systematic iteration with empty content (a machinery test) — start, gather, compose, every milestone gate M1-M8, coverage rules, report, ship — and all gates pass. State resolves under the workspace, not the engine.
+statement: A vehicle (from start init) creates a dummy workspace. The engine drives that workspace through a FULL systematic iteration with empty content, a machinery test: start, gather, compose, every milestone gate M1-M8, coverage rules, report, ship. All gates pass. State resolves under the workspace, not the engine.
 class: review
 verify: selftest:workspace
 killer: true
@@ -732,7 +732,7 @@ The i4 killer end-to-end demonstration (the user's acceptance bar). selftest:wor
 ---
 id: test-no-trace-gate
 type: test
-statement: No trace-typed node (need/usecase/requirement/design/test/adr) is ever a task gate — asserted over the loaded graph.
+statement: No trace-typed node (need/usecase/requirement/design/test/adr) is ever a task gate. This is asserted over the loaded graph.
 class: executed
 verify: selftest:no-trace-gate
 killer: false
@@ -756,7 +756,7 @@ New self-test asserting the build determinizer wiring (re-baseline path).
 ---
 id: test-tests-pass-unify
 type: test
-statement: A selftest:-verified test passes inside the tests-pass coverage rule — proving tests-pass and the gate state machine use the same executed-check evaluator.
+statement: A selftest:-verified test passes inside the tests-pass coverage rule. This proves tests-pass and the gate state machine use the same executed-check evaluator.
 class: executed
 verify: selftest:tests-pass-eval
 killer: false
@@ -768,7 +768,7 @@ New self-test guarding against the two-path divergence.
 ---
 id: test-trace-nesting
 type: test
-statement: The report renders a third nesting level — build steps under a build parent, tests under a testing parent — and engage seeds subtasks under those parents.
+statement: The report renders a third nesting level: build steps under a build parent, tests under a testing parent. Engage seeds subtasks under those parents.
 class: executed
 verify: selftest:report-nesting
 killer: false
@@ -816,7 +816,7 @@ New self-test over the report shell.
 ---
 id: test-white-label
 type: test
-statement: Engine output is branded from argv[0] — the invoked name drives usage/version; the default is quack; a vehicle named otherwise reads as that name.
+statement: Engine output is branded from argv[0]: the invoked name drives usage/version. The default is quack. A vehicle named otherwise reads as that name.
 class: executed
 verify: selftest:brand
 killer: false
@@ -837,7 +837,7 @@ The sebot `base`-style separation. The headline of i4.
 ---
 id: uc-review-board
 type: usecase
-statement: A reader reviews any workspace's board and can see not just THAT a check passed but WHY — its verdict (bless attestation) or evidence — with the task tree nested to reflect real build/test hierarchy.
+statement: A reader reviews any workspace's board and can see not just THAT a check passed but WHY: its verdict (bless attestation) or evidence. The task tree nests to reflect real build/test hierarchy.
 class: review
 ---
 ## Rationale (not load-bearing)
@@ -846,7 +846,7 @@ Folds the two report notes (verdict-link, graph nesting) into i4.
 ---
 id: uc-self-workspace
 type: usecase
-statement: The engine drives its OWN workspace (dogfood) — product+spec+state resolved from the local workspace by default.
+statement: The engine drives its OWN workspace (dogfood). Product, spec, and state resolve from the local workspace by default.
 class: review
 ---
 ## Rationale (not load-bearing)
@@ -855,7 +855,7 @@ The default, backward-compatible case.
 ---
 id: uc-ship-branded-engine
 type: usecase
-statement: A builder vendors the engine into a project under its own brand (launcher, binary, output, slash-commands), so the project's users never see "quack" — the engine-distribution path shipped this session.
+statement: A builder vendors the engine into a project under its own brand (launcher, binary, output, slash-commands), so the project's users never see "quack". The engine-distribution path shipped this session.
 class: review
 ---
 ## Rationale (not load-bearing)
@@ -864,7 +864,7 @@ Grandfathers the vendoring-out work (vendor model, start init, white-label, .cla
 ---
 id: uc-usability
 type: usecase
-statement: ISO/IEC 25010 Usability (renamed Interaction Capability in the 2023 revision) — the product is recognizable, aesthetically coherent, and communicates in a consistent voice. Its sub-characteristics here are appropriateness-recognizability and user-interface aesthetics, realized by the brand/design-language; a vehicle re-skins by overriding, an unbranded one falls back to a neutral default.
+statement: ISO/IEC 25010 Usability, renamed Interaction Capability in the 2023 revision: the product is recognizable, aesthetically coherent, and communicates in a consistent voice. Its sub-characteristics here are appropriateness-recognizability and user-interface aesthetics, realized by the brand/design-language. A vehicle re-skins by overriding; an unbranded one falls back to a neutral default.
 class: review
 ---
 ## Rationale (not load-bearing)

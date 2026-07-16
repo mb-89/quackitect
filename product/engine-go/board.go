@@ -1,17 +1,7 @@
 package main
 
 // design: go-facet-board  implements: req-derived-boards.1
-// The faceted coverage board: requirements carry multi-valued
-// classification facets (phase, discipline, quality); the VOCABULARIES live in the type
-// layer and derive like the stakeholder classes - default plus the union of the iterations'
-// types - so the board stores no names. The board renders one count per
-// vocabulary value; a ZERO count is a visible hole. A facet value outside the vocabulary is a loud
-// finding. The board IS the register's filter row (the recorded
-// exemption from the pills rule - the register's filters live here, not in a second pill
-// set): a click toggles a VISIBLY selected value and the shell filters the register table's
-// once-rendered rows by their baked f-… classes - OR within a facet, AND across facets,
-// multi-select. The script only toggles visibility, never creates content. Facet tagging is
-// accepted, expected work the AI does - no advisory valve.
+// This is the faceted coverage board. Requirements carry multi-valued classification facets: phase, discipline, quality. The VOCABULARIES live in the type layer and derive like the stakeholder classes, default plus the union of the iterations' types, so the board stores no names. The board renders one count per vocabulary value, and a ZERO count is a visible hole. A facet value outside the vocabulary is a loud finding. The board IS the register's filter row, the recorded exemption from the pills rule: the register's filters live here, not in a second pill set. A click toggles a VISIBLY selected value, and the shell filters the register table's once-rendered rows by their baked f-... classes: OR within a facet, AND across facets, multi-select. The script only toggles visibility, never creates content. Facet tagging is accepted, expected work the AI does, with no advisory valve.
 
 import (
 	"os"

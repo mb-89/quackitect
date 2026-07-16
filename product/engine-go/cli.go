@@ -60,9 +60,7 @@ func cmdRender(args []string) {
 const version = "0.0.1-go"
 
 // design: go-brand  implements: req-vendor-workspace.4
-// brand is the invoked program name (argv[0] without dir or extension). A vehicle launched via its
-// own <project>.exe reads as "<project>"; the dogfood quack.exe reads as "quack". This is the
-// white-label hook — the engine never hardcodes its own name in user-facing output. Defaults to "quack".
+// brand is the invoked program name, argv[0] without dir or extension. A vehicle launched via its own <project>.exe reads as "<project>". The dogfood quack.exe reads as "quack". This is the white-label hook: the engine never hardcodes its own name in user-facing output. It defaults to "quack".
 func brand() string { return brandOf(os.Args[0]) }
 
 // brandOf derives the brand from a program path (testable; brand() applies it to os.Args[0]).
@@ -80,9 +78,9 @@ func usageText() string {
 	b := brand()
 	return b + ` — the determinizer lane (deterministic; no judgment).
 usage: ` + b + ` status [id] | next | start <id> [--plan] | why <id> | bless [--all|<id>] [--by A]
-       | note "..." | notes [--all] | gather <ver> | report [book] [--out F] | ship | build
+       | note "..." | notes [--all] | query "<expr>" | gather <ver> | report [book] [--out F] | ship | build
        | pair [ntfy] | ask <gate> [--timeout s] | await [--timeout s] | triage | compact <iter>
-       | apply <manifest> | mcp | grant open|close|review
+       | apply <manifest> | mcp [--child] | grant open|close|review
        | lint | verify <id> | progress [--pager <gate>] | migrate-actors | migrate-layout | version`
 }
 
@@ -135,12 +133,9 @@ func badIDArg(cmd string, rest []string) (string, bool) {
 }
 
 // design: go-module-command-selector  implements: req-module-command-selector
-// A leading module id selects that module subtree for module-aware commands. Single-module
-// workspaces hide the feature by leaving the command line unchanged.
+// A leading module id selects that module subtree for module-aware commands. Single-module workspaces hide the feature by leaving the command line unchanged.
 // design: go-cli-help  implements: req-go-port.4
-// One command surface with a shared help preamble. Every subcommand answers -h, --help,
-// and -? with usage and NO side effect, and an id that starts with '-' is rejected — the
-// structural fix for 'quack start --help' once activating a stray version named '--help'.
+// One command surface has a shared help preamble. Every subcommand answers -h, --help, and -? with usage and NO side effect. An id that starts with '-' is rejected. This is the structural fix for 'quack start --help' once activating a stray version named '--help'.
 func Dispatch(args []string) {
 	if len(args) == 0 || helpRequested(args) {
 		fmt.Println(usageText())
@@ -155,10 +150,7 @@ func Dispatch(args []string) {
 	callLogStart(cmd, rest) // one redacted line per dispatch (go-call-log)
 	defer func() { callLogWrite(0) }()
 	// design: go-lazy-verdicts  implements: req-lazy-verdicts
-	// lazy verdicts everywhere but the EXPLICIT verification surfaces: only selftest
-	// and verify re-run tests on a cache miss — the battery belongs to V&V, once per
-	// iteration (owner ruling). Every other command, renders included, answers from
-	// the cache and reads a moved hash as unverified.
+	// Verdicts stay lazy everywhere except the EXPLICIT verification surfaces. Only selftest and verify re-run tests on a cache miss. The battery belongs to V&V, once per iteration (owner ruling). Every other command, renders included, answers from the cache. It reads a moved hash as unverified.
 	verdictLazyMode = !map[string]bool{
 		"selftest": true, "verify": true,
 	}[cmd]
@@ -208,6 +200,8 @@ func Dispatch(args []string) {
 		cmdNote(rest)
 	case "notes":
 		cmdNotes(rest)
+	case "query":
+		cmdQuery(rest)
 	case "connections":
 		cmdConnections(rest)
 	case "promote":
@@ -293,7 +287,7 @@ func Dispatch(args []string) {
 	case "selftest":
 		quackExit(RunSelftestCLI(rest))
 	case "root":
-		fmt.Println(MerkleRoot(LoadAll()))
+		fmt.Println(workspaceRoot(LoadAll()))
 	case "dump":
 		nodes := LoadAll()
 		memo := map[string]string{}
@@ -451,11 +445,7 @@ func why(nodes map[string]Node, id string) []string {
 }
 
 // design: go-lint-exit  implements: req-lint-exit-honest
-// The lint command's three-code exit contract (req-lint-exit-honest): exit 0 = clean OR
-// advisory-only (coverage holes, adoption advisories, model/field/schema notes — nothing
-// build-blocking), exit 1 = one or more BLOCKING findings present, exit 2 = the graph was refused
-// at load (a malformed node, detected before any finding is computed). A pure mapping so the
-// contract is stated once and gated by selftest:lint-exit-honest.
+// The lint command carries a three-code exit contract (req-lint-exit-honest). Exit 0 means clean OR advisory-only: coverage holes, adoption advisories, model/field/schema notes, nothing build-blocking. Exit 1 means one or more BLOCKING findings are present. Exit 2 means the graph was refused at load, such as a malformed node detected before any finding is computed. It is a pure mapping, so the contract is stated once and gated by selftest:lint-exit-honest.
 func lintExitCode(refused bool, findings int) int {
 	switch {
 	case refused:
@@ -697,9 +687,11 @@ func cmdLint(rest []string) {
 	for _, f := range rigorFitFindings(nodes) {
 		fmt.Println("  - " + f)
 	}
-	// voice over authored statements (go-voice-lint): ADVISORY, like the terms lane.
-	if vf := voiceStatementFindings(nodes); len(vf) > 0 {
-		fmt.Printf("voice: %d advisory finding(s):\n", len(vf))
+	// voice over authored statements (go-voice-lint): ARMED at zero debt (adr-voice-ratchet,
+	// go-voice-gate) - since the i24 drain, a voice finding fails lint like the EARS lane.
+	vf := voiceStatementFindings(nodes)
+	if voiceLaneVerdict(len(vf)) {
+		fmt.Printf("voice: %d finding(s) - the lane is armed, a voice flaw fails lint:\n", len(vf))
 		for i, f := range vf {
 			if i == 20 {
 				fmt.Printf("  ... and %d more\n", len(vf)-20)
@@ -711,6 +703,6 @@ func cmdLint(rest []string) {
 	// the BLOCKING set (the three-code contract, go-lint-exit): structural findings that must not
 	// ship. Advisories — coverage holes, adoption advisories, model/field/schema notes — stay exit 0.
 	blocking := len(dups) + earsBad + len(qf) + len(mono) + len(placement) + len(orphans) +
-		len(metaQ) + len(drift) + len(external) + len(residue) + len(anchors) + termOrderBlocking(tof)
+		len(metaQ) + len(drift) + len(external) + len(residue) + len(anchors) + termOrderBlocking(tof) + len(vf)
 	quackExit(lintExitCode(false, blocking))
 }

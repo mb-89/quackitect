@@ -2,7 +2,7 @@
 id: req-channel-adapters
 ears: exempt - historical pre-EARS statement, retire-or-retrofit recorded (adr-grandfathers-historical)
 type: requirement
-statement: Every device channel shall be a zero-dependency adapter behind the ask seam - the numbered statements bind individually.
+statement: Every device channel shall be a zero-dependency adapter behind the ask seam. The numbered statements bind individually.
 class: review
 killer: false
 ---

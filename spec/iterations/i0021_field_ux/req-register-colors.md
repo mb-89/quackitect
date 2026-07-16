@@ -1,7 +1,7 @@
 ---
 id: req-register-colors
 type: requirement
-statement: The register shall compute each row's traffic-light color from recorded provenance, never from self-reported confidence - the numbered statements bind individually.
+statement: The register shall compute each row's traffic-light color from recorded provenance, never from self-reported confidence. The numbered statements bind individually.
 class: review
 killer: false
 ---

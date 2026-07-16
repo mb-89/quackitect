@@ -1,7 +1,7 @@
 ---
 id: test-graph-suffix-rooted
 type: test
-statement: A design implementing a numbered statement (req-x.2) and a test verifying one (req-x.1) root under req-x's need tab with no (unrooted) tab; iterations and age never enter the trace graph - no age-fold box and no phantom i0000_baseline group renders, fixture and live; the engine's own workspace renders fully rooted.
+statement: A design implementing a numbered statement (req-x.2) and a test verifying one (req-x.1) root under req-x's need tab, with no (unrooted) tab. Iterations and age never enter the trace graph: no age-fold box and no phantom i0000_baseline group renders, fixture and live. The engine's own workspace renders fully rooted.
 class: executed
 verify: selftest:graph-suffix-rooted
 killer: false

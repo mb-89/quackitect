@@ -12,7 +12,7 @@ Make the contract undodgeable AND land the data leg: engine-enforced attestation
 ---
 id: req-attest-ritual
 type: requirement
-statement: The engine shall gate agent-channel ledger commands behind contract attestation - grant, challenge, budgeted keys, renewal, and console exemption - the numbered statements bind individually.
+statement: The engine shall gate agent-channel ledger commands behind contract attestation: grant, challenge, budgeted keys, renewal, and console exemption. The numbered statements bind individually.
 class: review
 killer: false
 ---
@@ -28,7 +28,7 @@ killer: false
 ---
 id: req-contract-chain
 type: requirement
-statement: The repository shall deliver the contract through one unbroken pointer chain whose breakage turns the selftest red - the numbered statements bind individually.
+statement: The repository shall deliver the contract through one unbroken pointer chain whose breakage turns the selftest red. The numbered statements bind individually.
 class: review
 killer: false
 ---
@@ -39,7 +39,7 @@ killer: false
 ---
 id: req-decision-model
 type: requirement
-statement: The engine shall classify, list, and police decision nodes from graph facts alone - the numbered statements bind individually.
+statement: The engine shall classify, list, and police decision nodes from graph facts alone. The numbered statements bind individually.
 class: review
 killer: false
 ---
@@ -52,7 +52,7 @@ killer: false
 ---
 id: req-engine-distribution
 type: requirement
-statement: The launcher shall run one global engine binary, ratcheting it forward from the workspace's vendored source - the numbered statements bind individually.
+statement: The launcher shall run one global engine binary, ratcheting it forward from the workspace's vendored source. The numbered statements bind individually.
 class: review
 killer: false
 ---
@@ -77,7 +77,7 @@ Veto/defer/supersede minting especially becomes an op (correct sink edge, ready_
 ---
 id: req-note-capture-lane
 type: requirement
-statement: The engine shall own note capture - every note routes through its lane into the workspace notes home outside the repository - the numbered statements bind individually.
+statement: The engine shall own note capture. Every note routes through its lane into the workspace notes home outside the repository. The numbered statements bind individually.
 class: review
 killer: false
 ---
@@ -88,7 +88,7 @@ killer: false
 ---
 id: req-report-filter-gestures
 type: requirement
-statement: The report filter shall support the descendants gesture set - double-click, clear, and on-focus help - the numbered statements bind individually.
+statement: The report filter shall support the descendants gesture set: double-click, clear, and on-focus help. The numbered statements bind individually.
 class: review
 killer: false
 ---
@@ -101,7 +101,7 @@ killer: false
 ---
 id: req-report-why
 type: requirement
-statement: When the report's detail panel opens a SUSPECT check, the report shall name the cause of suspicion — the changed input nodes, or the derived-coverage rule whose flip reopened the check.
+statement: When the report's detail panel opens a SUSPECT check, the report shall name the cause of suspicion: the changed input nodes, or the derived-coverage rule whose flip reopened the check.
 depends_on: []
 class: review
 killer: false
@@ -115,7 +115,7 @@ The owner, 2026-07-04, while adjudicating the M1 gate: 74 global-V&V suspects wi
 ---
 id: req-state-layout
 type: requirement
-statement: The engine shall keep committed truth under spec and every regenerable artifact in the canonical user data home, leaving the tree clean - the numbered statements bind individually.
+statement: The engine shall keep committed truth under spec and every regenerable artifact in the canonical user data home, leaving the tree clean. The numbered statements bind individually.
 class: review
 killer: false
 ---
@@ -660,7 +660,7 @@ depends_on: [i9-m7-gate]
 ---
 id: test-attest-ritual
 type: test
-statement: Agent-channel ledger commands are gated behind attestation - grant, challenge, budgeted keys, renewal, expiry, and console exemption.
+statement: Agent-channel ledger commands are gated behind attestation: grant, challenge, budgeted keys, renewal, expiry, and console exemption.
 class: executed
 verify: selftest:attest-block attest-challenge attest-expiry attest-grant attest-keys attest-renewal attest-console
 tests_red: exempt - clustered at i17; the birth reds stand in the ledger under the origin ids (adr-cluster-numbered-statements)
@@ -719,7 +719,7 @@ killer: false
 ---
 id: test-filter-ux
 type: test
-statement: The rendered report contains the clear control wired to reset, the descendants predicate over refines/implements/verifies/addresses edges, the double-click handler applying it, and on-focus help naming all three; the descendants predicate computed for a sample node matches the engine-side cone.
+statement: The rendered report contains the clear control wired to reset, the descendants predicate over refines/implements/verifies/addresses edges, the double-click handler applying it, and on-focus help naming all three. The descendants predicate computed for a sample node matches the engine-side cone.
 class: executed
 verify: selftest:report-filter-ux
 killer: false
@@ -737,7 +737,7 @@ killer: false
 ---
 id: test-note-lane
 type: test
-statement: The note skill prompt (method/prompts/note.md) instructs calling quack note for capture — no instruction to hand-write a note file remains — and the engine's note lane accepts a multi-line body.
+statement: The note skill prompt (method/prompts/note.md) instructs calling quack note for capture. No instruction to hand-write a note file remains. The engine's note lane accepts a multi-line body.
 class: review
 killer: false
 ---
@@ -756,7 +756,7 @@ killer: false
 ---
 id: test-report-why
 type: test
-statement: A rendered report embeds, for every SUSPECT check, a non-empty cause — a hash-changed input is named as such, and a coverage-driven suspect names the flipped rule.
+statement: A rendered report embeds, for every SUSPECT check, a non-empty cause. A hash-changed input is named as such, and a coverage-driven suspect names the flipped rule.
 class: executed
 verify: selftest:report-why
 killer: false
@@ -791,7 +791,7 @@ killer: false
 ---
 id: uc-attested-session
 type: usecase
-statement: A fresh agent context cannot advance the ledger until the contract has entered its context and the adjudicator has granted once; within the session, key renewals are autonomous so unattended runs never stall on a person.
+statement: A fresh agent context cannot advance the ledger until the contract has entered its context and the adjudicator has granted once. Within the session, key renewals are autonomous, so unattended runs never stall on a person.
 class: review
 killer: false
 ---
@@ -801,7 +801,7 @@ The advisory floor failed in the field twice (Copilot i6; Claude Code 2026-07-04
 ---
 id: uc-backward-vv
 type: usecase
-statement: An iteration's verification and validation look backward only — they re-check everything up to and including their own iteration; later iterations never reopen an earlier iteration's verdicts by mere addition.
+statement: An iteration's verification and validation look backward only. They re-check everything up to and including their own iteration. Later iterations never reopen an earlier iteration's verdicts by mere addition.
 class: review
 killer: false
 ---
@@ -811,7 +811,7 @@ Owner directive 2026-07-04, after two rounds of explaining the 74-suspect wave: 
 ---
 id: uc-contract-delivery
 type: usecase
-statement: Every harness receives the full contract through its natively auto-loaded entry file, generated from the single contract source — no pointer-following required of the agent.
+statement: Every harness receives the full contract through its natively auto-loaded entry file, generated from the single contract source. No pointer-following is required of the agent.
 class: review
 killer: false
 ---
@@ -821,7 +821,7 @@ A thin harness never follows a pointer; the contract CONTENT must already sit in
 ---
 id: uc-decisions-never-relitigated
 type: usecase
-statement: Every decision — adopt, veto, defer — is an immutable node in spec/decisions/ classified purely from graph facts; the graveyard and parked panels are the read path that prevents re-raising a settled idea.
+statement: Every decision, adopt, veto, or defer, is an immutable node in spec/decisions/ classified purely from graph facts. The graveyard and parked panels are the read path that prevents re-raising a settled idea.
 class: review
 killer: false
 ---
@@ -831,7 +831,7 @@ Decision model v2: born made, never edited, exits by supersession only; no statu
 ---
 id: uc-deterministic-minting
 type: usecase
-statement: Every note and trace node is born engine-stamped with schema-valid frontmatter; the agent fills content, never authors shape — no invalid node ever exists.
+statement: Every note and trace node is born engine-stamped with schema-valid frontmatter. The agent fills content and never authors shape. No invalid node ever exists.
 class: review
 killer: false
 ---
@@ -841,7 +841,7 @@ The strict parser (i8) refuses malformed graphs at READ time; minting moves the 
 ---
 id: uc-global-engine
 type: usecase
-statement: One global quack binary serves every repo; a repo carries vendored engine source and can rebuild the global binary, ratcheting it forward — a newer global binary is used as-is, an older one is rebuilt.
+statement: One global quack binary serves every repo. A repo carries vendored engine source and can rebuild the global binary, ratcheting it forward. A newer global binary is used as-is; an older one is rebuilt.
 class: review
 killer: false
 ---
@@ -861,7 +861,7 @@ Raw notes can carry personal data; the owner wants them far from the published r
 ---
 id: uc-repo-holds-only-truth
 type: usecase
-statement: A checkout contains only recorded truth (spec/) and product; every cache is regenerable in the user data directory, so deleting the data dir loses nothing adjudicated and a fresh clone renders the same board on any machine.
+statement: A checkout contains only recorded truth (spec/) and product. Every cache is regenerable in the user data directory. Deleting the data dir loses nothing adjudicated, and a fresh clone renders the same board on any machine.
 class: review
 killer: false
 ---

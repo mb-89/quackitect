@@ -52,9 +52,7 @@ var i12xTests = []namedTest{
 }
 
 // design: go-verdict-order  implements: req-candidate-decisions.2
-// candidateClaimFindings: a candidate chosen or rejected by more than one decision is a
-// finding - the render stays deterministic (sorted adr walk), but a double claim is a
-// content error the owner must resolve, never a silent first-wins.
+// candidateClaimFindings flags a candidate chosen or rejected by more than one decision as a finding. The render stays deterministic, a sorted adr walk. But a double claim is a content error the owner must resolve, never a silent first-wins.
 func candidateClaimFindings(nodes map[string]Node) []string {
 	claims := map[string][]string{}
 	for _, n := range nodes {
@@ -85,11 +83,7 @@ func candidateClaimFindings(nodes map[string]Node) []string {
 // enddesign
 
 // design: go-id-charset  implements: req-spec-content-lint.5
-// The id-charset lint ships BEFORE any edge migration: '--' is the connection-id
-// separator and Windows folds filename case, so an id outside lowercase [a-z0-9-]
-// (or with stray consecutive hyphens) can collide or parse
-// ambiguously. Connection ids carry '--' BY GRAMMAR - their segments
-// are checked, not the separators.
+// The id-charset lint ships BEFORE any edge migration. '--' is the connection-id separator, and Windows folds filename case, so an id outside lowercase [a-z0-9-], or with stray consecutive hyphens, can collide or parse ambiguously. Connection ids carry '--' BY GRAMMAR. Their segments are checked, not the separators.
 var idCharRe = regexp.MustCompile(`^[a-z0-9-]+$`)
 
 func idCharsetFindings(nodes map[string]Node) []string {

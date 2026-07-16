@@ -1,7 +1,7 @@
 ---
 id: test-unknown-type
 type: test
-statement: A node whose type is outside the known set (a stray type:note, a typo) is refused by the strict referee naming the type; it never silently becomes a blessable gate; every known type still loads clean.
+statement: A node whose type is outside the known set (a stray type:note, a typo) is refused by the strict referee naming the type. It never silently becomes a blessable gate. Every known type still loads clean.
 class: executed
 verify: selftest:unknown-type-refused
 killer: false

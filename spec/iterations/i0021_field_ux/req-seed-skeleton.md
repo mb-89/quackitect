@@ -1,7 +1,7 @@
 ---
 id: req-seed-skeleton
 type: requirement
-statement: When a planned version is started, the engine shall seed the rigor checklist's gates and subtasks into the iteration's tasks folder with iteration-unique ids - the numbered statements bind individually.
+statement: When a planned version is started, the engine shall seed the rigor checklist's gates and subtasks into the iteration's tasks folder with iteration-unique ids. The numbered statements bind individually.
 class: review
 killer: false
 ---

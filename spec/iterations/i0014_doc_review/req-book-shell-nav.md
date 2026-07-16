@@ -1,7 +1,7 @@
 ---
 id: req-book-shell-nav
 type: requirement
-statement: The book shell shall organize navigation - sidebar order, section paging, deck listing, the title card, and stepped search - the numbered statements bind individually.
+statement: The book shell shall organize navigation: sidebar order, section paging, deck listing, the title card, and stepped search. The numbered statements bind individually.
 class: review
 killer: false
 ---

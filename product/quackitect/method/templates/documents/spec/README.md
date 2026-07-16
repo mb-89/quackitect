@@ -1,5 +1,5 @@
-<!-- design: method-spec-template  implements: req-template-home.7, req-seeded-examples.1 :: The spec template set: nine chapter manifests whose units open with a stable heading and carry a permanent fill comment (Contents/Motivation/Form/Sources + a machine-readable gating tag), a pre-seeded provenance mark, and a slot placeholder; the canned base queries ship beside them; start stubs instantiates the set into a bare workspace. Where a reader-facing view would otherwise render empty, the set ships a clearly-marked ex- example seed (statement opens EXAMPLE, body says delete me) the author replaces or deletes. -->
-# the spec template — nine chapters that drive a specification
+<!-- design: method-spec-template  implements: req-template-home.7, req-seeded-examples.1 :: The spec template set has nine chapter manifests. Their units open with a stable heading and carry a permanent fill comment, Contents/Motivation/Form/Sources plus a machine-readable gating tag, a pre-seeded provenance mark, and a slot placeholder. The canned base queries ship beside them. start stubs instantiates the set into a bare workspace. Where a reader-facing view would otherwise render empty, the set ships a clearly-marked ex- example seed that the author replaces or deletes. Its statement opens EXAMPLE, and its body says delete me. the spec template is nine chapters that drive a specification. -->
+# the spec template: nine chapters that drive a specification
 
 One manifest per chapter, content in notes, every projection deterministic.
 The authored source is truth. Any assembled form is ephemeral.
@@ -70,12 +70,12 @@ glossary stay emitter-derived — their term anchors and first-use expansion liv
 in the emitter.
 <!-- enddesign -->
 
-<!-- design: method-methods-view  implements: req-method-catalog.2 :: Methods route themselves: a method note names its chapters in applies_chapters, and each chapter embeds its own view of the pooled methods.base - demand-driven, no chapter hard-codes a method. -->
+<!-- design: method-methods-view  implements: req-method-catalog.2 :: Methods route themselves. A method note names its chapters in applies_chapters. Each chapter embeds its own view of the pooled methods.base. It is demand-driven; no chapter hard-codes a method. -->
 Methods route by `applies_chapters`: each chapter embeds its view of
 `queries/methods.base`; a method note names the chapters it serves.
 <!-- enddesign -->
 
-<!-- design: des-seed-examples  implements: req-seeded-examples.2 :: One ex- prefixed example note ships per otherwise-empty derived view (stakeholders, trace, usecases, raid, rules, guides, methods), and the dogfood spec seeds the reference flow end to end: fund-ai-involvement linked from ch8, ref-dora-genai linked from ch8 and the fundamental, meth-ears routed to design-input, a quality requirement with a scenario figure rendered at depth 2 in ch3. -->
+<!-- design: des-seed-examples  implements: req-seeded-examples.2 :: One ex- prefixed example note ships per otherwise-empty derived view: stakeholders, trace, usecases, raid, rules, guides, methods. The dogfood spec seeds the reference flow end to end. fund-ai-involvement links from ch8. ref-dora-genai links from ch8 and the fundamental. meth-ears routes to design-input. A quality requirement carries a scenario figure rendered at depth 2 in ch3. -->
 Example notes (`ex-*.md`) ship beside the skeletons so no derived view opens
 empty; delete each example when the first real item of its kind lands.
 <!-- enddesign -->

@@ -1,7 +1,7 @@
 ---
 id: test-handoff-lifecycle
 type: test
-statement: A one-shot hand-off server exits "unopened" when no page connects within the bound, "closed" when a connected page stops heartbeating (no answer recorded, the injected bless never fires), and "y" when the page answers - the recorded answer fires the injected bless exactly once.
+statement: A one-shot hand-off server exits "unopened" when no page connects within the bound. It exits "closed" when a connected page stops heartbeating (no answer recorded, the injected bless never fires). It exits "y" when the page answers. The recorded answer fires the injected bless exactly once.
 class: executed
 verify: selftest:handoff-lifecycle
 killer: false

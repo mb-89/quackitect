@@ -1,7 +1,7 @@
 ---
 id: req-rigor-fit
 type: requirement
-statement: When a version's composed trace size falls outside the chosen rigor's fit band, quack lint shall report an advisory rigor-fit finding - the numbered statements bind individually.
+statement: When a version's composed trace size falls outside the chosen rigor's fit band, quack lint shall report an advisory rigor-fit finding. The numbered statements bind individually.
 class: review
 killer: false
 ---

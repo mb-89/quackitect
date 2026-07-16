@@ -1,7 +1,7 @@
 ---
 id: req-comment-ux-keep
 type: requirement
-statement: The comment layer shall never lose or dislodge unposted text - the numbered statements bind individually.
+statement: The comment layer shall never lose or dislodge unposted text. The numbered statements bind individually.
 class: review
 killer: false
 ---

@@ -1,7 +1,7 @@
 ---
 id: uc-deck-deep-link
 type: usecase
-statement: A reader follows a plain link straight into a slideshow inside the book - from the README, from a guides-table row, from a colleague's message - and lands on the deck, not the book's top.
+statement: A reader follows a plain link straight into a slideshow inside the book, from the README, from a guides-table row, or from a colleague's message. They land on the deck, not the book's top.
 class: domain
 killer: false
 ---

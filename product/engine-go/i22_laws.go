@@ -197,10 +197,7 @@ func grantReview(events []Event) {
 // enddesign
 
 // design: go-guard-selftest  implements: req-selftest-gate.1, req-selftest-gate.2
-// The dispatch guard layer (adr-guard-dispatch-layer): ONE pass before any handler. The full
-// selftest battery on the agent channel is lawful only while a milestone gate of the active
-// version is ready or suspect - the battery belongs to gates (the trust-the-process law,
-// engine-enforced). Single-test runs and quack verify stay lawful everywhere.
+// This is the dispatch guard layer (adr-guard-dispatch-layer): ONE pass before any handler. The full selftest battery on the agent channel is lawful only while a milestone gate of the active version is ready or suspect. The battery belongs to gates, the trust-the-process law, engine-enforced. Single-test runs and quack verify stay lawful everywhere.
 
 // walkGuardDecision is the pure rule; "" means pass. It also carries the CLI lane block
 // (go-guard-cli below) so the layer stays one tested predicate set.
@@ -209,12 +206,28 @@ func walkGuardDecision(cmd string, fullBattery, interactive, gateInHand bool, ag
 		return "" // the console never takes a new refusal (raid-over-blocking)
 	}
 	if agentLane == "mcp" && ledgerCmd {
-		return "refused: this workspace declares MCP as the agent lane (agent_lane in spec/project.toml) - call the '" + cmd + "' MCP tool instead; the console is unaffected"
+		if cmd == "grant" {
+			// go-arg-guards: grant is the OWNER's act - there is no grant tool by design
+			return "refused: a grant is the owner's act - the owner runs it at their console (the agent lane serves no grant tool by design)"
+		}
+		return "refused: this workspace declares MCP as the agent lane (agent_lane in spec/project.toml) - call the '" + cmd + "' MCP tool instead; the console is unaffected. A dead MCP server revives on the harness's reconnect; the supervisor keeps it current from then on"
 	}
 	if cmd == "selftest" && fullBattery && !gateInHand {
 		return "refused: the full battery belongs to a milestone review, and no milestone gate is ready or suspect - re-run one check with `verify <id>` or `selftest <name>`; the battery runs at the gate"
 	}
 	return ""
+}
+
+// ledgerCmdClass refines the attest-gated set with sub-op awareness: the scaffold
+// sub-ops of start (stubs, init) are ungated CREATION, never ledger advancement.
+func ledgerCmdClass(cmd string, rest []string) bool {
+	if !attestGatedCmds[cmd] {
+		return false
+	}
+	if cmd == "start" && len(rest) > 0 && (rest[0] == "stubs" || rest[0] == "init") {
+		return false
+	}
+	return true
 }
 
 // gateReviewInHand: a milestone gate of the active version is ready (deps satisfied) or suspect.
@@ -249,7 +262,7 @@ func walkGuard(cmd string, rest []string) {
 		return
 	}
 	cfg := readProjectConfig()
-	ledger := attestGatedCmds[cmd]
+	ledger := ledgerCmdClass(cmd, rest)
 	full := cmd == "selftest" && len(rest) == 0
 	gateInHand := false
 	if full && cfg.AgentLane != "mcp" {
@@ -268,21 +281,11 @@ func walkGuard(cmd string, rest []string) {
 // enddesign
 
 // design: go-guard-cli  implements: req-cli-steer, req-mcp-discoverable
-// The declared agent lane (adr-mcp-lane-declared, q-cli-steering ruling A): with
-// `agent_lane = "mcp"` in spec/project.toml, a piped ledger command is refused with a pointer
-// at the MCP tools (the rule itself lives in walkGuardDecision above). The MCP server dispatches
-// its tool calls to the command functions directly, never through Dispatch, so the MCP lane can
-// not refuse itself. The engine's offer half of req-mcp-discoverable is `quack mcp` (go-mcp-server);
-// the workspace half is the committed .mcp.json plus the harness approval key in
-// .claude/settings.json - selftest:mcp-surface holds both halves.
+// This is the declared agent lane (adr-mcp-lane-declared, q-cli-steering ruling A). With `agent_lane = "mcp"` in spec/project.toml, a piped ledger command is refused with a pointer at the MCP tools; the rule itself lives in walkGuardDecision above. The MCP server dispatches its tool calls to the command functions directly, never through Dispatch, so the MCP lane cannot refuse itself. The engine's offer half of req-mcp-discoverable is `quack mcp` (go-mcp-server). The workspace half is the committed .mcp.json plus the harness approval key in .claude/settings.json. selftest:mcp-surface holds both halves.
 // enddesign
 
 // design: go-verdict-guard  implements: req-busy-no-record, req-first-green-guard
-// The two trust guards wrap the ONE verdict-write path (adr-verdict-write-guard), inside
-// runSelftestCached: a run that consulted a busy resource guard is discarded, never recorded
-// (the i21 poisoned-cache class dies at the write); a first green on a CURRENT-iteration test
-// node with no red record and no exemption is withheld and flagged - the red ritual,
-// engine-enforced. Historical iterations are untouched.
+// The two trust guards wrap the ONE verdict-write path (adr-verdict-write-guard), inside runSelftestCached. A run that consulted a busy resource guard is discarded, never recorded; the i21 poisoned-cache class dies at the write. A first green on a CURRENT-iteration test node with no red record and no exemption is withheld and flagged, the red ritual, engine-enforced. Historical iterations are untouched.
 
 // Busy trips are DEPTH-SCOPED: a vacuous busy answer poisons exactly the frame that consumed
 // it. A render-triggering test whose NESTED probes tripped (they got the vacuous answer, it
@@ -353,8 +356,7 @@ func firstGreenWithheld(id string, pass bool) bool {
 // enddesign
 
 // design: go-battery-progress  implements: req-battery-progress
-// One numbered line per test, printed by the battery loop - a watching console sees a real
-// bar, not only the slow outliers.
+// One numbered line per test is printed by the battery loop. A watching console sees a real bar, not only the slow outliers.
 func batteryProgressLine(i, total int, name, status string) string {
 	return fmt.Sprintf("[%d/%d] selftest %-12s %s", i, total, name, status)
 }
@@ -381,9 +383,7 @@ func batteryCachedNames(names []string, root string) (cached map[string]bool) {
 // enddesign
 
 // design: go-battery-parallel  implements: req-battery-parallel
-// A bounded worker pool over the SAFE set (adr-battery-run-shape): tests known free of global
-// seam mutation run concurrently; everything else stays serial. Results flow back to the main
-// goroutine, which owns every verdict write - one serialization point, no second write path.
+// A bounded worker pool runs over the SAFE set (adr-battery-run-shape). Tests known free of global seam mutation run concurrently. Everything else stays serial. Results flow back to the main goroutine, which owns every verdict write. This is one serialization point, with no second write path.
 
 // batteryParallelSafe names the registry tests safe for concurrent runs: pure predicates and
 // format checks that touch no global seam. Grown deliberately, never inferred.
@@ -455,14 +455,28 @@ func voiceStatementFindings(nodes map[string]Node) []string {
 }
 
 // voiceFlaw names the first voice violation in one statement, or "".
+// Backtick spans are CODE, not prose (go-voice-gate): a quoted marker like
+// `ears: exempt - <reason>` never counts as a dash-joined clause.
 func voiceFlaw(s string) string {
+	if strings.Count(s, "`") >= 2 {
+		parts := strings.Split(s, "`")
+		for i := 1; i < len(parts); i += 2 {
+			parts[i] = "CODE"
+		}
+		s = strings.Join(parts, "`")
+	}
 	for _, dash := range []string{" - ", " — "} {
-		if i := strings.Index(s, dash); i > 0 {
+		for i := strings.Index(s, dash); i > 0; {
 			before := strings.Fields(s[:i])
 			after := strings.Fields(s[i+len(dash):])
 			if len(before) >= 3 && len(after) >= 3 {
 				return "dash-joined clauses (voice: one thought per sentence, end it)"
 			}
+			next := strings.Index(s[i+1:], dash)
+			if next < 0 {
+				break
+			}
+			i += 1 + next
 		}
 	}
 	for _, sent := range strings.FieldsFunc(s, func(r rune) bool { return r == '.' || r == '!' || r == '?' }) {
@@ -476,10 +490,7 @@ func voiceFlaw(s string) string {
 // enddesign
 
 // design: go-recital-chain  implements: req-recital-chain
-// The wording-chain selftest: the engine's contract resource must carry the question-tool
-// recital mechanism and the TL;DR-card ruling; a workspace AGENTS.md (the entry hub), where
-// present, must still point its step at the recital-in-question mechanism. A missing hub is a
-// vehicle without one - nothing to drift, no vacuous pass on the contract half.
+// This is the wording-chain selftest. The engine's contract resource must carry the question-tool recital mechanism and the TL;DR-card ruling. A workspace AGENTS.md, the entry hub, where present, must still point its step at the recital-in-question mechanism. A missing hub is a vehicle without one. There is nothing to drift, and no vacuous pass on the contract half.
 func selftestRecitalChain() bool {
 	raw, err := os.ReadFile(filepath.Join(EngineDir(), "method", "prompts", "contract.md"))
 	if err != nil {

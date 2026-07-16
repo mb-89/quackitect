@@ -1,7 +1,7 @@
 ---
 id: req-chapter-placement
 type: requirement
-statement: The book shall place reader entry and guidance content in their owning chapters - the numbered statements bind individually.
+statement: The book shall place reader entry and guidance content in their owning chapters. The numbered statements bind individually.
 class: review
 killer: false
 ---

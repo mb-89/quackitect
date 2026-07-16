@@ -7,7 +7,7 @@ impact: 0.6
 mitigation: the seeder reads the rigor checklist SOURCE at seed time (single source of truth, no baked copy); test-seed-skeleton asserts the emitted set lints clean; the composer tailors ABOVE the floor, never edits the emitted wiring by hand
 owner: driving agent
 status: open
-statement: The engine-seeded checklist drifts from the rigor template - a template change stops reaching new iterations, or the seeder bakes its own divergent copy of the milestones.
+statement: The engine-seeded checklist drifts from the rigor template. A template change stops reaching new iterations, or the seeder bakes its own divergent copy of the milestones.
 class: review
 killer: false
 ---

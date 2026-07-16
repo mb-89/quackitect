@@ -2,7 +2,7 @@
 id: man-agent-guide
 type: manifest
 mode: agent
-statement: The agent guide - the operating contract for AI, and the source of AGENTS.md.
+statement: The agent guide is the operating contract for AI, and the source of AGENTS.md.
 ---
 <!-- ai:2 -->
 This chapter IS the repo's AGENTS.md - one source, two projections. An agent reads here (or the emitted file) and finds the ritual, the loop, and the rules.

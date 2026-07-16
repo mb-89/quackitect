@@ -1,7 +1,7 @@
 ---
 id: req-device-pairing
 type: requirement
-statement: The engine shall pair a device in one operation with a QR-rendered subscribe link and the safety disclaimers - the numbered statements bind individually.
+statement: The engine shall pair a device in one operation with a QR-rendered subscribe link and the safety disclaimers. The numbered statements bind individually.
 class: review
 killer: false
 ---

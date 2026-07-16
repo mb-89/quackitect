@@ -1,6 +1,6 @@
 # roles — the pluggable implementation seam
 
-<!-- design: method-role-seam  implements: req-pluggable-capabilities.1 :: A role is a strategy behind a stable FILE-BASED interface. Default binding for every role is INLINE (the driving agent performs it, today's behaviour). Bindings resolve at seed: iteration.roles ▸ type.roles ▸ default(inline). The engine never runs a role — it only gates the output (tests-red, designs-realized, tests-pass). -->
+<!-- design: method-role-seam  implements: req-pluggable-capabilities.1 :: A role is a strategy behind a stable FILE-BASED interface. Default binding for every role is INLINE; the driving agent performs it, today's behaviour. Bindings resolve at seed: iteration.roles, then type.roles, then default(inline). The engine never runs a role. It only gates the output: tests-red, designs-realized, tests-pass. -->
 A role is a strategy behind a stable, **file-based** interface. Swap it per project type or per
 iteration; the default for every role is **inline** (the driving agent does it — today's behaviour).
 
@@ -53,7 +53,7 @@ subagent forgets the method's point.
 <!-- enddesign -->
 
 ## doc-tests — the testdesigner for non-code deliverables
-<!-- design: method-doc-tests  implements: req-impl-fragment-tdd.3 :: For a non-code deliverable the testdesigner pushes each acceptance criterion toward class:executed wherever it is MECHANIZABLE (a check with a fixed expected result + mechanical evaluation + a gating pass/fail — the FIT/doctest/Vale pattern); the irreducible residue stays class:review. Same executed/review spectrum the engine already walks. -->
+<!-- design: method-doc-tests  implements: req-impl-fragment-tdd.3 :: For a non-code deliverable the testdesigner pushes each acceptance criterion toward class:executed wherever it is MECHANIZABLE. That means a check with a fixed expected result, mechanical evaluation, and a gating pass/fail, the FIT/doctest/Vale pattern. The irreducible residue stays class:review. It is the same executed/review spectrum the engine already walks. -->
 A "test" for a document is a criterion that is **(1)** stated with a fixed expected result, **(2)**
 evaluated mechanically, and **(3)** gates on a binary pass/fail. Push each acceptance criterion that
 far (→ `class: executed`); leave the irreducible residue as a user `class: review`. The RED→GREEN

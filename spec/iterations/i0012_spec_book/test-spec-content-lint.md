@@ -1,7 +1,7 @@
 ---
 id: test-spec-content-lint
 type: test
-statement: quack lint flags spec-content violations - dangling anchors, orphans, external links, bad ids, and meta-term leaks.
+statement: quack lint flags spec-content violations: dangling anchors, orphans, external links, bad ids, and meta-term leaks.
 class: executed
 verify: selftest:anchor-refers book-orphan-lint external-links meta-quarantine quarantine-scope residue-lint
 tests_red: exempt - clustered at i17; the birth reds stand in the ledger under the origin ids (adr-cluster-numbered-statements)

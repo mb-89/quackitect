@@ -1,16 +1,7 @@
 package main
 
 // design: go-auto-link  implements: req-manifest-render.5
-// The deterministic auto-link emit pass: plain-text occurrences of a content-note name or
-// alias (go-spec-content) link to their note. Rules, in order: authored links and inline
-// code stay untouched (protected spans); code fences, headings, comment lines, and
-// raw-HTML lines (inline SVG carries real text a link would corrupt) are
-// exempt whole; the LONGEST name wins at a given position (names are applied
-// longest-first and an inserted link becomes a protected span); matching is
-// case-insensitive on word boundaries. Glossary names link through the existing term
-// machinery ([text](term:slug) - usage tracking and first-use expansion ride along);
-// other kinds link their anchor. An alias claimed by two notes is a HARD error at index
-// build (AliasIndex) - the book surfaces it as a finding, never guesses.
+// The deterministic auto-link emit pass links plain-text occurrences of a content-note name or alias (go-spec-content) to their note. Rules apply in order. Authored links and inline code stay untouched, as protected spans. Code fences, headings, comment lines, and raw-HTML lines are exempt whole, since inline SVG carries real text a link would corrupt. The LONGEST name wins at a given position: names are applied longest-first, and an inserted link becomes a protected span. Matching is case-insensitive on word boundaries. Glossary names link through the existing term machinery, [text](term:slug), so usage tracking and first-use expansion ride along. Other kinds link their anchor. An alias claimed by two notes is a HARD error at index build (AliasIndex). The book surfaces it as a finding, never guesses.
 
 import (
 	"regexp"

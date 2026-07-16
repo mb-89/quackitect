@@ -9,7 +9,7 @@ ratings:
   crit-one-tap: 1.0
   crit-build-effort: 0.9
   crit-corporate-seam: 0.2
-statement: ntfy with X-Actions - up to three http-action buttons publish the option to the answer topic; one tap answers.
+statement: ntfy with X-Actions: up to three http-action buttons publish the option to the answer topic. One tap answers.
 class: review
 killer: false
 ---

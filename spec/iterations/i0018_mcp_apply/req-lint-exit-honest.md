@@ -2,7 +2,7 @@
 id: req-lint-exit-honest
 type: requirement
 depends_on: []
-statement: The engine shall exit lint with the agreed three-code contract - zero for clean or advisory-only, one for findings, two for a refused graph.
+statement: The engine shall exit lint with the agreed three-code contract: zero for clean or advisory-only, one for findings, two for a refused graph.
 class: review
 killer: false
 ---

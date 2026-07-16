@@ -2,7 +2,7 @@
 id: model-register-ask-flow
 type: model
 kind: sequence
-statement: how does a register answer travel - who talks to whom from tap to recolor, on desk and phone alike?
+statement: How does a register answer travel? Who talks to whom, from tap to recolor, on desk and phone alike?
 class: review
 killer: false
 ---

@@ -2,7 +2,7 @@
 id: req-stub-templates
 ears: exempt - historical pre-EARS statement, retire-or-retrofit recorded (adr-grandfathers-historical)
 type: requirement
-statement: start stubs shall instantiate the full template folder set including the spec skeleton - the numbered statements bind individually.
+statement: start stubs shall instantiate the full template folder set including the spec skeleton. The numbered statements bind individually.
 class: review
 killer: false
 ---

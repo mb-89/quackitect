@@ -4,7 +4,7 @@ type: adr
 kind: architecture
 decided_in: i0019_strangers_book
 adjudicated_by: user
-statement: The white-label mechanism is hybrid: the renderer takes the identity surfaces - title, wordmark, colophon - from the workspace's brand layer, and the method prose is written brand-neutral where it speaks self-referentially. Render-time prose substitution is rejected: rewriting text the ledger hashes would hide content from the trust chain.
+statement: The white-label mechanism is hybrid. The renderer takes the identity surfaces, title, wordmark, colophon, from the workspace's brand layer. The method prose is written brand-neutral where it speaks self-referentially. Render-time prose substitution is rejected, since rewriting text the ledger hashes would hide content from the trust chain.
 class: review
 killer: false
 ---

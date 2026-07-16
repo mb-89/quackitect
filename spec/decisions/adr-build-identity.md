@@ -3,7 +3,7 @@ id: adr-build-identity
 decided_in: i0010_engine_workshop
 type: adr
 adjudicated_by: human
-statement: The cache build identity is the sha256 self-hash of the running binary, computed once per process. Chosen over a version constant: a forgotten bump would serve stale verdicts - the same failure class as the mtime ratchet.
+statement: The cache build identity is the sha256 self-hash of the running binary, computed once per process. This was chosen over a version constant. A forgotten bump would serve stale verdicts. That is the same failure class as the mtime ratchet.
 class: review
 killer: false
 ---

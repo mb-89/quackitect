@@ -9,16 +9,7 @@ import (
 )
 
 // design: go-data-home  implements: req-state-layout.3, req-state-layout.6, req-state-layout.2
-// One user-scoped data home per WORKSPACE (adr-no-quack-data-home): <base>/quackitect/<slug>/<kind>
-// with kind subfolders (logs, notes, evidence, gather, overlay, out, golden, spikes) — one deletable
-// dir per workspace, so the amnesia test is a single rm -rf. The slug hashes the CANONICAL workspace
-// path — absolute, symlink-resolved where possible, separator-normalized, case-folded on Windows —
-// so PowerShell (C:\...) and git-bash (c:/...) resolve the SAME home.
-// Machine-local overrides live in ONE global user config (<base>/quackitect/config.toml), never
-// per-repo — a per-repo override stored in the directory it overrides was the chicken-egg.
-// Every regenerable artifact routes through dataDirFor (evidence, gather, overlay, out, golden,
-// spikes, logs, notes): the repo carries NO cache state and .quack is gone (req-state-layout.2);
-// selftest:clean-status holds the invariant.
+// One user-scoped data home exists per WORKSPACE (adr-no-quack-data-home): <base>/quackitect/<slug>/<kind> with kind subfolders (logs, notes, evidence, gather, overlay, out, golden, spikes). This is one deletable dir per workspace, so the amnesia test is a single rm -rf. The slug hashes the CANONICAL workspace path: absolute, symlink-resolved where possible, separator-normalized, case-folded on Windows. So PowerShell (C:\...) and git-bash (c:/...) resolve the SAME home. Machine-local overrides live in ONE global user config (<base>/quackitect/config.toml), never per-repo. A per-repo override stored in the directory it overrides was the chicken-egg. Every regenerable artifact routes through dataDirFor (evidence, gather, overlay, out, golden, spikes, logs, notes). The repo carries NO cache state, and .quack is gone (req-state-layout.2). selftest:clean-status holds the invariant.
 func canonicalWorkspacePath(p string) string {
 	if abs, err := filepath.Abs(p); err == nil {
 		p = abs
@@ -79,13 +70,7 @@ func recordedEngineHome() string {
 // enddesign
 
 // design: go-home-marker  implements: req-selftest-home-sweep, req-vehicle-drives-stub.2
-// Every data home records its workspace (workspace.txt), so a sweep can map a home back to
-// the directory it serves. Fixture homes leak by the hundreds otherwise - a home whose workspace no
-// longer exists is an orphan the selftest battery removes (sweepOrphanHomes).
-// The same marker family carries the PER-WORKSPACE engine-home record (engine-home.txt):
-// start stubs writes it at creation, so the stub remembers WHICH engine created it and a
-// vehicle-created stub resolves the vehicle's merged methods even when the machine-global
-// pointer names a different engine repo.
+// Every data home records its workspace (workspace.txt), so a sweep can map a home back to the directory it serves. Fixture homes leak by the hundreds otherwise. A home whose workspace no longer exists is an orphan the selftest battery removes (sweepOrphanHomes). The same marker family carries the PER-WORKSPACE engine-home record (engine-home.txt). start stubs writes it at creation, so the stub remembers WHICH engine created it. A vehicle-created stub resolves the vehicle's merged methods even when the machine-global pointer names a different engine repo.
 var homeStamped bool
 
 // dataHomeFor computes the data home serving ANY workspace path (pure; no writes).

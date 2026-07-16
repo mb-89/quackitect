@@ -4,7 +4,7 @@ type: manifest
 mode: deck
 statement: The talk - compiled from the spec, one slide per unit.
 ---
-<!-- design: method-doc-skeletons  implements: req-template-home.6 :: The deck, preset, and agent-guide manifests ship as skeletons - the engine modes predate them, only the shapes were missing; slots keep the drafting duty loud. -->
+<!-- design: method-doc-skeletons  implements: req-template-home.6 :: The deck, preset, and agent-guide manifests ship as skeletons. The engine modes predate them; only the shapes were missing. Slots keep the drafting duty loud. -->
 <!-- tailor: the deck skeleton. One unit per slide; Note: lines are the presenter's
   aside (hidden on screen, printed in the handout). Refs pull spec content at
   depth 1; figs and pooled views render live. Replace the slots, keep the shape.

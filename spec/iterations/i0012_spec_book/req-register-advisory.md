@@ -2,7 +2,7 @@
 id: req-register-advisory
 type: requirement
 depends_on: []
-statement: The engine shall surface register findings for book prose - readability and plain-language signals for the audience baseline - as advisory output that never blocks a gate.
+statement: The engine shall surface register findings for book prose, readability and plain-language signals for the audience baseline, as advisory output that never blocks a gate.
 class: review
 killer: false
 phase: [engineering]

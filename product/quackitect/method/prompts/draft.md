@@ -1,5 +1,5 @@
-<!-- design: method-ai-drafting  implements: req-ai-provenance.1 :: The drafting method: the AI writes every first draft of book prose FROM injected context (the manifest's referenced nodes, the glossary terms, the audience row, the voice) and stamps every prose unit with its involvement mark at write time; unmarked prose has no path into the book (the emitter refuses it); later touches adjust the mark on the surface-versus-core line. -->
-# draft — how book prose gets written
+<!-- design: method-ai-drafting  implements: req-ai-provenance.1 :: This is the drafting method. The AI writes every first draft of book prose FROM injected context: the manifest's referenced nodes, the glossary terms, the audience row, the voice. It stamps every prose unit with its involvement mark at write time. Unmarked prose has no path into the book; the emitter refuses it. Later touches adjust the mark on the surface-versus-core line. draft: how book prose gets written. -->
+# draft: how book prose gets written
 
 The AI writes every first draft. The user improves it. No exceptions, no unmarked prose.
 

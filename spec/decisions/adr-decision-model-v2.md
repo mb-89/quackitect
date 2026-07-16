@@ -3,7 +3,7 @@ id: adr-decision-model-v2
 decided_in: i0009_contract_attestation
 type: adr
 adjudicated_by: human
-statement: Decisions are immutable nodes in one folder — spec/decisions/, forward-only from i0009 with prior iteration-folder ADRs grandfathered — born made, never edited, exiting only by supersession, classified purely from graph facts (veto = scrap-sink edge, defer = scrap edge with ready_when, superseded = incoming supersedes edge) with the killer stamp remaining a person's judgment — chosen over the industry four-state status lifecycle, which would duplicate the gate ledger's state machine.
+statement: Decisions are immutable nodes in one folder, spec/decisions/, forward-only from i0009 with prior iteration-folder ADRs grandfathered. They are born made, never edited, and exit only by supersession. Classification derives purely from graph facts: veto is a scrap-sink edge, defer is a scrap edge with ready_when, superseded is an incoming supersedes edge. The killer stamp remains a person's judgment. This was chosen over the industry four-state status lifecycle, which would duplicate the gate ledger's state machine.
 depends_on: []
 class: review
 killer: true

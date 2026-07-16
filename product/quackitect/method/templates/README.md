@@ -1,5 +1,5 @@
-<!-- design: method-templates  implements: req-template-home.1, req-template-home.5, req-template-home.2 :: One method/templates home for ALL templates; frontmatter metadata (applies_rigor/applies_type) is the lower bound, judgment reaches beyond it with a retro mention; the eight milestone evidence templates are the first population; straying is questioned at the docs-complete review and improvements flow both ways, template to document and back. -->
-# templates - one home for all of them
+<!-- design: method-templates  implements: req-template-home.1, req-template-home.5, req-template-home.2 :: There is one method/templates home for ALL templates. Frontmatter metadata, applies_rigor and applies_type, is the lower bound, and judgment reaches beyond it with a retro mention. The eight milestone evidence templates are the first population. Straying is questioned at the docs-complete review. Improvements flow both ways, template to document and back. templates: one home for all of them. -->
+# templates: one home for all of them
 
 Every template lives here, whatever the artifact kind: prose, evidence docs, code shapes.
 

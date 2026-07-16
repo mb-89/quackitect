@@ -18,11 +18,7 @@ import (
 )
 
 // design: go-field-schemas  implements: req-field-schemas
-// Load per-field schemas from the method layer, merge common with the per-type
-// one, and report every node field value that breaks its schema — naming the
-// node, the field, and the broken rule (req-field-schemas.1, req-field-schemas.2).
-// Field-SHAPE checks only: enum membership, bool/int typing, pattern, min/max.
-// Referential integrity stays the strict referee's job.
+// Load per-field schemas from the method layer, and merge common with the per-type one. Report every node field value that breaks its schema, naming the node, the field, and the broken rule (req-field-schemas.1, req-field-schemas.2). These are field-SHAPE checks only: enum membership, bool/int typing, pattern, min/max. Referential integrity stays the strict referee's job.
 
 // schemaAttrs are the per-field attribute prefixes a schema key may carry.
 var schemaAttrs = map[string]bool{
@@ -195,12 +191,7 @@ func frontmatterMap(path string) map[string]string {
 }
 
 // design: go-field-tier  implements: req-field-tier
-// The tier rollup: a node's schema fields fold to ONE state. "undecided" while any
-// CORE field is missing or TBD (an unadjudicated core value blocks); "complete-with-
-// deferrals" when the only open fields are DEFERRABLE ones riding their defaults or
-// TBD (they default and count, never block); "complete" when every schema field holds
-// a value. The register's colors build on this (go-register-colors); the TBD marker
-// convention is a value starting "TBD" (req-mint-prefill.3).
+// This is the tier rollup: a node's schema fields fold to ONE state. It is "undecided" while any CORE field is missing or TBD, since an unadjudicated core value blocks. It is "complete-with-deferrals" when the only open fields are DEFERRABLE ones riding their defaults or TBD; they default and count, never block. It is "complete" when every schema field holds a value. The register's colors build on this (go-register-colors). The TBD marker convention is a value starting "TBD" (req-mint-prefill.3).
 
 type tierState struct {
 	state     string   // undecided | complete-with-deferrals | complete
@@ -243,14 +234,7 @@ func nodeTierState(schema *typeSchema, fm map[string]string) tierState {
 // enddesign
 
 // design: go-register-colors  implements: req-register-colors
-// The traffic light derives from RECORDED PROVENANCE ONLY (adr-provenance-in-node):
-//   green-user  — the field's provenance records a user ruling (adjudicated)
-//   green-agent — mechanically derived: a schema default or a deterministic derivation
-//   yellow      — a DEFERRABLE field riding its default or TBD (counts, never blocks)
-//   red         — a CORE field holding an unadjudicated assumption: an agent proposal,
-//                 a skeleton value, a TBD, or no provenance at all
-// Self-reported confidence is NOT an input: no provenance vocabulary carries it, and
-// an unknown source reads as an assumption (red on core), never as trust.
+// The traffic light derives from RECORDED PROVENANCE ONLY (adr-provenance-in-node). Green-user means the field's provenance records a user ruling, adjudicated. Green-agent means it is mechanically derived: a schema default or a deterministic derivation. Yellow means a DEFERRABLE field riding its default or TBD; it counts but never blocks. Red means a CORE field holding an unadjudicated assumption: an agent proposal, a skeleton value, a TBD, or no provenance at all. Self-reported confidence is NOT an input. No provenance vocabulary carries it. An unknown source reads as an assumption, red on core, never as trust.
 
 func fieldColor(r *fieldRule, value, source string) string {
 	src := strings.ToLower(strings.TrimSpace(source))
@@ -404,10 +388,7 @@ func ruleViolation(r *fieldRule, val string) string {
 // enddesign
 
 // design: go-schema-tester  implements: req-field-schemas
-// Validate the SCHEMA SET itself — the contract test (req-field-schemas.3). A
-// schema is a finding when it carries an unknown key, a field whose type is
-// unknown, a malformed enum, a missing or bad tier, or a default that falls
-// outside its own enum. Each finding names the schema file and the broken rule.
+// This validates the SCHEMA SET itself, the contract test (req-field-schemas.3). A schema is a finding when it carries an unknown key, a field whose type is unknown, or a malformed enum. It is also a finding when it carries a missing or bad tier, or a default that falls outside its own enum. Each finding names the schema file and the broken rule.
 
 // schemaSetFindings validates every schema file in dir, returning sorted findings.
 func schemaSetFindings(dir string) []string {

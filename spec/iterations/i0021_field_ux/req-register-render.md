@@ -1,7 +1,7 @@
 ---
 id: req-register-render
 type: requirement
-statement: When a gate reaches its bless moment, the engine shall render one decision-brief hand-off page - open decisions dealt one at a time, no standing register anywhere - the numbered statements bind individually.
+statement: When a gate reaches its bless moment, the engine shall render one decision-brief hand-off page. Open decisions are dealt one at a time. No standing register exists anywhere. The numbered statements bind individually.
 class: review
 killer: false
 ---

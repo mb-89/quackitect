@@ -4,8 +4,8 @@ rigor: lean
 statement: The lean checklist. Light structure. One grounded-review gate per concern. Executed checks where cheap. It inherits vibe. Systematic inherits it.
 ---
 
-<!-- design: method-lean-trace  implements: req-lean-enforces-trace :: Lean rigor carries the derived coverage checks (req-traced, req-has-test, adr-traced, designs-realized) in addition to tests-pass, so even at the lean floor the trace is structurally enforced; only the user review-gate count is reduced (one review per concern). -->
-# Lean — checklist template
+<!-- design: method-lean-trace  implements: req-lean-enforces-trace :: Lean rigor carries the derived coverage checks, req-traced, req-has-test, adr-traced, designs-realized, in addition to tests-pass. So even at the lean floor the trace is structurally enforced. Only the user review-gate count is reduced, to one review per concern. Lean: the checklist template. -->
+# Lean: checklist template
 
 A **condensed systematic walk**. Every concern gets ONE grounded-review gate. Point at the
 referent: a file, a line, a value. Not a bare "looks good". Cheap executed checks (tests,

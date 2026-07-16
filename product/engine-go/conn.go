@@ -1,14 +1,7 @@
 package main
 
 // design: go-conn-lanes  implements: req-connections-lanes.5, req-connections-lanes.3, req-connections-lanes.6, req-connections-lanes.4
-// The connections home (adr-connections-reified + adr-connection-lanes): one subfolder per
-// kind under spec/connections/, two lanes per kind - edges.jsonl carries trivial edges one
-// JSON line each ({"src","dst"[,"q"]}), con- notes carry the prose-bearing ones. An edge
-// lives in exactly ONE lane; the same triple in both refuses the graph. The kind vocabulary
-// is TYPE-LAYER data (project_types/*/type.md `connections:` map: "<direction> <lane>"),
-// unioned like the facet vocabularies; an unknown kind refuses. Every refusal is loud and
-// names its file - the empty-statement guard silently dropping a note is the trap this
-// loader exists to avoid.
+// The connections home (adr-connections-reified plus adr-connection-lanes) has one subfolder per kind under spec/connections/, with two lanes per kind. edges.jsonl carries trivial edges, one JSON line each ({"src","dst"[,"q"]}). con- notes carry the prose-bearing ones. An edge lives in exactly ONE lane. The same triple in both refuses the graph. The kind vocabulary is TYPE-LAYER data, project_types/*/type.md `connections:` map ("<direction> <lane>"), unioned like the facet vocabularies. An unknown kind refuses. Every refusal is loud and names its file. The empty-statement guard silently dropping a note is the trap this loader exists to avoid.
 
 import (
 	"encoding/json"
@@ -254,12 +247,7 @@ func connectionIssues(specDir string, ids map[string]string) []ParseIssue {
 }
 
 // design: go-conn-loader  implements: req-connections-lanes.2
-// Adjacency reconstruction, HASH-NEUTRAL by construction: a connection-stored edge lands
-// in exactly the Node field its frontmatter twin used, and fullHash sorts deps - so with
-// unchanged membership the node hashes are byte-identical across the two storages, and
-// blessed history never mass-suspects at migration.
-// Kinds without a legacy adjacency field (interface, conflicts-with, ...) reconstruct
-// nothing - they are queryable connections only.
+// Adjacency reconstruction is HASH-NEUTRAL by construction. A connection-stored edge lands in exactly the Node field its frontmatter twin used, and fullHash sorts deps. So with unchanged membership, the node hashes are byte-identical across the two storages, and blessed history never mass-suspects at migration. Kinds without a legacy adjacency field, interface, conflicts-with, and so on, reconstruct nothing. They are queryable connections only.
 var connKindField = map[string]string{
 	"verifies": "verifies", "refines": "refines", "addresses": "addresses",
 	"supersedes": "supersedes", "chosen": "chosen", "rejected": "rejected", "refers": "refers",
@@ -309,19 +297,10 @@ func applyConnEdges(nodes map[string]Node, edges []ConnEdge) {
 // enddesign
 
 // design: go-conn-tools  implements: req-connections-lanes.10, req-connections-lanes.11, req-connections-lanes.1
-// The connection determinizers own the housekeeping (no AI reasoning in the
-// loop). mint places an edge ONCE in its kind's default lane with the deterministic id and
-// canonical symmetric order; promote moves a jsonl edge into a note skeleton; connections
-// answers adjacency across ALL THREE lanes (jsonl, notes, code-derived implements) so no
-// consumer ever knows which lane an edge sits in - the view never lies.
+// The connection determinizers own the housekeeping, with no AI reasoning in the loop. mint places an edge ONCE in its kind's default lane with the deterministic id and canonical symmetric order. promote moves a jsonl edge into a note skeleton. connections answers adjacency across ALL THREE lanes, jsonl, notes, code-derived implements, so no consumer ever knows which lane an edge sits in. The view never lies.
 
 // design: go-edge-mode  implements: req-connections-lanes.8
-// The two-source interim gets a referee: spec/project.toml declares
-// edges = "frontmatter" (default) | "connections". In connections mode a legacy edge key
-// in node frontmatter REFUSES naming file and key - a leftover cannot silently double-count
-// or mask an edit. migrate-edges writes the flag LAST, as its commit point. depends_on and
-// parent (task wiring) plus code-declared implements stay legal in both modes
-// (adr-edges-scope).
+// The two-source interim gets a referee. spec/project.toml declares edges = "frontmatter" (default) | "connections". In connections mode, a legacy edge key in node frontmatter REFUSES, naming file and key, so a leftover cannot silently double-count or mask an edit. migrate-edges writes the flag LAST, as its commit point. depends_on and parent, task wiring, plus code-declared implements stay legal in both modes (adr-edges-scope).
 var legacyEdgeKeys = map[string]bool{
 	"verifies": true, "refines": true, "addresses": true, "refers": true,
 	"chosen": true, "rejected": true, "supersedes": true,
@@ -530,13 +509,7 @@ func connectionsFor(id string, nodes map[string]Node, edges []ConnEdge) []string
 }
 
 // design: go-migrate-edges  implements: req-connections-lanes.12
-// The audited one-shot: every frontmatter edge of the seven
-// legacy kinds moves into the connections home's jsonl lanes. It REFUSES on a duplicate
-// list entry (dups are hash-load-bearing; a lane cannot represent them)
-// and on a before-and-after adjacency mismatch (the golden re-baseline at
-// migration would bake a migration bug invisibly - so the migration proves itself before
-// the flag). The mode flag writes LAST, as the commit point; a crash mid-way leaves the
-// loud unfinished-migration state, and a re-run resumes idempotently.
+// This audited one-shot moves every frontmatter edge of the seven legacy kinds into the connections home's jsonl lanes. It REFUSES on a duplicate list entry, since dups are hash-load-bearing and a lane cannot represent them. It also refuses on a before-and-after adjacency mismatch. The golden re-baseline at migration would otherwise bake a migration bug invisibly, so the migration proves itself before the flag. The mode flag writes LAST, as the commit point. A crash mid-way leaves the loud unfinished-migration state. A re-run resumes idempotently.
 var legacyEdgeLine = regexp.MustCompile(`^(verifies|refines|addresses|refers|chosen|rejected|supersedes):`)
 
 func migrateEdges(specDir string) (string, error) {

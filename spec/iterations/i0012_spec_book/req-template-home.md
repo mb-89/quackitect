@@ -1,7 +1,7 @@
 ---
 id: req-template-home
 type: requirement
-statement: The method layer shall carry one template home covering every artifact kind, with improvements flowing template-to-document and back - the numbered statements bind individually.
+statement: The method layer shall carry one template home covering every artifact kind, with improvements flowing template-to-document and back. The numbered statements bind individually.
 class: review
 killer: false
 ---

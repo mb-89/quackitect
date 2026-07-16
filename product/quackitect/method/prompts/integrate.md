@@ -1,5 +1,5 @@
-<!-- design: integrate-prompt  implements: req-engine-vehicle-overlay.3 :: The integrate prompt: a documented path (vendor + build + configure + overlay + run) with a worked example for an external vehicle to run on the quackitect engine. The engine is vendored under tools/vendor/; one `start init` scaffolds it; the launcher bootstraps the global binary (adr-retire-legacy-lanes: no sidecar data lanes, no repo-local engine copy). -->
-# integrate — run a vehicle on the quackitect engine
+<!-- design: integrate-prompt  implements: req-engine-vehicle-overlay.3 :: The integrate prompt is a documented path: vendor, build, configure, overlay, run. It carries a worked example for an external vehicle to run on the quackitect engine. The engine is vendored under tools/vendor/. One `start init` scaffolds it. The launcher bootstraps the global binary (adr-retire-legacy-lanes: no sidecar data lanes, no repo-local engine copy). integrate: run a vehicle on the quackitect engine. -->
+# integrate: run a vehicle on the quackitect engine
 
 You are a **vehicle**: a project that uses quackitect as its engine to build *your own* tool. Your
 `product/` and `spec/` are **yours** (the tool you ship). quackitect is vendored in; you override what
@@ -156,7 +156,7 @@ Nestable: a vehicle can itself be an engine for another (the chain just grows).
 <!-- enddesign -->
 
 ## Start a new project (conversational bootstrap)
-<!-- design: method-bootstrap  implements: req-project-onboarding.1, req-project-onboarding.3, req-project-onboarding.2 :: On "start a new project" the agent runs a fixed onboarding — confirm intent to start an iteration, ask the target folder, ask vendor-engine vs drive-from-inside stubs — then scaffolds (start init / start stubs), lands in the workspace, and immediately opens the first iteration's M1 vision interview. A workspace with zero iterations auto-triggers this framing instead of dead-ending on a status board. The README leads with this flow; the raw clone/build CLI is a slim "get the engine" step beneath it. -->
+<!-- design: method-bootstrap  implements: req-project-onboarding.1, req-project-onboarding.3, req-project-onboarding.2 :: On "start a new project" the agent runs a fixed onboarding. It confirms intent to start an iteration, asks the target folder, and asks vendor-engine versus drive-from-inside stubs. Then it scaffolds, start init or start stubs, lands in the workspace, and immediately opens the first iteration's M1 vision interview. A workspace with zero iterations auto-triggers this framing instead of dead-ending on a status board. The README leads with this flow. The raw clone/build CLI is a slim "get the engine" step beneath it. -->
 When a user says **"start a new project"**, do NOT dump CLI steps. Run this flow:
 
 > **⚠️ A vehicle's own spec/ is for the VEHICLE's tool — never for a project it drives.**

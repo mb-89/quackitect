@@ -2,7 +2,7 @@
   "mcpServers": {
     "quack": {
       "command": "cmd",
-      "args": ["/c", "quack.cmd", "mcp"]
+      "args": ["/c", ".\\quack.cmd", "mcp"]
     }
   }
 }

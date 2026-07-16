@@ -2,7 +2,7 @@
 id: req-diagram-review-render
 type: requirement
 depends_on: []
-statement: The engine shall render one model as a standalone diagram whose change-marks propagate up the drill-down - the numbered statements bind individually.
+statement: The engine shall render one model as a standalone diagram whose change-marks propagate up the drill-down. The numbered statements bind individually.
 class: review
 killer: false
 ---

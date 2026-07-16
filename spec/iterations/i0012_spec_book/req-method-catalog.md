@@ -1,7 +1,7 @@
 ---
 id: req-method-catalog
 type: requirement
-statement: The method layer shall carry the methodology map and each chapter shall render the methods that declare it - the numbered statements bind individually.
+statement: The method layer shall carry the methodology map, and each chapter shall render the methods that declare it. The numbered statements bind individually.
 class: review
 killer: false
 ---

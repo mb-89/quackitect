@@ -12,14 +12,7 @@ import (
 )
 
 // design: go-comment-island  implements: req-comment-layer.7, req-comment-layer.9
-// The island: ONE <script type="application/json" id="quack-comments"> block per copy — the
-// single source the sidebar renders from and the read-back reads. The schema follows the W3C
-// Web Annotation vocabulary in compact keys: target carries the unit anchor + TextQuoteSelector
-// fields (quote/prefix/suffix) + position (start/end) + an optional figure element id; thread
-// messages carry the assessing mark (agree|reject|neutral); suggest carries a proposed edit
-// (the editing motivation). A target with ONLY a unit id is legal — that is a premark, authored
-// before any reader selection (uc-comment-premark stays buildable). Two islands = malformed,
-// refused, never guessed.
+// The island is ONE <script type="application/json" id="quack-comments"> block per copy, the single source the sidebar renders from and the read-back reads. The schema follows the W3C Web Annotation vocabulary in compact keys. target carries the unit anchor plus TextQuoteSelector fields (quote/prefix/suffix) plus position (start/end) plus an optional figure element id. thread messages carry the assessing mark (agree|reject|neutral). suggest carries a proposed edit, the editing motivation. A target with ONLY a unit id is legal, a premark authored before any reader selection (uc-comment-premark stays buildable). Two islands is malformed, refused, never guessed.
 type commentTarget struct {
 	Unit   string `json:"unit"`
 	Quote  string `json:"quote,omitempty"`
@@ -76,10 +69,7 @@ func parseCommentIsland(html string) (*commentIsland, error) {
 // enddesign
 
 // design: go-island-serialize  implements: req-comment-layer.4
-// The serializer half of the escape rule (proven live: a probe
-// broke on a comment containing a script-closing sequence). Marshal with HTML escaping: every
-// angle bracket lands as its unicode escape, so island content can never close its own script
-// tag — reversible, standard JSON.
+// This is the serializer half of the escape rule, proven live when a probe broke on a comment containing a script-closing sequence. Marshal with HTML escaping: every angle bracket lands as its unicode escape, so island content can never close its own script tag. This is reversible, standard JSON.
 func islandSerialize(raw []byte) (string, error) {
 	var v interface{}
 	if err := json.Unmarshal(raw, &v); err != nil {
@@ -92,11 +82,7 @@ func islandSerialize(raw []byte) (string, error) {
 // enddesign
 
 // design: go-file2list  implements: req-comment-file2list.1, req-comment-file2list.2
-// quack note --file2list <copy> — the pure lister (adr-comment-readback-lister): a commented
-// copy becomes a deterministic list of NOTE CANDIDATES the agent triages in context, minting
-// keepers as ordinary notes. It reads the island, never the DOM; two runs are byte-identical;
-// author names are replaced by reader roles (reader-1, reader-2 in first-appearance order) at
-// this boundary — no personal data can travel from a copy into the ledger.
+// quack note --file2list <copy> is the pure lister (adr-comment-readback-lister). A commented copy becomes a deterministic list of NOTE CANDIDATES the agent triages in context, minting keepers as ordinary notes. It reads the island, never the DOM. Two runs are byte-identical. Author names are replaced by reader roles, reader-1, reader-2 in first-appearance order, at this boundary. No personal data can travel from a copy into the ledger.
 func file2list(path string) (string, error) {
 	raw, err := os.ReadFile(path)
 	if err != nil {
@@ -150,10 +136,7 @@ func file2list(path string) (string, error) {
 // enddesign
 
 // design: go-calls-summary  implements: req-call-log-lifecycle.1
-// quack calls --summary IS the retro's log step (review.md): print the aggregate the
-// method asks for — per-command counts, failure rate, slow calls, channel mix — then delete
-// the log in the same move (retention is retro-bound, adr-call-log). One deterministic command,
-// never a hand-written aggregation script.
+// quack calls --summary IS the retro's log step (review.md). It prints the aggregate the method asks for: per-command counts, failure rate, slow calls, channel mix. Then it deletes the log in the same move, since retention is retro-bound (adr-call-log). It is one deterministic command, never a hand-written aggregation script.
 func cmdCalls(args []string) {
 	if !hasFlag(args, "--summary") {
 		fmt.Println("usage: " + brand() + " calls --summary   (print the call-log aggregate, then delete the log)")

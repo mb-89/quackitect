@@ -3,7 +3,7 @@ id: adr-trace-graph-unfolded
 type: adr
 decided_in: i0021_field_ux
 adjudicated_by: user
-statement: The trace graph carries the semantic design dimension only: no fold boxes and no iteration or age grouping - age lives in the report's iteration sidebar. The fold machinery (age fold and fan fold) is removed; render compaction for large tabs is an open design discussion deferred to a future iteration.
+statement: The trace graph carries the semantic design dimension only: no fold boxes and no iteration or age grouping. Age lives in the report's iteration sidebar. The fold machinery, age fold and fan fold, is removed. Render compaction for large tabs is an open design discussion deferred to a future iteration.
 class: review
 killer: false
 ---

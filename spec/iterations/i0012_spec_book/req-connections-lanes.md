@@ -1,7 +1,7 @@
 ---
 id: req-connections-lanes
 type: requirement
-statement: The engine shall store, mint, migrate, and serve trace edges through the spec connections lanes - the numbered statements bind individually.
+statement: The engine shall store, mint, migrate, and serve trace edges through the spec connections lanes. The numbered statements bind individually.
 class: review
 killer: false
 ---

@@ -1,7 +1,7 @@
 ---
 id: req-drivers-derived
 type: requirement
-statement: The book's drivers table shall render the derived union of requirements addressed by an architecture ADR and hand-tagged requirements, each row naming its deciding ADRs - the numbered statements bind individually.
+statement: The book's drivers table shall render the derived union of requirements addressed by an architecture ADR and hand-tagged requirements. Each row shall name its deciding ADRs. The numbered statements bind individually.
 class: review
 killer: false
 ---

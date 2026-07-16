@@ -3,8 +3,8 @@ id: rigor-shared-implementation
 statement: The implementation milestone, shared by lean and systematic. A test-first walk — author tests → observe RED → implement to GREEN. The SEQUENCE is fixed; RIGOR sets gate density; the iteration's ROLE BINDINGS set who performs each step. Never below this floor.
 ---
 
-<!-- design: method-shared-implementation  implements: req-impl-fragment-tdd.1 :: ONE shared implementation fragment, imported by BOTH lean and systematic (single source, no duplication). It replaces the old lean L4 and systematic M6 build content. gather() bundles it with the rigor source; the composer inlines it at the importing milestone's gate density (lean = one review gate + derived checks; systematic = one sub-gate per acceptance item). -->
-# Implementation — shared fragment (test-first)
+<!-- design: method-shared-implementation  implements: req-impl-fragment-tdd.1 :: There is ONE shared implementation fragment, imported by BOTH lean and systematic: single source, no duplication. It replaces the old lean L4 and systematic M6 build content. gather() bundles it with the rigor source. The composer inlines it at the importing milestone's gate density: lean means one review gate plus derived checks, and systematic means one sub-gate per acceptance item. Implementation: shared fragment (test-first). -->
+# Implementation: shared fragment (test-first)
 
 Imported by lean (as its build milestone) and systematic (as M6). Roles in «angle brackets» are
 resolved at seed from the project type + iteration overrides; the default binding is **inline**
@@ -21,6 +21,11 @@ resolved at seed from the project type + iteration overrides; the default bindin
 
 **Verify targeted while building; the battery belongs to the gate.** Mid-build,
 run ONLY the selftest(s) the change in hand touches (plus the build for the hash re-baseline).
+**Discover once, fix batched, confirm once (owner law).** At the gate, the battery runs ONCE
+to discover. Collect EVERY finding it surfaces before fixing anything. Fix them all in one
+pass. Then ONE confirmation run. A fix-one-rerun-one loop burns a full battery per finding
+and is the same over-checking failure mode in gate clothing. Trust that you will test anyway;
+build freely and let the one discovery run find what it finds.
 The FULL battery runs at ONE place: the verification gate, through `verify <check>` in its own
 visible console — never between edits, never as a slot ritual. The engine enforces this on the
 agent channel: a full battery outside a milestone review is refused (go-guard-selftest).
@@ -46,8 +51,8 @@ exactly this way). Run `observe-red` LAST before the build, and BEFORE the code 
 - [ ] implementation risks acceptable *(review — systematic only)*
 <!-- enddesign -->
 
-<!-- design: method-apply-default-lane  implements: req-apply-default-lane :: The mechanical-edit lane, named in the method: quack apply is the DEFAULT lane for a mechanical bulk edit (byte-exact old->new, dry-run first, all-or-nothing); editor tooling is the lane for a single edit; a byte-safe scripted edit is the recorded exception, never the default. -->
-## Editing lane — how a change reaches the files
+<!-- design: method-apply-default-lane  implements: req-apply-default-lane :: This is the mechanical-edit lane, named in the method. quack apply is the DEFAULT lane for a mechanical bulk edit (byte-exact old, dry-run first, all-or-nothing). Editor tooling stays the lane for a single edit. A byte-safe scripted edit is the recorded exception, never the default. -->
+## Editing lane: how a change reaches the files
 
 Every edit travels one lane. The apply lane is the agent's DEFAULT (adr-io-lane-default).
 

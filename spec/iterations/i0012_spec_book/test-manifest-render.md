@@ -1,7 +1,7 @@
 ---
 id: test-manifest-render
 type: test
-statement: Every document renders from manifest nodes - transcluded units at derived depth, deck mode, auto-linked prose, emitted entry files.
+statement: Every document renders from manifest nodes: transcluded units at derived depth, deck mode, auto-linked prose, emitted entry files.
 class: executed
 verify: selftest:agents-emit auto-link book-depth book-manifests deck-mode render-refs
 tests_red: exempt - clustered at i17; the birth reds stand in the ledger under the origin ids (adr-cluster-numbered-statements)

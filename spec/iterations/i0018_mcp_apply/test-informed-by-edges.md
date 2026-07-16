@@ -1,7 +1,7 @@
 ---
 id: test-informed-by-edges
 type: test
-statement: A decision's addresses edge to a model element loads first-class, the rendered informed-by list carries that decision ahead of any name-derived citation, and a dangling model target is a lint finding.
+statement: A decision's addresses edge to a model element loads first-class. The rendered informed-by list carries that decision ahead of any name-derived citation. A dangling model target is a lint finding.
 class: executed
 verify: selftest:informed-by-edges
 killer: false

@@ -22,7 +22,7 @@ semantic edge). The directions:
 
 Derived coverage rules (used as `verify: coverage:<rule>` on executed subtasks):
 `req-traced`, `req-has-test`, `req-has-design`, `adr-traced`, `designs-realized`, `tests-pass`, `tests-red`.
-`tests-red` = every executed test carries a `red-observed` attestation (via `quack observe-red <test>`) at its current hash — test-first RED before the build.
+`tests-red` = every executed test carries a `red-observed` attestation at its current hash — test-first RED before the build. The record lands via `quack observe-red <test>` at the console, or the `observe-red` MCP tool on the agent lane.
 
 ## Trace node frontmatter — in `spec/iterations/<iter>/`
 ```
@@ -78,9 +78,12 @@ move under one hash. There is NO standing register (adr-handoff-html): the gate'
 BRIEF derives the colors from that provenance — open decisions (red, dealt one card at a
 time with the agent's default and the lettered options), decided-already (green: the
 adjudicated filled dot and the agent-confident outlined dot never mix), defaults riding
-(yellow, off the page). A decision node authors its alternatives as an `## Options` body
-section (`A) …` paragraphs) and its ruling as a lettered `decided_via` — the card then reads
-"Bless selects B)". A bless records every stated default in the user's name, on any channel
+(yellow, off the page). A decision node's statement states the PROBLEM plainly, in one or two short sentences. It
+authors its alternatives as an `## Options` body section (`A) …` paragraphs — one option per
+PARAGRAPH, blank line between options, so each renders as its own line; the voice list law
+binds here) and its ruling as a lettered `decided_via` — the card then reads
+"Bless selects B)", the letter only. A decision missing this shape is reformatted BEFORE it
+reaches any hand-off (owner law). A bless records every stated default in the user's name, on any channel
 (page tap or phone card); killer decisions resolve ONLY over a hand-off channel or a console
 bless — every other lane refuses.
 
@@ -89,8 +92,8 @@ bless — every other lane refuses.
 - lean's derived coverage per milestone (see `rigor/lean/checklist.md`):
   M2 `{req-traced, req-has-test}` · M3 `{adr-traced}` · M4 `{designs-realized, tests-pass}`.
 
-<!-- design: method-ears-block  implements: req-ears-authoring.2 :: The compose reference carries the five EARS pattern shapes and the authoring instruction, integrated with the tests-red and roles content; new requirement statements at systematic rigor are authored EARS-shaped at compose time and checked by quack lint; historical non-EARS statements carry explicit ears exempt markers citing adr-grandfathers-historical. -->
-## EARS — requirement statements (systematic rigor)
+<!-- design: method-ears-block  implements: req-ears-authoring.2 :: The compose reference carries the five EARS pattern shapes and the authoring instruction, integrated with the tests-red and roles content. New requirement statements at systematic rigor are authored EARS-shaped at compose time and checked by quack lint. Historical non-EARS statements carry explicit ears exempt markers citing adr-grandfathers-historical. EARS: requirement statements (systematic rigor). -->
+## EARS: requirement statements (systematic rigor)
 Author every NEW `type: requirement` statement in one of the **five EARS shapes**, with **shall**:
 - **Ubiquitous** — `The <system> shall <response>.`
 - **Event-driven** — `When <trigger>, the <system> shall <response>.`

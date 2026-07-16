@@ -1,7 +1,7 @@
 ---
 id: test-vehicle-chain
 type: test
-statement: End to end in a hermetic home - a vehicle with a committed method override creates a stub; the stub resolves the vehicle's override; the machine-global engine home survives untouched.
+statement: End to end in a hermetic home, a vehicle with a committed method override creates a stub. The stub resolves the vehicle's override. The machine-global engine home survives untouched.
 class: executed
 verify: selftest:vehicle-chain
 killer: false

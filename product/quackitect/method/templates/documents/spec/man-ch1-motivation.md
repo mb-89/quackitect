@@ -5,7 +5,7 @@ mode: chapter
 order: 10
 statement: Motivation - where we want to be, and why we can get there.
 ---
-<!-- design: method-criteria-items  implements: req-criteria-validation, req-criteria-in-needs :: Success criteria live ON the need: each need carries its own `## Success criteria` pass lines, the standalone crit- node type is retired, the needs register renders in the delta section with the pass lines one expand away, and the ch5 validation view traces the same rows to their outcomes - the V-model's outer arc as data. -->
+<!-- design: method-criteria-items  implements: req-criteria-validation, req-criteria-in-needs :: Success criteria live ON the need. Each need carries its own `## Success criteria` pass lines. The standalone crit- node type is retired. The needs register renders in the delta section with the pass lines one expand away. The ch5 validation view traces the same rows to their outcomes, the V-model's outer arc as data. The big idea. -->
 ## The big idea
 <!-- fill [mandatory]
 Contents: why this system exists, in one breath, standalone-readable. Name the

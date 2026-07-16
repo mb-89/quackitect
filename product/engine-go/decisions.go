@@ -7,15 +7,7 @@ import (
 )
 
 // design: go-decisions  implements: req-decision-model.1, req-decision-model.3, req-decision-model.2, req-decision-model.4
-// Decision model v2 (adr-decision-model-v2): a decision is born made and never edited; ALL
-// classification derives from graph facts — an edge to the built-in `scrap` sink without ready_when
-// is a VETO, with ready_when a DEFER, an incoming supersedes edge means SUPERSEDED, anything else is
-// an ADOPTION. `scrap` is the /dev/null of the trace: one engine-built-in sink, no file on disk
-// (ref-integrity recognizes it). Placement is forward-only from i0009: a decision minted in a newer
-// iteration outside spec/decisions/ is a lint finding; the ~20 historical iteration-folder ADRs stay
-// grandfathered. The realized lint flags an ADOPTION whose addressed requirements lack realized
-// designs — and, being class-driven, can never nag a veto or a defer. `decisions --parked` lists
-// exactly the live defers (no incoming supersedes): the engage-start migration walks THIS list.
+// Decision model v2 (adr-decision-model-v2): a decision is born made and never edited. ALL classification derives from graph facts. An edge to the built-in `scrap` sink without ready_when is a VETO. With ready_when it is a DEFER. An incoming supersedes edge means SUPERSEDED. Anything else is an ADOPTION. `scrap` is the /dev/null of the trace: one engine-built-in sink, no file on disk; ref-integrity recognizes it. Placement is forward-only from i0009. A decision minted in a newer iteration outside spec/decisions/ is a lint finding. The roughly 20 historical iteration-folder ADRs stay grandfathered. The realized lint flags an ADOPTION whose addressed requirements lack realized designs. Being class-driven, it can never nag a veto or a defer. `decisions --parked` lists exactly the live defers, no incoming supersedes. The engage-start migration walks THIS list.
 const decisionsSince = "i0009"
 const scrapSink = "scrap"
 

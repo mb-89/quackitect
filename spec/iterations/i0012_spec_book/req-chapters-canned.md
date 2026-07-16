@@ -1,7 +1,7 @@
 ---
 id: req-chapters-canned
 type: requirement
-statement: The chapter skeletons shall ship canned derived units, keeping only judgment fills authored - the numbered statements bind individually.
+statement: The chapter skeletons shall ship canned derived units, keeping only judgment fills authored. The numbered statements bind individually.
 class: review
 killer: false
 ---

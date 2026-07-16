@@ -1,7 +1,7 @@
 ---
 id: test-external-engine-root
 type: test
-statement: The global binary resolves its resource layer LIVE for an external workspace - the workspace wins when it carries the layer, else the recorded engine home - and after one run inside the repo a complete external stub drives a full-graph command clean.
+statement: The global binary resolves its resource layer LIVE for an external workspace. The workspace wins when it carries the layer, else the recorded engine home applies. After one run inside the repo, a complete external stub drives a full-graph command clean.
 class: executed
 verify: selftest:external-engine-root
 killer: false

@@ -6,15 +6,7 @@ import (
 )
 
 // design: go-question-nodes  implements: req-question-nodes
-// Open unknowns ride the trace as first-class question nodes (adr-question-nodes-provenance):
-// `type: question` is trace CONTENT like requirement and adr — never a gate, never blessed,
-// no DONE/SUSPECT/OPEN of its own. A question carries a decision state (open | proposed |
-// decided) and, once decided, a `decided_via` provenance line — the ledger records WHAT was
-// decided and via what; it never simulates the deciding. Both fields fold into the node's
-// identity (the fullHash question seed), so deciding a question ripples its dependents
-// through the existing edge lanes like any content edit. The EARS lint never applies:
-// questions are questions, not shall-statements — the requirement-only rule exempts them
-// by type, the same way every other non-requirement type is exempt.
+// Open unknowns ride the trace as first-class question nodes (adr-question-nodes-provenance). `type: question` is trace CONTENT like requirement and adr. It is never a gate, never blessed, with no DONE/SUSPECT/OPEN of its own. A question carries a decision state, open, proposed, or decided, and once decided, a `decided_via` provenance line. The ledger records WHAT was decided and via what; it never simulates the deciding. Both fields fold into the node's identity, the fullHash question seed. So deciding a question ripples its dependents through the existing edge lanes like any content edit. The EARS lint never applies, since questions are questions, not shall-statements. The requirement-only rule exempts them by type, the same way every other non-requirement type is exempt.
 
 // questionState returns a question node's decision state (open | proposed | decided).
 func questionState(n Node) string { return n.State }

@@ -7,7 +7,7 @@ impact: 0.5
 mitigation: the M3 candidates step bounds the register to ONE placement; the fill/adjudicate UI unifies with the EXISTING ask path instead of growing a parallel one; two-model budget at M4
 owner: driving agent
 status: open
-statement: The register grows into a parallel UI system - its own renderer, its own answer path, its own state - instead of unifying with the existing ask/bless machinery.
+statement: The register grows into a parallel UI system: its own renderer, its own answer path, its own state. This happens instead of unifying with the existing ask/bless machinery.
 class: review
 killer: false
 ---

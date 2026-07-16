@@ -1,7 +1,7 @@
 ---
 id: raid-pc-clock
 type: raid
-statement: This machine's clock runs about one hour ahead of real time - ask staleness is shielded (channel-clock stamps), but ledger event timestamps and note ids still carry the skewed local time.
+statement: This machine's clock runs about one hour ahead of real time. Ask staleness is shielded via channel-clock stamps. Ledger event timestamps and note ids still carry the skewed local time.
 kind: issue
 probability: 1.0
 impact: 0.2

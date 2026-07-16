@@ -1,7 +1,7 @@
 ---
 id: req-candidate-decisions
 type: requirement
-statement: The spec shall model decisions choosing among rated candidates, rendered deterministically in their owning chapters - the numbered statements bind individually.
+statement: The spec shall model decisions choosing among rated candidates, rendered deterministically in their owning chapters. The numbered statements bind individually.
 class: review
 killer: false
 ---

@@ -9,7 +9,7 @@ ratings:
   crit-one-tap: 0.9
   crit-build-effort: 0.3
   crit-corporate-seam: 0.4
-statement: Slack Socket Mode - a hand-rolled RFC6455 websocket client receives button clicks; Block Kit buttons answer one-tap.
+statement: Slack Socket Mode: a hand-rolled RFC6455 websocket client receives button clicks. Block Kit buttons answer one-tap.
 class: review
 killer: false
 ---

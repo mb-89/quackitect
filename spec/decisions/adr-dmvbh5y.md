@@ -5,7 +5,7 @@ type: adr
 kind: project
 adjudicated_by: user
 ready_when: the corporate wave iteration (Teams/Outlook) picks the Slack adapter up with it
-statement: Slack leaves i0015 - the first wave ships ntfy only; the Slack adapter defers to the corporate wave.
+statement: Slack leaves i0015. The first wave ships ntfy only. The Slack adapter defers to the corporate wave.
 class: review
 killer: false
 ---

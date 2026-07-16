@@ -15,9 +15,7 @@ import (
 )
 
 // design: go-defer-retire  implements: req-go-port
-// Stamp lane: read the task file, insert the key into its frontmatter ahead of the closing
-// delimiter, write back byte-safe. A reason is REQUIRED - an unexplained defer is how scope
-// leaks silently; the stamp is greppable and the board renders [>] DEFER / [-] RETIRED.
+// The stamp lane reads the task file, inserts the key into its frontmatter ahead of the closing delimiter, and writes back byte-safe. A reason is REQUIRED, since an unexplained defer is how scope leaks silently. The stamp is greppable, and the board renders [>] DEFER / [-] RETIRED.
 func stampCheck(id, key, reason string) error {
 	nodes := LoadAll()
 	n, ok := nodes[id]
@@ -72,10 +70,7 @@ func init() {
 // enddesign
 
 // design: go-vehicle-misuse-guard  implements: req-engine-vehicle-overlay.3
-// The cheap lint that catches a driven project composed inside a vehicle's own spec: the
-// workspace IS a vehicle (its engine layer resolves through tools/vendor/), its spec holds
-// iterations, and its product/ is effectively empty (nothing beyond the seeded brand and
-// method-overlay README). Exactly the observed field failure; one warning line names the fix.
+// This is the cheap lint that catches a driven project composed inside a vehicle's own spec. The workspace IS a vehicle, since its engine layer resolves through tools/vendor/. Its spec holds iterations. Its product/ is effectively empty, nothing beyond the seeded brand and method-overlay README. This is exactly the observed field failure. One warning line names the fix.
 func vehicleMisuseFinding() string {
 	if !strings.Contains(EngineDir(), "vendor") {
 		return "" // dogfood or stub - not a vehicle

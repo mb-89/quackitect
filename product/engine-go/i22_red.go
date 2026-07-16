@@ -27,6 +27,24 @@ func selftestGuardSelftestGate() bool {
 	if walkGuardDecision("selftest", true, true, false, "", false) != "" {
 		return false // the console never takes the refusal
 	}
+	// sub-op awareness (i24 b5): scaffold sub-ops are creation, never ledger advancement
+	if ledgerCmdClass("start", []string{"stubs"}) || ledgerCmdClass("start", []string{"init", "x"}) {
+		return false
+	}
+	if !ledgerCmdClass("start", []string{"i0025_x"}) || !ledgerCmdClass("bless", nil) {
+		return false
+	}
+	if ledgerCmdClass("status", nil) {
+		return false
+	}
+	// the refusal names the revive path (i24 b5, the dead-server lockout)
+	if m := walkGuardDecision("bless", false, false, false, "mcp", true); !strings.Contains(m, "reconnect") {
+		return false
+	}
+	// grant's refusal points at the owner's console, never a nonexistent tool (i24 b17)
+	if m := walkGuardDecision("grant", false, false, false, "mcp", true); !strings.Contains(m, "console") || strings.Contains(m, "MCP tool") {
+		return false
+	}
 	return true
 }
 
@@ -57,7 +75,7 @@ func selftestMCPSurface() bool {
 	for _, t := range mcpTools() {
 		names[t.Name] = true
 	}
-	for _, must := range []string{"status", "next", "bless", "start"} {
+	for _, must := range []string{"status", "next", "bless", "start", "query", "observe-red", "ship"} {
 		if !names[must] {
 			return false
 		}

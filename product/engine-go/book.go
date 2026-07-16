@@ -17,13 +17,7 @@ import (
 )
 
 // design: go-book-manifests  implements: req-manifest-render.1, req-spec-content-lint.2, req-lint-classification.2
-// The manifest node type (adr-book-two-stage; one mechanism): a manifest
-// is trace CONTENT whose body lists UNITS separated by `---` lines. A unit is either a node
-// reference (a plain markdown link to a node id, optional `depth:N`) or inline markdown (ledes,
-// glue - provenance-marked like all prose). `Note:` lines carry speaker notes (deck mode). The
-// book-orphan lint arms once the FIRST manifest exists (fail-safe, the forward-only pattern):
-// every book-content node (need, usecase, requirement, adr) must be referenced by SOME manifest -
-// an exclude-mode manifest is the explicit exclusion record, referenced-but-not-rendered.
+// The manifest node type (adr-book-two-stage; one mechanism): a manifest is trace CONTENT whose body lists UNITS separated by `---` lines. A unit is either a node reference, a plain markdown link to a node id with optional `depth:N`, or inline markdown, ledes and glue, provenance-marked like all prose. `Note:` lines carry speaker notes, deck mode. The book-orphan lint arms once the FIRST manifest exists, fail-safe, the forward-only pattern. Every book-content node, need, usecase, requirement, adr, must be referenced by SOME manifest. An exclude-mode manifest is the explicit exclusion record, referenced-but-not-rendered.
 type ManifestUnit struct {
 	Ref     string // the referenced node id ("" for an inline unit)
 	Depth   int    // declared depth 1..4; 0 = the mode's default
@@ -226,16 +220,7 @@ func sortStrings(s []string) {
 // enddesign
 
 // design: go-book-emitter  implements: req-book-artifact.1, req-manifest-render.2, req-book-artifact.3, req-reader-structure.1, req-book-trust.2, req-book-artifact.6, req-chapter-placement.3, req-module-filter-first
-// The deterministic emitter core. Truth (nodes + manifests) renders to ONE self-contained HTML:
-// the project README opens the book as its own first chapter — the reader's starting point —
-// through the zero-dep renderReadme projection (headings, tables, lists, inline images);
-// every layer is real text in a semantic DOM at emit time (script never creates content); depth
-// derives from node anatomy (1 statement, 2 +rationale, 3 +children, 4 +evidence) - never an
-// authored tag (the strict allowlist refuses a `depth:` key on nodes); every chapter OPENS with
-// its lede (a missing lede is a finding); every unit carries a STABLE ANCHOR (<node>-u<idx>, the
-// future comment system's hook); the artifact stamps its source state (merkle root, iteration,
-// engine version); each node renders a visible meta line (id, type, ledger state) so trust
-// metadata survives plain-text extraction. No timestamps anywhere - same state, same bytes.
+// This is the deterministic emitter core. Truth, nodes plus manifests, renders to ONE self-contained HTML. The project README opens the book as its own first chapter, the reader's starting point, through the zero-dep renderReadme projection: headings, tables, lists, inline images. Every layer is real text in a semantic DOM at emit time; script never creates content. Depth derives from node anatomy: 1 is statement, 2 adds rationale, 3 adds children, 4 adds evidence. It is never an authored tag; the strict allowlist refuses a `depth:` key on nodes. Every chapter OPENS with its lede, and a missing lede is a finding. Every unit carries a STABLE ANCHOR, <node>-u<idx>, the future comment system's hook. The artifact stamps its source state: merkle root, iteration, engine version. Each node renders a visible meta line, id, type, ledger state, so trust metadata survives plain-text extraction. No timestamps anywhere: same state, same bytes.
 func mdLite(md string) string { return mdLiteAt(md, 2) }
 
 // mdLiteAt renders markdown-lite with a heading BASE level: a single `#` becomes
@@ -855,15 +840,7 @@ func splitChapterTitle(t string) (string, string) {
 }
 
 // design: go-guide-ch8  implements: req-chapter-placement.1, req-chapter-placement.2
-// The agent guide is no reader chapter: agent-mode manifests render
-// INSIDE the guidance chapter as one row of
-// the guides TABLE (go-guides-table); no per-audience subchapters. Every
-// audience class stays visible in that table, empty ones as an honest no-guide-yet
-// row (the pull law: a guide lands when demand appears).
-//
-// readerChapters collects the reading-flow chapters plus the agent guides, in reading
-// order — explicit Order slot, then id (req-system-overview). The renderer and the
-// terms-order lint (go-terms-order-lint) walk this SAME list: one order source.
+// The agent guide is no reader chapter. agent-mode manifests render INSIDE the guidance chapter as one row of the guides TABLE (go-guides-table), with no per-audience subchapters. Every audience class stays visible in that table, with empty ones as an honest no-guide-yet row, the pull law: a guide lands when demand appears. readerChapters collects the reading-flow chapters plus the agent guides, in reading order: explicit Order slot, then id (req-system-overview). The renderer and the terms-order lint (go-terms-order-lint) walk this SAME list. That is one order source.
 func readerChapters(nodes map[string]Node) (chapters, agentGuides []Node) {
 	for _, n := range nodes {
 		if n.Type == "manifest" && (n.Mode == "chapter" || n.Mode == "guidance") {
@@ -915,7 +892,7 @@ func renderBookHTML(nodes map[string]Node) (string, []string, []string) {
 	sm := StatusMap(nodes)
 	bl := latestBless()
 	cfg := readProjectConfig()
-	root := MerkleRoot(nodes)
+	root := workspaceRoot(nodes)
 	gloss := readGlossary()
 	tips := contentTips() // content-note one-liners for the termref affordance
 	used := map[string][]string{}
@@ -959,9 +936,7 @@ func renderBookHTML(nodes map[string]Node) (string, []string, []string) {
 			chb.WriteString(renderNodeAtDepth(u.Ref, u.Depth, nodes, sm, bl, anchor))
 		} else if m := figRefRe.FindStringSubmatch(strings.TrimSpace(u.Body)); m != nil {
 			// design: go-fig-fullscreen  implements: req-interactive-figures.1
-			// Every chapter figure wraps with the ⛶ button: a click
-			// flips the fig-full class on THIS existing element (a fixed-inset modal), Escape
-			// closes, and the embedded graphs refit on toggle - the script creates nothing.
+			// Every chapter figure wraps with the fullscreen button. A click flips the fig-full class on THIS existing element, a fixed-inset modal. Escape closes it. The embedded graphs refit on toggle. The script creates nothing.
 			if msg, retired := retiredFigKinds[m[1]]; retired {
 				findings = append(findings, "fig kind '"+m[1]+"' retired "+msg)
 			} else {
@@ -1037,9 +1012,7 @@ func renderBookHTML(nodes map[string]Node) (string, []string, []string) {
 	}
 	chaptersHTML := body.String() // usage referent for the pull law (go-ch2-derived)
 	// design: go-deck-mode  implements: req-manifest-render.4
-	// Deck manifests render in the SAME file: one unit per slide; `Note:` lines become the
-	// presenter's aside (hidden on screen outside present mode, printed in the handout); the
-	// present button flips paged fullscreen driven by arrow keys - CSS and class toggles only.
+	// Deck manifests render in the SAME file: one unit per slide. `Note:` lines become the presenter's aside, hidden on screen outside present mode, printed in the handout. The present button flips paged fullscreen driven by arrow keys, CSS and class toggles only.
 	var decks []Node
 	for _, n := range nodes {
 		if n.Type == "manifest" && n.Mode == "deck" {
@@ -1184,20 +1157,7 @@ func renderBookHTML(nodes map[string]Node) (string, []string, []string) {
 	bodyHTML, secNums, numAdvisories := numberBookSections(bodyHTML)
 	advisories = append(advisories, numAdvisories...)
 	// design: go-book-shell  implements: req-book-artifact.2, req-book-shell-nav.1, req-book-shell-nav.4, req-book-shell-nav.5, req-book-shell-nav.3, req-details-context.1
-	// The mdbook-style shell: one fixed sidebar carries the whole
-	// apparatus - the chapter TOC (collected above, static DOM, its own scrollbar), the
-	// GLOBAL search, ONE hand-editable filter expression every control compiles into, and
-	// the DETAILS PANE - a bar at the sidebar bottom that expands as the one context-help
-	// surface (window.bookDetail fills it for a clicked term, link, node, filter, search,
-	// graph node, or the book title). The pane is COMPLETELY context-sensitive:
-	// it shows only the clicked thing - the reader views ride the stakeholder rows
-	// as pills, the slide decks live in the views home (go-views-home); the baseline
-	// controls' placement stays deliberately undecided (q-views-placement).
-	// Single-click on a node/term reference opens the pane; NAVIGATION runs through the
-	// pane's link (window.bookGoto) - never a single-click jump. In-page anchors (the toc)
-	// keep navigating directly. The content column stays clean. The report's visual
-	// language carries over (#fafafa chrome, white panels, the uppercase small labels,
-	// the ▸/▾ disclosure trees). The script stays toggle-only.
+	// This is the mdbook-style shell. One fixed sidebar carries the whole apparatus. It holds the chapter TOC, collected above, static DOM, its own scrollbar, the GLOBAL search, ONE hand-editable filter expression every control compiles into, and the DETAILS PANE. The details pane is a bar at the sidebar bottom that expands as the one context-help surface. window.bookDetail fills it for a clicked term, link, node, filter, search, graph node, or the book title. The pane is COMPLETELY context-sensitive: it shows only the clicked thing. The reader views ride the stakeholder rows as pills. The slide decks live in the views home (go-views-home). The baseline controls' placement stays deliberately undecided (q-views-placement). A single click on a node or term reference opens the pane. NAVIGATION runs through the pane's link (window.bookGoto), never a single-click jump. In-page anchors, the toc, keep navigating directly. The content column stays clean. The report's visual language carries over: #fafafa chrome, white panels, the uppercase small labels, the disclosure triangles. The script stays toggle-only.
 	var doc strings.Builder
 	// the book's identity is the WORKSPACE's product (go-white-label-identity):
 	// a vehicle's book carries the vehicle's name, never the engine binary's.
@@ -1783,14 +1743,7 @@ func renderBookHTML(nodes map[string]Node) (string, []string, []string) {
 	doc.WriteString(deckAnchorsJS)
 	doc.WriteString("</script>\n")
 	// design: go-annotator-core  implements: req-comment-layer.8, req-comment-layer.6, req-comment-layer.5, req-comment-layer.3, req-comment-layer.4, req-comment-layer.12, req-comment-layer.14, req-comment-layer.2, req-comment-layer.1, req-comment-layer.10, req-comment-layer.11, req-comment-layer.13, req-comment-ux-keep.1, req-comment-ux-keep.2
-	// While a comment is unsaved the layer warns before the copy closes (beforeunload), keeps
-	// the comment and minimize controls in one place, and never shifts the bar when a post lands.
-	// The comment layer's core, emitted OUTSIDE <main>: one empty island slot plus the
-	// quack-annotator script. Anchors = unit id + quote/prefix/suffix + position (W3C shape);
-	// figure marks target <g id> elements, falling back to the whole figure's unit; paint goes
-	// through the CSS Custom Highlight API, so the content DOM is NEVER mutated; every comment
-	// string renders via textContent (no innerHTML anywhere in the layer); the island rewrite
-	// escapes angle brackets so stored text can never close the script tag.
+	// While a comment is unsaved, the layer warns before the copy closes (beforeunload). It keeps the comment and minimize controls in one place, and never shifts the bar when a post lands. The comment layer's core is emitted OUTSIDE <main>: one empty island slot plus the quack-annotator script. Anchors equal unit id plus quote/prefix/suffix plus position, the W3C shape. Figure marks target <g id> elements, falling back to the whole figure's unit. Paint goes through the CSS Custom Highlight API, so the content DOM is NEVER mutated. Every comment string renders via textContent, with no innerHTML anywhere in the layer. The island rewrite escapes angle brackets so stored text can never close the script tag.
 	doc.WriteString(`<script type="application/json" id="quack-comments">{"version":1,"annotations":[]}</script>
 <script>
 /* quack-annotator core */
@@ -2088,11 +2041,7 @@ btn.addEventListener('click',function(){
 }
 
 // design: go-book-a11y  implements: req-book-artifact.4
-// WCAG 2 AA over every surface the views added (the prior-art check's miss, owner-added at M2):
-// landmarks (header, labeled nav, main), a real heading hierarchy, native focusable controls only
-// (button, input, summary, a - never a click-only div), and CONTRAST COMPUTED, not eyeballed: the
-// theme colors live in ONE map, the stylesheet renders from it, and the selftest recomputes the
-// WCAG ratio against the page background - text at 4.5:1, graphics at 3:1.
+// WCAG 2 AA applies over every surface the views added, the prior-art check's miss, owner-added at M2. This means landmarks (header, labeled nav, main), a real heading hierarchy, and native focusable controls only (button, input, summary, a, never a click-only div). Contrast is COMPUTED, not eyeballed. The theme colors live in ONE map, the stylesheet renders from it, and the selftest recomputes the WCAG ratio against the page background: text at 4.5:1, graphics at 3:1.
 var bookColors = map[string]string{
 	"text":    "#1a1a1a", // body text on white
 	"meta":    "#55606a", // the meta lines (was opacity - opacity hides contrast from review)
@@ -2151,10 +2100,7 @@ func contrastRatio(fg, bg string) float64 {
 // enddesign
 
 // design: go-book-drift  implements: req-book-trust.3
-// Every published book copy (spec/book.html and the Pages copy docs/book.html, both written at
-// ship) must equal a fresh render - the emitter is deterministic by construction (no timestamps;
-// identity = the merkle root), so same state means same bytes, and a drifted copy is a lint
-// finding. An absent copy = disarmed (day-to-day renders live in the data home).
+// Every published book copy, spec/book.html and the Pages copy docs/book.html, both written at ship, must equal a fresh render. The emitter is deterministic by construction, with no timestamps; identity equals the merkle root. So same state means same bytes, and a drifted copy is a lint finding. An absent copy is disarmed, since day-to-day renders live in the data home.
 func committedBookPath() string { return filepath.Join(SPEC, "book.html") }
 
 // docsBookPath is the GitHub-Pages copy of the book: <workspace-root>/docs/book.html.
@@ -2229,19 +2175,11 @@ func cmdBook(args []string) {
 // enddesign
 
 // design: go-book-figures  implements: req-book-artifact.5
-// The derived figure set (adr-figures-derived-set): four diagram kinds whose
-// layout is trivial arithmetic render as inline SVG with REAL text - context star, building-block
-// tree, timeline, stakeholder matrix - each fed from live graph data, sorted for determinism.
-// A manifest unit references one with a single `fig: <kind>` line; authored inline SVG passes
-// through mdLite as ordinary (provenance-marked) content - the generous release valve.
-// fig: model takes an optional node-id argument — the group carries it through
+// The derived figure set (adr-figures-derived-set) has four diagram kinds whose layout is trivial arithmetic, rendering as inline SVG with REAL text: context star, building-block tree, timeline, stakeholder matrix. Each is fed from live graph data, sorted for determinism. A manifest unit references one with a single `fig: <kind>` line. Authored inline SVG passes through mdLite as ordinary, provenance-marked, content, the generous release valve. fig: model takes an optional node-id argument, and the group carries it through.
 var figRefRe = regexp.MustCompile(`^fig:\s*([a-z-]+(?:\s+[a-z0-9-]+)?)\s*$`)
 
 // design: go-fig-elem-ids  implements: req-comment-layer.6
-// Figure sub-elements carry stable ids - without them, figure part-marking has
-// nothing to grab. Each figure takes the next ordinal at render
-// (reset per emit - regeneration stays byte-identical); each element wraps in a <g> whose
-// id slugs its label: fig<N>-<label-slug>. The comment layer anchors to these ids.
+// Figure sub-elements carry stable ids. Without them, figure part-marking has nothing to grab. Each figure takes the next ordinal at render, reset per emit so regeneration stays byte-identical. Each element wraps in a <g> whose id slugs its label: fig<N>-<label-slug>. The comment layer anchors to these ids.
 var figSeq int
 
 func figNext() int { figSeq++; return figSeq }
@@ -2371,50 +2309,7 @@ func svgBlockTree(title string, blocks []string) string {
 }
 
 // design: go-onion-figure  implements: req-interactive-figures.2, req-compact-derived.1
-// The onion figure: a drill-down over the
-// DESIGN ELEMENTS (marked code regions). The layer map comes from go-onion-model-source. In
-// MODEL mode ring membership is STRAIGHT from the model — elements are design regions, files
-// are THEMES; a file never earns a ring and never renders as a block. In
-// FALLBACK mode (spec/design-layers.md, stub projects) an element takes the layer of its FILE
-// per the pattern map — the old behavior, untouched. The intra/inter-element flow is the REAL
-// call graph derived by deriveDesignFlow (a static AST pass): consumes[A] = design ids A calls
-// into, reads[A]/writes[A] = A does external input/output. The ONION is the OVERVIEW ONLY.
-// Level 0 draws concentric layer rings, one per SURVIVING layer, each labelled `name · N
-// elements`, with `inputs:` entering from the LEFT and `outputs:` leaving to the RIGHT as
-// external boxes. No element cards here; a changed ring carries a DOT. A layer with NO flow at
-// all (every element is off-flow infrastructure) is SKIPPED — no ring, no view — and its
-// elements sink INWARD into the next surviving layer's infrastructure pills.
-// Below the overview the drill-down keeps the owner's ONION vs CLUSTER split (go-onion-busbar
-// renders both shapes). Level 1 is the BAND view, and a band is itself an ONION: a ROUND body
-// with the band's INPUT bars on the LEFT, OUTPUT bars on the RIGHT, its BLOCKS ringing the
-// centre, and — unless it is the innermost KERNEL — a central CORE at the dead centre. The core
-// is the inner bands beneath; it is the drill affordance INTO the next-inner band (single-click,
-// its only action). Bars follow FLOW CONSERVATION: an input bar is an edge that ENTERS the band from an OUTER band (keyed by the
-// source band, or the external world for os reads); an output bar LEAVES it to an outer band; an
-// edge crossing to an INNER band routes to the CORE instead of a bar (signal TO / FROM the core);
-// an edge whose two ends are both in the band draws as a direct block-to-block SIBLING arrow,
-// never detouring through a bar. The kernel band is a round, coreless onion (nothing lies
-// beneath it). In model mode a BLOCK is the THEME: one cluster per file carrying
-// SEVERAL of the layer's regions, labelled `file` + `N regions`; a single-region theme renders
-// the region itself — responsibility text as the label, `in file` as the subtitle. Region
-// arrows aggregate to theme level, deduplicated; a collapsed multiplicity shows as `×N`.
-// Level 2 opens ONE cluster into a coreless bus-bar BOX (a cluster is NOT an onion — no round
-// body, no core): the cluster's own INPUT bars on top, OUTPUT bars on the bottom, its regions as
-// blocks in the middle, region-to-region arrows inside. Conservation carries the cluster's
-// band-level I/O down — exactly the bars it tapped as a band block reappear, and a band-level
-// SIBLING arrow becomes a `from <sibling>` / `→ <sibling>` bar once that sibling is outside the
-// drilled view. A drillable block hangs a small drill HANDLE off its own bottom edge (double-click to ENTER);
-// a leaf block has none. SINGLE-click a block to INSPECT it (details + highlight its
-// connections, staying at this level); the review render adds a details panel. Every region
-// block transports to its trace item on tap (the conn-code-designs surface). Design elements
-// OFF the flow entirely render as `infrastructure:` pills below the figure, each linking to its
-// trace item; model-mode AMBIENT elements always render as those pills — they sit on no ring,
-// flow or not. EVERY view (levels 0, 1, and 2) is pre-rendered static DOM with its own
-// breadcrumbs and layer nav — the script only toggles which view shows, it never creates
-// content. Excluded patterns (iteration files) stay out; in model mode non-engine marker files
-// (method/*.md) stay out too. An element no source claims falls into an outermost `unmapped`
-// ring, so the map cannot rot silently — in model mode that ring holds regions the model does
-// not allocate (the sky-fall lint keeps it empty).
+// The onion figure is a drill-down over the DESIGN ELEMENTS, the marked code regions. The layer map comes from go-onion-model-source. In MODEL mode ring membership is STRAIGHT from the model: elements are design regions, and files are THEMES. A file never earns a ring and never renders as a block. In FALLBACK mode (spec/design-layers.md, stub projects) an element takes the layer of its FILE per the pattern map, the old behavior, untouched. The intra/inter-element flow is the REAL call graph derived by deriveDesignFlow, a static AST pass: consumes[A] = design ids A calls into, and reads[A]/writes[A] = A does external input/output. The ONION is the OVERVIEW ONLY. Level 0 draws concentric layer rings, one per SURVIVING layer, each labelled `name · N elements`. `inputs:` enters from the LEFT, and `outputs:` leaves to the RIGHT as external boxes. No element cards appear here; a changed ring carries a DOT. A layer with NO flow at all, where every element is off-flow infrastructure, is SKIPPED entirely: no ring, no view. Its elements sink INWARD into the next surviving layer's infrastructure pills. Below the overview the drill-down keeps the owner's ONION vs CLUSTER split (go-onion-busbar renders both shapes). Level 1 is the BAND view, and a band is itself an ONION. It has a ROUND body with the band's INPUT bars on the LEFT, OUTPUT bars on the RIGHT, and its BLOCKS ringing the centre. Unless it is the innermost KERNEL, it also carries a central CORE at the dead centre. The core is the inner bands beneath. It is the drill affordance INTO the next-inner band, a single-click, its only action. Bars follow FLOW CONSERVATION. An input bar is an edge that ENTERS the band from an OUTER band, keyed by the source band, or the external world for os reads. An output bar LEAVES it to an outer band. An edge crossing to an INNER band routes to the CORE instead of a bar; that is signal TO or FROM the core. An edge whose two ends are both in the band draws as a direct block-to-block SIBLING arrow, never detouring through a bar. The kernel band is a round, coreless onion, since nothing lies beneath it. In model mode a BLOCK is the THEME: one cluster per file carrying SEVERAL of the layer's regions, labelled `file` + `N regions`. A single-region theme renders the region itself, with responsibility text as the label and `in file` as the subtitle. Region arrows aggregate to theme level, deduplicated; a collapsed multiplicity shows as `×N`. Level 2 opens ONE cluster into a coreless bus-bar BOX; a cluster is NOT an onion, with no round body and no core. The cluster's own INPUT bars sit on top, OUTPUT bars on the bottom, its regions as blocks in the middle, and region-to-region arrows inside. Conservation carries the cluster's band-level I/O down. Exactly the bars it tapped as a band block reappear. A band-level SIBLING arrow becomes a `from <sibling>` / `→ <sibling>` bar once that sibling is outside the drilled view. A drillable block hangs a small drill HANDLE off its own bottom edge, double-click to ENTER. A leaf block has none. SINGLE-click a block to INSPECT it, showing details and highlighting its connections while staying at this level; the review render adds a details panel. Every region block transports to its trace item on tap, the conn-code-designs surface. Design elements OFF the flow entirely render as `infrastructure:` pills below the figure, each linking to its trace item. Model-mode AMBIENT elements always render as those pills; they sit on no ring, flow or not. EVERY view, levels 0, 1, and 2, is pre-rendered static DOM with its own breadcrumbs and layer nav. The script only toggles which view shows; it never creates content. Excluded patterns, such as iteration files, stay out. In model mode, non-engine marker files (method/*.md) stay out too. An element no source claims falls into an outermost `unmapped` ring, so the map cannot rot silently. In model mode that ring holds regions the model does not allocate; the sky-fall lint keeps it empty.
 type onionLayer struct {
 	name string
 	pats []string
@@ -2504,12 +2399,7 @@ var flowWriteSel = map[string]bool{
 // unambiguously to its package-level declaration of the same name.
 //
 // design: go-lint-ast-cache  implements: req-battery-lean
-// Derived ONCE per process: the engine source cannot change within a run, yet a
-// single lint asks for the flow more than once (the conformance pass, then every
-// model figure of the book-drift render) — each ask re-ran go/parser over the
-// whole engine source. The memo holds the derived facts for the process lifetime;
-// callers treat the returned maps as read-only. In-process only — nothing lands
-// on disk, so there is no staleness risk across runs.
+// The flow is derived ONCE per process. The engine source cannot change within a run, yet a single lint asks for the flow more than once (the conformance pass, then every model figure of the book-drift render). Each ask used to re-run go/parser over the whole engine source. The memo holds the derived facts for the process lifetime. Callers treat the returned maps as read-only. It stays in-process only; nothing lands on disk, so there is no staleness risk across runs.
 var designFlowMemo *struct {
 	consumes map[string][]string
 	reads    map[string]bool
@@ -3758,30 +3648,7 @@ func renderOnionData(in onionInput, rev *onionReview, nodes map[string]Node) str
 // enddesign
 
 // design: go-onion-busbar  implements: req-interactive-figures.2
-// The drill-view SVG: ONE deterministic layout renders both drill shapes (owner's ONION vs
-// CLUSTER distinction). A BAND/LAYER is an ONION: opts.round draws a ROUND body, and unless
-// it is the innermost KERNEL it carries a CORE (a central circle = the layers beneath).
-// Signals go TO the core (a block calls inward), FROM the core (an inner layer calls a
-// block), or across it. The core is the DRILL affordance into the next-inner band — a
-// single-click ENTERS it (drilling is its only action); the kernel onion is round with buses
-// but coreless. A core arrow aims at the core CENTRE and clips to its circular border, so it
-// reads as pointing radially inward. A CLUSTER (a theme, a grouping INSIDE a band) is NOT an
-// onion: a coreless bus-bar BOX, no round body, no centre. Either way inputs enter on the LEFT
-// and outputs leave on the RIGHT (the overview's arrangement): a round band rings its BLOCKS
-// around the centred core; a cluster lays them in a centred grid. Bars carry flow
-// conservation: an input bar is an edge that ENTERS this view from outside a BAND boundary;
-// an output bar LEAVES it; an edge whose two ends are both inside draws as a direct
-// block-to-block SIBLING arrow, never detouring through a bar. In the layer onion an edge
-// crossing to an INNER band routes to the CORE instead of a bar. Each bus is ONE vertical rail
-// OUTSIDE the body; its pills sit at the horizontal extreme and join the rail with a plain
-// connector (an arrowhead never lands on a pill). A pill is CLICKABLE: a click traces every
-// block the bus signal reaches. A tapping block gets ONE flow arrow between it and the rail.
-// A drillable CLUSTER block hangs a small drill HANDLE off its own bottom edge (never a
-// centre circle — only a band has a core). Generated SVG keeps the book byte-stable with
-// real, machine-readable text (a canvas library needed live scripts and rendered nothing on
-// paper). Each block group carries a stable id (the comment layer anchors to it), a <title>
-// with the full untruncated text, its connection ids for the inspect highlight, and either
-// the drill target (clusters) or the trace link (regions).
+// The drill-view SVG uses ONE deterministic layout to render both drill shapes (the owner's ONION vs CLUSTER distinction). A BAND/LAYER is an ONION. opts.round draws a ROUND body, and unless it is the innermost KERNEL it carries a CORE, a central circle standing for the layers beneath. Signals go TO the core when a block calls inward, FROM the core when an inner layer calls a block, or across it. The core is the DRILL affordance into the next-inner band. A single-click ENTERS it; drilling is its only action. The kernel onion is round with buses but coreless. A core arrow aims at the core CENTRE and clips to its circular border, so it reads as pointing radially inward. A CLUSTER, a theme or a grouping INSIDE a band, is NOT an onion: a coreless bus-bar BOX, with no round body and no centre. Either way, inputs enter on the LEFT and outputs leave on the RIGHT, the overview's arrangement. A round band rings its BLOCKS around the centred core; a cluster lays them in a centred grid. Bars carry flow conservation. An input bar is an edge that ENTERS this view from outside a BAND boundary. An output bar LEAVES it. An edge whose two ends are both inside draws as a direct block-to-block SIBLING arrow, never detouring through a bar. In the layer onion an edge crossing to an INNER band routes to the CORE instead of a bar. Each bus is ONE vertical rail OUTSIDE the body. Its pills sit at the horizontal extreme and join the rail with a plain connector; an arrowhead never lands on a pill. A pill is CLICKABLE: a click traces every block the bus signal reaches. A tapping block gets ONE flow arrow between it and the rail. A drillable CLUSTER block hangs a small drill HANDLE off its own bottom edge, never a centre circle, since only a band has a core. Generated SVG keeps the book byte-stable with real, machine-readable text; a canvas library needed live scripts and rendered nothing on paper. Each block group carries a stable id, which the comment layer anchors to. It also carries a <title> with the full untruncated text, its connection ids for the inspect highlight, and either the drill target (clusters) or the trace link (regions).
 
 type obusBlock struct {
 	id, label, sub, full string
@@ -3829,12 +3696,7 @@ type obusOpts struct {
 }
 
 // design: go-onion-change-marks  implements: req-diagram-review-render
-// The review render's change-mark and its upward propagation. onionReview carries
-// the marked element set; renderOnionOpt propagates it up the drill-down (a marked
-// element marks its grouping block, a marked block marks its ring) and draws an
-// unmistakable orange DOT at EVERY level (dots, never dashes — the owner's rule).
-// So the overview shows WHICH rings changed, and each grouping view narrows to the
-// changed block, then the element — the mark travels up toward the reader.
+// This is the review render's change-mark and its upward propagation. onionReview carries the marked element set. renderOnionOpt propagates it up the drill-down: a marked element marks its grouping block, and a marked block marks its ring. It draws an unmistakable orange DOT at EVERY level; dots, never dashes, is the owner's rule. So the overview shows WHICH rings changed. Each grouping view narrows to the changed block, then the element. The mark travels up toward the reader.
 const onionMarkColor = "#e8590c"
 
 type onionReview struct{ marked map[string]bool }
@@ -4298,12 +4160,7 @@ func onionViewSVG(aria, title, vid string, inBars, outBars []string, blocks []*o
 // enddesign
 
 // design: go-model-standalone  implements: req-diagram-review-render
-// The standalone single-model render: ONE model's onion drill-down as a small,
-// self-contained HTML page. It reuses renderOnionOpt — the book's own onion — so
-// the two projections never drift, and inlines only the CSS and JS that figure
-// needs. No external request: the dom-static, single-file discipline. `marked`
-// names the changed elements; the shell adds a title, a legend, and the drill
-// script.
+// The standalone single-model render shows ONE model's onion drill-down as a small, self-contained HTML page. It reuses renderOnionOpt, the book's own onion, so the two projections never drift. It inlines only the CSS and JS that figure needs. It makes no external request, the dom-static, single-file discipline. `marked` names the changed elements. The shell adds a title, a legend, and the drill script.
 const onionStandaloneCSS = "*{box-sizing:border-box}" +
 	"body{font-family:system-ui,Segoe UI,sans-serif;margin:0;line-height:1.5;color:#1a1a1a;background:#fff}" +
 	"main{max-width:1040px;margin:0 auto;padding:1rem 1.5rem 3rem}" +
@@ -4402,19 +4259,7 @@ func renderStandaloneModel(modelID string, marked []string) (string, error) {
 // enddesign
 
 // design: go-onion-model-source  implements: req-models-in-book
-// The onion's layer map derives from the engine-layers MODEL node
-// (spec/models/model-engine-layers.md) — the authored truth;
-// spec/design-layers.md stays as the stub-project fallback. Rings = the model's
-// REAL layers in declared order (innermost first; bands and ambient are never
-// rings). The BLOCK unit is the model ELEMENT — a design region; files never
-// rank and never convert to patterns (elements are design
-// regions, files are themes). Allocation conventions:
-//   - a band's ("outer--inner") elements merge into the INNER of its two named
-//     rings — the transform feeds it
-//   - ambient elements (and any unranked stray) map to "ambient": NO ring; the
-//     renderer pins them to the innermost view's infrastructure pills
-//   - a realized engine region the model does not allocate is ABSENT here; the
-//     renderer's `unmapped` ring catches it (the sky-fall lint keeps it empty)
+// The onion's layer map derives from the engine-layers MODEL node (spec/models/model-engine-layers.md), the authored truth. spec/design-layers.md stays as the stub-project fallback. Rings are the model's REAL layers in declared order, innermost first; bands and ambient are never rings. The BLOCK unit is the model ELEMENT, a design region. Files never rank and never convert to patterns; elements are design regions, and files are themes. Allocation follows three conventions. A band's ("outer--inner") elements merge into the INNER of its two named rings; the transform feeds it. Ambient elements, and any unranked stray, map to "ambient": NO ring, and the renderer pins them to the innermost view's infrastructure pills. A realized engine region the model does not allocate is ABSENT here; the renderer's `unmapped` ring catches it, and the sky-fall lint keeps it empty.
 type modelOnion struct {
 	rings   []string          // ring names, innermost first
 	layerOf map[string]string // region id -> ring name ("ambient" = off the rings)
@@ -4494,14 +4339,7 @@ func onionLayerSource() (layers []onionLayer, excludes, inputs, outputs, infra [
 // enddesign
 
 // design: go-trace-graph  implements: req-system-overview, req-compact-derived.1
-// The trace chapter's per-need graph: it REUSES the report's per-need grouping
-// (traceTabs/subtree/buildTab via bookGraphTabs) with the book's own tab bake - the CLEAN
-// per-need trace: no fold boxes, no (unrooted) tab (a node reaching no need root does not
-// render), and decisions only when architectural. One page per need (a tab bar toggles which
-// need's graph shows); each node is clickable and opens the details
-// pane (data-node-link, shared handler; the pane's link transports to the table row); each node
-// carries a [ch N] badge naming the chapter its item's table renders in, so a reader always
-// knows where to read the detail.
+// The trace chapter's per-need graph REUSES the report's per-need grouping, traceTabs/subtree/buildTab via bookGraphTabs, with the book's own tab bake. This is the CLEAN per-need trace: no fold boxes, no (unrooted) tab, since a node reaching no need root does not render, and decisions only when architectural. One page appears per need; a tab bar toggles which need's graph shows. Each node is clickable and opens the details pane, data-node-link, a shared handler; the pane's link transports to the table row. Each node carries a [ch N] badge naming the chapter its item's table renders in, so a reader always knows where to read the detail.
 
 // chapterNumbers maps each reader chapter's manifest id to its 1-based render number.
 func chapterNumbers(nodes map[string]Node) map[string]int {
@@ -4625,17 +4463,7 @@ func svgMatrix(rows []string, cells map[string][]string) string {
 
 // renderFigure derives the named figure from live graph data, sorted for determinism.
 // design: go-fig-tables  implements: req-derived-boards.2
-// Tables are tables, figures are figures: the tabular fig kinds
-// (vv-table, stakeholder-matrix) retire in favor of canned base queries the manifests embed
-// as ```base blocks - they gain live Obsidian preview. fig: keeps only spatial graphics
-// whose selection is topological (context star, block tree, timeline). A retired kind is a
-// FINDING with the pointer to its canned query; a base block in any unit body evaluates
-// through the pinned evaluator (go-base-eval) into a semantic table.
-// Queries pool centrally: an inline block in a manifest
-// is a smell - the canonical home is spec/queries/, and a unit references a pooled query
-// with the Obsidian-native embed ![[name.base]] (Obsidian previews it live; the emitter
-// inlines the file and evaluates it exactly like an authored block). A missing pooled
-// query is a render-failing finding, never a silent skip.
+// Tables are tables, figures are figures. The tabular fig kinds, vv-table and stakeholder-matrix, retire in favor of canned base queries the manifests embed as ```base blocks; they gain live Obsidian preview. fig: keeps only spatial graphics whose selection is topological: context star, block tree, timeline. A retired kind is a FINDING with the pointer to its canned query. A base block in any unit body evaluates through the pinned evaluator (go-base-eval) into a semantic table. Queries pool centrally. An inline block in a manifest is a smell. The canonical home is spec/queries/, and a unit references a pooled query with the Obsidian-native embed ![[name.base]]. Obsidian previews it live, and the emitter inlines the file and evaluates it exactly like an authored block. A missing pooled query is a render-failing finding, never a silent skip.
 var retiredFigKinds = map[string]string{
 	"vv-table":           "(req-derived-boards.2) - embed its canned base query from method/templates/documents/spec/queries",
 	"stakeholder-matrix": "(req-derived-boards.2) - embed its canned base query from method/templates/documents/spec/queries",
@@ -4902,9 +4730,7 @@ func baseResultHTML(rs []BaseResult, nodes map[string]Node, sm map[string]string
 		}
 		if r.Refs {
 			// design: go-render-refs  implements: req-manifest-render.3
-			// A refs view hands its rows to the SAME renderer ref units use - gate state,
-			// verdict links, and depth mechanics ride along; Obsidian previews the rows as
-			// a plain table (the render key is ignored there).
+			// A refs view hands its rows to the SAME renderer ref units use. Gate state, verdict links, and depth mechanics ride along. Obsidian previews the rows as a plain table; the render key is ignored there.
 			depth := r.Depth
 			if depth < 1 {
 				depth = 1
@@ -4941,32 +4767,7 @@ func baseResultHTML(rs []BaseResult, nodes map[string]Node, sm map[string]string
 			continue
 		}
 		// design: go-q-table  implements: req-reader-tables.1, req-reader-tables.5, req-reader-tables.2, req-reader-tables.3, req-compact-derived.1, req-reader-tables.4
-		// Combinable pill FACETS ride above the table (AND across facets, OR within one): a
-		// universal need facet for trace items plus one facet per small-enum column - never a
-		// pill per item.
-		// The universal query table: a real thead with a clear
-		// header row, separated cells, rendered even with zero rows; the empty-value
-		// "(none)" bucket header never renders (its rows still do). Interactivity is
-		// STATIC DOM: a filter row with a text input plus one select per enum column
-		// (small distinct value set, derived from the rows at emit); ungrouped tables
-		// carry data-sortable and the shell script sorts by MOVING existing rows.
-		// Every row with an id is EXPANDABLE (req-reader-tables.3): a static
-		// detail row (statement, meta, body prose) follows it, hidden until toggled;
-		// expand-all/collapse-all buttons ride the filter row. A table beyond twenty
-		// rows pages BY NEED: each row is stamped with the first need its item traces
-		// up to (refines/verifies/implements walked upward, deterministic order),
-		// needless rows land on the last page, buckets chunk at twenty. Off-page rows
-		// carry hidden AT EMIT, so the no-script default is one bounded page
-		// (req-compact-derived.1); the pager only toggles visibility.
-		// The unified reader table: ONE interactive pattern everywhere.
-		// A row is the item NAME with a disclosure triangle; the expand carries the statement, the
-		// remaining fields, and the body. Combinable FILTER PILL facets ride above the table - a
-		// "need" facet plus one per small-distinct-value column. The controls below - filter box,
-		// expand/collapse-all, page size, pager - sit right-aligned. Pagination is client-side,
-		// default 20, configurable. Rows keep data-node for trace-graph transport; the script only toggles.
-		// a row landing in SEVERAL groups (a multi-valued groupBy facet) renders ONCE:
-		// the flat reader table shows no group sections, so the duplicate would read
-		// as a defect, not a grouping. The first group's key wins for data-gp.
+		// Combinable pill FACETS ride above the table: AND across facets, OR within one. A universal need facet covers trace items, plus one facet per small-enum column. There is never a pill per item. The universal query table uses a real thead with a clear header row and separated cells, rendered even with zero rows. The empty-value "(none)" bucket header never renders, though its rows still do. Interactivity is STATIC DOM. A filter row carries a text input plus one select per enum column, a small distinct value set derived from the rows at emit. Ungrouped tables carry data-sortable, and the shell script sorts by MOVING existing rows. Every row with an id is EXPANDABLE (req-reader-tables.3). A static detail row, with statement, meta, and body prose, follows it, hidden until toggled. Expand-all and collapse-all buttons ride the filter row. A table beyond twenty rows pages BY NEED. Each row is stamped with the first need its item traces up to, walking refines, verifies, and implements upward in deterministic order. Needless rows land on the last page, and buckets chunk at twenty. Off-page rows carry hidden AT EMIT, so the no-script default is one bounded page (req-compact-derived.1); the pager only toggles visibility. The unified reader table is ONE interactive pattern everywhere. A row is the item NAME with a disclosure triangle. The expand carries the statement, the remaining fields, and the body. Combinable FILTER PILL facets ride above the table: a "need" facet plus one per small-distinct-value column. The controls below, filter box, expand/collapse-all, page size, pager, sit right-aligned. Pagination is client-side, default 20, configurable. Rows keep data-node for trace-graph transport; the script only toggles. A row landing in SEVERAL groups, a multi-valued groupBy facet, renders ONCE. The flat reader table shows no group sections, so the duplicate would read as a defect, not a grouping. The first group's key wins for data-gp.
 		type flatRow struct {
 			row BaseRow
 			gp  string
@@ -5376,12 +5177,7 @@ func renderFigure(kind string, nodes map[string]Node) string {
 	switch kind {
 	case "context-star":
 		// design: go-context-neighbours  implements: req-interactive-figures.3
-		// The context star derives from the modeled neighbour notes (type: neighbour, id
-		// nbr-<name>): one border-connected node per note, sorted for determinism - never
-		// an invented actor.
-		// direction `in` (or none) feeds the system and sits LEFT; `out` consumes from it
-		// and sits RIGHT. With no neighbour notes the figure says so. rectBorder ends every
-		// connector at the node's border, so no line crosses the centre node.
+		// The context star derives from the modeled neighbour notes, type neighbour, id nbr-<name>: one border-connected node per note, sorted for determinism, never an invented actor. direction `in`, or none, feeds the system and sits LEFT. `out` consumes from it and sits RIGHT. With no neighbour notes, the figure says so. rectBorder ends every connector at the node's border, so no line crosses the centre node.
 		var ins, outs []string
 		for id, n := range nodes {
 			if n.Type != "neighbour" {
@@ -5410,9 +5206,7 @@ func renderFigure(kind string, nodes map[string]Node) string {
 		return renderUcfnBoard(nodes)
 	case "block-tree":
 		// design: go-block-tree-design  implements: req-derived-boards.5
-		// The block tree draws the SYSTEM's design elements (code-marker designs and des-
-		// notes), never the book's own chapters - otherwise every project gets a picture
-		// of its document structure in its architecture chapter.
+		// The block tree draws the SYSTEM's design elements, code-marker designs and des- notes, never the book's own chapters. Otherwise every project gets a picture of its document structure in its architecture chapter.
 		var blocks []string
 		for id, n := range nodes {
 			if n.Type == "design" {
@@ -5427,9 +5221,7 @@ func renderFigure(kind string, nodes map[string]Node) string {
 		// enddesign
 	case "results-exception":
 		// design: go-results-exception  implements: req-derived-boards.3
-		// Ledger-state views are FIG kinds, never base queries - state lives in the
-		// ledger, not frontmatter. The green mass summarizes as a count; failures and
-		// accepted deviations render prominently, by exception (the lab rule).
+		// Ledger-state views are FIG kinds, never base queries. State lives in the ledger, not frontmatter. The green mass summarizes as a count. Failures and accepted deviations render prominently, by exception, the lab rule.
 		sm := StatusMap(nodes)
 		var ids []string
 		for id := range nodes {
@@ -5735,15 +5527,7 @@ func decisionIteration(n Node, nodes map[string]Node) string {
 }
 
 // design: go-decisions-table  implements: req-decision-rendering.2, req-decision-rendering.3, req-candidate-decisions.2
-// ONE decisions table: every project, strategy,
-// and architecture decision in one reader table - human titles, never hash-slug ids -
-// with the TYPE as a rendered column and pill facets over type AND iteration. The row
-// expand carries the rationale, the addressed requirements as links, and the
-// candidates the decision weighed: the per-axis rating matrix plus each rejected
-// candidate's reason (q-candidates-placement, decided). Waivers stay with V&V. The
-// verdict scan walks adr ids SORTED - a map-order walk renders a double-claimed
-// candidate nondeterministically; the double claim itself
-// is a lint finding (candidateClaimFindings).
+// There is ONE decisions table: every project, strategy, and architecture decision in one reader table, with human titles, never hash-slug ids. The TYPE renders as a column, with pill facets over type AND iteration. The row expand carries the rationale, the addressed requirements as links, and the candidates the decision weighed: the per-axis rating matrix plus each rejected candidate's reason (q-candidates-placement, decided). Waivers stay with V&V. The verdict scan walks adr ids SORTED. A map-order walk would render a double-claimed candidate nondeterministically. The double claim itself is a lint finding (candidateClaimFindings).
 func renderDecisionsTable(nodes map[string]Node) string {
 	var adrIDs []string
 	for id, n := range nodes {
@@ -5889,12 +5673,7 @@ func renderDecisionsTable(nodes map[string]Node) string {
 // enddesign
 
 // design: go-asr-list  implements: req-decision-rendering.2, req-drivers-derived
-// The drivers section is GENERATED as a reader TABLE (the same table law as every
-// derived view): a requirement joins it as the DERIVED UNION - addressed by at least
-// one kind:architecture ADR (self-maintaining; the edges already exist), or carrying
-// the `architecturally-significant` hand tag (the judgment residue no ADR touched).
-// Each derived row's expand names its deciding ADR(s); the register-row link stays.
-// An empty table renders honestly: the union is derivation, never renderer guesswork.
+// The drivers section is GENERATED as a reader TABLE, the same table law as every derived view. A requirement joins it as the DERIVED UNION. It is addressed by at least one kind:architecture ADR, self-maintaining since the edges already exist, or it carries the `architecturally-significant` hand tag, the judgment residue no ADR touched. Each derived row's expand names its deciding ADR(s), and the register-row link stays. An empty table renders honestly: the union is derivation, never renderer guesswork.
 
 // driversUnion computes requirement -> deciding kind:architecture ADR ids. A hand-tagged
 // requirement joins with an empty list; a requirement with neither stays absent.
@@ -6041,14 +5820,7 @@ func renderDesignRegions(nodes map[string]Node) string {
 }
 
 // design: go-guides-table  implements: req-chapter-placement.1, req-chapter-placement.2
-// The guides render as ONE table: one row per guide with
-// the TARGET AUDIENCE as a rendered, pill-filterable column and the guide's full
-// content in the row expand - never per-audience sibling subchapters. Every
-// audience class of the project type stays visible: a class with no guide renders an
-// honest empty row (the pull law: a guide lands the day the audience asks). The agent
-// guide is ONE ROW (audience: agent) whose expand embeds the repo-root AGENTS.md
-// VERBATIM at render time - read, never regenerated - so the book shows exactly the
-// file an agent reads.
+// The guides render as ONE table: one row per guide, with the TARGET AUDIENCE as a rendered, pill-filterable column and the guide's full content in the row expand. There are never per-audience sibling subchapters. Every audience class of the project type stays visible. A class with no guide renders an honest empty row, the pull law: a guide lands the day the audience asks. The agent guide is ONE ROW, audience: agent. Its expand embeds the repo-root AGENTS.md VERBATIM at render time, read, never regenerated, so the book shows exactly the file an agent reads.
 func renderGuidesTable(nodes map[string]Node) string {
 	classes := typeClassSlugs(readProjectConfig().Type)
 	if len(classes) == 0 {
@@ -6155,13 +5927,7 @@ func renderGuidesTable(nodes map[string]Node) string {
 // enddesign
 
 // design: go-views-home  implements: req-book-shell-nav.3
-// The views home is BOOK CONTENT (`fig: views-home` in the orientation chapter): the
-// DOCUMENT OVERVIEW - one line per chapter with its link, derived from the book
-// structure at render time (the same order and numbers the shell uses, never a
-// hand-maintained list) - then the derived documents: the deck manifests baked into
-// this same file, compiled from book content only, one row each with its present
-// button. The reader views moved to the stakeholder rows (a view pill per reader);
-// no preset table renders here. An empty population says so out loud.
+// The views home is BOOK CONTENT (`fig: views-home` in the orientation chapter). It opens with the DOCUMENT OVERVIEW: one line per chapter with its link. That line derives from the book structure at render time, the same order and numbers the shell uses, never a hand-maintained list. Then come the derived documents: the deck manifests baked into this same file, compiled from book content only, one row each with its present button. The reader views moved to the stakeholder rows, a view pill per reader. No preset table renders here. An empty population says so out loud.
 func renderViewsHome(nodes map[string]Node) string {
 	var chapters, decks []Node
 	for _, n := range nodes {
@@ -6220,35 +5986,7 @@ func renderViewsHome(nodes map[string]Node) string {
 // enddesign
 
 // design: go-deck-anchors  implements: req-deck-links.1, req-deck-links.2, req-deck-links.3, req-deck-semantics.1, req-deck-semantics.2, req-onboarding-chapter.3, req-pong-deck.3
-// Deck citizenship (adr-deck-anchor-fragment). Every deck keeps ONE stable, human-readable
-// anchor: the manifest's own node id; each slide keeps `<deck>-s<n>`. The ids derive from the
-// manifest, never from render order, so links survive re-renders. The URL fragment rides the
-// EXISTING hash rail: present mode WRITES the current slide's anchor with history.replaceState
-// (a silent write - hashchange keeps its single reader), and the rail's reader routes a
-// fragment that lands inside a deck into present mode, on load and on change. The deck
-// boundary is machine-legible in the raw bytes: a named region landmark carrying the
-// slideshow roledescription. Slides are named groups - their first heading's text, else
-// their ordinal - groups, never landmarks, so a long deck cannot become landmark soup.
-// Decks stay OUT of the toc by construction: the toc collects chapter manifests only.
-// The timeline renders measured per-slide minutes (`Minutes:` unit lines) as a slim bar:
-// ticks mark slide STARTS and the bar ends exactly at the LAST slide's tick, so no
-// bar-space can read as a step after the final slide; the measured total is a text
-// caption after the bar, outside it. An ```embed``` fence bakes its script INERT inside
-// a <template>; two lanes turn the text into code, both lazy relative to page load: the
-// start button (the default), or - with the `auto` marker (```embed auto) - the deck's
-// show() on the slide's FIRST entry in present mode. One embed may add at most
-// deckEmbedBudget bytes to the book; over it, the executable lane is refused and a static
-// stand-in figure says so - the slide's authored figure carries the deliverable's picture.
-// A standalone `fig:` line INSIDE a slide body resolves to the book's own figure render -
-// the deck reuses figures, never duplicates them by hand; the copy's id attributes get a
-// slide prefix so the reading-flow copy keeps every anchor. A `|||` marker line splits a
-// slide body into columns (the first segment stays full-width - the heading lane).
-// FACET-PRESET fragments ride this same rail: an unknown-id fragment of the shape
-// `<base-id>--<facet>=<v1>,<v2>` scrolls to the base element and applies the named pill
-// facet MULTI-value (setFacetMulti). Every reader of the rail delegates to the ONE router
-// (__facetJump): the hashchange reader, the load-time jump, and bookGoto's miss lane.
-// The router writes the fragment with history.replaceState - never a push, so repeated
-// applications stay idempotent and spam no history, the deck rail's own discipline.
+// This is deck citizenship (adr-deck-anchor-fragment). Every deck keeps ONE stable, human-readable anchor: the manifest's own node id. Each slide keeps `<deck>-s<n>`. The ids derive from the manifest, never from render order, so links survive re-renders. The URL fragment rides the EXISTING hash rail. Present mode WRITES the current slide's anchor with history.replaceState, a silent write, since hashchange keeps its single reader. The rail's reader routes a fragment that lands inside a deck into present mode, on load and on change. The deck boundary is machine-legible in the raw bytes: a named region landmark carrying the slideshow roledescription. Slides are named groups, their first heading's text, else their ordinal, groups, never landmarks, so a long deck cannot become landmark soup. Decks stay OUT of the toc by construction, since the toc collects chapter manifests only. The timeline renders measured per-slide minutes (`Minutes:` unit lines) as a slim bar. Ticks mark slide STARTS, and the bar ends exactly at the LAST slide's tick, so no bar-space can read as a step after the final slide. The measured total is a text caption after the bar, outside it. An ```embed``` fence bakes its script INERT inside a <template>. Two lanes turn the text into code, both lazy relative to page load. One is the start button, the default. The other, with the `auto` marker (```embed auto), is the deck's show() on the slide's FIRST entry in present mode. One embed may add at most deckEmbedBudget bytes to the book. Over it, the executable lane is refused and a static stand-in figure says so; the slide's authored figure carries the deliverable's picture. A standalone `fig:` line INSIDE a slide body resolves to the book's own figure render. The deck reuses figures, never duplicates them by hand. The copy's id attributes get a slide prefix so the reading-flow copy keeps every anchor. A `|||` marker line splits a slide body into columns, and the first segment stays full-width, the heading lane. FACET-PRESET fragments ride this same rail. An unknown-id fragment of the shape `<base-id>--<facet>=<v1>,<v2>` scrolls to the base element and applies the named pill facet MULTI-value (setFacetMulti). Every reader of the rail delegates to the ONE router (__facetJump): the hashchange reader, the load-time jump, and bookGoto's miss lane. The router writes the fragment with history.replaceState, never a push, so repeated applications stay idempotent and spam no history. That is the deck rail's own discipline.
 
 var deckHeadingRe = regexp.MustCompile(`(?s)<h[1-6][^>]*>(.*?)</h[1-6]>`)
 var deckTagStripRe = regexp.MustCompile(`<[^>]*>`)
@@ -6514,14 +6252,7 @@ const deckAnchorsJS = `/* deck anchors: fragments ride the existing hash rail (a
 // enddesign
 
 // design: go-book-glossary  implements: req-project-content-roots.1, req-spec-content-lint.6, req-reader-tables.7
-// The LaTeX glossaries discipline (adr-glossary-discipline) over one shared source: per-term notes
-// in method/glossary (frontmatter: term, long, class). A USAGE is a marked link `[label](term:slug)`
-// - never trusted plain text. The emitter renders the used-terms-only glossary chapter with
-// back-references and expands the FIRST linked use per chapter to the long form; a link to a
-// missing term is an error finding; a plain-text occurrence of a defined term outside a link is an
-// ADVISORY. The meta-quarantine lint reads the SAME class field: a meta-classified term appearing
-// in a reader chapter's authored content is flagged (the agent guide - mode `agent` - is exempt;
-// per-vehicle classification keeps the dogfood edge honest: harness terms ARE domain here).
+// This follows the LaTeX glossaries discipline (adr-glossary-discipline) over one shared source: per-term notes in method/glossary, with frontmatter term, long, class. A USAGE is a marked link `[label](term:slug)`, never trusted plain text. The emitter renders the used-terms-only glossary chapter with back-references and expands the FIRST linked use per chapter to the long form. A link to a missing term is an error finding. A plain-text occurrence of a defined term outside a link is an ADVISORY. The meta-quarantine lint reads the SAME class field: a meta-classified term appearing in a reader chapter's authored content is flagged. The agent guide, mode `agent`, is exempt. Per-vehicle classification keeps the dogfood edge honest, since harness terms ARE domain here.
 type GlossTerm struct {
 	Slug, Term, Long, Class, Def string
 	Aliases                      []string // Obsidian-native aliases (go-spec-content); the auto-link pass shares them
@@ -6577,13 +6308,7 @@ func readGlossary() map[string]GlossTerm {
 }
 
 // design: go-ref-tooltips  implements: req-details-context.2
-// In-book reference links in prose render as their plain label plus a small (?) marker:
-// the marker's title carries the referent's statement or long form as the
-// hover tooltip; a click jumps to the definition. External URLs stay real links; runs
-// per chapter AFTER term expansion, so the term machinery is untouched. Content notes
-// (methods, fundamentals, references) carry their statement as the brief
-// (a method mention in prose is a dashed-underline link - the details pane shows
-// the brief plus the jump to the full method in the appendix).
+// In-book reference links in prose render as their plain label plus a small (?) marker. The marker's title carries the referent's statement or long form as the hover tooltip. A click jumps to the definition. External URLs stay real links. This runs per chapter AFTER term expansion, so the term machinery is untouched. Content notes, methods, fundamentals, references, carry their statement as the brief. A method mention in prose is a dashed-underline link; the details pane shows the brief plus the jump to the full method in the appendix.
 var refTipRe = regexp.MustCompile(`<a (?:class="term" )?href="#([^"]+)">([^<]+)</a>`)
 
 // contentTips maps every content-note slug to its one-liner - the termref brief.
@@ -6734,15 +6459,7 @@ func renderGlossaryChapter(gloss map[string]GlossTerm, used map[string][]string)
 }
 
 // design: go-ch2-derived  implements: req-chapters-canned.1
-// The pull law of the fundamentals chapter:
-// everything renders from USAGE alone - an entry nothing links does not render. Usage =
-// a link in the rendered chapters, authored or auto-linked (go-auto-link).
-// The references and fundamentals lists are POOLED QUERIES the ch2/ch8
-// manifests embed (`referenced != false`, evaluated deferred over the emitter's link
-// graph; full bodies via `render: full` - go-base-eval); references are the ONLY legal
-// home of an external URL (req-spec-content-lint.3), so the URL prints in that view and
-// nowhere else. Notation and the glossary stay emitter-derived below: their term-anchor
-// (`term-<slug>`) and first-use-expansion machinery is inherently the emitter's.
+// This is the pull law of the fundamentals chapter: everything renders from USAGE alone, and an entry nothing links does not render. Usage means a link in the rendered chapters, authored or auto-linked (go-auto-link). The references and fundamentals lists are POOLED QUERIES the ch2/ch8 manifests embed, `referenced != false`, evaluated deferred over the emitter's link graph, with full bodies via `render: full` (go-base-eval). References are the ONLY legal home of an external URL (req-spec-content-lint.3), so the URL prints in that view and nowhere else. Notation and the glossary stay emitter-derived below: their term-anchor (`term-<slug>`) and first-use-expansion machinery is inherently the emitter's.
 
 // renderNotationList emits the used notation-class terms with units.
 func renderNotationList(gloss map[string]GlossTerm, used map[string][]string) string {
@@ -6809,10 +6526,7 @@ func unlinkedTermAdvisories(chapterID, body string, gloss map[string]GlossTerm) 
 // metaQuarantineFindings: a meta-classified term in a reader chapter's authored content is flagged.
 func metaQuarantineFindings(nodes map[string]Node, gloss map[string]GlossTerm) []string {
 	// design: go-quarantine-scope  implements: req-spec-content-lint.7
-	// The boundary: EVERY
-	// chapter speaks only about the system - rationales included; the guidance chapter
-	// (mode `guidance`, renders as a chapter) and the agent guide (mode `agent`) are the
-	// only self-referential surfaces.
+	// This is the boundary: EVERY chapter speaks only about the system, rationales included. The guidance chapter (mode `guidance`, renders as a chapter) and the agent guide (mode `agent`) are the only self-referential surfaces.
 	// enddesign
 	var out []string
 	for id, n := range nodes {
@@ -6836,13 +6550,7 @@ func metaQuarantineFindings(nodes map[string]Node, gloss map[string]GlossTerm) [
 // enddesign
 
 // design: go-book-honesty  implements: req-book-trust.1, req-ai-provenance.2
-// The book never claims more than the gates (req-book-trust.1): every transcluded node renders its
-// LIVE ledger state as visible text and a data attribute; a SUSPECT or unverified state carries the
-// warning tag in the reading flow, never only styling. The provenance marks render as a
-// drawn SVG robot column - small icons set vertically in the text margin (no font
-// dependency, machine-readable label "AI involvement: N of 3"). The count comes ONLY from
-// the stored mark (write-time truth, adr-provenance-involvement); rendering can never show more
-// marks than recorded, and ai:0 renders none.
+// The book never claims more than the gates (req-book-trust.1). Every transcluded node renders its LIVE ledger state as visible text and a data attribute. A SUSPECT or unverified state carries the warning tag in the reading flow, never only styling. The provenance marks render as a drawn SVG robot column: small icons set vertically in the text margin. There is no font dependency, and each carries a machine-readable label "AI involvement: N of 3". The count comes ONLY from the stored mark, write-time truth (adr-provenance-involvement). Rendering can never show more marks than recorded, and ai:0 renders none.
 const svgRobot = `<svg width="14" height="14" viewBox="0 0 18 18" role="img" aria-label="AI mark"><rect x="3" y="6" width="12" height="9" rx="2" fill="#5b7fa6"/><circle cx="7" cy="10.5" r="1.6" fill="#fff"/><circle cx="11" cy="10.5" r="1.6" fill="#fff"/><line x1="9" y1="3" x2="9" y2="6" stroke="#5b7fa6" stroke-width="1.5"/><circle cx="9" cy="2.5" r="1.2" fill="#5b7fa6"/></svg>`
 
 func aiMarkColumn(n int) string {

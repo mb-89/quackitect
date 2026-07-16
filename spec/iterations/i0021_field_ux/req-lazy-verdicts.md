@@ -1,7 +1,7 @@
 ---
 id: req-lazy-verdicts
 type: requirement
-statement: While a walk command runs, the engine shall answer coverage from cached verdicts only - a moved hash counts unverified and nothing re-runs - the numbered statements bind individually.
+statement: While a walk command runs, the engine shall answer coverage from cached verdicts only. A moved hash counts unverified, and nothing re-runs. The numbered statements bind individually.
 class: review
 killer: false
 ---

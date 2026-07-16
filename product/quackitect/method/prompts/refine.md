@@ -5,7 +5,7 @@
 > all the time anyway: exploration is cheap and unlimited,
 > authority is expensive and gated.
 
-<!-- design: expedition-method  implements: req-expedition :: An expedition has unlimited epistemic reach and zero authority. Its findings enter the ledger only through the promotion gate — an owner ruling. Interior churn (drafts, dead ends, reversals inside the spike) never touches the ledger or moves a hash. -->
+<!-- design: expedition-method  implements: req-expedition :: An expedition has unlimited epistemic reach and zero authority. Its findings enter the ledger only through the promotion gate, an owner ruling. Interior churn, meaning drafts, dead ends, and reversals inside the spike, never touches the ledger or moves a hash. The expedition invariant. -->
 ## The expedition invariant
 
 An expedition may read anything, draft anything, prototype anything, and be wrong

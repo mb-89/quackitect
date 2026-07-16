@@ -106,7 +106,7 @@ M2. Two small determinizer fixes folded in.
 ---
 id: req-trace-model
 type: requirement
-statement: The engine shall model the trace as a fixed five-layer typed V-model and derive every milestone gate as coverage over it - the numbered statements bind individually.
+statement: The engine shall model the trace as a fixed five-layer typed V-model and derive every milestone gate as coverage over it. The numbered statements bind individually.
 class: review
 killer: false
 ---

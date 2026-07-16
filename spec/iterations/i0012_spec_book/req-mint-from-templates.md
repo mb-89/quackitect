@@ -2,7 +2,7 @@
 id: req-mint-from-templates
 ears: exempt - historical pre-EARS statement, retire-or-retrofit recorded (adr-grandfathers-historical)
 type: requirement
-statement: quack mint shall stamp field-complete skeletons from the templates for every item kind and milestone evidence doc - the numbered statements bind individually.
+statement: quack mint shall stamp field-complete skeletons from the templates for every item kind and milestone evidence doc. The numbered statements bind individually.
 class: review
 killer: false
 ---

@@ -13,12 +13,7 @@ import (
 )
 
 // design: go-rules-config  implements: req-config-split, req-prose-current
-// The tier-(a) split. Lists load from method/config/*.json, resolved engine-root-
-// relative like the model kind registry (go-model-registry). Two vocabularies ride it:
-// - weasel-words.json feeds the EARS lint through weaselWordsFromConfig; trust.go
-//   keeps its compiled list ONLY as the stub-workspace fallback.
-// - retired-vocabulary.json drives the prose-current check: every method prompt and
-//   workspace guide is scanned case-insensitively; a finding names file and term.
+// This is the tier-(a) split. Lists load from method/config/*.json, resolved engine-root-relative like the model kind registry (go-model-registry). Two vocabularies ride it. weasel-words.json feeds the EARS lint through weaselWordsFromConfig; trust.go keeps its compiled list ONLY as the stub-workspace fallback. retired-vocabulary.json drives the prose-current check: every method prompt and workspace guide is scanned case-insensitively, and a finding names file and term.
 
 // configDir resolves the engine's config home through the engine layer (EngineDir), so a
 // vehicle inherits the vendored config instead of probing its own product/quackitect —

@@ -9,7 +9,7 @@ ratings:
   crit-one-tap: 0.4
   crit-build-effort: 0.9
   crit-corporate-seam: 0.7
-statement: Slack text-reply polling - chat.postMessage sends the ask, conversations.history polling reads a typed option id as the answer; no websocket, no buttons.
+statement: Slack text-reply polling: chat.postMessage sends the ask, and conversations.history polling reads a typed option id as the answer. No websocket, no buttons.
 class: review
 killer: false
 ---

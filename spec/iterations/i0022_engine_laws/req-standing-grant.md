@@ -1,7 +1,7 @@
 ---
 id: req-standing-grant
 type: requirement
-statement: Where the owner records a standing grant, the engine shall accept in-scope agent blesses under it - the numbered statements bind individually.
+statement: Where the owner records a standing grant, the engine shall accept in-scope agent blesses under it. The numbered statements bind individually.
 class: review
 killer: false
 ---

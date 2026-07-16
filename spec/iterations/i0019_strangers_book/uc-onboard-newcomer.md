@@ -1,7 +1,7 @@
 ---
 id: uc-onboard-newcomer
 type: usecase
-statement: A stranger clones the repository and reaches a working understanding - what this is, how to install, how a project runs - in five minutes, through the onboarding chapter and the Pong walkthrough, without tripping over undefined terms.
+statement: A stranger clones the repository and reaches a working understanding, what this is, how to install, how a project runs, in five minutes. This happens through the onboarding chapter and the Pong walkthrough, without tripping over undefined terms.
 class: domain
 killer: true
 ---

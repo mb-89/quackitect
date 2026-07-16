@@ -2,7 +2,7 @@
 id: req-dsm-cluster
 type: requirement
 depends_on: []
-statement: When an architect requests a model's structure, the engine shall cluster its design regions by coupling and order the clusters into layers, reporting the residual cyclic couplings - the numbered statements bind individually.
+statement: When an architect requests a model's structure, the engine shall cluster its design regions by coupling and order the clusters into layers, reporting the residual cyclic couplings. The numbered statements bind individually.
 class: review
 killer: false
 ---

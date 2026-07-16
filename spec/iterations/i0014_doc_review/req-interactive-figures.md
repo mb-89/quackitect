@@ -1,7 +1,7 @@
 ---
 id: req-interactive-figures
 type: requirement
-statement: The book's figures shall be derived and interactive - fullscreen, layered drill-down, and the context diagram - the numbered statements bind individually.
+statement: The book's figures shall be derived and interactive: fullscreen, layered drill-down, and the context diagram. The numbered statements bind individually.
 class: review
 killer: false
 ---

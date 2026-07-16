@@ -1,7 +1,7 @@
 ---
 id: req-reader-structure
 type: requirement
-statement: The book shall lead every chapter with its lede and keep internals apart in the guidance chapter - the numbered statements bind individually.
+statement: The book shall lead every chapter with its lede and keep internals apart in the guidance chapter. The numbered statements bind individually.
 class: review
 killer: false
 ---

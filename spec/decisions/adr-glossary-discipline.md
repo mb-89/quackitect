@@ -4,7 +4,7 @@ decided_in: i0012_spec_book
 type: adr
 kind: architecture
 adjudicated_by: human
-statement: One note per glossary term in the method layer, frontmatter carrying the per-vehicle domain-or-meta classification; usage is a marked LINK to the term note; the glossary chapter is generated used-terms-only with back-references and first-use long-form expansion; a link to a missing term errors, an unlinked scanned usage advises.
+statement: One note per glossary term lives in the method layer, with frontmatter carrying the per-vehicle domain-or-meta classification. Usage is a marked LINK to the term note. The glossary chapter is generated used-terms-only, with back-references and first-use long-form expansion. A link to a missing term errors. An unlinked scanned usage advises.
 class: review
 killer: false
 ---

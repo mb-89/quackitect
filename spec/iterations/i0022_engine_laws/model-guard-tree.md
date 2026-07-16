@@ -2,7 +2,7 @@
 id: model-guard-tree
 type: model
 kind: element-tree
-statement: where does each new guard part sit - the part-of tree of the engine-laws subsystem?
+statement: Where does each new guard part sit? This is the part-of tree of the engine-laws subsystem.
 class: review
 killer: false
 provenance:

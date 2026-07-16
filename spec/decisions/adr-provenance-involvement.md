@@ -4,7 +4,7 @@ decided_in: i0012_spec_book
 type: adr
 kind: architecture
 adjudicated_by: human
-statement: Provenance marks measure AI INVOLVEMENT only - 3 fully generated, 1 slightly touched - never trust or review. The author owns all published content; no unreviewed state exists to render. The AI adjusts the mark at write time on the surface-versus-core line (surface touches leave it, core touches raise it to the real share, doubt leans higher); the human reduces by judgment. Rendered as small vertical icons in the text margin.
+statement: Provenance marks measure AI INVOLVEMENT only: 3 is fully generated, 1 is slightly touched. They never measure trust or review. The author owns all published content, and no unreviewed state exists to render. The AI adjusts the mark at write time on the surface-versus-core line: surface touches leave it, core touches raise it to the real share, and doubt leans higher. The human reduces the mark by judgment. It renders as small vertical icons in the text margin.
 class: review
 killer: false
 ---

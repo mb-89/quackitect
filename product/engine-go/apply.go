@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -10,12 +11,7 @@ import (
 )
 
 // design: go-apply-manifest  implements: req-apply-manifest, req-apply-general
-// The judged bulk-edit applier: `quack apply <manifest.json>` runs a JSON array of
-// {file, old, new} exact-string edits. Validate first, apply second — every edit's
-// old text must match its file exactly once (byte-level), or the WHOLE manifest is
-// refused and nothing is written. Edits to one file compose in manifest order
-// against the in-memory content. Bytes in, bytes out: no encoding pass, no BOM
-// handling. Writes are atomic per file (temp + rename).
+// This is the judged bulk-edit applier. `quack apply <manifest.json>` runs a JSON array of {file, old, new} exact-string edits. Validate first, apply second. Every edit's old text must match its file exactly once, byte-level, or the WHOLE manifest is refused and nothing is written. Edits to one file compose in manifest order against the in-memory content. Bytes in, bytes out: no encoding pass, no BOM handling. Writes are atomic per file, temp plus rename.
 
 // manifestEdit is one operation in an apply manifest. Op "" is the byte-exact
 // replacement; "create" births a file that must not exist; "write" replaces a whole
@@ -47,6 +43,9 @@ func applyManifest(path string, dry bool) ([]string, error) {
 	edits, err := loadEditManifest(path)
 	if err != nil {
 		return nil, err
+	}
+	if verdict := applyRedGuardLive(edits); verdict != "" {
+		return nil, errors.New(verdict) // go-red-edit-guard: a strand is refused before validation
 	}
 	contents := map[string][]byte{} // keyed by cleaned path
 	editCount := map[string]int{}

@@ -89,9 +89,7 @@ func bookAnnotatorFindings() []string {
 // enddesign
 
 // design: go-note-dedup  implements: req-note-collision
-// dedupNotePath returns a non-colliding path for a note capture: the plain name when free,
-// else -2, -3, … — a same-second, same-prefix capture never overwrites an earlier note
-// (silent overwrite is the one unforgivable failure of a capture lane).
+// dedupNotePath returns a non-colliding path for a note capture: the plain name when free, else -2, -3, and so on. A same-second, same-prefix capture never overwrites an earlier note. Silent overwrite is the one unforgivable failure of a capture lane.
 func dedupNotePath(dir, base string) string {
 	p := filepath.Join(dir, base+".md")
 	if _, err := os.Stat(p); err != nil {
@@ -108,9 +106,7 @@ func dedupNotePath(dir, base string) string {
 // enddesign
 
 // design: go-home-sweep  implements: req-selftest-home-sweep
-// sweepOrphanHomes removes data homes whose recorded workspace no longer exists (fixture
-// leftovers). A markerless home is removed only when it holds NO file at all — a real
-// pre-marker home always has content and is never touched. The live home is always kept.
+// sweepOrphanHomes removes data homes whose recorded workspace no longer exists, fixture leftovers. A markerless home is removed only when it holds NO file at all. A real pre-marker home always has content and is never touched. The live home is always kept.
 func sweepOrphanHomes() int {
 	base := filepath.Join(userDataBase(), "quackitect")
 	ents, err := os.ReadDir(base)
@@ -154,9 +150,7 @@ func sweepOrphanHomes() int {
 // enddesign
 
 // design: go-call-log-cap  implements: req-call-log-lifecycle.2
-// capCallLog trims the call log to capBytes, dropping the OLDEST lines. Retention stays
-// retro-bound (adr-call-log deletes at every retro); the cap is the safety net for the case
-// the retro never comes — an uncapped live logs dir once grew past 100 MB.
+// capCallLog trims the call log to capBytes, dropping the OLDEST lines. Retention stays retro-bound, since adr-call-log deletes at every retro. The cap is the safety net for the case the retro never comes. An uncapped live logs dir once grew past 100 MB.
 const callLogCapBytes = 8 << 20 // ~50k calls; one retro cycle fits with room to spare
 
 func capCallLog(path string, capBytes int64) {
@@ -183,11 +177,7 @@ func capCallLog(path string, capBytes int64) {
 // enddesign
 
 // design: go-observe-red-refresh  implements: req-observe-red-refresh
-// refreshRed builds the re-observation event for an AMENDED, still-failing test: the original
-// red was watched at the old hash; amending the statement moved the hash and stranded the record.
-// The refresh re-runs the test and re-attests at the CURRENT hash — a
-// passing test errors, exactly like a first observation: no fabricated red enters the ledger.
-// The caller (observe-red --refresh) appends the event; this seam never writes the log itself.
+// refreshRed builds the re-observation event for an AMENDED, still-failing test. The original red was watched at the old hash; amending the statement moved the hash and stranded the record. The refresh re-runs the test and re-attests at the CURRENT hash. A passing test errors here, exactly like a first observation, so no fabricated red enters the ledger. The caller (observe-red --refresh) appends the event; this seam never writes the log itself.
 func refreshRed(nodes map[string]Node, id string) (Event, error) {
 	n, ok := nodes[id]
 	if !ok {

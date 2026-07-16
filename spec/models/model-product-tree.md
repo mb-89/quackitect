@@ -2,7 +2,7 @@
 id: model-product-tree
 type: model
 kind: element-tree
-statement: what does the shipped product consist of - the part-of hierarchy?
+statement: What does the shipped product consist of? This is the part-of hierarchy.
 class: review
 killer: false
 ---

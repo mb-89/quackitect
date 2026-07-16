@@ -1,7 +1,7 @@
 ---
 id: test-comment-close
 type: test
-statement: In a live browser session, closing a thread hides its highlight while the island still carries the full thread; reopen restores it; delete removes it from the island; the session evidence is recorded.
+statement: In a live browser session, closing a thread hides its highlight while the island still carries the full thread. Reopen restores it. Delete removes it from the island. The session evidence is recorded.
 class: review
 killer: false
 ---

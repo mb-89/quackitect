@@ -10,11 +10,7 @@ import (
 )
 
 // design: go-readout-width  implements: req-deterministic-readout.3
-// The readout is a bordered box a fixed 80 columns wide (76 content + border), so it never mangles.
-// The engine never probes chat/terminal width (impossible — output is captured, not a TTY); it renders
-// plain inside a code fence when captured (chat/file) and with ANSI color when isTTY(stdout). Width is
-// measured in DISPLAY columns (dispWidth) because the bar uses emoji (2 cols each) — so the border
-// aligns. selftest:readout asserts every line is <= 80 display columns.
+// The readout is a bordered box, a fixed 80 columns wide, 76 content plus border, so it never mangles. The engine never probes chat or terminal width, since that is impossible when output is captured, not a TTY. It renders plain inside a code fence when captured, chat or file, and with ANSI color when isTTY(stdout). Width is measured in DISPLAY columns (dispWidth), because the bar uses emoji at 2 columns each, so the border aligns. selftest:readout asserts every line is <= 80 display columns.
 const boxContentW = 76
 const readoutMax = 80
 
@@ -292,11 +288,7 @@ func reviewEvidenceReady(id string, n Node) bool {
 }
 
 // design: go-pager-merge  implements: req-pager-merge
-// Merge the HAND-OFF, never the nodes (adr-pager-handoff; order
-// is not dependency): when every undone dependency of a milestone gate is a ready review gate,
-// the pager for the gate or any of those ready rows presents them all as one hand-off. One y
-// blesses the group (each bless recorded individually); a split answer stays possible. The
-// substance checks and the review gate remain separate records; only the ceremony is merged.
+// Merge the HAND-OFF, never the nodes (adr-pager-handoff; order is not dependency). When every undone dependency of a milestone gate is a ready review gate, the pager presents them all as one hand-off. This applies for the gate or any of those ready rows. One y blesses the group, with each bless recorded individually. A split answer stays possible. The substance checks and the review gate remain separate records. Only the ceremony is merged.
 func pagerGroup(id string, nodes map[string]Node, sm map[string]string) ([]string, string) {
 	n, ok := nodes[id]
 	if !ok {
@@ -350,10 +342,7 @@ func pagerGroup(id string, nodes map[string]Node, sm map[string]string) ([]strin
 // enddesign
 
 // design: go-pager-scope  implements: req-suspicion-attribution.2
-// A pager for a killer SUBTASK reports the readiness of THAT CHECK — its own upstreams and the
-// evidence doc — never the whole milestone (milestone scope gives false "ready: NO" alarms: a
-// milestone's first killer always reads 0/N). Gate pagers keep the milestone scope; the merge path resolves to the
-// gate before readiness is computed, so merged hand-offs stay milestone-scoped too.
+// A pager for a killer SUBTASK reports the readiness of THAT CHECK, its own upstreams and the evidence doc, never the whole milestone. Milestone scope gives false "ready: NO" alarms, since a milestone's first killer always reads 0/N. Gate pagers keep the milestone scope. The merge path resolves to the gate before readiness is computed, so merged hand-offs stay milestone-scoped too.
 func checkScopedReadiness(id string, nodes map[string]Node, sm map[string]string, evidence bool) []string {
 	own, ownDone := 0, 0
 	for _, dep := range parents(nodes[id]) {
@@ -378,9 +367,7 @@ func checkScopedReadiness(id string, nodes map[string]Node, sm map[string]string
 // enddesign
 
 // design: go-handover-pager  implements: req-deterministic-readout.1
-// The killer-gate hand-off readout, in one bordered <=80-col box: the emoji progress bar, biggest
-// decisions (the iteration's ADRs), biggest risks (M1 frame), deterministic readiness facts, and — LAST
-// — the bless question with 👍/👎 emojis. Decisions/risks point at their trace nodes, not restated.
+// The killer-gate hand-off readout renders in one bordered, 80-column-or-less box. It shows the emoji progress bar, biggest decisions, the iteration's ADRs, biggest risks, M1 frame, deterministic readiness facts, and LAST the bless question with thumbs-up and thumbs-down emojis. Decisions and risks point at their trace nodes, not restated.
 func HandoverPager(gateID, iter string, nodes map[string]Node, sm map[string]string, cfg Config, tty bool) string {
 	return render(box(pagerLines(gateID, iter, nodes, sm, cfg)), tty)
 }
@@ -533,9 +520,7 @@ func joinN(xs []string, n int) string {
 // enddesign
 
 // design: go-progress-cmd  implements: req-deterministic-readout.2, req-deterministic-readout.1
-// quack progress [--iter <v>] [--pager <gate>] [--color|--plain] — the deterministic readout: the bar
-// alone (self-bless) or bar + handover pager (killer hand-off). Colored on a TTY, plain-fenced when
-// captured; --color/--plain force a mode. Pure display — never mutates state.
+// quack progress [--iter <v>] [--pager <gate>] [--color|--plain] is the deterministic readout. It shows the bar alone for a self-bless, or the bar plus a handover pager for a killer hand-off. It is colored on a TTY, and plain-fenced when captured. --color and --plain force a mode. It is pure display and never mutates state.
 func cmdProgress(rest []string) {
 	nodes := LoadAll()
 	sm := StatusMap(nodes)
@@ -587,12 +572,21 @@ func cmdProgress(rest []string) {
 		base := <-started
 		fmt.Println("hand-off -> " + base + "/handoff/" + g + "   (file: " + filepath.ToSlash(out) + ")")
 		fmt.Println("❓ Bless " + g + "?  the page's buttons record; closing the page keeps the gate open")
-		openFile(base + "/handoff/" + g)
-		// the SAME brief rides the phone when one is paired (owner ruling): both
-		// channels, first answer wins, the round's end kills the leftover card
-		if cid, err := askSendForGate(g, 900, ""); err == nil {
-			fmt.Println("📱 the brief rides the paired phone too (" + cid + ")")
+		// design: go-pager-noopen  implements: req-register-render
+		// A FOREIGN workspace's pager (driven via --base/-C: fixtures, spikes, other projects)
+		// never auto-opens the owner's browser and never rides the phone. A fixture render
+		// must not impersonate a live hand-off. The page still serves; the pointer prints.
+		if baseFromArgs() == "" {
+			openFile(base + "/handoff/" + g)
+			// the SAME brief rides the phone when one is paired (owner ruling): both
+			// channels, first answer wins, the round's end kills the leftover card
+			if cid, err := askSendForGate(g, 900, ""); err == nil {
+				fmt.Println("📱 the brief rides the paired phone too (" + cid + ")")
+			}
+		} else {
+			fmt.Println("foreign workspace (--base): browser and phone stay quiet; open the pointer yourself")
 		}
+		// enddesign
 		o := <-res
 		switch o {
 		case "y":

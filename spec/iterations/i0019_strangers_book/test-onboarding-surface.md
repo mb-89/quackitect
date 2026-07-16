@@ -1,7 +1,7 @@
 ---
 id: test-onboarding-surface
 type: test
-statement: The rendered book carries section 2.2 with the newcomer arc, its deck link and its filtered guides link; the guides table carries the deck row; the README carries the deck reference - all against a fixture and the live book.
+statement: The rendered book carries section 2.2 with the newcomer arc, its deck link, and its filtered guides link. The guides table carries the deck row. The README carries the deck reference. This holds against a fixture and the live book.
 class: executed
 verify: selftest:onboarding-surface
 killer: false

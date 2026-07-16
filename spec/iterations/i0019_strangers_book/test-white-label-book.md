@@ -1,7 +1,7 @@
 ---
 id: test-white-label-book
 type: test
-statement: A book rendered from a fixture vehicle carries the vehicle's title, wordmark, and self-referential voice with the engine credited in the colophon; a planted engine-name-as-identity leak fails the check naming the leak.
+statement: A book rendered from a fixture vehicle carries the vehicle's title, wordmark, and self-referential voice, with the engine credited in the colophon. A planted engine-name-as-identity leak fails the check naming the leak.
 class: executed
 verify: selftest:white-label-book
 killer: false

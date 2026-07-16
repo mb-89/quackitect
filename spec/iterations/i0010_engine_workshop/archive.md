@@ -27,7 +27,7 @@ TODO
 id: req-mint-sugar
 ears: exempt - historical pre-EARS statement, retire-or-retrofit recorded (adr-grandfathers-historical)
 type: requirement
-statement: quack mint shall honor its sugar forms - rationale text and deduplicated sink addressing - the numbered statements bind individually.
+statement: quack mint shall honor its sugar forms: rationale text and deduplicated sink addressing. The numbered statements bind individually.
 class: review
 killer: false
 ---
@@ -39,7 +39,7 @@ killer: false
 id: req-notes-list
 type: requirement
 depends_on: []
-statement: When the user runs quack notes, the engine shall print the notes location and each open inbox note with id, age, and first line, including backlog and archive notes where --all is passed.
+statement: When the user runs quack notes, the engine shall print the notes location and each open inbox note with id, age, and first line. It includes backlog and archive notes where --all is passed.
 class: review
 killer: false
 phase: [operation]
@@ -53,7 +53,7 @@ TODO
 id: req-pager-merge
 type: requirement
 depends_on: []
-statement: When every undone dependency of a milestone gate is a ready killer subtask, quack progress --pager shall present one combined pager naming those killers and the gate, blessing each individually on a single yes and accepting a split answer.
+statement: When every undone dependency of a milestone gate is a ready killer subtask, quack progress --pager shall present one combined pager naming those killers and the gate. It blesses each individually on a single yes and accepts a split answer.
 class: review
 killer: false
 phase: [operation]
@@ -110,7 +110,7 @@ TODO
 ---
 id: req-verdict-machinery
 type: requirement
-statement: The engine shall serve verdicts from a cache for a fast board while announcing re-runs and naming why a check flipped - the numbered statements bind individually.
+statement: The engine shall serve verdicts from a cache for a fast board while announcing re-runs and naming why a check flipped. The numbered statements bind individually.
 class: review
 killer: false
 ---
@@ -620,7 +620,7 @@ TODO
 ---
 id: test-mint-sugar
 type: test
-statement: quack mint honors its sugar forms - rationale text and deduplicated sink addressing.
+statement: quack mint honors its sugar forms: rationale text and deduplicated sink addressing.
 class: executed
 verify: selftest:mint-dedupe mint-rationale
 tests_red: exempt - clustered at i17; the birth reds stand in the ledger under the origin ids (adr-cluster-numbered-statements)
@@ -644,7 +644,7 @@ TODO
 ---
 id: test-pager-merge
 type: test
-statement: With only ready killers and the gate left open, progress --pager emits one combined pager naming them all; open agent-blessable work suppresses the merge; two ready killers group with the gate.
+statement: With only ready killers and the gate left open, progress --pager emits one combined pager naming them all. Open agent-blessable work suppresses the merge. Two ready killers group with the gate.
 class: executed
 verify: selftest:pager-merge
 killer: false

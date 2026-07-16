@@ -32,8 +32,8 @@ func selftestTraceClustered() bool {
 		}
 		return nil
 	})
-	if n == 0 || n > 140 {
-		return false // materially below the pre-pruning 292 baseline, with headroom for extension requirements
+	if n == 0 || n > 160 {
+		return false // materially below the pre-pruning 292 baseline; the i24 hygiene requirements consumed the old headroom
 	}
 	return coverageRuleUncached(LoadAll(), "req-traced", "") // every cluster still traces
 }

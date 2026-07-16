@@ -4,7 +4,7 @@
 id: adr-actor-channel-stat
 type: adr
 adjudicated_by: human
-statement: The bless channel is detected by stdlib char-device stat on stdin+stdout (console = human, pipe/redirect = agent), overridden by an explicit --by flag; QUACK_ACTOR is retired — chosen over env heuristics (spoofable, nondeterministic) and over always-agent (worst console UX). The known MSYS/mintty pipe quirk mis-stamps toward agent, the designed-harmless direction (under-claims human oversight).
+statement: The bless channel is detected by stdlib char-device stat on stdin and stdout. Console means human. Pipe or redirect means agent. An explicit --by flag overrides the detection. QUACK_ACTOR is retired. This was chosen over env heuristics, which are spoofable and nondeterministic, and over always-agent, which is the worst console UX. The known MSYS/mintty pipe quirk mis-stamps toward agent. That is the designed-harmless direction, since it under-claims human oversight.
 depends_on: []
 class: review
 killer: true
@@ -16,7 +16,7 @@ Sensitivity: if the M5 terminal spike falsifies char-device detection on real Wi
 id: adr-ears-baseline
 type: adr
 adjudicated_by: human
-statement: Forward-only EARS discrimination uses a committed baseline corpus — the stmtHash of every requirement existing at feature-land; lint checks only requirements whose current stmtHash is absent from the baseline (new or genuinely re-stated), so blessed history is structurally unflaggable — chosen over attest-lineage reconstruction (complex, indirect) and iteration-order scoping (misses edited old statements).
+statement: Forward-only EARS discrimination uses a committed baseline corpus: the stmtHash of every requirement existing at feature-land. Lint checks only requirements whose current stmtHash is absent from the baseline, meaning new or genuinely re-stated ones. So blessed history is structurally unflaggable. This was chosen over attest-lineage reconstruction, which is complex and indirect, and over iteration-order scoping, which misses edited old statements.
 depends_on: []
 class: review
 killer: true
@@ -28,7 +28,7 @@ One diffable file, one deterministic set-membership test. Tamper-hardening the b
 id: adr-kernel-corpus
 type: adr
 adjudicated_by: human
-statement: Kernel corpora are baked as in-code Go literals (golden vectors, the linear/diamond/shared-subtree DAGs, tampered attest chains), and the property battery uses a hand-rolled xorshift64* PRNG with a baked seed — chosen over go:embed files (spreads the kernel's truth for no gain) and math/rand (stream stability across Go versions not ours to guarantee).
+statement: Kernel corpora are baked as in-code Go literals: golden vectors, the linear, diamond, and shared-subtree DAGs, and tampered attest chains. The property battery uses a hand-rolled xorshift64* PRNG with a baked seed. This was chosen over go:embed files, which spread the kernel's truth for no gain, and over math/rand, whose stream stability across Go versions is not ours to guarantee.
 depends_on: []
 class: review
 killer: false
@@ -38,7 +38,7 @@ killer: false
 id: adr-logs-user-dir
 type: adr
 adjudicated_by: human
-statement: The engine owns canonical log-dir resolution — %LOCALAPPDATA%\quackitect\logs\<slug> on Windows, $XDG_DATA_HOME (default ~/.local/share)/quackitect/logs/<slug> elsewhere, config.toml override wins, slug = workspace dir name + h12(abs-path) prefix — chosen over os.UserCacheDir (droppable-cache semantics for durable research data) and os.UserConfigDir (roaming AppData, wrong for bulk). The 122 MB under .quack/logs migrates once, verified by count+size, foreign folders included.
+statement: The engine owns canonical log-dir resolution: %LOCALAPPDATA%\quackitect\logs\<slug> on Windows, $XDG_DATA_HOME (default ~/.local/share)/quackitect/logs/<slug> elsewhere. A config.toml override wins. The slug is the workspace dir name plus an h12(abs-path) prefix. This was chosen over os.UserCacheDir, which has droppable-cache semantics wrong for durable research data, and over os.UserConfigDir, which is roaming AppData and wrong for bulk. The 122 MB under .quack/logs migrates once, verified by count and size, foreign folders included.
 depends_on: []
 class: review
 killer: false
@@ -48,7 +48,7 @@ killer: false
 id: adr-region-hash-ws
 type: adr
 adjudicated_by: human
-statement: Design regions fold ONE hash over whitespace-collapse-only normalization that PRESERVES case (a new normWS, not the statement norm) — chosen over reusing norm() verbatim, whose lowercasing would let a case-only code rename escape reopening; comments stay in the hash because in-region comments are design content.
+statement: Design regions fold ONE hash over whitespace-collapse-only normalization that PRESERVES case, a new normWS, not the statement norm. This was chosen over reusing norm() verbatim, whose lowercasing would let a case-only code rename escape reopening. Comments stay in the hash because in-region comments are design content.
 depends_on: []
 class: review
 killer: false
@@ -60,7 +60,7 @@ Sensitivity: the directive's operative words are "whitespace-collapse only"; "sa
 id: adr-strict-load
 type: adr
 adjudicated_by: human
-statement: Strictness applies at EVERY graph load, with all findings batched (file, key, direction) and nonzero exit — chosen over write-path-only or lint-only strictness, because a status rendered from a misparsed graph IS the silently-shrunk cone. A node file is recognized by a first-line frontmatter fence; iteration.md is its own strict key class; evidence docs are excluded naturally.
+statement: Strictness applies at EVERY graph load, with all findings batched (file, key, direction) and a nonzero exit. This was chosen over write-path-only or lint-only strictness, because a status rendered from a misparsed graph IS the silently-shrunk cone. A node file is recognized by a first-line frontmatter fence. iteration.md is its own strict key class. Evidence docs are excluded naturally.
 depends_on: []
 class: review
 killer: true
@@ -80,7 +80,7 @@ Harden the trust kernel: strict node parsing that fails loudly, per-channel acto
 ---
 id: req-actor-channels
 type: requirement
-statement: When a bless is recorded, the engine shall default the actor per channel — human for a bless entered at an interactive console, agent for a non-interactive harness-invoked bless — and shall accept an explicit --by flag overriding either; the QUACK_ACTOR environment variable shall be retired.
+statement: When a bless is recorded, the engine shall default the actor per channel: human for a bless entered at an interactive console, agent for a non-interactive harness-invoked bless. It shall accept an explicit --by flag overriding either. The QUACK_ACTOR environment variable shall be retired.
 depends_on: []
 class: review
 killer: true
@@ -92,7 +92,7 @@ quality: [security]
 ---
 id: req-design-hash-norm
 type: requirement
-statement: When the engine hashes a design region, it shall compute one hash over the whitespace-collapsed region content — the same normalization statements use — retaining comments, so that pure reformatting never changes the hash and any content edit does.
+statement: When the engine hashes a design region, it shall compute one hash over the whitespace-collapsed region content, retaining comments. This is the same normalization statements use. Pure reformatting never changes the hash. Any content edit does.
 depends_on: []
 class: review
 killer: false
@@ -104,7 +104,7 @@ quality: [reliability]
 ---
 id: req-ears-authoring
 type: requirement
-statement: The engine and the method shall enforce EARS-shaped requirement statements at authoring and lint time - the numbered statements bind individually.
+statement: The engine and the method shall enforce EARS-shaped requirement statements at authoring and lint time. The numbered statements bind individually.
 class: review
 killer: false
 ---
@@ -115,7 +115,7 @@ killer: false
 ---
 id: req-kernel-selftest
 type: requirement
-statement: The quack selftest shall verify the trust kernel from baked deterministic corpora with no unseeded randomness — golden hash vectors for norm, h12, statement hash, and the full fold; exact suspect-cone sets on linear, diamond, and shared-subtree fixture DAGs; the gate state-machine walk open, bless, done, dependency change, suspect, re-bless; parser strictness rejections; and attest prev_hash chain verification including the migrated-null anchor and tamper detection.
+statement: The quack selftest shall verify the trust kernel from baked deterministic corpora with no unseeded randomness. It verifies golden hash vectors for norm, h12, statement hash, and the full fold. It verifies exact suspect-cone sets on linear, diamond, and shared-subtree fixture DAGs. It verifies the gate state-machine walk: open, bless, done, dependency change, suspect, re-bless. It verifies parser strictness rejections. It verifies attest prev_hash chain verification, including the migrated-null anchor and tamper detection.
 depends_on: []
 class: review
 killer: true
@@ -139,7 +139,7 @@ quality: [maintainability]
 ---
 id: req-structural-strictness
 type: requirement
-statement: The engine shall refuse structurally invalid input - malformed frontmatter, dangling references, mis-wired milestone chains - the numbered statements bind individually.
+statement: The engine shall refuse structurally invalid input: malformed frontmatter, dangling references, mis-wired milestone chains. The numbered statements bind individually.
 class: review
 killer: false
 ---
@@ -638,7 +638,7 @@ killer: false
 ---
 id: test-kernel-selftest
 type: test
-statement: The trust kernel verifies from baked deterministic corpora - hash vectors, suspect cones, the gate walk, and attest chains.
+statement: The trust kernel verifies from baked deterministic corpora: hash vectors, suspect cones, the gate walk, and attest chains.
 class: executed
 verify: selftest:kernel-attest kernel-cone kernel-gatewalk kernel-vectors
 tests_red: exempt - clustered at i17; the birth reds stand in the ledger under the origin ids (adr-cluster-numbered-statements)
@@ -662,7 +662,7 @@ killer: false
 ---
 id: test-structural-strictness
 type: test
-statement: Structurally invalid input is refused - malformed frontmatter, dangling references, mis-wired milestone chains.
+statement: Structurally invalid input is refused: malformed frontmatter, dangling references, mis-wired milestone chains.
 class: executed
 verify: selftest:monotonic-lint ref-integrity parser-strict
 tests_red: exempt - clustered at i17; the birth reds stand in the ledger under the origin ids (adr-cluster-numbered-statements)
@@ -676,7 +676,7 @@ killer: false
 ---
 id: uc-ears-requirements
 type: usecase
-statement: New requirements composed at systematic rigor arrive EARS-shaped and weasel-word-free, enforced by deterministic lint — forward-only, never retrofitting blessed statements.
+statement: New requirements composed at systematic rigor arrive EARS-shaped and weasel-word-free, enforced by deterministic lint. This is forward-only and never retrofits blessed statements.
 class: review
 killer: false
 ---
@@ -686,7 +686,7 @@ Red-teamed and settled: retrofit + mass re-bless is a rubber-stamp factory and o
 ---
 id: uc-fail-loud-parsing
 type: usecase
-statement: ISO/IEC 25010 Reliability/Integrity — malformed or unknown node input can never silently shrink the suspect cone; the engine refuses loudly and names the offender.
+statement: ISO/IEC 25010 Reliability/Integrity: malformed or unknown node input can never silently shrink the suspect cone. The engine refuses loudly and names the offender.
 class: review
 killer: false
 ---
@@ -696,7 +696,7 @@ A typo (`depends-on` for `depends_on`) silently dropping an edge is the one fail
 ---
 id: uc-honest-adjudication
 type: usecase
-statement: The attest record names the true adjudicator — channel defaults match reality (interactive console = human, harness-invoked = agent) and an explicit flag overrides both, so omission errs toward under-claiming human oversight.
+statement: The attest record names the true adjudicator. Channel defaults match reality: interactive console equals human, harness-invoked equals agent. An explicit flag overrides both, so omission errs toward under-claiming human oversight.
 class: review
 killer: false
 ---
@@ -706,7 +706,7 @@ The realistic failure is omission, not malice: forgetting the QUACK_ACTOR env da
 ---
 id: uc-kernel-selftested
 type: usecase
-statement: The trust kernel proves itself on any machine through the shipped dependency-free selftest — hash vectors, suspect-cone exactness, the gate state machine, parser strictness, and the attest chain — with no toolchain and no unseeded randomness.
+statement: The trust kernel proves itself on any machine through the shipped dependency-free selftest: hash vectors, suspect-cone exactness, the gate state machine, parser strictness, and the attest chain. This needs no toolchain and no unseeded randomness.
 class: review
 killer: false
 ---
@@ -716,7 +716,7 @@ Never `go test`: Windows flags freshly built test binaries; selftest ships insid
 ---
 id: uc-monotonic-walk
 type: usecase
-statement: A composed checklist cannot let `quack next` jump a later milestone ahead of an unblessed gate — milestone-monotonic wiring is verified mechanically, not by composer discipline.
+statement: A composed checklist cannot let `quack next` jump a later milestone ahead of an unblessed gate. Milestone-monotonic wiring is verified mechanically, not by composer discipline.
 class: review
 killer: false
 ---
@@ -726,7 +726,7 @@ Caught live in i0002: M6 build-* checks were ready before the M5 spike. The comp
 ---
 id: uc-stable-design-hashes
 type: usecase
-statement: Pure reformatting churn (gofmt, whitespace) never reopens a design; any content change — including comments inside the region, which are design content — does.
+statement: Pure reformatting churn (gofmt, whitespace) never reopens a design. Any content change does, including comments inside the region, which are design content.
 class: review
 killer: false
 ---
@@ -734,7 +734,7 @@ killer: false
 ---
 id: uc-workspace-hygiene
 type: usecase
-statement: Engine session logs live in a stable user-scoped directory outside the repo — no repo bloat, no foreign personal data under version control, cross-project searchable, never OS-purged.
+statement: Engine session logs live in a stable user-scoped directory outside the repo. There is no repo bloat, no foreign personal data under version control. They are cross-project searchable and never OS-purged.
 class: review
 killer: false
 ---

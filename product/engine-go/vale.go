@@ -15,13 +15,7 @@ import (
 )
 
 // design: go-register-vale  implements: req-register-advisory
-// The register lane (adr-vale-autopull): Vale - one static MIT Go binary - is
-// AUTO-PULLED once per OS into the data home (pinned version, the global-binary bootstrap
-// pattern), run as a subprocess, never linked and never hand-rolled. When the binary is absent
-// and the pull fails, the engine prints ONE loud warning - "prose linter missing; prose quality
-// is likely to suffer" - and the lane stays empty. Findings are ADVISORY by construction: they
-// print on their own channel and never join a fatal exit set (the GitLab production lesson:
-// readability signals advise, only unambiguous rules block).
+// This is the register lane (adr-vale-autopull). Vale, one static MIT Go binary, is AUTO-PULLED once per OS into the data home, a pinned version, the global-binary bootstrap pattern. It runs as a subprocess, never linked and never hand-rolled. When the binary is absent and the pull fails, the engine prints ONE loud warning, "prose linter missing; prose quality is likely to suffer", and the lane stays empty. Findings are ADVISORY by construction. They print on their own channel and never join a fatal exit set. This is the GitLab production lesson: readability signals advise, and only unambiguous rules block.
 const valeVersion = "3.7.1"
 
 func valeDir() string  { return filepath.Join(dataHome(), "tools", "vale") }

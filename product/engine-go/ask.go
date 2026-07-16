@@ -20,11 +20,7 @@ import (
 )
 
 // design: go-ask-core  implements: req-ask-loop.1, req-ask-loop.5, req-ask-loop.3, req-ask-loop.6
-// The ask model: one pending question with a correlation id, 1..n id-labelled options
-// (buttons cap at three — the body always lists ALL options), an injectable-clock
-// timeout, and FIRST-WINS resolution: the first well-formed answer on a pending
-// correlation id resolves the ask; late, duplicate, or post-expiry answers are ignored
-// (the Home Assistant failure modes, engineered around).
+// The ask model has one pending question with a correlation id and 1..n id-labelled options; buttons cap at three though the body always lists ALL options. It also has an injectable-clock timeout and FIRST-WINS resolution. The first well-formed answer on a pending correlation id resolves the ask. Late, duplicate, or post-expiry answers are ignored. These are the Home Assistant failure modes, engineered around.
 type Ask struct {
 	ID            string   // ask id (unique per ask)
 	CID           string   // correlation id carried by every answer
@@ -174,19 +170,7 @@ func askExpire(s *AskStore, now int64) []Ask {
 // enddesign
 
 // design: go-ask-loop  implements: req-ask-loop.2, req-ask-loop.4, req-ask-loop.9, req-await-console-exit
-// The loop: dispatch every pending, unsent ask through EVERY paired adapter; poll the
-// adapters; correlate and apply. A resolved GATE answer becomes a bless with actor=user
-// — the paired device IS the adjudicator (paired = trustworthy) — and the
-// answering channel is noted in the record. Applying rides the EXISTING bless path; the
-// asks themselves never enter the ledger (BlessIntent, the pure answer model,
-// rides in go-ask-core).
-//
-// await-console-exit (req-await-console-exit): an await is AWAY-mode only. Every engine
-// dispatch appends one line to the workspace call log (go-call-log), and the awaiting
-// process writes its OWN line only at exit — so ANY line that lands while the loop runs is
-// a call from another process. awaitForeignCall watches for that growth and ends the await,
-// handing the walk back to drain mode (the next command drains the pending tap as the
-// fallback). The rule needs no PID: the awaiter's own line is not on disk until it exits.
+// The loop dispatches every pending, unsent ask through EVERY paired adapter, polls the adapters, then correlates and applies. A resolved GATE answer becomes a bless with actor=user, since the paired device IS the adjudicator, paired equals trustworthy, and the answering channel is noted in the record. Applying rides the EXISTING bless path. The asks themselves never enter the ledger; BlessIntent, the pure answer model, rides in go-ask-core. await-console-exit (req-await-console-exit): an await is AWAY-mode only. Every engine dispatch appends one line to the workspace call log (go-call-log), and the awaiting process writes its OWN line only at exit. So ANY line that lands while the loop runs is a call from another process. awaitForeignCall watches for that growth and ends the await, handing the walk back to drain mode, where the next command drains the pending tap as the fallback. The rule needs no PID, since the awaiter's own line is not on disk until it exits.
 
 // callLogLineCount counts the non-empty lines currently in the workspace call log; a missing
 // log is zero. It is the baseline an await snapshots and re-reads to detect foreign activity.
@@ -274,10 +258,7 @@ func askComposeBody(card, context string) string {
 // enddesign
 
 // design: go-ask-pairing  implements: req-device-pairing.1
-// `quack pair ntfy`: ONE operation mints the high-entropy topic pair (the credential —
-// answer authenticity equals its possession, adr-answer-authenticity), writes the
-// machine-local pairing config (data home, never the repo), and prints the transit
-// DISCLAIMER and the LOCKSCREEN instruction (raid-lockscreen-actions).
+// `quack pair ntfy` is ONE operation. It mints the high-entropy topic pair, the credential, since answer authenticity equals its possession (adr-answer-authenticity). It writes the machine-local pairing config, in the data home, never the repo. It prints the transit DISCLAIMER and the LOCKSCREEN instruction (raid-lockscreen-actions).
 var pairCfgOverride string // test seam
 
 func pairCfgPath() string {
@@ -364,11 +345,7 @@ func loadPairConfig() (pairConfig, bool) {
 // enddesign
 
 // design: go-ask-seam  implements: req-channel-adapters.1, req-channel-adapters.2
-// Adding a channel = one AskAdapter behind the seam; the loop never changes. Everything
-// is stdlib-only. The EXEC LANE (adr-ask-seam-exec-lane) drives an external process over
-// a file contract, so the deferred corporate adapters (PowerShell/Outlook-COM, Teams
-// flow sinks) drop in without engine work: the engine writes ask JSON to the contract
-// dir, invokes the command once per operation, and reads answer JSON lines back.
+// Adding a channel means one AskAdapter behind the seam; the loop never changes. Everything is stdlib-only. The EXEC LANE (adr-ask-seam-exec-lane) drives an external process over a file contract, so the deferred corporate adapters, PowerShell/Outlook-COM, Teams flow sinks, drop in without engine work. The engine writes ask JSON to the contract dir, invokes the command once per operation, and reads answer JSON lines back.
 type execAdapter struct {
 	name string
 	cmd  string // the external adapter command; contract dir passed as its argument
@@ -409,11 +386,7 @@ func (e *execAdapter) PollAnswers(since string) ([]AskAnswer, string, error) {
 // enddesign
 
 // design: go-ntfy-adapter  implements: req-channel-adapters.3, req-ask-loop.8
-// The ntfy adapter: send = one HTTP PUT with the ask body and headers; poll = one GET
-// with `since=` (json lines). A GATE ask renders visibly distinct (high priority,
-// bangbang tag) from a decision ask (default, question tag). Up to three X-Actions
-// buttons fire `PUT <option-id> <cid>` at the answer topic — the exact wire the
-// spike proved, phone tap included.
+// The ntfy adapter sends with one HTTP PUT carrying the ask body and headers. It polls with one GET using `since=` (json lines). A GATE ask renders visibly distinct, high priority with a bangbang tag, from a decision ask, default with a question tag. Up to three X-Actions buttons fire `PUT <option-id> <cid>` at the answer topic. This is the exact wire the spike proved, phone tap included.
 func ntfyHeaders(a Ask, answerTopic string) map[string]string {
 	h := map[string]string{}
 	h["X-Title"] = "quackitect " + strings.ToUpper(a.Kind) + " ask: " + a.Check

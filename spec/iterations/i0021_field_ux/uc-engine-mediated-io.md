@@ -1,7 +1,7 @@
 ---
 id: uc-engine-mediated-io
 type: usecase
-statement: An agent's file edits travel one engine-mediated lane - byte-safe, dry-runnable, audited - so no careless write can corrupt the workspace and every edit leaves a record.
+statement: An agent's file edits travel one engine-mediated lane: byte-safe, dry-runnable, audited. No careless write can corrupt the workspace, and every edit leaves a record.
 class: domain
 killer: false
 ---

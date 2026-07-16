@@ -1,7 +1,7 @@
 ---
 id: test-book-graph-membership
 type: test
-statement: The book trace graph pages one tab per need with that need as the tab's root, carries only decisions of frontmatter kind architecture, and leaves no unrooted stray - the display fold that relabels kind-less decisions as architecture never feeds the graph.
+statement: The book trace graph pages one tab per need, with that need as the tab's root. It carries only decisions of frontmatter kind architecture and leaves no unrooted stray. The display fold that relabels kind-less decisions as architecture never feeds the graph.
 class: executed
 verify: selftest:book-graph-membership
 killer: false

@@ -2,7 +2,7 @@
 id: req-trace-clustered
 type: requirement
 depends_on: []
-statement: The trace shall carry clustered requirements where concerns belong tightly together - each clustered statement individually sub-addressable for tracing and verification, tests staying more atomic than requirements - and the migrated spec shall hold materially fewer requirement nodes than the 2026-07-10 baseline.
+statement: The trace shall carry clustered requirements where concerns belong tightly together. Each clustered statement stays individually sub-addressable for tracing and verification, and tests stay more atomic than requirements. The migrated spec shall hold materially fewer requirement nodes than the 2026-07-10 baseline.
 class: review
 killer: false
 ---

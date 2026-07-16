@@ -6,7 +6,7 @@ ratings:
   single-file: 1
   agent-readability: 0.4
   dom-static: 0.1
-statement: Comments as hidden DOM elements beside their anchors (the OOXML school - markers in the document).
+statement: Comments as hidden DOM elements beside their anchors: the OOXML school, markers in the document.
 class: review
 killer: false
 ---

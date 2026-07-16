@@ -1,7 +1,7 @@
 ---
 id: uc-field-schemas
 type: usecase
-statement: A builder fills node and item fields against machine-checkable definitions - the engine catches a wrong type, a value outside its enum, or a missing core field before any reviewer does.
+statement: A builder fills node and item fields against machine-checkable definitions. The engine catches a wrong type, a value outside its enum, or a missing core field before any reviewer does.
 class: review
 killer: false
 ---

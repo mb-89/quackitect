@@ -16,22 +16,13 @@ import (
 type ParseIssue struct{ Path, Key, Msg string }
 
 // design: go-region-hash-norm  implements: req-design-hash-norm
-// ONE design-region hash over whitespace-collapse-only normalization (adr-region-hash-ws): pure
-// reformatting (gofmt, indent churn) never reopens a design, while ANY content edit — including
-// comments (design content) and case-only renames (normWS preserves case, unlike the statement
-// norm) — does. Folded at the single region-hash site in fullHash (engine.go).
+// There is ONE design-region hash, over whitespace-collapse-only normalization (adr-region-hash-ws). Pure reformatting, such as gofmt or indent churn, never reopens a design. ANY content edit does, including comments, which are design content, and case-only renames, since normWS preserves case unlike the statement norm. It folds at the single region-hash site in fullHash (engine.go).
 func normWS(s string) string { return strings.TrimSpace(wsRe.ReplaceAllString(s, " ")) }
 
 // enddesign
 
 // design: go-strict-load  implements: req-structural-strictness.1, req-structural-strictness.2
-// Strictness at EVERY graph load (adr-strict-load). A first-line '---' fence marks a node candidate
-// (evidence docs' mid-document hrules are excluded naturally); iteration.md is its own breadcrumb
-// key class. Malformed lines, keys outside the complete allowlist, duplicate
-// ids, unterminated fences, and dangling references — every declared edge field, checked against the
-// full recognized id set, both directions of the trace — are collected as BATCHED issues naming file
-// and key. LoadAll refuses the graph with nonzero exit rather than compute a silently-shrunk suspect
-// cone; `note` loads no graph and stays available mid-repair. The gather lane stays format-promiscuous.
+// Strictness applies at EVERY graph load (adr-strict-load). A first-line '---' fence marks a node candidate; evidence docs' mid-document hrules are excluded naturally. iteration.md is its own breadcrumb key class. Malformed lines, keys outside the complete allowlist, duplicate ids, unterminated fences, and dangling references are all collected as BATCHED issues naming file and key. Dangling references cover every declared edge field, checked against the full recognized id set, both directions of the trace. LoadAll refuses the graph with nonzero exit, rather than compute a silently-shrunk suspect cone. `note` loads no graph and stays available mid-repair. The gather lane stays format-promiscuous.
 var nodeKeysAllow = map[string]bool{
 	"id": true, "type": true, "statement": true, "class": true, "verify": true, "killer": true,
 	"milestone": true, "parent": true, "depends_on": true, "refines": true, "implements": true,
@@ -83,15 +74,7 @@ var refFields = map[string]bool{
 }
 
 // design: go-sub-addressing  implements: req-trace-clustered
-// A clustered requirement carries NUMBERED shall-statements (req-x.2,
-// adr-cluster-numbered-statements). An edge may target the number; the graph
-// resolves it against the base node (req-x). ONE helper strips the trailing .N.
-// It applies at exactly three resolution points — the strict referee's dangling
-// checks (here and connectionIssues), the lane merge (applyConnEdges), and the
-// trace graph's edge builder (traceEdges; code-scanned design markers keep raw
-// suffixed targets, so the graph resolves them itself) — and ONLY when the raw
-// id resolves nowhere, so a literal dotted node id still wins. Downstream
-// lookups (parents, fullHash, the coverage walks) then see plain ids.
+// A clustered requirement carries NUMBERED shall-statements (req-x.2, adr-cluster-numbered-statements). An edge may target the number, and the graph resolves it against the base node (req-x). ONE helper strips the trailing .N. It applies at exactly three resolution points: the strict referee's dangling checks, here and in connectionIssues, the lane merge (applyConnEdges), and the trace graph's edge builder (traceEdges). Code-scanned design markers keep raw suffixed targets, so the graph resolves them itself. It applies ONLY when the raw id resolves nowhere, so a literal dotted node id still wins. Downstream lookups, such as parents, fullHash, and the coverage walks, then see plain ids.
 func subAddrBase(ref string) string {
 	i := strings.LastIndex(ref, ".")
 	if i <= 0 || i == len(ref)-1 {
@@ -326,12 +309,7 @@ func strictGuard() {
 // enddesign
 
 // design: go-actor-channels  implements: req-actor-channels
-// The bless actor defaults per CHANNEL (adr-actor-channel-stat): an interactive console (BOTH stdin
-// and stdout are char-devices — this harness proves stdin alone lies) defaults to the user; any
-// piped / harness-invoked channel defaults to agent, so omission under-claims adjudicator oversight
-// (the harmless direction). An explicit `--by <actor>` overrides either, normalized through
-// normActor so new records always write `user` (go-stamp-user). QUACK_ACTOR is retired — env state
-// stamped agent blesses as the user when forgotten, blinding the self-cert metric.
+// The bless actor defaults per CHANNEL (adr-actor-channel-stat). An interactive console, where BOTH stdin and stdout are char-devices, since this harness proves stdin alone lies, defaults to the user. Any piped or harness-invoked channel defaults to agent, so omission under-claims adjudicator oversight, the harmless direction. An explicit `--by <actor>` overrides either, normalized through normActor so new records always write `user` (go-stamp-user). QUACK_ACTOR is retired, since env state stamped agent blesses as the user when forgotten, blinding the self-cert metric.
 func resolveActor(args []string, interactive bool) string {
 	for i := 0; i < len(args)-1; i++ {
 		if args[i] == "--by" {
@@ -356,14 +334,7 @@ func normActor(a string) string {
 // enddesign
 
 // design: go-kernel-selftest  implements: req-kernel-selftest
-// The trust kernel proves itself from BAKED deterministic corpora inside the shipped selftest
-// (adr-kernel-corpus) — never `go test` (Windows flags fresh test binaries), never unseeded
-// randomness. Golden vectors pin the hash primitives; reopenedSet gives the suspect-cone batteries
-// their exact-set oracle (fullHash folds transitively, so a changed upstream reopens precisely its
-// blessed descendants); verifyAttestChain makes the attest prev_hash chain load-bearing (per-check:
-// first bless anchors at null — the migrated anchor — and every later bless must back-point to its
-// predecessor's hash, so a rewritten or forged middle event is detected); xorshift64* is a hand-rolled
-// PRNG whose stream WE own across Go versions, for the fixed-seed property DAGs.
+// The trust kernel proves itself from BAKED deterministic corpora inside the shipped selftest (adr-kernel-corpus). It never runs `go test` (Windows flags fresh test binaries), and never uses unseeded randomness. Golden vectors pin the hash primitives. reopenedSet gives the suspect-cone batteries their exact-set oracle: fullHash folds transitively, so a changed upstream reopens precisely its blessed descendants. verifyAttestChain makes the attest prev_hash chain load-bearing. Per check, the first bless anchors at null (the migrated anchor). Every later bless must back-point to its predecessor's hash, so a rewritten or forged middle event is detected. xorshift64* is a hand-rolled PRNG whose stream WE own across Go versions, for the fixed-seed property DAGs.
 var kernelVectors = []struct{ In, H12 string }{
 	{"quack", "82d928273d06"},
 	{"hello world", "b94d27b9934d"},
@@ -423,12 +394,7 @@ func xorshift(seed uint64) func() uint64 {
 // enddesign
 
 // design: go-logs-dir  implements: req-logs-out-of-repo
-// The engine owns canonical log-dir resolution (adr-logs-user-dir): session/research logs live in a
-// STABLE user-scoped data dir — %LOCALAPPDATA%\quackitect\logs\<slug> on Windows, $XDG_DATA_HOME
-// (default ~/.local/share)/quackitect/logs/<slug> elsewhere — never in the repo (bloat + foreign
-// personal data) and never in a temp dir (OS-purged; these are durable, cross-project-searchable).
-// slug = workspace dir name + h12(abs path) prefix (readable AND collision-proof). A config.toml
-// `logs_dir = "..."` override wins verbatim. Surfaced via `quack version`.
+// The engine owns canonical log-dir resolution (adr-logs-user-dir). Session and research logs live in a STABLE user-scoped data dir: %LOCALAPPDATA%\quackitect\logs\<slug> on Windows, or $XDG_DATA_HOME (default ~/.local/share)/quackitect/logs/<slug> elsewhere. They never live in the repo (bloat plus foreign personal data), and never in a temp dir (OS-purged; these are durable and cross-project-searchable). slug = workspace dir name + h12(abs path) prefix, readable AND collision-proof. A config.toml `logs_dir = "..."` override wins verbatim. It is surfaced via `quack version`.
 func logsDir(cfg Config) string {
 	if cfg.LogsDir != "" {
 		return cfg.LogsDir
@@ -442,13 +408,7 @@ func logsDir(cfg Config) string {
 // enddesign
 
 // design: go-ears-lint  implements: req-ears-authoring.1
-// EARS enforcement over EVERY requirement. There is no anonymous forward-only baseline
-// (adr-grandfathers-historical): each historical non-EARS statement carries an explicit
-// `ears: exempt - <reason citing its ADR>` marker, so blessed history stays unflaggable by
-// RECORD, not by a silent set-membership file. A checked statement must match one of the five
-// EARS shapes and contain "shall"; blocklisted weasel words are flagged; `ears: exempt - <reason>`
-// skips the check and is COUNTED, while a bare exempt without a reason is itself a finding.
-// Applies to type:requirement at systematic rigor (gated at the lint call site).
+// EARS enforcement applies over EVERY requirement. There is no anonymous forward-only baseline (adr-grandfathers-historical). Each historical non-EARS statement carries an explicit `ears: exempt - <reason citing its ADR>` marker, so blessed history stays unflaggable by RECORD, not by a silent set-membership file. A checked statement must match one of the five EARS shapes and contain "shall". Blocklisted weasel words are flagged. `ears: exempt - <reason>` skips the check and is COUNTED, while a bare exempt without a reason is itself a finding. This applies to type:requirement at systematic rigor, gated at the lint call site.
 var earsPrefixes = []string{"the ", "when ", "while ", "if ", "where "}
 
 // weaselWords is the compiled FALLBACK only. The living list is config
@@ -531,12 +491,7 @@ func earsFindings(nodes map[string]Node) ([]string, int) {
 // enddesign
 
 // design: go-monotonic-lint  implements: req-structural-strictness.3
-// Milestone-monotonic wiring, enforced mechanically (the escape class: build steps ready
-// before their prior gate). Every task in milestone n≥2 must reach the SAME iteration's milestone-(n-1)
-// gate through its transitive depends_on chain — else `next` could schedule a later milestone ahead
-// of an unblessed gate. Composer discipline stays in engage.md; this makes the engine catch the miss.
-// FORWARD-ONLY like the EARS lint: iterations before monotonicSince are
-// grandfathered — rewiring blessed history would mass-suspect gates for zero new safety.
+// Milestone-monotonic wiring is enforced mechanically (the escape class: build steps ready before their prior gate). Every task in milestone n≥2 must reach the SAME iteration's milestone-(n-1) gate through its transitive depends_on chain. Otherwise `next` could schedule a later milestone ahead of an unblessed gate. Composer discipline stays in engage.md; this makes the engine catch the miss. It is FORWARD-ONLY, like the EARS lint. Iterations before monotonicSince are grandfathered, since rewiring blessed history would mass-suspect gates for zero new safety.
 const monotonicSince = "i0003"
 
 func monotonicFindings(nodes map[string]Node) []string {

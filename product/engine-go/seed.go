@@ -1,14 +1,7 @@
 package main
 
 // design: go-seed-skeleton  implements: req-seed-skeleton
-// quack start seeds the rigor checklist SKELETON by parsing the rigor source at seed
-// time (adr-seed-from-rigor-source): one gate per milestone plus its subtask items,
-// ids namespaced by the iteration tag, milestone-monotonic wiring (subtasks depend on
-// the prior gate, the gate on its subtasks plus the prior gate), and the template
-// wording as the statement pre-fill for the composer to tailor - seeding proposes,
-// the composer vetoes (req-seed-skeleton.3). Parse-at-seed keeps the checklist the
-// single source of truth: no baked copy exists to drift (raid-seeding-drift). An
-// existing tasks/ dir is never clobbered; a rigor with no checklist seeds nothing.
+// quack start seeds the rigor checklist SKELETON by parsing the rigor source at seed time (adr-seed-from-rigor-source). It creates one gate per milestone plus its subtask items, with ids namespaced by the iteration tag. It applies milestone-monotonic wiring: subtasks depend on the prior gate, and the gate depends on its subtasks plus the prior gate. It uses the template wording as the statement pre-fill for the composer to tailor. Seeding proposes, and the composer vetoes (req-seed-skeleton.3). Parse-at-seed keeps the checklist the single source of truth. No baked copy exists to drift (raid-seeding-drift). An existing tasks/ dir is never clobbered. A rigor with no checklist seeds nothing.
 
 import (
 	"fmt"

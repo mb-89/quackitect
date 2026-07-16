@@ -180,3 +180,12 @@
 {"src":"adr-vehicle-se-doc","dst":"req-vehicle-module-setup"}
 {"src":"adr-module-views","dst":"model-module-architecture"}
 {"src":"adr-module-views","dst":"req-module-registry"}
+{"src":"adr-mcp-supervisor","dst":"req-mcp-reload"}
+{"src":"adr-query-in-engine","dst":"req-query"}
+{"src":"adr-voice-ratchet","dst":"req-voice-zero"}
+{"src":"adr-i24-views","dst":"model-agent-lanes"}
+{"src":"adr-i24-views","dst":"model-reload-sequence"}
+{"src":"bud-binary-size","dst":"req-binary-budget"}
+{"src":"bud-cold-start","dst":"req-binary-budget"}
+{"src":"adr-i24-views","dst":"req-mcp-reload"}
+{"src":"adr-i24-views","dst":"req-query"}

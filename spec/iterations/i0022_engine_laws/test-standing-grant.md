@@ -1,7 +1,7 @@
 ---
 id: test-standing-grant
 type: test
-statement: A recorded grant carries scope and expiry; an in-scope agent bless stamps the grant id; an uncovered agent bless on a killer is refused; an agent-channel grant open is refused; the close presents the collection.
+statement: A recorded grant carries scope and expiry. An in-scope agent bless stamps the grant id. An uncovered agent bless on a killer is refused. An agent-channel grant open is refused. The close presents the collection.
 class: executed
 verify: selftest:standing-grant
 killer: false

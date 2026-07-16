@@ -3,7 +3,7 @@ id: adr-element-major-format
 decided_in: i0016_structural_models
 type: adr
 adjudicated_by: user
-statement: A structural model declares its elements first, one per line with layer attribute and responsibility, then flows on declared names - carried in a lint-pinned Mermaid subset; elements are allocated ahead of code and join realized design regions by marker id; coordinates are refused and layout derives.
+statement: A structural model declares its elements first, one per line with layer attribute and responsibility, then flows on declared names. This rides a lint-pinned Mermaid subset. Elements are allocated ahead of code and join realized design regions by marker id. Coordinates are refused, and layout derives.
 class: review
 killer: false
 ---

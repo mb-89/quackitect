@@ -1,7 +1,7 @@
 ---
 id: req-runme-orientation
 type: requirement
-statement: The RUNME scripts shall install and verify the toolchain and print orientation, and shall create no project - the numbered statements bind individually.
+statement: The RUNME scripts shall install and verify the toolchain and print orientation. They shall create no project. The numbered statements bind individually.
 class: review
 killer: false
 ---

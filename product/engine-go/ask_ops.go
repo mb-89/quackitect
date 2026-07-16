@@ -37,11 +37,7 @@ func loadAskStore() *AskStore {
 }
 
 // design: go-ask-hardening  implements: req-ask-hardening
-// Hardening the ask loop: every save MERGES with the on-disk store instead of
-// clobbering a concurrent writer (union by ask id, the newest state-change stamp wins,
-// swapped in atomically via temp+rename); `await` reloads the store from disk on every
-// loop pass and exits cleanly when nothing pends anymore; an answer stamped BEFORE its
-// ask's creation belongs to a previous ask generation and is refused at apply time.
+// Hardening the ask loop: every save MERGES with the on-disk store instead of clobbering a concurrent writer. This is a union by ask id, where the newest state-change stamp wins, swapped in atomically via temp plus rename. `await` reloads the store from disk on every loop pass and exits cleanly when nothing pends anymore. An answer stamped BEFORE its ask's creation belongs to a previous ask generation and is refused at apply time.
 
 // askStampOf is an ask's freshness for the merge: the last state-change stamp,
 // falling back to the creation stamp for pre-hardening records.

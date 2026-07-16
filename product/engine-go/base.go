@@ -1,25 +1,7 @@
 package main
 
 // design: go-base-eval  implements: req-base-view-queries.1
-// The pinned-subset Obsidian-Bases evaluator. The authoring surface is standard Bases YAML
-// (obsidian.md/help/bases/syntax) so the owner previews queries live in Obsidian; the engine
-// is the authoritative evaluator. The subset is PINNED and fails loudly: top-level keys
-// filters/views only; view type table only; filter trees of and/or/not over expression
-// strings; comparisons, boolean operators, property refs (bare, note.x, file.name, one-level
-// map entries), the file predicates hasLink/inFolder/hasTag, and <list>.contains(). order,
-// sort (property+direction, id tie-break), limit, groupBy (multi-valued properties fan out,
-// count per group). Volatile functions (now, today) refuse by name - byte-identical
-// regeneration is the contract (req-book-trust.2). Everything else: "out-of-subset" error
-// naming the construct. Growth only on template demand.
-// The view key
-// `render: full` renders results as full sections (statement + body) instead of a table -
-// Obsidian ignores the unknown key and previews the same rows as a plain table (the
-// understandable fallback). The bare property `referenced` is the pull law as a predicate:
-// true iff the emitter's link graph marks the item used. It exists ONLY where the emitter
-// injects that graph (EvalBaseUsed); anywhere else it refuses loudly. In Obsidian the
-// property is absent, so `referenced != false` previews the SUPERSET (all rows) - the book
-// stays the truth. A sort entry on the groupBy property orders the GROUPS (DESC puts
-// normative before informative, ISO clause-2 style).
+// This is the pinned-subset Obsidian-Bases evaluator. The authoring surface is standard Bases YAML (obsidian.md/help/bases/syntax), so the owner previews queries live in Obsidian, while the engine is the authoritative evaluator. The subset is PINNED and fails loudly. Top-level keys are filters and views only. View type is table only. Filter trees use and/or/not over expression strings. Supported are comparisons, boolean operators, property refs (bare, note.x, file.name, one-level map entries), the file predicates hasLink/inFolder/hasTag, and <list>.contains(). Also supported are order, sort (property plus direction, id tie-break), limit, and groupBy, where multi-valued properties fan out and count per group. Volatile functions, now and today, refuse by name, since byte-identical regeneration is the contract (req-book-trust.2). Everything else gets an "out-of-subset" error naming the construct. Growth happens only on template demand. The view key `render: full` renders results as full sections, statement plus body, instead of a table. Obsidian ignores the unknown key and previews the same rows as a plain table, the understandable fallback. The bare property `referenced` is the pull law as a predicate: true if and only if the emitter's link graph marks the item used. It exists ONLY where the emitter injects that graph (EvalBaseUsed); anywhere else it refuses loudly. In Obsidian the property is absent, so `referenced != false` previews the SUPERSET, all rows, and the book stays the truth. A sort entry on the groupBy property orders the GROUPS: DESC puts normative before informative, ISO clause-2 style.
 
 import (
 	"fmt"
@@ -637,11 +619,7 @@ func (bp *baseParser) hasLink(target string) bool {
 // enddesign
 
 // design: go-virtual-edges  implements: req-connections-lanes.9
-// Edge properties resolve from the GRAPH when the file lacks them: after migration the
-// frontmatter no longer carries verifies/refines/..., but the loader reconstructed the
-// adjacency - so a query sees exactly what frontmatter storage showed. Obsidian previews
-// of edge-driven views go empty post-migration (the named, owner-accepted cost); the
-// book is the truth.
+// Edge properties resolve from the GRAPH when the file lacks them. After migration the frontmatter no longer carries verifies, refines, and similar keys, but the loader reconstructed the adjacency. So a query sees exactly what frontmatter storage showed. Obsidian previews of edge-driven views go empty post-migration, the named, owner-accepted cost. The book is the truth.
 func (bp *baseParser) edgeList(prop string) []string {
 	if l, ok := bp.ctx.p.lists[prop]; ok && len(l) > 0 {
 		return l

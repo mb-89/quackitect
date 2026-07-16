@@ -1,7 +1,7 @@
 ---
 id: test-terms-before-use
 type: test
-statement: On a fixture book with a term used ahead of its glossary definition, the lint flags the term with both locations in the advisory class; a book with definitions ahead of every use passes; the term set follows the glossary with no second list.
+statement: On a fixture book with a term used ahead of its glossary definition, the lint flags the term with both locations in the advisory class. A book with definitions ahead of every use passes. The term set follows the glossary with no second list.
 class: executed
 verify: selftest:terms-before-use
 killer: false

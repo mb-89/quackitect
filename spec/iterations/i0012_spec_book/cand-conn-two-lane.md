@@ -8,7 +8,7 @@ ratings:
   bloat: 0.9
   uniformity: 0.8
   prose: 1
-statement: Two lanes per kind - edges.jsonl for trivial edges, con- notes for prose-bearing ones; one edge one lane; the adjacency determinizer merges.
+statement: Two lanes per kind: edges.jsonl for trivial edges, con- notes for prose-bearing ones. One edge lives in one lane. The adjacency determinizer merges them.
 class: review
 killer: false
 ---

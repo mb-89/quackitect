@@ -1,7 +1,7 @@
 ---
 id: uc-white-label-book
 type: usecase
-statement: An organization reader opens the book a VEHICLE rendered and reads it as the vehicle's own document - the vehicle's name and brand throughout, the same structure and method content, with quackitect credited as the engine rather than presented as the identity.
+statement: An organization reader opens the book a VEHICLE rendered and reads it as the vehicle's own document. It carries the vehicle's name and brand throughout, the same structure and method content, with quackitect credited as the engine rather than presented as the identity.
 class: domain
 killer: false
 ---

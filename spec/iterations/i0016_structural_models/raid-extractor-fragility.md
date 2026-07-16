@@ -7,7 +7,7 @@ impact: 0.5
 mitigation: TODO
 owner: TODO
 status: open
-statement: Risk: the excalidraw file format evolves and breaks the extractor - mitigation is the constrained drawing contract plus the format admission tests.
+statement: Risk: the excalidraw file format evolves and breaks the extractor. Mitigation is the constrained drawing contract plus the format admission tests.
 class: review
 killer: false
 ---

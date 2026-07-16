@@ -1,7 +1,7 @@
 ---
 id: req-apply-general
 type: requirement
-statement: The apply lane shall generalize beyond byte-exact replacement - create, write, replace, one audit trail, dry-run-first and all-or-nothing throughout - the numbered statements bind individually.
+statement: The apply lane shall generalize beyond byte-exact replacement: create, write, replace, one audit trail, dry-run-first and all-or-nothing throughout. The numbered statements bind individually.
 class: review
 killer: false
 ---

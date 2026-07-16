@@ -1,7 +1,7 @@
 ---
 id: req-terms-before-use
 type: requirement
-statement: When the rendered book uses a load-bearing term ahead of its definition, quack lint shall flag the use as a finding naming the term and both locations - the numbered statements bind individually.
+statement: When the rendered book uses a load-bearing term ahead of its definition, quack lint shall flag the use as a finding naming the term and both locations. The numbered statements bind individually.
 class: review
 killer: false
 ---

@@ -1,7 +1,7 @@
 ---
 id: req-details-context
 type: requirement
-statement: The book shall answer a clicked reference in the always-visible details pane - the numbered statements bind individually.
+statement: The book shall answer a clicked reference in the always-visible details pane. The numbered statements bind individually.
 class: review
 killer: false
 ---

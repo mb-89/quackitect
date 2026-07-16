@@ -43,9 +43,7 @@ var i12Tests = []namedTest{
 // i0012 spec-book test hooks.
 
 // design: go-ai-marks  implements: req-ai-provenance.1, req-lint-classification.1
-// The mechanical half of the drafting rule: the mark syntax (`<!-- ai:N -->`, N 0..3, own line
-// above the paragraph) and the refusal predicate - a prose unit without a mark has NO path into
-// the book. ai:0 is explicit pure-human, so "unmarked" never means anything.
+// This is the mechanical half of the drafting rule: the mark syntax (`<!-- ai:N -->`, N 0..3, own line above the paragraph) and the refusal predicate. A prose unit without a mark has NO path into the book. ai:0 is explicit pure-human, so "unmarked" never means anything.
 var aiMarkRe = regexp.MustCompile(`^\s*<!--\s*ai:([0-3])\s*-->\s*$`)
 
 // parseAIMark returns the involvement value of a mark line, or -1 when the line is no mark.
@@ -153,10 +151,7 @@ func selftestAiDrafting() bool {
 }
 
 // design: go-guidance-split  implements: req-reader-structure.2
-// Audience prose apart from internals: internals live as guidance docs (method/guidance/<slug>.md);
-// a content node points at its internals through the `guidance:` frontmatter tag; the tag must
-// RESOLVE (a dangling guidance pointer is a failure); the book renders guidance only in the
-// agent-guide chapter (the emitter's quarantine, guarded by meta-quarantine).
+// Audience prose stays apart from internals. Internals live as guidance docs (method/guidance/<slug>.md). A content node points at its internals through the `guidance:` frontmatter tag. The tag must RESOLVE, since a dangling guidance pointer is a failure. The book renders guidance only in the agent-guide chapter, the emitter's quarantine, guarded by meta-quarantine.
 func guidanceDocPath(slug string) string {
 	return filepath.Join(EngineDir(), "method", "guidance", slug+".md")
 }
@@ -164,10 +159,7 @@ func guidanceDocPath(slug string) string {
 // enddesign
 
 // design: go-type-stakeholders  implements: req-derived-boards.4
-// Stakeholder classes are one-note-per-class (project_types/classes/); each project TYPE links the
-// classes it adds (markdown links - the lower bound); the project's class set derives as default's
-// set plus the union over its ITERATIONS' types. Never a stored flag: a doc-only iteration cannot
-// flip the project. cyber_physical links both parent sets - union by links, no duplication.
+// Stakeholder classes are one-note-per-class (project_types/classes/). Each project TYPE links the classes it adds, markdown links, the lower bound. The project's class set derives as default's set plus the union over its ITERATIONS' types. It is never a stored flag, so a doc-only iteration cannot flip the project. cyber_physical links both parent sets: union by links, no duplication.
 var classLinkRe = regexp.MustCompile(`\]\(([^)]*classes/([a-z0-9-]+)\.md)\)`)
 
 func typeFilePath(t string) string {
@@ -348,7 +340,9 @@ func selftestBookIdentity() bool {
 	fx := bookFixture(dir, 1, true)
 	html, _, _ := renderBookHTML(fx)
 	cfg := readProjectConfig()
-	return strings.Contains(html, MerkleRoot(fx)) && strings.Contains(html, cfg.Version) && strings.Contains(html, version)
+	// the identity stamp is the WORKSPACE root since i24 (go-root-content): the node
+	// merkle plus the content pairs - the same root parity and golden enforce
+	return strings.Contains(html, workspaceRoot(fx)) && strings.Contains(html, cfg.Version) && strings.Contains(html, version)
 }
 
 // test-llm-digestible -> selftest:llm-digestible

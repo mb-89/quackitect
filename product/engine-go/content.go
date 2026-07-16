@@ -1,14 +1,7 @@
 package main
 
 // design: go-spec-content  implements: req-project-content-roots.2
-// Content notes are PROJECT content, not method machinery:
-// glossary terms, reference notes, fundamentals, and method notes live under the
-// workspace spec - spec/glossary, spec/references, spec/fundamentals, spec/methods -
-// for every project including quackitect itself. They are NOT trace nodes: the strict
-// guard, LoadAll, and scanIDs skip these directories; dedicated loaders read them.
-// Every kind carries Obsidian-native aliases (the auto-link pass and Obsidian's own
-// autocomplete share them). The method layer keeps everything else and stays inherited
-// by driven workspaces unchanged.
+// Content notes are PROJECT content, not method machinery. Glossary terms, reference notes, fundamentals, and method notes live under the workspace spec: spec/glossary, spec/references, spec/fundamentals, spec/methods. This holds for every project, including quackitect itself. They are NOT trace nodes. The strict guard, LoadAll, and scanIDs skip these directories, and dedicated loaders read them. Every kind carries Obsidian-native aliases; the auto-link pass and Obsidian's own autocomplete share them. The method layer keeps everything else and stays inherited by driven workspaces unchanged.
 
 import (
 	"os"

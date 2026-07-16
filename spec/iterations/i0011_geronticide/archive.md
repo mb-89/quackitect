@@ -12,7 +12,7 @@ Kill the grandfathers and the small lies: parity out of the verification suites,
 ---
 id: req-evidence-ledger
 type: requirement
-statement: The engine shall fold evidence docs into check hashes and cap each check's stored verdicts - the numbered statements bind individually.
+statement: The engine shall fold evidence docs into check hashes and cap each check's stored verdicts. The numbered statements bind individually.
 class: review
 killer: false
 ---
@@ -24,7 +24,7 @@ killer: false
 id: req-legacy-decided
 ears: exempt - historical pre-EARS statement, retire-or-retrofit recorded (adr-grandfathers-historical)
 type: requirement
-statement: No grandfathered legacy shall survive undecided - exemptions carry recorded markers and decisions, and retired lanes stay retired - the numbered statements bind individually.
+statement: No grandfathered legacy shall survive undecided. Exemptions carry recorded markers and decisions. Retired lanes stay retired. The numbered statements bind individually.
 class: review
 killer: false
 ---
@@ -64,7 +64,7 @@ TODO
 ---
 id: req-suspicion-attribution
 type: requirement
-statement: The readouts shall attribute suspicion precisely - a propagated check names its root and the pager scopes to the check in hand - the numbered statements bind individually.
+statement: The readouts shall attribute suspicion precisely. A propagated check names its root, and the pager scopes to the check in hand. The numbered statements bind individually.
 class: review
 killer: false
 ---
@@ -346,7 +346,7 @@ killer: false
 ---
 id: test-legacy-decided
 type: test
-statement: No grandfathered legacy survives undecided - exemptions carry recorded markers and retired lanes stay retired.
+statement: No grandfathered legacy survives undecided. Exemptions carry recorded markers, and retired lanes stay retired.
 class: executed
 verify: selftest:grandfathers-decided legacy-lanes-retired testsred-exempt
 tests_red: exempt - clustered at i17; the birth reds stand in the ledger under the origin ids (adr-cluster-numbered-statements)
@@ -382,7 +382,7 @@ TODO
 ---
 id: test-suspicion-attribution
 type: test
-statement: Suspicion is attributed precisely - a propagated check names its root and the pager scopes to the check in hand.
+statement: Suspicion is attributed precisely. A propagated check names its root, and the pager scopes to the check in hand.
 class: executed
 verify: selftest:pager-scope suspect-root
 tests_red: exempt - clustered at i17; the birth reds stand in the ledger under the origin ids (adr-cluster-numbered-statements)

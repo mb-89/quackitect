@@ -1,7 +1,7 @@
 ---
 id: req-ask-loop
 type: requirement
-statement: The engine shall run the ask loop - each ask rendered, dispatched, distinctly gated, resolved exactly once, and recorded with its actor - the numbered statements bind individually.
+statement: The engine shall run the ask loop. Each ask is rendered, dispatched, distinctly gated, resolved exactly once, and recorded with its actor. The numbered statements bind individually.
 class: review
 killer: false
 ---

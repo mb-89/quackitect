@@ -1,7 +1,7 @@
 ---
 id: uc-connections
 type: usecase
-statement: The owner models relations between items as first-class connections - typed, queryable, prose-bearing where human-facing - stored in one connections home and maintained by determinizers.
+statement: The owner models relations between items as first-class connections: typed, queryable, prose-bearing where human-facing. These are stored in one connections home and maintained by determinizers.
 class: review
 killer: false
 ---

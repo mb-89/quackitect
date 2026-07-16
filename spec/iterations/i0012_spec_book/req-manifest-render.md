@@ -1,7 +1,7 @@
 ---
 id: req-manifest-render
 type: requirement
-statement: The engine shall render every document from manifest nodes - transcluded units at derived depth, deck mode, auto-linked prose, emitted entry files - the numbered statements bind individually.
+statement: The engine shall render every document from manifest nodes: transcluded units at derived depth, deck mode, auto-linked prose, emitted entry files. The numbered statements bind individually.
 class: review
 killer: false
 ---

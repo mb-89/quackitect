@@ -1,7 +1,7 @@
 ---
 id: uc-work-register
 type: usecase
-statement: The user works the hand-off page instead of authoring forms - decisions arrive as proposals with defaults, bless accepts, reopen dissents - so a filling session is vetoing proposals, never writing into blanks.
+statement: The user works the hand-off page instead of authoring forms. Decisions arrive as proposals with defaults: bless accepts, reopen dissents. A filling session is vetoing proposals, never writing into blanks.
 class: domain
 killer: true
 ---

@@ -1,7 +1,7 @@
 ---
 id: test-defer-excludes-coverage
 type: test
-statement: A requirement a defer or veto decision scrap-addresses owes nothing to the coverage rules until its ready_when - no design, no test, no trace hole.
+statement: A requirement a defer or veto decision scrap-addresses owes nothing to the coverage rules until its ready_when: no design, no test, no trace hole.
 class: executed
 verify: selftest:defer-excludes-coverage
 killer: false

@@ -14,13 +14,7 @@ import (
 )
 
 // design: go-verdict-cache  implements: req-verdict-machinery.1, req-verdict-machinery.3, req-responsive-status
-// One JSON verdict map in the data home (adr-verdict-cache): test id -> {input hash, build id,
-// result, ms}. The build identity is the sha256 self-hash of the running binary
-// (adr-build-identity) — a rebuild always invalidates; a forgotten version bump cannot lie. The
-// evaluators (the tests-pass battery and gateState's selftest checks) consult the map through
-// runSelftestCached and re-run ONLY on a miss: an edited input or a new build. Verdicts of both
-// colors are recorded — determinism makes a red verdict as cacheable as a green one. Spike-proven
-// (M5): this key discipline cannot serve a stale verdict.
+// There is one JSON verdict map in the data home (adr-verdict-cache): test id maps to {input hash, build id, result, ms}. The build identity is the sha256 self-hash of the running binary (adr-build-identity). A rebuild always invalidates, so a forgotten version bump cannot lie. The evaluators, the tests-pass battery and gateState's selftest checks, consult the map through runSelftestCached and re-run ONLY on a miss: an edited input or a new build. Verdicts of both colors are recorded, since determinism makes a red verdict as cacheable as a green one. Spike-proven at M5: this key discipline cannot serve a stale verdict.
 
 type verdictRec struct {
 	Input  string `json:"input"`
@@ -130,9 +124,7 @@ func runSelftestCached(id, name, input string) bool {
 // enddesign
 
 // design: go-verify-feedback  implements: req-verdict-machinery.2
-// A re-running battery announces itself once on stderr BEFORE the first test, and names each test
-// that runs longer than one second (responsiveness guide: visible feedback within a second). A
-// fully cached run stays silent — silence means nothing ran. feedbackW is the selftest seam.
+// A re-running battery announces itself once on stderr BEFORE the first test. It names each test that runs longer than one second, the responsiveness guide: visible feedback within a second. A fully cached run stays silent; silence means nothing ran. feedbackW is the selftest seam.
 var (
 	feedbackW      io.Writer = os.Stderr
 	rerunAnnounced bool
@@ -155,10 +147,7 @@ func announceSlow(id string, d time.Duration) {
 // enddesign
 
 // design: go-why-derived  implements: req-verdict-machinery.4
-// `why` on a coverage-verified check names the RULE, its computed answer over the check's scope,
-// and the DELTA: exactly which counted inputs fail it. The delta collector mirrors each rule's
-// evaluation but gathers offenders instead of failing fast. tests-pass consults ONLY the verdict
-// cache (a miss reads "unverified at this build") — asking why never triggers a battery.
+// `why` on a coverage-verified check names the RULE, its computed answer over the check's scope, and the DELTA: exactly which counted inputs fail it. The delta collector mirrors each rule's evaluation but gathers offenders instead of failing fast. tests-pass consults ONLY the verdict cache; a miss reads "unverified at this build". Asking why never triggers a battery.
 func whyCoverage(nodes map[string]Node, rule, scope string) []string {
 	verdictTag := "computes TRUE"
 	if !coverageRule(nodes, rule, scope) {
@@ -247,7 +236,7 @@ func coverageDelta(nodes map[string]Node, rule, scope string) []string {
 					out = append(out, "requirement "+n.ID+" has no design")
 				}
 				for _, d := range regionless[n.ID] {
-					out = append(out, "design "+d+" (for "+n.ID+") has no realized code region")
+					out = append(out, emptyRegionDelta(d)+" (implements "+n.ID+")")
 				}
 			}
 		case "tests-red":
@@ -281,10 +270,7 @@ func coverageDelta(nodes map[string]Node, rule, scope string) []string {
 // enddesign
 
 // design: go-notes-list  implements: req-notes-list
-// `quack notes [--all]` is the READ lane beside the `note` capture lane: it prints the notes
-// location and each open inbox note with id, age, and first body line; --all adds backlog and
-// archive. Read-only — nothing is created, moved, or deleted. Exists because the data home
-// makes the inbox invisible from the repo (uc-notes-visible).
+// `quack notes [--all]` is the READ lane beside the `note` capture lane. It prints the notes location and each open inbox note with id, age, and first body line. --all adds backlog and archive. It is read-only; nothing is created, moved, or deleted. It exists because the data home makes the inbox invisible from the repo (uc-notes-visible).
 var notesHomeOverride string // selftest seam
 
 func notesHomeDir() string {
@@ -370,11 +356,7 @@ func cmdNotes(args []string) {
 // enddesign
 
 // design: go-call-log  implements: req-call-log
-// One redacted JSONL line per dispatch into <logs home>/calls.jsonl (adr-call-log): ts, command,
-// args, duration ms, exit code, channel. Secret VALUES never land at rest: --key/--answer values,
-// grant codes, and session keys are replaced by REDACTED at capture time. Exit paths funnel
-// through quackExit so the line carries the real exit code; the retro (review.md)
-// aggregates the file, then deletes it — retention is retro-bound, no rotation machinery.
+// One redacted JSONL line per dispatch lands in <logs home>/calls.jsonl (adr-call-log): ts, command, args, duration ms, exit code, channel. Secret VALUES never land at rest. --key/--answer values, grant codes, and session keys are replaced by REDACTED at capture time. Exit paths funnel through quackExit so the line carries the real exit code. The retro (review.md) aggregates the file, then deletes it. Retention is retro-bound, with no rotation machinery.
 var (
 	callT0              time.Time
 	callCmd             string
@@ -455,9 +437,21 @@ func callLogWrite(exit int) {
 }
 
 // quackExit is the exit funnel: the call line lands with its REAL exit code, then the process ends.
+// design: go-mcp-errors  implements: req-mcp-reload
+// While the MCP server is serving, an exit becomes a recoverable panic: the capture layer turns
+// it into a JSON-RPC error result. A served refusal never kills the stdio transport.
+type quackExitPanic struct{ code int }
+
+var mcpServing bool
+
 func quackExit(code int) {
 	callLogWrite(code)
+	if mcpServing {
+		panic(quackExitPanic{code})
+	}
 	os.Exit(code)
 }
+
+// enddesign
 
 // enddesign

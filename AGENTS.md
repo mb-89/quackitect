@@ -48,7 +48,7 @@ quack next               # the next ready check to walk
 quack start <id> [--plan]# activate a version (--plan registers a future one)
 quack start stubs [path] # emit drive-from-inside stubs into a bare workspace (ungated: creation, not ledger)
 quack start init <path>  # scaffold a full VEHICLE: vendored engine + committed method overlay (product/<name>/method, declared in spec/project.toml)
-quack mcp                # serve the command surface as MCP tools over stdio (agent-discoverable; per-session attest)
+quack mcp                # serve the command surface as MCP tools over stdio (agent-discoverable; per-session attest). The default face is a SUPERVISOR: a staged build hot-swaps the child engine mid-session and emits list_changed; observe-red, query, and ship ride the tool surface
 quack render <model> --out <F> [--mark ids] # standalone architecture-review onion with change marks
 quack cluster <model>    # DSM structuring proposal: coupling clusters, layering, tears
 quack apply <manifest.json> [--dry] # judged bulk edits: byte-exact {file, old, new}, all-or-nothing
@@ -57,6 +57,7 @@ quack bless [--all|<id>] [--by user|agent] # record an adjudication; actor defau
 quack grant open|close|review # a recorded standing grant (scope, expiry); in-scope agent blesses stamp it; review lists the collection for confirmation
 quack migrate-actors     # one-shot: rewrite legacy actor stamps to user (audited; no-op when done)
 quack migrate-layout     # one-shot: move a legacy-layout spec to the template-mirroring layout (no-op when done)
+quack query "<expr>"     # read-only rows from the loaded graph (nodes; edge.* edges; note.* notes) - the agent's read lane, also an MCP tool
 quack note "<text>"      # deterministic capture lane
 quack note --file2list <copy.html> # list a commented book copy as note candidates (roles, never names)
 quack notes [--all]      # list open inbox notes (--all adds backlog + archive)

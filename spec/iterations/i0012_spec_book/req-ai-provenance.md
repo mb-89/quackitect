@@ -2,7 +2,7 @@
 id: req-ai-provenance
 ears: exempt - historical pre-EARS statement, retire-or-retrofit recorded (adr-grandfathers-historical)
 type: requirement
-statement: AI-drafted prose shall enter and render with provenance marks that only the user reduces - the numbered statements bind individually.
+statement: AI-drafted prose shall enter and render with provenance marks that only the user reduces. The numbered statements bind individually.
 class: review
 killer: false
 ---

@@ -2,7 +2,7 @@
 id: req-build-cheap
 ears: exempt - historical pre-EARS statement, retire-or-retrofit recorded (adr-grandfathers-historical)
 type: requirement
-statement: quack build and dispatch shall stay cheap - the compile skipped when unchanged, verdicts kept surgically, no needless child process - the numbered statements bind individually.
+statement: quack build and dispatch shall stay cheap. The compile is skipped when unchanged, verdicts are kept surgically, and no needless child process runs. The numbered statements bind individually.
 class: review
 killer: false
 ---

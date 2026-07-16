@@ -3,7 +3,7 @@
 ---
 id: adr-contract-delivery
 type: adr
-statement: Deliver the contract to the agent through the harness's NATIVE instruction channel (AGENTS.md for agents that honor it; .github/copilot-instructions.md for Copilot) carrying the rules with an active read→paraphrase→confirm imperative, single-sourced from contract.md. Deferred: an engine-time renderer that generates the entry files, and runtime engine-serve (quack contract) — until the wording is empirically shown insufficient, because a thin harness may never run the engine. Passive pointers are rejected outright (they failed on Copilot).
+statement: Deliver the contract to the agent through the harness's NATIVE instruction channel: AGENTS.md for agents that honor it, .github/copilot-instructions.md for Copilot. It carries the rules with an active read-paraphrase-confirm imperative, single-sourced from contract.md. Deferred: an engine-time renderer that generates the entry files, and runtime engine-serve (quack contract). These wait until the wording is empirically shown insufficient, because a thin harness may never run the engine. Passive pointers are rejected outright, since they failed on Copilot.
 adjudicated_by: human
 killer: false
 ---
@@ -33,7 +33,7 @@ Bless-time readout (72-col fenced progress bar + handover one-pager), conversati
 id: req-contract-delivery
 ears: exempt - historical pre-EARS statement, retire-or-retrofit recorded (adr-grandfathers-historical)
 type: requirement
-statement: Every entry surface shall deliver the contract as an active read-paraphrase-confirm imperative through each harness's native channel - the numbered statements bind individually.
+statement: Every entry surface shall deliver the contract as an active read-paraphrase-confirm imperative through each harness's native channel. The numbered statements bind individually.
 class: review
 killer: false
 ---
@@ -45,7 +45,7 @@ killer: false
 ---
 id: req-deterministic-readout
 type: requirement
-statement: The engine shall render deterministic fixed-width readouts - the progress bar and the killer handover pager - the numbered statements bind individually.
+statement: The engine shall render deterministic fixed-width readouts: the progress bar and the killer handover pager. The numbered statements bind individually.
 class: review
 killer: false
 ---
@@ -57,7 +57,7 @@ killer: false
 ---
 id: req-killer-adjudication
 type: requirement
-statement: The contract shall let the user's explicit gate-specific authorization - including a y to a presented pager - bless a killer gate - the numbered statements bind individually.
+statement: The contract shall let the user's explicit gate-specific authorization bless a killer gate. This includes a y to a presented pager. The numbered statements bind individually.
 class: review
 killer: false
 ---
@@ -68,7 +68,7 @@ killer: false
 ---
 id: req-lean-enforces-trace
 type: requirement
-statement: Lean rigor structurally enforces the trace via derived coverage checks (req-traced, req-has-test, adr-traced, designs-realized) in addition to tests-pass — so even at the lean floor the trace is gated, only the human review count is reduced. The lean checklist template carries these checks.
+statement: Lean rigor structurally enforces the trace via derived coverage checks (req-traced, req-has-test, adr-traced, designs-realized), in addition to tests-pass. Even at the lean floor, the trace stays gated. Only the human review count is reduced. The lean checklist template carries these checks.
 class: review
 killer: false
 ears: exempt - historical statement, retrofit rejected (adr-grandfathers-historical)
@@ -82,7 +82,7 @@ i0006 requirement under uc-engine-correctness.
 ---
 id: req-project-onboarding
 type: requirement
-statement: The entry surfaces shall onboard a new project conversationally from first contact into its first iteration - the numbered statements bind individually.
+statement: The entry surfaces shall onboard a new project conversationally from first contact into its first iteration. The numbered statements bind individually.
 class: review
 killer: false
 ---
@@ -341,7 +341,7 @@ i0006 test. Selftest built in M4; RED until then.
 ---
 id: test-contract-rules
 type: test
-statement: Selftest asserts the contract and entry surfaces carry the required clauses — the y=console-bless rule, the killer-bless explicit-authorization exception, the confirm-back ritual, the active read→paraphrase→confirm imperative, and the existence of .github/copilot-instructions.md single-sourced from contract.md.
+statement: Selftest asserts the contract and entry surfaces carry the required clauses. These are the y=console-bless rule, the killer-bless explicit-authorization exception, and the confirm-back ritual. It also asserts the active read→paraphrase→confirm imperative, and the existence of .github/copilot-instructions.md single-sourced from contract.md.
 class: review
 verify: selftest:contract
 killer: false
@@ -353,7 +353,7 @@ i0006 test. Selftest built in M4; RED until then.
 ---
 id: test-correctness
 type: test
-statement: Selftest asserts the lean checklist template carries the derived coverage checks (req-traced, req-has-test, adr-traced, designs-realized) so lean structurally enforces the trace. (The other correctness concerns — no trace-typed node is a gate; tests-pass uses the in-process evaluator — are already covered by i0004's selftest:no-trace-gate and selftest:tests-pass-eval.)
+statement: Selftest asserts the lean checklist template carries the derived coverage checks (req-traced, req-has-test, adr-traced, designs-realized), so lean structurally enforces the trace. Two other correctness concerns are already covered by i0004's selftest:no-trace-gate and selftest:tests-pass-eval: no trace-typed node is a gate, and tests-pass uses the in-process evaluator.
 class: review
 verify: selftest:correctness
 killer: false
@@ -365,7 +365,7 @@ i0006. Only req-lean-enforces-trace is new; the other two retro notes were alrea
 ---
 id: test-readout
 type: test
-statement: Selftest asserts the progress bar and handover one-pager render deterministically (identical bytes for identical inputs), contain the required sections (START/milestones/END; decisions/risks/readiness/bless line), and every line is <=72 columns inside a code fence.
+statement: Selftest asserts the progress bar and handover one-pager render deterministically, identical bytes for identical inputs. They contain the required sections: START/milestones/END, and decisions/risks/readiness/bless line. Every line is <=72 columns inside a code fence.
 class: review
 verify: selftest:readout
 killer: false
@@ -377,7 +377,7 @@ i0006 test. Selftest built in M4; RED until then.
 ---
 id: test-report-live
 type: test
-statement: Selftest renders the report and asserts it carries the live-reload hook (an EventSource on /__reload). Recompute-live is structural — StatusMap is called on every render, the snapshot machinery is removed.
+statement: Selftest renders the report and asserts it carries the live-reload hook (an EventSource on /__reload). Recompute-live is structural: StatusMap is called on every render, and the snapshot machinery is removed.
 class: review
 verify: selftest:report-live
 killer: false
@@ -389,7 +389,7 @@ i0006 test for the live report.
 ---
 id: uc-bless-readout
 type: usecase
-statement: When the agent adjudicates a gate it shows a deterministic at-a-glance readout. On a self-bless — a horizontal progress bar of where the iteration stands (START · milestones · END, current position marked). On handing a killer gate to the human — the bar plus a one-pager (biggest decisions, biggest risks, readiness facts, a bless recommendation), where a human "y" is taken as the bless. Blessing a killer is permitted only with the human's explicit authorization.
+statement: When the agent adjudicates a gate, it shows a deterministic at-a-glance readout. On a self-bless, it shows a horizontal progress bar of where the iteration stands (START, milestones, END, current position marked). On handing a killer gate to the human, it shows the bar plus a one-pager: biggest decisions, biggest risks, readiness facts, a bless recommendation. A human "y" is taken as the bless. Blessing a killer is permitted only with the human's explicit authorization.
 class: review
 killer: false
 ---
@@ -399,7 +399,7 @@ i0006. The bless-time readout, folded under need-engage (advancing the loop with
 ---
 id: uc-engine-correctness
 type: usecase
-statement: ISO/IEC 25010 Functional Correctness — the determinizer's own checks are internally consistent (one evaluation path for executed checks) and structurally enforce the trace at every rigor (including lean), so the ledger cannot silently mis-report.
+statement: ISO/IEC 25010 Functional Correctness: the determinizer's own checks are internally consistent, with one evaluation path for executed checks. They structurally enforce the trace at every rigor, including lean, so the ledger cannot silently mis-report.
 class: review
 killer: false
 ---
@@ -409,7 +409,7 @@ i0006. Folds the retro correctness notes (tests-pass evaluator split; trace-type
 ---
 id: uc-harness-portability
 type: usecase
-statement: ISO/IEC 25010 Portability/Compatibility — the binding method reaches the agent reliably regardless of harness. A thin harness that will not follow a file pointer (e.g. GitHub Copilot) still receives the contract through its native instruction channel with an active read→paraphrase→confirm imperative, so it can engage the loop.
+statement: ISO/IEC 25010 Portability/Compatibility: the binding method reaches the agent reliably regardless of harness. A thin harness that will not follow a file pointer (e.g. GitHub Copilot) still receives the contract through its native instruction channel, with an active read→paraphrase→confirm imperative. This lets it engage the loop.
 class: review
 killer: false
 ---
@@ -419,7 +419,7 @@ i0006. Field-driven: Opus 4.8 via Copilot could not engage the loop because AGEN
 ---
 id: uc-new-project
 type: usecase
-statement: A user says "start a new project"; the agent asks the framing questions (start an iteration? which folder? vendor the engine or drive-from-inside stubs?), scaffolds the workspace, lands in it, and immediately opens the first iteration's M1 vision interview — no manual CLI setup.
+statement: A user says "start a new project." The agent asks the framing questions: start an iteration? Which folder? Vendor the engine or drive-from-inside stubs? It scaffolds the workspace, lands in it, and immediately opens the first iteration's M1 vision interview. No manual CLI setup is needed.
 class: review
 killer: false
 ---

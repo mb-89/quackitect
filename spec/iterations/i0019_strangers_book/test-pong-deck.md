@@ -1,7 +1,7 @@
 ---
 id: test-pong-deck
 type: test
-statement: The rendered book carries the walkthrough deck with the full arc in order (clone, prerequisites, install, the milestones, the deliverable); the prerequisites slide names what RUNME checks; the deck carries the measured per-milestone timeline; the final slide embeds the playable game only while the size budget holds, else the static figure.
+statement: The rendered book carries the walkthrough deck with the full arc in order: clone, prerequisites, install, the milestones, the deliverable. The prerequisites slide names what RUNME checks. The deck carries the measured per-milestone timeline. The final slide embeds the playable game only while the size budget holds, else the static figure.
 class: executed
 verify: selftest:pong-deck
 killer: false

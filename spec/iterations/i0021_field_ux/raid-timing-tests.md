@@ -1,7 +1,7 @@
 ---
 id: raid-timing-tests
 type: raid
-statement: The hand-off lifecycle tests run real millisecond timings - under heavy CPU load a watchdog window can flake the battery.
+statement: The hand-off lifecycle tests run real millisecond timings. Under heavy CPU load a watchdog window can flake the battery.
 kind: risk
 probability: 0.2
 impact: 0.3

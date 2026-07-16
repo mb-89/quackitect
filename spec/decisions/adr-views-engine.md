@@ -3,7 +3,7 @@ id: adr-views-engine
 decided_in: i0016_structural_models
 type: adr
 adjudicated_by: user
-statement: Views chosen for the engine (i16 dogfood, owner rulings 2026-07-09/10) - model-engine-layers as the onion layer map, plus two structural models: model-check-states (state, the check lifecycle), model-product-tree (element-tree, "flow doesn't catch all" - composition of the shipped product); sequence rejected for now (the i15 ask loop carries its diagram in the pairing guide); context derives as always.
+statement: Views chosen for the engine (i16 dogfood, owner rulings 2026-07-09/10): model-engine-layers as the onion layer map, plus two structural models. model-check-states covers state, the check lifecycle. model-product-tree covers element-tree, since "flow doesn't catch all" the composition of the shipped product. Sequence is rejected for now, since the i15 ask loop carries its diagram in the pairing guide. Context derives as always.
 class: review
 killer: false
 ---

@@ -18,13 +18,7 @@ import (
 )
 
 // design: go-attest-state  implements: req-attest-ritual.5, req-attest-ritual.3
-// The attestation state (adr-attest-ritual) is a small JSON file in the workspace data home —
-// machine-local cache, never the repo. It stores only sha256 HASHES of the grant code and the key
-// chain: the plaintext key exists in exactly one place, the conversation that received it. The
-// current key carries a command budget (default 100 - sized so the renewal ritual still
-// fires on long sessions, just not several times a day); each gated command consumes one; at zero the key expires and only a
-// renewal (old key + fresh challenge) issues a successor. The previous key's hash is kept
-// solely to refuse a stale renew.
+// The attestation state (adr-attest-ritual) is a small JSON file in the workspace data home, a machine-local cache, never the repo. It stores only sha256 HASHES of the grant code and the key chain. The plaintext key exists in exactly one place: the conversation that received it. The current key carries a command budget, default 100, sized so the renewal ritual still fires on long sessions, just not several times a day. Each gated command consumes one. At zero the key expires, and only a renewal, old key plus fresh challenge, issues a successor. The previous key's hash is kept solely to refuse a stale renew.
 const attestBudgetDefault = 100
 
 type akState struct {
@@ -87,13 +81,7 @@ func attestConsume(key string) error {
 // enddesign
 
 // design: go-attest-ritual  implements: req-attest-ritual.4, req-attest-ritual.2, req-attest-ritual.6
-// The ritual (adr-attest-ritual): a one-time grant code is minted for the interactive console
-// (channel enforcement at the CLI layer); redeeming it — or renewing with the current key — requires
-// answering a CHALLENGE derived from the live contract: sha256(nonce+text) picks rule K and word N
-// among the rule's LETTER-BEARING words (raw positions can land on punctuation).
-// The nonce is the code/key being redeemed, so every attest step binds to its own fresh question and
-// the only way to answer is to have the contract text at hand. A successor key supersedes the old
-// one; a superseded key can neither act nor renew.
+// The ritual (adr-attest-ritual): a one-time grant code is minted for the interactive console, channel enforcement at the CLI layer. Redeeming it, or renewing with the current key, requires answering a CHALLENGE derived from the live contract. sha256(nonce+text) picks rule K and word N among the rule's LETTER-BEARING words, since raw positions can land on punctuation. The nonce is the code or key being redeemed, so every attest step binds to its own fresh question. The only way to answer is to have the contract text at hand. A successor key supersedes the old one. A superseded key can neither act nor renew.
 func attestContractPath() string {
 	return filepath.Join(EngineDir(), "method", "prompts", "contract.md")
 }
@@ -247,18 +235,7 @@ func attestRedeem(code, answer string) (string, error) {
 // enddesign
 
 // design: go-attest-gate  implements: req-attest-ritual.1, req-attest-ritual.7
-// The gate (adr-attest-ritual): ledger-ADVANCING commands (next, start, bless, ship, observe-red)
-// on the agent channel refuse to run without a valid session key (--key flag, QUACK_KEY env as the
-// second read path); read-only commands stay open so debugging is never hostage. The refusal names
-// contract.md and NOTHING else — the unlock instructions live only inside the contract, so the sole
-// path to a key runs through the file. The interactive console (a person, by the channel stat) is never
-// gated by its own machinery.
-// `ask` and `await` advance the ledger too (an ask can end in a bless), so they ride the
-// gate; the drain-on-run fallback executes the USER's recorded tap and is deliberately
-// ungated (the paired credential IS its authorization — adr-answer-authenticity).
-// One scope carve-out lives in attestGuard: `start stubs` and `start init` are workspace
-// CREATION, not ledger advancement — a fresh workspace cannot hold an attest session yet —
-// so those two subverbs bypass the gate while plain `start <version>` stays gated.
+// The gate (adr-attest-ritual) covers ledger-ADVANCING commands: next, start, bless, ship, observe-red. On the agent channel these refuse to run without a valid session key, the --key flag, with QUACK_KEY env as the second read path. Read-only commands stay open, so debugging is never hostage. The refusal names contract.md and NOTHING else. The unlock instructions live only inside the contract, so the sole path to a key runs through the file. The interactive console, a person, by the channel stat, is never gated by its own machinery. `ask` and `await` advance the ledger too, since an ask can end in a bless, so they ride the gate. The drain-on-run fallback executes the USER's recorded tap and is deliberately ungated, since the paired credential IS its authorization (adr-answer-authenticity). One scope carve-out lives in attestGuard: `start stubs` and `start init` are workspace CREATION, not ledger advancement, since a fresh workspace cannot hold an attest session yet. So those two subverbs bypass the gate while plain `start <version>` stays gated.
 var attestGatedCmds = map[string]bool{"next": true, "start": true, "bless": true, "ship": true, "observe-red": true, "migrate-actors": true, "ask": true, "await": true, "grant": true}
 
 func attestRequired(cmd string, interactive bool) bool {

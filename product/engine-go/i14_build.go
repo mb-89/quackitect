@@ -11,10 +11,7 @@ import (
 )
 
 // design: go-shell-title-card  implements: req-book-shell-nav.2
-// The page header is gone and so is the standing info
-// block: the spec-state root, iteration, and engine ride the title button as data
-// attributes - DOM from birth - and a title click feeds the DETAILS pane like any other
-// click target (window.bookDetail fills the chrome pane; the content DOM never changes).
+// The page header is gone, and so is the standing info block. The spec-state root, iteration, and engine ride the title button as data attributes, DOM from birth. A title click feeds the DETAILS pane like any other click target. window.bookDetail fills the chrome pane, and the content DOM never changes.
 func bookTitleAttrs(root, iteration, engineVersion string) string {
 	return ` data-root="` + htmlEscape(root) +
 		`" data-iteration="` + htmlEscape(iteration) +
@@ -24,17 +21,7 @@ func bookTitleAttrs(root, iteration, engineVersion string) string {
 // enddesign
 
 // design: go-white-label-identity  implements: req-vehicle-white-label.1, req-vehicle-white-label.2, req-vehicle-white-label.3, req-vehicle-white-label.4
-// A rendered book's identity comes from the WORKSPACE, never from the binary's invocation
-// name: brand() is argv[0]-based — the right seam for console output, the wrong one for a
-// published artifact (a vehicle usually drives an engine binary named quack, and its book
-// must not present the engine as itself — adr-white-label-hybrid). The name source, most
-// explicit first:
-//   - product/brand/name.txt — the brand layer's name asset, WORKSPACE-ONLY. The engine
-//     design fallback is deliberately not consulted: an engine default here would BE the leak.
-//   - the overlay key's product/<name> — the vehicle's committed product home.
-//   - the workspace basename.
-// whiteLabelLeaks is the identity guard: it scans ONLY the identity surfaces
-// (title, wordmark). Mentions in prose are legal — identity is the bar, not occurrences.
+// A rendered book's identity comes from the WORKSPACE, never from the binary's invocation name. brand() is argv[0]-based, the right seam for console output but the wrong one for a published artifact. A vehicle usually drives an engine binary named quack, and its book must not present the engine as itself (adr-white-label-hybrid). The name source, most explicit first, works like this. First is product/brand/name.txt, the brand layer's name asset, WORKSPACE-ONLY. The engine design fallback is deliberately not consulted; an engine default here would BE the leak. Second is the overlay key's product/<name>, the vehicle's committed product home. Third is the workspace basename. whiteLabelLeaks is the identity guard. It scans ONLY the identity surfaces: title, wordmark. Mentions in prose are legal; identity is the bar, not occurrences.
 
 // engineCredit is the retired colophon text. It remains only so tests can assert it is absent.
 const engineCredit = "engine: quackitect " + version
@@ -158,10 +145,7 @@ func shortUnitClass(html string) string {
 // enddesign
 
 // design: go-ucfn-board  implements: req-need-scoped-views.1, req-need-scoped-views.2
-// Use cases and functions merge into ONE deterministic per-need board:
-// each need row expands into two columns - its functions (the need item's `functions:`
-// list) and its use cases (the refines edges, lane-fed by the loader). The board is a
-// query over the graph, never agent prose; empty columns say so honestly.
+// Use cases and functions merge into ONE deterministic per-need board. Each need row expands into two columns: its functions, the need item's `functions:` list, and its use cases, the refines edges, lane-fed by the loader. The board is a query over the graph, never agent prose. Empty columns say so honestly.
 var needFnsRe = regexp.MustCompile(`(?m)^functions:\s*\[([^\]]*)\]`)
 
 func needFunctions(path string) []string {

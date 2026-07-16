@@ -31,12 +31,7 @@ func MerkleRoot(nodes map[string]Node) string {
 }
 
 // design: go-selftest  implements: req-go-port.1
-// The engine verifies ITSELF, in Go, in-process, with zero external toolchain — no uv, no python,
-// no go test. Executed checks carry 'verify: selftest:<name>'; the engine runs the named check
-// directly. Parity = the merkle root equals the baselined golden root (a determinism regression).
-// A CLUSTERED test node names several checks in one verify value
-// (adr-cluster-numbered-statements): space-separated, ALL must pass — the node
-// is the ledger unit, the named checks are its runners.
+// The engine verifies ITSELF, in Go, in-process, with zero external toolchain: no uv, no python, no go test. Executed checks carry 'verify: selftest:<name>', and the engine runs the named check directly. Parity means the merkle root equals the baselined golden root, a determinism regression. A CLUSTERED test node names several checks in one verify value (adr-cluster-numbered-statements), space-separated, and ALL must pass. The node is the ledger unit, and the named checks are its runners.
 func runSelftest(name string) bool {
 	if names := strings.Fields(name); len(names) > 1 {
 		for _, one := range names {
@@ -140,7 +135,7 @@ func selftestParser() bool {
 // selftestParity: the merkle root must equal the baselined golden. The golden is written once
 // (from the verified-parity moment) and then enforced forever — even after Python is gone.
 func selftestParity() bool {
-	root := MerkleRoot(LoadAll())
+	root := workspaceRoot(LoadAll())
 	gp := goldenRootPath()
 	if raw, err := os.ReadFile(gp); err == nil {
 		return strings.TrimSpace(string(raw)) == root
@@ -643,20 +638,7 @@ var externalRootTests = []namedTest{
 }
 
 // design: go-selftest-registry  implements: req-battery-lean
-// ONE source for the selftest battery: each test-implementation file declares an
-// ordered []namedTest slice beside its functions, and the single init below
-// concatenates them EXPLICITLY, in battery order. The registry drives BOTH the
-// name->func dispatch (runSelftestOne) and the full-battery name list
-// (RunSelftestCLI), so the dispatch and the battery can never drift apart.
-//
-// Why an init assignment and not a var initializer: the battery is genuinely
-// recursive — verify-cache and evidence-honesty drive the evaluator, which
-// dispatches THROUGH the registry — so any var initializer that can reach the
-// slices is an initialization cycle (vet refuses it); the assignment in init is
-// the language's sanctioned break. The order still cannot depend on file names:
-// this is the ONLY init touching the registry, and the concatenation below is
-// the single, explicit order source (per-file inits appending their own slices
-// WOULD order the battery compiler-alphabetically — that shape stays banned).
+// There is ONE source for the selftest battery. Each test-implementation file declares an ordered []namedTest slice beside its functions. The single init below concatenates them EXPLICITLY, in battery order. The registry drives BOTH the name->func dispatch (runSelftestOne) and the full-battery name list (RunSelftestCLI). So the dispatch and the battery can never drift apart. Why use an init assignment and not a var initializer? The battery is genuinely recursive. Verify-cache and evidence-honesty drive the evaluator, which dispatches THROUGH the registry. So any var initializer that can reach the slices is an initialization cycle, and vet refuses it. The assignment in init is the language's sanctioned break. The order still cannot depend on file names. This is the ONLY init touching the registry, and the concatenation below is the single, explicit order source. Per-file inits appending their own slices WOULD order the battery compiler-alphabetically. That shape stays banned.
 type namedTest struct {
 	name string
 	fn   func() bool
@@ -692,6 +674,7 @@ func init() {
 		i21Tests,          // i21_red.go
 		i22Tests,          // i22_red.go (the engine-laws batch)
 		i23Tests,          // i23_red.go (module workspace checks)
+		i24Tests,          // i24_red.go (the hygiene batch)
 	)
 }
 

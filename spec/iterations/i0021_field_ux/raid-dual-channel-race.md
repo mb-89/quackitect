@@ -1,7 +1,7 @@
 ---
 id: raid-dual-channel-race
 type: raid
-statement: A phone tap made while the hand-off page is open applies only at the next drain - a page answer in the same window can record a second bless event on the same gate.
+statement: A phone tap made while the hand-off page is open applies only at the next drain. A page answer in the same window can record a second bless event on the same gate.
 kind: risk
 probability: 0.2
 impact: 0.4

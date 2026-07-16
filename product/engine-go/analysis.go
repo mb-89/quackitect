@@ -8,10 +8,7 @@ import (
 )
 
 // design: go-build-analysis  implements: req-go-analysis
-// The build gate runs the stdlib analyzers - gofmt -l (format debt) and go vet
-// (correctness) - and fails on findings (adr-go-analysis-stdlib-first). Zero new
-// dependencies: both ride the toolchain the build already requires. staticcheck
-// joins grab-if-present when found on PATH; its absence is never an error.
+// The build gate runs the stdlib analyzers, gofmt -l for format debt and go vet for correctness, and fails on findings (adr-go-analysis-stdlib-first). This adds zero new dependencies, since both ride the toolchain the build already requires. staticcheck joins grab-if-present when found on PATH. Its absence is never an error.
 func buildAnalysisFindings(dir string) []string {
 	var finds []string
 	if out, err := exec.Command("gofmt", "-l", dir).Output(); err == nil {

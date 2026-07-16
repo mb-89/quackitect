@@ -3,5 +3,6 @@
 [iteration]
 type    = "default"
 rigor   = "systematic"
-version = "i0023_modules"
+version = "i0024_hygiene"
 edges = "connections"
+agent_lane = "mcp"

@@ -1,7 +1,7 @@
 ---
 id: raid-busy-record
 type: raid
-statement: A test that consults a busy render guard can record the guard's vacuous answer as a real verdict - the false entry then self-perpetuates on cache hits.
+statement: A test that consults a busy render guard can record the guard's vacuous answer as a real verdict. The false entry then self-perpetuates on cache hits.
 kind: risk
 probability: 0.3
 impact: 0.6

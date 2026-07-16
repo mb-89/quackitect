@@ -2,7 +2,7 @@
 id: guide-mobile-pairing
 type: guide
 audience: user
-statement: Pair a phone, answer gates from anywhere - setup, answering, and the sharp edges.
+statement: Pair a phone, and answer gates from anywhere. Setup, answering, and the sharp edges.
 class: review
 killer: false
 ---

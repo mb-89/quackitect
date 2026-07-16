@@ -2,7 +2,7 @@
 id: req-informed-by-edges
 type: requirement
 depends_on: []
-statement: The engine shall accept a decision edge to a model or model element first-class - the numbered statements bind individually.
+statement: The engine shall accept a decision edge to a model or model element first-class. The numbered statements bind individually.
 class: review
 killer: false
 ---

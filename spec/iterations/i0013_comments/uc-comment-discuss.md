@@ -1,7 +1,7 @@
 ---
 id: uc-comment-discuss
 type: usecase
-statement: A reader replies in a comment thread, marks agree or reject, and closes settled threads - the history stays in the file.
+statement: A reader replies in a comment thread, marks agree or reject, and closes settled threads. The history stays in the file.
 class: review
 killer: false
 ---

@@ -3,7 +3,7 @@ id: adr-rules-as-config
 decided_in: i0017_pruning
 type: adr
 adjudicated_by: user
-statement: Configuration splits from code in three tiers - pure data (vocabularies, grammars) loads from method/config files; shapes and skeletons (mint bodies, card layouts) load from the template files that already exist as their registry; logic variants become strategy registries in code, where adding a variant never touches shared dispatch - and the compile boundary is stated honestly, config selects among compiled strategies or feeds data to a generic engine, it never injects behavior.
+statement: Configuration splits from code in three tiers. Pure data, such as vocabularies and grammars, loads from method/config files. Shapes and skeletons, such as mint bodies and card layouts, load from the template files that already exist as their registry. Logic variants become strategy registries in code, where adding a variant never touches shared dispatch. The compile boundary is stated honestly: config selects among compiled strategies or feeds data to a generic engine, and it never injects behavior.
 class: review
 killer: false
 ---

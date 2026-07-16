@@ -16,15 +16,7 @@ import (
 )
 
 // design: go-cluster  implements: req-trace-clustered
-// `cluster --into <id> --statement "<umbrella>" <req-id>...` — the merge:
-//   - the cluster node lands beside the FIRST member (same iteration), statement
-//     = the umbrella, body = numbered singular statements (1. <original>), each
-//     line naming its origin id for the archaeology;
-//   - refines edges: the union of the members' upward edges, deduplicated;
-//   - inbound verifies/addresses lane edges rewrite member -> <into>.N (the
-//     sub-address; resolution folds to the base at load, go-sub-addressing);
-//   - code design markers rewrite `implements: ...<member>...` -> `<into>.N`;
-//   - member files delete; the caller owes ONE re-baseline and ONE wave bless.
+// `cluster --into <id> --statement "<umbrella>" <req-id>...` performs the merge. The cluster node lands beside the FIRST member, same iteration, with statement equal to the umbrella and body as numbered singular statements (1. <original>), each line naming its origin id for the archaeology. Refines edges become the union of the members' upward edges, deduplicated. Inbound verifies/addresses lane edges rewrite member to <into>.N, the sub-address; resolution folds to the base at load (go-sub-addressing). Code design markers rewrite `implements: ...<member>...` to `<into>.N`. Member files delete. The caller owes ONE re-baseline and ONE wave bless.
 func cmdCluster(args []string) {
 	if hasFlag(args, "--tests") {
 		cmdClusterTests(args)

@@ -1,7 +1,7 @@
 ---
 id: req-pong-deck
 type: requirement
-statement: The book shall carry the five-minutes walkthrough deck as a derived document - from cloning to the delivered Pong game - the numbered statements bind individually.
+statement: The book shall carry the five-minutes walkthrough deck as a derived document, from cloning to the delivered Pong game. The numbered statements bind individually.
 class: review
 killer: false
 ---

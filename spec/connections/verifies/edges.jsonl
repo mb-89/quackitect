@@ -269,3 +269,15 @@
 {"src":"test-module-import","dst":"req-module-import"}
 {"src":"test-module-update","dst":"req-module-update"}
 {"src":"test-vehicle-module-setup","dst":"req-vehicle-module-setup"}
+{"src":"test-query","dst":"req-query"}
+{"src":"test-voice-zero","dst":"req-voice-zero"}
+{"src":"test-root-content","dst":"req-root-content"}
+{"src":"test-red-edit-guard","dst":"req-red-edit-guard"}
+{"src":"test-mcp-birth","dst":"req-mcp-birth"}
+{"src":"test-mcp-self-arm","dst":"req-mcp-self-arm"}
+{"src":"test-empty-region-message","dst":"req-empty-region-message"}
+{"src":"test-card-empty-register","dst":"req-register-render.2"}
+{"src":"test-mcp-reload","dst":"req-mcp-reload"}
+{"src":"test-ledger-arg-guards","dst":"req-ledger-arg-guards"}
+{"src":"test-adopt-honest","dst":"req-adopt-honest"}
+{"src":"test-binary-budget","dst":"req-binary-budget"}

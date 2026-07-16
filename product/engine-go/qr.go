@@ -7,10 +7,7 @@ package main
 // bits are COMPUTED (BCH over generator 0x537, XOR 0x5412), never a memorized table.
 
 // design: go-pair-qr  implements: req-device-pairing.2
-// GF(256) arithmetic over the QR polynomial 0x11D drives the Reed-Solomon parity;
-// the matrix builder places finders, timing, alignment, the dark module, the two
-// format copies, and the zigzag data stream under mask 0. The console render draws
-// two modules per character with a quiet zone, the plain link printed beside it.
+// GF(256) arithmetic over the QR polynomial 0x11D drives the Reed-Solomon parity. The matrix builder places finders, timing, alignment, the dark module, the two format copies, and the zigzag data stream under mask 0. The console render draws two modules per character with a quiet zone. The plain link prints beside it.
 
 var qrExp [512]byte
 var qrLog [256]int

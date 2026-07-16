@@ -6,20 +6,15 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"os/exec"
 	"sort"
 	"strings"
+	"sync"
+	"time"
 )
 
 // design: go-mcp-server  implements: req-mcp-server.1, req-mcp-server.2, req-mcp-server.4, req-mcp-server.5, req-mcp-server.6
-// The hand-rolled, zero-dependency stdio MCP transport (adr-mcp-transport): newline-delimited
-// JSON-RPC 2.0 over stdin/stdout, three methods (initialize, tools/list, tools/call), the
-// protocol version PINNED, ALL diagnostics to stderr so stdout stays pure framing. The tool
-// surface is GENERATED from the command surface — one core, thin faces — so a read-only command
-// (status, why, notes) and a ledger command (next, start, bless) each become a tool whose call
-// dispatches to the real command and answers with its structured result, read fresh from the
-// workspace at call time. A failed tool call is a RESULT with isError set, never a broken
-// transport; only a parse failure or an unknown method is a JSON-RPC error. A newer staged build
-// supersedes the running server: the loop exits before answering a later call from stale code.
+// The MCP transport is hand-rolled and zero-dependency, over stdio (adr-mcp-transport). It uses newline-delimited JSON-RPC 2.0 over stdin/stdout, with three methods: initialize, tools/list, tools/call. The protocol version is PINNED. ALL diagnostics go to stderr, so stdout stays pure framing. The tool surface is GENERATED from the command surface: one core, thin faces. So a read-only command (status, why, notes) and a ledger command (next, start, bless) each become a tool. Its call dispatches to the real command and answers with its structured result, read fresh from the workspace at call time. A failed tool call is a RESULT with isError set, never a broken transport. Only a parse failure or an unknown method is a JSON-RPC error. A newer staged build supersedes the running server: the loop exits before answering a later call from stale code.
 const mcpProtocolVersion = "2025-06-18"
 
 // mcpRequest keeps ID as raw JSON to tell a notification (id ABSENT) from a request
@@ -121,6 +116,27 @@ func mcpTools() []mcpToolSpec {
 			Description: "Attest this session with an earned session key; unlocks ledger tools for the connection.",
 			InputSchema: mcpObjSchema(map[string]interface{}{"key": mcpStr("the earned session key")}, "key"),
 		},
+		{
+			Name:        "query",
+			Description: "Read-only rows from the loaded graph: nodes by field, edge.* for edges, note.* for notes.",
+			InputSchema: mcpObjSchema(map[string]interface{}{
+				"expr": mcpStr("the pinned Bases-subset expression, e.g. type == \"requirement\" && state == \"SUSPECT\"")}, "expr"),
+		},
+		{
+			Name:        "observe-red",
+			Description: "Run a test and record it FAILING at its current hash; a pass is refused. refresh re-attests an amended, still-failing test.",
+			InputSchema: mcpObjSchema(map[string]interface{}{
+				"test":    mcpStr("the test node id"),
+				"refresh": mcpBool("re-attest an amended, still-failing test"),
+			}, "test"),
+			ledger: true,
+		},
+		{
+			Name:        "ship",
+			Description: "Package product/ into the data home with fresh book and report; runs immediately after the M8 bless (owner law).",
+			InputSchema: mcpObjSchema(map[string]interface{}{}),
+			ledger:      true,
+		},
 	}
 }
 
@@ -143,6 +159,13 @@ func mcpToolByName(name string) (mcpToolSpec, bool) {
 	return mcpToolSpec{}, false
 }
 
+// mcpRun executes one command handler exit-aware: a quackExit inside becomes an isError
+// result carrying the handler's output, never a dead transport (go-mcp-errors).
+func mcpRun(fn func()) map[string]interface{} {
+	out, code := mcpCaptureExit(fn)
+	return mcpTextResult(code > 0, out)
+}
+
 // mcpTextResult is one tools/call result: a single text content item plus the isError flag.
 func mcpTextResult(isError bool, text string) map[string]interface{} {
 	return map[string]interface{}{
@@ -157,13 +180,199 @@ func mcpLog(args ...interface{}) {
 	fmt.Fprintln(os.Stderr, args...)
 }
 
-// cmdMCP runs the stdio MCP server until its client closes stdin. It is the console face; the
-// serve loop and its per-line superseded guard are the transport.
+// cmdMCP runs the stdio MCP surface. The default face is the SUPERVISOR: a thin parent that
+// proxies stdio to a swappable child engine (adr-mcp-supervisor). --child serves directly.
 func cmdMCP(args []string) {
-	mcpLog("server up; protocol", mcpProtocolVersion)
-	newMCPSession().serve(os.Stdin, os.Stdout)
+	mcpServing = true // exits become recoverable errors (go-mcp-errors)
+	if hasFlag(args, "--child") {
+		mcpChildMode = true
+		mcpLog("child up; protocol", mcpProtocolVersion)
+		newMCPSession().serve(os.Stdin, os.Stdout)
+		mcpLog("child stdin closed; exiting clean")
+		return
+	}
+	mcpLog("supervisor up; protocol", mcpProtocolVersion)
+	supervise()
 	mcpLog("stdin closed; exiting clean")
 }
+
+// design: go-mcp-supervisor  implements: req-mcp-reload
+// The parent never exits and never swaps itself. It proxies newline framing to a child engine spawned from the CURRENT binary path. When a newer build stages, it drains open replies, respawns the child from the staged binary, replays the client's initialize, and emits list_changed. This is the sequence model-reload-sequence draws. A child that dies on its own is respawned the same way.
+var mcpChildMode bool
+
+type supState struct {
+	mu         sync.Mutex
+	inFlight   int
+	swapWanted bool
+	initLine   []byte
+	child      *exec.Cmd
+	childIn    io.WriteCloser
+	childBorn  int64
+	out        *bufio.Writer
+	seq        supSequence
+}
+
+func supSpawnArgs() []string {
+	exe, err := os.Executable()
+	if err != nil {
+		exe = "quack"
+	}
+	return append([]string{exe, "mcp", "--child"}, os.Args[2:]...)
+}
+
+func (st *supState) spawn(replayInit bool) error {
+	a := supSpawnArgs()
+	c := exec.Command(a[0], a[1:]...)
+	c.Stderr = os.Stderr
+	in, err := c.StdinPipe()
+	if err != nil {
+		return err
+	}
+	outPipe, err := c.StdoutPipe()
+	if err != nil {
+		return err
+	}
+	if err := c.Start(); err != nil {
+		return err
+	}
+	st.child, st.childIn = c, in
+	st.childBorn = mcpBornStamp()
+	sc := bufio.NewScanner(outPipe)
+	sc.Buffer(make([]byte, 0, 1<<20), 8<<20)
+	if replayInit && st.initLine != nil {
+		in.Write(append(st.initLine, '\n'))
+		if sc.Scan() {
+			mcpLog("supervisor: child re-initialized")
+		}
+	}
+	go st.pump(sc, c)
+	return nil
+}
+
+// pump forwards one child's stdout to the client and tracks reply drainage. It ends
+// with its child; a dead child with no swap pending is respawned by the next request.
+func (st *supState) pump(sc *bufio.Scanner, c *exec.Cmd) {
+	for sc.Scan() {
+		line := append([]byte{}, sc.Bytes()...)
+		var f struct {
+			ID json.RawMessage `json:"id,omitempty"`
+		}
+		json.Unmarshal(line, &f)
+		st.mu.Lock()
+		if st.child == c { // a superseded pump never writes
+			st.out.Write(append(line, '\n'))
+			st.out.Flush()
+			if len(f.ID) > 0 && st.inFlight > 0 {
+				st.inFlight--
+			}
+		}
+		st.mu.Unlock()
+	}
+}
+
+// swapIfReady performs the drain-spawn-notify sequence when a swap is wanted and no
+// reply is open. Callers hold no lock.
+func (st *supState) swapIfReady() {
+	st.mu.Lock()
+	ready := supSwapReady(st.inFlight, st.swapWanted)
+	if ready {
+		st.swapWanted = false
+	}
+	st.mu.Unlock()
+	if !ready {
+		return
+	}
+	st.seq.record("drain")
+	mcpLog("supervisor: drained; swapping the child")
+	if st.childIn != nil {
+		st.childIn.Close()
+	}
+	if st.child != nil && st.child.Process != nil {
+		st.child.Process.Kill()
+		st.child.Wait()
+	}
+	if err := st.spawn(true); err != nil {
+		mcpLog("supervisor: respawn failed:", err)
+		return
+	}
+	st.seq.record("spawn")
+	st.mu.Lock()
+	st.out.WriteString(supNotifyFrame() + "\n")
+	st.out.Flush()
+	st.mu.Unlock()
+	st.seq.record("notify")
+	mcpLog("supervisor: list_changed emitted")
+}
+
+func supervise() {
+	st := &supState{out: bufio.NewWriter(os.Stdout)}
+	if err := st.spawn(false); err != nil {
+		mcpLog("supervisor: cannot spawn the child engine:", err)
+		return
+	}
+	// the stamp watcher: an idle session still swaps and notifies
+	go func() {
+		for {
+			time.Sleep(500 * time.Millisecond)
+			st.mu.Lock()
+			stale := mcpSuperseded(st.childBorn)
+			if stale {
+				st.swapWanted = true
+			}
+			st.mu.Unlock()
+			if stale {
+				st.swapIfReady()
+			}
+		}
+	}()
+	in := bufio.NewScanner(os.Stdin)
+	in.Buffer(make([]byte, 0, 1<<20), 8<<20)
+	for in.Scan() {
+		line := append([]byte{}, in.Bytes()...)
+		var f struct {
+			ID     json.RawMessage `json:"id,omitempty"`
+			Method string          `json:"method"`
+		}
+		json.Unmarshal(line, &f)
+		if f.Method == "initialize" {
+			st.initLine = append([]byte{}, line...)
+		}
+		// a stale child never answers a fresh request: swap first, then forward
+		st.mu.Lock()
+		if mcpSuperseded(st.childBorn) {
+			st.swapWanted = true
+		}
+		dead := st.child == nil || st.child.ProcessState != nil
+		st.mu.Unlock()
+		deadline := time.Now().Add(supDrainTimeout())
+		for time.Now().Before(deadline) {
+			st.mu.Lock()
+			wanted := st.swapWanted
+			st.mu.Unlock()
+			if !wanted {
+				break
+			}
+			st.swapIfReady()
+			time.Sleep(20 * time.Millisecond)
+		}
+		if dead {
+			st.mu.Lock()
+			st.swapWanted = true
+			st.mu.Unlock()
+			st.swapIfReady()
+		}
+		st.mu.Lock()
+		if len(f.ID) > 0 {
+			st.inFlight++
+		}
+		if st.childIn != nil {
+			st.childIn.Write(append(line, '\n'))
+		}
+		st.mu.Unlock()
+	}
+}
+
+// enddesign
 
 // serve is the read/dispatch/flush loop: one JSON object per line, a reply per request, silence
 // per notification, a clean return on EOF (req-mcp-server.4). Before each line it re-checks the
@@ -266,35 +475,45 @@ func mcpSuperseded(born int64) bool {
 // a temp FILE (not a pipe: a command that spawns a detached child would keep a pipe open and block
 // the read); the MCP writer holds the ORIGINAL stdout handle, so framing is untouched.
 func mcpCapture(fn func()) string {
-	old := os.Stdout
+	out, _ := mcpCaptureExit(fn)
+	return out
+}
+
+// mcpCaptureExit additionally reports a handler's exit code: quackExit under a serving MCP
+// session panics (go-mcp-errors) and lands here as a code instead of killing the transport.
+// stderr is captured too, so a refusal's text reaches the tool result.
+func mcpCaptureExit(fn func()) (string, int) {
+	old, oldErr := os.Stdout, os.Stderr
 	tmp, err := os.CreateTemp("", "quack-mcp-*.out")
 	if err != nil {
 		fn()
-		return ""
+		return "", -1
 	}
 	defer os.Remove(tmp.Name())
-	os.Stdout = tmp
+	os.Stdout, os.Stderr = tmp, tmp
+	code := -1
 	func() {
-		defer func() { _ = recover() }()
+		defer func() {
+			if r := recover(); r != nil {
+				if ep, ok := r.(quackExitPanic); ok {
+					code = ep.code
+				}
+			}
+		}()
 		fn()
 	}()
-	os.Stdout = old
+	os.Stdout, os.Stderr = old, oldErr
 	tmp.Sync()
 	tmp.Seek(0, 0)
 	b, _ := io.ReadAll(tmp)
 	tmp.Close()
-	return strings.TrimRight(string(b), "\n")
+	return strings.TrimRight(string(b), "\n"), code
 }
 
 // enddesign
 
 // design: go-mcp-session  implements: req-mcp-server.3
-// The per-session attest choke (adr-mcp-attest): the server process IS the session. Read-only
-// tools always run. The FIRST ledger-advancing tool call on an unattested session does not run —
-// it returns the attest CHALLENGE as a tool result (not a transport error), the same challenge the
-// command line derives from the live contract. The `attest` tool, given the earned session key,
-// flips an IN-MEMORY flag; nothing is written at rest. Thereafter ledger tools run with no key per
-// call. The flag dies with the process, so a build swap ends the session and costs one re-attest.
+// The per-session attest choke (adr-mcp-attest) treats the server process as the session. Read-only tools always run. The FIRST ledger-advancing tool call on an unattested session does not run. It returns the attest CHALLENGE as a tool result, not a transport error, the same challenge the command line derives from the live contract. The `attest` tool, given the earned session key, flips an IN-MEMORY flag. Nothing is written at rest. Thereafter ledger tools run with no key per call. The flag dies with the process, so a build swap ends the session and costs one re-attest.
 type mcpSession struct {
 	attested bool
 	nonce    string // this session's challenge nonce, minted once at connect
@@ -371,31 +590,31 @@ func (s *mcpSession) runToolCommand(name string, args map[string]interface{}) ma
 		if id := argStr(args, "id"); id != "" {
 			a = []string{id}
 		}
-		return mcpTextResult(false, mcpCapture(func() { cmdStatus(a) }))
+		return mcpRun(func() { cmdStatus(a) })
 	case "why":
 		id := argStr(args, "id")
 		if id == "" {
 			return mcpTextResult(true, "why: 'id' (string) is required")
 		}
-		return mcpTextResult(false, mcpCapture(func() { cmdWhy([]string{id}) }))
+		return mcpRun(func() { cmdWhy([]string{id}) })
 	case "notes":
 		var a []string
 		if argBool(args, "all") {
 			a = []string{"--all"}
 		}
-		return mcpTextResult(false, mcpCapture(func() { cmdNotes(a) }))
+		return mcpRun(func() { cmdNotes(a) })
 	case "note":
 		text := argStr(args, "text")
 		if strings.TrimSpace(text) == "" {
 			return mcpTextResult(true, "note: 'text' (string) is required")
 		}
-		return mcpTextResult(false, mcpCapture(func() { cmdNote([]string{text}) }))
+		return mcpRun(func() { cmdNote([]string{text}) })
 	case "next":
 		var a []string
 		if pref := argStr(args, "prefer"); pref != "" {
 			a = []string{pref}
 		}
-		return mcpTextResult(false, mcpCapture(func() { cmdNext(a) }))
+		return mcpRun(func() { cmdNext(a) })
 	case "start":
 		id := argStr(args, "id")
 		if id == "" {
@@ -405,7 +624,7 @@ func (s *mcpSession) runToolCommand(name string, args map[string]interface{}) ma
 		if argBool(args, "plan") {
 			a = append(a, "--plan")
 		}
-		return mcpTextResult(false, mcpCapture(func() { cmdStart(a) }))
+		return mcpRun(func() { cmdStart(a) })
 	case "bless":
 		target := argStr(args, "target")
 		if target == "" {
@@ -416,7 +635,25 @@ func (s *mcpSession) runToolCommand(name string, args map[string]interface{}) ma
 			a = append(a, "--by", by)
 		}
 		a = append(a, target)
-		return mcpTextResult(false, mcpCapture(func() { cmdBless(a) }))
+		return mcpRun(func() { cmdBless(a) })
+	case "query":
+		expr := argStr(args, "expr")
+		if strings.TrimSpace(expr) == "" {
+			return mcpTextResult(true, "query: 'expr' (string) is required")
+		}
+		return mcpRun(func() { cmdQuery([]string{expr}) })
+	case "observe-red":
+		test := argStr(args, "test")
+		if test == "" {
+			return mcpTextResult(true, "observe-red: 'test' (string) is required")
+		}
+		a := []string{test}
+		if argBool(args, "refresh") {
+			a = append(a, "--refresh")
+		}
+		return mcpRun(func() { cmdObserveRed(a) })
+	case "ship":
+		return mcpRun(func() { cmdShip(nil) })
 	default:
 		return mcpTextResult(true, "tool not dispatchable: "+name)
 	}

@@ -2,7 +2,7 @@
 id: req-comment-file2list
 ears: exempt - historical pre-EARS statement, retire-or-retrofit recorded (adr-grandfathers-historical)
 type: requirement
-statement: quack note --file2list shall read a commented copy back as deterministic, role-anonymous note candidates - the numbered statements bind individually.
+statement: quack note --file2list shall read a commented copy back as deterministic, role-anonymous note candidates. The numbered statements bind individually.
 class: review
 killer: false
 ---

@@ -1,7 +1,7 @@
 ---
 id: test-register-ask
 type: test
-statement: Answering a red row's questionnaire records the decision with actor and channel and the row recolors from its new provenance; the mobile ask renders from the same questionnaire source as the inline one.
+statement: Answering a red row's questionnaire records the decision with actor and channel, and the row recolors from its new provenance. The mobile ask renders from the same questionnaire source as the inline one.
 class: executed
 verify: selftest:register-ask
 killer: false

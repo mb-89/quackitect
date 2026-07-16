@@ -4,7 +4,7 @@ decided_in: i0014_doc_review
 type: adr
 kind: architecture
 adjudicated_by: user
-statement: Mechanically derivable sections render as canned deterministic queries; authored prose remains only where judgment adds content. Rejected: agent-drafted section prose - it drifts and duplicates.
+statement: Mechanically derivable sections render as canned deterministic queries. Authored prose remains only where judgment adds content. Rejected: agent-drafted section prose, since it drifts and duplicates.
 class: review
 killer: false
 ---

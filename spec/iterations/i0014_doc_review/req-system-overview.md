@@ -2,7 +2,7 @@
 id: req-system-overview
 type: requirement
 depends_on: []
-statement: The book shall render the trace graph as its own numbered chapter placed before design input, paged one page per need, with all nodes shown by default and each node marked with its chapter; when a reader clicks a graph item, the book shall open that item's table row expanded, collapse the sibling rows, and link back to the graph.
+statement: The book shall render the trace graph as its own numbered chapter placed before design input, paged one page per need. All nodes shall show by default, each marked with its chapter. When a reader clicks a graph item, the book shall open that item's table row expanded. It shall collapse the sibling rows and link back to the graph.
 class: review
 killer: false
 phase: [operation]

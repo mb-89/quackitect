@@ -7,7 +7,7 @@ impact: 0.2
 mitigation: owner samples the register per facet; a wrong tag is a one-line frontmatter fix, hash-neutral
 owner: project-owner
 status: open
-statement: All 187 requirements were facet-tagged in one pattern-based sweep - individual tags may misclassify.
+statement: All 187 requirements were facet-tagged in one pattern-based sweep. Individual tags may misclassify.
 class: review
 killer: false
 ---

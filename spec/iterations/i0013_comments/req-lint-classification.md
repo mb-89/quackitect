@@ -1,7 +1,7 @@
 ---
 id: req-lint-classification
 type: requirement
-statement: The book content lints shall classify correctly - comment interiors skipped, view-rendered nodes counted as referenced - the numbered statements bind individually.
+statement: The book content lints shall classify correctly: comment interiors skipped, view-rendered nodes counted as referenced. The numbered statements bind individually.
 class: review
 killer: false
 ---

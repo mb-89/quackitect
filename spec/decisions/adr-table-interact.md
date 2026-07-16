@@ -4,7 +4,7 @@ decided_in: i0014_doc_review
 type: adr
 kind: architecture
 adjudicated_by: user
-statement: Table interactivity extends the existing Bases-table substrate in vanilla inline JS. Rejected: a JS table library - it breaks the CSP-safe, dependency-free single file.
+statement: Table interactivity extends the existing Bases-table substrate in vanilla inline JS. Rejected: a JS table library, since it breaks the CSP-safe, dependency-free single file.
 class: review
 killer: false
 ---

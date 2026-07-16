@@ -1,7 +1,7 @@
 ---
 id: req-book-trust
 type: requirement
-statement: The book shall render its exact ledger truth - live state, stamped identity, drift flagged at ship - the numbered statements bind individually.
+statement: The book shall render its exact ledger truth: live state, stamped identity, drift flagged at ship. The numbered statements bind individually.
 class: review
 killer: false
 ---

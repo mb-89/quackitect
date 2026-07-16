@@ -30,16 +30,7 @@ func saveEvents(events []Event) {
 }
 
 // design: go-bless  implements: fill-adjudicate, suspect-bless, state-model, req-report-debounce
-// bless appends an attestation event (adjudicated_by actor + filled_by, recorded separately). Only
-// gates are blessable; content and executed checks are never blessed. The event stores the full_hash
-// and dep hashes, so any later input change makes the check SUSPECT (the suspect/bless mechanism).
-// The actor is stamped per channel with a --by override (go-actor-channels); QUACK_ACTOR is retired.
-//
-// report-debounce (req-report-debounce): a bless refreshes the board so any open --watch page
-// follows the adjudication, but a bless WAVE must not spawn dozens of identical renders (a static
-// output may be stale; the consumer regenerates). The refresh is debounced against the last render
-// time (a stamp in the data home): a refresh inside reportDebounceInterval of the last render is
-// SKIPPED, one outside it renders and re-arms the stamp — so a wave collapses to one render.
+// bless appends an attestation event, adjudicated_by actor plus filled_by, recorded separately. Only gates are blessable. Content and executed checks are never blessed. The event stores the full_hash and dep hashes, so any later input change makes the check SUSPECT, the suspect/bless mechanism. The actor is stamped per channel with a --by override (go-actor-channels). QUACK_ACTOR is retired. report-debounce (req-report-debounce): a bless refreshes the board so any open --watch page follows the adjudication. But a bless WAVE must not spawn dozens of identical renders, since a static output may be stale and the consumer regenerates. The refresh is debounced against the last render time, a stamp in the data home. A refresh inside reportDebounceInterval of the last render is SKIPPED. One outside it renders and re-arms the stamp. So a wave collapses to one render.
 
 const reportDebounceInterval = 3 * time.Second
 
@@ -92,6 +83,15 @@ func cmdBless(args []string) {
 		ids, refusedOpen = waveBlessSelect(nodes, StatusMap(nodes))
 		refuseOpenGates(refusedOpen)
 	} else {
+		// go-arg-guards: a typo'd bless never enters the ledger silently
+		known := make([]string, 0, len(nodes))
+		for id := range nodes {
+			known = append(known, id)
+		}
+		if v := blessUnknownVerdict(target, known); v != "" {
+			fmt.Fprintln(os.Stderr, v)
+			quackExit(2)
+		}
 		ids = []string{target}
 	}
 	events := attestEvents()
@@ -154,14 +154,7 @@ func cmdBless(args []string) {
 // enddesign
 
 // design: go-tests-red  implements: req-impl-fragment-tdd.2
-// tests-red enforces test-first: `observe-red <test>` RUNS the test and records that it was seen
-// FAILING at its CURRENT full-hash — a run-once attestation on the Event log, mirroring a bless.
-// The tool enforces the observation: a passing test is REFUSED, so a fabricated
-// red can never enter the ledger — the record is machine evidence, not an honor system. The
-// coverage:tests-red rule is satisfied only when every NEW test of the CHECK'S OWN iteration
-// carries a red-observed attestation at its current hash, so a test never run-red, or edited
-// since (hash changed), fails the rule until re-observed. A recorded observation stays valid
-// while the hash stands — a now-green test needs no re-run to prove it was once red.
+// tests-red enforces test-first. `observe-red <test>` RUNS the test and records that it was seen FAILING at its CURRENT full-hash, a run-once attestation on the Event log, mirroring a bless. The tool enforces the observation. A passing test is REFUSED, so a fabricated red can never enter the ledger. The record is machine evidence, not an honor system. The coverage:tests-red rule is satisfied only when every NEW test of the CHECK'S OWN iteration carries a red-observed attestation at its current hash. So a test never run-red, or edited since with a changed hash, fails the rule until re-observed. A recorded observation stays valid while the hash stands. A now-green test needs no re-run to prove it was once red.
 func cmdObserveRed(args []string) {
 	if len(args) == 0 {
 		fmt.Println("usage: observe-red <test-id>")
@@ -392,9 +385,16 @@ func cmdStart(args []string) {
 	vid := rest[0]
 	motivation := strings.Join(rest[1:], " ")
 	d := filepath.Join(SPEC, "iterations", vid)
+	cfg := readProjectConfig()
+	// go-arg-guards: plan-first activation (owner ruling) - activating an unknown id
+	// refuses toward --plan; re-starting the active version refuses as a no-op.
+	_, regErr := os.Stat(filepath.Join(d, "iteration.md"))
+	if v := startGuardVerdict(vid, cfg.Version, regErr == nil, plan); v != "" {
+		fmt.Fprintln(os.Stderr, v)
+		quackExit(2)
+	}
 	os.MkdirAll(d, 0o755)
 	p := filepath.Join(d, "iteration.md")
-	cfg := readProjectConfig()
 	status := "active"
 	if plan {
 		status = "planned"
@@ -402,6 +402,14 @@ func cmdStart(args []string) {
 	fm := []string{"---", "iteration: " + vid, "status: " + status}
 	if !plan {
 		fm = append(fm, "type: "+cfg.Type, "rigor: "+cfg.Rigor)
+	}
+	if motivation == "" {
+		// go-arg-guards: activating a registered version preserves its planned motivation
+		if raw, err := os.ReadFile(p); err == nil {
+			if parts := strings.SplitN(strings.ReplaceAll(string(raw), "\r\n", "\n"), "---", 3); len(parts) == 3 {
+				motivation = strings.TrimSpace(parts[2])
+			}
+		}
 	}
 	if motivation == "" {
 		motivation = "(motivation: TBD)"
@@ -433,11 +441,7 @@ func notesHome() string { return dataDirFor("notes") }
 // enddesign
 
 // design: go-notes-out  implements: req-note-capture-lane.2, req-note-capture-lane.1
-// Notes live OUTSIDE the repository (adr-no-quack-data-home): the capture lane writes beneath the
-// workspace's notes home in the user data dir — raw notes carry personal data and never belong in a
-// published checkout. The lane is the ONLY minting path (adr-deterministic-mint): a multi-line body
-// arrives via --file <path> or --file - (stdin), so the note skill CALLS the engine instead of
-// hand-writing files; id, timestamp, slug and frontmatter stay engine-stamped.
+// Notes live OUTSIDE the repository (adr-no-quack-data-home). The capture lane writes beneath the workspace's notes home in the user data dir. Raw notes carry personal data and never belong in a published checkout. The lane is the ONLY minting path (adr-deterministic-mint). A multi-line body arrives via `--file <path>` or `--file -` (stdin), so the note skill CALLS the engine instead of hand-writing files. Id, timestamp, slug, and frontmatter stay engine-stamped.
 func cmdNote(args []string) {
 	// the read-back lane: a commented copy lists as note candidates (go-file2list)
 	for i := 0; i < len(args); i++ {
@@ -565,12 +569,7 @@ func cmdGather(args []string) {
 // enddesign
 
 // design: go-ship  implements: req-tooling
-// ship packages product/ into a versioned zip under the data home's out/. The zip is
-// ephemeral output. The BOOK and the REPORT regenerate at ship and ride the ZIP
-// ROOT - a recipient opens the deliverable and the two reading
-// surfaces sit on top; every published book copy (spec/book.html + the Pages copy
-// docs/book.html, same bytes) refreshes in the same move, so the
-// drift lint is green at the shipped state. This works in ANY workspace, not just the dogfood repo.
+// ship packages product/ into a versioned zip under the data home's out/. The zip is ephemeral output. The BOOK and the REPORT regenerate at ship and ride the ZIP ROOT. A recipient opens the deliverable, and the two reading surfaces sit on top. Every published book copy, spec/book.html plus the Pages copy docs/book.html, same bytes, refreshes in the same move. So the drift lint is green at the shipped state. This works in ANY workspace, not just the dogfood repo.
 func cmdShip(args []string) {
 	cfg := readProjectConfig()
 	dest := dataDirFor("out")
@@ -668,9 +667,7 @@ func writeBookCopies(html string, paths []string) error {
 // enddesign
 
 // design: go-build  implements: req-gate-eval-integrity.3
-// quack build compiles the engine from its source (EngineSrc: vendored, else dogfood) to
-// .quack/engine/<brand>.exe AND re-baselines the determinism golden in one step — closing the
-// stale-golden footgun where a hand-run build forgot to re-baseline and produced false milestone FAILs.
+// quack build compiles the engine from its source, EngineSrc: vendored, else dogfood, to .quack/engine/<brand>.exe. It also re-baselines the determinism golden in one step. This closes the stale-golden footgun where a hand-run build forgot to re-baseline and produced false milestone FAILs.
 // enddesign
 
 // design: go-build-fast-path  implements: req-build-cheap.1, req-selftest-tiers
@@ -788,28 +785,35 @@ func cmdBuild(args []string) {
 	if !runBuildFastTier() { // the fast invariant tier rides every build (req-selftest-tiers.1)
 		quackExit(1)
 	}
+	// go-binary-budget: the fresh binary answers to its budget nodes
+	if msgs, refuse := budgetBuildChecks(fresh); len(msgs) > 0 {
+		for _, m := range msgs {
+			fmt.Fprintln(os.Stderr, m)
+		}
+		if refuse {
+			quackExit(1)
+		}
+	}
+	// go-adopt-honest: the final line never claims an adoption that did not happen
+	if _, err := os.Stat(staged); err == nil {
+		fmt.Println(adoptBlockedMessage("binary in use") + " | golden re-baselined to " + root[:12])
+		return
+	}
 	fmt.Println("built ->", filepath.ToSlash(out), "| golden re-baselined to", root[:12])
 }
 
 // enddesign
 
 // design: go-authoring-cheap  implements: req-authoring-cheap
-// One build restores an honest board. The re-baseline runs in the FRESHLY BUILT binary — never
-// only the old process, which refuses spec keys it predates (the self-wedge: a build dies on
-// its own new frontmatter key until run twice). And the verdict cache dies with the old baseline:
-// a parity FAIL recorded before the re-baseline shares the old binary's buildID and node hash, so
-// it would be served as a stale FAIL forever; flushing at re-baseline kills it.
-// buildRebaseline computes the root via the fresh exe, writes the golden, flushes verdicts.
+// One build restores an honest board. The re-baseline runs in the FRESHLY BUILT binary, never only the old process, which refuses spec keys it predates. This is the self-wedge: a build dies on its own new frontmatter key until run twice. The verdict cache dies with the old baseline too. A parity FAIL recorded before the re-baseline shares the old binary's buildID and node hash, so it would be served as a stale FAIL forever. Flushing at re-baseline kills it. buildRebaseline computes the root via the fresh exe, writes the golden, and flushes verdicts.
 func buildRebaseline(freshExe string) string {
 	root := ""
 	// design: go-rebaseline-inprocess  implements: req-build-cheap.3
-	// The self-exec exists for ONE reason: a JUST-COMPILED binary must read the spec, because the
-	// old process refuses keys it predates (the self-wedge). When the binary did not change
-	// (the fast path), the running process IS the fresh engine — compute in-process, spawn nothing.
+	// The self-exec exists for ONE reason. A JUST-COMPILED binary must read the spec, because the old process refuses keys it predates, the self-wedge. When the binary did not change, the fast path, the running process IS the fresh engine. It computes in-process and spawns nothing.
 	self, _ := os.Executable()
 	if si, err1 := os.Stat(self); err1 == nil {
 		if fi, err2 := os.Stat(freshExe); err2 == nil && os.SameFile(si, fi) {
-			root = MerkleRoot(LoadAll())
+			root = workspaceRoot(LoadAll())
 		}
 	}
 	// enddesign
@@ -819,14 +823,11 @@ func buildRebaseline(freshExe string) string {
 		}
 	}
 	if len(root) < 12 {
-		root = MerkleRoot(LoadAll()) // fallback: the running process (a malformed graph still fails loudly here)
+		root = workspaceRoot(LoadAll()) // fallback: the running process (a malformed graph still fails loudly here)
 	}
 	os.WriteFile(goldenRootPath(), []byte(root+"\n"), 0o644)
 	// design: go-verdict-surgical  implements: req-build-cheap.2
-	// Surgical, not wholesale: green verdicts survive the re-baseline — they stay self-validating
-	// on (input hash, buildID) and can only go stale through a change those keys already catch.
-	// Red verdicts die here: a FAIL recorded against the OLD golden shares input+build after a
-	// content-only re-baseline and would be served forever (the stale-FAIL wedge).
+	// This is surgical, not wholesale. Green verdicts survive the re-baseline. They stay self-validating on (input hash, buildID) and can only go stale through a change those keys already catch. Red verdicts die here. A FAIL recorded against the OLD golden shares input and build after a content-only re-baseline, and would be served forever, the stale-FAIL wedge.
 	kept := map[string]verdictRec{}
 	for k, v := range verdictLoad() {
 		if v.Result {
@@ -844,12 +845,7 @@ func buildRebaseline(freshExe string) string {
 // enddesign
 
 // design: go-start-init  implements: req-engine-vehicle-overlay.3, req-vendor-workspace.2, req-vendor-workspace.1, req-scaffold-modern, req-vehicle-drives-stub.1, req-vehicle-module-setup
-// `quack start init <target>` is run FROM a quackitect checkout and sets up a NEW vehicle at <target>
-// in the CURRENT world (adr-no-quack-data-home, adr-entry-chain, adr-ratchet-stamp):
-// it vendors the engine (product/ -> tools/vendor/, stamp included), writes spec/project.toml as the
-// root marker, a global-bin bootstrap launcher, and the pointer-chain entry files (CLAUDE.md ->
-// AGENTS.md -> the vendored contract). No .quack anywhere. It deliberately does NOT mint an iteration
-// or write any spec — the user drives that. Only meaningful from a quackitect checkout.
+// `quack start init <target>` runs FROM a quackitect checkout and sets up a NEW vehicle at <target> in the CURRENT world (adr-no-quack-data-home, adr-entry-chain, adr-ratchet-stamp). It vendors the engine, product/ into tools/vendor/, stamp included. It writes spec/project.toml as the root marker, a global-bin bootstrap launcher, and the pointer-chain entry files: CLAUDE.md to AGENTS.md to the vendored contract. There is no .quack anywhere. It deliberately does NOT mint an iteration or write any spec; the user drives that. It is only meaningful from a quackitect checkout.
 const vehicleLauncherTmpl = `@echo off
 rem {{PROJ}} launcher: forwards to the ONE global engine binary; bootstraps it from the vendored source when absent.
 setlocal
@@ -1017,10 +1013,7 @@ func cmdStartInit(args []string) {
 // --- drive-from-inside stubs: make a bare workspace drivable from within, engine linked at runtime ---
 
 // design: go-inside-launcher  implements: req-workspace-stubs.4, req-workspace-stubs.2
-// The committed root launcher for a bare workspace. It resolves an engine at runtime — the global
-// binary, then the env var — and forwards; with neither present it fails clearly. No engine binary
-// and no engine path is ever committed, so a clone carries no machine-local state (no .quack
-// internal/pointer lanes - adr-retire-legacy-lanes).
+// This is the committed root launcher for a bare workspace. It resolves an engine at runtime, the global binary, then the env var, and forwards. With neither present, it fails clearly. No engine binary and no engine path is ever committed, so a clone carries no machine-local state: no .quack internal/pointer lanes (adr-retire-legacy-lanes).
 const insideLauncherTmpl = `@echo off
 rem {{PROJ}} launcher: resolve an engine (global binary -> env) and forward. No engine path committed.
 setlocal enabledelayedexpansion
@@ -1036,9 +1029,7 @@ exit /b %errorlevel%
 // enddesign
 
 // design: go-inside-agents  implements: req-workspace-stubs.3
-// The committed AGENTS.md entry surface for a bare workspace: tells an AI to drive via the launcher and
-// load method prompts path-free through `quack resolve` / `quack guides`. Self-contained — no hard link
-// to a quackitect checkout.
+// This is the committed AGENTS.md entry surface for a bare workspace. It tells an AI to drive via the launcher and load method prompts path-free through `quack resolve` / `quack guides`. It is self-contained, with no hard link to a quackitect checkout.
 const insideAgentsTmpl = `# AGENTS.md — {{PROJ}}
 
 {{PROJ}} is a quackitect workspace with no engine of its own. Drive it from INSIDE this folder:
@@ -1064,8 +1055,7 @@ The user adjudicates gates; never bless on their behalf.
 // enddesign
 
 // design: go-inside-claude  implements: req-scaffold-modern
-// The stub CLAUDE.md pointer: Claude Code auto-loads CLAUDE.md only, so a bare
-// workspace carries the same pointer chain as a full vehicle — CLAUDE.md commands AGENTS.md to the letter.
+// This is the stub CLAUDE.md pointer. Claude Code auto-loads CLAUDE.md only, so a bare workspace carries the same pointer chain as a full vehicle. CLAUDE.md commands AGENTS.md to the letter.
 const insideClaudeTmpl = `# CLAUDE.md — entry for the Claude Code harness
 
 Claude Code auto-loads this file, not AGENTS.md.
@@ -1089,19 +1079,14 @@ func insideStubFiles(proj string) map[string]string {
 		"CLAUDE.md":   sub(insideClaudeTmpl),
 		// a stub is born in connections mode (go-edge-mode): its edges live in the
 		// spec/connections lanes from the first minute — a fresh stub never needs migrate-edges.
-		filepath.Join("spec", "project.toml"): "# the workspace root marker + iteration breadcrumb (adr-no-quack-data-home).\n[iteration]\ntype    = \"default\"\nrigor   = \"systematic\"\nversion = \"\"\nedges = \"connections\"\n",
+		// It is also born MCP-armed (go-mcp-birth): agent_lane set, .mcp.json beside the launcher.
+		filepath.Join("spec", "project.toml"): "# the workspace root marker + iteration breadcrumb (adr-no-quack-data-home).\n[iteration]\nagent_lane = \"mcp\"\ntype    = \"default\"\nrigor   = \"systematic\"\nversion = \"\"\nedges = \"connections\"\n",
+		".mcp.json":                           "{\n  \"mcpServers\": {\n    \"" + proj + "\": {\n      \"command\": \"cmd\",\n      \"args\": [\"/c\", \".\\\\" + proj + ".cmd\", \"mcp\"]\n    }\n  }\n}\n",
 	}
 }
 
 // design: go-migrate-layout  implements: req-migrate-layout
-// The layout determinizer: the spec MIRRORS the template.
-// New workspaces seed the mirrored layout through start stubs; an EXISTING workspace
-// converts through this one-shot - manifests (man-*, SPEC-README) to the spec root,
-// stakeholders/usecases/raid notes to their item homes. Needs, criteria, and
-// rationales stay in spec/trace (their template home). Idempotent; an existing
-// destination is KEPT and warned about, never overwritten. Engine-resident on
-// purpose: migrations are determinizers in the one zero-dependency binary, never
-// shell scripts beside it.
+// This layout determinizer makes the spec MIRROR the template. New workspaces seed the mirrored layout through start stubs. An EXISTING workspace converts through this one-shot instead: manifests (man-*, SPEC-README) move to the spec root, and stakeholders, usecases, and raid notes move to their item homes. Needs, criteria, and rationales stay in spec/trace, their template home. It is idempotent. An existing destination is KEPT and warned about, never overwritten. It stays engine-resident on purpose: migrations are determinizers in the one zero-dependency binary, never shell scripts beside it.
 func migrateLayout(spec string) (int, error) {
 	trace := filepath.Join(spec, "trace")
 	ents, err := os.ReadDir(trace)
@@ -1162,12 +1147,7 @@ func cmdMigrateLayout() {
 // enddesign
 
 // design: go-init-stubs  implements: req-workspace-stubs.1, req-vehicle-drives-stub.2
-// `quack start stubs [target]` makes a workspace drivable from INSIDE: it writes the launcher,
-// AGENTS.md/CLAUDE.md, and spec/project.toml stubs (insideStubFiles) into target (default: the
-// current workspace ROOT). The launcher resolves an engine at runtime with no engine path
-// committed. Idempotent — existing files are kept. The CREATING process's engine root is
-// recorded in the stub's data home (engine-home.txt), so a vehicle-created stub resolves
-// the vehicle's merged methods over any machine-global pointer.
+// `quack start stubs [target]` makes a workspace drivable from INSIDE. It writes the launcher, AGENTS.md/CLAUDE.md, and spec/project.toml stubs (insideStubFiles) into target, default the current workspace ROOT. The launcher resolves an engine at runtime with no engine path committed. It is idempotent, and existing files are kept. The CREATING process's engine root is recorded in the stub's data home (engine-home.txt), so a vehicle-created stub resolves the vehicle's merged methods over any machine-global pointer.
 func cmdStartStubs(args []string) {
 	target := ROOT
 	if len(args) > 0 && strings.TrimSpace(args[0]) != "" {
@@ -1185,11 +1165,7 @@ func cmdStartStubs(args []string) {
 	// the stub remembers its creator: a stale record self-ignores at resolution (hasEngineLayer).
 	recordWorkspaceEngineHome(target, ENGINE)
 	// design: go-stub-spec  implements: req-stub-templates.2, req-stub-templates.1, req-template-home.8
-	// The instantiation path: the spec MIRRORS the template -
-	// top-level files land at the spec ROOT (README renamed SPEC-README), and EVERY
-	// template subfolder mirrored 1:1 under spec/ (queries, references, fundamentals, the
-	// global item homes with their ex- example notes, the connections kinds). Existing
-	// files are KEPT - a second run refuses to overwrite.
+	// This is the instantiation path: the spec MIRRORS the template. Top-level files land at the spec ROOT, with README renamed SPEC-README. EVERY template subfolder mirrors 1:1 under spec/: queries, references, fundamentals, the global item homes with their ex- example notes, and the connections kinds. Existing files are KEPT. A second run refuses to overwrite.
 	tplDir := filepath.Join(EngineDir(), "method", "templates", "documents", "spec")
 	if ents, err := os.ReadDir(tplDir); err == nil {
 		for _, e := range ents {
@@ -1382,11 +1358,7 @@ func writeIfAbsent(path, content string) {
 }
 
 // design: go-stamp-user  implements: req-stamp-user
-// The ledger says `user` (adr-actor-user-migration). New records write user (resolveActor);
-// `quack migrate-actors` rewrites historical human stamps to user in ONE audited pass — the
-// migration event records the count and timestamp, bless hashes and the prev_hash chain stay
-// untouched, and a second run is a no-op. Readers treat human and user as one value forever
-// (normActor, beside resolveActor in go-actor-channels), so an unmigrated clone still computes.
+// The ledger says `user` (adr-actor-user-migration). New records write user via resolveActor. `quack migrate-actors` rewrites historical human stamps to user in ONE audited pass. The migration event records the count and timestamp. Bless hashes and the prev_hash chain stay untouched. A second run is a no-op. Readers treat human and user as one value forever (normActor, beside resolveActor in go-actor-channels), so an unmigrated clone still computes.
 
 // migrateActorsFrom is the pure one-pass rewrite: every human actor/filler stamp becomes user;
 // when anything changed, ONE audit event (action migrate-actors) records how many events moved.

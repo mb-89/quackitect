@@ -1,7 +1,7 @@
 ---
 id: test-ask-loop
 type: test
-statement: The ask loop runs end to end - each ask rendered, dispatched, distinctly gated, resolved exactly once, and recorded with its actor.
+statement: The ask loop runs end to end. Each ask is rendered, dispatched, distinctly gated, resolved exactly once, and recorded with its actor.
 class: executed
 verify: selftest:answer-apply answer-idempotent ask-dispatch ask-format ask-timeout gate-distinct mobile-actor multi-ask
 tests_red: exempt - clustered at i17; the birth reds stand in the ledger under the origin ids (adr-cluster-numbered-statements)
