@@ -461,13 +461,23 @@ func isGate(n Node) bool {
 	return true
 }
 
+// iterOfMemo: the coverage rules ask iterOf per node per (rule, scope); keyed by
+// SPEC too because selftests swap roots mid-process.
+var iterOfMemo = map[string]string{}
+
 func iterOf(path string) string {
+	key := SPEC + "|" + path
+	if v, ok := iterOfMemo[key]; ok {
+		return v
+	}
 	rel, _ := filepath.Rel(SPEC, path)
 	parts := strings.Split(filepath.ToSlash(rel), "/")
+	v := "i0000_baseline"
 	if len(parts) > 1 && parts[0] == "iterations" {
-		return parts[1]
+		v = parts[1]
 	}
-	return "i0000_baseline"
+	iterOfMemo[key] = v
+	return v
 }
 
 // --- attestation (append-only bless event log) ---
@@ -489,13 +499,19 @@ type Event struct {
 	Expiry        string            `json:"expiry,omitempty"`  // grant-open: RFC3339 end of the stretch
 }
 
+// attestEventsMemo: one parse of the append-only log per process, keyed by the
+// ATTEST path; saveEvents writes through so a same-process append stays visible.
+var attestEventsMemo = map[string][]Event{}
+
 func attestEvents() []Event {
-	raw, err := os.ReadFile(ATTEST)
-	if err != nil {
-		return nil
+	if ev, ok := attestEventsMemo[ATTEST]; ok {
+		return ev
 	}
 	var ev []Event
-	json.Unmarshal(raw, &ev)
+	if raw, err := os.ReadFile(ATTEST); err == nil {
+		json.Unmarshal(raw, &ev)
+	}
+	attestEventsMemo[ATTEST] = ev
 	return ev
 }
 

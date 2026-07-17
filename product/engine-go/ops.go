@@ -28,6 +28,7 @@ func saveEvents(events []Event) {
 	os.MkdirAll(filepath.Dir(ATTEST), 0o755)
 	out, _ := json.MarshalIndent(events, "", "  ")
 	os.WriteFile(ATTEST, out, 0o644)
+	attestEventsMemo[ATTEST] = events
 }
 
 // design: go-bless-preflight  implements: req-bless-preflight

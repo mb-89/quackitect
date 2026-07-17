@@ -63422,5 +63422,58 @@
     },
     "prev_hash": null,
     "grant": "grant-20260717-173742"
+  },
+  {
+    "check": "test-status-fast",
+    "action": "red-observed",
+    "actor": "tester",
+    "ts": "2026-07-17T19:15:46+02:00",
+    "hash": "d972b1a61d13",
+    "statement_hash": "b3f921deba16",
+    "deps": null,
+    "prev_hash": null
+  },
+  {
+    "check": "test-responsive-status",
+    "action": "red-observed",
+    "actor": "tester",
+    "ts": "2026-07-17T19:15:55+02:00",
+    "hash": "8e32a0152f92",
+    "statement_hash": "71f9a3a28cb9",
+    "deps": null,
+    "prev_hash": null
+  },
+  {
+    "check": "i26-m8-handover-accepted",
+    "action": "bless",
+    "actor": "user",
+    "filled_by": "agent",
+    "ts": "2026-07-17T19:27:43+02:00",
+    "hash": "e105f59046d7",
+    "statement_hash": "0d9725929e8c",
+    "deps": {
+      "i26-m7-gate": "7a04c9afb5a2"
+    },
+    "prev_hash": null,
+    "channel": "handoff"
+  },
+  {
+    "check": "i26-m8-gate",
+    "action": "bless",
+    "actor": "user",
+    "filled_by": "agent",
+    "ts": "2026-07-17T19:27:43+02:00",
+    "hash": "4e0bf6db13c5",
+    "statement_hash": "cb052e148ceb",
+    "deps": {
+      "i26-m7-gate": "7a04c9afb5a2",
+      "i26-m8-configuration-baselined": "1dc8a62d9d04",
+      "i26-m8-docs-complete-match": "7cdcb6da88fa",
+      "i26-m8-handover-accepted": "e105f59046d7",
+      "i26-m8-ifu-usecase-coverage": "f168b7429dcb",
+      "i26-m8-packaged-versioned": "78529640de97"
+    },
+    "prev_hash": null,
+    "channel": "handoff"
   }
 ]
