@@ -815,7 +815,7 @@ type: test
 statement: A golden-output suite runs each command on a fixture vehicle. The Go output matches the Python baseline, including the report determinism root, byte for byte.
 class: executed
 verify: selftest:parity
-suite: standalone
+suite: never-cached
 killer: false
 tests_red: exempt - predates the red-observation mechanism (adr-grandfathers-historical)
 ---

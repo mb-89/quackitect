@@ -48,12 +48,12 @@ The requirement set held against the feature checklists of the prior art (M1 sou
 
 ## Requirements traced → i13-m2-req-traced
 
-Every requirement refines a use case; every use case refines a need (need-docu for the comment family, need-workspace-drive for the workshop family). The coverage check computes live.
+Every requirement refines a use case. Every use case refines a need (need-docu for the comment family, need-workspace-drive for the workshop family). The coverage check computes live.
 
 ## Review rounds & verdict
 
-1. **Verify.** Node files exist for 5 use cases, 28 requirements (EARS-shaped, faceted), 28 tests; 61 edges appended. The two derived checks adjudicate the wiring deterministically.
-2. **Validate.** The set covers every owner decision from 2026-07-07 (island, anchoring, save, author, privacy, suggest, hand-roll, unreliable-source stance) and all ten engine-batch items. The premark future is held open by req-comment-premark-open without building it.
-3. **Red-team.** Sharpest attack: "9 review-class tests is a lot of user time." Held: each is one observable browser action at M7; the mechanizable core (island, read-back, escape, DOM-static) is executed. Second attack: "req-orphan-render-refs bakes a ruling the owner has not spoken." Correct — it is flagged in the node's rationale and named at this gate for explicit adoption or rejection.
+- **Verify.** Node files exist for 5 use cases, 28 requirements (EARS-shaped, faceted), 28 tests; 61 edges appended. The two derived checks adjudicate the wiring deterministically.
+- **Validate.** The set covers every owner decision from 2026-07-07 (island, anchoring, save, author, privacy, suggest, hand-roll, unreliable-source stance) and all ten engine-batch items. The premark future is held open by req-comment-premark-open without building it.
+- **Red-team.** Sharpest attack: "9 review-class tests is a lot of user time." Held: each is one observable browser action at M7; the mechanizable core (island, read-back, escape, DOM-static) is executed. Second attack: "req-orphan-render-refs bakes a ruling the owner has not spoken." Correct — it is flagged in the node's rationale and named at this gate for explicit adoption or rejection.
 
 **Verdict: pass**, with one named decision for the adjudicator at the gate: adopt the orphan-lint ruling (views count as references — pull law) or reopen req-orphan-render-refs with the curation alternative.

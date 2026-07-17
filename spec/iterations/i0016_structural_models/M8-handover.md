@@ -1,6 +1,14 @@
 # M8 - Handover (i0016_structural_models, systematic)
 
-TL;DR: The model layer ships - three live models over a five-kind registry, the pinned-subset extractor with semantic hashing, conformance with smells at lint-zero, the region-block onion with theme clusters, and the method steps in both rigor checklists. The reader starts at guide-model-syntax; the pruning iteration inherits three recorded RAID leads.
+TL;DR: The model layer ships:
+
+- three live models over a five-kind registry
+- the pinned-subset extractor with semantic hashing
+- conformance with smells at lint-zero
+- the region-block onion with theme clusters
+- the method steps in both rigor checklists
+
+The reader starts at guide-model-syntax. The pruning iteration inherits three recorded RAID leads.
 
 ## Docs complete & matching  -> i16-m8-docs
 - [guide-model-syntax](../../guides/guide-model-syntax.md) UPDATED at this gate to the final surface: the b9 physics section (gradient, seam bands, ambient, identity transit, a-to-b), regions-are-elements/files-are-themes, spec/models location, the mint --kind seed.
@@ -24,8 +32,14 @@ TL;DR: The model layer ships - three live models over a five-kind registry, the 
 
 ## Milestone review  -> i16-m8-gate
 
-**Verify.** The guide matches the shipped surface (updated in this gate's own diff); the registry files pin their contract by selftest; the checklists and compose-reference edits are in the method layer; packaging and baseline mechanics are the standing i12 machinery, unchanged.
+**Verify.** The guide matches the shipped surface (updated in this gate's own diff). The registry files pin their contract by selftest. The checklists and compose-reference edits are in the method layer. Packaging and baseline mechanics are the standing i12 machinery, unchanged.
 
-**Validate.** The iteration theme - introduce the models and render them, all changes in-iteration - is delivered: models, checks, renders, restructuring, and the method steps for every future iteration.
+**Validate.** The iteration theme - introduce the models and render them, all changes in-iteration - is delivered:
 
-**Red-team.** Attack: the guide was updated minutes before the gate - is it reviewed or merely written? Defense: its content is the owner's own rulings restated by-example; the adjudicator reads it AT this gate (it is the hand-off's referent). Attack: shipping with 3 carried RAID leads - acceptable? They are recorded, owner-ruled descopes with a named successor iteration, not silent gaps. **Verdict: PASS** - hand-off for the combined killer + gate; ship follows the bless.
+- models
+- checks
+- renders
+- restructuring
+- the method steps for every future iteration
+
+**Red-team.** Attack: the guide was updated minutes before the gate - is it reviewed or merely written? Defense: its content is the owner's own rulings restated by-example; the adjudicator reads it AT this gate (it is the hand-off's referent). Attack: shipping with 3 carried RAID leads - acceptable? They are recorded, owner-ruled descopes with a named successor iteration - not silent gaps. **Verdict: PASS** - hand-off for the combined killer + gate; ship follows the bless.

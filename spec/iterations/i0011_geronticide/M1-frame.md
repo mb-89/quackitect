@@ -12,13 +12,19 @@
 
 **Success, checkable.**
 
-1. Red means regression: parity standalone; propagated suspects marked with their root named; pagers scoped to the check in hand.
+1. Red means regression:
+   - parity standalone
+   - propagated suspects marked with their root named
+   - pagers scoped to the check in hand
 2. Evidence is immutable-or-suspect: docs hashed into their checks; verdict files bounded.
 3. Records say `user`: new blesses and migrated history, self-cert metric unbroken across eras.
-4. No grandfather without a decision: explicit exemption markers, retire-or-retrofit ADRs for the EARS baseline and pre-i4 designs, legacy lanes gone.
+4. No grandfather without a decision:
+   - explicit exemption markers
+   - retire-or-retrofit ADRs for the EARS baseline and pre-i4 designs
+   - legacy lanes gone
 
 **Worth solving.** Every item is a trust cost on the ledger itself — the product IS the trustworthy board.
 
 ## Milestone review  → i11-m1-gate
 
-**Verify:** each problem line carries a dated referent from the i10 walk or the note trail. **Validate:** the frame covers exactly the nine composed requirements, nothing more. **Red-team (scaled to a lean frame gate):** "why not fold into the docu iteration?" — because every item ships engine behavior, not prose; docu builds ON a board that stops lying. **Verdict: PASS.**
+**Verify:** each problem line carries a dated referent from the i10 walk or the note trail. **Validate:** the frame covers exactly the nine composed requirements, nothing more. **Red-team (scaled to a lean frame gate):** "why not fold into the docu iteration?" — because every item ships engine behavior, not prose. Docu builds ON a board that stops lying. **Verdict: PASS.**

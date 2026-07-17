@@ -26,10 +26,12 @@ PR-FAQ pressure test (condensed):
 - *Q: Why now?* A: The schema layer shipped in i18 unconsumed; the seeding defer (i20-m4-seed)
   falls due here; the pieces exist separately in the wild and nobody has joined them.
 
-Scope: schema consumption (mint prefill + tiers), the register (colors, render, ask,
-killer-guard), start-time seeding, plus the approved ride-alongs (EARS sweep, rigor-fit,
-drivers table, lint scopes, battery tiers, deck-goto fix, apply-lane generalization with
-q-io-lane-scope open for the owner).
+Scope:
+
+- schema consumption (mint prefill + tiers)
+- the register (colors, render, ask, killer-guard)
+- start-time seeding
+- the approved ride-alongs (EARS sweep, rigor-fit, drivers table, lint scopes, battery tiers, deck-goto fix, apply-lane generalization with q-io-lane-scope open for the owner)
 
 Non-killer review; blessed by the driving agent.
 
@@ -55,7 +57,7 @@ External validation from the prior-art scan (above):
 - The fix direction is market-converged: machine proposes, human curates (GitHub's 2026 veto
   dialog; tax prefill compliance gains).
 
-The delta is real, owner-named, and worth solving; this iteration exists for it.
+The delta is real, owner-named and worth solving. This iteration exists for it.
 
 Adjudication: killer review. Blessed by the driving agent under the owner's standing overnight
 grant (2026-07-13: "assume for all killers that I approve/bless, collect them for the morning").
@@ -67,11 +69,11 @@ Ch1 success criteria for this iteration - each binary, each demonstrated at M7:
 
 1. **Zero blanks.** A node minted on a schema reaches the user with 0 empty fields - every
    slot carries a value or an explicit counted TBD (test-mint-prefill).
-2. **A veto session works end-to-end.** On a real node set: open the register, resolve every
-   red row through the questionnaire, skim the yellows, finish without typing a value into a
+2. **A veto session works end-to-end.** On a real node set: open the register. Resolve every
+   red row through the questionnaire. Skim the yellows. Finish without typing a value into a
    blank (the M7 killer-uc demonstration of uc-work-register).
 3. **Start seeds the skeleton.** `quack start` on a planned fixture version emits the full
-   rigor gate/subtask set, lint-clean, ids namespaced (test-seed-skeleton) - the hand-copying
+   rigor gate/subtask set - lint-clean, ids namespaced (test-seed-skeleton). The hand-copying
    this compose itself did (~40 files) never happens again.
 4. **Colors are computed.** Every register color is derivable from recorded provenance by rule;
    no color input is self-reported (test-register-colors).
@@ -82,7 +84,7 @@ Non-killer review; blessed by the driving agent.
 
 ## Top risks logged → i21-m1-risks
 
-Four RAID items minted, each with probability, impact, and a concrete mitigation:
+Four RAID items minted. Each carries probability, impact and a concrete mitigation:
 
 - [raid-register-scope-creep](../../raid/raid-register-scope-creep.md) - the register grows a parallel UI instead of unifying with the ask path.
 - [raid-provenance-gamed](../../raid/raid-provenance-gamed.md) - proposals game the traffic lights; over-green is the dangerous class.
@@ -93,9 +95,9 @@ Non-killer review; blessed by the driving agent.
 
 ## State of the art checked → i21-m1-prior-art
 
-Method: the referenced research capability (deep-research; 5 angles, 22 sources fetched, 25 top
-claims adversarially verified 3-vote, 24 confirmed / 1 refuted). Full verified report retained in
-the session record; the load-bearing findings:
+Method: the referenced research capability (deep-research). 5 angles. 22 sources fetched.
+25 top claims adversarially verified 3-vote - 24 confirmed / 1 refuted. Full verified report
+retained in the session record; the load-bearing findings:
 
 - **Schema-driven forms are solved, but render BLANK.** react-jsonschema-form and JSON Forms
   drive widgets, validation, and defaults from one JSON Schema at runtime. Both needed a SECOND
@@ -138,7 +140,7 @@ disclosure's primary failure mode" (0-3).
 
 Design obligations the evidence imposes on this iteration:
 
-1. Expect prefill quality to fall with node complexity; the register must make that visible
+1. Expect prefill quality to fall with node complexity. The register must make that visible
    per row, not average it away.
 2. Treat agent-favoring errors (over-green) as the dangerous class; colors derive from
    provenance only (req-register-colors.4).
@@ -156,15 +158,15 @@ design obligations. Non-killer review; blessed by the driving agent.
 
 Increasing-scrutiny rounds:
 
-1. **Verify (built it right).** Every subtask delivered a referent: the Moore vision + PR-FAQ
-   (this doc), the owner-named delta with external validation, an adversarially verified
-   prior-art scan (24/25 claims confirmed, 1 refuted and discarded), five binary Ch1 criteria
-   each mapped to a composed test, four RAID items with concrete mitigations.
+1. **Verify (built it right).** Every subtask delivered a referent. The Moore vision + PR-FAQ
+   (this doc). The owner-named delta with external validation. An adversarially verified
+   prior-art scan (24/25 claims confirmed, 1 refuted and discarded). Five binary Ch1 criteria
+   each mapped to a composed test. Four RAID items with concrete mitigations.
 2. **Validate (built the right thing).** The frame matches the approved plan and the owner's
-   seeds verbatim: filling becomes vetoing; schema consumption, register, seeding as the core;
-   ride-alongs named; nothing out of scope entered.
+   seeds verbatim: filling becomes vetoing. Schema consumption + register + seeding as the
+   core. Ride-alongs named. Nothing out of scope entered.
 3. **Red-team.** Opposing case "this is UI polish, not method": rejected - the delta is the
-   authoring MODE, and the register surfaces the contract's own FILL/ADJUDICATE split.
+   authoring MODE and the register surfaces the contract's own FILL/ADJUDICATE split.
    Opposing case "prefill invites slop": the residual risk is logged (raid-provenance-gamed,
    raid-reviewer-habituation) with named guards. Kill criterion recorded: if the M7 register
    session cannot beat blank-form filling on a real node set, the iteration fails validation.

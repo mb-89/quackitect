@@ -1,6 +1,16 @@
 # M4 - Build and test (i0017_pruning, lean)
 
-TL;DR: Eleven build steps landed test-first: seven selftests observed RED then green, three migrations executed by determinizer commands (63 requirement clusters, 42 test clusters, the archive loader), the three metrics deleted with tombstone, the analysis gate armed in the build, rules split to config, renders folded three ways, and the ask carries its narrative. The trace shrank 292->125 requirements and 279->171 tests with zero lost ledger truth. One incident recorded honestly.
+TL;DR: Eleven build steps landed test-first:
+
+- seven selftests observed RED then green
+- three migrations executed by determinizer commands (63 requirement clusters, 42 test clusters, the archive loader)
+- the three metrics deleted with tombstone
+- the analysis gate armed in the build
+- rules split to config
+- renders folded three ways
+- the ask carries its narrative
+
+The trace shrank 292->125 requirements and 279->171 tests with zero lost ledger truth. One incident recorded honestly.
 
 ## Build  -> i17-m4-build
 The eleven steps, each blessed after its green: b1 red battery (7 observed RED), b2 ask-context (card first, narrative below, both lanes identical), b3 metrics removal (veto with both testimonies; "engine-verified" replaces the odd "self-certified" label), b4 rules-as-config (retired-vocabulary + weasel-words as JSON; the EARS lint consumes config), b5 the analysis gate (gofmt+vet always, staticcheck grab-if-present; the 15-file format debt paid), b6 sub-addressing (req-x.N folds at every lookup - referee, lanes, coverage, holes, deltas, book refs, dep hashing), b7 the requirement clustering (63 clusters, 39 deliberately-left with reasons, one tool gap found and noted), b8 render folds (fan boxes, theme clusters, the five-iteration age fold - all pre-baked static DOM), b9 compaction (byte-exact archive round trip, hashes proven immovable on the fixture), b10 mint-from-templates (nine static kinds; interpolated kinds honestly kept in code), b11 test clustering (42 clusters via multi-selftest verify; exempt tests skipped because citations cannot survive a merge).

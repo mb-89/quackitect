@@ -2,7 +2,7 @@
 
 ## Alternatives elaborated → i21-m3-alternatives
 
-Four concerns, each with viable rivals. Feasibility anchors name EXISTING machinery, probed at
+Four concerns, each with viable rivals. Feasibility anchors name EXISTING machinery - probed at
 M2, not hoped-for parts.
 
 ### A. Register placement
@@ -65,7 +65,7 @@ under the owner's standing overnight grant (2026-07-13); collected for the morni
 Derived from the requirement set and the recorded risks, weighted /10:
 
 1. **One-system unification** (w3) - no parallel renderer/answer path (raid-register-scope-creep; the register seed's law).
-2. **Provenance integrity** (w3) - colors derivable from recorded data on a fresh clone; veto and provenance move together (req-register-colors, repo law).
+2. **Provenance integrity** (w3) - colors derivable from recorded data on a fresh clone. Veto and provenance move together (req-register-colors, repo law).
 3. **Drift immunity** (w2) - one source of truth for milestones and schemas (raid-seeding-drift, template render law).
 4. **Overlay/vehicle fit** (w1) - a vehicle's schemas and rigor win through the overlay (M2 stakeholder sweep, integrator).
 5. **Build cost inside the iteration** (w1) - lands within i21 without starving the ride-alongs.
@@ -91,10 +91,10 @@ Non-killer review; blessed by the driving agent.
 ## Milestone review → i21-m3-gate
 
 1. **Verify.** Four concerns each carry 2-3 elaborated rivals with feasibility anchors in
-   probed machinery; the criteria derive traceably from requirements and RAID items; no
+   probed machinery. The criteria derive traceably from requirements and RAID items. No
    candidate is a strawman (each has a real anchor and a real loss mode).
-2. **Validate.** The concern set covers the iteration's architecture surface: placement,
-   transport, seeding, provenance. The apply-lane scope is deliberately excluded and parked
+2. **Validate.** The concern set covers the iteration's architecture surface: placement +
+   transport + seeding + provenance. The apply-lane scope is deliberately excluded and parked
    in q-io-lane-scope for the owner - the one decision the standing grant does not cover.
 3. **Red-team.** Hardest push: "B1 makes the register depend on --watch" - answered by the
    B1+B2 composition (static mode stays honest with emitted commands). "D1 bloats node

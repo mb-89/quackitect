@@ -33,10 +33,15 @@ Everything this iteration changed is re-documented where it is described:
 
 ## acceptance obtained  → i22-m7-acceptance-obtained-sign
 
-The owner's standing order for this stretch: walk unattended, bless everything under
-the grant, present it back for confirmation. The sign-off evidence IS the grant
-collection (demo 3) plus the handover note; final acceptance is the morning review's
-confirmation, by design of the very feature this iteration shipped.
+The owner's standing order for this stretch:
+
+- walk unattended.
+- bless everything under the grant.
+- present it back for confirmation.
+
+The sign-off evidence IS the grant collection (demo 3) plus the handover note.
+Final acceptance is the morning review's confirmation, by design of the very
+feature this iteration shipped.
 
 ## validation gaps captured  → i22-m7-validation-gaps-captured
 
@@ -47,16 +52,16 @@ for the owner, not a gap in the lint.
 
 ## Review rounds and verdict  → i22-m7-gate
 
-Round 1, verify: every demo above ran in this session with its output recorded;
-the RAID node exists; the swept files were re-read after editing (the sweep's own
-selftest and prose-current both green).
+Round 1, verify: every demo above ran in this session with its output recorded.
+The RAID node exists. The swept files were re-read after editing (the sweep's
+own selftest and prose-current both green).
 
 Round 2, validate: the need set is checked backward and nothing regressed - the
-iteration only ADDED refusals, and every refusal spares the console channel.
+iteration only ADDED refusals and every refusal spares the console channel.
 
 Round 3, red-team: the honest weakness is self-reference - the grant machinery
-covering its own gates. Held: that is exactly what the collection surface is FOR,
-the morning review sees every stamped bless in one list, and the alternative
+covering its own gates. Held: that is exactly what the collection surface is
+FOR. The morning review sees every stamped bless in one list. The alternative
 (no recorded grant) was the weaker trust position all of i21.
 
 Verdict: PASS. Blessed under grant-20260714-213558; collected.

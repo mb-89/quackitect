@@ -2,7 +2,7 @@
 
 ## Chosen architecture → i9-m4-architecture-stated
 
-One sentence: **the engine gates the ledger behind a console-granted, self-renewing key ritual; the contract ships pre-rendered into every entry file; the repo keeps only truth, everything else lives in one data home per workspace, served by one forward-ratcheting global binary; decisions are immutable graph-classified nodes, and every node is engine-minted.**
+In short: **the engine gates the ledger behind a console-granted and self-renewing key ritual. The contract ships pre-rendered into every entry file. The repo keeps only truth — everything else lives in one data home per workspace, served by one forward-ratcheting global binary. Decisions are immutable graph-classified nodes. Every node is engine-minted.**
 
 Per axis — chosen / why / runner-up:
 
@@ -22,7 +22,15 @@ ADRs: [adr-attest-ritual](../../decisions/adr-attest-ritual.md) · [adr-entry-re
 
 ## Choice traced to the criteria → i9-m4-choice-traced
 
-Pugh, datum = "do nothing" (advisory floor + .quack as-is). Score −1/0/+1 per criterion, weighted (C1=5, C2=4, C3=4, C4=4, C5=3, C6=3, C7=3).
+Pugh, datum = "do nothing" (advisory floor + .quack as-is). Score −1/0/+1 per criterion, weighted:
+
+- C1=5
+- C2=4
+- C3=4
+- C4=4
+- C5=3
+- C6=3
+- C7=3
 
 | Candidate set | C1 | C2 | C3 | C4 | C5 | C6 | C7 | Weighted |
 |---|---|---|---|---|---|---|---|---|
@@ -31,9 +39,9 @@ Pugh, datum = "do nothing" (advisory floor + .quack as-is). Score −1/0/+1 per 
 | Keep .quack, kind-first, launcher ratchet | 0 | +1 | 0 | 0 | −1 | −1 | +1 | +1 |
 | Do nothing (datum) | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
 
-**Sensitivity.** The chosen set wins under any single weight change of ±2: its lead rests on C1 (which only it scores) and on breadth, not on one criterion. Doubling C7 (friction) to 6 still leaves it ahead (+20 vs +12). The one genuine sensitivity is feasibility, not weighting: if the M5 spikes falsify the code round-trip or the rename dance, the pre-agreed fallbacks (shorter code format; build-next-launch) keep the set intact — no candidate flip.
+**Sensitivity.** The chosen set wins under any single weight change of ±2: its lead rests on C1 (which only it scores) and on breadth, not on one criterion. Doubling C7 (friction) to 6 still leaves it ahead (+20 vs +12). The one genuine sensitivity is feasibility rather than weighting: the pre-agreed fallbacks (shorter code format; build-next-launch) keep the set intact if the M5 spikes falsify the code round-trip or the rename dance — no candidate flip.
 
-**Datum re-run (gate discussion 2026-07-04, red-team criticism upheld).** Same weights, datum = the strongest rival (soft-ritual set), the comparison the first run hid:
+**Datum re-run (gate discussion 2026-07-04, red-team criticism upheld).** Same weights; datum = the strongest rival (soft-ritual set) — the comparison the first run hid:
 
 | Candidate set vs soft-ritual datum | C1 | C2 | C3 | C4 | C5 | C6 | C7 | Weighted |
 |---|---|---|---|---|---|---|---|---|
@@ -41,17 +49,32 @@ Pugh, datum = "do nothing" (advisory floor + .quack as-is). Score −1/0/+1 per 
 | Keep .quack, kind-first, launcher ratchet | +1 | 0 | −1 | 0 | −2* | −1 | 0 | −10 |
 | Soft-ritual set (datum) | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
 
-*scored −2 as worse-than-either on simplicity: launcher version logic duplicated per platform. The choice survives the honest datum: the chosen set trades simplicity and friction for structural proof, determinism, and the amnesia test — exactly the priorities the M1 frame set. Method fix (datum = strongest rival, status quo only for worth-doing-at-all) noted for triage into the M4 checklist method line.
+*scored −2 as worse-than-either on simplicity: launcher version logic duplicated per platform. The choice survives the honest datum: the chosen set trades simplicity and friction for structural proof, determinism and the amnesia test — exactly the priorities the M1 frame set. Method fix (datum = strongest rival, status quo only for worth-doing-at-all) noted for triage into the M4 checklist method line.
 
 ## ADRs recorded → i9-m4-adr-recorded
 Derived: coverage:adr-traced — all six ADRs address requirements. Computed live.
 
 ## Review rounds & verdict
 
-**Round 1 — Verify.** Six ADR nodes load under the strict parser from `spec/decisions/`; adr-traced computes green (every ADR addresses named requirements); every M3 axis appears in the decision table with its runner-up and reason; the Pugh matrix uses the M3 weights unchanged.
+**Round 1 — Verify.**
 
-**Round 2 — Validate.** The chosen set realizes both halves of the vision (undodgeable contract; truth-only repo) and every owner call is traceable to its recording: ratchet (2026-07-04), no-.quack (2026-07-04), decision model (2026-07-03). Nothing decided here contradicts a blessed decision elsewhere; the one superseded decision (.quack as plumbing, 2026-06-30) is named inside adr-no-quack-data-home rather than silently overwritten.
+- Six ADR nodes load under the strict parser from `spec/decisions/`.
+- adr-traced computes green (every ADR addresses named requirements).
+- Every M3 axis appears in the decision table with its runner-up and reason.
+- The Pugh matrix uses the M3 weights unchanged.
 
-**Round 3 — Red-team.** (i) "The Pugh datum is a straw man — 'do nothing' can't win." Fair; the matrix's real work is ranking the second row (the plausible soft-ritual set), which loses exactly where it should: no structural proof (C1). (ii) "Six ADRs at once dilutes adjudication." Countered by the gate ceremony: each killer stamp is listed at the hand-off, and any single ADR can be reopened by name without touching the others. (iii) "Dogfooding spec/decisions/ before the lint exists risks orphaned convention" — accepted deliberately; the M6 lint lands on files already in place, and a failure there is loud, not silent. Kill-criteria stand at M5 (round-trip, rename dance) with pre-agreed fallbacks.
+**Round 2 — Validate.** The chosen set realizes both halves of the vision (undodgeable contract; truth-only repo). Every owner call is traceable to its recording:
 
-**Verdict: PASS.** Architecture decided and traced. M5 proves the two riskiest unknowns. Gate discussion 2026-07-04: datum criticism upheld — dual-datum run recorded above and the method fix noted for triage; adr-entry-render demoted to non-killer by the owner (cheap reversal); the since-marker residual consciously accepted by the owner (fix if it happens).
+- ratchet (2026-07-04)
+- no-.quack (2026-07-04)
+- decision model (2026-07-03)
+
+Nothing decided here contradicts a blessed decision elsewhere. The one superseded decision (.quack as plumbing, 2026-06-30) is named inside adr-no-quack-data-home rather than silently overwritten.
+
+**Round 3 — Red-team.** (i) "The Pugh datum is a straw man — 'do nothing' can't win." Fair. The matrix's real work is ranking the second row (the plausible soft-ritual set). That row loses exactly where it should: no structural proof (C1). (ii) "Six ADRs at once dilutes adjudication." Countered by the gate ceremony: each killer stamp is listed at the hand-off, and any single ADR can be reopened by name without touching the others. (iii) "Dogfooding spec/decisions/ before the lint exists risks orphaned convention" — accepted deliberately. The M6 lint lands on files already in place. A failure there is loud rather than silent.
+
+**Verdict: PASS.** Architecture decided and traced. M5 proves the two riskiest unknowns. Gate discussion 2026-07-04 recorded three rulings:
+
+- Datum criticism upheld — dual-datum run recorded above and the method fix noted for triage.
+- adr-entry-render demoted to non-killer by the owner (cheap reversal).
+- The since-marker residual consciously accepted by the owner (fix if it happens).

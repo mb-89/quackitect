@@ -118,7 +118,10 @@ func decisionFindings(nodes map[string]Node) (placement, unrealized []string) {
 	for _, n := range nodes {
 		if n.Type == "design" {
 			for _, r := range n.Implements {
-				impl[r] = true
+				// a sub-addressed implement (req-x.2) credits its base, exactly as the
+				// coverage rules count it (go-sub-addressing); the adoption lint agreeing
+				// killed a 50-strong false-positive class in i25
+				impl[subAddrBase(r)] = true
 			}
 		}
 	}

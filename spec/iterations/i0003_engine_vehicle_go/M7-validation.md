@@ -18,15 +18,19 @@ Each M1 success criterion, demonstrated by a green check the engine runs on itse
 | 8 | a vehicle integrates via a documented path; `gather` resolves engine resources through the overlay chain | test-integrate (`selftest:integrate`) — **demonstrated** by scaffolding a throwaway vehicle and running `quack gather` (5 folders resolved) |
 | + | feedback under 1s on a 2025 mid-range laptop (responsiveness) | test-responsiveness (`selftest:perf`) |
 
-All green. The need — a reusable, dependency-free engine that vehicles vendor and that runs from an
-unzipped folder — is met: a single static Go binary, shipped as source, that verifies itself with no
+All green. The need — a reusable dependency-free engine that vehicles vendor and that runs from an
+unzipped folder — is met: a single static Go binary that ships as source and verifies itself with no
 external toolchain. quackitect now dogfoods its own Go engine; Python is gone.
 
 ## Acceptance obtained  -> i3-m7-acceptance-obtained
 
-The human walked M1–M6 and blessed each gate in increasing-scrutiny rounds. The working engine
-(`quack status/next/start/bless/note/gather/ship/lint/report/verify/selftest`), the parity-proven
-core, and the tuned report are the acceptance evidence. `status`: 105 gates, 0 suspect.
+The human walked M1–M6 and blessed each gate in increasing-scrutiny rounds. The acceptance evidence:
+
+- the working engine (`quack status/next/start/bless/note/gather/ship/lint/report/verify/selftest`)
+- the parity-proven core
+- the tuned report
+
+`status`: 105 gates, 0 suspect.
 
 ## Validation gaps (RAID)  -> i3-m7-validation-gaps
 

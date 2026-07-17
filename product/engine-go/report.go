@@ -1342,6 +1342,7 @@ func renderHandoffHTML(gateID string, nodes map[string]Node, sm map[string]strin
 	// Opt-in evidence rides the handoff when the check asks for it. Milestone gates
 	// also carry the whole milestone verdict.
 	var evidenceSecs, verdictSecs [][2]string
+	rawSecs := map[string]string{} // go-card-evidence: title -> raw body, for the per-card evidence line
 	if raw := nodeBodySectionRaw(gate.Path, "Handoff Evidence"); raw != "" {
 		evidenceSecs = append(evidenceSecs, [2]string{"Evidence", handoffEvidenceHTML(raw, nodes)})
 	}
@@ -1356,11 +1357,21 @@ func renderHandoffHTML(gateID string, nodes map[string]Node, sm map[string]strin
 					if len(lines) > 1 {
 						body = lines[1]
 					}
+					rawSecs[title] = body
 					sec := [2]string{title, handoffEvidenceHTML(body, nodes)}
 					verdictSecs = append(verdictSecs, sec)
 				}
 			}
 		}
+	}
+	// go-card-evidence: the section that fills a check carries its research links onto the card
+	cardEvidenceFor := func(id string) string {
+		for title, body := range rawSecs {
+			if strings.Contains(title, "-> "+id) || strings.Contains(title, "→ "+id) {
+				return cardEvidenceLine(body)
+			}
+		}
+		return ""
 	}
 
 	b.WriteString(`<nav class="sum">`)
@@ -1410,6 +1421,9 @@ func renderHandoffHTML(gateID string, nodes map[string]Node, sm map[string]strin
 				b.WriteString(`<p class="dsel"><b>Bless</b> adjudicates this killer, in your name.</p>`)
 			case r.hasReg:
 				b.WriteString(`<p class="dsel"><b>Bless selects</b> ` + esc(blessSelects(r)) + `</p>`)
+				if ev := cardEvidenceFor(r.id); ev != "" {
+					b.WriteString(`<p class="dsel">` + ev + `</p>`) // go-card-evidence: links readable on the card
+				}
 			default:
 				b.WriteString(`<p class="dsel"><b>Bless</b> accepts this as it stands.</p>`)
 			}

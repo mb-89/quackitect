@@ -1,6 +1,6 @@
 # M8 — Package & hand over (i0008_trust_hardening)
 
-Evidence for the M8 gate. Docs match the surface, the artifact is packaged, the configuration is baselined, the record is self-explaining.
+Evidence for the M8 gate. Docs match the surface. The artifact is packaged. The configuration is baselined. The record is self-explaining.
 
 ## Docs complete & match the actual surface  → i8-m8-docs-complete  *(killer)*
 - **AGENTS.md**: the command list now shows `bless [--by]` with the channel-default semantics, `lint [--ears-baseline]` with its three lint lanes, and `quack version` with the out-of-repo log location.
@@ -26,10 +26,15 @@ The iteration record is self-explaining: eight evidence docs (M1–M8) with revi
 
 ## Milestone review (increasing scrutiny)
 
-**Round 1 — Verify.** Each doc claim was checked against the running surface, not memory: usage printed, selftests surface/contract/ears-method/bootstrap green (they mechanically pin AGENTS.md, contract.md, compose-reference.md, README), the PNG opened and inspected (M1–M7 green, M8 open, suspect frontier 0 — an honest mid-M8 board), lint exit 0.
+**Round 1 — Verify.** Each doc claim was checked against the running surface, not memory:
 
-**Round 2 — Validate.** Nothing in the frame is left un-handed-over: every M1 Ch1 criterion traces to a demonstrated behavior (M7) and a doc that tells the next session how to use it (M8). The record a future auditor needs — why each decision holds, who blessed what, as whom — is in the ledger, not in this conversation.
+- usage printed
+- selftests surface/contract/ears-method/bootstrap green (they mechanically pin AGENTS.md + contract.md + compose-reference.md + README)
+- the PNG opened and inspected (M1–M7 green, M8 open, suspect frontier 0 — an honest mid-M8 board)
+- lint exit 0
 
-**Round 3 — Red-team.** (i) "The README image is gitignored — docs-complete with an unpublishable image?" The reference resolves in every checkout that runs `quack report` + screenshot, the criterion (reference resolves or dropped) is met as amended by the owner, and publishing is deliberately the owner's. (ii) "The board in the PNG shows M8 open" — correct and honest: it was rendered mid-M8; a green-M8 PNG can only exist after this gate, and re-rendering it post-bless is a one-liner if wanted. (iii) No undocumented surface remains: `resolve`/`guides`/`dump`/`root` predate i8 and are unchanged.
+**Round 2 — Validate.** Nothing in the frame is left un-handed-over: every M1 Ch1 criterion traces to a demonstrated behavior (M7) and a doc that tells the next session how to use it (M8). The record a future auditor needs — why each decision holds and who blessed what as whom — is in the ledger, not in this conversation.
+
+**Round 3 — Red-team.** (i) "The README image is gitignored — docs-complete with an unpublishable image?" The reference resolves in every checkout that runs `quack report` + screenshot. The criterion (reference resolves or dropped) is met as amended by the owner, and publishing is deliberately the owner's. (ii) "The board in the PNG shows M8 open" — correct and honest: it was rendered mid-M8. A green-M8 PNG can only exist after this gate, and re-rendering it post-bless is a one-liner if wanted. (iii) No undocumented surface remains: `resolve`/`guides`/`dump`/`root` predate i8 and are unchanged.
 
 **Verdict: PASS.** Proceed to the human bless of `i8-m8-docs-complete` (killer) and `i8-m8-gate` — then `engage ship`.

@@ -1,6 +1,6 @@
 # M7 - Validation (i0016_structural_models, systematic)
 
-TL;DR: All six M1 success criteria are demonstrated - four by executed selftests, two by proof-by-use during the walk itself (the sky-fall lint caught two unallocated regions live, including the conformance checker's own). The M4 tripwire (authoring comfort in anger) fired real authoring all day and the owner drove every ruling - the text-first decision held. One recorded gap rides to the pruning iteration by owner ruling.
+TL;DR: All six M1 success criteria are demonstrated - four by executed selftests, two by proof-by-use during the walk itself. The sky-fall lint caught two unallocated regions live, including the conformance checker's own. The M4 tripwire (authoring comfort in anger) fired real authoring all day and the owner drove every ruling - the text-first decision held. One recorded gap rides to the pruning iteration by owner ruling.
 
 ## Meets the need  -> i16-m7-need
 Validated against the M1 success criteria, each with its referent:
@@ -31,8 +31,20 @@ Backward-cumulative: the full battery (every iteration's tests) is green; no ear
 
 ## Milestone review  -> i16-m7-gate
 
-**Verify.** Every criterion above names a green selftest, a live lint state, or a dated walk event; the acceptance section lists the owner's actual adjudications.
+**Verify.** Every criterion above names one of these:
 
-**Validate.** The iteration's need - structure declared before code, checked mechanically, rendered for reading - is not just met but SELF-demonstrated: the machinery validated its own construction while being built.
+- a green selftest
+- a live lint state
+- a dated walk event
 
-**Red-team.** Attack: "proof by use" leans on one day's dogfood - will the discipline hold when the novelty fades? Defense: the discipline is not voluntary - sky-fall, rank checks, and the SUSPECT ripple fire mechanically on every lint and build; rot requires actively ignoring a red board. Attack: the owner co-designed everything, so acceptance is self-serving - true and intended: the adjudicator IS the product owner; external validation arrives with the field loop, as always. **Verdict: PASS** - hand-off for the combined killer + gate.
+The acceptance section lists the owner's actual adjudications.
+
+**Validate.** The iteration's need is structure declared before code, then checked mechanically and rendered for reading. The need is not just met but SELF-demonstrated: the machinery validated its own construction while being built.
+
+**Red-team.** Attack: "proof by use" leans on one day's dogfood - will the discipline hold when the novelty fades? Defense: the discipline is not voluntary. Three guards fire mechanically on every lint and build:
+
+- sky-fall
+- rank checks
+- the SUSPECT ripple
+
+Rot requires actively ignoring a red board. Attack: the owner co-designed everything, so acceptance is self-serving - true and intended. The adjudicator IS the product owner. External validation arrives with the field loop, as always. **Verdict: PASS** - hand-off for the combined killer + gate.

@@ -189,3 +189,13 @@
 {"src":"bud-cold-start","dst":"req-binary-budget"}
 {"src":"adr-i24-views","dst":"req-mcp-reload"}
 {"src":"adr-i24-views","dst":"req-query"}
+{"src":"adr-fail-at-end","dst":"req-battery-fail-at-end"}
+{"src":"adr-yijggxq","dst":"req-parity-standalone"}
+{"src":"adr-chk4d2y","dst":"q-spike-risk-retire"}
+{"src":"adr-chk4d2y","dst":"scrap"}
+{"src":"adr-kofmqtq","dst":"req-channel-adapters.4"}
+{"src":"adr-elovshy","dst":"req-terms-before-use"}
+{"src":"adr-s7f5mzi","dst":"req-informed-by-edges.2"}
+{"src":"adr-m3zsxta","dst":"req-engine-distribution"}
+{"src":"adr-ke46cra","dst":"req-voice-prose.2"}
+{"src":"adr-mi74yii","dst":"scrap"}

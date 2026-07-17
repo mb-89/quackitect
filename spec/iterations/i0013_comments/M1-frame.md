@@ -39,17 +39,23 @@ Prior art scanned in the 2026-07-07 discussion (web-researched, sources in the s
 - **Acrobat / FDF** — separable comment data; anchoring loss accepted between versions. We adopt the same loss-acceptance stance.
 - **TiddlyWiki** — the single-file-that-saves-itself pattern; File System Access API with download fallback.
 
-Position: no prior art combines single-file, serverless, and deterministic agent read-back. The composition of known parts is the novelty; no part is novel itself.
+Position: no prior art combines these three properties:
+
+- single-file
+- serverless
+- deterministic agent read-back
+
+The composition of known parts is the novelty. No part is novel itself.
 
 ## Success is measurable → i13-m1-success-measurable
 
 Ch1 criteria:
 
-1. On a shipped book copy in a Chromium browser a reader can: mark prose, mark a figure (SVG sub-element or whole figure), comment, reply, agree/reject, close a thread, and save in place. Reopening the file shows everything.
-2. The engine lists every comment from such a file deterministically — anchor, author, thread, status. Two runs are byte-identical.
-3. A suggested edit accepted at triage lands in the source document.
-4. Author names are stored in the copy but stripped at triage (privacy rule).
-5. Every engine-batch item has a closing, checkable mark:
+- On a shipped book copy in a Chromium browser a reader can: mark prose, mark a figure (SVG sub-element or whole figure), comment, reply, agree/reject, close a thread, and save in place. Reopening the file shows everything.
+- The engine lists every comment from such a file deterministically — anchor, author, thread, status. Two runs are byte-identical.
+- A suggested edit accepted at triage lands in the source document.
+- Author names are stored in the copy but stripped at triage (privacy rule).
+- Every engine-batch item has a closing, checkable mark:
    - note same-second collision → selftest yields two files.
    - mint writes connection edges in connections mode → selftest.
    - proseUnitsMarked handles multi-line fill comments → selftest; `quack book` accepts template chapters.
@@ -73,8 +79,8 @@ Ch1 criteria:
 
 ## Review rounds & verdict
 
-1. **Verify.** Each fill above points at its referent: the archived pivot/decisions notes, the archived i12 bench note, the session's research sources, the recorded owner rulings. The claims match the record.
-2. **Validate.** The frame matches the owner's ask verbatim (comment system now, engine work folded in, mobile pushed). Nothing out of scope crept in; the report stays untouched.
-3. **Red-team.** Strongest opposing case: "chat feedback is good enough — this is doc-infra gold-plating." Rebuttal: the owner explicitly wants file-anchored, machine-readable feedback to improve the docu, and i12's dogfood already produced feedback that had to be hand-carried into notes. Kill-criterion for the feature: if the M5 spike cannot prove the mark→save→read-back round-trip on a real book copy, the design steps back to M3.
+- **Verify.** Each fill above points at its referent: the archived pivot/decisions notes, the archived i12 bench note, the session's research sources, the recorded owner rulings. The claims match the record.
+- **Validate.** The frame matches the owner's ask verbatim (comment system now, engine work folded in, mobile pushed). Nothing out of scope crept in; the report stays untouched.
+- **Red-team.** Strongest opposing case: "chat feedback is good enough — this is doc-infra gold-plating." Rebuttal: the owner explicitly wants file-anchored, machine-readable feedback to improve the docu, and i12's dogfood already produced feedback that had to be hand-carried into notes. Kill-criterion for the feature: if the M5 spike cannot prove the mark→save→read-back round-trip on a real book copy, the design steps back to M3.
 
 **Verdict: pass.** M1 subtasks filled. The killer (problem-agreed) and the gate go to the adjudicator.

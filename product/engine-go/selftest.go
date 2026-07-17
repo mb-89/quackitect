@@ -675,6 +675,7 @@ func init() {
 		i22Tests,          // i22_red.go (the engine-laws batch)
 		i23Tests,          // i23_red.go (module workspace checks)
 		i24Tests,          // i24_red.go (the hygiene batch)
+		i25Tests,          // i25_red.go (the clean-state batch)
 	)
 }
 
@@ -695,6 +696,9 @@ func concatTests(groups ...[]namedTest) []namedTest {
 func RunSelftestCLI(args []string) int {
 	names := args
 	full := len(args) == 0
+	// go-battery-isolation: the orphan sweep waits until this battery finishes
+	batteryRunning = true
+	defer func() { batteryRunning = false }()
 	if full {
 		names = make([]string, 0, len(selftestRegistry))
 		for _, t := range selftestRegistry {

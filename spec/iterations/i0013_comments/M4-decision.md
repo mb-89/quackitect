@@ -2,7 +2,7 @@
 
 ## Chosen architecture stated → i13-m4-architecture-stated
 
-One sentence: **a hand-rolled annotator script in the book shell renders highlights through the CSS Custom Highlight API, keeps every comment in one W3C-vocabulary JSON island anchored by unit-id + quote/position, saves in place via the File System Access API (download fallback), and a pure lister — `quack note --file2list <file>`, no new top-level command — turns the island into a list of note candidates for opinionated triage.**
+In short: **a hand-rolled annotator script in the book shell renders highlights through the CSS Custom Highlight API. It keeps every comment in one W3C-vocabulary JSON island anchored by unit-id + quote/position. It saves in place via the File System Access API (download fallback). A pure lister — `quack note --file2list <file>`, no new top-level command — turns the island into a list of note candidates for opinionated triage.**
 
 ```
  book copy (single HTML)
@@ -23,7 +23,11 @@ One sentence: **a hand-rolled annotator script in the book shell renders highlig
 ```
 What to see: the island is the single moving part — the DOM is paint-only, the save rewrites one block, the lister reads the same block.
 
-Pugh run (datum = strongest rival per axis; + better, 0 same, − worse against the weighted criteria of M3):
+Pugh run (datum = strongest rival per axis) against the weighted criteria of M3:
+
+- `+` better
+- `0` same
+- `−` worse
 
 | axis | datum (strongest rival) | winner | decisive criteria |
 |---|---|---|---|
@@ -51,8 +55,8 @@ Five ADRs in spec/decisions/: [storage-island](../../decisions/adr-comment-stora
 
 ## Review rounds & verdict
 
-1. **Verify.** Five ADRs exist, 21 decision edges wired, every M3 axis closed with an explicit winner and explicit rejections.
-2. **Validate.** The architecture satisfies every M2 requirement family; no requirement is left without a home (comment-layer JS, island schema, save path, lister, engine batch).
-3. **Red-team.** Attack: "the sensitivity check is soft — both flips were dismissed." Held: both dismissals carry recorded tripwires with named observables (synced-folder round-trips; a reader without the API), not silent judgment. Attack: "one ADR per axis is ceremony." Held: the axes fail independently and their tripwires differ; merging them would blur the audit trail.
+- **Verify.** Five ADRs exist, 21 decision edges wired, every M3 axis closed with an explicit winner and explicit rejections.
+- **Validate.** The architecture satisfies every M2 requirement family; no requirement is left without a home (comment-layer JS, island schema, save path, lister, engine batch).
+- **Red-team.** Attack: "the sensitivity check is soft — both flips were dismissed." Held: both dismissals carry recorded tripwires with named observables (synced-folder round-trips; a reader without the API), not silent judgment. Attack: "one ADR per axis is ceremony." Held: the axes fail independently and their tripwires differ; merging them would blur the audit trail.
 
 **Verdict: pass.** The gate goes to the adjudicator.

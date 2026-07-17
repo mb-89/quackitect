@@ -2,7 +2,7 @@
 
 ## Inputs captured → i21-m2-inputs
 
-Context - the system in focus is the ENGINE's field layer; everything it touches, with
+Context - the system in focus is the ENGINE's field layer. Everything it touches, with
 direction:
 
 ```mermaid
@@ -33,8 +33,8 @@ flowchart LR
     PHONE -->|answers, actor+channel| REG
 ```
 
-One line: templates and schemas feed the mint and the seeder; everything the human sees is the
-register's computed surface; every answer returns over the recorded ask path.
+One line: templates and schemas feed the mint and the seeder. Everything the human sees is the
+register's computed surface. Every answer returns over the recorded ask path.
 
 Stakeholders by role (no role left out):
 
@@ -46,17 +46,19 @@ Stakeholders by role (no role left out):
 - **Maintainer** - owns schema/template evolution; the seeding-drift risk names their hazard.
 - **Assessor / book reader** - reads the drivers table and lint results the ride-alongs fix.
 
-Use cases: [uc-work-register](uc-work-register.md) (killer, new),
-[uc-engine-mediated-io](uc-engine-mediated-io.md) (new), and the reused spine -
-uc-field-schemas (i18), uc-engage-start, uc-mobile-adjudicate, uc-onboard-newcomer,
-uc-workshop-smooth, uc-book-tables. The function tree IS the requirement set composed at plan
-time; no shadow tree is authored.
+Use cases:
+
+- [uc-work-register](uc-work-register.md) (killer, new)
+- [uc-engine-mediated-io](uc-engine-mediated-io.md) (new)
+- the reused spine - uc-field-schemas (i18), uc-engage-start, uc-mobile-adjudicate, uc-onboard-newcomer, uc-workshop-smooth, uc-book-tables
+
+The function tree IS the requirement set composed at plan time; no shadow tree is authored.
 
 Non-killer review; blessed by the driving agent.
 
 ## Stakeholder coverage → i21-m2-stakeholders
 
-The M2-inputs roles swept against the full always-on class set; the remainder, explicitly:
+The M2-inputs roles swept against the full always-on class set. The remainder, explicitly:
 
 - **Integrator (vehicle builder)** - REAL consideration: schemas and the seeder must resolve
   through the overlay (workspace -> vehicle overlay -> engine), so a vehicle's own schemas
@@ -120,16 +122,16 @@ Assumption holds; no requirement changes. Non-killer review; blessed by the driv
 
 ## Milestone review → i21-m2-gate
 
-1. **Verify.** Inputs carry the context figure and full role set; the stakeholder sweep walked
-   every always-on class with two consciously-out records; prior-art held the 13 requirements
-   against the verified scan (2 misses RECORDED, none silently dropped); the probe looked at
-   the live code and shipped schema files, not memory. `req-has-test` and `req-traced`
+1. **Verify.** Inputs carry the context figure and full role set. The stakeholder sweep walked
+   every always-on class with two consciously-out records. Prior-art held the 13 requirements
+   against the verified scan (2 misses RECORDED, none silently dropped). The probe looked at
+   the live code and shipped schema files rather than memory. `req-has-test` and `req-traced`
    computed green by the engine - every requirement has a test and traces to a need.
-2. **Validate.** The set covers exactly the approved scope: schema consumption (2 reqs),
-   register (4), seeding (1), ride-alongs (5), apply generalization (1). Nothing entered
-   beyond the plan; the open question q-io-lane-scope correctly blocks M3/M4, not M2.
-3. **Red-team.** Weakest statement hunted: req-register-render.3 "visually distinct" - held,
-   because its test asserts distinct DOM marks, not taste. req-drivers-derived's hand-tag
+2. **Validate.** The set covers exactly the approved scope: schema consumption (2 reqs) +
+   register (4) + seeding (1) + ride-alongs (5) + apply generalization (1). Nothing entered
+   beyond the plan. The open question q-io-lane-scope correctly blocks M3/M4, not M2.
+3. **Red-team.** Weakest statement hunted: req-register-render.3 "visually distinct" - held:
+   its test asserts distinct DOM marks, not taste. req-drivers-derived's hand-tag
    leans on the existing architecturally-significant tag - confirmed present in the ledger.
    No requirement failed the falsifiability probe.
 

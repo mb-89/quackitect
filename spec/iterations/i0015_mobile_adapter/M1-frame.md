@@ -4,11 +4,17 @@
 
 Goal: a stalled gate is answerable from anywhere. Actual: an OPEN gate waits until the adjudicator sits at the desk. Delta: remote answerability of exactly the asks the loop already produces.
 
-The Moore pitch: **For** the adjudicator away from the desk, **who** must answer a gate or decision ask before the walk can continue, **the** quackitect ask loop **is an** engine feature **that** sends the pager's question to a paired phone and records the answer as the adjudication. **Unlike** approval-as-a-service products and harness-bound remotes, **it** lives in the ledger, works over NAT with zero dependencies, and speaks through swappable channels (ntfy and Slack now, corporate later).
+The Moore pitch:
+
+- **For** the adjudicator away from the desk,
+- **who** must answer a gate or decision ask before the walk can continue,
+- **the** quackitect ask loop **is an** engine feature **that** sends the pager's question to a paired phone and records the answer as the adjudication.
+- **Unlike** approval-as-a-service products and harness-bound remotes,
+- **it** lives in the ledger, works over NAT with zero dependencies, and speaks through swappable channels (ntfy and Slack now, corporate later).
 
 Scope (owner rulings 2026-07-04..09): the FULL send+poll+apply loop — notify-only is overruled. ntfy and Slack channels. Corporate (Teams wait-for-response, Outlook-COM) deferred but the seam is designed for it. `quack listen` (phone-initiated queries) stays sliced last or out.
 
-PR-FAQ pressure test (working backwards): *"quackitect 0.2 lets the adjudicator bless a killer gate from the phone. Q: does this weaken adjudication? A: no — the same pager, the same explicit y, recorded actor=user with the channel noted; forgery risk is a written, accepted ADR. Q: does the walk block on the phone? A: no — the OPEN gate was always the durable stall; the agent keeps walking other ready checks."* The pitch survives the FAQ.
+PR-FAQ pressure test (working backwards): *"quackitect 0.2 lets the adjudicator bless a killer gate from the phone. Q: does this weaken adjudication? A: no — the same pager and the same explicit y, recorded actor=user with the channel noted. Forgery risk is a written, accepted ADR. Q: does the walk block on the phone? A: no — the OPEN gate was always the durable stall; the agent keeps walking other ready checks."* The pitch survives the FAQ.
 
 ## Problem agreed  → i15-m1-problem  (killer)
 
@@ -16,7 +22,7 @@ The stall is real and recurring: every killer/milestone gate in i9–i14 waited 
 
 ## State of the art checked  → i15-m1-prior-art
 
-Positioned against the verified landscape (prior-art notes, 3-0 adversarial votes, primary sources; see the pulled note family):
+Positioned against the verified landscape (prior-art notes, 3-0 adversarial votes and primary sources — see the pulled note family):
 
 - **HumanLayer** proved suspend-at-the-tool-boundary and reject-with-comment-as-answer — and its pivot proves the approval primitive is an ENGINE FEATURE, not a product. We copy the mechanism, not the business.
 - **Home Assistant** actionable notifications = the battle-tested two-way loop; its failure modes (dangling notifications, unreliable dismissal, duplicate answers) enter our RAID as design law.
@@ -30,11 +36,22 @@ Positioned against the verified landscape (prior-art notes, 3-0 adversarial vote
 
 ## Top risks logged  → i15-m1-risks
 
-Four RAID risks minted, each with its mitigation recorded: [raid-lockscreen-actions](../../raid/raid-lockscreen-actions.md), [raid-answer-forgery](../../raid/raid-answer-forgery.md) (accepted-risk, MUST be written into the M4 channel ADR), [raid-dangling-notifications](../../raid/raid-dangling-notifications.md), [raid-relay-retention](../../raid/raid-relay-retention.md).
+Four RAID risks minted, each with its mitigation recorded:
+
+- [raid-lockscreen-actions](../../raid/raid-lockscreen-actions.md)
+- [raid-answer-forgery](../../raid/raid-answer-forgery.md) (accepted-risk, MUST be written into the M4 channel ADR)
+- [raid-dangling-notifications](../../raid/raid-dangling-notifications.md)
+- [raid-relay-retention](../../raid/raid-relay-retention.md)
 
 ## Milestone review
 
-**Verify.** Every subtask has its referent above; the risks live as raid- items, the criterion on the need, the scope in the iteration motivation.
-**Validate.** The frame matches the owner's rulings verbatim (full loop, ntfy+Slack, corporate deferred, forgery written).
+**Verify.** Every subtask has its referent above. The risks live as raid- items. The criterion lives on the need. The scope lives in the iteration motivation.
+**Validate.** The frame matches the owner's rulings verbatim:
+
+- full loop
+- ntfy+Slack
+- corporate deferred
+- forgery written
+
 **Red-team.** Opposing case: "Remote Control makes this redundant." Held: it binds adjudication to one harness and cannot serve the corporate lane; the owner ruled the channels explicitly. Kill-criterion: if M3 finds no zero-dep NAT-friendly Slack shape, Slack drops to the corporate wave rather than importing a dependency.
 **Verdict: PASS** — proceed to the gate bless.

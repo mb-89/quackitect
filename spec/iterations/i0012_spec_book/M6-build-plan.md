@@ -1,10 +1,10 @@
 # M6 — Build plan (i0012_spec_book, systematic)
 
-TL;DR: twenty resumable steps under the build task, in the owner's agreed order (infra, then method data, then emitter, then surfaces, then deck and content). Order rides the ID stage digit; dependency edges carry only real prerequisites. The pre-agreed defer lane stays open if the walk proves too big for the deadline.
+TL;DR: twenty resumable steps under the build task, in the owner's agreed order (infra → method data → emitter → surfaces → deck and content). Order rides the ID stage digit; dependency edges carry only real prerequisites. The pre-agreed defer lane stays open if the walk proves too big for the deadline.
 
 ## Build planned  → i12-m6-build-planned
 
-**Ordering discipline:** the agreed order (infra friction → templates → glossary and guidance → book emitter → deck) is encoded in the id stage digit (`bs1`…`bs5`), which the walk's deterministic ID tie-break honors — no fake dependency edges (ORDER IS NOT DEPENDENCY, i10 ruling). Every `depends_on` names a real prerequisite: a consumer on its producer.
+**Ordering discipline:** the agreed order (infra friction → templates → glossary and guidance → book emitter → deck) is encoded in the id stage digit (`bs1`…`bs5`), which the walk's deterministic ID tie-break honors. No fake dependency edges (ORDER IS NOT DEPENDENCY, i10 ruling). Every `depends_on` names a real prerequisite: a consumer on its producer.
 
 **The steps (children of i12-m6-build):**
 
@@ -34,13 +34,13 @@ TL;DR: twenty resumable steps under the build task, in the owner's agreed order 
   - `bs5-deck` — present mode.
   - `bs5-content` — the quackitect book itself, AI-first drafted with marks.
 
-**Sizing honesty:** twenty steps carrying 27 requirements is the largest build of the project so far, under a real deadline. The relief valve is pre-agreed since planning: if mid-build the schedule breaks, the stage-4/5 tail (or the deck alone) defers to a fresh version as a first-class move — stages 1–3 alone already ship the templates, the type model, and a readable book core. Owner option recorded at the plan bless: a BRAKE (a review stop) between stages may be added mid-walk when wanted.
+**Sizing honesty:** twenty steps carrying 27 requirements is the largest build of the project so far, under a real deadline. The relief valve is pre-agreed since planning: if mid-build the schedule breaks, the stage-4/5 tail (or the deck alone) defers to a fresh version as a first-class move. Stages 1–3 alone already ship the templates, the type model and a readable book core. Owner option recorded at the plan bless: a BRAKE (a review stop) between stages may be added mid-walk when wanted.
 
-**Next after the plan bless:** observe every one of the 27 new tests RED (`quack observe-red`, the batch), then walk the steps in stage order.
+**Next after the plan bless:** observe every one of the 27 new tests RED (`quack observe-red`, the batch). Then walk the steps in stage order.
 
 ## Extension (owner-directed, 2026-07-05) — the spec template
 
-The owner ruled the rendered book a tech demo, not proper output, and directed the fix INTO this iteration: a spec template drives the document; the design was settled in a full-day walk (the ch0–ch8 SETTLED note series). Sixteen new requirements under `uc-spec-template` (plus two under `uc-book-read`), sixteen new tests, fourteen new build steps in three stages, flat off `i12-m6-tests-red`, real prerequisites only:
+The owner ruled the rendered book a tech demo, not proper output. The owner directed the fix INTO this iteration: a spec template drives the document. The design was settled in a full-day walk (the ch0–ch8 SETTLED note series). The extension adds sixteen new requirements under `uc-spec-template` (plus two under `uc-book-read`). It adds sixteen new tests. It adds fourteen new build steps in three stages. The steps hang flat off `i12-m6-tests-red`. Real prerequisites only:
 
 - Stage 6 — engine substrate:
   - `bs6-ratings-map` — one-level frontmatter maps under strict parse.
@@ -64,7 +64,13 @@ The dogfood content redraft (the book rewritten through the template, with owner
 
 ### Pilot migration findings (bs8-pilot, recorded as they broke)
 
-Converted: eleven cand- notes from the M3 axes (wired chosen/rejected into the five deciding ADRs), four raid- items from the M1/M6 risk record, eleven stk- notes for the derived classes. What broke, and what it taught:
+Converted:
+
+- eleven cand- notes from the M3 axes (wired chosen/rejected into the five deciding ADRs)
+- four raid- items from the M1/M6 risk record
+- eleven stk- notes for the derived classes
+
+What broke, and what it taught:
 
 - New item types leaked into the WALKABLE set — candidates rendered as OPEN checks on the board. The trace-content filters (engine + report) did not know the new types. Fixed: candidate, stakeholder, raid, rationale, record are trace content, never gates; selftest:no-trace-gate holds.
 - The user-wording sweep caught the decision item template mentioning the banned word outside the allowed vocabulary — the i10 lint generalized correctly to NEW method content. Fixed by rephrasing; the lint was right.
@@ -80,7 +86,7 @@ Written at the gate, after the build and verification.
 
 ## Build (extension)  -> i12-m6-build
 
-Sixteen steps (bs9-bs24), all realized and selftested; 32 tests observed RED first (two carry honest tests_red exemptions after post-observation statement amendments - the retro lead is noted).
+Sixteen steps (bs9-bs24), all realized and selftested. 32 tests observed RED first (two carry honest tests_red exemptions after post-observation statement amendments - the retro lead is noted).
 
 - The connection system is LIVE on this workspace: quack migrate-edges moved 572 edges across 6 kinds into spec/connections/<kind>/edges.jsonl; the audit reported byte-equal multisets; the board kept its exact suspect set - the hash-neutrality requirement held on the real ledger, not just the fixture.
 - Engine: two-lane loader with loud refusals, hash-neutral adjacency, virtual edge properties for queries, the edge-mode referee, the id-charset lint, three determinizers (mint/promote/connections), the verdict-order fix, render: refs, the results-by-exception fig, block-tree from design elements.
@@ -89,12 +95,37 @@ Sixteen steps (bs9-bs24), all realized and selftested; 32 tests observed RED fir
 
 ## Implementation risks acceptable (extension)  -> i12-m6-impl-risks
 
-Every red-team fence is a passing test: silent edge loss (refuse-never-skip), duplicate collapse (migration refuses), interim ambiguity (mode referee plus the loud unfinished-migration state), id ambiguity (charset lint), prose mutation (connection bodies hash), mass-suspect (hash-neutral proof on 572 live edges). Two live catches during the walk are the system working: the strict guard caught the scrap-sink exemption gap at the dogfood migration, and the gate count exposed the missing traceContent classification - both fixed and covered.
+Every red-team fence is a passing test:
+
+- silent edge loss (refuse-never-skip)
+- duplicate collapse (migration refuses)
+- interim ambiguity (mode referee plus the loud unfinished-migration state)
+- id ambiguity (charset lint)
+- prose mutation (connection bodies hash)
+- mass-suspect (hash-neutral proof on 572 live edges)
+
+Two live catches during the walk are the system working. The strict guard caught the scrap-sink exemption gap at the dogfood migration. The gate count exposed the missing traceContent classification. Both are fixed and covered.
 
 ## Internal quality (extension)  -> i12-m6-internal-quality
 
-Full selftest ALL OK (including the 32 extension tests); quack lint clean: coverage no holes, EARS clean (61 exemptions), ids clean, no double claims, no orphans; the book renders finding-free; a pre-migration spec backup sits in the data home (backup-pre-migrate-20260706).
+Full selftest ALL OK (including the 32 extension tests). quack lint clean:
+
+- coverage: no holes
+- EARS clean (61 exemptions)
+- ids clean
+- no double claims
+- no orphans
+
+The book renders finding-free. A pre-migration spec backup sits in the data home (backup-pre-migrate-20260706).
 
 ## Milestone review (extension)  -> i12-m6-gate
 
-**Verify:** every extension step traces to its requirements; every requirement has a red-observed (or honestly exempted) test now green and a design region. **Validate:** the owner's rulings are honored verbatim - one system for semantic relations with the two evidence-forced carve-outs, option-A lanes, determinizer housekeeping, example notes, the mechanized chapters. **Red-team:** the standing gate condition is NOT met yet - the owner holds this gate for the DOGFOOD SPEC redrafted through the template; the machinery is complete, the redraft is the remaining work before the y. **Verdict: machinery PASS - the gate stays with the adjudicator's condition (dogfood redraft), then the bless.**
+- **Verify:** every extension step traces to its requirements. Every requirement has a red-observed (or honestly exempted) test now green and a design region.
+- **Validate:** the owner's rulings are honored verbatim:
+  - one system for semantic relations with the two evidence-forced carve-outs
+  - option-A lanes
+  - determinizer housekeeping
+  - example notes
+  - the mechanized chapters
+- **Red-team:** the standing gate condition is NOT met yet. The owner holds this gate for the DOGFOOD SPEC redrafted through the template. The machinery is complete. The redraft is the remaining work before the y.
+- **Verdict: machinery PASS - the gate stays with the adjudicator's condition (dogfood redraft), then the bless.**

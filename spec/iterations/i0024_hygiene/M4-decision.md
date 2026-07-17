@@ -61,7 +61,7 @@ Both models exist with elements allocated ahead of code. The build fills exactly
 
 ## Review Verdict -> i24-m4-gate
 
-Verify: both models render; the ADRs trace; the Pugh runs use honest datums.
+Verify: both models render. The ADRs trace. The Pugh runs use honest datums.
 
 Validate: the decision answers the owner's two asks. The kill-criterion from M3 rides the sequence model.
 

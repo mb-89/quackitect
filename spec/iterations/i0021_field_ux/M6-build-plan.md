@@ -3,14 +3,14 @@
 ## Build planned → i21-m6-build-planned
 
 Fifteen resumable steps seeded as children of i21-m6-build (b1-b15), dependency-ordered:
-the schema data feeds tier/provenance/prefill; colors need tier+provenance; render needs
-colors; the answer endpoint needs render. Seeder, apply ops, and the five ride-alongs hang
-flat. Killer review, blessed by the driving agent under the standing overnight grant;
-collected for the morning.
+the schema data feeds tier/provenance/prefill. Colors need tier+provenance. Render needs
+colors. The answer endpoint needs render. Seeder, apply ops and the five ride-alongs hang
+flat. Killer review, blessed by the driving agent under the standing overnight grant.
+Collected for the morning.
 
 ## Schema set → i21-b1-schema-set
 
-Five new schemas authored (usecase, need, question, raid, model) and requirement extended
+Five new schemas authored (usecase / need / question / raid / model) and requirement extended
 (ears exemption pattern; required statement):
 
 - question: state enum (open/proposed/decided/suspect), core, default open - a question
@@ -28,7 +28,7 @@ zero schema findings). Non-killer review; blessed by the driving agent.
 
 ## EARS grandfather sweep → i21-b10-ears-sweep
 
-The red ritual held: selftest ears-baseline observed RED at 68e59343 (18 findings), then the
+The red ritual held: selftest ears-baseline observed RED at 68e59343 (18 findings). Then the
 sweep landed over the sanctioned lane - a `quack apply` manifest (dry-run validated 18 files,
 all-or-nothing write): every historical statement now carries
 `ears: exempt - historical pre-EARS statement, retire-or-retrofit recorded
@@ -51,14 +51,14 @@ Non-killer review; blessed by the driving agent.
 ## Drivers table → i21-b12-drivers-derived
 
 Red at c505647d, then green: driversUnion computes requirement -> deciding kind:architecture
-ADRs (suffix-resolved, sorted) plus hand-tag entries; renderAsrList renders the union and each
-expand names its deciding ADR(s) or "owner hand-tag". Ch 10.5 populates from the existing
+ADRs (suffix-resolved and sorted) plus hand-tag entries. renderAsrList renders the union and
+each expand names its deciding ADR(s) or "owner hand-tag". Ch 10.5 populates from the existing
 addresses edges. Non-killer review; blessed by the driving agent.
 
 ## Lint scopes → i21-b13-lint-scopes
 
 Both lanes live inside go-terms-order-lint (the M4 allocation held: extensions, not new
-elements - the sky-fall lint REJECTED my first attempt at new markers, exactly as designed):
+elements - the sky-fall lint REJECTED my first attempt at new markers exactly as designed):
 
 - README terms (define-before-use, README edition): a glossary term whose FIRST use is
   linked is legal thereafter; a bare first use flags. THE LINT FOUND 5 REAL FINDINGS in the
@@ -74,14 +74,14 @@ names the lead. Non-killer review; blessed by the driving agent.
 
 ## Battery tiers → i21-b14-battery-tiers
 
-Red at 787d7ae4, then green: buildFastTier (deps, parser, determinism, ids, parity) rides
-EVERY build path after the re-baseline - a failing invariant fails the build; `quack selftest`
+Red at 787d7ae4, then green: buildFastTier (deps / parser / determinism / ids / parity) rides
+EVERY build path after the re-baseline - a failing invariant fails the build. `quack selftest`
 keeps the full battery unchanged. Measured: the fast-path build round-trip is 1.16 s - inside
 the responsiveness bound. Non-killer review; blessed by the driving agent.
 
 ## The kernel chain → i21-b2..b5
 
-All red-ritual (reds at 36a9dded, 539afa8b, cc1dd954, c9eb4a62):
+All red-ritual (reds at 36a9dded / 539afa8b / cc1dd954 / c9eb4a62):
 
 - **b2 field-tier**: nodeTierState rolls a node's schema fields to undecided /
   complete-with-deferrals / complete; TBD marker convention fixed as a value starting "TBD".
@@ -99,60 +99,66 @@ All red-ritual (reds at 36a9dded, 539afa8b, cc1dd954, c9eb4a62):
 
 ## The register surface → i21-b6, i21-b7
 
-Reds at 3320d51e, 0e08e514, 9c3db500. The register renders as a report section: statement +
-color chip collapsed, core fields on the first expand, everything + provenance on the second;
-the adjudicated green is a filled dot, the agent-confident green an outlined one. The answer
+Reds at 3320d51e / 0e08e514 / 9c3db500. The register renders as a report section: statement +
+color chip collapsed. Core fields on the first expand. Everything + provenance on the second.
+The adjudicated green is a filled dot, the agent-confident green an outlined one. The answer
 lane: POST /register-answer on the watch server dispatches the same validated application a
-console edit makes (schema-validated, refused on rule breaks), rewrites value + provenance
-under one hash, and records a resolved decision ask carrying the channel. Killer rows carry
+console edit makes (schema-validated, refused on rule breaks). It rewrites value + provenance
+under one hash and records a resolved decision ask carrying the channel. Killer rows carry
 the pager pointer and no affordance - the guard held byte-identical files in the selftest.
 FIRST VISUAL CUT - the owner's drafting rounds are expected input.
 
 ## Seeder → i21-b8
 
 Red at 0113c19b. quack start parses the rigor source at activation (UTF-8 bytes; the em-dash
-rides the regex as \x{2014}) and emits the full gate/subtask skeleton - namespaced ids,
-milestone-monotonic wiring, killer and derived marks honored, template wording as pre-fill;
-never clobbers a composed set. A PowerShell mojibake incident struck the seed file mid-build
-(the banned round-trip lane) - caught in diff review, rewritten via the editor lane, noted for
-the retro, and the editing-lane method text now names the corrupter.
+rides the regex as \x{2014}) and emits the full gate/subtask skeleton - never clobbering a
+composed set. The skeleton:
+
+- namespaced ids
+- milestone-monotonic wiring
+- killer and derived marks honored
+- template wording as pre-fill
+
+A PowerShell mojibake incident struck the seed file mid-build (the banned round-trip lane) -
+caught in diff review and rewritten via the editor lane. Noted for the retro. The editing-lane
+method text now names the corrupter.
 
 ## Apply ops → i21-b9
 
 Red at f1445ffe. The manifest gains op:create (file must not exist) and op:write (whole-file),
-validate-first and all-or-nothing across every op kind; touched files and the outcome ride the
+validate-first and all-or-nothing across every op kind. Touched files and the outcome ride the
 dispatch's call-log line (callLogSetExtra). The extension lives inside go-apply-manifest - the
 build found no seam that earned the separately allocated element, and the model was corrected
 accordingly.
 
 ## Method docs → i21-b15
 
-compose-reference and engage now teach engine seeding (tailor, don't author), the prefill/
-provenance/register flow, and the implementation fragment's editing-lane list names the
-PowerShell round-trip as the corrupter. The editing-lane DEFAULT still awaits the owner's
-q-io-lane-scope ruling - the one open question, by design.
+compose-reference and engage now teach engine seeding (tailor, don't author) and the prefill/
+provenance/register flow. The implementation fragment's editing-lane list names the PowerShell
+round-trip as the corrupter. The editing-lane DEFAULT still awaits the owner's q-io-lane-scope
+ruling - the one open question, by design.
 
 ## Rigor-fit (the plan hole) → unplanned slice
 
 Closing M6 honestly surfaced that req-rigor-fit never got a build step - the coverage hole
 said so. Built under the red at b979514d: fit bands live in the rigor definitions
-(fit_min/fit_max), rigorFitAdvisory hints below/above band, advisory by law (rule 5 keeps the
+(fit_min/fit_max). rigorFitAdvisory hints below/above band. Advisory by law (rule 5 keeps the
 human confirming rigor). The plan gap itself is a retro fact: the build-planned statement
 named the ride-alongs and omitted this one.
 
 ## Evidence correction
 
 The b13 section claimed "zero jargon findings on the live book" - WRONG once the lane was
-wired: 22 findings, dominated by emphasis-caps noise (IS, NEVER). The heuristic gained the
+wired: 22 findings, dominated by emphasis-caps noise (IS / NEVER). The heuristic gained the
 vocab filter (a caps token whose lowercase form lives in the book's own prose is emphasis,
-not an acronym); 12 real leads remain as advisories for the book's owner rounds.
+not an acronym). 12 real leads remain as advisories for the book's owner rounds.
 
 ## Deck-goto → i21-b11-deck-goto
 
 Reproduce-first paid off: the delegation ALREADY SHIPPED - `git log -S "__deckJump(t)"` shows
 it landed with i0019's bugfix batch, hours after the note was filed. No fix needed; the gap was
 the class guard. test-deck-goto carries `tests_red: exempt` citing adr-red-unobservable (the
-behavior predates the test), and selftest deck-goto statically asserts on the REAL rendered
+behavior predates the test). selftest deck-goto statically asserts on the REAL rendered
 book: every emitted bookGoto copy delegates to __deckJump BEFORE any scroll, and __deckJump
 enters present mode via bookSlideTo. Green. Non-killer review; blessed by the driving agent.
 
@@ -164,42 +170,42 @@ close; every requirement carries a realized design (coverage: clean).
 ## Models adhered → i21-m6-models
 
 The conformance lint reports zero model findings: the build filled exactly the M4-allocated
-elements, and the two deviations went through the model EXPLICITLY - go-defer-retire moved to
-rim when the checker refuted the services placement, and go-apply-general folded into
+elements, and the two deviations went through the model EXPLICITLY. go-defer-retire moved to
+rim when the checker refuted the services placement. go-apply-general folded into
 go-apply-manifest with the allocation prose corrected. No element entered silently.
 
 ## Internal quality → i21-m6-quality
 
 The build gate enforced gofmt+vet on every compile (three refusals caught real issues: a
 missing import twice, a redeclared helper). House idiom held: design markers on every new
-region, kernel purity (the provenance fold is a pure field fold), zero new dependencies.
+region. Kernel purity (the provenance fold is a pure field fold). Zero new dependencies.
 Honest debits, recorded: two ritual slips (tests green before their red was recorded - exempt
-markers carry the truth) and one mojibake incident (the banned lane; caught, noted, method
-text updated).
+markers carry the truth) and one mojibake incident (the banned lane). Caught and noted; the
+method text updated.
 
 ## Implementation risks → i21-m6-impl-risks
 
 Acceptable, with two watch items: the B1 wedge tripwire stays armed (a binary swap during a
-watch answer - fallback recorded in the ADR), and the register's first visual cut awaits the
-owner's drafting rounds (raid habituation guards are structural, not visual). No risk blocks
-validation.
+watch answer - fallback recorded in the ADR). The register's first visual cut awaits the
+owner's drafting rounds (raid habituation guards are structural rather than visual). No risk
+blocks validation.
 
 ## Milestone review → i21-m6-gate
 
-1. **Verify.** Sixteen slices (15 planned + the rigor-fit hole), every engine slice under a
-   recorded red (two honest exemptions carry their reasons); the derived checks compute
-   green: tests authored, reds observed, designs realized, verification green across ALL
+1. **Verify.** Sixteen slices (15 planned + the rigor-fit hole). Every engine slice under a
+   recorded red (two honest exemptions carry their reasons). The derived checks compute
+   green: tests authored + reds observed + designs realized + verification green across ALL
    iterations. The full battery closed the milestone at exit 0.
-2. **Validate.** Every M1 criterion has its machinery: zero blanks (mint prefill), the veto
-   session (register + answer lane), start seeds the skeleton, computed colors, lint exit 0
+2. **Validate.** Every M1 criterion has its machinery: zero blanks (mint prefill). The veto
+   session (register + answer lane). start seeds the skeleton. Computed colors. lint exit 0
    on the clean tree (ears clean). The M7 demonstrations remain - machinery is not yet a
    demonstrated session.
-3. **Red-team.** The build's own checkers drew blood four times (sky-fall on my markers, the
-   services placement, the strict referee on prefilled enums, the battery on decided-in-mint)
-   - each caught pre-gate, each fixed structurally. Residual dissent: the register's
-   questionnaire is a prompt(), not the seed's inline form - deliberately thin until the
-   owner's visual rounds; recorded, not hidden. OPEN QUESTION in the cone: q-io-lane-scope
-   (the owner rules; blocks only the method-default text).
+3. **Red-team.** The build's own checkers drew blood four times (sky-fall on my markers / the
+   services placement / the strict referee on prefilled enums / the battery on
+   decided-in-mint) - each caught pre-gate, each fixed structurally. Residual dissent: the
+   register's questionnaire is a prompt(), not the seed's inline form - deliberately thin
+   until the owner's visual rounds. Recorded rather than hidden. OPEN QUESTION in the cone:
+   q-io-lane-scope (the owner rules; blocks only the method-default text).
 
 **Verdict: PASS - the gate awaits the owner's bless.** The walk stops here by design.
 
@@ -224,7 +230,8 @@ and redirected: adjudication is a MOMENT, not a dashboard. The reshape, same wal
 
 ## The owner's second round: lifecycle and speed (gate still open)
 
-Two more owner rulings landed live, both red-ritual (reds at 41fca2ba, 7a8b538d), battery green:
+Two more owner rulings landed live, both red-ritual (reds at 41fca2ba / 7a8b538d) with the
+battery green:
 
 - **Lazy verdicts (req-lazy-verdicts)** - the owner's measured complaint: walk commands paid
   15-25 s verdict storms. Now ONLY the verification surfaces (report, selftest, verify,
@@ -242,7 +249,7 @@ Two more owner rulings landed live, both red-ritual (reds at 41fca2ba, 7a8b538d)
 
 ## Post-verdict additions (owner-invited, gate still open)
 
-While the gate waited, the owner opened a slot for backlog work that fits; three things landed:
+While the gate waited, the owner opened a slot for backlog work that fits. Three things landed:
 
 - **Unknown-type refusal** (the i19 spike's engine-hygiene priority): a node whose type is
   outside the known set is now REFUSED by the strict referee - isGate can no longer default a

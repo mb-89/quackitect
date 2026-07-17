@@ -11,7 +11,13 @@
 
 ## Packaged & versioned  → i10-m8-packaged-versioned
 
-The deliverable is the ONE global binary plus its committed provenance: `quack.exe` at build stamp in `engine-stamp.txt` (rides the vendored source into every future vehicle), golden root re-baselined, report rendered to the data home. `engage ship` packages `product/` after the gate.
+The deliverable is the ONE global binary plus its committed provenance:
+
+- `quack.exe` at build stamp in `engine-stamp.txt` (rides the vendored source into every future vehicle)
+- golden root re-baselined
+- report rendered to the data home
+
+`engage ship` packages `product/` after the gate.
 
 ## Configuration baselined  → i10-m8-config-baselined
 
@@ -23,10 +29,10 @@ The handover artifact is the live board (0 suspect, 399 gates) plus the eight ev
 
 ## Milestone review  → i10-m8-gate
 
-**Round 1 — verify.** Docs cross-checked against the actual surface (commands, method rules, wording guard). The package is the global binary + stamp + ledger — all present and current.
+**Round 1 — verify.** Docs cross-checked against the actual surface (commands + method rules + wording guard). The package is the global binary + stamp + ledger — all present and current.
 
-**Round 2 — validate.** The iteration closes with every Ch1 criterion demonstrated or watch-listed, the board at zero suspects, and three owner rulings (churn, order≠dependency, birth-evidence) baked into method and engine rather than left as chat.
+**Round 2 — validate.** The iteration closes with every Ch1 criterion demonstrated or watch-listed and the board at zero suspects. Three owner rulings (churn + order≠dependency + birth-evidence) are baked into method and engine rather than left as chat.
 
-**Round 3 — red-team.** Objection: two engine refinements (pager grouping, birth-evidence rule) landed after M6's gate — is M6's bless stale? Answer: both were owner-adjudicated at their own hand-offs, both carry tests (one with a staged honest RED), and the affected checks were re-blessed; the ledger records the sequence faithfully. Objection: "handover accepted" self-referential — answer: acceptance IS the user's gate bless; this doc only points at it.
+**Round 3 — red-team.** Objection: two engine refinements (pager grouping, birth-evidence rule) landed after M6's gate — is M6's bless stale? Answer: both were owner-adjudicated at their own hand-offs and both carry tests (one with a staged honest RED), and the affected checks were re-blessed. The ledger records the sequence faithfully. Objection: "handover accepted" self-referential — answer: acceptance IS the user's gate bless; this doc only points at it.
 
 **Verdict: PASS** — proceed to bless, then `engage ship`.

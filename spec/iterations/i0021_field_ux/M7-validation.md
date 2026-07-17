@@ -25,9 +25,14 @@ Verdict: accepted in use, not in a demo — the strongest sign-off this method k
 
 ## Consistency swept  → i21-m7-consistency
 
-Changed behavior this iteration: the standing register died into the hand-off brief, the
-battery went lazy-everywhere with V&V-once, killers rule over hand-off channels, asks carry
-the brief. Sweep findings, all fixed in place:
+Changed behavior this iteration:
+
+- the standing register died into the hand-off brief
+- the battery went lazy-everywhere with V&V-once
+- killers rule over hand-off channels
+- asks carry the brief
+
+Sweep findings, all fixed in place:
 
 - [compose-reference.md](../../../product/quackitect/method/prompts/compose-reference.md):
   the prefill section taught the RETIRED report-register and the old killer routing —
@@ -47,7 +52,7 @@ the brief. Sweep findings, all fixed in place:
 ## Validation gaps as RAID  → i21-m7-gaps
 
 Four honest gaps from the live day, each a RAID node with proposed kind and mitigation —
-they arrive red on this gate's own hand-off, so the bless that closes the gate rules them:
+they arrive red on this gate's own hand-off. The bless that closes the gate rules them:
 
 - [raid-busy-record](raid-busy-record.md) — a busy-guard's vacuous answer can record as a
   real verdict; class fix queued, two instances guarded.
@@ -59,7 +64,7 @@ they arrive red on this gate's own hand-off, so the bless that closes the gate r
 
 ## Killer use-cases demonstrated  → i21-m7-killer-ucs
 
-[uc-work-register](uc-work-register.md) ran for real, repeatedly, today:
+[uc-work-register](uc-work-register.md) ran for real today, repeatedly:
 
 - M6: the owner blessed from the PHONE card; the open ruling (`q-io-lane-scope`) recorded
   itself in their name, provenance on the node.
@@ -70,7 +75,7 @@ they arrive red on this gate's own hand-off, so the bless that closes the gate r
   card died each time.
 
 Not a staged demo — the iteration's own gates were adjudicated THROUGH the deliverable,
-across both channels, with rulings landing as node provenance.
+across both channels. Rulings landed as node provenance.
 
 ## Meets the need  → i21-m7-meets-need
 
@@ -100,18 +105,21 @@ Every need's Ch1 success criteria, checked:
 
 ## Review rounds and verdict  → i21-m7-gate
 
-1. Verify — every subtask delivered against its evidence: acceptance (live sign-off),
-   consistency (four docs fixed, verification re-green), gaps (four RAID nodes, rulings
-   recorded), killer-ucs (demonstrated by the day itself), meets-need (five criteria,
-   one ruled tension). All five blessed by the owner on hand-off rounds, both channels
-   exercised.
+1. Verify — every subtask delivered against its evidence:
+   - acceptance (live sign-off)
+   - consistency (four docs fixed / verification re-green)
+   - gaps (four RAID nodes / rulings recorded)
+   - killer-ucs (demonstrated by the day itself)
+   - meets-need (five criteria / one ruled tension)
+
+   All five blessed by the owner on hand-off rounds, both channels exercised.
 2. Validate — the iteration's promise (filling becomes vetoing, never authoring into
-   blanks) held in use: no blank form was authored by the owner today; every ruling
+   blanks) held in use: no blank form was authored by the owner today. Every ruling
    arrived as an accept or veto of a proposal.
-3. Challenge — what a red-teamer pokes, all captured: the RAID quartet (busy-record,
-   timing flake, dual-channel race, pc clock), the voice defect in the RAID statements
-   (owner correction noted, retro item), and the still-open notes inbox (selftest block
-   outside review, MCP lane, battery UX leads).
+3. Challenge — what a red-teamer pokes, all captured:
+   - the RAID quartet (busy-record / timing flake / dual-channel race / pc clock)
+   - the voice defect in the RAID statements (owner correction noted - a retro item)
+   - the still-open notes inbox (selftest block outside review / MCP lane / battery UX leads)
 
 Verdict: M7 validation complete. The deliverable was validated by adjudicating the
 iteration through it.

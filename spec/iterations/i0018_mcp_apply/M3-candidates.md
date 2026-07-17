@@ -11,6 +11,7 @@ Two open forks, each with real candidates. The transport fork is q-mcp-transport
 - Cons: protocol conformance is our responsibility; a spec revision is a manual update; no SDK ergonomics (schema helpers, typed handlers).
 
 **Candidate 1B - adopt the official modelcontextprotocol/go-sdk.**
+
 - Depend on the SDK; register tools through its API; it owns framing, lifecycle, and version negotiation.
 - Pros: conformance maintained upstream; less code to write; future protocol changes handled for us; typed tool declarations.
 - Cons: the engine's FIRST runtime dependency - a direct breach of the zero-dep law that has defined the project since the Go rewrite; dependency weight in a static binary; SDK API churn; vendoring/supply-chain surface. The whole distribution story (one ratcheting static binary) rests on zero deps.
@@ -22,9 +23,10 @@ Two open forks, each with real candidates. The transport fork is q-mcp-transport
 - Cons: frontmatter cannot express conditionals or nesting - the sebot tripwire says the day a rule needs that, generate real JSON Schema from the frontmatter (frontmatter stays the authored source).
 
 **Candidate 2B - JSON schema files in method/config (the config-loader precedent).**
+
 - Schemas as `.json` under `method/config/` beside retired-vocabulary.json and weasel-words.json; possibly real JSON Schema.
-- Pros: structured and machine-native; reuses the existing config lane from i17; JSON Schema is a standard the MCP tool declarations also want.
-- Cons: less readable than frontmatter notes; JSON Schema is heavier than today's needs (the tripwire says adopt it only when conditionals arrive); a second schema format to learn.
+- Pros: structured and machine-native. Reuses the existing config lane from i17. JSON Schema is a standard the MCP tool declarations also want.
+- Cons: less readable than frontmatter notes. JSON Schema is heavier than today's needs (the tripwire says adopt it only when conditionals arrive). A second schema format to learn.
 
 ## Criteria weighted (from the requirements)  -> i18-m3-criteria
 Derived from the M2 requirement set, weighted 0..1 by how load-bearing each is to the project's identity:

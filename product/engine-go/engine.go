@@ -365,7 +365,8 @@ func scanDesignsUnder(base string) map[string]Node {
 			j := i + 1
 			for j < len(lines) {
 				lt := strings.TrimLeft(lines[j], " \t")
-				if !(strings.HasPrefix(lt, "#") || strings.HasPrefix(lt, "//")) || strings.Contains(lines[j], "enddesign") {
+				if !(strings.HasPrefix(lt, "#") || strings.HasPrefix(lt, "//")) || strings.Contains(lines[j], "enddesign") ||
+					descScanStops(lines[j]) { // go-marker-scan-stop: never absorb a neighboring marker
 					break
 				}
 				desc = append(desc, strings.TrimRight(strings.TrimLeft(lt, "#/ "), " \t\r"))

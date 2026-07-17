@@ -2,11 +2,55 @@
 
 ## Inputs captured → i9-m2-inputs-captured
 
-**Context (system-in-focus + environment).** The Go engine (`product/engine-go`, one static binary) driven through `quack.cmd` by: an interactive console (a person), thick harnesses (Claude Code), thin harnesses (Copilot — known to bypass the engine entirely), and CI/pipes. State surfaces today: the repo (`spec/`, `product/`, `.quack/`), the per-workspace user data home (`%LOCALAPPDATA%\quackitect\...`, logs since i8), and generated entry files (AGENTS.md; copilot-instructions.md missing today). IN: contract.md (single rule source), notes, blesses, engine source. OUT: refusals/keys (attest), rendered entry files, report, ship zip.
+**Context (system-in-focus + environment).** The Go engine (`product/engine-go`, one static binary) is driven through `quack.cmd` by:
 
-**Source notes (all archived with TRIAGE-CLOSE stamps 2026-07-04):** `block-the-ledger-until-the-contr` (attestation design, settled with the owner), `thin-harness-contract-delivery` + `origin-field-i6-field-feedback-b` (ready-when fired), `raw-notes-out-of-repo`, `decision-model-v2`, `eliminate-quack-folder` (incl. the owner's informal ratchet call), `deterministic-minting`, `logs-dir-fragments-by-path-casin`; plus live directives from the owner this session (fold data-leg into i9; ratchet rule; report suspect-why while adjudicating M1).
+- an interactive console (a person)
+- thick harnesses (Claude Code)
+- thin harnesses (Copilot — known to bypass the engine entirely)
+- CI/pipes
 
-**Use cases (this iteration):** uc-attested-session, uc-contract-delivery, uc-stable-data-dir, uc-repo-holds-only-truth, uc-global-engine, uc-notes-private, uc-decisions-never-relitigated, uc-deterministic-minting; plus refined global surfaces uc-review-report (req-report-why) and uc-backward-vv (req-vv-time-scope) and the filter-UX family (req-filter-clear/descendants/dblclick/help) — owner directives at the M1–M3 stops — all folded under existing needs (need-qualities, need-engage, need-note, need-workspace-drive), no new needs minted.
+State surfaces today:
+
+- the repo (`spec/`, `product/`, `.quack/`)
+- the per-workspace user data home (`%LOCALAPPDATA%\quackitect\...`, logs since i8)
+- generated entry files (AGENTS.md; copilot-instructions.md missing today)
+
+IN: contract.md (single rule source) + notes + blesses + engine source. OUT: refusals/keys (attest) + rendered entry files + report + ship zip.
+
+**Source notes (all archived with TRIAGE-CLOSE stamps 2026-07-04):**
+
+- `block-the-ledger-until-the-contr` (attestation design, settled with the owner)
+- `thin-harness-contract-delivery` + `origin-field-i6-field-feedback-b` (ready-when fired)
+- `raw-notes-out-of-repo`
+- `decision-model-v2`
+- `eliminate-quack-folder` (incl. the owner's informal ratchet call)
+- `deterministic-minting`
+- `logs-dir-fragments-by-path-casin`
+
+Plus live directives from the owner this session:
+
+- fold data-leg into i9
+- ratchet rule
+- report suspect-why while adjudicating M1
+
+**Use cases (this iteration):**
+
+- uc-attested-session
+- uc-contract-delivery
+- uc-stable-data-dir
+- uc-repo-holds-only-truth
+- uc-global-engine
+- uc-notes-private
+- uc-decisions-never-relitigated
+- uc-deterministic-minting
+
+Plus refined global surfaces — owner directives at the M1–M3 stops:
+
+- uc-review-report (req-report-why)
+- uc-backward-vv (req-vv-time-scope)
+- the filter-UX family (req-filter-clear/descendants/dblclick/help)
+
+All folded under existing needs (need-qualities + need-engage + need-note + need-workspace-drive), no new needs minted.
 
 ## Stakeholder coverage → i9-m2-stakeholder-coverage
 
@@ -29,10 +73,24 @@ Derived: coverage:req-traced — every i9 requirement refines a use case, every 
 
 ## Review rounds & verdict
 
-**Round 1 — Verify.** All referents real: the eight source notes exist in the archive with TRIAGE-CLOSE stamps; all i9 use-case and requirement nodes (9 + 30) load under the strict parser; both derived checks (req-has-test, req-traced) compute green live; EARS lint clean with zero exemptions.
+**Round 1 — Verify.** All referents real:
 
-**Round 2 — Validate.** The requirement set covers every M1 success criterion (attest 1–2 → req-attest-*; render 3 → req-contract-render/render-drift; clean-status 4 → req-clean-status; amnesia 5 → req-no-quack-state/truth-in-spec; mint 6 → req-mint; one-home 7 → req-logs-canonical) and every stakeholder row. req-report-why and req-vv-time-scope folded per the owner's live directives at the M1 and M2 stops (suspects must explain themselves; V&V looks backward only). Migrations are deliberately build steps, not requirements. No duplicated claims found (logs-canonical = slug computation; no-quack-state = artifact location — distinct).
+- the eight source notes exist in the archive with TRIAGE-CLOSE stamps
+- all i9 use-case and requirement nodes (9 + 30) load under the strict parser
+- both derived checks (req-has-test, req-traced) compute green live
+- EARS lint clean with zero exemptions
 
-**Round 3 — Red-team.** Strongest case: "some requirements smuggle design" — req-engine-ratchet and req-decision-classes are the closest calls. Held: ratchet is the owner's recorded decision with the mechanism (launcher vs engine self-check) left open for M3/M4; the decision-model schema was settled with the owner 2026-07-03, and its remaining axes are named M3 work. Kill-criterion forward: if M3 shows the scrap-sink model can't coexist with the strict parser's allowlist, req-decision-classes reopens. Second case: "25 reqs = too big" — acknowledged as R8, carried, mitigated at M6 slicing.
+**Round 2 — Validate.** The requirement set covers every M1 success criterion and every stakeholder row:
+
+- attest 1–2 → req-attest-*
+- render 3 → req-contract-render/render-drift
+- clean-status 4 → req-clean-status
+- amnesia 5 → req-no-quack-state/truth-in-spec
+- mint 6 → req-mint
+- one-home 7 → req-logs-canonical
+
+req-report-why and req-vv-time-scope folded per the owner's live directives at the M1 and M2 stops (suspects must explain themselves; V&V looks backward only). Migrations are deliberately build steps, not requirements. No duplicated claims found (logs-canonical = slug computation; no-quack-state = artifact location — distinct).
+
+**Round 3 — Red-team.** Strongest case: "some requirements smuggle design" — req-engine-ratchet and req-decision-classes are the closest calls. Held: ratchet is the owner's recorded decision with the mechanism (launcher vs engine self-check) left open for M3/M4. The decision-model schema was settled with the owner 2026-07-03, and its remaining axes are named M3 work. Kill-criterion forward: if M3 shows the scrap-sink model can't coexist with the strict parser's allowlist, req-decision-classes reopens. Second case: "25 reqs = too big" — acknowledged as R8, carried and mitigated at M6 slicing.
 
 **Verdict: PASS.** Proceed to M3 (candidates).

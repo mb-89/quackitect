@@ -4,13 +4,13 @@
 
 Against the Ch1 success criteria (M1-frame.md):
 
-1. **Mark, thread, assess, close, save on a real copy** — machine-proven end-to-end in the bs20 dogfood (headless session, real book copy, real island); the in-place save is the one part needing a human gesture — demonstrated in the live session below.
-2. **Deterministic extraction** — proven: `quack note --file2list` is byte-identical across runs (selftest:comment-readback), reads only the island.
-3. **An accepted suggested edit lands in the source** — demonstrated in the live session below.
-4. **Names stripped at the boundary** — proven (selftest:comment-privacy; reader roles in first-appearance order).
-5. **Every engine-batch item closed with a checkable mark** — all ten green: note collision, mint edge-mode, prose comment-state, orphan view-refs, connection code-endpoints, root-storm fix, build fast-path (content-only build sub-second, live), surgical verdicts, calls --summary + log cap, home sweep, observe-red --refresh.
+- **Mark, thread, assess, close, save on a real copy** — machine-proven end-to-end in the bs20 dogfood (headless session, real book copy, real island); the in-place save is the one part needing a human gesture — demonstrated in the live session below.
+- **Deterministic extraction** — proven: `quack note --file2list` is byte-identical across runs (selftest:comment-readback), reads only the island.
+- **An accepted suggested edit lands in the source** — demonstrated in the live session below.
+- **Names stripped at the boundary** — proven (selftest:comment-privacy; reader roles in first-appearance order).
+- **Every engine-batch item closed with a checkable mark** — all ten green: note collision, mint edge-mode, prose comment-state, orphan view-refs, connection code-endpoints, root-storm fix, build fast-path (content-only build sub-second, live), surgical verdicts, calls --summary + log cap, home sweep, observe-red --refresh.
 
-Against ALL needs, every iteration (backward-cumulative): verification green across the whole battery; the one old-test conflict (test-authoring-cheap) was resolved by preserving its INTENT (one build → honest board; the stale-FAIL wedge stays dead) under the new surgical mechanism — the need behind it is served better, not worse. need-docu gains its feedback channel; need-workspace-drive gains a cleaner, faster surface; no earlier need lost anything it had.
+Against ALL needs, every iteration (backward-cumulative): verification green across the whole battery. The one old-test conflict (test-authoring-cheap) was resolved by preserving its INTENT (one build → honest board; the stale-FAIL wedge stays dead) under the new surgical mechanism. The need behind it is served better, not worse. need-docu gains its feedback channel. need-workspace-drive gains a cleaner, faster surface. No earlier need lost anything it had.
 
 ## Killer use cases demonstrated end-to-end → i13-m7-killer-usecases
 
@@ -19,7 +19,7 @@ Against ALL needs, every iteration (backward-cumulative): verification green acr
 
 ## Acceptance obtained → i13-m7-acceptance
 
-Owner, 2026-07-07, after the third live session: "now its good. very nice. lets finish this iteration, and in the next iter i can pass some comments to you." The nine field rulings from the sessions are folded in and re-validated; the last pan behavior the owner validated (v3) is exactly what ships.
+The owner ruled after the third live session (2026-07-07): "now its good. very nice. lets finish this iteration, and in the next iter i can pass some comments to you." The nine field rulings from the sessions are folded in and re-validated. The last pan behavior the owner validated (v3) is exactly what ships.
 
 ## Validation gaps captured (RAID) → i13-m7-gaps-captured
 

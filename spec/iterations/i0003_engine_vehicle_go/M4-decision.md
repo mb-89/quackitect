@@ -1,6 +1,6 @@
 # M4 — Decide the architecture (i0003_engine_vehicle_go)
 
-The decision, scored against M3's weighted criteria, traced to the ADRs.
+The decision, scored against M3's weighted criteria and traced to the ADRs.
 
 ## Chosen architecture  → i3-m4-architecture-stated
 
@@ -31,11 +31,12 @@ The headline criterion is **real-world AV/SmartScreen cleanliness**, not merely 
 
 ## Sensitivity check
 
-Go beats PyInstaller **structurally** — the AV penalty holds under any weighting. Go versus Rust hinges on the one **toolchain-simplicity** criterion: zero its weight and the two tie at +9, broken only by rewrite cost and LLM-assisted maintenance, both favouring Go but under-weighted here. So the win over PyInstaller is structural; the win over Rust is a deliberate call on real-world setup pain for non-technical authors.
+Go beats PyInstaller **structurally** — the AV penalty holds under any weighting. Go versus Rust hinges on the one **toolchain-simplicity** criterion: zero its weight and the two tie at +9, broken only by rewrite cost and LLM-assisted maintenance — both favouring Go but under-weighted here. So the win over PyInstaller is structural; the win over Rust is a deliberate call on real-world setup pain for non-technical authors.
 
 ## ADRs recorded  → i3-m4-adr-recorded *(derived: coverage:adr-traced)*
 
 Four ADRs, each addressing a requirement (computed live):
+
 - `adr-go-language` → req-go-engine
 - `adr-handroll-parse` → req-zero-dep-parse
 - `adr-engine-vehicle-overlay` → req-engine-vehicle-split, req-overlay-resolver

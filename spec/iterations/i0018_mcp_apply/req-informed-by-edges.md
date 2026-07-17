@@ -8,5 +8,5 @@ killer: false
 ---
 ## Statements
 1. Where a decision addresses a model or a model element, the engine shall load that edge first-class, exactly as an edge to a requirement.
-2. When the book renders an informed-by list, the renderer shall list every decision holding a first-class edge to the model or its elements, and shall keep a name-derived citation only for a decision without a first-class edge.
+2. The engine shall derive no informed-by citation from name matching (narrowed by adr-s7f5mzi; the first-class addresses edge is the only informing lane).
 3. If an addresses edge names a model element that no model declares, then quack lint shall flag the dangling target.

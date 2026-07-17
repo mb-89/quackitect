@@ -12,7 +12,18 @@ Moore frame (For / Who / The / That / Unlike):
 - **That** other projects vendor and overlay without forking, and that runs from an unzipped folder with nothing to install,
 - **Unlike** the current Python-plus-uv engine, which downloads executables (tripping Windows security), starts slowly, and tangles the engine with quackitect's own project files.
 
-Scope (the agreed FIRST move): the Go port **is** the engine/vehicle separation, in one iteration. In scope: the Go rewrite, the engine/vehicle split, one overlay resolver, hand-rolled parsing, the cli-help fix, the dependency-check prompt, the unique-id guard, and the report trace-graph filter. Out of scope: `drive_as_engine` / `integrate_as_engine` (the manifest + extension-API prompt) — a later version.
+Scope (the agreed FIRST move): the Go port **is** the engine/vehicle separation, in one iteration. In scope:
+
+- the Go rewrite
+- the engine/vehicle split
+- one overlay resolver
+- hand-rolled parsing
+- the cli-help fix
+- the dependency-check prompt
+- the unique-id guard
+- the report trace-graph filter
+
+Out of scope: `drive_as_engine` / `integrate_as_engine` (the manifest + extension-API prompt) — a later version.
 
 ## Problem agreed — the delta is real and worth solving  → i3-m1-problem-agreed  *(killer)*
 
@@ -24,13 +35,13 @@ Scope (the agreed FIRST move): the Go port **is** the engine/vehicle separation,
 
 Each criterion maps to an executed test (the acceptance contract):
 
-1. A single built binary runs every command on a fresh machine with no Python, no uv, no network, from an unzipped folder. → `test-binary-deps`
+1. A single built binary runs every command on a fresh machine from an unzipped folder. No Python. No uv. No network. → `test-binary-deps`
 2. The Go report determinism root is byte-identical to the Python report for the same spec. → `test-parity-golden`
 3. A vehicle run resolves engine + vehicle resources through one overlay chain and never writes under the engine. → `test-split-readonly`
 4. No node id is declared twice; `quack lint` fails on any collision. → `test-unique-ids` (already green)
 5. Every subcommand answers `-h` / `--help` / `-?` with usage and no side effects; ids starting with a dash are rejected. → `test-cli-help`
 6. A dependency-check prompt lists each build dependency with its winget path. → `test-dep-prompt`
-7. The report trace graph filters live (one box: iteration + text/regex, AND/OR) and relayouts, without changing the committed HTML. → `test-trace-filter`
+7. The report trace graph filters live and relayouts without changing the committed HTML (one box: iteration + text/regex, AND/OR). → `test-trace-filter`
 8. An external vehicle can integrate quackitect as an engine via a documented path (vendor → build → configure → overlay → run); a vehicle's `quack gather` resolves the engine's resources through the overlay chain. → `test-integrate` *(added at M7: the integration was wrongly deferred; captured backward as `req-integrate`)*
 
 ## Top risks logged — RAID  → i3-m1-top-risks-logged

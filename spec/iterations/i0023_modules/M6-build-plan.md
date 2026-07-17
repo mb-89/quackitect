@@ -11,7 +11,7 @@ The build is decomposed into eight resumable child steps under `i23-m6-build-the
 5. `i23-m6-b5-command-selector` - leading module selector in command dispatch.
 6. `i23-m6-b6-import-manifest` - dry-run import/update manifests.
 7. `i23-m6-b7-vehicle-fixture` - vehicle fixture with imported `se` and local doc modules.
-8. `i23-m6-b8-docs-sync` - docs, templates, and guidance updates.
+8. `i23-m6-b8-docs-sync` - docs, templates and guidance updates.
 
 Each step depends on the prior step. The aggregate build task depends on the final documentation step.
 
@@ -176,7 +176,7 @@ All planned child steps are complete:
 - vehicle module fixture
 - documentation and template sync
 
-The build remained additive: one workspace timeline and ledger are preserved, and module behavior is introduced as metadata, filtering, and deterministic import/update planning.
+The build remained additive: one workspace timeline and ledger are preserved. Module behavior is introduced as metadata, filtering and deterministic import/update planning.
 
 ## Implementation risks acceptable -> i23-m6-implementation-risks-acceptable
 
@@ -187,7 +187,13 @@ Accepted implementation risks:
 - Module-first table filtering is emitted in the book table renderer first; report-specific module UX can follow if needed.
 - Command selection currently filters `status` and `next`; deeper module-specific commands can extend the same selector.
 
-These are acceptable for the first implementation because the core invariants are in place: module registry, default membership, subtree matching, import/update planning, and documented vehicle setup.
+These are acceptable for the first implementation because the core invariants are in place:
+
+- module registry
+- default membership
+- subtree matching
+- import/update planning
+- documented vehicle setup
 
 ## Internal quality ok -> i23-m6-internal-quality-ok
 

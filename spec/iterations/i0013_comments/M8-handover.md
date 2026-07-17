@@ -22,14 +22,17 @@
 
 To the next session, in order:
 
-1. The owner passes real commented copies of the book — run them through `quack note --file2list`, triage opinionated (rejection normal), mint keepers `origin: field`; the FIRST ACCEPTED edit landing in a source doc closes the recorded M7 gap.
-2. Retro leads waiting in the inbox: the comment-dom-static recursion defect record (generic recursion guard, evaluation watchdog), the battery concurrency plan (pure pool + serial rump), and the dogfood keeper note.
+1. The owner passes real commented copies of the book. Run them through `quack note --file2list`. Triage opinionated (rejection normal). Mint keepers `origin: field`. The FIRST ACCEPTED edit landing in a source doc closes the recorded M7 gap.
+2. Retro leads waiting in the inbox:
+   - the comment-dom-static recursion defect record (generic recursion guard, evaluation watchdog)
+   - the battery concurrency plan (pure pool + serial rump)
+   - the dogfood keeper note
 3. Attest keys die with the session — fresh grant at the next engage.
 
 ## Review rounds & verdict
 
-1. **Verify.** Every doc pointer above names its file; the surface additions are in the emitted help and the manifest; the ship refresh mechanism is the standing i12 machinery.
-2. **Validate.** The iteration delivers exactly the owner's 2026-07-07 frame: the comment loop closed live, the engine batch closed with checkable marks, the mobile adapter untouched in the backlog.
+1. **Verify.** Every doc pointer above names its file. The surface additions are in the emitted help and the manifest. The ship refresh mechanism is the standing i12 machinery.
+2. **Validate.** The iteration delivers exactly the owner's 2026-07-07 frame. The comment loop closed live. The engine batch closed with checkable marks. The mobile adapter stayed untouched in the backlog.
 3. **Red-team.** Weakest claim: "docs complete" for a feature whose UI was reworked the same day — held: the book IS the doc and ships the final validated UI; the guide documents the read-back lane the agent (not the reader) uses. No open dissent.
 
 **Verdict: pass.** The gate goes to the adjudicator; ship follows the y immediately.

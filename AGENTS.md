@@ -85,6 +85,9 @@ plain engine — no agent needed while it runs. Spawn it visibly (`Start-Process
 running the command) so the user watches live progress; read the verdict from the cache after.
 The window closes ITSELF about a minute after the verdict (no `-NoExit`; end the command with
 a short announced sleep). Never hold the conversation behind a silent multi-minute tool call.
+**Wait loops poll FILES, never `status`.** A wait condition is mechanical; check the verdict
+store or the output artifact's state. Every `status` call runs the never-cached suite live -
+the i24 poll loops dispatched it 2355 times before this law.
 
 ## Rules
 - **The repo is self-sufficient.** Everything an agent needs to work well here lives IN THIS

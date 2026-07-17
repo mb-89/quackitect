@@ -146,8 +146,6 @@
 {"src":"test-no-flow-smell","dst":"req-no-flow-smell"}
 {"src":"test-models-in-book","dst":"req-models-in-book"}
 {"src":"test-model-consistency","dst":"req-model-consistency"}
-{"src":"test-model-tray","dst":"req-model-tray"}
-{"src":"test-model-groom","dst":"req-model-groom"}
 {"src":"test-answer-validated","dst":"req-ask-loop.4"}
 {"src":"test-trace-clustered","dst":"req-trace-clustered"}
 {"src":"test-metrics-removed","dst":"req-metrics-removed"}
@@ -281,3 +279,8 @@
 {"src":"test-ledger-arg-guards","dst":"req-ledger-arg-guards"}
 {"src":"test-adopt-honest","dst":"req-adopt-honest"}
 {"src":"test-binary-budget","dst":"req-binary-budget"}
+{"src":"test-battery-fail-at-end","dst":"req-battery-fail-at-end"}
+{"src":"test-battery-isolation","dst":"req-battery-isolation"}
+{"src":"test-marker-scan","dst":"req-marker-scan"}
+{"src":"test-voice-prose","dst":"req-voice-prose"}
+{"src":"test-card-evidence","dst":"req-card-evidence"}

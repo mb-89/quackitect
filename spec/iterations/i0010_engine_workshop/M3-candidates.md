@@ -2,9 +2,10 @@
 
 ## Alternatives elaborated  → i10-m3-alternatives-elaborated
 
-Seven open axes. Each card: context, options with one-line pro/con, and the leaning. Scoring happens at M4 (Pugh, strongest-rival datum).
+Seven open axes. Each card: context, then options with one-line pro/con and the leaning. Scoring happens at M4 (Pugh, strongest-rival datum).
 
 **A1 — Verdict cache shape** *(req-verify-cache)*
+
 - Context: verdicts are machine-local caches, never truth. Truth stays in spec/ (i9 principle).
 - (a) **Single JSON map** in the data home, rewritten atomically per battery. Pro: one read, trivially consistent, self-pruning. Con: whole-file rewrite per battery.
 - (b) **Append-only JSONL log**, last-wins per test. Pro: cheap appends, natural history. Con: grows unbounded, needs compaction.
@@ -18,6 +19,7 @@ Seven open axes. Each card: context, options with one-line pro/con, and the lean
 - Leaning: (a).
 
 **A3 — Call-log shape** *(req-call-log)*
+
 - (a) **calls.jsonl** append-only in the logs home, redacted fields, size-capped. Pro: owner-directed shape, disposable like logs. Con: cap needs rotation logic.
 - (b) Per-day files. Pro: rotation for free. Con: aggregation reads many files.
 - (c) SQLite. REJECTED: zero-dep engine.
@@ -31,6 +33,7 @@ Seven open axes. Each card: context, options with one-line pro/con, and the lean
 - Leaning: (a), with (b)'s version-greater guard folded in if the spike shows hash-only ambiguity.
 
 **A5 — Stamp vocabulary** *(req-user-wording; owner ruling: user replaces human)*
+
 - Context: the recorded actor stamp feeds the self-cert metric (agent-blessed killers ÷ killers). Prose is free; the schema is not.
 - (a) **Sweep prose + CLI display; stamps stay `actor=human`/`--by human`** as a frozen allowlist. Pro: zero ledger churn. Con: the frozen word contradicts the ruling at the record layer.
 - (b) **Full rename to `actor=user`/`--by user`** with a ledger migration and a read-compat shim for old records. Pro: one vocabulary everywhere. Con: schema churn, migration risk, i8 design regions reopen.
@@ -72,9 +75,18 @@ Derived from the requirements and the standing constraints, vital-few:
 
 ## Milestone review  → i10-m3-gate
 
-**Round 1 — verify.** Seven axes, each with ≥2 genuinely viable options and a one-line pro/con; two option-classes rejected at birth with reasons (spec-resident cache, SQLite). Criteria table derives from named requirements. Feasibility notes point at concrete mechanisms (stdlib calls, existing build hooks).
+**Round 1 — verify.** Seven axes, each with ≥2 genuinely viable options and a one-line pro/con. Two option-classes rejected at birth with reasons (spec-resident cache and SQLite). Criteria table derives from named requirements. Feasibility notes point at concrete mechanisms (stdlib calls, existing build hooks).
 
-**Round 2 — validate.** Axis coverage against the requirement set: A1/A2→verify-cache, A3→call-log, A4→ratchet-semantic, A5→user-wording, A6→notes-list, A7→why-derived. req-verify-feedback, req-status-fast, req-mint-*, req-scaffold-modern, and req-pager-merge carry no open architecture axis — their shape is fixed by their statements or an owner ruling; elaborating fake alternatives for them would be ceremony. The mid-walk findings (parity placement, tests-red scope) are captured as notes for the next compose, not smuggled into this axis set.
+**Round 2 — validate.** Axis coverage against the requirement set:
+
+- A1/A2→verify-cache
+- A3→call-log
+- A4→ratchet-semantic
+- A5→user-wording
+- A6→notes-list
+- A7→why-derived
+
+req-verify-feedback + req-status-fast + req-mint-* + req-scaffold-modern + req-pager-merge carry no open architecture axis — their shape is fixed by their statements or an owner ruling; elaborating fake alternatives for them would be ceremony. The mid-walk findings (parity placement and tests-red scope) are captured as notes for the next compose, not smuggled into this axis set.
 
 **Round 3 — red-team.** Strongest opposing case per leaning probed: A2's version-constant is cheaper but reproduces today's mtime failure class — the self-hash leaning survives. A5 is deliberately left undecided; forcing it here would pre-empt the Pugh run the datum discipline demands. A7(b)'s instant answer tempts, but a second cache to keep honest contradicts C3. No axis has a hidden third option that dominates.
 

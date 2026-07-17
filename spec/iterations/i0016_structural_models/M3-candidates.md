@@ -67,10 +67,34 @@ Selection precedes evaluation (Pahl/Beitz): the DEMANDS - good editor, zero-dep 
 
 ## Milestone review  -> i16-m3-gate
 
-**Verify.** Six candidates minted with full rating maps; seven criteria minted with metric, weight, and scale anchors; weights sum to 1.00; every criterion traces to a requirement or a dated ruling; feasibility carries referents (the i14 probe) or names its spike question.
+**Verify.** The evidence:
 
-**Validate.** The candidate space covers the owner's explicit instructions: text-first small languages seriously weighed (not decoration), SysML named and rejected on grounds, bespoke DSL killed by the recorded ownership law, per-kind split honored. Today's design discussions (tray, groom, delta scenario, one-owning-view) all surface as criteria or candidate features.
+- six candidates minted with full rating maps
+- seven criteria minted with metric, weight, and scale anchors
+- weights sum to 1.00
+- every criterion traces to a requirement or a dated ruling
+- feasibility carries referents (the i14 probe) or names its spike question
+
+**Validate.** The candidate space covers the owner's explicit instructions:
+
+- text-first small languages seriously weighed (not decoration)
+- SysML named and rejected on grounds
+- bespoke DSL killed by the recorded ownership law
+- per-kind split honored
+
+Today's design discussions all surface as criteria or candidate features:
+
+- tray
+- groom
+- delta scenario
+- one-owning-view
 
 **Red-team.** The original matrix disclosed its sharpest weakness itself: the co-moving canvas criteria carried 0.30 on an assumed sketching preference. The adjudicator answered the disclosed question pre-bless ("trees are also very easy in text") and the leader flipped - the review round above records the revision. Remaining attack surface: text-all's editor score (0.6) still assumes the owner accepts typing layer lists and Mermaid; the M5 spike's derived-render targets give the evidence either way. Kill-criterion (revised): if the derived renders from text models cannot reproduce the reading value of the i14 onion, the canvas hybrids reopen (both preserved with full ratings).
 
-**Verdict: PASS** - candidates ready for the M4 Pugh run (datum: cand-hybrid-exca-mermaid, the strongest rival after revision). Adjudication: the owner drove the M3 review live (matrix challenge, leader flip, format rounds) and closed it with the explicit instruction "make sure this is represented in the m3 matrix, then go to m4" - the killer and gate are blessed actor=agent under the contract rule-3 exception (explicit gate-naming instruction), with this line as the record.
+**Verdict: PASS** - candidates ready for the M4 Pugh run (datum: cand-hybrid-exca-mermaid, the strongest rival after revision). Adjudication: the owner drove the M3 review live. The live review rounds:
+
+- matrix challenge
+- leader flip
+- format rounds
+
+The owner closed it with the explicit instruction "make sure this is represented in the m3 matrix, then go to m4". The killer and gate are blessed actor=agent under the contract rule-3 exception (explicit gate-naming instruction). This line is the record.

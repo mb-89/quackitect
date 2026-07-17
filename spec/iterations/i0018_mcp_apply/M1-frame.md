@@ -14,22 +14,24 @@ Worth solving now: MCP is the discoverability the tools have lacked since v0, th
 Two scans positioned the idea: an adversarially-verified web scan of the MCP protocol and Go tooling, and a read-only mine of the local sebot projects (the owner's prior knowledge-tool attempts). Full findings in NOTE-20260711-184944 (web) and NOTE-20260711-184422 (sebot).
 
 **MCP over stdio is hand-roll-friendly (web scan, 10 claims verified 3-0).**
+
 - Framing is newline-delimited JSON-RPC - no Content-Length headers; a simple line reader/writer suffices. A message must not contain an embedded newline.
 - The one hard conformance rule: the server must write nothing to stdout that is not a valid MCP message; stderr is free for logging. For a Go binary this means routing every log line to stderr.
-- Lifecycle is a three-step handshake (initialize -> capabilities -> notifications/initialized) with deterministic version negotiation; stdio shutdown has no message - the client closes stdin and the server exits, which matches quack's single-shot model exactly.
+- Lifecycle is a three-step handshake (initialize -> capabilities -> notifications/initialized) with deterministic version negotiation. Stdio shutdown has no message - the client closes stdin and the server exits, which matches quack's single-shot model exactly.
 - Message directions are restricted (servers never initiate requests) - the server loop stays simple.
-- Caution: the newest DRAFT spec removes the handshake into per-request _meta; pin to a stable dated version, do not chase the draft.
+- Caution: the newest DRAFT spec removes the handshake into per-request _meta. Pin to a stable dated version, do not chase the draft.
 
-**The transport fork is well-evidenced (both scans).** An official modelcontextprotocol/go-sdk exists but is NOT zero-dependency. sebot hand-rolled a working MCP server in ~555 LOC (3 methods: initialize, tools/list, tools/call) on pure stdlib, and it satisfied Claude Code. So hand-rolling stdio to keep the zero-dependency law is proven feasible; adopting the SDK would be the engine's first runtime dependency. The decision is q-mcp-transport, ruled at M3/M4 - not pre-empted here.
+**The transport fork is well-evidenced (both scans).** An official modelcontextprotocol/go-sdk exists but is NOT zero-dependency. sebot hand-rolled a working MCP server in ~555 LOC on pure stdlib, and it satisfied Claude Code. Its 3 methods: initialize, tools/list and tools/call. So hand-rolling stdio to keep the zero-dependency law is proven feasible; adopting the SDK would be the engine's first runtime dependency. The decision is q-mcp-transport, ruled at M3/M4 - not pre-empted here.
 
 **Where this differs / what to take (sebot lessons):**
+
 - AVOID sebot's resident daemon - every hard fix in its server was Windows daemon scar tissue (Smart App Control, ghost discovery files, pid shims, cwd resets, concurrency collisions). sebot chose HTTP+daemon only because its server had to outlive the agent; quack has no such need, so stdio launch-on-demand keeps the single-shot property that sidesteps all of it.
 - AVOID bearer-token-in-a-file auth - it authenticates the transport, not the actor. quack's attest/key model is strictly stronger; carry the key as a tool argument, not a header.
 - TAKE the one-core-many-faces pattern: MCP tool declarations generated from the same command definitions the CLI reads (no second surface to drift).
 - TAKE the schema pattern for req-field-schemas: per-field typed rules, common+per-type merge, field-shape checks separated from referential checks, and a fixture selftest asserting exact issue sets as the contract test. Put field defaults IN the schema (sebot split them into templates and paid to maintain both).
 - The motivating lesson (sebot atom 0052): deterministic tools behind a CLI incantation get SKIPPED by the agent, which then redoes the work by hand. Discoverability is the product - which is the whole case for the MCP surface.
 
-**Verdict: the idea is positioned.** MCP-over-stdio is a small, conformant, zero-dependency target; the field-schema system has a proven shape to adapt; the one genuine fork is recorded as an open question for the owner.
+**Verdict: the idea is positioned.** MCP-over-stdio is a small and conformant zero-dependency target. The field-schema system has a proven shape to adapt. The one genuine fork is recorded as an open question for the owner.
 
 ## Success is measurable  -> i18-m1-success
 Every requirement maps to a named selftest (the seven are already composed: mcp-serve, apply-default-lane, await-console-exit, informed-by-edges, lint-exit-honest, report-debounce, field-schemas). The killer acceptance is behavioral, not structural: a real MCP client drives a status-to-bless walk over the server end-to-end (the M5 spike + the M7 killer-use-case demo), and a planted field-schema violation is caught by `quack lint`, not by a human reader. "The engine refuses" is the measurable bar for both the MCP surface and the schema.

@@ -1,13 +1,14 @@
 # M1 - Frame (i0016_structural_models, systematic)
 
-TL;DR: Structural models become a declared architecting artifact between the architecture decision and the implementation. The owner sketches them in files that stay the checked truth. The engine extracts them, lints ambiguity, and checks the code against them. Drift flips SUSPECT. The book renders them.
+TL;DR: Structural models become a declared architecting artifact between the architecture decision and the implementation. The owner sketches them in files that stay the checked truth. The engine extracts them. It lints ambiguity and checks the code against them. Drift flips SUSPECT. The book renders them.
 
 ## Vision & scope stated  -> i16-m1-vision
 **Vision (Moore).** For the owner of a spec-driven project / who needs the implementation to follow a deliberately chosen structure instead of the agent's defaults / structural models in quackitect are a declared, conformance-checked spec layer / that turns architectural intent into a fence the agent builds inside, with drift surfacing as SUSPECT on the board / unlike rule-test libraries (ArchUnit family: no visual model, no ledger) and CASE/SysML tools (heavy editors, drawings that rot).
 
-**PR-FAQ pressure test.** Headline: "The spec now refuses drift from the declared architecture." Hardest FAQ: "Is this not BDUF?" Answer: models are chosen per iteration at views-chosen (default two), each names the question it answers, and every one is mechanically checked - a model that cannot gate is refused admission. The ratchet is rough-to-detailed, not big-design-up-front.
+**PR-FAQ pressure test.** Headline: "The spec now refuses drift from the declared architecture." Hardest FAQ: "Is this not BDUF?" Answer: models are chosen per iteration at views-chosen (default two). Each names the question it answers. Every one is mechanically checked - a model that cannot gate is refused admission. The ratchet is rough-to-detailed, not big-design-up-front.
 
 **Scope IN:**
+
 - model-kind catalog with admission tests and selection heuristics
 - views-chosen decision step after the architecture milestone
 - model nodes in the spec, draft==truth (the authored file IS the checked file)
@@ -18,6 +19,7 @@ TL;DR: Structural models become a declared architecting artifact between the arc
 - dogfood: the engine's own structure declared and checked
 
 **Scope OUT:**
+
 - report tabs for models (owner: probable, decision deferred to the walk)
 - allocation/deployment kind (parked for the mechatronics wave)
 - vendoring any external renderer (PlantUML jar, render servers)
@@ -54,10 +56,36 @@ TL;DR: Structural models become a declared architecting artifact between the arc
 
 ## Milestone review  -> i16-m1-gate
 
-**Verify.** Each subtask has its section above with dated referents: the vision carries Moore + PR-FAQ, the problem carries four dated owner rulings, the sota scan ran live searches (reflexion models, ArchUnit family, view catalogs, format research), success criteria map 1:1 to baked selftests, and four RAID nodes are minted in the iteration.
+**Verify.** Each subtask has its section above with dated referents:
 
-**Validate.** The frame matches the owner's commission verbatim: models after architecture and before implementation, implementation follows them, book rendering in, report tabs explicitly deferred. Nothing out of the commission's scope was added beyond the dogfood case, which the onion-structure note demands.
+- the vision carries Moore + PR-FAQ
+- the problem carries four dated owner rulings
+- the sota scan ran live searches (reflexion models, ArchUnit family, view catalogs, format research)
+- success criteria map 1:1 to baked selftests
+- four RAID nodes are minted in the iteration
 
-**Red-team.** The opposing case (BDUF, dual maintenance, wrong-model risk, rot) was argued in the owner discussion 2026-07-09 and each point is either adopted as a rule (only checkable kinds admitted; per-iteration choice; models gate or are refused) or carried as a RAID node. Kill-criterion for the iteration: if the M5 spike cannot extract the real i14 draft with a zero-dep parser, the visual draft==truth path dies and the format decision reopens.
+**Validate.** The frame matches the owner's commission verbatim:
 
-**Verdict: PASS** - problem real, scope bounded, success measurable. Hand-off to the adjudicator for the killer + gate bless.
+- models after architecture and before implementation
+- implementation follows them
+- book rendering in
+- report tabs explicitly deferred
+
+Nothing out of the commission's scope was added beyond the dogfood case, which the onion-structure note demands.
+
+**Red-team.** The opposing case was argued in the owner discussion 2026-07-09. Its points:
+
+- BDUF
+- dual maintenance
+- wrong-model risk
+- rot
+
+Each point is either adopted as a rule or carried as a RAID node. The adopted rules:
+
+- only checkable kinds admitted
+- per-iteration choice
+- models gate or are refused
+
+Kill-criterion for the iteration: if the M5 spike cannot extract the real i14 draft with a zero-dep parser, the visual draft==truth path dies and the format decision reopens.
+
+**Verdict: PASS** - problem real. Scope bounded. Success measurable. Hand-off to the adjudicator for the killer + gate bless.

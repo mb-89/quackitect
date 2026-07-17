@@ -219,7 +219,7 @@ func coverageRuleUncached(nodes map[string]Node, rule, scope string) bool {
 		defrdP := deferredReqs(nodes)
 		for _, n := range nodes {
 			if n.Class == "executed" && !strings.HasPrefix(n.Verify, "coverage:") && inscope(n) {
-				if n.Suite == "standalone" {
+				if n.Suite == "never-cached" {
 					continue // not a suite member: watches workspace state, not iteration correctness (adr-standalone-suite)
 				}
 				if testDeferred(n, defrdP) {
@@ -246,17 +246,26 @@ func coverageRuleUncached(nodes map[string]Node, rule, scope string) bool {
 			defer func() { tpAnnouncing = false }()
 		}
 		memo := map[string]string{}
+		// go-fail-at-end (adr-fail-at-end): the whole scope runs; every failure lands in
+		// ONE end report; the rule answers once. Discover once, fix batched, confirm once.
+		var rep batteryReport
 		for i, t := range ts {
 			if announce {
 				fmt.Fprintf(feedbackW, "verification: %d/%d %s\n", i+1, len(ts), t.ID)
 			}
+			pass := false
 			if strings.HasPrefix(t.Verify, "selftest:") { // in-process, like gateState — cached by verdict (go-verdict-cache)
-				if !runSelftestCached(t.ID, strings.TrimSpace(t.Verify[len("selftest:"):]), fullHash(t.ID, nodes, memo)) {
-					return false
-				}
-			} else if runExecuted(t, fullHash(t.ID, nodes, memo)) != "pass" {
-				return false
+				pass = runSelftestCached(t.ID, strings.TrimSpace(t.Verify[len("selftest:"):]), fullHash(t.ID, nodes, memo))
+			} else {
+				pass = runExecuted(t, fullHash(t.ID, nodes, memo)) == "pass"
 			}
+			rep.record(t.ID, pass)
+		}
+		if out, code := rep.summary(); code != 0 {
+			if announce {
+				fmt.Fprintln(feedbackW, out)
+			}
+			return false
 		}
 		return true
 	}

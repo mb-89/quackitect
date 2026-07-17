@@ -31,4 +31,4 @@ Validate: the iteration record is self-explaining for the next session; every op
 
 Red-team: nothing rides on memory or chat; the repo carries every law this walk baked.
 
-Verdict: pass. Ready for the gate bless, then the wave, then ship.
+Verdict: pass. Ready for the gate bless - then the wave, then ship.

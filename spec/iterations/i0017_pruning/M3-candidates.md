@@ -1,6 +1,6 @@
 # M3 - Design (i0017_pruning, lean)
 
-TL;DR: Six approaches, each with its reason and its rejected obvious alternative, five sealed as ADRs. The riskiest scope is the compaction loader (hash preservation) - its kill-criterion stands from M1. Numbers pinned: 292 requirement files at baseline, target <= 120.
+TL;DR: Six approaches, each with its reason and its rejected obvious alternative. Five are sealed as ADRs. The riskiest scope is the compaction loader (hash preservation) - its kill-criterion stands from M1. Numbers pinned: 292 requirement files at baseline, target <= 120.
 
 ## Approach chosen with recorded reasons  -> i17-m3-approach
 
@@ -11,7 +11,12 @@ TL;DR: Six approaches, each with its reason and its rejected obvious alternative
 - **Go analysis** ([adr-go-analysis-stdlib-first](../../decisions/adr-go-analysis-stdlib-first.md)): `quack build` always runs gofmt + go vet and fails on findings (the toolchain is already required - zero new deps); staticcheck grab-if-present from the tools lane. *Rejected:* golangci-lint as required dependency - the meta-linter is the industry standard but violates the zero-dep spirit and imports a config culture we do not need at this size.
 - **Ask context** ([adr-ask-context-once](../../decisions/adr-ask-context-once.md)): `ask` gains the narrative below the card - one generated text, both lanes identical, card first. *Rejected:* a second ntfy message - the two-cards law forbids it.
 
-Scope guard (what does NOT happen, per the owner's light-on-features ruling): no new model kinds, no new report surfaces, no Slack/corporate work, no book-manifest additions (descoped to this iteration's own docs round only where the owner rules).
+Scope guard (what does NOT happen, per the owner's light-on-features ruling):
+
+- no new model kinds
+- no new report surfaces
+- no Slack/corporate work
+- no book-manifest additions (descoped to this iteration's own docs round only where the owner rules)
 
 ## Decisions traced  -> derived check
 Five ADRs, each addressing its requirement; req-metrics-removed and req-docs-clean need none (pure removals and the owner round).

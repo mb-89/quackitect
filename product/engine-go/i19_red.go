@@ -134,16 +134,12 @@ func selftestDeckLinks() bool {
 		strings.Contains(h1, "new Function(h.content?h.content.textContent:h.textContent)()")
 }
 
-// selftest:terms-before-use — the reading-order term lint (test-terms-before-use,
-// req-terms-before-use), bound statement by statement:
-//  1. a term used BEFORE the glossary's definition point flags ONCE — the first use —
-//     naming the term, the using location, and the defining location; decoy uses in
-//     headings and code fences never count;
-//  2. the glossary IS the term set: the lint takes the renderer's own glossary map
-//     (readGlossary — no second list exists by construction), and a term added to the
-//     glossary joins the check with no other registration;
-//  3. the class is advisory: the lane's blocking contribution is pinned zero, so the
-//     lint exit stays 0 when only term-order findings exist.
+// selftest:terms-before-use — the RETIRED reading-order term lane
+// (test-terms-before-use; the superseding decision on req-terms-before-use), pinned:
+//  1. the lane finds NOTHING, even on the once-flagging shape — an early use before
+//     the definition point;
+//  2. the lane's blocking contribution stays zero whatever a findings list holds,
+//     so the lint exit stays 0.
 func selftestTermsBeforeUse() bool {
 	dir, err := os.MkdirTemp("", "q19to")
 	if err != nil {
@@ -157,39 +153,22 @@ func selftestTermsBeforeUse() bool {
 		os.WriteFile(p, []byte("---\nid: "+id+"\ntype: manifest\nmode: chapter\norder: "+itoa(order)+"\nstatement: "+id+".\n---\n"+body), 0o644)
 		return Node{ID: id, Type: "manifest", Mode: "chapter", Order: order, Statement: id + ".", Path: p}
 	}
+	// THE LANE IS RETIRED (the superseding decision on req-terms-before-use, owner
+	// cleanup 2026-07-16): definitions travel WITH the word as termref toasts, so
+	// reading order stopped mattering. The pin flips: the once-flagging shape - an
+	// early use before the definition point - now finds NOTHING, and the lane's
+	// blocking contribution stays zero, whatever the prose does.
 	early := "<!-- ai:3 -->\n# widget in a heading is exempt\n```\nwidget in a code fence is exempt\n```\nA widget appears before any definition.\n"
 	fx := map[string]Node{}
 	fx["man-ch1-fix"] = write("man-ch1-fix", 10, early)
 	fx[fundamentalsChapterID] = write(fundamentalsChapterID, 20, "<!-- ai:3 -->\nThe fundamentals prose; the glossary splices at this chapter's end.\n")
 	fx["man-ch3-fix"] = write("man-ch3-fix", 30, "<!-- ai:3 -->\nA widget after the definition point is legal.\n")
-	f := termOrderFindings(fx, readGlossary())
-	if len(f) != 1 {
-		return false // one term, ONE finding — the first use only; the decoys stayed exempt
-	}
-	if !strings.Contains(f[0], "'widget'") || !strings.Contains(f[0], "man-ch1-fix-u1") || !strings.Contains(f[0], fundamentalsChapterID) {
-		return false // the finding names the term, the using and the defining location
-	}
-	// definitions-first passes: the same book without the early use is clean.
-	fx["man-ch1-fix"] = write("man-ch1-fix", 10, "<!-- ai:3 -->\nAn opening with no load-bearing vocabulary.\n")
 	if len(termOrderFindings(fx, readGlossary())) != 0 {
-		return false
-	}
-	// the glossary's growth is the check's growth: a NEW term, no other registration,
-	// makes yesterday's clean prose flag — the same source feeds render and lint.
-	os.WriteFile(filepath.Join(dir, "glossary", "vocabulary.md"),
-		[]byte("---\nterm: vocabulary\nlong: the fixture vocabulary\nclass: domain\n---\n<!-- ai:3 -->\nGrown later.\n"), 0o644)
-	grown := termOrderFindings(fx, readGlossary())
-	hit := false
-	for _, g := range grown {
-		if strings.Contains(g, "'vocabulary'") && strings.Contains(g, "man-ch1-fix-u1") {
-			hit = true
-		}
-	}
-	if !hit {
-		return false
+		return false // the retired lane never flags, even on the once-flagging shape
 	}
 	// advisory by construction: the lane adds ZERO to the blocking count, whatever it finds.
-	return termOrderBlocking(grown) == 0 && lintExitCode(false, termOrderBlocking(grown)) == 0
+	stub := []string{"term-order: widget used before its definition (synthetic)"}
+	return termOrderBlocking(stub) == 0 && lintExitCode(false, termOrderBlocking(stub)) == 0
 }
 
 // selftest:white-label-book — a vehicle's book carries the VEHICLE's identity

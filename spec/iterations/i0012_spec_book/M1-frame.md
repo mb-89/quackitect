@@ -8,9 +8,19 @@ Who need to understand the system without reading the repo or asking an AI.
 The spec book is one portable HTML file, compiled from the gated spec graph.
 That serves each stakeholder a view in their own register, with the big ideas first.
 Unlike hand-written docs, which will not be written. Unlike chat-over-repo, which assumes AI access.
-The book is deterministic, hash-backed, and always as current as the ledger.
+The book is deterministic and hash-backed. It is always as current as the ledger.
 
-**Scope.** Full book (owner ruling at plan): all chapters, templates, glossary/SyA, guidance split, methodology map, deck, plus the evidence-authoring infra fixes on the side. One iteration; M6 may defer the book half if the plan proves too big.
+**Scope.** Full book (owner ruling at plan):
+
+- all chapters
+- templates
+- glossary/SyA
+- guidance split
+- methodology map
+- deck
+- plus the evidence-authoring infra fixes on the side
+
+One iteration; M6 may defer the book half if the plan proves too big.
 
 **Stakeholder-specific communication (owner brief, M1).** This is a load-bearing frame element, not a style nicety:
 
@@ -28,7 +38,7 @@ The book is deterministic, hash-backed, and always as current as the ledger.
 - Every AI-written paragraph carries "ai written" icons: three when the AI drafted it.
 - A user correction or rewrite may reduce the icon count. The count is a per-paragraph provenance record, rendered by the book.
 
-**PR-FAQ pressure test (working backwards).** "Project X ships its manual today. Nobody wrote it. The spec compiled it: every claim traces to a gated check, every AI-drafted paragraph says so on its face, and the owner's edits are visible as reduced AI marks. The deck for the launch talk is the same file in present mode." — FAQ: What if the AI prose is too dense? The register is bounded per audience and the TL;DR is mandatory; the provenance marks invite the human rewrite exactly where it is needed.
+**PR-FAQ pressure test (working backwards).** "Project X ships its manual today. Nobody wrote it. The spec compiled it: every claim traces to a gated check. Every AI-drafted paragraph says so on its face. The owner's edits are visible as reduced AI marks. The deck for the launch talk is the same file in present mode." — FAQ: What if the AI prose is too dense? The register is bounded per audience and the TL;DR is mandatory; the provenance marks invite the human rewrite exactly where it is needed.
 
 ## Problem agreed  → i12-m1-problem-agreed
 
@@ -43,9 +53,9 @@ The book is deterministic, hash-backed, and always as current as the ledger.
 Ch1 criteria (each checked at M7):
 
 1. Each preset audience answers its entry question from the book alone — one real read session per preset.
-2. A professional of average competence, non-native, reads one chapter and can restate its big idea. The TL;DR is present in every chapter; register bounds are checked mechanically where possible (readability lint is an M2 candidate).
+2. A professional of average competence (non-native) reads one chapter and can restate its big idea. The TL;DR is present in every chapter; register bounds are checked mechanically where possible (readability lint is an M2 candidate).
 3. What-and-why precedes detail in every chapter; big ideas before specifics.
-4. The AI drafted 100% of the book's first-draft prose; every AI paragraph carries its provenance icons; user edits show as reduced counts.
+4. The AI drafted 100% of the book's first-draft prose. Every AI paragraph carries its provenance icons. User edits show as reduced counts.
 5. The deck carries the presentation; regeneration of the committed book is a no-op.
 
 ## Top risks logged (RAID)  → i12-m1-risks-logged
@@ -71,4 +81,10 @@ The scan positions the idea. Full cited report: `<data-home>/logs/research-ai-do
 
 ## Milestone review  → i12-m1-gate
 
-**Verify:** each subtask carries its referent — the owner's M1 brief (this session, recorded verbatim above), the spec-book design note, the two evidence-doc field findings. **Validate:** the frame covers the plan-approved scope and adds the owner's stakeholder-communication and provenance rulings; nothing out of scope entered. **Red-team:** strongest counter — "a generated book reads generated; the audience notices and trusts it less." Answered: the provenance icons make generation an honest, visible property instead of a hidden one, and the owner's reductions are the trust signal. Kill-criterion for the frame: if the M7 read sessions show the register still failing average professionals, the register bounds were wrong, not the audience. **Verdict: PASS — pending the adjudicator's bless.**
+**Verify:** each subtask carries its referent:
+
+- the owner's M1 brief (this session, recorded verbatim above)
+- the spec-book design note
+- the two evidence-doc field findings
+
+**Validate:** the frame covers the plan-approved scope and adds the owner's stakeholder-communication and provenance rulings; nothing out of scope entered. **Red-team:** strongest counter — "a generated book reads generated; the audience notices and trusts it less." Answered: the provenance icons make generation an honest, visible property instead of a hidden one. The owner's reductions are the trust signal. Kill-criterion for the frame: if the M7 read sessions show the register still failing average professionals, the register bounds were wrong — not the audience. **Verdict: PASS — pending the adjudicator's bless.**

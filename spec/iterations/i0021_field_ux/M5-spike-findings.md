@@ -17,16 +17,21 @@ Probed live with a throwaway read-only script over
 
 **Assumption 2 - a register answer can ride the real ask path (B1,
 adr-register-watch-answers).** Evidence from the executed suite (all green in tonight's full
-battery, not re-run one by one - the verdict cache holds them): ask-dispatch, answer-apply
-(answers validate and stamp actor+channel), answer-idempotent, first-wins-lanes (desk and
-phone race resolves), adapter-zero-dep (the transport fakes cleanly in fixtures),
-await-console-exit (the console reclaims the seam). The NEW surface (the watch endpoint) only
-routes INTO this proven lane; the wedge risk (binary swap during an answer) stays the ADR's
-recorded tripwire with command-emission as the fallback.
+battery, not re-run one by one - the verdict cache holds them):
+
+- ask-dispatch
+- answer-apply (answers validate and stamp actor+channel)
+- answer-idempotent
+- first-wins-lanes (desk and phone race resolves)
+- adapter-zero-dep (the transport fakes cleanly in fixtures)
+- await-console-exit (the console reclaims the seam)
+
+The NEW surface (the watch endpoint) only routes INTO this proven lane; the wedge risk (binary
+swap during an answer) stays the ADR's recorded tripwire with command-emission as the fallback.
 
 **Assumption 3 - a seeded skeleton passes lint on a fixture.** The shape proof exists in the
 ledger: this very iteration's task set was hand-seeded to exactly the emitter's target shape
-(41 checks, namespaced ids, milestone-monotonic wiring) and lints clean - the walk you are
+(41 checks / namespaced ids / milestone-monotonic wiring) and lints clean - the walk you are
 reading is running on it. The emitter reproduces a shape the parser demonstrably accepts.
 
 Killer review. Blessed by the driving agent under the owner's standing overnight grant
@@ -47,10 +52,10 @@ statement. Non-killer review; blessed by the driving agent.
 
 ## Milestone review → i21-m5-gate
 
-1. **Verify.** Three assumptions, three evidence classes: a live parse probe with counts, the
-   green executed-suite mapping for the ask lane, and the ledger's own seeded set as the
-   shape proof. Each referent is inspectable.
-2. **Validate.** The spikes hit exactly the two recorded M4 tripwires (C1 parseability, B1
+1. **Verify.** Three assumptions, three evidence classes: a live parse probe with counts. The
+   green executed-suite mapping for the ask lane. The ledger's own seeded set as the shape
+   proof. Each referent is inspectable.
+2. **Validate.** The spikes hit exactly the two recorded M4 tripwires (C1 parseability / B1
    lane safety) plus the seeding shape - the riskiest unknowns by the M4 record, not a
    convenience selection.
 3. **Red-team.** Weakness owned honestly: assumption 2 leans on EXISTING tests rather than a

@@ -1,11 +1,27 @@
 # M1 — Frame the problem & vision (i0007_tdd_implementation)
 
-Evidence for the M1 gate. Blameless framing; the delta, the vision, the success criteria, the risks.
+Evidence for the M1 gate. Blameless framing:
+
+- the delta
+- the vision
+- the success criteria
+- the risks
 
 ## Vision & scope  → i7-m1-vision-scope-stated
 **For** a builder driving systematic/lean work with an AI agent, **who** needs the build phase to be as rigorous and auditable as the design phase, **the** i0007 iteration **is** a test-first implementation subsystem **that** (a) extracts the build milestone into ONE shared, imported implementation checklist (lean + systematic, no duplication), (b) makes it test-first — author tests → plan → observe RED → implement GREEN — enforced by a new `tests-red` coverage rule, and (c) makes the test-designer / implementer / tester **pluggable** roles (default inline, swappable per deliverable), **unlike** today's unstructured build step that bolts tests on after the fact.
 
-**Scope (the 8 triaged notes):** the shared fragment + TDD sequence (#1), pluggable roles (#1), doc-tests spectrum (#1), research-as-pluggable-capability (#2), the evidence-cache honesty fix (#8), verdict-links on DONE checks (#9), build/test report nesting (#6), and cross-harness obedience — contract-render + git commit gate (#3/#4/#7). **Fixes first, then TDD.**
+**Scope (the 8 triaged notes):**
+
+- the shared fragment + TDD sequence (#1)
+- pluggable roles (#1)
+- doc-tests spectrum (#1)
+- research-as-pluggable-capability (#2)
+- the evidence-cache honesty fix (#8)
+- verdict-links on DONE checks (#9)
+- build/test report nesting (#6)
+- cross-harness obedience — contract-render + git commit gate (#3/#4/#7)
+
+**Fixes first, then TDD.**
 
 ## Problem agreed  → i7-m1-problem-agreed  *(killer)*
 Implementation is quackitect's weak leg, on three concrete counts, all surfaced as **field feedback** this cycle:
@@ -13,7 +29,7 @@ Implementation is quackitect's weak leg, on three concrete counts, all surfaced 
 2. **The ledger's test evidence can lie.** `selftest:workspace` FAILs on a live re-run yet shows DONE from cached `tests-pass` evidence (note #8). A gate ledger whose evidence masks a red test is not trustworthy — and a red/green TDD gate built on that cache would inherit the lie.
 3. **Thin harnesses bypass the engine entirely.** Copilot did the work itself and never called `quack`; the default-closed killers never fire because they're never invoked. Advisory instructions don't enforce.
 
-The delta between "auditable, test-first, harness-agnostic implementation" and today's state is real, and it undermines the core value proposition (an auditable gate ledger). **Worth solving.**
+Today's state falls short of the vision: an implementation that is auditable, test-first and harness-agnostic. The delta is real, and it undermines the core value proposition (an auditable gate ledger). **Worth solving.**
 
 ## Success is measurable  → i7-m1-success-measurable
 Ch1 acceptance criteria for i0007:

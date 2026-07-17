@@ -3,13 +3,40 @@
 ## Chosen architecture stated  -> i19-m4-chosen
 Pugh runs per fork, datum = the strongest rival (M3), criteria and weights from i19-m3-criteria:
 
-**Fork A (datum: A2 router)** - A1 fragment-reflection: single-file (=), shareable links (=), one-owner-per-mechanism (+, the router CONTENDS with the existing hash rail), machine-digestible/minimal JS (+), DRY (=), hash-honesty (=). **A1 wins on 2 criteria, loses none.**
-**Fork B (datum: B2 curated list)** - B1 glossary-as-list: DRY (+, no shadow list), single-source growth (+), independence from glossary thinness (-, carried RAID). **B1 wins 2:1**; the loss is mitigated by the glossary growth the stranger needs anyway.
-**Fork C (datum: C1 renderer-only substitution)** - C3 hybrid: hash-honesty (+, no render-time prose rewriting), mechanical testability of identity surfaces (=), bounded prose sweep (-, effort). **C3 wins 1:-1 net positive with the effort priced at M6.**
+**Fork A (datum: A2 router)** - A1 fragment-reflection:
 
-**Sensitivity check, REVERSED (find the world where the winner loses):** A1 loses if a future book becomes a multi-VIEW SPA where many components own navigation state - then a router is the right owner. Credibility: LOW for a document that is deliberately one self-contained HTML; recorded as a tripwire, not a blocker: IF a second hash-state owner ever appears beyond the existing rail, revisit adr-deck-anchor-fragment. B1 loses if the glossary permanently stays thin - then the lint is inert; credibility MEDIUM, carried as the M1 RAID with the mitigation in-scope (glossary growth is part of the stranger fixes). C3 loses if the prose sweep explodes (hundreds of self-referential sites); credibility LOW - the M2 probe found the vehicle book small and the M6 white-label test enumerates leaks first.
+- single-file (=)
+- shareable links (=)
+- one-owner-per-mechanism (+, the router CONTENDS with the existing hash rail)
+- machine-digestible/minimal JS (+)
+- DRY (=)
+- hash-honesty (=)
 
-Decisions recorded: adr-deck-anchor-fragment, adr-terms-source-glossary, adr-white-label-hybrid (all kind: architecture, informed-by wired to their elements).
+**A1 wins on 2 criteria, loses none.**
+
+**Fork B (datum: B2 curated list)** - B1 glossary-as-list:
+
+- DRY (+, no shadow list)
+- single-source growth (+)
+- independence from glossary thinness (-, carried RAID)
+
+**B1 wins 2:1**; the loss is mitigated by the glossary growth the stranger needs anyway.
+
+**Fork C (datum: C1 renderer-only substitution)** - C3 hybrid:
+
+- hash-honesty (+, no render-time prose rewriting)
+- mechanical testability of identity surfaces (=)
+- bounded prose sweep (-, effort)
+
+**C3 wins 1:-1 net positive with the effort priced at M6.**
+
+**Sensitivity check, REVERSED (find the world where the winner loses):** A1 loses if a future book becomes a multi-VIEW SPA where many components own navigation state - then a router is the right owner. Credibility: LOW for a document that is deliberately one self-contained HTML. Recorded as a tripwire, not a blocker. IF a second hash-state owner ever appears beyond the existing rail, revisit adr-deck-anchor-fragment. B1 loses if the glossary permanently stays thin - then the lint is inert. Credibility MEDIUM, carried as the M1 RAID with the mitigation in-scope (glossary growth is part of the stranger fixes). C3 loses if the prose sweep explodes (hundreds of self-referential sites); credibility LOW - the M2 probe found the vehicle book small and the M6 white-label test enumerates leaks first.
+
+Decisions recorded (all kind: architecture, informed-by wired to their elements):
+
+- adr-deck-anchor-fragment
+- adr-terms-source-glossary
+- adr-white-label-hybrid
 
 ## Choice traced  -> i19-m4-traced-choice
 Every choice traces to the weighted criteria, which trace to requirements and standing laws: single-file (the book's law), shareable links (uc-deck-deep-link), one-owner (the M2 probe's existing rail), DRY (owner law), hash-honesty (the ledger's trust chain). No criterion is taste.

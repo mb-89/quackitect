@@ -203,6 +203,12 @@ func ParseNodeBytes(path string, txt []byte) Node {
 		case "retired":
 			n.Retired = v
 		case "suite":
+			// go-never-cached-rename: the suite renamed standalone -> never-cached
+			// (owner ruling 2026-07-16); the old word reads as the new, so external
+			// workspaces keep loading
+			if v == "standalone" {
+				v = "never-cached"
+			}
 			n.Suite = v
 		case "direction":
 			n.Direction = v

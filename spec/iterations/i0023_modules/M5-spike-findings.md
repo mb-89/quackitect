@@ -26,7 +26,7 @@ The first implementation can therefore proceed as an additive module metadata an
 
 Assumption 1: module semantics can be added without splitting the ledger.
 
-Evidence: `StatusMap`, `gateState`, and attest events operate over loaded nodes and ids. Adding module metadata does not require changing the event model. Rollups can be view-only.
+Evidence: `StatusMap`, `gateState` and attest events operate over loaded nodes and ids. Adding module metadata does not require changing the event model. Rollups can be view-only.
 
 Assumption 2: imported modules can reuse deterministic file lanes.
 
@@ -34,7 +34,7 @@ Evidence: `copyTree` already mirrors engine source into a vehicle. `quack apply`
 
 Assumption 3: module-first filters can reuse the derived-table facet machinery.
 
-Evidence: the book/report already render facet pills for type, need, decision type, and iteration. A module facet is another first-class facet, with the special rule that selecting a parent dotted id includes child ids.
+Evidence: the book/report already render facet pills for type + need + decision type + iteration. A module facet is another first-class facet, with the special rule that selecting a parent dotted id includes child ids.
 
 Assumption 4: single-module workspaces can remain visually unchanged.
 

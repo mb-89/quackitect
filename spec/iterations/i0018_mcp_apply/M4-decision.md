@@ -14,8 +14,8 @@ Datum = the official Go SDK (1B), scored 0. Criteria weighted from M3.
 | attest integrity (0.8) | **0** - the key is a tool argument either way |
 | latency (0.5) | **0** - both launch on demand |
 
-Weighted sum vs datum: +1.0 −0.9 −0.6 = **−0.5** on the tally alone. **The winner is still 1A**, because the single **+** is the zero-dep law - a project invariant, not a tradeable criterion. A negative Pugh tally against a rival that breaks a hard constraint is a signal the criteria weights understate the constraint, not that the rival wins. The zero-dep law is boolean: the SDK violates it, so the SDK is disqualified regardless of tally. Recorded in [adr-mcp-transport](../../decisions/adr-mcp-transport.md).
-**Reversed sensitivity:** the SDK wins in the first world where the protocol churns faster than we can track AND conformance bugs reach real clients. Credibility: plausible over years, not months - MCP is stabilizing, and we pin a dated version. Recorded as a tripwire (watch spec revisions; SDK is the M5 fallback), not a silent dismissal.
+Weighted sum vs datum: +1.0 −0.9 −0.6 = **−0.5** on the tally alone. **The winner is still 1A**, because the single **+** is the zero-dep law - a project invariant rather than a tradeable criterion. A negative Pugh tally against a rival that breaks a hard constraint is a signal the criteria weights understate the constraint, not that the rival wins. The zero-dep law is boolean: the SDK violates it, so the SDK is disqualified regardless of tally. Recorded in [adr-mcp-transport](../../decisions/adr-mcp-transport.md).
+**Reversed sensitivity:** the SDK wins in the first world where the protocol churns faster than we can track AND conformance bugs reach real clients. Credibility: plausible over years rather than months - MCP is stabilizing, and we pin a dated version. Recorded as a tripwire (watch spec revisions; SDK is the M5 fallback) rather than a silent dismissal.
 
 ### Fork 2 - the field-schema format: FRONTMATTER notes (2A)
 Datum = JSON config files (2B), scored 0.

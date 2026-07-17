@@ -48,6 +48,6 @@ Verify: both spikes have runnable artifacts in the spike dirs. The findings abov
 
 Validate: the two riskiest assumptions from M4's red-team are exactly what got probed.
 
-Red-team: the unprobed half (harness adoption) is named, bounded, and carries its tripwire and fallback. Accepting it now risks one reconnect, not the iteration.
+Red-team: the unprobed half (harness adoption) is named and bounded, and carries its tripwire and fallback. Accepting it now risks one reconnect, not the iteration.
 
 Verdict: pass. Ready for the gate bless.

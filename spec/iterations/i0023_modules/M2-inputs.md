@@ -51,7 +51,14 @@ No new named stakeholder classes are needed for this engine iteration. The exist
 - newcomer: benefits from single-module hiding and module-first views when projects grow
 - assessor: reviews module imports, provenance, and cross-module trace visibility
 
-The requirements cover each role's concern: ownership, shareability, filtering, imports, updates, and bounded dotted nesting.
+The requirements cover each role's concern:
+
+- ownership
+- shareability
+- filtering
+- imports
+- updates
+- bounded dotted nesting
 
 Late design input from the i23 walk: user handoffs must batch only user-adjudicated checks. The durable marker is `killer: true`. Deterministic checks and agent-fillable review work stay in the agent lane. The engine should prefer agent-lane ready work before opening a user handoff. When dependency order leaves only ready user-lane checks, the handoff may batch them together.
 
@@ -65,9 +72,19 @@ Every module requirement refines one of the composed module use cases, and each 
 
 ## Review Verdict -> i23-m2-gate
 
-Verify: the trace covers module ownership, import/update, module-first filtering, command selection, and generic vehicle setup.
+Verify - the trace covers:
 
-Validate: the requirements match the revised owner direction: no per-module iterations, dotted nested ids as filter rollups, and no Tracer-specific Quackitect documentation.
+- module ownership
+- import/update
+- module-first filtering
+- command selection
+- generic vehicle setup
+
+Validate: the requirements match the revised owner direction:
+
+- no per-module iterations
+- dotted nested ids as filter rollups
+- no Tracer-specific Quackitect documentation
 
 Red-team: the main missing design decision would be treating imports as overlays only. That is rejected by `req-module-import` and `req-module-update`, which require deterministic manifests and provenance.
 

@@ -17,7 +17,7 @@ There has to be a better way!
 **quackitect**  
 *The rubber duck that went to engineering school.*
 
-quackitect is an LLM Harness: rules and tools wrapped around an AI agent while it works. It knows how to properly architect. It's trained on forty years of engineering method: requirements engineering, architecture decision records, the V-model, verification and validation, the whole canon. You want to shoot a rocket to the moon? quackitect knows how they did it.
+quackitect is an [LLM](spec/book.html#term-llm) Harness: rules and tools wrapped around an AI agent while it works. It knows how to properly architect. It's trained on forty years of engineering method: requirements engineering, architecture decision records, the V-model, verification and validation, the whole canon. You want to shoot a rocket to the moon? quackitect knows how they did it.
 
 It asks the right questions, at the right time. It pushes back where you need it. It sharpens your ideas, writes down your decisions, understands your requirements and traces them into your design. It designs the deliverable, tests it, documents it. Once you plan changes, it tells you the impact.
 

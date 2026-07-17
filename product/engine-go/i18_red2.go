@@ -75,8 +75,8 @@ func selftestAwaitConsoleExit() bool {
 // selftest:informed-by-edges — the first-class decision→model-element link (test-informed-by-edges,
 // req-informed-by-edges) on a HERMETIC fixture graph. It asserts all three numbered statements:
 //  1. a model node and a declared model element are first-class addresses targets;
-//  2. the rendered informed-by list LEADS with the decision holding a first-class edge, and keeps
-//     the name-derived citation only for the decision without one;
+//  2. the first-class edge set is the ONLY informing lane (adr-s7f5mzi): the set is exactly
+//     the edge-holder, and a decision merely NAMING an element never joins it;
 //  3. an addresses edge to a design region no model declares is a dangling model target the lint flags.
 func selftestInformedByEdges() bool {
 	dir, err := os.MkdirTemp("", "q18ibe")
@@ -115,15 +115,10 @@ func selftestInformedByEdges() bool {
 	if !addressFirstClass("q-fix", nodes, elems) {
 		return false
 	}
-	// the first-class informing set is exactly the edge-holder
+	// 2. the first-class informing set is exactly the edge-holder; adr-name only NAMES
+	// el-two and stays out — no name-derived lane exists (adr-s7f5mzi)
 	fc := firstClassInformedBy("model-x", []string{"el-one", "el-two"}, nodes)
 	if len(fc) != 1 || fc[0] != "adr-fc" {
-		return false
-	}
-	// 2. the render leads with the first-class edge, then the name-derived citation
-	html := renderModelInformed("model-x", modelSrc, nodes)
-	iFC, iName := strings.Index(html, "adr-fc"), strings.Index(html, "adr-name")
-	if iFC < 0 || iName < 0 || iFC > iName {
 		return false
 	}
 	// 3. an addresses edge to a design region no model declares is a dangling model target

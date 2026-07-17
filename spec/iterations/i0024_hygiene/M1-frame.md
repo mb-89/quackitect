@@ -2,9 +2,9 @@
 
 ## vision & scope stated -> i24-m1-vision-scope-stated
 
-Vision (Moore): FOR the driving agent and the owner, WHO lose time to file dumps, shell hazards, and a stale tool surface, THE i0024 hygiene iteration is a trust and lane upgrade THAT gives the agent a read query, a self-refreshing MCP surface, and a voice-clean, fully hashed spec, UNLIKE dev-time reload proxies and unhashed query pools that sit outside the trust chain.
+Vision (Moore): FOR the driving agent and the owner WHO lose time to file dumps + shell hazards + a stale tool surface, THE i0024 hygiene iteration is a trust and lane upgrade THAT gives the agent a read query + a self-refreshing MCP surface + a voice-clean and fully hashed spec. UNLIKE dev-time reload proxies and unhashed query pools that sit outside the trust chain.
 
-Goal, actual, delta:
+Goal, actual and delta:
 
 - Goal: every structured read is one filtered call. Every content input is hashed. Every authored statement obeys the voice.
 - Actual, five gaps:
@@ -23,7 +23,7 @@ Out of scope:
 
 ## problem agreed -> i24-m1-problem-agreed-the
 
-The delta is real, and each half was observed live, not assumed:
+The delta is real, and each half was observed live rather than assumed:
 
 - The owner asked for the query lane after watching four greps and a blown output cap in one session (2026-07-15).
 - The owner asked for hot reload after the MCP surface needed a manual reconnect for one config fix.
@@ -36,7 +36,7 @@ Worth solving now: the wave and the build both get cheaper with query and apply 
 
 Verify: every M1 subcheck points at a concrete referent in this doc or the risk register. The research findings carry source links via the compose notes.
 
-Validate: the frame answers the owner's actual asks from 2026-07-15 chat: query lane, hot reload, statement cleanup, plus the agreed cleanup seeds. Nothing here invents scope beyond the approved plan.
+Validate: the frame answers the owner's actual asks from 2026-07-15 chat: query lane + hot reload + statement cleanup, plus the agreed cleanup seeds. Nothing here invents scope beyond the approved plan.
 
 Red-team: the riskiest claim is reload feasibility on this harness. It rests on documentation, not a live probe. The M5 spike carries a kill-criterion: if the harness does not adopt list_changed live, reload ships console-first and the MCP half re-scopes. Second risk: the wave's size. The grant collection and roots-only triage price it. No override needed.
 

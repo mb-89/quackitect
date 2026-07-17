@@ -252,7 +252,7 @@ func coverageDelta(nodes map[string]Node, rule, scope string) []string {
 			}
 		case "tests-pass":
 			if n.Class == "executed" && !strings.HasPrefix(n.Verify, "coverage:") && inscope(n) && n.Verify != "" &&
-				n.Suite != "standalone" { // the RULE skips standalone members; the delta must agree
+				n.Suite != "never-cached" { // the RULE skips standalone members; the delta must agree
 				if strings.HasPrefix(n.Verify, "selftest:") {
 					if pass, ok := verdictLookup(n.ID, fullHash(n.ID, nodes, memo)); !ok {
 						out = append(out, "test "+n.ID+" unverified at this build (verdict-cache miss)")

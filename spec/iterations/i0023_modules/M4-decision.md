@@ -65,7 +65,7 @@ flowchart TD
 
 ## Structuring method considered -> i23-m4-structuring-method-considered
 
-DSM, DMM, and MDM were considered and skipped for this first cut.
+DSM, DMM and MDM were considered and skipped for this first cut.
 
 Reason: the module split is already forced by ownership boundaries:
 
@@ -106,9 +106,9 @@ Key ADRs:
 
 ## Review Verdict -> i23-m4-gate
 
-Verify: the selected architecture is stated, traced to criteria, represented as a model, and backed by ADRs.
+Verify: the selected architecture is stated and traced to criteria. It is represented as a model and backed by ADRs.
 
-Validate: the architecture preserves one workspace timeline and ledger while adding module ownership, dotted child rollups, and deterministic imports.
+Validate: the architecture preserves one workspace timeline and ledger. It adds module ownership, dotted child rollups and deterministic imports.
 
 Red-team: the design keeps parent modules as rollup views, not separate process owners. Child modules still use the normal workspace process and gates.
 

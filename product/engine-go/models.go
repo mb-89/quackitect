@@ -249,54 +249,6 @@ func renderModelsTable(nodes map[string]Node) string {
 	return b.String()
 }
 
-// modelInformedBy derives the architecture decisions CURRENTLY informing a
-// structural model, from existing data only — no new model kind, no authored list:
-//   - the decisions the model's own authored file cites by id (the model says
-//     why it is the way it is), and
-//   - the decisions whose statement names the model, its kind, or one of its
-//     id-shaped (dash-carrying) elements.
-//
-// The addresses→implements→element chain was measured and rejected: a TOTAL
-// model (the engine onion covers every design region by construction) is
-// "informed" by nearly every decision through it — a list that discriminates
-// nothing is not an honest view. Plain-word element ids (a product tree's
-// `engine`, `method`) are skipped for the same reason: indistinguishable from
-// prose. Decisions not informing stay out — the full set lives with the
-// project chapter's one decisions table.
-func modelInformedBy(modelID, src string, nodes map[string]Node) []string {
-	tokens := []string{modelID}
-	if k := nodes[modelID].Kind; k != "" {
-		tokens = append(tokens, k)
-	}
-	g, _ := extractModelGraph(src)
-	var elems []string
-	for e := range g.Elems {
-		if strings.Contains(e, "-") {
-			elems = append(elems, e)
-		}
-	}
-	sort.Strings(elems)
-	tokens = append(tokens, elems...)
-	var out []string
-	for id, n := range nodes {
-		if n.Type != "adr" || n.Kind == "waiver" || !decisionArchitectural(n) {
-			continue
-		}
-		if nameMatchToken(src, id) {
-			out = append(out, id)
-			continue
-		}
-		for _, t := range tokens {
-			if nameMatchToken(n.Statement, t) {
-				out = append(out, id)
-				break
-			}
-		}
-	}
-	sort.Strings(out)
-	return out
-}
-
 // nameMatchToken reports whether text carries tok as a whole id-shaped word:
 // the neighbours may not be id characters ([a-z0-9-]), so `state` never
 // matches `check-states` and `adr-x` never matches `adr-x-y`.
@@ -322,43 +274,9 @@ func nameMatchToken(text, tok string) bool {
 	}
 }
 
-// renderModelInformed emits the compact informed-by link list for one model —
-// nodeLinkHTML affordances, honest when empty. The list LEADS with the decisions holding a
-// FIRST-CLASS addresses edge to the model or one of its elements (go-informed-by-edges,
-// req-informed-by-edges.2), then keeps the name-derived citation only for a decision without
-// a first-class edge.
-func renderModelInformed(modelID, src string, nodes map[string]Node) string {
-	g, _ := extractModelGraph(src)
-	var elems []string
-	for e := range g.Elems {
-		elems = append(elems, e)
-	}
-	fc := firstClassInformedBy(modelID, elems, nodes)
-	seen := map[string]bool{}
-	for _, id := range fc {
-		seen[id] = true
-	}
-	var derived []string
-	for _, id := range modelInformedBy(modelID, src, nodes) {
-		if !seen[id] {
-			derived = append(derived, id) // name-derived citation only WITHOUT a first-class edge
-		}
-	}
-	ids := append(append([]string{}, fc...), derived...)
-	if len(ids) == 0 {
-		return `<p class="meta model-informed">no decision names this model yet — informing decisions link here as they arrive; the full set lives with the project chapter</p>` + "\n"
-	}
-	var b strings.Builder
-	b.WriteString(`<p class="meta model-informed">informed by: `)
-	for i, id := range ids {
-		if i > 0 {
-			b.WriteString(", ")
-		}
-		b.WriteString(nodeLinkHTML(id, nodes))
-	}
-	b.WriteString("</p>\n")
-	return b.String()
-}
+// renderModelInformed and modelInformedBy retired in i25 (adr-s7f5mzi): the
+// informed-by list left the book render, and the word-match deriver went with it.
+// The first-class addresses edge is the only informing lane.
 
 func svgModelGraph(g modelGraph) string {
 	ids := make([]string, 0, len(g.Elems))

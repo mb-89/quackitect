@@ -5,6 +5,7 @@ Evidence for the M3 subtasks. Each section is the referent for one gate.
 ## Alternatives elaborated  → i5-m3-alternatives-elaborated  *(killer)*
 
 How a bare workspace reaches its engine:
+
 - **A. Env var** (`QUACK_ENGINE`) — zero files, nothing in VC; but fails if unset, easy to forget.
 - **B. Gitignored pointer** (`.quack/engine.local`) — discoverable in-repo, per-clone override, nothing machine-specific committed.
 - **C. Engine on PATH** — simplest launcher; but global mutation, ambiguous which engine, no per-workspace pinning.
@@ -29,4 +30,7 @@ Verified live against the existing engine:
 
 ## Verdict
 
-**Verify** — the chosen order (internal → B → A) satisfies every High criterion and is buildable on the existing engine. **Validate** — preserves the dogfood case (internal-first) while enabling the bare-workspace case; nothing regresses. **Red-team** — C rejected (global/ambiguous), D rejected (leaks path to VC); residual = a machine with none of internal/B/A, handled by the launcher's clear failure message. **Pass** → gate blessed.
+- **Verify** — the chosen order (internal → B → A) satisfies every High criterion and is buildable on the existing engine.
+- **Validate** — preserves the dogfood case (internal-first) while enabling the bare-workspace case; nothing regresses.
+- **Red-team** — C rejected (global/ambiguous), D rejected (leaks path to VC); residual = a machine with none of internal/B/A, handled by the launcher's clear failure message.
+- **Pass** → gate blessed.

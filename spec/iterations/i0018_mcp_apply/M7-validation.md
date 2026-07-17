@@ -10,18 +10,53 @@ All prior-iteration needs still validate: full battery green across every iterat
 Each killer use case exercised FOR REAL, not "tests green":
 
 **uc-mcp-drive** — the compiled `quack mcp` binary driven over real stdin/stdout. Two live drives:
+
 - Discovery + read + attest-gate: `initialize` → serverInfo `quack-mcp`, protocol `2025-06-18`; `notifications/initialized` → no reply; `tools/list` → 8 tools with JSON inputSchemas (status, why, notes, note, next, start, bless, attest); `why` (read-only) → live result `isError:false`; `next` (ledger, unattested) → REFUSED with the contract challenge returned AS A RESULT (`"word 16 of rule 1 (nonce …)"`, `isError:false`) — the attest choke point holds and never flips the flag. stderr carried only `[mcp] server up` / `[mcp] stdin closed; exiting clean` — stdout purity + clean EOF confirmed.
 - Full write path: `initialize` → `attest` (earned key) → `"session attested: ledger tools are now live"` → `bless i18-m5-spike-recorded by=agent` → `"blessed i18-m5-spike-recorded"`. A REAL ledger write through the server — the status-to-bless walk the M1 bar named. (This same drive cleared the M5 propagated-suspect cone.)
 
-**uc-field-schemas** — the schema mechanism exercised on a real graph fixture: a planted node with a bad enum/type is flagged by name+field+broken-rule; a valid node passes; the schema-set tester rejects a malformed schema (unknown type, bad tier, default outside enum). The live graph stays clean — zero field findings on blessed nodes (enums scoped to live values, the composed-verify pattern widened, embedded-region id-guard).
+**uc-field-schemas** — the schema mechanism exercised on a real graph fixture:
 
-**uc-architecture-review** — the onion diagram IS the reviewable deliverable. `quack render` produces the self-contained onion: concentric-circles-always (no ellipses), per-element placement rationale, informed-by links from architecture ADRs, and change-marks that propagate element→cluster→ring; single-click inspects + highlights connections, double-click drills. Screenshot-verified without owner input at overview / L1-band / kernel / cluster levels — the services band renders as a clean concentric circle, every I/O bar is labeled, no targetless bar and no arrow-to-ambient (ambient is off-flow infra pills). The morning review render is `onion-review.html`.
+- a planted node with a bad enum/type is flagged by name+field+broken-rule
+- a valid node passes
+- the schema-set tester rejects a malformed schema (unknown type, bad tier, default outside enum)
 
-**uc-derive-structure** — `quack cluster` run on our OWN design-flow DSM (not a toy): 141 coupled design regions, 330 directed couplings, degree-of-connectivity 0.0167 (sparse → clustering meaningful), TotalCost 28254, deterministic (id-sorted passes + 3 fixed restarts, no RNG). It produced 41 coupling-grouped clusters layered by Tarjan+Kahn with tearing. The i18 work self-clusters coherently — C7 = {go-mcp-server, go-mcp-session}, C4 = {go-field-schemas, go-schema-tester} — evidence the grouping tracks real coupling. The feature-module lens vs the abstraction-onion lens agree partially (complementary views, judged NOT a defect — recorded, not auto-restructured).
+The live graph stays clean — zero field findings on blessed nodes. The fixes behind it:
 
-**uc-run-dep-free** (reframed by adr-install-not-zero-dep) — the one-click install-and-demo package (tools/RUNME.ps1 Windows/Winget, tools/RUNME.sh Linux/CI) each check+install deps and run a small demo on a fresh machine. Built as M8-prep (see M8-handover.md); the ship packaging itself is M8, owner-gated.
+- enums scoped to live values
+- the composed-verify pattern widened
+- embedded-region id-guard
 
-**uc-vehicle-extends** (killer, composed at this validation walk) — the M7 all-needs sweep found the vehicle chain short of the owner's field case (IP-restricted norms in a vehicle driving stubs) and drove the fix back into M6 (req-vehicle-drives-stub, test-first). Demonstrated LIVE, the owner's exact flow: `start init` scaffolded a vehicle; an IEC-norm method file was committed into its declared overlay (`product/iec-vehicle/method/norms/`); the vehicle created a stub; the stub resolved the vehicle's norm AND the vendored engine prompt (the merged surface) and drove `status` cleanly — while the machine-global engine pointer survived untouched (the hijack the walk had demonstrated live is closed). The hermetic e2e (selftest:vehicle-chain) repeats the chain in the battery. This validation also verified the OLD bug report (bugreport-external-stub-engineroot.md, commit 1ee99ca): its exact repro now passes.
+**uc-architecture-review** — the onion diagram IS the reviewable deliverable. `quack render` produces the self-contained onion:
+
+- concentric-circles-always (no ellipses)
+- per-element placement rationale
+- informed-by links from architecture ADRs
+- change-marks that propagate element→cluster→ring
+- single-click inspects + highlights connections
+- double-click drills
+
+Screenshot-verified without owner input at overview / L1-band / kernel / cluster levels. The services band renders as a clean concentric circle. Every I/O bar is labeled. No targetless bar and no arrow-to-ambient (ambient is off-flow infra pills). The morning review render is `onion-review.html`.
+
+**uc-derive-structure** — `quack cluster` run on our OWN design-flow DSM (not a toy):
+
+- 141 coupled design regions
+- 330 directed couplings
+- degree-of-connectivity 0.0167 (sparse → clustering meaningful)
+- TotalCost 28254
+- deterministic (id-sorted passes + 3 fixed restarts, no RNG)
+
+It produced 41 coupling-grouped clusters layered by Tarjan+Kahn with tearing. The i18 work self-clusters coherently — `C7 = {go-mcp-server, go-mcp-session}` and `C4 = {go-field-schemas, go-schema-tester}` — evidence the grouping tracks real coupling. The feature-module lens vs the abstraction-onion lens agree partially (complementary views, judged NOT a defect — recorded rather than auto-restructured).
+
+**uc-run-dep-free** (reframed by adr-install-not-zero-dep) — the one-click install-and-demo package (tools/RUNME.ps1 Windows/Winget, tools/RUNME.sh Linux/CI) each check+install deps and run a small demo on a fresh machine. Built as M8-prep (see M8-handover.md). The ship packaging itself is M8, owner-gated.
+
+**uc-vehicle-extends** (killer, composed at this validation walk) — the M7 all-needs sweep found the vehicle chain short of the owner's field case (IP-restricted norms in a vehicle driving stubs). The sweep drove the fix back into M6 (req-vehicle-drives-stub, test-first). Demonstrated LIVE, the owner's exact flow:
+
+- `start init` scaffolded a vehicle.
+- An IEC-norm method file was committed into its declared overlay (`product/iec-vehicle/method/norms/`).
+- The vehicle created a stub.
+- The stub resolved the vehicle's norm AND the vendored engine prompt (the merged surface) and drove `status` cleanly — while the machine-global engine pointer survived untouched (the hijack the walk had demonstrated live is closed).
+
+The hermetic e2e (selftest:vehicle-chain) repeats the chain in the battery. This validation also verified the OLD bug report (bugreport-external-stub-engineroot.md, commit 1ee99ca): its exact repro now passes.
 
 ## Acceptance obtained  -> i18-m7-acceptance
 Owner sign-off is the adjudicated act — left for the owner, not agent-stamped. Agent-side acceptance evidence: every killer use case has a REAL demonstration recorded above (live MCP transcript, planted-violation catch, screenshot-verified diagram, cluster run on our own objects), not merely a green test. Owner adjudicates at review.

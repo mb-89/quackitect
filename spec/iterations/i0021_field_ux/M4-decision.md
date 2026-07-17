@@ -3,7 +3,7 @@
 ## Chosen architecture → i21-m4-chosen
 
 One sentence: **the register is a live-report tab whose answers ride the watch server onto the
-existing ask path; provenance lives in the node; start seeds the checklist by parsing the rigor
+existing ask path; provenance lives in the node and start seeds the checklist by parsing the rigor
 source.**
 
 Pugh runs per concern, datum = the strongest viable rival (weights from M3 criteria):
@@ -18,14 +18,14 @@ Pugh runs per concern, datum = the strongest viable rival (weights from M3 crite
 | **net** | **+6** | **+5** | **+2** | **+6** |
 
 Controlled convergence: each winner re-ran as its own datum against the remaining rival (A3
-book view, B2-alone, C2-with-drift-lint, D1-lean variant); no rival beat the winner on any
-weighted criterion; the D1-lean variant (source tag only in frontmatter) is recorded as the
-fallback inside [adr-provenance-in-node](../../decisions/adr-provenance-in-node.md). Decisions:
-[adr-register-in-report](../../decisions/adr-register-in-report.md),
-[adr-register-watch-answers](../../decisions/adr-register-watch-answers.md),
-[adr-seed-from-rigor-source](../../decisions/adr-seed-from-rigor-source.md),
-[adr-provenance-in-node](../../decisions/adr-provenance-in-node.md) - all kind:architecture,
-each carrying its datum and tripwire in the statement.
+book view / B2-alone / C2-with-drift-lint / D1-lean variant). No rival beat the winner on any
+weighted criterion. The D1-lean variant (source tag only in frontmatter) is recorded as the
+fallback inside [adr-provenance-in-node](../../decisions/adr-provenance-in-node.md). Decisions - all kind:architecture, each carrying its datum and tripwire in the statement:
+
+- [adr-register-in-report](../../decisions/adr-register-in-report.md)
+- [adr-register-watch-answers](../../decisions/adr-register-watch-answers.md)
+- [adr-seed-from-rigor-source](../../decisions/adr-seed-from-rigor-source.md)
+- [adr-provenance-in-node](../../decisions/adr-provenance-in-node.md)
 
 The apply-lane SCOPE stays undecided by design: [q-io-lane-scope](q-io-lane-scope.md) is the
 owner's ruling; req-apply-general keeps the lane capable under any outcome.
@@ -51,7 +51,7 @@ world where each winner LOSES, judged out loud:
   verbose sources; the recorded fallback is the lean variant (tag in frontmatter, prose in
   the rationale). Not a flip - a degradation path inside the same choice.
 
-No credible full flip found; two tripwires recorded (B1 wedge, D1 bloat). Non-killer review;
+No credible full flip found. Two tripwires recorded (B1 wedge, D1 bloat). Non-killer review;
 blessed by the driving agent.
 
 ## Views chosen → i21-m4-views
@@ -65,18 +65,21 @@ From the registry (two-model default budget):
   does an answer travel from tap to recolor on both lanes? The killer-guard is the first
   branch; both lanes converge on one ask store.
 
-Rejected kinds, recorded: element-tree (the onion already carries part-of placement for these
-elements; a second tree would duplicate it), state (the register row's states are two colors
-plus green-variants - too small for a state model), context (the M2 context figure already
-answers it at iteration scope).
+Rejected kinds, recorded:
+
+- element-tree (the onion already carries part-of placement for these elements; a second tree
+  would duplicate it)
+- state (the register row's states are two colors plus green-variants - too small for a state
+  model)
+- context (the M2 context figure already answers it at iteration scope)
 
 Non-killer review; blessed by the driving agent.
 
 ## Structuring method considered → i21-m4-structuring
 
-Considered and SKIPPED, with reason: the elements slot into an existing, owner-approved onion
-whose bands already encode the layering; a DSM run needs a coupling matrix over new elements
-that do not exist yet - post-build, the standing conformance lint plus a future `quack cluster`
+Considered and SKIPPED, with reason: the elements slot into an existing owner-approved onion
+whose bands already encode the layering. A DSM run needs a coupling matrix over new elements
+that do not exist yet. Post-build, the standing conformance lint plus a future `quack cluster`
 run can challenge the cut. The cut was obvious enough to skip; recorded per the checklist.
 
 Non-killer review; blessed by the driving agent.
@@ -105,18 +108,18 @@ onion and the sequence model are first on the morning list.
 
 ## Milestone review → i21-m4-gate
 
-1. **Verify.** Four concerns decided with recorded Pugh runs; every ADR carries datum,
-   weights, and a tripwire in its statement; the model allocations exist in the ledger (the
-   conformance lint now expects exactly these elements); adr-traced computes green (every ADR
+1. **Verify.** Four concerns decided with recorded Pugh runs. Every ADR carries datum +
+   weights + a tripwire in its statement. The model allocations exist in the ledger (the
+   conformance lint now expects exactly these elements). adr-traced computes green (every ADR
    addresses a requirement).
-2. **Validate.** The decisions realize the M1 vision (one system, computed colors, veto
-   lane) and honor every M2 obligation: the single-schema watch-item shaped D1's fallback;
-   the integrator criterion shaped the overlay weight; the two-greens and killer-guard
+2. **Validate.** The decisions realize the M1 vision (one system / computed colors / veto
+   lane) and honor every M2 obligation: the single-schema watch-item shaped D1's fallback.
+   The integrator criterion shaped the overlay weight. The two-greens and killer-guard
    survived into the sequence model's first branch.
 3. **Red-team.** Strongest opposing case: "B1 adds a server dependency to a static-output
    philosophy." Answered structurally - the static lane stays first-class (B2 command
    emission), the server only exists where --watch already runs. OPEN QUESTION IN THE CONE,
-   named per the law: q-io-lane-scope (apply-lane scope) - blessed past KNOWINGLY; it blocks
+   named per the law: q-io-lane-scope (apply-lane scope) - blessed past KNOWINGLY. It blocks
    no M5/M6 capability work and the owner rules it in the morning.
 
 **Verdict: PASS.** Killer milestone gate. Blessed by the driving agent under the owner's

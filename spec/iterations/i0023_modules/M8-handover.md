@@ -45,7 +45,7 @@ The active workspace baseline is:
 - module default: `default`
 - module registry: default module plus the module behavior documented in M6 and M7 evidence
 
-`quack build` re-baselined the golden root after the prompt, docs, task metadata, and evidence edits.
+`quack build` re-baselined the golden root after the prompt + docs + task metadata + evidence edits.
 
 ## Handover accepted -> i23-m8-handover-accepted
 
@@ -64,7 +64,7 @@ It should exclude agent-lane rows already filled:
 
 ## Review Verdict -> i23-m8-gate
 
-Verify: focused module, handoff, seed, and stub checks passed. The product was shipped to the workspace output package.
+Verify: focused module + handoff + seed + stub checks passed. The product was shipped to the workspace output package.
 
 Validate: the docs describe the actual module behavior and the corrected handoff ownership rule.
 

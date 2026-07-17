@@ -6,25 +6,25 @@ The design question: WHERE do the guards live? Three candidates, elaborated.
 
 Candidate A — one guard layer in dispatch.
 Every command passes one `guardCheck(cmd, channel, state)` function before its handler
-runs. The refusal logic sits in one file. The predicates (channel, review-in-hand,
+runs. The refusal logic sits in one file. The predicates (channel / review-in-hand /
 MCP-served) are computed once per dispatch.
-Strengths: one home, one test surface, uniform refusal messages, trivially covers new
+Strengths: one home. One test surface. Uniform refusal messages. Trivially covers new
 commands. Weaknesses: dispatch grows a state lookup it never needed; per-command nuance
 (selftest allows single-test runs?) needs a rule table anyway.
 
 Candidate B — per-command guards.
-Each guarded command (selftest, bless, the CLI entry) checks its own preconditions at
+Each guarded command (selftest / bless / the CLI entry) checks its own preconditions at
 the top of its handler.
 Strengths: nuance lives where the command lives; no dispatch coupling. Weaknesses:
-guard logic scatters across files; a new command ships unguarded by default; refusal
-wording drifts apart; three near-identical predicate blocks to test.
+guard logic scatters across files. A new command ships unguarded by default. Refusal
+wording drifts apart. Three near-identical predicate blocks to test.
 
 Candidate C — config-layer policy.
 A policy file in the workspace (or the overlay) declares rules; a generic interpreter
 enforces them.
 Strengths: rules changeable without a rebuild; vehicles could tune policy. Weaknesses:
-a policy file is data an agent could edit — the no-bypass maxim falls; an interpreter
-is a new engine subsystem for five rules; the owner's configuration-vs-code question
+a policy file is data an agent could edit — the no-bypass maxim falls. An interpreter
+is a new engine subsystem for five rules. The owner's configuration-vs-code question
 (field #6) is a LATER discussion, not this iteration's call.
 
 Battery-side candidates (orthogonal, for the three battery requirements):
@@ -51,7 +51,7 @@ Derived from the requirements and the RAID set. Weights sum to 1.
 ## Review rounds and verdict  → i22-m3-gate
 
 Round 1, verify: three genuine command-side candidates plus the orthogonal battery
-pair; each carries strengths, weaknesses, and a feasibility line. The criteria
+pair. Each carries strengths, weaknesses and a feasibility line. The criteria
 derive from named requirements and RAID nodes, weighted and summing to one.
 
 Round 2, validate: the candidates answer exactly the M1 delta (laws into engine).
@@ -59,7 +59,7 @@ Candidate C honestly connects to the parked configuration-vs-code field question
 instead of quietly deciding it.
 
 Round 3, red-team: is B a straw man? No — B is today's de-facto pattern in the
-engine (attest checks sit per-command) and would work; its scatter cost is the real
+engine (attest checks sit per-command) and would work. Its scatter cost is the real
 argument, not a rigged one. Is the battery per-test candidate dismissed too fast?
 No — it is the documented failure mode from i21, cited.
 

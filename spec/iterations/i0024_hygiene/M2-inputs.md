@@ -2,7 +2,7 @@
 
 ## inputs captured -> i24-m2-inputs-captured-context
 
-Context: the engine, its MCP surface, and the harness around them. Everything is inside one workspace; the one external contact is the MCP client (Claude Code), probed at M5.
+Context: the engine, its MCP surface and the harness around them. Everything is inside one workspace. The one external contact is the MCP client (Claude Code), probed at M5.
 
 Sources feeding the requirement set:
 
@@ -58,6 +58,6 @@ Verify: eight requirements, each with a test and a use-case edge. The two derive
 
 Validate: the set covers all five seed notes and all three owner rulings from 2026-07-15. Nothing in the set exceeds the approved plan.
 
-Red-team: the weakest link was visibility, not substance — the prior-art evidence had not been shown to the owner at fill time. Corrected mid-walk: findings and links presented in chat; the show-research law is now baked in engage.md. The voice and root items cite convention and in-repo precedent rather than external research; recorded here as accepted scope, not hidden.
+Red-team: the weakest link was visibility, not substance — the prior-art evidence had not been shown to the owner at fill time. Corrected mid-walk: findings and links presented in chat. The show-research law is now baked in engage.md. The voice and root items cite convention and in-repo precedent rather than external research. Recorded here as accepted scope, not hidden.
 
 Verdict: pass. Ready for the gate bless.

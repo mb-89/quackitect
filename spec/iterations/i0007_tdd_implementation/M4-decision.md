@@ -1,6 +1,6 @@
 # M4 — Decide the architecture (i0007_tdd_implementation)
 
-Evidence for the M4 gate. The chosen options (from M3's candidates), traced to the weighted criteria, recorded as ADRs.
+Evidence for the M4 gate. The chosen options (from M3's candidates), traced to the weighted criteria and recorded as ADRs.
 
 ## Chosen architecture  → i7-m4-architecture-stated
 1. **Shared implementation fragment** — one `method/rigor/_shared/implementation.md`, imported by lean (one review gate) and systematic (full sub-gate density). Replaces today's L4/M6 build content.

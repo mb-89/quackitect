@@ -30,12 +30,12 @@ machinery this iteration shipped exists precisely to make that honest.
 
 ## Review rounds and verdict  → i22-m8-gate
 
-Round 1, verify: each section above points at its artifact (files, commands, the
-RAID node, the grant id).
+Round 1, verify: each section above points at its artifact (files / commands / the
+RAID node / the grant id).
 
-Round 2, validate: the iteration hands over exactly what M1 framed - the laws are
-engine behavior, the audit surface exists, the one unarmed lane is recorded with
-its arming order.
+Round 2, validate: the iteration hands over exactly what M1 framed - the laws
+are engine behavior. The audit surface exists. The one unarmed lane is recorded
+with its arming order.
 
 Round 3, red-team: shipping with a half-armed criterion 6 could be called
 incomplete. Held: arming inside THIS session is impossible by the harness's own

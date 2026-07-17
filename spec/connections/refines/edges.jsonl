@@ -324,3 +324,8 @@
 {"src":"req-ledger-arg-guards","dst":"uc-lawful-walk"}
 {"src":"req-adopt-honest","dst":"uc-battery-trust"}
 {"src":"req-binary-budget","dst":"uc-run-dep-free"}
+{"src":"req-battery-fail-at-end","dst":"uc-battery-trust"}
+{"src":"req-battery-isolation","dst":"uc-battery-trust"}
+{"src":"req-marker-scan","dst":"uc-stable-design-hashes"}
+{"src":"req-voice-prose","dst":"uc-authoring-guard"}
+{"src":"req-card-evidence","dst":"uc-work-register"}

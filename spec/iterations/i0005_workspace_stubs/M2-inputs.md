@@ -18,12 +18,23 @@ Evidence for the M2 subtasks. Each section is the referent for one gate.
 ## Requirements traced  → i5-m2-requirements-traced  *(derived: coverage:req-traced — DONE)*
 
 Reused need `need-workspace-drive`; new use case `uc-drive-from-inside` refines it. Every requirement refines the use case:
+
 - `req-inside-launcher`, `req-inside-entry-surface`, `req-engine-loc-untracked`, and killer `req-drive-from-inside`.
 
 ## Requirements verifiable  → i5-m2-requirements-verifiable  *(derived: coverage:req-has-test — DONE)*
 
-Each requirement has a verifying test: `test-inside-launcher`, `test-inside-entry-surface`, `test-engine-loc-untracked` (all `selftest:stubs`), and `test-drive-from-inside` (extends `selftest:workspace`, killer). The four "no design" lint holes are honest design-holes, realized in M6.
+Each requirement has a verifying test:
+
+- `test-inside-launcher` (`selftest:stubs`)
+- `test-inside-entry-surface` (`selftest:stubs`)
+- `test-engine-loc-untracked` (`selftest:stubs`)
+- `test-drive-from-inside` (extends `selftest:workspace`, killer)
+
+The four "no design" lint holes are honest design-holes, realized in M6.
 
 ## Verdict
 
-**Verify** — `req-has-test` and `req-traced` both green; every requirement has a test and traces to a need. **Validate** — the requirements cover the M1 success criteria 1:1 (inside status, no engine path in VC, self-contained AGENTS stub, roundtrip test green). **Red-team** — R1/R2 pinned by `req-inside-launcher`'s fixed order and `req-engine-loc-untracked`; the killer's test closes "does it work from inside" at M7. **Pass** → gate blessed.
+- **Verify** — `req-has-test` and `req-traced` both green; every requirement has a test and traces to a need.
+- **Validate** — the requirements cover the M1 success criteria 1:1 (inside status, no engine path in VC, self-contained AGENTS stub, roundtrip test green).
+- **Red-team** — R1/R2 pinned by `req-inside-launcher`'s fixed order and `req-engine-loc-untracked`; the killer's test closes "does it work from inside" at M7.
+- **Pass** → gate blessed.

@@ -26,7 +26,17 @@ A timeboxed walking-skeleton spike to validate the two riskiest unknowns — the
 
 ## Design is buildable  → i3-m5-design-buildable
 
-The engine maps cleanly onto the Go standard library — `crypto/sha256`, `sort`, `strings`, `os`, `encoding/json`, `html/template`, `archive/zip`. No third-party dependency is needed, so `req-zero-dep-parse` and `req-go-engine` hold. Hand-rolled frontmatter/TOML parsing is trivial for the subset in use.
+The engine maps cleanly onto the Go standard library:
+
+- `crypto/sha256`
+- `sort`
+- `strings`
+- `os`
+- `encoding/json`
+- `html/template`
+- `archive/zip`
+
+No third-party dependency is needed, so `req-zero-dep-parse` and `req-go-engine` hold. Hand-rolled frontmatter/TOML parsing is trivial for the subset in use.
 
 ## Kill-criterion check
 

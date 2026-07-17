@@ -902,7 +902,7 @@ func selftestAuthoringCheap() bool {
 	}
 	// the why-delta agrees with the rule: a standalone member never shows as unverified.
 	iterPath := filepath.Join(SPEC, "iterations", "i0001_syn", "t.md")
-	syn := map[string]Node{"t-solo": {ID: "t-solo", Type: "test", Class: "executed", Verify: "selftest:parity", Suite: "standalone", Path: iterPath}}
+	syn := map[string]Node{"t-solo": {ID: "t-solo", Type: "test", Class: "executed", Verify: "selftest:parity", Suite: "never-cached", Path: iterPath}}
 	for _, d := range coverageDelta(syn, "tests-pass", "") {
 		if strings.Contains(d, "t-solo") {
 			return false

@@ -24,7 +24,7 @@ var i11Tests = []namedTest{
 }
 
 // design: go-standalone-suite  implements: req-parity-standalone
-// A test node carrying `suite: standalone` is not a member of any verification suite. tests-pass skips it, and the board carries it as its own entry with a live verdict (adr-standalone-suite). The parity tamper check moves to this suite, so legitimate authoring no longer reddens history. A moved golden root reddens exactly one row, and that row says what it means.
+// A test node carrying `suite: never-cached` is not a member of any verification suite. tests-pass skips it, and the board carries it as its own entry with a live verdict (adr-standalone-suite). The parity tamper check moves to this suite, so legitimate authoring no longer reddens history. A moved golden root reddens exactly one row, and that row says what it means.
 
 // test-parity-standalone -> selftest:parity-standalone
 func selftestParityStandalone() bool {
@@ -42,7 +42,7 @@ func selftestParityStandalone() bool {
 	iterPath := filepath.Join(SPEC, "iterations", "i0001_syn", "t.md")
 	syn := map[string]Node{
 		"test-reg":  {ID: "test-reg", Type: "test", Class: "executed", Verify: "selftest:ids", Path: iterPath},
-		"test-solo": {ID: "test-solo", Type: "test", Class: "executed", Verify: "selftest:no-such-check", Suite: "standalone", Path: iterPath},
+		"test-solo": {ID: "test-solo", Type: "test", Class: "executed", Verify: "selftest:no-such-check", Suite: "never-cached", Path: iterPath},
 	}
 	if !coverageRule(syn, "tests-pass", "") {
 		return false // the FAILING standalone member must not redden the suite
@@ -56,7 +56,7 @@ func selftestParityStandalone() bool {
 		return false // demoted node is no longer a standalone check
 	}
 	nodes := LoadAll()
-	if nodes["test-parity-golden"].Suite != "standalone" {
+	if nodes["test-parity-golden"].Suite != "never-cached" {
 		return false // the tamper check rides the standalone suite for real
 	}
 	solo := standaloneChecks(nodes)

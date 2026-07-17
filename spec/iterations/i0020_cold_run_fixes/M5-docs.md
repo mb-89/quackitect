@@ -16,11 +16,20 @@ Note-by-note outcome - every one of the 10 archived cold-run notes, disposed:
 | project-type classes smell | **FIXED** - classes/README declares role classes, not a type; type-stakeholders test respects it |
 | stub template pollution | **FIXED** - trace-entering ex-* nodes and example edges out; example-notes/stub-spec/type-stakeholders amended to the new contract |
 
-In-flight findings, disposed: the i0016 "orphan tests" alarm was a MISDIAGNOSIS - groom/tray are properly deferred dormant canvas features and tests-pass honors the deferral; the REAL blemishes (why-delta lists deferred/uncached tests as deltas; the two deferral ADRs carry TODO statements) are noted for the next triage. The pre-existing selftest failures are gone: clean-status (the stray .quack removed with the shim fix) and go-analysis (the gofmt shim) - the analysis gate is live again and vetoed unformatted code in this very batch.
+In-flight findings, disposed: the i0016 "orphan tests" alarm was a MISDIAGNOSIS - groom/tray are properly deferred dormant canvas features and tests-pass honors the deferral. The REAL blemishes (why-delta lists deferred/uncached tests as deltas; the two deferral ADRs carry TODO statements) are noted for the next triage. The pre-existing selftest failures are gone: clean-status (the stray .quack removed with the shim fix) and go-analysis (the gofmt shim) - the analysis gate is live again and vetoed unformatted code in this very batch.
 
-Consistency sweep: dependencies.md, AGENTS.md, compose-reference, integrate.md, the new guide, and the launcher comments all describe the POST-fix behavior; no prompt teaches the superseded way (the retired .quack\tools reference is gone).
+Consistency sweep - all of these describe the POST-fix behavior:
+
+- dependencies.md
+- AGENTS.md
+- compose-reference
+- integrate.md
+- the new guide
+- the launcher comments
+
+No prompt teaches the superseded way (the retired .quack\tools reference is gone).
 
 ## Packaged  → i20-m5-packaged
 `quack ship` packages product/ -> the data home out/, regenerating the book and report; the committed spec/book.html refreshes in the same move.
 
-**Verdict:** every note fixed, canonized, or explicitly deferred with its reason; battery green (exit 0, zero FAIL); the working-tomorrow goal is covered (fresh clone + `.\quack` bootstraps and ratchets with zero native Go). The killer docs check and the L5 gate go to the owner.
+**Verdict:** every note fixed, canonized or explicitly deferred with its reason. Battery green (exit 0, zero FAIL). The working-tomorrow goal is covered (fresh clone + `.\quack` bootstraps and ratchets with zero native Go). The killer docs check and the L5 gate go to the owner.

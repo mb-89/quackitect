@@ -45,8 +45,8 @@ Two authored models - the default budget, held.
 
 ## structuring method considered  → i22-m4-structuring-method-considered
 
-Skipped, recorded: eleven leaves fall into four self-evident groups (command,
-grant, battery, lint); a DSM over eleven elements with obvious clustering buys
+Skipped, recorded: eleven leaves fall into four self-evident groups (command /
+grant / battery / lint). A DSM over eleven elements with obvious clustering buys
 nothing. The register (spec/methods) stays available for a bigger cut.
 
 ## model authored  → i22-m4-model-authored-the
@@ -61,22 +61,22 @@ The M6 build fills exactly these leaves; a new element goes back through review
 ## ADR recorded and traced  → i22-m4-adr-recorded-and
 
 Five ADRs minted in [spec/decisions/](../../decisions/), each addressing its
-requirements over the connections lane (10 addresses edges, 5 chosen edges).
+requirements over the connections lane (10 addresses edges and 5 chosen edges).
 The derived check computes it.
 
 ## Review rounds and verdict  → i22-m4-gate
 
-Round 1, verify: the Pugh table's datum is the strongest rival, not a straw man;
-run 2 re-converged on the winner; the sensitivity check was reversed and judged
+Round 1, verify: the Pugh table's datum is the strongest rival rather than a straw man.
+Run 2 re-converged on the winner. The sensitivity check was reversed and judged
 out loud. Both models render valid mermaid and carry per-element rationale.
 
-Round 2, validate: every M1 criterion maps to an allocated element; the two owner
+Round 2, validate: every M1 criterion maps to an allocated element. The two owner
 rulings shaped exactly the two ADRs that needed them (adr-mcp-lane-declared
 realizes q-cli-steering A with an activation boundary instead of a walk-stranding
 unconditional block; adr-grant-ledger-events realizes q-grant-honesty A).
 
 Round 3, red-team: the sharpest attack - the lane declaration reintroduces config
-the agent could edit, softening ruling A. Held: the declaration is git-tracked
+the agent could edit and so softens ruling A. Held: the declaration is git-tracked
 owner intent with the same visibility as the contract itself, and the M7 demo
 tripwire forces the block to be shown live. Second attack: eleven design markers
 for five requirements' worth of code smells like ceremony. Held: the markers ARE

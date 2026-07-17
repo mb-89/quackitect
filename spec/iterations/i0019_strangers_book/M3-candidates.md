@@ -3,14 +3,17 @@
 ## Alternatives elaborated  -> i19-m3-alternatives  (KILLER - owner adjudicates)
 
 **Fork A - the deck-anchor mechanism (req-deck-links):**
+
 - **A1 - URL-fragment reflection.** Opening a deck writes `#deck-<slug>` via history.replaceState; loading with that fragment opens the deck; per-slide depth reuses the EXISTING stable slide ids (`…-s2`). Precedented (reveal.js `#/<id>`, Quarto hash slugs), zero new machinery, file://-safe, and it RIDES the rail the M2 probe found: the guides table already keeps view state in the URL hash.
 - **A2 - a router-owned deck route.** A small JS router owns view state (`#/deck/<slug>/<n>` paths), centralizing navigation beyond decks. More expressive, but it would CONTEND with the existing hash rail (two owners of location.hash = the classic conflict), adds SPA-shaped complexity to a document, and its extra power (per-slide paths) is reachable within A1 anyway.
 
 **Fork B - the terms-lint term source (req-terms-before-use):**
+
 - **B1 - the glossary IS the term list.** One source of truth; the check follows the glossary's growth; zero curation drift. Weakness: inherits the glossary's current thinness (M1 RAID) - the lint is only as good as the glossary it reads.
 - **B2 - a dedicated curated term list** (Vale-vocabulary style). Curated independently of the glossary, so it could cover terms the glossary lacks - but that is exactly a SHADOW LIST: two places for one fact, drifting apart (the DRY law), and the verified prior art shows Vale-style lists solve spelling, not ordering. The honest fix for B1's weakness is growing the glossary, which the stranger needs anyway.
 
 **Fork C - where the white-label voice fix lives (req-vehicle-white-label):**
+
 - **C1 - renderer substitution.** The book emitter takes title, wordmark, and colophon identity from the brand layer / workspace name; one code path, mechanical, testable.
 - **C2 - brand-neutral method prose.** The method text says "the engine" where it now says quackitect-as-self, so the SAME prose is honest in every vehicle; no render-time rewriting of prose (which would be fragile and dishonest to hashes).
 - **C3 (hybrid, the likely winner) - C1 for the identity SURFACES (title/wordmark/colophon), C2 for the prose VOICE.** Each mechanism where it is natural; no runtime text substitution beyond the identity slots.

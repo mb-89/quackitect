@@ -6,7 +6,7 @@ All nine i11 tests were authored as spec nodes and observed FAILING (`quack obse
 
 ## Parity standalone  → i11-bs-parity
 
-- `suite: standalone` marker on test nodes; `tests-pass` skips standalone members.
+- `suite: never-cached` marker on test nodes; `tests-pass` skips standalone members.
 - [test-parity-golden](test-parity-golden.md) rides the standalone suite: a moved golden root reddens exactly one row.
 - Realized in [i11_red.go](../../../product/engine-go/i11_red.go) (design `go-standalone-suite`).
 
@@ -80,4 +80,14 @@ Derived (`coverage:tests-pass`), computes live: the backward-cumulative suite th
 
 ## Milestone review  → i11-m4-gate
 
-**Verify:** all nine build steps realized with passing selftests; the full selftest suite green at build; both derived checks compute live. **Validate:** every M1 problem line is answered by a shipped behavior — the tamper tripwire is standalone, propagated suspects name their root, pagers scope to the check, evidence is hashed-or-suspect, verdict files are bounded, the ledger says user, and no grandfather survives without its recorded decision. **Red-team:** the migration was the riskiest step — it ran fixture-first, the audit event records count and time, hashes stayed untouched (attest chain verified), and the pass is idempotent. The evidence-hash wave was the designed churn: re-blessed deliberately at M1–M3, never silently restamped. **Verdict: PASS.**
+**Verify:** all nine build steps realized with passing selftests. The full selftest suite green at build. Both derived checks compute live. **Validate:** every M1 problem line is answered by a shipped behavior:
+
+- the tamper tripwire is standalone
+- propagated suspects name their root
+- pagers scope to the check
+- evidence is hashed-or-suspect
+- verdict files are bounded
+- the ledger says user
+- no grandfather survives without its recorded decision
+
+**Red-team:** the migration was the riskiest step. It ran fixture-first. The audit event records count and time. Hashes stayed untouched (attest chain verified). The pass is idempotent. The evidence-hash wave was the designed churn: re-blessed deliberately at M1–M3, never silently restamped. **Verdict: PASS.**

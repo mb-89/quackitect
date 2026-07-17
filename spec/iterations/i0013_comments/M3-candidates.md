@@ -38,8 +38,8 @@ Derived from the M2 requirements, weights 0–1:
 
 ## Review rounds & verdict
 
-1. **Verify.** Twelve candidate nodes exist, each with axis, ratings, statement, and pro/con. Every M2 decision axis with a genuine choice has ≥2 candidates.
-2. **Validate.** The axes cover all open design surface: storage, anchoring, rendering, save, read-back. Nothing the requirements demand lacks a candidate; nothing outside the requirements sneaked in.
-3. **Red-team.** Attack: "the owner already decided island + highlight API + FS API — M3 is theater." Held: the owner's picks entered as *candidates with real rivals*, and M4's Pugh run uses the strongest rival as datum, per method. If the matrix flips a pick, the M4 gate is where the owner sees it. The rivals here are genuinely viable (sidecar IS Acrobat's model; span-wrap ran a decade of annotator.js) — this is controlled convergence, not decoration.
+- **Verify.** Twelve candidate nodes exist, each with axis, ratings, statement, and pro/con. Every M2 decision axis with a genuine choice has ≥2 candidates.
+- **Validate.** The axes cover all open design surface: storage, anchoring, rendering, save, read-back. Nothing the requirements demand lacks a candidate; nothing outside the requirements sneaked in.
+- **Red-team.** Attack: "the owner already decided island + highlight API + FS API — M3 is theater." Held: the owner's picks entered as *candidates with real rivals*, and M4's Pugh run uses the strongest rival as datum, per method. If the matrix flips a pick, the M4 gate is where the owner sees it. The rivals here are genuinely viable (sidecar IS Acrobat's model; span-wrap ran a decade of annotator.js) — this is controlled convergence, not decoration.
 
 **Verdict: pass.** The killer (alternatives) and the gate go to the adjudicator.

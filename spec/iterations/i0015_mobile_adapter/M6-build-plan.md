@@ -2,21 +2,34 @@
 
 ## Build planned  → i15-m6-build-planned  (killer)
 
-Eight steps under `i15-m6-build`, each a unit of durable progress with one verification concern, wired by real prerequisites only:
+Eight steps under `i15-m6-build`, each a unit of durable progress with one verification concern. Wired by real prerequisites only:
 
-1. **b1-tests** — the thirteen executed selftests with production stubs; every one observed RED. All thirteen mechanize: the adapters test against `net/http/httptest` fakes (hermetic, stdlib), the loop against a dummy adapter, timeouts against an injectable clock.
-2. **b2-ask-core** — the ask model and store: correlation ids, kinds, options, timeout, first-wins state.
-3. **b3-seam** — the adapter interface, the registry, the exec lane (the role-seam file contract, reused).
-4. **b4-loop** — dispatch, poll, correlate, apply (a gate answer records the bless with `actor=user` and the channel), expire and supersede.
-5. **b5-pairing** — `quack pair`: one op, credential minted, disclaimer and lockscreen instruction printed.
+1. **b1-tests** — the thirteen executed selftests with production stubs; every one observed RED. All thirteen mechanize: the adapters test against `net/http/httptest` fakes (hermetic, stdlib). The loop tests against a dummy adapter. Timeouts test against an injectable clock.
+2. **b2-ask-core** — the ask model and store:
+   - correlation ids
+   - kinds
+   - options
+   - timeout
+   - first-wins state
+3. **b3-seam** — the seam pieces:
+   - the adapter interface
+   - the registry
+   - the exec lane (the role-seam file contract, reused)
+4. **b4-loop** — the loop operations:
+   - dispatch
+   - poll
+   - correlate
+   - apply (a gate answer records the bless with `actor=user` and the channel)
+   - expire and supersede
+5. **b5-pairing** — `quack pair`: one op. Credential minted. Disclaimer and lockscreen instruction printed.
 6. **b6-ntfy** — the adapter the spike already walked, as code.
-7. **b8-integrate** — `quack ask <check>` sends; `quack await <ask> [--timeout]` blocks until the answer arrives and applies it (the driving agent runs it in the background at a hand-off, so a phone bless RESUMES the walk immediately — owner requirement, 2026-07-09); EVERY engine run additionally drains pending answers as the fallback; the pager and the method prompts name the lane.
+7. **b8-integrate** — `quack ask <check>` sends. `quack await <ask> [--timeout]` blocks until the answer arrives and applies it. The driving agent runs it in the background at a hand-off. So a phone bless RESUMES the walk immediately (owner requirement, 2026-07-09). EVERY engine run additionally drains pending answers as the fallback. The pager and the method prompts name the lane.
 
-SCOPE AMENDMENT (owner, 2026-07-09, answering ask i15-ask-003 with option 3): **Slack leaves i15** — step b7 removed, req-slack-channel deferred by decision (adr-dmvbh5y) to the corporate wave; adr-slack-text-poll stands as the pre-decided shape for its return. Twelve requirements remain in scope; the selftest count drops to twelve.
+SCOPE AMENDMENT (owner ruling 2026-07-09, answering ask i15-ask-003 with option 3): **Slack leaves i15** — step b7 removed. req-slack-channel deferred by decision (adr-dmvbh5y) to the corporate wave. adr-slack-text-poll stands as the pre-decided shape for its return. Twelve requirements remain in scope; the selftest count drops to twelve.
 
-Residency decision baked into the plan: no listener, no daemon — `await` is a bounded foreground command the caller chooses to run, and any engine run drains answers as the fallback. Asks live in the DATA HOME (runtime state, not truth); the resolved gate answer lands in the ledger through the existing bless path.
+Residency decision baked into the plan: no listener and no daemon — `await` is a bounded foreground command the caller chooses to run, and any engine run drains answers as the fallback. Asks live in the DATA HOME (runtime state, not truth). The resolved gate answer lands in the ledger through the existing bless path.
 
-Poll cadence (owner question, 2026-07-09): ntfy awaits over a held-open streaming GET — no interval, answers arrive instantly, reconnect with `since=<last>` is lossless. Slack has no stream: `await` polls `conversations.history` every 5 seconds, backing off to 30 seconds after ten idle minutes (well inside the Tier-3 rate limit). Outside `await`, no cadence exists — one drain per engine run.
+Poll cadence (owner question, 2026-07-09): ntfy awaits over a held-open streaming GET. No interval. Answers arrive instantly. Reconnect with `since=<last>` is lossless. Slack has no stream: `await` polls `conversations.history` every 5 seconds, backing off to 30 seconds after ten idle minutes (well inside the Tier-3 rate limit). Outside `await`, no cadence exists — one drain per engine run.
 
 ## The build record  → i15-m6-build
 
@@ -37,6 +50,13 @@ Poll cadence (owner question, 2026-07-09): ntfy awaits over a held-open streamin
 
 ## Implementation risks  → i15-m6-impl-risks
 
-Reviewed against the RAID log: lockscreen (pairing text ships the instruction ✓), forgery (accepted-risk ADR stands; high-entropy topics minted ✓), dangling notifications (expiry engine-driven, idempotent answers ✓), retention (disclaimer printed at pairing ✓). New risk accepted and recorded here: the fallback drain applies user taps without a session key — deliberate, per the trust model (possession of the paired credential IS the authorization).
+Reviewed against the RAID log:
+
+- lockscreen (pairing text ships the instruction ✓)
+- forgery (accepted-risk ADR stands; high-entropy topics minted ✓)
+- dangling notifications (expiry engine-driven, idempotent answers ✓)
+- retention (disclaimer printed at pairing ✓)
+
+New risk accepted and recorded here: the fallback drain applies user taps without a session key — deliberate, per the trust model (possession of the paired credential IS the authorization).
 
 Interruption test: losing any single step loses at most one concern; every step leaves the battery green or observably red at its seam.

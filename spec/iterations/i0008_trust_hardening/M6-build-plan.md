@@ -5,18 +5,26 @@ Evidence for the M6 gate. Test-first walk: runners → RED → implement to GREE
 ## Build planned  → i8-m6-build-planned  *(killer)*
 Nine steps seeded as children of `i8-m6-build`, each a single design-or-verification concern worth resuming on its own, in dependency order (the report nests them under the build task):
 
-1. **bs-runners** — all twelve new selftest runners + compile-only stubs; suite run, every runner observed FAILING, `observe-red` recorded per test node. *(the testdesigner/tester half of the fragment — everything after this is implement-to-green)*
-2. *(derived checkpoint)* **tests-red-observed** — `coverage:tests-red` computes from the observe-red attestations before any implementation step unlocks.
-3. **bs-strict-parser** — strict load (recognition rule, final M5 allowlist, batched errors, dup + both-direction ref rejection, nonzero exits). Realizes `req-strict-frontmatter`, `req-ref-integrity`.
-4. **bs-actor-by** — both-chardev channel default + `--by` override, `QUACK_ACTOR` retired. Realizes `req-actor-channels`.
-5. **bs-normws** — case-preserving whitespace-collapse region hash; re-baseline; R5 one-time ripple walked honestly. Realizes `req-design-hash-norm`.
-6. **bs-ears** — EARS lint (five shapes, shall, weasel blocklist), committed stmtHash baseline, `ears: exempt` counting; compose-reference five-pattern block. Realizes `req-ears-lint`, `req-ears-method`.
-7. **bs-monotonic** — milestone-monotonic lint rule. Realizes `req-monotonic-lint`.
-8. **bs-logsdir** — engine-owned log-dir resolution + config override; 122 MB migration (count+size verified, foreign folders included); **method prompts pointed at the new location** (review retro reads logs there; the owner's instruction at the M4 gate). Realizes `req-logs-out-of-repo`.
-9. **bs-kernel** — kernel batteries to green: golden vectors, exact-cone fixtures, gate walk, attest chain verification, fixed-seed property DAGs. Realizes `req-kernel-selftest`.
-10. **bs-cleanup** — dashboard_draft frontmatter strip (strict-parser prerequisite found at M5), `quack.exe~` deleted, final `quack build` + full selftest green.
+- 1. **bs-runners** — all twelve new selftest runners + compile-only stubs; suite run, every runner observed FAILING, `observe-red` recorded per test node. *(the testdesigner/tester half of the fragment — everything after this is implement-to-green)*
+- 2. *(derived checkpoint)* **tests-red-observed** — `coverage:tests-red` computes from the observe-red attestations before any implementation step unlocks.
+- 3. **bs-strict-parser** — strict load (recognition rule, final M5 allowlist, batched errors, dup + both-direction ref rejection, nonzero exits). Realizes `req-strict-frontmatter`, `req-ref-integrity`.
+- 4. **bs-actor-by** — both-chardev channel default + `--by` override, `QUACK_ACTOR` retired. Realizes `req-actor-channels`.
+- 5. **bs-normws** — case-preserving whitespace-collapse region hash; re-baseline; R5 one-time ripple walked honestly. Realizes `req-design-hash-norm`.
+- 6. **bs-ears** — EARS lint (five shapes, shall, weasel blocklist), committed stmtHash baseline, `ears: exempt` counting; compose-reference five-pattern block. Realizes `req-ears-lint`, `req-ears-method`.
+- 7. **bs-monotonic** — milestone-monotonic lint rule. Realizes `req-monotonic-lint`.
+- 8. **bs-logsdir** — engine-owned log-dir resolution + config override; 122 MB migration (count+size verified, foreign folders included); **method prompts pointed at the new location** (review retro reads logs there; the owner's instruction at the M4 gate). Realizes `req-logs-out-of-repo`.
+- 9. **bs-kernel** — kernel batteries to green: golden vectors, exact-cone fixtures, gate walk, attest chain verification, fixed-seed property DAGs. Realizes `req-kernel-selftest`.
+- 10. **bs-cleanup** — dashboard_draft frontmatter strip (strict-parser prerequisite found at M5), `quack.exe~` deleted, final `quack build` + full selftest green.
 
-Sequencing rationale: runners first makes RED observable at all (fragment sequence, fixed); strict-parser before actor/normws because its recognition rule touches the same load path the later steps' tests parse through; ears/monotonic extend lint after the parser owns exits; logsdir is independent but sits before kernel so the kernel batteries run against the final resolver; cleanup last so the strict parser's live sweep is the step's own regression check. Tests stay in the trace (they verify requirements) — the verification subtask rolls them up; no test is a task.
+Sequencing rationale:
+
+- runners first makes RED observable at all (fragment sequence, fixed)
+- strict-parser before actor/normws because its recognition rule touches the same load path the later steps' tests parse through
+- ears/monotonic extend lint after the parser owns exits
+- logsdir is independent but sits before kernel so the kernel batteries run against the final resolver
+- cleanup last so the strict parser's live sweep is the step's own regression check
+
+Tests stay in the trace (they verify requirements) — the verification subtask rolls them up. No test is a task.
 
 ## Suite observed RED  → i8-m6-tests-red-observed  *(derived: coverage:tests-red)*
 All twelve runners compiled against the `trust.go` stubs and ran FAILING in one battery run (32 existing ok / 12 new FAIL); `observe-red` recorded per test node at its then-current hash. Computed live by the engine.
@@ -48,12 +56,26 @@ R1 closed: the strict flip landed with zero false rejections on the live repo (t
 
 ## Milestone review (increasing scrutiny)
 
-**Round 1 — Verify.** Each build step's claim was verified by execution in this walk, not by reading: the strict parser refused fixtures and passed the live tree; the actor default was exercised by this session's own blesses (stamped agent by channel, no env dance); the EARS/monotonic lints ran on the live repo with exit codes checked; the migration counts matched; the kernel chain verified the real log; 44/44 green from the rebuilt binary. The three derived checks (tests-red, designs-realized, tests-pass) compute live — no hand-stamps.
+**Round 1 — Verify.** Each build step's claim was verified by execution in this walk, not by reading:
 
-**Round 2 — Validate.** Against the M1 frame: all six directive items plus the surviving pulled item are realized; each Ch1 criterion demonstrable (walked again at M7). The TDD discipline the iteration inherited from i7 was honored for real: stubs, observed red, implement to green — including recording two of my own test bugs rather than silently fixing them.
+- the strict parser refused fixtures and passed the live tree
+- the actor default was exercised by this session's own blesses (stamped agent by channel, no env dance)
+- the EARS/monotonic lints ran on the live repo with exit codes checked
+- the migration counts matched
+- the kernel chain verified the real log
+- 44/44 green from the rebuilt binary
 
-**Gate-verification discovery (recorded before the bless).** At the gate, `coverage:tests-red` computed FAIL: the rule is global, and 30 tests from i0000–i0007 predate `observe-red` entirely (i7 built the mechanism; this is the first iteration walked under it — i7's own checklist had no tests-red subtask). The two candidate fixes: fabricate 30 retroactive red-observations (a forged attestation — the exact lie the ledger exists to refuse), or grandfather tests authored before the mechanism existed (`testsRedSince = i0008`, third instance of the directive's forward-only principle). The grandfather landed; all 12 i8 tests remain fully gated. Surfaced for the adjudicator to strike down.
+The three derived checks (tests-red + designs-realized + tests-pass) compute live — no hand-stamps.
 
-**Round 3 — Red-team.** (i) "The monotonic grandfather was invented mid-build — scope drift?" It is the SAME forward-only principle the directive red-teamed and fixed for EARS, applied when the live sweep surfaced identical churn; the alternative (rewiring 31 blessed tasks) is the rejected rubber-stamp factory. Recorded here for the adjudicator to strike down. (ii) "strictGuard exits inside a library call" — deliberate: any answer from a malformed graph is worse than no answer (adr-strict-load); `note` stays usable. (iii) "quack version grew a line" — resolution had to be discoverable from the binary; a full new command would have violated the default-closed surface. Kill-criteria from M1: none tripped.
+**Round 2 — Validate.** Against the M1 frame: all six directive items plus the surviving pulled item are realized; each Ch1 criterion demonstrable (walked again at M7). The TDD discipline the iteration inherited from i7 was honored for real: stubs → observed red → implement to green — including recording two of my own test bugs rather than silently fixing them.
+
+**Gate-verification discovery (recorded before the bless).** At the gate `coverage:tests-red` computed FAIL: the rule is global, and 30 tests from i0000–i0007 predate `observe-red` entirely. i7 built the mechanism. This is the first iteration walked under it — i7's own checklist had no tests-red subtask. The two candidate fixes:
+
+- fabricate 30 retroactive red-observations (a forged attestation — the exact lie the ledger exists to refuse)
+- grandfather tests authored before the mechanism existed (`testsRedSince = i0008`, third instance of the directive's forward-only principle)
+
+The grandfather landed; all 12 i8 tests remain fully gated. Surfaced for the adjudicator to strike down.
+
+**Round 3 — Red-team.** (i) "The monotonic grandfather was invented mid-build — scope drift?" It is the SAME forward-only principle the directive red-teamed and fixed for EARS, applied when the live sweep surfaced identical churn. The alternative (rewiring 31 blessed tasks) is the rejected rubber-stamp factory. Recorded here for the adjudicator to strike down. (ii) "strictGuard exits inside a library call" — deliberate: any answer from a malformed graph is worse than no answer (adr-strict-load); `note` stays usable. (iii) "quack version grew a line" — resolution had to be discoverable from the binary; a full new command would have violated the default-closed surface. Kill-criteria from M1: none tripped.
 
 **Verdict: PASS.** Proceed to the human bless of `i8-m6-gate`.

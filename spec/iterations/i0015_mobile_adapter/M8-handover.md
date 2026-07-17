@@ -18,11 +18,18 @@
 
 ## Handover accepted  → i15-m8-handover
 
-The adjudicator has driven the surface end-to-end personally: paired via QR, answered two gate asks and one decision ask from the phone, exercised both delivery lanes (await stream and drain-on-run), and hit and confirmed the delete-before-tap edge. The M8 gate bless completes the handover.
+The adjudicator has driven the surface end-to-end personally:
+
+- paired via QR
+- answered two gate asks and one decision ask from the phone
+- exercised both delivery lanes (await stream and drain-on-run)
+- hit and confirmed the delete-before-tap edge
+
+The M8 gate bless completes the handover.
 
 ## Milestone review
 
 **Verify.** Each doc claim points at a shipped surface; the config homes exist and carry live state from today's run.
 **Validate.** The iteration's motivation — decision one-pagers reach the phone, the answer comes back as an adjudication — was not merely built but USED to adjudicate this very iteration's gates.
-**Red-team.** Opposing case: "docs written by the builder flatter the build." Held: the guide documents the failure modes the OWNER found (browser-vs-app, deleted message), not a happy path. Kill-criterion: a field reader failing to pair from the guide alone reopens the docs check.
+**Red-team.** Opposing case: "docs written by the builder flatter the build." Held: the guide documents the failure modes the OWNER found (browser-vs-app and deleted message), not a happy path. Kill-criterion: a field reader failing to pair from the guide alone reopens the docs check.
 **Verdict: PASS** — proceed to the gate bless.

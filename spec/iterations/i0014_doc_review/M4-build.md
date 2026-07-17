@@ -2,7 +2,7 @@
 
 ## Compact renders  → i14-bs20-compact-renders
 
-The check was a DISCUSS-BLOCK: the three oversized renders (field c33, c34, c36) waited behind a design discussion. The discussion ran 2026-07-08; the owner ruled, the bounds landed in the trace, the templates changed FIRST, the spec mirrored, the engine realized them.
+The check was a DISCUSS-BLOCK: the three oversized renders (field c33, c34 and c36) waited behind a design discussion. The discussion ran 2026-07-08. The owner ruled. The bounds landed in the trace. The templates changed FIRST. The spec mirrored. The engine realized them.
 
 ### The rulings (owner, 2026-07-08)
 
@@ -53,7 +53,7 @@ Second round (2026-07-09), after the owner-draft capture reopened the cone - eig
 
 ## Documentation completion (owner directive 2026-07-08)
 
-The owner scoped i14 to complete the documentation, capture the gaps into design input, all non-architectural. New design-input requirements (both non-architectural, refine to uc-book-content): [req-example-content](req-example-content.md), [req-decision-rationale](req-decision-rationale.md).
+The owner scoped i14 to complete the documentation and capture the gaps into design input, all non-architectural. New design-input requirements (both non-architectural, refine to uc-book-content): [req-example-content](req-example-content.md), [req-decision-rationale](req-decision-rationale.md).
 
 ### Chapter numbers  → i14-bs02-sidebar-order (re-walk)
 
@@ -85,7 +85,7 @@ The owner scoped i14 to complete the documentation, capture the gaps into design
 
 ## Internal quality  → i14-m4-internal-quality
 
-Self review of the changed engine, template, and spec content (2026-07-08):
+Self review of the changed engine, template and spec content (2026-07-08):
 
 - Template↔spec mirror parity spot-checked on every changed unit (onion, vv-exceptions, design-decisions move, candidates removal): no drift. Design markers live template-side only, per convention.
 - The q-table substrate: sort moves row PAIRS, filters hide pairs, an active filter searches across pages; group headers hide when their rows do. All interaction toggles visibility only - the script never creates content (the annotator law held).
@@ -137,7 +137,7 @@ The rebuild invalidated the verdict cache; the fresh run revealed reds the cache
 
 ## M4 verdict (second round, 2026-07-09)
 
-Round 1 (existence): every planned step built; the owner-draft onion and the context diagram realized; designs-realized, tests-red, and tests-pass all compute green. Round 2 (spot-scrutiny): the reconciled tests assert the RULED behavior, not the code's accidents; the one engine regression (pull-law usage) was found BY a fixture test and fixed in the engine, not the test. Round 3 (adversarial): the riskiest claim is the onion visual - the data is derived and pinned, the layout is one first cut from the owner's draft and is exactly what this gate presents for adjudication. Recommended: bless, with the onion look explicitly reviewed in the rendered book.
+Round 1 (existence): every planned step built. The owner-draft onion and the context diagram realized. designs-realized, tests-red and tests-pass all compute green. Round 2 (spot-scrutiny): the reconciled tests assert the RULED behavior, not the code's accidents. The one engine regression (pull-law usage) was found BY a fixture test and fixed in the engine, not the test. Round 3 (adversarial): the riskiest claim is the onion visual - the data is derived and pinned, the layout is one first cut from the owner's draft and is exactly what this gate presents for adjudication. Recommended: bless, with the onion look explicitly reviewed in the rendered book.
 
 ### Interpretation noted for the adjudicator
 

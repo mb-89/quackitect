@@ -1,6 +1,10 @@
 # M2 - Design input (i0017_pruning, lean)
 
-TL;DR: Seven requirements over uc-prune, one per field item plus the owner-led docs round. The clustering requirement carries the M1-gate rulings verbatim: sub-addressable statements, tests as the atomic layer, the graph render compacting with the data.
+TL;DR: Seven requirements over uc-prune, one per field item plus the owner-led docs round. The clustering requirement carries the M1-gate rulings verbatim:
+
+- sub-addressable statements
+- tests as the atomic layer
+- the graph render compacting with the data
 
 ## Requirements stated, each checkable  -> i17-m2-reqs
 - [req-trace-clustered](req-trace-clustered.md) - clustered nodes, sub-addressable statements (req-x.1), tests more atomic than requirements, count materially below the 2026-07-10 baseline; the render compacts too. (Deliberate ISO 29148 divergence, mitigated at statement level - M1 red team.)

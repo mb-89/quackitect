@@ -2,7 +2,12 @@
 
 ## Vision and scope stated -> i23-m1-vision-scope-stated
 
-Vision: a Quackitect workspace is a set of modules sharing one iteration, one ledger, one report, and one book.
+Vision: a Quackitect workspace is a set of modules that share:
+
+- one iteration
+- one ledger
+- one report
+- one book
 
 The first module implementation is deliberately small:
 
@@ -34,7 +39,18 @@ The needed capability is narrower:
 - Filter every table by module before need.
 - Let dotted child modules roll up in views without recursive process semantics.
 
-The current engine has related pieces: vendored vehicles, overlays, `--base`, and deterministic apply manifests. It does not yet have first-class modules, module import/update, or module-scoped derived views.
+The current engine has related pieces:
+
+- vendored vehicles
+- overlays
+- `--base`
+- deterministic apply manifests
+
+It does not yet have:
+
+- first-class modules
+- module import/update
+- module-scoped derived views
 
 This iteration is therefore justified as an engine architecture change, not only a vehicle customization.
 
@@ -74,13 +90,17 @@ The risk register now carries the main module risks:
 - `raid-module-scope-confusion`: dotted modules can be mistaken for nested projects.
 - `raid-module-id-collisions`: module-local content can collide while ids remain globally keyed.
 
-The mitigations match the selected first cut: deterministic dry-run manifests, one ledger with view-only rollups, and module-prefix lint before any later composite identity change.
+The mitigations match the selected first cut:
+
+- deterministic dry-run manifests
+- one ledger with view-only rollups
+- module-prefix lint before any later composite identity change
 
 ## Review Verdict -> i23-m1-gate
 
 Verify: every M1 subcheck has a concrete referent in this evidence file or the risk register.
 
-Validate: the iteration answers the actual owner ask. It starts module support for shareable vehicles, avoids module-local timelines, and keeps Tracer out of the Quackitect iteration record.
+Validate: the iteration answers the actual owner ask. It starts module support for shareable vehicles. It avoids module-local timelines. It keeps Tracer out of the Quackitect iteration record.
 
 Red-team: the main risk is overbuilding modules into nested projects. The explicit out-of-scope list and dotted-id rollup ADR keep the first implementation bounded.
 

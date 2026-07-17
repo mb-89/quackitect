@@ -17,7 +17,7 @@ Three axes, two viable candidates each (the project chapter renders the per-axis
 
 ## Criteria weighted  → i15-m3-criteria
 
-Derived from the requirement set; weights fixed BEFORE scoring (anti-bias law); scale anchors in each criterion's body:
+Derived from the requirement set. Weights fixed BEFORE scoring (anti-bias law). Scale anchors in each criterion's body:
 
 - [crit-zero-dep](crit-zero-dep.md) — 0.9 (req-adapter-zero-dep)
 - [crit-nat-friendly](crit-nat-friendly.md) — 0.9 (req-slack-channel, the NAT law)
@@ -35,7 +35,7 @@ Derived from the requirement set; weights fixed BEFORE scoring (anti-bias law); 
 
 ## Milestone review
 
-**Verify.** Every candidate carries its axis and per-axis ratings; the criteria carry metric, weight, and anchors; the live probe is reproducible from the steps above.
-**Validate.** The axes cover exactly the open decisions the rulings left (Slack shape, seam shape, ask rendering); nothing re-opens ruled matters (channel set, full loop, pairing shape).
+**Verify.** Every candidate carries its axis and per-axis ratings. The criteria carry metric, weight and anchors. The live probe is reproducible from the steps above.
+**Validate.** The axes cover exactly the open decisions the rulings left (Slack shape, seam shape and ask rendering). Nothing re-opens ruled matters (channel set, full loop and pairing shape).
 **Red-team.** Opposing case: "the ratings pre-bake the winner." Held: the anchors are stated per criterion and the M4 Pugh run uses the STRONGEST rival as datum with a reversed sensitivity check — a flipped winner becomes a tripwire, not a silent dismissal. Kill-criterion: if the M5 spike shows Slack text-poll latency or the typed-answer UX is unacceptable to the adjudicator, socket-mode re-enters at M4 as the datum.
 **Verdict: PASS** — proceed to the gate bless.

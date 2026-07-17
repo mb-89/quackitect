@@ -6,11 +6,20 @@ Evidence for the M5 gate. The one genuine unknown (R1: deterministic RED observa
 **Risk R1:** can the engine durably record "test observed FAILING" **without a later re-run** (which can't see a past red once green), and **re-suspect** when the test changes?
 
 **Validated** — by inspection of the real engine + a runnable tracer (`.quack/spikes/tests-red/spike.sh`):
+
 - The `Event` log (`attest.json`) already discriminates by an `action` field (only `"bless"` today). A `"red-observed"` event `{check:<test>, action:"red-observed", hash:<test fullHash>}` is the durable record — exactly analogous to a bless.
 - `gateState` already returns DONE on attested-hash == current-hash and **SUSPECT** on mismatch. `tests-red` reuses that for the "re-suspect on change" behaviour **for free**.
-- Tracer output (verbatim): red-observed@H1 → **SATISFIED**; test edited H1→H2, no re-run → **SUSPECT**; re-observe@H2 → **SATISFIED**.
+- Tracer output (verbatim):
+  - red-observed@H1 → **SATISFIED**
+  - test edited H1→H2, no re-run → **SUSPECT**
+  - re-observe@H2 → **SATISFIED**
 
-**Conclusion:** `tests-red` is `tests-pass`'s dual — a small reuse, not a new subsystem. Insertion points: (a) `Event` — no change; (b) `attestLoad` — add a `red-observed` loader; (c) `coverage.go` — add `case "tests-red"` (mirrors `case "tests-pass"`); (d) a writer op (`quack observe-red <test>`, run by the tester pre-build, or folded into the build-planned step).
+**Conclusion:** `tests-red` is `tests-pass`'s dual — a small reuse, not a new subsystem. Insertion points:
+
+- (a) `Event` — no change.
+- (b) `attestLoad` — add a `red-observed` loader.
+- (c) `coverage.go` — add `case "tests-red"` (mirrors `case "tests-pass"`).
+- (d) a writer op (`quack observe-red <test>`, run by the tester pre-build, or folded into the build-planned step).
 
 ## Design is buildable  → i7-m5-design-buildable
 All six work-items are buildable:

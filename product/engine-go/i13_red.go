@@ -108,6 +108,9 @@ func dedupNotePath(dir, base string) string {
 // design: go-home-sweep  implements: req-selftest-home-sweep
 // sweepOrphanHomes removes data homes whose recorded workspace no longer exists, fixture leftovers. A markerless home is removed only when it holds NO file at all. A real pre-marker home always has content and is never touched. The live home is always kept.
 func sweepOrphanHomes() int {
+	if !sweepAllowedDuringBattery() {
+		return 0 // go-battery-isolation: mid-battery, homes in use look orphaned
+	}
 	base := filepath.Join(userDataBase(), "quackitect")
 	ents, err := os.ReadDir(base)
 	if err != nil {

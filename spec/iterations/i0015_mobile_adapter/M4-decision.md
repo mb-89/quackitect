@@ -19,11 +19,11 @@ Pugh, weights fixed at M3 (0.9 zero-dep, 0.9 NAT, 0.6 auth, 0.6 corporate, 0.5 o
 
 ## ADRs recorded and traced  → i15-m4-adr-traced
 
-Four decisions in `spec/decisions/`, each addressing its requirement through the lanes, chosen/rejected edges wired to the candidates. `coverage:adr-traced` computes.
+Four decisions in `spec/decisions/`, each addressing its requirement through the lanes. The chosen/rejected edges are wired to the candidates. `coverage:adr-traced` computes.
 
 ## Milestone review
 
-**Verify.** Every choice ties to the M3 ratings and weights; both Pugh runs and both reversals are written; raid-answer-forgery is now WRITTEN into an ADR, closing the red-team obligation.
-**Validate.** The architecture satisfies all thirteen requirements on paper; nothing contradicts a ruling; the corporate seam is designed-for without being built.
+**Verify.** Every choice ties to the M3 ratings and weights. Both Pugh runs and both reversals are written. raid-answer-forgery is now WRITTEN into an ADR, closing the red-team obligation.
+**Validate.** The architecture satisfies all thirteen requirements on paper. Nothing contradicts a ruling. The corporate seam is designed-for without being built.
 **Red-team.** Opposing case: "text-poll makes Slack a second-class channel." Held: the tripwire keeps socket-mode one credible flip away, and ntfy carries the one-tap lane meanwhile. Kill-criterion: an M5 spike showing polling misses Slack messages (pagination/rate limits) steps back here.
 **Verdict: PASS** — proceed to the gate bless.

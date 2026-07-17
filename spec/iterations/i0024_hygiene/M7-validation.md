@@ -5,7 +5,7 @@
 Validated against the Ch1 criteria, each with its live referent:
 
 1. Voice: `quack lint` reports zero voice findings. Baseline was 566.
-2. Query: the walk itself ran on it. Edge folds, suspect listings, and note scans each answered in one call.
+2. Query: the walk itself ran on it. Edge folds, suspect listings and note scans each answered in one call.
 3. Trust: pooled queries and references hash into the identity root; an edit flips dependents suspect.
 4. Reload: the live demo below. A staged build reached the connected session without a reconnect.
 5. Birth: `selftest mcp-birth` proves the scaffold arms MCP with the explicit path.
@@ -41,7 +41,7 @@ Everything this iteration changed is re-documented where it is described:
 
 ## acceptance obtained -> i24-m7-acceptance-obtained-sign
 
-The owner's standing grant (grant-20260715-202439, scope all) covers the walk; every bless is collected for the morning review. The owner reviewed the collection live mid-walk (the grant review paste) and ordered: finish this iteration.
+The owner's standing grant (grant-20260715-202439, scope all) covers the walk. Every bless is collected for the morning review. The owner reviewed the collection live mid-walk (the grant review paste) and ordered: finish this iteration.
 
 ## Review Verdict -> i24-m7-gate
 

@@ -13,7 +13,7 @@ Validated against the M1 success criteria:
 - Update planning: `selftest module-update` passed.
 - Vehicle fixture: `selftest vehicle-module-setup` passed.
 
-The implementation keeps one workspace timeline and ledger. Modules add ownership, filtering, and import/update planning. They do not add nested ledgers or parent-module gates.
+The implementation keeps one workspace timeline and ledger. Modules add ownership, filtering and import/update planning. They do not add nested ledgers or parent-module gates.
 
 ## Killer use-cases demonstrated -> i23-m7-killer-use-cases
 

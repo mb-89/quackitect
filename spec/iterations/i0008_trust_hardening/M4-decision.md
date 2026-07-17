@@ -1,6 +1,6 @@
 # M4 — Decide the architecture (i0008_trust_hardening)
 
-Evidence for the M4 gate. The chosen architecture, its trace to the weighted criteria, and the recorded ADRs.
+Evidence for the M4 gate. The chosen architecture, with its trace to the weighted criteria and the recorded ADRs.
 
 ## Chosen architecture stated  → i8-m4-architecture-stated
 One sentence per choice, scored against M3's Pugh criteria (fidelity 5 · determinism 4 · non-brickage 4 · zero-dep 3 · churn 3 · simplicity 2):
@@ -24,10 +24,10 @@ Computed live by the engine: six ADRs, each `addresses:` its requirement(s) — 
 
 ## Milestone review (increasing scrutiny)
 
-**Round 1 — Verify.** Each ADR names its losers and the reason they lost, in the criteria's own terms; each traces to requirement(s) via `addresses:` and the derived check computes green. The two killer-class ADRs (`adr-strict-load`, `adr-actor-channel-stat`, `adr-ears-baseline` — the three whose failure falsifies the record) carry their kill-criteria/fallbacks inline.
+**Round 1 — Verify.** Each ADR names its losers and the reason they lost, in the criteria's own terms. Each traces to requirement(s) via `addresses:` and the derived check computes green. The two killer-class ADRs (`adr-strict-load` + `adr-actor-channel-stat` + `adr-ears-baseline` — the three whose failure falsifies the record) carry their kill-criteria/fallbacks inline.
 
-**Round 2 — Validate.** The decision set covers every M3 load-bearing choice; no choice was decided that M3 didn't surface (no scope-invention at decision time). Decisions honor the directive verbatim where it bound (log paths, forward-only, one hash) and exercise judgment only where it delegated (mechanisms).
+**Round 2 — Validate.** The decision set covers every M3 load-bearing choice; no choice was decided that M3 didn't surface (no scope-invention at decision time). Decisions honor the directive verbatim where it bound (log paths + forward-only + one hash) and exercise judgment only where it delegated (mechanisms).
 
-**Round 3 — Red-team.** Argued against the set as a whole: is this over-engineered for six small features? The counter holds — every ADR removes a class of silent record corruption, and the two spike-gated ADRs (strict-load's no-brick, channel-stat's terminal reality) are exactly the ones a hasty build would get wrong. Residual risk honestly carried: the EARS baseline file is tamper-diffable but not tamper-proof (deferred to evidence-into-merkle, recorded in the ADR).
+**Round 3 — Red-team.** Argued against the set as a whole: is this over-engineered for six small features? The counter holds — every ADR removes a class of silent record corruption. The two spike-gated ADRs (strict-load's no-brick and channel-stat's terminal reality) are exactly the ones a hasty build would get wrong. Residual risk honestly carried: the EARS baseline file is tamper-diffable but not tamper-proof (deferred to evidence-into-merkle, recorded in the ADR).
 
-**Verdict: PASS.** Decisions stated, traced, sensitivity-checked; ADRs recorded and computing green. Proceed to the human bless of `i8-m4-gate`.
+**Verdict: PASS.** Decisions stated, traced and sensitivity-checked. ADRs recorded and computing green. Proceed to the human bless of `i8-m4-gate`.

@@ -1,6 +1,6 @@
 # M2 - Design input (i0014_doc_review, lean)
 
-TL;DR: 23 requirements, distilled from the 19 field notes of the first returned book copy plus three owner rulings. Every requirement is EARS-shaped, faceted, and carries its source comment ids in the rationale. Both derived coverage rules compute green.
+TL;DR: 23 requirements, distilled from the 19 field notes of the first returned book copy plus three owner rulings. Every requirement is EARS-shaped and faceted. Each carries its source comment ids in the rationale. Both derived coverage rules compute green.
 
 ## Requirements stated, each checkable  -> i14-m2-reqs-stated
 
@@ -35,7 +35,13 @@ The set, grouped by use-case:
 - uc-book-present (existing, i0012) - 1:
   - [req-deck-views-section](req-deck-views-section.md) (c44)
 
-**Checkable.** Every statement is EARS-shaped with shall. `quack lint` on 2026-07-07 reports zero EARS violations, zero duplicate ids, zero wiring faults. The 23 "no design" holes are the expected pre-build state; the book-drift line resolves at ship.
+**Checkable.** Every statement is EARS-shaped with shall. `quack lint` on 2026-07-07 reports:
+
+- zero EARS violations
+- zero duplicate ids
+- zero wiring faults
+
+The 23 "no design" holes are the expected pre-build state; the book-drift line resolves at ship.
 
 **Not requirements, on record:**
 
@@ -45,11 +51,11 @@ The set, grouped by use-case:
 
 ## Requirements traced / verifiable  -> derived checks
 
-23 of 23 refine a use-case chaining to need-docu (via the connections lanes); 23 of 23 carry a test: 19 executed selftests, 4 review residues (doc-tests rule: mechanize what is mechanizable, the rest stays review). Both rules compute live.
+23 of 23 refine a use-case chaining to need-docu (via the connections lanes). 23 of 23 carry a test: 19 executed selftests plus 4 review residues (doc-tests rule: mechanize what is mechanizable, the rest stays review). Both rules compute live.
 
 ## Milestone review  -> i14-m2-gate
 
-**Verify.** Each requirement's rationale names its field comment(s); the statements match the triaged notes; the derived checks compute green.
-**Validate.** The set covers all eight M1 themes; nothing in it exceeds the book-and-substrate scope; the parked items (oversized renders) are IN the set but ordered last per the owner ruling.
-**Red-team.** Opposing case: "23 requirements is scope creep for lean." Held against the checklist: each maps to concrete field pain, none is speculative; the four review residues carry the judgment honestly instead of faking executed checks. Kill-criterion: a requirement whose fix breaks the single-file book steps back to design discussion.
+**Verify.** Each requirement's rationale names its field comment(s). The statements match the triaged notes. The derived checks compute green.
+**Validate.** The set covers all eight M1 themes. Nothing in it exceeds the book-and-substrate scope. The parked items (oversized renders) are IN the set but ordered last per the owner ruling.
+**Red-team.** Opposing case: "23 requirements is scope creep for lean." Held against the checklist: each maps to concrete field pain, and none is speculative. The four review residues carry the judgment honestly instead of faking executed checks. Kill-criterion: a requirement whose fix breaks the single-file book steps back to design discussion.
 **Verdict: PASS** - proceed to the gate bless.

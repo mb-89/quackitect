@@ -371,16 +371,16 @@ func cmdStatus(rest []string) {
 		if !runSelftest(strings.TrimSpace(n.Verify[len("selftest:"):])) {
 			m, st = "[!]", "RED"
 		}
-		fmt.Println(m + " " + ljust(st, 8) + " " + n.ID + "  (standalone)")
+		fmt.Println(m + " " + ljust(st, 8) + " " + n.ID + "  (never-cached)")
 	}
 	fmt.Printf("\n%d gates | %d done | %d suspect | %d trace-content\n", len(gates), done, susp, len(nodes)-len(gates))
 }
 
-// standaloneChecks returns the suite: standalone tests, ID-sorted (go-standalone-suite).
+// standaloneChecks returns the suite: never-cached tests, ID-sorted (go-standalone-suite).
 func standaloneChecks(nodes map[string]Node) []Node {
 	var out []Node
 	for _, n := range nodes {
-		if n.Suite == "standalone" && n.Class == "executed" && strings.HasPrefix(n.Verify, "selftest:") {
+		if n.Suite == "never-cached" && n.Class == "executed" && strings.HasPrefix(n.Verify, "selftest:") {
 			out = append(out, n)
 		}
 	}
@@ -700,9 +700,22 @@ func cmdLint(rest []string) {
 			fmt.Println("  - " + f)
 		}
 	}
+	// prose over evidence docs (go-voice-prose): ARMED at zero debt (req-voice-prose.3,
+	// drained 2026-07-17) - a prose finding fails lint like the voice lane.
+	pf := voiceProseFindings()
+	if len(pf) > 0 {
+		fmt.Printf("prose: %d finding(s) - the lane is armed, a prose flaw fails lint:\n", len(pf))
+		for i, f := range pf {
+			if i == 12 {
+				fmt.Printf("  ... and %d more\n", len(pf)-12)
+				break
+			}
+			fmt.Println("  - " + f)
+		}
+	}
 	// the BLOCKING set (the three-code contract, go-lint-exit): structural findings that must not
 	// ship. Advisories — coverage holes, adoption advisories, model/field/schema notes — stay exit 0.
 	blocking := len(dups) + earsBad + len(qf) + len(mono) + len(placement) + len(orphans) +
-		len(metaQ) + len(drift) + len(external) + len(residue) + len(anchors) + termOrderBlocking(tof) + len(vf)
+		len(metaQ) + len(drift) + len(external) + len(residue) + len(anchors) + termOrderBlocking(tof) + len(vf) + len(pf)
 	quackExit(lintExitCode(false, blocking))
 }

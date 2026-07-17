@@ -1,6 +1,6 @@
 # M2 — Requirements (i0007_tdd_implementation)
 
-Evidence for the M2 gate. The requirements are the 9 composed `req-*` nodes; this records their inputs, coverage, and structural verification.
+Evidence for the M2 gate. The requirements are the 9 composed `req-*` nodes. This records their inputs, their coverage and their structural verification.
 
 ## Inputs captured  → i7-m2-inputs-captured
 Sources folded into the requirements:

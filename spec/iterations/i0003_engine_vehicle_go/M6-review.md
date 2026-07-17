@@ -4,7 +4,15 @@ Evidence for the M6 review subtasks.
 
 ## Internal quality ok  -> i3-m6-internal-quality-ok
 
-The Go engine is `product/engine-go/` (one module, ~9 files): parse, engine (load/hash/merkle/attest/gate-state), coverage (rules + mint_id + duplicate-id guard), cli (+ shared help preamble), report (html/template + cytoscape, read from file, inlined for a self-contained email-able file), resolver (vehicle->engine overlay), selftest (in-process, zero external toolchain).
+The Go engine is `product/engine-go/` (one module, ~9 files):
+
+- parse
+- engine (load/hash/merkle/attest/gate-state)
+- coverage (rules + mint_id + duplicate-id guard)
+- cli (+ shared help preamble)
+- report (html/template + cytoscape, read from file, inlined for a self-contained email-able file)
+- resolver (vehicle->engine overlay)
+- selftest (in-process, zero external toolchain)
 
 - Parity proven: the Go merkle root equals the Python root over the full graph, re-confirmed after every change.
 - Determinism: the report is a pure display (rendering never runs checks — a re-entrancy guard), so it is byte-identical across renders and fast (responsiveness).
@@ -19,4 +27,8 @@ The Go engine is `product/engine-go/` (one module, ~9 files): parse, engine (loa
 - **No-Python end state:** the 6 old Python-engine tests are migrated to fast Go selftest:. The Python engine is transitional scaffolding, deleted at ship.
 - **Distribution:** ship Go source, rebuilt locally (adr-ship-source); Go is a build dependency (dependency-check prompt). Code-signing for other SAC machines is an M7/release concern, not a dev blocker.
 
-Residual to carry to M7: validate against the M1 success criteria; confirm the ship deletes the Python engine; decide signing for public distribution.
+Residual to carry to M7:
+
+- validate against the M1 success criteria
+- confirm the ship deletes the Python engine
+- decide signing for public distribution

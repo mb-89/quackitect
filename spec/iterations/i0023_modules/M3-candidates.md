@@ -11,7 +11,7 @@ Four alternatives were elaborated:
 
 The current preferred candidate is `cand-dotted-modules`.
 
-It gives useful nesting, module-first views, and exact imports without introducing separate module timelines, nested ledgers, or recursive gate semantics.
+It gives useful nesting, module-first views and exact imports. It introduces no separate module timelines, no nested ledgers and no recursive gate semantics.
 
 ## Criteria weighted -> i23-m3-criteria-weighted-derived
 
@@ -39,7 +39,7 @@ Conclusion: dotted module ids are the feasible first implementation.
 
 ## Review Verdict -> i23-m3-gate
 
-Verify: four alternatives are recorded, the weighted criteria are stated, and each candidate has a feasibility judgment.
+Verify: four alternatives are recorded. The weighted criteria are stated. Each candidate has a feasibility judgment.
 
 Validate: the selected dotted-module candidate matches the owner direction: nesting as rollup, not recursive process behavior.
 

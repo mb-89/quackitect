@@ -4,7 +4,7 @@ TL;DR: No new architecture - the iteration reworks rendering inside the shipped 
 
 ## Approach chosen with recorded reasons  -> i14-m3-approach-chosen
 
-**The approach.** Fix everything inside the existing single-file book substrate. Template-first: rendering changes land in the engine and template home, the dogfooding spec re-derives, and the book-drift check gates the sync. Content changes (seeded examples, prose rework) land in this project's spec.
+**The approach.** Fix everything inside the existing single-file book substrate. Template-first: rendering changes land in the engine and template home. The dogfooding spec re-derives. The book-drift check gates the sync. Content changes (seeded examples, prose rework) land in this project's spec.
 
 The deciding ADRs, each with its rejected alternative:
 
@@ -21,7 +21,7 @@ All four ADRs address requirements via the addresses lane; the rule computes liv
 
 ## Milestone review  -> i14-m3-gate
 
-**Verify.** The four ADR nodes exist in spec/decisions with adjudicated_by stamps; the addresses edges are in the lane; the derived check computes green.
-**Validate.** The approach honors the M1 kill-criterion (nothing breaks the single-file book) and the owner rulings (template-first sync, derived over authored, easy stuff first).
-**Red-team.** Opposing case: "client-side paging + in-place filtering will bloat the inline JS." Held: the substrate already carries the annotator and Bases tables in inline JS; the increments are bounded, and the dom-static selftests gate regressions. Kill-criterion: if paging or interactivity forces an external dependency, the ADR reopens.
+**Verify.** The four ADR nodes exist in spec/decisions with adjudicated_by stamps. The addresses edges are in the lane. The derived check computes green.
+**Validate.** The approach honors the M1 kill-criterion (nothing breaks the single-file book). It honors the owner rulings too (template-first sync, derived over authored and easy stuff first).
+**Red-team.** Opposing case: "client-side paging + in-place filtering will bloat the inline JS." Held: the substrate already carries the annotator and Bases tables in inline JS. The increments are bounded, and the dom-static selftests gate regressions. Kill-criterion: if paging or interactivity forces an external dependency, the ADR reopens.
 **Verdict: PASS** - proceed to the gate bless.

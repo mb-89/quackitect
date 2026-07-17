@@ -1,6 +1,6 @@
 # M3 — Candidate architectures (i0007_tdd_implementation)
 
-Evidence for the M3 gate. Alternatives per key decision, criteria weighted from the requirements, feasibility rough-checked. Chosen options are decided at M4 (ADRs); the riskiest is spiked at M5.
+Evidence for the M3 gate. Alternatives per key decision, with criteria weighted from the requirements and feasibility rough-checked. Chosen options are decided at M4 (ADRs); the riskiest is spiked at M5.
 
 ## Scope note — cross-harness enforcement DESCOPED at M3
 The original frame carried a third decision (contract delivery) and a git pre-commit gate. Both were **cut by human direction**: (a) contract *delivery* is advisory-only and is already covered by the SessionStart hook + `copilot-instructions.md` added this session — observe empirically first (per i0006 `adr-contract-delivery`'s "escalate only if shown insufficient"); (b) a pre-commit gate blocking a suspect/incomplete ledger is hostile to work-in-progress commits. See the backlog note. `uc-reliability` is now scoped to evidence honesty (#8) only. Two design decisions remain.

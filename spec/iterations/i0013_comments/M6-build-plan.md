@@ -36,7 +36,12 @@ Test-first sequence ahead: the 19 executed tests get their selftest hooks author
 
 ## Build record → i13-m6-build
 
-Sequence held: 19 selftest hooks authored (`i13_red.go`), 17 observed RED, 2 honestly exempt (view-orphan lint and the launcher probe — both behaviors pre-existed; markers carry the reasons), then all 20 steps built to green, engine family first (owner ruling).
+Sequence held:
+
+- 19 selftest hooks authored (`i13_red.go`)
+- 17 observed RED
+- 2 honestly exempt (view-orphan lint and the launcher probe — both behaviors pre-existed; markers carry the reasons)
+- then all 20 steps built to green, engine family first (owner ruling)
 
 Highlights and deviations, for the record:
 
@@ -50,7 +55,7 @@ Highlights and deviations, for the record:
 - **bs18** `quack note --file2list` — pure lister, reader roles replace names at the boundary.
 - **bs20 dogfood, end-to-end on a real copy**: headless reader session made a prose comment, an agree reply, a closed thread, a suggested edit, and a figure-element comment (`fig1-quack`); the returned copy listed deterministically; one keeper note minted (origin: field), two comments rejected — the unreliable-source stance exercised for real.
 
-One encoding incident during bs07: a PowerShell regex rewrite mojibaked `i10_red.go`; caught immediately via git diff, reverted, redone with the Edit tool. No damage shipped.
+One encoding incident during bs07: a PowerShell regex rewrite mojibaked `i10_red.go`. It was caught immediately via git diff. The file was reverted and redone with the Edit tool. No damage shipped.
 
 ## Internal quality → i13-m6-internal-quality
 
@@ -68,13 +73,13 @@ One encoding incident during bs07: a PowerShell regex rewrite mojibaked `i10_red
 
 ## Review rounds & verdict
 
-1. **Verify.** All 20 steps carry blessed evidence; the derived checks compute live: coverage clean (every requirement traced, tested, designed), tests-red satisfied (17 observed + 2 reasoned exemptions), verification green across all iterations. The dogfood record is a real artifact trail (spike dir: dogfood copy, returned copy, file2list output, keeper note).
-2. **Validate.** The build realizes every owner decision: island, unit+quote anchoring, Highlight-API paint, in-place save with fallback, prompt-once author, file2list under the note family, suggest in scope, opinionated triage exercised. The engine batch closed all ten items plus the two pre-landed ones honestly.
-3. **Red-team.** Weakest point: the browser-interaction tests (9 review-class) have only headless-driver evidence so far, not a human session — that is precisely M7's killer-use-case demo, not a M6 gap. Second: the i12 shell-law rescope could hide layer bloat in later scripts; held: the layer's own machine check (comment-dom-static) covers every script after the shell.
+- **Verify.** All 20 steps carry blessed evidence; the derived checks compute live: coverage clean (every requirement traced, tested, designed), tests-red satisfied (17 observed + 2 reasoned exemptions), verification green across all iterations. The dogfood record is a real artifact trail (spike dir: dogfood copy, returned copy, file2list output, keeper note).
+- **Validate.** The build realizes every owner decision: island, unit+quote anchoring, Highlight-API paint, in-place save with fallback, prompt-once author, file2list under the note family, suggest in scope, opinionated triage exercised. The engine batch closed all ten items plus the two pre-landed ones honestly.
+- **Red-team.** Weakest point: the browser-interaction tests (9 review-class) have only headless-driver evidence so far, not a human session — that is precisely M7's killer-use-case demo, not a M6 gap. Second: the i12 shell-law rescope could hide layer bloat in later scripts; held: the layer's own machine check (comment-dom-static) covers every script after the shell.
 
 **Verdict: pass.** The gate goes to the adjudicator.
 
 ## Post-review defect, caught by this gate's own verification
 
-The first cold-cache evaluation of the M6 board hung: `selftest:comment-dom-static` self-recursed (its book render computes StatusMap, whose coverage evaluation re-runs the not-yet-recorded test — one book render per lap, 10 GB RSS before the kill). Diagnosed by process sampling + a one-run instrumented dispatcher (294 nested runs in 90 s); fixed with the engine's existing busy-guard pattern (the i10 status-fast precedent); defect + three retro leads recorded as a note. The battery is green end-to-end after the fix — the verdict above stands, now with this repair on the record.
+The first cold-cache evaluation of the M6 board hung: `selftest:comment-dom-static` self-recursed. Its book render computes StatusMap, whose coverage evaluation re-runs the not-yet-recorded test. Cost: one book render per lap, 10 GB RSS before the kill. Diagnosed by process sampling + a one-run instrumented dispatcher (294 nested runs in 90 s). Fixed with the engine's existing busy-guard pattern (the i10 status-fast precedent). The defect + three retro leads are recorded as a note. The battery is green end-to-end after the fix — the verdict above stands, now with this repair on the record.
 

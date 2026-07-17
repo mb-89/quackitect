@@ -1,6 +1,12 @@
 # M3 — Candidate architectures (i0003_engine_vehicle_go)
 
-Two architecture decisions carry this iteration. For each: the alternatives, the weighted criteria (derived from the requirements), and a rough feasibility check. The decision and ADR are M4.
+Two architecture decisions carry this iteration. For each:
+
+- the alternatives
+- the weighted criteria (derived from the requirements)
+- a rough feasibility check
+
+The decision and ADR are M4.
 
 ## Decision A — engine implementation & distribution
 

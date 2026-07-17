@@ -28,7 +28,7 @@ flowchart LR
 ```
 
 One line to see: every guard of this iteration attaches to the agent edges (CLI, MCP)
-or to the battery; the console edge stays refusal-free (raid-over-blocking).
+or to the battery. The console edge stays refusal-free (raid-over-blocking).
 
 Probes run 2026-07-14 (the real channel, not the datasheet):
 
@@ -37,13 +37,16 @@ Probes run 2026-07-14 (the real channel, not the datasheet):
 - THIS session has no quack MCP tools loaded. The gap is harness-side (project-server approval or config), not engine-side.
 - The channel predicate exists: [trust.go resolveActor](../../../product/engine-go/trust.go) stamps by `--by` override, else interactive console = user, piped call = agent. The new guards reuse it.
 
-The battery lanes, named: `selftest` runs the full battery; `verify <check>` re-runs one
-check eagerly; every walk command answers lazily from the verdict cache (req-lazy-verdicts,
-i21); a build's hand-back runs the battery once per slot.
+The battery lanes, named:
 
-The grant lifecycle, named: record (scope, expiry, empty collection) → live (in-scope
+- `selftest` runs the full battery
+- `verify <check>` re-runs one check eagerly
+- every walk command answers lazily from the verdict cache (req-lazy-verdicts; i21)
+- a build's hand-back runs the battery once per slot
+
+The grant lifecycle, named: record (scope / expiry / empty collection) → live (in-scope
 agent blesses stamp the grant id) → close (expiry or owner order) → morning review
-(the collection presented, each bless confirmed or reopened).
+(the collection presented - each bless confirmed or reopened).
 
 ## prior art checked  → i22-m2-prior-art-checked
 
@@ -87,12 +90,12 @@ file). The derived checks computed green: every requirement refines a use-case
 Round 2, validate: the requirement set realizes exactly the four approved clusters.
 Both owner rulings are woven in (req-cli-steer says refuse; need-engage carries the
 amended criterion). The environment assumptions a requirement builds on were
-probed, not assumed: .mcp.json, the MCP handshake, the channel predicate.
+probed, not assumed: .mcp.json, the MCP handshake and the channel predicate.
 
-Round 3, red-team: the sharpest attack is the harness-side MCP gap — the engine
+Round 3, red-team: the sharpest attack is the harness-side MCP gap. The engine
 can serve tools all day, and a harness that never loads .mcp.json leaves
 req-mcp-discoverable unmet in practice. Held with a boundary: the requirement
-binds the ENGINE's offer; the harness approval step is configuration, and M5
+binds the ENGINE's offer. The harness approval step is configuration, and M5
 spikes it on this machine. The recorded miss (over-implementation detection)
 stays a miss, not scope creep.
 

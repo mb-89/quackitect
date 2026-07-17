@@ -20,17 +20,18 @@ the no-trace-gate invariant + tests-pass/gateState unification (guarded by selft
 verdict-link + nesting — 23 green selftests, 0 suspect. The machinery test passes: a vehicle creates a
 dummy workspace and is driven through a full systematic iteration on empty content, all milestones green.
 
-Also delivered (the qualities NFR, `need-qualities`): a **design language** — each project's brand at
-`product/brand/` (voice + logos + palette), the engine shipping a generic template (`design/`) that
-`start init` seeds and `resolveBrand` falls back to. The report renders the resolved mark left of the
-project name at 80% titlebar height (duck for quackitect, `[ LOGO GOES HERE ]` placeholder for a fresh
-vehicle). Guarded by `selftest:brand-resolves`.
+Also delivered (the qualities NFR, `need-qualities`): a **design language**. Each project's brand
+lives at `product/brand/` (voice + logos + palette). The engine ships a generic template (`design/`)
+that `start init` seeds and `resolveBrand` falls back to. The report renders the resolved mark left
+of the project name at 80% titlebar height (duck for quackitect, `[ LOGO GOES HERE ]` placeholder
+for a fresh vehicle). Guarded by `selftest:brand-resolves`.
 
 Late refinement (a mechanism that did not work as intended): **global validation is now structural.** A
 gate with `validates: needs` folds the digest of EVERY need into its hash, so adding/changing/removing
-any need reopens it (SUSPECT) — closing the gap where "validated against all needs" was prose, not a
-wired input (the same class of miss the i3 retro caught). Applied to both `i*-m7-meets-need`; guarded by
-`selftest:validation-global`. Validation now has the reach `coverage:tests-pass` already gave verification.
+any need reopens it (SUSPECT). That closes the gap where "validated against all needs" was prose rather
+than a wired input (the same class of miss the i3 retro caught). Applied to both `i*-m7-meets-need`;
+guarded by `selftest:validation-global`. Validation now has the reach `coverage:tests-pass` already gave
+verification.
 
 ## Carried forward (RAID / backlog)
 - Raw bless-attestation view in the verdict-link (who/when/hash), beyond the evidence doc.

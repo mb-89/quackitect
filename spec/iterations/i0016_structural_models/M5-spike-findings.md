@@ -1,6 +1,13 @@
 # M5 - Spike findings (i0016_structural_models, systematic)
 
-TL;DR: The kill-criterion is dead. A ~100-line throwaway extractor parsed a real engine layers+flow model in the pinned Mermaid subset, the semantic hash proved bit-stable under cosmetic edits and moved under semantic ones, the ambiguity lint fired on both planted violations, and a hand-rolled SVG derived a readable four-ring onion with labeled flows from the text truth. Two findings feed M6: BOM stripping and beyond-subset tolerance.
+TL;DR: The kill-criterion is dead. The spike's results:
+
+- a ~100-line throwaway extractor parsed a real engine layers+flow model in the pinned Mermaid subset
+- the semantic hash proved bit-stable under cosmetic edits and moved under semantic ones
+- the ambiguity lint fired on both planted violations
+- a hand-rolled SVG derived a readable four-ring onion with labeled flows from the text truth
+
+Two findings feed M6: BOM stripping and beyond-subset tolerance.
 
 ## Riskiest assumptions validated  -> i16-m5-assumptions
 Spike home: `<data-home>/spikes/i16-m5/` (throwaway, outside the repo). Four artifacts, four proofs (agent-run, 2026-07-09):
@@ -22,10 +29,10 @@ Spike home: `<data-home>/spikes/i16-m5/` (throwaway, outside the repo). Four art
 
 ## Milestone review  -> i16-m5-gate
 
-**Verify.** Every claim above has a runnable referent in the spike folder; the two hashes and the lint transcript are recorded verbatim; the SVG exists and derives from the same file the extractor hashed.
+**Verify.** Every claim above has a runnable referent in the spike folder. The two hashes and the lint transcript are recorded verbatim. The SVG exists and derives from the same file the extractor hashed.
 
 **Validate.** The spike answers exactly the M4 kill-criterion: derived renders from text models reproduce the onion's reading value, and the semantic hash behaves. The canvas-slot reopening clause stays dormant.
 
-**Red-team.** Sharpest residue: the spike onion's LAYOUT is crude (angle-spread dots, crossing lines) - but layout quality was never the criterion; the approved i14 renderer owns layout, and the spike proves the DATA suffices. Second: the spike model's structure is my draft, not the owner's ruling - deliberately so; authoring the real structure is M6 dogfood WITH the owner. The M4 tripwire (authoring comfort in anger) stays armed and untested until then - correctly so, M7 is its test.
+**Red-team.** Sharpest residue: the spike onion's LAYOUT is crude (angle-spread dots, crossing lines) - but layout quality was never the criterion. The approved i14 renderer owns layout, and the spike proves the DATA suffices. Second: the spike model's structure is my draft, not the owner's ruling - deliberately so. Authoring the real structure is M6 dogfood WITH the owner. The M4 tripwire (authoring comfort in anger) stays armed and untested until then - correctly so, M7 is its test.
 
 **Verdict: PASS** - hand-off to the adjudicator for the combined killer + gate.

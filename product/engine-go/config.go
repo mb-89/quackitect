@@ -99,4 +99,14 @@ func weaselWordsFromConfig() []string {
 	return words
 }
 
+// proseExemptions loads the prose-lint exemption tokens (prose-exemptions.json,
+// req-voice-prose.4): literal tokens whose separators never count as list
+// separators (the seed entry is TL;DR). Nil when the file is missing — a stub
+// workspace simply has no exemptions.
+func proseExemptions() []string {
+	var tokens []string
+	loadJSONConfig("prose-exemptions.json", &tokens)
+	return tokens
+}
+
 // enddesign

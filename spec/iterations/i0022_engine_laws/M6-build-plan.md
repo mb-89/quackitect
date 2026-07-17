@@ -2,9 +2,14 @@
 
 ## build planned  → i22-m6-build-planned-decomposed
 
-Ten steps, children of the build task, each one design concern and one durable
-checkpoint. Real prerequisites only: b2 needs b1's store; b4 needs b3's guard
-layer; b8 needs b5's guarded write. Everything else hangs flat off the M5 gate.
+Ten steps, children of the build task - each one design concern and one durable
+checkpoint. Real prerequisites only:
+
+- b2 needs b1's store.
+- b4 needs b3's guard layer.
+- b8 needs b5's guarded write.
+
+Everything else hangs flat off the M5 gate.
 
 - i22-b1-grant-store: grant events (go-grant-store)
 - i22-b2-grant-review: the collection surface (go-grant-review) ← b1
@@ -21,17 +26,22 @@ Per-step ritual, binding: author the test → `observe-red` RECORDS the failure 
 implement to green → targeted selftest only. The battery waits for the gate.
 All 11 reds were observed 2026-07-14 ~20:56 before any implementation landed.
 One slip: the statement-3 honesty amendment of req-standing-grant landed AFTER
-the red, stranding test-standing-grant's record - marked exempt with the reason
-(adr-red-unobservable), and noted for the retro (the i21 b13 class recurred).
+the red, stranding test-standing-grant's record. Marked exempt with the reason
+(adr-red-unobservable) and noted for the retro (the i21 b13 class recurred).
 
 ## grant ledger events  → i22-b1-grant-store
 
-go-grant-store in [i22_laws.go](../../../product/engine-go/i22_laws.go): grant-open and
-grant-close events with scope and expiry; blessGrantCheck refuses an uncovered agent
-killer-bless (cmdBless wires it, exit 5); a covered bless stamps `grant:`; grant open on
-the agent channel needs an explicit --by user delegation. selftest:standing-grant green.
-Proven live the same minute: grant-20260714-213558 (scope i22-*, 12 h) records the
-owner's chat delegation of this stretch.
+go-grant-store in [i22_laws.go](../../../product/engine-go/i22_laws.go):
+
+- grant-open and grant-close events with scope and expiry.
+- blessGrantCheck refuses an uncovered agent killer-bless (cmdBless wires it,
+  exit 5).
+- a covered bless stamps `grant:`.
+- grant open on the agent channel needs an explicit --by user delegation.
+
+selftest:standing-grant green. Proven live the same minute:
+grant-20260714-213558 (scope i22-*, 12 h) records the owner's chat delegation
+of this stretch.
 
 ## morning-review surface  → i22-b2-grant-review
 
@@ -40,11 +50,11 @@ owner's confirmation; `grant close` prints the same collection at the stretch's 
 
 ## dispatch guard layer  → i22-b3-guard-selftest
 
-go-guard-selftest: walkGuard runs as ONE pass in Dispatch before any handler; the pure
-rule (walkGuardDecision) refuses an agent-channel FULL battery while no milestone gate
-of the active version is ready or suspect, naming verify and the gate as the lawful
-lanes. The readiness pass runs lazy, so the guard never runs tests to decide whether
-tests may run. selftest:selftest-gate green.
+go-guard-selftest: walkGuard runs as ONE pass in Dispatch before any handler.
+The pure rule (walkGuardDecision) refuses an agent-channel FULL battery while
+no milestone gate of the active version is ready or suspect, naming verify and
+the gate as the lawful lanes. The readiness pass runs lazy, so the guard never
+runs tests to decide whether tests may run. selftest:selftest-gate green.
 
 ## declared agent lane  → i22-b4-guard-cli
 
@@ -83,10 +93,11 @@ live, adr-standalone-suite). selftest:battery-batch green.
 
 ## battery worker pool  → i22-b8-battery-parallel
 
-go-battery-parallel: the SAFE set (an explicit, deliberately grown allowlist - pure
-predicates and read-only checks) runs on a bounded pool; results return to the main
-goroutine, which owns every verdict write. Overlap is proven by handshake, not by
-timing (raid-guard-timing-flakes). selftest:battery-parallel green.
+go-battery-parallel: the SAFE set (an explicit and deliberately grown
+allowlist - pure predicates and read-only checks) runs on a bounded pool.
+Results return to the main goroutine, which owns every verdict write. Overlap
+is proven by handshake, not by timing (raid-guard-timing-flakes).
+selftest:battery-parallel green.
 
 ## voice lint  → i22-b9-voice-lint
 
@@ -97,11 +108,11 @@ twenty printed findings. selftest:voice-lint green.
 ## models adhered-to  → i22-m6-models-adhered-to
 
 All ten leaves of model-guard-tree are realized as `design:` regions in
-[i22_laws.go](../../../product/engine-go/i22_laws.go); the onion
+[i22_laws.go](../../../product/engine-go/i22_laws.go). The onion
 (model-engine-layers) allocates every one by essence (seven rim, three band).
-The sky-fall lint ran RED first (seven unallocated regions), the allocation
-landed, and it now runs clean - the conformance loop worked as designed. No
-element was invented beside the diagram; one region was restructured (grant
+The sky-fall lint ran RED first (seven unallocated regions). The allocation
+landed. It now runs clean - the conformance loop worked as designed. No
+element was invented beside the diagram. One region was restructured (grant
 review extracted from the grant store) to keep regions unnested.
 
 ## implementation risks acceptable  → i22-m6-implementation-risks-acceptable
@@ -114,17 +125,25 @@ review extracted from the grant store) to keep regions unnested.
 
 ## internal quality ok  → i22-m6-internal-quality-ok
 
-gofmt runs clean over product/engine-go. The new code is two files plus surgical
-seam edits; pure rules sit apart from console shells; the guards reuse existing
-predicates (channelInteractive, StatusMap, attestGatedCmds) instead of new state.
-Lint: coverage clean, EARS clean, conformance clean for i22; the remaining
-blocking finding is the book drift the ship regenerates. Two pre-existing RAID
-field-enum findings were drained in passing (status closed).
+gofmt runs clean over product/engine-go. The new code is two files plus
+surgical seam edits. Pure rules sit apart from console shells. The guards
+reuse existing predicates (channelInteractive / StatusMap / attestGatedCmds)
+instead of new state.
+
+Lint:
+
+- coverage clean.
+- EARS clean.
+- conformance clean for i22.
+- the remaining blocking finding is the book drift the ship regenerates.
+
+Two pre-existing RAID field-enum findings were drained in passing (status
+closed).
 
 ## recital chain selftest  → i22-b10-recital-chain
 
 go-recital-chain: the engine's contract resource must carry the question-tool recital
-mechanism, the TL;DR-card ruling, and the preview lane; a present AGENTS.md must still
+mechanism + the TL;DR-card ruling + the preview lane; a present AGENTS.md must still
 name the recital and the question. selftest:recital-chain green.
 
 ## suite observed RED  → i22-m6-suite-observed-red
@@ -143,14 +162,14 @@ green across all iterations, coverage:tests-pass computes DONE.
 
 ## Review rounds and verdict  → i22-m6-gate
 
-Round 1, verify: ten build steps, each with its design region, selftest, and
-evidence section; the derived checks (tests authored, suite red, designs
-realized, verification green) all compute from the trace.
+Round 1, verify: ten build steps - each with its design region + selftest +
+evidence section. The derived checks (tests authored / suite red / designs
+realized / verification green) all compute from the trace.
 
 Round 2, validate: the build fills exactly the M4-allocated elements - the
-sky-fall lint ran red on the missing onion allocations and clean after; no
+sky-fall lint ran red on the missing onion allocations and clean after. No
 element entered beside the diagram. The M1 criteria 1-5 and 7 are demonstrably
-in; criterion 6 (MCP lane live) is deliberately half-armed pending the fresh
+in. Criterion 6 (MCP lane live) is deliberately half-armed pending the fresh
 session (adr-mcp-lane-declared).
 
 Round 3, red-team: the battery's own three-pass history is the strongest

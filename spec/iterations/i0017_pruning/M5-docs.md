@@ -1,6 +1,12 @@
 # M5 - Docs round (i0017_pruning, lean)
 
-TL;DR: The owner reviewed the whole book verbally; twenty-three captured items plus two question nodes drove a six-phase render sweep. Every item landed template-first, the book renders byte-deterministically, and three durable laws came out of the round and live in the repo (self-sufficiency, the learning-escalation ladder, comments-without-provenance). The provenance-smear purge swept the historical debt. Owner adjudication of the final book pends.
+TL;DR: The owner reviewed the whole book verbally; twenty-three captured items plus two question nodes drove a six-phase render sweep. Every item landed template-first. The book renders byte-deterministically. Three durable laws came out of the round and live in the repo:
+
+- self-sufficiency
+- the learning-escalation ladder
+- comments-without-provenance
+
+The provenance-smear purge swept the historical debt. Owner adjudication of the final book pends.
 
 ## Docs round with the owner  -> i17-m5-docs
 The review ran as a conversation, not the comment layer - the owner dictated chapter by chapter; every item was captured as a note in the deterministic lane and implemented in phases:

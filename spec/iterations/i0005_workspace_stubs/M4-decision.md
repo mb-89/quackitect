@@ -30,4 +30,7 @@ Internal → B → A dominates the rejected C/D on the High criteria.
 
 ## Verdict
 
-**Verify** — the ADR captures exactly the decided order (internal → B → A, no C, no D) and traces to a requirement; coverage green apart from the expected M6 design-holes. **Validate** — realizes `uc-drive-from-inside` without touching the engine or the `--base` path; the dogfood case is preserved (internal-first). **Red-team** — rejections justified in the ADR; only residual is a machine with none of internal/B/A, handled by the launcher's clear failure. **Pass** → gate blessed.
+- **Verify** — the ADR captures exactly the decided order (internal → B → A, no C, no D) and traces to a requirement; coverage green apart from the expected M6 design-holes.
+- **Validate** — realizes `uc-drive-from-inside` without touching the engine or the `--base` path; the dogfood case is preserved (internal-first).
+- **Red-team** — rejections justified in the ADR; only residual is a machine with none of internal/B/A, handled by the launcher's clear failure.
+- **Pass** → gate blessed.

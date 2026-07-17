@@ -1,6 +1,10 @@
 # M6 — Build evidence (i0012_spec_book, systematic; extends M6-build-plan.md)
 
-TL;DR: all twenty planned steps realized in stage order; every requirement carries a realized design; the 26 mechanized tests went RED then GREEN; the dogfood book renders clean with the deck, the glossary, and the emitted AGENTS.md.
+TL;DR: all twenty planned steps realized in stage order. Every requirement carries a realized design. The 26 mechanized tests went RED then GREEN. The dogfood book renders clean with:
+
+- the deck
+- the glossary
+- the emitted AGENTS.md
 
 ## Build  → i12-m6-build
 
@@ -28,11 +32,15 @@ All twenty steps landed, in the planned stage order (the walk's own ledger is th
 
 ## Verification green / designs realized / tests red  → derived checks
 
-Compute live on this board: 27/27 requirements with realized designs (`quack lint`: the last hole closed with the deck step); all 26 mechanized tests carry birth-red observations and pass at their current hashes; the review-residue test (template-flow) waits for its M8 adjudication by design.
+Compute live on this board:
+
+- 27/27 requirements with realized designs (`quack lint`: the last hole closed with the deck step).
+- All 26 mechanized tests carry birth-red observations and pass at their current hashes.
+- The review-residue test (template-flow) waits for its M8 adjudication by design.
 
 ## Extension build (owner-directed 2026-07-05) — the spec template  → i12-m6-build
 
-All fourteen extension steps realized in stage order (bs6 substrate, bs7 machinery, bs8 authoring), each individually blessed with its selftest green at bless time:
+All fourteen extension steps realized in stage order: bs6 substrate -> bs7 machinery -> bs8 authoring. Each step is individually blessed with its selftest green at bless time:
 
 - Stage 6: one-level frontmatter maps under strict parse; the spec content roots (glossary MIGRATED to spec/glossary, references/fundamentals/methods loaders, aliases); the pinned-subset Bases evaluator (volatile functions refuse, out-of-subset refuses, byte-identical evaluation proven).
 - Stage 7: the alias auto-linker (authored links win, longest match, collision refuses); three lints (external-links-only-in-references, slot residue, dangling heading anchors); decision kinds + candidate nodes with 0..1 ratings; the faceted coverage board with type-layer vocabularies and zero-count holes; vv-table and stakeholder-matrix migrated to canned base queries; the quarantine boundary moved to everything-except-guidance.
@@ -53,17 +61,37 @@ All fourteen extension steps realized in stage order (bs6 substrate, bs7 machine
 
 ## Milestone review  → i12-m6-gate
 
-**Verify:** every planned step is individually blessed with its selftest green at bless time; the derived checks compute; the book artifact exists and regenerates byte-identically. **Validate:** the build honors every owner ruling of this walk - the mark law with surface-versus-core, margin robots, Vale-not-hand-rolled, generous machine-readable figures, one-source AGENTS.md, truth only in spec. **Red-team:** the largest risk was scope under deadline; answered: the relief valve was never needed - all five stages landed, and the two soft spots (Vale dependency, browser-specific disclosure) are ADR-recorded trades with fallbacks, not surprises. **Extension review:** verify - 34 steps total realized, 42 tests birth-red and green at their hashes, coverage clean, lint clean, full battery green. Validate - every 2026-07-05 owner ruling is realized or recorded: two markdowns, pull law, items and views, facets as expected work, decision kinds, the quarantine, the anchors. Red-team - the biggest exposure is the unproven authoring loop (no dogfood chapter has been drafted through the template yet); answered: the redraft is deliberately the refine track, with the owner in the review loop where judgment belongs. **Verdict: PASS - pending the adjudicator's bless.**
+- **Verify:** every planned step is individually blessed with its selftest green at bless time. The derived checks compute. The book artifact exists and regenerates byte-identically.
+- **Validate:** the build honors every owner ruling of this walk:
+  - the mark law with surface-versus-core
+  - margin robots
+  - Vale-not-hand-rolled
+  - generous machine-readable figures
+  - one-source AGENTS.md
+  - truth only in spec
+- **Red-team:** the largest risk was scope under deadline. Answered: the relief valve was never needed - all five stages landed. The two soft spots (Vale dependency, browser-specific disclosure) are ADR-recorded trades with fallbacks, not surprises.
+- **Extension review:**
+  - Verify - 34 steps total realized. 42 tests birth-red and green at their hashes. Coverage clean. Lint clean. Full battery green.
+  - Validate - every 2026-07-05 owner ruling is realized or recorded:
+    - two markdowns
+    - pull law
+    - items and views
+    - facets as expected work
+    - decision kinds
+    - the quarantine
+    - the anchors
+  - Red-team - the biggest exposure is the unproven authoring loop (no dogfood chapter has been drafted through the template yet). Answered: the redraft is deliberately the refine track, with the owner in the review loop where judgment belongs.
+- **Verdict: PASS - pending the adjudicator's bless.**
 
 ## Dogfood-redraft record (2026-07-07) - the gate condition worked off  → i12-m6-gate
 
-Three engine defects surfaced by the redraft, each walked test-first (amend, observe red, fix, green):
+Three engine defects surfaced by the redraft. Each was walked test-first (amend -> observe red -> fix -> green):
 
 - Fill comments (owner note, 07:56): proseUnitsMarked had no multi-line comment state - the shared stripFillComments helper now strips non-mark comments in the predicate, the renderer, and the AGENTS.md emitter. Red at b56741bc.
 - Orphan lint vs live views (owner ruling): bookOrphanFindings now counts nodes a chapter's embedded base view matches as reached; pull-law (`referenced`) queries are excluded - they follow references, never create them. Red at ca0bc4a5.
 - Grouped refs views (owner ruling): a groupBy refs view renders each group as a disclosure whose summary carries the key node's statement - usecases.base groups by the refined need. Red at 13ef4183.
 
-The redraft itself, template-faithful (canned units verbatim, fills authored):
+The redraft itself is template-faithful (canned units verbatim, fills authored):
 
 - ch0 orientation: lede fill; per-paragraph marks (a TEMPLATE defect the instantiation exposed - fixed in the template first, mirrored here; the ch8 about-unit likewise).
 - ch1 motivation: the owner-driven morning draft, rendering since the fill-comment fix.
@@ -76,9 +104,22 @@ The redraft itself, template-faithful (canned units verbatim, fills authored):
 - Facets: all 187 requirements tagged phase/discipline/quality from the type-layer vocabularies (hash-neutral; the coverage board and register filters are live).
 - Needs: the two i0004 needs gained their source stakeholders.
 
-Internal quality: full selftest ALL OK; quack lint fully clean; the book renders finding-free with all ten chapters; zero suspects throughout - the facet and needs edits proved hash-neutral as designed.
+Internal quality:
 
-**Review of the redraft:** verify - the book renders every chapter through the template; the three fixes carry red-observed tests now green. Validate - the gate condition (the dogfood spec redrafted through the template) is MET in structure; the owner's full-book read is the remaining judgment; the ELI5 rule the owner set mid-walk is baked into the voice. Red-team - the weakest spots are the empty views (methods, rules, interfaces, force-rationales - no such notes exist yet), the pattern-based facet tags (bulk judgment, owner sampling advised), and the long need statements heading the grouped use-case views; none blocks the review, all are visible in the artifact. **Verdict: redraft COMPLETE - the pager and the owner's read of the full book decide the gate.**
+- Full selftest ALL OK.
+- quack lint fully clean.
+- The book renders finding-free with all ten chapters.
+- Zero suspects throughout - the facet and needs edits proved hash-neutral as designed.
+
+**Review of the redraft:**
+
+- Verify - the book renders every chapter through the template. The three fixes carry red-observed tests now green.
+- Validate - the gate condition (the dogfood spec redrafted through the template) is MET in structure. The owner's full-book read is the remaining judgment. The ELI5 rule the owner set mid-walk is baked into the voice.
+- Red-team - the weakest spots (none blocks the review; all are visible in the artifact):
+  - the empty views (methods, rules, interfaces, force-rationales - no such notes exist yet)
+  - the pattern-based facet tags (bulk judgment, owner sampling advised)
+  - the long need statements heading the grouped use-case views
+- **Verdict: redraft COMPLETE - the pager and the owner's read of the full book decide the gate.**
 
 ## Owner-directed second wave (2026-07-07, afternoon)  → i12-m6-gate
 

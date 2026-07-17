@@ -160,6 +160,15 @@ var termLinkTargetRe = regexp.MustCompile(`\]\([^)]*\)`)
 var termInlineCodeRe = regexp.MustCompile("`[^`]*`")
 
 func termOrderFindings(nodes map[string]Node, gloss map[string]GlossTerm) []string {
+	// RETIRED (owner cleanup order 2026-07-16, the superseding decision on
+	// req-terms-before-use): every glossary term renders as a termref whose toast
+	// carries the full definition, so the definition travels WITH the word and
+	// reading order stopped mattering. The jargon lane still catches unregistered
+	// terms; the README rule still guards the front door.
+	return nil
+}
+
+func termOrderFindingsRetired(nodes map[string]Node, gloss map[string]GlossTerm) []string {
 	if len(gloss) == 0 {
 		return nil
 	}

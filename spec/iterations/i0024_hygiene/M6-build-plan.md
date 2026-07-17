@@ -46,11 +46,11 @@ Fifteen new design regions carry the markers; the derived check computes live.
 
 ## internal quality ok -> i24-m6-internal-quality-ok
 
-gofmt and vet clean on every build (the analysis gate refused one finding mid-walk and it was fixed in place). The engine's own absorption quirk (a marker swallowing its neighbor's marker line) was found by the wave's assembler, guarded in the assembler, and noted for the engine. Debug instrumentation was added and fully removed; the diff carries no scaffolding.
+gofmt and vet clean on every build (the analysis gate refused one finding mid-walk and it was fixed in place). The engine's own absorption quirk (a marker swallowing its neighbor's marker line) was found by the wave's assembler, then guarded in the assembler and noted for the engine. Debug instrumentation was added and fully removed; the diff carries no scaffolding.
 
 ## verification green -> i24-m6-verification-green-every
 
-The full backward-cumulative battery ran ONCE, at this gate, in its own visible console (`quack verify i24-m6-verification-green-every`). The verdict is read from the cache below.
+The full backward-cumulative battery ran ONCE at this gate, in its own visible console (`quack verify i24-m6-verification-green-every`). The verdict is read from the cache below.
 
 ## implementation risks acceptable -> i24-m6-implementation-risks-acceptable
 
@@ -65,10 +65,15 @@ New risk found and priced: the ratchet wedge class (b16 fixed it; one recorded e
 
 ## Review Verdict -> i24-m6-gate
 
-Verify: nineteen steps blessed with green targeted selftests; twelve reds recorded; the battery verdict at this gate.
+Verify: nineteen steps blessed with green targeted selftests. Twelve reds recorded. The battery verdict at this gate.
 
-Validate: the build answers every owner ask from 2026-07-15: the query lane (used live for the walk's own reads), hot reload (mechanics proven; live demo at M7), the statement drain (566 to zero, lane armed), and the five pulled rulings.
+Validate: the build answers every owner ask from 2026-07-15:
 
-Red-team: the riskiest residue is the harness's live adoption of list_changed — deliberately deferred to M7's killer demo with console-first as the recorded fallback. Second residue: 200 historical review gates sit suspect from the wave's ripple; the engine's own wave guard demands they wait for the walk's end, exactly as designed.
+- the query lane (used live for the walk's own reads)
+- hot reload (mechanics proven; live demo at M7)
+- the statement drain (566 to zero, lane armed)
+- the five pulled rulings
+
+Red-team: the riskiest residue is the harness's live adoption of list_changed — deliberately deferred to M7's killer demo with console-first as the recorded fallback. Second residue: 200 historical review gates sit suspect from the wave's ripple. The engine's own wave guard demands they wait for the walk's end, exactly as designed.
 
 Verdict: pass, contingent on the battery verdict above. Ready for the gate bless.

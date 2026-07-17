@@ -4,6 +4,7 @@
 The iteration's riskiest unknown: can a hand-rolled, zero-dependency, stdio MCP server be conformant enough that a REAL client completes the handshake and a tool call? adr-mcp-transport rests on this being true and small. A throwaway spike answered it with evidence, not assertion.
 
 **Verdict: CONFIRMED feasible-and-small. Nothing surprised us.**
+
 - A real MCP client (`claude` CLI 2.1.196) registered the spike binary as a stdio server, performed a live `initialize`, listed the tools, and called them: `echo` -> `hello-from-M5`, `status` -> `ok`. Proof of the real lifecycle, not a mock.
 - A deterministic conformance driver (spawns the real binary over pipes) passed ALL 19 assertions - jsonrpc/id echo (numeric and string), protocolVersion echo, capabilities, serverInfo, exactly-2-tools-with-schemas, ok-result shape, unknown-tool isError result listing the tool names, bad-args isError, notification-produces-no-reply, clean EOF exit(0).
 - **Cost: 217 lines total, ~180 non-blank, one file, stdlib only, go.mod with zero requires.** The "~200 LOC" estimate that decided adr-mcp-transport was accurate.

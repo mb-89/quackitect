@@ -1,10 +1,14 @@
 # M3 — Candidate architectures (i0012_spec_book, systematic)
 
-TL;DR: eight open axes, two to three candidates each, one preferred per axis. The riskiest new scope is figure rendering; it goes to the M5 spike. Every settled-by-requirement axis is recorded as such, not re-opened.
+TL;DR: eight open axes. Two to three candidates each, one preferred per axis. The riskiest new scope is figure rendering; it goes to the M5 spike. Every settled-by-requirement axis is recorded as such, not re-opened.
 
 ## Alternatives elaborated  → i12-m3-alternatives
 
-One card per axis: context line, options with pro and con, preferred with why.
+One card per axis:
+
+- context line
+- options with pro and con
+- preferred with why
 
 ### Axis 1 — Emitter pipeline
 Context: how the graph becomes the book.
@@ -66,11 +70,19 @@ Context: req-book-figures demands inline, machine-readable figures; view-time Me
 - **C — author-time rendered SVG committed as assets.** Pro: no engine surface. Con: hand-maintained artifacts drift; against AI-first authoring.
 - **Preferred: A, scope-capped**: a SMALL fixed set of derived diagram kinds, spiked at M5 before commitment; ASCII/`<pre>` blocks remain the honest fallback for anything beyond the set.
 
-**Settled axes NOT re-opened** (decided by blessed requirements or recorded rules): single-file, one manifest node type with modes, `---` unit separator, markdown-link refs, depth derived from anatomy, static substrate, write-time provenance recording.
+**Settled axes NOT re-opened** (decided by blessed requirements or recorded rules):
+
+- single-file
+- one manifest node type with modes
+- `---` unit separator
+- markdown-link refs
+- depth derived from anatomy
+- static substrate
+- write-time provenance recording
 
 ## Criteria weighted  → i12-m3-criteria-weighted
 
-Derived from the requirements, vital few, weight 1-5:
+Derived from the requirements — vital few, weight 1-5:
 
 - Trust and honesty (honesty, identity, drift, provenance): **5**
 - Zero-dep and self-contained (single-file, engine principle): **5**
@@ -80,7 +92,7 @@ Derived from the requirements, vital few, weight 1-5:
 - Audience register fit (tldr, register, a11y): **3**
 - Reversibility of the choice: **2**
 
-Every preferred pick above wins on the 5-weights first; the two picks that trade against the deadline (figure SVG, per-term glossary notes) are scope-capped rather than dropped.
+Every preferred pick above wins on the 5-weights first. The two picks that trade against the deadline (figure SVG, per-term glossary notes) are scope-capped rather than dropped.
 
 ## Feasibility rough-checked  → i12-m3-feasibility
 
@@ -95,7 +107,14 @@ Every preferred pick above wins on the 5-weights first; the two picks that trade
 
 ## Milestone review  → i12-m3-gate
 
-**Verify:** every open axis carries at least two elaborated candidates with pro and con; every settled axis names the requirement or ruling that settled it; the criteria derive from blessed requirements and the picks trace to them. **Validate:** the preferred set honors the frame - static substrate, AI-first drafting surface (markdown intermediates), the owner's provenance ladder preserved inside the synthesis, scope guard enforced by capping, not by dropping. **Red-team:** strongest counter - axis 8 adds real engine surface under a deadline; answered: spike-gated at M5, ASCII fallback recorded, and the AI-drawn inline SVG release valve carries one-off figures with zero engine surface. Second counter - axis 7 introduces the first soft runtime dependency; answered: never linked, pulled once, loud graceful degradation, and the alternative is maintaining a prose linter forever. Third counter - the AI judging its own involvement marks could drift self-servingly; answered: the criterion is the recorded surface-versus-core line, doubt leans higher by rule, and every mark change is reviewable in the same diff as the edit it claims to describe. **Verdict: PASS - pending the adjudicator's bless.**
+**Verify:** every open axis carries at least two elaborated candidates with pro and con. Every settled axis names the requirement or ruling that settled it. The criteria derive from blessed requirements and the picks trace to them. **Validate:** the preferred set honors the frame:
+
+- static substrate
+- AI-first drafting surface (markdown intermediates)
+- the owner's provenance ladder preserved inside the synthesis
+- scope guard enforced by capping, not by dropping
+
+**Red-team:** strongest counter - axis 8 adds real engine surface under a deadline. Answered: spike-gated at M5, with the ASCII fallback recorded. The AI-drawn inline SVG release valve carries one-off figures with zero engine surface. Second counter - axis 7 introduces the first soft runtime dependency. Answered: never linked, pulled once. Degradation is loud and graceful. The alternative is maintaining a prose linter forever. Third counter - the AI judging its own involvement marks could drift self-servingly. Answered: the criterion is the recorded surface-versus-core line. Doubt leans higher by rule. Every mark change is reviewable in the same diff as the edit it claims to describe. **Verdict: PASS - pending the adjudicator's bless.**
 
 ---
 
@@ -115,7 +134,7 @@ Context: implements edges are declared in code design markers ([cand-impl-derive
 - **A — derive connection notes from code.** Con: every failure mode is silent-drift-shaped (stale generated files, orphan connections bricking the strict guard).
 - **B — stay code-declared, merge at read time. Preferred.** Code regions already hash; DRY holds by deriving the view.
 
-Task wiring (depends_on, parent) is the recorded open sub-question: joining is jsonl-cheap; the recommendation (stay frontmatter this iteration) goes to the adjudicator at M4.
+Task wiring (depends_on, parent) is the recorded open sub-question: joining is jsonl-cheap. The recommendation (stay frontmatter this iteration) goes to the adjudicator at M4.
 
 ## Criteria weighted (extension)  → i12-m3-criteria-weighted
 The M3 weights carry unchanged; workspace bloat and Obsidian-preview fidelity score under authoring cost (4) and audience register fit (3). The candidate ratings encode them per option.

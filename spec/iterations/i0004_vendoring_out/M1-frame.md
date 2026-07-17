@@ -11,6 +11,7 @@ Evidence for the four M1 subtasks. Each section is the referent for one gate.
 ## Vision and scope  → i4-m1-vision-scope-stated
 
 Moore frame:
+
 - **For** builders who drive multiple projects with one engineering-gate engine,
 - **Who** need the engine decoupled from any single project's data,
 - **The** quackitect engine **operates on a selectable workspace**,
@@ -24,13 +25,28 @@ Moore frame:
 4. **Engine hardening from the i3 retro** — tests-pass/gateState unification, the no-trace-gate invariant.
 5. **Report** — DONE→verdict/evidence link; build/test nesting (3rd level).
 
-**Out of scope:** a multi-workspace registry/switcher UI; remote workspaces; signed-release binary (carried from i3).
+**Out of scope:**
+
+- a multi-workspace registry/switcher UI
+- remote workspaces
+- signed-release binary (carried from i3)
 
 ## Success is measurable — the acceptance contract  → i4-m1-success-measurable
 
-The **killer end-to-end** (the user's bar): *a vehicle (from `start init`) creates a dummy workspace, and the engine drives that workspace through a **full systematic iteration with empty content** — a "machinery test", every milestone argued as exercising the machinery — and **all milestones go green**, with state resolving under the workspace.* → `test-machinery-e2e` (`i4-m7-killer-ucs-demonstrated`).
+The **killer end-to-end** (the user's bar): *a vehicle (from `start init`) creates a dummy workspace. The engine drives that workspace through a **full systematic iteration with empty content** — a "machinery test", every milestone argued as exercising the machinery. **All milestones go green**, with state resolving under the workspace.* → `test-machinery-e2e` (`i4-m7-killer-ucs-demonstrated`).
 
-Every requirement maps to a test (`req-has-test`): `selftest:workspace`, `:split`, `:integrate`, `:brand`, `:claude-vendor`, `:build`, `:tests-pass-eval`, `:no-trace-gate`, `:report-verdict`, `:report-nesting`.
+Every requirement maps to a test (`req-has-test`):
+
+- `selftest:workspace`
+- `:split`
+- `:integrate`
+- `:brand`
+- `:claude-vendor`
+- `:build`
+- `:tests-pass-eval`
+- `:no-trace-gate`
+- `:report-verdict`
+- `:report-nesting`
 
 ## Top risks logged — RAID  → i4-m1-top-risks-logged
 

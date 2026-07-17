@@ -20,10 +20,16 @@ Hand-back to the adjudicator: the workspace runs entirely on the new machinery (
 
 ## Review rounds & verdict
 
-**Round 1 — Verify.** Baseline write observed (102 hashes, git-tracked change in spec/ledger); README grep for `.quack` returns nothing; entry files byte-match a fresh render (lint clean); full selftest sweep green; `decisions --parked` lists exactly the one defer.
+**Round 1 — Verify.** Five observations:
 
-**Round 2 — Validate.** The handover state IS the iteration's thesis: a clone of this repo + one launcher call reconstructs everything (bootstrap build, data home, entry files), and nothing adjudicated lives outside `spec/`. Docs describe the machine that exists, not the one that existed this morning.
+- Baseline write observed (102 hashes, git-tracked change in spec/ledger).
+- README grep for `.quack` returns nothing.
+- Entry files byte-match a fresh render (lint clean).
+- Full selftest sweep green.
+- `decisions --parked` lists exactly the one defer.
 
-**Round 3 — Red-team.** (i) "The version string is a lie of omission — big release, same 0.0.1." Held as accepted debt, recorded here; release versioning is not an i9 requirement. (ii) "Quiet `attest` violates the cli-help guide's discoverability." Deliberate tension, decided at M3/M4 (unlock lives in the contract only); the guide's core (help flags safe, no side effects) holds — `quack attest` with no args prints usage once you know it exists. (iii) "Handover to the same person who walked it is thin." True in a one-person project; the ledger's actor stamps keep the record honest about exactly that.
+**Round 2 — Validate.** The handover state IS the iteration's thesis: a clone of this repo + one launcher call reconstructs everything (bootstrap build + data home + entry files), and nothing adjudicated lives outside `spec/`. Docs describe the machine that exists, not the one that existed this morning.
 
-**Verdict: PASS.** Packaged, documented, handed over.
+**Round 3 — Red-team.** (i) "The version string is a lie of omission — big release, same 0.0.1." Held as accepted debt, recorded here. Release versioning is not an i9 requirement. (ii) "Quiet `attest` violates the cli-help guide's discoverability." Deliberate tension, decided at M3/M4 (unlock lives in the contract only). The guide's core (help flags safe and no side effects) holds — `quack attest` with no args prints usage once you know it exists. (iii) "Handover to the same person who walked it is thin." True in a one-person project; the ledger's actor stamps keep the record honest about exactly that.
+
+**Verdict: PASS.** Packaged, documented and handed over.

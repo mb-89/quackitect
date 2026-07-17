@@ -26,6 +26,7 @@ M3 feasibility already proved the two load-bearing facts (launcher internal case
 ```
 
 **What it proves (R1, R2):**
+
 - **Drive-from-inside works** — the launcher, run from within the workspace, forwarded to the resolved engine, which walked up from cwd to the workspace's own `.quack` marker: the board is the BARE workspace's own (empty), not quackitect's 175 gates. `ROOT` = the workspace, `ENGINE` = wherever the binary lives.
 - **Resolution order is real** — internal engine absent, so path B (the gitignored pointer) resolved the engine. Clean exit 0.
 - **No engine path in version control** — the only reference to the engine lives in `.quack/engine.local`, which `.gitignore` excludes; no engine binary in the tree.
@@ -38,4 +39,7 @@ Spike lives at `.quack/spikes/i5-inside-drive/` (gitignored). Keeper captured ba
 
 ## Verdict
 
-**Verify** — the spike ran green from inside a bare workspace via the resolved engine. **Validate** — it demonstrates the M1 success criteria 1 & 2 directly (inside `.\quack status`; no engine path in VC). **Red-team** — the untested branches (A fallback, clear-failure message) are named and assigned to `selftest:stubs` in M6, not hand-waved. **Pass** → gate blessed.
+- **Verify** — the spike ran green from inside a bare workspace via the resolved engine.
+- **Validate** — it demonstrates the M1 success criteria 1 & 2 directly (inside `.\quack status`; no engine path in VC).
+- **Red-team** — the untested branches (A fallback, clear-failure message) are named and assigned to `selftest:stubs` in M6, not hand-waved.
+- **Pass** → gate blessed.

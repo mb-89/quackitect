@@ -1,6 +1,6 @@
 # M6 — Build plan (i0003_engine_vehicle_go)
 
-Evidence for `i3-m6-build-planned`. The port is decomposed into small, resumable subtasks, **chained** so the build proceeds in dependency order and survives interruption. Each is one sitting of work that ends green.
+Evidence for `i3-m6-build-planned`. The port is decomposed into small resumable subtasks, **chained** so the build proceeds in dependency order and survives interruption. Each is one sitting of work that ends green.
 
 ## Build sequence (each depends on the previous)
 

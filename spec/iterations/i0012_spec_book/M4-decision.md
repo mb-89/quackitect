@@ -15,7 +15,14 @@ TL;DR: the chosen architecture is the two-stage book pipeline with owner-ruled p
 - **Register** — Decision: Vale auto-pulled per OS, subprocess, loud graceful degradation ([adr-vale-autopull](../../decisions/adr-vale-autopull.md)). Because: zero maintenance of ours; industry rules. Rejected: hand-rolled linter (owner: we would maintain it); linked dependency (breaks zero-dep).
 - **Figures** — Decision: engine-derived fixed diagram set as inline SVG, spike-gated; AI-drawn inline SVG for everything else ([adr-figures-derived-set](../../decisions/adr-figures-derived-set.md)). Because: arbitrary-graph layout is the recorded infra grave; the release valve keeps figures generous. Rejected: view-time Mermaid (script-created visuals); hand-committed assets (drift).
 
-**Pugh run.** Datum = the strongest viable rival: the REPORT-REUSE architecture (one-pass emitter on report.go, single glossary file, view-time JS figures, hand-rolled register checks) - genuinely fastest to first pixel. Criteria and weights from M3.
+**Pugh run.** Datum = the strongest viable rival: the REPORT-REUSE architecture - genuinely fastest to first pixel. Its shape:
+
+- one-pass emitter on report.go
+- single glossary file
+- view-time JS figures
+- hand-rolled register checks
+
+Criteria and weights from M3.
 
 | Criterion (weight) | Rival (datum) | Chosen |
 |---|---|---|
@@ -27,7 +34,7 @@ TL;DR: the chosen architecture is the two-stage book pipeline with owner-ruled p
 | Register fit (3) | 0 | **+** (Vale rules vs hand-rolled floor) |
 | Reversibility (2) | 0 | **+** (markdown intermediates keep every exit open) |
 
-Weighted score: chosen = +5 +5 +3 +2 − 4 = **+11** against the datum. **Sensitivity check:** raise deadline weight to 5 and drop reversibility - chosen still +10; the win rests on the three 5-weights, not on tuning. A second run with the status-quo datum (no book at all) was not needed - worth-doing was settled at M1 (the killer).
+Weighted score: chosen = +5 +5 +3 +2 − 4 = **+11** against the datum. **Sensitivity check:** raise deadline weight to 5 and drop reversibility - chosen still +10. The win rests on the three 5-weights, not on tuning. A second run with the status-quo datum (no book at all) was not needed - worth-doing was settled at M1 (the killer).
 
 **Reverse argumentation (method addition, owner 2026-07-05): the first plausible world where the winner loses.**
 
@@ -37,15 +44,22 @@ Weighted score: chosen = +5 +5 +3 +2 − 4 = **+11** against the datum. **Sensit
 
 ## Choice traced  → i12-m4-choice-traced
 
-Every card's Because names its criterion or blessed requirement; the Pugh columns ARE the M3 weights; each Rejected entry names its killing reason. The five consequential calls carry ADRs addressing their requirements; the losing options live in the cards and the ADR statements - the graveyard feeds the book's non-goals chapter later, per the design note.
+Every card's Because names its criterion or blessed requirement. The Pugh columns ARE the M3 weights. Each Rejected entry names its killing reason. The five consequential calls carry ADRs addressing their requirements. The losing options live in the cards and the ADR statements - the graveyard feeds the book's non-goals chapter later, per the design note.
 
 ## ADRs recorded and traced  → i12-m4-adr-traced
 
-Derived, computes live: five ADRs minted this milestone, each addressing a requirement. All decisions of record for this iteration trace.
+Derived, computes live: five ADRs minted this milestone — each addressing a requirement. All decisions of record for this iteration trace.
 
 ## Milestone review  → i12-m4-gate
 
-**Verify:** each axis card carries Decision, Because, and Rejected with reasons; the Pugh datum is the strongest rival, not a strawman - report-reuse would genuinely ship faster; the sensitivity flip is recorded. **Validate:** the composite honors every owner ruling from M2/M3 verbatim - involvement-only marks with the refined touch rule, auto-pull Vale with the loud warning, generous figures through the release valve, emit-time everything. **Red-team:** the deadline criterion lost to the trust criteria - is that right under a real presentation date? Answered: the rival's speed buys a book that extractors cannot read and that renders figures only with script - it fails two blessed requirements outright; speed that fails requirements is not speed. Kill-criterion carried forward: if the M5 spike shows the derived-SVG set or the disclosure mechanism infeasible, the affected axis falls back (ASCII figures, always-expanded details) WITHOUT reopening this composite. **Verdict: PASS - pending the adjudicator's bless.**
+**Verify:** each axis card carries Decision, Because and Rejected with reasons. The Pugh datum is the strongest rival, not a strawman - report-reuse would genuinely ship faster. The sensitivity flip is recorded. **Validate:** the composite honors every owner ruling from M2/M3 verbatim:
+
+- involvement-only marks with the refined touch rule
+- auto-pull Vale with the loud warning
+- generous figures through the release valve
+- emit-time everything
+
+**Red-team:** the deadline criterion lost to the trust criteria - is that right under a real presentation date? Answered: the rival's speed buys a book that extractors cannot read and that renders figures only with script - it fails two blessed requirements outright; speed that fails requirements is not speed. Kill-criterion carried forward: if the M5 spike shows the derived-SVG set or the disclosure mechanism infeasible, the affected axis falls back (ASCII figures / always-expanded details) WITHOUT reopening this composite. **Verdict: PASS - pending the adjudicator's bless.**
 
 ---
 
@@ -69,7 +83,7 @@ Derived, computes live: five ADRs minted this milestone, each addressing a requi
 | Register/preview fit (3) | 0 | **+** (tensions and interfaces preview live in Obsidian) |
 | Reversibility (2) | 0 | **=** (promote/demote moves lanes; both reversible) |
 
-Weighted: chosen = +5 +4 +3 = **+12** against the strongest rival. Sensitivity: drop preview fit to zero weight - still +9; the win rests on trust and authoring, not on the preview alone.
+Weighted: chosen = +5 +4 +3 = **+12** against the strongest rival. Sensitivity: drop preview fit to zero weight - still +9. The win rests on trust and authoring, not on the preview alone.
 
 ## Choice traced (extension)  → i12-m4-choice-traced
 Every Because names its criterion or red-team finding; the three ADRs address their requirements; chosen and rejected candidates carry the verdict edges; the losing options live in the Axis 9/10 cards with their killing reasons.

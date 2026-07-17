@@ -2,7 +2,7 @@
 
 ## Packaged and versioned  → i21-m8-packaged
 
-`quack ship` ran at this walk: `quack-i0021_field_ux.zip`, 289 entries, ~9.7 MB, with
+`quack ship` ran at this walk: `quack-i0021_field_ux.zip` with 289 entries at ~9.7 MB.
 book.html + report.html + README.md + RUNME.ps1 + RUNME.sh verified at the zip root.
 The book and report regenerated from the final build; the final battery was green
 (179/179) on that build before packaging.
@@ -14,11 +14,18 @@ The book and report regenerated from the final build; the final battery was gree
 ## Handover accepted  → i21-m8-handover
 
 The owner drove the deliverable through the whole closing day and adjudicated every gate
-of it personally — nine design rounds, a phone bless, three dual-channel hand-offs at M7,
-the RAID rulings, the ship-tags ruling. There is no separate handover to perform: the
-owner has been operating the product since noon. The session's open threads live where
-the method wants them — the notes inbox (voice on RAID statements, selftest block, MCP
-lane, battery UX) for the retro, the RAID quartet on the ledger.
+of it personally:
+
+- nine design rounds
+- a phone bless
+- three dual-channel hand-offs at M7
+- the RAID rulings
+- the ship-tags ruling
+
+There is no separate handover to perform: the owner has been operating the product since
+noon. The session's open threads live where the method wants them — the notes inbox (voice
+on RAID statements / selftest block / MCP lane / battery UX) for the retro, the RAID quartet
+on the ledger.
 
 ## Docs complete and matching the surface  → i21-m8-docs
 
@@ -47,13 +54,14 @@ re-documented where it is described:
 
 ## Milestone review and verdict  → i21-m8-gate
 
-1. Verify — every M8 subtask delivered and owner-blessed: config (baselined; ship-tags
-   ruled C, repo surface live), docs (the consistency trail; no auto-open anywhere),
-   handover (the owner operated the deliverable all day), packaged (zip verified, five
-   root files, final battery green 179/179).
+1. Verify — every M8 subtask delivered and owner-blessed:
+   - config: baselined, with ship-tags ruled C and the repo surface live
+   - docs: the consistency trail and no auto-open anywhere
+   - handover: the owner operated the deliverable all day
+   - packaged: zip verified / five root files / final battery green 179/179
 2. Validate — the iteration's reason held end to end: filling became vetoing. Every
    ruling of this closing day arrived as a proposal the owner accepted or rejected with
-   one tap, on the deliverable itself, page or phone.
+   one tap, on the deliverable itself - page or phone.
 3. Red-team — shipped but undocumented? The M7 sweep caught that class; nothing new
    surfaced. Shipped but unruled? The RAID quartet and the notes inbox hold every open
    thread, each with an owner-visible home. The pc clock and the busy-record class fix

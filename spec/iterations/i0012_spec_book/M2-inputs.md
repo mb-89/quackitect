@@ -2,9 +2,9 @@
 
 ## Audience model settled  → i12-m2-audience-model
 
-**The reader baseline (owner ruling, M1).** Every audience below is assumed at average intelligence, competence, and motivation. English is not assumed native. The content must land anyway. Big ideas first; what and why before detail; a TL;DR opens every chapter.
+**The reader baseline (owner ruling, M1).** Every audience below is assumed at average intelligence, competence and motivation. English is not assumed native. The content must land anyway. Big ideas first. What and why before detail. A TL;DR opens every chapter.
 
-**The model: who reads, in which situation, with what question.**
+**The model: who reads, in which situation and with what question.**
 
 | # | Reader | Situation | Their question | Register | Entry (preset) | Depth |
 |---|--------|-----------|----------------|----------|----------------|-------|
@@ -27,7 +27,7 @@
 - The stakeholder/view matrix on the book's entry page (ch0) IS this table, rendered: one preset button per reader row.
 - A newcomer (reader 3) reading a single chapter out of context is a SUPPORTED case: every chapter's TL;DR plus the glossary must carry enough context to stand alone.
 
-**Stakeholder classes sorted into project types (owner ruling, this walk).** The classes live as one note per class in the method layer; each project type links the classes that apply (markdown links, Obsidian-compatible). The project's overall type is never a stored flag: it derives as the union of its iterations' types, so a doc-only iteration cannot flip the whole project. Realized at M6 (req-type-stakeholders); the sorting decided now:
+**Stakeholder classes sorted into project types (owner ruling, this walk).** The classes live as one note per class in the method layer. Each project type links the classes that apply (markdown links, Obsidian-compatible). The project's overall type is never a stored flag: it derives as the union of its iterations' types, so a doc-only iteration cannot flip the whole project. Realized at M6 (req-type-stakeholders); the sorting decided now:
 
 - **default** (always applies, every project):
   - acquirer / decision maker
@@ -52,9 +52,24 @@
   - end-of-life / recycling
 - **cyber_physical**: links the software AND manufactured_good class sets - the union, three links, no duplication.
 
-Anchors: [IEC/IEEE 82079-1](https://www.iso.org/standard/71620.html) (information for use separated per target audience, unskilled to professional), [ISO/IEC/IEEE 15288](https://www.iso.org/standard/81702.html) (stakeholders attach to life-cycle stages - production, installation, support, retirement activate the manufactured classes), the SyA class rubric (at least one reader per class), arc42 (neighboring-system developers). One recorded footnote: if per-type guide/checklist CASCADING is ever built, the directory nesting question returns; for class links it has no impact.
+Anchors:
 
-**What this settles for the requirements:** every view/preset requirement traces to a reader row; the reader matrix above is the software-type rendering for THIS project; stakeholder-coverage (the next check) is judged row by row against the type-derived class set - a class with no serving row fails it.
+- [IEC/IEEE 82079-1](https://www.iso.org/standard/71620.html) — information for use separated per target audience, unskilled to professional
+- [ISO/IEC/IEEE 15288](https://www.iso.org/standard/81702.html) — stakeholders attach to life-cycle stages. The manufactured classes activate at:
+  - production
+  - installation
+  - support
+  - retirement
+- the SyA class rubric — at least one reader per class
+- arc42 — neighboring-system developers
+
+One recorded footnote: if per-type guide/checklist CASCADING is ever built, the directory nesting question returns. For class links it has no impact.
+
+**What this settles for the requirements:**
+
+- Every view/preset requirement traces to a reader row.
+- The reader matrix above is the software-type rendering for THIS project.
+- Stakeholder-coverage (the next check) is judged row by row against the type-derived class set - a class with no serving row fails it.
 
 ## Inputs captured  → i12-m2-inputs-captured
 
@@ -88,7 +103,7 @@ Every derived class has a serving row; every row has an entry preset in the matr
 
 ## Substrate thesis re-examined  → i12-m2-substrate-thesis
 
-**The thesis (owner, load-bearing):** LLM costs may rise; never assume the reader has AI. AI writes UPSTREAM into the graph; everything downstream of the graph is deterministic. Consumption never needs a model.
+**The thesis (owner, load-bearing):** LLM costs may rise. Never assume the reader has AI. AI writes UPSTREAM into the graph; everything downstream of the graph is deterministic. Consumption never needs a model.
 
 **Re-examination, 2026-07-05.** The adversarial research pass returned NO verified evidence for or against the industry direction - both the llms.txt/RAG positioning angle and the drift-detection angle came back empty. The thesis therefore stands on our own reasoning, and we say so. Directional, unverified signals from the fetch stage all point our way:
 
@@ -96,7 +111,7 @@ Every derived class has a serving row; every row has an entry preset in the matr
 - AI-driven readership of static docs reached 41% - agents already consume plain HTML.
 - AGENTS.md thrives as STATIC curation under a foundation - the agent world standardizes on curated files, not live pipelines.
 
-**The asymmetry that decides it:** if AI stays cheap, the book is ideal agent substrate (semantic DOM, trust metadata, embedded graph). If AI gets expensive, the book still serves every human reader. The bet wins in both worlds; a stored-and-gated substrate also feeds any future consumption interface.
+**The asymmetry that decides it:** if AI stays cheap, the book is ideal agent substrate (semantic DOM / trust metadata / embedded graph). If AI gets expensive, the book still serves every human reader. The bet wins in both worlds; a stored-and-gated substrate also feeds any future consumption interface.
 
 **Consequences recorded:**
 
@@ -127,19 +142,40 @@ The concrete set was positioned against the standard checklists for an HTML docu
 - [req-book-identity](req-book-identity.md) - the artifact stamps its source state (merkle root, iteration, engine version), per reproducibility practice.
 - [req-book-figures](req-book-figures.md) - inline, machine-readable figures; carries the owner's general ruling (diagrams over prose, generously, everywhere - now in the voice).
 
-Non-goals RECORDED, not added: translation/i18n (plain English is the chosen answer for non-native readers; the market-language duty of IEC/IEEE 82079-1 activates only with the manufactured_good type - noted for the type files); reader feedback (owner: a real COMMENT system, benched deliberately - captured as a note with its ready-when). This check becomes a structural M2 item in the rigor templates from this walk on.
+Non-goals RECORDED, not added:
+
+- translation/i18n — plain English is the chosen answer for non-native readers. The market-language duty of IEC/IEEE 82079-1 activates only with the manufactured_good type - noted for the type files.
+- reader feedback — owner: a real COMMENT system, benched deliberately - captured as a note with its ready-when.
+
+This check becomes a structural M2 item in the rigor templates from this walk on.
 
 ## Requirements verifiable / traced  → i12-m2-req-has-test · i12-m2-req-traced
 
-Derived, compute live: 27 requirements, each with a test node; every requirement refines a use case under [need-docu](need-docu.md) or the standing need-review. Both rules green on this board.
+Derived, compute live: 27 requirements — each with a test node. Every requirement refines a use case under [need-docu](need-docu.md) or the standing need-review. Both rules green on this board.
 
 ## Milestone review  → i12-m2-gate
 
-**Verify:** every subtask delivered against its referent - the ten-row audience model (owner-shaped, SyA/arc42-checked), the context with a probe-status ledger per environment assumption, coverage judged row-by-row against the type-derived class set, the substrate thesis re-examined with the research absence recorded. Both derived checks compute green over 21 requirements.
+**Verify:** every subtask delivered against its referent:
 
-**Validate:** every M1 ruling is now structural, none is folklore - AI-first drafting (req-ai-drafting), TL;DR/lede unified (req-chapter-tldr), register advisory (req-register-advisory), provenance icons with the stated failure direction (req-provenance-icons), type-linked stakeholders with union derivation (req-type-stakeholders), LLM digestibility as outcome with the index demoted to fallback (req-llm-digestible). The late additions were caught BY this gate's review and by the owner reading the evidence - the requirement set matched the frame only after them.
+- the ten-row audience model (owner-shaped, SyA/arc42-checked)
+- the context with a probe-status ledger per environment assumption
+- coverage judged row-by-row against the type-derived class set
+- the substrate thesis re-examined with the research absence recorded
 
-**Red-team:** weakest point probed - the requirement set grew mid-milestone (16 → 27); is it still coherent? Checked: all five additions trace to recorded owner rulings from this walk, none is speculative scope. Second probe - the substrate thesis has no external validation; answered: recorded honestly in the thesis section with a named revisit trigger, and the M7 legibility probe tests the machine-consumption half empirically. Scope guard intact: no new engine surface was promised beyond the capped set (emitter, manifest type, two lints) plus the owner-ruled type/class notes, which are method-layer data, not engine.
+Both derived checks compute green over 21 requirements.
+
+**Validate:** every M1 ruling is now structural, none is folklore:
+
+- AI-first drafting (req-ai-drafting)
+- TL;DR/lede unified (req-chapter-tldr)
+- register advisory (req-register-advisory)
+- provenance icons with the stated failure direction (req-provenance-icons)
+- type-linked stakeholders with union derivation (req-type-stakeholders)
+- LLM digestibility as outcome with the index demoted to fallback (req-llm-digestible)
+
+The late additions were caught BY this gate's review and by the owner reading the evidence - the requirement set matched the frame only after them.
+
+**Red-team:** weakest point probed - the requirement set grew mid-milestone (16 → 27); is it still coherent? Checked: all five additions trace to recorded owner rulings from this walk, none is speculative scope. Second probe - the substrate thesis has no external validation. Answered: recorded honestly in the thesis section with a named revisit trigger. The M7 legibility probe tests the machine-consumption half empirically. Scope guard intact: no new engine surface was promised beyond the capped set (emitter, manifest type and two lints) plus the owner-ruled type/class notes. Those are method-layer data, not engine.
 
 **Verdict: PASS - pending the adjudicator's bless.**
 
@@ -149,16 +185,16 @@ Derived, compute live: 27 requirements, each with a test node; every requirement
 
 ## Inputs captured (extension)  → i12-m2-inputs-captured
 
-**Owner directive:** fold the full mechanization survey into i12. Template chapters become machinery wherever text is project-independent; relations become first-class connections; housekeeping goes to determinizers. No new needs - everything traces to [need-docu](need-docu.md) through [uc-spec-template](uc-spec-template.md), [uc-book-read](uc-book-read.md), and the new [uc-connections](uc-connections.md).
+**Owner directive:** fold the full mechanization survey into i12. Template chapters become machinery wherever text is project-independent. Relations become first-class connections. Housekeeping goes to determinizers. No new needs - everything traces to [need-docu](need-docu.md) through [uc-spec-template](uc-spec-template.md), [uc-book-read](uc-book-read.md), and the new [uc-connections](uc-connections.md).
 
-**The captured input, by source (full texts in the notes archive, 2026-07-06):**
+**The captured input, by source (full texts in the 2026-07-06 notes archive):**
 
 - Owner rulings: the connection system (one system for semantic relations); storage option A (two lanes per kind); ch8 guides as notes, one subchapter per type; example notes per derived kind; the ch3 mechanization set (functions deferred); the extension scope itself, with the scope complaint pre-acknowledged as a retro lead.
 - Red-team, trust lens: hash-neutral loading is the hard requirement; migration self-audits or bakes its own bugs into the golden; the id-charset lint ships first; the edge-mode key is the migration's commit point; connection prose must hash; one pre-existing nondeterminism found (candidate verdict scans map order).
 - Red-team, standards lens: the item-kind set is standards-complete at this scale; SysML2-aligned kind vocabulary; budget gains margin; mode/state and function deferred; concern, view/viewpoint, ConOps, change-request, and actor consciously rejected.
 - Red-team, template lens: four shipped defects (fig lines render as prose, block-tree draws the book's chapters, the methods view does not exist, the need kind is half-born); mint covers 5 of 13 kinds against its own principle.
 
-**Requirement growth:** 27 → 59, all EARS-shaped, each with a test; both derived rules compute green on this board.
+**Requirement growth:** 27 → 59, all EARS-shaped and each with a test. Both derived rules compute green on this board.
 
 **Scope items flagged to the adjudicator at this gate:**
 
@@ -167,4 +203,4 @@ Derived, compute live: 27 requirements, each with a test node; every requirement
 
 ## Milestone review (extension)  → i12-m2-gate
 
-**Verify:** all 32 additions trace to recorded rulings or red-team findings; none is speculative; the derived rules compute green over the grown set. **Validate:** the owner's one-system intent survives with two evidence-forced carve-outs (implements stays code-declared; task wiring at the owner's discretion) - honesty over slogan. **Red-team:** the iteration doubled mid-flight; answered: the owner weighed a split i13 and ruled to extend, the complaint is recorded as a retro lead, and every addition rode the same M2 discipline as the original set. **Verdict: PASS - pending the adjudicator's bless.**
+**Verify:** all 32 additions trace to recorded rulings or red-team findings. None is speculative. The derived rules compute green over the grown set. **Validate:** the owner's one-system intent survives with two evidence-forced carve-outs (implements stays code-declared; task wiring at the owner's discretion) - honesty over slogan. **Red-team:** the iteration doubled mid-flight. Answered: the owner weighed a split i13 and ruled to extend. The complaint is recorded as a retro lead. Every addition rode the same M2 discipline as the original set. **Verdict: PASS - pending the adjudicator's bless.**

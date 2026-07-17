@@ -1,6 +1,6 @@
 # M2 — Requirements inputs (i0003_engine_vehicle_go)
 
-Evidence for the M2 review subtasks. The requirements themselves are the typed `req-*` trace nodes; the two derived subtasks (traced, verifiable) are computed from the trace.
+Evidence for the M2 review subtasks. The requirements themselves are the typed `req-*` trace nodes. The two derived subtasks (traced and verifiable) are computed from the trace.
 
 ## Context  → i3-m2-inputs-captured
 
@@ -20,7 +20,11 @@ System-in-focus: **the quackitect engine** (the single binary, post-port).
 - **OS / security tooling** (Windows SmartScreen, antivirus) — a constraint-bearing actor: no web-downloaded executables.
 - **Determinism / CI** — consumes the report integrity root; wants byte-identical output for the same spec.
 
-No role from M1's vision is left out: the distribution pain maps to the end user + OS tooling; the reuse goal maps to the vehicle author + maintainer; the gate trust maps to the adjudicator + determinism.
+No role from M1's vision is left out:
+
+- the distribution pain maps to the end user + OS tooling
+- the reuse goal maps to the vehicle author + maintainer
+- the gate trust maps to the adjudicator + determinism
 
 ## Requirements (the trace)  → i3-m2-requirements-traced / i3-m2-requirements-verifiable *(derived)*
 

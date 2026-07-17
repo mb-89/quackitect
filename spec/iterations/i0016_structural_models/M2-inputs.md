@@ -1,6 +1,12 @@
 # M2 - Design input (i0016_structural_models, systematic)
 
-TL;DR: Thirteen EARS requirements over three use cases define the model layer: declare after the architecture decision, check on every run, render in the book. The set was positioned against the SyA program, the book corpus (Janschek, Eigner, Pahl/Beitz), and the web-research prior art. One miss surfaced and was added: model-to-model consistency (req-model-consistency).
+TL;DR: Thirteen EARS requirements over three use cases define the model layer. Declare after the architecture decision. Check on every run. Render in the book. The set was positioned against:
+
+- the SyA program
+- the book corpus (Janschek, Eigner, Pahl/Beitz)
+- the web-research prior art
+
+One miss surfaced and was added: model-to-model consistency (req-model-consistency).
 
 ## Inputs captured  -> i16-m2-inputs
 - What flows IN:
@@ -53,13 +59,28 @@ The requirement set positioned against three source families:
 
 ## Milestone review  -> i16-m2-gate
 
-**Verify.** Every requirement is EARS-shaped (lint: clean), refines one of the three use cases, and carries a minted test with a selftest name. The inputs table lists probes with status; two assumptions are probed, one probe is explicitly owed at M5. The stakeholder table covers every always-on class with a serving row or a recorded N/A.
+**Verify.** Every requirement is EARS-shaped (lint: clean). Each refines one of the three use cases and carries a minted test with a selftest name. The inputs table lists probes with status. Two assumptions are probed. One probe is explicitly owed at M5. The stakeholder table covers every always-on class with a serving row or a recorded N/A.
 
-**Validate.** The set covers the owner's commission: declare-before-build (req-views-chosen, req-models-gate-build), draft==truth (req-draft-is-truth, req-semantic-hash), follow-the-models (req-conformance, req-divergence-suspect), book rendering (req-models-in-book). The corpus check ADDED one requirement rather than merely confirming - evidence the check had teeth.
+**Validate.** The set covers the owner's commission:
 
-**Red-team.** Sharpest opposing case: thirteen requirements for a modeling layer is heavy - could this be five? Answer: each maps to a distinct failure mode already OBSERVED (onion structure fight, no-flow layer, format churn, stale drawings) or to a corpus-named rule; none is speculative. Kill-criterion held from M1: the M5 spike on the real i14 draft. Watch-item: req-model-consistency is the only requirement without an observed failure behind it - if M6 shows it gold-plated, defer it with a recorded reason rather than build it thin.
+- declare-before-build (req-views-chosen, req-models-gate-build)
+- draft==truth (req-draft-is-truth, req-semantic-hash)
+- follow-the-models (req-conformance, req-divergence-suspect)
+- book rendering (req-models-in-book)
+
+The corpus check ADDED one requirement rather than merely confirming - evidence the check had teeth.
+
+**Red-team.** Sharpest opposing case: thirteen requirements for a modeling layer is heavy - could this be five? Answer: each maps to a corpus-named rule or to a distinct failure mode already OBSERVED. None is speculative. The observed failure modes:
+
+- onion structure fight
+- no-flow layer
+- format churn
+- stale drawings
+
+Kill-criterion held from M1: the M5 spike on the real i14 draft. Watch-item: req-model-consistency is the only requirement without an observed failure behind it - if M6 shows it gold-plated, defer it with a recorded reason rather than build it thin.
 
 **Round 4 - owner-directed deep re-check (2026-07-09, "make sure we didn't miss anything").** Full gap sweep against every source read this iteration:
+
 - MISS FOUND AND ADDED: the same-day design discussion (tray top-up, groom) produced feature surface with no covering requirement. Added req-model-tray and req-model-groom as EARS Where-shaped conditionals - they bind only if M4 admits a canvas format, so they do not presuppose the winner. Tests minted (test-model-groom pins the two provable invariants: semantic graph preserved, idempotent).
 - Leveled models (Janschek parent/child balancing): reference semantics covered by req-model-consistency; leveling rules are per-kind catalog content. No requirement owed. RECORDED.
 - Interfaces: edges ARE the interfaces; label discipline covered by req-model-lint + the catalog's dictionary rules. RECORDED.
@@ -69,4 +90,4 @@ The requirement set positioned against three source families:
 - Extraction performance: bound by the global responsiveness guide + verdict cache; watch at M6, no per-feature requirement.
 - Report tabs: owner-deferred at commission; unchanged.
 
-**Verdict: PASS** (15 requirements after round 4) - the owner blessed the gate by explicit console instruction ("bless M2", 2026-07-09), recorded --by user.
+**Verdict: PASS** (15 requirements after round 4) - the owner blessed the gate by explicit console instruction ("bless M2" on 2026-07-09). Recorded --by user.

@@ -2,24 +2,34 @@
 
 ## vision & scope stated  → i22-m1-vision-scope-stated
 
-Vision (Moore): FOR the owner-adjudicator and the driving agent, WHO lose correction
+Vision (Moore): FOR the owner-adjudicator and the driving agent WHO lose correction
 rounds to agent drift, THE engine-laws iteration is a set of engine guards THAT refuse
-unlawful walk moves, record honest battery verdicts, and put the agent on the MCP lane.
-UNLIKE harness hooks (TDD Guard, agent-guardrails), the refusal lives in the ledger's
+unlawful walk moves + record honest battery verdicts + put the agent on the MCP lane.
+UNLIKE harness hooks (TDD Guard / agent-guardrails), the refusal lives in the ledger's
 own engine: it travels with the workspace and binds every harness the same way.
 
-Goal, actual, delta:
+Goal, actual and delta:
 
 - Goal: a walk law that CAN be enforced mechanically IS enforced mechanically.
 - Actual: the laws live in prompts. i21 logged five drift incidents in three days.
 - Delta: eleven requirements across four use-cases (the approved plan).
 
-Scope: engine guards, battery trust and UX, the MCP agent channel, two lints.
-Out of scope: harness-side hooks, the phone lane, book or render work.
+Scope:
+
+- engine guards
+- battery trust and UX
+- the MCP agent channel
+- two lints
+
+Out of scope:
+
+- harness-side hooks
+- the phone lane
+- book or render work
 
 PR-FAQ pressure test (Working Backwards, condensed): "Quackitect now refuses its
 agent's own bad habits." Q: Does this slow the agent? A: No. Refusals answer instantly
-and name the lawful lane; the battery gets faster (cache, batch, cores). Q: Can the
+and name the lawful lane; the battery gets faster (cache / batch / cores). Q: Can the
 agent bypass it? A: Not on the ledger; the guards live where the record is made.
 Q: What if a guard is wrong? A: raid-over-blocking carries the escape lanes.
 
@@ -28,7 +38,7 @@ Q: What if a guard is wrong? A: raid-over-blocking carries the escape lanes.
 The problem: the walk's laws live in prompt prose. Prose bends under agent drift.
 The engine executes none of it.
 
-The recorded evidence, all from one iteration (i21, 2026-07-12 to 2026-07-14):
+The recorded evidence, all from one iteration - i21 (2026-07-12 to 2026-07-14):
 
 - Selftest over-checking. The call log counted 72 selftest calls, 35 failing. The owner complained live (NOTE-20260714-152053). The law ("the battery belongs to gates") existed the whole time.
 - Red-ritual slip. Two lint selftests reached green with no recorded red (i21 b13, NOTE-20260714-091639). The prompt carried the ritual; nothing refused the slip.
@@ -52,10 +62,10 @@ Scanned 2026-07-14 (two web sweeps; sources below). Four enforcement families ex
 - Permission surfaces. Claude Code permission modes, OpenAI Agents SDK and Codex CLI gate tools with per-tool approval policies (always / never / callback).
 - Repo and OS gates. Git pre-commit hooks, branch protection, CI required checks; ActPlane (research) pushes policy to the OS level.
 
-Positioning: every found system enforces at the HARNESS, repo, or OS layer. Quackitect
+Positioning: every found system enforces at the HARNESS, repo or OS layer. Quackitect
 enforces in the ENGINE and its ledger: the refusal travels with the workspace, binds every
-harness equally, and leaves a hashed record. The busy-no-record guard and the recorded
-standing grant (scope, expiry, morning-review collection) have no counterpart in the found
+harness equally and leaves a hashed record. The busy-no-record guard and the recorded
+standing grant (scope / expiry / morning-review collection) have no counterpart in the found
 set; per-tool "always/never" approval is the nearest relative of the grant and lacks its
 audit half. The idea stands; the differences are real.
 
@@ -70,11 +80,11 @@ Sources: [agent-guardrails](https://github.com/roboticforce/agent-guardrails),
 
 The Ch1 criteria, each checkable at M7:
 
-1. Refusals fire. Each guard (selftest gate, first-green, busy-no-record, CLI block, out-of-scope grant bless) demonstrably refuses its unlawful move, live and in a selftest.
+1. Refusals fire. Each guard (selftest gate / first-green / busy-no-record / CLI block / out-of-scope grant bless) demonstrably refuses its unlawful move, live and in a selftest.
 2. No false verdicts. A busy-guard run leaves no cache entry. The poisoned-entry class of i21 cannot recur.
 3. The battery is watchable. A console run shows one numbered line per test, live.
 4. No redundant full runs. A repeat selftest over unchanged content answers from the cache.
-5. The grant is a ledger fact. Scope, expiry, and the collected blesses are readable at the morning review.
+5. The grant is a ledger fact. Scope, expiry and the collected blesses are readable at the morning review.
 6. The agent lane is MCP. The tools are discoverable in a fresh session, and the bare CLI refuses the agent channel.
 7. The lints exist. A dash-joined or overlong statement draws a flag. A broken recital chain fails the selftest.
 
@@ -101,12 +111,12 @@ else. Both open questions were decided by the owner in-chat before this gate
 
 Round 3, red-team: the opposing case says this is self-referential tooling polish.
 Counter: the owner ordered the scope, and the metric (correction rounds burned on
-drift) is real cost, five incidents in three days. Second attack: over-blocking is
+drift) is real cost - five incidents in three days. Second attack: over-blocking is
 under-weighted. Held: raid-over-blocking carries the escape lanes, and M5 spikes
 the riskiest predicate (review-in-hand detection) before anything builds on it.
 Kill criterion, recorded: if the M5 spike shows the review-in-hand predicate cannot
-be computed reliably, req-selftest-gate's shape goes back to the owner at M4/M5
+be computed reliably then req-selftest-gate's shape goes back to the owner at M4/M5
 rather than shipping a flaky refusal.
 
 Verdict: PASS. All five subtasks delivered. Blessed under the standing grant
-(2026-07-14 evening, chat-recorded); collected for the morning review.
+(2026-07-14 evening, chat-recorded). Collected for the morning review.

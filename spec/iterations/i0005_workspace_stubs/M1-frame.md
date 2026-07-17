@@ -17,7 +17,11 @@ Evidence for the four M1 subtasks. Each section is the referent for one gate.
 
 **In scope:** committed root launcher (`quack.cmd`) resolving an engine at runtime; committed `AGENTS.md` stub; `.gitignore` for the local engine pointer/binary; extend the roundtrip machinery test to drive from inside.
 
-**Out of scope:** building/installing the engine (assumed present); retrofitting existing bare workspaces like `adapter_obs_pola` (deferred); any change to the `--base` external-drive path.
+**Out of scope:**
+
+- building/installing the engine (assumed present)
+- retrofitting existing bare workspaces like `adapter_obs_pola` (deferred)
+- any change to the `--base` external-drive path
 
 ## Success is measurable  → i5-m1-success-measurable
 
@@ -37,4 +41,7 @@ Evidence for the four M1 subtasks. Each section is the referent for one gate.
 
 ## Verdict
 
-**Verify** — the four subtasks delivered: problem, vision/scope, measurable success, RAID. **Validate** — the frame answers the real gap (a bare workspace has no entry surface); success is observable. **Red-team** — biggest exposure is R1/R2 (resolution + keeping it out of VC); both carried forward as M2 dependencies D1/D2. **Pass** → gate blessed.
+- **Verify** — the four subtasks delivered: problem, vision/scope, measurable success, RAID.
+- **Validate** — the frame answers the real gap (a bare workspace has no entry surface); success is observable.
+- **Red-team** — biggest exposure is R1/R2 (resolution + keeping it out of VC); both carried forward as M2 dependencies D1/D2.
+- **Pass** → gate blessed.
