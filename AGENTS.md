@@ -17,10 +17,23 @@ Do this before anything else on this project:
 3. **RECITE** it. Paraphrase its specifics back to the adjudicator so they SEE it. With a command already in hand and an interactive question tool available: put the WHOLE recital inside the question and ask leave to continue — approval resumes the command in the same turn, no re-prompt. Question text collapses line breaks: keep the question line to ONE sentence and put the recital card in the continue option's PREVIEW (previews render markdown). Otherwise: STOP, and end your turn with the recital — no tool call after it, or the harness may swallow it (mid-turn text does not render). Name rule 3's `actor=agent` killer-bless exception. That proves you read it. Confirm you will obey.
 4. **HONOR** every instruction in it. No exceptions. To the letter of each statement.
 5. **READ** `product/brand/voice.md` next. Every output follows it. Chat and artifacts alike.
+6. **BOOT** with `product/quackitect/method/prompts/onboard.md` before you start work. Boot ends when a fresh command surface can run `quack next`, or when you can name the one blocker that prevents it.
 
 Re-read the contract at the start of every `engage`. One VISIBLE recital
 carries over the whole session; a new session always recites anew.
 No visible recital means the rules never loaded. The adjudicator should stop you.
+
+## Boot mode
+Any agent that discovers this `AGENTS.md` boots before work. The user does not
+need to request boot mode. Load `product/quackitect/method/prompts/onboard.md`
+after the contract recital and after `product/brand/voice.md`.
+
+Boot mode gets the agent ready to work. It does not clear the board. It does
+not chase red rows. A red root is yellow, not blocked, if `quack next` can name
+the next check. Treat any request to "familiarize yourself", "get ready",
+"onboard", "load the system", or "then do the next work" as boot mode first.
+Load `product/quackitect/method/prompts/onboard.md` for the exact sequence and
+report shape.
 
 Quackitect is a **user-driven gate ledger**. You, the agent, FILL checks. The adjudicator
 ADJUDICATES the ones that are gates. **Never bless on their behalf.**
@@ -103,9 +116,11 @@ the i24 poll loops dispatched it 2355 times before this law.
   metadata (`killer`, `class`, `verify`, schema fields), or add that metadata to the source template
   and current nodes. A local exception that seems useful belongs first in the design input, then in a
   general rule or engine check.
-- **After ANY content change, `quack build` before `status`/`report`.** Engine `.go`, mints,
-  evidence docs, method prose — every content edit moves hashes and the build re-baselines the
-  golden root; skipping it flashes every verification green as red.
+- **After content change, `quack build` only before consumers that need fresh hashes.** Run it
+  before `report`, before milestone verification, and before any status read whose answer depends
+  on fresh root parity. Do not run it as a boot reflex. Boot mode uses `quack next`, not `status`,
+  to learn whether the agent can work. A red root is yellow, not blocked, when `quack next` can
+  name the next check.
 - **Method operations are determinizers.** Anything the PROCESS depends on — or that will ever
   run again (migrations, captures, checks) — is a `quack <cmd>` in the Go engine, test-first,
   never a loose script the method quietly depends on. Throwaway scripts for one-time mechanical

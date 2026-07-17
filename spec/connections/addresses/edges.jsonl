@@ -148,6 +148,9 @@
 {"src":"adr-trace-graph-unfolded","dst":"req-trace-clustered"}
 {"src":"adr-register-in-report","dst":"req-register-render"}
 {"src":"adr-register-in-report","dst":"go-register-render"}
+{"src":"adr-ifu-kind","dst":"req-ifu-markdown-source"}
+{"src":"adr-ifu-kind","dst":"req-ifu-discovery"}
+{"src":"adr-ifu-kind","dst":"req-ifu-usecase-index"}
 {"src":"adr-register-watch-answers","dst":"req-register-ask"}
 {"src":"adr-register-watch-answers","dst":"req-register-killer-guard"}
 {"src":"adr-register-watch-answers","dst":"go-register-answer"}

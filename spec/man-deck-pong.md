@@ -2,7 +2,8 @@
 id: man-deck-pong
 type: manifest
 mode: deck
-statement: The five-minutes walkthrough: from an empty folder to a shipped Pong game.
+kind: ifu
+statement: The Pong IFU: a five-minutes walkthrough from an empty folder to a shipped Pong game.
 ---
 <!-- Minutes mapping (owner ruling 2026-07-12): the timeline shows the REAL walk - the spike
   measured 10:24 total, but that included friction FIXED at i19 (legacy-edge scaffold, unclean

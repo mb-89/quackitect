@@ -3,7 +3,7 @@ id: adr-mi74yii
 type: adr
 decided_in: i0025_clean_state
 adjudicated_by: user
-statement: Retired by the owner's i25 ruling (2026-07-17): test-model-groom and test-model-tray die with their vetoed requirements. req-model-groom and req-model-tray were scrapped final in i16 (adr-fu55aja, adr-6cfyu3a); the tests' selftests left the engine in a later compaction, and the nodes rode stale cached verdicts until the i25 cache flush exposed them. A test of a vetoed requirement retires with it.
+statement: Retired by the owner's i25 ruling. test-model-groom and test-model-tray die with their vetoed requirements. req-model-groom and req-model-tray were scrapped final in i16. See adr-fu55aja and adr-6cfyu3a. Their selftests left the engine in a later compaction. Stale cached verdicts hid the nodes until the i25 cache flush exposed them. A test of a vetoed requirement retires with it.
 class: review
 killer: false
 kind: architecture

@@ -168,6 +168,11 @@
 {"src":"test-legacy-decided","dst":"req-legacy-decided"}
 {"src":"test-suspicion-attribution","dst":"req-suspicion-attribution"}
 {"src":"test-ai-provenance","dst":"req-ai-provenance"}
+{"src":"test-ifu-system","dst":"req-ifu-markdown-source"}
+{"src":"test-ifu-system","dst":"req-ifu-discovery"}
+{"src":"test-ifu-system","dst":"req-ifu-usecase-index"}
+{"src":"test-ifu-system","dst":"req-ifu-coverage"}
+{"src":"test-bless-preflight","dst":"req-bless-preflight"}
 {"src":"test-base-view-queries","dst":"req-base-view-queries"}
 {"src":"test-book-artifact","dst":"req-book-artifact"}
 {"src":"test-book-trust","dst":"req-book-trust"}

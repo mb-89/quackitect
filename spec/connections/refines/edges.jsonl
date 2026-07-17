@@ -178,6 +178,14 @@
 {"src":"req-evidence-ledger","dst":"uc-verdict-integrity"}
 {"src":"req-legacy-decided","dst":"uc-no-grandfathers"}
 {"src":"req-suspicion-attribution","dst":"uc-honest-board"}
+{"src":"uc-find-ifu","dst":"need-docu"}
+{"src":"uc-author-ifu","dst":"need-docu"}
+{"src":"uc-ifu-coverage","dst":"need-docu"}
+{"src":"req-ifu-markdown-source","dst":"uc-author-ifu"}
+{"src":"req-ifu-discovery","dst":"uc-find-ifu"}
+{"src":"req-ifu-usecase-index","dst":"uc-ifu-coverage"}
+{"src":"req-ifu-coverage","dst":"uc-ifu-coverage"}
+{"src":"req-bless-preflight","dst":"uc-lawful-walk"}
 {"src":"req-connections-lanes","dst":"uc-connections"}
 {"src":"req-book-artifact","dst":"uc-book-agent"}
 {"src":"req-book-artifact","dst":"uc-book-read"}

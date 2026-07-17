@@ -414,6 +414,25 @@ func evidenceDocSeed(iter string, ms int) string {
 	return "|evidence:" + h12(strings.Join(parts, ";"))
 }
 
+func evidenceMentionsCheck(iter string, ms int, id string) bool {
+	base := evidenceBaseOverride
+	if base == "" {
+		base = filepath.Join(SPEC, "iterations")
+	}
+	m, _ := filepath.Glob(filepath.Join(base, iter, "M"+strconv.Itoa(ms)+"-*.md"))
+	for _, p := range m {
+		raw, err := os.ReadFile(p)
+		if err != nil {
+			continue
+		}
+		body := string(raw)
+		if strings.Contains(body, "-> "+id) || strings.Contains(body, "→ "+id) || strings.Contains(body, "#"+id) {
+			return true
+		}
+	}
+	return false
+}
+
 // enddesign
 
 var traceContent = map[string]bool{"need": true, "usecase": true, "requirement": true, "design": true, "adr": true, "test": true, "manifest": true,

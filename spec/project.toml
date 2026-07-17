@@ -3,6 +3,6 @@
 [iteration]
 type    = "default"
 rigor   = "systematic"
-version = "i0025_clean_state"
+version = "i0026_ifu_system"
 edges = "connections"
 agent_lane = "mcp"

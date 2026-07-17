@@ -2,6 +2,7 @@ package main
 
 import (
 	"archive/zip"
+	"bytes"
 	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
@@ -28,6 +29,31 @@ func saveEvents(events []Event) {
 	out, _ := json.MarshalIndent(events, "", "  ")
 	os.WriteFile(ATTEST, out, 0o644)
 }
+
+// design: go-bless-preflight  implements: req-bless-preflight
+// Bless preflight is enforced at the write path. A direct bless cannot skip unfinished
+// prerequisite gates. A first-time review bless in the active iteration also needs an
+// evidence section, so a grant changes authority only, never the work owed.
+func blessPreflightVerdict(id string, n Node, nodes map[string]Node, st map[string]string, cur map[string]attestState) string {
+	for _, d := range parents(n) {
+		dep, ok := nodes[d]
+		if !ok || !isGate(dep) {
+			continue
+		}
+		if !stateSatisfies(st[d]) {
+			return "refused: " + id + " has unfinished prerequisite " + d + " (" + st[d] + ") - walk it with next before blessing"
+		}
+	}
+	if _, alreadyBlessed := cur[id]; alreadyBlessed || n.Milestone <= 0 || iterOf(n.Path) != readProjectConfig().Version {
+		return ""
+	}
+	if !evidenceMentionsCheck(iterOf(n.Path), n.Milestone, id) {
+		return "refused: " + id + " has no evidence section in M" + itoa(n.Milestone) + " evidence - write the evidence before blessing"
+	}
+	return ""
+}
+
+// enddesign
 
 // design: go-bless  implements: fill-adjudicate, suspect-bless, state-model, req-report-debounce
 // bless appends an attestation event, adjudicated_by actor plus filled_by, recorded separately. Only gates are blessable. Content and executed checks are never blessed. The event stores the full_hash and dep hashes, so any later input change makes the check SUSPECT, the suspect/bless mechanism. The actor is stamped per channel with a --by override (go-actor-channels). QUACK_ACTOR is retired. report-debounce (req-report-debounce): a bless refreshes the board so any open --watch page follows the adjudication. But a bless WAVE must not spawn dozens of identical renders, since a static output may be stale and the consumer regenerates. The refresh is debounced against the last render time, a stamp in the data home. A refresh inside reportDebounceInterval of the last render is SKIPPED. One outside it renders and re-arms the stamp. So a wave collapses to one render.
@@ -96,12 +122,17 @@ func cmdBless(args []string) {
 	}
 	events := attestEvents()
 	cur := attestLoad()
+	st := StatusMap(nodes)
 	ts := time.Now().Format(time.RFC3339)
 	grants := liveGrantsFrom(events, time.Now()) // the standing-grant rule (go-grant-store)
 	for _, nid := range ids {
 		n, ok := nodes[nid]
 		if !ok || n.Class == "executed" || !isGate(n) {
 			continue
+		}
+		if v := blessPreflightVerdict(nid, n, nodes, st, cur); v != "" {
+			fmt.Fprintln(os.Stderr, v)
+			quackExit(5)
 		}
 		gid, refused := blessGrantCheck(n.Killer, actor, grants, nid)
 		if refused {
@@ -1409,13 +1440,23 @@ func cmdVerify(args []string) {
 		return
 	}
 	memo := map[string]string{}
+	var detail bytes.Buffer
+	oldFeedback := feedbackW
+	feedbackW = &detail
+	defer func() { feedbackW = oldFeedback }()
+	verdict := ""
 	if strings.HasPrefix(n.Verify, "coverage:") {
 		ok := coverageRule(nodes, strings.TrimSpace(n.Verify[len("coverage:"):]), iterOf(n.Path))
-		fmt.Println(n.ID, "->", map[bool]string{true: "pass", false: "fail"}[ok], "(derived:", n.Verify+")")
+		verdict = fmt.Sprintln(n.ID, "->", map[bool]string{true: "pass", false: "fail"}[ok], "(derived:", n.Verify+")")
 	} else if strings.HasPrefix(n.Verify, "selftest:") {
 		ok := runSelftest(strings.TrimSpace(n.Verify[len("selftest:"):]))
-		fmt.Println(n.ID, "->", map[bool]string{true: "pass", false: "fail"}[ok])
+		verdict = fmt.Sprintln(n.ID, "->", map[bool]string{true: "pass", false: "fail"}[ok])
 	} else {
-		fmt.Println(n.ID, "->", runExecuted(n, fullHash(n.ID, nodes, memo)))
+		verdict = fmt.Sprintln(n.ID, "->", runExecuted(n, fullHash(n.ID, nodes, memo)))
+	}
+	fmt.Print(verdict)
+	if d := strings.TrimRight(detail.String(), "\n"); d != "" {
+		fmt.Println(d)
+		fmt.Print(verdict)
 	}
 }

@@ -16,7 +16,7 @@ import (
 	"strings"
 )
 
-// design: go-book-manifests  implements: req-manifest-render.1, req-spec-content-lint.2, req-lint-classification.2
+// design: go-book-manifests  implements: req-manifest-render.1, req-spec-content-lint.2, req-lint-classification.2, req-ifu-markdown-source
 // The manifest node type (adr-book-two-stage; one mechanism): a manifest is trace CONTENT whose body lists UNITS separated by `---` lines. A unit is either a node reference, a plain markdown link to a node id with optional `depth:N`, or inline markdown, ledes and glue, provenance-marked like all prose. `Note:` lines carry speaker notes, deck mode. The book-orphan lint arms once the FIRST manifest exists, fail-safe, the forward-only pattern. Every book-content node, need, usecase, requirement, adr, must be referenced by SOME manifest. An exclude-mode manifest is the explicit exclusion record, referenced-but-not-rendered.
 type ManifestUnit struct {
 	Ref     string // the referenced node id ("" for an inline unit)
@@ -30,8 +30,13 @@ type ManifestUnit struct {
 // it to the base node and keeps the sub-number for the reader
 var unitRefRe = regexp.MustCompile(`^\[([A-Za-z0-9_-]+(?:\.[0-9]+)?)\]\([^)]*\)(?:\s+depth:([1-4]))?\s*$`)
 
+var manifestBodyOverride map[string]string // selftest seam: manifest path -> body
+
 // manifestBody returns the content after the frontmatter fence of a manifest file.
 func manifestBody(path string) string {
+	if manifestBodyOverride != nil {
+		return manifestBodyOverride[path]
+	}
 	raw, err := os.ReadFile(path)
 	if err != nil {
 		return ""
@@ -5819,7 +5824,7 @@ func renderDesignRegions(nodes map[string]Node) string {
 	return b.String()
 }
 
-// design: go-guides-table  implements: req-chapter-placement.1, req-chapter-placement.2
+// design: go-guides-table  implements: req-chapter-placement.1, req-chapter-placement.2, req-ifu-discovery
 // The guides render as ONE table: one row per guide, with the TARGET AUDIENCE as a rendered, pill-filterable column and the guide's full content in the row expand. There are never per-audience sibling subchapters. Every audience class of the project type stays visible. A class with no guide renders an honest empty row, the pull law: a guide lands the day the audience asks. The agent guide is ONE ROW, audience: agent. Its expand embeds the repo-root AGENTS.md VERBATIM at render time, read, never regenerated, so the book shows exactly the file an agent reads.
 func renderGuidesTable(nodes map[string]Node) string {
 	classes := typeClassSlugs(readProjectConfig().Type)
@@ -5926,7 +5931,7 @@ func renderGuidesTable(nodes map[string]Node) string {
 
 // enddesign
 
-// design: go-views-home  implements: req-book-shell-nav.3
+// design: go-views-home  implements: req-book-shell-nav.3, req-ifu-discovery, req-ifu-usecase-index
 // The views home is BOOK CONTENT (`fig: views-home` in the orientation chapter). It opens with the DOCUMENT OVERVIEW: one line per chapter with its link. That line derives from the book structure at render time, the same order and numbers the shell uses, never a hand-maintained list. Then come the derived documents: the deck manifests baked into this same file, compiled from book content only, one row each with its present button. The reader views moved to the stakeholder rows, a view pill per reader. No preset table renders here. An empty population says so out loud.
 func renderViewsHome(nodes map[string]Node) string {
 	var chapters, decks []Node

@@ -10,6 +10,11 @@ The context is the engine and its own recorded debt. Sources, one per scope item
   - never-cached as the suite name
   - no data embedded in the executable, ever
   - discover once, fix batched, confirm once
+- one owner ruling from the onboarding review:
+  - boot mode uses `quack next` as readiness
+  - `status` is diagnostic, not a boot gate
+  - `start` does not need a fresh golden root
+  - `build` waits for report, status parity diagnosis, or milestone verification
 
 Use cases: all five requirements fold into existing use-cases.
 

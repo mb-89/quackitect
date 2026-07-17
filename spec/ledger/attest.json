@@ -62433,5 +62433,994 @@
     "statement_hash": "",
     "deps": null,
     "prev_hash": null
+  },
+  {
+    "check": "grant-20260717-145207",
+    "action": "grant-open",
+    "actor": "user",
+    "ts": "2026-07-17T14:52:07+02:00",
+    "hash": "",
+    "statement_hash": "",
+    "deps": null,
+    "prev_hash": null,
+    "scope": "i25-*",
+    "expiry": "2026-07-18T02:52:07+02:00"
+  },
+  {
+    "check": "i25-m2-gate",
+    "action": "bless",
+    "actor": "agent",
+    "filled_by": "agent",
+    "ts": "2026-07-17T14:52:14+02:00",
+    "hash": "4548b417491b",
+    "statement_hash": "a39cc54fffa0",
+    "deps": {
+      "i25-m1-gate": "ff5f6fab6584",
+      "i25-m2-inputs-captured-context": "ca5739a94d60",
+      "i25-m2-prior-art-checked": "8b339fca3680",
+      "i25-m2-requirements-traced-every": "6d78e585a730",
+      "i25-m2-requirements-verifiable-every": "5f8a0a8599c4",
+      "i25-m2-stakeholder-coverage-no": "12698964e89f"
+    },
+    "prev_hash": "3e4901cac281",
+    "grant": "grant-20260717-145207"
+  },
+  {
+    "check": "i25-m3-criteria-weighted-derived",
+    "action": "bless",
+    "actor": "agent",
+    "filled_by": "agent",
+    "ts": "2026-07-17T14:52:27+02:00",
+    "hash": "5aa59a79b91f",
+    "statement_hash": "937c576fc8d0",
+    "deps": {
+      "i25-m2-gate": "4548b417491b"
+    },
+    "prev_hash": "e56ff72016ee",
+    "grant": "grant-20260717-145207"
+  },
+  {
+    "check": "i25-m3-feasibility-rough-checked",
+    "action": "bless",
+    "actor": "agent",
+    "filled_by": "agent",
+    "ts": "2026-07-17T14:52:32+02:00",
+    "hash": "fe33326457ed",
+    "statement_hash": "6e28fad54fcc",
+    "deps": {
+      "i25-m2-gate": "4548b417491b"
+    },
+    "prev_hash": "9254e26b7b4c",
+    "grant": "grant-20260717-145207"
+  },
+  {
+    "check": "i25-m3-2-alternatives-elaborated",
+    "action": "bless",
+    "actor": "agent",
+    "filled_by": "agent",
+    "ts": "2026-07-17T14:52:41+02:00",
+    "hash": "57730bda1a55",
+    "statement_hash": "47b8a945a47d",
+    "deps": {
+      "i25-m2-gate": "4548b417491b"
+    },
+    "prev_hash": "d49b4a19db44",
+    "grant": "grant-20260717-145207"
+  },
+  {
+    "check": "i25-m3-gate",
+    "action": "bless",
+    "actor": "agent",
+    "filled_by": "agent",
+    "ts": "2026-07-17T14:52:47+02:00",
+    "hash": "54d5bf7a0f20",
+    "statement_hash": "155efe08826e",
+    "deps": {
+      "i25-m2-gate": "4548b417491b",
+      "i25-m3-2-alternatives-elaborated": "57730bda1a55",
+      "i25-m3-criteria-weighted-derived": "5aa59a79b91f",
+      "i25-m3-feasibility-rough-checked": "fe33326457ed"
+    },
+    "prev_hash": "1353b27c180f",
+    "grant": "grant-20260717-145207"
+  },
+  {
+    "check": "i25-m4-choice-traced-to",
+    "action": "bless",
+    "actor": "agent",
+    "filled_by": "agent",
+    "ts": "2026-07-17T14:52:52+02:00",
+    "hash": "e5d52b49489c",
+    "statement_hash": "6709f1d0c00d",
+    "deps": {
+      "i25-m3-gate": "54d5bf7a0f20"
+    },
+    "prev_hash": "52002a074207",
+    "grant": "grant-20260717-145207"
+  },
+  {
+    "check": "i25-m4-chosen-architecture-stated",
+    "action": "bless",
+    "actor": "agent",
+    "filled_by": "agent",
+    "ts": "2026-07-17T14:52:59+02:00",
+    "hash": "c3d5a2bf2929",
+    "statement_hash": "0742f56ad934",
+    "deps": {
+      "i25-m3-gate": "54d5bf7a0f20"
+    },
+    "prev_hash": "c7aa102575ce",
+    "grant": "grant-20260717-145207"
+  },
+  {
+    "check": "i25-m4-structuring-method-considered",
+    "action": "bless",
+    "actor": "agent",
+    "filled_by": "agent",
+    "ts": "2026-07-17T14:53:04+02:00",
+    "hash": "00033bac823a",
+    "statement_hash": "43acc86e4745",
+    "deps": {
+      "i25-m3-gate": "54d5bf7a0f20"
+    },
+    "prev_hash": "a4657b12a9b0",
+    "grant": "grant-20260717-145207"
+  },
+  {
+    "check": "i25-m4-views-chosen-model",
+    "action": "bless",
+    "actor": "agent",
+    "filled_by": "agent",
+    "ts": "2026-07-17T14:53:10+02:00",
+    "hash": "f53f86ab2398",
+    "statement_hash": "3aaf3dd7e057",
+    "deps": {
+      "i25-m3-gate": "54d5bf7a0f20"
+    },
+    "prev_hash": "942fdfa05810",
+    "grant": "grant-20260717-145207"
+  },
+  {
+    "check": "i25-m4-architecture-model-ready",
+    "action": "bless",
+    "actor": "agent",
+    "filled_by": "agent",
+    "ts": "2026-07-17T14:53:16+02:00",
+    "hash": "b4c16ee49ec4",
+    "statement_hash": "3b42249d8eed",
+    "deps": {
+      "i25-m3-gate": "54d5bf7a0f20"
+    },
+    "prev_hash": "d8187a74a4f6",
+    "grant": "grant-20260717-145207"
+  },
+  {
+    "check": "grant-20260717-145513",
+    "action": "grant-open",
+    "actor": "user",
+    "ts": "2026-07-17T14:55:13+02:00",
+    "hash": "",
+    "statement_hash": "",
+    "deps": null,
+    "prev_hash": null,
+    "scope": "i26-*",
+    "expiry": "2026-07-18T02:55:13+02:00"
+  },
+  {
+    "check": "i26-m1-state-of-the",
+    "action": "bless",
+    "actor": "agent",
+    "filled_by": "agent",
+    "ts": "2026-07-17T14:55:16+02:00",
+    "hash": "4c5167aa948e",
+    "statement_hash": "8f603d05496f",
+    "deps": {},
+    "prev_hash": null,
+    "grant": "grant-20260717-145513"
+  },
+  {
+    "check": "i26-m1-success-is-measurable",
+    "action": "bless",
+    "actor": "agent",
+    "filled_by": "agent",
+    "ts": "2026-07-17T14:57:04+02:00",
+    "hash": "46fbcf2a9b95",
+    "statement_hash": "76d01e7a16ab",
+    "deps": {},
+    "prev_hash": null,
+    "grant": "grant-20260717-145513"
+  },
+  {
+    "check": "i26-m1-top-risks-logged",
+    "action": "bless",
+    "actor": "agent",
+    "filled_by": "agent",
+    "ts": "2026-07-17T14:57:08+02:00",
+    "hash": "ca086fd8b362",
+    "statement_hash": "c511595efe38",
+    "deps": {},
+    "prev_hash": null,
+    "grant": "grant-20260717-145513"
+  },
+  {
+    "check": "i26-m1-vision-scope-stated",
+    "action": "bless",
+    "actor": "agent",
+    "filled_by": "agent",
+    "ts": "2026-07-17T14:57:15+02:00",
+    "hash": "fde9ac2f01af",
+    "statement_hash": "c6984a0f69ef",
+    "deps": {},
+    "prev_hash": null,
+    "grant": "grant-20260717-145513"
+  },
+  {
+    "check": "i26-m1-problem-agreed-the",
+    "action": "bless",
+    "actor": "agent",
+    "filled_by": "agent",
+    "ts": "2026-07-17T14:59:21+02:00",
+    "hash": "76b43fd3b610",
+    "statement_hash": "5c719fafdd84",
+    "deps": {},
+    "prev_hash": null,
+    "grant": "grant-20260717-145513"
+  },
+  {
+    "check": "i26-m1-gate",
+    "action": "bless",
+    "actor": "agent",
+    "filled_by": "agent",
+    "ts": "2026-07-17T14:59:26+02:00",
+    "hash": "2ba50a02b7e9",
+    "statement_hash": "ea95e9ecfe35",
+    "deps": {
+      "i26-m1-problem-agreed-the": "76b43fd3b610",
+      "i26-m1-state-of-the": "4c5167aa948e",
+      "i26-m1-success-is-measurable": "46fbcf2a9b95",
+      "i26-m1-top-risks-logged": "ca086fd8b362",
+      "i26-m1-vision-scope-stated": "fde9ac2f01af"
+    },
+    "prev_hash": null,
+    "grant": "grant-20260717-145513"
+  },
+  {
+    "check": "i26-m2-inputs-captured-context",
+    "action": "bless",
+    "actor": "agent",
+    "filled_by": "agent",
+    "ts": "2026-07-17T14:59:32+02:00",
+    "hash": "1a595b1d1625",
+    "statement_hash": "6bb9db9a3ce9",
+    "deps": {
+      "i26-m1-gate": "2ba50a02b7e9"
+    },
+    "prev_hash": null,
+    "grant": "grant-20260717-145513"
+  },
+  {
+    "check": "grant-20260717-145513",
+    "action": "grant-close",
+    "actor": "user",
+    "ts": "2026-07-17T15:04:29+02:00",
+    "hash": "",
+    "statement_hash": "",
+    "deps": null,
+    "prev_hash": null
+  },
+  {
+    "check": "grant-20260717-153335",
+    "action": "grant-open",
+    "actor": "user",
+    "ts": "2026-07-17T15:33:35+02:00",
+    "hash": "",
+    "statement_hash": "",
+    "deps": null,
+    "prev_hash": null,
+    "scope": "i26-*",
+    "expiry": "2026-07-18T03:33:35+02:00"
+  },
+  {
+    "check": "i26-m1-state-of-the",
+    "action": "bless",
+    "actor": "agent",
+    "filled_by": "agent",
+    "ts": "2026-07-17T15:35:25+02:00",
+    "hash": "1a66cf62f7dc",
+    "statement_hash": "ec0fe950fdaf",
+    "deps": {},
+    "prev_hash": "4c5167aa948e",
+    "grant": "grant-20260717-153335"
+  },
+  {
+    "check": "i26-m1-success-is-measurable",
+    "action": "bless",
+    "actor": "agent",
+    "filled_by": "agent",
+    "ts": "2026-07-17T15:35:34+02:00",
+    "hash": "53baa283d89b",
+    "statement_hash": "88df40918421",
+    "deps": {},
+    "prev_hash": "46fbcf2a9b95",
+    "grant": "grant-20260717-153335"
+  },
+  {
+    "check": "i26-m1-top-risks-logged",
+    "action": "bless",
+    "actor": "agent",
+    "filled_by": "agent",
+    "ts": "2026-07-17T15:35:42+02:00",
+    "hash": "a7d929438024",
+    "statement_hash": "22a4a567bbb3",
+    "deps": {},
+    "prev_hash": "ca086fd8b362",
+    "grant": "grant-20260717-153335"
+  },
+  {
+    "check": "i26-m1-vision-scope-stated",
+    "action": "bless",
+    "actor": "agent",
+    "filled_by": "agent",
+    "ts": "2026-07-17T15:35:59+02:00",
+    "hash": "31e2c755991c",
+    "statement_hash": "cdfd3c1c449d",
+    "deps": {},
+    "prev_hash": "fde9ac2f01af",
+    "grant": "grant-20260717-153335"
+  },
+  {
+    "check": "i26-m1-problem-agreed-the",
+    "action": "bless",
+    "actor": "agent",
+    "filled_by": "agent",
+    "ts": "2026-07-17T15:36:07+02:00",
+    "hash": "70168d9d1685",
+    "statement_hash": "3d055ba26c82",
+    "deps": {},
+    "prev_hash": "76b43fd3b610",
+    "grant": "grant-20260717-153335"
+  },
+  {
+    "check": "i26-m1-gate",
+    "action": "bless",
+    "actor": "agent",
+    "filled_by": "agent",
+    "ts": "2026-07-17T15:36:20+02:00",
+    "hash": "d2fd46f6a491",
+    "statement_hash": "ea95e9ecfe35",
+    "deps": {
+      "i26-m1-problem-agreed-the": "70168d9d1685",
+      "i26-m1-state-of-the": "1a66cf62f7dc",
+      "i26-m1-success-is-measurable": "53baa283d89b",
+      "i26-m1-top-risks-logged": "a7d929438024",
+      "i26-m1-vision-scope-stated": "31e2c755991c"
+    },
+    "prev_hash": "2ba50a02b7e9",
+    "grant": "grant-20260717-153335"
+  },
+  {
+    "check": "i26-m2-inputs-captured-context",
+    "action": "bless",
+    "actor": "agent",
+    "filled_by": "agent",
+    "ts": "2026-07-17T15:36:35+02:00",
+    "hash": "f0235f94a92d",
+    "statement_hash": "c5c34cdd25f5",
+    "deps": {
+      "i26-m1-gate": "d2fd46f6a491"
+    },
+    "prev_hash": "1a595b1d1625",
+    "grant": "grant-20260717-153335"
+  },
+  {
+    "check": "i26-m2-prior-art-checked",
+    "action": "bless",
+    "actor": "agent",
+    "filled_by": "agent",
+    "ts": "2026-07-17T15:36:48+02:00",
+    "hash": "dcb4df6bcb21",
+    "statement_hash": "675519a93cae",
+    "deps": {
+      "i26-m1-gate": "d2fd46f6a491"
+    },
+    "prev_hash": null,
+    "grant": "grant-20260717-153335"
+  },
+  {
+    "check": "i26-m2-stakeholder-coverage-no",
+    "action": "bless",
+    "actor": "agent",
+    "filled_by": "agent",
+    "ts": "2026-07-17T15:36:56+02:00",
+    "hash": "681323cf3351",
+    "statement_hash": "70d3fb9b35d6",
+    "deps": {
+      "i26-m1-gate": "d2fd46f6a491"
+    },
+    "prev_hash": null,
+    "grant": "grant-20260717-153335"
+  },
+  {
+    "check": "i26-m2-gate",
+    "action": "bless",
+    "actor": "agent",
+    "filled_by": "agent",
+    "ts": "2026-07-17T15:37:08+02:00",
+    "hash": "2d1cb0339022",
+    "statement_hash": "a39cc54fffa0",
+    "deps": {
+      "i26-m1-gate": "d2fd46f6a491",
+      "i26-m2-inputs-captured-context": "f0235f94a92d",
+      "i26-m2-prior-art-checked": "dcb4df6bcb21",
+      "i26-m2-requirements-traced-every": "d688837256f5",
+      "i26-m2-requirements-verifiable-every": "f6e00503ed55",
+      "i26-m2-stakeholder-coverage-no": "681323cf3351"
+    },
+    "prev_hash": null,
+    "grant": "grant-20260717-153335"
+  },
+  {
+    "check": "i26-m3-criteria-weighted-derived",
+    "action": "bless",
+    "actor": "agent",
+    "filled_by": "agent",
+    "ts": "2026-07-17T15:37:17+02:00",
+    "hash": "05f819be7e4b",
+    "statement_hash": "937c576fc8d0",
+    "deps": {
+      "i26-m2-gate": "2d1cb0339022"
+    },
+    "prev_hash": null,
+    "grant": "grant-20260717-153335"
+  },
+  {
+    "check": "i26-m3-feasibility-rough-checked",
+    "action": "bless",
+    "actor": "agent",
+    "filled_by": "agent",
+    "ts": "2026-07-17T15:37:30+02:00",
+    "hash": "73245f3aba98",
+    "statement_hash": "6e28fad54fcc",
+    "deps": {
+      "i26-m2-gate": "2d1cb0339022"
+    },
+    "prev_hash": null,
+    "grant": "grant-20260717-153335"
+  },
+  {
+    "check": "i26-m3-2-alternatives-elaborated",
+    "action": "bless",
+    "actor": "agent",
+    "filled_by": "agent",
+    "ts": "2026-07-17T15:37:39+02:00",
+    "hash": "ef09004c17b5",
+    "statement_hash": "bb672ae71ef6",
+    "deps": {
+      "i26-m2-gate": "2d1cb0339022"
+    },
+    "prev_hash": null,
+    "grant": "grant-20260717-153335"
+  },
+  {
+    "check": "i26-m3-gate",
+    "action": "bless",
+    "actor": "agent",
+    "filled_by": "agent",
+    "ts": "2026-07-17T15:37:52+02:00",
+    "hash": "2646ee6ee76a",
+    "statement_hash": "155efe08826e",
+    "deps": {
+      "i26-m2-gate": "2d1cb0339022",
+      "i26-m3-2-alternatives-elaborated": "ef09004c17b5",
+      "i26-m3-criteria-weighted-derived": "05f819be7e4b",
+      "i26-m3-feasibility-rough-checked": "73245f3aba98"
+    },
+    "prev_hash": null,
+    "grant": "grant-20260717-153335"
+  },
+  {
+    "check": "i26-m4-choice-traced-to",
+    "action": "bless",
+    "actor": "agent",
+    "filled_by": "agent",
+    "ts": "2026-07-17T15:38:01+02:00",
+    "hash": "32ac3f7743f4",
+    "statement_hash": "6709f1d0c00d",
+    "deps": {
+      "i26-m3-gate": "2646ee6ee76a"
+    },
+    "prev_hash": null,
+    "grant": "grant-20260717-153335"
+  },
+  {
+    "check": "i26-m4-chosen-architecture-stated",
+    "action": "bless",
+    "actor": "agent",
+    "filled_by": "agent",
+    "ts": "2026-07-17T15:38:13+02:00",
+    "hash": "643f836a9a7c",
+    "statement_hash": "e629382544bb",
+    "deps": {
+      "i26-m3-gate": "2646ee6ee76a"
+    },
+    "prev_hash": null,
+    "grant": "grant-20260717-153335"
+  },
+  {
+    "check": "i26-m4-structuring-method-considered",
+    "action": "bless",
+    "actor": "agent",
+    "filled_by": "agent",
+    "ts": "2026-07-17T15:38:29+02:00",
+    "hash": "360cd655cff3",
+    "statement_hash": "43acc86e4745",
+    "deps": {
+      "i26-m3-gate": "2646ee6ee76a"
+    },
+    "prev_hash": null,
+    "grant": "grant-20260717-153335"
+  },
+  {
+    "check": "i26-m4-views-chosen-model",
+    "action": "bless",
+    "actor": "agent",
+    "filled_by": "agent",
+    "ts": "2026-07-17T15:38:39+02:00",
+    "hash": "385113c81d7b",
+    "statement_hash": "3aaf3dd7e057",
+    "deps": {
+      "i26-m3-gate": "2646ee6ee76a"
+    },
+    "prev_hash": null,
+    "grant": "grant-20260717-153335"
+  },
+  {
+    "check": "i26-m4-architecture-model-ready",
+    "action": "bless",
+    "actor": "agent",
+    "filled_by": "agent",
+    "ts": "2026-07-17T15:38:54+02:00",
+    "hash": "cc3f4065aba4",
+    "statement_hash": "3b42249d8eed",
+    "deps": {
+      "i26-m3-gate": "2646ee6ee76a"
+    },
+    "prev_hash": null,
+    "grant": "grant-20260717-153335"
+  },
+  {
+    "check": "i26-m4-gate",
+    "action": "bless",
+    "actor": "agent",
+    "filled_by": "agent",
+    "ts": "2026-07-17T15:39:04+02:00",
+    "hash": "35790396d48f",
+    "statement_hash": "89c5d36a0faf",
+    "deps": {
+      "i26-m3-gate": "2646ee6ee76a",
+      "i26-m4-adr-recorded-and": "bd80a6f13c34",
+      "i26-m4-architecture-model-ready": "cc3f4065aba4",
+      "i26-m4-choice-traced-to": "32ac3f7743f4",
+      "i26-m4-chosen-architecture-stated": "643f836a9a7c",
+      "i26-m4-structuring-method-considered": "360cd655cff3",
+      "i26-m4-views-chosen-model": "385113c81d7b"
+    },
+    "prev_hash": null,
+    "grant": "grant-20260717-153335"
+  },
+  {
+    "check": "i26-m5-design-is-buildable",
+    "action": "bless",
+    "actor": "agent",
+    "filled_by": "agent",
+    "ts": "2026-07-17T15:39:21+02:00",
+    "hash": "69cddce997e1",
+    "statement_hash": "0e6fb8c74f37",
+    "deps": {
+      "i26-m4-gate": "35790396d48f"
+    },
+    "prev_hash": null,
+    "grant": "grant-20260717-153335"
+  },
+  {
+    "check": "i26-m5-spike-results-recorded",
+    "action": "bless",
+    "actor": "agent",
+    "filled_by": "agent",
+    "ts": "2026-07-17T15:39:34+02:00",
+    "hash": "6ec2b61693f8",
+    "statement_hash": "7c20517c8837",
+    "deps": {
+      "i26-m4-gate": "35790396d48f"
+    },
+    "prev_hash": null,
+    "grant": "grant-20260717-153335"
+  },
+  {
+    "check": "i26-m5-riskiest-assumptions-validated",
+    "action": "bless",
+    "actor": "agent",
+    "filled_by": "agent",
+    "ts": "2026-07-17T15:39:50+02:00",
+    "hash": "d29f36c8a4dc",
+    "statement_hash": "2c8b7309cd8c",
+    "deps": {
+      "i26-m4-gate": "35790396d48f"
+    },
+    "prev_hash": null,
+    "grant": "grant-20260717-153335"
+  },
+  {
+    "check": "i26-m5-gate",
+    "action": "bless",
+    "actor": "agent",
+    "filled_by": "agent",
+    "ts": "2026-07-17T15:40:00+02:00",
+    "hash": "1abaf3da72d2",
+    "statement_hash": "a0ca39b6aaf0",
+    "deps": {
+      "i26-m4-gate": "35790396d48f",
+      "i26-m5-design-is-buildable": "69cddce997e1",
+      "i26-m5-riskiest-assumptions-validated": "d29f36c8a4dc",
+      "i26-m5-spike-results-recorded": "6ec2b61693f8"
+    },
+    "prev_hash": null,
+    "grant": "grant-20260717-153335"
+  },
+  {
+    "check": "i26-m6-build-the-planned",
+    "action": "bless",
+    "actor": "agent",
+    "filled_by": "agent",
+    "ts": "2026-07-17T15:40:16+02:00",
+    "hash": "e0eb6fe0aa1a",
+    "statement_hash": "e609af30730f",
+    "deps": {
+      "i26-m5-gate": "1abaf3da72d2"
+    },
+    "prev_hash": null,
+    "grant": "grant-20260717-153335"
+  },
+  {
+    "check": "i26-m6-implementation-risks-acceptable",
+    "action": "bless",
+    "actor": "agent",
+    "filled_by": "agent",
+    "ts": "2026-07-17T15:40:32+02:00",
+    "hash": "0c018930543e",
+    "statement_hash": "ea7238c288ef",
+    "deps": {
+      "i26-m5-gate": "1abaf3da72d2"
+    },
+    "prev_hash": null,
+    "grant": "grant-20260717-153335"
+  },
+  {
+    "check": "i26-m6-internal-quality-ok",
+    "action": "bless",
+    "actor": "agent",
+    "filled_by": "agent",
+    "ts": "2026-07-17T15:40:42+02:00",
+    "hash": "7f0305630122",
+    "statement_hash": "9b8504927364",
+    "deps": {
+      "i26-m5-gate": "1abaf3da72d2"
+    },
+    "prev_hash": null,
+    "grant": "grant-20260717-153335"
+  },
+  {
+    "check": "i26-m6-models-adhered-to",
+    "action": "bless",
+    "actor": "agent",
+    "filled_by": "agent",
+    "ts": "2026-07-17T15:40:56+02:00",
+    "hash": "c9f4908e23f1",
+    "statement_hash": "c0516da106c2",
+    "deps": {
+      "i26-m5-gate": "1abaf3da72d2"
+    },
+    "prev_hash": null,
+    "grant": "grant-20260717-153335"
+  },
+  {
+    "check": "i26-m6-build-planned-decomposed",
+    "action": "bless",
+    "actor": "agent",
+    "filled_by": "agent",
+    "ts": "2026-07-17T15:49:17+02:00",
+    "hash": "1fd8e22d66a3",
+    "statement_hash": "dab6f2beb180",
+    "deps": {
+      "i26-m5-gate": "1abaf3da72d2"
+    },
+    "prev_hash": null,
+    "grant": "grant-20260717-153335"
+  },
+  {
+    "check": "i26-m6-gate",
+    "action": "bless",
+    "actor": "agent",
+    "filled_by": "agent",
+    "ts": "2026-07-17T15:49:32+02:00",
+    "hash": "551710c8e679",
+    "statement_hash": "e2fcdd359d0b",
+    "deps": {
+      "i26-m5-gate": "1abaf3da72d2",
+      "i26-m6-build-planned-decomposed": "1fd8e22d66a3",
+      "i26-m6-build-the-planned": "e0eb6fe0aa1a",
+      "i26-m6-design-realized-in": "686e6af1cebf",
+      "i26-m6-implementation-risks-acceptable": "0c018930543e",
+      "i26-m6-internal-quality-ok": "7f0305630122",
+      "i26-m6-models-adhered-to": "c9f4908e23f1",
+      "i26-m6-suite-observed-red": "1c1dd11d88d2",
+      "i26-m6-verification-green-every": "cc4076b68170"
+    },
+    "prev_hash": null,
+    "grant": "grant-20260717-153335"
+  },
+  {
+    "check": "i26-m7-consistency-swept-everything",
+    "action": "bless",
+    "actor": "agent",
+    "filled_by": "agent",
+    "ts": "2026-07-17T15:49:51+02:00",
+    "hash": "81cdbff198ab",
+    "statement_hash": "42c8eb703105",
+    "deps": {
+      "i26-m6-gate": "551710c8e679"
+    },
+    "prev_hash": null,
+    "grant": "grant-20260717-153335"
+  },
+  {
+    "check": "i26-m7-killer-use-cases",
+    "action": "bless",
+    "actor": "agent",
+    "filled_by": "agent",
+    "ts": "2026-07-17T15:50:05+02:00",
+    "hash": "c201fa61454b",
+    "statement_hash": "4f5fe2e19300",
+    "deps": {
+      "i26-m6-gate": "551710c8e679"
+    },
+    "prev_hash": null,
+    "grant": "grant-20260717-153335"
+  },
+  {
+    "check": "i26-m7-validation-gaps-captured",
+    "action": "bless",
+    "actor": "agent",
+    "filled_by": "agent",
+    "ts": "2026-07-17T15:50:24+02:00",
+    "hash": "73fab3377fc3",
+    "statement_hash": "dada1912c878",
+    "deps": {
+      "i26-m6-gate": "551710c8e679"
+    },
+    "prev_hash": null,
+    "grant": "grant-20260717-153335"
+  },
+  {
+    "check": "i26-m7-acceptance-obtained-sign",
+    "action": "bless",
+    "actor": "agent",
+    "filled_by": "agent",
+    "ts": "2026-07-17T15:50:38+02:00",
+    "hash": "6abacd49b8cf",
+    "statement_hash": "8fdc8a353806",
+    "deps": {
+      "i26-m6-gate": "551710c8e679"
+    },
+    "prev_hash": null,
+    "grant": "grant-20260717-153335"
+  },
+  {
+    "check": "i26-m7-meets-the-need",
+    "action": "bless",
+    "actor": "agent",
+    "filled_by": "agent",
+    "ts": "2026-07-17T15:50:52+02:00",
+    "hash": "660a376b71f1",
+    "statement_hash": "015d5330d5a9",
+    "deps": {
+      "i26-m6-gate": "551710c8e679"
+    },
+    "prev_hash": null,
+    "grant": "grant-20260717-153335"
+  },
+  {
+    "check": "i26-m7-gate",
+    "action": "bless",
+    "actor": "agent",
+    "filled_by": "agent",
+    "ts": "2026-07-17T15:51:12+02:00",
+    "hash": "5abf08fc380a",
+    "statement_hash": "a182bb3cfb43",
+    "deps": {
+      "i26-m6-gate": "551710c8e679",
+      "i26-m7-acceptance-obtained-sign": "6abacd49b8cf",
+      "i26-m7-consistency-swept-everything": "81cdbff198ab",
+      "i26-m7-killer-use-cases": "c201fa61454b",
+      "i26-m7-meets-the-need": "660a376b71f1",
+      "i26-m7-validation-gaps-captured": "73fab3377fc3"
+    },
+    "prev_hash": null,
+    "grant": "grant-20260717-153335"
+  },
+  {
+    "check": "grant-20260717-153335",
+    "action": "grant-close",
+    "actor": "user",
+    "ts": "2026-07-17T15:51:27+02:00",
+    "hash": "",
+    "statement_hash": "",
+    "deps": null,
+    "prev_hash": null
+  },
+  {
+    "check": "grant-20260717-173742",
+    "action": "grant-open",
+    "actor": "user",
+    "ts": "2026-07-17T17:37:42+02:00",
+    "hash": "",
+    "statement_hash": "",
+    "deps": null,
+    "prev_hash": null,
+    "scope": "i26-*",
+    "expiry": "2026-07-18T05:37:42+02:00"
+  },
+  {
+    "check": "i26-m6-gate",
+    "action": "bless",
+    "actor": "agent",
+    "filled_by": "agent",
+    "ts": "2026-07-17T17:38:14+02:00",
+    "hash": "d17bb97a482d",
+    "statement_hash": "e2fcdd359d0b",
+    "deps": {
+      "i26-m5-gate": "1abaf3da72d2",
+      "i26-m6-build-planned-decomposed": "1fd8e22d66a3",
+      "i26-m6-build-the-planned": "e0eb6fe0aa1a",
+      "i26-m6-design-realized-in": "686e6af1cebf",
+      "i26-m6-implementation-risks-acceptable": "0c018930543e",
+      "i26-m6-internal-quality-ok": "7f0305630122",
+      "i26-m6-models-adhered-to": "c9f4908e23f1",
+      "i26-m6-suite-observed-red": "1c1dd11d88d2",
+      "i26-m6-verification-green-every": "cc4076b68170"
+    },
+    "prev_hash": "551710c8e679",
+    "grant": "grant-20260717-173742"
+  },
+  {
+    "check": "i26-m7-consistency-swept-everything",
+    "action": "bless",
+    "actor": "agent",
+    "filled_by": "agent",
+    "ts": "2026-07-17T17:38:42+02:00",
+    "hash": "9e95c23f12b9",
+    "statement_hash": "42c8eb703105",
+    "deps": {
+      "i26-m6-gate": "d17bb97a482d"
+    },
+    "prev_hash": "81cdbff198ab",
+    "grant": "grant-20260717-173742"
+  },
+  {
+    "check": "i26-m7-killer-use-cases",
+    "action": "bless",
+    "actor": "agent",
+    "filled_by": "agent",
+    "ts": "2026-07-17T17:39:04+02:00",
+    "hash": "288c56bc29d0",
+    "statement_hash": "4f5fe2e19300",
+    "deps": {
+      "i26-m6-gate": "d17bb97a482d"
+    },
+    "prev_hash": "c201fa61454b",
+    "grant": "grant-20260717-173742"
+  },
+  {
+    "check": "i26-m7-validation-gaps-captured",
+    "action": "bless",
+    "actor": "agent",
+    "filled_by": "agent",
+    "ts": "2026-07-17T17:39:28+02:00",
+    "hash": "269a226b10b5",
+    "statement_hash": "dada1912c878",
+    "deps": {
+      "i26-m6-gate": "d17bb97a482d"
+    },
+    "prev_hash": "73fab3377fc3",
+    "grant": "grant-20260717-173742"
+  },
+  {
+    "check": "i26-m7-acceptance-obtained-sign",
+    "action": "bless",
+    "actor": "agent",
+    "filled_by": "agent",
+    "ts": "2026-07-17T17:39:53+02:00",
+    "hash": "a237c110f598",
+    "statement_hash": "8fdc8a353806",
+    "deps": {
+      "i26-m6-gate": "d17bb97a482d"
+    },
+    "prev_hash": "6abacd49b8cf",
+    "grant": "grant-20260717-173742"
+  },
+  {
+    "check": "i26-m7-meets-the-need",
+    "action": "bless",
+    "actor": "agent",
+    "filled_by": "agent",
+    "ts": "2026-07-17T17:40:14+02:00",
+    "hash": "50498e4a14a5",
+    "statement_hash": "015d5330d5a9",
+    "deps": {
+      "i26-m6-gate": "d17bb97a482d"
+    },
+    "prev_hash": "660a376b71f1",
+    "grant": "grant-20260717-173742"
+  },
+  {
+    "check": "i26-m7-gate",
+    "action": "bless",
+    "actor": "agent",
+    "filled_by": "agent",
+    "ts": "2026-07-17T17:40:38+02:00",
+    "hash": "7a04c9afb5a2",
+    "statement_hash": "a182bb3cfb43",
+    "deps": {
+      "i26-m6-gate": "d17bb97a482d",
+      "i26-m7-acceptance-obtained-sign": "a237c110f598",
+      "i26-m7-consistency-swept-everything": "9e95c23f12b9",
+      "i26-m7-killer-use-cases": "288c56bc29d0",
+      "i26-m7-meets-the-need": "50498e4a14a5",
+      "i26-m7-validation-gaps-captured": "269a226b10b5"
+    },
+    "prev_hash": "5abf08fc380a",
+    "grant": "grant-20260717-173742"
+  },
+  {
+    "check": "i26-m8-configuration-baselined",
+    "action": "bless",
+    "actor": "agent",
+    "filled_by": "agent",
+    "ts": "2026-07-17T17:41:12+02:00",
+    "hash": "1dc8a62d9d04",
+    "statement_hash": "454e73673de2",
+    "deps": {
+      "i26-m7-gate": "7a04c9afb5a2"
+    },
+    "prev_hash": null,
+    "grant": "grant-20260717-173742"
+  },
+  {
+    "check": "i26-m8-packaged-versioned",
+    "action": "bless",
+    "actor": "agent",
+    "filled_by": "agent",
+    "ts": "2026-07-17T17:42:10+02:00",
+    "hash": "78529640de97",
+    "statement_hash": "0884f52c4b20",
+    "deps": {
+      "i26-m7-gate": "7a04c9afb5a2"
+    },
+    "prev_hash": null,
+    "grant": "grant-20260717-173742"
+  },
+  {
+    "check": "i26-m8-docs-complete-match",
+    "action": "bless",
+    "actor": "agent",
+    "filled_by": "agent",
+    "ts": "2026-07-17T17:42:31+02:00",
+    "hash": "7cdcb6da88fa",
+    "statement_hash": "a597e05ab442",
+    "deps": {
+      "i26-m7-gate": "7a04c9afb5a2"
+    },
+    "prev_hash": null,
+    "grant": "grant-20260717-173742"
   }
 ]

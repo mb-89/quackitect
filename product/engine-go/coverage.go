@@ -130,6 +130,8 @@ func coverageRuleUncached(nodes map[string]Node, rule, scope string) bool {
 			}
 		}
 		return true
+	case "ifu-usecases":
+		return len(ifuCoverageMissing(nodes, scope)) == 0
 	case "adr-traced":
 		elems := modelDeclaredElements(nodes) // an addresses edge may trace to a model/element first-class (go-informed-by-edges)
 		for _, a := range adrs {

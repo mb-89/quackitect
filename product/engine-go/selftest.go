@@ -676,6 +676,7 @@ func init() {
 		i23Tests,          // i23_red.go (module workspace checks)
 		i24Tests,          // i24_red.go (the hygiene batch)
 		i25Tests,          // i25_red.go (the clean-state batch)
+		i26Tests,          // i26_red.go (the autopilot guard batch)
 	)
 }
 

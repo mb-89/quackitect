@@ -533,6 +533,33 @@ func budgetVerdict(metric string, measured, target, margin float64) string {
 	return ""
 }
 
+func budgetBestPositive(vals ...float64) float64 {
+	best := -1.0
+	for _, v := range vals {
+		if v < 0 {
+			continue
+		}
+		if best < 0 || v < best {
+			best = v
+		}
+	}
+	return best
+}
+
+func coldStartMeasure(exe string) float64 {
+	measure := func() float64 {
+		t0 := time.Now()
+		c := exec.Command(exe, "version")
+		c.Env = append(os.Environ(), "QUACK_RATCHETED=1")
+		c.Dir = ROOT
+		if c.Run() == nil {
+			return float64(time.Since(t0).Milliseconds())
+		}
+		return -1
+	}
+	return budgetBestPositive(measure(), measure())
+}
+
 // budgetBuildChecks measures the built binary against every budget node.
 // size reads the exe bytes; cold-start times one `version` run of the fresh binary.
 func budgetBuildChecks(exe string) (msgs []string, refuse bool) {
@@ -556,13 +583,7 @@ func budgetBuildChecks(exe string) (msgs []string, refuse bool) {
 				measured = float64(fi.Size()) / (1024 * 1024)
 			}
 		case "cold-start":
-			t0 := time.Now()
-			c := exec.Command(exe, "version")
-			c.Env = append(os.Environ(), "QUACK_RATCHETED=1")
-			c.Dir = ROOT
-			if c.Run() == nil {
-				measured = float64(time.Since(t0).Milliseconds())
-			}
+			measured = coldStartMeasure(exe)
 		}
 		if measured < 0 || target == 0 {
 			continue

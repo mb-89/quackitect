@@ -23,7 +23,7 @@ This chapter holds what the rest of the document stands on:
 <!-- ai:3 -->
 Every entry below is a link. Click one to open its full entry.
 ---
-## Onboarding
+## Onboarding And IFUs
 <!-- tailor: quackitect-specific landing - the section ROUTES (Diataxis: the deck
   teaches, the guides serve work, this landing only points). The deck link rides the
   anchor rail into present mode; the guides link carries the audience preset fragment.
@@ -35,10 +35,13 @@ New here? quackitect is a gated ledger around your AI agent:
 - a deterministic engine keeps the record honest
 
 <!-- ai:3 -->
+This chapter introduces IFUs.
+
+<!-- ai:3 -->
 The route in, three steps:
-- Watch the [five-minutes walkthrough](man-deck-pong). It lives among the derived documents. It walks from an empty folder to a shipped Pong game, with the measured minutes per step.
+- Watch the [Pong IFU](man-deck-pong). It lives among the derived documents. It walks from an empty folder to a shipped Pong game, with the measured minutes per step.
 - Get the toolchain. The walkthrough's first slide names both install lanes and the exact prerequisites the install scripts check.
-- Want more? [All guides for the user and newcomer audiences](guides-table--aud=user,newcomer).
+- Want more? [All guides and IFUs for the user and newcomer audiences](guides-table--aud=user,newcomer).
 ---
 ## Key concepts
 <!-- tailor: shipped machinery - the fundamentals list IS the key-concepts view:

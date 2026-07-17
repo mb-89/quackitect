@@ -561,7 +561,8 @@ func (s *mcpSession) attestChallengeResult(tool string) map[string]interface{} {
 	}
 	return mcpTextResult(false, fmt.Sprintf(
 		"ledger tool %q is refused: this session is not attested. %s Read the contract, earn a session "+
-			"key, then call the `attest` tool with it. Ledger tools then run for the rest of this connection.",
+			"key, then call the `attest` tool with it. Ledger tools then run for the rest of this connection. "+
+			"If this followed a build swap or tools/list_changed, call `attest` again with the current session key.",
 		tool, ch))
 }
 
