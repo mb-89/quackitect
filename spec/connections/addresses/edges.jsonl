@@ -202,3 +202,7 @@
 {"src":"adr-m3zsxta","dst":"req-engine-distribution"}
 {"src":"adr-ke46cra","dst":"req-voice-prose.2"}
 {"src":"adr-mi74yii","dst":"scrap"}
+{"src":"adr-onion-extend","dst":"req-onion-io-rendering"}
+{"src":"adr-slide-figref","dst":"req-ifu-split-slide"}
+{"src":"adr-pugh-fields","dst":"req-pugh-render"}
+{"src":"adr-i27-views","dst":"model-quack-structure"}

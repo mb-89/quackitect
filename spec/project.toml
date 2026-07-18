@@ -3,6 +3,6 @@
 [iteration]
 type    = "default"
 rigor   = "systematic"
-version = "i0026_ifu_system"
+version = "i0027_book_feedback"
 edges = "connections"
 agent_lane = "mcp"

@@ -1089,6 +1089,12 @@ func handoffAccepts(gateID string, nodes map[string]Node, sm map[string]string) 
 		if n.Type == "test" || n.Type == "" {
 			continue
 		}
+		// a PROPOSED question the owner rules on the page: a y finalizes the proposal —
+		// state proposed → decided, keeping the proposed decided_via letter as the ruling.
+		if n.Type == "question" && questionState(n) == "proposed" {
+			fs = append(fs, handoffDefault{node: id, field: "state", value: "decided"})
+			continue
+		}
 		schema := mergedSchema(schemas, n.Type)
 		fm := frontmatterMap(n.Path)
 		if len(schema.fields) == 0 || fm["id"] != id {
@@ -1211,6 +1217,10 @@ func renderHandoffHTML(gateID string, nodes map[string]Node, sm map[string]strin
 		switch {
 		case r.n.Type == "test" || r.n.Type == "":
 			// state, not a decision
+		case r.n.Type == "question" && questionState(r.n) == "proposed":
+			blockers = append(blockers, r) // a PROPOSAL you rule on: the card reads "Bless selects <letter>"
+		case r.n.Type == "question" && questionState(r.n) == "decided":
+			doneRows = append(doneRows, r) // already ruled: "Decided <letter>", bless changes nothing
 		case r.color == "reg-red" || (r.n.Killer && isGate(r.n) && sm[r.id] != "DONE"):
 			blockers = append(blockers, r)
 		case hasRuling(r):

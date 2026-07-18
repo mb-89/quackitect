@@ -1262,6 +1262,7 @@ func renderBookHTML(nodes map[string]Node) (string, []string, []string) {
 		"body[data-present] .slide{display:none}body[data-present] .slide.current{display:block;position:fixed;inset:0;background:" + bookColors["bg"] + ";padding:8vh 10vw;overflow:auto;z-index:9}" +
 		// the slide counter: baked chrome the present script fills; hidden outside present mode
 		"#slide-pos{display:none}body[data-present] #slide-pos{display:block;position:fixed;right:16px;bottom:12px;z-index:10;font-size:13px;color:" + bookColors["meta"] + ";background:" + bookColors["bg"] + ";border:1px solid #ddd;border-radius:12px;padding:2px 10px;font-variant-numeric:tabular-nums}" +
+		"#slide-esc{display:none}body[data-present] #slide-esc{display:block;position:fixed;right:16px;bottom:44px;z-index:10;font:inherit;font-size:12px;color:" + bookColors["meta"] + ";background:" + bookColors["bg"] + ";border:1px solid #ddd;border-radius:12px;padding:2px 10px;cursor:pointer}" +
 		// the deck timeline: a slim measured-minutes bar across the presented deck's slides
 		".deck-timeline{display:none}" +
 		// prominent (owner rule): a visibly taller bar, a "time since start" caption above it,
@@ -1361,6 +1362,7 @@ func renderBookHTML(nodes map[string]Node) (string, []string, []string) {
 	doc.WriteString(bodyHTML)
 	doc.WriteString(`</main>
 <div id="slide-pos" role="status"></div>
+<button id="slide-esc" type="button" title="close the slideshow">ESC</button>
 </div>
 <script>/* filters and toggles only - this script never creates content (go-book-shell) */
 (function(){
@@ -1720,10 +1722,13 @@ func renderBookHTML(nodes map[string]Node) (string, []string, []string) {
   if(e.key==='ArrowLeft')pageShow(pg-1,true);});
  pageShow(0,false);
  var cur=-1,slides=[];
- function show(i){if(!slides.length)return;cur=(i+slides.length)%slides.length;
+ /* navigation clamps at the ends - no wraparound (owner ruling) */
+ function show(i){if(!slides.length)return;cur=Math.max(0,Math.min(slides.length-1,i));
   slides.forEach(function(s,j){s.classList.toggle('current',j===cur);});
   var sp=document.getElementById('slide-pos');if(sp)sp.textContent=(cur+1)+'/'+slides.length;
   if(window.__deckShown)window.__deckShown(slides[cur],cur);}
+ function deckExit(){if(window.__deckExit)window.__deckExit();b.removeAttribute('data-present');slides.forEach(function(s){s.classList.remove('current');});slides=[];cur=-1;}
+ var esc=document.getElementById('slide-esc');if(esc)esc.addEventListener('click',deckExit);
  document.querySelectorAll('button.present').forEach(function(btn){btn.addEventListener('click',function(){
   var d=document.getElementById(btn.getAttribute('data-deck'));
   slides=Array.prototype.slice.call(d.querySelectorAll('.slide'));
@@ -1739,7 +1744,7 @@ func renderBookHTML(nodes map[string]Node) (string, []string, []string) {
   if(e.target&&e.target.matches&&e.target.matches('input,textarea,select'))return;
   if(e.key==='ArrowRight'||e.key==='PageDown')show(cur+1);
   if(e.key==='ArrowLeft'||e.key==='PageUp')show(cur-1);
-  if(e.key==='Escape'){if(window.__deckExit)window.__deckExit();b.removeAttribute('data-present');slides.forEach(function(s){s.classList.remove('current');});slides=[];cur=-1;}});
+  if(e.key==='Escape')deckExit();});
  apply();
 })();
 `)

@@ -18,3 +18,6 @@
 {"src":"adr-slack-text-poll","dst":"cand-slack-socket"}
 {"src":"adr-ntfy-actions","dst":"cand-ntfy-reply"}
 {"src":"adr-ask-seam-exec-lane","dst":"cand-seam-internal"}
+{"src":"adr-onion-extend","dst":"cand-onion-fresh"}
+{"src":"adr-slide-figref","dst":"cand-embed-template"}
+{"src":"adr-pugh-fields","dst":"cand-pugh-block"}

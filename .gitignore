@@ -15,6 +15,8 @@ __pycache__/
 .venv/
 # throwaway exploration scratch (refine)
 .quack/spikes/
+# local drawing scratch — a drawing becomes spec by moving into an iteration folder
+Excalidraw/
 # gathered source bundles (derived)
 .quack/gather/
 

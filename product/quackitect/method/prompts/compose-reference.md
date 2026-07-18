@@ -111,6 +111,13 @@ statements only — tests keep verifying (`verifies:`, tests-red discipline) and
 exactly as above.
 <!-- enddesign -->
 
+## Decision criteria in the agent era (owner law)
+- BUILD EFFORT is a human-era criterion. With an agent building, weigh it at 0.05-0.10, or drop it. The training-data default of cost-heavy weighting encodes a world where people typed the code.
+- What stays genuinely scarce, and may be weighed instead: the OWNER's review attention, and machine-bound verification time (the battery on the reference machine).
+- REWORK vs REBUILD decides on ARCHITECTURE FIT, not effort: extend when the existing architecture holds; rewrite when the architecture must change. A spike that shows the architecture cannot host the new need IS the rewrite trigger.
+- The rewrite-safety precondition is this method itself: the classic never-rewrite warning rests on knowledge trapped in old code; a traced spec with test-first coverage externalizes that knowledge, so a rewrite loses nothing the ledger holds.
+- ALWAYS-REGENERATE (phoenix-style) is rejected: regenerating unchanged architecture spends review and verification for the same result. And a regeneration that LOSES behavior indicts the SPEC, not the code - fix the spec and regenerate again. The full grounding with references: the rationale `why-regenerable-code`.
+
 ## Voice binds authored nodes
 `product/brand/voice.md` binds every authored `statement:` field. A node is prose like chat and
 the book. Re-read voice.md before authoring any node batch. One thought per sentence. Aim for

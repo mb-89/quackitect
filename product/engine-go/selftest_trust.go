@@ -94,8 +94,11 @@ func selftestParserStrict() bool {
 		return false
 	}
 	// and the loader must never load what recognition rejects (no unchecked side door)
+	// (7) a committed Excalidraw drawing opens with '---' but is a spec artifact, not a node
+	drawing := []byte("---\n\nexcalidraw-plugin: parsed\ntags: [excalidraw]\n\n---\n# Excalidraw Data\n")
 	return !nodeFence([]byte("# prose evidence doc\n---\nx: y\n---\n")) &&
-		nodeFence([]byte("---\nid: x\n---\n")) && nodeFence([]byte("\ufeff---\nid: x\n---\n"))
+		nodeFence([]byte("---\nid: x\n---\n")) && nodeFence([]byte("\ufeff---\nid: x\n---\n")) &&
+		!nodeFence(drawing)
 }
 
 // selftestRefIntegrity — test-ref-integrity: a reference through any edge field

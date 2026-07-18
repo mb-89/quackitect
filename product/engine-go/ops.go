@@ -28,7 +28,11 @@ func saveEvents(events []Event) {
 	os.MkdirAll(filepath.Dir(ATTEST), 0o755)
 	out, _ := json.MarshalIndent(events, "", "  ")
 	os.WriteFile(ATTEST, out, 0o644)
-	attestEventsMemo[ATTEST] = events
+	var mt, sz int64
+	if fi, err := os.Stat(ATTEST); err == nil {
+		mt, sz = fi.ModTime().UnixNano(), fi.Size()
+	}
+	attestEventsMemo[ATTEST] = attestMemoEntry{events, mt, sz}
 }
 
 // design: go-bless-preflight  implements: req-bless-preflight

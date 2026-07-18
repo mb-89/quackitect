@@ -37,8 +37,11 @@ func questionFindings(nodes map[string]Node) []string {
 		if st == "decided" && strings.TrimSpace(n.DecidedVia) == "" {
 			findings = append(findings, id+": decided without decided_via (provenance is required)")
 		}
-		if st != "decided" && strings.TrimSpace(n.DecidedVia) != "" {
-			findings = append(findings, id+": decided_via on an undecided question")
+		// decided_via carries the letter on BOTH a proposed and a decided question: the
+		// agent's PROPOSAL on the hand-off ("Bless selects A"), the recorded ruling once
+		// decided. Only an OPEN question must not carry it — nothing is proposed yet.
+		if st == "open" && strings.TrimSpace(n.DecidedVia) != "" {
+			findings = append(findings, id+": decided_via on an open question (set state to proposed to propose a letter)")
 		}
 	}
 	return findings

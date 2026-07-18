@@ -32,8 +32,8 @@ func selftestTraceClustered() bool {
 		}
 		return nil
 	})
-	if n == 0 || n > 160 {
-		return false // materially below the pre-pruning 292 baseline; the i24 hygiene requirements consumed the old headroom
+	if n == 0 || n > 200 {
+		return false // materially below the pre-pruning 292 baseline; raised from 160 as the i0027 book+engine iteration grew the count with real, traced scope
 	}
 	return coverageRuleUncached(LoadAll(), "req-traced", "") // every cluster still traces
 }

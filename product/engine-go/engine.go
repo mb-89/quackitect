@@ -499,19 +499,32 @@ type Event struct {
 	Expiry        string            `json:"expiry,omitempty"`  // grant-open: RFC3339 end of the stretch
 }
 
-// attestEventsMemo: one parse of the append-only log per process, keyed by the
-// ATTEST path; saveEvents writes through so a same-process append stays visible.
-var attestEventsMemo = map[string][]Event{}
+// attestEventsMemo: one parse of the append-only log per FILE STATE, keyed by the
+// ATTEST path. A cheap stat guards freshness: a bless written by ANOTHER process
+// (the pager's watch server, a console) must stay visible to a long-lived reader
+// like the resident MCP child. The stat costs microseconds; the memo saves the
+// guarded parse of the whole ledger.
+type attestMemoEntry struct {
+	events []Event
+	mtime  int64
+	size   int64
+}
+
+var attestEventsMemo = map[string]attestMemoEntry{}
 
 func attestEvents() []Event {
-	if ev, ok := attestEventsMemo[ATTEST]; ok {
-		return ev
+	var mt, sz int64
+	if fi, err := os.Stat(ATTEST); err == nil {
+		mt, sz = fi.ModTime().UnixNano(), fi.Size()
+	}
+	if e, ok := attestEventsMemo[ATTEST]; ok && e.mtime == mt && e.size == sz {
+		return e.events
 	}
 	var ev []Event
 	if raw, err := os.ReadFile(ATTEST); err == nil {
 		json.Unmarshal(raw, &ev)
 	}
-	attestEventsMemo[ATTEST] = ev
+	attestEventsMemo[ATTEST] = attestMemoEntry{ev, mt, sz}
 	return ev
 }
 

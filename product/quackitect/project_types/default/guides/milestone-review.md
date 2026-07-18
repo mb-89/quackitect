@@ -18,6 +18,8 @@ Each review covers two sets of checks. The milestone's own checks. And every inp
 
 **The M4 gate is a DIAGRAM review (hard rule).** Architecture is decided as a MODEL, not just as text. The M4 gate cannot bless until the chosen views exist as model nodes with their elements ALLOCATED (the blocks the build will fill, ahead of any code), the structure drawn, and each architecture ADR marked `kind: architecture` and linked to the element(s) it shapes. The architect (owner) reviews the DIAGRAM here and approves the decomposition before anyone builds. M6 then adheres: the build fills the allocated elements and invents no element the diagram did not sanction (the conformance/sky-fall lint enforces adherence). A genuinely-needed new element found mid-build goes back through an architecture review, never in silently. This is the architect→developer handoff made structural; revert only if it proves to cost more than it protects.
 
+**The M4 review asks the boilerplate question.** While reviewing the diagram, name each block that could classify as boilerplate: meaning-free utilities, stable plumbing, uniformly-coupled infrastructure. The owner stamps the confirmed ones. The model stays complete regardless. The stamp only governs the render's hide-boilerplate control, since the model is design input, never documentation.
+
 **The stranger's read (final milestone of a reader-facing iteration).** When the
 milestone ships an artifact meant for outside readers (the book, a guide, a README),
 the red-team round includes a COLD READER: a fresh agent with zero project knowledge,

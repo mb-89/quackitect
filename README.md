@@ -17,9 +17,9 @@ There has to be a better way!
 **quackitect**  
 *The rubber duck that went to engineering school.*
 
-quackitect is an [LLM](spec/book.html#term-llm) Harness: rules and tools wrapped around an AI agent while it works. It knows how to properly architect. It's trained on forty years of engineering method: requirements engineering, architecture decision records, the V-model, verification and validation, the whole canon. You want to shoot a rocket to the moon? quackitect knows how they did it.
+quackitect is an [LLM](https://mb-89.github.io/quackitect/book.html#term-llm) Harness: rules and tools wrapped around an AI agent while it works. It knows how to properly architect. It's trained on forty years of engineering method: requirements engineering, architecture decision records, the V-model, verification and validation, the whole canon. You want to shoot a rocket to the moon? quackitect knows how they did it.
 
-It asks the right questions, at the right time. It pushes back where you need it. It sharpens your ideas, writes down your decisions, understands your requirements and traces them into your design. It designs the deliverable, tests it, documents it. Once you plan changes, it tells you the impact.
+It asks the right questions, at the right time. It pushes back where you need it. It sharpens your ideas, writes down your decisions, understands your requirements and traces them into your design. It designs the deliverable, tests it, documents it. When (not if) you plan changes, it tells you the impact.
 
 All you bring is the big ideas — and your judgement.
 
@@ -47,12 +47,12 @@ Engineers driving work with AI agents — software or any other discipline — w
 The primary way to use quackitect is to **tell your AI agent what you need**. It runs the
 onboarding for you.
 
-> Say to your agent: **“clone https://github.com/mb-89/quackitect, and lets start a new project”**
-
-**Not ready to hand over a repo yet?** Watch a **[5-minute walkthrough](https://mb-89.github.io/quackitect/book.html#man-deck-pong)** first — an empty folder to a shipped, playable Pong game, measured end to end.
+> Say to your agent: “clone https://github.com/mb-89/quackitect, and lets start a new project”
 
 Quackitect will guide you through all steps up to your first [milestone](https://mb-89.github.io/quackitect/book.html#term-milestone).
 Need more details, or a list of all functions? Ask it.
+
+> Not ready to hand over a repo yet? **Watch this:** [From nothing to pong in 5 minutes](https://mb-89.github.io/quackitect/book.html#man-deck-pong)
 
 <p align="center"><img src=".github/report.png" width="860" alt="The quackitect report — gated milestones (left), the trace graph (center), and coverage metrics (right)."></p>
 

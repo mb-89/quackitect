@@ -365,6 +365,16 @@ func selftestRegisterKillerGuard() bool {
 // field with provenance on the second, distinct marks for the two greens, y/n bless
 // actions on the page (dead buttons on a stale file are fine - the owner's ruling),
 // and the REPORT carries no standing register section.
+// hasHoffField reports whether a handoffAccepts result carries a specific field write.
+func hasHoffField(fs []handoffDefault, node, field, value string) bool {
+	for _, f := range fs {
+		if f.node == node && f.field == field && f.value == value {
+			return true
+		}
+	}
+	return false
+}
+
 func selftestRegisterRender() bool {
 	dir, err := os.MkdirTemp("", "q21hoff")
 	if err != nil {
@@ -379,7 +389,17 @@ func selftestRegisterRender() bool {
 	gate := write("g1-gate.md", "---\nid: g1-gate\nstatement: M1 reviewed and adjudicated.\nmilestone: M1\nclass: review\nkiller: true\ndepends_on: [raid-open, raid-ruled]\n---\n")
 	red := write("raid-open.md", "---\nid: raid-open\ntype: raid\nstatement: the open risk\nkind: risk\nmitigation: TBD - propose or veto\nstatus: open\nkiller: false\nprovenance:\n  kind: schema-default (risk)\n  mitigation: tbd - no default\n  status: schema-default (open)\n---\n")
 	ruled := write("raid-ruled.md", "---\nid: raid-ruled\ntype: raid\nstatement: the ruled risk\nkind: risk\nprobability: 0.2\nimpact: 0.9\nmitigation: bounded by the spike\nowner: the maintainer\nstatus: open\nkiller: false\nprovenance:\n  kind: user-ruling via console\n  probability: user-ruling via console\n  impact: user-ruling via console\n  mitigation: user-ruling via console\n  owner: user-ruling via console\n  status: user-ruling via console\n---\n")
-	nodes := map[string]Node{"g1-gate": gate, "raid-open": red, "raid-ruled": ruled}
+	// a PROPOSED question: the card must read "Bless selects <letter>", and a bless finalizes it
+	prop := write("q-fix.md", "---\nid: q-fix\ntype: question\nstate: proposed\ndecided_via: B\nstatement: which way?\nclass: review\nkiller: false\n---\n## Options\n\nA) first way.\n\nB) second way.\n")
+	nodes := map[string]Node{"g1-gate": gate, "raid-open": red, "raid-ruled": ruled, "q-fix": prop}
+	sm := map[string]string{"g1-gate": "OPEN", "raid-open": "OPEN", "raid-ruled": "DONE", "q-fix": "OPEN"}
+	if !strings.Contains(renderHandoffHTML("g1-gate", nodes, sm), "Bless selects") ||
+		!strings.Contains(renderHandoffHTML("g1-gate", nodes, sm), "B)") {
+		return false // a proposed decision names the letter a bless selects
+	}
+	if fs, _ := handoffAccepts("g1-gate", nodes, sm); !hasHoffField(fs, "q-fix", "state", "decided") {
+		return false // a y finalizes the proposal: state proposed -> decided
+	}
 	html := renderHandoffHTML("g1-gate", nodes, map[string]string{"g1-gate": "OPEN", "raid-open": "OPEN", "raid-ruled": "DONE"})
 	if !strings.Contains(html, "<h1>M1</h1>") || strings.Contains(html, "Action:") || strings.Contains(html, "Check:") {
 		return false // the page opens with the milestone title and no redundant labels

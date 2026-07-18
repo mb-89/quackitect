@@ -16,7 +16,9 @@ decided and via what; it never simulates the deciding. Id prefix `q-`.
 - `type` (question): fixed.
 - `statement` (one sentence): the question itself — a question, not a shall-statement (EARS never applies).
 - `state` (open | proposed | decided): the decision state; anything else is a lint finding.
-- `decided_via` (free text): how the ruling happened (owner ruling, expedition finding, measurement). Required once `state: decided`; a lint finding on an undecided question.
+- `decided_via` (a letter or free text): carries the letter on a `proposed` OR a `decided` question. On `proposed` it is the agent's PROPOSAL, so a hand-off card reads "Bless selects A" and a bless finalizes it. On `decided` it is the recorded ruling. Required once `state: decided`. A lint finding only on an `open` question (nothing is proposed yet).
+
+An open question that reaches a hand-off is unanswerable: the card reads "no ruling renderable yet". Before a hand-off, set `state: proposed` and `decided_via: <letter>` so the owner rules by accepting or rejecting the proposal.
 
 ## Body
 The candidates considered and what the answer unblocks. On decision, the ruling's

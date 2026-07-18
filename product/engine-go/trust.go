@@ -90,17 +90,42 @@ func subAddrBase(ref string) string {
 
 // enddesign
 
-// nodeFence is THE single recognition rule, shared by the strict guard and the loader (LoadAll,
-// scanIDs): a file is a node candidate iff its first line (UTF-8 BOM stripped) is the '---' fence.
-// One rule means nothing can be loaded unchecked — a BOM'd file can slip past the guard while
-// the lenient loader still parses it.
+// design: go-drawing-not-node  implements: req-drawing-is-spec
+// nodeFence is the single recognition rule. The strict guard and the loader both share it. A file
+// is a node candidate when its first line is the fence, after a UTF-8 BOM is stripped. One rule
+// means nothing loads unchecked. A committed drawing opens with the same fence but is a spec
+// artifact, never a trace node. Its frontmatter carries an excalidraw-plugin key. The rule rejects
+// it here. So a drawing lives in the iteration folder without being parsed, id-scanned, or
+// strict-refused. drawingFrontmatter reads only the frontmatter block. It stays path-agnostic.
 func nodeFence(raw []byte) bool {
 	s := strings.TrimPrefix(string(raw), "\ufeff")
+	first := s
 	if i := strings.IndexByte(s, '\n'); i >= 0 {
-		s = s[:i]
+		first = s[:i]
 	}
-	return strings.TrimSpace(s) == "---"
+	if strings.TrimSpace(first) != "---" {
+		return false
+	}
+	return !drawingFrontmatter(s)
 }
+
+// drawingFrontmatter reports whether the opening frontmatter block declares an Excalidraw drawing.
+// It scans the lines between the first '---' fence and its close for the `excalidraw-plugin` key.
+func drawingFrontmatter(s string) bool {
+	lines := strings.Split(s, "\n")
+	for i := 1; i < len(lines); i++ {
+		t := strings.TrimSpace(lines[i])
+		if t == "---" {
+			return false // reached the close without the marker
+		}
+		if strings.HasPrefix(t, "excalidraw-plugin:") {
+			return true
+		}
+	}
+	return false
+}
+
+// enddesign
 
 // StrictIssues walks one directory tree and returns every strict-load finding, batched.
 func StrictIssues(specDir string) []ParseIssue {

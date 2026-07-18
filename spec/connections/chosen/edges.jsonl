@@ -16,3 +16,8 @@
 {"src":"adr-register-watch-answers","dst":"model-register-ask-flow"}
 {"src":"adr-guard-dispatch-layer","dst":"model-guard-tree"}
 {"src":"adr-grant-ledger-events","dst":"model-grant-lifecycle"}
+{"src":"adr-onion-extend","dst":"cand-onion-extend"}
+{"src":"adr-slide-figref","dst":"cand-embed-figref"}
+{"src":"adr-pugh-fields","dst":"cand-pugh-fields"}
+{"src":"adr-i27-views","dst":"model-quack-structure"}
+{"src":"adr-i27-views","dst":"model-engine-layers"}
