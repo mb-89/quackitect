@@ -103,7 +103,9 @@ func selftestModelsCompleteBook() bool {
 	for _, f := range modelKindFiles() {
 		kind := strings.TrimSuffix(filepath.Base(f), filepath.Ext(f))
 		if !strings.Contains(html, "data-kind-example=\""+kind+"\"") {
-			return false // one example figure per supported kind, from the registry
+			// every shipped kind is USED in this workspace, so each renders; an
+			// unused kind would be honestly absent (req-model-kinds-catalog)
+			return false
 		}
 	}
 	return true

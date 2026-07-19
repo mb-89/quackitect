@@ -13,9 +13,7 @@
 {"src":"adr-slack-text-poll","dst":"cand-slack-text-poll"}
 {"src":"adr-ntfy-actions","dst":"cand-ntfy-actions"}
 {"src":"adr-ask-seam-exec-lane","dst":"cand-seam-exec-lane"}
-{"src":"adr-register-watch-answers","dst":"model-register-ask-flow"}
 {"src":"adr-guard-dispatch-layer","dst":"model-guard-tree"}
-{"src":"adr-grant-ledger-events","dst":"model-grant-lifecycle"}
 {"src":"adr-onion-extend","dst":"cand-onion-extend"}
 {"src":"adr-slide-figref","dst":"cand-embed-figref"}
 {"src":"adr-pugh-fields","dst":"cand-pugh-fields"}

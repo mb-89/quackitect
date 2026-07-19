@@ -7,7 +7,7 @@ applies_type: [default]
 # neighbour — one external system or actor on the context boundary
 
 Lives in `spec/trace/`. The ch3 context unit derives its figures from these
-notes: the context star draws one border-connected node per neighbour, and the
+notes: the context model draws one border-connected node per neighbour, and the
 neighbours view lists each with its interface line. Model the neighbour once
 here; never hand-author it into prose. Id prefix `nbr-`; the star labels the
 node with the id minus the prefix, so pick the id for reading.

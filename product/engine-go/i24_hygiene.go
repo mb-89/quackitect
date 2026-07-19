@@ -262,6 +262,37 @@ func (s *supSequence) orderHeld() bool {
 
 func supDrainTimeout() time.Duration { return 10 * time.Second }
 
+// design: go-supervisor-hardening  implements: req-supervisor-any-swap
+// The 2026-07-18 four-process wedge, killed at the root by the owner's directive. A
+// wanted swap FORCES through once the drain timeout passes: stuck replies drop with a
+// loud log line instead of wedging every later call forever. The swap also SWEEPS stale
+// parked binaries (quack.exe.old*). Deletion succeeds exactly when no process holds one,
+// so the sweep is the leak detector too. The kill path waits bounded and escalates
+// before a new child spawns: never two children alive on purpose.
+func supForceSwap(inFlight int, waited, timeout time.Duration) bool {
+	return inFlight > 0 && waited > timeout
+}
+
+func sweepStaleParks(dir string) int {
+	ents, err := os.ReadDir(dir)
+	if err != nil {
+		return 0
+	}
+	n := 0
+	for _, e := range ents {
+		name := e.Name()
+		if e.IsDir() || !strings.HasPrefix(name, "quack.exe.old") {
+			continue
+		}
+		if os.Remove(filepath.Join(dir, name)) == nil {
+			n++
+		}
+	}
+	return n
+}
+
+// enddesign
+
 // enddesign
 
 // design: go-root-content  implements: req-root-content
@@ -526,7 +557,7 @@ func budgetVerdict(metric string, measured, target, margin float64) string {
 	}
 	switch {
 	case measured > hardCap:
-		return fmt.Sprintf("budget: %s %.0f exceeds the hard cap %.0f - build refused", metric, measured, hardCap)
+		return fmt.Sprintf("budget: %s %.0f exceeds the hard cap %.0f - shrink the change or raise the budget node, then re-run", metric, measured, hardCap)
 	case measured > target:
 		return fmt.Sprintf("budget: %s %.0f over target %.0f (hard cap %.0f) - trim before the cap bites", metric, measured, target, hardCap)
 	}

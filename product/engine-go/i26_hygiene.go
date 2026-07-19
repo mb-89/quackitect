@@ -2,14 +2,15 @@ package main
 
 import (
 	"sort"
-	"strings"
 )
 
 // design: go-ifu-coverage  implements: req-ifu-coverage
 // IFU decks are ordinary markdown deck manifests with `kind: ifu`. Their source is the
 // authoring truth. The coverage rule reads those sources and requires every in-scope
-// use case to be visibly named by at least one IFU deck. The link target can live on
-// the final slide; the checker cares about source truth, not slide position.
+// use case to be LINKED on at least one IFU deck's COVERAGE slide. That slide is the
+// last one, the arc's machine-readable reference home (go-ifu-arc-lint, i27). A
+// scattered or bare mention satisfies nothing: that is the coverage theater the owner
+// banned.
 func ifuCoverageMissing(nodes map[string]Node, scope string) []string {
 	covered := map[string]bool{}
 	var ids []string
@@ -23,9 +24,13 @@ func ifuCoverageMissing(nodes map[string]Node, scope string) []string {
 		if n.Type != "manifest" || n.Mode != "deck" || n.Kind != "ifu" {
 			continue
 		}
-		body := manifestBody(n.Path)
+		units := parseManifestUnits(manifestBody(n.Path))
+		if len(units) == 0 {
+			continue
+		}
+		last := units[len(units)-1].Body
 		for _, id := range ids {
-			if strings.Contains(body, id) {
+			if ifuRefLinked(last, id) {
 				covered[id] = true
 			}
 		}

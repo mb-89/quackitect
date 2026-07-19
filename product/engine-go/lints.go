@@ -146,7 +146,7 @@ func specLintFindingsAt(specDir string, nodes map[string]Node) (external, residu
 
 // fundamentalsChapterID names the chapter the glossary splices into — one fact,
 // shared by the renderer's splice and this lint's definition point.
-const fundamentalsChapterID = "man-ch2-fundamentals"
+const fundamentalsChapterID = "man-fundamentals"
 
 // termOrderBlocking is the lane's contribution to lint's blocking count: always zero.
 // A term-order finding informs the author (req-terms-before-use.3); the selftest pins

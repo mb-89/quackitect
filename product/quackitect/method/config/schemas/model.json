@@ -2,7 +2,7 @@
   "type": "model",
   "fields": ["kind"],
   "type_kind": "enum",
-  "enum_kind": ["context", "element-tree", "sequence", "state"],
+  "enum_kind": ["context", "structural", "onion"],
   "tier_kind": "core",
   "required": ["statement", "kind"]
 }

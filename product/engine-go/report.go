@@ -185,7 +185,8 @@ func iterationOfNode(n Node, nodes map[string]Node, seen map[string]bool) string
 // stakeholder, raid, rationale, record, and the extension kinds - are content, never
 // graph nodes; the engine's traceContent classification keeps them counted and off
 // the walkable board.
-var traceTypes = map[string]bool{"need": true, "usecase": true, "requirement": true, "design": true, "test": true, "adr": true}
+var traceTypes = map[string]bool{"need": true, "usecase": true, "requirement": true, "design": true, "test": true, "adr": true,
+	"function": true} // first-class need decomposition (go-function-nodes)
 
 // A semantic target may name a numbered statement (req-x.2). The graph resolves it
 // against the base node with the ONE suffix helper (go-sub-addressing); the raw id
@@ -278,7 +279,106 @@ func buildTab(label string, idset map[string]bool, nodes map[string]Node, sm map
 			els = append(els, gel{Data: map[string]string{"id": e[0] + "__" + id, "source": e[0], "target": id, "etype": e[1]}})
 		}
 	}
-	return gtab{Label: label, Count: len(ids), Elements: els}
+	return collapseTraceTab(gtab{Label: label, Count: len(ids), Elements: els}, nodes)
+}
+
+// enddesign
+
+// design: go-trace-collapsible  implements: req-trace-collapsible
+// Homogeneous fan-outs fold (owner ruling, the M2 sessions): a parent with
+// traceClusterMin or more same-type, single-parent LEAF children renders them as ONE
+// typed cluster node. The type keeps its place and its color. The cluster joins the parent
+// by a DOUBLE line (two parallel bezier edges; the node wears the double border).
+// Opening the cluster shows the BUSBAR INTERIOR, the onion-cluster law
+// (req-onion-clusters): a coreless box, the parent lane as an identified input bar,
+// every member a block riding it. Multi-parent or child-bearing nodes never fold:
+// folding them would tear real edges off the graph.
+const traceClusterMin = 5
+
+func collapseTraceTab(t gtab, nodes map[string]Node) gtab {
+	parentsOf := map[string][]string{}
+	childrenOf := map[string][]string{}
+	nodeEl := map[string]gel{}
+	var nodeIDs []string
+	var edges []gel
+	for _, e := range t.Elements {
+		if e.Data["source"] != "" {
+			edges = append(edges, e)
+			parentsOf[e.Data["target"]] = append(parentsOf[e.Data["target"]], e.Data["source"])
+			childrenOf[e.Data["source"]] = append(childrenOf[e.Data["source"]], e.Data["target"])
+			continue
+		}
+		nodeEl[e.Data["id"]] = e
+		nodeIDs = append(nodeIDs, e.Data["id"])
+	}
+	group := map[[2]string][]string{}
+	for _, id := range nodeIDs {
+		if len(childrenOf[id]) > 0 || len(parentsOf[id]) != 1 {
+			continue
+		}
+		key := [2]string{parentsOf[id][0], nodeEl[id].Data["type"]}
+		group[key] = append(group[key], id)
+	}
+	keys := make([][2]string, 0, len(group))
+	for k, members := range group {
+		if len(members) >= traceClusterMin {
+			keys = append(keys, k)
+		}
+	}
+	if len(keys) == 0 {
+		return t
+	}
+	sort.Slice(keys, func(i, j int) bool {
+		return keys[i][0]+"|"+keys[i][1] < keys[j][0]+"|"+keys[j][1]
+	})
+	folded := map[string]bool{}
+	var clusters, clusterEdges []gel
+	for _, key := range keys {
+		members := group[key]
+		sort.Strings(members)
+		for _, m := range members {
+			folded[m] = true
+		}
+		cid := "cl:" + key[0] + ":" + key[1]
+		clusters = append(clusters, gel{Data: map[string]string{
+			"id": cid, "label": itoa(len(members)) + " " + key[1] + "s", "type": key[1],
+			"cluster": "1", "members": strings.Join(members, ","),
+			"interior": traceClusterInterior(cid, key[0], key[1], members, nodes)}})
+		for i := 0; i < 2; i++ {
+			// two parallel bezier edges read as the double join
+			clusterEdges = append(clusterEdges, gel{Data: map[string]string{
+				"id": cid + "__j" + itoa(i), "source": key[0], "target": cid, "etype": "cluster"}})
+		}
+	}
+	out := make([]gel, 0, len(t.Elements))
+	for _, id := range nodeIDs {
+		if !folded[id] {
+			out = append(out, nodeEl[id])
+		}
+	}
+	out = append(out, clusters...)
+	for _, e := range edges {
+		if folded[e.Data["source"]] || folded[e.Data["target"]] {
+			continue
+		}
+		out = append(out, e)
+	}
+	out = append(out, clusterEdges...)
+	return gtab{Label: t.Label, Count: t.Count, Elements: out}
+}
+
+// traceClusterInterior renders the cluster's busbar interior: the parent lane as the
+// identified input bar, every member a block tapping it.
+func traceClusterInterior(cid, parent, typ string, members []string, nodes map[string]Node) string {
+	var blocks []*obusBlock
+	for _, m := range members {
+		bl := &obusBlock{id: m, label: m, full: strings.TrimSpace(nodes[m].Statement)}
+		bl.tapIn(0)
+		blocks = append(blocks, bl)
+	}
+	vid := "tcl-" + strings.NewReplacer(":", "-", "/", "-").Replace(cid)
+	title := itoa(len(members)) + " " + typ + "s under " + parent
+	return onionViewSVG(title, title, vid, []string{"from " + parent}, nil, blocks, nil, false, obusOpts{})
 }
 
 // enddesign
@@ -447,6 +547,13 @@ func renderSubsCurrent(ids []string, nodes map[string]Node, sm map[string]string
 }
 
 func renderSubsMarked(ids []string, nodes map[string]Node, sm map[string]string, marked map[string]bool) string {
+	return renderSubsDrill(ids, nodes, sm, marked, nil, nil)
+}
+
+// renderSubsDrill is the full tree emit: marked rows carry the this-page chip, DECIDING
+// rows wear the deciding mark (the hand-off's yellow surface, req-timeline-drilldown),
+// and a task with drill content becomes an expandable row holding it.
+func renderSubsDrill(ids []string, nodes map[string]Node, sm map[string]string, marked, deciding map[string]bool, drill func(string) string) string {
 	set := map[string]bool{}
 	for _, id := range ids {
 		set[id] = true
@@ -507,18 +614,29 @@ func renderSubsMarked(ids []string, nodes map[string]Node, sm map[string]string,
 		if marked[id] {
 			auto += " <span class=\"auto current\" title=\"this page blesses this check\">this page</span>"
 		}
+		dec := ""
+		if deciding[id] {
+			dec = " deciding" // the surface under decision is unmistakable (owner ruling)
+		}
 		row := mark(sm[id]) + "<span class=\"rid\">" + esc(id) + "</span>" + auto
+		d := ""
+		if drill != nil {
+			d = drill(id)
+		}
 		ks := kids[id]
 		if len(ks) > 0 {
 			ordered(ks)
 			// a parent with children is a collapsible group (open by default)
-			b.WriteString("<details class=\"task par\" open><summary data-nid=\"" + esc(id) + "\">" + row + "</summary><div class=\"kids\">")
+			b.WriteString("<details class=\"task par" + dec + "\" open><summary data-nid=\"" + esc(id) + "\">" + row + "</summary>" + d + "<div class=\"kids\">")
 			for _, k := range ks {
 				emit(k)
 			}
 			b.WriteString("</div></details>")
+		} else if d != "" {
+			// a leaf with recorded content is itself expandable — the drill inside
+			b.WriteString("<details class=\"task par tdl" + dec + "\"><summary data-nid=\"" + esc(id) + "\">" + row + "</summary>" + d + "</details>")
 		} else {
-			b.WriteString("<a class=\"task leaf\" href=\"#\" data-nid=\"" + esc(id) + "\">" + row + "</a>")
+			b.WriteString("<a class=\"task leaf" + dec + "\" href=\"#\" data-nid=\"" + esc(id) + "\">" + row + "</a>")
 		}
 	}
 	for _, r := range roots {
@@ -561,6 +679,28 @@ func milestoneDisplayTitle(iter string, ms int, nodes map[string]Node) string {
 	return label
 }
 
+// design: go-timeline-frames  implements: req-timeline-anchor, req-project-timeline
+// The REPORT and BOOK frames of the shared timeline (go-timeline-shared). The report's
+// old bracket-lane tree died with the one-renderer ruling: each iteration row keeps its
+// summary count, and its body is the shared component in the report frame. The working
+// milestone starts open. The panel stacks iterations OLDEST FIRST inside .qtl-scroll between an
+// arrow on each end (overflow scrolls by arrow and wheel, never pagination). The
+// shell script anchors the CURRENT iteration three quarters down the viewport, earlier
+// iterations above (req-timeline-anchor). The book frame renders every iteration at full
+// width through the same component, the current one open.
+func timelineOpenMS(it string, gates []string, nodes map[string]Node, sm map[string]string) int {
+	openMS := 0
+	for _, id := range gates {
+		if sm[id] == "DONE" || nodes[id].Milestone == 0 {
+			continue
+		}
+		if openMS == 0 || nodes[id].Milestone < openMS {
+			openMS = nodes[id].Milestone
+		}
+	}
+	return openMS
+}
+
 func iterationsPanel(nodes map[string]Node, sm map[string]string, iters map[string][]string, cfg Config) string {
 	var its []string
 	for it := range iters {
@@ -568,6 +708,7 @@ func iterationsPanel(nodes map[string]Node, sm map[string]string, iters map[stri
 	}
 	sort.Strings(its)
 	var b strings.Builder
+	b.WriteString(`<div class="qtl-anchor"><button type="button" class="uarrow" data-uscroll="up">▲</button><div class="qtl-scroll" id="qtl-scroll">`)
 	for _, it := range its {
 		var gates []string
 		for _, id := range iters[it] {
@@ -593,74 +734,164 @@ func iterationsPanel(nodes map[string]Node, sm map[string]string, iters map[stri
 			}
 		}
 		b.WriteString(fmt.Sprintf("<details class=\"iter%s\"%s><summary data-iter=\"%s\">%s <span class=\"%s\">%s</span></summary>", cur, op, esc(it), esc(it), fracCls, frac))
-		lanes := map[int][]string{}
-		var loose []string
-		for _, id := range gates {
-			if ms, ok := milestoneOf(nodes[id]); ok {
-				lanes[ms] = append(lanes[ms], id)
-			} else {
-				loose = append(loose, id)
-			}
-		}
-		b.WriteString("<div class=\"tg\">")
-		b.WriteString("<div class=\"bracket start\" data-bracket=\"" + esc(it) + "::start\"><span class=\"bdot\"></span>START</div>")
-		msset := map[int]bool{}
-		for _, m := range policyMilestones(rigorOf(it, cfg)) {
-			msset[m] = true
-		}
-		for m := range lanes {
-			msset[m] = true
-		}
-		var mss []int
-		for m := range msset {
-			mss = append(mss, m)
-		}
-		sort.Ints(mss)
-		for _, ms := range mss {
-			members := lanes[ms]
-			sort.Strings(members)
-			gate := milestoneGate(members, ms)
-			var subs []string
-			for _, m := range members {
-				if m != gate {
-					subs = append(subs, m)
-				}
-			}
-			d := 0
-			for _, x := range subs {
-				if sm[x] == "DONE" {
-					d++
-				}
-			}
-			gmark := mark("OPEN")
-			attr := ""
-			if gate != "" {
-				gmark = mark(sm[gate])
-				attr = " data-nid=\"" + esc(gate) + "\""
-			}
-			body := renderSubs(subs, nodes, sm)
-			if len(subs) == 0 {
-				body = "<div class=\"mshint\">no subtasks</div>"
-			}
-			openAttr := ""
-			if len(subs) > 0 {
-				openAttr = " open"
-			}
-			b.WriteString(fmt.Sprintf("<details class=\"ms%s\"><summary%s>%s<span class=\"mstag\">%s</span><span class=\"mscount\">%d/%d</span></summary><div class=\"kids\">%s</div></details>",
-				openAttr, attr, gmark, esc(milestoneDisplayTitle(it, ms, nodes)), d, len(subs), body))
-		}
-		if len(loose) > 0 {
-			b.WriteString("<div class=\"kids nolane\">" + renderSubs(loose, nodes, sm) + "</div>")
-		}
-		endok := ""
-		if len(gates) > 0 && done == len(gates) {
-			endok = " ok"
-		}
-		b.WriteString("<div class=\"bracket end" + endok + "\" data-bracket=\"" + esc(it) + "::end\"><span class=\"bdot\"></span>END</div>")
-		b.WriteString("</div></details>")
+		b.WriteString(renderIterationTimeline(it, nodes, sm, timelineOpts{frame: "report", openMS: timelineOpenMS(it, gates, nodes, sm)}))
+		b.WriteString("</details>")
 	}
+	b.WriteString(`</div><button type="button" class="uarrow" data-uscroll="down">▼</button></div>`)
 	return b.String()
 }
+
+// design: go-timeline-drilldown  implements: req-timeline-drilldown
+// The task drill-down: expanding a timeline task lists what happened in it. The evidence
+// section and the trace elements the section CITES, grouped by type, each group its own
+// expandable details. One horizontal pill row (the single-dimension shape of the filter
+// rule) narrows the groups. Every element row carries BOTH details-pane hooks: data-nid
+// for the report, data-node-link for the book, plus the source link the pane resolves.
+// The evidence sections come from the iteration's M<n>-*.md docs, keyed by the
+// `## heading -> check-id` convention the verdict links already use.
+func loadEvidenceSections(it string) map[string]string {
+	secs := map[string]string{}
+	ms, _ := filepath.Glob(filepath.Join(SPEC, "iterations", it, "M*-*.md"))
+	sort.Strings(ms)
+	for _, p := range ms {
+		raw, err := os.ReadFile(p)
+		if err != nil {
+			continue
+		}
+		for _, part := range strings.Split("\n"+strings.ReplaceAll(string(raw), "\r\n", "\n"), "\n## ")[1:] {
+			lines := strings.SplitN(part, "\n", 2)
+			title := strings.TrimSpace(lines[0])
+			body := ""
+			if len(lines) > 1 {
+				body = lines[1]
+			}
+			id := ""
+			if i := strings.LastIndex(title, "-> "); i >= 0 {
+				id = strings.TrimSpace(title[i+3:])
+			} else if i := strings.LastIndex(title, "→ "); i >= 0 {
+				id = strings.TrimSpace(title[i+len("→ "):])
+			}
+			if id != "" {
+				secs[id] = body
+			}
+		}
+	}
+	return secs
+}
+
+// timelineDrillTypes: the group order and labels; a type outside the list lands nowhere.
+var timelineDrillTypes = [][2]string{
+	{"adr", "decisions"}, {"question", "questions"}, {"requirement", "requirements"},
+	{"usecase", "use cases"}, {"function", "functions"}, {"design", "designs"},
+	{"test", "tests"}, {"model", "models"},
+}
+
+func timelineTaskDrill(id string, evidence map[string]string, nodes map[string]Node) string {
+	body := evidence[id]
+	// the elements the evidence cites, grouped by type in fixed order
+	cited := map[string][]string{}
+	if body != "" {
+		for nid, n := range nodes {
+			if !strings.Contains(body, nid) {
+				continue
+			}
+			for _, tl := range timelineDrillTypes {
+				if n.Type == tl[0] {
+					cited[tl[0]] = append(cited[tl[0]], nid)
+					break
+				}
+			}
+		}
+	}
+	groups := 0
+	for _, ids := range cited {
+		if len(ids) > 0 {
+			groups++
+		}
+	}
+	if body == "" && groups == 0 {
+		return "" // nothing recorded: no drill
+	}
+	var b strings.Builder
+	b.WriteString(`<div class="tdrill">`)
+	// one dimension -> one horizontal pill row (req-filter-pill-rule), counts included
+	if groups+1 >= 2 {
+		b.WriteString(`<div class="upills" data-facet="ttype"><button type="button" class="upill on" data-fv="*">all</button>`)
+		if body != "" {
+			b.WriteString(`<button type="button" class="upill" data-fv="evidence">evidence</button>`)
+		}
+		for _, tl := range timelineDrillTypes {
+			if n := len(cited[tl[0]]); n > 0 {
+				b.WriteString(`<button type="button" class="upill" data-fv="` + tl[1] + `">` + tl[1] + ` <span class="meta">(` + strconv.Itoa(n) + `)</span></button>`)
+			}
+		}
+		b.WriteString(`</div>`)
+	}
+	if body != "" {
+		b.WriteString(`<details class="tgroup" data-ttype="evidence"><summary>evidence</summary>` +
+			`<div class="vmd">` + handoffEvidenceHTML(body, nodes) + `</div></details>`)
+	}
+	for _, tl := range timelineDrillTypes {
+		ids := cited[tl[0]]
+		if len(ids) == 0 {
+			continue
+		}
+		sort.Strings(ids)
+		b.WriteString(`<details class="tgroup" data-ttype="` + tl[1] + `"><summary>` + tl[1] + ` (` + strconv.Itoa(len(ids)) + `)</summary>`)
+		for _, nid := range ids {
+			b.WriteString(`<button type="button" class="tel tty-` + esc(nodes[nid].Type) + `" data-nid="` + esc(nid) + `" data-node-link="` + esc(nid) + `" title="` + esc(nodes[nid].Statement) + `">` + esc(nid) + `</button>`)
+		}
+		b.WriteString(`</details>`)
+	}
+	b.WriteString(`</div>`)
+	return b.String()
+}
+
+// enddesign
+
+// renderProjectTimeline is the BOOK frame: every iteration, width unconstrained,
+// the current one open at its working milestone (`fig: project-timeline`).
+func renderProjectTimeline(nodes map[string]Node) string {
+	cfg := readProjectConfig()
+	sm := StatusMap(nodes)
+	iters := map[string][]string{}
+	for id, n := range nodes {
+		if isGate(n) {
+			it := iterOf(n.Path)
+			iters[it] = append(iters[it], id)
+		}
+	}
+	var its []string
+	for it := range iters {
+		its = append(its, it)
+	}
+	sortStrings(its)
+	if len(its) == 0 {
+		return `<p class="meta">no iterations yet — the timeline renders as they arrive</p>`
+	}
+	var b strings.Builder
+	b.WriteString(`<div class="qtl-project" data-layer="derived">` + "\n")
+	for _, it := range its {
+		op, cur := "", ""
+		if it == cfg.Version {
+			op, cur = " open", " current"
+		}
+		done := 0
+		for _, id := range iters[it] {
+			if sm[id] == "DONE" {
+				done++
+			}
+		}
+		b.WriteString(fmt.Sprintf(`<details class="iter%s"%s><summary data-iter="%s">%s <span class="frac">%d/%d</span></summary>`,
+			cur, op, esc(it), esc(it), done, len(iters[it])))
+		b.WriteString(renderIterationTimeline(it, nodes, sm, timelineOpts{frame: "book", openMS: timelineOpenMS(it, iters[it], nodes, sm)}))
+		b.WriteString(`</details>` + "\n")
+	}
+	b.WriteString(`</div>` + "\n")
+	return b.String()
+}
+
+// enddesign
 
 func metricCards(nodes map[string]Node, sm map[string]string, cfg Config) string {
 	var gates []string
@@ -853,13 +1084,15 @@ func RenderReport(outPath string) error {
 	}
 	data["itermeta"] = im
 	data["project"] = map[string]string{"name": filepath.Base(ROOT), "desc": projectDesc()}
+	data["typecolors"] = typeColors() // the one palette source paints the graph (go-type-colors)
 	gdata, _ := json.Marshal(data)
 
 	var H strings.Builder
 	H.WriteString("<!doctype html><html lang=en><head><meta charset=utf-8>")
 	H.WriteString("<meta name=viewport content='width=device-width,initial-scale=1'>")
 	H.WriteString("<title>" + esc(filepath.Base(ROOT)) + " — report</title>")
-	H.WriteString("<style>" + reportCSS + "</style></head><body>")
+	// the type swatch and chip rules come from the ONE palette source (go-type-colors)
+	H.WriteString("<style>" + reportCSS + traceTypeCSS(".sw.") + traceTypeCSS(".dchip.ty-") + "</style></head><body>")
 	H.WriteString(fmt.Sprintf("<header>%s<div class=h1 id=ptitle title='click for project info'>%s</div><div class=hash>⛓ %s</div><div class=stamp>%s</div></header>",
 		brandLogoInline(), esc(filepath.Base(ROOT)), root[:12], esc(gitStamp())))
 	H.WriteString("<main class=grid>")
@@ -890,7 +1123,7 @@ func RenderReport(outPath string) error {
 
 // enddesign
 
-// design: go-register-render  implements: req-register-render
+// design: go-register-render  implements: req-register-render, req-handoff-live-figures
 // The REGISTER treats fill and adjudicate as UI (adr-register-in-report). One row appears per node, whose TYPE carries its own schema fields. The row collapses to statement plus a computed color chip (go-register-colors). The first disclosure level shows the CORE fields. The second shows every field with its provenance line. The two greens wear DISTINCT marks: adjudicated is filled, and agent-confident is outlined. So a proposal never reads as a decision. A KILLER node's row carries the pager pointer and no answer affordance (req-register-killer-guard). A red non-killer row carries the answer affordance the watch lane activates (b7), and the static file leaves it inert. renderHandoffHTML is the adjudication page (adr-handoff-html): one gate as a DECISION BRIEF on a single phone-sized card, centered unchanged on a desktop, with no page scroll. At the top sit the gate id, the gate's question, and a one-line BLUF wearing the striped agent chip, a proposal, never a ruling. The middle holds the summary lines: you-must-decide, settle later, riding a default, done. Tests and walked steps appear NOWHERE, since they are state, never decisions, and the brief is only about decisions (owner ruling). A killer DEMO settles at its own milestone and rides the "settle later" line. The decide view deals the blockers ONE AT A TIME (‹ › deck). Every card states in plain words WHAT A BLESS ACCEPTS: the agent's defaults become the ruling, and a killer gate is adjudicated individually in the user's name. The bottom carries the page's ONLY two actions, y/n. A y makes handoffBless record everything stated. The buttons POST to the local watch server. On a stale file with no listener they no-op by design (the owner's ruling). It is self-contained: no external asset, ever. handoffCone is the gate's adjudication material: its direct inputs plus every register-eligible trace node of the gate's iteration.
 func handoffCone(gate Node, nodes map[string]Node) map[string]bool {
 	member := map[string]bool{}
@@ -1027,7 +1260,10 @@ func handoffEvidenceHTML(body string, nodes map[string]Node) string {
 		for _, line := range strings.Split(seg, "\n") {
 			if m := figRefRe.FindStringSubmatch(strings.TrimSpace(line)); m != nil {
 				flush()
-				out.WriteString(`<figure data-layer="figure">` + renderFigure(m[1], nodes) + `</figure>` + "\n")
+				// an embedded figure's ids scope to the evidence instance, so the
+				// chapter's own anchor stays the one goto target
+				fh := deckScopeIDs(renderFigure(m[1], nodes), "ev"+itoa(figNext()))
+				out.WriteString(`<figure data-layer="figure">` + fh + `</figure>` + "\n")
 				continue
 			}
 			buf = append(buf, line)
@@ -1042,7 +1278,13 @@ func handoffEvidenceHTML(body string, nodes map[string]Node) string {
 		src := body[m[2]:m[3]]
 		g, lint := extractModelGraph(src)
 		if len(lint) == 0 && len(g.Elems) > 0 {
-			out.WriteString(`<div class="handoff-model">` + svgModelGraph(g) + `</div>` + "\n")
+			// a LAYERED figure renders through the book's interactive onion, browsable
+			// in place (req-handoff-live-figures); a flat graph stays the flow figure
+			if len(g.Layers) > 1 {
+				out.WriteString(`<div class="handoff-model">` + renderOnionFromGraph(g, "hof"+itoa(figNext())) + `</div>` + "\n")
+			} else {
+				out.WriteString(`<div class="handoff-model">` + svgModelGraph(g) + `</div>` + "\n")
+			}
 		} else {
 			out.WriteString("<pre><code>" + esc(src) + "</code></pre>\n")
 		}
@@ -1120,6 +1362,67 @@ func handoffAccepts(gateID string, nodes map[string]Node, sm map[string]string) 
 	}
 	return fs, killers
 }
+
+// design: go-timeline-shared  implements: req-project-timeline
+// ONE timeline renderer for every surface (the owner's one-renderer ruling): the handover
+// pager's milestone-grouped drill-down tree, extracted as the shared component. A frame
+// passes its name (handover | report | book) as the CSS hook plus its open milestone. The
+// content (milestone rows with done counts, the task tree, the marked rows) is the same
+// everywhere, so the three surfaces cannot drift.
+type timelineOpts struct {
+	frame    string          // handover | report | book: the css hook on the host
+	openMS   int             // the milestone whose group starts open (0 = none)
+	marked   map[string]bool // rows highlighted (the pager's gate group)
+	deciding map[string]bool // rows under decision: the hand-off's yellow surface
+}
+
+func renderIterationTimeline(it string, nodes map[string]Node, sm map[string]string, o timelineOpts) string {
+	var taskIDs []string
+	for id, n := range nodes {
+		if iterOf(n.Path) == it && isGate(n) {
+			taskIDs = append(taskIDs, id)
+		}
+	}
+	if len(taskIDs) == 0 {
+		return ""
+	}
+	sort.Strings(taskIDs)
+	byMS := map[int][]string{}
+	for _, id := range taskIDs {
+		byMS[nodes[id].Milestone] = append(byMS[nodes[id].Milestone], id)
+	}
+	var mss []int
+	for ms := range byMS {
+		mss = append(mss, ms)
+	}
+	sort.Ints(mss)
+	// the drill-down rides EVERY frame: a task opens into its evidence and the
+	// typed elements the evidence cites (go-timeline-drilldown)
+	ev := loadEvidenceSections(it)
+	drill := func(id string) string { return timelineTaskDrill(id, ev, nodes) }
+	var b strings.Builder
+	b.WriteString(`<div class="qtl qtl-` + esc(o.frame) + `" data-iter="` + esc(it) + `">`)
+	for _, ms := range mss {
+		done := 0
+		for _, id := range byMS[ms] {
+			if sm[id] == "DONE" {
+				done++
+			}
+		}
+		label := milestoneDisplayTitle(it, ms, nodes)
+		open := ""
+		if ms == o.openMS {
+			open = " open"
+		}
+		b.WriteString(`<details class="hrow"` + open + `><summary><span class="hid">` + label + `</span>` +
+			`<span class="hstmt">` + strconv.Itoa(done) + ` / ` + strconv.Itoa(len(byMS[ms])) + ` done</span></summary>` +
+			`<div class="ttree">` + renderSubsDrill(byMS[ms], nodes, sm, o.marked, o.deciding, drill) + `</div></details>`)
+	}
+	b.WriteString(`</div>`)
+	return b.String()
+}
+
+// enddesign
 
 func renderHandoffHTML(gateID string, nodes map[string]Node, sm map[string]string) string {
 	gate, ok := nodes[gateID]
@@ -1276,7 +1579,7 @@ func renderHandoffHTML(gateID string, nodes map[string]Node, sm map[string]strin
 		}
 	}
 	writeRow := func(r hoffRow) {
-		b.WriteString(`<details class="hrow" data-node="` + esc(r.id) + `">`)
+		b.WriteString(`<details class="hoffrow" data-node="` + esc(r.id) + `">`)
 		b.WriteString(`<summary><span class="regdot ` + r.color + `"></span><span class="hid">` + esc(r.id) + `</span>` +
 			`<span class="hstmt">` + esc(r.n.Statement) + `</span></summary>`)
 		// a decided decision reads like an open one: the options, then the letter
@@ -1349,9 +1652,11 @@ func renderHandoffHTML(gateID string, nodes map[string]Node, sm map[string]strin
 	}
 	sort.Strings(taskIDs)
 
-	// Opt-in evidence rides the handoff when the check asks for it. Milestone gates
-	// also carry the whole milestone verdict.
-	var evidenceSecs, verdictSecs [][2]string
+	// Opt-in evidence rides the handoff when the check asks for it. The separate
+	// milestone-verdict panel DISSOLVED into the tasks drill-down (req-timeline-drilldown):
+	// each task's evidence hangs inside the task row; only the per-card evidence
+	// lines still read the raw milestone sections.
+	var evidenceSecs [][2]string
 	rawSecs := map[string]string{} // go-card-evidence: title -> raw body, for the per-card evidence line
 	if raw := nodeBodySectionRaw(gate.Path, "Handoff Evidence"); raw != "" {
 		evidenceSecs = append(evidenceSecs, [2]string{"Evidence", handoffEvidenceHTML(raw, nodes)})
@@ -1368,8 +1673,6 @@ func renderHandoffHTML(gateID string, nodes map[string]Node, sm map[string]strin
 						body = lines[1]
 					}
 					rawSecs[title] = body
-					sec := [2]string{title, handoffEvidenceHTML(body, nodes)}
-					verdictSecs = append(verdictSecs, sec)
 				}
 			}
 		}
@@ -1393,9 +1696,6 @@ func renderHandoffHTML(gateID string, nodes map[string]Node, sm map[string]strin
 	}
 	if len(evidenceSecs) > 0 {
 		b.WriteString(`<button class="sline" data-view="evidence"><span class="regdot reg-none"></span>evidence<span class="chev">›</span></button>`)
-	}
-	if len(verdictSecs) > 0 {
-		b.WriteString(`<button class="sline" data-view="verdict"><span class="regdot reg-none"></span>milestone verdict<span class="chev">›</span></button>`)
 	}
 	if len(taskIDs) > 0 {
 		b.WriteString(`<button class="sline" data-view="tasks"><span class="regdot reg-none"></span>tasks ` +
@@ -1425,6 +1725,10 @@ func renderHandoffHTML(gateID string, nodes map[string]Node, sm map[string]strin
 			b.WriteString(`<p class="dstmt">` + esc(r.n.Statement) + `</p>`)
 			for _, p := range nodeBodySection(r.n.Path, "Options") {
 				b.WriteString(`<p class="dopt">` + optHTML(p) + `</p>`)
+			}
+			// a datum-bearing decision carries its derived Pugh matrix (go-pugh-render)
+			if pm := renderPughMatrix(r.n, nodes); pm != "" {
+				b.WriteString(`<details class="reg-all"><summary>the matrix</summary>` + pm + `</details>`)
 			}
 			switch {
 			case r.n.Killer:
@@ -1456,48 +1760,17 @@ func renderHandoffHTML(gateID string, nodes map[string]Node, sm map[string]strin
 	if len(evidenceSecs) > 0 {
 		b.WriteString(`<section class="view" id="view-evidence"><p class="vlead">Evidence for this handoff.</p>`)
 		for _, s := range evidenceSecs {
-			b.WriteString(`<details class="hrow" open><summary><span class="hstmt">` + esc(s[0]) + `</span></summary>` +
+			b.WriteString(`<details class="hoffrow" open><summary><span class="hstmt">` + esc(s[0]) + `</span></summary>` +
 				`<div class="vmd">` + s[1] + `</div></details>`)
 		}
 		b.WriteString(`</section>`)
 	}
-	if len(verdictSecs) > 0 {
-		b.WriteString(`<section class="view" id="view-verdict"><p class="vlead">The milestone's evidence, one section per heading.</p>`)
-		for _, s := range verdictSecs {
-			b.WriteString(`<details class="hrow"><summary><span class="hstmt">` + esc(s[0]) + `</span></summary>` +
-				`<div class="vmd">` + s[1] + `</div></details>`)
-		}
-		b.WriteString(`</section>`)
-	}
-	// the tasks panel: the report's own tree, milestone-grouped, current one open —
-	// the auditor sees where the iteration stands (owner ruling)
+	// the tasks panel: the SHARED timeline (go-timeline-shared) in its handover frame,
+	// the gate's milestone open, the gate group wearing the DECIDING mark, each task's
+	// evidence hanging inside its drill — the one field (req-timeline-drilldown)
 	if len(taskIDs) > 0 {
 		b.WriteString(`<section class="view" id="view-tasks">`)
-		byMS := map[int][]string{}
-		for _, id := range taskIDs {
-			byMS[nodes[id].Milestone] = append(byMS[nodes[id].Milestone], id)
-		}
-		var mss []int
-		for ms := range byMS {
-			mss = append(mss, ms)
-		}
-		sort.Ints(mss)
-		for _, ms := range mss {
-			done := 0
-			for _, id := range byMS[ms] {
-				if sm[id] == "DONE" {
-					done++
-				}
-			}
-			label := milestoneDisplayTitle(it, ms, nodes)
-			open := ""
-			if ms == gate.Milestone {
-				open = " open"
-			}
-			b.WriteString(`<details class="hrow"` + open + `><summary><span class="hid">` + label + `</span>` +
-				`<span class="hstmt">` + strconv.Itoa(done) + ` / ` + strconv.Itoa(len(byMS[ms])) + ` done</span></summary>` +
-				`<div class="ttree">` + renderSubsMarked(byMS[ms], nodes, sm, markedTasks) + `</div></details>`)
-		}
+		b.WriteString(renderIterationTimeline(it, nodes, sm, timelineOpts{frame: "handover", openMS: gate.Milestone, marked: markedTasks, deciding: markedTasks}))
 		b.WriteString(`</section>`)
 	}
 	b.WriteString(`</main>`)
@@ -1505,7 +1778,56 @@ func renderHandoffHTML(gateID string, nodes map[string]Node, sm map[string]strin
 	b.WriteString(`<footer class="hfoot"><button class="hb hy" data-bless="` + esc(gateID) + `" data-verdict="y">👍 bless</button>` +
 		`<button class="hb hn" data-bless="` + esc(gateID) + `" data-verdict="n">👎 reopen</button>` +
 		`<span class="hnote" id="hnote"></span></footer>`)
-	b.WriteString(`</div><script>` + handoffJS + `</script></body></html>`)
+	// design: go-details-toast  implements: req-details-full-entry
+	// ONE reference-resolution mechanism, two outputs (the owner ruling). A surface with a
+	// details pane fills the pane. The hand-off, which has none, pops the SAME full entry
+	// as a small toast. The page ships every referenced entry as a template. The ids are
+	// scanned from the page's own reference attributes and markdown hrefs, and the script
+	// resolves a click against them. The dotted links live everywhere.
+	page := b.String()
+	refIDs := map[string]bool{}
+	for _, m := range regexp.MustCompile(`data-(?:nid|node-link|goto)="([^"]+)"`).FindAllStringSubmatch(page, -1) {
+		refIDs[m[1]] = true
+	}
+	for _, m := range regexp.MustCompile(`href="(?:[^":]*/)?([a-z0-9][a-z0-9.-]*)\.md"`).FindAllStringSubmatch(page, -1) {
+		refIDs[m[1]] = true
+	}
+	var refList []string
+	for id := range refIDs {
+		if _, ok := nodes[id]; ok {
+			refList = append(refList, id)
+		}
+	}
+	sort.Strings(refList)
+	b.WriteString(`<div id="toast" hidden></div>`)
+	for _, id := range refList {
+		b.WriteString(`<template data-entry="` + esc(id) + `">` + nodeEntryHTML(id, nodes) + `</template>`)
+	}
+	// enddesign
+	b.WriteString(`</div><script>` + onionInteractJS + handoffJS + `</script></body></html>`)
+	return b.String()
+}
+
+// nodeEntryHTML is the one resolver's output: the FULL referenced entry — id, type,
+// statement, and body — identical whichever container shows it (go-details-toast).
+func nodeEntryHTML(id string, nodes map[string]Node) string {
+	n := nodes[id]
+	var b strings.Builder
+	b.WriteString(`<div class="entry"><p class="eid">` + esc(id))
+	if n.Type != "" {
+		b.WriteString(` · ` + esc(n.Type))
+	}
+	if n.Killer {
+		b.WriteString(` · killer`)
+	}
+	b.WriteString(`</p>`)
+	if n.Statement != "" {
+		b.WriteString(`<p class="estmt">` + esc(n.Statement) + `</p>`)
+	}
+	if body := strings.TrimSpace(stripLeadingStatement(nodeBodyOf(n), n.Statement)); body != "" {
+		b.WriteString(`<div class="ebody">` + mdLite(body) + `</div>`)
+	}
+	b.WriteString(`</div>`)
 	return b.String()
 }
 
@@ -1554,13 +1876,13 @@ main{flex:1;min-height:0;display:flex}
 .regdot.reg-yellow{background:var(--yel);border:2px solid var(--yelb)}
 .regdot.reg-red{background:var(--red);border:2px solid var(--redb)}
 .regdot.reg-none{background:var(--mut);border:2px solid var(--mutb)}
-.hrow{border-top:1px solid #eee}
-.hrow>summary{display:flex;gap:8px;align-items:center;padding:8px 0;cursor:pointer;list-style:none;min-width:0}
-.hrow>summary::-webkit-details-marker{display:none}
-.hid{font-family:ui-monospace,Consolas,monospace;font-size:11px;font-weight:600;flex:none;max-width:45vw;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.hstmt{font-size:12px;color:#555;flex:1 1 0;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.hrow[open]>summary{flex-wrap:wrap}
-.hrow[open]>summary .hstmt{white-space:normal;overflow:visible;flex:1 1 100%}
+.hoffrow{border-top:1px solid #eee}
+.hoffrow>summary{display:flex;gap:8px;align-items:center;padding:8px 0;cursor:pointer;list-style:none;min-width:0}
+.hoffrow>summary::-webkit-details-marker{display:none}
+.hoffrow .hid{font-family:ui-monospace,Consolas,monospace;font-size:11px;font-weight:600;flex:none;max-width:45vw;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hoffrow .hstmt{font-size:12px;color:#555;flex:1 1 0;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hoffrow[open]>summary{flex-wrap:wrap}
+.hoffrow[open]>summary .hstmt{white-space:normal;overflow:visible;flex:1 1 100%}
 .hfield{display:flex;gap:6px;align-items:baseline;font-size:12px;padding:4px 0 4px 8px;flex-wrap:wrap}
 .hfn{font-weight:600;min-width:90px}.hfv{overflow-wrap:anywhere}.hfp{color:#888;font-style:italic;flex:1 1 100%;padding-left:20px}
 .reg-all{margin:4px 0 8px 8px;font-size:12px}.reg-all>summary{cursor:pointer;color:#666}
@@ -1574,19 +1896,25 @@ main{flex:1;min-height:0;display:flex}
 .vmd a{color:#2456b3;text-decoration:none;border-bottom:1px dotted #2456b3}
 .vmd code{font-family:ui-monospace,Consolas,monospace;font-size:11px;background:#f2f2f2;padding:0 3px;border-radius:3px}
 .vmd figure{margin:6px 0}.vmd .onion .oview[hidden]{display:none}.vmd .onion [data-onion-go]{cursor:pointer}.vmd .onion-flow{overflow-x:auto;max-width:100%}.vmd .onion-flow svg{display:block}.vmd .onion svg{cursor:grab;touch-action:none;max-width:100%}.vmd .onion [data-node-link],.vmd .onion .oblock,.vmd .onion .opill{cursor:pointer}.vmd .onion .osel>rect{stroke:#1b6fd6;stroke-width:2.6}.vmd .onion .oc-nb>rect{stroke:#1b6fd6;stroke-width:2}.vmd .onion .oc-on{stroke:#1b6fd6;stroke-width:2.6;opacity:1}
-.ttree{font-size:12px;padding:2px 0 8px 4px}
-.ttree .task{display:block;padding:3px 0;color:inherit;text-decoration:none;cursor:default}
-.ttree details.task{padding:0}
-.ttree details.task>summary{cursor:pointer;list-style:none;padding:3px 0}
-.ttree details.task>summary::-webkit-details-marker{display:none}
-.ttree .kids{padding-left:14px;border-left:1px solid #eee}
-.ttree .rid{font-family:ui-monospace,Consolas,monospace;font-size:11px}
-.ttree .auto{font-size:10px;color:#999}
-.mk{display:inline-block;width:16px;font-weight:700}
-.mk.done{color:var(--grn)}
-.mk.fail{color:var(--red)}
-.mk.sus{color:var(--yelb)}
-`
+.pugh{border-collapse:collapse;margin:6px 0;font-size:12px}
+.pugh th,.pugh td{border:1px solid #e3e3e3;padding:2px 7px;text-align:center}
+.pugh td:first-child,.pugh th:first-child{text-align:left}
+.pugh .pgh-tag{font-size:9px;font-weight:700;color:#52628a;background:#eef2f9;border:1px solid #dce4f2;border-radius:8px;padding:0 4px}
+.pugh .pgh-tag.pgh-win{color:#14531f;background:#d9efdc;border-color:var(--grn)}
+.pugh .pgh-better{color:var(--grn);font-weight:700}
+.pugh .pgh-worse{color:var(--red);font-weight:700}
+.pugh .pgh-same{color:#888}.pugh .pgh-none{color:#ccc}
+.pugh tr.pgh-total td{font-weight:600;background:#fafafa}
+#toast{position:fixed;left:50%;bottom:14px;transform:translateX(-50%);width:min(400px,92vw);max-height:45vh;overflow-y:auto;background:#fff;border:1px solid #ccc;border-radius:12px;box-shadow:0 6px 24px rgba(0,0,0,.25);padding:10px 12px;z-index:40;cursor:pointer}
+#toast[hidden]{display:none}
+.entry .eid{margin:0;font-family:ui-monospace,Consolas,monospace;font-size:11px;font-weight:700;color:#52628a}
+.entry .estmt{margin:4px 0;font-size:13px}
+.entry .ebody{font-size:12px;color:#444}
+.mdtable{border-collapse:collapse;margin:6px 0;font-size:12px}
+.mdtable th,.mdtable td{border:1px solid #e3e3e3;padding:2px 8px;text-align:left}
+.mdtable th{background:#fafafa}
+.handoff-model svg{display:block;margin:0 auto;max-width:100%}
+` + qtlSharedCSS
 
 // handoffJS: the bless tap and the red-field ruling POST to the local watch server;
 // with no listener a tap no-ops (a stale page's dead button is fine - the owner's
@@ -1597,6 +1925,27 @@ const handoffJS = `
    close. Against a stale file both silently fail - dead buttons by ruling. */
 setInterval(function(){fetch('/hb',{method:'POST'}).catch(function(){});},3000);
 window.addEventListener('pagehide',function(){try{navigator.sendBeacon('/bye');}catch(_){}});
+/* the drill-down's type pills (req-timeline-drilldown): first draft, one selection */
+document.addEventListener('click',function(e){
+ var p=e.target.closest?e.target.closest('.tdrill .upill'):null;if(!p)return;
+ e.preventDefault();var dr=p.closest('.tdrill'),v=p.getAttribute('data-fv');
+ Array.prototype.forEach.call(dr.querySelectorAll('.upill'),function(x){x.classList.toggle('on',x===p);});
+ Array.prototype.forEach.call(dr.querySelectorAll('.tgroup'),function(g){
+  g.style.display=(v==='*'||g.getAttribute('data-ttype')===v)?'':'none';});});
+/* the toast (req-details-full-entry): a followed reference pops the shipped full entry —
+   the same content a details pane would show; a tap on the toast dismisses it. */
+document.addEventListener('click',function(e){
+ var c=e.target.closest?e.target.closest('#toast'):null;
+ if(c){document.getElementById('toast').hidden=true;return;}
+ var t=e.target.closest?e.target.closest('[data-node-link],[data-nid],a[href$=".md"]'):null;if(!t)return;
+ var id=t.getAttribute('data-node-link')||t.getAttribute('data-nid')||'';
+ if(!id){var h=t.getAttribute('href')||'';id=h.replace(/^.*\//,'').replace(/\.md$/,'');}
+ var tp=document.querySelector('template[data-entry="'+id+'"]');if(!tp)return;
+ e.preventDefault();
+ var toast=document.getElementById('toast');if(!toast)return;
+ toast.innerHTML='';toast.appendChild(tp.content.cloneNode(true));
+ toast.hidden=false;
+ clearTimeout(window.__toastT);window.__toastT=setTimeout(function(){toast.hidden=true;},8000);});
 function dgo(fwd){
  var cards=document.querySelectorAll('.dcard'),i;if(!cards.length)return;
  var cur=0;
@@ -1605,34 +1954,8 @@ function dgo(fwd){
  for(i=0;i<cards.length;i++){cards[i].className=i===nx?'dcard on':'dcard';}
  var pos=document.getElementById('dpos');if(pos)pos.textContent=(nx+1)+' / '+cards.length;
 }
-var __onionStack=[];
-function __onionShow(host,t){Array.prototype.forEach.call(host.querySelectorAll('.oview'),function(v){v.hidden=true;});t.hidden=false;}
-function __onionClear(host){Array.prototype.forEach.call(host.querySelectorAll('.osel,.oc-nb,.oc-on'),function(x){x.classList.remove('osel','oc-nb','oc-on');});}
-function __onionInspect(g){var host=g.closest('.onion');if(!host)return;__onionClear(host);g.classList.add('osel');
- var id=g.getAttribute('data-oc-id')||'';
- Array.prototype.forEach.call(host.querySelectorAll('[data-oc-block="'+id+'"]'),function(l){l.classList.add('oc-on');});
- Array.prototype.forEach.call(host.querySelectorAll('[data-oc-src],[data-oc-dst]'),function(l){
-	var s=l.getAttribute('data-oc-src'),d=l.getAttribute('data-oc-dst');if(s!==id&&d!==id)return;
-	l.classList.add('oc-on');var o=host.querySelector('[data-oc-id="'+(s===id?d:s)+'"]');if(o)o.classList.add('oc-nb');});}
-function __onionPill(g){var host=g.closest('.onion');if(!host)return;__onionClear(host);g.classList.add('osel');
- var flow=g.getAttribute('data-oc-pill');
- (g.getAttribute('data-oc-blocks')||'').split(',').forEach(function(id){if(!id)return;
-	var o=host.querySelector('[data-oc-id="'+id+'"]');if(o)o.classList.add('oc-nb');
-	Array.prototype.forEach.call(host.querySelectorAll('[data-oc-block="'+id+'"][data-oc-flow="'+flow+'"]'),function(l){l.classList.add('oc-on');});});}
-function __onionDrill(el){var t=document.getElementById(el.getAttribute('data-onion-go'));var host=el.closest('.onion');if(!t||!host)return;var cur=host.querySelector('.oview:not([hidden])');if(cur&&cur!==t){__onionStack.push({host:host,id:cur.id});}__onionShow(host,t);}
-document.querySelectorAll('.onion [data-onion-go]').forEach(function(el){var ev=el.hasAttribute('data-oc-id')?'dblclick':'click';el.addEventListener(ev,function(e){e.preventDefault();e.stopPropagation();__onionDrill(el);});});
-document.querySelectorAll('.onion [data-oc-id]').forEach(function(el){el.addEventListener('click',function(ev){ev.preventDefault();__onionInspect(el);});});
-document.querySelectorAll('.onion [data-oc-pill]').forEach(function(el){el.addEventListener('click',function(ev){ev.preventDefault();ev.stopPropagation();__onionPill(el);});});
-document.querySelectorAll('.onion svg').forEach(function(svg){
- var vb=(svg.getAttribute('viewBox')||'0 0 380 360').split(/\s+/).map(Number);
- var base=vb.slice(),st={x:vb[0],y:vb[1],w:vb[2],h:vb[3]},drag=null;
- function apply(){svg.setAttribute('viewBox',st.x+' '+st.y+' '+st.w+' '+st.h);}
- svg.addEventListener('wheel',function(e){e.preventDefault();var r=svg.getBoundingClientRect();if(!r.width)return;var mx=st.x+(e.clientX-r.left)/r.width*st.w,my=st.y+(e.clientY-r.top)/r.height*st.h,f=e.deltaY<0?0.85:1.18;st.w*=f;st.h*=f;st.x=mx-(e.clientX-r.left)/r.width*st.w;st.y=my-(e.clientY-r.top)/r.height*st.h;apply();},{passive:false});
- svg.addEventListener('pointerdown',function(e){if(e.target.closest&&e.target.closest('[data-onion-go],[data-node-link],[data-oc-id],[data-oc-pill]'))return;drag={x:e.clientX,y:e.clientY,sx:st.x,sy:st.y};try{svg.setPointerCapture(e.pointerId);}catch(_){}svg.style.cursor='grabbing';});
- svg.addEventListener('pointermove',function(e){if(!drag)return;var r=svg.getBoundingClientRect();if(!r.width)return;st.x=drag.sx-(e.clientX-drag.x)/r.width*st.w;st.y=drag.sy-(e.clientY-drag.y)/r.height*st.h;apply();});
- svg.addEventListener('pointerup',function(){drag=null;svg.style.cursor='';});
- svg.addEventListener('dblclick',function(){st.x=base[0];st.y=base[1];st.w=base[2];st.h=base[3];apply();});
-});
+/* the onion interaction rides the SHARED script (go-onion-interact), prepended at page
+   emit — the pager's private fork is retired (req-handoff-live-figures). */
 document.addEventListener('click',function(e){
  var i;
  var tk=e.target.closest?e.target.closest('a.task'):null;

@@ -5,7 +5,6 @@ source: stk-project-owner
 statement: As a builder I need to capture an idea the moment it occurs, without friction or losing flow.
 class: review
 killer: false
-functions: [capture a note, mint an item, record a connection]
 ---
 
 ## note (not load-bearing)

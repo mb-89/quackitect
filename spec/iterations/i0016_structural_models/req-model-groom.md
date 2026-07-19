@@ -8,4 +8,4 @@ killer: false
 retired: dropped in i0027 - a dormant canvas feature, never built; the owner drops parked requirements rather than defer them forever (q-i0016-selftests, ruling B). If canvas authoring is pulled from the park, the requirement returns then.
 ---
 ## Rationale (not load-bearing)
-TODO
+Not applicable - not recorded at authoring; the trace edges and the provenance block carry the derivation.

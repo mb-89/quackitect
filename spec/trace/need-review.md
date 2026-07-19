@@ -5,7 +5,6 @@ source: stk-project-owner
 statement: As a builder and stakeholder I need to see where the project stands and look back to improve.
 class: review
 killer: false
-functions: [compute coverage, render the board]
 ---
 
 ## note (not load-bearing)

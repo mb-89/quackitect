@@ -7,6 +7,8 @@ import (
 	"io"
 	"os"
 	"os/exec"
+	"path/filepath"
+	"runtime"
 	"sort"
 	"strings"
 	"sync"
@@ -204,6 +206,7 @@ type supState struct {
 	mu         sync.Mutex
 	inFlight   int
 	swapWanted bool
+	swapSince  time.Time
 	initLine   []byte
 	child      *exec.Cmd
 	childIn    io.WriteCloser
@@ -270,13 +273,48 @@ func (st *supState) pump(sc *bufio.Scanner, c *exec.Cmd) {
 	}
 }
 
+// killChild ends the child DETERMINISTICALLY: close stdin, kill, bounded wait, then the
+// OS-level fallback (taskkill sweeps the whole tree). It returns only when the process
+// is gone — the owner's directive after the 2026-07-18 leaked-children wedge.
+func (st *supState) killChild() {
+	if st.childIn != nil {
+		st.childIn.Close()
+	}
+	c := st.child
+	if c == nil || c.Process == nil {
+		return
+	}
+	if err := c.Process.Kill(); err != nil {
+		mcpLog("supervisor: kill:", err)
+	}
+	done := make(chan struct{})
+	go func() { c.Wait(); close(done) }()
+	select {
+	case <-done:
+	case <-time.After(3 * time.Second):
+		mcpLog("supervisor: child ignored kill; escalating")
+		if runtime.GOOS == "windows" {
+			exec.Command("taskkill", "/F", "/T", "/PID", fmt.Sprint(c.Process.Pid)).Run()
+		}
+		<-done
+	}
+}
+
 // swapIfReady performs the drain-spawn-notify sequence when a swap is wanted and no
-// reply is open. Callers hold no lock.
-func (st *supState) swapIfReady() {
+// reply is open. With force set, a drain past its timeout gives up on the stuck
+// replies — they are dropped LOUDLY and the swap proceeds; a wedge never outlives
+// the timeout. Callers hold no lock.
+func (st *supState) swapIfReady(force bool) {
 	st.mu.Lock()
 	ready := supSwapReady(st.inFlight, st.swapWanted)
+	if !ready && force && st.swapWanted && st.inFlight > 0 {
+		mcpLog(fmt.Sprintf("supervisor: drain timed out; dropping %d stuck replies - retry the call", st.inFlight))
+		st.inFlight = 0
+		ready = true
+	}
 	if ready {
 		st.swapWanted = false
+		st.swapSince = time.Time{}
 	}
 	st.mu.Unlock()
 	if !ready {
@@ -284,16 +322,15 @@ func (st *supState) swapIfReady() {
 	}
 	st.seq.record("drain")
 	mcpLog("supervisor: drained; swapping the child")
-	if st.childIn != nil {
-		st.childIn.Close()
-	}
-	if st.child != nil && st.child.Process != nil {
-		st.child.Process.Kill()
-		st.child.Wait()
-	}
+	st.killChild()
 	if err := st.spawn(true); err != nil {
 		mcpLog("supervisor: respawn failed:", err)
 		return
+	}
+	if exe, err := os.Executable(); err == nil {
+		if n := sweepStaleParks(filepath.Dir(exe)); n > 0 {
+			mcpLog(fmt.Sprintf("supervisor: swept %d stale parked binaries", n))
+		}
 	}
 	st.seq.record("spawn")
 	st.mu.Lock()
@@ -310,18 +347,24 @@ func supervise() {
 		mcpLog("supervisor: cannot spawn the child engine:", err)
 		return
 	}
-	// the stamp watcher: an idle session still swaps and notifies
+	// the stamp watcher: an idle session still swaps and notifies; a swap stuck past
+	// its drain timeout FORCES through instead of wedging the session
 	go func() {
 		for {
 			time.Sleep(500 * time.Millisecond)
 			st.mu.Lock()
-			stale := mcpSuperseded(st.childBorn)
-			if stale {
-				st.swapWanted = true
+			if mcpSuperseded(st.childBorn) {
+				if !st.swapWanted {
+					st.swapWanted = true
+					st.swapSince = time.Now()
+				}
 			}
+			wanted := st.swapWanted
+			force := wanted && !st.swapSince.IsZero() &&
+				supForceSwap(st.inFlight, time.Since(st.swapSince), supDrainTimeout())
 			st.mu.Unlock()
-			if stale {
-				st.swapIfReady()
+			if wanted {
+				st.swapIfReady(force)
 			}
 		}
 	}()
@@ -339,8 +382,9 @@ func supervise() {
 		}
 		// a stale child never answers a fresh request: swap first, then forward
 		st.mu.Lock()
-		if mcpSuperseded(st.childBorn) {
+		if mcpSuperseded(st.childBorn) && !st.swapWanted {
 			st.swapWanted = true
+			st.swapSince = time.Now()
 		}
 		dead := st.child == nil || st.child.ProcessState != nil
 		st.mu.Unlock()
@@ -352,14 +396,17 @@ func supervise() {
 			if !wanted {
 				break
 			}
-			st.swapIfReady()
+			st.swapIfReady(false)
 			time.Sleep(20 * time.Millisecond)
 		}
+		// past the deadline a wanted swap forces through - stuck replies drop
+		// loudly; the session never wedges behind them
+		st.swapIfReady(true)
 		if dead {
 			st.mu.Lock()
 			st.swapWanted = true
 			st.mu.Unlock()
-			st.swapIfReady()
+			st.swapIfReady(false)
 		}
 		st.mu.Lock()
 		if len(f.ID) > 0 {

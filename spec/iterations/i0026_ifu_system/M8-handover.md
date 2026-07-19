@@ -4,9 +4,7 @@
 
 The visible docs match the surface:
 - Pong is titled as an IFU.
-- The IFU map is a deck.
 - Guide rows include IFU in the title.
-- Chapter 2's derived documents table lists deck statements.
 
 ## Packaged and versioned -> i26-m8-packaged-versioned
 

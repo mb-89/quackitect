@@ -1,6 +1,7 @@
 ---
 id: crit-responsiveness-law
 type: criterion
+weight: 0.15
 metric: worst interaction latency on the reference machine (seconds)
 target: under one second per the responsiveness guide, measured at the timing selftests
 statement: The axis weighs whether interaction stays inside the one-second law on the reference machine.

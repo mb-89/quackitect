@@ -13,4 +13,4 @@ provenance:
   kind: agent-proposal: first of functional|quality|constraint|interface - veto or confirm
 ---
 ## Rationale (not load-bearing)
-TODO
+A verify run racing a rebuild judged old code in the field; pinning the build makes the verdict honest about what it measured.

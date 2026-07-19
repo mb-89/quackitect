@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"sort"
 	"strings"
@@ -44,6 +45,66 @@ func buildID() string {
 	}
 	return buildIDMemo
 }
+
+// design: go-verify-pin  implements: req-verify-pins-build
+// A battery run PINS the on-disk binary at start (a fresh hash, never the process memo)
+// and re-checks it at the end. A mid-run swap means every recorded verdict belongs to a
+// superseded build. The run RE-EXECUTES itself once (the new binary, the same arguments)
+// so the work lands under the final build. A second swap refuses with the recovery named;
+// a build storm should not chase its own tail. The wave order carries this early so every
+// later build step inherits the protection (the owner's wired-wave ruling).
+func diskBuildID(path string) string {
+	b, err := os.ReadFile(path)
+	if err != nil {
+		return ""
+	}
+	h := sha256.Sum256(b)
+	return hex.EncodeToString(h[:])
+}
+
+func verifySwapDecision(start, end string, attempt int) (bool, string) {
+	if start == end {
+		return false, ""
+	}
+	if attempt == 0 {
+		return true, "verify: the binary swapped mid-run — re-running under the final build"
+	}
+	return false, "verify: the binary swapped again mid-run — let the builds settle, then re-run verify"
+}
+
+// verifyRunPinned wraps a battery-running body with the pin: on a first-swap it re-execs
+// the CURRENT binary with the same arguments and forwards that exit code.
+func verifyRunPinned(body func() int) int {
+	exe, err := os.Executable()
+	if err != nil {
+		return body() // no pin without a path; the run still happens
+	}
+	attempt := 0
+	if os.Getenv("QUACK_VERIFY_ATTEMPT") == "1" {
+		attempt = 1
+	}
+	start := diskBuildID(exe)
+	code := body()
+	rerun, msg := verifySwapDecision(start, diskBuildID(exe), attempt)
+	if msg != "" {
+		fmt.Fprintln(os.Stderr, msg)
+	}
+	if !rerun {
+		return code
+	}
+	cmd := exec.Command(exe, os.Args[1:]...)
+	cmd.Env = append(os.Environ(), "QUACK_VERIFY_ATTEMPT=1")
+	cmd.Stdout, cmd.Stderr, cmd.Stdin = os.Stdout, os.Stderr, os.Stdin
+	if err := cmd.Run(); err != nil {
+		if xe, ok := err.(interface{ ExitCode() int }); ok {
+			return xe.ExitCode()
+		}
+		return 1
+	}
+	return 0
+}
+
+// enddesign
 
 func verdictPath() string {
 	if verdictPathOverride != "" {
@@ -146,7 +207,19 @@ func announceSlow(id string, d time.Duration) {
 
 // enddesign
 
-// design: go-why-derived  implements: req-verdict-machinery.4
+// The coverage announce hooks are assigned HERE, outside the region on purpose
+// (q-coverage-ids-physics, ruling B): the kernel decides WHEN to announce; the
+// announce lane owns the world contact; the assignment itself is plumbing.
+func init() {
+	coverageProgress = func(i, n int, id string) {
+		fmt.Fprintf(feedbackW, "verification: %d/%d %s\n", i, n, id)
+	}
+	coverageReport = func(line string) {
+		fmt.Fprintln(feedbackW, line)
+	}
+}
+
+// design: go-why-derived  implements: req-verdict-machinery.4, req-why-honest-delta
 // `why` on a coverage-verified check names the RULE, its computed answer over the check's scope, and the DELTA: exactly which counted inputs fail it. The delta collector mirrors each rule's evaluation but gathers offenders instead of failing fast. tests-pass consults ONLY the verdict cache; a miss reads "unverified at this build". Asking why never triggers a battery.
 func whyCoverage(nodes map[string]Node, rule, scope string) []string {
 	verdictTag := "computes TRUE"
@@ -196,7 +269,9 @@ func coverageDelta(nodes map[string]Node, rule, scope string) []string {
 	var out []string
 	memo := map[string]string{}
 	for _, n := range nodes {
-		if deferred[n.ID] {
+		// the FULL deferral skip set (req-why-honest-delta): the adr-scrap lane AND the
+		// node's own deferred/retired stamp — a parked item never lists as an offender
+		if deferred[n.ID] || n.Deferred != "" || n.Retired != "" {
 			continue
 		}
 		switch rule {
@@ -255,7 +330,7 @@ func coverageDelta(nodes map[string]Node, rule, scope string) []string {
 				n.Suite != "never-cached" { // the RULE skips standalone members; the delta must agree
 				if strings.HasPrefix(n.Verify, "selftest:") {
 					if pass, ok := verdictLookup(n.ID, fullHash(n.ID, nodes, memo)); !ok {
-						out = append(out, "test "+n.ID+" unverified at this build (verdict-cache miss)")
+						out = append(out, "test "+n.ID+" unverified at this build (verdict-cache miss) - run `quack verify "+n.ID+"` to record it")
 					} else if !pass {
 						out = append(out, "test "+n.ID+" FAILS at its current inputs")
 					}

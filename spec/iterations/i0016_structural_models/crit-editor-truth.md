@@ -1,6 +1,7 @@
 ---
 id: crit-editor-truth
 type: criterion
+weight: 0.20
 metric: authoring comfort in the truth file (0-1)
 target: sketch-grade comfort for the spatial kinds
 statement: The axis weighs how pleasantly the owner authors the model in the very file the engine checks.

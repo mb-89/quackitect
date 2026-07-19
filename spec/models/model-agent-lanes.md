@@ -1,7 +1,7 @@
 ---
 id: model-agent-lanes
 type: model
-kind: element-tree
+kind: structural
 statement: Where the agent's read and write lanes and the i24 guards live.
 ---
 

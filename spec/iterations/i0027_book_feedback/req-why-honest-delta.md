@@ -13,4 +13,4 @@ provenance:
   kind: agent-proposal: first of functional|quality|constraint|interface - veto or confirm
 ---
 ## Rationale (not load-bearing)
-TODO
+The why lister named inputs that had not changed; the delta must name exactly what moved, or say nothing moved.

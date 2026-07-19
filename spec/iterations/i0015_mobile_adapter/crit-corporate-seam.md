@@ -1,6 +1,7 @@
 ---
 id: crit-corporate-seam
 type: criterion
+weight: 0.6
 metric: rework needed for Teams or Outlook-COM
 statement: The axis weighs how directly the shape carries to the deferred corporate adapters.
 class: review

@@ -1,6 +1,7 @@
 ---
 id: adr-onion-extend
 type: adr
+datum: cand-onion-fresh
 decided_in: i0027_book_feedback
 adjudicated_by: user
 statement: The onion render extends the existing bus-bar machinery in place. Chosen over a fresh renderer, which scored lower on cost and the one-renderer axis; the M5 spike is the kill-criterion.
@@ -13,4 +14,4 @@ provenance:
   kind: agent-proposal: first of architecture|project|waiver|quality|risk - veto or confirm
 ---
 ## Rationale (not load-bearing)
-TODO
+Not applicable - the decision body above carries the options and the reasoning; this slot adds nothing.

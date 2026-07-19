@@ -1,6 +1,7 @@
 ---
 id: crit-zero-dep
 type: criterion
+weight: 0.9
 metric: lines of protocol code beyond net/http
 statement: The axis weighs how much hand-rolled protocol code the candidate forces into the stdlib-only engine.
 class: review

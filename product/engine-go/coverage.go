@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -29,6 +28,13 @@ var coverageMemo = map[string]bool{}
 // tpAnnouncing latches the OUTERMOST tests-pass evaluation as the only announcer:
 // one run, one stable 1..N sequence, a computable percentage.
 var tpAnnouncing bool
+
+// The announce SEAM (q-coverage-ids-physics, ruling B): the kernel rule computes and
+// DECIDES; it never prints. The verify-feedback lane injects these hooks at init, so
+// the progress lines still reach the watching console - through the I/O lane, where
+// world contact belongs. A nil hook simply stays silent.
+var coverageProgress func(i, n int, id string)
+var coverageReport func(line string)
 
 func coverageRule(nodes map[string]Node, rule, scope string) bool {
 	key := rule + "|" + scope
@@ -252,8 +258,8 @@ func coverageRuleUncached(nodes map[string]Node, rule, scope string) bool {
 		// ONE end report; the rule answers once. Discover once, fix batched, confirm once.
 		var rep batteryReport
 		for i, t := range ts {
-			if announce {
-				fmt.Fprintf(feedbackW, "verification: %d/%d %s\n", i+1, len(ts), t.ID)
+			if announce && coverageProgress != nil {
+				coverageProgress(i+1, len(ts), t.ID)
 			}
 			pass := false
 			if strings.HasPrefix(t.Verify, "selftest:") { // in-process, like gateState — cached by verdict (go-verdict-cache)
@@ -264,8 +270,8 @@ func coverageRuleUncached(nodes map[string]Node, rule, scope string) bool {
 			rep.record(t.ID, pass)
 		}
 		if out, code := rep.summary(); code != 0 {
-			if announce {
-				fmt.Fprintln(feedbackW, out)
+			if announce && coverageReport != nil {
+				coverageReport(out)
 			}
 			return false
 		}

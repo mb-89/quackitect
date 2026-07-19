@@ -13,4 +13,4 @@ provenance:
   kind: agent-proposal: first of architecture|project|waiver|quality|risk - veto or confirm
 ---
 ## Rationale (not load-bearing)
-TODO
+Not applicable - the decision body above carries the options and the reasoning; this slot adds nothing.

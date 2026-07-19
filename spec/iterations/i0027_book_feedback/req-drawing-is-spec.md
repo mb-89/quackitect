@@ -13,4 +13,4 @@ provenance:
   kind: agent-proposal: first of functional|quality|constraint|interface - veto or confirm
 ---
 ## Rationale (not load-bearing)
-TODO
+A committed drawing is a spec artifact, never a trace node; the fence rule lets drawings live in iteration folders without being parsed.

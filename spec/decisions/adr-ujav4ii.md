@@ -9,4 +9,4 @@ class: review
 killer: false
 ---
 ## Rationale (not load-bearing)
-TODO
+Not applicable - the decision body above carries the options and the reasoning; this slot adds nothing.

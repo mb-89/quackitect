@@ -1,6 +1,7 @@
 ---
 id: crit-self-contained
 type: criterion
+weight: 0.15
 metric: external requests at open, and book size delta (MB)
 target: zero external requests; size growth bounded by the embed budget discipline
 statement: The axis weighs whether the book stays one dependency-free file of bounded size.

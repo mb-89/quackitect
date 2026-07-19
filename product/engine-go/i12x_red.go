@@ -836,9 +836,9 @@ func selftestChapterCanning() bool {
 	slotRe := regexp.MustCompile(`\{\{([a-z-]+)`)
 	// no ch7: rationales fold into the ch8 Appendix
 	allowed := map[string]map[string]bool{
-		"man-ch5-verification-validation": {"records-lede": true, "validation": true},
-		"man-ch6-project":                 {"approach": true},
-		"man-ch8-guidance":                {"guides": true},
+		"man-verification-validation": {"records-lede": true, "validation": true},
+		"man-project":                 {"approach": true},
+		"man-guidance":                {"guides": true},
 	}
 	base := filepath.Join(EngineDir(), "method", "templates", "documents", "spec")
 	for ch, ok := range allowed {
@@ -864,7 +864,7 @@ func selftestDocSkeletons() bool {
 	}
 	preset, err := os.ReadFile(filepath.Join(base, "man-preset-newcomer.md"))
 	if err != nil || !strings.Contains(string(preset), "mode: preset") ||
-		!strings.Contains(string(preset), "man-ch0-orientation") {
+		!strings.Contains(string(preset), "man-intro-ifus") {
 		return false
 	}
 	agent, err := os.ReadFile(filepath.Join(base, "man-agent-guide.md"))
@@ -904,12 +904,12 @@ func selftestMethodsView() bool {
 	}
 	// the appendix embeds the view; no reader chapter embeds a methods view anymore
 	base := filepath.Join(EngineDir(), "method", "templates", "documents", "spec")
-	ch8, err := os.ReadFile(filepath.Join(base, "man-ch8-guidance.md"))
+	ch8, err := os.ReadFile(filepath.Join(base, "man-guidance.md"))
 	if err != nil || !strings.Contains(string(ch8), "![[methods.base#Methods in full]]") {
 		return false
 	}
-	for _, ch := range []string{"man-ch3-design-input", "man-ch4-design-output",
-		"man-ch5-verification-validation", "man-ch6-project"} {
+	for _, ch := range []string{"man-design-input", "man-design-output",
+		"man-verification-validation", "man-project"} {
 		raw, err := os.ReadFile(filepath.Join(base, ch+".md"))
 		if err != nil || strings.Contains(string(raw), "![[methods.base#") {
 			return false
@@ -995,8 +995,8 @@ func selftestCriteriaValidation() bool {
 	if err != nil {
 		return false
 	}
-	ch1, _ := os.ReadFile(filepath.Join(EngineDir(), "method", "templates", "documents", "spec", "man-ch1-motivation.md"))
-	ch5, _ := os.ReadFile(filepath.Join(EngineDir(), "method", "templates", "documents", "spec", "man-ch5-verification-validation.md"))
+	ch1, _ := os.ReadFile(filepath.Join(EngineDir(), "method", "templates", "documents", "spec", "man-motivation.md"))
+	ch5, _ := os.ReadFile(filepath.Join(EngineDir(), "method", "templates", "documents", "spec", "man-verification-validation.md"))
 	if !strings.Contains(string(ch1), "![[needs.base]]") || strings.Contains(string(ch1), "![[criteria.base]]") ||
 		!strings.Contains(string(ch1), "## The delta, and what closes it") ||
 		!strings.Contains(string(ch5), "![[criteria.base]]") {
@@ -1018,7 +1018,7 @@ func selftestCriteriaValidation() bool {
 
 // test-ch3-mech -> selftest:ch3-mech
 func selftestCh3Mech() bool {
-	raw, err := os.ReadFile(filepath.Join(EngineDir(), "method", "templates", "documents", "spec", "man-ch3-design-input.md"))
+	raw, err := os.ReadFile(filepath.Join(EngineDir(), "method", "templates", "documents", "spec", "man-design-input.md"))
 	if err != nil {
 		return false
 	}
@@ -1038,15 +1038,17 @@ func selftestCh3Mech() bool {
 	// requirements.base nor assumptions.base (assumptions read in the raid
 	// register); the methods view lives in the appendix)
 	// RE-POINTED at the post-ship feedback batch (owner note 5): the QUALITIES and
-	// CONSTRAINTS sections DIED - both are filterable TYPE values of the register
-	// now, so the two base embeds must be GONE from the chapter.
-	for _, want := range []string{"fig: context-star", "![[neighbours.base]]", "![[tensions.base]]", "fig: ucfn-board",
+	// CONSTRAINTS sections DIED - both are filterable TYPE values of the register.
+	// RE-POINTED again at the i27 register fold: the use-cases-and-functions board
+	// DIED too - the register carries the fold, so its fig must be gone as well.
+	for _, want := range []string{"fig: context-model", "![[neighbours.base]]", "![[tensions.base]]",
 		"fig: input-register"} {
 		if !strings.Contains(t, want) {
 			return false
 		}
 	}
-	if strings.Contains(t, "![[qualities.base]]") || strings.Contains(t, "![[constraints.base]]") {
+	if strings.Contains(t, "![[qualities.base]]") || strings.Contains(t, "![[constraints.base]]") ||
+		strings.Contains(t, "fig: ucfn-board") {
 		return false // the dead sections must not resurface
 	}
 	// the coverage board sits in its own unit
@@ -1071,7 +1073,7 @@ func selftestCh3Mech() bool {
 
 // test-ch4-mech -> selftest:ch4-mech
 func selftestCh4Mech() bool {
-	raw, err := os.ReadFile(filepath.Join(EngineDir(), "method", "templates", "documents", "spec", "man-ch4-design-output.md"))
+	raw, err := os.ReadFile(filepath.Join(EngineDir(), "method", "templates", "documents", "spec", "man-design-output.md"))
 	if err != nil {
 		return false
 	}
@@ -1099,7 +1101,7 @@ func selftestCh4Mech() bool {
 		return false // the copied-content view is dead; the drivers list lives in the appendix
 	}
 	// the drivers landed in the appendix guidance beside the methods
-	ch8t, err := os.ReadFile(filepath.Join(EngineDir(), "method", "templates", "documents", "spec", "man-ch8-guidance.md"))
+	ch8t, err := os.ReadFile(filepath.Join(EngineDir(), "method", "templates", "documents", "spec", "man-guidance.md"))
 	if err != nil || !strings.Contains(string(ch8t), "fig: asr-list") || !strings.Contains(string(ch8t), "fig: model-kinds") {
 		return false
 	}

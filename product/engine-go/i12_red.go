@@ -372,7 +372,9 @@ func selftestBookFigures() bool {
 	}
 	defer os.RemoveAll(dir)
 	fx := bookFixture(dir, 1, true)
-	man := "---\nid: man-fig\ntype: manifest\nmode: chapter\nstatement: Figures.\n---\n<!-- ai:3 -->\nThe lede for the figure chapter.\n---\nfig: timeline\n---\nfig: context-star\n"
+	// re-pointed at the i27 c12 walk: the 'timeline' fig kind retired for the shared
+	// project-timeline component, so the inline-fig probe rides the context model
+	man := "---\nid: man-fig\ntype: manifest\nmode: chapter\nstatement: Figures.\n---\n<!-- ai:3 -->\nThe lede for the figure chapter.\n---\nfig: context-model\n"
 	mp := filepath.Join(dir, "man-fig.md")
 	os.WriteFile(mp, []byte(man), 0o644)
 	fx["man-fig"] = Node{ID: "man-fig", Type: "manifest", Mode: "chapter", Statement: "Figures.", Path: mp}
@@ -384,14 +386,14 @@ func selftestBookFigures() bool {
 	if len(findings) != 0 {
 		return false
 	}
-	if !strings.Contains(html, `aria-label="timeline"`) || !strings.Contains(html, `aria-label="context diagram"`) {
+	if !strings.Contains(html, `aria-label="context diagram"`) {
 		return false // derived figures render inline
 	}
 	if strings.Contains(html, "src=") {
 		return false // no external asset request
 	}
 	text := regexp.MustCompile(`<[^>]+>`).ReplaceAllString(html, " ")
-	if !strings.Contains(text, "i0012_spec_book") {
+	if !strings.Contains(text, "probe") {
 		return false // the figure's text content survives plain-text extraction
 	}
 	// stakeholder-matrix and vv-table retired to canned base queries (req-derived-boards.2, selftest:fig-tables)
@@ -654,7 +656,9 @@ func selftestDeckMode() bool {
 	}
 	defer os.RemoveAll(dir)
 	fx := bookFixture(dir, 1, true)
-	man := "---\nid: man-deck-fix\ntype: manifest\nmode: deck\nstatement: Fixture deck.\n---\n<!-- ai:3 -->\n# Title slide\nNote: opening words\n---\n[req-fix](req-fix.md)\nNote: the requirement slide\n---\nfig: timeline\n"
+	// re-pointed at the i27 c12 walk: the 'timeline' fig kind retired; the deck's
+	// fig slide rides the context model (an empty star still renders a valid unit)
+	man := "---\nid: man-deck-fix\ntype: manifest\nmode: deck\nstatement: Fixture deck.\n---\n<!-- ai:3 -->\n# Title slide\nNote: opening words\n---\n[req-fix](req-fix.md)\nNote: the requirement slide\n---\nfig: context-model\n"
 	mp := filepath.Join(dir, "man-deck-fix.md")
 	os.WriteFile(mp, []byte(man), 0o644)
 	fx["man-deck-fix"] = Node{ID: "man-deck-fix", Type: "manifest", Mode: "deck", Statement: "Fixture deck.", Path: mp}

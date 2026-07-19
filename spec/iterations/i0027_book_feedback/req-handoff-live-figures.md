@@ -14,4 +14,4 @@ provenance:
   statement: skeleton value
 ---
 ## Rationale (not load-bearing)
-TODO
+The handover page reviews models; static snapshots lie - the live figures must carry the same interactivity as the book.

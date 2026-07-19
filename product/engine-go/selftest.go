@@ -50,7 +50,24 @@ func runSelftestOne(name string) bool {
 			return t.fn()
 		}
 	}
-	return false // unknown / not-yet-built check -> OPEN
+	return false // unknown / not-yet-built check -> OPEN (the CLI surface says UNKNOWN)
+}
+
+// selftestKnown answers whether a name is registered — the CLI's unknown-name guard.
+func selftestKnown(name string) bool {
+	for _, names := range strings.Fields(name) {
+		found := false
+		for _, t := range selftestRegistry {
+			if t.name == names {
+				found = true
+				break
+			}
+		}
+		if !found {
+			return false
+		}
+	}
+	return true
 }
 
 // The smallest core checks, formerly inline in the dispatch switch.
@@ -766,6 +783,13 @@ func RunSelftestCLI(args []string) int {
 		return 1
 	}
 	for _, n := range names {
+		// an unknown name says so (go-refusal-lint): a bare FAIL here reads as a
+		// regression and has cost real false scares — the trap this message kills
+		if !selftestKnown(n) {
+			ok = false
+			fmt.Printf("selftest %-12s UNKNOWN - not a registered name; a test node's verify line may bundle several names - read it, then re-run\n", n)
+			continue
+		}
 		pass := runSelftest(n)
 		status := "ok"
 		if !pass {

@@ -15,8 +15,8 @@ import (
 // and expiry, grant-close ends the stretch. In-scope agent blesses stamp the grant id on their
 // own bless event; an uncovered agent bless on a KILLER is refused toward the pager. Opening or
 // closing a grant is the owner's act: the console channel, or an explicit --by user delegation
-// on the agent channel (the same channel-actor doctrine as bless). Model contract:
-// model-grant-lifecycle (live -> closed -> reviewed, no way back to live).
+// on the agent channel (the same channel-actor doctrine as bless). The lifecycle
+// contract: live -> closed -> reviewed, no way back to live.
 
 type grantInfo struct {
 	ID     string

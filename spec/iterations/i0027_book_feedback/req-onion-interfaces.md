@@ -13,4 +13,4 @@ provenance:
   kind: agent-proposal: first of functional|quality|constraint|interface - veto or confirm
 ---
 ## Rationale (not load-bearing)
-TODO
+The interfaces are architecture content and belong beside the onion; an all-empty column is noise, not information.

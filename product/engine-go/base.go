@@ -568,7 +568,7 @@ func (bp *baseParser) parseCall(name string) (string, error) {
 	bp.take() // )
 	short := name[strings.LastIndex(name, ".")+1:]
 	if baseVolatile[short] {
-		return "", fmt.Errorf("base: volatile function %q refused (byte-identical regeneration)", short)
+		return "", fmt.Errorf("base: volatile function %q refused (byte-identical regeneration) - drop the volatile call from the view", short)
 	}
 	switch {
 	case name == "file.hasLink" && len(args) == 1:
@@ -752,7 +752,7 @@ type BaseRow struct {
 	Facets []string // f-<facet>-<value> classes for the board's CSS filter (go-facet-board)
 	Head   string   // full render: the section headline (statement, else title, else id)
 	Body   string   // full render: the note body markdown
-	Need   string   // authored need for a row without a node id (a derived function row); node-backed rows resolve through the trace
+	Need   string   // authored need for a row without a node id; node-backed rows resolve through the trace
 }
 
 type BaseGroup struct {
@@ -762,12 +762,14 @@ type BaseGroup struct {
 }
 
 type BaseResult struct {
-	Name    string
-	Columns []string
-	Groups  []BaseGroup
-	Full    bool // render as sections with bodies instead of a table
-	Refs    bool // render rows through the state-aware node renderer
-	Depth   int  // refs depth; default 1
+	Name     string
+	Columns  []string
+	Groups   []BaseGroup
+	Full     bool                // render as sections with bodies instead of a table
+	Refs     bool                // render rows through the state-aware node renderer
+	Depth    int                 // refs depth; default 1
+	PageSize int                 // reader-table default rows per page; 0 = the shared default (20)
+	FacetOff map[string][]string // column name -> facet values DESELECTED at emit (e.g. a closed status starts hidden) - the default stays data, not code
 }
 
 // EvalBase evaluates a base block over the given note files, deterministically.

@@ -14,7 +14,7 @@ Do this before anything else on this project:
 
 1. **READ** `product/quackitect/method/prompts/contract.md`. The whole file, with your file-reading tool. No skimming. No summaries. No memory of a past session.
 2. **UNDERSTAND** it. It is binding. It overrides your defaults. It governs every move you make here.
-3. **RECITE** it. Paraphrase its specifics back to the adjudicator so they SEE it. With a command already in hand and an interactive question tool available: put the WHOLE recital inside the question and ask leave to continue — approval resumes the command in the same turn, no re-prompt. Question text collapses line breaks: keep the question line to ONE sentence and put the recital card in the continue option's PREVIEW (previews render markdown). Otherwise: STOP, and end your turn with the recital — no tool call after it, or the harness may swallow it (mid-turn text does not render). Name rule 3's `actor=agent` killer-bless exception. That proves you read it. Confirm you will obey.
+3. **RECITE** it. Paraphrase its specifics back to the adjudicator so they SEE it. With a command already in hand and an interactive question tool available: put the WHOLE recital inside the question and ask leave to continue — approval resumes the command in the same turn, no re-prompt. Question text collapses line breaks: keep the question line to ONE sentence and put the recital card in the continue option's PREVIEW (previews render markdown). Otherwise: STOP, and end your turn with the recital — no tool call after it, or the harness may swallow it (mid-turn text does not render). Name rule 3's `actor=agent` killer-bless exception. That proves you read it. Confirm you will obey. A fresh session never holds a session key. So ask for the attest grant in the SAME recital round: tell the adjudicator to run `quack attest --grant` and hand you the code. Do not probe the engine source for the attest mechanics. The contract's attest section has them all.
 4. **HONOR** every instruction in it. No exceptions. To the letter of each statement.
 5. **READ** `product/brand/voice.md` next. Every output follows it. Chat and artifacts alike.
 6. **BOOT** with `product/quackitect/method/prompts/onboard.md` before you start work. Boot ends when a fresh command surface can run `quack next`, or when you can name the one blocker that prevents it.
@@ -58,25 +58,28 @@ ADJUDICATES the ones that are gates. **Never bless on their behalf.**
 ```
 quack status [id]        # the text board to stdout; with an id, why it's suspect
 quack next               # the next ready check to walk
+quack boot               # the fixed boot sequence as a live checklist + verdict (ungated; runs before attest)
 quack start <id> [--plan]# activate a version (--plan registers a future one)
 quack start stubs [path] # emit drive-from-inside stubs into a bare workspace (ungated: creation, not ledger)
 quack start init <path>  # scaffold a full VEHICLE: vendored engine + committed method overlay (product/<name>/method, declared in spec/project.toml)
 quack mcp                # serve the command surface as MCP tools over stdio (agent-discoverable; per-session attest). The default face is a SUPERVISOR: a staged build hot-swaps the child engine mid-session and emits list_changed; observe-red, query, and ship ride the tool surface
 quack render <model> --out <F> [--mark ids] # standalone architecture-review onion with change marks
 quack cluster <model>    # DSM structuring proposal: coupling clusters, layering, tears
-quack apply <manifest.json> [--dry] # judged bulk edits: byte-exact {file, old, new}, all-or-nothing
+quack apply <manifest.json> [--dry] # judged bulk edits: byte-exact {file, old, new} plus op set-field (scalar frontmatter surgery), all-or-nothing; --undo reverts the last apply (journal keeps the last four)
+quack mv <old-id> <new-id> [--dry] # the rename determinizer: renames the node and follows EVERY reference class - file name, links, bare ids, edge lanes, engine source - journaled and undoable
 quack why <id>           # what input changed
 quack bless [--all|<id>] [--by user|agent] # record an adjudication; actor defaults by CHANNEL; an agent bless on a KILLER needs a live grant
 quack grant open|close|review # a recorded standing grant (scope, expiry); in-scope agent blesses stamp it; review lists the collection for confirmation
 quack migrate-actors     # one-shot: rewrite legacy actor stamps to user (audited; no-op when done)
 quack migrate-layout     # one-shot: move a legacy-layout spec to the template-mirroring layout (no-op when done)
+quack migrate-functions  # one-shot: mint need functions-list entries as function nodes (no-op when done)
 quack query "<expr>"     # read-only rows from the loaded graph (nodes; edge.* edges; note.* notes) - the agent's read lane, also an MCP tool
 quack note "<text>"      # deterministic capture lane
 quack note --file2list <copy.html> # list a commented book copy as note candidates (roles, never names)
 quack notes [--all]      # list open inbox notes (--all adds backlog + archive)
 quack observe-red <test> [--refresh] # run a test and record it FAILING at its current hash (a pass is refused; --refresh re-attests an amended, still-failing test)
 quack gather <ver>       # collect all rigor+type source for an iteration
-quack report [--watch]   # render the live HTML board (--open opens it; --out F renders elsewhere)
+quack report [book] [--watch] # render the live HTML board, or a fresh BOOK with `book` (--open opens it; --out F renders elsewhere)
 quack progress [--pager <gate>] # the readout, or the handover pager for a killer/milestone gate
 quack calls --summary    # print the call-log aggregate, then delete the log (the retro's log step)
 quack pair [ntfy]        # one-time device pairing: mints the topic credential, renders the deep-link QR, prints the disclaimer + lockscreen instruction
@@ -86,7 +89,7 @@ quack await [--timeout s]      # block until a pending ask is answered and APPLY
 quack ship               # package product/ -> the workspace data home (out/)
 quack verify <check>     # re-run one executed check eagerly - THE V&V battery lane, once per iteration, in its own visible console
 quack build              # compile the engine, write the build stamp, re-baseline golden-root (skips the compile when no engine source changed)
-quack lint               # coverage holes, duplicate ids, EARS lint, monotonic wiring
+quack lint               # coverage holes, duplicate ids, EARS lint, monotonic wiring, refusal recovery, rationale slots, voice/prose, schema fields, stale book
 quack selftest           # the engine's own dependency-free self-test (agent channel: the FULL battery only at a milestone review; single tests always)
 quack version            # engine version + the resolved data locations
 ```

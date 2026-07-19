@@ -2,7 +2,7 @@
 id: req-ch3-needs-intro
 type: requirement
 depends_on: []
-statement: The book shall open chapter 3 with IFU prose and a reference to the design-input register, not a needs list.
+statement: The book shall open the design-input chapter with IFU prose and a reference to the design-input register, not a needs list.
 class: review
 killer: false
 kind: functional

@@ -52,7 +52,7 @@ var nodeKeysAllow = map[string]bool{
 	"allocations": true, "scope": true, "audience": true, "responsibility": true,
 	"realization": true, "preset": true, "guide": true, "src": true, "dst": true, "q": true,
 	"verify_method": true, // the requirement item's method field - the bare verify key stays the executed-check referent
-	"functions":     true, // the need item's functional structure (semantics in the need item template)
+	"datum":         true, // the M4 decision's Pugh datum candidate (req-pugh-render)
 	"question":      true, // the model node's question field (the statement may carry it instead)
 	// the question-node fields (go-question-nodes, adr-question-nodes-provenance):
 	// decision state (open | proposed | decided) and, once decided, its provenance
@@ -60,6 +60,11 @@ var nodeKeysAllow = map[string]bool{
 	// the decision-node provenance field: the iteration the decision was DECIDED in
 	// (optional; quack mint stamps it from the active iteration)
 	"decided_in": true,
+	// the IFU deck fields (go-ifu-arc, req-ifu-quality, req-ifu-base-state):
+	// review-82079 is the one-level map recording the seven-principle review;
+	// arc is the one-level map carrying arc metadata (start: fresh is the ruled
+	// fresh-start exception to the shared base state)
+	"review-82079": true, "arc": true,
 }
 var iterKeysAllow = map[string]bool{
 	"iteration": true, "status": true, "type": true, "rigor": true,
@@ -70,7 +75,8 @@ var refFields = map[string]bool{
 	"supersedes": true,
 	// decision-over-candidate links (go-items): dangling chosen/rejected refuse like any edge.
 	// refers is NOT here - it may carry id#heading anchors, checked by the anchor lint instead.
-	"chosen": true, "rejected": true,
+	// datum names the Pugh comparison base — a candidate id, resolved like chosen (req-pugh-render).
+	"chosen": true, "rejected": true, "datum": true,
 }
 
 // design: go-sub-addressing  implements: req-trace-clustered
@@ -215,7 +221,7 @@ func StrictIssues(specDir string) []ParseIssue {
 				if curMap == "" {
 					issues = append(issues, ParseIssue{path, k, "indented entry outside a map key"})
 				} else if v == "" {
-					issues = append(issues, ParseIssue{path, curMap + "." + k, "nested map refused (one level only)"})
+					issues = append(issues, ParseIssue{path, curMap + "." + k, "nested map refused (one level only) - flatten the entry to one level"})
 				} else if curMap == "ratings" { // go-items: scales are 0..1 everywhere
 					if f, err := strconv.ParseFloat(v, 64); err != nil || f < 0 || f > 1 {
 						issues = append(issues, ParseIssue{path, curMap + "." + k, "rating outside 0..1: " + v})
@@ -225,7 +231,12 @@ func StrictIssues(specDir string) []ParseIssue {
 			}
 			if !keys[k] {
 				curMap = ""
-				issues = append(issues, ParseIssue{path, k, "unknown frontmatter key"})
+				if !isIter && k == "functions" {
+					// retired with go-function-nodes: the list became first-class nodes
+					issues = append(issues, ParseIssue{path, k, "retired key: functions lists became function nodes - run `quack migrate-functions`"})
+				} else {
+					issues = append(issues, ParseIssue{path, k, "unknown frontmatter key"})
+				}
 				continue
 			}
 			if v == "" {

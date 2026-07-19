@@ -4,6 +4,6 @@ type: manifest
 mode: preset
 statement: First contact: orientation and motivation.
 ---
-[man-ch0-orientation](man-ch0-orientation.md)
+[man-intro-ifus](man-intro-ifus.md)
 ---
-[man-ch1-motivation](man-ch1-motivation.md)
+[man-motivation](man-motivation.md)

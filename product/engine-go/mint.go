@@ -186,7 +186,7 @@ func mintBody(kind, id string, extra map[string]string, lanes bool) string {
 	case "model":
 		mk := extra["kind"]
 		if mk == "" {
-			mk = "element-tree"
+			mk = "structural"
 		}
 		b.WriteString("kind: " + mk + "\n")
 	case "design":
@@ -215,7 +215,7 @@ func mintBody(kind, id string, extra map[string]string, lanes bool) string {
 	if kind == "model" {
 		mk := extra["kind"]
 		if mk == "" {
-			mk = "element-tree"
+			mk = "structural"
 		}
 		if stub := modelStubFor(mk); stub != "" {
 			// the registry's example IS the skeleton (go-model-registry) - authored

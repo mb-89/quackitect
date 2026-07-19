@@ -3,9 +3,9 @@ id: test-drawing-is-spec
 type: test
 statement: A committed Excalidraw drawing in an iteration folder loads without becoming a node or a strict issue.
 class: executed
-verify: selftest:structural-strictness
+verify: selftest:parser-strict
 killer: false
-tests_red: exempt - built as an unblocking bugfix; the drawing assertion lives in the structural-strictness recognition selftest and was green on landing (adr-red-unobservable)
+tests_red: exempt - built as an unblocking bugfix; the drawing assertion lives in the parser-strict recognition selftest and was green on landing (adr-red-unobservable)
 provenance:
   class: skeleton value
   killer: schema-default (false)

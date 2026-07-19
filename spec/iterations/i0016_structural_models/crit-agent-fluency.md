@@ -1,6 +1,7 @@
 ---
 id: crit-agent-fluency
 type: criterion
+weight: 0.15
 metric: read/write reliability from format familiarity (0-1)
 target: native fluency, no per-session teaching
 statement: The axis weighs how natively the driving agent reads and writes the format.

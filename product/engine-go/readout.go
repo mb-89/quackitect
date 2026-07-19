@@ -554,6 +554,11 @@ func cmdProgress(rest []string) {
 			fmt.Println("handoff refused: " + g + " has no review evidence yet")
 			return
 		}
+		if qs := pagerOpenQuestions(nodes[g], nodes); len(qs) > 0 {
+			fmt.Println("handoff refused: open question(s) in the cone - propose or decide them first: " + strings.Join(qs, ", "))
+			return
+		}
+		os.Remove(pagerResultPath(g)) // a fresh round: the file's APPEARANCE is the end signal
 		out := filepath.Join(dataDirFor("out"), "handoff-"+g+".html")
 		os.MkdirAll(filepath.Dir(out), 0o755)
 		os.WriteFile(out, []byte(renderHandoffHTML(g, nodes, sm)), 0o644) // the findable artifact (dead buttons by ruling)
@@ -594,7 +599,7 @@ func cmdProgress(rest []string) {
 		case "n":
 			fmt.Println("answered n — dissent recorded, " + g + " stays open")
 		case "closed":
-			fmt.Println("page closed without an answer — " + g + " stays open, the server is gone")
+			fmt.Println("page closed — that IS the answer: rejection. " + g + " stays open, the server is gone, stop waiting")
 		case "unopened":
 			fmt.Println("no page opened — " + g + " stays open, the server is gone")
 		default:
@@ -603,6 +608,10 @@ func cmdProgress(rest []string) {
 		// end the phone side of the round: an answered page invalidates the card
 		// outright; an unanswered close first honors a tap that already arrived
 		handoffAsksClose(g, o != "y" && o != "n")
+		// the round-end contract (go-pager-round): the pollable file first, then the
+		// machine line as the FINAL stdout line
+		os.WriteFile(pagerResultPath(g), pagerResultJSON(g, o), 0o644)
+		fmt.Println(pagerRoundLine(g, o))
 		return
 	}
 	fmt.Println(ProgressBar(iter, nodes, sm, cfg, tty))

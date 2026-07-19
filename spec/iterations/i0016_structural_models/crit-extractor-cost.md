@@ -1,6 +1,7 @@
 ---
 id: crit-extractor-cost
 type: criterion
+weight: 0.15
 metric: extractor size and drift fragility (0-1, higher is cheaper)
 target: one small hand-rolled parser per admitted format
 statement: The axis weighs the cost of the zero-dep hand-rolled extractor and its fragility under format drift.

@@ -1,6 +1,7 @@
 ---
 id: crit-spatial-meaning
 type: criterion
+weight: 0.10
 metric: authored-arrangement expressiveness, after derived renders are credited (0-1)
 target: the reader gets rings and trees; authored placement is possible where a kind needs it
 statement: The axis weighs whether spatial arrangement the reader needs can be carried. Derived renders count.

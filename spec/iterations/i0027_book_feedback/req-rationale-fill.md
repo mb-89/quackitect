@@ -13,4 +13,4 @@ provenance:
   kind: agent-proposal: first of functional|quality|constraint|interface - veto or confirm
 ---
 ## Rationale (not load-bearing)
-TODO
+An empty rationale slot reads as neglect in a shipped book; the explicit not-applicable mark distinguishes judged silence from forgotten homework.

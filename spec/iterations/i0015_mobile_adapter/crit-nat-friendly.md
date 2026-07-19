@@ -1,6 +1,7 @@
 ---
 id: crit-nat-friendly
 type: criterion
+weight: 0.9
 metric: inbound endpoints required
 statement: The axis weighs whether the candidate works with outbound HTTPS only, no inbound endpoint.
 class: review

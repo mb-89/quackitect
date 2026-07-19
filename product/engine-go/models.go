@@ -14,6 +14,7 @@ import (
 	"path/filepath"
 	"regexp"
 	"sort"
+	"strconv"
 	"strings"
 )
 
@@ -26,12 +27,17 @@ type modelGraph struct {
 	Layers []string
 	Elems  map[string]modelElem
 	Flows  []modelFlow
+	// Routes: authored element -> target-node navigation (go-structure-layers).
+	// Navigation, never semantics: CanonicalHash deliberately ignores it.
+	Routes map[string]string
 }
 
 var (
 	modelSubRe  = regexp.MustCompile(`^subgraph\s+([A-Za-z0-9_-]+)$`)
 	modelNodeRe = regexp.MustCompile(`^([A-Za-z0-9_-]+)\["([^"]*)"\]$`)
 	modelEdgeRe = regexp.MustCompile(`^([A-Za-z0-9_-]+)\s*-->\|([^|]*)\|\s*([A-Za-z0-9_-]+)$`)
+	// the authored navigation route (go-structure-layers): %% route: element -> target
+	modelRouteRe = regexp.MustCompile(`^%%\s*route:\s*([A-Za-z0-9_-]+)\s*->\s*([A-Za-z0-9_-]+)$`)
 )
 
 // modelSource isolates the fenced mermaid block when the source is a full node
@@ -107,12 +113,20 @@ func extractModelGraph(src string) (modelGraph, []string) {
 	g := modelGraph{Elems: map[string]modelElem{}}
 	var lint []string
 	cur := ""
-	// a flat model (element-tree kind): no subgraph anywhere -> bare declarations
+	// a flat model (structural kind): no subgraph anywhere -> bare declarations
 	// are legal, layer stays empty
 	flat := !strings.Contains(body, "subgraph ")
 	for ln, line := range strings.Split(body, "\n") {
 		t := strings.TrimSpace(strings.TrimPrefix(line, "\ufeff"))
 		switch {
+		case modelRouteRe.MatchString(t):
+			// the authored navigation route (go-structure-layers); validated after
+			// the pass so declaration order stays free
+			m := modelRouteRe.FindStringSubmatch(t)
+			if g.Routes == nil {
+				g.Routes = map[string]string{}
+			}
+			g.Routes[m[1]] = m[2]
 		case t == "" || strings.HasPrefix(t, "%%") || t == "flowchart TD":
 			// blank, comment, or the header — cosmetic
 		case t == "end":
@@ -140,6 +154,11 @@ func extractModelGraph(src string) (modelGraph, []string) {
 			g.Flows = append(g.Flows, modelFlow{Src: m[1], Dst: m[3], Payload: m[2]})
 		default:
 			lint = append(lint, fmt.Sprintf("line %d: beyond-subset syntax: %q", ln+1, t))
+		}
+	}
+	for src := range g.Routes {
+		if _, ok := g.Elems[src]; !ok {
+			lint = append(lint, fmt.Sprintf("route from undeclared element %q - declare the element, or drop the route", src))
 		}
 	}
 	return g, lint
@@ -174,6 +193,27 @@ func (g modelGraph) CanonicalHash() string {
 
 // enddesign
 
+// design: go-models-useful  implements: req-models-useful
+// The GLOSSARY PULL LAW for models (owner ruling 2026-07-19). The book renders a
+// model ONLY when a views decision covers it: an ADR chooses it or names it in its
+// statement, the views-chosen lint's own covered rule. An uncovered model simply does
+// not appear in the book. No row, no stub, no review chatter in the reader surface:
+// that conversation is workshop business and lives in the lint and the ledger. The
+// markdown node stays legal spec truth regardless. Render follows use.
+func modelChosen(id string, nodes map[string]Node) bool {
+	for _, d := range nodes {
+		if d.Type != "adr" {
+			continue
+		}
+		if strings.Contains(d.Statement, id) || containsID(d.Chosen, id) {
+			return true
+		}
+	}
+	return false
+}
+
+// enddesign
+
 // design: go-model-render  implements: req-models-in-book
 // The book's design output chapter renders every declared model from its extracted graph, the derived view of the text truth. Every arrow carries its payload name; unlabeled arrows are useless. One figure line does it: `fig: model <id>`, or bare `fig: model` for all models sorted. The structural-models SECTION renders as the auto-generated table below (`fig: models-table`, the same table law as every other derived view). It carries one row per declared model, with the figure inside the row expand.
 func renderModelFigure(arg string, nodes map[string]Node) string {
@@ -194,6 +234,9 @@ func renderModelFigure(arg string, nodes map[string]Node) string {
 		if err != nil {
 			continue
 		}
+		if !modelChosen(id, nodes) {
+			continue // the pull law (go-models-useful): an unused model stays out of the book
+		}
 		g, _ := extractModelGraph(string(raw))
 		b.WriteString(`<section id="` + id + `" data-layer="informative"><p class="stmt"><strong>` + id + `</strong> — ` + n.Statement + "</p>\n")
 		b.WriteString(svgModelGraph(g))
@@ -208,7 +251,8 @@ func renderModelFigure(arg string, nodes map[string]Node) string {
 func renderModelsTable(nodes map[string]Node) string {
 	var ids []string
 	for id, n := range nodes {
-		if n.Type == "model" {
+		// the pull law (go-models-useful): only a views-covered model earns a row
+		if n.Type == "model" && modelChosen(id, nodes) {
 			ids = append(ids, id)
 		}
 	}
@@ -244,7 +288,7 @@ func renderModelsTable(nodes map[string]Node) string {
 		b.WriteString(`<p class="meta">` + htmlEscape(id) + `</p></td></tr>` + "\n")
 	}
 	b.WriteString("</tbody></table>")
-	b.WriteString(utableControls())
+	b.WriteString(utableControls(0))
 	b.WriteString(`</div>` + "\n")
 	return b.String()
 }
@@ -330,8 +374,16 @@ func svgModelGraph(g modelGraph) string {
 	}
 	for _, id := range ids {
 		p := pos[id]
+		// a routed element carries the book's standard click-through
+		// (go-structure-layers): the reading path context -> structural -> onion
+		if tgt := g.Routes[id]; tgt != "" {
+			b.WriteString(`<g data-node-link="` + htmlEscape(tgt) + `" style="cursor:pointer">`)
+		}
 		b.WriteString(fmt.Sprintf(`<circle cx="%.0f" cy="%.0f" r="5" fill="#4a3a1f"/>`, p[0], p[1]))
 		b.WriteString(fmt.Sprintf(`<text x="%.0f" y="%.0f" font-size="12" fill="#2a2a2a" text-anchor="middle">%s</text>`, p[0], p[1]-10, id))
+		if g.Routes[id] != "" {
+			b.WriteString(`</g>`)
+		}
 	}
 	b.WriteString(`</svg>`)
 	return b.String()
@@ -468,48 +520,244 @@ func modelStubFor(kind string) string {
 
 // enddesign
 
-// design: go-models-complete-book  implements: req-models-complete-book
-// The kind-example figure (`fig: model-kinds`) carries ONE row per supported model kind, in the same expandable reader table as everything else. It derives at render time from the registry files themselves (modelKindFiles); the book carries no hand-authored duplicate. The row names the kind, and the brief is the kind's own question. The expand holds the example: a section marked data-kind-example="<kind>" (<kind> = the registry file's base name) whose figure is the kind's by-example stub run through the normal extractor and renderer. A derived kind, with no authored stub since the context star computes from live spec data, says so instead of faking an authored example.
-func renderModelKindExamples() string {
+// design: go-models-complete-book  implements: req-models-complete-book, req-model-kinds-catalog
+// The model-kinds CATALOG (`fig: model-kinds`) derives per KIND from the registry file itself (modelKindFiles); the book carries no hand-authored duplicate. Each used kind emits one section marked data-kind-example="<kind>". The template BODY is the kind's prose, living in the template once. The template's fenced example renders small through the normal extractor: a layered example draws as the interactive onion, a flat one as the flow figure. The USE LIST links every declared model of the kind through the details-pane affordance. A kind used nowhere does not render. USE means a model node carries the kind. The derived context kind is the exception, whose use is the neighbour notes the context model computes from. Extending the section means adding one template file, nothing else.
+func renderModelKindsCatalog(nodes map[string]Node) string {
 	files := modelKindFiles()
 	if len(files) == 0 {
 		return `<p class="meta">no model kinds yet — the registry (method/models/) is empty</p>`
 	}
+	usesOf := func(kind string) []string {
+		var ids []string
+		for id, n := range nodes {
+			if n.Type == "model" && n.Kind == kind {
+				ids = append(ids, id)
+			}
+		}
+		sortStrings(ids)
+		return ids
+	}
+	neighbours := false
+	for _, n := range nodes {
+		if n.Type == "neighbour" {
+			neighbours = true
+			break
+		}
+	}
 	var b strings.Builder
-	b.WriteString(`<div class="utable" id="model-kinds-table" data-layer="derived">`)
-	b.WriteString(`<table class="q-table u-table" data-layer="derived"><thead><tr><th scope="col">kind</th><th scope="col">question</th></tr></thead><tbody>` + "\n")
+	b.WriteString(`<div id="model-kinds-catalog" data-layer="derived">` + "\n")
+	rendered := 0
 	for _, f := range files {
 		kind := strings.TrimSuffix(filepath.Base(f), filepath.Ext(f))
+		uses := usesOf(kind)
+		if kind == "context" {
+			if !neighbours {
+				continue // the derived kind is in use exactly when neighbour notes exist
+			}
+		} else if len(uses) == 0 {
+			continue // a kind used nowhere does not render
+		}
 		raw, err := os.ReadFile(f)
 		if err != nil {
 			continue
 		}
+		src := strings.ReplaceAll(string(raw), "\r\n", "\n")
 		question := ""
-		for _, ln := range strings.Split(string(raw), "\n") {
+		for _, ln := range strings.Split(src, "\n") {
 			if strings.HasPrefix(ln, "question:") {
 				question = strings.TrimSpace(strings.TrimPrefix(ln, "question:"))
 				break
 			}
 		}
-		b.WriteString(`<tr class="urow qt-exp" data-text="` + attesc(htmlEscape(strings.ToLower(kind+" "+question))) + `"><td><span class="utri" aria-hidden="true"></span>` + htmlEscape(kind) + `</td><td class="ubrief">` + htmlEscape(question) + `</td></tr>` + "\n")
-		b.WriteString(`<tr class="udetail" hidden><td colspan="2">`)
+		body := src
+		if i := strings.Index(src, "\n---\n"); i >= 0 {
+			body = src[i+len("\n---\n"):]
+		}
+		if i := strings.Index(body, "```mermaid"); i >= 0 {
+			body = body[:i]
+		}
+		body = strings.TrimSpace(body)
+		if strings.HasPrefix(body, "# ") {
+			// the template's own title heading duplicates the section heading
+			if j := strings.IndexByte(body, '\n'); j >= 0 {
+				body = strings.TrimSpace(body[j+1:])
+			} else {
+				body = ""
+			}
+		}
 		b.WriteString(`<section data-kind-example="` + kind + `" data-layer="informative">` + "\n")
+		b.WriteString(`<h3>` + htmlEscape(kind) + `</h3>` + "\n")
+		if question != "" {
+			b.WriteString(`<p class="meta">` + htmlEscape(question) + `</p>` + "\n")
+		}
+		if body != "" {
+			b.WriteString(mdLite(body) + "\n")
+		}
 		if stub := modelStubFor(kind); stub != "" {
 			g, _ := extractModelGraph(stub)
-			b.WriteString(svgModelGraph(g))
-		} else {
-			b.WriteString(`<p class="meta">derived kind — its figure computes from live spec data; no authored example exists</p>`)
+			if len(g.Layers) > 1 {
+				b.WriteString(renderOnionFromGraph(g, "mkc-"+kind))
+			} else {
+				b.WriteString(svgModelGraph(g))
+			}
 		}
-		b.WriteString("</section>")
-		b.WriteString(`</td></tr>` + "\n")
+		if len(uses) > 0 {
+			b.WriteString(`<p class="meta">used by:</p><ul>` + "\n")
+			for _, id := range uses {
+				title := nodes[id].Statement
+				b.WriteString(`<li><button type="button" data-node-link="` + htmlEscape(id) + `" title="` + attesc(htmlEscape(title)) + `">` + htmlEscape(humanizeID(id)) + `</button></li>` + "\n")
+			}
+			b.WriteString(`</ul>` + "\n")
+		} else {
+			b.WriteString(`<p class="meta">derived from the neighbour notes — no authored instances</p>` + "\n")
+		}
+		b.WriteString(`</section>` + "\n")
+		rendered++
 	}
-	b.WriteString("</tbody></table>")
-	b.WriteString(utableControls())
+	if rendered == 0 {
+		b.WriteString(`<p class="meta">no kind in use yet — a model minted with a kind surfaces it here</p>` + "\n")
+	}
 	b.WriteString(`</div>` + "\n")
 	return b.String()
 }
 
 // enddesign
+
+// design: go-pugh-matrix-render  implements: req-pugh-render
+// The Pugh matrix DERIVES, never prose. Criteria rows come from the union of the
+// candidates' rating keys that are weighted criterion nodes. Candidates come from the
+// decision's chosen and rejected edges, the DATUM column (the decision's datum field)
+// first and marked. A cell is the SIGN of the rating's delta against the datum. Better,
+// same, and worse draw as colored glyphs, the raw 0..1 rating in the title. A
+// weighted-totals row (sum of weight×rating over the weight sum) closes the table, and
+// the winner mark rides the chosen column. A decision without a datum draws nothing:
+// the data gap stays honest.
+func renderPughMatrix(adr Node, nodes map[string]Node) string {
+	datum := strings.TrimSpace(basePropsOf(adr.Path).scalars["datum"])
+	if adr.Type != "adr" || datum == "" {
+		return ""
+	}
+	if _, ok := nodes[datum]; !ok {
+		return ""
+	}
+	cands := []string{datum}
+	seen := map[string]bool{datum: true}
+	chosen := map[string]bool{}
+	for _, id := range adr.Chosen {
+		chosen[id] = true
+	}
+	rest := append(append([]string{}, adr.Chosen...), adr.Rejected...)
+	sortStrings(rest)
+	for _, id := range rest {
+		if !seen[id] {
+			if _, ok := nodes[id]; ok {
+				seen[id] = true
+				cands = append(cands, id)
+			}
+		}
+	}
+	if len(cands) < 2 {
+		return ""
+	}
+	rating := func(cand, crit string) (float64, bool) {
+		m := nodes[cand].Maps["ratings"]
+		if m == nil {
+			return 0, false
+		}
+		v, err := strconv.ParseFloat(strings.TrimSpace(m[crit]), 64)
+		if err != nil {
+			return 0, false
+		}
+		return v, true
+	}
+	// the criteria: every weighted criterion node any column rates, sorted
+	var crits []string
+	seenC := map[string]bool{}
+	for _, c := range cands {
+		for k := range nodes[c].Maps["ratings"] {
+			n, ok := nodes[k]
+			if !ok || n.Type != "criterion" || seenC[k] {
+				continue
+			}
+			seenC[k] = true
+			crits = append(crits, k)
+		}
+	}
+	sortStrings(crits)
+	if len(crits) == 0 {
+		return ""
+	}
+	weight := func(crit string) float64 {
+		v, err := strconv.ParseFloat(strings.TrimSpace(basePropsOf(nodes[crit].Path).scalars["weight"]), 64)
+		if err != nil {
+			return 0
+		}
+		return v
+	}
+	var b strings.Builder
+	b.WriteString(`<table class="pugh"><thead><tr><th scope="col">criterion</th><th scope="col">w</th>`)
+	for i, c := range cands {
+		mark := ""
+		cls := ""
+		if i == 0 {
+			mark = ` <span class="pgh-tag">datum</span>`
+			cls = ` class="pgh-datum"`
+		}
+		if chosen[c] {
+			mark += ` <span class="pgh-tag pgh-win">chosen</span>`
+		}
+		b.WriteString(`<th scope="col"` + cls + ` title="` + attesc(htmlEscape(nodes[c].Statement)) + `">` + htmlEscape(humanizeID(c)) + mark + `</th>`)
+	}
+	b.WriteString(`</tr></thead><tbody>`)
+	for _, cr := range crits {
+		w := weight(cr)
+		b.WriteString(`<tr><td title="` + attesc(htmlEscape(nodes[cr].Statement)) + `">` + htmlEscape(humanizeID(cr)) + `</td><td>` + strconv.FormatFloat(w, 'g', -1, 64) + `</td>`)
+		dv, dok := rating(cands[0], cr)
+		for i, c := range cands {
+			v, ok := rating(c, cr)
+			cell, cls := "·", "pgh-none"
+			switch {
+			case !ok:
+				// unrated: the dot stays
+			case i == 0 || !dok || v == dv:
+				cell, cls = "0", "pgh-same"
+			case v > dv:
+				cell, cls = "+", "pgh-better"
+			default:
+				cell, cls = "−", "pgh-worse"
+			}
+			title := ""
+			if ok {
+				title = ` title="` + strconv.FormatFloat(v, 'g', -1, 64) + `"`
+			}
+			b.WriteString(`<td class="` + cls + `"` + title + `>` + cell + `</td>`)
+		}
+		b.WriteString(`</tr>`)
+	}
+	// the weighted totals close the table: sum(w×r) over the weight sum
+	b.WriteString(`<tr class="pgh-total"><td>weighted total</td><td></td>`)
+	for _, c := range cands {
+		sumW, sumWR := 0.0, 0.0
+		for _, cr := range crits {
+			if v, ok := rating(c, cr); ok {
+				w := weight(cr)
+				sumW += w
+				sumWR += w * v
+			}
+		}
+		cell := "—"
+		if sumW > 0 {
+			cell = strconv.FormatFloat(sumWR/sumW+1e-9, 'f', 2, 64)
+		}
+		b.WriteString(`<td>` + cell + `</td>`)
+	}
+	b.WriteString(`</tr></tbody></table>`)
+	return b.String()
+}
+
+// enddesign
+
+// design: go-model-asbuilt  implements: req-conformance
 
 // design: go-model-asbuilt  implements: req-conformance
 // This is the as-built side of the engine's own onion. deriveDesignFlow's region call graph becomes a modelGraph. Elements are the regions the code actually carries, their layer looked up from the DECLARED model, sky-falls empty. Flows are the real calls, and reads/writes mark world contact. The lint runs the reflexion diff live: inward-only calls, rim-only I/O, kernel purity, sky-fall. This is the code's answer to the declared intent, on every lint.

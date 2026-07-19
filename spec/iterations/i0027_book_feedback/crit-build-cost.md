@@ -1,6 +1,7 @@
 ---
 id: crit-build-cost
 type: criterion
+weight: 0.20
 metric: estimated build steps and battery re-runs a candidate costs
 target: the build plan fits the iteration without tripping the requirement cap or drowning the walk
 statement: The axis weighs the engine implementation cost against this iteration's forty-test budget.

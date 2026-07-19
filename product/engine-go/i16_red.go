@@ -50,7 +50,7 @@ func selftestModelNodes() bool {
 		return false
 	}
 	defer os.RemoveAll(dir)
-	raw := "---\nid: model-probe\ntype: model\nkind: element-tree\nquestion: what depends on what?\nstatement: probe model\n---\n```mermaid\n" + i16FixtureModel + "```\n"
+	raw := "---\nid: model-probe\ntype: model\nkind: structural\nquestion: what depends on what?\nstatement: probe model\n---\n```mermaid\n" + i16FixtureModel + "```\n"
 	p := filepath.Join(dir, "model-probe.md")
 	os.WriteFile(p, []byte(raw), 0o644)
 	n := ParseNode(p)
@@ -64,7 +64,7 @@ func selftestModelNodes() bool {
 // test-draft-is-truth -> selftest:draft-is-truth
 func selftestDraftIsTruth() bool {
 	// the graph extracts from the NODE FILE itself - the fenced block, no sidecar
-	raw := "---\nid: model-x\ntype: model\nkind: element-tree\nstatement: s\n---\nprose before\n```mermaid\n" + i16FixtureModel + "```\nprose after\n"
+	raw := "---\nid: model-x\ntype: model\nkind: structural\nstatement: s\n---\nprose before\n```mermaid\n" + i16FixtureModel + "```\nprose after\n"
 	g, _ := extractModelGraph(raw)
 	if len(g.Elems) != 3 || len(g.Flows) != 2 {
 		return false
@@ -166,10 +166,18 @@ func selftestNoFlowSmell() bool {
 }
 
 // test-model-kinds -> selftest:model-kinds
+// RE-POINTED (the i27 kind walk, req-models-useful): the shipped registry is
+// context, onion, and structural; sequence and state dropped for now.
 func selftestModelKinds() bool {
 	files := modelKindFiles()
-	if len(files) < 4 {
-		return false // the registry carries the shipped model kinds
+	want := map[string]bool{"context": true, "onion": true, "structural": true}
+	if len(files) != len(want) {
+		return false // the registry carries exactly the shipped model kinds
+	}
+	for _, f := range files {
+		if !want[strings.TrimSuffix(filepath.Base(f), ".md")] {
+			return false
+		}
 	}
 	for _, f := range files {
 		raw, err := os.ReadFile(f)
@@ -188,7 +196,7 @@ func selftestModelKinds() bool {
 
 // test-model-stubs -> selftest:model-stubs
 func selftestModelStubs() bool {
-	stub := modelStubFor("element-tree")
+	stub := modelStubFor("structural")
 	if stub == "" {
 		return false
 	}
@@ -218,9 +226,9 @@ func selftestModelsGateBuild() bool {
 	}
 	defer os.RemoveAll(dir)
 	authored := filepath.Join(dir, "model-full.md")
-	os.WriteFile(authored, []byte("---\nid: model-full\ntype: model\nkind: element-tree\nstatement: s\n---\n```mermaid\n"+i16FixtureModel+"```\n"), 0o644)
+	os.WriteFile(authored, []byte("---\nid: model-full\ntype: model\nkind: structural\nstatement: s\n---\n```mermaid\n"+i16FixtureModel+"```\n"), 0o644)
 	empty := filepath.Join(dir, "model-hollow.md")
-	os.WriteFile(empty, []byte("---\nid: model-hollow\ntype: model\nkind: element-tree\nstatement: s\n---\n"), 0o644)
+	os.WriteFile(empty, []byte("---\nid: model-hollow\ntype: model\nkind: structural\nstatement: s\n---\n"), 0o644)
 	nodes := map[string]*Node{
 		"model-full":   {ID: "model-full", Type: "model", Path: authored},
 		"model-hollow": {ID: "model-hollow", Type: "model", Path: empty},
@@ -238,8 +246,11 @@ func selftestModelsInBook() bool {
 	defer os.RemoveAll(dir)
 	fx := bookFixture(dir, 1, true)
 	mp := filepath.Join(dir, "model-probe.md")
-	os.WriteFile(mp, []byte("---\nid: model-probe\ntype: model\nkind: element-tree\nstatement: probe\n---\n```mermaid\n"+i16FixtureModel+"```\n"), 0o644)
+	os.WriteFile(mp, []byte("---\nid: model-probe\ntype: model\nkind: structural\nstatement: probe\n---\n```mermaid\n"+i16FixtureModel+"```\n"), 0o644)
 	fx["model-probe"] = Node{ID: "model-probe", Type: "model", Statement: "probe", Path: mp}
+	// RE-POINTED at i27 (go-models-useful): a model renders as content only once a
+	// views decision covers it - the fixture carries its covering choice
+	fx["adr-fx-views"] = Node{ID: "adr-fx-views", Type: "adr", Statement: "the fixture views", Chosen: []string{"model-probe"}}
 	man := "---\nid: man-mod\ntype: manifest\nmode: chapter\nstatement: Design output.\n---\n<!-- ai:3 -->\nThe lede for the model chapter.\n---\nfig: model model-probe\n"
 	mpn := filepath.Join(dir, "man-mod.md")
 	os.WriteFile(mpn, []byte(man), 0o644)

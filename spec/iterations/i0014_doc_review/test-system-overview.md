@@ -8,4 +8,4 @@ killer: false
 tests_red: exempt - amended 2026-07-08 to the embedded report graph already built; a red at the amended statement was unobservable (adr-red-unobservable)
 ---
 ## Rationale (not load-bearing)
-TODO
+Not applicable - the verify line binds this test to its check; the why lives with the requirement it verifies.

@@ -52,7 +52,7 @@ onboarding for you.
 Quackitect will guide you through all steps up to your first [milestone](https://mb-89.github.io/quackitect/book.html#term-milestone).
 Need more details, or a list of all functions? Ask it.
 
-> Not ready to hand over a repo yet? **Watch this:** [From nothing to pong in 5 minutes](https://mb-89.github.io/quackitect/book.html#man-deck-pong)
+> Not ready to hand over a repo yet? **Watch this:** [From nothing to pong in 5 minutes](https://mb-89.github.io/quackitect/book.html#ifu0002-pong)
 
 <p align="center"><img src=".github/report.png" width="860" alt="The quackitect report — gated milestones (left), the trace graph (center), and coverage metrics (right)."></p>
 
@@ -66,4 +66,4 @@ You're looking at quackitect's own design, tracked and built by quackitect. It *
 |---|---|
 | [The book](spec/book.html) | quackitect's whole spec as one page. Works locally and on GitHub. |
 | [Read the book in your browser](https://mb-89.github.io/quackitect/book.html) | The same book on GitHub Pages. No clone needed. |
-| [The five-minutes walkthrough](https://mb-89.github.io/quackitect/book.html#man-deck-pong) | From an empty folder to a shipped Pong game, measured. Opens as slides; the last slide plays the game. |
+| [The five-minutes walkthrough](https://mb-89.github.io/quackitect/book.html#ifu0002-pong) | From an empty folder to a shipped Pong game, measured. Opens as slides; the last slide plays the game. |

@@ -10,4 +10,4 @@ statement: Agent - the guidance chapter, where the agent guide lives.
   (stk-agent -> man-preset-agent).
 -->
 ---
-[man-ch8-guidance](man-ch8-guidance.md)
+[man-guidance](man-guidance.md)

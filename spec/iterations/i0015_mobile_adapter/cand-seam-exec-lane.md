@@ -11,4 +11,4 @@ class: review
 killer: false
 ---
 ## Rationale (not load-bearing)
-TODO
+Not applicable - the candidate's merits live in the deciding record: the M4 decision or the Pugh matrix.

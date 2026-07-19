@@ -8,9 +8,6 @@ ratings:
   crit-responsiveness-law: 0.8
   crit-self-contained: 1.0
   crit-build-cost: 0.4
-axis: TODO
-ratings:
-  crit-TODO: 0.5
 statement: Write a fresh onion renderer against the new layout spec and retire the old figure path once parity holds.
 class: review
 killer: false
@@ -19,4 +16,4 @@ provenance:
   killer: schema-default (false)
 ---
 ## Rationale (not load-bearing)
-TODO
+Not applicable - the candidate's merits live in the deciding record: the M4 decision or the Pugh matrix.

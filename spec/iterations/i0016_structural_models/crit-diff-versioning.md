@@ -1,6 +1,7 @@
 ---
 id: crit-diff-versioning
 type: criterion
+weight: 0.10
 metric: git-diff signal and semantic-hash stability (0-1)
 target: reviewable diffs; cosmetic churn never ripples
 statement: The axis weighs git-diff readability and semantic-hash stability under edits.

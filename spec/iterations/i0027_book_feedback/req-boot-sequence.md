@@ -13,4 +13,4 @@ provenance:
   kind: agent-proposal: first of functional|quality|constraint|interface - veto or confirm
 ---
 ## Rationale (not load-bearing)
-TODO
+The 2026-07-18 boot ruling: fresh sessions stalled on ritual mechanics; a deterministic checklist makes boot self-explaining for agents and people alike.

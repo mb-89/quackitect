@@ -8,4 +8,4 @@ killer: false
 tests_red: exempt - stripFillComments landed late in i12 (pre-ship; the book could not have emitted otherwise); a true red was never observable in i13; the recorded red reflected a broken fixture, corrected at bs09 (adr-red-unobservable)
 ---
 ## Rationale (not load-bearing)
-TODO
+Not applicable - the verify line binds this test to its check; the why lives with the requirement it verifies.

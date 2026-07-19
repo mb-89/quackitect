@@ -13,4 +13,4 @@ provenance:
   kind: agent-proposal: first of functional|quality|constraint|interface - veto or confirm
 ---
 ## Rationale (not load-bearing)
-TODO
+The i24-i27 field sessions lost time to refusals that named no way forward; a refusal carrying its recovery is cheaper than any documentation.

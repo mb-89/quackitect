@@ -1,6 +1,6 @@
 package main
 
-// design: go-conn-lanes  implements: req-connections-lanes.5, req-connections-lanes.3, req-connections-lanes.6, req-connections-lanes.4
+// design: go-conn-lanes  implements: req-connections-lanes.5, req-connections-lanes.3, req-connections-lanes.6, req-connections-lanes.4, req-interface-notes
 // The connections home (adr-connections-reified plus adr-connection-lanes) has one subfolder per kind under spec/connections/, with two lanes per kind. edges.jsonl carries trivial edges, one JSON line each ({"src","dst"[,"q"]}). con- notes carry the prose-bearing ones. An edge lives in exactly ONE lane. The same triple in both refuses the graph. The kind vocabulary is TYPE-LAYER data, project_types/*/type.md `connections:` map ("<direction> <lane>"), unioned like the facet vocabularies. An unknown kind refuses. Every refusal is loud and names its file. The empty-statement guard silently dropping a note is the trap this loader exists to avoid.
 
 import (
@@ -219,7 +219,7 @@ func connectionIssues(specDir string, ids map[string]string) []ParseIssue {
 				s, d, q := props.scalars["src"], props.scalars["dst"], props.scalars["q"]
 				nk := props.scalars["kind"]
 				if props.scalars["statement"] == "" || s == "" || d == "" || nk == "" {
-					issues = append(issues, ParseIssue{p, "", "a connection note needs kind, src, dst, and statement - refused, never skipped"})
+					issues = append(issues, ParseIssue{p, "", "a connection note needs kind, src, dst, and statement - add the missing keys, then re-run"})
 					continue
 				}
 				if nk != kind {

@@ -340,23 +340,29 @@ func selftestOnboardingSurface() bool {
 	if !live {
 		return true // nested probe: the outer run decides
 	}
-	if !strings.Contains(html, `id="man-deck-pong"`) {
+	if !strings.Contains(html, `id="ifu0002-pong"`) {
 		// a vehicle's book carries its own content; only the dogfood must carry the deck
 		return !isEngineRepo(ROOT)
 	}
-	// the onboarding section IS the second unit of the fundamentals chapter (x.2)
-	u2 := strings.Index(html, `id="man-ch2-fundamentals-u2"`)
-	u3 := strings.Index(html, `id="man-ch2-fundamentals-u3"`)
-	if u2 < 0 || u3 < u2 {
+	// the onboarding home is ch2's IFUs section (x.2).
+	// RE-POINTED at i27 b22 (req-ch2-ifu-intro): the section is titled "IFUs" now -
+	// the one onboarding landing, IFU-first by owner ruling.
+	// RE-POINTED at the layout rework: chapter files carry no numbers - the intro
+	// chapter is man-intro-ifus, and the slice covers the whole article.
+	u2 := strings.Index(html, `id="man-intro-ifus"`)
+	if u2 < 0 {
 		return false
 	}
-	sec := html[u2:u3]
-	if !regexp.MustCompile(`<span class="secnum">[0-9]+\.2</span> Onboarding`).MatchString(sec) {
+	sec := html[u2:]
+	if e := strings.Index(sec, "</article>"); e > 0 {
+		sec = sec[:e]
+	}
+	if !regexp.MustCompile(`<span class="secnum">[0-9]+\.2</span> IFUs`).MatchString(sec) {
 		return false
 	}
-	// the deck link by anchor, the guides link with the preset fragment (statements 2, 3)
-	if !strings.Contains(sec, `data-goto="man-deck-pong"`) ||
-		!strings.Contains(sec, `data-goto="guides-table--aud=user,newcomer"`) {
+	// RE-POINTED at the owner's landing rework: the route-in prose died; the IFU
+	// table's auto-derived open pills carry the deck transports now.
+	if !strings.Contains(sec, `data-goto="ifu0002-pong"`) {
 		return false
 	}
 	// the guides table's deck row: typed newcomer, the deck linked by anchor in the expand
@@ -368,7 +374,7 @@ func selftestOnboardingSurface() bool {
 	if n := strings.Index(row[1:], `<tr class="urow`); n >= 0 {
 		row = row[:n+1]
 	}
-	if !strings.Contains(row, `data-aud="newcomer"`) || !strings.Contains(row, `data-goto="man-deck-pong"`) {
+	if !strings.Contains(row, `data-aud="newcomer"`) || !strings.Contains(row, `data-goto="ifu0002-pong"`) {
 		return false
 	}
 	// the README's further-reading reference: the deck at its Pages URL, by anchor
@@ -376,10 +382,10 @@ func selftestOnboardingSurface() bool {
 	if err != nil {
 		return false
 	}
-	want := "book.html#man-deck-pong" // no origin remote: the anchor still binds
+	want := "book.html#ifu0002-pong" // no origin remote: the anchor still binds
 	selfURL, hasRemote := pagesBookURL(originRemoteURL(ROOT))
 	if hasRemote {
-		want = selfURL + "#man-deck-pong"
+		want = selfURL + "#ifu0002-pong"
 	}
 	if !strings.Contains(string(raw), want) {
 		return false
@@ -397,8 +403,8 @@ func selftestOnboardingSurface() bool {
 		rdb = rdb[:n]
 	}
 	if hasRemote {
-		if !strings.Contains(rdb, `data-goto="man-deck-pong"`) ||
-			strings.Contains(rdb, selfURL+"#man-deck-pong") {
+		if !strings.Contains(rdb, `data-goto="ifu0002-pong"`) ||
+			strings.Contains(rdb, selfURL+"#ifu0002-pong") {
 			return false
 		}
 	}
@@ -439,33 +445,38 @@ func selftestPongDeck() bool {
 	if !live {
 		return true // nested probe: the outer run decides
 	}
-	di := strings.Index(html, `id="man-deck-pong"`)
+	di := strings.Index(html, `id="ifu0002-pong"`)
 	if di < 0 {
 		return !isEngineRepo(ROOT) // a vehicle's book has no pong deck; the dogfood must
 	}
-	// six slides in outline order
-	var pos [6]int
+	// seven slides in outline order (RE-POINTED at i27 b28: the arc ruling added the
+	// coverage slide as s7, the machine-readable reference home; the game stays s6)
+	var pos [7]int
 	at := di
-	for i := 1; i <= 6; i++ {
-		p := strings.Index(html, `id="man-deck-pong-s`+itoa(i)+`"`)
+	for i := 1; i <= 7; i++ {
+		p := strings.Index(html, `id="ifu0002-pong-s`+itoa(i)+`"`)
 		if p < at {
 			return false
 		}
 		pos[i-1] = p
 		at = p
 	}
-	if strings.Contains(html, `id="man-deck-pong-s7"`) {
+	if strings.Contains(html, `id="ifu0002-pong-s8"`) {
 		return false
 	}
 	deckEnd := len(html)
-	if e := strings.Index(html[pos[5]:], "</article>"); e >= 0 {
-		deckEnd = pos[5] + e
+	if e := strings.Index(html[pos[6]:], "</article>"); e >= 0 {
+		deckEnd = pos[6] + e
 	}
 	slide := func(i int) string {
-		if i < 6 {
+		if i < 7 {
 			return html[pos[i-1]:pos[i]]
 		}
-		return html[pos[5]:deckEnd]
+		return html[pos[6]:deckEnd]
+	}
+	// s7 — the coverage slide links the loop use cases the walk exercises
+	if s7 := slide(7); !strings.Contains(s7, "uc-engage-start") || !strings.Contains(s7, "uc-lawful-walk") {
+		return false
 	}
 	// s1 — get it: the clone line for THIS repo, the verbatim agent prompt
 	s1 := slide(1)
@@ -530,9 +541,11 @@ func selftestPongDeck() bool {
 			return false
 		}
 	}
-	// s3 — PONG's own design-input register (owner: pong's data, the book's table shape)
-	if !strings.Contains(s3, "req-paddle-control") || !strings.Contains(s3, "q-table") ||
-		!strings.Contains(s3, "What to see above:") {
+	// s3 — PONG's own design-input register (re-pointed at the i27 c15 walk: the
+	// authored table died; the SAME register component renders pong's data on the
+	// split slide's right half, the story text on the left)
+	if !strings.Contains(s3, "req-paddle-control") || !strings.Contains(s3, `class="sample-register"`) ||
+		!strings.Contains(s3, `class="slide-cols"`) || !strings.Contains(s3, "What to see on the right:") {
 		return false
 	}
 	s4 := slide(4)
@@ -546,8 +559,8 @@ func selftestPongDeck() bool {
 	// payload labels a bar; the caption sentence below the figure is GONE (owner
 	// ruling 2026-07-12: drop the sentence, the figure speaks).
 	if !strings.Contains(s4, `class="onion onion-sm"`) ||
-		!strings.Contains(s4, `id="man-deck-pong-s4m1-o0"`) ||
-		!strings.Contains(s4, `data-onion-go="man-deck-pong-s4m1-oLv0"`) ||
+		!strings.Contains(s4, `id="ifu0002-pong-s4m1-o0"`) ||
+		!strings.Contains(s4, `data-onion-go="ifu0002-pong-s4m1-oLv0"`) ||
 		!strings.Contains(s4, `aria-label="layered overview"`) ||
 		!strings.Contains(s4, "state to draw") ||
 		strings.Contains(s4, "What to see above:") ||
@@ -562,8 +575,10 @@ func selftestPongDeck() bool {
 	// the timeline: every slide carries its Minutes line; the total renders the REAL walk
 	// (owner ruling 2026-07-12: the measured 4:46 walk-only, fixed friction excluded,
 	// half-minute steps -> 5 minutes), never float noise
-	units := parseManifestUnits(manifestBody(filepath.Join(SPEC, "man-deck-pong.md")))
-	if len(units) != 6 {
+	// RE-POINTED at i27 b28: the arc ruling added the coverage slide (the machine-readable
+	// reference home, go-ifu-arc), so the deck carries seven units; the game stays s6.
+	units := parseManifestUnits(manifestBody(filepath.Join(SPEC, "ifus", "ifu0002-pong.md")))
+	if len(units) != 7 {
 		return false
 	}
 	for _, u := range units {
@@ -581,7 +596,7 @@ func selftestPongDeck() bool {
 	// slide's first entry (static court, no page-load work); the script's OWN start/stop
 	// buttons run and halt the simulation; leaving the slide halts it via slot.__stop
 	s6 := slide(6)
-	th := `<template id="man-deck-pong-s6-e1" data-auto="1">`
+	th := `<template id="ifu0002-pong-s6-e1" data-auto="1">`
 	tb := strings.Index(s6, th)
 	if tb < 0 {
 		return false

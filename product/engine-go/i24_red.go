@@ -299,8 +299,10 @@ func selftestBinaryBudget() bool {
 		return false // over target warns
 	}
 	fail := budgetVerdict("size", 36, 25, 0.29)
-	if fail == "" || !strings.Contains(fail, "cap") || !strings.Contains(fail, "refused") {
-		return false // over the cap refuses
+	// RE-POINTED (go-refusal-lint): the cap message now names its recovery move;
+	// the build-refused framing rides the caller's header line.
+	if fail == "" || !strings.Contains(fail, "cap") || !strings.Contains(fail, "shrink") {
+		return false // over the cap refuses, naming the way out
 	}
 	return true
 }

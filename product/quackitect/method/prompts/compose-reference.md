@@ -112,7 +112,7 @@ exactly as above.
 <!-- enddesign -->
 
 ## Decision criteria in the agent era (owner law)
-- BUILD EFFORT is a human-era criterion. With an agent building, weigh it at 0.05-0.10, or drop it. The training-data default of cost-heavy weighting encodes a world where people typed the code.
+- BUILD EFFORT is a criterion from the hand-typed era. With an agent building, weigh it at 0.05-0.10, or drop it. The training-data default of cost-heavy weighting encodes a world where people typed the code.
 - What stays genuinely scarce, and may be weighed instead: the OWNER's review attention, and machine-bound verification time (the battery on the reference machine).
 - REWORK vs REBUILD decides on ARCHITECTURE FIT, not effort: extend when the existing architecture holds; rewrite when the architecture must change. A spike that shows the architecture cannot host the new need IS the rewrite trigger.
 - The rewrite-safety precondition is this method itself: the classic never-rewrite warning rests on knowledge trapped in old code; a traced spec with test-first coverage externalizes that knowledge, so a rewrite loses nothing the ledger holds.
@@ -154,6 +154,13 @@ or WITH any renderer change - template↔book drift is forbidden. The renderer d
 table-vs-prose deterministically: a homogeneous set of typed nodes is a TABLE (never authored
 prose); a statement renders once (row brief; the expand adds only what the row lacks); section
 numbers derive at render time; cross-references are links (name + brief), never copies.
+
+## Chapter order lives in the toc (owner law, i0027)
+`spec/toc.md` (`mode: toc`) OWNS every chapter's place: one `- [name](file.md)` line per
+chapter, nested lines placing decks. A chapter file never knows its number - no number in
+the file name, none in the manifest; `order:` is only the fallback when no toc exists.
+Renaming a node (and every reference to it) is `quack mv`; scalar frontmatter surgery is
+`quack apply` with `op: set-field` - never hand-swept.
 
 ## Cross-cutting qualities (NFRs) — the owner's convention
 Reserve ONE need for qualities (e.g. `need-qualities`: "the system meets its cross-cutting

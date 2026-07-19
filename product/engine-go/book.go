@@ -117,21 +117,16 @@ func bookOrphanFindings(nodes map[string]Node) []string {
 				referenced[u.Ref] = true
 			}
 		}
-		// the ucfn board renders every need and use case - a manifest
-		// embedding it reaches them all
-		if strings.Contains(body, "fig: ucfn-board") {
-			for id, bn := range nodes {
-				if bn.Type == "need" || bn.Type == "usecase" {
-					referenced[id] = true
-				}
-			}
-		}
-		// the design input register renders every FILE-BACKED use case and
-		// requirement (the population a base view evaluates) - a node without a
-		// file stays an orphan finding
+		// the design input register renders every FILE-BACKED use case, function,
+		// and requirement (the population a base view evaluates), and its need
+		// facet lists every need - a node without a file stays an orphan finding
 		if strings.Contains(body, "fig: input-register") {
 			for id, bn := range nodes {
-				if bn.Type != "usecase" && bn.Type != "requirement" {
+				if bn.Type == "need" {
+					referenced[id] = true
+					continue
+				}
+				if bn.Type != "usecase" && bn.Type != "function" && bn.Type != "requirement" {
 					continue
 				}
 				if _, err := os.Stat(bn.Path); err != nil {
@@ -224,7 +219,7 @@ func sortStrings(s []string) {
 
 // enddesign
 
-// design: go-book-emitter  implements: req-book-artifact.1, req-manifest-render.2, req-book-artifact.3, req-reader-structure.1, req-book-trust.2, req-book-artifact.6, req-chapter-placement.3, req-module-filter-first
+// design: go-book-emitter  implements: req-book-artifact.1, req-manifest-render.2, req-book-artifact.3, req-reader-structure.1, req-book-trust.2, req-book-artifact.6, req-chapter-placement.3, req-module-filter-first, req-evidence-md-tables
 // This is the deterministic emitter core. Truth, nodes plus manifests, renders to ONE self-contained HTML. The project README opens the book as its own first chapter, the reader's starting point, through the zero-dep renderReadme projection: headings, tables, lists, inline images. Every layer is real text in a semantic DOM at emit time; script never creates content. Depth derives from node anatomy: 1 is statement, 2 adds rationale, 3 adds children, 4 adds evidence. It is never an authored tag; the strict allowlist refuses a `depth:` key on nodes. Every chapter OPENS with its lede, and a missing lede is a finding. Every unit carries a STABLE ANCHOR, <node>-u<idx>, the future comment system's hook. The artifact stamps its source state: merkle root, iteration, engine version. Each node renders a visible meta line, id, type, ledger state, so trust metadata survives plain-text extraction. No timestamps anywhere: same state, same bytes.
 func mdLite(md string) string { return mdLiteAt(md, 2) }
 
@@ -353,13 +348,48 @@ func mdLiteBlocksAt(md string, base int) string {
 			out.WriteString(p + "\n")
 			continue
 		}
-		// the block renders as RUNS: list lines make a real <ul> and quote lines a real
-		// <blockquote> even when prose shares the block - an enumeration never renders
-		// as dashed prose inside a paragraph.
+		// the block renders as RUNS: list lines make a real <ul>, pipe lines a real
+		// <table> (req-evidence-md-tables), and quote lines a real <blockquote> even
+		// when prose shares the block - an enumeration never renders as dashed prose.
 		blines := strings.Split(p, "\n")
 		for li := 0; li < len(blines); {
 			t := strings.TrimSpace(blines[li])
 			switch {
+			case strings.HasPrefix(t, "|"):
+				var trows [][]string
+				for ; li < len(blines); li++ {
+					rt := strings.TrimSpace(blines[li])
+					if !strings.HasPrefix(rt, "|") {
+						break
+					}
+					cells := strings.Split(strings.Trim(rt, "|"), "|")
+					for ci := range cells {
+						cells[ci] = strings.TrimSpace(cells[ci])
+					}
+					trows = append(trows, cells)
+				}
+				// a --- separator row marks row 0 as the header; without one the
+				// block renders headerless
+				hasHead := len(trows) > 1 && mdTableSepRe.MatchString(strings.Join(trows[1], "|"))
+				out.WriteString(`<table class="mdtable"` + attr + `>`)
+				start := 0
+				if hasHead {
+					out.WriteString("<thead><tr>")
+					for _, c := range trows[0] {
+						out.WriteString("<th>" + mdInline(c) + "</th>")
+					}
+					out.WriteString("</tr></thead>")
+					start = 2
+				}
+				out.WriteString("<tbody>")
+				for _, r := range trows[start:] {
+					out.WriteString("<tr>")
+					for _, c := range r {
+						out.WriteString("<td>" + mdInline(c) + "</td>")
+					}
+					out.WriteString("</tr>")
+				}
+				out.WriteString("</tbody></table>\n")
 			case strings.HasPrefix(t, "- "):
 				if attr != "" {
 					out.WriteString("<div" + attr + ">")
@@ -386,7 +416,7 @@ func mdLiteBlocksAt(md string, base int) string {
 				var pr []string
 				for ; li < len(blines); li++ {
 					pt := strings.TrimSpace(blines[li])
-					if strings.HasPrefix(pt, "- ") || strings.HasPrefix(pt, "> ") || pt == ">" {
+					if strings.HasPrefix(pt, "- ") || strings.HasPrefix(pt, "> ") || pt == ">" || strings.HasPrefix(pt, "|") {
 						break
 					}
 					pr = append(pr, blines[li])
@@ -399,6 +429,17 @@ func mdLiteBlocksAt(md string, base int) string {
 }
 
 var mdLinkRe = regexp.MustCompile(`\[([^\]]+)\]\(([^)]+)\)`)
+
+// mdTableSepRe: the header separator row of a markdown table (dashes, colons, pipes).
+var mdTableSepRe = regexp.MustCompile(`^[\s:|-]+$`)
+
+// shortHash: the display prefix of a build or input hash.
+func shortHash(s string) string {
+	if len(s) > 12 {
+		return s[:12]
+	}
+	return s
+}
 
 // aiMarksTokenRe: the ((ai:N)) inline token renders N robot glyphs (the involvement
 // measure shows as the ROBOT icons the margins use,
@@ -833,16 +874,24 @@ func numberBookSections(html string) (string, map[string]string, []string) {
 	return out.String(), secNums, advisories
 }
 
-// splitChapterTitle splits a chapter statement at its first dash separator into the
-// short sidebar title and the subtitle. A statement with no separator stays whole.
+// design: go-chapter-title-split  implements: req-chapter-titles
+// splitChapterTitle splits a chapter statement at its earliest dash or sentence
+// separator into the short title and the subtitle. A statement with no separator
+// stays whole. The heading renders the short title; the remainder is the sub line.
 func splitChapterTitle(t string) (string, string) {
-	for _, d := range []string{" — ", " – ", " - "} {
-		if i := strings.Index(t, d); i > 0 {
-			return strings.TrimSpace(t[:i]), strings.TrimSpace(t[i+len(d):])
+	cut, dl := -1, 0
+	for _, d := range []string{" — ", " – ", " - ", ". "} {
+		if i := strings.Index(t, d); i > 0 && (cut < 0 || i < cut) {
+			cut, dl = i, len(d)
 		}
 	}
-	return t, ""
+	if cut < 0 {
+		return t, ""
+	}
+	return strings.TrimSpace(t[:cut]), strings.TrimSpace(t[cut+dl:])
 }
+
+// enddesign
 
 // design: go-guide-ch8  implements: req-chapter-placement.1, req-chapter-placement.2
 // The agent guide is no reader chapter. agent-mode manifests render INSIDE the guidance chapter as one row of the guides TABLE (go-guides-table), with no per-audience subchapters. Every audience class stays visible in that table, with empty ones as an honest no-guide-yet row, the pull law: a guide lands when demand appears. readerChapters collects the reading-flow chapters plus the agent guides, in reading order: explicit Order slot, then id (req-system-overview). The renderer and the terms-order lint (go-terms-order-lint) walk this SAME list. That is one order source.
@@ -873,13 +922,67 @@ func readerChapters(nodes map[string]Node) (chapters, agentGuides []Node) {
 		chapters = append(chapters, agentGuides...)
 		agentGuides = nil
 	}
+	less := chapterLess(nodes)
 	for i := 1; i < len(chapters); i++ {
-		for j := i; j > 0 && (chapters[j].Order < chapters[j-1].Order || (chapters[j].Order == chapters[j-1].Order && chapters[j].ID < chapters[j-1].ID)); j-- {
+		for j := i; j > 0 && less(chapters[j], chapters[j-1]); j-- {
 			chapters[j], chapters[j-1] = chapters[j-1], chapters[j]
 		}
 	}
 	return chapters, agentGuides
 }
+
+// design: go-toc-order  implements: req-toc-order
+// The table of contents OWNS the order: a mode-toc manifest lists the chapters as
+// a markdown list, nested entries placing the decks. A chapter never knows its own
+// position; the Order slot stays the fallback for a workspace without a toc. A
+// chapter the toc misses appends at the END, visibly. Never a silent drop.
+var tocEntryRe = regexp.MustCompile(`(?m)^([ \t]*)-\s*\[[^\]]*\]\(([^)]+)\)`)
+
+func tocOrderIndex(nodes map[string]Node) (top map[string]int, nested map[string]int, ok bool) {
+	for _, n := range nodes {
+		if n.Type == "manifest" && n.Mode == "toc" {
+			top, nested = map[string]int{}, map[string]int{}
+			for i, m := range tocEntryRe.FindAllStringSubmatch(nodeBodyOf(n), -1) {
+				id := strings.TrimSuffix(filepath.Base(strings.ReplaceAll(strings.TrimSpace(m[2]), "\\", "/")), ".md")
+				if len(m[1]) == 0 {
+					top[id] = i
+				} else {
+					nested[id] = i
+				}
+			}
+			return top, nested, true
+		}
+	}
+	return nil, nil, false
+}
+
+// chapterLess is the ONE chapter comparator: toc position first when a toc
+// exists, the Order slot otherwise; the id breaks ties deterministically.
+func chapterLess(nodes map[string]Node) func(a, b Node) bool {
+	top, _, hasToc := tocOrderIndex(nodes)
+	pos := func(n Node) (int, int) {
+		if hasToc {
+			if p, ok := top[n.ID]; ok {
+				return p, 0
+			}
+			return 1 << 20, n.Order
+		}
+		return n.Order, 0
+	}
+	return func(a, b Node) bool {
+		pa, sa := pos(a)
+		pb, sb := pos(b)
+		if pa != pb {
+			return pa < pb
+		}
+		if sa != sb {
+			return sa < sb
+		}
+		return a.ID < b.ID
+	}
+}
+
+// enddesign
 
 // enddesign
 
@@ -945,7 +1048,15 @@ func renderBookHTML(nodes map[string]Node) (string, []string, []string) {
 			if msg, retired := retiredFigKinds[m[1]]; retired {
 				findings = append(findings, "fig kind '"+m[1]+"' retired "+msg)
 			} else {
-				chb.WriteString(`<figure id="` + anchor + `" data-layer="figure">` + "\n" +
+				// design: go-onion-space  implements: req-onion-space
+				// An onion figure breaks out of the prose column: the wrapper wears fig-wide,
+				// and the shell carries the breakout rule with the fullscreen exclusion.
+				wide := ""
+				if m[1] == "onion" {
+					wide = ` class="fig-wide"`
+				}
+				// enddesign
+				chb.WriteString(`<figure id="` + anchor + `"` + wide + ` data-layer="figure">` + "\n" +
 					`<button type="button" class="fig-fs" data-figfs title="fullscreen (Esc closes)">⛶</button>` + "\n" +
 					renderFigure(m[1], nodes) + "\n</figure>\n")
 			}
@@ -1036,6 +1147,10 @@ func renderBookHTML(nodes map[string]Node) (string, []string, []string) {
 		// The boundary/slide naming, the timeline, and the inert embed slots come from
 		// go-deck-anchors; the deck's anchor id IS the manifest's node id.
 		units := parseManifestUnits(manifestBody(dk.Path))
+		if dk.Kind == "ifu" {
+			// the IFU arc shape check (go-ifu-arc): findings ride the render lane
+			findings = append(findings, ifuArcFindings(dk.ID, manifestBody(dk.Path))...)
+		}
 		// the deck body assembles locally so it rides the SAME term-link + tooltip pass
 		// the chapters get: a slide's glossary term becomes a real termref (the present-mode
 		// toast reads its data-help), never a bare anchor.
@@ -1161,7 +1276,7 @@ func renderBookHTML(nodes map[string]Node) (string, []string, []string) {
 	// advisories; the toc reuses the same numbers via the anchor map.
 	bodyHTML, secNums, numAdvisories := numberBookSections(bodyHTML)
 	advisories = append(advisories, numAdvisories...)
-	// design: go-book-shell  implements: req-book-artifact.2, req-book-shell-nav.1, req-book-shell-nav.4, req-book-shell-nav.5, req-book-shell-nav.3, req-details-context.1
+	// design: go-book-shell  implements: req-book-artifact.2, req-book-shell-nav.1, req-book-shell-nav.4, req-book-shell-nav.5, req-book-shell-nav.3, req-details-context.1, req-filter-feedback, req-search-visible-hits
 	// This is the mdbook-style shell. One fixed sidebar carries the whole apparatus. It holds the chapter TOC, collected above, static DOM, its own scrollbar, the GLOBAL search, ONE hand-editable filter expression every control compiles into, and the DETAILS PANE. The details pane is a bar at the sidebar bottom that expands as the one context-help surface. window.bookDetail fills it for a clicked term, link, node, filter, search, graph node, or the book title. The pane is COMPLETELY context-sensitive: it shows only the clicked thing. The reader views ride the stakeholder rows as pills. The slide decks live in the views home (go-views-home). The baseline controls' placement stays deliberately undecided (q-views-placement). A single click on a node or term reference opens the pane. NAVIGATION runs through the pane's link (window.bookGoto), never a single-click jump. In-page anchors, the toc, keep navigating directly. The content column stays clean. The report's visual language carries over: #fafafa chrome, white panels, the uppercase small labels, the disclosure triangles. The script stays toggle-only.
 	var doc strings.Builder
 	// the book's identity is the WORKSPACE's product (go-white-label-identity):
@@ -1171,12 +1286,14 @@ func renderBookHTML(nodes map[string]Node) (string, []string, []string) {
 	doc.WriteString("<meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">\n")
 	doc.WriteString("<title>" + htmlEscape(product) + " — the spec book</title>\n")
 	doc.WriteString("<style>*{box-sizing:border-box}body{font-family:system-ui,Segoe UI,sans-serif;margin:0;line-height:1.5;color:" + bookColors["text"] + ";background:" + bookColors["bg"] + ";display:flex}" +
-		"#sidebar{width:300px;flex:none;height:100vh;position:sticky;top:0;overflow:hidden;background:#fafafa;border-right:1px solid #e3e3e3;padding:14px 16px;display:flex;flex-direction:column;gap:10px}" +
+		"#sidebar{width:300px;flex:none;height:100vh;position:sticky;top:0;overflow:clip;overflow-clip-margin:4vmax;background:#fafafa;border-right:1px solid #e3e3e3;padding:14px 16px;display:flex;flex-direction:column;gap:10px}" +
 		".sb-brand{font-weight:600;font-size:15px;margin:0;cursor:pointer;background:none;border:0;padding:0;text-align:left;font-family:inherit;color:inherit}" +
 		".sb-h{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:#7d7d7d;margin:8px 0 2px}" +
 		"#sidebar input{width:100%;padding:5px 8px;border:1px solid #ddd;border-radius:5px;font:inherit;font-size:13px;background:" + bookColors["bg"] + "}" +
 		// an ACTIVE filter is unmistakable: the input line goes yellow while any token is live
 		"#filter-expr.flt-on{background:#ffe873;border-color:#c9a400;font-weight:bold}" +
+		"#filter-wrap{position:relative;display:block}" +
+		"#filter-wrap.pinging .ping-echo{animation:qping .32s ease-out forwards}#filter-wrap.pinging .ping-echo:nth-of-type(2){animation-delay:.15s}#filter-wrap.pinging .ping-echo:nth-of-type(3){animation-delay:.3s}" +
 		// the contents area owns its scrollbar: the toc flexes to the
 		// remaining height and scrolls on its own, so it stays scrollable while the
 		// details pane below claims space.
@@ -1185,10 +1302,10 @@ func renderBookHTML(nodes map[string]Node) (string, []string, []string) {
 		"#toc summary:hover,#toc a:hover{background:#f0f0f0}#toc a{display:block;color:#333;text-decoration:none;padding:2px 6px;border-radius:4px}" +
 		"#toc .toc-sec{padding-left:22px;font-size:12px;color:#555}#toc .off{color:#bbb}" +
 		"#toc .toc-num{display:inline-block;min-width:1.1em;color:#8a93a3;font-variant-numeric:tabular-nums}" +
-		"h1 .ch-sub{display:block;font-size:.55em;font-weight:400;color:" + bookColors["meta"] + ";margin-top:.15em;line-height:1.4}" +
+		"h1 .ch-sub{display:block;font-size:.45em;font-weight:400;color:" + bookColors["meta"] + ";margin-top:.15em;line-height:1.4}" +
 		// context-help pane: a flex child pinned to the sidebar bottom. It claims space
 		// from the contents area when it expands; the toc keeps its own scrollbar above.
-		"#details.dpane{flex:none;margin:auto -16px -14px;background:#fafafa;border-top:1px solid #d8d8d8;box-shadow:0 -4px 10px rgba(0,0,0,.06)}" +
+		"#details.dpane{flex:none;position:relative;margin:auto -16px -14px;background:#fafafa;border-top:1px solid #d8d8d8;box-shadow:0 -4px 10px rgba(0,0,0,.06)}" +
 		"#dpane-bar{width:100%;text-align:left;font:inherit;font-size:12px;font-weight:600;color:#555;background:#f0f0f0;border:0;border-top:1px solid #ddd;padding:5px 12px;cursor:pointer}" +
 		"#dpane-body{max-height:60vh;overflow:auto;padding:6px 12px}" +
 		"#details.collapsed #dpane-body{display:none}" +
@@ -1206,6 +1323,22 @@ func renderBookHTML(nodes map[string]Node) (string, []string, []string) {
 		/* unified reader table */
 		".utable{margin:.7rem 0}.utable-cap{font-weight:600;margin:.2rem 0}" +
 		".upills{display:flex;flex-wrap:wrap;gap:5px;margin:.3rem 0}" +
+		".ufilters{display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap;margin:.3rem 0}" +
+		".upills.ufcol{flex-direction:column;align-items:stretch;flex-wrap:nowrap;margin:0;min-width:110px}" +
+		".upills.ufcol .pilllbl{font-weight:600}" +
+		".ufchips{display:flex;flex-direction:column;gap:5px;max-height:250px;overflow-y:auto}" +
+		".uarrow{font:inherit;font-size:.7rem;padding:0 4px;border:1px solid #d5d5d5;border-radius:6px;background:#fff;cursor:pointer}" +
+		".gopen{text-align:right;white-space:nowrap}a.gdeck{text-decoration:none}" +
+		".raid-matrix .rbub{cursor:pointer}.raid-wrap{display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap}.raid-wrap>svg{flex:0 0 50%;max-width:50%}.raid-side{flex:1 1 0;min-width:0;overflow-x:auto}.raid-side tr.rsel>td{background:#eef6ff}.rfacts{margin:.2rem 0;padding-left:18px}" +
+		qtlSharedCSS +
+		".pugh{border-collapse:collapse;margin:.4rem 0;font-size:.85rem}.pugh th,.pugh td{border:1px solid #e3e3e3;padding:2px 8px;text-align:center}.pugh td:first-child,.pugh th:first-child{text-align:left}" +
+		".pugh .pgh-tag{font-size:.65rem;font-weight:700;color:#52628a;background:#eef2f9;border:1px solid #dce4f2;border-radius:8px;padding:0 5px}.pugh .pgh-tag.pgh-win{color:#14531f;background:#d9efdc;border-color:#2f8f4e}" +
+		".pugh .pgh-better{color:#2f8f4e;font-weight:700}.pugh .pgh-worse{color:#c0392b;font-weight:700}.pugh .pgh-same{color:#888}.pugh .pgh-none{color:#ccc}.pugh tr.pgh-total td{font-weight:600;background:#fafafa}" +
+		".mdtable{border-collapse:collapse;margin:.4rem 0;font-size:.85rem}.mdtable th,.mdtable td{border:1px solid #e3e3e3;padding:2px 8px;text-align:left}.mdtable th{background:#fafafa}" +
+		".ping-echo{position:absolute;inset:-2px;border:2px solid #555;border-radius:inherit;pointer-events:none;opacity:0;z-index:3}" +
+		"#details.pinging .ping-echo{animation:qping .32s ease-out forwards}#details.pinging .ping-echo:nth-of-type(2){animation-delay:.15s}#details.pinging .ping-echo:nth-of-type(3){animation-delay:.3s}" +
+		"@keyframes qping{0%{inset:-2px;opacity:.95}100%{inset:calc(-2px - 3vmax);opacity:0}}" +
+		`figure[data-layer="figure"]>svg{display:block;margin:0 auto;max-width:100%}` +
 		".upill{font:inherit;font-size:.75rem;padding:2px 10px;border:1px solid #d5d5d5;border-radius:13px;background:#fff;cursor:pointer;color:#555}.upill.on{background:#2762c4;border-color:#2762c4;color:#fff}.upill.on .meta{color:#dbe6fa}" +
 		".pilllbl{font-size:.72rem;color:#999;margin-right:2px;align-self:center}" +
 		".u-table{width:100%;border-collapse:collapse}.u-table thead th{background:#fafafa;font-size:.75rem;font-weight:600;color:#888;text-align:left;padding:4px 8px;border:0;border-bottom:2px solid #e3e3e3;cursor:pointer}" +
@@ -1224,12 +1357,12 @@ func renderBookHTML(nodes map[string]Node) (string, []string, []string) {
 		".ucontrols{display:flex;flex-wrap:wrap;gap:6px;justify-content:flex-end;align-items:center;margin:.3rem 0;font-size:.8rem}" +
 		".ucontrols button{font:inherit;font-size:.75rem;padding:2px 8px;border:1px solid #ddd;border-radius:5px;background:#fff;cursor:pointer}.ucontrols button:hover{background:#f0f0f0}" +
 		".ucontrols input,.ucontrols select{font:inherit;font-size:.78rem;padding:2px 6px;border:1px solid #ddd;border-radius:5px}.qt-pos{color:#555;min-width:8ch;text-align:center;display:inline-block}" +
-		".onion .oview[hidden]{display:none}.onion [data-onion-go]{cursor:pointer}.onion-flow{overflow-x:auto;max-width:100%}.onion-flow svg{display:block}.onion svg{cursor:grab;touch-action:none;max-width:100%}.onion [data-node-link]{cursor:pointer}.onion .oblock{cursor:pointer}.onion .opill{cursor:pointer}.onion .osel>rect{stroke:#1b6fd6;stroke-width:2.6}.onion .oc-nb>rect{stroke:#1b6fd6;stroke-width:2}.onion .oc-on{stroke:#1b6fd6;stroke-width:2.6;opacity:1}" +
+		".onion .oview[hidden]{display:none}.onion [data-onion-go]{cursor:pointer}.onion-flow{overflow-x:auto;max-width:100%}.onion-flow svg{display:block;margin:0 auto}.onion svg{cursor:grab;touch-action:none;max-width:100%}.onion [data-node-link]{cursor:pointer}.onion .oblock{cursor:pointer}.onion .opill{cursor:pointer}.onion .osel>rect{stroke:#1b6fd6;stroke-width:2.6}.onion .oc-nb>rect{stroke:#1b6fd6;stroke-width:2}.onion .oc-on{stroke:#1b6fd6;stroke-width:2.6;opacity:1}" +
 		// the compact slide instance: the same interactive onion, sized to share a slide
 		// the slide onion FILLS the slide (owner rule): width up to the slide, height capped
 		// so the heading, bullets, and timeline stay on one screen with it
 		".onion-sm{width:100%;max-width:1100px;margin:0 auto}.onion-sm svg{max-height:62vh;width:auto;margin:0 auto;display:block}" +
-		".ctx-star svg{display:block;max-width:560px}" +
+		".ctx-model svg{display:block;max-width:560px;margin:0 auto}" +
 		/* the fullscreen button flows BELOW the figure's explanation paragraph (the prose
 		   unit above the figure), never floating over the graphic */
 		"figure[data-layer=\"figure\"]{position:relative;margin:1rem 0}.fig-fs{display:inline-block;margin:0 0 .35rem;font:inherit;font-size:13px;padding:2px 8px;border:1px solid #d5d5d5;border-radius:6px;background:#fff;cursor:pointer;opacity:.55}.fig-fs:hover{opacity:1}" +
@@ -1237,13 +1370,18 @@ func renderBookHTML(nodes map[string]Node) (string, []string, []string) {
 		   into it (a wide figure uses the full width, a tall one the full height) */
 		"figure.fig-full{position:fixed;inset:0;z-index:50;background:#fff;overflow:auto;margin:0;padding:26px;box-shadow:0 0 0 100vmax rgba(0,0,0,.35)}" +
 		"figure.fig-full .fig-fs{position:sticky;top:0;z-index:2}" +
-		"figure.fig-full>svg,figure.fig-full .oview svg,figure.fig-full .onion-flow svg,figure.fig-full .ctx-star svg{width:100%;height:calc(100vh - 100px);max-height:none;max-width:none}" +
+		"figure.fig-full>svg,figure.fig-full .oview svg,figure.fig-full .onion-flow svg,figure.fig-full .ctx-model svg{width:100%;height:calc(100vh - 100px);max-height:none;max-width:none}" +
 		"figure.fig-full .tgraph #graph{height:calc(100vh - 170px)}" +
+		"figure.fig-wide:not(.fig-full){width:min(calc(100vw - 380px),1600px);position:relative;left:50%;transform:translateX(-50%)}" +
+		"@media(max-width:900px){figure.fig-wide{width:auto;left:auto;transform:none}}" +
 		".onion-infra{display:flex;flex-wrap:wrap;gap:5px;align-items:center;margin:.3rem 0;font-size:.78rem}.onion-infra .il{color:#888;margin-right:4px}.onion-infra button{font:inherit;font-size:.75rem;padding:2px 9px;border:1px solid #d5d5d5;border-radius:12px;background:#fff;cursor:pointer}" +
+		".onion.fold-amb [data-oc-amb]{display:none}" +
 		".tgraph #graph{height:675px;border:1px solid #e3e3e3;border-radius:6px;background:#fff}" +
 		".tgraph .tabbar{display:flex;flex-wrap:wrap;gap:4px;margin:.4rem 0}.tgraph .tab{font:inherit;font-size:.78rem;padding:3px 9px;border:1px solid #ddd;border-radius:12px;background:#fff;cursor:pointer}.tgraph .tab.active{background:#eaf0fb;border-color:#9db6e0}" +
 		".tgraph .legendrow{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:.3rem 0;font-size:.8rem}.tgraph .legend{display:flex;flex-wrap:wrap;gap:8px}.tgraph .lg{display:flex;align-items:center;gap:3px;cursor:pointer}" +
-		".tgraph .sw{width:11px;height:11px;border-radius:3px;display:inline-block}.tgraph .sw.need{background:#ffe0b2}.tgraph .sw.usecase{background:#fff3b0}.tgraph .sw.requirement{background:#cfe3fb}.tgraph .sw.design{background:#cdeccd}.tgraph .sw.test{background:#e9d5f3}.tgraph .sw.adr{background:#d7ccc8}" +
+		".tgraph .sw{width:11px;height:11px;border-radius:3px;display:inline-block}" +
+		// the legend swatches come from the ONE palette source (go-type-colors)
+		traceTypeCSS(".tgraph .sw.") +
 		".tgraph #trace-filter{flex:1;min-width:120px;padding:3px 8px;border:1px solid #ddd;border-radius:5px;font:inherit;font-size:.8rem}.tgraph #filter-clear{border:1px solid #ddd;border-radius:5px;background:#fff;cursor:pointer}.tgraph #detail{display:none}" +
 		".crumbs{font-size:.85rem;margin:.3rem 0;color:#555}.crumbs button{background:none;border:none;color:#2762c4;cursor:pointer;padding:0;font:inherit;text-decoration:underline}" +
 		"article.ch.pg-hide{display:none}" +
@@ -1319,7 +1457,9 @@ func renderBookHTML(nodes map[string]Node) (string, []string, []string) {
 	// filter is one line; help opens in the details pane on focus/click.
 	// The facet tokens (phase/discipline/quality) are not in the expression: the register's
 	// coverage board carries those filters (the pills-rule exemption).
-	doc.WriteString(`<input id="filter-expr" type="text" placeholder="filter: preset:… text" title="tokens: preset:<name> state:<suspect|verified> - anything else filters as text">` + "\n")
+	// the filter field rides static ping chrome (req-filter-feedback + the dom-static
+	// law): the echoes are emitted here; the script only re-arms the pinging class
+	doc.WriteString(`<span id="filter-wrap"><input id="filter-expr" type="text" placeholder="filter: preset:… text" title="tokens: preset:<name> state:<suspect|verified> - anything else filters as text"><span class="ping-echo"></span><span class="ping-echo"></span><span class="ping-echo"></span></span>` + "\n")
 	doc.WriteString(`<p class="sb-h">contents</p><div id="toc">` + "\n")
 	for _, e := range toc {
 		// the chapter number leads its toc entry (req-book-shell-nav.1); back-matter (num 0) stays bare
@@ -1352,7 +1492,10 @@ func renderBookHTML(nodes map[string]Node) (string, []string, []string) {
 	// baseline controls stay unplaced (q-views-placement stays open). window.bookDetail fills
 	// #dpane-content on demand; the book identity rides the title button's data
 	// attributes and shows on a title click like any other click target.
-	doc.WriteString(`<div id="details" class="dpane collapsed"><button id="dpane-bar" type="button">Details <span id="dpane-caret">▴</span></button><div id="dpane-body"><div id="dpane-content"><p class="meta">Click a term, link, filter, or a graph node to see details here.</p></div></div></div>` + "\n")
+	// the three ping echoes are STATIC chrome siblings of the bar (dom-static law:
+	// the shell script toggles the pinging class, never creates nodes); they sit on
+	// #details, outside #dpane-content, so the pane fill never wipes them
+	doc.WriteString(`<div id="details" class="dpane collapsed"><div class="ping-echo"></div><div class="ping-echo"></div><div class="ping-echo"></div><button id="dpane-bar" type="button">Details <span id="dpane-caret">▴</span></button><div id="dpane-body"><div id="dpane-content"><p class="meta">Click a term, link, filter, or a graph node to see details here.</p></div></div></div>` + "\n")
 	doc.WriteString("</nav>\n")
 	doc.WriteString(`<div id="page">` + "\n")
 	// one page per top-level section (req-book-shell-nav.4, adr-section-paging):
@@ -1368,8 +1511,14 @@ func renderBookHTML(nodes map[string]Node) (string, []string, []string) {
 (function(){
  var b=document.body,fe=document.getElementById('filter-expr'),se=document.getElementById('search');
  function setTok(key,val,toggle){var t=(fe.value||'').split(/\s+/).filter(function(x){return x&&x.indexOf(key+':')!==0;});
-  var had=(fe.value||'').split(/\s+/).indexOf(key+':'+val)>=0;
-  if(val&&!(toggle&&had))t.push(key+':'+val);fe.value=t.join(' ');apply();}
+  var had=(fe.value||'').split(/\s+/).indexOf(key+':'+val)>=0,add=!!val&&!(toggle&&had);
+  if(add)t.push(key+':'+val);fe.value=t.join(' ');apply();
+  /* the round-trip (req-filter-feedback): an APPLIED view filter lands the reader on
+     the README - the stable ground - and the field announces itself with the ping */
+  if(add){if(window.bookGoto)window.bookGoto('man-readme');
+   var w=document.getElementById('filter-wrap');
+   if(w){w.classList.remove('pinging');void w.offsetWidth;w.classList.add('pinging');
+    setTimeout(function(){w.classList.remove('pinging');},800);}}}
  function apply(){
   var toks=(fe.value||'').trim().split(/\s+/).filter(Boolean),preset='',state='',words=[];
   fe.classList.toggle('flt-on',toks.length>0);
@@ -1379,6 +1528,9 @@ func renderBookHTML(nodes map[string]Node) (string, []string, []string) {
   /* a chapter with nothing for the active filter EMPTIES, never disappears:
      the heading lines stay visible, only the content hides (CSS on flt-empty) */
   document.querySelectorAll('article.ch').forEach(function(a){
+   /* the README is NEVER filtered (req-filter-feedback): it stays whole, whatever
+      the filter - the ground the filtered world is surveyed from */
+   if(a.id==='man-readme'){a.classList.remove('flt-empty');return;}
    var hid=(preset!=='')&&!a.classList.contains('in-man-preset-'+preset);
    if(!hid&&words.length){var txt=a.textContent.toLowerCase();
     words.forEach(function(w){if(txt.indexOf(w)<0)hid=true;});}
@@ -1429,8 +1581,24 @@ func renderBookHTML(nodes map[string]Node) (string, []string, []string) {
   CSS.highlights.set('book-hits',h);}
  function updateNav(){if(snav)snav.hidden=hits.length===0;
   if(hpos)hpos.textContent=hits.length?(hcur+1)+'/'+hits.length:'';}
+ /* revealHit (req-search-visible-hits): landing on a hit makes it VISIBLE first —
+    collapsed details ancestors open, a hidden expand row unhides with its trigger row
+    marked open, and a graph hit pans its svg viewBox onto the hit. */
+ function revealHit(x){var el=x.node.parentElement;if(!el)return;
+  for(var a=el;a&&a.tagName!=='MAIN';a=a.parentElement){
+   if(a.tagName==='DETAILS'&&!a.open)a.open=true;
+   if(a.hasAttribute&&a.hasAttribute('hidden'))a.removeAttribute('hidden');
+   if(a.classList&&a.classList.contains('udetail')){
+    var pr=a.previousElementSibling;if(pr&&pr.classList.contains('urow'))pr.classList.add('open');}
+  }
+  var svg=el.ownerSVGElement;
+  if(svg&&svg.getAttribute('viewBox')&&el.getBBox){try{
+   var bb=el.getBBox(),vb=svg.getAttribute('viewBox').split(/\s+/).map(Number);
+   svg.setAttribute('viewBox',(bb.x+bb.width/2-vb[2]/2)+' '+(bb.y+bb.height/2-vb[3]/2)+' '+vb[2]+' '+vb[3]);
+  }catch(e){}}}
  function goHit(i){var x=hits[i];if(!x)return;
   var host=x.node.parentElement;if(window.bookPageTo)window.bookPageTo(host);
+  revealHit(x);
   var r=document.createRange();
   try{r.setStart(x.node,x.start);r.setEnd(x.node,x.start+x.len);
    var rect=r.getBoundingClientRect();
@@ -1440,6 +1608,9 @@ func renderBookHTML(nodes map[string]Node) (string, []string, []string) {
  if(hprev)hprev.addEventListener('click',function(){stepHit(-1);});
  if(hnext)hnext.addEventListener('click',function(){stepHit(1);});
  if(se)se.addEventListener('input',function(){collectHits((se.value||'').trim());paintHits();hcur=0;updateNav();if(hits.length)goHit(0);});
+ /* the previous/next SHORTCUTS: Enter steps forward, Shift+Enter back */
+ if(se)se.addEventListener('keydown',function(e){if(e.key!=='Enter')return;
+  e.preventDefault();stepHit(e.shiftKey?-1:1);});
  /* the coverage board IS the register's filter row: a facet-count click
     toggles a VISIBLY selected pill and filters the
     register table in the same chapter - OR within one facet, AND across facets,
@@ -1535,7 +1706,10 @@ func renderBookHTML(nodes map[string]Node) (string, []string, []string) {
  document.querySelectorAll('.utable').forEach(function(ut){
   var tb=ut.querySelector('table.u-table'),body=tb?tb.tBodies[0]:null;if(!body)return;
   var facets={},board={},page=0;
-  Array.prototype.forEach.call(ut.querySelectorAll('.upills'),function(fe){var fn=fe.getAttribute('data-facet');if(fn)facets[fn]={};});
+  /* the emitted pill states seed the model (FacetOff pre-selection): a chip already
+     wearing .on starts selected - the default is data, not code */
+  Array.prototype.forEach.call(ut.querySelectorAll('.upills'),function(fe){var fn=fe.getAttribute('data-facet');if(!fn)return;facets[fn]={};
+   Array.prototype.forEach.call(fe.querySelectorAll('.upill.on'),function(p){var v=p.getAttribute('data-fv');if(v!=='*')facets[fn][v]=true;});});
   function size(){var s=ut.querySelector('.qt-size');return s?+s.value:20;}
   function rows(){return Array.prototype.slice.call(body.querySelectorAll('tr.urow'));}
   function detailOf(r){var n=r.nextElementSibling;return (n&&n.classList.contains('udetail'))?n:null;}
@@ -1544,7 +1718,11 @@ func renderBookHTML(nodes map[string]Node) (string, []string, []string) {
    if(q&&(r.getAttribute('data-text')||'').indexOf(q)<0)return false;
    for(var fn in facets){var act=facets[fn],any=false,k;
     for(k in act){if(act[k]){any=true;break;}}
-    if(any&&!act[r.getAttribute('data-'+fn)||''])return false;}
+    if(!any)continue;
+    if(fn.indexOf('b:')===0){var fok=false;
+     for(k in act){if(act[k]&&r.classList.contains('f-'+fn.slice(2)+'-'+k)){fok=true;break;}}
+     if(!fok)return false;
+    }else if(!act[r.getAttribute('data-'+fn)||''])return false;}
    /* board facets: the coverage board's selected values filter here -
       OR within one facet, AND across facets, over the rows' baked f-… classes */
    for(var bf in board){var bact=board[bf],bany=false,bk;
@@ -1600,6 +1778,11 @@ func renderBookHTML(nodes map[string]Node) (string, []string, []string) {
   if(nx)nx.addEventListener('click',function(){page++;apply();});
   var qi=ut.querySelector('.qt-search');if(qi)qi.addEventListener('input',function(){page=0;apply();});
   var sz=ut.querySelector('.qt-size');if(sz)sz.addEventListener('change',function(){page=0;apply();});
+  /* filter-column scroll arrows (req-filter-pill-rule): past ten values the chip
+     column scrolls; each arrow nudges it three chip heights. */
+  Array.prototype.forEach.call(ut.querySelectorAll('.uarrow'),function(a){a.addEventListener('click',function(){
+   var col=a.closest('.upills');if(!col)return;var ch=col.querySelector('.ufchips');if(!ch)return;
+   ch.scrollTop+=a.getAttribute('data-uscroll')==='up'?-75:75;});});
   /* setFacetMulti: select a SET of values of one pill facet (the preset-fragment
      router feeds it) - state and pill classes stay in step; an empty set resets to all */
   ut.setFacetMulti=function(fn,fvs){if(!(fn in facets))return;
@@ -1623,65 +1806,9 @@ func renderBookHTML(nodes map[string]Node) (string, []string, []string) {
    apply();return r;};
   apply();
  });
- /* onion drill-down (req-interactive-figures.2): every level is pre-rendered; the script
-    only switches which view is visible. DOUBLE-click a ring or a drillable block ENTERS it;
-    SINGLE-click a block INSPECTS it (details pane + highlight its connections), staying at
-    this level. Each drill pushes a history entry so BACK returns to the previous view; a
-    shared nav marker keeps the trace-graph and onion popstate handlers from fighting. */
- window.__quackNav=window.__quackNav||[];
- var __onionStack=[];
- function __onionShow(host,t){Array.prototype.forEach.call(host.querySelectorAll('.oview'),function(v){v.hidden=true;});t.hidden=false;}
- function __onionClear(host){Array.prototype.forEach.call(host.querySelectorAll('.osel,.oc-nb,.oc-on'),function(x){x.classList.remove('osel','oc-nb','oc-on');});}
- function __onionInspect(g){var host=g.closest('.onion');if(!host)return;__onionClear(host);g.classList.add('osel');
-  var id=g.getAttribute('data-oc-id')||'';
-  Array.prototype.forEach.call(host.querySelectorAll('[data-oc-block="'+id+'"]'),function(l){l.classList.add('oc-on');});
-  Array.prototype.forEach.call(host.querySelectorAll('[data-oc-src],[data-oc-dst]'),function(l){
-   var s=l.getAttribute('data-oc-src'),d=l.getAttribute('data-oc-dst');if(s!==id&&d!==id)return;
-   l.classList.add('oc-on');var o=host.querySelector('[data-oc-id="'+(s===id?d:s)+'"]');if(o)o.classList.add('oc-nb');});}
- /* a bus PILL: single-click traces every block the bus signal reaches (data-oc-blocks),
-    lighting each target block and the tap arrow that carries this direction. */
- function __onionPill(g){var host=g.closest('.onion');if(!host)return;__onionClear(host);g.classList.add('osel');
-  var flow=g.getAttribute('data-oc-pill');
-  (g.getAttribute('data-oc-blocks')||'').split(',').forEach(function(id){if(!id)return;
-   var o=host.querySelector('[data-oc-id="'+id+'"]');if(o)o.classList.add('oc-nb');
-   Array.prototype.forEach.call(host.querySelectorAll('[data-oc-block="'+id+'"][data-oc-flow="'+flow+'"]'),function(l){l.classList.add('oc-on');});});}
- function __onionDrill(el){var t=document.getElementById(el.getAttribute('data-onion-go'));
-  var host=el.closest('.onion');if(!t||!host)return;
-  var cur=host.querySelector('.oview:not([hidden])');
-  if(cur&&cur!==t){__onionStack.push({host:host,id:cur.id});window.__quackNav.push('onion');try{history.pushState({nav:'onion'},'');}catch(_){}}
-  __onionShow(host,t);}
- /* drill is SINGLE-click when it is the only action (a ring, a core, a crumb); a block that
-    ALSO inspects keeps drill on DOUBLE-click, so its single click can inspect+highlight. */
- document.querySelectorAll('.onion [data-onion-go]').forEach(function(el){
-  var ev=el.hasAttribute('data-oc-id')?'dblclick':'click';
-  el.addEventListener(ev,function(e){e.preventDefault();e.stopPropagation();__onionDrill(el);});});
- document.querySelectorAll('.onion [data-oc-id]').forEach(function(el){el.addEventListener('click',function(ev){
-  ev.preventDefault();__onionInspect(el);});});
- document.querySelectorAll('.onion [data-oc-pill]').forEach(function(el){el.addEventListener('click',function(ev){
-  ev.preventDefault();ev.stopPropagation();__onionPill(el);});});
- window.addEventListener('popstate',function(){
-  var nv=window.__quackNav||[];
-  if(nv.length===0||nv[nv.length-1]!=='onion')return;
-  nv.pop();
-  var e=__onionStack.pop();if(!e)return;
-  var t=document.getElementById(e.id);if(!t)return;
-  __onionShow(e.host,t);});
- /* pan+zoom the onion svgs (owner: zoomable like the trace graph) - wheel zooms toward the
-    cursor, drag pans, double-click resets; clicks on drill targets still pass through */
- document.querySelectorAll('.onion svg').forEach(function(svg){
-  var vb=(svg.getAttribute('viewBox')||'0 0 380 360').split(/\s+/).map(Number);
-  var base=vb.slice(),st={x:vb[0],y:vb[1],w:vb[2],h:vb[3]},drag=null;
-  function apply(){svg.setAttribute('viewBox',st.x+' '+st.y+' '+st.w+' '+st.h);}
-  svg.addEventListener('wheel',function(e){e.preventDefault();var r=svg.getBoundingClientRect();if(!r.width)return;
-   var mx=st.x+(e.clientX-r.left)/r.width*st.w,my=st.y+(e.clientY-r.top)/r.height*st.h,f=e.deltaY<0?0.85:1.18;
-   st.w*=f;st.h*=f;st.x=mx-(e.clientX-r.left)/r.width*st.w;st.y=my-(e.clientY-r.top)/r.height*st.h;apply();},{passive:false});
-  svg.addEventListener('pointerdown',function(e){if(e.target.closest&&e.target.closest('[data-onion-go],[data-node-link],[data-oc-id],[data-oc-pill]'))return;
-   drag={x:e.clientX,y:e.clientY,sx:st.x,sy:st.y};try{svg.setPointerCapture(e.pointerId);}catch(_){}svg.style.cursor='grabbing';});
-  svg.addEventListener('pointermove',function(e){if(!drag)return;var r=svg.getBoundingClientRect();if(!r.width)return;
-   st.x=drag.sx-(e.clientX-drag.x)/r.width*st.w;st.y=drag.sy-(e.clientY-drag.y)/r.height*st.h;apply();});
-  svg.addEventListener('pointerup',function(){drag=null;svg.style.cursor='';});
-  svg.addEventListener('dblclick',function(){st.x=base[0];st.y=base[1];st.w=base[2];st.h=base[3];apply();});
- });
+ /* onion drill-down (req-interactive-figures.2): the shared interaction script
+    (go-onion-interact) — one constant for the book and the standalone review. */
+` + onionInteractJS + `
  /* figure fullscreen: the button flips a class on its own figure; an embedded
     cytoscape canvas refits to the new box */
  document.querySelectorAll('[data-figfs]').forEach(function(btn){btn.addEventListener('click',function(){
@@ -1692,6 +1819,50 @@ func renderBookHTML(nodes map[string]Node) (string, []string, []string) {
  document.addEventListener('keydown',function(e){if(e.key!=='Escape')return;
   document.querySelectorAll('figure.fig-full').forEach(function(f){f.classList.remove('fig-full');
    var b=f.querySelector('[data-figfs]');if(b)b.textContent='⛶';});});
+ /* the drill-down's type pills (req-timeline-drilldown): first draft, one selection */
+ document.addEventListener('click',function(e){
+  var p=e.target.closest?e.target.closest('.tdrill .upill'):null;if(!p)return;
+  e.preventDefault();var dr=p.closest('.tdrill'),v=p.getAttribute('data-fv');
+  Array.prototype.forEach.call(dr.querySelectorAll('.upill'),function(x){x.classList.toggle('on',x===p);});
+  Array.prototype.forEach.call(dr.querySelectorAll('.tgroup'),function(g){
+   g.style.display=(v==='*'||g.getAttribute('data-ttype')===v)?'':'none';});});
+ /* the attention ping (req-details-full-entry): three STATIC border echoes announce a
+    pane change — the pane never moves; each echo expands 3vmax outward while fading.
+    Dom-static: the script only re-arms the pinging class; the echoes are emitted chrome. */
+ function __panePing(card){if(!card)return;
+  card.classList.remove('pinging');void card.offsetWidth;card.classList.add('pinging');
+  setTimeout(function(){card.classList.remove('pinging');},800);}
+ (function(){
+  var det=document.getElementById('dpane-content'),card=document.getElementById('details');
+  if(!det||!card||!window.MutationObserver)return;
+  new MutationObserver(function(){__panePing(card);}).observe(det,{childList:true});
+ })();
+ /* the RAID matrix (req-risk-matrix): the STANDARD reader table beside the matrix owns
+    the pills and the rows; the bubbles just LISTEN - visibility recomputes from the
+    pills' on-state after the table script has handled the click, so the default stays
+    data, not code. Bubble clicks ride the shared data-node-link lane below. */
+ document.querySelectorAll('.raid-matrix').forEach(function(host){
+  function apply(){
+   var sel={};
+   Array.prototype.forEach.call(host.querySelectorAll('.upills'),function(fe){
+    var fn=fe.getAttribute('data-facet');if(!fn)return;sel[fn]={};
+    var star=fe.querySelector('.upill[data-fv="*"]');
+    if(star&&star.classList.contains('on'))return;
+    Array.prototype.forEach.call(fe.querySelectorAll('.upill.on'),function(p){
+     var v=p.getAttribute('data-fv');if(v!=='*')sel[fn][v]=true;});});
+   Array.prototype.forEach.call(host.querySelectorAll('.rbub'),function(c){
+    var ok=true;
+    for(var fn in sel){var vs=sel[fn];if(!Object.keys(vs).length)continue;
+     if(!vs[c.getAttribute('data-'+fn)])ok=false;}
+    c.style.display=ok?'':'none';});}
+  host.addEventListener('click',function(e){
+   if(e.target.closest&&e.target.closest('.upill')){setTimeout(apply,0);return;}
+   var bb=e.target.closest?e.target.closest('.rbub'):null;if(!bb)return;
+   var id=bb.getAttribute('data-node-link');
+   Array.prototype.forEach.call(host.querySelectorAll('tr.rsel'),function(r){r.classList.remove('rsel');});
+   var row=host.querySelector('tr.urow[data-node="'+id+'"]');
+   if(row){row.classList.add('rsel');if(row.scrollIntoView)row.scrollIntoView({block:'nearest'});}});
+  apply();});
  /* trace-item links: a single click opens the node in
     the DETAILS pane; navigation runs through the pane's link, never the click itself */
  document.querySelectorAll('[data-node-link]').forEach(function(a){a.addEventListener('click',function(ev){
@@ -2185,7 +2356,7 @@ func cmdBook(args []string) {
 // enddesign
 
 // design: go-book-figures  implements: req-book-artifact.5
-// The derived figure set (adr-figures-derived-set) has four diagram kinds whose layout is trivial arithmetic, rendering as inline SVG with REAL text: context star, building-block tree, timeline, stakeholder matrix. Each is fed from live graph data, sorted for determinism. A manifest unit references one with a single `fig: <kind>` line. Authored inline SVG passes through mdLite as ordinary, provenance-marked, content, the generous release valve. fig: model takes an optional node-id argument, and the group carries it through.
+// The derived figure set (adr-figures-derived-set) has four diagram kinds whose layout is trivial arithmetic, rendering as inline SVG with REAL text: context model, building-block tree, timeline, stakeholder matrix. Each is fed from live graph data, sorted for determinism. A manifest unit references one with a single `fig: <kind>` line. Authored inline SVG passes through mdLite as ordinary, provenance-marked, content, the generous release valve. fig: model takes an optional node-id argument, and the group carries it through.
 var figRefRe = regexp.MustCompile(`^fig:\s*([a-z-]+(?:\s+[a-z0-9-]+)?)\s*$`)
 
 // design: go-fig-elem-ids  implements: req-comment-layer.6
@@ -2245,15 +2416,35 @@ func circleBorder(cx, cy, r, tx, ty int) (int, int) {
 	return cx + int(float64(r)*dx/d), cy + int(float64(r)*dy/d)
 }
 
-// svgContextStar draws the derived context diagram. Actors split by flank:
+// svgContextModel draws the derived context diagram. Actors split by flank:
 // direction `in` feeds the system and sits LEFT, direction `out` consumes
 // from it and sits RIGHT; an actor without a direction joins the left flank. Each flank
 // fans out vertically from the middle.
-func svgContextStar(center string, ins, outs []string) string {
+// design: go-structure-layers  implements: req-structure-layers
+// The reading path, an owner ruling. The context model's CENTRE routes into the
+// workspace's own structural model, model-<brand>-structure. The id is brand-derived,
+// so a vehicle inherits the path. The structural model's determinizer element routes
+// onward into the onion via its authored `%% route:` line. Each hop rides the book's
+// standard data-node-link click lane. No hop is hardcoded to this workspace.
+func contextModelRoute(nodes map[string]Node) string {
+	id := "model-" + brand() + "-structure"
+	if _, ok := nodes[id]; ok {
+		return id
+	}
+	return ""
+}
+
+// enddesign
+
+func svgContextModel(center string, ins, outs []string, route string, iface map[string][2]string) string {
 	fig := figNext()
 	var b strings.Builder
 	b.WriteString(`<svg viewBox="0 0 640 420" font-family="system-ui" font-size="13" role="img" aria-label="context diagram">`)
-	b.WriteString(fmt.Sprintf(`<g id="%s"><rect x="250" y="180" width="140" height="60" rx="8" fill="#e8f0fe" stroke="#4a6fa5"/><text x="320" y="215" text-anchor="middle">%s</text></g>`, figElemID(fig, center), htmlEscape(center)))
+	link := ""
+	if route != "" {
+		link = ` data-node-link="` + htmlEscape(route) + `" style="cursor:pointer"`
+	}
+	b.WriteString(fmt.Sprintf(`<g id="%s"%s><rect x="250" y="180" width="140" height="60" rx="8" fill="#e8f0fe" stroke="#4a6fa5"/><text x="320" y="215" text-anchor="middle">%s</text></g>`, figElemID(fig, center), link, htmlEscape(center)))
 	flank := func(actors []string, side int) { // side -1 = left (in), +1 = right (out)
 		n := len(actors)
 		if n > 8 {
@@ -2272,7 +2463,15 @@ func svgContextStar(center string, ins, outs []string) string {
 			if side < 0 { // flow reads left→right: in-arrows point AT the system
 				sx, sy, ex, ey = ex, ey, sx, sy
 			}
-			b.WriteString(fmt.Sprintf(`<line x1="%d" y1="%d" x2="%d" y2="%d" stroke="#999"/>`, sx, sy, ex, ey))
+			ln := fmt.Sprintf(`<line x1="%d" y1="%d" x2="%d" y2="%d" stroke="#999"/>`, sx, sy, ex, ey)
+			if fi, ok := iface[a]; ok && fi[0] != "" {
+				// the boundary line IS the interface: a label on the connector, the
+				// full note one click away
+				mx, my := (sx+ex)/2, (sy+ey)/2
+				ln = `<g data-node-link="` + htmlEscape(fi[0]) + `" style="cursor:pointer">` + ln +
+					fmt.Sprintf(`<text x="%d" y="%d" text-anchor="middle" font-size="9" fill="#667">%s</text>`, mx, my-4, htmlEscape(fi[1])) + `</g>`
+			}
+			b.WriteString(ln)
 			b.WriteString(fmt.Sprintf(`<g id="%s"><rect x="%d" y="%d" width="110" height="30" rx="15" fill="#fff" stroke="#888"/><text x="%d" y="%d" text-anchor="middle">%s</text></g>`, figElemID(fig, a), x-55, y-15, x, y+5, htmlEscape(a)))
 		}
 	}
@@ -2318,15 +2517,25 @@ func svgBlockTree(title string, blocks []string) string {
 	return b.String()
 }
 
-// design: go-onion-figure  implements: req-interactive-figures.2, req-compact-derived.1
-// The onion figure is a drill-down over the DESIGN ELEMENTS, the marked code regions. The layer map comes from go-onion-model-source. In MODEL mode ring membership is STRAIGHT from the model: elements are design regions, and files are THEMES. A file never earns a ring and never renders as a block. In FALLBACK mode (spec/design-layers.md, stub projects) an element takes the layer of its FILE per the pattern map, the old behavior, untouched. The intra/inter-element flow is the REAL call graph derived by deriveDesignFlow, a static AST pass: consumes[A] = design ids A calls into, and reads[A]/writes[A] = A does external input/output. The ONION is the OVERVIEW ONLY. Level 0 draws concentric layer rings, one per SURVIVING layer, each labelled `name · N elements`. `inputs:` enters from the LEFT, and `outputs:` leaves to the RIGHT as external boxes. No element cards appear here; a changed ring carries a DOT. A layer with NO flow at all, where every element is off-flow infrastructure, is SKIPPED entirely: no ring, no view. Its elements sink INWARD into the next surviving layer's infrastructure pills. Below the overview the drill-down keeps the owner's ONION vs CLUSTER split (go-onion-busbar renders both shapes). Level 1 is the BAND view, and a band is itself an ONION. It has a ROUND body with the band's INPUT bars on the LEFT, OUTPUT bars on the RIGHT, and its BLOCKS ringing the centre. Unless it is the innermost KERNEL, it also carries a central CORE at the dead centre. The core is the inner bands beneath. It is the drill affordance INTO the next-inner band, a single-click, its only action. Bars follow FLOW CONSERVATION. An input bar is an edge that ENTERS the band from an OUTER band, keyed by the source band, or the external world for os reads. An output bar LEAVES it to an outer band. An edge crossing to an INNER band routes to the CORE instead of a bar; that is signal TO or FROM the core. An edge whose two ends are both in the band draws as a direct block-to-block SIBLING arrow, never detouring through a bar. The kernel band is a round, coreless onion, since nothing lies beneath it. In model mode a BLOCK is the THEME: one cluster per file carrying SEVERAL of the layer's regions, labelled `file` + `N regions`. A single-region theme renders the region itself, with responsibility text as the label and `in file` as the subtitle. Region arrows aggregate to theme level, deduplicated; a collapsed multiplicity shows as `×N`. Level 2 opens ONE cluster into a coreless bus-bar BOX; a cluster is NOT an onion, with no round body and no core. The cluster's own INPUT bars sit on top, OUTPUT bars on the bottom, its regions as blocks in the middle, and region-to-region arrows inside. Conservation carries the cluster's band-level I/O down. Exactly the bars it tapped as a band block reappear. A band-level SIBLING arrow becomes a `from <sibling>` / `→ <sibling>` bar once that sibling is outside the drilled view. A drillable block hangs a small drill HANDLE off its own bottom edge, double-click to ENTER. A leaf block has none. SINGLE-click a block to INSPECT it, showing details and highlighting its connections while staying at this level; the review render adds a details panel. Every region block transports to its trace item on tap, the conn-code-designs surface. Design elements OFF the flow entirely render as `infrastructure:` pills below the figure, each linking to its trace item. Model-mode AMBIENT elements always render as those pills; they sit on no ring, flow or not. EVERY view, levels 0, 1, and 2, is pre-rendered static DOM with its own breadcrumbs and layer nav. The script only toggles which view shows; it never creates content. Excluded patterns, such as iteration files, stay out. In model mode, non-engine marker files (method/*.md) stay out too. An element no source claims falls into an outermost `unmapped` ring, so the map cannot rot silently. In model mode that ring holds regions the model does not allocate; the sky-fall lint keeps it empty.
+// design: go-onion-figure  implements: req-interactive-figures.2, req-compact-derived.1, req-onion-io-rendering
+// The onion figure is a drill-down over the DESIGN ELEMENTS, the marked code regions. The layer map comes from go-onion-model-source. In MODEL mode ring membership is STRAIGHT from the model: elements are design regions, and files are THEMES (secondary info only). A file never earns a ring and never renders as a block. In FALLBACK mode (spec/design-layers.md, stub projects) an element takes the layer of its FILE per the pattern map, the old behavior, untouched. The intra/inter-element flow is the REAL call graph derived by deriveDesignFlow, a static AST pass: consumes[A] = design ids A calls into, and reads[A]/writes[A] = A does external input/output. The ONION is the OVERVIEW ONLY. Level 0 draws concentric layer rings, one per SURVIVING layer, each labelled `name · N elements`. `inputs:` enters from the TOP, and `outputs:` leaves to the BOTTOM as external boxes; every overview arrow STOPS at the onion's outside. No element cards appear here; a changed ring carries a DOT. A layer with NO flow at all, where every element is off-flow infrastructure, is SKIPPED entirely: no ring, no view. Its elements sink INWARD into the next surviving layer's infrastructure pills. Below the overview the drill-down keeps the owner's ONION vs CLUSTER split (go-onion-busbar renders both shapes). Level 1 is the BAND view, and a band is itself an ONION. It has a ROUND body with the band's INPUT bars across the TOP, OUTPUT bars across the BOTTOM, and its BLOCKS beside the centre by the side rule. Unless it is the innermost KERNEL, it also carries a central CORE at the dead centre. The core is the inner bands beneath. It is the drill affordance INTO the next-inner band, a single-click, its only action. Bars follow FLOW CONSERVATION. An input bar is an edge that ENTERS the band from an OUTER band, keyed by the source band, or the external world for os reads. An output bar LEAVES it to an outer band. An edge crossing to an INNER band routes to the CORE instead of a bar; that is signal TO or FROM the core. An edge whose two ends are both in the band draws as a direct block-to-block SIBLING arrow, never detouring through a bar. The kernel band is a round, coreless onion, since nothing lies beneath it. In model mode a BLOCK is a DSM COUPLING MODULE (go-onion-dsm-groups): one cluster per coupling group carrying SEVERAL of the layer's regions, labelled `module k` + `N regions`. An uncoupled region renders itself, with responsibility text as the label and `in file` as the subtitle. Region arrows aggregate to block level, deduplicated; a collapsed multiplicity shows as `×N`. Level 2 opens ONE cluster into a coreless bus-bar BOX; a cluster is NOT an onion, with no round body and no core. The cluster's own INPUT bars sit on top, OUTPUT bars on the bottom, its regions as blocks in the middle, and region-to-region arrows inside. Conservation carries the cluster's band-level I/O down. Exactly the bars it tapped as a band block reappear. A member may itself be a cluster: the interior re-derives its grouping, and the bus-only, coreless boundary repeats at every depth. A band-level SIBLING arrow becomes a `from <sibling>` / `→ <sibling>` bar once that sibling is outside the drilled view. A drillable block hangs a small drill HANDLE off its own bottom edge, double-click to ENTER. A leaf block has none. SINGLE-click a block to INSPECT it, showing details and highlighting its connections while staying at this level; the review render adds a details panel. Every region block transports to its trace item on tap, the conn-code-designs surface. Design elements OFF the flow entirely render as `infrastructure:` pills below the figure, each linking to its trace item. Model-mode AMBIENT elements always render as those pills; they sit on no ring, flow or not. EVERY view, levels 0, 1, and 2, is pre-rendered static DOM with its own breadcrumbs and layer nav. The script only toggles which view shows; it never creates content. Excluded patterns, such as iteration files, stay out. In model mode, non-engine marker files (method/*.md) stay out too. An element no source claims falls into an outermost `unmapped` ring, so the map cannot rot silently. In model mode that ring holds regions the model does not allocate; the sky-fall lint keeps it empty.
 type onionLayer struct {
 	name string
 	pats []string
 }
 
+// designLayersPath resolves the layer map: spec/design/ is its home; the old
+// top-level spot stays a fallback for vehicles that have not moved yet.
+func designLayersPath() string {
+	p := filepath.Join(SPEC, "design", "design-layers.md")
+	if _, err := os.Stat(p); err == nil {
+		return p
+	}
+	return filepath.Join(SPEC, "design-layers.md")
+}
+
 func readDesignLayers() (layers []onionLayer, excludes, inputs, outputs, infra []string) {
-	raw, err := os.ReadFile(filepath.Join(SPEC, "design-layers.md"))
+	raw, err := os.ReadFile(designLayersPath())
 	if err != nil {
 		return nil, nil, nil, nil, nil
 	}
@@ -2360,9 +2569,13 @@ func readDesignLayers() (layers []onionLayer, excludes, inputs, outputs, infra [
 		case "exclude":
 			excludes = append(excludes, pats...)
 		case "inputs":
-			inputs = append(inputs, pats...)
+			for _, p := range pats {
+				inputs = append(inputs, stripNbrAnnotation(p))
+			}
 		case "outputs":
-			outputs = append(outputs, pats...)
+			for _, p := range pats {
+				outputs = append(outputs, stripNbrAnnotation(p))
+			}
 		case "infra":
 			infra = append(infra, pats...)
 		default:
@@ -2370,6 +2583,35 @@ func readDesignLayers() (layers []onionLayer, excludes, inputs, outputs, infra [
 		}
 	}
 	return layers, excludes, inputs, outputs, infra
+}
+
+// an inputs/outputs entry may name its neighbour: `git (nbr-git)`. The name
+// renders; the neighbour drives the overview pill's click-through.
+func stripNbrAnnotation(p string) string {
+	if i := strings.Index(p, "("); i > 0 {
+		return strings.TrimSpace(p[:i])
+	}
+	return p
+}
+
+// designLayerNeighbours maps each annotated input/output name to its neighbour.
+func designLayerNeighbours() map[string]string {
+	out := map[string]string{}
+	raw, err := os.ReadFile(designLayersPath())
+	if err != nil {
+		return out
+	}
+	re := regexp.MustCompile(`([^,:()]+)\((nbr-[a-z0-9-]+)\)`)
+	for _, ln := range strings.Split(strings.ReplaceAll(string(raw), "\r\n", "\n"), "\n") {
+		t := strings.TrimSpace(ln)
+		if !strings.HasPrefix(t, "inputs:") && !strings.HasPrefix(t, "outputs:") {
+			continue
+		}
+		for _, m := range re.FindAllStringSubmatch(t, -1) {
+			out[strings.TrimSpace(m[1])] = m[2]
+		}
+	}
+	return out
 }
 
 // layerPatMatch: the pattern matches the END of the slash-normalized path; `*` matches any run.
@@ -2384,15 +2626,9 @@ func layerPatMatch(pat, path string) bool {
 // design region as doing external input / output. Matching is textual (no type
 // resolution needed): additionally, flag.* counts as input and fmt.Fprint* as
 // output, handled by prefix below.
-var flowReadSel = map[string]bool{
-	"os.ReadFile": true, "os.Open": true, "os.ReadDir": true, "os.Stat": true,
-	"os.Args": true, "os.Stdin": true, "io.ReadAll": true,
-}
-var flowWriteSel = map[string]bool{
-	"os.WriteFile": true, "os.Create": true, "os.MkdirAll": true,
-	"os.Stdout": true, "os.Stderr": true,
-	"fmt.Print": true, "fmt.Println": true, "fmt.Printf": true,
-}
+// The I/O selector vocabulary lives in ioSelClass (io_busbar.go, go-io-busbar):
+// disk touches apart from console traffic, one classification for the flow pass
+// and the busbar taps alike.
 
 // deriveDesignFlow is a Doxygen-style static pass over the engine's own Go
 // source. It reads the AST (go/parser + go/ast, zero third-party deps) and
@@ -2414,26 +2650,39 @@ var designFlowMemo *struct {
 	consumes map[string][]string
 	reads    map[string]bool
 	writes   map[string]bool
+	diskR    map[string]bool
+	diskW    map[string]bool
 }
 
 func deriveDesignFlow() (map[string][]string, map[string]bool, map[string]bool) {
 	if designFlowMemo == nil {
-		c, r, w := deriveDesignFlowUncached()
+		c, r, w, dr, dw := deriveDesignFlowUncached()
 		designFlowMemo = &struct {
 			consumes map[string][]string
 			reads    map[string]bool
 			writes   map[string]bool
-		}{c, r, w}
+			diskR    map[string]bool
+			diskW    map[string]bool
+		}{c, r, w, dr, dw}
 	}
 	return designFlowMemo.consumes, designFlowMemo.reads, designFlowMemo.writes
 }
 
+// deriveDesignIO returns the DISK subsets of the derived I/O flags (go-io-busbar):
+// the blocks that tap the onion's disk busbar.
+func deriveDesignIO() (diskReads, diskWrites map[string]bool) {
+	deriveDesignFlow()
+	return designFlowMemo.diskR, designFlowMemo.diskW
+}
+
 // enddesign
 
-func deriveDesignFlowUncached() (consumes map[string][]string, reads map[string]bool, writes map[string]bool) {
+func deriveDesignFlowUncached() (consumes map[string][]string, reads, writes, diskR, diskW map[string]bool) {
 	consumes = map[string][]string{}
 	reads = map[string]bool{}
 	writes = map[string]bool{}
+	diskR = map[string]bool{}
+	diskW = map[string]bool{}
 	consumeSet := map[string]map[string]bool{}
 
 	// EngineSrc() names the engine source home; scanDesignsUnder gives every
@@ -2551,12 +2800,23 @@ func deriveDesignFlowUncached() (consumes map[string][]string, reads map[string]
 				case *ast.SelectorExpr:
 					if x, ok := e.X.(*ast.Ident); ok && e.Sel != nil {
 						key := x.Name + "." + e.Sel.Name
-						switch {
-						case flowReadSel[key], x.Name == "flag":
+						// the class split (go-io-busbar): disk touches apart from
+						// console traffic; the union flags keep their historical meaning
+						switch ioSelClass(key) {
+						case "disk-read":
 							reads[owner] = true
-						case flowWriteSel[key],
-							x.Name == "fmt" && strings.HasPrefix(e.Sel.Name, "Fprint"):
+							diskR[owner] = true
+						case "disk-write":
 							writes[owner] = true
+							diskW[owner] = true
+						case "read":
+							reads[owner] = true
+						case "write":
+							writes[owner] = true
+						default:
+							if x.Name == "flag" {
+								reads[owner] = true
+							}
 						}
 					}
 				}
@@ -2573,7 +2833,7 @@ func deriveDesignFlowUncached() (consumes map[string][]string, reads map[string]
 		sort.Strings(ids)
 		consumes[owner] = ids
 	}
-	return consumes, reads, writes
+	return consumes, reads, writes, diskR, diskW
 }
 
 // debugDesignFlow renders a compact text report of deriveDesignFlow for manual
@@ -2651,14 +2911,17 @@ type onionInput struct {
 	model           *modelOnion
 	consumes        map[string][]string
 	reads, writes   map[string]bool
-	payload         map[[2]string]string // authored payload per src->dst edge; nil = count labels only
-	els             []string             // the block-earning element ids
-	relOf           map[string]string    // element -> its theme path ("" = none)
-	themes          bool                 // cluster a layer's blocks by FILE theme (the engine binding)
-	links           bool                 // blocks carry data-node-link to their trace items
-	crumb           string               // overview crumb text ("" = the brand's default)
-	idp             string               // instance id prefix; "" mints the fig-sequence default
-	sizeClass       string               // extra class on the .onion host (the compact slide instance)
+	// the disk subsets (go-io-busbar): only these tap the declared "disk" bus
+	diskReads, diskWrites map[string]bool
+	payload               map[[2]string]string // authored payload per src->dst edge; nil = count labels only
+	els                   []string             // the block-earning element ids
+	relOf                 map[string]string    // element -> its theme path ("" = none)
+	themes                bool                 // group a layer's blocks into DSM coupling modules (the engine binding)
+	links                 bool                 // blocks carry data-node-link to their trace items
+	crumb                 string               // overview crumb text ("" = the brand's default)
+	idp                   string               // instance id prefix; "" mints the fig-sequence default
+	sizeClass             string               // extra class on the .onion host (the compact slide instance)
+	ioLink                map[string]string    // input/output name -> the node its pill opens (interface note or neighbour)
 }
 
 func renderOnionOpt(nodes map[string]Node, rev *onionReview) string {
@@ -2738,8 +3001,36 @@ func renderOnionOpt(nodes map[string]Node, rev *onionReview) string {
 			rev.marked[id] = true // a planned element is a change, auto-marked
 		}
 	}
+	diskR, diskW := deriveDesignIO()
+	// an annotated input/output pill opens its neighbour's interface note, the
+	// neighbour itself when no note exists
+	ioLink := map[string]string{}
+	if nbrOf := designLayerNeighbours(); len(nbrOf) > 0 {
+		note := map[string]string{}
+		if edges, err := LoadConnections(SPEC); err == nil {
+			for _, e := range edges {
+				if e.Kind != "interface" {
+					continue
+				}
+				for _, end := range []string{e.Src, e.Dst} {
+					if strings.HasPrefix(end, "nbr-") && note[end] == "" {
+						note[end] = e.Note
+					}
+				}
+			}
+		}
+		for name, nbr := range nbrOf {
+			if n := note[nbr]; n != "" {
+				ioLink[name] = n
+			} else {
+				ioLink[name] = nbr
+			}
+		}
+	}
 	in := onionInput{layers: layers, inputs: inputs, outputs: outputs, model: model,
-		consumes: consumes, reads: reads, writes: writes, els: els, relOf: relOf,
+		ioLink:   ioLink,
+		consumes: consumes, reads: reads, writes: writes,
+		diskReads: diskR, diskWrites: diskW, els: els, relOf: relOf,
 		themes: true, links: true}
 	return renderOnionData(in, rev, nodes)
 }
@@ -3071,12 +3362,27 @@ func renderOnionData(in onionInput, rev *onionReview, nodes map[string]Node) str
 	fills := []string{"#eef3fa", "#dde8f5"}
 
 	// --- level 0: the OVERVIEW only — concentric layer rings, one per layer, labelled name+count.
-	// No element nodes here; inputs enter from the left, outputs leave to the right. Each ring
-	// drills into that layer's own flow view. ---
+	// No element nodes here; input boxes ride the TOP and output boxes the BOTTOM (the committed
+	// layout spec onion-io-layout.excalidraw.md, rule 1), and every arrow STOPS at the onion's
+	// OUTSIDE (rule 2). Each ring drills into that layer's own flow view. ---
 	{
-		W, H := 520, 280
-		cx, cy := 260, 140
+		W := 520
 		rMax, rMin := 120, 30
+		// the bus stack sizes the canvas: every bar owns a FULL-WIDTH rail (the committed
+		// layout spec onion-io-layout.excalidraw.md — one bus line per input, never a merged
+		// rail), so the ring centre slides down as input rails stack above it
+		ebw, ebh, egap := 84, 22, 6
+		topH := 24
+		if len(inputs) > 0 {
+			topH = 20 + len(inputs)*(ebh+egap)
+		}
+		botH := 24
+		if len(outputs) > 0 {
+			botH = 20 + len(outputs)*(ebh+egap)
+		}
+		cx := W / 2
+		cy := topH + 26 + rMax
+		H := cy + rMax + 26 + botH
 		n := ns
 		radius := func(k int) int { // k=0 outermost..ns-1 innermost (the kernel disc)
 			if n <= 1 {
@@ -3084,7 +3390,6 @@ func renderOnionData(in onionInput, rev *onionReview, nodes map[string]Node) str
 			}
 			return rMin + (rMax-rMin)*(n-1-k)/(n-1)
 		}
-		leftRim, rightRim := cx-radius(0), cx+radius(0)
 		crumb := in.crumb
 		if crumb == "" {
 			crumb = brand() + " — layered overview"
@@ -3118,28 +3423,41 @@ func renderOnionData(in onionInput, rev *onionReview, nodes map[string]Node) str
 			b.WriteString(fmt.Sprintf(`<text x="%d" y="%d" text-anchor="middle" fill="#555" pointer-events="none">%s</text>`,
 				cx, ly, htmlEscape(label)))
 		}
+		// the overview carries the SAME bus form as the band view: one full-width rail PER
+		// input across the top with its box riding the rail's LEFT end, the mirrored
+		// per-output rails below with each box at the RIGHT end; every rail sends its own
+		// solid tap stopping at the onion's outside, and an annotated box opens its
+		// interface note
 		if len(inputs) > 0 {
-			ebw, ebh, gap := 84, 22, 7
-			y0 := cy - (len(inputs)*ebh+(len(inputs)-1)*gap)/2
-			b.WriteString(fmt.Sprintf(`<text x="%d" y="%d" text-anchor="middle" font-size="9" fill="#777">inputs</text>`, 4+ebw/2, y0-5))
-			for i, in := range inputs {
-				by := y0 + i*(ebh+gap)
-				b.WriteString(fmt.Sprintf(`<rect x="4" y="%d" width="%d" height="%d" rx="4" fill="#f6f8fa" stroke="#888"/><text x="%d" y="%d" text-anchor="middle">%s</text>`,
-					by, ebw, ebh, 4+ebw/2, by+ebh/2+4, htmlEscape(in)))
-				b.WriteString(fmt.Sprintf(`<line x1="%d" y1="%d" x2="%d" y2="%d" stroke="#4a6fa5" stroke-dasharray="3 3" marker-end="url(#%sarr)"/>`,
-					4+ebw+2, by+ebh/2, leftRim-3, cy, base))
+			b.WriteString(fmt.Sprintf(`<text x="%d" y="12" text-anchor="middle" font-size="9" fill="#777">inputs</text>`, cx))
+			for i, name := range inputs {
+				ry := 29 + i*(ebh+egap)
+				b.WriteString(fmt.Sprintf(`<line x1="%d" y1="%d" x2="%d" y2="%d" stroke="#2f8f4e" stroke-width="1.6"/>`, 12+ebw, ry, W-12, ry))
+				pill := fmt.Sprintf(`<rect x="12" y="%d" width="%d" height="%d" rx="4" fill="#eef7f0" stroke="#2f8f4e"/><text x="%d" y="%d" text-anchor="middle">%s</text>`,
+					ry-ebh/2, ebw, ebh, 12+ebw/2, ry+4, htmlEscape(name))
+				if nl := in.ioLink[name]; nl != "" {
+					pill = `<g data-node-link="` + htmlEscape(nl) + `" style="cursor:pointer">` + pill + `</g>`
+				}
+				b.WriteString(pill)
+				tx := cx - (len(inputs)-1)*12 + i*24
+				ex, ey := circleBorder(cx, cy, radius(0)+3, tx, ry)
+				b.WriteString(fmt.Sprintf(`<line x1="%d" y1="%d" x2="%d" y2="%d" stroke="#2f8f4e" stroke-width="1.6" marker-end="url(#%sarr)"/>`, tx, ry, ex, ey, base))
 			}
 		}
 		if len(outputs) > 0 {
-			ebw, ebh, gap := 84, 22, 7
-			y0 := cy - (len(outputs)*ebh+(len(outputs)-1)*gap)/2
-			b.WriteString(fmt.Sprintf(`<text x="%d" y="%d" text-anchor="middle" font-size="9" fill="#777">outputs</text>`, W-4-ebw/2, y0-5))
-			for i, out := range outputs {
-				by := y0 + i*(ebh+gap)
-				b.WriteString(fmt.Sprintf(`<line x1="%d" y1="%d" x2="%d" y2="%d" stroke="#4a6fa5" stroke-dasharray="3 3" marker-end="url(#%sarr)"/>`,
-					rightRim+3, cy, W-4-ebw-2, by+ebh/2, base))
-				b.WriteString(fmt.Sprintf(`<rect x="%d" y="%d" width="%d" height="%d" rx="4" fill="#f6f8fa" stroke="#888"/><text x="%d" y="%d" text-anchor="middle">%s</text>`,
-					W-4-ebw, by, ebw, ebh, W-4-ebw/2, by+ebh/2+4, htmlEscape(out)))
+			b.WriteString(fmt.Sprintf(`<text x="%d" y="%d" text-anchor="middle" font-size="9" fill="#777">outputs</text>`, cx, H-2))
+			for i, name := range outputs {
+				ry := H - 29 - i*(ebh+egap)
+				b.WriteString(fmt.Sprintf(`<line x1="%d" y1="%d" x2="%d" y2="%d" stroke="#b5651d" stroke-width="1.6"/>`, 12, ry, W-12-ebw, ry))
+				pill := fmt.Sprintf(`<rect x="%d" y="%d" width="%d" height="%d" rx="4" fill="#fbf2ea" stroke="#b5651d"/><text x="%d" y="%d" text-anchor="middle">%s</text>`,
+					W-12-ebw, ry-ebh/2, ebw, ebh, W-12-ebw/2, ry+4, htmlEscape(name))
+				if nl := in.ioLink[name]; nl != "" {
+					pill = `<g data-node-link="` + htmlEscape(nl) + `" style="cursor:pointer">` + pill + `</g>`
+				}
+				b.WriteString(pill)
+				tx := cx - (len(outputs)-1)*12 + i*24
+				sx, sy := circleBorder(cx, cy, radius(0)+3, tx, ry)
+				b.WriteString(fmt.Sprintf(`<line x1="%d" y1="%d" x2="%d" y2="%d" stroke="#b5651d" stroke-width="1.6" marker-end="url(#%sarr)"/>`, sx, sy, tx, ry, base))
 			}
 		}
 		b.WriteString("</svg>\n</div>\n")
@@ -3183,11 +3501,11 @@ func renderOnionData(in onionInput, rev *onionReview, nodes map[string]Node) str
 		// cluster block that drills into a level-2 view; a single-region theme renders the
 		// region itself. nodeOf maps every flow region to its level-1 block.
 		nodeOf := map[string]string{}
-		type themeView struct {
-			file, view string
-			ids        []string
+		type clusterView struct {
+			view, title string
+			ids         []string
 		}
-		var themes []themeView
+		var clusters []clusterView
 		var blocks []*obusBlock
 		blockOf := map[string]*obusBlock{}
 		addBlock := func(id, label, sub string, cluster bool, drill, link, full string) {
@@ -3212,35 +3530,28 @@ func renderOnionData(in onionInput, rev *onionReview, nodes map[string]Node) str
 				setInspect(blockOf[id], id)
 			}
 		} else if model != nil {
-			byTheme := map[string][]string{}
-			var order []string
-			for _, id := range s.flow {
-				f := theme(id)
-				if len(byTheme[f]) == 0 {
-					order = append(order, f)
+			// DSM grouping (go-onion-dsm-groups): coupling clusters are the grouping
+			// source; a file stays secondary info on a single block, never a group.
+			groups, singles := dsmGroups(s.flow, consumes)
+			for gi, g := range groups {
+				cv := viewID(si) + "c" + itoa(gi)
+				lbl := "module " + itoa(gi+1)
+				for _, id := range g {
+					nodeOf[id] = "cl:" + cv
 				}
-				byTheme[f] = append(byTheme[f], id)
+				addBlock("cl:"+cv, lbl, itoa(len(g))+" regions", true, cv, "",
+					lbl+" — "+itoa(len(g))+" regions in "+L+": "+strings.Join(g, ", "))
+				blockOf["cl:"+cv].marked = anyMarked(g) // a cluster carries a marked member's mark
+				clusters = append(clusters, clusterView{view: cv, title: lbl, ids: g})
 			}
-			sortStrings(order)
-			for _, f := range order {
-				ids := byTheme[f]
-				if len(ids) == 1 {
-					nodeOf[ids[0]] = ids[0]
-					full := ids[0]
-					if lb := model.labelOf[ids[0]]; lb != "" {
-						full = ids[0] + " — " + lb
-					}
-					addBlock(ids[0], respLabel(ids[0]), "in "+f, false, "", ids[0], full)
-					setInspect(blockOf[ids[0]], ids[0])
-					continue
+			for _, id := range singles {
+				nodeOf[id] = id
+				full := id
+				if lb := model.labelOf[id]; lb != "" {
+					full = id + " — " + lb
 				}
-				vid := viewID(si) + "f" + itoa(len(themes))
-				themes = append(themes, themeView{file: f, view: vid, ids: ids})
-				for _, id := range ids {
-					nodeOf[id] = "th:" + f
-				}
-				addBlock("th:"+f, f, itoa(len(ids))+" regions", true, vid, "", f+" — "+itoa(len(ids))+" regions in "+L)
-				blockOf["th:"+f].marked = anyMarked(ids) // a cluster carries a marked member's mark
+				addBlock(id, respLabel(id), "in "+theme(id), false, "", id, full)
+				setInspect(blockOf[id], id)
 			}
 		} else {
 			for _, id := range s.flow {
@@ -3460,9 +3771,26 @@ func renderOnionData(in onionInput, rev *onionReview, nodes map[string]Node) str
 			`</div>` + "\n")
 		// off-flow design elements (own + pushed down from skipped outer layers, plus
 		// model-mode ambient on the innermost view): infrastructure pills
+		// design: go-onion-boilerplate  implements: req-onion-boilerplate
+		// An ambient-stamped element is BOILERPLATE: its pill carries data-oc-amb, and a
+		// hide control folds every stamped pill render-side (the fold-amb CSS class the
+		// shared script toggles). The DOM keeps the pills, so the model stays complete.
 		if len(s.infra) > 0 {
-			b.WriteString(`<div class="onion-infra"><span class="il">infrastructure:</span>`)
+			amb := 0
 			for _, id := range s.infra {
+				if layerOf[id] == "ambient" {
+					amb++
+				}
+			}
+			b.WriteString(`<div class="onion-infra"><span class="il">infrastructure:</span>`)
+			if amb > 0 {
+				b.WriteString(`<button type="button" data-oc-fold="1" data-oc-hide="hide boilerplate" data-oc-show="show boilerplate (` + itoa(amb) + `)">hide boilerplate</button>`)
+			}
+			for _, id := range s.infra {
+				ambAttr := ""
+				if layerOf[id] == "ambient" {
+					ambAttr = ` data-oc-amb="1"`
+				}
 				dot := ""
 				if isMarked(id) {
 					dot = `<span style="color:` + onionMarkColor + `">● </span>`
@@ -3477,39 +3805,21 @@ func renderOnionData(in onionInput, rev *onionReview, nodes map[string]Node) str
 					if in.links {
 						link = ` data-node-link="` + htmlEscape(id) + `"`
 					}
-					b.WriteString(`<button type="button"` + link + ` title="` + htmlEscape(title) + `">` + dot + htmlEscape(respLabel(id)) + `</button>`)
+					b.WriteString(`<button type="button"` + link + ambAttr + ` title="` + htmlEscape(title) + `">` + dot + htmlEscape(respLabel(id)) + `</button>`)
 					continue
 				}
-				b.WriteString(`<button type="button" data-node-link="` + htmlEscape(id) + `">` + dot + htmlEscape(shortID(id)) + `</button>`)
+				b.WriteString(`<button type="button" data-node-link="` + htmlEscape(id) + `"` + ambAttr + `>` + dot + htmlEscape(shortID(id)) + `</button>`)
 			}
 			b.WriteString(`</div>`)
 		}
+		// enddesign
 		b.WriteString("</div>\n")
 
-		// --- level 2: a theme block opens into ITS regions — one pre-rendered bus-bar
-		// GROUPING view per cluster (the script only toggles; the dom-static law). Same
-		// scheme as a layer: the block's INPUT bars on top, OUTPUT bars on the bottom, its
-		// regions as blocks in the middle, region-to-region SIBLING arrows inside. Flow
-		// conservation carries the block's layer-level I/O down — an edge from outside the
-		// block becomes a bar keyed by a SIBLING block (same layer) or another layer; an
-		// edge between two inside regions stays a sibling arrow. ---
-		for _, th := range themes {
-			inTheme := map[string]bool{}
-			for _, id := range th.ids {
-				inTheme[id] = true
-			}
-			var tblocks []*obusBlock
-			tBlockOf := map[string]*obusBlock{}
-			for _, id := range th.ids {
-				full := id
-				if lb := model.labelOf[id]; lb != "" {
-					full = id + " — " + lb
-				}
-				bl := &obusBlock{id: id, label: respLabel(id), sub: shortID(id), link: id, full: full, marked: isMarked(id)}
-				setInspect(bl, id)
-				tblocks = append(tblocks, bl)
-				tBlockOf[id] = bl
-			}
+		// --- level 2 and deeper: a coupling cluster opens into its interior — the
+		// recursive DSM group emitter (go-onion-dsm-groups). Conservation carries the
+		// cluster's band-level I/O down as identified lanes; a member may itself be a
+		// cluster; every depth keeps the bus-only, coreless boundary. ---
+		if len(clusters) > 0 {
 			// crossName: the display name a crossing edge points at — a SIBLING block in
 			// this layer (its level-1 label) or, off-layer, the layer name.
 			crossName := func(other string) string {
@@ -3523,132 +3833,28 @@ func renderOnionData(in onionInput, rev *onionReview, nodes map[string]Node) str
 				}
 				return layerOf[other]
 			}
-			ec2 := map[[2]string]int{}
-			var eo2 [][2]string
-			var inBars2, outBars2 []string
-			inTap2 := map[string][]string{}
-			outTap2 := map[string][]string{}
-			pushIn2 := func(label, block string) {
-				if _, ok := inTap2[label]; !ok {
-					inBars2 = append(inBars2, label)
-				}
-				inTap2[label] = appendUniqStr(inTap2[label], block)
-			}
-			pushOut2 := func(label, block string) {
-				if _, ok := outTap2[label]; !ok {
-					outBars2 = append(outBars2, label)
-				}
-				outTap2[label] = appendUniqStr(outTap2[label], block)
-			}
-			// external world for the theme's own os readers/writers (conservation)
-			for _, id := range th.ids {
-				if reads[id] {
-					for _, in := range inputs {
-						pushIn2(in, id)
-					}
-				}
-				if writes[id] {
-					for _, out := range outputs {
-						pushOut2(out, id)
-					}
-				}
-			}
-			type xb struct {
-				key, block string
-				sort       int
-			}
-			// OUTPUT bars + sibling arrows: edges leaving each region
-			var xo []xb
-			for _, a := range th.ids {
-				for _, bb := range consumes[a] {
-					if inTheme[bb] {
-						k := [2]string{a, bb}
-						if ec2[k] == 0 {
-							eo2 = append(eo2, k)
-						}
-						ec2[k]++
-						continue
-					}
-					if layerOf[bb] == "ambient" {
-						continue // ambient is off-flow: infra pills only, never a bar (owner rule)
-					}
-					if layerOf[bb] == L {
-						if _, ok := nodeOf[bb]; !ok {
-							continue // a pill carries it, the flow does not
+			ctx := ogCtx{
+				consumes: consumes, reads: reads, writes: writes,
+				diskReads: in.diskReads, diskWrites: in.diskWrites,
+				inputs: inputs, outputs: outputs, els: els, layerOf: layerOf,
+				L: L, base: base + "0", layerView: viewID(si), layerName: L,
+				crossName: crossName, layerSort: layerSort,
+				label: respLabel,
+				sub:   func(id string) string { return "in " + theme(id) },
+				full: func(id string) string {
+					if model != nil {
+						if lb := model.labelOf[id]; lb != "" {
+							return id + " — " + lb
 						}
 					}
-					xo = append(xo, xb{key: "→ " + crossName(bb), block: a, sort: layerSort(layerOf[bb])})
-				}
+					return id
+				},
+				link: in.links, isMarked: isMarked, inspect: setInspect,
 			}
-			// INPUT bars: edges entering a region from outside the theme
-			var xiv []xb
-			for _, oa := range els {
-				if inTheme[oa] {
-					continue
-				}
-				for _, bb := range consumes[oa] {
-					if !inTheme[bb] {
-						continue
-					}
-					if layerOf[oa] == "ambient" {
-						continue // ambient is off-flow: infra pills only, never a bar (owner rule)
-					}
-					if layerOf[oa] == L {
-						if _, ok := nodeOf[oa]; !ok {
-							continue
-						}
-					}
-					xiv = append(xiv, xb{key: "from " + crossName(oa), block: bb, sort: layerSort(layerOf[oa])})
-				}
+			for _, cl := range clusters {
+				ctx.emit(&b, cl.view, cl.title, cl.ids,
+					[][2]string{{base + "0", "overview"}, {viewID(si), L}})
 			}
-			sortXb := func(v []xb) {
-				sort.Slice(v, func(i, j int) bool {
-					if v[i].sort != v[j].sort {
-						return v[i].sort < v[j].sort
-					}
-					if v[i].key != v[j].key {
-						return v[i].key < v[j].key
-					}
-					return v[i].block < v[j].block
-				})
-			}
-			sortXb(xiv)
-			sortXb(xo)
-			for _, x := range xiv {
-				pushIn2(x.key, x.block)
-			}
-			for _, x := range xo {
-				pushOut2(x.key, x.block)
-			}
-			for k, label := range inBars2 {
-				for _, blk := range inTap2[label] {
-					if bl := tBlockOf[blk]; bl != nil {
-						bl.tapIn(k)
-					}
-				}
-			}
-			for j, label := range outBars2 {
-				for _, blk := range outTap2[label] {
-					if bl := tBlockOf[blk]; bl != nil {
-						bl.tapOut(j)
-					}
-				}
-			}
-			var edges2 []obusEdge
-			for _, k := range eo2 {
-				lb := ""
-				if ec2[k] > 1 {
-					lb = "×" + itoa(ec2[k])
-				}
-				edges2 = append(edges2, obusEdge{s: k[0], t: k[1], label: lb})
-			}
-			b.WriteString(`<div class="oview" id="` + th.view + `" hidden>` + "\n")
-			b.WriteString(`<nav class="crumbs"><button type="button" data-onion-go="` + base + `0">overview</button> ▸ <button type="button" data-onion-go="` + viewID(si) + `">` + htmlEscape(L) + `</button> ▸ <span>` + htmlEscape(th.file) + `</span></nav>` + "\n")
-			b.WriteString(`<nav class="crumbs"><button type="button" data-onion-go="` + viewID(si) + `">▲ ` + htmlEscape(L) + `</button></nav>` + "\n")
-			b.WriteString(`<div class="onion-flow">` +
-				onionViewSVG(th.file+" regions in "+L, th.file+" in "+L, th.view, inBars2, outBars2, tblocks, edges2, anyMarked(th.ids), obusOpts{}) +
-				`</div>` + "\n")
-			b.WriteString("</div>\n")
 		}
 	}
 	b.WriteString("</div>\n")
@@ -3657,8 +3863,262 @@ func renderOnionData(in onionInput, rev *onionReview, nodes map[string]Node) str
 
 // enddesign
 
-// design: go-onion-busbar  implements: req-interactive-figures.2
-// The drill-view SVG uses ONE deterministic layout to render both drill shapes (the owner's ONION vs CLUSTER distinction). A BAND/LAYER is an ONION. opts.round draws a ROUND body, and unless it is the innermost KERNEL it carries a CORE, a central circle standing for the layers beneath. Signals go TO the core when a block calls inward, FROM the core when an inner layer calls a block, or across it. The core is the DRILL affordance into the next-inner band. A single-click ENTERS it; drilling is its only action. The kernel onion is round with buses but coreless. A core arrow aims at the core CENTRE and clips to its circular border, so it reads as pointing radially inward. A CLUSTER, a theme or a grouping INSIDE a band, is NOT an onion: a coreless bus-bar BOX, with no round body and no centre. Either way, inputs enter on the LEFT and outputs leave on the RIGHT, the overview's arrangement. A round band rings its BLOCKS around the centred core; a cluster lays them in a centred grid. Bars carry flow conservation. An input bar is an edge that ENTERS this view from outside a BAND boundary. An output bar LEAVES it. An edge whose two ends are both inside draws as a direct block-to-block SIBLING arrow, never detouring through a bar. In the layer onion an edge crossing to an INNER band routes to the CORE instead of a bar. Each bus is ONE vertical rail OUTSIDE the body. Its pills sit at the horizontal extreme and join the rail with a plain connector; an arrowhead never lands on a pill. A pill is CLICKABLE: a click traces every block the bus signal reaches. A tapping block gets ONE flow arrow between it and the rail. A drillable CLUSTER block hangs a small drill HANDLE off its own bottom edge, never a centre circle, since only a band has a core. Generated SVG keeps the book byte-stable with real, machine-readable text; a canvas library needed live scripts and rendered nothing on paper. Each block group carries a stable id, which the comment layer anchors to. It also carries a <title> with the full untruncated text, its connection ids for the inspect highlight, and either the drill target (clusters) or the trace link (regions).
+// design: go-onion-dsm-groups  implements: req-onion-clusters
+// Coupling clusters are the ONE grouping source of the onion's interiors (the owner's
+// cluster rules, req-onion-clusters). File themes retired as the source; a file stays
+// secondary info on a single block. dsmGroups splits a member set by its INTERNAL call
+// graph through the deterministic DSM pipeline (go-dsm-cluster). A cluster of two or
+// more members becomes ONE enterable block, and every other member keeps its own block.
+// The recursive emitter renders a cluster's interior as a coreless bus-bar box: top
+// input bus, bottom output bus, identified lanes carrying the group's outer I/O by flow
+// conservation. It re-derives grouping INSIDE each cluster, so a member may itself be a
+// cluster at every depth (rule 7). A member's talk with the core rides the group's
+// output lane. The core wiring stays on the band level (rule 4).
+func dsmGroups(ids []string, consumes map[string][]string) ([][]string, []string) {
+	inSet := make(map[string]bool, len(ids))
+	for _, id := range ids {
+		inSet[id] = true
+	}
+	sub := map[string][]string{}
+	for _, a := range ids {
+		for _, bb := range consumes[a] {
+			if inSet[bb] && bb != a {
+				sub[a] = append(sub[a], bb)
+			}
+		}
+	}
+	res := dsmAnalyze(sub)
+	var groups [][]string
+	grouped := map[string]bool{}
+	for _, cl := range res.Clusters {
+		if len(cl) >= 2 {
+			g := append([]string{}, cl...)
+			sortStrings(g)
+			groups = append(groups, g)
+			for _, id := range g {
+				grouped[id] = true
+			}
+		}
+	}
+	var singles []string
+	for _, id := range ids {
+		if !grouped[id] {
+			singles = append(singles, id)
+		}
+	}
+	sortStrings(singles)
+	if len(groups) == 1 && len(groups[0]) == len(ids) {
+		all := append([]string{}, ids...)
+		sortStrings(all)
+		return nil, all // the analysis keeps the set whole: no split, flat members
+	}
+	return groups, singles
+}
+
+// ogCtx carries the band context the recursive DSM group emitter needs.
+type ogCtx struct {
+	consumes              map[string][]string
+	reads, writes         map[string]bool
+	diskReads, diskWrites map[string]bool
+	inputs, outputs       []string
+	els                   []string
+	layerOf               map[string]string
+	L                     string
+	base                  string // the overview view id (the crumb root)
+	layerView             string // the band's own view id (the ▲ up-nav)
+	layerName             string
+	crossName             func(string) string
+	layerSort             func(string) int
+	label                 func(string) string
+	sub                   func(string) string
+	full                  func(string) string
+	link                  bool
+	isMarked              func(string) bool
+	inspect               func(*obusBlock, string)
+}
+
+// emit renders one cluster group's interior view, then recurses into its sub-groups.
+// Every depth keeps the bus-only boundary: a coreless box, lanes named by source/target.
+func (c ogCtx) emit(b *strings.Builder, view, title string, ids []string, trail [][2]string) {
+	inSet := make(map[string]bool, len(ids))
+	for _, id := range ids {
+		inSet[id] = true
+	}
+	groups, singles := dsmGroups(ids, c.consumes)
+	memberBlock := map[string]string{} // member -> the block carrying it in THIS view
+	type child struct {
+		view, title string
+		ids         []string
+	}
+	var children []child
+	var blocks []*obusBlock
+	blockOf := map[string]*obusBlock{}
+	for k, g := range groups {
+		cv := view + "c" + itoa(k)
+		lbl := "module " + itoa(k+1)
+		bl := &obusBlock{id: "cl:" + cv, label: lbl, sub: itoa(len(g)) + " regions",
+			cluster: true, drill: cv, full: lbl + " — " + strings.Join(g, ", ")}
+		for _, id := range g {
+			memberBlock[id] = bl.id
+			if c.isMarked(id) {
+				bl.marked = true
+			}
+		}
+		blocks = append(blocks, bl)
+		blockOf[bl.id] = bl
+		children = append(children, child{cv, lbl, g})
+	}
+	for _, id := range singles {
+		bl := &obusBlock{id: id, label: c.label(id), sub: c.sub(id), full: c.full(id), marked: c.isMarked(id)}
+		if c.link {
+			bl.link = id
+		}
+		c.inspect(bl, id)
+		memberBlock[id] = id
+		blocks = append(blocks, bl)
+		blockOf[id] = bl
+	}
+	// bars by flow conservation over the whole member set: an outside edge becomes an
+	// identified lane (rule 5); an inside edge stays a sibling arrow at block level.
+	var inBars, outBars []string
+	inTap := map[string][]string{}
+	outTap := map[string][]string{}
+	pushIn := func(label, blk string) {
+		if _, ok := inTap[label]; !ok {
+			inBars = append(inBars, label)
+		}
+		inTap[label] = appendUniqStr(inTap[label], blk)
+	}
+	pushOut := func(label, blk string) {
+		if _, ok := outTap[label]; !ok {
+			outBars = append(outBars, label)
+		}
+		outTap[label] = appendUniqStr(outTap[label], blk)
+	}
+	for _, id := range ids {
+		// per-bus tap decision (go-io-busbar): the disk bus belongs to disk-touching
+		// blocks alone; every other bus keeps the union flag
+		for _, in := range c.inputs {
+			if busTapsIn(in, c.reads[id], c.diskReads[id]) {
+				pushIn(in, memberBlock[id])
+			}
+		}
+		for _, out := range c.outputs {
+			if busTapsOut(out, c.writes[id], c.diskWrites[id]) {
+				pushOut(out, memberBlock[id])
+			}
+		}
+	}
+	type xb struct {
+		key, block string
+		sort       int
+	}
+	ec := map[[2]string]int{}
+	var eo [][2]string
+	var xi, xo []xb
+	for _, a := range ids {
+		for _, bb := range c.consumes[a] {
+			if inSet[bb] {
+				sa, tb := memberBlock[a], memberBlock[bb]
+				if sa == tb {
+					continue
+				}
+				k := [2]string{sa, tb}
+				if ec[k] == 0 {
+					eo = append(eo, k)
+				}
+				ec[k]++
+				continue
+			}
+			if c.layerOf[bb] == "ambient" {
+				continue // ambient is off-flow: infra pills only, never a lane (owner rule)
+			}
+			xo = append(xo, xb{key: "→ " + c.crossName(bb), block: memberBlock[a], sort: c.layerSort(c.layerOf[bb])})
+		}
+	}
+	for _, oa := range c.els {
+		if inSet[oa] || c.layerOf[oa] == "ambient" {
+			continue
+		}
+		for _, bb := range c.consumes[oa] {
+			if !inSet[bb] {
+				continue
+			}
+			xi = append(xi, xb{key: "from " + c.crossName(oa), block: memberBlock[bb], sort: c.layerSort(c.layerOf[oa])})
+		}
+	}
+	sortXb := func(v []xb) {
+		sort.Slice(v, func(i, j int) bool {
+			if v[i].sort != v[j].sort {
+				return v[i].sort < v[j].sort
+			}
+			if v[i].key != v[j].key {
+				return v[i].key < v[j].key
+			}
+			return v[i].block < v[j].block
+		})
+	}
+	sortXb(xi)
+	sortXb(xo)
+	for _, x := range xi {
+		pushIn(x.key, x.block)
+	}
+	for _, x := range xo {
+		pushOut(x.key, x.block)
+	}
+	for k, label := range inBars {
+		for _, blk := range inTap[label] {
+			if bl := blockOf[blk]; bl != nil {
+				bl.tapIn(k)
+			}
+		}
+	}
+	for j, label := range outBars {
+		for _, blk := range outTap[label] {
+			if bl := blockOf[blk]; bl != nil {
+				bl.tapOut(j)
+			}
+		}
+	}
+	var edges []obusEdge
+	for _, k := range eo {
+		lb := ""
+		if ec[k] > 1 {
+			lb = "×" + itoa(ec[k])
+		}
+		edges = append(edges, obusEdge{s: k[0], t: k[1], label: lb})
+	}
+	anyM := false
+	for _, id := range ids {
+		if c.isMarked(id) {
+			anyM = true
+			break
+		}
+	}
+	b.WriteString(`<div class="oview" id="` + view + `" hidden>` + "\n")
+	b.WriteString(`<nav class="crumbs">`)
+	for i, t := range trail {
+		if i > 0 {
+			b.WriteString(" ▸ ")
+		}
+		b.WriteString(`<button type="button" data-onion-go="` + t[0] + `">` + htmlEscape(t[1]) + `</button>`)
+	}
+	b.WriteString(` ▸ <span>` + htmlEscape(title) + `</span></nav>` + "\n")
+	up := trail[len(trail)-1]
+	b.WriteString(`<nav class="crumbs"><button type="button" data-onion-go="` + up[0] + `">▲ ` + htmlEscape(up[1]) + `</button></nav>` + "\n")
+	b.WriteString(`<div class="onion-flow">` +
+		onionViewSVG(title+" in "+c.layerName, title+" in "+c.layerName, view, inBars, outBars, blocks, edges, anyM, obusOpts{}) +
+		`</div>` + "\n")
+	b.WriteString("</div>\n")
+	for _, ch := range children {
+		c.emit(b, ch.view, ch.title, ch.ids, append(append([][2]string{}, trail...), [2]string{view, title}))
+	}
+}
+
+// enddesign
+
+// design: go-onion-busbar  implements: req-interactive-figures.2, req-onion-io-rendering
+// The drill-view SVG uses ONE deterministic layout to render both drill shapes (the owner's ONION vs CLUSTER distinction). A BAND/LAYER is an ONION. opts.round draws a ROUND body, and unless it is the innermost KERNEL it carries a CORE, a central circle standing for the layers beneath. Signals go TO the core when a block calls inward, FROM the core when an inner layer calls a block, or across it. The core is the DRILL affordance into the next-inner band. A single-click ENTERS it; drilling is its only action. The kernel onion is round with buses but coreless. A core arrow aims at the core CENTRE and clips to its circular border, so it reads as pointing radially inward. A CLUSTER, a theme or a grouping INSIDE a band, is NOT an onion: a coreless bus-bar BOX, with no round body and no centre. Either way, inputs enter on the TOP and outputs leave on the BOTTOM (the committed layout spec onion-io-layout.excalidraw.md, rule 1). A round band stacks its BLOCKS beside the centred core by the SIDE rule: to-core LEFT, from-core RIGHT, pass-through balanced against crowding. A cluster lays them in a centred grid. Bars carry flow conservation. An input bar is an edge that ENTERS this view from outside a BAND boundary. An output bar LEAVES it. An edge whose two ends are both inside draws as a direct block-to-block SIBLING arrow, never detouring through a bar. In the layer onion an edge crossing to an INNER band routes to the CORE instead of a bar. Each bus is ONE horizontal rail OUTSIDE the body. Its pills sit at the vertical extreme and join the rail with a plain connector; an arrowhead never lands on a pill. A pill is CLICKABLE: a click traces every block the bus signal reaches. A tapping block gets ONE flow arrow between it and the rail. A drillable CLUSTER block hangs a small drill HANDLE off its own bottom edge, never a centre circle, since only a band has a core. Generated SVG keeps the book byte-stable with real, machine-readable text; a canvas library needed live scripts and rendered nothing on paper. Each block group carries a stable id, which the comment layer anchors to. It also carries a <title> with the full untruncated text, its connection ids for the inspect highlight, and either the drill target (clusters) or the trace link (regions).
 
 type obusBlock struct {
 	id, label, sub, full string
@@ -3771,13 +4231,11 @@ func onionViewSVG(aria, title, vid string, inBars, outBars []string, blocks []*o
 	const (
 		pad     = 14
 		barH    = 24
-		barGap  = 10
 		blockW  = 170
 		colGap  = 28
 		rowGap  = 26
 		ringGap = 26
 		busGap  = 46
-		pillGap = 18
 		coreRad = 48
 		maxCols = 4
 	)
@@ -3801,33 +4259,54 @@ func onionViewSVG(aria, title, vid string, inBars, outBars []string, blocks []*o
 		barW = 210
 	}
 	N := len(blocks)
-	maxBH := 40
-	for _, bl := range blocks {
-		if bl.h > maxBH {
-			maxBH = bl.h
-		}
-	}
 	coreR := 0
 	if opts.hasCore {
 		coreR = coreRad
 	}
 	// --- block placement, centred on the origin (0,0) ---
-	// A round BAND (or the coreless KERNEL) is an onion: its blocks ring the CENTRED core, so
-	// the core sits dead centre on both axes. A coreless CLUSTER stays a centred grid box.
+	// A round BAND (or the coreless KERNEL) is an onion with the core dead centre. Its blocks
+	// obey the SIDE rule (the committed layout spec onion-io-layout.excalidraw.md, rules 3/4/6):
+	// a block whose output goes INTO the core stacks on the LEFT, a block receiving its input
+	// FROM the core stacks on the RIGHT, and a pass-through block joins the emptier side. A
+	// coreless CLUSTER stays a centred grid box.
 	var contentL, contentR, contentT, contentB, discR int
 	if opts.round {
-		ringR := coreR + 46 + maxBH/2
-		if N > 1 {
-			if need := int(float64(N) * float64(blockW+ringGap) / (2 * math.Pi)); need > ringR {
-				ringR = need
+		var left, right []*obusBlock
+		for _, bl := range blocks {
+			switch {
+			case bl.toCore: // a both-ways block sits left: the output rule names the side first
+				left = append(left, bl)
+			case bl.fromCore:
+				right = append(right, bl)
 			}
 		}
-		for i, bl := range blocks {
-			ang := -math.Pi/2 + 2*math.Pi*float64(i)/float64(N)
-			cx := int(float64(ringR) * math.Cos(ang))
-			cy := int(float64(ringR) * math.Sin(ang))
-			bl.x, bl.y = cx-bl.w/2, cy-bl.h/2
+		for _, bl := range blocks {
+			if bl.toCore || bl.fromCore {
+				continue
+			}
+			if len(left) <= len(right) {
+				left = append(left, bl)
+			} else {
+				right = append(right, bl)
+			}
 		}
+		sideX := coreR + 46 + blockW/2
+		stack := func(col []*obusBlock, cx int) {
+			total := 0
+			for i, bl := range col {
+				if i > 0 {
+					total += rowGap
+				}
+				total += bl.h
+			}
+			y := -total / 2
+			for _, bl := range col {
+				bl.x, bl.y = cx-bl.w/2, y
+				y += bl.h + rowGap
+			}
+		}
+		stack(left, -sideX)
+		stack(right, sideX)
 		// the disc is a TRUE CIRCLE (never an ellipse — owner hard rule) enclosing every block
 		// corner and the core; one radius, concentric with its inner echo.
 		discR = coreR + 22
@@ -3891,62 +4370,46 @@ func onionViewSVG(aria, title, vid string, inBars, outBars []string, blocks []*o
 	bcx := func(bl *obusBlock) int { return bl.x + bl.w/2 }
 	bcy := func(bl *obusBlock) int { return bl.y + bl.h/2 }
 
-	// --- bus rails + pills OUTSIDE the body: inputs on the LEFT, outputs on the RIGHT (the
-	// overview's arrangement). A pill sits at the horizontal extreme and joins the rail with a
-	// PLAIN connector; no arrowhead ever lands on or leaves a pill. ---
+	// --- bus rails + boxes OUTSIDE the body: ONE full-width horizontal rail PER input bar,
+	// stacked across the TOP with each bar's box riding its rail's LEFT end; the output bars
+	// mirror across the BOTTOM, each box riding its rail's RIGHT end (the committed layout
+	// spec onion-io-layout.excalidraw.md — every bus is its own line, never a merged rail,
+	// and every layer renders the same). No arrowhead ever lands on or leaves a box. ---
 	Kin, Kout := len(inBars), len(outBars)
-	inBusX := contentL - busGap
-	outBusX := contentR + busGap
-	inPillX := inBusX - pillGap - barW
-	outPillX := outBusX + pillGap
-	inPillY := func(k int) int { return -(Kin*barH+(Kin-1)*barGap)/2 + k*(barH+barGap) }
-	outPillY := func(k int) int { return -(Kout*barH+(Kout-1)*barGap)/2 + k*(barH+barGap) }
-	railT, railB := contentT, contentB
-	if Kin > 0 {
-		if t := inPillY(0); t < railT {
-			railT = t
+	railStep := barH + 8
+	railL, railR := contentL-8, contentR+8
+	inRailY := func(k int) int { return contentT - busGap - (Kin-1-k)*railStep }
+	outRailY := func(k int) int { return contentB + busGap + (Kout-1-k)*railStep }
+	clampIn := func(x int) int {
+		if x < railL+barW+10 {
+			return railL + barW + 10
 		}
-		if b := inPillY(Kin-1) + barH; b > railB {
-			railB = b
+		if x > railR-10 {
+			return railR - 10
 		}
+		return x
 	}
-	if Kout > 0 {
-		if t := outPillY(0); t < railT {
-			railT = t
+	clampOut := func(x int) int {
+		if x < railL+10 {
+			return railL + 10
 		}
-		if b := outPillY(Kout-1) + barH; b > railB {
-			railB = b
+		if x > railR-barW-10 {
+			return railR - barW - 10
 		}
-	}
-	railT -= 8
-	railB += 8
-	clampRail := func(y int) int {
-		if y < railT {
-			return railT
-		}
-		if y > railB {
-			return railB
-		}
-		return y
+		return x
 	}
 
 	// viewBox bounds over everything drawn
-	minX, maxX := contentL-pad, contentR+pad
-	if Kin > 0 {
-		minX = inPillX - pad
-	}
-	if Kout > 0 {
-		maxX = outPillX + barW + pad
-	}
+	minX, maxX := railL-pad, railR+pad
 	top := contentT
-	if railT < top {
-		top = railT
+	if Kin > 0 {
+		top = inRailY(0) - barH/2
 	}
 	titleY := top - 14
 	minY := titleY - 12
-	maxY := railB + pad
-	if contentB+pad > maxY {
-		maxY = contentB + pad
+	maxY := contentB + pad
+	if Kout > 0 {
+		maxY = outRailY(0) + barH/2 + pad
 	}
 
 	slug := func(s string) string {
@@ -3979,8 +4442,8 @@ func onionViewSVG(aria, title, vid string, inBars, outBars []string, blocks []*o
 		sb.WriteString(onionMarkDot(len([]rune(tt))*3+9, titleY-4))
 	}
 
-	// input bus (left): one vertical rail; every input pill joins it with a plain connector and
-	// is CLICKABLE — a click traces every block the bus signal reaches (data-oc-blocks).
+	// per-bar rails: every bar draws its OWN rail with its box riding the end; a box is
+	// CLICKABLE — a click traces every block the bus signal reaches (data-oc-blocks).
 	pillTargets := func(k int, out bool) []string {
 		var tgt []string
 		for _, bl := range blocks {
@@ -3998,43 +4461,47 @@ func onionViewSVG(aria, title, vid string, inBars, outBars []string, blocks []*o
 		return tgt
 	}
 	if Kin > 0 {
-		sb.WriteString(fmt.Sprintf(`<line x1="%d" y1="%d" x2="%d" y2="%d" stroke="#2f8f4e" stroke-width="1.6"/>`, inBusX, railT, inBusX, railB))
 		for k, lb := range inBars {
-			py := inPillY(k)
-			pcy := py + barH/2
-			sb.WriteString(fmt.Sprintf(`<line x1="%d" y1="%d" x2="%d" y2="%d" stroke="#2f8f4e" stroke-width="1.2" opacity="0.7"/>`, inPillX+barW, pcy, inBusX, pcy))
+			ry := inRailY(k)
+			sb.WriteString(fmt.Sprintf(`<line x1="%d" y1="%d" x2="%d" y2="%d" stroke="#2f8f4e" stroke-width="1.6"/>`, railL+barW, ry, railR, ry))
 			sb.WriteString(fmt.Sprintf(`<g class="opill" data-oc-pill="in" data-oc-blocks="%s"><title>%s — input bus (click to trace its targets)</title>`, htmlEscape(strings.Join(pillTargets(k, false), ",")), htmlEscape(lb)))
 			sb.WriteString(fmt.Sprintf(`<rect x="%d" y="%d" width="%d" height="%d" rx="4" fill="#eef7f0" stroke="#2f8f4e"/><text x="%d" y="%d" text-anchor="middle" pointer-events="none">%s</text></g>`,
-				inPillX, py, barW, barH, inPillX+barW/2, pcy+4, htmlEscape(lb)))
+				railL, ry-barH/2, barW, barH, railL+barW/2, ry+4, htmlEscape(lb)))
 		}
 	}
-	// output bus (right): one vertical rail; every output pill is clickable the same way.
+	// output rails (bottom): the mirror — each rail runs INTO its box at the right end.
 	if Kout > 0 {
-		sb.WriteString(fmt.Sprintf(`<line x1="%d" y1="%d" x2="%d" y2="%d" stroke="#b5651d" stroke-width="1.6"/>`, outBusX, railT, outBusX, railB))
 		for k, lb := range outBars {
-			py := outPillY(k)
-			pcy := py + barH/2
-			sb.WriteString(fmt.Sprintf(`<line x1="%d" y1="%d" x2="%d" y2="%d" stroke="#b5651d" stroke-width="1.2" opacity="0.7"/>`, outBusX, pcy, outPillX, pcy))
+			ry := outRailY(k)
+			sb.WriteString(fmt.Sprintf(`<line x1="%d" y1="%d" x2="%d" y2="%d" stroke="#b5651d" stroke-width="1.6"/>`, railL, ry, railR-barW, ry))
 			sb.WriteString(fmt.Sprintf(`<g class="opill" data-oc-pill="out" data-oc-blocks="%s"><title>%s — output bus (click to trace its sources)</title>`, htmlEscape(strings.Join(pillTargets(k, true), ",")), htmlEscape(lb)))
 			sb.WriteString(fmt.Sprintf(`<rect x="%d" y="%d" width="%d" height="%d" rx="4" fill="#fbf2ea" stroke="#b5651d"/><text x="%d" y="%d" text-anchor="middle" pointer-events="none">%s</text></g>`,
-				outPillX, py, barW, barH, outPillX+barW/2, pcy+4, htmlEscape(lb)))
+				railR-barW, ry-barH/2, barW, barH, railR-barW/2, ry+4, htmlEscape(lb)))
 		}
 	}
-	// block taps: ONE flow arrow between the bus rail and each tapping block. The input arrow
-	// points INTO the block (inflow); the output arrow terminates ON the rail (outflow). Either
-	// way the arrowhead is on the rail or the block — never on a pill.
+	// block taps: ONE flow arrow between EACH consumed rail and the tapping block. The input
+	// arrow points INTO the block (inflow); the output arrow terminates ON its rail (outflow).
+	// Either way the arrowhead is on a rail or a block — never on a box.
 	for _, bl := range blocks {
-		if Kin > 0 && len(bl.ins) > 0 {
-			by := clampRail(bcy(bl))
-			ex, ey := rectBorder(bcx(bl), bcy(bl), bl.w/2, bl.h/2, float64(inBusX-bcx(bl)), float64(by-bcy(bl)))
+		for _, k := range bl.ins {
+			if k < 0 || k >= Kin {
+				continue
+			}
+			ry := inRailY(k)
+			bx := clampIn(bcx(bl))
+			ex, ey := rectBorder(bcx(bl), bcy(bl), bl.w/2, bl.h/2, float64(bx-bcx(bl)), float64(ry-bcy(bl)))
 			sb.WriteString(fmt.Sprintf(`<line data-oc-block="%s" data-oc-flow="in" x1="%d" y1="%d" x2="%d" y2="%d" stroke="#2f8f4e" stroke-width="1.2" marker-end="url(#%smi)"/>`,
-				htmlEscape(bl.id), inBusX, by, ex, ey, vid))
+				htmlEscape(bl.id), bx, ry, ex, ey, vid))
 		}
-		if Kout > 0 && len(bl.outs) > 0 {
-			by := clampRail(bcy(bl))
-			sx, sy := rectBorder(bcx(bl), bcy(bl), bl.w/2, bl.h/2, float64(outBusX-bcx(bl)), float64(by-bcy(bl)))
+		for _, k := range bl.outs {
+			if k < 0 || k >= Kout {
+				continue
+			}
+			ry := outRailY(k)
+			bx := clampOut(bcx(bl))
+			sx, sy := rectBorder(bcx(bl), bcy(bl), bl.w/2, bl.h/2, float64(bx-bcx(bl)), float64(ry-bcy(bl)))
 			sb.WriteString(fmt.Sprintf(`<line data-oc-block="%s" data-oc-flow="out" x1="%d" y1="%d" x2="%d" y2="%d" stroke="#b5651d" stroke-width="1.2" marker-end="url(#%smo)"/>`,
-				htmlEscape(bl.id), sx, sy, outBusX, by, vid))
+				htmlEscape(bl.id), sx, sy, bx, ry, vid))
 		}
 	}
 	// sibling flow arrows: both ends inside this view (a flow never detours through a bar)
@@ -4132,11 +4599,14 @@ func onionViewSVG(aria, title, vid string, inBars, outBars []string, blocks []*o
 		}
 		sb.WriteString(`<g class="` + cls + `" id="` + vid + `-e-` + slug(bl.id) + `"` + attr + `>`)
 		sb.WriteString(`<title>` + htmlEscape(bl.full) + `</title>`)
+		fill := "#fff"
 		if bl.cluster {
-			sb.WriteString(fmt.Sprintf(`<rect x="%d" y="%d" width="%d" height="%d" rx="6" fill="#eef3fa" stroke="#4a6fa5"/>`, bl.x, bl.y, bl.w, bl.h))
+			fill = "#eef3fa"
+		}
+		sb.WriteString(fmt.Sprintf(`<rect x="%d" y="%d" width="%d" height="%d" rx="6" fill="%s" stroke="#4a6fa5"/>`, bl.x, bl.y, bl.w, bl.h, fill))
+		if bl.drill != "" {
+			// the double border marks an enterable block
 			sb.WriteString(fmt.Sprintf(`<rect x="%d" y="%d" width="%d" height="%d" rx="4" fill="none" stroke="#4a6fa5"/>`, bl.x+3, bl.y+3, bl.w-6, bl.h-6))
-		} else {
-			sb.WriteString(fmt.Sprintf(`<rect x="%d" y="%d" width="%d" height="%d" rx="6" fill="#fff" stroke="#4a6fa5"/>`, bl.x, bl.y, bl.w, bl.h))
 		}
 		if bl.marked {
 			sb.WriteString(fmt.Sprintf(`<rect x="%d" y="%d" width="%d" height="%d" rx="6" fill="none" stroke="%s" stroke-width="2.4"/>`, bl.x, bl.y, bl.w, bl.h, onionMarkColor))
@@ -4169,8 +4639,91 @@ func onionViewSVG(aria, title, vid string, inBars, outBars []string, blocks []*o
 
 // enddesign
 
+// design: go-onion-interact  implements: req-onion-click, req-onion-enter
+// ONE onion interaction script for every host. The book shell and the standalone review
+// page ride the SAME constant, so behavior can never drift (the M5 spike: the standalone
+// lacked history navigation). Single-click INSPECTS a block: highlight plus the host's
+// details lane. The book's data-node-link handler opens its details pane, and a
+// standalone host registers window.__onionInspectHook to fill its own panel. Double-click
+// ENTERS a drillable block. A ring, core, or crumb with no inspect action enters on a
+// single click. Every entry pushes a history state, so browser BACK exits the block
+// (req-onion-enter): entering is normal, reversible navigation. Drill targets resolve
+// HOST-SCOPED by exact id or id-SUFFIX, so a deck slide's id-prefixed copy drills its
+// own views, never the chapter original (the spike's bounded defect). The popstate
+// stack keeps the view ELEMENT, never a global id lookup.
+const onionInteractJS = `
+ window.__quackNav=window.__quackNav||[];
+ var __onionStack=[];
+ function __onionShow(host,t){Array.prototype.forEach.call(host.querySelectorAll('.oview'),function(v){v.hidden=true;});t.hidden=false;}
+ function __onionClear(host){Array.prototype.forEach.call(host.querySelectorAll('.osel,.oc-nb,.oc-on'),function(x){x.classList.remove('osel','oc-nb','oc-on');});}
+ function __onionInspect(g){var host=g.closest('.onion');if(!host)return;__onionClear(host);g.classList.add('osel');
+  var id=g.getAttribute('data-oc-id')||'';
+  Array.prototype.forEach.call(host.querySelectorAll('[data-oc-block="'+id+'"]'),function(l){l.classList.add('oc-on');});
+  Array.prototype.forEach.call(host.querySelectorAll('[data-oc-src],[data-oc-dst]'),function(l){
+   var s=l.getAttribute('data-oc-src'),d=l.getAttribute('data-oc-dst');if(s!==id&&d!==id)return;
+   l.classList.add('oc-on');var o=host.querySelector('[data-oc-id="'+(s===id?d:s)+'"]');if(o)o.classList.add('oc-nb');});
+  if(window.__onionInspectHook)window.__onionInspectHook(g);}
+ /* a bus PILL: single-click traces every block the bus signal reaches (data-oc-blocks),
+    lighting each target block and the tap arrow that carries this direction. */
+ function __onionPill(g){var host=g.closest('.onion');if(!host)return;__onionClear(host);g.classList.add('osel');
+  var flow=g.getAttribute('data-oc-pill');
+  (g.getAttribute('data-oc-blocks')||'').split(',').forEach(function(id){if(!id)return;
+   var o=host.querySelector('[data-oc-id="'+id+'"]');if(o)o.classList.add('oc-nb');
+   Array.prototype.forEach.call(host.querySelectorAll('[data-oc-block="'+id+'"][data-oc-flow="'+flow+'"]'),function(l){l.classList.add('oc-on');});});}
+ function __onionDrill(el){var host=el.closest('.onion');if(!host)return;
+  var tid=el.getAttribute('data-onion-go'),t=null;
+  Array.prototype.forEach.call(host.querySelectorAll('.oview'),function(v){
+   if(!t&&(v.id===tid||v.id.length>tid.length&&v.id.slice(-tid.length-1)==='-'+tid))t=v;});
+  if(!t)return;
+  var cur=host.querySelector('.oview:not([hidden])');
+  if(cur&&cur!==t){__onionStack.push({host:host,el:cur});window.__quackNav.push('onion');try{history.pushState({nav:'onion'},'');}catch(_){}}
+  __onionShow(host,t);}
+ /* drill is SINGLE-click when it is the only action (a ring, a core, a crumb); a block that
+    ALSO inspects keeps drill on DOUBLE-click, so its single click can inspect+highlight. */
+ document.querySelectorAll('.onion [data-onion-go]').forEach(function(el){
+  var ev=el.hasAttribute('data-oc-id')?'dblclick':'click';
+  el.addEventListener(ev,function(e){e.preventDefault();e.stopPropagation();__onionDrill(el);});});
+ /* a block's single click INSPECTS and nothing else: propagation stops here, so
+    the book's bubbling data-node-link transport never double-fires a jump */
+ document.querySelectorAll('.onion [data-oc-id]').forEach(function(el){el.addEventListener('click',function(ev){
+  ev.preventDefault();ev.stopPropagation();__onionInspect(el);});});
+ document.querySelectorAll('.onion [data-oc-pill]').forEach(function(el){el.addEventListener('click',function(ev){
+  ev.preventDefault();ev.stopPropagation();__onionPill(el);});});
+ window.addEventListener('popstate',function(){
+  var nv=window.__quackNav||[];
+  if(nv.length===0||nv[nv.length-1]!=='onion')return;
+  nv.pop();
+  var e=__onionStack.pop();if(!e)return;
+  __onionShow(e.host,e.el);});
+ /* hide-boilerplate (req-onion-boilerplate): the fold control toggles the host's fold-amb
+    class; the CSS rule hides every ambient-stamped pill, the DOM stays complete. */
+ document.querySelectorAll('.onion [data-oc-fold]').forEach(function(btn){btn.addEventListener('click',function(){
+  var host=btn.closest('.onion');if(!host)return;
+  var on=host.classList.toggle('fold-amb');
+  Array.prototype.forEach.call(host.querySelectorAll('[data-oc-fold]'),function(x){
+   x.textContent=on?x.getAttribute('data-oc-show'):x.getAttribute('data-oc-hide');});});});
+ /* pan+zoom the onion svgs (owner: zoomable like the trace graph) - wheel zooms toward the
+    cursor, drag pans, double-click resets; clicks on drill targets still pass through */
+ document.querySelectorAll('.onion svg').forEach(function(svg){
+  var vb=(svg.getAttribute('viewBox')||'0 0 380 360').split(/\s+/).map(Number);
+  var base=vb.slice(),st={x:vb[0],y:vb[1],w:vb[2],h:vb[3]},drag=null;
+  function apply(){svg.setAttribute('viewBox',st.x+' '+st.y+' '+st.w+' '+st.h);}
+  svg.addEventListener('wheel',function(e){e.preventDefault();var r=svg.getBoundingClientRect();if(!r.width)return;
+   var mx=st.x+(e.clientX-r.left)/r.width*st.w,my=st.y+(e.clientY-r.top)/r.height*st.h,f=e.deltaY<0?0.85:1.18;
+   st.w*=f;st.h*=f;st.x=mx-(e.clientX-r.left)/r.width*st.w;st.y=my-(e.clientY-r.top)/r.height*st.h;apply();},{passive:false});
+  svg.addEventListener('pointerdown',function(e){if(e.target.closest&&e.target.closest('[data-onion-go],[data-node-link],[data-oc-id],[data-oc-pill]'))return;
+   drag={x:e.clientX,y:e.clientY,sx:st.x,sy:st.y};try{svg.setPointerCapture(e.pointerId);}catch(_){}svg.style.cursor='grabbing';});
+  svg.addEventListener('pointermove',function(e){if(!drag)return;var r=svg.getBoundingClientRect();if(!r.width)return;
+   st.x=drag.sx-(e.clientX-drag.x)/r.width*st.w;st.y=drag.sy-(e.clientY-drag.y)/r.height*st.h;apply();});
+  svg.addEventListener('pointerup',function(){drag=null;svg.style.cursor='';});
+  svg.addEventListener('dblclick',function(){st.x=base[0];st.y=base[1];st.w=base[2];st.h=base[3];apply();});
+ });
+`
+
+// enddesign
+
 // design: go-model-standalone  implements: req-diagram-review-render
-// The standalone single-model render shows ONE model's onion drill-down as a small, self-contained HTML page. It reuses renderOnionOpt, the book's own onion, so the two projections never drift. It inlines only the CSS and JS that figure needs. It makes no external request, the dom-static, single-file discipline. `marked` names the changed elements. The shell adds a title, a legend, and the drill script.
+// The standalone single-model render shows ONE model's onion drill-down as a small, self-contained HTML page. It reuses renderOnionOpt, the book's own onion, AND the shared interaction script (go-onion-interact), so the two projections never drift in figure or behavior. It inlines only the CSS and panel glue it needs. It makes no external request, the dom-static, single-file discipline. `marked` names the changed elements. The shell adds a title, a legend, and the drill script.
 const onionStandaloneCSS = "*{box-sizing:border-box}" +
 	"body{font-family:system-ui,Segoe UI,sans-serif;margin:0;line-height:1.5;color:#1a1a1a;background:#fff}" +
 	"main{max-width:1040px;margin:0 auto;padding:1rem 1.5rem 3rem}" +
@@ -4188,51 +4741,25 @@ const onionStandaloneCSS = "*{box-sizing:border-box}" +
 	".onion-infra{display:flex;flex-wrap:wrap;gap:5px;align-items:center;margin:.3rem 0;font-size:.78rem}" +
 	".onion-infra .il{color:#888;margin-right:4px}" +
 	".onion-infra button{font:inherit;font-size:.75rem;padding:2px 9px;border:1px solid #d5d5d5;border-radius:12px;background:#fff;cursor:pointer}" +
+	".onion.fold-amb [data-oc-amb]{display:none}" +
 	"#rv-detail{position:fixed;top:0;right:0;width:320px;max-width:88vw;height:100%;overflow:auto;background:#fff;border-left:1px solid #e3e3e3;box-shadow:-4px 0 16px rgba(0,0,0,.08);padding:1rem 1.1rem;font-size:.85rem;z-index:20}" +
 	"#rv-detail[hidden]{display:none}#rv-detail h2{margin:.2rem 0 .6rem;font-size:1rem;word-break:break-word}" +
 	"#rv-close{float:right;font:inherit;font-size:.78rem;padding:2px 9px;border:1px solid #d5d5d5;border-radius:6px;background:#fff;cursor:pointer}" +
 	".rv-d-row{margin:.35rem 0;display:flex;gap:.5rem}.rv-d-lbl{color:#888;min-width:6.5rem;flex:0 0 6.5rem}"
 
+// onionStandaloneJS is only the PANEL GLUE: the interaction itself is the shared
+// onionInteractJS (go-onion-interact); this registers the inspect hook filling the
+// standalone's own details panel, plus its close button.
 const onionStandaloneJS = "(function(){" +
-	"function show(host,t){Array.prototype.forEach.call(host.querySelectorAll('.oview'),function(v){v.hidden=true;});t.hidden=false;}" +
-	"function clr(host){Array.prototype.forEach.call(host.querySelectorAll('.osel,.oc-nb,.oc-on'),function(x){x.classList.remove('osel','oc-nb','oc-on');});}" +
 	"var panel=document.getElementById('rv-detail');" +
 	"function fld(i,v){var e=document.getElementById(i);if(e)e.textContent=v||'\\u2014';}" +
-	"function inspect(g){var host=g.closest('.onion');if(!host)return;clr(host);g.classList.add('osel');" +
-	"var id=g.getAttribute('data-oc-id')||'';" +
-	"Array.prototype.forEach.call(host.querySelectorAll('[data-oc-block=\"'+id+'\"]'),function(l){l.classList.add('oc-on');});" +
-	"Array.prototype.forEach.call(host.querySelectorAll('[data-oc-src],[data-oc-dst]'),function(l){" +
-	"var s=l.getAttribute('data-oc-src'),d=l.getAttribute('data-oc-dst');if(s!==id&&d!==id)return;" +
-	"l.classList.add('oc-on');var o=host.querySelector('[data-oc-id=\"'+(s===id?d:s)+'\"]');if(o)o.classList.add('oc-nb');});" +
-	"if(panel){fld('rv-d-name',id);" +
+	"window.__onionInspectHook=function(g){if(!panel)return;" +
+	"fld('rv-d-name',g.getAttribute('data-oc-id')||'');" +
 	"fld('rv-d-status',g.getAttribute('data-oc-new')?'new element':(g.getAttribute('data-oc-changed')?'behavior change':'unchanged'));" +
 	"fld('rv-d-resp',g.getAttribute('data-oc-resp'));fld('rv-d-req',g.getAttribute('data-oc-req'));fld('rv-d-dec',g.getAttribute('data-oc-dec'));" +
-	"panel.hidden=false;}}" +
-	"function pill(g){var host=g.closest('.onion');if(!host)return;clr(host);g.classList.add('osel');" +
-	"var flow=g.getAttribute('data-oc-pill');" +
-	"(g.getAttribute('data-oc-blocks')||'').split(',').forEach(function(id){if(!id)return;" +
-	"var o=host.querySelector('[data-oc-id=\"'+id+'\"]');if(o)o.classList.add('oc-nb');" +
-	"Array.prototype.forEach.call(host.querySelectorAll('[data-oc-block=\"'+id+'\"][data-oc-flow=\"'+flow+'\"]'),function(l){l.classList.add('oc-on');});});}" +
-	"function drill(el){var t=document.getElementById(el.getAttribute('data-onion-go'));var host=el.closest('.onion');if(!t||!host)return;show(host,t);}" +
-	"document.querySelectorAll('.onion [data-onion-go]').forEach(function(el){var ev=el.hasAttribute('data-oc-id')?'dblclick':'click';" +
-	"el.addEventListener(ev,function(e){e.preventDefault();e.stopPropagation();drill(el);});});" +
-	"document.querySelectorAll('.onion [data-oc-id]').forEach(function(el){el.addEventListener('click',function(ev){ev.preventDefault();inspect(el);});});" +
-	"document.querySelectorAll('.onion [data-oc-pill]').forEach(function(el){el.addEventListener('click',function(ev){ev.preventDefault();ev.stopPropagation();pill(el);});});" +
+	"panel.hidden=false;};" +
 	"var cl=document.getElementById('rv-close');if(cl&&panel)cl.addEventListener('click',function(){panel.hidden=true;});" +
-	"document.querySelectorAll('.onion svg').forEach(function(svg){" +
-	"var vb=(svg.getAttribute('viewBox')||'0 0 520 280').split(/\\s+/).map(Number);" +
-	"var base=vb.slice(),st={x:vb[0],y:vb[1],w:vb[2],h:vb[3]},drag=null;" +
-	"function apply(){svg.setAttribute('viewBox',st.x+' '+st.y+' '+st.w+' '+st.h);}" +
-	"svg.addEventListener('wheel',function(e){e.preventDefault();var r=svg.getBoundingClientRect();if(!r.width)return;" +
-	"var mx=st.x+(e.clientX-r.left)/r.width*st.w,my=st.y+(e.clientY-r.top)/r.height*st.h,f=e.deltaY<0?0.85:1.18;" +
-	"st.w*=f;st.h*=f;st.x=mx-(e.clientX-r.left)/r.width*st.w;st.y=my-(e.clientY-r.top)/r.height*st.h;apply();},{passive:false});" +
-	"svg.addEventListener('pointerdown',function(e){if(e.target.closest&&e.target.closest('[data-onion-go],[data-oc-id],[data-oc-pill]'))return;" +
-	"drag={x:e.clientX,y:e.clientY,sx:st.x,sy:st.y};try{svg.setPointerCapture(e.pointerId);}catch(_){}svg.style.cursor='grabbing';});" +
-	"svg.addEventListener('pointermove',function(e){if(!drag)return;var r=svg.getBoundingClientRect();if(!r.width)return;" +
-	"st.x=drag.sx-(e.clientX-drag.x)/r.width*st.w;st.y=drag.sy-(e.clientY-drag.y)/r.height*st.h;apply();});" +
-	"svg.addEventListener('pointerup',function(){drag=null;svg.style.cursor='';});" +
-	"svg.addEventListener('dblclick',function(){st.x=base[0];st.y=base[1];st.w=base[2];st.h=base[3];apply();});" +
-	"});})();"
+	"})();"
 
 func renderStandaloneModel(modelID string, marked []string) (string, error) {
 	if modelID != "model-engine-layers" {
@@ -4262,7 +4789,7 @@ func renderStandaloneModel(modelID string, marked []string) (string, error) {
 		`<p class="rv-d-row"><span class="rv-d-lbl">responsibility</span><span id="rv-d-resp"></span></p>` +
 		`<p class="rv-d-row"><span class="rv-d-lbl">implements</span><span id="rv-d-req"></span></p>` +
 		`<p class="rv-d-row"><span class="rv-d-lbl">informed by</span><span id="rv-d-dec"></span></p></aside>` + "\n")
-	b.WriteString("<script>" + onionStandaloneJS + "</script>\n</body></html>\n")
+	b.WriteString("<script>" + onionInteractJS + onionStandaloneJS + "</script>\n</body></html>\n")
 	return b.String(), nil
 }
 
@@ -4348,7 +4875,7 @@ func onionLayerSource() (layers []onionLayer, excludes, inputs, outputs, infra [
 
 // enddesign
 
-// design: go-trace-graph  implements: req-system-overview, req-compact-derived.1
+// design: go-trace-graph  implements: req-system-overview, req-compact-derived.1, req-graph-centering
 // The trace chapter's per-need graph REUSES the report's per-need grouping, traceTabs/subtree/buildTab via bookGraphTabs, with the book's own tab bake. This is the CLEAN per-need trace: no fold boxes, no (unrooted) tab, since a node reaching no need root does not render, and decisions only when architectural. One page appears per need; a tab bar toggles which need's graph shows. Each node is clickable and opens the details pane, data-node-link, a shared handler; the pane's link transports to the table row. Each node carries a [ch N] badge naming the chapter its item's table renders in, so a reader always knows where to read the detail.
 
 // chapterNumbers maps each reader chapter's manifest id to its 1-based render number.
@@ -4359,8 +4886,9 @@ func chapterNumbers(nodes map[string]Node) map[string]int {
 			chs = append(chs, n)
 		}
 	}
+	clless := chapterLess(nodes)
 	for i := 1; i < len(chs); i++ {
-		for j := i; j > 0 && (chs[j].Order < chs[j-1].Order || (chs[j].Order == chs[j-1].Order && chs[j].ID < chs[j-1].ID)); j-- {
+		for j := i; j > 0 && clless(chs[j], chs[j-1]); j-- {
 			chs[j], chs[j-1] = chs[j-1], chs[j]
 		}
 	}
@@ -4374,9 +4902,9 @@ func chapterNumbers(nodes map[string]Node) map[string]int {
 // typeChapterID names the chapter whose tables render each trace type (decisions
 // render in the project chapter).
 var typeChapterID = map[string]string{
-	"need": "man-ch3-design-input", "usecase": "man-ch3-design-input",
-	"requirement": "man-ch3-design-input", "design": "man-ch4-design-output",
-	"test": "man-ch5-verification-validation", "adr": "man-ch6-project",
+	"need": "man-design-input", "usecase": "man-design-input",
+	"requirement": "man-design-input", "design": "man-design-output",
+	"test": "man-verification-validation", "adr": "man-project",
 }
 
 func renderTraceGraph(nodes map[string]Node) string {
@@ -4390,8 +4918,9 @@ func renderTraceGraph(nodes map[string]Node) string {
 	// to KEEP the graph working offline after the book is received - the book stays fully self-contained,
 	// its "no external requests" property intact).
 	data := map[string]interface{}{
-		"tabs":   bookGraphTabs(nodes, sm),
-		"checks": checksMap(nodes, sm, dataDirFor("out")),
+		"tabs":       bookGraphTabs(nodes, sm),
+		"checks":     checksMap(nodes, sm, dataDirFor("out")),
+		"typecolors": typeColors(), // the one palette source paints the graph (go-type-colors)
 	}
 	gdata, _ := json.Marshal(data)
 	chNum := chapterNumbers(nodes)
@@ -4415,10 +4944,10 @@ func renderTraceGraph(nodes map[string]Node) string {
 	// chapter marking lives OUTSIDE the 1:1 graph (rendered as a list): a node colour is
 	// its type; this says which chapter each type's table sits in, and a click transports there.
 	b.WriteString(`<p class="meta">Click any node to open its row in the chapter that owns it:</p><ul class="meta tg-chmap">` +
-		`<li>needs, use-cases, and requirements — chapter ` + chcap("man-ch3-design-input") + `</li>` +
-		`<li>designs — chapter ` + chcap("man-ch4-design-output") + `</li>` +
-		`<li>tests — chapter ` + chcap("man-ch5-verification-validation") + `</li>` +
-		`<li>decisions — chapter ` + chcap("man-ch6-project") + `</li></ul>`)
+		`<li>needs, use-cases, and requirements — chapter ` + chcap("man-design-input") + `</li>` +
+		`<li>designs — chapter ` + chcap("man-design-output") + `</li>` +
+		`<li>tests — chapter ` + chcap("man-verification-validation") + `</li>` +
+		`<li>decisions — chapter ` + chcap("man-project") + `</li></ul>`)
 	b.WriteString(`<div id="tabbar" class="tabbar"></div>`)
 	b.WriteString(`<div class="legendrow">` + bookLegend +
 		`<input id="trace-filter" placeholder="filter… (click for help)" title="filter the graph" autocomplete="off"><button id="filter-clear" title="clear the filter">&#215;</button></div>`)
@@ -4438,20 +4967,6 @@ func renderTraceGraph(nodes map[string]Node) string {
 }
 
 // enddesign
-
-func svgTimeline(items []string) string {
-	fig := figNext()
-	var b strings.Builder
-	w := 80 + len(items)*130
-	b.WriteString(fmt.Sprintf(`<svg viewBox="0 0 %d 120" font-family="system-ui" font-size="12" role="img" aria-label="timeline">`, w))
-	b.WriteString(fmt.Sprintf(`<line x1="40" y1="60" x2="%d" y2="60" stroke="#4a6fa5" stroke-width="2"/>`, w-40))
-	for i, it := range items {
-		x := 80 + i*130
-		b.WriteString(fmt.Sprintf(`<g id="%s"><circle cx="%d" cy="60" r="6" fill="#4a6fa5"/><text x="%d" y="92" text-anchor="middle">%s</text></g>`, figElemID(fig, it), x, x, htmlEscape(it)))
-	}
-	b.WriteString(`</svg>`)
-	return b.String()
-}
 
 func svgMatrix(rows []string, cells map[string][]string) string {
 	fig := figNext()
@@ -4473,11 +4988,14 @@ func svgMatrix(rows []string, cells map[string][]string) string {
 
 // renderFigure derives the named figure from live graph data, sorted for determinism.
 // design: go-fig-tables  implements: req-derived-boards.2
-// Tables are tables, figures are figures. The tabular fig kinds, vv-table and stakeholder-matrix, retire in favor of canned base queries the manifests embed as ```base blocks; they gain live Obsidian preview. fig: keeps only spatial graphics whose selection is topological: context star, block tree, timeline. A retired kind is a FINDING with the pointer to its canned query. A base block in any unit body evaluates through the pinned evaluator (go-base-eval) into a semantic table. Queries pool centrally. An inline block in a manifest is a smell. The canonical home is spec/queries/, and a unit references a pooled query with the Obsidian-native embed ![[name.base]]. Obsidian previews it live, and the emitter inlines the file and evaluates it exactly like an authored block. A missing pooled query is a render-failing finding, never a silent skip.
+// Tables are tables, figures are figures. The tabular fig kinds, vv-table and stakeholder-matrix, retire in favor of canned base queries the manifests embed as ```base blocks; they gain live Obsidian preview. fig: keeps only spatial graphics whose selection is topological: context model, block tree, timeline. A retired kind is a FINDING with the pointer to its canned query. A base block in any unit body evaluates through the pinned evaluator (go-base-eval) into a semantic table. Queries pool centrally. An inline block in a manifest is a smell. The canonical home is spec/queries/, and a unit references a pooled query with the Obsidian-native embed ![[name.base]]. Obsidian previews it live, and the emitter inlines the file and evaluates it exactly like an authored block. A missing pooled query is a render-failing finding, never a silent skip.
 var retiredFigKinds = map[string]string{
 	"vv-table":           "(req-derived-boards.2) - embed its canned base query from method/templates/documents/spec/queries",
 	"stakeholder-matrix": "(req-derived-boards.2) - embed its canned base query from method/templates/documents/spec/queries",
 	"candidates-matrix":  "(req-decision-rendering.2) - the record lives with the project chapter: the timeline reaches each iteration's candidates and decisions",
+	"timeline":           "(req-project-timeline) - use fig: project-timeline, the one shared component",
+	"context-star":       "(req-interactive-figures.3) - use fig: context-model, the same derived figure under its right name",
+	"coverage-board":     "(req-derived-boards.1) - its facets ride the register's filter columns now",
 }
 
 var queriesDirOverride string // test seam: an alternate pooled-query dir for fixtures
@@ -4715,11 +5233,17 @@ func promoteBrief(name, head, body string) (brief, outBody string) {
 
 // utableControls is the shared reader-table footer: expand/collapse-all, the text
 // filter, the page size, and the pager - ONE markup for every utable render site.
-func utableControls() string {
+// psize > 0 makes that size the table's default page (a leading selected option);
+// 0 keeps the shared default of twenty.
+func utableControls(psize int) string {
+	sizes := `<select class="qt-size"><option>20</option><option>50</option><option value="0">all</option></select>`
+	if psize > 0 && psize != 20 {
+		sizes = `<select class="qt-size"><option selected>` + itoa(psize) + `</option><option>20</option><option>50</option><option value="0">all</option></select>`
+	}
 	return `<div class="ucontrols">` +
 		`<button type="button" class="qt-xall">expand all</button><button type="button" class="qt-call">collapse all</button>` +
 		`<input class="qt-search" type="search" placeholder="filter…">` +
-		`<label class="qt-sizel">show <select class="qt-size"><option>20</option><option>50</option><option value="0">all</option></select></label>` +
+		`<label class="qt-sizel">show ` + sizes + `</label>` +
 		`<span class="qt-pager"><button type="button" class="qt-prev" aria-label="previous page">&#8249;</button><span class="qt-pos"></span><button type="button" class="qt-next" aria-label="next page">&#8250;</button></span>` +
 		`</div>`
 }
@@ -4776,7 +5300,7 @@ func baseResultHTML(rs []BaseResult, nodes map[string]Node, sm map[string]string
 			// enddesign
 			continue
 		}
-		// design: go-q-table  implements: req-reader-tables.1, req-reader-tables.5, req-reader-tables.2, req-reader-tables.3, req-compact-derived.1, req-reader-tables.4
+		// design: go-q-table  implements: req-reader-tables.1, req-reader-tables.5, req-reader-tables.2, req-reader-tables.3, req-compact-derived.1, req-reader-tables.4, req-vv-result-links, req-onion-interfaces
 		// Combinable pill FACETS ride above the table: AND across facets, OR within one. A universal need facet covers trace items, plus one facet per small-enum column. There is never a pill per item. The universal query table uses a real thead with a clear header row and separated cells, rendered even with zero rows. The empty-value "(none)" bucket header never renders, though its rows still do. Interactivity is STATIC DOM. A filter row carries a text input plus one select per enum column, a small distinct value set derived from the rows at emit. Ungrouped tables carry data-sortable, and the shell script sorts by MOVING existing rows. Every row with an id is EXPANDABLE (req-reader-tables.3). A static detail row, with statement, meta, and body prose, follows it, hidden until toggled. Expand-all and collapse-all buttons ride the filter row. A table beyond twenty rows pages BY NEED. Each row is stamped with the first need its item traces up to, walking refines, verifies, and implements upward in deterministic order. Needless rows land on the last page, and buckets chunk at twenty. Off-page rows carry hidden AT EMIT, so the no-script default is one bounded page (req-compact-derived.1); the pager only toggles visibility. The unified reader table is ONE interactive pattern everywhere. A row is the item NAME with a disclosure triangle. The expand carries the statement, the remaining fields, and the body. Combinable FILTER PILL facets ride above the table: a "need" facet plus one per small-distinct-value column. The controls below, filter box, expand/collapse-all, page size, pager, sit right-aligned. Pagination is client-side, default 20, configurable. Rows keep data-node for trace-graph transport; the script only toggles. A row landing in SEVERAL groups, a multi-valued groupBy facet, renders ONCE. The flat reader table shows no group sections, so the duplicate would read as a defect, not a grouping. The first group's key wins for data-gp.
 		type flatRow struct {
 			row BaseRow
@@ -4921,38 +5445,71 @@ func baseResultHTML(rs []BaseResult, nodes map[string]Node, sm map[string]string
 		if len(viewTok) > 0 {
 			viewCols = 1
 		}
+		// a deck-manifest row auto-earns an OPEN pill: a click transports to the deck
+		// through the data-goto rail - the same affordance the guides table wears,
+		// derived from the row's node, never hand-maintained
+		openTok := map[string]bool{}
+		for _, fr := range frows {
+			if n, ok := nodes[fr.row.ID]; ok && n.Type == "manifest" && n.Mode == "deck" {
+				openTok[fr.row.ID] = true
+			}
+		}
+		openCols := 0
+		if len(openTok) > 0 {
+			openCols = 1
+		}
 		tid := "ut" + itoa(figNext())
 		b.WriteString(`<div class="utable" id="` + tid + `">`)
 		if r.Name != "" {
 			b.WriteString(`<p class="utable-cap">` + htmlEscape(r.Name) + `</p>`)
 		}
-		// MULTIPLE pill facets, each its own combinable .upills row (AND across facets, OR within
-		// one). A pill facet per column of small distinct value set (the enumCols), plus a universal
-		// "need" facet (every trace item traces up to a need). Cap needs at ~16: beyond that it is
-		// one-per-item, not a filter.
+		// design: go-filter-columns  implements: req-filter-pill-rule
+		// Combinable pill facets: AND across facets, OR within one. The mechanism is
+		// GENERIC (the owner's filter rules). The facets COLLECT first, and the emit
+		// shape follows their count. SEVERAL dimensions render one VERTICAL column each
+		// inside one .ufilters row. The header names the category, and the chips carry
+		// counts. An empty value stays visible and clickable at zero, since the need
+		// facet lists every need. A column past TEN values scrolls between an arrow on
+		// each end. ONE dimension stays a single horizontal .upills row. The chips keep
+		// the same data-facet/data-fv wiring, so the shell script needs no fork.
+		type uchip struct {
+			v string
+			n int
+		}
+		type ufacet struct {
+			facet, label string
+			chips        []uchip
+			off          map[string]bool // values DESELECTED at emit (BaseResult.FacetOff): the rest start on
+		}
+		var ufacets []ufacet
 		if len(cfg.Modules) > 1 && len(moduleCount) >= 2 {
 			mods := []string{}
 			for k := range moduleCount {
 				mods = append(mods, k)
 			}
 			sortStrings(mods)
-			b.WriteString(`<div class="upills" data-facet="mod"><span class="pilllbl">module</span><button type="button" class="upill on" data-fv="*">all</button>`)
+			fc := ufacet{facet: "mod", label: "module"}
 			for _, m := range mods {
-				b.WriteString(` <button type="button" class="upill" data-fv="` + htmlEscape(m) + `">` + htmlEscape(m) + ` <span class="meta">(` + itoa(moduleCount[m]) + `)</span></button>`)
+				fc.chips = append(fc.chips, uchip{m, moduleCount[m]})
 			}
-			b.WriteString(`</div>`)
+			ufacets = append(ufacets, fc)
 		}
 		if !rowDim && len(needCount) >= 2 && len(needCount) <= 16 {
 			needs := []string{}
 			for k := range needCount {
 				needs = append(needs, k)
 			}
-			sortStrings(needs)
-			b.WriteString(`<div class="upills" data-facet="need"><span class="pilllbl">need</span><button type="button" class="upill on" data-fv="*">all</button>`)
-			for _, nd := range needs {
-				b.WriteString(` <button type="button" class="upill" data-fv="` + htmlEscape(nd) + `">` + htmlEscape(nd) + ` <span class="meta">(` + itoa(needCount[nd]) + `)</span></button>`)
+			for id, n := range nodes {
+				if n.Type == "need" && needCount[id] == 0 {
+					needs = append(needs, id) // an empty value stays visible, at zero
+				}
 			}
-			b.WriteString(`</div>`)
+			sortStrings(needs)
+			fc := ufacet{facet: "need", label: "need"}
+			for _, nd := range needs {
+				fc.chips = append(fc.chips, uchip{nd, needCount[nd]})
+			}
+			ufacets = append(ufacets, fc)
 		}
 		for _, ci := range enumCols {
 			vals := []string{}
@@ -4979,12 +5536,97 @@ func baseResultHTML(rs []BaseResult, nodes map[string]Node, sm map[string]string
 			if singletons {
 				continue
 			}
-			b.WriteString(`<div class="upills" data-facet="e` + itoa(ci) + `"><span class="pilllbl">` + htmlEscape(r.Columns[ci]) + `</span><button type="button" class="upill on" data-fv="*">all</button>`)
+			fc := ufacet{facet: "e" + itoa(ci), label: r.Columns[ci]}
+			if offs := r.FacetOff[r.Columns[ci]]; len(offs) > 0 {
+				fc.off = map[string]bool{}
+				for _, v := range offs {
+					fc.off[v] = true
+				}
+			}
 			for _, v := range vals {
-				b.WriteString(` <button type="button" class="upill" data-fv="` + htmlEscape(v) + `">` + htmlEscape(v) + ` <span class="meta">(` + itoa(cnt[v]) + `)</span></button>`)
+				fc.chips = append(fc.chips, uchip{v, cnt[v]})
+			}
+			ufacets = append(ufacets, fc)
+		}
+		// the board facets fold into the SAME filter row: each f-<facet>-<value> row
+		// class becomes a chip column keyed "b:<facet>" (the class-matching lane
+		// carries multi-valued facets); the type-layer vocabulary supplies the
+		// zero-count holes, so the completeness check stays live in the ONE surface
+		rowFacetCnt := map[string]map[string]int{}
+		for _, fr := range frows {
+			for _, cls := range fr.row.Facets {
+				rest := strings.TrimPrefix(cls, "f-")
+				for _, f := range facetNames {
+					if strings.HasPrefix(rest, f+"-") {
+						if rowFacetCnt[f] == nil {
+							rowFacetCnt[f] = map[string]int{}
+						}
+						rowFacetCnt[f][strings.TrimPrefix(rest, f+"-")]++
+					}
+				}
+			}
+		}
+		if len(rowFacetCnt) > 0 {
+			vocab := FacetVocab()
+			for _, f := range facetNames {
+				vals := append([]string{}, vocab[f]...)
+				seen := map[string]bool{}
+				for _, v := range vals {
+					seen[v] = true
+				}
+				for v := range rowFacetCnt[f] {
+					if !seen[v] {
+						vals = append(vals, v)
+						seen[v] = true
+					}
+				}
+				sortStrings(vals)
+				if len(vals) == 0 {
+					continue
+				}
+				fc := ufacet{facet: "b:" + f, label: f}
+				for _, v := range vals {
+					fc.chips = append(fc.chips, uchip{v, rowFacetCnt[f][v]})
+				}
+				ufacets = append(ufacets, fc)
+			}
+		}
+		multiF := len(ufacets) >= 2
+		if multiF {
+			b.WriteString(`<div class="ufilters">`)
+		}
+		for _, fc := range ufacets {
+			cls := "upills"
+			if multiF {
+				cls += " ufcol"
+			}
+			// FacetOff pre-selection: the star yields to the emitted chip states, so the
+			// no-script default is the same bounded view the script would compute
+			starOn := " on"
+			if len(fc.off) > 0 {
+				starOn = ""
+			}
+			b.WriteString(`<div class="` + cls + `" data-facet="` + fc.facet + `"><span class="pilllbl">` + htmlEscape(fc.label) + `</span><button type="button" class="upill` + starOn + `" data-fv="*">all</button>`)
+			scroll := multiF && len(fc.chips) > 10
+			if scroll {
+				b.WriteString(`<button type="button" class="uarrow" data-uscroll="up">▲</button><div class="ufchips">`)
+			}
+			for _, c := range fc.chips {
+				chipOn := ""
+				if len(fc.off) > 0 && !fc.off[c.v] {
+					chipOn = " on"
+				}
+				b.WriteString(` <button type="button" class="upill` + chipOn + `" data-fv="` + htmlEscape(c.v) + `">` + htmlEscape(c.v) + ` <span class="meta">(` + itoa(c.n) + `)</span></button>`)
+			}
+			if scroll {
+				b.WriteString(`</div><button type="button" class="uarrow" data-uscroll="down">▼</button>`)
 			}
 			b.WriteString(`</div>`)
 		}
+		if multiF {
+			b.WriteString(`</div>`)
+		}
+		// enddesign
 		// enum facet columns render as VISIBLE columns too (references carry their
 		// normative/informative kind, decisions their type - a
 		// filterable value the reader cannot see per row is a hidden fact).
@@ -4994,6 +5636,9 @@ func baseResultHTML(rs []BaseResult, nodes map[string]Node, sm map[string]string
 		}
 		if viewCols > 0 {
 			b.WriteString(`<th scope="col">view</th>`)
+		}
+		if openCols > 0 {
+			b.WriteString(`<th scope="col"></th>`)
 		}
 		b.WriteString(`</tr></thead><tbody>`)
 		empty := true
@@ -5068,6 +5713,13 @@ func baseResultHTML(rs []BaseResult, nodes map[string]Node, sm map[string]string
 					}
 					b.WriteString(`<td class="uview">` + pill + `</td>`)
 				}
+				if openCols > 0 {
+					pill := ""
+					if openTok[row.ID] {
+						pill = `<a class="upill gdeck" href="#` + htmlEscape(row.ID) + `" data-goto="` + htmlEscape(row.ID) + `">open the slides</a>`
+					}
+					b.WriteString(`<td class="gopen">` + pill + `</td>`)
+				}
 				b.WriteString(`</tr>`)
 				if expandable {
 					// statement-once: the expand shows ONLY what the
@@ -5075,7 +5727,7 @@ func baseResultHTML(rs []BaseResult, nodes map[string]Node, sm map[string]string
 					// not carry it; a cell repeating the statement, the brief, or the name is
 					// skipped; a body that opens by restating the statement loses that prefix,
 					// and a body paragraph promoted into the brief leaves the body.
-					b.WriteString(`<tr class="udetail" hidden><td colspan="` + itoa(2+len(enumCols)+viewCols) + `">`)
+					b.WriteString(`<tr class="udetail" hidden><td colspan="` + itoa(2+len(enumCols)+viewCols+openCols) + `">`)
 					if row.Head != "" && row.Head != name && row.Head != brief {
 						b.WriteString(`<p class="stmt">` + htmlEscape(row.Head) + `</p>`)
 					}
@@ -5101,6 +5753,20 @@ func baseResultHTML(rs []BaseResult, nodes map[string]Node, sm map[string]string
 						b.WriteString(`<p class="ufield"><span class="ufl">` + htmlEscape(r.Columns[ci]) + `:</span> ` + htmlEscape(row.Cells[ci]) + `</p>`)
 					}
 					b.WriteString(`<p class="meta">` + htmlEscape(row.ID) + `</p>`)
+					// a verification row links its LATEST recorded result (req-vv-result-links):
+					// the verdict store's entry, opened in place; no record says so honestly
+					if rn, isNode := nodes[row.ID]; isNode && rn.Type == "test" {
+						if v, hasRec := verdictLoad()[row.ID]; hasRec {
+							res := "fail"
+							if v.Result {
+								res = "pass"
+							}
+							b.WriteString(`<details class="vvres"><summary>result: ` + res + ` · ` + itoa(int(v.Ms)) + `ms</summary>` +
+								`<p class="meta">the latest recorded run — build ` + htmlEscape(shortHash(v.Build)) + `, input ` + htmlEscape(shortHash(v.Input)) + `</p></details>`)
+						} else {
+							b.WriteString(`<p class="meta vvres-none">no recorded result yet</p>`)
+						}
+					}
 					if bodyTxt != "" {
 						// item-body headings render compact (base 3: `## x` = h4) - detail
 						// labels inside the expand, never book sections.
@@ -5116,7 +5782,7 @@ func baseResultHTML(rs []BaseResult, nodes map[string]Node, sm map[string]string
 		} else {
 			// the enum columns are pill facets above the table; only the shared
 			// controls footer lives below.
-			b.WriteString(utableControls())
+			b.WriteString(utableControls(r.PageSize))
 		}
 		b.WriteString(`</div>`)
 		// enddesign
@@ -5171,9 +5837,9 @@ func renderFigure(kind string, nodes map[string]Node) string {
 		return renderModelFigure(strings.TrimSpace(strings.TrimPrefix(kind, "model")), nodes)
 	}
 	if kind == "model-kinds" {
-		// one table row per supported model kind, example in the expand, derived
-		// from the kind registry (go-models-complete-book)
-		return renderModelKindExamples()
+		// the per-kind catalog: template prose, small render, linked uses; unused
+		// kinds absent — derived from the kind registry (go-models-complete-book)
+		return renderModelKindsCatalog(nodes)
 	}
 	if kind == "models-table" {
 		// the structural-models section table: one row per declared model,
@@ -5184,10 +5850,21 @@ func renderFigure(kind string, nodes map[string]Node) string {
 		// the detailed-design section table: one row per design element
 		return renderDesignRegions(nodes)
 	}
+	if kind == "sample-register" {
+		return renderSampleRegister()
+	}
+	if kind == "raid-matrix" {
+		// the RAID bubble matrix: impact x probability, kind colors (go-raid-matrix)
+		return renderRaidMatrix(nodes)
+	}
+	if kind == "project-timeline" {
+		// the BOOK frame of the shared timeline (go-timeline-frames)
+		return renderProjectTimeline(nodes)
+	}
 	switch kind {
-	case "context-star":
+	case "context-model":
 		// design: go-context-neighbours  implements: req-interactive-figures.3
-		// The context star derives from the modeled neighbour notes, type neighbour, id nbr-<name>: one border-connected node per note, sorted for determinism, never an invented actor. direction `in`, or none, feeds the system and sits LEFT. `out` consumes from it and sits RIGHT. With no neighbour notes, the figure says so. rectBorder ends every connector at the node's border, so no line crosses the centre node.
+		// The context model derives from the modeled neighbour notes, type neighbour, id nbr-<name>: one border-connected node per note, sorted for determinism, never an invented actor. direction `in`, or none, feeds the system and sits LEFT. `out` consumes from it and sits RIGHT. With no neighbour notes, the figure says so. rectBorder ends every connector at the node's border, so no line crosses the centre node.
 		var ins, outs []string
 		for id, n := range nodes {
 			if n.Type != "neighbour" {
@@ -5200,20 +5877,38 @@ func renderFigure(kind string, nodes map[string]Node) string {
 			}
 		}
 		if len(ins)+len(outs) == 0 {
-			return `<p class="meta">no neighbour notes yet — the context star renders as nbr- notes arrive</p>`
+			return `<p class="meta">no neighbour notes yet — the context model renders as nbr- notes arrive</p>`
 		}
 		sortStrings(ins)
 		sortStrings(outs)
-		// the star is the familiar-but-secondary view: the neighbours table above
+		// each boundary line carries its interface note: the label rides the
+		// connector, the click opens the note (the c16 card-4 ruling)
+		iface := map[string][2]string{}
+		if edges, err := LoadConnections(SPEC); err == nil {
+			for _, e := range edges {
+				if e.Kind != "interface" {
+					continue
+				}
+				for _, end := range []string{e.Src, e.Dst} {
+					if strings.HasPrefix(end, "nbr-") {
+						a := strings.TrimPrefix(end, "nbr-")
+						if _, seen := iface[a]; !seen && e.Note != "" {
+							lb := nodes[e.Note].Statement
+							if ci := strings.Index(lb, ":"); ci > 0 {
+								lb = lb[:ci]
+							}
+							iface[a] = [2]string{e.Note, lb}
+						}
+					}
+				}
+			}
+		}
+		// the model is the familiar-but-secondary view: the neighbours table above
 		// carries the detail, so the graphic renders capped, not page-wide
-		return `<div class="ctx-star">` + svgContextStar(brand(), ins, outs) + `</div>`
+		return `<div class="ctx-model">` + svgContextModel(brand(), ins, outs, contextModelRoute(nodes), iface) + `</div>`
 		// enddesign
-	case "timeline":
-		return svgTimeline(versions())
 	case "input-register":
 		return renderInputRegister(nodes)
-	case "ucfn-board":
-		return renderUcfnBoard(nodes)
 	case "block-tree":
 		// design: go-block-tree-design  implements: req-derived-boards.5
 		// The block tree draws the SYSTEM's design elements, code-marker designs and des- notes, never the book's own chapters. Otherwise every project gets a picture of its document structure in its architecture chapter.
@@ -5279,8 +5974,6 @@ func renderFigure(kind string, nodes map[string]Node) string {
 		b.WriteString("</div>\n")
 		return b.String()
 		// enddesign
-	case "coverage-board":
-		return renderCoverageBoard(nodes)
 	case "onion":
 		return renderOnion(nodes)
 	case "readme":
@@ -5309,6 +6002,9 @@ func renderFigure(kind string, nodes map[string]Node) string {
 		var reqIDs, missing []string
 		for id, n := range nodes {
 			if n.Type == "requirement" {
+				if n.Retired != "" || n.Deferred != "" {
+					continue // out of scope by recorded ruling — not a verification item
+				}
 				reqIDs = append(reqIDs, id)
 				if !verified[id] {
 					missing = append(missing, id)
@@ -5325,9 +6021,16 @@ func renderFigure(kind string, nodes map[string]Node) string {
 		} else {
 			b.WriteString(`<p class="stmt state-suspect"><strong>` + itoa(len(reqIDs)-len(missing)) + ` / ` + itoa(len(reqIDs)) +
 				` requirements verified — ` + itoa(len(missing)) + ` unverified:</strong></p>` + "\n")
-			b.WriteString(`<table class="q-table" data-layer="derived"><thead><tr><th scope="col">requirement</th><th scope="col">statement</th><th scope="col">why visible</th></tr></thead><tbody>` + "\n")
+			b.WriteString(`<table class="q-table" data-layer="derived"><thead><tr><th scope="col">requirement</th><th scope="col">statement</th><th scope="col">recorded reason</th></tr></thead><tbody>` + "\n")
 			for _, id := range missing {
-				b.WriteString(`<tr class="state-suspect"><td>` + htmlEscape(id) + `</td><td>` + htmlEscape(nodes[id].Statement) + `</td><td>no verifying test</td></tr>` + "\n")
+				// the no-test policy (req-vv-no-test-policy): the recorded reason renders
+				// beside the item; an unexplained one shows AS the defect it is
+				reason := noTestReason(nodes[id])
+				cell := htmlEscape(reason)
+				if reason == "" {
+					cell = `<span class="state-fail">unexplained — record the reason</span>`
+				}
+				b.WriteString(`<tr class="state-suspect"><td>` + htmlEscape(id) + `</td><td>` + htmlEscape(nodes[id].Statement) + `</td><td>` + cell + `</td></tr>` + "\n")
 			}
 			b.WriteString("</tbody></table>\n")
 		}
@@ -5536,6 +6239,62 @@ func decisionIteration(n Node, nodes map[string]Node) string {
 	return "-"
 }
 
+// design: go-no-test-policy  implements: req-vv-no-test-policy
+// A verification item with NO test must carry its recorded reason. The reason is the
+// item's rationale body. A bare TODO (the mint prefill) records nothing. noTestReason
+// extracts it for the verdict-first render, and noTestPolicyFindings is the CHECK: one
+// finding per unverified requirement whose reason is missing or TODO. It runs over
+// fixtures and over this workspace alike, so the policy enforces itself in the battery.
+func noTestReason(n Node) string {
+	body := nodeBodyOf(n)
+	if i := strings.Index(body, "## Rationale"); i >= 0 {
+		body = body[i:]
+		if j := strings.IndexByte(body, '\n'); j >= 0 {
+			body = body[j+1:]
+		} else {
+			body = ""
+		}
+	}
+	line := ""
+	for _, l := range strings.Split(body, "\n") {
+		if t := strings.TrimSpace(l); t != "" && !strings.HasPrefix(t, "#") {
+			line = t
+			break
+		}
+	}
+	if line == "" || strings.HasPrefix(strings.ToUpper(line), "TODO") {
+		return ""
+	}
+	return line
+}
+
+func noTestPolicyFindings(nodes map[string]Node) []string {
+	verified := map[string]bool{}
+	for _, n := range nodes {
+		if n.Type == "test" {
+			for _, r := range n.Verifies {
+				verified[r] = true
+			}
+		}
+	}
+	var fs []string
+	for id, n := range nodes {
+		if n.Type != "requirement" || verified[id] {
+			continue
+		}
+		if n.Retired != "" || n.Deferred != "" {
+			continue // the retirement/defer stamp IS the recorded reason
+		}
+		if noTestReason(n) == "" {
+			fs = append(fs, id+": no verifying test and no recorded reason (a bare TODO records nothing)")
+		}
+	}
+	sortStrings(fs)
+	return fs
+}
+
+// enddesign
+
 // design: go-decisions-table  implements: req-decision-rendering.2, req-decision-rendering.3, req-candidate-decisions.2
 // There is ONE decisions table: every project, strategy, and architecture decision in one reader table, with human titles, never hash-slug ids. The TYPE renders as a column, with pill facets over type AND iteration. The row expand carries the rationale, the addressed requirements as links, and the candidates the decision weighed: the per-axis rating matrix plus each rejected candidate's reason (q-candidates-placement, decided). Waivers stay with V&V. The verdict scan walks adr ids SORTED. A map-order walk would render a double-claimed candidate nondeterministically. The double claim itself is a lint finding (candidateClaimFindings).
 func renderDecisionsTable(nodes map[string]Node) string {
@@ -5620,6 +6379,12 @@ func renderDecisionsTable(nodes map[string]Node) string {
 		if bodyTxt := stripLeadingStatement(nodeBodyOf(n), n.Statement); bodyTxt != "" {
 			b.WriteString(`<div data-layer="informative">` + mdLiteAt(bodyTxt, 3) + `</div>`)
 		}
+		// the derived Pugh matrix (go-pugh-render): signs against the datum, weighted
+		// totals, the winner from the chosen edge — rendered when the decision
+		// declares its datum; the raw per-axis matrix below stays the expand.
+		if pm := renderPughMatrix(n, nodes); pm != "" {
+			b.WriteString(pm)
+		}
 		// the considered alternatives (q-candidates-placement, decided): the per-axis
 		// rating matrix over this decision's claimed candidates, then each rejected
 		// candidate's reason from its own note.
@@ -5675,7 +6440,7 @@ func renderDecisionsTable(nodes map[string]Node) string {
 		b.WriteString(`</td></tr>` + "\n")
 	}
 	b.WriteString("</tbody></table>")
-	b.WriteString(utableControls())
+	b.WriteString(utableControls(0))
 	b.WriteString(`</div>` + "\n")
 	return b.String()
 }
@@ -5761,7 +6526,7 @@ func renderAsrList(nodes map[string]Node) string {
 		b.WriteString(`<p class="meta">` + htmlEscape(id) + `</p></td></tr>` + "\n")
 	}
 	b.WriteString("</tbody></table>")
-	b.WriteString(utableControls())
+	b.WriteString(utableControls(0))
 	b.WriteString(`</div>` + "\n")
 	return b.String()
 }
@@ -5785,18 +6550,38 @@ func renderDesignRegions(nodes map[string]Node) string {
 	if len(ids) == 0 {
 		return `<p class="meta">no design elements yet — the table renders as design regions arrive</p>`
 	}
-	var b strings.Builder
-	b.WriteString(`<div class="utable" id="design-regions" data-layer="derived">`)
-	b.WriteString(`<table class="q-table u-table" data-layer="derived"><thead><tr><th scope="col">element</th><th scope="col">responsibility</th></tr></thead><tbody>` + "\n")
+	// briefs first: a responsibility column that is EMPTY across every row hides
+	// (req-onion-interfaces) - an all-blank column is noise, not information
+	briefOf := map[string]string{}
+	anyBrief := false
 	for _, id := range ids {
-		n := nodes[id]
-		resp := strings.TrimSpace(n.Statement)
+		resp := strings.TrimSpace(nodes[id].Statement)
 		brief := ""
 		if len(resp) <= 110 {
 			brief = resp
 		} else if lead, sub := splitChapterTitle(resp); sub != "" && len(lead) <= 110 {
 			brief = lead
 		}
+		briefOf[id] = brief
+		if brief != "" {
+			anyBrief = true
+		}
+	}
+	cols := 2
+	if !anyBrief {
+		cols = 1
+	}
+	var b strings.Builder
+	b.WriteString(`<div class="utable" id="design-regions" data-layer="derived">`)
+	b.WriteString(`<table class="q-table u-table" data-layer="derived"><thead><tr><th scope="col">element</th>`)
+	if anyBrief {
+		b.WriteString(`<th scope="col">responsibility</th>`)
+	}
+	b.WriteString(`</tr></thead><tbody>` + "\n")
+	for _, id := range ids {
+		n := nodes[id]
+		resp := strings.TrimSpace(n.Statement)
+		brief := briefOf[id]
 		file := n.Path
 		if rel, err := filepath.Rel(ROOT, n.Path); err == nil {
 			file = filepath.ToSlash(rel)
@@ -5805,8 +6590,12 @@ func renderDesignRegions(nodes map[string]Node) string {
 		// statement may legitimately name an artifact signature like the comments
 		// island's id attribute - rendered with &quot; it reads the same and never
 		// counterfeits the artifact inside the content region (comment-dom-static).
-		b.WriteString(`<tr class="urow qt-exp" data-node="` + htmlEscape(id) + `" data-text="` + attesc(htmlEscape(strings.ToLower(id+" "+resp+" "+file))) + `"><td><span class="utri" aria-hidden="true"></span>` + htmlEscape(id) + `</td><td class="ubrief">` + attesc(htmlEscape(brief)) + `</td></tr>` + "\n")
-		b.WriteString(`<tr class="udetail" hidden><td colspan="2">`)
+		b.WriteString(`<tr class="urow qt-exp" data-node="` + htmlEscape(id) + `" data-text="` + attesc(htmlEscape(strings.ToLower(id+" "+resp+" "+file))) + `"><td><span class="utri" aria-hidden="true"></span>` + htmlEscape(id) + `</td>`)
+		if anyBrief {
+			b.WriteString(`<td class="ubrief">` + attesc(htmlEscape(brief)) + `</td>`)
+		}
+		b.WriteString(`</tr>` + "\n")
+		b.WriteString(`<tr class="udetail" hidden><td colspan="` + itoa(cols) + `">`)
 		if resp != "" && resp != brief {
 			b.WriteString(`<p class="stmt">` + attesc(htmlEscape(resp)) + `</p>`)
 		}
@@ -5824,7 +6613,7 @@ func renderDesignRegions(nodes map[string]Node) string {
 		b.WriteString(`<p class="meta">` + htmlEscape(id) + `</p></td></tr>` + "\n")
 	}
 	b.WriteString("</tbody></table>")
-	b.WriteString(utableControls())
+	b.WriteString(utableControls(0))
 	b.WriteString(`</div>` + "\n")
 	return b.String()
 }
@@ -5891,8 +6680,8 @@ func renderGuidesTable(nodes map[string]Node) string {
 	}
 	b.WriteString(`</div>`)
 	// the TARGET AUDIENCE leads the row (the owner reads the table by audience first)
-	b.WriteString(`<table class="q-table u-table" data-layer="derived"><thead><tr><th scope="col">target audience</th><th scope="col">guide</th><th scope="col">brief</th></tr></thead><tbody>` + "\n")
-	row := func(id, name, brief, aud, expand string) {
+	b.WriteString(`<table class="q-table u-table" data-layer="derived"><thead><tr><th scope="col">target audience</th><th scope="col">guide</th><th scope="col">brief</th><th scope="col"></th></tr></thead><tbody>` + "\n")
+	row := func(id, name, brief, aud, expand, deck string) {
 		exp := expand != ""
 		cls := "urow"
 		tri := ""
@@ -5900,18 +6689,31 @@ func renderGuidesTable(nodes map[string]Node) string {
 			cls += " qt-exp"
 			tri = `<span class="utri" aria-hidden="true"></span>`
 		}
-		b.WriteString(`<tr class="` + cls + `" id="` + htmlEscape(id) + `" data-node="` + htmlEscape(id) + `" data-aud="` + htmlEscape(aud) + `" data-text="` + attesc(htmlEscape(strings.ToLower(name+" "+brief+" "+aud))) + `"><td class="uenum">` + tri + htmlEscape(aud) + `</td><td>` + htmlEscape(name) + `</td><td class="ubrief">` + htmlEscape(brief) + `</td></tr>` + "\n")
+		pill := ""
+		if deck != "" {
+			// a guide that IS a slide deck carries the open pill at the row's end
+			pill = `<a class="upill gdeck" href="#` + htmlEscape(deck) + `" data-goto="` + htmlEscape(deck) + `">open the slides</a>`
+		}
+		b.WriteString(`<tr class="` + cls + `" id="` + htmlEscape(id) + `" data-node="` + htmlEscape(id) + `" data-aud="` + htmlEscape(aud) + `" data-text="` + attesc(htmlEscape(strings.ToLower(name+" "+brief+" "+aud))) + `"><td class="uenum">` + tri + htmlEscape(aud) + `</td><td>` + htmlEscape(name) + `</td><td class="ubrief">` + htmlEscape(brief) + `</td><td class="gopen">` + pill + `</td></tr>` + "\n")
 		if exp {
-			b.WriteString(`<tr class="udetail" hidden><td colspan="3">` + expand + `</td></tr>` + "\n")
+			b.WriteString(`<tr class="udetail" hidden><td colspan="4">` + expand + `</td></tr>` + "\n")
 		}
 	}
+	deckLink := regexp.MustCompile(`\]\(([a-z0-9-]+)\)`)
 	for _, c := range order {
 		for _, g := range byAud[c] {
 			expand := `<p class="meta">` + htmlEscape(g.ID) + `</p>`
 			if body := strings.TrimSpace(nodeBodyOf(g)); body != "" {
 				expand += `<div data-layer="informative">` + mdLiteAt(body, 3) + `</div>`
 			}
-			row(g.ID, humanizeID(g.ID), g.Statement, c, expand)
+			deck := ""
+			for _, m := range deckLink.FindAllStringSubmatch(nodeBodyOf(g), -1) {
+				if t, ok := nodes[m[1]]; ok && t.Type == "manifest" && t.Mode == "deck" {
+					deck = m[1]
+					break
+				}
+			}
+			row(g.ID, humanizeID(g.ID), g.Statement, c, expand, deck)
 		}
 		if c == "agent" {
 			for _, ag := range agents {
@@ -5921,11 +6723,11 @@ func renderGuidesTable(nodes map[string]Node) string {
 				} else {
 					expand += `<p class="meta">AGENTS.md not found at the project root yet</p>`
 				}
-				row(ag.ID, "AGENTS.md", ag.Statement, "agent", expand)
+				row(ag.ID, "AGENTS.md", ag.Statement, "agent", expand, "")
 			}
 		}
 		if len(byAud[c]) == 0 && !(c == "agent" && len(agents) > 0) {
-			row("guide-hole-"+c, "—", "no guide yet — one lands the day this audience asks.", c, "")
+			row("guide-hole-"+c, "—", "no guide yet — one lands the day this audience asks.", c, "", "")
 		}
 	}
 	b.WriteString("</tbody></table></div>\n")
@@ -5940,6 +6742,7 @@ func renderGuidesTable(nodes map[string]Node) string {
 // The views home is BOOK CONTENT (`fig: views-home` in the orientation chapter). It opens with the DOCUMENT OVERVIEW: one line per chapter with its link. That line derives from the book structure at render time, the same order and numbers the shell uses, never a hand-maintained list. Then come the derived documents: the deck manifests baked into this same file, compiled from book content only, one row each with its present button. The reader views moved to the stakeholder rows, a view pill per reader. No preset table renders here. An empty population says so out loud.
 func renderViewsHome(nodes map[string]Node) string {
 	var chapters, decks []Node
+	anyIFU := false
 	for _, n := range nodes {
 		if n.Type != "manifest" {
 			continue
@@ -5948,16 +6751,39 @@ func renderViewsHome(nodes map[string]Node) string {
 		case "chapter", "guidance":
 			chapters = append(chapters, n)
 		case "deck":
+			if n.Kind == "ifu" {
+				// an IFU deck's one home is the intro's ifus.base table (owner
+				// ruling: ONE IFU table in chapter two) - never listed here too
+				anyIFU = true
+				continue
+			}
 			decks = append(decks, n)
 		}
 	}
+	vhless := chapterLess(nodes)
 	for i := 1; i < len(chapters); i++ {
-		for j := i; j > 0 && (chapters[j].Order < chapters[j-1].Order || (chapters[j].Order == chapters[j-1].Order && chapters[j].ID < chapters[j-1].ID)); j-- {
+		for j := i; j > 0 && vhless(chapters[j], chapters[j-1]); j-- {
 			chapters[j], chapters[j-1] = chapters[j-1], chapters[j]
 		}
 	}
+	// the toc's NESTED entries place the decks; an unlisted deck sorts by id after
+	_, nested, hasToc := tocOrderIndex(nodes)
+	dpos := func(n Node) int {
+		if hasToc {
+			if p, ok := nested[n.ID]; ok {
+				return p
+			}
+		}
+		return 1 << 20
+	}
+	dless := func(a, b Node) bool {
+		if pa, pb := dpos(a), dpos(b); pa != pb {
+			return pa < pb
+		}
+		return a.ID < b.ID
+	}
 	for i := 1; i < len(decks); i++ {
-		for j := i; j > 0 && decks[j].ID < decks[j-1].ID; j-- {
+		for j := i; j > 0 && dless(decks[j], decks[j-1]); j-- {
 			decks[j], decks[j-1] = decks[j-1], decks[j]
 		}
 	}
@@ -5978,13 +6804,17 @@ func renderViewsHome(nodes map[string]Node) string {
 		b.WriteString("</ul>\n")
 	}
 	if len(decks) == 0 {
-		b.WriteString(`<p class="meta">no derived documents yet — the shipped decks render here as they arrive</p>` + "\n")
+		if !anyIFU { // all decks IFU: the ifus.base table below lists them - say nothing here
+			b.WriteString(`<p class="meta">no derived documents yet — the shipped decks render here as they arrive</p>` + "\n")
+		}
 	} else {
+		// the document column IS the file name; the statement is its own description
+		// column (owner ruling) - a reader finds the deck by the name on disk
 		b.WriteString(`<table class="q-table"><caption>Derived documents — presentations compiled from this book</caption>` +
-			`<thead><tr><th>document</th><th>slides</th><th></th></tr></thead><tbody>` + "\n")
+			`<thead><tr><th>document</th><th>description</th><th>slides</th><th></th></tr></thead><tbody>` + "\n")
 		for _, d := range decks {
 			slides := len(parseManifestUnits(manifestBody(d.Path)))
-			b.WriteString(`<tr><td>` + htmlEscape(d.Statement) + `</td><td class="uenum">` + itoa(slides) +
+			b.WriteString(`<tr><td>` + htmlEscape(d.ID) + `</td><td class="ubrief">` + htmlEscape(d.Statement) + `</td><td class="uenum">` + itoa(slides) +
 				`</td><td><button type="button" class="present" data-deck="` + htmlEscape(d.ID) + `">present</button></td></tr>` + "\n")
 		}
 		b.WriteString("</tbody></table>\n")
@@ -5995,7 +6825,7 @@ func renderViewsHome(nodes map[string]Node) string {
 
 // enddesign
 
-// design: go-deck-anchors  implements: req-deck-links.1, req-deck-links.2, req-deck-links.3, req-deck-semantics.1, req-deck-semantics.2, req-onboarding-chapter.3, req-pong-deck.3
+// design: go-deck-anchors  implements: req-deck-links.1, req-deck-links.2, req-deck-links.3, req-deck-semantics.1, req-deck-semantics.2, req-onboarding-chapter.3, req-pong-deck.3, req-deck-nav-usability, req-ifu-split-slide
 // This is deck citizenship (adr-deck-anchor-fragment). Every deck keeps ONE stable, human-readable anchor: the manifest's own node id. Each slide keeps `<deck>-s<n>`. The ids derive from the manifest, never from render order, so links survive re-renders. The URL fragment rides the EXISTING hash rail. Present mode WRITES the current slide's anchor with history.replaceState, a silent write, since hashchange keeps its single reader. The rail's reader routes a fragment that lands inside a deck into present mode, on load and on change. The deck boundary is machine-legible in the raw bytes: a named region landmark carrying the slideshow roledescription. Slides are named groups, their first heading's text, else their ordinal, groups, never landmarks, so a long deck cannot become landmark soup. Decks stay OUT of the toc by construction, since the toc collects chapter manifests only. The timeline renders measured per-slide minutes (`Minutes:` unit lines) as a slim bar. Ticks mark slide STARTS, and the bar ends exactly at the LAST slide's tick, so no bar-space can read as a step after the final slide. The measured total is a text caption after the bar, outside it. An ```embed``` fence bakes its script INERT inside a <template>. Two lanes turn the text into code, both lazy relative to page load. One is the start button, the default. The other, with the `auto` marker (```embed auto), is the deck's show() on the slide's FIRST entry in present mode. One embed may add at most deckEmbedBudget bytes to the book. Over it, the executable lane is refused and a static stand-in figure says so; the slide's authored figure carries the deliverable's picture. A standalone `fig:` line INSIDE a slide body resolves to the book's own figure render. The deck reuses figures, never duplicates them by hand. The copy's id attributes get a slide prefix so the reading-flow copy keeps every anchor. A `|||` marker line splits a slide body into columns, and the first segment stays full-width, the heading lane. FACET-PRESET fragments ride this same rail. An unknown-id fragment of the shape `<base-id>--<facet>=<v1>,<v2>` scrolls to the base element and applies the named pill facet MULTI-value (setFacetMulti). Every reader of the rail delegates to the ONE router (__facetJump): the hashchange reader, the load-time jump, and bookGoto's miss lane. The router writes the fragment with history.replaceState, never a push, so repeated applications stay idempotent and spam no history. That is the deck rail's own discipline.
 
 var deckHeadingRe = regexp.MustCompile(`(?s)<h[1-6][^>]*>(.*?)</h[1-6]>`)

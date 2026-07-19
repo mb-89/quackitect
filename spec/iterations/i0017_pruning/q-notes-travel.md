@@ -7,4 +7,4 @@ class: review
 killer: false
 ---
 ## Rationale (not load-bearing)
-TODO
+Not applicable - the options and the ruling above carry the reasoning.

@@ -5,7 +5,6 @@ source: stk-project-owner
 statement: As a builder I need to advance an iteration from plan through build to delivery, with the work and its checks visible.
 class: review
 killer: false
-functions: [pick the next check, record an adjudication, reopen a changed check]
 ---
 
 ## note (not load-bearing)

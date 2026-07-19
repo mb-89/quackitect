@@ -14,4 +14,4 @@ provenance:
   kind: agent-proposal: first of functional|quality|constraint|interface - veto or confirm
 ---
 ## Rationale (not load-bearing)
-TODO
+Single-click inspects, double-click drills - matching the review habit; mis-modeled clicks made review sessions stumble.

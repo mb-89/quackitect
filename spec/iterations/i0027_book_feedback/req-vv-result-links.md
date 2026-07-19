@@ -13,4 +13,4 @@ provenance:
   kind: agent-proposal: first of functional|quality|constraint|interface - veto or confirm
 ---
 ## Rationale (not load-bearing)
-TODO
+The V&V matrix said pass without showing where; linking each result to its verdict record makes the claim auditable.

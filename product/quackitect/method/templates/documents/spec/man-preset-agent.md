@@ -11,4 +11,4 @@ statement: Agent - the guidance chapter, where the agent guide lives.
   parses when it stands alone in its unit.
 -->
 ---
-[man-ch8-guidance](man-ch8-guidance.md)
+[man-guidance](man-guidance.md)

@@ -32,8 +32,8 @@ func selftestTraceClustered() bool {
 		}
 		return nil
 	})
-	if n == 0 || n > 200 {
-		return false // materially below the pre-pruning 292 baseline; raised from 160 as the i0027 book+engine iteration grew the count with real, traced scope
+	if n == 0 || n > 240 {
+		return false // the sprawl tripwire; raised 200 -> 240 by owner ruling after the i27 reopen minted real, traced scope
 	}
 	return coverageRuleUncached(LoadAll(), "req-traced", "") // every cluster still traces
 }

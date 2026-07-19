@@ -14,4 +14,4 @@ provenance:
   kind: agent-proposal: first of functional|quality|constraint|interface - veto or confirm
 ---
 ## Rationale (not load-bearing)
-TODO
+Ambient pills flooded the onion in review; folding boilerplate keeps the architecture readable while the DOM stays complete.

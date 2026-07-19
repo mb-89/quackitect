@@ -26,16 +26,24 @@ whether to continue.
 
 1. Read `AGENTS.md`.
 2. Read `product/quackitect/method/prompts/contract.md`.
-3. Recite the contract once, visibly.
+3. Recite the contract once, visibly. Ask for the attest grant in the same
+   round. A fresh session never holds a session key. The adjudicator runs
+   `quack attest --grant` and hands you the code.
 4. Read `product/brand/voice.md`.
 5. Read this file.
 6. Read `product/quackitect/method/prompts/engage.md`.
 7. Read the method map below.
-8. Earn or apply an attested session key.
-9. Call `quack next` through the preferred live surface.
-10. If it succeeds, stop booting.
-11. If it is refused for attestation, complete the contract's attest ritual.
-12. If MCP is stale after a build swap, use the fresh CLI with `QUACK_KEY`.
+8. Run `quack boot`. It prints this sequence as a checklist with completion
+   state and ends with the report verdict (green / yellow / blocked). It is
+   ungated and read-only; it runs before attestation on purpose. Trust its
+   verdict over your own board reading, and take the one action its deciding
+   step names.
+9. Redeem the grant code for a session key. Follow the contract's attest
+   section. Do not read engine source to learn the mechanics.
+10. Call `quack next` through the preferred live surface.
+11. If it succeeds, stop booting.
+12. If it is refused for attestation, complete the contract's attest ritual.
+13. If MCP is stale after a build swap, use the fresh CLI with `QUACK_KEY`.
 
 If the terminal keeps returning a bare `^C` or continuation marker instead of
 command output, treat that terminal as contaminated. Start a fresh command
@@ -51,6 +59,11 @@ for consumers that need fresh hashes: reports, milestone verification, and a
 status read whose answer depends on root parity. Boot does not need those.
 
 ## Command Boundaries
+
+`quack boot` is the mechanical boot readout. It emits the fixed sequence with
+completion state and the report verdict below, computed live. Ungated,
+read-only, safe at any time. It never advances the ledger; a green boot still
+walks through `quack next`.
 
 `quack next` is the boot readiness check. It is the first live ledger command
 after attestation. If it returns a check, boot is green or yellow. If it says
@@ -96,7 +109,9 @@ After boot, the agent should know:
 
 ## Report
 
-Use this short shape:
+`quack boot`'s last line IS this report, computed mechanically. Repeat it
+verbatim to the owner, then add the returned check's id when green or yellow.
+The shape:
 
 - `boot: green` — `quack next` is usable. Name the returned check, or say done.
 - `boot: yellow` — `quack next` is usable. Name the returned check and the

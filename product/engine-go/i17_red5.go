@@ -49,7 +49,7 @@ func selftestPresetsVisible() bool {
 		}
 	}
 	// the agent view surfaces the guidance chapter (owner note 2)
-	agent := regexp.MustCompile(`<article id="man-ch8-guidance" class="[^"]*in-man-preset-agent[\s"]`)
+	agent := regexp.MustCompile(`<article id="man-guidance" class="[^"]*in-man-preset-agent[\s"]`)
 	return agent.MatchString(html)
 }
 

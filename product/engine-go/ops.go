@@ -304,15 +304,10 @@ func pickVersion(nodes map[string]Node, st map[string]string, prefer string) str
 	return ""
 }
 
-func cmdNext(args []string) {
-	nodes := LoadAll()
-	st := StatusMap(nodes)
-	prefer := ""
-	if len(args) > 0 && !strings.HasPrefix(args[0], "-") {
-		prefer = args[0]
-	}
-	v := pickVersion(nodes, st, prefer)
-	fmt.Println("version:", v)
+// nextReadyIDs computes the walkable checks of version v: open or suspect, module-selected,
+// every gating parent satisfied. Returns the gate set too (the done/blocked scan needs it).
+// Shared by cmdNext and the boot readout.
+func nextReadyIDs(nodes map[string]Node, st map[string]string, v string) ([]string, map[string]bool) {
 	gates := map[string]bool{}
 	for id := range nodes {
 		if st[id] != "CONTENT" && moduleSelected(nodes[id]) {
@@ -335,6 +330,19 @@ func cmdNext(args []string) {
 			ready = append(ready, id)
 		}
 	}
+	return ready, gates
+}
+
+func cmdNext(args []string) {
+	nodes := LoadAll()
+	st := StatusMap(nodes)
+	prefer := ""
+	if len(args) > 0 && !strings.HasPrefix(args[0], "-") {
+		prefer = args[0]
+	}
+	v := pickVersion(nodes, st, prefer)
+	fmt.Println("version:", v)
+	ready, gates := nextReadyIDs(nodes, st, v)
 	if len(ready) == 0 {
 		done := true
 		for id := range gates {
@@ -1182,6 +1190,147 @@ func cmdMigrateLayout() {
 
 // enddesign
 
+// design: go-function-nodes  implements: req-function-nodes
+// A function is a first-class node: type function, trace content, one refines edge to its
+// need. This one-shot migrates the retired need-functions lists: one node per list entry,
+// minted beside its need. The edge follows the workspace's edge lane (go-edge-mode): a
+// frontmatter refines key, or a line in the refines jsonl in connections mode. The list
+// line strips in the same pass, so a second run finds nothing. An existing destination
+// file is kept and warned about, never overwritten. The strict referee refuses a leftover
+// list naming this command (the retired-key case in trust.go).
+var needFnListRe = regexp.MustCompile(`(?m)^functions:\s*\[([^\]]*)\]`)
+var fnListLineRe = regexp.MustCompile(`(?m)^functions:[^\n]*\n?`)
+var needTypeRe = regexp.MustCompile(`(?m)^type:\s*need\s*$`)
+var fnFmIDRe = regexp.MustCompile(`(?m)^id:\s*(\S+)`)
+
+// fnSlug: the node id from the function's verb-noun text - lowercase, dashes between words.
+func fnSlug(s string) string {
+	var b []byte
+	dash := false
+	for _, r := range strings.ToLower(strings.TrimSpace(s)) {
+		if (r >= 'a' && r <= 'z') || (r >= '0' && r <= '9') {
+			b = append(b, byte(r))
+			dash = false
+		} else if !dash && len(b) > 0 {
+			b = append(b, '-')
+			dash = true
+		}
+	}
+	return strings.TrimRight(string(b), "-")
+}
+
+// enddesign
+
+// The migration walker below is PLUMBING, deliberately outside the region
+// (q-coverage-ids-physics, ruling B): the marked region is the function-node rule;
+// the one-shot file I/O stays on the command's side of the rim.
+
+// appendConnEdge appends one asymmetric edge line to a kind's jsonl lane, once.
+func appendConnEdge(spec, kind, src, dst string) error {
+	dir := filepath.Join(spec, "connections", kind)
+	if err := os.MkdirAll(dir, 0o755); err != nil {
+		return err
+	}
+	p := filepath.Join(dir, "edges.jsonl")
+	line := `{"src":"` + src + `","dst":"` + dst + `"}`
+	raw, err := os.ReadFile(p)
+	if err != nil && !os.IsNotExist(err) {
+		return err
+	}
+	if strings.Contains(string(raw), line) {
+		return nil // already recorded - one edge, one lane
+	}
+	if len(raw) > 0 && raw[len(raw)-1] != '\n' {
+		raw = append(raw, '\n')
+	}
+	return os.WriteFile(p, append(raw, []byte(line+"\n")...), 0o644)
+}
+
+func migrateFunctions(spec string) (int, error) {
+	connMode := edgesModeOf(spec) == "connections"
+	made := 0
+	werr := filepath.Walk(spec, func(path string, fi os.FileInfo, err error) error {
+		if err != nil || fi.IsDir() || !strings.HasSuffix(path, ".md") {
+			return err
+		}
+		raw, rerr := os.ReadFile(path)
+		if rerr != nil {
+			return rerr
+		}
+		if !nodeFence(raw) {
+			return nil
+		}
+		norm := strings.ReplaceAll(string(raw), "\r\n", "\n")
+		lines := strings.Split(norm, "\n")
+		end := -1
+		for i := 1; i < len(lines); i++ {
+			if strings.TrimSpace(lines[i]) == "---" {
+				end = i
+				break
+			}
+		}
+		if end < 0 {
+			return nil
+		}
+		fm := strings.Join(lines[:end], "\n")
+		if !needTypeRe.MatchString(fm) {
+			return nil
+		}
+		m := needFnListRe.FindStringSubmatch(fm)
+		if m == nil {
+			return nil
+		}
+		needID := strings.TrimSuffix(filepath.Base(path), ".md")
+		if im := fnFmIDRe.FindStringSubmatch(fm); im != nil {
+			needID = im[1]
+		}
+		for _, entry := range strings.Split(m[1], ",") {
+			entry = strings.TrimSpace(entry)
+			if entry == "" {
+				continue
+			}
+			id := "fn-" + fnSlug(entry)
+			dst := filepath.Join(filepath.Dir(path), id+".md")
+			if _, serr := os.Stat(dst); serr == nil {
+				fmt.Println("kept, resolve by hand:", dst, "already exists")
+				continue
+			}
+			body := "---\nid: " + id + "\ntype: function\nstatement: " + entry + "\n"
+			if !connMode {
+				body += "refines: [" + needID + "]\n"
+			}
+			body += "---\n"
+			if werr := os.WriteFile(dst, []byte(body), 0o644); werr != nil {
+				return werr
+			}
+			if connMode {
+				if cerr := appendConnEdge(spec, "refines", id, needID); cerr != nil {
+					return cerr
+				}
+			}
+			fmt.Println("minted " + id + " <- " + needID)
+			made++
+		}
+		out := fnListLineRe.ReplaceAllString(string(raw), "")
+		if out != string(raw) {
+			if werr := os.WriteFile(path, []byte(out), 0o644); werr != nil {
+				return werr
+			}
+		}
+		return nil
+	})
+	return made, werr
+}
+
+func cmdMigrateFunctions() {
+	n, err := migrateFunctions(SPEC)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, "migrate-functions:", err)
+		quackExit(1)
+	}
+	fmt.Printf("migrate-functions: %d function node(s) minted\n", n)
+}
+
 // design: go-init-stubs  implements: req-workspace-stubs.1, req-vehicle-drives-stub.2
 // `quack start stubs [target]` makes a workspace drivable from INSIDE. It writes the launcher, AGENTS.md/CLAUDE.md, and spec/project.toml stubs (insideStubFiles) into target, default the current workspace ROOT. The launcher resolves an engine at runtime with no engine path committed. It is idempotent, and existing files are kept. The CREATING process's engine root is recorded in the stub's data home (engine-home.txt), so a vehicle-created stub resolves the vehicle's merged methods over any machine-global pointer.
 func cmdStartStubs(args []string) {
@@ -1438,6 +1587,11 @@ func cmdVerify(args []string) {
 		fmt.Println("usage: " + brand() + " verify <id>")
 		return
 	}
+	// the verify lane runs under the build pin too (go-verify-pin)
+	quackExit(verifyRunPinned(func() int { cmdVerifyBody(args); return 0 }))
+}
+
+func cmdVerifyBody(args []string) {
 	nodes := LoadAll()
 	n, ok := nodes[args[0]]
 	if !ok || n.Class != "executed" {

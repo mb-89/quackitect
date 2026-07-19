@@ -14,4 +14,4 @@ provenance:
   statement: skeleton value
 ---
 ## Rationale (not load-bearing)
-TODO
+A round presented over an open question wastes the adjudication: the brief is not ready to rule on, and the refusal must say which unknown blocks it.

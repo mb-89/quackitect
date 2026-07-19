@@ -3,7 +3,7 @@ id: q-coverage-ids-physics
 type: question
 state: decided
 decided_via: B
-statement: The kernel's coverage rules do external I/O and call outward - accept as documented, or refactor?
+statement: The kernel's coverage rules do external I/O and call outward. Accept as documented, or refactor?
 class: review
 killer: false
 provenance:

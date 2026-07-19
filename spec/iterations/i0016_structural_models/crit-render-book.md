@@ -1,6 +1,7 @@
 ---
 id: crit-render-book
 type: criterion
+weight: 0.15
 metric: zero-external-service render into the single-file book (0-1)
 target: models render offline in the design output chapter
 statement: The axis weighs rendering the model into the single-file book without external services.

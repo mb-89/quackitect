@@ -29,7 +29,7 @@ Note: {{opening-words}}
 [{{key-node}}]({{key-node}}.md)
 Note: {{why-this-node-carries-the-story}}
 ---
-fig: timeline
+fig: project-timeline
 Note: {{where-the-project-stands}}
 ---
 <!-- ai:3 -->

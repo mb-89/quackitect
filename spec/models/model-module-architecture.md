@@ -1,7 +1,7 @@
 ---
 id: model-module-architecture
 type: model
-kind: element-tree
+kind: structural
 statement: The module architecture separates workspace process, module ownership, and import/update mechanics.
 ---
 

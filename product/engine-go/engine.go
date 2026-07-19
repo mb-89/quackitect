@@ -442,6 +442,8 @@ var traceContent = map[string]bool{"need": true, "usecase": true, "requirement":
 	"connection": true, "rule": true, "budget": true, "criterion": true, "guide": true, "neighbour": true,
 	// structural models: content that ripples via its extracted graph, never a gate
 	"model": true,
+	// functions: first-class need decomposition (go-function-nodes), content, never a gate
+	"function": true,
 	// open unknowns (go-question-nodes, adr-question-nodes-provenance): first-class trace
 	// content with a decision state and provenance, never a gate
 	"question": true}

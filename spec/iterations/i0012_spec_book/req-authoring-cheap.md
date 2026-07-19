@@ -11,4 +11,4 @@ discipline: [software]
 quality: [functionality]
 ---
 ## Rationale (not load-bearing)
-TODO
+Not applicable - not recorded at authoring; the trace edges and the provenance block carry the derivation.

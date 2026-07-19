@@ -14,4 +14,4 @@ provenance:
   kind: agent-proposal: first of functional|quality|constraint|interface - veto or confirm
 ---
 ## Rationale (not load-bearing)
-TODO
+Owner ruling: the fundamentals chapter opens IFU-first - a newcomer meets what the system does before any terminology.

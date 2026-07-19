@@ -1,6 +1,7 @@
 ---
 id: crit-one-tap
 type: criterion
+weight: 0.5
 metric: interactions per answer
 statement: The axis weighs the taps from seeing the ask to a recorded answer.
 class: review

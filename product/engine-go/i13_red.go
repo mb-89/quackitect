@@ -544,12 +544,18 @@ func selftestCallsSummary() bool {
 }
 
 // test-selftest-home-sweep -> selftest:selftest-home-sweep
+// RE-POINTED at i27: RunSelftestCLI arms batteryRunning for EVERY run (i25's
+// isolation), so the sweep mechanics are asserted with the guard lifted here -
+// the guard itself is selftest:battery-isolation's assertion, i25_red.go.
 func selftestSelftestHomeSweep() bool {
 	root := filepath.Dir(filepath.Dir(globalBinPath())) // LOCALAPPDATA/quackitect
 	fake := filepath.Join(root, "duckpond-i13sweepfixture")
 	os.MkdirAll(fake, 0o755)
 	defer os.RemoveAll(fake)
+	wasRunning := batteryRunning
+	batteryRunning = false
 	sweepOrphanHomes()
+	batteryRunning = wasRunning
 	_, err := os.Stat(fake)
 	return os.IsNotExist(err) // the orphaned fixture home is gone
 }

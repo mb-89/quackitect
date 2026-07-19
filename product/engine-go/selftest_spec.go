@@ -691,7 +691,7 @@ func selftestQuarantineScope() bool {
 	}
 	nodes := map[string]Node{
 		"man-ch7-rationales": mk("man-ch7-rationales", "chapter"),
-		"man-ch8-guidance":   mk("man-ch8-guidance", "guidance"),
+		"man-guidance":       mk("man-guidance", "guidance"),
 		"man-agent-guide":    mk("man-agent-guide", "agent"),
 	}
 	got := metaQuarantineFindings(nodes, gloss)
@@ -748,9 +748,9 @@ func selftestSpecTemplateSet() bool {
 		return false
 	}
 	// no ch7: rationales fold into the ch8 Appendix
-	chapters := []string{"man-ch0-orientation", "man-ch1-motivation", "man-ch2-fundamentals",
-		"man-ch3-design-input", "man-ch4-design-output", "man-ch5-verification-validation",
-		"man-ch6-project", "man-ch8-guidance"}
+	chapters := []string{"man-intro-ifus", "man-motivation",
+		"man-fundamentals", "man-design-input", "man-design-output",
+		"man-verification-validation", "man-project", "man-guidance"}
 	gateRe := regexp.MustCompile(`\[(mandatory|judgment|type: [^\]]+)\]`)
 	for _, ch := range chapters {
 		raw, err := os.ReadFile(filepath.Join(dir, ch+".md"))
@@ -807,8 +807,8 @@ func selftestStubSpec() bool {
 	// the spec ROOT, exactly where the template keeps them; subfolders mirror 1:1.
 	for _, f := range []string{
 		filepath.Join(dir, "spec", "SPEC-README.md"),
-		filepath.Join(dir, "spec", "man-ch0-orientation.md"),
-		filepath.Join(dir, "spec", "man-ch8-guidance.md"),
+		filepath.Join(dir, "spec", "man-intro-ifus.md"),
+		filepath.Join(dir, "spec", "man-guidance.md"),
 		filepath.Join(dir, "spec", "queries", "vv-matrix.base"),
 		filepath.Join(dir, "spec", "references", "ref-tech-dok-grundlagen.md"),
 		filepath.Join(dir, "spec", "fundamentals", "README.md"),
@@ -836,7 +836,7 @@ func selftestStubSpec() bool {
 		}
 	}
 	// a second run keeps existing content - never overwrites
-	marker := filepath.Join(dir, "spec", "man-ch1-motivation.md")
+	marker := filepath.Join(dir, "spec", "man-motivation.md")
 	os.WriteFile(marker, []byte("EDITED BY THE PROJECT"), 0o644)
 	cmdStartStubs([]string{dir})
 	raw, _ := os.ReadFile(marker)

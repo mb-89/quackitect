@@ -12,4 +12,4 @@ class: review
 killer: false
 ---
 ## Rationale (not load-bearing)
-TODO
+Not applicable - the assessment lives in the risk fields: probability, impact, mitigation.

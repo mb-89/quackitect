@@ -1,7 +1,7 @@
 ---
 id: model-engine-layers
 type: model
-kind: element-tree
+kind: onion
 statement: what may depend on what in the engine, and how do signals travel through it?
 class: review
 killer: false
@@ -13,6 +13,10 @@ flowchart TD
   %% Bands own the transforms; ambient holds meaning-free utilities.
   %% Allocations marked "%% ?" are agent judgment awaiting owner confirmation.
   subgraph kernel
+    go-voice-gate["voice gate rule"]
+    go-io-busbar["disk-selector classing for the physics rules"]
+    go-drawing-not-node["drawing recognition rule"]
+    go-fail-at-end["battery fail-at-end rule"]
     go-engine-core["graph resolution and full hashes"]
     go-suspect-root["suspect propagation"]
     go-coverage-ids["coverage rules"]
@@ -37,11 +41,13 @@ flowchart TD
     go-refusal-lint["refusal messages carry cause plus recovery"]
     go-bless-preflight["bless preflight at the write path"]
     go-ifu-coverage["ifu use-case coverage rule"]
+    go-no-test-policy["vv no-test policy findings"]
     go-red-edit-guard["red-observed edit guard"]
     go-field-tier["tier semantics: core blocks, deferrable defaults count"]
     go-register-colors["provenance to traffic-light derivation"]
   end
   subgraph graph
+    go-sub-addressing["requirement sub-statement addressing"]
     go-function-nodes["function node type"]
     go-conn-tools["lane tooling"]
     go-conn-lane-root["lane root resolution"]
@@ -54,6 +60,16 @@ flowchart TD
     go-question-nodes["question state and provenance"]
   end
   subgraph rim--graph
+    go-chapter-title-split["chapter title and subtitle split"]
+    go-toc-order["the toc owns the chapter order"]
+    go-onion-interact["the one onion interaction script"]
+    go-card-evidence["hand-off card evidence render"]
+    go-handoff-lifecycle["hand-off page lifecycle"]
+    go-timeline-drilldown["task drill into evidence and cited elements"]
+    go-root-content["identity-root content set"]
+    go-module-config["module config read"]
+    go-node-module-default["node module default"]
+    go-rigor-fit["rigor fit lint"]
     go-verdict-guard["verdict-write guards: busy discard, first-green withhold"]
     go-voice-lint["voice lint over authored statements"]
     go-recital-chain["recital wording-chain selftest"]
@@ -81,6 +97,9 @@ flowchart TD
     go-cluster["cluster migration"]
     go-dsm-cluster["design coupling clustering"]
     go-apply-manifest["judged bulk-edit applier"]
+    go-apply-undo["apply undo journal"]
+    go-quack-mv["the rename determinizer"]
+    go-apply-field-ops["scalar frontmatter surgery"]
     go-mint-skeleton["mint skeletons"]
     go-mint-templates["mint bodies from template files"]
     go-rules-config["rule-sets from config files"]
@@ -108,9 +127,10 @@ flowchart TD
     go-deck-anchors["deck url anchors + reflection"]
     go-guide-ch8["guidance chapter"]
     go-guidance-split["guidance split rules"]
-    go-context-neighbours["context star from nbr notes"]
+    go-context-neighbours["context model from nbr notes"]
     go-onion-figure["the onion drill-down render"]
     go-onion-busbar["bus-bar level layout"]
+    go-onion-dsm-groups["dsm coupling clusters in the onion"]
     go-model-standalone["standalone single-model render"]
     go-onion-change-marks["review change-marks that propagate up"]
     go-block-tree-design["block tree render"]
@@ -142,6 +162,9 @@ flowchart TD
     go-file2list["commented copy readback"]
     go-report["report render"]
     go-render-folds["fan, theme, and age folds"]
+    go-trace-collapsible["typed trace clusters with busbar interiors"]
+    go-models-useful["the model pull law - render follows the views ruling"]
+    go-structure-layers["authored model routes - context to structure to onion"]
     go-report-why["why panel"]
     go-report-filter-ux["report filters"]
     go-report-logo["report logo"]
@@ -154,6 +177,7 @@ flowchart TD
     go-progress-bar["progress bar"]
     go-progress-cmd["progress command render"]
     go-model-render["model figures"]
+    go-onion-space["onion figures break out of the prose column"]
     go-models-complete-book["kind-example figures"]
     go-onion-model-source["onion layer map from the model"]
     go-book-once["shared real-book render memo"]
@@ -163,16 +187,21 @@ flowchart TD
     go-ask-core["ask model and store serialization"]
     go-first-wins-lanes["first answer wins"]
     go-timeline-shared["the one timeline renderer, three frames"]
+    go-timeline-shared-css["the one timeline stylesheet"]
+    go-timeline-frames["timeline frame surfaces and the evidence drilldown"]
     go-pugh-matrix-render["pugh matrix from criterion and candidate nodes"]
     go-raid-matrix-render["raid bubble matrix"]
     go-register-fold["design-input register + generic filter columns"]
+    go-sample-register["the pong sample of the register component"]
     go-ifu-arc-lint["ifu deck arc shape check"]
+    go-rationale-fill["rationale fill lint - real content or an explicit n/a mark"]
     go-card-guard["card select-line guard"]
     go-marker-scan-stop["marker scan stop rule"]
     go-module-import-plan["module import planning"]
     go-voice-prose["prose voice lint"]
   end
   subgraph services
+    go-region-delta["why-delta region attribution"]
     go-build["engine build orchestration"]
     go-build-fast-skip["compile skip"]
     go-rebaseline-inprocess["in-process re-baseline"]
@@ -180,7 +209,6 @@ flowchart TD
     go-note-dedup["note collision"]
     go-stamp-user["user stamp"]
     go-verdict-surgical["surgical verdicts"]
-    go-verify-feedback["verify feedback"]
     go-why-derived["why for derived checks"]
     go-mint["deterministic minting"]
     go-mint-content["mint bodies"]
@@ -189,11 +217,22 @@ flowchart TD
     go-mint-prefill["mint pre-fills schema fields with proposals and provenance"]
   end
   subgraph rim
+    go-mcp-supervisor["mcp supervisor face"]
+    go-mcp-self-arm["mcp self-arm on birth"]
+    go-mcp-errors["mcp error surfaces"]
+    go-supervisor-hardening["force-swap, deterministic kill, park sweep"]
+    go-ask-context["ask context capture"]
+    go-lint-exit["honest lint exit"]
+    go-verify-pin["battery build pinning"]
+    go-battery-isolation["battery isolation"]
+    go-arg-guards["argv guards"]
+    go-adopt-honest["honest adoption"]
     go-guard-selftest["battery gating in dispatch"]
     go-guard-cli["declared agent lane refusal"]
     go-grant-store["standing grant events"]
     go-grant-review["grant collection surface"]
     go-battery-progress["battery progress line"]
+    go-verify-feedback["verify feedback - the battery announce lane on stderr"]
     go-battery-batch["battery batch cache"]
     go-battery-parallel["battery worker pool"]
     go-binary["process entry"]
@@ -249,6 +288,7 @@ flowchart TD
     go-module-command-selector["module command dispatch"]
   end
   subgraph ambient
+    go-type-colors["one palette source for every render"]
     go-palette-source["type colors resolved from the one palette source"]
     go-data-home["data home paths"]
     go-call-log["telemetry - cross-cutting by decision (adr-logging-ambient)"]
@@ -313,5 +353,12 @@ Allocated at i21 M4 AHEAD of the build (the diagram-first hard rule) - eight new
 Allocated at i27 M4 AHEAD of the build (the diagram-first hard rule) - ten new elements, UNREALIZED until M6 fills them. By essence: go-function-nodes -> graph (a node type beside go-model-nodes and go-items); go-refusal-lint -> kernel (a message-format trust rule beside go-ears-lint); go-timeline-shared, go-pugh-matrix-render, go-raid-matrix-render, go-register-fold, go-ifu-arc-lint -> rim--graph (graph-to-html renders and a spec lint, the established render family); go-boot-cmd, go-pager-result -> rim (a console verb and round-end I/O beside go-handover-pager's family); go-palette-source -> ambient (a meaning-free resolution utility the renders share). The REST of i27's scope lands as behavior changes to EXISTING elements, not new blocks: onion clusters, enter navigation, and the boilerplate fold extend go-onion-figure and go-onion-busbar in place (adr-onion-extend); the slide live half extends go-deck-mode via fig resolution (adr-slide-figref); deck nav clamping extends go-deck-mode; why-delta honesty modifies the why lister; verify build-pinning modifies the battery runner; supervisor-any-swap modifies go-mcp-server; details-full-entry, search-visible-hits, graph centering, ch2/ch3 restructure, vv result links, and timeline anchoring modify their owning render elements.
 
 Late allocations at i27 M4 (the conformance debt): twelve regions realized in i22-i26 while this model was typed guide, conformance-blind. Allocated by essence: trust rules to the kernel (go-bless-preflight, go-ifu-coverage, go-red-edit-guard), text and file transforms to the band (go-card-guard, go-marker-scan-stop, go-module-import-plan, go-voice-prose), verbs and world contact to the rim (go-query, go-binary-budget, go-mcp-birth, go-mcp-reload, go-module-command-selector). The two physics findings were RULED at the i27 M4 gate (q-coverage-ids-physics, B): external I/O goes through the layers - file and disk I/O crosses on an I/O busbar like any other input, and a kernel element never touches the world directly. The coverage rules' run seam refactors through the I/O lane at the build, and the onion gains a disk-I/O busbar representation then.
+
+Closed out at i27 M6 (the build's conformance debt, b29). Four regions the build realized under names the M4 allocation did not carry, allocated by essence: go-apply-undo -> rim--graph (the undo journal is a file transform beside go-apply-manifest); go-onion-dsm-groups -> rim--graph (the cluster grouping earned its own seam beside go-onion-busbar - the build found the seam the M4 text expected to stay in place); go-timeline-frames -> rim--graph (the frame surfaces and evidence drilldown beside go-timeline-shared); go-no-test-policy -> kernel (a vv trust rule beside go-vv-exceptions). Four more built regions were renamed to their allocated M4 names instead (go-ifu-arc-lint, go-pager-result, go-pugh-matrix-render, go-raid-matrix-render, go-register-fold). And the PHYSICS REFACTOR ruled at M4 landed: the coverage rules' progress announcements inject through a seam the verify-feedback lane owns, so the kernel prints nothing itself; the refusal lint's file walker and the function-node migration's file I/O moved out of their rule regions (the marked region is the rule, the shell is plumbing); the onion's declared I/O gains the disk busbar, tapped by the blocks whose code actually touches the disk. go-verify-feedback moved services -> rim in the same pass: the battery announce lane prints to stderr by essence, so its home is the world-facing shell. go-rationale-fill (b30) allocated rim--graph on arrival: a raw-text lint over node files, the go-spec-lints family. The unbuilt-trio repair (owner ruling B, 2026-07-19) allocated its three regions the same way: go-models-useful (the render pull gate), go-structure-layers (route parse and render), go-trace-collapsible (the tab collapse and interior render) - graph-to-render transforms every one, the established family.
+
+Allocated at the i27 M6 reopen (the c-wave), by essence: go-onion-space -> rim--graph (a render layout rule on the figure wrapper, the go-model-render family); go-timeline-shared-css -> rim--graph (the one stylesheet beside go-timeline-shared, a render constant allocated for honesty though it carries no calls); go-sample-register -> rim--graph (a graph-to-html render of the canonical teaching fixture, beside go-register-fold).
+
+Allocated at the i27 c9 walk (the same conformance-blind class the M4 late-allocation paragraph closed for i22-i26): twenty-six flow-light regions realized across i24-i27 that the sky-fall lint never saw - they carry no product-internal calls - yet banded into the overview's unmapped ring. By essence: trust rules to the kernel (go-voice-gate, go-io-busbar, go-drawing-not-node, and go-fail-at-end - the conformance checker corrected its first rim placement, the kernel coverage rules call it); the sub-statement vocabulary to the graph; renders, file transforms, and text lints to rim--graph (go-chapter-title-split, go-onion-interact, go-card-evidence, go-handoff-lifecycle, go-timeline-drilldown, go-root-content, go-module-config, go-node-module-default, go-rigor-fit); the why-delta attribution to services; transport faces, battery-runner shape, and verbs to the rim (the mcp family, go-supervisor-hardening, go-ask-context, go-lint-exit, go-verify-pin, go-battery-isolation, go-arg-guards, go-adopt-honest); the palette resolution to ambient (go-type-colors, beside go-palette-source). go-toc-order joined rim--graph on arrival: a file-to-order transform in the render family, per the owner's hand-editable-toc ruling. go-quack-mv and go-apply-field-ops joined rim--graph beside go-apply-manifest: file-coordinate transforms both, per the owner's learn-it-into-apply ruling on the vault-tool research.
+
 
 Allocated at i22 (engine laws), by essence. To the rim: go-guard-selftest and go-guard-cli (the dispatch guard layer - the same command-shell family as go-attest-gate), go-grant-store and go-grant-review (adjudication event verbs beside go-bless), go-battery-progress, go-battery-batch, and go-battery-parallel (battery runner shape beside go-selftest). To the band (rim--graph): go-verdict-guard (the verdict-file write rule beside go-verdict-cache and go-evidence-honesty), go-voice-lint (a raw-text lint beside go-register-vale), go-recital-chain (a text-chain rule beside go-entry-chain).

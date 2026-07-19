@@ -1,6 +1,7 @@
 ---
 id: crit-delta-ergonomics
 type: criterion
+weight: 0.15
 metric: cost of adding elements to a living model (0-1, higher is cheaper)
 target: a new function lands in its models within minutes
 statement: The axis weighs how cheaply new elements enter a living model when requirements change.

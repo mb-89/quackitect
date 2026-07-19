@@ -1,6 +1,7 @@
 ---
 id: crit-spec-fidelity
 type: criterion
+weight: 0.30
 metric: share of layout-spec rules the render honors without exception (0-1)
 target: every rule of onion-io-layout, the deck arc, and the matrix spec renders as drawn
 statement: The axis weighs how exactly a candidate renders the committed layout specs: the onion drawing, the deck arc, the matrix.

@@ -8,4 +8,4 @@ killer: false
 tests_red: exempt - the view-ref behavior landed in i12 bs16 before this iteration composed; a red state is unobservable; the case guards against regression (adr-red-unobservable)
 ---
 ## Rationale (not load-bearing)
-TODO
+Not applicable - the verify line binds this test to its check; the why lives with the requirement it verifies.

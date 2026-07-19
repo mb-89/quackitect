@@ -51,8 +51,6 @@ h2{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:#999;margi
 a.task{display:flex;align-items:center;gap:8px;padding:3px 6px;text-decoration:none;color:#333;border-radius:4px}
 a.task.leaf{padding-left:23px}
 .task.par>summary .rid{font-weight:600;color:#222}
-.mk{display:inline-flex;align-items:center;justify-content:center;width:15px;height:15px;font-size:12px;font-weight:700;line-height:1;flex:none}
-.mk.done{color:#2e8b2e}.mk.sus{color:#e0a400}.mk.fail{color:#d23b3b}
 .mscount.empty{color:#cbcbcb}
 .mshint{font-size:11px;color:#b5b5b5;font-style:italic;padding:2px 6px 3px}
 .auto{font-size:9px;color:#5a7a5a;background:#eef4ec;border:1px solid #d8e6d4;border-radius:8px;padding:0 5px;margin-left:auto;text-transform:uppercase;letter-spacing:.04em}
@@ -73,13 +71,11 @@ a.task.leaf{padding-left:23px}
 .legend label.lg{cursor:pointer} .legend .tytog{margin:0 2px 0 0;width:12px;height:12px}
 .lg{display:inline-flex;align-items:center;gap:4px}
 .sw{width:12px;height:12px;border-radius:3px;display:inline-block;border:1px solid rgba(0,0,0,.12)}
-.sw.need{background:#ffe0b2}.sw.usecase{background:#fff3b0}.sw.requirement{background:#cfe3fb}.sw.design{background:#cdeccd}.sw.test{background:#e9d5f3}.sw.adr{background:#d7ccc8}
 .detail{background:#fff;border:1px solid #e3e3e3;border-radius:6px;margin:0 0 14px;padding:10px 12px}
 .dempty{color:#aaa;font-style:italic;font-size:13px;padding:8px 2px}
 .dhead{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:6px;padding-right:18px}
 .did{font-family:ui-monospace,Consolas,monospace;font-weight:700}
 .dchip{font-size:10px;padding:2px 7px;border-radius:10px;text-transform:uppercase;letter-spacing:.04em}
-.dchip.ty-need{background:#ffe0b2}.dchip.ty-usecase{background:#fff3b0}.dchip.ty-requirement{background:#cfe3fb}.dchip.ty-design{background:#cdeccd}.dchip.ty-test{background:#e9d5f3}.dchip.ty-adr{background:#d7ccc8}
 .dchip.st-done{background:#d8f5d8;color:#1c6b1c}.dchip.st-open{background:#eee;color:#666}.dchip.st-suspect{background:#ffe9b0;color:#7a5800}
 .dk{font-size:10px;color:#b00;font-weight:700}
 .dstmt{font-size:13px;line-height:1.5;margin-bottom:8px}
@@ -87,7 +83,52 @@ a.task.leaf{padding-left:23px}
 .dv code{font-family:ui-monospace,Consolas,monospace;font-size:11px;background:#f5f5f5;padding:1px 4px;border-radius:3px;word-break:break-all}
 .dlink{font-size:12px;font-weight:600;color:#2a6fb0;text-decoration:none}
 .dfall{font-size:12px;color:#b00;margin-top:6px}.dfall[hidden]{display:none}
+.ping{position:absolute;inset:-2px;border:2px solid #555;border-radius:inherit;pointer-events:none;z-index:3;animation:qping .32s ease-out forwards}
+@keyframes qping{0%{inset:-2px;opacity:.95}100%{inset:calc(-2px - 3vmax);opacity:0}}
+` + qtlSharedCSS
+
+// design: go-timeline-shared-css  implements: req-project-timeline
+// ONE stylesheet for the shared timeline component: every surface (report, hand-off,
+// book) embeds this constant verbatim and carries no local variant, so the surfaces
+// cannot drift apart visually.
+const qtlSharedCSS = `.qtl-anchor{display:flex;flex-direction:column;gap:4px}
+.qtl-anchor .uarrow{font:inherit;font-size:10px;border:1px solid #ddd;border-radius:6px;background:#fff;cursor:pointer;padding:1px 0}
+.qtl-scroll{overflow-y:auto;max-height:calc(100vh - 160px)}
+.qtl .hrow{margin:2px 0;border-top:1px solid #eee}
+.qtl .hrow>summary{cursor:pointer;display:flex;gap:8px;align-items:center;padding:7px 6px;border-radius:4px;list-style:none;min-width:0}
+.qtl .hrow>summary::-webkit-details-marker{display:none}
+.qtl .hrow>summary:hover{background:#f4f4f4}
+.qtl .hid{font-family:ui-monospace,Consolas,monospace;font-size:10px;font-weight:700;color:#52628a;background:#eef2f9;border:1px solid #dce4f2;border-radius:10px;padding:1px 8px;flex:none}
+.qtl .hstmt{font-size:11px;color:#888;margin-left:7px;flex:1 1 0;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.qtl .hrow[open]>summary{flex-wrap:wrap}
+.qtl .hrow[open]>summary .hstmt{white-space:normal;overflow:visible;flex:1 1 100%}
+.qtl .ttree{font-size:12px;padding:2px 0 8px 11px;margin-left:5px;border-left:1px solid #ececec}
+.qtl a.task{display:flex;gap:6px;align-items:center;text-decoration:none;color:#333;padding:2px 4px}
+.qtl .ttree .task{padding:3px 0;color:inherit;text-decoration:none}
+.qtl .ttree details.task{padding:0}
+.qtl .ttree details.task>summary{cursor:pointer;list-style:none;padding:3px 0}
+.qtl .ttree details.task>summary::-webkit-details-marker{display:none}
+.qtl .ttree .kids{padding-left:14px;border-left:1px solid #eee}
+.qtl .ttree .rid{font-family:ui-monospace,Consolas,monospace;font-size:11px}
+.qtl .ttree .auto{font-size:10px;color:#999}
+.qtl .mk{display:inline-block;width:16px;font-weight:700}
+.qtl .mk.done{color:#2f9e44}
+.qtl .mk.fail{color:#d6336c}
+.qtl .mk.sus{color:#e0a800}
+.qtl-project details.iter{margin:.3rem 0;border:1px solid #e3e3e3;border-radius:8px;padding:2px 10px}
+.qtl-project details.iter>summary{cursor:pointer;font-weight:600}
+.qtl-project .frac{color:#999;font-weight:400;margin-left:8px}
+.qtl .task.deciding,.qtl details.deciding>summary{background:#fff3bf;border-radius:4px}
+.qtl .tdrill{margin:2px 0 6px 18px;font-size:12px}
+.qtl .tdrill .upills{display:flex;flex-wrap:wrap;gap:4px;margin:3px 0}
+.qtl .tdrill .upill{font:inherit;font-size:11px;padding:1px 8px;border:1px solid #d5d5d5;border-radius:12px;background:#fff;cursor:pointer}
+.qtl .tdrill .upill.on{background:#1e1e1e;color:#fff;border-color:#1e1e1e}
+.qtl .tgroup{margin:2px 0}
+.qtl .tgroup>summary{cursor:pointer;font-size:12px;color:#444}
+.qtl .tel{font:inherit;font-size:11px;font-family:ui-monospace,Consolas,monospace;border:1px solid #dce4f2;border-radius:6px;background:#f6f9ff;cursor:pointer;margin:2px 3px 2px 0;padding:1px 6px}
 `
+
+// enddesign
 
 // design: go-report-filter-ux  implements: req-report-filter-gestures.1, req-report-filter-gestures.3, req-report-filter-gestures.2, req-report-filter-gestures.4
 // The filter gains four things. A clear control returns to the full graph in one click. A descendants:<id> predicate selects the node plus everything tracing into it, successors over the parent->child edges, the same cone the suspect ripple walks. A double-click gesture applies that predicate for the tapped node. On-focus help documents every form, including these. JS only filters and toggles. Content stays server-baked; the report remains a pure display.
@@ -123,13 +164,8 @@ const reportJS = `
     {selector:'node',style:{'label':'data(label)','font-size':9,'text-wrap':'wrap','text-max-width':100,
       'width':118,'height':36,'shape':'round-rectangle','background-color':'#eee','border-width':3,
       'border-color':'#bbb','text-valign':'center','text-halign':'center','color':'#1e1e1e'}},
-    {selector:'node[type="need"]',style:{'background-color':'#ffe0b2'}},
-    {selector:'node[type="usecase"]',style:{'background-color':'#fff3b0'}},
-    {selector:'node[type="requirement"]',style:{'background-color':'#cfe3fb'}},
-    {selector:'node[type="design"]',style:{'background-color':'#cdeccd'}},
-    {selector:'node[type="test"]',style:{'background-color':'#e9d5f3'}},
-    {selector:'node[type="adr"]',style:{'background-color':'#d7ccc8'}},
-    {selector:'node[type="question"]',style:{'background-color':'#ffd6e0'}},  // go-question-nodes: open unknowns wear their own colour
+    /* the per-type node colors come from the ONE palette source (go-type-colors):
+       QUACK_DATA.typecolors is the resolved list — no literal lives here */
     {selector:'edge',style:{'width':1.5,'line-color':'#c8ccd0','target-arrow-color':'#c8ccd0',
       'target-arrow-shape':'triangle','curve-style':'bezier','arrow-scale':0.9}},
     {selector:'edge[etype="implements"]',style:{'line-color':'#2f9e44','target-arrow-color':'#2f9e44'}},
@@ -137,8 +173,15 @@ const reportJS = `
     {selector:'edge[etype="addresses"]',style:{'line-color':'#8d6e63','target-arrow-color':'#8d6e63','line-style':'dotted'}},
     // go-render-folds: a boundary edge with a label names the folded member it stands for
     {selector:'edge[label]',style:{'label':'data(label)','font-size':7,'color':'#777',
-      'text-rotation':'autorotate','text-background-color':'#fff','text-background-opacity':0.85}}
+      'text-rotation':'autorotate','text-background-color':'#fff','text-background-opacity':0.85}},
+    // go-trace-collapsible: a typed cluster wears the double border; its join is the
+    // parallel edge pair (bezier separates them into the double line)
+    {selector:'node[cluster]',style:{'border-style':'double','border-width':6,'shape':'round-rectangle','font-weight':'bold','padding':'6px'}},
+    {selector:'edge[etype="cluster"]',style:{'width':1.5,'target-arrow-shape':'none'}}
   ];
+  Object.keys(D.typecolors||{}).forEach(function(t){
+    STYLE.push({selector:'node[type="'+t+'"]',style:{'background-color':D.typecolors[t]}});
+  });
   function esc(t){return String(t==null?'':t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
   function openSource(href, el){
     if(!href){return;}
@@ -259,6 +302,12 @@ const reportJS = `
     // table row instead of opening the report's detail panel); unset, the report is unchanged.
     window.__quackGraphRefit=function(){ if(cy){ cy.resize(); relayout(); } };
     cy.on('tap','node',function(e){
+      // go-trace-collapsible: a cluster OPENS with its busbar interior - the book's
+      // details pane, else the report's detail panel (both are chrome surfaces)
+      if(e.target.data('cluster')){var ih=e.target.data('interior')||'';
+        if(window.bookDetail){window.bookDetail(e.target.data('label'),ih);}
+        else{var dp=document.getElementById('detail');if(dp){dp.innerHTML=ih;dp.hidden=false;}}
+        return;}
       if(window.QUACK_NODE_TAP){ window.QUACK_NODE_TAP(e.target.id()); return; } showDetail(D.checks[e.target.id()]);});
     cy.on('dbltap','node',function(e){ // dblclick on a node applies the descendants filter for it
       // book AND report alike: the filter relayout re-fits the view, so the
@@ -302,6 +351,41 @@ const reportJS = `
   }
   var pt=document.getElementById('ptitle');
   if(pt){ pt.style.cursor='pointer'; pt.onclick=function(){ if(D.project){showProjectDetail(D.project);} }; }
+})();
+/* the timeline anchor (req-timeline-anchor): the CURRENT iteration sits three quarters
+   down the scroll viewport, earlier iterations stacked above; the arrows nudge the
+   stack, the wheel scrolls natively — never pagination. */
+(function(){
+  var qs=document.getElementById('qtl-scroll');
+  if(!qs)return;
+  var arrows=document.querySelectorAll('.qtl-anchor .uarrow');
+  for(var i=0;i<arrows.length;i++){(function(a){a.addEventListener('click',function(){
+    qs.scrollTop+=a.getAttribute('data-uscroll')==='up'?-160:160;});})(arrows[i]);}
+  var cur=qs.querySelector('details.iter.current');
+  if(cur)qs.scrollTop=Math.max(0,cur.offsetTop-qs.clientHeight*0.75);
+})();
+/* the drill-down's type pills (req-timeline-drilldown): first draft, one selection */
+document.addEventListener('click',function(e){
+  var p=e.target.closest?e.target.closest('.tdrill .upill'):null;if(!p)return;
+  e.preventDefault();var dr=p.closest('.tdrill'),v=p.getAttribute('data-fv');
+  Array.prototype.forEach.call(dr.querySelectorAll('.upill'),function(x){x.classList.toggle('on',x===p);});
+  Array.prototype.forEach.call(dr.querySelectorAll('.tgroup'),function(g){
+    g.style.display=(v==='*'||g.getAttribute('data-ttype')===v)?'':'none';});});
+/* the attention ping (req-details-full-entry): three border echoes announce a pane
+   change — the pane never moves; each echo expands outward while fading. Riding onto
+   neighboring content is fine; leaving the screen is accepted (owner, 2026-07-19). */
+function __panePing(el){if(!el)return;
+  if(getComputedStyle(el).position==='static')el.style.position='relative';
+  [0,150,300].forEach(function(d){setTimeout(function(){
+    var r=document.createElement('div');r.className='ping';el.appendChild(r);
+    setTimeout(function(){if(r.parentNode)r.parentNode.removeChild(r);},400);},d);});}
+(function(){
+  var det=document.getElementById('detail');if(!det||!window.MutationObserver)return;
+  new MutationObserver(function(ms){
+    for(var i=0;i<ms.length;i++){var ad=ms[i].addedNodes;
+      for(var j=0;j<ad.length;j++){var n=ad[j];
+        if(!(n.classList&&n.classList.contains('ping'))){__panePing(det);return;}}}
+  }).observe(det,{childList:true});
 })();
 `
 

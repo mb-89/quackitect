@@ -15,7 +15,7 @@ linked â€” it never disrupts the flow. Id prefix `why-`.
 
 ## Fields
 - `type` (rationale): fixed.
-- `refers` (list of referents): node ids or heading anchors (`man-ch1-motivation#where-we-want-to-be`).
+- `refers` (list of referents): node ids or heading anchors (`man-motivation#where-we-want-to-be`).
   Heading slugs are STABLE anchors â€” the lint flags a dangling one after a rename.
 - `tags` (list of slugs, optional): query hooks â€” a chapter view filters rationales
   by tag (`stakeholder-conflict`, `partitioning-force`) via `file.hasTag`.

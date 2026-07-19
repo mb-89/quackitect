@@ -155,7 +155,7 @@ func registerAnswerApply(nodes map[string]Node, id, field, value, channel string
 		return fmt.Errorf("field %q is not in the %s schema", field, n.Type)
 	}
 	if msg := ruleViolation(r, value); msg != "" {
-		return fmt.Errorf("answer refused: field %q %s", field, msg)
+		return fmt.Errorf("answer refused: field %q %s - fix the value, then answer again", field, msg)
 	}
 	if err := rewriteNodeField(n.Path, field, value, "user-ruling via "+channel); err != nil {
 		return err

@@ -187,7 +187,6 @@
 {"src":"adr-query-in-engine","dst":"req-query"}
 {"src":"adr-voice-ratchet","dst":"req-voice-zero"}
 {"src":"adr-i24-views","dst":"model-agent-lanes"}
-{"src":"adr-i24-views","dst":"model-reload-sequence"}
 {"src":"bud-binary-size","dst":"req-binary-budget"}
 {"src":"bud-cold-start","dst":"req-binary-budget"}
 {"src":"adr-i24-views","dst":"req-mcp-reload"}
@@ -206,3 +205,4 @@
 {"src":"adr-slide-figref","dst":"req-ifu-split-slide"}
 {"src":"adr-pugh-fields","dst":"req-pugh-render"}
 {"src":"adr-i27-views","dst":"model-quack-structure"}
+{"src":"adr-i27-views","dst":"req-structure-layers"}

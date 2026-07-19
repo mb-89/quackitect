@@ -193,7 +193,7 @@ func compactIteration(root, iter string) error {
 		}
 		for _, line := range strings.Split(string(raw), "\n") {
 			if _, _, ok := parseArchiveMarker(line); ok {
-				return fmt.Errorf("compact: %s carries a container marker line — refused", rel)
+				return fmt.Errorf("compact: %s carries a container marker line — remove the marker line, then re-run", rel)
 			}
 		}
 		mark := archiveMarkOpen

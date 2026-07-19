@@ -1,6 +1,7 @@
 ---
 id: crit-build-effort
 type: criterion
+weight: 0.5
 metric: estimated adapter lines and moving parts
 statement: The axis weighs the adapter size and its failure surface.
 class: review

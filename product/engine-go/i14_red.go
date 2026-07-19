@@ -31,7 +31,7 @@ var i14Tests = []namedTest{
 	{"system-overview", selftestSystemOverview},
 	{"comment-persist", selftestCommentPersist},
 	{"deck-views-section", selftestDeckViewsSection},
-	{"context-star-derived", selftestContextStarDerived},
+	{"context-model-derived", selftestContextModelDerived},
 }
 
 // The shared render, THE process-global memo (bookOnceHTML in
@@ -42,13 +42,15 @@ func i14Book() (string, bool) { return bookOnceHTML() }
 // No STANDING #book-info block - the
 // identity rides the title button's data attributes and a title click feeds the
 // details pane like any other click target.
+// RE-POINTED (the i27 timeline drill-down): the old "reader's contract" phrase probe
+// is retired — the phrase legitimately reappears inside EMBEDDED milestone evidence
+// (the ch6 timeline drill renders old M-docs); the structural markers stay the guard.
 func selftestShellTitleCard() bool {
 	html, live := i14Book()
 	if !live {
 		return true
 	}
-	return !strings.Contains(html, "reader's contract") &&
-		!strings.Contains(html, "<header data-root=") &&
+	return !strings.Contains(html, "<header data-root=") &&
 		!strings.Contains(html, `id="book-info"`) &&
 		strings.Contains(html, `data-iteration="`) &&
 		strings.Contains(html, `data-engine="`)
@@ -80,7 +82,7 @@ func selftestSidebarOrder() bool {
 		!strings.Contains(nav, "dpane-views") &&
 		!strings.Contains(nav, `id="expand-all"`) &&
 		!strings.Contains(nav, "toc-sub") &&
-		strings.Contains(nav, " Introduction</a>") &&
+		strings.Contains(nav, " Introduction and IFUs</a>") &&
 		strings.Contains(html, `class="ch-sub"`)
 }
 
@@ -186,7 +188,9 @@ func selftestCh6NoGraph() bool {
 	if !live {
 		return true
 	}
-	i := strings.Index(html, `<article id="man-ch6`)
+	// RE-POINTED at the layout rework: chapter files carry no numbers - the project
+	// chapter is man-project now
+	i := strings.Index(html, `<article id="man-project"`)
 	if i < 0 {
 		return false
 	}
@@ -194,8 +198,8 @@ func selftestCh6NoGraph() bool {
 	if j := strings.Index(ch[1:], "<article "); j >= 0 {
 		ch = ch[:j+1]
 	}
-	// no timeline GRAPH in ch6 (the table carries it); the gate-tally table
-	// and the ai-mark icons stay
+	// no dot-line timeline GRAPH in the chapter (the shared timeline and the tables
+	// carry it); the reader tables and the ai-mark icons stay
 	return strings.Contains(ch, `class="q-table`) && !strings.Contains(ch, `aria-label="timeline"`)
 }
 
@@ -243,31 +247,31 @@ func selftestCh8AudienceSubchapters() bool {
 }
 
 // test-ch3-ucfn-merge -> selftest:ch3-ucfn-merge
+// RE-POINTED (the i27 register fold, req-design-input-register): the separate
+// use-cases-and-functions board DIED — the register is the one design-input home.
 func selftestCh3UcfnMerge() bool {
 	html, live := i14Book()
 	if !live {
 		return true
 	}
-	return strings.Contains(html, `id="ucfn-board"`)
+	return !strings.Contains(html, `id="ucfn-board"`) && strings.Contains(html, `id="input-register"`)
 }
 
 // test-need-expand -> selftest:need-expand
-// No per-need disclosure
-// board - TWO reader tables inside the merged section: use cases (expand =
-// the definition) and functions (each row naming its need).
+// RE-POINTED (the i27 register fold): the per-need view rides the register's need
+// facet, and a use-case row stays expandable to its definition INSIDE the register.
 func selftestNeedExpand() bool {
 	html, live := i14Book()
 	if !live {
 		return true
 	}
-	i := strings.Index(html, `id="ucfn-board"`)
+	i := strings.Index(html, `id="input-register"`)
 	if i < 0 {
 		return false
 	}
-	board := html[i:]
-	// both captions render; a use-case row is expandable
-	return strings.Contains(board, ">Use cases</p>") && strings.Contains(board, ">Functions</p>") &&
-		strings.Contains(board, `data-node="uc-`) && strings.Contains(board, "urow qt-exp")
+	reg := html[i:]
+	return strings.Contains(reg, `data-facet="need"`) &&
+		strings.Contains(reg, `data-node="uc-`) && strings.Contains(reg, "urow qt-exp")
 }
 
 // test-system-overview -> selftest:system-overview
@@ -276,8 +280,8 @@ func selftestSystemOverview() bool {
 	if !live {
 		return true
 	}
-	return strings.Contains(html, `id="man-sys-overview"`) &&
-		strings.Contains(html, `data-ch="man-sys-overview"`)
+	return strings.Contains(html, `id="man-overview"`) &&
+		strings.Contains(html, `data-ch="man-overview"`)
 }
 
 // test-comment-persist -> selftest:comment-persist
@@ -296,10 +300,32 @@ func selftestCommentPersist() bool {
 }
 
 // test-deck-views-section -> selftest:deck-views-section
-// The decks
-// have ONE entry point - present buttons inside the views home block in the
-// introduction chapter. Never the details pane; no deck list rides the sidebar.
+// The decks have ONE entry point each and never the details pane; no deck list rides the
+// sidebar. An IFU-kind deck's entry is the intro's ifus.base table (owner ruling: ONE IFU
+// table in chapter two), so the views-home derived-documents table lists NON-ifu decks
+// only — the duplication guard the first cut of this test missed.
 func selftestDeckViewsSection() bool {
+	// direct probe: an ifu deck stays OUT of views-home, a plain deck keeps its row
+	fix := map[string]Node{
+		"man-ch":     {ID: "man-ch", Type: "manifest", Mode: "chapter", Statement: "Probe chapter."},
+		"deck-ifu":   {ID: "deck-ifu", Type: "manifest", Mode: "deck", Kind: "ifu", Statement: "An IFU deck."},
+		"deck-plain": {ID: "deck-plain", Type: "manifest", Mode: "deck", Statement: "A plain deck."},
+	}
+	vh := renderViewsHome(fix)
+	if !strings.Contains(vh, `data-deck="deck-plain"`) || strings.Contains(vh, "deck-ifu") {
+		return false // the ifu deck is ABSENT, the plain deck presents
+	}
+	// all decks ifu: no derived table AND no misleading empty-state line
+	delete(fix, "deck-plain")
+	vh = renderViewsHome(fix)
+	if strings.Contains(vh, "Derived documents") || strings.Contains(vh, "no derived documents yet") {
+		return false
+	}
+	// genuinely no decks: the empty-state line stays honest
+	delete(fix, "deck-ifu")
+	if !strings.Contains(renderViewsHome(fix), "no derived documents yet") {
+		return false
+	}
 	html, live := i14Book()
 	if !live {
 		return true
@@ -307,21 +333,20 @@ func selftestDeckViewsSection() bool {
 	return !strings.Contains(html, `id="deck-list"`) &&
 		!strings.Contains(html, "dpane-views") &&
 		strings.Contains(html, `class="views-home"`) &&
-		strings.Contains(html, `class="present" data-deck="`) &&
 		strings.Contains(html, `class="deck"`)
 }
 
-// test-context-diagram -> selftest:context-star-derived
+// test-context-diagram -> selftest:context-model-derived
 // The star derives from neighbour NOTES, never from invented actors: each nbr- node
 // renders as one border-connected box, direction `in` on the left flank and `out` on
 // the right; an empty neighbour set says so out loud.
-func selftestContextStarDerived() bool {
+func selftestContextModelDerived() bool {
 	nodes := map[string]Node{
 		"nbr-console": {ID: "nbr-console", Type: "neighbour", Statement: "The console. Commands and blesses.", Direction: "in"},
 		"nbr-reader":  {ID: "nbr-reader", Type: "neighbour", Statement: "The reader's browser.", Direction: "out"},
 	}
-	svg := renderFigure("context-star", nodes)
-	empty := renderFigure("context-star", map[string]Node{})
+	svg := renderFigure("context-model", nodes)
+	empty := renderFigure("context-model", map[string]Node{})
 	return strings.Contains(svg, `x="70" y="215" text-anchor="middle">console<`) && // in = left flank
 		strings.Contains(svg, `x="570" y="215" text-anchor="middle">reader<`) && // out = right flank
 		strings.Contains(svg, "<line ") && strings.Contains(empty, "no neighbour")

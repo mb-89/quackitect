@@ -2,9 +2,14 @@ package main
 
 import (
 	"fmt"
+	"go/ast"
+	"go/parser"
+	"go/token"
 	"os"
 	"path/filepath"
+	"regexp"
 	"sort"
+	"strconv"
 	"strings"
 )
 
@@ -80,11 +85,82 @@ func usageText() string {
 usage: ` + b + ` status [id] | next | start <id> [--plan] | why <id> | bless [--all|<id>] [--by A]
        | note "..." | notes [--all] | query "<expr>" | gather <ver> | report [book] [--out F] | ship | build
        | pair [ntfy] | ask <gate> [--timeout s] | await [--timeout s] | triage | compact <iter>
-       | apply <manifest> | mcp [--child] | grant open|close|review
-       | lint | verify <id> | progress [--pager <gate>] | migrate-actors | migrate-layout | version`
+       | apply <manifest> [--undo] | mv <old-id> <new-id> [--dry] | mcp [--child] | grant open|close|review
+       | lint | verify <id> | progress [--pager <gate>] | migrate-actors | migrate-layout | migrate-functions | version`
 }
 
 // enddesign
+
+// design: go-refusal-lint  implements: req-refusal-recovery
+// Every refusal and cache-miss message names its cause and ONE recovery move. The lint
+// parses the engine source's string LITERALS through go/parser, so comments and test
+// assertions never trip it. It keeps the ones that speak a refusal (refused, BLOCKED,
+// cache miss, cannot be). Each such message must carry a recovery marker: an
+// imperative naming the next command or move. The red batteries and selftest files are
+// excluded, since they assert against these messages. The battery keeps the set clean
+// (selftest:refusal-recovery). The speak pattern is CONCATENATED so this file's own
+// literal never trips the sweep.
+var refusalSpeakRe = regexp.MustCompile(`(?i)refus` + `ed|refus` + `e[sd]?:|BLOCK` + `ED|cache ` + `miss|cannot be`)
+var refusalRecoverRe = regexp.MustCompile(`(?i)\brun[s]?\b|re-run|rerun|retry|resolve by hand|remove the entry|walk (it|them)|ask the adjudicator|attest|bless|use the|use \x60|call the|see \x60|renew|re-render|migrate|by ruling|nothing to|instead|console|next launch|fix |flatten|merge the|make the|add the|shrink|drop the|restore`)
+
+func refusalLintSrc(path, src string) []string {
+	fset := token.NewFileSet()
+	f, err := parser.ParseFile(fset, path, src, 0)
+	if err != nil {
+		return []string{path + ": unparsable: " + err.Error() + " - fix the syntax, then re-run the lint"}
+	}
+	var fs []string
+	ast.Inspect(f, func(n ast.Node) bool {
+		lit, ok := n.(*ast.BasicLit)
+		if !ok || lit.Kind != token.STRING {
+			return true
+		}
+		s, uerr := strconv.Unquote(lit.Value)
+		if uerr != nil || len(s) < 20 {
+			return true // a short fragment is a composition piece, judged where composed
+		}
+		if strings.HasSuffix(s, "(") || strings.HasSuffix(s, ": ") || strings.HasSuffix(s, "'") {
+			return true // a prefix fragment: the composed message carries the recovery
+		}
+		if !refusalSpeakRe.MatchString(s) || refusalRecoverRe.MatchString(s) {
+			return true
+		}
+		short := s
+		if len(short) > 60 {
+			short = short[:60] + "…"
+		}
+		fs = append(fs, fmt.Sprintf("%s:%d: refusal without a recovery move: %q", filepath.Base(path), fset.Position(lit.Pos()).Line, short))
+		return true
+	})
+	return fs
+}
+
+// enddesign
+
+// refusalFindings walks the engine source for the kernel rule above. The walker is
+// PLUMBING, deliberately outside the region (q-coverage-ids-physics, ruling B): the
+// marked region is the rule; the file I/O stays on the lint command's side of the rim.
+func refusalFindings() []string {
+	var fs []string
+	filepath.Walk(EngineSrc(), func(path string, fi os.FileInfo, err error) error {
+		if err != nil || fi.IsDir() || !strings.HasSuffix(path, ".go") {
+			return nil
+		}
+		base := filepath.Base(path)
+		// the red batteries and selftest files assert AGAINST refusal texts
+		if strings.Contains(base, "_red") || strings.HasPrefix(base, "selftest") || strings.HasSuffix(base, "_test.go") {
+			return nil
+		}
+		raw, rerr := os.ReadFile(path)
+		if rerr != nil {
+			return nil
+		}
+		fs = append(fs, refusalLintSrc(path, string(raw))...)
+		return nil
+	})
+	sort.Strings(fs)
+	return fs
+}
 
 // helpRequested reports whether any argument asks for help.
 func helpRequested(args []string) bool {
@@ -194,6 +270,8 @@ func Dispatch(args []string) {
 		cmdBless(rest)
 	case "next":
 		cmdNext(rest)
+	case "boot":
+		cmdBoot(rest)
 	case "start":
 		cmdStart(rest)
 	case "note":
@@ -225,6 +303,8 @@ func Dispatch(args []string) {
 		cmdMigrateActors()
 	case "migrate-layout":
 		cmdMigrateLayout()
+	case "migrate-functions":
+		cmdMigrateFunctions()
 	case "gather":
 		cmdGather(rest)
 	case "ship":
@@ -285,7 +365,9 @@ func Dispatch(args []string) {
 	case "calls":
 		cmdCalls(rest)
 	case "selftest":
-		quackExit(RunSelftestCLI(rest))
+		// the battery runs under the build pin (go-verify-pin): a mid-run binary
+		// swap re-executes the run once under the final build
+		quackExit(verifyRunPinned(func() int { return RunSelftestCLI(rest) }))
 	case "root":
 		fmt.Println(workspaceRoot(LoadAll()))
 	case "dump":
@@ -463,7 +545,7 @@ func cmdLint(rest []string) {
 	// three-code contract (go-lint-exit): a refused graph exits 2 BEFORE any finding is computed —
 	// checked here so lint reports the refusal itself rather than dying inside LoadAll's strict guard.
 	if issues := StrictIssues(SPEC); len(issues) > 0 {
-		fmt.Fprintf(os.Stderr, "STRICT: %d issue(s) — graph refused:\n", len(issues))
+		fmt.Fprintf(os.Stderr, "STRICT: %d issue(s) — graph refused; fix the findings below, then re-run:\n", len(issues))
 		for _, is := range issues {
 			rel, _ := filepath.Rel(ROOT, is.Path)
 			fmt.Fprintf(os.Stderr, "  - %s [%s] %s\n", filepath.ToSlash(rel), is.Key, is.Msg)
@@ -490,6 +572,24 @@ func cmdLint(rest []string) {
 		fmt.Printf("coverage: %d hole(s):\n", len(holes))
 		for _, h := range holes {
 			fmt.Println("  - " + h)
+		}
+	}
+	// refusal recovery (go-refusal-lint): every refusal names its recovery move
+	if rf := refusalFindings(); len(rf) == 0 {
+		fmt.Println("refusals: clean (every refusal names its recovery)")
+	} else {
+		fmt.Printf("refusals: %d without a recovery move:\n", len(rf))
+		for _, f := range rf {
+			fmt.Println("  - " + f)
+		}
+	}
+	// rationale fill (go-rationale-fill): real content or an explicit not-applicable mark
+	if rr := rationaleFillFindings(SPEC); len(rr) == 0 {
+		fmt.Println("rationales: clean (every slot filled or marked not applicable)")
+	} else {
+		fmt.Printf("rationales: %d empty or TODO:\n", len(rr))
+		for _, f := range rr {
+			fmt.Println("  - " + f)
 		}
 	}
 	// EARS enforcement (go-ears-lint): at systematic rigor every requirement statement is checked;

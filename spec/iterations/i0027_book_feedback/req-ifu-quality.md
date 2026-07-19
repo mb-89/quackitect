@@ -14,4 +14,4 @@ provenance:
   kind: agent-proposal: first of functional|quality|constraint|interface - veto or confirm
 ---
 ## Rationale (not load-bearing)
-TODO
+82079-1 is the governing standard for instructions for use; recording the seven-principle review per deck keeps IFU quality checkable instead of assumed.

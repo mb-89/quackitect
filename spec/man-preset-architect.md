@@ -4,6 +4,6 @@ type: manifest
 mode: preset
 statement: The build: input, output, decisions.
 ---
-[man-ch3-design-input](man-ch3-design-input.md)
+[man-design-input](man-design-input.md)
 ---
-[man-ch4-design-output](man-ch4-design-output.md)
+[man-design-output](man-design-output.md)

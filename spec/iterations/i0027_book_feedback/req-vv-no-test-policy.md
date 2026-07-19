@@ -13,4 +13,4 @@ provenance:
   kind: agent-proposal: first of functional|quality|constraint|interface - veto or confirm
 ---
 ## Rationale (not load-bearing)
-TODO
+A requirement without a test needs a stated policy, not silence; retired and deferred nodes owe nothing.

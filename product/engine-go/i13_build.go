@@ -57,7 +57,7 @@ func parseCommentIsland(html string) (*commentIsland, error) {
 		return nil, fmt.Errorf("no comment island in the copy")
 	}
 	if len(ms) > 1 {
-		return nil, fmt.Errorf("malformed copy: %d comment islands (exactly one) - refused, never guessed", len(ms))
+		return nil, fmt.Errorf("malformed copy: %d comment islands (exactly one) - restore the copy's single island, then re-run", len(ms))
 	}
 	var isl commentIsland
 	if err := json.Unmarshal([]byte(ms[0][1]), &isl); err != nil {

@@ -6,4 +6,4 @@ class: review
 killer: false
 ---
 ## Rationale (not load-bearing)
-TODO
+Not applicable - the use case stands on the need it refines; the journey IFUs carry the story.

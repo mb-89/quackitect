@@ -19,6 +19,11 @@ book, timeline, register, matrix. No render defines its own.
 - design `#cdeccd`
 - test `#e9d5f3`
 - adr `#d7ccc8`
+- function `#d2ede4`
+- question `#f6dbe6`
+- risk `#c0392b`
+- assumption `#2762c4`
+- issue `#7d3fa8`
+- dependency `#2f8f4e`
 
-Types without an entry yet (function, question, the RAID kinds) get theirs here,
-in this list, before any render uses them.
+A new node type gets its entry here, in this list, before any render uses it.

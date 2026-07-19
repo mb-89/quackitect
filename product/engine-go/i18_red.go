@@ -331,10 +331,11 @@ func selftestDiagramReviewRender() bool {
 	// RE-POINTED (onion grouping redesign): the drill-down is now bus-bar GROUPING views
 	// (input+output bars at EVERY level, both-direction cross-layer bars) plus the review
 	// inspect data (per-block responsibility/requirement/decision for the details panel).
-	// The page grew from ~290KB to ~314KB — still a SMALL self-contained review, under 10%
-	// of the ~3.4MB full book. The guard rises to 384KB to keep the "not the whole book"
-	// property honest without pinning the retired recursive-onion size.
-	if len(html) > 384*1024 {
+	// RE-POINTED again (go-onion-dsm-groups): DSM coupling modules nest, so every band
+	// pre-renders its module interiors at every depth (~74 views, ~670KB). Still a
+	// self-contained review well under the ~3.4MB full book; the guard holds at 1MB to
+	// keep the "not the whole book" property honest without pinning the view count.
+	if len(html) > 1024*1024 {
 		return false // not small
 	}
 	// element level: at least one block carries the change outline

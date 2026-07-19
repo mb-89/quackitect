@@ -14,4 +14,4 @@ provenance:
   statement: skeleton value
 ---
 ## Rationale (not load-bearing)
-TODO
+Field feedback: evidence docs carry markdown tables that rendered as prose lines; a table must read as a table.

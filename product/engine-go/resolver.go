@@ -69,6 +69,73 @@ func resolveBrand(name string) string {
 	return ""
 }
 
+// design: go-type-colors  implements: req-type-colors
+// ONE color per node type, identical in every surface. The single source is the design
+// language's palette (product/brand/palette.md through the brand overlay; the engine's
+// generic template is the fallback and carries the same list). typeColors parses the
+// "## Type colors" list once per process; no render carries its own literal. The
+// type-colors selftest sweeps the Go source for the trace hexes to keep it that way.
+var typeColorsMemo map[string]string
+
+// traceTypeOrder: the trace types in their fixed legend order (the palette may list more).
+var traceTypeOrder = []string{"need", "usecase", "requirement", "design", "test", "adr"}
+
+func typeColors() map[string]string {
+	if typeColorsMemo != nil {
+		return typeColorsMemo
+	}
+	m := map[string]string{}
+	for _, p := range []string{resolveBrand("palette.md"), filepath.Join(EngineDir(), "design", "palette.md")} {
+		if p == "" || len(m) > 0 {
+			continue // the most-specific palette that carries the list wins
+		}
+		raw, err := os.ReadFile(p)
+		if err != nil {
+			continue
+		}
+		in := false
+		for _, ln := range strings.Split(strings.ReplaceAll(string(raw), "\r\n", "\n"), "\n") {
+			t := strings.TrimSpace(ln)
+			if strings.HasPrefix(t, "## ") {
+				in = strings.Contains(t, "Type colors")
+				continue
+			}
+			if !in || !strings.HasPrefix(t, "- ") {
+				continue
+			}
+			f := strings.Fields(strings.TrimPrefix(t, "- "))
+			if len(f) >= 2 {
+				c := strings.Trim(f[1], "`")
+				if strings.HasPrefix(c, "#") {
+					m[f[0]] = c
+				}
+			}
+		}
+	}
+	typeColorsMemo = m
+	return m
+}
+
+// typeColor answers one type's color; an unlisted type paints neutral rather than invisible.
+func typeColor(t string) string {
+	if c := typeColors()[t]; c != "" {
+		return c
+	}
+	return "#dddddd"
+}
+
+// traceTypeCSS emits one background rule per trace type under the given selector prefix,
+// e.g. traceTypeCSS(".sw.") -> ".sw.need{background:<palette>}...".
+func traceTypeCSS(selPrefix string) string {
+	var b strings.Builder
+	for _, t := range traceTypeOrder {
+		b.WriteString(selPrefix + t + "{background:" + typeColor(t) + "}")
+	}
+	return b.String()
+}
+
+// enddesign
+
 // Resolve returns the path of a resource from the most-specific layer that has it, or "" if none.
 func Resolve(rel string) string {
 	rel = filepath.FromSlash(rel)

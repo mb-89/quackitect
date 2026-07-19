@@ -14,4 +14,4 @@ provenance:
   kind: agent-proposal: first of functional|quality|constraint|interface - veto or confirm
 ---
 ## Rationale (not load-bearing)
-TODO
+Field feedback: the timeline scrolled away from the current iteration; anchoring keeps now in view.

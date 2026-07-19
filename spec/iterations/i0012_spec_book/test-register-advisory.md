@@ -7,4 +7,4 @@ verify: selftest:register-advisory
 killer: false
 ---
 ## Rationale (not load-bearing)
-TODO
+Not applicable - the verify line binds this test to its check; the why lives with the requirement it verifies.

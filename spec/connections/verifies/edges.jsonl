@@ -334,3 +334,15 @@
 {"src":"test-handoff-live-figures","dst":"req-handoff-live-figures"}
 {"src":"test-evidence-md-tables","dst":"req-evidence-md-tables"}
 {"src":"test-filter-feedback","dst":"req-filter-feedback"}
+{"src":"test-apply-undo","dst":"req-apply-undo"}
+{"src":"test-io-busbar","dst":"req-conformance"}
+{"src":"test-onion-space","dst":"req-onion-space"}
+{"src":"test-timeline-singular","dst":"req-project-timeline"}
+{"src":"test-ifu-deck-pills","dst":"req-ifu-discovery"}
+{"src":"test-pong-register-render","dst":"req-design-input-register"}
+{"src":"test-context-model-interfaces","dst":"req-interface-notes"}
+{"src":"test-chapter-titles","dst":"req-chapter-titles"}
+{"src":"test-filter-unification","dst":"req-derived-boards"}
+{"src":"test-toc-order","dst":"req-toc-order"}
+{"src":"test-quack-mv","dst":"req-quack-mv"}
+{"src":"test-apply-field-ops","dst":"req-apply-field-ops"}
