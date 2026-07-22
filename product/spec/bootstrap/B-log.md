@@ -298,3 +298,11 @@ here; v1 stays runnable on `main` until UC-4 passes.
   attesting the hash admits the session; SE-C-005 gates the surface until
   then. Handover re-homed to `product/spec/handover.md` (gitignored),
   served inline on admission.
+- **Module registry (owner ruling):** `modules/kb` declaration in the
+  consumer (dep_kind module, mode import, path `../benjamin`); manifest
+  renders from the local install; the boot enumerates modules and
+  deactivates unresolvable imports. npm dep optional. **Absence path
+  tested empirically** (scratch dir): npm ci succeeds with a dangling
+  junction, the import fails gracefully, kb deactivates, boot reports.
+  The server stays `se` — it is the se module's surface; kb tools ride
+  it as `kb_*` when kb contributes tools.
