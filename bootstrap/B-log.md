@@ -225,3 +225,21 @@ recorded driver; `state/i1.json` + `evidence/i1/` are the committed record).
 
 **Bootstrap session: B0–B6 complete.** v2 hosts its own iterations from
 here; v1 stays runnable on `main` until UC-4 passes.
+
+## Post-B6 owner rulings (2026-07-22, same day)
+
+- **se.rule-owner-pushes (minted through the apply lane):** the agent
+  never pushes to origin — pushing is an owner act. Engine refusal
+  SE-C-003 (`assertNotPush`); session agents follow the same rule.
+  Commits stay the agent lane. The B0–B6 pushes predate the ruling and
+  are grandfathered, not precedent. **Consequence: from this ruling on,
+  local branches run ahead until the owner pushes.**
+- **benjamin remote exists and is PUBLIC** (owner-created; design said
+  private). Fine while the repo carries machinery only. Before any kb
+  CONTENT lands: flip to private or land the pre-push tier hook (Track
+  B3) first — an item's tier must never be loosened by its transport.
+- **Surface noise:** split ruling proposed — trim tool descriptions to
+  one line now (guidance belongs in next/help, not the tool list; §5
+  prompt-cache caveat), defer visibility machinery to the i2 surface
+  growth trigger with `se.structure` ("~5 visible per level") as the
+  tripwire. Awaiting owner word on the trim.

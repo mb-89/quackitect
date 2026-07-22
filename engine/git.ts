@@ -95,10 +95,31 @@ export function assertNotHistoryRewrite(args: string[]): void {
       got: `git ${joined}`,
       remedy: {
         tool: "se.git",
-        args: { args: ["push"] },
-        note: "push without force; if the branch diverged, reconcile by merge",
+        args: { args: ["status"] },
+        note: "history rewrites are refused outright; if the branch diverged, reconcile by merge",
       },
       source: "engine/git.ts assertNotHistoryRewrite",
+    });
+  }
+}
+
+/**
+ * se.rule-owner-pushes: the agent never pushes to origin — pushing is an
+ * owner act. The agent lane refuses every push (SE-C-003); the owner pushes
+ * from their own console.
+ */
+export function assertNotPush(args: string[]): void {
+  if (args[0] === "push") {
+    throw new Rejection({
+      clause: "SE-C-003",
+      expected: "no push on the agent lane — pushing is an owner act (se.rule-owner-pushes)",
+      got: `git ${args.join(" ")}`,
+      remedy: {
+        tool: "se.git",
+        args: { args: ["log", "--oneline", "@{upstream}.."] },
+        note: "commit locally and list what is ahead; the owner pushes when they choose",
+      },
+      source: "engine/git.ts assertNotPush",
     });
   }
 }

@@ -5,7 +5,7 @@ import assert from "node:assert/strict";
 import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { git, repoRoot, commonDir, assertOperable, assertNotHistoryRewrite } from "../engine/git.ts";
+import { git, repoRoot, commonDir, assertOperable, assertNotHistoryRewrite, assertNotPush } from "../engine/git.ts";
 import { Rejection } from "../engine/errors.ts";
 
 function fixtureRepo(): string {
@@ -70,7 +70,19 @@ test("rebase and force-push are refused (SE-C-002)", () => {
       `should refuse: git ${args.join(" ")}`,
     );
   }
-  assertNotHistoryRewrite(["push", "origin", "v2"]); // plain push is fine
+  assertNotHistoryRewrite(["push", "origin", "v2"]); // not a rewrite — SE-C-003's job
+});
+
+test("every push is refused on the agent lane (SE-C-003, se.rule-owner-pushes)", () => {
+  for (const args of [["push"], ["push", "origin", "v2"], ["push", "-u", "origin", "main"]]) {
+    assert.throws(
+      () => assertNotPush(args),
+      (e: unknown) => e instanceof Rejection && e.clause === "SE-C-003",
+      `should refuse: git ${args.join(" ")}`,
+    );
+  }
+  assertNotPush(["commit", "-m", "x"]); // committing stays the agent lane
+  assertNotPush(["fetch", "origin"]); // reading the remote is fine
 });
 
 test("rejections carry the full required shape", () => {
