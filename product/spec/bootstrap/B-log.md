@@ -292,3 +292,9 @@ here; v1 stays runnable on `main` until UC-4 passes.
   normal gated move. The system works on itself.
 - **Repo-local `.se` deleted;** the i1 call log moved to
   `~/.se/quackitect-v2/calls.jsonl` — the baseline series survives.
+- **The boot built (owner ruling; ledger node `se.adr-boot-admission`):**
+  AGENTS.md is one rule (work through the server, do what it tells you);
+  `se_boot` serves project + contract (general rules + voice) + hash;
+  attesting the hash admits the session; SE-C-005 gates the surface until
+  then. Handover re-homed to `product/spec/handover.md` (gitignored),
+  served inline on admission.
