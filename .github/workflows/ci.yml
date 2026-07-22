@@ -23,7 +23,7 @@ jobs:
           if [ -f ../benjamin/package.json ]; then npm ci; else echo "sibling missing - skipping install"; fi
       - name: guards + engine tests (dependency-free)
         working-directory: quackitect
-        run: node --test tests/guards.test.ts tests/git.test.ts
+        run: node --test product/tests/guards.test.ts product/tests/git.test.ts
       - name: full verify (when sibling present)
         working-directory: quackitect
         run: |

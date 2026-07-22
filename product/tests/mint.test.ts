@@ -15,7 +15,7 @@ try {
   // already registered via tools.ts in the same process
 }
 
-const V1_ROOT = join(import.meta.dirname, "..", "..", "quackitect");
+const V1_ROOT = join(import.meta.dirname, "..", "..", "..", "quackitect");
 const haveV1 = existsSync(join(V1_ROOT, "spec", "decisions"));
 
 test("a v1 tree that breaks the P3 accounting fails the mint loudly", () => {

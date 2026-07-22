@@ -5,9 +5,9 @@
   "description": "SE — a process layer over a git repository. v2: TypeScript, MCP-only lane, guidance-first, update-toll, modules by default.",
   "type": "module",
   "scripts": {
-    "test": "node --test \"tests/**/*.test.ts\"",
-    "typecheck": "tsc --noEmit",
-    "guards": "node --test tests/guards.test.ts",
+    "test": "node --test \"product/tests/**/*.test.ts\"",
+    "typecheck": "tsc -p product",
+    "guards": "node --test product/tests/guards.test.ts",
     "verify": "npm run typecheck && npm test"
   },
   "dependencies": {

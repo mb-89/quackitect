@@ -17,8 +17,8 @@ Needs the sibling checkout `../benjamin` (private repo, live kb import).
 
 ## Layout
 
-- `engine/` — the SE engine (TypeScript, run natively by Node >= 22)
-- `modules/se/` — the se module declaration
-- `ledger/` — the ledger (markdown nodes; minted at B3 from v1)
-- `tests/` — node:test suites, including CI guards and git-layer fixture tests
-- `bootstrap/` — the B0–B6 session log
+Per the structure rule: spec is the thinking, product is what ships.
+
+- `spec/` — ledger (markdown nodes), iterations (state + evidence + grants), bootstrap log
+- `product/` — engine, bin, modules, tests, brand
+- `.se/` — machine-local: call log, toll, live offer (never committed)

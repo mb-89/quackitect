@@ -3,8 +3,8 @@
 // nothing on any read path executes checks. Long waits are not waits — the
 // agent parks; the offer lives in the ledger; dismissal-by-absence.
 import { existsSync, statSync } from "node:fs";
-import { join } from "node:path";
 import { Rejection } from "./errors.ts";
+import { layout } from "./layout.ts";
 
 export type WaitCondition =
   | { kind: "file"; path: string; until: "exists" | "changes" }
@@ -36,7 +36,7 @@ export async function seWait(root: string, condition: WaitCondition, timeoutS: n
     });
   }
   const started = Date.now();
-  const offerPath = join(root, "state", "offer.json");
+  const offerPath = layout.offerPath(root);
 
   const initial = ((): string => {
     switch (condition.kind) {

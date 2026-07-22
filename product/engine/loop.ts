@@ -9,6 +9,7 @@ import { Rejection } from "./errors.ts";
 import { CallLog } from "./calllog.ts";
 import { runCommand } from "./run.ts";
 import { Gate } from "./gate.ts";
+import { layout } from "./layout.ts";
 import { advance, validateMachine, type MachineDecl, type MachineInstance, type StateDecl } from "./machine.ts";
 
 export interface WorkPacket {
@@ -38,30 +39,29 @@ export class Loop {
   constructor(root: string, machine: MachineDecl) {
     this.root = root;
     this.machine = machine;
-    this.log = new CallLog(join(root, ".se"));
+    this.log = new CallLog(layout.seDir(root));
     validateMachine(machine);
   }
 
-  private stateDir(): string {
-    return join(this.root, "state");
-  }
-
   private instancePath(iteration: string): string {
-    return join(this.stateDir(), `${iteration}.json`);
+    return layout.instancePath(this.root, iteration);
   }
 
   private openInstance(): MachineInstance | null {
-    if (!existsSync(this.stateDir())) return null;
-    for (const f of readdirSync(this.stateDir())) {
-      if (!f.endsWith(".json")) continue;
-      const inst = JSON.parse(readFileSync(join(this.stateDir(), f), "utf8")) as MachineInstance;
+    const iterations = layout.iterations(this.root);
+    if (!existsSync(iterations)) return null;
+    for (const dir of readdirSync(iterations, { withFileTypes: true })) {
+      if (!dir.isDirectory()) continue;
+      const file = layout.instancePath(this.root, dir.name);
+      if (!existsSync(file)) continue;
+      const inst = JSON.parse(readFileSync(file, "utf8")) as MachineInstance;
       if (inst.status === "open") return inst;
     }
     return null;
   }
 
   private save(inst: MachineInstance): void {
-    mkdirSync(this.stateDir(), { recursive: true });
+    mkdirSync(layout.iterationDir(this.root, inst.iteration), { recursive: true });
     writeFileSync(this.instancePath(inst.iteration), JSON.stringify(inst, null, 2) + "\n", "utf8");
   }
 
@@ -290,7 +290,7 @@ export class Loop {
     payload: Record<string, unknown>,
     run?: { ref: string } | undefined,
   ): string {
-    const dir = join(this.root, "evidence", inst.iteration);
+    const dir = layout.evidenceDir(this.root, inst.iteration);
     mkdirSync(dir, { recursive: true });
     const seq = inst.history.length + 1;
     const file = `${String(seq).padStart(2, "0")}-${stateId}.json`;
@@ -299,6 +299,6 @@ export class Loop {
       JSON.stringify({ iteration: inst.iteration, state: stateId, at: now(), payload, ...(run ? { pinned_run: run } : {}) }, null, 2) + "\n",
       "utf8",
     );
-    return `evidence/${inst.iteration}/${file}`;
+    return `spec/iterations/${inst.iteration}/evidence/${file}`;
   }
 }

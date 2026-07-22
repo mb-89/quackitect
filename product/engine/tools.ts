@@ -14,15 +14,16 @@ import { Toll } from "./toll.ts";
 import { help } from "./help.ts";
 import { seWait, type WaitCondition } from "./wait.ts";
 import { McpServer } from "./mcp.ts";
+import { layout } from "./layout.ts";
 import { join } from "node:path";
 
 registerMigration(v1Import);
 
-/** The tool surface bound to a repo root (ledger/, state/, evidence/, .se/). */
+/** The tool surface bound to a repo root (spec/, product/, .se/). */
 export function coreTools(root: string, opts: { toll?: Toll } = {}): ToolDef[] {
-  const ledgerRoot = join(root, "ledger");
+  const ledgerRoot = layout.ledger(root);
   const loop = (): Loop => new Loop(root, systematic);
-  const log = (): CallLog => new CallLog(join(root, ".se"));
+  const log = (): CallLog => new CallLog(layout.seDir(root));
   const tools: ToolDef[] = [
     {
       name: "se_loop_next",
@@ -203,11 +204,11 @@ export function coreTools(root: string, opts: { toll?: Toll } = {}): ToolDef[] {
 
 /** The full server: tools + the toll as dispatch middleware. */
 export function buildServer(root: string, opts: { tollWindowMs?: number; now?: () => number } = {}): McpServer {
-  const toll = new Toll(join(root, ".se"), {
+  const toll = new Toll(layout.seDir(root), {
     ...(opts.tollWindowMs !== undefined ? { windowMs: opts.tollWindowMs } : {}),
     ...(opts.now ? { now: opts.now } : {}),
   });
-  const log = new CallLog(join(root, ".se"));
+  const log = new CallLog(layout.seDir(root));
   const server = new McpServer({ name: "se-mcp", version: "2.0.0-bootstrap" }, coreTools(root, { toll }));
   server.addGuard((tool, args) => toll.check(tool, args, log));
   // §9 log-everything: every call through the single MCP path lands raw in

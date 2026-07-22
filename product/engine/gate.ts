@@ -8,9 +8,10 @@
 // flag 2; delegated adjudication is a policy knob — agent blesses are legal
 // where enabled and transparently recorded).
 import { appendFileSync, existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
-import { dirname, join } from "node:path";
+import { dirname } from "node:path";
 import { Rejection } from "./errors.ts";
 import { sha256 } from "./hash.ts";
+import { layout } from "./layout.ts";
 import { advance, type MachineDecl, type MachineInstance } from "./machine.ts";
 
 export interface Offer {
@@ -45,11 +46,11 @@ export class Gate {
   }
 
   private offerPath(): string {
-    return join(this.root, "state", "offer.json");
+    return layout.offerPath(this.root);
   }
 
   grantsPath(): string {
-    return join(this.root, "state", "grants.jsonl");
+    return layout.grantsPath(this.root);
   }
 
   makeOffer(inst: MachineInstance, stateId: string, evidence: Record<string, string>, brief: string): Offer {
@@ -107,7 +108,7 @@ export class Gate {
         source: "engine/gate.ts bless",
       });
     }
-    const instPath = join(this.root, "state", `${offer.iteration}.json`);
+    const instPath = layout.instancePath(this.root, offer.iteration);
     const inst = JSON.parse(readFileSync(instPath, "utf8")) as MachineInstance;
     if (inst.current !== offer.state || inst.status !== "open") {
       throw new Rejection({

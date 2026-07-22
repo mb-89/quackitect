@@ -56,13 +56,13 @@ test("B5 pass: a console bless lands with channel + hash on the grant record", a
     assert.equal(code, 0, `se-gate failed: ${out}`);
     assert.match(out, /blessed — grant recorded: channel=tty/);
 
-    const grants = readFileSync(join(root, "state", "grants.jsonl"), "utf8").trim().split("\n").map((l) => JSON.parse(l));
+    const grants = readFileSync(join(root, "spec", "iterations", "grants.jsonl"), "utf8").trim().split("\n").map((l) => JSON.parse(l));
     assert.equal(grants.length, 1);
     assert.equal(grants[0].channel, "tty"); // floor flag 2: channel
     assert.equal(grants[0].hash, offerHash); // bound to the offered state
     assert.ok(grants[0].adjudicated_by.length > 0); // floor flag 2: adjudicator
     // The machine advanced through the approval edge.
-    const inst = JSON.parse(readFileSync(join(root, "state", "i0-gate.json"), "utf8"));
+    const inst = JSON.parse(readFileSync(join(root, "spec", "iterations", "i0-gate", "state.json"), "utf8"));
     assert.equal(inst.status, "closed");
   } finally {
     rmSync(root, { recursive: true, force: true });
@@ -177,7 +177,7 @@ test("se.wait on the offer resolves when a bless lands", async () => {
   const root = mkdtempSync(join(tmpdir(), "se-wait-offer-"));
   try {
     const offerHash = reachGate(root);
-    assert.ok(existsSync(join(root, "state", "offer.json")));
+    assert.ok(existsSync(join(root, ".se", "offer.json")));
     setTimeout(() => {
       new Gate(root).bless(machineOK(), offerHash, { channel: "scripted", adjudicated_by: "wait-test" });
     }, 400);

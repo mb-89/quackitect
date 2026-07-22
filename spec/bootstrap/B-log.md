@@ -243,3 +243,17 @@ here; v1 stays runnable on `main` until UC-4 passes.
   prompt-cache caveat), defer visibility machinery to the i2 surface
   growth trigger with `se.structure` ("~5 visible per level") as the
   tripwire. Awaiting owner word on the trim.
+- **se.structure applied to disk (owner ruling: the noise rule covers the
+  repo, not just surfaces).** Root reshaped to the v1 form:
+  - `spec/` — the thinking: ledger, iterations (state + evidence +
+    grants), bootstrap log
+  - `product/` — what ships: engine, bin, modules, tests, brand
+  - `.se/` — machinery, machine-local (call log, toll, live offer;
+    the offer moved here — losing it IS dismissal, safe by design)
+  - Root files: README, RUNME ×2, package.json (+lock, npm-forced)
+  - All engine paths derive from `product/engine/layout.ts` — one file
+    to touch on any future move. A guard test fails when the root
+    exceeds 7 visible entries. RUNME green on the new layout; 43/43.
+- **Voice carried over:** v1 `product/brand/voice.md` copied verbatim to
+  v2 `product/brand/voice.md`; also recorded as standing session rules
+  in the agent's memory (short sentences, lists, DRY, sycophancy guard).
