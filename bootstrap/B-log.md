@@ -160,3 +160,35 @@ filled fields), one-open-iteration-per-worktree (SE-C-031).
   mechanical states fill, never bless, and the gate stays adjudicated.
 - Tool surface now takes a repo ROOT (`--root`), not just a ledger path:
   ledger/, state/, evidence/, .se/ hang off it.
+
+## B5 — guard rails
+
+**Pass condition met:** a console bless (spawned `bin/se-gate.ts`, real
+stdin/stdout) lands with `channel: tty` + the offer hash + adjudicator on
+`state/grants.jsonl` (40/40).
+
+**What changed / decisions:**
+
+- **Gate semantics from B5 on:** submit at a gate state creates an OFFER
+  (hash bound to iteration+state+evidence), never a close. Bless arrives
+  through a channel the agent doesn't control: `bin/se-gate.ts` (console).
+  Offer TTL 15 min wall clock; expiry/interrupt = dismissal by absence, no
+  write. Stale hash → SE-C-042; no live offer → SE-C-041; machine moved →
+  SE-C-043; second offer while one lives → SE-C-044.
+- **The toll** is dispatch middleware on the MCP server (`addGuard`).
+  Armed on first submit; refusal SE-C-040 carries the SAME call with the
+  update schema inline (`remedy.args.update`); the paid call proceeds and
+  the update lands in the call log (`se.toll.update`). No success-path
+  narration. Window default 10 min, injectable.
+- **se.help armed:** keyword search over tool descriptions + the machine's
+  guidance slices; hits are affordances, miss returns the honest
+  "no such tool — do it yourself" refusal; every call logged with intent
+  and a `miss` flag (the live demand signal). SE-C-090 retired.
+- **se.wait:** mechanical conditions only (file exists/changes, offer
+  state), 250 ms poll, cap 300 s — anything longer is a park and SE-C-050
+  says so with the park guidance in the remedy. No checks on any read path.
+- MCP dispatch is now async (await handlers) — needed for se.wait.
+- The bless lane is deliberately NOT an MCP tool: agents park or wait on
+  the offer; humans bless via console. Delegated adjudication (agent
+  bless) stays possible through the same Gate API with its channel
+  recorded — the policy knob, transparent by construction.

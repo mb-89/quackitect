@@ -7,6 +7,7 @@ import { mkdtempSync, rmSync, readFileSync, existsSync, readdirSync } from "node
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { Loop } from "../engine/loop.ts";
+import { Gate } from "../engine/gate.ts";
 import { systematic } from "../engine/machines/systematic.ts";
 import { validateMachine, type MachineDecl } from "../engine/machine.ts";
 import { Rejection } from "../engine/errors.ts";
@@ -53,8 +54,17 @@ test("scripted walk closes a dummy iteration with no human and no agent", () => 
     assert.equal(p.auto_closed![0].state, "verify");
     assert.equal(p.auto_closed![0].ok, true);
 
+    // Gate submit creates an OFFER (B5): the bless arrives through a channel
+    // the agent doesn't control. The script plays the human via the gate API,
+    // channel recorded as scripted (delegated adjudication, transparent).
     p = loop.submit({ exit_check_result: "closed; verify ran mechanically with exit 0" });
-    assert.equal(p.kind, "closed");
+    assert.equal(p.kind, "gate_offered");
+    assert.ok(p.offer_hash);
+    const gate = new Gate(root);
+    const grant = gate.bless(machineWith(OK), p.offer_hash!, { channel: "scripted", adjudicated_by: "b4-walk-test" });
+    assert.equal(grant.channel, "scripted");
+    // The bless closed the iteration; next() is back to the instruction state.
+    assert.equal(loop.next().kind, "instruction");
 
     // Machine state is on the branch: the instance file exists and is closed.
     const inst = JSON.parse(readFileSync(join(root, "state", "i0-dummy.json"), "utf8"));

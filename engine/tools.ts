@@ -4,21 +4,26 @@ import { loadLedger } from "./store.ts";
 import { WarmIndex } from "./warmindex.ts";
 import { getNode, type GetMode } from "./get.ts";
 import { dryRun, execute, type ApplyOp } from "./apply.ts";
-import { Rejection } from "./errors.ts";
 import type { ToolDef } from "./mcp.ts";
 import { migrateDryRun, migrateExecute, registerMigration } from "./migrate.ts";
 import { v1Import } from "./migrations/v1-import.ts";
 import { Loop } from "./loop.ts";
 import { systematic } from "./machines/systematic.ts";
+import { CallLog } from "./calllog.ts";
+import { Toll } from "./toll.ts";
+import { help } from "./help.ts";
+import { seWait, type WaitCondition } from "./wait.ts";
+import { McpServer } from "./mcp.ts";
 import { join } from "node:path";
 
 registerMigration(v1Import);
 
 /** The tool surface bound to a repo root (ledger/, state/, evidence/, .se/). */
-export function coreTools(root: string): ToolDef[] {
+export function coreTools(root: string, opts: { toll?: Toll } = {}): ToolDef[] {
   const ledgerRoot = join(root, "ledger");
   const loop = (): Loop => new Loop(root, systematic);
-  return [
+  const log = (): CallLog => new CallLog(join(root, ".se"));
+  const tools: ToolDef[] = [
     {
       name: "se_loop_next",
       title: "se.loop.next",
@@ -48,7 +53,11 @@ export function coreTools(root: string): ToolDef[] {
         properties: { evidence: { type: "object", description: "field -> value, per the step's evidence_form" } },
         required: ["evidence"],
       },
-      handler: (args) => loop().submit((args.evidence ?? {}) as Record<string, string>),
+      handler: (args) => {
+        const packet = loop().submit((args.evidence ?? {}) as Record<string, string>);
+        opts.toll?.arm(); // pillar 3: armed after the first submit
+        return packet;
+      },
     },
     {
       name: "se_loop_abandon",
@@ -168,17 +177,38 @@ export function coreTools(root: string): ToolDef[] {
         },
         required: ["query", "intent"],
       },
-      // The real logged version lands at B5; the tool exists from day one so
-      // the surface never ships without the demand-capture lane.
-      handler: () => {
-        throw new Rejection({
-          clause: "SE-C-090",
-          expected: "se.help wired to the call log (B5)",
-          got: "placeholder",
-          remedy: { tool: "se_help", args: {}, note: "not yet armed — lands at B5" },
-          source: "engine/tools.ts",
-        });
+      handler: (args) => help(String(args.query), String(args.intent), tools, systematic, log()),
+    },
+    {
+      name: "se_wait",
+      title: "se.wait",
+      description:
+        "The declared wait lane: return when a MECHANICAL condition changes (file, offer state) or after timeout_s (max 300 — longer waits are parks). Runs no checks on the read path. Never poll a judgment surface.",
+      inputSchema: {
+        type: "object",
+        properties: {
+          condition: {
+            type: "object",
+            description: '{ kind: "offer" } or { kind: "file", path, until: "exists" | "changes" }',
+          },
+          timeout_s: { type: "number", default: 60 },
+        },
+        required: ["condition"],
       },
+      handler: (args) => seWait(root, args.condition as WaitCondition, Number(args.timeout_s ?? 60)),
     },
   ];
+  return tools;
+}
+
+/** The full server: tools + the toll as dispatch middleware. */
+export function buildServer(root: string, opts: { tollWindowMs?: number; now?: () => number } = {}): McpServer {
+  const toll = new Toll(join(root, ".se"), {
+    ...(opts.tollWindowMs !== undefined ? { windowMs: opts.tollWindowMs } : {}),
+    ...(opts.now ? { now: opts.now } : {}),
+  });
+  const log = new CallLog(join(root, ".se"));
+  const server = new McpServer({ name: "se-mcp", version: "2.0.0-bootstrap" }, coreTools(root, { toll }));
+  server.addGuard((tool, args) => toll.check(tool, args, log));
+  return server;
 }

@@ -20,8 +20,11 @@ export interface ToolDef {
   title: string;
   description: string;
   inputSchema: Record<string, unknown>;
-  handler: (args: Record<string, unknown>) => unknown;
+  handler: (args: Record<string, unknown>) => unknown | Promise<unknown>;
 }
+
+/** Dispatch middleware — may throw a Rejection to refuse the call (the toll). */
+export type DispatchGuard = (toolName: string, args: Record<string, unknown>) => void;
 
 interface JsonRpcRequest {
   jsonrpc: "2.0";
@@ -41,11 +44,16 @@ export const PROTOCOL_VERSION = "2025-06-18";
 
 export class McpServer {
   private tools = new Map<string, ToolDef>();
+  private guards: DispatchGuard[] = [];
   readonly serverInfo: { name: string; version: string };
 
   constructor(serverInfo: { name: string; version: string }, tools: ToolDef[] = []) {
     this.serverInfo = serverInfo;
     for (const t of tools) this.register(t);
+  }
+
+  addGuard(guard: DispatchGuard): void {
+    this.guards.push(guard);
   }
 
   register(tool: ToolDef): void {
@@ -59,7 +67,7 @@ export class McpServer {
   }
 
   /** Handle one message. Returns null for notifications (no response). */
-  handle(msg: JsonRpcRequest): JsonRpcResponse | null {
+  async handle(msg: JsonRpcRequest): Promise<JsonRpcResponse | null> {
     if (msg.id === undefined || msg.id === null) return null; // notification
     const id = msg.id;
     try {
@@ -87,7 +95,8 @@ export class McpServer {
           if (!tool) return this.err(id, -32602, `unknown tool: ${name}`);
           const args = (msg.params?.arguments ?? {}) as Record<string, unknown>;
           try {
-            const result = tool.handler(args);
+            for (const guard of this.guards) guard(name, args);
+            const result = await tool.handler(args);
             return this.ok(id, {
               content: [{ type: "text", text: JSON.stringify(result, null, 1) }],
               isError: false,
@@ -139,7 +148,8 @@ export function runStdio(server: McpServer): void {
       );
       return;
     }
-    const res = server.handle(msg);
-    if (res) process.stdout.write(JSON.stringify(res) + "\n");
+    void server.handle(msg).then((res) => {
+      if (res) process.stdout.write(JSON.stringify(res) + "\n");
+    });
   });
 }

@@ -8,10 +8,13 @@ import { join } from "node:path";
 import { Rejection } from "./errors.ts";
 import { CallLog } from "./calllog.ts";
 import { runCommand } from "./run.ts";
+import { Gate } from "./gate.ts";
 import { advance, validateMachine, type MachineDecl, type MachineInstance, type StateDecl } from "./machine.ts";
 
 export interface WorkPacket {
-  kind: "instruction" | "work" | "gate" | "closed" | "escaped";
+  kind: "instruction" | "work" | "gate" | "gate_offered" | "closed" | "escaped";
+  offer_hash?: string;
+  brief?: string;
   iteration?: string;
   state?: string;
   statement?: string;
@@ -148,6 +151,24 @@ export class Loop {
       };
     }
     const state = this.decl(inst);
+    // A gate with a live offer: the agent parks or waits — never polls a
+    // judgment surface (G1).
+    if (state.kind === "gate") {
+      const offer = new Gate(this.root).current();
+      if (offer) {
+        return {
+          kind: "gate_offered",
+          iteration: inst.iteration,
+          state: state.id,
+          statement: state.statement,
+          offer_hash: offer.base_hash,
+          brief: offer.brief,
+          legal: ["se.wait { condition: offer }", "park (end the turn; the offer dismisses by absence)"],
+          recommended: "se.wait",
+          note: "Offer pending. A human blesses via the console (bin/se-gate.ts); the grant records channel + hash.",
+        };
+      }
+    }
     return {
       kind: state.kind === "gate" ? "gate" : "work",
       iteration: inst.iteration,
@@ -197,6 +218,40 @@ export class Loop {
         },
         source: "engine/loop.ts submit",
       });
+    }
+    // Gate states: submit's evidence becomes an OFFER, not a close. The
+    // bless arrives through a channel the agent doesn't control (§7).
+    if (state.kind === "gate") {
+      const gate = new Gate(this.root);
+      const existing = gate.current();
+      if (existing) {
+        throw new Rejection({
+          clause: "SE-C-044",
+          expected: "no live offer (one offer at a time; one iteration per brief)",
+          got: `offer pending for ${existing.iteration}/${existing.state}`,
+          remedy: { tool: "se.loop.next", args: {}, note: "the pending offer must resolve (bless / dismiss / expire) first" },
+          source: "engine/loop.ts submit",
+        });
+      }
+      const brief = [
+        `GATE ${state.id} — iteration ${inst.iteration}`,
+        state.statement,
+        "",
+        ...Object.entries(evidence).map(([k, v]) => `  ${k}: ${v}`),
+      ].join("\n");
+      const offer = gate.makeOffer(inst, state.id, evidence, brief);
+      this.pinEvidence(inst, state.id, { ...evidence, offer_hash: offer.base_hash });
+      this.save(inst);
+      return {
+        kind: "gate_offered",
+        iteration: inst.iteration,
+        state: state.id,
+        offer_hash: offer.base_hash,
+        brief,
+        legal: ["se.wait { condition: offer }", "park (end the turn)"],
+        recommended: "se.wait",
+        note: "Offer created. A human blesses via the console; the grant records channel + hash.",
+      };
     }
     // Pin the referenced run record into the evidence (G2), if present.
     const runRef = evidence.run_ref?.trim();

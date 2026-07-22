@@ -1,0 +1,95 @@
+// The update-toll (pillar 3). The server timestamps the agent's last
+// update; a tool call arriving more than N minutes after it is refused
+// ONCE with the update schema inline — the update rides as a tool argument
+// on the corrected call, then the original call proceeds. Works because
+// work IS tool calls: an agent physically cannot keep working un-narrated.
+//
+// Armed only after the first submit (the first call of a session must not
+// pay a toll for a session with no history). No narration on the success
+// path. Idle-waiting needs no carve-out: no calls, no toll.
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { Rejection } from "./errors.ts";
+import type { CallLog } from "./calllog.ts";
+
+export interface TollUpdate {
+  current_step: string;
+  next_milestone: string;
+  /** Clock-time ETA, e.g. "14:25" or "in ~20 min". */
+  eta: string;
+}
+
+interface TollState {
+  armed: boolean;
+  last_update_ts: number;
+  last_update?: TollUpdate;
+}
+
+export const TOLL_UPDATE_SCHEMA = {
+  type: "object",
+  description: "structured toll update — lands server-side (heartbeat store, board, phone)",
+  properties: {
+    current_step: { type: "string" },
+    next_milestone: { type: "string" },
+    eta: { type: "string", description: "clock-time ETA" },
+  },
+  required: ["current_step", "next_milestone", "eta"],
+} as const;
+
+export class Toll {
+  private path: string;
+  private windowMs: number;
+  private now: () => number;
+
+  constructor(seDir: string, opts: { windowMs?: number; now?: () => number } = {}) {
+    this.path = join(seDir, "toll.json");
+    this.windowMs = opts.windowMs ?? 10 * 60 * 1000;
+    this.now = opts.now ?? Date.now;
+  }
+
+  private load(): TollState {
+    if (!existsSync(this.path)) return { armed: false, last_update_ts: 0 };
+    return JSON.parse(readFileSync(this.path, "utf8")) as TollState;
+  }
+
+  private save(s: TollState): void {
+    mkdirSync(dirname(this.path), { recursive: true });
+    writeFileSync(this.path, JSON.stringify(s, null, 2) + "\n", "utf8");
+  }
+
+  /** Called on the first successful submit of the session. */
+  arm(): void {
+    const s = this.load();
+    if (!s.armed) this.save({ armed: true, last_update_ts: this.now() });
+  }
+
+  /**
+   * Dispatch guard. Throws the toll refusal when an update is due and the
+   * call carries none; records and resets when one rides along.
+   */
+  check(toolName: string, args: Record<string, unknown>, log: CallLog): void {
+    const s = this.load();
+    const update = args.update as TollUpdate | undefined;
+    if (update && update.current_step && update.next_milestone && update.eta) {
+      log.append({ tool: "se.toll.update", args: { via: toolName, ...update }, ok: true, duration_ms: 0 });
+      this.save({ ...s, armed: true, last_update_ts: this.now(), last_update: update });
+      return;
+    }
+    if (!s.armed) return;
+    if (this.now() - s.last_update_ts <= this.windowMs) return;
+    throw new Rejection({
+      clause: "SE-C-040",
+      expected: `an update within ${Math.round(this.windowMs / 60000)} min of the last (schema inline in remedy.args.update)`,
+      got: `last update ${Math.round((this.now() - s.last_update_ts) / 60000)} min ago`,
+      remedy: {
+        tool: toolName,
+        args: {
+          ...args,
+          update: { current_step: "<what you are doing now>", next_milestone: "<next visible result>", eta: "<clock time>" },
+        },
+        note: "pay the toll by resending THIS call with the update field filled — it proceeds immediately",
+      },
+      source: "engine/toll.ts check",
+    });
+  }
+}
