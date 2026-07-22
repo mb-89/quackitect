@@ -1,0 +1,145 @@
+// The MCP lane (pillar 2) — hand-rolled stdio transport.
+//
+// DECIDED AT B2 (decision-timing principle, with implementation data):
+// hand-rolled over @modelcontextprotocol/sdk. Grounds: the needed subset
+// (stdio line-delimited JSON-RPC; initialize, tools/list, tools/call, ping)
+// is thin; the engine is zero-runtime-deps and the SDK brings zod plus
+// transitive churn; the toll and refusal-first behaviors need custom
+// dispatch middleware anyway. Risk (protocol drift) is carried by contract
+// tests that speak real bytes to a spawned server.
+//
+// Wire names use underscores (se_get_node): the Anthropic API rejects dots
+// in tool names, so dotted names live in titles/descriptions only.
+import { createInterface } from "node:readline";
+import { Rejection } from "./errors.ts";
+
+export interface ToolDef {
+  /** Wire name, [a-zA-Z0-9_-] only. */
+  name: string;
+  /** Human/display name — the dotted form, e.g. "se.get.node". */
+  title: string;
+  description: string;
+  inputSchema: Record<string, unknown>;
+  handler: (args: Record<string, unknown>) => unknown;
+}
+
+interface JsonRpcRequest {
+  jsonrpc: "2.0";
+  id?: number | string | null;
+  method: string;
+  params?: Record<string, unknown>;
+}
+
+interface JsonRpcResponse {
+  jsonrpc: "2.0";
+  id: number | string | null;
+  result?: unknown;
+  error?: { code: number; message: string; data?: unknown };
+}
+
+export const PROTOCOL_VERSION = "2025-06-18";
+
+export class McpServer {
+  private tools = new Map<string, ToolDef>();
+  readonly serverInfo: { name: string; version: string };
+
+  constructor(serverInfo: { name: string; version: string }, tools: ToolDef[] = []) {
+    this.serverInfo = serverInfo;
+    for (const t of tools) this.register(t);
+  }
+
+  register(tool: ToolDef): void {
+    if (!/^[a-zA-Z0-9_-]{1,64}$/.test(tool.name)) throw new Error(`illegal tool name: ${tool.name}`);
+    if (this.tools.has(tool.name)) throw new Error(`duplicate tool: ${tool.name}`);
+    this.tools.set(tool.name, tool);
+  }
+
+  toolNames(): string[] {
+    return [...this.tools.keys()];
+  }
+
+  /** Handle one message. Returns null for notifications (no response). */
+  handle(msg: JsonRpcRequest): JsonRpcResponse | null {
+    if (msg.id === undefined || msg.id === null) return null; // notification
+    const id = msg.id;
+    try {
+      switch (msg.method) {
+        case "initialize":
+          return this.ok(id, {
+            protocolVersion: PROTOCOL_VERSION,
+            capabilities: { tools: {} },
+            serverInfo: this.serverInfo,
+          });
+        case "ping":
+          return this.ok(id, {});
+        case "tools/list":
+          return this.ok(id, {
+            tools: [...this.tools.values()].map((t) => ({
+              name: t.name,
+              title: t.title,
+              description: t.description,
+              inputSchema: t.inputSchema,
+            })),
+          });
+        case "tools/call": {
+          const name = String(msg.params?.name ?? "");
+          const tool = this.tools.get(name);
+          if (!tool) return this.err(id, -32602, `unknown tool: ${name}`);
+          const args = (msg.params?.arguments ?? {}) as Record<string, unknown>;
+          try {
+            const result = tool.handler(args);
+            return this.ok(id, {
+              content: [{ type: "text", text: JSON.stringify(result, null, 1) }],
+              isError: false,
+            });
+          } catch (e) {
+            if (e instanceof Rejection) {
+              // Rejections are results, not protocol errors: the model must
+              // read clause + executable remedy and recover in one turn.
+              return this.ok(id, {
+                content: [{ type: "text", text: JSON.stringify(e.toJSON(), null, 1) }],
+                isError: true,
+              });
+            }
+            return this.ok(id, {
+              content: [{ type: "text", text: JSON.stringify({ kind: "errored", message: String((e as Error).message) }) }],
+              isError: true,
+            });
+          }
+        }
+        default:
+          return this.err(id, -32601, `method not found: ${msg.method}`);
+      }
+    } catch (e) {
+      return this.err(id, -32603, `internal: ${String((e as Error).message)}`);
+    }
+  }
+
+  private ok(id: number | string, result: unknown): JsonRpcResponse {
+    return { jsonrpc: "2.0", id, result };
+  }
+
+  private err(id: number | string, code: number, message: string): JsonRpcResponse {
+    return { jsonrpc: "2.0", id, error: { code, message } };
+  }
+}
+
+/** stdio loop: one JSON message per line, UTF-8. */
+export function runStdio(server: McpServer): void {
+  const rl = createInterface({ input: process.stdin, terminal: false });
+  rl.on("line", (line) => {
+    const trimmed = line.trim();
+    if (trimmed === "") return;
+    let msg: JsonRpcRequest;
+    try {
+      msg = JSON.parse(trimmed) as JsonRpcRequest;
+    } catch {
+      process.stdout.write(
+        JSON.stringify({ jsonrpc: "2.0", id: null, error: { code: -32700, message: "parse error" } }) + "\n",
+      );
+      return;
+    }
+    const res = server.handle(msg);
+    if (res) process.stdout.write(JSON.stringify(res) + "\n");
+  });
+}
