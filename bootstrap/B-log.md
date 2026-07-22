@@ -192,3 +192,36 @@ stdin/stdout) lands with `channel: tty` + the offer hash + adjudicator on
   the offer; humans bless via console. Delegated adjudication (agent
   bless) stays possible through the same Gate API with its channel
   recorded — the policy knob, transparent by construction.
+
+## B6 — self-host exit
+
+**i1 of v2's own development ran under v2** (`bootstrap/i1-walk.mjs` is the
+recorded driver; `state/i1.json` + `evidence/i1/` are the committed record).
+
+- **Goal:** every MCP tool call lands raw in the call log through the
+  single dispatch path (successes AND rejections, with outcome tags).
+  Load-bearing for: the log-everything ruling and v1's measured loss (the
+  retro-deleted raw call log made P5 counts lower bounds forever).
+- **Walk:** declare_goal → do_work (typecheck run `run-04926d236045`
+  pinned) → verify engine-filled (`npm test`, `run-80119a7c6cce`, ok) →
+  gate offer `0711aba7f0b4…` → blessed, channel `chat-session`,
+  `adjudicated_by: agent:claude-bootstrap-session`. **Owner audit point:**
+  this bless used the delegated-adjudication knob; flip it by dismissing
+  and re-blessing via `node bin/se-gate.ts` if the run-end review says so.
+
+**Exit test (absolute):**
+
+- *Zero ad-hoc scripts:* no script was written to work around a missing SE
+  tool during i1; the one gap probe (`se.help` for a deploy-shaped query)
+  returned the honest refusal and is in the call log as demand.
+- *Rejections recover in one turn:* every rejection path carries the
+  corrected call as `remedy` and is tested that way (CAS collision, missing
+  evidence fields, stale gate hash, toll).
+- *Feels fast:* every loop step returned in milliseconds except verify
+  (~3 s, the real test suite). No step needed a re-read or a re-derivation.
+- *Baseline series:* i1's call log rides `.se/calls.jsonl` (machine-local
+  by design); the runs that back evidence are pinned into `evidence/i1/`
+  and committed. The series starts here.
+
+**Bootstrap session: B0–B6 complete.** v2 hosts its own iterations from
+here; v1 stays runnable on `main` until UC-4 passes.

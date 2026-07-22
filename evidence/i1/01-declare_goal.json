@@ -1,0 +1,10 @@
+{
+  "iteration": "i1",
+  "state": "declare_goal",
+  "at": "2026-07-22T18:22:08.998Z",
+  "payload": {
+    "goal": "every MCP tool call lands raw in the call log (successes and rejections), through the single dispatch path",
+    "load_bearing_for": "the log-everything ruling (2026-07-22) and v1's measured loss: the raw call log was retro-deleted, making P5 counts lower bounds forever; v2's baseline series depends on this log existing from i1",
+    "exit_check": "a contract test proves both a successful and a rejected tools/call appear in .se/calls.jsonl with outcome tags; full suite green"
+  }
+}

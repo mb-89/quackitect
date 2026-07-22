@@ -1,0 +1,9 @@
+{
+  "iteration": "i1",
+  "state": "close_iteration",
+  "at": "2026-07-22T18:22:13.376Z",
+  "payload": {
+    "exit_check_result": "contract test 'every MCP tool call lands raw in the call log' passes: se_get_node success logged outcome=result, unknown-id rejection logged outcome=rejected; suite 41/41 green (pinned typecheck run + verify state's npm test run)",
+    "offer_hash": "0711aba7f0b4a267bba1c9bd93f68717fe7cca6d4a6dc65f5c4b157507e856d3"
+  }
+}

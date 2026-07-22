@@ -210,5 +210,10 @@ export function buildServer(root: string, opts: { tollWindowMs?: number; now?: (
   const log = new CallLog(join(root, ".se"));
   const server = new McpServer({ name: "se-mcp", version: "2.0.0-bootstrap" }, coreTools(root, { toll }));
   server.addGuard((tool, args) => toll.check(tool, args, log));
+  // §9 log-everything: every call through the single MCP path lands raw in
+  // the call log — successes too, not just errors (i1 of self-hosting).
+  server.addObserver(({ tool, args, ok, duration_ms, outcome }) =>
+    log.append({ tool, args, ok, duration_ms, detail: { outcome } }),
+  );
   return server;
 }

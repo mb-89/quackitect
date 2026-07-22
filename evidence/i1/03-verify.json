@@ -1,0 +1,28 @@
+{
+  "iteration": "i1",
+  "state": "verify",
+  "at": "2026-07-22T18:22:13.373Z",
+  "payload": {
+    "run_ref": "run-80119a7c6cce",
+    "command": "npm test --silent",
+    "exit": 0
+  },
+  "pinned_run": {
+    "ref": "run-80119a7c6cce",
+    "ts": "2026-07-22T18:22:13.372Z",
+    "se_version": "2.0.0-bootstrap",
+    "tool": "se.run",
+    "args": {
+      "command": "npm test --silent",
+      "cwd": "C:/Users/ichbi/Desktop/ai/quackitect-v2"
+    },
+    "ok": true,
+    "duration_ms": 3104,
+    "detail": {
+      "command": "npm test --silent",
+      "exit": 0,
+      "stdout": "✔ dry_run -> execute applies create, edit and edge ops atomically (26.1557ms)\n✔ mid-air collision dies at the write with a one-turn-recoverable rejection (12.4433ms)\n✔ a stale hash cannot replay after a successful execute (9.7584ms)\n✔ edge fields are writable only via edge ops (SE-C-011) (4.6189ms)\n✔ delete removes the file; unknown ids are rejected (8.9709ms)\n✔ get.node outline/section/full carry id + hash (5.7747ms)\n✔ git layer works against a fixture repo (419.4518ms)\n✔ repoRoot is null outside a work tree (34.5009ms)\n✔ SE refuses to operate on its own repo (SE-C-001) (66.5391ms)\n✔ allow_self flag overrides the self-repo refusal (0.1537ms)\n✔ fixture repos are operable without a flag (273.8359ms)\n✔ rebase and force-push are refused (SE-C-002) (0.3463ms)\n✔ rejections carry the full required shape (0.1702ms)\n✔ no shared utils package between modules (1.5032ms)\n✔ dependency direction: kb imports nothing of se (sibling scan, best effort) (4.4129ms)\n✔ se module declaration exists and declares the kb dependency (3.1217ms)\n✔ kb module is importable through the workspace link (0.9307ms)\n✔ the systematic machine passes load-time checks (1.3816ms)\n✔ scripted walk closes a dummy iteration with no human and no agent (102.0583ms)\n✔ a failing engine state is a normal Failed: fallback reopens, then escape records the guard (203.8269ms)\n✔ evidence-form validation is field-targeted and one-turn recoverable (SE-C-030) (3.4401ms)\n✔ one open iteration per worktree (SE-C-031); abandon is terminal and recorded (7.2791ms)\n✔ every MCP tool call lands raw in the call log — successes and rejections (i1) (166.8511ms)\n✔ initialize -> tools/list -> tools/call round trip over stdio (138.7116ms)\n✔ a rejection arrives as an isError result carrying the executable remedy (143.8718ms)\n✔ full write loop over MCP: dry_run then execute with the hash (141.7263ms)\n✔ a v1 tree that breaks the P3 accounting fails the mint loudly (6.9245ms)\n✔ the mint accounts 126/126 and is idempotent (empty diff on re-run) (669.4498ms)\n✔ B5 pass: a console bless lands with channel + hash on the grant record (214.3633ms)\n✔ a stale hash cannot bless; an expired offer is dismissal by absence (77.8114ms)\n✔ the toll refuses once with the schema inline, and the paid call proceeds (4.7574ms)\n✔ se.help: hits are affordances, misses are honest and logged as demand (2.785ms)\n✔ se.wait returns on a mechanical file condition and refuses park-length waits (1582.2643ms)\n✔ se.wait on the offer resolves when a bless lands (595.968ms)\n✔ ledger loads, ids match paths, edges resolve (9.5546ms)\n✔ hashes are stable across independent loads (5.9924ms)\n✔ hash is over canonical form — CRLF and key order do not move it (0.4402ms)\n✔ serialize -> parse round-trips to the same hash (0.3648ms)\n✔ index rebuilds from files alone, and a fresh rebuild is identical (9.9946ms)\n✔ unknown edge kinds are refused at parse (0.5043ms)\n✔ missing breaks_if_removed on a requirement is a lint finding (4.0682ms)\nℹ tests 41\nℹ suites 0\nℹ pass 41\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 2720.6869\n",
+      "stderr": ""
+    }
+  }
+}

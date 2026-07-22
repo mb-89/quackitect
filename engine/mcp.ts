@@ -26,6 +26,16 @@ export interface ToolDef {
 /** Dispatch middleware — may throw a Rejection to refuse the call (the toll). */
 export type DispatchGuard = (toolName: string, args: Record<string, unknown>) => void;
 
+/** Post-dispatch observer — the single call path's log hook (§9: log
+ *  everything raw; derive at read time). Never throws into dispatch. */
+export type CallObserver = (record: {
+  tool: string;
+  args: Record<string, unknown>;
+  ok: boolean;
+  duration_ms: number;
+  outcome: "result" | "rejected" | "errored";
+}) => void;
+
 interface JsonRpcRequest {
   jsonrpc: "2.0";
   id?: number | string | null;
@@ -45,6 +55,7 @@ export const PROTOCOL_VERSION = "2025-06-18";
 export class McpServer {
   private tools = new Map<string, ToolDef>();
   private guards: DispatchGuard[] = [];
+  private observers: CallObserver[] = [];
   readonly serverInfo: { name: string; version: string };
 
   constructor(serverInfo: { name: string; version: string }, tools: ToolDef[] = []) {
@@ -54,6 +65,20 @@ export class McpServer {
 
   addGuard(guard: DispatchGuard): void {
     this.guards.push(guard);
+  }
+
+  addObserver(observer: CallObserver): void {
+    this.observers.push(observer);
+  }
+
+  private observe(record: Parameters<CallObserver>[0]): void {
+    for (const o of this.observers) {
+      try {
+        o(record);
+      } catch {
+        // The log hook must never break dispatch.
+      }
+    }
   }
 
   register(tool: ToolDef): void {
@@ -94,9 +119,11 @@ export class McpServer {
           const tool = this.tools.get(name);
           if (!tool) return this.err(id, -32602, `unknown tool: ${name}`);
           const args = (msg.params?.arguments ?? {}) as Record<string, unknown>;
+          const started = Date.now();
           try {
             for (const guard of this.guards) guard(name, args);
             const result = await tool.handler(args);
+            this.observe({ tool: name, args, ok: true, duration_ms: Date.now() - started, outcome: "result" });
             return this.ok(id, {
               content: [{ type: "text", text: JSON.stringify(result, null, 1) }],
               isError: false,
@@ -105,11 +132,13 @@ export class McpServer {
             if (e instanceof Rejection) {
               // Rejections are results, not protocol errors: the model must
               // read clause + executable remedy and recover in one turn.
+              this.observe({ tool: name, args, ok: false, duration_ms: Date.now() - started, outcome: "rejected" });
               return this.ok(id, {
                 content: [{ type: "text", text: JSON.stringify(e.toJSON(), null, 1) }],
                 isError: true,
               });
             }
+            this.observe({ tool: name, args, ok: false, duration_ms: Date.now() - started, outcome: "errored" });
             return this.ok(id, {
               content: [{ type: "text", text: JSON.stringify({ kind: "errored", message: String((e as Error).message) }) }],
               isError: true,

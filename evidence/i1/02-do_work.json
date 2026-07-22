@@ -1,0 +1,27 @@
+{
+  "iteration": "i1",
+  "state": "do_work",
+  "at": "2026-07-22T18:22:10.267Z",
+  "payload": {
+    "changed": "engine/mcp.ts (CallObserver + observe on dispatch: result/rejected/errored with duration); engine/tools.ts (buildServer wires the observer to the call log); tests/mcp.test.ts (contract test: success + rejection both land)",
+    "run_ref": "run-04926d236045"
+  },
+  "pinned_run": {
+    "ref": "run-04926d236045",
+    "ts": "2026-07-22T18:22:10.266Z",
+    "se_version": "2.0.0-bootstrap",
+    "tool": "se.run",
+    "args": {
+      "command": "npm run typecheck",
+      "cwd": "C:/Users/ichbi/Desktop/ai/quackitect-v2"
+    },
+    "ok": true,
+    "duration_ms": 1265,
+    "detail": {
+      "command": "npm run typecheck",
+      "exit": 0,
+      "stdout": "\n> quackitect@2.0.0-bootstrap typecheck\n> tsc --noEmit\n\n",
+      "stderr": ""
+    }
+  }
+}

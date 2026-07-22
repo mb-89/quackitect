@@ -8,6 +8,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { once } from "node:events";
 import { createInterface } from "node:readline";
+import { readFileSync } from "node:fs";
 
 const NODE = `---
 id: se.adr-mcp
@@ -20,7 +21,9 @@ statement: MCP transport is hand-rolled, decided at B2 with implementation data.
 Thin protocol subset, zero-dep engine, custom dispatch middleware needed anyway.
 `;
 
-async function withServer(fn: (send: (msg: object) => Promise<Record<string, unknown>>) => Promise<void>): Promise<void> {
+async function withServer(
+  fn: (send: (msg: object) => Promise<Record<string, unknown>>, root: string) => Promise<void>,
+): Promise<void> {
   const root = mkdtempSync(join(tmpdir(), "se-mcp-"));
   mkdirSync(join(root, "ledger", "se"), { recursive: true });
   writeFileSync(join(root, "ledger", "se", "adr-mcp.md"), NODE);
@@ -45,7 +48,7 @@ async function withServer(fn: (send: (msg: object) => Promise<Record<string, unk
   };
 
   try {
-    await fn(send);
+    await fn(send, root);
   } finally {
     proc.kill();
     await once(proc, "exit").catch(() => {});
@@ -53,6 +56,27 @@ async function withServer(fn: (send: (msg: object) => Promise<Record<string, unk
     rmSync(root, { recursive: true, force: true });
   }
 }
+
+function readCallLog(root: string): { tool: string; ok: boolean; detail?: { outcome?: string } }[] {
+  return readFileSync(join(root, ".se", "calls.jsonl"), "utf8")
+    .trim()
+    .split("\n")
+    .map((l) => JSON.parse(l) as { tool: string; ok: boolean; detail?: { outcome?: string } });
+}
+
+test("every MCP tool call lands raw in the call log — successes and rejections (i1)", async () => {
+  await withServer(async (send, root) => {
+    await send({ method: "tools/call", params: { name: "se_get_node", arguments: { id: "se.adr-mcp" } } });
+    await send({ method: "tools/call", params: { name: "se_get_node", arguments: { id: "se.nope" } } });
+    const log = readCallLog(root);
+    const calls = log.filter((l) => l.tool === "se_get_node");
+    assert.equal(calls.length, 2);
+    assert.equal(calls[0].ok, true);
+    assert.equal(calls[0].detail?.outcome, "result");
+    assert.equal(calls[1].ok, false);
+    assert.equal(calls[1].detail?.outcome, "rejected");
+  });
+});
 
 test("initialize -> tools/list -> tools/call round trip over stdio", async () => {
   await withServer(async (send) => {

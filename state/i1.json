@@ -1,0 +1,34 @@
+{
+  "machine": "systematic",
+  "iteration": "i1",
+  "current": "closed",
+  "counters": {},
+  "history": [
+    {
+      "state": "declare_goal",
+      "outcome": "filled",
+      "evidence": "evidence/i1/01-declare_goal.json",
+      "at": "2026-07-22T18:22:08.999Z"
+    },
+    {
+      "state": "do_work",
+      "outcome": "filled",
+      "evidence": "evidence/i1/02-do_work.json",
+      "at": "2026-07-22T18:22:10.268Z"
+    },
+    {
+      "state": "verify",
+      "outcome": "filled",
+      "evidence": "run-80119a7c6cce",
+      "at": "2026-07-22T18:22:13.373Z"
+    },
+    {
+      "state": "close_iteration",
+      "outcome": "filled",
+      "evidence": "grant:0711aba7f0b4",
+      "at": "2026-07-22T18:22:13.377Z"
+    }
+  ],
+  "escapes": [],
+  "status": "closed"
+}
