@@ -1,0 +1,9 @@
+{
+  "id": "kb",
+  "dep_kind": "module",
+  "home": "https://github.com/mb-89/benjamin",
+  "mode": "import",
+  "import_path": "../benjamin",
+  "rights": "full",
+  "note": "The declaration lives here; the module's manifest renders from the local install (import mode during co-development, pillar 5). Vendoring is decided at ship."
+}

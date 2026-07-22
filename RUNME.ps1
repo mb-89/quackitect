@@ -16,12 +16,6 @@ if (-not $node) {
 $major = [int]((node --version).TrimStart("v").Split(".")[0])
 if ($major -lt 22) { Fail "Node >= 22 required, found $(node --version)" }
 
-# Sibling benjamin checkout (live kb import)
-if (-not (Test-Path "$PSScriptRoot\..\benjamin\package.json")) {
-    Fail "sibling checkout missing: clone mb-89/benjamin next to this repo (..\benjamin)"
-}
-
-# Install once
 if (-not (Test-Path "$PSScriptRoot\product\deliverable\node_modules")) {
     Push-Location "$PSScriptRoot\product\deliverable"
     try { npm ci; if (-not $?) { Fail "npm ci failed" } } finally { Pop-Location }

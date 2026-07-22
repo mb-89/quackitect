@@ -16,6 +16,7 @@ import { basename, join, resolve } from "node:path";
 import { Rejection } from "./errors.ts";
 import { sha256 } from "./hash.ts";
 import { layout } from "./layout.ts";
+import { loadModules, type ModuleStatus } from "./modules.ts";
 
 export interface Session {
   admitted: boolean;
@@ -65,6 +66,7 @@ export function composeContract(root: string): { contract: string; hash: string 
 export interface BootStep1 {
   step: "attest";
   project: string;
+  modules: ModuleStatus[];
   contract: string;
   contract_hash: string;
   note: string;
@@ -73,14 +75,16 @@ export interface BootStep1 {
 export interface BootAdmitted {
   step: "admitted";
   project: string;
+  modules: ModuleStatus[];
   handover?: string;
   note: string;
 }
 
 export function boot(root: string, session: Session, contractHash?: string): BootStep1 | BootAdmitted {
   const project = basename(resolve(root));
+  const modules = loadModules(root);
   if (session.admitted) {
-    return { step: "admitted", project, note: "already admitted — se_loop_next continues" };
+    return { step: "admitted", project, modules, note: "already admitted — se_loop_next continues" };
   }
   const { contract, hash } = composeContract(root);
   if (contractHash === undefined) {
@@ -88,6 +92,7 @@ export function boot(root: string, session: Session, contractHash?: string): Boo
     return {
       step: "attest",
       project,
+      modules,
       contract,
       contract_hash: hash,
       note: "read the contract, then call se_boot again with contract_hash — that attestation admits this session",
@@ -109,6 +114,7 @@ export function boot(root: string, session: Session, contractHash?: string): Boo
   return {
     step: "admitted",
     project,
+    modules,
     ...(existsSync(handoverPath) ? { handover: readFileSync(handoverPath, "utf8") } : {}),
     note: "admitted. The handover above is your state; se_loop_next is your next call.",
   };

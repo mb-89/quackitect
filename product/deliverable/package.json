@@ -10,7 +10,7 @@
     "guards": "node --test tests/guards.test.ts",
     "verify": "npm run typecheck && npm test"
   },
-  "dependencies": {
+  "optionalDependencies": {
     "kb": "file:../../../benjamin"
   },
   "devDependencies": {
