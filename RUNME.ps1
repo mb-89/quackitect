@@ -27,8 +27,13 @@ if (-not (Test-Path "$PSScriptRoot\product\deliverable\node_modules")) {
     try { npm ci; if (-not $?) { Fail "npm ci failed" } } finally { Pop-Location }
 }
 
-# Start the agent in the workspace.
-$claude = Get-Command claude -ErrorAction SilentlyContinue
-if (-not $claude) { Fail "Claude Code not found - install it, then re-run (or start your agent in workspace\ yourself)" }
+# Start the agent in the workspace. Most consumers have Copilot; the ones
+# with Claude usually have no Copilot, so detection order settles it.
 Set-Location "$PSScriptRoot\workspace"
-claude
+if (Get-Command copilot -ErrorAction SilentlyContinue) {
+    copilot
+} elseif (Get-Command claude -ErrorAction SilentlyContinue) {
+    claude
+} else {
+    Fail "no agent CLI found - install GitHub Copilot CLI or Claude Code, then re-run"
+}
