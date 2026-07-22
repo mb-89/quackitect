@@ -94,3 +94,43 @@ wire names. Wire = `se_get_node`; the dotted form rides title/description.
   se.help unarmed. Clause nodes mint at B3+.
 - `se.help` is on the surface from day one but refuses until armed at B5 —
   the surface never ships without the demand-capture lane declared.
+
+## B3 — the mint (`se.set.migrate v1-import`)
+
+**Pass conditions met:** re-run yields an empty diff (verified on the live
+ledger, 0 files); **126/126 accounted** (124 explicitly verdicted by P3 + 2
+never named by P3, flagged as questions — see delta below).
+
+**Result: 226 nodes minted.** decisions 62 keep + 18 keep-am (amendments
+applied as a `v2 amendment` section + `v2_amendment` field) · 12 re-derive
+question nodes · 11 anti-keep graveyard (incl. the two owner-ruled
+supersedes: chat-grant, call-log) · methods 8 · references 35 (26 baseline
++ 9 post-P3, marked) · raid 19 (17 keep + 2 post-P3, marked; 5 P3 drops
+honored) · glossary 39 · fundamentals 1 · rules 1 · UC-1..10 from the
+design doc + **UC-11** (owner ruling) + **se.req-runme-dep-free** (owner
+ruling: uc-run-dep-free → requirement) + **se.adr-mcp-transport-v2** (the
+B2 decision, `adjudicated_by: agent`, channel bootstrap-session —
+transparent per the delegated-adjudication ruling; owner reviews at run
+end).
+
+**P3 delta — needs owner adjudication (7 question nodes, `se.q-p3delta-*`):**
+5 decisions landed in v1 after the P3 cut (adr-i27-views, adr-ifu-kind,
+adr-onion-extend, adr-pugh-fields, adr-slide-figref) and 2 existed at the
+cut but were never named by a P3 verdict (adr-module-views — proposed drop
+like its views siblings; adr-vale-autopull — proposed re-derive under the
+TS toolchain). Nothing was silently imported or silently dropped.
+
+**Edges:** 3 imported (both endpoints in v2), 1005 skipped honestly —
+v1's edges mostly target iteration-level req-*/check-* ids that stay on
+v1's branches per the events-stay-on-branch doctrine. `refers` dropped by
+rule; v1's `interface` lane had no jsonl. Zero parse failures across all
+v1 files.
+
+**Trace dir ruled (was: uninspected):** v1 `trace/` is v1's self-model
+(8 fn-* stubs, 6 nbr-*, 4 need-*). Needs fold into value_props by ruling;
+v2 grows its own spine at self-host. NOT migrated. Fill ruling — flip if
+wanted.
+
+**Term-lint first run:** `bootstrap/term-worklist.md` — 139 candidate
+abbreviations without glossary entries (45 known terms). Noisy by design;
+it is a worklist, not a gate.

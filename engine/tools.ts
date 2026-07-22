@@ -6,6 +6,10 @@ import { getNode, type GetMode } from "./get.ts";
 import { dryRun, execute, type ApplyOp } from "./apply.ts";
 import { Rejection } from "./errors.ts";
 import type { ToolDef } from "./mcp.ts";
+import { migrateDryRun, migrateExecute, registerMigration } from "./migrate.ts";
+import { v1Import } from "./migrations/v1-import.ts";
+
+registerMigration(v1Import);
 
 export function coreTools(ledgerRoot: string): ToolDef[] {
   return [
@@ -79,6 +83,28 @@ export function coreTools(ledgerRoot: string): ToolDef[] {
         const wantsExecute = args.execute_hash !== undefined && args.dry_run !== true;
         if (!wantsExecute) return dryRun(ledgerRoot, ops);
         return execute(ledgerRoot, ops, String(args.execute_hash));
+      },
+    },
+    {
+      name: "se_set_migrate",
+      title: "se.set.migrate",
+      description:
+        "One-shot audited whole-ledger migration by name from the engine's registry. Generates an apply manifest and rides the normal lane: dry_run -> diff hash -> execute. Idempotent: re-run yields an empty diff.",
+      inputSchema: {
+        type: "object",
+        properties: {
+          name: { type: "string", enum: ["v1-import"] },
+          params: { type: "object", description: "migration inputs, e.g. { v1_root: path }" },
+          dry_run: { type: "boolean", default: true },
+          execute_hash: { type: "string" },
+        },
+        required: ["name"],
+      },
+      handler: (args) => {
+        const ctx = { ledgerRoot, params: (args.params ?? {}) as Record<string, string> };
+        const wantsExecute = args.execute_hash !== undefined && args.dry_run !== true;
+        if (!wantsExecute) return migrateDryRun(String(args.name), ctx);
+        return migrateExecute(String(args.name), ctx, String(args.execute_hash));
       },
     },
     {
