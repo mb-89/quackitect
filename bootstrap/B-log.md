@@ -32,3 +32,29 @@ Micro-decisions recorded here route into the ledger at/after B3.
 - quackitect CI can't check out the private sibling without a
   `BENJAMIN_TOKEN` secret; the workflow degrades honestly (guards + engine
   tests still run).
+
+## B1 — store + index
+
+**Pass condition met:** index rebuilds from files alone; hashes stable across
+rebuilds (18/18 tests).
+
+**Micro-decisions (defaults taken, flip any):**
+
+- Frontmatter is a strict YAML **subset** (`engine/yamlite.ts`): scalars,
+  lists, one-level maps, two-space indent. The engine refuses anything
+  outside it instead of guessing — invalid states unrepresentable, and no
+  YAML dependency (supply-chain discipline). Obsidian renders it fine.
+- Node hash = SHA-256 over the **canonical serialization** (envelope keys in
+  fixed order, LF, trailing-newline normalized), not raw disk bytes. CRLF
+  churn and key reordering don't move hashes; content changes do.
+  Attribution-by-exclusion still works — detection re-canonicalizes on read.
+- File layout: `ledger/<module>/<localId>.md`, id = `<module>.<localId>`,
+  checked against the path at load. Kind lives in frontmatter, not the path
+  (renames of kind don't move files; refactor stays id-stable).
+- Edge vocabulary hard-refuses unknown kinds at parse (`serves` is refused —
+  it is a projection, not an edge). Endpoint-pair legality is a lint layer,
+  not parse-fatal, until the node-kind set settles at B3.
+- The three ⚑ naming defaults from p4-edge-vocabulary rev 2 are taken as
+  defaulted: `exemplifies`, `fulfills`, off-spine kinds lint-exempt.
+- FTS5 confirmed in Node's built-in sqlite (3.53) — the warm index has zero
+  dependencies. Index db lives under `.se/` (gitignored, derived).
