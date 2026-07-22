@@ -8,11 +8,59 @@ import { Rejection } from "./errors.ts";
 import type { ToolDef } from "./mcp.ts";
 import { migrateDryRun, migrateExecute, registerMigration } from "./migrate.ts";
 import { v1Import } from "./migrations/v1-import.ts";
+import { Loop } from "./loop.ts";
+import { systematic } from "./machines/systematic.ts";
+import { join } from "node:path";
 
 registerMigration(v1Import);
 
-export function coreTools(ledgerRoot: string): ToolDef[] {
+/** The tool surface bound to a repo root (ledger/, state/, evidence/, .se/). */
+export function coreTools(root: string): ToolDef[] {
+  const ledgerRoot = join(root, "ledger");
+  const loop = (): Loop => new Loop(root, systematic);
   return [
+    {
+      name: "se_loop_next",
+      title: "se.loop.next",
+      description:
+        "The entry point. Always callable, never errors. Returns the work packet for the current step: statement, guidance, evidence form, legal moves. Engine-filled states run mechanically before it returns.",
+      inputSchema: { type: "object", properties: {} },
+      handler: () => loop().next(),
+    },
+    {
+      name: "se_loop_start",
+      title: "se.loop.start",
+      description: "Opens an iteration (bootstrap policy: systematic). One open iteration per worktree.",
+      inputSchema: {
+        type: "object",
+        properties: { iteration: { type: "string", description: "e.g. i1" } },
+        required: ["iteration"],
+      },
+      handler: (args) => loop().start(String(args.iteration)),
+    },
+    {
+      name: "se_loop_submit",
+      title: "se.loop.submit",
+      description:
+        "Produces evidence for the current step; SE validates the shape and closes it. Reference a run record via evidence.run_ref instead of re-typing output — referenced runs are pinned into the iteration's evidence.",
+      inputSchema: {
+        type: "object",
+        properties: { evidence: { type: "object", description: "field -> value, per the step's evidence_form" } },
+        required: ["evidence"],
+      },
+      handler: (args) => loop().submit((args.evidence ?? {}) as Record<string, string>),
+    },
+    {
+      name: "se_loop_abandon",
+      title: "se.loop.abandon",
+      description: "Terminal, recorded with a reason.",
+      inputSchema: {
+        type: "object",
+        properties: { reason: { type: "string" } },
+        required: ["reason"],
+      },
+      handler: (args) => loop().abandon(String(args.reason)),
+    },
     {
       name: "se_get_node",
       title: "se.get.node",

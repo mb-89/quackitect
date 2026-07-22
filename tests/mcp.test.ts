@@ -22,11 +22,11 @@ Thin protocol subset, zero-dep engine, custom dispatch middleware needed anyway.
 
 async function withServer(fn: (send: (msg: object) => Promise<Record<string, unknown>>) => Promise<void>): Promise<void> {
   const root = mkdtempSync(join(tmpdir(), "se-mcp-"));
-  mkdirSync(join(root, "se"), { recursive: true });
-  writeFileSync(join(root, "se", "adr-mcp.md"), NODE);
+  mkdirSync(join(root, "ledger", "se"), { recursive: true });
+  writeFileSync(join(root, "ledger", "se", "adr-mcp.md"), NODE);
 
   const bin = join(import.meta.dirname, "..", "bin", "se-mcp.ts");
-  const proc = spawn(process.execPath, [bin, "--ledger", root], { stdio: ["pipe", "pipe", "pipe"] });
+  const proc = spawn(process.execPath, [bin, "--root", root], { stdio: ["pipe", "pipe", "pipe"] });
   const rl = createInterface({ input: proc.stdout });
   const pending: ((line: string) => void)[] = [];
   rl.on("line", (line) => pending.shift()?.(line));

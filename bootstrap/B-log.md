@@ -134,3 +134,29 @@ wanted.
 **Term-lint first run:** `bootstrap/term-worklist.md` — 139 candidate
 abbreviations without glossary entries (45 known terms). Noisy by design;
 it is a worklist, not a gate.
+
+## B4 — machine + loop
+
+**Pass condition met:** a scripted walk closes a dummy iteration with no
+human and no agent (34/34). Also tested: Failed-opens-fallbacks with a
+guarded retry (`verify_attempts < 3`), escape recording the exhausted
+guard, field-targeted evidence validation (SE-C-030, remedy preserves
+filled fields), one-open-iteration-per-worktree (SE-C-031).
+
+**Decisions:**
+
+- Machine state lives at `state/<iteration>.json` (committed — machine
+  state rides the branch); evidence at `evidence/<iteration>/NN-state.json`
+  (committed — events stay on the branch); raw call log at `.se/calls.jsonl`
+  (machine-local, gitignored, log-everything). G2 pinning: submit's
+  `run_ref` copies the run record into the evidence file.
+- Guards are a deliberately tiny language (`counter op int`) — extended
+  state stays counters + guards, no expression engine.
+- The systematic machine (bootstrap cut) is engine data
+  (`engine/machines/systematic.ts`): declare_goal → do_work → verify
+  (engine-filled, `npm test --silent`) → close_iteration (gate) → closed.
+  Minting policies as ledger nodes is i1 work.
+- The bootstrap gate closes by submit; the real TTY gate arms at B5 —
+  mechanical states fill, never bless, and the gate stays adjudicated.
+- Tool surface now takes a repo ROOT (`--root`), not just a ledger path:
+  ledger/, state/, evidence/, .se/ hang off it.
