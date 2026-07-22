@@ -1,0 +1,30 @@
+name: ci
+on: [push, pull_request]
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: { path: quackitect }
+      # Live kb import: private sibling. Needs a repo secret BENJAMIN_TOKEN
+      # (read access to mb-89/benjamin). Guards and engine tests run either way.
+      - uses: actions/checkout@v4
+        if: ${{ github.event_name == 'push' }}
+        continue-on-error: true
+        with:
+          repository: mb-89/benjamin
+          token: ${{ secrets.BENJAMIN_TOKEN }}
+          path: benjamin
+      - uses: actions/setup-node@v4
+        with: { node-version: 24 }
+      - name: install (when sibling present)
+        working-directory: quackitect
+        run: |
+          if [ -f ../benjamin/package.json ]; then npm ci; else echo "sibling missing - skipping install"; fi
+      - name: guards + engine tests (dependency-free)
+        working-directory: quackitect
+        run: node --test tests/guards.test.ts tests/git.test.ts
+      - name: full verify (when sibling present)
+        working-directory: quackitect
+        run: |
+          if [ -f ../benjamin/package.json ]; then npm run verify; else echo "sibling missing - skipped"; fi

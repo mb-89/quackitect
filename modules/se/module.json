@@ -1,0 +1,17 @@
+{
+  "id": "se",
+  "name": "Systematic Engineering",
+  "home": "quackitect",
+  "contributes": {
+    "artifact_kinds": [],
+    "guidance_slices": [],
+    "check_lanes": [],
+    "render_views": []
+  },
+  "depends_on": ["kb"],
+  "invariants": [
+    "se may depend on kb, never the reverse",
+    "multiple modules are the standard state; a single module is the degraded state",
+    "structure never collapses, only presentation does"
+  ]
+}
