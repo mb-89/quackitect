@@ -255,5 +255,21 @@ here; v1 stays runnable on `main` until UC-4 passes.
     to touch on any future move. A guard test fails when the root
     exceeds 7 visible entries. RUNME green on the new layout; 43/43.
 - **Voice carried over:** v1 `product/brand/voice.md` copied verbatim to
-  v2 `product/brand/voice.md`; also recorded as standing session rules
-  in the agent's memory (short sentences, lists, DRY, sycophancy guard).
+  v2 (now `product/deliverable/brand/voice.md`).
+- **Memory retracted (owner ruling):** agent memory must carry no v2
+  knowledge — v2 tells a fresh agent what to do by itself. All project
+  memories deleted; the index says so. The rules live here instead.
+- **Workspace isolation (owner ruling; ledger node
+  `se.adr-workspace-isolation`):** root = README, RUNME ×2, workspace/,
+  product/ (5 visible; guard test caps at 6). workspace/ = agent
+  territory (AGENTS.md, .mcp.json link, deny rules). product/spec/ =
+  ledger + iterations, MCP-only. product/deliverable/ = engine + npm,
+  reached through the new **se.deliverable** lane (list / read / patch /
+  write, CAS-guarded, path-escape refused SE-C-060..064; "deliverable"
+  not "code" — realization kinds beyond code may follow). **se.git**
+  added: allowlisted subcommands, push refused. Machine-local state
+  moved to `~/.se/<project>/` (SE_STATE_DIR overrides; the call log must
+  survive, so profile not temp). RUNME reworked: it STARTS an agent in
+  the workspace; verification lives in `npm run verify` (CI unchanged).
+  Named residual: subprocess porosity, accepted per §14; belts are deny
+  rules + AGENTS.md (rule extends to subagents) + logged dispatch.

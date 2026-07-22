@@ -14,7 +14,7 @@ const flag = (f: string): string | undefined => {
   return i === -1 ? undefined : rest[i + 1];
 };
 const ctx = {
-  ledgerRoot: resolve(flag("--ledger") ?? "spec/ledger"),
+  ledgerRoot: resolve(flag("--ledger") ?? "product/spec/ledger"),
   params: { v1_root: resolve(flag("--v1-root") ?? "../quackitect") },
 };
 

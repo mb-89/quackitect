@@ -1,10 +1,10 @@
-# RUNME — quackitect v2, Windows. The distribution bar (TS ruling 2026-07-22):
-# RUNME + winget Node. A fresh machine runs this and gets a green check.
+# RUNME — run me: start an agent in the workspace.
+# Setup happens only when missing. Verification lives in `npm run verify`.
 $ErrorActionPreference = "Stop"
 
-function Fail($msg) { Write-Host "RUNME: FAIL - $msg" -ForegroundColor Red; exit 1 }
+function Fail($msg) { Write-Host "RUNME: $msg" -ForegroundColor Red; exit 1 }
 
-# 1. Node >= 22 (type stripping + node:sqlite required)
+# Node >= 22 (type stripping + node:sqlite)
 $node = Get-Command node -ErrorAction SilentlyContinue
 if (-not $node) {
     Write-Host "RUNME: Node not found - installing via winget..."
@@ -16,19 +16,19 @@ if (-not $node) {
 $major = [int]((node --version).TrimStart("v").Split(".")[0])
 if ($major -lt 22) { Fail "Node >= 22 required, found $(node --version)" }
 
-# 2. Sibling benjamin checkout (live kb import)
+# Sibling benjamin checkout (live kb import)
 if (-not (Test-Path "$PSScriptRoot\..\benjamin\package.json")) {
     Fail "sibling checkout missing: clone mb-89/benjamin next to this repo (..\benjamin)"
 }
 
-# 3. Install (npm ci against the committed lockfile) + verify
-Push-Location $PSScriptRoot
-try {
-    npm ci
-    if (-not $?) { Fail "npm ci failed" }
-    npm run verify
-    if (-not $?) { Fail "verify failed" }
-} finally { Pop-Location }
+# Install once
+if (-not (Test-Path "$PSScriptRoot\product\deliverable\node_modules")) {
+    Push-Location "$PSScriptRoot\product\deliverable"
+    try { npm ci; if (-not $?) { Fail "npm ci failed" } } finally { Pop-Location }
+}
 
-Write-Host ""
-Write-Host "RUNME: GREEN - quackitect v2 verified on this machine" -ForegroundColor Green
+# Start the agent in the workspace.
+$claude = Get-Command claude -ErrorAction SilentlyContinue
+if (-not $claude) { Fail "Claude Code not found - install it, then re-run (or start your agent in workspace\ yourself)" }
+Set-Location "$PSScriptRoot\workspace"
+claude

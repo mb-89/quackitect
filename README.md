@@ -13,12 +13,16 @@ B3 mint and stops being authoritative then.
 
 Windows: `.\RUNME.ps1` · POSIX: `./RUNME.sh`
 
-Needs the sibling checkout `../benjamin` (private repo, live kb import).
+RUNME starts an agent in `workspace/`. Setup runs only when missing.
+Needs the sibling checkout `../benjamin` (live kb import).
+CI check: `npm run verify` inside `product/deliverable`.
 
 ## Layout
 
-Per the structure rule: spec is the thinking, product is what ships.
-
-- `spec/` — ledger (markdown nodes), iterations (state + evidence + grants), bootstrap log
-- `product/` — engine, bin, modules, tests, brand
-- `.se/` — machine-local: call log, toll, live offer (never committed)
+- `workspace/` — agent territory. AGENTS.md, the MCP link, deny rules.
+  Agents start here and reach the project only through the se server.
+- `product/spec/` — the thinking: ledger, iterations (state + evidence +
+  grants), bootstrap log. MCP-only.
+- `product/deliverable/` — what ships: engine, bin, modules, tests, brand.
+  Reached through the se.deliverable lane.
+- `~/.se/<project>/` — machine-local: call log, toll, live offer.

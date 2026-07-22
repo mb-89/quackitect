@@ -9,6 +9,10 @@ import { join } from "node:path";
 import { once } from "node:events";
 import { createInterface } from "node:readline";
 import { readFileSync } from "node:fs";
+import { layout } from "../engine/layout.ts";
+
+// Machine-local state goes to a throwaway dir, never the real profile.
+process.env.SE_STATE_DIR = mkdtempSync(join(tmpdir(), "se-state-"));
 
 const NODE = `---
 id: se.adr-mcp
@@ -25,8 +29,8 @@ async function withServer(
   fn: (send: (msg: object) => Promise<Record<string, unknown>>, root: string) => Promise<void>,
 ): Promise<void> {
   const root = mkdtempSync(join(tmpdir(), "se-mcp-"));
-  mkdirSync(join(root, "spec", "ledger", "se"), { recursive: true });
-  writeFileSync(join(root, "spec", "ledger", "se", "adr-mcp.md"), NODE);
+  mkdirSync(join(root, "product", "spec", "ledger", "se"), { recursive: true });
+  writeFileSync(join(root, "product", "spec", "ledger", "se", "adr-mcp.md"), NODE);
 
   const bin = join(import.meta.dirname, "..", "bin", "se-mcp.ts");
   const proc = spawn(process.execPath, [bin, "--root", root], { stdio: ["pipe", "pipe", "pipe"] });
@@ -58,7 +62,7 @@ async function withServer(
 }
 
 function readCallLog(root: string): { tool: string; ok: boolean; detail?: { outcome?: string } }[] {
-  return readFileSync(join(root, ".se", "calls.jsonl"), "utf8")
+  return readFileSync(join(layout.seDir(root), "calls.jsonl"), "utf8")
     .trim()
     .split("\n")
     .map((l) => JSON.parse(l) as { tool: string; ok: boolean; detail?: { outcome?: string } });

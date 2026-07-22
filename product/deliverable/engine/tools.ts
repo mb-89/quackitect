@@ -15,7 +15,9 @@ import { help } from "./help.ts";
 import { seWait, type WaitCondition } from "./wait.ts";
 import { McpServer } from "./mcp.ts";
 import { layout } from "./layout.ts";
-import { join } from "node:path";
+import { listDeliverable, readDeliverable, writeDeliverable, patchDeliverable } from "./deliverable.ts";
+import { git, assertNotHistoryRewrite, assertNotPush } from "./git.ts";
+import { Rejection } from "./errors.ts";
 
 registerMigration(v1Import);
 
@@ -163,6 +165,93 @@ export function coreTools(root: string, opts: { toll?: Toll } = {}): ToolDef[] {
         const wantsExecute = args.execute_hash !== undefined && args.dry_run !== true;
         if (!wantsExecute) return migrateDryRun(String(args.name), ctx);
         return migrateExecute(String(args.name), ctx, String(args.execute_hash));
+      },
+    },
+    {
+      name: "se_deliverable_list",
+      title: "se.deliverable.list",
+      description: "List deliverable entries under a directory (deliverable-relative paths).",
+      inputSchema: {
+        type: "object",
+        properties: { dir: { type: "string", default: "." } },
+      },
+      handler: (args) => listDeliverable(root, String(args.dir ?? ".")),
+    },
+    {
+      name: "se_deliverable_read",
+      title: "se.deliverable.read",
+      description: "Read one deliverable file; returns content + hash (the CAS base for edits).",
+      inputSchema: {
+        type: "object",
+        properties: { path: { type: "string" } },
+        required: ["path"],
+      },
+      handler: (args) => readDeliverable(root, String(args.path)),
+    },
+    {
+      name: "se_deliverable_write",
+      title: "se.deliverable.write",
+      description: "Whole-file write. base_hash: null creates; otherwise it must match disk (CAS).",
+      inputSchema: {
+        type: "object",
+        properties: {
+          path: { type: "string" },
+          content: { type: "string" },
+          base_hash: { type: ["string", "null"] },
+        },
+        required: ["path", "content", "base_hash"],
+      },
+      handler: (args) =>
+        writeDeliverable(root, String(args.path), String(args.content), args.base_hash === null ? null : String(args.base_hash)),
+    },
+    {
+      name: "se_deliverable_patch",
+      title: "se.deliverable.patch",
+      description: "Exact-match edit: old_string must occur exactly once; optional base_hash double-guard.",
+      inputSchema: {
+        type: "object",
+        properties: {
+          path: { type: "string" },
+          old_string: { type: "string" },
+          new_string: { type: "string" },
+          base_hash: { type: "string" },
+        },
+        required: ["path", "old_string", "new_string"],
+      },
+      handler: (args) =>
+        patchDeliverable(
+          root,
+          String(args.path),
+          String(args.old_string),
+          String(args.new_string),
+          args.base_hash === undefined ? undefined : String(args.base_hash),
+        ),
+    },
+    {
+      name: "se_git",
+      title: "se.git",
+      description: "Git through SE, allowlisted: status, log, diff, show, add, commit, fetch, branch, rev-parse. Push is the owner's act.",
+      inputSchema: {
+        type: "object",
+        properties: { args: { type: "array", items: { type: "string" } } },
+        required: ["args"],
+      },
+      handler: (args) => {
+        const gitArgs = (args.args as string[]).map(String);
+        assertNotPush(gitArgs);
+        assertNotHistoryRewrite(gitArgs);
+        const ALLOWED = new Set(["status", "log", "diff", "show", "add", "commit", "fetch", "branch", "rev-parse"]);
+        if (!ALLOWED.has(gitArgs[0])) {
+          throw new Rejection({
+            clause: "SE-C-004",
+            expected: `an allowlisted git subcommand (${[...ALLOWED].join(", ")})`,
+            got: gitArgs[0] ?? "(none)",
+            remedy: { tool: "se.git", args: { args: ["status"] }, note: "destructive git stays engine-internal; ask via se.help if a lane is missing" },
+            source: "engine/tools.ts se_git",
+          });
+        }
+        const r = git(root, ...gitArgs);
+        return { ok: r.ok, code: r.code, stdout: r.stdout.slice(-20_000), stderr: r.stderr.slice(-20_000) };
       },
     },
     {

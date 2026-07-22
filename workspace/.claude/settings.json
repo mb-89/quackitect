@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "deny": [
+      "Read(../product/**)",
+      "Edit(../product/**)",
+      "Write(../product/**)",
+      "Edit(../**)",
+      "Write(../**)",
+      "Bash(git:*)",
+      "Bash(node:*)",
+      "Bash(npm:*)"
+    ]
+  }
+}

@@ -299,6 +299,6 @@ export class Loop {
       JSON.stringify({ iteration: inst.iteration, state: stateId, at: now(), payload, ...(run ? { pinned_run: run } : {}) }, null, 2) + "\n",
       "utf8",
     );
-    return `spec/iterations/${inst.iteration}/evidence/${file}`;
+    return `product/spec/iterations/${inst.iteration}/evidence/${file}`;
   }
 }

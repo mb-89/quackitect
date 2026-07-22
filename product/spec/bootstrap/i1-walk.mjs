@@ -1,9 +1,9 @@
 ﻿// i1 driver â€” v2's own development iteration running under v2's loop.
-import { Loop } from "../../product/engine/loop.ts";
-import { Gate } from "../../product/engine/gate.ts";
-import { CallLog } from "../../product/engine/calllog.ts";
-import { runCommand } from "../../product/engine/run.ts";
-import { systematic } from "../../product/engine/machines/systematic.ts";
+import { Loop } from "../../deliverable/engine/loop.ts";
+import { Gate } from "../../deliverable/engine/gate.ts";
+import { CallLog } from "../../deliverable/engine/calllog.ts";
+import { runCommand } from "../../deliverable/engine/run.ts";
+import { systematic } from "../../deliverable/engine/machines/systematic.ts";
 
 const root = "C:/Users/ichbi/Desktop/ai/quackitect-v2";
 const loop = new Loop(root, systematic);

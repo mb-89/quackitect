@@ -1,8 +1,9 @@
 #!/usr/bin/env sh
-# RUNME — quackitect v2, POSIX. See RUNME.ps1 for the Windows path.
+# RUNME — run me: start an agent in the workspace.
+# Setup happens only when missing. Verification lives in `npm run verify`.
 set -e
 
-fail() { echo "RUNME: FAIL - $1" >&2; exit 1; }
+fail() { echo "RUNME: $1" >&2; exit 1; }
 
 command -v node >/dev/null 2>&1 || fail "install Node >= 22 first (https://nodejs.org)"
 major=$(node --version | sed 's/^v//' | cut -d. -f1)
@@ -11,9 +12,10 @@ major=$(node --version | sed 's/^v//' | cut -d. -f1)
 dir=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
 [ -f "$dir/../benjamin/package.json" ] || fail "sibling checkout missing: clone mb-89/benjamin next to this repo (../benjamin)"
 
-cd "$dir"
-npm ci
-npm run verify
+if [ ! -d "$dir/product/deliverable/node_modules" ]; then
+  (cd "$dir/product/deliverable" && npm ci)
+fi
 
-echo ""
-echo "RUNME: GREEN - quackitect v2 verified on this machine"
+command -v claude >/dev/null 2>&1 || fail "Claude Code not found - install it, then re-run (or start your agent in workspace/ yourself)"
+cd "$dir/workspace"
+exec claude

@@ -8,7 +8,10 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { Loop } from "../engine/loop.ts";
 import { Gate } from "../engine/gate.ts";
+import { layout } from "../engine/layout.ts";
 import { systematic } from "../engine/machines/systematic.ts";
+
+process.env.SE_STATE_DIR = mkdtempSync(join(tmpdir(), "se-state-"));
 import { validateMachine, type MachineDecl } from "../engine/machine.ts";
 import { Rejection } from "../engine/errors.ts";
 
@@ -67,17 +70,17 @@ test("scripted walk closes a dummy iteration with no human and no agent", () => 
     assert.equal(loop.next().kind, "instruction");
 
     // Machine state is on the branch: the instance file exists and is closed.
-    const inst = JSON.parse(readFileSync(join(root, "spec", "iterations", "i0-dummy", "state.json"), "utf8"));
+    const inst = JSON.parse(readFileSync(layout.instancePath(root, "i0-dummy"), "utf8"));
     assert.equal(inst.status, "closed");
     assert.equal(inst.machine, "systematic"); // floor flag 1: policy in force
     // Evidence pinned per step, including the engine-run verify.
-    const evDir = join(root, "spec", "iterations", "i0-dummy", "evidence");
+    const evDir = layout.evidenceDir(root, "i0-dummy");
     const evidence = readdirSync(evDir);
     assert.equal(evidence.length, 4);
     const verifyEv = JSON.parse(readFileSync(join(evDir, evidence.find((f) => f.includes("verify"))!), "utf8"));
     assert.ok(verifyEv.pinned_run.ref.startsWith("run-"), "the run record is pinned into evidence");
     // The raw run landed in the call log.
-    assert.ok(readFileSync(join(root, ".se", "calls.jsonl"), "utf8").includes(verifyEv.pinned_run.ref));
+    assert.ok(readFileSync(join(layout.seDir(root), "calls.jsonl"), "utf8").includes(verifyEv.pinned_run.ref));
   } finally {
     rmSync(root, { recursive: true, force: true });
   }
@@ -101,7 +104,7 @@ test("a failing engine state is a normal Failed: fallback reopens, then escape r
     const p = loop.submit({ changed: "attempt 3" });
     assert.equal(p.kind, "escaped");
     assert.match(p.note!, /verify_attempts < 3/);
-    const inst = JSON.parse(readFileSync(join(root, "spec", "iterations", "i0-fail", "state.json"), "utf8"));
+    const inst = JSON.parse(readFileSync(layout.instancePath(root, "i0-fail"), "utf8"));
     assert.equal(inst.escapes.length, 1);
     assert.match(inst.escapes[0].exhausted_guard, /verify_attempts/);
     assert.equal(inst.counters.verify_attempts, 3);
@@ -143,7 +146,7 @@ test("one open iteration per worktree (SE-C-031); abandon is terminal and record
     );
     const p = loop.abandon("scope changed");
     assert.equal(p.kind, "instruction");
-    const instPath = join(root, "spec", "iterations", "i0-a", "state.json");
+    const instPath = layout.instancePath(root, "i0-a");
     const inst = JSON.parse(readFileSync(instPath, "utf8"));
     assert.equal(inst.status, "abandoned");
     assert.equal(inst.history.at(-1).evidence, "scope changed");

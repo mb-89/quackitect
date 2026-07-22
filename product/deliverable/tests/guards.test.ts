@@ -5,8 +5,9 @@ import assert from "node:assert/strict";
 import { readdirSync, readFileSync, existsSync } from "node:fs";
 import { join } from "node:path";
 
-const repoRoot = join(import.meta.dirname, "..", "..");
+const repoRoot = join(import.meta.dirname, "..", "..", "..");
 const siblingKb = join(repoRoot, "..", "benjamin");
+const deliverable = join(repoRoot, "product", "deliverable");
 
 function walk(dir: string): string[] {
   const out: string[] = [];
@@ -22,15 +23,15 @@ function walk(dir: string): string[] {
 test("no shared utils package between modules", () => {
   for (const banned of ["shared", "utils", "common"]) {
     assert.ok(!existsSync(join(repoRoot, banned)), `banned top-level dir: ${banned}`);
-    assert.ok(!existsSync(join(repoRoot, "product", "modules", banned)), `banned module: ${banned}`);
+    assert.ok(!existsSync(join(deliverable, "modules", banned)), `banned module: ${banned}`);
   }
 });
 
 test("se.structure holds at the root: ~5 visible entries, dotfolders exempt", () => {
   const visible = readdirSync(repoRoot, { withFileTypes: true })
     .map((e) => e.name)
-    .filter((n) => !n.startsWith(".") && n !== "node_modules" && n !== "package-lock.json");
-  assert.ok(visible.length <= 7, `root too noisy (${visible.length}): ${visible.join(", ")}`);
+    .filter((n) => !n.startsWith("."));
+  assert.ok(visible.length <= 6, `root too noisy (${visible.length}): ${visible.join(", ")}`);
 });
 
 test("dependency direction: kb imports nothing of se (sibling scan, best effort)", (t) => {
@@ -49,7 +50,7 @@ test("dependency direction: kb imports nothing of se (sibling scan, best effort)
 });
 
 test("se module declaration exists and declares the kb dependency", () => {
-  const mod = JSON.parse(readFileSync(join(repoRoot, "product", "modules", "se", "module.json"), "utf8"));
+  const mod = JSON.parse(readFileSync(join(deliverable, "modules", "se", "module.json"), "utf8"));
   assert.equal(mod.id, "se");
   assert.ok(mod.depends_on.includes("kb"));
 });
