@@ -31,6 +31,22 @@ if (-not (Test-Path "$PSScriptRoot\product\deliverable\node_modules")) {
 # with Claude usually have no Copilot, so detection order settles it.
 Set-Location "$PSScriptRoot\workspace"
 if (Get-Command copilot -ErrorAction SilentlyContinue) {
+    # Copilot CLI has no repo-level MCP config yet - register the se server
+    # in the user-level config (idempotent merge, absolute paths).
+    $copilotHome = if ($env:COPILOT_HOME) { $env:COPILOT_HOME } else { "$env:USERPROFILE\.copilot" }
+    New-Item -ItemType Directory -Force $copilotHome | Out-Null
+    $cfgPath = Join-Path $copilotHome "mcp-config.json"
+    $cfg = if (Test-Path $cfgPath) { Get-Content $cfgPath -Raw | ConvertFrom-Json } else { [pscustomobject]@{} }
+    if (-not $cfg.PSObject.Properties["mcpServers"]) {
+        $cfg | Add-Member -NotePropertyName mcpServers -NotePropertyValue ([pscustomobject]@{})
+    }
+    $se = [pscustomobject]@{
+        command = "node"
+        args    = @("$PSScriptRoot\product\deliverable\bin\se-mcp.ts", "--root", "$PSScriptRoot")
+    }
+    if ($cfg.mcpServers.PSObject.Properties["se"]) { $cfg.mcpServers.se = $se }
+    else { $cfg.mcpServers | Add-Member -NotePropertyName se -NotePropertyValue $se }
+    $cfg | ConvertTo-Json -Depth 10 | Out-File $cfgPath -Encoding utf8
     copilot
 } elseif (Get-Command claude -ErrorAction SilentlyContinue) {
     claude

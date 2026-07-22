@@ -1,0 +1,28 @@
+﻿{
+  "iteration": "i1-bootstrap",
+  "state": "verify",
+  "at": "2026-07-22T18:22:13.373Z",
+  "payload": {
+    "run_ref": "run-80119a7c6cce",
+    "command": "npm test --silent",
+    "exit": 0
+  },
+  "pinned_run": {
+    "ref": "run-80119a7c6cce",
+    "ts": "2026-07-22T18:22:13.372Z",
+    "se_version": "2.0.0-bootstrap",
+    "tool": "se.run",
+    "args": {
+      "command": "npm test --silent",
+      "cwd": "C:/Users/ichbi/Desktop/ai/quackitect-v2"
+    },
+    "ok": true,
+    "duration_ms": 3104,
+    "detail": {
+      "command": "npm test --silent",
+      "exit": 0,
+      "stdout": "âœ” dry_run -> execute applies create, edit and edge ops atomically (26.1557ms)\nâœ” mid-air collision dies at the write with a one-turn-recoverable rejection (12.4433ms)\nâœ” a stale hash cannot replay after a successful execute (9.7584ms)\nâœ” edge fields are writable only via edge ops (SE-C-011) (4.6189ms)\nâœ” delete removes the file; unknown ids are rejected (8.9709ms)\nâœ” get.node outline/section/full carry id + hash (5.7747ms)\nâœ” git layer works against a fixture repo (419.4518ms)\nâœ” repoRoot is null outside a work tree (34.5009ms)\nâœ” SE refuses to operate on its own repo (SE-C-001) (66.5391ms)\nâœ” allow_self flag overrides the self-repo refusal (0.1537ms)\nâœ” fixture repos are operable without a flag (273.8359ms)\nâœ” rebase and force-push are refused (SE-C-002) (0.3463ms)\nâœ” rejections carry the full required shape (0.1702ms)\nâœ” no shared utils package between modules (1.5032ms)\nâœ” dependency direction: kb imports nothing of se (sibling scan, best effort) (4.4129ms)\nâœ” se module declaration exists and declares the kb dependency (3.1217ms)\nâœ” kb module is importable through the workspace link (0.9307ms)\nâœ” the systematic machine passes load-time checks (1.3816ms)\nâœ” scripted walk closes a dummy iteration with no human and no agent (102.0583ms)\nâœ” a failing engine state is a normal Failed: fallback reopens, then escape records the guard (203.8269ms)\nâœ” evidence-form validation is field-targeted and one-turn recoverable (SE-C-030) (3.4401ms)\nâœ” one open iteration per worktree (SE-C-031); abandon is terminal and recorded (7.2791ms)\nâœ” every MCP tool call lands raw in the call log â€” successes and rejections (i1) (166.8511ms)\nâœ” initialize -> tools/list -> tools/call round trip over stdio (138.7116ms)\nâœ” a rejection arrives as an isError result carrying the executable remedy (143.8718ms)\nâœ” full write loop over MCP: dry_run then execute with the hash (141.7263ms)\nâœ” a v1 tree that breaks the P3 accounting fails the mint loudly (6.9245ms)\nâœ” the mint accounts 126/126 and is idempotent (empty diff on re-run) (669.4498ms)\nâœ” B5 pass: a console bless lands with channel + hash on the grant record (214.3633ms)\nâœ” a stale hash cannot bless; an expired offer is dismissal by absence (77.8114ms)\nâœ” the toll refuses once with the schema inline, and the paid call proceeds (4.7574ms)\nâœ” se.help: hits are affordances, misses are honest and logged as demand (2.785ms)\nâœ” se.wait returns on a mechanical file condition and refuses park-length waits (1582.2643ms)\nâœ” se.wait on the offer resolves when a bless lands (595.968ms)\nâœ” ledger loads, ids match paths, edges resolve (9.5546ms)\nâœ” hashes are stable across independent loads (5.9924ms)\nâœ” hash is over canonical form â€” CRLF and key order do not move it (0.4402ms)\nâœ” serialize -> parse round-trips to the same hash (0.3648ms)\nâœ” index rebuilds from files alone, and a fresh rebuild is identical (9.9946ms)\nâœ” unknown edge kinds are refused at parse (0.5043ms)\nâœ” missing breaks_if_removed on a requirement is a lint finding (4.0682ms)\nâ„¹ tests 41\nâ„¹ suites 0\nâ„¹ pass 41\nâ„¹ fail 0\nâ„¹ cancelled 0\nâ„¹ skipped 0\nâ„¹ todo 0\nâ„¹ duration_ms 2720.6869\n",
+      "stderr": ""
+    }
+  }
+}

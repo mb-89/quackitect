@@ -1,0 +1,13 @@
+{
+  "servers": {
+    "se": {
+      "type": "stdio",
+      "command": "node",
+      "args": [
+        "${workspaceFolder}/product/deliverable/bin/se-mcp.ts",
+        "--root",
+        "${workspaceFolder}"
+      ]
+    }
+  }
+}

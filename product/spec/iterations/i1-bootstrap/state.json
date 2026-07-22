@@ -1,19 +1,19 @@
-{
+﻿{
   "machine": "systematic",
-  "iteration": "i1",
+  "iteration": "i1-bootstrap",
   "current": "closed",
   "counters": {},
   "history": [
     {
       "state": "declare_goal",
       "outcome": "filled",
-      "evidence": "evidence/i1/01-declare_goal.json",
+      "evidence": "evidence/i1-bootstrap/01-declare_goal.json",
       "at": "2026-07-22T18:22:08.999Z"
     },
     {
       "state": "do_work",
       "outcome": "filled",
-      "evidence": "evidence/i1/02-do_work.json",
+      "evidence": "evidence/i1-bootstrap/02-do_work.json",
       "at": "2026-07-22T18:22:10.268Z"
     },
     {

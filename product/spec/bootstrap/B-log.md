@@ -273,3 +273,22 @@ here; v1 stays runnable on `main` until UC-4 passes.
   the workspace; verification lives in `npm run verify` (CI unchanged).
   Named residual: subprocess porosity, accepted per §14; belts are deny
   rules + AGENTS.md (rule extends to subagents) + logged dispatch.
+- **Copilot consumers (owner ruling):** RUNME launches Copilot when
+  found, else Claude. Copilot wiring: `.github/copilot-instructions.md`
+  is a thin shim to `workspace/AGENTS.md`; `.vscode/mcp.json` covers
+  VS Code; the CLI has NO repo-level MCP config yet
+  (github/copilot-cli#2528), so RUNME merges the `se` server into
+  `~/.copilot/mcp-config.json` with absolute paths, idempotently.
+  RUNME.sh dropped — Windows is the consumer base; cloud VMs get their
+  own startup lane later.
+- **Iterations carry names (owner ruling):** number + name, v1 style.
+  First iteration renamed `i1` → `i1-bootstrap` (dir + record fields).
+  Grandfather note: the recorded grant hash was computed when the
+  iteration was named `i1`; the record's `iteration` field was updated,
+  the hash left as history (adr-grandfathers-historical).
+- **Form of spec/ and deliverable/ is NOT final (owner):** accepted for
+  this iteration; the machinery to reshape it properly (refactor lane,
+  migrations, projections) arrives later, and reshaping is then a
+  normal gated move. The system works on itself.
+- **Repo-local `.se` deleted;** the i1 call log moved to
+  `~/.se/quackitect-v2/calls.jsonl` — the baseline series survives.
