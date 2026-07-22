@@ -15,6 +15,7 @@ import { help } from "./help.ts";
 import { seWait, type WaitCondition } from "./wait.ts";
 import { McpServer } from "./mcp.ts";
 import { layout } from "./layout.ts";
+import { boot, newSession, assertAdmitted, type Session } from "./boot.ts";
 import { listDeliverable, readDeliverable, writeDeliverable, patchDeliverable } from "./deliverable.ts";
 import { git, assertNotHistoryRewrite, assertNotPush } from "./git.ts";
 import { Rejection } from "./errors.ts";
@@ -22,8 +23,9 @@ import { Rejection } from "./errors.ts";
 registerMigration(v1Import);
 
 /** The tool surface bound to a repo root (spec/, product/, .se/). */
-export function coreTools(root: string, opts: { toll?: Toll } = {}): ToolDef[] {
+export function coreTools(root: string, opts: { toll?: Toll; session?: Session } = {}): ToolDef[] {
   const ledgerRoot = layout.ledger(root);
+  const session = opts.session ?? newSession();
   const loop = (): Loop => new Loop(root, systematic);
   const log = (): CallLog => new CallLog(layout.seDir(root));
   const tools: ToolDef[] = [
@@ -33,7 +35,30 @@ export function coreTools(root: string, opts: { toll?: Toll } = {}): ToolDef[] {
       description:
         "The entry point. Always callable, never errors. Returns the work packet for the current step: statement, guidance, evidence form, legal moves. Engine-filled states run mechanically before it returns.",
       inputSchema: { type: "object", properties: {} },
-      handler: () => loop().next(),
+      handler: () => {
+        if (!session.admitted) {
+          return {
+            kind: "instruction",
+            legal: ["se_boot {}"],
+            recommended: "se_boot",
+            note: "Unbooted session. The boot: se_boot returns the project + the contract + its hash; se_boot with contract_hash attests and admits you. Then next works.",
+          };
+        }
+        return loop().next();
+      },
+    },
+    {
+      name: "se_boot",
+      title: "se.boot",
+      description:
+        "The boot: log onto the project and receive the contract (general rules + voice). Call again with contract_hash to attest — that admits the session. One round-trip.",
+      inputSchema: {
+        type: "object",
+        properties: {
+          contract_hash: { type: "string", description: "the hash from the previous se_boot call — attesting it admits the session" },
+        },
+      },
+      handler: (args) => boot(root, session, args.contract_hash === undefined ? undefined : String(args.contract_hash)),
     },
     {
       name: "se_loop_start",
@@ -298,7 +323,9 @@ export function buildServer(root: string, opts: { tollWindowMs?: number; now?: (
     ...(opts.now ? { now: opts.now } : {}),
   });
   const log = new CallLog(layout.seDir(root));
-  const server = new McpServer({ name: "se-mcp", version: "2.0.0-bootstrap" }, coreTools(root, { toll }));
+  const session = newSession();
+  const server = new McpServer({ name: "se-mcp", version: "2.0.0-bootstrap" }, coreTools(root, { toll, session }));
+  server.addGuard((tool) => assertAdmitted(session, tool)); // §7 admission gates the surface
   server.addGuard((tool, args) => toll.check(tool, args, log));
   // §9 log-everything: every call through the single MCP path lands raw in
   // the call log — successes too, not just errors (i1 of self-hosting).

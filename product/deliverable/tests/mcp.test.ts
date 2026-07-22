@@ -70,6 +70,7 @@ function readCallLog(root: string): { tool: string; ok: boolean; detail?: { outc
 
 test("every MCP tool call lands raw in the call log — successes and rejections (i1)", async () => {
   await withServer(async (send, root) => {
+    await bootSession(send);
     await send({ method: "tools/call", params: { name: "se_get_node", arguments: { id: "se.adr-mcp" } } });
     await send({ method: "tools/call", params: { name: "se_get_node", arguments: { id: "se.nope" } } });
     const log = readCallLog(root);
@@ -79,6 +80,51 @@ test("every MCP tool call lands raw in the call log — successes and rejections
     assert.equal(calls[0].detail?.outcome, "result");
     assert.equal(calls[1].ok, false);
     assert.equal(calls[1].detail?.outcome, "rejected");
+  });
+});
+
+type Send = (msg: object) => Promise<Record<string, unknown>>;
+
+/** The session boot over the wire: contract -> attest. */
+async function bootSession(send: Send): Promise<void> {
+  const step1 = await send({ method: "tools/call", params: { name: "se_boot", arguments: {} } });
+  const payload = JSON.parse((step1.result as { content: { text: string }[] }).content[0].text) as {
+    contract_hash: string;
+  };
+  const step2 = await send({
+    method: "tools/call",
+    params: { name: "se_boot", arguments: { contract_hash: payload.contract_hash } },
+  });
+  const admitted = JSON.parse((step2.result as { content: { text: string }[] }).content[0].text) as { step: string };
+  assert.equal(admitted.step, "admitted");
+}
+
+test("an unbooted session is refused everywhere except next/boot/help", async () => {
+  await withServer(async (send) => {
+    const call = await send({
+      method: "tools/call",
+      params: { name: "se_get_node", arguments: { id: "se.adr-mcp" } },
+    });
+    const result = call.result as { isError: boolean; content: { text: string }[] };
+    assert.equal(result.isError, true);
+    const rej = JSON.parse(result.content[0].text) as { clause: string; remedy: { tool: string } };
+    assert.equal(rej.clause, "SE-C-005");
+    assert.equal(rej.remedy.tool, "se_boot");
+
+    const next = await send({ method: "tools/call", params: { name: "se_loop_next", arguments: {} } });
+    const packet = JSON.parse((next.result as { content: { text: string }[] }).content[0].text) as {
+      kind: string;
+      recommended: string;
+    };
+    assert.equal(packet.kind, "instruction");
+    assert.equal(packet.recommended, "se_boot");
+
+    await bootSession(send);
+    const after = await send({
+      method: "tools/call",
+      params: { name: "se_get_node", arguments: { id: "se.adr-mcp" } },
+    });
+    assert.equal((after.result as { isError: boolean }).isError, false);
   });
 });
 
@@ -97,6 +143,7 @@ test("initialize -> tools/list -> tools/call round trip over stdio", async () =>
     assert.ok(names.includes("se_get_node") && names.includes("se_set_apply") && names.includes("se_help"));
     assert.equal(tools.find((t) => t.name === "se_get_node")!.title, "se.get.node");
 
+    await bootSession(send);
     const call = await send({
       method: "tools/call",
       params: { name: "se_get_node", arguments: { id: "se.adr-mcp" } },
@@ -111,6 +158,7 @@ test("initialize -> tools/list -> tools/call round trip over stdio", async () =>
 
 test("a rejection arrives as an isError result carrying the executable remedy", async () => {
   await withServer(async (send) => {
+    await bootSession(send);
     const call = await send({
       method: "tools/call",
       params: { name: "se_get_node", arguments: { id: "se.does-not-exist" } },
@@ -126,6 +174,7 @@ test("a rejection arrives as an isError result carrying the executable remedy", 
 
 test("full write loop over MCP: dry_run then execute with the hash", async () => {
   await withServer(async (send) => {
+    await bootSession(send);
     const ops = [{ op: "set_field", id: "se.adr-mcp", field: "statement", value: "Amended over MCP." }];
     const dry = await send({
       method: "tools/call",
