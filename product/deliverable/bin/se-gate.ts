@@ -8,7 +8,7 @@ import { resolve } from "node:path";
 import { createInterface } from "node:readline";
 import { hostname, userInfo } from "node:os";
 import { Gate } from "../engine/gate.ts";
-import { systematic } from "../engine/machines/systematic.ts";
+import { requireSystematic } from "../engine/machines/load.ts";
 
 const args = process.argv.slice(2);
 const flagIdx = args.indexOf("--root");
@@ -31,7 +31,7 @@ if (args.includes("--dismiss")) {
 // question — pasting the hash back is the same affirmative act.
 const blessIdx = args.indexOf("--bless");
 if (blessIdx !== -1) {
-  const grant = gate.bless(systematic, args[blessIdx + 1] ?? "", {
+  const grant = gate.bless(requireSystematic(root), args[blessIdx + 1] ?? "", {
     channel: "tty",
     adjudicated_by: `${userInfo().username}@${hostname()}`,
   });
@@ -47,7 +47,7 @@ const rl = createInterface({ input: process.stdin, output: process.stdout });
 rl.question("bless as offered? [y/N] ", (answer) => {
   rl.close();
   if (answer.trim().toLowerCase() === "y") {
-    const grant = gate.bless(systematic, offer.base_hash, {
+    const grant = gate.bless(requireSystematic(root), offer.base_hash, {
       channel: "tty",
       adjudicated_by: `${userInfo().username}@${hostname()}`,
     });

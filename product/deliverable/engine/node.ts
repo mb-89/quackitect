@@ -25,6 +25,9 @@ export interface LedgerNode {
   body: string;
   /** Content hash over the serialized file (LF-normalized). */
   hash: string;
+  /** Canvas-format nodes (engine/canvas.ts): the parsed Advanced JSON Canvas payload. */
+  format?: "canvas";
+  canvas?: unknown;
 }
 
 export class NodeParseError extends Error {
@@ -38,7 +41,7 @@ export class NodeParseError extends Error {
 
 const ENVELOPE_KEYS = new Set(["id", "kind", "statement", "provenance", "breaks_if_removed", "edges", "migrated_from_v1"]);
 
-const ID_RE = /^[a-z0-9]+(\.[a-z0-9][a-z0-9-]*)+$/;
+export const ID_RE = /^[a-z0-9]+(\.[a-z0-9][a-z0-9-]*)+$/;
 
 export function parseNode(raw: string, file: string): LedgerNode {
   const text = raw.replace(/\r\n/g, "\n");

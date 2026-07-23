@@ -3,6 +3,7 @@
 import { readdirSync, readFileSync, existsSync } from "node:fs";
 import { join, basename } from "node:path";
 import { parseNode, type LedgerNode } from "./node.ts";
+import { parseCanvasNode } from "./canvas.ts";
 
 export interface LintFinding {
   node: string;
@@ -25,10 +26,13 @@ export function loadLedger(root: string): Ledger {
     if (!moduleEntry.isDirectory()) continue;
     const moduleDir = join(root, moduleEntry.name);
     for (const f of readdirSync(moduleDir, { withFileTypes: true })) {
-      if (!f.isFile() || !f.name.endsWith(".md")) continue;
+      if (!f.isFile()) continue;
+      const isCanvas = f.name.endsWith(".canvas");
+      if (!f.name.endsWith(".md") && !isCanvas) continue;
       const file = join(moduleDir, f.name);
-      const node = parseNode(readFileSync(file, "utf8"), file);
-      const expectedId = `${moduleEntry.name}.${basename(f.name, ".md")}`;
+      const raw = readFileSync(file, "utf8");
+      const node = isCanvas ? parseCanvasNode(raw, file) : parseNode(raw, file);
+      const expectedId = `${moduleEntry.name}.${basename(f.name, isCanvas ? ".canvas" : ".md")}`;
       if (node.id !== expectedId) {
         throw new Error(`${file}: id ${node.id} does not match path (expected ${expectedId})`);
       }

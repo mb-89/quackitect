@@ -11,8 +11,10 @@ import { once } from "node:events";
 process.env.SE_STATE_DIR = mkdtempSync(join(tmpdir(), "se-state-"));
 import { Loop } from "../engine/loop.ts";
 import { layout } from "../engine/layout.ts";
-import { systematic } from "../engine/machines/systematic.ts";
+import { loadSystematic } from "../engine/machines/load.ts";
 import type { MachineDecl } from "../engine/machine.ts";
+
+const systematic = loadSystematic(join(import.meta.dirname, "..", "..", ".."))!;
 
 const OK = `node -e "process.exit(0)"`;
 const machineOK = (): MachineDecl => ({

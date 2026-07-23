@@ -13,12 +13,14 @@ import { Rejection } from "./errors.ts";
 import { sha256 } from "./hash.ts";
 import { EDGE_KIND_NAMES } from "./edges.ts";
 import { parseNode, serializeNode, type LedgerNode } from "./node.ts";
+import { parseCanvasNode, serializeCanvasNode } from "./canvas.ts";
 import { loadLedger } from "./store.ts";
 import { replaceSection } from "./sections.ts";
 import type { YamliteValue } from "./yamlite.ts";
 
 export type ApplyOp =
   | { op: "create"; id: string; kind: string; statement: string; provenance?: Record<string, string>; breaks_if_removed?: string; extra?: Record<string, YamliteValue>; body?: string }
+  | { op: "write_canvas"; id: string; canvas: unknown }
   | { op: "delete"; id: string }
   | { op: "set_field"; id: string; field: string; value: YamliteValue }
   | { op: "replace_section"; id: string; section: string; content: string }
@@ -26,7 +28,7 @@ export type ApplyOp =
   | { op: "remove_edge"; id: string; kind: string; target: string };
 
 export interface DiffEntry {
-  /** Ledger-relative file path, `<module>/<localId>.md`. */
+  /** Ledger-relative file path, `<module>/<localId>.md` or `.canvas`. */
   file: string;
   /** Canonical node hash before, or null when the file is being created. */
   old_hash: string | null;
@@ -58,9 +60,21 @@ function reject(clause: string, expected: string, got: string, remedyArgs: Recor
   });
 }
 
-function nodePath(id: string): string {
-  const dot = id.indexOf(".");
-  return `${id.slice(0, dot)}/${id.slice(dot + 1)}.md`;
+function nodeFile(n: LedgerNode): string {
+  return `${n.module}/${n.localId}.${n.format === "canvas" ? "canvas" : "md"}`;
+}
+
+function serialize(n: LedgerNode): string {
+  return n.format === "canvas" ? serializeCanvasNode(n) : serializeNode(n);
+}
+
+/** Drawings hold no fields or sections to edit in place; the canvas is the unit. */
+function refuseOnCanvas(n: LedgerNode, op: string): void {
+  if (n.format === "canvas") {
+    reject("SE-C-067", `a markdown node for op ${op}`, `${n.id} is a canvas node`,
+      { ops: [{ op: "write_canvas", id: n.id, canvas: "<the full canvas payload>" }], dry_run: true },
+      "canvas nodes change as a whole: write_canvas replaces the drawing, delete removes it");
+  }
 }
 
 /** Pure: compute the diff an op list produces over the current ledger. */
@@ -68,9 +82,11 @@ export function computeDiff(ledgerRoot: string, ops: ApplyOp[]): DiffEntry[] {
   const ledger = loadLedger(ledgerRoot);
   const working = new Map<string, LedgerNode>();
   const beforeHash = new Map<string, string>();
+  const fileOf = new Map<string, string>();
   for (const [id, n] of ledger.nodes) {
     working.set(id, n);
     beforeHash.set(id, n.hash);
+    fileOf.set(id, nodeFile(n));
   }
   const deleted = new Set<string>();
 
@@ -88,7 +104,7 @@ export function computeDiff(ledgerRoot: string, ops: ApplyOp[]): DiffEntry[] {
     return n;
   };
 
-  const reparse = (n: LedgerNode): LedgerNode => parseNode(serializeNode(n), nodePath(n.id));
+  const reparse = (n: LedgerNode): LedgerNode => parseNode(serializeNode(n), nodeFile(n));
 
   for (const op of ops) {
     switch (op.op) {
@@ -110,7 +126,32 @@ export function computeDiff(ledgerRoot: string, ops: ApplyOp[]): DiffEntry[] {
           ...(op.breaks_if_removed !== undefined ? { breaks_if_removed: op.breaks_if_removed } : {}),
         };
         deleted.delete(op.id);
-        working.set(op.id, reparse(draft as LedgerNode));
+        const node = reparse(draft as LedgerNode);
+        working.set(op.id, node);
+        fileOf.set(op.id, nodeFile(node));
+        break;
+      }
+      case "write_canvas": {
+        const existing = working.get(op.id);
+        if (existing !== undefined && !deleted.has(op.id) && existing.format !== "canvas") {
+          reject("SE-C-067", "a canvas node (or a fresh id) for write_canvas", `${op.id} exists as markdown`,
+            { ops: [], dry_run: true }, "delete the markdown node first, or pick a fresh id");
+        }
+        let node: LedgerNode;
+        try {
+          node = parseCanvasNode(JSON.stringify(op.canvas), `${op.id}.canvas`);
+        } catch (e) {
+          reject("SE-C-066", "a valid Advanced JSON Canvas payload (pinned version, frontmatter id/kind/statement)",
+            String((e as Error).message), { ops: [], dry_run: true },
+            "fix the canvas payload and re-send");
+        }
+        if (node.id !== op.id) {
+          reject("SE-C-066", `frontmatter id ${op.id}`, node.id, { ops: [], dry_run: true },
+            "the canvas frontmatter id must match the op id");
+        }
+        deleted.delete(op.id);
+        working.set(op.id, node);
+        fileOf.set(op.id, nodeFile(node));
         break;
       }
       case "delete": {
@@ -120,6 +161,7 @@ export function computeDiff(ledgerRoot: string, ops: ApplyOp[]): DiffEntry[] {
       }
       case "set_field": {
         const base = mustGet(op.id, "set_field");
+        refuseOnCanvas(base, "set_field");
         const n = { ...base, provenance: { ...base.provenance }, edges: { ...base.edges }, extra: { ...base.extra } };
         if (op.field === "edges" || EDGE_KIND_NAMES.has(op.field)) {
           reject("SE-C-011", "edge writes via add_edge/remove_edge only", `set_field on ${op.field}`,
@@ -139,7 +181,9 @@ export function computeDiff(ledgerRoot: string, ops: ApplyOp[]): DiffEntry[] {
         break;
       }
       case "replace_section": {
-        const n = { ...mustGet(op.id, "replace_section") };
+        const base = mustGet(op.id, "replace_section");
+        refuseOnCanvas(base, "replace_section");
+        const n = { ...base };
         try {
           n.body = replaceSection(n.body, op.section, op.content);
         } catch {
@@ -152,6 +196,7 @@ export function computeDiff(ledgerRoot: string, ops: ApplyOp[]): DiffEntry[] {
       case "add_edge":
       case "remove_edge": {
         const base = mustGet(op.id, op.op);
+        refuseOnCanvas(base, op.op);
         const n = { ...base, edges: { ...base.edges } };
         if (!EDGE_KIND_NAMES.has(op.kind)) {
           reject("SE-C-016", `an edge kind from the vocabulary`, op.kind, { ops: [], dry_run: true },
@@ -178,13 +223,13 @@ export function computeDiff(ledgerRoot: string, ops: ApplyOp[]): DiffEntry[] {
 
   const diff: DiffEntry[] = [];
   for (const id of deleted) {
-    diff.push({ file: nodePath(id), old_hash: beforeHash.get(id) ?? null, new_content: null });
+    diff.push({ file: fileOf.get(id)!, old_hash: beforeHash.get(id) ?? null, new_content: null });
   }
   for (const [id, n] of working) {
     if (deleted.has(id)) continue;
     const before = beforeHash.get(id) ?? null;
     if (before !== n.hash) {
-      diff.push({ file: nodePath(id), old_hash: before, new_content: serializeNode(n) });
+      diff.push({ file: fileOf.get(id)!, old_hash: before, new_content: serialize(n) });
     }
   }
   diff.sort((a, b) => a.file.localeCompare(b.file));
@@ -236,7 +281,8 @@ export function execute(ledgerRoot: string, ops: ApplyOp[], executeHash: string)
     const abs = join(ledgerRoot, d.file);
     // CAS per file, checked again at write time.
     if (d.old_hash !== null) {
-      const onDisk = parseNode(readFileSync(abs, "utf8"), d.file).hash;
+      const raw = readFileSync(abs, "utf8");
+      const onDisk = (d.file.endsWith(".canvas") ? parseCanvasNode(raw, d.file) : parseNode(raw, d.file)).hash;
       if (onDisk !== d.old_hash) {
         throw new Rejection({
           clause: "SE-C-010",

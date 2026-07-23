@@ -84,13 +84,16 @@ if (args.includes("--child")) {
   const rl = createInterface({ input: process.stdin, terminal: false });
   rl.on("line", (line) => {
     if (line.trim() === "") return;
+    // The restart check runs BEFORE this request joins the pending set —
+    // otherwise no moment is ever quiet and the child never restarts.
+    const c = ensureChild();
     try {
       const id = (JSON.parse(line) as { id?: number | string | null }).id;
       if (id !== undefined && id !== null) pending.add(id);
     } catch {
       // the child answers parse errors itself
     }
-    ensureChild().stdin!.write(line + "\n");
+    c.stdin!.write(line + "\n");
   });
   rl.on("close", () => {
     child?.kill();

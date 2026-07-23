@@ -8,8 +8,7 @@ import { Gate, type GrantRecord, type Offer } from "./gate.ts";
 import { readJsonFile, stripBom } from "./jsonio.ts";
 import { layout } from "./layout.ts";
 import type { MachineInstance } from "./machine.ts";
-import { systematic } from "./machines/systematic.ts";
-import { sessionMachine } from "./machines/session.ts";
+import { loadSession, loadSystematic } from "./machines/load.ts";
 import { loadModules, type ModuleStatus } from "./modules.ts";
 import type { TollUpdate } from "./toll.ts";
 
@@ -111,6 +110,9 @@ export function projectState(root: string): ProjectionState {
   const nameplate = layout.nameplatePath(abs);
   const product = existsSync(nameplate) ? readJsonFile<{ product?: string }>(nameplate).product ?? basename(abs) : basename(abs);
 
+  const sysMachine = loadSystematic(abs);
+  const sesMachine = loadSession(abs);
+
   const tollPath = join(layout.seDir(abs), "toll.json");
   type TollFile = { last_update_ts: number; last_update?: TollUpdate & { todo?: string[] } };
   const toll = existsSync(tollPath) ? readJsonFile<TollFile>(tollPath) : undefined;
@@ -149,7 +151,10 @@ export function projectState(root: string): ProjectionState {
         status: inst.status,
         current: inst.current,
         ...(goal !== undefined ? { goal } : {}),
-        steps: systematic.states.filter((s) => s.kind !== "terminal").map((s) => ({ state: s.id, done: done.has(s.id) })),
+        steps:
+          sysMachine !== null
+            ? sysMachine.states.filter((s) => s.kind !== "terminal").map((s) => ({ state: s.id, done: done.has(s.id) }))
+            : [...done].map((state) => ({ state, done: true })),
         ...(updatedAt !== undefined ? { updated_at: updatedAt } : {}),
         worked_on:
           inst.status === "open" && heartbeat !== null && heartbeat.age_s < HEARTBEAT_FRESH_S,
@@ -207,13 +212,15 @@ export function projectState(root: string): ProjectionState {
     });
 
   const openView = iterations.find((it) => it.status === "open");
-  const sessionCurrent = openView !== undefined ? "iteration" : sessionStarted !== null ? "idle" : "lock_on";
-  const sessionIdx = sessionMachine.states.findIndex((s) => s.id === sessionCurrent);
-  const machineStack: MachineFrame[] = [
-    {
-      id: sessionMachine.id,
+  const machineStack: MachineFrame[] = [];
+  if (sesMachine !== null) {
+    const nestedState = sesMachine.states.find((s) => s.submachine !== undefined)?.id ?? "idle";
+    const sessionCurrent = openView !== undefined ? nestedState : sessionStarted !== null ? "idle" : "lock_on";
+    const sessionIdx = sesMachine.states.findIndex((s) => s.id === sessionCurrent);
+    machineStack.push({
+      id: sesMachine.id,
       current: sessionCurrent,
-      states: sessionMachine.states.map((s, i) => ({
+      states: sesMachine.states.map((s, i) => ({
         id: s.id,
         kind: s.kind,
         ...(s.group !== undefined ? { group: s.group } : {}),
@@ -221,14 +228,14 @@ export function projectState(root: string): ProjectionState {
         statement: s.statement,
         guidance: s.guidance,
       })),
-    },
-  ];
-  if (openView !== undefined) {
+    });
+  }
+  if (openView !== undefined && sysMachine !== null) {
     const filled = new Set(openView.steps.filter((st) => st.done).map((st) => st.state));
     machineStack.push({
-      id: systematic.id,
+      id: sysMachine.id,
       current: openView.current,
-      states: systematic.states.map((s) => ({
+      states: sysMachine.states.map((s) => ({
         id: s.id,
         kind: s.kind,
         ...(s.group !== undefined ? { group: s.group } : {}),

@@ -11,7 +11,7 @@ import type { ToolDef } from "./mcp.ts";
 import { migrateDryRun, migrateExecute, registerMigration } from "./migrate.ts";
 import { v1Import } from "./migrations/v1-import.ts";
 import { Loop } from "./loop.ts";
-import { systematic } from "./machines/systematic.ts";
+import { loadSystematic, requireSystematic } from "./machines/load.ts";
 import { CallLog } from "./calllog.ts";
 import { Toll, TOLL_UPDATE_SCHEMA } from "./toll.ts";
 import { help } from "./help.ts";
@@ -30,7 +30,7 @@ registerMigration(v1Import);
 export function coreTools(root: string, opts: { toll?: Toll; session?: Session } = {}): ToolDef[] {
   const ledgerRoot = layout.ledger(root);
   const session = opts.session ?? newSession();
-  const loop = (): Loop => new Loop(root, systematic);
+  const loop = (): Loop => new Loop(root, requireSystematic(root));
   const log = (): CallLog => new CallLog(layout.seDir(root));
   const tools: ToolDef[] = [
     {
@@ -343,7 +343,7 @@ export function coreTools(root: string, opts: { toll?: Toll; session?: Session }
         required: ["hash"],
       },
       handler: (args) => {
-        const grant = new Gate(root).bless(systematic, String(args.hash), { channel: "chat", adjudicated_by: "owner" });
+        const grant = new Gate(root).bless(requireSystematic(root), String(args.hash), { channel: "chat", adjudicated_by: "owner" });
         return { grant, next: loop().next() };
       },
     },
@@ -359,7 +359,7 @@ export function coreTools(root: string, opts: { toll?: Toll; session?: Session }
         },
         required: ["query", "intent"],
       },
-      handler: (args) => help(String(args.query), String(args.intent), tools, systematic, log()),
+      handler: (args) => help(String(args.query), String(args.intent), tools, loadSystematic(root), log()),
     },
     {
       name: "se_wait",

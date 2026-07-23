@@ -1,0 +1,69 @@
+{
+	"metadata": {
+		"version": "1.0-1.0",
+		"frontmatter": {
+			"id": "se.machine-offer",
+			"kind": "machine",
+			"statement": "The offer: waiting, then accepted or gone - absence is dismissal.",
+			"entry": "waiting",
+			"reentry": "restart"
+		}
+	},
+	"nodes": [
+		{
+			"id": "n-waiting",
+			"type": "file",
+			"file": "spec/ledger/se/machine-offer-waiting.md",
+			"x": 0,
+			"y": 0,
+			"width": 420,
+			"height": 140
+		},
+		{
+			"id": "n-accepted",
+			"type": "file",
+			"file": "spec/ledger/se/machine-offer-accepted.md",
+			"x": -260,
+			"y": 260,
+			"width": 420,
+			"height": 140,
+			"styleAttributes": {
+				"shape": "terminal"
+			}
+		},
+		{
+			"id": "n-dismissed",
+			"type": "file",
+			"file": "spec/ledger/se/machine-offer-dismissed.md",
+			"x": 260,
+			"y": 260,
+			"width": 420,
+			"height": 140,
+			"styleAttributes": {
+				"shape": "terminal"
+			}
+		}
+	],
+	"edges": [
+		{
+			"id": "e-w-a",
+			"fromNode": "n-waiting",
+			"fromSide": "bottom",
+			"toNode": "n-accepted",
+			"toSide": "top",
+			"styleAttributes": {
+				"role": "approval"
+			}
+		},
+		{
+			"id": "e-w-d",
+			"fromNode": "n-waiting",
+			"fromSide": "bottom",
+			"toNode": "n-dismissed",
+			"toSide": "top",
+			"styleAttributes": {
+				"role": "alternative"
+			}
+		}
+	]
+}

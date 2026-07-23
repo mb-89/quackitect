@@ -16,7 +16,7 @@ export function help(
   query: string,
   intent: string,
   tools: ToolDef[],
-  machine: MachineDecl,
+  machine: MachineDecl | null,
   log: CallLog,
 ): HelpResult {
   const terms = query.toLowerCase().split(/\s+/).filter((t) => t.length > 1);
@@ -30,7 +30,7 @@ export function help(
     .sort((a, b) => b.s - a.s)
     .slice(0, 5)
     .map((x) => ({ tool: x.t.name, title: x.t.title, description: x.t.description }));
-  const guidanceHits = machine.states
+  const guidanceHits = (machine === null ? [] : machine.states)
     .map((s) => ({ s, n: score(`${s.id} ${s.statement} ${s.guidance}`) }))
     .filter((x) => x.n > 0)
     .sort((a, b) => b.n - a.n)

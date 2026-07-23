@@ -1,0 +1,29 @@
+/* @advanced-canvas-edge-style
+key: role
+label: Role
+options:
+  -
+    label: Normal
+    value: null
+    icon: arrow-right
+  -
+    label: Alternative
+    value: alternative
+    icon: split
+  -
+    label: Fallback
+    value: fallback
+    icon: undo-2
+  -
+    label: Recovery
+    value: recovery
+    icon: life-buoy
+  -
+    label: Approval
+    value: approval
+    icon: circle-check
+  -
+    label: Error
+    value: error
+    icon: circle-x
+*/

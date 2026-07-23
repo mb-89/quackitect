@@ -9,9 +9,12 @@ import { join } from "node:path";
 import { Loop } from "../engine/loop.ts";
 import { Gate } from "../engine/gate.ts";
 import { layout } from "../engine/layout.ts";
-import { systematic } from "../engine/machines/systematic.ts";
+import { loadSystematic } from "../engine/machines/load.ts";
 
 process.env.SE_STATE_DIR = mkdtempSync(join(tmpdir(), "se-state-"));
+// The drawn machine from this repo's own ledger IS the fixture: tests
+// compile the real canvas, so breaking the drawing breaks the suite.
+const systematic = loadSystematic(join(import.meta.dirname, "..", "..", ".."))!;
 import { validateMachine, type MachineDecl } from "../engine/machine.ts";
 import { Rejection } from "../engine/errors.ts";
 

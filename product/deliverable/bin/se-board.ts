@@ -17,7 +17,7 @@ import { spawn } from "node:child_process";
 import { createServer } from "node:http";
 import { resolve } from "node:path";
 import { Gate } from "../engine/gate.ts";
-import { systematic } from "../engine/machines/systematic.ts";
+import { requireSystematic } from "../engine/machines/load.ts";
 import { BOARD_PORT } from "../engine/board.ts";
 import { projectState, BOARD_VERSION } from "../engine/project.ts";
 import { Rejection } from "../engine/errors.ts";
@@ -423,7 +423,7 @@ const server = createServer(async (req, res) => {
       res.end(JSON.stringify({ viewer_recent: viewerRecent, opened: !viewerRecent && !noOpen }));
     } else if (req.method === "POST" && req.url === "/bless") {
       const { hash } = JSON.parse(await readBody(req)) as { hash: string };
-      const grant = new Gate(root).bless(systematic, hash, { channel: "board", adjudicated_by: "owner" });
+      const grant = new Gate(root).bless(requireSystematic(root), hash, { channel: "board", adjudicated_by: "owner" });
       res.writeHead(200, { "content-type": "application/json" });
       res.end(JSON.stringify({ blessed: true, grant }));
     } else if (req.method === "POST" && req.url === "/dismiss") {

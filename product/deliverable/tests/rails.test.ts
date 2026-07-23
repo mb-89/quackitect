@@ -16,11 +16,12 @@ import { help } from "../engine/help.ts";
 import { seWait } from "../engine/wait.ts";
 import { coreTools } from "../engine/tools.ts";
 import { layout } from "../engine/layout.ts";
-import { systematic } from "../engine/machines/systematic.ts";
+import { loadSystematic } from "../engine/machines/load.ts";
 import { Rejection } from "../engine/errors.ts";
 import type { MachineDecl } from "../engine/machine.ts";
 
 process.env.SE_STATE_DIR = mkdtempSync(join(tmpdir(), "se-state-"));
+const systematic = loadSystematic(join(import.meta.dirname, "..", "..", ".."))!;
 
 const OK = `node -e "process.exit(0)"`;
 
