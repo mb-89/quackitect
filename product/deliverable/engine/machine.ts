@@ -31,6 +31,8 @@ export interface EdgeDecl {
 export interface StateDecl {
   id: string;
   kind: "work" | "gate" | "terminal";
+  /** Diagram grouping, e.g. "boot" — presentation metadata, no run-time meaning. */
+  group?: string;
   statement: string;
   filled_by: "agent" | "engine";
   /** Declared on the state, never invented at run time (engine-filled only). */

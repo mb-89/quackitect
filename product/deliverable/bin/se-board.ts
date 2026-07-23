@@ -1,12 +1,13 @@
 #!/usr/bin/env node
 // se-board — the live state board (owner sketch: status-dashboard).
-// Layout is the owner's ruling, redline round 4: narrow resizable sidebars.
-// Middle splits at 500px: state-machine column (browsable stack, current
-// state lit) beside the train-of-thought column (current state / log / log
-// details in thirds); below 500px the two collapse into sub-tabs per agent.
-// Log: one line per command — a command and its response are one thing.
-// Right sidebar, fixed thirds: decisions (a bless is one card, one shown
-// at a time) / notes / details (the generic click fallback). No footer.
+// Layout is the owner's ruling, redline round 5: narrow resizable sidebars.
+// The agent tab (mallard) tops the middle; under it, state machine and
+// train of thought — side by side when both columns get 500px, sub-tabs
+// otherwise. The state machine renders as a diagram: start dot, boxed
+// states, dashed groups, terminal end node. Log and notes are uniform
+// tables with headers and filters; filter help lands in the generic
+// details, log rows in the dedicated log details, notes rows generic.
+// Right sidebar, fixed thirds: decisions / notes / details. No footer.
 // The bless button is an owner act on the owner's own channel: channel=board.
 // Zero deps. Port in use = another board is up: exit silently.
 import { spawn } from "node:child_process";
@@ -66,20 +67,32 @@ const PAGE = `<!doctype html>
   .max { margin-left: auto; border: none; background: none; color: var(--dim); cursor: pointer; font-size: 13px; padding: 0 .2em; }
   .max:hover { color: #1e1e1e; }
   .body { flex: 1; min-height: 0; overflow-y: auto; }
+  #agentbar { padding: .4em .7em 0; background: #fff; }
+  #tabs { display: flex; gap: .3em; border-bottom: 1px solid var(--line); }
+  #subtabbar { display: none; padding: .3em .7em 0; background: #fff; border-bottom: 1px solid var(--line); }
+  body.mid-narrow #subtabbar { display: flex; gap: .3em; }
+  .tab { padding: .25em .9em; border: 1px solid var(--line); border-bottom: none; border-radius: 6px 6px 0 0; background: #fff; font-size: 12px; cursor: pointer; }
+  .tab.active { border-color: var(--mark); color: var(--mark); }
   #midsplit { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
   body.mid-narrow #midsplit { grid-template-columns: minmax(0, 1fr); }
   #sm-col { display: flex; flex-direction: column; min-height: 0; border-right: 1px solid var(--line); }
   body.mid-narrow #sm-col { border-right: none; }
   #tot-col { display: flex; flex-direction: column; min-height: 0; }
-  #tabs { display: flex; gap: .3em; border-bottom: 1px solid var(--line); }
-  #tabslot-wide { padding: .4em .7em 0; }
-  #tabslot-narrow { padding: .4em .7em 0; border-bottom: 1px solid var(--line); background: #fff; }
-  .tab { padding: .25em .9em; border: 1px solid var(--line); border-bottom: none; border-radius: 6px 6px 0 0; background: #fff; font-size: 12px; cursor: pointer; }
-  .tab.active { border-color: var(--mark); color: var(--mark); }
-  #subtabs { display: flex; gap: .3em; margin-top: .3em; }
   #smcrumb { margin-bottom: .4em; font-size: 12px; }
   .crumb { cursor: pointer; color: var(--dim); }
   .crumb.active { color: var(--mark); font-weight: 600; }
+  .smwrap { display: flex; flex-direction: column; align-items: center; padding: .3em 0; }
+  .smstart { width: .8em; height: .8em; border-radius: 50%; background: #1e1e1e; }
+  .smend { width: 1.1em; height: 1.1em; border-radius: 50%; border: 2px solid #1e1e1e; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+  .smend::after { content: ""; width: .5em; height: .5em; border-radius: 50%; background: #1e1e1e; }
+  .smend.current { border-color: var(--warn); animation: pulse 1.2s ease-in-out infinite; }
+  .smend.done { border-color: var(--ok); }
+  .smconn { color: var(--dim); font-size: 10px; line-height: 1.2; }
+  .smnode { border: 1.5px solid #9a9a9a; border-radius: 10px; padding: .2em 1.1em; margin: .05em 0; cursor: pointer; background: #fff; min-width: 9em; text-align: center; }
+  .smnode.done { border-color: var(--ok); background: #eaf4ea; }
+  .smnode.current { border-color: var(--warn); background: #fdf6e0; animation: pulse 1.2s ease-in-out infinite; }
+  .smgroup { border: 1px dashed #9a9a9a; border-radius: 10px; padding: .3em .8em .45em; margin: .05em 0; display: flex; flex-direction: column; align-items: center; }
+  .smglabel { font-size: 10px; text-transform: uppercase; letter-spacing: .06em; color: var(--dim); align-self: flex-start; margin-bottom: .15em; }
   .iterrow { display: flex; align-items: center; gap: .5em; padding: .18em .3em; cursor: pointer; border-radius: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .iterrow:hover { background: #eef; }
   .led { width: .6em; height: .6em; border-radius: 50%; background: #e4e4e4; flex: 0 0 auto; }
@@ -91,17 +104,17 @@ const PAGE = `<!doctype html>
   ul.todo { list-style: none; padding-left: .2em; font-size: 13px; }
   .tick { color: var(--ok); }
   .cross { color: var(--bad); }
-  #filter { width: 100%; padding: .3em; margin-bottom: .4em; border: 1px solid var(--line); border-radius: 4px; }
-  .lrow { display: grid; grid-template-columns: 4.8em 4.5em 3em minmax(7em, 10em) 1fr 6em; gap: .5em; font: 12px ui-monospace, monospace; cursor: pointer; white-space: nowrap; padding: .08em .2em; }
-  .lrow:hover { background: #eef; }
-  .lrow span { overflow: hidden; text-overflow: ellipsis; }
-  .lhead { font-weight: 600; color: var(--dim); cursor: default; }
-  .lhead:hover { background: none; }
+  .tfilter { width: 100%; padding: .3em; margin-bottom: .4em; border: 1px solid var(--line); border-radius: 4px; }
+  .trow { display: grid; gap: .5em; font: 12px ui-monospace, monospace; cursor: pointer; white-space: nowrap; padding: .08em .2em; }
+  .trow:hover { background: #eef; }
+  .trow span { overflow: hidden; text-overflow: ellipsis; }
+  .trow.log { grid-template-columns: 4.8em 4.5em 3em minmax(7em, 12em) 1fr; }
+  .trow.note { grid-template-columns: 5.5em 1fr; }
+  .thead { font-weight: 600; color: var(--dim); cursor: default; }
+  .thead:hover { background: none; }
   #details pre, #logdetail pre, #modalbody pre { white-space: pre-wrap; word-break: break-word; font-size: 12px; background: #fff; border: 1px solid var(--line); border-radius: 6px; padding: .5em; }
   .card { background: #fff; border: 1px solid var(--line); border-radius: 6px; padding: .5em .6em; margin-bottom: .5em; }
   .card pre { max-height: 9em; overflow-y: auto; white-space: pre-wrap; word-break: break-word; font-size: 11px; margin: .4em 0; }
-  .call { padding: .1em .2em; cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 13px; }
-  .call:hover { background: #eef; }
   button { padding: .4em 1em; border: 1px solid var(--line); border-radius: 6px; cursor: pointer; background: #fff; }
   #blessBtn { background: var(--ok); color: #fff; border-color: var(--ok); }
   .dim { color: var(--dim); font-size: 12px; }
@@ -124,21 +137,19 @@ const PAGE = `<!doctype html>
   </div>
   <div class="gutter" id="gl"></div>
   <div class="col">
-    <div id="tabslot-narrow" style="display:none">
-      <div id="subtabs"><span class="tab" id="st-sm" onclick="setSub('sm')">state machine</span><span class="tab" id="st-tot" onclick="setSub('tot')">train of thought</span></div>
-    </div>
+    <div id="agentbar"><div id="tabs"></div></div>
+    <div id="subtabbar"><span class="tab" id="st-sm" onclick="setSub('sm')">state machine</span><span class="tab" id="st-tot" onclick="setSub('tot')">train of thought</span></div>
     <div id="midsplit">
       <div id="sm-col">
-        <div id="tabslot-wide"><div id="tabs"></div></div>
         <div class="pane" id="p-sm"><h2>State machine<button class="max" onclick="maximize('p-sm')">⛶</button></h2>
           <div id="smcrumb"></div>
           <div class="body" id="smlist"></div></div>
       </div>
       <div id="tot-col">
-        <div class="pane" id="p-tot"><h2>Current state<button class="max" onclick="maximize('p-tot')">⛶</button></h2>
+        <div class="pane" id="p-tot"><h2>Last update<button class="max" onclick="maximize('p-tot')">⛶</button></h2>
           <div class="body" id="tot"></div></div>
         <div class="pane" id="p-log"><h2>Log<button class="max" onclick="maximize('p-log')">⛶</button></h2>
-          <input id="filter" placeholder="filter — click for help">
+          <input id="lfilter" class="tfilter" placeholder="filter — click for help">
           <div class="body" id="feed"></div></div>
         <div class="pane" id="p-logdetail"><h2>Log details<button class="max" onclick="maximize('p-logdetail')">⛶</button></h2>
           <div class="body" id="logdetail"><pre>click a log row</pre></div></div>
@@ -150,6 +161,7 @@ const PAGE = `<!doctype html>
     <div class="pane" id="p-decisions"><h2>Decisions<span id="decnav" style="margin-left:.6em; display:none"><button class="max" onclick="decStep(-1)">◀</button><span id="deccount" class="dim"></span><button class="max" onclick="decStep(1)">▶</button></span><button class="max" onclick="maximize('p-decisions')">⛶</button></h2>
       <div class="body" id="decisions"></div></div>
     <div class="pane" id="p-notes"><h2>Notes (private inbox)<button class="max" onclick="maximize('p-notes')">⛶</button></h2>
+      <input id="nfilter" class="tfilter" placeholder="filter — click for help">
       <div class="body" id="notes"></div></div>
     <div class="pane" id="p-details"><h2>Details<button class="max" onclick="maximize('p-details')">⛶</button></h2>
       <div class="body" id="details"><pre>click anything</pre></div></div>
@@ -171,7 +183,7 @@ const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({"&":"&amp;","<":"&lt;",
 const el = (id) => document.getElementById(id);
 function detail(obj) { el("details").innerHTML = "<pre>" + esc(typeof obj === "string" ? obj : JSON.stringify(obj, null, 2)) + "</pre>"; }
 function detailLog(obj) { el("logdetail").innerHTML = "<pre>" + esc(typeof obj === "string" ? obj : JSON.stringify(obj, null, 2)) + "</pre>"; }
-const FILTER_HELP = "The filter hides log rows.\\n\\nType any text. A row stays visible when its time, source, destination, tool, info, or result column contains that text. Case does not matter.\\n\\nExamples:\\n  file      only the file-lane calls\\n  se_git    only git calls\\n  09:4      calls from that minute\\n\\nClear the field to see every row again.";
+const FILTER_HELP = "A filter hides table rows.\\n\\nType any text. A row stays visible when any of its columns contains that text. Case does not matter.\\n\\nExamples:\\n  file      log: only the file-lane calls\\n  se_git    log: only git calls\\n  gap       notes: only notes mentioning a gap\\n\\nClear the field to see every row again.";
 function maximize(paneId) { maximized = paneId; syncModal(); el("modal").className = "open"; }
 function closeModal() { maximized = null; el("modal").className = ""; }
 function syncModal() {
@@ -188,17 +200,19 @@ function watchdog() {
 const iterNum = (id) => { const m = id.match(/^i(\\d+)/); return m ? Number(m[1]) : 999; };
 function setSub(t) { subTab = t; layoutMiddle(); }
 function layoutMiddle() {
-  const wide = el("midsplit").offsetWidth > 500;
+  const wide = el("midsplit").parentElement.offsetWidth >= 1000;
   document.body.classList.toggle("mid-narrow", !wide);
-  el("tabslot-narrow").style.display = wide ? "none" : "";
-  const slot = wide ? el("tabslot-wide") : el("tabslot-narrow");
-  if (el("tabs").parentElement !== slot) slot.prepend(el("tabs"));
   el("sm-col").style.display = wide || subTab === "sm" ? "" : "none";
   el("tot-col").style.display = wide || subTab === "tot" ? "" : "none";
   el("st-sm").className = "tab" + (subTab === "sm" ? " active" : "");
   el("st-tot").className = "tab" + (subTab === "tot" ? " active" : "");
 }
 function smView(i) { SMVIEW = i; render(); }
+function smNode(idx, i, st) {
+  const click = ' onclick="detail(S.machine_stack[' + idx + '].states[' + i + '])"';
+  if (st.kind === "terminal") return '<div class="smend ' + st.status + '" title="' + esc(st.id) + '"' + click + "></div>";
+  return '<div class="smnode ' + st.status + '"' + click + ">" + esc(st.id) + "</div>";
+}
 function renderSM() {
   const stack = S.machine_stack ?? [];
   const idx = SMVIEW < 0 || SMVIEW >= stack.length ? stack.length - 1 : SMVIEW;
@@ -206,10 +220,29 @@ function renderSM() {
     '<span class="crumb' + (i === idx ? " active" : "") + '" onclick="smView(' + i + ')">' + esc(m.id) + "</span>"
   ).join(" ▸ ");
   const f = stack[idx];
-  el("smlist").innerHTML = f ? f.states.map((st, i) =>
-    '<div class="iterrow" onclick="detail(S.machine_stack[' + idx + '].states[' + i + '])">' +
-    '<span class="led ' + (st.status === "done" ? "done" : st.status === "current" ? "open" : "") + '"></span>' +
-    esc(st.id) + "</div>").join("") : "";
+  if (!f) { el("smlist").innerHTML = ""; return; }
+  const parts = ['<div class="smwrap">', '<div class="smstart" title="start"></div>'];
+  let i = 0;
+  while (i < f.states.length) {
+    parts.push('<div class="smconn">▼</div>');
+    const g = f.states[i].group;
+    if (g) {
+      parts.push('<div class="smgroup"><div class="smglabel">' + esc(g) + "</div>");
+      let first = true;
+      while (i < f.states.length && f.states[i].group === g) {
+        if (!first) parts.push('<div class="smconn">▼</div>');
+        parts.push(smNode(idx, i, f.states[i]));
+        first = false;
+        i++;
+      }
+      parts.push("</div>");
+    } else {
+      parts.push(smNode(idx, i, f.states[i]));
+      i++;
+    }
+  }
+  parts.push("</div>");
+  el("smlist").innerHTML = parts.join("");
 }
 function render() {
   if (!S) return;
@@ -234,16 +267,23 @@ function render() {
       return "<li>" + esc(t) + "</li>";
     }).join("") + "</ul>" : "");
   const me = S.agents[0].name;
-  const q = el("filter").value.toLowerCase();
-  const rows = S.calls.map((c, i) => {
+  const lq = el("lfilter").value.toLowerCase();
+  const lrows = S.calls.map((c, i) => {
     const res = c.ok ? '<span class="tick">✓</span>'
       : '<span class="cross">✗ ' + esc(c.response && c.response.clause ? c.response.clause : "failed") + "</span>";
-    return '<div class="lrow" onclick="detailLog(S.calls[' + i + '])"><span>' + c.ts.slice(11, 19) + "</span><span>" +
-      esc(me) + "</span><span>se</span><span>" + esc(c.tool) + "</span><span>" + esc(c.intent ?? "") + "</span><span>" + res + "</span></div>";
+    return '<div class="trow log" onclick="detailLog(S.calls[' + i + '])"><span>' + c.ts.slice(11, 19) + "</span><span>" +
+      esc(me) + "</span><span>se</span><span>" + esc(c.tool) + "</span><span>" + res + "</span></div>";
   });
   el("feed").innerHTML =
-    '<div class="lrow lhead"><span>time</span><span>source</span><span>dest</span><span>tool</span><span>info</span><span>result</span></div>' +
-    rows.filter(r => !q || r.toLowerCase().includes(q)).join("");
+    '<div class="trow log thead"><span>time</span><span>source</span><span>dest</span><span>tool</span><span>result</span></div>' +
+    lrows.filter(r => !lq || r.toLowerCase().includes(lq)).join("");
+  const nq = el("nfilter").value.toLowerCase();
+  const nrows = (S.notes ?? []).map((n, i) =>
+    '<div class="trow note" onclick="detail(S.notes[' + i + '])"><span>' + esc(n.at.slice(5, 16)) + "</span><span>" +
+    esc(n.text) + "</span></div>");
+  el("notes").innerHTML =
+    '<div class="trow note thead"><span>time</span><span>note</span></div>' +
+    (nrows.filter(r => !nq || r.toLowerCase().includes(nq)).join("") || '<span class="dim">empty</span>');
   DECS = [];
   if (S.offer) {
     DECS.push('<div class="card"><b>Gate: ' + esc(S.offer.iteration) + "</b><pre>" + esc(S.offer.brief) + "</pre>" +
@@ -254,9 +294,6 @@ function render() {
   el("decisions").innerHTML = DECS[decIdx] ?? '<span class="dim">nothing to decide</span>';
   el("decnav").style.display = DECS.length > 1 ? "" : "none";
   el("deccount").textContent = (decIdx + 1) + "/" + DECS.length;
-  el("notes").innerHTML = (S.notes ?? []).map((n, i) =>
-    '<div class="call" onclick="detail(S.notes[' + i + '])">' + esc(n.at.slice(5, 16)) + " " + esc(n.text.slice(0, 60)) + "</div>"
-  ).join("") || '<span class="dim">empty</span>';
   syncModal();
 }
 function decStep(d) { if (DECS.length > 1) { decIdx = (decIdx + d + DECS.length) % DECS.length; render(); } }
@@ -300,8 +337,10 @@ function initResize() {
 }
 initResize();
 addEventListener("resize", layoutMiddle);
-el("filter").addEventListener("input", render);
-el("filter").addEventListener("focus", () => detailLog(FILTER_HELP));
+el("lfilter").addEventListener("input", render);
+el("lfilter").addEventListener("focus", () => detail(FILTER_HELP));
+el("nfilter").addEventListener("input", render);
+el("nfilter").addEventListener("focus", () => detail(FILTER_HELP));
 layoutMiddle();
 tick();
 setInterval(tick, 2000);

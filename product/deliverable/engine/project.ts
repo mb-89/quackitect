@@ -48,7 +48,7 @@ export interface NoteLine {
 export interface MachineFrame {
   id: string;
   current: string;
-  states: { id: string; status: "done" | "current" | "future"; statement: string; guidance: string }[];
+  states: { id: string; kind: string; group?: string; status: "done" | "current" | "future"; statement: string; guidance: string }[];
 }
 
 export interface ProjectionState {
@@ -215,7 +215,9 @@ export function projectState(root: string): ProjectionState {
       current: sessionCurrent,
       states: sessionMachine.states.map((s, i) => ({
         id: s.id,
-        status: s.id === sessionCurrent ? "current" : i < sessionIdx ? "done" : "future",
+        kind: s.kind,
+        ...(s.group !== undefined ? { group: s.group } : {}),
+        status: s.id === sessionCurrent ? ("current" as const) : i < sessionIdx ? ("done" as const) : ("future" as const),
         statement: s.statement,
         guidance: s.guidance,
       })),
@@ -228,7 +230,9 @@ export function projectState(root: string): ProjectionState {
       current: openView.current,
       states: systematic.states.map((s) => ({
         id: s.id,
-        status: s.id === openView.current ? "current" : filled.has(s.id) ? "done" : "future",
+        kind: s.kind,
+        ...(s.group !== undefined ? { group: s.group } : {}),
+        status: s.id === openView.current ? ("current" as const) : filled.has(s.id) ? ("done" as const) : ("future" as const),
         statement: s.statement,
         guidance: s.guidance,
       })),

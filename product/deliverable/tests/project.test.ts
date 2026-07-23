@@ -104,6 +104,8 @@ test("the call feed is session-scoped and carries direction data", () => {
     assert.equal(s.machine_stack.length, 1);
     assert.equal(s.machine_stack[0].id, "session");
     assert.equal(s.machine_stack[0].current, "idle");
+    assert.equal(s.machine_stack[0].states[0].group, "boot");
+    assert.equal(s.machine_stack[0].states.at(-1)!.kind, "terminal");
     assert.equal(s.calls.length, 1, "pre-session calls are filtered out");
     assert.equal(s.calls[0].intent, "fresh");
     assert.equal((s.calls[0].response as { clause: string }).clause, "SE-C-060");

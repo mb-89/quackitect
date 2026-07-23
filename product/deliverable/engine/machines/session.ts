@@ -13,6 +13,7 @@ export const sessionMachine: MachineDecl = {
     {
       id: "lock_on",
       kind: "work",
+      group: "boot",
       statement: "Lock onto a product root; the nameplate names it.",
       filled_by: "agent",
       guidance: "se_boot with no arguments returns the project, the contract and its hash.",
@@ -22,6 +23,7 @@ export const sessionMachine: MachineDecl = {
     {
       id: "attest",
       kind: "work",
+      group: "boot",
       statement: "Read the contract; attest its hash.",
       filled_by: "agent",
       guidance: "se_boot with contract_hash admits the session.",
@@ -31,8 +33,9 @@ export const sessionMachine: MachineDecl = {
     {
       id: "admitted",
       kind: "work",
+      group: "boot",
       statement: "Admission gates the tool surface; the lock and the board exist now.",
-      filled_by: "engine",
+      filled_by: "agent",
       guidance: "The fence reads the lock; the handover is a live projection.",
       evidence_form: [],
       edges: [{ to: "idle", role: "normal" }],
@@ -44,7 +47,10 @@ export const sessionMachine: MachineDecl = {
       filled_by: "agent",
       guidance: "se_loop_start enters the iteration machine; notes and questions stay legal.",
       evidence_form: [],
-      edges: [{ to: "iteration", role: "normal" }],
+      edges: [
+        { to: "iteration", role: "normal" },
+        { to: "ended", role: "alternative" },
+      ],
     },
     {
       id: "iteration",
@@ -54,6 +60,15 @@ export const sessionMachine: MachineDecl = {
       guidance: "The nested machine's states carry their own statements; browse down one level.",
       evidence_form: [],
       edges: [{ to: "idle", role: "normal" }],
+    },
+    {
+      id: "ended",
+      kind: "terminal",
+      statement: "The session ended; a new boot starts a new session.",
+      filled_by: "agent",
+      guidance: "Sessions are per-process: a reconnect or a fresh shell boots again, by design.",
+      evidence_form: [],
+      edges: [],
     },
   ],
 };
