@@ -54,9 +54,10 @@ const PAGE = `<!doctype html>
   .wdot.green { background: var(--ok); }
   .wdot.yellow { background: var(--warn); }
   .wdot.red { background: var(--bad); }
-  main { flex: 1; display: grid; grid-template-columns: 230px minmax(0, 1fr) 320px; min-height: 0; }
-  .col { display: flex; flex-direction: column; min-height: 0; border-right: 1px solid var(--line); }
-  .col:last-child { border-right: none; }
+  main { flex: 1; display: grid; grid-template-columns: var(--wl, 230px) 4px minmax(0, 1fr) 4px var(--wr, 320px); min-height: 0; }
+  .col { display: flex; flex-direction: column; min-height: 0; }
+  .gutter { cursor: col-resize; border-left: 1px solid var(--line); }
+  .gutter:hover { background: #dde4f2; }
   .pane { flex: 1 1 0; min-height: 0; display: flex; flex-direction: column; border-bottom: 1px solid var(--line); padding: .5em .7em; background: #fafafa; }
   .pane:last-child { border-bottom: none; }
   .pane > h2 { display: flex; align-items: center; font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: var(--dim); margin: 0 0 .4em; }
@@ -110,6 +111,7 @@ const PAGE = `<!doctype html>
     <div class="pane" id="p-iters"><h2>Iterations<button class="max" onclick="maximize('p-iters')">⛶</button></h2>
       <div class="body" id="iterlist"></div></div>
   </div>
+  <div class="gutter" id="gl"></div>
   <div class="col">
     <div id="tabs"></div>
     <div class="pane" id="p-tot"><h2>Train of thought<button class="max" onclick="maximize('p-tot')">⛶</button></h2>
@@ -118,6 +120,7 @@ const PAGE = `<!doctype html>
       <input id="filter" placeholder="filter — click for help">
       <div class="body" id="feed"></div></div>
   </div>
+  <div class="gutter" id="gr"></div>
   <div class="col">
     <div class="pane" id="p-details"><h2>Details<button class="max" onclick="maximize('p-details')">⛶</button></h2>
       <div class="body" id="details"><pre>click anything</pre></div></div>
@@ -230,6 +233,29 @@ async function bless() {
   tick();
 }
 async function dismiss() { await fetch("/dismiss", { method: "POST" }); tick(); }
+function initResize() {
+  const rootEl = document.documentElement;
+  for (const [k, v] of [["--wl", "sb-l"], ["--wr", "sb-r"]]) {
+    const saved = localStorage.getItem(v);
+    if (saved) rootEl.style.setProperty(k, saved);
+  }
+  const drag = (id, calc, varName, key) => {
+    el(id).addEventListener("mousedown", (e) => {
+      e.preventDefault();
+      const move = (ev) => {
+        const w = Math.max(140, Math.min(window.innerWidth / 2, calc(ev)));
+        rootEl.style.setProperty(varName, w + "px");
+        localStorage.setItem(key, w + "px");
+      };
+      const up = () => { removeEventListener("mousemove", move); removeEventListener("mouseup", up); };
+      addEventListener("mousemove", move);
+      addEventListener("mouseup", up);
+    });
+  };
+  drag("gl", (ev) => ev.clientX, "--wl", "sb-l");
+  drag("gr", (ev) => window.innerWidth - ev.clientX, "--wr", "sb-r");
+}
+initResize();
 el("filter").addEventListener("input", render);
 el("filter").addEventListener("focus", () => detail(FILTER_HELP));
 tick();
