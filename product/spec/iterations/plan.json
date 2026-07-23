@@ -19,10 +19,9 @@
       "id": "i4-questions-and-hygiene",
       "goal": "The parked adjudications clear and the mint's loose ends close.",
       "steps": [
-        { "text": "adjudicate the 7 se.q-p3delta-* question nodes", "owner": true },
         { "text": "audit the i1 chat-session bless - re-bless via console or accept", "owner": true },
         { "text": "trace-dir ruling: v1 trace stays unmigrated, v2 grows its own spine - confirm or flip", "owner": true },
-        { "text": "apply the verdicts to the ledger" },
+        { "text": "set_field dot-path support for nested frontmatter; then correct the 7 stale pending-owner stamps in the resolved q-p3delta nodes" },
         { "text": "draft glossary entries for the 139 term-worklist candidates" },
         { "text": "cold-model run: feed each rejection to a fresh session, prove one-turn recovery" }
       ]
