@@ -1,7 +1,7 @@
 {
   "machine": "lean",
   "iteration": "i2g-tutorial-machine",
-  "current": "close_iteration",
+  "current": "closed",
   "counters": {},
   "history": [
     {
@@ -21,8 +21,14 @@
       "outcome": "filled",
       "evidence": "run-ce4ed696180f",
       "at": "2026-07-23T17:33:00.291Z"
+    },
+    {
+      "state": "close_iteration",
+      "outcome": "filled",
+      "evidence": "grant:62a2202715ea",
+      "at": "2026-07-23T20:03:48.246Z"
     }
   ],
   "escapes": [],
-  "status": "open"
+  "status": "closed"
 }

@@ -1,9 +1,9 @@
 {
   "iteration": "i2g-tutorial-machine",
   "state": "close_iteration",
-  "at": "2026-07-23T17:34:03.125Z",
+  "at": "2026-07-23T20:01:10.472Z",
   "payload": {
-    "exit_check_result": "Declared: compileMachine(se.machine-tutorial) succeeds exercising all six roles, a guarded fallback loop, engine-fill with command, a gate, two terminals, a nested machine, the iteration socket, and a group, with text-node comments skipped; verify green. Showed: verify run-ce4ed696180f green; the new coverage test asserts each feature on the compiled tutorial machine; a second fixture test proves comment skipping; the drawing carries eight annotations and the systematic machine nested through a live portal.",
-    "offer_hash": "a0a607cd37d588eac72e88350528c5ffa814248af09326f6e872fcc51dd8612e"
+    "exit_check_result": "Original scope (tutorial machine): compileMachine(se.machine-tutorial) green with full feature coverage (verify run-ce4ed696180f, 77/77) - unchanged. Owner-expanded scope (built after that verify, per your fold-into-i2g ruling): (1) the systematic machine drawn in full - 9 milestones, 45 states, 9 gates with killer fields, 4 seeding sockets (candidates, spikes, build chunks, killer demos), the battery law as guarded fallback edges, market-scoped fields on the validation and release gates; (2) 30 self-contained method notes wikilinked from the task notes (SyA re-expressed, no digest dependency); (3) the old machine renamed lean, all 9 iteration records repointed, i2g itself now runs under lean (this very gate serves the lean note); (4) engine resolves each iteration's machine from its instance record (floor flag 1) in loop, gate and projection; (5) design doc amended with the full walkthrough block; (6) new compile tests pin the lean shape and the systematic coverage (45 states, 9 gates, sockets, battery loop). HONEST DISCLOSURE: the machine is past its verify state, so everything after run-ce4ed696180f is typecheck-unverified by the battery - mitigated by live probes (the loop runs on lean, both machines compile on every call, the board renders) and confirmed by the next iteration's first verify. Known cosmetic: the canvas header comment says three seeding sockets, there are four. The 9-milestone machine is drawn as the binding spec; the parallel executor that runs it is the next engine iteration.",
+    "offer_hash": "62a2202715ea6a6d640aef701711d7b4521e68a99681bfdcf74fbbf5903f8559"
   }
 }

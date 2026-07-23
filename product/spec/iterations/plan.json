@@ -1,38 +1,26 @@
 {
   "iterations": [
     {
-      "id": "i2f-machines-are-canvases",
-      "goal": "State machines become Advanced Canvas drawings in the ledger: canvas frontmatter + topology plus referenced state notes are the single source of truth; a load-time compiler feeds the engine; the hand-written TS machines retire.",
-      "steps": [
-        { "text": "machine identity rides the canvas frontmatter (id, entry state, re-entry semantics); the index treats machine canvases as ledger nodes" },
-        { "text": "compiler at load, nothing checked in: pinned Advanced Canvas schema, loud typed failure on unknown shapes; edges carry roles + guards; implicit escape/ask-human edges and the total priority order added by the compiler, never drawn" },
-        { "text": "state details live in referenced notes: guidance refs, filled_by engine + command, evidence-form schema" },
-        { "text": "session and systematic re-authored as canvases; engine loads from the ledger; engine/machines/*.ts deleted" },
-        { "text": "offer machine drawn too - keep or discard at the gate", "owner": true },
-        { "text": "board machine diagram renders from the compiled machine (renderer free: graphviz or a TS library, no 1:1 canvas fidelity)" },
-        { "text": "voluntary updates: declare update as an optional typed property on every tool schema; submit guidance says attach the flipped todo on completion; a pushed update resets the toll clock (engine already accepts it) so the board refreshes per completion" },
-        { "text": "bless the canvas machine form at the gate", "owner": true }
-      ]
-    },
-    {
       "id": "i3-machine-and-retro",
-      "goal": "Day-scale iterations become real: the machine gets a continue-working edge, and the retro flow arrives (notes drain + cleanup, field-feedback first).",
+      "machine": "systematic",
+      "goal": "Day-scale iterations become real: the parallel executor makes the drawn systematic machine runnable, and the retro flow arrives (notes drain + cleanup, field-feedback first).",
       "steps": [
+        { "text": "parallel executor: token-set instances, fired-edge activation, all-fired-input joins, offer queue, runtime seeding of iteration sub-machines, gate-template injection, packet method-link resolution, market flag - the drawn systematic machine becomes runnable" },
         { "text": "plan insert/renumber ops: planned iterations renumber freely, started ids are frozen (engine-checked); rides the dry_run -> execute lane" },
         { "text": "link graph + rename ripple: warm index over all markdown links incl. section targets; renaming a note or a section updates every inbound link (se.set.refactor kind=rename)" },
-        { "text": "hot reload: stable stdio shim, engine dynamic-imported per call keyed by mtime - engine edits go live without /mcp reconnect" },
-        { "text": "systematic machine: continue-working edge so one iteration holds many verified chunks" },
-        { "text": "retro flow v1 - opens with the field-feedback question, drains the notes inbox, cleans it up" },
-        { "text": "mint policies as ledger nodes (open since B4)" },
+        { "text": "search scope parameter: se_file_search/read/list over declared roots (imports, v1, the owner's working folder) - declared, never arbitrary" },
+        { "text": "retro flow v1 - opens with the field-feedback question, drains the notes inbox, cleans it up; standing question: has the process gone stale (state-of-the-art, process dimension)" },
+        { "text": "policy derivation: lean re-derived as a strike-list from systematic - diffable, per the walkthrough ruling" },
         { "text": "projection: last_verify picked by timestamp, not folder order" },
         { "text": "boot cleanliness: the toll never blocks a session's first se_boot; one-question ritual per the contract" },
         { "text": "se-gate: record role not username@hostname; loud message on expired offer" },
-        { "text": "bless the machine redesign at the gate", "owner": true },
+        { "text": "bless the executor behavior against the drawn machine at the gate", "owner": true },
         { "text": "retro shape: answer the field-feedback opener", "owner": true }
       ]
     },
     {
       "id": "i4-questions-and-hygiene",
+      "machine": "systematic",
       "goal": "The parked adjudications clear and the mint's loose ends close.",
       "steps": [
         { "text": "audit the i1 chat-session bless - re-bless via console or accept", "owner": true },
@@ -44,6 +32,7 @@
     },
     {
       "id": "i5-kb-content",
+      "machine": "systematic",
       "goal": "The kb module carries real content, tier-safe.",
       "steps": [
         { "text": "benjamin: stay public with a tier pre-push hook, or flip private - decide", "owner": true },
@@ -54,6 +43,7 @@
     },
     {
       "id": "i6-phone-lane",
+      "machine": "systematic",
       "goal": "Offers reach the phone; a bless works from anywhere within the 6h window.",
       "steps": [
         { "text": "offer briefs push to the phone (ntfy); bless-by-reply carries the hash" },
@@ -63,15 +53,18 @@
     },
     {
       "id": "i7-board-rounds",
+      "machine": "systematic",
       "goal": "The board matures through owner design rounds.",
       "steps": [
         { "text": "redline rounds on the live board (sketch: product/scratchpad/exc/status-dashboard.md)", "owner": true },
         { "text": "apply the rounds; dark theme; multi-agent tabs when worktrees land" },
+        { "text": "liveness honesty: the green dot goes red when no session is connected; log details show request AND response; drop the minutes-ago age display" },
         { "text": "search checkpoint with scale data: FTS5-ranked index, vendor rg or stay naive", "owner": true }
       ]
     },
     {
       "id": "i8-v1-retirement",
+      "machine": "systematic",
       "goal": "v2 daily-drives the real work; v1 archives.",
       "depends_on": ["i3-machine-and-retro"],
       "steps": [
