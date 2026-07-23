@@ -10,6 +10,7 @@
         { "text": "session and systematic re-authored as canvases; engine loads from the ledger; engine/machines/*.ts deleted" },
         { "text": "offer machine drawn too - keep or discard at the gate", "owner": true },
         { "text": "board machine diagram renders from the compiled machine (renderer free: graphviz or a TS library, no 1:1 canvas fidelity)" },
+        { "text": "voluntary updates: declare update as an optional typed property on every tool schema; submit guidance says attach the flipped todo on completion; a pushed update resets the toll clock (engine already accepts it) so the board refreshes per completion" },
         { "text": "bless the canvas machine form at the gate", "owner": true }
       ]
     },
