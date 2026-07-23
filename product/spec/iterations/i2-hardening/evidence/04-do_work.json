@@ -1,0 +1,8 @@
+{
+  "iteration": "i2-hardening",
+  "state": "do_work",
+  "at": "2026-07-23T09:01:59.858Z",
+  "payload": {
+    "changed": "engine/jsonio.ts: new - stripBom + readJsonFile, BOM-tolerant JSON reads\nengine/loop.ts: state reads via readJsonFile; evidenceRef helper; offers carry their evidence path\nengine/gate.ts: BOM-tolerant reads; Offer.evidence_path; GrantRecord gains policy, evidence pointer, imports stamp\nengine/modules.ts: BOM-tolerant reads; import_root on ModuleStatus; importStamps (module commit at gate time)\nengine/toll.ts: BOM-tolerant read; accepts stringified update (harness without declared schema bricked the surface - live incident this session)\nengine/calllog.ts + engine/migrations/v1-import.ts: jsonl line parses strip BOM\nengine/machines/systematic.ts: verify command now 'npm --prefix product/deliverable run verify --loglevel=error' (old command predated the workspace-isolation restructure; failed silently from root)\nengine/tools.ts: all tool descriptions trimmed to ~1 line\ntests/loop.test.ts: BOM-prefixed instance file regression\ntests/rails.test.ts: string-update toll regression; grant floor-flag asserts (policy, evidence pointer, imports)\nproduct/spec/iterations/i1-bootstrap/state.json: stray BOM stripped by hand\nLANE NOTE: toll.ts, loop.ts, one gate.ts import line and rails.test.ts were edited outside the deliverable lane while the toll deadlock bricked the surface; owner ruled it a defect repair and reconnected the server after"
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "iteration": "i2-hardening",
+  "state": "declare_goal",
+  "at": "2026-07-23T08:44:45.718Z",
+  "payload": {
+    "goal": "Harden SE for unattended dogfood: se.emit.handover (pure projection), ~1-line tool descriptions, floor flags on all grant/evidence records (incl. kb import stamp), weak-model rejection recovery, and BOM-tolerant state parsing (found live: i1 state.json BOM took the whole loop lane down).",
+    "load_bearing_for": "A fresh session cannot resume from the ledger alone: the handover is hand-written, the tool list carries guidance noise, records miss p4 §3 floor flags, rejections strand a cold model, and one BOM byte in a state file bricks se_loop_*.",
+    "exit_check": "se.emit.handover output supersedes the hand-written handover; every tool description <= ~1 line; grants/evidence records carry policy, channel+adjudicator, iteration provenance, evidence pointer, kb commit stamp; each rejection recovers a cold model in one turn; a BOM-prefixed state file parses; UC-3: iteration closes with no process-mistake correction and zero ad-hoc scripts."
+  }
+}

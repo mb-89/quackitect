@@ -1,0 +1,8 @@
+{
+  "iteration": "i2-hardening",
+  "state": "do_work",
+  "at": "2026-07-23T08:48:21.759Z",
+  "payload": {
+    "changed": "engine/jsonio.ts: new — stripBom + readJsonFile (BOM-tolerant JSON reads)\nengine/loop.ts: openInstance reads via readJsonFile\nengine/gate.ts: offer + instance reads via readJsonFile\nengine/toll.ts: toll state read via readJsonFile\nengine/modules.ts: module.json read via readJsonFile\nengine/calllog.ts: find() strips BOM before line parse\nengine/migrations/v1-import.ts: edges.jsonl line parse strips BOM\ntests/loop.test.ts: regression — a BOM-prefixed instance file still parses\nproduct/spec/iterations/i1-bootstrap/state.json: stray BOM stripped by hand (the incident that motivated this; engine was down, se_help asked first)"
+  }
+}

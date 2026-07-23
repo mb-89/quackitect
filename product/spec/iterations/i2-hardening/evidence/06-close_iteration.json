@@ -1,0 +1,9 @@
+{
+  "iteration": "i2-hardening",
+  "state": "close_iteration",
+  "at": "2026-07-23T09:03:00.033Z",
+  "payload": {
+    "exit_check_result": "Declared exit check, item by item: BOM-prefixed state file parses - regression test green (was the live incident that opened the session). Verify command repaired and proven: the engine itself ran typecheck + full suite green (run-e67fab5f0818); the old command failed silently from the pre-restructure layout. Tool descriptions at ~1 line - green. Grant floor flags (policy, channel+adjudicator, provenance, evidence pointer, import stamp) - shipped, asserted in the B5 test. Toll rejection now one-turn recoverable for string-serializing harnesses - fixed, regression-tested, proven live on this session's own re-boot. NOT in this close, deliberately: se.emit.handover and the full rejection-remedy sweep - declared too broadly at declare_goal; they need their own verify run, so they move to a follow-up iteration (i2b). UC-3 partial: zero ad-hoc scripts held for product work, but the toll deadlock forced four out-of-lane engine edits, owner-ruled a defect repair; recorded in the do_work evidence.",
+    "offer_hash": "5062d069baa559411667fea54158bb1222b416067665a0de2b360ad5e06183f0"
+  }
+}

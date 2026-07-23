@@ -1,0 +1,48 @@
+{
+  "machine": "systematic",
+  "iteration": "i2-hardening",
+  "current": "closed",
+  "counters": {
+    "verify_attempts": 1
+  },
+  "history": [
+    {
+      "state": "declare_goal",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i2-hardening/evidence/01-declare_goal.json",
+      "at": "2026-07-23T08:44:45.718Z"
+    },
+    {
+      "state": "do_work",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i2-hardening/evidence/02-do_work.json",
+      "at": "2026-07-23T08:48:21.759Z"
+    },
+    {
+      "state": "verify",
+      "outcome": "failed",
+      "evidence": "run-4f59f4187214",
+      "at": "2026-07-23T08:48:23.163Z"
+    },
+    {
+      "state": "do_work",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i2-hardening/evidence/04-do_work.json",
+      "at": "2026-07-23T09:01:59.858Z"
+    },
+    {
+      "state": "verify",
+      "outcome": "filled",
+      "evidence": "run-e67fab5f0818",
+      "at": "2026-07-23T09:02:04.379Z"
+    },
+    {
+      "state": "close_iteration",
+      "outcome": "filled",
+      "evidence": "grant:5062d069baa5",
+      "at": "2026-07-23T09:14:29.447Z"
+    }
+  ],
+  "escapes": [],
+  "status": "closed"
+}

@@ -4,6 +4,7 @@
 import { appendFileSync, existsSync, mkdirSync, readFileSync, statSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { randomBytes } from "node:crypto";
+import { stripBom } from "./jsonio.ts";
 
 export interface CallRecord {
   ref: string;
@@ -42,7 +43,7 @@ export class CallLog {
   /** Look a record up by ref (evidence pinning reads through this). */
   find(ref: string): CallRecord | undefined {
     if (!existsSync(this.path)) return undefined;
-    for (const line of readFileSync(this.path, "utf8").split("\n")) {
+    for (const line of stripBom(readFileSync(this.path, "utf8")).split("\n")) {
       if (line.trim() === "") continue;
       const rec = JSON.parse(line) as CallRecord;
       if (rec.ref === ref) return rec;

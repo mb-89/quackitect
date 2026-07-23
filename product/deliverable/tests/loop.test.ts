@@ -3,7 +3,7 @@
 // evidence-form validation, run pinning.
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { mkdtempSync, rmSync, readFileSync, existsSync, readdirSync } from "node:fs";
+import { mkdtempSync, rmSync, readFileSync, existsSync, readdirSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { Loop } from "../engine/loop.ts";
@@ -130,6 +130,20 @@ test("evidence-form validation is field-targeted and one-turn recoverable (SE-C-
     assert.match(rejection.expected, /exit_check/);
     const remedyEvidence = (rejection.remedy.args as { evidence: Record<string, string> }).evidence;
     assert.equal(remedyEvidence.goal, "only the goal", "remedy preserves what was already filled");
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test("a BOM-prefixed instance file still parses", () => {
+  const root = mkdtempSync(join(tmpdir(), "se-loop-bom-"));
+  try {
+    const loop = new Loop(root, machineWith(OK));
+    loop.start("i0-bom");
+    const instPath = layout.instancePath(root, "i0-bom");
+    writeFileSync(instPath, String.fromCharCode(0xfeff) + readFileSync(instPath, "utf8"), "utf8");
+    const p = loop.next();
+    assert.equal(p.state, "declare_goal");
   } finally {
     rmSync(root, { recursive: true, force: true });
   }

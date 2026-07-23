@@ -4,6 +4,7 @@
 // present are skipped, so a re-run yields an empty diff.
 import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { join, basename } from "node:path";
+import { stripBom } from "../jsonio.ts";
 import type { ApplyOp } from "../apply.ts";
 import type { Migration, MigrationContext, MigrationOutput } from "../migrate.ts";
 import { loadLedger } from "../store.ts";
@@ -366,7 +367,7 @@ function generate(ctx: MigrationContext): MigrationOutput {
         if (line.trim() === "") continue;
         let e: { src: string; dst: string };
         try {
-          e = JSON.parse(line) as { src: string; dst: string };
+          e = JSON.parse(stripBom(line)) as { src: string; dst: string };
         } catch {
           misparses.push(`${kindDir}/edges.jsonl: ${line.slice(0, 80)}`);
           continue;

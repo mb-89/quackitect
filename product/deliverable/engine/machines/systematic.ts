@@ -40,7 +40,7 @@ export const systematic: MachineDecl = {
       kind: "work",
       statement: "The declared check runs mechanically.",
       filled_by: "engine",
-      command: "npm test --silent",
+      command: "npm --prefix product/deliverable run verify --loglevel=error",
       guidance:
         "Engine-filled: the command declared on this state runs through the se.run capture lane; the result lands as evidence with zero model turns. A failing command is a normal Failed — the fallback edge reopens do_work.",
       evidence_form: [],

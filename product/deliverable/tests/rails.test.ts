@@ -64,6 +64,9 @@ test("B5 pass: a console bless lands with channel + hash on the grant record", a
     assert.equal(grants[0].channel, "tty"); // floor flag 2: channel
     assert.equal(grants[0].hash, offerHash); // bound to the offered state
     assert.ok(grants[0].adjudicated_by.length > 0); // floor flag 2: adjudicator
+    assert.equal(grants[0].policy, "systematic"); // floor flag 1: policy in force
+    assert.match(grants[0].evidence, /evidence\/\d\d-close_iteration\.json$/); // floor flag 4: evidence pointer
+    assert.equal(typeof grants[0].imports, "object"); // import stamp (fixture has no modules: empty)
     // The machine advanced through the approval edge.
     const inst = JSON.parse(readFileSync(layout.instancePath(root, "i0-gate"), "utf8"));
     assert.equal(inst.status, "closed");
@@ -124,8 +127,33 @@ test("the toll refuses once with the schema inline, and the paid call proceeds",
     // Paying the toll: same call + update proceeds and resets the clock.
     toll.check("se_get_node", { id: "se.x", update: { current_step: "s", next_milestone: "m", eta: "14:00" } }, log);
     toll.check("se_get_node", { id: "se.x" }, log); // within window again
+
+    // A harness that has not declared the update property serializes it as a
+    // JSON string — the stringified form pays the toll too.
+    clock += 11 * 60 * 1000;
+    toll.check(
+      "se_get_node",
+      { id: "se.x", update: JSON.stringify({ current_step: "s2", next_milestone: "m2", eta: "14:30" }) },
+      log,
+    );
+    toll.check("se_get_node", { id: "se.x" }, log); // within window again
     // The update landed server-side (call log).
     assert.match(readFileSync(join(seDir, "calls.jsonl"), "utf8"), /se\.toll\.update/);
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test("a chat-relayed bless lands with channel=chat and the owner as adjudicator", () => {
+  const root = mkdtempSync(join(tmpdir(), "se-chat-bless-"));
+  try {
+    const offerHash = reachGate(root);
+    const bless = coreTools(root).find((t) => t.name === "se_gate_bless")!;
+    const r = bless.handler({ hash: offerHash }) as { grant: { channel: string; adjudicated_by: string } };
+    assert.equal(r.grant.channel, "chat");
+    assert.equal(r.grant.adjudicated_by, "owner");
+    const inst = JSON.parse(readFileSync(layout.instancePath(root, "i0-gate"), "utf8"));
+    assert.equal(inst.status, "closed");
   } finally {
     rmSync(root, { recursive: true, force: true });
   }

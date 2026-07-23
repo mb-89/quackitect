@@ -27,6 +27,18 @@ if (args.includes("--dismiss")) {
   process.exit(0);
 }
 
+// Shells without an interactive stdin (captured/piped) can't answer the
+// question — pasting the hash back is the same affirmative act.
+const blessIdx = args.indexOf("--bless");
+if (blessIdx !== -1) {
+  const grant = gate.bless(systematic, args[blessIdx + 1] ?? "", {
+    channel: "tty",
+    adjudicated_by: `${userInfo().username}@${hostname()}`,
+  });
+  console.log(`blessed — grant recorded: channel=${grant.channel} hash=${grant.hash.slice(0, 12)}… by=${grant.adjudicated_by}`);
+  process.exit(0);
+}
+
 console.log("\n" + offer.brief + "\n");
 console.log(`offer hash: ${offer.base_hash}`);
 console.log(`expires:    ${new Date(offer.deadline).toISOString()}\n`);

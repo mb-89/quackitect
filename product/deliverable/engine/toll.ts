@@ -7,8 +7,9 @@
 // Armed only after the first submit (the first call of a session must not
 // pay a toll for a session with no history). No narration on the success
 // path. Idle-waiting needs no carve-out: no calls, no toll.
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
+import { readJsonFile } from "./jsonio.ts";
 import { Rejection } from "./errors.ts";
 import type { CallLog } from "./calllog.ts";
 
@@ -36,6 +37,21 @@ export const TOLL_UPDATE_SCHEMA = {
   required: ["current_step", "next_milestone", "eta"],
 } as const;
 
+// Harnesses that load tool schemas without the (undeclared) update property
+// serialize it as a JSON string — accept both forms, or the toll deadlocks
+// the whole surface.
+function parseUpdate(v: unknown): TollUpdate | undefined {
+  if (typeof v === "string") {
+    try {
+      v = JSON.parse(v);
+    } catch {
+      return undefined;
+    }
+  }
+  const u = v as TollUpdate | undefined;
+  return u && u.current_step && u.next_milestone && u.eta ? u : undefined;
+}
+
 export class Toll {
   private path: string;
   private windowMs: number;
@@ -49,7 +65,7 @@ export class Toll {
 
   private load(): TollState {
     if (!existsSync(this.path)) return { armed: false, last_update_ts: 0 };
-    return JSON.parse(readFileSync(this.path, "utf8")) as TollState;
+    return readJsonFile<TollState>(this.path);
   }
 
   private save(s: TollState): void {
@@ -69,8 +85,8 @@ export class Toll {
    */
   check(toolName: string, args: Record<string, unknown>, log: CallLog): void {
     const s = this.load();
-    const update = args.update as TollUpdate | undefined;
-    if (update && update.current_step && update.next_milestone && update.eta) {
+    const update = parseUpdate(args.update);
+    if (update) {
       log.append({ tool: "se.toll.update", args: { via: toolName, ...update }, ok: true, duration_ms: 0 });
       this.save({ ...s, armed: true, last_update_ts: this.now(), last_update: update });
       return;

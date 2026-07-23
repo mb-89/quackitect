@@ -3,8 +3,9 @@
 // instruction returned, not an error. The work packet is the evidence-form
 // shape adopted from the projection spike (§20): legal moves + recommended +
 // guidance + evidence form + filled state + validation findings.
-import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
-import { join } from "node:path";
+import { existsSync, mkdirSync, readdirSync, writeFileSync } from "node:fs";
+import { basename, join } from "node:path";
+import { readJsonFile } from "./jsonio.ts";
 import { Rejection } from "./errors.ts";
 import { CallLog } from "./calllog.ts";
 import { runCommand } from "./run.ts";
@@ -54,7 +55,7 @@ export class Loop {
       if (!dir.isDirectory()) continue;
       const file = layout.instancePath(this.root, dir.name);
       if (!existsSync(file)) continue;
-      const inst = JSON.parse(readFileSync(file, "utf8")) as MachineInstance;
+      const inst = readJsonFile<MachineInstance>(file);
       if (inst.status === "open") return inst;
     }
     return null;
@@ -239,7 +240,7 @@ export class Loop {
         "",
         ...Object.entries(evidence).map(([k, v]) => `  ${k}: ${v}`),
       ].join("\n");
-      const offer = gate.makeOffer(inst, state.id, evidence, brief);
+      const offer = gate.makeOffer(inst, state.id, evidence, brief, this.evidenceRef(inst, state.id));
       this.pinEvidence(inst, state.id, { ...evidence, offer_hash: offer.base_hash });
       this.save(inst);
       return {
@@ -283,6 +284,13 @@ export class Loop {
     return this.next();
   }
 
+  /** The ledger-relative path the NEXT pinned evidence file will land at. */
+  private evidenceRef(inst: MachineInstance, stateId: string): string {
+    const seq = inst.history.length + 1;
+    const file = `${String(seq).padStart(2, "0")}-${stateId}.json`;
+    return `product/spec/iterations/${inst.iteration}/evidence/${file}`;
+  }
+
   /** Evidence files commit to the branch; a pinned run record survives call-log cleanup. */
   private pinEvidence(
     inst: MachineInstance,
@@ -290,15 +298,14 @@ export class Loop {
     payload: Record<string, unknown>,
     run?: { ref: string } | undefined,
   ): string {
+    const ref = this.evidenceRef(inst, stateId);
     const dir = layout.evidenceDir(this.root, inst.iteration);
     mkdirSync(dir, { recursive: true });
-    const seq = inst.history.length + 1;
-    const file = `${String(seq).padStart(2, "0")}-${stateId}.json`;
     writeFileSync(
-      join(dir, file),
+      join(dir, basename(ref)),
       JSON.stringify({ iteration: inst.iteration, state: stateId, at: now(), payload, ...(run ? { pinned_run: run } : {}) }, null, 2) + "\n",
       "utf8",
     );
-    return `product/spec/iterations/${inst.iteration}/evidence/${file}`;
+    return ref;
   }
 }

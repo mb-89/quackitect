@@ -1,0 +1,28 @@
+{
+  "iteration": "i2-hardening",
+  "state": "verify",
+  "at": "2026-07-23T09:02:04.378Z",
+  "payload": {
+    "run_ref": "run-e67fab5f0818",
+    "command": "npm --prefix product/deliverable run verify --loglevel=error",
+    "exit": 0
+  },
+  "pinned_run": {
+    "ref": "run-e67fab5f0818",
+    "ts": "2026-07-23T09:02:04.378Z",
+    "se_version": "2.0.0-bootstrap",
+    "tool": "se.run",
+    "args": {
+      "command": "npm --prefix product/deliverable run verify --loglevel=error",
+      "cwd": "C:\\Users\\ichbi\\Desktop\\ai\\quackitect-v2"
+    },
+    "ok": true,
+    "duration_ms": 4518,
+    "detail": {
+      "command": "npm --prefix product/deliverable run verify --loglevel=error",
+      "exit": 0,
+      "stdout": "\n> quackitect@2.0.0-bootstrap verify\n> npm run typecheck && npm test\n\n\n> quackitect@2.0.0-bootstrap typecheck\n> tsc --noEmit\n\n\n> quackitect@2.0.0-bootstrap test\n> node --test \"tests/**/*.test.ts\"\n\n✔ dry_run -> execute applies create, edit and edge ops atomically (30.6443ms)\n✔ mid-air collision dies at the write with a one-turn-recoverable rejection (10.9735ms)\n✔ a stale hash cannot replay after a successful execute (14.8006ms)\n✔ edge fields are writable only via edge ops (SE-C-011) (4.3995ms)\n✔ delete removes the file; unknown ids are rejected (9.3868ms)\n✔ get.node outline/section/full carry id + hash (4.7657ms)\n✔ boot: contract -> attest -> admitted, with the handover served (8.495ms)\n✔ a wrong or stale contract hash is refused (SE-C-006) (12.5829ms)\n✔ the surface is gated until admission; next/boot/help stay legal (SE-C-005) (0.3963ms)\n✔ list and read return deliverable-relative paths with hashes (8.7925ms)\n✔ patch requires a unique match and moves the hash (10.6475ms)\n✔ write is CAS-guarded: stale hash refused, create refuses existing (10.6691ms)\n✔ paths outside the deliverable are refused (SE-C-060) — the ledger has its own lane (3.9979ms)\n✔ git layer works against a fixture repo (347.6919ms)\n✔ repoRoot is null outside a work tree (25.4241ms)\n✔ SE refuses to operate on its own repo (SE-C-001) (54.3575ms)\n✔ allow_self flag overrides the self-repo refusal (0.1381ms)\n✔ fixture repos are operable without a flag (230.8246ms)\n✔ rebase and force-push are refused (SE-C-002) (0.3238ms)\n✔ every push is refused on the agent lane (SE-C-003, se.rule-owner-pushes) (0.1861ms)\n✔ rejections carry the full required shape (0.1274ms)\n✔ no shared utils package between modules (1.3384ms)\n✔ se.structure holds at the root: ~5 visible entries, dotfolders exempt (0.4709ms)\n✔ dependency direction: kb imports nothing of se (sibling scan, best effort) (4.0148ms)\n✔ se module declaration exists and declares the kb dependency (2.1664ms)\n✔ kb module is importable through the workspace link (when present) (5.2894ms)\n✔ the systematic machine passes load-time checks (1.4596ms)\n✔ scripted walk closes a dummy iteration with no human and no agent (93.4695ms)\n✔ a failing engine state is a normal Failed: fallback reopens, then escape records the guard (183.4677ms)\n✔ evidence-form validation is field-targeted and one-turn recoverable (SE-C-030) (4.7183ms)\n✔ a BOM-prefixed instance file still parses (5.0588ms)\n✔ one open iteration per worktree (SE-C-031); abandon is terminal and recorded (5.9244ms)\n✔ every MCP tool call lands raw in the call log — successes and rejections (i1) (175.6715ms)\n✔ an unbooted session is refused everywhere except next/boot/help (154.2726ms)\n✔ initialize -> tools/list -> tools/call round trip over stdio (133.0572ms)\n✔ a rejection arrives as an isError result carrying the executable remedy (137.1809ms)\n✔ full write loop over MCP: dry_run then execute with the hash (125.5722ms)\n✔ a v1 tree that breaks the P3 accounting fails the mint loudly (5.582ms)\n✔ the mint accounts 126/126 and is idempotent (empty diff on re-run) (661.3282ms)\n✔ local modules are active; a resolvable import is active (23.2091ms)\n✔ a missing import deactivates the module instead of erroring (6.3226ms)\n✔ the real repo reports both modules, kb via the sibling import (1.8977ms)\n✔ B5 pass: a console bless lands with channel + hash on the grant record (203.2535ms)\n✔ a stale hash cannot bless; an expired offer is dismissal by absence (65.7887ms)\n✔ the toll refuses once with the schema inline, and the paid call proceeds (6.5888ms)\n✔ se.help: hits are affordances, misses are honest and logged as demand (3.9472ms)\n✔ se.wait returns on a mechanical file condition and refuses park-length waits (1560.5748ms)\n✔ se.wait on the offer resolves when a bless lands (593.9659ms)\n✔ ledger loads, ids match paths, edges resolve (8.2969ms)\n✔ hashes are stable across independent loads (6.764ms)\n✔ hash is over canonical form — CRLF and key order do not move it (0.4726ms)\n✔ serialize -> parse round-trips to the same hash (0.373ms)\n✔ index rebuilds from files alone, and a fresh rebuild is identical (6.433ms)\n✔ unknown edge kinds are refused at parse (0.5187ms)\n✔ missing breaks_if_removed on a requirement is a lint finding (3.6137ms)\nℹ tests 55\nℹ suites 0\nℹ pass 55\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 2685.6209\n",
+      "stderr": ""
+    }
+  }
+}

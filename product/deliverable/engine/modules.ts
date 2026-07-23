@@ -3,8 +3,10 @@
 // (kb -> ../benjamin). Imports that don't resolve are DEACTIVATED, never
 // errors: absence must not look like nonexistence, and it must not break
 // the session (honest degradation).
-import { existsSync, readFileSync, readdirSync } from "node:fs";
+import { existsSync, readdirSync } from "node:fs";
 import { join, resolve } from "node:path";
+import { git } from "./git.ts";
+import { readJsonFile } from "./jsonio.ts";
 import { layout } from "./layout.ts";
 
 export interface ModuleStatus {
@@ -14,6 +16,8 @@ export interface ModuleStatus {
   mode: "local" | "import";
   /** For imports: where the declaration points, and what happened. */
   detail: string;
+  /** For imports: the resolved local checkout, when found. */
+  import_root?: string;
 }
 
 export function loadModules(root: string): ModuleStatus[] {
@@ -24,11 +28,11 @@ export function loadModules(root: string): ModuleStatus[] {
     if (!entry.isDirectory()) continue;
     const declPath = join(modulesDir, entry.name, "module.json");
     if (!existsSync(declPath)) continue;
-    const decl = JSON.parse(readFileSync(declPath, "utf8")) as {
+    const decl = readJsonFile<{
       id: string;
       mode?: string;
       import_path?: string;
-    };
+    }>(declPath);
     if (decl.mode !== "import") {
       out.push({ id: decl.id, status: "active", mode: "local", detail: "local module" });
       continue;
@@ -37,7 +41,7 @@ export function loadModules(root: string): ModuleStatus[] {
     const importRoot = resolve(root, decl.import_path ?? "");
     const manifest = join(importRoot, "modules", decl.id, "module.json");
     if (existsSync(manifest)) {
-      out.push({ id: decl.id, status: "active", mode: "import", detail: `import ${decl.import_path} (found)` });
+      out.push({ id: decl.id, status: "active", mode: "import", detail: `import ${decl.import_path} (found)`, import_root: importRoot });
     } else {
       out.push({
         id: decl.id,
@@ -48,4 +52,19 @@ export function loadModules(root: string): ModuleStatus[] {
     }
   }
   return out.sort((a, b) => a.id.localeCompare(b.id));
+}
+
+/** Commit hash per import module, resolved at call time (the import stamp on grants). */
+export function importStamps(root: string): Record<string, string> {
+  const out: Record<string, string> = {};
+  for (const m of loadModules(root)) {
+    if (m.mode !== "import") continue;
+    if (m.status !== "active" || !m.import_root) {
+      out[m.id] = "absent";
+      continue;
+    }
+    const r = git(m.import_root, "rev-parse", "HEAD");
+    out[m.id] = r.ok ? r.stdout : "unversioned";
+  }
+  return out;
 }

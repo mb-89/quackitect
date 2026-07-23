@@ -16,6 +16,7 @@ import { seWait, type WaitCondition } from "./wait.ts";
 import { McpServer } from "./mcp.ts";
 import { layout } from "./layout.ts";
 import { boot, newSession, assertAdmitted, type Session } from "./boot.ts";
+import { Gate } from "./gate.ts";
 import { listDeliverable, readDeliverable, writeDeliverable, patchDeliverable } from "./deliverable.ts";
 import { git, assertNotHistoryRewrite, assertNotPush } from "./git.ts";
 import { Rejection } from "./errors.ts";
@@ -32,8 +33,7 @@ export function coreTools(root: string, opts: { toll?: Toll; session?: Session }
     {
       name: "se_loop_next",
       title: "se.loop.next",
-      description:
-        "The entry point. Always callable, never errors. Returns the work packet for the current step: statement, guidance, evidence form, legal moves. Engine-filled states run mechanically before it returns.",
+      description: "The entry point: the current step's work packet. Always callable, never errors.",
       inputSchema: { type: "object", properties: {} },
       handler: () => {
         if (!session.admitted) {
@@ -50,8 +50,7 @@ export function coreTools(root: string, opts: { toll?: Toll; session?: Session }
     {
       name: "se_boot",
       title: "se.boot",
-      description:
-        "The boot: log onto the project and receive the contract (general rules + voice). Call again with contract_hash to attest — that admits the session. One round-trip.",
+      description: "Log onto the project; call again with contract_hash to attest — that admits the session.",
       inputSchema: {
         type: "object",
         properties: {
@@ -74,8 +73,7 @@ export function coreTools(root: string, opts: { toll?: Toll; session?: Session }
     {
       name: "se_loop_submit",
       title: "se.loop.submit",
-      description:
-        "Produces evidence for the current step; SE validates the shape and closes it. Reference a run record via evidence.run_ref instead of re-typing output — referenced runs are pinned into the iteration's evidence.",
+      description: "Submit evidence for the current step; reference a run via evidence.run_ref, never re-type output.",
       inputSchema: {
         type: "object",
         properties: { evidence: { type: "object", description: "field -> value, per the step's evidence_form" } },
@@ -101,8 +99,7 @@ export function coreTools(root: string, opts: { toll?: Toll; session?: Session }
     {
       name: "se_get_node",
       title: "se.get.node",
-      description:
-        "One node. mode: outline | section | full — defaults to outline (the skeleton: statement, edges, fields, section list). Every result carries the node id and its hash.",
+      description: "One node with its hash. mode: outline | section | full (default outline).",
       inputSchema: {
         type: "object",
         properties: {
@@ -123,8 +120,7 @@ export function coreTools(root: string, opts: { toll?: Toll; session?: Session }
     {
       name: "se_get_search",
       title: "se.get.search",
-      description:
-        "BM25 full-text search over ledger content. Ranked snippets with anchors, never whole files. Truncation is honest: the result names how many more matches exist.",
+      description: "BM25 full-text search over ledger content: ranked snippets, honest truncation.",
       inputSchema: {
         type: "object",
         properties: {
@@ -152,8 +148,7 @@ export function coreTools(root: string, opts: { toll?: Toll; session?: Session }
     {
       name: "se_set_apply",
       title: "se.set.apply",
-      description:
-        "Atomic list of operations (create, delete, set_field, replace_section, add_edge, remove_edge). dry_run: true returns the diff and its hash; passing that hash as execute_hash executes if and only if the state still matches. Fifty edits is one call carrying fifty operations.",
+      description: "Atomic ledger ops (create, delete, set_field, replace_section, add_edge, remove_edge): dry_run -> diff hash -> execute.",
       inputSchema: {
         type: "object",
         properties: {
@@ -173,8 +168,7 @@ export function coreTools(root: string, opts: { toll?: Toll; session?: Session }
     {
       name: "se_set_migrate",
       title: "se.set.migrate",
-      description:
-        "One-shot audited whole-ledger migration by name from the engine's registry. Generates an apply manifest and rides the normal lane: dry_run -> diff hash -> execute. Idempotent: re-run yields an empty diff.",
+      description: "Audited whole-ledger migration by name; rides the dry_run -> execute lane; idempotent.",
       inputSchema: {
         type: "object",
         properties: {
@@ -280,10 +274,23 @@ export function coreTools(root: string, opts: { toll?: Toll; session?: Session }
       },
     },
     {
+      name: "se_gate_bless",
+      title: "se.gate.bless",
+      description: "Relay the owner's explicit chat approval of the live offer; the grant records channel=chat, adjudicated_by=owner.",
+      inputSchema: {
+        type: "object",
+        properties: { hash: { type: "string", description: "the live offer's base hash" } },
+        required: ["hash"],
+      },
+      handler: (args) => {
+        const grant = new Gate(root).bless(systematic, String(args.hash), { channel: "chat", adjudicated_by: "owner" });
+        return { grant, next: loop().next() };
+      },
+    },
+    {
       name: "se_help",
       title: "se.help",
-      description:
-        "Keyword search over tool descriptions. Returns closest-match affordances, or the honest refusal: no such tool — do it yourself. Every call is logged with stated intent; misses are the live missing-tool demand signal.",
+      description: "Keyword search over the tool surface; a miss is an honest refusal, logged as demand.",
       inputSchema: {
         type: "object",
         properties: {
@@ -297,8 +304,7 @@ export function coreTools(root: string, opts: { toll?: Toll; session?: Session }
     {
       name: "se_wait",
       title: "se.wait",
-      description:
-        "The declared wait lane: return when a MECHANICAL condition changes (file, offer state) or after timeout_s (max 300 — longer waits are parks). Runs no checks on the read path. Never poll a judgment surface.",
+      description: "Wait for a mechanical condition (file, offer) or timeout_s (max 300); never poll a judgment surface.",
       inputSchema: {
         type: "object",
         properties: {
