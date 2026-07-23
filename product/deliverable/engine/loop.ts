@@ -13,6 +13,7 @@ import { runCommand } from "./run.ts";
 import { Gate } from "./gate.ts";
 import { layout } from "./layout.ts";
 import { advance, validateMachine, type MachineDecl, type MachineInstance, type StateDecl } from "./machine.ts";
+import { loadMachine } from "./machines/load.ts";
 
 export interface WorkPacket {
   kind: "instruction" | "work" | "gate" | "gate_offered" | "closed" | "escaped";
@@ -67,8 +68,25 @@ export class Loop {
     writeFileSync(this.instancePath(inst.iteration), JSON.stringify(inst, null, 2) + "\n", "utf8");
   }
 
+  /** The instance's own machine (floor flag 1): an open iteration keeps the
+   *  machine it started under, whatever the ledger's current default is. */
+  private machineFor(inst: MachineInstance): MachineDecl {
+    if (inst.machine === this.machine.id) return this.machine;
+    const m = loadMachine(this.root, inst.machine);
+    if (m === null) {
+      throw new Rejection({
+        clause: "SE-C-036",
+        expected: `the machine ${inst.machine} (recorded on ${inst.iteration}) in the ledger`,
+        got: "no such machine node",
+        remedy: { tool: "se_get_search", args: { query: "machine" }, note: "restore the machine the iteration started under" },
+        source: "engine/loop.ts machineFor",
+      });
+    }
+    return m;
+  }
+
   private decl(inst: MachineInstance): StateDecl {
-    return this.machine.states.find((s) => s.id === inst.current)!;
+    return this.machineFor(inst).states.find((s) => s.id === inst.current)!;
   }
 
   start(iteration: string): WorkPacket {
@@ -127,7 +145,7 @@ export class Loop {
       const outcome = rec.ok ? "filled" : "failed";
       if (!rec.ok) inst.counters[`${state.id}_attempts`] = (inst.counters[`${state.id}_attempts`] ?? 0) + 1;
       inst.history.push({ state: state.id, outcome: rec.ok ? "filled" : "failed", evidence: rec.ref, at: now() });
-      const adv = advance(this.machine, inst, outcome, now());
+      const adv = advance(this.machineFor(inst), inst, outcome, now());
       autoClosed.push({ state: state.id, run_ref: rec.ref, ok: rec.ok });
       this.save(inst);
       if (!adv.moved) {
@@ -262,7 +280,7 @@ export class Loop {
     const rec = runRef ? this.log.find(runRef) : undefined;
     const ref = this.pinEvidence(inst, state.id, evidence, rec);
     inst.history.push({ state: state.id, outcome: "filled", evidence: ref, at: now() });
-    advance(this.machine, inst, "filled", now());
+    advance(this.machineFor(inst), inst, "filled", now());
     this.save(inst);
     if (inst.status === "closed") {
       return {

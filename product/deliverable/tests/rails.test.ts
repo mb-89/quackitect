@@ -16,13 +16,13 @@ import { help } from "../engine/help.ts";
 import { seWait } from "../engine/wait.ts";
 import { coreTools } from "../engine/tools.ts";
 import { layout } from "../engine/layout.ts";
-import { loadSystematic } from "../engine/machines/load.ts";
+import { loadMachine } from "../engine/machines/load.ts";
 import { plantMachines } from "./fixtures.ts";
 import { Rejection } from "../engine/errors.ts";
 import type { MachineDecl } from "../engine/machine.ts";
 
 process.env.SE_STATE_DIR = mkdtempSync(join(tmpdir(), "se-state-"));
-const systematic = loadSystematic(join(import.meta.dirname, "..", "..", ".."))!;
+const systematic = loadMachine(join(import.meta.dirname, "..", "..", ".."), "lean")!;
 
 const OK = `node -e "process.exit(0)"`;
 
@@ -67,7 +67,7 @@ test("B5 pass: a console bless lands with channel + hash on the grant record", a
     assert.equal(grants[0].channel, "tty"); // floor flag 2: channel
     assert.equal(grants[0].hash, offerHash); // bound to the offered state
     assert.ok(grants[0].adjudicated_by.length > 0); // floor flag 2: adjudicator
-    assert.equal(grants[0].policy, "systematic"); // floor flag 1: policy in force
+    assert.equal(grants[0].policy, "lean"); // floor flag 1: policy in force
     assert.match(grants[0].evidence, /evidence\/\d\d-close_iteration\.json$/); // floor flag 4: evidence pointer
     assert.equal(typeof grants[0].imports, "object"); // import stamp (fixture has no modules: empty)
     // The machine advanced through the approval edge.

@@ -1,11 +1,11 @@
 ---
-id: se.machine-systematic-do-work
+id: se.machine-lean-do-work
 kind: machine_state
 statement: Do the work; record what changed.
 provenance:
-  iteration: i2f-machines-are-canvases
+  iteration: i2g-tutorial-machine
   ai_involvement: agent-drafted
-machine: se.machine-systematic
+machine: se.machine-lean
 state: do_work
 state_kind: work
 filled_by: agent

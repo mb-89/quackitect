@@ -1,11 +1,11 @@
 ---
-id: se.machine-systematic-verify
+id: se.machine-lean-verify
 kind: machine_state
 statement: The declared check runs mechanically.
 provenance:
-  iteration: i2f-machines-are-canvases
+  iteration: i2g-tutorial-machine
   ai_involvement: agent-drafted
-machine: se.machine-systematic
+machine: se.machine-lean
 state: verify
 state_kind: work
 filled_by: engine

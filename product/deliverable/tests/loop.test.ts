@@ -9,12 +9,12 @@ import { join } from "node:path";
 import { Loop } from "../engine/loop.ts";
 import { Gate } from "../engine/gate.ts";
 import { layout } from "../engine/layout.ts";
-import { loadSystematic } from "../engine/machines/load.ts";
+import { loadMachine } from "../engine/machines/load.ts";
 
 process.env.SE_STATE_DIR = mkdtempSync(join(tmpdir(), "se-state-"));
 // The drawn machine from this repo's own ledger IS the fixture: tests
 // compile the real canvas, so breaking the drawing breaks the suite.
-const systematic = loadSystematic(join(import.meta.dirname, "..", "..", ".."))!;
+const systematic = loadMachine(join(import.meta.dirname, "..", "..", ".."), "lean")!;
 import { validateMachine, type MachineDecl } from "../engine/machine.ts";
 import { Rejection } from "../engine/errors.ts";
 
@@ -75,7 +75,7 @@ test("scripted walk closes a dummy iteration with no human and no agent", () => 
     // Machine state is on the branch: the instance file exists and is closed.
     const inst = JSON.parse(readFileSync(layout.instancePath(root, "i0-dummy"), "utf8"));
     assert.equal(inst.status, "closed");
-    assert.equal(inst.machine, "systematic"); // floor flag 1: policy in force
+    assert.equal(inst.machine, "lean"); // floor flag 1: policy in force
     // Evidence pinned per step, including the engine-run verify.
     const evDir = layout.evidenceDir(root, "i0-dummy");
     const evidence = readdirSync(evDir);

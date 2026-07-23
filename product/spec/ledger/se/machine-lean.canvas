@@ -1,0 +1,113 @@
+{
+	"metadata": {
+		"version": "1.0-1.0",
+		"frontmatter": {
+			"id": "se.machine-lean",
+			"kind": "machine",
+			"statement": "The lean cut: one linear iteration - goal, work, verify, gate, close. Scaffolding until the real lean is re-derived by striking from systematic.",
+			"entry": "declare_goal",
+			"reentry": "restart"
+		}
+	},
+	"nodes": [
+		{
+			"id": "n-declare-goal",
+			"type": "file",
+			"file": "spec/ledger/se/machine-lean-declare-goal.md",
+			"x": 0,
+			"y": 0,
+			"width": 420,
+			"height": 140
+		},
+		{
+			"id": "n-do-work",
+			"type": "file",
+			"file": "spec/ledger/se/machine-lean-do-work.md",
+			"x": 0,
+			"y": 220,
+			"width": 420,
+			"height": 140
+		},
+		{
+			"id": "n-verify",
+			"type": "file",
+			"file": "spec/ledger/se/machine-lean-verify.md",
+			"x": 0,
+			"y": 440,
+			"width": 420,
+			"height": 140,
+			"styleAttributes": {
+				"shape": "predefined-process"
+			}
+		},
+		{
+			"id": "n-close-iteration",
+			"type": "file",
+			"file": "spec/ledger/se/machine-lean-close-iteration.md",
+			"x": 0,
+			"y": 660,
+			"width": 420,
+			"height": 140,
+			"styleAttributes": {
+				"shape": "diamond"
+			}
+		},
+		{
+			"id": "n-closed",
+			"type": "file",
+			"file": "spec/ledger/se/machine-lean-closed.md",
+			"x": 0,
+			"y": 880,
+			"width": 420,
+			"height": 140,
+			"styleAttributes": {
+				"shape": "terminal"
+			}
+		}
+	],
+	"edges": [
+		{
+			"id": "e-dg-dw",
+			"fromNode": "n-declare-goal",
+			"fromSide": "bottom",
+			"toNode": "n-do-work",
+			"toSide": "top"
+		},
+		{
+			"id": "e-dw-v",
+			"fromNode": "n-do-work",
+			"fromSide": "bottom",
+			"toNode": "n-verify",
+			"toSide": "top"
+		},
+		{
+			"id": "e-v-ci",
+			"fromNode": "n-verify",
+			"fromSide": "bottom",
+			"toNode": "n-close-iteration",
+			"toSide": "top"
+		},
+		{
+			"id": "e-v-dw",
+			"fromNode": "n-verify",
+			"fromSide": "left",
+			"toNode": "n-do-work",
+			"toSide": "left",
+			"label": "verify_attempts < 3",
+			"styleAttributes": {
+				"role": "fallback",
+				"path": "dotted"
+			}
+		},
+		{
+			"id": "e-ci-c",
+			"fromNode": "n-close-iteration",
+			"fromSide": "bottom",
+			"toNode": "n-closed",
+			"toSide": "top",
+			"styleAttributes": {
+				"role": "approval"
+			}
+		}
+	]
+}

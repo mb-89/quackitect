@@ -9,11 +9,11 @@ process.env.SE_STATE_DIR = mkdtempSync(join(tmpdir(), "se-state-"));
 import { Loop } from "../engine/loop.ts";
 import { layout } from "../engine/layout.ts";
 import { projectState, renderHandover } from "../engine/project.ts";
-import { loadSystematic } from "../engine/machines/load.ts";
+import { loadMachine } from "../engine/machines/load.ts";
 import { plantMachines } from "./fixtures.ts";
 import type { MachineDecl } from "../engine/machine.ts";
 
-const systematic = loadSystematic(join(import.meta.dirname, "..", "..", ".."))!;
+const systematic = loadMachine(join(import.meta.dirname, "..", "..", ".."), "lean")!;
 
 const OK = `node -e "process.exit(0)"`;
 const machineOK = (): MachineDecl => ({
@@ -45,7 +45,7 @@ test("projection carries product, iterations with goals and steps, offer and cal
     // An open iteration nests its machine under the session machine.
     assert.equal(s.machine_stack.length, 2);
     assert.equal(s.machine_stack[0].current, "systematic");
-    assert.equal(s.machine_stack[1].id, "systematic");
+    assert.equal(s.machine_stack[1].id, "lean");
     assert.equal(s.machine_stack[1].current, "close_iteration");
 
     const handover = renderHandover(s);

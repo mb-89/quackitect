@@ -13,9 +13,9 @@ import { CANVAS_VERSION } from "../engine/canvas.ts";
 const REPO_ROOT = join(import.meta.dirname, "..", "..", "..");
 const repoLedger = () => loadLedger(layout.ledger(REPO_ROOT));
 
-test("the repo's drawn systematic machine compiles to the executable shape", () => {
-  const m = compileMachine(repoLedger(), "se.machine-systematic");
-  assert.equal(m.id, "systematic");
+test("the drawn lean machine compiles to the executable shape", () => {
+  const m = compileMachine(repoLedger(), "se.machine-lean");
+  assert.equal(m.id, "lean");
   assert.equal(m.initial, "declare_goal");
   assert.equal(m.reentry, "restart");
   assert.deepEqual(m.states.map((s) => s.id), ["declare_goal", "do_work", "verify", "close_iteration", "closed"]);
@@ -29,6 +29,29 @@ test("the repo's drawn systematic machine compiles to the executable shape", () 
   assert.equal(gate.kind, "gate");
   assert.equal(gate.edges[0].role, "approval");
   assert.ok(m.states.find((s) => s.id === "declare_goal")!.evidence_form.length === 3);
+});
+
+test("the drawn systematic machine: nine milestones, gates, seeding sockets, the battery loop", () => {
+  const m = compileMachine(repoLedger(), "se.machine-systematic");
+  assert.equal(m.id, "systematic");
+  assert.equal(m.initial, "draft_vision");
+  assert.equal(m.states.length, 45);
+  assert.equal(m.states.filter((s) => s.kind === "gate").length, 9);
+  assert.equal(m.states.filter((s) => s.kind === "terminal").length, 1);
+  // The seeding sockets: candidates, spikes, build chunks, killer demos.
+  assert.deepEqual(
+    m.states.filter((s) => s.submachine === "iteration").map((s) => s.id).sort(),
+    ["enumerate_space", "fill_story_evidence", "plan_build", "rank_unknowns"],
+  );
+  // The battery law as edges: verification falls back into fix_findings, guarded.
+  const ver = m.states.find((s) => s.id === "verification")!;
+  assert.equal(ver.filled_by, "engine");
+  const fb = ver.edges.find((e) => e.role === "fallback")!;
+  assert.equal(fb.to, "fix_findings");
+  assert.equal(fb.guard, "verification_attempts < 3");
+  // Groups carry the milestone names.
+  assert.equal(m.states.find((s) => s.id === "draft_vision")!.group, "M1 Frame");
+  assert.equal(m.states.find((s) => s.id === "gate_release")!.group, "M9 Ship");
 });
 
 test("the drawn session machine nests systematic and carries the boot group", () => {

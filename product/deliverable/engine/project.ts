@@ -7,8 +7,8 @@ import { basename, join, resolve } from "node:path";
 import { Gate, type GrantRecord, type Offer } from "./gate.ts";
 import { readJsonFile, stripBom } from "./jsonio.ts";
 import { layout } from "./layout.ts";
-import type { MachineInstance } from "./machine.ts";
-import { loadSession, loadSystematic } from "./machines/load.ts";
+import type { MachineDecl, MachineInstance } from "./machine.ts";
+import { loadMachine, loadSession, loadSystematic } from "./machines/load.ts";
 import { loadModules, type ModuleStatus } from "./modules.ts";
 import type { TollUpdate } from "./toll.ts";
 
@@ -123,6 +123,7 @@ export function projectState(root: string): ProjectionState {
 
   const iterations: IterationView[] = [];
   let openIteration: string | null = null;
+  let openMachine: MachineDecl | null = null;
   const iterationsDir = layout.iterations(abs);
   let lastVerify: ProjectionState["last_verify"] = null;
   if (existsSync(iterationsDir)) {
@@ -146,14 +147,17 @@ export function projectState(root: string): ProjectionState {
       }
       const done = new Set(inst.history.filter((h) => h.outcome === "filled").map((h) => h.state));
       const updatedAt = inst.history.at(-1)?.at;
+      // Each iteration renders against ITS machine (floor flag 1).
+      const instMachine = inst.machine === sysMachine?.id ? sysMachine : loadMachine(abs, inst.machine);
+      if (inst.status === "open") openMachine = instMachine;
       iterations.push({
         id: inst.iteration,
         status: inst.status,
         current: inst.current,
         ...(goal !== undefined ? { goal } : {}),
         steps:
-          sysMachine !== null
-            ? sysMachine.states.filter((s) => s.kind !== "terminal").map((s) => ({ state: s.id, done: done.has(s.id) }))
+          instMachine !== null
+            ? instMachine.states.filter((s) => s.kind !== "terminal").map((s) => ({ state: s.id, done: done.has(s.id) }))
             : [...done].map((state) => ({ state, done: true })),
         ...(updatedAt !== undefined ? { updated_at: updatedAt } : {}),
         worked_on:
@@ -230,12 +234,12 @@ export function projectState(root: string): ProjectionState {
       })),
     });
   }
-  if (openView !== undefined && sysMachine !== null) {
+  if (openView !== undefined && openMachine !== null) {
     const filled = new Set(openView.steps.filter((st) => st.done).map((st) => st.state));
     machineStack.push({
-      id: sysMachine.id,
+      id: openMachine.id,
       current: openView.current,
-      states: sysMachine.states.map((s) => ({
+      states: openMachine.states.map((s) => ({
         id: s.id,
         kind: s.kind,
         ...(s.group !== undefined ? { group: s.group } : {}),

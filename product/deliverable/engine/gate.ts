@@ -14,6 +14,7 @@ import { Rejection } from "./errors.ts";
 import { sha256 } from "./hash.ts";
 import { layout } from "./layout.ts";
 import { advance, type MachineDecl, type MachineInstance } from "./machine.ts";
+import { loadMachine } from "./machines/load.ts";
 import { importStamps } from "./modules.ts";
 
 export interface Offer {
@@ -132,11 +133,14 @@ export class Gate {
         source: "engine/gate.ts bless",
       });
     }
+    // The instance's own machine wins (floor flag 1) — a bless must advance
+    // the machine the iteration started under, not the ledger's current default.
+    const m = machine.id === inst.machine ? machine : loadMachine(this.root, inst.machine) ?? machine;
     const grant: GrantRecord = {
       iteration: offer.iteration,
       state: offer.state,
       hash: offer.base_hash,
-      policy: machine.id,
+      policy: m.id,
       channel: by.channel,
       adjudicated_by: by.adjudicated_by,
       evidence: offer.evidence_path,
@@ -146,7 +150,7 @@ export class Gate {
     };
     appendFileSync(this.grantsPath(), JSON.stringify(grant) + "\n", "utf8");
     inst.history.push({ state: offer.state, outcome: "filled", evidence: `grant:${grant.hash.slice(0, 12)}`, at: grant.at });
-    advance(machine, inst, "filled", grant.at);
+    advance(m, inst, "filled", grant.at);
     writeFileSync(instPath, JSON.stringify(inst, null, 2) + "\n", "utf8");
     this.dismiss();
     return grant;

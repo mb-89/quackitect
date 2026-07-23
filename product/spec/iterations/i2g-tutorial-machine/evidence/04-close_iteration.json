@@ -1,0 +1,9 @@
+{
+  "iteration": "i2g-tutorial-machine",
+  "state": "close_iteration",
+  "at": "2026-07-23T17:34:03.125Z",
+  "payload": {
+    "exit_check_result": "Declared: compileMachine(se.machine-tutorial) succeeds exercising all six roles, a guarded fallback loop, engine-fill with command, a gate, two terminals, a nested machine, the iteration socket, and a group, with text-node comments skipped; verify green. Showed: verify run-ce4ed696180f green; the new coverage test asserts each feature on the compiled tutorial machine; a second fixture test proves comment skipping; the drawing carries eight annotations and the systematic machine nested through a live portal.",
+    "offer_hash": "a0a607cd37d588eac72e88350528c5ffa814248af09326f6e872fcc51dd8612e"
+  }
+}
