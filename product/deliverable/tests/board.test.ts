@@ -54,7 +54,8 @@ test("board serves page + projection, and the bless button closes the gate on th
     proc = started.proc;
 
     const page = await (await fetch(started.url)).text();
-    assert.match(page, /Train of thought/);
+    assert.match(page, /State machine/);
+    assert.match(page, /train of thought/);
 
     // No viewer yet: a poke would open a tab (suppressed by --no-open here).
     const cold = (await (await fetch(started.url + "open", { method: "POST" })).json()) as { viewer_recent: boolean };

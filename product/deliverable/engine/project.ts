@@ -9,6 +9,7 @@ import { readJsonFile, stripBom } from "./jsonio.ts";
 import { layout } from "./layout.ts";
 import type { MachineInstance } from "./machine.ts";
 import { systematic } from "./machines/systematic.ts";
+import { sessionMachine } from "./machines/session.ts";
 import { loadModules, type ModuleStatus } from "./modules.ts";
 import type { TollUpdate } from "./toll.ts";
 
@@ -43,6 +44,13 @@ export interface NoteLine {
   at: string;
 }
 
+/** One machine on the stack: its states with live status, deepest last. */
+export interface MachineFrame {
+  id: string;
+  current: string;
+  states: { id: string; status: "done" | "current" | "future"; statement: string; guidance: string }[];
+}
+
 export interface ProjectionState {
   product: string;
   root: string;
@@ -59,6 +67,8 @@ export interface ProjectionState {
   heartbeat: (TollUpdate & { todo?: string[]; age_s: number }) | null;
   grants: GrantRecord[];
   last_verify: { ok: boolean; exit: number; at: string; iteration: string } | null;
+  /** The session machine, plus the open iteration's machine nested below it. */
+  machine_stack: MachineFrame[];
   calls: CallLine[];
   /** Private inbox (machine-local, drained at retros) — the board shows it, the repo never does. */
   notes: NoteLine[];
@@ -196,6 +206,35 @@ export function projectState(root: string): ProjectionState {
       };
     });
 
+  const openView = iterations.find((it) => it.status === "open");
+  const sessionCurrent = openView !== undefined ? "iteration" : sessionStarted !== null ? "idle" : "lock_on";
+  const sessionIdx = sessionMachine.states.findIndex((s) => s.id === sessionCurrent);
+  const machineStack: MachineFrame[] = [
+    {
+      id: sessionMachine.id,
+      current: sessionCurrent,
+      states: sessionMachine.states.map((s, i) => ({
+        id: s.id,
+        status: s.id === sessionCurrent ? "current" : i < sessionIdx ? "done" : "future",
+        statement: s.statement,
+        guidance: s.guidance,
+      })),
+    },
+  ];
+  if (openView !== undefined) {
+    const filled = new Set(openView.steps.filter((st) => st.done).map((st) => st.state));
+    machineStack.push({
+      id: systematic.id,
+      current: openView.current,
+      states: systematic.states.map((s) => ({
+        id: s.id,
+        status: s.id === openView.current ? "current" : filled.has(s.id) ? "done" : "future",
+        statement: s.statement,
+        guidance: s.guidance,
+      })),
+    });
+  }
+
   return {
     product,
     root: abs,
@@ -210,6 +249,7 @@ export function projectState(root: string): ProjectionState {
     heartbeat,
     grants,
     last_verify: lastVerify,
+    machine_stack: machineStack,
     calls,
     notes: jsonLines<NoteLine>(tailText(layout.notesPath(abs))).slice(-10).reverse(),
   };

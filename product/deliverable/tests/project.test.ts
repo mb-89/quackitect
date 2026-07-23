@@ -38,6 +38,11 @@ test("projection carries product, iterations with goals and steps, offer and cal
     assert.ok(s.offer !== null && s.offer.base_hash === p.offer_hash);
     assert.ok(s.last_verify?.ok);
     assert.ok(s.calls.length > 0, "the wireshark feed sees the run records");
+    // An open iteration nests its machine under the session machine.
+    assert.equal(s.machine_stack.length, 2);
+    assert.equal(s.machine_stack[0].current, "iteration");
+    assert.equal(s.machine_stack[1].id, "systematic");
+    assert.equal(s.machine_stack[1].current, "close_iteration");
 
     const handover = renderHandover(s);
     assert.match(handover, /proj-fixture/);
@@ -95,6 +100,10 @@ test("the call feed is session-scoped and carries direction data", () => {
     const s = projectState(root);
     assert.equal(s.agents[0].name, "mallard");
     assert.equal(s.session_started, "2026-06-01T00:00:00.000Z");
+    // Admitted, nothing open: the session machine sits at idle, no nested frame.
+    assert.equal(s.machine_stack.length, 1);
+    assert.equal(s.machine_stack[0].id, "session");
+    assert.equal(s.machine_stack[0].current, "idle");
     assert.equal(s.calls.length, 1, "pre-session calls are filtered out");
     assert.equal(s.calls[0].intent, "fresh");
     assert.equal((s.calls[0].response as { clause: string }).clause, "SE-C-060");

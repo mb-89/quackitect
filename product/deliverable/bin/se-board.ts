@@ -1,10 +1,12 @@
 #!/usr/bin/env node
 // se-board — the live state board (owner sketch: status-dashboard).
-// Layout is the owner's ruling, redline round 2: narrow sidebars, big
-// middle. Left = iterations only. Middle = agent tabs over train-of-thought
-// (one third) and the call table (two thirds). Right sidebar, fixed thirds:
-// details / decisions (a bless is one decision card) / notes. No footer.
-// Every pane maximizes into a modal; clicks land in the details pane.
+// Layout is the owner's ruling, redline round 4: narrow resizable sidebars.
+// Middle splits at 500px: state-machine column (browsable stack, current
+// state lit) beside the train-of-thought column (current state / log / log
+// details in thirds); below 500px the two collapse into sub-tabs per agent.
+// Log: one line per command — a command and its response are one thing.
+// Right sidebar, fixed thirds: decisions (a bless is one card, one shown
+// at a time) / notes / details (the generic click fallback). No footer.
 // The bless button is an owner act on the owner's own channel: channel=board.
 // Zero deps. Port in use = another board is up: exit silently.
 import { spawn } from "node:child_process";
@@ -64,9 +66,20 @@ const PAGE = `<!doctype html>
   .max { margin-left: auto; border: none; background: none; color: var(--dim); cursor: pointer; font-size: 13px; padding: 0 .2em; }
   .max:hover { color: #1e1e1e; }
   .body { flex: 1; min-height: 0; overflow-y: auto; }
-  #tabs { display: flex; gap: .3em; margin-bottom: .4em; border-bottom: 1px solid var(--line); }
-  .tab { padding: .25em .9em; border: 1px solid var(--line); border-bottom: none; border-radius: 6px 6px 0 0; background: #fff; font-size: 12px; }
+  #midsplit { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  body.mid-narrow #midsplit { grid-template-columns: minmax(0, 1fr); }
+  #sm-col { display: flex; flex-direction: column; min-height: 0; border-right: 1px solid var(--line); }
+  body.mid-narrow #sm-col { border-right: none; }
+  #tot-col { display: flex; flex-direction: column; min-height: 0; }
+  #tabs { display: flex; gap: .3em; border-bottom: 1px solid var(--line); }
+  #tabslot-wide { padding: .4em .7em 0; }
+  #tabslot-narrow { padding: .4em .7em 0; border-bottom: 1px solid var(--line); background: #fff; }
+  .tab { padding: .25em .9em; border: 1px solid var(--line); border-bottom: none; border-radius: 6px 6px 0 0; background: #fff; font-size: 12px; cursor: pointer; }
   .tab.active { border-color: var(--mark); color: var(--mark); }
+  #subtabs { display: flex; gap: .3em; margin-top: .3em; }
+  #smcrumb { margin-bottom: .4em; font-size: 12px; }
+  .crumb { cursor: pointer; color: var(--dim); }
+  .crumb.active { color: var(--mark); font-weight: 600; }
   .iterrow { display: flex; align-items: center; gap: .5em; padding: .18em .3em; cursor: pointer; border-radius: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .iterrow:hover { background: #eef; }
   .led { width: .6em; height: .6em; border-radius: 50%; background: #e4e4e4; flex: 0 0 auto; }
@@ -79,12 +92,12 @@ const PAGE = `<!doctype html>
   .tick { color: var(--ok); }
   .cross { color: var(--bad); }
   #filter { width: 100%; padding: .3em; margin-bottom: .4em; border: 1px solid var(--line); border-radius: 4px; }
-  .lrow { display: grid; grid-template-columns: 5em 5em 5em minmax(7em, 11em) 1fr; gap: .5em; font: 12px ui-monospace, monospace; cursor: pointer; white-space: nowrap; padding: .08em .2em; }
+  .lrow { display: grid; grid-template-columns: 4.8em 4.5em 3em minmax(7em, 10em) 1fr 6em; gap: .5em; font: 12px ui-monospace, monospace; cursor: pointer; white-space: nowrap; padding: .08em .2em; }
   .lrow:hover { background: #eef; }
   .lrow span { overflow: hidden; text-overflow: ellipsis; }
   .lhead { font-weight: 600; color: var(--dim); cursor: default; }
   .lhead:hover { background: none; }
-  #details pre, #modalbody pre { white-space: pre-wrap; word-break: break-word; font-size: 12px; background: #fff; border: 1px solid var(--line); border-radius: 6px; padding: .5em; }
+  #details pre, #logdetail pre, #modalbody pre { white-space: pre-wrap; word-break: break-word; font-size: 12px; background: #fff; border: 1px solid var(--line); border-radius: 6px; padding: .5em; }
   .card { background: #fff; border: 1px solid var(--line); border-radius: 6px; padding: .5em .6em; margin-bottom: .5em; }
   .card pre { max-height: 9em; overflow-y: auto; white-space: pre-wrap; word-break: break-word; font-size: 11px; margin: .4em 0; }
   .call { padding: .1em .2em; cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 13px; }
@@ -111,15 +124,26 @@ const PAGE = `<!doctype html>
   </div>
   <div class="gutter" id="gl"></div>
   <div class="col">
-    <div class="pane" id="p-tot">
-      <div id="tabs"></div>
-      <h2>Train of thought<button class="max" onclick="maximize('p-tot')">⛶</button></h2>
-      <div class="body" id="tot"></div></div>
-    <div class="pane" id="p-log"><h2>Log<button class="max" onclick="maximize('p-log')">⛶</button></h2>
-      <input id="filter" placeholder="filter — click for help">
-      <div class="body" id="feed"></div></div>
-    <div class="pane" id="p-logdetail"><h2>Log details<button class="max" onclick="maximize('p-logdetail')">⛶</button></h2>
-      <div class="body" id="logdetail"><pre>click a log row</pre></div></div>
+    <div id="tabslot-narrow" style="display:none">
+      <div id="subtabs"><span class="tab" id="st-sm" onclick="setSub('sm')">state machine</span><span class="tab" id="st-tot" onclick="setSub('tot')">train of thought</span></div>
+    </div>
+    <div id="midsplit">
+      <div id="sm-col">
+        <div id="tabslot-wide"><div id="tabs"></div></div>
+        <div class="pane" id="p-sm"><h2>State machine<button class="max" onclick="maximize('p-sm')">⛶</button></h2>
+          <div id="smcrumb"></div>
+          <div class="body" id="smlist"></div></div>
+      </div>
+      <div id="tot-col">
+        <div class="pane" id="p-tot"><h2>Current state<button class="max" onclick="maximize('p-tot')">⛶</button></h2>
+          <div class="body" id="tot"></div></div>
+        <div class="pane" id="p-log"><h2>Log<button class="max" onclick="maximize('p-log')">⛶</button></h2>
+          <input id="filter" placeholder="filter — click for help">
+          <div class="body" id="feed"></div></div>
+        <div class="pane" id="p-logdetail"><h2>Log details<button class="max" onclick="maximize('p-logdetail')">⛶</button></h2>
+          <div class="body" id="logdetail"><pre>click a log row</pre></div></div>
+      </div>
+    </div>
   </div>
   <div class="gutter" id="gr"></div>
   <div class="col">
@@ -141,11 +165,13 @@ let ITERS = [];
 let DECS = [], decIdx = 0;
 let maximized = null;
 let wdTick = 0, wdFail = 0;
+let SMVIEW = -1;
+let subTab = "tot";
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const el = (id) => document.getElementById(id);
 function detail(obj) { el("details").innerHTML = "<pre>" + esc(typeof obj === "string" ? obj : JSON.stringify(obj, null, 2)) + "</pre>"; }
 function detailLog(obj) { el("logdetail").innerHTML = "<pre>" + esc(typeof obj === "string" ? obj : JSON.stringify(obj, null, 2)) + "</pre>"; }
-const FILTER_HELP = "The filter hides log rows.\\n\\nType any text. A row stays visible when its time, source, destination, tool, or info column contains that text. Case does not matter.\\n\\nExamples:\\n  file      only the file-lane calls\\n  se_git    only git calls\\n  09:4      calls from that minute\\n\\nClear the field to see every row again.";
+const FILTER_HELP = "The filter hides log rows.\\n\\nType any text. A row stays visible when its time, source, destination, tool, info, or result column contains that text. Case does not matter.\\n\\nExamples:\\n  file      only the file-lane calls\\n  se_git    only git calls\\n  09:4      calls from that minute\\n\\nClear the field to see every row again.";
 function maximize(paneId) { maximized = paneId; syncModal(); el("modal").className = "open"; }
 function closeModal() { maximized = null; el("modal").className = ""; }
 function syncModal() {
@@ -160,6 +186,31 @@ function watchdog() {
   for (let i = 0; i < 3; i++) dots[i].className = "wdot" + (i === wdTick % 3 ? " " + cls : "");
 }
 const iterNum = (id) => { const m = id.match(/^i(\\d+)/); return m ? Number(m[1]) : 999; };
+function setSub(t) { subTab = t; layoutMiddle(); }
+function layoutMiddle() {
+  const wide = el("midsplit").offsetWidth > 500;
+  document.body.classList.toggle("mid-narrow", !wide);
+  el("tabslot-narrow").style.display = wide ? "none" : "";
+  const slot = wide ? el("tabslot-wide") : el("tabslot-narrow");
+  if (el("tabs").parentElement !== slot) slot.prepend(el("tabs"));
+  el("sm-col").style.display = wide || subTab === "sm" ? "" : "none";
+  el("tot-col").style.display = wide || subTab === "tot" ? "" : "none";
+  el("st-sm").className = "tab" + (subTab === "sm" ? " active" : "");
+  el("st-tot").className = "tab" + (subTab === "tot" ? " active" : "");
+}
+function smView(i) { SMVIEW = i; render(); }
+function renderSM() {
+  const stack = S.machine_stack ?? [];
+  const idx = SMVIEW < 0 || SMVIEW >= stack.length ? stack.length - 1 : SMVIEW;
+  el("smcrumb").innerHTML = stack.map((m, i) =>
+    '<span class="crumb' + (i === idx ? " active" : "") + '" onclick="smView(' + i + ')">' + esc(m.id) + "</span>"
+  ).join(" ▸ ");
+  const f = stack[idx];
+  el("smlist").innerHTML = f ? f.states.map((st, i) =>
+    '<div class="iterrow" onclick="detail(S.machine_stack[' + idx + '].states[' + i + '])">' +
+    '<span class="led ' + (st.status === "done" ? "done" : st.status === "current" ? "open" : "") + '"></span>' +
+    esc(st.id) + "</div>").join("") : "";
+}
 function render() {
   if (!S) return;
   el("product").textContent = S.product;
@@ -172,6 +223,7 @@ function render() {
     '<div class="iterrow" onclick="detail(ITERS[' + i + '])">' +
     '<span class="led ' + (it.status === "closed" ? "done" : it.status === "open" ? "open" : "") + '"></span>' +
     esc(it.id) + "</div>").join("");
+  renderSM();
   const hb = S.heartbeat;
   el("tot").innerHTML =
     (hb ? '<div class="hb"><b>' + esc(hb.current_step) + "</b><br>next: " + esc(hb.next_milestone) +
@@ -183,20 +235,14 @@ function render() {
     }).join("") + "</ul>" : "");
   const me = S.agents[0].name;
   const q = el("filter").value.toLowerCase();
-  const rows = [];
-  S.calls.forEach((c, i) => {
-    const t = c.ts.slice(11, 19);
-    const resp = c.ok ? '<span class="tick">✓ ok</span>'
+  const rows = S.calls.map((c, i) => {
+    const res = c.ok ? '<span class="tick">✓</span>'
       : '<span class="cross">✗ ' + esc(c.response && c.response.clause ? c.response.clause : "failed") + "</span>";
-    rows.push(
-      '<div class="lrow" onclick="detailLog(reqOf(' + i + '))"><span>' + t + "</span><span>" + esc(me) +
-        "</span><span>se</span><span>" + esc(c.tool) + "</span><span>" + esc(c.intent ?? "") + "</span></div>",
-      '<div class="lrow" onclick="detailLog(respOf(' + i + '))"><span>' + t + "</span><span>se</span><span>" + esc(me) +
-        "</span><span>" + esc(c.tool) + "</span><span>" + resp + "</span></div>",
-    );
+    return '<div class="lrow" onclick="detailLog(S.calls[' + i + '])"><span>' + c.ts.slice(11, 19) + "</span><span>" +
+      esc(me) + "</span><span>se</span><span>" + esc(c.tool) + "</span><span>" + esc(c.intent ?? "") + "</span><span>" + res + "</span></div>";
   });
   el("feed").innerHTML =
-    '<div class="lrow lhead"><span>time</span><span>source</span><span>dest</span><span>tool</span><span>info</span></div>' +
+    '<div class="lrow lhead"><span>time</span><span>source</span><span>dest</span><span>tool</span><span>info</span><span>result</span></div>' +
     rows.filter(r => !q || r.toLowerCase().includes(q)).join("");
   DECS = [];
   if (S.offer) {
@@ -212,12 +258,6 @@ function render() {
     '<div class="call" onclick="detail(S.notes[' + i + '])">' + esc(n.at.slice(5, 16)) + " " + esc(n.text.slice(0, 60)) + "</div>"
   ).join("") || '<span class="dim">empty</span>';
   syncModal();
-}
-function reqOf(i) { const c = S.calls[i]; return { direction: S.agents[0].name + " → se", ts: c.ts, tool: c.tool, args: c.detail }; }
-function respOf(i) {
-  const c = S.calls[i];
-  return { direction: "se → " + S.agents[0].name, ts: c.ts, tool: c.tool, ok: c.ok,
-    duration_ms: c.duration_ms, response: c.response ?? "ok" };
 }
 function decStep(d) { if (DECS.length > 1) { decIdx = (decIdx + d + DECS.length) % DECS.length; render(); } }
 async function tick() {
@@ -248,6 +288,7 @@ function initResize() {
         const w = Math.max(140, Math.min(window.innerWidth / 2, calc(ev)));
         rootEl.style.setProperty(varName, w + "px");
         localStorage.setItem(key, w + "px");
+        layoutMiddle();
       };
       const up = () => { removeEventListener("mousemove", move); removeEventListener("mouseup", up); };
       addEventListener("mousemove", move);
@@ -258,8 +299,10 @@ function initResize() {
   drag("gr", (ev) => window.innerWidth - ev.clientX, "--wr", "sb-r");
 }
 initResize();
+addEventListener("resize", layoutMiddle);
 el("filter").addEventListener("input", render);
 el("filter").addEventListener("focus", () => detailLog(FILTER_HELP));
+layoutMiddle();
 tick();
 setInterval(tick, 2000);
 </script>
