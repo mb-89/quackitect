@@ -53,7 +53,7 @@ export function coreTools(root: string, opts: { toll?: Toll; session?: Session }
     {
       name: "se_boot",
       title: "se.boot",
-      description: "Log onto the project; call again with contract_hash to attest — that admits the session.",
+      description: "Lock onto the project; call again with contract_hash to attest — that admits the session.",
       inputSchema: {
         type: "object",
         properties: {

@@ -2,7 +2,7 @@
 //
 // A session starts knowing nothing. The boot takes it from initial to the
 // state where se.loop.next works:
-//   1. log onto the product (nameplate-recognized; recents recorded for
+//   1. lock onto the product (nameplate-recognized; recents recorded for
 //      the future picker)
 //   2. receive the contract — the project's general guidance (rules +
 //      voice), served by the server, never baked into AGENTS.md
@@ -55,6 +55,14 @@ You work through the se MCP server, and you do what it tells you.
 - You never push. The owner pushes.
 - Gates are offers. A human blesses through their own channel. You park
   or wait; you do not poll a judgment surface.
+
+## The boot ritual (chat side)
+
+- Recite the contract's core in one visible message.
+- Ask ONE question, once: proceed, and with which project.
+- Then run to idle with no further questions.
+- At idle, say so: "idle — what next?" with the options.
+- Never start an iteration unasked. Idle is a stop, not a springboard.
 
 ## The lanes (the loop will hand you the right one)
 
@@ -192,7 +200,7 @@ export function assertAdmitted(session: Session, toolName: string): void {
   if (session.admitted || PRE_BOOT_TOOLS.has(toolName)) return;
   throw new Rejection({
     clause: "SE-C-005",
-    expected: "an admitted session (the boot: log on, read the contract, attest its hash)",
+    expected: "an admitted session (the boot: lock on, read the contract, attest its hash)",
     got: `unadmitted call to ${toolName}`,
     remedy: { tool: "se_boot", args: {}, note: "one round-trip: se_boot returns the contract + hash; se_boot with contract_hash admits you" },
     source: "engine/boot.ts assertAdmitted",
