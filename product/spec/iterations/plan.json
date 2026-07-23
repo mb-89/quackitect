@@ -10,7 +10,6 @@
         { "text": "retro flow v1 - opens with the field-feedback question, drains the notes inbox, cleans it up" },
         { "text": "mint policies as ledger nodes (open since B4)" },
         { "text": "projection: last_verify picked by timestamp, not folder order" },
-        { "text": "boot: already-admitted sessions also spawn/poke the board" },
         { "text": "boot cleanliness: the toll never blocks a session's first se_boot; one-question ritual per the contract" },
         { "text": "se-gate: record role not username@hostname; loud message on expired offer" },
         { "text": "bless the machine redesign at the gate", "owner": true },

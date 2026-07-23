@@ -1,8 +1,9 @@
 #!/usr/bin/env node
 // se-board — the live state board (owner sketch: status-dashboard).
-// Layout is the owner's ruling, redline round 1: left = iterations only;
-// middle = agent tabs over train-of-thought / call table / details, fixed
-// thirds; right = bless / decisions / notes, fixed thirds. No footer.
+// Layout is the owner's ruling, redline round 2: narrow sidebars, big
+// middle. Left = iterations only. Middle = agent tabs over train-of-thought
+// (one third) and the call table (two thirds). Right sidebar, fixed thirds:
+// details / decisions (a bless is one decision card) / notes. No footer.
 // Every pane maximizes into a modal; clicks land in the details pane.
 // The bless button is an owner act on the owner's own channel: channel=board.
 // Zero deps. Port in use = another board is up: exit silently.
@@ -12,7 +13,7 @@ import { resolve } from "node:path";
 import { Gate } from "../engine/gate.ts";
 import { systematic } from "../engine/machines/systematic.ts";
 import { BOARD_PORT } from "../engine/board.ts";
-import { projectState, renderHandover, BOARD_VERSION } from "../engine/project.ts";
+import { projectState, BOARD_VERSION } from "../engine/project.ts";
 import { Rejection } from "../engine/errors.ts";
 
 const args = process.argv.slice(2);
@@ -53,12 +54,14 @@ const PAGE = `<!doctype html>
   .wdot.green { background: var(--ok); }
   .wdot.yellow { background: var(--warn); }
   .wdot.red { background: var(--bad); }
-  main { flex: 1; display: grid; grid-template-columns: 1fr 1.7fr 1fr; min-height: 0; }
+  main { flex: 1; display: grid; grid-template-columns: 230px minmax(0, 1fr) 320px; min-height: 0; }
   .col { display: flex; flex-direction: column; min-height: 0; border-right: 1px solid var(--line); }
   .col:last-child { border-right: none; }
   .pane { flex: 1 1 0; min-height: 0; display: flex; flex-direction: column; border-bottom: 1px solid var(--line); padding: .5em .7em; background: #fafafa; }
   .pane:last-child { border-bottom: none; }
   .pane > h2 { display: flex; align-items: center; font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: var(--dim); margin: 0 0 .4em; }
+  #p-tot { flex: 1 1 0; }
+  #p-log { flex: 2 1 0; }
   .max { margin-left: auto; border: none; background: none; color: var(--dim); cursor: pointer; font-size: 13px; padding: 0 .2em; }
   .max:hover { color: #1e1e1e; }
   .body { flex: 1; min-height: 0; overflow-y: auto; }
@@ -77,13 +80,14 @@ const PAGE = `<!doctype html>
   .tick { color: var(--ok); }
   .cross { color: var(--bad); }
   #filter { width: 100%; padding: .3em; margin-bottom: .4em; border: 1px solid var(--line); border-radius: 4px; }
-  .lrow { display: grid; grid-template-columns: 4.6em 4.6em 4.6em minmax(6em, 9em) 1fr; gap: .5em; font: 11px ui-monospace, monospace; cursor: pointer; white-space: nowrap; padding: .08em .2em; }
+  .lrow { display: grid; grid-template-columns: 5em 5em 5em minmax(7em, 11em) 1fr; gap: .5em; font: 12px ui-monospace, monospace; cursor: pointer; white-space: nowrap; padding: .08em .2em; }
   .lrow:hover { background: #eef; }
   .lrow span { overflow: hidden; text-overflow: ellipsis; }
   .lhead { font-weight: 600; color: var(--dim); cursor: default; }
   .lhead:hover { background: none; }
   #details pre, #modalbody pre { white-space: pre-wrap; word-break: break-word; font-size: 12px; background: #fff; border: 1px solid var(--line); border-radius: 6px; padding: .5em; }
   .card { background: #fff; border: 1px solid var(--line); border-radius: 6px; padding: .5em .6em; margin-bottom: .5em; }
+  .card pre { max-height: 9em; overflow-y: auto; white-space: pre-wrap; word-break: break-word; font-size: 11px; margin: .4em 0; }
   .call { padding: .1em .2em; cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 13px; }
   .call:hover { background: #eef; }
   button { padding: .4em 1em; border: 1px solid var(--line); border-radius: 6px; cursor: pointer; background: #fff; }
@@ -113,13 +117,11 @@ const PAGE = `<!doctype html>
     <div class="pane" id="p-log"><h2>Log<button class="max" onclick="maximize('p-log')">⛶</button></h2>
       <input id="filter" placeholder="filter — click for help">
       <div class="body" id="feed"></div></div>
-    <div class="pane" id="p-details"><h2>Details<button class="max" onclick="maximize('p-details')">⛶</button></h2>
-      <div class="body" id="details"><pre>click anything</pre></div></div>
   </div>
   <div class="col">
-    <div class="pane" id="p-bless"><h2>Bless<button class="max" onclick="maximize('p-bless')">⛶</button></h2>
-      <div class="body" id="offer">no pending offer</div></div>
-    <div class="pane" id="p-decisions"><h2>Decisions<button class="max" onclick="maximize('p-decisions')">⛶</button></h2>
+    <div class="pane" id="p-details"><h2>Details<button class="max" onclick="maximize('p-details')">⛶</button></h2>
+      <div class="body" id="details"><pre>click anything</pre></div></div>
+    <div class="pane" id="p-decisions"><h2>Decisions<span id="decnav" style="margin-left:.6em; display:none"><button class="max" onclick="decStep(-1)">◀</button><span id="deccount" class="dim"></span><button class="max" onclick="decStep(1)">▶</button></span><button class="max" onclick="maximize('p-decisions')">⛶</button></h2>
       <div class="body" id="decisions"></div></div>
     <div class="pane" id="p-notes"><h2>Notes (private inbox)<button class="max" onclick="maximize('p-notes')">⛶</button></h2>
       <div class="body" id="notes"></div></div>
@@ -132,6 +134,7 @@ const PAGE = `<!doctype html>
 <script>
 let S = null;
 let ITERS = [];
+let DECS = [], decIdx = 0;
 let maximized = null;
 let wdTick = 0, wdFail = 0;
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
@@ -190,15 +193,16 @@ function render() {
   el("feed").innerHTML =
     '<div class="lrow lhead"><span>time</span><span>source</span><span>dest</span><span>tool</span><span>info</span></div>' +
     rows.filter(r => !q || r.toLowerCase().includes(q)).join("");
-  el("offer").innerHTML = S.offer
-    ? "<pre>" + esc(S.offer.brief) + "</pre><button id=\\"blessBtn\\" onclick=\\"bless()\\">bless as offered</button> " +
-      "<button onclick=\\"dismiss()\\">dismiss</button>"
-    : '<span class="dim">no pending offer</span>';
-  const seen = localStorage.getItem("handover-seen");
-  el("decisions").innerHTML = (S.handover && seen !== S.session_started)
-    ? '<div class="card"><b>Boot handover</b><div class="dim">the session state at admission</div>' +
-      '<button onclick="showHandover()">read</button> <button onclick="handoverDone()">done</button></div>'
-    : '<span class="dim">nothing to decide</span>';
+  DECS = [];
+  if (S.offer) {
+    DECS.push('<div class="card"><b>Gate: ' + esc(S.offer.iteration) + "</b><pre>" + esc(S.offer.brief) + "</pre>" +
+      "<button id=\\"blessBtn\\" onclick=\\"bless()\\">bless as offered</button> " +
+      "<button onclick=\\"dismiss()\\">dismiss</button></div>");
+  }
+  if (decIdx >= DECS.length) decIdx = Math.max(0, DECS.length - 1);
+  el("decisions").innerHTML = DECS[decIdx] ?? '<span class="dim">nothing to decide</span>';
+  el("decnav").style.display = DECS.length > 1 ? "" : "none";
+  el("deccount").textContent = (decIdx + 1) + "/" + DECS.length;
   el("notes").innerHTML = (S.notes ?? []).map((n, i) =>
     '<div class="call" onclick="detail(S.notes[' + i + '])">' + esc(n.at.slice(5, 16)) + " " + esc(n.text.slice(0, 60)) + "</div>"
   ).join("") || '<span class="dim">empty</span>';
@@ -210,8 +214,7 @@ function respOf(i) {
   return { direction: "se → " + S.agents[0].name, ts: c.ts, tool: c.tool, ok: c.ok,
     duration_ms: c.duration_ms, response: c.response ?? "ok" };
 }
-function showHandover() { el("modaltitle").textContent = "Boot handover"; el("modalbody").innerHTML = "<pre>" + esc(S.handover) + "</pre>"; maximized = null; el("modal").className = "open"; }
-function handoverDone() { localStorage.setItem("handover-seen", S.session_started); render(); }
+function decStep(d) { if (DECS.length > 1) { decIdx = (decIdx + d + DECS.length) % DECS.length; render(); } }
 async function tick() {
   wdTick++;
   try {
@@ -251,9 +254,8 @@ const server = createServer(async (req, res) => {
       res.end(PAGE);
     } else if (req.method === "GET" && req.url === "/state.json") {
       lastSeen = Date.now();
-      const s = projectState(root);
       res.writeHead(200, { "content-type": "application/json" });
-      res.end(JSON.stringify({ ...s, handover: renderHandover(s) }));
+      res.end(JSON.stringify(projectState(root)));
     } else if (req.method === "POST" && req.url === "/open") {
       const viewerRecent = Date.now() - lastSeen < VIEWER_FRESH_MS;
       if (!viewerRecent) openBrowser();

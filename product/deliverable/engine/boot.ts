@@ -157,6 +157,10 @@ export function boot(
   const { name: project, nameplate } = productName(root);
   const modules = loadModules(root);
   if (session.admitted) {
+    if (opts.board === true) {
+      spawnBoard(root);
+      pokeBoard();
+    }
     return {
       step: "admitted",
       project,
