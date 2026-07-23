@@ -1,7 +1,7 @@
 {
   "machine": "systematic",
   "iteration": "i2f-machines-are-canvases",
-  "current": "close_iteration",
+  "current": "closed",
   "counters": {
     "verify_attempts": 1
   },
@@ -35,8 +35,14 @@
       "outcome": "filled",
       "evidence": "run-d6b3047fd93f",
       "at": "2026-07-23T17:14:55.360Z"
+    },
+    {
+      "state": "close_iteration",
+      "outcome": "filled",
+      "evidence": "grant:e99148398763",
+      "at": "2026-07-23T17:16:57.666Z"
     }
   ],
   "escapes": [],
-  "status": "open"
+  "status": "closed"
 }
