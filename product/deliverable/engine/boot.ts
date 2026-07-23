@@ -15,7 +15,7 @@
 // Admission is per-session, per-shim (in-memory): a reclaimed VM or fresh
 // process boots again, by design.
 import { appendFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
-import { basename, join, resolve } from "node:path";
+import { basename, dirname, join, resolve } from "node:path";
 import { boardUrl, pokeBoard, spawnBoard } from "./board.ts";
 import { Rejection } from "./errors.ts";
 import { sha256 } from "./hash.ts";
@@ -31,7 +31,23 @@ export interface Session {
 }
 
 export function newSession(): Session {
+  const file = process.env.SE_SESSION_FILE;
+  if (file !== undefined && existsSync(file)) {
+    try {
+      return readJsonFile<Session>(file);
+    } catch {
+      // torn write — start fresh
+    }
+  }
   return { admitted: false };
+}
+
+/** Admission survives an engine hot-restart: the shim owns the file's lifetime. */
+function persistSession(session: Session): void {
+  const file = process.env.SE_SESSION_FILE;
+  if (file === undefined) return;
+  mkdirSync(dirname(file), { recursive: true });
+  writeFileSync(file, JSON.stringify(session) + "\n", "utf8");
 }
 
 /** Tools legal before admission. */
@@ -194,6 +210,7 @@ export function boot(
   session.admitted = true;
   session.project = project;
   session.contractHash = hash;
+  persistSession(session);
   writeLock(root, project, modules);
   appendRecents(root, project);
   if (opts.board === true) {

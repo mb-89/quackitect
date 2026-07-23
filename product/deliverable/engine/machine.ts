@@ -41,6 +41,8 @@ export interface StateDecl {
   guidance: string;
   /** The evidence form `submit` must satisfy (shape check; review checks quality). */
   evidence_form: EvidenceField[];
+  /** A nested machine: a ledger machine id, or "iteration" — the iteration may provide its own. */
+  submachine?: string;
   edges: EdgeDecl[];
 }
 

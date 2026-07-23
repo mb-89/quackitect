@@ -13,7 +13,7 @@ import { v1Import } from "./migrations/v1-import.ts";
 import { Loop } from "./loop.ts";
 import { systematic } from "./machines/systematic.ts";
 import { CallLog } from "./calllog.ts";
-import { Toll } from "./toll.ts";
+import { Toll, TOLL_UPDATE_SCHEMA } from "./toll.ts";
 import { help } from "./help.ts";
 import { seWait, type WaitCondition } from "./wait.ts";
 import { McpServer } from "./mcp.ts";
@@ -240,7 +240,7 @@ export function coreTools(root: string, opts: { toll?: Toll; session?: Session }
         required: ["path", "content", "base_hash"],
       },
       handler: (args) =>
-        fileWrite(root, String(args.path), String(args.content), args.base_hash === null ? null : String(args.base_hash)),
+        fileWrite(root, String(args.path), String(args.content), args.base_hash === null || args.base_hash === "null" ? null : String(args.base_hash)),
     },
     {
       name: "se_file_patch",
@@ -379,6 +379,11 @@ export function coreTools(root: string, opts: { toll?: Toll; session?: Session }
       handler: (args) => seWait(root, args.condition as WaitCondition, Number(args.timeout_s ?? 60)),
     },
   ];
+  // The voluntary update lane: any call may carry one — the toll records it
+  // and resets, so the board refreshes per completion, not only per toll.
+  for (const t of tools) {
+    t.inputSchema.properties = { ...((t.inputSchema.properties as Record<string, unknown>) ?? {}), update: TOLL_UPDATE_SCHEMA };
+  }
   return tools;
 }
 
