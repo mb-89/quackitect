@@ -1,0 +1,10 @@
+{
+  "iteration": "i2b-visibility",
+  "state": "declare_goal",
+  "at": "2026-07-23T09:55:49.463Z",
+  "payload": {
+    "goal": "Owner visibility and honest access lanes: the live board (per the owner's sketch: iterations, train-of-thought with wireshark feed, details, bless panel with board-channel button), the widened se_file_* lane with search, the boot lock + workspace fence hook, the product nameplate check, and boot handover from projection.",
+    "load_bearing_for": "The owner is blind while the agent works (no live state surface, no heartbeat display) and the agent keeps falling into direct product access because the server lacks file search/read/write outside product/deliverable and nothing mechanically fences it - three live incidents this session, none of which se_help could log because it was never asked.",
+    "exit_check": "Engine verify green over: se_file_list/read/write/patch/search rooted at the repo root (workspace and ledger-writes refused), boot writing the lock file (product root + active import roots) and appending recents, projection module with board server serving /state.json and a board-channel bless, boot handover rendered from the projection. Plus on disk: the fence hook registered in workspace/.claude/settings.json denying locked-root access with a lane-pointing message. Owner-visible after reconnect: the board opens and a chat/board y closes this gate."
+  }
+}

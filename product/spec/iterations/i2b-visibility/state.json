@@ -1,0 +1,48 @@
+{
+  "machine": "systematic",
+  "iteration": "i2b-visibility",
+  "current": "closed",
+  "counters": {
+    "verify_attempts": 1
+  },
+  "history": [
+    {
+      "state": "declare_goal",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i2b-visibility/evidence/01-declare_goal.json",
+      "at": "2026-07-23T09:55:49.464Z"
+    },
+    {
+      "state": "do_work",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i2b-visibility/evidence/02-do_work.json",
+      "at": "2026-07-23T10:09:24.712Z"
+    },
+    {
+      "state": "verify",
+      "outcome": "failed",
+      "evidence": "run-6dfbdb132ab0",
+      "at": "2026-07-23T10:09:29.427Z"
+    },
+    {
+      "state": "do_work",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i2b-visibility/evidence/04-do_work.json",
+      "at": "2026-07-23T10:10:02.333Z"
+    },
+    {
+      "state": "verify",
+      "outcome": "filled",
+      "evidence": "run-ccfcb2a83e6f",
+      "at": "2026-07-23T10:10:06.995Z"
+    },
+    {
+      "state": "close_iteration",
+      "outcome": "filled",
+      "evidence": "grant:5e1e44161671",
+      "at": "2026-07-23T11:45:23.897Z"
+    }
+  ],
+  "escapes": [],
+  "status": "closed"
+}

@@ -18,6 +18,8 @@ export interface TollUpdate {
   next_milestone: string;
   /** Clock-time ETA, e.g. "14:25" or "in ~20 min". */
   eta: string;
+  /** Optional fine-grained task list; "[x] done / [ ] open" per line. The board renders it. */
+  todo?: string[];
 }
 
 interface TollState {

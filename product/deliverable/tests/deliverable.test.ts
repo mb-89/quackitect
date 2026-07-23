@@ -1,29 +1,52 @@
-// The realization lane: list/read/patch/write, CAS-guarded, scoped to
-// product/deliverable, escapes refused.
+// The file lane: list/search/read/patch/write/delete over the repo root,
+// CAS-guarded; workspace and escapes refused; ledger writes have their own
+// lane.
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { mkdtempSync, rmSync, mkdirSync, writeFileSync, readFileSync } from "node:fs";
+import { mkdtempSync, rmSync, mkdirSync, writeFileSync, readFileSync, existsSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { listDeliverable, readDeliverable, writeDeliverable, patchDeliverable } from "../engine/deliverable.ts";
+import { fileList, fileRead, fileWrite, filePatch, fileDelete, fileSearch } from "../engine/deliverable.ts";
 import { Rejection } from "../engine/errors.ts";
 
 function fixture(): string {
-  const root = mkdtempSync(join(tmpdir(), "se-dlv-"));
+  const root = mkdtempSync(join(tmpdir(), "se-file-"));
   mkdirSync(join(root, "product", "deliverable", "engine"), { recursive: true });
   writeFileSync(join(root, "product", "deliverable", "engine", "a.ts"), "export const a = 1;\n");
-  mkdirSync(join(root, "product", "spec", "ledger"), { recursive: true });
+  mkdirSync(join(root, "product", "spec", "ledger", "se"), { recursive: true });
+  writeFileSync(join(root, "product", "spec", "ledger", "se", "node.md"), "a ledger node\n");
+  mkdirSync(join(root, "workspace"), { recursive: true });
+  writeFileSync(join(root, "workspace", "mine.md"), "agent territory\n");
+  writeFileSync(join(root, "README.md"), "the front door\n");
   return root;
 }
 
-test("list and read return deliverable-relative paths with hashes", () => {
+test("list and read work root-wide; workspace and dot-dirs stay invisible", () => {
   const root = fixture();
   try {
-    const top = listDeliverable(root);
-    assert.deepEqual(top, [{ path: "engine", kind: "dir" }]);
-    const f = readDeliverable(root, "engine/a.ts");
-    assert.equal(f.content, "export const a = 1;\n");
+    const top = fileList(root);
+    assert.deepEqual(
+      top.map((e) => e.path).sort(),
+      ["README.md", "product"],
+    );
+    const f = fileRead(root, "README.md");
+    assert.equal(f.content, "the front door\n");
     assert.equal(f.hash.length, 64);
+    assert.equal(fileRead(root, "product/spec/ledger/se/node.md").content, "a ledger node\n");
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test("search finds by name and by content, workspace excluded", () => {
+  const root = fixture();
+  try {
+    const byName = fileSearch(root, "a.ts");
+    assert.ok(byName.hits.some((h) => h.path === "product/deliverable/engine/a.ts"));
+    const byContent = fileSearch(root, "front door");
+    assert.deepEqual(byContent.hits, [{ path: "README.md", line: 1, text: "the front door" }]);
+    assert.equal(fileSearch(root, "agent territory").hits.length, 0);
+    assert.equal(fileSearch(root, "no such needle anywhere").hits.length, 0);
   } finally {
     rmSync(root, { recursive: true, force: true });
   }
@@ -32,14 +55,14 @@ test("list and read return deliverable-relative paths with hashes", () => {
 test("patch requires a unique match and moves the hash", () => {
   const root = fixture();
   try {
-    const before = readDeliverable(root, "engine/a.ts");
-    const after = patchDeliverable(root, "engine/a.ts", "a = 1", "a = 2", before.hash);
+    const before = fileRead(root, "product/deliverable/engine/a.ts");
+    const after = filePatch(root, "product/deliverable/engine/a.ts", "a = 1", "a = 2", before.hash);
     assert.notEqual(after.hash, before.hash);
     assert.match(readFileSync(join(root, "product", "deliverable", "engine", "a.ts"), "utf8"), /a = 2/);
 
     writeFileSync(join(root, "product", "deliverable", "engine", "a.ts"), "x\nx\n");
     assert.throws(
-      () => patchDeliverable(root, "engine/a.ts", "x", "y"),
+      () => filePatch(root, "product/deliverable/engine/a.ts", "x", "y"),
       (e: unknown) => e instanceof Rejection && e.clause === "SE-C-064",
     );
   } finally {
@@ -47,41 +70,52 @@ test("patch requires a unique match and moves the hash", () => {
   }
 });
 
-test("write is CAS-guarded: stale hash refused, create refuses existing", () => {
+test("write is CAS-guarded: stale hash refused, create refuses existing; delete is hash-guarded", () => {
   const root = fixture();
   try {
-    const f = readDeliverable(root, "engine/a.ts");
-    // A concurrent edit moves the disk.
-    writeFileSync(join(root, "product", "deliverable", "engine", "a.ts"), "changed\n");
+    const f = fileRead(root, "README.md");
+    writeFileSync(join(root, "README.md"), "changed\n");
     assert.throws(
-      () => writeDeliverable(root, "engine/a.ts", "mine\n", f.hash),
+      () => fileWrite(root, "README.md", "mine\n", f.hash),
       (e: unknown) => e instanceof Rejection && e.clause === "SE-C-063",
     );
-    // Fresh read -> write succeeds.
-    const fresh = readDeliverable(root, "engine/a.ts");
-    writeDeliverable(root, "engine/a.ts", "mine\n", fresh.hash);
-    assert.equal(readFileSync(join(root, "product", "deliverable", "engine", "a.ts"), "utf8"), "mine\n");
-    // Create with null base_hash; refuses when the file exists.
-    writeDeliverable(root, "engine/new.ts", "n\n", null);
+    const fresh = fileRead(root, "README.md");
+    fileWrite(root, "README.md", "mine\n", fresh.hash);
+    fileWrite(root, "product.json", "{\"product\":\"fixture\"}\n", null);
     assert.throws(
-      () => writeDeliverable(root, "engine/new.ts", "n2\n", null),
+      () => fileWrite(root, "product.json", "x\n", null),
       (e: unknown) => e instanceof Rejection && e.clause === "SE-C-062",
     );
+    assert.throws(
+      () => fileDelete(root, "product.json", "0".repeat(64)),
+      (e: unknown) => e instanceof Rejection && e.clause === "SE-C-063",
+    );
+    fileDelete(root, "product.json", fileRead(root, "product.json").hash);
+    assert.equal(existsSync(join(root, "product.json")), false);
   } finally {
     rmSync(root, { recursive: true, force: true });
   }
 });
 
-test("paths outside the deliverable are refused (SE-C-060) — the ledger has its own lane", () => {
+test("escapes and workspace are refused (SE-C-060); ledger writes point to se_set_apply (SE-C-065)", () => {
   const root = fixture();
   try {
-    for (const bad of ["../spec/ledger/x.md", "..\\..\\etc", "engine/../../spec/x"]) {
+    for (const bad of ["../outside", "..\\..\\etc", "workspace/mine.md", "product/../../x"]) {
       assert.throws(
-        () => readDeliverable(root, bad),
+        () => fileRead(root, bad),
         (e: unknown) => e instanceof Rejection && e.clause === "SE-C-060",
         `should refuse: ${bad}`,
       );
     }
+    for (const op of [
+      () => fileWrite(root, "product/spec/ledger/se/node.md", "x\n", null),
+      () => filePatch(root, "product/spec/ledger/se/node.md", "a ledger node", "edited"),
+      () => fileDelete(root, "product/spec/ledger/se/node.md", "0".repeat(64)),
+    ]) {
+      assert.throws(op, (e: unknown) => e instanceof Rejection && e.clause === "SE-C-065");
+    }
+    // Ledger READS are legal — search must see inside the ledger too.
+    assert.ok(fileSearch(root, "ledger node").hits.length > 0);
   } finally {
     rmSync(root, { recursive: true, force: true });
   }

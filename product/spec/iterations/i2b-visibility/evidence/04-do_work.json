@@ -1,0 +1,8 @@
+{
+  "iteration": "i2b-visibility",
+  "state": "do_work",
+  "at": "2026-07-23T10:10:02.332Z",
+  "payload": {
+    "changed": "tests/deliverable.test.ts: list-order assertion made order-insensitive (localeCompare sorts case-insensitively; the lane's ordering is cosmetic)"
+  }
+}

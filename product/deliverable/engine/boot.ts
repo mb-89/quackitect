@@ -2,21 +2,29 @@
 //
 // A session starts knowing nothing. The boot takes it from initial to the
 // state where se.loop.next works:
-//   1. log onto the project (single project today; the dimension exists)
+//   1. log onto the product (nameplate-recognized; recents recorded for
+//      the future picker)
 //   2. receive the contract — the project's general guidance (rules +
 //      voice), served by the server, never baked into AGENTS.md
 //   3. attest by returning the contract's hash — the same hash-as-grant
 //      mechanism as the write lane; one round-trip per session
-// Until admitted, the surface refuses everything except next, boot, help.
+// Admission writes the session lock (product root + active import roots) —
+// the workspace fence reads it — and hands over a PROJECTION of live state,
+// never a hand-written file.
 //
 // Admission is per-session, per-shim (in-memory): a reclaimed VM or fresh
 // process boots again, by design.
-import { existsSync, readFileSync } from "node:fs";
+import { spawn } from "node:child_process";
+import { appendFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { basename, join, resolve } from "node:path";
 import { Rejection } from "./errors.ts";
 import { sha256 } from "./hash.ts";
+import { readJsonFile } from "./jsonio.ts";
 import { layout } from "./layout.ts";
 import { loadModules, type ModuleStatus } from "./modules.ts";
+import { projectState, renderHandover } from "./project.ts";
+
+export const BOARD_PORT = 7346;
 
 export interface Session {
   admitted: boolean;
@@ -37,10 +45,15 @@ You work through the se MCP server, and you do what it tells you.
 
 ## Hard rules
 
-- Everything goes through the server. Also git. Also reads. Pass this
-  rule to every subagent you spawn.
+- Everything goes through the server. Also git. Also reads. Also file
+  SEARCH: locating a file is lane work, not harness work. Pass this rule
+  to every subagent you spawn.
+- Before any direct harness tool touches or looks for product content
+  (read, grep, glob, find, shell), call se_help first. No logged miss, no
+  direct tool. The workspace fence enforces this; the call log proves it
+  at review.
 - Never write an ad-hoc script for something SE should do. Ask se_help
-  first. That call is checked at review.
+  first.
 - You never push. The owner pushes.
 - Gates are offers. A human blesses through their own channel. You park
   or wait; you do not poll a judgment surface.
@@ -48,7 +61,7 @@ You work through the se MCP server, and you do what it tells you.
 ## The lanes (the loop will hand you the right one)
 
 - Ledger: se_get_*, se_set_apply (dry_run -> diff hash -> execute).
-- Deliverable: se_deliverable_list / read / patch / write (hash-guarded).
+- Files: se_file_list / search / read / patch / write / delete (CAS).
 - Shell: se_run. Git: se_git (allowlisted). Waiting: se_wait.
 
 ## Voice — how to write every output
@@ -61,6 +74,51 @@ export function composeContract(root: string): { contract: string; hash: string 
     : "(no voice guide found — write plainly, short sentences, lists)";
   const contract = `${GENERAL_RULES}\n${voice.trim()}\n`;
   return { contract, hash: sha256(contract) };
+}
+
+/** The product name: nameplate if present, folder name until then. */
+export function productName(root: string): { name: string; nameplate: boolean } {
+  const path = layout.nameplatePath(root);
+  if (!existsSync(path)) return { name: basename(resolve(root)), nameplate: false };
+  const decl = readJsonFile<{ product?: string }>(path);
+  return { name: decl.product ?? basename(resolve(root)), nameplate: true };
+}
+
+/** Admission side-effect: the fence reads this to know what is locked. */
+function writeLock(root: string, product: string, modules: ModuleStatus[]): void {
+  const abs = resolve(root);
+  const lock = {
+    product,
+    product_root: abs,
+    locked_roots: [abs, ...modules.filter((m) => m.import_root !== undefined).map((m) => m.import_root!)],
+    workspace_exempt: join(abs, "workspace"),
+    at: new Date().toISOString(),
+  };
+  mkdirSync(layout.seDir(abs), { recursive: true });
+  writeFileSync(layout.lockPath(abs), JSON.stringify(lock, null, 2) + "\n", "utf8");
+}
+
+/** Recents feed the future product picker; one line per product, deduped. */
+function appendRecents(root: string, product: string): void {
+  const abs = resolve(root);
+  const path = layout.recentsPath();
+  if (existsSync(path)) {
+    const lines = readFileSync(path, "utf8").split("\n").filter((l) => l.trim() !== "");
+    if (lines.some((l) => (JSON.parse(l) as { root: string }).root === abs)) return;
+  } else {
+    mkdirSync(join(path, ".."), { recursive: true });
+  }
+  appendFileSync(path, JSON.stringify({ root: abs, product, at: new Date().toISOString() }) + "\n", "utf8");
+}
+
+/** The board self-guards against double-starts (port in use = already up). */
+function spawnBoard(root: string): void {
+  // SE_STATE_DIR set = test or headless state override: no UI side-effects.
+  if (process.env.SE_STATE_DIR !== undefined) return;
+  const bin = join(layout.deliverable(root), "bin", "se-board.ts");
+  if (!existsSync(bin)) return;
+  const child = spawn(process.execPath, [bin, "--root", resolve(root)], { detached: true, stdio: "ignore" });
+  child.unref();
 }
 
 export interface BootStep1 {
@@ -76,15 +134,29 @@ export interface BootAdmitted {
   step: "admitted";
   project: string;
   modules: ModuleStatus[];
-  handover?: string;
+  board_url: string;
+  handover: string;
   note: string;
 }
 
-export function boot(root: string, session: Session, contractHash?: string): BootStep1 | BootAdmitted {
-  const project = basename(resolve(root));
+export function boot(
+  root: string,
+  session: Session,
+  contractHash?: string,
+  opts: { board?: boolean } = {},
+): BootStep1 | BootAdmitted {
+  const { name: project, nameplate } = productName(root);
   const modules = loadModules(root);
+  const boardUrl = `http://localhost:${BOARD_PORT}/`;
   if (session.admitted) {
-    return { step: "admitted", project, modules, note: "already admitted — se_loop_next continues" };
+    return {
+      step: "admitted",
+      project,
+      modules,
+      board_url: boardUrl,
+      handover: renderHandover(projectState(root)),
+      note: "already admitted — se_loop_next continues",
+    };
   }
   const { contract, hash } = composeContract(root);
   if (contractHash === undefined) {
@@ -110,13 +182,18 @@ export function boot(root: string, session: Session, contractHash?: string): Boo
   session.admitted = true;
   session.project = project;
   session.contractHash = hash;
-  const handoverPath = join(root, "product", "spec", "handover.md");
+  writeLock(root, project, modules);
+  appendRecents(root, project);
+  if (opts.board === true) spawnBoard(root);
   return {
     step: "admitted",
     project,
     modules,
-    ...(existsSync(handoverPath) ? { handover: readFileSync(handoverPath, "utf8") } : {}),
-    note: "admitted. The handover above is your state; se_loop_next is your next call.",
+    board_url: boardUrl,
+    handover: renderHandover(projectState(root)),
+    note: nameplate
+      ? "admitted. The handover above is live state; se_loop_next is your next call."
+      : "admitted. NOTE: no product.json nameplate at the root — create one via se_file_write ({\"product\": \"<name>\"}).",
   };
 }
 

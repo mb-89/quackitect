@@ -33,4 +33,10 @@ export const layout = {
   grantsPath: (root: string): string => join(root, "product", "spec", "iterations", "grants.jsonl"),
   /** The live offer is transient: losing it IS dismissal (safe by design). */
   offerPath: (root: string): string => join(layout.seDir(root), "offer.json"),
+  /** The session lock: which roots the fence protects (product + imports). */
+  lockPath: (root: string): string => join(layout.seDir(root), "lock.json"),
+  /** Machine-wide recents: one line per product ever logged onto (picker fuel). */
+  recentsPath: (): string => join(stateBase(), "recents.jsonl"),
+  /** The product nameplate: { "product": "<name>" } at the repo root. */
+  nameplatePath: (root: string): string => join(root, "product.json"),
 };

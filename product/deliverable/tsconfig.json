@@ -9,5 +9,5 @@
     "allowImportingTsExtensions": true,
     "skipLibCheck": true
   },
-  "include": ["engine/**/*.ts", "modules/**/*.ts", "tests/**/*.ts"]
+  "include": ["bin/**/*.ts", "engine/**/*.ts", "modules/**/*.ts", "tests/**/*.ts"]
 }

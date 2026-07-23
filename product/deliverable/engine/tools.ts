@@ -17,7 +17,7 @@ import { McpServer } from "./mcp.ts";
 import { layout } from "./layout.ts";
 import { boot, newSession, assertAdmitted, type Session } from "./boot.ts";
 import { Gate } from "./gate.ts";
-import { listDeliverable, readDeliverable, writeDeliverable, patchDeliverable } from "./deliverable.ts";
+import { fileList, fileRead, fileWrite, filePatch, fileDelete, fileSearch } from "./deliverable.ts";
 import { git, assertNotHistoryRewrite, assertNotPush } from "./git.ts";
 import { Rejection } from "./errors.ts";
 
@@ -57,7 +57,7 @@ export function coreTools(root: string, opts: { toll?: Toll; session?: Session }
           contract_hash: { type: "string", description: "the hash from the previous se_boot call — attesting it admits the session" },
         },
       },
-      handler: (args) => boot(root, session, args.contract_hash === undefined ? undefined : String(args.contract_hash)),
+      handler: (args) => boot(root, session, args.contract_hash === undefined ? undefined : String(args.contract_hash), { board: true }),
     },
     {
       name: "se_loop_start",
@@ -187,29 +187,44 @@ export function coreTools(root: string, opts: { toll?: Toll; session?: Session }
       },
     },
     {
-      name: "se_deliverable_list",
-      title: "se.deliverable.list",
-      description: "List deliverable entries under a directory (deliverable-relative paths).",
+      name: "se_file_list",
+      title: "se.file.list",
+      description: "List product entries under a directory (root-relative; workspace/ and ledger writes excluded).",
       inputSchema: {
         type: "object",
         properties: { dir: { type: "string", default: "." } },
       },
-      handler: (args) => listDeliverable(root, String(args.dir ?? ".")),
+      handler: (args) => fileList(root, String(args.dir ?? ".")),
     },
     {
-      name: "se_deliverable_read",
-      title: "se.deliverable.read",
-      description: "Read one deliverable file; returns content + hash (the CAS base for edits).",
+      name: "se_file_search",
+      title: "se.file.search",
+      description: "Find product files by name or content; paths + line anchors, detail via se_file_read.",
+      inputSchema: {
+        type: "object",
+        properties: {
+          query: { type: "string" },
+          intent: { type: "string", description: "what you are trying to find — logged" },
+          limit: { type: "number", default: 20 },
+        },
+        required: ["query", "intent"],
+      },
+      handler: (args) => fileSearch(root, String(args.query), Number(args.limit ?? 20)),
+    },
+    {
+      name: "se_file_read",
+      title: "se.file.read",
+      description: "Read one product file; returns content + hash (the CAS base for edits).",
       inputSchema: {
         type: "object",
         properties: { path: { type: "string" } },
         required: ["path"],
       },
-      handler: (args) => readDeliverable(root, String(args.path)),
+      handler: (args) => fileRead(root, String(args.path)),
     },
     {
-      name: "se_deliverable_write",
-      title: "se.deliverable.write",
+      name: "se_file_write",
+      title: "se.file.write",
       description: "Whole-file write. base_hash: null creates; otherwise it must match disk (CAS).",
       inputSchema: {
         type: "object",
@@ -221,11 +236,11 @@ export function coreTools(root: string, opts: { toll?: Toll; session?: Session }
         required: ["path", "content", "base_hash"],
       },
       handler: (args) =>
-        writeDeliverable(root, String(args.path), String(args.content), args.base_hash === null ? null : String(args.base_hash)),
+        fileWrite(root, String(args.path), String(args.content), args.base_hash === null ? null : String(args.base_hash)),
     },
     {
-      name: "se_deliverable_patch",
-      title: "se.deliverable.patch",
+      name: "se_file_patch",
+      title: "se.file.patch",
       description: "Exact-match edit: old_string must occur exactly once; optional base_hash double-guard.",
       inputSchema: {
         type: "object",
@@ -238,13 +253,27 @@ export function coreTools(root: string, opts: { toll?: Toll; session?: Session }
         required: ["path", "old_string", "new_string"],
       },
       handler: (args) =>
-        patchDeliverable(
+        filePatch(
           root,
           String(args.path),
           String(args.old_string),
           String(args.new_string),
           args.base_hash === undefined ? undefined : String(args.base_hash),
         ),
+    },
+    {
+      name: "se_file_delete",
+      title: "se.file.delete",
+      description: "Hash-guarded delete: base_hash must match disk — no blind removal.",
+      inputSchema: {
+        type: "object",
+        properties: {
+          path: { type: "string" },
+          base_hash: { type: "string" },
+        },
+        required: ["path", "base_hash"],
+      },
+      handler: (args) => fileDelete(root, String(args.path), String(args.base_hash)),
     },
     {
       name: "se_git",

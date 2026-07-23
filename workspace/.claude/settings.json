@@ -10,5 +10,21 @@
       "Bash(node:*)",
       "Bash(npm:*)"
     ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Read|Edit|Write|Glob|Grep|Bash|NotebookEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node",
+            "args": ["C:\\Users\\ichbi\\Desktop\\ai\\quackitect-v2\\product\\deliverable\\bin\\se-fence.ts"],
+            "timeout": 10,
+            "statusMessage": "se-fence: checking locked product roots"
+          }
+        ]
+      }
+    ]
   }
 }
