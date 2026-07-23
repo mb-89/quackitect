@@ -1,0 +1,8 @@
+{
+  "iteration": "i2f-machines-are-canvases",
+  "state": "do_work",
+  "at": "2026-07-23T17:14:49.865Z",
+  "payload": {
+    "changed": "engine/run.ts: spawned commands no longer inherit SE_SESSION_FILE (the shim-engine session contract must not leak into verify subprocesses)\ntests/fixtures.ts: new - plantMachines copies the repo's drawn machines into fixture roots\ntests/boot.test.ts: deletes SE_SESSION_FILE at top (hosting session's admission must not leak in)\ntests/project.test.ts, board.test.ts, rails.test.ts: fixture roots get the drawn machines planted (the loader compiles from the root's ledger)"
+  }
+}

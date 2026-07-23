@@ -1,0 +1,10 @@
+{
+  "iteration": "i2f-machines-are-canvases",
+  "state": "declare_goal",
+  "at": "2026-07-23T16:23:58.463Z",
+  "payload": {
+    "goal": "State machines become Advanced Canvas drawings in the ledger (canvas frontmatter = machine identity, referenced notes = state details), compiled at load into what the engine runs; the hand-written TS machines retire; tool schemas gain the voluntary update property.",
+    "load_bearing_for": "Machines as TS code are invisible to the ledger: not gated, not hashed, not linkable, not owner-editable in Obsidian - violating design (section 6 authoring: canvas -> compiler, section 12 a policy IS a machine and lives in the ledger). Also: board updates arrive only when the toll pulls one, so the panel goes stale between tolls.",
+    "exit_check": "Engine loads session + systematic from ledger canvases (engine/machines/*.ts deleted, verify green); a drawn offer machine exists with an owner keep/discard ruling; the board renders the machine diagram from compiled data; update is a declared optional property on every tool schema and a submit carrying one refreshes the board panel; owner blesses the canvas machine form at the gate."
+  }
+}

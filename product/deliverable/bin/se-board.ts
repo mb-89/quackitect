@@ -251,7 +251,7 @@ function layoutMiddle() {
 function smView(i) { SMVIEW = i; render(); }
 function smDive(idx, i) {
   const stack = S.machine_stack ?? [];
-  if (stack[idx] && stack[idx].states[i].id === "iteration" && stack[idx + 1]) { SMVIEW = idx + 1; render(); }
+  if (stack[idx] && stack[idx + 1] && stack[idx].states[i].id === stack[idx + 1].id) { SMVIEW = idx + 1; render(); }
 }
 function smNode(idx, i, st) {
   const click = ' onclick="detail(S.machine_stack[' + idx + '].states[' + i + '])" ondblclick="smDive(' + idx + "," + i + ')"';

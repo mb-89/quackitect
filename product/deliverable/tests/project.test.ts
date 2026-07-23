@@ -10,6 +10,7 @@ import { Loop } from "../engine/loop.ts";
 import { layout } from "../engine/layout.ts";
 import { projectState, renderHandover } from "../engine/project.ts";
 import { loadSystematic } from "../engine/machines/load.ts";
+import { plantMachines } from "./fixtures.ts";
 import type { MachineDecl } from "../engine/machine.ts";
 
 const systematic = loadSystematic(join(import.meta.dirname, "..", "..", ".."))!;
@@ -23,6 +24,7 @@ const machineOK = (): MachineDecl => ({
 test("projection carries product, iterations with goals and steps, offer and calls", () => {
   const root = mkdtempSync(join(tmpdir(), "se-proj-"));
   try {
+    plantMachines(root);
     writeFileSync(join(root, "product.json"), JSON.stringify({ product: "proj-fixture" }) + "\n", "utf8");
     const loop = new Loop(root, machineOK());
     loop.start("i0-proj");
@@ -91,6 +93,7 @@ test("planned iterations join the projection; started ids skipped; owner steps f
 test("the call feed is session-scoped and carries direction data", () => {
   const root = mkdtempSync(join(tmpdir(), "se-scope-"));
   try {
+    plantMachines(root);
     mkdirSync(layout.seDir(root), { recursive: true });
     const calls = [
       { ref: "run-old", ts: "2026-01-01T00:00:00.000Z", tool: "se_help", args: { intent: "stale" }, ok: true, se_version: "t", duration_ms: 1, detail: { outcome: "result" } },

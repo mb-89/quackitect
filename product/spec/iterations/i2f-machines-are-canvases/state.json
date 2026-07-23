@@ -1,0 +1,42 @@
+{
+  "machine": "systematic",
+  "iteration": "i2f-machines-are-canvases",
+  "current": "close_iteration",
+  "counters": {
+    "verify_attempts": 1
+  },
+  "history": [
+    {
+      "state": "declare_goal",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i2f-machines-are-canvases/evidence/01-declare_goal.json",
+      "at": "2026-07-23T16:23:58.464Z"
+    },
+    {
+      "state": "do_work",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i2f-machines-are-canvases/evidence/02-do_work.json",
+      "at": "2026-07-23T17:11:02.304Z"
+    },
+    {
+      "state": "verify",
+      "outcome": "failed",
+      "evidence": "run-6e30431f6873",
+      "at": "2026-07-23T17:11:07.642Z"
+    },
+    {
+      "state": "do_work",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i2f-machines-are-canvases/evidence/04-do_work.json",
+      "at": "2026-07-23T17:14:49.866Z"
+    },
+    {
+      "state": "verify",
+      "outcome": "filled",
+      "evidence": "run-d6b3047fd93f",
+      "at": "2026-07-23T17:14:55.360Z"
+    }
+  ],
+  "escapes": [],
+  "status": "open"
+}

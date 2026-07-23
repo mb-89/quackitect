@@ -7,7 +7,11 @@ import { CallLog, type CallRecord } from "./calllog.ts";
 
 export function runCommand(log: CallLog, command: string, cwd: string): CallRecord {
   const started = Date.now();
-  const r = spawnSync(command, { shell: true, cwd, encoding: "utf8", timeout: 10 * 60 * 1000 });
+  // The session file is the shim↔engine contract; commands the engine runs
+  // (verify batteries) must not inherit the running session's admission.
+  const env = { ...process.env };
+  delete env.SE_SESSION_FILE;
+  const r = spawnSync(command, { shell: true, cwd, encoding: "utf8", timeout: 10 * 60 * 1000, env });
   const exit = r.status ?? -1;
   return log.append({
     tool: "se.run",

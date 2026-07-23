@@ -1,0 +1,8 @@
+{
+  "iteration": "i2f-machines-are-canvases",
+  "state": "do_work",
+  "at": "2026-07-23T17:11:02.303Z",
+  "payload": {
+    "changed": "engine/canvas.ts: new - Advanced JSON Canvas 1.0-1.0 as a ledger node format (pinned version, envelope in metadata.frontmatter, key-order-independent hash)\nengine/machines/compile.ts: new - canvas + machine_state notes -> MachineDecl at load; loud MachineCompileError naming the element\nengine/machines/load.ts: new - loadMachine/loadSystematic/loadSession + requireSystematic (SE-C-035)\nengine/machines/systematic.ts + session.ts: DELETED - the drawings are the only truth\nengine/apply.ts: write_canvas op; canvas-aware paths, serialization, CAS re-check; partial ops refused on canvas nodes (SE-C-066/067)\nengine/store.ts: loads .canvas files as nodes with id-path check\nengine/node.ts: ID_RE exported; LedgerNode carries format/canvas\nengine/tools.ts, project.ts, help.ts, bin/se-gate.ts, bin/se-board.ts: machines come from the loader; projection null-tolerant for machine-less ledgers\nbin/se-mcp.ts: shim restart check runs before the request joins the pending set\nledger: 3 drawn machines (systematic, session nesting systematic via portal, offer) + 13 machine_state notes + se.meth-machine-canvas convention node\n.obsidian/snippets/se-machine-styles.css: the six-role edge attribute for the canvas popup\ntests: canvas.test.ts + compile.test.ts new; loop/rails/board/project tests compile the repo's own drawn machine as fixture"
+  }
+}

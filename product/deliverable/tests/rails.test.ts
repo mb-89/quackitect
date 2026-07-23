@@ -17,6 +17,7 @@ import { seWait } from "../engine/wait.ts";
 import { coreTools } from "../engine/tools.ts";
 import { layout } from "../engine/layout.ts";
 import { loadSystematic } from "../engine/machines/load.ts";
+import { plantMachines } from "./fixtures.ts";
 import { Rejection } from "../engine/errors.ts";
 import type { MachineDecl } from "../engine/machine.ts";
 
@@ -31,6 +32,7 @@ function machineOK(): MachineDecl {
 
 /** Drive an iteration to the gate offer; returns the offer hash. */
 function reachGate(root: string): string {
+  plantMachines(root);
   const loop = new Loop(root, machineOK());
   loop.start("i0-gate");
   loop.submit({ goal: "g", load_bearing_for: "l", exit_check: "e" });

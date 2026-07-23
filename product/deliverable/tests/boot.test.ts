@@ -8,6 +8,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 
 process.env.SE_STATE_DIR = mkdtempSync(join(tmpdir(), "se-state-"));
+delete process.env.SE_SESSION_FILE; // a hosting session's admission must not leak in
 import { boot, newSession, assertAdmitted, composeContract, PRE_BOOT_TOOLS } from "../engine/boot.ts";
 import { layout } from "../engine/layout.ts";
 import { Rejection } from "../engine/errors.ts";

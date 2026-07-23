@@ -15,6 +15,7 @@ import { loadSystematic } from "../engine/machines/load.ts";
 import type { MachineDecl } from "../engine/machine.ts";
 
 const systematic = loadSystematic(join(import.meta.dirname, "..", "..", ".."))!;
+import { plantMachines } from "./fixtures.ts";
 
 const OK = `node -e "process.exit(0)"`;
 const machineOK = (): MachineDecl => ({
@@ -44,6 +45,7 @@ test("board serves page + projection, and the bless button closes the gate on th
   const root = mkdtempSync(join(tmpdir(), "se-board-"));
   let proc: ChildProcess | undefined;
   try {
+    plantMachines(root);
     writeFileSync(join(root, "product.json"), JSON.stringify({ product: "board-fixture" }) + "\n", "utf8");
     const loop = new Loop(root, machineOK());
     loop.start("i0-board");
