@@ -1,0 +1,10 @@
+{
+  "iteration": "i2c-b-roundtrip-wide",
+  "state": "declare_goal",
+  "at": "2026-07-23T12:00:57.785Z",
+  "payload": {
+    "goal": "The comfortable working surface, wide (owner ruling: bigger iterations): board auto-open/reopen without duplicate tabs, 6h offers, callable remedy names, git unstage, patch dollar-literal fix - plus search v2 (multi-hit literal, ranked multi-term, fuzzy filenames) and se_note frictionless capture with board display.",
+    "load_bearing_for": "The owner navigates by hand, blesses into a void, loses offers to a 15-min clock, and has no note capture; a cold model cannot resend most remedies; the file lane corrupts payloads carrying dollar patterns (burned three verifies in i2c); search returns one hit per file and only literal matches.",
+    "exit_check": "One engine verify green over all of it: board /open honors viewer-alive; TTL 6h; remedies callable; restore --staged only; patch keeps dollar sequences literal; fileSearch returns multiple hits per file, ranked mode orders multi-term queries, fuzzy mode matches subsequence filenames; se_note mints a ledger note in one call and the projection carries it. Owner-visible: the close offer pops the board open by itself."
+  }
+}

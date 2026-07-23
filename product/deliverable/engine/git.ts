@@ -73,9 +73,9 @@ export function assertOperable(targetPath: string, opts: { allowSelf?: boolean }
       expected: "a target repo that is not the repo SE was built from",
       got: `target shares SE's own git common dir: ${target}`,
       remedy: {
-        tool: "se.git",
-        args: { path: targetPath, allow_self: true },
-        note: "pass allow_self: true only if you intend SE to operate on its own repo",
+        tool: "se_git",
+        args: { args: ["status"] },
+        note: "SE refuses to operate on its own source repo; allow_self is an engine-level flag, not a tool argument",
       },
       source: "engine/git.ts assertOperable",
     });
@@ -94,7 +94,7 @@ export function assertNotHistoryRewrite(args: string[]): void {
       expected: "no rebase or force-push — superseded ledger content lives in history",
       got: `git ${joined}`,
       remedy: {
-        tool: "se.git",
+        tool: "se_git",
         args: { args: ["status"] },
         note: "history rewrites are refused outright; if the branch diverged, reconcile by merge",
       },
@@ -115,7 +115,7 @@ export function assertNotPush(args: string[]): void {
       expected: "no push on the agent lane — pushing is an owner act (se.rule-owner-pushes)",
       got: `git ${args.join(" ")}`,
       remedy: {
-        tool: "se.git",
+        tool: "se_git",
         args: { args: ["log", "--oneline", "@{upstream}.."] },
         note: "commit locally and list what is ahead; the owner pushes when they choose",
       },

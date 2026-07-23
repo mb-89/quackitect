@@ -46,13 +46,29 @@ test("search finds by name and by content, workspace excluded", () => {
     const byContent = fileSearch(root, "front door");
     assert.deepEqual(byContent.hits, [{ path: "README.md", line: 1, text: "the front door" }]);
     assert.equal(fileSearch(root, "agent territory").hits.length, 0);
-    assert.equal(fileSearch(root, "no such needle anywhere").hits.length, 0);
+    assert.equal(fileSearch(root, "no such match anywhere").hits.length, 0);
+
+    // Literal returns every matching line per file (capped), not just the first.
+    writeFileSync(join(root, "product", "twice.md"), "needle one\nnothing\nneedle two\n");
+    const multi = fileSearch(root, "needle");
+    assert.equal(multi.hits.filter((h) => h.path === "product/twice.md").length, 2);
+
+    // Ranked: the file carrying both terms outranks the single-term file.
+    writeFileSync(join(root, "product", "both.md"), "alpha beta\nalpha\n");
+    writeFileSync(join(root, "product", "one.md"), "alpha\n");
+    const ranked = fileSearch(root, "alpha beta", 20, "ranked");
+    assert.equal(ranked.hits[0].path, "product/both.md");
+    assert.ok((ranked.hits[0].score ?? 0) > (ranked.hits.find((h) => h.path === "product/one.md")?.score ?? 0));
+
+    // Fuzzy: filename subsequence.
+    const fuzzy = fileSearch(root, "prodtwice", 20, "fuzzy");
+    assert.ok(fuzzy.hits.some((h) => h.path === "product/twice.md"));
   } finally {
     rmSync(root, { recursive: true, force: true });
   }
 });
 
-test("patch requires a unique match and moves the hash", () => {
+test("patch requires a unique match, moves the hash, and keeps replacements literal", () => {
   const root = fixture();
   try {
     const before = fileRead(root, "product/deliverable/engine/a.ts");
@@ -64,6 +80,17 @@ test("patch requires a unique match and moves the hash", () => {
     assert.throws(
       () => filePatch(root, "product/deliverable/engine/a.ts", "x", "y"),
       (e: unknown) => e instanceof Rejection && e.clause === "SE-C-064",
+    );
+
+    // Replacement patterns stay literal: the matched text must not splice
+    // back in. (The marker is built by concatenation so the pattern never
+    // appears literally in any lane payload.)
+    const marker = "$" + "&";
+    writeFileSync(join(root, "product", "deliverable", "engine", "a.ts"), "const re = 1;\n");
+    filePatch(root, "product/deliverable/engine/a.ts", "= 1", "= \"" + marker + "\"");
+    assert.equal(
+      readFileSync(join(root, "product", "deliverable", "engine", "a.ts"), "utf8"),
+      "const re = \"" + marker + "\";\n",
     );
   } finally {
     rmSync(root, { recursive: true, force: true });

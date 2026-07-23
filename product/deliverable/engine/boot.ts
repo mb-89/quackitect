@@ -14,17 +14,15 @@
 //
 // Admission is per-session, per-shim (in-memory): a reclaimed VM or fresh
 // process boots again, by design.
-import { spawn } from "node:child_process";
 import { appendFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { basename, join, resolve } from "node:path";
+import { boardUrl, pokeBoard, spawnBoard } from "./board.ts";
 import { Rejection } from "./errors.ts";
 import { sha256 } from "./hash.ts";
 import { readJsonFile } from "./jsonio.ts";
 import { layout } from "./layout.ts";
 import { loadModules, type ModuleStatus } from "./modules.ts";
 import { projectState, renderHandover } from "./project.ts";
-
-export const BOARD_PORT = 7346;
 
 export interface Session {
   admitted: boolean;
@@ -111,16 +109,6 @@ function appendRecents(root: string, product: string): void {
   appendFileSync(path, JSON.stringify({ root: abs, product, at: new Date().toISOString() }) + "\n", "utf8");
 }
 
-/** The board self-guards against double-starts (port in use = already up). */
-function spawnBoard(root: string): void {
-  // SE_STATE_DIR set = test or headless state override: no UI side-effects.
-  if (process.env.SE_STATE_DIR !== undefined) return;
-  const bin = join(layout.deliverable(root), "bin", "se-board.ts");
-  if (!existsSync(bin)) return;
-  const child = spawn(process.execPath, [bin, "--root", resolve(root)], { detached: true, stdio: "ignore" });
-  child.unref();
-}
-
 export interface BootStep1 {
   step: "attest";
   project: string;
@@ -147,13 +135,12 @@ export function boot(
 ): BootStep1 | BootAdmitted {
   const { name: project, nameplate } = productName(root);
   const modules = loadModules(root);
-  const boardUrl = `http://localhost:${BOARD_PORT}/`;
   if (session.admitted) {
     return {
       step: "admitted",
       project,
       modules,
-      board_url: boardUrl,
+      board_url: boardUrl(),
       handover: renderHandover(projectState(root)),
       note: "already admitted — se_loop_next continues",
     };
@@ -184,12 +171,15 @@ export function boot(
   session.contractHash = hash;
   writeLock(root, project, modules);
   appendRecents(root, project);
-  if (opts.board === true) spawnBoard(root);
+  if (opts.board === true) {
+    spawnBoard(root);
+    pokeBoard();
+  }
   return {
     step: "admitted",
     project,
     modules,
-    board_url: boardUrl,
+    board_url: boardUrl(),
     handover: renderHandover(projectState(root)),
     note: nameplate
       ? "admitted. The handover above is live state; se_loop_next is your next call."

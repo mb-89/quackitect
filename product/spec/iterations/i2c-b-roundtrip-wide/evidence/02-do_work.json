@@ -1,0 +1,8 @@
+{
+  "iteration": "i2c-b-roundtrip-wide",
+  "state": "do_work",
+  "at": "2026-07-23T12:04:24.468Z",
+  "payload": {
+    "changed": "Everything from the escaped i2c (board auto-open/reopen + viewer-alive, 6h offers, callable remedies, restore --staged, dollar-literal patch fix, fence state-dir exemption) PLUS the wide additions:\nengine/deliverable.ts: fileSearch v2 - literal mode returns up to 3 line hits per file; ranked mode scores multi-term queries (name hits weigh 5x); fuzzy mode matches filename subsequences (fzf-style streak scoring)\nengine/tools.ts: se_file_search gains mode; se_note - one-call private capture (machine-local notes.jsonl, drained at retros, never committed)\nengine/layout.ts: notesPath under the state dir\nengine/project.ts: projection carries the notes inbox (newest first)\nbin/se-board.ts: notes inbox panel under iterations\ntests: notes.test.ts new (capture, count, projection order, repo stays clean); deliverable.test extended (multi-hit, ranked ordering, fuzzy)"
+  }
+}

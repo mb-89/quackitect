@@ -32,6 +32,12 @@ export interface CallLine {
   detail: string;
 }
 
+export interface NoteLine {
+  ref: string;
+  text: string;
+  at: string;
+}
+
 export interface ProjectionState {
   product: string;
   root: string;
@@ -45,6 +51,8 @@ export interface ProjectionState {
   grants: GrantRecord[];
   last_verify: { ok: boolean; exit: number; at: string; iteration: string } | null;
   calls: CallLine[];
+  /** Private inbox (machine-local, drained at retros) — the board shows it, the repo never does. */
+  notes: NoteLine[];
 }
 
 /** Tail up to maxBytes of a file without reading the whole thing. */
@@ -157,6 +165,7 @@ export function projectState(root: string): ProjectionState {
     grants,
     last_verify: lastVerify,
     calls,
+    notes: jsonLines<NoteLine>(tailText(layout.notesPath(abs))).slice(-10).reverse(),
   };
 }
 

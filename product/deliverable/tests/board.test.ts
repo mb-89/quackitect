@@ -22,7 +22,7 @@ const machineOK = (): MachineDecl => ({
 
 async function startBoard(root: string): Promise<{ proc: ChildProcess; url: string }> {
   const bin = join(import.meta.dirname, "..", "bin", "se-board.ts");
-  const proc = spawn(process.execPath, [bin, "--root", root, "--port", "0"], { stdio: ["ignore", "pipe", "pipe"] });
+  const proc = spawn(process.execPath, [bin, "--root", root, "--port", "0", "--no-open"], { stdio: ["ignore", "pipe", "pipe"] });
   let out = "";
   const url = await new Promise<string>((res, rej) => {
     const t = setTimeout(() => rej(new Error(`board did not announce: ${out}`)), 10_000);
@@ -56,6 +56,10 @@ test("board serves page + projection, and the bless button closes the gate on th
     const page = await (await fetch(started.url)).text();
     assert.match(page, /Train of thought/);
 
+    // No viewer yet: a poke would open a tab (suppressed by --no-open here).
+    const cold = (await (await fetch(started.url + "open", { method: "POST" })).json()) as { viewer_recent: boolean };
+    assert.equal(cold.viewer_recent, false);
+
     const state = (await (await fetch(started.url + "state.json")).json()) as {
       product: string;
       offer: { base_hash: string } | null;
@@ -64,6 +68,11 @@ test("board serves page + projection, and the bless button closes the gate on th
     assert.equal(state.product, "board-fixture");
     assert.equal(state.open_iteration, "i0-board");
     assert.equal(state.offer?.base_hash, offered.offer_hash);
+
+    // The state fetch counts as a live viewer: a poke now opens nothing.
+    const warm = (await (await fetch(started.url + "open", { method: "POST" })).json()) as { viewer_recent: boolean; opened: boolean };
+    assert.equal(warm.viewer_recent, true);
+    assert.equal(warm.opened, false);
 
     const bless = await fetch(started.url + "bless", {
       method: "POST",

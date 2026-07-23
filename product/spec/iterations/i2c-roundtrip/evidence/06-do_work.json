@@ -1,0 +1,8 @@
+{
+  "iteration": "i2c-roundtrip",
+  "state": "do_work",
+  "at": "2026-07-23T11:55:57.875Z",
+  "payload": {
+    "changed": "engine/deliverable.ts: filePatch uses a function replacement - $-patterns in new content stay literal (the running lane spliced matched text into my fence patch; found live, twice)\nbin/se-fence.ts: rewritten clean via whole-file write; basename check exempts the .se state dir\ntests/deliverable.test.ts: rewritten whole-file (its own patch got mangled by the same $-bug); literal-replacement regression test built by concatenation so no lane payload ever carries the pattern\ntests/apply.test.ts: dotted remedy asserts updated (from attempt 1)"
+  }
+}

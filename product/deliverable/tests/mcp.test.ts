@@ -168,7 +168,7 @@ test("a rejection arrives as an isError result carrying the executable remedy", 
     const rej = JSON.parse(result.content[0].text) as { kind: string; clause: string; remedy: { tool: string } };
     assert.equal(rej.kind, "rejected");
     assert.equal(rej.clause, "SE-C-012");
-    assert.equal(rej.remedy.tool, "se.get.search");
+    assert.equal(rej.remedy.tool, "se_get_search");
   });
 });
 

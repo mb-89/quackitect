@@ -1,0 +1,66 @@
+{
+  "machine": "systematic",
+  "iteration": "i2c-roundtrip",
+  "current": "verify",
+  "counters": {
+    "verify_attempts": 3
+  },
+  "history": [
+    {
+      "state": "declare_goal",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i2c-roundtrip/evidence/01-declare_goal.json",
+      "at": "2026-07-23T11:48:09.889Z"
+    },
+    {
+      "state": "do_work",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i2c-roundtrip/evidence/02-do_work.json",
+      "at": "2026-07-23T11:52:26.260Z"
+    },
+    {
+      "state": "verify",
+      "outcome": "failed",
+      "evidence": "run-33b30a47e9e2",
+      "at": "2026-07-23T11:52:30.983Z"
+    },
+    {
+      "state": "do_work",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i2c-roundtrip/evidence/04-do_work.json",
+      "at": "2026-07-23T11:53:47.094Z"
+    },
+    {
+      "state": "verify",
+      "outcome": "failed",
+      "evidence": "run-3df58d16fdb3",
+      "at": "2026-07-23T11:53:48.084Z"
+    },
+    {
+      "state": "do_work",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i2c-roundtrip/evidence/06-do_work.json",
+      "at": "2026-07-23T11:55:57.875Z"
+    },
+    {
+      "state": "verify",
+      "outcome": "failed",
+      "evidence": "run-de0662726131",
+      "at": "2026-07-23T11:55:58.850Z"
+    },
+    {
+      "state": "verify",
+      "outcome": "abandoned",
+      "evidence": "Owner-ruled escape resolution: three verify attempts were burned by one engine bug (filePatch interpreted dollar replacement patterns, mangling two repair payloads in cascade). The fix is on disk; the work reruns as i2c-b with a wider scope per the owner's too-small-iterations feedback.",
+      "at": "2026-07-23T12:00:39.174Z"
+    }
+  ],
+  "escapes": [
+    {
+      "state": "verify",
+      "exhausted_guard": "verify_attempts < 3",
+      "at": "2026-07-23T11:55:58.850Z"
+    }
+  ],
+  "status": "abandoned"
+}

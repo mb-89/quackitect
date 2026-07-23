@@ -39,4 +39,6 @@ export const layout = {
   recentsPath: (): string => join(stateBase(), "recents.jsonl"),
   /** The product nameplate: { "product": "<name>" } at the repo root. */
   nameplatePath: (root: string): string => join(root, "product.json"),
+  /** Notes are PRIVATE: machine-local until drained at a retro, never committed. */
+  notesPath: (root: string): string => join(layout.seDir(root), "notes.jsonl"),
 };

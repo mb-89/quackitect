@@ -1,5 +1,8 @@
 // The tool surface (§5) bound to a ledger root. B2 ships the read/write
 // pair + search; loop tools land at B4, guard rails at B5.
+import { appendFileSync, mkdirSync, readFileSync } from "node:fs";
+import { randomBytes } from "node:crypto";
+import { dirname } from "node:path";
 import { loadLedger } from "./store.ts";
 import { WarmIndex } from "./warmindex.ts";
 import { getNode, type GetMode } from "./get.ts";
@@ -17,7 +20,7 @@ import { McpServer } from "./mcp.ts";
 import { layout } from "./layout.ts";
 import { boot, newSession, assertAdmitted, type Session } from "./boot.ts";
 import { Gate } from "./gate.ts";
-import { fileList, fileRead, fileWrite, filePatch, fileDelete, fileSearch } from "./deliverable.ts";
+import { fileList, fileRead, fileWrite, filePatch, fileDelete, fileSearch, type SearchMode } from "./deliverable.ts";
 import { git, assertNotHistoryRewrite, assertNotPush } from "./git.ts";
 import { Rejection } from "./errors.ts";
 
@@ -199,17 +202,18 @@ export function coreTools(root: string, opts: { toll?: Toll; session?: Session }
     {
       name: "se_file_search",
       title: "se.file.search",
-      description: "Find product files by name or content; paths + line anchors, detail via se_file_read.",
+      description: "Find product files: literal (default), ranked (multi-term), or fuzzy (filename); detail via se_file_read.",
       inputSchema: {
         type: "object",
         properties: {
           query: { type: "string" },
           intent: { type: "string", description: "what you are trying to find — logged" },
+          mode: { type: "string", enum: ["literal", "ranked", "fuzzy"], default: "literal" },
           limit: { type: "number", default: 20 },
         },
         required: ["query", "intent"],
       },
-      handler: (args) => fileSearch(root, String(args.query), Number(args.limit ?? 20)),
+      handler: (args) => fileSearch(root, String(args.query), Number(args.limit ?? 20), (args.mode as SearchMode) ?? "literal"),
     },
     {
       name: "se_file_read",
@@ -288,18 +292,45 @@ export function coreTools(root: string, opts: { toll?: Toll; session?: Session }
         const gitArgs = (args.args as string[]).map(String);
         assertNotPush(gitArgs);
         assertNotHistoryRewrite(gitArgs);
-        const ALLOWED = new Set(["status", "log", "diff", "show", "add", "commit", "fetch", "branch", "rev-parse"]);
+        const ALLOWED = new Set(["status", "log", "diff", "show", "add", "commit", "fetch", "branch", "rev-parse", "restore"]);
         if (!ALLOWED.has(gitArgs[0])) {
           throw new Rejection({
             clause: "SE-C-004",
             expected: `an allowlisted git subcommand (${[...ALLOWED].join(", ")})`,
             got: gitArgs[0] ?? "(none)",
-            remedy: { tool: "se.git", args: { args: ["status"] }, note: "destructive git stays engine-internal; ask via se.help if a lane is missing" },
+            remedy: { tool: "se_git", args: { args: ["status"] }, note: "destructive git stays engine-internal; ask via se_help if a lane is missing" },
+            source: "engine/tools.ts se_git",
+          });
+        }
+        // restore un-stages only: without --staged it would discard worktree edits.
+        if (gitArgs[0] === "restore" && !gitArgs.includes("--staged")) {
+          throw new Rejection({
+            clause: "SE-C-004",
+            expected: "restore with --staged (unstage only)",
+            got: `git ${gitArgs.join(" ")}`,
+            remedy: { tool: "se_git", args: { args: ["restore", "--staged", "<path>"] }, note: "worktree restores discard human edits; only unstaging is lane-legal" },
             source: "engine/tools.ts se_git",
           });
         }
         const r = git(root, ...gitArgs);
         return { ok: r.ok, code: r.code, stdout: r.stdout.slice(-20_000), stderr: r.stderr.slice(-20_000) };
+      },
+    },
+    {
+      name: "se_note",
+      title: "se.note",
+      description: "Capture a note, frictionless. Private: machine-local until drained at a retro, never committed.",
+      inputSchema: {
+        type: "object",
+        properties: { text: { type: "string" } },
+        required: ["text"],
+      },
+      handler: (args) => {
+        const note = { ref: "note-" + randomBytes(6).toString("hex"), text: String(args.text), at: new Date().toISOString() };
+        mkdirSync(dirname(layout.notesPath(root)), { recursive: true });
+        appendFileSync(layout.notesPath(root), JSON.stringify(note) + "\n", "utf8");
+        const count = readFileSync(layout.notesPath(root), "utf8").trim().split("\n").length;
+        return { captured: note.ref, inbox_count: count };
       },
     },
     {

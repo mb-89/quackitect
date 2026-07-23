@@ -87,7 +87,7 @@ test("mid-air collision dies at the write with a one-turn-recoverable rejection"
     assert.ok(rejection instanceof Rejection, "expected a Rejection");
     assert.equal(rejection.clause, "SE-C-010");
     // One-turn recovery: the remedy IS the corrected call.
-    assert.equal(rejection.remedy.tool, "se.set.apply");
+    assert.equal(rejection.remedy.tool, "se_set_apply");
     assert.deepEqual((rejection.remedy.args as { ops: ApplyOp[] }).ops, ops);
     // And the human edit was not clobbered.
     assert.ok(readFileSync(join(root, "se", "adr-example.md"), "utf8").includes("human-edited"));
@@ -168,7 +168,7 @@ test("get.node outline/section/full carry id + hash", () => {
     // Unknown node: rejection whose remedy is the search call.
     assert.throws(
       () => getNode(ledger, "se.missing"),
-      (e: unknown) => e instanceof Rejection && e.remedy.tool === "se.get.search",
+      (e: unknown) => e instanceof Rejection && e.remedy.tool === "se_get_search",
     );
   } finally {
     rmSync(root, { recursive: true, force: true });

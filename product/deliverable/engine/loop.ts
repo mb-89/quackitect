@@ -6,6 +6,7 @@
 import { existsSync, mkdirSync, readdirSync, writeFileSync } from "node:fs";
 import { basename, join } from "node:path";
 import { readJsonFile } from "./jsonio.ts";
+import { pokeBoard } from "./board.ts";
 import { Rejection } from "./errors.ts";
 import { CallLog } from "./calllog.ts";
 import { runCommand } from "./run.ts";
@@ -77,7 +78,7 @@ export class Loop {
         clause: "SE-C-031",
         expected: "no open iteration in this worktree (one instance per execution context)",
         got: `${open.iteration} is open at ${open.current}`,
-        remedy: { tool: "se.loop.next", args: {}, note: "continue the open iteration, or abandon it first" },
+        remedy: { tool: "se_loop_next", args: {}, note: "continue the open iteration, or abandon it first" },
         source: "engine/loop.ts start",
       });
     }
@@ -86,7 +87,7 @@ export class Loop {
         clause: "SE-C-032",
         expected: "a fresh iteration name",
         got: `${iteration} already ran (re-entry: ${this.machine.reentry} does not resurrect closed iterations)`,
-        remedy: { tool: "se.loop.start", args: { iteration: `${iteration}-b` }, note: "pick a fresh name" },
+        remedy: { tool: "se_loop_start", args: { iteration: `${iteration}-b` }, note: "pick a fresh name" },
         source: "engine/loop.ts start",
       });
     }
@@ -157,6 +158,7 @@ export class Loop {
     if (state.kind === "gate") {
       const offer = new Gate(this.root).current();
       if (offer) {
+        pokeBoard(); // something needs the owner: surface the board
         return {
           kind: "gate_offered",
           iteration: inst.iteration,
@@ -190,7 +192,7 @@ export class Loop {
         clause: "SE-C-033",
         expected: "an open iteration to submit against",
         got: "none",
-        remedy: { tool: "se.loop.next", args: {}, note: "next tells you the current step; start an iteration first" },
+        remedy: { tool: "se_loop_next", args: {}, note: "next tells you the current step; start an iteration first" },
         source: "engine/loop.ts submit",
       });
     }
@@ -200,7 +202,7 @@ export class Loop {
         clause: "SE-C-034",
         expected: "an agent-filled state (engine states fill themselves)",
         got: state.id,
-        remedy: { tool: "se.loop.next", args: {}, note: "call next — the engine runs this step mechanically" },
+        remedy: { tool: "se_loop_next", args: {}, note: "call next — the engine runs this step mechanically" },
         source: "engine/loop.ts submit",
       });
     }
@@ -213,7 +215,7 @@ export class Loop {
         expected: `evidence fields: ${missing.map((f) => `${f.name} (${f.description})`).join("; ")}`,
         got: `missing: ${missing.map((f) => f.name).join(", ")}`,
         remedy: {
-          tool: "se.loop.submit",
+          tool: "se_loop_submit",
           args: { evidence: { ...evidence, ...Object.fromEntries(missing.map((f) => [f.name, "<fill>"])) } },
           note: "fill the named fields and resend — this is the corrected call",
         },
@@ -230,7 +232,7 @@ export class Loop {
           clause: "SE-C-044",
           expected: "no live offer (one offer at a time; one iteration per brief)",
           got: `offer pending for ${existing.iteration}/${existing.state}`,
-          remedy: { tool: "se.loop.next", args: {}, note: "the pending offer must resolve (bless / dismiss / expire) first" },
+          remedy: { tool: "se_loop_next", args: {}, note: "the pending offer must resolve (bless / dismiss / expire) first" },
           source: "engine/loop.ts submit",
         });
       }
@@ -243,6 +245,7 @@ export class Loop {
       const offer = gate.makeOffer(inst, state.id, evidence, brief, this.evidenceRef(inst, state.id));
       this.pinEvidence(inst, state.id, { ...evidence, offer_hash: offer.base_hash });
       this.save(inst);
+      pokeBoard(); // a fresh offer: surface the board
       return {
         kind: "gate_offered",
         iteration: inst.iteration,

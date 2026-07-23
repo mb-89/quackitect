@@ -85,7 +85,7 @@ test("a stale hash cannot bless; an expired offer is dismissal by absence", () =
       (e: unknown) => e instanceof Rejection && e.clause === "SE-C-042",
     );
     // Expiry: a gate whose clock is past the deadline sees no offer.
-    const later = new Gate(root, { now: () => Date.now() + 16 * 60 * 1000 });
+    const later = new Gate(root, { now: () => Date.now() + 7 * 60 * 60 * 1000 });
     assert.equal(later.current(), null);
     assert.throws(
       () => later.bless(machineOK(), "anything", { channel: "tty", adjudicated_by: "x" }),

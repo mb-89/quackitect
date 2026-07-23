@@ -38,7 +38,7 @@ export function getMigration(name: string): Migration {
       clause: "SE-C-020",
       expected: `a registered migration (${[...registry.keys()].join(", ") || "none registered"})`,
       got: name,
-      remedy: { tool: "se.set.migrate", args: { name: "v1-import", dry_run: true }, note: "migrations are engine code, never loose scripts" },
+      remedy: { tool: "se_set_migrate", args: { name: "v1-import", dry_run: true }, note: "migrations are engine code, never loose scripts" },
       source: "engine/migrate.ts",
     });
   }

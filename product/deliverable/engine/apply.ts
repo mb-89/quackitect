@@ -53,7 +53,7 @@ function reject(clause: string, expected: string, got: string, remedyArgs: Recor
     clause,
     expected,
     got,
-    remedy: { tool: "se.set.apply", args: remedyArgs, note },
+    remedy: { tool: "se_set_apply", args: remedyArgs, note },
     source: SRC,
   });
 }
@@ -82,7 +82,7 @@ export function computeDiff(ledgerRoot: string, ops: ApplyOp[]): DiffEntry[] {
         `an existing node for op ${op}`,
         `unknown node id: ${id}`,
         { ops: [], dry_run: true },
-        "check the id with se.get.search, then re-send the corrected op list",
+        "check the id with se_get_search, then re-send the corrected op list",
       );
     }
     return n;
@@ -144,7 +144,7 @@ export function computeDiff(ledgerRoot: string, ops: ApplyOp[]): DiffEntry[] {
           n.body = replaceSection(n.body, op.section, op.content);
         } catch {
           reject("SE-C-015", `an existing section in ${op.id}`, `section not found: ${op.section}`,
-            { ops: [], dry_run: true }, "read the node with se.get.node mode=outline to see its sections");
+            { ops: [], dry_run: true }, "read the node with se_get_node mode=outline to see its sections");
         }
         working.set(op.id, reparse(n));
         break;
@@ -164,7 +164,7 @@ export function computeDiff(ledgerRoot: string, ops: ApplyOp[]): DiffEntry[] {
           const i = list.indexOf(op.target);
           if (i === -1) {
             reject("SE-C-017", `an existing ${op.kind} edge to remove`, `${op.id} has no ${op.kind} -> ${op.target}`,
-              { ops: [], dry_run: true }, "read the node's edges with se.get.node mode=outline");
+              { ops: [], dry_run: true }, "read the node's edges with se_get_node mode=outline");
           }
           list.splice(i, 1);
         }
@@ -224,7 +224,7 @@ export function execute(ledgerRoot: string, ops: ApplyOp[], executeHash: string)
       expected: `diff hash ${executeHash} (the state you saw at dry_run)`,
       got: `diff hash ${current} — the ledger moved underneath you`,
       remedy: {
-        tool: "se.set.apply",
+        tool: "se_set_apply",
         args: { ops, dry_run: true },
         note: "re-run dry_run to see the current diff, then execute with the fresh hash",
       },
@@ -242,7 +242,7 @@ export function execute(ledgerRoot: string, ops: ApplyOp[], executeHash: string)
           clause: "SE-C-010",
           expected: `on-disk hash ${d.old_hash} for ${d.file}`,
           got: onDisk,
-          remedy: { tool: "se.set.apply", args: { ops, dry_run: true }, note: "state moved between check and write; re-run dry_run" },
+          remedy: { tool: "se_set_apply", args: { ops, dry_run: true }, note: "state moved between check and write; re-run dry_run" },
           source: SRC,
         });
       }

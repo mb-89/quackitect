@@ -34,6 +34,7 @@ if (existsSync(base)) {
 if (locks.length === 0) process.exit(0);
 
 const norm = (s: string): string => s.replaceAll("\\", "/").toLowerCase();
+const escapeRegex = (s: string): string => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
 function deny(lock: Lock, what: string): never {
   process.stderr.write(
@@ -69,7 +70,11 @@ process.stdin.on("end", () => {
       }
       if (command !== "") {
         const cmd = exempt !== null ? norm(command).split(exempt).join("") : norm(command);
-        if (cmd.includes(root) || cmd.includes("/" + basename(root).toLowerCase())) deny(lock, command.slice(0, 120));
+        // Basename match catches relative-path commands, but the machine-local
+        // state dir (~/.se/<basename>/) legitimately shares the name — a
+        // ".se/" prefix exempts it.
+        const bnHit = new RegExp(`(?<!\\.se)/${escapeRegex(basename(root).toLowerCase())}(?=[/"'\\s]|$)`).test(cmd);
+        if (cmd.includes(root) || bnHit) deny(lock, command.slice(0, 120));
       }
     }
   }

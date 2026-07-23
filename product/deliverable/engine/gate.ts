@@ -44,7 +44,10 @@ export interface GrantRecord {
   at: string;
 }
 
-const OFFER_TTL_MS = 15 * 60 * 1000; // wall clock, owned by SE (§7)
+// 6 hours (owner ruling): an offer must survive a phone conversation away
+// from the desk. Safe at any length — the hash binds the bless to the
+// offered state, and a moved machine refuses (SE-C-043).
+const OFFER_TTL_MS = 6 * 60 * 60 * 1000;
 
 export class Gate {
   private root: string;
@@ -103,9 +106,9 @@ export class Gate {
     if (!offer) {
       throw new Rejection({
         clause: "SE-C-041",
-        expected: "a live offer (offers expire after 15 min; absence is dismissal)",
+        expected: "a live offer (offers expire after 6 hours; absence is dismissal)",
         got: "no live offer",
-        remedy: { tool: "se.loop.next", args: {}, note: "re-reach the gate; a fresh offer carries a fresh hash" },
+        remedy: { tool: "se_loop_next", args: {}, note: "re-reach the gate; a fresh offer carries a fresh hash" },
         source: "engine/gate.ts bless",
       });
     }
@@ -114,7 +117,7 @@ export class Gate {
         clause: "SE-C-042",
         expected: `the live offer's hash ${offer.base_hash}`,
         got: hash,
-        remedy: { tool: "se.loop.next", args: {}, note: "a stale tap cannot match — read the current offer and bless that" },
+        remedy: { tool: "se_loop_next", args: {}, note: "a stale tap cannot match — read the current offer and bless that" },
         source: "engine/gate.ts bless",
       });
     }
@@ -125,7 +128,7 @@ export class Gate {
         clause: "SE-C-043",
         expected: `instance open at ${offer.state}`,
         got: `${inst.iteration} at ${inst.current} (${inst.status})`,
-        remedy: { tool: "se.loop.next", args: {}, note: "the machine moved; the offer no longer binds" },
+        remedy: { tool: "se_loop_next", args: {}, note: "the machine moved; the offer no longer binds" },
         source: "engine/gate.ts bless",
       });
     }

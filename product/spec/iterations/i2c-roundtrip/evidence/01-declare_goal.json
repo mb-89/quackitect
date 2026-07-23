@@ -1,0 +1,10 @@
+{
+  "iteration": "i2c-roundtrip",
+  "state": "declare_goal",
+  "at": "2026-07-23T11:48:09.889Z",
+  "payload": {
+    "goal": "A comfortable offer round-trip: the board opens itself (boot and every new offer poke it; a live tab means no duplicate), offers live 6 hours, every rejection remedy names a callable tool with schema-true args, and the git lane can unstage (restore --staged).",
+    "load_bearing_for": "The owner had to navigate to the board by hand and blessed into a void twice today; 15-minute offers die mid-conversation (phone case); a cold model resending most remedies gets tool-not-found (dotted titles, one schema-false args); a too-broad git add cannot be unstaged through the lane.",
+    "exit_check": "Engine verify green over: board self-open on start and /open poke honoring viewer-alive (asserted with --no-open), offer TTL 6h (expiry test moved past it), every remedy.tool in engine+bin matching an actual tool name with schema-valid args (tests updated), se_git restore accepted only with --staged. Owner-visible: the close offer of THIS iteration pops the board open by itself."
+  }
+}

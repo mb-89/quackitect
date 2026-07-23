@@ -40,7 +40,7 @@ export function getNode(ledger: Ledger, id: string, mode: GetMode = "outline", s
       expected: "an existing node id",
       got: id,
       remedy: {
-        tool: "se.get.search",
+        tool: "se_get_search",
         args: { query: id.split(".").pop() ?? id },
         note: "search for the node first; ids are module-qualified (module.local-id)",
       },
@@ -65,7 +65,7 @@ export function getNode(ledger: Ledger, id: string, mode: GetMode = "outline", s
           clause: "SE-C-015",
           expected: "a section name with mode=section",
           got: "none",
-          remedy: { tool: "se.get.node", args: { id, mode: "outline" }, note: "outline lists the node's sections" },
+          remedy: { tool: "se_get_node", args: { id, mode: "outline" }, note: "outline lists the node's sections" },
           source: "engine/get.ts getNode",
         });
       }
@@ -75,7 +75,7 @@ export function getNode(ledger: Ledger, id: string, mode: GetMode = "outline", s
           clause: "SE-C-015",
           expected: `an existing section of ${id}`,
           got: section,
-          remedy: { tool: "se.get.node", args: { id, mode: "outline" }, note: "outline lists the node's sections" },
+          remedy: { tool: "se_get_node", args: { id, mode: "outline" }, note: "outline lists the node's sections" },
           source: "engine/get.ts getNode",
         });
       }

@@ -4,11 +4,12 @@
 // (todo + wireshark feed), context details, bless panel. The bless button
 // is an owner act on the owner's own channel: channel=board.
 // Zero deps. Port in use = another board is up: exit silently.
+import { spawn } from "node:child_process";
 import { createServer } from "node:http";
 import { resolve } from "node:path";
 import { Gate } from "../engine/gate.ts";
 import { systematic } from "../engine/machines/systematic.ts";
-import { BOARD_PORT } from "../engine/boot.ts";
+import { BOARD_PORT } from "../engine/board.ts";
 import { projectState, BOARD_VERSION } from "../engine/project.ts";
 import { Rejection } from "../engine/errors.ts";
 
@@ -17,6 +18,22 @@ const rootIdx = args.indexOf("--root");
 const root = resolve(rootIdx === -1 ? "." : args[rootIdx + 1]);
 const portIdx = args.indexOf("--port");
 const port = portIdx === -1 ? BOARD_PORT : Number(args[portIdx + 1]);
+const noOpen = args.includes("--no-open") || process.env.SE_STATE_DIR !== undefined;
+
+// The page polls /state.json every 2s — a recent poll IS a live tab.
+const VIEWER_FRESH_MS = 6000;
+let lastSeen = 0;
+let liveUrl = `http://localhost:${port}/`;
+
+function openBrowser(): void {
+  if (noOpen) return;
+  const cmd =
+    process.platform === "win32"
+      ? spawn("cmd", ["/c", "start", "", liveUrl], { detached: true, stdio: "ignore" })
+      : spawn(process.platform === "darwin" ? "open" : "xdg-open", [liveUrl], { detached: true, stdio: "ignore" });
+  cmd.on("error", () => {});
+  cmd.unref();
+}
 
 const PAGE = `<!doctype html>
 <html lang="en">
@@ -64,7 +81,8 @@ const PAGE = `<!doctype html>
   <span id="dot" title="connection"></span>
 </header>
 <main>
-  <section id="iters"><h2>Iterations</h2><div id="iterlist"></div></section>
+  <section id="iters"><h2>Iterations</h2><div id="iterlist"></div>
+    <h2 style="margin-top:1em">Notes (private inbox)</h2><div id="notes"></div></section>
   <section id="tot"><h2>Train of thought</h2>
     <div id="todo"></div>
     <div id="feedwrap">
@@ -95,6 +113,9 @@ function render() {
     "<b>" + esc(it.id) + "</b> · " + esc(it.status) + (it.worked_on ? ' <span class="flag">● worked on</span>' : "") +
     '<div class="steps">' + it.steps.map(s => (s.done ? "✓" : "○") + " " + esc(s.state)).join(" → ") + "</div></div>"
   ).join("");
+  el("notes").innerHTML = (S.notes ?? []).map((n, i) =>
+    '<div class="call" onclick="detail(S.notes[' + i + '])">' + esc(n.at.slice(5, 16)) + " " + esc(n.text.slice(0, 60)) + "</div>"
+  ).join("") || '<span class="steps">empty</span>';
   const hb = S.heartbeat;
   el("todo").innerHTML =
     (hb ? '<div class="hb"><b>' + esc(hb.current_step) + "</b><br>next: " + esc(hb.next_milestone) +
@@ -150,8 +171,14 @@ const server = createServer(async (req, res) => {
       res.writeHead(200, { "content-type": "text/html; charset=utf-8" });
       res.end(PAGE);
     } else if (req.method === "GET" && req.url === "/state.json") {
+      lastSeen = Date.now();
       res.writeHead(200, { "content-type": "application/json" });
       res.end(JSON.stringify(projectState(root)));
+    } else if (req.method === "POST" && req.url === "/open") {
+      const viewerRecent = Date.now() - lastSeen < VIEWER_FRESH_MS;
+      if (!viewerRecent) openBrowser();
+      res.writeHead(200, { "content-type": "application/json" });
+      res.end(JSON.stringify({ viewer_recent: viewerRecent, opened: !viewerRecent && !noOpen }));
     } else if (req.method === "POST" && req.url === "/bless") {
       const { hash } = JSON.parse(await readBody(req)) as { hash: string };
       const grant = new Gate(root).bless(systematic, hash, { channel: "board", adjudicated_by: "owner" });
@@ -179,5 +206,7 @@ server.on("error", (e: NodeJS.ErrnoException) => {
 
 server.listen(port, "127.0.0.1", () => {
   const bound = (server.address() as { port: number }).port;
-  console.log(`se-board ${BOARD_VERSION} — http://localhost:${bound}/ (root: ${root})`);
+  liveUrl = `http://localhost:${bound}/`;
+  console.log(`se-board ${BOARD_VERSION} — ${liveUrl} (root: ${root})`);
+  openBrowser();
 });

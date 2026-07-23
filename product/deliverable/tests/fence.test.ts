@@ -85,6 +85,13 @@ test("shell commands containing a locked root are denied; workspace-scoped comma
 
     const free = await runFence(stateDir, { tool_name: "Bash", tool_input: { command: "echo hello" } });
     assert.equal(free.code, 0);
+
+    // The machine-local state dir shares the product's folder name — legal.
+    const state = await runFence(stateDir, {
+      tool_name: "Bash",
+      tool_input: { command: `tail ~/.se/${product.split(/[\\/]/).pop()}/calls.jsonl` },
+    });
+    assert.equal(state.code, 0);
   } finally {
     for (const d of [stateDir, product, imported]) rmSync(d, { recursive: true, force: true });
   }

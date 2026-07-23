@@ -1,0 +1,28 @@
+{
+  "iteration": "i2c-roundtrip",
+  "state": "verify",
+  "at": "2026-07-23T11:53:48.083Z",
+  "payload": {
+    "run_ref": "run-3df58d16fdb3",
+    "command": "npm --prefix product/deliverable run verify --loglevel=error",
+    "exit": 2
+  },
+  "pinned_run": {
+    "ref": "run-3df58d16fdb3",
+    "ts": "2026-07-23T11:53:48.083Z",
+    "se_version": "2.0.0-bootstrap",
+    "tool": "se.run",
+    "args": {
+      "command": "npm --prefix product/deliverable run verify --loglevel=error",
+      "cwd": "C:\\Users\\ichbi\\Desktop\\ai\\quackitect-v2"
+    },
+    "ok": false,
+    "duration_ms": 988,
+    "detail": {
+      "command": "npm --prefix product/deliverable run verify --loglevel=error",
+      "exit": 2,
+      "stdout": "\n> quackitect@2.0.0-bootstrap verify\n> npm run typecheck && npm test\n\n\n> quackitect@2.0.0-bootstrap typecheck\n> tsc --noEmit\n\nbin/se-fence.ts(75,106): error TS1005: ',' expected.\r\nbin/se-fence.ts(75,110): error TS1002: Unterminated string literal.\r\nbin/se-fence.ts(76,9): error TS1005: ',' expected.\r\nbin/se-fence.ts(78,11): error TS1002: Unterminated string literal.\r\nbin/se-fence.ts(84,3): error TS1005: ',' expected.\r\nbin/se-fence.ts(84,18): error TS1005: ')' expected.\r\nbin/se-fence.ts(85,1): error TS1128: Declaration or statement expected.\r\nbin/se-fence.ts(85,2): error TS1128: Declaration or statement expected.\r\n",
+      "stderr": ""
+    }
+  }
+}

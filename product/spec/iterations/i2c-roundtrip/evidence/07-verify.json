@@ -1,0 +1,28 @@
+{
+  "iteration": "i2c-roundtrip",
+  "state": "verify",
+  "at": "2026-07-23T11:55:58.850Z",
+  "payload": {
+    "run_ref": "run-de0662726131",
+    "command": "npm --prefix product/deliverable run verify --loglevel=error",
+    "exit": 2
+  },
+  "pinned_run": {
+    "ref": "run-de0662726131",
+    "ts": "2026-07-23T11:55:58.850Z",
+    "se_version": "2.0.0-bootstrap",
+    "tool": "se.run",
+    "args": {
+      "command": "npm --prefix product/deliverable run verify --loglevel=error",
+      "cwd": "C:\\Users\\ichbi\\Desktop\\ai\\quackitect-v2"
+    },
+    "ok": false,
+    "duration_ms": 973,
+    "detail": {
+      "command": "npm --prefix product/deliverable run verify --loglevel=error",
+      "exit": 2,
+      "stdout": "\n> quackitect@2.0.0-bootstrap verify\n> npm run typecheck && npm test\n\n\n> quackitect@2.0.0-bootstrap typecheck\n> tsc --noEmit\n\nengine/deliverable.ts(250,1): error TS1128: Declaration or statement expected.\r\nengine/deliverable.ts(250,5): error TS1127: Invalid character.\r\nengine/deliverable.ts(250,7): error TS1109: Expression expected.\r\nengine/deliverable.ts(250,22): error TS1005: ';' expected.\r\nengine/deliverable.ts(250,27): error TS1434: Unexpected keyword or identifier.\r\nengine/deliverable.ts(250,40): error TS1003: Identifier expected.\r\nengine/deliverable.ts(254,1): error TS1128: Declaration or statement expected.\r\n",
+      "stderr": ""
+    }
+  }
+}

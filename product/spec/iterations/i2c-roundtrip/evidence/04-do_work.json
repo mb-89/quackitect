@@ -1,0 +1,8 @@
+{
+  "iteration": "i2c-roundtrip",
+  "state": "do_work",
+  "at": "2026-07-23T11:53:47.093Z",
+  "payload": {
+    "changed": "tests/apply.test.ts: two stale dotted remedy asserts updated (missed in the sweep - line-based search cannot see multi-line remedies; noted for search v2)\nbin/se-fence.ts: basename heuristic no longer false-positives on the machine-local state dir (~/.se/<name>/ shares the product folder name; .se/ prefix exempts) - found live when the fence blocked my own call-log read\ntests/fence.test.ts: state-dir command passes"
+  }
+}

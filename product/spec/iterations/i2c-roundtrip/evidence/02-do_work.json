@@ -1,0 +1,8 @@
+{
+  "iteration": "i2c-roundtrip",
+  "state": "do_work",
+  "at": "2026-07-23T11:52:26.259Z",
+  "payload": {
+    "changed": "engine/board.ts: new - BOARD_PORT/boardUrl/spawnBoard/pokeBoard (fire-and-forget)\nengine/boot.ts: board half moved to board.ts; admission spawns AND pokes\nengine/loop.ts: pokes the board when an offer is created and when a pending offer is re-encountered\nbin/se-board.ts: self-opens the browser on start; POST /open opens only when no live viewer (page polls = alive signal); --no-open for tests\nengine/gate.ts: offer TTL 6h (owner ruling), refusal text updated\nengine/{apply,get,gate,loop,migrate,git,tools}.ts: every remedy.tool now a callable underscore name; SE-C-001 remedy args schema-true; prose notes normalized\nengine/tools.ts: se_git allows restore ONLY with --staged (unstage lane)\ntests: rails expiry moved past 6h; mcp remedy assert updated; board test covers /open cold (no viewer) and warm (viewer alive) under --no-open"
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "iteration": "i2c-b-roundtrip-wide",
+  "state": "close_iteration",
+  "at": "2026-07-23T12:04:55.765Z",
+  "payload": {
+    "exit_check_result": "Engine verify green in one run (run-064fbcd4e872) over the full bundle: board /open honors viewer-alive (cold opens, warm does not - asserted under --no-open); offer TTL 6h with the expiry test moved past it; every remedy.tool callable with schema-true args (apply/get/gate/loop/migrate/git/tools swept, three test asserts updated); se_git restore accepted only with --staged; filePatch keeps dollar sequences literal (regression test; the bug burned all three i2c verifies before the escape); fileSearch v2 - multi-hit literal, ranked multi-term ordering, fuzzy filename subsequence, all asserted; se_note captures machine-local in one call, projection lists newest first, repo stays clean (asserted). Owner-visible after the next reconnect + board restart: boot and every offer surface the board by themselves; this close still shows on the currently running old board.",
+    "offer_hash": "e63ab0d12fde8e1c555df3cf38e2fbf5141f8fa932afcf308202f0496452f557"
+  }
+}
