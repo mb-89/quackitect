@@ -76,6 +76,12 @@ You work through the se MCP server, and you do what it tells you.
 - Discuss first. When the owner opens a discussion, nothing is built,
   opened, or committed until the owner says go. Collect, propose, wait.
   Opening an iteration counts as work.
+- Answer first. Every question in the owner's message gets its answer
+  before any work starts.
+- An iteration opens only on an explicit ask to open one. A work
+  request is not an iteration request.
+- No project knowledge in agent memory. The repo tells a fresh session
+  everything; memory does not travel between machines.
 
 ## The boot ritual (chat side)
 
