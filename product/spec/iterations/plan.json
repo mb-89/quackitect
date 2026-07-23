@@ -5,6 +5,7 @@
       "goal": "Day-scale iterations become real: the machine gets a continue-working edge, and the retro flow arrives (notes drain + cleanup, field-feedback first).",
       "steps": [
         { "text": "plan insert/renumber ops: planned iterations renumber freely, started ids are frozen (engine-checked); rides the dry_run -> execute lane" },
+        { "text": "hot reload: stable stdio shim, engine dynamic-imported per call keyed by mtime - engine edits go live without /mcp reconnect" },
         { "text": "systematic machine: continue-working edge so one iteration holds many verified chunks" },
         { "text": "retro flow v1 - opens with the field-feedback question, drains the notes inbox, cleans it up" },
         { "text": "mint policies as ledger nodes (open since B4)" },
