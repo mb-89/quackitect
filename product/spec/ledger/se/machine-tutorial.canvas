@@ -1,0 +1,263 @@
+{
+	"metadata": {
+		"version": "1.0-1.0",
+		"frontmatter": {
+			"id": "se.machine-tutorial",
+			"kind": "machine",
+			"statement": "The feature tour: every construct the machine language supports, in one compilable drawing.",
+			"entry": "start",
+			"reentry": "restart"
+		}
+	},
+	"nodes": [
+		{
+			"id": "c-head",
+			"type": "text",
+			"text": "# The tutorial machine\nEvery feature the machine language supports, in one drawing. It compiles - the tests hold it green. Click any box to open its state note; double-click the portal to dive.",
+			"x": -560,
+			"y": -300,
+			"width": 1000,
+			"height": 150
+		},
+		{
+			"id": "g-basics",
+			"type": "group",
+			"label": "basics",
+			"x": -40,
+			"y": -60,
+			"width": 500,
+			"height": 260
+		},
+		{
+			"id": "n-start",
+			"type": "file",
+			"file": "spec/ledger/se/machine-tutorial-start.md",
+			"x": 0,
+			"y": 0,
+			"width": 420,
+			"height": 140
+		},
+		{
+			"id": "c-state",
+			"type": "text",
+			"text": "A state = a file node onto a machine_state note. The note carries statement, guidance and the evidence form. Text boxes like this one are comments - the compiler skips them.",
+			"x": 560,
+			"y": -40,
+			"width": 460,
+			"height": 170
+		},
+		{
+			"id": "n-try-build",
+			"type": "file",
+			"file": "spec/ledger/se/machine-tutorial-try-build.md",
+			"x": 0,
+			"y": 240,
+			"width": 420,
+			"height": 140,
+			"styleAttributes": {
+				"shape": "predefined-process"
+			}
+		},
+		{
+			"id": "c-engine",
+			"type": "text",
+			"text": "filled_by: engine - the engine runs the declared command itself; the result lands as pinned evidence with zero model turns. A failing command is a normal Failed.",
+			"x": 560,
+			"y": 220,
+			"width": 460,
+			"height": 170
+		},
+		{
+			"id": "n-fix",
+			"type": "file",
+			"file": "spec/ledger/se/machine-tutorial-fix.md",
+			"x": -560,
+			"y": 240,
+			"width": 420,
+			"height": 140
+		},
+		{
+			"id": "c-roles",
+			"type": "text",
+			"text": "Edge roles ride the edge popup (enable the se-machine-styles snippet). The label is the guard: try_build_attempts < 2 caps this loop - then the machine escapes to a human. Priority: authored > fallback > escape > ask-human.",
+			"x": -560,
+			"y": 440,
+			"width": 460,
+			"height": 210
+		},
+		{
+			"id": "n-aborted",
+			"type": "file",
+			"file": "spec/ledger/se/machine-tutorial-aborted.md",
+			"x": -560,
+			"y": 720,
+			"width": 420,
+			"height": 140,
+			"styleAttributes": {
+				"shape": "terminal"
+			}
+		},
+		{
+			"id": "c-ends",
+			"type": "text",
+			"text": "Two ends: done (via the gate's approval) and aborted (the error role - infrastructure trouble, not test-red). Never drawn: escape-to-parent and ask-human exist on every state.",
+			"x": -1080,
+			"y": 700,
+			"width": 460,
+			"height": 190
+		},
+		{
+			"id": "n-decide",
+			"type": "file",
+			"file": "spec/ledger/se/machine-tutorial-decide.md",
+			"x": 0,
+			"y": 520,
+			"width": 420,
+			"height": 140,
+			"styleAttributes": {
+				"shape": "diamond"
+			}
+		},
+		{
+			"id": "c-gate",
+			"type": "text",
+			"text": "A gate: submit creates an OFFER; a human blesses through their own channel (board, console, chat). The approval edge fires on the bless - mechanical states fill, never bless.",
+			"x": 40,
+			"y": 720,
+			"width": 460,
+			"height": 180
+		},
+		{
+			"id": "n-sidetrack",
+			"type": "file",
+			"file": "spec/ledger/se/machine-tutorial-sidetrack.md",
+			"x": 560,
+			"y": 520,
+			"width": 420,
+			"height": 140
+		},
+		{
+			"id": "c-socket",
+			"type": "text",
+			"text": "The socket: submachine: iteration lets the running iteration plug in its own one-shot drawing, kept in the iteration's folder as an event - never a template.",
+			"x": 1080,
+			"y": 500,
+			"width": 460,
+			"height": 180
+		},
+		{
+			"id": "n-nested",
+			"type": "file",
+			"file": "spec/ledger/se/machine-systematic.canvas",
+			"x": 560,
+			"y": 780,
+			"width": 420,
+			"height": 300,
+			"portal": true
+		},
+		{
+			"id": "c-nest",
+			"type": "text",
+			"text": "Nesting: a file node onto another machine's canvas. Portal on shows it inline. The compiler links the machine, never copies it.",
+			"x": 1080,
+			"y": 800,
+			"width": 460,
+			"height": 160
+		},
+		{
+			"id": "n-done",
+			"type": "file",
+			"file": "spec/ledger/se/machine-tutorial-done.md",
+			"x": 0,
+			"y": 1160,
+			"width": 420,
+			"height": 140,
+			"styleAttributes": {
+				"shape": "terminal"
+			}
+		}
+	],
+	"edges": [
+		{
+			"id": "e-start-build",
+			"fromNode": "n-start",
+			"fromSide": "bottom",
+			"toNode": "n-try-build",
+			"toSide": "top"
+		},
+		{
+			"id": "e-build-decide",
+			"fromNode": "n-try-build",
+			"fromSide": "bottom",
+			"toNode": "n-decide",
+			"toSide": "top"
+		},
+		{
+			"id": "e-build-fix",
+			"fromNode": "n-try-build",
+			"fromSide": "left",
+			"toNode": "n-fix",
+			"toSide": "right",
+			"label": "try_build_attempts < 2",
+			"styleAttributes": {
+				"role": "fallback",
+				"path": "dotted"
+			}
+		},
+		{
+			"id": "e-fix-build",
+			"fromNode": "n-fix",
+			"fromSide": "top",
+			"toNode": "n-try-build",
+			"toSide": "left",
+			"styleAttributes": {
+				"role": "recovery"
+			}
+		},
+		{
+			"id": "e-build-abort",
+			"fromNode": "n-try-build",
+			"fromSide": "left",
+			"toNode": "n-aborted",
+			"toSide": "top",
+			"styleAttributes": {
+				"role": "error",
+				"path": "dotted"
+			}
+		},
+		{
+			"id": "e-decide-done",
+			"fromNode": "n-decide",
+			"fromSide": "bottom",
+			"toNode": "n-done",
+			"toSide": "top",
+			"styleAttributes": {
+				"role": "approval"
+			}
+		},
+		{
+			"id": "e-decide-side",
+			"fromNode": "n-decide",
+			"fromSide": "right",
+			"toNode": "n-sidetrack",
+			"toSide": "left",
+			"styleAttributes": {
+				"role": "alternative"
+			}
+		},
+		{
+			"id": "e-side-nested",
+			"fromNode": "n-sidetrack",
+			"fromSide": "bottom",
+			"toNode": "n-nested",
+			"toSide": "top"
+		},
+		{
+			"id": "e-nested-done",
+			"fromNode": "n-nested",
+			"fromSide": "left",
+			"toNode": "n-done",
+			"toSide": "right"
+		}
+	]
+}

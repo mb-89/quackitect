@@ -1,0 +1,8 @@
+{
+  "iteration": "i2g-tutorial-machine",
+  "state": "do_work",
+  "at": "2026-07-23T17:32:54.740Z",
+  "payload": {
+    "changed": "engine/machines/compile.ts: text nodes are comments - the compiler skips them (drawings may annotate themselves)\ntests/compile.test.ts: comment-skip covered; new test asserts the tutorial machine compiles and exercises every feature (all six roles, guard loop, engine-fill, gate, two terminals, nesting, iteration socket, group)\nledger: se.machine-tutorial.canvas - the annotated feature tour (8 comments, nested systematic portal) + 7 machine_state notes\nse.meth-machine-canvas: comment rule + tutorial link added to The form"
+  }
+}

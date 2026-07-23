@@ -1,0 +1,28 @@
+{
+  "machine": "systematic",
+  "iteration": "i2g-tutorial-machine",
+  "current": "close_iteration",
+  "counters": {},
+  "history": [
+    {
+      "state": "declare_goal",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i2g-tutorial-machine/evidence/01-declare_goal.json",
+      "at": "2026-07-23T17:28:45.742Z"
+    },
+    {
+      "state": "do_work",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i2g-tutorial-machine/evidence/02-do_work.json",
+      "at": "2026-07-23T17:32:54.740Z"
+    },
+    {
+      "state": "verify",
+      "outcome": "filled",
+      "evidence": "run-ce4ed696180f",
+      "at": "2026-07-23T17:33:00.291Z"
+    }
+  ],
+  "escapes": [],
+  "status": "open"
+}

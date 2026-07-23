@@ -48,6 +48,19 @@ test("the drawn offer machine compiles", () => {
   assert.deepEqual(m.states.map((s) => s.id).sort(), ["accepted", "dismissed", "waiting"]);
 });
 
+test("the tutorial machine compiles and exercises every feature", () => {
+  const m = compileMachine(repoLedger(), "se.machine-tutorial");
+  const roles = new Set<string>(m.states.flatMap((s) => s.edges.map((e) => e.role)));
+  for (const r of ["normal", "alternative", "fallback", "recovery", "approval", "error"]) assert.ok(roles.has(r), r);
+  assert.ok(m.states.some((s) => s.filled_by === "engine" && s.command !== undefined));
+  assert.ok(m.states.some((s) => s.kind === "gate"));
+  assert.equal(m.states.filter((s) => s.kind === "terminal").length, 2);
+  assert.ok(m.states.some((s) => s.submachine === "iteration"));
+  assert.ok(m.states.some((s) => s.submachine === "se.machine-systematic"));
+  assert.ok(m.states.some((s) => s.edges.some((e) => e.guard !== undefined)));
+  assert.ok(m.states.some((s) => s.group !== undefined));
+});
+
 /** A minimal drawn machine in a throwaway ledger, mutated per failure case. */
 function fixture(mutate: (canvas: Record<string, unknown>) => void): () => void {
   const root = mkdtempSync(join(tmpdir(), "se-compile-"));
@@ -81,6 +94,8 @@ function fixture(mutate: (canvas: Record<string, unknown>) => void): () => void 
 
 test("a well-formed fixture compiles; each malformation refuses with the element named", () => {
   fixture(() => {})();
+  // Text nodes are comments: the compiler skips them.
+  fixture((c) => (c.nodes as object[]).push({ id: "n-c", type: "text", text: "a comment", x: 0, y: 200, width: 10, height: 10 }))();
 
   const cases: { name: string; mutate: (c: Record<string, unknown>) => void; want: RegExp }[] = [
     {
@@ -92,11 +107,6 @@ test("a well-formed fixture compiles; each malformation refuses with the element
       name: "label that is not a guard",
       mutate: (c) => (((c.edges as { label?: string }[])[0]).label = "blessed"),
       want: /must be a guard/,
-    },
-    {
-      name: "text node as a state",
-      mutate: (c) => (c.nodes as object[]).push({ id: "n-t", type: "text", text: "x", x: 0, y: 200, width: 10, height: 10 }),
-      want: /states are file nodes/,
     },
     {
       name: "dangling note reference",

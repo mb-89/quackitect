@@ -1,128 +1,39 @@
 {
-	"metadata": {
-		"version": "1.0-1.0",
-		"frontmatter": {
-			"id": "se.machine-session",
-			"kind": "machine",
-			"statement": "The session: boot, admission, idle as the hub; iterations run as a nested machine.",
-			"entry": "lock_on",
-			"reentry": "restart"
-		}
+	"metadata":{
+		"version":"1.0-1.0",
+		"frontmatter":{"id":"se.machine-session","kind":"machine","statement":"The session: boot, admission, idle as the hub; iterations run as a nested machine.","entry":"lock_on","reentry":"restart"}
 	},
-	"nodes": [
+	"nodes":[
+		{"id":"g-boot","type":"group","x":-40,"y":-40,"width":500,"height":560,"label":"boot"},
+		{"id":"n-lock-on","type":"file","file":"spec/ledger/se/machine-session-lock-on.md","x":0,"y":0,"width":420,"height":120},
+		{"id":"n-attest","type":"file","file":"spec/ledger/se/machine-session-attest.md","x":0,"y":180,"width":420,"height":120},
+		{"id":"n-admitted","type":"file","file":"spec/ledger/se/machine-session-admitted.md","x":0,"y":360,"width":420,"height":120},
+		{"id":"n-idle","type":"file","file":"spec/ledger/se/machine-session-idle.md","x":0,"y":600,"width":420,"height":120},
+		{"id":"n-systematic","type":"file","file":"spec/ledger/se/machine-systematic.canvas","portal":true,"x":0,"y":820,"width":520,"height":1120},
 		{
-			"id": "g-boot",
-			"type": "group",
-			"label": "boot",
-			"x": -40,
-			"y": -40,
-			"width": 500,
-			"height": 560
-		},
-		{
-			"id": "n-lock-on",
-			"type": "file",
-			"file": "spec/ledger/se/machine-session-lock-on.md",
-			"x": 0,
-			"y": 0,
-			"width": 420,
-			"height": 120
-		},
-		{
-			"id": "n-attest",
-			"type": "file",
-			"file": "spec/ledger/se/machine-session-attest.md",
-			"x": 0,
-			"y": 180,
-			"width": 420,
-			"height": 120
-		},
-		{
-			"id": "n-admitted",
-			"type": "file",
-			"file": "spec/ledger/se/machine-session-admitted.md",
-			"x": 0,
-			"y": 360,
-			"width": 420,
-			"height": 120
-		},
-		{
-			"id": "n-idle",
-			"type": "file",
-			"file": "spec/ledger/se/machine-session-idle.md",
-			"x": 0,
-			"y": 600,
-			"width": 420,
-			"height": 120
-		},
-		{
-			"id": "n-systematic",
-			"type": "file",
-			"file": "spec/ledger/se/machine-systematic.canvas",
-			"x": 0,
-			"y": 820,
-			"width": 420,
-			"height": 300,
-			"portal": true
-		},
-		{
-			"id": "n-ended",
-			"type": "file",
-			"file": "spec/ledger/se/machine-session-ended.md",
-			"x": 560,
-			"y": 600,
-			"width": 420,
-			"height": 120,
-			"styleAttributes": {
-				"shape": "terminal"
-			}
+			"id":"n-ended",
+			"type":"file",
+			"file":"spec/ledger/se/machine-session-ended.md",
+			"styleAttributes":{"shape":"terminal"},
+			"x":560,
+			"y":600,
+			"width":420,
+			"height":120
 		}
 	],
-	"edges": [
+	"edges":[
+		{"id":"e-lo-at","fromNode":"n-lock-on","fromSide":"bottom","toNode":"n-attest","toSide":"top"},
+		{"id":"e-at-ad","fromNode":"n-attest","fromSide":"bottom","toNode":"n-admitted","toSide":"top"},
+		{"id":"e-ad-id","fromNode":"n-admitted","fromSide":"bottom","toNode":"n-idle","toSide":"top"},
+		{"id":"e-id-sy","fromNode":"n-idle","fromSide":"bottom","toNode":"n-systematic","toSide":"top"},
+		{"id":"e-sy-id","fromNode":"n-systematic","fromSide":"right","toNode":"n-idle","toSide":"right"},
 		{
-			"id": "e-lo-at",
-			"fromNode": "n-lock-on",
-			"fromSide": "bottom",
-			"toNode": "n-attest",
-			"toSide": "top"
-		},
-		{
-			"id": "e-at-ad",
-			"fromNode": "n-attest",
-			"fromSide": "bottom",
-			"toNode": "n-admitted",
-			"toSide": "top"
-		},
-		{
-			"id": "e-ad-id",
-			"fromNode": "n-admitted",
-			"fromSide": "bottom",
-			"toNode": "n-idle",
-			"toSide": "top"
-		},
-		{
-			"id": "e-id-sy",
-			"fromNode": "n-idle",
-			"fromSide": "bottom",
-			"toNode": "n-systematic",
-			"toSide": "top"
-		},
-		{
-			"id": "e-sy-id",
-			"fromNode": "n-systematic",
-			"fromSide": "right",
-			"toNode": "n-idle",
-			"toSide": "right"
-		},
-		{
-			"id": "e-id-en",
-			"fromNode": "n-idle",
-			"fromSide": "right",
-			"toNode": "n-ended",
-			"toSide": "left",
-			"styleAttributes": {
-				"role": "alternative"
-			}
+			"id":"e-id-en",
+			"styleAttributes":{"role":"alternative"},
+			"fromNode":"n-idle",
+			"fromSide":"right",
+			"toNode":"n-ended",
+			"toSide":"left"
 		}
 	]
 }

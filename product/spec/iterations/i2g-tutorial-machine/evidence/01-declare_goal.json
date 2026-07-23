@@ -1,0 +1,10 @@
+{
+  "iteration": "i2g-tutorial-machine",
+  "state": "declare_goal",
+  "at": "2026-07-23T17:28:45.742Z",
+  "payload": {
+    "goal": "A drawn tutorial machine (se.machine-tutorial) in the ledger that demonstrates every feature the machine system supports - all six edge roles, guard loops, engine-fill, gate, terminals, nesting, the iteration socket, groups - annotated with canvas comments; the compiler learns that text nodes are comments.",
+    "load_bearing_for": "A stranger (or the owner months later) has no single place that shows what the machine language can express; features get rediscovered by reading the compiler. Also: canvases could not carry annotations - the compiler refused text nodes, blocking self-documenting drawings.",
+    "exit_check": "compileMachine(se.machine-tutorial) succeeds and the compiled machine exercises: >=1 edge of every role, a guarded fallback loop, an engine-filled state with command, a gate, >=2 terminals, a nested machine reference, a submachine: iteration socket, a group; canvas text-node comments present and skipped by the compiler (test); verify green."
+  }
+}

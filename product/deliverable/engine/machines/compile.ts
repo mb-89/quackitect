@@ -131,6 +131,7 @@ export function compileMachine(ledger: Ledger, machineNodeId: string): MachineDe
       groups.push(el);
       continue;
     }
+    if (el.type === "text") continue; // comments — a drawing may annotate itself
     if (el.type !== "file") {
       throw new MachineCompileError(machineNodeId, `canvas node ${el.id}`, `states are file nodes onto notes (got type ${el.type})`);
     }

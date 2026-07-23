@@ -8,14 +8,17 @@ provenance:
 ---
 
 ## The form
+
 - One machine = one canvas file in the ledger plus one note per state.
 - The canvas frontmatter carries the machine identity: `id`, `kind: machine`, `statement`, `entry` (the initial state), `reentry` (`restart` or `resume`).
 - A state is a file node pointing at its `machine_state` note. The note carries the details.
+- A text node is a comment. The compiler skips it; annotate drawings freely.
 - A file node pointing at another machine's canvas nests that machine (turn the portal on to see it inline).
 - An edge's role rides the edge popup menu (the custom style attribute `role`; no selection means `normal`).
 - An edge's label is the guard, nothing else: `<counter> <op> <int>`, e.g. `verify_attempts < 3`.
 - A group node's label becomes the diagram group of the states drawn inside it (presentation only).
 - Never drawn, owned by the executor: escape-to-parent, ask-human, and the priority order `authored > fallback > escape > ask-human`.
+- The feature tour lives in [machine-tutorial.canvas](machine-tutorial.canvas).
 
 ## The state note
 - Frontmatter: `id`, `kind: machine_state`, `machine`, `state`, `state_kind` (`work` | `gate` | `terminal`), `filled_by` (`agent` | `engine`), `command` (engine-filled only), `statement`.
