@@ -1,7 +1,7 @@
 {
   "machine": "systematic",
   "iteration": "i2e-board-rounds",
-  "current": "close_iteration",
+  "current": "closed",
   "counters": {},
   "history": [
     {
@@ -21,8 +21,14 @@
       "outcome": "filled",
       "evidence": "run-e45653f0b4ca",
       "at": "2026-07-23T13:53:33.092Z"
+    },
+    {
+      "state": "close_iteration",
+      "outcome": "filled",
+      "evidence": "grant:89b207510cb3",
+      "at": "2026-07-23T14:59:13.365Z"
     }
   ],
   "escapes": [],
-  "status": "open"
+  "status": "closed"
 }

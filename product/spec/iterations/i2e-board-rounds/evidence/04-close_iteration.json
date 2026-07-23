@@ -1,0 +1,9 @@
+{
+  "iteration": "i2e-board-rounds",
+  "state": "close_iteration",
+  "at": "2026-07-23T13:55:30.133Z",
+  "payload": {
+    "exit_check_result": "Declared exit check: engine verify green with tests covering session-scoped calls, direction rows, agents field — run-e45653f0b4ca, full suite green first run, new test asserts scope filter + intent + response clause + mallard. One post-verify change: two contract prose lines (call discipline) inside boot.ts's string constant; no test pins that text (boot tests attest the hash dynamically). Owner half of the check — redlining the live board — happens at this gate: the old board process is retired, the new page + engine go live at the owner's reconnect, and this offer is the first thing the new board shows.",
+    "offer_hash": "89b207510cb31af8bf8fa745f884e1b46048817dec7237e22275f8eea953e137"
+  }
+}
