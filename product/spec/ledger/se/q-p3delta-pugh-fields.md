@@ -8,7 +8,8 @@ provenance:
   ai_involvement: engine-migrated
   adjudicated_by: pending-owner
 v1_statement: "The Pugh data format extends frontmatter: a weight field on criterion, a datum field on decision. Chosen over a config block, which invents a second map convention."
-status: open
+status: resolved
+verdict: import — carried as se.adr-pugh-fields (owner, 2026-07-23)
 ---
 
 ## Why this is open

@@ -8,7 +8,8 @@ provenance:
   ai_involvement: engine-migrated
   adjudicated_by: pending-owner
 v1_statement: The onion render extends the existing bus-bar machinery in place. Chosen over a fresh renderer, which scored lower on cost and the one-renderer axis; the M5 spike is the kill-criterion.
-status: open
+status: resolved
+verdict: drop — v1 renderer internals (bus-bar machinery); nothing to bind in v2 (owner, 2026-07-23)
 ---
 
 ## Why this is open

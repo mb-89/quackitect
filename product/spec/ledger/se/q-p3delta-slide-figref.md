@@ -8,7 +8,8 @@ provenance:
   ai_involvement: engine-migrated
   adjudicated_by: pending-owner
 v1_statement: The IFU slide's live right half reuses fig-line figure resolution. Chosen over the embed-fence lane, which stays for executable demos; the two lanes compose.
-status: open
+status: resolved
+verdict: "import — carried as se.adr-slide-figref; owner reading: slides are views on the book, one renderer reused everywhere (owner, 2026-07-23)"
 ---
 
 ## Why this is open

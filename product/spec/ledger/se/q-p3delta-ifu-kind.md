@@ -8,7 +8,8 @@ provenance:
   ai_involvement: engine-migrated
   adjudicated_by: pending-owner
 v1_statement: "IFU is a `kind: ifu` deck and guide row, not a new document type."
-status: open
+status: resolved
+verdict: import — carried as se.adr-ifu-kind (owner, 2026-07-23)
 ---
 
 ## Why this is open
