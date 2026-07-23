@@ -1,13 +1,16 @@
 #!/usr/bin/env node
 // se-board — the live state board (owner sketch: status-dashboard).
-// Layout is the owner's ruling, redline round 5: narrow resizable sidebars.
+// Layout is the owner's ruling, redline round 6: narrow resizable sidebars.
 // The agent tab (mallard) tops the middle; under it, state machine and
 // train of thought — side by side when both columns get 500px, sub-tabs
 // otherwise. The state machine renders as a diagram: start dot, boxed
-// states, dashed groups, terminal end node. Log and notes are uniform
-// tables with headers and filters; filter help lands in the generic
+// states, dashed groups, terminal end node; double-click dives into a
+// nested machine. Log and notes are uniform tables: headers, per-table
+// filters with per-table help, drag-resizable columns; timestamps render
+// in the machine's local timezone. Filter help lands in the generic
 // details, log rows in the dedicated log details, notes rows generic.
-// Right sidebar, fixed thirds: decisions / notes / details. No footer.
+// Right sidebar, thirds aligned to the middle's: decisions / notes /
+// details. No footer.
 // The bless button is an owner act on the owner's own channel: channel=board.
 // Zero deps. Port in use = another board is up: exit silently.
 import { spawn } from "node:child_process";
@@ -108,10 +111,13 @@ const PAGE = `<!doctype html>
   .trow { display: grid; gap: .5em; font: 12px ui-monospace, monospace; cursor: pointer; white-space: nowrap; padding: .08em .2em; }
   .trow:hover { background: #eef; }
   .trow span { overflow: hidden; text-overflow: ellipsis; }
-  .trow.log { grid-template-columns: 4.8em 4.5em 3em minmax(7em, 12em) 1fr; }
-  .trow.note { grid-template-columns: 5.5em 1fr; }
+  .trow.log { grid-template-columns: var(--cols-log, 5em 4.5em 3em 12em 1fr); }
+  .trow.note { grid-template-columns: var(--cols-note, 7em 1fr); }
   .thead { font-weight: 600; color: var(--dim); cursor: default; }
   .thead:hover { background: none; }
+  .thead span { position: relative; overflow: visible; }
+  .colgrip { position: absolute; right: -4px; top: -2px; bottom: -2px; width: 7px; cursor: col-resize; }
+  .colgrip:hover { background: #dde4f2; }
   #details pre, #logdetail pre, #modalbody pre { white-space: pre-wrap; word-break: break-word; font-size: 12px; background: #fff; border: 1px solid var(--line); border-radius: 6px; padding: .5em; }
   .card { background: #fff; border: 1px solid var(--line); border-radius: 6px; padding: .5em .6em; margin-bottom: .5em; }
   .card pre { max-height: 9em; overflow-y: auto; white-space: pre-wrap; word-break: break-word; font-size: 11px; margin: .4em 0; }
@@ -158,6 +164,7 @@ const PAGE = `<!doctype html>
   </div>
   <div class="gutter" id="gr"></div>
   <div class="col">
+    <div id="rspacer"></div>
     <div class="pane" id="p-decisions"><h2>Decisions<span id="decnav" style="margin-left:.6em; display:none"><button class="max" onclick="decStep(-1)">◀</button><span id="deccount" class="dim"></span><button class="max" onclick="decStep(1)">▶</button></span><button class="max" onclick="maximize('p-decisions')">⛶</button></h2>
       <div class="body" id="decisions"></div></div>
     <div class="pane" id="p-notes"><h2>Notes (private inbox)<button class="max" onclick="maximize('p-notes')">⛶</button></h2>
@@ -181,9 +188,42 @@ let SMVIEW = -1;
 let subTab = "tot";
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const el = (id) => document.getElementById(id);
+const p2 = (n) => String(n).padStart(2, "0");
+function fmtT(iso) { const d = new Date(iso); return p2(d.getHours()) + ":" + p2(d.getMinutes()) + ":" + p2(d.getSeconds()); }
+function fmtD(iso) { const d = new Date(iso); return p2(d.getMonth() + 1) + "-" + p2(d.getDate()) + " " + p2(d.getHours()) + ":" + p2(d.getMinutes()); }
 function detail(obj) { el("details").innerHTML = "<pre>" + esc(typeof obj === "string" ? obj : JSON.stringify(obj, null, 2)) + "</pre>"; }
 function detailLog(obj) { el("logdetail").innerHTML = "<pre>" + esc(typeof obj === "string" ? obj : JSON.stringify(obj, null, 2)) + "</pre>"; }
-const FILTER_HELP = "A filter hides table rows.\\n\\nType any text. A row stays visible when any of its columns contains that text. Case does not matter.\\n\\nExamples:\\n  file      log: only the file-lane calls\\n  se_git    log: only git calls\\n  gap       notes: only notes mentioning a gap\\n\\nClear the field to see every row again.";
+const HELP = {
+  log: "The log filter hides rows.\\n\\nType any text. A row stays visible when its time, source, dest, tool, or result contains it. Case does not matter.\\n\\nExamples:\\n  se_git    only git calls\\n  16:4      calls from that minute\\n  SE-C      only rejections (their clause)\\n\\nClear the field to see every row.",
+  note: "The notes filter hides rows.\\n\\nType any text. A row stays visible when its time or note text contains it. Case does not matter.\\n\\nExamples:\\n  gap       notes mentioning a gap\\n  07-23     notes from that day\\n\\nClear the field to see every row.",
+};
+const DEFCOLS = { log: "5em 4.5em 3em 12em 1fr", note: "7em 1fr" };
+function colInit() {
+  for (const t of ["log", "note"]) {
+    document.documentElement.style.setProperty("--cols-" + t, localStorage.getItem("cols-" + t) || DEFCOLS[t]);
+  }
+}
+function grip(t, ci) { return '<span class="colgrip" onmousedown="colDrag(event,&quot;' + t + '&quot;,' + ci + ')"></span>'; }
+function colDrag(e, t, ci) {
+  e.preventDefault();
+  e.stopPropagation();
+  const cell = e.target.parentElement;
+  const startX = e.clientX, startW = cell.offsetWidth;
+  const cur = getComputedStyle(document.documentElement).getPropertyValue("--cols-" + t).trim().split(/\\s+/);
+  const move = (ev) => {
+    cur[ci] = Math.max(30, startW + ev.clientX - startX) + "px";
+    const v = cur.join(" ");
+    document.documentElement.style.setProperty("--cols-" + t, v);
+    localStorage.setItem("cols-" + t, v);
+  };
+  const up = () => { removeEventListener("mousemove", move); removeEventListener("mouseup", up); };
+  addEventListener("mousemove", move);
+  addEventListener("mouseup", up);
+}
+function thead(t, names) {
+  return '<div class="trow ' + t + ' thead">' +
+    names.map((n, i) => "<span>" + n + (i < names.length - 1 ? grip(t, i) : "") + "</span>").join("") + "</div>";
+}
 function maximize(paneId) { maximized = paneId; syncModal(); el("modal").className = "open"; }
 function closeModal() { maximized = null; el("modal").className = ""; }
 function syncModal() {
@@ -206,10 +246,15 @@ function layoutMiddle() {
   el("tot-col").style.display = wide || subTab === "tot" ? "" : "none";
   el("st-sm").className = "tab" + (subTab === "sm" ? " active" : "");
   el("st-tot").className = "tab" + (subTab === "tot" ? " active" : "");
+  el("rspacer").style.height = (el("agentbar").offsetHeight + el("subtabbar").offsetHeight) + "px";
 }
 function smView(i) { SMVIEW = i; render(); }
+function smDive(idx, i) {
+  const stack = S.machine_stack ?? [];
+  if (stack[idx] && stack[idx].states[i].id === "iteration" && stack[idx + 1]) { SMVIEW = idx + 1; render(); }
+}
 function smNode(idx, i, st) {
-  const click = ' onclick="detail(S.machine_stack[' + idx + '].states[' + i + '])"';
+  const click = ' onclick="detail(S.machine_stack[' + idx + '].states[' + i + '])" ondblclick="smDive(' + idx + "," + i + ')"';
   if (st.kind === "terminal") return '<div class="smend ' + st.status + '" title="' + esc(st.id) + '"' + click + "></div>";
   return '<div class="smnode ' + st.status + '"' + click + ">" + esc(st.id) + "</div>";
 }
@@ -269,21 +314,25 @@ function render() {
   const me = S.agents[0].name;
   const lq = el("lfilter").value.toLowerCase();
   const lrows = S.calls.map((c, i) => {
-    const res = c.ok ? '<span class="tick">✓</span>'
-      : '<span class="cross">✗ ' + esc(c.response && c.response.clause ? c.response.clause : "failed") + "</span>";
-    return '<div class="trow log" onclick="detailLog(S.calls[' + i + '])"><span>' + c.ts.slice(11, 19) + "</span><span>" +
-      esc(me) + "</span><span>se</span><span>" + esc(c.tool) + "</span><span>" + res + "</span></div>";
+    const clause = c.response && c.response.clause ? c.response.clause : "failed";
+    const t = fmtT(c.ts);
+    const res = c.ok ? '<span class="tick">✓</span>' : '<span class="cross">✗ ' + esc(clause) + "</span>";
+    return {
+      key: (t + " " + me + " se " + c.tool + " " + (c.ok ? "ok" : clause)).toLowerCase(),
+      html: '<div class="trow log" onclick="detailLog(S.calls[' + i + '])"><span>' + t + "</span><span>" +
+        esc(me) + "</span><span>se</span><span>" + esc(c.tool) + "</span><span>" + res + "</span></div>",
+    };
   });
-  el("feed").innerHTML =
-    '<div class="trow log thead"><span>time</span><span>source</span><span>dest</span><span>tool</span><span>result</span></div>' +
-    lrows.filter(r => !lq || r.toLowerCase().includes(lq)).join("");
+  el("feed").innerHTML = thead("log", ["time", "source", "dest", "tool", "result"]) +
+    lrows.filter(r => !lq || r.key.includes(lq)).map(r => r.html).join("");
   const nq = el("nfilter").value.toLowerCase();
-  const nrows = (S.notes ?? []).map((n, i) =>
-    '<div class="trow note" onclick="detail(S.notes[' + i + '])"><span>' + esc(n.at.slice(5, 16)) + "</span><span>" +
-    esc(n.text) + "</span></div>");
-  el("notes").innerHTML =
-    '<div class="trow note thead"><span>time</span><span>note</span></div>' +
-    (nrows.filter(r => !nq || r.toLowerCase().includes(nq)).join("") || '<span class="dim">empty</span>');
+  const nrows = (S.notes ?? []).map((n, i) => ({
+    key: (fmtD(n.at) + " " + n.text).toLowerCase(),
+    html: '<div class="trow note" onclick="detail(S.notes[' + i + '])"><span>' + fmtD(n.at) + "</span><span>" +
+      esc(n.text) + "</span></div>",
+  }));
+  el("notes").innerHTML = thead("note", ["time", "note"]) +
+    (nrows.filter(r => !nq || r.key.includes(nq)).map(r => r.html).join("") || '<span class="dim">empty</span>');
   DECS = [];
   if (S.offer) {
     DECS.push('<div class="card"><b>Gate: ' + esc(S.offer.iteration) + "</b><pre>" + esc(S.offer.brief) + "</pre>" +
@@ -335,12 +384,13 @@ function initResize() {
   drag("gl", (ev) => ev.clientX, "--wl", "sb-l");
   drag("gr", (ev) => window.innerWidth - ev.clientX, "--wr", "sb-r");
 }
+colInit();
 initResize();
 addEventListener("resize", layoutMiddle);
 el("lfilter").addEventListener("input", render);
-el("lfilter").addEventListener("focus", () => detail(FILTER_HELP));
+el("lfilter").addEventListener("focus", () => detail(HELP.log));
 el("nfilter").addEventListener("input", render);
-el("nfilter").addEventListener("focus", () => detail(FILTER_HELP));
+el("nfilter").addEventListener("focus", () => detail(HELP.note));
 layoutMiddle();
 tick();
 setInterval(tick, 2000);
