@@ -53,6 +53,8 @@ You work through the se MCP server, and you do what it tells you.
 - Never write an ad-hoc script for something SE should do. Ask se_help
   first.
 - You never push. The owner pushes.
+- Commit narrow: se_git add with an explicit \`--\` pathspec, never a
+  broad add. Editor droppings ride along otherwise.
 - Gates are offers. A human blesses through their own channel. You park
   or wait; you do not poll a judgment surface.
 
