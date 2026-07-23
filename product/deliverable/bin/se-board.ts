@@ -1,8 +1,10 @@
 #!/usr/bin/env node
 // se-board — the live state board (owner sketch: status-dashboard).
-// Serves the projection; renders header, iterations, train-of-thought
-// (todo + wireshark feed), context details, bless panel. The bless button
-// is an owner act on the owner's own channel: channel=board.
+// Layout is the owner's ruling, redline round 1: left = iterations only;
+// middle = agent tabs over train-of-thought / call table / details, fixed
+// thirds; right = bless / decisions / notes, fixed thirds. No footer.
+// Every pane maximizes into a modal; clicks land in the details pane.
+// The bless button is an owner act on the owner's own channel: channel=board.
 // Zero deps. Port in use = another board is up: exit silently.
 import { spawn } from "node:child_process";
 import { createServer } from "node:http";
@@ -10,7 +12,7 @@ import { resolve } from "node:path";
 import { Gate } from "../engine/gate.ts";
 import { systematic } from "../engine/machines/systematic.ts";
 import { BOARD_PORT } from "../engine/board.ts";
-import { projectState, BOARD_VERSION } from "../engine/project.ts";
+import { projectState, renderHandover, BOARD_VERSION } from "../engine/project.ts";
 import { Rejection } from "../engine/errors.ts";
 
 const args = process.argv.slice(2);
@@ -41,109 +43,183 @@ const PAGE = `<!doctype html>
 <meta charset="utf-8">
 <title>se-board</title>
 <style>
-  :root { --line:#d0d0d0; --dim:#777; --ok:#2e7d32; --bad:#c62828; --mark:#1565c0; }
+  :root { --line:#d0d0d0; --dim:#777; --ok:#2e7d32; --bad:#c62828; --warn:#f9a825; --mark:#1565c0; }
   * { box-sizing: border-box; margin: 0; }
   body { font: 14px/1.45 system-ui, sans-serif; color: #1e1e1e; background: #fafafa; height: 100vh; display: flex; flex-direction: column; }
-  header, footer { display: flex; gap: 1.5em; align-items: baseline; padding: .5em 1em; border-bottom: 1px solid var(--line); background: #fff; }
-  footer { border-top: 1px solid var(--line); border-bottom: none; color: var(--dim); font-size: 12px; }
+  header { display: flex; gap: 1.5em; align-items: center; padding: .5em 1em; border-bottom: 1px solid var(--line); background: #fff; }
   header b { font-size: 16px; }
-  #dot { width:.7em; height:.7em; border-radius:50%; background:var(--bad); display:inline-block; margin-left:auto; }
-  #dot.ok { background: var(--ok); }
-  main { flex: 1; display: grid; grid-template-columns: 1fr 1.4fr 1fr; gap: 0; min-height: 0; }
-  section { border-right: 1px solid var(--line); overflow-y: auto; padding: .7em; min-height: 0; }
-  h2 { font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: var(--dim); margin: .3em 0 .5em; }
-  .iter { padding: .4em .5em; border: 1px solid var(--line); border-radius: 6px; margin-bottom: .5em; cursor: pointer; background: #fff; }
-  .iter.open { border-color: var(--mark); }
-  .iter .flag { color: var(--mark); font-size: 12px; }
-  .steps { color: var(--dim); font-size: 12px; }
-  #tot { display: flex; flex-direction: column; min-height: 0; }
-  #todo { flex: 0 0 auto; max-height: 45%; overflow-y: auto; border-bottom: 1px solid var(--line); padding-bottom: .5em; margin-bottom: .5em; }
-  #feedwrap { flex: 1; min-height: 0; display: flex; flex-direction: column; }
-  #filter { width: 100%; padding: .3em; margin-bottom: .4em; border: 1px solid var(--line); border-radius: 4px; }
-  #feed { flex: 1; overflow-y: auto; font-family: ui-monospace, monospace; font-size: 12px; }
-  .call { padding: .1em .2em; cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .call.err { color: var(--bad); }
-  .call:hover { background: #eef; }
-  #details pre { white-space: pre-wrap; word-break: break-word; font-size: 12px; background: #fff; border: 1px solid var(--line); border-radius: 6px; padding: .5em; }
-  #bless { border-top: 1px solid var(--line); margin-top: .7em; padding-top: .5em; }
-  #bless pre { max-height: 14em; overflow-y: auto; }
-  button { padding: .45em 1.1em; border: 1px solid var(--line); border-radius: 6px; cursor: pointer; background: #fff; }
-  #blessBtn { background: var(--ok); color: #fff; border-color: var(--ok); }
+  #wd { margin-left: auto; display: flex; gap: .3em; }
+  .wdot { width: .55em; height: .55em; border-radius: 50%; background: #e4e4e4; }
+  .wdot.green { background: var(--ok); }
+  .wdot.yellow { background: var(--warn); }
+  .wdot.red { background: var(--bad); }
+  main { flex: 1; display: grid; grid-template-columns: 1fr 1.7fr 1fr; min-height: 0; }
+  .col { display: flex; flex-direction: column; min-height: 0; border-right: 1px solid var(--line); }
+  .col:last-child { border-right: none; }
+  .pane { flex: 1 1 0; min-height: 0; display: flex; flex-direction: column; border-bottom: 1px solid var(--line); padding: .5em .7em; background: #fafafa; }
+  .pane:last-child { border-bottom: none; }
+  .pane > h2 { display: flex; align-items: center; font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: var(--dim); margin: 0 0 .4em; }
+  .max { margin-left: auto; border: none; background: none; color: var(--dim); cursor: pointer; font-size: 13px; padding: 0 .2em; }
+  .max:hover { color: #1e1e1e; }
+  .body { flex: 1; min-height: 0; overflow-y: auto; }
+  #tabs { display: flex; gap: .3em; padding: .4em .7em 0; border-bottom: 1px solid var(--line); background: #fff; }
+  .tab { padding: .25em .9em; border: 1px solid var(--line); border-bottom: none; border-radius: 6px 6px 0 0; background: #fff; font-size: 12px; }
+  .tab.active { border-color: var(--mark); color: var(--mark); }
+  .iterrow { display: flex; align-items: center; gap: .5em; padding: .18em .3em; cursor: pointer; border-radius: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .iterrow:hover { background: #eef; }
+  .led { width: .6em; height: .6em; border-radius: 50%; background: #e4e4e4; flex: 0 0 auto; }
+  .led.done { background: var(--ok); }
+  .led.open { background: var(--warn); animation: pulse 1.2s ease-in-out infinite; }
+  @keyframes pulse { 50% { opacity: .25; } }
   .hb { background: #fff; border: 1px solid var(--line); border-radius: 6px; padding: .4em .6em; margin-bottom: .5em; }
   .hb .age { color: var(--dim); font-size: 12px; }
-  ul.todo { list-style: none; padding-left: .2em; }
+  ul.todo { list-style: none; padding-left: .2em; font-size: 13px; }
+  .tick { color: var(--ok); }
+  .cross { color: var(--bad); }
+  #filter { width: 100%; padding: .3em; margin-bottom: .4em; border: 1px solid var(--line); border-radius: 4px; }
+  .lrow { display: grid; grid-template-columns: 4.6em 4.6em 4.6em minmax(6em, 9em) 1fr; gap: .5em; font: 11px ui-monospace, monospace; cursor: pointer; white-space: nowrap; padding: .08em .2em; }
+  .lrow:hover { background: #eef; }
+  .lrow span { overflow: hidden; text-overflow: ellipsis; }
+  .lhead { font-weight: 600; color: var(--dim); cursor: default; }
+  .lhead:hover { background: none; }
+  #details pre, #modalbody pre { white-space: pre-wrap; word-break: break-word; font-size: 12px; background: #fff; border: 1px solid var(--line); border-radius: 6px; padding: .5em; }
+  .card { background: #fff; border: 1px solid var(--line); border-radius: 6px; padding: .5em .6em; margin-bottom: .5em; }
+  .call { padding: .1em .2em; cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 13px; }
+  .call:hover { background: #eef; }
+  button { padding: .4em 1em; border: 1px solid var(--line); border-radius: 6px; cursor: pointer; background: #fff; }
+  #blessBtn { background: var(--ok); color: #fff; border-color: var(--ok); }
+  .dim { color: var(--dim); font-size: 12px; }
+  #modal { position: fixed; inset: 0; display: none; background: rgba(30,30,30,.45); z-index: 10; padding: 4vh 4vw; }
+  #modal.open { display: block; }
+  #modalbox { background: #fafafa; border-radius: 8px; height: 100%; display: flex; flex-direction: column; padding: .8em 1em; }
+  #modalbox > h2 { display: flex; align-items: center; font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: var(--dim); margin-bottom: .5em; }
+  #modalbody { flex: 1; min-height: 0; overflow: auto; }
 </style>
 </head>
 <body>
 <header>
   <b id="product">…</b>
-  <span id="iterline" class="steps">–</span>
-  <span id="dot" title="connection"></span>
+  <div id="wd" title="watchdog"><span class="wdot"></span><span class="wdot"></span><span class="wdot"></span></div>
 </header>
 <main>
-  <section id="iters"><h2>Iterations</h2><div id="iterlist"></div>
-    <h2 style="margin-top:1em">Notes (private inbox)</h2><div id="notes"></div></section>
-  <section id="tot"><h2>Train of thought</h2>
-    <div id="todo"></div>
-    <div id="feedwrap">
-      <input id="filter" placeholder="filter messages (wireshark-style substring)">
-      <div id="feed"></div>
-    </div>
-  </section>
-  <section>
-    <h2>Details</h2><div id="details"><pre>click anything</pre></div>
-    <div id="bless"><h2>Bless / decision</h2><div id="offer">no pending offer</div></div>
-  </section>
+  <div class="col">
+    <div class="pane" id="p-iters"><h2>Iterations<button class="max" onclick="maximize('p-iters')">⛶</button></h2>
+      <div class="body" id="iterlist"></div></div>
+  </div>
+  <div class="col">
+    <div id="tabs"></div>
+    <div class="pane" id="p-tot"><h2>Train of thought<button class="max" onclick="maximize('p-tot')">⛶</button></h2>
+      <div class="body" id="tot"></div></div>
+    <div class="pane" id="p-log"><h2>Log<button class="max" onclick="maximize('p-log')">⛶</button></h2>
+      <input id="filter" placeholder="filter — click for help">
+      <div class="body" id="feed"></div></div>
+    <div class="pane" id="p-details"><h2>Details<button class="max" onclick="maximize('p-details')">⛶</button></h2>
+      <div class="body" id="details"><pre>click anything</pre></div></div>
+  </div>
+  <div class="col">
+    <div class="pane" id="p-bless"><h2>Bless<button class="max" onclick="maximize('p-bless')">⛶</button></h2>
+      <div class="body" id="offer">no pending offer</div></div>
+    <div class="pane" id="p-decisions"><h2>Decisions<button class="max" onclick="maximize('p-decisions')">⛶</button></h2>
+      <div class="body" id="decisions"></div></div>
+    <div class="pane" id="p-notes"><h2>Notes (private inbox)<button class="max" onclick="maximize('p-notes')">⛶</button></h2>
+      <div class="body" id="notes"></div></div>
+  </div>
 </main>
-<footer>
-  <span id="modules"></span><span id="verify"></span><span id="grants"></span>
-  <span style="margin-left:auto">se-board ${BOARD_VERSION}</span>
-</footer>
+<div id="modal" onclick="if(event.target===this)closeModal()">
+  <div id="modalbox"><h2><span id="modaltitle"></span><button class="max" onclick="closeModal()">✕</button></h2>
+    <div id="modalbody"></div></div>
+</div>
 <script>
 let S = null;
+let ITERS = [];
+let maximized = null;
+let wdTick = 0, wdFail = 0;
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const el = (id) => document.getElementById(id);
 function detail(obj) { el("details").innerHTML = "<pre>" + esc(typeof obj === "string" ? obj : JSON.stringify(obj, null, 2)) + "</pre>"; }
+const FILTER_HELP = "The filter hides log rows.\\n\\nType any text. A row stays visible when its time, source, destination, tool, or info column contains that text. Case does not matter.\\n\\nExamples:\\n  file      only the file-lane calls\\n  se_git    only git calls\\n  09:4      calls from that minute\\n\\nClear the field to see every row again.";
+function maximize(paneId) { maximized = paneId; syncModal(); el("modal").className = "open"; }
+function closeModal() { maximized = null; el("modal").className = ""; }
+function syncModal() {
+  if (!maximized) return;
+  const pane = el(maximized);
+  el("modaltitle").textContent = pane.querySelector("h2").firstChild.textContent;
+  el("modalbody").innerHTML = pane.querySelector(".body").innerHTML;
+}
+function watchdog() {
+  const cls = wdFail === 0 ? "green" : wdFail < 3 ? "yellow" : "red";
+  const dots = el("wd").children;
+  for (let i = 0; i < 3; i++) dots[i].className = "wdot" + (i === wdTick % 3 ? " " + cls : "");
+}
+const iterNum = (id) => { const m = id.match(/^i(\\d+)/); return m ? Number(m[1]) : 999; };
 function render() {
   if (!S) return;
   el("product").textContent = S.product;
-  el("iterline").textContent = S.open_iteration ? S.open_iteration + " · " + (S.iterations.find(i => i.id === S.open_iteration)?.current ?? "") : "no open iteration";
-  el("iterlist").innerHTML = S.iterations.map((it, i) =>
-    '<div class="iter ' + (it.status === "open" ? "open" : "") + '" onclick="detail(S.iterations[' + i + '])">' +
-    "<b>" + esc(it.id) + "</b> · " + esc(it.status) + (it.worked_on ? ' <span class="flag">● worked on</span>' : "") +
-    '<div class="steps">' + (it.status === "planned"
-      ? it.steps.length + " steps · " + it.steps.filter(s => s.owner).length + " need you"
-      : it.steps.map(s => (s.done ? "✓" : "○") + " " + esc(s.state)).join(" → ")) + "</div></div>"
-  ).join("");
-  el("notes").innerHTML = (S.notes ?? []).map((n, i) =>
-    '<div class="call" onclick="detail(S.notes[' + i + '])">' + esc(n.at.slice(5, 16)) + " " + esc(n.text.slice(0, 60)) + "</div>"
-  ).join("") || '<span class="steps">empty</span>';
+  document.title = "se-board · " + S.product;
+  el("tabs").innerHTML = S.agents.map((a, i) =>
+    '<span class="tab' + (i === 0 ? " active" : "") + '">' + esc(a.name) + " · " + esc(a.role) + "</span>").join("");
+  ITERS = S.iterations.filter(it => it.status !== "abandoned")
+    .slice().sort((a, b) => iterNum(a.id) - iterNum(b.id) || a.id.localeCompare(b.id));
+  el("iterlist").innerHTML = ITERS.map((it, i) =>
+    '<div class="iterrow" onclick="detail(ITERS[' + i + '])">' +
+    '<span class="led ' + (it.status === "closed" ? "done" : it.status === "open" ? "open" : "") + '"></span>' +
+    esc(it.id) + "</div>").join("");
   const hb = S.heartbeat;
-  el("todo").innerHTML =
+  el("tot").innerHTML =
     (hb ? '<div class="hb"><b>' + esc(hb.current_step) + "</b><br>next: " + esc(hb.next_milestone) +
-      ' · eta ' + esc(hb.eta) + ' <span class="age">(' + Math.round(hb.age_s / 60) + "m ago)</span></div>" : "") +
-    (hb && hb.todo ? '<ul class="todo">' + hb.todo.map(t => "<li>" + esc(t) + "</li>").join("") + "</ul>" : "");
+      " · eta " + esc(hb.eta) + ' <span class="age">(' + Math.round(hb.age_s / 60) + "m ago)</span></div>" : "") +
+    (hb && hb.todo ? '<ul class="todo">' + hb.todo.map(t => {
+      if (t.startsWith("[x] ")) return '<li><span class="tick">✓</span> ' + esc(t.slice(4)) + "</li>";
+      if (t.startsWith("[ ] ")) return "<li>○ " + esc(t.slice(4)) + "</li>";
+      return "<li>" + esc(t) + "</li>";
+    }).join("") + "</ul>" : "");
+  const me = S.agents[0].name;
   const q = el("filter").value.toLowerCase();
-  el("feed").innerHTML = S.calls
-    .map((c, i) => ({ c, i }))
-    .filter(x => !q || (x.c.tool + x.c.detail + x.c.ts).toLowerCase().includes(q))
-    .map(x => '<div class="call ' + (x.c.ok ? "" : "err") + '" onclick="detail(S.calls[' + x.i + '])">' +
-      esc(x.c.ts.slice(11, 19)) + " " + (x.c.ok ? "·" : "✗") + " " + esc(x.c.tool) + " " + esc(x.c.detail) + "</div>").join("");
+  const rows = [];
+  S.calls.forEach((c, i) => {
+    const t = c.ts.slice(11, 19);
+    const resp = c.ok ? '<span class="tick">✓ ok</span>'
+      : '<span class="cross">✗ ' + esc(c.response && c.response.clause ? c.response.clause : "failed") + "</span>";
+    rows.push(
+      '<div class="lrow" onclick="detail(reqOf(' + i + '))"><span>' + t + "</span><span>" + esc(me) +
+        "</span><span>se</span><span>" + esc(c.tool) + "</span><span>" + esc(c.intent ?? "") + "</span></div>",
+      '<div class="lrow" onclick="detail(respOf(' + i + '))"><span>' + t + "</span><span>se</span><span>" + esc(me) +
+        "</span><span>" + esc(c.tool) + "</span><span>" + resp + "</span></div>",
+    );
+  });
+  el("feed").innerHTML =
+    '<div class="lrow lhead"><span>time</span><span>source</span><span>dest</span><span>tool</span><span>info</span></div>' +
+    rows.filter(r => !q || r.toLowerCase().includes(q)).join("");
   el("offer").innerHTML = S.offer
     ? "<pre>" + esc(S.offer.brief) + "</pre><button id=\\"blessBtn\\" onclick=\\"bless()\\">bless as offered</button> " +
       "<button onclick=\\"dismiss()\\">dismiss</button>"
-    : "no pending offer";
-  el("modules").textContent = S.modules.map(m => m.id + (m.status === "active" ? " ✓" : " ✗")).join("  ");
-  el("verify").textContent = S.last_verify ? ("verify " + (S.last_verify.ok ? "✓" : "✗ exit " + S.last_verify.exit)) : "";
-  el("grants").textContent = S.grants.length + " grants";
+    : '<span class="dim">no pending offer</span>';
+  const seen = localStorage.getItem("handover-seen");
+  el("decisions").innerHTML = (S.handover && seen !== S.session_started)
+    ? '<div class="card"><b>Boot handover</b><div class="dim">the session state at admission</div>' +
+      '<button onclick="showHandover()">read</button> <button onclick="handoverDone()">done</button></div>'
+    : '<span class="dim">nothing to decide</span>';
+  el("notes").innerHTML = (S.notes ?? []).map((n, i) =>
+    '<div class="call" onclick="detail(S.notes[' + i + '])">' + esc(n.at.slice(5, 16)) + " " + esc(n.text.slice(0, 60)) + "</div>"
+  ).join("") || '<span class="dim">empty</span>';
+  syncModal();
 }
+function reqOf(i) { const c = S.calls[i]; return { direction: S.agents[0].name + " → se", ts: c.ts, tool: c.tool, args: c.detail }; }
+function respOf(i) {
+  const c = S.calls[i];
+  return { direction: "se → " + S.agents[0].name, ts: c.ts, tool: c.tool, ok: c.ok,
+    duration_ms: c.duration_ms, response: c.response ?? "ok" };
+}
+function showHandover() { el("modaltitle").textContent = "Boot handover"; el("modalbody").innerHTML = "<pre>" + esc(S.handover) + "</pre>"; maximized = null; el("modal").className = "open"; }
+function handoverDone() { localStorage.setItem("handover-seen", S.session_started); render(); }
 async function tick() {
+  wdTick++;
   try {
     S = await (await fetch("/state.json")).json();
-    el("dot").className = "ok";
-    document.title = "se-board · " + (S.open_iteration ?? S.product);
+    wdFail = 0;
     render();
-  } catch { el("dot").className = ""; }
+  } catch { wdFail++; }
+  watchdog();
 }
 async function bless() {
   const r = await fetch("/bless", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ hash: S.offer.base_hash }) });
@@ -152,6 +228,7 @@ async function bless() {
 }
 async function dismiss() { await fetch("/dismiss", { method: "POST" }); tick(); }
 el("filter").addEventListener("input", render);
+el("filter").addEventListener("focus", () => detail(FILTER_HELP));
 tick();
 setInterval(tick, 2000);
 </script>
@@ -174,8 +251,9 @@ const server = createServer(async (req, res) => {
       res.end(PAGE);
     } else if (req.method === "GET" && req.url === "/state.json") {
       lastSeen = Date.now();
+      const s = projectState(root);
       res.writeHead(200, { "content-type": "application/json" });
-      res.end(JSON.stringify(projectState(root)));
+      res.end(JSON.stringify({ ...s, handover: renderHandover(s) }));
     } else if (req.method === "POST" && req.url === "/open") {
       const viewerRecent = Date.now() - lastSeen < VIEWER_FRESH_MS;
       if (!viewerRecent) openBrowser();

@@ -38,6 +38,14 @@ Write plainly. These are rules, not suggestions. They bind every output: chat, d
 - Author every figure in a text-based form: inline SVG with real text, Mermaid, or ASCII. A machine must be able to read it.
 - Give each figure one line saying what to see in it.
 
+### Visual design
+- The owner owns visual design. A sketch is a contract: render exactly what it shows.
+- Never add a visual element the sketch does not show. A missing affordance becomes a question to the owner, never a silent addition.
+- Every widget gets a maximize control. It opens the widget full-screen as a modal over the grayed page. Close returns to the layout.
+- Click for detail. Clicking an element shows its details: a dedicated surface if one exists, the details pane as the fallback.
+- Panes hold their size. Content never resizes the layout. The maximize modal is the room to breathe.
+- Color carries meaning, never decoration: green = pass, red = failure or rejection, yellow = attention.
+
 ### Do not repeat (DRY)
 - Single source of truth. Each fact lives in one place. Everything else points to it.
 - Do not repeat prose, data, or code. Not across files. Not across panels. Not within one screen.

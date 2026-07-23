@@ -81,6 +81,28 @@ test("planned iterations join the projection; started ids skipped; owner steps f
   }
 });
 
+test("the call feed is session-scoped and carries direction data", () => {
+  const root = mkdtempSync(join(tmpdir(), "se-scope-"));
+  try {
+    mkdirSync(layout.seDir(root), { recursive: true });
+    const calls = [
+      { ref: "run-old", ts: "2026-01-01T00:00:00.000Z", tool: "se_help", args: { intent: "stale" }, ok: true, se_version: "t", duration_ms: 1, detail: { outcome: "result" } },
+      { ref: "run-new", ts: "2026-12-31T00:00:00.000Z", tool: "se_file_search", args: { intent: "fresh" }, ok: false, se_version: "t", duration_ms: 2, detail: { outcome: "rejected", response: { clause: "SE-C-060" } } },
+    ];
+    writeFileSync(join(layout.seDir(root), "calls.jsonl"), calls.map((c) => JSON.stringify(c)).join("\n") + "\n", "utf8");
+    writeFileSync(layout.lockPath(root), JSON.stringify({ at: "2026-06-01T00:00:00.000Z" }) + "\n", "utf8");
+
+    const s = projectState(root);
+    assert.equal(s.agents[0].name, "mallard");
+    assert.equal(s.session_started, "2026-06-01T00:00:00.000Z");
+    assert.equal(s.calls.length, 1, "pre-session calls are filtered out");
+    assert.equal(s.calls[0].intent, "fresh");
+    assert.equal((s.calls[0].response as { clause: string }).clause, "SE-C-060");
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+});
+
 test("projection of an empty root is honest, not an error", () => {
   const root = mkdtempSync(join(tmpdir(), "se-proj-empty-"));
   try {

@@ -35,8 +35,9 @@ export const TOLL_UPDATE_SCHEMA = {
     current_step: { type: "string" },
     next_milestone: { type: "string" },
     eta: { type: "string", description: "clock-time ETA" },
+    todo: { type: "array", items: { type: "string" }, description: 'task list, one item per line: "[x] done" / "[ ] open"' },
   },
-  required: ["current_step", "next_milestone", "eta"],
+  required: ["current_step", "next_milestone", "eta", "todo"],
 } as const;
 
 // Harnesses that load tool schemas without the (undeclared) update property
@@ -103,7 +104,12 @@ export class Toll {
         tool: toolName,
         args: {
           ...args,
-          update: { current_step: "<what you are doing now>", next_milestone: "<next visible result>", eta: "<clock time>" },
+          update: {
+            current_step: "<what you are doing now>",
+            next_milestone: "<next visible result>",
+            eta: "<clock time>",
+            todo: ["[x] <a finished task>", "[ ] <the task in progress>", "[ ] <a task still open>"],
+          },
         },
         note: "pay the toll by resending THIS call with the update field filled — it proceeds immediately",
       },

@@ -30,6 +30,11 @@ export interface CallLine {
   tool: string;
   ok: boolean;
   detail: string;
+  duration_ms?: number;
+  /** The call's declared purpose, when its args carry one. */
+  intent?: string;
+  /** Rejection/error payload — the response direction of the feed. */
+  response?: unknown;
 }
 
 export interface NoteLine {
@@ -43,6 +48,10 @@ export interface ProjectionState {
   root: string;
   generated_at: string;
   board_version: string;
+  /** Admission time of the current session (the lock's timestamp); scopes the call feed. */
+  session_started: string | null;
+  /** One tab per agent; names are duck species, the driving agent is mallard. */
+  agents: { name: string; role: string }[];
   modules: ModuleStatus[];
   iterations: IterationView[];
   open_iteration: string | null;
@@ -158,22 +167,42 @@ export function projectState(root: string): ProjectionState {
 
   const grants = jsonLines<GrantRecord>(tailText(layout.grantsPath(abs))).slice(-10).reverse();
 
-  type RawCall = { ts: string; tool: string; ok: boolean; args?: Record<string, unknown> };
+  const sessionStarted = existsSync(layout.lockPath(abs))
+    ? readJsonFile<{ at?: string }>(layout.lockPath(abs)).at ?? null
+    : null;
+
+  type RawCall = {
+    ts: string;
+    tool: string;
+    ok: boolean;
+    args?: Record<string, unknown>;
+    duration_ms?: number;
+    detail?: { outcome?: string; response?: unknown };
+  };
   const calls = jsonLines<RawCall>(tailText(join(layout.seDir(abs), "calls.jsonl")))
+    .filter((c) => sessionStarted === null || c.ts >= sessionStarted)
     .slice(-200)
     .reverse()
-    .map((c) => ({
-      ts: c.ts,
-      tool: c.tool,
-      ok: c.ok,
-      detail: JSON.stringify(c.args ?? {}).slice(0, 300),
-    }));
+    .map((c) => {
+      const intent = c.args?.intent ?? (c.args?.update as { current_step?: unknown } | undefined)?.current_step;
+      return {
+        ts: c.ts,
+        tool: c.tool,
+        ok: c.ok,
+        detail: JSON.stringify(c.args ?? {}).slice(0, 300),
+        ...(c.duration_ms !== undefined ? { duration_ms: c.duration_ms } : {}),
+        ...(typeof intent === "string" ? { intent } : {}),
+        ...(c.detail?.response !== undefined ? { response: c.detail.response } : {}),
+      };
+    });
 
   return {
     product,
     root: abs,
     generated_at: new Date().toISOString(),
     board_version: BOARD_VERSION,
+    session_started: sessionStarted,
+    agents: [{ name: "mallard", role: "main" }],
     modules: loadModules(abs),
     iterations,
     open_iteration: openIteration,

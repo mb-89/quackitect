@@ -1,0 +1,28 @@
+{
+  "machine": "systematic",
+  "iteration": "i2e-board-rounds",
+  "current": "close_iteration",
+  "counters": {},
+  "history": [
+    {
+      "state": "declare_goal",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i2e-board-rounds/evidence/01-declare_goal.json",
+      "at": "2026-07-23T13:46:17.155Z"
+    },
+    {
+      "state": "do_work",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i2e-board-rounds/evidence/02-do_work.json",
+      "at": "2026-07-23T13:53:27.976Z"
+    },
+    {
+      "state": "verify",
+      "outcome": "filled",
+      "evidence": "run-e45653f0b4ca",
+      "at": "2026-07-23T13:53:33.092Z"
+    }
+  ],
+  "escapes": [],
+  "status": "open"
+}

@@ -34,6 +34,8 @@ export type CallObserver = (record: {
   ok: boolean;
   duration_ms: number;
   outcome: "result" | "rejected" | "errored";
+  /** Rejection/error payload — the response direction of the call feed. */
+  response?: unknown;
 }) => void;
 
 interface JsonRpcRequest {
@@ -132,13 +134,13 @@ export class McpServer {
             if (e instanceof Rejection) {
               // Rejections are results, not protocol errors: the model must
               // read clause + executable remedy and recover in one turn.
-              this.observe({ tool: name, args, ok: false, duration_ms: Date.now() - started, outcome: "rejected" });
+              this.observe({ tool: name, args, ok: false, duration_ms: Date.now() - started, outcome: "rejected", response: e.toJSON() });
               return this.ok(id, {
                 content: [{ type: "text", text: JSON.stringify(e.toJSON(), null, 1) }],
                 isError: true,
               });
             }
-            this.observe({ tool: name, args, ok: false, duration_ms: Date.now() - started, outcome: "errored" });
+            this.observe({ tool: name, args, ok: false, duration_ms: Date.now() - started, outcome: "errored", response: String((e as Error).message) });
             return this.ok(id, {
               content: [{ type: "text", text: JSON.stringify({ kind: "errored", message: String((e as Error).message) }) }],
               isError: true,

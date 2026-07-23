@@ -1,0 +1,22 @@
+{
+  "machine": "systematic",
+  "iteration": "i7-board-rounds",
+  "current": "do_work",
+  "counters": {},
+  "history": [
+    {
+      "state": "declare_goal",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i7-board-rounds/evidence/01-declare_goal.json",
+      "at": "2026-07-23T13:37:13.736Z"
+    },
+    {
+      "state": "do_work",
+      "outcome": "abandoned",
+      "evidence": "Owner ruling mid-discussion: iteration names carry their order; this round belongs before the planned i3, so it reopens as i2e-board-rounds. Also opened before the discussion ended — the discuss-first law lands in the contract this round.",
+      "at": "2026-07-23T13:46:00.989Z"
+    }
+  ],
+  "escapes": [],
+  "status": "abandoned"
+}

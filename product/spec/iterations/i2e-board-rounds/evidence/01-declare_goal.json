@@ -1,0 +1,10 @@
+{
+  "iteration": "i2e-board-rounds",
+  "state": "declare_goal",
+  "at": "2026-07-23T13:46:17.155Z",
+  "payload": {
+    "goal": "Board redline round 1 (the owner's 20-point ruleset): no footer, DRY header, 3-dot watchdog, LED iteration list oldest-first, agent tab strip (mallard), 3x3 fixed thirds, Wireshark table with direction columns, session-scoped log, details-pane fallback + filter help, maximize-everywhere, decisions pane with handover card, toll todo checklist — plus three laws into the served contract/voice: discuss-first, sketch-adherence, maximize rule.",
+    "load_bearing_for": "The board is the owner's only always-on window into agent work; today's design round caught it inventing elements beyond the owner's sketch and repeating state across panels — exactly the trust the board exists to build.",
+    "exit_check": "Engine verify green (tests cover session-scoped calls, direction rows, agents field); then the owner redlines the live board and blesses the gate."
+  }
+}

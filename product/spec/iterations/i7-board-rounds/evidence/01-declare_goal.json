@@ -1,0 +1,10 @@
+{
+  "iteration": "i7-board-rounds",
+  "state": "declare_goal",
+  "at": "2026-07-23T13:37:13.735Z",
+  "payload": {
+    "goal": "Board redline round 1 applied: the owner's 14-point ruleset (no footer, DRY header, watchdog dots, LED iteration list oldest-first one-line, agent tabs, 3x3 fixed-thirds layout with details-pane fallback, session-scoped log, filter help, toll todo checklist) plus the adhere-to-sketch law in the contract.",
+    "load_bearing_for": "The board is the owner's only always-on window into agent work; a board that invents visual elements beyond the owner's sketch (footer, duplicated state) erodes exactly the trust it exists to build — caught live in today's design round.",
+    "exit_check": "Engine verify green: board tests cover the new projection fields (session-scoped calls, agent name); the owner redlines the live board and blesses the gate when the round satisfies."
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "iteration": "i2e-board-rounds",
+  "state": "do_work",
+  "at": "2026-07-23T13:53:27.975Z",
+  "payload": {
+    "changed": "bin/se-board.ts: page rebuilt to redline round 1 (no footer, 3-dot watchdog, LED iteration list oldest-first one-line abandoned-hidden, agent tab strip, 3x3 fixed thirds, wireshark table time/src/dst/tool/info with request+response rows, filter help in details, maximize modal on every pane, decisions pane with handover card); engine/mcp.ts: observer carries the response payload for rejections/errors; engine/tools.ts: response lands in the call log; engine/project.ts: session-scoped call feed (lock timestamp), intent+response+duration on call lines, agents field (mallard/main), session_started; engine/toll.ts: todo checklist required in the update schema and remedy template; engine/boot.ts: discuss-first law in the contract; brand/voice.md: Visual design section (sketch adherence, maximize rule, click-for-detail, fixed panes, color as meaning); tests/project.test.ts: session-scope + direction-data test"
+  }
+}

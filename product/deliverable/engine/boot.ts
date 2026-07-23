@@ -57,6 +57,9 @@ You work through the se MCP server, and you do what it tells you.
   broad add. Editor droppings ride along otherwise.
 - Gates are offers. A human blesses through their own channel. You park
   or wait; you do not poll a judgment surface.
+- Discuss first. When the owner opens a discussion, nothing is built,
+  opened, or committed until the owner says go. Collect, propose, wait.
+  Opening an iteration counts as work.
 
 ## The boot ritual (chat side)
 
@@ -71,6 +74,14 @@ You work through the se MCP server, and you do what it tells you.
 - Ledger: se_get_*, se_set_apply (dry_run -> diff hash -> execute).
 - Files: se_file_list / search / read / patch / write / delete (CAS).
 - Shell: se_run. Git: se_git (allowlisted). Waiting: se_wait.
+
+## Call discipline
+
+- Batch known-target reads into ONE message; every separate call costs
+  a full round-trip. Go sequential only when the next call depends on
+  the previous result.
+- Prefer one whole-file write over three or more patches when you hold
+  the whole file. Prefer one surgical patch in a big file you don't.
 
 ## Voice — how to write every output
 `;
