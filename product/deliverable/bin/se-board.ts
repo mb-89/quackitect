@@ -61,12 +61,10 @@ const PAGE = `<!doctype html>
   .pane { flex: 1 1 0; min-height: 0; display: flex; flex-direction: column; border-bottom: 1px solid var(--line); padding: .5em .7em; background: #fafafa; }
   .pane:last-child { border-bottom: none; }
   .pane > h2 { display: flex; align-items: center; font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: var(--dim); margin: 0 0 .4em; }
-  #p-tot { flex: 1 1 0; }
-  #p-log { flex: 2 1 0; }
   .max { margin-left: auto; border: none; background: none; color: var(--dim); cursor: pointer; font-size: 13px; padding: 0 .2em; }
   .max:hover { color: #1e1e1e; }
   .body { flex: 1; min-height: 0; overflow-y: auto; }
-  #tabs { display: flex; gap: .3em; padding: .4em .7em 0; border-bottom: 1px solid var(--line); background: #fff; }
+  #tabs { display: flex; gap: .3em; margin-bottom: .4em; border-bottom: 1px solid var(--line); }
   .tab { padding: .25em .9em; border: 1px solid var(--line); border-bottom: none; border-radius: 6px 6px 0 0; background: #fff; font-size: 12px; }
   .tab.active { border-color: var(--mark); color: var(--mark); }
   .iterrow { display: flex; align-items: center; gap: .5em; padding: .18em .3em; cursor: pointer; border-radius: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -113,21 +111,24 @@ const PAGE = `<!doctype html>
   </div>
   <div class="gutter" id="gl"></div>
   <div class="col">
-    <div id="tabs"></div>
-    <div class="pane" id="p-tot"><h2>Train of thought<button class="max" onclick="maximize('p-tot')">⛶</button></h2>
+    <div class="pane" id="p-tot">
+      <div id="tabs"></div>
+      <h2>Train of thought<button class="max" onclick="maximize('p-tot')">⛶</button></h2>
       <div class="body" id="tot"></div></div>
     <div class="pane" id="p-log"><h2>Log<button class="max" onclick="maximize('p-log')">⛶</button></h2>
       <input id="filter" placeholder="filter — click for help">
       <div class="body" id="feed"></div></div>
+    <div class="pane" id="p-logdetail"><h2>Log details<button class="max" onclick="maximize('p-logdetail')">⛶</button></h2>
+      <div class="body" id="logdetail"><pre>click a log row</pre></div></div>
   </div>
   <div class="gutter" id="gr"></div>
   <div class="col">
-    <div class="pane" id="p-details"><h2>Details<button class="max" onclick="maximize('p-details')">⛶</button></h2>
-      <div class="body" id="details"><pre>click anything</pre></div></div>
     <div class="pane" id="p-decisions"><h2>Decisions<span id="decnav" style="margin-left:.6em; display:none"><button class="max" onclick="decStep(-1)">◀</button><span id="deccount" class="dim"></span><button class="max" onclick="decStep(1)">▶</button></span><button class="max" onclick="maximize('p-decisions')">⛶</button></h2>
       <div class="body" id="decisions"></div></div>
     <div class="pane" id="p-notes"><h2>Notes (private inbox)<button class="max" onclick="maximize('p-notes')">⛶</button></h2>
       <div class="body" id="notes"></div></div>
+    <div class="pane" id="p-details"><h2>Details<button class="max" onclick="maximize('p-details')">⛶</button></h2>
+      <div class="body" id="details"><pre>click anything</pre></div></div>
   </div>
 </main>
 <div id="modal" onclick="if(event.target===this)closeModal()">
@@ -143,6 +144,7 @@ let wdTick = 0, wdFail = 0;
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const el = (id) => document.getElementById(id);
 function detail(obj) { el("details").innerHTML = "<pre>" + esc(typeof obj === "string" ? obj : JSON.stringify(obj, null, 2)) + "</pre>"; }
+function detailLog(obj) { el("logdetail").innerHTML = "<pre>" + esc(typeof obj === "string" ? obj : JSON.stringify(obj, null, 2)) + "</pre>"; }
 const FILTER_HELP = "The filter hides log rows.\\n\\nType any text. A row stays visible when its time, source, destination, tool, or info column contains that text. Case does not matter.\\n\\nExamples:\\n  file      only the file-lane calls\\n  se_git    only git calls\\n  09:4      calls from that minute\\n\\nClear the field to see every row again.";
 function maximize(paneId) { maximized = paneId; syncModal(); el("modal").className = "open"; }
 function closeModal() { maximized = null; el("modal").className = ""; }
@@ -187,9 +189,9 @@ function render() {
     const resp = c.ok ? '<span class="tick">✓ ok</span>'
       : '<span class="cross">✗ ' + esc(c.response && c.response.clause ? c.response.clause : "failed") + "</span>";
     rows.push(
-      '<div class="lrow" onclick="detail(reqOf(' + i + '))"><span>' + t + "</span><span>" + esc(me) +
+      '<div class="lrow" onclick="detailLog(reqOf(' + i + '))"><span>' + t + "</span><span>" + esc(me) +
         "</span><span>se</span><span>" + esc(c.tool) + "</span><span>" + esc(c.intent ?? "") + "</span></div>",
-      '<div class="lrow" onclick="detail(respOf(' + i + '))"><span>' + t + "</span><span>se</span><span>" + esc(me) +
+      '<div class="lrow" onclick="detailLog(respOf(' + i + '))"><span>' + t + "</span><span>se</span><span>" + esc(me) +
         "</span><span>" + esc(c.tool) + "</span><span>" + resp + "</span></div>",
     );
   });
@@ -257,7 +259,7 @@ function initResize() {
 }
 initResize();
 el("filter").addEventListener("input", render);
-el("filter").addEventListener("focus", () => detail(FILTER_HELP));
+el("filter").addEventListener("focus", () => detailLog(FILTER_HELP));
 tick();
 setInterval(tick, 2000);
 </script>
