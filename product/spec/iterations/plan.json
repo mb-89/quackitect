@@ -1,10 +1,24 @@
 {
   "iterations": [
     {
+      "id": "i2f-machines-are-canvases",
+      "goal": "State machines become Advanced Canvas drawings in the ledger: canvas frontmatter + topology plus referenced state notes are the single source of truth; a load-time compiler feeds the engine; the hand-written TS machines retire.",
+      "steps": [
+        { "text": "machine identity rides the canvas frontmatter (id, entry state, re-entry semantics); the index treats machine canvases as ledger nodes" },
+        { "text": "compiler at load, nothing checked in: pinned Advanced Canvas schema, loud typed failure on unknown shapes; edges carry roles + guards; implicit escape/ask-human edges and the total priority order added by the compiler, never drawn" },
+        { "text": "state details live in referenced notes: guidance refs, filled_by engine + command, evidence-form schema" },
+        { "text": "session and systematic re-authored as canvases; engine loads from the ledger; engine/machines/*.ts deleted" },
+        { "text": "offer machine drawn too - keep or discard at the gate", "owner": true },
+        { "text": "board machine diagram renders from the compiled machine (renderer free: graphviz or a TS library, no 1:1 canvas fidelity)" },
+        { "text": "bless the canvas machine form at the gate", "owner": true }
+      ]
+    },
+    {
       "id": "i3-machine-and-retro",
       "goal": "Day-scale iterations become real: the machine gets a continue-working edge, and the retro flow arrives (notes drain + cleanup, field-feedback first).",
       "steps": [
         { "text": "plan insert/renumber ops: planned iterations renumber freely, started ids are frozen (engine-checked); rides the dry_run -> execute lane" },
+        { "text": "link graph + rename ripple: warm index over all markdown links incl. section targets; renaming a note or a section updates every inbound link (se.set.refactor kind=rename)" },
         { "text": "hot reload: stable stdio shim, engine dynamic-imported per call keyed by mtime - engine edits go live without /mcp reconnect" },
         { "text": "systematic machine: continue-working edge so one iteration holds many verified chunks" },
         { "text": "retro flow v1 - opens with the field-feedback question, drains the notes inbox, cleans it up" },
