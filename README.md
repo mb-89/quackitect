@@ -11,7 +11,7 @@ B3 mint and stops being authoritative then.
 
 ## Run
 
-Windows: `.\RUNME.ps1` · POSIX: `./RUNME.sh`
+Windows: `.\RUNME.ps1`
 
 RUNME starts an agent in `workspace/`. Setup runs only when missing.
 Needs the sibling checkout `../benjamin` (live kb import).

@@ -19,8 +19,8 @@ export interface IterationView {
   status: string;
   current: string;
   goal?: string;
-  /** Machine states in order, with what history says about each. */
-  steps: { state: string; done: boolean }[];
+  /** Machine states in order, with what history says about each; planned entries carry plan steps and owner flags. */
+  steps: { state: string; done: boolean; owner?: boolean }[];
   updated_at?: string;
   worked_on: boolean;
 }
@@ -137,7 +137,24 @@ export function projectState(root: string): ProjectionState {
       });
     }
   }
-  iterations.sort((a, b) => (a.updated_at ?? "").localeCompare(b.updated_at ?? "")).reverse();
+  const planPath = layout.planPath(abs);
+  if (existsSync(planPath)) {
+    type Plan = { iterations?: { id: string; goal?: string; steps?: { text: string; owner?: boolean }[] }[] };
+    const plan = readJsonFile<Plan>(planPath);
+    for (const p of plan.iterations ?? []) {
+      if (existsSync(layout.instancePath(abs, p.id))) continue; // started: the real record wins
+      iterations.push({
+        id: p.id,
+        status: "planned",
+        current: "-",
+        ...(p.goal !== undefined ? { goal: p.goal } : {}),
+        steps: (p.steps ?? []).map((s) => ({ state: s.text, done: false, ...(s.owner === true ? { owner: true } : {}) })),
+        worked_on: false,
+      });
+    }
+  }
+  const rank = (it: IterationView): number => (it.status === "open" ? 0 : it.status === "planned" ? 1 : 2);
+  iterations.sort((a, b) => rank(a) - rank(b) || (b.updated_at ?? "").localeCompare(a.updated_at ?? ""));
 
   const grants = jsonLines<GrantRecord>(tailText(layout.grantsPath(abs))).slice(-10).reverse();
 

@@ -1,0 +1,10 @@
+{
+  "iteration": "i2d-plan",
+  "state": "declare_goal",
+  "at": "2026-07-23T12:15:50.723Z",
+  "payload": {
+    "goal": "The visible iteration plan: every open bootstrap and session item grouped into day-scale planned iterations in spec (plan.json), merged into the projection so the board shows planned work beside open and closed - with owner-needed steps flagged so the owner sees when they are required.",
+    "load_bearing_for": "The open work lives scattered across the B-log's deviations, the retired handover's owner list, the term worklist, question nodes and my notes - the owner cannot see what is still to do or when they will be needed.",
+    "exit_check": "Engine verify green: projection merges plan.json entries as status=planned (skipping ids that already started), owner-flagged steps carried through; the board renders planned iterations with step and owner-needed counts. Owner-visible: the panel lists the planned iterations i3..i7 with flags."
+  }
+}

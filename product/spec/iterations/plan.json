@@ -1,0 +1,69 @@
+{
+  "iterations": [
+    {
+      "id": "i3-machine-and-retro",
+      "goal": "Day-scale iterations become real: the machine gets a continue-working edge, and the retro flow arrives (notes drain + cleanup, field-feedback first).",
+      "steps": [
+        { "text": "systematic machine: continue-working edge so one iteration holds many verified chunks" },
+        { "text": "retro flow v1 - opens with the field-feedback question, drains the notes inbox, cleans it up" },
+        { "text": "mint policies as ledger nodes (open since B4)" },
+        { "text": "projection: last_verify picked by timestamp, not folder order" },
+        { "text": "boot: already-admitted sessions also spawn/poke the board" },
+        { "text": "boot cleanliness: the toll never blocks a session's first se_boot; one-question ritual per the contract" },
+        { "text": "se-gate: record role not username@hostname; loud message on expired offer" },
+        { "text": "bless the machine redesign at the gate", "owner": true },
+        { "text": "retro shape: answer the field-feedback opener", "owner": true }
+      ]
+    },
+    {
+      "id": "i4-questions-and-hygiene",
+      "goal": "The parked adjudications clear and the mint's loose ends close.",
+      "steps": [
+        { "text": "adjudicate the 7 se.q-p3delta-* question nodes", "owner": true },
+        { "text": "audit the i1 chat-session bless - re-bless via console or accept", "owner": true },
+        { "text": "trace-dir ruling: v1 trace stays unmigrated, v2 grows its own spine - confirm or flip", "owner": true },
+        { "text": "apply the verdicts to the ledger" },
+        { "text": "draft glossary entries for the 139 term-worklist candidates" },
+        { "text": "cold-model run: feed each rejection to a fresh session, prove one-turn recovery" }
+      ]
+    },
+    {
+      "id": "i5-kb-content",
+      "goal": "The kb module carries real content, tier-safe.",
+      "steps": [
+        { "text": "benjamin: stay public with a tier pre-push hook, or flip private - decide", "owner": true },
+        { "text": "tier pre-push hook (Track B3) per the ruling" },
+        { "text": "first kb content lands; kb_* tools ride the se surface" },
+        { "text": "CI: add the BENJAMIN_TOKEN secret when benjamin goes private", "owner": true }
+      ]
+    },
+    {
+      "id": "i6-phone-lane",
+      "goal": "Offers reach the phone; a bless works from anywhere within the 6h window.",
+      "steps": [
+        { "text": "offer briefs push to the phone (ntfy); bless-by-reply carries the hash" },
+        { "text": "pair the phone channel once", "owner": true },
+        { "text": "bless one real gate from away", "owner": true }
+      ]
+    },
+    {
+      "id": "i7-board-rounds",
+      "goal": "The board matures through owner design rounds.",
+      "steps": [
+        { "text": "redline rounds on the live board (sketch: product/scratchpad/exc/status-dashboard.md)", "owner": true },
+        { "text": "apply the rounds; dark theme; multi-agent tabs when worktrees land" },
+        { "text": "search checkpoint with scale data: FTS5-ranked index, vendor rg or stay naive", "owner": true }
+      ]
+    },
+    {
+      "id": "i8-v1-retirement",
+      "goal": "v2 daily-drives the real work; v1 archives.",
+      "depends_on": ["i3-machine-and-retro"],
+      "steps": [
+        { "text": "UC-4 evidence: a full working day runs on v2 alone" },
+        { "text": "final call: archive v1, v2 becomes main", "owner": true },
+        { "text": "push cadence: local branches run ahead until you push - recurring until then", "owner": true }
+      ]
+    }
+  ]
+}

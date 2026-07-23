@@ -1,0 +1,8 @@
+{
+  "iteration": "i2d-plan",
+  "state": "do_work",
+  "at": "2026-07-23T12:17:21.744Z",
+  "payload": {
+    "changed": "product/spec/iterations/plan.json: the open work as six planned day-scale iterations (i3 machine+retro, i4 questions+hygiene, i5 kb content, i6 phone lane, i7 board rounds, i8 v1 retirement) with owner-needed steps flagged\nengine/layout.ts: planPath\nengine/project.ts: projection merges plan entries as status=planned (started ids skipped - the real record wins); ordering open > planned > done\nbin/se-board.ts: planned rows show step count + how many need the owner\ntests/project.test.ts: planned merge, skip-on-started, owner flag, ordering"
+  }
+}

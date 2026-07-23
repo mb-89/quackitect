@@ -41,4 +41,6 @@ export const layout = {
   nameplatePath: (root: string): string => join(root, "product.json"),
   /** Notes are PRIVATE: machine-local until drained at a retro, never committed. */
   notesPath: (root: string): string => join(layout.seDir(root), "notes.jsonl"),
+  /** Planned-but-unstarted iterations; the board shows them beside open and closed. */
+  planPath: (root: string): string => join(root, "product", "spec", "iterations", "plan.json"),
 };

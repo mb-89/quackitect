@@ -1,0 +1,9 @@
+{
+  "iteration": "i2d-plan",
+  "state": "close_iteration",
+  "at": "2026-07-23T12:17:35.786Z",
+  "payload": {
+    "exit_check_result": "Verify green in one run (run-d7143ea1adc8): the projection merges plan.json as planned iterations, skips started ids, carries owner flags, ranks open > planned > done - all asserted; the board renders planned rows with step and needs-you counts. The panel now lists i3-machine-and-retro through i8-v1-retirement with 13 owner-flagged steps across them. The offer for THIS close is the first one the new board surfaces by itself.",
+    "offer_hash": "9c70ec9f85b723ebaa7c2c171f7eae2386b928223c23e6b961fa185dcdc8ffa3"
+  }
+}

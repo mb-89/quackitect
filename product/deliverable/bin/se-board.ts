@@ -111,7 +111,9 @@ function render() {
   el("iterlist").innerHTML = S.iterations.map((it, i) =>
     '<div class="iter ' + (it.status === "open" ? "open" : "") + '" onclick="detail(S.iterations[' + i + '])">' +
     "<b>" + esc(it.id) + "</b> · " + esc(it.status) + (it.worked_on ? ' <span class="flag">● worked on</span>' : "") +
-    '<div class="steps">' + it.steps.map(s => (s.done ? "✓" : "○") + " " + esc(s.state)).join(" → ") + "</div></div>"
+    '<div class="steps">' + (it.status === "planned"
+      ? it.steps.length + " steps · " + it.steps.filter(s => s.owner).length + " need you"
+      : it.steps.map(s => (s.done ? "✓" : "○") + " " + esc(s.state)).join(" → ")) + "</div></div>"
   ).join("");
   el("notes").innerHTML = (S.notes ?? []).map((n, i) =>
     '<div class="call" onclick="detail(S.notes[' + i + '])">' + esc(n.at.slice(5, 16)) + " " + esc(n.text.slice(0, 60)) + "</div>"

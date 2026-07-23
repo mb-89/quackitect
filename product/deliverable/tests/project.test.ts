@@ -1,7 +1,7 @@
 // The projection: pure, complete, and the single source both renderers use.
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
@@ -43,6 +43,39 @@ test("projection carries product, iterations with goals and steps, offer and cal
     assert.match(handover, /proj-fixture/);
     assert.match(handover, /i0-proj: open at close_iteration/);
     assert.match(handover, /Pending offer/);
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test("planned iterations join the projection; started ids skipped; owner steps flagged; open ranks first", () => {
+  const root = mkdtempSync(join(tmpdir(), "se-plan-"));
+  try {
+    const plansDir = join(root, "product", "spec", "iterations");
+    mkdirSync(plansDir, { recursive: true });
+    writeFileSync(
+      join(plansDir, "plan.json"),
+      JSON.stringify({
+        iterations: [
+          { id: "i9-future", goal: "later work", steps: [{ text: "build it" }, { text: "rule on it", owner: true }] },
+          { id: "i0-started", goal: "ignored - the real record wins", steps: [] },
+        ],
+      }) + "\n",
+      "utf8",
+    );
+    const loop = new Loop(root, machineOK());
+    loop.start("i0-started");
+
+    const s = projectState(root);
+    assert.equal(s.iterations.filter((it) => it.id === "i0-started").length, 1);
+    assert.equal(s.iterations.find((it) => it.id === "i0-started")!.status, "open");
+    const planned = s.iterations.find((it) => it.id === "i9-future")!;
+    assert.equal(planned.status, "planned");
+    assert.equal(planned.steps.length, 2);
+    assert.equal(planned.steps[1].owner, true);
+    // Open work first, planned after.
+    assert.equal(s.iterations[0].id, "i0-started");
+    assert.equal(s.iterations[1].id, "i9-future");
   } finally {
     rmSync(root, { recursive: true, force: true });
   }
