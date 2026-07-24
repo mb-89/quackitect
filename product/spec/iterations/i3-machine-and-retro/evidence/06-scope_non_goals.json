@@ -1,0 +1,9 @@
+{
+  "iteration": "i3-machine-and-retro",
+  "state": "scope_non_goals",
+  "at": "2026-07-24T08:18:57.432Z",
+  "payload": {
+    "scope": "i3 takes on: (1) the parallel executor - token sets, fired-edge activation, all-fired joins, offer queue, runtime seeding of iteration sub-machines, gate-template injection, packet method-link resolution, market flag; (2) parallelism made visible and usable early - side-by-side branch rendering on the board, two agents holding two active states of one iteration; (3) the retro flow as the drawn M0 onboarding, backed by a generic log-aggregation lane; (4) the engine-law set the retro and today's rulings produced - 1s interactive with backgrounded suite runs, milestone-scoped test lane, gate-bound commit lane, toll-on-submit, mechanical boot-project question, call-log clause+dedupe hygiene, apply-lane ergonomics, hot reload, process lane, offer dismiss/supersede, se-gate role stamps, contract gate-watcher bake; (5) plan insert/renumber ops, link graph + rename ripple, declared-roots search scope, last_verify by timestamp, lean as a diffable strike-list.",
+    "non_goals": "Trace/book rendering - deliberately i5-trace-book. Phone lane - i7. Board redline rounds incl. DRY blink and liveness honesty - i8. Ledger schema validation and dot-file lanes - i4. kb content - i6. v1 retirement call - i9. Multi-project support, non-Obsidian drawing tools, any machine-language feature the tutorial canvas does not already demonstrate - out entirely, no landing slot."
+  }
+}

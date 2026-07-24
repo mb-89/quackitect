@@ -1,0 +1,13 @@
+{
+  "iteration": "i3-machine-and-retro",
+  "state": "gate_motivation",
+  "at": "2026-07-24T08:35:51.730Z",
+  "payload": {
+    "vision_scope_stated": "Complete and correctly scoped per the inheritance ruling: the product vision is the ledger node se.vision (idea, to-be world, goal system, pitch, lineage, amendment rule) - book-referenceable; iteration evidence points there. Iteration-scoped fills stand alone: define_actual (six witnessed pains), frame_delta (gap, why-now, value props with pass lines), scope_non_goals (incl. the ruled inheritance + commit-window steps).",
+    "problem_agreed": "The delta is real by measurement: 840 logged calls show the 5s blocking submits; four prose-law violations in one fresh session today; the interim executor skipped the drawn parallel states on the way to this gate. ALL M1 states are now walked and recorded: log_risks and pressure_test show filled in the instance (green on the board), their evidence pinned as 08/09 - via the day's third hand side-channel, which is the measured size of the executor gap (note d60fd2d4). Pressure test: 'over-engineering for one person?' is answered by the record - prose discipline failed four times in one morning; unattended runs need refusals, not vigilance.",
+    "prior_art_positioned": "Prompt-discipline harnesses: flexible, zero guarantees. Workflow/CI engines: hard guarantees, no human-gate-as-state, no owner-drawable source. v1 quack: enforced walk laws, but the process lived in Go and templates. Learned-from failure: v1's retro-bound log deletion destroyed its own baselines; v2 logs everything and this retro ran on that data. The fusion no alternative holds: owner-drawn source + tool-boundary enforcement.",
+    "success_measurable": "Pass lines on the value-prop needs (05-frame_delta): one full iteration kickoff-to-ship with every gate offered mechanically; one real parallel branch run by two agents, both tokens side-by-side on the board; no interactive call over 1s in the iteration's log slice; a cold session reaches its first gate with zero process-question se_help misses; one-turn refusal recovery measured in i4's cold-model run.",
+    "risks_logged": "Register pinned (08-log_risks) and recorded in the instance: 6 risks, 2 assumptions, 1 dependency, 2 open issues, each with kind, owner, trigger. Commit-window part of R1 since RULED (bless -> next submit; owner-grant escape). The PR-FAQ's weakest answer - the machine has no legal way to be wrong, i.e. no agent-legal lane to correct a diverged record (no dismiss, skip, re-enter, or repair; today needed three hand side-channels) - is folded into R1/I2 and covered by the i3 offer-lane and escape steps.",
+    "offer_hash": "0a630b15025893c45ec4c7183334ce41d6b8be492ad9ccf9dc00e6d251413345"
+  }
+}

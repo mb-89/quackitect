@@ -1,7 +1,7 @@
 {
   "machine": "systematic",
   "iteration": "i3-machine-and-retro",
-  "current": "draft_vision",
+  "current": "draw_context",
   "counters": {},
   "history": [
     {
@@ -15,6 +15,48 @@
       "outcome": "filled",
       "evidence": "grant:30224131fd63",
       "at": "2026-07-24T08:16:24.997Z"
+    },
+    {
+      "state": "draft_vision",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i3-machine-and-retro/evidence/03-draft_vision.json",
+      "at": "2026-07-24T08:17:47.981Z"
+    },
+    {
+      "state": "define_actual",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i3-machine-and-retro/evidence/04-define_actual.json",
+      "at": "2026-07-24T08:18:08.850Z"
+    },
+    {
+      "state": "frame_delta",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i3-machine-and-retro/evidence/05-frame_delta.json",
+      "at": "2026-07-24T08:18:37.085Z"
+    },
+    {
+      "state": "scope_non_goals",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i3-machine-and-retro/evidence/06-scope_non_goals.json",
+      "at": "2026-07-24T08:18:57.432Z"
+    },
+    {
+      "state": "log_risks",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i3-machine-and-retro/evidence/08-log_risks.json",
+      "at": "2026-07-24T08:24:15.000Z"
+    },
+    {
+      "state": "pressure_test",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i3-machine-and-retro/evidence/09-pressure_test.json",
+      "at": "2026-07-24T08:24:15.000Z"
+    },
+    {
+      "state": "gate_motivation",
+      "outcome": "filled",
+      "evidence": "grant:0a630b150258",
+      "at": "2026-07-24T08:38:11.171Z"
     }
   ],
   "escapes": [],

@@ -1,0 +1,21 @@
+{
+  "iteration": "i3-machine-and-retro",
+  "state": "log_risks",
+  "at": "2026-07-24T10:24:15+02:00",
+  "note": "Inline fill after the interim executor skipped this drawn parallel state (see note 401bdae3). Owner required the state walked before blessing gate_motivation. Pinned by hand; the parallel executor makes this lane mechanical.",
+  "payload": {
+    "raid_opened": [
+      "R1 (risk, from goal-conflict a) | Enforcement rigidity blocks legitimate work - a refusal (commit, test, offer) lands during something genuinely urgent and there is no legal move. Owner: the owner rules the escape. Trigger: first refusal that blocks an urgent action; the commit-window question (note 3e4a4cdc) is the first known instance.",
+      "R2 (risk, from goal-conflict b) | The owner becomes the bottleneck: parallel work multiplies ripe gates while adjudication stays serial. Owner: the owner. Trigger: offer queue depth exceeds 3.",
+      "R3 (risk, from goal-conflict c) | Scope overrun: ~20 steps in a day-scale iteration. Owner: driving agent. Trigger: the M6 build plan exceeds ~2 days of chunks; remedy is a split via the new plan-renumber op.",
+      "R4 (risk) | Rebuilding the executor that is flying this very iteration corrupts the running instance. Owner: driving agent. Trigger: instance-state corruption; the instance file is git-tracked - restore and resume.",
+      "R5 (risk) | Backgrounded engine-filled runs break evidence pinning (run_ref semantics change). Owner: driving agent. Trigger: verify evidence missing run refs.",
+      "R6 (risk) | Two agents on parallel states write-conflict in one worktree. Owner: driving agent. Trigger: first two-agent run; the lane/worktree rule is decided BEFORE enabling.",
+      "A1 (assumption) | The Advanced Canvas format stays stable; the compiler pins 1.0-1.0 and refuses unknown versions loudly. Revisit trigger: an Obsidian/plugin update changes the emitted format.",
+      "A2 (assumption) | One owner adjudicates everything; multi-adjudicator flows are out of scope for v2 bootstrap.",
+      "D1 (dependency) | Drawing depends on Obsidian + Advanced Canvas; blessing depends on the board until the phone lane (i7).",
+      "I1 (issue, open) | Call log lacks rejection clauses and double-logs dispatches - the retro could not rank clauses. Already an i3 step.",
+      "I2 (issue, open) | No offer dismiss/supersede lane - a stale offer wedges the gate until bless or 6h expiry (witnessed at the i2e gate). Already an i3 step."
+    ]
+  }
+}
