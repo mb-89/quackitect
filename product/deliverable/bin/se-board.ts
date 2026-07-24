@@ -305,7 +305,7 @@ function render() {
   const hb = S.heartbeat;
   el("tot").innerHTML =
     (hb ? '<div class="hb"><b>' + esc(hb.current_step) + "</b><br>next: " + esc(hb.next_milestone) +
-      " · eta " + esc(hb.eta) + ' <span class="age">(' + Math.round(hb.age_s / 60) + "m ago)</span></div>" : "") +
+      " · eta " + esc(hb.eta) + "</div>" : "") +
     (hb && hb.todo ? '<ul class="todo">' + hb.todo.map(t => {
       if (t.startsWith("[x] ")) return '<li><span class="tick">✓</span> ' + esc(t.slice(4)) + "</li>";
       if (t.startsWith("[ ] ")) return "<li>○ " + esc(t.slice(4)) + "</li>";

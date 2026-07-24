@@ -1,0 +1,22 @@
+{
+  "machine": "systematic",
+  "iteration": "i4-questions-and-hygiene",
+  "current": "draft_vision",
+  "counters": {},
+  "history": [
+    {
+      "state": "onboard_retro",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i4-questions-and-hygiene/evidence/01-onboard_retro.json",
+      "at": "2026-07-24T10:51:35.808Z"
+    },
+    {
+      "state": "gate_kickoff",
+      "outcome": "filled",
+      "evidence": "grant:6ee7ae2eb861",
+      "at": "2026-07-24T10:53:58.508Z"
+    }
+  ],
+  "escapes": [],
+  "status": "open"
+}

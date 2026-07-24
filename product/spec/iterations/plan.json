@@ -33,7 +33,7 @@
     {
       "id": "i4-questions-and-hygiene",
       "machine": "systematic",
-      "goal": "The parked adjudications clear and the mint's loose ends close.",
+      "goal": "The parked adjudications clear, the mint's loose ends close, the board reads human, and the i3 engine leftovers land.",
       "steps": [
         { "text": "audit the i1 chat-session bless - re-bless via console or accept", "owner": true },
         { "text": "trace-dir ruling: v1 trace stays unmigrated, v2 grows its own spine - confirm or flip", "owner": true },
@@ -42,7 +42,28 @@
         { "text": "dot-path file lane: product/.obsidian and root dot-files (.gitignore) served through se_file_* - today reachable by nobody" },
         { "text": "ledger structure talk: flat-dir index (Obsidian index/Bases view) and the methods/templates home question", "owner": true },
         { "text": "draft glossary entries for the 139 term-worklist candidates" },
-        { "text": "cold-model run: feed each rejection to a fresh session, prove one-turn recovery" }
+        { "text": "cold-model run: feed each rejection to a fresh session, prove one-turn recovery" },
+        { "text": "board: JSON tree as the DEFAULT detail renderer - collapsible keys, fits the design; purpose-built renderers override, plain text stops being the fallback" },
+        { "text": "board: parallel branches side-by-side with every active token highlighted (carried req-board-parallel)" },
+        { "text": "board: maximize fills the screen; the refresh preserves scroll position" },
+        { "text": "test-lane scope refusal: suite and single-test runs refused outside milestone verification states (completes req-test-lane)" },
+        { "text": "state-inherit acceptance: an inherit evidence (pointer + delta or unchanged) satisfies resident-targeting states (req-state-inherit)" },
+        { "text": "search roots: declared roots (imports, v1, the owner's working folder) served, undeclared refused (req-search-roots)" },
+        { "text": "link graph + rename ripple: warm index over markdown links incl. section targets; renames update every inbound link (req-link-rename)" },
+        { "text": "plan insert/renumber ops: planned renumber freely, started frozen (req-plan-ops)" },
+        { "text": "lean as a diffable strike-list over systematic (req-lean-strike) - unlocks the onboarding prune-down for real" },
+        { "text": "canvas surgical ops: add/remove node and edge (completes req-apply-ergonomics)" },
+        { "text": "se-gate console: record role not username; loud message on expired offers (completes req-grant-role)" },
+        { "text": "guidance registry: applies_to guidance notes joined onto chunk packets by realization kind; packet method-link resolution; market flag" },
+        { "text": "child machines complete: engine-filled sub-states and sub-gates (lifts the i3 slice limits)" },
+        { "text": "evidence ids collision-free: state+attempt naming, never list-length (retires the 09/26 collisions)" },
+        { "text": "call-log hygiene rest: se_run single-line (observer owns it), the pre-K2 clauseless era stays an honest lower bound" },
+        { "text": "gate parking rides se_wait offer waits; the scratch watcher retires (exit-on-empty documented as the fallback's law)" },
+        { "text": "projection last_verify: the dedicated multi-iteration ordering test (pays V4)" },
+        { "text": "toll grace-warning: a lapsed window warns on the passing call, blocks only the call after an ignored warning" },
+        { "text": "absolute scoring: fixed 0-5 anchors on evaluate_set/evaluate_baseline/gate_requirements evidence; a RESEARCH AGENT scores against prior art and external tools, never the builder; spider render rides the board later" },
+        { "text": "ETA calibration: the standing retro query (ETA vs actual per state kind); future ETAs quote the measured table" },
+        { "text": "shim restart guard: only swap onto loadable engine fingerprints (canary import) - the atomicity lesson as a refusal" }
       ]
     },
     {

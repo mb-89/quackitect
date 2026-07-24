@@ -1,0 +1,12 @@
+{
+  "iteration": "i4-questions-and-hygiene",
+  "state": "onboard_retro",
+  "at": "2026-07-24T10:51:35.808Z",
+  "payload": {
+    "field_feedback": "Two items from the owner's live use since the i3 ship: (1) JSON in detail panes reads as plain text - ruled: a collapsible JSON tree becomes the DEFAULT renderer, purpose-built renderers override later; (2) the machine panel was expected to render parallel states side-by-side - already carried as req-board-parallel/V3, confirmed as i4 scope. Bonus rulings landed during the retro itself: build_steps drawn into M7 NOW (done - between observe_red and verification, submachine iteration, compile-verified 97/97), the minutes-ago age display removed NOW (done), absolute scores come from a RESEARCH AGENT, ETA calibration accepted, scope B (i4 swallows everything), rigor systematic.",
+    "notes_drained": "44 -> 0, every note mechanically drained through se_note_drain with its disposition recorded in the inbox itself: 21 done (i3 delivered them), 8 routed to i8-board-rounds, 13 pulled into i4 (now concrete plan steps), 1 rejected as superseded, 1 routed to future planning guidance. First zero-inbox retro; uc-7's drained-marked pass line is demonstrated.",
+    "call_log_mined": "Via se_log_query, no scripts: 436 calls since the i3 retro, 11 failures (2.5%, down from 8.8%). Clause ranking now WORKS for post-hygiene lines: SE-C-046 x2 (the toll catching its author), SE-C-047 x1 (the stale-board window gap), SE-C-064 x1 (a patch miss); the 7 clauseless failures predate the fix and stay an honest lower bound - v1's lesson honored. se_help misses: 1 real (the run lane - since built same day). New lead found IN the mining: se_run dispatches log twice (observer + runCommand's internal line) - now an i4 step.",
+    "waste_leads": "Three from the day's record, all with durable homes: the import-batch engine crash (shim canary guard - i4 step), the watcher race (se_wait offer waits - i4 step), the red-first slip on C5-C7 checks (practice: the check rides BEFORE its chunk, restated here as the standing rule).",
+    "process_stale": "Checked against the day's own evidence rather than opinion: the machine caught its author twice (toll, commit window), the retro ran entirely on built lanes (query + drain), and the owner's three process rulings (build_steps placeholder, notes-not-live-passes for mid-build input, measured ETAs) are process IMPROVEMENTS adopted, not staleness. No staleness flag; next check at the i5 onboarding."
+  }
+}

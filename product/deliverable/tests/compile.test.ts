@@ -35,13 +35,13 @@ test("the drawn systematic machine: onboarding plus nine milestones, gates, seed
   const m = compileMachine(repoLedger(), "se.machine-systematic");
   assert.equal(m.id, "systematic");
   assert.equal(m.initial, "onboard_retro");
-  assert.equal(m.states.length, 47);
+  assert.equal(m.states.length, 48);
   assert.equal(m.states.filter((s) => s.kind === "gate").length, 10);
   assert.equal(m.states.filter((s) => s.kind === "terminal").length, 1);
   // The seeding sockets: candidates, spikes, build chunks, killer demos.
   assert.deepEqual(
     m.states.filter((s) => s.submachine === "iteration").map((s) => s.id).sort(),
-    ["enumerate_space", "fill_story_evidence", "plan_build", "rank_unknowns"],
+    ["build_steps", "enumerate_space", "fill_story_evidence", "plan_build", "rank_unknowns"],
   );
   // The battery law as edges: verification falls back into fix_findings, guarded.
   const ver = m.states.find((s) => s.id === "verification")!;
