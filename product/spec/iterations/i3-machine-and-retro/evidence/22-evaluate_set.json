@@ -1,0 +1,10 @@
+{
+  "iteration": "i3-machine-and-retro",
+  "state": "evaluate_set",
+  "at": "2026-07-24T08:58:53.739Z",
+  "payload": {
+    "scores": "Candidates x weighted criteria (C1 record 25, C2 migratability 20, C3 latency 15, C4 visibility 15, C5 simplicity 15, C6 throughput 10; 1-5 scale). K1 extend-in-place: C1 4 (single record; minor current-alias ambiguity), C2 5 (additive, the running i3 instance adopts by gaining one field), C3 5 (background runs orthogonal), C4 4, C5 4, C6 4 -> weighted 4.35. K2 token-engine rewrite: C1 5 (replay = perfect record), C2 2 (replaying a mid-flight, hand-repaired instance is the riskiest available move - and i3's instance IS hand-repaired nine times), C3 5, C4 4, C5 2 (IR + replay machinery against the zero-dep ethos), C6 5 -> 3.75. K3 scheduler sidecar: C1 2 (two sources of truth - the defect class this iteration exists to kill), C2 4, C3 5, C4 3 (board must merge two stores), C5 3, C6 4 -> 3.30. The formulated examples walked through each: S2 (two agents, one iteration) passes on all three mechanically; S1's commit-window and record checks fail on K3's split truth.",
+    "front": "Non-dominated front: {K1, K2}. K1 leads overall; K2 survives because it strictly wins C1 and C6 - the record-purity ceiling is real and a future iteration may buy it once no mid-flight instance is at stake.",
+    "eliminations": "K3 eliminated, dominated: equal-or-worse than K1 on every criterion, and its two-truth record directly violates req-exec-tokens' intent (the machine's record must explain the system). No other eliminations; the front goes to converge_pugh at M5."
+  }
+}

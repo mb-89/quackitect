@@ -1,0 +1,13 @@
+{
+  "iteration": "i3-machine-and-retro",
+  "state": "gate_candidates",
+  "at": "2026-07-24T08:59:14.712Z",
+  "payload": {
+    "viable_set": "Two viable candidates survive to the front: K1 extend-in-place (instance gains active[], advance generalizes to token ops) and K2 token-engine rewrite (event-sourced v2 format, history replay). Both satisfy the full register on paper; they differ in what they optimize - K1 protects the flying iteration, K2 buys record purity with churn.",
+    "complete_allocation": "All eight function clusters allocate in every candidate (20-partition_functions, 21-enumerate_space): K1 keeps each cluster in its current file and adds one interface (offer-queue wrapper); K2 adds compiler IR and replay modules (three new interfaces); K3 added a scheduler store beside the instance (the two-truth interface that eliminated it). Rationale recorded per candidate.",
+    "criteria_traced": "Six weighted criteria (19-derive_criteria), each with requirement lineage: record integrity 25 (req-exec-tokens, req-grant-role), mid-flight migratability 20 (register R4), latency 15 (req-1s-interactive), owner visibility 15 (req-board-parallel), zero-dep simplicity 15 (engine ethos), parallel throughput 10 (req-exec-parallel, uc-4). Weight order follows the goal system's ruled conflict order: record and enforcement over speed.",
+    "front_recorded": "Front {K1, K2}; K1 weighted 4.35, K2 3.75, K3 3.30 eliminated as dominated - equal-or-worse than K1 everywhere and its split record violates req-exec-tokens' intent. Eliminations reasoned in 22-evaluate_set.",
+    "feasibility_checked": "K1: high - additive JSON field, old readers keep working via the current alias; probed against the real instance file. K2: medium - replay must reconstruct a mid-flight instance that was hand-repaired nine times this iteration; feasible but the risk lands exactly on R4. Both walked through the formulated examples; S2 (two agents, one iteration) passes mechanically on both.",
+    "offer_hash": "3e9d4081bb87de23e02966950fcee720ae9ffe279d9aa467b804f03d4a3e6ac8"
+  }
+}

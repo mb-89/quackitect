@@ -1,0 +1,19 @@
+{
+  "iteration": "i3-machine-and-retro",
+  "state": "partition_functions",
+  "at": "2026-07-24T09:40:00.000Z",
+  "note": "Inline fill - interim executor skipped this drawn parallel state (side-channel #8).",
+  "payload": {
+    "clusters": [
+      "TOKEN ENGINE (basic) | hold token set, activate successors, hold joins, record history | home: machine.ts",
+      "PACKET SERVICE (basic) | serve packets, attach guidance, resolve method links, validate evidence form, pin evidence | home: loop.ts",
+      "SESSION ASSIGNMENT (additional) | assign active states to sessions, record acting session | new, thin - rides the packet service",
+      "ADJUDICATION (safety) | queue offers, dismiss, supersede, replace, record grant, advance on bless | home: gate.ts",
+      "RUN SERVICE (basic) | start background run, expose handle, report completion, pin run record | home: run.ts + a run store",
+      "LAW GUARDS (safety) | refuse out-of-scope tests, out-of-window commits, update-less submits, project-less boots | home: toll.ts + dispatch",
+      "RECORD (support) | log one line per dispatch with clause, aggregate logs, mark notes drained, project handover | home: calllog.ts + notes + emit",
+      "SURFACE (support) | render branches side by side, highlight tokens, iteration tabs, manage owned processes, reload engine | home: se-board.ts + shim"
+    ],
+    "coupling": "One relation meaning: shares-runtime-state. TOKEN ENGINE <-> PACKET SERVICE (the instance), ADJUDICATION <-> TOKEN ENGINE (advance on bless), RUN SERVICE <-> PACKET SERVICE (engine-filled states), LAW GUARDS <-> dispatch (every call), SURFACE reads all, writes none. The partitioning is shared across all candidates; the static cut varies per candidate."
+  }
+}

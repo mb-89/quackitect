@@ -1,0 +1,8 @@
+{
+  "iteration": "i3-machine-and-retro",
+  "state": "derive_criteria",
+  "at": "2026-07-24T08:57:18.688Z",
+  "payload": {
+    "criteria": "Six vital criteria, weights sum 100, each with lineage: C1 record integrity (w25, req-exec-tokens + req-grant-role) - every activation, fill and actor lands in the history; no state of the system is unexplained by the record; the whole trust chain rests here. C2 mid-flight migratability (w20, register R4) - the new executor must adopt the RUNNING i3 instance without corrupting it; instance format changes need a lossless migration or dual-read. C3 interactive latency (w15, req-1s-interactive + req-verify-milestone-scope) - no call over 1s; long work returns handles. C4 owner visibility (w15, req-board-parallel + uc-8) - the board shows token truth live, side by side; a wrong render is worse than none. C5 zero-dep simplicity (w15, se-v2-design engine ethos) - hand-rolled, no runtime dependencies, small enough to hold in one head; complexity is the standing failure mode of executor rewrites. C6 parallel throughput (w10, req-exec-parallel + req-exec-multi-agent + uc-4) - independent states genuinely run concurrently for two sessions; weighted lowest because it is the FEATURE the others must survive, not the thing to trade them for. Weighting method: direct comparison against the goal system's ruled conflict order (enforcement and record over speed)."
+  }
+}

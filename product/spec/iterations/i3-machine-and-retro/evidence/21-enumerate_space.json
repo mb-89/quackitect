@@ -1,0 +1,14 @@
+{
+  "iteration": "i3-machine-and-retro",
+  "state": "enumerate_space",
+  "at": "2026-07-24T09:40:00.000Z",
+  "note": "Inline fill - interim executor skipped this drawn state AND its candidate sub-machine seeding (side-channel #9); the three candidates below are the compose states walked by one hand.",
+  "payload": {
+    "candidates": [
+      "K1 extend-in-place | The MachineInstance keeps its shape and gains active: string[] (current stays as first-token alias for old readers). advance() generalizes to token ops: complete(state) fires outbound edges, activates all-fired successors, holds joins. The packet service serves the first unassigned active state per session; the offer queue becomes an array keyed by state. Allocation: every cluster stays in its current file. Interfaces: instance JSON (additive), offer file gains a queue wrapper. Feasibility: high - additive migration, the running i3 instance adopts by gaining one field. Rationale: smallest change that satisfies the register.",
+      "K2 token-engine rewrite | Instance format v2: tokens[], fired-edge set, per-state attempts; state COMPUTED from history replay (event-sourced); an explicit compiler IR between canvas and runtime. Migration: rebuild the running instance by replaying its history. Interfaces: new instance schema, replay module. Feasibility: medium - replaying a mid-flight hand-repaired instance is the single riskiest move available. Rationale: the cleanest semantics and a perfect record, bought with the biggest churn.",
+      "K3 scheduler sidecar | machine.ts/loop.ts stay sequential; a new scheduler walks the drawn graph and drives one lean sub-instance per branch, joining at gates. Migration: none. Interfaces: scheduler state file BESIDE the instance - two sources of truth. Feasibility: medium. Rationale: no core surgery, but the record splits."
+    ],
+    "shared_metrics": "Element count: K1 8 clusters/6 files, K2 10/8 (adds IR + replay), K3 9/7 (adds scheduler). New interfaces: K1 1 (queue wrapper), K2 3, K3 2 (one duplicating truth)."
+  }
+}
