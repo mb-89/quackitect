@@ -1,0 +1,9 @@
+{
+  "iteration": "i8-phone-lane",
+  "state": "evaluate_baseline",
+  "at": "2026-07-24T14:39:24.878Z",
+  "payload": {
+    "walk": "Quality scenarios through E1-E5: S1 forged tap (stimulus: an answer with a guessed-but-wrong id) -> E4's id===live-hash check rejects it: ADDRESSED by adr-phone-hash-correlation, carried by E4. S2 secret leak (stimulus: the lane runs and logs) -> E1 reads the config but the call-log observer never sees the token (publish args carry topic+message, never the token which lives in the Transport's own construction): AT-RISK unless the NtfyTransport keeps the token OUT of any object that reaches the log - carried into the build as a named E2 duty + fitness F-b (inspection). S3 unattended silent death (stimulus: the poll throws) -> E4 wrapped so a poll error is caught, logged as a failure, and the board keeps ticking: ADDRESSED by best-effort, carried E4/E5. S4 the 1s law (stimulus: pollAnswers runs each board tick) -> the poll is a single since-request; if the transport hangs it must not wedge the tick - AT-RISK: the poll needs a timeout so a slow ntfy never freezes the board: carried as an E2 duty + fitness F-c. S5 unconfigured install (stimulus: no phone.json) -> E1 returns null, E3/E4 no-op: ADDRESSED by graceful-absent. S6 duplicate delivery (stimulus: ntfy redelivers an answer) -> the answered-cursor makes it a no-op: ADDRESSED by idempotent.",
+    "fitness_candidates": "F-a: a mock tap with the live hash produces exactly one channel=phone grant bound to that hash (test). F-b: no config/token string appears in the call log or any evidence doc after a publish (inspection-assert against the log). F-c: pollAnswers returns within a bounded time even when the transport stalls (test with a hanging mock - the S4 timeout guard). F-d: with config absent, announceOffer and pollAnswers make zero transport calls and never throw (test). F-e: a stale-hash tap and a duplicate leave grants.jsonl byte-identical (test)."
+  }
+}

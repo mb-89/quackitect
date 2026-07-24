@@ -1,0 +1,10 @@
+{
+  "iteration": "i8-phone-lane",
+  "state": "evaluate_set",
+  "at": "2026-07-24T14:36:27.049Z",
+  "payload": {
+    "scores": "Scored at baseline anchors (0-3) - no research agent this time, recorded reason: the front is an INTERNAL realization choice (poll loop in the board process vs a dedicated process), not a beyond-prior-art claim, so no 4/5 is available and a prior-art scorer would add theater not signal (meth-scoring-anchors: 4/5 require a named external comparison, which does not apply to 'which process hosts the loop'). K1 poll-in-board: C1 auditability 3 (same Gate.bless path, hash-bound), C2 unattended-safety 3 (one existing supervised process, no new port, no new thing to crash), C3 stray-input 3 (cursor+hash match), C4 non-blocking 3 (publish is fire-and-forget off the offer event), C5 zero-dep 3 (fetch only) = weighted 300. K2 poll-dedicated: C1 3, C2 2 (a second long-lived process to supervise and reap - more unattended surface), C3 3, C4 3, C5 3 = weighted 275. Example walk (recorded): both walk P1-P4 identically at the function level; the only difference is process topology - K2 adds an se_ps-managed watcher that could die silently while the board lives, a real unattended-safety cost K1 does not pay.",
+    "front": "K1 poll-in-board is non-dominated and dominates K2 on C2 with parity elsewhere. K2 survives as the recorded ALTERNATIVE for the day the board and the watcher must scale independently (many topics, or the board off but adjudication still wanted) - a real future world, not a current need.",
+    "eliminations": "K3 push-subscribe eliminated before scoring: a long-lived WebSocket to an external service is more unattended surface (reconnect logic, silent-drop detection) for a latency win that does not matter on a 6h window - dominated by K1 on C2 with no compensating criterion. K2 not eliminated but not selected - it is the front's second, kept for the scale world with its trigger."
+  }
+}

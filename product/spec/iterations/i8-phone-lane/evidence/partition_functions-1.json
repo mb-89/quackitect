@@ -1,0 +1,8 @@
+{
+  "iteration": "i8-phone-lane",
+  "state": "partition_functions",
+  "at": "2026-07-24T14:35:34.247Z",
+  "payload": {
+    "partitioning": "Relation meaning: 'shares message/decision state' (topic, correlation id, offer hash, cursor). Coupling reasons classified: G1-G9 fall into three clusters. OUTBOUND {G1 read config, G2 announce, G3 carry-out, G8 fail-safe-on-publish} - coupled through the offer-created event and the config gate; reason: one trigger, one transport handle. INBOUND {G4 collect answers, G5 authenticate, G6 apply, G7 suppress dups} - coupled through the cursor + the live-offer match; reason: shared read-position and the offer hash. CROSS {G1 config, G9 protect-credential} - the config/secret pair both clusters read but neither owns; reason: the credential is the shared secret both directions need, so it clusters alone as a SUPPORT concern injected into both. Qualities: basic = G2,G3,G4,G6 (announce/carry/collect/apply - without them there is no lane); additional = G5 authenticate (correctness), G1 config; safety = G7 suppress-strays, G8 fail-safe, G9 protect-credential; support = the transport boundary itself. The clusters are candidate-invariant: every candidate cuts OUTBOUND / INBOUND / CREDENTIAL; what varies is whether INBOUND is a poll loop or a push callback, and whether OUTBOUND+INBOUND share one module or split."
+  }
+}

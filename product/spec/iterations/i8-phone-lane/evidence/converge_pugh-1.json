@@ -1,0 +1,9 @@
+{
+  "iteration": "i8-phone-lane",
+  "state": "converge_pugh",
+  "at": "2026-07-24T14:37:24.228Z",
+  "payload": {
+    "matrix_runs": "Run 1, datum K2 (the rival): K1 scores + on unattended-safety (one fewer supervised process, nothing to reap or watchdog), = on auditability/stray-input/non-blocking/zero-dep. No minus. Run 2, datum K1: K2 is - on unattended-safety, = elsewhere - it never overtakes. The arithmetic (300 vs 275) and the Pugh both point one way; no iteration needed. Qualitative round: the deciding non-number is that K1 REUSES an already-supervised long-lived process (the board) that already polls state every 2s - adding one more poll to it is nearly free and inherits its liveness (the board's own watchdog dots already show if it died), whereas K2's dedicated watcher is a NEW silent-failure surface exactly in the unattended mode this whole delegation depends on.",
+    "winner": "K1 poll-in-board: the phone module's OUTBOUND publishes on the offer-created event (the same seam pokeBoard fires from), and the board process drives its INBOUND poll each tick. The why beyond arithmetic: it adds zero new processes to an unattended system, inherits the board's existing liveness signal, and keeps the whole lane in one injectable-transport module that mock-tests without any process orchestration. Recorded fallback with a mechanical trigger: if adjudication is ever needed while the board is intentionally OFF (or topics multiply), K2's dedicated watcher takes over - trigger = the first 'bless from phone with board down' requirement. Grafted nothing from K2 now; its process split waits for that world."
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "iteration": "i8-phone-lane",
+  "state": "record_adrs",
+  "at": "2026-07-24T14:38:41.945Z",
+  "payload": {
+    "adrs": "Three minted with addresses+realizes edges landed (via add_edge, the known create-op-drops-edges gap): adr-phone-poll-in-board (K1; addresses publish, transport-injectable, best-effort; rejected K2/K3 as recorded fallbacks with TW1/TW2), adr-phone-secret-machine-local (~/.se/<project>/phone.json, opt-in, agent never mints/logs/enters; addresses config-secret, graceful-absent), adr-phone-hash-correlation (offer base_hash IS the correlation id, idempotent match; addresses bless, idempotent; realizes the inherited adr-answer-authenticity). The inherited channel decision (adr-ntfy-actions, adr-kofmqtq) stands unamended - these three ADRs are the v2 REALIZATION decisions layered on it."
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "iteration": "i8-phone-lane",
+  "state": "gate_architecture",
+  "at": "2026-07-24T14:39:50.890Z",
+  "payload": {
+    "choice_traced": "K1 poll-in-board traced to C2 unattended-safety (the criterion that separated the front, weight 25) with parity on the other four; both Pugh runs recorded (datum K2 then K1), K1 never overtaken; the deciding qualitative reason (reuse the already-supervised board process, inherit its liveness) named beyond the arithmetic.",
+    "sensitivity_ruled": "Robust - K1 wins or ties every criterion so no weight perturbation flips it; two tripwires armed in RAID-equivalent record (TW1 board-off adjudication -> dedicated watcher, TW2 topic scale -> per-stream watcher), both future-not-now, judged out loud.",
+    "matrix_review": "Reviewed as data: decomposition E1-E5 follows the OUTBOUND/INBOUND/CREDENTIAL clustering - E3=OUTBOUND, E4=INBOUND (whole cluster, cohesive), E1/E2=CREDENTIAL+transport spanning both as declared support; allocation G1-G9 single-owner per function (column property holds); interfaces declared at both ends with payloads named, E2 the single transport seam touched by exactly E3 and E4, no one-sided edge; the two NEW elements (E2 Transport interface, E4 watcher) are exactly the functions no existing element performed (G3/G4 carry, G5 authenticate) - nothing new elsewhere; E5 is a two-line hook into the existing board tick.",
+    "evaluation_recorded": "Six scenarios walked: four addressed with carriers, TWO at-risk finds converted to named build duties - S2 (the token must never enter any logged object -> E2 keeps it in its own construction, fitness F-b inspection) and S4 (the poll needs a timeout so a stalled ntfy never wedges the board tick -> E2 duty, fitness F-c); five fitness functions queued for M7.",
+    "adrs_traced": "All three ADRs carry addresses edges to their forcing requirements (poll-in-board->publish/transport-injectable/best-effort, secret-machine-local->config-secret/graceful-absent, hash-correlation->bless/idempotent) plus realizes edges to the inherited adr-answer-authenticity; the channel ADRs (ntfy-actions/kofmqtq) stand as the inherited base.",
+    "offer_hash": "61cce43d2f93d4e935193356cb3a8854d64dbf90a8cf6ac4e7f0b4df9875e73b"
+  }
+}

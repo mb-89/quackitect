@@ -1,0 +1,10 @@
+{
+  "iteration": "i8-phone-lane",
+  "state": "consolidate_baseline",
+  "at": "2026-07-24T14:39:02.196Z",
+  "payload": {
+    "baseline": "Elements (black-box, one line each): E1 phone config loader (engine/phone.ts, reads seDir/phone.json -> {enabled, topic, answer_topic, token} or null; G1+G9). E2 Transport interface (NEW: publish(topic, {message, actions, id}) + pollSince(topic, cursor) -> answers; real impl NtfyTransport over fetch, mock impl in tests; G3+G4, the injectable boundary). E3 publisher (phone.ts announceOffer: on offer-created, if enabled, build the brief+bless/dismiss actions with id=offer hash, call E2.publish, swallow failures; G2+G8). E4 answer watcher (phone.ts pollAnswers: E2.pollSince from a cursor, for each answer match id to Gate.current().base_hash, bless or dismiss, advance the answered-cursor, ignore strays; G4+G5+G6+G7). E5 the board poll hook (bin/se-board.ts calls phone.pollAnswers each tick; the offer-created hook fires announceOffer from the same seam pokeBoard uses). Reused, unchanged: Gate.bless/dismiss/current, the offer store, layout.seDir.",
+    "allocation_exact": "G1->E1, G2->E3, G3->E2, G4->E2+E4 (E2 carries, E4 drives - single owner E4 with E2 as the mechanism), G5->E4, G6->E4, G7->E4, G8->E3, G9->E1. Every function exactly once; no element functionless. E4 owns the whole INBOUND cluster (cohesive), E3 the OUTBOUND, E1/E2 the cross concerns.",
+    "interfaces_both_ends": "Declared symmetric pairs: E3<->E2 {topic, message, actions, id}; E4<->E2 {topic, cursor} and {answers}; E4<->Gate {hash, channel/dismiss}; E1->E3 and E1->E4 {config}; E5->E3 {offer-created event}, E5->E4 {tick}. The element DSM has no one-sided edge; E2 is declared at both the publisher and watcher ends as the single transport seam."
+  }
+}

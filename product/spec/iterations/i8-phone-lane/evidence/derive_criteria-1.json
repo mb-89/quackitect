@@ -1,0 +1,8 @@
+{
+  "iteration": "i8-phone-lane",
+  "state": "derive_criteria",
+  "at": "2026-07-24T14:35:13.963Z",
+  "payload": {
+    "criteria": "Five vital criteria, weighted by direct comparison (sum 100): C1 auditability (30) - a phone bless lands as a hash-bound, channel-stamped grant indistinguishable in the trail from a desk bless (req-phone-bless, adr-answer-authenticity). C2 unattended safety (25) - no live endpoint touched during a build, no secret minted/logged, the lane silent unless the owner turns it on (req-phone-transport-injectable, req-phone-config-secret, req-phone-graceful-absent). C3 correctness under stray input (20) - only the hash-matched live offer is ever acted on; stale/dup/garbled ignored (req-phone-idempotent). C4 non-blocking (15) - notification never stalls gate creation (req-phone-best-effort). C5 zero-dep fit (10) - realized on Node built-ins, no package (req-phone-transport-injectable; adadr-install/hygiene). Note: the CHANNEL choice (ntfy vs Slack vs email) is NOT a live criterion - it is owner-decided (adr-kofmqtq: ntfy suffices, Slack retired); these criteria score realization approaches, not the channel."
+  }
+}

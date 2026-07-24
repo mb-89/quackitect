@@ -1,0 +1,13 @@
+{
+  "iteration": "i8-phone-lane",
+  "state": "gate_candidates",
+  "at": "2026-07-24T14:36:49.938Z",
+  "payload": {
+    "viable_set": "Two viable candidates on the front: K1 poll-in-board and K2 poll-dedicated - both genuinely build the lane; K1 dominates on unattended-safety with parity elsewhere, K2 is the recorded alternative for the independent-scale world. Not a manufactured pair - they differ on the one real axis (process topology) the DSM left candidate-variable.",
+    "complete_allocation": "Both allocate all nine functions along the shared OUTBOUND/INBOUND/CREDENTIAL clusters: K1 puts OUTBOUND (G1,G2,G3,G8) and INBOUND (G4,G5,G6,G7) in one phone module whose poll loop the board process drives, CREDENTIAL (G1 config read, G9 protect) in a config loader both use; K2 identical except INBOUND runs in a dedicated watcher process. Interfaces = cluster edges: OUTBOUND<->transport {topic, brief, actions, id}; INBOUND<->transport {topic, cursor}; INBOUND<->Gate {hash, channel}; CREDENTIAL feeds both {topic, token}. Rationale per candidate in the chart evidence.",
+    "criteria_traced": "C1-C5 each carry their requirement ids and weights (30/25/20/15/10), derived from the register and the stakeholder tensions at derive_criteria; the channel choice explicitly excluded as owner-ruled, not a criterion.",
+    "front_recorded": "Front {K1, K2}; K3 push-subscribe eliminated (unattended surface for a moot latency win); K2 kept-not-selected with its scale trigger. All eliminations reasoned.",
+    "feasibility_checked": "K1: every mechanism exists - the board process already long-lives and polls, Gate.bless already records channel, fetch is present, seDir holds the config; feasible by construction, the one unknown (does an in-board poll loop stay within the 1s law and not wedge the board) is the M6 spike. K2: feasible too but adds a supervised process; its feasibility cost IS its C2 deduction, verified against the existing se_ps supervision surface.",
+    "offer_hash": "2e1702509d22945fee6acc78e6cb4d40db7dc2a9ce8d4d32636ab4a6fafda6ac"
+  }
+}

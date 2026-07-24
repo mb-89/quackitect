@@ -1,0 +1,9 @@
+{
+  "iteration": "i8-phone-lane",
+  "state": "reverse_sensitivity",
+  "at": "2026-07-24T14:37:45.068Z",
+  "payload": {
+    "sensitivity": "Robust: K1 leads on the arithmetic AND wins or ties every criterion, so no single-weight perturbation flips it - the only criterion separating them (C2 unattended-safety) is the one K1 wins, so raising ANY weight cannot help K2 and lowering C2 only shrinks K1's margin to a tie, never a loss. The worlds where K1 genuinely loses: (1) the board-off world - adjudication wanted while the board is deliberately not running; then K1's INBOUND has no host and K2's dedicated watcher is required; (2) the many-topics world - if the lane grows to many independent topics/agents, one shared poll loop in the board could lag and a dedicated (or per-worktree) watcher scales better. Neither is credible at owner-scale today: the board runs whenever the owner works, and there is one topic.",
+    "tripwires": "Two flips armed as RAID watch-items: TW1 (board-off adjudication): the first requirement to bless from the phone while the board is intentionally down -> stand up K2's dedicated watcher (the recorded fallback), no re-litigation. TW2 (topic scale): more than a handful of independent topics/streams -> move INBOUND to a per-stream watcher (composes with i5's worktree streams). World-credibility judged out loud: both are real future worlds, neither is now; no tripwire for a latency concern (the 6h window makes poll latency irrelevant)."
+  }
+}

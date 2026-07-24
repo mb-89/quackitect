@@ -1,7 +1,7 @@
 {
   "machine": "systematic",
   "iteration": "i8-phone-lane",
-  "current": "derive_criteria",
+  "current": "rank_unknowns",
   "counters": {},
   "history": [
     {
@@ -111,16 +111,79 @@
       "outcome": "filled",
       "evidence": "grant:c73d58f310b9",
       "at": "2026-07-24T14:34:34.482Z"
+    },
+    {
+      "state": "derive_criteria",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i8-phone-lane/evidence/derive_criteria-1.json",
+      "at": "2026-07-24T14:35:13.964Z"
+    },
+    {
+      "state": "partition_functions",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i8-phone-lane/evidence/partition_functions-1.json",
+      "at": "2026-07-24T14:35:34.248Z"
+    },
+    {
+      "state": "enumerate_space",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i8-phone-lane/evidence/enumerate_space-1.json",
+      "at": "2026-07-24T14:35:58.934Z"
+    },
+    {
+      "state": "evaluate_set",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i8-phone-lane/evidence/evaluate_set-1.json",
+      "at": "2026-07-24T14:36:27.049Z"
+    },
+    {
+      "state": "gate_candidates",
+      "outcome": "filled",
+      "evidence": "grant:2e1702509d22",
+      "at": "2026-07-24T14:37:03.419Z"
+    },
+    {
+      "state": "converge_pugh",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i8-phone-lane/evidence/converge_pugh-1.json",
+      "at": "2026-07-24T14:37:24.228Z"
+    },
+    {
+      "state": "reverse_sensitivity",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i8-phone-lane/evidence/reverse_sensitivity-1.json",
+      "at": "2026-07-24T14:37:45.068Z"
+    },
+    {
+      "state": "record_adrs",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i8-phone-lane/evidence/record_adrs-1.json",
+      "at": "2026-07-24T14:38:41.946Z"
+    },
+    {
+      "state": "consolidate_baseline",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i8-phone-lane/evidence/consolidate_baseline-1.json",
+      "at": "2026-07-24T14:39:02.197Z"
+    },
+    {
+      "state": "evaluate_baseline",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i8-phone-lane/evidence/evaluate_baseline-1.json",
+      "at": "2026-07-24T14:39:24.878Z"
+    },
+    {
+      "state": "gate_architecture",
+      "outcome": "filled",
+      "evidence": "grant:61cce43d2f93",
+      "at": "2026-07-24T14:40:00.167Z"
     }
   ],
   "escapes": [],
   "status": "open",
   "fired": [],
   "active": [
-    "derive_criteria",
-    "partition_functions"
+    "rank_unknowns"
   ],
-  "claims": {
-    "derive_criteria": "main"
-  }
+  "claims": {}
 }
