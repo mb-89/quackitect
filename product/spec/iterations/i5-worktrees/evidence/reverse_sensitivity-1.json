@@ -1,0 +1,9 @@
+{
+  "iteration": "i5-worktrees",
+  "state": "reverse_sensitivity",
+  "at": "2026-07-24T13:40:45.376Z",
+  "payload": {
+    "sensitivity": "Weight perturbation: the tie means ANY weight shift flips the arithmetic - the numbers alone are maximally sensitive, which is exactly why the decision rests on the qualitative asymmetry (certain structural costs vs one testable risk), not the sum. The worlds where K1-prime genuinely loses: (1) the spike world - work-plane root-resolution breaks CAS or the fence in ways that need per-lane special cases (violating C4's own principle); (2) the subagent world arriving EARLY - if real parallel subagents land before i6, per-tree servers become mandatory anyway and the routing spine is scaffolding; (3) the scale world - many simultaneous worktrees make one server the bottleneck (not credible at owner-scale: 2-3 streams).",
+    "tripwires": "Two credible flips armed as RAID watch-items: TW1 (the spike trigger, already recorded in the winner): spike shows lane root-resolution breaking CAS/fence law -> build K2, no re-litigation. TW2: when real parallel subagents are granted (the owner's noted direction), each subagent binds its own --root server - if that mode becomes the DEFAULT way iterations run, retire the spine's work-plane routing in favor of pure per-tree serving and keep the spine for lifecycle only; trigger = the first two-subagent run. World (3) dismissed out loud: owner-scale is 2-3 streams, not a fleet - not credible, no tripwire."
+  }
+}

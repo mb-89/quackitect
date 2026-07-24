@@ -1,0 +1,8 @@
+{
+  "iteration": "i5-worktrees",
+  "state": "derive_criteria",
+  "at": "2026-07-24T13:35:45.316Z",
+  "payload": {
+    "criteria": "Six vital criteria, weighted by direct comparison (sum 100): C1 merge honesty (30) - no design overlap reunifies unmarked; the iteration's reason to exist (req-merge-suspects, req-conflict-stops). C2 unattended safety (25) - nothing destructive, everything adoptable after a crash (req-abandon-flags, req-adopt-leftover; the delegation decision). C3 mechanism fit (15) - rides existing seams (loop paths, git layer, projection) over new subsystems (set_holds' affordability). C4 root coherence (15) - every lane (fence, board, instances) sees the right root with one rule, no per-lane special cases (R1; req-concurrent-open, req-streams-visible). C5 debris hygiene (10) - closed work leaves no unflagged trees or stray tracked files (req-ship-merge; the git-add probe finding). C6 one-click continuity (5) - the owner's install-over-zerodep principle: no new external dependency for any of this (adr-install-over-zerodep, trivially satisfiable - guard criterion)."
+  }
+}

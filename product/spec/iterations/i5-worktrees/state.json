@@ -1,7 +1,7 @@
 {
   "machine": "systematic",
   "iteration": "i5-worktrees",
-  "current": "derive_criteria",
+  "current": "rank_unknowns",
   "counters": {},
   "history": [
     {
@@ -111,16 +111,79 @@
       "outcome": "filled",
       "evidence": "grant:77b7492b9e6d",
       "at": "2026-07-24T13:35:13.996Z"
+    },
+    {
+      "state": "derive_criteria",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i5-worktrees/evidence/derive_criteria-1.json",
+      "at": "2026-07-24T13:35:45.316Z"
+    },
+    {
+      "state": "partition_functions",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i5-worktrees/evidence/partition_functions-1.json",
+      "at": "2026-07-24T13:36:00.260Z"
+    },
+    {
+      "state": "enumerate_space",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i5-worktrees/evidence/enumerate_space-1.json",
+      "at": "2026-07-24T13:36:41.685Z"
+    },
+    {
+      "state": "evaluate_set",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i5-worktrees/evidence/evaluate_set-1.json",
+      "at": "2026-07-24T13:39:01.866Z"
+    },
+    {
+      "state": "gate_candidates",
+      "outcome": "filled",
+      "evidence": "grant:3d76075f71c9",
+      "at": "2026-07-24T13:39:32.165Z"
+    },
+    {
+      "state": "converge_pugh",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i5-worktrees/evidence/converge_pugh-1.json",
+      "at": "2026-07-24T13:40:25.802Z"
+    },
+    {
+      "state": "reverse_sensitivity",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i5-worktrees/evidence/reverse_sensitivity-1.json",
+      "at": "2026-07-24T13:40:45.376Z"
+    },
+    {
+      "state": "record_adrs",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i5-worktrees/evidence/record_adrs-1.json",
+      "at": "2026-07-24T13:42:11.109Z"
+    },
+    {
+      "state": "consolidate_baseline",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i5-worktrees/evidence/consolidate_baseline-1.json",
+      "at": "2026-07-24T13:42:36.437Z"
+    },
+    {
+      "state": "evaluate_baseline",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i5-worktrees/evidence/evaluate_baseline-1.json",
+      "at": "2026-07-24T13:43:04.116Z"
+    },
+    {
+      "state": "gate_architecture",
+      "outcome": "filled",
+      "evidence": "grant:1c2939f9322f",
+      "at": "2026-07-24T13:43:49.573Z"
     }
   ],
   "escapes": [],
   "status": "open",
   "fired": [],
   "active": [
-    "derive_criteria",
-    "partition_functions"
+    "rank_unknowns"
   ],
-  "claims": {
-    "derive_criteria": "main"
-  }
+  "claims": {}
 }

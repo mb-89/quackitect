@@ -1,0 +1,10 @@
+{
+  "iteration": "i5-worktrees",
+  "state": "evaluate_set",
+  "at": "2026-07-24T13:39:01.865Z",
+  "payload": {
+    "scores": "Scored by a spawned research agent against prior art per meth-scoring-anchors (the builder walked the examples, the agent scored; 4s name their comparisons - DOORS-style suspect links, VS Code multi-root, LSP server-per-workspace, in-repo worktree conventions). K1 routed spine: C1 4, C2 3, C3 3, C4 4, C5 4, C6 3 = 355. K2 server-per-tree: C1 4, C2 4, C3 4, C4 2, C5 3, C6 3 = 355. K3 hybrid: 4/3/3/3/3/3 = 330. Builder's example walk (recorded beside, not scored): K2's board story breaks today (single-port single-root board collides or blinds) and every stream switch costs a harness reconnect; K1/K3 walk all four W-stories through one served surface.",
+    "front": "K1 and K2 - a genuine tie at 355 with opposite strengths: K1 wins root coherence + debris hygiene (single rule, ledger-checked in-repo trees), K2 wins unattended safety + mechanism fit (zero new subsystems, crash isolated per stream). The research agent's falsifying question survives to M5/M6: whether the apply lane and gate machinery actually operate when routed across a non-trunk root is UNVERIFIED - a 'no' collapses K1's C1/C4 and hands the front to K2 alone; this is the top-ranked unknown for M6.",
+    "eliminations": "K3 eliminated as dominated by K1 (equal or worse on every criterion; the double-serve hazard and two sanctioned root paths dilute exactly the coherence K1 wins on). Its one idea worth grafting at convergence WITHOUT re-admitting the candidate: the shim's --root spawn path already exists and stays legal for future subagents - that is a fact of the codebase, not a design element to build."
+  }
+}

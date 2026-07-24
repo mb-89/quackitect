@@ -1,0 +1,9 @@
+{
+  "iteration": "i5-worktrees",
+  "state": "converge_pugh",
+  "at": "2026-07-24T13:40:25.802Z",
+  "payload": {
+    "matrix_runs": "Run 1, datum K2 (strongest rival): K1 scores + on root coherence (one rule), + on debris (ledger-checked in-repo trees), - on unattended safety (unproven router), - on mechanism fit (new routing), = elsewhere. Run 2, datum K1: mirror image - the arithmetic stays tied, confirming the front was honest. Qualitative round (the discussion the numbers cannot have): the falsifying question decomposes - K1's routing is really TWO claims: (a) control plane (discovery, gates, merges, projection) served from one trunk server across roots - LOW risk, every path derives from a root argument by construction (probe A4); (b) work-plane lanes (file edits, applies) following the served iteration's root - the genuinely unverified piece. K2's costs are certain TODAY (board collision, lane disagreement mid-reconnect, weaker shipped-signal); K1's cost is a RISK that a spike can burn down before the build. Set-based discipline says: pay a probe, not a certainty.",
+    "winner": "K1-prime, 'iteration-resolved roots': one trunk server; every loop/gate/merge/projection operation resolves its root FROM the iteration it serves; the work-plane lanes (file, apply) follow the OPEN iteration a session works rather than binding the boot root. The why beyond arithmetic: it is the only candidate where all four W-stories walk through ONE surface the owner already watches, and its sole weakness is a testable unknown while K2's weaknesses are structural facts of the current board. Recorded fallback with a mechanical trigger: if the M6 spike shows work-plane root-resolution breaking the CAS/fence laws, K2 (per-tree servers, reconnect accepted) takes the build with no re-litigation - the flip condition is written before any code exists. Grafted fact: the shim's --root spawn stays legal for future subagents either way."
+  }
+}

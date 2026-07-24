@@ -1,0 +1,13 @@
+{
+  "iteration": "i5-worktrees",
+  "state": "gate_candidates",
+  "at": "2026-07-24T13:39:21.806Z",
+  "payload": {
+    "viable_set": "Two genuinely viable candidates survive AT A TIE (355/355) with opposite strengths - K1 routed spine, K2 server-per-tree; not a manufactured front, the tiebreak is deferred to M5 where the falsifying question (routed serving across a non-trunk root) is the deciding evidence.",
+    "complete_allocation": "Both allocate all ten functions along the shared START/SHIP/SURFACE/GUARDS clusters: K1 puts F1-F3 in the loop's start path with instance routing in the spine, F4-F7 in the git layer's ship path, F8 in the projection, F9/F10 in their lanes; K2 identical except F3/F8 bind per-root (each stream's own server and board slice). Interfaces = the cluster edges: START passes {root, branch, instance path} to SHIP; SHIP passes {merge result, overlap set} to SURFACE; GUARDS touch nothing. Rationale recorded per candidate in the chart evidence.",
+    "criteria_traced": "C1-C6 each carry their requirement ids and weights (30/25/15/15/10/5), derived from the register and the stakeholder tensions at derive_criteria - no orphan criterion.",
+    "front_recorded": "Front {K1, K2}; K3 eliminated as dominated by K1 with the double-serve hazard named; the graftable fact (the shim's existing --root path) recorded as codebase fact, not candidate.",
+    "feasibility_checked": "K1: git plumbing probe-proven; the routing itself is the one unverified piece - flagged as THE M6-ranked unknown, not assumed. K2: every mechanism exists today (spawn --root, per-root layout) - feasible by construction; its C4 weakness (board collision, lane disagreement during reconnects) is a fact of the current board, verified by reading bin/se-board.ts's single-port design.",
+    "offer_hash": "3d76075f71c9adb665eb3b91fbb78960cecd45e72202aa41b0bf212fc68dee77"
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "iteration": "i5-worktrees",
+  "state": "evaluate_baseline",
+  "at": "2026-07-24T13:43:04.116Z",
+  "payload": {
+    "walk": "Quality scenarios through E1-E8 (evaluation, not proof): S1 crash mid-start (stimulus: process dies after worktree add, before instance write) -> E1's adopt path finds the leftover, start reruns idempotently: ADDRESSED by adr-worktree-home + req-adopt-leftover, carried by E1. S2 unattended textual conflict at ship -> E4 halts, records, leaves the merge aborted; nothing lost: ADDRESSED, carried by E4 + the excluded-use law. S3 the 1s law under routing (stimulus: loop_next while three worktrees exist) -> E3's resolution is an in-memory map + instance reads, no scan explosion at owner-scale: ADDRESSED with a watch (fitness candidate F-b). S4 fence integrity across roots (stimulus: direct harness tool on a worktree's product path) -> AT-RISK: the lock currently records boot-time roots only; E2 must append worktree roots to the lock at start or the fence has a hole - carried INTO the build as a named chunk duty (this is the ATAM find of the walk). S5 suspect false-negative (stimulus: node edited on both lines but only whitespace) -> mark fires on any both-sides change; over-marking accepted over under-marking per C1: ADDRESSED by design bias, test pins it. S6 board honesty during streams (stimulus: two open worktrees) -> E6's tab data derives at read: ADDRESSED, small.",
+    "fitness_candidates": "F-a: the debris invariant - after any close (ship or abandon), zero unflagged trees under .worktrees (automatable in the lifecycle tests, M7). F-b: loop_next latency with N worktrees stays under the 1s law (assertable in the serving tests). F-c: the fence denies a direct write under a WORKTREE root after start (automatable against the fence tests - S4's guard). F-d: merge idempotence - re-running a completed ship merge changes nothing (test)."
+  }
+}

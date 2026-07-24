@@ -1,0 +1,10 @@
+{
+  "iteration": "i5-worktrees",
+  "state": "consolidate_baseline",
+  "at": "2026-07-24T13:42:36.437Z",
+  "payload": {
+    "baseline": "Elements (black-box, one line each): E1 worktree lane (engine/worktree.ts, NEW): provision/adopt/retire trees and branches per adr-worktree-home-inrepo. E2 start gate (loop.ts start path, EXTENDED): dependency check per adr-shipped-is-release-grant, then E1 provision, instance opened in the tree. E3 root resolver (engine seam, NEW-small): iteration -> root mapping used by loop/gate/projection per adr-iteration-resolved-roots. E4 ship merge (git.ts, EXTENDED): merge-to-trunk, conflict stop, E1 retire. E5 suspect marker (apply lane + merge, NEW-small): fork-point overlap -> frontmatter marks per adr-suspect-frontmatter. E6 stream projection (project.ts, EXTENDED): agents/tab data per open worktree. E7 drain guard (tools.ts, EXTENDED): unknown-ref refusal. E8 board act-guard (se-board.ts, EXTENDED): generation-guarded ticks. Plus the guidance amendment (ledger, onboarding note).",
+    "allocation_exact": "F1->E1, F2->E2, F3->E2+E3 (serve = start's routing through the resolver - one function, one owning element E3 with E2 as caller; allocation stays single-owner), F4->E4, F5->E5, F6->E4 (conflict stop is the merge's own halt), F7->E1, F8->E6, F9->E7, F10->E8. Every function exactly once; no element functionless.",
+    "interfaces_both_ends": "Declared symmetric pairs: E2<->E1 {iteration id, root, branch}; E2<->E3 {iteration -> root registration}; E4<->E5 {fork point, overlap set}; E4<->E1 {retire on ship}; E3<->E6 {live roots for projection}; E7 and E8 touch only their own lanes - no undeclared edge; the element DSM has no one-sided entry."
+  }
+}

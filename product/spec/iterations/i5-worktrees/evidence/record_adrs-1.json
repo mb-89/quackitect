@@ -1,0 +1,8 @@
+{
+  "iteration": "i5-worktrees",
+  "state": "record_adrs",
+  "at": "2026-07-24T13:42:11.108Z",
+  "payload": {
+    "adrs": "Four minted, each with addresses edges landed (an apply-lane gap surfaced doing it: create ops silently DROP an unknown edges field - the edges went in via add_edge; 'create refuses unknown op fields' recorded as a lead for the register): adr-iteration-resolved-roots (K1-prime, the rejected set and both tripwires in the body; addresses concurrent-open, streams-visible, worktree-start), adr-worktree-home-inrepo (.worktrees/ gitignored, iter/<id> branches; addresses worktree-start, ship-merge), adr-suspect-frontmatter (the mark defined: a frontmatter field written by the merge through the apply lane; addresses merge-suspects - resolves probe A3's refutation), adr-shipped-is-release-grant (the grants ledger is the ship truth; addresses depends-on-gate)."
+  }
+}

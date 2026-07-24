@@ -1,0 +1,13 @@
+{
+  "iteration": "i5-worktrees",
+  "state": "gate_architecture",
+  "at": "2026-07-24T13:43:28.650Z",
+  "payload": {
+    "choice_traced": "K1-prime traced through the weighted set: wins C4 root coherence + C5 debris (the two criteria the tie hinged on qualitatively) while its C2/C3 deficits are a testable unknown, not a structure; both Pugh runs recorded with each rival as datum - the tie was honest and broken by evidence-asymmetry, not weight-tuning.",
+    "sensitivity_ruled": "Weight-sensitive by construction (a tie), ruled on the qualitative asymmetry; two tripwires armed in the record: TW1 spike-flip to K2 with a mechanical condition, TW2 subagent-default retiring work-plane routing; the non-credible scale world dismissed out loud.",
+    "matrix_review": "Reviewed as data: decomposition E1-E8 follows the shared START/SHIP/SURFACE/GUARDS clustering (the DSM's clusters ARE the element cut - no element straddles clusters); allocation F1-F10 single-owner per function, column property holds; interfaces declared at both ends with their payloads named, no one-sided edge; the two NEW elements (E1 worktree lane, E3 root resolver) are exactly the two functions no existing element performed (F1, F3-routing) - nothing new snuck in elsewhere; E5/E7/E8 are seam extensions, honestly small.",
+    "evaluation_recorded": "Six scenarios walked: five addressed with carriers named, ONE at-risk find (S4: the session lock must learn worktree roots at start or the fence has a hole) converted into a named build duty plus fitness candidate F-c; four fitness functions queued for M7 (debris invariant, 1s-law under N trees, fence-across-roots, merge idempotence).",
+    "adrs_traced": "All four ADRs carry addresses edges to their forcing requirements (landed via add_edge after the create-op gap surfaced - the gap itself recorded as a register lead): roots->concurrent-open/streams-visible/worktree-start, home->worktree-start/ship-merge, suspect->merge-suspects, shipped->depends-on-gate.",
+    "offer_hash": "1c2939f9322fccce7072b8418aaefbafd8cbade51b07924260ec1ea8eb3fcc80"
+  }
+}
