@@ -1,7 +1,7 @@
 {
   "machine": "systematic",
   "iteration": "i4-questions-and-hygiene",
-  "current": "write_requirements",
+  "current": "derive_criteria",
   "counters": {},
   "history": [
     {
@@ -87,6 +87,30 @@
       "outcome": "filled",
       "evidence": "grant:41ee5e9bb41f",
       "at": "2026-07-24T11:04:48.159Z"
+    },
+    {
+      "state": "write_requirements",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i4-questions-and-hygiene/evidence/15-write_requirements.json",
+      "at": "2026-07-24T11:08:58.378Z"
+    },
+    {
+      "state": "probe_assumptions",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i4-questions-and-hygiene/evidence/17-probe_assumptions.json",
+      "at": "2026-07-24T11:45:00.000Z"
+    },
+    {
+      "state": "derive_functions",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i4-questions-and-hygiene/evidence/16-derive_functions.json",
+      "at": "2026-07-24T11:09:20.320Z"
+    },
+    {
+      "state": "gate_requirements",
+      "outcome": "filled",
+      "evidence": "grant:494c03449cb8",
+      "at": "2026-07-24T11:12:07.746Z"
     }
   ],
   "escapes": [],

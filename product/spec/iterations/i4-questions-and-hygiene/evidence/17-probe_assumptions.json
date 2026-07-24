@@ -1,0 +1,15 @@
+{
+  "iteration": "i4-questions-and-hygiene",
+  "state": "probe_assumptions",
+  "at": "2026-07-24T11:45:00.000Z",
+  "note": "Inline fill - exhibit I1, tally 16.",
+  "payload": {
+    "probes": [
+      "A: the seven stamps sit in nested provenance reachable by dot-path (A1) | probe: real file-lane search - q-p3delta-*.md carry 'adjudicated_by: pending-owner' at frontmatter line 9 under provenance, exactly the dot-path shape | HOLDS; the T3 pass line (zero markers queryable) is checkable via the same search.",
+      "A: the JSON tree can stay zero-dep | analysis on the real target: the board is server-rendered HTML - native details/summary elements give collapsible keys with no library; fits the design system | HOLDS by construction.",
+      "A: the toll grace-warning can ride results | probe: mcp.ts read this morning - dispatch has guards and observers but NO result decorator; the warning needs the small decorate hook designed in the drained note | HOLDS with the named addition.",
+      "A: calibration data exists and parses | probe: se_log_query over toll updates - every update carries eta + ts, BUT early records mix formats ('within 10 minutes', '~5 min', clock times); the query needs parsing tolerance and the dirty prefix stays a lower-bound band | HOLDS with tolerance.",
+      "FOUND while probing: se_get_search breaks on hyphenated queries (FTS5 reads 'pending-owner' as a column filter -> 'no such column: owner' error) - unsanitized query metacharacters; folded into the i4 search hardening scope as a finding."
+    ]
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "iteration": "i4-questions-and-hygiene",
+  "state": "derive_functions",
+  "at": "2026-07-24T11:09:20.320Z",
+  "payload": {
+    "function_structure": "INHERIT the i3 function structure (16-derive_functions of i3) as the base - overall function and the seven clusters stand. The i4 DELTA, solution-neutral: A' execute-the-drawing gains serve concurrent states and complete child machines fully (engine states, gates). B' serve-the-work gains accept inherit evidence and attach discipline guidance by realization kind. D' keep-the-rhythm gains warn before refusing (toll grace) and quote measured estimates. E' keep-the-record gains refuse off-vocabulary writes, reach nested fields, name evidence collision-free, keep one line per dispatch. F' show-the-truth gains unfold structured data, lay branches side by side, fill the screen on maximize, hold the scroll, show both directions of a call. G' maintain-the-system gains serve dot-paths and declared roots, ripple renames, restructure the plan, guard the child swap (canary), score absolutely via research, derive lean by strikes.",
+    "coverage": "All 10 new requirements map into the delta functions above (json-tree/scroll/maximize/branches -> F'; schema/dotpath/evidence-ids/log-line -> E'; loop-parallel-serve + child completion -> A'; score-absolute + eta-measured -> G'/D'; toll-grace -> D'; shim-canary -> G'; dotfile/roots/rename/plan-ops -> G'; inherit-acceptance -> B'). The 19 completed residents keep their i3 mappings. UC steps: uc-3/6/7/8 covered by the delta, uc-4's within-iteration case completes at A'; no orphan functions, no unmapped requirement."
+  }
+}

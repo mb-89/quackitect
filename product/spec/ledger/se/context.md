@@ -8,12 +8,14 @@ provenance:
 ---
 
 ## Boundary
+
 Inside: the engine (dispatch, loop, gates, lanes, toll, call log), the MCP server surface (se_* tools), the board (localhost:7346), the ledger (spec/ledger - nodes, machines as canvases), the iteration spine (spec/iterations). Outside, as named neighbours with interfaces:
 - the harness (Claude Code) | MCP stdio - the only way agents reach the system
 - Obsidian + Advanced Canvas | the drawing medium; the compiler reads the canvas files at load
 - git | the durability layer; se_git is the allowlisted interface; push stays with the owner
-- the owner | channels: board (bless/dismiss), chat relay (se_gate_bless), console (bin/se-gate), phone (i7)
+- the owner | channels: board (bless/dismiss), chat relay (se_gate_bless), console (bin/se-gate), phone (planned)
 - module imports (kb, ../benjamin) | read-only content served through the se surface, stamped at gate time
+- the research-agent scorer | spawned per evaluate-class state; reads prior art and external tools, returns one absolute score row, holds no state
 - the machine-local state dir (~/.se/<project>) | offers, notes inbox, call log, toll - never committed
 
 ## Intended use

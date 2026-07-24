@@ -1,0 +1,14 @@
+{
+  "iteration": "i4-questions-and-hygiene",
+  "state": "gate_requirements",
+  "at": "2026-07-24T11:11:19.835Z",
+  "payload": {
+    "verifiable": "All 10 new requirements carry named verify methods: 7 test, 1 demonstration (score-absolute, with the owner's calibration round), 2 inspection (json-tree at a real gate walk, eta-measured against the query output). The 19 completed residents keep their i3 methods. None unnameable.",
+    "traced": "Every new requirement traces to a drained note or a retro ruling, and through the stories: json-tree/scroll/maximize -> T1; loop-parallel-serve -> T2; schema/dotpath/evidence-ids -> T3; eta-measured/score-absolute -> T4; toll-grace, shim-canary, dotfile-lane -> the register incidents that birthed them. No empty rows.",
+    "functions_cover": "The inherited i3 structure plus seven named cluster deltas (16-derive_functions of this iteration) absorb all 29 steps; every new requirement maps, uc-3/6/7/8 covered, uc-4's within-iteration case completes at the execute cluster.",
+    "set_holds": "Complete (29 steps -> requirements or process-by-nature), consistent (each new law extends an existing anchor - grace refines toll, canary completes hot-reload, parallel-serve completes exec-parallel), affordable (7/10 ride the standing battery), bounded (worktree requirements deliberately deferred to i5's own M3). No TBD.",
+    "breaks_if_removed": "Filled on all 10 mints, each citing its measured incident: the fifteen-skip tally, the hung lane, the 30s toll round-trips, the 09/26 collisions, the owner's twice-named JSON pain.",
+    "assumptions_probed": "Four probes on real channels plus one bonus finding (17-probe_assumptions, walked inline - tally 16): the stamp shape confirmed in the actual files (dot-path reaches it), the JSON tree zero-dep by native elements, the grace-warning needs the named decorate hook, the calibration data parses with tolerance for the dirty early formats. FOUND during probing: se_get_search crashes on hyphenated queries (FTS5 column syntax leaks) - folded into the search-hardening scope as a live defect with its reproduction.",
+    "offer_hash": "494c03449cb8e8a40cdc9700a5401a003a11a820d9d058d83033cf131980a9a7"
+  }
+}
