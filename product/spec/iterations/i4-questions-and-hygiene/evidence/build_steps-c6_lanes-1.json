@@ -1,0 +1,9 @@
+{
+  "iteration": "i4-questions-and-hygiene",
+  "state": "build_steps-c6_lanes",
+  "at": "2026-07-24T12:06:13.792Z",
+  "payload": {
+    "what_landed": "deliverable.ts: dot-paths under the product now serve (SKIP set = node_modules/workspace/.git/.se, the top-segment dot refusal dropped) - product/.obsidian reachable; declared roots from the nameplate ('roots' on product.json) served read-only via @name/... paths (SE-C-069 undeclared refusal names the vocabulary, SE-C-070 keeps them read-only, escape guard per root); warmindex.ts: search quotes every term so hyphenated/punctuated queries never parse as FTS5 column syntax. c6-lanes 3/3 + old deliverable suite 8/8 in run-d5d2a94acdb1.",
+    "run_ref": "run-d5d2a94acdb1"
+  }
+}

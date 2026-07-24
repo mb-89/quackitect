@@ -1,0 +1,80 @@
+{
+  "machine": "build-steps",
+  "iteration": "i4-questions-and-hygiene#build_steps",
+  "current": "done",
+  "counters": {},
+  "history": [
+    {
+      "state": "start",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i4-questions-and-hygiene/evidence/36-build_steps-start.json",
+      "at": "2026-07-24T11:39:16.562Z"
+    },
+    {
+      "state": "c1_serving",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i4-questions-and-hygiene/evidence/36-build_steps-c1_serving.json",
+      "at": "2026-07-24T11:43:15.068Z"
+    },
+    {
+      "state": "c2_children",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i4-questions-and-hygiene/evidence/36-build_steps-c2_children.json",
+      "at": "2026-07-24T11:45:47.632Z"
+    },
+    {
+      "state": "c3_apply",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i4-questions-and-hygiene/evidence/build_steps-c3_apply-1.json",
+      "at": "2026-07-24T11:54:33.221Z"
+    },
+    {
+      "state": "c4_stamps",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i4-questions-and-hygiene/evidence/build_steps-c4_stamps-1.json",
+      "at": "2026-07-24T11:55:11.385Z"
+    },
+    {
+      "state": "c5_guards",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i4-questions-and-hygiene/evidence/build_steps-c5_guards-1.json",
+      "at": "2026-07-24T12:03:01.862Z"
+    },
+    {
+      "state": "c6_lanes",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i4-questions-and-hygiene/evidence/build_steps-c6_lanes-1.json",
+      "at": "2026-07-24T12:06:13.795Z"
+    },
+    {
+      "state": "c7_links",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i4-questions-and-hygiene/evidence/build_steps-c7_links-1.json",
+      "at": "2026-07-24T12:21:00.104Z"
+    },
+    {
+      "state": "c8_record",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i4-questions-and-hygiene/evidence/build_steps-c8_record-1.json",
+      "at": "2026-07-24T12:24:11.340Z"
+    },
+    {
+      "state": "c9_board",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i4-questions-and-hygiene/evidence/build_steps-c9_board-1.json",
+      "at": "2026-07-24T12:32:25.688Z"
+    },
+    {
+      "state": "c10_knowledge",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i4-questions-and-hygiene/evidence/build_steps-c10_knowledge-1.json",
+      "at": "2026-07-24T12:36:02.442Z"
+    }
+  ],
+  "escapes": [],
+  "status": "closed",
+  "fired": [],
+  "active": [
+    "done"
+  ]
+}

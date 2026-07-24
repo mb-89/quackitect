@@ -68,7 +68,7 @@ test("B5 pass: a console bless lands with channel + hash on the grant record", a
     assert.equal(grants[0].hash, offerHash); // bound to the offered state
     assert.ok(grants[0].adjudicated_by.length > 0); // floor flag 2: adjudicator
     assert.equal(grants[0].policy, "lean"); // floor flag 1: policy in force
-    assert.match(grants[0].evidence, /evidence\/\d\d-close_iteration\.json$/); // floor flag 4: evidence pointer
+    assert.match(grants[0].evidence, /evidence\/close_iteration-\d+\.json$/); // floor flag 4: evidence pointer
     assert.equal(typeof grants[0].imports, "object"); // import stamp (fixture has no modules: empty)
     // The machine advanced through the approval edge.
     const inst = JSON.parse(readFileSync(layout.instancePath(root, "i0-gate"), "utf8"));
@@ -112,6 +112,10 @@ test("the toll refuses once with the schema inline, and the paid call proceeds",
 
     toll.arm();
     clock += 11 * 60 * 1000; // past the window
+
+    // Grace: the first lapsed call proceeds, carrying a warning.
+    toll.check("se_get_node", { id: "se.x" }, log);
+    assert.match(toll.takeWarning() ?? "", /refused/);
 
     let rejection: Rejection | undefined;
     try {

@@ -33,7 +33,9 @@ export interface CallLine {
   duration_ms?: number;
   /** The call's declared purpose, when its args carry one. */
   intent?: string;
-  /** Rejection/error payload — the response direction of the feed. */
+  /** The request arguments — the log details render request then response. */
+  request?: Record<string, unknown>;
+  /** Rejection/error payload, or the success summary — the response direction. */
   response?: unknown;
 }
 
@@ -46,8 +48,33 @@ export interface NoteLine {
 /** One machine on the stack: its states with live status, deepest last. */
 export interface MachineFrame {
   id: string;
+  /** The parent state this frame was seeded from (dive anchor). */
+  seeded_from?: string;
   current: string;
-  states: { id: string; kind: string; group?: string; status: "done" | "current" | "future"; statement: string; guidance: string }[];
+  states: { id: string; kind: string; group?: string; status: "done" | "current" | "future"; row: number; substeps?: number; statement: string; guidance: string }[];
+}
+
+/**
+ * Layout rows (longest path): states sharing a row are parallel branches
+ * and render side by side. Only forward edges count — declaration order
+ * breaks cycles (repair loops never inflate the layout) — and terminals
+ * always sit below everything: the end renders at the end.
+ */
+export function stateRows(m: MachineDecl): Record<string, number> {
+  const ord = new Map(m.states.map((s, i) => [s.id, i]));
+  const row: Record<string, number> = {};
+  for (const s of m.states) row[s.id] = 0;
+  for (const s of m.states) {
+    for (const e of s.edges) {
+      if ((ord.get(e.to) ?? -1) <= ord.get(s.id)!) continue;
+      if (row[e.to] < row[s.id] + 1) row[e.to] = row[s.id] + 1;
+    }
+  }
+  const floor = Math.max(0, ...m.states.filter((s) => s.kind !== "terminal").map((s) => row[s.id]));
+  for (const s of m.states) {
+    if (s.kind === "terminal") row[s.id] = Math.max(row[s.id], floor + 1);
+  }
+  return row;
 }
 
 export interface ProjectionState {
@@ -196,7 +223,7 @@ export function projectState(root: string): ProjectionState {
     ok: boolean;
     args?: Record<string, unknown>;
     duration_ms?: number;
-    detail?: { outcome?: string; response?: unknown };
+    detail?: { outcome?: string; response?: unknown; response_summary?: string };
   };
   const calls = jsonLines<RawCall>(tailText(join(layout.seDir(abs), "calls.jsonl")))
     .filter((c) => sessionStarted === null || c.ts >= sessionStarted)
@@ -204,6 +231,7 @@ export function projectState(root: string): ProjectionState {
     .reverse()
     .map((c) => {
       const intent = c.args?.intent ?? (c.args?.update as { current_step?: unknown } | undefined)?.current_step;
+      const response = c.detail?.response ?? c.detail?.response_summary ?? (c.tool === "se.run" ? c.detail : undefined);
       return {
         ts: c.ts,
         tool: c.tool,
@@ -211,72 +239,109 @@ export function projectState(root: string): ProjectionState {
         detail: JSON.stringify(c.args ?? {}).slice(0, 300),
         ...(c.duration_ms !== undefined ? { duration_ms: c.duration_ms } : {}),
         ...(typeof intent === "string" ? { intent } : {}),
-        ...(c.detail?.response !== undefined ? { response: c.detail.response } : {}),
+        ...(c.args !== undefined ? { request: c.args } : {}),
+        ...(response !== undefined ? { response } : {}),
       };
     });
 
   const openView = iterations.find((it) => it.status === "open");
   const machineStack: MachineFrame[] = [];
+  // A seeding state renders marked (double border, sub-step count).
+  const substepsOf = (sub: string | undefined, stateId: string): number | undefined => {
+    if (sub === undefined) return undefined;
+    const decl =
+      sub === "iteration"
+        ? openView === undefined
+          ? null
+          : loadIterationMachine(abs, openView.id, stateId)
+        : loadMachine(abs, sub.replace(/^se\.machine-/, ""));
+    return decl === null ? undefined : decl.states.filter((s) => s.kind !== "terminal").length;
+  };
   if (sesMachine !== null) {
     const nestedState = sesMachine.states.find((s) => s.submachine !== undefined)?.id ?? "idle";
     const sessionCurrent = openView !== undefined ? nestedState : sessionStarted !== null ? "idle" : "lock_on";
     const sessionIdx = sesMachine.states.findIndex((s) => s.id === sessionCurrent);
+    const sesRows = stateRows(sesMachine);
     machineStack.push({
       id: sesMachine.id,
       current: sessionCurrent,
-      states: sesMachine.states.map((s, i) => ({
-        id: s.id,
-        kind: s.kind,
-        ...(s.group !== undefined ? { group: s.group } : {}),
-        status: s.id === sessionCurrent ? ("current" as const) : i < sessionIdx ? ("done" as const) : ("future" as const),
-        statement: s.statement,
-        guidance: s.guidance,
-      })),
+      states: sesMachine.states.map((s, i) => {
+        const substeps = substepsOf(s.submachine, s.id);
+        return {
+          id: s.id,
+          kind: s.kind,
+          ...(s.group !== undefined ? { group: s.group } : {}),
+          status: s.id === sessionCurrent ? ("current" as const) : i < sessionIdx ? ("done" as const) : ("future" as const),
+          row: sesRows[s.id] ?? i,
+          ...(substeps !== undefined ? { substeps } : {}),
+          statement: s.statement,
+          guidance: s.guidance,
+        };
+      }),
     });
   }
   if (openView !== undefined && openMachine !== null) {
     const filled = new Set(openView.steps.filter((st) => st.done).map((st) => st.state));
+    // Every active token lights up, not only the first-token alias.
+    const openInst = readJsonFile<MachineInstance>(layout.instancePath(abs, openView.id));
+    const activeIter = new Set(openInst.active ?? [openInst.current]);
+    const iterRows = stateRows(openMachine);
+    const seededFrom = sesMachine?.states.find((s) => s.submachine !== undefined)?.id;
     machineStack.push({
       id: openMachine.id,
+      ...(seededFrom !== undefined ? { seeded_from: seededFrom } : {}),
       current: openView.current,
-      states: openMachine.states.map((s) => ({
-        id: s.id,
-        kind: s.kind,
-        ...(s.group !== undefined ? { group: s.group } : {}),
-        status: s.id === openView.current ? ("current" as const) : filled.has(s.id) ? ("done" as const) : ("future" as const),
-        statement: s.statement,
-        guidance: s.guidance,
-      })),
+      states: openMachine.states.map((s, i) => {
+        const substeps = substepsOf(s.submachine, s.id);
+        return {
+          id: s.id,
+          kind: s.kind,
+          ...(s.group !== undefined ? { group: s.group } : {}),
+          status: activeIter.has(s.id) ? ("current" as const) : filled.has(s.id) ? ("done" as const) : ("future" as const),
+          row: iterRows[s.id] ?? i,
+          ...(substeps !== undefined ? { substeps } : {}),
+          statement: s.statement,
+          guidance: s.guidance,
+        };
+      }),
     });
   }
 
-  // A seeded sub-machine renders as the third frame: session > iteration > chunks.
+  // Seeded sub-machines render as further frames: session > iteration >
+  // chunks. Every EXISTING sub-instance stays on the stack — a completed
+  // build's chunk record remains divable, not just the live one.
   if (openView !== undefined && openMachine !== null) {
-    const cur = openMachine.states.find((s) => s.id === openView.current);
-    if (cur?.submachine !== undefined) {
-      const subPath = join(layout.iterationDir(abs, openView.id), `sub-${cur.id}.json`);
-      if (existsSync(subPath)) {
-        const child = readJsonFile<MachineInstance>(subPath);
-        const childDecl =
-          cur.submachine === "iteration"
-            ? loadIterationMachine(abs, openView.id, cur.id)
-            : loadMachine(abs, cur.submachine.replace(/^se\.machine-/, ""));
-        if (childDecl !== null) {
-          const childDone = new Set(child.history.filter((h) => h.outcome === "filled").map((h) => h.state));
-          machineStack.push({
-            id: childDecl.id,
-            current: child.current,
-            states: childDecl.states.map((s) => ({
-              id: s.id,
-              kind: s.kind,
-              ...(s.group !== undefined ? { group: s.group } : {}),
-              status: s.id === child.current ? ("current" as const) : childDone.has(s.id) ? ("done" as const) : ("future" as const),
-              statement: s.statement,
-              guidance: s.guidance,
-            })),
-          });
-        }
-      }
+    for (const st of openMachine.states) {
+      if (st.submachine === undefined) continue;
+      const subPath = join(layout.iterationDir(abs, openView.id), `sub-${st.id}.json`);
+      if (!existsSync(subPath)) continue;
+      const child = readJsonFile<MachineInstance>(subPath);
+      const childDecl =
+        st.submachine === "iteration"
+          ? loadIterationMachine(abs, openView.id, st.id)
+          : loadMachine(abs, st.submachine.replace(/^se\.machine-/, ""));
+      if (childDecl === null) continue;
+      const childDone = new Set(child.history.filter((h) => h.outcome === "filled").map((h) => h.state));
+      const activeChild = new Set(child.status === "open" ? child.active ?? [child.current] : []);
+      const childRows = stateRows(childDecl);
+      machineStack.push({
+        id: childDecl.id,
+        seeded_from: st.id,
+        current: child.current,
+        states: childDecl.states.map((s, i) => {
+          const substeps = substepsOf(s.submachine, s.id);
+          return {
+            id: s.id,
+            kind: s.kind,
+            ...(s.group !== undefined ? { group: s.group } : {}),
+            status: activeChild.has(s.id) ? ("current" as const) : childDone.has(s.id) ? ("done" as const) : ("future" as const),
+            row: childRows[s.id] ?? i,
+            ...(substeps !== undefined ? { substeps } : {}),
+            statement: s.statement,
+            guidance: s.guidance,
+          };
+        }),
+      });
     }
   }
 

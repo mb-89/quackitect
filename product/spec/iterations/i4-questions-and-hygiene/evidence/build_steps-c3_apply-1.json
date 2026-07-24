@@ -1,0 +1,9 @@
+{
+  "iteration": "i4-questions-and-hygiene",
+  "state": "build_steps-c3_apply",
+  "at": "2026-07-24T11:54:33.221Z",
+  "payload": {
+    "what_landed": "apply.ts: KIND_VOCAB+assertKind (SE-C-068), dot-path set_field with intermediate creation, four canvas surgical ops (clone-mutate-reparse); loop.ts exports evidenceName(state,attempt) - evidence refs collision-free, child '#' stripped; engine/jsontree.ts renderJsonTree with key-preview summaries (c9 core, pulled early to unblock the shared test file); chunk tests split per chunk (c5-guards, c6-lanes stay red-first).",
+    "run_ref": "run-7248dc6ca72c"
+  }
+}

@@ -20,7 +20,8 @@ export function loadIterationMachine(root: string, iteration: string, stateId: s
   const dir = join(layout.iterationDir(root, iteration), "machines");
   if (!existsSync(dir)) return null;
   const ledger = loadLedger(dir);
-  const id = `it.machine-${stateId}`;
+  // Ledger localIds forbid underscores; state ids allow them — sanitize.
+  const id = `it.machine-${stateId.replace(/_/g, "-")}`;
   if (!ledger.nodes.has(id)) return null;
   return compileMachine(ledger, id);
 }

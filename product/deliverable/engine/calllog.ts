@@ -28,7 +28,7 @@ export class CallLog {
     this.path = join(seDir, "calls.jsonl");
   }
 
-  append(entry: Omit<CallRecord, "ref" | "ts" | "se_version">): CallRecord {
+  append(entry: Omit<CallRecord, "ref" | "ts" | "se_version"> & { ref?: string }): CallRecord {
     const rec: CallRecord = {
       ref: `run-${randomBytes(6).toString("hex")}`,
       ts: new Date().toISOString(),
@@ -102,4 +102,68 @@ export class CallLog {
   cleanupDue(): boolean {
     return existsSync(this.path) && statSync(this.path).size >= GB;
   }
+
+  /**
+   * ETA calibration: every toll update's claimed ETA against the time the
+   * next submit actually landed. Dirty early formats parse where they can
+   * and are skipped where they cannot — an honest sample beats a guessed one.
+   */
+  calibration(): { count: number; median_ratio: number | null; samples: CalibrationSample[] } {
+    if (!existsSync(this.path)) return { count: 0, median_ratio: null, samples: [] };
+    const records: CallRecord[] = [];
+    for (const line of stripBom(readFileSync(this.path, "utf8")).split("\n")) {
+      if (line.trim() === "") continue;
+      try {
+        records.push(JSON.parse(line) as CallRecord);
+      } catch {
+        continue;
+      }
+    }
+    const samples: CalibrationSample[] = [];
+    for (let i = 0; i < records.length; i++) {
+      const u = records[i];
+      if (u.tool !== "se.toll.update") continue;
+      const eta = String(u.args.eta ?? "");
+      const claimed = parseEtaMinutes(eta, u.ts);
+      if (claimed === null) continue;
+      const done = records.slice(i + 1).find((r) => r.tool === "se_loop_submit" && r.ok);
+      if (done === undefined) continue;
+      const actual = (new Date(done.ts).getTime() - new Date(u.ts).getTime()) / 60000;
+      if (actual <= 0) continue;
+      samples.push({
+        at: u.ts,
+        step: String(u.args.current_step ?? ""),
+        eta,
+        claimed_min: Math.round(claimed),
+        actual_min: Math.round(actual),
+        ratio: Math.round((actual / claimed) * 100) / 100,
+      });
+    }
+    const ratios = samples.map((s) => s.ratio).sort((a, b) => a - b);
+    const median = ratios.length === 0 ? null : ratios[Math.floor(ratios.length / 2)];
+    return { count: samples.length, median_ratio: median, samples: samples.slice(-50) };
+  }
+}
+
+export interface CalibrationSample {
+  at: string;
+  step: string;
+  eta: string;
+  claimed_min: number;
+  actual_min: number;
+  ratio: number;
+}
+
+/** "22:35" (owner-local clock) or "in ~20 min"; anything else is skipped. */
+export function parseEtaMinutes(eta: string, fromTs: string): number | null {
+  const rel = eta.match(/(\d+)\s*min/i);
+  if (rel !== null) return Number(rel[1]);
+  const hm = eta.match(/(\d{1,2}):(\d{2})/);
+  if (hm === null) return null;
+  const from = new Date(fromTs);
+  const target = new Date(from);
+  target.setHours(Number(hm[1]), Number(hm[2]), 0, 0);
+  let diff = (target.getTime() - from.getTime()) / 60000;
+  if (diff < -120) diff += 24 * 60; // an ETA just past midnight
+  return diff > 0 ? diff : null;
 }

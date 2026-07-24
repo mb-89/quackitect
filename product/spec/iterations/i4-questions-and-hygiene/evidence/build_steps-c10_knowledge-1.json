@@ -1,0 +1,8 @@
+{
+  "iteration": "i4-questions-and-hygiene",
+  "state": "build_steps-c10_knowledge",
+  "at": "2026-07-24T12:36:02.442Z",
+  "payload": {
+    "what_landed": "Minted in one apply: se.meth-scoring-anchors (absolute 0-5 anchors, scores above 3 REQUIRE a named external comparison, plus the research-agent spawn recipe - the builder never self-scores); three guidance registry nodes (guidance-engine-ts, guidance-board-html, guidance-ledger) with applies_to, and the loop now joins them onto packets as guidance_refs by the state's 'Realization:' kind; 36 gloss entries for the genuine terms of the 139-candidate worklist; se.note-termlint-noise records the triage ruling (internal labels get collective entries gloss-milestones/pillars/bootstrap-steps, uppercase English words are lint false positives, stopword lead for the term lint). Engine seams: PlanEntry gained the market flag (declared at kickoff, read by gate_validation's tier), WorkPacket gained guidance_refs."
+  }
+}

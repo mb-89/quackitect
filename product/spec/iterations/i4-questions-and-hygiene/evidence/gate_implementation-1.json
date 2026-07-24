@@ -1,0 +1,15 @@
+{
+  "iteration": "i4-questions-and-hygiene",
+  "state": "gate_implementation",
+  "at": "2026-07-24T12:40:15.230Z",
+  "payload": {
+    "build_planned": "The seeded chunk machine (it.machine-build-steps, drawn into the iteration at plan_build) was walked END TO END through the loop: start, c1_serving, c2_children, c3_apply, c4_stamps, c5_guards, c6_lanes, c7_links, c8_record, c9_board, c10_knowledge - every chunk submitted with its green run ref; sub-build_steps.json is the record.",
+    "models_adhered": "Every landing filled an allocated element: executor/loop/gate (c1-c2), apply lane (c3, c7), toll+run+shim (c5), deliverable lane + warm index (c6), calllog+project (c8), board page (c9), ledger content (c4, c10). One module file minted beyond the drawing: engine/jsontree.ts - sanctioned by adr-json-tree-native-first (it IS that decision's element). No other new elements.",
+    "red_observed": "35-observe_red pinned the authored-red set; live reds observed per chunk: i4-lanes failed AT LOAD pre-c3, c5-guards/c6-lanes red-first, the battery itself ran red twice at verification (4 typecheck findings, then the vocabulary gap) before green - both fix passes recorded as fix_findings evidence.",
+    "designs_realized": "All 10 i4 requirements realized with checks: req-json-tree (jsontree.ts + board tree+filter), req-loop-parallel-serve (c1 claims/serving), req-schema-refuse (KIND_VOCAB SE-C-068), req-dotpath-field (c3, exercised by c4's live stamps), req-dotfile-lane (c6), req-score-absolute (meth-scoring-anchors), req-eta-measured (c8 calibration query, live-proven), req-toll-grace (c5, fired live twice this session), req-evidence-ids (evidenceName), req-shim-canary (c5). Carried i3 residents: req-search-roots (c6), req-link-rename + req-plan-ops (c7), req-test-lane scope (c5), req-log-hygiene/aggregate (c8), req-board-parallel (c9 rows + tokens).",
+    "verification_green": "run-28021f3d45be: exit 0, 119/119 across every suite and all iterations (the two red passes before it consumed the fix_findings recovery as drawn).",
+    "quality_ok": "Chunk tests live per chunk and load standalone; the executor drive-by (advance token sync, engine states via completeState) closed a real i3 regression rails caught; guidance registry + working-rules nodes bake this session's lessons; known debts recorded honestly: gloss+glossary kind duplication (rename-lane candidate), termlint stopword lead, ETA-on-steps redesign note for the retro.",
+    "risks_acceptable": "Riskiest changes are guarded: canary keeps a broken engine from swapping in; commit window + toll laws unchanged and tested; board changes are render-only over the projection; declared roots are read-only by clause. Open owner items (i1-bless audit, trace-dir ruling, structure talk, scorer calibration round) remain on the plan - not silently dropped.",
+    "offer_hash": "716f2290c9c5fea14fa9ee21648b21b2760ae249563ca6d1e8984239556b3e19"
+  }
+}

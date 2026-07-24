@@ -1,0 +1,8 @@
+{
+  "iteration": "i4-questions-and-hygiene",
+  "state": "observe_red",
+  "at": "2026-07-24T11:38:55.772Z",
+  "payload": {
+    "red_observed": "run-3be682eb: the new set fails exactly where the unbuilt design lives - the parallel-serving test reds (next has no session parameter, submit no state routing), the child engine+gate test reds (children refuse engine states today), and the whole i4-lanes file reds at load on the missing engine/jsontree.ts module, which carries every lane check behind it (grace, scope, schema, dotpath, canvas ops, ids, FTS, tree). The single-active regression fence PASSES by design - it is the fence, not a check under build. Chunk-scheduled checks (search/filter behavior, calibration, dotfile/roots/rename/plan) observe their own red with their chunk."
+  }
+}

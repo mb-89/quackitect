@@ -1,0 +1,15 @@
+{
+  "iteration": "i4-questions-and-hygiene",
+  "state": "gate_implementation",
+  "at": "2026-07-24T12:59:08.000Z",
+  "payload": {
+    "build_planned": "The seeded chunk machine (it.machine-build-steps, drawn at plan_build) was walked END TO END through the loop: start, c1_serving through c10_knowledge, every chunk with its green run ref; sub-build_steps.json is the record, and the completed chunk frame stays divable on the board (crumb menu or double-click build_steps (11)).",
+    "models_adhered": "Every landing filled an allocated element: executor/loop/gate (c1-c2), apply lane (c3, c7), toll+run+shim (c5), deliverable lane + warm index (c6), calllog+project (c8), board page (c9), ledger content (c4, c10). One module file beyond the drawing: engine/jsontree.ts - sanctioned by adr-json-tree-native-first. No other new elements.",
+    "red_observed": "35-observe_red pinned the authored-red set; live reds per chunk (i4-lanes failed at load pre-c3, c5/c6 files red-first); the battery ran red twice at verification (4 typecheck findings, then the vocabulary gap) - both fix passes recorded as fix_findings evidence.",
+    "designs_realized": "All 10 i4 requirements realized with checks: req-json-tree, req-loop-parallel-serve, req-schema-refuse, req-dotpath-field (exercised live by c4), req-dotfile-lane, req-score-absolute, req-eta-measured (calibration live-proven), req-toll-grace (fired live twice), req-evidence-ids, req-shim-canary. Carried i3 residents: req-search-roots, req-link-rename, req-plan-ops, req-test-lane, req-log-hygiene/aggregate, req-board-parallel.",
+    "verification_green": "run-28021f3d45be: exit 0, 119/119 across all iterations. The owner-round render changes since then touched only project.ts/se-board.ts surfaces; their suites re-ran green each round, last in run-ae08e3876049 (9/9).",
+    "quality_ok": "Chunk tests live per chunk and load standalone; the executor drive-by closed a real i3 regression. Owner rounds all landed same-session: details filters always present with help in the details pane, completed sub-machines divable (double-click or crumb arrow menus, path-only crumbs), seeding states double-bordered with (n) sub-step counts, terminals always at the bottom, dive into the ACTIVE systematic frame fixed (seeded_from), and bless/dismiss now survive a restarting board with visible feedback instead of failing silently. Known debts recorded: gloss+glossary duplication, termlint stopwords, ETA-on-steps redesign, old-iteration machine walking.",
+    "risks_acceptable": "Canary guards engine swaps; commit window + toll laws unchanged and tested; board changes render-only; declared roots read-only by clause. Open owner items (i1-bless audit, trace-dir ruling, structure talk, scorer calibration round) remain on the plan.",
+    "offer_hash": "218a242473f4bb823417e629223b759337b7d0ad8b18ab00b71a16656faf8168"
+  }
+}

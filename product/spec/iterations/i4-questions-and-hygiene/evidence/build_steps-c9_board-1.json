@@ -1,0 +1,9 @@
+{
+  "iteration": "i4-questions-and-hygiene",
+  "state": "build_steps-c9_board",
+  "at": "2026-07-24T12:32:25.687Z",
+  "payload": {
+    "what_landed": "project.ts: stateRows (longest-path layout over authored edges, cycle-safe) + row on every frame state, EVERY active token lights current (iteration + child frames read active[]), call lines carry request+response (se.run responses fall back to their run detail); bin/se-board.ts: client jsonTree with key-preview summaries as THE default detail renderer, filter layer (key:/val:, /re/ regex, space-AND, inline keyword help on focus - no button), parallel states render side-by-side (.smrow), maximize modal fills the screen and gained the resizable right details sidebar (default 1/4, drag gutter, clicks inside the modal route details there), every pane refresh preserves scroll (setHTML), log slimmed to time|tool|result with request-then-response details. Verified live in Chrome: tree in log details, modal sidebar receiving node details, chunk chain green to c8 with c9 lit. c9 checks + board + projection suites 9/9 in run-c84efc1052b7; board cycled so the owner sees the new one.",
+    "run_ref": "run-c84efc1052b7"
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "iteration": "i4-questions-and-hygiene",
+  "state": "build_steps-c1_serving",
+  "at": "2026-07-24T11:43:15.067Z",
+  "payload": {
+    "what_landed": "loop.ts: next(session) serves every unclaimed active state via serveTarget (claims through the locked instance lane), submit(evidence, state/session) routes fills to the named active state and completes them through the TOKEN op; gate.ts: a blessed gate now fires ALL its approval edges (the root cause of the M1/M2 fan skips); tools.ts: session and state ride the se_loop_next/submit schemas; the single-active path stays on the old shape and the whole prior suite passes untouched as the fence.",
+    "run_ref": "run-c550cc800286"
+  }
+}

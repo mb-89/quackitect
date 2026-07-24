@@ -7,7 +7,7 @@
 //
 // A bless is bound to a starting state, not just to a change: if anything
 // moved underneath, the hash no longer matches and the apply is void.
-import { mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { Rejection } from "./errors.ts";
 import { sha256 } from "./hash.ts";
@@ -25,7 +25,51 @@ export type ApplyOp =
   | { op: "set_field"; id: string; field: string; value: YamliteValue }
   | { op: "replace_section"; id: string; section: string; content: string }
   | { op: "add_edge"; id: string; kind: string; target: string }
-  | { op: "remove_edge"; id: string; kind: string; target: string };
+  | { op: "remove_edge"; id: string; kind: string; target: string }
+  | { op: "add_canvas_node"; id: string; node: unknown }
+  | { op: "remove_canvas_node"; id: string; node_id: string }
+  | { op: "add_canvas_edge"; id: string; edge: unknown }
+  | { op: "remove_canvas_edge"; id: string; edge_id: string }
+  | { op: "rename"; id: string; new_id: string }
+  | { op: "plan_insert"; entry: PlanEntry; after?: string }
+  | { op: "plan_renumber"; id: string; new_id: string };
+
+export interface PlanEntry {
+  id: string;
+  machine?: string;
+  goal?: string;
+  depends_on?: string[];
+  /** Declared at kickoff; gate_validation's market tier applies only when set. */
+  market?: boolean;
+  steps?: { text: string; owner?: boolean }[];
+}
+
+interface PlanFile {
+  iterations: PlanEntry[];
+}
+
+/** plan.json sits beside the ledger; its diff entry is raw bytes, not a node. */
+const PLAN_REL = "../iterations/plan.json";
+
+/** The node-kind vocabulary; creates and kind-writes outside it refuse.
+ *  Pre-vocabulary content is grandfathered - the sweep never rewrites it. */
+export const KIND_VOCAB: ReadonlySet<string> = new Set([
+  "note", "question", "adr", "decision", "anti_decision", "requirement", "use_case",
+  "need", "story", "test", "design", "spike", "machine", "machine_state", "method",
+  "vision", "context", "stakeholders", "gloss", "glossary", "guidance", "raid",
+  "reference", "rule", "fundamental",
+]);
+
+function assertKind(kind: string): void {
+  if (KIND_VOCAB.has(kind)) return;
+  reject(
+    "SE-C-068",
+    `a kind from the vocabulary: ${[...KIND_VOCAB].join(", ")}`,
+    kind,
+    { ops: [], dry_run: true },
+    "pick the matching kind; a genuinely new kind enters the vocabulary by decision, never by typo",
+  );
+}
 
 export interface DiffEntry {
   /** Ledger-relative file path, `<module>/<localId>.md` or `.canvas`. */
@@ -106,9 +150,21 @@ export function computeDiff(ledgerRoot: string, ops: ApplyOp[]): DiffEntry[] {
 
   const reparse = (n: LedgerNode): LedgerNode => parseNode(serializeNode(n), nodeFile(n));
 
+  // Plan mutations accumulate on a working copy; one raw diff entry at the end.
+  const planAbs = join(ledgerRoot, PLAN_REL);
+  let planRaw: string | null | undefined; // undefined = untouched
+  let plan: PlanFile | undefined;
+  const loadPlan = (): PlanFile => {
+    if (plan !== undefined) return plan;
+    planRaw = existsSync(planAbs) ? readFileSync(planAbs, "utf8") : null;
+    plan = planRaw === null ? { iterations: [] } : (JSON.parse(planRaw) as PlanFile);
+    return plan;
+  };
+
   for (const op of ops) {
     switch (op.op) {
       case "create": {
+        assertKind(op.kind);
         if (working.has(op.id) && !deleted.has(op.id)) {
           reject("SE-C-013", `a fresh id for create`, `node already exists: ${op.id}`, { ops: [], dry_run: true },
             "ids are minted deterministically; use set_field/replace_section to edit the existing node");
@@ -169,11 +225,35 @@ export function computeDiff(ledgerRoot: string, ops: ApplyOp[]): DiffEntry[] {
             "trace links are written only through the declared edge ops");
         }
         if (op.field === "id") {
-          reject("SE-C-014", "ids are immutable (rename rides se.set.refactor)", `set_field on id`,
-            { ops: [], dry_run: true }, "use se.set.refactor kind=rename when it exists; ids never change in place");
+          reject("SE-C-014", "ids are immutable in place (rename is its own op)", `set_field on id`,
+            { ops: [{ op: "rename", id: op.id, new_id: "<new module-qualified id>" }], dry_run: true },
+            "the rename op moves the node and rewrites every inbound link in the same apply");
         }
         if (op.field === "statement" && typeof op.value === "string") n.statement = op.value;
-        else if (op.field === "kind" && typeof op.value === "string") n.kind = op.value;
+        else if (op.field === "kind" && typeof op.value === "string") {
+          assertKind(op.value);
+          n.kind = op.value;
+        } else if (op.field.includes(".")) {
+          // Dot paths reach nested frontmatter; missing intermediates are created.
+          const parts = op.field.split(".");
+          const head = parts[0];
+          let cur: Record<string, unknown>;
+          if (head === "provenance") cur = n.provenance as Record<string, unknown>;
+          else {
+            const existing = n.extra[head];
+            const obj = typeof existing === "object" && existing !== null && !Array.isArray(existing) ? { ...(existing as Record<string, YamliteValue>) } : {};
+            // yamlite nests one level; deeper paths die at serialize, honestly.
+            n.extra[head] = obj as unknown as YamliteValue;
+            cur = obj;
+          }
+          for (let i = 1; i < parts.length - 1; i++) {
+            const k = parts[i];
+            const nested = cur[k];
+            cur[k] = typeof nested === "object" && nested !== null && !Array.isArray(nested) ? { ...(nested as Record<string, unknown>) } : {};
+            cur = cur[k] as Record<string, unknown>;
+          }
+          cur[parts[parts.length - 1]] = op.value;
+        }
         else if (op.field === "breaks_if_removed" && typeof op.value === "string") n.breaks_if_removed = op.value;
         else if (op.field === "provenance" && typeof op.value === "object" && !Array.isArray(op.value)) n.provenance = { ...(op.value as Record<string, string>) };
         else n.extra = { ...n.extra, [op.field]: op.value };
@@ -191,6 +271,142 @@ export function computeDiff(ledgerRoot: string, ops: ApplyOp[]): DiffEntry[] {
             { ops: [], dry_run: true }, "read the node with se_get_node mode=outline to see its sections");
         }
         working.set(op.id, reparse(n));
+        break;
+      }
+      case "add_canvas_node":
+      case "remove_canvas_node":
+      case "add_canvas_edge":
+      case "remove_canvas_edge": {
+        // Surgical drawing edits: one element moves, never a whole-canvas resend.
+        const base = mustGet(op.id, op.op);
+        if (base.format !== "canvas") {
+          reject("SE-C-067", `a canvas node for op ${op.op}`, `${op.id} is markdown`, { ops: [], dry_run: true },
+            "surgical canvas ops apply to drawings only");
+        }
+        const data = JSON.parse(JSON.stringify(base.canvas)) as { nodes?: { id: string }[]; edges?: { id: string; fromNode?: string; toNode?: string }[] };
+        data.nodes ??= [];
+        data.edges ??= [];
+        if (op.op === "add_canvas_node") data.nodes.push(op.node as { id: string });
+        else if (op.op === "remove_canvas_node") {
+          data.nodes = data.nodes.filter((n) => n.id !== op.node_id);
+          data.edges = data.edges.filter((e) => e.fromNode !== op.node_id && e.toNode !== op.node_id);
+        } else if (op.op === "add_canvas_edge") data.edges.push(op.edge as { id: string });
+        else data.edges = data.edges.filter((e) => e.id !== op.edge_id);
+        let node: LedgerNode;
+        try {
+          node = parseCanvasNode(JSON.stringify(data), nodeFile(base));
+        } catch (e) {
+          reject("SE-C-066", "a canvas that still parses after the edit", String((e as Error).message),
+            { ops: [], dry_run: true }, "the edit broke the drawing - fix the element and re-send");
+        }
+        working.set(op.id, node);
+        break;
+      }
+      case "rename": {
+        // The refactor lane (req-link-rename): the node moves AND every
+        // inbound reference — edges, markdown links incl. #section targets,
+        // canvas file refs — rewrites in the same apply.
+        const base = mustGet(op.id, "rename");
+        if (!/^[a-z][a-z0-9-]*\.[a-z0-9][a-z0-9-]*$/.test(op.new_id)) {
+          reject("SE-C-014", "a module-qualified kebab id (the ledger id law)", op.new_id,
+            { ops: [], dry_run: true }, "ids are lowercase kebab: <module>.<local-id>");
+        }
+        if (working.has(op.new_id) && !deleted.has(op.new_id)) {
+          reject("SE-C-013", "a fresh id for rename", `node already exists: ${op.new_id}`, { ops: [], dry_run: true },
+            "renames never merge nodes; pick an unused id");
+        }
+        const newModule = op.new_id.slice(0, op.new_id.indexOf("."));
+        const newLocal = op.new_id.slice(op.new_id.indexOf(".") + 1);
+        const ext = base.format === "canvas" ? "canvas" : "md";
+        const oldPath = `${base.module}/${base.localId}.${ext}`;
+        const newPath = `${newModule}/${newLocal}.${ext}`;
+        const rewrite = (text: string, sameModule: boolean): string => {
+          let t = text.replaceAll(oldPath, newPath).replaceAll(op.id, op.new_id);
+          // Same-module relative links keep working: (old.md and (old.md#sec
+          if (sameModule) t = t.replaceAll(`(${base.localId}.${ext}`, `(${newLocal}.${ext}`);
+          return t;
+        };
+        deleted.add(op.id);
+        const moved = { ...base, id: op.new_id, module: newModule, localId: newLocal };
+        deleted.delete(op.new_id);
+        const movedNode = base.format === "canvas"
+          ? parseCanvasNode(rewrite(JSON.stringify({ ...(base.canvas as Record<string, unknown>) }), false), newPath)
+          : reparse(moved as LedgerNode);
+        working.set(op.new_id, movedNode);
+        fileOf.set(op.new_id, newPath);
+        for (const [nid, n] of working) {
+          if (nid === op.new_id || deleted.has(nid)) continue;
+          if (n.format === "canvas") {
+            const raw = JSON.stringify(n.canvas);
+            const next = rewrite(raw, false);
+            if (next !== raw) working.set(nid, parseCanvasNode(next, nodeFile(n)));
+            continue;
+          }
+          const sameModule = n.module === base.module;
+          const edges: Record<string, string[]> = {};
+          let touched = false;
+          for (const [k, targets] of Object.entries(n.edges)) {
+            edges[k] = targets.map((t) => (t === op.id ? ((touched = true), op.new_id) : t));
+          }
+          // Extra fields carry id references too (source_refs and friends).
+          const deep = (v: unknown): unknown => {
+            if (typeof v === "string") {
+              const next = rewrite(v, sameModule);
+              if (next !== v) touched = true;
+              return next;
+            }
+            if (Array.isArray(v)) return v.map(deep);
+            if (typeof v === "object" && v !== null) {
+              return Object.fromEntries(Object.entries(v).map(([k, x]) => [k, deep(x)]));
+            }
+            return v;
+          };
+          const extra = deep(n.extra) as typeof n.extra;
+          const body = rewrite(n.body, sameModule);
+          const statement = rewrite(n.statement, sameModule);
+          if (touched || body !== n.body || statement !== n.statement) {
+            working.set(nid, reparse({ ...n, edges, extra, body, statement }));
+          }
+        }
+        break;
+      }
+      case "plan_insert": {
+        const p = loadPlan();
+        if (p.iterations.some((it) => it.id === op.entry.id)) {
+          reject("SE-C-071", "a fresh planned-iteration id", `${op.entry.id} is already planned`, { ops: [], dry_run: true },
+            "renumber or edit the existing entry instead");
+        }
+        if (existsSync(join(ledgerRoot, "..", "iterations", op.entry.id))) {
+          reject("SE-C-071", "an id no started iteration holds", `${op.entry.id} already ran`, { ops: [], dry_run: true },
+            "started iterations are frozen history; pick a fresh id");
+        }
+        const at = op.after === undefined ? p.iterations.length : p.iterations.findIndex((it) => it.id === op.after) + 1;
+        if (op.after !== undefined && at === 0) {
+          reject("SE-C-012", `an existing plan entry for after`, op.after, { ops: [], dry_run: true },
+            "name a planned iteration to insert after, or omit after to append");
+        }
+        p.iterations.splice(at, 0, op.entry);
+        break;
+      }
+      case "plan_renumber": {
+        const p = loadPlan();
+        if (existsSync(join(ledgerRoot, "..", "iterations", op.id))) {
+          reject("SE-C-071", "a PLANNED iteration (started ids are frozen)", `${op.id} already ran`, { ops: [], dry_run: true },
+            "started iterations keep their ids forever; only planned ones renumber");
+        }
+        const entry = p.iterations.find((it) => it.id === op.id);
+        if (entry === undefined) {
+          reject("SE-C-012", "an existing plan entry to renumber", op.id, { ops: [], dry_run: true },
+            "check plan.json ids with se_file_read");
+        }
+        if (p.iterations.some((it) => it.id === op.new_id) || existsSync(join(ledgerRoot, "..", "iterations", op.new_id))) {
+          reject("SE-C-071", "a fresh id to renumber onto", `${op.new_id} is taken`, { ops: [], dry_run: true },
+            "pick an unused iteration id");
+        }
+        entry.id = op.new_id;
+        for (const it of p.iterations) {
+          if (it.depends_on !== undefined) it.depends_on = it.depends_on.map((d) => (d === op.id ? op.new_id : d));
+        }
         break;
       }
       case "add_edge":
@@ -230,6 +446,12 @@ export function computeDiff(ledgerRoot: string, ops: ApplyOp[]): DiffEntry[] {
     const before = beforeHash.get(id) ?? null;
     if (before !== n.hash) {
       diff.push({ file: fileOf.get(id)!, old_hash: before, new_content: serialize(n) });
+    }
+  }
+  if (plan !== undefined) {
+    const next = JSON.stringify(plan, null, 2) + "\n";
+    if (planRaw !== next) {
+      diff.push({ file: PLAN_REL, old_hash: planRaw === null ? null : sha256(planRaw!), new_content: next });
     }
   }
   diff.sort((a, b) => a.file.localeCompare(b.file));
@@ -279,10 +501,13 @@ export function execute(ledgerRoot: string, ops: ApplyOp[], executeHash: string)
   const files: string[] = [];
   for (const d of diff) {
     const abs = join(ledgerRoot, d.file);
-    // CAS per file, checked again at write time.
+    // CAS per file, checked again at write time. Raw entries (plan.json)
+    // hash bytes; node entries hash canonically.
     if (d.old_hash !== null) {
       const raw = readFileSync(abs, "utf8");
-      const onDisk = (d.file.endsWith(".canvas") ? parseCanvasNode(raw, d.file) : parseNode(raw, d.file)).hash;
+      const onDisk = d.file.startsWith("..")
+        ? sha256(raw)
+        : (d.file.endsWith(".canvas") ? parseCanvasNode(raw, d.file) : parseNode(raw, d.file)).hash;
       if (onDisk !== d.old_hash) {
         throw new Rejection({
           clause: "SE-C-010",

@@ -1,0 +1,8 @@
+{
+  "iteration": "i4-questions-and-hygiene",
+  "state": "fix_findings",
+  "at": "2026-07-24T12:39:18.354Z",
+  "payload": {
+    "findings_fixed": "One finding this pass: KIND_VOCAB was narrower than the ledger's real kind set - the v1-import mint legitimately carries anti_decision (and the ledger holds raid, reference, rule, fundamental, glossary). Vocabulary completed from the measured set (node scan over the ledger); mint idempotence test green again plus the c3 schema refusal still refuses invented kinds (run-bb301cb31da1). Side note recorded mentally for the retro: gloss AND glossary both live - a unification candidate for the rename lane."
+  }
+}

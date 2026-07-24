@@ -1,0 +1,9 @@
+{
+  "iteration": "i4-questions-and-hygiene",
+  "state": "build_steps-c8_record",
+  "at": "2026-07-24T12:24:11.340Z",
+  "payload": {
+    "what_landed": "calllog.ts: calibration() pairs every toll update's ETA with the next submit (clock and relative formats parse, dirty ones skip; median + last-50 samples), served via se_log_query group_by=calibration; run.ts+tools.ts: runCommand mints the record without writing, the dispatch observer appends the ONE se.run line under the same ref (evidence pinning unbroken); project.ts ordering paid with the dedicated multi-iteration test (alphabetical order opposing timestamp order). Live proof: the calibration query ran on the real log - median ratio 0.01, exposing the agent's 8h wall-clock anchor error (noted for the retro). c8 3/3 in run-a3852e110353.",
+    "run_ref": "run-a3852e110353"
+  }
+}

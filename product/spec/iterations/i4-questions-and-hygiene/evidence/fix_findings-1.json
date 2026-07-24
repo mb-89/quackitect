@@ -1,0 +1,8 @@
+{
+  "iteration": "i4-questions-and-hygiene",
+  "state": "fix_findings",
+  "at": "2026-07-24T12:37:54.438Z",
+  "payload": {
+    "findings_fixed": "One collection, all typecheck findings, all in apply.ts, all yamlite-variance: (1) dot-path intermediate assignment cast to YamliteValue with the honest one-level-nesting comment (deeper paths die at serialize); (2-4) the rename deep-rewrite now walks unknown and casts once at its extra call site - no more YamliteValue[] / map variance fights. Typecheck green in run-e7f442890879; no behavioral change, both chunks' tests unaffected."
+  }
+}

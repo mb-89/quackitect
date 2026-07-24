@@ -1,0 +1,8 @@
+{
+  "iteration": "i4-questions-and-hygiene",
+  "state": "author_tests",
+  "at": "2026-07-24T11:34:11.547Z",
+  "payload": {
+    "checks": "Fully authored RED (2 new files): tests/serving.test.ts - req-loop-parallel-serve (both branches served, per-session claims, join holds; the single-active regression fence), req-exec-seed's completion (a child machine runs an engine-filled state mechanically and OFFERS its gate for real); tests/i4-lanes.test.ts - req-toll-grace (warn-pass-refuse-clear cycle with a controlled clock), req-test-lane's refusal (suite command refused outside verification states, other commands free), req-schema-refuse (off-vocabulary kind named), req-dotpath-field (nested provenance write verified in the file), req-apply-ergonomics' canvas surgical ops (add node, remove+add edges, no whole-canvas resend), req-evidence-ids (state+attempt naming), the FTS sanitizing fix (hyphens and punctuation never crash the search), req-json-tree's render core (details/summary nesting, keys on summaries, no raw JSON leak). Authored with their build slice, red before each lands: the search/filter layer's behavior checks (they need the render DOM to assert against), the ETA calibration query, dotfile/roots/rename/plan-op lane tests. Review-class residue per declared methods: json-tree at a real gate walk + eta-measured (inspection), score-absolute (demonstration with the owner's calibration round), the stamp corrections and adjudication audits (owner steps at gates)."
+  }
+}

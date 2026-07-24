@@ -1,0 +1,9 @@
+{
+  "iteration": "i4-questions-and-hygiene",
+  "state": "plan_build",
+  "at": "2026-07-24T11:38:03.386Z",
+  "payload": {
+    "build_machine": "DRAWN, for the first time as a real runtime artifact: it.machine-build-steps lives in the iteration's own machines/ directory - 11 chunks plus terminal, each with realization kind and its own evidence form. Chain-ordered by dependency AND by honesty: until c1 (the loop's parallel serving) exists, children walk single-token, so a fan-out drawing would silently skip branches - the chain guarantees every chunk is served and shown; the fan-out drawing becomes legal for i5's builds, recorded here as the expectation. Order: start -> c1 serving -> c2 children -> c3 apply hygiene -> c4 stamps (rides c3's dot-path) -> c5 rhythm guards -> c6 file lanes -> c7 links+plan -> c8 record instruments -> c9 board cluster -> c10 knowledge -> done. Entering build_steps instantiates it and the board's third frame shows every chunk. Bonus finding folded during seeding: ledger localIds forbid underscores, so the loader now sanitizes derived machine ids (underscore to hyphen) - the first real seeded build caught a latent i3 bug before it could bite anyone else.",
+    "promotions_placed": "None to place - the spike machine was honestly empty; the M3 probe artifacts (FTS reproduction, dirty-format samples) already ride the authored red set."
+  }
+}

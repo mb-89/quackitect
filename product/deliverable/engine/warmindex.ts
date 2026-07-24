@@ -81,11 +81,16 @@ export class WarmIndex {
 
   /** BM25-ranked snippets with anchors, never whole files (§5). */
   search(query: string, limit = 10): SearchHit[] {
+    // Queries are plain keywords: every term is quoted, so FTS5 never reads
+    // hyphens or colons as column syntax ("pending-owner" broke live).
+    const terms = query.match(/[A-Za-z0-9_]+/g) ?? [];
+    if (terms.length === 0) return [];
+    const q = terms.map((t) => `"${t}"`).join(" ");
     return this.db
       .prepare(
         "SELECT id, statement, snippet(fts, 2, '[', ']', ' … ', 12) AS snippet FROM fts WHERE fts MATCH ? ORDER BY bm25(fts) LIMIT ?",
       )
-      .all(query, limit)
+      .all(q, limit)
       .map((r) => ({ ...r }) as unknown as SearchHit);
   }
 

@@ -1,0 +1,15 @@
+{
+  "iteration": "i4-questions-and-hygiene",
+  "state": "gate_implementation",
+  "at": "2026-07-24T12:44:23.129Z",
+  "payload": {
+    "build_planned": "The seeded chunk machine (it.machine-build-steps, drawn at plan_build) was walked END TO END through the loop: start, c1_serving through c10_knowledge, every chunk with its green run ref; sub-build_steps.json is the record - and since the re-offer, the completed chunk frame STAYS on the board's machine stack (crumb: session > systematic > build-steps), divable from the build_steps node.",
+    "models_adhered": "Every landing filled an allocated element: executor/loop/gate (c1-c2), apply lane (c3, c7), toll+run+shim (c5), deliverable lane + warm index (c6), calllog+project (c8), board page (c9), ledger content (c4, c10). One module file beyond the drawing: engine/jsontree.ts - sanctioned by adr-json-tree-native-first. No other new elements.",
+    "red_observed": "35-observe_red pinned the authored-red set; live reds per chunk (i4-lanes failed at load pre-c3, c5/c6 files red-first); the battery ran red twice at verification (4 typecheck findings, then the vocabulary gap) - both fix passes recorded as fix_findings evidence.",
+    "designs_realized": "All 10 i4 requirements realized with checks: req-json-tree, req-loop-parallel-serve, req-schema-refuse, req-dotpath-field (exercised live by c4), req-dotfile-lane, req-score-absolute, req-eta-measured (calibration live-proven), req-toll-grace (fired live twice), req-evidence-ids, req-shim-canary. Carried i3 residents: req-search-roots, req-link-rename, req-plan-ops, req-test-lane, req-log-hygiene/aggregate, req-board-parallel.",
+    "verification_green": "run-28021f3d45be: exit 0, 119/119 across all iterations. The two owner redlines landed AFTER that run touched only project.ts/se-board.ts render surfaces; their suites re-ran green in run-665fb57f3904 (12/12).",
+    "quality_ok": "Chunk tests live per chunk and load standalone; the executor drive-by closed a real i3 regression; both dismissal redlines fixed same-session: filter help routes to the DETAILS pane (one honest exception: the details pane's own filter, where help would destroy the input mid-click), completed sub-machines stay divable with the default view following the live token. Known debts recorded: gloss+glossary duplication, termlint stopwords, ETA-on-steps redesign.",
+    "risks_acceptable": "Canary guards engine swaps; commit window + toll laws unchanged and tested; board changes render-only; declared roots read-only by clause. Open owner items (i1-bless audit, trace-dir ruling, structure talk, scorer calibration round) remain on the plan.",
+    "offer_hash": "9dbe3bae136d0cd3f5a6ae40977d540f553fbda6e7969c0d6e4d90c6b3d60e02"
+  }
+}

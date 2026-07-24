@@ -6,7 +6,7 @@ provenance:
   migrated_by: se.set.migrate v1-import
   iteration: bootstrap-b3
   ai_involvement: engine-migrated
-  adjudicated_by: pending-owner
+  adjudicated_by: owner
 v1_statement: "The i27 views: the quack structural model joins the registry as the middle altitude; the onion keeps the determinizer view with the i27 elements allocated."
 status: resolved
 verdict: drop — rules on v1 model/renderer internals; nothing to bind in v2 (owner, 2026-07-23)

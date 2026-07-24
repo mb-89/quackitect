@@ -1,8 +1,10 @@
 {
   "machine": "systematic",
   "iteration": "i4-questions-and-hygiene",
-  "current": "author_tests",
-  "counters": {},
+  "current": "fill_story_evidence",
+  "counters": {
+    "verification_attempts": 2
+  },
   "history": [
     {
       "state": "onboard_retro",
@@ -195,8 +197,72 @@
       "outcome": "filled",
       "evidence": "grant:214d0fa26d91",
       "at": "2026-07-24T11:30:54.708Z"
+    },
+    {
+      "state": "author_tests",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i4-questions-and-hygiene/evidence/33-author_tests.json",
+      "at": "2026-07-24T11:34:11.547Z"
+    },
+    {
+      "state": "plan_build",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i4-questions-and-hygiene/evidence/34-plan_build.json",
+      "at": "2026-07-24T11:38:03.389Z"
+    },
+    {
+      "state": "observe_red",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i4-questions-and-hygiene/evidence/35-observe_red.json",
+      "at": "2026-07-24T11:38:55.773Z"
+    },
+    {
+      "state": "build_steps",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i4-questions-and-hygiene/evidence/build_steps-1.json",
+      "at": "2026-07-24T12:36:02.453Z"
+    },
+    {
+      "state": "verification",
+      "outcome": "failed",
+      "evidence": "run-81b8783affbe",
+      "at": "2026-07-24T12:36:21.555Z"
+    },
+    {
+      "state": "fix_findings",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i4-questions-and-hygiene/evidence/fix_findings-1.json",
+      "at": "2026-07-24T12:37:54.438Z"
+    },
+    {
+      "state": "verification",
+      "outcome": "failed",
+      "evidence": "run-e344d847a4ee",
+      "at": "2026-07-24T12:38:09.517Z"
+    },
+    {
+      "state": "fix_findings",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i4-questions-and-hygiene/evidence/fix_findings-2.json",
+      "at": "2026-07-24T12:39:18.355Z"
+    },
+    {
+      "state": "verification",
+      "outcome": "filled",
+      "evidence": "run-28021f3d45be",
+      "at": "2026-07-24T12:39:36.236Z"
+    },
+    {
+      "state": "gate_implementation",
+      "outcome": "filled",
+      "evidence": "grant:218a242473f4",
+      "at": "2026-07-24T13:00:14.487Z"
     }
   ],
   "escapes": [],
-  "status": "open"
+  "status": "open",
+  "fired": [],
+  "active": [
+    "fill_story_evidence"
+  ]
 }

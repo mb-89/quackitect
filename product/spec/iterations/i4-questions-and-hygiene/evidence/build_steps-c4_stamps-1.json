@@ -1,0 +1,8 @@
+{
+  "iteration": "i4-questions-and-hygiene",
+  "state": "build_steps-c4_stamps",
+  "at": "2026-07-24T11:55:11.384Z",
+  "payload": {
+    "what_landed": "One apply, seven set_field ops through the new dot-path lane (diff 5d418516): q-p3delta-{i27-views, ifu-kind, module-views, onion-extend, pugh-fields, slide-figref, vale-autopull} provenance.adjudicated_by -> owner. Zero-marker query: se_file_search 'adjudicated_by: pending-owner' returns ONE hit, the 17-probe evidence doc quoting the pre-fix state - no ledger node carries the marker. T3 pass line met."
+  }
+}

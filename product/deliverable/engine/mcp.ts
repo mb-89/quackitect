@@ -26,6 +26,9 @@ export interface ToolDef {
 /** Dispatch middleware — may throw a Rejection to refuse the call (the toll). */
 export type DispatchGuard = (toolName: string, args: Record<string, unknown>) => void;
 
+/** Success-path hook — may enrich a result (the toll's grace warning rides here). */
+export type ResultDecorator = (toolName: string, result: unknown) => unknown;
+
 /** Post-dispatch observer — the single call path's log hook (§9: log
  *  everything raw; derive at read time). Never throws into dispatch. */
 export type CallObserver = (record: {
@@ -57,6 +60,7 @@ export const PROTOCOL_VERSION = "2025-06-18";
 export class McpServer {
   private tools = new Map<string, ToolDef>();
   private guards: DispatchGuard[] = [];
+  private decorators: ResultDecorator[] = [];
   private observers: CallObserver[] = [];
   readonly serverInfo: { name: string; version: string };
 
@@ -67,6 +71,10 @@ export class McpServer {
 
   addGuard(guard: DispatchGuard): void {
     this.guards.push(guard);
+  }
+
+  addDecorator(decorator: ResultDecorator): void {
+    this.decorators.push(decorator);
   }
 
   addObserver(observer: CallObserver): void {
@@ -124,7 +132,8 @@ export class McpServer {
           const started = Date.now();
           try {
             for (const guard of this.guards) guard(name, args);
-            const result = await tool.handler(args);
+            let result = await tool.handler(args);
+            for (const d of this.decorators) result = d(name, result);
             this.observe({ tool: name, args, ok: true, duration_ms: Date.now() - started, outcome: "result", response: result });
             return this.ok(id, {
               content: [{ type: "text", text: JSON.stringify(result, null, 1) }],

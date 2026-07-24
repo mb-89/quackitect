@@ -200,6 +200,13 @@ export function advance(
       if (!roles.includes(e.role)) continue;
       if (!evalGuard(e.guard, inst.counters)) continue;
       inst.current = e.to;
+      // Token sync: an instance running the token model swaps the moving
+      // token too — current and active[] never drift apart.
+      if (inst.active) {
+        inst.active = inst.active.filter((s) => s !== state.id);
+        if (!inst.active.includes(e.to)) inst.active.push(e.to);
+        if (inst.claims) delete inst.claims[state.id];
+      }
       const next = m.states.find((s) => s.id === e.to)!;
       if (next.kind === "terminal") inst.status = "closed";
       return { moved: true };

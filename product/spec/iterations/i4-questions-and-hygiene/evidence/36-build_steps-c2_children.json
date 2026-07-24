@@ -1,0 +1,9 @@
+{
+  "iteration": "i4-questions-and-hygiene",
+  "state": "build_steps-c2_children",
+  "at": "2026-07-24T11:45:47.632Z",
+  "payload": {
+    "what_landed": "loop.ts: the child walker runs engine-filled sub-states as background runs with the same 1s grace (child pending_run survives restarts), and child gates OFFER for real - submit builds the offer against the child's identity, next surfaces a pending child offer; gate.ts: the bless routes 'iteration#state' offers to the child record and completes it under its own iteration drawing; the i3 slice limits are lifted.",
+    "run_ref": "run-ebd257b0cbdd"
+  }
+}

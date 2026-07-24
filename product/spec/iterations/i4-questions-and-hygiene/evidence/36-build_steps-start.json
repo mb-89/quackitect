@@ -1,0 +1,8 @@
+{
+  "iteration": "i4-questions-and-hygiene",
+  "state": "build_steps-start",
+  "at": "2026-07-24T11:39:16.561Z",
+  "payload": {
+    "opened": "run-3be682eb - the red set stands observed (parallel serving, child completion, and the whole lane file red on the missing jsontree module); the chain order matches the dependencies (c1 serving first, everything else behind it, stamps behind dot-path). The build runs SERVED for the first time - this very packet carried parent_state: build_steps."
+  }
+}

@@ -22,7 +22,7 @@ import { boot, newSession, assertAdmitted, registerLaneNames, type Session } fro
 import { Gate } from "./gate.ts";
 import { fileList, fileRead, fileWrite, filePatch, fileDelete, fileSearch, type SearchMode } from "./deliverable.ts";
 import { git, assertNotHistoryRewrite, assertNotPush, assertCommitWindow } from "./git.ts";
-import { runCommand } from "./run.ts";
+import { runCommand, assertTestRunScope } from "./run.ts";
 import { psAction } from "./ps.ts";
 
 /** Captures minus drain lines: the honest inbox size. */
@@ -51,8 +51,8 @@ export function coreTools(root: string, opts: { toll?: Toll; session?: Session }
       name: "se_loop_next",
       title: "se.loop.next",
       description: "The entry point: the current step's work packet. Always callable, never errors.",
-      inputSchema: { type: "object", properties: {} },
-      handler: () => {
+      inputSchema: { type: "object", properties: { session: { type: "string", description: "this session's name - parallel states are claimed per session" } } },
+      handler: (args) => {
         if (!session.admitted) {
           return {
             kind: "instruction",
@@ -61,7 +61,7 @@ export function coreTools(root: string, opts: { toll?: Toll; session?: Session }
             note: "Unbooted session. The boot: se_boot returns the project + the contract + its hash; se_boot with contract_hash attests and admits you. Then next works.",
           };
         }
-        return loop().next();
+        return loop().next(args.session === undefined ? {} : { session: String(args.session) });
       },
     },
     {
@@ -101,11 +101,18 @@ export function coreTools(root: string, opts: { toll?: Toll; session?: Session }
       description: "Submit evidence for the current step; reference a run via evidence.run_ref, never re-type output.",
       inputSchema: {
         type: "object",
-        properties: { evidence: { type: "object", description: "field -> value, per the step's evidence_form" } },
+        properties: {
+          evidence: { type: "object", description: "field -> value, per the step's evidence_form" },
+          state: { type: "string", description: "which ACTIVE state this fills - required only when several are active" },
+          session: { type: "string", description: "this session's name for claim routing" },
+        },
         required: ["evidence"],
       },
       handler: (args) => {
-        const packet = loop().submit((args.evidence ?? {}) as Record<string, string>);
+        const packet = loop().submit((args.evidence ?? {}) as Record<string, string>, {
+          ...(args.state !== undefined ? { state: String(args.state) } : {}),
+          ...(args.session !== undefined ? { session: String(args.session) } : {}),
+        });
         opts.toll?.arm(); // pillar 3: armed after the first submit
         return packet;
       },
@@ -380,7 +387,10 @@ export function coreTools(root: string, opts: { toll?: Toll; session?: Session }
         properties: { command: { type: "string" } },
         required: ["command"],
       },
-      handler: (args) => runCommand(log(), String(args.command), root),
+      handler: (args) => {
+        assertTestRunScope(root, String(args.command));
+        return runCommand(log(), String(args.command), root);
+      },
     },
     {
       name: "se_note",
@@ -472,12 +482,16 @@ export function coreTools(root: string, opts: { toll?: Toll; session?: Session }
           limit: { type: "number", default: 20 },
         },
       },
-      handler: (args) =>
-        log().query({
+      handler: (args) => {
+        // group_by "calibration" serves the ETA-vs-actual table (the
+        // standing retro query, req-eta-measured).
+        if (args.group_by === "calibration") return log().calibration();
+        return log().query({
           filter: (args.filter ?? {}) as { tool?: string; ok?: boolean; since?: string; clause?: string },
           group_by: args.group_by === undefined ? undefined : String(args.group_by),
           limit: args.limit === undefined ? undefined : Number(args.limit),
-        }),
+        });
+      },
     },
     {
       name: "se_gate_dismiss",
@@ -531,9 +545,24 @@ export function buildServer(root: string, opts: { tollWindowMs?: number; now?: (
   const server = new McpServer({ name: "se-mcp", version: "2.0.0-bootstrap" }, coreTools(root, { toll, session }));
   server.addGuard((tool) => assertAdmitted(session, tool)); // §7 admission gates the surface
   server.addGuard((tool, args) => toll.check(tool, args, log));
+  // The toll's grace warning rides the successful result it graced.
+  server.addDecorator((_tool, result) => {
+    const w = toll.takeWarning();
+    if (w === undefined) return result;
+    return typeof result === "object" && result !== null && !Array.isArray(result)
+      ? { ...(result as Record<string, unknown>), toll_warning: w }
+      : { result, toll_warning: w };
+  });
   // §9 log-everything: every call through the single MCP path lands raw in
   // the call log — successes too, not just errors (i1 of self-hosting).
   server.addObserver(({ tool, args, ok, duration_ms, outcome, response }) => {
+    // se_run: ONE line, the full record under ITS ref — never a second
+    // summary line beside it (evidence pinning finds the ref here).
+    if (tool === "se_run" && ok && typeof response === "object" && response !== null && "ref" in response) {
+      const r = response as { ref: string; args: Record<string, unknown>; ok: boolean; detail?: Record<string, unknown> };
+      log.append({ ref: r.ref, tool: "se.run", args: r.args, ok: r.ok, duration_ms, detail: r.detail ?? {} });
+      return;
+    }
     const detail: Record<string, unknown> = { outcome };
     if (ok) {
       // Successes carry a capped summary — the board's request+response view

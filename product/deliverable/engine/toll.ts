@@ -26,6 +26,8 @@ interface TollState {
   armed: boolean;
   last_update_ts: number;
   last_update?: TollUpdate;
+  /** A lapsed window warned once already — the next bare call refuses. */
+  warned?: boolean;
 }
 
 export const TOLL_UPDATE_SCHEMA = {
@@ -59,6 +61,7 @@ export class Toll {
   private path: string;
   private windowMs: number;
   private now: () => number;
+  private warning: string | undefined;
 
   constructor(seDir: string, opts: { windowMs?: number; now?: () => number } = {}) {
     this.path = join(seDir, "toll.json");
@@ -76,6 +79,13 @@ export class Toll {
     writeFileSync(this.path, JSON.stringify(s, null, 2) + "\n", "utf8");
   }
 
+  /** The pending grace warning, if any — reading it clears it. */
+  takeWarning(): string | undefined {
+    const w = this.warning;
+    this.warning = undefined;
+    return w;
+  }
+
   /** Called on the first successful submit of the session. */
   arm(): void {
     const s = this.load();
@@ -91,7 +101,7 @@ export class Toll {
     const update = parseUpdate(args.update);
     if (update) {
       log.append({ tool: "se.toll.update", args: { via: toolName, ...update }, ok: true, duration_ms: 0 });
-      this.save({ ...s, armed: true, last_update_ts: this.now(), last_update: update });
+      this.save({ ...s, armed: true, last_update_ts: this.now(), last_update: update, warned: false });
       return;
     }
     if (toolName === "se_loop_submit") {
@@ -117,6 +127,16 @@ export class Toll {
     }
     if (!s.armed) return;
     if (this.now() - s.last_update_ts <= this.windowMs) return;
+    if (s.warned !== true) {
+      // Grace: the first lapsed call proceeds, carrying a warning on its
+      // result (the mcp decorator attaches it). Only ignoring the warning
+      // earns the hard refusal — a smooth rhythm never gets interrupted.
+      this.save({ ...s, warned: true });
+      this.warning =
+        `update overdue (${Math.round((this.now() - s.last_update_ts) / 60000)} min since the last) — ` +
+        "the next call without an update is refused; add the update field to any call";
+      return;
+    }
     throw new Rejection({
       clause: "SE-C-040",
       expected: `an update within ${Math.round(this.windowMs / 60000)} min of the last (schema inline in remedy.args.update)`,

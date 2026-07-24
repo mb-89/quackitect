@@ -1,0 +1,39 @@
+{
+	"metadata": {
+		"version": "1.0-1.0",
+		"frontmatter": {
+			"id": "it.machine-build-steps",
+			"kind": "machine",
+			"statement": "The i4 chunk chain, dependency-ordered - the fan-out drawing arrives once c1's parallel serving is the engine that runs it.",
+			"entry": "start",
+			"reentry": "resume"
+		}
+	},
+	"nodes": [
+		{ "id": "n0", "type": "file", "file": "ledger/it/machine-build-steps-start.md", "x": 0, "y": 0, "width": 420, "height": 120 },
+		{ "id": "n1", "type": "file", "file": "ledger/it/machine-build-steps-c1-serving.md", "x": 0, "y": 180, "width": 420, "height": 120 },
+		{ "id": "n2", "type": "file", "file": "ledger/it/machine-build-steps-c2-children.md", "x": 0, "y": 360, "width": 420, "height": 120 },
+		{ "id": "n3", "type": "file", "file": "ledger/it/machine-build-steps-c3-apply.md", "x": 0, "y": 540, "width": 420, "height": 120 },
+		{ "id": "n4", "type": "file", "file": "ledger/it/machine-build-steps-c4-stamps.md", "x": 0, "y": 720, "width": 420, "height": 120 },
+		{ "id": "n5", "type": "file", "file": "ledger/it/machine-build-steps-c5-guards.md", "x": 0, "y": 900, "width": 420, "height": 120 },
+		{ "id": "n6", "type": "file", "file": "ledger/it/machine-build-steps-c6-lanes.md", "x": 0, "y": 1080, "width": 420, "height": 120 },
+		{ "id": "n7", "type": "file", "file": "ledger/it/machine-build-steps-c7-links.md", "x": 0, "y": 1260, "width": 420, "height": 120 },
+		{ "id": "n8", "type": "file", "file": "ledger/it/machine-build-steps-c8-record.md", "x": 0, "y": 1440, "width": 420, "height": 120 },
+		{ "id": "n9", "type": "file", "file": "ledger/it/machine-build-steps-c9-board.md", "x": 0, "y": 1620, "width": 420, "height": 120 },
+		{ "id": "n10", "type": "file", "file": "ledger/it/machine-build-steps-c10-knowledge.md", "x": 0, "y": 1800, "width": 420, "height": 120 },
+		{ "id": "nd", "type": "file", "file": "ledger/it/machine-build-steps-done.md", "x": 0, "y": 1980, "width": 420, "height": 120, "styleAttributes": { "shape": "terminal" } }
+	],
+	"edges": [
+		{ "id": "e0", "fromNode": "n0", "toNode": "n1", "fromSide": "bottom", "toSide": "top" },
+		{ "id": "e1", "fromNode": "n1", "toNode": "n2", "fromSide": "bottom", "toSide": "top" },
+		{ "id": "e2", "fromNode": "n2", "toNode": "n3", "fromSide": "bottom", "toSide": "top" },
+		{ "id": "e3", "fromNode": "n3", "toNode": "n4", "fromSide": "bottom", "toSide": "top" },
+		{ "id": "e4", "fromNode": "n4", "toNode": "n5", "fromSide": "bottom", "toSide": "top" },
+		{ "id": "e5", "fromNode": "n5", "toNode": "n6", "fromSide": "bottom", "toSide": "top" },
+		{ "id": "e6", "fromNode": "n6", "toNode": "n7", "fromSide": "bottom", "toSide": "top" },
+		{ "id": "e7", "fromNode": "n7", "toNode": "n8", "fromSide": "bottom", "toSide": "top" },
+		{ "id": "e8", "fromNode": "n8", "toNode": "n9", "fromSide": "bottom", "toSide": "top" },
+		{ "id": "e9", "fromNode": "n9", "toNode": "n10", "fromSide": "bottom", "toSide": "top" },
+		{ "id": "e10", "fromNode": "n10", "toNode": "nd", "fromSide": "bottom", "toSide": "top" }
+	]
+}

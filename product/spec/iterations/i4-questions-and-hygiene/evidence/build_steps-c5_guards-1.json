@@ -1,0 +1,9 @@
+{
+  "iteration": "i4-questions-and-hygiene",
+  "state": "build_steps-c5_guards",
+  "at": "2026-07-24T12:03:01.861Z",
+  "payload": {
+    "what_landed": "toll.ts: warned flag + grace (first lapsed call passes, takeWarning; second refuses SE-C-040); mcp.ts: ResultDecorator hook on the success path; tools.ts: warning rides successful results, assertTestRunScope wired on se_run; run.ts: SE-C-053 battery-is-milestone-scoped refusal; bin/se-mcp.ts: canary import-links engine/tools.ts before any child swap, bad fingerprints keep the running engine (req-shim-canary). Drive-by fix the tests exposed: engine-filled states now complete via the token op (advance kept for the failure ladder, with token sync) - gate bless after an engine state was broken since the executor migration; rails' evidence-name assertion moved to the c3 scheme.",
+    "run_ref": "run-04298948b54d"
+  }
+}

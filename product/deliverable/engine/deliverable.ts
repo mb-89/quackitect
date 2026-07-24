@@ -15,18 +15,74 @@ import { layout } from "./layout.ts";
 
 const SRC = "engine/deliverable.ts";
 
-/** Never listed, never searched, never served. */
-const SKIP_DIRS = new Set(["node_modules", "workspace"]);
-const skipEntry = (name: string): boolean => name.startsWith(".") || SKIP_DIRS.has(name);
+/** Never listed, never searched, never served. Dot-paths otherwise SERVE
+ *  (req-dotfile-lane: product/.obsidian is tracked owner content). */
+const SKIP_DIRS = new Set(["node_modules", "workspace", ".git", ".se"]);
+const skipEntry = (name: string): boolean => SKIP_DIRS.has(name);
+
+/** Roots declared on the nameplate: { "roots": { "v1": "<abs path>", ... } }. */
+function declaredRoots(root: string): Record<string, string> {
+  const p = layout.nameplatePath(root);
+  if (!existsSync(p)) return {};
+  try {
+    return (JSON.parse(readFileSync(p, "utf8")) as { roots?: Record<string, string> }).roots ?? {};
+  } catch {
+    return {};
+  }
+}
+
+/** True for lane paths addressing a declared root, e.g. "@v1/engine/x.ts". */
+const isRootRef = (path: string): boolean => path.startsWith("@");
+
+/** Resolve "@name/rest" against the declared roots (read lanes only). */
+function resolveDeclaredRoot(root: string, path: string): string {
+  const [name, ...rest] = path.slice(1).split(/[\\/]+/);
+  const roots = declaredRoots(root);
+  const target = roots[name];
+  if (target === undefined) {
+    throw new Rejection({
+      clause: "SE-C-069",
+      expected: `a declared root (${Object.keys(roots).join(", ") || "none declared"})`,
+      got: `@${name}`,
+      remedy: { tool: "se_file_read", args: { path: "product.json" }, note: 'roots are declared on the nameplate under "roots"' },
+      source: SRC,
+    });
+  }
+  const base = resolve(target);
+  const abs = resolve(base, rest.join("/"));
+  if (abs !== base && !abs.startsWith(base + sep)) {
+    throw new Rejection({
+      clause: "SE-C-060",
+      expected: `a path inside the declared root @${name}`,
+      got: path,
+      remedy: { tool: "se_file_list", args: { dir: `@${name}` }, note: "no escapes out of a declared root" },
+      source: SRC,
+    });
+  }
+  return abs;
+}
+
+/** Declared roots are research surfaces, never write targets (SE-C-070). */
+function refuseRootWrite(path: string): void {
+  if (!isRootRef(path)) return;
+  throw new Rejection({
+    clause: "SE-C-070",
+    expected: "a product path (declared roots are read-only)",
+    got: path,
+    remedy: { tool: "se_file_read", args: { path }, note: "copy what you need into the product; foreign repos are never edited from here" },
+    source: SRC,
+  });
+}
 
 /** Resolve a root-relative path; refuse escapes and agent territory (SE-C-060). */
 function resolveInside(root: string, path: string): string {
+  if (isRootRef(path)) return resolveDeclaredRoot(root, path);
   const base = resolve(root);
   const abs = resolve(base, path);
   const inside = abs === base || abs.startsWith(base + sep);
   const rel = inside ? relative(base, abs) : "";
   const topSegment = rel.split(sep)[0] ?? "";
-  if (!inside || topSegment === "workspace" || topSegment.startsWith(".")) {
+  if (!inside || topSegment === "workspace" || topSegment === ".git") {
     throw new Rejection({
       clause: "SE-C-060",
       expected: "a path inside the product root (workspace/ and dot-dirs are not the lane's)",
@@ -68,10 +124,12 @@ export function fileList(root: string, dir = "."): { path: string; kind: "file" 
     });
   }
   const base = resolve(root);
+  const display = (name: string): string =>
+    isRootRef(dir) ? `${dir.replace(/[\\/]+$/, "")}/${name}` : relative(base, join(abs, name)).replaceAll(sep, "/");
   return readdirSync(abs, { withFileTypes: true })
     .filter((e) => !skipEntry(e.name))
     .map((e) => ({
-      path: relative(base, join(abs, e.name)).replaceAll(sep, "/"),
+      path: display(e.name),
       kind: e.isDirectory() ? ("dir" as const) : ("file" as const),
     }))
     .sort((a, b) => a.path.localeCompare(b.path));
@@ -226,6 +284,7 @@ export function fileRead(root: string, path: string): LaneFile {
  * is new; otherwise it must match the current disk hash.
  */
 export function fileWrite(root: string, path: string, content: string, baseHash: string | null): LaneFile {
+  refuseRootWrite(path);
   const abs = resolveInside(root, path);
   refuseLedgerWrite(root, abs, path);
   const exists = existsSync(abs);
@@ -269,6 +328,7 @@ export function fileWrite(root: string, path: string, content: string, baseHash:
  * precondition, so no base_hash is needed; pass one to double-guard.
  */
 export function filePatch(root: string, path: string, oldString: string, newString: string, baseHash?: string): LaneFile {
+  refuseRootWrite(path);
   refuseLedgerWrite(root, resolveInside(root, path), path);
   const current = fileRead(root, path);
   if (baseHash !== undefined && baseHash !== current.hash) {
@@ -302,6 +362,7 @@ export function filePatch(root: string, path: string, oldString: string, newStri
 
 /** Hash-guarded delete: base_hash must match disk — no blind removal. */
 export function fileDelete(root: string, path: string, baseHash: string): { path: string; deleted: true } {
+  refuseRootWrite(path);
   const abs = resolveInside(root, path);
   refuseLedgerWrite(root, abs, path);
   const current = fileRead(root, path);

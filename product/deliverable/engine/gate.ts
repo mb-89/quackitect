@@ -8,13 +8,13 @@
 // flag 2; delegated adjudication is a policy knob — agent blesses are legal
 // where enabled and transparently recorded).
 import { appendFileSync, existsSync, mkdirSync, rmSync, writeFileSync } from "node:fs";
-import { dirname } from "node:path";
+import { dirname, join } from "node:path";
 import { readJsonFile } from "./jsonio.ts";
 import { Rejection } from "./errors.ts";
 import { sha256 } from "./hash.ts";
 import { layout } from "./layout.ts";
-import { advance, type MachineDecl, type MachineInstance } from "./machine.ts";
-import { loadMachine } from "./machines/load.ts";
+import { completeState, type MachineDecl, type MachineInstance } from "./machine.ts";
+import { loadIterationMachine, loadMachine } from "./machines/load.ts";
 import { importStamps } from "./modules.ts";
 import { openCommitWindow } from "./git.ts";
 
@@ -123,7 +123,12 @@ export class Gate {
         source: "engine/gate.ts bless",
       });
     }
-    const instPath = layout.instancePath(this.root, offer.iteration);
+    // Child offers carry "iteration#state" — the bless routes to the child record.
+    const [iterName, childOf] = offer.iteration.split("#");
+    const instPath =
+      childOf !== undefined
+        ? join(layout.iterationDir(this.root, iterName), `sub-${childOf}.json`)
+        : layout.instancePath(this.root, offer.iteration);
     const inst = readJsonFile<MachineInstance>(instPath);
     if (inst.current !== offer.state || inst.status !== "open") {
       throw new Rejection({
@@ -136,7 +141,12 @@ export class Gate {
     }
     // The instance's own machine wins (floor flag 1) — a bless must advance
     // the machine the iteration started under, not the ledger's current default.
-    const m = machine.id === inst.machine ? machine : loadMachine(this.root, inst.machine) ?? machine;
+    const m =
+      childOf !== undefined
+        ? loadIterationMachine(this.root, iterName, childOf) ?? machine
+        : machine.id === inst.machine
+          ? machine
+          : loadMachine(this.root, inst.machine) ?? machine;
     const grant: GrantRecord = {
       iteration: offer.iteration,
       state: offer.state,
@@ -152,7 +162,8 @@ export class Gate {
     appendFileSync(this.grantsPath(), JSON.stringify(grant) + "\n", "utf8");
     openCommitWindow(this.root, `grant:${grant.hash.slice(0, 12)}`);
     inst.history.push({ state: offer.state, outcome: "filled", evidence: `grant:${grant.hash.slice(0, 12)}`, at: grant.at });
-    advance(m, inst, "filled", grant.at);
+    // A blessed gate fires ALL its approval edges - fanned milestones open in parallel.
+    completeState(m, inst, offer.state, "filled", grant.at);
     writeFileSync(instPath, JSON.stringify(inst, null, 2) + "\n", "utf8");
     this.dismiss();
     return grant;

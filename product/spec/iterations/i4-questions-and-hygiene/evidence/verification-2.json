@@ -1,0 +1,13 @@
+{
+  "iteration": "i4-questions-and-hygiene",
+  "state": "verification",
+  "at": "2026-07-24T12:38:09.516Z",
+  "payload": {
+    "run_ref": "run-e344d847a4ee",
+    "command": "npm --prefix product/deliverable run verify --loglevel=error",
+    "exit": 1
+  },
+  "pinned_run": {
+    "ref": "run-e344d847a4ee"
+  }
+}

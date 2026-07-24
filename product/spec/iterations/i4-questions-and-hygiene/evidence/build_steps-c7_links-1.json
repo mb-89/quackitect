@@ -1,0 +1,9 @@
+{
+  "iteration": "i4-questions-and-hygiene",
+  "state": "build_steps-c7_links",
+  "at": "2026-07-24T12:21:00.103Z",
+  "payload": {
+    "what_landed": "apply.ts: rename op (SE-C-013/014 guards, kebab id law) moves the node and rewrites EVERY inbound reference in the same apply - edges map, extra id-refs (source_refs and friends, deep walk), body/statement links incl. #section anchors and same-module relative links, canvas file refs; plan_insert/plan_renumber ops mutate plan.json as a raw diff entry through the same dry_run->execute lane (SE-C-071: started iterations frozen, depends_on renumbers along); execute grew a raw-bytes CAS branch for non-node files. The link graph derives live from the loaded ledger at apply time - no persisted index to go stale. c7 2/2 + apply regression 6/6 in run-55f90b0d38bc.",
+    "run_ref": "run-55f90b0d38bc"
+  }
+}

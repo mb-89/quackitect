@@ -6,7 +6,7 @@ provenance:
   migrated_by: se.set.migrate v1-import
   iteration: bootstrap-b3
   ai_involvement: engine-migrated
-  adjudicated_by: pending-owner
+  adjudicated_by: owner
 v1_statement: "The Pugh data format extends frontmatter: a weight field on criterion, a datum field on decision. Chosen over a config block, which invents a second map convention."
 status: resolved
 verdict: import — carried as se.adr-pugh-fields (owner, 2026-07-23)
