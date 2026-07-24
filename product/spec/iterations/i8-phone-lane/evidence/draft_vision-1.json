@@ -1,0 +1,11 @@
+{
+  "iteration": "i8-phone-lane",
+  "state": "draft_vision",
+  "at": "2026-07-24T14:27:33.895Z",
+  "payload": {
+    "big_idea": "Inherit se.vision. The i8 delta in one breath: the gate offer that today only reaches the board now also reaches the owner's PHONE - a high-entropy ntfy topic carries the brief out as a one-tap action and carries the tap back as a hash-bound bless, so a gate can be adjudicated from the grocery queue within the 6h offer window. Lineage: the v1 phone lane (adr-ntfy-actions, adr-answer-authenticity, adr-kofmqtq - ntfy suffices, Slack retired), re-realized on the v2 engine's gate/grant machinery.",
+    "to_be_world": "Inherit se.vision's to-be world; the delta scene: a gate offers while the owner is away; the engine publishes the brief to the paired ntfy topic; the phone buzzes with the offer and a 'bless' action button; one tap PUTs to the answer topic; the engine's watcher sees the answer, matches its correlation id to the live offer's hash, and records a grant channel=phone - the same hash-bound, channel-stamped bless the console and chat give, just from a pocket. A late or duplicate tap is idempotently ignored; a tap for a stale offer no longer binds.",
+    "goal_system": "Inherited goals unchanged; the delta priorities with conflicts named: (1) reachability beats ceremony - the owner should adjudicate in one tap, not a login; (2) the bless stays HASH-BOUND and CHANNEL-STAMPED - a phone bless is as auditable as chat-grant, never a bare 'yes'; (3) authenticity = possession of the paired channel credential, and the residual forgery risk is ACCEPTED (adr-answer-authenticity, owner-ruled, red-teamed - the industry baseline is identical). Conflict named: convenience (one tap, no auth) vs security (no forged bless) - resolved exactly as v1 ruled: high-entropy topic + correlation id + idempotent dedup, upgrade path to token-ACL ntfy recorded.",
+    "moore_pitch": "FOR the owner who blesses gates but is not always at the desk WHO would otherwise stall a 6h offer until they return, THE phone lane IS an ntfy push-and-reply channel THAT delivers the offer brief and returns a hash-bound bless in one tap, UNLIKE the board and console which require being at the machine, OURS makes from-away adjudication a first-class, channel-stamped, idempotent bless - not a second-class 'reply yes'."
+  }
+}

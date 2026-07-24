@@ -1,0 +1,8 @@
+{
+  "iteration": "i8-phone-lane",
+  "state": "define_actual",
+  "at": "2026-07-24T14:27:54.532Z",
+  "payload": {
+    "as_is": "Pain 1 - a gate offer reaches only the board and the console: if the owner is away from the machine, a blessed-worthy offer sits untouched until they return; the 6h offer window can expire on a decision the owner would have made in one tap (witness: TODAY's session - the owner left for groceries and every gate had to be self-blessed under a delegation grant precisely because there was no way to reach them; the delegation is a workaround for the missing channel). Pain 2 - the v2 engine has NO outbound notification path at all: pokeBoard nudges a local browser tab and nothing else; there is no publish, no topic, no phone (witness: engine/board.ts is the only 'notify' surface, and it is localhost-only). Pain 3 - there is no inbound adjudication channel besides console/chat/board: the gate machinery accepts a bless only from a process with local access to the offer hash; a person holding a phone across town cannot produce one (witness: se_gate_bless and bin/se-gate.ts both require local offer access; Gate.bless takes a hash the caller must already hold). Pain 4 - the v1 phone lane that solved all of this (ntfy pairing, X-Actions asks, hash-bound blesses, proven end-to-end) exists only as MIGRATED DECISION NODES in the v2 ledger, not as running code - the design shipped in v1's i15/i16 and was re-verified 2026-07-21, but no v2 engine module realizes it (witness: adr-ntfy-actions/adr-answer-authenticity/adr-kofmqtq are 'keep' verdicts with no v2 realization; grep of engine/ finds zero ntfy code)."
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "iteration": "i8-phone-lane",
+  "state": "gate_motivation",
+  "at": "2026-07-24T14:29:36.080Z",
+  "payload": {
+    "vision_scope_stated": "Complete in the M1 chain: inherited vision + phone delta (idea, to-be scene, goal priorities with the convenience-vs-security conflict resolved as v1 ruled), Moore pitch filled, scope = realize the inherited design on v2 against mock transport, non-goals = live pairing/from-away demo/live endpoint/secrets/Slack all explicitly out.",
+    "problem_agreed": "The delta is real and proven TODAY: the whole delegated run exists because a gate offer cannot reach an away owner - the delegation is the workaround standing in for this exact lane. The goal is worth having because from-away adjudication turns the 6h window from a stall risk into a one-tap decision, and because delegation should be a CHOICE the owner makes, not the only option when they step out.",
+    "prior_art_positioned": "Positioned against the field in adr-answer-authenticity's own comparison (HA context.id, LangGraph thread_id, gotoHuman meta) plus PagerDuty-style mobile ack: all take a correlation-id-possession ack (identical trust model to ours), but none produce a hash-bound, channel-stamped GRANT recorded beside desk blesses; raw ntfy sheds process; v1's own phone lane is the direct predecessor - it shipped and proved end-to-end, and this iteration re-realizes it on v2.",
+    "success_measurable": "Every need carries a mechanical pass line: a correct simulated tap -> a channel=phone grant bound to the offer hash (test); stale/duplicate taps -> unchanged grant chain (test); publish is a pure function to an injectable transport, mock-tested, no live topic touched (test); missing config -> graceful disable, no secret logged (test). The live from-away tap is the one owner-physical pass line, carried as a RAID trigger.",
+    "risks_logged": "Five entries with owners and triggers (accepted forgery risk per the inherited ruling, unattended-live-endpoint fenced to mock, secret-is-owner-config, idempotent dedup, reachability-with-fallback) plus the carried raid-answer-forgery re-affirmed.",
+    "offer_hash": "01c3414a4af424bc25a60830d0808ec9e8fa57c722c33ca8fa51ae916290d7f8"
+  }
+}

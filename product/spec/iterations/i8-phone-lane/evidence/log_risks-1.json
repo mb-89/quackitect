@@ -1,0 +1,8 @@
+{
+  "iteration": "i8-phone-lane",
+  "state": "log_risks",
+  "at": "2026-07-24T14:28:13.193Z",
+  "payload": {
+    "raid_opened": "R1 (risk, owner, trigger = live pairing): forged bless - anyone who learns the answer topic could publish a tap; ACCEPTED per adr-answer-authenticity (authenticity = possession of the paired credential, red-teamed, industry-standard), mitigated by high-entropy minted topics + correlation-id matching + idempotent dedup; upgrade path to token-ACL ntfy recorded. R2 (risk, driving agent, trigger = M6 spike): unattended live inbound - a watcher that closes gates from an internet reply must NOT run wired to a real public topic during this unattended delegated build; the build proves the mechanism against a MOCK/loopback endpoint only, the live topic is the owner-physical pairing step. R3 (risk, driving agent, trigger = M4): secret handling - the ntfy topic/token is a credential; it must live in owner-provided config, never be minted-and-logged by the agent, never entered by the agent (prohibited); the design must read it from a config file the owner populates. R4 (issue, driving agent, trigger = M7): stale/duplicate taps - a tap for an expired or already-resolved offer must be idempotently ignored, matching the v1 ruling; without it a late tap could bind the wrong gate. R5 (risk, owner, trigger = from-away demo): reachability failure - ntfy delivery is best-effort; a missed push must not lose the offer (the 6h window + board fallback cover it). Carried: raid-answer-forgery (WRITTEN, inherited from v1, re-affirmed)."
+  }
+}

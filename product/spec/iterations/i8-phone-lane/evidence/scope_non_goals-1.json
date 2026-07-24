@@ -1,0 +1,9 @@
+{
+  "iteration": "i8-phone-lane",
+  "state": "scope_non_goals",
+  "at": "2026-07-24T14:28:55.479Z",
+  "payload": {
+    "scope": "Takes on the realization of the inherited phone-lane design on the v2 engine: (1) an outbound publish - when a gate offers, push the brief + a bless action to the paired ntfy topic, through an INJECTABLE transport (real ntfy via config, mock in test); (2) an inbound answer path - a watcher/poll that reads the answer topic, matches a tap's correlation id to the live offer hash, and calls the existing Gate.bless with channel=phone; (3) idempotent dedup - stale, duplicate, and wrong-offer taps ignored; (4) config-driven credentials - topic/token from an owner-populated config file, the lane disables gracefully when absent; (5) the plain-reply degraded path documented (adr-ntfy-actions' fallback). All proven against mock/loopback; every gate self-blessed under the delegation.",
+    "non_goals": "Live pairing to the owner's real device (owner-physical, RAID). The real from-away bless demonstration (owner-physical, RAID). Wiring a live public ntfy topic during this unattended build (R2 - mock only). Minting or entering any ntfy token/secret (prohibited - owner config only). Slack (retired, adr-kofmqtq). Asks/questions beyond gate blesses (the plan scopes i8 to the bless path; general ask-over-phone can follow). Any i9 board work or the ETA redesign."
+  }
+}

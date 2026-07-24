@@ -1,0 +1,73 @@
+{
+  "machine": "systematic",
+  "iteration": "i8-phone-lane",
+  "current": "draw_context",
+  "counters": {},
+  "history": [
+    {
+      "state": "onboard_retro",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i8-phone-lane/evidence/onboard_retro-1.json",
+      "at": "2026-07-24T14:25:52.507Z"
+    },
+    {
+      "state": "gate_kickoff",
+      "outcome": "filled",
+      "evidence": "grant:88a85b2d481c",
+      "at": "2026-07-24T14:26:35.947Z"
+    },
+    {
+      "state": "draft_vision",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i8-phone-lane/evidence/draft_vision-1.json",
+      "at": "2026-07-24T14:27:33.896Z"
+    },
+    {
+      "state": "define_actual",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i8-phone-lane/evidence/define_actual-1.json",
+      "at": "2026-07-24T14:27:54.533Z"
+    },
+    {
+      "state": "log_risks",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i8-phone-lane/evidence/log_risks-1.json",
+      "at": "2026-07-24T14:28:13.194Z"
+    },
+    {
+      "state": "frame_delta",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i8-phone-lane/evidence/frame_delta-1.json",
+      "at": "2026-07-24T14:28:39.279Z"
+    },
+    {
+      "state": "scope_non_goals",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i8-phone-lane/evidence/scope_non_goals-1.json",
+      "at": "2026-07-24T14:28:55.480Z"
+    },
+    {
+      "state": "pressure_test",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i8-phone-lane/evidence/pressure_test-1.json",
+      "at": "2026-07-24T14:29:17.240Z"
+    },
+    {
+      "state": "gate_motivation",
+      "outcome": "filled",
+      "evidence": "grant:01c3414a4af4",
+      "at": "2026-07-24T14:29:46.288Z"
+    }
+  ],
+  "escapes": [],
+  "status": "open",
+  "fired": [],
+  "active": [
+    "draw_context",
+    "map_stakeholders",
+    "write_stories"
+  ],
+  "claims": {
+    "draw_context": "main"
+  }
+}

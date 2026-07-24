@@ -1,0 +1,13 @@
+{
+  "iteration": "i8-phone-lane",
+  "state": "gate_kickoff",
+  "at": "2026-07-24T14:26:18.091Z",
+  "payload": {
+    "retro_drained": "Every inbox note has a recorded disposition: one drained (the flicker watch-item, fixed in i5), fourteen kept with explicit keep-reasons - all owner-judgment or not-delegated (the i9 board-consolidation set, the ETA-on-steps redesign, the test-command demand, subagent parallelism, and the id-law/method-drawing/JSON-fallback leads). Per the owner's standing ruling, what needs their judgment stays parked with its reason rather than force-drained.",
+    "goal": "Offers reach the phone; a bless works from anywhere within the 6h window (i8-phone-lane, planned goal confirmed verbatim).",
+    "pulled_in": "From the plan: (1) offer briefs push to the phone via ntfy when a gate offers; (2) bless-by-reply carrying the hash - a reply from the phone lands as a bless, channel-stamped so it cannot be forged. From the retro: the from-away transparency requirement (a phone bless records its own channel, exactly as chat-grant does - the delegation run proved this matters). Everything runs under se.decision-delegated-adjudication - every i8 gate self-blessed with the agent stamp.",
+    "left_out": "The two OWNER-PHYSICAL steps the plan flags (pair the phone channel once; bless one real gate from away) - these need the owner's actual device and are explicitly NOT delegated; they park as RAID triggers, exactly as i5's live-parallel demo did. The machinery is built and proven against a mock ntfy endpoint + simulated reply; the live human validation waits for the owner. Also out: Slack (deferred since i15), any i9 board work, the ETA redesign.",
+    "rigor": "Systematic, unpruned - this adds an external I/O channel (network push, inbound reply parsing, a secret token) touching the security-sensitive bless path; the full M0-M9 walk with spikes on the real ntfy channel is exactly what de-risks letting a phone reply close a gate. No strikes.",
+    "offer_hash": "88a85b2d481c0846d36dee5c7b7702eabe50c2131878774a162d692b0440bd74"
+  }
+}
