@@ -1,0 +1,24 @@
+{
+  "metadata": {
+    "version": "1.0-1.0",
+    "frontmatter": {
+      "id": "it.machine-build-steps",
+      "kind": "machine",
+      "statement": "i8's build: the phone lane in three chunks, dependency-ordered.",
+      "entry": "start"
+    }
+  },
+  "nodes": [
+    { "id": "n0", "type": "file", "file": "ledger/it/machine-build-steps-start.md", "x": 0, "y": 0, "width": 260, "height": 60 },
+    { "id": "n1", "type": "file", "file": "ledger/it/machine-build-steps-c1-lane-core.md", "x": 0, "y": 120, "width": 260, "height": 60 },
+    { "id": "n2", "type": "file", "file": "ledger/it/machine-build-steps-c2-transport.md", "x": 0, "y": 240, "width": 260, "height": 60 },
+    { "id": "n3", "type": "file", "file": "ledger/it/machine-build-steps-c3-board-hook.md", "x": 0, "y": 360, "width": 260, "height": 60 },
+    { "id": "n4", "type": "file", "file": "ledger/it/machine-build-steps-done.md", "x": 0, "y": 480, "width": 260, "height": 60 }
+  ],
+  "edges": [
+    { "id": "e0", "fromNode": "n0", "toNode": "n1", "fromSide": "bottom", "toSide": "top" },
+    { "id": "e1", "fromNode": "n1", "toNode": "n2", "fromSide": "bottom", "toSide": "top" },
+    { "id": "e2", "fromNode": "n2", "toNode": "n3", "fromSide": "bottom", "toSide": "top" },
+    { "id": "e3", "fromNode": "n3", "toNode": "n4", "fromSide": "bottom", "toSide": "top" }
+  ]
+}

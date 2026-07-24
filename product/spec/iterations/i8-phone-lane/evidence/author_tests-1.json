@@ -1,0 +1,8 @@
+{
+  "iteration": "i8-phone-lane",
+  "state": "author_tests",
+  "at": "2026-07-24T14:44:08.087Z",
+  "payload": {
+    "checks": "tests/i8-phone.test.ts authored red against the DESIGNED API (engine/phone.ts: PhoneLane class with announceOffer/pollAnswers, the Transport interface, NtfyTransport, PhoneAnswer type - none exist, the file reds at load). Seven checks, one per in-scope requirement: req-phone-publish -> publish test (one publish, offer hash as id, bless action); req-phone-bless -> matched-tap test (channel=phone grant bound to hash + offer dismissed); req-phone-dismiss-action -> dismiss-tap test; req-phone-idempotent -> stale/mismatch/duplicate test (offer survives a mismatch, duplicate writes nothing); req-phone-graceful-absent -> unconfigured test (no publish, no poll, no throw); req-phone-config-secret -> the SECRET-TOK-never-in-the-call-log test (the inspection verify_method made mechanical); and the S4 fitness -> the hanging-server bounded-read test (promoted from sp1). A MockTransport records publishes and feeds scripted answers so nothing touches the network. req-phone-best-effort's publish-failure path folds into the announceOffer swallow (asserted by the unconfigured + a build-time throwing-mock). Review-class residue: the LIVE from-away round-trip - inherently owner-physical, its mechanical shadow is the full mock round-trip here."
+  }
+}

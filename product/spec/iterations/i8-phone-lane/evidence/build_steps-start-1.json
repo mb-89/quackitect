@@ -1,0 +1,8 @@
+{
+  "iteration": "i8-phone-lane",
+  "state": "build_steps-start",
+  "at": "2026-07-24T14:45:41.482Z",
+  "payload": {
+    "plan": "Chain as drawn: c1 lane core (config + announceOffer + pollAnswers against the injected Transport) -> c2 real transport (NtfyTransport over fetch with the sp1 timeout + token-hiding) -> c3 board hook (wire into the live board tick). The promoted sp1 timeout pattern lands in c2 and its fixture is the S4 red check already in the file; each chunk greens its named test slice and re-runs the board/rails neighbours it touches."
+  }
+}

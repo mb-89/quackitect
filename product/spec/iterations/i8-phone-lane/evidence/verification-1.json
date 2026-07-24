@@ -1,0 +1,13 @@
+{
+  "iteration": "i8-phone-lane",
+  "state": "verification",
+  "at": "2026-07-24T14:49:15.284Z",
+  "payload": {
+    "run_ref": "run-d5eeaa67fad6",
+    "command": "npm --prefix product/deliverable run verify --loglevel=error",
+    "exit": 0
+  },
+  "pinned_run": {
+    "ref": "run-d5eeaa67fad6"
+  }
+}

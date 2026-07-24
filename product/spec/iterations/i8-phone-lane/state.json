@@ -1,7 +1,7 @@
 {
   "machine": "systematic",
   "iteration": "i8-phone-lane",
-  "current": "author_tests",
+  "current": "fill_story_evidence",
   "counters": {},
   "history": [
     {
@@ -195,13 +195,49 @@
       "outcome": "filled",
       "evidence": "grant:f081da9a3657",
       "at": "2026-07-24T14:42:42.575Z"
+    },
+    {
+      "state": "author_tests",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i8-phone-lane/evidence/author_tests-1.json",
+      "at": "2026-07-24T14:44:08.088Z"
+    },
+    {
+      "state": "plan_build",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i8-phone-lane/evidence/plan_build-1.json",
+      "at": "2026-07-24T14:45:00.157Z"
+    },
+    {
+      "state": "observe_red",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i8-phone-lane/evidence/observe_red-1.json",
+      "at": "2026-07-24T14:45:28.266Z"
+    },
+    {
+      "state": "build_steps",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i8-phone-lane/evidence/build_steps-1.json",
+      "at": "2026-07-24T14:48:34.055Z"
+    },
+    {
+      "state": "verification",
+      "outcome": "filled",
+      "evidence": "run-d5eeaa67fad6",
+      "at": "2026-07-24T14:49:15.285Z"
+    },
+    {
+      "state": "gate_implementation",
+      "outcome": "filled",
+      "evidence": "grant:47c840747f86",
+      "at": "2026-07-24T14:49:51.731Z"
     }
   ],
   "escapes": [],
   "status": "open",
   "fired": [],
   "active": [
-    "author_tests"
+    "fill_story_evidence"
   ],
   "claims": {}
 }

@@ -1,0 +1,9 @@
+{
+  "iteration": "i8-phone-lane",
+  "state": "build_steps-c1_lane_core",
+  "at": "2026-07-24T14:46:53.604Z",
+  "payload": {
+    "what_landed": "engine/phone.ts core (E1+E3+E4): the Transport interface + PhoneAnswer type (the injectable boundary), loadPhoneConfig reading seDir/phone.json with graceful-absent (disabled/missing/incomplete -> null), PhoneLane.announceOffer (config gate, builds the brief + bless/dismiss actions with id=offer.base_hash, publishes, swallows failures to the log as best-effort), PhoneLane.pollAnswers (pollSince from a cursor, matches a.id to Gate.current().base_hash, blesses channel=phone or dismisses, advances the cursor, ignores stale/mismatch/duplicate via an applied-id set). Six of the seven checks green (publish, bless, dismiss, idempotent, graceful-absent, secret-never-logged) in run-23dffc8b9af7.",
+    "run_ref": "run-23dffc8b9af7"
+  }
+}

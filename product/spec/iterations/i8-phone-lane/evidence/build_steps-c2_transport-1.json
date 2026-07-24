@@ -1,0 +1,9 @@
+{
+  "iteration": "i8-phone-lane",
+  "state": "build_steps-c2_transport",
+  "at": "2026-07-24T14:47:08.400Z",
+  "payload": {
+    "what_landed": "engine/phone.ts NtfyTransport (E2): implements the Transport interface against an ntfy base URL - publish POSTs the message with the X-Actions header carrying the bless/dismiss actions and X-Tags carrying the correlation id (adr-ntfy-actions); pollSince GETs the /json?poll&since endpoint and parses '<action> <id>' bodies into PhoneAnswers; BOTH requests wrap fetch in AbortSignal.timeout (the promoted sp1 pattern, default 8s) so a stalled ntfy never wedges the caller; the token lives ONLY inside the Authorization header builder, never in a returned object or a logged arg (the S2 duty). The S4 bounded-read test passed against a real hanging local server (run-23dffc8b9af7, 326ms); the secret-never-logged test confirms the token-hiding.",
+    "run_ref": "run-23dffc8b9af7"
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "machine": "build-steps",
+  "iteration": "i8-phone-lane#build_steps",
+  "current": "done",
+  "counters": {},
+  "history": [
+    {
+      "state": "start",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i8-phone-lane/evidence/build_steps-start-1.json",
+      "at": "2026-07-24T14:45:41.482Z"
+    },
+    {
+      "state": "c1_lane_core",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i8-phone-lane/evidence/build_steps-c1_lane_core-1.json",
+      "at": "2026-07-24T14:46:53.605Z"
+    },
+    {
+      "state": "c2_transport",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i8-phone-lane/evidence/build_steps-c2_transport-1.json",
+      "at": "2026-07-24T14:47:08.401Z"
+    },
+    {
+      "state": "c3_board_hook",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i8-phone-lane/evidence/build_steps-c3_board_hook-1.json",
+      "at": "2026-07-24T14:48:34.042Z"
+    }
+  ],
+  "escapes": [],
+  "status": "closed",
+  "fired": [],
+  "active": [
+    "done"
+  ]
+}

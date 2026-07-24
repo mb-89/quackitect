@@ -1,0 +1,9 @@
+{
+  "iteration": "i8-phone-lane",
+  "state": "plan_build",
+  "at": "2026-07-24T14:45:00.156Z",
+  "payload": {
+    "build_machine": "it.machine-build-steps drawn into the iteration (canvas + 5 notes, chain-ordered): start -> c1_lane_core (engine-ts, E1+E3+E4 against the injected Transport) -> c2_transport (engine-ts, E2 NtfyTransport over fetch with the timeout + token-hiding duties) -> c3_board_hook (engine-ts + board-html, E5 wiring into the live board) -> done. Dependencies real: c1 defines the Transport interface c2 implements; c3 wires c1+c2 into the board. Each chunk carries its realization kind so the guidance registry serves the discipline.",
+    "promotions_placed": "sp1's AbortSignal.timeout pattern is placed in c2 (the NtfyTransport's publish/pollSince timeout) and its hanging-server fixture is already the S4 test in the red file; the promotion enters as the RED CHECK c2 greens rather than a separate starting chunk."
+  }
+}

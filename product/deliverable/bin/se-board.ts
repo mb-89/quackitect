@@ -21,6 +21,7 @@ import { requireSystematic } from "../engine/machines/load.ts";
 import { BOARD_PORT } from "../engine/board.ts";
 import { projectState, BOARD_VERSION } from "../engine/project.ts";
 import { Rejection } from "../engine/errors.ts";
+import { PhoneLane, NtfyTransport, loadPhoneConfig } from "../engine/phone.ts";
 
 const args = process.argv.slice(2);
 const rootIdx = args.indexOf("--root");
@@ -671,3 +672,29 @@ server.listen(port, "127.0.0.1", () => {
   console.log(`se-board ${BOARD_VERSION} — ${liveUrl} (root: ${root})`);
   openBrowser();
 });
+
+// The phone lane (i8, E5): opt-in. When phone.json is present, push new
+// offers out and poll taps in from this already-supervised process; every
+// call is best-effort so a lane error never disturbs the board. Absent
+// config => phoneLane stays null and nothing runs (the board test never
+// touches the network).
+const phoneCfg = loadPhoneConfig(root);
+if (phoneCfg !== null) {
+  const lane = new PhoneLane(root, new NtfyTransport(phoneCfg.base ?? "https://ntfy.sh", { token: phoneCfg.token }));
+  let lastAnnounced: string | null = null;
+  const phoneTick = async (): Promise<void> => {
+    try {
+      const offer = new Gate(root).current();
+      const h = offer ? offer.base_hash : null;
+      if (h !== null && h !== lastAnnounced) {
+        await lane.announceOffer();
+        lastAnnounced = h;
+      }
+      if (h === null) lastAnnounced = null;
+      await lane.pollAnswers();
+    } catch (e) {
+      console.error("se-board phone lane", e);
+    }
+  };
+  setInterval(() => void phoneTick(), 3000);
+}

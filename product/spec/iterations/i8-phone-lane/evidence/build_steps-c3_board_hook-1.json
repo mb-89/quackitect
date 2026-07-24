@@ -1,0 +1,9 @@
+{
+  "iteration": "i8-phone-lane",
+  "state": "build_steps-c3_board_hook",
+  "at": "2026-07-24T14:48:34.041Z",
+  "payload": {
+    "what_landed": "bin/se-board.ts (E5): on listen, loadPhoneConfig(root) - if present, construct a PhoneLane over a real NtfyTransport(base, {token}) and start a 3s phoneTick that announces a NEW offer once (guarded by lastAnnounced so it never re-publishes the same offer) and polls answers each tick; every call is try/caught so a lane error only logs and the board keeps ticking. Absent config -> phoneLane null, nothing runs (the board test spawns with no phone.json and stays offline). phone.ts PhoneConfig gained base (defaults to the public ntfy). The lane runs in the board's already-supervised process, inheriting its liveness (adr-phone-poll-in-board). Verified: phone 7/7 AND board.test still green with the hook wired in (run-bdf502bd34bf); no live topic touched.",
+    "run_ref": "run-bdf502bd34bf"
+  }
+}

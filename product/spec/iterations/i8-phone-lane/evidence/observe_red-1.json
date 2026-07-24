@@ -1,0 +1,8 @@
+{
+  "iteration": "i8-phone-lane",
+  "state": "observe_red",
+  "at": "2026-07-24T14:45:28.265Z",
+  "payload": {
+    "red_observed": "run-75f1e98d4d3e: the whole i8-phone test file fails at LOAD - engine/phone.ts does not exist (the import of PhoneLane/Transport/NtfyTransport/PhoneAnswer resolves to nothing), so all seven checks are red by construction (0 pass, 1 fail file). No check is green with no realized design: publish, bless, dismiss, idempotent, graceful-absent, secret-in-log, and the bounded-read guard all await engine/phone.ts. Red observed before any code lands."
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "iteration": "i8-phone-lane",
+  "state": "gate_implementation",
+  "at": "2026-07-24T14:49:40.514Z",
+  "payload": {
+    "build_planned": "The seeded chunk machine (it.machine-build-steps) walked start -> c1_lane_core -> c2_transport -> c3_board_hook -> done, each with its green run ref; sub-build_steps.json is the record. The spike machine (machine-rank-unknowns) ran to terminal at M6.",
+    "models_adhered": "Every landing filled an allocated element E1-E5: E1 config loader (loadPhoneConfig), E2 Transport interface + NtfyTransport, E3 announceOffer, E4 pollAnswers, E5 the board hook - all in engine/phone.ts + the bin/se-board.ts wiring, exactly the baseline. NO unsanctioned element: nothing new surfaced mid-build (the design's maturity - inherited and spiked - meant zero architecture surprises). The reused seams (Gate, offer store, seDir, board tick) were touched exactly as the interface set declared.",
+    "red_observed": "observe_red pinned the whole file failing at load (engine/phone.ts absent, run-75f1e98d4d3e); the build landed the module and all seven checks moved red->green together (the core and transport ship in one file). The S4 bounded-read check went red->green against a real hanging local server.",
+    "designs_realized": "All 8 i8 requirements realized with checks: req-phone-publish, req-phone-transport-injectable, req-phone-bless, req-phone-idempotent, req-phone-config-secret (the token-never-in-log test - the inspection method made mechanical), req-phone-graceful-absent, req-phone-best-effort (swallowed publish/poll failures), req-phone-dismiss-action. The three v2 ADRs shipped (poll-in-board, secret-machine-local, hash-correlation) realizing the inherited answer-authenticity ruling.",
+    "verification_green": "run-d5eeaa67fad6: exit 0, 135/135 across ALL suites and iterations, FIRST PASS - no fix_findings.",
+    "quality_ok": "Chunk tests load standalone; the guidance registry served engine-ts + worktree + board-html discipline onto the chunks; no network touched by any test (MockTransport + a local hanging server only); the token-hiding is proven by an assertion, not just intent. No churn. The board test confirms the live hook does not disturb existing behavior.",
+    "risks_acceptable": "The security-sensitive paths are guarded and tested: authenticity = correlation-id possession (the owner-ruled accepted risk, realized exactly), the token never enters a logged object (tested), a stalled transport is abort-bounded (tested, never wedges the board), stale/dup/mismatch taps are inert (tested), the lane is opt-in and silent unconfigured (tested). CRITICAL unattended-safety property HELD: no live/public ntfy topic was contacted during this build - the real wiring only activates when the owner populates phone.json, which is the owner-physical pairing step (RAID). The two M5 tripwires (board-off, topic-scale) stand un-fired.",
+    "offer_hash": "47c840747f86501d290e5cd6f80762ba5c18faea816c3c3271558ea3e48e1f1f"
+  }
+}
