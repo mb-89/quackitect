@@ -22,6 +22,7 @@ import { boot, newSession, assertAdmitted, type Session } from "./boot.ts";
 import { Gate } from "./gate.ts";
 import { fileList, fileRead, fileWrite, filePatch, fileDelete, fileSearch, type SearchMode } from "./deliverable.ts";
 import { git, assertNotHistoryRewrite, assertNotPush } from "./git.ts";
+import { runCommand } from "./run.ts";
 import { Rejection } from "./errors.ts";
 
 registerMigration(v1Import);
@@ -315,6 +316,17 @@ export function coreTools(root: string, opts: { toll?: Toll; session?: Session }
         const r = git(root, ...gitArgs);
         return { ok: r.ok, code: r.code, stdout: r.stdout.slice(-20_000), stderr: r.stderr.slice(-20_000) };
       },
+    },
+    {
+      name: "se_run",
+      title: "se.run",
+      description: "Run a shell command through SE: captured raw in the call log, referenced by run ref — never re-type output.",
+      inputSchema: {
+        type: "object",
+        properties: { command: { type: "string" } },
+        required: ["command"],
+      },
+      handler: (args) => runCommand(log(), String(args.command), root),
     },
     {
       name: "se_note",

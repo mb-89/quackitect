@@ -1,0 +1,9 @@
+{
+  "iteration": "i3-machine-and-retro",
+  "state": "fold_back",
+  "at": "2026-07-24T09:09:16.326Z",
+  "payload": {
+    "folded": "SP1 (concurrent instance writes) could NOT execute: the probe script exists in the workspace, but v2 has no run lane and the direct fallback was denied twice - the miss is logged (se_help 'run spike script node scratch workspace'). Folded upstream: (1) the claim design (27-evaluate_baseline) is now analysis-backed only - writeFileSync interleaving is assumed UNSAFE until proven, so the design commits to temp-write + rename replace AND a rename-based claim lock, the conservative end; (2) the RAID register: U1 stays OPEN with a tripwire - the FIRST authored test of the TokenEngine build chunk is the concurrency test, red before any parallel serving is enabled; two-agent mode stays off until it greens; (3) the run-lane requirement (req-process-lane's sibling gap) gains its sharpest witness: a milestone spike blocked by the missing affordance - retro fodder recorded in the call log. SP2 (cross-session wake) deferred to the req-exec-multi-agent demonstration with reason, unchanged. SP3 (hot-reload locks) rides the build chunk with the shim-restart fallback, unchanged.",
+    "promotions": "One promotion marked for the build: the spike script spike-concurrent-writes.mjs (workspace) enters the build as the seed of the TokenEngine concurrency TEST - converted from probe to executed test, not carried as a scratch script. Nothing else promotes."
+  }
+}

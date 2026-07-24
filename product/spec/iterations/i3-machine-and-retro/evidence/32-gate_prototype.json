@@ -1,0 +1,11 @@
+{
+  "iteration": "i3-machine-and-retro",
+  "state": "gate_prototype",
+  "at": "2026-07-24T09:21:11.305Z",
+  "payload": {
+    "assumptions_validated": "U1 PROBED on the real channel (run-4dec3ea07f16, via the freshly registered se_run): naive concurrent writes lose 43% of updates and tear reads - today's write path is proven unsafe for two agents; atomic rename alone still loses 56% (no torn reads); rename-lock recovers 99% with a residual 4/400 loss because the probe's lock wrapped a plain write. Design HOLDS and sharpens: claim lock + atomic temp-rename write INSIDE the lock, reads of a mutating instance under the same lock; the authored test demands 400/400. U2 defers to the multi-agent demonstration (declared verify method). U3 rides the build with the shim-restart fallback.",
+    "buildable": "Buildable as evidenced, now with measured concurrency data instead of analysis: six existing files + one runs store; additive instance migration probed; the riskiest mechanism has numbers and a pass line (zero lost, zero torn at 2x200).",
+    "results_recorded": "SP1 pinned as run-4dec3ea07f16 (engine-captured, three phases with per-worker counts); the spike script promotes into the build as the concurrency-test seed. SP2/SP3 deferrals recorded with reasons. The run lane itself was registered mid-gate per the owner's C ruling (se_run wired to the existing run module; contract-lane DRY fix and boot tool-list read added to the plan).",
+    "offer_hash": "393a250df0eada07a168b5bed102c21b53ff52650221096208954ed1479b5cee"
+  }
+}

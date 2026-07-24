@@ -1,0 +1,9 @@
+{
+  "iteration": "i3-machine-and-retro",
+  "state": "rank_unknowns",
+  "at": "2026-07-24T09:07:33.976Z",
+  "payload": {
+    "ranking": "Three unknowns, ranked by what-if-wrong: U1 concurrent instance writes (two agents, one instance file; writeFileSync is not atomic and there is no lock) - if wrong, record corruption, the C1 catastrophe; sourced from the claim-race flag in 27-evaluate_baseline. U2 cross-session wake (a background run started by session A completing while session B is parked - does the harness wake the right one) - if wrong, the unattended story S1 stalls; sourced from probe A6 which only confirmed same-session wake. U3 hot-reload on Windows (mtime-keyed re-import: ESM cache growth, file locks on re-import) - if wrong, dev-mode annoyance, worst case a shim restart; lowest hurt.",
+    "seeded": "Spike list (the drawn seeding is executor work; these run as timeboxed probes between here and fold_back): SP1 concurrent-write probe, timebox 30 min, runs NOW in the fence-exempt workspace - two processes hammer one JSON file with read-modify-write, count torn/lost writes, then repeat with rename-based atomic replace; verdict feeds the claim design. SP2 cross-session wake: NOT probeable with one session at the desk - deferred to the req-exec-multi-agent demonstration (its verify_method already says demonstration); recorded with reason, not skipped. SP3 hot-reload locks: folded into the build chunk as a tripwire with a documented fallback (shim restart via the process lane) - a pre-build probe would duplicate the chunk's own first test."
+  }
+}
