@@ -1,7 +1,7 @@
 {
   "machine": "systematic",
   "iteration": "i4-questions-and-hygiene",
-  "current": "converge_pugh",
+  "current": "rank_unknowns",
   "counters": {},
   "history": [
     {
@@ -141,6 +141,42 @@
       "outcome": "filled",
       "evidence": "grant:867b0fbc9683",
       "at": "2026-07-24T11:17:37.893Z"
+    },
+    {
+      "state": "converge_pugh",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i4-questions-and-hygiene/evidence/24-converge_pugh.json",
+      "at": "2026-07-24T11:19:31.090Z"
+    },
+    {
+      "state": "reverse_sensitivity",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i4-questions-and-hygiene/evidence/25-reverse_sensitivity.json",
+      "at": "2026-07-24T11:19:54.587Z"
+    },
+    {
+      "state": "consolidate_baseline",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i4-questions-and-hygiene/evidence/27-consolidate_baseline.json",
+      "at": "2026-07-24T12:10:00.000Z"
+    },
+    {
+      "state": "evaluate_baseline",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i4-questions-and-hygiene/evidence/28-evaluate_baseline.json",
+      "at": "2026-07-24T12:10:00.000Z"
+    },
+    {
+      "state": "record_adrs",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i4-questions-and-hygiene/evidence/26-record_adrs.json",
+      "at": "2026-07-24T11:20:43.040Z"
+    },
+    {
+      "state": "gate_architecture",
+      "outcome": "filled",
+      "evidence": "grant:55adfbcd1db2",
+      "at": "2026-07-24T11:24:33.731Z"
     }
   ],
   "escapes": [],

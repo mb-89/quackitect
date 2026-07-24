@@ -1,0 +1,8 @@
+{
+  "iteration": "i4-questions-and-hygiene",
+  "state": "record_adrs",
+  "at": "2026-07-24T11:20:43.037Z",
+  "payload": {
+    "adrs": "Two minted, each traced: [[adr-install-over-zerodep]] - the packaging law is one-click installable, the zero-dep fossil retired with its history kept (addresses the criteria lineage and req-json-tree; decided_via the owner's chat ruling); [[adr-json-tree-native-first]] - native server-side tree first, the client layer pre-approved behind tripwire T-J2 (addresses req-json-tree and the visibility/record tension; J3's pre-correction elimination kept as history). No further ADRs: the remaining 28 steps implement blessed requirements inside the blessed baseline - their whys already live on the requirement nodes."
+  }
+}

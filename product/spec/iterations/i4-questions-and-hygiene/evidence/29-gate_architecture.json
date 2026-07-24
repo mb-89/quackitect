@@ -1,0 +1,13 @@
+{
+  "iteration": "i4-questions-and-hygiene",
+  "state": "gate_architecture",
+  "at": "2026-07-24T11:21:57.062Z",
+  "payload": {
+    "choice_traced": "J1-first traced to the criteria - both Pugh runs recorded (24-converge_pugh) UNDER THE CORRECTED C5 (one-click installable per [[adr-install-over-zerodep]]); the gap between J1 and J2 narrowed honestly once the zero-dep dogma stopped inflating J2's penalty, and the winning argument is pure sequencing: J1 spends nothing, J2 layers on without rework.",
+    "sensitivity_ruled": "Nearly flip-proof by construction (25-reverse_sensitivity); the one credible flip is the owner finding the native tree insufficient for deep briefs - tripwire T-J2 in the register fires the pre-approved client layer within this iteration, no new gate.",
+    "matrix_review": "(killer) The i3 matrices INHERIT unchanged (eight elements, five interfaces, acyclic); the delta consolidation (27) adds exactly one interface - the result-decorator hook for the grace warning - and one sibling index in an existing home; the scorer allocates outside the engine by design. Reviewed as data, no new element, nothing returns to this gate mid-build unless genuinely new.",
+    "evaluation_recorded": "Every criterion walked against the delta (28-evaluate_baseline), five PASS and one flagged: the loop's multi-active packet flow - fenced by keeping every existing single-active loop test green untouched, and first-red-tested in the serving chunk. Installability evaluated under the corrected criterion: zero new declared dependencies in the whole delta.",
+    "adrs_traced": "[[adr-install-over-zerodep]] addresses the criteria lineage (decided_via the owner's ruling); [[adr-json-tree-native-first]] addresses req-json-tree with J3's history kept. The remaining steps carry their whys on their requirement nodes - no ADR inflation. Note for the review: consolidate/evaluate_baseline were single-token-skipped and walked inline (27/28) - exhibit I1 at tally 20, retired by this iteration's own build.",
+    "offer_hash": "55adfbcd1db203b5af043de99aaf7348a31642c17a28b70489a03a866d073941"
+  }
+}

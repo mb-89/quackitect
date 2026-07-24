@@ -1,0 +1,9 @@
+{
+  "iteration": "i4-questions-and-hygiene",
+  "state": "consolidate_baseline",
+  "at": "2026-07-24T12:10:00.000Z",
+  "note": "Inline fill - exhibit I1, tally 19.",
+  "payload": {
+    "baseline": "INHERIT the i3 baseline (26-consolidate_baseline of i3): eight elements, five interfaces, acyclic coupling - unchanged. Delta allocation consolidated (19-partition_functions of this iteration): every i4 function lands inside an existing element; the only new interface is the mcp.ts result-decorator hook (LawGuards -> dispatch results, one direction, for the grace warning); the scorer stays outside the engine entirely (reads evidence, writes through the submit lane). The link index joins the warm-index family inside the ledger store element - a second index, same home, same lifecycle."
+  }
+}

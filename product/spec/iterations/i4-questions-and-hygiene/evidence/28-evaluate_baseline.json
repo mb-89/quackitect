@@ -1,0 +1,17 @@
+{
+  "iteration": "i4-questions-and-hygiene",
+  "state": "evaluate_baseline",
+  "at": "2026-07-24T12:10:00.000Z",
+  "note": "Inline fill - exhibit I1, tally 20.",
+  "payload": {
+    "evaluation": [
+      "record integrity | PASS: the tree renders the projection verbatim (never a summary); schema refusals tighten the record; evidence ids stop collisions",
+      "migratability | PASS with one flag: the loop's parallel serving changes packet flow for multi-active positions - single-active behavior byte-identical, guarded by keeping every existing loop test green untouched",
+      "latency | PASS: grace-warning removes round-trips; the link index builds lazily like the warm index",
+      "visibility | PASS: the whole board cluster serves it; panes hold size per the visual law (the tree collapses INSIDE the pane, maximize is the room to breathe)",
+      "installability (C5 corrected) | PASS: no new declared dependency anywhere in the delta; everything hand-rolled small or native",
+      "throughput | PASS: parallel serving is the step that finally cashes the i3 token engine"
+    ],
+    "flags_routed": "The multi-active packet-flow flag becomes the first authored test of the loop-serving chunk (existing tests stay green as the regression fence)."
+  }
+}

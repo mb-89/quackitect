@@ -1,0 +1,9 @@
+{
+  "iteration": "i4-questions-and-hygiene",
+  "state": "converge_pugh",
+  "at": "2026-07-24T11:19:31.090Z",
+  "payload": {
+    "matrix_runs": "Run under the CORRECTED C5 (installability and hand-rolled simplicity - one-click installable is the law; hand-rolling legal to ~200 lines; the zero-dep fossil retired per the owner's ruling, note de7db381). Run 1, datum J2: J1 scores simplicity +, latency 0, visibility -, install 0 (both one-click - a hand-rolled script costs installability nothing under the new criterion). Run 2, datum J1: J2 visibility + (expand-all, search - real wants for an owner who reads long gate briefs deeply), simplicity - (mild now, no longer disqualifying), others 0. The gap NARROWED under the corrected criterion: the old reasoning would have called J2's script weight a near-veto; the new one prices it honestly at one mild minus.",
+    "winner": "J1 first, J2's layer pre-approved as the follow-up within this same iteration if the board round asks for expand-all or search. Beyond the arithmetic: J1 ships in ten lines TODAY and satisfies T1's pass line outright, and J2 layers on J1's server-rendered output without rework - so building J1 first spends nothing and keeps J2 a pure addition; under the corrected criterion that sequencing, not any dogma, is the whole argument. Recorded openly: had one-click-installable been the criterion at M4, J3's elimination reasoning would have differed (a vendored renderer is install-free) - the elimination stands on the blessed record, and vendored options re-enter FUTURE rounds on their merits."
+  }
+}
