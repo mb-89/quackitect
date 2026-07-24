@@ -1,0 +1,9 @@
+{
+  "iteration": "i4-questions-and-hygiene",
+  "state": "rank_unknowns",
+  "at": "2026-07-24T11:27:19.495Z",
+  "payload": {
+    "ranking": "Ranked from the register, tripwires and verify methods - and the honest verdict is that i4 has NO spike-worthy unknown: (1) the loop's multi-active packet flow (R2) is a regression risk, not a knowledge gap - the mechanism was proven at unit level in i3; what remains is wiring under a test fence, spikes teach nothing a red test will not. (2) The FTS hyphen crash is already REPRODUCED (the M3 probe) - the unknown died on contact. (3) The calibration data's dirty formats were probed with the real log at M3 - tolerance requirements known. (4) The scorer's failure mode (confident nonsense, R3) is not probeable without running it - the owner's calibration round at the first scored gate IS the designed probe. Worst-if-wrong ranking exists only to confirm each is fenced: R2 by the untouched green suite, R3 by the owner round, R4 (schema grandfathering) by the sweep-first build order.",
+    "seeded": "No spikes seeded - the recorded no-spike case above. The spike machine stays empty by argument, not by omission; every former unknown either died at an M3 probe, lives behind a test fence, or has a designed adjudication round."
+  }
+}

@@ -1,7 +1,7 @@
 {
   "machine": "systematic",
   "iteration": "i4-questions-and-hygiene",
-  "current": "rank_unknowns",
+  "current": "author_tests",
   "counters": {},
   "history": [
     {
@@ -177,6 +177,24 @@
       "outcome": "filled",
       "evidence": "grant:55adfbcd1db2",
       "at": "2026-07-24T11:24:33.731Z"
+    },
+    {
+      "state": "rank_unknowns",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i4-questions-and-hygiene/evidence/30-rank_unknowns.json",
+      "at": "2026-07-24T11:27:19.495Z"
+    },
+    {
+      "state": "fold_back",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i4-questions-and-hygiene/evidence/31-fold_back.json",
+      "at": "2026-07-24T11:27:40.947Z"
+    },
+    {
+      "state": "gate_prototype",
+      "outcome": "filled",
+      "evidence": "grant:214d0fa26d91",
+      "at": "2026-07-24T11:30:54.708Z"
     }
   ],
   "escapes": [],

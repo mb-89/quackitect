@@ -43,7 +43,7 @@
         { "text": "ledger structure talk: flat-dir index (Obsidian index/Bases view) and the methods/templates home question", "owner": true },
         { "text": "draft glossary entries for the 139 term-worklist candidates" },
         { "text": "cold-model run: feed each rejection to a fresh session, prove one-turn recovery" },
-        { "text": "board: JSON tree as the DEFAULT detail renderer - collapsible keys, fits the design; purpose-built renderers override, plain text stops being the fallback; SHIPS WITH search and filter (key:/val:, /re/ regex, space-AND, ? help) per the fired T-J2 ruling" },
+        { "text": "board: JSON tree as the DEFAULT detail renderer - collapsible keys, fits the design; purpose-built renderers override, plain text stops being the fallback; SHIPS WITH search and filter (key:/val:, /re/ regex, space-AND); clicking the filter input surfaces its keyword help in the DETAILS pane - no help buttons, per the click-for-detail law" },
         { "text": "board: parallel branches side-by-side with every active token highlighted (carried req-board-parallel)" },
         { "text": "board: maximize fills the screen; the refresh preserves scroll position" },
         { "text": "test-lane scope refusal: suite and single-test runs refused outside milestone verification states (completes req-test-lane)" },

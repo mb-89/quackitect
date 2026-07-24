@@ -1,0 +1,11 @@
+{
+  "iteration": "i4-questions-and-hygiene",
+  "state": "gate_prototype",
+  "at": "2026-07-24T11:28:02.137Z",
+  "payload": {
+    "assumptions_validated": "(killer) Every risky assumption was validated by evidence BEFORE this gate, at its natural place: the stamp shape probed in the real files, the FTS crash reproduced live, the calibration data's dirty formats measured in the actual log, the JSON tree's zero-script feasibility settled by the board's own rendering model. The one unresolvable-in-advance risk (the scorer's judgment quality, R3) has a DESIGNED adjudication: the owner calibrates its first live round - a probe would only simulate what the round does for real.",
+    "buildable": "Buildable as evidenced: every step allocates into a blessed home, the one flagged mechanism (multi-active packet flow) is fenced by the untouched green suite plus red-first tests, and the whole delta adds zero declared dependencies under the corrected installability criterion.",
+    "results_recorded": "The spike machine is honestly empty (no-spike case recorded at rank_unknowns and fold_back); the M3 probe artifacts are pinned in 17-probe_assumptions and routed as red-test seeds through author_tests. Nothing promoted because nothing ran - by argument, not omission.",
+    "offer_hash": "214d0fa26d91646c15af0153a38c46655d72996f227de3c6965a9560946532da"
+  }
+}

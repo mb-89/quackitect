@@ -1,0 +1,9 @@
+{
+  "iteration": "i4-questions-and-hygiene",
+  "state": "fold_back",
+  "at": "2026-07-24T11:27:40.947Z",
+  "payload": {
+    "folded": "Nothing to fold - no spikes ran (the recorded no-spike case at rank_unknowns). The M3 probes already folded their findings when they happened: the FTS reproduction entered the search-hardening scope, the calibration tolerance entered req-eta-measured's reading, and the stamp-shape confirmation validated the dot-path plan. Upstream stands as blessed.",
+    "promotions": "None - the empty spike machine promotes nothing. The M3 probe artifacts (the FTS reproduction case, the dirty-format samples) enter the build as red-test seeds through the normal author_tests path, which is where they were already routed."
+  }
+}

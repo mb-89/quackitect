@@ -9,7 +9,7 @@ provenance:
 
 ## Decision
 
-J1 first: the projection's JSON renders into native collapsible elements server-side - no script, satisfies the zero-raw-JSON pass line outright. The J2 client layer (search + filter over the same rendered tree: key:/val: keywords, /re/ regex, space-AND, a ? help listing them) ships IN THE SAME BUILD - tripwire T-J2 was fired pre-emptively by the owner before the first board round, on the argument that the fallback renderer will carry most of what the owner reads.
+J1 first: the projection's JSON renders into native collapsible elements server-side - no script, satisfies the zero-raw-JSON pass line outright. The J2 client layer (search + filter over the same rendered tree: key:/val: keywords, /re/ regex, space-AND) ships IN THE SAME BUILD - tripwire T-J2 was fired pre-emptively by the owner. Help follows the click-for-detail law: clicking the filter input surfaces the keyword reference in the details pane; no dedicated help control exists.
 
 ## Addresses
 - [[req-json-tree]] - plain text stops being the fallback

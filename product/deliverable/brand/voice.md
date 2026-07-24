@@ -43,6 +43,7 @@ Write plainly. These are rules, not suggestions. They bind every output: chat, d
 - Never add a visual element the sketch does not show. A missing affordance becomes a question to the owner, never a silent addition.
 - Every widget gets a maximize control. It opens the widget full-screen as a modal over the grayed page. Close returns to the layout.
 - Click for detail. Clicking an element shows its details: a dedicated surface if one exists, the details pane as the fallback.
+- Help is a detail, never a button. Clicking a control surfaces its context-sensitive help in the details pane. No dedicated help buttons or icons exist anywhere.
 - Panes hold their size. Content never resizes the layout. The maximize modal is the room to breathe.
 - Color carries meaning, never decoration: green = pass, red = failure or rejection, yellow = attention.
 
