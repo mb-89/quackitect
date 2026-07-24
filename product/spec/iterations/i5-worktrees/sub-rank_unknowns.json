@@ -1,0 +1,32 @@
+{
+  "machine": "rank-unknowns",
+  "iteration": "i5-worktrees#rank_unknowns",
+  "current": "done",
+  "counters": {},
+  "history": [
+    {
+      "state": "start",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i5-worktrees/evidence/rank_unknowns-start-1.json",
+      "at": "2026-07-24T13:47:20.041Z"
+    },
+    {
+      "state": "sp1_routed_root",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i5-worktrees/evidence/rank_unknowns-sp1_routed_root-1.json",
+      "at": "2026-07-24T13:48:47.252Z"
+    },
+    {
+      "state": "sp2_fence_roots",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i5-worktrees/evidence/rank_unknowns-sp2_fence_roots-1.json",
+      "at": "2026-07-24T13:49:40.391Z"
+    }
+  ],
+  "escapes": [],
+  "status": "closed",
+  "fired": [],
+  "active": [
+    "done"
+  ]
+}

@@ -1,7 +1,7 @@
 {
   "machine": "systematic",
   "iteration": "i5-worktrees",
-  "current": "rank_unknowns",
+  "current": "author_tests",
   "counters": {},
   "history": [
     {
@@ -177,13 +177,31 @@
       "outcome": "filled",
       "evidence": "grant:1c2939f9322f",
       "at": "2026-07-24T13:43:49.573Z"
+    },
+    {
+      "state": "rank_unknowns",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i5-worktrees/evidence/rank_unknowns-1.json",
+      "at": "2026-07-24T13:49:40.399Z"
+    },
+    {
+      "state": "fold_back",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i5-worktrees/evidence/fold_back-1.json",
+      "at": "2026-07-24T13:49:57.536Z"
+    },
+    {
+      "state": "gate_prototype",
+      "outcome": "filled",
+      "evidence": "grant:a14439e296d3",
+      "at": "2026-07-24T13:50:29.581Z"
     }
   ],
   "escapes": [],
   "status": "open",
   "fired": [],
   "active": [
-    "rank_unknowns"
+    "author_tests"
   ],
   "claims": {}
 }

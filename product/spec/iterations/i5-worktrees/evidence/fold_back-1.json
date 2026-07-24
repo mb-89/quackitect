@@ -1,0 +1,9 @@
+{
+  "iteration": "i5-worktrees",
+  "state": "fold_back",
+  "at": "2026-07-24T13:49:57.535Z",
+  "payload": {
+    "folded": "sp1: TW1 is DISARMED - the routed-root risk died on evidence (all laws held under a real worktree root, replay refused, zero trunk leakage); adr-iteration-resolved-roots stands unamended, K2 stays a recorded fallback with no live trigger; R1's risk rating drops to watched. sp2: S4 rewrites from 'the lock must learn worktree roots' to 'covered by construction under the in-repo home' - the ATAM find resolves WITHOUT a build duty; the residual is a new small note: a worktree's own workspace/ is fence-denied (trunk-only exemption), recorded as a build-note for the per-tree-server future (TW2's world), harmless in sequential mode. Nothing upstream invalidated; no gate reopens.",
+    "promotions": "Both spike scripts stay throwaway (workspace/, deleted at ship) - their CONTENT promotes: sp1's fixture pattern (trunk + real worktree + full loop/gate/apply walk) becomes the skeleton of the M7 lifecycle tests; sp2's fence expectation becomes fitness F-c as a one-line assertion against the existing fence fixtures."
+  }
+}

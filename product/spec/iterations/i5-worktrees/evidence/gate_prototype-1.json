@@ -1,0 +1,11 @@
+{
+  "iteration": "i5-worktrees",
+  "state": "gate_prototype",
+  "at": "2026-07-24T13:50:19.289Z",
+  "payload": {
+    "assumptions_validated": "Both ranked unknowns burned down inside their boxes: U1 routed-root serving HELD on a real worktree (run-de1691fda075, seven checks incl. CAS replay refusal and zero trunk leakage) - the deciding evidence the convergence asked for; U2 fence coverage HELD by construction under the in-repo home (run-82e1c46272ba) - the S4 duty dissolves. The design did not change; one wrinkle recorded (worktree workspace exemption, future-mode note).",
+    "buildable": "Evidenced buildable: every E1-E8 mechanism now has either a green spike (routing, fence), a green probe (worktree/merge plumbing, overlap enumeration), or an existing proven seam (apply lane for the suspect field, projection for tab data, board page for the act-guard). Nothing in the build rests on an untested claim.",
+    "results_recorded": "Spike verdicts pinned as chunk evidence in sub-rank_unknowns records with their run refs; promotions marked: sp1's fixture pattern -> the M7 lifecycle test skeleton, sp2's expectation -> fitness F-c; scripts remain throwaway in workspace/ and die at ship.",
+    "offer_hash": "a14439e296d3c8aa1650beaece40e86562908279969c6aad14a286a87fce5fc6"
+  }
+}

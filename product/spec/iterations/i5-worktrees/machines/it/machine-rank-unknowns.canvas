@@ -1,0 +1,22 @@
+{
+  "metadata": {
+    "version": "1.0-1.0",
+    "frontmatter": {
+      "id": "it.machine-rank-unknowns",
+      "kind": "machine",
+      "statement": "i5's spike machine: burn down the two ranked unknowns before the build.",
+      "entry": "start"
+    }
+  },
+  "nodes": [
+    { "id": "n-start", "type": "file", "file": "ledger/it/machine-rank-unknowns-start.md", "x": 0, "y": 0, "width": 220, "height": 60 },
+    { "id": "n-sp1", "type": "file", "file": "ledger/it/machine-rank-unknowns-sp1-routed-root.md", "x": 0, "y": 120, "width": 220, "height": 60 },
+    { "id": "n-sp2", "type": "file", "file": "ledger/it/machine-rank-unknowns-sp2-fence-roots.md", "x": 0, "y": 240, "width": 220, "height": 60 },
+    { "id": "n-done", "type": "file", "file": "ledger/it/machine-rank-unknowns-done.md", "x": 0, "y": 360, "width": 220, "height": 60 }
+  ],
+  "edges": [
+    { "id": "e-start-sp1", "fromNode": "n-start", "toNode": "n-sp1", "fromSide": "bottom", "toSide": "top" },
+    { "id": "e-sp1-sp2", "fromNode": "n-sp1", "toNode": "n-sp2", "fromSide": "bottom", "toSide": "top" },
+    { "id": "e-sp2-done", "fromNode": "n-sp2", "toNode": "n-done", "fromSide": "bottom", "toSide": "top" }
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "iteration": "i5-worktrees",
+  "state": "rank_unknowns-sp2_fence_roots",
+  "at": "2026-07-24T13:49:40.391Z",
+  "payload": {
+    "run_ref": "run-82e1c46272ba",
+    "verdict": "HELD, better than feared: with the in-repo home, .worktrees/* sits UNDER the product root - the fence covers worktree product paths BY CONSTRUCTION, no lock change needed; S4 closes for free. One wrinkle recorded for the build: a worktree's own workspace/ dir is ALSO denied (the exemption names the trunk workspace only) - harmless for this iteration's sequential mode, a build-note for the subagent future (per-root exemptions when per-tree servers arrive)."
+  }
+}

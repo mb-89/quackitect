@@ -1,0 +1,9 @@
+{
+  "iteration": "i5-worktrees",
+  "state": "rank_unknowns-sp1_routed_root",
+  "at": "2026-07-24T13:48:47.252Z",
+  "payload": {
+    "run_ref": "run-de1691fda075",
+    "verdict": "HELD, all seven checks: a real worktree root drove Loop start-to-close, gate offer + bless with the grant landing in the WORKTREE's grants ledger, apply create with CAS replay refused, evidence pinned inside the worktree, zero leakage into the trunk. K1-prime's falsifying question dies; TW1 does not fire."
+  }
+}
