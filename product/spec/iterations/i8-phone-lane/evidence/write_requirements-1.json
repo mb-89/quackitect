@@ -1,0 +1,9 @@
+{
+  "iteration": "i8-phone-lane",
+  "state": "write_requirements",
+  "at": "2026-07-24T14:32:43.029Z",
+  "payload": {
+    "register": "8 residents minted (diff 57aa49ce): req-phone-publish (realizes adr-ntfy-actions), req-phone-transport-injectable (constraint), req-phone-bless (realizes adr-answer-authenticity), req-phone-idempotent, req-phone-config-secret (constraint, verify=inspection - the security check), req-phone-graceful-absent, req-phone-best-effort, req-phone-dismiss-action. Every row EARS-shaped, kind named (6 functional, 2 constraint), verify_method on each (test x7, inspection x1 for the no-secret-in-logs rule), breaks_if_removed carried; sources point at the two UCs, stakeholders, and the inherited ADRs/RAID.",
+    "set_criteria": "Complete: every UC-P1/P2 main step and lettered extension maps to a row (publish->publish, config-check->graceful-absent, fail->best-effort, match->bless, stale/dup->idempotent, dismiss-action->dismiss-action) plus the two cross-cutting constraints (injectable transport, config-secret). Consistent: no pair conflicts - best-effort bounds publish, idempotent bounds bless, graceful-absent gates the whole lane; all compatible with the excluded-use list. Affordable: one new engine module (phone lane) + a config loader + a hook at the offer-created seam + a watcher; all Node built-in HTTP, no dep, mock-tested - a day's build. Bounded: no quality rows because the qualities (best-effort latency, the 1s law) ride existing laws unchanged; positioned against the notification-with-ack checklist (deliver, correlate, dedup, degrade) - all four covered. No TBD."
+  }
+}

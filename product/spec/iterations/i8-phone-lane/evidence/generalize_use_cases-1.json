@@ -1,0 +1,8 @@
+{
+  "iteration": "i8-phone-lane",
+  "state": "generalize_use_cases",
+  "at": "2026-07-24T14:31:30.863Z",
+  "payload": {
+    "use_cases": "UC-P1 Publish an offer to the phone (covers P3, P4) | Primary actor: the engine at offer-creation | Main: 1. a gate creates an offer 2. the lane checks phone config 3. the lane calls the transport to publish {brief, bless action, correlation id = offer hash} to the paired topic | Extensions: 2a. config absent or disabled -> do nothing, no error (P3); 3a. transport publish fails -> record the failure, do not block the offer (best-effort, board fallback stands); 3b. offer has no brief -> publish the id + a minimal notice. UC-P2 Adjudicate from the phone (covers P1, P2) | Primary actor: the away owner via the answer topic | Main: 1. the watcher reads new answers on the answer topic since its cursor 2. for an answer, it extracts the correlation id 3. it loads the live offer; if the id matches the offer hash, it calls Gate.bless(hash, {channel: phone, adjudicated_by: owner}) 4. it advances its cursor past the answer | Extensions: 2a. answer carries no/garbled correlation id -> skip, advance cursor; 3a. no live offer, or id != live hash (stale/wrong) -> ignore, advance cursor (P2); 3b. an answer whose id was already honored -> idempotently ignore (P2 duplicate); 3c. an answer carrying an explicit dismiss action -> dismiss the offer instead of blessing. All four stories covered; no orphan UC. No UI mechanics - the tap-to-PUT is the transport's concern."
+  }
+}

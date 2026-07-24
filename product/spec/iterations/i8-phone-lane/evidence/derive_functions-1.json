@@ -1,0 +1,9 @@
+{
+  "iteration": "i8-phone-lane",
+  "state": "derive_functions",
+  "at": "2026-07-24T14:33:01.296Z",
+  "payload": {
+    "function_structure": "Overall function: carry a gate decision to and from a remote adjudicator, auditably. Sub-functions, verb+noun, solution-neutral: G1 read the channel config (is the lane on, what topic, what credential); G2 announce an offer (emit the brief + the decision actions bound to a correlation id); G3 carry the message out (the transport's send); G4 collect remote answers (the transport's read-since); G5 authenticate an answer (match its correlation id to the live decision); G6 apply the decision (bless or dismiss the matched offer through the existing grant path); G7 suppress duplicates and strays (ignore stale, mismatched, already-applied); G8 fail safe (an out-carry failure never blocks the decision; an absent config silences the lane); G9 protect the credential (keep the secret out of logs and commits).",
+    "coverage": "Requirement -> function: req-phone-publish->G2+G3, req-phone-transport-injectable->G3+G4 (the injectable boundary), req-phone-bless->G5+G6, req-phone-idempotent->G7, req-phone-config-secret->G1+G9, req-phone-graceful-absent->G1+G8, req-phone-best-effort->G8, req-phone-dismiss-action->G6 - all 8 mapped. UC-P1 1-3 -> G1,G2,G3; UC-P1 extensions -> G8; UC-P2 1-4 -> G4,G5,G6; UC-P2 extensions -> G7 (+ G6 for dismiss). No hole either way; G3/G4 (the transport boundary) and G5 (authenticate) are the functions no existing element performs - the rest reuse Gate/offer/config seams."
+  }
+}

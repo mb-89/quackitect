@@ -1,0 +1,8 @@
+{
+  "iteration": "i8-phone-lane",
+  "state": "probe_assumptions",
+  "at": "2026-07-24T14:34:00.182Z",
+  "payload": {
+    "probes": "A1 (ntfy HTTP shape: PUT publish with X-Actions, GET since-poll) | probe: INHERITED - adr-ntfy-actions records it was probed live 2026-07-09 ('PUT with X-Actions accepted, since-poll returns verbatim'), re-verified 2026-07-21; NOT re-probed live here by design (R2/R3 forbid touching a live topic unattended) | CONFIRMED by inheritance, and the real transport is deferred behind the injectable boundary so the live wiring is the owner-physical pairing step. A2 (Node can speak the transport with zero deps) | probe: node -e - global fetch is a function, node:http.request and node:https.request both present (run-3ecc10e70474) | CONFIRMED: the real transport needs no dependency, honoring adr-install/zero-dep-era hygiene. A3 (the offer carries a hash usable as correlation id, and Gate.bless takes a channel) | probe: read gate.ts - Offer.base_hash is the hash, Gate.current() returns it, Gate.bless(hash, {channel, adjudicated_by}) already records channel; grants.jsonl stamps it | CONFIRMED: the phone grant slots into the existing schema with no change. A4 (a machine-local, never-committed home exists for the secret) | probe: read layout.ts - seDir = ~/.se/<project>/, outside the repo tree, fence-exempt, already holds toll/offer/calls | CONFIRMED: phone config (~/.se/<project>/phone.json) is the natural secret home - never committed, never in the ledger, satisfying req-phone-config-secret by construction. No assumption refuted; RAID unchanged."
+  }
+}

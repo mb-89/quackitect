@@ -1,0 +1,14 @@
+{
+  "iteration": "i8-phone-lane",
+  "state": "gate_requirements",
+  "at": "2026-07-24T14:34:22.863Z",
+  "payload": {
+    "verifiable": "All 8 rows carry a named verify_method: test x7 (each with a mock-testable pass line from frame_delta), inspection x1 (req-phone-config-secret - the no-secret-in-logs rule is verified by inspecting that no log/commit path touches the credential).",
+    "traced": "Every row traces: publish/graceful-absent/best-effort -> UC-P1 + one-pager B; bless/idempotent/dismiss-action -> UC-P2 + one-pager A; transport-injectable -> raid-answer-forgery + one-pager B; config-secret -> stakeholders. Two rows also carry realizes edges to the inherited ADRs (publish->adr-ntfy-actions, bless->adr-answer-authenticity). No empty row.",
+    "functions_cover": "G1-G9 cover all 8 requirements and every UC step/extension - the mapping is written both directions in derive_functions; G3/G4 (transport boundary) and G5 (authenticate) are the net-new functions, the rest reuse Gate/offer/config seams.",
+    "set_holds": "Complete against the UCs + the two cross-cutting constraints; consistent (best-effort bounds publish, idempotent bounds bless, graceful-absent gates the lane); affordable (one module + config loader + offer-seam hook + watcher, zero-dep, mock-tested); bounded (no quality rows - latency/1s ride existing laws, stated). No TBD.",
+    "breaks_if_removed": "Filled on all 8 - each names the concrete regression (inert lane, network-in-tests, no from-away grant, wrong-gate bind, secret leak, unconfigured crash, notification stalling adjudication, one-sided lane).",
+    "assumptions_probed": "Four probes: A1 ntfy shape CONFIRMED by inheritance (live re-probe forbidden unattended, deferred behind the injectable boundary to the owner-physical pairing), A2 zero-dep transport CONFIRMED (fetch/http/https all present), A3 offer-hash-as-correlation-id + Gate.bless channel CONFIRMED by code read, A4 machine-local secret home CONFIRMED (seDir). Nothing scheduled-unprobed; nothing refuted.",
+    "offer_hash": "c73d58f310b93a9e1c0fac91a29e9577393712ef812561f17387535f6f93ec54"
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "iteration": "i8-phone-lane",
+  "state": "gate_inputs",
+  "at": "2026-07-24T14:31:46.202Z",
+  "payload": {
+    "props_realized": "One-pager A (away owner) realized by P1 (killer, bless from away) and P2 (killer, tap that must not bind); one-pager B (agent) realized by P3 (silent-when-unconfigured) and P4 (mock-proven publish). No prop unrealized, no story propless.",
+    "stories_generalized": "P1+P2 live in UC-P2 (adjudicate from the phone), P3+P4 in UC-P1 (publish an offer) - the mapping is stated per UC with numbered mains and lettered extensions.",
+    "roles_covered": "Away owner (UC-P2 actor), device holder + forger (the accepted-risk trust model, named), ntfy service (the untrusted transport), engine-at-offer (UC-P1 actor) - all covered; the two tensions resolved by the inherited ruling.",
+    "excluded_stated": "The binding does-NOT-do list stands at draw_context: no secret minting/logging, no live topic unattended, no bare-reply bless, bless only the hash-matched live offer, best-effort no-retry, no asks-beyond-bless, no Slack, watcher only runs when configured.",
+    "examples_formulated": "The four slideshows' slides and the UC scenario paths (every lettered extension incl. 2a garbled id, 3a stale, 3b duplicate, 3c dismiss) are the formulated example set; each carries its mock-testable pass line from frame_delta - M7's tests are their checkable form.",
+    "offer_hash": "88ba1d9f36ca9234d3f1d899cb440b476f71084757503b4ce4e1e1f04cb6add1"
+  }
+}

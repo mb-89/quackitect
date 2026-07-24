@@ -1,0 +1,8 @@
+{
+  "iteration": "i8-phone-lane",
+  "state": "write_stories",
+  "at": "2026-07-24T14:31:11.534Z",
+  "payload": {
+    "stories": "P1 (KILLER, realizes A) The bless from away | Slide 1: a gate offers while the owner is out; the engine publishes the brief + a 'bless' action to the paired topic. Slide 2: the phone buzzes; the owner reads the brief and taps 'bless'. Slide 3: the watcher reads the tap, its correlation id matches the live offer hash, records a grant channel=phone adjudicated_by=owner, dismisses the offer. PASS: a simulated tap (right topic, right hash) yields exactly that grant, bound to the hash - by test. P2 (KILLER, realizes A) The tap that must not bind | Slide 1: a tap arrives for an offer that already expired or was resolved. Slide 2: the watcher finds no matching live offer. Slide 3: the tap is ignored; the grant chain is unchanged; a duplicate of an already-honored tap is likewise ignored. PASS: stale-hash tap and double tap both leave grants.jsonl unchanged - by test. P3 (realizes B) The silent-when-unconfigured lane | Slide 1: no phone config present. Slide 2: a gate offers; the board pokes as always; no publish is attempted, no error. PASS: with config absent, offering a gate does not call the transport and does not throw - by test. P4 (realizes B) The mock-proven publish | Slide 1: a gate offers with config present but a MOCK transport. Slide 2: the lane calls transport.publish(topic, brief, actions) once with the offer's hash embedded as the correlation id. PASS: the mock records one publish carrying the hash; no network touched - by test."
+  }
+}

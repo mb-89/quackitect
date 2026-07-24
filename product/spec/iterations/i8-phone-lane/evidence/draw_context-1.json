@@ -1,0 +1,10 @@
+{
+  "iteration": "i8-phone-lane",
+  "state": "draw_context",
+  "at": "2026-07-24T14:30:34.213Z",
+  "payload": {
+    "boundary": "Inside: an outbound publisher (offer -> ntfy PUT with X-Actions), an inbound answer reader (poll the answer topic since a cursor -> match correlation id -> Gate.bless channel=phone), a config loader (topic/token/enabled from an owner file), the dedup guard. Outside, with interfaces named: the ntfy service (HTTP PUT to publish, GET since-poll to read - interface: an injectable Transport, real over network in prod, mock in test); the Gate (existing bless(hash, {channel, adjudicated_by}) - the phone lane calls it, never reimplements grant recording); the offer store (offer.json - the lane reads the live offer's hash + brief, writes nothing there); the pokeBoard/notify seam (the phone push hooks the SAME offer-created moment the board poke does); the owner's device (fully outside - pairing is theirs); config file (owner-populated, agent read-only). Neighbours otherwise inherit se.context.",
+    "intended_use": "One honest paragraph: when a gate creates an offer and the phone lane is configured, the engine publishes the brief and a bless action to the paired topic; the owner taps once from anywhere; a watcher reads the answer, and if the tap's correlation id matches the live offer's hash it records a grant channel=phone exactly as a console bless would, then dismisses the offer. Unconfigured, the lane is silent and every other channel works unchanged.",
+    "excluded_use": "Does NOT: mint, store, or log the ntfy secret (owner config only); contact a live/public topic during an unattended build (mock transport only); accept a bare text reply as a bless (only a correlation-id-matched action tap; plain-reply is a documented degraded path, not built here); bless anything but the ONE live offer whose hash matches; retry-forever on delivery failure (best-effort push, the 6h window + board are the fallback); carry asks/questions beyond gate blesses; touch Slack; run its inbound watcher without explicit config enabling it."
+  }
+}

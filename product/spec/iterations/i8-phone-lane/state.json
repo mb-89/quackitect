@@ -1,7 +1,7 @@
 {
   "machine": "systematic",
   "iteration": "i8-phone-lane",
-  "current": "draw_context",
+  "current": "derive_criteria",
   "counters": {},
   "history": [
     {
@@ -57,17 +57,70 @@
       "outcome": "filled",
       "evidence": "grant:01c3414a4af4",
       "at": "2026-07-24T14:29:46.288Z"
+    },
+    {
+      "state": "draw_context",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i8-phone-lane/evidence/draw_context-1.json",
+      "at": "2026-07-24T14:30:34.213Z"
+    },
+    {
+      "state": "map_stakeholders",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i8-phone-lane/evidence/map_stakeholders-1.json",
+      "at": "2026-07-24T14:30:52.327Z"
+    },
+    {
+      "state": "write_stories",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i8-phone-lane/evidence/write_stories-1.json",
+      "at": "2026-07-24T14:31:11.534Z"
+    },
+    {
+      "state": "generalize_use_cases",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i8-phone-lane/evidence/generalize_use_cases-1.json",
+      "at": "2026-07-24T14:31:30.863Z"
+    },
+    {
+      "state": "gate_inputs",
+      "outcome": "filled",
+      "evidence": "grant:88ba1d9f36ca",
+      "at": "2026-07-24T14:31:55.899Z"
+    },
+    {
+      "state": "write_requirements",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i8-phone-lane/evidence/write_requirements-1.json",
+      "at": "2026-07-24T14:32:43.030Z"
+    },
+    {
+      "state": "derive_functions",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i8-phone-lane/evidence/derive_functions-1.json",
+      "at": "2026-07-24T14:33:01.297Z"
+    },
+    {
+      "state": "probe_assumptions",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i8-phone-lane/evidence/probe_assumptions-1.json",
+      "at": "2026-07-24T14:34:00.183Z"
+    },
+    {
+      "state": "gate_requirements",
+      "outcome": "filled",
+      "evidence": "grant:c73d58f310b9",
+      "at": "2026-07-24T14:34:34.482Z"
     }
   ],
   "escapes": [],
   "status": "open",
   "fired": [],
   "active": [
-    "draw_context",
-    "map_stakeholders",
-    "write_stories"
+    "derive_criteria",
+    "partition_functions"
   ],
   "claims": {
-    "draw_context": "main"
+    "derive_criteria": "main"
   }
 }

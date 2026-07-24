@@ -1,0 +1,9 @@
+{
+  "iteration": "i8-phone-lane",
+  "state": "map_stakeholders",
+  "at": "2026-07-24T14:30:52.327Z",
+  "payload": {
+    "roles": "Inherit se.stakeholders; the delta: the AWAY OWNER (the same owner, but adjudicating without local access - the phone lane's whole reason); the DEVICE HOLDER (whoever physically has the paired phone - normally the owner, but the trust model treats possession-of-credential AS the owner, which is the accepted risk); a would-be FORGER (adversarial role, explicitly modelled by adr-answer-authenticity and accepted as out-of-reach-of-mitigation-beyond-topic-entropy); the ntfy SERVICE (an external dependency, best-effort, not trusted for authenticity, only for transport).",
+    "tensions": "Two live pairs: away owner (wants one tap, no friction) vs the forger (any friction that stops a forger also slows the owner) - resolved by the inherited ruling: credential-possession IS authenticity, entropy + correlation-id + dedup are the mitigation, and the residual risk is ACCEPTED rather than paying login-friction that would defeat the purpose. Device holder vs owner-identity (a lost/shared phone = a bless the owner didn't make) - accepted under the same ruling, upgrade path (token-ACL ntfy, workspace-authenticated Slack) recorded for when the risk tolerance changes. No new UNRESOLVED tension - v1 already walked these with the owner in two red-team rounds."
+  }
+}
