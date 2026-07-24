@@ -67,7 +67,19 @@
       ]
     },
     {
-      "id": "i5-trace-book",
+      "id": "i5-worktrees",
+      "machine": "systematic",
+      "goal": "Iterations become independent and parallel: each runs in its own worktree and branch, merges mark suspects, and independent planned iterations may fire together.",
+      "steps": [
+        { "text": "worktree lifecycle: se_loop_start creates the iteration's worktree + branch; ship merges back to the trunk; the owner pushes - the engine owns creation and merge, never push" },
+        { "text": "merge semantics: the second merge marks suspects created by the first (uc-4's across-iterations pass line)" },
+        { "text": "plan metadata: depends_on on planned iterations; two independent iterations with dependencies met may fire together; every owner question names its iteration; the board's tab data carries one entry per running worktree" },
+        { "text": "onboarding guidance amendment: retros distribute work into INDEPENDENT iterations and trace dependencies as metadata; DSM-style partitioning over plan items where the cut is unclear" },
+        { "text": "demonstration: two iterations run in parallel once, merge cleanly, suspects marked", "owner": true }
+      ]
+    },
+    {
+      "id": "i6-trace-book",
       "machine": "systematic",
       "goal": "The spec becomes visible: one button renders the book, and the trace graph is browsable - lands before the phone lane and before v1 retires.",
       "steps": [
@@ -78,7 +90,7 @@
       ]
     },
     {
-      "id": "i6-kb-content",
+      "id": "i7-kb-content",
       "machine": "systematic",
       "goal": "The kb module carries real content, tier-safe.",
       "steps": [
@@ -89,7 +101,7 @@
       ]
     },
     {
-      "id": "i7-phone-lane",
+      "id": "i8-phone-lane",
       "machine": "systematic",
       "goal": "Offers reach the phone; a bless works from anywhere within the 6h window.",
       "steps": [
@@ -99,7 +111,7 @@
       ]
     },
     {
-      "id": "i8-board-rounds",
+      "id": "i9-board-rounds",
       "machine": "systematic",
       "goal": "The board matures through owner design rounds.",
       "steps": [
@@ -111,7 +123,7 @@
       ]
     },
     {
-      "id": "i9-v1-retirement",
+      "id": "i10-v1-retirement",
       "machine": "systematic",
       "goal": "v2 daily-drives the real work; v1 archives.",
       "depends_on": ["i3-machine-and-retro"],

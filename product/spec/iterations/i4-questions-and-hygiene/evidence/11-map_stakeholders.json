@@ -1,0 +1,9 @@
+{
+  "iteration": "i4-questions-and-hygiene",
+  "state": "map_stakeholders",
+  "at": "2026-07-24T11:20:00.000Z",
+  "note": "Inline fill - exhibit I1 (loop wiring lands this iteration).",
+  "payload": {
+    "roles_mapped": "INHERIT [[stakeholders]] (se.stakeholders) with one amendment owed: the RESEARCH-AGENT SCORER joins the sub-agent roles - spawned per evaluate state, reads prior art and external tools, writes one absolute score row against fixed anchors, never adjudicates and never scores its own build (the owner calibrates its first round, register R3). Tension added with it: independent scoring vs cost-per-gate - resolved by scoring only evaluate-class states, never every fill. Amendment lands on the node at M3 beside the context amendment; all other roles and tensions stand."
+  }
+}

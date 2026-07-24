@@ -1,0 +1,13 @@
+{
+  "iteration": "i4-questions-and-hygiene",
+  "state": "gate_inputs",
+  "at": "2026-07-24T11:04:21.347Z",
+  "payload": {
+    "props_realized": "Every prop carries a story (12-write_stories): the-board-reads-human by T1 the readable gate (KILLER); laws-complete by T2 the served parallel walk (KILLER - exhibit I1's tally, now at thirteen skips, stops growing); nothing-pending by T3 the clean ledger; quality-and-estimates-measured by T4 the measured estimate. Each story carries a mechanical pass line.",
+    "stories_generalized": "All four inside resident use cases (13-generalize_use_cases): T1/T2 -> uc-8 + uc-3; T3 -> uc-6 + uc-3; T4 -> uc-7 + uc-8. Sufficiency against uc-1..uc-11: sufficient, no new use case minted, no amendment beyond i3's uc-4.",
+    "roles_covered": "INHERIT [[stakeholders]] with one owed amendment, named at 11-map_stakeholders: the research-agent scorer joins the sub-agent roles (spawned per evaluate state, scores against prior art on fixed anchors, never adjudicates, never scores its own build; the owner calibrates the first round per R3). New tension recorded with it: independent scoring vs cost per gate - resolved by scoring evaluate-class states only. Amendment lands on the node at M3.",
+    "excluded_stated": "INHERIT [[context]] excluded list, unchanged and binding. Ruled during this milestone: worktree-per-iteration is a capability, not a boundary change - it entered the PLAN as the new i5-worktrees (owner's A ruling; trace-book through retirement pushed to i6-i10), and one-project-root-per-server stands.",
+    "examples_formulated": "The formulated examples are the four pass lines: zero raw JSON on one real gate walk, a served (never inline) parallel M1, zero pending markers plus one live schema refusal, one table-quoted ETA. Each becomes an executable or demonstrable check at M7. Note for the review: map_stakeholders, write_stories and generalize_use_cases were single-token-skipped and walked inline (11/12/13, instance recorded) - the thirteenth, fourteenth and fifteenth entries in exhibit I1, arguing for their own fix.",
+    "offer_hash": "41ee5e9bb41ff9bcffa3e6cb7f220b2b4269f210accab0ce926e7140206a85e8"
+  }
+}

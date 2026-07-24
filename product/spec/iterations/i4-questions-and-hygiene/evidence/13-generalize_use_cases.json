@@ -1,0 +1,9 @@
+{
+  "iteration": "i4-questions-and-hygiene",
+  "state": "generalize_use_cases",
+  "at": "2026-07-24T11:20:00.000Z",
+  "note": "Inline fill - exhibit I1.",
+  "payload": {
+    "sufficiency_check": "Against the resident set uc-1..uc-11: T1 and T2 generalize into uc-8 (one-page visibility) and uc-3 (an iteration without process mistakes or ad-hoc scripts); T3 into uc-6 (hand-edited ledger stays trustworthy) and uc-3; T4 into uc-7 (the retro's measured record) and uc-8. Sufficient - no new use case; no amendment beyond uc-4's, which i3 already carried."
+  }
+}

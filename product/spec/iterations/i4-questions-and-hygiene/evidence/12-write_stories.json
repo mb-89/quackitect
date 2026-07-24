@@ -1,0 +1,14 @@
+{
+  "iteration": "i4-questions-and-hygiene",
+  "state": "write_stories",
+  "at": "2026-07-24T11:20:00.000Z",
+  "note": "Inline fill - exhibit I1.",
+  "payload": {
+    "stories": [
+      "T1 (KILLER) The readable gate | The owner opens a gate's detail on the board: the evidence unfolds as a collapsible tree, the log line shows request then response in one object, no raw JSON anywhere. PASS: one real gate walked end-to-end with zero plain-text JSON on screen.",
+      "T2 (KILLER) The served parallel walk | The next iteration's M1 runs under the wired loop: log_risks and pressure_test are SERVED as parallel states, two columns and two tokens on the board, zero inline walks. PASS: exhibit I1's tally stops growing - the walk that has been skipped thirteen times happens by the machine.",
+      "T3 The clean ledger | The seven stamps corrected through dot-path, the i1 bless re-adjudicated, and a deliberately invented field value REFUSED live by the schema lane. PASS: zero pending-owner markers queryable; the refusal demonstrated once.",
+      "T4 The measured estimate | A gate hand-off quotes its ETA from the calibration table, not intuition. PASS: the quoted figure traces to the standing query's output."
+    ]
+  }
+}
