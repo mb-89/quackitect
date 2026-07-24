@@ -1,7 +1,7 @@
 {
   "machine": "systematic",
   "iteration": "i3-machine-and-retro",
-  "current": "gate_kickoff",
+  "current": "draft_vision",
   "counters": {},
   "history": [
     {
@@ -9,6 +9,12 @@
       "outcome": "filled",
       "evidence": "product/spec/iterations/i3-machine-and-retro/evidence/01-onboard_retro.json",
       "at": "2026-07-24T08:06:11.798Z"
+    },
+    {
+      "state": "gate_kickoff",
+      "outcome": "filled",
+      "evidence": "grant:30224131fd63",
+      "at": "2026-07-24T08:16:24.997Z"
     }
   ],
   "escapes": [],
