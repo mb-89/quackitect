@@ -57,6 +57,14 @@ export interface MachineInstance {
   machine: string;
   iteration: string;
   current: string;
+  /** The token set: every concurrently active state. Absent = [current] (adoption). */
+  active?: string[];
+  /** Fired edges awaiting consumption by a join, as "from->to" keys. */
+  fired?: string[];
+  /** Which session holds which active state. */
+  claims?: Record<string, string>;
+  /** An engine-filled state's background run awaiting completion. */
+  pending_run?: { state: string; ref: string };
   /** Extended state: counters as variables. */
   counters: Record<string, number>;
   history: { state: string; outcome: "filled" | "failed" | "escaped" | "abandoned"; evidence?: string; at: string }[];
@@ -111,6 +119,65 @@ export function evalGuard(guard: string | undefined, counters: Record<string, nu
 
 export type StepOutcome = "filled" | "failed";
 
+/** The token set with adoption: an instance without active[] reads as [current]. */
+export function activeStates(inst: MachineInstance): string[] {
+  return inst.active ?? [inst.current];
+}
+
+/**
+ * The token op: complete one active state, fire its matching outbound
+ * edges, activate every successor whose required inbound edges have ALL
+ * fired (consuming them), and keep `current` as the first-token alias.
+ */
+export function completeState(
+  m: MachineDecl,
+  inst: MachineInstance,
+  stateId: string,
+  outcome: StepOutcome,
+  now: string,
+): { activated: string[] } {
+  const state = m.states.find((s) => s.id === stateId);
+  if (!state) throw new Error(`completeState: undeclared state ${stateId}`);
+  let active = activeStates(inst).slice();
+  if (!active.includes(stateId)) throw new Error(`completeState: ${stateId} is not active`);
+  active = active.filter((s) => s !== stateId);
+  if (inst.claims) delete inst.claims[stateId];
+  const roles: EdgeRole[] = outcome === "filled" ? ["normal", "alternative", "approval", "recovery"] : ["fallback", "error"];
+  inst.fired ??= [];
+  const activated: string[] = [];
+  for (const e of state.edges) {
+    if (!roles.includes(e.role)) continue;
+    if (!evalGuard(e.guard, inst.counters)) continue;
+    if (e.role === "normal" || e.role === "approval") {
+      // AND-join fuel: the key waits until every required inbound fired.
+      const key = `${stateId}->${e.to}`;
+      if (!inst.fired.includes(key)) inst.fired.push(key);
+    } else if (!active.includes(e.to) && !activated.includes(e.to)) {
+      // OR paths (alternative, recovery, fallback, error): activate directly.
+      activated.push(e.to);
+      const target = m.states.find((s) => s.id === e.to)!;
+      if (target.kind === "terminal") inst.status = "closed";
+    }
+  }
+  for (const s of m.states) {
+    if (active.includes(s.id) || activated.includes(s.id)) continue;
+    // Required inbound: normal and approval edges. Alternatives are OR paths
+    // and never hold a join hostage.
+    const inbound = m.states.flatMap((src) =>
+      src.edges.filter((e) => e.to === s.id && (e.role === "normal" || e.role === "approval")).map(() => `${src.id}->${s.id}`),
+    );
+    if (inbound.length === 0) continue;
+    if (!inbound.every((k) => inst.fired!.includes(k))) continue;
+    inst.fired = inst.fired!.filter((k) => !inbound.includes(k)); // consume
+    activated.push(s.id);
+    if (s.kind === "terminal") inst.status = "closed";
+  }
+  inst.active = [...active, ...activated];
+  inst.current = inst.active[0] ?? stateId;
+  void now;
+  return { activated };
+}
+
 /**
  * Advance the instance after a step outcome. Priority is total:
  * authored (normal/alternative/approval) > fallback/recovery > escape.
@@ -124,8 +191,10 @@ export function advance(
 ): { moved: boolean; escaped?: string } {
   const state = m.states.find((s) => s.id === inst.current);
   if (!state) throw new Error(`instance at undeclared state ${inst.current}`);
+  // recovery fires on FILLED: a successful repair returns into the verifying
+  // state. Failure opens fallbacks and error paths.
   const authored: EdgeRole[] = outcome === "filled" ? ["normal", "alternative", "approval"] : [];
-  const fallback: EdgeRole[] = outcome === "failed" ? ["fallback", "recovery", "error"] : [];
+  const fallback: EdgeRole[] = outcome === "filled" ? ["recovery"] : ["fallback", "error"];
   for (const roles of [authored, fallback]) {
     for (const e of state.edges) {
       if (!roles.includes(e.role)) continue;
