@@ -1,0 +1,9 @@
+{
+  "iteration": "i5-worktrees",
+  "state": "package",
+  "at": "2026-07-24T14:23:01.430Z",
+  "payload": {
+    "package": "v2 ships as the branch state, as every bootstrap iteration: the versioned artifact is the v2 branch at this release - the M7 build (9abd209: engine/worktree.ts + the i5 test suite, loop/tools/project/board wiring, 33 files) plus M8 (7a62868) plus the M9 close-out commit to come. The ledger grew by 11 requirements, 4 ADRs, 2 decisions/notes-of-record, 2 guidance nodes, 5 RAID entries; the drawn build and spike machines with their walked records ship inside the iteration folder. No zip lane - unchanged from i3/i4.",
+    "entry_script": "README.md and RUNME.ps1 stand unchanged at the root; the M8 sweep confirmed none of i5's changes touch the entry promises. New this iteration and gitignored (never shipped): .worktrees/ - the runtime home for isolated streams, correctly excluded from the artifact."
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "iteration": "i5-worktrees",
+  "state": "gate_release",
+  "at": "2026-07-24T14:23:45.647Z",
+  "payload": {
+    "docs_match": "The handover, board and contract are projections read back against the surface at finalize_docs (handover shows i5 at its true state with its green verify; the board renders worktree streams; the contract lane list matches the served registry). The worktree discipline is taught in the ledger guidance nodes the registry serves, tool descriptions updated. Honest absences (book emitter -> i6; live parallel demo -> RAID trigger) are planned, not papered over.",
+    "packaged": "The branch state is the artifact: 9abd209 (M7) + 7a62868 (M8) + this window's close-out; README + RUNME unchanged; .worktrees/ gitignored out of the artifact; the drawn machines and their records ship in the iteration folder.",
+    "dependencies_ruled": "No flips - stock git + Node built-ins; the .gitattributes union-merge is a declared behavior, not a divergence; nothing owed upstream.",
+    "handover_accepted": "This bless is the acceptance: i5-worktrees closes M0-M9 in ONE unattended run under the recorded delegation - six gates self-blessed with the agent stamp (the kickoff mis-stamp corrected on record), 128/128 battery first pass at M7, real git worktrees provisioned/merged/suspect-marked/cleaned in the fixture. The owner reviews the shipped iteration; the parked live-parallel demo and the two engine-hygiene items carry triggers. Next in the owner's sequence: i8-phone-lane.",
+    "offer_hash": "9467f4b9917bebbf70d51748d72bb444f625e2f121aa50b6b9eac21a3c9f06f6"
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "iteration": "i5-worktrees",
+  "state": "ship_review",
+  "at": "2026-07-24T14:23:16.989Z",
+  "payload": {
+    "review": "No dependency flips: the worktree lane calls the system git binary (already a dependency, allowlisted through se_git) and Node built-ins only - no package added. Module deps unchanged (kb sibling import active). One CONFIGURATION addition ships and is worth flagging: the worktree lane provisions a .gitattributes ('grants.jsonl merge=union') into any trunk it ships from - this is intentional and required (append-only reunification), recorded in adr-suspect-frontmatter's neighbourhood and the guidance node; it is not a divergence but a declared behavior. Nothing forked or vendored.",
+    "upstream": "None owed - the lane wraps stock git worktree/merge; no external project was modified. The two engine-hygiene RAID items (CRLF noise, per-tree workspace exemption) are internal, not upstream deposits."
+  }
+}

@@ -1,7 +1,7 @@
 {
   "machine": "systematic",
   "iteration": "i5-worktrees",
-  "current": "finalize_docs",
+  "current": "shipped",
   "counters": {},
   "history": [
     {
@@ -255,13 +255,37 @@
       "outcome": "filled",
       "evidence": "grant:0e9eb8fade45",
       "at": "2026-07-24T14:22:13.279Z"
+    },
+    {
+      "state": "finalize_docs",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i5-worktrees/evidence/finalize_docs-1.json",
+      "at": "2026-07-24T14:22:48.015Z"
+    },
+    {
+      "state": "package",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i5-worktrees/evidence/package-1.json",
+      "at": "2026-07-24T14:23:01.431Z"
+    },
+    {
+      "state": "ship_review",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i5-worktrees/evidence/ship_review-1.json",
+      "at": "2026-07-24T14:23:16.990Z"
+    },
+    {
+      "state": "gate_release",
+      "outcome": "filled",
+      "evidence": "grant:9467f4b9917b",
+      "at": "2026-07-24T14:23:55.229Z"
     }
   ],
   "escapes": [],
-  "status": "open",
+  "status": "closed",
   "fired": [],
   "active": [
-    "finalize_docs"
+    "shipped"
   ],
   "claims": {}
 }
