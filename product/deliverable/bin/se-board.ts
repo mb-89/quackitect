@@ -88,12 +88,12 @@ const PAGE = `<!doctype html>
   .smstart { width: .8em; height: .8em; border-radius: 50%; background: #1e1e1e; }
   .smend { width: 1.1em; height: 1.1em; border-radius: 50%; border: 2px solid #1e1e1e; display: flex; align-items: center; justify-content: center; cursor: pointer; }
   .smend::after { content: ""; width: .5em; height: .5em; border-radius: 50%; background: #1e1e1e; }
-  .smend.current { border-color: var(--warn); animation: pulse 1.2s ease-in-out infinite; }
+  .smend.current { border-color: var(--warn); animation: pulse 2.4s ease-in-out infinite; }
   .smend.done { border-color: var(--ok); }
   .smconn { color: var(--dim); font-size: 10px; line-height: 1.2; }
   .smnode { border: 1.5px solid #9a9a9a; border-radius: 10px; padding: .2em 1.1em; margin: .05em 0; cursor: pointer; background: #fff; min-width: 9em; text-align: center; }
   .smnode.done { border-color: var(--ok); background: #eaf4ea; }
-  .smnode.current { border-color: var(--warn); background: #fdf6e0; animation: pulse 1.2s ease-in-out infinite; }
+  .smnode.current { border-color: var(--warn); background: #fdf6e0; animation: pulse 2.4s ease-in-out infinite; }
   .smgroup { border: 1px dashed #9a9a9a; border-radius: 10px; padding: .3em .8em .45em; margin: .05em 0; display: flex; flex-direction: column; align-items: center; }
   .smglabel { font-size: 10px; text-transform: uppercase; letter-spacing: .06em; color: var(--dim); align-self: flex-start; margin-bottom: .15em; }
   .iterrow { display: flex; align-items: center; gap: .5em; padding: .18em .3em; cursor: pointer; border-radius: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }

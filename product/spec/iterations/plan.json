@@ -9,10 +9,11 @@
         { "text": "plan insert/renumber ops: planned iterations renumber freely, started ids are frozen (engine-checked); rides the dry_run -> execute lane" },
         { "text": "link graph + rename ripple: warm index over all markdown links incl. section targets; renaming a note or a section updates every inbound link (se.set.refactor kind=rename)" },
         { "text": "search scope parameter: se_file_search/read/list over declared roots (imports, v1, the owner's working folder) - declared, never arbitrary" },
-        { "text": "retro flow v1 - opens with the field-feedback question, drains the notes inbox, cleans it up; standing question: has the process gone stale (state-of-the-art, process dimension)" },
+        { "text": "retro flow v1 - runs as the drawn M0 onboarding block (onboard_retro -> onboard_plan -> onboard_rigor -> gate_kickoff): field-feedback question first, notes inbox drained, call log and se_help misses mined, scope and rigor confirmed at the kickoff gate; standing question: has the process gone stale (state-of-the-art, process dimension)" },
         { "text": "policy derivation: lean re-derived as a strike-list from systematic - diffable, per the walkthrough ruling" },
         { "text": "projection: last_verify picked by timestamp, not folder order" },
-        { "text": "boot cleanliness: the toll never blocks a session's first se_boot; one-question ritual per the contract" },
+        { "text": "boot cleanliness: the toll never blocks a session's first se_boot; se_boot refuses without a named project and its refusal tells the agent to ask the owner; one-question ritual per the contract" },
+        { "text": "toll v2: update required on se_loop_submit; wall-clock floor tightened to ~5 min; toll and update-field text teach proactive updates (a volunteered update is never stopped)" },
         { "text": "se-gate: record role not username@hostname; loud message on expired offer" },
         { "text": "bless the executor behavior against the drawn machine at the gate", "owner": true },
         { "text": "retro shape: answer the field-feedback opener", "owner": true }

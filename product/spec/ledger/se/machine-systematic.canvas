@@ -1,993 +1,345 @@
 {
-	"metadata": {
-		"version": "1.0-1.0",
-		"frontmatter": {
-			"id": "se.machine-systematic",
-			"kind": "machine",
-			"statement": "Full systematic rigor: nine gated milestones from vision to ship - Frame, Understand, Specify, Explore, Decide, Prove, Build, Validate, Ship.",
-			"entry": "draft_vision",
-			"reentry": "restart"
-		}
+	"metadata":{
+		"version":"1.0-1.0",
+		"frontmatter":{"id":"se.machine-systematic","kind":"machine","statement":"Full systematic rigor: onboarding then nine gated milestones from vision to ship - Onboard, Frame, Understand, Specify, Explore, Decide, Prove, Build, Validate, Ship.","entry":"onboard_retro","reentry":"restart"}
 	},
-	"nodes": [
+	"nodes":[
+		{"id":"c-head","type":"text","text":"# The systematic machine\nNine milestones, each ending in an owner-adjudicated gate. Edges are dependencies: all successors of a completed state may run in parallel; a state with several fired inputs waits for all of them. Gate reviews follow meth-gate-review; three states seed iteration-local sub-machines (candidates, spikes, build chunks). Runs on the parallel executor once it lands - drawn now as the binding spec.","x":-620,"y":-400,"width":1100,"height":260},
+		{"id":"g0","type":"group","label":"M0 Onboard","x":-680,"y":-1680,"width":1180,"height":1020},
+		{"id":"n-oret","type":"file","file":"spec/ledger/se/machine-systematic-onboard-retro.md","x":0,"y":-1600,"width":420,"height":140},
+		{"id":"n-oplan","type":"file","file":"spec/ledger/se/machine-systematic-onboard-plan.md","x":0,"y":-1360,"width":420,"height":140},
+		{"id":"n-orig","type":"file","file":"spec/ledger/se/machine-systematic-onboard-rigor.md","x":0,"y":-1120,"width":420,"height":140},
 		{
-			"id": "c-head",
-			"type": "text",
-			"text": "# The systematic machine\nNine milestones, each ending in an owner-adjudicated gate. Edges are dependencies: all successors of a completed state may run in parallel; a state with several fired inputs waits for all of them. Gate reviews follow meth-gate-review; three states seed iteration-local sub-machines (candidates, spikes, build chunks). Runs on the parallel executor once it lands - drawn now as the binding spec.",
-			"x": -620,
-			"y": -400,
-			"width": 1100,
-			"height": 260
+			"id":"n-gkick",
+			"type":"file",
+			"file":"spec/ledger/se/machine-systematic-gate-kickoff.md",
+			"x":0,
+			"y":-880,
+			"width":420,
+			"height":140,
+			"styleAttributes":{"shape":"diamond"}
+		},
+		{"id":"g1","type":"group","label":"M1 Frame","x":-680,"y":-80,"width":1180,"height":1320},
+		{"id":"n-dv","type":"file","file":"spec/ledger/se/machine-systematic-draft-vision.md","x":0,"y":0,"width":420,"height":140},
+		{"id":"n-da","type":"file","file":"spec/ledger/se/machine-systematic-define-actual.md","x":0,"y":240,"width":420,"height":140},
+		{"id":"n-fd","type":"file","file":"spec/ledger/se/machine-systematic-frame-delta.md","x":0,"y":480,"width":420,"height":140},
+		{"id":"n-sng","type":"file","file":"spec/ledger/se/machine-systematic-scope-non-goals.md","x":0,"y":720,"width":420,"height":140},
+		{"id":"n-lr","type":"file","file":"spec/ledger/se/machine-systematic-log-risks.md","x":-560,"y":240,"width":420,"height":140},
+		{"id":"n-pt","type":"file","file":"spec/ledger/se/machine-systematic-pressure-test.md","x":-560,"y":720,"width":420,"height":140},
+		{
+			"id":"n-gm",
+			"type":"file",
+			"file":"spec/ledger/se/machine-systematic-gate-motivation.md",
+			"x":0,
+			"y":1000,
+			"width":420,
+			"height":140,
+			"styleAttributes":{"shape":"diamond"}
+		},
+		{"id":"g2","type":"group","label":"M2 Understand","x":-680,"y":1520,"width":1180,"height":900},
+		{"id":"n-dc","type":"file","file":"spec/ledger/se/machine-systematic-draw-context.md","x":-560,"y":1600,"width":420,"height":140},
+		{"id":"n-ms","type":"file","file":"spec/ledger/se/machine-systematic-map-stakeholders.md","x":-560,"y":1840,"width":420,"height":140},
+		{"id":"n-ws","type":"file","file":"spec/ledger/se/machine-systematic-write-stories.md","x":0,"y":1600,"width":420,"height":140},
+		{"id":"n-guc","type":"file","file":"spec/ledger/se/machine-systematic-generalize-use-cases.md","x":0,"y":1840,"width":420,"height":140},
+		{
+			"id":"n-gi",
+			"type":"file",
+			"file":"spec/ledger/se/machine-systematic-gate-inputs.md",
+			"x":0,
+			"y":2120,
+			"width":420,
+			"height":140,
+			"styleAttributes":{"shape":"diamond"}
+		},
+		{"id":"g3","type":"group","label":"M3 Specify","x":-680,"y":2420,"width":1800,"height":900},
+		{"id":"n-wr","type":"file","file":"spec/ledger/se/machine-systematic-write-requirements.md","x":0,"y":2500,"width":420,"height":140},
+		{"id":"n-df","type":"file","file":"spec/ledger/se/machine-systematic-derive-functions.md","x":-560,"y":2740,"width":420,"height":140},
+		{"id":"n-pa","type":"file","file":"spec/ledger/se/machine-systematic-probe-assumptions.md","x":560,"y":2740,"width":420,"height":140},
+		{
+			"id":"n-gr",
+			"type":"file",
+			"file":"spec/ledger/se/machine-systematic-gate-requirements.md",
+			"x":0,
+			"y":3020,
+			"width":420,
+			"height":140,
+			"styleAttributes":{"shape":"diamond"}
+		},
+		{"id":"g4","type":"group","label":"M4 Explore","x":-680,"y":3320,"width":1800,"height":1140},
+		{"id":"n-dcrit","type":"file","file":"spec/ledger/se/machine-systematic-derive-criteria.md","x":-560,"y":3400,"width":420,"height":140},
+		{"id":"n-pf","type":"file","file":"spec/ledger/se/machine-systematic-partition-functions.md","x":0,"y":3400,"width":420,"height":140},
+		{"id":"n-es","type":"file","file":"spec/ledger/se/machine-systematic-enumerate-space.md","x":0,"y":3640,"width":420,"height":140},
+		{"id":"c-cand","type":"text","text":"enumerate_space SEEDS the iteration's candidate machine: one parallel compose state per shortlisted combination - static partitioning, allocation DMM, element DSM, interfaces, metrics, rationale each.","x":560,"y":3620,"width":460,"height":200},
+		{"id":"n-evs","type":"file","file":"spec/ledger/se/machine-systematic-evaluate-set.md","x":0,"y":3880,"width":420,"height":140},
+		{
+			"id":"n-gc",
+			"type":"file",
+			"file":"spec/ledger/se/machine-systematic-gate-candidates.md",
+			"x":0,
+			"y":4160,
+			"width":420,
+			"height":140,
+			"styleAttributes":{"shape":"diamond"}
+		},
+		{"id":"g5","type":"group","label":"M5 Decide","x":-680,"y":4460,"width":1180,"height":1360},
+		{"id":"n-cp","type":"file","file":"spec/ledger/se/machine-systematic-converge-pugh.md","x":0,"y":4540,"width":420,"height":140},
+		{"id":"n-rs","type":"file","file":"spec/ledger/se/machine-systematic-reverse-sensitivity.md","x":0,"y":4780,"width":420,"height":140},
+		{"id":"n-ra","type":"file","file":"spec/ledger/se/machine-systematic-record-adrs.md","x":-560,"y":5020,"width":420,"height":140},
+		{"id":"n-cb","type":"file","file":"spec/ledger/se/machine-systematic-consolidate-baseline.md","x":0,"y":5020,"width":420,"height":140},
+		{"id":"n-eb","type":"file","file":"spec/ledger/se/machine-systematic-evaluate-baseline.md","x":0,"y":5260,"width":420,"height":140},
+		{
+			"id":"n-ga",
+			"type":"file",
+			"file":"spec/ledger/se/machine-systematic-gate-architecture.md",
+			"x":0,
+			"y":5540,
+			"width":420,
+			"height":140,
+			"styleAttributes":{"shape":"diamond"}
+		},
+		{"id":"g6","type":"group","label":"M6 Prove","x":-120,"y":5820,"width":1240,"height":900},
+		{"id":"n-ru","type":"file","file":"spec/ledger/se/machine-systematic-rank-unknowns.md","x":0,"y":5900,"width":420,"height":140},
+		{"id":"c-spike","type":"text","text":"rank_unknowns SEEDS the iteration's spike machine: one timeboxed parallel spike per chosen unknown; they run between these two states.","x":560,"y":5900,"width":460,"height":170},
+		{"id":"n-fb","type":"file","file":"spec/ledger/se/machine-systematic-fold-back.md","x":0,"y":6140,"width":420,"height":140},
+		{
+			"id":"n-gp",
+			"type":"file",
+			"file":"spec/ledger/se/machine-systematic-gate-prototype.md",
+			"x":0,
+			"y":6420,
+			"width":420,
+			"height":140,
+			"styleAttributes":{"shape":"diamond"}
+		},
+		{"id":"g7","type":"group","label":"M7 Build","x":-680,"y":6700,"width":1800,"height":1400},
+		{"id":"n-at","type":"file","file":"spec/ledger/se/machine-systematic-author-tests.md","x":0,"y":6780,"width":420,"height":140},
+		{"id":"n-pb","type":"file","file":"spec/ledger/se/machine-systematic-plan-build.md","x":0,"y":7020,"width":420,"height":140},
+		{"id":"c-chunk","type":"text","text":"plan_build SEEDS the iteration's build machine: small resumable chunks, dependency edges, one realization kind each (the guidance registry serves each builder). Chunks run in parallel between observe_red and verification; a promoted spike enters as a pre-verified chunk.","x":560,"y":7000,"width":460,"height":240},
+		{"id":"n-or","type":"file","file":"spec/ledger/se/machine-systematic-observe-red.md","x":0,"y":7260,"width":420,"height":140},
+		{
+			"id":"n-ver",
+			"type":"file",
+			"file":"spec/ledger/se/machine-systematic-verification.md",
+			"x":0,
+			"y":7500,
+			"width":420,
+			"height":140,
+			"styleAttributes":{"shape":"predefined-process"}
+		},
+		{"id":"n-ff","type":"file","file":"spec/ledger/se/machine-systematic-fix-findings.md","x":-560,"y":7500,"width":420,"height":140},
+		{
+			"id":"n-gimpl",
+			"type":"file",
+			"file":"spec/ledger/se/machine-systematic-gate-implementation.md",
+			"x":0,
+			"y":7780,
+			"width":420,
+			"height":140,
+			"styleAttributes":{"shape":"diamond"}
+		},
+		{"id":"g8","type":"group","label":"M8 Validate","x":-680,"y":8060,"width":1800,"height":900},
+		{"id":"n-fse","type":"file","file":"spec/ledger/se/machine-systematic-fill-story-evidence.md","x":0,"y":8140,"width":420,"height":140},
+		{"id":"n-sc","type":"file","file":"spec/ledger/se/machine-systematic-sweep-consistency.md","x":-560,"y":8380,"width":420,"height":140},
+		{"id":"n-lg","type":"file","file":"spec/ledger/se/machine-systematic-log-gaps.md","x":560,"y":8380,"width":420,"height":140},
+		{
+			"id":"n-gv",
+			"type":"file",
+			"file":"spec/ledger/se/machine-systematic-gate-validation.md",
+			"x":0,
+			"y":8660,
+			"width":420,
+			"height":140,
+			"styleAttributes":{"shape":"diamond"}
+		},
+		{"id":"g9","type":"group","label":"M9 Ship","x":-120,"y":8940,"width":700,"height":1400},
+		{"id":"n-fdoc","type":"file","file":"spec/ledger/se/machine-systematic-finalize-docs.md","x":0,"y":9020,"width":420,"height":140},
+		{"id":"n-pk","type":"file","file":"spec/ledger/se/machine-systematic-package.md","x":0,"y":9260,"width":420,"height":140},
+		{"id":"n-sr","type":"file","file":"spec/ledger/se/machine-systematic-ship-review.md","x":0,"y":9500,"width":420,"height":140},
+		{
+			"id":"n-grel",
+			"type":"file",
+			"file":"spec/ledger/se/machine-systematic-gate-release.md",
+			"x":0,
+			"y":9740,
+			"width":420,
+			"height":140,
+			"styleAttributes":{"shape":"diamond"}
 		},
 		{
-			"id": "g1",
-			"type": "group",
-			"label": "M1 Frame",
-			"x": -680,
-			"y": -80,
-			"width": 1180,
-			"height": 1320
-		},
-		{
-			"id": "n-dv",
-			"type": "file",
-			"file": "spec/ledger/se/machine-systematic-draft-vision.md",
-			"x": 0,
-			"y": 0,
-			"width": 420,
-			"height": 140
-		},
-		{
-			"id": "n-da",
-			"type": "file",
-			"file": "spec/ledger/se/machine-systematic-define-actual.md",
-			"x": 0,
-			"y": 240,
-			"width": 420,
-			"height": 140
-		},
-		{
-			"id": "n-fd",
-			"type": "file",
-			"file": "spec/ledger/se/machine-systematic-frame-delta.md",
-			"x": 0,
-			"y": 480,
-			"width": 420,
-			"height": 140
-		},
-		{
-			"id": "n-sng",
-			"type": "file",
-			"file": "spec/ledger/se/machine-systematic-scope-non-goals.md",
-			"x": 0,
-			"y": 720,
-			"width": 420,
-			"height": 140
-		},
-		{
-			"id": "n-lr",
-			"type": "file",
-			"file": "spec/ledger/se/machine-systematic-log-risks.md",
-			"x": -560,
-			"y": 240,
-			"width": 420,
-			"height": 140
-		},
-		{
-			"id": "n-pt",
-			"type": "file",
-			"file": "spec/ledger/se/machine-systematic-pressure-test.md",
-			"x": -560,
-			"y": 720,
-			"width": 420,
-			"height": 140
-		},
-		{
-			"id": "n-gm",
-			"type": "file",
-			"file": "spec/ledger/se/machine-systematic-gate-motivation.md",
-			"x": 0,
-			"y": 1000,
-			"width": 420,
-			"height": 140,
-			"styleAttributes": {
-				"shape": "diamond"
-			}
-		},
-		{
-			"id": "g2",
-			"type": "group",
-			"label": "M2 Understand",
-			"x": -680,
-			"y": 1520,
-			"width": 1180,
-			"height": 900
-		},
-		{
-			"id": "n-dc",
-			"type": "file",
-			"file": "spec/ledger/se/machine-systematic-draw-context.md",
-			"x": -560,
-			"y": 1600,
-			"width": 420,
-			"height": 140
-		},
-		{
-			"id": "n-ms",
-			"type": "file",
-			"file": "spec/ledger/se/machine-systematic-map-stakeholders.md",
-			"x": -560,
-			"y": 1840,
-			"width": 420,
-			"height": 140
-		},
-		{
-			"id": "n-ws",
-			"type": "file",
-			"file": "spec/ledger/se/machine-systematic-write-stories.md",
-			"x": 0,
-			"y": 1600,
-			"width": 420,
-			"height": 140
-		},
-		{
-			"id": "n-guc",
-			"type": "file",
-			"file": "spec/ledger/se/machine-systematic-generalize-use-cases.md",
-			"x": 0,
-			"y": 1840,
-			"width": 420,
-			"height": 140
-		},
-		{
-			"id": "n-gi",
-			"type": "file",
-			"file": "spec/ledger/se/machine-systematic-gate-inputs.md",
-			"x": 0,
-			"y": 2120,
-			"width": 420,
-			"height": 140,
-			"styleAttributes": {
-				"shape": "diamond"
-			}
-		},
-		{
-			"id": "g3",
-			"type": "group",
-			"label": "M3 Specify",
-			"x": -680,
-			"y": 2420,
-			"width": 1800,
-			"height": 900
-		},
-		{
-			"id": "n-wr",
-			"type": "file",
-			"file": "spec/ledger/se/machine-systematic-write-requirements.md",
-			"x": 0,
-			"y": 2500,
-			"width": 420,
-			"height": 140
-		},
-		{
-			"id": "n-df",
-			"type": "file",
-			"file": "spec/ledger/se/machine-systematic-derive-functions.md",
-			"x": -560,
-			"y": 2740,
-			"width": 420,
-			"height": 140
-		},
-		{
-			"id": "n-pa",
-			"type": "file",
-			"file": "spec/ledger/se/machine-systematic-probe-assumptions.md",
-			"x": 560,
-			"y": 2740,
-			"width": 420,
-			"height": 140
-		},
-		{
-			"id": "n-gr",
-			"type": "file",
-			"file": "spec/ledger/se/machine-systematic-gate-requirements.md",
-			"x": 0,
-			"y": 3020,
-			"width": 420,
-			"height": 140,
-			"styleAttributes": {
-				"shape": "diamond"
-			}
-		},
-		{
-			"id": "g4",
-			"type": "group",
-			"label": "M4 Explore",
-			"x": -680,
-			"y": 3320,
-			"width": 1800,
-			"height": 1140
-		},
-		{
-			"id": "n-dcrit",
-			"type": "file",
-			"file": "spec/ledger/se/machine-systematic-derive-criteria.md",
-			"x": -560,
-			"y": 3400,
-			"width": 420,
-			"height": 140
-		},
-		{
-			"id": "n-pf",
-			"type": "file",
-			"file": "spec/ledger/se/machine-systematic-partition-functions.md",
-			"x": 0,
-			"y": 3400,
-			"width": 420,
-			"height": 140
-		},
-		{
-			"id": "n-es",
-			"type": "file",
-			"file": "spec/ledger/se/machine-systematic-enumerate-space.md",
-			"x": 0,
-			"y": 3640,
-			"width": 420,
-			"height": 140
-		},
-		{
-			"id": "c-cand",
-			"type": "text",
-			"text": "enumerate_space SEEDS the iteration's candidate machine: one parallel compose state per shortlisted combination - static partitioning, allocation DMM, element DSM, interfaces, metrics, rationale each.",
-			"x": 560,
-			"y": 3620,
-			"width": 460,
-			"height": 200
-		},
-		{
-			"id": "n-evs",
-			"type": "file",
-			"file": "spec/ledger/se/machine-systematic-evaluate-set.md",
-			"x": 0,
-			"y": 3880,
-			"width": 420,
-			"height": 140
-		},
-		{
-			"id": "n-gc",
-			"type": "file",
-			"file": "spec/ledger/se/machine-systematic-gate-candidates.md",
-			"x": 0,
-			"y": 4160,
-			"width": 420,
-			"height": 140,
-			"styleAttributes": {
-				"shape": "diamond"
-			}
-		},
-		{
-			"id": "g5",
-			"type": "group",
-			"label": "M5 Decide",
-			"x": -680,
-			"y": 4460,
-			"width": 1180,
-			"height": 1360
-		},
-		{
-			"id": "n-cp",
-			"type": "file",
-			"file": "spec/ledger/se/machine-systematic-converge-pugh.md",
-			"x": 0,
-			"y": 4540,
-			"width": 420,
-			"height": 140
-		},
-		{
-			"id": "n-rs",
-			"type": "file",
-			"file": "spec/ledger/se/machine-systematic-reverse-sensitivity.md",
-			"x": 0,
-			"y": 4780,
-			"width": 420,
-			"height": 140
-		},
-		{
-			"id": "n-ra",
-			"type": "file",
-			"file": "spec/ledger/se/machine-systematic-record-adrs.md",
-			"x": -560,
-			"y": 5020,
-			"width": 420,
-			"height": 140
-		},
-		{
-			"id": "n-cb",
-			"type": "file",
-			"file": "spec/ledger/se/machine-systematic-consolidate-baseline.md",
-			"x": 0,
-			"y": 5020,
-			"width": 420,
-			"height": 140
-		},
-		{
-			"id": "n-eb",
-			"type": "file",
-			"file": "spec/ledger/se/machine-systematic-evaluate-baseline.md",
-			"x": 0,
-			"y": 5260,
-			"width": 420,
-			"height": 140
-		},
-		{
-			"id": "n-ga",
-			"type": "file",
-			"file": "spec/ledger/se/machine-systematic-gate-architecture.md",
-			"x": 0,
-			"y": 5540,
-			"width": 420,
-			"height": 140,
-			"styleAttributes": {
-				"shape": "diamond"
-			}
-		},
-		{
-			"id": "g6",
-			"type": "group",
-			"label": "M6 Prove",
-			"x": -120,
-			"y": 5820,
-			"width": 1240,
-			"height": 900
-		},
-		{
-			"id": "n-ru",
-			"type": "file",
-			"file": "spec/ledger/se/machine-systematic-rank-unknowns.md",
-			"x": 0,
-			"y": 5900,
-			"width": 420,
-			"height": 140
-		},
-		{
-			"id": "c-spike",
-			"type": "text",
-			"text": "rank_unknowns SEEDS the iteration's spike machine: one timeboxed parallel spike per chosen unknown; they run between these two states.",
-			"x": 560,
-			"y": 5900,
-			"width": 460,
-			"height": 170
-		},
-		{
-			"id": "n-fb",
-			"type": "file",
-			"file": "spec/ledger/se/machine-systematic-fold-back.md",
-			"x": 0,
-			"y": 6140,
-			"width": 420,
-			"height": 140
-		},
-		{
-			"id": "n-gp",
-			"type": "file",
-			"file": "spec/ledger/se/machine-systematic-gate-prototype.md",
-			"x": 0,
-			"y": 6420,
-			"width": 420,
-			"height": 140,
-			"styleAttributes": {
-				"shape": "diamond"
-			}
-		},
-		{
-			"id": "g7",
-			"type": "group",
-			"label": "M7 Build",
-			"x": -680,
-			"y": 6700,
-			"width": 1800,
-			"height": 1400
-		},
-		{
-			"id": "n-at",
-			"type": "file",
-			"file": "spec/ledger/se/machine-systematic-author-tests.md",
-			"x": 0,
-			"y": 6780,
-			"width": 420,
-			"height": 140
-		},
-		{
-			"id": "n-pb",
-			"type": "file",
-			"file": "spec/ledger/se/machine-systematic-plan-build.md",
-			"x": 0,
-			"y": 7020,
-			"width": 420,
-			"height": 140
-		},
-		{
-			"id": "c-chunk",
-			"type": "text",
-			"text": "plan_build SEEDS the iteration's build machine: small resumable chunks, dependency edges, one realization kind each (the guidance registry serves each builder). Chunks run in parallel between observe_red and verification; a promoted spike enters as a pre-verified chunk.",
-			"x": 560,
-			"y": 7000,
-			"width": 460,
-			"height": 240
-		},
-		{
-			"id": "n-or",
-			"type": "file",
-			"file": "spec/ledger/se/machine-systematic-observe-red.md",
-			"x": 0,
-			"y": 7260,
-			"width": 420,
-			"height": 140
-		},
-		{
-			"id": "n-ver",
-			"type": "file",
-			"file": "spec/ledger/se/machine-systematic-verification.md",
-			"x": 0,
-			"y": 7500,
-			"width": 420,
-			"height": 140,
-			"styleAttributes": {
-				"shape": "predefined-process"
-			}
-		},
-		{
-			"id": "n-ff",
-			"type": "file",
-			"file": "spec/ledger/se/machine-systematic-fix-findings.md",
-			"x": -560,
-			"y": 7500,
-			"width": 420,
-			"height": 140
-		},
-		{
-			"id": "n-gimpl",
-			"type": "file",
-			"file": "spec/ledger/se/machine-systematic-gate-implementation.md",
-			"x": 0,
-			"y": 7780,
-			"width": 420,
-			"height": 140,
-			"styleAttributes": {
-				"shape": "diamond"
-			}
-		},
-		{
-			"id": "g8",
-			"type": "group",
-			"label": "M8 Validate",
-			"x": -680,
-			"y": 8060,
-			"width": 1800,
-			"height": 900
-		},
-		{
-			"id": "n-fse",
-			"type": "file",
-			"file": "spec/ledger/se/machine-systematic-fill-story-evidence.md",
-			"x": 0,
-			"y": 8140,
-			"width": 420,
-			"height": 140
-		},
-		{
-			"id": "n-sc",
-			"type": "file",
-			"file": "spec/ledger/se/machine-systematic-sweep-consistency.md",
-			"x": -560,
-			"y": 8380,
-			"width": 420,
-			"height": 140
-		},
-		{
-			"id": "n-lg",
-			"type": "file",
-			"file": "spec/ledger/se/machine-systematic-log-gaps.md",
-			"x": 560,
-			"y": 8380,
-			"width": 420,
-			"height": 140
-		},
-		{
-			"id": "n-gv",
-			"type": "file",
-			"file": "spec/ledger/se/machine-systematic-gate-validation.md",
-			"x": 0,
-			"y": 8660,
-			"width": 420,
-			"height": 140,
-			"styleAttributes": {
-				"shape": "diamond"
-			}
-		},
-		{
-			"id": "g9",
-			"type": "group",
-			"label": "M9 Ship",
-			"x": -120,
-			"y": 8940,
-			"width": 700,
-			"height": 1400
-		},
-		{
-			"id": "n-fdoc",
-			"type": "file",
-			"file": "spec/ledger/se/machine-systematic-finalize-docs.md",
-			"x": 0,
-			"y": 9020,
-			"width": 420,
-			"height": 140
-		},
-		{
-			"id": "n-pk",
-			"type": "file",
-			"file": "spec/ledger/se/machine-systematic-package.md",
-			"x": 0,
-			"y": 9260,
-			"width": 420,
-			"height": 140
-		},
-		{
-			"id": "n-sr",
-			"type": "file",
-			"file": "spec/ledger/se/machine-systematic-ship-review.md",
-			"x": 0,
-			"y": 9500,
-			"width": 420,
-			"height": 140
-		},
-		{
-			"id": "n-grel",
-			"type": "file",
-			"file": "spec/ledger/se/machine-systematic-gate-release.md",
-			"x": 0,
-			"y": 9740,
-			"width": 420,
-			"height": 140,
-			"styleAttributes": {
-				"shape": "diamond"
-			}
-		},
-		{
-			"id": "n-ship",
-			"type": "file",
-			"file": "spec/ledger/se/machine-systematic-shipped.md",
-			"x": 0,
-			"y": 10020,
-			"width": 420,
-			"height": 140,
-			"styleAttributes": {
-				"shape": "terminal"
-			}
+			"id":"n-ship",
+			"type":"file",
+			"file":"spec/ledger/se/machine-systematic-shipped.md",
+			"x":0,
+			"y":10020,
+			"width":420,
+			"height":140,
+			"styleAttributes":{"shape":"terminal"}
 		}
 	],
-	"edges": [
+	"edges":[
+		{"id":"e0-1","fromNode":"n-oret","fromSide":"bottom","toNode":"n-oplan","toSide":"top"},
+		{"id":"e0-2","fromNode":"n-oplan","fromSide":"bottom","toNode":"n-orig","toSide":"top"},
+		{"id":"e0-3","fromNode":"n-orig","fromSide":"bottom","toNode":"n-gkick","toSide":"top"},
 		{
-			"id": "e1",
-			"fromNode": "n-dv",
-			"fromSide": "bottom",
-			"toNode": "n-da",
-			"toSide": "top"
+			"id":"e0-4",
+			"fromNode":"n-gkick",
+			"fromSide":"bottom",
+			"toNode":"n-dv",
+			"toSide":"top",
+			"styleAttributes":{"role":"approval"}
+		},
+		{"id":"e1","fromNode":"n-dv","fromSide":"bottom","toNode":"n-da","toSide":"top"},
+		{"id":"e2","fromNode":"n-da","fromSide":"bottom","toNode":"n-fd","toSide":"top"},
+		{"id":"e3","fromNode":"n-fd","fromSide":"bottom","toNode":"n-sng","toSide":"top"},
+		{"id":"e4","fromNode":"n-dv","fromSide":"left","toNode":"n-lr","toSide":"top"},
+		{"id":"e5","fromNode":"n-fd","fromSide":"left","toNode":"n-pt","toSide":"top"},
+		{"id":"e6","fromNode":"n-sng","fromSide":"bottom","toNode":"n-gm","toSide":"top"},
+		{"id":"e7","fromNode":"n-lr","fromSide":"bottom","toNode":"n-gm","toSide":"left"},
+		{"id":"e8","fromNode":"n-pt","fromSide":"bottom","toNode":"n-gm","toSide":"left"},
+		{
+			"id":"e9",
+			"fromNode":"n-gm",
+			"fromSide":"bottom",
+			"toNode":"n-dc",
+			"toSide":"top",
+			"styleAttributes":{"role":"approval"}
 		},
 		{
-			"id": "e2",
-			"fromNode": "n-da",
-			"fromSide": "bottom",
-			"toNode": "n-fd",
-			"toSide": "top"
+			"id":"e10",
+			"fromNode":"n-gm",
+			"fromSide":"bottom",
+			"toNode":"n-ms",
+			"toSide":"left",
+			"styleAttributes":{"role":"approval"}
 		},
 		{
-			"id": "e3",
-			"fromNode": "n-fd",
-			"fromSide": "bottom",
-			"toNode": "n-sng",
-			"toSide": "top"
+			"id":"e11",
+			"fromNode":"n-gm",
+			"fromSide":"bottom",
+			"toNode":"n-ws",
+			"toSide":"top",
+			"styleAttributes":{"role":"approval"}
+		},
+		{"id":"e12","fromNode":"n-ws","fromSide":"bottom","toNode":"n-guc","toSide":"top"},
+		{"id":"e13","fromNode":"n-dc","fromSide":"bottom","toNode":"n-gi","toSide":"left"},
+		{"id":"e14","fromNode":"n-ms","fromSide":"bottom","toNode":"n-gi","toSide":"left"},
+		{"id":"e15","fromNode":"n-guc","fromSide":"bottom","toNode":"n-gi","toSide":"top"},
+		{
+			"id":"e16",
+			"fromNode":"n-gi",
+			"fromSide":"bottom",
+			"toNode":"n-wr",
+			"toSide":"top",
+			"styleAttributes":{"role":"approval"}
+		},
+		{"id":"e17","fromNode":"n-wr","fromSide":"bottom","toNode":"n-df","toSide":"top"},
+		{"id":"e18","fromNode":"n-wr","fromSide":"right","toNode":"n-pa","toSide":"top"},
+		{"id":"e19","fromNode":"n-df","fromSide":"bottom","toNode":"n-gr","toSide":"left"},
+		{"id":"e20","fromNode":"n-pa","fromSide":"bottom","toNode":"n-gr","toSide":"right"},
+		{
+			"id":"e21",
+			"fromNode":"n-gr",
+			"fromSide":"bottom",
+			"toNode":"n-dcrit",
+			"toSide":"top",
+			"styleAttributes":{"role":"approval"}
 		},
 		{
-			"id": "e4",
-			"fromNode": "n-dv",
-			"fromSide": "left",
-			"toNode": "n-lr",
-			"toSide": "top"
+			"id":"e22",
+			"fromNode":"n-gr",
+			"fromSide":"bottom",
+			"toNode":"n-pf",
+			"toSide":"top",
+			"styleAttributes":{"role":"approval"}
+		},
+		{"id":"e23","fromNode":"n-pf","fromSide":"bottom","toNode":"n-es","toSide":"top"},
+		{"id":"e24","fromNode":"n-es","fromSide":"bottom","toNode":"n-evs","toSide":"top"},
+		{"id":"e25","fromNode":"n-dcrit","fromSide":"bottom","toNode":"n-evs","toSide":"left"},
+		{"id":"e26","fromNode":"n-evs","fromSide":"bottom","toNode":"n-gc","toSide":"top"},
+		{
+			"id":"e27",
+			"fromNode":"n-gc",
+			"fromSide":"bottom",
+			"toNode":"n-cp",
+			"toSide":"top",
+			"styleAttributes":{"role":"approval"}
+		},
+		{"id":"e28","fromNode":"n-cp","fromSide":"bottom","toNode":"n-rs","toSide":"top"},
+		{"id":"e29","fromNode":"n-rs","fromSide":"left","toNode":"n-ra","toSide":"top"},
+		{"id":"e30","fromNode":"n-rs","fromSide":"bottom","toNode":"n-cb","toSide":"top"},
+		{"id":"e31","fromNode":"n-cb","fromSide":"bottom","toNode":"n-eb","toSide":"top"},
+		{"id":"e32","fromNode":"n-ra","fromSide":"bottom","toNode":"n-ga","toSide":"left"},
+		{"id":"e33","fromNode":"n-eb","fromSide":"bottom","toNode":"n-ga","toSide":"top"},
+		{
+			"id":"e34",
+			"fromNode":"n-ga",
+			"fromSide":"bottom",
+			"toNode":"n-ru",
+			"toSide":"top",
+			"styleAttributes":{"role":"approval"}
+		},
+		{"id":"e35","fromNode":"n-ru","fromSide":"bottom","toNode":"n-fb","toSide":"top"},
+		{"id":"e36","fromNode":"n-fb","fromSide":"bottom","toNode":"n-gp","toSide":"top"},
+		{
+			"id":"e37",
+			"fromNode":"n-gp",
+			"fromSide":"bottom",
+			"toNode":"n-at",
+			"toSide":"top",
+			"styleAttributes":{"role":"approval"}
+		},
+		{"id":"e38","fromNode":"n-at","fromSide":"bottom","toNode":"n-pb","toSide":"top"},
+		{"id":"e39","fromNode":"n-pb","fromSide":"bottom","toNode":"n-or","toSide":"top"},
+		{"id":"e40","fromNode":"n-or","fromSide":"bottom","toNode":"n-ver","toSide":"top"},
+		{"id":"e41","fromNode":"n-ver","fromSide":"bottom","toNode":"n-gimpl","toSide":"top"},
+		{
+			"id":"e42",
+			"fromNode":"n-ver",
+			"fromSide":"left",
+			"toNode":"n-ff",
+			"toSide":"right",
+			"label":"verification_attempts < 3",
+			"styleAttributes":{"role":"fallback","path":"dotted"}
 		},
 		{
-			"id": "e5",
-			"fromNode": "n-fd",
-			"fromSide": "left",
-			"toNode": "n-pt",
-			"toSide": "top"
+			"id":"e43",
+			"fromNode":"n-ff",
+			"fromSide":"top",
+			"toNode":"n-ver",
+			"toSide":"left",
+			"styleAttributes":{"role":"recovery"}
 		},
 		{
-			"id": "e6",
-			"fromNode": "n-sng",
-			"fromSide": "bottom",
-			"toNode": "n-gm",
-			"toSide": "top"
+			"id":"e44",
+			"fromNode":"n-gimpl",
+			"fromSide":"bottom",
+			"toNode":"n-fse",
+			"toSide":"top",
+			"styleAttributes":{"role":"approval"}
 		},
+		{"id":"e45","fromNode":"n-fse","fromSide":"left","toNode":"n-sc","toSide":"top"},
+		{"id":"e46","fromNode":"n-fse","fromSide":"right","toNode":"n-lg","toSide":"top"},
+		{"id":"e47","fromNode":"n-fse","fromSide":"bottom","toNode":"n-gv","toSide":"top"},
+		{"id":"e48","fromNode":"n-sc","fromSide":"bottom","toNode":"n-gv","toSide":"left"},
+		{"id":"e49","fromNode":"n-lg","fromSide":"bottom","toNode":"n-gv","toSide":"right"},
 		{
-			"id": "e7",
-			"fromNode": "n-lr",
-			"fromSide": "bottom",
-			"toNode": "n-gm",
-			"toSide": "left"
+			"id":"e50",
+			"fromNode":"n-gv",
+			"fromSide":"bottom",
+			"toNode":"n-fdoc",
+			"toSide":"top",
+			"styleAttributes":{"role":"approval"}
 		},
+		{"id":"e51","fromNode":"n-fdoc","fromSide":"bottom","toNode":"n-pk","toSide":"top"},
+		{"id":"e52","fromNode":"n-pk","fromSide":"bottom","toNode":"n-sr","toSide":"top"},
+		{"id":"e53","fromNode":"n-sr","fromSide":"bottom","toNode":"n-grel","toSide":"top"},
 		{
-			"id": "e8",
-			"fromNode": "n-pt",
-			"fromSide": "bottom",
-			"toNode": "n-gm",
-			"toSide": "left"
-		},
-		{
-			"id": "e9",
-			"fromNode": "n-gm",
-			"fromSide": "bottom",
-			"toNode": "n-dc",
-			"toSide": "top",
-			"styleAttributes": {
-				"role": "approval"
-			}
-		},
-		{
-			"id": "e10",
-			"fromNode": "n-gm",
-			"fromSide": "bottom",
-			"toNode": "n-ms",
-			"toSide": "left",
-			"styleAttributes": {
-				"role": "approval"
-			}
-		},
-		{
-			"id": "e11",
-			"fromNode": "n-gm",
-			"fromSide": "bottom",
-			"toNode": "n-ws",
-			"toSide": "top",
-			"styleAttributes": {
-				"role": "approval"
-			}
-		},
-		{
-			"id": "e12",
-			"fromNode": "n-ws",
-			"fromSide": "bottom",
-			"toNode": "n-guc",
-			"toSide": "top"
-		},
-		{
-			"id": "e13",
-			"fromNode": "n-dc",
-			"fromSide": "bottom",
-			"toNode": "n-gi",
-			"toSide": "left"
-		},
-		{
-			"id": "e14",
-			"fromNode": "n-ms",
-			"fromSide": "bottom",
-			"toNode": "n-gi",
-			"toSide": "left"
-		},
-		{
-			"id": "e15",
-			"fromNode": "n-guc",
-			"fromSide": "bottom",
-			"toNode": "n-gi",
-			"toSide": "top"
-		},
-		{
-			"id": "e16",
-			"fromNode": "n-gi",
-			"fromSide": "bottom",
-			"toNode": "n-wr",
-			"toSide": "top",
-			"styleAttributes": {
-				"role": "approval"
-			}
-		},
-		{
-			"id": "e17",
-			"fromNode": "n-wr",
-			"fromSide": "bottom",
-			"toNode": "n-df",
-			"toSide": "top"
-		},
-		{
-			"id": "e18",
-			"fromNode": "n-wr",
-			"fromSide": "right",
-			"toNode": "n-pa",
-			"toSide": "top"
-		},
-		{
-			"id": "e19",
-			"fromNode": "n-df",
-			"fromSide": "bottom",
-			"toNode": "n-gr",
-			"toSide": "left"
-		},
-		{
-			"id": "e20",
-			"fromNode": "n-pa",
-			"fromSide": "bottom",
-			"toNode": "n-gr",
-			"toSide": "right"
-		},
-		{
-			"id": "e21",
-			"fromNode": "n-gr",
-			"fromSide": "bottom",
-			"toNode": "n-dcrit",
-			"toSide": "top",
-			"styleAttributes": {
-				"role": "approval"
-			}
-		},
-		{
-			"id": "e22",
-			"fromNode": "n-gr",
-			"fromSide": "bottom",
-			"toNode": "n-pf",
-			"toSide": "top",
-			"styleAttributes": {
-				"role": "approval"
-			}
-		},
-		{
-			"id": "e23",
-			"fromNode": "n-pf",
-			"fromSide": "bottom",
-			"toNode": "n-es",
-			"toSide": "top"
-		},
-		{
-			"id": "e24",
-			"fromNode": "n-es",
-			"fromSide": "bottom",
-			"toNode": "n-evs",
-			"toSide": "top"
-		},
-		{
-			"id": "e25",
-			"fromNode": "n-dcrit",
-			"fromSide": "bottom",
-			"toNode": "n-evs",
-			"toSide": "left"
-		},
-		{
-			"id": "e26",
-			"fromNode": "n-evs",
-			"fromSide": "bottom",
-			"toNode": "n-gc",
-			"toSide": "top"
-		},
-		{
-			"id": "e27",
-			"fromNode": "n-gc",
-			"fromSide": "bottom",
-			"toNode": "n-cp",
-			"toSide": "top",
-			"styleAttributes": {
-				"role": "approval"
-			}
-		},
-		{
-			"id": "e28",
-			"fromNode": "n-cp",
-			"fromSide": "bottom",
-			"toNode": "n-rs",
-			"toSide": "top"
-		},
-		{
-			"id": "e29",
-			"fromNode": "n-rs",
-			"fromSide": "left",
-			"toNode": "n-ra",
-			"toSide": "top"
-		},
-		{
-			"id": "e30",
-			"fromNode": "n-rs",
-			"fromSide": "bottom",
-			"toNode": "n-cb",
-			"toSide": "top"
-		},
-		{
-			"id": "e31",
-			"fromNode": "n-cb",
-			"fromSide": "bottom",
-			"toNode": "n-eb",
-			"toSide": "top"
-		},
-		{
-			"id": "e32",
-			"fromNode": "n-ra",
-			"fromSide": "bottom",
-			"toNode": "n-ga",
-			"toSide": "left"
-		},
-		{
-			"id": "e33",
-			"fromNode": "n-eb",
-			"fromSide": "bottom",
-			"toNode": "n-ga",
-			"toSide": "top"
-		},
-		{
-			"id": "e34",
-			"fromNode": "n-ga",
-			"fromSide": "bottom",
-			"toNode": "n-ru",
-			"toSide": "top",
-			"styleAttributes": {
-				"role": "approval"
-			}
-		},
-		{
-			"id": "e35",
-			"fromNode": "n-ru",
-			"fromSide": "bottom",
-			"toNode": "n-fb",
-			"toSide": "top"
-		},
-		{
-			"id": "e36",
-			"fromNode": "n-fb",
-			"fromSide": "bottom",
-			"toNode": "n-gp",
-			"toSide": "top"
-		},
-		{
-			"id": "e37",
-			"fromNode": "n-gp",
-			"fromSide": "bottom",
-			"toNode": "n-at",
-			"toSide": "top",
-			"styleAttributes": {
-				"role": "approval"
-			}
-		},
-		{
-			"id": "e38",
-			"fromNode": "n-at",
-			"fromSide": "bottom",
-			"toNode": "n-pb",
-			"toSide": "top"
-		},
-		{
-			"id": "e39",
-			"fromNode": "n-pb",
-			"fromSide": "bottom",
-			"toNode": "n-or",
-			"toSide": "top"
-		},
-		{
-			"id": "e40",
-			"fromNode": "n-or",
-			"fromSide": "bottom",
-			"toNode": "n-ver",
-			"toSide": "top"
-		},
-		{
-			"id": "e41",
-			"fromNode": "n-ver",
-			"fromSide": "bottom",
-			"toNode": "n-gimpl",
-			"toSide": "top"
-		},
-		{
-			"id": "e42",
-			"fromNode": "n-ver",
-			"fromSide": "left",
-			"toNode": "n-ff",
-			"toSide": "right",
-			"label": "verification_attempts < 3",
-			"styleAttributes": {
-				"role": "fallback",
-				"path": "dotted"
-			}
-		},
-		{
-			"id": "e43",
-			"fromNode": "n-ff",
-			"fromSide": "top",
-			"toNode": "n-ver",
-			"toSide": "left",
-			"styleAttributes": {
-				"role": "recovery"
-			}
-		},
-		{
-			"id": "e44",
-			"fromNode": "n-gimpl",
-			"fromSide": "bottom",
-			"toNode": "n-fse",
-			"toSide": "top",
-			"styleAttributes": {
-				"role": "approval"
-			}
-		},
-		{
-			"id": "e45",
-			"fromNode": "n-fse",
-			"fromSide": "left",
-			"toNode": "n-sc",
-			"toSide": "top"
-		},
-		{
-			"id": "e46",
-			"fromNode": "n-fse",
-			"fromSide": "right",
-			"toNode": "n-lg",
-			"toSide": "top"
-		},
-		{
-			"id": "e47",
-			"fromNode": "n-fse",
-			"fromSide": "bottom",
-			"toNode": "n-gv",
-			"toSide": "top"
-		},
-		{
-			"id": "e48",
-			"fromNode": "n-sc",
-			"fromSide": "bottom",
-			"toNode": "n-gv",
-			"toSide": "left"
-		},
-		{
-			"id": "e49",
-			"fromNode": "n-lg",
-			"fromSide": "bottom",
-			"toNode": "n-gv",
-			"toSide": "right"
-		},
-		{
-			"id": "e50",
-			"fromNode": "n-gv",
-			"fromSide": "bottom",
-			"toNode": "n-fdoc",
-			"toSide": "top",
-			"styleAttributes": {
-				"role": "approval"
-			}
-		},
-		{
-			"id": "e51",
-			"fromNode": "n-fdoc",
-			"fromSide": "bottom",
-			"toNode": "n-pk",
-			"toSide": "top"
-		},
-		{
-			"id": "e52",
-			"fromNode": "n-pk",
-			"fromSide": "bottom",
-			"toNode": "n-sr",
-			"toSide": "top"
-		},
-		{
-			"id": "e53",
-			"fromNode": "n-sr",
-			"fromSide": "bottom",
-			"toNode": "n-grel",
-			"toSide": "top"
-		},
-		{
-			"id": "e54",
-			"fromNode": "n-grel",
-			"fromSide": "bottom",
-			"toNode": "n-ship",
-			"toSide": "top",
-			"styleAttributes": {
-				"role": "approval"
-			}
+			"id":"e54",
+			"fromNode":"n-grel",
+			"fromSide":"bottom",
+			"toNode":"n-ship",
+			"toSide":"top",
+			"styleAttributes":{"role":"approval"}
 		}
 	]
 }
