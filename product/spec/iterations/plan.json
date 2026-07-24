@@ -9,12 +9,20 @@
         { "text": "plan insert/renumber ops: planned iterations renumber freely, started ids are frozen (engine-checked); rides the dry_run -> execute lane" },
         { "text": "link graph + rename ripple: warm index over all markdown links incl. section targets; renaming a note or a section updates every inbound link (se.set.refactor kind=rename)" },
         { "text": "search scope parameter: se_file_search/read/list over declared roots (imports, v1, the owner's working folder) - declared, never arbitrary" },
-        { "text": "retro flow v1 - runs as the drawn M0 onboarding block (onboard_retro -> onboard_plan -> onboard_rigor -> gate_kickoff): field-feedback question first, notes inbox drained, call log and se_help misses mined, scope and rigor confirmed at the kickoff gate; standing question: has the process gone stale (state-of-the-art, process dimension)" },
+        { "text": "retro flow v1 - runs as the drawn M0 onboarding (onboard_retro -> gate_kickoff): field-feedback question first, notes inbox drained, call log and se_help misses mined; ONE kickoff handover carries goal, scope and rigor; standing question: has the process gone stale (state-of-the-art, process dimension)" },
         { "text": "policy derivation: lean re-derived as a strike-list from systematic - diffable, per the walkthrough ruling" },
         { "text": "projection: last_verify picked by timestamp, not folder order" },
         { "text": "boot cleanliness: the toll never blocks a session's first se_boot; se_boot refuses without a named project and its refusal tells the agent to ask the owner; one-question ritual per the contract" },
         { "text": "toll v2: update required on se_loop_submit; wall-clock floor tightened to ~5 min; toll and update-field text teach proactive updates (a volunteered update is never stopped)" },
         { "text": "se-gate: record role not username@hostname; loud message on expired offer" },
+        { "text": "apply-lane ergonomics: dry_run optional (fire-first philosophy), execute-by-hash without resending ops, surgical canvas ops (add/remove node and edge)" },
+        { "text": "1s interactive rule (req-1s-interactive): every se call answers within 1s or returns a background handle; first offender fixed: engine-filled states (verify suite) run inline in next() - move them to background runs" },
+        { "text": "call log hygiene: failures log clause + short reason (the retro ranks clauses); fix the double-logged dispatch lines" },
+        { "text": "engine hot reload: mtime-keyed dynamic import behind the stable stdio shim - retires the /mcp reconnect chore (dev mode)" },
+        { "text": "run-tests affordance: one call runs the declared suite outside loop verify (rides the 1s/background rule)" },
+        { "text": "process lane: list/stop/cycle se-owned processes (board, engine child) - retires ad-hoc netstat/taskkill" },
+        { "text": "offer lane: dismiss/supersede a stale offer; re-offer replaces when machine state is unchanged" },
+        { "text": "contract bake: gate parking arms a watcher on offer.json; boot's already-admitted branch pokes the board" },
         { "text": "bless the executor behavior against the drawn machine at the gate", "owner": true },
         { "text": "retro shape: answer the field-feedback opener", "owner": true }
       ]
@@ -27,12 +35,26 @@
         { "text": "audit the i1 chat-session bless - re-bless via console or accept", "owner": true },
         { "text": "trace-dir ruling: v1 trace stays unmigrated, v2 grows its own spine - confirm or flip", "owner": true },
         { "text": "set_field dot-path support for nested frontmatter; then correct the 7 stale pending-owner stamps in the resolved q-p3delta nodes" },
+        { "text": "apply-lane schema validation: kind-level vocabulary and required-field rules - the lane refuses what a schema can refuse" },
+        { "text": "dot-path file lane: product/.obsidian and root dot-files (.gitignore) served through se_file_* - today reachable by nobody" },
+        { "text": "ledger structure talk: flat-dir index (Obsidian index/Bases view) and the methods/templates home question", "owner": true },
         { "text": "draft glossary entries for the 139 term-worklist candidates" },
         { "text": "cold-model run: feed each rejection to a fresh session, prove one-turn recovery" }
       ]
     },
     {
-      "id": "i5-kb-content",
+      "id": "i5-trace-book",
+      "machine": "systematic",
+      "goal": "The spec becomes visible: one button renders the book, and the trace graph is browsable - lands before the phone lane and before v1 retires.",
+      "steps": [
+        { "text": "book button on the board: one click renders the book from the ledger and opens it" },
+        { "text": "trace graph view: requirements, designs, questions and their edges browsable (cytoscape drill-down per the v1 onion learnings)" },
+        { "text": "requirement capture proven: req-1s-interactive and successors live as trace residents with verify methods" },
+        { "text": "redline round on book and trace view", "owner": true }
+      ]
+    },
+    {
+      "id": "i6-kb-content",
       "machine": "systematic",
       "goal": "The kb module carries real content, tier-safe.",
       "steps": [
@@ -43,7 +65,7 @@
       ]
     },
     {
-      "id": "i6-phone-lane",
+      "id": "i7-phone-lane",
       "machine": "systematic",
       "goal": "Offers reach the phone; a bless works from anywhere within the 6h window.",
       "steps": [
@@ -53,18 +75,19 @@
       ]
     },
     {
-      "id": "i7-board-rounds",
+      "id": "i8-board-rounds",
       "machine": "systematic",
       "goal": "The board matures through owner design rounds.",
       "steps": [
         { "text": "redline rounds on the live board (sketch: product/scratchpad/exc/status-dashboard.md)", "owner": true },
-        { "text": "apply the rounds; dark theme; multi-agent tabs when worktrees land" },
-        { "text": "liveness honesty: the green dot goes red when no session is connected; log details show request AND response; drop the minutes-ago age display" },
+        { "text": "apply the rounds; dark theme; multi-agent tabs when worktrees land; DRY blink token (one pulse definition, one edit changes the speed)" },
+        { "text": "liveness honesty: the green dot goes red when no session is connected; log details show request AND response; drop the minutes-ago age display; ETA renders as clock time" },
+        { "text": "board as interaction surface (owner click = input channel) - revisit once the executor landed", "owner": true },
         { "text": "search checkpoint with scale data: FTS5-ranked index, vendor rg or stay naive", "owner": true }
       ]
     },
     {
-      "id": "i8-v1-retirement",
+      "id": "i9-v1-retirement",
       "machine": "systematic",
       "goal": "v2 daily-drives the real work; v1 archives.",
       "depends_on": ["i3-machine-and-retro"],

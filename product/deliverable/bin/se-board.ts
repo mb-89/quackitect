@@ -100,7 +100,7 @@ const PAGE = `<!doctype html>
   .iterrow:hover { background: #eef; }
   .led { width: .6em; height: .6em; border-radius: 50%; background: #e4e4e4; flex: 0 0 auto; }
   .led.done { background: var(--ok); }
-  .led.open { background: var(--warn); animation: pulse 1.2s ease-in-out infinite; }
+  .led.open { background: var(--warn); animation: pulse 2.4s ease-in-out infinite; }
   @keyframes pulse { 50% { opacity: .25; } }
   .hb { background: #fff; border: 1px solid var(--line); border-radius: 6px; padding: .4em .6em; margin-bottom: .5em; }
   .hb .age { color: var(--dim); font-size: 12px; }

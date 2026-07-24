@@ -5,16 +5,14 @@
 	},
 	"nodes":[
 		{"id":"c-head","type":"text","text":"# The systematic machine\nNine milestones, each ending in an owner-adjudicated gate. Edges are dependencies: all successors of a completed state may run in parallel; a state with several fired inputs waits for all of them. Gate reviews follow meth-gate-review; three states seed iteration-local sub-machines (candidates, spikes, build chunks). Runs on the parallel executor once it lands - drawn now as the binding spec.","x":-620,"y":-400,"width":1100,"height":260},
-		{"id":"g0","type":"group","label":"M0 Onboard","x":-680,"y":-1680,"width":1180,"height":1020},
+		{"id":"g0","type":"group","label":"M0 Onboard","x":-680,"y":-1680,"width":1180,"height":560},
 		{"id":"n-oret","type":"file","file":"spec/ledger/se/machine-systematic-onboard-retro.md","x":0,"y":-1600,"width":420,"height":140},
-		{"id":"n-oplan","type":"file","file":"spec/ledger/se/machine-systematic-onboard-plan.md","x":0,"y":-1360,"width":420,"height":140},
-		{"id":"n-orig","type":"file","file":"spec/ledger/se/machine-systematic-onboard-rigor.md","x":0,"y":-1120,"width":420,"height":140},
 		{
 			"id":"n-gkick",
 			"type":"file",
 			"file":"spec/ledger/se/machine-systematic-gate-kickoff.md",
 			"x":0,
-			"y":-880,
+			"y":-1360,
 			"width":420,
 			"height":140,
 			"styleAttributes":{"shape":"diamond"}
@@ -177,11 +175,9 @@
 		}
 	],
 	"edges":[
-		{"id":"e0-1","fromNode":"n-oret","fromSide":"bottom","toNode":"n-oplan","toSide":"top"},
-		{"id":"e0-2","fromNode":"n-oplan","fromSide":"bottom","toNode":"n-orig","toSide":"top"},
-		{"id":"e0-3","fromNode":"n-orig","fromSide":"bottom","toNode":"n-gkick","toSide":"top"},
+		{"id":"e0-1","fromNode":"n-oret","fromSide":"bottom","toNode":"n-gkick","toSide":"top"},
 		{
-			"id":"e0-4",
+			"id":"e0-2",
 			"fromNode":"n-gkick",
 			"fromSide":"bottom",
 			"toNode":"n-dv",
