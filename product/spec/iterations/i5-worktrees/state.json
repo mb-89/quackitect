@@ -1,7 +1,7 @@
 {
   "machine": "systematic",
   "iteration": "i5-worktrees",
-  "current": "author_tests",
+  "current": "fill_story_evidence",
   "counters": {},
   "history": [
     {
@@ -195,13 +195,49 @@
       "outcome": "filled",
       "evidence": "grant:a14439e296d3",
       "at": "2026-07-24T13:50:29.581Z"
+    },
+    {
+      "state": "author_tests",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i5-worktrees/evidence/author_tests-1.json",
+      "at": "2026-07-24T13:52:26.536Z"
+    },
+    {
+      "state": "plan_build",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i5-worktrees/evidence/plan_build-1.json",
+      "at": "2026-07-24T13:53:32.560Z"
+    },
+    {
+      "state": "observe_red",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i5-worktrees/evidence/observe_red-1.json",
+      "at": "2026-07-24T13:53:56.168Z"
+    },
+    {
+      "state": "build_steps",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i5-worktrees/evidence/build_steps-1.json",
+      "at": "2026-07-24T14:18:42.720Z"
+    },
+    {
+      "state": "verification",
+      "outcome": "filled",
+      "evidence": "run-119bc601e093",
+      "at": "2026-07-24T14:19:15.031Z"
+    },
+    {
+      "state": "gate_implementation",
+      "outcome": "filled",
+      "evidence": "grant:57bfbc70ad42",
+      "at": "2026-07-24T14:19:54.799Z"
     }
   ],
   "escapes": [],
   "status": "open",
   "fired": [],
   "active": [
-    "author_tests"
+    "fill_story_evidence"
   ],
   "claims": {}
 }

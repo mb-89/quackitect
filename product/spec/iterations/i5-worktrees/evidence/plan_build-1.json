@@ -1,0 +1,9 @@
+{
+  "iteration": "i5-worktrees",
+  "state": "plan_build",
+  "at": "2026-07-24T13:53:32.557Z",
+  "payload": {
+    "build_machine": "it.machine-build-steps drawn into the iteration (canvas + 7 notes, chain-ordered): start -> c1_worktree_lane (engine-ts, E1) -> c2_depends_gate (engine-ts, E2+E3) -> c3_ship_merge (engine-ts, E4+E5) -> c4_surface_guards (engine-ts + board-html, E6-E8) -> c5_knowledge (ledger + process) -> done. Dependencies are real: c2 starts trees c1 makes, c3 merges what c2 opened; c4/c5 chain for the single session. Every chunk carries its realization kind so the guidance registry serves the discipline rules.",
+    "promotions_placed": "sp1's fixture pattern (trunk + real worktrees + full walk) is the authored W1 killer test's skeleton - already in tests/i5-worktrees.test.ts, so the promotion enters as the RED CHECKS the chunks green rather than a separate starting chunk; sp2's expectation lives as the fence coverage already pinned."
+  }
+}

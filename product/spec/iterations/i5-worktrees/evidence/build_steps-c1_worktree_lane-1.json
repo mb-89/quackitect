@@ -1,0 +1,9 @@
+{
+  "iteration": "i5-worktrees",
+  "state": "build_steps-c1_worktree_lane",
+  "at": "2026-07-24T13:55:50.116Z",
+  "payload": {
+    "what_landed": "engine/worktree.ts: worktreeHome/worktreePath/branchName per adr-worktree-home-inrepo, provisionWorktree (adopts leftovers, re-uses existing branches, SE-C-074 on unprovisionable trees, ensureIgnored writes the .worktrees/ gitignore entry idempotently), retireWorktree (ship removes via git, abandon writes the .abandoned flag, failed removal flags .retire-failed - never forces further), openWorktrees (porcelain list filtered to the home, abandoned excluded), plus assertDependsMet (SE-C-072, c2's law, landed with the module) and an honest not-built shipMerge thrower so the red file links. c1's two tests green in run-cd000b23c7a2 (provision/adopt, abandon/debris); every other red is now a mechanism red, with one test-fixture mkdir-order fix applied for c2.",
+    "run_ref": "run-cd000b23c7a2"
+  }
+}

@@ -10,6 +10,7 @@ import { layout } from "./layout.ts";
 import type { MachineDecl, MachineInstance } from "./machine.ts";
 import { loadIterationMachine, loadMachine, loadSession, loadSystematic } from "./machines/load.ts";
 import { loadModules, type ModuleStatus } from "./modules.ts";
+import { openWorktrees } from "./worktree.ts";
 import type { TollUpdate } from "./toll.ts";
 
 export const BOARD_VERSION = "0.1.0";
@@ -84,8 +85,9 @@ export interface ProjectionState {
   board_version: string;
   /** Admission time of the current session (the lock's timestamp); scopes the call feed. */
   session_started: string | null;
-  /** One tab per agent; names are duck species, the driving agent is mallard. */
-  agents: { name: string; role: string }[];
+  /** One tab per agent; the driving agent is mallard. Worktree streams
+   *  (req-streams-visible) join with role="stream", carrying their root. */
+  agents: { name: string; role: string; iteration?: string; root?: string }[];
   modules: ModuleStatus[];
   iterations: IterationView[];
   open_iteration: string | null;
@@ -351,7 +353,7 @@ export function projectState(root: string): ProjectionState {
     generated_at: new Date().toISOString(),
     board_version: BOARD_VERSION,
     session_started: sessionStarted,
-    agents: [{ name: "mallard", role: "main" }],
+    agents: [{ name: "mallard", role: "main" }, ...worktreeStreams(abs)],
     modules: loadModules(abs),
     iterations,
     open_iteration: openIteration,
@@ -363,6 +365,22 @@ export function projectState(root: string): ProjectionState {
     calls,
     notes: liveNotes(abs).slice(-10).reverse(),
   };
+}
+
+/** Every open worktree iteration as a board stream (req-streams-visible). */
+function worktreeStreams(abs: string): { name: string; role: string; iteration: string; root: string }[] {
+  const out: { name: string; role: string; iteration: string; root: string }[] = [];
+  for (const w of openWorktrees(abs)) {
+    const instPath = layout.instancePath(w.root, w.iteration);
+    if (!existsSync(instPath)) continue;
+    try {
+      if (readJsonFile<MachineInstance>(instPath).status !== "open") continue;
+    } catch {
+      continue;
+    }
+    out.push({ name: w.iteration, role: "stream", iteration: w.iteration, root: w.root });
+  }
+  return out;
 }
 
 /** The inbox minus drained notes: a disposition line retires its target. */

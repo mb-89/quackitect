@@ -1,0 +1,9 @@
+{
+  "iteration": "i5-worktrees",
+  "state": "build_steps-c3_ship_merge",
+  "at": "2026-07-24T14:13:59.771Z",
+  "payload": {
+    "what_landed": "worktree.ts shipMerge (E4+E5): current-branch-aware merge to trunk; overlap = fork-point diff intersection filtered to ledger .md; a clean merge writes the suspect frontmatter field on every overlapping node through canonical parseNode/serializeNode (adr-suspect-frontmatter), commits them, and retires the tree; a textual conflict collects the U-files, aborts, and returns {merged:false, conflict} leaving trunk truth untouched (req-conflict-stops). DESIGN FINDING surfaced and handled: two iterations both closing both APPEND grants.jsonl -> add/add conflict that would block every honest parallel ship; shipMerge provisions a .gitattributes 'grants.jsonl merge=union' on the trunk before merging so append-only ledger events concatenate instead of conflicting - a genuinely new element found mid-build, small and inside the SHIP cluster, recorded here rather than sneaked in. W1 killer + conflict tests green in run-a9bb68008f3c (the 3 remaining reds are all c4).",
+    "run_ref": "run-a9bb68008f3c"
+  }
+}

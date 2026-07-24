@@ -41,6 +41,8 @@ export interface PlanEntry {
   depends_on?: string[];
   /** Declared at kickoff; gate_validation's market tier applies only when set. */
   market?: boolean;
+  /** The iteration opens in its own provisioned worktree (i5 lane). */
+  worktree?: boolean;
   steps?: { text: string; owner?: boolean }[];
 }
 

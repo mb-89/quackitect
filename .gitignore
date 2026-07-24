@@ -2,3 +2,4 @@
 *.tsbuildinfo
 product/spec/handover.md
 product/scratchpad/
+.worktrees/

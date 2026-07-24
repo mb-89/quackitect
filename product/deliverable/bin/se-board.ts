@@ -359,6 +359,7 @@ function layoutMiddle() {
   el("st-tot").className = "tab" + (subTab === "tot" ? " active" : "");
   el("rspacer").style.height = (el("agentbar").offsetHeight + el("subtabbar").offsetHeight) + "px";
 }
+let actGen = 0; // bumps on every local act; a poll older than the last act is stale
 let CRUMBMENU = -1;
 function smView(i) { SMVIEW = i; CRUMBMENU = -1; render(); }
 function crumbMenu(p, ev) { ev.stopPropagation(); CRUMBMENU = CRUMBMENU === p ? -1 : p; render(); }
@@ -515,8 +516,13 @@ function render() {
 function decStep(d) { if (DECS.length > 1) { decIdx = (decIdx + d + DECS.length) % DECS.length; render(); } }
 async function tick() {
   wdTick++;
+  const gen = actGen;
   try {
-    S = await (await fetch("/state.json")).json();
+    const next = await (await fetch("/state.json")).json();
+    // A local act fired while this poll was in flight: dropping the stale
+    // poll keeps a consumed offer from flickering back onto the board.
+    if (gen !== actGen) { console.error("se-board: stale poll dropped"); return; }
+    S = next;
     wdFail = 0;
     render();
   } catch (e) {
@@ -529,6 +535,7 @@ async function tick() {
 // lands in details, and the next poll restores the card if the act failed.
 async function bless() {
   const hash = S.offer.base_hash;
+  actGen++;
   S.offer = null;
   render();
   try {
@@ -540,6 +547,7 @@ async function bless() {
   tick();
 }
 async function dismiss() {
+  actGen++;
   S.offer = null;
   render();
   try {

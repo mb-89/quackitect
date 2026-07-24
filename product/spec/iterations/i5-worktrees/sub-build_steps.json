@@ -1,0 +1,50 @@
+{
+  "machine": "build-steps",
+  "iteration": "i5-worktrees#build_steps",
+  "current": "done",
+  "counters": {},
+  "history": [
+    {
+      "state": "start",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i5-worktrees/evidence/build_steps-start-1.json",
+      "at": "2026-07-24T13:54:09.238Z"
+    },
+    {
+      "state": "c1_worktree_lane",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i5-worktrees/evidence/build_steps-c1_worktree_lane-1.json",
+      "at": "2026-07-24T13:55:50.116Z"
+    },
+    {
+      "state": "c2_depends_gate",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i5-worktrees/evidence/build_steps-c2_depends_gate-1.json",
+      "at": "2026-07-24T13:57:44.880Z"
+    },
+    {
+      "state": "c3_ship_merge",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i5-worktrees/evidence/build_steps-c3_ship_merge-1.json",
+      "at": "2026-07-24T14:13:59.772Z"
+    },
+    {
+      "state": "c4_surface_guards",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i5-worktrees/evidence/build_steps-c4_surface_guards-1.json",
+      "at": "2026-07-24T14:17:41.935Z"
+    },
+    {
+      "state": "c5_knowledge",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i5-worktrees/evidence/build_steps-c5_knowledge-1.json",
+      "at": "2026-07-24T14:18:42.707Z"
+    }
+  ],
+  "escapes": [],
+  "status": "closed",
+  "fired": [],
+  "active": [
+    "done"
+  ]
+}

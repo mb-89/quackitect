@@ -1,0 +1,13 @@
+{
+  "iteration": "i5-worktrees",
+  "state": "verification",
+  "at": "2026-07-24T14:19:15.030Z",
+  "payload": {
+    "run_ref": "run-119bc601e093",
+    "command": "npm --prefix product/deliverable run verify --loglevel=error",
+    "exit": 0
+  },
+  "pinned_run": {
+    "ref": "run-119bc601e093"
+  }
+}

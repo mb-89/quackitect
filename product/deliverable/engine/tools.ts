@@ -10,7 +10,8 @@ import { dryRun, execute, type ApplyOp } from "./apply.ts";
 import type { ToolDef } from "./mcp.ts";
 import { migrateDryRun, migrateExecute, registerMigration } from "./migrate.ts";
 import { v1Import } from "./migrations/v1-import.ts";
-import { Loop } from "./loop.ts";
+import { Loop, hasOpenInstance } from "./loop.ts";
+import { openWorktrees } from "./worktree.ts";
 import { loadSystematic, requireSystematic } from "./machines/load.ts";
 import { CallLog } from "./calllog.ts";
 import { Toll, TOLL_UPDATE_SCHEMA } from "./toll.ts";
@@ -44,7 +45,17 @@ registerMigration(v1Import);
 export function coreTools(root: string, opts: { toll?: Toll; session?: Session } = {}): ToolDef[] {
   const ledgerRoot = layout.ledger(root);
   const session = opts.session ?? newSession();
-  const loop = (): Loop => new Loop(root, requireSystematic(root));
+  // K1-prime routing (adr-iteration-resolved-roots): the trunk's open
+  // instance serves first; otherwise the first open worktree stream does,
+  // under ITS OWN root and machines.
+  const loop = (): Loop => {
+    if (!hasOpenInstance(root)) {
+      for (const w of openWorktrees(root)) {
+        if (hasOpenInstance(w.root)) return new Loop(w.root, requireSystematic(w.root));
+      }
+    }
+    return new Loop(root, requireSystematic(root));
+  };
   const log = (): CallLog => new CallLog(layout.seDir(root));
   const tools: ToolDef[] = [
     {
@@ -421,12 +432,32 @@ export function coreTools(root: string, opts: { toll?: Toll; session?: Session }
         required: ["ref", "disposition"],
       },
       handler: (args) => {
+        const ref = String(args.ref);
+        // A dead ref (a truncated fragment, a typo) must not fake a disposition.
+        const known = existsSync(layout.notesPath(root))
+          ? new Set(
+              readFileSync(layout.notesPath(root), "utf8")
+                .split("\n")
+                .filter((l) => l.trim() !== "")
+                .map((l) => (JSON.parse(l) as { ref?: string }).ref)
+                .filter((r): r is string => r !== undefined),
+            )
+          : new Set<string>();
+        if (!known.has(ref)) {
+          throw new Rejection({
+            clause: "SE-C-073",
+            expected: "a ref carried by a live note (drains never fake a disposition)",
+            got: ref,
+            remedy: { tool: "se_note_drain", args: { ref: "<a real note ref from the inbox>", disposition: String(args.disposition ?? "") }, note: "read the inbox; refs are full note-<hex>, never a fragment" },
+            source: "engine/tools.ts se_note_drain",
+          });
+        }
         appendFileSync(
           layout.notesPath(root),
-          JSON.stringify({ drain_of: String(args.ref), disposition: String(args.disposition), at: new Date().toISOString() }) + "\n",
+          JSON.stringify({ drain_of: ref, disposition: String(args.disposition), at: new Date().toISOString() }) + "\n",
           "utf8",
         );
-        return { drained: String(args.ref), inbox_count: inboxCount(root) };
+        return { drained: ref, inbox_count: inboxCount(root) };
       },
     },
     {

@@ -1,0 +1,9 @@
+{
+  "iteration": "i5-worktrees",
+  "state": "build_steps-c4_surface_guards",
+  "at": "2026-07-24T14:17:41.935Z",
+  "payload": {
+    "what_landed": "project.ts: worktreeStreams derives one agents[] entry per OPEN worktree iteration (role=stream, iteration+root; req-streams-visible, DRY-derived at read from git worktree list + instance status); openWorktrees hardened to a slash-agnostic parent-dir check. tools.ts: se_note_drain now refuses an unknown ref (SE-C-073) - the truncated-ref incident that seeded this becomes an engine refusal. bin/se-board.ts: actGen generation counter - bless/dismiss bump it, tick drops any poll response issued before the last local act (the witnessed decisions-flicker fixed at the client too, on top of i4's server cache-bust). All 8 i5 tests green in run-794eec4fe05a; board fenced to tab data + the guard, nothing into i9's territory.",
+    "run_ref": "run-794eec4fe05a"
+  }
+}

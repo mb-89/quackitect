@@ -18,6 +18,8 @@ import { activeStates, advance, completeState, validateMachine, type MachineDecl
 import { claimState, readInstance } from "./instance.ts";
 import { loadIterationMachine, loadMachine } from "./machines/load.ts";
 import { loadLedger } from "./store.ts";
+import { assertDependsMet, provisionWorktree, worktreeHome } from "./worktree.ts";
+import { basename as pathBase, dirname as pathDir } from "node:path";
 
 export interface WorkPacket {
   kind: "instruction" | "work" | "gate" | "gate_offered" | "closed" | "escaped" | "running";
@@ -43,6 +45,26 @@ export interface WorkPacket {
 }
 
 const now = (): string => new Date().toISOString();
+
+/** True when a root holds an open iteration instance (per-root SE-C-031 scope). */
+export function hasOpenInstance(root: string): boolean {
+  const iterations = layout.iterations(root);
+  if (!existsSync(iterations)) return false;
+  for (const dir of readdirSync(iterations, { withFileTypes: true })) {
+    if (!dir.isDirectory()) continue;
+    const file = layout.instancePath(root, dir.name);
+    if (!existsSync(file)) continue;
+    try {
+      if (readJsonFile<MachineInstance>(file).status === "open") return true;
+    } catch {
+      continue;
+    }
+  }
+  return false;
+}
+
+/** True when this root IS an iteration worktree (never nest streams). */
+export const isWorktreeRoot = (root: string): boolean => pathBase(pathDir(root)) === ".worktrees";
 
 /** Collision-free evidence file names: state and attempt, never list length. */
 export function evidenceName(state: string, attempt: number): string {
@@ -105,6 +127,26 @@ export class Loop {
   }
 
   start(iteration: string): WorkPacket {
+    // The start gate (i5): dependencies must have shipped (SE-C-072).
+    assertDependsMet(this.root, iteration);
+    // Worktree mode: a plan entry with worktree:true opens its instance in a
+    // provisioned tree (never nested - a worktree-resident loop starts plain).
+    // Self-hosted note: the product repo IS the engine's repo here, so the
+    // worktree lane runs with allowSelf; SE-C-001 keeps guarding se_git.
+    if (!isWorktreeRoot(this.root)) {
+      const planPath = layout.planPath(this.root);
+      if (existsSync(planPath)) {
+        const entry = readJsonFile<{ iterations?: { id: string; worktree?: boolean }[] }>(planPath)
+          .iterations?.find((it) => it.id === iteration);
+        if (entry?.worktree === true) {
+          const w = provisionWorktree(this.root, iteration, { allowSelf: true });
+          const wLoop = new Loop(w.root, this.machine);
+          const packet = wLoop.start(iteration);
+          void worktreeHome; // home derivation lives with the lane
+          return { ...packet, note: `${packet.note ?? ""} [stream: ${w.branch} at ${w.root}]`.trim() };
+        }
+      }
+    }
     const open = this.openInstance();
     if (open) {
       throw new Rejection({

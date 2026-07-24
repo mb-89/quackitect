@@ -1,0 +1,8 @@
+{
+  "iteration": "i5-worktrees",
+  "state": "author_tests",
+  "at": "2026-07-24T13:52:26.535Z",
+  "payload": {
+    "checks": "tests/i5-worktrees.test.ts authored red against the DESIGNED API (engine/worktree.ts: provisionWorktree/retireWorktree/openWorktrees/assertDependsMet/shipMerge - none exist yet; the file reds at load by design, the i4 pattern): req-worktree-start + req-adopt-leftover -> provision/adopt test; req-depends-on-gate (SE-C-072) + adr-shipped-is-release-grant -> the depends test; req-merge-suspects + req-ship-merge + req-concurrent-open -> the W1 killer test (two worktrees, both ship, overlap marked, trees removed, branches kept - sp1's promoted fixture pattern); req-conflict-stops -> the abort test (trunk truth untouched); req-abandon-flags + fitness F-a -> the flag/debris test; req-streams-visible -> the projection test; req-drain-known-refs (SE-C-073) -> the drain guard test; req-board-act-race -> the page-marker test (actGen generation counter). Fitness F-d (merge idempotence) rides the W1 test's structure; F-b (1s law) stays in the serving suite; F-c (fence) proven at sp2 and pinned there. Review-class residue: none - every row got a mechanical check."
+  }
+}

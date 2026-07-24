@@ -1,0 +1,8 @@
+{
+  "iteration": "i5-worktrees",
+  "state": "observe_red",
+  "at": "2026-07-24T13:53:56.168Z",
+  "payload": {
+    "red_observed": "run-09a9f99c7d03: the whole authored file fails at LOAD - engine/worktree.ts does not exist (ERR_MODULE_NOT_FOUND), so every check in it is red by construction; the board actGen marker test is inside the same red file. No new check is green with no realized design; the guards, drain refusal and projection assertions all await their mechanisms. Red observed before any code lands."
+  }
+}

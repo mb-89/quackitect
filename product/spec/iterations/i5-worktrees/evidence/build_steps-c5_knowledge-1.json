@@ -1,0 +1,8 @@
+{
+  "iteration": "i5-worktrees",
+  "state": "build_steps-c5_knowledge",
+  "at": "2026-07-24T14:18:42.706Z",
+  "payload": {
+    "what_landed": "The trunk .gitignore gains .worktrees/ (so provisioned trees never get swept in - the probe's finding closed for the real repo). Two guidance nodes minted (diff 44048e6e), both joining the registry by applies_to: se.guidance-worktrees (the lane's discipline - one stream per iteration, merge at ship only, suspects over silent wins, abandon flags never deletes, grants union-merge, depends_on is a release grant) and se.guidance-retro-independence (the onboarding amendment - retros distribute into INDEPENDENT iterations, record cross-iteration coupling as depends_on, DSM-partition where the cut is unclear, but keep genuinely-single work whole). The registry now serves worktree discipline onto any engine-ts/process chunk automatically."
+  }
+}

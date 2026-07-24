@@ -1,0 +1,10 @@
+{
+  "iteration": "i5-worktrees",
+  "state": "build_steps",
+  "at": "2026-07-24T14:18:42.719Z",
+  "payload": {
+    "submachine": "build-steps",
+    "chunks_filled": 6,
+    "sub_record": "sub-build_steps.json"
+  }
+}

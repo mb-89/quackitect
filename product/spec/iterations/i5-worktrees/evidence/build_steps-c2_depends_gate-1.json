@@ -1,0 +1,9 @@
+{
+  "iteration": "i5-worktrees",
+  "state": "build_steps-c2_depends_gate",
+  "at": "2026-07-24T13:57:44.880Z",
+  "payload": {
+    "what_landed": "loop.ts: start now runs assertDependsMet (SE-C-072) first, then worktree mode - a plan entry with worktree:true provisions the tree (allowSelf for the self-hosted repo, noted in place) and opens the instance INSIDE it via a root-bound Loop, never nesting (isWorktreeRoot guard); hasOpenInstance exported (per-root SE-C-031 scope); tools.ts: the K1-prime routing - the serving loop resolves to the trunk's open instance or the first open worktree stream under its OWN root and machines; apply.ts: PlanEntry gains the worktree flag. Depends test green plus loop 6/6 and serving 3/3 unbroken in run-d7c8b6d597b7.",
+    "run_ref": "run-d7c8b6d597b7"
+  }
+}
