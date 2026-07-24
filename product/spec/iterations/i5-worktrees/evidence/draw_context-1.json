@@ -1,0 +1,10 @@
+{
+  "iteration": "i5-worktrees",
+  "state": "draw_context",
+  "at": "2026-07-24T13:30:49.099Z",
+  "payload": {
+    "boundary": "Inside: the loop's start/ship/abandon paths (worktree lifecycle), a merge routine in the git layer (suspect marking), the plan reader (depends_on enforcement), instance discovery across worktrees, the projection's agents/tab data, the drain-ref guard, the board's tick race fix. Outside, with interfaces named: git itself (worktree/branch/merge plumbing - we call, never reimplement), the harness (one chat session drives whichever worktree the server addresses - interface: the session lock + loop routing), the board page (consumes projection tab data - interface: state.json only), the fence hook (reads the lock; must learn worktree roots), v1 (untouched), the owner's push (theirs alone). Neighbours unchanged from se.context otherwise - pointer inherit with this delta.",
+    "intended_use": "One honest paragraph: an owner (or their delegated agent) opens an iteration and gets an isolated worktree on its own branch; work proceeds there exactly as in the main tree - same lanes, same laws, same board visibility via tab data; at ship the branch merges to trunk with ledger nodes both lines touched wearing suspect marks; dependent iterations refuse to open before their dependencies shipped; independent ones may be open at the same time, worked by whoever holds their sessions.",
+    "excluded_use": "Does NOT: run merges anywhere but ship (no mid-iteration trunk sync); resolve source-code conflicts by itself (a true conflict stops and asks); delete worktrees on abandon (flags only - nothing destructive unattended); serve as a multi-USER system (one owner, their agents); change the board beyond tab data (i9's territory); enable cross-worktree writes (each session's fence locks its own root); replace git branches for non-iteration purposes."
+  }
+}

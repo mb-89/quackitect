@@ -1,7 +1,7 @@
 {
   "machine": "systematic",
   "iteration": "i5-worktrees",
-  "current": "draw_context",
+  "current": "derive_criteria",
   "counters": {},
   "history": [
     {
@@ -57,17 +57,70 @@
       "outcome": "filled",
       "evidence": "grant:1e2749f740ae",
       "at": "2026-07-24T13:29:57.953Z"
+    },
+    {
+      "state": "draw_context",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i5-worktrees/evidence/draw_context-1.json",
+      "at": "2026-07-24T13:30:49.099Z"
+    },
+    {
+      "state": "map_stakeholders",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i5-worktrees/evidence/map_stakeholders-1.json",
+      "at": "2026-07-24T13:31:06.752Z"
+    },
+    {
+      "state": "write_stories",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i5-worktrees/evidence/write_stories-1.json",
+      "at": "2026-07-24T13:31:26.411Z"
+    },
+    {
+      "state": "generalize_use_cases",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i5-worktrees/evidence/generalize_use_cases-1.json",
+      "at": "2026-07-24T13:31:45.869Z"
+    },
+    {
+      "state": "gate_inputs",
+      "outcome": "filled",
+      "evidence": "grant:bbbaa6471d75",
+      "at": "2026-07-24T13:32:17.773Z"
+    },
+    {
+      "state": "write_requirements",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i5-worktrees/evidence/write_requirements-1.json",
+      "at": "2026-07-24T13:33:24.042Z"
+    },
+    {
+      "state": "derive_functions",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i5-worktrees/evidence/derive_functions-1.json",
+      "at": "2026-07-24T13:33:43.887Z"
+    },
+    {
+      "state": "probe_assumptions",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i5-worktrees/evidence/probe_assumptions-1.json",
+      "at": "2026-07-24T13:34:38.621Z"
+    },
+    {
+      "state": "gate_requirements",
+      "outcome": "filled",
+      "evidence": "grant:77b7492b9e6d",
+      "at": "2026-07-24T13:35:13.996Z"
     }
   ],
   "escapes": [],
   "status": "open",
   "fired": [],
   "active": [
-    "draw_context",
-    "map_stakeholders",
-    "write_stories"
+    "derive_criteria",
+    "partition_functions"
   ],
   "claims": {
-    "draw_context": "main"
+    "derive_criteria": "main"
   }
 }

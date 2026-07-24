@@ -1,0 +1,9 @@
+{
+  "iteration": "i5-worktrees",
+  "state": "derive_functions",
+  "at": "2026-07-24T13:33:43.886Z",
+  "payload": {
+    "function_structure": "Overall function: run iterations in isolated, honestly-reunified work streams. Sub-functions, verb+noun, solution-neutral: F1 provision a stream (create the isolated tree + line of history for an iteration); F2 gate the start (check declared dependencies against shipped truth); F3 route the work (open and serve the instance inside its stream); F4 reunify a stream (bring shipped work back to the trunk); F5 mark the overlap (identify design nodes touched by both lines and stamp them suspect); F6 halt on conflict (detect irreconcilable textual overlap, record, hand to a human); F7 retire a stream (clean a shipped stream, flag an abandoned one, adopt leftovers); F8 expose the streams (project every live stream to the surfaces); F9 guard the drain (refuse dispositions against unknown notes); F10 guard the act (discard surface state older than the user's last action).",
+    "coverage": "Requirement -> function: worktree-start->F1+F3, depends-on-gate->F2, concurrent-open->F1+F3 (per-stream instance discovery), adopt-leftover->F7, ship-merge->F4+F7, merge-suspects->F5, conflict-stops->F6, abandon-flags->F7, streams-visible->F8, drain-known-refs->F9, board-act-race->F10 - all 11 mapped. UC steps: UC-W1 1-5 -> F2,F1,F3,F8; UC-W2 1-5 -> F4,F5,F6,F7; UC-W3 -> F7,F8; UC-W4 -> F8. No hole in either direction; F5/F6 are the two functions no existing element performs at all (the genuinely new mechanics)."
+  }
+}

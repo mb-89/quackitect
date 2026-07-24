@@ -1,0 +1,9 @@
+{
+  "iteration": "i5-worktrees",
+  "state": "map_stakeholders",
+  "at": "2026-07-24T13:31:06.752Z",
+  "payload": {
+    "roles": "Inherit se.stakeholders (owner, driving agent, adjudicator, scorer/research agent, future reader) - pointer with this delta: the DELEGATED ADJUDICATOR role becomes real (the agent wearing the adjudicator hat under a recorded grant - i4's scorer amendment pattern repeated), and a new role appears: the CONCURRENT WORKER (a second session/subagent holding another worktree's claims - today hypothetical, next-opportunity real).",
+    "tensions": "Three live pairs: owner-as-reviewer vs delegated adjudicator - the reviewer wants everything re-examinable, the delegate wants momentum; resolved by append-only grants + correction-node practice (never edit, always annotate). Driving agent vs concurrent worker - both want the trunk; resolved by ship-time-only merges and suspect marks (the trunk never carries un-marked mixed design). Owner-as-pusher vs unattended shipping - merges land on trunk while pushes stay manual; the local trunk can run ahead by several shipped iterations, so the push-cadence RAID from the plan (i10) sharpens: the owner returns to a trunk N commits ahead - acceptable, recorded, theirs to push."
+  }
+}

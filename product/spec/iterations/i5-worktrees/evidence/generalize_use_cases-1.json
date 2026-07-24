@@ -1,0 +1,8 @@
+{
+  "iteration": "i5-worktrees",
+  "state": "generalize_use_cases",
+  "at": "2026-07-24T13:31:45.868Z",
+  "payload": {
+    "use_cases": "UC-W1 Open an iteration in isolation (covers W1 s1-2, W4) | Primary actor: driving agent | Main: 1. actor requests start for a planned iteration 2. system checks depends_on against shipped iterations 3. system creates worktree + branch for the iteration 4. system opens the instance IN that worktree 5. projection lists the stream | Extensions: 2a. dependency unshipped -> refuse naming it (W2); 2b. iteration already open elsewhere -> refuse (existing SE-C-031 generalized per-iteration); 3a. worktree/branch already exists (crash leftover) -> adopt it, never duplicate. UC-W2 Ship a worktree iteration (covers W1 s3, W3 s1-2) | Main: 1. release gate blesses 2. system merges the iteration branch to trunk 3. system re-marks: ledger nodes changed by BOTH the branch and the trunk since the fork point gain the suspect mark 4. system removes the worktree, keeps the branch 5. owner pushes when ready | Extensions: 2a. textual git conflict -> stop, record, ask a human (never auto-resolve); 3a. no overlap -> zero marks, stated; 4a. removal fails (dirty tree) -> flag instead of force. UC-W3 Abandon a worktree iteration (covers W3 s3) | Main: 1. abandon recorded 2. tree flagged abandoned, never deleted 3. projection stops listing it as live | Extension: 2a. flagging fails -> loud error, nothing silent. UC-W4 Observe concurrent streams (covers W4) | Main: 1. any surface reads the projection 2. every open worktree appears with root + iteration + last heartbeat. All four stories covered; no orphan UC."
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "iteration": "i5-worktrees",
+  "state": "write_requirements",
+  "at": "2026-07-24T13:33:24.041Z",
+  "payload": {
+    "register": "11 residents minted fire-first (diff 879984b6): req-worktree-start, req-depends-on-gate, req-concurrent-open, req-adopt-leftover, req-ship-merge, req-merge-suspects (source: se.uc-4 - its across-iterations pass line finally gets a payer), req-conflict-stops, req-abandon-flags (source: the delegation decision - non-destructive by requirement), req-streams-visible, req-drain-known-refs, req-board-act-race. Every row EARS-shaped, kind functional, verify_method test, breaks_if_removed carried; sources point at context/stakeholders/uc-4/the delegation decision.",
+    "set_criteria": "Complete: every UC main step and lettered extension maps to a row (W1->start/concurrent/ship/suspects, W2->depends-on, W3->ship/abandon/adopt, W4->streams-visible) plus the two retro pulls; nothing in scope lacks a row. Consistent: no pair conflicts - conflict-stops bounds ship-merge, abandon-flags bounds the lifecycle, all compatible with the excluded-use list. Affordable: all engine-ts work on existing seams (loop start/ship paths, git layer, projection) plus one board fix - one day's build against measured chunk rates. Bounded: no quality/constraint rows because the qualities ride existing laws (1s law, fence, CAS) unchanged - stated, not forgotten; positioned against the standard worktree checklists (git's own docs' caveats: detached trees, locked trees) via the adopt/debris rows."
+  }
+}

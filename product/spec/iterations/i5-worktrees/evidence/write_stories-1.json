@@ -1,0 +1,8 @@
+{
+  "iteration": "i5-worktrees",
+  "state": "write_stories",
+  "at": "2026-07-24T13:31:26.410Z",
+  "payload": {
+    "stories": "W1 (KILLER, realizes A) The isolated pair | Slide 1: the owner grants two independent iterations and leaves. Slide 2: each opens in its own worktree on its own branch; both boards' tab data show them. Slide 3: both ship; the second merge finds a ledger node the first also touched and MARKS it suspect instead of silently winning. PASS: the fixture pair walks all three slides; the overlapping node carries the mark; the trunk holds both merges. W2 (KILLER, realizes A) The refused early start | Slide 1: an iteration declares depends_on an unshipped one. Slide 2: se_loop_start REFUSES with the dependency named. Slide 3: the dependency ships; the start now passes. PASS: refusal and pass both by test, clause recorded. W3 (realizes B) The clean close | Slide 1: an iteration ships from its worktree. Slide 2: the merge lands on trunk, the worktree is removed, the branch stays for history. Slide 3: an ABANDONED iteration's tree stays but wears the abandoned flag. PASS: the debris test - no unflagged tree survives a close. W4 (realizes B) The visible streams | Slide 1: two worktrees open. Slide 2: the projection's agents/tab data lists both with their roots. PASS: the projection test shows two entries. (M1's parallel-serve within one iteration stays i4's story - not re-told here.)"
+  }
+}

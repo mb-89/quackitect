@@ -1,0 +1,8 @@
+{
+  "iteration": "i5-worktrees",
+  "state": "probe_assumptions",
+  "at": "2026-07-24T13:34:38.618Z",
+  "payload": {
+    "probes": "A1 (git worktree mechanics work as the requirements assume) | probe: real fixture repo via node - worktree add -b under .worktrees/, list, remove; all behaved | CONFIRMED, with a BONUS FINDING: a worktree homed INSIDE the repo gets swept up by git add as an embedded repo (git's own hint fired) - the worktree home must be gitignored or the add paths must exclude it; folded into the design inputs. A2 (both-sides overlap is enumerable) | probe: same fixture - merge-base, diff --name-only base..branch intersected with base..trunk yielded exactly the deliberately-overlapping file; textual conflict detected and cleanly aborted | CONFIRMED - F5/F6's plumbing exists as assumed. A3 (a suspect MARK exists to write) | probe: engine grep - edges declare suspect DIRECTION (edges.ts, warm index) and the design doc promises 'merge: recompute suspects', but NO persistent node-level suspect representation exists anywhere | REFUTED as assumed: F5 must first DEFINE the mark (candidate: a frontmatter field written through the apply lane, grandfather-safe) - promoted to a named M4/M5 decision, RAID R2 sharpened. A4 (per-root layout derivation) | probe: layout.ts read - every path derives from the root argument by construction | CONFIRMED, the loop/board just need the right root handed in."
+  }
+}

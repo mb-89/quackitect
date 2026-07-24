@@ -1,0 +1,13 @@
+{
+  "iteration": "i5-worktrees",
+  "state": "gate_inputs",
+  "at": "2026-07-24T13:32:07.253Z",
+  "payload": {
+    "props_realized": "One-pager A realized by W1 (killer, isolation + honest merge) and W2 (killer, dependency order); one-pager B realized by W3 (clean close) and W4 (visible streams). No prop unrealized, no story propless.",
+    "stories_generalized": "W1-W4 all live inside UC-W1..UC-W4 with numbered mains and lettered extensions; the mapping is stated per UC.",
+    "roles_covered": "Inherited roles plus the two deltas (delegated adjudicator now real, concurrent worker named); three tensions recorded with their resolutions (append-only grants, ship-time merges with marks, trunk-ahead push cadence).",
+    "excluded_stated": "The binding does-NOT-do list stands at draw_context: no mid-iteration trunk sync, no auto conflict resolution, no unattended deletion, no multi-user, no board work beyond tab data, no cross-worktree writes.",
+    "examples_formulated": "The four slideshows' slides and the UC scenario paths (incl. every lettered extension) are the formulated example set; each already carries its mechanical pass line from frame_delta - M7's tests are their checkable form.",
+    "offer_hash": "bbbaa6471d75052f905d23cc13d2e171afea9b8f0413e1955578de2a71f8ef22"
+  }
+}
