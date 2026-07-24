@@ -1,0 +1,8 @@
+{
+  "iteration": "i4-questions-and-hygiene",
+  "state": "finalize_docs",
+  "at": "2026-07-24T13:09:44.513Z",
+  "payload": {
+    "docs": "Emitted-as-projection and read back against the live surface: the boot handover re-emitted NOW shows i4 open at finalize_docs and 'Last verify: green (i4-questions-and-hygiene)' - the timestamp ordering paid for in c8 proving itself on its own iteration; the board runs the current code (cycled after every render round today, last with the bless-flicker fix; renders machine stack, offer, unified projections from ONE source); the contract's lane list rendered from the live registry and was re-attested against its fresh hash after this session's reconnect - contract and surface cannot diverge by construction. Teaching surfaces match the shipped behavior per the M8 sweep (tool descriptions carry the new lanes). Honest absences, unchanged and planned: the BOOK emitter is i6-trace-book's whole point - no book claimed; old-iteration machine walking is the noted state-machine rework."
+  }
+}

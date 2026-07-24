@@ -1,0 +1,9 @@
+{
+  "iteration": "i4-questions-and-hygiene",
+  "state": "ship_review",
+  "at": "2026-07-24T13:10:42.228Z",
+  "payload": {
+    "review": "The dependency picture is unchanged by i4: the engine runs on Node built-ins alone (node:sqlite included), no package was added or flipped - noteworthy only that adr-install-over-zerodep (M5) retired the zero-dep PRINCIPLE, so future iterations may add installable deps through candidates without re-litigating; none did here. Module deps: kb imports sibling ../benjamin (found, active, untouched); se local. No divergence to flag - no vendored or forked code exists.",
+    "upstream": "None owed - no external projects were consumed in a way that generates proposals; the SYA estimation slides remain a READ item for the ETA discussion, not an upstream deposit."
+  }
+}

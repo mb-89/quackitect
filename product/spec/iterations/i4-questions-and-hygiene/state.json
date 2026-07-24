@@ -1,7 +1,7 @@
 {
   "machine": "systematic",
   "iteration": "i4-questions-and-hygiene",
-  "current": "finalize_docs",
+  "current": "shipped",
   "counters": {
     "verification_attempts": 2
   },
@@ -281,13 +281,37 @@
       "outcome": "filled",
       "evidence": "grant:5814118d6ec7",
       "at": "2026-07-24T13:07:32.577Z"
+    },
+    {
+      "state": "finalize_docs",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i4-questions-and-hygiene/evidence/finalize_docs-1.json",
+      "at": "2026-07-24T13:09:44.514Z"
+    },
+    {
+      "state": "package",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i4-questions-and-hygiene/evidence/package-1.json",
+      "at": "2026-07-24T13:10:18.708Z"
+    },
+    {
+      "state": "ship_review",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i4-questions-and-hygiene/evidence/ship_review-1.json",
+      "at": "2026-07-24T13:10:42.229Z"
+    },
+    {
+      "state": "gate_release",
+      "outcome": "filled",
+      "evidence": "grant:4b4ad5ef152f",
+      "at": "2026-07-24T13:11:31.212Z"
     }
   ],
   "escapes": [],
-  "status": "open",
+  "status": "closed",
   "fired": [],
   "active": [
-    "finalize_docs"
+    "shipped"
   ],
   "claims": {}
 }

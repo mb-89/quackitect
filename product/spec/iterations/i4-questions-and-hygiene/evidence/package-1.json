@@ -1,0 +1,9 @@
+{
+  "iteration": "i4-questions-and-hygiene",
+  "state": "package",
+  "at": "2026-07-24T13:10:18.708Z",
+  "payload": {
+    "package": "v2 ships as the repo itself during bootstrap - the versioned artifact is the branch state at this release: engine + tests at 82041af (M7 build, 116 files) and 32f27df (M8 validate), the ledger grown by 45 knowledge nodes + 3 RAID entries + 10 requirements + 2 ADRs this iteration, the drawn chunk machine with its walked record (sub-build_steps.json), the full evidence chain, grants and the plan. No zip lane exists or is claimed - unchanged from i3; a packaged artifact enters through the plan when it becomes a need.",
+    "entry_script": "README.md and RUNME.ps1 stand at the root, unchanged this iteration; the M8 sweep re-checked the teaching surfaces and none of i4's changes touch the entry promises (design source, v1 fallback until UC-4)."
+  }
+}

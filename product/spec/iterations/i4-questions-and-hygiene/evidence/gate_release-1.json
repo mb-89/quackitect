@@ -1,0 +1,12 @@
+{
+  "iteration": "i4-questions-and-hygiene",
+  "state": "gate_release",
+  "at": "2026-07-24T13:10:58.368Z",
+  "payload": {
+    "docs_match": "The handover, board and contract are all projections of live state read back against the surface at finalize_docs (handover shows i4 at its true state with its own green verify; the contract lane list matched the served registry by construction and was re-attested this session); tool descriptions teach the shipped lanes after the M8 sweep; the honest absences (book emitter -> i6, old-iteration machine walking -> the noted rework) are planned, not papered over.",
+    "packaged": "The branch state IS the versioned artifact: 82041af (M7) + 32f27df (M8) + this window's close-out commit; README + RUNME stand unchanged at the root; the drawn chunk machine and its walked record ship inside the iteration folder.",
+    "dependencies_ruled": "No dep flips - Node built-ins only; kb's sibling import active; install-over-zerodep stands as the ruled principle with no dep yet riding it; nothing diverged, nothing owed upstream.",
+    "handover_accepted": "This bless is the acceptance: i4 closes with 29/29 plan steps swallowed or homed (the four owner-gated items live on as RAID/plan entries with owners), 119/119 battery, ten served chunks, four owner render rounds absorbed same-day, and 18 notes waiting in the inbox for the retro that opens the next start.",
+    "offer_hash": "4b4ad5ef152f19123ca1becc561761a76561575d57f430c57521d0dfb03638f8"
+  }
+}

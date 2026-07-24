@@ -633,10 +633,12 @@ const server = createServer(async (req, res) => {
     } else if (req.method === "POST" && req.url === "/bless") {
       const { hash } = JSON.parse(await readBody(req)) as { hash: string };
       const grant = new Gate(root).bless(requireSystematic(root), hash, { channel: "board", adjudicated_by: "owner" });
+      stateCache = { at: 0, body: "" }; // never resurrect the consumed offer from the memo
       res.writeHead(200, { "content-type": "application/json" });
       res.end(JSON.stringify({ blessed: true, grant }));
     } else if (req.method === "POST" && req.url === "/dismiss") {
       new Gate(root).dismiss();
+      stateCache = { at: 0, body: "" };
       res.writeHead(200, { "content-type": "application/json" });
       res.end(JSON.stringify({ dismissed: true }));
     } else {
