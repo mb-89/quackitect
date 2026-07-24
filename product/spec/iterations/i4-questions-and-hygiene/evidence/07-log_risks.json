@@ -1,0 +1,17 @@
+{
+  "iteration": "i4-questions-and-hygiene",
+  "state": "log_risks",
+  "at": "2026-07-24T11:05:00.000Z",
+  "note": "Inline fill - the top-level loop still serves one state at a time (the token engine exists, the loop wiring is i4 scope); this skip is the standing exhibit for that step.",
+  "payload": {
+    "raid_opened": [
+      "R1 (risk) | 29 steps overrun day-scale despite the measured over-estimation factor. Owner: driving agent. Trigger: the M6 build plan exceeds one working day of chunks -> split via the plan-renumber op built early in this very iteration.",
+      "R2 (risk) | The loop-level parallel wiring destabilizes the running i4 walk (the same fly-the-plane risk as i3's R4). Owner: driving agent. Trigger: instance corruption -> git-tracked instance, restore and resume; the lock+atomic lane from i3 lowers the blast radius.",
+      "R3 (risk) | The research-agent scorer produces confident nonsense (a scored 4 on weak prior art is worse than no score). Owner: the owner adjudicates the FIRST scored gate as a calibration round. Trigger: the first absolute-score row at a gate.",
+      "R4 (risk) | Schema refusals break existing ledger content that predates the vocabulary. Owner: driving agent. Trigger: the first schema sweep run - grandfather with recorded markers, never silently loosen the schema.",
+      "A1 (assumption) | The seven q-p3delta stamps are reachable once dot-path lands - no deeper corruption beneath. Revisit: the first dot-path write.",
+      "D1 (dependency) | The i1-bless audit and trace-dir ruling need the owner at the desk - both are owner steps, scheduled at gates.",
+      "I1 (issue, open) | Eleven inline parallel-state walks across two iterations - retired only when the loop serves tokens (this iteration's step)."
+    ]
+  }
+}
