@@ -1,0 +1,14 @@
+{
+  "iteration": "i8-phone-lane",
+  "state": "gate_validation",
+  "at": "2026-07-24T14:52:08.261Z",
+  "payload": {
+    "meets_need": "One-pager A (away owner): bless without being at the machine -> a matched tap yields a channel=phone grant bound to the offer hash within the window (P1 test); a wrong/late tap never binds (P2 test). One-pager B (agent): publish without wiring a live endpoint unattended -> mock-tested publish, no network (P4 test); the credential stays the owner's -> token never in the log, silent-when-absent (P3 + secret test). Every need's pass line is a green test in the 135-suite battery. The single owner-physical need (a real from-away tap) is homed as raid-phone-live-pairing.",
+    "killers_demonstrated": "P1 bless-from-away: exercised end to end via the mock round-trip (announce -> tap -> hash-matched channel=phone grant -> offer dismissed), run-d5eeaa67fad6. P2 must-not-bind: stale, mismatched, and duplicate taps all demonstrated inert. The live wall-clock tap on the owner's device is the parked RAID trigger - its full mechanical shadow is demonstrated here.",
+    "acceptance_converted": "The executable slices ARE permanent acceptance scenarios: i8-phone.test.ts (7 checks: publish, bless, dismiss, idempotent, graceful-absent, secret-never-logged, bounded-read) joined the battery, re-proving the lane every run. Nothing left as a one-shot demo.",
+    "consistency_swept": "The enablement how-to lives in se.guidance-phone-setup (the durable home, registry-served); no tool/contract change (the lane is automatic); the inherited v1 ADRs are now realized, not just decided. run-d5eeaa67fad6 green.",
+    "gaps_logged": "Two RAID entries: raid-phone-live-pairing (owner-physical validation) and raid-phone-real-ntfy-shape (format-drift re-probe at pairing), each with owner and trigger.",
+    "market_tier": "Not a market iteration - no market flag at kickoff; the tier does not apply.",
+    "offer_hash": "1b96f3cd4c8e5b95ce64f6f7d0d3267f5f26ec95aba28c98b835aac3f26f7161"
+  }
+}

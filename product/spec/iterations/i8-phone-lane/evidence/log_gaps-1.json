@@ -1,0 +1,8 @@
+{
+  "iteration": "i8-phone-lane",
+  "state": "log_gaps",
+  "at": "2026-07-24T14:51:48.385Z",
+  "payload": {
+    "gaps": "Two entries minted (diff 5e80d2f5), each with owner and trigger: raid-phone-live-pairing (risk, OWNER, trigger = populate phone.json + subscribe + bless one real gate from away, close with the channel=phone grant) and raid-phone-real-ntfy-shape (risk, driving agent, trigger = at live pairing, re-probe and adjust the NtfyTransport if the format drifted - a one-file fix behind the injectable boundary). No unfilled slide - every P-story passed against the shipped lane; these two gaps are exactly the owner-physical validation the scope deferred, now homed with triggers."
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "iteration": "i8-phone-lane",
+  "state": "fill_story_evidence",
+  "at": "2026-07-24T14:50:39.703Z",
+  "payload": {
+    "slides_filled": "P1 (killer, bless from away): FILLED by the matched-tap test - a simulated tap carrying the live offer hash produces a grant channel=phone adjudicated_by=owner bound to the hash and dismisses the offer (i8-phone.test.ts, run-d5eeaa67fad6). Evidence ref: the test + engine/phone.ts pollAnswers. P2 (killer, tap that must not bind): FILLED by the stale/mismatch/duplicate test - a wrong-hash tap leaves the offer live, a replayed tap writes nothing. P3 (silent-when-unconfigured): FILLED by the unconfigured test - no publish, no poll, no throw, offer untouched. P4 (mock-proven publish): FILLED by the publish test - one publish carrying the offer hash as id and a bless action, mock transport, no network. Every slide filled from the shipped system; no finding. The LIVE from-away tap on the owner's real device stays the owner-physical demonstration (RAID), exactly as scoped.",
+    "demos_seeded": "Both killers demonstrated as permanent acceptance scenarios in the battery, not one-shot demos: the matched-tap test IS the bless-from-away demonstration (mock round-trip, repeatable, a 135-suite member), the stale/dup test IS the must-not-bind demonstration. No separate demo machine - the live wall-clock from-away tap is the recorded owner-physical RAID trigger (needs the owner's paired device); its mechanical shadow (the full mock round-trip) is the acceptance scenario."
+  }
+}

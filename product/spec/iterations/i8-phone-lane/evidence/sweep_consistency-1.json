@@ -1,0 +1,8 @@
+{
+  "iteration": "i8-phone-lane",
+  "state": "sweep_consistency",
+  "at": "2026-07-24T14:51:18.726Z",
+  "payload": {
+    "swept": "The new surface is the phone lane, which is AUTOMATIC (runs in the board process, no tool to invoke) - so there is no tool description to update; instead the durable teaching home is a new node, se.guidance-phone-setup, documenting the owner enablement (the ~/.se/<project>/phone.json shape, the two-topic pairing, the accepted-risk authenticity note, and the owner-physical verify step) - the ONE place the how-to-turn-it-on lives, registry-served. Checked: no v2 doc taught a superseded phone way (there was none); the inherited v1 phone ADRs (adr-ntfy-actions, adr-answer-authenticity, adr-kofmqtq) remain accurate and are now REALIZED, not just decided. The contract, tool descriptions, and README are unaffected - the lane adds no lane to the registry and no rule to the contract. No superseded teaching left standing."
+  }
+}

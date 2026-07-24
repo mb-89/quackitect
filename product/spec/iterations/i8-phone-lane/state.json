@@ -1,7 +1,7 @@
 {
   "machine": "systematic",
   "iteration": "i8-phone-lane",
-  "current": "fill_story_evidence",
+  "current": "finalize_docs",
   "counters": {},
   "history": [
     {
@@ -231,13 +231,37 @@
       "outcome": "filled",
       "evidence": "grant:47c840747f86",
       "at": "2026-07-24T14:49:51.731Z"
+    },
+    {
+      "state": "fill_story_evidence",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i8-phone-lane/evidence/fill_story_evidence-1.json",
+      "at": "2026-07-24T14:50:39.703Z"
+    },
+    {
+      "state": "sweep_consistency",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i8-phone-lane/evidence/sweep_consistency-1.json",
+      "at": "2026-07-24T14:51:18.727Z"
+    },
+    {
+      "state": "log_gaps",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i8-phone-lane/evidence/log_gaps-1.json",
+      "at": "2026-07-24T14:51:48.385Z"
+    },
+    {
+      "state": "gate_validation",
+      "outcome": "filled",
+      "evidence": "grant:1b96f3cd4c8e",
+      "at": "2026-07-24T14:52:18.988Z"
     }
   ],
   "escapes": [],
   "status": "open",
   "fired": [],
   "active": [
-    "fill_story_evidence"
+    "finalize_docs"
   ],
   "claims": {}
 }
