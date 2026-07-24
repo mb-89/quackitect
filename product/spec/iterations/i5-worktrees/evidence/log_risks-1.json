@@ -1,0 +1,8 @@
+{
+  "iteration": "i5-worktrees",
+  "state": "log_risks",
+  "at": "2026-07-24T13:28:26.819Z",
+  "payload": {
+    "raid_opened": "R1 (risk, agent, trigger M4/M5): the engine assumes ONE root - session lock, board, instance discovery all bind to it; the worktree design must decide per-root sessions vs a root parameter, and a wrong pick ripples everywhere. R2 (risk, agent, trigger M7 verification + uc-4 pass line): suspect marking can fail silently - a MISSED suspect is worse than a false one; the merge tests must prove the across-iterations case red-first. R3 (risk, agent, trigger ship/abandon paths): worktree and branch debris - closed iterations must remove or explicitly flag their trees, or the repo silts up. R4 (issue, owner review at return, standing): every i5/i8 gate is self-blessed under the delegation - no second reader until the owner's review; mitigation: verbatim evidence, the correction-note practice, and nothing destructive without the machinery. R5 (risk, agent, trigger scope check at M6/M7): the board's per-worktree tab data borders i9's NOT-delegated consolidation - board changes stay minimal (tab data only); anything more parks for the owner. Carried in: raid-i5-parallel-serve-demo (the live demo is deferred by today's no-parallel ruling - its fixture half lands here, trigger updated at M8)."
+  }
+}

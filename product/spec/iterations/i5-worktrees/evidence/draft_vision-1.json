@@ -1,0 +1,11 @@
+{
+  "iteration": "i5-worktrees",
+  "state": "draft_vision",
+  "at": "2026-07-24T13:27:39.424Z",
+  "payload": {
+    "big_idea": "Inherit se.vision unchanged. The i5 delta in one breath: the machine that already walks one iteration learns to walk MANY - each iteration in its own worktree and branch, isolated like lab benches, merged with suspects marked, so independent work streams stop queueing behind one working directory. Lineage: git worktrees (standard practice in agentic tooling per ref-kiro-era practice) grafted onto the drawn-machine executor.",
+    "to_be_world": "Inherit se.vision's to-be world; the delta scene: the owner says 'run these two' and walks away - each iteration opens its own worktree, its own branch, its own board tab; the agent (or two subagents, later) works them without stepping on each other's files; at ship each merges back to the trunk, and where iteration B touched what iteration A also changed, the affected nodes wear the suspect mark instead of silently winning; the owner reviews shipped, merged, honestly-flagged work.",
+    "goal_system": "Inherited goals unchanged; the delta priorities, conflicts named: (1) isolation beats convenience - a worktree per iteration even when it feels heavy for small ones (the owner may strike per-iteration later); (2) trunk truth beats branch speed - merge at ship only, owner pushes; (3) honest conflict marking beats auto-resolution - suspects over silent merges. Conflict: worktree-per-iteration vs the single se server/board assuming one root - resolved this iteration by design, not assumed away.",
+    "moore_pitch": "FOR the owner running multiple work streams WHO cannot wait on one serialized working directory, THE se worktree lane IS an iteration-isolation mechanism THAT gives every iteration its own tree, branch and board presence with suspect-marked merges, UNLIKE single-directory agent sessions where parallel work trips over itself, OURS makes parallel iterations a first-class, honestly-merged machine operation."
+  }
+}

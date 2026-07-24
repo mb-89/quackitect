@@ -166,6 +166,24 @@ test("a chat-relayed bless lands with channel=chat and the owner as adjudicator"
   }
 });
 
+test("a delegated bless stamps the agent and cites its granting decision - never the owner", () => {
+  const root = mkdtempSync(join(tmpdir(), "se-delegated-"));
+  try {
+    const offerHash = reachGate(root);
+    const bless = coreTools(root).find((t) => t.name === "se_gate_bless")!;
+    const r = bless.handler({ hash: offerHash, delegated: true }) as {
+      grant: { channel: string; adjudicated_by: string; delegated_via?: string };
+    };
+    assert.equal(r.grant.adjudicated_by, "agent");
+    assert.equal(r.grant.channel, "chat-grant");
+    assert.equal(r.grant.delegated_via, "se.decision-delegated-adjudication");
+    const inst = JSON.parse(readFileSync(layout.instancePath(root, "i0-gate"), "utf8"));
+    assert.equal(inst.status, "closed");
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+});
+
 test("se.help: hits are affordances, misses are honest refusals (the observer owns the log line)", () => {
   const root = mkdtempSync(join(tmpdir(), "se-help-"));
   try {

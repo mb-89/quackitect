@@ -1,0 +1,9 @@
+{
+  "iteration": "i5-worktrees",
+  "state": "scope_non_goals",
+  "at": "2026-07-24T13:29:09.230Z",
+  "payload": {
+    "scope": "Takes on the blessed kickoff set: the worktree lifecycle wired into the loop (start creates worktree+branch under .worktrees/ or git-standard placement, ship merges to trunk and cleans, abandon flags), merge suspect-marking (the across-iterations uc-4 case, test-first), plan dependency enforcement (depends_on read at start: unmet refuses, met-and-independent may open concurrently), per-worktree presence in the projection's tab data (minimal - names and roots, nothing more), the onboarding guidance amendment (retros distribute into independent iterations, DSM partitioning where the cut is unclear), the flicker fix (client poll race, pulled from the retro), and the drain-unknown-ref refusal (retro determinizer).",
+    "non_goals": "The live two-real-iterations parallel demo (owner ruled: next opportunity; fixtures only here). Real parallel subagents (noted direction, next opportunity). Any board consolidation beyond tab data (i9, not delegated). Phone lane (i8, next). Multi-agent claim UX (mallard stays the one agent this iteration). Rewriting v1 history or the i1 bless (owner-owned RAID). The ETA-on-steps redesign (owner discussion)."
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "iteration": "i5-worktrees",
+  "state": "frame_delta",
+  "at": "2026-07-24T13:28:52.920Z",
+  "payload": {
+    "gap_claim": "The scanned field: raw git worktrees give isolation but know nothing of iterations, gates or suspects (they shed process); agentic tools with parallel sessions (multi-tab harnesses, cloud agents) shed the MERGE HONESTY - parallel edits reunify by textual git resolution with no design-level conflict marks; v2 today has the process but sheds parallelism entirely (one open iteration per worktree, one root). Nobody in the field marks DESIGN suspects at merge time - that is the gap this iteration closes: process-aware worktrees whose merges write suspect marks into the trace.",
+    "why_now": "Three things matured this week: the executor speaks tokens and per-session claims (i3/i4) so two work streams are servable; the plan gained surgery ops and depends_on exists as data (i4/i2d); and the owner's delegation ruling made unattended multi-stream runs REAL - the queueing pain went from theoretical to today's actual ask.",
+    "value_props": "One-pager A - the owner. Need: hand over N independent iterations and step away | outcome: each runs isolated in its own worktree+branch and ships merged with honest marks; PASS: two fixture iterations run through worktree lifecycle end-to-end, merge to trunk, and the deliberately-overlapping node carries the suspect mark (uc-4's across-iterations line, finally paid). Need: the plan enforces order | outcome: a depends_on-unmet iteration REFUSES to start, independent ones may open concurrently; PASS: the refusal and the concurrent open both demonstrated by test. One-pager B - the driving agent. Need: a worktree lifecycle I cannot misuse | outcome: start creates tree+branch mechanically, ship merges and cleans, abandon flags; PASS: lifecycle tests green incl. the debris check (closed iteration leaves no unflagged tree). Need: visibility per stream | outcome: the board's tab data carries one entry per running worktree; PASS: projection test shows two entries for two open worktrees.",
+    "business_case": "Skipped with reason, as every iteration so far: no acquirer exists - the currency is the owner's unattended throughput, already priced by the delegation ruling itself."
+  }
+}

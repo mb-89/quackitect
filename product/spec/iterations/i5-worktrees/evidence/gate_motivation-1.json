@@ -1,0 +1,13 @@
+{
+  "iteration": "i5-worktrees",
+  "state": "gate_motivation",
+  "at": "2026-07-24T13:29:48.616Z",
+  "payload": {
+    "vision_scope_stated": "Complete in the M1 evidence chain: inherited vision + worktree delta (big idea, to-be scene, goal priorities with conflicts), Moore pitch filled, scope = the blessed kickoff set + two retro pulls, non-goals = live parallel demo, subagents, i9 board work, phone, ETA redesign.",
+    "problem_agreed": "The delta is not theoretical - it fired TODAY: the owner asked for parallel iterations and the machinery refused by construction (one root, one open iteration, no dependency reads, no suspect-marking merges). Every pain in define_actual carries a same-day witness. The goal is worth having because the delegation ruling makes unattended multi-stream work the OPERATING MODE, not a wish - without isolation and honest merges, that mode is unsafe exactly when nobody is watching.",
+    "prior_art_positioned": "Raw git worktrees: isolation without process. Parallel agent harness sessions: throughput without merge honesty (textual resolution silently wins). v1 quackitect: single-tree, single-stream by design. The unclosed spot - design-level suspect marks written AT MERGE - is uc-4's standing pass line since i2, and no scanned alternative pays it.",
+    "success_measurable": "Every need in the two one-pagers carries a mechanical pass line: fixture lifecycle end-to-end with the overlapping node suspect-marked; depends_on refusal + concurrent-open both by test; debris check on close; two tab entries for two open worktrees in the projection.",
+    "risks_logged": "Five entries opened with owners and triggers (multi-root design pick at M4, suspect false-negatives at M7, debris at lifecycle paths, the delegation blind spot owned by the owner's return review, board scope creep fenced to tab data) plus the carried parallel-demo RAID with its trigger updated.",
+    "offer_hash": "1e2749f740ae4b690b9e33c5337261e1293bf49ba3fb68f36d088dbe1dda5f50"
+  }
+}

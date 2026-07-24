@@ -40,6 +40,8 @@ export interface GrantRecord {
   policy: string;
   channel: string;
   adjudicated_by: string;
+  /** Set on delegated blesses: the decision node granting the delegation. */
+  delegated_via?: string;
   evidence: string;
   imports: Record<string, string>;
   as_offered: boolean;
@@ -102,7 +104,7 @@ export class Gate {
   bless(
     machine: MachineDecl,
     hash: string,
-    by: { channel: string; adjudicated_by: string },
+    by: { channel: string; adjudicated_by: string; delegated_via?: string },
   ): GrantRecord {
     const offer = this.current();
     if (!offer) {
@@ -154,6 +156,7 @@ export class Gate {
       policy: m.id,
       channel: by.channel,
       adjudicated_by: by.adjudicated_by,
+      ...(by.delegated_via !== undefined ? { delegated_via: by.delegated_via } : {}),
       evidence: offer.evidence_path,
       imports: importStamps(this.root),
       as_offered: true,

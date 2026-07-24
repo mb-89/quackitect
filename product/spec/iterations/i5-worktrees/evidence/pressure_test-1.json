@@ -1,0 +1,9 @@
+{
+  "iteration": "i5-worktrees",
+  "state": "pressure_test",
+  "at": "2026-07-24T13:29:29.119Z",
+  "payload": {
+    "prfaq": "PRESS RELEASE (dateline: this evening): quackitect iterations now run in isolated worktrees - the owner hands over independent work streams, steps away, and reviews merged, suspect-marked results; dependency-aware starts refuse out-of-order work and the trunk stays the single truth the owner pushes. HOSTILE FAQ: Q1 'Does one MCP server even serve two roots?' - the design decision of this iteration; candidates at M4 (root param on the session vs shim-per-worktree), not hand-waved. Q2 'What happens when both iterations edit engine code?' - textual conflicts stay git's; DESIGN-level overlap gets suspect marks; a true source conflict still needs a human - recorded, not hidden. Q3 'Who cleans up when an iteration dies mid-worktree?' - abandon flags the tree instead of deleting (nothing destructive under delegation); ship cleans. Q4 'Why trust self-blessed gates on the iteration that builds unattended machinery?' - the delegation decision is recorded, every grant stamps agent+delegated_via, the kickoff mis-stamp got a public correction node, and the owner reviews shipped work - the trail is the answer. Q5 'Does suspect marking scale or will every merge scream?' - marks only on nodes BOTH sides touched, not whole-file noise; the test pins the precision.",
+    "findings_folded": "Two folds: Q1 hardened R1's trigger (the M4 candidate set is now explicitly root-param vs shim-per-worktree vs config-file, no other hand-waves); Q3 folded into scope - abandon FLAGS rather than deletes, keeping delegated runs non-destructive by construction. Q2/Q4/Q5 answered from the packet as drafted - no upstream change."
+  }
+}

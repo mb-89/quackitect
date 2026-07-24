@@ -1,0 +1,13 @@
+{
+  "iteration": "i5-worktrees",
+  "state": "gate_kickoff",
+  "at": "2026-07-24T13:24:49.940Z",
+  "payload": {
+    "retro_drained": "22 notes at open, 14 kept with recorded keep-reasons (owner judgment or future homes), 8 drained with dispositions - every note accounted; the drain record is in notes.jsonl and the retro evidence.",
+    "goal": "Iterations become independent and parallel: each runs in its own worktree and branch, merges mark suspects, and independent planned iterations may fire together (i5-worktrees, planned goal confirmed verbatim).",
+    "pulled_in": "From the plan (all five steps): worktree lifecycle (se_loop_start creates worktree+branch, ship merges to trunk, owner pushes), merge semantics with suspect marking (uc-4's across-iterations pass line), plan depends_on metadata + parallel fire + per-worktree board tab data, onboarding guidance amendment (retros distribute into INDEPENDENT iterations, DSM partitioning where the cut is unclear). From the retro: the decisions-card flicker fix (owner: fix next iteration), the drain-refuses-unknown-refs determinizer (found today, small, hygiene). From the ruling: this whole iteration runs under se.decision-delegated-adjudication - every gate self-blessed with the agent stamp.",
+    "left_out": "The live two-iterations-in-parallel demonstration - the owner ruled no parallel run this time; the plan step converts to: machinery proven by tests + fixture repos, the live demo parks as a RAID trigger for the next parallel opportunity (also covers raid-i5-parallel-serve-demo's two-token half where feasible in fixtures). i9 board consolidation (owner judgment, explicitly not delegated), the ETA-on-steps redesign (owner discussion), the test command (parked demand), phone lane (i8, next in sequence).",
+    "rigor": "Systematic, unpruned - same as i3/i4: this iteration rewires how iterations THEMSELVES run (worktrees, merge semantics); the full M0-M9 walk with drawn chunks at M7 is exactly what de-risks it. No strikes.",
+    "offer_hash": "de4039a60ffb505c1a18b5a2c3def6188584aab8a16790f201c216cc828c9f38"
+  }
+}

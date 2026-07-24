@@ -432,14 +432,27 @@ export function coreTools(root: string, opts: { toll?: Toll; session?: Session }
     {
       name: "se_gate_bless",
       title: "se.gate.bless",
-      description: "Relay the owner's explicit chat approval of the live offer; the grant records channel=chat, adjudicated_by=owner.",
+      description: "Relay the owner's explicit chat approval of the live offer (channel=chat, adjudicated_by=owner); delegated:true self-blesses under a recorded owner grant, stamped agent + delegated_via.",
       inputSchema: {
         type: "object",
-        properties: { hash: { type: "string", description: "the live offer's base hash" } },
+        properties: {
+          hash: { type: "string", description: "the live offer's base hash" },
+          delegated: { type: "boolean", description: "bless under the recorded delegation decision - stamps agent, never the owner" },
+        },
         required: ["hash"],
       },
       handler: (args) => {
-        const grant = new Gate(root).bless(requireSystematic(root), String(args.hash), { channel: "chat", adjudicated_by: "owner" });
+        // "delegated:<hash>" carries the flag inside the hash param: a
+        // harness validating against a cached schema strips unknown fields,
+        // and a silently-dropped flag would stamp the owner on a self-bless.
+        const rawHash = String(args.hash);
+        const prefixed = rawHash.startsWith("delegated:");
+        const hash = prefixed ? rawHash.slice("delegated:".length) : rawHash;
+        const by =
+          args.delegated === true || prefixed
+            ? { channel: "chat-grant", adjudicated_by: "agent", delegated_via: "se.decision-delegated-adjudication" }
+            : { channel: "chat", adjudicated_by: "owner" };
+        const grant = new Gate(root).bless(requireSystematic(root), hash, by);
         return { grant, next: loop().next() };
       },
     },
