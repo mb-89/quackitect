@@ -125,7 +125,7 @@ export class McpServer {
           try {
             for (const guard of this.guards) guard(name, args);
             const result = await tool.handler(args);
-            this.observe({ tool: name, args, ok: true, duration_ms: Date.now() - started, outcome: "result" });
+            this.observe({ tool: name, args, ok: true, duration_ms: Date.now() - started, outcome: "result", response: result });
             return this.ok(id, {
               content: [{ type: "text", text: JSON.stringify(result, null, 1) }],
               isError: false,

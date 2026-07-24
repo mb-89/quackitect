@@ -162,25 +162,18 @@ test("a chat-relayed bless lands with channel=chat and the owner as adjudicator"
   }
 });
 
-test("se.help: hits are affordances, misses are honest and logged as demand", () => {
+test("se.help: hits are affordances, misses are honest refusals (the observer owns the log line)", () => {
   const root = mkdtempSync(join(tmpdir(), "se-help-"));
   try {
-    const log = new CallLog(join(root, ".se"));
     const tools = coreTools(root);
 
-    const hit = help("apply atomic operations", "bulk edit nodes", tools, systematic, log);
+    const hit = help("apply atomic operations", "bulk edit nodes", tools, systematic);
     assert.ok(hit.hits.some((h) => h.tool === "se_set_apply"));
     assert.equal(hit.refusal, undefined);
 
-    const miss = help("deploy kubernetes cluster", "ship to prod", tools, systematic, log);
+    const miss = help("deploy kubernetes cluster", "ship to prod", tools, systematic);
     assert.equal(miss.hits.length, 0);
     assert.match(miss.refusal!, /no such tool — do it yourself/);
-
-    const logLines = readFileSync(join(root, ".se", "calls.jsonl"), "utf8").trim().split("\n").map((l) => JSON.parse(l));
-    const helpCalls = logLines.filter((l) => l.tool === "se.help");
-    assert.equal(helpCalls.length, 2);
-    assert.equal(helpCalls[1].detail.miss, true);
-    assert.equal(helpCalls[1].args.intent, "ship to prod");
   } finally {
     rmSync(root, { recursive: true, force: true });
   }

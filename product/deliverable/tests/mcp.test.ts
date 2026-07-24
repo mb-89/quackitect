@@ -31,6 +31,7 @@ async function withServer(
   const root = mkdtempSync(join(tmpdir(), "se-mcp-"));
   mkdirSync(join(root, "product", "spec", "ledger", "se"), { recursive: true });
   writeFileSync(join(root, "product", "spec", "ledger", "se", "adr-mcp.md"), NODE);
+  writeFileSync(join(root, "product.json"), JSON.stringify({ product: "mcp-fixture" }) + "\n", "utf8");
 
   const bin = join(import.meta.dirname, "..", "bin", "se-mcp.ts");
   const proc = spawn(process.execPath, [bin, "--root", root], { stdio: ["pipe", "pipe", "pipe"] });
@@ -87,7 +88,7 @@ type Send = (msg: object) => Promise<Record<string, unknown>>;
 
 /** The session boot over the wire: contract -> attest. */
 async function bootSession(send: Send): Promise<void> {
-  const step1 = await send({ method: "tools/call", params: { name: "se_boot", arguments: {} } });
+  const step1 = await send({ method: "tools/call", params: { name: "se_boot", arguments: { project: "mcp-fixture" } } });
   const payload = JSON.parse((step1.result as { content: { text: string }[] }).content[0].text) as {
     contract_hash: string;
   };

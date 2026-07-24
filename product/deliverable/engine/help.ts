@@ -3,7 +3,6 @@
 // permissive refusal: "no such tool — do it yourself." Every call is logged
 // with stated intent: misses are the live missing-tool demand signal.
 import type { ToolDef } from "./mcp.ts";
-import type { CallLog } from "./calllog.ts";
 import type { MachineDecl } from "./machine.ts";
 
 export interface HelpResult {
@@ -12,13 +11,7 @@ export interface HelpResult {
   refusal?: string;
 }
 
-export function help(
-  query: string,
-  intent: string,
-  tools: ToolDef[],
-  machine: MachineDecl | null,
-  log: CallLog,
-): HelpResult {
+export function help(query: string, intent: string, tools: ToolDef[], machine: MachineDecl | null): HelpResult {
   const terms = query.toLowerCase().split(/\s+/).filter((t) => t.length > 1);
   const score = (text: string): number => {
     const lower = text.toLowerCase();
@@ -37,15 +30,9 @@ export function help(
     .slice(0, 3)
     .map((x) => ({ state: x.s.id, guidance: x.s.guidance }));
 
+  // One line per dispatch: the observer logs this call; the miss is
+  // recoverable from the logged response summary.
   const miss = hits.length === 0;
-  log.append({
-    tool: "se.help",
-    args: { query, intent },
-    ok: true,
-    duration_ms: 0,
-    detail: { miss, hit_count: hits.length },
-  });
-
   return {
     hits,
     guidance_hits: guidanceHits,

@@ -6,10 +6,11 @@
 // And one from §4: SE never rebases or force-pushes a published branch.
 
 import { spawnSync } from "node:child_process";
-import { existsSync, realpathSync } from "node:fs";
-import { dirname, resolve } from "node:path";
+import { existsSync, mkdirSync, realpathSync, rmSync, writeFileSync } from "node:fs";
+import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { Rejection } from "./errors.ts";
+import { layout } from "./layout.ts";
 
 export interface GitResult {
   ok: boolean;
@@ -80,6 +81,34 @@ export function assertOperable(targetPath: string, opts: { allowSelf?: boolean }
       source: "engine/git.ts assertOperable",
     });
   }
+}
+
+const commitWindowPath = (root: string): string => join(layout.seDir(root), "commit-window.json");
+
+/** A gate bless opens the window; the next loop submit closes it. */
+export function openCommitWindow(root: string, grantRef: string): void {
+  mkdirSync(layout.seDir(root), { recursive: true });
+  writeFileSync(commitWindowPath(root), JSON.stringify({ grant: grantRef, at: new Date().toISOString() }) + "\n", "utf8");
+}
+
+export function closeCommitWindow(root: string): void {
+  rmSync(commitWindowPath(root), { force: true });
+}
+
+/** Commits are gate-bound: refused outside the bless window. */
+export function assertCommitWindow(root: string): void {
+  if (existsSync(commitWindowPath(root))) return;
+  throw new Rejection({
+    clause: "SE-C-047",
+    expected: "a commit inside the bless window (gate bless -> next loop submit)",
+    got: "no open window",
+    remedy: {
+      tool: "se_loop_next",
+      args: {},
+      note: "reach and pass the next gate, then commit; an explicit owner grant is the emergency escape",
+    },
+    source: "engine/git.ts assertCommitWindow",
+  });
 }
 
 /** Refuse destructive history rewrites on published branches (§4). */

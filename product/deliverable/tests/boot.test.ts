@@ -5,7 +5,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { mkdtempSync, rmSync, mkdirSync, writeFileSync, readFileSync, existsSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { basename, join } from "node:path";
 
 process.env.SE_STATE_DIR = mkdtempSync(join(tmpdir(), "se-state-"));
 delete process.env.SE_SESSION_FILE; // a hosting session's admission must not leak in
@@ -27,7 +27,7 @@ test("boot: contract -> attest -> admitted, with lock, recents and a projected h
   try {
     const session = newSession();
 
-    const step1 = boot(root, session);
+    const step1 = boot(root, session, undefined, {}, "boot-fixture");
     assert.equal(step1.step, "attest");
     assert.equal(step1.project, "boot-fixture"); // the nameplate names the product
     assert.match((step1 as { contract: string }).contract, /Write plainly/);
@@ -57,7 +57,7 @@ test("a wrong or stale contract hash is refused (SE-C-006)", () => {
   const root = fixture();
   try {
     const session = newSession();
-    boot(root, session);
+    boot(root, session, undefined, {}, "boot-fixture");
     assert.throws(
       () => boot(root, session, "0".repeat(64)),
       (e: unknown) => e instanceof Rejection && e.clause === "SE-C-006",
@@ -80,7 +80,7 @@ test("a root without a nameplate still boots, named by folder, with the note poi
   try {
     mkdirSync(join(root, "product", "deliverable"), { recursive: true });
     const session = newSession();
-    const step1 = boot(root, session);
+    const step1 = boot(root, session, undefined, {}, basename(root));
     const step2 = boot(root, session, (step1 as { contract_hash: string }).contract_hash);
     assert.equal(step2.step, "admitted");
     assert.match((step2 as { note: string }).note, /product\.json/);

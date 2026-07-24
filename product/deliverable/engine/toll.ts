@@ -62,7 +62,7 @@ export class Toll {
 
   constructor(seDir: string, opts: { windowMs?: number; now?: () => number } = {}) {
     this.path = join(seDir, "toll.json");
-    this.windowMs = opts.windowMs ?? 10 * 60 * 1000;
+    this.windowMs = opts.windowMs ?? 5 * 60 * 1000;
     this.now = opts.now ?? Date.now;
   }
 
@@ -93,6 +93,27 @@ export class Toll {
       log.append({ tool: "se.toll.update", args: { via: toolName, ...update }, ok: true, duration_ms: 0 });
       this.save({ ...s, armed: true, last_update_ts: this.now(), last_update: update });
       return;
+    }
+    if (toolName === "se_loop_submit") {
+      throw new Rejection({
+        clause: "SE-C-046",
+        expected: "an update riding every se_loop_submit — a submit is a step boundary",
+        got: "submit without an update",
+        remedy: {
+          tool: toolName,
+          args: {
+            ...args,
+            update: {
+              current_step: "<what this submit closes>",
+              next_milestone: "<next visible result>",
+              eta: "<clock time>",
+              todo: ["[x] <a finished task>", "[ ] <the task in progress>"],
+            },
+          },
+          note: "resend with the update field — volunteered updates are never stopped",
+        },
+        source: "engine/toll.ts check",
+      });
     }
     if (!s.armed) return;
     if (this.now() - s.last_update_ts <= this.windowMs) return;

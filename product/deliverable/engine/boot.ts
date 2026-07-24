@@ -91,11 +91,11 @@ You work through the se MCP server, and you do what it tells you.
 - At idle, say so: "idle — what next?" with the options.
 - Never start an iteration unasked. Idle is a stop, not a springboard.
 
-## The lanes (the loop will hand you the right one)
+## The lanes
 
-- Ledger: se_get_*, se_set_apply (dry_run -> diff hash -> execute).
-- Files: se_file_list / search / read / patch / write / delete (CAS).
-- Shell: se_run. Git: se_git (allowlisted). Waiting: se_wait.
+__LANES__
+Read this list once at boot — it IS the served registry; the contract can
+never name a lane the surface does not serve.
 
 ## Call discipline
 
@@ -108,12 +108,23 @@ You work through the se MCP server, and you do what it tells you.
 ## Voice — how to write every output
 `;
 
+// The lane list renders FROM the registry: coreTools registers the served
+// names, so contract and surface cannot diverge.
+let LANE_NAMES: string[] = [];
+export function registerLaneNames(names: string[]): void {
+  LANE_NAMES = [...names].sort();
+}
+
 export function composeContract(root: string): { contract: string; hash: string } {
   const voicePath = join(layout.deliverable(root), "brand", "voice.md");
   const voice = existsSync(voicePath)
     ? readFileSync(voicePath, "utf8")
     : "(no voice guide found — write plainly, short sentences, lists)";
-  const contract = `${GENERAL_RULES}\n${voice.trim()}\n`;
+  const lanes =
+    LANE_NAMES.length > 0
+      ? `Served by this registry, right now: ${LANE_NAMES.join(", ")}.`
+      : "(registry not loaded — se_help lists the surface)";
+  const contract = `${GENERAL_RULES.replace("__LANES__", lanes)}\n${voice.trim()}\n`;
   return { contract, hash: sha256(contract) };
 }
 
@@ -175,9 +186,31 @@ export function boot(
   session: Session,
   contractHash?: string,
   opts: { board?: boolean } = {},
+  namedProject?: string,
 ): BootStep1 | BootAdmitted {
   const { name: project, nameplate } = productName(root);
   const modules = loadModules(root);
+  if (!session.admitted) {
+    const named = namedProject ?? session.project;
+    if (named === undefined) {
+      throw new Rejection({
+        clause: "SE-C-007",
+        expected: "a named project — ask the owner which project to lock onto, then boot with their answer",
+        got: "boot without a project",
+        remedy: { tool: "se_boot", args: { project: "<the owner's answer>" }, note: "the one-question ritual is mechanical: no named project, no lock-on" },
+        source: "engine/boot.ts",
+      });
+    }
+    if (named !== project) {
+      throw new Rejection({
+        clause: "SE-C-007",
+        expected: `the project this root serves: ${project}`,
+        got: named,
+        remedy: { tool: "se_boot", args: { project }, note: "confirm the mismatch with the owner before locking on" },
+        source: "engine/boot.ts",
+      });
+    }
+  }
   if (session.admitted) {
     if (opts.board === true) {
       spawnBoard(root);

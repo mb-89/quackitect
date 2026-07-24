@@ -31,12 +31,12 @@ test("the drawn lean machine compiles to the executable shape", () => {
   assert.ok(m.states.find((s) => s.id === "declare_goal")!.evidence_form.length === 3);
 });
 
-test("the drawn systematic machine: nine milestones, gates, seeding sockets, the battery loop", () => {
+test("the drawn systematic machine: onboarding plus nine milestones, gates, seeding sockets, the battery loop", () => {
   const m = compileMachine(repoLedger(), "se.machine-systematic");
   assert.equal(m.id, "systematic");
-  assert.equal(m.initial, "draft_vision");
-  assert.equal(m.states.length, 45);
-  assert.equal(m.states.filter((s) => s.kind === "gate").length, 9);
+  assert.equal(m.initial, "onboard_retro");
+  assert.equal(m.states.length, 47);
+  assert.equal(m.states.filter((s) => s.kind === "gate").length, 10);
   assert.equal(m.states.filter((s) => s.kind === "terminal").length, 1);
   // The seeding sockets: candidates, spikes, build chunks, killer demos.
   assert.deepEqual(

@@ -1,8 +1,8 @@
 // The tool surface (§5) bound to a ledger root. B2 ships the read/write
 // pair + search; loop tools land at B4, guard rails at B5.
-import { appendFileSync, mkdirSync, readFileSync } from "node:fs";
+import { appendFileSync, existsSync, mkdirSync, readFileSync } from "node:fs";
 import { randomBytes } from "node:crypto";
-import { dirname } from "node:path";
+import { dirname, join } from "node:path";
 import { loadLedger } from "./store.ts";
 import { WarmIndex } from "./warmindex.ts";
 import { getNode, type GetMode } from "./get.ts";
@@ -18,11 +18,24 @@ import { help } from "./help.ts";
 import { seWait, type WaitCondition } from "./wait.ts";
 import { McpServer } from "./mcp.ts";
 import { layout } from "./layout.ts";
-import { boot, newSession, assertAdmitted, type Session } from "./boot.ts";
+import { boot, newSession, assertAdmitted, registerLaneNames, type Session } from "./boot.ts";
 import { Gate } from "./gate.ts";
 import { fileList, fileRead, fileWrite, filePatch, fileDelete, fileSearch, type SearchMode } from "./deliverable.ts";
-import { git, assertNotHistoryRewrite, assertNotPush } from "./git.ts";
+import { git, assertNotHistoryRewrite, assertNotPush, assertCommitWindow } from "./git.ts";
 import { runCommand } from "./run.ts";
+import { psAction } from "./ps.ts";
+
+/** Captures minus drain lines: the honest inbox size. */
+function inboxCount(root: string): number {
+  if (!existsSync(layout.notesPath(root))) return 0;
+  const lines = readFileSync(layout.notesPath(root), "utf8")
+    .trim()
+    .split("\n")
+    .filter((l) => l.trim() !== "")
+    .map((l) => JSON.parse(l) as { ref?: string; drain_of?: string });
+  const drained = new Set(lines.filter((l) => l.drain_of !== undefined).map((l) => l.drain_of));
+  return lines.filter((l) => l.ref !== undefined && !drained.has(l.ref)).length;
+}
 import { Rejection } from "./errors.ts";
 
 registerMigration(v1Import);
@@ -59,9 +72,17 @@ export function coreTools(root: string, opts: { toll?: Toll; session?: Session }
         type: "object",
         properties: {
           contract_hash: { type: "string", description: "the hash from the previous se_boot call — attesting it admits the session" },
+          project: { type: "string", description: "the project to lock onto — ask the owner, never assume" },
         },
       },
-      handler: (args) => boot(root, session, args.contract_hash === undefined ? undefined : String(args.contract_hash), { board: true }),
+      handler: (args) =>
+        boot(
+          root,
+          session,
+          args.contract_hash === undefined ? undefined : String(args.contract_hash),
+          { board: true },
+          args.project === undefined ? undefined : String(args.project),
+        ),
     },
     {
       name: "se_loop_start",
@@ -163,10 +184,42 @@ export function coreTools(root: string, opts: { toll?: Toll; session?: Session }
         required: ["ops"],
       },
       handler: (args) => {
-        const ops = args.ops as ApplyOp[];
+        const ops = (args.ops ?? []) as ApplyOp[];
+        const cachePath = join(layout.seDir(root), "apply-cache.jsonl");
         const wantsExecute = args.execute_hash !== undefined && args.dry_run !== true;
-        if (!wantsExecute) return dryRun(ledgerRoot, ops);
-        return execute(ledgerRoot, ops, String(args.execute_hash));
+        if (wantsExecute) {
+          let useOps = ops;
+          if (ops.length === 0) {
+            // Execute-by-hash: the dry_run's ops replay from the cache — no resend.
+            const cached = existsSync(cachePath)
+              ? readFileSync(cachePath, "utf8")
+                  .trim()
+                  .split("\n")
+                  .map((l) => JSON.parse(l) as { hash: string; ops: ApplyOp[] })
+                  .find((c) => c.hash === args.execute_hash)
+              : undefined;
+            if (cached === undefined) {
+              throw new Rejection({
+                clause: "SE-C-049",
+                expected: "a cached dry_run for this hash (the cache is machine-local and session-fresh)",
+                got: String(args.execute_hash),
+                remedy: { tool: "se_set_apply", args: { ops: [], dry_run: true }, note: "re-run the dry_run, then execute by its fresh hash" },
+                source: "engine/tools.ts se_set_apply",
+              });
+            }
+            useOps = cached.ops;
+          }
+          return execute(ledgerRoot, useOps, String(args.execute_hash));
+        }
+        if (args.dry_run === false) {
+          // Fire-first: apply directly; the engine still hash-guards internally.
+          const d = dryRun(ledgerRoot, ops);
+          return { ...execute(ledgerRoot, ops, d.diff_hash), fired_direct: true };
+        }
+        const d = dryRun(ledgerRoot, ops);
+        mkdirSync(layout.seDir(root), { recursive: true });
+        appendFileSync(cachePath, JSON.stringify({ hash: d.diff_hash, ops }) + "\n", "utf8");
+        return d;
       },
     },
     {
@@ -293,6 +346,7 @@ export function coreTools(root: string, opts: { toll?: Toll; session?: Session }
         const gitArgs = (args.args as string[]).map(String);
         assertNotPush(gitArgs);
         assertNotHistoryRewrite(gitArgs);
+        if (gitArgs[0] === "commit") assertCommitWindow(root);
         const ALLOWED = new Set(["status", "log", "diff", "show", "add", "commit", "fetch", "branch", "rev-parse", "restore"]);
         if (!ALLOWED.has(gitArgs[0])) {
           throw new Rejection({
@@ -341,8 +395,28 @@ export function coreTools(root: string, opts: { toll?: Toll; session?: Session }
         const note = { ref: "note-" + randomBytes(6).toString("hex"), text: String(args.text), at: new Date().toISOString() };
         mkdirSync(dirname(layout.notesPath(root)), { recursive: true });
         appendFileSync(layout.notesPath(root), JSON.stringify(note) + "\n", "utf8");
-        const count = readFileSync(layout.notesPath(root), "utf8").trim().split("\n").length;
-        return { captured: note.ref, inbox_count: count };
+        return { captured: note.ref, inbox_count: inboxCount(root) };
+      },
+    },
+    {
+      name: "se_note_drain",
+      title: "se.note.drain",
+      description: "Mark a note drained with its disposition — the retro's mechanical half; drained notes leave the inbox count.",
+      inputSchema: {
+        type: "object",
+        properties: {
+          ref: { type: "string", description: "the note ref to drain" },
+          disposition: { type: "string", description: "where it went: pulled into <iteration>, routed to <home>, rejected because <reason>" },
+        },
+        required: ["ref", "disposition"],
+      },
+      handler: (args) => {
+        appendFileSync(
+          layout.notesPath(root),
+          JSON.stringify({ drain_of: String(args.ref), disposition: String(args.disposition), at: new Date().toISOString() }) + "\n",
+          "utf8",
+        );
+        return { drained: String(args.ref), inbox_count: inboxCount(root) };
       },
     },
     {
@@ -371,7 +445,53 @@ export function coreTools(root: string, opts: { toll?: Toll; session?: Session }
         },
         required: ["query", "intent"],
       },
-      handler: (args) => help(String(args.query), String(args.intent), tools, loadSystematic(root), log()),
+      handler: (args) => help(String(args.query), String(args.intent), tools, loadSystematic(root)),
+    },
+    {
+      name: "se_ps",
+      title: "se.ps",
+      description: "List, stop or cycle SE-owned processes (the board) — foreign processes are refused.",
+      inputSchema: {
+        type: "object",
+        properties: {
+          action: { type: "string", enum: ["list", "stop", "cycle"], default: "list" },
+          target: { type: "string", default: "board" },
+        },
+      },
+      handler: (args) => psAction(root, (args.action as "list" | "stop" | "cycle") ?? "list", String(args.target ?? "board")),
+    },
+    {
+      name: "se_log_query",
+      title: "se.log.query",
+      description: "Generic log aggregation: filter, group, count over the call log — the retro's lane, never an ad-hoc script.",
+      inputSchema: {
+        type: "object",
+        properties: {
+          filter: { type: "object", description: "{ tool?, ok?, since? (ISO), clause? }" },
+          group_by: { type: "string", description: 'dot path to group counts by, e.g. "tool" or "detail.clause"' },
+          limit: { type: "number", default: 20 },
+        },
+      },
+      handler: (args) =>
+        log().query({
+          filter: (args.filter ?? {}) as { tool?: string; ok?: boolean; since?: string; clause?: string },
+          group_by: args.group_by === undefined ? undefined : String(args.group_by),
+          limit: args.limit === undefined ? undefined : Number(args.limit),
+        }),
+    },
+    {
+      name: "se_gate_dismiss",
+      title: "se.gate.dismiss",
+      description: "Dismiss the live offer with a reason — the agent-legal way when its evidence is superseded.",
+      inputSchema: {
+        type: "object",
+        properties: { reason: { type: "string", description: "why the offer no longer binds — logged" } },
+        required: ["reason"],
+      },
+      handler: () => {
+        new Gate(root).dismiss();
+        return { dismissed: true };
+      },
     },
     {
       name: "se_wait",
@@ -396,6 +516,7 @@ export function coreTools(root: string, opts: { toll?: Toll; session?: Session }
   for (const t of tools) {
     t.inputSchema.properties = { ...((t.inputSchema.properties as Record<string, unknown>) ?? {}), update: TOLL_UPDATE_SCHEMA };
   }
+  registerLaneNames(tools.map((t) => t.name));
   return tools;
 }
 
@@ -412,8 +533,21 @@ export function buildServer(root: string, opts: { tollWindowMs?: number; now?: (
   server.addGuard((tool, args) => toll.check(tool, args, log));
   // §9 log-everything: every call through the single MCP path lands raw in
   // the call log — successes too, not just errors (i1 of self-hosting).
-  server.addObserver(({ tool, args, ok, duration_ms, outcome, response }) =>
-    log.append({ tool, args, ok, duration_ms, detail: { outcome, ...(response !== undefined ? { response } : {}) } }),
-  );
+  server.addObserver(({ tool, args, ok, duration_ms, outcome, response }) => {
+    const detail: Record<string, unknown> = { outcome };
+    if (ok) {
+      // Successes carry a capped summary — the board's request+response view
+      // and the retro's miss queries read it.
+      if (response !== undefined) detail.response_summary = JSON.stringify(response).slice(0, 500);
+    } else {
+      if (response !== undefined) detail.response = response;
+      const r = response as { clause?: string; expected?: string } | undefined;
+      if (r?.clause !== undefined) {
+        detail.clause = r.clause;
+        detail.reason = r.expected;
+      }
+    }
+    log.append({ tool, args, ok, duration_ms, detail });
+  });
   return server;
 }
