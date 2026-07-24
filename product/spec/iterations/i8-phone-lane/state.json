@@ -1,7 +1,7 @@
 {
   "machine": "systematic",
   "iteration": "i8-phone-lane",
-  "current": "finalize_docs",
+  "current": "shipped",
   "counters": {},
   "history": [
     {
@@ -255,13 +255,37 @@
       "outcome": "filled",
       "evidence": "grant:1b96f3cd4c8e",
       "at": "2026-07-24T14:52:18.988Z"
+    },
+    {
+      "state": "finalize_docs",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i8-phone-lane/evidence/finalize_docs-1.json",
+      "at": "2026-07-24T14:52:54.995Z"
+    },
+    {
+      "state": "package",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i8-phone-lane/evidence/package-1.json",
+      "at": "2026-07-24T14:53:07.770Z"
+    },
+    {
+      "state": "ship_review",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i8-phone-lane/evidence/ship_review-1.json",
+      "at": "2026-07-24T14:53:22.982Z"
+    },
+    {
+      "state": "gate_release",
+      "outcome": "filled",
+      "evidence": "grant:209722428c77",
+      "at": "2026-07-24T14:53:52.446Z"
     }
   ],
   "escapes": [],
-  "status": "open",
+  "status": "closed",
   "fired": [],
   "active": [
-    "finalize_docs"
+    "shipped"
   ],
   "claims": {}
 }

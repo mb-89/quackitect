@@ -1,0 +1,9 @@
+{
+  "iteration": "i8-phone-lane",
+  "state": "package",
+  "at": "2026-07-24T14:53:07.769Z",
+  "payload": {
+    "package": "v2 ships as the branch state: the M7 build (5b49669: engine/phone.ts + i8-phone.test.ts + the board hook) plus M8 (a0d243b) plus the M9 close-out to come. The ledger grew by 8 requirements, 3 v2 ADRs, 1 setup guidance node, 2 RAID entries; the drawn build and spike machines with their walked records ship in the iteration folder. No zip lane - unchanged from i3-i5.",
+    "entry_script": "README.md and RUNME.ps1 stand unchanged at the root. The phone lane adds a NEW optional config file, ~/.se/<project>/phone.json - machine-local, gitignored-by-location (it lives outside the repo entirely, in the state home), correctly excluded from the artifact; its setup is documented in guidance-phone-setup, the owner-physical enablement step."
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "iteration": "i8-phone-lane",
+  "state": "ship_review",
+  "at": "2026-07-24T14:53:22.982Z",
+  "payload": {
+    "review": "No dependency flips: the phone lane uses Node's built-in fetch/AbortSignal only - no package added, honoring the install-hygiene ADR. A NEW EXTERNAL SERVICE dependency ships and is worth flagging: ntfy (the push service) - but it is OPTIONAL (the lane is off until the owner configures it), UNTRUSTED for authenticity (adr-answer-authenticity treats it as transport only), and INJECTABLE (the Transport boundary means a different service is a one-class swap); not a code dependency, a runtime one the owner opts into. Module deps unchanged (kb sibling import active). Nothing forked or vendored.",
+    "upstream": "None owed - the NtfyTransport speaks stock ntfy's documented HTTP API (PUT publish with X-Actions, since-poll); no modification to ntfy or any external project. The v1->v2 realization is internal."
+  }
+}

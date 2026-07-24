@@ -1,0 +1,12 @@
+{
+  "iteration": "i8-phone-lane",
+  "state": "gate_release",
+  "at": "2026-07-24T14:53:41.488Z",
+  "payload": {
+    "docs_match": "The handover, board and contract are projections read back against the surface at finalize_docs; the phone lane's enablement is documented in guidance-phone-setup (registry-served), the inherited ADRs now describe realized code. Honest absences (book emitter -> i6; live pairing -> owner-physical RAID) are planned, not papered over.",
+    "packaged": "The branch state is the artifact: 5b49669 (M7) + a0d243b (M8) + this close-out; README + RUNME unchanged; the optional phone.json lives outside the repo in the state home, never shipped; the drawn machines and records ship in the iteration folder.",
+    "dependencies_ruled": "No code-dep flips (Node built-ins only); ntfy flagged as an optional, untrusted, injectable RUNTIME dependency the owner opts into; nothing forked or owed upstream.",
+    "handover_accepted": "This bless is the acceptance: i8-phone-lane closes M0-M9 in one unattended run under the recorded delegation - six gates self-blessed with the agent stamp, 135/135 battery FIRST pass at M7, the from-away bless proven end to end via the mock round-trip with the token-hiding and stalled-transport guards tested. The owner reviews the shipped iteration; the live pairing and the ntfy-shape re-probe carry triggers. This completes the owner's delegated sequence (i5 then i8); i9 was explicitly NOT delegated and waits for the owner.",
+    "offer_hash": "209722428c77caec93bc698c2e26df8f739e7671c03115541a7b145ddf74318f"
+  }
+}

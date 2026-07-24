@@ -1,0 +1,8 @@
+{
+  "iteration": "i8-phone-lane",
+  "state": "finalize_docs",
+  "at": "2026-07-24T14:52:54.995Z",
+  "payload": {
+    "docs": "Emitted-as-projection and read back against the shipped surface: the boot handover shows i8-phone-lane at finalize_docs with its green verify; the board runs the phone lane when configured (verified the wiring does not disturb the board test). The phone lane's how-to lives WHERE it is taught - se.guidance-phone-setup (config shape, pairing, accepted-risk note, owner-physical verify), registry-served. The inherited v1 phone ADRs now describe REALIZED code, not just a decision. Honest absences unchanged: the BOOK emitter is i6's job; the live from-away pairing is the owner-physical RAID. No doc teaches a superseded way."
+  }
+}
