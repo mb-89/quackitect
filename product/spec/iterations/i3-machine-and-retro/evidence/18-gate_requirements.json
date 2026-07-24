@@ -1,0 +1,14 @@
+{
+  "iteration": "i3-machine-and-retro",
+  "state": "gate_requirements",
+  "at": "2026-07-24T08:54:45.575Z",
+  "payload": {
+    "verifiable": "All 25 requirements carry a named verify_method: 21 test, 2 demonstration (req-exec-multi-agent, req-hot-reload - both observable behaviors of live sessions, not unit-testable), 2 inspection (req-board-parallel render, req-lean-strike diffability). None unnameable, none dropped.",
+    "traced": "Every requirement carries source_refs into the ledger: UCs (uc-2,3,4,6,7,8,9), residents (vision via context/stakeholders chains), or a sibling requirement (test-lane -> verify-scope; verify-scope -> 1s). No empty rows; the reverse direction (every story realized) was blessed at gate_inputs.",
+    "functions_cover": "The function structure (16-derive_functions) maps all 25: executor set -> execute-the-drawing + serve-the-work + show-the-truth; session laws -> keep-the-rhythm; record set -> keep-the-record; lanes -> maintain-the-system; offers -> adjudicate. UC steps covered; uc-6 explicitly untouched by i3 (hand-edit rehash live since i2f). No orphan function, no unmapped requirement.",
+    "set_holds": "Complete: every blessed i3 plan step has its requirement(s) and vice versa. Consistent: one scoping anchor (milestone/gate states) ties test lane, verify scope and commit window; 1s and background runs are one mechanism. Affordable: 21/25 ride the existing suite runner. Bounded: nothing outside the kickoff-blessed scope. No TBD in any statement. Honest gap carried openly: quality reqs use numeric pass lines instead of six-part scenarios (1s latency, one-line-per-dispatch); scenario formalism deferred with reason - the numbers ARE the scenario for these two.",
+    "breaks_if_removed": "Filled on all 25, each naming the concrete regression - most cite measured incidents from this iteration's record (six side-channels, 5s submits, clauseless failures, inbox growth 25->31).",
+    "assumptions_probed": "Six probes on the real channels (17-probe_assumptions, walked inline after the executor skipped the drawn state - the seventh side-channel, now register evidence): offer-hash/instance independence CONFIRMED in source; 5s-submit cause CONFIRMED in the log; canvas round-trip HOLDS (loud-refusal fixture scheduled to author_tests with reason); offer survives board cycles CONFIRMED; chat bless stamping CONFIRMED; harness wake-on-completion CONFIRMED. RAID updated by result, no new entries needed.",
+    "offer_hash": "e242c2359017d03f4739a7de4375ab65f6dc2ebf9298fcf3c12c91936c3a5648"
+  }
+}

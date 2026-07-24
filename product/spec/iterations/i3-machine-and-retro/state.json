@@ -1,7 +1,7 @@
 {
   "machine": "systematic",
   "iteration": "i3-machine-and-retro",
-  "current": "write_requirements",
+  "current": "derive_criteria",
   "counters": {},
   "history": [
     {
@@ -87,6 +87,30 @@
       "outcome": "filled",
       "evidence": "grant:f834b2efab2d",
       "at": "2026-07-24T08:46:45.185Z"
+    },
+    {
+      "state": "write_requirements",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i3-machine-and-retro/evidence/15-write_requirements.json",
+      "at": "2026-07-24T08:52:46.020Z"
+    },
+    {
+      "state": "probe_assumptions",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i3-machine-and-retro/evidence/17-probe_assumptions.json",
+      "at": "2026-07-24T09:20:00.000Z"
+    },
+    {
+      "state": "derive_functions",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i3-machine-and-retro/evidence/16-derive_functions.json",
+      "at": "2026-07-24T08:53:31.496Z"
+    },
+    {
+      "state": "gate_requirements",
+      "outcome": "filled",
+      "evidence": "grant:e242c2359017",
+      "at": "2026-07-24T08:56:10.671Z"
     }
   ],
   "escapes": [],

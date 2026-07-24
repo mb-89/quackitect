@@ -1,0 +1,9 @@
+{
+  "iteration": "i3-machine-and-retro",
+  "state": "write_requirements",
+  "at": "2026-07-24T08:52:46.020Z",
+  "payload": {
+    "register": "25 requirement nodes live in the ledger, each EARS-shaped with req_kind, verify_method and breaks_if_removed, source_refs to UCs/residents. Executor and machine semantics (9): req-exec-parallel, req-exec-tokens, req-exec-seed, req-exec-multi-agent, req-board-parallel, req-state-inherit, req-verify-milestone-scope, req-offer-lane, req-1s-interactive (pre-minted). Session laws (5, all constraints): req-test-lane, req-commit-window, req-toll-submit, req-boot-project, req-grant-role. Record quality (3): req-log-hygiene, req-log-aggregate, req-projection-verify. Lanes and ops (8): req-hot-reload, req-process-lane, req-apply-ergonomics, req-search-roots, req-link-rename, req-plan-ops, req-retro-drain, req-lean-strike. Verify methods: 21 test, 2 demonstration (multi-agent, hot-reload), 2 inspection (board render, strike-list).",
+    "set_criteria": "Complete: every i3 plan step maps to at least one requirement, and every requirement traces to a UC or resident - checked by walking the plan step list against the register. Consistent: the constraint set shares one scoping anchor (milestone/gate states) so test lane, verify scope and commit window cannot contradict each other; the 1s rule and background runs are one mechanism. Affordable: 21 of 25 verify by test in the existing suite runner; no new infrastructure beyond the executor itself. Bounded: nothing outside i3's blessed scope - board redlines, phone lane, schema validation and dot-file lanes are absent by design (their iterations hold them). Honest gap: quality requirements carry no six-part scenarios yet; the two measurable ones (1s latency, log hygiene) have numeric pass lines instead - flagged for the gate rather than padded."
+  }
+}

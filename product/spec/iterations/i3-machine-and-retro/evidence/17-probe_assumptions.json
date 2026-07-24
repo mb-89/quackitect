@@ -1,0 +1,16 @@
+{
+  "iteration": "i3-machine-and-retro",
+  "state": "probe_assumptions",
+  "at": "2026-07-24T09:20:00.000Z",
+  "note": "Inline fill - interim executor skipped this drawn parallel state (seventh side-channel; same defect, see note 401bdae3).",
+  "payload": {
+    "probes": [
+      "A: the offer hash does not bind the instance file (req-offer-lane and the repair lane depend on it) | probe: read gate.ts makeOffer/bless on the real source | result: CONFIRMED - base_hash = sha256(iteration, state, evidence, brief, evidence_path); bless checks only current+status. RAID unchanged.",
+      "A: engine-filled inline runs cause the 5s submits (req-verify-milestone-scope) | probe: call-log durations (31 submits: median 85ms vs 4.7-5.6s cluster) cross-read with loop.ts next() runCommand path | result: CONFIRMED on the real channel, not assumed.",
+      "A: the Advanced Canvas pin holds (A1 in the register) | probe: today's write_canvas round-trip - the engine re-serialized and Obsidian-compatible structure survived; compiler validated at load twice | result: HOLDS for 1.0-1.0; the loud-refusal path itself is untested - scheduled into author_tests (M7) with the compile suite, reason: needs a fixture, not a field probe.",
+      "A: a pending offer survives a board process cycle (D1 dependency) | probe: killed the board twice today with a live offer; offer.json untouched in the state dir, offers survived | result: CONFIRMED.",
+      "A: chat is a legal bless channel with correct stamping (req-grant-role) | probe: today's two grants via se_gate_bless | result: CONFIRMED - channel=chat, adjudicated_by=owner, no usernames.",
+      "A: the harness notifies on background-task completion (the run-handle design in D leans on it) | probe: four watcher tasks today, every completion woke the session | result: CONFIRMED for the harness channel; the engine-side run-handle store is new build, covered by req tests."
+    ]
+  }
+}
