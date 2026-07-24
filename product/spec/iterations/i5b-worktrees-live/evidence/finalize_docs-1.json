@@ -1,0 +1,8 @@
+{
+  "iteration": "i5b-worktrees-live",
+  "state": "finalize_docs",
+  "at": "2026-07-24T17:23:52.202Z",
+  "payload": {
+    "docs": "No standalone report artifact - the book renderer lands in i6 (not yet shipped), so the docs ARE the ledger + the live board (the everyday report). Matched against the shipped surface: se.guidance-worktrees now teaches default isolation + the local seed-and-trim machine; the se_loop_start description and the loop.ts comment agree with default provisioning; the framing-state guidance (draft_vision/define_actual/frame_delta) teaches the inherit rule; the two new test files (i5b-worktrees-live, i5b-e2e) ARE the permanent acceptance record. No doc contradicts the shipped behaviour."
+  }
+}

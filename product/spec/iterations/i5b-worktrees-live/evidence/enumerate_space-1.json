@@ -1,0 +1,9 @@
+{
+  "iteration": "i5b-worktrees-live",
+  "state": "enumerate_space",
+  "at": "2026-07-24T16:26:14.591Z",
+  "payload": {
+    "chart": "Rows x options (pruned cells noted):\n- A LOCATE a worktree-resident instance: A1 openInstance SCANS the .worktrees/* homes (+trunk) | A2 a trunk-side ACTIVE-ITERATION POINTER file records {iteration -> worktree root} | A3 the server holds an IN-MEMORY stream registry (rebuilt from openWorktrees).\n- B INSTANCE FILE location: B1 in the worktree [keep - matches isolation] | B2 on trunk while work is in the tree [PRUNED - splits state, breaks isolation].\n- C LOCAL MACHINE: C1 an iteration-local machine DRAWING, machineFor prefers it (lift loadIterationMachine to top-level) - reuses the canvas+compile pattern (machine-lean/tutorial) | C2 a strike-list OVERLAY on the named machine [DEFERRED = req-lean-strike; noted as the future DRY form].\n- D PROVISION trigger: D1 DEFAULT in loop.start (provision unless already a worktree root) [reverses the opt-in] | D2 a plan flag defaulted true [PRUNED - still floggable, the defect could recur].",
+    "shortlist": "- K1 SCAN: A1+B1+C1+D1 - openInstance scans the worktree homes; no new registry; simplest wiring; cost = a directory scan per loop call.\n- K2 POINTER: A2+B1+C1+D1 - a trunk-side active-iteration pointer; O(1) locate; cost = one more file to keep consistent across start/ship/abandon.\n- K3 SERVER-REGISTRY: A3+B1+C1+D1 - the server holds an in-memory stream registry rebuilt from openWorktrees at boot; fast; cost = rebuild-on-restart, memory is not the source of truth."
+  }
+}

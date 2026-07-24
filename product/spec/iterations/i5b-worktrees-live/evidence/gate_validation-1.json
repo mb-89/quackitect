@@ -1,0 +1,14 @@
+{
+  "iteration": "i5b-worktrees-live",
+  "state": "gate_validation",
+  "at": "2026-07-24T17:22:12.924Z",
+  "payload": {
+    "meets_need": "Every need's pass lines demonstrated, all iterations green:\n- Isolated by default: R1 (run-5b82e0e6e894) + the e2e provisions without any flag.\n- The live server drives it: R3 + the LIVE e2e (run-615346de3d42) - open -> walk -> gate -> ship, all from the trunk-rooted server.\n- Trim its own machine: R4 (run-5b82e0e6e894) - a local trimmed machine overrides the template.\n- Ship honestly: i5's W1 suspect-marking (green in the full battery run-caf35aa1879c) + the e2e's live shipMerge.\n- Proven-live acceptance (R7): unit-green was explicitly NOT the acceptance - a full live lifecycle ran through the real engine.",
+    "killers_demonstrated": "UC-1 (run an iteration LIVE in its worktree) exercised end-to-end: tests/i5b-e2e.test.ts, run-615346de3d42 - the exact lifecycle i5 never ran. UC-2 (trim) via R4. UC-3 (honest merge) via i5's W1 + the e2e ship. Each killer exercised for real, green.",
+    "acceptance_converted": "Executable slices are now PERMANENT acceptance scenarios in the battery: tests/i5b-worktrees-live.test.ts (R1 default-provision, R3 live-routing, R4 local-machine) and tests/i5b-e2e.test.ts (the full open->walk->gate->ship live demo). They run in every future verification.",
+    "consistency_swept": "Yes - the surfaces agree with the behaviour: se_loop_start description (tools.ts), the loop.ts comment, se.guidance-worktrees Rules (default + local machine), and the framing-state inherit guidance all updated. No surface still teaches the opt-in way.",
+    "gaps_logged": "In RAID/gaps (log_gaps): the inline build (no seeded chunk sub-machine, note-408f50dd89a2) + the inline demo - both the accepted debt routed to the mechanical build_steps guard; the scan-cost sensitivity tripwire (fallback K2); the two-live-at-once demo (i5's owner-physical RAID); the description-cache /mcp reconnect (cosmetic). No new correctness gap.",
+    "market_tier": "Skipped with reason: i5b is internal tooling for the owner's own use of se - not declared to market, no external acquirer. The real-world tier does not apply; the live e2e through the real engine is the acceptance.",
+    "offer_hash": "133311414e5ffc47925110635adcfba387c0819d38f86c9bb9cf865760a3c488"
+  }
+}

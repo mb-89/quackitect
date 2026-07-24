@@ -1,0 +1,10 @@
+{
+  "iteration": "i5b-worktrees-live",
+  "state": "evaluate_set",
+  "at": "2026-07-24T16:26:45.150Z",
+  "payload": {
+    "scores": "Weighted 0-5 (Correctness-live .30, Least-machinery .20, No-wedge .20, DRY .15, Mechanical .15):\n- K1 SCAN: 4 / 5 / 4 / 5 / 5 = 4.50. Reliable locate, no new state, the worktrees ARE the single source, fully automatic.\n- K2 POINTER: 4 / 3 / 3 / 2 / 5 = 3.45. Works but adds a pointer file + lifecycle; duplicates 'where X lives' (can drift); an extra failure mode.\n- K3 SERVER-REGISTRY: 3 / 3 / 3 / 3 / 4 = 3.15. Memory is not the source of truth; restart/ desync risk, no upside over K1.\n(Research-agent scoring skipped with reason: this is an internal topology choice - how to LOCATE an instance - not a prior-art architecture claim.)",
+    "front": "K1 SCAN is non-dominated and clearly leads (>= every other on every criterion). Front = {K1}. K2 is retained OFF-front as a scale fallback only (if the worktree count ever makes the per-call scan measurably slow - not the case for the handful of concurrent iterations expected).",
+    "eliminations": "K3 SERVER-REGISTRY eliminated: dominated by K1 on all criteria; an in-memory mirror of the worktrees adds desync/restart risk with no benefit. K2 POINTER eliminated from the front (dominated by K1 on every criterion) but recorded as the documented scale fallback per TW-style tradeoff - a trunk-side pointer trades DRY for O(1) locate, worth it only if the scan cost ever shows up."
+  }
+}

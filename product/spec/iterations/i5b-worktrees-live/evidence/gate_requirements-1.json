@@ -1,0 +1,14 @@
+{
+  "iteration": "i5b-worktrees-live",
+  "state": "gate_requirements",
+  "at": "2026-07-24T16:24:16.764Z",
+  "payload": {
+    "verifiable": "Every requirement carries its verify_method: R1 test, R2 test, R3 demonstration (live e2e), R4 test, R5 test, R6 test, R7 demonstration, R8 inspection.",
+    "traced": "Every requirement traces to a story/prop: R1,R2,R3 -> STORY 1 (isolated-by-default + live-server-drives); R4 -> STORY 2 (trim); R5 -> UC-2 ext 3a; R6 -> STORY 3 (honest merge); R7 -> the acceptance prop + the process-stale finding; R8 -> owner feedback this session. No empty rows.",
+    "functions_cover": "Every requirement requires at least one function (R1,R2->Isolate; R3->Locate+Drive; R4,R5->Adapt; R6->Reunify; R7->Prove; R8->Guide); every use-case step covered (UC-1 open/route/ship, UC-2, UC-3). No holes.",
+    "set_holds": "Complete (R1-R6 cover the UCs, R7 the acceptance, R8 the guidance fix), consistent (R2 bounds R1, R5 bounds R4, R7 governs acceptance), affordable (mostly wiring over i5 primitives + the compiler; genuinely-new = span openInstance R3 and lift the local machine R4), bounded (excludes the general strike-list, auto-skip judgment, two-at-once demo, i9). No TBD.",
+    "breaks_if_removed": "Filled on every requirement R1-R8 (opt-in returns / nesting / server can't continue a branched iteration / no local trim / broken machine wedges / silent merge / untested-live recurs / vision re-derived needlessly).",
+    "assumptions_probed": "A1 (worktrees available) confirmed (v2 is itself a linked worktree; i5 tests exercise the ops). The R3 LIVE ROUTING unknown is scheduled for M6 with reason (it is the ranked #1 prototype probe - the exact untested gap). R4 (local top-level machine) and R5 (dangling-edge refusal) probed as feasible against loadIterationMachine + validateMachine.",
+    "offer_hash": "e571a530f35fd5520f7abec5d5a62589ac98a7c95b401c1ed153949ca1e870c4"
+  }
+}

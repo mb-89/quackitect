@@ -1,0 +1,9 @@
+{
+  "iteration": "i5b-worktrees-live",
+  "state": "plan_build",
+  "at": "2026-07-24T16:49:51.997Z",
+  "payload": {
+    "build_machine": "Chunks (id | what | realization | deps):\n- c1 DEFAULT-PROVISION (E1) | in loop.start, remove the `entry?.worktree === true` opt-in gate so every start provisions iter/<id> unless isWorktreeRoot; keep the never-nest guard | engine-ts | none. Turns R1 green.\n- c2 WIDEN-OPENINSTANCE (E2) | openInstance (and hasOpenInstance) scan the .worktrees/* homes in addition to the server root, returning the open worktree-resident instance | engine-ts | none. Turns R3 green.\n- c3 LOCAL-TOP-MACHINE (E4) | machineFor prefers an iteration-local TOP-LEVEL machine drawing (loadIterationMachine lifted from sub-machines) when present, else the named ledger machine; + a red-first test | engine-ts | none.\n- c4 INHERIT-GUIDANCE (E7) | amend the draft_vision/define_actual/frame_delta state-note guidance to 'inherit se.vision (pointer+delta) unless deviating' | ledger-doc | none.\n- c5 VERIFY | full battery green (typecheck + all tests, incl. i5's, unbroken) | verification | c1,c2,c3,c4.\nc1+c2 are the two-defect core (make R1/R3 green together); c3+c4 complete the blessed scope. Independent chunks - could fan out, but done inline here on the live engine with care (whole-file writes, no half-patched imports).",
+    "promotions_placed": "The M6 spike run-00bb96bfac69 is the pre-verified basis: SP2 (provision from a linked-worktree root) underwrites c1; SP1 (trunk-root scan finds a worktree-resident instance) underwrites c2. The red-first tests (run-4c3b123136b3: R1, R3) are the pre-authored checks c1 and c2 turn green; they entered as the M6->M7 promotions."
+  }
+}

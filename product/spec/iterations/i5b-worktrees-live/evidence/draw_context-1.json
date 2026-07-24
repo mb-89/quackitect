@@ -1,0 +1,10 @@
+{
+  "iteration": "i5b-worktrees-live",
+  "state": "draw_context",
+  "at": "2026-07-24T16:16:54.805Z",
+  "payload": {
+    "boundary": "Inherits the se system boundary (se.vision + i5-worktrees context) - pointer, unchanged. The i5b DELTA boundary - INSIDE: loop.start() provisioning (made default), openInstance() (span the worktree homes), machineFor()/loadIterationMachine (lift local machines to the top level), the live-run test harness, and the framing-state guidance notes. Neighbours/interfaces: git (worktree/branch/merge via engine/git.ts + worktree.ts), the .worktrees/ home, the plan.json entry, the board (live-stream tab data), and se.machine-systematic (the seed for a trimmed local machine). OUTSIDE: the owner's push, the phone lane, the general strike-list, multi-agent orchestration.",
+    "intended_use": "An iteration opens and runs, LIVE, inside its own worktree + branch by default; the running server drives it there through the whole walk to ship; it may trim its own machine, seeded from systematic; ship merges to trunk with suspects marked and the owner pushes. Used by the owner (and later parallel agents) to run isolated iterations that are proven, not merely built.",
+    "excluded_use": "Does NOT: auto-decide which states an iteration may skip (authoring judgment stays with the owner); run two worktrees in parallel with two agents at once (i5's owner-physical RAID); touch the phone lane or the i8 bless mechanics; provide a general strike-list over arbitrary machines; push (the owner's act); consolidate the board beyond one live stream (i9)."
+  }
+}

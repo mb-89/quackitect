@@ -1,0 +1,9 @@
+{
+  "iteration": "i5b-worktrees-live",
+  "state": "map_stakeholders",
+  "at": "2026-07-24T16:17:52.969Z",
+  "payload": {
+    "roles": "Inherited from se, no new roles: the owner (opens iterations, blesses gates, pushes); the driving agent (walks the machine, builds); the adjudicator (blesses - here the owner, attended); the maintainer (future readers of trunk). Enabled-but-not-staffed by i5b: parallel agents each holding their own worktree.",
+    "tensions": "The named goal-system conflicts are the live ones: (1) default isolation (every iteration branches, a cost per iteration) vs convenience (skip the overhead for tiny work) - resolved for isolation; off-by-default was the defect. (2) the driving agent's pull to ship fast vs the owner's requirement that it be PROVEN live - resolved for proven; fast-without-proof caused the regression this iteration fixes. No new stakeholder-specific tensions beyond these."
+  }
+}

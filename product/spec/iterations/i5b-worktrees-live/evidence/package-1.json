@@ -1,0 +1,9 @@
+{
+  "iteration": "i5b-worktrees-live",
+  "state": "package",
+  "at": "2026-07-24T17:24:16.938Z",
+  "payload": {
+    "package": "i5b is an ENGINE-BEHAVIOUR increment, not a new distributable. The package is the versioned source set: engine/loop.ts (default provisioning, worktree routing, local-machine override + start-initial), engine/tools.ts (se_loop_start description) + the loop.ts comment + se.guidance-worktrees + the 3 framing-state notes (docs), and the two new acceptance tests (tests/i5b-worktrees-live.test.ts, tests/i5b-e2e.test.ts). Baselined by git; i5b runs on trunk as the bootstrap (the owner commits + pushes). Version 2.0.0-bootstrap unchanged - a behaviour increment within the bootstrap line.",
+    "entry_script": "Recorded skip: the one-script entry (RUNME.ps1, install-and-run) is UNCHANGED. i5b adds no install step - the worktree default rides the existing engine; a fresh clone + RUNME still installs and runs. No new entry script needed."
+  }
+}

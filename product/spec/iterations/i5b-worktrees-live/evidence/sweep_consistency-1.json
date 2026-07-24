@@ -1,0 +1,8 @@
+{
+  "iteration": "i5b-worktrees-live",
+  "state": "sweep_consistency",
+  "at": "2026-07-24T17:21:44.743Z",
+  "payload": {
+    "swept": "Every surface this iteration changed, re-documented where it is taught:\n- se_loop_start TOOL DESCRIPTION (tools.ts): 'A worktree:true plan entry opens it' -> 'Every iteration opens in its own .worktrees/<id> tree+branch by default (a non-repo root starts plain)'. (Cached in tools/list; re-serves after a /mcp reconnect - cosmetic.)\n- loop.ts start() COMMENT: the 'worktree mode / plan entry with worktree:true' comment replaced with 'default isolation'.\n- se.guidance-worktrees (Rules): the opt-in rule replaced by the default; a NEW rule documents the LOCAL seed-and-trim machine (c3/R4).\n- Framing-state guidance (draft_vision/define_actual/frame_delta): already amended for the inherit rule (c4).\nHistorical evidence (i5 build records, i5b as-is) left untouched - they describe what was true then. No describing surface still teaches the opt-in way."
+  }
+}

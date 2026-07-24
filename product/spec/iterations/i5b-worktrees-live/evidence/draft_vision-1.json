@@ -1,0 +1,11 @@
+{
+  "iteration": "i5b-worktrees-live",
+  "state": "draft_vision",
+  "at": "2026-07-24T16:09:23.303Z",
+  "payload": {
+    "big_idea": "Inherit se.vision. The i5b delta: i5 built the worktree lane but shipped it OPT-IN and never ran it live, so no iteration ever branched. i5b makes isolation REAL and DEFAULT - every iteration opens in its own worktree and branch, the running server drives it there, and it carries a local machine seeded from systematic and trimmed in place. Lineage: i5-worktrees (the lane), its two defects (opt-in note-e8a12b600638, untested-live note-6815f9db4930), and the owner's model of per-branch, locally-trimmable machines.",
+    "to_be_world": "The owner opens an iteration; the engine provisions iter/<id> in .worktrees/<id> and works there without touching trunk; the board shows that live stream; the iteration trims its own machine (seeded from systematic) so a reuse iteration is genuinely short; at ship it merges back to trunk marking suspects, and the owner pushes. Two independent iterations can each hold their own tree. Nothing runs 'effectively off', and nothing ships without having been run for real.",
+    "goal_system": "Inherited goals unchanged; delta priorities, conflicts named: (1) isolation BY DEFAULT beats convenience - every iteration branches, not only those that remember a flag (reverses the opt-in defect); (2) PROVEN-LIVE beats unit-green - acceptance is an end-to-end run through the real server, never isolated parts (reverses the untested defect); (3) LOCAL machines beat a shared template - an iteration trims its own seeded copy, so reduction is per-branch, not a global edit. Conflict named: default branching adds git/worktree cost to every small iteration - accepted, isolation is the point (a trivial-iteration exemption may come later, but off-by-default is the wrong default).",
+    "moore_pitch": "FOR the owner running iterations who was promised isolation WHO instead got a feature that shipped off and untested, THE default worktree lane IS branch-per-iteration that actually runs live and carries a trimmable local machine, UNLIKE i5's opt-in-and-unproven lane, OURS makes isolation the real, proven, per-branch default - and closes the regression that let 'done but never run' pass."
+  }
+}

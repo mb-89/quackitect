@@ -1,0 +1,9 @@
+{
+  "iteration": "i5b-worktrees-live",
+  "state": "derive_functions",
+  "at": "2026-07-24T16:23:53.332Z",
+  "payload": {
+    "function_structure": "Overall function: run an iteration in isolation, live, on a trimmable process, merging honestly. Sub-functions (verb + noun, no technology):\n- Isolate an iteration - give each iteration a private workspace and its own line of history [R1, R2].\n- Locate the active iteration - find the running iteration wherever it lives [R3].\n- Drive the located iteration - serve and advance it through its steps and gates [R3].\n- Adapt the process - seed a base process, remove unneeded steps, keep it well-formed [R4, R5].\n- Reunify honestly - fold an iteration's line back, marking overlaps [R6].\n- Prove the whole path - exercise the real end-to-end path as acceptance [R7].\n- Guide the framing - tell the author to inherit the standing vision unless deviating [R8].",
+    "coverage": "Every requirement maps to a function: R1,R2 -> Isolate; R3 -> Locate + Drive; R4,R5 -> Adapt; R6 -> Reunify; R7 -> Prove; R8 -> Guide. Every use-case step covered: UC-1 open/provision -> Isolate, step-5 route -> Locate + Drive, ship -> Reunify; UC-2 -> Adapt; UC-3 -> Reunify. No holes."
+  }
+}

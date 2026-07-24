@@ -12,7 +12,10 @@ filled_by: agent
 ---
 
 ## Guidance
+
 Vision FIRST - it is the stop-or-continue filter; if the vision alone is not interesting, nothing downstream matters. The big idea in one breath, lineage named. The to-be world alive, not abstract. The goal system with conflicts named openly ([[meth-goal-system]]). Close with the pitch ([[meth-moore-pitch]]). The vision is axiomatic: nothing derives it; the gate adjudicates whether it is worth having.
+
+INHERIT where possible: if this iteration reuses an existing design and does not deviate from se.vision, satisfy this state with a pointer to se.vision plus the delta - do not re-derive the axiom (state-inheritance).
 
 ## Evidence form
 - big_idea | one breath, standalone-readable, lineage named | required

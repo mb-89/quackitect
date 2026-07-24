@@ -1,0 +1,8 @@
+{
+  "iteration": "i5b-worktrees-live",
+  "state": "define_actual",
+  "at": "2026-07-24T16:10:03.151Z",
+  "payload": {
+    "as_is": "Pain 1 - isolation shipped OFF. i5's worktree lane is opt-in via a plan flag that no iteration sets, so every iteration (i3-i10) runs on trunk; the promised branch-per-iteration never happened. Witness: plan.json carries no worktree:true anywhere, the working branch is v2, and defect note-e8a12b600638.\n\nPain 2 - the live path was never run. The i5 suite tests the parts in isolation and, wherever it 'runs' an iteration, constructs the loop ALREADY rooted at a worktree; the real path (start() provisions, then the running server routes se_loop_next/submit/gate to the worktree-resident instance) is untested, and because openInstance() scans only the server's own root, it looks broken. Witness: tests/i5-worktrees.test.ts, engine/loop.ts openInstance, defect note-6815f9db4930.\n\nPain 3 - no local top-level machine. An iteration's top-level machine is shared and loaded BY NAME (machineFor -> loadMachine -> se.machine-systematic); only SUB-machines can be iteration-local (loadIterationMachine). So an iteration cannot trim its own process locally, and the refine cut had nowhere to live. Witness: engine/loop.ts machineFor, engine/machines/load.ts, and this session's i8b refine-cut dead-end."
+  }
+}

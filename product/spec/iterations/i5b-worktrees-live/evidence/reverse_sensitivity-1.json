@@ -1,0 +1,9 @@
+{
+  "iteration": "i5b-worktrees-live",
+  "state": "reverse_sensitivity",
+  "at": "2026-07-24T16:28:21.688Z",
+  "payload": {
+    "sensitivity": "K1 is robust across the plausible weight range. The ONLY losing world: if DRY and Least-machinery weights collapse toward zero AND a performance criterion is added and heavily weighted, in a scenario with MANY concurrent worktrees (dozens+) where the per-call directory scan becomes measurable latency - there K2's O(1) pointer wins. That world is not credible now (a handful of concurrent iterations expected), but it is the genuine flip.",
+    "tripwires": "One RAID tripwire (not a silent dismissal): IF the concurrent worktree count ever grows enough that the openInstance scan adds measurable latency to a loop call (approaching the 1s-interactive budget), THEN switch to K2 (the trunk-side active-iteration pointer, already the recorded fallback). Watch-item: loop-call latency vs live-worktree count. Owner: the driving agent. Trigger: a slow-call observation in the retro's ETA/latency mining."
+  }
+}

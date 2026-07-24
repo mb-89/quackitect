@@ -1,0 +1,8 @@
+{
+  "iteration": "i5b-worktrees-live",
+  "state": "derive_criteria",
+  "at": "2026-07-24T16:25:14.880Z",
+  "payload": {
+    "criteria": "The vital few (definition | requirement id | weight):\n1. Correctness-live - the routed iteration actually runs live end-to-end, no silent breakage | R3, R7 | 0.30.\n2. Least-machinery - fewest new moving parts; reuse i5 primitives + the machine compiler | affordability of the R-set | 0.20.\n3. No-wedge robustness - a bad state or missing tree cannot wedge the loop for ALL iterations; failures are contained and named | R1, R5 | 0.20.\n4. DRY single-source - one place knows where an iteration lives; no duplicated routing/state logic | owner DRY law | 0.15.\n5. Mechanical, no-LLM-judgment - provisioning and routing are automatic; the agent never decides where an iteration runs | owner ruling 'bake into the machinery' | 0.15."
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "iteration": "i5b-worktrees-live",
+  "state": "log_gaps",
+  "at": "2026-07-24T17:21:32.499Z",
+  "payload": {
+    "swept": "Every surface this iteration changed, re-documented where it is taught:\n- se_loop_start TOOL DESCRIPTION (tools.ts): 'A worktree:true plan entry opens it' -> 'Every iteration opens in its own .worktrees/<id> tree+branch by default (a non-repo root starts plain)'. (Cached in tools/list; re-serves after a /mcp reconnect - cosmetic.)\n- loop.ts start() COMMENT: the 'worktree mode / plan entry with worktree:true' comment replaced with 'default isolation'.\n- se.guidance-worktrees (Rules): the opt-in rule replaced by the default; a NEW rule documents the LOCAL seed-and-trim machine (c3/R4).\n- Framing-state guidance (draft_vision/define_actual/frame_delta): already amended for the inherit rule (c4).\nHistorical evidence (i5 build records, i5b as-is) left untouched - they describe what was true then. No describing surface still teaches the opt-in way.",
+    "gaps": "Gaps logged during validation (no NEW correctness gap - the full battery + the live e2e are green):\n- The inline build (no seeded chunk sub-machine) - the build_steps mechanical guard (note-408f50dd89a2), carried as accepted debt + a follow-up.\n- The demonstration was also seeded inline (a test, not a drawn demo sub-machine) - same class.\n- The scan-cost sensitivity tripwire (switch to K2 pointer at scale) stays an open watch-item.\n- Two-live-worktrees-at-once with two agents stays i5's owner-physical RAID (not exercised here).\n- The se_loop_start description re-serves only after a /mcp reconnect (tools/list cache) - cosmetic, owner-run."
+  }
+}

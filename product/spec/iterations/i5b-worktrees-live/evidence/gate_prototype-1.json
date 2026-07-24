@@ -1,0 +1,11 @@
+{
+  "iteration": "i5b-worktrees-live",
+  "state": "gate_prototype",
+  "at": "2026-07-24T16:40:10.976Z",
+  "payload": {
+    "assumptions_validated": "VALIDATED by real runs (se_run ref run-00bb96bfac69, exit 0): SP1 PASS - a trunk-root scan of the .worktrees homes located a worktree-resident OPEN instance ([[iter-a,iter-a]]), proving U1, the routing concept - the exact gap i5 never tested. SP2 PASS - `git worktree add` succeeded from a LINKED-worktree root (our real v2 shape, which i5's plain-init fixtures never covered) and `git worktree list` shows the nested iter/iter-b tree, proving U2. Both riskiest assumptions HOLD; the design did not change. (Correction to the earlier fold_back record: the spikes DID run - the initial 'could not run' was an agent tool-choice error (Bash, fenced) not a real limit; se_run runs non-battery commands freely.)",
+    "buildable": "Yes, now evidenced: the routing SCAN locates a worktree-resident instance and provisioning works from our linked-worktree root - both proven in the tracer. The build widens openInstance to the proven scan (E2) and defaults provisionWorktree in loop.start (E1); most other elements are existing tested code. Fallback K2 (trunk pointer) recorded if scan cost ever bites.",
+    "results_recorded": "Spike run pinned: run-00bb96bfac69 (SP1 routing + SP2 linked-worktree provision, exit 0); tracer = scratchpad/i5b_spike.cjs. Promotions marked for M7 build: SP1 -> the red-first routing test (F4, openInstance from trunk finds a worktree-resident instance); SP2 -> a provision-from-linked-worktree test (covers the fixture gap i5 missed); both feed F2, the M8 live end-to-end demonstration. Harness finding note-d8c88277c5f5 superseded by note-e9e41af9c834 (the rule was already test-scoped).",
+    "offer_hash": "515bd3d509cdd906968ee7a91370aee67c391fb875a6b663e3d27bfd6e4e23a4"
+  }
+}

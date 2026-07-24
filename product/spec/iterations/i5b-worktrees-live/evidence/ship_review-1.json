@@ -1,0 +1,9 @@
+{
+  "iteration": "i5b-worktrees-live",
+  "state": "ship_review",
+  "at": "2026-07-24T17:24:33.775Z",
+  "payload": {
+    "review": "No dependency flips: i5b uses only existing engine modules (worktree.ts, machines/load.ts, git.ts) + node built-ins - no package added, honouring se.adr-install-over-zerodep and the install-hygiene ADR. No new external service. No diverged dependency. No new ask - the sticky rulings (default branching, local seed-and-trim machine, proven-live acceptance) were each blessed at their gates this iteration.",
+    "upstream": "None owed: i5b changes SE's OWN engine (the product IS the engine here), so there is no separate upstream to deposit to. The follow-up leads (mechanical build_steps guard note-408f50dd89a2, ETA-mechanical + board-reopen for i9, the v1->v2 porting audit, memory-migration + mechanical-once retro rules) are captured as notes for their own iterations, not upstream proposals."
+  }
+}

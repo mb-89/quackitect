@@ -1,0 +1,15 @@
+{
+  "iteration": "i5b-worktrees-live",
+  "state": "gate_implementation",
+  "at": "2026-07-24T17:14:55.785Z",
+  "payload": {
+    "build_planned": "HONEST: NO chunk sub-machine was seeded - the build was INLINE (the regression you caught, note-408f50dd89a2). The chunk PLAN exists (plan_build: c1-c4 with deps + realization kinds) and each chunk was built and verified, but the drawn sub-machine (visibility + resumability on the board) was skipped. You accepted the inline build for i5b ('finish it all now') and routed the mechanical build_steps guard - refuse entry until a sub-machine is seeded - to a follow-up. This gate asks you to accept the inline build for i5b with that debt recorded.",
+    "models_adhered": "The build filled the allocated elements and only those: E1 provisionWorktree default (loop.start), E2 openInstance widening + openWorktreeRoot routing (next/submit), E4 machineFor local override, E7 the framing-state guidance notes. E5 Reunifier (shipMerge) and R5's validateMachine were reused unchanged. No unsanctioned new element; nothing went back through the architecture gate.",
+    "red_observed": "Every new check failed before the build: R1 (no default provision), R3 (trunk loop served undefined) and R4 (added with c3) all red first - run-4c3b123136b3 shows R1/R3 red; R4 was authored against c3 and turned green with it.",
+    "designs_realized": "Every requirement has a realized design: R1 default provision (git-guarded), R2 never-nest (isWorktreeRoot preserved), R3 live routing (trunk-first delegation), R4 local machine (machineFor + start-initial), R5 dangling-edge (validateMachine, unchanged), R6 honest merge (shipMerge, unchanged), R8 inherit guidance (3 state notes). R7 proven-live: the routing is realized + tested; the FULL open->walk->gate->ship-in-a-worktree live demonstration (F2) is the M8 validation.",
+    "verification_green": "The full battery passed across all iterations: run-caf35aa1879c ok:true (typecheck + every test file). Plus run-5b82e0e6e894 (R1/R3/R4) and run-0812c9c0c6e8 (loop suites 33/33) - no regressions from the default-provision or routing changes.",
+    "quality_ok": "Internal quality: the routing change is ADDITIVE and trunk-first, so a trunk-resident iteration (i5b itself) is never disturbed - which is why the whole battery stayed green. Provisioning is git-guarded (a non-repo root starts plain). DRY: the worktrees are the single source of truth for 'where an iteration lives' - no pointer to drift. One recorded debt: the inline build (no sub-machine).",
+    "risks_acceptable": "RAID judged: R1 (a routing bug could wedge the loop for all) - mitigated by trunk-first + the full battery green; R2 (single trunk-rooted server vs worktree instance) - resolved by the delegation, proven by R3; R3 (trimmed machine mis-compiles) - guarded by the reused validateMachine; the scan-cost flip is the recorded sensitivity tripwire (fallback K2). The one accepted debt is the inline build, routed to the mechanical build_steps guard follow-up.",
+    "offer_hash": "453741f5f973ec512155e65b99a4577f2d60c9d54cb4093b30f13a98ae4ebd7b"
+  }
+}

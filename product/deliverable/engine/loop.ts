@@ -18,7 +18,7 @@ import { activeStates, advance, completeState, validateMachine, type MachineDecl
 import { claimState, readInstance } from "./instance.ts";
 import { loadIterationMachine, loadMachine } from "./machines/load.ts";
 import { loadLedger } from "./store.ts";
-import { assertDependsMet, provisionWorktree, worktreeHome } from "./worktree.ts";
+import { assertDependsMet, openWorktrees, provisionWorktree, worktreeHome } from "./worktree.ts";
 import { basename as pathBase, dirname as pathDir } from "node:path";
 
 export interface WorkPacket {
@@ -100,6 +100,27 @@ export class Loop {
     return null;
   }
 
+  /** The root of a worktree-resident open iteration, else null (routing, E2).
+   *  Consulted only when the server's own root has no open instance —
+   *  trunk-first, so a trunk-resident iteration is never disturbed. */
+  private openWorktreeRoot(): string | null {
+    for (const w of openWorktrees(this.root)) {
+      const base = layout.iterations(w.root);
+      if (!existsSync(base)) continue;
+      for (const dir of readdirSync(base, { withFileTypes: true })) {
+        if (!dir.isDirectory()) continue;
+        const file = layout.instancePath(w.root, dir.name);
+        if (!existsSync(file)) continue;
+        try {
+          if (readJsonFile<MachineInstance>(file).status === "open") return w.root;
+        } catch {
+          continue;
+        }
+      }
+    }
+    return null;
+  }
+
   private save(inst: MachineInstance): void {
     mkdirSync(layout.iterationDir(this.root, inst.iteration), { recursive: true });
     writeFileSync(this.instancePath(inst.iteration), JSON.stringify(inst, null, 2) + "\n", "utf8");
@@ -108,6 +129,10 @@ export class Loop {
   /** The instance's own machine (floor flag 1): an open iteration keeps the
    *  machine it started under, whatever the ledger's current default is. */
   private machineFor(inst: MachineInstance): MachineDecl {
+    // A local machine (seeded from the named one, then trimmed in the branch)
+    // overrides the shared template for THIS iteration only.
+    const local = loadIterationMachine(this.root, inst.iteration, inst.machine);
+    if (local !== null) return local;
     if (inst.machine === this.machine.id) return this.machine;
     const m = loadMachine(this.root, inst.machine);
     if (m === null) {
@@ -129,23 +154,18 @@ export class Loop {
   start(iteration: string): WorkPacket {
     // The start gate (i5): dependencies must have shipped (SE-C-072).
     assertDependsMet(this.root, iteration);
-    // Worktree mode: a plan entry with worktree:true opens its instance in a
-    // provisioned tree (never nested - a worktree-resident loop starts plain).
-    // Self-hosted note: the product repo IS the engine's repo here, so the
-    // worktree lane runs with allowSelf; SE-C-001 keeps guarding se_git.
-    if (!isWorktreeRoot(this.root)) {
-      const planPath = layout.planPath(this.root);
-      if (existsSync(planPath)) {
-        const entry = readJsonFile<{ iterations?: { id: string; worktree?: boolean }[] }>(planPath)
-          .iterations?.find((it) => it.id === iteration);
-        if (entry?.worktree === true) {
-          const w = provisionWorktree(this.root, iteration, { allowSelf: true });
-          const wLoop = new Loop(w.root, this.machine);
-          const packet = wLoop.start(iteration);
-          void worktreeHome; // home derivation lives with the lane
-          return { ...packet, note: `${packet.note ?? ""} [stream: ${w.branch} at ${w.root}]`.trim() };
-        }
-      }
+    // Default isolation: every iteration opens in its own provisioned tree +
+    // branch (never nested - a worktree-resident loop, or a non-repo root,
+    // starts plain). Self-hosted note: the product repo IS the engine's repo
+    // here, so the worktree lane runs with allowSelf; SE-C-001 guards se_git.
+    if (!isWorktreeRoot(this.root) && existsSync(join(this.root, ".git"))) {
+      // Every iteration opens in its own worktree + branch. Only where git can
+      // provision one; a non-repo root (or a worktree-resident loop) starts plain.
+      const w = provisionWorktree(this.root, iteration, { allowSelf: true });
+      const wLoop = new Loop(w.root, this.machine);
+      const packet = wLoop.start(iteration);
+      void worktreeHome; // home derivation lives with the lane
+      return { ...packet, note: `${packet.note ?? ""} [stream: ${w.branch} at ${w.root}]`.trim() };
     }
     const open = this.openInstance();
     if (open) {
@@ -169,7 +189,8 @@ export class Loop {
     const inst: MachineInstance = {
       machine: this.machine.id, // floor flag 1: policy in force, on the iteration
       iteration,
-      current: this.machine.initial,
+      // A local machine may trim or relocate the entry; honour its initial.
+      current: (loadIterationMachine(this.root, iteration, this.machine.id) ?? this.machine).initial,
       counters: {},
       history: [],
       escapes: [],
@@ -193,6 +214,9 @@ export class Loop {
   next(opts: { session?: string } = {}): WorkPacket {
     let inst = this.openInstance();
     if (!inst) {
+      // Trunk-first: only when nothing is open here, route to a worktree stream.
+      const wtRoot = this.openWorktreeRoot();
+      if (wtRoot !== null) return new Loop(wtRoot, this.machine).next(opts);
       return {
         kind: "instruction",
         legal: ["se.loop.start { iteration }"],
@@ -415,6 +439,9 @@ export class Loop {
   submit(evidence: Record<string, string>, opts: { state?: string; session?: string } = {}): WorkPacket {
     const inst = this.openInstance();
     if (!inst) {
+      // Trunk-first: route a submit to the worktree stream when trunk is empty.
+      const wtRoot = this.openWorktreeRoot();
+      if (wtRoot !== null) return new Loop(wtRoot, this.machine).submit(evidence, opts);
       throw new Rejection({
         clause: "SE-C-033",
         expected: "an open iteration to submit against",

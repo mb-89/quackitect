@@ -1,0 +1,8 @@
+{
+  "iteration": "i5b-worktrees-live",
+  "state": "log_risks",
+  "at": "2026-07-24T16:10:17.252Z",
+  "payload": {
+    "raid_opened": "R1 (risk) - making branching DEFAULT changes every iteration's execution context; a broken live-routing fix could wedge the loop for ALL iterations, not just one. Owner: the driving agent. Trigger: the M6 routing probe and the M8 live end-to-end test.\n\nR2 (risk) - the single running server/board is rooted at trunk; driving a worktree-resident instance may collide with that one root (two roots, one process). Owner: the driving agent. Trigger: the M6 probe.\n\nR3 (risk) - a local top-level machine, seeded then trimmed, could diverge from systematic and mis-compile or fail validateMachine (dangling edges after removing states). Owner: the driving agent. Trigger: the local-machine build + its compile test.\n\nA1 (assumption) - git worktrees are available and the repo supports them; the whole v2 is already a linked worktree, so nesting rules matter. Owner: the owner / environment. Trigger: re-check if the repo layout changes.\n\nD1 (dependency) - i5b runs on trunk (bootstrap: it builds the branching it will hand to future iterations); the owner pushes. Owner: the owner. Trigger: i5b ship.\n\nCarried - the two-live-worktrees-at-once demo stays i5's owner-physical RAID (raid-i5-parallel-serve-demo); i5b proves ONE live stream."
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "iteration": "i5b-worktrees-live",
+  "state": "rank_unknowns",
+  "at": "2026-07-24T16:31:49.347Z",
+  "payload": {
+    "ranking": "1. U1 LIVE ROUTING (R3, QS-1) - does a loop rooted at TRUNK locate and drive an instance living in .worktrees/<id>? What-if-wrong: default-branching is unusable and the whole iteration collapses; this is the EXACT untested gap behind defect #2 (note-6815f9db4930). HIGHEST.\n2. U2 PROVISION FROM A LINKED-WORKTREE ROOT - v2 is itself a linked worktree (B-log); does `git worktree add .worktrees/<id>` succeed from such a root? What-if-wrong: provisioning fails in the REAL repo even though i5's tests passed against plain `git init` fixtures. HIGH - an untested combination.\n3. U3 LOCAL TOP-LEVEL MACHINE LIFT - can machineFor resolve an iteration-local top-level drawing? What-if-wrong: no local trim. LOW - loadIterationMachine + compileMachine already exist; wiring only.",
+    "seeded": "- SP1 (U1), timebox 20 min: a scratch prototype - a git repo with a worktree; write a fake instance.json inside the worktree; a scan function (mimicking the widened openInstance) locates it from the TRUNK root and 'drives' it. Proves the routing concept before building it for real.\n- SP2 (U2), timebox 15 min: a scratch prototype - create a linked worktree, then `git worktree add` a nested .worktrees/ tree FROM it; confirm success + `git worktree list`. Proves provisioning works from our real root shape.\n- U3: no spike - build duty, feasible against existing loaders."
+  }
+}

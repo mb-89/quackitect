@@ -1,0 +1,9 @@
+{
+  "iteration": "i5b-worktrees-live",
+  "state": "pressure_test",
+  "at": "2026-07-24T16:12:58.430Z",
+  "payload": {
+    "prfaq": "PRESS RELEASE (internal): Every iteration gets its own room. Open an iteration and it lands on its own branch in its own worktree - trunk stays clean. The server runs it there, live, from start to ship. It can trim its own process, so a small iteration stays small. And it's proven by actually running one end-to-end, not just unit tests.\n\nHOSTILE FAQ:\n- Didn't i5 already do this? i5 built the parts but shipped them opt-in and never ran them live; i5b makes it default and proves it.\n- Won't a branch per iteration be heavy for tiny changes? Accepted - isolation is the point. A trivial-iteration exemption can come later; off-by-default was the wrong default.\n- How do we know the live path works this time? The acceptance IS a live end-to-end run through the real tools; unit-green is not accepted.\n- Won't a local machine drift from systematic? It is seeded from systematic and must compile + validate; trimming rewires with no dangling edges.\n- Does this touch the phone work? No - phone re-opens as a fresh iteration after.",
+    "findings_folded": "None new, with reason: the FAQ's points were already carried upstream - the default-vs-convenience conflict in the goal system, R1 (wedge) and R3 (machine drift) in the RAID, and the live-not-unit acceptance in the value-prop pass lines. Nothing to fold; the packet already answers them."
+  }
+}

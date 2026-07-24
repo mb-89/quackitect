@@ -1,0 +1,8 @@
+{
+  "iteration": "i5b-worktrees-live",
+  "state": "partition_functions",
+  "at": "2026-07-24T16:25:38.349Z",
+  "payload": {
+    "partitioning": "Relation meaning: 'must share the same state' (chiefly: where does iteration X live?). Coupling, classified:\n- Isolate <-> Locate: STRONG - both hinge on 'where iteration X lives' (its worktree home). This is the crux coupling - the routing decision.\n- Locate <-> Drive: STRONG - Drive operates on whatever Locate finds.\n- Adapt <-> Drive: MEDIUM - Drive serves states from the (possibly trimmed) machine Adapt produced.\n- Reunify <-> Isolate: MEDIUM - Reunify folds back the line Isolate created.\n- Prove: cross-cutting - it exercises the whole chain.\n- Guide: DECOUPLED - pure guidance text, no runtime coupling.\nClusters:\n- C1 LOCATION/ROUTING {Isolate, Locate, Drive, Reunify} - all bound by 'where iteration X lives'; the routing decision lives here.\n- C2 PROCESS-ADAPTATION {Adapt} - the local-machine cluster (interfaces Drive).\n- C3 ACCEPTANCE {Prove} - cross-cutting, the live test.\n- C4 GUIDANCE {Guide} - standalone doc fix.\nQualities: Isolate/Locate/Drive/Reunify = basic (core); Adapt = additional; Prove = safety (guards the regression); Guide = support."
+  }
+}

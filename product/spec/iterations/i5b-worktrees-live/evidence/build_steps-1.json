@@ -1,0 +1,8 @@
+{
+  "iteration": "i5b-worktrees-live",
+  "state": "build_steps",
+  "at": "2026-07-24T17:10:57.319Z",
+  "payload": {
+    "build_record": "Chunks built INLINE (the seeded chunk-sub-machine was NOT drawn - the regression flagged in note-408f50dd89a2, for the mechanical build_steps guard). Actor: the driving agent throughout.\n- c1 DEFAULT-PROVISION: loop.start provisions iter/<id> for every iteration, git-guarded (existsSync .git), never nested. R1 green.\n- c2 WIDEN-OPENINSTANCE: openWorktrees import + openWorktreeRoot() helper + trunk-first delegation in next()/submit(); the running server drives a worktree-resident iteration. R3 green.\n- c3 LOCAL-MACHINE: machineFor prefers an iteration-local machine (loadIterationMachine lifted to top level); start() honours the local machine's initial. R4 green.\n- c4 INHERIT-GUIDANCE: draft_vision/define_actual/frame_delta state notes amended (se_set_apply) to instruct inheriting se.vision/baseline.\nGreen evidence: run-5b82e0e6e894 (R1/R3/R4 pass), run-0812c9c0c6e8 (executor/serving/laws/board/i5/i5b = 33/33, no regressions). Sub-record file: none (inline build). The FULL battery runs at the verification state next."
+  }
+}

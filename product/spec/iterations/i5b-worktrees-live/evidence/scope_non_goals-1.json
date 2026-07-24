@@ -1,0 +1,9 @@
+{
+  "iteration": "i5b-worktrees-live",
+  "state": "scope_non_goals",
+  "at": "2026-07-24T16:12:36.633Z",
+  "payload": {
+    "scope": "i5b takes on:\n- DEFAULT provisioning: remove the opt-in so every se_loop_start creates iter/<id> in .worktrees/ (keep only the never-nest guard).\n- LIVE routing: openInstance spans the worktree homes so the running server/board drives a worktree-resident iteration through next/submit/gate/ship.\n- LOCAL top-level machines: lift the iteration-local machine (today only loadIterationMachine for sub-machines) to the iteration's TOP-LEVEL machine - seeded from systematic, trimmed locally, removed states rewired, compile + validate.\n- An END-TO-END LIVE test as the acceptance (open -> walk -> gate -> ship inside the worktree, real tools).\n- Owner feedback this session (small, folded in): (a) the trim capability above IS what lets a low-deviation iteration SKIP the early framing states; (b) a guidance-text fix on those states - prefer inheriting se.vision (pointer + delta) over re-drafting, per the state-inheritance ruling.",
+    "non_goals": "- The general refine/lean strike-list over ANY machine (se.req-lean-strike broader scope): i5b gives the local-trim mechanism; specific trimmed variants ride later.\n- Auto-DECIDING which states an iteration may skip (the deviation judgment stays owner/authoring judgment; i5b enables trimming, not the choice).\n- The full v1->v2 porting + red-team/validation-regression audit (the next deep retro, note-cc4c498ca67f).\n- Two live worktrees at once with two agents (stays i5's owner-physical RAID).\n- Phone-connect (re-opens as a fresh iteration after i5b, reusing abandoned i8b).\n- Board multi-agent tabs beyond one live stream (i9)."
+  }
+}

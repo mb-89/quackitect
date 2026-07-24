@@ -1,0 +1,13 @@
+{
+  "iteration": "i5b-worktrees-live",
+  "state": "gate_inputs",
+  "at": "2026-07-24T16:18:34.156Z",
+  "payload": {
+    "props_realized": "Every value prop is realized by a story: 'isolated by default' + 'live server drives it' -> STORY 1 (killer, = UC-1); 'trim its own machine' -> STORY 2 (UC-2); 'ship honestly' -> STORY 3 (UC-3).",
+    "stories_generalized": "Every story sits inside a use case: STORY 1 -> UC-1, STORY 2 -> UC-2, STORY 3 -> UC-3; each carries a main path plus extensions.",
+    "roles_covered": "No role left out: owner, driving agent, adjudicator, maintainer, and the enabled-but-unstaffed parallel-agent role. Tensions named: default-isolation vs convenience (resolved for isolation); ship-fast vs proven-live (resolved for proven).",
+    "excluded_stated": "The binding excluded-use list exists (draw_context): no auto-skip decision, no two-at-once demo, no phone/i8 bless touch, no general strike-list, no push, no i9 board work.",
+    "examples_formulated": "The scenario paths ARE the formulated examples: UC-1 main + ext 5a (the routing-defect example that becomes the live test), UC-2 main + ext 3a (dangling-edge refusal), UC-3 main (suspect-on-second-ship). These seed the M8 live/acceptance tests.",
+    "offer_hash": "99fc93cc5cb525c11bb0a602335aeabeb9fdbf0f9e1dd63c39635ff28025893e"
+  }
+}

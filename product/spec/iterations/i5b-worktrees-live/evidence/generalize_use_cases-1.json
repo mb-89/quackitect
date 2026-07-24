@@ -1,0 +1,8 @@
+{
+  "iteration": "i5b-worktrees-live",
+  "state": "generalize_use_cases",
+  "at": "2026-07-24T16:18:10.636Z",
+  "payload": {
+    "use_cases": "UC-1 (KILLER) Run an iteration LIVE in its worktree. Primary actor: the owner via the engine. Main: 1. owner opens an iteration; 2. engine provisions iter/<id> + tree (default); 3. engine writes the instance INSIDE the worktree; 4. owner calls next/submit/gate; 5. the running server locates the worktree-resident instance and serves it; 6. owner blesses a gate; 7. owner ships; 8. engine merges to trunk marking suspects. Extensions: 2a tree already exists -> adopt; 5a server rooted at trunk cannot find the worktree instance -> THE defect i5b fixes.\n\nUC-2 Trim a local machine. Main: 1. the iteration seeds systematic locally; 2. authoring removes the states it does not need; 3. engine compiles + validates the local machine; 4. the loop serves the trimmed state set for THIS iteration only. Extension: 3a a removed state leaves a dangling edge -> refuse, naming it.\n\nUC-3 Honest merge (i5's, re-run live). Main: 1. two iterations edit a shared ledger node; 2. the first ships (no trunk overlap); 3. the second ships -> the overlap is marked suspect; 4. the owner reviews and pushes."
+  }
+}

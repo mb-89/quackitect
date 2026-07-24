@@ -1,0 +1,13 @@
+{
+  "iteration": "i5b-worktrees-live",
+  "state": "gate_candidates",
+  "at": "2026-07-24T16:27:07.990Z",
+  "payload": {
+    "viable_set": "Two viable candidates survive: K1 SCAN (openInstance scans the worktree homes) and K2 POINTER (a trunk-side active-iteration pointer). K1 leads on every criterion; K2 is the recorded scale-fallback. K3 SERVER-REGISTRY eliminated. The killer holds - a real alternative (K2) survives, not decision theater.",
+    "complete_allocation": "Both candidates allocate ALL functions - Isolate, Locate, Drive, Adapt, Reunify, Prove, Guide. They differ ONLY in Locate (A1 scan vs A2 pointer); Adapt (C1 local machine drawing), Isolate/Reunify (i5 primitives), and Provision (D1 default) are shared. Interfaces: the openInstance boundary (widened to span worktree homes) and machineFor's local-machine resolution. Rationale recorded per candidate in the shortlist.",
+    "criteria_traced": "Weights derived from requirements + tensions: Correctness-live (.30) from R3/R7 and the proven-vs-fast tension; Least-machinery (.20) from the R-set affordability; No-wedge (.20) from R1/R5; DRY (.15) from the owner's single-source law; Mechanical (.15) from the owner ruling 'bake into the machinery, no LLM judgment'.",
+    "front_recorded": "Front = {K1}. K2 off-front, retained as the documented scale fallback (trades DRY for O(1) locate). K3 eliminated: dominated by K1 on all criteria - an in-memory mirror of the worktrees adds desync/restart risk with no benefit.",
+    "feasibility_checked": "K1: openInstance already scans one root; widening it to iterate the .worktrees/* homes is a small change, and the scan is cheap for the handful of concurrent trees expected - feasible. K2: a pointer file is trivial to write but needs consistent lifecycle on start/ship/abandon - feasible, more moving parts. Both clear rough feasibility.",
+    "offer_hash": "01f0349f146e5b77797fec26497a3327080659795d694b5f5535c37f9214d26e"
+  }
+}

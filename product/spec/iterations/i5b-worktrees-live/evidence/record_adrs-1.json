@@ -1,0 +1,8 @@
+{
+  "iteration": "i5b-worktrees-live",
+  "state": "record_adrs",
+  "at": "2026-07-24T16:29:31.267Z",
+  "payload": {
+    "adrs": "ADR-1 LOCATE-BY-SCAN: openInstance spans the .worktrees/* homes (plus trunk); the worktrees are the single source of truth for which iterations are live. Addresses R3 (live routing) + the DRY law. Rejected: K2 trunk-pointer (a shadow copy that can drift - the failure class behind i5's defects), K3 server-registry (memory not truth). K2 retained as the scale fallback (sensitivity tripwire).\n\nADR-2 PROVISION-BY-DEFAULT: se_loop_start provisions iter/<id> in .worktrees/<id> unless the root is already a worktree; the opt-in flag is removed. Addresses R1 (default branching) + R2 (never nest). Reverses the i5 opt-in defect (note-e8a12b600638). Rejected: a plan flag defaulted true (still floggable).\n\nADR-3 LOCAL MACHINE AS A DRAWING: machineFor prefers an iteration-local machine drawing (lifting loadIterationMachine from sub-machines to the top level), seeded from systematic and trimmed; else the named ledger machine. Addresses R4 (local trim) + R5 (integrity via the existing validateMachine dangling-edge refusal). Rejected: a strike-list overlay (deferred = se.req-lean-strike, the future DRY form).\n\nADR-4 PROVEN-LIVE ACCEPTANCE: acceptance is a demonstration test that runs an iteration open -> walk -> gate -> ship INSIDE a worktree through the real tool surface; unit-green does not satisfy. Addresses R7; closes the untested-live defect (note-6815f9db4930)."
+  }
+}

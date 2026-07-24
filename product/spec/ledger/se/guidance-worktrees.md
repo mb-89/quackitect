@@ -12,7 +12,8 @@ applies_to:
 
 ## Rules
 
-- A worktree:true plan entry opens its iteration in .worktrees/<id> on iter/<id>; the trunk stays untouched until ship.
+- Every iteration opens in its own .worktrees/<id> on iter/<id> by default (a non-repo root starts plain, a worktree-resident loop never nests); the trunk stays untouched until ship.
+- An iteration may carry a LOCAL machine (a drawing in its machines/ dir, seeded from the named template and trimmed); it overrides the shared machine for that iteration only.
 - Merge ONLY at ship (gate_release), never mid-iteration; the owner pushes the trunk.
 - Every ledger node changed on both lines wears the suspect frontmatter field after merge - a human re-adjudicates and clears it; over-marking beats a missed suspect.
 - A textual conflict STOPS the ship and asks a human; the engine never auto-resolves source truth.

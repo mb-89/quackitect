@@ -1,0 +1,9 @@
+{
+  "iteration": "i5b-worktrees-live",
+  "state": "fill_story_evidence",
+  "at": "2026-07-24T17:19:02.397Z",
+  "payload": {
+    "slides_filled": "Every story walked against its pass lines, evidence refs from the shipped system:\n- STORY 1 (KILLER = UC-1, isolated-by-default + live-server-drives): the LIVE e2e demo run-615346de3d42 - an iteration is default-provisioned into its worktree, walked and gated FROM the trunk-rooted server, then shipped to trunk (tree retired, branch kept for history). Plus R1 default-provision + R3 routing (run-5b82e0e6e894). This is the exact lifecycle i5 never ran.\n- STORY 2 (UC-2, trim its own machine): R4 - a local trimmed machine overrides the shared template and its short path runs (run-5b82e0e6e894).\n- STORY 3 (UC-3, ship honestly): i5's W1 suspect-marking test, green in the full battery (run-caf35aa1879c); the e2e's shipMerge exercises the same merge live. No slide unfilled.",
+    "demos_seeded": "One demonstration per killer use case: UC-1 (run an iteration live in its worktree) = tests/i5b-e2e.test.ts (run-615346de3d42) - an EXECUTABLE slice promoted to a PERMANENT acceptance scenario: open -> walk -> gate -> ship, all through the real engine, driven from the trunk-rooted server, green. (Seeded inline as a test, not a drawn demo sub-machine - same inline note as the build, note-408f50dd89a2; the demo itself ran for real.)"
+  }
+}

@@ -98,7 +98,7 @@ export function coreTools(root: string, opts: { toll?: Toll; session?: Session }
     {
       name: "se_loop_start",
       title: "se.loop.start",
-      description: "Opens an iteration (bootstrap policy: systematic). A worktree:true plan entry opens it in its own .worktrees/<id> tree+branch; depends_on must have shipped.",
+      description: "Opens an iteration (bootstrap policy: systematic). Every iteration opens in its own .worktrees/<id> tree+branch by default (a non-repo root starts plain); depends_on must have shipped.",
       inputSchema: {
         type: "object",
         properties: { iteration: { type: "string", description: "e.g. i1" } },

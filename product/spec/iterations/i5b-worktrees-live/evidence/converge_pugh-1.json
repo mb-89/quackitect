@@ -1,0 +1,9 @@
+{
+  "iteration": "i5b-worktrees-live",
+  "state": "converge_pugh",
+  "at": "2026-07-24T16:28:05.032Z",
+  "payload": {
+    "matrix_runs": "Run 1, datum = K2 POINTER (the strongest rival). K1 SCAN vs datum on the criteria: Correctness-live S | Least-machinery + | No-wedge + | DRY + | Mechanical S. Net K1 = +3 / -0 / 2S -> K1 clears the datum. One run suffices: K1 weakly dominates K2 (never worse on any criterion, better on three). No second run needed.",
+    "winner": "K1 SCAN. Beyond the arithmetic: the worktrees ARE the single source of truth about which iterations are live, so scanning them means there is NO second place for 'where X lives' to drift out of sync - and drift between recorded state and reality is exactly the class of bug that produced i5's defects (a flag that said off while the goal said on). K2's pointer would reintroduce a shadow copy of that fact. K1 keeps truth in one place, is fully mechanical, and reuses the existing openWorktrees enumeration. K2 stays documented as the fallback if the per-call scan ever costs measurably at scale."
+  }
+}

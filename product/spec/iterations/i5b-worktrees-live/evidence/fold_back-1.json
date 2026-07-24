@@ -1,0 +1,9 @@
+{
+  "iteration": "i5b-worktrees-live",
+  "state": "fold_back",
+  "at": "2026-07-24T16:34:11.806Z",
+  "payload": {
+    "folded": "SP1 (routing) and SP2 (provision-from-linked-worktree) could NOT be executed at M6 - the tool surface blocks it (Bash denied by the se-fence; se_run refused outside a milestone verification state; no IDE notebook kernel). So NEITHER unknown is closed by run evidence at M6 (recorded, note-d8c88277c5f5, not a silent pass). Upstream effect: QS-1 correctness-live stays AT-RISK (NOT promoted to addressed); U1 and U2 remain OPEN. No requirement or ADR is invalidated - the design stands; only the PROOF's location moves downstream to verification states.",
+    "promotions": "Promoted for build entry as RED-FIRST tests that WILL actually run in M7's verification state: SP1 -> a routing test (openInstance, from the trunk root, finds a worktree-resident open instance) = fitness F4; SP2 -> a provision-from-linked-worktree test (git worktree add succeeds from our real linked-worktree root, which i5's plain-init fixtures never covered); both feed the M8 live demonstration (F2, the acceptance). Also promoted: the harness finding itself (note-d8c88277c5f5) toward the validation-regression discussion - the process must be able to RUN a spike, or spikes silently become build tests."
+  }
+}

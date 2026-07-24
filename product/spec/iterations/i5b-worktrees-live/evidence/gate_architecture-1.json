@@ -1,0 +1,13 @@
+{
+  "iteration": "i5b-worktrees-live",
+  "state": "gate_architecture",
+  "at": "2026-07-24T16:30:19.995Z",
+  "payload": {
+    "choice_traced": "Winner K1 SCAN traced to the weighted criteria: it wins Correctness-live (.30, ties K2 but reliable), Least-machinery (.20), No-wedge (.20), DRY (.15) and ties Mechanical (.15) - net +3/-0 over the datum. One Pugh run recorded (datum = K2 POINTER, the strongest viable rival). The status-quo (i5's opt-in) is the anti-pattern being reversed, not a viable datum, so no status-quo run applies.",
+    "sensitivity_ruled": "Verdict: robust across the plausible weight range. One credible flip recorded as a RAID tripwire: if live-worktree count grows enough that the openInstance scan approaches the 1s budget, switch to K2 (the trunk pointer, already the recorded fallback). Owner: driving agent; trigger: a slow-call observation in retro latency mining.",
+    "matrix_review": "Baseline reviewed as data: DECOMPOSITION - E1 Provisioner, E2 Locator, E3 Driver, E4 MachineResolver, E5 Reunifier, E6 LiveProof, E7 FramingGuidance. CLUSTERING - C1 Location/Routing {E1,E2,E3,E5}, C2 Process-adaptation {E4}, C3 Acceptance {E6}, C4 Guidance {E7}. ALLOCATION - every function exactly once (Isolate->E1, Locate->E2, Drive->E3, Adapt->E4, Reunify->E5, Prove->E6, Guide->E7). INTERFACES - E1<->E2 (home layout), E2<->E3 (located instance), E2/E3<->E4 (machine resolution), E1<->E5 (branch fold-back), E6 spans E1-E5, E7 standalone; each coupling recorded both ends. Most elements are WIDENINGS of existing code (E2 openInstance, E4 machineFor), not new modules - low decomposition risk.",
+    "evaluation_recorded": "Every quality scenario recorded: QS-1 correctness-live ADDRESSED but AT-RISK until the M6 routing probe; QS-2 no-wedge ADDRESSED; QS-3 DRY ADDRESSED; QS-4 mechanical ADDRESSED; QS-5 honest-merge ADDRESSED (re-run live at M8). The one at-risk item is exactly what M6 burns down first.",
+    "adrs_traced": "Every deciding ADR addresses its requirement: ADR-1 (scan-locate) -> R3 + DRY; ADR-2 (default provision) -> R1 + R2; ADR-3 (local machine drawing) -> R4 + R5; ADR-4 (proven-live acceptance) -> R7. Rejected options recorded as history in each.",
+    "offer_hash": "ddd1642e48a742ff2d782a8784f3eb7c34682f29f978e6cbc670424541115f58"
+  }
+}

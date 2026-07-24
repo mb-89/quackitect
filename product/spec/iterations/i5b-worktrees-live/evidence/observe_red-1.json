@@ -1,0 +1,8 @@
+{
+  "iteration": "i5b-worktrees-live",
+  "state": "observe_red",
+  "at": "2026-07-24T16:50:11.472Z",
+  "payload": {
+    "red_observed": "Both new checks observed RED (run-4c3b123136b3, exit 1), each failing for the RIGHT reason (design not yet realized, not a fixture error):\n- R1 DEFAULT: failed at the 'worktree exists without any opt-in flag' assertion (actual=false) - default provisioning not built.\n- R3 LIVE ROUTING: failed at 'the trunk-rooted loop served the worktree-resident iteration' (actual=undefined, expected 'it-a') - openInstance scans only the server's own root.\nExisting suite stays green (unchanged guards); these two are the only reds."
+  }
+}

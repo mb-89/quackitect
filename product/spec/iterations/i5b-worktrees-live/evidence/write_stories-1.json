@@ -1,0 +1,10 @@
+{
+  "iteration": "i5b-worktrees-live",
+  "state": "write_stories",
+  "at": "2026-07-24T16:17:41.927Z",
+  "payload": {
+    "roles": "Inherited from se, no new roles: the owner (opens iterations, blesses gates, pushes); the driving agent (walks the machine, builds); the adjudicator (blesses - here the owner, attended); the maintainer (future readers of trunk). Enabled-but-not-staffed by i5b: parallel agents each holding their own worktree.",
+    "tensions": "The named goal-system conflicts are the live ones: (1) default isolation (every iteration branches, a cost per iteration) vs convenience (skip the overhead for tiny work) - resolved for isolation; off-by-default was the defect. (2) the driving agent's pull to ship fast vs the owner's requirement that it be PROVEN live - resolved for proven; fast-without-proof caused the regression this iteration fixes. No new stakeholder-specific tensions beyond these.",
+    "stories": "Slideshows per the value-prop needs (killers marked):\n- STORY 1 (KILLER - the acceptance): the owner opens an iteration; it lands in .worktrees/<id> on iter/<id>; the owner walks it, blesses a gate, and ships - ALL live through the real tools, the instance resident in the worktree; trunk untouched until the ship merge. Realizes 'isolated by default' + 'live server drives it'.\n- STORY 2: a low-deviation iteration trims its seeded machine, skipping the framing states; its walk follows the trimmed set. Realizes 'trim its own machine'.\n- STORY 3: two iterations touch the same ledger node; the second ship marks it suspect; the owner reviews and pushes. Realizes 'ship honestly' (i5's, re-run live)."
+  }
+}

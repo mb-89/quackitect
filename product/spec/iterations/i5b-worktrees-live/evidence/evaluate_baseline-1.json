@@ -1,0 +1,9 @@
+{
+  "iteration": "i5b-worktrees-live",
+  "state": "evaluate_baseline",
+  "at": "2026-07-24T16:29:55.886Z",
+  "payload": {
+    "walk": "- QS-1 Correctness-live (R7): open->walk->gate->ship in a worktree completes via real tools. Verdict: ADDRESSED by E2 (locator scan) + E6 (live proof), but AT-RISK until the M6 routing probe confirms the trunk-rooted server drives a worktree-resident instance. Carrying decision: ADR-1.\n- QS-2 No-wedge (R1/R5): a missing/abandoned tree or a broken local machine must not wedge the loop. Verdict: ADDRESSED - E2 skips .abandoned (openWorktrees already filters), E4 falls back to the named machine, and validateMachine refuses a broken local machine naming the element. Carrying: ADR-2, ADR-3.\n- QS-3 DRY single-source: Verdict: ADDRESSED by ADR-1 (scan; the worktrees are the source; no pointer to drift).\n- QS-4 Mechanical (no LLM judgment): Verdict: ADDRESSED - E1 default provision + E2 scan; the agent never chooses where an iteration runs.\n- QS-5 Honest merge (R6): Verdict: ADDRESSED (E5 unchanged, i5-proven), to be RE-RUN live at M8.",
+    "fitness_candidates": "- F1: se_loop_start with NO flag -> iter/<id> tree+branch exists and trunk HEAD unchanged (test).\n- F2 (acceptance): a scripted open -> walk -> gate -> ship through the REAL tool surface completes with the instance resident in the worktree (demonstration).\n- F3: a local machine with a removed state leaving a dangling edge -> compile/validate refuses, naming it (test).\n- F4: openInstance, called from the trunk root, finds an instance living in .worktrees/<id> (test - the routing unit under F2).\n- F5: a second ship marks the overlapping ledger node suspect (i5's, re-run live)."
+  }
+}

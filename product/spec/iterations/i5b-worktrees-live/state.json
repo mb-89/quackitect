@@ -1,0 +1,291 @@
+{
+  "machine": "systematic",
+  "iteration": "i5b-worktrees-live",
+  "current": "shipped",
+  "counters": {},
+  "history": [
+    {
+      "state": "onboard_retro",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i5b-worktrees-live/evidence/onboard_retro-1.json",
+      "at": "2026-07-24T16:06:59.928Z"
+    },
+    {
+      "state": "gate_kickoff",
+      "outcome": "filled",
+      "evidence": "grant:c6b1a2d2f269",
+      "at": "2026-07-24T16:08:22.428Z"
+    },
+    {
+      "state": "draft_vision",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i5b-worktrees-live/evidence/draft_vision-1.json",
+      "at": "2026-07-24T16:09:23.306Z"
+    },
+    {
+      "state": "define_actual",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i5b-worktrees-live/evidence/define_actual-1.json",
+      "at": "2026-07-24T16:10:03.151Z"
+    },
+    {
+      "state": "log_risks",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i5b-worktrees-live/evidence/log_risks-1.json",
+      "at": "2026-07-24T16:10:17.253Z"
+    },
+    {
+      "state": "frame_delta",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i5b-worktrees-live/evidence/frame_delta-1.json",
+      "at": "2026-07-24T16:10:50.134Z"
+    },
+    {
+      "state": "scope_non_goals",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i5b-worktrees-live/evidence/scope_non_goals-1.json",
+      "at": "2026-07-24T16:12:36.634Z"
+    },
+    {
+      "state": "pressure_test",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i5b-worktrees-live/evidence/pressure_test-1.json",
+      "at": "2026-07-24T16:12:58.430Z"
+    },
+    {
+      "state": "gate_motivation",
+      "outcome": "filled",
+      "evidence": "grant:2b5cd5bfe13b",
+      "at": "2026-07-24T16:16:03.601Z"
+    },
+    {
+      "state": "draw_context",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i5b-worktrees-live/evidence/draw_context-1.json",
+      "at": "2026-07-24T16:16:54.805Z"
+    },
+    {
+      "state": "write_stories",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i5b-worktrees-live/evidence/write_stories-1.json",
+      "at": "2026-07-24T16:17:41.927Z"
+    },
+    {
+      "state": "map_stakeholders",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i5b-worktrees-live/evidence/map_stakeholders-1.json",
+      "at": "2026-07-24T16:17:52.969Z"
+    },
+    {
+      "state": "generalize_use_cases",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i5b-worktrees-live/evidence/generalize_use_cases-1.json",
+      "at": "2026-07-24T16:18:10.636Z"
+    },
+    {
+      "state": "gate_inputs",
+      "outcome": "filled",
+      "evidence": "grant:99fc93cc5cb5",
+      "at": "2026-07-24T16:20:44.587Z"
+    },
+    {
+      "state": "write_requirements",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i5b-worktrees-live/evidence/write_requirements-1.json",
+      "at": "2026-07-24T16:21:29.745Z"
+    },
+    {
+      "state": "probe_assumptions",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i5b-worktrees-live/evidence/probe_assumptions-1.json",
+      "at": "2026-07-24T16:23:41.119Z"
+    },
+    {
+      "state": "derive_functions",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i5b-worktrees-live/evidence/derive_functions-1.json",
+      "at": "2026-07-24T16:23:53.335Z"
+    },
+    {
+      "state": "gate_requirements",
+      "outcome": "filled",
+      "evidence": "grant:e571a530f35f",
+      "at": "2026-07-24T16:24:34.441Z"
+    },
+    {
+      "state": "derive_criteria",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i5b-worktrees-live/evidence/derive_criteria-1.json",
+      "at": "2026-07-24T16:25:14.880Z"
+    },
+    {
+      "state": "partition_functions",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i5b-worktrees-live/evidence/partition_functions-1.json",
+      "at": "2026-07-24T16:25:38.349Z"
+    },
+    {
+      "state": "enumerate_space",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i5b-worktrees-live/evidence/enumerate_space-1.json",
+      "at": "2026-07-24T16:26:14.592Z"
+    },
+    {
+      "state": "evaluate_set",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i5b-worktrees-live/evidence/evaluate_set-1.json",
+      "at": "2026-07-24T16:26:45.150Z"
+    },
+    {
+      "state": "gate_candidates",
+      "outcome": "filled",
+      "evidence": "grant:01f0349f146e",
+      "at": "2026-07-24T16:27:38.414Z"
+    },
+    {
+      "state": "converge_pugh",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i5b-worktrees-live/evidence/converge_pugh-1.json",
+      "at": "2026-07-24T16:28:05.032Z"
+    },
+    {
+      "state": "reverse_sensitivity",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i5b-worktrees-live/evidence/reverse_sensitivity-1.json",
+      "at": "2026-07-24T16:28:21.689Z"
+    },
+    {
+      "state": "consolidate_baseline",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i5b-worktrees-live/evidence/consolidate_baseline-1.json",
+      "at": "2026-07-24T16:29:15.075Z"
+    },
+    {
+      "state": "record_adrs",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i5b-worktrees-live/evidence/record_adrs-1.json",
+      "at": "2026-07-24T16:29:31.268Z"
+    },
+    {
+      "state": "evaluate_baseline",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i5b-worktrees-live/evidence/evaluate_baseline-1.json",
+      "at": "2026-07-24T16:29:55.886Z"
+    },
+    {
+      "state": "gate_architecture",
+      "outcome": "filled",
+      "evidence": "grant:ddd1642e48a7",
+      "at": "2026-07-24T16:30:36.405Z"
+    },
+    {
+      "state": "rank_unknowns",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i5b-worktrees-live/evidence/rank_unknowns-1.json",
+      "at": "2026-07-24T16:31:49.348Z"
+    },
+    {
+      "state": "fold_back",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i5b-worktrees-live/evidence/fold_back-1.json",
+      "at": "2026-07-24T16:34:11.806Z"
+    },
+    {
+      "state": "gate_prototype",
+      "outcome": "filled",
+      "evidence": "grant:515bd3d509cd",
+      "at": "2026-07-24T16:40:56.882Z"
+    },
+    {
+      "state": "author_tests",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i5b-worktrees-live/evidence/author_tests-1.json",
+      "at": "2026-07-24T16:49:18.548Z"
+    },
+    {
+      "state": "plan_build",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i5b-worktrees-live/evidence/plan_build-1.json",
+      "at": "2026-07-24T16:49:51.997Z"
+    },
+    {
+      "state": "observe_red",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i5b-worktrees-live/evidence/observe_red-1.json",
+      "at": "2026-07-24T16:50:11.472Z"
+    },
+    {
+      "state": "build_steps",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i5b-worktrees-live/evidence/build_steps-1.json",
+      "at": "2026-07-24T17:10:57.320Z"
+    },
+    {
+      "state": "verification",
+      "outcome": "filled",
+      "evidence": "run-caf35aa1879c",
+      "at": "2026-07-24T17:13:52.327Z"
+    },
+    {
+      "state": "gate_implementation",
+      "outcome": "filled",
+      "evidence": "grant:453741f5f973",
+      "at": "2026-07-24T17:16:16.716Z"
+    },
+    {
+      "state": "fill_story_evidence",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i5b-worktrees-live/evidence/fill_story_evidence-1.json",
+      "at": "2026-07-24T17:19:02.398Z"
+    },
+    {
+      "state": "log_gaps",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i5b-worktrees-live/evidence/log_gaps-1.json",
+      "at": "2026-07-24T17:21:32.499Z"
+    },
+    {
+      "state": "sweep_consistency",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i5b-worktrees-live/evidence/sweep_consistency-1.json",
+      "at": "2026-07-24T17:21:44.746Z"
+    },
+    {
+      "state": "gate_validation",
+      "outcome": "filled",
+      "evidence": "grant:133311414e5f",
+      "at": "2026-07-24T17:23:28.874Z"
+    },
+    {
+      "state": "finalize_docs",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i5b-worktrees-live/evidence/finalize_docs-1.json",
+      "at": "2026-07-24T17:23:52.203Z"
+    },
+    {
+      "state": "package",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i5b-worktrees-live/evidence/package-1.json",
+      "at": "2026-07-24T17:24:16.939Z"
+    },
+    {
+      "state": "ship_review",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i5b-worktrees-live/evidence/ship_review-1.json",
+      "at": "2026-07-24T17:24:33.776Z"
+    },
+    {
+      "state": "gate_release",
+      "outcome": "filled",
+      "evidence": "grant:8d0da57ad181",
+      "at": "2026-07-24T17:27:10.777Z"
+    }
+  ],
+  "escapes": [],
+  "status": "closed",
+  "fired": [],
+  "active": [
+    "shipped"
+  ],
+  "claims": {}
+}

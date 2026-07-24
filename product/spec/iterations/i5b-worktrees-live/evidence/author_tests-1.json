@@ -1,0 +1,8 @@
+{
+  "iteration": "i5b-worktrees-live",
+  "state": "author_tests",
+  "at": "2026-07-24T16:49:18.547Z",
+  "payload": {
+    "checks": "Red-first checks in tests/i5b-worktrees-live.test.ts, both RED (run-4c3b123136b3, exit 1):\n- R1 DEFAULT: se_loop_start with NO plan flag provisions iter/<id> in .worktrees + trunk HEAD unchanged. RED: no worktree provisioned (opt-in still in force).\n- R3 LIVE ROUTING: a TRUNK-rooted loop locates+serves a WORKTREE-resident instance. RED: served `undefined` (openInstance scans only the server's own root).\nThese two encode the exact i5 defects (opt-in narrowing, untested-live routing) and turn the M6 spikes into standing tests. Other in-scope requirements' checks: R2 never-nest = existing isWorktreeRoot guard (unchanged, kept green); R5 dangling-edge = existing validateMachine refusal; R6 honest-merge = i5's suite, re-run live at M8; R4 local top-level machine + R8 inherit-guidance = authored alongside their build steps; F2 live end-to-end = the M8 demonstration (open->walk->gate->ship in a worktree)."
+  }
+}

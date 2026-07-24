@@ -1,0 +1,13 @@
+{
+  "iteration": "i5b-worktrees-live",
+  "state": "gate_release",
+  "at": "2026-07-24T17:24:58.441Z",
+  "payload": {
+    "docs_match": "Docs complete and matching the actual surface: se.guidance-worktrees (default isolation + local machine), the se_loop_start description + loop.ts comment (default provisioning), the framing-state inherit guidance, and the two acceptance test files all agree with the shipped behaviour. The book renderer is i6 (recorded, not this iteration). No surface teaches the superseded opt-in way.",
+    "packaged": "Versioned: the engine source set + docs + two acceptance tests, baselined by git. Config unchanged (2.0.0-bootstrap). Entry script RUNME.ps1 unchanged (recorded skip - no new install step). i5b runs on trunk as the bootstrap.",
+    "dependencies_ruled": "The ship review is done: no dependency flips, no package added (node built-ins + existing engine modules), install-hygiene honoured (adr-install-over-zerodep). No diverged dep; sticky rulings (default branching, local machine, proven-live) honoured. No upstream owed.",
+    "handover_accepted": "This bless is the acceptance and the ship. The need is met and PROVEN LIVE (the e2e killer demo run-615346de3d42: open->walk->gate->ship in a worktree), both i5 defects closed, full battery green, surfaces swept, the inline-build debt honestly recorded and routed to the mechanical guard follow-up.",
+    "market_block": "N/A - i5b is internal tooling, not declared to market; the real-world tier does not gate this ship.",
+    "offer_hash": "8d0da57ad181b463fe2778830cfe897bd17b1ed5e3bcb0e3ac2b4c862d3b8407"
+  }
+}
