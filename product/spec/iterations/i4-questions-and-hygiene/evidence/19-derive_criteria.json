@@ -1,0 +1,8 @@
+{
+  "iteration": "i4-questions-and-hygiene",
+  "state": "derive_criteria",
+  "at": "2026-07-24T11:13:11.060Z",
+  "payload": {
+    "criteria": "INHERIT the six weighted criteria from i3 (19-derive_criteria of i3-machine-and-retro), unchanged in definition, lineage and weights: record integrity 25, mid-flight migratability 20, interactive latency 15, owner visibility 15, zero-dep simplicity 15, parallel throughput 10. They were derived from the same requirements family this iteration completes, and the goal system's ruled conflict order has not moved. One reading note for the delta: owner visibility carries extra load this round (the board cluster) - the WEIGHT stays, because visibility work must still lose to record integrity wherever they collide (e.g. the log details render never truncates what the record holds)."
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "iteration": "i4-questions-and-hygiene",
+  "state": "evaluate_set",
+  "at": "2026-07-24T11:15:03.658Z",
+  "payload": {
+    "scores": "The one real set - the JSON tree approach - scored on the inherited criteria (1-5): J1 native details/summary server-side: record 5 (renders exactly what the projection holds), migratability 5 (pure HTML change), latency 5 (no script cost), visibility 4 (collapse/expand per key; no search/expand-all), simplicity 5 (zero JS added), throughput n/a -> 4.8 weighted. J2 hand-rolled client JS tree: visibility 5 (expand-all, search), simplicity 3 (script surface grows in the page the owner reads all day), others 4-5 -> 4.3. J3 vendored library: visibility 5, simplicity 1 (breaks the zero-dep ethos outright), migratability 3 -> 3.2. The T1 example walked through each: all three pass the zero-raw-JSON line; only J1 passes it for free. Everything else in the iteration is allocation into the blessed i3 baseline - scored once as a set: no allocation contradicts a criterion, and none has an architectural alternative worth a row.",
+    "front": "Front = {J1, J2}: J1 leads; J2 survives non-dominated on visibility (expand-all and search are real wants the owner may name at the board round). The build starts at J1; J2's extras remain buyable as a later layer on top of the same server-rendered tree - the option is kept, not spent.",
+    "eliminations": "J3 eliminated, dominated: nothing it adds over J2 survives the zero-dep loss (the recorded engine ethos and [[context]]'s excluded list both bind). The no-real-alternatives case for the remaining 28 steps is recorded here explicitly rather than padded into fake candidates - the gate adjudicates that claim itself."
+  }
+}

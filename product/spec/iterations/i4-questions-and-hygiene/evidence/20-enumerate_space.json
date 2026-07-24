@@ -1,0 +1,9 @@
+{
+  "iteration": "i4-questions-and-hygiene",
+  "state": "enumerate_space",
+  "at": "2026-07-24T11:55:00.000Z",
+  "note": "Inline fill - exhibit I1, tally 18.",
+  "payload": {
+    "space": "One genuine candidate set exists in this completion iteration - the JSON tree approach: J1 native details/summary elements rendered server-side (zero-dep, zero JS, collapsible by the browser itself); J2 a hand-rolled client-side JS tree walker (more control - expand-all, search - at the cost of script weight in the board page); J3 a vendored renderer library (most features, breaks the zero-dep ethos outright). Everything else in scope is allocation into blessed homes with no architectural alternative - the no-real-alternatives case to be argued at the gate, not padded into fake candidates."
+  }
+}

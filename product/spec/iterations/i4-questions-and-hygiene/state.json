@@ -1,7 +1,7 @@
 {
   "machine": "systematic",
   "iteration": "i4-questions-and-hygiene",
-  "current": "derive_criteria",
+  "current": "converge_pugh",
   "counters": {},
   "history": [
     {
@@ -111,6 +111,36 @@
       "outcome": "filled",
       "evidence": "grant:494c03449cb8",
       "at": "2026-07-24T11:12:07.746Z"
+    },
+    {
+      "state": "partition_functions",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i4-questions-and-hygiene/evidence/19-partition_functions.json",
+      "at": "2026-07-24T11:55:00.000Z"
+    },
+    {
+      "state": "enumerate_space",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i4-questions-and-hygiene/evidence/20-enumerate_space.json",
+      "at": "2026-07-24T11:55:00.000Z"
+    },
+    {
+      "state": "derive_criteria",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i4-questions-and-hygiene/evidence/19-derive_criteria.json",
+      "at": "2026-07-24T11:13:11.060Z"
+    },
+    {
+      "state": "evaluate_set",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i4-questions-and-hygiene/evidence/22-evaluate_set.json",
+      "at": "2026-07-24T11:15:03.658Z"
+    },
+    {
+      "state": "gate_candidates",
+      "outcome": "filled",
+      "evidence": "grant:867b0fbc9683",
+      "at": "2026-07-24T11:17:37.893Z"
     }
   ],
   "escapes": [],
