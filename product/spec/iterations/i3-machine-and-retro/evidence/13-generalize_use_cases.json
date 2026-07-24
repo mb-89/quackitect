@@ -1,0 +1,10 @@
+{
+  "iteration": "i3-machine-and-retro",
+  "state": "generalize_use_cases",
+  "at": "2026-07-24T08:50:00.000Z",
+  "note": "Inline fill - interim executor skipped this drawn parallel state. First real sufficiency check on the v1-imported UC residents.",
+  "payload": {
+    "sufficiency_check": "The ledger already holds uc-1..uc-11 (v1-imported, bootstrap-b3). Every i3 story generalizes into an existing UC: S1 -> uc-3 (interactive iteration without process mistakes) + uc-8 (one-page visibility) + uc-2 (phone bless, realized i7); S2 -> uc-4 (parallel agents); S3 -> uc-7 (retro over inbox, call log, history - its pass line IS i3's retro-flow deliverable: ranked clauses, drained-marked notes); S4 -> uc-3 + uc-9 (fresh session resumes from the ledger). No new UC minted.",
+    "amendment_candidate": "uc-4 states two agents / TWO iterations (merge marks suspects). i3's parallelism is two agents / ONE iteration (token set, join at the gate). Same intent, narrower case - flagged as an amendment candidate on uc-4 rather than silently stretched; the gate carries the flag."
+  }
+}

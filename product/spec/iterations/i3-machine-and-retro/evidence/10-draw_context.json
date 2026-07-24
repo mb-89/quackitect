@@ -1,0 +1,10 @@
+{
+  "iteration": "i3-machine-and-retro",
+  "state": "draw_context",
+  "at": "2026-07-24T08:40:06.313Z",
+  "payload": {
+    "boundary": "Ledger resident per the inheritance ruling: [[context]] (se.context) - inside: engine, MCP surface, board, ledger, iteration spine; neighbours with named interfaces: harness (MCP stdio), Obsidian/Advanced Canvas (compiler input), git (se_git allowlist, owner push), owner channels (board, chat relay, console, phone at i7), module imports (gate-stamped), machine-local state dir. Minted this iteration; future iterations check sufficiency and amend the node.",
+    "intended_use": "As recorded on [[context]]: one owner drives one project's iterations through agent sessions; drawn machines hand out packets, gates collect one human bless per milestone, and the record stays complete enough for any fresh session or retro to reconstruct what happened and why.",
+    "excluded_use": "Binding does-NOT-do list lives on [[context]]: no multi-project instances, no multi-owner adjudication, no drawing formats beyond the pinned canvas version, no CI/CD or hosting duties, no secrets management, no replacing git, no general-purpose agent framework."
+  }
+}

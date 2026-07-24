@@ -1,0 +1,9 @@
+{
+  "iteration": "i3-machine-and-retro",
+  "state": "map_stakeholders",
+  "at": "2026-07-24T08:50:00.000Z",
+  "note": "Inline fill - interim executor skipped this drawn parallel state (same defect as M1, see notes 401bdae3/d60fd2d4).",
+  "payload": {
+    "roles_mapped": "Ledger resident per the inheritance ruling: [[stakeholders]] (se.stakeholders), minted this iteration. Roles: the owner (designer by drawing, sole adjudicator, push owner, only current user), the driving agent, sub-agents (bounded substeps, inherited guidance), the reader (average professional, non-native - the book's audience, i5). Tensions recorded on the node: owner-as-designer vs owner-as-bottleneck (R2 watches offer-queue depth); agent speed vs record completeness (the 1s rule keeps enforcement invisible); one adjudicator vs away-time (6h offers, phone lane extends reach, never adds adjudicators). Future iterations check sufficiency and amend the node."
+  }
+}

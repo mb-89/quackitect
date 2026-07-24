@@ -1,0 +1,14 @@
+{
+  "iteration": "i3-machine-and-retro",
+  "state": "write_stories",
+  "at": "2026-07-24T08:50:00.000Z",
+  "note": "Inline fill - interim executor skipped this drawn parallel state. Stories stay evidence-level this iteration; node-ization rides the inheritance sweep step (owner-ruled residents list names stories).",
+  "payload": {
+    "stories": [
+      "S1 (KILLER) The unattended milestone | The owner leaves the desk mid-M7. The agent walks the build states; verification runs as a background run; the implementation gate ripens and the offer waits on the board. The owner blesses from the couch; the commit lands in the bless window. PASS: the whole span owner-touch = one bless; no call over 1s; commit inside the window. Realizes: prop A (controlled unattended) - uc-3, uc-8, later uc-2.",
+      "S2 (KILLER) Two agents, one iteration | The executor activates log_risks beside the M1 spine; a second agent takes it while the first walks the spine; the board shows both tokens side by side; the join at the gate waits for both. PASS: both fills recorded with distinct actors, zero hand side-channels (today's M1 needed three). Realizes: prop A (parallel speed) - extends uc-4's spirit from two-iterations to two-agents-one-iteration (amendment candidate flagged at the gate).",
+      "S3 The morning onboarding | A new iteration opens; onboard_retro drains the inbox and queries the log lane; one kickoff brief carries goal, scope, rigor; one bless sets the iteration. PASS: retro evidence complete with zero ad-hoc scripts. Realizes: prop A (retro-first) - uc-7.",
+      "S4 The cold session | A fresh session boots, names the project (mechanical), recites, and reaches its first gate purely on packets. PASS: zero process-question se_help misses. Realizes: prop B (agent never guesses) - uc-3, uc-9."
+    ]
+  }
+}

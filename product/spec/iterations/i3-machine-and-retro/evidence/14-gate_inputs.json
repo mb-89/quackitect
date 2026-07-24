@@ -1,0 +1,13 @@
+{
+  "iteration": "i3-machine-and-retro",
+  "state": "gate_inputs",
+  "at": "2026-07-24T08:43:12.595Z",
+  "payload": {
+    "props_realized": "Every value prop carries at least one story (12-write_stories): prop A (controlled unattended) by S1 the unattended milestone (KILLER) and S3 the morning onboarding; prop A's parallel-speed need by S2 two agents, one iteration (KILLER); prop B (the agent never guesses) by S4 the cold session. Each story carries its pass line.",
+    "stories_generalized": "All four stories generalize into existing ledger UCs (13-generalize_use_cases): S1 -> uc-3 + uc-8 (+ uc-2 at i7); S2 -> uc-4; S3 -> uc-7 (whose pass line IS the i3 retro deliverable: ranked clauses, drained-marked notes); S4 -> uc-3 + uc-9. Sufficiency check on the v1-imported set (uc-1..uc-11): sufficient, no new UC. One amendment candidate flagged, not silently stretched: uc-4 says two agents/two iterations; i3 adds two agents/ONE iteration (token set, join at the gate) - bless accepts the amendment of uc-4 to cover both.",
+    "roles_covered": "Ledger resident [[stakeholders]] (minted this iteration): owner (designer by drawing, sole adjudicator, push owner), driving agent, sub-agents, the reader of the future book. Tensions named on the node: bottleneck (R2 watches queue depth), speed vs record (1s rule), one adjudicator vs away-time (6h offers, phone extends reach).",
+    "excluded_stated": "Binding excluded-use list lives on [[context]] (minted this iteration): no multi-project instances, no multi-owner adjudication, no unpinned drawing formats, no CI/CD or hosting, no secrets, no replacing git, no general agent framework.",
+    "examples_formulated": "The formulated examples are the stories' pass lines (12-write_stories), each mechanically checkable from the record: owner-touch counted from grants, call durations from the log slice, side-channel count from the notes, se_help misses from the log. They become the executable checks at author_tests (M7). Note for the review: map_stakeholders, write_stories and generalize_use_cases were again executor-skipped and walked inline (evidence 11/12/13, instance repaired) - the fourth-through-sixth side-channels; the count keeps measuring the executor gap this iteration closes.",
+    "offer_hash": "f834b2efab2d299878e6b71c1febecc1f8433240884f8854b4aa4be3a7790612"
+  }
+}
