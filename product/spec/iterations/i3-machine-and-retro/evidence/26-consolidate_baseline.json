@@ -1,0 +1,27 @@
+{
+  "iteration": "i3-machine-and-retro",
+  "state": "consolidate_baseline",
+  "at": "2026-07-24T10:05:00.000Z",
+  "note": "Inline fill - interim executor skipped this drawn state (side-channel #10).",
+  "payload": {
+    "elements": [
+      "TokenEngine | machine.ts | instance schema + active[] (current = first-token alias), fire-edge/activate/join ops, per-state attempts",
+      "PacketService | loop.ts | next() with per-session state assignment, submit routed by state, evidence validation + collision-free pinning",
+      "RunService | run.ts + runs store (new file) | background spawn, handle record, completion signal, pinned run_ref",
+      "Adjudication | gate.ts | offer QUEUE (state-keyed array), dismiss/supersede/replace ops, grant + advance unchanged",
+      "LawGuards | toll.ts + dispatch | commit-window state, test-lane scope check, update-on-submit, boot-project refusal",
+      "Record | calllog.ts + notes + emit | clause on failure, one line per dispatch, generic aggregation query, drained marks, last_verify by timestamp",
+      "Surface | bin/se-board.ts | branch columns from canvas geometry, token highlights, iteration tabs (later), process lane endpoints",
+      "HotReload | bin/se-mcp.ts shim | mtime-keyed dynamic import of the engine per call (dev mode)"
+    ],
+    "allocation_dmm": "8 function clusters x 8 homes, 1:1 except SESSION ASSIGNMENT which rides PacketService (thin, no own state). No cluster homeless, no home clusterless.",
+    "interfaces": [
+      "instance JSON | TokenEngine <-> PacketService <-> Adjudication | single source of iteration truth",
+      "offer queue file | Adjudication -> Surface + watchers | replaces the single-offer file, same location",
+      "runs store file | RunService -> PacketService + Surface | handles and completions, machine-local",
+      "calls.jsonl | Record -> Surface + retro queries | append-only",
+      "canvas files | compiler -> TokenEngine | pinned version, refuse-loud"
+    ],
+    "structure_note": "Coupling stays acyclic: Surface reads everything, writes nothing; LawGuards sit on dispatch only; the instance remains the only mutable truth for iteration state."
+  }
+}

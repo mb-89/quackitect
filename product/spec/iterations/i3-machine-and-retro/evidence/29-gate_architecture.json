@@ -1,0 +1,13 @@
+{
+  "iteration": "i3-machine-and-retro",
+  "state": "gate_architecture",
+  "at": "2026-07-24T09:04:03.399Z",
+  "payload": {
+    "choice_traced": "Winner K1 extend-in-place, traced to the weighted criteria (19-derive_criteria): both Pugh runs recorded (24-converge_pugh) - run 1 datum K2 (strongest rival), run 2 datum flipped to K1; no hybrid row emerged; the K2-later sequencing is recorded on the ADR, not smuggled into the matrix.",
+    "sensitivity_ruled": "Robust for this iteration (25-reverse_sensitivity): the flip needs record-integrity weight nearly doubled AND migratability halved - a world that only exists between iterations. Tripwire T1 in the register: re-run the decision when no mid-flight instance exists and a record consumer needs replay guarantees; fallback K2 as its own iteration.",
+    "matrix_review": "Reviewed as data (26-consolidate_baseline): 8 elements with homes, allocation DMM 1:1 (SessionAssignment deliberately rides PacketService - thin, no own state), 5 interfaces each with owner and direction, coupling acyclic (Surface reads all writes none; the instance is the only mutable iteration truth). Decomposition finding: one new file total (runs store) - the cut respects the existing seams.",
+    "evaluation_recorded": "Every criterion walked against the baseline (27-evaluate_baseline): latency, visibility, migratability, simplicity PASS by construction; two flagged risks routed to authored tests - current/active[0] drift (consistency test) and the state-claim race (atomic claim, CAS-guarded). The two numeric qualities keep their register pass numbers. Nothing silently green.",
+    "adrs_traced": "One deciding ADR, ledger resident [[adr-executor-extend-in-place]], addressing req-exec-parallel/tokens/multi-agent, register R4 and the zero-dep ethos; rejected K2/K3 recorded as history on the node with K2's re-entry condition named. Note for the review: consolidate_baseline and evaluate_baseline were executor-skipped and walked inline (evidence 26/27, side-channels #10/#11).",
+    "offer_hash": "04ae7c717d579d59fc852969205f2e345c2623342243bbde8fb9ac3d004947f6"
+  }
+}

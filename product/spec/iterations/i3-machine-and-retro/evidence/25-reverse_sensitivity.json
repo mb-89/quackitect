@@ -1,0 +1,9 @@
+{
+  "iteration": "i3-machine-and-retro",
+  "state": "reverse_sensitivity",
+  "at": "2026-07-24T09:01:26.125Z",
+  "payload": {
+    "sensitivity": "Perturbed by hand across the plausible range: K1 keeps winning until record integrity (C1) climbs from 25 to ~45 of 100 with migratability (C2) simultaneously halved - i.e. a world where replay purity matters far more than the flying iteration. That world becomes real exactly when NO mid-flight instance exists (between iterations) and the record's consumers multiply (the i5 book, external audits). Credible, but not during i3 by definition - i3 IS the mid-flight instance. Second flip probe: if C5 simplicity were weighted to zero (an ethos reversal), K2 still would not pass K1 without the C2 halving; single-criterion perturbations alone never flip. Verdict: robust for this iteration.",
+    "tripwires": "One RAID watch-item added, not silently dismissed: T1 - when a future iteration opens with no mid-flight instance AND a record consumer needs replay guarantees (book provenance, audit), re-run this decision with C1 reweighted; fallback is K2 as its own iteration, feasible because K1 keeps the history complete (the option was deliberately kept). Owner: driving agent at that iteration's onboarding. No other credible flips found."
+  }
+}

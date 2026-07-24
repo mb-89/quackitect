@@ -1,0 +1,9 @@
+{
+  "iteration": "i3-machine-and-retro",
+  "state": "converge_pugh",
+  "at": "2026-07-24T09:01:08.610Z",
+  "payload": {
+    "matrix_runs": "Run 1, datum K2 (strongest rival): K1 scores C1 record -, C2 migratability +, C3 latency 0, C4 visibility 0, C5 simplicity +, C6 throughput 0 -> weighted +2 net (the + criteria carry 35 weight, the single - carries 25). Run 2, datum flipped to K1: K2 scores C1 +, C2 -, C5 -, others 0 -> weighted -10 net. No hybrid emerged that keeps K2's replay purity without its migration risk; the closest hybrid (K1 now, event-sourcing later) is not a matrix row but a sequencing decision, recorded with the winner.",
+    "winner": "K1 extend-in-place. Beyond the arithmetic: (1) the migration risk is NOW - the running i3 instance carries nine hand repairs, and K2's replay would have to reconstruct exactly that; K1's additive field adopts it untouched. (2) K1 does not foreclose K2: the history stays complete under K1, so an event-sourced v2 remains buyable in a later iteration once no mid-flight instance is at stake - the option is kept, not spent. (3) Zero-dep ethos: K1 adds no IR, no replay module; the diff stays reviewable by one owner in one sitting. Qualitative check against the killer stories: S2 (two agents, one iteration) needs only the active[] set and session assignment - K1's exact core."
+  }
+}

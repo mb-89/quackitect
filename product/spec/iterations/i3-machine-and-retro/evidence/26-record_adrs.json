@@ -1,0 +1,8 @@
+{
+  "iteration": "i3-machine-and-retro",
+  "state": "record_adrs",
+  "at": "2026-07-24T09:02:18.181Z",
+  "payload": {
+    "adrs": "One deciding ADR, minted as ledger resident [[adr-executor-extend-in-place]]: the executor extends the instance in place (active[] token set, current as first-token alias, advance generalized; offer surface becomes a state-keyed queue). Addresses req-exec-parallel, req-exec-tokens, req-exec-multi-agent, register R4 and the zero-dep ethos. Rejected options recorded as history on the node: K2 event-sourced rewrite (kept buyable - tripwire T1 names the re-entry condition) and K3 scheduler sidecar (two-truth record). No second ADR needed: the remaining i3 decisions (background runs, law guards) implement requirements directly without architectural alternatives."
+  }
+}

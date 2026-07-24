@@ -1,0 +1,17 @@
+{
+  "iteration": "i3-machine-and-retro",
+  "state": "evaluate_baseline",
+  "at": "2026-07-24T10:05:00.000Z",
+  "note": "Inline fill - interim executor skipped this drawn state (side-channel #11).",
+  "payload": {
+    "evaluation": [
+      "latency (req-1s-interactive) | PASS by construction: every long command routes through RunService handles; no dispatch path calls runCommand inline anymore",
+      "record integrity (req-exec-tokens) | PASS with one flagged risk: current stored beside active[] can drift - rule: one writer sets both, and a consistency test asserts current === active[0]; goes to author_tests",
+      "visibility (req-board-parallel) | PASS: Surface derives columns from canvas geometry it already parses; tokens = instance.active",
+      "migratability (R4) | PASS: additive field; old instances read as active=[current]; the running i3 instance adopts without touching history",
+      "simplicity | PASS: one new file (runs store); no new dependency; diff reviewable in one sitting",
+      "throughput (req-exec-multi-agent) | PASS with one flagged risk: two sessions claiming the same state race - rule: atomic claim field CAS-guarded on the instance write; claim collision returns the next unclaimed state; test scheduled"
+    ],
+    "flags_routed": "Both flags become authored tests at M7 (consistency: current===active[0]; claim race). No quality scenario unaddressed; the two numeric qualities (1s, one-line-per-dispatch) carry their pass numbers from the register."
+  }
+}

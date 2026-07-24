@@ -1,7 +1,7 @@
 {
   "machine": "systematic",
   "iteration": "i3-machine-and-retro",
-  "current": "converge_pugh",
+  "current": "rank_unknowns",
   "counters": {},
   "history": [
     {
@@ -141,6 +141,42 @@
       "outcome": "filled",
       "evidence": "grant:3e9d4081bb87",
       "at": "2026-07-24T09:00:12.819Z"
+    },
+    {
+      "state": "converge_pugh",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i3-machine-and-retro/evidence/24-converge_pugh.json",
+      "at": "2026-07-24T09:01:08.611Z"
+    },
+    {
+      "state": "reverse_sensitivity",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i3-machine-and-retro/evidence/25-reverse_sensitivity.json",
+      "at": "2026-07-24T09:01:26.128Z"
+    },
+    {
+      "state": "record_adrs",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i3-machine-and-retro/evidence/26-record_adrs.json",
+      "at": "2026-07-24T09:02:18.182Z"
+    },
+    {
+      "state": "consolidate_baseline",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i3-machine-and-retro/evidence/26-consolidate_baseline.json",
+      "at": "2026-07-24T10:05:00.000Z"
+    },
+    {
+      "state": "evaluate_baseline",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i3-machine-and-retro/evidence/27-evaluate_baseline.json",
+      "at": "2026-07-24T10:05:00.000Z"
+    },
+    {
+      "state": "gate_architecture",
+      "outcome": "filled",
+      "evidence": "grant:04ae7c717d57",
+      "at": "2026-07-24T09:06:13.126Z"
     }
   ],
   "escapes": [],
