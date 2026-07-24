@@ -1,7 +1,7 @@
 // The worktree lane (i5, E1): iterations run in isolated worktrees on their
 // own branches and reunify honestly at ship. Home and naming per
 // adr-worktree-home-inrepo; nothing here deletes an abandoned tree.
-import { appendFileSync, existsSync, readFileSync, writeFileSync } from "node:fs";
+import { appendFileSync, existsSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { Rejection } from "./errors.ts";
 import { assertOperable, git } from "./git.ts";
@@ -78,18 +78,15 @@ export function retireWorktree(root: string, iteration: string, mode: "ship" | "
 export function openWorktrees(root: string): { iteration: string; root: string; branch: string }[] {
   const home = worktreeHome(root);
   if (!existsSync(home)) return [];
-  void home;
+  // Read the .worktrees home from the filesystem — NO git subprocess. The board
+  // polls this every tick; spawning git each time flashes a console and churns
+  // CPU. Provisioning names each tree .worktrees/<iteration> on iter/<iteration>.
   const out: { iteration: string; root: string; branch: string }[] = [];
-  const list = git(root, "worktree", "list", "--porcelain").stdout;
-  for (const block of list.split("\n\n")) {
-    const dir = block.match(/^worktree (.+)$/m)?.[1];
-    if (dir === undefined) continue;
-    // Ours iff its parent directory is the .worktrees home (slash-agnostic).
-    const segs = dir.split(/[\\/]/);
-    if (segs[segs.length - 2] !== ".worktrees") continue;
-    if (existsSync(join(dir, ".abandoned"))) continue;
-    const iteration = segs[segs.length - 1];
-    out.push({ iteration, root: dir, branch: block.match(/^branch refs\/heads\/(.+)$/m)?.[1] ?? branchName(iteration) });
+  for (const entry of readdirSync(home, { withFileTypes: true })) {
+    if (!entry.isDirectory()) continue;
+    const wtRoot = join(home, entry.name);
+    if (existsSync(join(wtRoot, ".abandoned"))) continue;
+    out.push({ iteration: entry.name, root: wtRoot, branch: branchName(entry.name) });
   }
   return out;
 }

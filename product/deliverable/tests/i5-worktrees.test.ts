@@ -168,15 +168,15 @@ test("abandon FLAGS the tree and never deletes; the debris invariant holds after
   }
 });
 
-test("the projection lists every live stream with root and iteration", () => {
+test("a worktree iteration shows in the iterations list, not as a separate agent tab", () => {
   const root = trunkFixture();
   try {
     const a = provisionWorktree(root, "it-a");
     const m = leanOK(a.root);
     new Loop(a.root, m).start("it-a");
     const s = projectState(root);
-    const streams = s.agents.filter((x) => x.role !== "main");
-    assert.ok(streams.some((x) => "iteration" in x && (x as { iteration?: string }).iteration === "it-a"), "the worktree stream appears");
+    assert.ok(s.iterations.some((it) => it.id === "it-a" && it.status === "open"), "the worktree iteration is in the list");
+    assert.equal(s.agents.filter((x) => x.role !== "main").length, 0, "a worktree is not its own agent tab (tabs are per agent)");
   } finally {
     rmSync(root, { recursive: true, force: true });
   }

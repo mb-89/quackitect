@@ -152,6 +152,7 @@ export function projectState(root: string): ProjectionState {
 
   const iterations: IterationView[] = [];
   let openIteration: string | null = null;
+  let openRoot = abs; // where the open iteration lives — trunk, or its worktree.
   let openMachine: MachineDecl | null = null;
   const iterationsDir = layout.iterations(abs);
   let lastVerify: ProjectionState["last_verify"] = null;
@@ -193,6 +194,47 @@ export function projectState(root: string): ProjectionState {
           inst.status === "open" && heartbeat !== null && heartbeat.age_s < HEARTBEAT_FRESH_S,
       });
     }
+  }
+  // Worktree-resident iterations render on the SAME board: their instance,
+  // machine and evidence live under the worktree root, but the board is one
+  // surface (the requirement i5b left unmet — a worktree iteration was invisible).
+  for (const w of openWorktrees(abs)) {
+    const wInstPath = layout.instancePath(w.root, w.iteration);
+    if (!existsSync(wInstPath)) continue;
+    let winst: MachineInstance;
+    try {
+      winst = readJsonFile<MachineInstance>(wInstPath);
+    } catch {
+      continue;
+    }
+    if (iterations.some((it) => it.id === winst.iteration)) continue;
+    if (winst.status === "open") {
+      openIteration = winst.iteration;
+      openRoot = w.root;
+    }
+    let wgoal: string | undefined;
+    const wEvidenceDir = layout.evidenceDir(w.root, winst.iteration);
+    if (existsSync(wEvidenceDir)) {
+      for (const f of readdirSync(wEvidenceDir).sort()) {
+        const ev = readJsonFile<{ state: string; payload: Record<string, unknown> }>(join(wEvidenceDir, f));
+        if (ev.state === "declare_goal" && wgoal === undefined) wgoal = String(ev.payload.goal ?? "");
+      }
+    }
+    const wdone = new Set(winst.history.filter((h) => h.outcome === "filled").map((h) => h.state));
+    const wMachine = winst.machine === sysMachine?.id ? sysMachine : loadMachine(w.root, winst.machine);
+    if (winst.status === "open") openMachine = wMachine;
+    iterations.push({
+      id: winst.iteration,
+      status: winst.status,
+      current: winst.current,
+      ...(wgoal !== undefined ? { goal: wgoal } : {}),
+      steps:
+        wMachine !== null
+          ? wMachine.states.filter((s) => s.kind !== "terminal").map((s) => ({ state: s.id, done: wdone.has(s.id) }))
+          : [...wdone].map((state) => ({ state, done: true })),
+      ...(winst.history.at(-1)?.at !== undefined ? { updated_at: winst.history.at(-1)!.at } : {}),
+      worked_on: winst.status === "open" && heartbeat !== null && heartbeat.age_s < HEARTBEAT_FRESH_S,
+    });
   }
   const planPath = layout.planPath(abs);
   if (existsSync(planPath)) {
@@ -255,7 +297,7 @@ export function projectState(root: string): ProjectionState {
       sub === "iteration"
         ? openView === undefined
           ? null
-          : loadIterationMachine(abs, openView.id, stateId)
+          : loadIterationMachine(openRoot, openView.id, stateId)
         : loadMachine(abs, sub.replace(/^se\.machine-/, ""));
     return decl === null ? undefined : decl.states.filter((s) => s.kind !== "terminal").length;
   };
@@ -285,7 +327,7 @@ export function projectState(root: string): ProjectionState {
   if (openView !== undefined && openMachine !== null) {
     const filled = new Set(openView.steps.filter((st) => st.done).map((st) => st.state));
     // Every active token lights up, not only the first-token alias.
-    const openInst = readJsonFile<MachineInstance>(layout.instancePath(abs, openView.id));
+    const openInst = readJsonFile<MachineInstance>(layout.instancePath(openRoot, openView.id));
     const activeIter = new Set(openInst.active ?? [openInst.current]);
     const iterRows = stateRows(openMachine);
     const seededFrom = sesMachine?.states.find((s) => s.submachine !== undefined)?.id;
@@ -315,12 +357,12 @@ export function projectState(root: string): ProjectionState {
   if (openView !== undefined && openMachine !== null) {
     for (const st of openMachine.states) {
       if (st.submachine === undefined) continue;
-      const subPath = join(layout.iterationDir(abs, openView.id), `sub-${st.id}.json`);
+      const subPath = join(layout.iterationDir(openRoot, openView.id), `sub-${st.id}.json`);
       if (!existsSync(subPath)) continue;
       const child = readJsonFile<MachineInstance>(subPath);
       const childDecl =
         st.submachine === "iteration"
-          ? loadIterationMachine(abs, openView.id, st.id)
+          ? loadIterationMachine(openRoot, openView.id, st.id)
           : loadMachine(abs, st.submachine.replace(/^se\.machine-/, ""));
       if (childDecl === null) continue;
       const childDone = new Set(child.history.filter((h) => h.outcome === "filled").map((h) => h.state));
@@ -353,11 +395,15 @@ export function projectState(root: string): ProjectionState {
     generated_at: new Date().toISOString(),
     board_version: BOARD_VERSION,
     session_started: sessionStarted,
-    agents: [{ name: "mallard", role: "main" }, ...worktreeStreams(abs)],
+    // Tabs are per AGENT, not per worktree: the main agent working in a
+    // worktree is still one agent. A worktree iteration shows in the iterations
+    // list + state machine (above), never as its own tab. Separate-agent tabs
+    // return when parallel agents land.
+    agents: [{ name: "mallard", role: "main" }],
     modules: loadModules(abs),
     iterations,
     open_iteration: openIteration,
-    offer: new Gate(abs).current(),
+    offer: new Gate(openRoot).current(),
     heartbeat,
     grants,
     last_verify: lastVerify,
@@ -365,22 +411,6 @@ export function projectState(root: string): ProjectionState {
     calls,
     notes: liveNotes(abs).slice(-10).reverse(),
   };
-}
-
-/** Every open worktree iteration as a board stream (req-streams-visible). */
-function worktreeStreams(abs: string): { name: string; role: string; iteration: string; root: string }[] {
-  const out: { name: string; role: string; iteration: string; root: string }[] = [];
-  for (const w of openWorktrees(abs)) {
-    const instPath = layout.instancePath(w.root, w.iteration);
-    if (!existsSync(instPath)) continue;
-    try {
-      if (readJsonFile<MachineInstance>(instPath).status !== "open") continue;
-    } catch {
-      continue;
-    }
-    out.push({ name: w.iteration, role: "stream", iteration: w.iteration, root: w.root });
-  }
-  return out;
 }
 
 /** The inbox minus drained notes: a disposition line retires its target. */

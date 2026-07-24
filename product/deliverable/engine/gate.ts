@@ -17,6 +17,7 @@ import { completeState, type MachineDecl, type MachineInstance } from "./machine
 import { loadIterationMachine, loadMachine } from "./machines/load.ts";
 import { importStamps } from "./modules.ts";
 import { openCommitWindow } from "./git.ts";
+import { openWorktrees } from "./worktree.ts";
 
 export interface Offer {
   iteration: string;
@@ -127,10 +128,14 @@ export class Gate {
     }
     // Child offers carry "iteration#state" — the bless routes to the child record.
     const [iterName, childOf] = offer.iteration.split("#");
+    // The iteration may live in a worktree; the bless must advance it there.
+    const iterRoot = existsSync(layout.instancePath(this.root, iterName))
+      ? this.root
+      : openWorktrees(this.root).find((w) => w.iteration === iterName)?.root ?? this.root;
     const instPath =
       childOf !== undefined
-        ? join(layout.iterationDir(this.root, iterName), `sub-${childOf}.json`)
-        : layout.instancePath(this.root, offer.iteration);
+        ? join(layout.iterationDir(iterRoot, iterName), `sub-${childOf}.json`)
+        : layout.instancePath(iterRoot, offer.iteration);
     const inst = readJsonFile<MachineInstance>(instPath);
     if (inst.current !== offer.state || inst.status !== "open") {
       throw new Rejection({
@@ -145,10 +150,10 @@ export class Gate {
     // the machine the iteration started under, not the ledger's current default.
     const m =
       childOf !== undefined
-        ? loadIterationMachine(this.root, iterName, childOf) ?? machine
+        ? loadIterationMachine(iterRoot, iterName, childOf) ?? machine
         : machine.id === inst.machine
           ? machine
-          : loadMachine(this.root, inst.machine) ?? machine;
+          : loadMachine(iterRoot, inst.machine) ?? machine;
     const grant: GrantRecord = {
       iteration: offer.iteration,
       state: offer.state,
