@@ -1,0 +1,14 @@
+{
+  "iteration": "i5-worktrees",
+  "state": "gate_validation",
+  "at": "2026-07-24T14:22:03.413Z",
+  "payload": {
+    "meets_need": "One-pager A (the owner): hand over independent iterations and step away -> each runs isolated in its own worktree+branch and ships merged with honest suspect marks (W1 test); the plan enforces order -> depends_on refuses early, independent opens concurrently (W2 test). One-pager B (the agent): a lifecycle I cannot misuse -> provision/adopt/ship-remove/abandon-flag with the debris invariant (W3 test); visibility per stream -> tab data per open worktree (W4 test). Every need's pass line is a green test in the 128-suite battery, all iterations.",
+    "killers_demonstrated": "W1 isolated-pair-with-honest-merge: exercised end to end in the fixture (two real git worktrees, two closes, two merges, the overlap suspect-marked, trees cleaned) - run-119bc601e093. W2 refused-early-start: the SE-C-072 refusal and the post-ship pass both demonstrated. The one thing NOT exercised live is the wall-clock two-iterations-at-once run - the owner ruled no parallel run this iteration; its fixture equivalent (both worktrees provisioned and merged in one test) IS demonstrated, and the live run is the recorded RAID trigger.",
+    "acceptance_converted": "The executable slices ARE now permanent acceptance scenarios: tests/i5-worktrees.test.ts (8 checks) joined the battery, so every future run re-proves isolation, dependency order, suspect marking, conflict-stop, debris, streams, drain guard and the board act-guard. Nothing left as a one-shot demo.",
+    "consistency_swept": "se_loop_start and se_note_drain descriptions teach the new behavior; the discipline lives in guidance-worktrees + guidance-retro-independence (registry-served, DRY); the contract's push/owner rules already describe the ship-merge flow. run-119bc601e093 green after the sweep's text edits.",
+    "gaps_logged": "Three RAID entries: raid-worktree-workspace-fence, raid-crlf-warning-noise, and the carried raid-i5-parallel-serve-demo (trigger updated to the next parallel slot). Each with owner and trigger.",
+    "market_tier": "Not a market iteration - no market flag at kickoff; the tier does not apply.",
+    "offer_hash": "0e9eb8fade452d4fbd51cb80c8ceec870ef825f72a1a83d78de1baafc360cee8"
+  }
+}

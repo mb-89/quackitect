@@ -1,0 +1,8 @@
+{
+  "iteration": "i5-worktrees",
+  "state": "sweep_consistency",
+  "at": "2026-07-24T14:21:12.398Z",
+  "payload": {
+    "swept": "Teaching surfaces reconciled with the shipped worktree lane: (1) se_loop_start's description now teaches worktree-mode opening and the depends_on gate; se_note_drain teaches the SE-C-073 unknown-ref refusal (both text-only, the lane registry and contract hash are unchanged so the session attestation stands). (2) The discipline itself lives in the ledger not in prose: guidance-worktrees and guidance-retro-independence carry the how, served automatically onto engine-ts/process chunks by the registry - the DRY home, nothing duplicated. (3) The contract's hard rules audited against the new behavior - 'you never push / the owner pushes' now literally describes the ship-merge-to-trunk flow, no edit needed; commit-window and lane rules unchanged. (4) Agent memory checked: it carries harness mechanics only and taught nothing false about worktrees (the worktree design belongs in the repo per repo-self-sufficiency, and is there). No superseded teaching left standing."
+  }
+}

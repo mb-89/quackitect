@@ -1,0 +1,9 @@
+{
+  "iteration": "i5-worktrees",
+  "state": "fill_story_evidence",
+  "at": "2026-07-24T14:20:34.827Z",
+  "payload": {
+    "slides_filled": "W1 (killer, isolated pair + honest merge): FILLED by the W1-killer test - two worktrees provisioned, both walked to close, both merged to trunk, the overlapping se.shared node wears the suspect frontmatter, trees removed, branches kept (tests/i5-worktrees.test.ts, run-119bc601e093). Evidence ref: the test + engine/worktree.ts shipMerge. W2 (killer, refused early start): FILLED by the depends test - assertDependsMet refuses SE-C-072 naming the unshipped dependency, passes once a gate_release grant exists. W3 (clean close): FILLED by the abandon/debris test - ship removes, abandon flags .abandoned, the debris invariant holds. W4 (visible streams): FILLED by the projection-streams test - an open worktree appears in agents[] with role=stream, root and iteration. Every slide filled from the shipped system; no finding. Note the LIVE two-real-iterations demo stays deferred by the owner's no-parallel ruling (raid-i5-parallel-serve-demo) - the fixture-level proof is complete, the wall-clock parallel run waits for the next opportunity.",
+    "demos_seeded": "Both killers demonstrated as permanent acceptance scenarios in the battery rather than one-shot demos: the W1 killer test IS the isolation+merge+suspect demonstration (repeatable, 128-suite member); the W2 killer test IS the dependency-order demonstration. No separate demo machine seeded - the owner ruled no live parallel run this iteration, so the fixture acceptance scenarios are the demonstration, and the live two-worktree wall-clock run is the recorded RAID trigger for the next slot (also carries raid-i5-parallel-serve-demo's two-token half)."
+  }
+}

@@ -98,7 +98,7 @@ export function coreTools(root: string, opts: { toll?: Toll; session?: Session }
     {
       name: "se_loop_start",
       title: "se.loop.start",
-      description: "Opens an iteration (bootstrap policy: systematic). One open iteration per worktree.",
+      description: "Opens an iteration (bootstrap policy: systematic). A worktree:true plan entry opens it in its own .worktrees/<id> tree+branch; depends_on must have shipped.",
       inputSchema: {
         type: "object",
         properties: { iteration: { type: "string", description: "e.g. i1" } },
@@ -422,7 +422,7 @@ export function coreTools(root: string, opts: { toll?: Toll; session?: Session }
     {
       name: "se_note_drain",
       title: "se.note.drain",
-      description: "Mark a note drained with its disposition — the retro's mechanical half; drained notes leave the inbox count.",
+      description: "Mark a note drained with its disposition — the retro's mechanical half; an unknown ref is refused (SE-C-073). Drained notes leave the inbox count.",
       inputSchema: {
         type: "object",
         properties: {

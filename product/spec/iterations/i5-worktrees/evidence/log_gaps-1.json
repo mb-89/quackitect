@@ -1,0 +1,8 @@
+{
+  "iteration": "i5-worktrees",
+  "state": "log_gaps",
+  "at": "2026-07-24T14:21:41.389Z",
+  "payload": {
+    "gaps": "Two entries minted (diff fe86770), each with owner and trigger: raid-worktree-workspace-fence (risk, driving agent, trigger = first per-tree-server subagent run - add a per-root workspace exemption then) and raid-crlf-warning-noise (issue, driving agent, trigger = next engine-hygiene slot - .gitattributes text=auto or filter the captured output). Plus the carried raid-i5-parallel-serve-demo whose trigger updates to 'the next parallel-run opportunity' (the live two-worktree wall-clock demo the owner deferred). No unfilled slide - every W-story passed against the shipped lane."
+  }
+}
