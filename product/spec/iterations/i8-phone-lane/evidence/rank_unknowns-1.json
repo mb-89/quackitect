@@ -1,0 +1,10 @@
+{
+  "iteration": "i8-phone-lane",
+  "state": "rank_unknowns",
+  "at": "2026-07-24T14:41:59.144Z",
+  "payload": {
+    "submachine": "rank-unknowns",
+    "chunks_filled": 2,
+    "sub_record": "sub-rank_unknowns.json"
+  }
+}

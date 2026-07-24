@@ -1,0 +1,20 @@
+{
+  "metadata": {
+    "version": "1.0-1.0",
+    "frontmatter": {
+      "id": "it.machine-rank-unknowns",
+      "kind": "machine",
+      "statement": "i8's spike: confirm the poll-timeout guard before building the in-board watcher on it.",
+      "entry": "start"
+    }
+  },
+  "nodes": [
+    { "id": "n-start", "type": "file", "file": "ledger/it/machine-rank-unknowns-start.md", "x": 0, "y": 0, "width": 240, "height": 60 },
+    { "id": "n-sp1", "type": "file", "file": "ledger/it/machine-rank-unknowns-sp1-poll-timeout.md", "x": 0, "y": 120, "width": 240, "height": 60 },
+    { "id": "n-done", "type": "file", "file": "ledger/it/machine-rank-unknowns-done.md", "x": 0, "y": 240, "width": 240, "height": 60 }
+  ],
+  "edges": [
+    { "id": "e-start-sp1", "fromNode": "n-start", "toNode": "n-sp1", "fromSide": "bottom", "toSide": "top" },
+    { "id": "e-sp1-done", "fromNode": "n-sp1", "toNode": "n-done", "fromSide": "bottom", "toSide": "top" }
+  ]
+}

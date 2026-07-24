@@ -1,0 +1,9 @@
+{
+  "iteration": "i8-phone-lane",
+  "state": "fold_back",
+  "at": "2026-07-24T14:42:15.144Z",
+  "payload": {
+    "folded": "sp1: the S4 poll-timeout risk is DISARMED on evidence - AbortSignal.timeout bounds a hanging read (322ms), so the E2 Transport's pollSince wraps its fetch in a timeout and the in-board poll (K1) is confirmed safe; adr-phone-poll-in-board stands unamended, no gate reopens. The at-risk S4 becomes a fixed E2 build duty with a known mechanism rather than an open unknown. Nothing upstream invalidated.",
+    "promotions": "The spike script stays throwaway (workspace/, deleted at ship). Its MECHANISM promotes: the AbortSignal.timeout pattern becomes the E2 NtfyTransport's pollSince/publish timeout, and the hanging-server fixture becomes the fitness F-c test (pollAnswers returns within bound against a stalled mock). No code promoted verbatim - the pattern is a one-liner."
+  }
+}

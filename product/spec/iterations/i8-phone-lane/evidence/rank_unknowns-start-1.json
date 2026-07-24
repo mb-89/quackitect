@@ -1,0 +1,9 @@
+{
+  "iteration": "i8-phone-lane",
+  "state": "rank_unknowns-start",
+  "at": "2026-07-24T14:41:19.713Z",
+  "payload": {
+    "ranking": "U1 poll-timeout guard (from ATAM S4 + adr-phone-poll-in-board): does an abort-timeout actually bound a hanging transport read so the in-board poll can never wedge the board tick - what-if-wrong: the whole K1 decision (poll INSIDE the board) becomes unsafe, because a stalled ntfy would freeze the board; the single mechanism the unattended-safety criterion rests on, ranked first and spiked. Not spiked, with reasons: the ntfy HTTP shape (inherited-probed in v1, re-probe forbidden unattended); zero-dep transport (probe A2 confirmed); offer-hash-as-correlation-id and Gate.bless channel (probe A3, code-confirmed); the token-never-logged duty (an inspection/build duty with fitness F-b, not a mechanism unknown); the mock round-trip (that IS the M7 test, not a pre-build spike).",
+    "timeboxes": "sp1: 10 minutes, local hanging-server fixture, no network, no engine edits. Overrun = stop, record the partial, fold_back decides the guard mechanism with what exists (fallback: a manual setTimeout + AbortController)."
+  }
+}

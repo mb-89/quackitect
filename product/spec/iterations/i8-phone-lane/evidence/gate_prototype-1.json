@@ -1,0 +1,11 @@
+{
+  "iteration": "i8-phone-lane",
+  "state": "gate_prototype",
+  "at": "2026-07-24T14:42:31.457Z",
+  "payload": {
+    "assumptions_validated": "The one ranked riskiest unknown burned down inside its box: U1 poll-timeout HELD (run-cd36610bb4d2, TimeoutError in 322ms) - the guard the whole in-board-poll decision rests on works, so K1 is confirmed safe and no design changed. The lower-ranked assumptions were confirmed at probe time (ntfy shape inherited, zero-dep transport, offer-hash correlation, seDir secret home) or are build duties with fitness tests (token-never-logged).",
+    "buildable": "Evidenced buildable: every E1-E5 mechanism has a green spike (poll-timeout), a green probe (transport, correlation id, secret home), an inherited-and-re-verified decision (ntfy shape, answer-authenticity), or an existing proven seam (Gate.bless/dismiss/current, the board tick, layout.seDir). Nothing rests on an untested claim; the live ntfy wiring is deliberately the owner-physical pairing step, not a build unknown.",
+    "results_recorded": "Spike verdict pinned as chunk evidence with its run ref (sub-rank_unknowns); promotions marked: the AbortSignal.timeout pattern -> E2 transport timeout, the hanging-server fixture -> fitness F-c; the script stays throwaway in workspace/, deleted at ship.",
+    "offer_hash": "f081da9a3657a40db6b1b5e5efdaa36b3cfef1f85071b309037d3cb7fac8b0ef"
+  }
+}

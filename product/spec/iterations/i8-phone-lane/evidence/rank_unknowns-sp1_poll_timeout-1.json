@@ -1,0 +1,9 @@
+{
+  "iteration": "i8-phone-lane",
+  "state": "rank_unknowns-sp1_poll_timeout",
+  "at": "2026-07-24T14:41:59.136Z",
+  "payload": {
+    "run_ref": "run-cd36610bb4d2",
+    "verdict": "HELD: a fetch against a hanging local server with AbortSignal.timeout(300) rejected as TimeoutError in 322ms - bounded well under 2s. The S4 guard mechanism is confirmed: the in-board poll wraps its transport read in AbortSignal.timeout, so a stalled ntfy can never wedge the board tick. K1 stays safe; no fallback timer needed."
+  }
+}

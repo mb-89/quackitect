@@ -1,0 +1,26 @@
+{
+  "machine": "rank-unknowns",
+  "iteration": "i8-phone-lane#rank_unknowns",
+  "current": "done",
+  "counters": {},
+  "history": [
+    {
+      "state": "start",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i8-phone-lane/evidence/rank_unknowns-start-1.json",
+      "at": "2026-07-24T14:41:19.713Z"
+    },
+    {
+      "state": "sp1_poll_timeout",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i8-phone-lane/evidence/rank_unknowns-sp1_poll_timeout-1.json",
+      "at": "2026-07-24T14:41:59.136Z"
+    }
+  ],
+  "escapes": [],
+  "status": "closed",
+  "fired": [],
+  "active": [
+    "done"
+  ]
+}
