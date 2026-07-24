@@ -1,0 +1,9 @@
+{
+  "iteration": "i3-machine-and-retro",
+  "state": "package",
+  "at": "2026-07-24T10:22:10.106Z",
+  "payload": {
+    "package": "v2 ships as the repo itself during bootstrap - the versioned artifact is the branch state at this release: engine + tests (K1 41359ff, K2 e8b57e2, K3 eeb03d8), the ledger (vision, context, stakeholders, 25 requirements, the ADR, the amended machine drawings), the full iteration record (44 evidence files, grants), and the plan. No zip lane exists or is claimed - v1's ship packaging is not ported; if a packaged artifact becomes a need it enters through the plan, not silently here.",
+    "entry_script": "README.md and RUNME.ps1 stand at the root (req-runme-dep-free lives in the ledger); their bootstrap-era claims were verified unchanged at the sweep - v2's promises (design source, v1 fallback until UC-4) still hold as written."
+  }
+}

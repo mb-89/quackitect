@@ -16,6 +16,7 @@ import { layout } from "./layout.ts";
 import { advance, type MachineDecl, type MachineInstance } from "./machine.ts";
 import { loadMachine } from "./machines/load.ts";
 import { importStamps } from "./modules.ts";
+import { openCommitWindow } from "./git.ts";
 
 export interface Offer {
   iteration: string;
@@ -149,6 +150,7 @@ export class Gate {
       at: new Date(this.now()).toISOString(),
     };
     appendFileSync(this.grantsPath(), JSON.stringify(grant) + "\n", "utf8");
+    openCommitWindow(this.root, `grant:${grant.hash.slice(0, 12)}`);
     inst.history.push({ state: offer.state, outcome: "filled", evidence: `grant:${grant.hash.slice(0, 12)}`, at: grant.at });
     advance(m, inst, "filled", grant.at);
     writeFileSync(instPath, JSON.stringify(inst, null, 2) + "\n", "utf8");

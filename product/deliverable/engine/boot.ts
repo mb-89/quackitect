@@ -71,6 +71,8 @@ You work through the se MCP server, and you do what it tells you.
 - You never push. The owner pushes.
 - Commit narrow: se_git add with an explicit \`--\` pathspec, never a
   broad add. Editor droppings ride along otherwise.
+- Commits ride the bless window (gate bless -> the next loop submit);
+  the engine refuses outside it. An explicit owner grant is the escape.
 - Gates are offers. A human blesses through their own channel. You park
   or wait; you do not poll a judgment surface.
 - Discuss first. When the owner opens a discussion, nothing is built,

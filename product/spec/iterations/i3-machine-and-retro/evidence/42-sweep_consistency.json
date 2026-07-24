@@ -1,0 +1,8 @@
+{
+  "iteration": "i3-machine-and-retro",
+  "state": "sweep_consistency",
+  "at": "2026-07-24T10:14:36.085Z",
+  "payload": {
+    "swept": "Teaching surfaces walked against every behavior this iteration changed. Updated: (1) the contract (boot.ts) - the commit rule now teaches the bless window and its owner-grant escape; the lane list already renders from the registry since K2, so no hand-sweep needed there ever again. (2) meth-machine-canvas - the iteration-drawing convention documented (module 'it', machines/ dir, sub-<state>.json instances, current-slice limits on child gates and engine states). Checked and clean: workspace/AGENTS.md (delegation-clean by design - everything reaches sessions through the server), README (bootstrap-era claims unchanged), the drawn machine's state notes (verification's semantics unchanged - only its execution backgrounded). The contract hash moves with the edit; fresh sessions attest the new text."
+  }
+}

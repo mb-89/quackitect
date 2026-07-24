@@ -21,10 +21,12 @@ provenance:
 - The feature tour lives in [machine-tutorial.canvas](machine-tutorial.canvas).
 
 ## The state note
+
 - Frontmatter: `id`, `kind: machine_state`, `machine`, `state`, `state_kind` (`work` | `gate` | `terminal`), `filled_by` (`agent` | `engine`), `command` (engine-filled only), `statement`.
 - Body section `## Guidance`: the method slice served with the step.
 - Body section `## Evidence form`: one field per line, `name | description | required` (or `optional`). Absent section means an empty form.
-- Optional `submachine`: a machine's ledger id, or `iteration` - the iteration may provide its own drawing in its own directory. One-shot sub-machines (a build list) stay with the iteration as events; they are never templates.
+- Optional `submachine`: a machine's ledger id, or `iteration` - the iteration provides its own drawing. One-shot sub-machines (a build list) stay with the iteration as events; they are never templates.
+- An iteration drawing lives at `product/spec/iterations/<iteration>/machines/` as ledger module `it`: canvas id `it.machine-<state>`, state notes beside it, file references shaped `ledger/it/<name>.md`. Entering the seeding state instantiates it (`sub-<state>.json`); its terminal completes the parent state. Current slice: child states are agent-filled work only - engine-filled children and child gates land with the next executor pass.
 
 ## The compiler
 - Runs at load, writes nothing. The compiled machine exists only in memory - a committed intermediate form would be a second source of truth.

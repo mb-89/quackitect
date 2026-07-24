@@ -1,0 +1,8 @@
+{
+  "iteration": "i3-machine-and-retro",
+  "state": "finalize_docs",
+  "at": "2026-07-24T10:21:06.251Z",
+  "payload": {
+    "docs": "Emitted-as-projection and read back against the live surface: the boot handover (re-emitted after the build - it now shows i3 at its true state and 'Last verify: green (i3)', which is the timestamp fix proving itself), the board (cycled onto current code; renders the machine, offers, log, notes from the same projection), and the contract (its lane list rendered from the live registry - matched the served tools by construction). Teaching docs match the shipped surface per the sweep: commit-window rule in the contract, iteration-drawing convention in meth-machine-canvas. Honest absence: the BOOK emitter does not exist in v2 yet - it is the whole point of the planned i5-trace-book (one button renders the book from the ledger); no book is claimed here."
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "iteration": "i3-machine-and-retro",
+  "state": "ship_review",
+  "at": "2026-07-24T10:22:33.130Z",
+  "payload": {
+    "review": "Dependency list, one line each: the Node runtime (zero npm runtime dependencies held - the engine imports node:* only; the sole package.json entry is the optional kb file link); the kb import (../benjamin, stamped on every grant at commit 00320210 - unchanged all day, no divergence); Obsidian + Advanced Canvas (pinned format 1.0-1.0, compiler refuses loud - unchanged); git (allowlisted lane, owner-pushed). No dependency flipped this iteration, no diverged dep ships, no new ask without a sticky ruling.",
+    "upstream": "None owed - kb is an import, not a fork; nothing was patched that belongs upstream. The one candidate (the harness's tool-list caching that hides freshly registered tools until reconnect) is a harness property, recorded in the notes for the retro rather than deposited anywhere."
+  }
+}

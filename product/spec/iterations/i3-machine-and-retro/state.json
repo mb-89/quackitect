@@ -1,7 +1,7 @@
 {
   "machine": "systematic",
   "iteration": "i3-machine-and-retro",
-  "current": "fill_story_evidence",
+  "current": "shipped",
   "counters": {
     "verification_attempts": 1
   },
@@ -245,8 +245,56 @@
       "outcome": "filled",
       "evidence": "grant:951843654728",
       "at": "2026-07-24T10:08:00.770Z"
+    },
+    {
+      "state": "fill_story_evidence",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i3-machine-and-retro/evidence/41-fill_story_evidence.json",
+      "at": "2026-07-24T10:13:29.219Z"
+    },
+    {
+      "state": "log_gaps",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i3-machine-and-retro/evidence/43-log_gaps.json",
+      "at": "2026-07-24T10:20:00.000Z"
+    },
+    {
+      "state": "sweep_consistency",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i3-machine-and-retro/evidence/42-sweep_consistency.json",
+      "at": "2026-07-24T10:14:36.085Z"
+    },
+    {
+      "state": "gate_validation",
+      "outcome": "filled",
+      "evidence": "grant:0053d0525a16",
+      "at": "2026-07-24T10:16:06.932Z"
+    },
+    {
+      "state": "finalize_docs",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i3-machine-and-retro/evidence/45-finalize_docs.json",
+      "at": "2026-07-24T10:21:06.251Z"
+    },
+    {
+      "state": "package",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i3-machine-and-retro/evidence/46-package.json",
+      "at": "2026-07-24T10:22:10.106Z"
+    },
+    {
+      "state": "ship_review",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i3-machine-and-retro/evidence/47-ship_review.json",
+      "at": "2026-07-24T10:22:33.131Z"
+    },
+    {
+      "state": "gate_release",
+      "outcome": "filled",
+      "evidence": "grant:4e0bea48ce06",
+      "at": "2026-07-24T10:23:10.574Z"
     }
   ],
   "escapes": [],
-  "status": "open"
+  "status": "closed"
 }
