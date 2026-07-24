@@ -1,0 +1,12 @@
+{
+  "iteration": "i3-machine-and-retro",
+  "state": "onboard_retro",
+  "at": "2026-07-24T08:06:11.797Z",
+  "payload": {
+    "field_feedback": "Nothing yet (owner, 2026-07-24). v2 has not shipped to an outside field; the working sessions themselves are the field for now.",
+    "notes_drained": "25 -> 25 dispositioned, 0 open (owner ruled every disposition in chat 2026-07-24). Breakdown: 5 already-done (onboarding drawn; contract already carries call-discipline and answer-first; toll-v2 and boot-ritual became i3 steps); 1 rejected as superseded (retro-gap note f62adb09); 4 drained onto existing i3 steps (last_verify timestamp, link graph, guidance registry, gate watcher); 5 pulled into i3 as new steps (engine hot reload, run-tests affordance, process lane, offer dismiss/supersede, apply-lane ergonomics); 5 routed to i4 (dot-file lane x2, set_field dot-path, apply schema validation, structure talk); 4 routed to i8-board-rounds (liveness honesty, log request+response detail, ETA clock time, DRY blink token); 1 parked on i8 (board as interaction surface). Mechanical drained-marking lands with retro flow v1 in i3; until then the inbox file keeps the entries.",
+    "call_log_mined": "840 calls since i1 (first v2 retro), 74 failures (8.8%). Top failure shares: se_file_write 9/34 (ledger-path learning), se_file_patch 15/227. Log gaps found: failure lines carry no clause ({outcome: errored} only - the clause ranking this evidence field asks for is impossible today) and dispatches double-log (28 se_help lines = 14 calls); both -> i3 call-log-hygiene step. 14 unique se_help misses = recorded demand: run-tests, canvas surgical ops, declared roots (v1/owner folder), inbox+call-log read lanes, git unstage, BOM repair. Slow calls: se_loop_submit ~5s whenever the following engine-filled verify runs inline in next() -> req-1s-interactive minted + i3 step; se_wait 300s timeouts are expected gate parks.",
+    "waste_leads": "Canvas payloads ride twice through the forced dry_run -> execute resend (apply-lane ergonomics step). Board process cycled by hand twice via netstat+taskkill (process lane step).",
+    "process_stale": "No staleness flag this round: machines-as-canvases plus deterministic packets matches the current state of spec-driven practice; the gaps found are tooling, all routed into i3/i4/i8. Next check at the next onboarding."
+  }
+}

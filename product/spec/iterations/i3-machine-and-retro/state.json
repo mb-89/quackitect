@@ -1,9 +1,16 @@
 {
   "machine": "systematic",
   "iteration": "i3-machine-and-retro",
-  "current": "onboard_retro",
+  "current": "gate_kickoff",
   "counters": {},
-  "history": [],
+  "history": [
+    {
+      "state": "onboard_retro",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i3-machine-and-retro/evidence/01-onboard_retro.json",
+      "at": "2026-07-24T08:06:11.798Z"
+    }
+  ],
   "escapes": [],
   "status": "open"
 }

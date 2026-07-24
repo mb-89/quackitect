@@ -1,0 +1,13 @@
+{
+  "iteration": "i3-machine-and-retro",
+  "state": "gate_kickoff",
+  "at": "2026-07-24T08:06:30.044Z",
+  "payload": {
+    "retro_drained": "25/25 inbox notes carry a recorded disposition (owner-ruled in chat 2026-07-24; full breakdown in the retro evidence, 01-onboard_retro). Mechanical drained-marking is itself an i3 deliverable (retro flow v1).",
+    "goal": "Day-scale iterations become real: the parallel executor makes the drawn systematic machine runnable, and the retro flow arrives (notes drain + cleanup, field-feedback first).",
+    "pulled_in": "Original i3 set: parallel executor; plan insert/renumber ops; link graph + rename ripple; declared-roots search scope; retro flow v1 (now the drawn M0 onboarding); lean as strike-list; last_verify by timestamp; boot cleanliness incl. mechanical project question (owner ruling today); toll v2 update-on-submit (owner ruling today); se-gate role stamps. Pulled in from the retro drain (owner-ruled): apply-lane ergonomics (dry_run optional, execute-by-hash, surgical canvas ops); 1s interactive rule fixing the ~5s inline verify (req-1s-interactive, from call-log mining); call-log hygiene (clause logging + dedupe); engine hot reload; run-tests affordance; process lane; offer dismiss/supersede; contract bake (gate watcher + board poke).",
+    "left_out": "To i4: dot-file/.obsidian lanes, set_field dot-path, apply schema validation, ledger structure talk. To new i5-trace-book (owner-inserted today, before phone lane and v1 retirement): book button, browsable trace graph, requirement capture proven. To i8-board-rounds: liveness honesty, log request+response, ETA clock render, DRY blink token, interaction-surface idea. Renumbered: kb-content i6, phone lane i7, board rounds i8, v1 retirement i9.",
+    "rigor": "systematic, full - no strikes. Reasoning: i3 builds the executor and touches engine, gates and contract everywhere; every milestone earns its keep on this one. Prune-down recommendations become possible once lean exists as a strike-list, which is itself an i3 deliverable.",
+    "offer_hash": "2be1fc74b9c89c35f8074efa2ab7bade0a259743c11d2a87e37fa93febcbb295"
+  }
+}
