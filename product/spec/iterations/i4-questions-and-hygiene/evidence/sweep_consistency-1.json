@@ -1,0 +1,8 @@
+{
+  "iteration": "i4-questions-and-hygiene",
+  "state": "sweep_consistency",
+  "at": "2026-07-24T13:04:53.937Z",
+  "payload": {
+    "swept": "Teaching surfaces checked against every i4 change: (1) tool descriptions were the stale surface - se_set_apply now names its full op set (dot-paths, canvas ops, rename ripple, plan ops, fire-first), se_run teaches the battery's milestone scope, se_file_list teaches dot-paths and @declared-roots (text-only changes; the contract hash is untouched so the session attestation stands, the harness picks the fresh text up at its next reconnect). (2) The boot contract itself audited line by line - every hard rule still true, commit-window and lane-registry lines already teach the current laws; no edit needed. (3) The driving agent's own harness memory corrected (it taught 'no se_run in v2'). (4) workspace/AGENTS.md checked - generic by design, still accurate. Verified nothing broke: laws+boot suites 15/15 in run-b04cdc966e22."
+  }
+}

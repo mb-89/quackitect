@@ -180,7 +180,7 @@ export function coreTools(root: string, opts: { toll?: Toll; session?: Session }
     {
       name: "se_set_apply",
       title: "se.set.apply",
-      description: "Atomic ledger ops (create, delete, set_field, replace_section, add_edge, remove_edge): dry_run -> diff hash -> execute.",
+      description: "Atomic ledger ops (create, delete, set_field incl. dot-paths, replace_section, edges, surgical canvas ops, rename with link ripple, plan_insert/plan_renumber): dry_run -> diff hash -> execute, or fire-first with dry_run:false.",
       inputSchema: {
         type: "object",
         properties: {
@@ -253,7 +253,7 @@ export function coreTools(root: string, opts: { toll?: Toll; session?: Session }
     {
       name: "se_file_list",
       title: "se.file.list",
-      description: "List product entries under a directory (root-relative; workspace/ and ledger writes excluded).",
+      description: "List product entries under a directory (root-relative; dot-paths serve, @name reaches declared read-only roots; workspace/ excluded).",
       inputSchema: {
         type: "object",
         properties: { dir: { type: "string", default: "." } },
@@ -381,7 +381,7 @@ export function coreTools(root: string, opts: { toll?: Toll; session?: Session }
     {
       name: "se_run",
       title: "se.run",
-      description: "Run a shell command through SE: captured raw in the call log, referenced by run ref — never re-type output.",
+      description: "Run a shell command through SE: captured raw in the call log, referenced by run ref — never re-type output. Individual tests run free; the full battery only at milestone verification.",
       inputSchema: {
         type: "object",
         properties: { command: { type: "string" } },
