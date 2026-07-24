@@ -1,0 +1,27 @@
+{
+  "iteration": "i3-machine-and-retro",
+  "state": "fix_findings",
+  "at": "2026-07-24T09:44:49.350Z",
+  "payload": {
+    "findings_fixed": "Second collection, all fixed in this pass (first pass run-c78143bd greened the suite; walking the machine then exposed two engine defects and absorbed two owner rulings): (1) recovery-edge misclassification - advance() treated recovery as a failure path, so a successful fix had no legal edge and the machine recorded a bogus escape; fixed in advance() (recovery fires on filled) and in completeState (OR-path activation for alternative/recovery/fallback/error), guarded by two new tests; the bogus escape removed from the instance record. (2) The loop's own engine-filled runs blocked inline - the very 5s defect the register outlaws; next() now starts commands as background runs with a 900ms grace: fast commands keep the synchronous shape, longer ones return a running packet with the run ref, completed on the next call; guarded by the slow-verify integration test. (3) req-test-lane amended per owner ruling (individual tests). (4) Toll grace-warning ruling captured as note c744cf1c, deliberately NOT built in this pass per owner. Battery after the pass: typecheck clean, 91/91 green (run-74514a56).",
+    "run_ref": "run-74514a565f8a"
+  },
+  "pinned_run": {
+    "ref": "run-74514a565f8a",
+    "ts": "2026-07-24T09:44:26.213Z",
+    "se_version": "2.0.0-bootstrap",
+    "tool": "se.run",
+    "args": {
+      "command": "cd product/deliverable && npm run typecheck 2>&1 | tail -15 && node --test --experimental-strip-types \"tests/*.test.ts\" 2>&1 | grep -E \"^(✖|ℹ (tests|pass|fail))\" | head -20",
+      "cwd": "C:\\Users\\ichbi\\Desktop\\ai\\quackitect-v2"
+    },
+    "ok": true,
+    "duration_ms": 7827,
+    "detail": {
+      "command": "cd product/deliverable && npm run typecheck 2>&1 | tail -15 && node --test --experimental-strip-types \"tests/*.test.ts\" 2>&1 | grep -E \"^(✖|ℹ (tests|pass|fail))\" | head -20",
+      "exit": 0,
+      "stdout": "\n> quackitect@2.0.0-bootstrap typecheck\n> tsc --noEmit\n\nℹ tests 91\nℹ pass 91\nℹ fail 0\n",
+      "stderr": ""
+    }
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "iteration": "i3-machine-and-retro",
+  "state": "verification",
+  "at": "2026-07-24T09:45:21.599Z",
+  "payload": {
+    "run_ref": "run-1fcefa68394a",
+    "command": "npm --prefix product/deliverable run verify --loglevel=error",
+    "exit": 0
+  },
+  "pinned_run": {
+    "ref": "run-1fcefa68394a"
+  }
+}

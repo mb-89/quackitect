@@ -8,7 +8,7 @@ import { Gate, type GrantRecord, type Offer } from "./gate.ts";
 import { readJsonFile, stripBom } from "./jsonio.ts";
 import { layout } from "./layout.ts";
 import type { MachineDecl, MachineInstance } from "./machine.ts";
-import { loadMachine, loadSession, loadSystematic } from "./machines/load.ts";
+import { loadIterationMachine, loadMachine, loadSession, loadSystematic } from "./machines/load.ts";
 import { loadModules, type ModuleStatus } from "./modules.ts";
 import type { TollUpdate } from "./toll.ts";
 
@@ -139,7 +139,7 @@ export function projectState(root: string): ProjectionState {
         for (const f of readdirSync(evidenceDir).sort()) {
           const ev = readJsonFile<{ state: string; at: string; payload: Record<string, unknown> }>(join(evidenceDir, f));
           if (ev.state === "declare_goal" && goal === undefined) goal = String(ev.payload.goal ?? "");
-          if (ev.state === "verify") {
+          if ((ev.state === "verify" || ev.state === "verification") && (lastVerify === null || ev.at > lastVerify.at)) {
             const exit = Number(ev.payload.exit ?? -1);
             lastVerify = { ok: exit === 0, exit, at: ev.at, iteration: inst.iteration };
           }
@@ -250,6 +250,36 @@ export function projectState(root: string): ProjectionState {
     });
   }
 
+  // A seeded sub-machine renders as the third frame: session > iteration > chunks.
+  if (openView !== undefined && openMachine !== null) {
+    const cur = openMachine.states.find((s) => s.id === openView.current);
+    if (cur?.submachine !== undefined) {
+      const subPath = join(layout.iterationDir(abs, openView.id), `sub-${cur.id}.json`);
+      if (existsSync(subPath)) {
+        const child = readJsonFile<MachineInstance>(subPath);
+        const childDecl =
+          cur.submachine === "iteration"
+            ? loadIterationMachine(abs, openView.id, cur.id)
+            : loadMachine(abs, cur.submachine.replace(/^se\.machine-/, ""));
+        if (childDecl !== null) {
+          const childDone = new Set(child.history.filter((h) => h.outcome === "filled").map((h) => h.state));
+          machineStack.push({
+            id: childDecl.id,
+            current: child.current,
+            states: childDecl.states.map((s) => ({
+              id: s.id,
+              kind: s.kind,
+              ...(s.group !== undefined ? { group: s.group } : {}),
+              status: s.id === child.current ? ("current" as const) : childDone.has(s.id) ? ("done" as const) : ("future" as const),
+              statement: s.statement,
+              guidance: s.guidance,
+            })),
+          });
+        }
+      }
+    }
+  }
+
   return {
     product,
     root: abs,
@@ -266,8 +296,15 @@ export function projectState(root: string): ProjectionState {
     last_verify: lastVerify,
     machine_stack: machineStack,
     calls,
-    notes: jsonLines<NoteLine>(tailText(layout.notesPath(abs))).slice(-10).reverse(),
+    notes: liveNotes(abs).slice(-10).reverse(),
   };
+}
+
+/** The inbox minus drained notes: a disposition line retires its target. */
+function liveNotes(abs: string): NoteLine[] {
+  const lines = jsonLines<NoteLine & { drain_of?: string }>(tailText(layout.notesPath(abs)));
+  const drained = new Set(lines.filter((l) => l.drain_of !== undefined).map((l) => l.drain_of));
+  return lines.filter((l) => l.ref !== undefined && !drained.has(l.ref));
 }
 
 /** The boot handover, rendered from the projection — the file is dead. */

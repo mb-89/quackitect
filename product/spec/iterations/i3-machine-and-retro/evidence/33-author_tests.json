@@ -1,0 +1,8 @@
+{
+  "iteration": "i3-machine-and-retro",
+  "state": "author_tests",
+  "at": "2026-07-24T09:24:55.518Z",
+  "payload": {
+    "checks": "Fully authored RED now (2 new files): tests/executor.test.ts - req-exec-parallel (all-fired activation), req-exec-tokens (adoption active=[current], current===active[0] consistency, join hold, terminal close), req-exec-multi-agent mechanical half (claim routing, claims recorded; the live half stays its declared demonstration), plus the SP1 verdict as law (2x100 concurrent mutations, zero lost - run-4dec3ea07f16 seeded it); tests/laws.test.ts - req-commit-window (refuse/open/close), req-1s-interactive + req-verify-milestone-scope (startRun returns a handle under 1s, completion observable), req-toll-submit (submit without update refused), req-boot-project (refusal names asking the owner), req-log-hygiene (one line, clause carried). Authored red WITH their build chunk (named check each, red before the chunk builds): req-offer-lane (queue replace/dismiss), req-exec-seed (sub-machine instantiation), req-state-inherit (inherit evidence accepted), req-log-aggregate (filter/group/count query), req-process-lane (owned-only list/stop), req-apply-ergonomics (execute-by-hash without resend), req-search-roots (declared root served, undeclared refused), req-link-rename (inbound links rewritten), req-plan-ops (renumber planned, refuse started), req-retro-drain (drained leaves count), req-projection-verify (timestamp beats folder order), req-test-lane (suite refused outside verification states), req-grant-role (no usernames in grants). Review-class residue, per their declared methods: req-hot-reload + multi-agent live (demonstration at the gate), req-board-parallel + req-lean-strike (inspection at the gate)."
+  }
+}

@@ -1,7 +1,7 @@
 ---
 id: se.req-test-lane
 kind: requirement
-statement: When a session requests a test run outside a milestone verification state, the engine shall refuse with a remedy; inside one, a single call shall run the declared suite as a background run.
+statement: When a session requests a test run outside a milestone verification state, the engine shall refuse with a remedy; inside one, a single call shall run the declared suite OR a named individual test as a background run.
 provenance:
   iteration: i3-machine-and-retro
   ai_involvement: agent-drafted

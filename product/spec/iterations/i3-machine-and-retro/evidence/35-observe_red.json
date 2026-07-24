@@ -1,0 +1,8 @@
+{
+  "iteration": "i3-machine-and-retro",
+  "state": "observe_red",
+  "at": "2026-07-24T09:25:47.537Z",
+  "payload": {
+    "red_observed": "run-892543fa9e6c (engine-captured): 2 files, 0 pass, 2 fail. executor.test.ts fails at load - ERR_MODULE_NOT_FOUND engine/instance.ts (the designed lock+atomic instance lane does not exist yet), which reds every token/join/claim/concurrency check inside it. laws.test.ts fails at load - engine/git.ts exports no assertCommitWindow/openCommitWindow/closeCommitWindow, which reds the window, run-handle, toll, boot and log-hygiene checks behind it. Chunk-scheduled checks (C5-C9) will observe their own red per chunk before that chunk builds, per the plan. No new check is green without realized design."
+  }
+}

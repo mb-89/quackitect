@@ -1,8 +1,10 @@
 {
   "machine": "systematic",
   "iteration": "i3-machine-and-retro",
-  "current": "author_tests",
-  "counters": {},
+  "current": "fill_story_evidence",
+  "counters": {
+    "verification_attempts": 1
+  },
   "history": [
     {
       "state": "onboard_retro",
@@ -195,6 +197,54 @@
       "outcome": "filled",
       "evidence": "grant:393a250df0ea",
       "at": "2026-07-24T09:21:22.652Z"
+    },
+    {
+      "state": "author_tests",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i3-machine-and-retro/evidence/33-author_tests.json",
+      "at": "2026-07-24T09:24:55.521Z"
+    },
+    {
+      "state": "plan_build",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i3-machine-and-retro/evidence/34-plan_build.json",
+      "at": "2026-07-24T09:25:20.645Z"
+    },
+    {
+      "state": "observe_red",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i3-machine-and-retro/evidence/35-observe_red.json",
+      "at": "2026-07-24T09:25:47.537Z"
+    },
+    {
+      "state": "verification",
+      "outcome": "failed",
+      "evidence": "run-73a47e88ddb6",
+      "at": "2026-07-24T09:25:49.626Z"
+    },
+    {
+      "state": "fix_findings",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i3-machine-and-retro/evidence/37-fix_findings.json",
+      "at": "2026-07-24T09:38:08.385Z"
+    },
+    {
+      "state": "fix_findings",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i3-machine-and-retro/evidence/38-fix_findings.json",
+      "at": "2026-07-24T09:44:49.351Z"
+    },
+    {
+      "state": "verification",
+      "outcome": "filled",
+      "evidence": "run-1fcefa68394a",
+      "at": "2026-07-24T09:45:21.599Z"
+    },
+    {
+      "state": "gate_implementation",
+      "outcome": "filled",
+      "evidence": "grant:951843654728",
+      "at": "2026-07-24T10:08:00.770Z"
     }
   ],
   "escapes": [],

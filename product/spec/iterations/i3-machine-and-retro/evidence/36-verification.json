@@ -1,0 +1,28 @@
+{
+  "iteration": "i3-machine-and-retro",
+  "state": "verification",
+  "at": "2026-07-24T09:25:49.625Z",
+  "payload": {
+    "run_ref": "run-73a47e88ddb6",
+    "command": "npm --prefix product/deliverable run verify --loglevel=error",
+    "exit": 2
+  },
+  "pinned_run": {
+    "ref": "run-73a47e88ddb6",
+    "ts": "2026-07-24T09:25:49.625Z",
+    "se_version": "2.0.0-bootstrap",
+    "tool": "se.run",
+    "args": {
+      "command": "npm --prefix product/deliverable run verify --loglevel=error",
+      "cwd": "C:\\Users\\ichbi\\Desktop\\ai\\quackitect-v2"
+    },
+    "ok": false,
+    "duration_ms": 2085,
+    "detail": {
+      "command": "npm --prefix product/deliverable run verify --loglevel=error",
+      "exit": 2,
+      "stdout": "\n> quackitect@2.0.0-bootstrap verify\n> npm run typecheck && npm test\n\n\n> quackitect@2.0.0-bootstrap typecheck\n> tsc --noEmit\n\ntests/executor.test.ts(13,10): error TS2305: Module '\"../engine/machine.ts\"' has no exported member 'activeStates'.\r\ntests/executor.test.ts(13,24): error TS2305: Module '\"../engine/machine.ts\"' has no exported member 'completeState'.\r\ntests/executor.test.ts(14,63): error TS2307: Cannot find module '../engine/instance.ts' or its corresponding type declarations.\r\ntests/executor.test.ts(129,43): error TS2307: Cannot find module '../engine/instance.ts' or its corresponding type declarations.\r\ntests/laws.test.ts(14,10): error TS2305: Module '\"../engine/git.ts\"' has no exported member 'assertCommitWindow'.\r\ntests/laws.test.ts(14,30): error TS2305: Module '\"../engine/git.ts\"' has no exported member 'openCommitWindow'.\r\ntests/laws.test.ts(14,48): error TS2305: Module '\"../engine/git.ts\"' has no exported member 'closeCommitWindow'.\r\ntests/laws.test.ts(15,10): error TS2305: Module '\"../engine/run.ts\"' has no exported member 'startRun'.\r\ntests/laws.test.ts(15,20): error TS2305: Module '\"../engine/run.ts\"' has no exported member 'runStatus'.\r\ntests/laws.test.ts(74,103): error TS2339: Property 'payload' does not exist on type 'Rejection'.\r\ntests/laws.test.ts(76,53): error TS2554: Expected 2-4 arguments, but got 5.\r\ntests/laws.test.ts(87,9): error TS2339: Property 'appendFailure' does not exist on type 'CallLog'.\r\n",
+      "stderr": ""
+    }
+  }
+}

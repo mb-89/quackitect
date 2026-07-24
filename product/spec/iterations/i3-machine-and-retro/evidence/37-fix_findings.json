@@ -1,0 +1,27 @@
+{
+  "iteration": "i3-machine-and-retro",
+  "state": "fix_findings",
+  "at": "2026-07-24T09:38:08.385Z",
+  "payload": {
+    "findings_fixed": "All findings from the red battery (run-892543fa, run-a21ff656, run-44c1e779) collected and fixed in ONE pass. (1) Missing designed modules: engine/instance.ts built - mkdir-lock, temp+rename atomic writes, mutateInstance, claimState; machine.ts gained the token set (active/fired/claims), activeStates and completeState with all-fired-join consumption. (2) Missing run handles: startRun/runStatus in run.ts - detached wrapper writes its own done-file, survives engine restarts. (3) Missing guards: commit window in git.ts (opened by gate.bless, closed by loop.submit, enforced on se_git commit), toll refuses update-less submits (SE-C-046) and the floor tightened to 5 min, boot refuses unnamed projects (SE-C-007) with the ask-the-owner remedy, calllog.appendFailure carries clause+reason. (4) Test-harness defect: the concurrency test forked the test file itself - children re-ran the suite and crashed the reporter; isolated into tests/conc-worker.ts. (5) Law-sweep fallout, amended in the same walk: boot tests name their project, mcp fixture carries a nameplate and boots with it, compile test matches the drawn machine as it now is (onboard_retro entry, 47 states, 10 gates). Suite after the pass: 89/89 green (run-c78143bd). Register amendment carried to the gate: req-test-lane now covers named individual tests (owner ruling mid-build). Live proof en passant: THIS submit was refused by the freshly built SE-C-046 until it carried an update - the hot reload and the guard both work in production.",
+    "run_ref": "run-c78143bdd7df"
+  },
+  "pinned_run": {
+    "ref": "run-c78143bdd7df",
+    "ts": "2026-07-24T09:36:46.782Z",
+    "se_version": "2.0.0-bootstrap",
+    "tool": "se.run",
+    "args": {
+      "command": "cd product/deliverable && node --test --experimental-strip-types \"tests/*.test.ts\" 2>&1 | grep -E \"^(✖|ℹ (tests|pass|fail))\" | head -20",
+      "cwd": "C:\\Users\\ichbi\\Desktop\\ai\\quackitect-v2"
+    },
+    "ok": true,
+    "duration_ms": 4203,
+    "detail": {
+      "command": "cd product/deliverable && node --test --experimental-strip-types \"tests/*.test.ts\" 2>&1 | grep -E \"^(✖|ℹ (tests|pass|fail))\" | head -20",
+      "exit": 0,
+      "stdout": "ℹ tests 89\nℹ pass 89\nℹ fail 0\n",
+      "stderr": ""
+    }
+  }
+}
