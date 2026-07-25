@@ -28,6 +28,12 @@ Write plainly. These are rules, not suggestions. They bind every output: chat, d
 - Lead each item with its key word.
 - Link the referent. An item that points at a file, note, or URL carries it as a link.
 
+### Identifiers
+- Expand every identifier in the message that uses it. Never assume an id travels.
+- The reader adjudicates from chat and the board. They have not read the evidence files where the ids live.
+- Prefer the plain phrase. Use the id only where traceability needs it.
+- An unexpanded id reads as precision and carries nothing.
+
 ### AI involvement
 - The AI-involvement marks measure involvement. Never quality. Never trust.
 - The author owns all published content, whatever the AI share. "The AI wrote it, I did not review it" is unacceptable.
