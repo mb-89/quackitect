@@ -13,7 +13,7 @@ import { loadMachine } from "../engine/machines/load.ts";
 import { Loop } from "../engine/loop.ts";
 import { Gate } from "../engine/gate.ts";
 import { shipMerge } from "../engine/worktree.ts";
-import { plantMachines } from "./fixtures.ts";
+import { plantMachines, ROUNDS } from "./fixtures.ts";
 
 const git = (c: string, cwd: string): string => execSync(`git ${c}`, { cwd, encoding: "utf8" }).trim();
 
@@ -42,7 +42,7 @@ test("R7/F2 LIVE E2E: default-provisioned iteration walks + gates from the trunk
     // Walk from the TRUNK server (each submit routes to the worktree instance).
     srv().submit({ goal: "g", load_bearing_for: "l", exit_check: "e" }); // declare_goal
     srv().submit({ changed: "c" }); // do_work -> verify (engine no-op) auto-runs
-    const offered = srv().submit({ exit_check_result: "done" }); // close_iteration gate -> offer
+    const offered = srv().submit({ exit_check_result: "done", ...ROUNDS }); // close_iteration gate -> offer
     assert.equal(offered.kind, "gate_offered", "the close gate offered, live, from the trunk server");
 
     // Bless (a human channel). Since i5d the FINAL BLESS performs the close
@@ -53,7 +53,10 @@ test("R7/F2 LIVE E2E: default-provisioned iteration walks + gates from the trunk
     assert.notEqual(git("rev-parse HEAD", root), trunkBefore, "the close merged the branch to trunk");
     assert.match(git("tag --list iter/demo", root), /iter\/demo/, "the record is named by its tag");
     assert.ok(!existsSync(wt), "the shipped tree retired");
-    assert.match(git("branch --list iter/demo", root), /iter\/demo/, "the branch stays for history");
+    // i12: the branch is deleted after a successful merge — the tag carries the
+// name, and the merge's second parent carries the history.
+assert.equal(git("branch --list iter/demo", root), "", "the branch goes after the merge");
+assert.match(git("tag --list iter/demo", root), /iter\/demo/, "the tag remains as the readable name");
     assert.equal(shipMerge(root, "demo").merged, false, "a second close is a no-op refusal, never a double merge");
   } finally {
     try { rmSync(root, { recursive: true, force: true, maxRetries: 20, retryDelay: 100 }); } catch { /* temp cleanup is best-effort */ }

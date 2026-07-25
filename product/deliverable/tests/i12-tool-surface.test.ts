@@ -69,6 +69,51 @@ test("R3/R5: search reaches the working tree AND a ref, and says which", () => {
   }
 });
 
+test("R3: A MATCH CARRIES ITS CONTEXT, in ONE call, from the tree", () => {
+  const root = fixture();
+  try {
+    const r = searchProduct(root, "NEEDLE", { context: 1 });
+    assert.equal(r.hits.length, 1);
+    const h = r.hits[0];
+    assert.equal(h.line, 2);
+    assert.deepEqual(h.before, ["const a = 1;"], "the line before comes WITH the match");
+    assert.deepEqual(h.after, ["const CHANGED = 9;"], "and the line after");
+    // THE CHECK THE FIRST PASS NEVER HAD. It returned locations only and an ADR
+    // explained why context belonged in a separate read — the requirement was
+    // retired to fit the tool. This asserts the requirement's own words:
+    // "a caller-specified number of surrounding lines", in one call.
+    assert.ok(h.before !== undefined && h.after !== undefined, "context is part of the RESULT, not a second call");
+  } finally {
+    drop(root);
+  }
+});
+
+test("R3: a match carries its context from a REF too - the provider differs, the contract does not", () => {
+  const root = fixture();
+  try {
+    const r = searchProduct(root, "NEEDLE", { ref: "iter/x", context: 1 });
+    assert.equal(r.hits.length, 1);
+    const h = r.hits[0];
+    assert.equal(h.source, "iter/x");
+    assert.deepEqual(h.before, ["const a = 1;"]);
+    assert.deepEqual(h.after, ["const b = 3;"], "the committed line, not the working tree's");
+  } finally {
+    drop(root);
+  }
+});
+
+test("R3: context is opt-in and bounded - no context asked, none returned", () => {
+  const root = fixture();
+  try {
+    const none = searchProduct(root, "NEEDLE", {});
+    assert.equal(none.hits[0].before, undefined, "asking for no context returns none");
+    const huge = searchProduct(root, "NEEDLE", { context: 9999 });
+    assert.ok((huge.hits[0].before ?? []).length <= 20, "context is capped, not unbounded");
+  } finally {
+    drop(root);
+  }
+});
+
 test("R5: the record and the tree genuinely differ - a ref search sees the committed bytes", () => {
   const root = fixture();
   try {

@@ -171,6 +171,33 @@ export function reopenStates(
   // fuel left over from the walk being replaced.
   inst.fired = (inst.fired ?? []).filter((key) => !cone.has(key.split("->")[0]));
 
+  // RE-ARM THE JOINS FROM OUTSIDE. A state in the cone may be an AND-join fed
+  // by states that are NOT being reopened and remain done. Their edges fired
+  // once and were CONSUMED when the join first activated, so after a reopen
+  // that fuel is gone and nothing will ever produce it again — the walk
+  // reaches the join and stops dead, with no error and no legal move.
+  //
+  // Found the first time reopen was used in anger: gate_inputs is a three-way
+  // join (draw_context, map_stakeholders, generalize_use_cases). Reopening
+  // write_stories re-walked one of the three; the other two stayed correctly
+  // done, and the gate became unreachable.
+  //
+  // So: for every edge crossing INTO the cone from a source outside it, put
+  // the fuel back if that source is still filled. Not if it is superseded —
+  // then it is being re-walked and will fire on its own.
+  const stillDone = new Set(
+    inst.history.filter((h) => h.outcome === "filled" && !cone.has(h.state)).map((h) => h.state),
+  );
+  for (const src of m.states) {
+    if (cone.has(src.id) || !stillDone.has(src.id)) continue;
+    for (const e of src.edges) {
+      if (!cone.has(e.to)) continue;
+      if (e.role !== "normal" && e.role !== "approval") continue;
+      const key = `${src.id}->${e.to}`;
+      if (!inst.fired.includes(key)) inst.fired.push(key);
+    }
+  }
+
   // Supersede prior fills in the cone — kept, not erased.
   let superseded = 0;
   for (const h of inst.history) {

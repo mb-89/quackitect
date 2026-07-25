@@ -1,7 +1,7 @@
 {
   "machine": "systematic",
   "iteration": "i12-tool-surface",
-  "current": "draw_context",
+  "current": "write_requirements",
   "counters": {},
   "history": [
     {
@@ -279,15 +279,61 @@
       "outcome": "filled",
       "evidence": "grant:9e56a314ae0c",
       "at": "2026-07-25T15:40:00.546Z"
+    },
+    {
+      "state": "draw_context",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i12-tool-surface/evidence/draw_context-3.json",
+      "at": "2026-07-25T16:27:59.283Z"
+    },
+    {
+      "state": "map_stakeholders",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i12-tool-surface/evidence/map_stakeholders-3.json",
+      "at": "2026-07-25T16:28:28.815Z"
+    },
+    {
+      "state": "write_stories",
+      "outcome": "superseded",
+      "evidence": "product/spec/iterations/i12-tool-surface/evidence/write_stories-3.json",
+      "at": "2026-07-25T16:30:30.771Z"
+    },
+    {
+      "state": "generalize_use_cases",
+      "outcome": "superseded",
+      "evidence": "product/spec/iterations/i12-tool-surface/evidence/generalize_use_cases-3.json",
+      "at": "2026-07-25T16:31:22.849Z"
+    },
+    {
+      "state": "write_stories",
+      "outcome": "reopened",
+      "evidence": "Verdict of gate_inputs, 2026-07-25. Three needs in the register have no story and therefore no use case: N3 (know the rules that bind this step — guidance arrives resolved in the packet), N8 (the record survives carelessness — evidence outlives a deleted tag or a flagless push), N9 (the audit distin",
+      "at": "2026-07-25T16:34:47.096Z"
+    },
+    {
+      "state": "write_stories",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i12-tool-surface/evidence/write_stories-5.json",
+      "at": "2026-07-25T16:35:46.294Z"
+    },
+    {
+      "state": "generalize_use_cases",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i12-tool-surface/evidence/generalize_use_cases-4.json",
+      "at": "2026-07-25T16:36:48.877Z"
+    },
+    {
+      "state": "gate_inputs",
+      "outcome": "filled",
+      "evidence": "grant:c07e076c7042",
+      "at": "2026-07-25T16:46:55.641Z"
     }
   ],
   "escapes": [],
   "status": "open",
   "fired": [],
   "active": [
-    "draw_context",
-    "map_stakeholders",
-    "write_stories"
+    "write_requirements"
   ],
   "claims": {}
 }

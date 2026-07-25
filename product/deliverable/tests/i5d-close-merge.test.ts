@@ -16,7 +16,7 @@ import { provisionWorktree, shipMerge, commitMilestone, isEventPath, iterationTa
 import { Loop } from "../engine/loop.ts";
 import { Gate } from "../engine/gate.ts";
 import { loadMachine } from "../engine/machines/load.ts";
-import { plantMachines } from "./fixtures.ts";
+import { plantMachines, ROUNDS } from "./fixtures.ts";
 
 const git = (args: string[], cwd: string): string =>
   execFileSync("git", args, { cwd, encoding: "utf8" }).trim();
@@ -302,7 +302,7 @@ test("THE SHIP PATH ITSELF SPLITS: closing an iteration through the loop merges,
 
     loop().submit({ goal: "g", load_bearing_for: "l", exit_check: "e" });
     loop().submit({ changed: "c" });
-    const offered = loop().submit({ exit_check_result: "done" });
+    const offered = loop().submit({ exit_check_result: "done", ...ROUNDS }); // i12: a gate carries its four rounds or is refused
     new Gate(wt).bless(lean, offered.offer_hash!, { channel: "test", adjudicated_by: "agent" });
 
     // Nobody calls shipMerge here - blessing the final gate must do the split,

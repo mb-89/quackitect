@@ -30,7 +30,14 @@ test("projection carries product, iterations with goals and steps, offer and cal
     loop.start("i0-proj");
     loop.submit({ goal: "the projected goal", load_bearing_for: "l", exit_check: "e" });
     loop.submit({ changed: "c" });
-    const p = loop.submit({ exit_check_result: "done" });
+    // i12: a gate submit carries the four standard rounds or is refused.
+    const p = loop.submit({
+      exit_check_result: "done",
+      verify_round: "the input state delivered; evidence matches claim",
+      validate_round: "meets the fixture's intent: a projectable open iteration",
+      redteam_round: "kill-criterion: the projection reads a state the walk never reached. Looked: the offer exists. Trivial fixture gate",
+      verdict: "pass",
+    });
     assert.equal(p.kind, "gate_offered");
 
     const s = projectState(root);

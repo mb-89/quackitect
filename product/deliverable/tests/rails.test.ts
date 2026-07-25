@@ -17,7 +17,7 @@ import { seWait } from "../engine/wait.ts";
 import { coreTools } from "../engine/tools.ts";
 import { layout } from "../engine/layout.ts";
 import { loadMachine } from "../engine/machines/load.ts";
-import { plantMachines } from "./fixtures.ts";
+import { plantMachines, ROUNDS } from "./fixtures.ts";
 import { Rejection } from "../engine/errors.ts";
 import type { MachineDecl } from "../engine/machine.ts";
 
@@ -37,7 +37,7 @@ function reachGate(root: string): string {
   loop.start("i0-gate");
   loop.submit({ goal: "g", load_bearing_for: "l", exit_check: "e" });
   loop.submit({ changed: "c" });
-  const p = loop.submit({ exit_check_result: "done" });
+  const p = loop.submit({ exit_check_result: "done", ...ROUNDS });
   assert.equal(p.kind, "gate_offered");
   return p.offer_hash!;
 }

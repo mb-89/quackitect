@@ -12,7 +12,7 @@ process.env.SE_STATE_DIR = mkdtempSync(join(tmpdir(), "se-state-"));
 import { layout } from "../engine/layout.ts";
 import { Loop } from "../engine/loop.ts";
 import { loadMachine } from "../engine/machines/load.ts";
-import { plantMachines } from "./fixtures.ts";
+import { plantMachines, ROUNDS } from "./fixtures.ts";
 import { PhoneLane, type Transport, type PhoneAnswer } from "../engine/phone.ts";
 import { CallLog } from "../engine/calllog.ts";
 
@@ -46,7 +46,7 @@ const reachOffer = (root: string): string => {
   loop.start("i0-phone");
   loop.submit({ goal: "g", load_bearing_for: "l", exit_check: "e" });
   loop.submit({ changed: "c" });
-  const p = loop.submit({ exit_check_result: "done" });
+  const p = loop.submit({ exit_check_result: "done", ...ROUNDS });
   return p.offer_hash!;
 };
 
