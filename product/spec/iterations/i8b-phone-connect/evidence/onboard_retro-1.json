@@ -1,0 +1,12 @@
+{
+  "iteration": "i8b-phone-connect",
+  "state": "onboard_retro",
+  "at": "2026-07-24T15:01:53.512Z",
+  "payload": {
+    "field_feedback": "Direct owner feedback since the i8 ship (the owner is back and present): (1) surprised i8 finished without a LIVE phone pairing - the phone lane needs a real end-to-end test, and there was no easy way to pair; (2) wants a top-middle TOOLBAR of small icons (book once it exists, phone-connect now); clicking the phone icon should pop a QR CODE into the details pane to scan-and-connect; (3) the split-mechanical-vs-judgment iteration rule for future starts. Items (1)+(2) ARE this iteration - i8b makes the phone lane testable by making pairing a one-click QR act.",
+    "notes_drained": "15 in the inbox, 15 after - none drained: the fresh split-iterations note (note-34ca555b2351) is a working rule that belongs in guidance-retro-independence's durable home (route it there when the terms/guidance sweep runs, not force-drained mid-iteration); the other 14 are the standing owner-judgment set (i9 board consolidation, ETA redesign, test-command, subagent parallelism, method-drawing leads) kept with their reasons. The QR-connect note's CONTENT is being built now, so it stays live until i8b ships and drains it.",
+    "call_log_mined": "Since i8 open: exactly 1 failure, clauseless (an errored call, likely the head-pipe probe). Zero clause rejections, zero se_help misses across the entire i8 build - the cleanest run yet, which fits: i8's design was inherited and mature, so the machinery had little to refuse. No new tool demand. The only standing determinizer lead unchanged: the dedicated test command (note).",
+    "waste_leads": "None this run - no rework, no reversal, no reinvention; i8 was one clean red-first pass at 135/135. The inherited-design pattern (realize an owner-ruled v1 decision) proved efficient: the design gates moved fast because the decisions were already made and red-teamed.",
+    "process_stale": "Checked against the state of the art for pairing UX (QR-to-connect is the universal pattern - WhatsApp Web, Home Assistant, ntfy's own app all pair by QR): the owner's ask IS the current standard, and i8's hand-edit-a-config pairing was the stale part - i8b closes exactly that gap. The split-mechanical-vs-judgment rule is a genuine process improvement toward the parallel-iteration future; homed in the note for guidance-retro-independence. No other staleness."
+  }
+}

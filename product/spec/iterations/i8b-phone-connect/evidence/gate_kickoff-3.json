@@ -1,0 +1,13 @@
+{
+  "iteration": "i8b-phone-connect",
+  "state": "gate_kickoff",
+  "at": "2026-07-24T15:19:18.918Z",
+  "payload": {
+    "retro_drained": "Done WITH the owner. Inbox 15 -> 13: two drained (note-4e764ab29ee4 the delegated-bless mis-stamp -> its committed ledger node se.note-grant-stamp-correction; note-34ca555b2351 the split-rule -> folded into guidance-retro-independence as the first mechanical-vs-judgment cut). 13 kept with reasons (i9 board cluster, method-drawing ideas, ETA-redesign/test-command/parallel-subagents discussions, i6 trace-hierarchy). New: se.decision-refine-mode + se.note-engine-determinizers. Field feedback (owner): the delegated run went fine; i8 shipping without a live phone test is accepted (owner authorized solo work) and i8b closes it.",
+    "goal": "The board gets a top-middle toolbar; a phone-connect icon pops a locally-generated QR into the details pane so the owner scans to pair the phone lane - making the from-away bless testable for the first time.",
+    "pulled_in": "Owner feedback (present): a top-middle toolbar of small icons; a greyed book icon (until i6); a phone-connect icon whose click renders a QR in the details pane; the connect FLOW - engine generates the ntfy topic pair, writes ~/.se/<project>/phone.json, renders the QR LOCALLY zero-dep (no external image service). Closes raid-phone-live-pairing. Owner CONFIRMED: the config-write amends adr-phone-secret-machine-local (acceptable - topic-possession authenticity), and local zero-dep QR.",
+    "left_out": "The book itself + open action (i6, icon greyed); other toolbar icons (future); non-ntfy channels; the i8 bless mechanics (unchanged); QR decoding/inbound (the phone app subscribes; we only encode).",
+    "rigor": "REFINE (se.decision-refine-mode): i8b iterates on shipped i8, so design-input is reduced - M1 a short delta, M2 inherits i8's context/stakeholders, M3 only the new requirements (toolbar, QR-render, connect-flow, config-write amendment), M4/M5 the one real decision (config-write amendment), M6 the one new unknown (zero-dep QR encoder); M7-M9 full. Systematic-locked so walked light, not state-dropped. Owner-attended - the owner blesses each gate.",
+    "offer_hash": "965ce832cdabfb56369c738f5e1d3e07d33ce81b17eabec572d2c1896fd16dfd"
+  }
+}

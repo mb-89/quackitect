@@ -1,0 +1,11 @@
+{
+  "iteration": "i8b-phone-connect",
+  "state": "draft_vision",
+  "at": "2026-07-24T15:36:19.009Z",
+  "payload": {
+    "big_idea": "Inherit se.vision and i8's phone-lane vision unchanged. The i8b delta in one breath: the phone lane i8 built and mock-proved becomes PAIRABLE in one gesture - the board grows a top-middle toolbar; a phone-connect icon renders a QR in the details pane; the owner scans it and the phone is live, so a from-away bless is testable for the first time. Lineage: i8's paired-topic bless path (adr-answer-authenticity, adr-ntfy-actions), now given its missing on-ramp. Two carried fixes ride along: the refine machine-variant (seed from systematic, then remove the design-input states a reuse iteration does not need) and the offer-reappear fix.",
+    "to_be_world": "Inherit i8's to-be world; the delta scene: the owner opens the board, clicks the phone icon in the new top-middle toolbar, and a QR appears in the details pane. They scan it with their phone's ntfy app. The topic is now paired - generated locally, written to ~/.se/<project>/phone.json, never sent anywhere. From then on a gate offer buzzes their phone, and one tap blesses it from away - the thing i8 built but could never test without this pairing gesture.",
+    "goal_system": "Inherited goals unchanged; the delta priorities, conflicts named: (1) pairing is ONE gesture - click, scan, done - not a hand-edited config chore; (2) the topic is a SECRET - generated and QR-encoded locally, never handed to an external image service (conflict: the convenience of a hosted QR API vs the topic staying secret - resolved for secrecy, encode on our side); (3) install stays ONE-CLICK (se.adr-install-over-zerodep) - the QR encoder is vendored or hand-rolled, whichever keeps that; zero-dep is explicitly NOT a goal.",
+    "moore_pitch": "FOR the owner who wants to bless gates from away WHO cannot today because the phone was never paired, THE board's phone-connect toolbar IS a click-then-scan pairing gesture THAT generates the topic, writes the config, and renders a local QR, UNLIKE editing a secret config file by hand, OURS makes the i8 phone lane actually reachable - and testable from away for the first time."
+  }
+}

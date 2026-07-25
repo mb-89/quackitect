@@ -1,0 +1,79 @@
+{
+  "machine": "systematic",
+  "iteration": "i8b-phone-connect",
+  "current": "draw_context",
+  "counters": {},
+  "history": [
+    {
+      "state": "onboard_retro",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i8b-phone-connect/evidence/onboard_retro-1.json",
+      "at": "2026-07-24T15:01:53.512Z"
+    },
+    {
+      "state": "gate_kickoff",
+      "outcome": "filled",
+      "evidence": "grant:74f02ce7d2c7",
+      "at": "2026-07-24T15:34:06.638Z"
+    },
+    {
+      "state": "draft_vision",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i8b-phone-connect/evidence/draft_vision-1.json",
+      "at": "2026-07-24T15:36:19.010Z"
+    },
+    {
+      "state": "log_risks",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i8b-phone-connect/evidence/log_risks-1.json",
+      "at": "2026-07-24T15:37:14.116Z"
+    },
+    {
+      "state": "define_actual",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i8b-phone-connect/evidence/define_actual-1.json",
+      "at": "2026-07-24T15:38:27.638Z"
+    },
+    {
+      "state": "frame_delta",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i8b-phone-connect/evidence/frame_delta-1.json",
+      "at": "2026-07-24T15:39:13.876Z"
+    },
+    {
+      "state": "pressure_test",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i8b-phone-connect/evidence/pressure_test-1.json",
+      "at": "2026-07-24T15:41:06.308Z"
+    },
+    {
+      "state": "scope_non_goals",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i8b-phone-connect/evidence/scope_non_goals-1.json",
+      "at": "2026-07-24T15:42:01.546Z"
+    },
+    {
+      "state": "gate_motivation",
+      "outcome": "filled",
+      "evidence": "grant:92022fa66ee2",
+      "at": "2026-07-24T15:43:08.564Z"
+    },
+    {
+      "state": "draw_context",
+      "outcome": "abandoned",
+      "evidence": "Owner ruling 2026-07-24 (Option A): worktrees become DEFAULT (not opt-in) and must run live, with local seed/trim machines - to be built as a new iteration i5b on trunk first (folds in the two logged i5 defects: opt-in narrowing note-e8a12b600638, untested-live note-6815f9db4930). The current i8b was barely started (M2, kickoff+motivation blessed) and is dropped, KEPT AS INSPIRATION - its evidence files remain under spec/iterations/i8b-phone-connect/. A fresh phone-connect iteration re-opens on the branched infra after i5b ships.",
+      "at": "2026-07-24T16:03:24.489Z"
+    }
+  ],
+  "escapes": [],
+  "status": "abandoned",
+  "fired": [],
+  "active": [
+    "draw_context",
+    "map_stakeholders",
+    "write_stories"
+  ],
+  "claims": {
+    "draw_context": "post-crash"
+  }
+}

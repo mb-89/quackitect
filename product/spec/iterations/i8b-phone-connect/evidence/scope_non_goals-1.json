@@ -1,0 +1,9 @@
+{
+  "iteration": "i8b-phone-connect",
+  "state": "scope_non_goals",
+  "at": "2026-07-24T15:42:01.546Z",
+  "payload": {
+    "scope": "i8b takes on:\n- A top-middle board toolbar of small icons: a greyed book placeholder (until i6) and an active phone-connect icon.\n- The connect action: clicking phone-connect generates the ntfy topic pair, writes ~/.se/<project>/phone.json (enabled), and renders a locally-encoded QR in the details pane.\n- The offer-reappear fix: a blessed or dismissed offer stays gone (red-first test).\n- The refine machine-variant: seed from systematic, strike M2/M4/M5, and switch i8b's own machine to it so its remaining walk is genuinely short.\nAll against the existing i8 bless mechanics, unchanged.",
+    "non_goals": "- The book itself and its open action (i6; the icon ships greyed).\n- Other toolbar icons (future, per feature).\n- Non-ntfy channels.\n- The i8 bless mechanics themselves (unchanged).\n- QR decoding / the inbound side (the phone app subscribes; we only encode a subscribe link).\n- The general lean strike-list over any machine (se.req-lean-strike's broader scope; i8b realizes only the refine cut).\n- Live from-away pairing with the owner's real device (owner-physical; se.raid-phone-live-pairing).\n- Board consolidation beyond the toolbar (i9); the ETA-on-steps redesign (owner discussion)."
+  }
+}

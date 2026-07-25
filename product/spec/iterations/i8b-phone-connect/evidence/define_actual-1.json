@@ -1,0 +1,8 @@
+{
+  "iteration": "i8b-phone-connect",
+  "state": "define_actual",
+  "at": "2026-07-24T15:38:27.638Z",
+  "payload": {
+    "as_is": "Pain 1 - the phone lane has no on-ramp. i8 built and mock-proved the from-away bless, but a real phone cannot be paired: pairing today means hand-creating an ntfy topic and hand-writing ~/.se/<project>/phone.json. So the shipped lane has never been exercised with a real device. Witness: the i8 ship review flags exactly this, the retro's field feedback names it as the one snag, and se.raid-phone-live-pairing stands open.\n\nPain 2 - a blessed or dismissed offer flickers back. When the owner acts on an offer in the panel, it clears but flashes back for one board tick before settling. It is brief but irritating, and it undermines trust that the action landed. Witness: the owner observed it live this session while blessing the i8b kickoff.\n\nPain 3 - a design-reuse iteration is front-heavy. Even when the design is already ruled, the iteration still walks the full systematic design-input states (M2 Understand, M4 Explore, M5 Decide), paying a design cost that has nothing left to decide. Witness: i8 and i8b both exposed this tax; se.decision-refine-mode records the owner's ruling this session to reduce design input for reuse iterations."
+  }
+}

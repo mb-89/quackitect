@@ -1,0 +1,13 @@
+{
+  "iteration": "i8b-phone-connect",
+  "state": "gate_kickoff",
+  "at": "2026-07-24T15:02:46.445Z",
+  "payload": {
+    "retro_drained": "Every inbox note has a recorded disposition: 15 kept with explicit reasons - the fresh split-mechanical-vs-judgment rule (note-34ca555b2351) routed to guidance-retro-independence's durable home at the next guidance sweep, and 14 standing owner-judgment items (i9 board set, ETA redesign, test-command, subagent parallelism, method-drawing leads) kept for their sessions. Nothing force-drained; the QR-connect note drains when i8b ships.",
+    "goal": "The board gets a top-middle toolbar; a phone-connect icon pops a locally-generated QR into the details pane so the owner scans to pair the phone lane - making the from-away bless testable for the first time.",
+    "pulled_in": "From owner feedback (present, today): (1) a top-middle toolbar of small icons on the board; (2) a book icon placeholder (disabled/greyed until i6 ships the book); (3) a phone-connect icon whose click renders a QR in the details pane; (4) the connect FLOW - generate the ntfy topic pair, write ~/.se/<project>/phone.json (enabled), render the QR LOCALLY (zero-dep, never sending the topic to any external image service - the topic is the credential). This closes raid-phone-live-pairing by making pairing one click + one scan. Amends adr-phone-secret-machine-local: the engine MAY generate unguessable topics on an owner-initiated connect (board channel) - topic-possession-as-authenticity is already the accepted model; any private-server token stays owner-provided.",
+    "left_out": "The book itself and the book-open action (i6 - the icon ships greyed). Other toolbar icons (future, per-feature). Any non-ntfy channel. Changing the i8 bless mechanics (unchanged - this only adds the pairing convenience + the QR). The QR-decoding/inbound side (the phone app handles subscribe; we only ENCODE a subscribe link).",
+    "rigor": "Systematic, unpruned. Small but it (a) touches the SECURITY path - the engine now writes the phone credential config, amending a shipped ADR, and (b) carries a real unknown - a correct, zero-dependency QR encoder. Both want the gates (a red-first QR test, a design record for the config-write amendment). No strikes; the iteration is just short.",
+    "offer_hash": "d8e2e5f60d44ce36d08ea30eccbf72b71b174d8cb8fcc4c1975c900ea8f41d24"
+  }
+}
