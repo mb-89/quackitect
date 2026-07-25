@@ -1,0 +1,10 @@
+---
+id: se.raid-the-killer-story-that-could-not-be-demonstrated
+kind: raid
+statement: "A KILLER STORY ENDED THE ITERATION UNFILLABLE. Owner: the next iteration, already ruled and scoped. Trigger: closed when a packet demonstrably carries a rule the agent did not go looking for.\n\nTHE STORY: 'the law minted this afternoon'. Four laws are minted in one afternoon; the agent that will next violate one has never read it, was trained before it existed, and has no reason to search. The packet should CARRY the rule, resolved.\n\nWHAT IS TRUE AT THE CLOSE: nothing carries it. The join is unbuilt, so the story's scenario is exactly as false as it was at the start. Ten notes and four laws were minted during this iteration and none of them will reach a packet tomorrow.\n\nWHY THE SPIKE DID NOT RUN: it required a hand-written answer key BEFORE any selection was run, or the measurement would be rigged. Rushing it inside the remaining budget would have produced the one outcome its own kill condition forbids - picking the least-bad vocabulary and calling it settled. Nothing was built on a guessed selector; the chunk is drawn as blocked rather than filled badly.\n\nWHAT MAKES THIS MORE THAN AN UNFINISHED FEATURE: the iteration demonstrated the failure ON ITSELF. Its first pass recorded a decision about how version-control grep treats untracked files. Two hours later its own rewalk eliminated a candidate on a claim that contradicted that decision. Same iteration, same tool, same agent, one working session - and nothing carried the decision to the state that needed it. If a decision two hours old cannot reach the state it binds, no rule minted last month will.\n\nDESTINATION: the owner has designed the successor in full and ruled it a separate iteration - a tag-joined guidance library in Obsidian-compatible markdown, guidance delivered as hash-bearing LINKS rather than inlined text, a welcome form on entering a state beside the evidence form on leaving one, and the agent declaring which hashes it already holds. Captured as note-8bd6114eceac."
+provenance:
+  iteration: i12-tool-surface
+  ai_involvement: agent-drafted
+---
+
+

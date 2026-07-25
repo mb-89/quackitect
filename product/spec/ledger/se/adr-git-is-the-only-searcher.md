@@ -1,0 +1,10 @@
+---
+id: se.adr-git-is-the-only-searcher
+kind: decision
+statement: "SUPERSEDED AT i12's REWALK - the conclusion was wrong, the analysis was not.\n\nIT SAID: git serves both the working tree and the record; no ripgrep, no second engine. Its deciding argument was that answering ONE question through TWO tools is itself the duplication the no-duplicate-code ruling forbids.\n\nWHY IT FELL, owner ruling 2026-07-25: 'This is not one job. It's two jobs.' Searching a working tree and searching history are different questions with different answers. One tool per job is FIT, not duplication - so the criterion I weighted at 5 (one-implementation-per-job) was my misreading of intent, not the owner's rule, and it carried the winner's entire margin. The owner also named what the first pass had shed: 'we just found out that you need context search, and you need search that limits size - you need that, you didn't have it, and that's when you were slow today.'\n\nSUPERSEDED BY: ripgrep for the working tree (native context, caps, globs, typed --json events, submatch spans) and git grep for any ref (the record and v1 live in git and no tree tool can see them). Two providers, two jobs, one result shape.\n\nWHAT SURVIVES AND SHOULD BE READ: the field scan (three layers - exact, structural, semantic - with sequential escalation), the FRESHNESS veto that disqualifies any index for product files because the agent reads back what it just wrote, the deferral of ast-grep with its trigger, and the probe showing `git grep -z` yields three clean NUL-separated fields. That probe is why git remains the ref provider rather than being replaced too.\n\nTHE LESSON, recorded because it is the reusable part: the analysis was sound and the CRITERION WEIGHT was an interpretation of the owner's intent. I found that exact flip in my own sensitivity analysis, called it 'moderate credibility', and routed it to the owner - then let the arithmetic decide anyway. A flip that turns on reading someone's intent deserves more weight than one that turns on a measurement."
+provenance:
+  iteration: i12-tool-surface
+  ai_involvement: agent-drafted
+---
+
+

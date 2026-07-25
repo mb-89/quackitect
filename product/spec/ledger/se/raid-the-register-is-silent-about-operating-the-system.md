@@ -1,0 +1,10 @@
+---
+id: se.raid-the-register-is-silent-about-operating-the-system
+kind: raid
+statement: "THREE GAPS ON ONE AXIS, FOUND THREE DIFFERENT WAYS, NONE BY A GATE. Owner: the next requirements author. Trigger: any further ask that no check covers and that concerns using the system rather than recording with it.\n\nTHE THREE, each surfaced by the drift indicator at a different gate:\n  1. NOTHING REQUIRES THE SYSTEM TO BE UNOBTRUSIVE WHILE IT RUNS. Found when console windows spawned by the engine were stealing focus badly enough to stop the owner's voice dictation working. Sixteen call sites, fixed and lint-guarded - with no requirement behind any of it.\n  2. NOTHING COVERS THE ENTRY POINT. Found when the one-click installability criterion finally got a definition, two milestones after it started deciding things at maximum weight.\n  3. NOTHING REQUIRED A REFUSAL TO DIAGNOSE rather than merely refuse. Found when the promotion refused five times, correctly each time, and every diagnosis was manual. The owner named it from outside: 'you still have to do too much guessing and fixing by hand.'\n\nTHE PATTERN, which is the entry rather than the three incidents: the register is thorough about what the machine RECORDS and silent about what USING it is like. Thirty-eight requirements cover reading, searching, editing, checking, deciding and preserving. None covers whether the thing is pleasant, quiet, or self-explaining while a person operates it.\n\nWHY IT KEEPS BEING MISSED: every one of these was found by a person noticing, or by an owner complaining. No gate asks 'what is this like to use'. The stories and use cases are written from the agent's side; the owner appears as a stakeholder who READS the record, never as one who OPERATES the tool.\n\nWHAT WOULD FIX IT rather than patch it: a value proposition for the operator, with needs and pass lines, at the framing milestone - so operating the system has a register of its own rather than being discovered in complaints."
+provenance:
+  iteration: i12-tool-surface
+  ai_involvement: agent-drafted
+---
+
+

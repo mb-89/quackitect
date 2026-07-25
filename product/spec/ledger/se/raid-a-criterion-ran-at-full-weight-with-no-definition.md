@@ -1,0 +1,10 @@
+---
+id: se.raid-a-criterion-ran-at-full-weight-with-no-definition
+kind: raid
+statement: "A DECISION CRITERION DECIDED AN ARCHITECTURE WITHOUT EVER BEING DEFINED. Owner: the next decision author. Trigger: any criteria set entering a Pugh run.\n\nWHAT HAPPENED: one-click installability was carried at the heaviest weight through two milestones. It shaped the candidate scoring, it produced the single highest-credibility flip in the sensitivity analysis, and it was the reason an architecture was nearly reversed. Nobody had written down what it MEANT. When the owner was finally asked, the answer changed the score, closed a tripwire, and dissolved most of a risk entry - because the platforms in scope turned out to be three, exotic distributions were explicitly out, and a failed install may simply tell the user what to install.\n\nWHAT NO INSTRUMENT CAUGHT: not a gate, not a review round, not a lint. The criteria state's own form asks for 'the vital few, each with definition, requirement id and weight' - and a sentence WAS present in the definition field. It just described a virtue rather than an observable, and nothing distinguishes those.\n\nTHE CHECKABLE VERSION, which is why this is a register entry rather than a lesson: a criterion's definition must name something OBSERVABLE - a condition that could be met or unmet by a candidate. 'A plain install yields a working tool' is observable. 'Installation is easy' is not. That distinction is close to mechanical and would have fired here.\n\nTHE SHAPE IT SHARES WITH EVERYTHING ELSE IN THIS ITERATION: required in writing, obvious in hindsight, collected by nothing.\n\nTHE SECOND-ORDER LESSON, recorded because it cost the most: a flip that turns on someone's INTENT deserves more weight than one that turns on a measurement. This was flagged in the sensitivity analysis as high-credibility, routed to the owner - and then the walk continued past it anyway. The same mistake is recorded in se.adr-git-is-the-only-searcher, one milestone earlier. Twice in one iteration."
+provenance:
+  iteration: i12-tool-surface
+  ai_involvement: agent-drafted
+---
+
+
