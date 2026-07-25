@@ -206,6 +206,12 @@ export function defaultSuite(cwd: string): SuiteResult {
   // the variable is cleared rather than trusted.
   const env = { ...process.env };
   delete env.NODE_TEST_CONTEXT;
+  // SE_SESSION_FILE points at the LIVE session's admission. A suite that
+  // inherits it is verifying against a session that is already admitted, so
+  // any test asserting that an unadmitted call is refused sees the wrong
+  // world. run.ts scrubs it from every spawned command for this reason; the
+  // suite runner is a spawned command too.
+  delete env.SE_SESSION_FILE;
   try {
     const r = countTests(execFileSync(process.execPath, ["--test", "--test-concurrency=1", ...files], { cwd, encoding: "utf8", maxBuffer: 1 << 26, env }));
     // A run that exits 0 having executed NOTHING is not a pass. Silence is not
