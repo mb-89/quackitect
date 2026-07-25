@@ -10,9 +10,6 @@
     "guards": "node --test tests/guards.test.ts",
     "verify": "npm run typecheck && npm test"
   },
-  "optionalDependencies": {
-    "kb": "file:../../../benjamin"
-  },
   "devDependencies": {
     "@types/node": "24.13.3",
     "typescript": "5.8.3"
