@@ -1,0 +1,8 @@
+{
+  "iteration": "i8c-phone-connect",
+  "state": "build_steps-start",
+  "at": "2026-07-24T20:40:33.649Z",
+  "payload": {
+    "plan": "Chunk order is dependency-linear: c1_qr_encoder (the vendored encoder - the shared dependency) -> c2_connect_engine (uses encodeQR) -> c3_board_tool (uses connectPhone/phonePairingQR). The promoted M6 QR-feasibility spike lands AS c1: it entered pre-proven (qrcode-generator encodes a structurally valid QR), so c1 reduced to exposing the single encodeQR surface plus the loud credit header."
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "iteration": "i8c-phone-connect",
+  "state": "gate_implementation",
+  "at": "2026-07-24T21:06:17.177Z",
+  "payload": {
+    "build_planned": "The chunk machine machines/it/machine-build-steps.canvas was seeded and walked: start -> c1_qr_encoder -> c2_connect_engine -> c3_board_tool -> done, each recorded with what_landed + a green run_ref (run-34fdf73086c7).",
+    "models_adhered": "Three files, all sanctioned by the M4/M5 design: engine/vendor/qrcode.ts (vendored encoder), engine/connect.ts (the pairing surface), bin/se-board.ts (the board tool). No new engine element beyond the phone-connect lane; phoneConfigPath is REUSED from phone.ts (i8), never duplicated.",
+    "red_observed": "All four checks failed before the build: with connect.ts + vendor/qrcode.ts set aside the test could not load (ERR_MODULE_NOT_FOUND) - run-f877b7973e0f.",
+    "designs_realized": "Every requirement has a realized design: connectPhone mints a topic pair, encodes locally, writes phone.json (R1); zero fetch (R2); the vendored encoder yields a valid QR - finder pattern (R3); atomic - no partial config on encode failure (R5); the board tool renders the ntfy:// deep-link QR in the details pane, owner-confirmed live to open the ntfy app.",
+    "verification_green": "Full battery green across all iterations - run-253cc2759fe5 (tsc --noEmit clean + all tests pass, serial). The suite was hardened this milestone (best-effort temp cleanup + serial execution) to defeat the pre-existing Windows parallel flakes; all 34 files also pass individually (run-1c80ce9b598d).",
+    "quality_ok": "DRY held: one config-path home (phone.ts), one deep-link builder, one payload. The vendored encoder carries loud attribution (author/version/license/source) + @ts-nocheck. The board tool follows the click-for-detail rule (no modal). Owner reviewed the icon placement and QR live and approved.",
+    "risks_acceptable": "Risks judged: (a) the topic is the credential - machine-local in ~/.se, never committed; (b) relay transit is the inherited i8 accepted risk (adr-answer-authenticity); (c) two i5 worktree-infra gaps surfaced and were noted (a worktree carries no node_modules; it was cut before the i5c engine fixes) - patched locally for this run, durable fix owed. The live phone-bless test is deferred to the owner (phone paired; lane restored at ship).",
+    "offer_hash": "35e077f7fa0ac173aa84150aa864e2963ad529b06a4b8f98d95b0aef094ec3d0"
+  }
+}

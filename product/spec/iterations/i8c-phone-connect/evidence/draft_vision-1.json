@@ -1,0 +1,11 @@
+{
+  "iteration": "i8c-phone-connect",
+  "state": "draft_vision",
+  "at": "2026-07-24T18:42:06.106Z",
+  "payload": {
+    "big_idea": "Inherit se.vision and i8's phone-lane vision. The i8c delta: i8's from-away bless lane gets its missing ON-RAMP - the board grows a top toolbar; a phone-connect icon renders a locally-encoded QR in the details pane; the owner scans it and the phone is paired, so the from-away bless is testable for the first time. Lineage: i8's paired-topic bless (adr-answer-authenticity, adr-ntfy-actions), the abandoned i8b's toolbar/QR design, now realized on the branched worktree infra (i5b/i5c).",
+    "to_be_world": "Inherit i8's to-be world; the delta scene: the owner clicks the phone icon in the new toolbar; a QR appears in the details pane; they scan it with their ntfy app; the topic is paired - generated locally, written to ~/.se/<project>/phone.json, never sent anywhere. From then on a gate offer buzzes the phone, and one tap blesses from away - the thing i8 built but could never test without this pairing gesture.",
+    "goal_system": "Inherited goals unchanged; delta priorities, conflicts named: (1) pairing is ONE gesture - click, scan, done - not a hand-edited config; (2) the topic is a SECRET - encoded locally, never handed to an external image service (conflict: a hosted QR API's convenience vs the topic staying secret - resolved for secrecy); (3) install stays ONE-CLICK (se.adr-install-over-zerodep) - the QR encoder is vendored or hand-rolled; zero-dep is not the goal.",
+    "moore_pitch": "FOR the owner who wants to bless from away WHO cannot today because the phone was never paired, THE board's phone-connect toolbar IS a click-then-scan pairing gesture THAT generates the topic, writes the config, and renders a local QR, UNLIKE hand-editing a secret config file, OURS makes i8's phone lane reachable - and testable from away for the first time."
+  }
+}

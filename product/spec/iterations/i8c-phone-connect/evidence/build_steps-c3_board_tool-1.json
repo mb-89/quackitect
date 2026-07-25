@@ -1,0 +1,9 @@
+{
+  "iteration": "i8c-phone-connect",
+  "state": "build_steps-c3_board_tool",
+  "at": "2026-07-24T20:41:41.877Z",
+  "payload": {
+    "what_landed": "bin/se-board.ts: a centered #tools strip added to the header (📲 as the first tool, between the product name and the watchdog dots); a POST /connect route calls phonePairingQR(root); a client renderer paints the boolean matrix as an inline SVG QR into the details pane with the caption 'Scan this QR code to link via ntfy.' plus the topic - no modal, click-for-detail per the board rule. Owner-reviewed live: the icon placement was approved and the deep-link QR confirmed to open the ntfy app.",
+    "run_ref": "run-34fdf73086c7 (board.test.ts green: the board still serves its page + projection and carries the owner's bless channel)"
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "iteration": "i8c-phone-connect",
+  "state": "gate_prototype",
+  "at": "2026-07-24T19:08:50.416Z",
+  "payload": {
+    "assumptions_validated": "VALIDATED by real evidence (run-2e1841091b74): the ranked riskiest assumption U1 - can we obtain a correct, scannable, vendorable QR encoder - HOLDS. qrcode-generator encoded an ntfy topic into a valid 29x29 QR matrix (finder pattern present), is npm-fetchable, MIT-licensed, and zero-dep. So K2 (vendor) is feasible and correct; the design did not change. K1 hand-roll stays the recorded fallback only if the ship-review rejects the vendored source.",
+    "buildable": "Yes, evidenced: the connect flow (E1 toolbar, E2 connect action, E4 render) is wiring over i8's phone.json shape + the i5c board surfaces; the one genuinely-new element E3 is a proven vendored source file (copied, no npm dep). The encode is confirmed; the atomic write + no-external-call are straightforward build duties with red-first tests.",
+    "results_recorded": "Spike pinned: run-2e1841091b74 (qrcode-generator encodes a valid QR). Promotions to M7: the vendored source -> E3 (copied into tools/vendor, no runtime dep); the encode confirmation -> F2 (known-answer test); F1/F3/F4/F5/F6 are the red-first build tests. The vendored source is audited at the M9 ship dependency-review.",
+    "offer_hash": "18cece2e2f45b3bef02a919901d54952558958f80f04f463eed868ac18e2b786"
+  }
+}

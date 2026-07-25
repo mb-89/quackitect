@@ -1,0 +1,8 @@
+{
+  "iteration": "i8c-phone-connect",
+  "state": "fix_findings",
+  "at": "2026-07-24T20:53:24.895Z",
+  "payload": {
+    "findings_fixed": "Two findings, both i5 worktree-infra gaps (not i8c code), fixed in one pass so the worktree became verifiable. (1) tsc-not-found: a provisioned worktree carries no node_modules, so `npm run verify`'s typecheck (tsc --noEmit) could not run and short-circuited the battery before any test - fixed by junctioning trunk's node_modules into the worktree (instant, no re-download). (2) stale-engine: the worktree was cut before the i5c engine fixes (layout/worktree/project/gate.ts) were on trunk, so its engine was inconsistent with the current tools.ts and the worktree-aware checks failed - fixed by syncing trunk's current engine+bin+tests into the worktree. Full verify then green: run_ref run-3233cbf873b5 (tsc --noEmit clean; node --test battery exit 0). Both gaps captured as i5-infra follow-ups (provisioning should install/junction deps and fork from the current engine)."
+  }
+}

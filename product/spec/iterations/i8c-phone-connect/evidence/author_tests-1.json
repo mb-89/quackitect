@@ -1,0 +1,8 @@
+{
+  "iteration": "i8c-phone-connect",
+  "state": "author_tests",
+  "at": "2026-07-24T19:55:58.201Z",
+  "payload": {
+    "checks": "Four checks author every in-scope requirement in tests/i8c-phone-connect.test.ts: R1 (connectPhone writes an enabled phone.json with a high-entropy topic and returns a QR module matrix), R2 (secrecy — connect encodes locally, zero fetch calls, the topic never leaves), R3 (the vendored encoder turns a known input into a valid QR: square >=21x21, finder-pattern dark corner + light inner ring), R5 (atomic — an injected encode failure leaves no partial phone.json). Verified via run_ref run-c0f6d83c980e: tests 4, pass 4, fail 0."
+  }
+}

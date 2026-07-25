@@ -1,0 +1,13 @@
+{
+  "iteration": "i8c-phone-connect",
+  "state": "gate_validation",
+  "at": "2026-07-24T21:13:05.161Z",
+  "payload": {
+    "meets_need": "The need - pair a phone in one gesture from the board so from-away bless becomes testable - is met and demonstrated: R1/R2/R3/R5 green (run-253cc2759fe5), and the board round-trip proven LIVE (the owner clicked the 📲 tool, scanned the ntfy:// QR, and the ntfy app opened subscribed to the topic). All iterations green.",
+    "killers_demonstrated": "The killer - pair-from-the-board - exercised end to end this session with a real phone: click -> QR in the details pane -> scan -> ntfy app opens subscribed -> phone.json written, lane enabled. The ultimate killer (bless a real gate from away) is unblocked by this pairing; its live tap is the owner's deferred physical step (se.raid-phone-live-pairing).",
+    "acceptance_converted": "The four executable checks (R1/R2/R3/R5) are permanent acceptance scenarios in the battery (tests/i8c-phone-connect.test.ts), and the board test guards the tool + /connect route. The live-scan slice is owner-physical (a real camera + app), not automatable in-suite - recorded as se.raid-phone-live-pairing rather than converted.",
+    "consistency_swept": "guidance-phone-setup rewritten to teach the board pairing (the superseded manual JSON demoted to the advanced/self-hosted path); the board self-documents via its caption + click-for-detail; the encoder's provenance lives in its loud credit header; the ntfy:// choice is recorded in connect.ts. No surface teaches the old way.",
+    "gaps_logged": "se.raid-worktree-provisioning-incomplete and se.raid-battery-windows-parallel-flake added this milestone; se.raid-phone-live-pairing (the live from-away bless) remains open and owner-deferred.",
+    "offer_hash": "3db86eccf61f95278d6663bdc6eb704ee5119176b8f2929adb4b7f8763c8d545"
+  }
+}

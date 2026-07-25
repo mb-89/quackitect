@@ -1,0 +1,11 @@
+{
+  "iteration": "i8c-phone-connect",
+  "state": "frame_delta",
+  "at": "2026-07-24T18:43:23.810Z",
+  "payload": {
+    "gap_claim": "Against the scanned field of pairing a push channel: hand-editing the config sheds usability (no gesture, error-prone); a hosted QR API sheds security (it leaks the topic, which is the credential); ntfy subscribe-by-typing sheds the one-gesture property. Ours - one click on the board renders a locally-encoded QR the owner scans - is the only option that keeps all three: gesture + secrecy + one-click install.",
+    "why_now": "i8 shipped the from-away bless and the phone.json shape; the board has a details pane and a header for a toolbar; i5b/i5c just made a worktree iteration show and bless on the board. So the only missing pieces are the pairing GESTURE and a local QR encoder - a small delta (toolbar + connect action + a vendored/hand-rolled encoder), not new infrastructure.",
+    "value_props": "One audience - the owner - one one-pager:\nAudience: the owner, wanting to bless from away.\nAlternative today: hand-edit a secret config file; the lane stays untested with a device.\nDifference: click-then-scan pairing, topic encoded locally.\nValidation signal: the owner scans once and blesses a real gate from away.\n\nNeeds (need | outcome | pass line):\n- Pair without hand-editing | click the phone icon, a QR appears, scan it, phone.json is written enabled | TEST: the connect action writes phone.json with a generated topic + enabled=true and returns a QR for that topic.\n- The topic never leaks | the QR is encoded on our side | TEST: the encode path makes no external network call; the topic is sent nowhere.\n- Install stays one-click | encoder vendored or hand-rolled | TEST: the encoder turns a known input into the correct QR matrix (known-answer vector); a new dependency passes the ship-review.\n- The toolbar shows | a top-middle toolbar: a greyed book icon (until i6) + an active phone-connect icon | board render check (owner redline).",
+    "business_case": "Skipped with reason: no external acquirer - i8c is internal tooling for the owner's own use. The currency is the owner's own reachability (blessing from away), captured in the value-prop pass lines."
+  }
+}

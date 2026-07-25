@@ -1,0 +1,13 @@
+{
+  "iteration": "i8c-phone-connect",
+  "state": "gate_inputs",
+  "at": "2026-07-24T18:55:41.527Z",
+  "payload": {
+    "props_realized": "Every value prop is realized by a story: the pairing prop -> STORY 1 (killer, UC-1); the secrecy prop -> STORY 2 (UC-2); the toolbar prop -> STORY 3 (UC-3).",
+    "stories_generalized": "Every story sits inside a use case: STORY 1 -> UC-1, STORY 2 -> UC-2, STORY 3 -> UC-3; each with a main path (UC-1 also carries extensions).",
+    "roles_covered": "No role left out: owner, driving agent, adjudicator, maintainer, and the external phone (subscribes + scans). Tensions named: one-gesture vs config-chore; topic-secrecy vs hosted-QR convenience; one-click install vs zero-dep.",
+    "excluded_stated": "The binding excluded-use list exists (draw_context): no QR decode / inbound, no external image/QR service, no change to the i8 bless auth, no non-ntfy channels, no book (i6), no live owner-physical pairing.",
+    "examples_formulated": "The scenario paths ARE the formulated examples: UC-1 main + ext 2a (phone.json exists) + ext 4a (encode failure -> no partial write), UC-2 (no external call), UC-3 (toolbar render). These seed the M7 red-first tests + the M8 acceptance.",
+    "offer_hash": "0d1e032465807a62998155237a6363e36e96ef32385b024393d94c0e71bdba8d"
+  }
+}

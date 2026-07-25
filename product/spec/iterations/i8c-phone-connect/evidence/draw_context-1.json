@@ -1,0 +1,10 @@
+{
+  "iteration": "i8c-phone-connect",
+  "state": "draw_context",
+  "at": "2026-07-24T18:51:03.975Z",
+  "payload": {
+    "boundary": "Inherits i8's phone-lane context (i8 draw_context) unchanged - pointer. The i8c DELTA boundary - INSIDE: the board header (new toolbar), the details pane (QR render), the connect action (engine: topic-pair generation + phone.json write + local QR encode), and the local QR encoder. Neighbours/interfaces: the ntfy topic (generated credential), phone.json (i8's config shape), the existing Gate.bless path (untouched), the board client. OUTSIDE: the phone app (subscribes + scans), any external QR/image service (never called).",
+    "intended_use": "The owner clicks phone-connect once, scans the QR with their ntfy app, and the phone is paired; thereafter i8's from-away bless works. A one-time pairing gesture plus a local encoder - nothing more.",
+    "excluded_use": "Does NOT: decode QRs or handle the inbound subscribe (the phone app does); call any external image/QR service; change the i8 bless authentication; add channels beyond ntfy; open the book (i6); pair live with the owner's real device (owner-physical, se.raid-phone-live-pairing)."
+  }
+}

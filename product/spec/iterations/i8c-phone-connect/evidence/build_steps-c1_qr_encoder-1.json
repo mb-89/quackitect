@@ -1,0 +1,9 @@
+{
+  "iteration": "i8c-phone-connect",
+  "state": "build_steps-c1_qr_encoder",
+  "at": "2026-07-24T20:41:13.473Z",
+  "payload": {
+    "what_landed": "engine/vendor/qrcode.ts: qrcode-generator@1.4.4 (Kazuhiko Arase, MIT) vendored verbatim - the UMD footer swapped for an ESM export, guarded by @ts-nocheck and a loud credit header naming author/version/license/source/npm; encodeQR(text) walks q.getModuleCount()/q.isDark into a boolean[][] matrix. Zero runtime node_modules - node type-strips the .ts.",
+    "run_ref": "run-34fdf73086c7 (R3 finder-pattern check green: a square matrix, dark finder corner, light inner ring)"
+  }
+}

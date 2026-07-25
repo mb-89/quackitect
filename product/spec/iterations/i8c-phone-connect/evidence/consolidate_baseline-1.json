@@ -1,0 +1,11 @@
+{
+  "iteration": "i8c-phone-connect",
+  "state": "consolidate_baseline",
+  "at": "2026-07-24T19:04:06.758Z",
+  "payload": {
+    "adrs": "ADR-1 VENDOR-QR-ENCODER: vendor a small proven QR library (source into tools/vendor, no npm) for the Encode function. Addresses R3 (scannability - correctness is field-proven) + R4 (install - vendoring is permitted). Rejected: hand-roll (K1, correctness risk - kept as the fallback), npm-install (dependency risk).\nADR-2 CONFIG-WRITE-AMENDMENT: the engine writing phone.json (a secret) is permitted, amending adr-phone-secret-machine-local; the write is ATOMIC (temp + rename). Addresses R5 + R1. Owner-confirmed. Rejected: direct write (non-atomic, partial-config risk).\nADR-3 LOCAL-ONLY-ENCODE: the topic is encoded on our side; no external image/QR service is contacted. Addresses R2 (secrecy) + se.adr-answer-authenticity. Rejected: a hosted QR API (leaks the topic).",
+    "baseline": "Elements (black-box, one line each):\n- E1 Toolbar (board): the top-middle toolbar + a greyed book icon + the active phone-connect icon.\n- E2 ConnectAction (engine): on click, generate the ntfy topic pair, write phone.json atomically, call the encoder.\n- E3 QRVendor (tools/vendor): the vendored encoder - topic string -> QR matrix, NO external edge.\n- E4 QRRender (board details pane): renders the matrix where the owner scans.\n- E5 InstallGuard: the vendored source is runtime-dep-free, vetted at the ship dependency-review.",
+    "allocation_exact": "Every function allocated exactly once: Trigger -> E1; Generate + Persist -> E2; Encode -> E3; Present -> E4; Preserve-install -> E5; Preserve-boundary -> E2 (leaves the bless path untouched). No function unallocated, none double-allocated.",
+    "interfaces_both_ends": "Element DSM, symmetric where it must be:\n- E1 <-> E2: the click triggers the connect action.\n- E2 <-> E3: E2 hands the topic to the encoder, receives the matrix.\n- E3 <-> E4: the matrix flows to the render.\n- E2 -> phone.json: the atomic config write (a side output).\n- E5 <-> E3: the install guard constrains the encoder to be dep-free.\nEach coupling recorded at both ends; E3 has NO external edge (the secrecy boundary)."
+  }
+}

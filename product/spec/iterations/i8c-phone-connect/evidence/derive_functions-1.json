@@ -1,0 +1,9 @@
+{
+  "iteration": "i8c-phone-connect",
+  "state": "derive_functions",
+  "at": "2026-07-24T18:58:40.339Z",
+  "payload": {
+    "function_structure": "Overall function: pair a phone by a one-click gesture that hands the owner a scannable secret. Sub-functions (verb + noun, no technology):\n- Trigger the pairing - offer the gesture on the board [R6].\n- Generate the credential - mint an unguessable topic pair [R1].\n- Persist the credential - write it to the local config, atomically [R1, R5].\n- Encode the credential - turn the topic into a scannable matrix, on our side [R2, R3].\n- Present the code - render it where the owner scans [R6].\n- Preserve install + boundary - keep one-click install; leave the bless path untouched [R4, R7].",
+    "coverage": "Every requirement maps to a function: R1 -> Generate + Persist; R2 -> Encode (local); R3 -> Encode (correct); R4 -> Preserve-install; R5 -> Persist (atomic); R6 -> Trigger + Present; R7 -> Preserve-boundary. Every use-case step covered: UC-1 -> Trigger/Generate/Persist/Encode/Present; UC-2 -> Encode-local; UC-3 -> Trigger/Present. No holes."
+  }
+}

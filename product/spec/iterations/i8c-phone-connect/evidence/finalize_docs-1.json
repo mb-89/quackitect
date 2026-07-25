@@ -1,0 +1,8 @@
+{
+  "iteration": "i8c-phone-connect",
+  "state": "finalize_docs",
+  "at": "2026-07-24T21:13:41.659Z",
+  "payload": {
+    "docs": "The describing set matches the shipped surface. guidance-phone-setup now teaches the board pairing exactly as built (click the 📲 tool -> the ntfy://<host>/<topic> QR renders in the details pane -> scan -> a topic pair is minted into ~/.se/<project>/phone.json), with the hand-written JSON kept as the advanced path. The board is the everyday report and self-documents via its caption + click-for-detail; the vendored encoder's provenance lives in its loud credit header; connect.ts records the ntfy:// deep-link choice with the v1 ask.go reference. Read against the actual surface: no doc teaches a behavior that is not there, and the one superseded surface (manual pairing) was corrected."
+  }
+}

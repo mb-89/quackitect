@@ -1,0 +1,317 @@
+{
+  "machine": "systematic",
+  "iteration": "i8c-phone-connect",
+  "current": "shipped",
+  "counters": {
+    "verification_attempts": 2
+  },
+  "history": [
+    {
+      "state": "onboard_retro",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i8c-phone-connect/evidence/onboard_retro-1.json",
+      "at": "2026-07-24T17:42:00.387Z"
+    },
+    {
+      "state": "gate_kickoff",
+      "outcome": "filled",
+      "evidence": "grant:676f1bfd3bae",
+      "at": "2026-07-24T18:32:12.138Z"
+    },
+    {
+      "state": "draft_vision",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i8c-phone-connect/evidence/draft_vision-1.json",
+      "at": "2026-07-24T18:42:06.106Z"
+    },
+    {
+      "state": "log_risks",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i8c-phone-connect/evidence/log_risks-1.json",
+      "at": "2026-07-24T18:42:41.229Z"
+    },
+    {
+      "state": "define_actual",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i8c-phone-connect/evidence/define_actual-1.json",
+      "at": "2026-07-24T18:42:55.941Z"
+    },
+    {
+      "state": "frame_delta",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i8c-phone-connect/evidence/frame_delta-1.json",
+      "at": "2026-07-24T18:43:23.811Z"
+    },
+    {
+      "state": "pressure_test",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i8c-phone-connect/evidence/pressure_test-1.json",
+      "at": "2026-07-24T18:43:56.325Z"
+    },
+    {
+      "state": "scope_non_goals",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i8c-phone-connect/evidence/scope_non_goals-1.json",
+      "at": "2026-07-24T18:44:15.094Z"
+    },
+    {
+      "state": "gate_motivation",
+      "outcome": "filled",
+      "evidence": "grant:1623ce42a862",
+      "at": "2026-07-24T18:44:50.665Z"
+    },
+    {
+      "state": "draw_context",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i8c-phone-connect/evidence/draw_context-1.json",
+      "at": "2026-07-24T18:51:03.976Z"
+    },
+    {
+      "state": "write_stories",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i8c-phone-connect/evidence/write_stories-1.json",
+      "at": "2026-07-24T18:54:44.718Z"
+    },
+    {
+      "state": "map_stakeholders",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i8c-phone-connect/evidence/map_stakeholders-1.json",
+      "at": "2026-07-24T18:54:57.022Z"
+    },
+    {
+      "state": "generalize_use_cases",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i8c-phone-connect/evidence/generalize_use_cases-1.json",
+      "at": "2026-07-24T18:55:20.136Z"
+    },
+    {
+      "state": "gate_inputs",
+      "outcome": "filled",
+      "evidence": "grant:0d1e03246580",
+      "at": "2026-07-24T18:57:09.531Z"
+    },
+    {
+      "state": "write_requirements",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i8c-phone-connect/evidence/write_requirements-1.json",
+      "at": "2026-07-24T18:58:01.103Z"
+    },
+    {
+      "state": "probe_assumptions",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i8c-phone-connect/evidence/probe_assumptions-1.json",
+      "at": "2026-07-24T18:58:25.005Z"
+    },
+    {
+      "state": "derive_functions",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i8c-phone-connect/evidence/derive_functions-1.json",
+      "at": "2026-07-24T18:58:40.339Z"
+    },
+    {
+      "state": "gate_requirements",
+      "outcome": "filled",
+      "evidence": "grant:8386eaa4710b",
+      "at": "2026-07-24T19:00:15.498Z"
+    },
+    {
+      "state": "derive_criteria",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i8c-phone-connect/evidence/derive_criteria-1.json",
+      "at": "2026-07-24T19:00:47.198Z"
+    },
+    {
+      "state": "partition_functions",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i8c-phone-connect/evidence/partition_functions-1.json",
+      "at": "2026-07-24T19:01:08.549Z"
+    },
+    {
+      "state": "enumerate_space",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i8c-phone-connect/evidence/enumerate_space-1.json",
+      "at": "2026-07-24T19:01:37.099Z"
+    },
+    {
+      "state": "evaluate_set",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i8c-phone-connect/evidence/evaluate_set-1.json",
+      "at": "2026-07-24T19:02:08.681Z"
+    },
+    {
+      "state": "gate_candidates",
+      "outcome": "filled",
+      "evidence": "grant:0fc564e1009a",
+      "at": "2026-07-24T19:02:47.504Z"
+    },
+    {
+      "state": "converge_pugh",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i8c-phone-connect/evidence/converge_pugh-1.json",
+      "at": "2026-07-24T19:03:21.165Z"
+    },
+    {
+      "state": "reverse_sensitivity",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i8c-phone-connect/evidence/reverse_sensitivity-1.json",
+      "at": "2026-07-24T19:03:39.790Z"
+    },
+    {
+      "state": "consolidate_baseline",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i8c-phone-connect/evidence/consolidate_baseline-1.json",
+      "at": "2026-07-24T19:04:06.759Z"
+    },
+    {
+      "state": "record_adrs",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i8c-phone-connect/evidence/record_adrs-1.json",
+      "at": "2026-07-24T19:04:20.990Z"
+    },
+    {
+      "state": "evaluate_baseline",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i8c-phone-connect/evidence/evaluate_baseline-1.json",
+      "at": "2026-07-24T19:04:42.258Z"
+    },
+    {
+      "state": "gate_architecture",
+      "outcome": "filled",
+      "evidence": "grant:a6beb4025345",
+      "at": "2026-07-24T19:05:35.585Z"
+    },
+    {
+      "state": "rank_unknowns",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i8c-phone-connect/evidence/rank_unknowns-1.json",
+      "at": "2026-07-24T19:06:35.903Z"
+    },
+    {
+      "state": "fold_back",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i8c-phone-connect/evidence/fold_back-1.json",
+      "at": "2026-07-24T19:08:23.407Z"
+    },
+    {
+      "state": "gate_prototype",
+      "outcome": "filled",
+      "evidence": "grant:18cece2e2f45",
+      "at": "2026-07-24T19:09:05.499Z"
+    },
+    {
+      "state": "author_tests",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i8c-phone-connect/evidence/author_tests-1.json",
+      "at": "2026-07-24T19:55:58.203Z"
+    },
+    {
+      "state": "plan_build",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i8c-phone-connect/evidence/plan_build-1.json",
+      "at": "2026-07-24T20:39:04.542Z"
+    },
+    {
+      "state": "observe_red",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i8c-phone-connect/evidence/observe_red-1.json",
+      "at": "2026-07-24T20:40:10.326Z"
+    },
+    {
+      "state": "build_steps",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i8c-phone-connect/evidence/build_steps-1.json",
+      "at": "2026-07-24T20:41:41.894Z"
+    },
+    {
+      "state": "verification",
+      "outcome": "failed",
+      "evidence": "run-7af6441c63f2",
+      "at": "2026-07-24T20:42:21.982Z"
+    },
+    {
+      "state": "fix_findings",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i8c-phone-connect/evidence/fix_findings-1.json",
+      "at": "2026-07-24T20:53:24.896Z"
+    },
+    {
+      "state": "verification",
+      "outcome": "failed",
+      "evidence": "run-7b48730c050e",
+      "at": "2026-07-24T20:53:44.476Z"
+    },
+    {
+      "state": "fix_findings",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i8c-phone-connect/evidence/fix_findings-2.json",
+      "at": "2026-07-24T21:04:52.726Z"
+    },
+    {
+      "state": "verification",
+      "outcome": "filled",
+      "evidence": "run-253cc2759fe5",
+      "at": "2026-07-24T21:05:40.745Z"
+    },
+    {
+      "state": "gate_implementation",
+      "outcome": "filled",
+      "evidence": "grant:35e077f7fa0a",
+      "at": "2026-07-24T21:06:35.295Z"
+    },
+    {
+      "state": "fill_story_evidence",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i8c-phone-connect/evidence/fill_story_evidence-1.json",
+      "at": "2026-07-24T21:07:12.027Z"
+    },
+    {
+      "state": "sweep_consistency",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i8c-phone-connect/evidence/sweep_consistency-1.json",
+      "at": "2026-07-24T21:10:12.590Z"
+    },
+    {
+      "state": "log_gaps",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i8c-phone-connect/evidence/log_gaps-1.json",
+      "at": "2026-07-24T21:12:41.018Z"
+    },
+    {
+      "state": "gate_validation",
+      "outcome": "filled",
+      "evidence": "grant:3db86eccf61f",
+      "at": "2026-07-24T21:13:14.079Z"
+    },
+    {
+      "state": "finalize_docs",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i8c-phone-connect/evidence/finalize_docs-1.json",
+      "at": "2026-07-24T21:13:41.660Z"
+    },
+    {
+      "state": "package",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i8c-phone-connect/evidence/package-1.json",
+      "at": "2026-07-24T21:14:07.134Z"
+    },
+    {
+      "state": "ship_review",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i8c-phone-connect/evidence/ship_review-1.json",
+      "at": "2026-07-24T21:14:29.799Z"
+    },
+    {
+      "state": "gate_release",
+      "outcome": "filled",
+      "evidence": "grant:396d526ddec6",
+      "at": "2026-07-24T21:15:02.795Z"
+    }
+  ],
+  "escapes": [],
+  "status": "closed",
+  "fired": [],
+  "active": [
+    "shipped"
+  ],
+  "claims": {}
+}

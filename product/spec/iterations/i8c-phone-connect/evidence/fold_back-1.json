@@ -1,0 +1,9 @@
+{
+  "iteration": "i8c-phone-connect",
+  "state": "fold_back",
+  "at": "2026-07-24T19:08:23.407Z",
+  "payload": {
+    "folded": "SP1 confirmed U1 (run-2e1841091b74): qrcode-generator (npm-fetchable, MIT, zero runtime deps) encodes an ntfy topic into a VALID QR matrix - 29x29 modules, 449 dark, finder pattern present at the corners. So ADR-1 (vendor) stands and is EXECUTABLE - K2 is feasible, K1 hand-roll is not needed. QS-1 scannability moves from at-risk toward addressed (the vendored encoder yields a correct matrix; the M7 known-answer test locks it). No requirement or ADR invalidated - the design stands. Correction to the earlier worry: npm IS reachable here, so vendoring a library IS possible (I only need to COPY its source, not depend on npm at runtime).",
+    "promotions": "Promoted to the M7 build: (1) qrcode-generator's source -> the vendored E3 encoder, COPIED into tools/vendor (the product carries the source, no npm dependency, one-click install preserved per adr-install-over-zerodep); (2) the encode confirmation -> the F2 known-answer test (a fixed topic -> the expected module count / a decode check); both fed by run-2e1841091b74. The ship dependency-review (M9) audits the vendored source (license + no network + no hidden dep)."
+  }
+}

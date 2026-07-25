@@ -1,0 +1,9 @@
+{
+  "iteration": "i8c-phone-connect",
+  "state": "fill_story_evidence",
+  "at": "2026-07-24T21:07:12.026Z",
+  "payload": {
+    "slides_filled": "All acceptance points filled from the shipped system (run-253cc2759fe5): R1 - connectPhone writes an enabled phone.json with a high-entropy topic and returns a QR matrix; R2 - local encode, zero fetch, the topic never leaves; R3 - the vendored encoder yields a valid QR (square, finder pattern); R5 - atomic: an encode failure leaves no partial config; and the board tool renders the ntfy://<host>/<topic> QR in the details pane with the caption. The board slide was filled LIVE: the owner clicked the icon, scanned the QR, and the ntfy app opened subscribed to the topic. No slide left unfilled.",
+    "demos_seeded": "One killer demonstration - the pair-from-the-board round-trip - exercised FOR REAL this session: owner clicks the board's phone-connect icon -> a QR renders in the details pane -> scanning it opens the ntfy app subscribed to the fresh topic -> phone.json is written, enabling the i8 lane. The ultimate killer (a gate offer blessed from the phone away from the desk) is now UNBLOCKED by this pairing; its live tap-to-bless is the owner's physical step, deferred to tomorrow (phone paired; lane paused for the unattended run and restored at ship)."
+  }
+}

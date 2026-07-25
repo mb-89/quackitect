@@ -1,0 +1,9 @@
+{
+  "iteration": "i8c-phone-connect",
+  "state": "build_steps-c2_connect_engine",
+  "at": "2026-07-24T20:41:26.486Z",
+  "payload": {
+    "what_landed": "engine/connect.ts: connectPhone mints a high-entropy topic pair, encodes the ntfy://<host>/<topic> deep link FIRST, then writes phone.json via temp-file-then-rename (so an encode failure leaves no partial config), returns {qr, topic}; phonePairingQR reuses an existing valid pairing else creates one (re-clicking never silently re-pairs); phoneConfigPath is re-exported from phone.ts so the write side and the i8 read side share one path. The deep link opens the ntfy app - an https link opens only the browser (v1's ask.go ruling).",
+    "run_ref": "run-34fdf73086c7 (R1 enabled config + high-entropy topic + QR matrix, R2 zero fetch, R5 no partial config on an injected encode failure - all green)"
+  }
+}

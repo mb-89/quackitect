@@ -1,0 +1,9 @@
+{
+  "iteration": "i8c-phone-connect",
+  "state": "converge_pugh",
+  "at": "2026-07-24T19:03:21.165Z",
+  "payload": {
+    "matrix_runs": "Run 1, datum = K1 HAND-ROLL (the zero-dep rival). K2 VENDOR vs datum: Scannability + (proven vs unproven) | Install-simplicity - (one vendored source vs zero) | Secrecy S | Least-code + (we don't author the QR logic) | Time + (wire an existing encoder). Net K2 = +3 / -1 -> K2 clears the datum. One run suffices.",
+    "winner": "K2 VENDOR. Beyond the arithmetic: QR correctness - Reed-Solomon ECC, masking, format/version info - is a solved but SUBTLE problem where a hand-rolled bug yields an unscannable code the owner literally cannot pair with (the highest-cost failure, against the top-weight criterion). A field-tested vendored encoder eliminates that risk. Its install cost is a single vendored source file (no npm), which se.adr-install-over-zerodep explicitly permits - vendoring IS allowed. K1 hand-roll stays the recorded fallback if the vendored library fails the ship dependency-review."
+  }
+}

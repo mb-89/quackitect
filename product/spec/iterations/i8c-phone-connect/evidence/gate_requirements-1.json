@@ -1,0 +1,14 @@
+{
+  "iteration": "i8c-phone-connect",
+  "state": "gate_requirements",
+  "at": "2026-07-24T18:59:00.901Z",
+  "payload": {
+    "verifiable": "Every requirement carries its verify_method: R1 test, R2 test (no external call), R3 test (known-answer), R4 inspection + ship-review, R5 test (atomic write), R6 inspection (owner redline) + render test, R7 analysis + the i8 suite green.",
+    "traced": "Every requirement traces to a story/prop: R1 -> STORY 1/UC-1 (pairing); R2 -> STORY 2/UC-2 (secrecy); R3 -> UC-1 step 4; R4 -> the install prop (adr-install-over-zerodep); R5 -> UC-1 ext 4a + the config-write decision; R6 -> STORY 3/UC-3 (toolbar); R7 -> the non-goals boundary. No empty rows.",
+    "functions_cover": "Every requirement requires at least one function (R1->Generate+Persist, R2/R3->Encode, R4->Preserve-install, R5->Persist, R6->Trigger+Present, R7->Preserve-boundary); every use-case step covered (UC-1/2/3). No holes.",
+    "set_holds": "Complete (pairing, encoder, secrecy, config-write, toolbar, boundary), consistent (R2 bounds R1's encode, R4 bounds R3, R5 governs the write, R7 fences the bless path), affordable (the QR encoder is the only new build; the rest is board UI + wiring over i8's config), bounded (excludes decode, external services, non-ntfy, book, live pairing). No TBD.",
+    "breaks_if_removed": "Filled on every requirement R1-R7 (unpaired lane / topic leak / wrong QR / broken install / partial config / no gesture surface / bless regresses).",
+    "assumptions_probed": "A1 topic-possession authenticity confirmed (owner-ruled, adr-answer-authenticity). The QR-encoder unknown is scheduled for the M6 prototype with reason (it is the one genuinely-new unknown - a correct local encoder). ntfy topic generation + the board render surfaces probed as feasible.",
+    "offer_hash": "8386eaa4710bf9ab332da46d68e1df4f3c776b767746505b37a12edf352dd67c"
+  }
+}

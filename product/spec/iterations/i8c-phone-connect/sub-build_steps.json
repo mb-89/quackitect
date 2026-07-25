@@ -1,0 +1,38 @@
+{
+  "machine": "build-steps",
+  "iteration": "i8c-phone-connect#build_steps",
+  "current": "done",
+  "counters": {},
+  "history": [
+    {
+      "state": "start",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i8c-phone-connect/evidence/build_steps-start-1.json",
+      "at": "2026-07-24T20:40:33.650Z"
+    },
+    {
+      "state": "c1_qr_encoder",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i8c-phone-connect/evidence/build_steps-c1_qr_encoder-1.json",
+      "at": "2026-07-24T20:41:13.473Z"
+    },
+    {
+      "state": "c2_connect_engine",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i8c-phone-connect/evidence/build_steps-c2_connect_engine-1.json",
+      "at": "2026-07-24T20:41:26.487Z"
+    },
+    {
+      "state": "c3_board_tool",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i8c-phone-connect/evidence/build_steps-c3_board_tool-1.json",
+      "at": "2026-07-24T20:41:41.878Z"
+    }
+  ],
+  "escapes": [],
+  "status": "closed",
+  "fired": [],
+  "active": [
+    "done"
+  ]
+}

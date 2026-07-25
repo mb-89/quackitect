@@ -1,0 +1,12 @@
+{
+  "iteration": "i8c-phone-connect",
+  "state": "onboard_retro",
+  "at": "2026-07-24T17:42:00.387Z",
+  "payload": {
+    "field_feedback": "Retro DEFERRED by owner - no retro this iteration; i8c reopens the abandoned i8b-phone-connect to FINISH the in-flight phone-connect QR work, now on the branched worktree infra. The one live field signal worth recording: i5b just proved itself HERE - se_loop_start default-provisioned i8c's own worktree (.worktrees/i8c-phone-connect) and this trunk-rooted server drives it. The full retro (inbox drain + the validation-regression deep-dive) is explicitly deferred to after i9.",
+    "notes_drained": "DEFERRED per owner ruling (no retro now). Inbox ~25 - NOT drained this iteration; every note carried forward to the post-i9 retro. The one disposition relevant here is inherited, not from the inbox: the QR-connect design comes from the abandoned i8b-phone-connect evidence.",
+    "call_log_mined": "Deferred with the retro. Single live signal recorded: se_loop_start default-provisioned i8c's worktree and the trunk-rooted server routed to it (i5b live). Full call-log mining waits for the post-i9 retro.",
+    "waste_leads": "Deferred (retro). The prior i8b M1 rework is already captured (settle-execution-model-before-walking) - and closed by i5b landing the worktree infra i8c now rides.",
+    "process_stale": "Deferred to the post-i9 retro, which owns the validation-regression deep-dive. The session's mechanical-ization rulings are already captured as notes (build_steps sub-machine guard, ETA + board-reopen mechanical for i9, se_run scope, memory-migration + mechanical-once retro channels) for that retro to bake into mechanics."
+  }
+}

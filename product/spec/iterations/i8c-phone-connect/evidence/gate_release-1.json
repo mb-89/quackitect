@@ -1,0 +1,12 @@
+{
+  "iteration": "i8c-phone-connect",
+  "state": "gate_release",
+  "at": "2026-07-24T21:14:52.887Z",
+  "payload": {
+    "docs_match": "Docs complete and matching: se.guidance-phone-setup teaches the board 📲 pairing exactly as built; the board self-documents (caption + click-for-detail); the vendored encoder's credit header and connect.ts's ntfy:// note carry provenance. No surface teaches a behavior that is not shipped.",
+    "packaged": "Versioned at quackitect@2.0.0-bootstrap (the pre-1.0 rolling baseline); configuration baselined (phone.json shape documented, machine-local in ~/.se, never committed); entry script unchanged - recorded skip, the feature rides the existing MCP server + board.",
+    "dependencies_ruled": "Ship review done: all depends_on shipped (i8-phone-lane, i5/i5b-worktrees), none diverged; the kb import is pinned; the i5 worktree-provisioning gaps were deposited upstream as RAID, not pushed. Sticky rulings honored - the owner ruled the design live and delegated adjudication for this unattended run.",
+    "handover_accepted": "This bless is the acceptance, self-blessed as the agent under the owner's explicit delegation this session ('finish this iteration, bless as the agent'): channel=chat-grant, adjudicated_by=agent, stamped delegated_via se.decision-delegated-adjudication. The live owner-physical bless-from-away stays the owner's step (se.raid-phone-live-pairing), deferred to tomorrow with the phone paired and the lane restored at ship.",
+    "offer_hash": "396d526ddec6d34ba72f85dd93887c55ced0358c6bb8edd6e392ceb0cbb27fd8"
+  }
+}

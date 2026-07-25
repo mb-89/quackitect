@@ -1,0 +1,13 @@
+{
+  "iteration": "i8c-phone-connect",
+  "state": "verification",
+  "at": "2026-07-24T20:42:21.981Z",
+  "payload": {
+    "run_ref": "run-7af6441c63f2",
+    "command": "npm --prefix product/deliverable run verify --loglevel=error",
+    "exit": 1
+  },
+  "pinned_run": {
+    "ref": "run-7af6441c63f2"
+  }
+}

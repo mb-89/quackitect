@@ -1,0 +1,9 @@
+{
+  "iteration": "i8c-phone-connect",
+  "state": "rank_unknowns",
+  "at": "2026-07-24T19:06:35.902Z",
+  "payload": {
+    "ranking": "1. U1 QR-ENCODER FEASIBILITY (R3, ADR-1) - can we OBTAIN a correct, scannable, vendorable QR encoder (byte mode + Reed-Solomon ECC), with no external call? What-if-wrong: if no library is already present or fetchable in this fenced/offline environment, the VENDOR path (K2) is not executable and we fall back to hand-roll (K1) or the owner provides the source. HIGHEST - it decides the whole build path. This is the vendor-vs-hand-roll tripwire from M5, now a live question.",
+    "seeded": "- SP1 (U1), timebox 30 min: probe availability - is a QR encoder already present (node_modules / tools/vendor / the repo), fetchable via npm, or must it be hand-rolled? Then confirm the chosen encoder turns a known input into the correct QR matrix (known-answer / decode check). The result picks K2 (vendor, if a source is obtainable) or K1 (hand-roll, the recorded fallback)."
+  }
+}

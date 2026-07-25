@@ -1,0 +1,8 @@
+{
+  "iteration": "i8c-phone-connect",
+  "state": "partition_functions",
+  "at": "2026-07-24T19:01:08.548Z",
+  "payload": {
+    "partitioning": "Relation meaning: data-flow (one function feeds the next). Coupling, classified:\n- Trigger -> Generate -> Persist -> Encode -> Present: a PIPELINE (the connect action) - each step feeds the next; strong sequential coupling.\n- Encode <-> Present: Encode produces the matrix Present renders.\n- Preserve-install/boundary: CROSS-CUTTING - constrains Encode's choice and fences the bless path; decoupled from the runtime flow.\nClusters:\n- C1 CONNECT-FLOW {Trigger, Generate, Persist, Present} - the board->engine->board pipeline; mostly wiring over i8's config shape + the board surfaces (i5c).\n- C2 ENCODE {Encode} - the QR encoder, the ONE genuinely-new build; the vendor-vs-hand-roll decision lives here.\n- C3 CONSTRAINTS {Preserve-install/boundary} - cross-cutting (one-click install + the untouched bless path).\nQualities: Trigger/Generate/Persist/Present = basic; Encode = additional (the new capability); Preserve-install/boundary = safety/support."
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "iteration": "i8c-phone-connect",
+  "state": "pressure_test",
+  "at": "2026-07-24T18:43:56.324Z",
+  "payload": {
+    "scope": "i8c takes on:\n- A top-middle board toolbar: a greyed book placeholder (until i6) + an active phone-connect icon.\n- The connect action: clicking phone-connect generates the ntfy topic pair, writes ~/.se/<project>/phone.json (enabled), and renders a QR in the details pane, encoded LOCALLY.\n- A correct local QR encoder (vendored or hand-rolled per se.adr-install-over-zerodep).\nAll against the existing i8 bless mechanics, unchanged. Runs in i8c's worktree, blessed on the board.",
+    "non_goals": "- The book itself + its open action (i6; the icon ships greyed).\n- Other toolbar icons (future, per feature).\n- Non-ntfy channels.\n- The i8 bless mechanics (unchanged).\n- QR decoding / the inbound side (the phone app subscribes; we only ENCODE).\n- Live owner-physical pairing (se.raid-phone-live-pairing).",
+    "prfaq": "PRESS RELEASE (internal): Pair your phone in one click. The se board gains a phone-connect button; click it, a QR appears in the details pane, scan it with your ntfy app, and your phone is paired. Gate offers reach your pocket; one tap blesses from away. No config files; the topic is generated and drawn locally, never leaving your machine.\n\nHOSTILE FAQ:\n- Isn't a QR carrying a secret a leak? Encoded locally, shown only on your board; the topic IS the credential (se.adr-answer-authenticity).\n- Why not a hosted QR service? It hands the topic to a third party. Refused.\n- Heavy dependency? No - one-click install is the law; the encoder is vendored or hand-rolled, vetted at ship.\n- Phone required? No - opt-in; without phone.json it is silent, unchanged from i8.\n- Auth changed? No - i8's hash-bound, channel-stamped bless is untouched; i8c adds only the pairing gesture.",
+    "findings_folded": "None, with reason: no test or spike has run at M1. The QR encoder spike is M6; the red-first tests (connect action, encoder, toolbar) land at M7. Nothing to fold upstream."
+  }
+}

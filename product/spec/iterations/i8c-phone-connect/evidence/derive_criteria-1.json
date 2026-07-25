@@ -1,0 +1,8 @@
+{
+  "iteration": "i8c-phone-connect",
+  "state": "derive_criteria",
+  "at": "2026-07-24T19:00:47.197Z",
+  "payload": {
+    "criteria": "The vital few (definition | requirement id | weight):\n1. Scannability - the QR encodes to the correct, reliably-scannable matrix | R3 | 0.30.\n2. Install-simplicity - one-click install preserved; a vendored dep must be small + clean, a hand-roll adds code but no dep | R4, se.adr-install-over-zerodep | 0.25.\n3. Secrecy-safe - encodes locally, no external call; a vendored lib must not phone home | R2 | 0.20.\n4. Least-code / maintainable - fewest lines and moving parts to carry | maintainability | 0.15.\n5. Time-to-build - how fast to a correct working encoder | affordability | 0.10."
+  }
+}

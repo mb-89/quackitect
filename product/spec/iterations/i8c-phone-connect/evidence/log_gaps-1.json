@@ -1,0 +1,8 @@
+{
+  "iteration": "i8c-phone-connect",
+  "state": "log_gaps",
+  "at": "2026-07-24T21:12:41.017Z",
+  "payload": {
+    "gaps": "Two new RAID entries added, one existing referenced. NEW: (1) se.raid-worktree-provisioning-incomplete (issue, agent) - a provisioned worktree carries no node_modules and, if cut before uncommitted engine fixes, runs a stale engine; i8c hit both, patched locally (junction + engine sync), durable provisioning fix owed. (2) se.raid-battery-windows-parallel-flake (risk, agent) - the battery flaked on Windows under parallel execution (temp rmSync EPERM from a detached verification process + cross-file races); mitigated this iteration (best-effort cleanup + serial --test-concurrency=1), deeper root owed. EXISTING, still open: se.raid-phone-live-pairing (risk, owner) - the live owner-physical bless-from-away is undemonstrated; i8c made pairing a single board gesture (proven live this session - the owner scanned and the app opened), so only the tap-to-bless remains, deferred to the owner."
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "iteration": "i8c-phone-connect",
+  "state": "gate_kickoff",
+  "at": "2026-07-24T18:32:00.483Z",
+  "payload": {
+    "retro_drained": "Retro DEFERRED (owner ruling, no retro now). Inbox carried whole to the post-i9 retro. i8c reopens the abandoned i8b-phone-connect to finish in-flight work; design INHERITED from that iteration's evidence.",
+    "goal": "The board gets a top-middle toolbar; a phone-connect icon renders a locally-encoded QR in the details pane so the owner scans to pair the phone lane - making the from-away bless testable for the first time.",
+    "pulled_in": "INHERITED from the abandoned i8b-phone-connect (blessed M1 + M2 design by pointer + delta):\n- A top-middle board toolbar of small icons: a greyed book placeholder (until i6) and an active phone-connect icon.\n- The connect action: clicking phone-connect generates the ntfy topic pair, writes ~/.se/<project>/phone.json (enabled), and renders a QR in the details pane, ENCODED LOCALLY (the topic is the credential, never sent to an external service).\n- Dependency is free (se.adr-install-over-zerodep): QR encoder vendored or hand-rolled; one-click install is the law.\n- The config-write amendment (owner-confirmed): the engine writing phone.json amends adr-phone-secret-machine-local.\nFROM this session: i8c runs in its OWN worktree and now SHOWS + BLESSES on the board (projectState worktree-aware, offer in the shared dir, Gate.bless finds the worktree instance, board no longer spawns git per poll, worktree is not a separate tab - all tested).",
+    "left_out": "- The book itself + its open action (i6 - the icon ships greyed).\n- Other toolbar icons (future).\n- Non-ntfy channels.\n- The i8 bless mechanics (unchanged).\n- QR decoding / the inbound side (the phone app subscribes; we only ENCODE).\n- Live owner-physical pairing (raid-phone-live-pairing).",
+    "rigor": "REFINE - inherits the abandoned i8b design by pointer + delta. Real work: M6 (the local QR encoder) + M7 build (toolbar + connect action + QR + config write) with red-first tests; M8/M9 full. Systematic-locked, walked LIGHT. Owner-attended - blessed on the board (now worktree-visible). No strikes beyond the inherit.",
+    "offer_hash": "676f1bfd3baed49fd1d61b9b2c20826959b5d490c4fab601739a7f3dbc88bc5f"
+  }
+}

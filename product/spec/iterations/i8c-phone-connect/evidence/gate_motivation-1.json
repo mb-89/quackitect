@@ -1,0 +1,13 @@
+{
+  "iteration": "i8c-phone-connect",
+  "state": "gate_motivation",
+  "at": "2026-07-24T18:44:43.364Z",
+  "payload": {
+    "vision_scope_stated": "Complete across M1: vision inherits i8's phone-lane + the delta (toolbar + local-QR pairing on-ramp); as-is = the no-on-ramp pain with witnesses; RAID open; frame = gap-claim + why-now + value-props with pass lines; scope = toolbar + connect action + local QR encoder; non-goals = the book, other icons, non-ntfy, i8 bless mechanics, inbound QR, live owner-physical pairing.",
+    "problem_agreed": "The delta is real and witnessed: i8 shipped the from-away bless but left no way to pair a real phone - the lane has never run against a device (i8 ship review, this session's field feedback, open se.raid-phone-live-pairing). The goal is worth having because one gesture turns a shipped-but-untested lane into a testable one, and makes from-away adjudication real rather than a fallback.",
+    "prior_art_positioned": "Positioned against the field: hand-editing the config sheds usability; a hosted QR API sheds security (leaks the topic, the credential); ntfy subscribe-by-typing sheds the one-gesture property. The direct predecessors are i8's shipped bless path and the abandoned i8b's toolbar/QR design, now realized on the branched worktree infra; i8c adds only the pairing on-ramp and does not touch the bless path.",
+    "success_measurable": "Every need carries a pass line (frame value-props): the connect action writes phone.json enabled with a generated topic and returns a QR for it (test); the encode path makes no external call, the topic is sent nowhere (test); the encoder turns a known input into the correct QR matrix (known-answer test); the toolbar renders a greyed book icon + an active phone icon (owner redline). The single owner-physical pass line - the owner scans and blesses from away - is a RAID trigger.",
+    "risks_logged": "Open with owners + triggers: R1 the QR dependency, vetted at the ship-review; R2 the config-write of a secret (topic) from the board, guarded by its build test; A1 topic-possession authenticity accepted (owner-ruled, se.adr-answer-authenticity); D1 the live owner-physical pairing, carried as se.raid-phone-live-pairing.",
+    "offer_hash": "1623ce42a8625610acbede23157864836f6996a84b33404d07c81d7f9b5e93a5"
+  }
+}

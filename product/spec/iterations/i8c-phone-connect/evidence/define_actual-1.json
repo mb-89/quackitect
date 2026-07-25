@@ -1,0 +1,8 @@
+{
+  "iteration": "i8c-phone-connect",
+  "state": "define_actual",
+  "at": "2026-07-24T18:42:55.940Z",
+  "payload": {
+    "as_is": "Pain 1 - i8's phone lane has no on-ramp. i8 shipped and mock-proved the from-away bless, but a real phone cannot be paired without hand-creating an ntfy topic and hand-writing ~/.se/<project>/phone.json. So the shipped lane has never run against a device. Witness: the i8 ship review, this session's field feedback, and open se.raid-phone-live-pairing. Baseline context inherited from i8 (state-inheritance)."
+  }
+}

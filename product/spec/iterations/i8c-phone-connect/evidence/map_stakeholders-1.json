@@ -1,0 +1,9 @@
+{
+  "iteration": "i8c-phone-connect",
+  "state": "map_stakeholders",
+  "at": "2026-07-24T18:54:57.021Z",
+  "payload": {
+    "roles": "Inherited from se + i8, no new roles: the owner (clicks connect, scans, blesses on the board); the driving agent (builds); the adjudicator (the owner); the maintainer. The phone (the owner's device) is the external actor that subscribes + scans - not staffed by us.",
+    "tensions": "The named goal-system conflicts are the live ones: one-gesture vs a config chore (resolved for the gesture); topic-secrecy vs hosted-QR convenience (resolved for secrecy, encode locally); one-click install vs zero-dep (resolved for install - encoder vendored or hand-rolled). No new stakeholder tensions beyond i8's."
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "iteration": "i8c-phone-connect",
+  "state": "gate_architecture",
+  "at": "2026-07-24T19:05:07.850Z",
+  "payload": {
+    "choice_traced": "Winner K2 VENDOR traced to the weighted criteria: it wins Scannability (.30, the top weight - proven correctness), Least-code (.15) and Time (.10), ties Secrecy (.20), loses only Install-simplicity (.25, one vendored source vs zero) - net +3/-1 over the datum. One Pugh run recorded (datum = K1 HAND-ROLL, the strongest rival). No status-quo run applies (there is no existing pairing to compare).",
+    "sensitivity_ruled": "Verdict: robust across the plausible weight range. One credible flip recorded as a RAID tripwire: if the vendored QR library fails the ship dependency-review (hidden dep, network call, bad license, bloat), fall back to K1 hand-roll. Owner: driving agent; trigger: the M9 ship dependency-review / a build-time audit of the vendored source.",
+    "matrix_review": "Baseline reviewed as data. DECOMPOSITION: E1 Toolbar, E2 ConnectAction, E3 QRVendor, E4 QRRender, E5 InstallGuard. CLUSTERING: C1 connect-flow {E1,E2,E4}, C2 encode {E3}, C3 constraints {E5}. ALLOCATION: every function exactly once (Trigger->E1, Generate+Persist->E2, Encode->E3, Present->E4, Preserve-install->E5, Preserve-boundary->E2). INTERFACES: E1->E2 (click), E2<->E3 (topic/matrix), E3->E4 (render), E2->phone.json (atomic write), E5 constrains E3; E3 has NO external edge (the secrecy boundary). The connect-flow is wiring over i8's config + the i5c board surfaces; E3 is the one new element.",
+    "evaluation_recorded": "Every quality scenario recorded: QS-1 scannability ADDRESSED but AT-RISK until the M6 spike; QS-2 secrecy ADDRESSED; QS-3 install-one-click ADDRESSED; QS-4 atomic-config ADDRESSED; QS-5 bless-unchanged ADDRESSED. The one at-risk item is what M6 burns down.",
+    "adrs_traced": "Every deciding ADR addresses its requirement: ADR-1 (vendor encoder) -> R3 + R4; ADR-2 (atomic config-write amendment) -> R5 + R1; ADR-3 (local-only encode) -> R2. Rejected options recorded as history.",
+    "offer_hash": "a6beb40253454fd3373bce264ecda901b8421500a57fe34d6178360509c5bc01"
+  }
+}

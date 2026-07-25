@@ -1,0 +1,9 @@
+{
+  "iteration": "i8c-phone-connect",
+  "state": "reverse_sensitivity",
+  "at": "2026-07-24T19:03:39.789Z",
+  "payload": {
+    "sensitivity": "K2 is robust across the plausible weight range. The only losing world: if Install-simplicity dominated (weight >= 0.5) AND a STRICT zero-added-code policy were enforced - but se.adr-install-over-zerodep explicitly permits vendoring, so that world is not credible. The genuine flip is not about weights: if the chosen vendored library turns out to have a hidden dependency, a network call, a bad license, or bloat, K1 (hand-roll) wins by default.",
+    "tripwires": "One RAID tripwire (not a silent dismissal): IF the vendored QR library fails the ship dependency-review (a hidden dep, any network call, an unacceptable license, or unreasonable bloat), THEN fall back to K1 - hand-roll the minimal encoder. Watch-item: the M9 ship dependency-review of the vendored source (se.meth-dependency-ship-review). Owner: the driving agent. Trigger: the ship-review, or an audit of the vendored source at build."
+  }
+}

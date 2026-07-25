@@ -1,0 +1,8 @@
+{
+  "iteration": "i8c-phone-connect",
+  "state": "record_adrs",
+  "at": "2026-07-24T19:04:20.989Z",
+  "payload": {
+    "adrs": "ADR-1 VENDOR-QR-ENCODER: vendor a small proven QR library (source into tools/vendor, no npm) for the Encode function. Addresses R3 (scannability - correctness is field-proven) + R4 (install - vendoring is permitted). Rejected: hand-roll (K1, correctness risk - kept as the fallback), npm-install (dependency risk).\nADR-2 CONFIG-WRITE-AMENDMENT: the engine writing phone.json (a secret) is permitted, amending se.adr-phone-secret-machine-local; the write is ATOMIC (temp + rename). Addresses R5 + R1. Owner-confirmed. Rejected: direct write (non-atomic, partial-config risk).\nADR-3 LOCAL-ONLY-ENCODE: the topic is encoded on our side; no external image/QR service is contacted. Addresses R2 (secrecy) + se.adr-answer-authenticity. Rejected: a hosted QR API (leaks the topic)."
+  }
+}

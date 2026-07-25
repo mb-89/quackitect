@@ -1,0 +1,13 @@
+{
+  "iteration": "i8c-phone-connect",
+  "state": "gate_candidates",
+  "at": "2026-07-24T19:02:31.955Z",
+  "payload": {
+    "viable_set": "Two viable candidates survive: K2 VENDOR (a proven QR library, source-copied) leads; K1 HAND-ROLL (a minimal zero-dep encoder) is the recorded fallback if the vendored library fails the ship dependency-review. The killer holds - a real alternative survives.",
+    "complete_allocation": "Both candidates allocate ALL functions - Trigger, Generate, Persist, Encode, Present, Preserve-install/boundary. They differ ONLY in Encode (hand-rolled vs vendored). Interfaces: the connect-flow pipeline (Trigger->Generate->Persist->Encode->Present) + the Encode boundary (input = topic string, output = QR matrix, no external edge). Rationale per candidate in the shortlist.",
+    "criteria_traced": "Weights derived from requirements + tensions: Scannability (.30) from R3 (a wrong matrix is unusable); Install-simplicity (.25) from R4 + adr-install-over-zerodep; Secrecy-safe (.20) from R2; Least-code (.15) from maintainability; Time-to-build (.10) from affordability.",
+    "front_recorded": "Front = {K1, K2}. K2 leads (4.50) and wins scannability + time; K1 (3.65) is non-dominated only on install-simplicity, kept as the zero-dep fallback. Eliminated: A3 npm-install (risks one-click install), B2 non-atomic write (violates R5).",
+    "feasibility_checked": "K2: small proven QR libraries exist that encode byte mode with ECC in a few hundred lines of vendorable source, no runtime deps - feasible, the mainstream path. K1: a correct minimal QR encoder is feasible but demanding (Reed-Solomon ECC + masking + format info) and must be proven scannable by our own tests - feasible, higher risk. Both clear rough feasibility.",
+    "offer_hash": "0fc564e1009a1bcfb87c0def3b5a38a36b3b097678d60943caa9bdc990de9b51"
+  }
+}

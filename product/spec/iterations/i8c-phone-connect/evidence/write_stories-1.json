@@ -1,0 +1,10 @@
+{
+  "iteration": "i8c-phone-connect",
+  "state": "write_stories",
+  "at": "2026-07-24T18:54:44.718Z",
+  "payload": {
+    "roles": "Inherited from se + i8, no new roles: the owner (clicks connect, scans, blesses on the board); the driving agent (builds); the adjudicator (the owner); the maintainer. The phone (the owner's device) is the external actor that subscribes + scans - not staffed by us.",
+    "tensions": "The named goal-system conflicts are the live ones: one-gesture vs a config chore (resolved for the gesture); topic-secrecy vs hosted-QR convenience (resolved for secrecy, encode locally); one-click install vs zero-dep (resolved for install - encoder vendored or hand-rolled). No new stakeholder tensions beyond i8's.",
+    "stories": "Slideshows per the value-props (killers marked):\n- STORY 1 (KILLER): the owner clicks phone-connect, a QR appears in the details pane, scans it, phone.json is written enabled, and the from-away bless now works. Realizes the pairing prop.\n- STORY 2: the QR encodes the topic locally; nothing is sent to any external service. Realizes the secrecy prop.\n- STORY 3: the toolbar shows a greyed book icon + the active phone-connect icon. Realizes the toolbar prop."
+  }
+}

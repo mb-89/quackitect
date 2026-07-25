@@ -1,0 +1,9 @@
+{
+  "iteration": "i8c-phone-connect",
+  "state": "log_risks",
+  "at": "2026-07-24T18:42:41.229Z",
+  "payload": {
+    "as_is": "Pain 1 - i8's phone lane has no on-ramp. i8 shipped and mock-proved the from-away bless, but a real phone cannot be paired without hand-creating an ntfy topic and hand-writing ~/.se/<project>/phone.json. So the shipped lane has never run against a device. Witness: the i8 ship review, this session's field feedback, and open se.raid-phone-live-pairing. Baseline context inherited from i8 (state-inheritance).",
+    "raid_opened": "R1 (risk) - the QR encoder (vendored or hand-rolled) could add a bad dependency or bloat one-click install. Owner: the driving agent. Trigger: the ship dependency-review (M9, se.meth-dependency-ship-review).\nR2 (risk) - the connect action writes phone.json (a secret) from the board; a bug could leak or mis-write the topic. Owner: the driving agent. Trigger: the config-write build + its test.\nA1 (assumption) - topic-possession authenticity is accepted (se.adr-answer-authenticity); the QR carries the topic and that IS the credential, so local-only encoding suffices. Owner: the owner (ruled). Trigger: re-open only if the auth model is challenged.\nD1 (dependency, owner-physical) - live pairing needs the owner's real device to scan the QR and bless from away. Owner: the owner. Trigger: after ship (se.raid-phone-live-pairing)."
+  }
+}

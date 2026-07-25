@@ -22,6 +22,7 @@ import { BOARD_PORT } from "../engine/board.ts";
 import { projectState, BOARD_VERSION } from "../engine/project.ts";
 import { Rejection } from "../engine/errors.ts";
 import { PhoneLane, NtfyTransport, loadPhoneConfig } from "../engine/phone.ts";
+import { phonePairingQR } from "../engine/connect.ts";
 
 const args = process.argv.slice(2);
 const rootIdx = args.indexOf("--root");
@@ -57,7 +58,14 @@ const PAGE = `<!doctype html>
   body { font: 14px/1.45 system-ui, sans-serif; color: #1e1e1e; background: #fafafa; height: 100vh; display: flex; flex-direction: column; }
   header { display: flex; gap: 1.5em; align-items: center; padding: .5em 1em; border-bottom: 1px solid var(--line); background: #fff; }
   header b { font-size: 16px; }
-  #wd { margin-left: auto; display: flex; gap: .3em; }
+  #tools { margin: 0 auto; display: flex; align-items: center; gap: .9em; }
+  .tool { cursor: pointer; font-size: 17px; line-height: 1; opacity: .72; user-select: none; }
+  .tool:hover { opacity: 1; }
+  .qrwrap { text-align: center; padding: .4em 0; }
+  .qrwrap svg { max-width: 100%; height: auto; image-rendering: pixelated; }
+  .qrcap { color: var(--dim); font-size: 12px; margin-top: .5em; }
+  .qrtopic { color: var(--dim); font-size: 11px; font-family: ui-monospace, monospace; margin-top: .2em; word-break: break-all; }
+  #wd { display: flex; gap: .3em; }
   .wdot { width: .55em; height: .55em; border-radius: 50%; background: #e4e4e4; }
   .wdot.green { background: var(--ok); }
   .wdot.yellow { background: var(--warn); }
@@ -153,6 +161,7 @@ const PAGE = `<!doctype html>
 <body>
 <header>
   <b id="product">…</b>
+  <div id="tools"><span class="tool" id="phoneConnectBtn" title="Connect a phone — show its pairing QR" onclick="phoneConnect()">📲</span></div>
   <div id="wd" title="watchdog"><span class="wdot"></span><span class="wdot"></span><span class="wdot"></span></div>
 </header>
 <main>
@@ -559,6 +568,25 @@ async function dismiss() {
   }
   tick();
 }
+// The phone-connect tool: ask the server for a pairing QR and paint it into
+// the details pane (no modal — click-for-detail). The topic never leaves the
+// machine; the QR is the only place it is shown, to be scanned.
+async function phoneConnect() {
+  try {
+    const r = await fetch("/connect", { method: "POST" });
+    const d = await r.json();
+    if (d.error) { detail(d); return; }
+    renderQR(d.qr, d.topic);
+  } catch (e) { detail("phone connect failed (" + e + ") — the board may be restarting; retry in a moment"); }
+}
+function renderQR(qr, topic) {
+  const n = qr.length, cell = 6, quiet = 4, size = (n + quiet * 2) * cell;
+  let rects = "";
+  for (let r = 0; r < n; r++) for (let c = 0; c < n; c++) if (qr[r][c]) rects += '<rect x="' + ((c + quiet) * cell) + '" y="' + ((r + quiet) * cell) + '" width="' + cell + '" height="' + cell + '"/>';
+  const svg = '<svg width="' + size + '" height="' + size + '" viewBox="0 0 ' + size + ' ' + size + '" xmlns="http://www.w3.org/2000/svg"><rect width="' + size + '" height="' + size + '" fill="#fff"/><g fill="#000">' + rects + "</g></svg>";
+  const target = maximized ? el("modalside") : el("details");
+  target.innerHTML = '<div class="qrwrap">' + svg + '<div class="qrcap">Scan this QR code to link via ntfy.</div><div class="qrtopic">topic: ' + esc(topic) + "</div></div>";
+}
 function initResize() {
   const rootEl = document.documentElement;
   for (const [k, v] of [["--wl", "sb-l"], ["--wr", "sb-r"]]) {
@@ -650,6 +678,11 @@ const server = createServer(async (req, res) => {
       stateCache = { at: 0, body: "" };
       res.writeHead(200, { "content-type": "application/json" });
       res.end(JSON.stringify({ dismissed: true }));
+    } else if (req.method === "POST" && req.url === "/connect") {
+      // Phone-connect tool: mint or reuse a pairing and return its QR matrix.
+      const pairing = phonePairingQR(root);
+      res.writeHead(200, { "content-type": "application/json" });
+      res.end(JSON.stringify(pairing));
     } else {
       res.writeHead(404);
       res.end();

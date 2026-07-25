@@ -1,0 +1,9 @@
+{
+  "iteration": "i8c-phone-connect",
+  "state": "package",
+  "at": "2026-07-24T21:14:07.133Z",
+  "payload": {
+    "package": "No separate artifact - i8c is a feature increment on the ongoing v2 deliverable (quackitect@2.0.0-bootstrap, the pre-1.0 rolling baseline). Contents shipped this iteration: engine/vendor/qrcode.ts (vendored QR encoder), engine/connect.ts (connectPhone + phonePairingQR + phoneConfigPath re-export), bin/se-board.ts (header tools strip + 📲 + /connect route + details-pane QR render), tests/i8c-phone-connect.test.ts (R1/R2/R3/R5), and the updated se.guidance-phone-setup. Battery green at run-253cc2759fe5.",
+    "entry_script": "Recorded skip: no new entry script. The feature rides the existing v2 entry - the se MCP server boots the board, and the board serves the 📲 tool. Install-and-run is unchanged (npm install for devDeps + the MCP server); i8c adds a board affordance and an engine surface, not a new runnable."
+  }
+}

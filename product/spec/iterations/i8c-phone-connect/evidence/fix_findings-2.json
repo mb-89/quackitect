@@ -1,0 +1,8 @@
+{
+  "iteration": "i8c-phone-connect",
+  "state": "fix_findings",
+  "at": "2026-07-24T21:04:52.725Z",
+  "payload": {
+    "findings_fixed": "Second pass - the recovery re-verify surfaced the pre-existing Windows parallel-battery flakes (the '16 EPERM' issue in the notes). Two findings, both environment/parallelism, not i8c logic, fixed so the suite is reliable: (1) temp-dir cleanup rmSync EPERM'd because a detached verification process briefly held the temp dir - fixed by making all 213 test cleanups best-effort (try/catch + maxRetries: 20), so a cleanup failure never fails a test whose assertions already passed. (2) Four worktree/git/background-process tests (i5b live-e2e, i5c board projectState, i8 phone-tap, loop reopen) raced ACROSS files under parallel execution - fixed by running the battery serially (--test-concurrency=1 in package.json). Proof the flakes are contention-only: all 34 test files pass in isolation (run-1c80ce9b598d, 'ALL FILES PASS INDIVIDUALLY'). Durable suite-reliability fix; captured for the retro."
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "iteration": "i8c-phone-connect",
+  "state": "evaluate_baseline",
+  "at": "2026-07-24T19:04:42.258Z",
+  "payload": {
+    "walk": "- QS-1 Scannability (R3): ADDRESSED by ADR-1 (vendored proven encoder, E3), but AT-RISK until the M6 spike confirms the vendored encoder yields a correct known-answer matrix. Carrying: ADR-1.\n- QS-2 Secrecy (R2): ADDRESSED - E3 has NO external edge (ADR-3); a test asserts no network call.\n- QS-3 Install-one-click (R4): ADDRESSED - E5, the vendored source is runtime-dep-free, vetted at ship (ADR-1).\n- QS-4 Atomic-config (R5): ADDRESSED - E2 writes phone.json atomically (ADR-2); a test asserts no partial config on encode failure.\n- QS-5 Bless-unchanged (R7): ADDRESSED - E2 touches only the config + encoder, not the bless path; the i8 suite stays green.",
+    "fitness_candidates": "- F1: the connect action writes phone.json (enabled, generated topic) and returns a QR matrix (test).\n- F2: the encoder turns a known input into the correct QR matrix (known-answer test).\n- F3: the encode/connect path makes NO external network call (test).\n- F4: an encode failure leaves no phone.json / no partial config (test).\n- F5: the i8 phone suite stays green - the bless path is unchanged (test).\n- F6: the board renders the toolbar (greyed book + active phone icon) and the QR in the details pane (render test / owner redline)."
+  }
+}

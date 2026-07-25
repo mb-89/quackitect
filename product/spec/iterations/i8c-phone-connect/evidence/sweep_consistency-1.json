@@ -1,0 +1,8 @@
+{
+  "iteration": "i8c-phone-connect",
+  "state": "sweep_consistency",
+  "at": "2026-07-24T21:10:12.589Z",
+  "payload": {
+    "swept": "One describing surface taught the superseded (manual) pairing and was updated. guidance-phone-setup (the how-to-enable doc, se.guidance-phone-setup): rewritten to lead with the one-gesture board pairing - click the 📲 tool, scan the ntfy://<host>/<topic> deep-link QR (opens the app), and a fresh topic pair is minted into ~/.se/<project>/phone.json - keeping the hand-written JSON as the advanced/self-hosted path; the statement and the answer-topic explanation (bless/dismiss rides the notification's action buttons, not a manual subscribe) were corrected. The other changes are self-documenting where they live: the board tool teaches itself via the caption + click-for-detail (no separate doc); the vendored encoder's provenance lives in its loud credit header (author/version/license/source); the ntfy:// choice is recorded in connect.ts with the v1 ask.go reference. No doc now teaches the old way."
+  }
+}

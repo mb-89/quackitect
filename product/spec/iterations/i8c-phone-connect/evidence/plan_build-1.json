@@ -1,0 +1,9 @@
+{
+  "iteration": "i8c-phone-connect",
+  "state": "plan_build",
+  "at": "2026-07-24T20:39:04.541Z",
+  "payload": {
+    "build_machine": "Seeded machines/it/machine-build-steps.canvas: start -> c1_qr_encoder (realization: vendor) -> c2_connect_engine (engine-ts) -> c3_board_tool (engine-ts) -> done, dependency-ordered (connect needs the encoder; the board tool needs connect). Each chunk carries its realization kind and a what_landed + run_ref evidence form.",
+    "promotions_placed": "The M6 QR-feasibility spike (qrcode-generator vendorable, encodes a structurally valid QR - finder pattern present) is promoted as the starting chunk c1_qr_encoder: it enters pre-proven, so only the single encodeQR surface plus the loud credit header remained to land."
+  }
+}

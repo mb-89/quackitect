@@ -1,0 +1,9 @@
+{
+  "iteration": "i8c-phone-connect",
+  "state": "enumerate_space",
+  "at": "2026-07-24T19:01:37.098Z",
+  "payload": {
+    "chart": "Rows x options (pruned cells noted):\n- A QR ENCODER: A1 HAND-ROLL a minimal encoder (byte mode + Reed-Solomon ECC + masking + matrix) - no dep | A2 VENDOR a small proven QR library (source copied into tools/vendor, NO npm install) | A3 npm-install a QR package [PRUNED - a real npm dependency risks one-click install; se.adr-install-over-zerodep prefers vendored/hand-rolled].\n- B CONFIG WRITE: B1 write phone.json ATOMICALLY (temp + rename) [the owner-confirmed amendment] | B2 write directly [PRUNED - non-atomic, risks a partial config on failure, violates R5].\n- C TRIGGER/PRESENT: C1 a board toolbar icon -> the engine connect action -> QR in the details pane (the i5c board surfaces). Single option.",
+    "shortlist": "- K1 HAND-ROLL: A1+B1+C1 - a hand-rolled minimal QR encoder; ZERO dependency, full control; cost = ~300-500 lines of correct QR (ECC + masking) to write and verify, error-prone.\n- K2 VENDOR: A2+B1+C1 - vendor a small proven QR library (source copied, no npm); correctness INHERITED and battle-tested; cost = one vendored dependency to carry and vet at the ship-review."
+  }
+}

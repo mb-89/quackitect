@@ -1,0 +1,8 @@
+{
+  "iteration": "i8c-phone-connect",
+  "state": "observe_red",
+  "at": "2026-07-24T20:40:10.307Z",
+  "payload": {
+    "red_observed": "All four checks (R1 connect/config, R2 secrecy, R3 QR finder-pattern, R5 atomic) observed RED before the build: with engine/connect.ts and engine/vendor/qrcode.ts set aside, the test file cannot load (ERR_MODULE_NOT_FOUND: cannot find connect.ts), so every check errors at import - no false green is possible. The two files were restored immediately after. run_ref run-f877b7973e0f (RED_exit=1)."
+  }
+}

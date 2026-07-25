@@ -1,0 +1,9 @@
+{
+  "iteration": "i8c-phone-connect",
+  "state": "ship_review",
+  "at": "2026-07-24T21:14:29.799Z",
+  "payload": {
+    "review": "Dependencies, all shipped, none diverged: i8-phone-lane (i8c pairs its lane - the phone.json shape + phoneConfigPath are reused, not forked); i5-worktrees + i5b-worktrees-live (i8c ran in their worktree - it surfaced two provisioning gaps but did not diverge the engine); the kb module import pinned at 00320210e10fda85690f046c2bd2476e828c16e4. No new asks - the owner ruled the design live this session (📲 icon B, the ntfy:// deep link matching v1, machine-local per-machine storage).",
+    "upstream": "One upstream concern deposited, not pushed: the worktree-provisioning gaps (node_modules absence + stale-engine-on-fork) belong to i5's provisionWorktree, not i8c - recorded as se.raid-worktree-provisioning-incomplete for the i5-infra follow-up, per deposit-never-push."
+  }
+}

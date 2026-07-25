@@ -1,0 +1,10 @@
+{
+  "iteration": "i8c-phone-connect",
+  "state": "evaluate_set",
+  "at": "2026-07-24T19:02:08.681Z",
+  "payload": {
+    "scores": "Weighted 0-5 (Scannability .30, Install-simplicity .25, Secrecy .20, Least-code .15, Time .10):\n- K1 HAND-ROLL: 3 / 5 / 5 / 2 / 2 = 3.65. Zero-dep and fully ours, but QR ECC + masking is hard to get exactly right (scannability risk), ~300-500 lines to carry, slow to verify.\n- K2 VENDOR: 5 / 4 / 5 / 4 / 4 = 4.50. A proven library is reliably scannable (its own real-world use is the external validation), fast to wire, little code we author; cost = one vendored dep (source copied, no npm) with a slight install-overhead vs zero.\n(External-validation note: K2's scannability is proven by the library's field use; K1's is unproven until our own tests - a real prior-art edge for K2 on the highest-weight criterion.)",
+    "front": "K2 VENDOR leads clearly (4.50 vs 3.65), winning the highest-weight criterion (scannability) + time. K1 HAND-ROLL is non-dominated only on install-simplicity (5 vs 4), so both stay on the front for the M5 convergence; K2 is the strong favourite.",
+    "eliminations": "A3 (npm-install a QR package) eliminated at enumerate: a real npm dependency risks one-click install. B2 (non-atomic config write) eliminated: violates R5 (partial-config on failure). K1 and K2 both survive to M5 (K1 kept as the zero-dep alternative if the vendored lib fails the ship dependency-review)."
+  }
+}

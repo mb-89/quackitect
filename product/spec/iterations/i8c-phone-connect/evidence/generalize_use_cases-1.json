@@ -1,0 +1,8 @@
+{
+  "iteration": "i8c-phone-connect",
+  "state": "generalize_use_cases",
+  "at": "2026-07-24T18:55:20.136Z",
+  "payload": {
+    "use_cases": "UC-1 (KILLER) Pair the phone. Primary actor: the owner. Main: 1. owner clicks phone-connect; 2. engine generates the ntfy topic pair; 3. engine writes phone.json (enabled); 4. engine encodes a QR LOCALLY and renders it in the details pane; 5. owner scans it with the ntfy app; 6. the phone is paired - from-away bless now works. Extensions: 2a phone.json already exists -> confirm/regenerate; 4a encode failure -> error, no partial config write.\n\nUC-2 Keep the topic secret. Main: the QR encodes the topic on our side; no external service is contacted. It is a constraint over UC-1 step 4.\n\nUC-3 Show the toolbar. Main: the board renders a top-middle toolbar - a greyed book icon (until i6) + an active phone-connect icon."
+  }
+}
