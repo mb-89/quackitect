@@ -295,10 +295,23 @@ export function shipMerge(root: string, iteration: string, opts: { allowSelf?: b
 
   const m = git(root, ...GIT_ID, "merge", "--no-commit", "--no-ff", branch);
   const conflicted = git(root, "diff", "--name-only", "--diff-filter=U").stdout.split("\n").filter(Boolean);
-  if (!m.ok && conflicted.length > 0) {
+  // ANY failed merge stops the close, not only a conflicting one: a merge also
+  // refuses when trunk's tree is dirty, and falling through then commits trunk's
+  // own pending changes under the close's name - one parent, none of the
+  // iteration's work. A half-applied close, witnessed on the first real use.
+  if (!m.ok) {
     git(root, "merge", "--abort");
     undoClose();
-    return { merged: false, conflict: conflicted.join(", ").slice(0, 300), suspects: [] };
+    return conflicted.length > 0
+      ? { merged: false, conflict: conflicted.join(", ").slice(0, 300), suspects: [] }
+      : { merged: false, refused: `the merge could not start: ${m.stderr.split("\n")[0].slice(0, 200)}`, suspects: [] };
+  }
+  // No MERGE_HEAD means nothing actually merged; committing then would fabricate
+  // a single-parent commit that reads like a close.
+  if (!git(root, "rev-parse", "--verify", "-q", "MERGE_HEAD").ok) {
+    git(root, "merge", "--abort");
+    undoClose();
+    return { merged: false, refused: "the merge produced no MERGE_HEAD - nothing was merged", suspects: [] };
   }
 
   // Withhold the record: drop this iteration's events from the pending merge.
