@@ -47,7 +47,7 @@ export interface PromoteResult {
 
 function git(root: string, args: string[]): { code: number; stdout: string; stderr: string } {
   try {
-    return { code: 0, stdout: execFileSync("git", args, { cwd: root, encoding: "utf8", maxBuffer: 1 << 26 }).trim(), stderr: "" };
+    return { code: 0, stdout: execFileSync("git", args, { cwd: root, encoding: "utf8", maxBuffer: 1 << 26, windowsHide: true }).trim(), stderr: "" };
   } catch (e) {
     const err = e as { status?: number; stdout?: string; stderr?: string };
     return { code: err.status ?? -1, stdout: (err.stdout ?? "").trim(), stderr: (err.stderr ?? "").trim() };
@@ -129,7 +129,7 @@ export function promoteEngine(
     // than "the dependency is missing".
     if (files.some((f) => f.endsWith("package.json"))) {
       try {
-        execFileSync("npm", ["install", "--no-audit", "--no-fund"], { cwd: join(trunk, "product", "deliverable"), encoding: "utf8", shell: true, stdio: "pipe" });
+        execFileSync("npm", ["install", "--no-audit", "--no-fund"], { cwd: join(trunk, "product", "deliverable"), encoding: "utf8", shell: true, stdio: "pipe", windowsHide: true });
       } catch (e) {
         throw new Error(`the promoted dependencies could not be installed in trunk: ${String((e as Error).message).slice(0, 200)}`);
       }
@@ -213,7 +213,7 @@ export function defaultSuite(cwd: string): SuiteResult {
   // suite runner is a spawned command too.
   delete env.SE_SESSION_FILE;
   try {
-    const r = countTests(execFileSync(process.execPath, ["--test", "--test-concurrency=1", ...files], { cwd, encoding: "utf8", maxBuffer: 1 << 26, env }));
+    const r = countTests(execFileSync(process.execPath, ["--test", "--test-concurrency=1", ...files], { cwd, encoding: "utf8", maxBuffer: 1 << 26, env, windowsHide: true }));
     // A run that exits 0 having executed NOTHING is not a pass. Silence is not
     // evidence, and this is the only place that decides whether trunk changes.
     if (r.passed + r.failed === 0) return { passed: 0, failed: 1, failing: [`${files.length} test files were found but none RAN — the runner reported nothing`] };

@@ -93,7 +93,7 @@ export function isEventPath(rel: string, iteration: string): boolean {
 function ensureToolchain(wtRoot: string): void {
   const dir = layout.deliverable(wtRoot);
   if (!existsSync(join(dir, "package.json")) || existsSync(join(dir, "node_modules"))) return;
-  spawnSync("npm", ["install", "--no-audit", "--no-fund"], { cwd: dir, encoding: "utf8", shell: true });
+  spawnSync("npm", ["install", "--no-audit", "--no-fund"], { cwd: dir, encoding: "utf8", shell: true, windowsHide: true });
 }
 
 /** Provision the iteration's worktree and branch; leftovers are ADOPTED. */

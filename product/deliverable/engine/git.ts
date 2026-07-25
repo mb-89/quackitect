@@ -21,7 +21,10 @@ export interface GitResult {
 
 /** Run a git command in a directory. Never throws on nonzero exit. */
 export function git(cwd: string, ...args: string[]): GitResult {
-  const r = spawnSync("git", args, { cwd, encoding: "utf8" });
+  // windowsHide: every spawn in this engine sets it. Without it Windows flashes
+  // a console window that STEALS FOCUS, which breaks the owner's voice dictation
+  // mid-sentence. The board polls, so this one fires every couple of seconds.
+  const r = spawnSync("git", args, { cwd, encoding: "utf8", windowsHide: true });
   if (r.error) {
     return { ok: false, code: -1, stdout: "", stderr: String(r.error) };
   }
