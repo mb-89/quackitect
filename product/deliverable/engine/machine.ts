@@ -193,6 +193,12 @@ export function reopenStates(
     for (const e of src.edges) {
       if (!cone.has(e.to)) continue;
       if (e.role !== "normal" && e.role !== "approval") continue;
+      // NOT into a state this reopen is activating directly. Fuel exists to
+      // activate something later; these states are being activated NOW. Left
+      // in place it sits until the state COMPLETES, then re-activates it —
+      // so the reopened state fills, re-opens, fills, re-opens, and the walk
+      // never moves. Observed on the second live reopen.
+      if (stateIds.includes(e.to)) continue;
       const key = `${src.id}->${e.to}`;
       if (!inst.fired.includes(key)) inst.fired.push(key);
     }

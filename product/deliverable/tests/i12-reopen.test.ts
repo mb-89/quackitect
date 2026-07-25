@@ -23,6 +23,49 @@ import { completeState, reopenStates, type MachineDecl, type MachineInstance } f
  * `join` requires BOTH inbound edges. Reopening `up` re-walks the right-hand
  * arm while `left` stays legitimately done.
  */
+/**
+ * The reopened state now has an inbound edge, which the first fixture did not.
+ * That gap is why the re-arm shipped with a bug of its own: fuel was restored
+ * for the edge INTO the state being reopened, and since that state is already
+ * active, the fuel sat until it completed and then re-activated it. Fill,
+ * reopen, fill, reopen — the walk never moves and nothing reports an error.
+ *
+ *     begin ──> up ──> mid ──> join
+ *     left ────────────────────> join
+ */
+function machineWithInbound(): MachineDecl {
+  const m = machine();
+  m.states.push({
+    id: "begin",
+    kind: "work",
+    statement: "begin",
+    filled_by: "agent",
+    guidance: "",
+    evidence_form: [],
+    edges: [{ to: "up", role: "normal" }],
+  });
+  return m;
+}
+
+test("a reopened state does not re-activate itself forever", () => {
+  const m = machineWithInbound();
+  const inst = instance();
+  inst.active = ["left", "begin"];
+
+  fill(m, inst, "begin");
+  fill(m, inst, "up");
+  fill(m, inst, "mid");
+  fill(m, inst, "left");
+  assert.deepEqual(inst.active, ["join"]);
+
+  reopenStates(m, inst, ["up"], "the review sent it back", "t");
+  assert.deepEqual(inst.active, ["up"], "reopen activates it once");
+
+  fill(m, inst, "up");
+  assert.equal(inst.active?.includes("up"), false, "and completing it must MOVE ON — begin's fuel was consumed when up first activated and must not be handed back");
+  assert.deepEqual(inst.active, ["mid"]);
+});
+
 function machine(): MachineDecl {
   const state = (id: string, edges: { to: string; role: "normal" }[], kind: "work" | "gate" | "terminal" = "work") => ({
     id,
