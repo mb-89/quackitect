@@ -18,7 +18,15 @@ import { activeStates, advance, completeState, validateMachine, type MachineDecl
 import { claimState, readInstance } from "./instance.ts";
 import { loadIterationMachine, loadMachine } from "./machines/load.ts";
 import { loadLedger } from "./store.ts";
-import { assertDependsMet, openWorktrees, provisionWorktree, worktreeHome } from "./worktree.ts";
+import {
+  assertDependsMet,
+  commitMilestone,
+  openWorktrees,
+  projectRootOf,
+  provisionWorktree,
+  shipMerge,
+  worktreeHome,
+} from "./worktree.ts";
 import { basename as pathBase, dirname as pathDir } from "node:path";
 
 export interface WorkPacket {
@@ -295,13 +303,17 @@ export class Loop {
       }
     }
     if (inst.status === "closed") {
+      // An iteration usually closes on its final GATE, so the split must run
+      // here too, not only after a submit. Idempotent: a retired stream is no
+      // longer found, so a second call is a no-op.
+      const close = this.closeStream(inst.iteration);
       return {
         kind: "closed",
         iteration: inst.iteration,
         legal: ["se.loop.start { iteration }"],
         recommended: "se.loop.start",
         ...(autoClosed.length > 0 ? { auto_closed: autoClosed } : {}),
-        note: `Iteration ${inst.iteration} is closed.`,
+        note: `Iteration ${inst.iteration} is closed.${close === null ? "" : ` ${close}`}`,
       };
     }
     // Token serving: with several active states, each session gets its own.
@@ -597,15 +609,36 @@ export class Loop {
     completeState(this.machineFor(inst), inst, state.id, "filled", now());
     this.save(inst);
     if (inst.status === "closed") {
+      const close = this.closeStream(inst.iteration);
       return {
         kind: "closed",
         iteration: inst.iteration,
         legal: ["se.loop.start { iteration }"],
         recommended: "se.loop.start",
-        note: `Iteration ${inst.iteration} is closed.`,
+        note: `Iteration ${inst.iteration} is closed.${close === null ? "" : ` ${close}`}`,
       };
     }
     return this.next();
+  }
+
+  /**
+   * A closing iteration that lives in a worktree performs the SPLIT: its final
+   * milestone lands on its branch, then only its live claims merge to trunk
+   * while the record stays reachable at the tag. Without this the close marks
+   * an iteration shipped while the repository records nothing — which is what
+   * i8c did. Returns a sentence for the packet, or null when there is no stream.
+   */
+  private closeStream(iteration: string): string | null {
+    const project = projectRootOf(this.root);
+    if (!openWorktrees(project).some((w) => w.iteration === iteration)) return null;
+    // The closing submit's own writes must be on the branch before it merges.
+    commitMilestone(project, iteration, `${iteration} closed`, { allowSelf: true });
+    const res = shipMerge(project, iteration, { allowSelf: true });
+    if (res.merged) {
+      const suspects = res.suspects.length > 0 ? ` ${res.suspects.length} node(s) marked suspect.` : "";
+      return `Live claims merged to trunk; the record stays at ${res.tag}.${suspects}`;
+    }
+    return `NOT merged — ${res.refused ?? res.conflict ?? "unknown"}. Trunk is unchanged.`;
   }
 
   abandon(reason: string): WorkPacket {

@@ -45,12 +45,16 @@ test("R7/F2 LIVE E2E: default-provisioned iteration walks + gates from the trunk
     const offered = srv().submit({ exit_check_result: "done" }); // close_iteration gate -> offer
     assert.equal(offered.kind, "gate_offered", "the close gate offered, live, from the trunk server");
 
-    // Bless (a human channel), then ship back to trunk.
+    // Bless (a human channel). Since i5d the FINAL BLESS performs the close
+    // itself - the split runs on the same path a board bless takes - so nothing
+    // calls shipMerge by hand any more.
+    const trunkBefore = git("rev-parse HEAD", root);
     new Gate(wt).bless(lean(wt), offered.offer_hash!, { channel: "test", adjudicated_by: "agent" });
-    const res = shipMerge(root, "demo");
-    assert.equal(res.merged, true, "the worktree branch merged to trunk");
+    assert.notEqual(git("rev-parse HEAD", root), trunkBefore, "the close merged the branch to trunk");
+    assert.match(git("tag --list iter/demo", root), /iter\/demo/, "the record is named by its tag");
     assert.ok(!existsSync(wt), "the shipped tree retired");
     assert.match(git("branch --list iter/demo", root), /iter\/demo/, "the branch stays for history");
+    assert.equal(shipMerge(root, "demo").merged, false, "a second close is a no-op refusal, never a double merge");
   } finally {
     try { rmSync(root, { recursive: true, force: true, maxRetries: 20, retryDelay: 100 }); } catch { /* temp cleanup is best-effort */ }
   }

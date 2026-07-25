@@ -27,7 +27,12 @@ import {
 
 const git = (c: string, cwd: string): string => execSync(`git ${c}`, { cwd, encoding: "utf8" }).trim();
 const commitAll = (cwd: string, msg: string): void => {
-  execSync(`git add -A && git -c user.email=t@t -c user.name=t commit -m "${msg}"`, { cwd, encoding: "utf8" });
+  // Nothing to commit is legal, exactly as it is for the engine: since i5d a
+  // blessed gate commits the milestone itself, so a fixture that writes and
+  // then closes may find the tree already clean.
+  execSync("git add -A", { cwd, encoding: "utf8" });
+  if (execSync("git status --porcelain", { cwd, encoding: "utf8" }).trim() === "") return;
+  execSync(`git -c user.email=t@t -c user.name=t commit -m "${msg}"`, { cwd, encoding: "utf8" });
 };
 
 /** A trunk fixture: git repo with machines planted and committed. */
@@ -108,24 +113,19 @@ test("W1 killer: two iterations, both ship, the second merge marks the overlappi
     const a = provisionWorktree(root, "it-a");
     const b = provisionWorktree(root, "it-b");
     // Both iterations edit the SAME node, differently placed so git merges cleanly.
+    // Both edits are made BEFORE either closes, so the branches diverge from the
+    // same base - since i5d each close happens at that iteration's final bless.
     writeFileSync(join(a.root, "product", "spec", "ledger", "se", "shared.md"),
       "---\nid: se.shared\nkind: note\nstatement: Base.\nfrom_a: yes\n---\n\n## Body\nbase\n", "utf8");
-    closeIteration(a.root, "it-a");
-    commitAll(a.root, "it-a work");
     writeFileSync(join(b.root, "product", "spec", "ledger", "se", "shared.md"),
       "---\nid: se.shared\nkind: note\nstatement: Base.\n---\n\n## Body\nbase plus b\n", "utf8");
-    closeIteration(b.root, "it-b");
-    commitAll(b.root, "it-b work");
 
-    const first = shipMerge(root, "it-a");
-    assert.equal(first.merged, true);
-    assert.deepEqual(first.suspects, [], "first merge has no trunk overlap");
-    const second = shipMerge(root, "it-b");
-    assert.equal(second.merged, true);
-    assert.ok(second.suspects.some((s) => s.includes("shared")), "the overlap is named");
+    closeIteration(a.root, "it-a"); // the bless ships it: first merge, no trunk overlap
+    assert.ok(!existsSync(a.root), "the first shipped tree retired");
+    closeIteration(b.root, "it-b"); // the second merge finds trunk moved underneath
     const merged = readFileSync(join(seDir, "shared.md"), "utf8");
     assert.match(merged, /suspect:/, "the node wears the mark");
-    assert.ok(!existsSync(a.root) && !existsSync(b.root), "shipped trees are removed");
+    assert.ok(!existsSync(b.root), "shipped trees are removed");
     assert.match(git("branch --list iter/it-a", root), /iter\/it-a/, "branches stay for history");
   } finally {
     try { rmSync(root, { recursive: true, force: true, maxRetries: 20, retryDelay: 100 }); } catch { /* temp cleanup is best-effort */ }
@@ -140,10 +140,11 @@ test("a textual conflict STOPS the ship: recorded, aborted, nothing auto-resolve
     commitAll(root, "shared");
     const a = provisionWorktree(root, "it-a");
     writeFileSync(join(a.root, shared), "---\nid: se.shared\nkind: note\nstatement: From the branch.\n---\n\n## Body\nbase\n", "utf8");
-    closeIteration(a.root, "it-a");
-    commitAll(a.root, "branch edit");
+    // Trunk diverges BEFORE the close, so the conflict is already there when the
+    // final bless tries to ship - the close aborts and leaves the branch unmerged.
     writeFileSync(join(root, shared), "---\nid: se.shared\nkind: note\nstatement: From the trunk.\n---\n\n## Body\nbase\n", "utf8");
     commitAll(root, "trunk edit");
+    closeIteration(a.root, "it-a");
     const r = shipMerge(root, "it-a");
     assert.equal(r.merged, false);
     assert.ok(r.conflict !== undefined && /shared/.test(r.conflict), "the conflict is named");

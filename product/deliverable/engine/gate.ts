@@ -17,7 +17,7 @@ import { completeState, type MachineDecl, type MachineInstance } from "./machine
 import { loadIterationMachine, loadMachine } from "./machines/load.ts";
 import { importStamps } from "./modules.ts";
 import { openCommitWindow } from "./git.ts";
-import { openWorktrees } from "./worktree.ts";
+import { commitMilestone, iterationTag, openWorktrees, projectRootOf, shipMerge } from "./worktree.ts";
 
 export interface Offer {
   iteration: string;
@@ -44,6 +44,8 @@ export interface GrantRecord {
   /** Set on delegated blesses: the decision node granting the delegation. */
   delegated_via?: string;
   evidence: string;
+  /** The tag the evidence will be reachable under once the close withholds it. */
+  evidence_tag?: string;
   imports: Record<string, string>;
   as_offered: boolean;
   at: string;
@@ -129,9 +131,12 @@ export class Gate {
     // Child offers carry "iteration#state" — the bless routes to the child record.
     const [iterName, childOf] = offer.iteration.split("#");
     // The iteration may live in a worktree; the bless must advance it there.
-    const iterRoot = existsSync(layout.instancePath(this.root, iterName))
-      ? this.root
-      : openWorktrees(this.root).find((w) => w.iteration === iterName)?.root ?? this.root;
+    // The caller may be rooted at trunk OR at the worktree itself; both must
+    // recognise the same stream, or a worktree iteration silently loses its
+    // milestone commits and closes on an empty branch.
+    const projectRoot = projectRootOf(this.root);
+    const stream = openWorktrees(projectRoot).find((w) => w.iteration === iterName);
+    const iterRoot = existsSync(layout.instancePath(this.root, iterName)) ? this.root : stream?.root ?? this.root;
     const instPath =
       childOf !== undefined
         ? join(layout.iterationDir(iterRoot, iterName), `sub-${childOf}.json`)
@@ -163,6 +168,9 @@ export class Gate {
       adjudicated_by: by.adjudicated_by,
       ...(by.delegated_via !== undefined ? { delegated_via: by.delegated_via } : {}),
       evidence: offer.evidence_path,
+      // The tag is deterministic, so the pointer can name it before the close
+      // creates it — without this the evidence path dangles once it is withheld.
+      ...(stream !== undefined ? { evidence_tag: iterationTag(iterName) } : {}),
       imports: importStamps(this.root),
       as_offered: true,
       at: new Date(this.now()).toISOString(),
@@ -174,6 +182,32 @@ export class Gate {
     completeState(m, inst, offer.state, "filled", grant.at);
     writeFileSync(instPath, JSON.stringify(inst, null, 2) + "\n", "utf8");
     this.dismiss();
+    // The milestone lands on the iteration's OWN branch, after the machine has
+    // advanced so the commit captures the blessed state. Best-effort by design:
+    // a failed commit must never void a legitimate bless.
+    if (stream !== undefined) {
+      try {
+        // allowSelf mirrors the worktree lane in loop.ts: SE develops itself, so
+        // the lane operates on its own repo; SE-C-001 exists to guard se_git.
+        commitMilestone(projectRoot, iterName, `${offer.state} blessed (${grant.hash.slice(0, 12)})`, { allowSelf: true });
+        // An iteration usually closes on its FINAL GATE, so the split runs here -
+        // for every channel, since a board bless comes through this same path.
+        // Without it the iteration is marked shipped while the repository records
+        // nothing, which is exactly what i8c did.
+        // completeState may have closed the instance; the earlier open-guard
+        // narrowed the type, so read the mutated value widened.
+        const statusAfter: string = inst.status;
+        if (statusAfter === "closed" && childOf === undefined) {
+          const res = shipMerge(projectRoot, iterName, { allowSelf: true });
+          if (!res.merged) {
+            console.error(`se: ${iterName} closed but did NOT merge — ${res.refused ?? res.conflict ?? "unknown"}; trunk unchanged`);
+          }
+        }
+      } catch (e) {
+        // The grant stands: a legitimate bless is never voided by the split.
+        console.error(`se: ${iterName} bless recorded, close/commit failed — ${String((e as Error).message)}`);
+      }
+    }
     return grant;
   }
 }
