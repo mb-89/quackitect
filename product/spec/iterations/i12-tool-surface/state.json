@@ -1,7 +1,7 @@
 {
   "machine": "systematic",
   "iteration": "i12-tool-surface",
-  "current": "write_requirements",
+  "current": "derive_criteria",
   "counters": {},
   "history": [
     {
@@ -87,13 +87,38 @@
       "outcome": "filled",
       "evidence": "grant:1ee7f8bc0c9d",
       "at": "2026-07-25T14:29:46.136Z"
+    },
+    {
+      "state": "write_requirements",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i12-tool-surface/evidence/write_requirements-1.json",
+      "at": "2026-07-25T14:31:31.759Z"
+    },
+    {
+      "state": "derive_functions",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i12-tool-surface/evidence/derive_functions-1.json",
+      "at": "2026-07-25T14:32:13.500Z"
+    },
+    {
+      "state": "probe_assumptions",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i12-tool-surface/evidence/probe_assumptions-1.json",
+      "at": "2026-07-25T14:34:10.340Z"
+    },
+    {
+      "state": "gate_requirements",
+      "outcome": "filled",
+      "evidence": "grant:950cbc78ba6f",
+      "at": "2026-07-25T14:35:41.513Z"
     }
   ],
   "escapes": [],
   "status": "open",
   "fired": [],
   "active": [
-    "write_requirements"
+    "derive_criteria",
+    "partition_functions"
   ],
   "claims": {}
 }
