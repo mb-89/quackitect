@@ -19,7 +19,7 @@ export function assertOwned(target: string): void {
 
 /** The PID listening on the board port, or null. Windows and POSIX netstat shapes. */
 export function boardPid(): number | null {
-  const r = spawnSync("netstat", ["-ano", "-p", "tcp"], { encoding: "utf8" });
+  const r = spawnSync("netstat", ["-ano", "-p", "tcp"], { encoding: "utf8", windowsHide: true });
   if (r.status !== 0) return null;
   for (const line of (r.stdout ?? "").split("\n")) {
     const cols = line.trim().split(/\s+/);
@@ -39,7 +39,7 @@ export function psAction(
   const pid = boardPid();
   if (action === "list") return { board: { running: pid !== null, ...(pid !== null ? { pid } : {}) } };
   if (pid !== null) {
-    if (process.platform === "win32") spawnSync("taskkill", ["/PID", String(pid), "/F"]);
+    if (process.platform === "win32") spawnSync("taskkill", ["/PID", String(pid), "/F"], { windowsHide: true });
     else process.kill(pid);
   }
   if (action === "cycle") spawnBoard(root);

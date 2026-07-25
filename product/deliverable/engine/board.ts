@@ -16,7 +16,7 @@ export function spawnBoard(root: string): void {
   if (process.env.SE_STATE_DIR !== undefined) return;
   const bin = join(layout.deliverable(root), "bin", "se-board.ts");
   if (!existsSync(bin)) return;
-  const child = spawn(process.execPath, [bin, "--root", resolve(root)], { detached: true, stdio: "ignore" });
+  const child = spawn(process.execPath, [bin, "--root", resolve(root)], { detached: true, stdio: "ignore", windowsHide: true });
   child.unref();
 }
 

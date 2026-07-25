@@ -41,8 +41,8 @@ function openBrowser(): void {
   if (noOpen) return;
   const cmd =
     process.platform === "win32"
-      ? spawn("cmd", ["/c", "start", "", liveUrl], { detached: true, stdio: "ignore" })
-      : spawn(process.platform === "darwin" ? "open" : "xdg-open", [liveUrl], { detached: true, stdio: "ignore" });
+      ? spawn("cmd", ["/c", "start", "", liveUrl], { detached: true, stdio: "ignore", windowsHide: true })
+      : spawn(process.platform === "darwin" ? "open" : "xdg-open", [liveUrl], { detached: true, stdio: "ignore", windowsHide: true });
   cmd.on("error", () => {});
   cmd.unref();
 }

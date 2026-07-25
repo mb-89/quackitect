@@ -69,7 +69,7 @@ if (args.includes("--child")) {
   const canaryOk = (): boolean => {
     const entry = pathToFileURL(join(binDir, "..", "engine", "tools.ts")).href;
     const probe = `import(${JSON.stringify(entry)}).then(()=>process.exit(0),(e)=>{console.error("se canary: "+(e&&e.message||e));process.exit(1)})`;
-    const r = spawnSync(process.execPath, ["-e", probe], { encoding: "utf8", timeout: 30_000 });
+    const r = spawnSync(process.execPath, ["-e", probe], { encoding: "utf8", timeout: 30_000, windowsHide: true });
     return r.status === 0;
   };
 
@@ -89,6 +89,7 @@ if (args.includes("--child")) {
       const c = spawn(process.execPath, [join(binDir, "se-mcp.ts"), "--root", root, "--child"], {
         stdio: ["pipe", "pipe", "inherit"],
         env: { ...process.env, SE_SESSION_FILE: sessionFile },
+        windowsHide: true,
       });
       c.on("exit", () => {
         if (child === c) child = null;

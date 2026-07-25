@@ -1,0 +1,10 @@
+---
+id: se.raid-a-recorded-decision-did-not-reach-the-state-that-contradicted-it
+kind: raid
+statement: "THE ITERATION'S OWN THESIS, DEMONSTRATED ON ITSELF, and the sharpest evidence for R14 yet.\n\nWHAT HAPPENED: i12's first pass recorded se.adr-untracked-files-are-searched-by-default, which states plainly that version-control grep is tracked-files-only by default, that this would make a just-written file invisible, and that the flag exists. Two hours later the SAME iteration's rewalk eliminated a candidate on the claim that version-control grep cannot see an unstaged file - contradicting a decision it had itself recorded, in the same iteration, about the same tool. The contradiction survived a state whose whole job is scoring candidates. It was caught only because a required red-team round probed the claim, and the probe re-discovered what the ledger already said.\n\nWHY IT MATTERS BEYOND THE INCIDENT: the correction is usually described as 'the red team worked', and it did. But the deeper reading is that a DECISION ALREADY IN THE LEDGER did not reach the state that needed it. No packet carried it, nothing checked the new claim against it, and the agent that wrote both was the same agent within one working session. If a decision recorded two hours earlier cannot reach the state it binds, no rule minted last month will either.\n\nCONSEQUENCE FOR R14: strengthens it from 'laws should reach the packet' to 'DECISIONS should reach the packet' - the applicability join must cover decision nodes, not only guidance and laws. The probe that measured applicability found ten nodes carrying it and zero machine states; this is a second reason that migration is not optional.\n\nWATCH FOR: any evidence field asserting a property of a tool or a mechanism that some ledger node already records. A cheap mechanical check exists in principle - match claims against decision statements - and it is exactly the kind of thing that should move into the lint registry rather than staying a matter of care."
+provenance:
+  iteration: i12-tool-surface
+  ai_involvement: agent-drafted
+---
+
+

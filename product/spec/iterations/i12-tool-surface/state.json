@@ -1,7 +1,7 @@
 {
   "machine": "systematic",
   "iteration": "i12-tool-surface",
-  "current": "converge_pugh",
+  "current": "rank_unknowns",
   "counters": {},
   "history": [
     {
@@ -393,13 +393,49 @@
       "outcome": "filled",
       "evidence": "grant:8061579515dd",
       "at": "2026-07-25T17:18:14.775Z"
+    },
+    {
+      "state": "converge_pugh",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i12-tool-surface/evidence/converge_pugh-2.json",
+      "at": "2026-07-25T17:22:43.320Z"
+    },
+    {
+      "state": "reverse_sensitivity",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i12-tool-surface/evidence/reverse_sensitivity-2.json",
+      "at": "2026-07-25T17:23:29.313Z"
+    },
+    {
+      "state": "record_adrs",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i12-tool-surface/evidence/record_adrs-2.json",
+      "at": "2026-07-25T17:26:29.128Z"
+    },
+    {
+      "state": "consolidate_baseline",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i12-tool-surface/evidence/consolidate_baseline-2.json",
+      "at": "2026-07-25T17:27:36.990Z"
+    },
+    {
+      "state": "evaluate_baseline",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i12-tool-surface/evidence/evaluate_baseline-2.json",
+      "at": "2026-07-25T17:28:41.176Z"
+    },
+    {
+      "state": "gate_architecture",
+      "outcome": "filled",
+      "evidence": "grant:224516f5f70f",
+      "at": "2026-07-25T17:31:01.654Z"
     }
   ],
   "escapes": [],
   "status": "open",
   "fired": [],
   "active": [
-    "converge_pugh"
+    "rank_unknowns"
   ],
   "claims": {
     "evaluate_set": "main"
