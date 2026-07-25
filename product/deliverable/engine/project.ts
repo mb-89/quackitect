@@ -242,7 +242,12 @@ export function projectState(root: string): ProjectionState {
     type Plan = { iterations?: { id: string; goal?: string; steps?: { text: string; owner?: boolean }[] }[] };
     const plan = readJsonFile<Plan>(planPath);
     for (const p of plan.iterations ?? []) {
-      if (existsSync(layout.instancePath(abs, p.id))) continue; // started: the real record wins
+      // Started: the real record wins. Guard against the LIST, not against
+      // trunk's disk - a worktree-resident iteration has no instance under
+      // `abs`, so the disk check missed it and the board rendered the same
+      // iteration twice (owner-reported 2026-07-25, first triggered by i12,
+      // the first id to be both planned and worktree-resident).
+      if (iterations.some((it) => it.id === p.id)) continue;
       iterations.push({
         id: p.id,
         status: "planned",

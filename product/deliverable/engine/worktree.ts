@@ -214,7 +214,13 @@ export interface ShipMergeResult {
   refused?: string;
   conflict?: string;
   suspects: string[];
+  /** The readable name. A convenience, and deletable by anyone. */
   tag?: string;
+  /** THE POINTER: the evidence commit's hash. Reachable from trunk as the
+   *  merge's second parent, so it survives any tag or branch deletion. */
+  evidence_commit?: string;
+  /** Whether the iteration branch was removed, freeing the ref name for the tag. */
+  branch_deleted?: boolean;
 }
 
 /** Append-only ledger events (grants) union-merge — two iterations closing
@@ -271,9 +277,20 @@ export function shipMerge(root: string, iteration: string, opts: { allowSelf?: b
   if (git(root, "rev-parse", "-q", "--verify", `refs/tags/${tag}`).ok) {
     return { merged: false, refused: `the tag ${tag} already exists — the record cannot be named`, suspects: [] };
   }
-  if (!git(root, "tag", tag, branch).ok) {
+  // ANNOTATED, not lightweight (se.adr-the-hash-is-the-pointer-the-tag-is-the-name).
+  // Verified 2026-07-25: push.followTags carries ONLY annotated tags, so a
+  // lightweight tag means the config every VS Code user would set pushes the
+  // commits and silently drops every iter/* tag. The message makes `git show
+  // iter/<id>` say what the iteration WAS rather than just naming a commit —
+  // which matters now that tags are the handles a record search uses.
+  const evidenceCommit = git(root, "rev-parse", branch).stdout;
+  const annotation = `${iteration}\n\nThe iteration's record: evidence, machines and state, withheld from trunk by the close.\nEvidence commit: ${evidenceCommit}\nReachable from trunk as the merge's second parent, with or without this tag.`;
+  if (!git(root, ...GIT_ID, "tag", "-a", "-m", annotation, tag, branch).ok) {
     return { merged: false, refused: `the tag ${tag} could not be created`, suspects: [] };
   }
+  // A flagless push must not silently drop the record (R25). Idempotent, and
+  // local-only: it changes this clone's config, never the remote.
+  git(root, "config", "push.followTags", "true");
 
   // The union-merge attribute must be in the tree BEFORE the merge to take
   // effect on grants.jsonl — but committing it separately would move trunk's
@@ -341,7 +358,19 @@ export function shipMerge(root: string, iteration: string, opts: { allowSelf?: b
     git(root, ...GIT_ID, "commit", "-m", `suspects marked after merging ${branch}`);
   }
   retireWorktree(root, iteration, "ship", opts);
-  return { merged: true, suspects, tag };
+
+  // THE BRANCH GOES (R24, se.adr-the-hash-is-the-pointer-the-tag-is-the-name).
+  // Not housekeeping: a branch and a tag sharing the name iter/<id> make the
+  // ref AMBIGUOUS — git said so itself during an i12 probe ("warning: refname
+  // 'iter/i8d-phone-brief' is ambiguous") and resolved silently to one of them.
+  // Record search reads these refs by name, so one name must mean one thing.
+  // Safe by construction: the merge's second parent holds the evidence commit,
+  // so nothing becomes unreachable. Best-effort — a branch that will not delete
+  // must never void a completed close.
+  const deleted = git(root, "branch", "-D", branch).ok;
+  if (!deleted) console.error(`se: ${branch} merged but could not be deleted — the ref name stays ambiguous against tag ${tag}`);
+
+  return { merged: true, suspects, tag, evidence_commit: evidenceCommit, branch_deleted: deleted };
 }
 
 /** depends_on is satisfied only by a gate_release grant (adr-shipped-is-release-grant). */

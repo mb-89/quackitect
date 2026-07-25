@@ -6,7 +6,14 @@ import assert from "node:assert/strict";
 import { mkdtempSync, rmSync, mkdirSync, writeFileSync, readFileSync, existsSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { fileList, fileRead, fileWrite, filePatch, fileDelete, fileSearch } from "../engine/deliverable.ts";
+// NOTE (i12): fileSearch and its literal/ranked/fuzzy modes were DELETED, not
+// replaced in place — git is now the only search provider
+// (se.adr-git-is-the-only-searcher) and keeping a second implementation was
+// ruled out. The search behaviour these tests used to cover now lives in
+// tests/i12-tool-surface.test.ts against the real thing, including cases the
+// old searcher could not do at all: searching a ref, and finding a file that
+// was never staged.
+import { fileList, fileRead, fileWrite, filePatch, fileDelete } from "../engine/deliverable.ts";
 import { Rejection } from "../engine/errors.ts";
 
 function fixture(): string {
@@ -33,36 +40,6 @@ test("list and read work root-wide; workspace and dot-dirs stay invisible", () =
     assert.equal(f.content, "the front door\n");
     assert.equal(f.hash.length, 64);
     assert.equal(fileRead(root, "product/spec/ledger/se/node.md").content, "a ledger node\n");
-  } finally {
-    try { rmSync(root, { recursive: true, force: true, maxRetries: 20, retryDelay: 100 }); } catch { /* temp cleanup is best-effort */ }
-  }
-});
-
-test("search finds by name and by content, workspace excluded", () => {
-  const root = fixture();
-  try {
-    const byName = fileSearch(root, "a.ts");
-    assert.ok(byName.hits.some((h) => h.path === "product/deliverable/engine/a.ts"));
-    const byContent = fileSearch(root, "front door");
-    assert.deepEqual(byContent.hits, [{ path: "README.md", line: 1, text: "the front door" }]);
-    assert.equal(fileSearch(root, "agent territory").hits.length, 0);
-    assert.equal(fileSearch(root, "no such match anywhere").hits.length, 0);
-
-    // Literal returns every matching line per file (capped), not just the first.
-    writeFileSync(join(root, "product", "twice.md"), "needle one\nnothing\nneedle two\n");
-    const multi = fileSearch(root, "needle");
-    assert.equal(multi.hits.filter((h) => h.path === "product/twice.md").length, 2);
-
-    // Ranked: the file carrying both terms outranks the single-term file.
-    writeFileSync(join(root, "product", "both.md"), "alpha beta\nalpha\n");
-    writeFileSync(join(root, "product", "one.md"), "alpha\n");
-    const ranked = fileSearch(root, "alpha beta", 20, "ranked");
-    assert.equal(ranked.hits[0].path, "product/both.md");
-    assert.ok((ranked.hits[0].score ?? 0) > (ranked.hits.find((h) => h.path === "product/one.md")?.score ?? 0));
-
-    // Fuzzy: filename subsequence.
-    const fuzzy = fileSearch(root, "prodtwice", 20, "fuzzy");
-    assert.ok(fuzzy.hits.some((h) => h.path === "product/twice.md"));
   } finally {
     try { rmSync(root, { recursive: true, force: true, maxRetries: 20, retryDelay: 100 }); } catch { /* temp cleanup is best-effort */ }
   }
@@ -141,8 +118,8 @@ test("escapes and workspace are refused (SE-C-060); ledger writes point to se_se
     ]) {
       assert.throws(op, (e: unknown) => e instanceof Rejection && e.clause === "SE-C-065");
     }
-    // Ledger READS are legal — search must see inside the ledger too.
-    assert.ok(fileSearch(root, "ledger node").hits.length > 0);
+    // Ledger READS stay legal — only WRITES ride se_set_apply.
+    assert.equal(fileRead(root, "product/spec/ledger/se/node.md").content, "a ledger node\n");
   } finally {
     try { rmSync(root, { recursive: true, force: true, maxRetries: 20, retryDelay: 100 }); } catch { /* temp cleanup is best-effort */ }
   }

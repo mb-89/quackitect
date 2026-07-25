@@ -135,129 +135,6 @@ export function fileList(root: string, dir = "."): { path: string; kind: "file" 
     .sort((a, b) => a.path.localeCompare(b.path));
 }
 
-export interface SearchHit {
-  path: string;
-  /** 1-indexed line and its text for content hits; absent for name hits. */
-  line?: number;
-  text?: string;
-  /** Ranked and fuzzy modes only. */
-  score?: number;
-}
-
-export type SearchMode = "literal" | "ranked" | "fuzzy";
-
-const MAX_SEARCH_FILE_BYTES = 1024 * 1024;
-const MAX_HITS_PER_FILE = 3;
-
-function listFiles(base: string): { rel: string; abs: string }[] {
-  const out: { rel: string; abs: string }[] = [];
-  const walk = (dir: string): void => {
-    for (const e of readdirSync(dir, { withFileTypes: true })) {
-      if (skipEntry(e.name)) continue;
-      const abs = join(dir, e.name);
-      if (e.isDirectory()) walk(abs);
-      else out.push({ rel: relative(base, abs).replaceAll(sep, "/"), abs });
-    }
-  };
-  walk(base);
-  return out;
-}
-
-/** Text content, or null for binary/oversized files. */
-function readText(abs: string): string | null {
-  if (statSync(abs).size > MAX_SEARCH_FILE_BYTES) return null;
-  const content = readFileSync(abs, "utf8");
-  return content.includes(String.fromCharCode(0)) ? null : content;
-}
-
-/** Subsequence match; consecutive runs score higher (the fzf idea, tiny). */
-function fuzzyScore(query: string, path: string): number {
-  let qi = 0;
-  let streak = 0;
-  let score = 0;
-  for (let i = 0; i < path.length && qi < query.length; i++) {
-    if (path[i] === query[qi]) {
-      qi++;
-      streak++;
-      score += streak;
-    } else {
-      streak = 0;
-    }
-  }
-  return qi === query.length ? score : 0;
-}
-
-/**
- * Find files three ways: literal (substring, up to 3 line hits per file),
- * ranked (multi-term, occurrence-scored, name hits weigh more), fuzzy
- * (filename subsequence). Paths + anchors only — the detail read is a
- * second call. Intent is logged like se.help: searches ARE the demand
- * signal for missing affordances.
- */
-export function fileSearch(root: string, query: string, limit = 20, mode: SearchMode = "literal"): { hits: SearchHit[]; truncated: boolean } {
-  const base = resolve(root);
-  const files = listFiles(base);
-  const needle = query.toLowerCase();
-  let hits: SearchHit[] = [];
-
-  if (mode === "fuzzy") {
-    const q = needle.replace(/\s+/g, "");
-    hits = files
-      .map((f) => ({ path: f.rel, score: fuzzyScore(q, f.rel.toLowerCase()) }))
-      .filter((h) => h.score > 0)
-      .sort((a, b) => b.score - a.score);
-  } else if (mode === "ranked") {
-    const terms = needle.split(/\s+/).filter((t) => t.length > 1);
-    for (const f of files) {
-      let score = terms.reduce((n, t) => n + (f.rel.toLowerCase().includes(t) ? 5 : 0), 0);
-      const content = readText(f.abs);
-      let first: SearchHit | undefined;
-      if (content !== null && terms.length > 0) {
-        const lower = content.toLowerCase();
-        for (const t of terms) {
-          let i = lower.indexOf(t);
-          while (i !== -1) {
-            score++;
-            i = lower.indexOf(t, i + t.length);
-          }
-        }
-        if (score > 0) {
-          const lines = content.split("\n");
-          for (let i = 0; i < lines.length; i++) {
-            if (terms.some((t) => lines[i].toLowerCase().includes(t))) {
-              first = { path: f.rel, line: i + 1, text: lines[i].trim().slice(0, 200) };
-              break;
-            }
-          }
-        }
-      }
-      if (score > 0) hits.push({ path: f.rel, score, ...(first?.line !== undefined ? { line: first.line, text: first.text } : {}) });
-    }
-    hits.sort((a, b) => (b.score ?? 0) - (a.score ?? 0));
-  } else {
-    for (const f of files) {
-      if (hits.length > limit) break;
-      if (f.rel.toLowerCase().includes(needle)) {
-        hits.push({ path: f.rel });
-        continue;
-      }
-      const content = readText(f.abs);
-      if (content === null) continue;
-      const lines = content.split("\n");
-      let inFile = 0;
-      for (let i = 0; i < lines.length && inFile < MAX_HITS_PER_FILE; i++) {
-        if (lines[i].toLowerCase().includes(needle)) {
-          hits.push({ path: f.rel, line: i + 1, text: lines[i].trim().slice(0, 200) });
-          inFile++;
-        }
-      }
-    }
-  }
-  const truncated = hits.length > limit;
-  if (truncated) hits.length = limit;
-  return { hits, truncated };
-}
-
 export interface LaneFile {
   path: string;
   hash: string;
@@ -358,6 +235,79 @@ export function filePatch(root: string, path: string, oldString: string, newStri
   const next = current.content.replace(oldString, () => newString);
   writeFileSync(resolveInside(root, path), next, "utf8");
   return { path, hash: sha256(next), content: "" };
+}
+
+export interface PatchOp {
+  path: string;
+  old_string: string;
+  new_string: string;
+  base_hash?: string;
+}
+
+/**
+ * MANY EDITS, ONE ACT (i12/R11, R12). se_file_patch applies exactly one edit
+ * per call, which made it simultaneously the most-used product tool (645 calls)
+ * and the most-failing (28) — and produced a hand-rolled sweep script when six
+ * call sites needed the same change.
+ *
+ * ATOMICITY IS BY CONSTRUCTION, not by rollback: every op is resolved and
+ * verified against disk FIRST, and nothing is written until all of them hold.
+ * A failing guard therefore leaves the tree untouched, with no partial state to
+ * unwind and no window where half the edits are visible.
+ */
+export function filePatchBatch(root: string, ops: PatchOp[]): { applied: number; files: string[] } {
+  if (ops.length === 0) {
+    throw new Rejection({
+      clause: "SE-C-064",
+      expected: "at least one edit",
+      got: "an empty batch",
+      remedy: { tool: "se_file_patch", args: { path: "<path>", old_string: "<old>", new_string: "<new>" }, note: "send the edits you mean to apply" },
+      source: SRC,
+    });
+  }
+
+  // PASS 1 — resolve and verify everything. Writes nothing.
+  const planned: { abs: string; path: string; next: string }[] = [];
+  const pending = new Map<string, string>(); // path -> content as it will be after earlier ops
+  for (const [i, op] of ops.entries()) {
+    refuseRootWrite(op.path);
+    const abs = resolveInside(root, op.path);
+    refuseLedgerWrite(root, abs, op.path);
+    const current = pending.get(op.path) ?? fileRead(root, op.path).content;
+    if (op.base_hash !== undefined && sha256(current) !== op.base_hash) {
+      throw new Rejection({
+        clause: "SE-C-063",
+        expected: `disk hash ${op.base_hash} for ${op.path}`,
+        got: sha256(current),
+        remedy: { tool: "se_file_read", args: { path: op.path }, note: `edit ${i + 1} of ${ops.length} is stale — re-read and re-send the whole batch; NOTHING was applied` },
+        source: SRC,
+      });
+    }
+    const count = current.split(op.old_string).length - 1;
+    if (count !== 1) {
+      throw new Rejection({
+        clause: "SE-C-064",
+        expected: `old_string occurring exactly once (edit ${i + 1} of ${ops.length})`,
+        got: `${count} occurrences in ${op.path}`,
+        remedy: {
+          tool: "se_file_patch",
+          args: { path: op.path, old_string: "<longer, unique excerpt>", new_string: op.new_string },
+          note: `edit ${i + 1} failed, so NOTHING in this batch was applied — the tree is untouched. ${count === 0 ? "Not found: re-read the file." : "Add surrounding lines until the match is unique."}`,
+        },
+        source: SRC,
+      });
+    }
+    const next = current.replace(op.old_string, () => op.new_string);
+    pending.set(op.path, next);
+    planned.push({ abs, path: op.path, next });
+  }
+
+  // PASS 2 — write. Every guard already held; one write per FILE, not per op,
+  // so several edits to one file land as its single final content.
+  const finals = new Map<string, { abs: string; next: string }>();
+  for (const p of planned) finals.set(p.path, { abs: p.abs, next: p.next });
+  for (const [, f] of finals) writeFileSync(f.abs, f.next, "utf8");
+  return { applied: ops.length, files: [...finals.keys()] };
 }
 
 /** Hash-guarded delete: base_hash must match disk — no blind removal. */
