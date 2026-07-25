@@ -8,7 +8,7 @@
 //
 // Usage: node bin/se-mcp.ts [--root <repo root>] [--child]
 import { spawn, spawnSync, type ChildProcess } from "node:child_process";
-import { randomBytes } from "node:crypto";
+import { createHash } from "node:crypto";
 import { existsSync, readdirSync, rmSync, statSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
@@ -25,7 +25,16 @@ if (args.includes("--child")) {
   runStdio(buildServer(root));
 } else {
   const binDir = dirname(fileURLToPath(import.meta.url));
-  const sessionFile = join(tmpdir(), `se-session-${randomBytes(6).toString("hex")}.json`);
+  // STABLE PER ROOT, not random per process (i12). It was named with random
+  // bytes at shim start, so admission survived a CHILD restart but vanished if
+  // the SHIM itself restarted — the session file it had written could never be
+  // found again. Observed live: landing engine changes cost a mid-run re-boot.
+  // Keying on the root means the record is findable across both restarts.
+  // TRADE-OFF, taken knowingly: two sessions on the same root now share the
+  // admission record. That is acceptable because admission attests THE
+  // CONTRACT, which is identical for both — per-agent state is carried by the
+  // machine's session claims, not by this file.
+  const sessionFile = join(tmpdir(), `se-session-${createHash("sha256").update(root).digest("hex").slice(0, 16)}.json`);
 
   const fingerprint = (): string => {
     const parts: string[] = [];

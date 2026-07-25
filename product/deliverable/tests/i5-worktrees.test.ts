@@ -11,7 +11,7 @@ import { execSync } from "node:child_process";
 process.env.SE_STATE_DIR = mkdtempSync(join(tmpdir(), "se-state-"));
 import { layout } from "../engine/layout.ts";
 import { Rejection } from "../engine/errors.ts";
-import { plantMachines } from "./fixtures.ts";
+import { plantMachines, ROUNDS } from "./fixtures.ts";
 import { loadMachine } from "../engine/machines/load.ts";
 import { Loop } from "../engine/loop.ts";
 import { Gate } from "../engine/gate.ts";
@@ -57,7 +57,7 @@ function closeIteration(wtRoot: string, iteration: string): void {
   loop.start(iteration);
   loop.submit({ goal: "g", load_bearing_for: "l", exit_check: "e" });
   loop.submit({ changed: "c" });
-  const p = loop.submit({ exit_check_result: "done" });
+  const p = loop.submit({ exit_check_result: "done", ...ROUNDS });
   new Gate(wtRoot).bless(m, p.offer_hash!, { channel: "test", adjudicated_by: "agent" });
 }
 
@@ -126,7 +126,13 @@ test("W1 killer: two iterations, both ship, the second merge marks the overlappi
     const merged = readFileSync(join(seDir, "shared.md"), "utf8");
     assert.match(merged, /suspect:/, "the node wears the mark");
     assert.ok(!existsSync(b.root), "shipped trees are removed");
-    assert.match(git("branch --list iter/it-a", root), /iter\/it-a/, "branches stay for history");
+    // i12 CHANGED THIS RULE. The branch used to stay "for history", which left a
+// branch AND a tag both named iter/it-a — git itself calls that refname
+// ambiguous, and record search reads these refs by name. History is not lost:
+// the merge's second parent holds the evidence commit, so it is reachable
+// with or without either name (se.adr-the-hash-is-the-pointer-the-tag-is-the-name).
+assert.equal(git("branch --list iter/it-a", root), "", "the branch goes after the merge, so one name means one thing");
+assert.match(git("tag --list iter/it-a", root), /iter\/it-a/, "the TAG carries the readable name");
   } finally {
     try { rmSync(root, { recursive: true, force: true, maxRetries: 20, retryDelay: 100 }); } catch { /* temp cleanup is best-effort */ }
   }

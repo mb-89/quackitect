@@ -63,7 +63,16 @@ test("scripted walk closes a dummy iteration with no human and no agent", () => 
     // Gate submit creates an OFFER (B5): the bless arrives through a channel
     // the agent doesn't control. The script plays the human via the gate API,
     // channel recorded as scripted (delegated adjudication, transparent).
-    p = loop.submit({ exit_check_result: "closed; verify ran mechanically with exit 0" });
+    // i12: every gate carries the four standard review rounds, injected by the
+    // compiler and REFUSED if absent (SE-C-030). A scripted walk fills them the
+    // way a trivial gate should — scale to size, but never blank.
+    p = loop.submit({
+      exit_check_result: "closed; verify ran mechanically with exit 0",
+      verify_round: "the one input state (do_work) delivered; its evidence matches its claim",
+      validate_round: "meets the dummy walk's only intent: close mechanically with no human and no agent",
+      redteam_round: "kill-criterion: the walk closes without the engine-filled verify actually running. Looked: auto_closed records verify with ok true. Trivial gate, no further opposing case",
+      verdict: "pass",
+    });
     assert.equal(p.kind, "gate_offered");
     assert.ok(p.offer_hash);
     const gate = new Gate(root);

@@ -126,7 +126,15 @@ test("a child machine runs engine-filled states and offers its gate", async () =
     const p1 = loop.start("i-child"); // the child's engine state runs mechanically
     assert.equal(p1.state, "check", "the engine-filled child state auto-closed");
     assert.equal((p1 as { parent_state?: string }).parent_state, "seed");
-    const offered = loop.submit({ ok: "y" }); // the child gate OFFERS like any gate
+    // i12: a child gate is still a gate — it carries the four standard rounds
+  // like any other, and the submit is refused without them.
+  const offered = loop.submit({
+    ok: "y",
+    verify_round: "the child's engine-filled states ran; their records match their claims",
+    validate_round: "meets the child machine's intent: run engine states, then offer",
+    redteam_round: "kill-criterion: the child offers without its engine states having run. Looked: they ran. Trivial gate",
+    verdict: "pass",
+  }); // the child gate OFFERS like any gate
     assert.equal(offered.kind, "gate_offered");
     const gate = new Gate(root);
     assert.ok(gate.current() !== null, "a real offer exists for the child gate");

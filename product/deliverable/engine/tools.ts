@@ -26,6 +26,7 @@ import { fileList, fileRead, fileWrite, filePatch, filePatchBatch, fileDelete, t
 import { searchProduct, readRange, listFiles as gitListFiles } from "./search.ts";
 import { showConfig, setConfig, validateConfig } from "./config.ts";
 import { registeredChecks } from "./lint.ts";
+import { promoteEngine } from "./promote.ts";
 import { git, assertNotHistoryRewrite, assertNotPush, assertCommitWindow } from "./git.ts";
 import { runCommand, assertTestRunScope } from "./run.ts";
 import { psAction } from "./ps.ts";
@@ -61,9 +62,27 @@ export function coreTools(root: string, opts: { toll?: Toll; session?: Session }
   // shared across a project's worktrees) legitimately use `root`.
   const activeRoot = (): string => {
     if (!hasOpenInstance(root)) {
-      for (const w of openWorktrees(root)) {
-        if (hasOpenInstance(w.root)) return w.root;
+      const open = openWorktrees(root).filter((w) => hasOpenInstance(w.root));
+      // AMBIGUITY IS A REFUSAL, NOT A COIN FLIP (i12). The old rule took "the
+      // first open worktree", which is whichever the directory listing happened
+      // to return. With ONE iteration open that is unambiguous; with two — the
+      // parallel-iterations goal worktrees exist for — it silently routes one
+      // agent's writes into the other agent's tree. Nothing warns, and the
+      // damage is discovered later as work that vanished.
+      if (open.length > 1) {
+        throw new Rejection({
+          clause: "SE-C-072",
+          expected: "exactly one open iteration for this session to act on",
+          got: `${open.length} open: ${open.map((w) => w.iteration).join(", ")}`,
+          remedy: {
+            tool: "se_loop_next",
+            args: { session: "<this session's name>" },
+            note: "with several iterations open, the session must say which one it is working — otherwise a write lands in the wrong worktree",
+          },
+          source: "engine/tools.ts activeRoot",
+        });
       }
+      if (open.length === 1) return open[0].root;
     }
     return root;
   };
@@ -142,6 +161,33 @@ export function coreTools(root: string, opts: { toll?: Toll; session?: Session }
         });
         opts.toll?.arm(); // pillar 3: armed after the first submit
         return packet;
+      },
+    },
+    {
+      name: "se_promote",
+      title: "se.promote",
+      description:
+        "Land ENGINE changes from the open iteration's worktree onto trunk, so the running lane gains the behaviour before the close. Engine/bin/test files only; the whole suite must pass IN TRUNK first; on any failure trunk is restored untouched.",
+      inputSchema: {
+        type: "object",
+        properties: {
+          files: { type: "array", items: { type: "string" }, description: "repo-relative engine/bin/test paths" },
+          reason: { type: "string", description: "why the running lane needs this before the close" },
+        },
+        required: ["files", "reason"],
+      },
+      handler: (args) => {
+        const wt = activeRoot();
+        if (wt === root) {
+          throw new Rejection({
+            clause: "SE-C-071",
+            expected: "an open iteration in a worktree to promote FROM",
+            got: "the active root is trunk itself",
+            remedy: { tool: "se_git", args: { args: ["status"] }, note: "nothing to promote — trunk already runs what you are editing" },
+            source: "engine/tools.ts se_promote",
+          });
+        }
+        return promoteEngine(root, wt, (args.files as string[]).map(String), String(args.reason));
       },
     },
     {
@@ -726,7 +772,13 @@ export function buildServer(root: string, opts: { tollWindowMs?: number; now?: (
   // than enumerating the ways a call can be malformed.
   const required = new Map(tools.map((t) => [t.name, (t.inputSchema.required as string[] | undefined) ?? []]));
   server.addGuard((tool, args) => {
-    const missing = (required.get(tool) ?? []).filter((k) => args[k] === undefined || args[k] === null);
+    // ABSENT means the key was not sent. NULL IS A VALUE, and a meaningful one:
+    // se_file_write takes base_hash: null to mean "create this file". Treating
+    // null as missing made the guard refuse correct work within minutes of
+    // being built — se.raid-a-wrong-lint-becomes-the-new-workaround-pressure,
+    // and the ruling made in advance was that a wrongly-firing guard is a
+    // defect to fix, never a cost to absorb.
+    const missing = (required.get(tool) ?? []).filter((k) => !(k in args) || args[k] === undefined);
     if (missing.length === 0) return;
     const known = Object.keys((tools.find((t) => t.name === tool)?.inputSchema.properties as Record<string, unknown>) ?? {});
     throw new Rejection({

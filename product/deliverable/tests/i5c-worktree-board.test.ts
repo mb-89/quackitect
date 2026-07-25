@@ -14,7 +14,7 @@ process.env.SE_STATE_DIR = mkdtempSync(join(tmpdir(), "se-state-"));
 import { loadMachine } from "../engine/machines/load.ts";
 import { Loop } from "../engine/loop.ts";
 import { projectState } from "../engine/project.ts";
-import { plantMachines } from "./fixtures.ts";
+import { plantMachines, ROUNDS } from "./fixtures.ts";
 
 const git = (c: string, cwd: string): string => execSync(`git ${c}`, { cwd, encoding: "utf8" }).trim();
 
@@ -39,7 +39,7 @@ test("a WORKTREE iteration shows in projectState: iterations list + machine_stac
     // Walk to the close gate FROM the trunk server, so an offer is live.
     srv().submit({ goal: "g", load_bearing_for: "l", exit_check: "e" });
     srv().submit({ changed: "c" });
-    const offered = srv().submit({ exit_check_result: "done" });
+    const offered = srv().submit({ exit_check_result: "done", ...ROUNDS }); // i12: a gate carries its four rounds or is refused
     assert.equal(offered.kind, "gate_offered", "the worktree iteration has a live offer");
 
     // The board renders THIS - it must show the worktree iteration everywhere.

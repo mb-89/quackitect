@@ -17,7 +17,7 @@ process.env.SE_STATE_DIR = mkdtempSync(join(tmpdir(), "se-state-"));
 import { layout } from "../engine/layout.ts";
 import { Loop } from "../engine/loop.ts";
 import { loadMachine } from "../engine/machines/load.ts";
-import { plantMachines } from "./fixtures.ts";
+import { plantMachines, ROUNDS } from "./fixtures.ts";
 import { seal, unseal, briefPage, briefHtml, briefEnvelope, publishBrief, MAX_BRIEF_TTL_S, type BriefStore } from "../engine/brief.ts";
 import { PhoneLane, answerUrl, type Transport, type PhoneAnswer, type CardMessage } from "../engine/phone.ts";
 import { seWait } from "../engine/wait.ts";
@@ -81,7 +81,7 @@ const reachOffer = (root: string): string => {
   loop.start("i0-brief");
   loop.submit({ goal: "g", load_bearing_for: "l", exit_check: "e" });
   loop.submit({ changed: "c" });
-  return loop.submit({ exit_check_result: "done" }).offer_hash!;
+  return loop.submit({ exit_check_result: "done", ...ROUNDS }).offer_hash!;
 };
 
 const writeConfig = (root: string, cfg: object): void =>

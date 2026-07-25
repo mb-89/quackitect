@@ -15,7 +15,7 @@ import { loadMachine } from "../engine/machines/load.ts";
 import type { MachineDecl } from "../engine/machine.ts";
 
 const systematic = loadMachine(join(import.meta.dirname, "..", "..", ".."), "lean")!;
-import { plantMachines } from "./fixtures.ts";
+import { plantMachines, ROUNDS } from "./fixtures.ts";
 
 const OK = `node -e "process.exit(0)"`;
 const machineOK = (): MachineDecl => ({
@@ -51,7 +51,7 @@ test("board serves page + projection, and the bless button closes the gate on th
     loop.start("i0-board");
     loop.submit({ goal: "g", load_bearing_for: "l", exit_check: "e" });
     loop.submit({ changed: "c" });
-    const offered = loop.submit({ exit_check_result: "done" });
+    const offered = loop.submit({ exit_check_result: "done", ...ROUNDS }); // i12: a gate carries its four rounds or is refused
     assert.equal(offered.kind, "gate_offered");
 
     const started = await startBoard(root);
