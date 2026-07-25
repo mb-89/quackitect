@@ -43,18 +43,30 @@ registerMigration(v1Import);
 
 /** The tool surface bound to a repo root (spec/, product/, .se/). */
 export function coreTools(root: string, opts: { toll?: Toll; session?: Session } = {}): ToolDef[] {
-  const ledgerRoot = layout.ledger(root);
   const session = opts.session ?? newSession();
-  // K1-prime routing (adr-iteration-resolved-roots): the trunk's open
-  // instance serves first; otherwise the first open worktree stream does,
-  // under ITS OWN root and machines.
-  const loop = (): Loop => {
+  // adr-iteration-resolved-roots: the ONE place a tool's working root is
+  // resolved. Trunk's open instance serves first; else the first open worktree
+  // stream, under ITS OWN root. A worktree is a full checkout, so resolution is
+  // per-CALL (the whole root), never per-file.
+  //
+  // REQUIREMENT (guarded by tools-worktree-aware.test.ts): every tool that
+  // touches iteration-scoped state - product files, the repo, the ledger - MUST
+  // take its root from activeRoot() (or ledgerRoot(), which derives from it),
+  // never the bound `root`. Only server-level tools (boot, ps, help) and
+  // shared-project-dir tools (notes, gate, wait, log - whose seDir is already
+  // shared across a project's worktrees) legitimately use `root`.
+  const activeRoot = (): string => {
     if (!hasOpenInstance(root)) {
       for (const w of openWorktrees(root)) {
-        if (hasOpenInstance(w.root)) return new Loop(w.root, requireSystematic(w.root));
+        if (hasOpenInstance(w.root)) return w.root;
       }
     }
-    return new Loop(root, requireSystematic(root));
+    return root;
+  };
+  const ledgerRoot = (): string => layout.ledger(activeRoot());
+  const loop = (): Loop => {
+    const r = activeRoot();
+    return new Loop(r, requireSystematic(r));
   };
   const log = (): CallLog => new CallLog(layout.seDir(root));
   const tools: ToolDef[] = [
@@ -154,7 +166,7 @@ export function coreTools(root: string, opts: { toll?: Toll; session?: Session }
       },
       handler: (args) =>
         getNode(
-          loadLedger(ledgerRoot),
+          loadLedger(ledgerRoot()),
           String(args.id),
           (args.mode as GetMode) ?? "outline",
           args.section === undefined ? undefined : String(args.section),
@@ -175,7 +187,7 @@ export function coreTools(root: string, opts: { toll?: Toll; session?: Session }
       handler: (args) => {
         const idx = new WarmIndex();
         try {
-          idx.rebuild(loadLedger(ledgerRoot));
+          idx.rebuild(loadLedger(ledgerRoot()));
           const limit = Number(args.limit ?? 10);
           const hits = idx.search(String(args.query), limit + 1);
           const truncated = hits.length > limit;
@@ -227,14 +239,14 @@ export function coreTools(root: string, opts: { toll?: Toll; session?: Session }
             }
             useOps = cached.ops;
           }
-          return execute(ledgerRoot, useOps, String(args.execute_hash));
+          return execute(ledgerRoot(), useOps, String(args.execute_hash));
         }
         if (args.dry_run === false) {
           // Fire-first: apply directly; the engine still hash-guards internally.
-          const d = dryRun(ledgerRoot, ops);
-          return { ...execute(ledgerRoot, ops, d.diff_hash), fired_direct: true };
+          const d = dryRun(ledgerRoot(), ops);
+          return { ...execute(ledgerRoot(), ops, d.diff_hash), fired_direct: true };
         }
-        const d = dryRun(ledgerRoot, ops);
+        const d = dryRun(ledgerRoot(), ops);
         mkdirSync(layout.seDir(root), { recursive: true });
         appendFileSync(cachePath, JSON.stringify({ hash: d.diff_hash, ops }) + "\n", "utf8");
         return d;
@@ -255,7 +267,7 @@ export function coreTools(root: string, opts: { toll?: Toll; session?: Session }
         required: ["name"],
       },
       handler: (args) => {
-        const ctx = { ledgerRoot, params: (args.params ?? {}) as Record<string, string> };
+        const ctx = { ledgerRoot: ledgerRoot(), params: (args.params ?? {}) as Record<string, string> };
         const wantsExecute = args.execute_hash !== undefined && args.dry_run !== true;
         if (!wantsExecute) return migrateDryRun(String(args.name), ctx);
         return migrateExecute(String(args.name), ctx, String(args.execute_hash));
@@ -269,7 +281,7 @@ export function coreTools(root: string, opts: { toll?: Toll; session?: Session }
         type: "object",
         properties: { dir: { type: "string", default: "." } },
       },
-      handler: (args) => fileList(root, String(args.dir ?? ".")),
+      handler: (args) => fileList(activeRoot(), String(args.dir ?? ".")),
     },
     {
       name: "se_file_search",
@@ -285,7 +297,7 @@ export function coreTools(root: string, opts: { toll?: Toll; session?: Session }
         },
         required: ["query", "intent"],
       },
-      handler: (args) => fileSearch(root, String(args.query), Number(args.limit ?? 20), (args.mode as SearchMode) ?? "literal"),
+      handler: (args) => fileSearch(activeRoot(), String(args.query), Number(args.limit ?? 20), (args.mode as SearchMode) ?? "literal"),
     },
     {
       name: "se_file_read",
@@ -296,7 +308,7 @@ export function coreTools(root: string, opts: { toll?: Toll; session?: Session }
         properties: { path: { type: "string" } },
         required: ["path"],
       },
-      handler: (args) => fileRead(root, String(args.path)),
+      handler: (args) => fileRead(activeRoot(), String(args.path)),
     },
     {
       name: "se_file_write",
@@ -312,7 +324,7 @@ export function coreTools(root: string, opts: { toll?: Toll; session?: Session }
         required: ["path", "content", "base_hash"],
       },
       handler: (args) =>
-        fileWrite(root, String(args.path), String(args.content), args.base_hash === null || args.base_hash === "null" ? null : String(args.base_hash)),
+        fileWrite(activeRoot(), String(args.path), String(args.content), args.base_hash === null || args.base_hash === "null" ? null : String(args.base_hash)),
     },
     {
       name: "se_file_patch",
@@ -330,7 +342,7 @@ export function coreTools(root: string, opts: { toll?: Toll; session?: Session }
       },
       handler: (args) =>
         filePatch(
-          root,
+          activeRoot(),
           String(args.path),
           String(args.old_string),
           String(args.new_string),
@@ -349,7 +361,7 @@ export function coreTools(root: string, opts: { toll?: Toll; session?: Session }
         },
         required: ["path", "base_hash"],
       },
-      handler: (args) => fileDelete(root, String(args.path), String(args.base_hash)),
+      handler: (args) => fileDelete(activeRoot(), String(args.path), String(args.base_hash)),
     },
     {
       name: "se_git",
@@ -362,9 +374,10 @@ export function coreTools(root: string, opts: { toll?: Toll; session?: Session }
       },
       handler: (args) => {
         const gitArgs = (args.args as string[]).map(String);
+        const gitRoot = activeRoot();
         assertNotPush(gitArgs);
         assertNotHistoryRewrite(gitArgs);
-        if (gitArgs[0] === "commit") assertCommitWindow(root);
+        if (gitArgs[0] === "commit") assertCommitWindow(gitRoot);
         const ALLOWED = new Set(["status", "log", "diff", "show", "add", "commit", "fetch", "branch", "rev-parse", "restore"]);
         if (!ALLOWED.has(gitArgs[0])) {
           throw new Rejection({
@@ -385,7 +398,7 @@ export function coreTools(root: string, opts: { toll?: Toll; session?: Session }
             source: "engine/tools.ts se_git",
           });
         }
-        const r = git(root, ...gitArgs);
+        const r = git(gitRoot, ...gitArgs);
         return { ok: r.ok, code: r.code, stdout: r.stdout.slice(-20_000), stderr: r.stderr.slice(-20_000) };
       },
     },
@@ -399,8 +412,9 @@ export function coreTools(root: string, opts: { toll?: Toll; session?: Session }
         required: ["command"],
       },
       handler: (args) => {
-        assertTestRunScope(root, String(args.command));
-        return runCommand(log(), String(args.command), root);
+        const runRoot = activeRoot();
+        assertTestRunScope(runRoot, String(args.command));
+        return runCommand(log(), String(args.command), runRoot);
       },
     },
     {
