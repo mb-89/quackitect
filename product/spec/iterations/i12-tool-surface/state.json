@@ -1,0 +1,26 @@
+{
+  "machine": "systematic",
+  "iteration": "i12-tool-surface",
+  "current": "draft_vision",
+  "counters": {},
+  "history": [
+    {
+      "state": "onboard_retro",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i12-tool-surface/evidence/onboard_retro-1.json",
+      "at": "2026-07-25T13:45:19.788Z"
+    },
+    {
+      "state": "gate_kickoff",
+      "outcome": "filled",
+      "evidence": "grant:22c4cafc0743",
+      "at": "2026-07-25T14:10:14.444Z"
+    }
+  ],
+  "escapes": [],
+  "status": "open",
+  "fired": [],
+  "active": [
+    "draft_vision"
+  ]
+}
