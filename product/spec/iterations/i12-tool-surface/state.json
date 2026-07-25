@@ -1,7 +1,7 @@
 {
   "machine": "systematic",
   "iteration": "i12-tool-surface",
-  "current": "author_tests",
+  "current": "fill_story_evidence",
   "counters": {},
   "history": [
     {
@@ -447,13 +447,49 @@
       "outcome": "filled",
       "evidence": "grant:302a63713da8",
       "at": "2026-07-25T17:44:17.518Z"
+    },
+    {
+      "state": "author_tests",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i12-tool-surface/evidence/author_tests-1.json",
+      "at": "2026-07-25T17:49:42.600Z"
+    },
+    {
+      "state": "plan_build",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i12-tool-surface/evidence/plan_build-1.json",
+      "at": "2026-07-25T17:50:24.716Z"
+    },
+    {
+      "state": "observe_red",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i12-tool-surface/evidence/observe_red-1.json",
+      "at": "2026-07-25T17:50:57.228Z"
+    },
+    {
+      "state": "build_steps",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i12-tool-surface/evidence/build_steps-1.json",
+      "at": "2026-07-25T17:51:21.694Z"
+    },
+    {
+      "state": "verification",
+      "outcome": "filled",
+      "evidence": "run-cbee88a4f78d",
+      "at": "2026-07-25T17:53:57.371Z"
+    },
+    {
+      "state": "gate_implementation",
+      "outcome": "filled",
+      "evidence": "grant:fc2694282bd3",
+      "at": "2026-07-25T18:19:49.283Z"
     }
   ],
   "escapes": [],
   "status": "open",
   "fired": [],
   "active": [
-    "author_tests"
+    "fill_story_evidence"
   ],
   "claims": {
     "evaluate_set": "main"
