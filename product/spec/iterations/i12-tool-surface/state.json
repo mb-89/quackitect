@@ -1,7 +1,7 @@
 {
   "machine": "systematic",
   "iteration": "i12-tool-surface",
-  "current": "derive_criteria",
+  "current": "converge_pugh",
   "counters": {},
   "history": [
     {
@@ -111,14 +111,43 @@
       "outcome": "filled",
       "evidence": "grant:950cbc78ba6f",
       "at": "2026-07-25T14:35:41.513Z"
+    },
+    {
+      "state": "derive_criteria",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i12-tool-surface/evidence/derive_criteria-1.json",
+      "at": "2026-07-25T14:36:26.015Z"
+    },
+    {
+      "state": "partition_functions",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i12-tool-surface/evidence/partition_functions-1.json",
+      "at": "2026-07-25T14:37:02.069Z"
+    },
+    {
+      "state": "enumerate_space",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i12-tool-surface/evidence/enumerate_space-1.json",
+      "at": "2026-07-25T14:38:31.062Z"
+    },
+    {
+      "state": "evaluate_set",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i12-tool-surface/evidence/evaluate_set-1.json",
+      "at": "2026-07-25T14:39:48.452Z"
+    },
+    {
+      "state": "gate_candidates",
+      "outcome": "filled",
+      "evidence": "grant:2aa3f43f9528",
+      "at": "2026-07-25T14:40:54.734Z"
     }
   ],
   "escapes": [],
   "status": "open",
   "fired": [],
   "active": [
-    "derive_criteria",
-    "partition_functions"
+    "converge_pugh"
   ],
   "claims": {}
 }
