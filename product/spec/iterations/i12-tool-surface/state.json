@@ -1,7 +1,7 @@
 {
   "machine": "systematic",
   "iteration": "i12-tool-surface",
-  "current": "finalize_docs",
+  "current": "shipped",
   "counters": {},
   "history": [
     {
@@ -507,13 +507,37 @@
       "outcome": "filled",
       "evidence": "grant:8fd4e9b23c16",
       "at": "2026-07-25T18:28:37.906Z"
+    },
+    {
+      "state": "finalize_docs",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i12-tool-surface/evidence/finalize_docs-1.json",
+      "at": "2026-07-25T18:37:01.270Z"
+    },
+    {
+      "state": "package",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i12-tool-surface/evidence/package-1.json",
+      "at": "2026-07-25T18:37:35.773Z"
+    },
+    {
+      "state": "ship_review",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i12-tool-surface/evidence/ship_review-1.json",
+      "at": "2026-07-25T18:38:21.250Z"
+    },
+    {
+      "state": "gate_release",
+      "outcome": "filled",
+      "evidence": "grant:ff4b6b6495fc",
+      "at": "2026-07-25T18:40:15.712Z"
     }
   ],
   "escapes": [],
-  "status": "open",
+  "status": "closed",
   "fired": [],
   "active": [
-    "finalize_docs"
+    "shipped"
   ],
   "claims": {
     "evaluate_set": "main"
