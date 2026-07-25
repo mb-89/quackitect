@@ -240,9 +240,45 @@
     },
     {
       "state": "gate_motivation",
-      "outcome": "filled",
+      "outcome": "superseded",
       "evidence": "grant:2d57c387f58f",
       "at": "2026-07-25T15:28:31.680Z"
+    },
+    {
+      "state": "draw_context",
+      "outcome": "superseded",
+      "evidence": "product/spec/iterations/i12-tool-surface/evidence/draw_context-2.json",
+      "at": "2026-07-25T15:29:05.797Z"
+    },
+    {
+      "state": "map_stakeholders",
+      "outcome": "superseded",
+      "evidence": "product/spec/iterations/i12-tool-surface/evidence/map_stakeholders-2.json",
+      "at": "2026-07-25T15:29:39.238Z"
+    },
+    {
+      "state": "write_stories",
+      "outcome": "superseded",
+      "evidence": "product/spec/iterations/i12-tool-surface/evidence/write_stories-2.json",
+      "at": "2026-07-25T15:30:04.470Z"
+    },
+    {
+      "state": "generalize_use_cases",
+      "outcome": "superseded",
+      "evidence": "product/spec/iterations/i12-tool-surface/evidence/generalize_use_cases-2.json",
+      "at": "2026-07-25T15:30:29.103Z"
+    },
+    {
+      "state": "gate_motivation",
+      "outcome": "reopened",
+      "evidence": "Owner instruction: redo the motivation gate with the guidance landed, running the red team and steelmanning the opposite in increasing strictness. The first two fills were made against a form that never asked for the rounds.",
+      "at": "2026-07-25T15:37:49.208Z"
+    },
+    {
+      "state": "gate_motivation",
+      "outcome": "filled",
+      "evidence": "grant:9e56a314ae0c",
+      "at": "2026-07-25T15:40:00.546Z"
     }
   ],
   "escapes": [],
