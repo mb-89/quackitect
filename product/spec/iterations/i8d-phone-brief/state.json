@@ -1,7 +1,7 @@
 {
   "machine": "systematic",
   "iteration": "i8d-phone-brief",
-  "current": "finalize_docs",
+  "current": "shipped",
   "counters": {},
   "history": [
     {
@@ -255,13 +255,37 @@
       "outcome": "filled",
       "evidence": "grant:799835439357",
       "at": "2026-07-25T12:52:24.241Z"
+    },
+    {
+      "state": "finalize_docs",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i8d-phone-brief/evidence/finalize_docs-1.json",
+      "at": "2026-07-25T12:52:47.033Z"
+    },
+    {
+      "state": "package",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i8d-phone-brief/evidence/package-1.json",
+      "at": "2026-07-25T12:53:14.019Z"
+    },
+    {
+      "state": "ship_review",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i8d-phone-brief/evidence/ship_review-1.json",
+      "at": "2026-07-25T12:53:39.260Z"
+    },
+    {
+      "state": "gate_release",
+      "outcome": "filled",
+      "evidence": "grant:09a58f197e1c",
+      "at": "2026-07-25T13:18:11.427Z"
     }
   ],
   "escapes": [],
-  "status": "open",
+  "status": "closed",
   "fired": [],
   "active": [
-    "finalize_docs"
+    "shipped"
   ],
   "claims": {}
 }

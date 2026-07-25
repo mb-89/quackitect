@@ -24,7 +24,7 @@ import { readJsonFile } from "./jsonio.ts";
 import { layout } from "./layout.ts";
 import { Gate } from "./gate.ts";
 import { requireSystematic } from "./machines/load.ts";
-import { briefHtml, loadBriefStore, publishBrief, type BriefStore } from "./brief.ts";
+import { briefEnvelope, loadBriefStore, publishBrief, type BriefStore } from "./brief.ts";
 import type { CallLog } from "./calllog.ts";
 
 /** An answer read back off the phone channel — one tap. */
@@ -37,7 +37,15 @@ export interface PhoneAnswer {
   at: number;
 }
 
-/** One card. Title, priority and tags make a gate look like a gate (R2). */
+/**
+ * One card. Title, priority and tags make a gate look like a gate (R2).
+ *
+ * THE MESSAGE IS ONE LINE, AND THAT LINE IS THE LINK (owner ruling
+ * 2026-07-25, and se-v2-design §11 before it: "ntfy carries the notification
+ * (click URL = page + #key)", explicitly NOT "an editorially compressed
+ * brief"). The hosted page is the reading surface; the card is the doorbell.
+ * `click` makes tapping the notification body open that page directly.
+ */
 export interface CardMessage {
   message: string;
   actions: unknown;
@@ -45,6 +53,8 @@ export interface CardMessage {
   title: string;
   priority: number;
   tags: string[];
+  /** Where tapping the notification itself goes (ntfy X-Click). */
+  click?: string;
 }
 
 /** The outside-world boundary. Real impl talks ntfy; tests inject a mock. */
@@ -141,32 +151,56 @@ export class PhoneLane {
     if (offer === null) return { announced: false, brief: "none" };
     const tx = this.txFor(cfg);
 
-    // Rung 1: the rich brief. Allowed to fail; the ladder degrades LOUDLY.
+    // Rung 1: the hosted DECISION PAGE - the board's decision card, encrypted,
+    // carrying its own bless and dismiss. Allowed to fail; the ladder degrades
+    // LOUDLY. The answer topic and the offer hash travel INSIDE the ciphertext,
+    // so the host learns neither.
     const store = opts.store === undefined ? loadBriefStore(this.root) : opts.store;
     let briefUrl: string | null = null;
     let briefState: AnnounceResult["brief"] = "none";
     if (store !== null) {
       // R7: a brief never outlives the decision it serves.
       const remainingS = Math.ceil((offer.deadline - Date.now()) / 1000);
-      briefUrl = await publishBrief(store, briefHtml(offer), remainingS);
+      const envelope = briefEnvelope(offer, answerUrl(cfg.base ?? "https://ntfy.sh", cfg.answer_topic!));
+      briefUrl = await publishBrief(store, envelope, remainingS);
       briefState = briefUrl === null ? "degraded" : "published";
     }
 
     // Rung 2: the summons itself. Always attempted, whatever rung 1 did.
+    //
+    // THE CARD CARRIES NO CONTROLS when a brief exists (owner ruling
+    // 2026-07-25): the page is the decision surface, the notification is the
+    // doorbell. Buttons here would be a second, poorer place to decide - the
+    // exact rubber-stamping this lane exists to prevent, since a card cannot
+    // show what is being blessed.
+    //
+    // WITHOUT a brief there is nothing to open, so the card falls back to
+    // carrying the two direct actions rather than summoning the owner to
+    // nothing. That fallback is the ladder's floor, not the design.
     const answer = answerUrl(cfg.base ?? "https://ntfy.sh", cfg.answer_topic!);
-    const actions: unknown[] = [
-      { action: "http", label: "bless", method: "PUT", url: answer, body: `bless ${offer.base_hash}` },
-      { action: "http", label: "dismiss", method: "PUT", url: answer, body: `dismiss ${offer.base_hash}` },
-    ];
-    if (briefUrl !== null) actions.push({ action: "view", label: "read the brief", url: briefUrl });
+    const actions: unknown[] =
+      briefUrl !== null
+        ? []
+        : [
+            { action: "http", label: "bless", method: "POST", url: answer, body: `bless ${offer.base_hash}` },
+            { action: "http", label: "dismiss", method: "POST", url: answer, body: `dismiss ${offer.base_hash}` },
+          ];
 
+    // ONE LINE, and that line is the link. Never the brief's prose: deciding
+    // from a truncated sentence is the rubber-stamping this whole lane exists
+    // to prevent, and the full text is one tap away on the hosted page.
+    // Without a store there is no link, so the line says exactly that rather
+    // than silently falling back to a wall of text.
     const card: CardMessage = {
-      message: (offer.brief ?? offer.state).slice(0, 400),
+      message: briefUrl ?? `no brief link — ${briefState === "degraded" ? "the brief could not be published" : "no brief store configured"}`,
       actions: actions.slice(0, ACTION_BUDGET),
       id: offer.base_hash,
       title: `GATE ${offer.iteration} · ${offer.state}`,
       priority: GATE_PRIORITY,
       tags: ["bangbang"],
+      // Tapping the notification body opens the page (se-v2-design §11:
+      // "click URL = page + #key").
+      ...(briefUrl !== null ? { click: briefUrl } : {}),
     };
 
     try {
@@ -241,6 +275,8 @@ export class NtfyTransport implements Transport {
         "X-Title": msg.title,
         "X-Priority": String(msg.priority),
         "X-Tags": msg.tags.join(","),
+        // Tapping the notification body opens the brief (se-v2-design §11).
+        ...(msg.click !== undefined ? { "X-Click": msg.click } : {}),
       }),
       body: msg.message,
       signal: AbortSignal.timeout(this.timeoutMs),

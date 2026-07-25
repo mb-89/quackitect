@@ -18,8 +18,8 @@ import { layout } from "../engine/layout.ts";
 import { Loop } from "../engine/loop.ts";
 import { loadMachine } from "../engine/machines/load.ts";
 import { plantMachines } from "./fixtures.ts";
-import { seal, unseal, briefPage, briefHtml, publishBrief, MAX_BRIEF_TTL_S, type BriefStore } from "../engine/brief.ts";
-import { PhoneLane, answerUrl, type Transport, type PhoneAnswer } from "../engine/phone.ts";
+import { seal, unseal, briefPage, briefHtml, briefEnvelope, publishBrief, MAX_BRIEF_TTL_S, type BriefStore } from "../engine/brief.ts";
+import { PhoneLane, answerUrl, type Transport, type PhoneAnswer, type CardMessage } from "../engine/phone.ts";
 import { seWait } from "../engine/wait.ts";
 import { CallLog } from "../engine/calllog.ts";
 
@@ -32,10 +32,12 @@ const drop = (root: string): void => {
 };
 
 class MockTransport implements Transport {
-  published: { topic: string; message: string; actions: unknown; id: string; title?: string; priority?: number; tags?: string[] }[] = [];
+  // Typed against the real CardMessage, so a new field on the card cannot
+  // silently escape the checks the way `click` just tried to.
+  published: (CardMessage & { topic: string })[] = [];
   answers: PhoneAnswer[] = [];
   failPublish = false;
-  async publish(topic: string, msg: { message: string; actions: unknown; id: string; title?: string; priority?: number; tags?: string[] }): Promise<void> {
+  async publish(topic: string, msg: CardMessage): Promise<void> {
     if (this.failPublish) throw new Error("transport down");
     this.published.push({ topic, ...msg });
   }
@@ -125,12 +127,15 @@ test("R4/R5: the page carries the ciphertext and its own decryptor, never the pl
 });
 
 test("R4: the brief renders the gate's own text, escaped", () => {
-  const html = briefHtml({ iteration: "i8d", state: "gate_release", brief: "line one\nline <two> & more" });
-  assert.match(html, /i8d/);
-  assert.match(html, /gate_release/);
-  assert.match(html, /line one/);
+  // Structure mirrors the board's decision card: the gate line names the
+  // ITERATION, and the state rides in the brief's own first line, exactly as
+  // the board shows it - one artifact, not two that can drift.
+  const html = briefHtml({ iteration: "i8d", state: "gate_release", brief: "GATE gate_release\nline <two> & more" });
+  assert.match(html, /<b>Gate: i8d<\/b>/);
+  assert.match(html, /gate_release/, "the state comes through the brief itself");
   assert.ok(!html.includes("<two>"), "markup in the brief must be escaped, not injected");
   assert.match(html, /&lt;two&gt;/);
+  assert.match(html, /&amp; more/);
 });
 
 // ---------------------------------------------------------- publish + verify
@@ -176,9 +181,13 @@ test("R1: every action URL is absolute http(s) - the defect that started this it
     const tx = new MockTransport();
     const lane = new PhoneLane(root, () => tx);
     reachOffer(root);
-    await lane.announceOffer({ store: new MockStore() });
+    // The floor rung is where the card still carries controls, so that is
+    // where the URL must be tappable. With a page there are no actions at all.
+    const noStore = new MockStore();
+    noStore.failPut = true;
+    await lane.announceOffer({ store: noStore });
     const actions = tx.published[0].actions as { url?: string }[];
-    assert.ok(actions.length > 0, "actions were published");
+    assert.ok(actions.length > 0, "the floor rung publishes actions");
     for (const a of actions) {
       assert.match(String(a.url), /^https?:\/\//, `"${a.url}" is not a tappable URL`);
     }
@@ -205,7 +214,7 @@ test("R2: a gate looks like a gate - titled, raised, tagged", async () => {
   }
 });
 
-test("R3: at most three actions, and the third opens the brief", async () => {
+test("R3: with a decision page the card carries NO controls - the page decides", async () => {
   const root = freshRoot();
   try {
     writeConfig(root, CONFIG);
@@ -213,11 +222,77 @@ test("R3: at most three actions, and the third opens the brief", async () => {
     const lane = new PhoneLane(root, () => tx);
     reachOffer(root);
     await lane.announceOffer({ store: new MockStore() });
-    const actions = tx.published[0].actions as { action: string; url: string }[];
-    assert.ok(actions.length <= 3, "ntfy drops the rest silently");
-    assert.equal(actions.length, 3, "bless, dismiss, and the brief");
-    assert.equal(actions[2].action, "view", "the third opens the brief");
-    assert.match(actions[2].url, /#/, "with its key");
+    const actions = tx.published[0].actions as unknown[];
+    assert.equal(actions.length, 0, "a card cannot show what is being blessed, so it must not offer to bless it");
+  } finally {
+    drop(root);
+  }
+});
+
+test("the page IS the board's decision card - same structure, carrying its own controls", async () => {
+  const answer = "https://ntfy.example/t-in";
+  const env = briefEnvelope({ iteration: "i8d", state: "gate_release", brief: "line one\nline <two>", base_hash: "HASH123" }, answer);
+  const parsed = JSON.parse(env) as { html: string; answer_url: string; hash: string };
+  assert.match(parsed.html, /<b>Gate: i8d<\/b>/, "the board's gate line");
+  assert.match(parsed.html, /<pre>/, "the brief pre-formatted, as the board renders it");
+  assert.ok(!parsed.html.includes("<two>"), "markup in the brief is escaped, not injected");
+  assert.equal(parsed.answer_url, answer);
+  assert.equal(parsed.hash, "HASH123");
+
+  const { payload, key } = seal(env);
+  const page = briefPage(payload);
+  assert.match(page, /id="b"[^>]*>bless as offered/, "bless lives in the page");
+  assert.match(page, /id="d"[^>]*>dismiss/, "so does dismiss");
+  assert.match(page, /fetch\(env\.answer_url/, "and the page posts the answer itself");
+  assert.match(page, /what\+' '\+env\.hash/, "bound to the offer hash");
+  // The host must learn neither the answer topic nor the hash.
+  assert.ok(!page.includes(answer), "the answer topic is not in the served bytes");
+  assert.ok(!page.includes("HASH123"), "nor is the hash");
+  assert.equal(await unseal(payload, key), env, "both travel inside the ciphertext");
+});
+
+test("R11: the page never carries a credential - it answers anonymously", async () => {
+  const env = briefEnvelope({ iteration: "i", state: "s", brief: "b", base_hash: "h" }, "https://ntfy.example/t-in");
+  const page = briefPage(seal(env).payload);
+  assert.ok(!page.includes("Authorization"), "no auth header in the page");
+  assert.ok(!page.includes("Bearer"), "no bearer token in the page");
+});
+
+test("R4: the message is ONE LINE and that line is the link - never the brief's prose", async () => {
+  const root = freshRoot();
+  try {
+    writeConfig(root, CONFIG);
+    const tx = new MockTransport();
+    const lane = new PhoneLane(root, () => tx);
+    reachOffer(root);
+    await lane.announceOffer({ store: new MockStore() });
+    const p = tx.published[0];
+    assert.equal(p.message.split("\n").length, 1, "one line - a lock screen is not a reading surface");
+    assert.match(p.message, /^https:\/\/brief\.example\/[a-f0-9]+#[A-Za-z0-9_-]+$/, "and the line IS the link");
+    assert.equal(p.click, p.message, "tapping the notification opens the page (se-v2-design §11)");
+    // The whole point: the decision text lives on the page, not in the card.
+    const offerBrief = JSON.parse(readFileSync(layout.offerPath(root), "utf8")).brief as string;
+    const firstWords = offerBrief.split(/\s+/).slice(0, 6).join(" ");
+    assert.ok(!p.message.includes(firstWords), "the card must not carry the brief's prose");
+  } finally {
+    drop(root);
+  }
+});
+
+test("R4/R8: with no brief the one line SAYS SO - it never falls back to a wall of text", async () => {
+  const root = freshRoot();
+  try {
+    writeConfig(root, CONFIG);
+    const tx = new MockTransport();
+    const store = new MockStore();
+    store.failPut = true;
+    const lane = new PhoneLane(root, () => tx);
+    reachOffer(root);
+    await lane.announceOffer({ store });
+    const p = tx.published[0];
+    assert.equal(p.message.split("\n").length, 1, "still one line");
+    assert.match(p.message, /no brief link/, "and it names the absence");
+    assert.equal(p.click, undefined, "nothing to open, so nothing is promised");
   } finally {
     drop(root);
   }

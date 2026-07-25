@@ -513,7 +513,11 @@ function render() {
     (nrows.filter(r => !nq || r.key.includes(nq)).map(r => r.html).join("") || '<span class="dim">empty</span>'));
   DECS = [];
   if (S.offer) {
-    DECS.push('<div class="card"><b>Gate: ' + esc(S.offer.iteration) + "</b><pre>" + esc(S.offer.brief) + "</pre>" +
+    // THE SAME CARD the phone gets: card_html comes from engine/brief.ts's
+    // briefHtml, the single renderer, already escaped. The board adds only its
+    // own controls; the hosted page adds its own. One card, two places to
+    // decide it - never two cards that can drift apart.
+    DECS.push('<div class="card">' + S.offer.card_html +
       "<button id=\\"blessBtn\\" onclick=\\"bless()\\">bless as offered</button> " +
       "<button onclick=\\"dismiss()\\">dismiss</button></div>");
   }
