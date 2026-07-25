@@ -49,7 +49,7 @@ test("boot: contract -> attest -> admitted, with lock, recents and a projected h
     // And the recents line for the picker.
     assert.match(readFileSync(layout.recentsPath(), "utf8"), /boot-fixture/);
   } finally {
-    rmSync(root, { recursive: true, force: true });
+    try { rmSync(root, { recursive: true, force: true, maxRetries: 20, retryDelay: 100 }); } catch { /* temp cleanup is best-effort */ }
   }
 });
 
@@ -71,7 +71,7 @@ test("a wrong or stale contract hash is refused (SE-C-006)", () => {
       (e: unknown) => e instanceof Rejection && e.clause === "SE-C-006",
     );
   } finally {
-    rmSync(root, { recursive: true, force: true });
+    try { rmSync(root, { recursive: true, force: true, maxRetries: 20, retryDelay: 100 }); } catch { /* temp cleanup is best-effort */ }
   }
 });
 
@@ -86,7 +86,7 @@ test("a root without a nameplate still boots, named by folder, with the note poi
     assert.match((step2 as { note: string }).note, /product\.json/);
     assert.equal(existsSync(layout.lockPath(root)), true);
   } finally {
-    rmSync(root, { recursive: true, force: true });
+    try { rmSync(root, { recursive: true, force: true, maxRetries: 20, retryDelay: 100 }); } catch { /* temp cleanup is best-effort */ }
   }
 });
 

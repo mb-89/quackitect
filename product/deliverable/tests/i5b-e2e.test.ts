@@ -52,6 +52,6 @@ test("R7/F2 LIVE E2E: default-provisioned iteration walks + gates from the trunk
     assert.ok(!existsSync(wt), "the shipped tree retired");
     assert.match(git("branch --list iter/demo", root), /iter\/demo/, "the branch stays for history");
   } finally {
-    rmSync(root, { recursive: true, force: true });
+    try { rmSync(root, { recursive: true, force: true, maxRetries: 20, retryDelay: 100 }); } catch { /* temp cleanup is best-effort */ }
   }
 });

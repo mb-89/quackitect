@@ -35,7 +35,7 @@ test("commit outside the bless window is refused; inside it passes; the next sub
     closeCommitWindow(root); // what se_loop_submit does
     assert.throws(() => assertCommitWindow(root), Rejection);
   } finally {
-    rmSync(root, { recursive: true, force: true });
+    try { rmSync(root, { recursive: true, force: true, maxRetries: 20, retryDelay: 100 }); } catch { /* temp cleanup is best-effort */ }
   }
 });
 
@@ -52,7 +52,7 @@ test("a long command returns a handle within 1s; completion is observable", asyn
     assert.equal(done.status, "done");
     assert.equal(done.ok, true);
   } finally {
-    rmSync(root, { recursive: true, force: true });
+    try { rmSync(root, { recursive: true, force: true, maxRetries: 20, retryDelay: 100 }); } catch { /* temp cleanup is best-effort */ }
   }
 });
 
@@ -88,7 +88,7 @@ test("an engine-filled state over the 1s grace returns a running packet; next() 
     const done = loop.next();
     assert.equal(done.kind, "closed");
   } finally {
-    rmSync(root, { recursive: true, force: true });
+    try { rmSync(root, { recursive: true, force: true, maxRetries: 20, retryDelay: 100 }); } catch { /* temp cleanup is best-effort */ }
   }
 });
 
@@ -102,7 +102,7 @@ test("se_loop_submit without an update is refused by the toll", () => {
       toll.check("se_loop_submit", { evidence: { a: "b" }, update: { current_step: "s", next_milestone: "m", eta: "12:00", todo: ["[ ] t"] } }, log),
     );
   } finally {
-    rmSync(root, { recursive: true, force: true });
+    try { rmSync(root, { recursive: true, force: true, maxRetries: 20, retryDelay: 100 }); } catch { /* temp cleanup is best-effort */ }
   }
 });
 
@@ -118,7 +118,7 @@ test("se_boot without a named project refuses and says to ask the owner", () => 
     const step = boot(root, session, undefined, {}, "lawsproj");
     assert.equal((step as { step: string }).step, "attest");
   } finally {
-    rmSync(root, { recursive: true, force: true });
+    try { rmSync(root, { recursive: true, force: true, maxRetries: 20, retryDelay: 100 }); } catch { /* temp cleanup is best-effort */ }
   }
 });
 
@@ -153,7 +153,7 @@ test("a re-offer for the same gate replaces the live offer; dismiss clears it", 
     gate.dismiss();
     assert.equal(gate.current(), null);
   } finally {
-    rmSync(root, { recursive: true, force: true });
+    try { rmSync(root, { recursive: true, force: true, maxRetries: 20, retryDelay: 100 }); } catch { /* temp cleanup is best-effort */ }
   }
 });
 
@@ -173,7 +173,7 @@ test("the log query lane filters, groups and counts", () => {
     const picked = log.query({ filter: { tool: "se_b" } });
     assert.equal(picked.records?.length, 1);
   } finally {
-    rmSync(root, { recursive: true, force: true });
+    try { rmSync(root, { recursive: true, force: true, maxRetries: 20, retryDelay: 100 }); } catch { /* temp cleanup is best-effort */ }
   }
 });
 
@@ -206,7 +206,7 @@ test("apply ergonomics: execute-by-hash without resend, and fire-first direct ex
     assert.equal(direct.applied, true);
     assert.equal(direct.fired_direct, true, "fire-first: no dry_run ceremony demanded");
   } finally {
-    rmSync(root, { recursive: true, force: true });
+    try { rmSync(root, { recursive: true, force: true, maxRetries: 20, retryDelay: 100 }); } catch { /* temp cleanup is best-effort */ }
   }
 });
 
@@ -222,7 +222,7 @@ test("draining a note retires it from the inbox count", () => {
     const after = drain.handler({ ref: first.captured, disposition: "routed to the fixture" }) as { inbox_count: number };
     assert.equal(after.inbox_count, 1, "drained notes leave the count");
   } finally {
-    rmSync(root, { recursive: true, force: true });
+    try { rmSync(root, { recursive: true, force: true, maxRetries: 20, retryDelay: 100 }); } catch { /* temp cleanup is best-effort */ }
   }
 });
 
@@ -238,6 +238,6 @@ test("a failed call logs exactly one line carrying the clause", () => {
     assert.equal(rec.detail.clause, "SE-C-999");
     assert.match(rec.detail.reason, /fixture/);
   } finally {
-    rmSync(root, { recursive: true, force: true });
+    try { rmSync(root, { recursive: true, force: true, maxRetries: 20, retryDelay: 100 }); } catch { /* temp cleanup is best-effort */ }
   }
 });

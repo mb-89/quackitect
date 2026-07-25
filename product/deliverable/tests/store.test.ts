@@ -56,7 +56,7 @@ test("ledger loads, ids match paths, edges resolve", () => {
     assert.equal(req.module, "se");
     assert.deepEqual(req.edges.refines, ["se.uc-3"]);
   } finally {
-    rmSync(root, { recursive: true, force: true });
+    try { rmSync(root, { recursive: true, force: true, maxRetries: 20, retryDelay: 100 }); } catch { /* temp cleanup is best-effort */ }
   }
 });
 
@@ -69,7 +69,7 @@ test("hashes are stable across independent loads", () => {
       assert.equal(node.hash, b.nodes.get(id)!.hash, `hash moved for ${id}`);
     }
   } finally {
-    rmSync(root, { recursive: true, force: true });
+    try { rmSync(root, { recursive: true, force: true, maxRetries: 20, retryDelay: 100 }); } catch { /* temp cleanup is best-effort */ }
   }
 });
 
@@ -109,7 +109,7 @@ test("index rebuilds from files alone, and a fresh rebuild is identical", () => 
     assert.deepEqual(idx2.edgesTo("se.uc-3"), [{ kind: "refines", src: "se.req-toll-arming" }]);
     idx2.close();
   } finally {
-    rmSync(root, { recursive: true, force: true });
+    try { rmSync(root, { recursive: true, force: true, maxRetries: 20, retryDelay: 100 }); } catch { /* temp cleanup is best-effort */ }
   }
 });
 
@@ -128,6 +128,6 @@ test("missing breaks_if_removed on a requirement is a lint finding", () => {
     const ledger = loadLedger(root);
     assert.ok(ledger.findings.some((f) => f.node === "se.req-bare" && f.rule === "breaks-if-removed-missing"));
   } finally {
-    rmSync(root, { recursive: true, force: true });
+    try { rmSync(root, { recursive: true, force: true, maxRetries: 20, retryDelay: 100 }); } catch { /* temp cleanup is best-effort */ }
   }
 });

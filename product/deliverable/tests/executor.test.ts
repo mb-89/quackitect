@@ -115,7 +115,7 @@ test("claim: the second claimant of one state loses and gets the next unclaimed"
     assert.equal(onDisk.claims?.b, "s1");
     assert.equal(onDisk.claims?.c, "s2");
   } finally {
-    rmSync(root, { recursive: true, force: true });
+    try { rmSync(root, { recursive: true, force: true, maxRetries: 20, retryDelay: 100 }); } catch { /* temp cleanup is best-effort */ }
   }
 });
 
@@ -175,7 +175,7 @@ test("a seeding state runs the iteration's own drawn sub-machine to its terminal
     const after = loop.submit({}); // the child reaches its terminal — the parent auto-completes
     assert.equal(after.state, "after", "the parent resumes past the seeded state");
   } finally {
-    rmSync(root, { recursive: true, force: true });
+    try { rmSync(root, { recursive: true, force: true, maxRetries: 20, retryDelay: 100 }); } catch { /* temp cleanup is best-effort */ }
   }
 });
 
@@ -201,6 +201,6 @@ test("concurrent instance writes lose nothing (2 workers x 100 locked increments
     assert.equal(final.counters.w1, N, "every w1 update kept");
     assert.equal(final.counters.w2, N, "every w2 update kept");
   } finally {
-    rmSync(root, { recursive: true, force: true });
+    try { rmSync(root, { recursive: true, force: true, maxRetries: 20, retryDelay: 100 }); } catch { /* temp cleanup is best-effort */ }
   }
 });

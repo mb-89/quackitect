@@ -27,7 +27,7 @@ test("the ledger search survives hyphenated and special-character queries", () =
       idx.close();
     }
   } finally {
-    rmSync(root, { recursive: true, force: true });
+    try { rmSync(root, { recursive: true, force: true, maxRetries: 20, retryDelay: 100 }); } catch { /* temp cleanup is best-effort */ }
   }
 });
 
@@ -42,7 +42,7 @@ test("dot-paths under the product serve like any other path; .git stays out", ()
     assert.ok(fileList(root, "product").some((e) => e.path === "product/.obsidian"), "dot-dirs are listed");
     assert.throws(() => fileRead(root, ".git/HEAD"), Rejection, ".git is never the lane's");
   } finally {
-    rmSync(root, { recursive: true, force: true });
+    try { rmSync(root, { recursive: true, force: true, maxRetries: 20, retryDelay: 100 }); } catch { /* temp cleanup is best-effort */ }
   }
 });
 
@@ -64,7 +64,7 @@ test("declared roots serve read-only; undeclared roots refuse with the vocabular
       "declared roots are read-only",
     );
   } finally {
-    rmSync(root, { recursive: true, force: true });
-    rmSync(foreign, { recursive: true, force: true });
+    try { rmSync(root, { recursive: true, force: true, maxRetries: 20, retryDelay: 100 }); } catch { /* temp cleanup is best-effort */ }
+    try { rmSync(foreign, { recursive: true, force: true, maxRetries: 20, retryDelay: 100 }); } catch { /* temp cleanup is best-effort */ }
   }
 });

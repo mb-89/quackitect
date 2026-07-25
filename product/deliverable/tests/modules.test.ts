@@ -38,7 +38,7 @@ test("local modules are active; a resolvable import is active", () => {
       ],
     );
   } finally {
-    rmSync(join(root, ".."), { recursive: true, force: true });
+    try { rmSync(join(root, ".."), { recursive: true, force: true, maxRetries: 20, retryDelay: 100 }); } catch { /* temp cleanup is best-effort */ }
   }
 });
 
@@ -52,7 +52,7 @@ test("a missing import deactivates the module instead of erroring", () => {
     // The rest of the session is untouched.
     assert.equal(mods.find((m) => m.id === "se")!.status, "active");
   } finally {
-    rmSync(join(root, ".."), { recursive: true, force: true });
+    try { rmSync(join(root, ".."), { recursive: true, force: true, maxRetries: 20, retryDelay: 100 }); } catch { /* temp cleanup is best-effort */ }
   }
 });
 

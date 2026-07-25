@@ -35,7 +35,7 @@ test("toll grace: a lapsed window warns once, then refuses; any update clears", 
     clock += 500;
     assert.doesNotThrow(() => toll.check("se_get_node", {}, log), "payment reset the warning state");
   } finally {
-    rmSync(root, { recursive: true, force: true });
+    try { rmSync(root, { recursive: true, force: true, maxRetries: 20, retryDelay: 100 }); } catch { /* temp cleanup is best-effort */ }
   }
 });
 
@@ -48,6 +48,6 @@ test("test-run scope: the declared suite refuses outside milestone verification 
     );
     assert.doesNotThrow(() => assertTestRunScope(root, "node workspace/anything-else.mjs"));
   } finally {
-    rmSync(root, { recursive: true, force: true });
+    try { rmSync(root, { recursive: true, force: true, maxRetries: 20, retryDelay: 100 }); } catch { /* temp cleanup is best-effort */ }
   }
 });

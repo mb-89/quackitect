@@ -55,6 +55,6 @@ test("a WORKTREE iteration shows in projectState: iterations list + machine_stac
     );
     assert.ok(s.offer !== null && s.offer.iteration === "wt-it", "its pending gate offer is shown to bless");
   } finally {
-    rmSync(root, { recursive: true, force: true });
+    try { rmSync(root, { recursive: true, force: true, maxRetries: 20, retryDelay: 100 }); } catch { /* temp cleanup is best-effort */ }
   }
 });

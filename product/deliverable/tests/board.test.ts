@@ -103,6 +103,6 @@ test("board serves page + projection, and the bless button closes the gate on th
   } finally {
     proc?.kill();
     if (proc) await once(proc, "exit").catch(() => {});
-    rmSync(root, { recursive: true, force: true });
+    try { rmSync(root, { recursive: true, force: true, maxRetries: 20, retryDelay: 100 }); } catch { /* temp cleanup is best-effort */ }
   }
 });

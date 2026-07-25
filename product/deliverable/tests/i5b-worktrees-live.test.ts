@@ -43,7 +43,7 @@ test("R1 DEFAULT: se_loop_start with NO plan flag provisions iter/<id> in .workt
     assert.match(git("branch --list iter/it-a", root), /iter\/it-a/, "the iteration branch exists");
     assert.equal(git("rev-parse HEAD", root), head, "trunk HEAD is untouched by opening the iteration");
   } finally {
-    rmSync(root, { recursive: true, force: true });
+    try { rmSync(root, { recursive: true, force: true, maxRetries: 20, retryDelay: 100 }); } catch { /* temp cleanup is best-effort */ }
   }
 });
 
@@ -62,7 +62,7 @@ test("R3 LIVE ROUTING: a TRUNK-rooted loop locates and serves a WORKTREE-residen
     assert.equal(packet.iteration, "it-a", "the trunk-rooted loop served the worktree-resident iteration");
     assert.notEqual(packet.kind, "instruction", "not the no-iteration-open fallback");
   } finally {
-    rmSync(root, { recursive: true, force: true });
+    try { rmSync(root, { recursive: true, force: true, maxRetries: 20, retryDelay: 100 }); } catch { /* temp cleanup is best-effort */ }
   }
 });
 
@@ -109,6 +109,6 @@ test("R4 LOCAL MACHINE: an iteration's local machine (trimmed) overrides the sha
     const after = loop.submit({}); // local edge s0 -> t2 (terminal) => CLOSED
     assert.equal(after.kind, "closed", "the LOCAL trimmed machine ran (the base would serve s1, not close)");
   } finally {
-    rmSync(root, { recursive: true, force: true });
+    try { rmSync(root, { recursive: true, force: true, maxRetries: 20, retryDelay: 100 }); } catch { /* temp cleanup is best-effort */ }
   }
 });

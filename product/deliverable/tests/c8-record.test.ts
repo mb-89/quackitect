@@ -43,7 +43,7 @@ test("calibration pairs each update's ETA with the next submit; dirty formats ar
     assert.equal(cal.median_ratio, 2);
     assert.equal(parseEtaMinutes("in ~15 min", at(0)), 15, "relative ETAs parse");
   } finally {
-    rmSync(root, { recursive: true, force: true });
+    try { rmSync(root, { recursive: true, force: true, maxRetries: 20, retryDelay: 100 }); } catch { /* temp cleanup is best-effort */ }
   }
 });
 
@@ -60,7 +60,7 @@ test("runCommand mints the record but writes no line - the dispatch observer own
     assert.equal(kept.ref, rec.ref, "append honors a provided ref - evidence pinning stays findable");
     assert.equal(log.find(rec.ref)?.tool, "se.run");
   } finally {
-    rmSync(root, { recursive: true, force: true });
+    try { rmSync(root, { recursive: true, force: true, maxRetries: 20, retryDelay: 100 }); } catch { /* temp cleanup is best-effort */ }
   }
 });
 
@@ -90,6 +90,6 @@ test("last_verify is picked by timestamp across iterations, never folder order",
     const raw = readFileSync(layout.instancePath(root, "a-newest"), "utf8");
     assert.match(raw, /closed/);
   } finally {
-    rmSync(root, { recursive: true, force: true });
+    try { rmSync(root, { recursive: true, force: true, maxRetries: 20, retryDelay: 100 }); } catch { /* temp cleanup is best-effort */ }
   }
 });

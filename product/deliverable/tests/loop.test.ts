@@ -85,7 +85,7 @@ test("scripted walk closes a dummy iteration with no human and no agent", () => 
     // The raw run landed in the call log.
     assert.ok(readFileSync(join(layout.seDir(root), "calls.jsonl"), "utf8").includes(verifyEv.pinned_run.ref));
   } finally {
-    rmSync(root, { recursive: true, force: true });
+    try { rmSync(root, { recursive: true, force: true, maxRetries: 20, retryDelay: 100 }); } catch { /* temp cleanup is best-effort */ }
   }
 });
 
@@ -112,7 +112,7 @@ test("a failing engine state is a normal Failed: fallback reopens, then escape r
     assert.match(inst.escapes[0].exhausted_guard, /verify_attempts/);
     assert.equal(inst.counters.verify_attempts, 3);
   } finally {
-    rmSync(root, { recursive: true, force: true });
+    try { rmSync(root, { recursive: true, force: true, maxRetries: 20, retryDelay: 100 }); } catch { /* temp cleanup is best-effort */ }
   }
 });
 
@@ -134,7 +134,7 @@ test("evidence-form validation is field-targeted and one-turn recoverable (SE-C-
     const remedyEvidence = (rejection.remedy.args as { evidence: Record<string, string> }).evidence;
     assert.equal(remedyEvidence.goal, "only the goal", "remedy preserves what was already filled");
   } finally {
-    rmSync(root, { recursive: true, force: true });
+    try { rmSync(root, { recursive: true, force: true, maxRetries: 20, retryDelay: 100 }); } catch { /* temp cleanup is best-effort */ }
   }
 });
 
@@ -148,7 +148,7 @@ test("a BOM-prefixed instance file still parses", () => {
     const p = loop.next();
     assert.equal(p.state, "declare_goal");
   } finally {
-    rmSync(root, { recursive: true, force: true });
+    try { rmSync(root, { recursive: true, force: true, maxRetries: 20, retryDelay: 100 }); } catch { /* temp cleanup is best-effort */ }
   }
 });
 
@@ -169,6 +169,6 @@ test("one open iteration per worktree (SE-C-031); abandon is terminal and record
     assert.equal(inst.history.at(-1).evidence, "scope changed");
     assert.ok(existsSync(instPath));
   } finally {
-    rmSync(root, { recursive: true, force: true });
+    try { rmSync(root, { recursive: true, force: true, maxRetries: 20, retryDelay: 100 }); } catch { /* temp cleanup is best-effort */ }
   }
 });

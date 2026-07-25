@@ -36,7 +36,7 @@ test("schema refusal: an off-vocabulary kind refuses with the vocabulary named",
       (e: unknown) => e instanceof Rejection && /kind/.test(e.expected),
     );
   } finally {
-    rmSync(root, { recursive: true, force: true });
+    try { rmSync(root, { recursive: true, force: true, maxRetries: 20, retryDelay: 100 }); } catch { /* temp cleanup is best-effort */ }
   }
 });
 
@@ -50,7 +50,7 @@ test("set_field reaches nested frontmatter through a dot path", () => {
     const text = readFileSync(join(ledgerRoot, "se", "x.md"), "utf8");
     assert.match(text, /provenance:\s*\n\s+adjudicated_by: owner/, "the nested key landed");
   } finally {
-    rmSync(root, { recursive: true, force: true });
+    try { rmSync(root, { recursive: true, force: true, maxRetries: 20, retryDelay: 100 }); } catch { /* temp cleanup is best-effort */ }
   }
 });
 
@@ -93,7 +93,7 @@ test("canvas surgical ops: add_canvas_node and add_canvas_edge without a whole-c
     assert.equal(canvas.nodes.length, 3);
     assert.deepEqual(canvas.edges.map((e) => e.id).sort(), ["e1a", "e1b"]);
   } finally {
-    rmSync(root, { recursive: true, force: true });
+    try { rmSync(root, { recursive: true, force: true, maxRetries: 20, retryDelay: 100 }); } catch { /* temp cleanup is best-effort */ }
   }
 });
 

@@ -64,7 +64,7 @@ test("locked product and import roots are denied; workspace and outside paths pa
     const outside = await runFence(stateDir, { tool_name: "Read", tool_input: { file_path: join(tmpdir(), "free.txt") } });
     assert.equal(outside.code, 0);
   } finally {
-    for (const d of [stateDir, product, imported]) rmSync(d, { recursive: true, force: true });
+    for (const d of [stateDir, product, imported]) try { rmSync(d, { recursive: true, force: true, maxRetries: 20, retryDelay: 100 }); } catch { /* temp cleanup is best-effort */ }
   }
 });
 
@@ -93,7 +93,7 @@ test("shell commands containing a locked root are denied; workspace-scoped comma
     });
     assert.equal(state.code, 0);
   } finally {
-    for (const d of [stateDir, product, imported]) rmSync(d, { recursive: true, force: true });
+    for (const d of [stateDir, product, imported]) try { rmSync(d, { recursive: true, force: true, maxRetries: 20, retryDelay: 100 }); } catch { /* temp cleanup is best-effort */ }
   }
 });
 
@@ -109,6 +109,6 @@ test("no locks, malformed input, malformed lock: the fence never blocks", async 
     const bad = await runFence(broken, { tool_name: "Read", tool_input: { file_path: "C:/anything" } });
     assert.equal(bad.code, 0);
   } finally {
-    for (const d of [empty, broken]) rmSync(d, { recursive: true, force: true });
+    for (const d of [empty, broken]) try { rmSync(d, { recursive: true, force: true, maxRetries: 20, retryDelay: 100 }); } catch { /* temp cleanup is best-effort */ }
   }
 });

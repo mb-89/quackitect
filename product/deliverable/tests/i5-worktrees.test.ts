@@ -69,7 +69,7 @@ test("provision creates tree+branch under .worktrees; a rerun ADOPTS, never dupl
     assert.equal(again.root, w.root);
     assert.equal(git("worktree list", root).split("\n").length, 2, "one trunk + one worktree, no duplicate");
   } finally {
-    rmSync(root, { recursive: true, force: true });
+    try { rmSync(root, { recursive: true, force: true, maxRetries: 20, retryDelay: 100 }); } catch { /* temp cleanup is best-effort */ }
   }
 });
 
@@ -94,7 +94,7 @@ test("depends_on gates the start: unshipped refuses naming it; a release grant p
     assert.doesNotThrow(() => assertDependsMet(root, "it-b"), "the release grant is the ship record");
     assert.doesNotThrow(() => assertDependsMet(root, "it-a"), "no depends_on, no gate");
   } finally {
-    rmSync(root, { recursive: true, force: true });
+    try { rmSync(root, { recursive: true, force: true, maxRetries: 20, retryDelay: 100 }); } catch { /* temp cleanup is best-effort */ }
   }
 });
 
@@ -128,7 +128,7 @@ test("W1 killer: two iterations, both ship, the second merge marks the overlappi
     assert.ok(!existsSync(a.root) && !existsSync(b.root), "shipped trees are removed");
     assert.match(git("branch --list iter/it-a", root), /iter\/it-a/, "branches stay for history");
   } finally {
-    rmSync(root, { recursive: true, force: true });
+    try { rmSync(root, { recursive: true, force: true, maxRetries: 20, retryDelay: 100 }); } catch { /* temp cleanup is best-effort */ }
   }
 });
 
@@ -150,7 +150,7 @@ test("a textual conflict STOPS the ship: recorded, aborted, nothing auto-resolve
     assert.doesNotMatch(git("status --porcelain", root), /^(UU|AA)/m, "the merge was aborted, not left half-done");
     assert.match(readFileSync(join(root, shared), "utf8"), /From the trunk/, "trunk truth untouched");
   } finally {
-    rmSync(root, { recursive: true, force: true });
+    try { rmSync(root, { recursive: true, force: true, maxRetries: 20, retryDelay: 100 }); } catch { /* temp cleanup is best-effort */ }
   }
 });
 
@@ -164,7 +164,7 @@ test("abandon FLAGS the tree and never deletes; the debris invariant holds after
     const open = openWorktrees(root);
     assert.ok(!open.some((w) => w.iteration === "it-a"), "abandoned streams are not live");
   } finally {
-    rmSync(root, { recursive: true, force: true });
+    try { rmSync(root, { recursive: true, force: true, maxRetries: 20, retryDelay: 100 }); } catch { /* temp cleanup is best-effort */ }
   }
 });
 
@@ -178,7 +178,7 @@ test("a worktree iteration shows in the iterations list, not as a separate agent
     assert.ok(s.iterations.some((it) => it.id === "it-a" && it.status === "open"), "the worktree iteration is in the list");
     assert.equal(s.agents.filter((x) => x.role !== "main").length, 0, "a worktree is not its own agent tab (tabs are per agent)");
   } finally {
-    rmSync(root, { recursive: true, force: true });
+    try { rmSync(root, { recursive: true, force: true, maxRetries: 20, retryDelay: 100 }); } catch { /* temp cleanup is best-effort */ }
   }
 });
 
@@ -196,7 +196,7 @@ test("draining an unknown note ref refuses loudly (SE-C-073)", () => {
     );
     assert.doesNotThrow(() => drain.handler({ ref: captured.captured, disposition: "routed to nowhere (test)" }));
   } finally {
-    rmSync(root, { recursive: true, force: true });
+    try { rmSync(root, { recursive: true, force: true, maxRetries: 20, retryDelay: 100 }); } catch { /* temp cleanup is best-effort */ }
   }
 });
 

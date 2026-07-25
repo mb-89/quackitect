@@ -62,7 +62,7 @@ test("the loop serves BOTH parallel states, claims separate sessions, and joins"
     const joined = loop.next();
     assert.equal(joined.state, "j", "all inputs fired - the join serves");
   } finally {
-    rmSync(root, { recursive: true, force: true });
+    try { rmSync(root, { recursive: true, force: true, maxRetries: 20, retryDelay: 100 }); } catch { /* temp cleanup is best-effort */ }
   }
 });
 
@@ -82,7 +82,7 @@ test("single-active machines keep the exact old packet flow", () => {
     const done = loop.submit({});
     assert.equal(done.kind, "closed");
   } finally {
-    rmSync(root, { recursive: true, force: true });
+    try { rmSync(root, { recursive: true, force: true, maxRetries: 20, retryDelay: 100 }); } catch { /* temp cleanup is best-effort */ }
   }
 });
 
@@ -132,6 +132,6 @@ test("a child machine runs engine-filled states and offers its gate", async () =
     assert.ok(gate.current() !== null, "a real offer exists for the child gate");
     gate.dismiss(); // clean up the offer for the tmp root
   } finally {
-    rmSync(root, { recursive: true, force: true });
+    try { rmSync(root, { recursive: true, force: true, maxRetries: 20, retryDelay: 100 }); } catch { /* temp cleanup is best-effort */ }
   }
 });

@@ -56,7 +56,7 @@ test("rename moves the node and rewrites edges, section links and canvas refs in
     assert.match(beta, /About se\.alpha-two\./, "id mentions in statements ripple");
     assert.match(readFileSync(join(dir, "board.canvas"), "utf8"), /spec\/ledger\/se\/alpha-two\.md/, "canvas refs ripple");
   } finally {
-    rmSync(root, { recursive: true, force: true });
+    try { rmSync(root, { recursive: true, force: true, maxRetries: 20, retryDelay: 100 }); } catch { /* temp cleanup is best-effort */ }
   }
 });
 
@@ -86,6 +86,6 @@ test("plan ops insert after an anchor and renumber planned iterations; started i
       "started iterations are frozen",
     );
   } finally {
-    rmSync(root, { recursive: true, force: true });
+    try { rmSync(root, { recursive: true, force: true, maxRetries: 20, retryDelay: 100 }); } catch { /* temp cleanup is best-effort */ }
   }
 });

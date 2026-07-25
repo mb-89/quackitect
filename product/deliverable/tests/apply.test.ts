@@ -65,7 +65,7 @@ test("dry_run -> execute applies create, edit and edge ops atomically", () => {
     assert.ok(adr.body.includes("Rewritten rationale."));
     assert.deepEqual(adr.edges.supersedes, ["se.raid-example"]);
   } finally {
-    rmSync(root, { recursive: true, force: true });
+    try { rmSync(root, { recursive: true, force: true, maxRetries: 20, retryDelay: 100 }); } catch { /* temp cleanup is best-effort */ }
   }
 });
 
@@ -98,7 +98,7 @@ test("mid-air collision dies at the write with a one-turn-recoverable rejection"
     const res = execute(root, ops, dry2.diff_hash);
     assert.equal(res.applied, true);
   } finally {
-    rmSync(root, { recursive: true, force: true });
+    try { rmSync(root, { recursive: true, force: true, maxRetries: 20, retryDelay: 100 }); } catch { /* temp cleanup is best-effort */ }
   }
 });
 
@@ -115,7 +115,7 @@ test("a stale hash cannot replay after a successful execute", () => {
       (e: unknown) => e instanceof Rejection && e.clause === "SE-C-010",
     );
   } finally {
-    rmSync(root, { recursive: true, force: true });
+    try { rmSync(root, { recursive: true, force: true, maxRetries: 20, retryDelay: 100 }); } catch { /* temp cleanup is best-effort */ }
   }
 });
 
@@ -127,7 +127,7 @@ test("edge fields are writable only via edge ops (SE-C-011)", () => {
       (e: unknown) => e instanceof Rejection && e.clause === "SE-C-011",
     );
   } finally {
-    rmSync(root, { recursive: true, force: true });
+    try { rmSync(root, { recursive: true, force: true, maxRetries: 20, retryDelay: 100 }); } catch { /* temp cleanup is best-effort */ }
   }
 });
 
@@ -146,7 +146,7 @@ test("delete removes the file; unknown ids are rejected", () => {
       (e: unknown) => e instanceof Rejection && e.clause === "SE-C-012",
     );
   } finally {
-    rmSync(root, { recursive: true, force: true });
+    try { rmSync(root, { recursive: true, force: true, maxRetries: 20, retryDelay: 100 }); } catch { /* temp cleanup is best-effort */ }
   }
 });
 
@@ -171,6 +171,6 @@ test("get.node outline/section/full carry id + hash", () => {
       (e: unknown) => e instanceof Rejection && e.remedy.tool === "se_get_search",
     );
   } finally {
-    rmSync(root, { recursive: true, force: true });
+    try { rmSync(root, { recursive: true, force: true, maxRetries: 20, retryDelay: 100 }); } catch { /* temp cleanup is best-effort */ }
   }
 });

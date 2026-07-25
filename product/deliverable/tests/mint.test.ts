@@ -32,8 +32,8 @@ test("a v1 tree that breaks the P3 accounting fails the mint loudly", () => {
       /P3 accounting broken/,
     );
   } finally {
-    rmSync(fakeV1, { recursive: true, force: true });
-    rmSync(ledger, { recursive: true, force: true });
+    try { rmSync(fakeV1, { recursive: true, force: true, maxRetries: 20, retryDelay: 100 }); } catch { /* temp cleanup is best-effort */ }
+    try { rmSync(ledger, { recursive: true, force: true, maxRetries: 20, retryDelay: 100 }); } catch { /* temp cleanup is best-effort */ }
   }
 });
 
@@ -79,6 +79,6 @@ test("the mint accounts 126/126 and is idempotent (empty diff on re-run)", (t) =
     assert.ok(ledger.nodes.has("se.req-runme-dep-free"), "the RUNME requirement exists");
     assert.ok(ledger.nodes.get("se.req-runme-dep-free")!.breaks_if_removed, "mandatory on requirements");
   } finally {
-    rmSync(ledgerRoot, { recursive: true, force: true });
+    try { rmSync(ledgerRoot, { recursive: true, force: true, maxRetries: 20, retryDelay: 100 }); } catch { /* temp cleanup is best-effort */ }
   }
 });

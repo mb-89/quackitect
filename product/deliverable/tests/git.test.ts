@@ -27,7 +27,7 @@ test("git layer works against a fixture repo", () => {
     const log = git(dir, "log", "--oneline");
     assert.ok(log.ok && log.stdout.includes("init"));
   } finally {
-    rmSync(dir, { recursive: true, force: true });
+    try { rmSync(dir, { recursive: true, force: true, maxRetries: 20, retryDelay: 100 }); } catch { /* temp cleanup is best-effort */ }
   }
 });
 
@@ -36,7 +36,7 @@ test("repoRoot is null outside a work tree", () => {
   try {
     assert.equal(repoRoot(dir), null);
   } finally {
-    rmSync(dir, { recursive: true, force: true });
+    try { rmSync(dir, { recursive: true, force: true, maxRetries: 20, retryDelay: 100 }); } catch { /* temp cleanup is best-effort */ }
   }
 });
 
@@ -58,7 +58,7 @@ test("fixture repos are operable without a flag", () => {
   try {
     assertOperable(dir); // must not throw
   } finally {
-    rmSync(dir, { recursive: true, force: true });
+    try { rmSync(dir, { recursive: true, force: true, maxRetries: 20, retryDelay: 100 }); } catch { /* temp cleanup is best-effort */ }
   }
 });
 

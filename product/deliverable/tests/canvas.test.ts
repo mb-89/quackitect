@@ -55,7 +55,7 @@ test("the store loads canvas nodes and checks id against path", () => {
     writeFileSync(join(root, "se", "wrong-name.canvas"), JSON.stringify(CANVAS), "utf8");
     assert.throws(() => loadLedger(root), /does not match path/);
   } finally {
-    rmSync(root, { recursive: true, force: true });
+    try { rmSync(root, { recursive: true, force: true, maxRetries: 20, retryDelay: 100 }); } catch { /* temp cleanup is best-effort */ }
   }
 });
 
@@ -82,6 +82,6 @@ test("write_canvas rides the dry_run -> execute lane; partial ops refuse on canv
       (e: unknown) => e instanceof Rejection && e.clause === "SE-C-066",
     );
   } finally {
-    rmSync(root, { recursive: true, force: true });
+    try { rmSync(root, { recursive: true, force: true, maxRetries: 20, retryDelay: 100 }); } catch { /* temp cleanup is best-effort */ }
   }
 });

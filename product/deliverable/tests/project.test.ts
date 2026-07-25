@@ -53,7 +53,7 @@ test("projection carries product, iterations with goals and steps, offer and cal
     assert.match(handover, /i0-proj: open at close_iteration/);
     assert.match(handover, /Pending offer/);
   } finally {
-    rmSync(root, { recursive: true, force: true });
+    try { rmSync(root, { recursive: true, force: true, maxRetries: 20, retryDelay: 100 }); } catch { /* temp cleanup is best-effort */ }
   }
 });
 
@@ -86,7 +86,7 @@ test("planned iterations join the projection; started ids skipped; owner steps f
     assert.equal(s.iterations[0].id, "i0-started");
     assert.equal(s.iterations[1].id, "i9-future");
   } finally {
-    rmSync(root, { recursive: true, force: true });
+    try { rmSync(root, { recursive: true, force: true, maxRetries: 20, retryDelay: 100 }); } catch { /* temp cleanup is best-effort */ }
   }
 });
 
@@ -115,7 +115,7 @@ test("the call feed is session-scoped and carries direction data", () => {
     assert.equal(s.calls[0].intent, "fresh");
     assert.equal((s.calls[0].response as { clause: string }).clause, "SE-C-060");
   } finally {
-    rmSync(root, { recursive: true, force: true });
+    try { rmSync(root, { recursive: true, force: true, maxRetries: 20, retryDelay: 100 }); } catch { /* temp cleanup is best-effort */ }
   }
 });
 
@@ -127,6 +127,6 @@ test("projection of an empty root is honest, not an error", () => {
     assert.equal(s.offer, null);
     assert.match(renderHandover(s), /none yet/);
   } finally {
-    rmSync(root, { recursive: true, force: true });
+    try { rmSync(root, { recursive: true, force: true, maxRetries: 20, retryDelay: 100 }); } catch { /* temp cleanup is best-effort */ }
   }
 });

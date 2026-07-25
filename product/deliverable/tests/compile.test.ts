@@ -110,7 +110,7 @@ function fixture(mutate: (canvas: Record<string, unknown>) => void): () => void 
     try {
       compileMachine(loadLedger(root), "se.machine-t");
     } finally {
-      rmSync(root, { recursive: true, force: true });
+      try { rmSync(root, { recursive: true, force: true, maxRetries: 20, retryDelay: 100 }); } catch { /* temp cleanup is best-effort */ }
     }
   };
 }

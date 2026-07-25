@@ -58,7 +58,7 @@ test("call lines carry request and response for the log details", () => {
     assert.deepEqual(s.calls[0].request, { id: "se.x" });
     assert.equal(s.calls[0].response, '{"id":"se.x"}');
   } finally {
-    rmSync(root, { recursive: true, force: true });
+    try { rmSync(root, { recursive: true, force: true, maxRetries: 20, retryDelay: 100 }); } catch { /* temp cleanup is best-effort */ }
   }
 });
 

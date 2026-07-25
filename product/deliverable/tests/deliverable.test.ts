@@ -34,7 +34,7 @@ test("list and read work root-wide; workspace and dot-dirs stay invisible", () =
     assert.equal(f.hash.length, 64);
     assert.equal(fileRead(root, "product/spec/ledger/se/node.md").content, "a ledger node\n");
   } finally {
-    rmSync(root, { recursive: true, force: true });
+    try { rmSync(root, { recursive: true, force: true, maxRetries: 20, retryDelay: 100 }); } catch { /* temp cleanup is best-effort */ }
   }
 });
 
@@ -64,7 +64,7 @@ test("search finds by name and by content, workspace excluded", () => {
     const fuzzy = fileSearch(root, "prodtwice", 20, "fuzzy");
     assert.ok(fuzzy.hits.some((h) => h.path === "product/twice.md"));
   } finally {
-    rmSync(root, { recursive: true, force: true });
+    try { rmSync(root, { recursive: true, force: true, maxRetries: 20, retryDelay: 100 }); } catch { /* temp cleanup is best-effort */ }
   }
 });
 
@@ -93,7 +93,7 @@ test("patch requires a unique match, moves the hash, and keeps replacements lite
       "const re = \"" + marker + "\";\n",
     );
   } finally {
-    rmSync(root, { recursive: true, force: true });
+    try { rmSync(root, { recursive: true, force: true, maxRetries: 20, retryDelay: 100 }); } catch { /* temp cleanup is best-effort */ }
   }
 });
 
@@ -120,7 +120,7 @@ test("write is CAS-guarded: stale hash refused, create refuses existing; delete 
     fileDelete(root, "product.json", fileRead(root, "product.json").hash);
     assert.equal(existsSync(join(root, "product.json")), false);
   } finally {
-    rmSync(root, { recursive: true, force: true });
+    try { rmSync(root, { recursive: true, force: true, maxRetries: 20, retryDelay: 100 }); } catch { /* temp cleanup is best-effort */ }
   }
 });
 
@@ -144,6 +144,6 @@ test("escapes and workspace are refused (SE-C-060); ledger writes point to se_se
     // Ledger READS are legal — search must see inside the ledger too.
     assert.ok(fileSearch(root, "ledger node").hits.length > 0);
   } finally {
-    rmSync(root, { recursive: true, force: true });
+    try { rmSync(root, { recursive: true, force: true, maxRetries: 20, retryDelay: 100 }); } catch { /* temp cleanup is best-effort */ }
   }
 });

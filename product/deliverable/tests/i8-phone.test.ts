@@ -66,7 +66,7 @@ test("configured: an offer publishes the brief + bless action carrying the offer
     assert.equal(tx.published[0].id, hash, "the offer hash is the correlation id");
     assert.match(JSON.stringify(tx.published[0].actions), /bless/i, "a bless action is offered");
   } finally {
-    rmSync(root, { recursive: true, force: true });
+    try { rmSync(root, { recursive: true, force: true, maxRetries: 20, retryDelay: 100 }); } catch { /* temp cleanup is best-effort */ }
   }
 });
 
@@ -86,7 +86,7 @@ test("a matched tap records a channel=phone grant bound to the hash and dismisse
     assert.equal(g.hash, hash, "bound to the offered hash");
     assert.equal(existsSync(layout.offerPath(root)), false, "the offer was dismissed");
   } finally {
-    rmSync(root, { recursive: true, force: true });
+    try { rmSync(root, { recursive: true, force: true, maxRetries: 20, retryDelay: 100 }); } catch { /* temp cleanup is best-effort */ }
   }
 });
 
@@ -104,7 +104,7 @@ test("a dismiss tap dismisses the offer without a grant", async () => {
     const after = existsSync(layout.grantsPath(root)) ? readFileSync(layout.grantsPath(root), "utf8") : "";
     assert.equal(after, before, "no grant written");
   } finally {
-    rmSync(root, { recursive: true, force: true });
+    try { rmSync(root, { recursive: true, force: true, maxRetries: 20, retryDelay: 100 }); } catch { /* temp cleanup is best-effort */ }
   }
 });
 
@@ -126,7 +126,7 @@ test("stale, mismatched and duplicate taps leave the grant chain unchanged", asy
     await lane.pollAnswers();
     assert.equal(readFileSync(layout.grantsPath(root), "utf8"), afterFirst, "the duplicate wrote nothing");
   } finally {
-    rmSync(root, { recursive: true, force: true });
+    try { rmSync(root, { recursive: true, force: true, maxRetries: 20, retryDelay: 100 }); } catch { /* temp cleanup is best-effort */ }
   }
 });
 
@@ -141,7 +141,7 @@ test("unconfigured: no publish, no poll, no throw - other channels untouched", a
     assert.equal(tx.published.length, 0, "silent when unconfigured");
     assert.ok(existsSync(layout.offerPath(root)), "the offer is untouched");
   } finally {
-    rmSync(root, { recursive: true, force: true });
+    try { rmSync(root, { recursive: true, force: true, maxRetries: 20, retryDelay: 100 }); } catch { /* temp cleanup is best-effort */ }
   }
 });
 
@@ -159,7 +159,7 @@ test("the credential never reaches the call log (req-phone-config-secret)", asyn
     const log = existsSync(logPath) ? readFileSync(logPath, "utf8") : "";
     assert.ok(!log.includes("SECRET-TOK"), "no token in the call log");
   } finally {
-    rmSync(root, { recursive: true, force: true });
+    try { rmSync(root, { recursive: true, force: true, maxRetries: 20, retryDelay: 100 }); } catch { /* temp cleanup is best-effort */ }
   }
 });
 

@@ -74,7 +74,7 @@ test("B5 pass: a console bless lands with channel + hash on the grant record", a
     const inst = JSON.parse(readFileSync(layout.instancePath(root, "i0-gate"), "utf8"));
     assert.equal(inst.status, "closed");
   } finally {
-    rmSync(root, { recursive: true, force: true });
+    try { rmSync(root, { recursive: true, force: true, maxRetries: 20, retryDelay: 100 }); } catch { /* temp cleanup is best-effort */ }
   }
 });
 
@@ -95,7 +95,7 @@ test("a stale hash cannot bless; an expired offer is dismissal by absence", () =
       (e: unknown) => e instanceof Rejection && e.clause === "SE-C-041",
     );
   } finally {
-    rmSync(root, { recursive: true, force: true });
+    try { rmSync(root, { recursive: true, force: true, maxRetries: 20, retryDelay: 100 }); } catch { /* temp cleanup is best-effort */ }
   }
 });
 
@@ -147,7 +147,7 @@ test("the toll refuses once with the schema inline, and the paid call proceeds",
     // The update landed server-side (call log).
     assert.match(readFileSync(join(seDir, "calls.jsonl"), "utf8"), /se\.toll\.update/);
   } finally {
-    rmSync(root, { recursive: true, force: true });
+    try { rmSync(root, { recursive: true, force: true, maxRetries: 20, retryDelay: 100 }); } catch { /* temp cleanup is best-effort */ }
   }
 });
 
@@ -162,7 +162,7 @@ test("a chat-relayed bless lands with channel=chat and the owner as adjudicator"
     const inst = JSON.parse(readFileSync(layout.instancePath(root, "i0-gate"), "utf8"));
     assert.equal(inst.status, "closed");
   } finally {
-    rmSync(root, { recursive: true, force: true });
+    try { rmSync(root, { recursive: true, force: true, maxRetries: 20, retryDelay: 100 }); } catch { /* temp cleanup is best-effort */ }
   }
 });
 
@@ -180,7 +180,7 @@ test("a delegated bless stamps the agent and cites its granting decision - never
     const inst = JSON.parse(readFileSync(layout.instancePath(root, "i0-gate"), "utf8"));
     assert.equal(inst.status, "closed");
   } finally {
-    rmSync(root, { recursive: true, force: true });
+    try { rmSync(root, { recursive: true, force: true, maxRetries: 20, retryDelay: 100 }); } catch { /* temp cleanup is best-effort */ }
   }
 });
 
@@ -197,7 +197,7 @@ test("se.help: hits are affordances, misses are honest refusals (the observer ow
     assert.equal(miss.hits.length, 0);
     assert.match(miss.refusal!, /no such tool — do it yourself/);
   } finally {
-    rmSync(root, { recursive: true, force: true });
+    try { rmSync(root, { recursive: true, force: true, maxRetries: 20, retryDelay: 100 }); } catch { /* temp cleanup is best-effort */ }
   }
 });
 
@@ -218,7 +218,7 @@ test("se.wait returns on a mechanical file condition and refuses park-length wai
     const t = await seWait(root, { kind: "file", path: join(root, "never.txt"), until: "exists" }, 1);
     assert.equal(t.outcome, "timeout");
   } finally {
-    rmSync(root, { recursive: true, force: true });
+    try { rmSync(root, { recursive: true, force: true, maxRetries: 20, retryDelay: 100 }); } catch { /* temp cleanup is best-effort */ }
   }
 });
 
@@ -234,6 +234,6 @@ test("se.wait on the offer resolves when a bless lands", async () => {
     assert.equal(r.outcome, "condition");
     assert.match(r.detail, /offer resolved/);
   } finally {
-    rmSync(root, { recursive: true, force: true });
+    try { rmSync(root, { recursive: true, force: true, maxRetries: 20, retryDelay: 100 }); } catch { /* temp cleanup is best-effort */ }
   }
 });

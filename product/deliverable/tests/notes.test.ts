@@ -33,6 +33,6 @@ test("se_note captures machine-local; the projection lists newest first; the rep
     assert.equal(s.notes.length, 2);
     assert.equal(s.notes[0].text, "board dark theme round");
   } finally {
-    rmSync(root, { recursive: true, force: true });
+    try { rmSync(root, { recursive: true, force: true, maxRetries: 20, retryDelay: 100 }); } catch { /* temp cleanup is best-effort */ }
   }
 });
