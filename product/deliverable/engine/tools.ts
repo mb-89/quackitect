@@ -569,7 +569,7 @@ export function coreTools(root: string, opts: { toll?: Toll; session?: Session }
     {
       name: "se_wait",
       title: "se.wait",
-      description: "Wait for a mechanical condition (file, offer) or timeout_s (max 300); never poll a judgment surface.",
+      description: "Wait for a mechanical condition (file, offer) or timeout_s (max 300); never poll a judgment surface. Waiting on an offer IS asking the owner, so it summons a paired phone — an offer you will self-bless must not be waited on.",
       inputSchema: {
         type: "object",
         properties: {

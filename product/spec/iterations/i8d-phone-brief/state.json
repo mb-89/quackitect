@@ -1,7 +1,7 @@
 {
   "machine": "systematic",
   "iteration": "i8d-phone-brief",
-  "current": "fill_story_evidence",
+  "current": "finalize_docs",
   "counters": {},
   "history": [
     {
@@ -231,13 +231,37 @@
       "outcome": "filled",
       "evidence": "grant:42b1032cea7c",
       "at": "2026-07-25T12:46:07.440Z"
+    },
+    {
+      "state": "fill_story_evidence",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i8d-phone-brief/evidence/fill_story_evidence-1.json",
+      "at": "2026-07-25T12:46:46.609Z"
+    },
+    {
+      "state": "sweep_consistency",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i8d-phone-brief/evidence/sweep_consistency-1.json",
+      "at": "2026-07-25T12:49:18.301Z"
+    },
+    {
+      "state": "log_gaps",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i8d-phone-brief/evidence/log_gaps-1.json",
+      "at": "2026-07-25T12:51:32.883Z"
+    },
+    {
+      "state": "gate_validation",
+      "outcome": "filled",
+      "evidence": "grant:799835439357",
+      "at": "2026-07-25T12:52:24.241Z"
     }
   ],
   "escapes": [],
   "status": "open",
   "fired": [],
   "active": [
-    "fill_story_evidence"
+    "finalize_docs"
   ],
   "claims": {}
 }
