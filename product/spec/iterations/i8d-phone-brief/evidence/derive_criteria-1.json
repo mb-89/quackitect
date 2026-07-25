@@ -1,0 +1,8 @@
+{
+  "iteration": "i8d-phone-brief",
+  "state": "derive_criteria",
+  "at": "2026-07-25T12:15:59.307Z",
+  "payload": {
+    "criteria": "STRUCK per the blessed rigor: the architecture is ruled twice over - se-v2-design §11 names the ladder and §18 records this exact transport as built and verified, and v1 runs the same shape in production. Recorded as a DEGENERATE decision rather than manufacturing weights for a choice already made.\n\nThe criteria that WOULD govern, kept for lineage and used as the build's acceptance emphasis:\n- C1 the owner is reached (R1, R8, R9, Q1; weight: VETO). Any option where a human-adjudicated gate can silently reach nobody is disqualified, not scored down - that is the failure this iteration exists to remove.\n- C2 the decision is readable (R4, R6; high). A link that opens nothing, or a page without the evidence, fails the purpose even if it delivers.\n- C3 the host learns nothing (R5, R11; high). Content encrypted at rest, credential never travelling.\n- C4 failure is visible (R12, R8; high). Degrading is acceptable; degrading silently is not.\n- C5 no new dependency surface (medium). One store, one relay, both already in use and re-verified; nothing new to own.\n\nDATUM: today's v2 lane. It fails C1 outright - its action URL cannot be tapped and it publishes nothing when the config changed after startup - and fails C2 and C4 completely: no page at all, and no report of anything. The ruled design passes all five, as probed at run-bfd564ff9add. No second candidate was elaborated, and that is the deliberate strike it is: the design document already records the eliminated alternatives (tunnel, artifact tier, paste hosts, message-only), each with the reason it sheds something."
+  }
+}
