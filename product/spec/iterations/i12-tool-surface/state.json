@@ -1,7 +1,7 @@
 {
   "machine": "systematic",
   "iteration": "i12-tool-surface",
-  "current": "draft_vision",
+  "current": "draw_context",
   "counters": {},
   "history": [
     {
@@ -15,12 +15,57 @@
       "outcome": "filled",
       "evidence": "grant:22c4cafc0743",
       "at": "2026-07-25T14:10:14.444Z"
+    },
+    {
+      "state": "draft_vision",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i12-tool-surface/evidence/draft_vision-1.json",
+      "at": "2026-07-25T14:14:02.072Z"
+    },
+    {
+      "state": "define_actual",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i12-tool-surface/evidence/define_actual-1.json",
+      "at": "2026-07-25T14:14:36.417Z"
+    },
+    {
+      "state": "log_risks",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i12-tool-surface/evidence/log_risks-1.json",
+      "at": "2026-07-25T14:16:24.747Z"
+    },
+    {
+      "state": "frame_delta",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i12-tool-surface/evidence/frame_delta-1.json",
+      "at": "2026-07-25T14:23:53.837Z"
+    },
+    {
+      "state": "scope_non_goals",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i12-tool-surface/evidence/scope_non_goals-1.json",
+      "at": "2026-07-25T14:24:20.767Z"
+    },
+    {
+      "state": "pressure_test",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i12-tool-surface/evidence/pressure_test-1.json",
+      "at": "2026-07-25T14:25:02.329Z"
+    },
+    {
+      "state": "gate_motivation",
+      "outcome": "filled",
+      "evidence": "grant:d18733b1dfb8",
+      "at": "2026-07-25T14:26:16.522Z"
     }
   ],
   "escapes": [],
   "status": "open",
   "fired": [],
   "active": [
-    "draft_vision"
-  ]
+    "draw_context",
+    "map_stakeholders",
+    "write_stories"
+  ],
+  "claims": {}
 }
