@@ -58,7 +58,7 @@ test("configured: an offer publishes the brief + bless action carrying the offer
   try {
     writeConfig(root, { enabled: true, topic: "t-out", answer_topic: "t-in", token: "SECRET-TOK" });
     const tx = new MockTransport();
-    const lane = new PhoneLane(root, tx);
+    const lane = new PhoneLane(root, () => tx);
     const hash = reachOffer(root);
     await lane.announceOffer();
     assert.equal(tx.published.length, 1, "one publish");
@@ -75,7 +75,7 @@ test("a matched tap records a channel=phone grant bound to the hash and dismisse
   try {
     writeConfig(root, { enabled: true, topic: "t-out", answer_topic: "t-in" });
     const tx = new MockTransport();
-    const lane = new PhoneLane(root, tx);
+    const lane = new PhoneLane(root, () => tx);
     const hash = reachOffer(root);
     tx.answers.push({ id: hash, action: "bless", at: Date.now() });
     await lane.pollAnswers();
@@ -95,7 +95,7 @@ test("a dismiss tap dismisses the offer without a grant", async () => {
   try {
     writeConfig(root, { enabled: true, topic: "t-out", answer_topic: "t-in" });
     const tx = new MockTransport();
-    const lane = new PhoneLane(root, tx);
+    const lane = new PhoneLane(root, () => tx);
     const hash = reachOffer(root);
     const before = existsSync(layout.grantsPath(root)) ? readFileSync(layout.grantsPath(root), "utf8") : "";
     tx.answers.push({ id: hash, action: "dismiss", at: Date.now() });
@@ -113,7 +113,7 @@ test("stale, mismatched and duplicate taps leave the grant chain unchanged", asy
   try {
     writeConfig(root, { enabled: true, topic: "t-out", answer_topic: "t-in" });
     const tx = new MockTransport();
-    const lane = new PhoneLane(root, tx);
+    const lane = new PhoneLane(root, () => tx);
     const hash = reachOffer(root);
     tx.answers.push({ id: "wrong-hash", action: "bless", at: Date.now() });
     await lane.pollAnswers();
@@ -134,7 +134,7 @@ test("unconfigured: no publish, no poll, no throw - other channels untouched", a
   const root = freshRoot();
   try {
     const tx = new MockTransport();
-    const lane = new PhoneLane(root, tx); // no phone.json written
+    const lane = new PhoneLane(root, () => tx); // no phone.json written
     reachOffer(root);
     await assert.doesNotReject(() => lane.announceOffer());
     await assert.doesNotReject(() => lane.pollAnswers());
@@ -150,7 +150,7 @@ test("the credential never reaches the call log (req-phone-config-secret)", asyn
   try {
     writeConfig(root, { enabled: true, topic: "t-out", answer_topic: "t-in", token: "SECRET-TOK" });
     const tx = new MockTransport();
-    const lane = new PhoneLane(root, tx, new CallLog(layout.seDir(root)));
+    const lane = new PhoneLane(root, () => tx, new CallLog(layout.seDir(root)));
     reachOffer(root);
     await lane.announceOffer();
     tx.answers.push({ id: "nope", action: "bless", at: Date.now() });

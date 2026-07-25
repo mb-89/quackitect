@@ -1,0 +1,13 @@
+{
+  "iteration": "i8d-phone-brief",
+  "state": "verification",
+  "at": "2026-07-25T12:44:41.492Z",
+  "payload": {
+    "run_ref": "run-86dadd78902a",
+    "command": "npm --prefix product/deliverable run verify --loglevel=error",
+    "exit": 0
+  },
+  "pinned_run": {
+    "ref": "run-86dadd78902a"
+  }
+}

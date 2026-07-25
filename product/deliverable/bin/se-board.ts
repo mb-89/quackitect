@@ -706,24 +706,22 @@ server.listen(port, "127.0.0.1", () => {
   openBrowser();
 });
 
-// The phone lane (i8, E5): opt-in. When phone.json is present, push new
-// offers out and poll taps in from this already-supervised process; every
-// call is best-effort so a lane error never disturbs the board. Absent
-// config => phoneLane stays null and nothing runs (the board test never
-// touches the network).
+// The phone lane's READING half (i8 E4). The board reads taps, and ONLY taps.
+//
+// It no longer announces. i8 pushed from this timer, which could see that an
+// offer existed but never whether the run was about to wait for the owner or
+// bless it itself — so it either spammed an unattended run or, as happened,
+// reached nobody. The push now belongs to the park seam in engine/wait.ts,
+// where the run declares that it is waiting (se.adr-announce-by-adjudicator,
+// guarded by tests/i8d-brief.test.ts).
+//
+// The reading half stays here on purpose: a tap arrives long after the
+// agent's turn has ended, so something supervised must be listening.
 const phoneCfg = loadPhoneConfig(root);
 if (phoneCfg !== null) {
-  const lane = new PhoneLane(root, new NtfyTransport(phoneCfg.base ?? "https://ntfy.sh", { token: phoneCfg.token }));
-  let lastAnnounced: string | null = null;
+  const lane = new PhoneLane(root, (c) => new NtfyTransport(c.base ?? "https://ntfy.sh", { token: c.token }));
   const phoneTick = async (): Promise<void> => {
     try {
-      const offer = new Gate(root).current();
-      const h = offer ? offer.base_hash : null;
-      if (h !== null && h !== lastAnnounced) {
-        await lane.announceOffer();
-        lastAnnounced = h;
-      }
-      if (h === null) lastAnnounced = null;
       await lane.pollAnswers();
     } catch (e) {
       console.error("se-board phone lane", e);

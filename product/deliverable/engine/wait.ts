@@ -21,7 +21,12 @@ const POLL_MS = 250;
 
 const sleep = (ms: number): Promise<void> => new Promise((r) => setTimeout(r, ms));
 
-export async function seWait(root: string, condition: WaitCondition, timeoutS: number): Promise<WaitResult> {
+export interface WaitOpts {
+  /** Called ONCE when a wait for the owner's decision begins on a live offer. */
+  onPark?: () => Promise<void>;
+}
+
+export async function seWait(root: string, condition: WaitCondition, timeoutS: number, opts: WaitOpts = {}): Promise<WaitResult> {
   if (timeoutS > MAX_WAIT_S) {
     throw new Rejection({
       clause: "SE-C-050",
@@ -46,6 +51,26 @@ export async function seWait(root: string, condition: WaitCondition, timeoutS: n
         return existsSync(offerPath) ? "live" : "absent";
     }
   })();
+
+  // THE PARK SEAM (R9, se.adr-announce-by-adjudicator). The owner asked for
+  // exactly one rule: push when the agent would otherwise be WAITING for
+  // their input. That moment is not something to infer from configuration or
+  // from a timer noticing an offer — it IS this call. An agent that will
+  // self-bless calls se_gate_bless and never arrives here.
+  //
+  // WHITELIST (se.law-whitelist-guards): the one state that announces is "a
+  // wait for an offer, beginning while an offer is live". Every other wait —
+  // a file wait, an offer wait with nothing offered — announces nothing, not
+  // because it was excluded but because it was never included.
+  if (condition.kind === "offer" && initial === "live" && opts.onPark !== undefined) {
+    // Best-effort: a summons that cannot be sent must never wedge the wait.
+    // Its failure is recorded by the announcer itself (R12).
+    try {
+      await opts.onPark();
+    } catch (e) {
+      console.error("se: park announcement failed —", String((e as Error).message));
+    }
+  }
 
   while (Date.now() - started < timeoutS * 1000) {
     await sleep(POLL_MS);

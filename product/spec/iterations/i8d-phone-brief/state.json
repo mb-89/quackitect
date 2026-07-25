@@ -1,7 +1,7 @@
 {
   "machine": "systematic",
   "iteration": "i8d-phone-brief",
-  "current": "author_tests",
+  "current": "fill_story_evidence",
   "counters": {},
   "history": [
     {
@@ -195,13 +195,49 @@
       "outcome": "filled",
       "evidence": "grant:e8608923f76d",
       "at": "2026-07-25T12:31:32.656Z"
+    },
+    {
+      "state": "author_tests",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i8d-phone-brief/evidence/author_tests-1.json",
+      "at": "2026-07-25T12:35:11.246Z"
+    },
+    {
+      "state": "plan_build",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i8d-phone-brief/evidence/plan_build-1.json",
+      "at": "2026-07-25T12:35:37.065Z"
+    },
+    {
+      "state": "observe_red",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i8d-phone-brief/evidence/observe_red-1.json",
+      "at": "2026-07-25T12:38:28.550Z"
+    },
+    {
+      "state": "build_steps",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i8d-phone-brief/evidence/build_steps-1.json",
+      "at": "2026-07-25T12:43:30.637Z"
+    },
+    {
+      "state": "verification",
+      "outcome": "filled",
+      "evidence": "run-86dadd78902a",
+      "at": "2026-07-25T12:44:41.492Z"
+    },
+    {
+      "state": "gate_implementation",
+      "outcome": "filled",
+      "evidence": "grant:42b1032cea7c",
+      "at": "2026-07-25T12:46:07.440Z"
     }
   ],
   "escapes": [],
   "status": "open",
   "fired": [],
   "active": [
-    "author_tests"
+    "fill_story_evidence"
   ],
   "claims": {}
 }
