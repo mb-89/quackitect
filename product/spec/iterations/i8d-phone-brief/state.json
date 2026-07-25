@@ -1,7 +1,7 @@
 {
   "machine": "systematic",
   "iteration": "i8d-phone-brief",
-  "current": "converge_pugh",
+  "current": "rank_unknowns",
   "counters": {},
   "history": [
     {
@@ -141,13 +141,49 @@
       "outcome": "filled",
       "evidence": "grant:447209dc17fa",
       "at": "2026-07-25T12:17:55.277Z"
+    },
+    {
+      "state": "converge_pugh",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i8d-phone-brief/evidence/converge_pugh-1.json",
+      "at": "2026-07-25T12:18:20.811Z"
+    },
+    {
+      "state": "reverse_sensitivity",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i8d-phone-brief/evidence/reverse_sensitivity-1.json",
+      "at": "2026-07-25T12:18:59.298Z"
+    },
+    {
+      "state": "record_adrs",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i8d-phone-brief/evidence/record_adrs-1.json",
+      "at": "2026-07-25T12:21:02.774Z"
+    },
+    {
+      "state": "consolidate_baseline",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i8d-phone-brief/evidence/consolidate_baseline-1.json",
+      "at": "2026-07-25T12:21:29.909Z"
+    },
+    {
+      "state": "evaluate_baseline",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i8d-phone-brief/evidence/evaluate_baseline-1.json",
+      "at": "2026-07-25T12:21:58.825Z"
+    },
+    {
+      "state": "gate_architecture",
+      "outcome": "filled",
+      "evidence": "grant:fe6378c2167e",
+      "at": "2026-07-25T12:23:22.948Z"
     }
   ],
   "escapes": [],
   "status": "open",
   "fired": [],
   "active": [
-    "converge_pugh"
+    "rank_unknowns"
   ],
   "claims": {}
 }
