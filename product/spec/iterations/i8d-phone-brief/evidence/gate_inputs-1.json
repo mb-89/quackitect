@@ -1,0 +1,13 @@
+{
+  "iteration": "i8d-phone-brief",
+  "state": "gate_inputs",
+  "at": "2026-07-25T12:12:05.332Z",
+  "payload": {
+    "props_realized": "All five props plus the folded finding. Prop 1 (a tap returns a grant) by S1. Prop 2 (the brief can be read) by S2. Prop 3 (the host learns nothing) by S3. Prop 4 (failure is admitted) by S4. Prop 5 (the right mode automatically) by S5. The folded finding (a brief must not outlive its decision) by S6.",
+    "stories_generalized": "Every story sits in a use case: S1, S2, S4, S5 and S6 inside UC-A announce a gate; S1 and S2 also inside UC-B adjudicate from the phone; S3 inside UC-C read without revealing; S6 inside UC-D expire. Each story's failure mode appears as a numbered extension rather than prose - self-bless publishes nothing, a rejected publish degrades to two actions, an unservable page is never announced, a stale or duplicate tap is ignored.",
+    "roles_covered": "Seven roles, none left out: the adjudicating owner (UC-B), the custodian owner (UC-C), the driving agent (UC-A), the relay (UC-A step 6, UC-B step 3), the static host (UC-A steps 4-5, UC-D), the phone app (UC-B step 2 - the component that cannot be mocked, which is why acceptance is a tap), the account maintainer (UC-A extension 4a, the degradation path). Five tensions named with resolutions: rich versus protected, silence versus reach, pointer versus page, mockable versus tappable, free-tier versus expectation.",
+    "excluded_stated": "Yes, binding and system-level at draw_context: no bless-with-changes, no cone render, no change to gate meaning or the hash binding, no second channel, no self-hosted ntfy, no automated account setup, no publishing for a self-blessed gate, no plaintext in the store, no token in any log, brief, grant or run record, and nothing touching the close, the machine, the board panels or archived-iteration reading.",
+    "examples_formulated": "The examples are born here as formulated scenarios. Formulated: the six story slideshows and the four use-case main scenarios. Those that will mature into assertive checks at M7: UC-A's action URLs being absolute (the defect), UC-A extension 1a (a self-blessed gate publishes nothing), UC-A extension 4a and 5a (degrade to actions and record the failure; never announce an unservable page), UC-C's decryption round trip and the ciphertext containing none of the brief's words, and UC-D's bounded expiry. Two examples CANNOT become automated checks and are named as such rather than faked: the card's rendering on the phone, and the tap itself - their authority is a real device, and this iteration's own release gate is that demonstration.",
+    "offer_hash": "a828a34d89b399b3b7f77aee68a2d2eda95081d5abea6c3cbcdc16e3d9f044f6"
+  }
+}

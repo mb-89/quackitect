@@ -1,7 +1,7 @@
 {
   "machine": "systematic",
   "iteration": "i8d-phone-brief",
-  "current": "draw_context",
+  "current": "write_requirements",
   "counters": {},
   "history": [
     {
@@ -57,15 +57,43 @@
       "outcome": "filled",
       "evidence": "grant:e28e9344b3c7",
       "at": "2026-07-25T12:09:55.212Z"
+    },
+    {
+      "state": "draw_context",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i8d-phone-brief/evidence/draw_context-1.json",
+      "at": "2026-07-25T12:10:21.114Z"
+    },
+    {
+      "state": "map_stakeholders",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i8d-phone-brief/evidence/map_stakeholders-1.json",
+      "at": "2026-07-25T12:10:51.805Z"
+    },
+    {
+      "state": "write_stories",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i8d-phone-brief/evidence/write_stories-1.json",
+      "at": "2026-07-25T12:11:12.902Z"
+    },
+    {
+      "state": "generalize_use_cases",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i8d-phone-brief/evidence/generalize_use_cases-1.json",
+      "at": "2026-07-25T12:11:42.310Z"
+    },
+    {
+      "state": "gate_inputs",
+      "outcome": "filled",
+      "evidence": "grant:a828a34d89b3",
+      "at": "2026-07-25T12:12:18.345Z"
     }
   ],
   "escapes": [],
   "status": "open",
   "fired": [],
   "active": [
-    "draw_context",
-    "map_stakeholders",
-    "write_stories"
+    "write_requirements"
   ],
   "claims": {}
 }
