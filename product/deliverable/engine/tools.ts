@@ -22,7 +22,10 @@ import { McpServer } from "./mcp.ts";
 import { layout } from "./layout.ts";
 import { boot, newSession, assertAdmitted, registerLaneNames, type Session } from "./boot.ts";
 import { Gate } from "./gate.ts";
-import { fileList, fileRead, fileWrite, filePatch, fileDelete, fileSearch, type SearchMode } from "./deliverable.ts";
+import { fileList, fileRead, fileWrite, filePatch, filePatchBatch, fileDelete, type PatchOp } from "./deliverable.ts";
+import { searchProduct, readRange, listFiles as gitListFiles } from "./search.ts";
+import { showConfig, setConfig, validateConfig } from "./config.ts";
+import { registeredChecks } from "./lint.ts";
 import { git, assertNotHistoryRewrite, assertNotPush, assertCommitWindow } from "./git.ts";
 import { runCommand, assertTestRunScope } from "./run.ts";
 import { psAction } from "./ps.ts";
@@ -139,6 +142,24 @@ export function coreTools(root: string, opts: { toll?: Toll; session?: Session }
         });
         opts.toll?.arm(); // pillar 3: armed after the first submit
         return packet;
+      },
+    },
+    {
+      name: "se_loop_reopen",
+      title: "se.loop.reopen",
+      description:
+        "Reopen named states and their downstream cone — the verdict a gate review can reach. Prior fills are SUPERSEDED, never erased, so the first pass stays readable in the record.",
+      inputSchema: {
+        type: "object",
+        properties: {
+          states: { type: "array", items: { type: "string" }, description: "the states to re-activate" },
+          reason: { type: "string", description: "why — recorded in the history beside the superseded fills" },
+        },
+        required: ["states", "reason"],
+      },
+      handler: (args) => {
+        const r = activeRoot();
+        return new Loop(r, requireSystematic(r)).reopen((args.states as string[]).map(String), String(args.reason));
       },
     },
     {
@@ -287,29 +308,93 @@ export function coreTools(root: string, opts: { toll?: Toll; session?: Session }
     {
       name: "se_file_search",
       title: "se.file.search",
-      description: "Find product files: literal (default), ranked (multi-term), or fuzzy (filename); detail via se_file_read.",
+      description:
+        "Search the working tree OR any git ref (a tag, a branch — v1 is branch 'main'). Returns match LOCATIONS; read around them with se_file_read's offset/limit. Untracked files are included by default, so a file you just wrote IS found.",
       inputSchema: {
         type: "object",
         properties: {
-          query: { type: "string" },
+          query: { type: "string", description: "the pattern (a regex git understands)" },
           intent: { type: "string", description: "what you are trying to find — logged" },
-          mode: { type: "string", enum: ["literal", "ranked", "fuzzy"], default: "literal" },
-          limit: { type: "number", default: 20 },
+          ref: { type: "string", description: "search this ref instead of the tree: iter/<id> for a shipped iteration's record, main for v1" },
+          path: { type: "string", description: "restrict to a path or glob" },
+          limit: { type: "number", default: 200 },
+          ignore_case: { type: "boolean" },
         },
         required: ["query", "intent"],
       },
-      handler: (args) => fileSearch(activeRoot(), String(args.query), Number(args.limit ?? 20), (args.mode as SearchMode) ?? "literal"),
+      handler: (args) =>
+        searchProduct(activeRoot(), String(args.query), {
+          ...(args.ref !== undefined ? { ref: String(args.ref) } : {}),
+          ...(args.path !== undefined ? { path: String(args.path) } : {}),
+          ...(args.limit !== undefined ? { limit: Number(args.limit) } : {}),
+          ...(args.ignore_case === true ? { ignore_case: true } : {}),
+        }),
+    },
+    {
+      name: "se_file_glob",
+      title: "se.file.glob",
+      description: "List product files matching a glob, in the tree or at a ref — the 'where does this live' lane.",
+      inputSchema: {
+        type: "object",
+        properties: {
+          glob: { type: "string", description: "e.g. **/*.test.ts" },
+          ref: { type: "string", description: "list at this ref instead of the tree" },
+        },
+        required: ["glob"],
+      },
+      handler: (args) => ({
+        files: gitListFiles(activeRoot(), String(args.glob), args.ref === undefined ? {} : { ref: String(args.ref) }),
+      }),
     },
     {
       name: "se_file_read",
       title: "se.file.read",
-      description: "Read one product file; returns content + hash (the CAS base for edits).",
+      description:
+        "Read a product file. Pass offset/limit to read a large file in PARTS — an oversize whole-file read is refused, never silently truncated. Pass ref to read it as committed at a tag or branch.",
       inputSchema: {
         type: "object",
-        properties: { path: { type: "string" } },
+        properties: {
+          path: { type: "string" },
+          offset: { type: "number", description: "1-based first line" },
+          limit: { type: "number", description: "how many lines" },
+          ref: { type: "string", description: "read the file as committed at this ref" },
+        },
         required: ["path"],
       },
-      handler: (args) => fileRead(activeRoot(), String(args.path)),
+      handler: (args) => {
+        // No range and no ref: the classic read, which still returns the CAS hash.
+        if (args.offset === undefined && args.limit === undefined && args.ref === undefined) {
+          return fileRead(activeRoot(), String(args.path));
+        }
+        return readRange(activeRoot(), String(args.path), {
+          ...(args.offset !== undefined ? { offset: Number(args.offset) } : {}),
+          ...(args.limit !== undefined ? { limit: Number(args.limit) } : {}),
+          ...(args.ref !== undefined ? { ref: String(args.ref) } : {}),
+        });
+      },
+    },
+    {
+      name: "se_config",
+      title: "se.config",
+      description:
+        "The machine-local config lane (~/.se/<project>/): show with secrets MASKED, or set with validation. Never touches the repository, never returns a credential.",
+      inputSchema: {
+        type: "object",
+        properties: {
+          action: { type: "string", enum: ["show", "set", "validate"], default: "show" },
+          name: { type: "string", enum: ["phone", "brief", "roots"] },
+          value: { type: "object", description: "the config to write (action=set)" },
+        },
+        required: ["name"],
+      },
+      handler: (args) => {
+        const name = String(args.name);
+        const action = String(args.action ?? "show");
+        if (action === "show") return showConfig(root, name);
+        const value = (args.value ?? {}) as Record<string, unknown>;
+        if (action === "validate") return validateConfig(name, value);
+        return setConfig(root, name, value);
+      },
     },
     {
       name: "se_file_write",
@@ -330,7 +415,8 @@ export function coreTools(root: string, opts: { toll?: Toll; session?: Session }
     {
       name: "se_file_patch",
       title: "se.file.patch",
-      description: "Exact-match edit: old_string must occur exactly once; optional base_hash double-guard.",
+      description:
+        "Exact-match edit: old_string must occur exactly once. Pass `ops` to apply MANY edits across MANY files in one atomic call — every guard is checked before anything is written, so a failure leaves the tree untouched.",
       inputSchema: {
         type: "object",
         properties: {
@@ -338,17 +424,34 @@ export function coreTools(root: string, opts: { toll?: Toll; session?: Session }
           old_string: { type: "string" },
           new_string: { type: "string" },
           base_hash: { type: "string" },
+          ops: {
+            type: "array",
+            description: "batch: [{path, old_string, new_string, base_hash?}, ...] — applied atomically",
+            items: { type: "object" },
+          },
         },
-        required: ["path", "old_string", "new_string"],
       },
-      handler: (args) =>
-        filePatch(
+      handler: (args) => {
+        if (Array.isArray(args.ops) && args.ops.length > 0) {
+          return filePatchBatch(activeRoot(), args.ops as PatchOp[]);
+        }
+        if (args.path === undefined || args.old_string === undefined || args.new_string === undefined) {
+          throw new Rejection({
+            clause: "SE-C-046",
+            expected: "either ops:[...] for a batch, or path + old_string + new_string for one edit",
+            got: `path=${args.path === undefined ? "missing" : "given"}, ops=${Array.isArray(args.ops) ? "empty" : "missing"}`,
+            remedy: { tool: "se_file_patch", args: { ops: [{ path: "<path>", old_string: "<old>", new_string: "<new>" }] }, note: "batch several edits into one call" },
+            source: "engine/tools.ts se_file_patch",
+          });
+        }
+        return filePatch(
           activeRoot(),
           String(args.path),
           String(args.old_string),
           String(args.new_string),
           args.base_hash === undefined ? undefined : String(args.base_hash),
-        ),
+        );
+      },
     },
     {
       name: "se_file_delete",
@@ -610,7 +713,31 @@ export function buildServer(root: string, opts: { tollWindowMs?: number; now?: (
   });
   const log = new CallLog(layout.seDir(root));
   const session = newSession();
-  const server = new McpServer({ name: "se-mcp", version: "2.0.0-bootstrap" }, coreTools(root, { toll, session }));
+  const tools = coreTools(root, { toll, session });
+  const server = new McpServer({ name: "se-mcp", version: "2.0.0-bootstrap" }, tools);
+
+  // R8 — REQUIRED ARGS ARE ENFORCED, and this guard exists because of a
+  // witnessed failure: se_file_search was called with the wrong argument name,
+  // String(undefined) produced the literal word "undefined", and the tool
+  // returned a page of real, correctly-formatted hits that answered nothing.
+  // A confident wrong answer is far more expensive than a refusal — it cost a
+  // wrong conclusion and a retracted note. WHITELIST (se.law-whitelist-guards):
+  // the declared shape is the accepted one; anything else is refused, rather
+  // than enumerating the ways a call can be malformed.
+  const required = new Map(tools.map((t) => [t.name, (t.inputSchema.required as string[] | undefined) ?? []]));
+  server.addGuard((tool, args) => {
+    const missing = (required.get(tool) ?? []).filter((k) => args[k] === undefined || args[k] === null);
+    if (missing.length === 0) return;
+    const known = Object.keys((tools.find((t) => t.name === tool)?.inputSchema.properties as Record<string, unknown>) ?? {});
+    throw new Rejection({
+      clause: "SE-C-046",
+      expected: `${tool} requires: ${(required.get(tool) ?? []).join(", ")}`,
+      got: `missing: ${missing.join(", ")}${Object.keys(args).length > 0 ? ` (received: ${Object.keys(args).join(", ")})` : " (no arguments)"}`,
+      remedy: { tool, args: Object.fromEntries(missing.map((k) => [k, "<value>"])), note: `this tool accepts: ${known.join(", ")}` },
+      source: "engine/tools.ts required-args",
+    });
+  });
+
   server.addGuard((tool) => assertAdmitted(session, tool)); // §7 admission gates the surface
   server.addGuard((tool, args) => toll.check(tool, args, log));
   // The toll's grace warning rides the successful result it graced.

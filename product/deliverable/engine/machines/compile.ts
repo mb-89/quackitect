@@ -62,6 +62,43 @@ function evidenceForm(machineId: string, note: LedgerNode): EvidenceField[] {
     });
 }
 
+/**
+ * THE STANDARD REVIEW ROUNDS ([[se.meth-review-rounds]], ported from v1's
+ * milestone-review guide). Every gate carries these in addition to its own
+ * acceptance items, in increasing scrutiny. They are REQUIRED: a review that
+ * nothing asks for is a review that never happens — which is exactly what
+ * i12 found, three separate times, in three different mechanisms.
+ *
+ * The rounds cover TWO SETS: this gate's own items, AND every input state
+ * feeding it since the last gate. Reviewing only the gate's own fields is the
+ * common failure and it is not a review.
+ */
+const STANDARD_ROUNDS: EvidenceField[] = [
+  {
+    name: "verify_round",
+    description:
+      "BUILT IT RIGHT: every input state since the last gate, its evidence read against its claim. Open what the evidence points at rather than trusting its description of itself — a bless is not proof.",
+    required: true,
+  },
+  {
+    name: "validate_round",
+    description:
+      "BUILT THE RIGHT THING: against the frame, the vision and the REQUIREMENT REGISTER, not merely this iteration's own plan. List what is missing, wrong or out of scope — and watch for asks NO check covered, which is where a design drifts from its register.",
+    required: true,
+  },
+  {
+    name: "redteam_round",
+    description:
+      "ARGUE THE OPPOSING CASE BEFORE ENDORSING. Cite a rubric — the criteria, the register, the goal system — never vibes. Name the KILL-CRITERION: what would have to be true for this to be the wrong call, then look for it. An override blesses past an unmet criterion and is logged WITH its dissent, never as a clean pass. Scale to the gate's risk.",
+    required: true,
+  },
+  {
+    name: "verdict",
+    description: "PASS, PASS WITH NOTED OVERRIDES, or REOPEN with the named states and reasons. No silent pass.",
+    required: true,
+  },
+];
+
 function stateFromNote(machineId: string, note: LedgerNode): StateDecl {
   if (note.kind !== "machine_state") {
     throw new MachineCompileError(machineId, note.id, `a drawn state points at a machine_state note (kind: ${note.kind})`);
@@ -93,7 +130,16 @@ function stateFromNote(machineId: string, note: LedgerNode): StateDecl {
     filled_by: filled,
     ...(typeof command === "string" && command !== "" ? { command } : {}),
     guidance: section(note.body, "Guidance"),
-    evidence_form: evidenceForm(machineId, note),
+    // THE STANDARD ROUNDS ARE INJECTED HERE, at the single source, for EVERY
+    // gate (i12/R30). se.meth-gate-review has required verify / validate /
+    // redteam / state_of_the_art / verdict since it was written, and said in
+    // its own text: "The compiler will inject the standard fields into every
+    // gate's form (single source); until then, fill them from here."
+    // Nothing ever did — so no evidence form asked for them, and NOT ONE was
+    // filled in any gate of any iteration. That is how a requirement (R3) was
+    // violated by the design that claimed to satisfy it and no round caught it.
+    // A gate's own specifics come FIRST; the rounds evaluate them.
+    evidence_form: [...evidenceForm(machineId, note), ...(kind === "gate" ? STANDARD_ROUNDS : [])],
     ...(typeof submachine === "string" && submachine !== "" ? { submachine } : {}),
     edges: [],
   };

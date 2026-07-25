@@ -14,7 +14,7 @@ import { sleepMs } from "./instance.ts";
 import { closeCommitWindow } from "./git.ts";
 import { Gate } from "./gate.ts";
 import { layout } from "./layout.ts";
-import { activeStates, advance, completeState, validateMachine, type MachineDecl, type MachineInstance, type StateDecl } from "./machine.ts";
+import { activeStates, advance, completeState, reopenStates, validateMachine, type MachineDecl, type MachineInstance, type StateDecl } from "./machine.ts";
 import { claimState, readInstance } from "./instance.ts";
 import { loadIterationMachine, loadMachine } from "./machines/load.ts";
 import { loadLedger } from "./store.ts";
@@ -650,6 +650,28 @@ export class Loop {
     inst.history.push({ state: inst.current, outcome: "abandoned", evidence: reason, at: now() });
     this.save(inst);
     return this.next();
+  }
+
+  /**
+   * REOPEN: the verdict a gate review can actually reach (i12). Until now the
+   * word did not appear anywhere in the engine, so "reopen with named states"
+   * was a verdict the machine could not carry out — which quietly made it a
+   * synonym for "carry on". Prior fills in the reopened cone are SUPERSEDED,
+   * never erased: the evidence stays readable, so a reader can see what was
+   * claimed the first time and that it did not survive review.
+   */
+  reopen(states: string[], reason: string): WorkPacket {
+    const inst = this.openInstance();
+    if (!inst) {
+      return { kind: "instruction", legal: ["se.loop.start { iteration }"], recommended: "se.loop.start", note: "Nothing open to reopen." };
+    }
+    const r = reopenStates(this.machine, inst, states, reason, now());
+    this.save(inst);
+    const packet = this.next();
+    return {
+      ...packet,
+      note: `Reopened ${r.reopened.join(", ")} — ${r.superseded} prior fill(s) superseded across a cone of ${r.cone.length} state(s). The record keeps them; they no longer count as done. Reason: ${reason}`,
+    };
   }
 
   /** The guidance registry: notes whose applies_to matches the state's

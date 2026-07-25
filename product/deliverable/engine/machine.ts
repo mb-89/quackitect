@@ -67,7 +67,11 @@ export interface MachineInstance {
   pending_run?: { state: string; ref: string };
   /** Extended state: counters as variables. */
   counters: Record<string, number>;
-  history: { state: string; outcome: "filled" | "failed" | "escaped" | "abandoned"; evidence?: string; at: string }[];
+  // "superseded" and "reopened" (i12): a reopen must be representable IN the
+  // record, not by deleting it. A superseded fill happened and did not survive
+  // review; erasing it would make a reopen indistinguishable from work that was
+  // never done, which is exactly the history a reader needs most.
+  history: { state: string; outcome: "filled" | "failed" | "escaped" | "abandoned" | "superseded" | "reopened"; evidence?: string; at: string }[];
   /** Escape records which guard was exhausted. */
   escapes: { state: string; exhausted_guard: string; at: string }[];
   status: "open" | "closed" | "abandoned";
@@ -118,6 +122,71 @@ export function evalGuard(guard: string | undefined, counters: Record<string, nu
 }
 
 export type StepOutcome = "filled" | "failed";
+
+/**
+ * REOPEN (i12). Specified in twelve ledger nodes — meth-gate-review's verdict
+ * ("reopen with named states and reasons"), fold_back's ripple, the refine
+ * track — and implemented in NONE of them until now: the word "reopen" did not
+ * appear anywhere in the engine. So a gate could VOTE to reopen and the machine
+ * could not act on it, which made "reopen" a synonym for "carry on".
+ *
+ * Semantics, from meth-gate-review: "A reopen names states; the executor
+ * re-activates them and their downstream cone. Reopen edges are never drawn."
+ * So the cone is computed from the graph rather than authored, and no edge is
+ * added to represent going backwards.
+ *
+ * THE RECORD IS NOT DELETED. Prior fills in the cone are marked `superseded`
+ * rather than removed: the evidence files stay on disk and in the history, so
+ * a reader can see what was claimed the first time and that it was reopened.
+ * Erasing them would make a reopen indistinguishable from work never done.
+ */
+export function reopenStates(
+  m: MachineDecl,
+  inst: MachineInstance,
+  stateIds: string[],
+  reason: string,
+  now: string,
+): { reopened: string[]; cone: string[]; superseded: number } {
+  for (const id of stateIds) {
+    if (!m.states.some((s) => s.id === id)) throw new Error(`reopenStates: undeclared state ${id}`);
+  }
+  // The downstream cone: everything reachable from the named states. Anything
+  // downstream was derived from what is being reopened, so it cannot stand.
+  const cone = new Set<string>(stateIds);
+  let grew = true;
+  while (grew) {
+    grew = false;
+    for (const s of m.states) {
+      if (!cone.has(s.id)) continue;
+      for (const e of s.edges) {
+        if (!cone.has(e.to)) {
+          cone.add(e.to);
+          grew = true;
+        }
+      }
+    }
+  }
+
+  // Un-fire every edge leaving the cone, so joins re-arm instead of firing on
+  // fuel left over from the walk being replaced.
+  inst.fired = (inst.fired ?? []).filter((key) => !cone.has(key.split("->")[0]));
+
+  // Supersede prior fills in the cone — kept, not erased.
+  let superseded = 0;
+  for (const h of inst.history) {
+    if (h.outcome === "filled" && cone.has(h.state)) {
+      (h as { outcome: string }).outcome = "superseded";
+      superseded++;
+    }
+  }
+
+  inst.history.push({ state: stateIds.join(","), outcome: "reopened", evidence: reason.slice(0, 300), at: now });
+  inst.active = [...stateIds];
+  inst.current = stateIds[0];
+  inst.status = "open"; // a reopen revives a closed instance by construction
+  if (inst.claims !== undefined) for (const id of cone) delete inst.claims[id];
+  return { reopened: [...stateIds], cone: [...cone], superseded };
+}
 
 /** The token set with adoption: an instance without active[] reads as [current]. */
 export function activeStates(inst: MachineInstance): string[] {

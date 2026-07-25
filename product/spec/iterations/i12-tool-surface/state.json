@@ -1,7 +1,7 @@
 {
   "machine": "systematic",
   "iteration": "i12-tool-surface",
-  "current": "author_tests",
+  "current": "draw_context",
   "counters": {},
   "history": [
     {
@@ -18,190 +18,240 @@
     },
     {
       "state": "draft_vision",
-      "outcome": "filled",
+      "outcome": "superseded",
       "evidence": "product/spec/iterations/i12-tool-surface/evidence/draft_vision-1.json",
       "at": "2026-07-25T14:14:02.072Z"
     },
     {
       "state": "define_actual",
-      "outcome": "filled",
+      "outcome": "superseded",
       "evidence": "product/spec/iterations/i12-tool-surface/evidence/define_actual-1.json",
       "at": "2026-07-25T14:14:36.417Z"
     },
     {
       "state": "log_risks",
-      "outcome": "filled",
+      "outcome": "superseded",
       "evidence": "product/spec/iterations/i12-tool-surface/evidence/log_risks-1.json",
       "at": "2026-07-25T14:16:24.747Z"
     },
     {
       "state": "frame_delta",
-      "outcome": "filled",
+      "outcome": "superseded",
       "evidence": "product/spec/iterations/i12-tool-surface/evidence/frame_delta-1.json",
       "at": "2026-07-25T14:23:53.837Z"
     },
     {
       "state": "scope_non_goals",
-      "outcome": "filled",
+      "outcome": "superseded",
       "evidence": "product/spec/iterations/i12-tool-surface/evidence/scope_non_goals-1.json",
       "at": "2026-07-25T14:24:20.767Z"
     },
     {
       "state": "pressure_test",
-      "outcome": "filled",
+      "outcome": "superseded",
       "evidence": "product/spec/iterations/i12-tool-surface/evidence/pressure_test-1.json",
       "at": "2026-07-25T14:25:02.329Z"
     },
     {
       "state": "gate_motivation",
-      "outcome": "filled",
+      "outcome": "superseded",
       "evidence": "grant:d18733b1dfb8",
       "at": "2026-07-25T14:26:16.522Z"
     },
     {
       "state": "draw_context",
-      "outcome": "filled",
+      "outcome": "superseded",
       "evidence": "product/spec/iterations/i12-tool-surface/evidence/draw_context-1.json",
       "at": "2026-07-25T14:27:23.810Z"
     },
     {
       "state": "map_stakeholders",
-      "outcome": "filled",
+      "outcome": "superseded",
       "evidence": "product/spec/iterations/i12-tool-surface/evidence/map_stakeholders-1.json",
       "at": "2026-07-25T14:28:01.521Z"
     },
     {
       "state": "write_stories",
-      "outcome": "filled",
+      "outcome": "superseded",
       "evidence": "product/spec/iterations/i12-tool-surface/evidence/write_stories-1.json",
       "at": "2026-07-25T14:28:27.660Z"
     },
     {
       "state": "generalize_use_cases",
-      "outcome": "filled",
+      "outcome": "superseded",
       "evidence": "product/spec/iterations/i12-tool-surface/evidence/generalize_use_cases-1.json",
       "at": "2026-07-25T14:28:58.628Z"
     },
     {
       "state": "gate_inputs",
-      "outcome": "filled",
+      "outcome": "superseded",
       "evidence": "grant:1ee7f8bc0c9d",
       "at": "2026-07-25T14:29:46.136Z"
     },
     {
       "state": "write_requirements",
-      "outcome": "filled",
+      "outcome": "superseded",
       "evidence": "product/spec/iterations/i12-tool-surface/evidence/write_requirements-1.json",
       "at": "2026-07-25T14:31:31.759Z"
     },
     {
       "state": "derive_functions",
-      "outcome": "filled",
+      "outcome": "superseded",
       "evidence": "product/spec/iterations/i12-tool-surface/evidence/derive_functions-1.json",
       "at": "2026-07-25T14:32:13.500Z"
     },
     {
       "state": "probe_assumptions",
-      "outcome": "filled",
+      "outcome": "superseded",
       "evidence": "product/spec/iterations/i12-tool-surface/evidence/probe_assumptions-1.json",
       "at": "2026-07-25T14:34:10.340Z"
     },
     {
       "state": "gate_requirements",
-      "outcome": "filled",
+      "outcome": "superseded",
       "evidence": "grant:950cbc78ba6f",
       "at": "2026-07-25T14:35:41.513Z"
     },
     {
       "state": "derive_criteria",
-      "outcome": "filled",
+      "outcome": "superseded",
       "evidence": "product/spec/iterations/i12-tool-surface/evidence/derive_criteria-1.json",
       "at": "2026-07-25T14:36:26.015Z"
     },
     {
       "state": "partition_functions",
-      "outcome": "filled",
+      "outcome": "superseded",
       "evidence": "product/spec/iterations/i12-tool-surface/evidence/partition_functions-1.json",
       "at": "2026-07-25T14:37:02.069Z"
     },
     {
       "state": "enumerate_space",
-      "outcome": "filled",
+      "outcome": "superseded",
       "evidence": "product/spec/iterations/i12-tool-surface/evidence/enumerate_space-1.json",
       "at": "2026-07-25T14:38:31.062Z"
     },
     {
       "state": "evaluate_set",
-      "outcome": "filled",
+      "outcome": "superseded",
       "evidence": "product/spec/iterations/i12-tool-surface/evidence/evaluate_set-1.json",
       "at": "2026-07-25T14:39:48.452Z"
     },
     {
       "state": "gate_candidates",
-      "outcome": "filled",
+      "outcome": "superseded",
       "evidence": "grant:2aa3f43f9528",
       "at": "2026-07-25T14:40:54.734Z"
     },
     {
       "state": "converge_pugh",
-      "outcome": "filled",
+      "outcome": "superseded",
       "evidence": "product/spec/iterations/i12-tool-surface/evidence/converge_pugh-1.json",
       "at": "2026-07-25T14:43:13.876Z"
     },
     {
       "state": "reverse_sensitivity",
-      "outcome": "filled",
+      "outcome": "superseded",
       "evidence": "product/spec/iterations/i12-tool-surface/evidence/reverse_sensitivity-1.json",
       "at": "2026-07-25T14:44:15.226Z"
     },
     {
       "state": "record_adrs",
-      "outcome": "filled",
+      "outcome": "superseded",
       "evidence": "product/spec/iterations/i12-tool-surface/evidence/record_adrs-1.json",
       "at": "2026-07-25T14:47:13.567Z"
     },
     {
       "state": "consolidate_baseline",
-      "outcome": "filled",
+      "outcome": "superseded",
       "evidence": "product/spec/iterations/i12-tool-surface/evidence/consolidate_baseline-1.json",
       "at": "2026-07-25T14:48:02.182Z"
     },
     {
       "state": "evaluate_baseline",
-      "outcome": "filled",
+      "outcome": "superseded",
       "evidence": "product/spec/iterations/i12-tool-surface/evidence/evaluate_baseline-1.json",
       "at": "2026-07-25T14:48:48.663Z"
     },
     {
       "state": "gate_architecture",
-      "outcome": "filled",
+      "outcome": "superseded",
       "evidence": "grant:30cd72be48c1",
       "at": "2026-07-25T14:50:11.379Z"
     },
     {
       "state": "rank_unknowns",
-      "outcome": "filled",
+      "outcome": "superseded",
       "evidence": "product/spec/iterations/i12-tool-surface/evidence/rank_unknowns-1.json",
       "at": "2026-07-25T14:50:46.450Z"
     },
     {
       "state": "fold_back",
-      "outcome": "filled",
+      "outcome": "superseded",
       "evidence": "product/spec/iterations/i12-tool-surface/evidence/fold_back-1.json",
       "at": "2026-07-25T14:53:38.287Z"
     },
     {
       "state": "gate_prototype",
-      "outcome": "filled",
+      "outcome": "superseded",
       "evidence": "grant:84561e69fb2b",
       "at": "2026-07-25T14:55:00.924Z"
+    },
+    {
+      "state": "draft_vision",
+      "outcome": "reopened",
+      "evidence": "Rewalk under the standard review rounds (owner instruction 2026-07-25). The first pass ran with NO verify/validate/redteam/verdict on any gate - meth-gate-review has required them since it was written and no evidence form ever collected them. R3 was violated by the design that claimed to satisfy it ",
+      "at": "2026-07-25T15:22:31.121Z"
+    },
+    {
+      "state": "draft_vision",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i12-tool-surface/evidence/draft_vision-3.json",
+      "at": "2026-07-25T15:23:33.406Z"
+    },
+    {
+      "state": "define_actual",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i12-tool-surface/evidence/define_actual-2.json",
+      "at": "2026-07-25T15:23:59.078Z"
+    },
+    {
+      "state": "log_risks",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i12-tool-surface/evidence/log_risks-2.json",
+      "at": "2026-07-25T15:24:55.987Z"
+    },
+    {
+      "state": "frame_delta",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i12-tool-surface/evidence/frame_delta-2.json",
+      "at": "2026-07-25T15:25:36.668Z"
+    },
+    {
+      "state": "scope_non_goals",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i12-tool-surface/evidence/scope_non_goals-2.json",
+      "at": "2026-07-25T15:26:08.228Z"
+    },
+    {
+      "state": "pressure_test",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i12-tool-surface/evidence/pressure_test-2.json",
+      "at": "2026-07-25T15:26:49.939Z"
+    },
+    {
+      "state": "gate_motivation",
+      "outcome": "filled",
+      "evidence": "grant:2d57c387f58f",
+      "at": "2026-07-25T15:28:31.680Z"
     }
   ],
   "escapes": [],
   "status": "open",
   "fired": [],
   "active": [
-    "author_tests"
+    "draw_context",
+    "map_stakeholders",
+    "write_stories"
   ],
   "claims": {}
 }
