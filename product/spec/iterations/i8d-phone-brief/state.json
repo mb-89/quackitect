@@ -1,0 +1,26 @@
+{
+  "machine": "systematic",
+  "iteration": "i8d-phone-brief",
+  "current": "draft_vision",
+  "counters": {},
+  "history": [
+    {
+      "state": "onboard_retro",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i8d-phone-brief/evidence/onboard_retro-1.json",
+      "at": "2026-07-25T12:03:54.666Z"
+    },
+    {
+      "state": "gate_kickoff",
+      "outcome": "filled",
+      "evidence": "grant:4caa677e880b",
+      "at": "2026-07-25T12:06:04.541Z"
+    }
+  ],
+  "escapes": [],
+  "status": "open",
+  "fired": [],
+  "active": [
+    "draft_vision"
+  ]
+}
