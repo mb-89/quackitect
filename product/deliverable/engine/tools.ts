@@ -17,6 +17,7 @@ import { CallLog } from "./calllog.ts";
 import { Toll, TOLL_UPDATE_SCHEMA } from "./toll.ts";
 import { help } from "./help.ts";
 import { seWait, type WaitCondition } from "./wait.ts";
+import { PhoneLane, NtfyTransport } from "./phone.ts";
 import { McpServer } from "./mcp.ts";
 import { layout } from "./layout.ts";
 import { boot, newSession, assertAdmitted, registerLaneNames, type Session } from "./boot.ts";
@@ -568,7 +569,7 @@ export function coreTools(root: string, opts: { toll?: Toll; session?: Session }
     {
       name: "se_wait",
       title: "se.wait",
-      description: "Wait for a mechanical condition (file, offer) or timeout_s (max 300); never poll a judgment surface.",
+      description: "Wait for a mechanical condition (file, offer) or timeout_s (max 300); never poll a judgment surface. Waiting on an offer IS asking the owner, so it summons a paired phone — an offer you will self-bless must not be waited on.",
       inputSchema: {
         type: "object",
         properties: {
@@ -580,7 +581,16 @@ export function coreTools(root: string, opts: { toll?: Toll; session?: Session }
         },
         required: ["condition"],
       },
-      handler: (args) => seWait(root, args.condition as WaitCondition, Number(args.timeout_s ?? 60)),
+      // The park seam: waiting for an offer IS asking the owner, so this is
+      // where the phone is summoned (R9). Silent unless a phone is paired.
+      handler: (args) =>
+        seWait(root, args.condition as WaitCondition, Number(args.timeout_s ?? 60), {
+          onPark: async () => {
+            const lane = new PhoneLane(root, (c) => new NtfyTransport(c.base ?? "https://ntfy.sh", { token: c.token }), log());
+            const res = await lane.announceOffer();
+            if (res.announced) console.error(`se: gate pushed to the phone (brief: ${res.brief})`);
+          },
+        }),
     },
   ];
   // The voluntary update lane: any call may carry one — the toll records it

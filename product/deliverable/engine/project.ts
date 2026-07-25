@@ -5,6 +5,7 @@
 import { closeSync, existsSync, openSync, readSync, readdirSync, statSync } from "node:fs";
 import { basename, join, resolve } from "node:path";
 import { Gate, type GrantRecord, type Offer } from "./gate.ts";
+import { briefHtml } from "./brief.ts";
 import { readJsonFile, stripBom } from "./jsonio.ts";
 import { layout } from "./layout.ts";
 import type { MachineDecl, MachineInstance } from "./machine.ts";
@@ -91,7 +92,7 @@ export interface ProjectionState {
   modules: ModuleStatus[];
   iterations: IterationView[];
   open_iteration: string | null;
-  offer: Offer | null;
+  offer: (Offer & { card_html: string }) | null;
   heartbeat: (TollUpdate & { todo?: string[]; age_s: number }) | null;
   grants: GrantRecord[];
   last_verify: { ok: boolean; exit: number; at: string; iteration: string } | null;
@@ -403,7 +404,11 @@ export function projectState(root: string): ProjectionState {
     modules: loadModules(abs),
     iterations,
     open_iteration: openIteration,
-    offer: new Gate(openRoot).current(),
+    // ONE CARD, rendered once (owner ruling 2026-07-25: "just take the same
+    // card"). briefHtml is the single renderer - the board paints this markup,
+    // and the phone's hosted page carries the same string inside its
+    // ciphertext. Two copies of a decision card can drift; one cannot.
+    offer: ((o) => (o === null ? null : { ...o, card_html: briefHtml(o) }))(new Gate(openRoot).current()),
     heartbeat,
     grants,
     last_verify: lastVerify,
