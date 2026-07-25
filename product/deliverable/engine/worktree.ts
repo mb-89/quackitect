@@ -294,24 +294,23 @@ export function shipMerge(root: string, iteration: string, opts: { allowSelf?: b
   const overlapLedger = trunkFiles.filter((f) => branchFiles.has(f)).filter((f) => f.startsWith(ledgerRel) && f.endsWith(".md"));
 
   const m = git(root, ...GIT_ID, "merge", "--no-commit", "--no-ff", branch);
-  const conflicted = git(root, "diff", "--name-only", "--diff-filter=U").stdout.split("\n").filter(Boolean);
-  // ANY failed merge stops the close, not only a conflicting one: a merge also
-  // refuses when trunk's tree is dirty, and falling through then commits trunk's
-  // own pending changes under the close's name - one parent, none of the
-  // iteration's work. A half-applied close, witnessed on the first real use.
-  if (!m.ok) {
+  // WHITELIST GUARD (se.law-whitelist-guards): name the ONE acceptable outcome
+  // and treat everything else as failure, rather than enumerating what can go
+  // wrong. The accepted state after a merge attempt is: git reported success, a
+  // MERGE_HEAD exists, and no path is unmerged. Blacklisting let two failures
+  // through - a close that merged nothing, and a close that committed trunk's
+  // own pending changes because the merge had refused on a dirty tree.
+  const mergeAccepted =
+    m.ok &&
+    git(root, "rev-parse", "--verify", "-q", "MERGE_HEAD").ok &&
+    git(root, "diff", "--name-only", "--diff-filter=U").stdout.trim() === "";
+  if (!mergeAccepted) {
+    const conflicted = git(root, "diff", "--name-only", "--diff-filter=U").stdout.split("\n").filter(Boolean);
     git(root, "merge", "--abort");
     undoClose();
     return conflicted.length > 0
       ? { merged: false, conflict: conflicted.join(", ").slice(0, 300), suspects: [] }
-      : { merged: false, refused: `the merge could not start: ${m.stderr.split("\n")[0].slice(0, 200)}`, suspects: [] };
-  }
-  // No MERGE_HEAD means nothing actually merged; committing then would fabricate
-  // a single-parent commit that reads like a close.
-  if (!git(root, "rev-parse", "--verify", "-q", "MERGE_HEAD").ok) {
-    git(root, "merge", "--abort");
-    undoClose();
-    return { merged: false, refused: "the merge produced no MERGE_HEAD - nothing was merged", suspects: [] };
+      : { merged: false, refused: `the merge did not reach an accepted state: ${(m.stderr || "no MERGE_HEAD").split("\n")[0].slice(0, 200)}`, suspects: [] };
   }
 
   // Withhold the record: drop this iteration's events from the pending merge.
