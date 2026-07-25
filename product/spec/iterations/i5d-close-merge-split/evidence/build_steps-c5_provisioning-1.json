@@ -1,0 +1,9 @@
+{
+  "iteration": "i5d-close-merge-split",
+  "state": "build_steps-c5_provisioning",
+  "at": "2026-07-25T10:52:53.193Z",
+  "payload": {
+    "what_landed": "engine/worktree.ts provisionWorktree: a new worktree is now equipped and honest about its fork. ensureToolchain links the existing install into the new tree - a junction rather than a re-install, so it costs milliseconds and no download - and creates the parent directory first, which is the bug the check caught: in a tree whose deliverable directory is not yet checked out, the link silently failed and the worktree was left unverifiable exactly as before. WorktreeRef gained an optional warnings list, carrying two: one when the toolchain still cannot be resolved, and one when trunk holds uncommitted deliverable changes at provisioning time, because the fork would then not match the running engine. Both are warnings rather than refusals - the owner may legitimately want to fork from a dirty trunk, they should just be told. Closes se.raid-worktree-provisioning-incomplete, whose two symptoms were exactly these.",
+    "run_ref": "run-1374010d27cb (11/11 green - the two new checks assert that the toolchain resolves from inside a fresh worktree, and that a clean trunk provisions silently while a dirty one warns)"
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "iteration": "i5d-close-merge-split",
+  "state": "gate_inputs",
+  "at": "2026-07-25T10:24:29.345Z",
+  "payload": {
+    "props_realized": "All four props plus the folded need are realized. Prop 1 (trunk carries live claims only) by S1. Prop 2 (nothing lost, everything reachable by name) by S1 and S2. Prop 3 (work durable mid-iteration) by S3. Prop 4 (a false ship is impossible) by S4. The folded no-regression need (a closed iteration stays visible) by S5. The provisioning half by S6.",
+    "stories_generalized": "Every story sits inside a use case: S1, S2, S4 and S5 inside UC-A close an iteration; S3 inside UC-B record a milestone; S2's pointer-following also inside UC-C follow a pointer to evidence; S6 inside UC-D provision a verifiable worktree. No story is left without a scenario path, and every failure the stories imply appears as a numbered extension.",
+    "roles_covered": "Six roles, none left out: the owner (UC-A's refusal path exists for them), the driving agent (UC-B, UC-D), the future reader of the ledger (UC-A's filtered tree), the auditor (UC-C), the board and projections (UC-A step 7 keeps them fed, and their rewiring is explicitly i5e), the git maintainer (served by the no-history-rewrite exclusion). Four tensions named with resolutions: reader vs auditor, agent vs reader, auditor vs maintainer, owner vs agent.",
+    "excluded_stated": "Yes, binding and system-level at draw_context: no reading back from git, no backport of existing iterations, no machine rework, no board panel changes, no moving grants.jsonl, no history rewriting, no push, no change to what a gate or evidence MEANS, and no parallel execution. Each names where it went instead.",
+    "examples_formulated": "The examples are born here as formulated scenarios, per the example lifecycle. Formulated: the six story slideshows and the four use-case main scenarios. The ones that will mature into assertive checks at M7 are UC-A's main scenario (a filtered close leaves trunk clean and the tag reachable), UC-A extension 1a (an empty branch refuses), UC-B's main scenario (a bless commits to the branch, tree clean), and UC-C's main scenario (a pointer resolves out of the tag). UC-D's is a provisioning check rather than a scenario. Authority today: illustrative; at M7 they convert to regression and acceptance authority.",
+    "offer_hash": "bcc87e91b40eecaead99cceb501e1380e0702b46503e47e14fbfcbdb2c36dd11"
+  }
+}

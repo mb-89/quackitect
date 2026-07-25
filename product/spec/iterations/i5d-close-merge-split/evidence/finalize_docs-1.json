@@ -1,0 +1,8 @@
+{
+  "iteration": "i5d-close-merge-split",
+  "state": "finalize_docs",
+  "at": "2026-07-25T11:37:12.338Z",
+  "payload": {
+    "docs": "The describing set matches the shipped surface. se.guidance-worktrees is the durable how-to home and now teaches exactly what the engine does: milestone commits on the branch, the close as a split, the tag created before the merge, the refusal rule, the installed toolchain, and PUSH WITH TAGS. Five ADRs carry the why once each - the filtered merge, the tag ordering, milestone commits, path-based event classification, and the owner's grant-index ruling with its no-content condition. se.law-imports-are-read-only carries the read-only import law, stated mechanism-agnostically at the owner's instruction, with four checks enforcing it. Eight RAID entries carry what is not solved: three new from this iteration, four carried, one closed.\n\nRead against the actual surface: no document teaches a behaviour that is not there, and the one surface that taught the superseded close was rewritten rather than annotated. The book emit is not exercised here - it is not built in v2 yet, so the ledger nodes plus the live board are the report, which is the design's own position (the book is the ship-time projection when it exists; the board is the everyday one)."
+  }
+}

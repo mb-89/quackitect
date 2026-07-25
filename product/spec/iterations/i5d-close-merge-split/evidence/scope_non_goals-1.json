@@ -1,0 +1,9 @@
+{
+  "iteration": "i5d-close-merge-split",
+  "state": "scope_non_goals",
+  "at": "2026-07-25T10:21:15.681Z",
+  "payload": {
+    "scope": "The WRITE side of the split, end to end. (1) A commit lane that fires at each blessed milestone and lands on the iteration's own branch, never on trunk. (2) A close that produces a merge commit keeping both parents while its tree carries only live claims - the ledger, the product code, the plan - with evidence, gate records and machine state left on the branch. (3) The mandatory iter/<id> tag, created before the filtered commit so the events are named before they leave the tree. (4) The pointer triple completed on grants and blessed nodes, so an evidence pointer still resolves once evidence is off trunk. (5) The empty-branch guard: a close that would produce nothing refuses instead of reporting success. (6) The two provisioning gaps closed - a provisioned worktree gets its dependencies and forks from a current engine.",
+    "non_goals": "- Reading archived iterations from git: the board and projectState still read from disk here; that is i5e.\n- Backporting the existing iterations off disk: i5e, as one audited migration.\n- The top-level machine rework (ad hoc, iteration planning, iterations with a viewer-only archive): i11.\n- Dropping the iteration sidebar or any board consolidation: i9, and it depends on i11 landing first.\n- Real parallel subagents: deliberately after i5e, per the owner's rule that the mechanics are fixed before anything is parallelized.\n- Moving grants.jsonl off trunk: the owner ruled it stays as a thin index; only its no-content condition is recorded here, as RAID.\n- Any change to how gates, blessing or evidence CONTENT work: this iteration moves where things live, never what they mean.\n- Pushing anything: the owner pushes."
+  }
+}

@@ -1,0 +1,50 @@
+{
+  "machine": "build-steps",
+  "iteration": "i5d-close-merge-split#build_steps",
+  "current": "done",
+  "counters": {},
+  "history": [
+    {
+      "state": "start",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i5d-close-merge-split/evidence/build_steps-start-1.json",
+      "at": "2026-07-25T10:46:58.623Z"
+    },
+    {
+      "state": "c1_classifier",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i5d-close-merge-split/evidence/build_steps-c1_classifier-1.json",
+      "at": "2026-07-25T10:47:12.898Z"
+    },
+    {
+      "state": "c2_milestone_lane",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i5d-close-merge-split/evidence/build_steps-c2_milestone_lane-1.json",
+      "at": "2026-07-25T10:47:32.476Z"
+    },
+    {
+      "state": "c3_atomic_close",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i5d-close-merge-split/evidence/build_steps-c3_atomic_close-1.json",
+      "at": "2026-07-25T10:47:48.900Z"
+    },
+    {
+      "state": "c4_bless_wiring",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i5d-close-merge-split/evidence/build_steps-c4_bless_wiring-1.json",
+      "at": "2026-07-25T10:50:53.002Z"
+    },
+    {
+      "state": "c5_provisioning",
+      "outcome": "filled",
+      "evidence": "product/spec/iterations/i5d-close-merge-split/evidence/build_steps-c5_provisioning-1.json",
+      "at": "2026-07-25T10:52:53.193Z"
+    }
+  ],
+  "escapes": [],
+  "status": "closed",
+  "fired": [],
+  "active": [
+    "done"
+  ]
+}

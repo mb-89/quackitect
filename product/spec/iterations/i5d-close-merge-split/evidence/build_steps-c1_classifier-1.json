@@ -1,0 +1,9 @@
+{
+  "iteration": "i5d-close-merge-split",
+  "state": "build_steps-c1_classifier",
+  "at": "2026-07-25T10:47:12.897Z",
+  "payload": {
+    "what_landed": "engine/worktree.ts: isEventPath(rel, iteration) - a pure path predicate, no git. It derives the iterations home from layout rather than hardcoding it (ITER_HOME_REL, computed once from layout.iterations), normalises separators, and returns true only for THAT iteration's evidence/, machines/, state.json and sub-*.json. Everything else is a live claim - the ledger, product code, grants.jsonl, plan.json, and crucially another iteration's evidence, which is the assertion that stops a close from over-reaching into a sibling.",
+    "run_ref": "run-c6c6455e629c (8/8 green; the classifier check asserts both directions - three positives and five negatives)"
+  }
+}

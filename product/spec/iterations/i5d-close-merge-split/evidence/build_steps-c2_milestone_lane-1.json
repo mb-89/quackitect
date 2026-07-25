@@ -1,0 +1,9 @@
+{
+  "iteration": "i5d-close-merge-split",
+  "state": "build_steps-c2_milestone_lane",
+  "at": "2026-07-25T10:47:32.475Z",
+  "payload": {
+    "what_landed": "engine/worktree.ts: commitMilestone(root, iteration, message) - stages and commits the iteration's working state onto its own branch, then returns the new sha. It drives git against the WORKTREE PATH explicitly (the promoted P1 rule) rather than the calling process's cwd, so a bless arriving from the board - a separate, trunk-rooted process - commits to the iteration's branch exactly as an agent-originated bless does. It checks status first and returns committed:false when there is nothing to commit, so no empty commit is ever created, and it never touches trunk.",
+    "run_ref": "run-c6c6455e629c (8/8 green; the two milestone checks assert one commit on the branch, trunk's HEAD unmoved, the worktree tree clean, and that an empty milestone is legal)"
+  }
+}

@@ -1,0 +1,120 @@
+{
+  "metadata": {
+    "version": "1.0-1.0",
+    "frontmatter": {
+      "id": "it.machine-build-steps",
+      "kind": "machine",
+      "statement": "i5d's build: the close-and-merge split in five chunks, dependency-ordered.",
+      "entry": "start"
+    }
+  },
+  "nodes": [
+    {
+      "id": "n0",
+      "type": "file",
+      "file": "ledger/it/machine-build-steps-start.md",
+      "x": 0,
+      "y": 0,
+      "width": 300,
+      "height": 60
+    },
+    {
+      "id": "n1",
+      "type": "file",
+      "file": "ledger/it/machine-build-steps-c1-classifier.md",
+      "x": 0,
+      "y": 120,
+      "width": 300,
+      "height": 60
+    },
+    {
+      "id": "n2",
+      "type": "file",
+      "file": "ledger/it/machine-build-steps-c2-milestone-lane.md",
+      "x": 0,
+      "y": 240,
+      "width": 300,
+      "height": 60
+    },
+    {
+      "id": "n3",
+      "type": "file",
+      "file": "ledger/it/machine-build-steps-c3-atomic-close.md",
+      "x": 0,
+      "y": 360,
+      "width": 300,
+      "height": 60
+    },
+    {
+      "id": "n4",
+      "type": "file",
+      "file": "ledger/it/machine-build-steps-c4-bless-wiring.md",
+      "x": 0,
+      "y": 480,
+      "width": 300,
+      "height": 60
+    },
+    {
+      "id": "n5",
+      "type": "file",
+      "file": "ledger/it/machine-build-steps-c5-provisioning.md",
+      "x": 0,
+      "y": 600,
+      "width": 300,
+      "height": 60
+    },
+    {
+      "id": "n6",
+      "type": "file",
+      "file": "ledger/it/machine-build-steps-done.md",
+      "x": 0,
+      "y": 720,
+      "width": 300,
+      "height": 60
+    }
+  ],
+  "edges": [
+    {
+      "id": "e0",
+      "fromNode": "n0",
+      "toNode": "n1",
+      "fromSide": "bottom",
+      "toSide": "top"
+    },
+    {
+      "id": "e1",
+      "fromNode": "n1",
+      "toNode": "n2",
+      "fromSide": "bottom",
+      "toSide": "top"
+    },
+    {
+      "id": "e2",
+      "fromNode": "n2",
+      "toNode": "n3",
+      "fromSide": "bottom",
+      "toSide": "top"
+    },
+    {
+      "id": "e3",
+      "fromNode": "n3",
+      "toNode": "n4",
+      "fromSide": "bottom",
+      "toSide": "top"
+    },
+    {
+      "id": "e4",
+      "fromNode": "n4",
+      "toNode": "n5",
+      "fromSide": "bottom",
+      "toSide": "top"
+    },
+    {
+      "id": "e5",
+      "fromNode": "n5",
+      "toNode": "n6",
+      "fromSide": "bottom",
+      "toSide": "top"
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "iteration": "i5d-close-merge-split",
+  "state": "verification",
+  "at": "2026-07-25T11:16:38.834Z",
+  "payload": {
+    "run_ref": "run-39903515d79b",
+    "command": "npm --prefix product/deliverable run verify --loglevel=error",
+    "exit": 1
+  },
+  "pinned_run": {
+    "ref": "run-39903515d79b"
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "iteration": "i5d-close-merge-split",
+  "state": "build_steps",
+  "at": "2026-07-25T10:52:53.206Z",
+  "payload": {
+    "submachine": "build-steps",
+    "chunks_filled": 6,
+    "sub_record": "sub-build_steps.json"
+  }
+}

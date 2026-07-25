@@ -1,0 +1,9 @@
+{
+  "iteration": "i5d-close-merge-split",
+  "state": "build_steps-c3_atomic_close",
+  "at": "2026-07-25T10:47:48.900Z",
+  "payload": {
+    "what_landed": "engine/worktree.ts shipMerge, rewritten as an ordered close that refuses rather than half-applies: count commits ahead of the fork point and refuse if zero (the i8c defect, now impossible); refuse if the tag name is taken or cannot be created; create the tag BEFORE anything leaves the tree; merge --no-commit --no-ff; on conflict abort, release the tag and refuse; otherwise drop the c1-classified event paths from index AND working tree, prune the directories they emptied, and commit - producing a two-parent merge whose tree carries only live claims. It then marks suspects and retires the worktree as before, and reports the tag it created.\n\nTWO DEFECTS THE CHECKS CAUGHT DURING THE BUILD, both fixed rather than accommodated. (1) The close committed .gitattributes SEPARATELY before merging, so a later refusal - a conflict - left trunk's HEAD moved: an atomicity breach that the conflict check exposed immediately. The attribute now rides the close's own commit, and every refusal path restores the file exactly as it was and deletes the tag it created, so a refused close leaves trunk byte-identical. (2) Withholding the files left their empty directories behind, so the iteration's folder survived on disk while its contents were gone - the prune now walks bottom-up rather than giving up at the first non-empty parent.",
+    "run_ref": "run-c6c6455e629c (8/8 green: tag created and reported, two parents, zero event files in the tree or on disk, claims from all three milestones merged, every milestone's evidence readable through the tag, and both refusal paths leaving trunk's HEAD unchanged with nothing pending)"
+  }
+}

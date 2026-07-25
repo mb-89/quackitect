@@ -1,0 +1,8 @@
+{
+  "iteration": "i5d-close-merge-split",
+  "state": "observe_red",
+  "at": "2026-07-25T10:41:33.854Z",
+  "payload": {
+    "red_observed": "All eight checks observed RED before any implementation, at run-76460e5466cb (exit 1, tests 1 / pass 0 / fail 1). The failure is at module load: SyntaxError - the requested module '../engine/worktree.ts' does not provide an export named 'commitMilestone'. Because the whole file fails to link, every one of the eight checks is unreachable and none can report a false green - the strongest form of red for a suite whose subject does not exist yet.\n\nPer check, the failure that will be observed once the module links (each names a symbol or behaviour that is absent today): the classifier check fails on the missing isEventPath export; both milestone checks fail on the missing commitMilestone export; the empty-branch check fails because shipMerge today reports merged:true on a branch with no commits rather than refusing (the exact i8c defect); the filtered-close check fails on three counts - no tag is created, shipMerge returns no tag field, and the merged tree still carries every event file; the untaggable check fails because nothing tags, so nothing can refuse on tagging; the conflict check is the one behaviour that already exists and would pass on its own, and it is authored anyway so the filter cannot regress it; the archive-listable check fails because the filter that would remove the iteration's files does not exist, so the assertion that they are gone cannot hold.\n\nHonest note on that seventh check: R8's abort-on-conflict is pre-existing behaviour, so it is a regression guard rather than a red-first requirement, and it is recorded as such rather than counted as newly-driven design."
+  }
+}

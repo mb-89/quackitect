@@ -1,0 +1,9 @@
+{
+  "iteration": "i5d-close-merge-split",
+  "state": "package",
+  "at": "2026-07-25T11:37:31.601Z",
+  "payload": {
+    "package": "No separate artifact - i5d is an engine increment on the rolling pre-1.0 baseline (quackitect@2.0.0-bootstrap). Contents shipped: engine/worktree.ts (isEventPath, commitMilestone, projectRootOf, the rewritten shipMerge, an installed rather than linked toolchain, the unlink-before-retire guard), engine/gate.ts (the evidence tag on the grant, the milestone commit, and the close performed on the bless path), engine/loop.ts (closeStream on both close paths), tests/i5d-close-merge.test.ts (13 checks) and tests/imports-readonly.test.ts (4 checks), the retired tests/kb-link.test.ts, three reconciled suites, package.json with the path dependency REMOVED, plus the ledger: five ADRs, one law, and the RAID set. Configuration baselined: the dependency declaration now carries no path protocol, which is itself the enforcement of the new law.",
+    "entry_script": "Recorded skip: no new entry script and no change to the existing one. Install-and-run is unchanged - npm install for the dev toolchain, then the MCP server - and this iteration adds engine behaviour rather than a new runnable. One install-relevant change is worth naming though: a provisioned worktree now installs its own toolchain rather than linking the shared one, so opening an iteration costs a couple of seconds of npm install instead of a junction, and the one-click install story for the deliverable is untouched."
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "iteration": "i5d-close-merge-split",
+  "state": "build_steps-c4_bless_wiring",
+  "at": "2026-07-25T10:50:53.002Z",
+  "payload": {
+    "what_landed": "engine/gate.ts bless(): the worktree stream is resolved once and reused for three purposes. The grant now carries evidence_tag - the deterministic iter/<id> - so a pointer still resolves after the close withholds its evidence; it is stamped only for worktree-resident iterations, since a trunk-resident one keeps its evidence on trunk and has no tag. After the machine advances and the instance is written, the bless commits the milestone to the iteration's OWN branch, so the commit captures the blessed state rather than the state before it. The commit is best-effort inside a try/catch by design: a failed commit leaves the branch missing that milestone but must never void a legitimate bless.",
+    "run_ref": "run-bda05d3cfc9d (9/9 green, including the new R7 check) and run-84fb0044de9c (no regressions: rails 8/8, i5-worktrees 8/8, i5b 3/3, i5c 1/1, i8-phone 7/7 - the five suites that exercise the bless path). HONEST NOTE on the R7 check: it asserts the tag's determinism behaviourally, then guards the wiring STRUCTURALLY - that the grant stamps the tag, that the bless calls commitMilestone, and that the commit happens after the instance write. A full behavioural test would need a complete machine fixture; the structural guard fails loudly if any of the three is dropped, and it is recorded as structural rather than dressed up as behavioural."
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "iteration": "i5d-close-merge-split",
+  "state": "derive_criteria",
+  "at": "2026-07-25T10:28:52.935Z",
+  "payload": {
+    "criteria": "STRUCK per the blessed rigor (se.decision-refine-mode): this iteration realizes an architecture that se-v2-design §4 already rules, so there is no candidate field to score. Recorded as a DEGENERATE decision, which the design explicitly permits, rather than inventing weights to justify a predecided option - that is the named decision-theater hazard.\n\nThe criteria that WOULD govern, kept for lineage and used as the build's acceptance emphasis rather than as a scoring device:\n- C1 nothing is lost (R6, R11; weight: veto). Any option that cannot guarantee reachability of withheld material is disqualified outright, not scored down. This is the goal system's ruled priority.\n- C2 trunk carries live claims only (R5; weight: high). The primary purpose.\n- C3 the record keeps a permanent name (R3, R4; weight: high). Without it, C1 degrades over time.\n- C4 failure leaves no partial state (Q1, R2, R8; weight: high). Unattended operation makes this non-optional.\n- C5 ordinary mechanics (weight: medium). Prefer plain git over clever git, because the repository must remain comprehensible to someone without SE.\n\nDatum: today's all-or-nothing merge. It fails C1 in the empty-branch case (a close that produces nothing), fails C2 outright (57 evidence files per close), and has no C3 at all (no tag is created). The ruled design passes all five, as probed at run-aa90b5a988e9. No second candidate was elaborated, and that is recorded as the deliberate strike it is."
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "iteration": "i5d-close-merge-split",
+  "state": "build_steps-start",
+  "at": "2026-07-25T10:46:58.623Z",
+  "payload": {
+    "plan": "Chunk order: c1_classifier -> c2_milestone_lane -> c3_atomic_close -> c4_bless_wiring -> c5_provisioning. The real dependencies are only two - c3 needs c1's classifier to know what to withhold, and c4 needs c2's milestone lane to call. {c1, c2, c5} are mutually independent and could have run in parallel; the chain is a single-builder artefact, recorded as such rather than presented as necessity. PROMOTIONS PLACED: P1, the root-resolution rule from SP1, lands inside c2 - commitMilestone drives git against the worktree explicitly rather than trusting the caller's cwd, which is what makes a board-originated bless behave identically to an agent one. P2, SP2's fixture shape, is already the acceptance scenario in the authored checks, so c3 was built against a pre-verified scaffold."
+  }
+}
