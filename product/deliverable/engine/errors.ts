@@ -53,4 +53,8 @@ export const CLAUSES = {
   NOT_LEGAL_IN_STATE: "SE-C-110", // the state gate: tool not legal in the active state
   CONDITION_UNMET: "SE-C-112", // enter/leave condition not met — evidence required
   ABOVE_THRESHOLD: "SE-C-113", // the state's priority exceeds the session threshold — the human advances
+  TOLL_DUE: "SE-C-040", // carried from v2 — update overdue; pay by resending the same call with the update field
+  UPDATE_MALFORMED: "SE-C-120", // the update field failed to parse as a decision-graph op
+  DECISION_NODE: "SE-C-121", // update names an unknown or already-resolved node
+  DECISION_UNRESOLVED: "SE-C-122", // done over open children — everything started gets resolved
 } as const;

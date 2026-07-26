@@ -5,11 +5,11 @@
 // MCP is the agent. The threshold gates only the agent; every route here
 // ticks with the human's hand, and POST /threshold moves the gate live.
 import { createServer, type Server } from "node:http";
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync, statSync } from "node:fs";
 import { marked } from "marked";
 import { CallLog } from "./calllog.ts";
 import { Rejection } from "./errors.ts";
-import { renderMirror, type MirrorState } from "./render.ts";
+import { feedRows, renderMirror, type MirrorState } from "./render.ts";
 import { resolveInRoot } from "./paths.ts";
 import { Session } from "./session.ts";
 
@@ -22,7 +22,7 @@ export interface MirrorOptions {
 }
 
 export function startMirror(o: MirrorOptions): Server {
-  const state: MirrorState = { session: o.session, root: o.root, lastPacket: undefined, mode: o.mode };
+  const state: MirrorState = { session: o.session, root: o.root, lastPacket: undefined, mode: o.mode, log: o.log };
 
   /** Collect a JSON body, run the handler (results may be async — script
    *  runs take seconds and must not block the server), log it, redirect. */
@@ -100,6 +100,25 @@ export function startMirror(o: MirrorOptions): Server {
         }));
         return;
       }
+      if (url.pathname === "/api/log") {
+        // The unified feed — session-scoped; ?ref= fetches one record in
+        // full (request AND response — the details pane's combined object).
+        const ref = url.searchParams.get("ref");
+        res.writeHead(200, { "content-type": "application/json; charset=utf-8" });
+        if (ref !== null) {
+          res.end(JSON.stringify(o.log.find(ref) ?? { missing: ref }));
+          return;
+        }
+        res.end(JSON.stringify(feedRows(o.log, state.session.startedTs)));
+        return;
+      }
+      if (url.pathname === "/api/decisions") {
+        // One state visit's decision tree — the details pane renders it.
+        const visit = url.searchParams.get("visit") ?? state.session.currentVisit();
+        res.writeHead(200, { "content-type": "application/json; charset=utf-8" });
+        res.end(JSON.stringify({ ...state.session.decisions.graph(visit), visits: state.session.decisions.visits() }));
+        return;
+      }
       if (url.pathname === "/doc") {
         // Serve a guidance document, rendered — links in the details pane.
         const p = url.searchParams.get("path") ?? "";
@@ -126,12 +145,14 @@ export function startMirror(o: MirrorOptions): Server {
           threshold: state.session.threshold,
           active: state.session.active(),
           busy: state.session.busy(),
+          // A monotone change signal for the feed — the log file only grows.
+          acts: existsSync(o.log.path) ? statSync(o.log.path).size : 0,
         }));
         return;
       }
-      if (url.pathname === "/widget/machine" || url.pathname === "/widget/details") {
+      if (url.pathname === "/widget/machine" || url.pathname === "/widget/details" || url.pathname === "/widget/log") {
         res.writeHead(200, { "content-type": "text/html; charset=utf-8" });
-        res.end(renderMirror(state, url.pathname === "/widget/machine" ? "machine" : "details", url.searchParams.get("view") ?? undefined));
+        res.end(renderMirror(state, url.pathname.slice("/widget/".length) as "machine" | "details" | "log", url.searchParams.get("view") ?? undefined));
         return;
       }
       // GET / — tick without arguments: information about where we are.

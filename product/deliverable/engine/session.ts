@@ -33,12 +33,14 @@ import { conditionNotePath } from "./conditions.ts";
 import { pulledFor, scanGuidance, type GuidanceDoc, type PulledDoc } from "./pull.ts";
 import { expClose, expFind, expList, expNew, type Expedition } from "./worktree.ts";
 import { spawn } from "node:child_process";
-import { resolveInRoot } from "./paths.ts";
+import { resolveInRoot, seDir } from "./paths.ts";
+import { Decisions } from "./decisions.ts";
 
 /** THE TICK is the machinery — one tool, legal in EVERY state. Without
  *  arguments it reports (observability is never gated); with arguments it
- *  advances. */
-const ALWAYS_LEGAL: ReadonlySet<string> = new Set(["se_tick"]);
+ *  advances. se_note is legal everywhere too: a stray is captured where it
+ *  strikes, never chased (contract rule 4). */
+const ALWAYS_LEGAL: ReadonlySet<string> = new Set(["se_tick", "se_note"]);
 const MACHINERY: readonly string[] = ["se_tick"];
 
 export function mainMachinePath(root: string): string {
@@ -87,6 +89,11 @@ export class Session {
   /** Fires once, after the tick that closes the MAIN machine — the server
    *  entry hooks the session shutdown here. */
   onClosed?: () => void;
+  /** When this session started — the mirror's log feed is scoped to it. */
+  readonly startedTs = new Date().toISOString();
+  /** The decision graph — the lane writes it (ops ride the update field),
+   *  the mirror reads it (the details pane renders the tree). */
+  readonly decisions: Decisions;
 
   constructor(root: string) {
     this.root = root;
@@ -94,6 +101,20 @@ export class Session {
     // an ungated lane.
     this.machine = compileMachine(root, mainMachinePath(root));
     this.instance = newInstance(this.machine);
+    this.decisions = new Decisions(seDir(root));
+  }
+
+  /** Boot is done — the toll arms on this; the reading room pays none. */
+  isBooted(): boolean {
+    return this.bannerShown;
+  }
+
+  /** The decision graph's key: the leaf state the walk stands in, plus how
+   *  many times it filled before — a re-walk gets a fresh tree. */
+  currentVisit(): string {
+    const id = this.active()[0];
+    const past = this.instance.history.filter((h) => h.state === id).length;
+    return `${id}@${past}`;
   }
 
   get threshold(): number {

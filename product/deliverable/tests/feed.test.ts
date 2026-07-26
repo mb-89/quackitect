@@ -1,0 +1,152 @@
+// THE UNIFIED FEED + DECISION GRAPH + TOLL (owner design, v2 i9 notes;
+// built 2026-07-26): every hand's act is one log line; updates are ops on a
+// per-state decision tree; the toll forces narration only after a lapse and
+// one ignored warning. No ETA anywhere — timestamps are the engine's.
+import { strict as assert } from "node:assert";
+import { mkdtempSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import { test } from "node:test";
+import { CallLog } from "../engine/calllog.ts";
+import { Decisions, parseUpdate } from "../engine/decisions.ts";
+import { seDir } from "../engine/paths.ts";
+import { feedRows, renderMirror } from "../engine/render.ts";
+import { Session } from "../engine/session.ts";
+import { buildServer } from "../engine/tools.ts";
+import { call, freshRoot, readHashesFor } from "./helpers.ts";
+
+function clause(e: unknown): string | undefined {
+  return (e as { clause?: string }).clause;
+}
+
+test("the decision graph: plan, fork, resolve — everything started gets resolved", () => {
+  const d = new Decisions(mkdtempSync(join(tmpdir(), "se-dec-")));
+  d.apply("s@0", parseUpdate({ op: "plan", items: ["build the pane", "test it"] })); // d1 d2
+  let g = d.graph("s@0");
+  assert.equal(g.nodes.length, 2);
+  assert.equal(g.active, "d1");
+  // An unplanned discovery forks WHERE YOU ARE (active = d1), with its own checklist.
+  d.apply("s@0", parseUpdate({ op: "fork", brief: "deps missing", items: ["npm install"] })); // d3 under d1, d4 under d3
+  g = d.graph("s@0");
+  assert.equal(g.active, "d3");
+  assert.equal(g.nodes.find((n) => n.id === "d3")?.parent, "d1");
+  assert.equal(g.nodes.find((n) => n.id === "d4")?.parent, "d3");
+  // done over an open child is refused — resolve children first.
+  assert.throws(() => d.apply("s@0", parseUpdate({ op: "done", node: "d3" })), (e) => clause(e) === "SE-C-122");
+  d.apply("s@0", parseUpdate({ op: "done", node: "d4", brief: "installed" }));
+  d.apply("s@0", parseUpdate({ op: "done", node: "d3" }));
+  // Closing the fork lands the hand back on the nearest open ancestor.
+  assert.equal(d.graph("s@0").active, "d1");
+  // Obsoleting a branch sweeps it visibly, never silently.
+  d.apply("s@0", parseUpdate({ op: "fork", brief: "wrong turn", items: ["a", "b"] })); // d5, d6 d7
+  d.apply("s@0", parseUpdate({ op: "obsolete", node: "d5", brief: "not needed" }));
+  g = d.graph("s@0");
+  assert.equal(g.nodes.find((n) => n.id === "d6")?.status, "obsolete");
+  assert.match(String(g.nodes.find((n) => n.id === "d6")?.resolution), /swept with d5/);
+  // A dead ref never fakes progress; garbage never parses.
+  assert.throws(() => d.apply("s@0", parseUpdate({ op: "done", node: "d99" })), (e) => clause(e) === "SE-C-121");
+  assert.throws(() => parseUpdate({ op: "sprint" }), (e) => clause(e) === "SE-C-120");
+  assert.throws(() => parseUpdate("not json"), (e) => clause(e) === "SE-C-120");
+  // The string form (a harness without the declared property) parses too.
+  const op = parseUpdate(JSON.stringify({ op: "note", brief: "still here" }));
+  assert.equal(op.op, "note");
+  assert.deepEqual(d.visits(), ["s@0"]);
+});
+
+test("the toll: armed after boot, one grace warning, then the refusal — any op pays", async () => {
+  let t = 1_000_000_000;
+  const root = freshRoot();
+  const session = new Session(root);
+  const server = buildServer(root, session, { now: () => t });
+  const hashes = readHashesFor(root);
+  for (let i = 0; i < 8; i++) {
+    const step = await call(server, "se_tick", { advance: true, read_hashes: hashes });
+    if (step.isError) throw new Error(JSON.stringify(step.body));
+    if (step.body.booted === true) break;
+  }
+  // The first call after boot arms the toll — no warning inside the window.
+  let r = await call(server, "se_tick", {});
+  assert.equal(r.body.toll_warning, undefined);
+  // Six silent minutes: the next call PASSES, carrying the grace warning.
+  t += 6 * 60 * 1000;
+  r = await call(server, "se_tick", {});
+  assert.equal(r.isError, false);
+  assert.match(String(r.body.toll_warning), /update overdue/);
+  // Ignoring the warning earns the refusal, with the resend inline.
+  r = await call(server, "se_tick", {});
+  assert.equal(r.isError, true);
+  assert.equal(r.body.clause, "SE-C-040");
+  assert.equal((r.body.remedy as { args: { update?: unknown } }).args.update !== undefined, true);
+  // Paying on the same call proceeds — and the op lands in graph AND log.
+  r = await call(server, "se_tick", { update: { op: "plan", items: ["wire the pane", "test it"] } });
+  assert.equal(r.isError, false);
+  const g = session.decisions.graph(session.currentVisit());
+  assert.equal(g.nodes.length, 2);
+  const q = await call(server, "se_log_query", { filter: { tool: "se_update" } });
+  assert.equal((q.body as { total?: number }).total, 1);
+  // The window is reset; the very next call is clean.
+  r = await call(server, "se_tick", {});
+  assert.equal(r.body.toll_warning, undefined);
+});
+
+test("se_note is legal in EVERY state — a stray is captured where it strikes", async () => {
+  const root = freshRoot();
+  const server = buildServer(root);
+  // Mid-boot, no tick yet: the state gate lets the note through.
+  const n1 = await call(server, "se_note", { text: "a stray idea" });
+  assert.equal(n1.isError, false);
+  assert.match(String(n1.body.captured), /^note-/);
+  const n2 = await call(server, "se_note", { text: "another" });
+  assert.equal(n2.body.inbox, 2);
+});
+
+test("the unified feed derives src, type and brief — and the mirror carries the log pane", () => {
+  const root = freshRoot();
+  const session = new Session(root);
+  const log = new CallLog(seDir(root));
+  log.append({ tool: "se_file_read", args: { path: "product/x.md" }, ok: true, outcome: "result", duration_ms: 1 });
+  log.append({ tool: "mirror_check", args: { path: "product/guidance/voice.md" }, ok: true, outcome: "result", duration_ms: 1 });
+  log.append({ tool: "se_update", args: { via: "se_tick", visit: "idle@0", op: "note", brief: "working" }, ok: true, outcome: "result", duration_ms: 0 });
+  log.append({ tool: "se_note", args: { text: "stray" }, ok: true, outcome: "result", duration_ms: 0 });
+  log.append({ tool: "se_run", args: { command: "boom" }, ok: false, outcome: "rejected", duration_ms: 1, response: { clause: "SE-C-046" } });
+  const { rows, capped } = feedRows(log, "1970-01-01T00:00:00.000Z");
+  assert.equal(capped, false);
+  assert.equal(rows.length, 5);
+  assert.deepEqual(rows.map((r) => r.src), ["agent", "human", "agent", "agent", "agent"]);
+  assert.deepEqual(rows.map((r) => r.type), ["call", "call", "update", "note", "call"]);
+  assert.match(String(rows[0].brief), /read product\/x\.md/);
+  assert.match(String(rows[1].brief), /check/);
+  assert.match(String(rows[2].brief), /note: working/);
+  assert.equal(rows[2].visit, "idle@0");
+  assert.equal(rows[4].clause, "SE-C-046");
+  // The sidebar: log pane present WITH a log, absent without.
+  const withLog = renderMirror({ session, root, lastPacket: undefined, mode: "manual", log });
+  assert.ok(withLog.includes('id="w-log"'));
+  assert.ok(withLog.includes('id="log-filter"'));
+  const bare = renderMirror({ session, root, lastPacket: undefined, mode: "manual" });
+  assert.ok(!bare.includes('id="w-log"'));
+  // The client script must PARSE — a syntax error would kill the whole
+  // mirror silently. new Function parses without executing.
+  for (const m of withLog.matchAll(/<script>([\s\S]*?)<\/script>/g)) {
+    assert.doesNotThrow(() => new Function(m[1].replace(/^window\.SE_DATA =/, "var SE_DATA =")));
+  }
+});
+
+test("the update rides any tool call, is stripped before the handler, and never trips the arg guards", async () => {
+  const root = freshRoot();
+  const session = new Session(root);
+  const server = buildServer(root, session);
+  // Boot the walk so a work tool is legal, then ride an update on it.
+  const hashes = readHashesFor(root);
+  for (let i = 0; i < 8; i++) {
+    const step = await call(server, "se_tick", { advance: true, read_hashes: hashes });
+    if (step.body.booted === true) break;
+  }
+  const r = await call(server, "se_file_list", { dir: ".", update: { op: "fork", brief: "looking around" } });
+  assert.equal(r.isError, false, JSON.stringify(r.body));
+  assert.equal(session.decisions.graph(session.currentVisit()).nodes.length, 1);
+  // A malformed update refuses the CALL with the shape in the remedy.
+  const bad = await call(server, "se_file_list", { dir: ".", update: { op: "sprint" } });
+  assert.equal(bad.isError, true);
+  assert.equal(bad.body.clause, "SE-C-120");
+});

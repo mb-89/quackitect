@@ -22,6 +22,23 @@ One tool drives everything: `se_tick`. It is legal in every state.
 - `back: <state>`: return to an earlier filled state. Everything downstream
   is superseded; its evidence is invalidated and earned again.
 
+Narration rides the walk (the unified log + the decision graph):
+
+- `update: {...}` on ANY lane call carries a decision-graph op.
+  - plan `{items}` starts the state's checklist.
+  - fork `{brief, items?}` opens an unplanned branch where you are.
+  - done | obsolete | revert `{node, brief}` resolves a node.
+  - note `{brief, node?}` says what you are doing.
+- Everything started gets resolved. Abandoning is legal. Abandoning
+  silently is not — the graph shows the drop.
+- The TOLL: after five silent minutes the next call carries a warning.
+  Ignore it, and the call after is refused until an update rides. A
+  volunteered update is never stopped.
+- `se_note {text}`: capture a stray anywhere, keep walking (contract
+  rule 4). Notes join the log feed; they drain at a retro, later.
+- The human sees it all live in the mirror's log pane. One line per act.
+  Clicking an update line opens the decision tree.
+
 Conditions gate movement. Every `entry`/`exit` key is a condition type; its
 note (linked in every refusal) says what it wants. A condition is worked
 only from inside its state.
