@@ -6,8 +6,18 @@ the whole rule.
 # First action
 
 Tick. `se_tick` with no arguments shows where you are; keep walking as the
-machine directs. How walking works: product/guidance/walking.md — it is
-pulled into every state's packet.
+machine directs — advance state by state until you reach idle or a refusal
+stops you. How walking works: product/guidance/walking.md — it is pulled
+into every state's packet.
+
+The session runs a THRESHOLD (the user's slider in the mirror). When an
+advance is refused with SE-C-113, that step is the user's: tell them where
+you stand and that you are holding ("I'm at start — entering boot is above
+the threshold, waiting for your hand"), then call `se_tick {wait: true}`.
+The call blocks until the user moves something (their tick, the slider,
+evidence) and returns the fresh packet — read it and continue walking. If
+it returns with changed: false, hold again. The same hold is how you wait
+at idle with nothing to do.
 
 Your native tools (Read, Write, Edit, Bash, Glob, Grep, web) are blocked in
 this workspace — by an explicit deny list in `.claude/settings.json`, tool by

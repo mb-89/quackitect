@@ -11,14 +11,17 @@
             "id": "5969142b02d143c4",
             "type": "leaf",
             "state": {
-              "type": "markdown",
+              "type": "canvas",
               "state": {
-                "file": "deliverable/machines/states/read_contract.md",
-                "mode": "source",
-                "source": false
+                "file": "deliverable/machines/main.canvas",
+                "viewState": {
+                  "x": -80,
+                  "y": -239.01630546491037,
+                  "zoom": -1.4564039259397292
+                }
               },
-              "icon": "lucide-file",
-              "title": "read_contract"
+              "icon": "lucide-layout-dashboard",
+              "title": "main"
             }
           }
         ]
@@ -185,6 +188,7 @@
   },
   "active": "5969142b02d143c4",
   "lastOpenFiles": [
+    "deliverable/machines/states/read_contract.md",
     "deliverable/tests/threshold.test.ts",
     "deliverable/engine/mirror.ts",
     "deliverable/node_modules/yaml/dist/schema/tags.d.ts",
@@ -195,14 +199,12 @@
     "deliverable/node_modules/yaml/dist/schema/json/schema.js",
     "deliverable/node_modules/yaml/dist/schema/json/schema.d.ts",
     "deliverable/node_modules/yaml/dist/schema/json",
-    "deliverable/node_modules/yaml/dist/stringify/stringifyComment.d.ts",
     "deliverable/node_modules/yaml/README.md",
     "deliverable/machines/states/pick.md",
     "deliverable/machines/states/prepare_idle.md",
     "deliverable/machines/states/leave.md",
     "deliverable/machines/states/work.md",
     "deliverable/machines/states/create.md",
-    "deliverable/machines/states/read_contract.md",
     "deliverable/machines/conditions/read.md",
     "deliverable/machines/conditions/script.md",
     "deliverable/machines/continue_iteration.canvas",

@@ -7,16 +7,17 @@ Preflight (node/git/ripgrep hard deps), cage install, engine selftests, then
 either the caged agent (default) or the Mirror in manual mode.
 
 .PARAMETER Manual
-Open the Mirror with NO agent attached: walk the machines yourself in the
-browser, tick by tick (http://localhost:7333). With an agent running you do
-not need this - the agent's server embeds the same Mirror on the same walk;
--Threshold 0 there IS manual mode.
+Alias for -Threshold 0. The agent STILL launches in this console - it just
+may not enter any state by itself, announces that it is holding, and you
+walk the machine from the Mirror (http://localhost:7333). Slide up whenever
+you want it to take over; it wakes and continues on its own.
 
 .PARAMETER Threshold
 0..1 - which states the AGENT enters by itself (a state's priority must be
 <= the threshold). 0: every step is yours, click through in the Mirror.
 0.5 (default): the agent does the everyday steps, killers wait for you.
-1: fully autonomous. Live-adjustable via the Mirror's slider.
+1: fully autonomous. Live-adjustable via the Mirror's slider - a holding
+agent is woken by the change.
 
 .PARAMETER Help
 Show this help (-h and -? work too).
@@ -112,15 +113,12 @@ try {
   Pop-Location
 }
 
-if ($Manual) {
-  # MANUAL MODE: the Mirror. Walk the machines yourself - tick by tick.
-  Write-Host "quackitect v3 - manual mode: the mirror at http://localhost:7333" -ForegroundColor Cyan
-  Start-Process "http://localhost:7333"
-  node (Join-Path $root "product\deliverable\engine\bin\se-manual.ts") --root $root
-  exit 0
-}
+# MANUAL is an alias for threshold 0: the agent still launches, but every
+# step is yours - you drive from the Mirror, the agent holds and narrates.
+# (Walking with NO agent at all: node engine\bin\se-manual.ts directly.)
+if ($Manual) { $Threshold = 0 }
 
-# AGENT MODE: launch Claude Code inside the cage. workspace/.claude/settings.json
+# Launch Claude Code inside the cage. workspace/.claude/settings.json
 # denies the native tools by name (explicit blacklist); workspace/.mcp.json
 # serves the se lane. The agent's whole world is the MCP server - which also
 # embeds the Mirror (http://localhost:7333): YOUR hand on the same walk.

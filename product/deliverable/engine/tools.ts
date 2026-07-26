@@ -27,7 +27,7 @@ export function sessionTools(session: Session): ToolDef[] {
       name: "se_tick",
       title: "se.tick",
       description:
-        "THE TICK — the universal walk operation, legal in EVERY state. Without arguments: where the machine is (state, guidance, what to read, legal tools, next states). With arguments: advance — to: <state> picks the edge (optional when there is only one), confirm: true confirms you have READ everything the state lists under `read` (required by read_guidance leave conditions; logged as evidence), advance: true advances when no other argument applies, back: <state> returns to an earlier filled state (downstream is superseded, evidence invalidated), state: <state> PEEKS at any state without moving — use it to choose among several ways forward. When a result carries a banner, show it to the user VERBATIM.",
+        "THE TICK — the universal walk operation, legal in EVERY state. Without arguments: where the machine is (state, guidance, what to read, legal tools, next states). With arguments: advance — to: <state> picks the edge (optional when there is only one), confirm: true confirms you have READ everything the state lists under `read` (required by read_guidance leave conditions; logged as evidence), advance: true advances when no other argument applies, back: <state> returns to an earlier filled state (downstream is superseded, evidence invalidated), state: <state> PEEKS at any state without moving — use it to choose among several ways forward, wait: true HOLDS: the call blocks until the human moves something (slider, tick, evidence) and returns the fresh packet — use it whenever a step is above your threshold or there is nothing to do; TELL the user you are holding first, and hold again when it returns unchanged. When a result carries a banner, show it to the user VERBATIM.",
       inputSchema: {
         type: "object",
         properties: {
@@ -36,11 +36,25 @@ export function sessionTools(session: Session): ToolDef[] {
           advance: { type: "boolean", description: "advance along the single drawn edge" },
           back: { type: "string", description: "jump BACK to an earlier filled state — everything downstream is superseded and its evidence invalidated" },
           state: { type: "string", description: "PEEK at a named state (full info: statement, guidance, conditions, next) — looking never moves" },
+          wait: { type: "boolean", description: "HOLD until the human's hand moves the walk or the slider — returns the fresh packet (changed: false on timeout; just hold again)" },
         },
       },
-      handler: (args) => {
+      handler: async (args) => {
         // THE CHANNEL RULE: MCP is the agent's hand — the threshold gates it.
         // (HTTP, the mirror, is the human's; the human always may.)
+        if (args.wait === true) {
+          // THE HOLD — the machine's push channel, inverted: the agent
+          // parks this call and the human's next move answers it.
+          const ms = Number(process.env.SE_WAIT_MS ?? 20_000);
+          const changed = await session.waitForChange(ms);
+          return {
+            ...session.tickInfo(),
+            changed,
+            note: changed
+              ? "something moved — read this packet and continue"
+              : `nothing moved in ${ms}ms — call se_tick {wait: true} again to keep holding`,
+          };
+        }
         if (args.state !== undefined) return session.stateInfo(String(args.state));
         if (args.back !== undefined) return session.jumpBack(String(args.back), "agent");
         const wantsAdvance = args.to !== undefined || args.confirm === true || args.advance === true;

@@ -19,7 +19,7 @@ test("threshold 0 is manual mode: the agent's every step is refused, the human w
   assert.equal(r.isError, true);
   assert.equal(r.body.clause, "SE-C-113");
   assert.match(String(r.body.got), /boot/);
-  assert.match(String((r.body.remedy as { note: string }).note), /WAIT/);
+  assert.match(String((r.body.remedy as { note: string }).note), /hold with se_tick/);
   // Looking is never gated — tick-info still answers the agent.
   const look = await call(server, "se_tick");
   assert.equal(look.isError, false);
@@ -109,6 +109,56 @@ test("reaching end fires onClosed once and the closing packet says session over"
   assert.equal(over.session_over, true);
   assert.match(String(over.banner), /session over/i);
   assert.equal(fired, 1);
+});
+
+test("the hold: se_tick {wait} blocks until the slider moves, then the agent walks on", async () => {
+  process.env.SE_WAIT_MS = "3000";
+  try {
+    const root = freshRoot();
+    const session = new Session(root);
+    session.setThreshold(0);
+    const server = buildServer(root, session);
+    // The agent is refused, the remedy says hold.
+    const refused = await call(server, "se_tick", { advance: true });
+    assert.equal(refused.body.clause, "SE-C-113");
+    assert.equal((refused.body.remedy as { args: { wait: boolean } }).args.wait, true);
+    // The agent holds; the human slides 120ms later; the hold wakes changed.
+    const held = call(server, "se_tick", { wait: true });
+    setTimeout(() => session.setThreshold(0.4), 120);
+    const woke = await held;
+    assert.equal(woke.isError, false);
+    assert.equal(woke.body.changed, true);
+    assert.equal(woke.body.threshold, 0.4);
+    // And now the same advance just goes.
+    const r = await call(server, "se_tick", { advance: true });
+    assert.equal(r.isError, false);
+    assert.deepEqual(r.body.active, ["boot/start"]);
+  } finally {
+    delete process.env.SE_WAIT_MS;
+  }
+});
+
+test("the hold wakes on the human's tick too, and times out honestly", async () => {
+  process.env.SE_WAIT_MS = "150";
+  try {
+    const root = freshRoot();
+    const session = new Session(root);
+    session.setThreshold(0);
+    const server = buildServer(root, session);
+    // Timeout: nothing moves — changed false, note says hold again.
+    const idle = await call(server, "se_tick", { wait: true });
+    assert.equal(idle.body.changed, false);
+    assert.match(String(idle.body.note), /wait: true/);
+    // The human's tick wakes a fresh hold.
+    process.env.SE_WAIT_MS = "3000";
+    const held = call(server, "se_tick", { wait: true });
+    setTimeout(() => session.tickAdvance(), 120); // human hand
+    const woke = await held;
+    assert.equal(woke.body.changed, true);
+    assert.deepEqual(woke.body.active, ["boot/start"]);
+  } finally {
+    delete process.env.SE_WAIT_MS;
+  }
 });
 
 test("the mirror over HTTP: slider served, POST /threshold moves the gate, /api/alive reports, end turns it red", async () => {

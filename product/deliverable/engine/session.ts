@@ -98,6 +98,34 @@ export class Session {
     return this._threshold;
   }
 
+  // ── THE WAIT — how the machine reaches a holding agent. MCP cannot push;
+  //    se_tick {wait: true} blocks server-side until the human's hand moves
+  //    something (slider, tick, evidence) and returns the fresh packet — the
+  //    nearest thing to "the machine sends an update to the agent". ────────
+  private waiters: Array<() => void> = [];
+
+  /** Wake every held wait — called on every successful change of the walk. */
+  private notifyChange(): void {
+    const held = this.waiters;
+    this.waiters = [];
+    for (const wake of held) wake();
+  }
+
+  /** Resolve true when something changes, false on timeout (call again). */
+  waitForChange(timeoutMs: number): Promise<boolean> {
+    return new Promise((resolve) => {
+      const wake = (): void => {
+        clearTimeout(timer);
+        resolve(true);
+      };
+      const timer = setTimeout(() => {
+        this.waiters = this.waiters.filter((w) => w !== wake);
+        resolve(false);
+      }, timeoutMs);
+      this.waiters.push(wake);
+    });
+  }
+
   setThreshold(value: number): Record<string, unknown> {
     if (typeof value !== "number" || Number.isNaN(value) || value < 0 || value > 1) {
       throw new Rejection({
@@ -110,6 +138,7 @@ export class Session {
     }
     const was = this._threshold;
     this._threshold = value;
+    this.notifyChange(); // a holding agent wakes and re-reads the packet
     return { threshold: value, was };
   }
 
@@ -125,7 +154,7 @@ export class Session {
           clause: CLAUSES.ABOVE_THRESHOLD,
           expected: `a state within the session threshold ${this._threshold}`,
           got: `${id} weighs ${t.priority} — this step is the human's`,
-          remedy: { tool: "se_tick", args: {}, note: "tell the human this step waits for them (they advance it from the mirror, or raise the threshold there) — then WAIT; do not retry" },
+          remedy: { tool: "se_tick", args: { wait: true }, note: "TELL the human this step waits for their hand (they advance it in the mirror, or raise the slider), then hold with se_tick {wait: true} — it returns when something moves. Never retry the advance blind." },
           source: "engine/session.ts threshold",
         });
       }
@@ -292,6 +321,7 @@ export class Session {
     const result = { ok, output: outputs.join("\n"), at: new Date().toISOString() };
     const key = this.evidenceKey(machine, s.id);
     this.evidence.set(key, { ...(this.evidence.get(key) ?? {}), script_result: result });
+    this.notifyChange();
     return { state: `${machine.id}/${s.id}`, script_result: result };
   }
 
@@ -347,6 +377,7 @@ export class Session {
     const key = this.evidenceKey(machine, s.id);
     const record = { ...(this.evidence.get(key) ?? {}), ...data, at: new Date().toISOString() };
     this.evidence.set(key, record);
+    this.notifyChange();
     return { state: `${machine.id}/${s.id}`, evidence: record };
   }
 
@@ -484,6 +515,7 @@ export class Session {
       completeState(this.sub!.decl, this.sub!.instance, cur, "filled", now, to);
       this.sub!.instance.history.push({ state: cur, outcome: "filled", at: now });
       this.instance.history.push({ state: `${this.sub!.decl.id}/${cur}`, outcome: "filled", at: now });
+      this.notifyChange();
       return this.tickInfo();
     }
     const cur = activeStates(this.instance)[0];
@@ -599,6 +631,7 @@ export class Session {
     } else {
       this.instance.history.push({ state: `${machine.id}/${target}`, outcome: "reopened", at: now });
     }
+    this.notifyChange();
     return this.tickInfo();
   }
 
@@ -608,6 +641,7 @@ export class Session {
    *  Reaching end fires onClosed once: the session is OVER — the server
    *  entry shuts the whole session down (owner ruling 2026-07-26). */
   private landing(): Record<string, unknown> {
+    this.notifyChange(); // every landing is a change a holding hand should see
     if (this.instance.status === "closed" && !this.closedFired) {
       this.closedFired = true;
       const info = this.tickInfo();

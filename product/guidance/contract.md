@@ -22,7 +22,8 @@ States carry a priority. The session sets the highest priority you may pass
 alone; a tick above it is refused (SE-C-113) — you present, you WAIT, you
 never retry your way past it. The threshold can change during the session
 (the user's slider); the refusal is the signal to tell the user a step is
-waiting for their hand.
+waiting for their hand, then hold with se_tick {wait: true} — it wakes you
+when their hand moves.
 
 ## 4. Capture strays, do not chase them
 An idea, a bug, a better way — note it and keep walking. You do not leave
