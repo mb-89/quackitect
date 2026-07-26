@@ -35,9 +35,17 @@ const PER_FILE_CAP = 50;
 
 let rgPathCached: string | undefined;
 
-/** @vscode/ripgrep's binary, else PATH rg. Throws when neither exists — the RUNME is the remedy. */
+/** SE_RG_PATH env override, else @vscode/ripgrep's binary, else PATH rg.
+ *  Throws when none exists — the RUNME is the remedy. The env override is
+ *  how a COPIED engine (test roots) or a spawned condition script finds
+ *  the binary the real repo's npm install provided. */
 export function rgPath(): string {
   if (rgPathCached !== undefined) return rgPathCached;
+  const envPath = process.env.SE_RG_PATH;
+  if (envPath !== undefined && envPath !== "" && spawnSync(envPath, ["--version"], { stdio: "ignore" }).status === 0) {
+    rgPathCached = envPath;
+    return rgPathCached;
+  }
   try {
     const req = createRequire(import.meta.url);
     const mod = req("@vscode/ripgrep") as { rgPath: string };

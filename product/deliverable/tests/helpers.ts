@@ -2,12 +2,23 @@
 // machine (copied from this repo), so buildServer() compiles the same
 // drawing the shipped server does.
 import { cpSync, mkdirSync, mkdtempSync } from "node:fs";
+import { createRequire } from "node:module";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { buildServer } from "../engine/tools.ts";
 
 const REPO_ROOT = fileURLToPath(new URL("../../..", import.meta.url));
+
+// Test roots carry a COPY of the engine with no node_modules above it; the
+// env override points ripgrep resolution (and every spawned condition
+// script) at the REAL repo's npm-provided binary. Without it, tests pass
+// only on machines with a PATH rg — the exact hole a Windows run found.
+try {
+  process.env.SE_RG_PATH ??= (createRequire(import.meta.url)("@vscode/ripgrep") as { rgPath: string }).rgPath;
+} catch {
+  // no npm install — rgPath() falls back to PATH rg and fails loudly if absent
+}
 
 export function freshRoot(): string {
   const root = mkdtempSync(join(tmpdir(), "se-v3-"));
