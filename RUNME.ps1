@@ -130,10 +130,27 @@ if ($null -eq $claude) {
 }
 $env:SE_THRESHOLD = $Threshold.ToString([System.Globalization.CultureInfo]::InvariantCulture)
 Write-Host "quackitect v3 - launching caged agent in workspace/ (threshold $env:SE_THRESHOLD)" -ForegroundColor Cyan
-Write-Host "quackitect v3 - the Mirror (your hand on the walk): http://localhost:7333" -ForegroundColor Cyan
+Write-Host "quackitect v3 - the Mirror (your hand on the walk) opens at http://localhost:7333 once the server is up" -ForegroundColor Cyan
+
+# Open the Mirror in the browser AS SOON AS it answers. The server only
+# exists once claude connects to the MCP lane, so a background job polls
+# /api/alive (up to 60s) and opens the browser on the first answer.
+Start-Job -ScriptBlock {
+  for ($i = 0; $i -lt 120; $i++) {
+    try {
+      Invoke-WebRequest -UseBasicParsing -TimeoutSec 1 "http://localhost:7333/api/alive" | Out-Null
+      Start-Process "http://localhost:7333"
+      break
+    } catch {
+      Start-Sleep -Milliseconds 500
+    }
+  }
+} | Out-Null
+
 Push-Location (Join-Path $root "workspace")
 try {
   claude
 } finally {
   Pop-Location
+  Get-Job | Remove-Job -Force -ErrorAction SilentlyContinue
 }
