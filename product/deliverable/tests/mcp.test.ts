@@ -1,21 +1,11 @@
 // Contract tests speaking real messages to the built server: dispatch,
 // guards, logging — the wire behavior the harness will see.
 import { strict as assert } from "node:assert";
-import { existsSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
-import { tmpdir } from "node:os";
+import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { test } from "node:test";
 import { buildServer } from "../engine/tools.ts";
-
-function fresh(): string {
-  return mkdtempSync(join(tmpdir(), "se-v3-mcp-"));
-}
-
-async function call(server: ReturnType<typeof buildServer>, name: string, args: Record<string, unknown>) {
-  const res = await server.handle({ jsonrpc: "2.0", id: 1, method: "tools/call", params: { name, arguments: args } });
-  const r = res?.result as { content: { text: string }[]; isError: boolean };
-  return { isError: r.isError, body: JSON.parse(r.content[0].text) as Record<string, unknown> };
-}
+import { bootedServer, call, freshRoot as fresh } from "./helpers.ts";
 
 test("initialize and tools/list serve the full lane", async () => {
   const server = buildServer(fresh());
@@ -24,6 +14,9 @@ test("initialize and tools/list serve the full lane", async () => {
   const list = await server.handle({ jsonrpc: "2.0", id: 2, method: "tools/list" });
   const names = (list?.result as { tools: { name: string }[] }).tools.map((t) => t.name);
   for (const expected of [
+    "se_boot",
+    "se_exit",
+    "se_state",
     "se_file_read",
     "se_file_write",
     "se_file_patch",
@@ -41,7 +34,7 @@ test("initialize and tools/list serve the full lane", async () => {
 });
 
 test("required args enforced at dispatch (R8) — missing arg refused with remedy", async () => {
-  const server = buildServer(fresh());
+  const server = await bootedServer(fresh());
   const r = await call(server, "se_file_read", {});
   assert.equal(r.isError, true);
   assert.equal(r.body.clause, "SE-C-046");
@@ -51,7 +44,7 @@ test("required args enforced at dispatch (R8) — missing arg refused with remed
 test("unknown arg NAME refused — the String(undefined) incident cannot recur", async () => {
   const root = fresh();
   writeFileSync(join(root, "f.md"), "content");
-  const server = buildServer(root);
+  const server = await bootedServer(root);
   const r = await call(server, "se_file_search", { pattern: "x", intent: "testing" }); // wrong: 'pattern' not 'query'
   assert.equal(r.isError, true);
   assert.equal(r.body.clause, "SE-C-046"); // missing 'query' reported first, with accepted-args note
@@ -63,7 +56,7 @@ test("unknown arg NAME refused — the String(undefined) incident cannot recur",
 test("a full read-edit-verify round trip over the wire, and every call logged", async () => {
   const root = fresh();
   writeFileSync(join(root, "doc.md"), "hello world\n");
-  const server = buildServer(root);
+  const server = await bootedServer(root);
 
   const read = await call(server, "se_file_read", { path: "doc.md" });
   assert.equal(read.isError, false);
@@ -75,15 +68,15 @@ test("a full read-edit-verify round trip over the wire, and every call logged", 
   const logPath = join(root, ".se", "calls.jsonl");
   assert.ok(existsSync(logPath));
   const lines = readFileSync(logPath, "utf8").trim().split("\n");
-  assert.equal(lines.length, 3);
-  const first = JSON.parse(lines[0]) as { tool: string; ok: boolean };
+  assert.equal(lines.length, 4); // se_boot + the three lane calls
+  const first = JSON.parse(lines[1]) as { tool: string; ok: boolean };
   assert.equal(first.tool, "se_file_read");
   assert.equal(first.ok, true);
 });
 
 test("se_run captures output and the log keeps it in full; se_log_query fetches by ref", async () => {
   const root = fresh();
-  const server = buildServer(root);
+  const server = await bootedServer(root);
   const cmd = process.platform === "win32" ? "Write-Output se-v3-proof" : "echo se-v3-proof";
   const r = await call(server, "se_run", { command: cmd });
   assert.equal(r.isError, false);
@@ -98,7 +91,7 @@ test("se_run captures output and the log keeps it in full; se_log_query fetches 
 });
 
 test("rejections are results (isError: true), not protocol errors — and carry executable remedies", async () => {
-  const server = buildServer(fresh());
+  const server = await bootedServer(fresh());
   const r = await call(server, "se_file_read", { path: "../../etc/passwd" });
   assert.equal(r.isError, true);
   assert.equal(r.body.clause, "SE-C-102");
@@ -110,7 +103,7 @@ test("unconfigured web search refuses with setup instructions, never fakes", asy
   const prev = process.env.SE_BRAVE_API_KEY;
   delete process.env.SE_BRAVE_API_KEY;
   try {
-    const server = buildServer(fresh());
+    const server = await bootedServer(fresh());
     const r = await call(server, "se_web_search", { query: "anything" });
     assert.equal(r.isError, true);
     assert.equal(r.body.clause, "SE-C-106");

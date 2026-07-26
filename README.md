@@ -78,16 +78,36 @@ on garbage. Every refusal is a typed rejection: clause, expected, got, and
 an executable remedy. Every call — result, rejection, error — is appended
 raw to `.se/calls.jsonl`.
 
+## Machines
+
+Machines are DRAWN — Advanced Canvas files, compiled at load, refused with
+the offending element named on any misparse. Engine-owned machines live in
+`product/deliverable/machines/` (they are product behavior and ship with the
+engine); owner-authored process machines will live in `product/spec/` later.
+States are file nodes onto state notes (`machines/states/*.md`: frontmatter
+`state / state_kind / filled_by / legal`, first `# heading` is the
+statement, `## Guidance` and `## Evidence form` are sections). Edge role
+rides `styleAttributes.role`; the edge label is the guard; groups are
+geometric; escape edges are never drawn.
+
+**The boot machine** runs every session: `unbooted → idle → done`. Unbooted
+locks the lane (`legal: se_boot`); the SessionStart hook makes the agent
+boot immediately and show the returned banner to the user; the state gate
+makes boot inevitable anyway — any pre-boot call is refused with `se_boot`
+as the remedy (SE-C-110). `se_state` is never gated. `se_exit` closes the
+session machine.
+
 ## Status
 
-- [x] M1a — cage + lane + log (this commit): engine selftests green, live
-      wire verified.
-- [ ] M1b — the state machine wired to dispatch: `engine/machine.ts` is the
-      harvested v2 kernel (edge roles, guards, token joins, sub-machine
-      seeding, reopen cones), not yet connected. Next: `se_next`/`se_submit`,
-      the per-state legality guard, machine declarations.
+- [x] M1a — cage + lane + log: selftests green, live wire verified.
+- [x] M1b (first cut) — the boot machine: canvas compiler (v2 grammar,
+      ledger-free), state notes, THE STATE GATE wired into dispatch
+      (per-state `legal` lists, enforced not advisory), se_boot/se_exit/
+      se_state, auto-boot SessionStart hook, banner.
 - [ ] M2 — the Mirror: an HTML projection, same renderer as the packet, so
-      the owner reads exactly what the agent reads. Immediately after M1b.
-- [ ] M2b — the canvas compiler (machines are drawn in Obsidian; that is the
-      authoring surface) — harvest from v2's `machines/compile.ts`.
-- [ ] M3+ — guidance library, gates/blessing, minimal ledger. Worktrees later.
+      the owner reads exactly what the agent reads. Next up.
+- [ ] Boot guidance — what the agent reads during boot (contract, stance,
+      method pointers): to be designed with the owner, served from the
+      unbooted/idle state notes.
+- [ ] M3+ — work machines (se_next/se_submit against drawn process
+      machines), gates/blessing, minimal ledger. Worktrees later.

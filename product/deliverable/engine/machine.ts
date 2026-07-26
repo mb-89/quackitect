@@ -43,6 +43,11 @@ export interface StateDecl {
   evidence_form: EvidenceField[];
   /** A nested machine: a ledger machine id, or "iteration" — the iteration may provide its own. */
   submachine?: string;
+  /** v3 — THE STATE GATE: wire names legal while this state is active.
+   *  ["all"] opens the whole lane. Absent = nothing beyond the gate's
+   *  always-legal set. Enforced at dispatch, not advisory (the guard v2
+   *  declared as `legal[]` in packets but never wired). */
+  legal?: string[];
   edges: EdgeDecl[];
 }
 

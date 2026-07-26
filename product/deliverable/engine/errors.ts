@@ -50,4 +50,5 @@ export const CLAUSES = {
   PATCH_AMBIGUOUS: "SE-C-105", // old_string not found or not unique
   NOT_CONFIGURED: "SE-C-106", // lane exists but needs owner configuration
   RUN_TIMEOUT: "SE-C-107", // command exceeded its time budget
+  NOT_LEGAL_IN_STATE: "SE-C-110", // the state gate: tool not legal in the active state
 } as const;

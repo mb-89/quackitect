@@ -18,5 +18,27 @@
       "mcp__se__*"
     ]
   },
-  "enableAllProjectMcpServers": true
+  "enableAllProjectMcpServers": true,
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup|resume|clear",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo [se] AUTO-BOOT: your FIRST action is the se_boot tool - call it now, before anything else. The lane is locked until you do (every other call is refused). Then show the user the banner it returns, VERBATIM, and proceed with their request."
+          }
+        ]
+      },
+      {
+        "matcher": "compact",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo [se] context was compacted - call se_state to reorient. The one rule is unchanged: you work through the se MCP server, and you do what it tells you."
+          }
+        ]
+      }
+    ]
+  }
 }

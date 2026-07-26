@@ -1,0 +1,19 @@
+{
+  "metadata": {
+    "version": "1.0-1.0",
+    "frontmatter": {
+      "entry": "unbooted",
+      "reentry": "restart"
+    }
+  },
+  "nodes": [
+    { "id": "n-note", "type": "text", "x": -60, "y": -220, "width": 560, "height": 120, "text": "THE BOOT MACHINE — every session starts here. unbooted locks the lane to se_boot; boot lands in idle (whole lane legal); se_exit closes the session. Escape/ask-human edges are never drawn — the executor owns them." },
+    { "id": "n-unbooted", "type": "file", "x": -60, "y": 0, "width": 240, "height": 120, "file": "states/unbooted.md" },
+    { "id": "n-idle", "type": "file", "x": 320, "y": 0, "width": 240, "height": 120, "file": "states/idle.md" },
+    { "id": "n-done", "type": "file", "x": 700, "y": 0, "width": 240, "height": 120, "file": "states/done.md" }
+  ],
+  "edges": [
+    { "id": "e-boot", "fromNode": "n-unbooted", "toNode": "n-idle" },
+    { "id": "e-exit", "fromNode": "n-idle", "toNode": "n-done" }
+  ]
+}

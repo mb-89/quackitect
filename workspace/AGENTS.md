@@ -1,6 +1,15 @@
 # The one rule
 
-You work through the `se` MCP server. That is the whole rule.
+You work through the `se` MCP server, and you do what it tells you. That is
+the whole rule.
+
+# Boot — automatic, always first
+
+Every session starts UNBOOTED: the machine locks the lane and `se_boot` is
+the only legal call. Call it as your very first action — before reading,
+before answering — then show the user the banner it returns VERBATIM and
+proceed with their request. If any call is ever refused with SE-C-110,
+follow the remedy: it names what is legal now.
 
 Your native tools (Read, Write, Edit, Bash, Glob, Grep, web) are blocked in
 this workspace — by an explicit deny list in `.claude/settings.json`, tool by

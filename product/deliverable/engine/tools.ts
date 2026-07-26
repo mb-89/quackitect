@@ -16,7 +16,36 @@ import { McpServer, type ToolDef } from "./mcp.ts";
 import { seDir } from "./paths.ts";
 import { run } from "./run.ts";
 import { search } from "./search.ts";
+import { Session } from "./session.ts";
 import { webFetch, webSearch } from "./web.ts";
+
+/** The session machine's own tools — boot, exit, and the always-legal probe. */
+export function sessionTools(session: Session): ToolDef[] {
+  return [
+    {
+      name: "se_boot",
+      title: "se.boot",
+      description:
+        "Boot the session — the ONLY legal call in an unbooted session. Returns the boot packet with a banner to show the user verbatim before proceeding.",
+      inputSchema: { type: "object", properties: {} },
+      handler: () => session.boot(),
+    },
+    {
+      name: "se_exit",
+      title: "se.exit",
+      description: "Close the session machine (legal from idle, when the user is done). Terminal — a new session starts unbooted.",
+      inputSchema: { type: "object", properties: {} },
+      handler: () => session.exit(),
+    },
+    {
+      name: "se_state",
+      title: "se.state",
+      description: "Where the session machine is: active states, status, what is legal now. Always safe to call.",
+      inputSchema: { type: "object", properties: {} },
+      handler: () => session.describe(),
+    },
+  ];
+}
 
 export function coreTools(root: string): ToolDef[] {
   return [
@@ -226,9 +255,11 @@ export function coreTools(root: string): ToolDef[] {
   ];
 }
 
-/** Build the server: tools + the arg-shape guard + the raw call log. */
+/** Build the server: session machine + tools + guards + the raw call log.
+ *  Guard order: arg shape → THE STATE GATE → handler. */
 export function buildServer(root: string): McpServer {
-  const tools = coreTools(root);
+  const session = new Session(root); // fails fast on a misdrawn machine
+  const tools = [...sessionTools(session), ...coreTools(root)];
   const server = new McpServer({ name: "se-mcp", version: "3.0.0-bootstrap" }, tools);
   const log = new CallLog(seDir(root));
 
@@ -267,6 +298,11 @@ export function buildServer(root: string): McpServer {
       });
     }
   });
+
+  // THE STATE GATE — what is legal now is decided by the machine, not the
+  // model. Runs after the shape guard so a malformed call is named as
+  // malformed, not as illegal-in-state.
+  server.addGuard((tool) => session.gate(tool));
 
   // §9 — the single call path logs everything. se_run keeps its full output.
   server.addObserver((rec) => {
