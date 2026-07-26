@@ -212,3 +212,23 @@ test("the agent can peek at any state without moving — the click, as a tool", 
   const unknown = await call(server, "se_tick", { state: "nope" });
   assert.equal(unknown.isError, true);
 });
+
+test("every script block the mirror serves is valid JavaScript — a broken block kills all handlers", async () => {
+  const { Session } = await import("../engine/session.ts");
+  const { renderMirror } = await import("../engine/render.ts");
+  const root = freshRoot();
+  const s = new Session(root);
+  const pages = [
+    renderMirror({ session: s, root, lastPacket: undefined, mode: "manual" }),
+    renderMirror({ session: s, root, lastPacket: undefined, mode: "manual" }, undefined, "boot"),
+    renderMirror({ session: s, root, lastPacket: undefined, mode: "manual" }, "machine"),
+    renderMirror({ session: s, root, lastPacket: undefined, mode: "manual" }, "details"),
+  ];
+  for (const [p, page] of pages.entries()) {
+    const blocks = [...page.matchAll(/<script>([\s\S]*?)<\/script>/g)].map((m) => m[1]);
+    assert.ok(blocks.length >= 1, `page ${p} serves scripts`);
+    for (const [b, code] of blocks.entries()) {
+      assert.doesNotThrow(() => new Function(code), `page ${p} script block ${b} must parse`);
+    }
+  }
+});

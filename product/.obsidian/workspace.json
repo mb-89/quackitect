@@ -4,24 +4,17 @@
     "type": "split",
     "children": [
       {
-        "id": "ac49e17e6026f4d0",
+        "id": "bef63a4aeaf01db3",
         "type": "tabs",
         "children": [
           {
-            "id": "fa3d3a77366da927",
+            "id": "5969142b02d143c4",
             "type": "leaf",
             "state": {
-              "type": "canvas",
-              "state": {
-                "file": "deliverable/machines/main.canvas",
-                "viewState": {
-                  "x": -410,
-                  "y": 40,
-                  "zoom": -0.4667364192605307
-                }
-              },
-              "icon": "lucide-layout-dashboard",
-              "title": "main"
+              "type": "empty",
+              "state": {},
+              "icon": "lucide-file",
+              "title": "New tab"
             }
           }
         ]
@@ -186,7 +179,7 @@
       "bases:Create new base": false
     }
   },
-  "active": "fa3d3a77366da927",
+  "active": "1696153da3034759",
   "lastOpenFiles": [
     "deliverable/machines/boot.canvas",
     "deliverable/node_modules/marked/bin/marked.js",
