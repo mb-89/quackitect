@@ -29,6 +29,13 @@ export function freshRoot(): string {
   cpSync(join(REPO_ROOT, "product", "deliverable", "engine"), join(root, "product", "deliverable", "engine"), {
     recursive: true,
   });
+  // The engine imports the yaml package; a bare specifier resolves upward
+  // from the COPIED engine, so the package must exist there too.
+  cpSync(
+    join(REPO_ROOT, "product", "deliverable", "node_modules", "yaml"),
+    join(root, "product", "deliverable", "node_modules", "yaml"),
+    { recursive: true },
+  );
   // The preflight verifies read paths — the guidance tree and the workspace
   // contract are among them.
   cpSync(join(REPO_ROOT, "product", "guidance"), join(root, "product", "guidance"), { recursive: true });

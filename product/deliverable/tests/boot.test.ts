@@ -125,7 +125,9 @@ test("manual mode: tick info at start, ticks walk the whole machine to end", asy
   // a round trip through an (empty) work machine and back
   s.tickAdvance("start_expedition");
   assert.deepEqual(s.active(), ["start_expedition/start"]);
-  s.tickAdvance(); // start -> end (the machine is empty for now)
+  s.tickAdvance();
+  assert.deepEqual(s.active(), ["start_expedition/create"]);
+  s.tickAdvance(); // create is freely leavable (minting is optional here)
   assert.deepEqual(s.active(), ["start_expedition/end"]);
   s.tickAdvance(); // pop: filled, back at idle
   assert.deepEqual(s.active(), ["idle"]);
@@ -242,4 +244,41 @@ test("every script block the mirror serves is valid JavaScript — a broken bloc
       assert.doesNotThrow(() => new Function(code), `page ${p} script block ${b} must parse`);
     }
   }
+});
+
+test("expeditions: worktree lifecycle — new, bind, work lands in the worktree, close merges", async () => {
+  const { Session } = await import("../engine/session.ts");
+  const { spawnSync } = await import("node:child_process");
+  const { readFileSync, existsSync } = await import("node:fs");
+  const { join } = await import("node:path");
+  const root = freshRoot();
+  const g = (...a: string[]) => {
+    const r = spawnSync("git", a, { cwd: root, encoding: "utf8" });
+    assert.equal(r.status, 0, `git ${a.join(" ")}: ${r.stderr}`);
+  };
+  g("init", "-q", "-b", "v3");
+  g("add", "-A");
+  g("-c", "user.name=t", "-c", "user.email=t@t", "commit", "-q", "-m", "seed");
+  g("config", "user.name", "t"); g("config", "user.email", "t@t");
+
+  const s = new Session(root);
+  const minted = s.expeditionNew("spike", "Try The Thing!") as { created: string };
+  assert.match(minted.created, /^e1-spike-try-the-thing/);
+  assert.deepEqual((s.expeditionList() as { open: string[] }).open, [minted.created]);
+
+  // bind: the lane's working root switches to the worktree
+  s.expeditionOpen(minted.created);
+  assert.ok(s.workRoot().includes(".worktrees"), "bound root is the worktree");
+  const { fileWrite } = await import("../engine/files.ts");
+  fileWrite(s.workRoot(), "scratch.md", "expedition work", null);
+  assert.ok(existsSync(join(s.workRoot(), "scratch.md")));
+  assert.ok(!existsSync(join(root, "scratch.md")), "main tree untouched while bound");
+
+  // close: leftovers committed, merged back, worktree gone, lane unbound
+  const closed = s.expeditionClose(true) as { merged: boolean };
+  assert.equal(closed.merged, true);
+  assert.equal(s.workRoot(), root);
+  assert.equal(readFileSync(join(root, "scratch.md"), "utf8"), "expedition work");
+  assert.deepEqual((s.expeditionList() as { open: string[] }).open, []);
+  assert.deepEqual((s.expeditionList() as { archive: string[] }).archive, [minted.created]);
 });

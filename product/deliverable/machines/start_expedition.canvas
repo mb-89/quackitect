@@ -9,41 +9,57 @@
   {
    "id": "n-comment",
    "type": "text",
-   "text": "START AD HOC WORK \u2014 mint a new expedition (kind: spike | fix | explore, and a goal). EMPTY until persistence lands (spec/expeditions/).",
+   "text": "START AD HOC WORK \u2014 mint a new expedition: a git worktree on its own branch. Creating does not bind; continue_expedition is where the work happens.",
    "x": -1100,
    "y": -340,
-   "width": 660,
+   "width": 900,
    "height": 120
   },
   {
    "id": "n-start",
    "type": "file",
    "file": "deliverable/machines/states/start.md",
-   "styleAttributes": {
-    "shape": "pill"
-   },
-   "x": -1100,
+   "x": -1400,
    "y": 80,
    "width": 160,
-   "height": 160
+   "height": 160,
+   "styleAttributes": {
+    "shape": "pill"
+   }
+  },
+  {
+   "id": "n-create",
+   "type": "file",
+   "file": "deliverable/machines/states/create.md",
+   "x": -1100,
+   "y": -160,
+   "width": 620,
+   "height": 640
   },
   {
    "id": "n-end",
    "type": "file",
    "file": "deliverable/machines/states/end.md",
-   "styleAttributes": {
-    "shape": "pill"
-   },
-   "x": -700,
+   "x": -340,
    "y": 80,
    "width": 160,
-   "height": 160
+   "height": 160,
+   "styleAttributes": {
+    "shape": "pill"
+   }
   }
  ],
  "edges": [
   {
-   "id": "e-start-end",
+   "id": "e-start-create",
    "fromNode": "n-start",
+   "fromSide": "right",
+   "toNode": "n-create",
+   "toSide": "left"
+  },
+  {
+   "id": "e-create-end",
+   "fromNode": "n-create",
    "fromSide": "right",
    "toNode": "n-end",
    "toSide": "left"

@@ -34,6 +34,7 @@ export function guidanceDir(root: string): string {
 }
 
 function list(v: unknown): string[] {
+  if (Array.isArray(v)) return v.map((x) => String(x).trim()).filter((x) => x !== "");
   return typeof v === "string" && v !== ""
     ? v.split(",").map((s) => s.trim()).filter((s) => s !== "")
     : [];

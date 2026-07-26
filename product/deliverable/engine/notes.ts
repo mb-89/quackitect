@@ -3,15 +3,19 @@
 // `## Guidance` and `## Evidence form` are sections, the first `# ` heading
 // is the statement.
 //
-// v3 addition (the state gate): `legal` in frontmatter — the tool allowlist
-// while this state is active. Comma-separated wire names, or `all`.
+// Frontmatter is REAL YAML (owner ruling: Obsidian-editable). Lists may be
+// YAML lists (Obsidian renders them as chips) or comma-separated strings —
+// both are accepted everywhere a list is expected. Conditions are FLAT
+// keys: exit_read, exit_script, entry_<type> — nested dictionaries render
+// as JSON blobs in Obsidian Properties and are refused by the compiler.
 import { readFileSync } from "node:fs";
+import { parse as parseYaml } from "yaml";
 import { stripBom } from "./jsonio.ts";
 
-export type FrontmatterValue = string | Record<string, string>;
+export type FrontmatterValue = unknown;
 
 export interface StateNote {
-  frontmatter: Record<string, FrontmatterValue>;
+  frontmatter: Record<string, unknown>;
   statement: string;
   body: string;
 }
@@ -19,27 +23,15 @@ export interface StateNote {
 export function parseStateNote(raw: string): StateNote {
   const text = stripBom(raw);
   const lines = text.split(/\r?\n/);
-  const frontmatter: Record<string, FrontmatterValue> = {};
+  let frontmatter: Record<string, unknown> = {};
   let bodyStart = 0;
   if (lines[0]?.trim() === "---") {
     const end = lines.findIndex((l, i) => i > 0 && l.trim() === "---");
     if (end > 0) {
-      let openDict: Record<string, string> | undefined;
-      for (const line of lines.slice(1, end)) {
-        const nested = line.match(/^\s+([A-Za-z_][A-Za-z0-9_]*):\s*(.*)$/);
-        if (nested && openDict !== undefined) {
-          openDict[nested[1]] = nested[2].trim();
-          continue;
-        }
-        const m = line.match(/^([A-Za-z_][A-Za-z0-9_]*):\s*(.*)$/);
-        if (!m) continue;
-        if (m[2].trim() === "") {
-          openDict = {};
-          frontmatter[m[1]] = openDict;
-        } else {
-          frontmatter[m[1]] = m[2].trim();
-          openDict = undefined;
-        }
+      const block = lines.slice(1, end).join("\n");
+      const parsed = parseYaml(block) as unknown;
+      if (parsed !== null && typeof parsed === "object" && !Array.isArray(parsed)) {
+        frontmatter = parsed as Record<string, unknown>;
       }
       bodyStart = end + 1;
     }

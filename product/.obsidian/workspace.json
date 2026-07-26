@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "deliverable/machines/states/read_contract.md",
+                "file": "deliverable/machines/states/prepare_idle.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "read_contract"
+              "title": "prepare_idle"
             }
           }
         ]
@@ -185,7 +185,19 @@
   },
   "active": "5969142b02d143c4",
   "lastOpenFiles": [
+    "deliverable/machines/states/leave.md",
+    "deliverable/machines/states/work.md",
+    "deliverable/machines/states/pick.md",
+    "deliverable/machines/states/create.md",
+    "deliverable/engine/worktree.ts",
+    "deliverable/machines/states/read_contract.md",
+    "deliverable/machines/states/prepare_idle.md",
+    "deliverable/machines/conditions/read.md",
+    "deliverable/machines/conditions/script.md",
+    "deliverable/machines/continue_iteration.canvas",
     "deliverable/machines/main.canvas",
+    "deliverable/machines/continue_expedition.canvas",
+    "deliverable/machines/start_iteration.canvas",
     "deliverable/engine/bin/se-manual.ts",
     "deliverable/engine/bin/se-mcp.ts",
     "deliverable/engine/bin",
@@ -199,7 +211,6 @@
     "deliverable/node_modules/marked/bin/marked.js",
     "deliverable/node_modules/marked/bin/main.js",
     "deliverable/node_modules/marked/bin",
-    "deliverable/node_modules/marked/lib/marked.d.ts",
     "deliverable/node_modules/marked/README.md",
     "deliverable/node_modules/marked/man/marked.1.md",
     "deliverable/node_modules/marked/LICENSE.md",
@@ -208,8 +219,6 @@
     "deliverable/machines/states/start.md",
     "deliverable/machines/states/end.md",
     "deliverable/machines/states/idle.md",
-    "deliverable/machines/states/prepare_idle.md",
-    "deliverable/machines/states/read_contract.md",
     "deliverable/machines/CANVAS-GUIDE.md",
     "deliverable/machines/states/done.md",
     "deliverable/machines/states/booted.md",

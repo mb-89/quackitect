@@ -49,7 +49,47 @@ export function sessionTools(session: Session): ToolDef[] {
   ];
 }
 
-export function coreTools(root: string): ToolDef[] {
+export function expeditionTools(session: Session): ToolDef[] {
+  return [
+    {
+      name: "se_exp_new",
+      title: "se.exp.new",
+      description: "Mint a new expedition: a git worktree on its own branch (exp/<id>). Declare kind (spike | fix | explore) and goal. Creating does not bind — continue_expedition does.",
+      inputSchema: {
+        type: "object",
+        properties: {
+          kind: { type: "string", description: "spike | fix | explore" },
+          goal: { type: "string", description: "what this expedition is after" },
+        },
+        required: ["kind", "goal"],
+      },
+      handler: (args) => session.expeditionNew(String(args.kind), String(args.goal)),
+    },
+    {
+      name: "se_exp_list",
+      title: "se.exp.list",
+      description: "Expeditions: open (worktree exists) and archive (merged/closed branches).",
+      inputSchema: { type: "object", properties: {} },
+      handler: () => session.expeditionList(),
+    },
+    {
+      name: "se_exp_open",
+      title: "se.exp.open",
+      description: "Bind the lane to an open expedition — file, search and run tools work in its worktree until you leave the machine or close it.",
+      inputSchema: { type: "object", properties: { id: { type: "string" } }, required: ["id"] },
+      handler: (args) => session.expeditionOpen(String(args.id)),
+    },
+    {
+      name: "se_exp_close",
+      title: "se.exp.close",
+      description: "Close the bound expedition: leftover changes are committed, the branch merges back (merge: false leaves it unmerged in the archive), the worktree is removed.",
+      inputSchema: { type: "object", properties: { merge: { type: "boolean", description: "default true — the bootstrap behavior until iterations receive changes as design input" } } },
+      handler: (args) => session.expeditionClose(args.merge !== false),
+    },
+  ];
+}
+
+export function coreTools(rootOf: () => string, projectRoot: string): ToolDef[] {
   return [
     {
       name: "se_file_read",
@@ -66,7 +106,7 @@ export function coreTools(root: string): ToolDef[] {
         required: ["path"],
       },
       handler: (args) =>
-        fileRead(root, String(args.path), {
+        fileRead(rootOf(), String(args.path), {
           ...(args.offset !== undefined ? { offset: Number(args.offset) } : {}),
           ...(args.limit !== undefined ? { limit: Number(args.limit) } : {}),
         }),
@@ -84,7 +124,7 @@ export function coreTools(root: string): ToolDef[] {
         },
         required: ["path", "content", "base_hash"],
       },
-      handler: (args) => fileWrite(root, String(args.path), String(args.content), args.base_hash === null ? null : String(args.base_hash)),
+      handler: (args) => fileWrite(rootOf(), String(args.path), String(args.content), args.base_hash === null ? null : String(args.base_hash)),
     },
     {
       name: "se_file_patch",
@@ -112,7 +152,7 @@ export function coreTools(root: string): ToolDef[] {
         },
         required: ["ops"],
       },
-      handler: (args) => filePatch(root, args.ops as PatchOp[]),
+      handler: (args) => filePatch(rootOf(), args.ops as PatchOp[]),
     },
     {
       name: "se_file_move",
@@ -127,7 +167,7 @@ export function coreTools(root: string): ToolDef[] {
         },
         required: ["from", "to"],
       },
-      handler: (args) => fileMove(root, String(args.from), String(args.to)),
+      handler: (args) => fileMove(rootOf(), String(args.from), String(args.to)),
     },
     {
       name: "se_file_delete",
@@ -138,7 +178,7 @@ export function coreTools(root: string): ToolDef[] {
         properties: { path: { type: "string" }, base_hash: { type: "string" } },
         required: ["path", "base_hash"],
       },
-      handler: (args) => fileDelete(root, String(args.path), String(args.base_hash)),
+      handler: (args) => fileDelete(rootOf(), String(args.path), String(args.base_hash)),
     },
     {
       name: "se_file_list",
@@ -148,7 +188,7 @@ export function coreTools(root: string): ToolDef[] {
         type: "object",
         properties: { dir: { type: "string", default: "." } },
       },
-      handler: (args) => fileList(root, String(args.dir ?? ".")),
+      handler: (args) => fileList(rootOf(), String(args.dir ?? ".")),
     },
     {
       name: "se_file_glob",
@@ -159,7 +199,7 @@ export function coreTools(root: string): ToolDef[] {
         properties: { glob: { type: "string" } },
         required: ["glob"],
       },
-      handler: (args) => fileGlob(root, String(args.glob)),
+      handler: (args) => fileGlob(rootOf(), String(args.glob)),
     },
     {
       name: "se_file_search",
@@ -179,7 +219,7 @@ export function coreTools(root: string): ToolDef[] {
         required: ["query", "intent"],
       },
       handler: (args) =>
-        search(root, String(args.query), {
+        search(rootOf(), String(args.query), {
           ...(args.path !== undefined ? { path: String(args.path) } : {}),
           ...(args.ref !== undefined ? { ref: String(args.ref) } : {}),
           ...(args.ignore_case === true ? { ignore_case: true } : {}),
@@ -201,7 +241,7 @@ export function coreTools(root: string): ToolDef[] {
         required: ["command"],
       },
       handler: (args) =>
-        run(root, String(args.command), {
+        run(rootOf(), String(args.command), {
           ...(args.timeout_ms !== undefined ? { timeout_ms: Number(args.timeout_ms) } : {}),
           ...(args.cwd !== undefined ? { cwd: String(args.cwd) } : {}),
         }),
@@ -248,7 +288,7 @@ export function coreTools(root: string): ToolDef[] {
         },
       },
       handler: (args) => {
-        const log = new CallLog(seDir(root));
+        const log = new CallLog(seDir(projectRoot));
         if (args.ref !== undefined) {
           const rec = log.find(String(args.ref));
           if (rec === undefined) {
@@ -276,7 +316,7 @@ export function coreTools(root: string): ToolDef[] {
  *  Guard order: arg shape → THE STATE GATE → handler. */
 export function buildServer(root: string): McpServer {
   const session = new Session(root); // fails fast on a misdrawn machine
-  const tools = [...sessionTools(session), ...coreTools(root)];
+  const tools = [...sessionTools(session), ...expeditionTools(session), ...coreTools(() => session.workRoot(), root)];
   const server = new McpServer({ name: "se-mcp", version: "3.0.0-bootstrap" }, tools);
   const log = new CallLog(seDir(root));
 

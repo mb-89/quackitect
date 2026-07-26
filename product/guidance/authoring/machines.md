@@ -69,10 +69,11 @@ legal_tools: all             # THE STATE GATE: tools legal here (`all` opens the
                              # se_tick is ALWAYS legal — it is the machinery)
 guidance: One or two short sentences the agent gets in its packet. Never empty.
 tags: review                 # optional; joins the state to guidance (the pull's tag rule)
-entry:                       # optional DICTIONARY — same shape as exit
-exit:                        # optional DICTIONARY: key = condition TYPE, value = args
-  read: workspace/AGENTS.md, product/guidance/voice.md
-  script: product/deliverable/engine/bin/preflight.ts
+exit_read:                   # conditions are FLAT keys: <entry|exit>_<type>.
+  - workspace/AGENTS.md      # YAML lists render as chips in Obsidian —
+  - product/guidance/voice.md    # comma strings are accepted too
+exit_script:
+  - product/deliverable/engine/bin/preflight.ts
 ---
 
 # Statement of the state
@@ -84,11 +85,12 @@ Optionally `## Evidence form` with lines "- name | description | required".
 `legal_tools` is about TOOLS only — legal STATES are the machine's edges.
 Keep `guidance` short and imperative; it is served verbatim in packets.
 
-Conditions: every `entry:`/`exit:` KEY is a condition TYPE, defined by its
-note in `deliverable/machines/conditions/<type>.md` — the compiler refuses
-a key without a note and an engine evaluator. All keys of a dictionary must
-hold (SCXML: the edge's effective cond is exit of its source AND entry of
-its target). Types today: `read` (args: documents whose confirmed reading
+Conditions: every `entry_<type>`/`exit_<type>` key names a condition TYPE,
+defined by its note in `deliverable/machines/conditions/<type>.md` — the
+compiler refuses a type without a note and an engine evaluator, and refuses
+a nested `entry:`/`exit:` dictionary (Obsidian renders those as JSON
+blobs). All of a state's conditions must hold (SCXML: the edge's effective
+cond is exit of its source AND entry of its target). Types today: `read` (args: documents whose confirmed reading
 is the evidence) and `script` (args: scripts the engine runs; exit 0 is the
 evidence — the STATE names what runs, e.g. boot's preflight script).
 

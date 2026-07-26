@@ -3,7 +3,7 @@
   "version": "3.0.0-bootstrap",
   "private": true,
   "type": "module",
-  "description": "quackitect v3 \u2014 the se MCP server: caged-agent tool lane, call log, state machine kernel.",
+  "description": "quackitect v3 — the se MCP server: caged-agent tool lane, call log, state machine kernel.",
   "engines": {
     "node": ">=22.6"
   },
@@ -13,7 +13,8 @@
   },
   "dependencies": {
     "@vscode/ripgrep": "^1.15.9",
-    "marked": "^15.0.0"
+    "marked": "^15.0.0",
+    "yaml": "^2.9.0"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",

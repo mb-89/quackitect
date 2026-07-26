@@ -1,8 +1,11 @@
 ---
 state: read_contract
 state_kind: work
-exit:
-  read: workspace/AGENTS.md, product/guidance/contract.md, product/guidance/voice.md, product/guidance/walking.md
+exit_read:
+  - workspace/AGENTS.md
+  - product/guidance/contract.md
+  - product/guidance/voice.md
+  - product/guidance/walking.md
 guidance: Confirm that you have read and understood the documents in the exit condition.
 ---
 

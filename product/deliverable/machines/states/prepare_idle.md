@@ -1,8 +1,8 @@
 ---
 state: prepare_idle
 state_kind: work
-exit:
-  script: product/deliverable/engine/bin/preflight.ts
+exit_script:
+  - product/deliverable/engine/bin/preflight.ts
 guidance: Preflight — the exit script runs the checks. Tick to run it. A failure is named in the refusal.
 ---
 

@@ -29,6 +29,7 @@ import {
 import { compileMachine, resolveRef } from "./machines/compile.ts";
 import { conditionNotePath } from "./conditions.ts";
 import { pulledFor, scanGuidance, type GuidanceDoc, type PulledDoc } from "./pull.ts";
+import { expClose, expFind, expList, expNew, type Expedition } from "./worktree.ts";
 import { spawnSync } from "node:child_process";
 import { resolveInRoot } from "./paths.ts";
 
@@ -67,6 +68,8 @@ export class Session {
   readonly instance: MachineInstance;
   private sub?: SubRun;
   private bannerShown = false;
+  /** The bound expedition — while set, the lane works in its worktree. */
+  private bound?: Expedition;
   /** Evidence store: "<machine>/<state>" → what was submitted. */
   private readonly evidence = new Map<string, Record<string, unknown>>();
 
@@ -76,6 +79,48 @@ export class Session {
     // an ungated lane.
     this.machine = compileMachine(root, mainMachinePath(root));
     this.instance = newInstance(this.machine);
+  }
+
+  /** Where the LANE works: the bound expedition's worktree, else the root. */
+  workRoot(): string {
+    return this.bound?.path ?? this.root;
+  }
+
+  expeditionNew(kind: string, goal: string): Record<string, unknown> {
+    const e = expNew(this.root, kind, goal);
+    return { created: e.id, branch: e.branch, note: "back at idle, enter continue_expedition to work in it" };
+  }
+
+  expeditionList(): Record<string, unknown> {
+    const all = expList(this.root);
+    return {
+      open: all.filter((e) => e.open).map((e) => e.id),
+      archive: all.filter((e) => !e.open).map((e) => e.id),
+    };
+  }
+
+  expeditionOpen(id: string): Record<string, unknown> {
+    this.bound = expFind(this.root, id);
+    return { bound: this.bound.id, note: "the lane now works in this expedition's worktree" };
+  }
+
+  expeditionClose(merge: boolean): Record<string, unknown> {
+    if (this.bound === undefined) {
+      throw new Rejection({
+        clause: CLAUSES.NOT_LEGAL_IN_STATE,
+        expected: "a bound expedition",
+        got: "none open",
+        remedy: { tool: "se_exp_list", args: {}, note: "open one first" },
+        source: "engine/session.ts expedition",
+      });
+    }
+    const result = expClose(this.root, this.bound, merge);
+    this.bound = undefined;
+    return { ...result, note: merge ? "merged back — iterations will replace this with design-input handover" : "left unmerged; the branch is the archive record" };
+  }
+
+  private unbind(): void {
+    this.bound = undefined;
   }
 
   private state(m: MachineDecl, id: string): StateDecl {
@@ -336,6 +381,7 @@ export class Session {
       machine: this.machine.id,
       breadcrumb: this.breadcrumb(),
       active: this.active(),
+      ...(this.bound !== undefined ? { expedition: this.bound.id } : {}),
       status: this.instance.status,
       legal_tools: all ? "all" : [...ALWAYS_LEGAL, ...tools],
       states,
@@ -369,6 +415,7 @@ export class Session {
         completeState(this.machine, this.instance, this.sub!.parentState, "filled", now);
         this.instance.history.push({ state: this.sub!.parentState, outcome: "filled", at: now });
         this.sub = undefined;
+        this.unbind(); // leaving the sub leaves the context (worktree stays)
         this.seedSubs();
         return this.landing();
       }

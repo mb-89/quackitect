@@ -15,7 +15,7 @@
 import { existsSync } from "node:fs";
 import { dirname, isAbsolute, join, resolve } from "node:path";
 import { loadCanvas, type CanvasElement } from "../canvas.ts";
-import { loadStateNote, section, type FrontmatterValue } from "../notes.ts";
+import { loadStateNote, section } from "../notes.ts";
 import { CONDITION_TYPES, conditionNoteAbs, conditionNotePath } from "../conditions.ts";
 import {
   evalGuard,
@@ -219,31 +219,39 @@ export function compileMachine(root: string, canvasPath: string): MachineDecl {
   return machine;
 }
 
-function asString(v: FrontmatterValue | undefined): string | undefined {
+function asString(v: unknown): string | undefined {
   return typeof v === "string" ? v : undefined;
 }
 
-function asList(v: FrontmatterValue | undefined): string[] | undefined {
+/** A list may be a YAML list (Obsidian chips) or a comma-separated string. */
+function asList(v: unknown): string[] | undefined {
+  if (Array.isArray(v)) {
+    const out = v.map((x) => String(x).trim()).filter((x) => x !== "");
+    return out.length > 0 ? out : undefined;
+  }
   const s = asString(v);
   if (s === undefined || s === "") return undefined;
   return s.split(",").map((t) => t.trim()).filter((t) => t !== "");
 }
 
-/** entry:/exit: dictionaries — key = condition type, value = its arguments. */
-function conditionDict(machineId: string, ref: string, root: string, which: string, v: FrontmatterValue | undefined): Record<string, string[]> | undefined {
-  if (v === undefined) return undefined;
-  if (typeof v === "string") {
-    throw new MachineCompileError(machineId, ref, `${which} is a DICTIONARY: an indented "  <type>: <args>" line per condition`);
-  }
+/** Conditions are FLAT frontmatter keys — exit_read, exit_script,
+ *  entry_<type> — because nested dictionaries render as JSON blobs in
+ *  Obsidian Properties (owner ruling: Obsidian-editable). */
+function conditionDict(machineId: string, ref: string, root: string, which: "entry" | "exit", fm: Record<string, unknown>): Record<string, string[]> | undefined {
   const out: Record<string, string[]> = {};
-  for (const [key, args] of Object.entries(v)) {
+  for (const [k, v] of Object.entries(fm)) {
+    if (!k.startsWith(`${which}_`)) continue;
+    const key = k.slice(which.length + 1);
     if (!CONDITION_TYPES.has(key)) {
       throw new MachineCompileError(machineId, ref, `unknown ${which} condition type ${JSON.stringify(key)} — engine types: ${[...CONDITION_TYPES].join(", ")}`);
     }
     if (!existsSync(conditionNoteAbs(root, key))) {
       throw new MachineCompileError(machineId, ref, `condition type ${key} has no note at ${conditionNotePath(key)} — every type is defined by its note`);
     }
-    out[key] = args === "" ? [] : args.split(",").map((t) => t.trim()).filter((t) => t !== "");
+    out[key] = asList(v) ?? [];
+  }
+  if (fm[which] !== undefined) {
+    throw new MachineCompileError(machineId, ref, `${which}: is not a field — conditions are FLAT keys (${which}_read, ${which}_script)`);
   }
   return Object.keys(out).length > 0 ? out : undefined;
 }
@@ -270,8 +278,8 @@ function stateFromNote(machineId: string, ref: string, notePath: string, root: s
     throw new MachineCompileError(machineId, ref, "every state carries guidance (frontmatter `guidance:`)");
   }
   const legalTools = asList(x.legal_tools);
-  const entry = conditionDict(machineId, ref, root, "entry", x.entry);
-  const exit = conditionDict(machineId, ref, root, "exit", x.exit);
+  const entry = conditionDict(machineId, ref, root, "entry", x);
+  const exit = conditionDict(machineId, ref, root, "exit", x);
   const tags = asList(x.tags);
   const submachine = asString(x.submachine);
   return {

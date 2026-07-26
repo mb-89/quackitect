@@ -58,6 +58,20 @@ Read confirmations and script results inside a record-bound walk persist in
 its machine.json. Session-level evidence (boot's contract confirmation)
 stays session-scoped — it must be earned every session.
 
+## Forward requirement: two agents at once (owner ruling 2026-07-26)
+
+Concurrent expeditions/iterations by multiple agents is where this design
+must not paint itself into a corner. Becomes a proper requirement once the
+ledger exists. What already holds: one session process per agent, own
+machine instance, own binding; worktrees isolate the filesystems; the
+instance model carries per-session claims (v2 kernel). Known seams to
+solve then, not now:
+
+- expedition id minting races (two agents computing e<n> concurrently)
+- concurrent merges into the main branch (expClose serialization)
+- the shared call log (per-line appends are safe; readers must not assume
+  one writer)
+
 ## Open questions for the owner
 
 - ID format and slugs: `e1-fix-mirror-links` — good?
