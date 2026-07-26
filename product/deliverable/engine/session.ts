@@ -60,6 +60,8 @@ export class Session {
   readonly machine: MachineDecl;
   readonly instance: MachineInstance;
   private sub?: SubRun;
+  /** Evidence store: "<machine>/<state>" → what was submitted. */
+  private readonly evidence = new Map<string, Record<string, unknown>>();
 
   constructor(root: string) {
     this.root = root;
@@ -145,6 +147,58 @@ export class Session {
     });
   }
 
+  // ── CONDITIONS (SCXML-style: authored on the note, evaluated as the
+  //    transition's cond — leave_when of the source AND enter_when of the
+  //    target must hold) ──────────────────────────────────────────────────
+
+  private evidenceKey(m: MachineDecl, stateId: string): string {
+    return `${m.id}/${stateId}`;
+  }
+
+  conditionMet(m: MachineDecl, s: StateDecl, which: "enter" | "leave"): boolean {
+    const cond = (which === "leave" ? s.leave_when : s.enter_when) ?? "always";
+    if (cond === "always") return true;
+    if (cond === "read_guidance") {
+      return this.evidence.get(this.evidenceKey(m, s.id))?.read_confirmed === true;
+    }
+    return false;
+  }
+
+  /** Record evidence for a state in the CURRENT machine (walk position's machine). */
+  submitEvidence(stateId: string, data: Record<string, unknown>): Record<string, unknown> {
+    const { machine } = this.leaves();
+    const s = this.state(machine, stateId);
+    const key = this.evidenceKey(machine, s.id);
+    const record = { ...(this.evidence.get(key) ?? {}), ...data, at: new Date().toISOString() };
+    this.evidence.set(key, record);
+    return { state: `${machine.id}/${s.id}`, evidence: record };
+  }
+
+  private assertConditions(m: MachineDecl, from: StateDecl, to?: string): void {
+    if (!this.conditionMet(m, from, "leave")) {
+      throw new Rejection({
+        clause: CLAUSES.CONDITION_UNMET,
+        expected: `leave condition of ${from.id}: ${from.leave_when} (read the guidance, then confirm)`,
+        got: "no evidence yet",
+        remedy: { tool: "se_boot", args: { confirm_read: true }, note: "confirm ONLY after actually reading the guidance — the confirmation is logged as your evidence" },
+        source: "engine/session.ts conditions",
+      });
+    }
+    const targetId = to ?? (from.edges.length === 1 ? from.edges[0].to : undefined);
+    if (targetId === undefined) return;
+    const target = m.states.find((s) => s.id === targetId);
+    if (target === undefined) return;
+    if (!this.conditionMet(m, target, "enter")) {
+      throw new Rejection({
+        clause: CLAUSES.CONDITION_UNMET,
+        expected: `enter condition of ${target.id}: ${target.enter_when}`,
+        got: "no evidence yet",
+        remedy: { tool: "se_state", args: {}, note: "the enter condition must hold before this state can activate" },
+        source: "engine/session.ts conditions",
+      });
+    }
+  }
+
   // ── THE TICK ────────────────────────────────────────────────────────────
 
   /** tick without arguments: information about where the machine is. */
@@ -158,7 +212,18 @@ export class Session {
         statement: s.statement,
         guidance: s.guidance,
         legal_tools: s.kind === "start" || s.kind === "end" ? [...MACHINERY] : (s.legal_tools ?? []),
-        next: s.edges.map((e) => ({ to: e.to, role: e.role, ...(e.guard !== undefined ? { guard: e.guard } : {}) })),
+        leave_when: s.leave_when ?? "always",
+        leave_met: this.conditionMet(machine, s, "leave"),
+        next: s.edges.map((e) => {
+          const t = machine.states.find((st) => st.id === e.to);
+          return {
+            to: e.to,
+            role: e.role,
+            ...(e.guard !== undefined ? { guard: e.guard } : {}),
+            enter_when: t?.enter_when ?? "always",
+            enter_met: t === undefined ? true : this.conditionMet(machine, t, "enter"),
+          };
+        }),
       };
     });
     const { all, tools } = this.legal();
@@ -199,6 +264,7 @@ export class Session {
       }
       const cur = activeStates(this.sub!.instance)[0];
       this.assertEdge(this.sub!.decl, cur, to);
+      this.assertConditions(this.sub!.decl, this.state(this.sub!.decl, cur), to);
       completeState(this.sub!.decl, this.sub!.instance, cur, "filled", now, to);
       this.sub!.instance.history.push({ state: cur, outcome: "filled", at: now });
       this.instance.history.push({ state: `${this.sub!.decl.id}/${cur}`, outcome: "filled", at: now });
@@ -206,6 +272,7 @@ export class Session {
     }
     const cur = activeStates(this.instance)[0];
     this.assertEdge(this.machine, cur, to);
+    this.assertConditions(this.machine, this.state(this.machine, cur), to);
     completeState(this.machine, this.instance, cur, "filled", now, to);
     this.instance.history.push({ state: cur, outcome: "filled", at: now });
     this.seedSubs();
@@ -241,8 +308,10 @@ export class Session {
   // ── The agent's hands on the tick ───────────────────────────────────────
 
   /** se_boot: one boot step per call — the agent's ticks skip straight
-   *  through mechanical start/end positions; banner when idle is reached. */
-  boot(): Record<string, unknown> {
+   *  through mechanical start/end positions; banner when idle is reached.
+   *  confirm_read: the caller confirms having read the current state's
+   *  guidance — recorded as evidence for a read_guidance leave condition. */
+  boot(confirmRead = false): Record<string, unknown> {
     if (this.instance.status === "closed" || (!this.inSub() && activeStates(this.instance).includes("idle"))) {
       throw new Rejection({
         clause: CLAUSES.NOT_LEGAL_IN_STATE,
@@ -251,6 +320,10 @@ export class Session {
         remedy: { tool: "se_state", args: {}, note: "already booted — carry on through the lane" },
         source: "engine/session.ts boot",
       });
+    }
+    if (confirmRead) {
+      const { ids } = this.leaves();
+      this.submitEvidence(ids[0], { read_confirmed: true, by: "agent" });
     }
     // Tick until a non-mechanical position (max a machine's worth of steps).
     for (let i = 0; i < 16; i++) {

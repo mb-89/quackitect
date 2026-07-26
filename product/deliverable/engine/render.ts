@@ -163,8 +163,9 @@ const STYLE = `
   table.kv td.v { color: #d8dde2; word-break: break-word; }
   table.kv table.kv { margin: 2px 0; }
   .vnull { color: #7f8b96; } .vnum { color: #7cc4e8; } .vbool { color: #c58fe8; } .vstr { color: #a8c88f; }
-  #w-walk { flex: 1 1 50%; border-radius: 0; border-left: 0; border-right: 0; border-top: 0; min-height: 0; }
-  #w-details { flex: 0 0 50%; border-radius: 0; border: 0; border-top: 1px solid #2a2f34; }
+  td.btncell { text-align: center; vertical-align: middle !important; width: 1%; }
+  button.go.locked { background: #2a2f34; color: #5b6772; cursor: not-allowed; }
+  #w-details { flex: 1; border-radius: 0; border: 0; }
 `;
 
 const SCRIPT = `
@@ -190,16 +191,34 @@ function showDetails(title, html) {
 }
 const CURRENT = (D.describe.active && D.describe.active[0]) ? D.describe.active[0].split("/").pop() : null;
 const WALK_HERE = D.viewingWalk;
+function nextTable(id, s) {
+  const here = WALK_HERE && id === CURRENT;
+  return '<table class="kv">' + s.next.map((n, i) => {
+    const inner = jsonTable({ to: n.to, role: n.role, ...(n.guard ? { guard: n.guard } : {}), ...(n.enter_when !== "always" ? { enter_when: n.enter_when } : {}) });
+    const unlocked = here && s.leave_met && n.enter_met;
+    const btn = here
+      ? '<button class="primary go' + (unlocked ? "" : " locked") + '" data-to="' + n.to + '"' + (unlocked ? "" : " disabled") +
+        ' title="' + (unlocked ? "tick: leave " + id + ", enter " + n.to : s.leave_met ? "enter condition of " + n.to + " not met" : "leave condition of " + id + " not met: " + s.leave_when) + '">▶</button>'
+      : "";
+    return '<tr><td class="k">' + i + '</td><td class="v">' + inner + '</td>' + (here ? '<td class="btncell">' + btn + "</td>" : "") + "</tr>";
+  }).join("") + "</table>";
+}
 function stateDetail(id) {
   const s = D.states[id] ?? {};
-  let html = jsonTable(s);
-  if (WALK_HERE && id === CURRENT && s.next && s.next.length > 0) {
-    html += '<div class="meta" style="padding:10px 0 4px">advance to:</div>' + s.next.map((n) =>
-      '<button class="primary go" data-to="' + n.to + '" title="tick: leave ' + id + ', enter ' + n.to + '">▶ ' + n.to + "</button>"
-    ).join(" ");
+  const bare = Object.assign({}, s); delete bare.next;
+  let html = jsonTable(bare);
+  if (WALK_HERE && id === CURRENT && s.leave_when === "read_guidance" && !s.leave_met) {
+    html += '<div style="padding:8px 0"><button class="primary confirm" title="the confirmation is logged as evidence">✓ I have read this</button></div>';
+  }
+  if (s.next && s.next.length > 0) {
+    html += '<div class="meta" style="padding:8px 0 4px">next</div>' + nextTable(id, s);
   }
   return html;
 }
+document.addEventListener("click", async (ev) => {
+  const c = ev.target.closest ? ev.target.closest(".confirm") : null;
+  if (c && CURRENT) { await fetch("/evidence", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ state: CURRENT }) }); location.href = "/"; }
+});
 function detailFor(key) {
   if (key === "comment") {
     const txt = (D.comment || "").replace(/&/g,"&amp;").replace(/</g,"&lt;");
@@ -268,9 +287,6 @@ if (divider && aside) {
   window.addEventListener("mouseup", () => { drag = null; });
 }
 
-const hist = document.getElementById("walk-history");
-if (hist) hist.innerHTML = jsonTable(D.history);
-
 if (CURRENT && D.states[CURRENT] && WALK_HERE) showDetails("state: " + CURRENT, stateDetail(CURRENT));
 `;
 
@@ -320,7 +336,18 @@ export function renderMirror(m: MirrorState, widget?: "machine" | "details", vie
       guidance: s.guidance,
       legal_tools: s.legal_tools ?? [],
       ...(s.submachine !== undefined ? { submachine: s.submachine } : {}),
-      next: s.edges.map((e) => ({ to: e.to, role: e.role, ...(e.guard !== undefined ? { guard: e.guard } : {}) })),
+      leave_when: s.leave_when ?? "always",
+      leave_met: m.session.conditionMet(decl, s, "leave"),
+      next: s.edges.map((e) => {
+        const t = decl.states.find((st) => st.id === e.to);
+        return {
+          to: e.to,
+          role: e.role,
+          ...(e.guard !== undefined ? { guard: e.guard } : {}),
+          enter_when: t?.enter_when ?? "always",
+          enter_met: t === undefined ? true : m.session.conditionMet(decl, t, "enter"),
+        };
+      }),
     };
   }
   const comment = (canvas.nodes ?? []).find((n) => n.type === "text")?.text ?? "";
@@ -336,11 +363,8 @@ export function renderMirror(m: MirrorState, widget?: "machine" | "details", vie
   }).replace(/</g, "\\u003c")};</script>`;
 
   const machineWidget = `<div class="widget" id="w-machine"><div class="widget-head"><span class="crumbs">${crumbs}</span><button class="expand" data-widget="w-machine" data-url="/widget/machine?view=${encodeURIComponent(decl.id)}" title="expand · ctrl-click: new tab · shift-click: new window">⛶</button></div><div class="widget-body">${svg}</div></div>`;
-  const walkWidget = `<div class="widget" id="w-walk">${widgetHead("walk", "w-walk", "/")}
-    ${info.status === "closed" ? '<div class="meta" style="color:#e86a5f">machine closed</div>' : ""}
-    <div class="panel" id="walk-history" style="padding-top:10px"></div>
-  </div>`;
   const detailsWidget = `<div class="widget" id="w-details">${widgetHead("details", "w-details", "/widget/details")}
+    ${info.status === "closed" ? '<div class="meta" style="color:#e86a5f">machine closed</div>' : ""}
     <div class="meta" id="details-title">—</div>
     <div class="panel" id="details"></div>
   </div>`;
@@ -361,7 +385,6 @@ export function renderMirror(m: MirrorState, widget?: "machine" | "details", vie
   </main>
   <div id="divider"></div>
   <aside id="sidebar">
-    ${walkWidget}
     ${detailsWidget}
   </aside>
 </div>

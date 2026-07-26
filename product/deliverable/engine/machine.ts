@@ -47,6 +47,12 @@ export interface StateDecl {
   evidence_form: EvidenceField[];
   /** A nested machine: a ledger machine id, or "iteration" — the iteration may provide its own. */
   submachine?: string;
+  /** SCXML-style state contract (owner ruling 2026-07-26): authored on the
+   *  NOTE, evaluated as the transition's cond — an edge's effective guard is
+   *  leave_when of its source AND enter_when of its target. Named engine
+   *  conditions; absent = always. */
+  enter_when?: string;
+  leave_when?: string;
   /** v3 — THE STATE GATE: the LEGAL TOOLS while this state is active
    *  (legal STATES are the machine's edges — this is only about tools).
    *  ["all"] opens the whole lane. Enforced at dispatch, not advisory. */

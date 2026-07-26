@@ -26,9 +26,9 @@ export function sessionTools(session: Session): ToolDef[] {
       name: "se_boot",
       title: "se.boot",
       description:
-        "Advance the boot sequence — the only legal call before idle. Each call completes the current boot step and returns the next step's packet; the last returns the booted banner to show the user verbatim.",
-      inputSchema: { type: "object", properties: {} },
-      handler: () => session.boot(),
+        "Advance the boot sequence — the only legal call before idle. Each call completes the current boot step and returns the next step's packet; the last returns the booted banner to show the user verbatim. Pass confirm_read: true to confirm you have READ the current step's guidance (required to leave a read_guidance-gated step; logged as evidence).",
+      inputSchema: { type: "object", properties: { confirm_read: { type: "boolean", description: "confirm the current guidance was actually read" } } },
+      handler: (args) => session.boot(args.confirm_read === true),
     },
     {
       name: "se_exit",

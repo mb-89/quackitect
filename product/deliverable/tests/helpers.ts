@@ -29,7 +29,7 @@ export async function call(server: Server, name: string, args: Record<string, un
 export async function bootedServer(root: string): Promise<Server> {
   const server = buildServer(root);
   for (let i = 0; i < 6; i++) {
-    const step = await call(server, "se_boot");
+    const step = await call(server, "se_boot", { confirm_read: true });
     if (step.isError) throw new Error(`boot failed: ${JSON.stringify(step.body)}`);
     if (step.body.booted === true) return server;
   }

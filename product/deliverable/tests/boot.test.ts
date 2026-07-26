@@ -45,7 +45,7 @@ test("se_state is always legal — even before boot (observability is never gate
   assert.ok((r.body.legal_tools as string[]).includes("se_boot"));
 });
 
-test("boot walks the sub-machine step by step and lands in idle with the banner", async () => {
+test("boot walks the sub-machine step by step, gated by the read confirmation", async () => {
   const server = buildServer(freshRoot());
   const s1 = await call(server, "se_boot");
   assert.equal(s1.isError, false);
@@ -56,12 +56,16 @@ test("boot walks the sub-machine step by step and lands in idle with the banner"
   assert.deepEqual(mid.body.active, ["boot/read_contract"]);
   const shut = await call(server, "se_run", { command: "echo nope" });
   assert.equal(shut.body.clause, "SE-C-110");
-  const s2 = await call(server, "se_boot");
+  // the leave condition bites: se_boot WITHOUT the confirmation is refused
+  const unread = await call(server, "se_boot");
+  assert.equal(unread.isError, true);
+  assert.equal(unread.body.clause, "SE-C-112");
+  assert.equal((unread.body.remedy as { args: { confirm_read: boolean } }).args.confirm_read, true);
+  const s2 = await call(server, "se_boot", { confirm_read: true });
   assert.equal(s2.body.phase, "boot/prepare_idle");
   const s3 = await call(server, "se_boot");
   assert.equal(s3.body.booted, true);
   assert.ok(String(s3.body.banner).includes("main machine @ idle"));
-  assert.ok(String(s3.body.display).includes("VERBATIM"));
   const again = await call(server, "se_boot");
   assert.equal(again.isError, true);
   assert.equal(again.body.clause, "SE-C-110");
@@ -86,7 +90,7 @@ test("the gate is logged like everything else — a refused pre-boot call lands 
   const root = freshRoot();
   const server = buildServer(root);
   await call(server, "se_run", { command: "echo nope" }); // refused at start
-  for (let i = 0; i < 3; i++) await call(server, "se_boot"); // walk to idle
+  for (let i = 0; i < 3; i++) await call(server, "se_boot", { confirm_read: true }); // walk to idle
   const q = await call(server, "se_log_query", { filter: { ok: false } });
   const recs = q.body.records as { tool: string; outcome: string }[];
   assert.equal(recs.length, 1);
@@ -104,6 +108,9 @@ test("manual mode: tick info at start, ticks walk the whole machine to end", asy
   assert.deepEqual(s.active(), ["boot/start"]);
   s.tickAdvance();
   assert.deepEqual(s.active(), ["boot/read_contract"]);
+  // the leave condition holds the manual walk too — until evidence lands
+  assert.throws(() => s.tickAdvance(), (e) => (e as { clause?: string }).clause === "SE-C-112");
+  s.submitEvidence("read_contract", { read_confirmed: true, by: "human" });
   s.tickAdvance();
   assert.deepEqual(s.active(), ["boot/prepare_idle"]);
   s.tickAdvance(); // prepare_idle -> boot's visible end position

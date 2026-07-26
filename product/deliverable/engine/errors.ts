@@ -51,4 +51,5 @@ export const CLAUSES = {
   NOT_CONFIGURED: "SE-C-106", // lane exists but needs owner configuration
   RUN_TIMEOUT: "SE-C-107", // command exceeded its time budget
   NOT_LEGAL_IN_STATE: "SE-C-110", // the state gate: tool not legal in the active state
+  CONDITION_UNMET: "SE-C-112", // enter/leave condition not met — evidence required
 } as const;

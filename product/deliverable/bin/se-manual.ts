@@ -73,6 +73,26 @@ const server = createServer((req, res) => {
       });
       return;
     }
+    if (req.method === "POST" && url.pathname === "/evidence") {
+      const chunks: Buffer[] = [];
+      req.on("data", (c) => chunks.push(c));
+      req.on("end", () => {
+        const started = Date.now();
+        try {
+          const body = JSON.parse(Buffer.concat(chunks).toString("utf8") || "{}") as { state?: string };
+          const result = state.session.submitEvidence(String(body.state ?? ""), { read_confirmed: true, by: "human" });
+          state.lastPacket = result;
+          log.append({ tool: "manual_evidence", args: { state: body.state ?? "" }, ok: true, outcome: "result", duration_ms: Date.now() - started, response: result });
+        } catch (e) {
+          if (!(e instanceof Rejection)) throw e;
+          state.lastPacket = e.toJSON();
+          log.append({ tool: "manual_evidence", args: {}, ok: false, outcome: "rejected", duration_ms: Date.now() - started, response: state.lastPacket });
+        }
+        res.writeHead(303, { location: "/" });
+        res.end();
+      });
+      return;
+    }
     if (url.pathname === "/api/tick") {
       res.writeHead(200, { "content-type": "application/json; charset=utf-8" });
       res.end(JSON.stringify(state.session.tickInfo(), null, 2));

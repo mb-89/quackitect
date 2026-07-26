@@ -27,6 +27,8 @@ import {
 } from "../machine.ts";
 
 const ROLES: ReadonlySet<string> = new Set(["normal", "alternative", "fallback", "recovery", "approval", "error"]);
+/** The engine-verifiable condition registry — unknown names refuse at compile. */
+const CONDITIONS: ReadonlySet<string> = new Set(["always", "read_guidance"]);
 
 export class MachineCompileError extends Error {
   constructor(machine: string, element: string, message: string) {
@@ -238,6 +240,12 @@ function stateFromNote(machineId: string, ref: string, notePath: string): StateD
   if (x.guidance === undefined || x.guidance.trim() === "") {
     throw new MachineCompileError(machineId, ref, "every state carries guidance (frontmatter `guidance:`)");
   }
+  for (const key of ["enter_when", "leave_when"] as const) {
+    const v = x[key];
+    if (v !== undefined && v !== "" && !CONDITIONS.has(v)) {
+      throw new MachineCompileError(machineId, ref, `${key} must be one of ${[...CONDITIONS].join(" | ")} (got ${JSON.stringify(v)})`);
+    }
+  }
   const legalTools =
     x.legal_tools === undefined || x.legal_tools === ""
       ? undefined
@@ -253,6 +261,8 @@ function stateFromNote(machineId: string, ref: string, notePath: string): StateD
     evidence_form: [...evidenceForm(machineId, ref, note.body), ...(kind === "gate" ? STANDARD_ROUNDS : [])],
     ...(x.submachine !== undefined && x.submachine !== "" ? { submachine: x.submachine } : {}),
     ...(legalTools !== undefined ? { legal_tools: legalTools } : {}),
+    ...(x.enter_when !== undefined && x.enter_when !== "" ? { enter_when: x.enter_when } : {}),
+    ...(x.leave_when !== undefined && x.leave_when !== "" ? { leave_when: x.leave_when } : {}),
     edges: [],
   };
 }
