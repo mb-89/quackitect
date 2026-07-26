@@ -21,6 +21,12 @@ The proof is per hand:
   checkbox: one check per VERSION of the file. The check pins the doc's
   current hash; an edited doc unchecks itself and asks again.
 
+The condition's status shows met when EITHER hand has proven every listed
+doc at its current version — the agent's passing tick turns the mirror's
+pill green too. The checkbox stays the human's alone: a green pill with
+empty boxes means the agent read, the human did not. An edited doc drops
+both proofs and asks again.
+
 THE HANDOVER RULE: the human's checked docs are the SESSION's reading
 list (`human_checked` in every packet). When the agent takes over — the
 slider rises mid-walk — its advances must prove that same list by hash,

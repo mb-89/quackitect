@@ -59,6 +59,29 @@ test("the mirror renders per-doc checkboxes and never locks reading itself", asy
   assert.match(after, /"checked":\s*true/);
 });
 
+test("the pill turns green from the machine: a passing agent tick records its proof — checkboxes stay human-only", async () => {
+  const root = freshRoot();
+  const server = buildServer(root);
+  // The agent walks into boot/read_contract; the exit read stands unmet.
+  await call(server, "se_tick", { advance: true });
+  await call(server, "se_tick", { advance: true });
+  const before = await call(server, "se_tick", {});
+  const beforeState = (before.body.states as { exit: { read: { met: boolean } } }[])[0];
+  assert.equal(beforeState.exit.read.met, false, "no proof presented yet");
+  // The tick that presents the hashes passes — and the proof STANDS.
+  const hashes = readHashesFor(root);
+  await call(server, "se_tick", { advance: true, read_hashes: hashes });
+  const after = await call(server, "se_tick", { state: "read_contract" });
+  const afterState = after.body as { exit: { read: { met: boolean } } };
+  assert.equal(afterState.exit.read.met, true, "the agent's presented proof is the pill's green");
+  // The human ledger is untouched: nothing checked, boxes stay empty.
+  assert.deepEqual(after.body.human_checked ?? (await call(server, "se_tick", {})).body.human_checked, []);
+  // A version pins the proof: editing a doc drops it, the pill asks again.
+  appendFileSync(join(root, "product", "guidance", "voice.md"), "\nEdited mid-session.\n");
+  const edited = await call(server, "se_tick", { state: "read_contract" });
+  assert.equal((edited.body as { exit: { read: { met: boolean } } }).exit.read.met, false, "an edited doc drops the agent's proof too");
+});
+
 test("THE HANDOVER: the human walks boot on checkboxes, raises the slider — the agent owes the same reading", async () => {
   const root = freshRoot();
   const { Session } = await import("../engine/session.ts");
