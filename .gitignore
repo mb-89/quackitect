@@ -1,0 +1,15 @@
+# machine-local — never committed
+.se/
+*.log
+
+# node
+node_modules/
+
+# editors / OS
+.vscode/
+.obsidian/workspace.json
+Thumbs.db
+.DS_Store
+
+# worktrees (later milestone)
+.worktrees/

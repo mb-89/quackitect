@@ -1,0 +1,24 @@
+{
+  "permissions": {
+    "deny": [
+      "Bash",
+      "BashOutput",
+      "KillShell",
+      "Read",
+      "Write",
+      "Edit",
+      "MultiEdit",
+      "NotebookEdit",
+      "Glob",
+      "Grep",
+      "WebSearch",
+      "WebFetch",
+      "Skill",
+      "SlashCommand"
+    ],
+    "allow": [
+      "mcp__se__*"
+    ]
+  },
+  "enableAllProjectMcpServers": true
+}
