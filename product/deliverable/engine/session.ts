@@ -62,6 +62,11 @@ interface SubRun {
   parentState: string;
 }
 
+/** WHOSE HAND is on the tick. The channel rule (owner ruling 2026-07-26):
+ *  HTTP is the human, MCP is the agent. The threshold gates only the
+ *  agent's hand — the human always may. */
+export type Channel = "human" | "agent";
+
 export class Session {
   private readonly root: string;
   readonly machine: MachineDecl;
@@ -72,6 +77,14 @@ export class Session {
   private bound?: Expedition;
   /** Evidence store: "<machine>/<state>" → what was submitted. */
   private readonly evidence = new Map<string, Record<string, unknown>>();
+  /** THE THRESHOLD — which states the AGENT may enter by itself: only those
+   *  with priority <= threshold. 0 hands every step to the human (manual
+   *  mode); 1 is fully autonomous. Content work inside a state is never
+   *  gated — only ENTERING is. Live-adjustable (the mirror's slider). */
+  private _threshold = 0.5;
+  /** Fires once, after the tick that closes the MAIN machine — the server
+   *  entry hooks the session shutdown here. */
+  onClosed?: () => void;
 
   constructor(root: string) {
     this.root = root;
@@ -79,6 +92,44 @@ export class Session {
     // an ungated lane.
     this.machine = compileMachine(root, mainMachinePath(root));
     this.instance = newInstance(this.machine);
+  }
+
+  get threshold(): number {
+    return this._threshold;
+  }
+
+  setThreshold(value: number): Record<string, unknown> {
+    if (typeof value !== "number" || Number.isNaN(value) || value < 0 || value > 1) {
+      throw new Rejection({
+        clause: CLAUSES.REQUIRED_ARGS,
+        expected: "a threshold between 0 (every step is the human's) and 1 (fully autonomous)",
+        got: String(value),
+        remedy: { tool: "se_tick", args: {}, note: "the threshold is set from the mirror's slider or at launch (--threshold)" },
+        source: "engine/session.ts threshold",
+      });
+    }
+    const was = this._threshold;
+    this._threshold = value;
+    return { threshold: value, was };
+  }
+
+  /** The threshold gate: an AGENT tick may enter a state only when its
+   *  priority <= the session threshold. The human's hand is never gated. */
+  private gatePriority(m: MachineDecl, targetIds: string[], channel: Channel): void {
+    if (channel !== "agent") return;
+    for (const id of targetIds) {
+      const t = m.states.find((s) => s.id === id);
+      if (t === undefined) continue;
+      if (t.priority > this._threshold) {
+        throw new Rejection({
+          clause: CLAUSES.ABOVE_THRESHOLD,
+          expected: `a state within the session threshold ${this._threshold}`,
+          got: `${id} weighs ${t.priority} — this step is the human's`,
+          remedy: { tool: "se_tick", args: {}, note: "tell the human this step waits for them (they advance it from the mirror, or raise the threshold there) — then WAIT; do not retry" },
+          source: "engine/session.ts threshold",
+        });
+      }
+    }
   }
 
   /** Where the LANE works: the bound expedition's worktree, else the root. */
@@ -356,6 +407,7 @@ export class Session {
         kind: s.kind,
         statement: s.statement,
         guidance: s.guidance,
+        priority: s.priority,
         legal_tools: s.kind === "start" || s.kind === "end" ? [...MACHINERY] : (s.legal_tools ?? []),
         ...(s.entry !== undefined ? { entry: this.conditionStatus(machine, s, "enter") } : {}),
         ...(s.exit !== undefined ? { exit: this.conditionStatus(machine, s, "leave") } : {}),
@@ -369,7 +421,7 @@ export class Session {
             to: e.to,
             role: e.role,
             ...(e.guard !== undefined ? { guard: e.guard } : {}),
-            ...(t !== undefined ? { kind: t.kind, statement: t.statement } : {}),
+            ...(t !== undefined ? { kind: t.kind, statement: t.statement, priority: t.priority } : {}),
             ...(t?.entry !== undefined ? { entry: this.conditionStatus(machine, t, "enter") } : {}),
             enter_met: t === undefined ? true : this.conditionMet(machine, t, "enter"),
           };
@@ -383,6 +435,7 @@ export class Session {
       active: this.active(),
       ...(this.bound !== undefined ? { expedition: this.bound.id } : {}),
       status: this.instance.status,
+      threshold: this._threshold,
       legal_tools: all ? "all" : [...ALWAYS_LEGAL, ...tools],
       states,
     };
@@ -390,8 +443,9 @@ export class Session {
 
   /** tick with arguments: complete the current state and move on.
    *  `to` picks the outgoing edge (needed only when there are several);
-   *  `confirm` records that the current state's `read` list was read. */
-  tickAdvance(to?: string, confirm = false): Record<string, unknown> {
+   *  `confirm` records that the current state's `read` list was read;
+   *  `channel` is whose hand this is — the threshold gates only the agent's. */
+  tickAdvance(to?: string, confirm = false, channel: Channel = "human"): Record<string, unknown> {
     const now = new Date().toISOString();
     if (confirm && this.instance.status === "open") {
       const { ids } = this.leaves();
@@ -411,7 +465,10 @@ export class Session {
     // the mechanical start/end positions of a sub-machine.
     if (this.inSub()) {
       if (this.sub!.instance.status !== "open") {
-        // Standing on the sub's end: this tick returns to the parent.
+        // Standing on the sub's end: this tick returns to the parent —
+        // whatever the parent's edges enter is what the threshold weighs.
+        const parent = this.state(this.machine, this.sub!.parentState);
+        this.gatePriority(this.machine, parent.edges.map((e) => e.to), channel);
         completeState(this.machine, this.instance, this.sub!.parentState, "filled", now);
         this.instance.history.push({ state: this.sub!.parentState, outcome: "filled", at: now });
         this.sub = undefined;
@@ -421,6 +478,8 @@ export class Session {
       }
       const cur = activeStates(this.sub!.instance)[0];
       this.assertEdge(this.sub!.decl, cur, to);
+      const subTarget = to ?? this.state(this.sub!.decl, cur).edges[0]?.to;
+      if (subTarget !== undefined) this.gatePriority(this.sub!.decl, [subTarget], channel);
       this.assertConditions(this.sub!.decl, this.state(this.sub!.decl, cur), to);
       completeState(this.sub!.decl, this.sub!.instance, cur, "filled", now, to);
       this.sub!.instance.history.push({ state: cur, outcome: "filled", at: now });
@@ -429,6 +488,8 @@ export class Session {
     }
     const cur = activeStates(this.instance)[0];
     this.assertEdge(this.machine, cur, to);
+    const target = to ?? this.state(this.machine, cur).edges[0]?.to;
+    if (target !== undefined) this.gatePriority(this.machine, [target], channel);
     this.assertConditions(this.machine, this.state(this.machine, cur), to);
     completeState(this.machine, this.instance, cur, "filled", now, to);
     this.instance.history.push({ state: cur, outcome: "filled", at: now });
@@ -457,6 +518,7 @@ export class Session {
       kind: s.kind,
       statement: s.statement,
       guidance: s.guidance,
+      priority: s.priority,
       legal_tools: s.kind === "start" || s.kind === "end" ? [...MACHINERY] : (s.legal_tools ?? []),
       ...(s.entry !== undefined ? { entry: this.conditionStatus(home, s, "enter") } : {}),
       ...(s.exit !== undefined ? { exit: this.conditionStatus(home, s, "leave") } : {}),
@@ -469,7 +531,7 @@ export class Session {
           to: e.to,
           role: e.role,
           ...(e.guard !== undefined ? { guard: e.guard } : {}),
-          ...(t !== undefined ? { kind: t.kind, statement: t.statement } : {}),
+          ...(t !== undefined ? { kind: t.kind, statement: t.statement, priority: t.priority } : {}),
         };
       }),
     };
@@ -479,8 +541,9 @@ export class Session {
    *  downstream is superseded (kept in the record, never erased) and its
    *  evidence and checks are invalidated — they are earned again on the
    *  re-walk. Legal for the user and the agent alike, while the machine is
-   *  open. */
-  jumpBack(target: string): Record<string, unknown> {
+   *  open — the agent's hand is still weighed against the threshold
+   *  (jumping back ENTERS the target). */
+  jumpBack(target: string, channel: Channel = "human"): Record<string, unknown> {
     const now = new Date().toISOString();
     if (this.instance.status === "closed") {
       throw new Rejection({
@@ -512,6 +575,7 @@ export class Session {
         source: "engine/session.ts jump",
       });
     }
+    this.gatePriority(machine, [target], channel);
     const { cone } = reopenStates(machine, inst, [target], "jump back", now);
     // Invalidate the cone's evidence and checks — including a nested
     // machine's, when a sub-machine state is inside the cone. And supersede
@@ -538,8 +602,23 @@ export class Session {
     return this.tickInfo();
   }
 
-  /** The tick's result — plus the booted banner the first time idle lands. */
+  private closedFired = false;
+
+  /** The tick's result — plus the booted banner the first time idle lands.
+   *  Reaching end fires onClosed once: the session is OVER — the server
+   *  entry shuts the whole session down (owner ruling 2026-07-26). */
   private landing(): Record<string, unknown> {
+    if (this.instance.status === "closed" && !this.closedFired) {
+      this.closedFired = true;
+      const info = this.tickInfo();
+      this.onClosed?.();
+      return {
+        ...info,
+        session_over: true,
+        banner: "🦆 SE session over — the machine reached end. The server is shutting down.",
+        display: "Show the banner above to the user VERBATIM. The session is over; no further calls will answer.",
+      };
+    }
     const info = this.tickInfo();
     if (!this.bannerShown && !this.inSub() && activeStates(this.instance).includes("idle")) {
       this.bannerShown = true;
@@ -600,6 +679,7 @@ export class Session {
       active: this.active(),
       ...(this.inSub() ? { submachine: { id: this.sub!.decl.id, active: activeStates(this.sub!.instance) } } : {}),
       status: this.instance.status,
+      threshold: this._threshold,
       legal_tools: all ? "all" : [...ALWAYS_LEGAL, ...tools],
       history: this.instance.history.slice(-10),
     };

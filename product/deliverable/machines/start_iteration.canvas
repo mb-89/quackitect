@@ -1,32 +1,53 @@
 {
-	"metadata":{
-		"version":"1.0-1.0",
-		"frontmatter":{"reentry":"restart"}
-	},
-	"nodes":[
-		{"id":"n-comment","type":"text","text":"START PLANNED WORK — plan a new iteration. EMPTY until persistence lands (spec/iterations/).","x":-1100,"y":-340,"width":660,"height":120},
-		{
-			"id":"n-start",
-			"type":"file",
-			"file":"deliverable/machines/states/start.md",
-			"styleAttributes":{"shape":"pill"},
-			"x":-1100,
-			"y":80,
-			"width":160,
-			"height":160
-		},
-		{
-			"id":"n-end",
-			"type":"file",
-			"file":"deliverable/machines/states/end.md",
-			"styleAttributes":{"shape":"pill"},
-			"x":-700,
-			"y":80,
-			"width":160,
-			"height":160
-		}
-	],
-	"edges":[
-		{"id":"e-start-end","fromNode":"n-start","fromSide":"right","toNode":"n-end","toSide":"left"}
-	]
+ "metadata": {
+  "version": "1.0-1.0",
+  "frontmatter": {
+   "reentry": "restart",
+   "priority": 0.5
+  }
+ },
+ "nodes": [
+  {
+   "id": "n-comment",
+   "type": "text",
+   "text": "START PLANNED WORK \u2014 plan a new iteration. EMPTY until persistence lands (spec/iterations/).",
+   "x": -1100,
+   "y": -340,
+   "width": 660,
+   "height": 120
+  },
+  {
+   "id": "n-start",
+   "type": "file",
+   "file": "deliverable/machines/states/start.md",
+   "styleAttributes": {
+    "shape": "pill"
+   },
+   "x": -1100,
+   "y": 80,
+   "width": 160,
+   "height": 160
+  },
+  {
+   "id": "n-end",
+   "type": "file",
+   "file": "deliverable/machines/states/end.md",
+   "styleAttributes": {
+    "shape": "pill"
+   },
+   "x": -700,
+   "y": 80,
+   "width": 160,
+   "height": 160
+  }
+ ],
+ "edges": [
+  {
+   "id": "e-start-end",
+   "fromNode": "n-start",
+   "fromSide": "right",
+   "toNode": "n-end",
+   "toSide": "left"
+  }
+ ]
 }

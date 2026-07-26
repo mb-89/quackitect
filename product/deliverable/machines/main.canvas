@@ -1,98 +1,258 @@
 {
-	"metadata":{
-		"version":"1.0-1.0",
-		"frontmatter":{"reentry":"restart"}
-	},
-	"nodes":[
-		{"id":"g-adhoc","type":"group","x":-1160,"y":-1020,"width":2260,"height":800,"label":"ad hoc"},
-		{"id":"g-planned","type":"group","x":-1160,"y":560,"width":2260,"height":800,"label":"planned"},
-		{"id":"n-boot","type":"file","file":"deliverable/machines/boot.canvas","x":-1100,"y":-160,"width":620,"height":640},
-		{"id":"n-idle","type":"file","file":"deliverable/machines/states/idle.md","x":-340,"y":-160,"width":620,"height":640},
-		{"id":"n-start_expedition","type":"file","file":"deliverable/machines/start_expedition.canvas","x":-1100,"y":-940,"width":620,"height":640},
-		{"id":"n-continue_expedition","type":"file","file":"deliverable/machines/continue_expedition.canvas","x":-340,"y":-940,"width":620,"height":640},
-		{"id":"n-expedition_archive","type":"file","file":"deliverable/machines/expedition_archive.canvas","x":420,"y":-940,"width":620,"height":640},
-		{"id":"n-start_iteration","type":"file","file":"deliverable/machines/start_iteration.canvas","x":-1100,"y":640,"width":620,"height":640},
-		{"id":"n-continue_iteration","type":"file","file":"deliverable/machines/continue_iteration.canvas","x":-340,"y":640,"width":620,"height":640},
-		{"id":"n-iteration_archive","type":"file","file":"deliverable/machines/iteration_archive.canvas","x":420,"y":640,"width":620,"height":640},
-		{
-			"id":"n-end",
-			"type":"file",
-			"file":"deliverable/machines/states/end.md",
-			"styleAttributes":{"shape":"pill"},
-			"x":1240,
-			"y":80,
-			"width":160,
-			"height":160
-		},
-		{
-			"id":"n-start",
-			"type":"file",
-			"file":"deliverable/machines/states/start.md",
-			"styleAttributes":{"shape":"pill"},
-			"x":-1400,
-			"y":80,
-			"width":160,
-			"height":160
-		},
-		{"id":"n-comment","type":"text","text":"THE MAIN MACHINE — every session runs this. start/end are mechanical; boot is a sub-machine; idle is home. Above idle: the ad hoc group (start · continue · archive). Below: the planned group, symmetric. se_exit closes to end.","x":-380,"y":-1240,"width":700,"height":140}
-	],
-	"edges":[
-		{"id":"e-start-boot","fromNode":"n-start","fromSide":"right","toNode":"n-boot","toSide":"left"},
-		{"id":"e-boot-idle","fromNode":"n-boot","fromSide":"right","toNode":"n-idle","toSide":"left"},
-		{"id":"e-idle-end","fromNode":"n-idle","fromSide":"right","toNode":"n-end","toSide":"left"},
-		{"id":"e-idle-start_expedition","fromNode":"n-idle","fromSide":"top","toNode":"n-start_expedition","toSide":"bottom"},
-		{
-			"id":"e-start_expedition-idle",
-			"styleAttributes":{"role":"alternative"},
-			"fromNode":"n-start_expedition",
-			"fromSide":"bottom",
-			"toNode":"n-idle",
-			"toSide":"top"
-		},
-		{"id":"e-idle-continue_expedition","fromNode":"n-idle","fromSide":"top","toNode":"n-continue_expedition","toSide":"bottom"},
-		{
-			"id":"e-continue_expedition-idle",
-			"styleAttributes":{"role":"alternative"},
-			"fromNode":"n-continue_expedition",
-			"fromSide":"bottom",
-			"toNode":"n-idle",
-			"toSide":"top"
-		},
-		{"id":"e-idle-expedition_archive","fromNode":"n-idle","fromSide":"top","toNode":"n-expedition_archive","toSide":"bottom"},
-		{
-			"id":"e-expedition_archive-idle",
-			"styleAttributes":{"role":"alternative"},
-			"fromNode":"n-expedition_archive",
-			"fromSide":"bottom",
-			"toNode":"n-idle",
-			"toSide":"top"
-		},
-		{"id":"e-idle-start_iteration","fromNode":"n-idle","fromSide":"bottom","toNode":"n-start_iteration","toSide":"top"},
-		{
-			"id":"e-start_iteration-idle",
-			"styleAttributes":{"role":"alternative"},
-			"fromNode":"n-start_iteration",
-			"fromSide":"top",
-			"toNode":"n-idle",
-			"toSide":"bottom"
-		},
-		{"id":"e-idle-continue_iteration","fromNode":"n-idle","fromSide":"bottom","toNode":"n-continue_iteration","toSide":"top"},
-		{
-			"id":"e-continue_iteration-idle",
-			"styleAttributes":{"role":"alternative"},
-			"fromNode":"n-continue_iteration",
-			"fromSide":"top",
-			"toNode":"n-idle",
-			"toSide":"bottom"
-		},
-		{"id":"e-idle-iteration_archive","fromNode":"n-idle","fromSide":"bottom","toNode":"n-iteration_archive","toSide":"top"},
-		{
-			"id":"e-iteration_archive-idle",
-			"styleAttributes":{"role":"alternative"},
-			"fromNode":"n-iteration_archive",
-			"fromSide":"top",
-			"toNode":"n-idle",
-			"toSide":"bottom"
-		}
-	]
+ "metadata": {
+  "version": "1.0-1.0",
+  "frontmatter": {
+   "reentry": "restart"
+  }
+ },
+ "nodes": [
+  {
+   "id": "g-adhoc",
+   "type": "group",
+   "label": "ad hoc",
+   "x": -1160,
+   "y": -1020,
+   "width": 2260,
+   "height": 800
+  },
+  {
+   "id": "g-planned",
+   "type": "group",
+   "label": "planned",
+   "x": -1160,
+   "y": 560,
+   "width": 2260,
+   "height": 800
+  },
+  {
+   "id": "n-comment",
+   "type": "text",
+   "text": "THE MAIN MACHINE \u2014 every session runs this. start/end are mechanical; boot is a sub-machine; idle is home. Above idle: the ad hoc group (start \u00b7 continue \u00b7 archive). Below: the planned group, symmetric. se_exit closes to end.",
+   "x": -1560,
+   "y": -360,
+   "width": 700,
+   "height": 140
+  },
+  {
+   "id": "n-boot",
+   "type": "file",
+   "file": "deliverable/machines/boot.canvas",
+   "x": -1100,
+   "y": -160,
+   "width": 620,
+   "height": 640
+  },
+  {
+   "id": "n-idle",
+   "type": "file",
+   "file": "deliverable/machines/states/idle.md",
+   "x": -340,
+   "y": -160,
+   "width": 620,
+   "height": 640
+  },
+  {
+   "id": "n-start_expedition",
+   "type": "file",
+   "file": "deliverable/machines/start_expedition.canvas",
+   "x": -1100,
+   "y": -940,
+   "width": 620,
+   "height": 640
+  },
+  {
+   "id": "n-continue_expedition",
+   "type": "file",
+   "file": "deliverable/machines/continue_expedition.canvas",
+   "x": -340,
+   "y": -940,
+   "width": 620,
+   "height": 640
+  },
+  {
+   "id": "n-expedition_archive",
+   "type": "file",
+   "file": "deliverable/machines/expedition_archive.canvas",
+   "x": 420,
+   "y": -940,
+   "width": 620,
+   "height": 640
+  },
+  {
+   "id": "n-start_iteration",
+   "type": "file",
+   "file": "deliverable/machines/start_iteration.canvas",
+   "x": -1100,
+   "y": 640,
+   "width": 620,
+   "height": 640
+  },
+  {
+   "id": "n-continue_iteration",
+   "type": "file",
+   "file": "deliverable/machines/continue_iteration.canvas",
+   "x": -340,
+   "y": 640,
+   "width": 620,
+   "height": 640
+  },
+  {
+   "id": "n-iteration_archive",
+   "type": "file",
+   "file": "deliverable/machines/iteration_archive.canvas",
+   "x": 420,
+   "y": 640,
+   "width": 620,
+   "height": 640
+  },
+  {
+   "id": "n-end",
+   "type": "file",
+   "file": "deliverable/machines/states/end.md",
+   "styleAttributes": {
+    "shape": "pill"
+   },
+   "x": 1240,
+   "y": 80,
+   "width": 160,
+   "height": 160
+  },
+  {
+   "id": "n-start",
+   "type": "file",
+   "file": "deliverable/machines/states/start.md",
+   "styleAttributes": {
+    "shape": "pill"
+   },
+   "x": -1400,
+   "y": 80,
+   "width": 160,
+   "height": 160
+  }
+ ],
+ "edges": [
+  {
+   "id": "e-start-boot",
+   "fromNode": "n-start",
+   "fromSide": "right",
+   "toNode": "n-boot",
+   "toSide": "left"
+  },
+  {
+   "id": "e-boot-idle",
+   "fromNode": "n-boot",
+   "fromSide": "right",
+   "toNode": "n-idle",
+   "toSide": "left"
+  },
+  {
+   "id": "e-idle-end",
+   "fromNode": "n-idle",
+   "fromSide": "right",
+   "toNode": "n-end",
+   "toSide": "left"
+  },
+  {
+   "id": "e-idle-start_expedition",
+   "fromNode": "n-idle",
+   "fromSide": "top",
+   "toNode": "n-start_expedition",
+   "toSide": "bottom"
+  },
+  {
+   "id": "e-start_expedition-idle",
+   "fromNode": "n-start_expedition",
+   "fromSide": "bottom",
+   "toNode": "n-idle",
+   "toSide": "top",
+   "styleAttributes": {
+    "role": "alternative"
+   }
+  },
+  {
+   "id": "e-idle-continue_expedition",
+   "fromNode": "n-idle",
+   "fromSide": "top",
+   "toNode": "n-continue_expedition",
+   "toSide": "bottom"
+  },
+  {
+   "id": "e-continue_expedition-idle",
+   "fromNode": "n-continue_expedition",
+   "fromSide": "bottom",
+   "toNode": "n-idle",
+   "toSide": "top",
+   "styleAttributes": {
+    "role": "alternative"
+   }
+  },
+  {
+   "id": "e-idle-expedition_archive",
+   "fromNode": "n-idle",
+   "fromSide": "top",
+   "toNode": "n-expedition_archive",
+   "toSide": "bottom"
+  },
+  {
+   "id": "e-expedition_archive-idle",
+   "fromNode": "n-expedition_archive",
+   "fromSide": "bottom",
+   "toNode": "n-idle",
+   "toSide": "top",
+   "styleAttributes": {
+    "role": "alternative"
+   }
+  },
+  {
+   "id": "e-idle-start_iteration",
+   "fromNode": "n-idle",
+   "fromSide": "bottom",
+   "toNode": "n-start_iteration",
+   "toSide": "top"
+  },
+  {
+   "id": "e-start_iteration-idle",
+   "fromNode": "n-start_iteration",
+   "fromSide": "top",
+   "toNode": "n-idle",
+   "toSide": "bottom",
+   "styleAttributes": {
+    "role": "alternative"
+   }
+  },
+  {
+   "id": "e-idle-continue_iteration",
+   "fromNode": "n-idle",
+   "fromSide": "bottom",
+   "toNode": "n-continue_iteration",
+   "toSide": "top"
+  },
+  {
+   "id": "e-continue_iteration-idle",
+   "fromNode": "n-continue_iteration",
+   "fromSide": "top",
+   "toNode": "n-idle",
+   "toSide": "bottom",
+   "styleAttributes": {
+    "role": "alternative"
+   }
+  },
+  {
+   "id": "e-idle-iteration_archive",
+   "fromNode": "n-idle",
+   "fromSide": "bottom",
+   "toNode": "n-iteration_archive",
+   "toSide": "top"
+  },
+  {
+   "id": "e-iteration_archive-idle",
+   "fromNode": "n-iteration_archive",
+   "fromSide": "top",
+   "toNode": "n-idle",
+   "toSide": "bottom",
+   "styleAttributes": {
+    "role": "alternative"
+   }
+  }
+ ]
 }

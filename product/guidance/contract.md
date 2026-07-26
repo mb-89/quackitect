@@ -19,9 +19,10 @@ what the state did not name. The engine does the checking.
 
 ## 3. Adjudication follows the session's threshold
 States carry a priority. The session sets the highest priority you may pass
-alone. Above it, the user adjudicates — you present, you wait. The
-threshold can change during the session. Until the priority system ships,
-treat every gate as above your threshold.
+alone; a tick above it is refused (SE-C-113) — you present, you WAIT, you
+never retry your way past it. The threshold can change during the session
+(the user's slider); the refusal is the signal to tell the user a step is
+waiting for their hand.
 
 ## 4. Capture strays, do not chase them
 An idea, a bug, a better way — note it and keep walking. You do not leave

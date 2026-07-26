@@ -52,4 +52,5 @@ export const CLAUSES = {
   RUN_TIMEOUT: "SE-C-107", // command exceeded its time budget
   NOT_LEGAL_IN_STATE: "SE-C-110", // the state gate: tool not legal in the active state
   CONDITION_UNMET: "SE-C-112", // enter/leave condition not met — evidence required
+  ABOVE_THRESHOLD: "SE-C-113", // the state's priority exceeds the session threshold — the human advances
 } as const;

@@ -1,11 +1,13 @@
 ---
 state: idle
 state_kind: work
+priority: 0.01
 legal_tools: all
-guidance: Work through the se lane; paths are root-relative. On a refusal, follow the typed remedy — recover in one turn. se_exit closes the session when the user is done.
+guidance: Idle is the ROUTER. The user's request decides the way out - ad hoc or exploratory work goes through start_expedition then continue_expedition; planned multi-step work goes through the iteration lane (when it exists). Nothing to do - say so and WAIT; never tick to end on your own, end means the user is done.
 ---
 
 # Idle
 
-Booted, no active process. The whole lane is legal. Future work states
-branch from here — an iteration, a review, whatever the owner draws next.
+Booted, no active process. The whole lane is legal, and the state routes:
+requests become expeditions (ad hoc) or iterations (planned). A backlog to
+pull from lands here later.

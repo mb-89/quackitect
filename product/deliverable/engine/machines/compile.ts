@@ -126,8 +126,15 @@ export function compileMachine(root: string, canvasPath: string): MachineDecl {
     const ref = el.file ?? "";
     let decl: StateDecl;
     if (ref.endsWith(".canvas")) {
-      // A drawn machine nested as a state.
+      // A drawn machine nested as a state — its priority is declared in the
+      // sub-canvas frontmatter (it has no note).
       const subId = ref.replace(/\\/g, "/").split("/").pop()!.replace(/\.canvas$/, "");
+      const subPath = resolveRef(root, canvasPath, ref);
+      const subFm = existsSync(subPath) ? (loadCanvas(subPath).metadata?.frontmatter ?? {}) : {};
+      const subPriority = asPriority(subFm.priority);
+      if (subPriority === undefined) {
+        throw new MachineCompileError(machineId, `canvas node ${el.id}`, `${subId}.canvas declares no priority in its frontmatter — every state has one (0.01 mechanical .. 1 killer)`);
+      }
       decl = {
         id: subId,
         kind: "work",
@@ -135,6 +142,7 @@ export function compileMachine(root: string, canvasPath: string): MachineDecl {
         guidance: `A sub-machine: entering this state enters ${subId} at its start; this state completes when ${subId} reaches its end.`,
         evidence_form: [],
         submachine: ref,
+        priority: subPriority,
         edges: [],
       };
     } else if (ref.endsWith(".md")) {
@@ -234,6 +242,11 @@ function asList(v: unknown): string[] | undefined {
   return s.split(",").map((t) => t.trim()).filter((t) => t !== "");
 }
 
+function asPriority(v: unknown): number | undefined {
+  const n = typeof v === "number" ? v : typeof v === "string" && v !== "" ? Number(v) : NaN;
+  return Number.isFinite(n) && n >= 0 && n <= 1 ? n : undefined;
+}
+
 /** Conditions are FLAT frontmatter keys — exit_read, exit_script,
  *  entry_<type> — because nested dictionaries render as JSON blobs in
  *  Obsidian Properties (owner ruling: Obsidian-editable). */
@@ -277,6 +290,10 @@ function stateFromNote(machineId: string, ref: string, notePath: string, root: s
   if (guidance === undefined || guidance.trim() === "") {
     throw new MachineCompileError(machineId, ref, "every state carries guidance (frontmatter `guidance:`)");
   }
+  const priority = asPriority(x.priority);
+  if (priority === undefined) {
+    throw new MachineCompileError(machineId, ref, "every state carries a priority (frontmatter `priority:` 0.01 mechanical .. 1 killer)");
+  }
   const legalTools = asList(x.legal_tools);
   const entry = conditionDict(machineId, ref, root, "entry", x);
   const exit = conditionDict(machineId, ref, root, "exit", x);
@@ -287,6 +304,7 @@ function stateFromNote(machineId: string, ref: string, notePath: string, root: s
     kind,
     statement: note.statement,
     guidance,
+    priority,
     evidence_form: [...evidenceForm(machineId, ref, note.body), ...(kind === "gate" ? STANDARD_ROUNDS : [])],
     ...(submachine !== undefined && submachine !== "" ? { submachine } : {}),
     ...(legalTools !== undefined ? { legal_tools: legalTools } : {}),

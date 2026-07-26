@@ -7,8 +7,16 @@ Preflight (node/git/ripgrep hard deps), cage install, engine selftests, then
 either the caged agent (default) or the Mirror in manual mode.
 
 .PARAMETER Manual
-Open the Mirror instead of the agent: walk the machines yourself in the
-browser, tick by tick (http://localhost:7333).
+Open the Mirror with NO agent attached: walk the machines yourself in the
+browser, tick by tick (http://localhost:7333). With an agent running you do
+not need this - the agent's server embeds the same Mirror on the same walk;
+-Threshold 0 there IS manual mode.
+
+.PARAMETER Threshold
+0..1 - which states the AGENT enters by itself (a state's priority must be
+<= the threshold). 0: every step is yours, click through in the Mirror.
+0.5 (default): the agent does the everyday steps, killers wait for you.
+1: fully autonomous. Live-adjustable via the Mirror's slider.
 
 .PARAMETER Help
 Show this help (-h and -? work too).
@@ -16,11 +24,14 @@ Show this help (-h and -? work too).
 .EXAMPLE
 .\RUNME.ps1
 .EXAMPLE
+.\RUNME.ps1 -Threshold 0
+.EXAMPLE
 .\RUNME.ps1 -Manual
 #>
 [CmdletBinding()]
 param(
   [switch]$Manual,
+  [ValidateRange(0.0, 1.0)][double]$Threshold = 0.5,
   [switch]$Help
 )
 if ($Help) {
@@ -111,13 +122,17 @@ if ($Manual) {
 
 # AGENT MODE: launch Claude Code inside the cage. workspace/.claude/settings.json
 # denies the native tools by name (explicit blacklist); workspace/.mcp.json
-# serves the se lane. The agent's whole world is the MCP server.
+# serves the se lane. The agent's whole world is the MCP server - which also
+# embeds the Mirror (http://localhost:7333): YOUR hand on the same walk.
+# .mcp.json args are fixed template text, so the threshold rides the env.
 $claude = Get-Command claude -ErrorAction SilentlyContinue
 if ($null -eq $claude) {
   Write-Host "claude CLI not found. Install Claude Code first: https://code.claude.com/docs" -ForegroundColor Red
   exit 1
 }
-Write-Host "quackitect v3 - launching caged agent in workspace/" -ForegroundColor Cyan
+$env:SE_THRESHOLD = $Threshold.ToString([System.Globalization.CultureInfo]::InvariantCulture)
+Write-Host "quackitect v3 - launching caged agent in workspace/ (threshold $env:SE_THRESHOLD)" -ForegroundColor Cyan
+Write-Host "quackitect v3 - the Mirror (your hand on the walk): http://localhost:7333" -ForegroundColor Cyan
 Push-Location (Join-Path $root "workspace")
 try {
   claude

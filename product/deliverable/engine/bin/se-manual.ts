@@ -1,20 +1,14 @@
-// se-manual — walk the machines yourself. A tiny local server: the Mirror
-// as the view, the tick as the only control. The same Session the agent
-// would drive; manual ticks land in the call log like any other call.
+// se-manual — walk the machines yourself, NO agent attached: the shared
+// mirror server (engine/mirror.ts) standing alone. With an agent running,
+// you do not need this — se-mcp embeds the same mirror on the same walk;
+// manual mode there is just the threshold at 0.
 //
 //   node engine/bin/se-manual.ts --root <project root> [--port 7333]
-//
-// tick · info     GET /        (tick without arguments: look, don't move)
-// tick · advance  POST /tick   (tick with arguments: complete and move on)
-// JSON            GET /api/tick
-import { createServer } from "node:http";
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync } from "node:fs";
 import { resolve } from "node:path";
-import { marked } from "marked";
 import { CallLog } from "../calllog.ts";
-import { Rejection } from "../errors.ts";
-import { renderMirror, type MirrorState } from "../render.ts";
-import { resolveInRoot, seDir } from "../paths.ts";
+import { startMirror } from "../mirror.ts";
+import { seDir } from "../paths.ts";
 import { Session } from "../session.ts";
 
 function argValue(flag: string): string | undefined {
@@ -23,15 +17,19 @@ function argValue(flag: string): string | undefined {
 }
 
 if (process.argv.some((a) => a === "--help" || a === "-h" || a === "-?")) {
-  process.stdout.write(`se-manual — walk the machines yourself (the Mirror, manual mode)
+  process.stdout.write(`se-manual — walk the machines yourself (the Mirror, no agent)
 
   node engine/bin/se-manual.ts --root <project root> [--port 7333]
 
   GET  /            the mirror (tick · info implied: looking never moves)
   POST /tick        tick with arguments: complete the current state, move on
+  POST /threshold   move the session threshold (the slider posts here)
   GET  /api/tick    the tick info packet as JSON
+  GET  /api/alive   position + threshold — the mirror polls this
   GET  /widget/machine | /widget/details    single widgets (tab/window)
   --help            this text (-h, -?)
+
+  Reaching end shuts the server down — the mirror turns red: session over.
 `);
   process.exit(0);
 }
@@ -43,122 +41,10 @@ if (!existsSync(root)) {
 }
 const port = Number(argValue("--port") ?? 7333);
 
-const log = new CallLog(seDir(root));
-const state: MirrorState = { session: new Session(root), root, lastPacket: undefined, mode: "manual" };
-
-const server = createServer((req, res) => {
-  const url = new URL(req.url ?? "/", `http://localhost:${port}`);
-  try {
-    if (req.method === "POST" && url.pathname === "/tick") {
-      const chunks: Buffer[] = [];
-      req.on("data", (c) => chunks.push(c));
-      req.on("end", () => {
-        const started = Date.now();
-        let to: string | undefined;
-        try {
-          const body = JSON.parse(Buffer.concat(chunks).toString("utf8") || "{}") as { to?: string; advance?: boolean; back?: string };
-          to = body.to;
-          if (body.back !== undefined) {
-            try {
-              state.lastPacket = state.session.jumpBack(String(body.back));
-              log.append({ tool: "manual_tick", args: { back: body.back }, ok: true, outcome: "result", duration_ms: Date.now() - started, response: state.lastPacket });
-            } catch (e) {
-              if (!(e instanceof Rejection)) throw e;
-              state.lastPacket = e.toJSON();
-              log.append({ tool: "manual_tick", args: { back: body.back }, ok: false, outcome: "rejected", duration_ms: Date.now() - started, response: state.lastPacket });
-            }
-            res.writeHead(303, { location: "/" });
-            res.end();
-            return;
-          }
-        } catch {
-          to = undefined;
-        }
-        try {
-          state.lastPacket = state.session.tickAdvance(to);
-          log.append({ tool: "manual_tick", args: { advance: true, ...(to !== undefined ? { to } : {}) }, ok: true, outcome: "result", duration_ms: Date.now() - started, response: state.lastPacket });
-        } catch (e) {
-          if (!(e instanceof Rejection)) throw e;
-          state.lastPacket = e.toJSON();
-          log.append({ tool: "manual_tick", args: { advance: true, ...(to !== undefined ? { to } : {}) }, ok: false, outcome: "rejected", duration_ms: Date.now() - started, response: state.lastPacket });
-        }
-        res.writeHead(303, { location: "/" });
-        res.end();
-      });
-      return;
-    }
-    if (req.method === "POST" && url.pathname === "/evidence") {
-      const chunks: Buffer[] = [];
-      req.on("data", (c) => chunks.push(c));
-      req.on("end", () => {
-        const started = Date.now();
-        try {
-          const body = JSON.parse(Buffer.concat(chunks).toString("utf8") || "{}") as { state?: string };
-          const result = state.session.submitEvidence(String(body.state ?? ""), { read_confirmed: true, by: "human" });
-          state.lastPacket = result;
-          log.append({ tool: "manual_evidence", args: { state: body.state ?? "" }, ok: true, outcome: "result", duration_ms: Date.now() - started, response: result });
-        } catch (e) {
-          if (!(e instanceof Rejection)) throw e;
-          state.lastPacket = e.toJSON();
-          log.append({ tool: "manual_evidence", args: {}, ok: false, outcome: "rejected", duration_ms: Date.now() - started, response: state.lastPacket });
-        }
-        res.writeHead(303, { location: "/" });
-        res.end();
-      });
-      return;
-    }
-    if (req.method === "POST" && url.pathname === "/script") {
-      const chunks: Buffer[] = [];
-      req.on("data", (c) => chunks.push(c));
-      req.on("end", () => {
-        const started = Date.now();
-        try {
-          const body = JSON.parse(Buffer.concat(chunks).toString("utf8") || "{}") as { state?: string };
-          const result = state.session.scriptRun(String(body.state ?? ""));
-          state.lastPacket = result;
-          log.append({ tool: "manual_script", args: { state: body.state ?? "" }, ok: (result.script_result as { ok: boolean }).ok, outcome: "result", duration_ms: Date.now() - started, response: result });
-        } catch (e) {
-          if (!(e instanceof Rejection)) throw e;
-          state.lastPacket = e.toJSON();
-          log.append({ tool: "manual_script", args: {}, ok: false, outcome: "rejected", duration_ms: Date.now() - started, response: state.lastPacket });
-        }
-        res.writeHead(303, { location: "/" });
-        res.end();
-      });
-      return;
-    }
-    if (url.pathname === "/doc") {
-      // Serve a guidance document, rendered — links in the details pane.
-      const p = url.searchParams.get("path") ?? "";
-      const abs = resolveInRoot(root, p, "se-manual /doc");
-      let raw = readFileSync(abs, "utf8");
-      raw = raw.replace(/^---\r?\n[\s\S]*?\r?\n---\r?\n/, ""); // frontmatter is machine-facing
-      const html = p.endsWith(".md") ? (marked.parse(raw) as string) : `<pre>${raw.replace(/&/g, "&amp;").replace(/</g, "&lt;")}</pre>`;
-      res.writeHead(200, { "content-type": "application/json; charset=utf-8" });
-      res.end(JSON.stringify({ path: p, html }));
-      return;
-    }
-    if (url.pathname === "/api/tick") {
-      res.writeHead(200, { "content-type": "application/json; charset=utf-8" });
-      res.end(JSON.stringify(state.session.tickInfo(), null, 2));
-      return;
-    }
-    if (url.pathname === "/widget/machine" || url.pathname === "/widget/details") {
-      res.writeHead(200, { "content-type": "text/html; charset=utf-8" });
-      res.end(renderMirror(state, url.pathname === "/widget/machine" ? "machine" : "details", url.searchParams.get("view") ?? undefined));
-      return;
-    }
-    // GET / — tick without arguments: information about where we are.
-    // ?view=<machine> browses a machine without moving the walk.
-    state.lastPacket = state.session.tickInfo();
-    res.writeHead(200, { "content-type": "text/html; charset=utf-8" });
-    res.end(renderMirror(state, undefined, url.searchParams.get("view") ?? undefined));
-  } catch (e) {
-    res.writeHead(500, { "content-type": "text/plain; charset=utf-8" });
-    res.end(String((e as Error).stack ?? e));
-  }
-});
-
-server.listen(port, () => {
-  process.stderr.write(`se-manual: walking ${root}\nse-manual: open http://localhost:${port}\n`);
-});
+const session = new Session(root);
+session.onClosed = () => {
+  process.stderr.write("se-manual: the machine reached end — session over, shutting down\n");
+  setTimeout(() => process.exit(0), 1500);
+};
+startMirror({ session, root, port, log: new CallLog(seDir(root)), mode: "manual" });
+process.stderr.write(`se-manual: walking ${root}\nse-manual: open http://localhost:${port}\n`);

@@ -1,6 +1,7 @@
 ---
 state: read_contract
 state_kind: work
+priority: 0.01
 exit_read:
   - workspace/AGENTS.md
   - product/guidance/contract.md

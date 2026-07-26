@@ -1,6 +1,7 @@
 ---
 state: end
 state_kind: end
+priority: 0.01
 guidance: This is the end state of a state machine. The machine is complete here. In a sub-machine, tick once more to return to the parent.
 ---
 

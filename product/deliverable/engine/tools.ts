@@ -39,11 +39,13 @@ export function sessionTools(session: Session): ToolDef[] {
         },
       },
       handler: (args) => {
+        // THE CHANNEL RULE: MCP is the agent's hand — the threshold gates it.
+        // (HTTP, the mirror, is the human's; the human always may.)
         if (args.state !== undefined) return session.stateInfo(String(args.state));
-        if (args.back !== undefined) return session.jumpBack(String(args.back));
+        if (args.back !== undefined) return session.jumpBack(String(args.back), "agent");
         const wantsAdvance = args.to !== undefined || args.confirm === true || args.advance === true;
         if (!wantsAdvance) return session.tickInfo();
-        return session.tickAdvance(args.to === undefined ? undefined : String(args.to), args.confirm === true);
+        return session.tickAdvance(args.to === undefined ? undefined : String(args.to), args.confirm === true, "agent");
       },
     },
   ];
@@ -313,9 +315,10 @@ export function coreTools(rootOf: () => string, projectRoot: string): ToolDef[] 
 }
 
 /** Build the server: session machine + tools + guards + the raw call log.
- *  Guard order: arg shape → THE STATE GATE → handler. */
-export function buildServer(root: string): McpServer {
-  const session = new Session(root); // fails fast on a misdrawn machine
+ *  Guard order: arg shape → THE STATE GATE → handler. Pass a Session to
+ *  share it with another hand (the embedded mirror drives the SAME walk). */
+export function buildServer(root: string, session = new Session(root)): McpServer {
+  // (a fresh Session fails fast on a misdrawn machine)
   const tools = [...sessionTools(session), ...expeditionTools(session), ...coreTools(() => session.workRoot(), root)];
   const server = new McpServer({ name: "se-mcp", version: "3.0.0-bootstrap" }, tools);
   const log = new CallLog(seDir(root));

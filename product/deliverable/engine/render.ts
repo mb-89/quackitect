@@ -208,6 +208,12 @@ const STYLE = `
   .docview a { color: #7cc4e8; }
   button.ghost { background: #22272c; color: #d8dde2; border: 1px solid #4a545e; border-radius: 8px; padding: 6px 12px; font: inherit; cursor: pointer; }
   #w-details { flex: 1; border-radius: 0; border: 0; }
+  .threshold { display: flex; align-items: center; gap: 8px; color: #7f8b96; font-size: 12px; text-transform: none; letter-spacing: 0; }
+  .threshold input { accent-color: #e8b339; width: 140px; }
+  #thr-val { color: #e8b339; min-width: 4ch; }
+  #over { position: fixed; inset: 0; background: rgba(20,23,26,.94); z-index: 100; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; }
+  #over .over-box { color: #e8332a; font-size: 62px; font-weight: 800; letter-spacing: .12em; border: 6px solid #e8332a; border-radius: 18px; padding: 26px 52px; }
+  #over .over-sub { color: #e86a5f; font-size: 15px; }
 `;
 
 const SCRIPT = `
@@ -403,6 +409,53 @@ if (divider && aside) {
 }
 
 if (CURRENT && D.states[CURRENT] && WALK_HERE) { CURRENT_DETAIL = "state:" + CURRENT; showDetails("state: " + CURRENT, stateDetail(CURRENT)); }
+
+// THE THRESHOLD SLIDER — the human's live grip on how much of the walk is
+// the agent's. Takes effect on the agent's NEXT tick; logged server-side.
+const thr = document.getElementById("thr");
+if (thr) {
+  const lbl = document.getElementById("thr-val");
+  thr.addEventListener("input", () => { if (lbl) lbl.textContent = Number(thr.value).toFixed(2); });
+  thr.addEventListener("change", async () => {
+    await fetch("/threshold", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ value: Number(thr.value) }) });
+  });
+}
+
+// SESSION OVER — anybody reaching end stops the whole session. The mirror
+// tries to close its window; where that is not allowed, the big red
+// message stands (owner ruling 2026-07-26).
+function sessionOver() {
+  if (document.getElementById("over")) return;
+  const d = document.createElement("div");
+  d.id = "over";
+  d.innerHTML = '<div class="over-box">SESSION OVER</div><div class="over-sub">the machine reached end — the server has shut down</div>';
+  document.body.appendChild(d);
+  try { window.close(); } catch (e) { /* user-opened windows refuse */ }
+}
+if (D.describe.status === "closed") sessionOver();
+
+// The mirror FOLLOWS the walk: poll the position — the agent's hand (or
+// another window) moves the machine under this page. A dead server reads
+// as session over.
+let aliveMisses = 0;
+const ACTIVE_AT_RENDER = JSON.stringify(D.describe.active || []);
+setInterval(async () => {
+  try {
+    const r = await fetch("/api/alive");
+    const a = await r.json();
+    aliveMisses = 0;
+    if (a.status === "closed") { sessionOver(); return; }
+    if (thr && document.activeElement !== thr && Number(thr.value) !== a.threshold) {
+      thr.value = a.threshold;
+      const lbl = document.getElementById("thr-val");
+      if (lbl) lbl.textContent = Number(a.threshold).toFixed(2);
+    }
+    if (JSON.stringify(a.active || []) !== ACTIVE_AT_RENDER) location.reload();
+  } catch (e) {
+    aliveMisses++;
+    if (aliveMisses >= 2) sessionOver();
+  }
+}, 2000);
 `;
 
 function widgetHead(title: string, widgetId: string, url: string): string {
@@ -465,6 +518,7 @@ export function renderMirror(m: MirrorState, widget?: "machine" | "details", vie
       kind: s.kind,
       statement: s.statement,
       guidance: s.guidance,
+      priority: s.priority,
       legal_tools: s.legal_tools ?? [],
       ...(s.submachine !== undefined ? { submachine: s.submachine } : {}),
       ...(s.entry !== undefined ? { entry: m.session.conditionStatus(decl, s, "enter") } : {}),
@@ -481,7 +535,7 @@ export function renderMirror(m: MirrorState, widget?: "machine" | "details", vie
           to: e.to,
           role: e.role,
           ...(e.guard !== undefined ? { guard: e.guard } : {}),
-          ...(t !== undefined ? { kind: t.kind, statement: t.statement } : {}),
+          ...(t !== undefined ? { kind: t.kind, statement: t.statement, priority: t.priority } : {}),
           enter_met: t === undefined ? true : m.session.conditionMet(decl, t, "enter"),
         };
       }),
@@ -499,7 +553,13 @@ export function renderMirror(m: MirrorState, widget?: "machine" | "details", vie
     history: history.slice(-20),
   }).replace(/</g, "\\u003c")};</script>`;
 
-  const machineWidget = `<div class="widget" id="w-machine"><div class="widget-head"><span class="crumbs">${crumbs}</span><button class="expand" data-widget="w-machine" data-url="/widget/machine?view=${encodeURIComponent(decl.id)}" title="expand · ctrl-click: new tab · shift-click: new window">⛶</button></div><div class="widget-body">${svg}</div></div>`;
+  // The slider — THE THRESHOLD: which states the agent enters by itself
+  // (priority <= threshold). 0 = the human clicks through everything
+  // (manual mode is just this); 1 = fully autonomous. Live: changes take
+  // effect on the agent's next tick.
+  const thr = m.session.threshold;
+  const slider = `<span class="threshold" title="the agent enters only states with priority ≤ threshold — 0: every step is yours, 1: fully autonomous"><span>agent ≤</span><input id="thr" type="range" min="0" max="1" step="0.01" value="${thr}"><span id="thr-val">${thr.toFixed(2)}</span></span>`;
+  const machineWidget = `<div class="widget" id="w-machine"><div class="widget-head"><span class="crumbs">${crumbs}</span>${slider}<button class="expand" data-widget="w-machine" data-url="/widget/machine?view=${encodeURIComponent(decl.id)}" title="expand · ctrl-click: new tab · shift-click: new window">⛶</button></div><div class="widget-body">${svg}</div></div>`;
   const detailsWidget = `<div class="widget" id="w-details">${widgetHead("details", "w-details", "/widget/details")}
     ${info.status === "closed" ? '<div class="meta" style="color:#e86a5f">machine closed</div>' : ""}
     <div class="meta" id="details-title">—</div>

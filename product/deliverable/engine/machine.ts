@@ -55,6 +55,11 @@ export interface StateDecl {
   exit?: Record<string, string[]>;
   /** Tags join states to guidance (the pull system's tag rule). */
   tags?: string[];
+  /** HUMAN INVOLVEMENT (owner ruling 2026-07-26): the weight of the
+   *  decision to ENTER this state, 0.01 (mechanical) .. 1 (killer). The
+   *  agent may enter only when priority <= the session threshold; the
+   *  human always may. Required on every state. */
+  priority: number;
   /** v3 — THE STATE GATE: the LEGAL TOOLS while this state is active
    *  (legal STATES are the machine's edges — this is only about tools).
    *  ["all"] opens the whole lane. Enforced at dispatch, not advisory. */

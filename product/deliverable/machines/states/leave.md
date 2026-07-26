@@ -1,6 +1,7 @@
 ---
 state: leave
 state_kind: work
+priority: 0.75
 legal_tools: se_exp_close, se_exp_list
 guidance: Close with se_exp_close to merge back and remove the worktree (bootstrap behavior until iterations receive changes as design input) — or tick onward WITHOUT closing to leave the expedition open for later.
 ---
