@@ -68,8 +68,8 @@ test("a full read-edit-verify round trip over the wire, and every call logged", 
   const logPath = join(root, ".se", "calls.jsonl");
   assert.ok(existsSync(logPath));
   const lines = readFileSync(logPath, "utf8").trim().split("\n");
-  assert.equal(lines.length, 4); // se_boot + the three lane calls
-  const first = JSON.parse(lines[1]) as { tool: string; ok: boolean };
+  assert.equal(lines.length, 6); // 3 boot steps + the three lane calls
+  const first = JSON.parse(lines[3]) as { tool: string; ok: boolean };
   assert.equal(first.tool, "se_file_read");
   assert.equal(first.ok, true);
 });

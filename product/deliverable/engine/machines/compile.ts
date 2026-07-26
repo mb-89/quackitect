@@ -86,9 +86,13 @@ function evidenceForm(machineId: string, noteName: string, body: string): Eviden
     });
 }
 
-/** File refs resolve canvas-dir-relative first, then project-root-relative. */
-function resolveRef(root: string, canvasPath: string, ref: string): string {
+/** File refs are VAULT-RELATIVE (the Obsidian vault root is product/ —
+ *  owner fix 2026-07-26): "deliverable/machines/states/x.md". Canvas-dir-
+ *  relative and root-relative are accepted as fallbacks. */
+export function resolveRef(root: string, canvasPath: string, ref: string): string {
   if (isAbsolute(ref)) return ref;
+  const vault = join(resolve(root), "product", ref);
+  if (existsSync(vault)) return vault;
   const nearCanvas = join(dirname(canvasPath), ref);
   if (existsSync(nearCanvas)) return nearCanvas;
   return join(resolve(root), ref);
@@ -131,10 +135,10 @@ export function compileMachine(root: string, canvasPath: string): MachineDecl {
         id: subId,
         kind: "work",
         statement: `Run the ${subId} machine.`,
-        filled_by: "agent",
-        guidance: "The nested machine's states carry their own statements; browse down one level.",
+        guidance: "The nested machine's states carry their own guidance; the executor runs it.",
         evidence_form: [],
         submachine: ref,
+        legal_tools: ["se_boot"],
         edges: [],
       };
     } else if (ref.endsWith(".md")) {
@@ -219,17 +223,12 @@ function stateFromNote(machineId: string, ref: string, notePath: string): StateD
   if (kind === null) {
     throw new MachineCompileError(machineId, ref, `state_kind must be work | gate | terminal (got ${JSON.stringify(x.state_kind)})`);
   }
-  const filled = x.filled_by === "agent" || x.filled_by === "engine" ? x.filled_by : null;
-  if (filled === null) {
-    throw new MachineCompileError(machineId, ref, `filled_by must be agent | engine (got ${JSON.stringify(x.filled_by)})`);
-  }
-  if (filled === "engine" && (x.command === undefined || x.command === "")) {
-    throw new MachineCompileError(machineId, ref, "engine-filled states declare their command");
-  }
-  const legal =
-    x.legal === undefined || x.legal === ""
+  // AGENT-FACING lives in FRONTMATTER; the body is prose for humans (owner
+  // ruling 2026-07-26). guidance is a frontmatter field — short by design.
+  const legalTools =
+    x.legal_tools === undefined || x.legal_tools === ""
       ? undefined
-      : x.legal
+      : x.legal_tools
           .split(",")
           .map((t) => t.trim())
           .filter((t) => t !== "");
@@ -237,12 +236,10 @@ function stateFromNote(machineId: string, ref: string, notePath: string): StateD
     id: stateId,
     kind,
     statement: note.statement,
-    filled_by: filled,
-    ...(x.command !== undefined && x.command !== "" ? { command: x.command } : {}),
-    guidance: section(note.body, "Guidance"),
+    guidance: x.guidance ?? "",
     evidence_form: [...evidenceForm(machineId, ref, note.body), ...(kind === "gate" ? STANDARD_ROUNDS : [])],
     ...(x.submachine !== undefined && x.submachine !== "" ? { submachine: x.submachine } : {}),
-    ...(legal !== undefined ? { legal } : {}),
+    ...(legalTools !== undefined ? { legal_tools: legalTools } : {}),
     edges: [],
   };
 }

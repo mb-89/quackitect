@@ -25,10 +25,13 @@ export async function call(server: Server, name: string, args: Record<string, un
   return { isError: r.isError, body: JSON.parse(r.content[0].text) as Record<string, unknown> };
 }
 
-/** A server already booted into idle — the lane tests' starting point. */
+/** A server driven through the whole boot sequence into idle. */
 export async function bootedServer(root: string): Promise<Server> {
   const server = buildServer(root);
-  const boot = await call(server, "se_boot");
-  if (boot.isError) throw new Error(`boot failed: ${JSON.stringify(boot.body)}`);
-  return server;
+  for (let i = 0; i < 6; i++) {
+    const step = await call(server, "se_boot");
+    if (step.isError) throw new Error(`boot failed: ${JSON.stringify(step.body)}`);
+    if (step.body.booted === true) return server;
+  }
+  throw new Error("boot did not converge in 6 steps");
 }

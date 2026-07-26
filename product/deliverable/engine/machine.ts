@@ -34,7 +34,8 @@ export interface StateDecl {
   /** Diagram grouping, e.g. "boot" — presentation metadata, no run-time meaning. */
   group?: string;
   statement: string;
-  filled_by: "agent" | "engine";
+  /** Optional: a human might fill a state too (owner ruling — v3 drops the requirement). */
+  filled_by?: "agent" | "engine";
   /** Declared on the state, never invented at run time (engine-filled only). */
   command?: string;
   /** Pillar 1 — the method slice for this step, inlined. */
@@ -43,11 +44,10 @@ export interface StateDecl {
   evidence_form: EvidenceField[];
   /** A nested machine: a ledger machine id, or "iteration" — the iteration may provide its own. */
   submachine?: string;
-  /** v3 — THE STATE GATE: wire names legal while this state is active.
-   *  ["all"] opens the whole lane. Absent = nothing beyond the gate's
-   *  always-legal set. Enforced at dispatch, not advisory (the guard v2
-   *  declared as `legal[]` in packets but never wired). */
-  legal?: string[];
+  /** v3 — THE STATE GATE: the LEGAL TOOLS while this state is active
+   *  (legal STATES are the machine's edges — this is only about tools).
+   *  ["all"] opens the whole lane. Enforced at dispatch, not advisory. */
+  legal_tools?: string[];
   edges: EdgeDecl[];
 }
 

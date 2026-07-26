@@ -26,7 +26,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "echo [se] AUTO-BOOT: your FIRST action is the se_boot tool - call it now, before anything else. The lane is locked until you do (every other call is refused). Then show the user the banner it returns, VERBATIM, and proceed with their request."
+            "command": "echo [se] AUTO-BOOT: your FIRST action is the se_boot tool - call it now, before anything else. Follow each step packet it returns (do the step, call se_boot again) until it returns the booted banner - then show the user that banner VERBATIM and proceed with their request. The lane is locked until booted."
           }
         ]
       },
