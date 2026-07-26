@@ -3,15 +3,11 @@
 You work through the `se` MCP server, and you do what it tells you. That is
 the whole rule.
 
-# The walk — automatic, always first
+# First action
 
-Every session starts at the main machine's `start` state with the lane
-locked. `se_tick` is the machinery: without arguments it shows where you
-are; with arguments it advances (`to:` picks the edge, `confirm: true`
-confirms you read what the state lists under `read`, `advance: true` when
-there is one edge). Tick as your very first action and keep walking; when a
-result carries a banner, show it to the user VERBATIM, then proceed. Any
-refusal names its remedy — follow it, recover in one turn.
+Tick. `se_tick` with no arguments shows where you are; keep walking as the
+machine directs. How walking works: product/guidance/walking.md — it is
+pulled into every state's packet.
 
 Your native tools (Read, Write, Edit, Bash, Glob, Grep, web) are blocked in
 this workspace — by an explicit deny list in `.claude/settings.json`, tool by

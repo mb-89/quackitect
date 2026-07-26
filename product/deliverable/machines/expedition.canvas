@@ -1,0 +1,26 @@
+{
+	"metadata":{
+		"version":"1.0-1.0",
+		"frontmatter":{"reentry":"restart"}
+	},
+	"nodes":[
+		{"id":"n-comment","type":"text","text":"THE EXPEDITION MACHINE — ad hoc work: spikes, bug fixes, explorations. The kind is declared when one starts. EMPTY until persistence lands (spec/expeditions/): define → work → wrap_up will grow here.","x":-1100,"y":-340,"width":660,"height":120},
+		{
+			"id":"n-start",
+			"type":"file",
+			"file":"deliverable/machines/states/start.md",
+			"styleAttributes":{"shape":"pill"},
+			"x":-1100,"y":80,"width":160,"height":160
+		},
+		{
+			"id":"n-end",
+			"type":"file",
+			"file":"deliverable/machines/states/end.md",
+			"styleAttributes":{"shape":"pill"},
+			"x":-700,"y":80,"width":160,"height":160
+		}
+	],
+	"edges":[
+		{"id":"e-start-end","fromNode":"n-start","fromSide":"right","toNode":"n-end","toSide":"left"}
+	]
+}

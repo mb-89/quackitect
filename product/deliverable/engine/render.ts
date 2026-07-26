@@ -62,6 +62,15 @@ function machineSvg(canvas: CanvasData, activeIds: Set<string>, doneIds: Set<str
   const byId = new Map(nodes.map((n) => [n.id, n]));
   const parts: string[] = [];
 
+  // Groups first — presentation only, drawn behind everything.
+  for (const n of nodes) {
+    if (n.type !== "group") continue;
+    parts.push(`<rect x="${n.x}" y="${n.y}" width="${n.width}" height="${n.height}" rx="18" class="group"/>`);
+    if (n.label !== undefined && n.label !== "") {
+      parts.push(`<text x="${n.x + 20}" y="${n.y + 38}" class="group-label">${esc(n.label)}</text>`);
+    }
+  }
+
   for (const edge of canvas.edges ?? []) {
     const a = byId.get(edge.fromNode);
     const b = byId.get(edge.toNode);
@@ -170,6 +179,8 @@ const STYLE = `
   .arrowhead { fill: #5b6772; }
   .guard { fill: #e8b339; font-size: 20px; text-anchor: middle; }
   .comment { fill: #1c2025; stroke: #2a2f34; }
+  .group { fill: #1a1e22; stroke: #333a41; stroke-dasharray: 10 6; stroke-width: 2; }
+  .group-label { fill: #5b6772; font-size: 24px; font-family: inherit; letter-spacing: .06em; }
   .comment-text { color: #7f8b96; font-size: 13px; line-height: 1.35; }
   .comment-detail { font-size: 15px; line-height: 1.55; color: #d8dde2; padding: 2px 0 10px; }
   .bar { display: flex; gap: 10px; padding: 12px; }

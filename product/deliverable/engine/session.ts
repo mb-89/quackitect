@@ -506,10 +506,21 @@ export class Session {
     return info;
   }
 
-  /** A chosen way out must be one of the state's drawn edges. */
+  /** A chosen way out must be one of the state's drawn edges — and with
+   *  several ways forward the tick MUST choose (an unnamed advance would
+   *  fire every edge at once in the token model). */
   private assertEdge(m: MachineDecl, stateId: string, to?: string): void {
-    if (to === undefined) return;
     const s = this.state(m, stateId);
+    if (to === undefined) {
+      if (s.edges.length <= 1) return;
+      throw new Rejection({
+        clause: CLAUSES.NOT_LEGAL_IN_STATE,
+        expected: `a named way forward — ${stateId} has several: ${s.edges.map((e) => e.to).join(", ")}`,
+        got: "an unnamed advance",
+        remedy: { tool: "se_tick", args: { to: s.edges[0].to }, note: "pick the edge; se_tick without arguments shows each target's statement" },
+        source: "engine/session.ts tick",
+      });
+    }
     if (s.edges.some((e) => e.to === to)) return;
     throw new Rejection({
       clause: CLAUSES.NOT_LEGAL_IN_STATE,

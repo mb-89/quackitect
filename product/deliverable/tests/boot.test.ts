@@ -27,7 +27,7 @@ test("the boot sub-machine compiles with its own mechanical start/end", () => {
   assert.equal(m.initial, "start");
   assert.equal(m.states.find((s) => s.id === "end")!.kind, "end");
   const rc = m.states.find((s) => s.id === "read_contract")!;
-  assert.deepEqual(rc.exit, { read: ["workspace/AGENTS.md", "product/guidance/contract.md", "product/guidance/voice.md"] });
+  assert.deepEqual(rc.exit, { read: ["workspace/AGENTS.md", "product/guidance/contract.md", "product/guidance/voice.md", "product/guidance/walking.md"] });
 });
 
 test("at start every lane tool is refused with se_tick as the remedy", async () => {
@@ -53,7 +53,7 @@ test("the agent's ticks walk boot, gated by the read confirmation, banner on idl
   const at = await call(server, "se_tick");
   assert.deepEqual(at.body.active, ["boot/read_contract"]);
   const state = (at.body.states as { exit?: Record<string, { args: string[] }>; pulled?: { path: string; hash: string; sources: string[] }[] }[])[0];
-  assert.ok(state.exit !== undefined && state.exit.read.args.length === 3, "the exit dictionary rides the packet");
+  assert.ok(state.exit !== undefined && state.exit.read.args.length === 4, "the exit dictionary rides the packet");
   assert.ok(state.pulled !== undefined && state.pulled.length >= 2, "the pull rides the packet");
   assert.ok(state.pulled!.every((p) => p.hash.length === 12 || p.hash === ""), "pulled docs carry hashes");
   assert.ok(state.pulled!.some((p) => p.sources.includes("root")), "root guidance pulled always");
@@ -120,7 +120,16 @@ test("manual mode: tick info at start, ticks walk the whole machine to end", asy
   assert.deepEqual(s.active(), ["boot/end"]);
   s.tickAdvance(); // pop back to main: boot filled, idle
   assert.deepEqual(s.active(), ["idle"]);
-  s.tickAdvance(); // idle -> end
+  // idle is a hub now: an unnamed advance is refused, the tick must choose
+  assert.throws(() => s.tickAdvance(), (e) => (e as { clause?: string }).clause === "SE-C-110");
+  // a round trip through the (empty) expedition machine and back
+  s.tickAdvance("expedition");
+  assert.deepEqual(s.active(), ["expedition/start"]);
+  s.tickAdvance(); // start -> end (the machine is empty for now)
+  assert.deepEqual(s.active(), ["expedition/end"]);
+  s.tickAdvance(); // pop: expedition filled, back at idle
+  assert.deepEqual(s.active(), ["idle"]);
+  s.tickAdvance("end");
   assert.equal((s.describe() as { status: string }).status, "closed");
 });
 

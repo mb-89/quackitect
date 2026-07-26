@@ -4,33 +4,35 @@
 		"frontmatter":{"reentry":"restart"}
 	},
 	"nodes":[
+		{"id":"g-adhoc","type":"group","label":"ad hoc","x":-420,"y":-1020,"width":780,"height":800},
+		{"id":"g-planned","type":"group","label":"planned","x":-420,"y":560,"width":780,"height":800},
+		{"id":"n-comment","type":"text","text":"THE MAIN MACHINE — every session runs this. start/end are mechanical; boot is a sub-machine; idle is home. Above idle: the ad hoc group (expeditions). Below: the planned group (iterations). se_exit closes to end.","x":-1560,"y":-360,"width":700,"height":140},
 		{"id":"n-boot","type":"file","file":"deliverable/machines/boot.canvas","x":-1100,"y":-160,"width":620,"height":640},
 		{"id":"n-idle","type":"file","file":"deliverable/machines/states/idle.md","x":-340,"y":-160,"width":620,"height":640},
+		{"id":"n-expedition","type":"file","file":"deliverable/machines/expedition.canvas","x":-340,"y":-940,"width":620,"height":640},
+		{"id":"n-iteration","type":"file","file":"deliverable/machines/iteration.canvas","x":-340,"y":640,"width":620,"height":640},
 		{
 			"id":"n-end",
 			"type":"file",
 			"file":"deliverable/machines/states/end.md",
 			"styleAttributes":{"shape":"pill"},
-			"x":420,
-			"y":80,
-			"width":160,
-			"height":160
+			"x":420,"y":80,"width":160,"height":160
 		},
 		{
 			"id":"n-start",
 			"type":"file",
 			"file":"deliverable/machines/states/start.md",
 			"styleAttributes":{"shape":"pill"},
-			"x":-1400,
-			"y":80,
-			"width":160,
-			"height":160
-		},
-		{"id":"n-comment","type":"text","text":"THE MAIN MACHINE — every session runs this. start/end are mechanical (every machine has them); boot is a sub-machine (boot.canvas); idle is home — future work states branch from it; se_exit closes to end.","x":-760,"y":-400,"width":700,"height":140}
+			"x":-1400,"y":80,"width":160,"height":160
+		}
 	],
 	"edges":[
 		{"id":"e-start-boot","fromNode":"n-start","fromSide":"right","toNode":"n-boot","toSide":"left"},
 		{"id":"e-boot-idle","fromNode":"n-boot","fromSide":"right","toNode":"n-idle","toSide":"left"},
-		{"id":"e-idle-end","fromNode":"n-idle","fromSide":"right","toNode":"n-end","toSide":"left"}
+		{"id":"e-idle-end","fromNode":"n-idle","fromSide":"right","toNode":"n-end","toSide":"left"},
+		{"id":"e-idle-exp","fromNode":"n-idle","fromSide":"top","toNode":"n-expedition","toSide":"bottom"},
+		{"id":"e-exp-idle","fromNode":"n-expedition","fromSide":"bottom","toNode":"n-idle","toSide":"top","styleAttributes":{"role":"alternative"}},
+		{"id":"e-idle-iter","fromNode":"n-idle","fromSide":"bottom","toNode":"n-iteration","toSide":"top"},
+		{"id":"e-iter-idle","fromNode":"n-iteration","fromSide":"top","toNode":"n-idle","toSide":"bottom","styleAttributes":{"role":"alternative"}}
 	]
 }

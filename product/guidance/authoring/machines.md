@@ -46,6 +46,9 @@ END (that is its state-machine name), not "done".
   others: `alternative | fallback | recovery | approval | error`). The edge
   **label is the guard** (`<counter> <op> <int>`) — nothing else goes in a
   label. Always set `fromSide`/`toSide` so the drawing stays readable.
+- **Hub rule**: a state's inbound NORMAL edges form an AND-join — it waits
+  for all of them. RETURN edges to a hub (idle) must be `alternative`, or
+  the hub becomes unreachable. Found twice: v2's gate_inputs, v3's idle.
 - **Text nodes are comments** — annotate freely, the compiler skips them.
 - **Groups are geometric**: a state whose center sits inside a group
   rectangle carries its label. Presentation only.
