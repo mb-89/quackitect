@@ -1,17 +1,21 @@
 // The Mirror — v2's web-interface conventions, rebuilt for v3:
-//   - ONE machine on screen: the one the walk is in; breadcrumbs above it
-//   - geometry-true SVG from the canvas, zoomable (wheel) and pannable (drag)
-//   - click a state → its details in the details pane (never advances)
-//   - click the machine's comment → the machine's own details
+//   - ONE machine on screen; the VIEW is independent of the walk position:
+//     double-click a sub-machine state to enter it as a viewer, use the
+//     breadcrumbs to leave; the small › arrows list the sub-machines
+//     selectable at that level (v2 style)
+//   - sub-machine states are drawn with a DOUBLE border
+//   - click a state → its details in the details pane (never advances);
+//     click the machine's comment → the comment, readable, plus the
+//     machine's details
 //   - every widget has an expand button: click = fullscreen,
-//     ctrl-click = open in a new tab, shift-click = open in a new window
-//   - the details pane is the bottom half of the resizable right sidebar
-//   - JSON rendered as nested key/value tables, not a <pre> dump
+//     ctrl-click = new tab, shift-click = new window
+//   - the details pane is fixed at half the sidebar; the sidebar resizes
+//   - geometry-true SVG, wheel-zoom, drag-pan; JSON as key/value tables
 // One source, two projections: the packet JSON shown here IS what the
 // agent receives.
 import { loadCanvas, type CanvasData, type CanvasElement } from "./canvas.ts";
 import { mainMachinePath, Session } from "./session.ts";
-import { resolveRef } from "./machines/compile.ts";
+import { compileMachine, resolveRef } from "./machines/compile.ts";
 import { type MachineDecl } from "./machine.ts";
 
 function esc(s: string): string {
@@ -41,7 +45,7 @@ function sidePoint(el: CanvasElement, side: string | undefined, other: CanvasEle
   }
 }
 
-function machineSvg(canvas: CanvasData, activeIds: Set<string>, doneIds: Set<string>): { svg: string; viewBox: string } {
+function machineSvg(canvas: CanvasData, activeIds: Set<string>, doneIds: Set<string>, subIds: Set<string>): string {
   const nodes = canvas.nodes ?? [];
   const pad = 60;
   const minX = Math.min(...nodes.map((n) => n.x)) - pad;
@@ -65,25 +69,28 @@ function machineSvg(canvas: CanvasData, activeIds: Set<string>, doneIds: Set<str
 
   for (const n of nodes) {
     if (n.type === "text") {
-      parts.push(`<g class="clickable" data-detail="machine"><rect x="${n.x}" y="${n.y}" width="${n.width}" height="${n.height}" class="comment"/>`);
+      parts.push(`<g class="clickable" data-detail="comment"><rect x="${n.x}" y="${n.y}" width="${n.width}" height="${n.height}" class="comment"/>`);
       parts.push(`<foreignObject x="${n.x + 10}" y="${n.y + 6}" width="${n.width - 20}" height="${n.height - 12}"><div xmlns="http://www.w3.org/1999/xhtml" class="comment-text">${esc(n.text ?? "")}</div></foreignObject></g>`);
       continue;
     }
     const sid = stateIdOf(n);
     if (sid === undefined) continue;
+    const isSub = subIds.has(sid);
     const pill = (n as { styleAttributes?: { shape?: string } }).styleAttributes?.shape === "pill";
     const cls = activeIds.has(sid) ? "state active" : doneIds.has(sid) ? "state done" : "state";
     const rx = pill ? Math.min(n.width, n.height) / 2 : 14;
-    parts.push(`<g class="clickable" data-detail="state:${esc(sid)}"><rect x="${n.x}" y="${n.y}" width="${n.width}" height="${n.height}" rx="${rx}" class="${cls}"/>`);
+    parts.push(`<g class="clickable" data-detail="state:${esc(sid)}"${isSub ? ` data-sub="${esc(sid)}"` : ""}>`);
+    parts.push(`<rect x="${n.x}" y="${n.y}" width="${n.width}" height="${n.height}" rx="${rx}" class="${cls}"/>`);
+    if (isSub) {
+      // Sub-machine states carry a DOUBLE border.
+      parts.push(`<rect x="${n.x + 8}" y="${n.y + 8}" width="${n.width - 16}" height="${n.height - 16}" rx="${Math.max(4, rx - 8)}" class="${cls} inner"/>`);
+    }
     parts.push(`<text x="${n.x + n.width / 2}" y="${n.y + n.height / 2 + 6}" class="label">${esc(sid)}</text></g>`);
   }
 
-  return {
-    viewBox: `${minX} ${minY} ${maxX - minX} ${maxY - minY}`,
-    svg: `<svg id="machine-svg" viewBox="${minX} ${minY} ${maxX - minX} ${maxY - minY}">
+  return `<svg id="machine-svg" viewBox="${minX} ${minY} ${maxX - minX} ${maxY - minY}">
   <defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" class="arrowhead"/></marker></defs>
-  ${parts.join("\n  ")}</svg>`,
-  };
+  ${parts.join("\n  ")}</svg>`;
 }
 
 export interface MirrorState {
@@ -93,35 +100,16 @@ export interface MirrorState {
   mode: "manual" | "agent";
 }
 
-function machineData(m: MirrorState): Record<string, unknown> {
-  const decl: MachineDecl = m.session.currentMachine();
-  const info = m.session.describe() as Record<string, unknown>;
-  const states: Record<string, unknown> = {};
-  for (const s of decl.states) {
-    states[s.id] = {
-      id: s.id,
-      kind: s.kind,
-      statement: s.statement,
-      guidance: s.guidance,
-      legal_tools: s.legal_tools ?? [],
-      ...(s.submachine !== undefined ? { submachine: s.submachine } : {}),
-      next: s.edges.map((e) => ({ to: e.to, role: e.role, ...(e.guard !== undefined ? { guard: e.guard } : {}) })),
-    };
+/** Resolve a viewable machine by id: main itself, or one of its subs. */
+function viewedMachine(m: MirrorState, view: string | undefined): { decl: MachineDecl; canvas: CanvasData } {
+  const mainPath = mainMachinePath(m.root);
+  if (view === undefined || view === m.session.machine.id) {
+    return { decl: m.session.machine, canvas: loadCanvas(mainPath) };
   }
-  return {
-    breadcrumb: m.session.breadcrumb(),
-    describe: info,
-    packet: m.session.tickInfo(),
-    lastPacket: m.lastPacket ?? null,
-    states,
-    machine: {
-      id: decl.id,
-      reentry: decl.reentry,
-      initial: decl.initial,
-      states: decl.states.map((s) => s.id),
-    },
-    history: (m.session.instance.history ?? []).slice(-20),
-  };
+  const subState = m.session.machine.states.find((s) => s.submachine !== undefined && s.id === view);
+  if (subState === undefined) return { decl: m.session.machine, canvas: loadCanvas(mainPath) };
+  const path = resolveRef(m.root, mainPath, subState.submachine!);
+  return { decl: compileMachine(m.root, path), canvas: loadCanvas(path) };
 }
 
 const STYLE = `
@@ -133,10 +121,16 @@ const STYLE = `
   main { flex: 1; min-width: 0; display: flex; flex-direction: column; padding: 14px 18px; }
   #divider { width: 6px; cursor: col-resize; background: #2a2f34; }
   aside { width: 620px; min-width: 320px; max-width: 80vw; display: flex; flex-direction: column; background: #191d21; }
-  h1 { font-size: 15px; margin: 0 0 10px; color: #e8b339; }
-  .crumbs { font-size: 14px; margin-bottom: 10px; color: #7f8b96; }
-  .crumbs b { color: #d8dde2; }
+  .crumbs { font-size: 14px; margin-bottom: 10px; color: #7f8b96; display: flex; align-items: center; gap: 4px; }
+  .crumbs a { color: #d8dde2; text-decoration: none; }
+  .crumbs a:hover { color: #e8b339; }
   .crumbs .here { color: #e8b339; }
+  .crumb-arrow { position: relative; cursor: pointer; color: #7f8b96; padding: 0 3px; }
+  .crumb-arrow:hover { color: #e8b339; }
+  .crumb-menu { display: none; position: absolute; top: 18px; left: 0; z-index: 10; background: #22272c; border: 1px solid #3a4147; border-radius: 8px; min-width: 160px; padding: 4px; }
+  .crumb-arrow.open .crumb-menu { display: block; }
+  .crumb-menu a { display: block; padding: 6px 10px; border-radius: 6px; }
+  .crumb-menu a:hover { background: #2a3138; }
   .widget { display: flex; flex-direction: column; border: 1px solid #2a2f34; border-radius: 10px; background: #191d21; min-height: 0; }
   .widget-head { display: flex; align-items: center; justify-content: space-between; padding: 6px 12px; border-bottom: 1px solid #2a2f34; color: #7f8b96; font-size: 12px; text-transform: uppercase; letter-spacing: .08em; }
   .widget-body { flex: 1; min-height: 0; overflow: auto; }
@@ -149,6 +143,7 @@ const STYLE = `
   .state { fill: #22272c; stroke: #4a545e; stroke-width: 2; }
   .state.active { fill: #3a2f14; stroke: #e8b339; stroke-width: 3.5; }
   .state.done { fill: #1d2b20; stroke: #4a7a55; }
+  .state.inner { fill: none; }
   .clickable { cursor: pointer; }
   .clickable:hover .state, .clickable:hover .comment { stroke: #8fa0b0; }
   .label { fill: #d8dde2; font-size: 26px; text-anchor: middle; font-family: inherit; pointer-events: none; }
@@ -157,24 +152,24 @@ const STYLE = `
   .guard { fill: #e8b339; font-size: 20px; text-anchor: middle; }
   .comment { fill: #1c2025; stroke: #2a2f34; }
   .comment-text { color: #7f8b96; font-size: 13px; line-height: 1.35; }
+  .comment-detail { font-size: 15px; line-height: 1.55; color: #d8dde2; padding: 2px 0 10px; }
   .bar { display: flex; gap: 10px; padding: 12px; }
   button.primary { background: #e8b339; color: #14171a; border: 0; border-radius: 8px; padding: 10px 18px; font: inherit; font-weight: 700; cursor: pointer; }
   .panel { padding: 0 12px 12px; overflow: auto; }
-  .meta { color: #7f8b96; font-size: 12px; padding: 0 12px 8px; }
+  .meta { color: #7f8b96; font-size: 12px; padding: 8px 12px; }
   table.kv { border-collapse: collapse; width: 100%; font-size: 12.5px; }
   table.kv td { border: 1px solid #2a2f34; padding: 4px 8px; vertical-align: top; }
   table.kv td.k { color: #e8b339; white-space: nowrap; width: 1%; }
   table.kv td.v { color: #d8dde2; word-break: break-word; }
   table.kv table.kv { margin: 2px 0; }
   .vnull { color: #7f8b96; } .vnum { color: #7cc4e8; } .vbool { color: #c58fe8; } .vstr { color: #a8c88f; }
-  #w-walk { flex: 0 0 auto; max-height: 50%; border-radius: 0; border-left: 0; border-right: 0; border-top: 0; }
-  #w-details { flex: 1; border-radius: 0; border: 0; }
+  #w-walk { flex: 1 1 50%; border-radius: 0; border-left: 0; border-right: 0; border-top: 0; min-height: 0; }
+  #w-details { flex: 0 0 50%; border-radius: 0; border: 0; border-top: 1px solid #2a2f34; }
 `;
 
 const SCRIPT = `
 const D = window.SE_DATA;
 
-// ── JSON → nested key/value tables ──
 function jsonTable(v) {
   if (v === null || v === undefined) return '<span class="vnull">null</span>';
   if (typeof v === "number") return '<span class="vnum">' + v + "</span>";
@@ -189,22 +184,31 @@ function jsonTable(v) {
   return '<table class="kv">' + keys.map((k) => '<tr><td class="k">' + k + '</td><td class="v">' + jsonTable(v[k]) + "</td></tr>").join("") + "</table>";
 }
 
-// ── details pane ──
-function showDetails(title, obj) {
+function showDetails(title, html) {
   const el = document.getElementById("details");
-  if (el) { document.getElementById("details-title").textContent = title; el.innerHTML = jsonTable(obj); }
+  if (el) { document.getElementById("details-title").textContent = title; el.innerHTML = html; }
 }
 function detailFor(key) {
-  if (key === "machine") return ["machine: " + D.machine.id, D.machine];
-  if (key.startsWith("state:")) { const id = key.slice(6); return ["state: " + id, D.states[id] ?? {}]; }
-  return [key, {}];
+  if (key === "comment") {
+    const txt = (D.comment || "").replace(/&/g,"&amp;").replace(/</g,"&lt;");
+    return ["machine: " + D.viewed.id, '<div class="comment-detail">' + txt + "</div>" + jsonTable(D.viewed)];
+  }
+  if (key.startsWith("state:")) { const id = key.slice(6); return ["state: " + id, jsonTable(D.states[id] ?? {})]; }
+  return [key, jsonTable({})];
 }
 document.addEventListener("click", (ev) => {
+  const arrow = ev.target.closest ? ev.target.closest(".crumb-arrow") : null;
+  document.querySelectorAll(".crumb-arrow.open").forEach((a) => { if (a !== arrow) a.classList.remove("open"); });
+  if (arrow) { arrow.classList.toggle("open"); return; }
   const g = ev.target.closest ? ev.target.closest(".clickable") : null;
-  if (g && g.dataset.detail) { const [t, o] = detailFor(g.dataset.detail); showDetails(t, o); }
+  if (g && g.dataset.detail) { const [t, h] = detailFor(g.dataset.detail); showDetails(t, h); }
+});
+// Double-click a sub-machine state: enter it as a VIEWER (walk unmoved).
+document.addEventListener("dblclick", (ev) => {
+  const g = ev.target.closest ? ev.target.closest(".clickable") : null;
+  if (g && g.dataset.sub) location.href = "/?view=" + encodeURIComponent(g.dataset.sub);
 });
 
-// ── widget expand: click = fullscreen, ctrl = new tab, shift = new window ──
 document.querySelectorAll(".expand").forEach((btn) => {
   btn.addEventListener("click", (ev) => {
     ev.stopPropagation();
@@ -216,7 +220,6 @@ document.querySelectorAll(".expand").forEach((btn) => {
   });
 });
 
-// ── svg zoom (wheel) + pan (drag) ──
 const svg = document.getElementById("machine-svg");
 if (svg) {
   let vb = svg.viewBox.baseVal;
@@ -240,7 +243,6 @@ if (svg) {
   window.addEventListener("mouseup", () => { panning = null; svg.classList.remove("panning"); });
 }
 
-// ── sidebar resize ──
 const divider = document.getElementById("divider");
 const aside = document.getElementById("sidebar");
 if (divider && aside) {
@@ -250,46 +252,80 @@ if (divider && aside) {
   window.addEventListener("mouseup", () => { drag = null; });
 }
 
-// ── tick · advance ──
 const adv = document.getElementById("advance");
-if (adv) adv.addEventListener("click", async () => { await fetch("/tick", { method: "POST" }); location.reload(); });
+if (adv) adv.addEventListener("click", async () => { await fetch("/tick", { method: "POST" }); location.href = "/"; });
 
-// default details: the current state
+const hist = document.getElementById("walk-history");
+if (hist) hist.innerHTML = jsonTable(D.history);
+
 const cur = (D.describe.active && D.describe.active[0]) ? D.describe.active[0].split("/").pop() : null;
-if (cur && D.states[cur]) showDetails("state: " + cur, D.states[cur]);
+if (cur && D.states[cur]) showDetails("state: " + cur, jsonTable(D.states[cur]));
 `;
 
 function widgetHead(title: string, widgetId: string, url: string): string {
   return `<div class="widget-head"><span>${esc(title)}</span><button class="expand" data-widget="${widgetId}" data-url="${esc(url)}" title="expand · ctrl-click: new tab · shift-click: new window">⛶</button></div>`;
 }
 
-export function renderMirror(m: MirrorState, widget?: "machine" | "details"): string {
+export function renderMirror(m: MirrorState, widget?: "machine" | "details", view?: string): string {
   const info = m.session.describe() as { active: string[]; status: string };
-  const decl = m.session.currentMachine();
-  const canvasPath =
-    decl.id === m.session.machine.id
-      ? mainMachinePath(m.root)
-      : resolveRef(m.root, mainMachinePath(m.root), m.session.machine.states.find((s) => s.submachine !== undefined && s.id === m.session.breadcrumb()[1])?.submachine ?? `deliverable/machines/${decl.id}.canvas`);
-  const canvas = loadCanvas(canvasPath);
-  const leafActive = new Set(info.active.map((a) => a.split("/").pop()!));
+  const walkMachine = m.session.currentMachine();
+  const { decl, canvas } = viewedMachine(m, view ?? walkMachine.id);
+  const viewingWalk = decl.id === walkMachine.id;
+
+  // Highlights follow the WALK; the view may be elsewhere.
+  const leafActive = viewingWalk ? new Set(info.active.map((a) => a.split("/").pop()!)) : new Set<string>();
+  if (!viewingWalk && decl.id === m.session.machine.id) {
+    // Viewing main while the walk is inside a sub: the sub state is the live one.
+    leafActive.add(m.session.breadcrumb()[1]);
+  }
+  const history = m.session.instance.history ?? [];
   const done = new Set(
-    (m.session.instance.history ?? [])
+    history
       .map((h) => h.state)
       .filter((s) => (decl.id === m.session.machine.id ? !s.includes("/") : s.startsWith(`${decl.id}/`)))
       .map((s) => s.split("/").pop()!),
   );
-  const { svg } = machineSvg(canvas, leafActive, done);
-  const crumbs = m.session
-    .breadcrumb()
-    .map((c, i, arr) => (i === arr.length - 1 ? `<b class="here">${esc(c)}</b>` : `<b>${esc(c)}</b>`))
-    .join(" › ");
-  const data = `<script>window.SE_DATA = ${JSON.stringify(machineData(m)).replace(/</g, "\\u003c")};</script>`;
+  const subIds = new Set(decl.states.filter((s) => s.submachine !== undefined).map((s) => s.id));
+  const svg = machineSvg(canvas, leafActive, done, subIds);
 
-  const machineWidget = `<div class="widget" id="w-machine">${widgetHead(`machine · ${decl.id}`, "w-machine", "/widget/machine")}<div class="widget-body">${svg}</div></div>`;
+  // Breadcrumbs describe the VIEW: main [›subs] [ › sub [›its subs] ].
+  const mainSubs = m.session.machine.states.filter((s) => s.submachine !== undefined).map((s) => s.id);
+  const crumbArrow = (subs: string[]): string =>
+    subs.length === 0
+      ? ""
+      : `<span class="crumb-arrow">›<span class="crumb-menu">${subs.map((s) => `<a href="/?view=${encodeURIComponent(s)}">${esc(s)}</a>`).join("")}</span></span>`;
+  let crumbs =
+    decl.id === m.session.machine.id
+      ? `<b class="here">${esc(m.session.machine.id)}</b>${crumbArrow(mainSubs)}`
+      : `<a href="/?view=${encodeURIComponent(m.session.machine.id)}">${esc(m.session.machine.id)}</a>${crumbArrow(mainSubs)}<b class="here">${esc(decl.id)}</b>${crumbArrow(decl.states.filter((s) => s.submachine !== undefined).map((s) => s.id))}`;
+
+  const states: Record<string, unknown> = {};
+  for (const s of decl.states) {
+    states[s.id] = {
+      id: s.id,
+      kind: s.kind,
+      statement: s.statement,
+      guidance: s.guidance,
+      legal_tools: s.legal_tools ?? [],
+      ...(s.submachine !== undefined ? { submachine: s.submachine } : {}),
+      next: s.edges.map((e) => ({ to: e.to, role: e.role, ...(e.guard !== undefined ? { guard: e.guard } : {}) })),
+    };
+  }
+  const comment = (canvas.nodes ?? []).find((n) => n.type === "text")?.text ?? "";
+  const data = `<script>window.SE_DATA = ${JSON.stringify({
+    describe: m.session.describe(),
+    packet: m.session.tickInfo(),
+    lastPacket: m.lastPacket ?? null,
+    states,
+    comment,
+    viewed: { id: decl.id, reentry: decl.reentry, initial: decl.initial, states: decl.states.map((s) => s.id) },
+    history: history.slice(-20),
+  }).replace(/</g, "\\u003c")};</script>`;
+
+  const machineWidget = `<div class="widget" id="w-machine">${widgetHead(`machine · ${decl.id}`, "w-machine", `/widget/machine?view=${encodeURIComponent(decl.id)}`)}<div class="widget-body">${svg}</div></div>`;
   const walkWidget = `<div class="widget" id="w-walk">${widgetHead("walk", "w-walk", "/")}
     <div class="bar"><button class="primary" id="advance" title="tick with arguments: complete the current state and move on">tick · advance</button>${info.status === "closed" ? '<span style="align-self:center;color:#e86a5f">machine closed</span>' : ""}</div>
     <div class="panel" id="walk-history"></div>
-    <script>document.addEventListener("DOMContentLoaded",()=>{document.getElementById("walk-history").innerHTML = jsonTable(window.SE_DATA.history);});</script>
   </div>`;
   const detailsWidget = `<div class="widget" id="w-details">${widgetHead("details", "w-details", "/widget/details")}
     <div class="meta" id="details-title">—</div>

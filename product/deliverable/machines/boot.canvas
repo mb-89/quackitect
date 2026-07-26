@@ -4,7 +4,6 @@
 		"frontmatter":{"reentry":"restart"}
 	},
 	"nodes":[
-		{"id":"n-comment","type":"text","text":"THE BOOT SUB-MACHINE — driven one step per tick: read the contract, run the preflight. start/end are the mechanical entry and close, like in every machine. Nested under the main machine's boot state.","x":-1560,"y":-340,"width":660,"height":120},
 		{
 			"id":"n-start",
 			"type":"file",
@@ -26,7 +25,8 @@
 			"y":80,
 			"width":160,
 			"height":160
-		}
+		},
+		{"id":"n-comment","type":"text","text":"THE BOOT SUB-MACHINE — driven one step per tick: read the contract, run the preflight. start/end are the mechanical entry and close, like in every machine. Nested under the main machine's boot state.","x":-720,"y":-360,"width":660,"height":120}
 	],
 	"edges":[
 		{"id":"e-start-read","fromNode":"n-start","fromSide":"right","toNode":"n-read-contract","toSide":"left"},

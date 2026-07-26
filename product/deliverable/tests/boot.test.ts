@@ -132,3 +132,19 @@ test("the mirror renders ONLY the current machine, with breadcrumbs", async () =
   assert.ok(html.includes("data-detail=\"state:read_contract\""), "states are clickable for details");
   assert.ok(html.includes("class=\"expand\""), "widgets carry expand buttons");
 });
+
+test("the view is independent of the walk: browse boot while standing at main/start", async () => {
+  const { Session } = await import("../engine/session.ts");
+  const { renderMirror } = await import("../engine/render.ts");
+  const root = freshRoot();
+  const s = new Session(root); // walk at main/start
+  const html = renderMirror({ session: s, root, lastPacket: undefined, mode: "manual" }, undefined, "boot");
+  assert.ok(html.includes(`>read_contract</text>`), "viewer entered boot");
+  assert.ok(!html.includes("state active"), "no live highlight — the walk is not here");
+  assert.ok(html.includes(`href="/?view=main"`), "breadcrumb navigates back out");
+  // and on main, the sub state is drawn with a double border + crumb menu lists it
+  const main = renderMirror({ session: s, root, lastPacket: undefined, mode: "manual" });
+  assert.ok(main.includes(`data-sub="boot"`), "sub-machine state is double-click enterable");
+  assert.ok(main.includes("state inner"), "double border drawn");
+  assert.ok(main.includes("crumb-menu"), "breadcrumb arrow lists selectable sub-machines");
+});

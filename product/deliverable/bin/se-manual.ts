@@ -69,13 +69,14 @@ const server = createServer((req, res) => {
     }
     if (url.pathname === "/widget/machine" || url.pathname === "/widget/details") {
       res.writeHead(200, { "content-type": "text/html; charset=utf-8" });
-      res.end(renderMirror(state, url.pathname === "/widget/machine" ? "machine" : "details"));
+      res.end(renderMirror(state, url.pathname === "/widget/machine" ? "machine" : "details", url.searchParams.get("view") ?? undefined));
       return;
     }
     // GET / — tick without arguments: information about where we are.
+    // ?view=<machine> browses a machine without moving the walk.
     state.lastPacket = state.session.tickInfo();
     res.writeHead(200, { "content-type": "text/html; charset=utf-8" });
-    res.end(renderMirror(state));
+    res.end(renderMirror(state, undefined, url.searchParams.get("view") ?? undefined));
   } catch (e) {
     res.writeHead(500, { "content-type": "text/plain; charset=utf-8" });
     res.end(String((e as Error).stack ?? e));

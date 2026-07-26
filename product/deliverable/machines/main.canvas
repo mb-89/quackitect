@@ -4,7 +4,6 @@
 		"frontmatter":{"reentry":"restart"}
 	},
 	"nodes":[
-		{"id":"n-comment","type":"text","text":"THE MAIN MACHINE — every session runs this. start/end are mechanical (every machine has them); boot is a sub-machine (boot.canvas); idle is home — future work states branch from it; se_exit closes to end.","x":-1560,"y":-360,"width":700,"height":140},
 		{"id":"n-boot","type":"file","file":"deliverable/machines/boot.canvas","x":-1100,"y":-160,"width":620,"height":640},
 		{"id":"n-idle","type":"file","file":"deliverable/machines/states/idle.md","x":-340,"y":-160,"width":620,"height":640},
 		{
@@ -26,7 +25,8 @@
 			"y":80,
 			"width":160,
 			"height":160
-		}
+		},
+		{"id":"n-comment","type":"text","text":"THE MAIN MACHINE — every session runs this. start/end are mechanical (every machine has them); boot is a sub-machine (boot.canvas); idle is home — future work states branch from it; se_exit closes to end.","x":-760,"y":-400,"width":700,"height":140}
 	],
 	"edges":[
 		{"id":"e-start-boot","fromNode":"n-start","fromSide":"right","toNode":"n-boot","toSide":"left"},
