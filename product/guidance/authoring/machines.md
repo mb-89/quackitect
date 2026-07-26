@@ -92,9 +92,18 @@ defined by its note in `deliverable/machines/conditions/<type>.md` — the
 compiler refuses a type without a note and an engine evaluator, and refuses
 a nested `entry:`/`exit:` dictionary (Obsidian renders those as JSON
 blobs). All of a state's conditions must hold (SCXML: the edge's effective
-cond is exit of its source AND entry of its target). Types today: `read` (args: documents whose confirmed reading
-is the evidence) and `script` (args: scripts the engine runs; exit 0 is the
-evidence — the STATE names what runs, e.g. boot's preflight script).
+cond is exit of its source AND entry of its target). Types today: `read`
+(args: documents whose PROVEN reading is the evidence — the agent sends
+each doc's current hash on the tick, the human checks each doc once per
+version in the mirror; see the condition note) and `script` (args: scripts
+the engine runs; exit 0 is the evidence — the STATE names what runs, e.g.
+boot's preflight and selftest scripts).
+
+THE PULL GATES ENTRY (owner ruling 2026-07-26): outside boot, entering a
+state also demands its pulled guidance proven read, the same way — hashes
+from the agent, checks from the human. Boot is exempt (it is where the
+first reads happen); a state's own `exit_read` list is excluded from its
+entry demand (that is the state's assignment, read inside it).
 
 ## Priority — the human-involvement scale
 

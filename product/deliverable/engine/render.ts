@@ -208,6 +208,7 @@ const STYLE = `
   .docview a { color: #7cc4e8; }
   button.ghost { background: #22272c; color: #d8dde2; border: 1px solid #4a545e; border-radius: 8px; padding: 6px 12px; font: inherit; cursor: pointer; }
   #w-details { flex: 1; border-radius: 0; border: 0; }
+  .docheck { accent-color: #e8b339; cursor: pointer; }
   .threshold { display: flex; align-items: center; gap: 8px; color: #7f8b96; font-size: 12px; text-transform: none; letter-spacing: 0; }
   .threshold input { accent-color: #e8b339; width: 140px; }
   #thr-val { color: #e8b339; min-width: 4ch; }
@@ -259,14 +260,20 @@ function nextTable(id, s) {
     return '<tr><td class="k">' + i + '</td><td class="v">' + inner + '</td>' + (here ? '<td class="btncell">' + btn + "</td>" : "") + "</tr>";
   }).join("") + "</table>";
 }
+function docRow(p) {
+  // One doc, one row: the human's proof-of-read checkbox (one per VERSION
+  // - an edited doc unchecks itself) plus the readable link.
+  const box = '<input type="checkbox" class="docheck" data-path="' + p.path + '" title="' + (p.checked ? "read (this version)" : "check = I read this version") + '"' + (p.checked ? " checked disabled" : "") + ">";
+  return '<div style="padding:2px 0 2px 14px">' + box + ' <a class="doclink" data-path="' + p.path + '">' + p.path + "</a></div>";
+}
 function pulledView(pulled) {
   const bySource = {};
-  for (const p of pulled) for (const src of p.sources) (bySource[src] ??= []).push(p.path);
-  return Object.entries(bySource).map(([srcName, paths]) =>
-    '<details><summary style="cursor:pointer;color:#7f8b96">' + srcName + " (" + paths.length + ")</summary>" +
-    paths.map((p) => '<div style="padding:2px 0 2px 14px"><a class="doclink" data-path="' + p + '">' + p + "</a></div>").join("") +
-    "</details>"
-  ).join("");
+  for (const p of pulled) for (const src of p.sources) (bySource[src] ??= []).push(p);
+  return Object.entries(bySource).map(([srcName, docs]) => {
+    const done = docs.filter((d) => d.checked).length;
+    return '<details><summary style="cursor:pointer;color:#7f8b96">' + srcName + " (" + done + "/" + docs.length + " read)</summary>" +
+      docs.map(docRow).join("") + "</details>";
+  }).join("");
 }
 function stateDetail(id) {
   const s = D.states[id] ?? {};
@@ -290,8 +297,8 @@ function stateDetail(id) {
   return html;
 }
 document.addEventListener("click", async (ev) => {
-  const c = ev.target.closest ? ev.target.closest(".confirm") : null;
-  if (c) { await fetch("/evidence", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ state: c.dataset.state || CURRENT }) }); location.href = "/"; return; }
+  const c = ev.target.closest ? ev.target.closest(".docheck") : null;
+  if (c) { if (c.disabled) return; ev.preventDefault(); await fetch("/check", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ path: c.dataset.path }) }); location.href = "/"; return; }
   const j = ev.target.closest ? ev.target.closest(".jump") : null;
   if (j) { await fetch("/tick", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ back: j.dataset.state }) }); location.href = "/"; return; }
   const rp = ev.target.closest ? ev.target.closest(".runpre") : null;
@@ -306,16 +313,21 @@ function condRows(id, dict, standing) {
     let row = '<div style="padding:6px 0 2px"><a class="doclink" data-path="' + c.note + '">' + key + "</a> ";
     row += c.met ? '<span style="color:#4a7a55">✓ met</span>' : '<span style="color:#e8b339">! unmet</span>';
     row += "</div>";
-    if (c.args.length > 0) row += jsonTable(c.args);
     if (key === "script") {
+      if (c.args.length > 0) row += jsonTable(c.args);
       const s = D.states[id] ?? {};
       const sc = s.script || { ran: false, ok: false, output: "" };
       row += '<div style="padding:6px 0"><button ' + (standing ? 'class="primary runpre" data-state="' + id + '"' : 'class="primary go locked" disabled title="enter the state to run the script"') + ">" + (sc.ran ? "re-run" : "run") + "</button></div>";
       if (sc.ran) row += '<div style="color:' + (sc.ok ? "#4a7a55" : "#e86a5f") + ';white-space:pre-wrap;font-size:12px">' + sc.output.replace(/&/g,"&amp;").replace(/</g,"&lt;") + "</div>";
       else row += '<div style="color:#7f8b96">not run yet</div>';
-    }
-    if (key === "read" && !c.met) {
-      row += '<div style="padding:6px 0"><button ' + (standing ? 'class="primary confirm" data-state="' + id + '" title="the confirmation is logged as evidence"' : 'class="primary go locked" disabled title="enter the state to confirm"') + ">confirm</button></div>";
+    } else if (key === "read") {
+      // One checkbox per doc — the human's proof, once per version. (The
+      // agent proves the same docs by sending hashes on its tick.)
+      const s = D.states[id] ?? {};
+      const pulled = s.pulled || [];
+      row += c.args.map((p) => docRow(pulled.find((d) => d.path === p) || { path: p, checked: false })).join("");
+    } else if (c.args.length > 0) {
+      row += jsonTable(c.args);
     }
     return row;
   }).join("");
@@ -536,7 +548,9 @@ export function renderMirror(m: MirrorState, widget?: "machine" | "details", vie
           role: e.role,
           ...(e.guard !== undefined ? { guard: e.guard } : {}),
           ...(t !== undefined ? { kind: t.kind, statement: t.statement, priority: t.priority } : {}),
-          enter_met: t === undefined ? true : m.session.conditionMet(decl, t, "enter"),
+          // The human's ▶ lock: explicit entry conditions AND the pull —
+          // every doc entering demands, checked at its current version.
+          enter_met: t === undefined ? true : m.session.entryReadyHuman(decl, t),
         };
       }),
     };

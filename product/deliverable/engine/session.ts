@@ -16,7 +16,9 @@
 //
 // State is in-memory: a server restart mid-session drops back to start, and
 // the next refused call's remedy re-boots the agent in one turn.
+import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
+import { contentHash } from "./hash.ts";
 import { CLAUSES, Rejection } from "./errors.ts";
 import {
   activeStates,
@@ -285,10 +287,15 @@ export class Session {
     return `${m.id}/${stateId}`;
   }
 
-  /** One condition key of a state's entry/exit dictionary. */
-  conditionKeyMet(m: MachineDecl, s: StateDecl, key: string): boolean {
+  /** One condition key of a state's entry/exit dictionary. For `read` this
+   *  is the HUMAN ledger's verdict (the mirror's truth): the agent's proof
+   *  is per-tick hashes and never stored, so it has no standing status. */
+  conditionKeyMet(m: MachineDecl, s: StateDecl, key: string, which: "enter" | "leave"): boolean {
+    if (key === "read") {
+      const docs = (which === "leave" ? s.exit : s.entry)?.read ?? [];
+      return docs.every((p) => this.readProven("human", p, {}));
+    }
     const ev = this.evidence.get(this.evidenceKey(m, s.id));
-    if (key === "read") return ev?.read_confirmed === true;
     if (key === "script") return (ev?.script_result as { ok?: boolean } | undefined)?.ok === true;
     return false;
   }
@@ -334,7 +341,7 @@ export class Session {
   conditionMet(m: MachineDecl, s: StateDecl, which: "enter" | "leave"): boolean {
     const dict = which === "leave" ? s.exit : s.entry;
     if (dict === undefined) return true;
-    return Object.keys(dict).every((k) => this.conditionKeyMet(m, s, k));
+    return Object.keys(dict).every((k) => this.conditionKeyMet(m, s, k, which));
   }
 
   /** Per-key status — the mirror's bubbles and the agent's packet share it. */
@@ -343,17 +350,126 @@ export class Session {
     if (dict === undefined) return undefined;
     const out: Record<string, { args: string[]; met: boolean; note: string }> = {};
     for (const [k, args] of Object.entries(dict)) {
-      out[k] = { args, met: this.conditionKeyMet(m, s, k), note: conditionNotePath(k) };
+      out[k] = { args, met: this.conditionKeyMet(m, s, k, which), note: conditionNotePath(k) };
     }
     return out;
   }
 
-  private guidanceCache?: GuidanceDoc[];
+  // ── THE READ PROOF (owner ruling 2026-07-26). A doc's hash is a TOKEN
+  //    held only by reading through the lane: se_file_read returns it, the
+  //    agent's packets never print it. The AGENT proves reading by SENDING
+  //    hashes on the tick (read_hashes: {path: hash}) — fresh every time,
+  //    so after a compaction the tokens are gone from its head and
+  //    re-reading is forced by construction (the hook only has to say so).
+  //    The HUMAN proves reading by CHECKING the doc in the mirror — once
+  //    per VERSION (the check pins the hash; an edited doc unchecks
+  //    itself). And THE PULL GATES ENTRY: a state is entered only when its
+  //    pulled guidance is proven read — armed outside boot, because boot
+  //    IS the reading room where the first tokens are earned. ────────────
+  private readonly humanChecks = new Map<string, Set<string>>();
 
-  /** THE PULL — derived, never authored; see engine/pull.ts. */
-  pulled(m: MachineDecl, s: StateDecl): PulledDoc[] {
-    this.guidanceCache ??= scanGuidance(this.root);
-    return pulledFor(this.root, this.guidanceCache, m, s);
+  private diskHash(rel: string): string {
+    try {
+      const abs = resolveInRoot(this.root, rel, "engine/session.ts reads");
+      return contentHash(readFileSync(abs));
+    } catch {
+      return "";
+    }
+  }
+
+  /** The mirror's checkbox: pin the doc AS IT STANDS as read-by-human. */
+  humanCheck(path: string): Record<string, unknown> {
+    const hash = this.diskHash(path);
+    if (hash === "") {
+      throw new Rejection({
+        clause: CLAUSES.REQUIRED_ARGS,
+        expected: "a readable project document",
+        got: path,
+        remedy: { tool: "se_tick", args: {}, note: "the pulled list names the checkable documents" },
+        source: "engine/session.ts reads",
+      });
+    }
+    const set = this.humanChecks.get(path) ?? new Set<string>();
+    set.add(hash);
+    this.humanChecks.set(path, set);
+    this.notifyChange();
+    return { path, hash, checked: true };
+  }
+
+  humanChecked(path: string, hash: string): boolean {
+    return hash !== "" && (this.humanChecks.get(path)?.has(hash) ?? false);
+  }
+
+  /** One doc, one channel, one verdict. The agent's supplied hash must
+   *  match the doc AS IT STANDS — a stale token proves a stale read. */
+  private readProven(channel: Channel, path: string, supplied: Record<string, string>): boolean {
+    const hash = this.diskHash(path);
+    if (hash === "") return false;
+    return channel === "agent" ? supplied[path] === hash : this.humanChecked(path, hash);
+  }
+
+  /** Boot is exempt from the pull gate — it is where the first reads
+   *  happen; gating entry on them would deadlock the session at start. */
+  private pullGateExempt(m: MachineDecl, t: StateDecl): boolean {
+    if (t.kind === "start" || t.kind === "end") return true;
+    if (m.id === "boot") return true;
+    if (t.submachine !== undefined && t.submachine.includes("boot")) return true;
+    return false;
+  }
+
+  /** What entering `t` demands proven: its entry read list plus its pull —
+   *  minus its own exit read list (that is the state's assignment, read
+   *  INSIDE it, not before). */
+  private entryRequirements(m: MachineDecl, t: StateDecl): string[] {
+    const req = new Set<string>(t.entry?.read ?? []);
+    if (!this.pullGateExempt(m, t)) {
+      for (const d of pulledFor(this.root, scanGuidance(this.root), m, t)) req.add(d.path);
+    }
+    for (const p of t.exit?.read ?? []) req.delete(p);
+    return [...req];
+  }
+
+  private refuseReads(which: "exit" | "entry", stateId: string, missing: string[], channel: Channel): never {
+    throw new Rejection({
+      clause: CLAUSES.CONDITION_UNMET,
+      expected: `${which === "exit" ? "leaving" : "entering"} ${stateId} demands proven reading of: ${missing.join(", ")}`,
+      got: channel === "agent" ? `no current hash supplied for: ${missing.join(", ")}` : `not checked in the mirror: ${missing.join(", ")}`,
+      remedy:
+        channel === "agent"
+          ? { tool: "se_file_read", args: { path: missing[0] }, note: "read EVERY missing doc through the lane — each result carries its hash — then repeat the tick with read_hashes: {\"<path>\": \"<hash>\", ...}. The hash is your proof; it must match the doc as it stands NOW, every time." }
+          : { tool: "se_tick", args: {}, note: "check each listed document in the mirror — one check per version; an edited doc asks again" },
+      source: "engine/session.ts reads",
+    });
+  }
+
+  /** THE READ GATE, both directions: the current state's exit read list,
+   *  and the target's entry requirements (explicit reads + the pull). */
+  private assertReads(m: MachineDecl, from: StateDecl, targetIds: string[], channel: Channel, supplied: Record<string, string>): void {
+    const missingExit = (from.exit?.read ?? []).filter((p) => !this.readProven(channel, p, supplied));
+    if (missingExit.length > 0) this.refuseReads("exit", from.id, missingExit, channel);
+    for (const id of targetIds) {
+      const t = m.states.find((s) => s.id === id);
+      if (t === undefined) continue;
+      const missing = this.entryRequirements(m, t).filter((p) => !this.readProven(channel, p, supplied));
+      if (missing.length > 0) this.refuseReads("entry", t.id, missing, channel);
+    }
+  }
+
+  /** The mirror's ▶ lock: is entering `t` fully proven on the human's
+   *  channel (explicit entry conditions AND the pull)? */
+  entryReadyHuman(m: MachineDecl, t: StateDecl): boolean {
+    if (!this.conditionMet(m, t, "enter")) return false;
+    return this.entryRequirements(m, t).every((p) => this.readProven("human", p, {}));
+  }
+
+  /** THE PULL — derived, never authored; see engine/pull.ts. Re-scanned
+   *  every time (no cache): an edited doc must show its fresh hash, or a
+   *  stale check could pass forever. `checked` is the human's ledger. */
+  pulled(m: MachineDecl, s: StateDecl): (PulledDoc & { checked: boolean })[] {
+    return pulledFor(this.root, scanGuidance(this.root), m, s).map((d) => {
+      const hash = d.hash !== "" ? d.hash : this.diskHash(d.path);
+      return { ...d, hash, checked: this.humanChecked(d.path, hash) };
+    });
   }
 
   private assertStanding(stateId: string): void {
@@ -394,15 +510,6 @@ export class Session {
         source: "engine/session.ts conditions",
       });
     }
-    if (key === "read") {
-      throw new Rejection({
-        clause: CLAUSES.CONDITION_UNMET,
-        expected: `${which} condition 'read' of ${stateId} — confirmed reading of: ${args.join(", ")} (see ${note})`,
-        got: "no evidence yet",
-        remedy: { tool: "se_tick", args: { confirm: true }, note: "READ the listed documents first (the lane serves them; during boot they ride the packet) — then confirm; the confirmation is logged as your evidence" },
-        source: "engine/session.ts conditions",
-      });
-    }
     throw new Rejection({
       clause: CLAUSES.CONDITION_UNMET,
       expected: `${which} condition '${key}' of ${stateId} (see ${note})`,
@@ -412,17 +519,20 @@ export class Session {
     });
   }
 
-  private assertConditions(m: MachineDecl, from: StateDecl, to?: string): void {
+  private assertConditions(m: MachineDecl, from: StateDecl, to: string | undefined, channel: Channel, supplied: Record<string, string>): void {
     if (from.exit?.script !== undefined) this.scriptRun(from.id); // a tick attempt runs the script
     for (const [key, args] of Object.entries(from.exit ?? {})) {
-      if (!this.conditionKeyMet(m, from, key)) this.refuseCondition(m, from, "exit", key, args);
+      if (key === "read") continue; // read is channel-proven below, not evidence
+      if (!this.conditionKeyMet(m, from, key, "leave")) this.refuseCondition(m, from, "exit", key, args);
     }
     const targetId = to ?? (from.edges.length === 1 ? from.edges[0].to : undefined);
+    this.assertReads(m, from, targetId === undefined ? [] : [targetId], channel, supplied);
     if (targetId === undefined) return;
     const target = m.states.find((s) => s.id === targetId);
     if (target === undefined) return;
     for (const [key, args] of Object.entries(target.entry ?? {})) {
-      if (!this.conditionKeyMet(m, target, key)) this.refuseCondition(m, target, "entry", key, args);
+      if (key === "read") continue;
+      if (!this.conditionKeyMet(m, target, key, "enter")) this.refuseCondition(m, target, "entry", key, args);
     }
   }
 
@@ -443,7 +553,9 @@ export class Session {
         ...(s.entry !== undefined ? { entry: this.conditionStatus(machine, s, "enter") } : {}),
         ...(s.exit !== undefined ? { exit: this.conditionStatus(machine, s, "leave") } : {}),
         exit_met: this.conditionMet(machine, s, "leave"),
-        pulled: this.pulled(machine, s),
+        // The agent's packet names the pulled docs but NEVER their hashes —
+        // the hash is the proof-of-read, obtainable only via se_file_read.
+        pulled: this.pulled(machine, s).map((p) => ({ path: p.path, sources: p.sources })),
         // Enough to CHOOSE among several ways forward: what the target is,
         // not just its name (the agent has no other way to peek).
         next: s.edges.map((e) => {
@@ -474,14 +586,11 @@ export class Session {
 
   /** tick with arguments: complete the current state and move on.
    *  `to` picks the outgoing edge (needed only when there are several);
-   *  `confirm` records that the current state's `read` list was read;
-   *  `channel` is whose hand this is — the threshold gates only the agent's. */
-  tickAdvance(to?: string, confirm = false, channel: Channel = "human"): Record<string, unknown> {
+   *  `channel` is whose hand this is — the threshold gates only the agent's;
+   *  `readHashes` is the agent's proof-of-read for this tick (path → hash,
+   *  each matching the doc as it stands; the human proves via checkboxes). */
+  tickAdvance(to?: string, channel: Channel = "human", readHashes: Record<string, string> = {}): Record<string, unknown> {
     const now = new Date().toISOString();
-    if (confirm && this.instance.status === "open") {
-      const { ids } = this.leaves();
-      this.submitEvidence(ids[0], { read_confirmed: true });
-    }
     if (this.instance.status === "closed") {
       throw new Rejection({
         clause: CLAUSES.NOT_LEGAL_IN_STATE,
@@ -497,9 +606,11 @@ export class Session {
     if (this.inSub()) {
       if (this.sub!.instance.status !== "open") {
         // Standing on the sub's end: this tick returns to the parent —
-        // whatever the parent's edges enter is what the threshold weighs.
+        // whatever the parent's edges enter is what the threshold weighs
+        // and what the read gate demands proven.
         const parent = this.state(this.machine, this.sub!.parentState);
         this.gatePriority(this.machine, parent.edges.map((e) => e.to), channel);
+        this.assertReads(this.machine, parent, parent.edges.map((e) => e.to), channel, readHashes);
         completeState(this.machine, this.instance, this.sub!.parentState, "filled", now);
         this.instance.history.push({ state: this.sub!.parentState, outcome: "filled", at: now });
         this.sub = undefined;
@@ -511,7 +622,7 @@ export class Session {
       this.assertEdge(this.sub!.decl, cur, to);
       const subTarget = to ?? this.state(this.sub!.decl, cur).edges[0]?.to;
       if (subTarget !== undefined) this.gatePriority(this.sub!.decl, [subTarget], channel);
-      this.assertConditions(this.sub!.decl, this.state(this.sub!.decl, cur), to);
+      this.assertConditions(this.sub!.decl, this.state(this.sub!.decl, cur), to, channel, readHashes);
       completeState(this.sub!.decl, this.sub!.instance, cur, "filled", now, to);
       this.sub!.instance.history.push({ state: cur, outcome: "filled", at: now });
       this.instance.history.push({ state: `${this.sub!.decl.id}/${cur}`, outcome: "filled", at: now });
@@ -522,7 +633,7 @@ export class Session {
     this.assertEdge(this.machine, cur, to);
     const target = to ?? this.state(this.machine, cur).edges[0]?.to;
     if (target !== undefined) this.gatePriority(this.machine, [target], channel);
-    this.assertConditions(this.machine, this.state(this.machine, cur), to);
+    this.assertConditions(this.machine, this.state(this.machine, cur), to, channel, readHashes);
     completeState(this.machine, this.instance, cur, "filled", now, to);
     this.instance.history.push({ state: cur, outcome: "filled", at: now });
     this.seedSubs();
@@ -555,7 +666,7 @@ export class Session {
       ...(s.entry !== undefined ? { entry: this.conditionStatus(home, s, "enter") } : {}),
       ...(s.exit !== undefined ? { exit: this.conditionStatus(home, s, "leave") } : {}),
       exit_met: this.conditionMet(home, s, "leave"),
-      pulled: this.pulled(home, s),
+      pulled: this.pulled(home, s).map((p) => ({ path: p.path, sources: p.sources })),
       ...(s.submachine !== undefined ? { submachine: s.submachine } : {}),
       next: s.edges.map((e) => {
         const t = home.states.find((st) => st.id === e.to);
@@ -573,9 +684,9 @@ export class Session {
    *  downstream is superseded (kept in the record, never erased) and its
    *  evidence and checks are invalidated — they are earned again on the
    *  re-walk. Legal for the user and the agent alike, while the machine is
-   *  open — the agent's hand is still weighed against the threshold
-   *  (jumping back ENTERS the target). */
-  jumpBack(target: string, channel: Channel = "human"): Record<string, unknown> {
+   *  open — the agent's hand is still weighed against the threshold, and
+   *  the read gate applies (jumping back ENTERS the target). */
+  jumpBack(target: string, channel: Channel = "human", readHashes: Record<string, string> = {}): Record<string, unknown> {
     const now = new Date().toISOString();
     if (this.instance.status === "closed") {
       throw new Rejection({
@@ -608,6 +719,9 @@ export class Session {
       });
     }
     this.gatePriority(machine, [target], channel);
+    const back = this.state(machine, target);
+    const missing = this.entryRequirements(machine, back).filter((p) => !this.readProven(channel, p, readHashes));
+    if (missing.length > 0) this.refuseReads("entry", target, missing, channel);
     const { cone } = reopenStates(machine, inst, [target], "jump back", now);
     // Invalidate the cone's evidence and checks — including a nested
     // machine's, when a sub-machine state is inside the cone. And supersede

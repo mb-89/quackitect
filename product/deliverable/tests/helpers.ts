@@ -1,11 +1,12 @@
 // Test scaffolding: a fresh temp project root carrying the REAL boot
 // machine (copied from this repo), so buildServer() compiles the same
 // drawing the shipped server does.
-import { cpSync, mkdirSync, mkdtempSync } from "node:fs";
+import { cpSync, mkdirSync, mkdtempSync, readFileSync } from "node:fs";
 import { createRequire } from "node:module";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { contentHash } from "../engine/hash.ts";
 import { buildServer } from "../engine/tools.ts";
 
 const REPO_ROOT = fileURLToPath(new URL("../../..", import.meta.url));
@@ -57,11 +58,34 @@ export async function call(server: Server, name: string, args: Record<string, un
   return { isError: r.isError, body: JSON.parse(r.content[0].text) as Record<string, unknown> };
 }
 
-/** A server ticked through the whole boot walk into idle. */
+/** The boot read list + the root guidance the pull demands at entry. */
+export const READ_DOCS = [
+  "workspace/AGENTS.md",
+  "product/guidance/contract.md",
+  "product/guidance/voice.md",
+  "product/guidance/walking.md",
+] as const;
+
+/** The agent's proof-of-read, earned the honest way: hash of each doc as
+ *  it stands on disk (exactly what se_file_read would have returned). */
+export function readHashesFor(root: string): Record<string, string> {
+  const out: Record<string, string> = {};
+  for (const p of READ_DOCS) out[p] = contentHash(readFileSync(join(root, ...p.split("/"))));
+  return out;
+}
+
+/** The human's side of the same proof: check every boot doc in the mirror. */
+export function checkDocs(session: { humanCheck: (p: string) => unknown }): void {
+  for (const p of READ_DOCS) session.humanCheck(p);
+}
+
+/** A server ticked through the whole boot walk into idle — supplying the
+ *  read hashes on every tick, as the agent's hand must. */
 export async function bootedServer(root: string): Promise<Server> {
   const server = buildServer(root);
+  const read_hashes = readHashesFor(root);
   for (let i = 0; i < 8; i++) {
-    const step = await call(server, "se_tick", { advance: true, confirm: true });
+    const step = await call(server, "se_tick", { advance: true, read_hashes });
     if (step.isError) throw new Error(`walk failed: ${JSON.stringify(step.body)}`);
     if (step.body.booted === true) return server;
   }

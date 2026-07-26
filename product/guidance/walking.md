@@ -7,8 +7,13 @@ One tool drives everything: `se_tick`. It is legal in every state.
 - `to: <state>`: complete the current state, enter that one. Required when
   several edges leave a state.
 - `advance: true`: advance along a single drawn edge.
-- `confirm: true`: confirm you READ what the current state's read condition
-  lists. Logged as evidence. Confirm only after actually reading.
+- `read_hashes: {"<path>": "<hash>", ...}`: your proof-of-read for this
+  tick. A transition demands it for the current state's read list and for
+  everything the TARGET pulls; each hash rides a `se_file_read` result and
+  must match the doc as it stands now. Fresh every tick — after a
+  compaction, re-read before advancing.
+- `wait: true`: hold. The call blocks until the human moves something
+  (slider, tick, check) and returns the fresh packet.
 - `state: <id>`: peek at any state without moving.
 - `back: <state>`: return to an earlier filled state. Everything downstream
   is superseded; its evidence is invalidated and earned again.

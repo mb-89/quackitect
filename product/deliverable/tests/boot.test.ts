@@ -7,7 +7,7 @@ import { fileURLToPath } from "node:url";
 import { compileMachine } from "../engine/machines/compile.ts";
 import { mainMachinePath } from "../engine/session.ts";
 import { buildServer } from "../engine/tools.ts";
-import { bootedServer, call, freshRoot } from "./helpers.ts";
+import { bootedServer, call, checkDocs, freshRoot, readHashesFor } from "./helpers.ts";
 
 const REPO_ROOT = fileURLToPath(new URL("../../..", import.meta.url));
 
@@ -46,28 +46,42 @@ test("se_tick without arguments reports the current state — legal everywhere",
   assert.ok((r.body.legal_tools as string[]).includes("se_tick"));
 });
 
-test("the agent's ticks walk boot, gated by the read confirmation, banner on idle", async () => {
-  const server = buildServer(freshRoot());
+test("the agent's ticks walk boot, gated by HASH proof-of-read, banner on idle", async () => {
+  const root = freshRoot();
+  const server = buildServer(root);
   await call(server, "se_tick", { advance: true }); // start -> boot/start
   await call(server, "se_tick", { advance: true }); // -> read_contract
   const at = await call(server, "se_tick");
   assert.deepEqual(at.body.active, ["boot/read_contract"]);
-  const state = (at.body.states as { exit?: Record<string, { args: string[] }>; pulled?: { path: string; hash: string; sources: string[] }[] }[])[0];
+  const state = (at.body.states as { exit?: Record<string, { args: string[] }>; pulled?: Record<string, unknown>[] }[])[0];
   assert.ok(state.exit !== undefined && state.exit.read.args.length === 4, "the exit dictionary rides the packet");
   assert.ok(state.pulled !== undefined && state.pulled.length >= 2, "the pull rides the packet");
-  assert.ok(state.pulled!.every((p) => p.hash.length === 12 || p.hash === ""), "pulled docs carry hashes");
-  assert.ok(state.pulled!.some((p) => p.sources.includes("root")), "root guidance pulled always");
+  // The hash IS the proof — the agent's packet must never print it.
+  assert.ok(state.pulled!.every((p) => !("hash" in p)), "packets never hand the agent the hashes");
+  assert.ok(state.pulled!.some((p) => (p.sources as string[]).includes("root")), "root guidance pulled always");
   const shut = await call(server, "se_run", { command: "echo nope" });
   assert.equal(shut.body.clause, "SE-C-110");
-  // the leave condition bites: a tick WITHOUT the confirmation is refused
+  // the read gate bites: a tick WITHOUT hashes is refused, remedy = read
   const unread = await call(server, "se_tick", { advance: true });
   assert.equal(unread.isError, true);
   assert.equal(unread.body.clause, "SE-C-112");
-  assert.equal((unread.body.remedy as { args: { confirm: boolean } }).args.confirm, true);
-  const s2 = await call(server, "se_tick", { confirm: true });
+  assert.equal((unread.body.remedy as { tool: string }).tool, "se_file_read");
+  // ... and a STALE hash proves nothing.
+  const stale = await call(server, "se_tick", { advance: true, read_hashes: Object.fromEntries(Object.keys(readHashesFor(root)).map((p) => [p, "0123456789ab"])) });
+  assert.equal(stale.isError, true);
+  assert.equal(stale.body.clause, "SE-C-112");
+  // The honest way: read through the lane — the result carries the hash.
+  const rc = await call(server, "se_file_read", { path: "product/guidance/voice.md" });
+  assert.equal(rc.isError, false, "se_file_read is legal in read_contract");
+  assert.equal(rc.body.hash, readHashesFor(root)["product/guidance/voice.md"], "the lane's hash is the proof token");
+  const s2 = await call(server, "se_tick", { advance: true, read_hashes: readHashesFor(root) });
   assert.deepEqual(s2.body.active, ["boot/prepare_idle"]);
   await call(server, "se_tick", { advance: true }); // -> boot/end
-  const landed = await call(server, "se_tick", { advance: true }); // -> idle
+  // the pop into idle demands the pull proven AGAIN (hashes, every time)
+  const bare = await call(server, "se_tick", { advance: true });
+  assert.equal(bare.isError, true);
+  assert.equal(bare.body.clause, "SE-C-112");
+  const landed = await call(server, "se_tick", { advance: true, read_hashes: readHashesFor(root) });
   assert.equal(landed.body.booted, true);
   assert.ok(String(landed.body.banner).includes("main machine @ idle"));
   // the banner shows once; a later tick-info is plain
@@ -93,7 +107,7 @@ test("the gate is logged like everything else — a refused pre-boot call lands 
   const root = freshRoot();
   const server = buildServer(root);
   await call(server, "se_run", { command: "echo nope" }); // refused at start
-  for (let i = 0; i < 5; i++) await call(server, "se_tick", { advance: true, confirm: true }); // walk to idle
+  for (let i = 0; i < 5; i++) await call(server, "se_tick", { advance: true, read_hashes: readHashesFor(root) }); // walk to idle
   const q = await call(server, "se_log_query", { filter: { ok: false } });
   const recs = q.body.records as { tool: string; outcome: string }[];
   assert.equal(recs.length, 1);
@@ -111,9 +125,9 @@ test("manual mode: tick info at start, ticks walk the whole machine to end", asy
   assert.deepEqual(s.active(), ["boot/start"]);
   s.tickAdvance();
   assert.deepEqual(s.active(), ["boot/read_contract"]);
-  // the leave condition holds the manual walk too — until evidence lands
+  // the read gate holds the manual walk too — until the docs are CHECKED
   assert.throws(() => s.tickAdvance(), (e) => (e as { clause?: string }).clause === "SE-C-112");
-  s.submitEvidence("read_contract", { read_confirmed: true, by: "human" });
+  checkDocs(s); // the mirror's checkboxes — one per doc version
   s.tickAdvance();
   assert.deepEqual(s.active(), ["boot/prepare_idle"]);
   s.tickAdvance(); // prepare_idle -> boot's visible end position
@@ -179,24 +193,25 @@ test("conditions are worked only from inside the state — no pre-running", asyn
   assert.throws(() => s.submitEvidence("read_contract", { read_confirmed: true }), (e) => (e as { clause?: string }).clause === "SE-C-112");
 });
 
-test("jump back: downstream superseded, evidence invalidated, re-walk earns it again", async () => {
+test("jump back: downstream superseded, script evidence invalidated; human checks persist per version", async () => {
   const { Session } = await import("../engine/session.ts");
   const s = new Session(freshRoot());
   // walk to idle
   s.tickAdvance(); s.tickAdvance();
-  s.submitEvidence("read_contract", { read_confirmed: true });
+  checkDocs(s);
   s.tickAdvance(); s.tickAdvance(); s.tickAdvance();
   assert.deepEqual(s.active(), ["idle"]);
   // jump back into boot from main: re-enters at the sub's start
   s.jumpBack("boot");
   assert.deepEqual(s.active(), ["boot/start"]);
-  // the read confirmation is invalidated — the re-walk must earn it again
+  // the CHECKS persist (one per doc version — the docs did not change),
+  // so the human re-walk flows; the preflight script must re-earn its 0.
   s.tickAdvance();
   assert.deepEqual(s.active(), ["boot/read_contract"]);
-  assert.throws(() => s.tickAdvance(), (e) => (e as { clause?: string }).clause === "SE-C-112");
-  s.submitEvidence("read_contract", { read_confirmed: true });
   s.tickAdvance();
   assert.deepEqual(s.active(), ["boot/prepare_idle"]);
+  const prepare = s.currentMachine().states.find((x) => x.id === "prepare_idle")!;
+  assert.equal(s.scriptStatus(s.currentMachine(), prepare).ran, false, "script evidence was invalidated by the jump");
   // the record survives: superseded entries, never erased
   assert.ok(s.instance.history.some((h) => h.outcome === "superseded"));
   // a never-filled state is not a jump target
@@ -207,7 +222,7 @@ test("jump back leaves nothing green: the nested walk's record is superseded too
   const { Session } = await import("../engine/session.ts");
   const s = new Session(freshRoot());
   s.tickAdvance(); s.tickAdvance();
-  s.submitEvidence("read_contract", { read_confirmed: true });
+  checkDocs(s);
   s.tickAdvance(); s.tickAdvance(); s.tickAdvance();
   s.jumpBack("boot");
   const filled = s.instance.history.filter((h) => h.outcome === "filled").map((h) => h.state);

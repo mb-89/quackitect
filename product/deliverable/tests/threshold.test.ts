@@ -7,7 +7,7 @@ import { strict as assert } from "node:assert";
 import { test } from "node:test";
 import { Session } from "../engine/session.ts";
 import { buildServer } from "../engine/tools.ts";
-import { call, freshRoot } from "./helpers.ts";
+import { call, checkDocs, freshRoot, readHashesFor } from "./helpers.ts";
 
 test("threshold 0 is manual mode: the agent's every step is refused, the human walks freely", async () => {
   const root = freshRoot();
@@ -47,7 +47,7 @@ test("the gate weighs the TARGET: a 0.5 state refuses the agent at 0.25, the hum
   const server = buildServer(root, session);
   // Walk to idle on the human's hand.
   session.tickAdvance(); session.tickAdvance();
-  session.submitEvidence("read_contract", { read_confirmed: true, by: "human" });
+  checkDocs(session);
   session.tickAdvance(); session.tickAdvance(); session.tickAdvance();
   assert.deepEqual(session.active(), ["idle"]);
   session.setThreshold(0.25);
@@ -55,8 +55,9 @@ test("the gate weighs the TARGET: a 0.5 state refuses the agent at 0.25, the hum
   const r = await call(server, "se_tick", { to: "start_expedition" });
   assert.equal(r.isError, true);
   assert.equal(r.body.clause, "SE-C-113");
-  // expedition_archive weighs 0.25 — exactly at the threshold, the agent may.
-  const ok = await call(server, "se_tick", { to: "expedition_archive" });
+  // expedition_archive weighs 0.25 — exactly at the threshold, the agent
+  // may (with its read proof: entering demands the pull's hashes).
+  const ok = await call(server, "se_tick", { to: "expedition_archive", read_hashes: readHashesFor(root) });
   assert.equal(ok.isError, false);
   // Walk the (empty) archive machine back to idle on the human's hand …
   session.tickAdvance(); session.tickAdvance();
@@ -71,7 +72,7 @@ test("jump back is entering too: the agent's back-jump is weighed against the th
   const session = new Session(root);
   const server = buildServer(root, session);
   session.tickAdvance(); session.tickAdvance();
-  session.submitEvidence("read_contract", { read_confirmed: true, by: "human" });
+  checkDocs(session);
   session.tickAdvance(); session.tickAdvance(); session.tickAdvance();
   session.setThreshold(0);
   const r = await call(server, "se_tick", { back: "boot" });
@@ -103,7 +104,7 @@ test("reaching end fires onClosed once and the closing packet says session over"
   let fired = 0;
   session.onClosed = () => fired++;
   session.tickAdvance(); session.tickAdvance();
-  session.submitEvidence("read_contract", { read_confirmed: true, by: "human" });
+  checkDocs(session);
   session.tickAdvance(); session.tickAdvance(); session.tickAdvance();
   const over = session.tickAdvance("end") as { session_over?: boolean; banner?: string };
   assert.equal(over.session_over, true);

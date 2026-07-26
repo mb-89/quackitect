@@ -63,15 +63,17 @@ export function startMirror(o: MirrorOptions): Server {
           const to = typeof body.to === "string" ? body.to : undefined;
           return {
             args: { advance: true, ...(to !== undefined ? { to } : {}) },
-            result: state.session.tickAdvance(to, false, "human"),
+            result: state.session.tickAdvance(to, "human"),
           };
         });
         return;
       }
-      if (req.method === "POST" && url.pathname === "/evidence") {
-        post(req, res, "mirror_evidence", (body) => ({
-          args: { state: body.state ?? "" },
-          result: state.session.submitEvidence(String(body.state ?? ""), { read_confirmed: true, by: "human" }),
+      if (req.method === "POST" && url.pathname === "/check") {
+        // The human's proof-of-read: one checkbox per doc VERSION. The
+        // check pins the doc's current hash; an edited doc asks again.
+        post(req, res, "mirror_check", (body) => ({
+          args: { path: body.path ?? "" },
+          result: state.session.humanCheck(String(body.path ?? "")),
         }));
         return;
       }

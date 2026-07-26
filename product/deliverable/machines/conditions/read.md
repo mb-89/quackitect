@@ -2,13 +2,25 @@
 condition: read
 ---
 
-# read — confirmed reading of the listed documents
+# read — proven reading of the listed documents
 
 Arguments: the documents (root-relative paths) that must be READ before the
-state can be left (exit) or entered (entry).
+state can be left (exit) or entered (entry). Beyond the explicit lists, THE
+PULL is an entry condition everywhere outside boot: entering a state
+demands its pulled guidance proven read too.
 
-How to satisfy it: actually read every listed document — the lane serves
-them, and during boot they ride the packet. Then confirm: the human clicks
-confirm in the mirror; the agent ticks with confirm: true. The confirmation
-is logged as evidence. Confirming without reading defeats the machine's
-whole purpose. (Hashes as proof-of-read: planned.)
+The proof is per hand:
+
+- **The agent sends hashes.** A doc's hash is a token you can only hold by
+  reading through the lane — `se_file_read` returns it; packets never
+  print it. Tick with `read_hashes: {"<path>": "<hash>", ...}`; every hash
+  must match the doc AS IT STANDS, and it is demanded fresh on every tick.
+  After a compaction the tokens are gone from your head — re-read, that is
+  the point.
+- **The human checks the box.** In the mirror, each doc carries a
+  checkbox: one check per VERSION of the file. The check pins the doc's
+  current hash; an edited doc unchecks itself and asks again.
+
+Sending a hash without reading defeats the machine's whole purpose — the
+hash proves the doc passed through your hands, not your head. Reading is
+what the machine is FOR.

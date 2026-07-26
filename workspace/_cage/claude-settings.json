@@ -26,16 +26,16 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node -e \"console.log('[se] WALK THE MACHINE: your FIRST action is the se_tick tool with no arguments - it shows where you are, its guidance, and what to do. Advance with se_tick {advance:true} (or {to:...}); when a state lists documents under read, READ them (they ride the packet or the lane), then se_tick {confirm:true}. If an advance is refused as above the threshold (SE-C-113), TELL the user which step is waiting for their hand, then hold with se_tick {wait:true} - it returns when they move the slider or the machine. When a result carries a banner, show it to the user VERBATIM and proceed with their request. The lane is locked until the machine reaches idle.')\""
+            "command": "node -e \"console.log('[se] WALK THE MACHINE: your FIRST action is the se_tick tool with no arguments - it shows where you are, its guidance, and what to do. Advance with se_tick {advance:true} (or {to:...}). READ PROOF: transitions demand read_hashes: an object of path-to-hash covering the listed and pulled docs - each hash rides a se_file_read result and must match the doc as it stands; reading is the point, the hash only proves it. If an advance is refused as above the threshold (SE-C-113), TELL the user which step is waiting for their hand, then hold with se_tick {wait:true} - it returns when they move the slider or the machine. When a result carries a banner, show it to the user VERBATIM and proceed with their request. The lane is locked until the machine reaches idle.')\""
           }
         ]
       },
       {
-        "matcher": "compact",
+        "matcher": "compact|clear",
         "hooks": [
           {
             "type": "command",
-            "command": "node -e \"console.log('[se] context was compacted - call se_tick with no arguments to reorient. The one rule is unchanged: you work through the se MCP server, and you do what it tells you.')\""
+            "command": "node -e \"console.log('[se] context was compacted - DROP every doc hash you remember: they no longer prove anything, because the reading they proved is gone from your head. Re-read what your state pulls through se_file_read (fresh hashes ride the results) before advancing anywhere. Call se_tick with no arguments to reorient. The one rule is unchanged: you work through the se MCP server, and you do what it tells you.')\""
           }
         ]
       }

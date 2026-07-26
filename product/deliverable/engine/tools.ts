@@ -27,16 +27,16 @@ export function sessionTools(session: Session): ToolDef[] {
       name: "se_tick",
       title: "se.tick",
       description:
-        "THE TICK — the universal walk operation, legal in EVERY state. Without arguments: where the machine is (state, guidance, what to read, legal tools, next states). With arguments: advance — to: <state> picks the edge (optional when there is only one), confirm: true confirms you have READ everything the state lists under `read` (required by read_guidance leave conditions; logged as evidence), advance: true advances when no other argument applies, back: <state> returns to an earlier filled state (downstream is superseded, evidence invalidated), state: <state> PEEKS at any state without moving — use it to choose among several ways forward, wait: true HOLDS: the call blocks until the human moves something (slider, tick, evidence) and returns the fresh packet — use it whenever a step is above your threshold or there is nothing to do; TELL the user you are holding first, and hold again when it returns unchanged. When a result carries a banner, show it to the user VERBATIM.",
+        "THE TICK — the universal walk operation, legal in EVERY state. Without arguments: where the machine is (state, guidance, what to read, legal tools, next states). With arguments: advance — to: <state> picks the edge (optional when there is only one), advance: true advances when no other argument applies, back: <state> returns to an earlier filled state (downstream is superseded, evidence invalidated), state: <state> PEEKS at any state without moving — use it to choose among several ways forward, wait: true HOLDS: the call blocks until the human moves something (slider, tick, check) and returns the fresh packet — use it whenever a step is above your threshold or there is nothing to do; TELL the user you are holding first, and hold again when it returns unchanged. READ PROOF: entering a state (and leaving one with a read condition) demands read_hashes: {\"<path>\": \"<hash>\", ...} covering the listed docs — the hash rides every se_file_read result and must match the doc AS IT STANDS; it proves YOUR reading, every tick, so after a compaction re-read before advancing. When a result carries a banner, show it to the user VERBATIM.",
       inputSchema: {
         type: "object",
         properties: {
           to: { type: "string", description: "the next state to enter (one of the drawn edges)" },
-          confirm: { type: "boolean", description: "confirm the current state's read list was actually read" },
           advance: { type: "boolean", description: "advance along the single drawn edge" },
           back: { type: "string", description: "jump BACK to an earlier filled state — everything downstream is superseded and its evidence invalidated" },
           state: { type: "string", description: "PEEK at a named state (full info: statement, guidance, conditions, next) — looking never moves" },
           wait: { type: "boolean", description: "HOLD until the human's hand moves the walk or the slider — returns the fresh packet (changed: false on timeout; just hold again)" },
+          read_hashes: { type: "object", description: "proof-of-read for this tick: {\"<root-relative path>\": \"<hash from se_file_read>\", ...} — must cover the docs the transition demands, each hash matching the doc as it stands now" },
         },
       },
       handler: async (args) => {
@@ -55,11 +55,12 @@ export function sessionTools(session: Session): ToolDef[] {
               : `nothing moved in ${ms}ms — call se_tick {wait: true} again to keep holding`,
           };
         }
+        const hashes = (typeof args.read_hashes === "object" && args.read_hashes !== null ? args.read_hashes : {}) as Record<string, string>;
         if (args.state !== undefined) return session.stateInfo(String(args.state));
-        if (args.back !== undefined) return session.jumpBack(String(args.back), "agent");
-        const wantsAdvance = args.to !== undefined || args.confirm === true || args.advance === true;
+        if (args.back !== undefined) return session.jumpBack(String(args.back), "agent", hashes);
+        const wantsAdvance = args.to !== undefined || args.advance === true || Object.keys(hashes).length > 0;
         if (!wantsAdvance) return session.tickInfo();
-        return session.tickAdvance(args.to === undefined ? undefined : String(args.to), args.confirm === true, "agent");
+        return session.tickAdvance(args.to === undefined ? undefined : String(args.to), "agent", hashes);
       },
     },
   ];
