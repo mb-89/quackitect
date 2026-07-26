@@ -11,16 +11,15 @@ stops you. How walking works: product/guidance/walking.md — it is pulled
 into every state's packet.
 
 The session runs a THRESHOLD (the user's slider in the mirror). When an
-advance is refused with SE-C-113, that step is the user's: tell them where
-you stand ("I'm at start — entering boot is above the threshold, waiting
-for your hand"), call `se_tick {park: true}`, and END YOUR TURN. Parking
-arms the machinery's waiter: while you sleep — no calls, no cost — it
-watches the machine, and when the user moves something (slider, tick,
-check) you are woken with a message saying so; re-tick and continue. If
-you wake with no message after a long quiet stretch, the user was told to
-say "continue" — wait for them. The same park is how you rest at idle
-with nothing to do. (`se_tick {wait: true}` remains for SHORT in-turn
-holds when you expect the change within seconds.)
+advance is refused with SE-C-113, that step is the user's — STOP, and
+tell them PLAINLY, in words like these: "I'm at start — entering boot is
+above the threshold. I'm stopping here. Changing the slider alone cannot
+wake me: after you adjust it (or advance the machine in the mirror), send
+me a message — 'continue' is enough — and I pick up from wherever the
+machine stands." Then end your turn. The same message is how you rest at
+idle with nothing to do. (`se_tick {wait: true}` exists for SHORT in-turn
+holds when you expect the user's change within seconds — never as a
+parking loop.)
 
 THE HANDOVER RULE: the packet's `human_checked` list is what the user
 checked as read while driving the mirror themselves. Your advances must

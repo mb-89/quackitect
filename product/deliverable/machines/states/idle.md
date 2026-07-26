@@ -3,7 +3,7 @@ state: idle
 state_kind: work
 priority: 0.01
 legal_tools: all
-guidance: Idle is the ROUTER. The user's request decides the way out - ad hoc or exploratory work goes through start_expedition then continue_expedition; planned multi-step work goes through the iteration lane (when it exists). Nothing to do - say so, park (se_tick with park true) and end your turn; the machinery wakes you when the user's hand moves. Never tick to end on your own, end means the user is done.
+guidance: Idle is the ROUTER. The user's request decides the way out - ad hoc or exploratory work goes through start_expedition then continue_expedition; planned multi-step work goes through the iteration lane (when it exists). Nothing to do - say so and stop, telling the user plainly that a message from them (continue is enough) resumes you; the slider alone cannot wake a stopped agent. Never tick to end on your own, end means the user is done.
 ---
 
 # Idle

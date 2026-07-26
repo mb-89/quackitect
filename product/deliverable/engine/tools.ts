@@ -27,7 +27,7 @@ export function sessionTools(session: Session): ToolDef[] {
       name: "se_tick",
       title: "se.tick",
       description:
-        "THE TICK — the universal walk operation, legal in EVERY state. Without arguments: where the machine is (state, guidance, what to read, legal tools, next states). With arguments: advance — to: <state> picks the edge (optional when there is only one), advance: true advances when no other argument applies, back: <state> returns to an earlier filled state (downstream is superseded, evidence invalidated), state: <state> PEEKS at any state without moving — use it to choose among several ways forward, park: true PARKS: when a step is above your threshold or there is nothing to do, TELL the user where you stand, park, and END YOUR TURN — the machinery watches while you sleep and wakes you with a message when their hand moves (wait: true is the short in-turn variant: it blocks until something moves, changed: false on timeout). READ PROOF: entering a state (and leaving one with a read condition) demands read_hashes: {\"<path>\": \"<hash>\", ...} covering the listed docs — the hash rides every se_file_read result and must match the doc AS IT STANDS; it proves YOUR reading, every tick, so after a compaction re-read before advancing. When a result carries a banner, show it to the user VERBATIM.",
+        "THE TICK — the universal walk operation, legal in EVERY state. Without arguments: where the machine is (state, guidance, what to read, legal tools, next states). With arguments: advance — to: <state> picks the edge (optional when there is only one), advance: true advances when no other argument applies, back: <state> returns to an earlier filled state (downstream is superseded, evidence invalidated), state: <state> PEEKS at any state without moving — use it to choose among several ways forward, wait: true is a SHORT in-turn hold: it blocks until the human moves something (slider, tick, check) and returns the fresh packet (changed: false on timeout) — use it only when you expect the change within seconds; otherwise STOP, telling the user plainly that they must message you (e.g. 'continue') after changing the slider, because the slider alone cannot wake a stopped agent. READ PROOF: entering a state (and leaving one with a read condition) demands read_hashes: {\"<path>\": \"<hash>\", ...} covering the listed docs — the hash rides every se_file_read result and must match the doc AS IT STANDS; it proves YOUR reading, every tick, so after a compaction re-read before advancing. When a result carries a banner, show it to the user VERBATIM.",
       inputSchema: {
         type: "object",
         properties: {
@@ -35,8 +35,7 @@ export function sessionTools(session: Session): ToolDef[] {
           advance: { type: "boolean", description: "advance along the single drawn edge" },
           back: { type: "string", description: "jump BACK to an earlier filled state — everything downstream is superseded and its evidence invalidated" },
           state: { type: "string", description: "PEEK at a named state (full info: statement, guidance, conditions, next) — looking never moves" },
-          wait: { type: "boolean", description: "short in-turn HOLD: blocks until the human's hand moves the walk or the slider, then returns the fresh packet (changed: false on timeout). For longer waits prefer park" },
-          park: { type: "boolean", description: "PARK: mark the session as waiting on the human, then END YOUR TURN — the machinery watches the machine while you sleep (no calls) and wakes you with a message when their hand moves" },
+          wait: { type: "boolean", description: "short in-turn HOLD: blocks until the human's hand moves the walk or the slider, then returns the fresh packet (changed: false on timeout). For longer waits STOP instead and ask the user to message you" },
           read_hashes: { type: "object", description: "proof-of-read for this tick: {\"<root-relative path>\": \"<hash from se_file_read>\", ...} — must cover the docs the transition demands, each hash matching the doc as it stands now" },
         },
       },
@@ -57,7 +56,6 @@ export function sessionTools(session: Session): ToolDef[] {
           };
         }
         const hashes = (typeof args.read_hashes === "object" && args.read_hashes !== null ? args.read_hashes : {}) as Record<string, string>;
-        if (args.park === true) return session.park();
         if (args.state !== undefined) return session.stateInfo(String(args.state));
         if (args.back !== undefined) return session.jumpBack(String(args.back), "agent", hashes);
         const wantsAdvance = args.to !== undefined || args.advance === true || Object.keys(hashes).length > 0;

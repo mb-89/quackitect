@@ -12,12 +12,12 @@ One tool drives everything: `se_tick`. It is legal in every state.
   everything the TARGET pulls; each hash rides a `se_file_read` result and
   must match the doc as it stands now. Fresh every tick — after a
   compaction, re-read before advancing.
-- `park: true`: mark the session as waiting on the human, then END your
-  turn. The machinery watches the machine while you sleep and wakes you
-  with a message when their hand moves (slider, tick, check).
-- `wait: true`: the short in-turn hold — blocks until something moves,
-  returns the fresh packet (changed: false on timeout). Prefer park for
-  anything longer than seconds.
+- `wait: true`: the short in-turn hold — blocks until something moves
+  (slider, tick, check), returns the fresh packet (changed: false on
+  timeout). Only when you expect the change within seconds. For anything
+  longer: STOP, telling the user plainly that the slider alone cannot
+  wake you — they must message you (continue is enough) after changing
+  it, and you resume from wherever the machine stands.
 - `state: <id>`: peek at any state without moving.
 - `back: <state>`: return to an earlier filled state. Everything downstream
   is superseded; its evidence is invalidated and earned again.

@@ -69,10 +69,11 @@ MCP's CALL is synchronous; the SERVER is not. Nothing stops the lane from
 growing a background arm: `se_run {background: true}` spawns and returns a
 ref immediately; a status tool (or the tick packet) reports progress; the
 full output lands in the call log under the ref, as ever. The elegant part
-is the wake path that now exists: task completion is a CHANGE — it fires
-notifyChange, which wakes a held `wait` and unparks a parked agent through
-the Stop hook. So an agent could start a long build, park, cost nothing
-while it runs, and be woken by its completion exactly like by the human's
-slider. What stays impossible: the server initiating a message mid-turn —
-the wake always lands at a turn boundary. Build when a real long-running
-task demands it, not before.
+is the wake path that exists: task completion is a CHANGE — it fires
+notifyChange, which wakes a held `wait`. So an agent could start a long
+build and hold a short wait on its completion. What stays impossible: the
+server initiating a message mid-turn, or waking a STOPPED agent — a Stop
+hook that held the turn open was tried (2026-07-26) and REMOVED: it froze
+the chat while waiting, and a second agent could not get a word in. A
+stopped agent resumes only when the user messages it. Build the async arm
+when a real long-running task demands it, not before.
