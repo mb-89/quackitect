@@ -239,6 +239,10 @@ function stateDetail(id) {
   let html = jsonTable(bare);
   if (s.next && s.next.length > 0) {
     html += '<div class="meta" style="padding:8px 0 4px">next</div>' + nextTable(id, s);
+  } else if (WALK_HERE && id === CURRENT && s.kind === "end" && D.describe.breadcrumb.length > 1) {
+    const parent = D.describe.breadcrumb[0];
+    html += '<div class="meta" style="padding:8px 0 4px">next</div>' +
+      '<table class="kv"><tr><td class="v">return to ' + parent + '</td><td class="btncell"><button class="primary go" data-to="" title="tick: leave the sub-machine">▶</button></td></tr></table>';
   }
   return html;
 }
@@ -254,6 +258,13 @@ function condDetail(id) {
   const s = D.states[id] ?? {};
   const met = s.leave_met;
   let html = "";
+  if (s.leave_when === "preflight") {
+    html += met
+      ? '<div style="padding:2px 0 10px;color:#4a7a55">preflight green ✓</div>'
+      : '<div style="padding:2px 0 10px;color:#e86a5f">preflight failures — engine-checked, a tick re-runs them:</div>' + jsonTable(s.preflight_failures || []);
+    html += '<div class="comment-detail">' + (s.guidance || "").replace(/&/g,"&amp;").replace(/</g,"&lt;") + "</div>";
+    return ["preflight · " + id, html];
+  }
   if (WALK_HERE && !met) html += '<div style="padding:2px 0 10px"><button class="primary confirm" data-state="' + id + '" title="the confirmation is logged as evidence">confirm</button></div>';
   if (met) html += '<div style="padding:2px 0 10px;color:#4a7a55">confirmed ✓</div>';
   html += '<div class="comment-detail">' + (s.guidance || "").replace(/&/g,"&amp;").replace(/</g,"&lt;") + "</div>";
@@ -280,7 +291,11 @@ function detailFor(key) {
 }
 document.addEventListener("click", async (ev) => {
   const go = ev.target.closest ? ev.target.closest(".go") : null;
-  if (go) { await fetch("/tick", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ to: go.dataset.to }) }); location.href = "/"; }
+  if (go) {
+    const body = go.dataset.to ? { to: go.dataset.to } : { advance: true };
+    await fetch("/tick", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) });
+    location.href = "/";
+  }
 });
 document.addEventListener("click", (ev) => {
   const arrow = ev.target.closest ? ev.target.closest(".crumb-arrow") : null;
@@ -398,6 +413,7 @@ export function renderMirror(m: MirrorState, widget?: "machine" | "details", vie
       ...(s.submachine !== undefined ? { submachine: s.submachine } : {}),
       leave_when: s.leave_when ?? "always",
       leave_met: m.session.conditionMet(decl, s, "leave"),
+      ...(s.leave_when === "preflight" ? { preflight_failures: m.session.preflight() } : {}),
       ...(s.read !== undefined ? { read: s.read } : {}),
       next: s.edges.map((e) => {
         const t = decl.states.find((st) => st.id === e.to);

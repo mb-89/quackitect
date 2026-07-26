@@ -56,7 +56,7 @@ const server = createServer((req, res) => {
         const started = Date.now();
         let to: string | undefined;
         try {
-          const body = JSON.parse(Buffer.concat(chunks).toString("utf8") || "{}") as { to?: string };
+          const body = JSON.parse(Buffer.concat(chunks).toString("utf8") || "{}") as { to?: string; advance?: boolean };
           to = body.to;
         } catch {
           to = undefined;

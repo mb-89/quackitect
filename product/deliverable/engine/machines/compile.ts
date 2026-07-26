@@ -28,7 +28,7 @@ import {
 
 const ROLES: ReadonlySet<string> = new Set(["normal", "alternative", "fallback", "recovery", "approval", "error"]);
 /** The engine-verifiable condition registry — unknown names refuse at compile. */
-const CONDITIONS: ReadonlySet<string> = new Set(["always", "read_guidance"]);
+const CONDITIONS: ReadonlySet<string> = new Set(["always", "read_guidance", "preflight"]);
 
 export class MachineCompileError extends Error {
   constructor(machine: string, element: string, message: string) {

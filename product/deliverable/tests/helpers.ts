@@ -1,7 +1,7 @@
 // Test scaffolding: a fresh temp project root carrying the REAL boot
 // machine (copied from this repo), so buildServer() compiles the same
 // drawing the shipped server does.
-import { cpSync, mkdtempSync } from "node:fs";
+import { cpSync, mkdirSync, mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -14,6 +14,9 @@ export function freshRoot(): string {
   cpSync(join(REPO_ROOT, "product", "deliverable", "machines"), join(root, "product", "deliverable", "machines"), {
     recursive: true,
   });
+  // The preflight verifies read paths — the workspace contract is one of them.
+  mkdirSync(join(root, "workspace"), { recursive: true });
+  cpSync(join(REPO_ROOT, "workspace", "AGENTS.md"), join(root, "workspace", "AGENTS.md"));
   return root;
 }
 

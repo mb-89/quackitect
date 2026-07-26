@@ -26,7 +26,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "echo [se] AUTO-BOOT: your FIRST action is the se_boot tool - call it now, before anything else. Follow each step packet it returns (do the step, call se_boot again) until it returns the booted banner - then show the user that banner VERBATIM and proceed with their request. The lane is locked until booted."
+            "command": "echo [se] WALK THE MACHINE: your FIRST action is the se_tick tool with no arguments - it shows where you are, its guidance, and what to do. Advance with se_tick {advance:true} (or {to:<state>}); when a state lists documents under read, READ them (they ride the packet or the lane), then se_tick {confirm:true}. When a result carries a banner, show it to the user VERBATIM and proceed with their request. The lane is locked until the machine reaches idle."
           }
         ]
       },
@@ -35,7 +35,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "echo [se] context was compacted - call se_state to reorient. The one rule is unchanged: you work through the se MCP server, and you do what it tells you."
+            "command": "echo [se] context was compacted - call se_tick with no arguments to reorient. The one rule is unchanged: you work through the se MCP server, and you do what it tells you."
           }
         ]
       }

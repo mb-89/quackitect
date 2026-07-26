@@ -16,7 +16,7 @@
 //
 // State is in-memory: a server restart mid-session drops back to start, and
 // the next refused call's remedy re-boots the agent in one turn.
-import { join } from "node:path";
+import { dirname, join } from "node:path";
 import { CLAUSES, Rejection } from "./errors.ts";
 import {
   activeStates,
@@ -26,6 +26,10 @@ import {
   type StateDecl,
 } from "./machine.ts";
 import { compileMachine, resolveRef } from "./machines/compile.ts";
+import { spawnSync } from "node:child_process";
+import { accessSync, constants, existsSync, mkdirSync, readdirSync } from "node:fs";
+import { rgPath } from "./search.ts";
+import { resolveInRoot, seDir } from "./paths.ts";
 
 /** THE TICK is the machinery — one tool, legal in EVERY state. Without
  *  arguments it reports (observability is never gated); with arguments it
@@ -161,7 +165,52 @@ export class Session {
     if (cond === "read_guidance") {
       return this.evidence.get(this.evidenceKey(m, s.id))?.read_confirmed === true;
     }
+    if (cond === "preflight") return this.preflight().length === 0;
     return false;
+  }
+
+  private preflightCache?: string[];
+
+  /** The engine-run preflight: failures by name, [] when green. Cached for
+   *  the session; a tick attempt re-runs it so a fixed failure clears. */
+  preflight(fresh = false): string[] {
+    if (this.preflightCache !== undefined && !fresh) return this.preflightCache;
+    const failures: string[] = [];
+    const machinesDir = join(this.root, "product", "deliverable", "machines");
+    const decls: MachineDecl[] = [];
+    for (const f of existsSync(machinesDir) ? readdirSync(machinesDir) : []) {
+      if (!f.endsWith(".canvas")) continue;
+      try {
+        decls.push(compileMachine(this.root, join(machinesDir, f)));
+      } catch (e) {
+        failures.push(`machine ${f} does not compile: ${String((e as Error).message)}`);
+      }
+    }
+    for (const d of decls) {
+      for (const s of d.states) {
+        for (const p of s.read ?? []) {
+          try {
+            if (!existsSync(resolveInRoot(this.root, p, "preflight"))) failures.push(`${d.id}/${s.id}: read path missing: ${p}`);
+          } catch {
+            failures.push(`${d.id}/${s.id}: read path escapes the root: ${p}`);
+          }
+        }
+      }
+    }
+    try {
+      rgPath();
+    } catch (e) {
+      failures.push(String((e as Error).message));
+    }
+    if (spawnSync("git", ["--version"], { stdio: "ignore" }).status !== 0) failures.push("git does not answer — it is a hard dependency");
+    try {
+      mkdirSync(seDir(this.root), { recursive: true });
+      accessSync(dirname(join(seDir(this.root), "calls.jsonl")), constants.W_OK);
+    } catch {
+      failures.push("the call log location is not writable (.se/)");
+    }
+    this.preflightCache = failures;
+    return failures;
   }
 
   /** Record evidence for a state in the CURRENT machine (walk position's machine). */
@@ -175,7 +224,17 @@ export class Session {
   }
 
   private assertConditions(m: MachineDecl, from: StateDecl, to?: string): void {
+    if (from.leave_when === "preflight") this.preflight(true); // a tick re-runs the checks
     if (!this.conditionMet(m, from, "leave")) {
+      if (from.leave_when === "preflight") {
+        throw new Rejection({
+          clause: CLAUSES.CONDITION_UNMET,
+          expected: `leave condition of ${from.id}: preflight — all checks green`,
+          got: this.preflight().join("; "),
+          remedy: { tool: "se_tick", args: { advance: true }, note: "fix the named failures, then tick again — the checks re-run on every attempt" },
+          source: "engine/session.ts conditions",
+        });
+      }
       throw new Rejection({
         clause: CLAUSES.CONDITION_UNMET,
         expected: `leave condition of ${from.id}: ${from.leave_when} (read the guidance, then confirm)`,

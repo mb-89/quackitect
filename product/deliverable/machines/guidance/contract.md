@@ -17,10 +17,11 @@ The machine gives you one state. Do exactly what its guidance asks. Produce
 its evidence. Move on. Do not look ahead, do not refactor, do not "improve"
 what the state did not name. The engine does the checking.
 
-## 3. The user adjudicates the gates
-You FILL. The user ADJUDICATES. Never pass a gate on the user's behalf. An
-explicit instruction naming a specific bless is the only exception; a
-blanket "keep going" is not permission.
+## 3. Adjudication follows the session's threshold
+States carry a priority. The session sets the highest priority you may pass
+alone. Above it, the user adjudicates — you present, you wait. The
+threshold can change during the session. Until the priority system ships,
+treat every gate as above your threshold.
 
 ## 4. Capture strays, do not chase them
 An idea, a bug, a better way — note it and keep walking. You do not leave
