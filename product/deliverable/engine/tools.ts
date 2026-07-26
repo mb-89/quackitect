@@ -8,8 +8,13 @@
 //         never silently coerced (the String(undefined) incident).
 //   NEW — unknown args are refused too, naming the accepted set.
 //   §5  — honest truncation everywhere; results carry the remedy inline.
+import { appendFileSync, mkdirSync, readFileSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { randomBytes } from "node:crypto";
 import { CLAUSES, Rejection } from "./errors.ts";
 import { CallLog } from "./calllog.ts";
+import { parseUpdate } from "./decisions.ts";
+import { Toll } from "./toll.ts";
 import { fileDelete, fileGlob, fileList, filePatch, fileRead, fileWrite, type PatchOp } from "./files.ts";
 import { capJson } from "./jsonio.ts";
 import { McpServer, type ToolDef } from "./mcp.ts";
@@ -292,6 +297,25 @@ export function coreTools(rootOf: () => string, projectRoot: string): ToolDef[] 
       handler: (args) => webSearch(String(args.query), args.count !== undefined ? Number(args.count) : 8),
     },
     {
+      name: "se_note",
+      title: "se.note",
+      description:
+        "Capture a stray — an idea, a bug, a better way — without leaving the state (contract rule 4). Machine-local (.se/notes.jsonl), never committed; joins the mirror's log feed; drained at a retro, later.",
+      inputSchema: {
+        type: "object",
+        properties: { text: { type: "string" } },
+        required: ["text"],
+      },
+      handler: (args) => {
+        const p = join(seDir(projectRoot), "notes.jsonl");
+        const note = { ref: `note-${randomBytes(6).toString("hex")}`, text: String(args.text), at: new Date().toISOString() };
+        mkdirSync(dirname(p), { recursive: true });
+        appendFileSync(p, JSON.stringify(note) + "\n", "utf8");
+        const inbox = readFileSync(p, "utf8").split("\n").filter((l) => l.trim() !== "").length;
+        return { captured: note.ref, inbox };
+      },
+    },
+    {
       name: "se_log_query",
       title: "se.log.query",
       description: "Query the call log (your own trail): filter by tool/ok/since, group_by a field, or fetch a se_run ref's full output.",
@@ -332,11 +356,45 @@ export function coreTools(rootOf: () => string, projectRoot: string): ToolDef[] 
 /** Build the server: session machine + tools + guards + the raw call log.
  *  Guard order: arg shape → THE STATE GATE → handler. Pass a Session to
  *  share it with another hand (the embedded mirror drives the SAME walk). */
-export function buildServer(root: string, session = new Session(root)): McpServer {
+export function buildServer(root: string, session = new Session(root), tollOpts: { windowMs?: number; now?: () => number } = {}): McpServer {
   // (a fresh Session fails fast on a misdrawn machine)
   const tools = [...sessionTools(session), ...expeditionTools(session), ...coreTools(() => session.workRoot(), root)];
+  // THE UPDATE FIELD — every lane tool accepts it: a decision-graph op
+  // riding the call. Declared on every schema so harnesses send it as an
+  // object (an undeclared property arrives as a JSON string — v2 lesson).
+  const UPDATE_PROP = {
+    type: "object",
+    description:
+      "decision-graph update riding this call — narrate as you work. {op: plan|fork|done|obsolete|revert|note, brief?, items?, node?}: plan {items} starts the state's checklist; fork {brief, items?} opens an unplanned branch where you are; done|obsolete|revert {node, brief} resolves a node — everything started gets resolved, silently abandoning is illegal; note {brief, node?} says what you are doing. A volunteered update resets the toll; when the toll lapses, the next call must carry one.",
+  };
+  for (const t of tools) (t.inputSchema.properties as Record<string, unknown>).update = UPDATE_PROP;
   const server = new McpServer({ name: "se-mcp", version: "3.0.0-bootstrap" }, tools);
   const log = new CallLog(seDir(root));
+  const toll = new Toll(tollOpts);
+
+  // THE UPDATE RIDES FIRST — applied before any other verdict (the
+  // narration stands even when the call itself is then refused), logged as
+  // its own record, paying the toll. Stripped so handlers never see it.
+  server.addGuard((tool, args) => {
+    if (args.update === undefined) return;
+    const raw = args.update;
+    delete args.update;
+    const op = parseUpdate(raw);
+    const visit = session.currentVisit();
+    const result = session.decisions.apply(visit, op);
+    log.append({ tool: "se_update", args: { via: tool, visit, ...op }, ok: true, outcome: "result", duration_ms: 0, response: result });
+    toll.paid();
+  });
+
+  // THE TOLL — armed after boot; one grace warning, then the refusal.
+  server.addGuard((tool, args) => toll.check(session.isBooted(), tool, args));
+
+  // The grace warning rides the NEXT successful result (never a refusal).
+  server.addDecorator((_tool, result) => {
+    const w = toll.takeWarning();
+    if (w === undefined || typeof result !== "object" || result === null || Array.isArray(result)) return result;
+    return { ...(result as Record<string, unknown>), toll_warning: w };
+  });
 
   // R8 + unknown-args: the declared shape is the accepted one (whitelist).
   const shapes = new Map(

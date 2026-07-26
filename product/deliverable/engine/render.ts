@@ -14,6 +14,7 @@
 // One source, two projections: the packet JSON shown here IS what the
 // agent receives.
 import { loadCanvas, type CanvasData, type CanvasElement } from "./canvas.ts";
+import { CallLog, type CallRecord } from "./calllog.ts";
 import { mainMachinePath, Session } from "./session.ts";
 import { compileMachine, resolveRef } from "./machines/compile.ts";
 import { type MachineDecl } from "./machine.ts";
@@ -126,6 +127,65 @@ export interface MirrorState {
   root: string;
   lastPacket: unknown;
   mode: "manual" | "agent";
+  /** The call log — present, the sidebar carries the unified feed. */
+  log?: CallLog;
+}
+
+/** One feed line's brief — the unified feed's middle column (owner ruling,
+ *  v2 i9 notes: time | src | brief | result; the full record is one click
+ *  away, so the brief only has to say WHAT, never everything). */
+function briefFor(rec: CallRecord): string {
+  const a = rec.args as Record<string, unknown>;
+  switch (rec.tool) {
+    case "se_tick":
+      return a.back !== undefined ? `back → ${a.back}` : a.state !== undefined ? `peek ${a.state}` : a.wait === true ? "hold (wait)" : a.to !== undefined ? `tick → ${a.to}` : a.advance === true ? "tick advance" : "tick (look)";
+    case "mirror_tick":
+      return a.back !== undefined ? `back → ${a.back}` : a.to !== undefined ? `tick → ${a.to}` : "tick advance";
+    case "mirror_check": return `check ${a.path}`;
+    case "mirror_threshold": return `slider → ${a.value}`;
+    case "mirror_script": return `run scripts · ${a.state}`;
+    case "se_update": {
+      const items = Array.isArray(a.items) ? ` (+${a.items.length})` : "";
+      return `${a.op}${a.node !== undefined ? ` ${a.node}` : ""}${a.brief !== undefined ? `: ${a.brief}` : ""}${items}`;
+    }
+    case "se_note": return String(a.text ?? "");
+    case "se_file_read": return `read ${a.path}${a.offset !== undefined ? ` @${a.offset}` : ""}`;
+    case "se_file_write": return `write ${a.path}`;
+    case "se_file_patch": return `patch ${Array.isArray(a.ops) ? a.ops.length : 0} op(s)`;
+    case "se_file_move": return `move ${a.from} → ${a.to}`;
+    case "se_file_delete": return `delete ${a.path}`;
+    case "se_file_list": return `list ${a.dir ?? "."}`;
+    case "se_file_glob": return `glob ${a.glob}`;
+    case "se_file_search": return `search /${a.query}/`;
+    case "se_run": return `run: ${String(a.command ?? "").replace(/\s+/g, " ").slice(0, 70)}`;
+    case "se_web_fetch": return `fetch ${a.url}`;
+    case "se_web_search": return `web: ${a.query}`;
+    case "se_log_query": return a.ref !== undefined ? `log ref ${a.ref}` : "log query";
+    case "se_exp_new": return `new expedition (${a.kind})`;
+    case "se_exp_open": return `bind ${a.id}`;
+    case "se_exp_close": return "close expedition";
+    case "se_exp_list": return "expeditions";
+    default: return rec.tool;
+  }
+}
+
+/** The session-scoped unified feed. Capped at the newest 500 rows — the
+ *  cap is declared in the result, never silent. */
+export function feedRows(log: CallLog, since: string): { capped: boolean; rows: Array<Record<string, unknown>> } {
+  const q = log.query({ filter: { since }, limit: 501 });
+  const records = q.records ?? [];
+  const capped = records.length > 500;
+  const rows = records.slice(-500).map((rec) => ({
+    ref: rec.ref,
+    ts: rec.ts,
+    src: rec.tool.startsWith("mirror_") ? "human" : "agent",
+    type: rec.tool === "se_update" ? "update" : rec.tool === "se_note" ? "note" : "call",
+    brief: briefFor(rec).slice(0, 90),
+    ok: rec.ok,
+    ...(rec.ok ? {} : { clause: (rec.response as { clause?: string } | undefined)?.clause }),
+    ...(rec.tool === "se_update" ? { visit: (rec.args as { visit?: string }).visit } : {}),
+  }));
+  return { capped, rows };
 }
 
 /** Resolve a viewable machine by id: main itself, or one of its subs. */
@@ -212,6 +272,29 @@ const STYLE = `
   .threshold { display: flex; align-items: center; gap: 8px; color: #7f8b96; font-size: 12px; text-transform: none; letter-spacing: 0; }
   .threshold input { accent-color: #e8b339; width: 140px; }
   #thr-val { color: #e8b339; min-width: 4ch; }
+  #w-log { flex: 0 0 42%; border-radius: 0; border: 0; border-bottom: 1px solid #2a2f34; }
+  .log-filter-row { padding: 6px 12px 0; }
+  #log-filter { width: 100%; box-sizing: border-box; background: #14171a; border: 1px solid #2a2f34; border-radius: 6px; color: #d8dde2; font: inherit; font-size: 12px; padding: 4px 8px; }
+  .log-panel { font-size: 12px; margin-top: 6px; }
+  .logrow { display: flex; gap: 8px; padding: 2px 0; cursor: pointer; border-bottom: 1px dotted #22272c; align-items: baseline; }
+  .logrow:hover { background: #22272c; }
+  .logrow .lt { color: #7f8b96; flex: 0 0 auto; }
+  .logrow .lsrc { flex: 0 0 5.5ch; color: #7cc4e8; }
+  .logrow .lsrc.human { color: #e8b339; }
+  .logrow .lbrief { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .logrow.update .lbrief { font-weight: 700; }
+  .logrow.note .lbrief { font-style: italic; }
+  .logrow .lok { flex: 0 0 auto; color: #4a7a55; }
+  .logrow.failed .lok { color: #e86a5f; }
+  .dnode { cursor: pointer; padding: 2px 0; font-size: 13px; }
+  .dnode:hover { background: #22272c; }
+  .dnode.s-done { color: #4a7a55; }
+  .dnode.s-open { color: #e8b339; }
+  .dnode.s-obsolete { color: #5b6772; text-decoration: line-through; }
+  .dnode.s-reverted { color: #e86a5f; text-decoration: line-through; }
+  .dnode.dactive { font-weight: 700; }
+  .dnode.dsel { background: #22272c; }
+  .dinfo { margin-top: 10px; border-top: 1px solid #2a2f34; padding-top: 8px; }
   #over { position: fixed; inset: 0; background: rgba(20,23,26,.94); z-index: 100; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; }
   #over .over-box { color: #e8332a; font-size: 62px; font-weight: 800; letter-spacing: .12em; border: 6px solid #e8332a; border-radius: 18px; padding: 26px 52px; }
   #over .over-sub { color: #e86a5f; font-size: 15px; }
@@ -371,6 +454,7 @@ async function openDoc(path, returnKey) {
   showDetails(path, '<div style="padding:2px 0 10px"><button class="ghost back" data-return="' + returnKey + '">‹ back</button></div><div class="docview">' + d.html + "</div>");
 }
 function detailFor(key) {
+  if (key.startsWith("log:")) { void openLogDetail(key.slice(4)); return ["log entry", '<div class="meta">loading…</div>']; }
   if (key.startsWith("cond:")) return condDetail(key.slice(5));
   if (key === "comment") {
     const txt = (D.comment || "").replace(/&/g,"&amp;").replace(/</g,"&lt;");
@@ -449,6 +533,82 @@ if (CURRENT && D.states[CURRENT] && WALK_HERE) { CURRENT_DETAIL = "state:" + CUR
 const DETAIL_PARAM = new URLSearchParams(location.search).get("detail");
 if (DETAIL_PARAM) { CURRENT_DETAIL = DETAIL_PARAM; const dp = detailFor(DETAIL_PARAM); showDetails(dp[0], dp[1]); }
 
+// THE UNIFIED FEED (owner ruling, v2 i9 notes; built in v3): every hand's
+// act, one line each — time | src | brief | result. Updates bold, notes
+// italic, refusals red. Click a line: the full record (request first, then
+// response, one combined object) in details; an update line: the decision
+// graph of its state visit.
+function escText(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;"); }
+const logPanel = document.getElementById("log-rows");
+let LOG_ROWS = [];
+let lastActs = null;
+let DECISION_GRAPH = null;
+function renderLog() {
+  if (!logPanel) return;
+  const fEl = document.getElementById("log-filter");
+  const f = fEl ? fEl.value.toLowerCase() : "";
+  const rows = LOG_ROWS.filter((r) => !f || (r.ts + " " + r.src + " " + r.type + " " + r.brief + " " + (r.clause || "")).toLowerCase().includes(f));
+  const stick = logPanel.scrollHeight - logPanel.scrollTop - logPanel.clientHeight < 40;
+  logPanel.innerHTML = rows.map((r) =>
+    '<div class="logrow ' + r.type + (r.ok ? "" : " failed") + '" data-ref="' + r.ref + '">' +
+      '<span class="lt">' + r.ts.slice(11, 19) + "</span>" +
+      '<span class="lsrc ' + r.src + '">' + r.src + "</span>" +
+      '<span class="lbrief">' + escText(r.brief) + "</span>" +
+      '<span class="lok">' + (r.ok ? "✓" : "✗ " + (r.clause || "")) + "</span>" +
+    "</div>").join("") || '<div class="meta">no acts' + (f ? " match the filter" : " this session yet") + "</div>";
+  if (stick) logPanel.scrollTop = logPanel.scrollHeight;
+}
+async function refreshLog() {
+  if (!logPanel) return;
+  try {
+    const r = await fetch("/api/log");
+    const d = await r.json();
+    LOG_ROWS = d.rows || [];
+    renderLog();
+  } catch (e) { /* the alive poll owns liveness verdicts */ }
+}
+if (logPanel) {
+  refreshLog();
+  const fEl = document.getElementById("log-filter");
+  if (fEl) fEl.addEventListener("input", renderLog);
+}
+async function openLogDetail(ref) {
+  CURRENT_DETAIL = "log:" + ref;
+  const r = await fetch("/api/log?ref=" + encodeURIComponent(ref));
+  const rec = await r.json();
+  if (rec.tool === "se_update" && rec.args && rec.args.visit) { await showDecisions(rec.args.visit, null); return; }
+  showDetails("log · " + (rec.tool || ref), jsonTable({ at: rec.ts, request: { tool: rec.tool, args: rec.args }, response: rec.response === undefined ? null : rec.response, duration_ms: rec.duration_ms }));
+}
+async function showDecisions(visit, sel) {
+  const r = await fetch("/api/decisions?visit=" + encodeURIComponent(visit));
+  DECISION_GRAPH = await r.json();
+  renderDecisions(sel);
+}
+function renderDecisions(sel) {
+  const g = DECISION_GRAPH;
+  if (!g) return;
+  const kids = {};
+  g.nodes.forEach((n) => { (kids[n.parent || ""] = kids[n.parent || ""] || []).push(n); });
+  const badge = { open: "●", done: "✓", obsolete: "⊘", reverted: "↩" };
+  function tree(pid, depth) {
+    return (kids[pid] || []).map((n) =>
+      '<div class="dnode s-' + n.status + (n.id === g.active ? " dactive" : "") + (n.id === sel ? " dsel" : "") + '" data-node="' + n.id + '" style="margin-left:' + depth * 14 + 'px" title="' + n.id + " · " + n.status + '">' + badge[n.status] + " " + escText(n.brief) + "</div>" + tree(n.id, depth + 1)
+    ).join("");
+  }
+  let html = tree("", 0) || '<div class="vnull">no decisions recorded for ' + escText(g.visit) + "</div>";
+  if (sel) {
+    const n = g.nodes.find((x) => x.id === sel);
+    if (n) html += '<div class="dinfo">' + jsonTable(Object.assign({ id: n.id, brief: n.brief, status: n.status }, n.resolution ? { resolution: n.resolution } : {}, { opened: n.at }, n.closed_at ? { closed: n.closed_at } : {})) + "</div>";
+  }
+  showDetails("decisions · " + g.visit, html);
+}
+document.addEventListener("click", (ev) => {
+  const lr = ev.target.closest ? ev.target.closest(".logrow") : null;
+  if (lr) { void openLogDetail(lr.dataset.ref); return; }
+  const dn = ev.target.closest ? ev.target.closest(".dnode") : null;
+  if (dn) { renderDecisions(dn.dataset.node); return; }
+});
+
 // THE THRESHOLD SLIDER — the human's live grip on how much of the walk is
 // the agent's. Takes effect on the agent's NEXT tick; logged server-side.
 const thr = document.getElementById("thr");
@@ -493,6 +653,7 @@ setInterval(async () => {
       const lbl = document.getElementById("thr-val");
       if (lbl) lbl.textContent = Number(a.threshold).toFixed(2);
     }
+    if (logPanel && a.acts !== lastActs) { lastActs = a.acts; refreshLog(); }
     if (JSON.stringify(a.active || []) !== ACTIVE_AT_RENDER) { location.reload(); return; }
     // A script run finishing elsewhere (agent tick, other window) lands
     // its result — refresh, keeping the open pane.
@@ -511,7 +672,7 @@ function widgetHead(title: string, widgetId: string, url: string): string {
   return `<div class="widget-head"><span>${esc(title)}</span><button class="expand" data-widget="${widgetId}" data-url="${esc(url)}" title="expand · ctrl-click: new tab · shift-click: new window">⛶</button></div>`;
 }
 
-export function renderMirror(m: MirrorState, widget?: "machine" | "details", view?: string): string {
+export function renderMirror(m: MirrorState, widget?: "machine" | "details" | "log", view?: string): string {
   const info = m.session.describe() as { active: string[]; status: string };
   const walkMachine = m.session.currentMachine();
   const { decl, canvas } = viewedMachine(m, view ?? walkMachine.id);
@@ -616,6 +777,17 @@ export function renderMirror(m: MirrorState, widget?: "machine" | "details", vie
     <div class="meta" id="details-title">—</div>
     <div class="panel" id="details"></div>
   </div>`;
+  // The unified feed sits ABOVE details (owner ruling 2026-07-26) — rows
+  // load and refresh client-side off /api/log; only present with a log.
+  const logWidget = m.log === undefined ? "" : `<div class="widget" id="w-log">${widgetHead("log", "w-log", "/widget/log")}
+    <div class="log-filter-row"><input id="log-filter" placeholder="filter the feed — substring over time/src/type/brief/clause"></div>
+    <div class="panel log-panel" id="log-rows"><div class="meta">loading…</div></div>
+  </div>`;
+
+  if (widget === "log") {
+    return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>se · log</title><style>${STYLE} #w-log{flex:1;border-bottom:0}</style></head>
+<body><div class="cols"><aside id="sidebar" style="width:100vw;max-width:100vw">${logWidget}</aside></div>${data}<script>${SCRIPT}</script></body></html>`;
+  }
 
   if (widget === "machine") {
     return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>se · machine</title><style>${STYLE} main{padding:10px}</style></head>
@@ -633,6 +805,7 @@ export function renderMirror(m: MirrorState, widget?: "machine" | "details", vie
   </main>
   <div id="divider"></div>
   <aside id="sidebar">
+    ${logWidget}
     ${detailsWidget}
   </aside>
 </div>

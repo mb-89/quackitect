@@ -63,6 +63,24 @@ Supersedes the first draft where they differ. Owner rulings incorporated:
 - Each mechanism must name the failure it is load-bearing for; anything that
   cannot is deferred.
 
+## Visibility before M4 (owner ruling 2026-07-26, expedition e2)
+
+The mirror grew the UNIFIED LOG: every hand's act — agent calls, human
+mirror acts, updates, notes — one line each in the sidebar above details;
+click → the full record (request then response); an update line → the
+DECISION GRAPH of its state visit. Updates are graph ops riding any call's
+`update` field (plan / fork / done / obsolete / revert / note); everything
+started gets resolved — silently abandoning is refused into visibility.
+The TOLL enforces narration: five silent minutes, one grace warning, then
+the refusal with the resend inline. `se_note` captures strays anywhere.
+Design source: v2's i9-board-rounds notes (never built there).
+
+ETA was DROPPED deliberately: hand-typed clock times proved
+uncalibratable in v2 (median claimed-vs-actual ratio 0.01, a wrong wall
+clock). If it returns, it returns as ETA-ON-STEPS: machine states declare
+expected durations, the engine stamps actuals, planned-vs-actual becomes
+the calibration table. Never an agent-authored clock time again.
+
 ## Forward: asynchronous lane tasks (owner question 2026-07-26)
 
 MCP's CALL is synchronous; the SERVER is not. Nothing stops the lane from
