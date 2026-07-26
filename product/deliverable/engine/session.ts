@@ -27,6 +27,8 @@ import {
   type StateDecl,
 } from "./machine.ts";
 import { compileMachine, resolveRef } from "./machines/compile.ts";
+import { conditionNotePath } from "./conditions.ts";
+import { pulledFor, scanGuidance, type GuidanceDoc, type PulledDoc } from "./pull.ts";
 import { spawnSync } from "node:child_process";
 import { accessSync, constants, existsSync, mkdirSync, readdirSync } from "node:fs";
 import { rgPath } from "./search.ts";
@@ -160,17 +162,40 @@ export class Session {
     return `${m.id}/${stateId}`;
   }
 
-  conditionMet(m: MachineDecl, s: StateDecl, which: "enter" | "leave"): boolean {
-    const cond = (which === "leave" ? s.leave_when : s.enter_when) ?? "always";
-    if (cond === "always") return true;
-    if (cond === "read_guidance") {
-      return this.evidence.get(this.evidenceKey(m, s.id))?.read_confirmed === true;
-    }
-    if (cond === "preflight") {
+  /** One condition key of a state's entry/exit dictionary. */
+  conditionKeyMet(m: MachineDecl, s: StateDecl, key: string): boolean {
+    if (key === "read") return this.evidence.get(this.evidenceKey(m, s.id))?.read_confirmed === true;
+    if (key === "preflight") {
       const c = this.preflightStatus();
       return c !== undefined && c.length === 0;
     }
     return false;
+  }
+
+  /** All keys of the dictionary must hold. Absent dictionary = always. */
+  conditionMet(m: MachineDecl, s: StateDecl, which: "enter" | "leave"): boolean {
+    const dict = which === "leave" ? s.exit : s.entry;
+    if (dict === undefined) return true;
+    return Object.keys(dict).every((k) => this.conditionKeyMet(m, s, k));
+  }
+
+  /** Per-key status — the mirror's bubbles and the agent's packet share it. */
+  conditionStatus(m: MachineDecl, s: StateDecl, which: "enter" | "leave"): Record<string, { args: string[]; met: boolean; note: string }> | undefined {
+    const dict = which === "leave" ? s.exit : s.entry;
+    if (dict === undefined) return undefined;
+    const out: Record<string, { args: string[]; met: boolean; note: string }> = {};
+    for (const [k, args] of Object.entries(dict)) {
+      out[k] = { args, met: this.conditionKeyMet(m, s, k), note: conditionNotePath(k) };
+    }
+    return out;
+  }
+
+  private guidanceCache?: GuidanceDoc[];
+
+  /** THE PULL — derived, never authored; see engine/pull.ts. */
+  pulled(m: MachineDecl, s: StateDecl): PulledDoc[] {
+    this.guidanceCache ??= scanGuidance(this.root);
+    return pulledFor(this.root, this.guidanceCache, m, s);
   }
 
   private preflightCache?: string[];
@@ -197,11 +222,13 @@ export class Session {
     }
     for (const d of decls) {
       for (const s of d.states) {
-        for (const p of s.read ?? []) {
-          try {
-            if (!existsSync(resolveInRoot(this.root, p, "preflight"))) failures.push(`${d.id}/${s.id}: read path missing: ${p}`);
-          } catch {
-            failures.push(`${d.id}/${s.id}: read path escapes the root: ${p}`);
+        for (const dict of [s.entry, s.exit]) {
+          for (const p of dict?.read ?? []) {
+            try {
+              if (!existsSync(resolveInRoot(this.root, p, "preflight"))) failures.push(`${d.id}/${s.id}: read path missing: ${p}`);
+            } catch {
+              failures.push(`${d.id}/${s.id}: read path escapes the root: ${p}`);
+            }
           }
         }
       }
@@ -246,38 +273,46 @@ export class Session {
     return { state: `${machine.id}/${s.id}`, evidence: record };
   }
 
-  private assertConditions(m: MachineDecl, from: StateDecl, to?: string): void {
-    if (from.leave_when === "preflight") this.preflightRun(); // a tick attempt runs the checks
-    if (!this.conditionMet(m, from, "leave")) {
-      if (from.leave_when === "preflight") {
-        throw new Rejection({
-          clause: CLAUSES.CONDITION_UNMET,
-          expected: `leave condition of ${from.id}: preflight — all checks green`,
-          got: (this.preflightStatus() ?? ["checks not run"]).join("; "),
-          remedy: { tool: "se_tick", args: { advance: true }, note: "fix the named failures, then tick again — the checks re-run on every attempt" },
-          source: "engine/session.ts conditions",
-        });
-      }
+  private refuseCondition(stateId: string, which: "exit" | "entry", key: string, args: string[]): never {
+    const note = conditionNotePath(key);
+    if (key === "preflight") {
       throw new Rejection({
         clause: CLAUSES.CONDITION_UNMET,
-        expected: `leave condition of ${from.id}: ${from.leave_when} (read the guidance, then confirm)`,
-        got: "no evidence yet",
-        remedy: { tool: "se_tick", args: { confirm: true }, note: "READ everything listed under `read` first (se_file_read serves the paths once booted; during boot they ride the packet) — then confirm; the confirmation is logged as your evidence" },
+        expected: `${which} condition 'preflight' of ${stateId} — all checks green (see ${note})`,
+        got: (this.preflightStatus() ?? ["checks not run"]).join("; "),
+        remedy: { tool: "se_tick", args: { advance: true }, note: "fix the named failures, then tick again — the checks re-run on every attempt" },
         source: "engine/session.ts conditions",
       });
+    }
+    if (key === "read") {
+      throw new Rejection({
+        clause: CLAUSES.CONDITION_UNMET,
+        expected: `${which} condition 'read' of ${stateId} — confirmed reading of: ${args.join(", ")} (see ${note})`,
+        got: "no evidence yet",
+        remedy: { tool: "se_tick", args: { confirm: true }, note: "READ the listed documents first (the lane serves them; during boot they ride the packet) — then confirm; the confirmation is logged as your evidence" },
+        source: "engine/session.ts conditions",
+      });
+    }
+    throw new Rejection({
+      clause: CLAUSES.CONDITION_UNMET,
+      expected: `${which} condition '${key}' of ${stateId} (see ${note})`,
+      got: "unmet",
+      remedy: { tool: "se_file_read", args: { path: note }, note: "the condition's note says what it wants" },
+      source: "engine/session.ts conditions",
+    });
+  }
+
+  private assertConditions(m: MachineDecl, from: StateDecl, to?: string): void {
+    if (from.exit?.preflight !== undefined) this.preflightRun(); // a tick attempt runs the checks
+    for (const [key, args] of Object.entries(from.exit ?? {})) {
+      if (!this.conditionKeyMet(m, from, key)) this.refuseCondition(from.id, "exit", key, args);
     }
     const targetId = to ?? (from.edges.length === 1 ? from.edges[0].to : undefined);
     if (targetId === undefined) return;
     const target = m.states.find((s) => s.id === targetId);
     if (target === undefined) return;
-    if (!this.conditionMet(m, target, "enter")) {
-      throw new Rejection({
-        clause: CLAUSES.CONDITION_UNMET,
-        expected: `enter condition of ${target.id}: ${target.enter_when}`,
-        got: "no evidence yet",
-        remedy: { tool: "se_tick", args: {}, note: "the enter condition must hold before this state can activate" },
-        source: "engine/session.ts conditions",
-      });
+    for (const [key, args] of Object.entries(target.entry ?? {})) {
+      if (!this.conditionKeyMet(m, target, key)) this.refuseCondition(target.id, "entry", key, args);
     }
   }
 
@@ -294,9 +329,10 @@ export class Session {
         statement: s.statement,
         guidance: s.guidance,
         legal_tools: s.kind === "start" || s.kind === "end" ? [...MACHINERY] : (s.legal_tools ?? []),
-        leave_when: s.leave_when ?? "always",
-        leave_met: this.conditionMet(machine, s, "leave"),
-        ...(s.read !== undefined ? { read: s.read } : {}),
+        ...(s.entry !== undefined ? { entry: this.conditionStatus(machine, s, "enter") } : {}),
+        ...(s.exit !== undefined ? { exit: this.conditionStatus(machine, s, "leave") } : {}),
+        exit_met: this.conditionMet(machine, s, "leave"),
+        pulled: this.pulled(machine, s),
         // Enough to CHOOSE among several ways forward: what the target is,
         // not just its name (the agent has no other way to peek).
         next: s.edges.map((e) => {
@@ -306,7 +342,7 @@ export class Session {
             role: e.role,
             ...(e.guard !== undefined ? { guard: e.guard } : {}),
             ...(t !== undefined ? { kind: t.kind, statement: t.statement } : {}),
-            enter_when: t?.enter_when ?? "always",
+            ...(t?.entry !== undefined ? { entry: this.conditionStatus(machine, t, "enter") } : {}),
             enter_met: t === undefined ? true : this.conditionMet(machine, t, "enter"),
           };
         }),
@@ -392,9 +428,10 @@ export class Session {
       statement: s.statement,
       guidance: s.guidance,
       legal_tools: s.kind === "start" || s.kind === "end" ? [...MACHINERY] : (s.legal_tools ?? []),
-      leave_when: s.leave_when ?? "always",
-      leave_met: this.conditionMet(home, s, "leave"),
-      ...(s.read !== undefined ? { read: s.read } : {}),
+      ...(s.entry !== undefined ? { entry: this.conditionStatus(home, s, "enter") } : {}),
+      ...(s.exit !== undefined ? { exit: this.conditionStatus(home, s, "leave") } : {}),
+      exit_met: this.conditionMet(home, s, "leave"),
+      pulled: this.pulled(home, s),
       ...(s.submachine !== undefined ? { submachine: s.submachine } : {}),
       next: s.edges.map((e) => {
         const t = home.states.find((st) => st.id === e.to);

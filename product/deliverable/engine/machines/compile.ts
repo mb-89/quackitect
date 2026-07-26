@@ -15,7 +15,8 @@
 import { existsSync } from "node:fs";
 import { dirname, isAbsolute, join, resolve } from "node:path";
 import { loadCanvas, type CanvasElement } from "../canvas.ts";
-import { loadStateNote, section } from "../notes.ts";
+import { loadStateNote, section, type FrontmatterValue } from "../notes.ts";
+import { CONDITION_TYPES, conditionNoteAbs, conditionNotePath } from "../conditions.ts";
 import {
   evalGuard,
   validateMachine,
@@ -27,8 +28,6 @@ import {
 } from "../machine.ts";
 
 const ROLES: ReadonlySet<string> = new Set(["normal", "alternative", "fallback", "recovery", "approval", "error"]);
-/** The engine-verifiable condition registry — unknown names refuse at compile. */
-const CONDITIONS: ReadonlySet<string> = new Set(["always", "read_guidance", "preflight"]);
 
 export class MachineCompileError extends Error {
   constructor(machine: string, element: string, message: string) {
@@ -144,7 +143,7 @@ export function compileMachine(root: string, canvasPath: string): MachineDecl {
       if (!existsSync(notePath)) {
         throw new MachineCompileError(machineId, `canvas node ${el.id}`, `dangling reference: ${ref} not found`);
       }
-      decl = stateFromNote(machineId, ref, notePath);
+      decl = stateFromNote(machineId, ref, notePath, root);
     } else {
       throw new MachineCompileError(machineId, `canvas node ${el.id}`, `file ${JSON.stringify(ref)} is neither a state note (.md) nor a machine (.canvas)`);
     }
@@ -221,15 +220,45 @@ export function compileMachine(root: string, canvasPath: string): MachineDecl {
   return machine;
 }
 
-function stateFromNote(machineId: string, ref: string, notePath: string): StateDecl {
+function asString(v: FrontmatterValue | undefined): string | undefined {
+  return typeof v === "string" ? v : undefined;
+}
+
+function asList(v: FrontmatterValue | undefined): string[] | undefined {
+  const s = asString(v);
+  if (s === undefined || s === "") return undefined;
+  return s.split(",").map((t) => t.trim()).filter((t) => t !== "");
+}
+
+/** entry:/exit: dictionaries — key = condition type, value = its arguments. */
+function conditionDict(machineId: string, ref: string, root: string, which: string, v: FrontmatterValue | undefined): Record<string, string[]> | undefined {
+  if (v === undefined) return undefined;
+  if (typeof v === "string") {
+    throw new MachineCompileError(machineId, ref, `${which} is a DICTIONARY: an indented "  <type>: <args>" line per condition`);
+  }
+  const out: Record<string, string[]> = {};
+  for (const [key, args] of Object.entries(v)) {
+    if (!CONDITION_TYPES.has(key)) {
+      throw new MachineCompileError(machineId, ref, `unknown ${which} condition type ${JSON.stringify(key)} — engine types: ${[...CONDITION_TYPES].join(", ")}`);
+    }
+    if (!existsSync(conditionNoteAbs(root, key))) {
+      throw new MachineCompileError(machineId, ref, `condition type ${key} has no note at ${conditionNotePath(key)} — every type is defined by its note`);
+    }
+    out[key] = args === "" ? [] : args.split(",").map((t) => t.trim()).filter((t) => t !== "");
+  }
+  return Object.keys(out).length > 0 ? out : undefined;
+}
+
+function stateFromNote(machineId: string, ref: string, notePath: string, root: string): StateDecl {
   const note = loadStateNote(notePath);
   const x = note.frontmatter;
-  const stateId = x.state;
+  const stateId = asString(x.state);
   if (stateId === undefined || stateId === "") {
     throw new MachineCompileError(machineId, ref, "missing state (the state's id) in frontmatter");
   }
   const KINDS = ["work", "gate", "terminal", "start", "end"];
-  const kind = KINDS.includes(x.state_kind) ? (x.state_kind as "work" | "gate" | "terminal" | "start" | "end") : null;
+  const kindRaw = asString(x.state_kind);
+  const kind = kindRaw !== undefined && KINDS.includes(kindRaw) ? (kindRaw as "work" | "gate" | "terminal" | "start" | "end") : null;
   if (kind === null) {
     throw new MachineCompileError(machineId, ref, `state_kind must be one of ${KINDS.join(" | ")} (got ${JSON.stringify(x.state_kind)})`);
   }
@@ -237,35 +266,26 @@ function stateFromNote(machineId: string, ref: string, notePath: string): StateD
   // ruling 2026-07-26). guidance is a frontmatter field — short by design,
   // and NEVER empty: a state with nothing to say is a state that leaves the
   // agent guessing (owner ruling, same day).
-  if (x.guidance === undefined || x.guidance.trim() === "") {
+  const guidance = asString(x.guidance);
+  if (guidance === undefined || guidance.trim() === "") {
     throw new MachineCompileError(machineId, ref, "every state carries guidance (frontmatter `guidance:`)");
   }
-  for (const key of ["enter_when", "leave_when"] as const) {
-    const v = x[key];
-    if (v !== undefined && v !== "" && !CONDITIONS.has(v)) {
-      throw new MachineCompileError(machineId, ref, `${key} must be one of ${[...CONDITIONS].join(" | ")} (got ${JSON.stringify(v)})`);
-    }
-  }
-  const legalTools =
-    x.legal_tools === undefined || x.legal_tools === ""
-      ? undefined
-      : x.legal_tools
-          .split(",")
-          .map((t) => t.trim())
-          .filter((t) => t !== "");
+  const legalTools = asList(x.legal_tools);
+  const entry = conditionDict(machineId, ref, root, "entry", x.entry);
+  const exit = conditionDict(machineId, ref, root, "exit", x.exit);
+  const tags = asList(x.tags);
+  const submachine = asString(x.submachine);
   return {
     id: stateId,
     kind,
     statement: note.statement,
-    guidance: x.guidance ?? "",
+    guidance,
     evidence_form: [...evidenceForm(machineId, ref, note.body), ...(kind === "gate" ? STANDARD_ROUNDS : [])],
-    ...(x.submachine !== undefined && x.submachine !== "" ? { submachine: x.submachine } : {}),
+    ...(submachine !== undefined && submachine !== "" ? { submachine } : {}),
     ...(legalTools !== undefined ? { legal_tools: legalTools } : {}),
-    ...(x.enter_when !== undefined && x.enter_when !== "" ? { enter_when: x.enter_when } : {}),
-    ...(x.leave_when !== undefined && x.leave_when !== "" ? { leave_when: x.leave_when } : {}),
-    ...(x.read !== undefined && x.read !== ""
-      ? { read: x.read.split(",").map((p) => p.trim()).filter((p) => p !== "") }
-      : {}),
+    ...(entry !== undefined ? { entry } : {}),
+    ...(exit !== undefined ? { exit } : {}),
+    ...(tags !== undefined ? { tags } : {}),
     edges: [],
   };
 }

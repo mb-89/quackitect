@@ -46,10 +46,10 @@ function sidePoint(el: CanvasElement, side: string | undefined, other: CanvasEle
 }
 
 export interface StateMeta {
-  leave_when: string;
-  leave_met: boolean;
-  enter_when: string;
-  enter_met: boolean;
+  has_exit: boolean;
+  exit_met: boolean;
+  has_entry: boolean;
+  entry_met: boolean;
 }
 
 function machineSvg(canvas: CanvasData, activeIds: Set<string>, doneIds: Set<string>, subIds: Set<string>, meta: Record<string, StateMeta>): string {
@@ -98,11 +98,11 @@ function machineSvg(canvas: CanvasData, activeIds: Set<string>, doneIds: Set<str
     const mt = meta[sid];
     if (mt !== undefined) {
       const cy = n.y + n.height / 2;
-      if (mt.enter_when !== "always") {
-        parts.push(`<g class="clickable cond ${mt.enter_met ? "met" : "unmet"}" data-detail="cond:${esc(sid)}"><circle cx="${n.x}" cy="${cy}" r="18"/><text x="${n.x}" y="${cy + 7}" class="cond-label">${mt.enter_met ? "✓" : "!"}</text></g>`);
+      if (mt.has_entry) {
+        parts.push(`<g class="clickable cond ${mt.entry_met ? "met" : "unmet"}" data-detail="cond:${esc(sid)}"><circle cx="${n.x}" cy="${cy}" r="18"/><text x="${n.x}" y="${cy + 7}" class="cond-label">${mt.entry_met ? "✓" : "!"}</text></g>`);
       }
-      if (mt.leave_when !== "always") {
-        parts.push(`<g class="clickable cond ${mt.leave_met ? "met" : "unmet"}" data-detail="cond:${esc(sid)}"><circle cx="${n.x + n.width}" cy="${cy}" r="18"/><text x="${n.x + n.width}" y="${cy + 7}" class="cond-label">${mt.leave_met ? "✓" : "!"}</text></g>`);
+      if (mt.has_exit) {
+        parts.push(`<g class="clickable cond ${mt.exit_met ? "met" : "unmet"}" data-detail="cond:${esc(sid)}"><circle cx="${n.x + n.width}" cy="${cy}" r="18"/><text x="${n.x + n.width}" y="${cy + 7}" class="cond-label">${mt.exit_met ? "✓" : "!"}</text></g>`);
       }
     }
   }
@@ -231,19 +231,31 @@ const WALK_HERE = D.viewingWalk;
 function nextTable(id, s) {
   const here = WALK_HERE && id === CURRENT;
   return '<table class="kv">' + s.next.map((n, i) => {
-    const inner = jsonTable({ to: n.to, ...(n.statement ? { statement: n.statement } : {}), role: n.role, ...(n.guard ? { guard: n.guard } : {}), ...(n.enter_when !== "always" ? { enter_when: n.enter_when } : {}) });
-    const unlocked = here && s.leave_met && n.enter_met;
+    const inner = jsonTable({ to: n.to, ...(n.statement ? { statement: n.statement } : {}), role: n.role, ...(n.guard ? { guard: n.guard } : {}) });
+    const unlocked = here && s.exit_met && n.enter_met;
     const btn = here
       ? '<button class="primary go' + (unlocked ? "" : " locked") + '" data-to="' + n.to + '"' + (unlocked ? "" : " disabled") +
-        ' title="' + (unlocked ? "tick: leave " + id + ", enter " + n.to : s.leave_met ? "enter condition of " + n.to + " not met" : "leave condition of " + id + " not met: " + s.leave_when) + '">▶</button>'
+        ' title="' + (unlocked ? "tick: leave " + id + ", enter " + n.to : s.exit_met ? "entry condition of " + n.to + " not met" : "exit condition of " + id + " not met") + '">▶</button>'
       : "";
     return '<tr><td class="k">' + i + '</td><td class="v">' + inner + '</td>' + (here ? '<td class="btncell">' + btn + "</td>" : "") + "</tr>";
   }).join("") + "</table>";
 }
+function pulledView(pulled) {
+  const bySource = {};
+  for (const p of pulled) for (const src of p.sources) (bySource[src] ??= []).push(p.path);
+  return Object.entries(bySource).map(([srcName, paths]) =>
+    '<details><summary style="cursor:pointer;color:#7f8b96">' + srcName + " (" + paths.length + ")</summary>" +
+    paths.map((p) => '<div style="padding:2px 0 2px 14px"><a class="doclink" data-path="' + p + '">' + p + "</a></div>").join("") +
+    "</details>"
+  ).join("");
+}
 function stateDetail(id) {
   const s = D.states[id] ?? {};
-  const bare = Object.assign({}, s); delete bare.next;
+  const bare = Object.assign({}, s); delete bare.next; delete bare.pulled; delete bare.preflight_ran; delete bare.preflight_failures; delete bare.was_filled;
   let html = jsonTable(bare);
+  if (s.pulled && s.pulled.length > 0) {
+    html += '<div class="meta" style="padding:8px 0 2px">pulled — derived by the machine, not authored</div>' + pulledView(s.pulled);
+  }
   if (s.next && s.next.length > 0) {
     html += '<div class="meta" style="padding:8px 0 4px">next</div>' + nextTable(id, s);
   }
@@ -269,31 +281,33 @@ document.addEventListener("click", async (ev) => {
   const back = ev.target.closest ? ev.target.closest(".back") : null;
   if (back) { const [t, h] = detailFor(back.dataset.return); showDetails(t, h); return; }
 });
+function condRows(id, dict, standing) {
+  return Object.entries(dict).map(([key, c]) => {
+    let row = '<div style="padding:6px 0 2px"><a class="doclink" data-path="' + c.note + '">' + key + "</a> ";
+    row += c.met ? '<span style="color:#4a7a55">✓ met</span>' : '<span style="color:#e8b339">! unmet</span>';
+    row += "</div>";
+    if (c.args.length > 0) row += jsonTable(c.args);
+    if (key === "preflight") {
+      const s = D.states[id] ?? {};
+      if (standing) row += '<div style="padding:6px 0"><button class="primary runpre">' + (s.preflight_ran ? "re-run checks" : "run checks") + "</button></div>";
+      if (s.preflight_ran && !c.met) row += '<div style="color:#e86a5f">failures:</div>' + jsonTable(s.preflight_failures || []);
+      if (!s.preflight_ran && !standing) row += '<div style="color:#7f8b96">not run yet — enter the state to run the checks</div>';
+    }
+    if (key === "read" && standing && !c.met) {
+      row += '<div style="padding:6px 0"><button class="primary confirm" data-state="' + id + '" title="the confirmation is logged as evidence">confirm</button></div>';
+    }
+    return row;
+  }).join("");
+}
 function condDetail(id) {
   const s = D.states[id] ?? {};
-  const met = s.leave_met;
-  let html = "";
   const standing = WALK_HERE && id === CURRENT;
-  if (s.leave_when === "preflight") {
-    if (standing) html += '<div style="padding:2px 0 10px"><button class="primary runpre" title="the engine runs the checks; the result is the evidence">' + (s.preflight_ran ? "re-run checks" : "run checks") + "</button></div>";
-    html += !s.preflight_ran
-      ? '<div style="padding:2px 0 10px;color:#7f8b96">not run yet' + (standing ? "" : " — enter the state to run the checks") + "</div>"
-      : met
-        ? '<div style="padding:2px 0 10px;color:#4a7a55">preflight green ✓ — exit condition met</div>'
-        : '<div style="padding:2px 0 10px;color:#e86a5f">failures:</div>' + jsonTable(s.preflight_failures || []);
-    html += '<div class="comment-detail">' + (s.guidance || "").replace(/&/g,"&amp;").replace(/</g,"&lt;") + "</div>";
-    return ["preflight · " + id, html];
-  }
-  if (standing && !met) html += '<div style="padding:2px 0 10px"><button class="primary confirm" data-state="' + id + '" title="the confirmation is logged as evidence">confirm</button></div>';
-  if (!standing && !met) html += '<div style="padding:2px 0 10px;color:#7f8b96">worked from inside the state — enter it first</div>';
-  if (met) html += '<div style="padding:2px 0 10px;color:#4a7a55">confirmed ✓</div>';
+  let html = "";
+  if (s.exit) html += '<div class="meta" style="padding:4px 0">exit</div>' + condRows(id, s.exit, standing);
+  if (s.entry) html += '<div class="meta" style="padding:4px 0">entry</div>' + condRows(id, s.entry, standing);
+  if (!standing && !s.exit_met) html += '<div style="padding:6px 0;color:#7f8b96">worked from inside the state — enter it first</div>';
   html += '<div class="comment-detail">' + (s.guidance || "").replace(/&/g,"&amp;").replace(/</g,"&lt;") + "</div>";
-  if (s.read && s.read.length > 0) {
-    html += '<div class="doclist">' + s.read.map((p) =>
-      '<a class="doclink" data-path="' + p + '" data-return="cond:' + id + '">' + p + "</a>"
-    ).join("") + "</div>";
-  }
-  return ["confirm · " + id, html];
+  return ["conditions · " + id, html];
 }
 async function openDoc(path, returnKey) {
   const r = await fetch("/doc?path=" + encodeURIComponent(path));
@@ -411,10 +425,10 @@ export function renderMirror(m: MirrorState, widget?: "machine" | "details", vie
   const meta: Record<string, StateMeta> = {};
   for (const s of decl.states) {
     meta[s.id] = {
-      leave_when: s.leave_when ?? "always",
-      leave_met: m.session.conditionMet(decl, s, "leave"),
-      enter_when: s.enter_when ?? "always",
-      enter_met: m.session.conditionMet(decl, s, "enter"),
+      has_exit: s.exit !== undefined,
+      exit_met: m.session.conditionMet(decl, s, "leave"),
+      has_entry: s.entry !== undefined,
+      entry_met: m.session.conditionMet(decl, s, "enter"),
     };
   }
   const svg = machineSvg(canvas, leafActive, done, subIds, meta);
@@ -453,7 +467,6 @@ export function renderMirror(m: MirrorState, widget?: "machine" | "details", vie
           role: e.role,
           ...(e.guard !== undefined ? { guard: e.guard } : {}),
           ...(t !== undefined ? { kind: t.kind, statement: t.statement } : {}),
-          enter_when: t?.enter_when ?? "always",
           enter_met: t === undefined ? true : m.session.conditionMet(decl, t, "enter"),
         };
       }),

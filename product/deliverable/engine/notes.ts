@@ -8,8 +8,10 @@
 import { readFileSync } from "node:fs";
 import { stripBom } from "./jsonio.ts";
 
+export type FrontmatterValue = string | Record<string, string>;
+
 export interface StateNote {
-  frontmatter: Record<string, string>;
+  frontmatter: Record<string, FrontmatterValue>;
   statement: string;
   body: string;
 }
@@ -17,14 +19,27 @@ export interface StateNote {
 export function parseStateNote(raw: string): StateNote {
   const text = stripBom(raw);
   const lines = text.split(/\r?\n/);
-  const frontmatter: Record<string, string> = {};
+  const frontmatter: Record<string, FrontmatterValue> = {};
   let bodyStart = 0;
   if (lines[0]?.trim() === "---") {
     const end = lines.findIndex((l, i) => i > 0 && l.trim() === "---");
     if (end > 0) {
+      let openDict: Record<string, string> | undefined;
       for (const line of lines.slice(1, end)) {
+        const nested = line.match(/^\s+([A-Za-z_][A-Za-z0-9_]*):\s*(.*)$/);
+        if (nested && openDict !== undefined) {
+          openDict[nested[1]] = nested[2].trim();
+          continue;
+        }
         const m = line.match(/^([A-Za-z_][A-Za-z0-9_]*):\s*(.*)$/);
-        if (m) frontmatter[m[1]] = m[2].trim();
+        if (!m) continue;
+        if (m[2].trim() === "") {
+          openDict = {};
+          frontmatter[m[1]] = openDict;
+        } else {
+          frontmatter[m[1]] = m[2].trim();
+          openDict = undefined;
+        }
       }
       bodyStart = end + 1;
     }

@@ -1,9 +1,9 @@
 ---
 state: read_contract
 state_kind: work
-leave_when: read_guidance
-read: workspace/AGENTS.md, product/guidance/contract.md, product/guidance/voice.md
-guidance: Confirm that you have read and understood the following guidance.
+exit:
+  read: workspace/AGENTS.md, product/guidance/contract.md, product/guidance/voice.md
+guidance: Confirm that you have read and understood the documents in the exit condition.
 ---
 
 # Read the contract

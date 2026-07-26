@@ -1,7 +1,8 @@
 ---
 state: prepare_idle
 state_kind: work
-leave_when: preflight
+exit:
+  preflight:
 guidance: Preflight — engine-checked, not claimed. Tick to run the checks and leave; a failure is named in the refusal. Checks today - every machine canvas compiles, every read path resolves, ripgrep and git answer, the call log writes.
 ---
 

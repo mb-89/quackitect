@@ -65,10 +65,11 @@ state_kind: work             # work | gate | terminal | start | end (required)
 legal_tools: all             # THE STATE GATE: tools legal here (`all` opens the lane;
                              # se_tick is ALWAYS legal — it is the machinery)
 guidance: One or two short sentences the agent gets in its packet. Never empty.
-enter_when: always           # optional; SCXML-style: the edge's effective cond is
-leave_when: read_guidance    # leave_when of its source AND enter_when of its target
-read: workspace/AGENTS.md, product/guidance/voice.md
-                             # docs a read_guidance condition demands (root-relative)
+tags: review                 # optional; joins the state to guidance (the pull's tag rule)
+entry:                       # optional DICTIONARY — same shape as exit
+exit:                        # optional DICTIONARY: key = condition TYPE, value = args
+  read: workspace/AGENTS.md, product/guidance/voice.md
+  preflight:
 ---
 
 # Statement of the state
@@ -79,6 +80,20 @@ Optionally `## Evidence form` with lines "- name | description | required".
 
 `legal_tools` is about TOOLS only — legal STATES are the machine's edges.
 Keep `guidance` short and imperative; it is served verbatim in packets.
+
+Conditions: every `entry:`/`exit:` KEY is a condition TYPE, defined by its
+note in `deliverable/machines/conditions/<type>.md` — the compiler refuses
+a key without a note and an engine evaluator. All keys of a dictionary must
+hold (SCXML: the edge's effective cond is exit of its source AND entry of
+its target). Types today: `read` (args: documents whose confirmed reading
+is the evidence) and `preflight` (no args; engine-checked).
+
+The pull: the machine DERIVES each state's relevant guidance (`pulled` in
+every packet — path, hash, sources). Rules: guidance-root docs and
+`applies: always` docs pull everywhere; a doc's `applies_to:` selectors
+(state id, `machine/*`, `kind: x`) pull where they match; `tags:` on the
+doc joins `tags:` on the state; `read` arguments always appear. Pulling is
+visibility — only conditions gate. Never author `pulled`.
 
 ## Layout and sizing
 

@@ -27,8 +27,7 @@ test("the boot sub-machine compiles with its own mechanical start/end", () => {
   assert.equal(m.initial, "start");
   assert.equal(m.states.find((s) => s.id === "end")!.kind, "end");
   const rc = m.states.find((s) => s.id === "read_contract")!;
-  assert.equal(rc.leave_when, "read_guidance");
-  assert.deepEqual(rc.read, ["workspace/AGENTS.md", "product/guidance/contract.md", "product/guidance/voice.md"]);
+  assert.deepEqual(rc.exit, { read: ["workspace/AGENTS.md", "product/guidance/contract.md", "product/guidance/voice.md"] });
 });
 
 test("at start every lane tool is refused with se_tick as the remedy", async () => {
@@ -53,8 +52,11 @@ test("the agent's ticks walk boot, gated by the read confirmation, banner on idl
   await call(server, "se_tick", { advance: true }); // -> read_contract
   const at = await call(server, "se_tick");
   assert.deepEqual(at.body.active, ["boot/read_contract"]);
-  const state = (at.body.states as { read?: string[] }[])[0];
-  assert.ok(state.read !== undefined && state.read.length === 3, "the read list rides the packet");
+  const state = (at.body.states as { exit?: Record<string, { args: string[] }>; pulled?: { path: string; hash: string; sources: string[] }[] }[])[0];
+  assert.ok(state.exit !== undefined && state.exit.read.args.length === 3, "the exit dictionary rides the packet");
+  assert.ok(state.pulled !== undefined && state.pulled.length >= 2, "the pull rides the packet");
+  assert.ok(state.pulled!.every((p) => p.hash.length === 12 || p.hash === ""), "pulled docs carry hashes");
+  assert.ok(state.pulled!.some((p) => p.sources.includes("root")), "root guidance pulled always");
   const shut = await call(server, "se_run", { command: "echo nope" });
   assert.equal(shut.body.clause, "SE-C-110");
   // the leave condition bites: a tick WITHOUT the confirmation is refused

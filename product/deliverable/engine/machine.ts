@@ -48,14 +48,13 @@ export interface StateDecl {
   /** A nested machine: a ledger machine id, or "iteration" — the iteration may provide its own. */
   submachine?: string;
   /** SCXML-style state contract (owner ruling 2026-07-26): authored on the
-   *  NOTE, evaluated as the transition's cond — an edge's effective guard is
-   *  leave_when of its source AND enter_when of its target. Named engine
-   *  conditions; absent = always. */
-  enter_when?: string;
-  leave_when?: string;
-  /** Documents to read in this state (root-relative) — a read_guidance
-   *  leave condition demands their confirmed reading. */
-  read?: string[];
+   *  NOTE, evaluated as the transition's cond. Each is a DICTIONARY:
+   *  key = a condition TYPE (defined by its note in machines/conditions/),
+   *  value = the type's arguments. All keys must hold. Absent = always. */
+  entry?: Record<string, string[]>;
+  exit?: Record<string, string[]>;
+  /** Tags join states to guidance (the pull system's tag rule). */
+  tags?: string[];
   /** v3 — THE STATE GATE: the LEGAL TOOLS while this state is active
    *  (legal STATES are the machine's edges — this is only about tools).
    *  ["all"] opens the whole lane. Enforced at dispatch, not advisory. */
