@@ -59,8 +59,13 @@ Agent-facing lives in FRONTMATTER; the body is prose for humans. First
 ---
 state: idle                  # the state's id (required)
 state_kind: work             # work | gate | terminal | start | end (required)
-legal_tools: se_boot, se_x   # THE STATE GATE: tools legal here; `all` opens the lane
-guidance: One or two short sentences the agent gets in its packet.
+legal_tools: all             # THE STATE GATE: tools legal here (`all` opens the lane;
+                             # se_tick is ALWAYS legal — it is the machinery)
+guidance: One or two short sentences the agent gets in its packet. Never empty.
+enter_when: always           # optional; SCXML-style: the edge's effective cond is
+leave_when: read_guidance    # leave_when of its source AND enter_when of its target
+read: workspace/AGENTS.md, product/deliverable/machines/guidance/voice.md
+                             # docs a read_guidance condition demands (root-relative)
 ---
 
 # Statement of the state

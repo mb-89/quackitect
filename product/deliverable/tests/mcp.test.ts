@@ -14,9 +14,7 @@ test("initialize and tools/list serve the full lane", async () => {
   const list = await server.handle({ jsonrpc: "2.0", id: 2, method: "tools/list" });
   const names = (list?.result as { tools: { name: string }[] }).tools.map((t) => t.name);
   for (const expected of [
-    "se_boot",
-    "se_exit",
-    "se_state",
+    "se_tick",
     "se_file_read",
     "se_file_write",
     "se_file_patch",
@@ -68,8 +66,8 @@ test("a full read-edit-verify round trip over the wire, and every call logged", 
   const logPath = join(root, ".se", "calls.jsonl");
   assert.ok(existsSync(logPath));
   const lines = readFileSync(logPath, "utf8").trim().split("\n");
-  assert.equal(lines.length, 6); // 3 boot steps + the three lane calls
-  const first = JSON.parse(lines[3]) as { tool: string; ok: boolean };
+  assert.equal(lines.length, 8); // 5 walk ticks + the three lane calls
+  const first = JSON.parse(lines[5]) as { tool: string; ok: boolean };
   assert.equal(first.tool, "se_file_read");
   assert.equal(first.ok, true);
 });

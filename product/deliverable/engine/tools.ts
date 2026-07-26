@@ -19,30 +19,27 @@ import { search } from "./search.ts";
 import { Session } from "./session.ts";
 import { webFetch, webSearch } from "./web.ts";
 
-/** The session machine's own tools — boot, exit, and the always-legal probe. */
+/** THE TICK — the machinery's one tool, legal in every state. */
 export function sessionTools(session: Session): ToolDef[] {
   return [
     {
-      name: "se_boot",
-      title: "se.boot",
+      name: "se_tick",
+      title: "se.tick",
       description:
-        "Advance the boot sequence — the only legal call before idle. Each call completes the current boot step and returns the next step's packet; the last returns the booted banner to show the user verbatim. Pass confirm_read: true to confirm you have READ the current step's guidance (required to leave a read_guidance-gated step; logged as evidence).",
-      inputSchema: { type: "object", properties: { confirm_read: { type: "boolean", description: "confirm the current guidance was actually read" } } },
-      handler: (args) => session.boot(args.confirm_read === true),
-    },
-    {
-      name: "se_exit",
-      title: "se.exit",
-      description: "Close the main machine (legal from idle, when the user is done). Terminal — a new session starts at the beginning.",
-      inputSchema: { type: "object", properties: {} },
-      handler: () => session.exit(),
-    },
-    {
-      name: "se_state",
-      title: "se.state",
-      description: "Where the main machine is: active states (sub-machine included), status, legal tools now. Always safe to call.",
-      inputSchema: { type: "object", properties: {} },
-      handler: () => session.describe(),
+        "THE TICK — the universal walk operation, legal in EVERY state. Without arguments: where the machine is (state, guidance, what to read, legal tools, next states). With arguments: advance — to: <state> picks the edge (optional when there is only one), confirm: true confirms you have READ everything the state lists under `read` (required by read_guidance leave conditions; logged as evidence), advance: true advances when no other argument applies. When a result carries a banner, show it to the user VERBATIM.",
+      inputSchema: {
+        type: "object",
+        properties: {
+          to: { type: "string", description: "the next state to enter (one of the drawn edges)" },
+          confirm: { type: "boolean", description: "confirm the current state's read list was actually read" },
+          advance: { type: "boolean", description: "advance along the single drawn edge" },
+        },
+      },
+      handler: (args) => {
+        const wantsAdvance = args.to !== undefined || args.confirm === true || args.advance === true;
+        if (!wantsAdvance) return session.tickInfo();
+        return session.tickAdvance(args.to === undefined ? undefined : String(args.to), args.confirm === true);
+      },
     },
   ];
 }

@@ -26,63 +26,64 @@ test("the boot sub-machine compiles with its own mechanical start/end", () => {
   const m = compileMachine(REPO_ROOT, mainMachinePath(REPO_ROOT).replace("main.canvas", "boot.canvas"));
   assert.equal(m.initial, "start");
   assert.equal(m.states.find((s) => s.id === "end")!.kind, "end");
-  assert.deepEqual(m.states.find((s) => s.id === "read_contract")!.legal_tools, ["se_boot"]);
+  const rc = m.states.find((s) => s.id === "read_contract")!;
+  assert.equal(rc.leave_when, "read_guidance");
+  assert.deepEqual(rc.read, ["workspace/AGENTS.md", "product/deliverable/machines/guidance/contract.md", "product/deliverable/machines/guidance/voice.md"]);
 });
 
-test("at start every lane tool is refused with se_boot as the remedy", async () => {
+test("at start every lane tool is refused with se_tick as the remedy", async () => {
   const server = buildServer(freshRoot());
   const r = await call(server, "se_file_list", { dir: "." });
   assert.equal(r.isError, true);
   assert.equal(r.body.clause, "SE-C-110");
-  assert.equal((r.body.remedy as { tool: string }).tool, "se_boot");
+  assert.equal((r.body.remedy as { tool: string }).tool, "se_tick");
 });
 
-test("se_state is always legal — even before boot (observability is never gated)", async () => {
+test("se_tick without arguments reports the current state — legal everywhere", async () => {
   const server = buildServer(freshRoot());
-  const r = await call(server, "se_state");
+  const r = await call(server, "se_tick");
   assert.equal(r.isError, false);
   assert.deepEqual(r.body.active, ["start"]);
-  assert.ok((r.body.legal_tools as string[]).includes("se_boot"));
+  assert.ok((r.body.legal_tools as string[]).includes("se_tick"));
 });
 
-test("boot walks the sub-machine step by step, gated by the read confirmation", async () => {
+test("the agent's ticks walk boot, gated by the read confirmation, banner on idle", async () => {
   const server = buildServer(freshRoot());
-  const s1 = await call(server, "se_boot");
-  assert.equal(s1.isError, false);
-  assert.equal(s1.body.phase, "boot/read_contract");
-  assert.ok(String(s1.body.guidance).includes("AGENTS.md"));
-  // mid-boot, the lane is still shut and se_state shows the nested position
-  const mid = await call(server, "se_state");
-  assert.deepEqual(mid.body.active, ["boot/read_contract"]);
+  await call(server, "se_tick", { advance: true }); // start -> boot/start
+  await call(server, "se_tick", { advance: true }); // -> read_contract
+  const at = await call(server, "se_tick");
+  assert.deepEqual(at.body.active, ["boot/read_contract"]);
+  const state = (at.body.states as { read?: string[] }[])[0];
+  assert.ok(state.read !== undefined && state.read.length === 3, "the read list rides the packet");
   const shut = await call(server, "se_run", { command: "echo nope" });
   assert.equal(shut.body.clause, "SE-C-110");
-  // the leave condition bites: se_boot WITHOUT the confirmation is refused
-  const unread = await call(server, "se_boot");
+  // the leave condition bites: a tick WITHOUT the confirmation is refused
+  const unread = await call(server, "se_tick", { advance: true });
   assert.equal(unread.isError, true);
   assert.equal(unread.body.clause, "SE-C-112");
-  assert.equal((unread.body.remedy as { args: { confirm_read: boolean } }).args.confirm_read, true);
-  const s2 = await call(server, "se_boot", { confirm_read: true });
-  assert.equal(s2.body.phase, "boot/prepare_idle");
-  const s3 = await call(server, "se_boot");
-  assert.equal(s3.body.booted, true);
-  assert.ok(String(s3.body.banner).includes("main machine @ idle"));
-  const again = await call(server, "se_boot");
-  assert.equal(again.isError, true);
-  assert.equal(again.body.clause, "SE-C-110");
+  assert.equal((unread.body.remedy as { args: { confirm: boolean } }).args.confirm, true);
+  const s2 = await call(server, "se_tick", { confirm: true });
+  assert.deepEqual(s2.body.active, ["boot/prepare_idle"]);
+  await call(server, "se_tick", { advance: true }); // -> boot/end
+  const landed = await call(server, "se_tick", { advance: true }); // -> idle
+  assert.equal(landed.body.booted, true);
+  assert.ok(String(landed.body.banner).includes("main machine @ idle"));
+  // the banner shows once; a later tick-info is plain
+  const info = await call(server, "se_tick");
+  assert.equal(info.body.booted, undefined);
 });
 
-test("idle opens the whole lane; se_exit closes it; after done only se_state answers", async () => {
+test("idle opens the whole lane; a tick to end closes it; after end only tick-info answers", async () => {
   const root = freshRoot();
   const server = await bootedServer(root);
   const w = await call(server, "se_file_write", { path: "x.md", content: "hi", base_hash: null });
   assert.equal(w.isError, false);
-  const exit = await call(server, "se_exit");
+  const exit = await call(server, "se_tick", { to: "end" });
   assert.equal(exit.isError, false);
-  assert.ok(String(exit.body.banner).includes("closed"));
   const after = await call(server, "se_file_read", { path: "x.md" });
   assert.equal(after.isError, true);
   assert.equal(after.body.clause, "SE-C-110");
-  const state = await call(server, "se_state");
+  const state = await call(server, "se_tick");
   assert.equal(state.body.status, "closed");
 });
 
@@ -90,7 +91,7 @@ test("the gate is logged like everything else — a refused pre-boot call lands 
   const root = freshRoot();
   const server = buildServer(root);
   await call(server, "se_run", { command: "echo nope" }); // refused at start
-  for (let i = 0; i < 3; i++) await call(server, "se_boot", { confirm_read: true }); // walk to idle
+  for (let i = 0; i < 5; i++) await call(server, "se_tick", { advance: true, confirm: true }); // walk to idle
   const q = await call(server, "se_log_query", { filter: { ok: false } });
   const recs = q.body.records as { tool: string; outcome: string }[];
   assert.equal(recs.length, 1);

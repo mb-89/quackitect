@@ -53,6 +53,9 @@ export interface StateDecl {
    *  conditions; absent = always. */
   enter_when?: string;
   leave_when?: string;
+  /** Documents to read in this state (root-relative) — a read_guidance
+   *  leave condition demands their confirmed reading. */
+  read?: string[];
   /** v3 — THE STATE GATE: the LEGAL TOOLS while this state is active
    *  (legal STATES are the machine's edges — this is only about tools).
    *  ["all"] opens the whole lane. Enforced at dispatch, not advisory. */

@@ -3,16 +3,15 @@
 You work through the `se` MCP server, and you do what it tells you. That is
 the whole rule.
 
-# Boot — automatic, always first
+# The walk — automatic, always first
 
-Every session starts at the main machine's `start` state: the lane is
-locked and `se_boot` is the only legal call. Call it as your very first
-action — before reading, before answering. Boot is a sequence: each
-`se_boot` returns a step packet (read the contract, run the preflight) —
-do the step, call `se_boot` again — until it returns the booted banner.
-Show that banner to the user VERBATIM, then proceed with their request.
-If any call is ever refused with SE-C-110, follow the remedy: it names
-what is legal now.
+Every session starts at the main machine's `start` state with the lane
+locked. `se_tick` is the machinery: without arguments it shows where you
+are; with arguments it advances (`to:` picks the edge, `confirm: true`
+confirms you read what the state lists under `read`, `advance: true` when
+there is one edge). Tick as your very first action and keep walking; when a
+result carries a banner, show it to the user VERBATIM, then proceed. Any
+refusal names its remedy — follow it, recover in one turn.
 
 Your native tools (Read, Write, Edit, Bash, Glob, Grep, web) are blocked in
 this workspace — by an explicit deny list in `.claude/settings.json`, tool by

@@ -37,10 +37,11 @@ product/
 .\RUNME.ps1 -Manual   # ...or open the MIRROR and walk the machines yourself, tick by tick
 ```
 
-**The tick** is the universal walk operation: tick without arguments =
-information about where the machine is; tick with arguments = complete the
-current state and move on. The agent (se_boot/se_exit), the manual Mirror
-buttons, and `POST /tick` on the manual server all drive the same core.
+**The tick** is the universal walk operation and `se_tick` the machinery's
+ONE tool, legal in every state: without arguments it reports where the
+machine is; with arguments it advances (`to:` picks the edge, `confirm:`
+confirms the state's `read` list was read). The agent, the Mirror's
+buttons, and `POST /tick` all drive the same core.
 
 ## The cage (how it blocks)
 
@@ -99,12 +100,14 @@ sharing the same two notes; the machinery walks out of start and the
 machine is done when end activates. **The MAIN machine** (`main.canvas`)
 runs every session: `start → boot → idle → end`, where **boot is a
 sub-machine** (`boot.canvas`: `start → read_contract → prepare_idle → end`)
-and future work states branch from idle. `se_boot` drives the sequence one step per call;
-the SessionStart hook makes the agent boot immediately and show the booted
-banner to the user; THE STATE GATE makes boot inevitable anyway — any
-pre-boot call is refused with `se_boot` as the remedy (SE-C-110). Each
-state's `legal_tools` list is enforced at dispatch; `se_state` is never
-gated; `se_exit` closes the session from idle.
+and future work states branch from idle. `se_tick` walks it one state per call; the
+SessionStart hook makes the agent tick immediately and show the landing
+banner verbatim; THE STATE GATE makes the walk inevitable anyway — any
+pre-idle lane call is refused with `se_tick` as the remedy (SE-C-110).
+States carry `legal_tools` (enforced at dispatch), SCXML-style
+`enter_when`/`leave_when` conditions (SE-C-112 when unmet — `read_guidance`
+demands a logged confirmation of the state's `read` list), and the tick is
+never gated.
 
 ## Status
 

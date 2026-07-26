@@ -263,6 +263,9 @@ function stateFromNote(machineId: string, ref: string, notePath: string): StateD
     ...(legalTools !== undefined ? { legal_tools: legalTools } : {}),
     ...(x.enter_when !== undefined && x.enter_when !== "" ? { enter_when: x.enter_when } : {}),
     ...(x.leave_when !== undefined && x.leave_when !== "" ? { leave_when: x.leave_when } : {}),
+    ...(x.read !== undefined && x.read !== ""
+      ? { read: x.read.split(",").map((p) => p.trim()).filter((p) => p !== "") }
+      : {}),
     edges: [],
   };
 }

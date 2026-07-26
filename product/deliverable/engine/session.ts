@@ -27,10 +27,11 @@ import {
 } from "./machine.ts";
 import { compileMachine, resolveRef } from "./machines/compile.ts";
 
-/** Observability is never gated (v2: "the emit group is always safe to call"). */
-const ALWAYS_LEGAL: ReadonlySet<string> = new Set(["se_state"]);
-/** The machinery's drivers — legal in mechanical start states. */
-const MACHINERY: readonly string[] = ["se_boot"];
+/** THE TICK is the machinery — one tool, legal in EVERY state. Without
+ *  arguments it reports (observability is never gated); with arguments it
+ *  advances. */
+const ALWAYS_LEGAL: ReadonlySet<string> = new Set(["se_tick"]);
+const MACHINERY: readonly string[] = ["se_tick"];
 
 export function mainMachinePath(root: string): string {
   return join(root, "product", "deliverable", "machines", "main.canvas");
@@ -60,6 +61,7 @@ export class Session {
   readonly machine: MachineDecl;
   readonly instance: MachineInstance;
   private sub?: SubRun;
+  private bannerShown = false;
   /** Evidence store: "<machine>/<state>" → what was submitted. */
   private readonly evidence = new Map<string, Record<string, unknown>>();
 
@@ -130,7 +132,7 @@ export class Session {
         clause: CLAUSES.NOT_LEGAL_IN_STATE,
         expected: "an open session machine",
         got: `${tool} after the machine closed`,
-        remedy: { tool: "se_state", args: {}, note: "only se_state answers now; a new session starts at the beginning" },
+        remedy: { tool: "se_tick", args: {}, note: "only the tick answers now; a new session starts at the beginning" },
         source: "engine/session.ts gate",
       });
     }
@@ -140,9 +142,7 @@ export class Session {
       clause: CLAUSES.NOT_LEGAL_IN_STATE,
       expected: `a tool legal in state [${active}]: ${legalList}`,
       got: tool,
-      remedy: tools.has("se_boot")
-        ? { tool: "se_boot", args: {}, note: "boot first — follow each step it returns, then show the user the booted banner verbatim" }
-        : { tool: "se_state", args: {}, note: "see where the machine is and what is legal" },
+      remedy: { tool: "se_tick", args: {}, note: "walk the machine first — se_tick without arguments shows where you are and what is legal" },
       source: "engine/session.ts gate",
     });
   }
@@ -180,7 +180,7 @@ export class Session {
         clause: CLAUSES.CONDITION_UNMET,
         expected: `leave condition of ${from.id}: ${from.leave_when} (read the guidance, then confirm)`,
         got: "no evidence yet",
-        remedy: { tool: "se_boot", args: { confirm_read: true }, note: "confirm ONLY after actually reading the guidance — the confirmation is logged as your evidence" },
+        remedy: { tool: "se_tick", args: { confirm: true }, note: "READ everything listed under `read` first (se_file_read serves the paths once booted; during boot they ride the packet) — then confirm; the confirmation is logged as your evidence" },
         source: "engine/session.ts conditions",
       });
     }
@@ -193,7 +193,7 @@ export class Session {
         clause: CLAUSES.CONDITION_UNMET,
         expected: `enter condition of ${target.id}: ${target.enter_when}`,
         got: "no evidence yet",
-        remedy: { tool: "se_state", args: {}, note: "the enter condition must hold before this state can activate" },
+        remedy: { tool: "se_tick", args: {}, note: "the enter condition must hold before this state can activate" },
         source: "engine/session.ts conditions",
       });
     }
@@ -214,6 +214,7 @@ export class Session {
         legal_tools: s.kind === "start" || s.kind === "end" ? [...MACHINERY] : (s.legal_tools ?? []),
         leave_when: s.leave_when ?? "always",
         leave_met: this.conditionMet(machine, s, "leave"),
+        ...(s.read !== undefined ? { read: s.read } : {}),
         next: s.edges.map((e) => {
           const t = machine.states.find((st) => st.id === e.to);
           return {
@@ -238,15 +239,20 @@ export class Session {
   }
 
   /** tick with arguments: complete the current state and move on.
-   *  `to` picks the outgoing edge (required only when there are several). */
-  tickAdvance(to?: string): Record<string, unknown> {
+   *  `to` picks the outgoing edge (needed only when there are several);
+   *  `confirm` records that the current state's `read` list was read. */
+  tickAdvance(to?: string, confirm = false): Record<string, unknown> {
     const now = new Date().toISOString();
+    if (confirm && this.instance.status === "open") {
+      const { ids } = this.leaves();
+      this.submitEvidence(ids[0], { read_confirmed: true });
+    }
     if (this.instance.status === "closed") {
       throw new Rejection({
         clause: CLAUSES.NOT_LEGAL_IN_STATE,
         expected: "an open machine",
         got: "a tick after end",
-        remedy: { tool: "se_state", args: {}, note: "the machine is done; a new session starts at the beginning" },
+        remedy: { tool: "se_tick", args: {}, note: "the machine is done; a new session starts at the beginning" },
         source: "engine/session.ts tick",
       });
     }
@@ -260,7 +266,7 @@ export class Session {
         this.instance.history.push({ state: this.sub!.parentState, outcome: "filled", at: now });
         this.sub = undefined;
         this.seedSubs();
-        return this.tickInfo();
+        return this.landing();
       }
       const cur = activeStates(this.sub!.instance)[0];
       this.assertEdge(this.sub!.decl, cur, to);
@@ -276,7 +282,22 @@ export class Session {
     completeState(this.machine, this.instance, cur, "filled", now, to);
     this.instance.history.push({ state: cur, outcome: "filled", at: now });
     this.seedSubs();
-    return this.tickInfo();
+    return this.landing();
+  }
+
+  /** The tick's result — plus the booted banner the first time idle lands. */
+  private landing(): Record<string, unknown> {
+    const info = this.tickInfo();
+    if (!this.bannerShown && !this.inSub() && activeStates(this.instance).includes("idle")) {
+      this.bannerShown = true;
+      return {
+        ...info,
+        booted: true,
+        banner: "🦆 SE v3 booted — main machine @ idle. All work runs through the se lane; every call is logged. se_tick shows where you are.",
+        display: "Show the banner above to the user VERBATIM as your first output, then proceed with their request.",
+      };
+    }
+    return info;
   }
 
   /** A chosen way out must be one of the state's drawn edges. */
@@ -306,73 +327,6 @@ export class Session {
   }
 
   // ── The agent's hands on the tick ───────────────────────────────────────
-
-  /** se_boot: one boot step per call — the agent's ticks skip straight
-   *  through mechanical start/end positions; banner when idle is reached.
-   *  confirm_read: the caller confirms having read the current state's
-   *  guidance — recorded as evidence for a read_guidance leave condition. */
-  boot(confirmRead = false): Record<string, unknown> {
-    if (this.instance.status === "closed" || (!this.inSub() && activeStates(this.instance).includes("idle"))) {
-      throw new Rejection({
-        clause: CLAUSES.NOT_LEGAL_IN_STATE,
-        expected: "an unbooted session",
-        got: `se_boot in state [${this.active().join(", ")}]`,
-        remedy: { tool: "se_state", args: {}, note: "already booted — carry on through the lane" },
-        source: "engine/session.ts boot",
-      });
-    }
-    if (confirmRead) {
-      const { ids } = this.leaves();
-      this.submitEvidence(ids[0], { read_confirmed: true, by: "agent" });
-    }
-    // Tick until a non-mechanical position (max a machine's worth of steps).
-    for (let i = 0; i < 16; i++) {
-      this.tickAdvance();
-      const { machine, ids } = this.leaves();
-      const kind = this.state(machine, ids[0]).kind;
-      if (kind !== "start" && kind !== "end") break;
-      if (this.instance.status === "closed") break;
-    }
-    if (!this.inSub() && activeStates(this.instance).includes("idle")) return this.bootedPacket();
-    const { machine, ids } = this.leaves();
-    const s = this.state(machine, ids[0]);
-    return {
-      phase: this.active()[0],
-      statement: s.statement,
-      guidance: s.guidance,
-      action: "Do what the guidance says, then call se_boot again to complete this step.",
-    };
-  }
-
-  private bootedPacket(): Record<string, unknown> {
-    const idle = this.machine.states.find((s) => s.id === "idle");
-    return {
-      booted: true,
-      machine: this.machine.id,
-      state: activeStates(this.instance),
-      banner: "🦆 SE v3 booted — main machine @ idle. All work runs through the se lane; every call is logged. se_state shows where you are.",
-      display: "Show the banner above to the user VERBATIM as your first output, then proceed with their request.",
-      guidance: idle?.guidance ?? "",
-    };
-  }
-
-  /** se_exit: from idle, walk into end. */
-  exit(): Record<string, unknown> {
-    if (this.inSub() || !activeStates(this.instance).includes("idle")) {
-      throw new Rejection({
-        clause: CLAUSES.NOT_LEGAL_IN_STATE,
-        expected: "an idle session",
-        got: `se_exit in state [${this.active().join(", ")}]`,
-        remedy: { tool: "se_state", args: {} },
-        source: "engine/session.ts exit",
-      });
-    }
-    this.tickAdvance();
-    return {
-      closed: true,
-      banner: "🦆 SE v3 session closed. The main machine reached end; a new session starts at the beginning.",
-    };
-  }
 
   describe(): Record<string, unknown> {
     const { all, tools } = this.legal();

@@ -8,12 +8,13 @@
 // tick · advance  POST /tick   (tick with arguments: complete and move on)
 // JSON            GET /api/tick
 import { createServer } from "node:http";
-import { existsSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
+import { marked } from "marked";
 import { CallLog } from "../engine/calllog.ts";
 import { Rejection } from "../engine/errors.ts";
 import { renderMirror, type MirrorState } from "../engine/render.ts";
-import { seDir } from "../engine/paths.ts";
+import { resolveInRoot, seDir } from "../engine/paths.ts";
 import { Session } from "../engine/session.ts";
 
 function argValue(flag: string): string | undefined {
@@ -91,6 +92,17 @@ const server = createServer((req, res) => {
         res.writeHead(303, { location: "/" });
         res.end();
       });
+      return;
+    }
+    if (url.pathname === "/doc") {
+      // Serve a guidance document, rendered — links in the details pane.
+      const p = url.searchParams.get("path") ?? "";
+      const abs = resolveInRoot(root, p, "se-manual /doc");
+      let raw = readFileSync(abs, "utf8");
+      raw = raw.replace(/^---\r?\n[\s\S]*?\r?\n---\r?\n/, ""); // frontmatter is machine-facing
+      const html = p.endsWith(".md") ? (marked.parse(raw) as string) : `<pre>${raw.replace(/&/g, "&amp;").replace(/</g, "&lt;")}</pre>`;
+      res.writeHead(200, { "content-type": "application/json; charset=utf-8" });
+      res.end(JSON.stringify({ path: p, html }));
       return;
     }
     if (url.pathname === "/api/tick") {

@@ -45,7 +45,14 @@ function sidePoint(el: CanvasElement, side: string | undefined, other: CanvasEle
   }
 }
 
-function machineSvg(canvas: CanvasData, activeIds: Set<string>, doneIds: Set<string>, subIds: Set<string>): string {
+export interface StateMeta {
+  leave_when: string;
+  leave_met: boolean;
+  enter_when: string;
+  enter_met: boolean;
+}
+
+function machineSvg(canvas: CanvasData, activeIds: Set<string>, doneIds: Set<string>, subIds: Set<string>, meta: Record<string, StateMeta>): string {
   const nodes = canvas.nodes ?? [];
   const pad = 60;
   const minX = Math.min(...nodes.map((n) => n.x)) - pad;
@@ -86,6 +93,18 @@ function machineSvg(canvas: CanvasData, activeIds: Set<string>, doneIds: Set<str
       parts.push(`<rect x="${n.x + 8}" y="${n.y + 8}" width="${n.width - 16}" height="${n.height - 16}" rx="${Math.max(4, rx - 8)}" class="${cls} inner"/>`);
     }
     parts.push(`<text x="${n.x + n.width / 2}" y="${n.y + n.height / 2 + 6}" class="label">${esc(sid)}</text></g>`);
+    // Condition buttons ride the node's edges: enter on the LEFT (where the
+    // arrow comes in), leave on the RIGHT (in front of the arrow out).
+    const mt = meta[sid];
+    if (mt !== undefined) {
+      const cy = n.y + n.height / 2;
+      if (mt.enter_when !== "always") {
+        parts.push(`<g class="clickable cond ${mt.enter_met ? "met" : "unmet"}" data-detail="cond:${esc(sid)}"><circle cx="${n.x}" cy="${cy}" r="18"/><text x="${n.x}" y="${cy + 7}" class="cond-label">${mt.enter_met ? "✓" : "!"}</text></g>`);
+      }
+      if (mt.leave_when !== "always") {
+        parts.push(`<g class="clickable cond ${mt.leave_met ? "met" : "unmet"}" data-detail="cond:${esc(sid)}"><circle cx="${n.x + n.width}" cy="${cy}" r="18"/><text x="${n.x + n.width}" y="${cy + 7}" class="cond-label">${mt.leave_met ? "✓" : "!"}</text></g>`);
+      }
+    }
   }
 
   return `<svg id="machine-svg" viewBox="${minX} ${minY} ${maxX - minX} ${maxY - minY}">
@@ -165,6 +184,17 @@ const STYLE = `
   .vnull { color: #7f8b96; } .vnum { color: #7cc4e8; } .vbool { color: #c58fe8; } .vstr { color: #a8c88f; }
   td.btncell { text-align: center; vertical-align: middle !important; width: 1%; }
   button.go.locked { background: #2a2f34; color: #5b6772; cursor: not-allowed; }
+  .cond circle { stroke-width: 2.5; }
+  .cond.unmet circle { fill: #3a2f14; stroke: #e8b339; }
+  .cond.met circle { fill: #1d2b20; stroke: #4a7a55; }
+  .cond-label { font-size: 20px; text-anchor: middle; fill: #d8dde2; pointer-events: none; }
+  .doclist a { display: block; color: #7cc4e8; padding: 4px 0; cursor: pointer; text-decoration: underline; }
+  .docview { font-size: 13.5px; line-height: 1.55; }
+  .docview h1, .docview h2, .docview h3 { color: #e8b339; }
+  .docview code { background: #22272c; padding: 1px 5px; border-radius: 4px; }
+  .docview pre { background: #14171a; border: 1px solid #2a2f34; border-radius: 8px; padding: 10px; overflow: auto; }
+  .docview a { color: #7cc4e8; }
+  button.ghost { background: #22272c; color: #d8dde2; border: 1px solid #4a545e; border-radius: 8px; padding: 6px 12px; font: inherit; cursor: pointer; }
   #w-details { flex: 1; border-radius: 0; border: 0; }
 `;
 
@@ -207,9 +237,6 @@ function stateDetail(id) {
   const s = D.states[id] ?? {};
   const bare = Object.assign({}, s); delete bare.next;
   let html = jsonTable(bare);
-  if (WALK_HERE && id === CURRENT && s.leave_when === "read_guidance" && !s.leave_met) {
-    html += '<div style="padding:8px 0"><button class="primary confirm" title="the confirmation is logged as evidence">✓ I have read this</button></div>';
-  }
   if (s.next && s.next.length > 0) {
     html += '<div class="meta" style="padding:8px 0 4px">next</div>' + nextTable(id, s);
   }
@@ -217,9 +244,33 @@ function stateDetail(id) {
 }
 document.addEventListener("click", async (ev) => {
   const c = ev.target.closest ? ev.target.closest(".confirm") : null;
-  if (c && CURRENT) { await fetch("/evidence", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ state: CURRENT }) }); location.href = "/"; }
+  if (c) { await fetch("/evidence", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ state: c.dataset.state || CURRENT }) }); location.href = "/"; return; }
+  const dl = ev.target.closest ? ev.target.closest(".doclink") : null;
+  if (dl) { openDoc(dl.dataset.path, dl.dataset.return); return; }
+  const back = ev.target.closest ? ev.target.closest(".back") : null;
+  if (back) { const [t, h] = detailFor(back.dataset.return); showDetails(t, h); return; }
 });
+function condDetail(id) {
+  const s = D.states[id] ?? {};
+  const met = s.leave_met;
+  let html = "";
+  if (WALK_HERE && !met) html += '<div style="padding:2px 0 10px"><button class="primary confirm" data-state="' + id + '" title="the confirmation is logged as evidence">confirm</button></div>';
+  if (met) html += '<div style="padding:2px 0 10px;color:#4a7a55">confirmed ✓</div>';
+  html += '<div class="comment-detail">' + (s.guidance || "").replace(/&/g,"&amp;").replace(/</g,"&lt;") + "</div>";
+  if (s.read && s.read.length > 0) {
+    html += '<div class="doclist">' + s.read.map((p) =>
+      '<a class="doclink" data-path="' + p + '" data-return="cond:' + id + '">' + p + "</a>"
+    ).join("") + "</div>";
+  }
+  return ["confirm · " + id, html];
+}
+async function openDoc(path, returnKey) {
+  const r = await fetch("/doc?path=" + encodeURIComponent(path));
+  const d = await r.json();
+  showDetails(path, '<div style="padding:2px 0 10px"><button class="ghost back" data-return="' + returnKey + '">‹ back</button></div><div class="docview">' + d.html + "</div>");
+}
 function detailFor(key) {
+  if (key.startsWith("cond:")) return condDetail(key.slice(5));
   if (key === "comment") {
     const txt = (D.comment || "").replace(/&/g,"&amp;").replace(/</g,"&lt;");
     return ["machine: " + D.viewed.id, '<div class="comment-detail">' + txt + "</div>" + jsonTable(D.viewed)];
@@ -314,7 +365,16 @@ export function renderMirror(m: MirrorState, widget?: "machine" | "details", vie
       .map((s) => s.split("/").pop()!),
   );
   const subIds = new Set(decl.states.filter((s) => s.submachine !== undefined).map((s) => s.id));
-  const svg = machineSvg(canvas, leafActive, done, subIds);
+  const meta: Record<string, StateMeta> = {};
+  for (const s of decl.states) {
+    meta[s.id] = {
+      leave_when: s.leave_when ?? "always",
+      leave_met: m.session.conditionMet(decl, s, "leave"),
+      enter_when: s.enter_when ?? "always",
+      enter_met: m.session.conditionMet(decl, s, "enter"),
+    };
+  }
+  const svg = machineSvg(canvas, leafActive, done, subIds, meta);
 
   // Breadcrumbs describe the VIEW: main [›subs] [ › sub [›its subs] ].
   const mainSubs = m.session.machine.states.filter((s) => s.submachine !== undefined).map((s) => s.id);
@@ -338,6 +398,7 @@ export function renderMirror(m: MirrorState, widget?: "machine" | "details", vie
       ...(s.submachine !== undefined ? { submachine: s.submachine } : {}),
       leave_when: s.leave_when ?? "always",
       leave_met: m.session.conditionMet(decl, s, "leave"),
+      ...(s.read !== undefined ? { read: s.read } : {}),
       next: s.edges.map((e) => {
         const t = decl.states.find((st) => st.id === e.to);
         return {
