@@ -122,12 +122,12 @@ test("manual mode: tick info at start, ticks walk the whole machine to end", asy
   assert.deepEqual(s.active(), ["idle"]);
   // idle is a hub now: an unnamed advance is refused, the tick must choose
   assert.throws(() => s.tickAdvance(), (e) => (e as { clause?: string }).clause === "SE-C-110");
-  // a round trip through the (empty) expedition machine and back
-  s.tickAdvance("expedition");
-  assert.deepEqual(s.active(), ["expedition/start"]);
+  // a round trip through an (empty) work machine and back
+  s.tickAdvance("start_expedition");
+  assert.deepEqual(s.active(), ["start_expedition/start"]);
   s.tickAdvance(); // start -> end (the machine is empty for now)
-  assert.deepEqual(s.active(), ["expedition/end"]);
-  s.tickAdvance(); // pop: expedition filled, back at idle
+  assert.deepEqual(s.active(), ["start_expedition/end"]);
+  s.tickAdvance(); // pop: filled, back at idle
   assert.deepEqual(s.active(), ["idle"]);
   s.tickAdvance("end");
   assert.equal((s.describe() as { status: string }).status, "closed");
