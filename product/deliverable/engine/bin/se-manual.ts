@@ -107,12 +107,24 @@ const server = createServer((req, res) => {
       });
       return;
     }
-    if (req.method === "POST" && url.pathname === "/preflight") {
-      const started = Date.now();
-      const failures = state.session.preflightRun();
-      log.append({ tool: "manual_preflight", args: {}, ok: failures.length === 0, outcome: "result", duration_ms: Date.now() - started, response: { failures } });
-      res.writeHead(303, { location: "/" });
-      res.end();
+    if (req.method === "POST" && url.pathname === "/script") {
+      const chunks: Buffer[] = [];
+      req.on("data", (c) => chunks.push(c));
+      req.on("end", () => {
+        const started = Date.now();
+        try {
+          const body = JSON.parse(Buffer.concat(chunks).toString("utf8") || "{}") as { state?: string };
+          const result = state.session.scriptRun(String(body.state ?? ""));
+          state.lastPacket = result;
+          log.append({ tool: "manual_script", args: { state: body.state ?? "" }, ok: (result.script_result as { ok: boolean }).ok, outcome: "result", duration_ms: Date.now() - started, response: result });
+        } catch (e) {
+          if (!(e instanceof Rejection)) throw e;
+          state.lastPacket = e.toJSON();
+          log.append({ tool: "manual_script", args: {}, ok: false, outcome: "rejected", duration_ms: Date.now() - started, response: state.lastPacket });
+        }
+        res.writeHead(303, { location: "/" });
+        res.end();
+      });
       return;
     }
     if (url.pathname === "/doc") {

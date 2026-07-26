@@ -162,8 +162,8 @@ test("the view is independent of the walk: browse boot while standing at main/st
 test("conditions are worked only from inside the state — no pre-running", async () => {
   const { Session } = await import("../engine/session.ts");
   const s = new Session(freshRoot());
-  // preflight: rendering-time status is NOT RUN, and nothing runs it implicitly
-  assert.equal(s.preflightStatus(), undefined);
+  // the condition script never pre-runs, and running it from outside is refused
+  assert.throws(() => s.scriptRun("prepare_idle"), (e) => (e as { clause?: string }).clause === "SE-C-112");
   // evidence for a state you are not standing in is refused
   assert.throws(() => s.submitEvidence("read_contract", { read_confirmed: true }), (e) => (e as { clause?: string }).clause === "SE-C-112");
 });

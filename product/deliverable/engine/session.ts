@@ -30,9 +30,7 @@ import { compileMachine, resolveRef } from "./machines/compile.ts";
 import { conditionNotePath } from "./conditions.ts";
 import { pulledFor, scanGuidance, type GuidanceDoc, type PulledDoc } from "./pull.ts";
 import { spawnSync } from "node:child_process";
-import { accessSync, constants, existsSync, mkdirSync, readdirSync } from "node:fs";
-import { rgPath } from "./search.ts";
-import { resolveInRoot, seDir } from "./paths.ts";
+import { resolveInRoot } from "./paths.ts";
 
 /** THE TICK is the machinery — one tool, legal in EVERY state. Without
  *  arguments it reports (observability is never gated); with arguments it
@@ -164,12 +162,46 @@ export class Session {
 
   /** One condition key of a state's entry/exit dictionary. */
   conditionKeyMet(m: MachineDecl, s: StateDecl, key: string): boolean {
-    if (key === "read") return this.evidence.get(this.evidenceKey(m, s.id))?.read_confirmed === true;
-    if (key === "preflight") {
-      const c = this.preflightStatus();
-      return c !== undefined && c.length === 0;
-    }
+    const ev = this.evidence.get(this.evidenceKey(m, s.id));
+    if (key === "read") return ev?.read_confirmed === true;
+    if (key === "script") return (ev?.script_result as { ok?: boolean } | undefined)?.ok === true;
     return false;
+  }
+
+  /** RUN a state's condition script — legal only while standing in it.
+   *  The result is engine-observed evidence; nobody can claim it. */
+  scriptRun(stateId: string): Record<string, unknown> {
+    this.assertStanding(stateId);
+    const { machine } = this.leaves();
+    const s = this.state(machine, stateId);
+    const scripts = [...(s.exit?.script ?? []), ...(s.entry?.script ?? [])];
+    if (scripts.length === 0) {
+      throw new Rejection({
+        clause: CLAUSES.CONDITION_UNMET,
+        expected: `a script condition on ${stateId}`,
+        got: "none declared",
+        remedy: { tool: "se_tick", args: { state: stateId }, note: "the state's conditions are in its packet" },
+        source: "engine/session.ts script",
+      });
+    }
+    const outputs: string[] = [];
+    let ok = true;
+    for (const rel of scripts) {
+      const abs = resolveInRoot(this.root, rel, "engine/session.ts script");
+      const r = spawnSync("node", [abs, "--root", this.root], { cwd: this.root, encoding: "utf8", timeout: 120_000, maxBuffer: 8 * 1024 * 1024 });
+      const out = `${r.stdout ?? ""}${r.stderr ?? ""}`.trim().slice(0, 4000);
+      outputs.push(`${rel} → exit ${r.status}${out === "" ? "" : `\n${out}`}`);
+      if (r.status !== 0) ok = false;
+    }
+    const result = { ok, output: outputs.join("\n"), at: new Date().toISOString() };
+    const key = this.evidenceKey(machine, s.id);
+    this.evidence.set(key, { ...(this.evidence.get(key) ?? {}), script_result: result });
+    return { state: `${machine.id}/${s.id}`, script_result: result };
+  }
+
+  scriptStatus(m: MachineDecl, s: StateDecl): { ran: boolean; ok: boolean; output: string } {
+    const r = this.evidence.get(this.evidenceKey(m, s.id))?.script_result as { ok?: boolean; output?: string } | undefined;
+    return { ran: r !== undefined, ok: r?.ok === true, output: r?.output ?? "" };
   }
 
   /** All keys of the dictionary must hold. Absent dictionary = always. */
@@ -198,57 +230,6 @@ export class Session {
     return pulledFor(this.root, this.guidanceCache, m, s);
   }
 
-  private preflightCache?: string[];
-
-  /** What the last run found — undefined means NOT RUN YET. The checks
-   *  never run implicitly: entering the state arms them, running is an
-   *  explicit act (a tick attempt, or the mirror's run button). */
-  preflightStatus(): string[] | undefined {
-    return this.preflightCache;
-  }
-
-  /** RUN the preflight — legal only while standing in a preflight-gated state. */
-  preflightRun(): string[] {
-    const failures: string[] = [];
-    const machinesDir = join(this.root, "product", "deliverable", "machines");
-    const decls: MachineDecl[] = [];
-    for (const f of existsSync(machinesDir) ? readdirSync(machinesDir) : []) {
-      if (!f.endsWith(".canvas")) continue;
-      try {
-        decls.push(compileMachine(this.root, join(machinesDir, f)));
-      } catch (e) {
-        failures.push(`machine ${f} does not compile: ${String((e as Error).message)}`);
-      }
-    }
-    for (const d of decls) {
-      for (const s of d.states) {
-        for (const dict of [s.entry, s.exit]) {
-          for (const p of dict?.read ?? []) {
-            try {
-              if (!existsSync(resolveInRoot(this.root, p, "preflight"))) failures.push(`${d.id}/${s.id}: read path missing: ${p}`);
-            } catch {
-              failures.push(`${d.id}/${s.id}: read path escapes the root: ${p}`);
-            }
-          }
-        }
-      }
-    }
-    try {
-      rgPath();
-    } catch (e) {
-      failures.push(String((e as Error).message));
-    }
-    if (spawnSync("git", ["--version"], { stdio: "ignore" }).status !== 0) failures.push("git does not answer — it is a hard dependency");
-    try {
-      mkdirSync(seDir(this.root), { recursive: true });
-      accessSync(dirname(join(seDir(this.root), "calls.jsonl")), constants.W_OK);
-    } catch {
-      failures.push("the call log location is not writable (.se/)");
-    }
-    this.preflightCache = failures;
-    return failures;
-  }
-
   private assertStanding(stateId: string): void {
     const { ids } = this.leaves();
     if (ids.includes(stateId)) return;
@@ -273,14 +254,16 @@ export class Session {
     return { state: `${machine.id}/${s.id}`, evidence: record };
   }
 
-  private refuseCondition(stateId: string, which: "exit" | "entry", key: string, args: string[]): never {
+  private refuseCondition(m: MachineDecl, s: StateDecl, which: "exit" | "entry", key: string, args: string[]): never {
+    const stateId = s.id;
     const note = conditionNotePath(key);
-    if (key === "preflight") {
+    if (key === "script") {
+      const st = this.scriptStatus(m, s);
       throw new Rejection({
         clause: CLAUSES.CONDITION_UNMET,
-        expected: `${which} condition 'preflight' of ${stateId} — all checks green (see ${note})`,
-        got: (this.preflightStatus() ?? ["checks not run"]).join("; "),
-        remedy: { tool: "se_tick", args: { advance: true }, note: "fix the named failures, then tick again — the checks re-run on every attempt" },
+        expected: `${which} condition 'script' of ${stateId} — ${args.join(", ")} exits 0 (see ${note})`,
+        got: st.ran ? st.output : "not run yet",
+        remedy: { tool: "se_tick", args: { advance: true }, note: "fix what the output names, then tick again — the script re-runs on every attempt" },
         source: "engine/session.ts conditions",
       });
     }
@@ -303,16 +286,16 @@ export class Session {
   }
 
   private assertConditions(m: MachineDecl, from: StateDecl, to?: string): void {
-    if (from.exit?.preflight !== undefined) this.preflightRun(); // a tick attempt runs the checks
+    if (from.exit?.script !== undefined) this.scriptRun(from.id); // a tick attempt runs the script
     for (const [key, args] of Object.entries(from.exit ?? {})) {
-      if (!this.conditionKeyMet(m, from, key)) this.refuseCondition(from.id, "exit", key, args);
+      if (!this.conditionKeyMet(m, from, key)) this.refuseCondition(m, from, "exit", key, args);
     }
     const targetId = to ?? (from.edges.length === 1 ? from.edges[0].to : undefined);
     if (targetId === undefined) return;
     const target = m.states.find((s) => s.id === targetId);
     if (target === undefined) return;
     for (const [key, args] of Object.entries(target.entry ?? {})) {
-      if (!this.conditionKeyMet(m, target, key)) this.refuseCondition(target.id, "entry", key, args);
+      if (!this.conditionKeyMet(m, target, key)) this.refuseCondition(m, target, "entry", key, args);
     }
   }
 
@@ -498,8 +481,6 @@ export class Session {
           (h as { outcome: string }).outcome = "superseded";
         }
       }
-      const s = machine.states.find((st) => st.id === id);
-      if (s?.leave_when === "preflight" || s?.submachine !== undefined) this.preflightCache = undefined;
     }
     if (!this.inSub()) {
       this.sub = undefined;

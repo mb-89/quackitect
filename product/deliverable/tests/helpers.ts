@@ -14,6 +14,10 @@ export function freshRoot(): string {
   cpSync(join(REPO_ROOT, "product", "deliverable", "machines"), join(root, "product", "deliverable", "machines"), {
     recursive: true,
   });
+  // Condition scripts are repo files — prepare_idle's preflight needs the engine.
+  cpSync(join(REPO_ROOT, "product", "deliverable", "engine"), join(root, "product", "deliverable", "engine"), {
+    recursive: true,
+  });
   // The preflight verifies read paths — the guidance tree and the workspace
   // contract are among them.
   cpSync(join(REPO_ROOT, "product", "guidance"), join(root, "product", "guidance"), { recursive: true });

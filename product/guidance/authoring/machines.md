@@ -69,7 +69,7 @@ tags: review                 # optional; joins the state to guidance (the pull's
 entry:                       # optional DICTIONARY — same shape as exit
 exit:                        # optional DICTIONARY: key = condition TYPE, value = args
   read: workspace/AGENTS.md, product/guidance/voice.md
-  preflight:
+  script: product/deliverable/engine/bin/preflight.ts
 ---
 
 # Statement of the state
@@ -86,7 +86,8 @@ note in `deliverable/machines/conditions/<type>.md` — the compiler refuses
 a key without a note and an engine evaluator. All keys of a dictionary must
 hold (SCXML: the edge's effective cond is exit of its source AND entry of
 its target). Types today: `read` (args: documents whose confirmed reading
-is the evidence) and `preflight` (no args; engine-checked).
+is the evidence) and `script` (args: scripts the engine runs; exit 0 is the
+evidence — the STATE names what runs, e.g. boot's preflight script).
 
 The pull: the machine DERIVES each state's relevant guidance (`pulled` in
 every packet — path, hash, sources). Rules: guidance-root docs and

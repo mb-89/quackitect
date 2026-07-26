@@ -215,7 +215,9 @@ function jsonTable(v) {
   }
   if (Array.isArray(v)) {
     if (v.length === 0) return '<span class="vnull">[]</span>';
-    return '<table class="kv">' + v.map((x, i) => '<tr><td class="k">' + i + '</td><td class="v">' + jsonTable(x) + "</td></tr>").join("") + "</table>";
+    const table = '<table class="kv">' + v.map((x, i) => '<tr><td class="k">' + i + '</td><td class="v">' + jsonTable(x) + "</td></tr>").join("") + "</table>";
+    if (v.length > 3) return '<details><summary style="cursor:pointer;color:#7f8b96">' + v.length + " items</summary>" + table + "</details>";
+    return table;
   }
   const keys = Object.keys(v);
   if (keys.length === 0) return '<span class="vnull">{}</span>';
@@ -251,10 +253,11 @@ function pulledView(pulled) {
 }
 function stateDetail(id) {
   const s = D.states[id] ?? {};
-  const bare = Object.assign({}, s); delete bare.next; delete bare.pulled; delete bare.preflight_ran; delete bare.preflight_failures; delete bare.was_filled;
+  const bare = Object.assign({}, s); delete bare.next; delete bare.pulled; delete bare.script; delete bare.was_filled;
   let html = jsonTable(bare);
   if (s.pulled && s.pulled.length > 0) {
-    html += '<div class="meta" style="padding:8px 0 2px">pulled — derived by the machine, not authored</div>' + pulledView(s.pulled);
+    const row = '<tr><td class="k" title="derived by the machine, not authored">pulled</td><td class="v">' + pulledView(s.pulled) + "</td></tr></table>";
+    html = html.endsWith("</table>") ? html.slice(0, -8) + row : html + '<table class="kv">' + row;
   }
   if (s.next && s.next.length > 0) {
     html += '<div class="meta" style="padding:8px 0 4px">next</div>' + nextTable(id, s);
@@ -275,7 +278,7 @@ document.addEventListener("click", async (ev) => {
   const j = ev.target.closest ? ev.target.closest(".jump") : null;
   if (j) { await fetch("/tick", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ back: j.dataset.state }) }); location.href = "/"; return; }
   const rp = ev.target.closest ? ev.target.closest(".runpre") : null;
-  if (rp) { await fetch("/preflight", { method: "POST" }); location.href = "/"; return; }
+  if (rp) { await fetch("/script", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ state: rp.dataset.state || CURRENT }) }); location.href = "/"; return; }
   const dl = ev.target.closest ? ev.target.closest(".doclink") : null;
   if (dl) { openDoc(dl.dataset.path, dl.dataset.return || CURRENT_DETAIL || (CURRENT ? "state:" + CURRENT : "comment")); return; }
   const back = ev.target.closest ? ev.target.closest(".back") : null;
@@ -287,14 +290,15 @@ function condRows(id, dict, standing) {
     row += c.met ? '<span style="color:#4a7a55">✓ met</span>' : '<span style="color:#e8b339">! unmet</span>';
     row += "</div>";
     if (c.args.length > 0) row += jsonTable(c.args);
-    if (key === "preflight") {
+    if (key === "script") {
       const s = D.states[id] ?? {};
-      if (standing) row += '<div style="padding:6px 0"><button class="primary runpre">' + (s.preflight_ran ? "re-run checks" : "run checks") + "</button></div>";
-      if (s.preflight_ran && !c.met) row += '<div style="color:#e86a5f">failures:</div>' + jsonTable(s.preflight_failures || []);
-      if (!s.preflight_ran && !standing) row += '<div style="color:#7f8b96">not run yet — enter the state to run the checks</div>';
+      const sc = s.script || { ran: false, ok: false, output: "" };
+      row += '<div style="padding:6px 0"><button ' + (standing ? 'class="primary runpre" data-state="' + id + '"' : 'class="primary go locked" disabled title="enter the state to run the script"') + ">" + (sc.ran ? "re-run" : "run") + "</button></div>";
+      if (sc.ran) row += '<div style="color:' + (sc.ok ? "#4a7a55" : "#e86a5f") + ';white-space:pre-wrap;font-size:12px">' + sc.output.replace(/&/g,"&amp;").replace(/</g,"&lt;") + "</div>";
+      else row += '<div style="color:#7f8b96">not run yet</div>';
     }
-    if (key === "read" && standing && !c.met) {
-      row += '<div style="padding:6px 0"><button class="primary confirm" data-state="' + id + '" title="the confirmation is logged as evidence">confirm</button></div>';
+    if (key === "read" && !c.met) {
+      row += '<div style="padding:6px 0"><button ' + (standing ? 'class="primary confirm" data-state="' + id + '" title="the confirmation is logged as evidence"' : 'class="primary go locked" disabled title="enter the state to confirm"') + ">confirm</button></div>";
     }
     return row;
   }).join("");
@@ -305,7 +309,6 @@ function condDetail(id) {
   let html = "";
   if (s.exit) html += '<div class="meta" style="padding:4px 0">exit</div>' + condRows(id, s.exit, standing);
   if (s.entry) html += '<div class="meta" style="padding:4px 0">entry</div>' + condRows(id, s.entry, standing);
-  if (!standing && !s.exit_met) html += '<div style="padding:6px 0;color:#7f8b96">worked from inside the state — enter it first</div>';
   html += '<div class="comment-detail">' + (s.guidance || "").replace(/&/g,"&amp;").replace(/</g,"&lt;") + "</div>";
   return ["conditions · " + id, html];
 }
@@ -453,13 +456,14 @@ export function renderMirror(m: MirrorState, widget?: "machine" | "details", vie
       guidance: s.guidance,
       legal_tools: s.legal_tools ?? [],
       ...(s.submachine !== undefined ? { submachine: s.submachine } : {}),
-      leave_when: s.leave_when ?? "always",
-      leave_met: m.session.conditionMet(decl, s, "leave"),
+      ...(s.entry !== undefined ? { entry: m.session.conditionStatus(decl, s, "enter") } : {}),
+      ...(s.exit !== undefined ? { exit: m.session.conditionStatus(decl, s, "leave") } : {}),
+      exit_met: m.session.conditionMet(decl, s, "leave"),
       was_filled: done.has(s.id),
-      ...(s.leave_when === "preflight"
-        ? { preflight_ran: m.session.preflightStatus() !== undefined, preflight_failures: m.session.preflightStatus() ?? [] }
+      ...(s.exit?.script !== undefined || s.entry?.script !== undefined
+        ? { script: m.session.scriptStatus(decl, s) }
         : {}),
-      ...(s.read !== undefined ? { read: s.read } : {}),
+      pulled: m.session.pulled(decl, s),
       next: s.edges.map((e) => {
         const t = decl.states.find((st) => st.id === e.to);
         return {

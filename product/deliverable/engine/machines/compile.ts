@@ -135,7 +135,6 @@ export function compileMachine(root: string, canvasPath: string): MachineDecl {
         guidance: `A sub-machine: entering this state enters ${subId} at its start; this state completes when ${subId} reaches its end.`,
         evidence_form: [],
         submachine: ref,
-        legal_tools: ["se_boot"],
         edges: [],
       };
     } else if (ref.endsWith(".md")) {
