@@ -13,6 +13,7 @@ import { CallLog } from "./calllog.ts";
 import { fileDelete, fileGlob, fileList, filePatch, fileRead, fileWrite, type PatchOp } from "./files.ts";
 import { capJson } from "./jsonio.ts";
 import { McpServer, type ToolDef } from "./mcp.ts";
+import { fileMove } from "./move.ts";
 import { seDir } from "./paths.ts";
 import { run } from "./run.ts";
 import { search } from "./search.ts";
@@ -112,6 +113,21 @@ export function coreTools(root: string): ToolDef[] {
         required: ["ops"],
       },
       handler: (args) => filePatch(root, args.ops as PatchOp[]),
+    },
+    {
+      name: "se_file_move",
+      title: "se.file.move",
+      description:
+        "Move or rename a file and fix EVERY reference in one pass: root-relative paths, vault-relative canvas refs, and wiki links across all .md and .canvas files. Reports what was rewritten. Refuses to overwrite.",
+      inputSchema: {
+        type: "object",
+        properties: {
+          from: { type: "string", description: "root-relative source path" },
+          to: { type: "string", description: "root-relative destination path" },
+        },
+        required: ["from", "to"],
+      },
+      handler: (args) => fileMove(root, String(args.from), String(args.to)),
     },
     {
       name: "se_file_delete",

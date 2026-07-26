@@ -28,7 +28,7 @@ test("the boot sub-machine compiles with its own mechanical start/end", () => {
   assert.equal(m.states.find((s) => s.id === "end")!.kind, "end");
   const rc = m.states.find((s) => s.id === "read_contract")!;
   assert.equal(rc.leave_when, "read_guidance");
-  assert.deepEqual(rc.read, ["workspace/AGENTS.md", "product/deliverable/machines/guidance/contract.md", "product/deliverable/machines/guidance/voice.md"]);
+  assert.deepEqual(rc.read, ["workspace/AGENTS.md", "product/guidance/contract.md", "product/guidance/voice.md"]);
 });
 
 test("at start every lane tool is refused with se_tick as the remedy", async () => {

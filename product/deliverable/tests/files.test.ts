@@ -145,3 +145,19 @@ test("ref search runs through git grep against a committed state (v2 parity)", (
   const inTree = search(root, "committed needle");
   assert.equal(inTree.total, 0);
 });
+
+test("move fixes every reference form: root-relative, vault-relative, wiki link", async () => {
+  const { fileMove } = await import("../engine/move.ts");
+  const root = fresh();
+  fileWrite(root, "product/guidance/old.md", "# Doc", null);
+  fileWrite(root, "product/notes/uses.md", "See product/guidance/old.md and [[guidance/old|the doc]].", null);
+  fileWrite(root, "product/m/x.canvas", '{"nodes":[{"id":"a","type":"file","file":"guidance/old.md","x":0,"y":0,"width":1,"height":1}]}', null);
+  const r = fileMove(root, "product/guidance/old.md", "product/guidance/new/doc.md");
+  assert.equal(r.rewritten.length, 2);
+  assert.ok(readFileSync(join(root, "product/notes/uses.md"), "utf8").includes("product/guidance/new/doc.md"));
+  assert.ok(readFileSync(join(root, "product/notes/uses.md"), "utf8").includes("[[guidance/new/doc|the doc]]"));
+  assert.ok(readFileSync(join(root, "product/m/x.canvas"), "utf8").includes("guidance/new/doc.md"));
+  // no silent overwrite
+  fileWrite(root, "product/guidance/other.md", "x", null);
+  assert.throws(() => fileMove(root, "product/guidance/other.md", "product/guidance/new/doc.md"), (e) => (e as Rejection).clause === "SE-C-104");
+});

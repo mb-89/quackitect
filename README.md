@@ -22,11 +22,12 @@ workspace/             where the agent runs (cwd of the session)
   .mcp.json            registers the se server
   .claude/settings.json  the cage: explicit deny list of native tools
 product/
+  guidance/            the method layer - contract, voice, authoring/, methods/
   deliverable/         the engine (TypeScript, Node >= 22.6, no build step)
-    bin/se-mcp.ts      server entry
     engine/            mcp transport, tool lane, call log, machine kernel
+      bin/             entries: se-mcp (the server), se-manual (the mirror)
     tests/             the lane's laws — node --test "tests/*.test.ts"
-  spec/                plan, decisions, (later) machines and guidance
+  spec/                v3's own record: plan, decisions, iterations
 .se/                   machine-local: calls.jsonl — the raw record (gitignored)
 ```
 
@@ -89,7 +90,7 @@ raw to `.se/calls.jsonl`.
 Machines are DRAWN — Advanced Canvas files, compiled at load, refused with
 the offending element named on any misparse. Engine-owned machines live in
 `product/deliverable/machines/`; owner-authored process machines will live
-in `product/spec/` later. **Authoring rules: `machines/CANVAS-GUIDE.md`** —
+in `product/spec/` later. **Authoring rules: `product/guidance/authoring/machines.md`** —
 notably: file refs are VAULT-relative (the Obsidian vault root is
 `product/`), agent-facing fields (`state`, `state_kind`, `legal_tools`,
 `guidance`) live in the state note's FRONTMATTER while the body is prose

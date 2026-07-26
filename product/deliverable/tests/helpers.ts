@@ -14,7 +14,9 @@ export function freshRoot(): string {
   cpSync(join(REPO_ROOT, "product", "deliverable", "machines"), join(root, "product", "deliverable", "machines"), {
     recursive: true,
   });
-  // The preflight verifies read paths — the workspace contract is one of them.
+  // The preflight verifies read paths — the guidance tree and the workspace
+  // contract are among them.
+  cpSync(join(REPO_ROOT, "product", "guidance"), join(root, "product", "guidance"), { recursive: true });
   mkdirSync(join(root, "workspace"), { recursive: true });
   cpSync(join(REPO_ROOT, "workspace", "AGENTS.md"), join(root, "workspace", "AGENTS.md"));
   return root;

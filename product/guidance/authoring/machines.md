@@ -1,5 +1,8 @@
 # How to write machine canvases
 
+(Lives in guidance/authoring/ — guidance is the method layer, spec is the
+project record, the engine is code.)
+
 The authoring rules for drawn machines. Written after the first canvas
 shipped with paths Obsidian could not resolve (owner fix 2026-07-26) — so
 the mistakes stay fixed. Follow this EVERY time a canvas is created or
@@ -64,7 +67,7 @@ legal_tools: all             # THE STATE GATE: tools legal here (`all` opens the
 guidance: One or two short sentences the agent gets in its packet. Never empty.
 enter_when: always           # optional; SCXML-style: the edge's effective cond is
 leave_when: read_guidance    # leave_when of its source AND enter_when of its target
-read: workspace/AGENTS.md, product/deliverable/machines/guidance/voice.md
+read: workspace/AGENTS.md, product/guidance/voice.md
                              # docs a read_guidance condition demands (root-relative)
 ---
 

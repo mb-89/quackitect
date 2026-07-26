@@ -1,15 +1,15 @@
 // se-mcp — the v3 server entry. Node ≥22 runs this directly (native type
 // stripping); no build step. The workspace's .mcp.json points here.
 //
-//   node bin/se-mcp.ts --root <project root>
+//   node engine/bin/se-mcp.ts --root <project root>
 //
 // --root is the QUACKITECT PROJECT root (the folder holding product/ and
 // workspace/) — the file lane serves that whole tree, the call log lives in
 // <root>/.se/calls.jsonl.
 import { existsSync } from "node:fs";
 import { resolve } from "node:path";
-import { runStdio } from "../engine/mcp.ts";
-import { buildServer } from "../engine/tools.ts";
+import { runStdio } from "../mcp.ts";
+import { buildServer } from "../tools.ts";
 
 function argValue(flag: string): string | undefined {
   const i = process.argv.indexOf(flag);
@@ -19,7 +19,7 @@ function argValue(flag: string): string | undefined {
 if (process.argv.some((a) => a === "--help" || a === "-h" || a === "-?")) {
   process.stdout.write(`se-mcp — the quackitect v3 MCP server (stdio JSON-RPC)
 
-  node bin/se-mcp.ts --root <project root>
+  node engine/bin/se-mcp.ts --root <project root>
 
   --root   the quackitect project root (holds product/ and workspace/);
            file lane serves that tree, call log lands in <root>/.se/

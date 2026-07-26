@@ -2,7 +2,7 @@
 // as the view, the tick as the only control. The same Session the agent
 // would drive; manual ticks land in the call log like any other call.
 //
-//   node bin/se-manual.ts --root <project root> [--port 7333]
+//   node engine/bin/se-manual.ts --root <project root> [--port 7333]
 //
 // tick · info     GET /        (tick without arguments: look, don't move)
 // tick · advance  POST /tick   (tick with arguments: complete and move on)
@@ -11,11 +11,11 @@ import { createServer } from "node:http";
 import { existsSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { marked } from "marked";
-import { CallLog } from "../engine/calllog.ts";
-import { Rejection } from "../engine/errors.ts";
-import { renderMirror, type MirrorState } from "../engine/render.ts";
-import { resolveInRoot, seDir } from "../engine/paths.ts";
-import { Session } from "../engine/session.ts";
+import { CallLog } from "../calllog.ts";
+import { Rejection } from "../errors.ts";
+import { renderMirror, type MirrorState } from "../render.ts";
+import { resolveInRoot, seDir } from "../paths.ts";
+import { Session } from "../session.ts";
 
 function argValue(flag: string): string | undefined {
   const i = process.argv.indexOf(flag);
@@ -25,7 +25,7 @@ function argValue(flag: string): string | undefined {
 if (process.argv.some((a) => a === "--help" || a === "-h" || a === "-?")) {
   process.stdout.write(`se-manual — walk the machines yourself (the Mirror, manual mode)
 
-  node bin/se-manual.ts --root <project root> [--port 7333]
+  node engine/bin/se-manual.ts --root <project root> [--port 7333]
 
   GET  /            the mirror (tick · info implied: looking never moves)
   POST /tick        tick with arguments: complete the current state, move on

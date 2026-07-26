@@ -105,7 +105,7 @@ if ($Manual) {
   # MANUAL MODE: the Mirror. Walk the machines yourself - tick by tick.
   Write-Host "quackitect v3 - manual mode: the mirror at http://localhost:7333" -ForegroundColor Cyan
   Start-Process "http://localhost:7333"
-  node (Join-Path $root "product\deliverable\bin\se-manual.ts") --root $root
+  node (Join-Path $root "product\deliverable\engine\bin\se-manual.ts") --root $root
   exit 0
 }
 
