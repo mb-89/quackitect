@@ -1,6 +1,7 @@
 ---
 state: start
 state_kind: start
+guidance: This is the start state of a state machine. It has no dedicated function. Select the next state you want to enter.
 ---
 
 # Start

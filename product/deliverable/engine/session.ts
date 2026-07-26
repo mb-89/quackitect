@@ -172,8 +172,9 @@ export class Session {
     };
   }
 
-  /** tick with arguments: complete the current state and move on. */
-  tickAdvance(): Record<string, unknown> {
+  /** tick with arguments: complete the current state and move on.
+   *  `to` picks the outgoing edge (required only when there are several). */
+  tickAdvance(to?: string): Record<string, unknown> {
     const now = new Date().toISOString();
     if (this.instance.status === "closed") {
       throw new Rejection({
@@ -197,16 +198,32 @@ export class Session {
         return this.tickInfo();
       }
       const cur = activeStates(this.sub!.instance)[0];
-      completeState(this.sub!.decl, this.sub!.instance, cur, "filled", now);
+      this.assertEdge(this.sub!.decl, cur, to);
+      completeState(this.sub!.decl, this.sub!.instance, cur, "filled", now, to);
       this.sub!.instance.history.push({ state: cur, outcome: "filled", at: now });
       this.instance.history.push({ state: `${this.sub!.decl.id}/${cur}`, outcome: "filled", at: now });
       return this.tickInfo();
     }
     const cur = activeStates(this.instance)[0];
-    completeState(this.machine, this.instance, cur, "filled", now);
+    this.assertEdge(this.machine, cur, to);
+    completeState(this.machine, this.instance, cur, "filled", now, to);
     this.instance.history.push({ state: cur, outcome: "filled", at: now });
     this.seedSubs();
     return this.tickInfo();
+  }
+
+  /** A chosen way out must be one of the state's drawn edges. */
+  private assertEdge(m: MachineDecl, stateId: string, to?: string): void {
+    if (to === undefined) return;
+    const s = this.state(m, stateId);
+    if (s.edges.some((e) => e.to === to)) return;
+    throw new Rejection({
+      clause: CLAUSES.NOT_LEGAL_IN_STATE,
+      expected: `one of ${stateId}'s next states: ${s.edges.map((e) => e.to).join(", ") || "(none)"}`,
+      got: to,
+      remedy: { tool: "se_state", args: {}, note: "the drawn edges are the legal next states" },
+      source: "engine/session.ts tick",
+    });
   }
 
   /** Enter any newly-active sub-machine state — the position becomes the

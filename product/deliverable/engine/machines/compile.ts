@@ -130,8 +130,8 @@ export function compileMachine(root: string, canvasPath: string): MachineDecl {
       decl = {
         id: subId,
         kind: "work",
-        statement: `Run the ${subId} machine.`,
-        guidance: "The nested machine's states carry their own guidance; the executor runs it.",
+        statement: `The ${subId} machine.`,
+        guidance: `A sub-machine: entering this state enters ${subId} at its start; this state completes when ${subId} reaches its end.`,
         evidence_form: [],
         submachine: ref,
         legal_tools: ["se_boot"],
@@ -232,7 +232,12 @@ function stateFromNote(machineId: string, ref: string, notePath: string): StateD
     throw new MachineCompileError(machineId, ref, `state_kind must be one of ${KINDS.join(" | ")} (got ${JSON.stringify(x.state_kind)})`);
   }
   // AGENT-FACING lives in FRONTMATTER; the body is prose for humans (owner
-  // ruling 2026-07-26). guidance is a frontmatter field — short by design.
+  // ruling 2026-07-26). guidance is a frontmatter field — short by design,
+  // and NEVER empty: a state with nothing to say is a state that leaves the
+  // agent guessing (owner ruling, same day).
+  if (x.guidance === undefined || x.guidance.trim() === "") {
+    throw new MachineCompileError(machineId, ref, "every state carries guidance (frontmatter `guidance:`)");
+  }
   const legalTools =
     x.legal_tools === undefined || x.legal_tools === ""
       ? undefined

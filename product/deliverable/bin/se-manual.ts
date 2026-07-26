@@ -49,17 +49,28 @@ const server = createServer((req, res) => {
   const url = new URL(req.url ?? "/", `http://localhost:${port}`);
   try {
     if (req.method === "POST" && url.pathname === "/tick") {
-      const started = Date.now();
-      try {
-        state.lastPacket = state.session.tickAdvance();
-        log.append({ tool: "manual_tick", args: { advance: true }, ok: true, outcome: "result", duration_ms: Date.now() - started, response: state.lastPacket });
-      } catch (e) {
-        if (!(e instanceof Rejection)) throw e;
-        state.lastPacket = e.toJSON();
-        log.append({ tool: "manual_tick", args: { advance: true }, ok: false, outcome: "rejected", duration_ms: Date.now() - started, response: state.lastPacket });
-      }
-      res.writeHead(303, { location: "/" });
-      res.end();
+      const chunks: Buffer[] = [];
+      req.on("data", (c) => chunks.push(c));
+      req.on("end", () => {
+        const started = Date.now();
+        let to: string | undefined;
+        try {
+          const body = JSON.parse(Buffer.concat(chunks).toString("utf8") || "{}") as { to?: string };
+          to = body.to;
+        } catch {
+          to = undefined;
+        }
+        try {
+          state.lastPacket = state.session.tickAdvance(to);
+          log.append({ tool: "manual_tick", args: { advance: true, ...(to !== undefined ? { to } : {}) }, ok: true, outcome: "result", duration_ms: Date.now() - started, response: state.lastPacket });
+        } catch (e) {
+          if (!(e instanceof Rejection)) throw e;
+          state.lastPacket = e.toJSON();
+          log.append({ tool: "manual_tick", args: { advance: true, ...(to !== undefined ? { to } : {}) }, ok: false, outcome: "rejected", duration_ms: Date.now() - started, response: state.lastPacket });
+        }
+        res.writeHead(303, { location: "/" });
+        res.end();
+      });
       return;
     }
     if (url.pathname === "/api/tick") {

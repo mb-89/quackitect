@@ -245,6 +245,8 @@ export function completeState(
   stateId: string,
   outcome: StepOutcome,
   now: string,
+  /** Fire only the edge to this state — the tick's chosen way out. */
+  only?: string,
 ): { activated: string[] } {
   const state = m.states.find((s) => s.id === stateId);
   if (!state) throw new Error(`completeState: undeclared state ${stateId}`);
@@ -256,6 +258,7 @@ export function completeState(
   inst.fired ??= [];
   const activated: string[] = [];
   for (const e of state.edges) {
+    if (only !== undefined && e.to !== only) continue;
     if (!roles.includes(e.role)) continue;
     if (!evalGuard(e.guard, inst.counters)) continue;
     if (e.role === "normal" || e.role === "approval") {

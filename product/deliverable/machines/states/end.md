@@ -1,6 +1,7 @@
 ---
 state: end
 state_kind: end
+guidance: This is the end state of a state machine. The machine is complete here; there is nothing to do.
 ---
 
 # End

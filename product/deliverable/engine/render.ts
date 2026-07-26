@@ -121,7 +121,7 @@ const STYLE = `
   main { flex: 1; min-width: 0; display: flex; flex-direction: column; padding: 14px 18px; }
   #divider { width: 6px; cursor: col-resize; background: #2a2f34; }
   aside { width: 620px; min-width: 320px; max-width: 80vw; display: flex; flex-direction: column; background: #191d21; }
-  .crumbs { font-size: 14px; margin-bottom: 10px; color: #7f8b96; display: flex; align-items: center; gap: 4px; }
+  .crumbs { font-size: 13px; color: #7f8b96; display: flex; align-items: center; gap: 4px; text-transform: none; letter-spacing: 0; }
   .crumbs a { color: #d8dde2; text-decoration: none; }
   .crumbs a:hover { color: #e8b339; }
   .crumbs .here { color: #e8b339; }
@@ -154,7 +154,7 @@ const STYLE = `
   .comment-text { color: #7f8b96; font-size: 13px; line-height: 1.35; }
   .comment-detail { font-size: 15px; line-height: 1.55; color: #d8dde2; padding: 2px 0 10px; }
   .bar { display: flex; gap: 10px; padding: 12px; }
-  button.primary { background: #e8b339; color: #14171a; border: 0; border-radius: 8px; padding: 10px 18px; font: inherit; font-weight: 700; cursor: pointer; }
+  button.primary { background: #e8b339; color: #14171a; border: 0; border-radius: 8px; padding: 8px 14px; font: inherit; font-weight: 700; cursor: pointer; margin: 2px 4px 2px 0; }
   .panel { padding: 0 12px 12px; overflow: auto; }
   .meta { color: #7f8b96; font-size: 12px; padding: 8px 12px; }
   table.kv { border-collapse: collapse; width: 100%; font-size: 12.5px; }
@@ -188,14 +188,30 @@ function showDetails(title, html) {
   const el = document.getElementById("details");
   if (el) { document.getElementById("details-title").textContent = title; el.innerHTML = html; }
 }
+const CURRENT = (D.describe.active && D.describe.active[0]) ? D.describe.active[0].split("/").pop() : null;
+const WALK_HERE = D.viewingWalk;
+function stateDetail(id) {
+  const s = D.states[id] ?? {};
+  let html = jsonTable(s);
+  if (WALK_HERE && id === CURRENT && s.next && s.next.length > 0) {
+    html += '<div class="meta" style="padding:10px 0 4px">advance to:</div>' + s.next.map((n) =>
+      '<button class="primary go" data-to="' + n.to + '" title="tick: leave ' + id + ', enter ' + n.to + '">▶ ' + n.to + "</button>"
+    ).join(" ");
+  }
+  return html;
+}
 function detailFor(key) {
   if (key === "comment") {
     const txt = (D.comment || "").replace(/&/g,"&amp;").replace(/</g,"&lt;");
     return ["machine: " + D.viewed.id, '<div class="comment-detail">' + txt + "</div>" + jsonTable(D.viewed)];
   }
-  if (key.startsWith("state:")) { const id = key.slice(6); return ["state: " + id, jsonTable(D.states[id] ?? {})]; }
+  if (key.startsWith("state:")) { const id = key.slice(6); return ["state: " + id, stateDetail(id)]; }
   return [key, jsonTable({})];
 }
+document.addEventListener("click", async (ev) => {
+  const go = ev.target.closest ? ev.target.closest(".go") : null;
+  if (go) { await fetch("/tick", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ to: go.dataset.to }) }); location.href = "/"; }
+});
 document.addEventListener("click", (ev) => {
   const arrow = ev.target.closest ? ev.target.closest(".crumb-arrow") : null;
   document.querySelectorAll(".crumb-arrow.open").forEach((a) => { if (a !== arrow) a.classList.remove("open"); });
@@ -252,14 +268,10 @@ if (divider && aside) {
   window.addEventListener("mouseup", () => { drag = null; });
 }
 
-const adv = document.getElementById("advance");
-if (adv) adv.addEventListener("click", async () => { await fetch("/tick", { method: "POST" }); location.href = "/"; });
-
 const hist = document.getElementById("walk-history");
 if (hist) hist.innerHTML = jsonTable(D.history);
 
-const cur = (D.describe.active && D.describe.active[0]) ? D.describe.active[0].split("/").pop() : null;
-if (cur && D.states[cur]) showDetails("state: " + cur, jsonTable(D.states[cur]));
+if (CURRENT && D.states[CURRENT] && WALK_HERE) showDetails("state: " + CURRENT, stateDetail(CURRENT));
 `;
 
 function widgetHead(title: string, widgetId: string, url: string): string {
@@ -318,14 +330,15 @@ export function renderMirror(m: MirrorState, widget?: "machine" | "details", vie
     lastPacket: m.lastPacket ?? null,
     states,
     comment,
+    viewingWalk,
     viewed: { id: decl.id, reentry: decl.reentry, initial: decl.initial, states: decl.states.map((s) => s.id) },
     history: history.slice(-20),
   }).replace(/</g, "\\u003c")};</script>`;
 
-  const machineWidget = `<div class="widget" id="w-machine">${widgetHead(`machine · ${decl.id}`, "w-machine", `/widget/machine?view=${encodeURIComponent(decl.id)}`)}<div class="widget-body">${svg}</div></div>`;
+  const machineWidget = `<div class="widget" id="w-machine"><div class="widget-head"><span class="crumbs">${crumbs}</span><button class="expand" data-widget="w-machine" data-url="/widget/machine?view=${encodeURIComponent(decl.id)}" title="expand · ctrl-click: new tab · shift-click: new window">⛶</button></div><div class="widget-body">${svg}</div></div>`;
   const walkWidget = `<div class="widget" id="w-walk">${widgetHead("walk", "w-walk", "/")}
-    <div class="bar"><button class="primary" id="advance" title="tick with arguments: complete the current state and move on">tick · advance</button>${info.status === "closed" ? '<span style="align-self:center;color:#e86a5f">machine closed</span>' : ""}</div>
-    <div class="panel" id="walk-history"></div>
+    ${info.status === "closed" ? '<div class="meta" style="color:#e86a5f">machine closed</div>' : ""}
+    <div class="panel" id="walk-history" style="padding-top:10px"></div>
   </div>`;
   const detailsWidget = `<div class="widget" id="w-details">${widgetHead("details", "w-details", "/widget/details")}
     <div class="meta" id="details-title">—</div>
@@ -334,7 +347,7 @@ export function renderMirror(m: MirrorState, widget?: "machine" | "details", vie
 
   if (widget === "machine") {
     return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>se · machine</title><style>${STYLE} main{padding:10px}</style></head>
-<body><div class="cols"><main><div class="crumbs">${crumbs}</div>${machineWidget}</main></div>${data}<script>${SCRIPT}</script></body></html>`;
+<body><div class="cols"><main>${machineWidget}</main></div>${data}<script>${SCRIPT}</script></body></html>`;
   }
   if (widget === "details") {
     return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>se · details</title><style>${STYLE}</style></head>
@@ -344,7 +357,6 @@ export function renderMirror(m: MirrorState, widget?: "machine" | "details", vie
 <body>
 <div class="cols">
   <main>
-    <div class="crumbs">${crumbs}</div>
     ${machineWidget}
   </main>
   <div id="divider"></div>
