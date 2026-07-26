@@ -100,13 +100,16 @@ Copy-Item (Join-Path $ws "_cage\mcp.json") (Join-Path $ws ".mcp.json") -Force
 Copy-Item (Join-Path $ws "_cage\claude-settings.json") (Join-Path $ws ".claude\settings.json") -Force
 Write-Host "  workspace\.mcp.json + workspace\.claude\settings.json in place"
 
-# Engine selftests - the lane's laws, each pinned to the incident that ruled it.
-Write-Host "quackitect v3 - selftest" -ForegroundColor Cyan
+# The FAST gate only (sub-second): canvases compile, hard deps answer, the
+# log location is writable. The FULL test suite is not run here - it runs
+# INSIDE boot (prepare_idle's selftest exit script), engine-observed, so
+# launching stays instant and the walk still proves the engine green.
+Write-Host "quackitect v3 - preflight (full selftests run in boot)" -ForegroundColor Cyan
 Push-Location (Join-Path $root "product\deliverable")
 try {
-  node --test "tests/*.test.ts"
+  node engine\bin\preflight.ts --root $root
   if ($LASTEXITCODE -ne 0) {
-    Write-Host "Selftests FAILED - do not launch on a red engine." -ForegroundColor Red
+    Write-Host "Preflight FAILED - do not launch on a red engine." -ForegroundColor Red
     exit 1
   }
 } finally {

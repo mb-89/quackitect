@@ -20,6 +20,11 @@ try {
   // no npm install — rgPath() falls back to PATH rg and fails loudly if absent
 }
 
+// Walks in tests hit prepare_idle's exit scripts, and one of those IS the
+// suite (engine/bin/selftest.ts) — without this guard every booted walk
+// would spawn the whole suite again, recursively.
+process.env.SE_SELFTEST_SKIP = "1";
+
 export function freshRoot(): string {
   const root = mkdtempSync(join(tmpdir(), "se-v3-"));
   cpSync(join(REPO_ROOT, "product", "deliverable", "machines"), join(root, "product", "deliverable", "machines"), {
