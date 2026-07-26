@@ -296,13 +296,29 @@ function stateDetail(id) {
   }
   return html;
 }
+// Reload WITHOUT losing the view or the open details pane — a checkbox
+// click must not cost the user their place (found: four re-opens to set
+// four checks).
+function reloadKeep(detail) {
+  const q = new URLSearchParams(location.search);
+  if (detail) q.set("detail", detail); else q.delete("detail");
+  const qs = q.toString();
+  location.href = location.pathname + (qs ? "?" + qs : "");
+}
 document.addEventListener("click", async (ev) => {
   const c = ev.target.closest ? ev.target.closest(".docheck") : null;
-  if (c) { if (c.disabled) return; ev.preventDefault(); await fetch("/check", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ path: c.dataset.path }) }); location.href = "/"; return; }
+  if (c) { if (c.disabled) return; ev.preventDefault(); c.disabled = true; await fetch("/check", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ path: c.dataset.path }) }); reloadKeep(CURRENT_DETAIL); return; }
   const j = ev.target.closest ? ev.target.closest(".jump") : null;
   if (j) { await fetch("/tick", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ back: j.dataset.state }) }); location.href = "/"; return; }
   const rp = ev.target.closest ? ev.target.closest(".runpre") : null;
-  if (rp) { await fetch("/script", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ state: rp.dataset.state || CURRENT }) }); location.href = "/"; return; }
+  if (rp) {
+    // Grey IMMEDIATELY — no second run behind an unresponsive button; the
+    // server coalesces stray extra clicks into the one run anyway.
+    rp.disabled = true; rp.classList.add("locked"); rp.textContent = "running…";
+    await fetch("/script", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ state: rp.dataset.state || CURRENT }) });
+    reloadKeep(CURRENT_DETAIL);
+    return;
+  }
   const dl = ev.target.closest ? ev.target.closest(".doclink") : null;
   if (dl) { openDoc(dl.dataset.path, dl.dataset.return || CURRENT_DETAIL || (CURRENT ? "state:" + CURRENT : "comment")); return; }
   const back = ev.target.closest ? ev.target.closest(".back") : null;
@@ -316,9 +332,17 @@ function condRows(id, dict, standing) {
     if (key === "script") {
       if (c.args.length > 0) row += jsonTable(c.args);
       const s = D.states[id] ?? {};
-      const sc = s.script || { ran: false, ok: false, output: "" };
-      row += '<div style="padding:6px 0"><button ' + (standing ? 'class="primary runpre" data-state="' + id + '"' : 'class="primary go locked" disabled title="enter the state to run the script"') + ">" + (sc.ran ? "re-run" : "run") + "</button></div>";
-      if (sc.ran) row += '<div style="color:' + (sc.ok ? "#4a7a55" : "#e86a5f") + ';white-space:pre-wrap;font-size:12px">' + sc.output.replace(/&/g,"&amp;").replace(/</g,"&lt;") + "</div>";
+      const sc = s.script || { ran: false, ok: false, output: "", running: false };
+      // The button greys IMMEDIATELY on click and stays grey while running
+      // and after success — it re-enables only on a FAILED run.
+      let btn;
+      if (sc.running) btn = '<button class="primary go locked" disabled>running…</button>';
+      else if (!standing) btn = '<button class="primary go locked" disabled title="enter the state to run the script">run</button>';
+      else if (sc.ran && sc.ok) btn = '<button class="primary go locked" disabled title="exit 0 — the condition is met">✓ ran</button>';
+      else btn = '<button class="primary runpre" data-state="' + id + '">' + (sc.ran ? "re-run" : "run") + "</button>";
+      row += '<div style="padding:6px 0">' + btn + "</div>";
+      if (sc.running) row += '<div style="color:#e8b339">running — the page follows; the result lands here</div>';
+      else if (sc.ran) row += '<div style="color:' + (sc.ok ? "#4a7a55" : "#e86a5f") + ';white-space:pre-wrap;font-size:12px">' + sc.output.replace(/&/g,"&amp;").replace(/</g,"&lt;") + "</div>";
       else row += '<div style="color:#7f8b96">not run yet</div>';
     } else if (key === "read") {
       // One checkbox per doc — the human's proof, once per version. (The
@@ -421,6 +445,9 @@ if (divider && aside) {
 }
 
 if (CURRENT && D.states[CURRENT] && WALK_HERE) { CURRENT_DETAIL = "state:" + CURRENT; showDetails("state: " + CURRENT, stateDetail(CURRENT)); }
+// A reload that carried its detail along (reloadKeep) restores the pane.
+const DETAIL_PARAM = new URLSearchParams(location.search).get("detail");
+if (DETAIL_PARAM) { CURRENT_DETAIL = DETAIL_PARAM; const dp = detailFor(DETAIL_PARAM); showDetails(dp[0], dp[1]); }
 
 // THE THRESHOLD SLIDER — the human's live grip on how much of the walk is
 // the agent's. Takes effect on the agent's NEXT tick; logged server-side.
@@ -450,8 +477,12 @@ if (D.describe.status === "closed") sessionOver();
 // another window) moves the machine under this page. A dead server reads
 // as session over.
 let aliveMisses = 0;
+let pollBusy = null;
+let pollInFlight = false;
 const ACTIVE_AT_RENDER = JSON.stringify(D.describe.active || []);
 setInterval(async () => {
+  if (pollInFlight) return; // never stack polls behind a slow server
+  pollInFlight = true;
   try {
     const r = await fetch("/api/alive");
     const a = await r.json();
@@ -462,10 +493,16 @@ setInterval(async () => {
       const lbl = document.getElementById("thr-val");
       if (lbl) lbl.textContent = Number(a.threshold).toFixed(2);
     }
-    if (JSON.stringify(a.active || []) !== ACTIVE_AT_RENDER) location.reload();
+    if (JSON.stringify(a.active || []) !== ACTIVE_AT_RENDER) { location.reload(); return; }
+    // A script run finishing elsewhere (agent tick, other window) lands
+    // its result — refresh, keeping the open pane.
+    if (pollBusy === true && a.busy === false) { reloadKeep(CURRENT_DETAIL); return; }
+    pollBusy = a.busy;
   } catch (e) {
     aliveMisses++;
     if (aliveMisses >= 2) sessionOver();
+  } finally {
+    pollInFlight = false;
   }
 }, 2000);
 `;

@@ -25,7 +25,7 @@ test("threshold 0 is manual mode: the agent's every step is refused, the human w
   assert.equal(look.isError, false);
   assert.equal(look.body.threshold, 0);
   // The human's hand (default channel): the same step just goes.
-  session.tickAdvance();
+  await session.tickAdvance();
   assert.deepEqual(session.active(), ["boot/start"]);
 });
 
@@ -46,9 +46,9 @@ test("the gate weighs the TARGET: a 0.5 state refuses the agent at 0.25, the hum
   const session = new Session(root);
   const server = buildServer(root, session);
   // Walk to idle on the human's hand.
-  session.tickAdvance(); session.tickAdvance();
+  await session.tickAdvance(); await session.tickAdvance();
   checkDocs(session);
-  session.tickAdvance(); session.tickAdvance(); session.tickAdvance();
+  await session.tickAdvance(); await session.tickAdvance(); await session.tickAdvance();
   assert.deepEqual(session.active(), ["idle"]);
   session.setThreshold(0.25);
   // start_expedition weighs 0.5 — above the agent's reach.
@@ -60,10 +60,10 @@ test("the gate weighs the TARGET: a 0.5 state refuses the agent at 0.25, the hum
   const ok = await call(server, "se_tick", { to: "expedition_archive", read_hashes: readHashesFor(root) });
   assert.equal(ok.isError, false);
   // Walk the (empty) archive machine back to idle on the human's hand …
-  session.tickAdvance(); session.tickAdvance();
+  await session.tickAdvance(); await session.tickAdvance();
   assert.deepEqual(session.active(), ["idle"]);
   // … and the human enters the 0.5 state the agent was refused.
-  session.tickAdvance("start_expedition");
+  await session.tickAdvance("start_expedition");
   assert.deepEqual(session.active(), ["start_expedition/start"]);
 });
 
@@ -71,9 +71,9 @@ test("jump back is entering too: the agent's back-jump is weighed against the th
   const root = freshRoot();
   const session = new Session(root);
   const server = buildServer(root, session);
-  session.tickAdvance(); session.tickAdvance();
+  await session.tickAdvance(); await session.tickAdvance();
   checkDocs(session);
-  session.tickAdvance(); session.tickAdvance(); session.tickAdvance();
+  await session.tickAdvance(); await session.tickAdvance(); await session.tickAdvance();
   session.setThreshold(0);
   const r = await call(server, "se_tick", { back: "boot" });
   assert.equal(r.isError, true);
@@ -99,14 +99,14 @@ test("the threshold refuses garbage: out-of-range values are typed rejections", 
   assert.equal(session.threshold, 0.5, "a refused set leaves the threshold untouched");
 });
 
-test("reaching end fires onClosed once and the closing packet says session over", () => {
+test("reaching end fires onClosed once and the closing packet says session over", async () => {
   const session = new Session(freshRoot());
   let fired = 0;
   session.onClosed = () => fired++;
-  session.tickAdvance(); session.tickAdvance();
+  await session.tickAdvance(); await session.tickAdvance();
   checkDocs(session);
-  session.tickAdvance(); session.tickAdvance(); session.tickAdvance();
-  const over = session.tickAdvance("end") as { session_over?: boolean; banner?: string };
+  await session.tickAdvance(); await session.tickAdvance(); await session.tickAdvance();
+  const over = (await session.tickAdvance("end")) as { session_over?: boolean; banner?: string };
   assert.equal(over.session_over, true);
   assert.match(String(over.banner), /session over/i);
   assert.equal(fired, 1);
@@ -153,7 +153,7 @@ test("the hold wakes on the human's tick too, and times out honestly", async () 
     // The human's tick wakes a fresh hold.
     process.env.SE_WAIT_MS = "3000";
     const held = call(server, "se_tick", { wait: true });
-    setTimeout(() => session.tickAdvance(), 120); // human hand
+    setTimeout(() => { void session.tickAdvance(); }, 120); // human hand
     const woke = await held;
     assert.equal(woke.body.changed, true);
     assert.deepEqual(woke.body.active, ["boot/start"]);

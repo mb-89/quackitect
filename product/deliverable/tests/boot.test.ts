@@ -121,31 +121,31 @@ test("manual mode: tick info at start, ticks walk the whole machine to end", asy
   const info = s.tickInfo() as { active: string[]; states: { kind: string }[] };
   assert.deepEqual(info.active, ["start"]);
   assert.equal(info.states[0].kind, "start");
-  s.tickAdvance(); // main/start -> boot's mechanical start (one position per tick)
+  await s.tickAdvance(); // main/start -> boot's mechanical start (one position per tick)
   assert.deepEqual(s.active(), ["boot/start"]);
-  s.tickAdvance();
+  await s.tickAdvance();
   assert.deepEqual(s.active(), ["boot/read_contract"]);
   // the read gate holds the manual walk too — until the docs are CHECKED
-  assert.throws(() => s.tickAdvance(), (e) => (e as { clause?: string }).clause === "SE-C-112");
+  await assert.rejects(() => s.tickAdvance(), (e) => (e as { clause?: string }).clause === "SE-C-112");
   checkDocs(s); // the mirror's checkboxes — one per doc version
-  s.tickAdvance();
+  await s.tickAdvance();
   assert.deepEqual(s.active(), ["boot/prepare_idle"]);
-  s.tickAdvance(); // prepare_idle -> boot's visible end position
+  await s.tickAdvance(); // prepare_idle -> boot's visible end position
   assert.deepEqual(s.active(), ["boot/end"]);
-  s.tickAdvance(); // pop back to main: boot filled, idle
+  await s.tickAdvance(); // pop back to main: boot filled, idle
   assert.deepEqual(s.active(), ["idle"]);
   // idle is a hub now: an unnamed advance is refused, the tick must choose
-  assert.throws(() => s.tickAdvance(), (e) => (e as { clause?: string }).clause === "SE-C-110");
+  await assert.rejects(() => s.tickAdvance(), (e) => (e as { clause?: string }).clause === "SE-C-110");
   // a round trip through an (empty) work machine and back
-  s.tickAdvance("start_expedition");
+  await s.tickAdvance("start_expedition");
   assert.deepEqual(s.active(), ["start_expedition/start"]);
-  s.tickAdvance();
+  await s.tickAdvance();
   assert.deepEqual(s.active(), ["start_expedition/create"]);
-  s.tickAdvance(); // create is freely leavable (minting is optional here)
+  await s.tickAdvance(); // create is freely leavable (minting is optional here)
   assert.deepEqual(s.active(), ["start_expedition/end"]);
-  s.tickAdvance(); // pop: filled, back at idle
+  await s.tickAdvance(); // pop: filled, back at idle
   assert.deepEqual(s.active(), ["idle"]);
-  s.tickAdvance("end");
+  await s.tickAdvance("end");
   assert.equal((s.describe() as { status: string }).status, "closed");
 });
 
@@ -159,7 +159,7 @@ test("the mirror renders ONLY the current machine, with breadcrumbs", async () =
   assert.ok(html.includes(`>idle</text>`));
   assert.ok(!html.includes(`>read_contract</text>`), "sub-machine states are NOT drawn while in main");
   // Step into boot: the boot canvas only, breadcrumb main › boot.
-  s.tickAdvance();
+  await s.tickAdvance();
   html = renderMirror({ session: s, root, lastPacket: undefined, mode: "manual" });
   assert.ok(html.includes(`>read_contract</text>`));
   assert.ok(!html.includes(`>idle</text>`), "main states are NOT drawn while in the sub");
@@ -188,7 +188,7 @@ test("conditions are worked only from inside the state — no pre-running", asyn
   const { Session } = await import("../engine/session.ts");
   const s = new Session(freshRoot());
   // the condition script never pre-runs, and running it from outside is refused
-  assert.throws(() => s.scriptRun("prepare_idle"), (e) => (e as { clause?: string }).clause === "SE-C-112");
+  await assert.rejects(() => s.scriptRun("prepare_idle"), (e) => (e as { clause?: string }).clause === "SE-C-112");
   // evidence for a state you are not standing in is refused
   assert.throws(() => s.submitEvidence("read_contract", { read_confirmed: true }), (e) => (e as { clause?: string }).clause === "SE-C-112");
 });
@@ -197,18 +197,18 @@ test("jump back: downstream superseded, script evidence invalidated; human check
   const { Session } = await import("../engine/session.ts");
   const s = new Session(freshRoot());
   // walk to idle
-  s.tickAdvance(); s.tickAdvance();
+  await s.tickAdvance(); await s.tickAdvance();
   checkDocs(s);
-  s.tickAdvance(); s.tickAdvance(); s.tickAdvance();
+  await s.tickAdvance(); await s.tickAdvance(); await s.tickAdvance();
   assert.deepEqual(s.active(), ["idle"]);
   // jump back into boot from main: re-enters at the sub's start
   s.jumpBack("boot");
   assert.deepEqual(s.active(), ["boot/start"]);
   // the CHECKS persist (one per doc version — the docs did not change),
   // so the human re-walk flows; the preflight script must re-earn its 0.
-  s.tickAdvance();
+  await s.tickAdvance();
   assert.deepEqual(s.active(), ["boot/read_contract"]);
-  s.tickAdvance();
+  await s.tickAdvance();
   assert.deepEqual(s.active(), ["boot/prepare_idle"]);
   const prepare = s.currentMachine().states.find((x) => x.id === "prepare_idle")!;
   assert.equal(s.scriptStatus(s.currentMachine(), prepare).ran, false, "script evidence was invalidated by the jump");
@@ -221,9 +221,9 @@ test("jump back: downstream superseded, script evidence invalidated; human check
 test("jump back leaves nothing green: the nested walk's record is superseded too", async () => {
   const { Session } = await import("../engine/session.ts");
   const s = new Session(freshRoot());
-  s.tickAdvance(); s.tickAdvance();
+  await s.tickAdvance(); await s.tickAdvance();
   checkDocs(s);
-  s.tickAdvance(); s.tickAdvance(); s.tickAdvance();
+  await s.tickAdvance(); await s.tickAdvance(); await s.tickAdvance();
   s.jumpBack("boot");
   const filled = s.instance.history.filter((h) => h.outcome === "filled").map((h) => h.state);
   assert.ok(!filled.some((f) => f.startsWith("boot/")), `boot walk entries still filled: ${filled}`);

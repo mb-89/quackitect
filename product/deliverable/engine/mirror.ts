@@ -24,31 +24,38 @@ export interface MirrorOptions {
 export function startMirror(o: MirrorOptions): Server {
   const state: MirrorState = { session: o.session, root: o.root, lastPacket: undefined, mode: o.mode };
 
-  /** Collect a JSON body, run the handler, log it, redirect to /. */
+  /** Collect a JSON body, run the handler (results may be async — script
+   *  runs take seconds and must not block the server), log it, redirect. */
   const post = (req: import("node:http").IncomingMessage, res: import("node:http").ServerResponse, tool: string, handle: (body: Record<string, unknown>) => { args: Record<string, unknown>; result: unknown }): void => {
     const chunks: Buffer[] = [];
     req.on("data", (c) => chunks.push(c));
     req.on("end", () => {
-      const started = Date.now();
-      let args: Record<string, unknown> = {};
-      try {
-        let body: Record<string, unknown> = {};
+      void (async () => {
+        const started = Date.now();
+        let args: Record<string, unknown> = {};
         try {
-          body = JSON.parse(Buffer.concat(chunks).toString("utf8") || "{}") as Record<string, unknown>;
-        } catch {
-          body = {};
+          let body: Record<string, unknown> = {};
+          try {
+            body = JSON.parse(Buffer.concat(chunks).toString("utf8") || "{}") as Record<string, unknown>;
+          } catch {
+            body = {};
+          }
+          const r = handle(body);
+          args = r.args;
+          state.lastPacket = await r.result;
+          o.log.append({ tool, args, ok: true, outcome: "result", duration_ms: Date.now() - started, response: state.lastPacket });
+        } catch (e) {
+          if (!(e instanceof Rejection)) {
+            res.writeHead(500, { "content-type": "text/plain; charset=utf-8" });
+            res.end(String((e as Error).stack ?? e));
+            return;
+          }
+          state.lastPacket = e.toJSON();
+          o.log.append({ tool, args, ok: false, outcome: "rejected", duration_ms: Date.now() - started, response: state.lastPacket });
         }
-        const r = handle(body);
-        args = r.args;
-        state.lastPacket = r.result;
-        o.log.append({ tool, args, ok: true, outcome: "result", duration_ms: Date.now() - started, response: state.lastPacket });
-      } catch (e) {
-        if (!(e instanceof Rejection)) throw e;
-        state.lastPacket = e.toJSON();
-        o.log.append({ tool, args, ok: false, outcome: "rejected", duration_ms: Date.now() - started, response: state.lastPacket });
-      }
-      res.writeHead(303, { location: "/" });
-      res.end();
+        res.writeHead(303, { location: "/" });
+        res.end();
+      })();
     });
   };
 
@@ -118,6 +125,7 @@ export function startMirror(o: MirrorOptions): Server {
           status: state.session.instance.status,
           threshold: state.session.threshold,
           active: state.session.active(),
+          busy: state.session.busy(),
         }));
         return;
       }

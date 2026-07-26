@@ -32,7 +32,7 @@ import { compileMachine, resolveRef } from "./machines/compile.ts";
 import { conditionNotePath } from "./conditions.ts";
 import { pulledFor, scanGuidance, type GuidanceDoc, type PulledDoc } from "./pull.ts";
 import { expClose, expFind, expList, expNew, type Expedition } from "./worktree.ts";
-import { spawnSync } from "node:child_process";
+import { spawn } from "node:child_process";
 import { resolveInRoot } from "./paths.ts";
 
 /** THE TICK is the machinery — one tool, legal in EVERY state. Without
@@ -300,9 +300,30 @@ export class Session {
     return false;
   }
 
+  /** One script, ASYNC — spawnSync would freeze the whole server (and the
+   *  mirror with it) for the run's duration; found when the suite's eight
+   *  seconds read as a crashed browser window. */
+  private spawnScript(abs: string): Promise<{ status: number | null; out: string }> {
+    return new Promise((resolve) => {
+      const child = spawn("node", [abs, "--root", this.root], { cwd: this.root });
+      let out = "";
+      child.stdout.on("data", (d: Buffer) => { out += d; });
+      child.stderr.on("data", (d: Buffer) => { out += d; });
+      const timer = setTimeout(() => child.kill(), 120_000);
+      child.on("error", (e) => { clearTimeout(timer); resolve({ status: null, out: String(e) }); });
+      child.on("close", (code) => { clearTimeout(timer); resolve({ status: code, out }); });
+    });
+  }
+
+  /** In-flight runs, keyed by state — a second hand (or a second click)
+   *  while one runs JOINS it instead of spawning the suite again. Found
+   *  when repeated clicks on an unresponsive button queued whole extra
+   *  suite runs behind the first. */
+  private readonly scriptRuns = new Map<string, Promise<Record<string, unknown>>>();
+
   /** RUN a state's condition script — legal only while standing in it.
    *  The result is engine-observed evidence; nobody can claim it. */
-  scriptRun(stateId: string): Record<string, unknown> {
+  async scriptRun(stateId: string): Promise<Record<string, unknown>> {
     this.assertStanding(stateId);
     const { machine } = this.leaves();
     const s = this.state(machine, stateId);
@@ -316,25 +337,42 @@ export class Session {
         source: "engine/session.ts script",
       });
     }
-    const outputs: string[] = [];
-    let ok = true;
-    for (const rel of scripts) {
-      const abs = resolveInRoot(this.root, rel, "engine/session.ts script");
-      const r = spawnSync("node", [abs, "--root", this.root], { cwd: this.root, encoding: "utf8", timeout: 120_000, maxBuffer: 8 * 1024 * 1024 });
-      const out = `${r.stdout ?? ""}${r.stderr ?? ""}`.trim().slice(0, 4000);
-      outputs.push(`${rel} → exit ${r.status}${out === "" ? "" : `\n${out}`}`);
-      if (r.status !== 0) ok = false;
-    }
-    const result = { ok, output: outputs.join("\n"), at: new Date().toISOString() };
     const key = this.evidenceKey(machine, s.id);
-    this.evidence.set(key, { ...(this.evidence.get(key) ?? {}), script_result: result });
-    this.notifyChange();
-    return { state: `${machine.id}/${s.id}`, script_result: result };
+    const inFlight = this.scriptRuns.get(key);
+    if (inFlight !== undefined) return inFlight;
+    const run = (async () => {
+      const outputs: string[] = [];
+      let ok = true;
+      for (const rel of scripts) {
+        const abs = resolveInRoot(this.root, rel, "engine/session.ts script");
+        const r = await this.spawnScript(abs);
+        const out = r.out.trim().slice(0, 4000);
+        outputs.push(`${rel} → exit ${r.status}${out === "" ? "" : `\n${out}`}`);
+        if (r.status !== 0) ok = false;
+      }
+      const result = { ok, output: outputs.join("\n"), at: new Date().toISOString() };
+      this.evidence.set(key, { ...(this.evidence.get(key) ?? {}), script_result: result });
+      this.notifyChange();
+      return { state: `${machine.id}/${s.id}`, script_result: result };
+    })().finally(() => this.scriptRuns.delete(key));
+    this.scriptRuns.set(key, run);
+    this.notifyChange(); // the mirror learns a run started
+    return run;
   }
 
-  scriptStatus(m: MachineDecl, s: StateDecl): { ran: boolean; ok: boolean; output: string } {
+  /** Any condition script currently running — the mirror's follow signal. */
+  busy(): boolean {
+    return this.scriptRuns.size > 0;
+  }
+
+  scriptStatus(m: MachineDecl, s: StateDecl): { ran: boolean; ok: boolean; output: string; running: boolean } {
     const r = this.evidence.get(this.evidenceKey(m, s.id))?.script_result as { ok?: boolean; output?: string } | undefined;
-    return { ran: r !== undefined, ok: r?.ok === true, output: r?.output ?? "" };
+    return {
+      ran: r !== undefined,
+      ok: r?.ok === true,
+      output: r?.output ?? "",
+      running: this.scriptRuns.has(this.evidenceKey(m, s.id)),
+    };
   }
 
   /** All keys of the dictionary must hold. Absent dictionary = always. */
@@ -519,8 +557,8 @@ export class Session {
     });
   }
 
-  private assertConditions(m: MachineDecl, from: StateDecl, to: string | undefined, channel: Channel, supplied: Record<string, string>): void {
-    if (from.exit?.script !== undefined) this.scriptRun(from.id); // a tick attempt runs the script
+  private async assertConditions(m: MachineDecl, from: StateDecl, to: string | undefined, channel: Channel, supplied: Record<string, string>): Promise<void> {
+    if (from.exit?.script !== undefined) await this.scriptRun(from.id); // a tick attempt runs the script
     for (const [key, args] of Object.entries(from.exit ?? {})) {
       if (key === "read") continue; // read is channel-proven below, not evidence
       if (!this.conditionKeyMet(m, from, key, "leave")) this.refuseCondition(m, from, "exit", key, args);
@@ -589,7 +627,7 @@ export class Session {
    *  `channel` is whose hand this is — the threshold gates only the agent's;
    *  `readHashes` is the agent's proof-of-read for this tick (path → hash,
    *  each matching the doc as it stands; the human proves via checkboxes). */
-  tickAdvance(to?: string, channel: Channel = "human", readHashes: Record<string, string> = {}): Record<string, unknown> {
+  async tickAdvance(to?: string, channel: Channel = "human", readHashes: Record<string, string> = {}): Promise<Record<string, unknown>> {
     const now = new Date().toISOString();
     if (this.instance.status === "closed") {
       throw new Rejection({
@@ -622,7 +660,7 @@ export class Session {
       this.assertEdge(this.sub!.decl, cur, to);
       const subTarget = to ?? this.state(this.sub!.decl, cur).edges[0]?.to;
       if (subTarget !== undefined) this.gatePriority(this.sub!.decl, [subTarget], channel);
-      this.assertConditions(this.sub!.decl, this.state(this.sub!.decl, cur), to, channel, readHashes);
+      await this.assertConditions(this.sub!.decl, this.state(this.sub!.decl, cur), to, channel, readHashes);
       completeState(this.sub!.decl, this.sub!.instance, cur, "filled", now, to);
       this.sub!.instance.history.push({ state: cur, outcome: "filled", at: now });
       this.instance.history.push({ state: `${this.sub!.decl.id}/${cur}`, outcome: "filled", at: now });
@@ -633,7 +671,7 @@ export class Session {
     this.assertEdge(this.machine, cur, to);
     const target = to ?? this.state(this.machine, cur).edges[0]?.to;
     if (target !== undefined) this.gatePriority(this.machine, [target], channel);
-    this.assertConditions(this.machine, this.state(this.machine, cur), to, channel, readHashes);
+    await this.assertConditions(this.machine, this.state(this.machine, cur), to, channel, readHashes);
     completeState(this.machine, this.instance, cur, "filled", now, to);
     this.instance.history.push({ state: cur, outcome: "filled", at: now });
     this.seedSubs();
