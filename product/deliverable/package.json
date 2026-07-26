@@ -11,6 +11,9 @@
     "test": "node --test \"tests/*.test.ts\"",
     "serve": "node bin/se-mcp.ts --root ../.."
   },
+  "dependencies": {
+    "@vscode/ripgrep": "^1.15.9"
+  },
   "devDependencies": {
     "@types/node": "^22.0.0",
     "typescript": "^5.6.0"

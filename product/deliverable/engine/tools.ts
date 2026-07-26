@@ -119,13 +119,14 @@ export function coreTools(root: string): ToolDef[] {
       name: "se_file_search",
       title: "se.file.search",
       description:
-        "Regex search across the project (ripgrep when installed). Returns match LOCATIONS with an intent trail; read around a hit with se_file_read offset/limit.",
+        "Regex search across the working tree (ripgrep) OR any git ref (pass ref — a branch or tag; this repo is a branch of quack, so 'main' reaches v1 and 'v2' reaches v2). Returns match LOCATIONS with an intent trail; read around a hit with se_file_read offset/limit.",
       inputSchema: {
         type: "object",
         properties: {
           query: { type: "string", description: "the regex" },
           intent: { type: "string", description: "what you are trying to find — logged, feeds the retro" },
-          path: { type: "string", description: "restrict to a subdirectory" },
+          path: { type: "string", description: "restrict to a subdirectory (a pathspec when ref is given)" },
+          ref: { type: "string", description: "search this committed ref instead of the tree" },
           ignore_case: { type: "boolean" },
           limit: { type: "number", default: 100 },
         },
@@ -134,6 +135,7 @@ export function coreTools(root: string): ToolDef[] {
       handler: (args) =>
         search(root, String(args.query), {
           ...(args.path !== undefined ? { path: String(args.path) } : {}),
+          ...(args.ref !== undefined ? { ref: String(args.ref) } : {}),
           ...(args.ignore_case === true ? { ignore_case: true } : {}),
           ...(args.limit !== undefined ? { limit: Number(args.limit) } : {}),
         }),

@@ -7,14 +7,12 @@
       "Read",
       "Write",
       "Edit",
-      "MultiEdit",
       "NotebookEdit",
       "Glob",
       "Grep",
       "WebSearch",
       "WebFetch",
-      "Skill",
-      "SlashCommand"
+      "Skill"
     ],
     "allow": [
       "mcp__se__*"

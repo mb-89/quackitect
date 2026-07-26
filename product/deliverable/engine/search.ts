@@ -1,11 +1,19 @@
-// The search lane — drop-in replacement for Grep. ripgrep when installed
-// (the RUNME offers it; owner ruling 2026-07-25: "we overvalued zero
-// dependency"), a pure-JS walk otherwise — same result shape either way.
+// The search lane — drop-in replacement for Grep.
+//
+// ripgrep and git are HARD dependencies (owner ruling 2026-07-26): there is
+// no fallback engine. ripgrep ships via @vscode/ripgrep (npm install in the
+// RUNME); PATH rg is accepted too. Missing both is a red preflight, not a
+// degraded search — v2's lesson: a weaker lane silently teaches the agent
+// to distrust the lane.
+//
+// ref search (v2 parity): pass ref to search a committed state instead of
+// the tree — git grep against any branch or tag (v3 is a branch of quack,
+// so `main` reaches v1, `v2` reaches v2).
 // Results are LOCATIONS; the remedy for "show me more" is a range read.
 import { spawnSync } from "node:child_process";
-import { readdirSync, readFileSync, statSync } from "node:fs";
-import { join, relative, sep } from "node:path";
-import { isExcluded, resolveInRoot } from "./paths.ts";
+import { createRequire } from "node:module";
+import { relative, resolve, sep } from "node:path";
+import { resolveInRoot } from "./paths.ts";
 
 export interface Match {
   path: string;
@@ -15,51 +23,66 @@ export interface Match {
 
 export interface SearchResult {
   query: string;
-  engine: "ripgrep" | "js";
+  engine: "ripgrep" | "git-grep";
+  ref?: string;
   matches: Match[];
   total: number;
   truncated: boolean;
 }
 
 const LINE_CAP = 300;
+const PER_FILE_CAP = 50;
 
-let rgAvailable: boolean | undefined;
-export function hasRipgrep(): boolean {
-  if (rgAvailable === undefined) {
-    rgAvailable = spawnSync("rg", ["--version"], { stdio: "ignore" }).status === 0;
+let rgPathCached: string | undefined;
+
+/** @vscode/ripgrep's binary, else PATH rg. Throws when neither exists — the RUNME is the remedy. */
+export function rgPath(): string {
+  if (rgPathCached !== undefined) return rgPathCached;
+  try {
+    const req = createRequire(import.meta.url);
+    const mod = req("@vscode/ripgrep") as { rgPath: string };
+    if (spawnSync(mod.rgPath, ["--version"], { stdio: "ignore" }).status === 0) {
+      rgPathCached = mod.rgPath;
+      return rgPathCached;
+    }
+  } catch {
+    // fall through to PATH
   }
-  return rgAvailable;
+  if (spawnSync("rg", ["--version"], { stdio: "ignore" }).status === 0) {
+    rgPathCached = "rg";
+    return rgPathCached;
+  }
+  throw new Error("ripgrep is a hard dependency and was not found — run RUNME.ps1 (npm install provides @vscode/ripgrep)");
 }
 
 export function search(
   root: string,
   query: string,
-  opts: { path?: string; ignore_case?: boolean; limit?: number } = {},
+  opts: { path?: string; ref?: string; ignore_case?: boolean; limit?: number } = {},
 ): SearchResult {
   const limit = opts.limit ?? 100;
-  const scope = opts.path === undefined ? root : resolveInRoot(root, opts.path, "engine/search.ts");
-  const matches = hasRipgrep() ? rgSearch(root, scope, query, opts.ignore_case === true) : jsSearch(root, scope, query, opts.ignore_case === true);
+  const matches = opts.ref === undefined ? rgSearch(root, query, opts) : gitGrepSearch(root, query, opts.ref, opts);
   return {
     query,
-    engine: hasRipgrep() ? "ripgrep" : "js",
+    engine: opts.ref === undefined ? "ripgrep" : "git-grep",
+    ...(opts.ref !== undefined ? { ref: opts.ref } : {}),
     matches: matches.slice(0, limit),
     total: matches.length,
     truncated: matches.length > limit,
   };
 }
 
-function rgSearch(root: string, scope: string, query: string, ignoreCase: boolean): Match[] {
-  const args = ["--line-number", "--no-heading", "--max-count", "50", "--max-columns", String(LINE_CAP)];
-  for (const d of [".se", "node_modules"]) args.push("--glob", `!${d}/**`);
-  if (ignoreCase) args.push("--ignore-case");
+function rgSearch(root: string, query: string, opts: { path?: string; ignore_case?: boolean }): Match[] {
+  const scope = opts.path === undefined ? resolve(root) : resolveInRoot(root, opts.path, "engine/search.ts");
+  const args = ["--line-number", "--no-heading", "--max-count", String(PER_FILE_CAP), "--max-columns", String(LINE_CAP)];
+  for (const d of [".se", "node_modules", ".worktrees"]) args.push("--glob", `!${d}/**`);
+  if (opts.ignore_case === true) args.push("--ignore-case");
   args.push("--regexp", query, scope);
-  const r = spawnSync("rg", args, { encoding: "utf8", maxBuffer: 16 * 1024 * 1024 });
+  const r = spawnSync(rgPath(), args, { encoding: "utf8", maxBuffer: 16 * 1024 * 1024 });
   if (r.status !== 0 && r.status !== 1) throw new Error(`ripgrep failed: ${r.stderr}`);
   const out: Match[] = [];
   for (const line of (r.stdout ?? "").split("\n")) {
     if (line.trim() === "") continue;
-    // <path>:<line>:<text> — path may contain ':' on Windows (C:\...), so
-    // find the line-number field from the right of the drive-letter case.
     const m = line.match(/^(.{1,}?):(\d+):(.*)$/s);
     if (m === null) continue;
     const rel = relative(root, m[1]).split(sep).join("/");
@@ -68,37 +91,21 @@ function rgSearch(root: string, scope: string, query: string, ignoreCase: boolea
   return out;
 }
 
-function jsSearch(root: string, scope: string, query: string, ignoreCase: boolean): Match[] {
-  const rx = new RegExp(query, ignoreCase ? "i" : "");
+/** Search a committed state: git grep at a ref. Path scope is a pathspec. */
+function gitGrepSearch(root: string, query: string, ref: string, opts: { path?: string; ignore_case?: boolean }): Match[] {
+  const args = ["grep", "-n", "-I", "-E", "--max-count", String(PER_FILE_CAP)];
+  if (opts.ignore_case === true) args.push("-i");
+  args.push(query, ref);
+  if (opts.path !== undefined) args.push("--", opts.path);
+  const r = spawnSync("git", args, { cwd: root, encoding: "utf8", maxBuffer: 16 * 1024 * 1024 });
+  if (r.status !== 0 && r.status !== 1) throw new Error(`git grep failed: ${(r.stderr ?? "").trim() || `exit ${r.status}`}`);
   const out: Match[] = [];
-  const files: string[] = [];
-  const gather = (p: string): void => {
-    const st = statSync(p);
-    if (st.isDirectory()) {
-      for (const e of readdirSync(p)) {
-        const abs = join(p, e);
-        if (isExcluded(relative(root, abs))) continue;
-        gather(abs);
-      }
-    } else if (st.size < 2 * 1024 * 1024) files.push(p);
-  };
-  gather(scope);
-  for (const f of files) {
-    let text: string;
-    try {
-      text = readFileSync(f, "utf8");
-    } catch {
-      continue;
-    }
-    if (text.includes("\u0000")) continue; // binary
-    const lines = text.split("\n");
-    let perFile = 0;
-    for (let i = 0; i < lines.length && perFile < 50; i++) {
-      if (rx.test(lines[i])) {
-        out.push({ path: relative(root, f).split(sep).join("/"), line: i + 1, text: lines[i].slice(0, LINE_CAP) });
-        perFile++;
-      }
-    }
+  for (const line of (r.stdout ?? "").split("\n")) {
+    if (line.trim() === "") continue;
+    // <ref>:<path>:<line>:<text>
+    const m = line.match(/^(.+?):(.+?):(\d+):(.*)$/s);
+    if (m === null) continue;
+    out.push({ path: m[2], line: Number(m[3]), text: m[4].slice(0, LINE_CAP) });
   }
   return out;
 }

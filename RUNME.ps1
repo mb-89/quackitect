@@ -19,12 +19,37 @@ if ([version]$nodeVersion -lt [version]"22.6.0") {
 }
 Write-Host "  node $nodeVersion  OK"
 
-# ripgrep is optional: se_file_search uses it when present, falls back to JS.
-$rg = Get-Command rg -ErrorAction SilentlyContinue
-if ($null -eq $rg) {
-  Write-Host "  ripgrep not found (optional). Faster search: winget install BurntSushi.ripgrep.MSVC" -ForegroundColor Yellow
-} else {
-  Write-Host "  ripgrep $((rg --version) -split "`n" | Select-Object -First 1)  OK"
+# git is a HARD dependency (ref search runs through git grep; v3 is a branch of quack).
+$git = Get-Command git -ErrorAction SilentlyContinue
+if ($null -eq $git) {
+  Write-Host "git not found - it is a hard dependency. winget install Git.Git and re-run." -ForegroundColor Red
+  exit 1
+}
+Write-Host "  $((git --version))  OK"
+
+# Engine dependencies. @vscode/ripgrep ships the rg binary via npm.
+Write-Host "quackitect v3 - installing engine dependencies" -ForegroundColor Cyan
+Push-Location (Join-Path $root "product\deliverable")
+try {
+  npm install --no-audit --no-fund --loglevel=error
+  if ($LASTEXITCODE -ne 0) {
+    Write-Host "npm install FAILED - the engine cannot run without it." -ForegroundColor Red
+    exit 1
+  }
+  # ripgrep is a HARD dependency (owner ruling 2026-07-26): no fallback engine.
+  $rgPath = node -p "try { require('@vscode/ripgrep').rgPath } catch { '' }"
+  if ([string]::IsNullOrWhiteSpace($rgPath) -or -not (Test-Path $rgPath)) {
+    $rgOnPath = Get-Command rg -ErrorAction SilentlyContinue
+    if ($null -eq $rgOnPath) {
+      Write-Host "ripgrep not found - it is a hard dependency. npm install should have provided it (or: winget install BurntSushi.ripgrep.MSVC). Re-run." -ForegroundColor Red
+      exit 1
+    }
+    Write-Host "  ripgrep (PATH) $((rg --version) -split "`n" | Select-Object -First 1)  OK"
+  } else {
+    Write-Host "  ripgrep (npm) $rgPath  OK"
+  }
+} finally {
+  Pop-Location
 }
 
 # Install the cage. .mcp.json and .claude\settings.json cannot be written by

@@ -1,6 +1,10 @@
 # quackitect v3
 
-A branch of quack. The agent is caged: its native tools are blocked, and its
+A branch of quack — literally: this folder is a linked git worktree of the
+`quackitect` repo on the orphan branch `v3` (like v2 before it). `main`
+reaches v1, `v2` reaches v2; `se_file_search` with `ref:` searches either.
+
+The agent is caged: its native tools are blocked, and its
 whole world is the `se` MCP server — every capability it has is one the
 engine serves, every call it makes is logged, and (next milestone) every
 action it may take is decided by the state machine.
@@ -36,12 +40,20 @@ product/
 ## The cage (how it blocks)
 
 `workspace/.claude/settings.json` **denies the current native tools by
-name** — Bash, Read, Write, Edit, MultiEdit, NotebookEdit, Glob, Grep,
-WebSearch, WebFetch, Skill, SlashCommand (an explicit blacklist by owner
+name** — Bash, BashOutput, KillShell, Read, Write, Edit, NotebookEdit,
+Glob, Grep, WebSearch, WebFetch, Skill (an explicit blacklist by owner
 ruling: a tool added in the future is NOT blocked automatically; blocking it
 is a deliberate edit to this list). Bare-name deny removes the tool from the
 model's context entirely. `mcp__se__*` is allowlisted. Subagents (Task)
 stay available and inherit the same denies — they are caged too.
+
+The settings file and `.mcp.json` are GENERATED: edit the templates in
+`workspace/_cage/`; the RUNME copies them into place on every run (the
+generated copies are gitignored).
+
+**Hard dependencies (owner ruling 2026-07-26): ripgrep and git.** The RUNME
+installs ripgrep via npm (`@vscode/ripgrep`) and fails red without either —
+there is no fallback search engine.
 
 ## The lane (11 tools, drop-in or better)
 
@@ -53,7 +65,7 @@ stay available and inherit the same denies — they are caged too.
 | — | `se_file_delete` | hash-guarded, no blind removal |
 | ls | `se_file_list` | junk dirs excluded |
 | Glob | `se_file_glob` | honest truncation flag |
-| Grep | `se_file_search` | ripgrep when installed, JS fallback; logged `intent` feeds the retro |
+| Grep | `se_file_search` | ripgrep (hard dep); `ref:` searches any committed branch/tag via git grep (main = v1, v2 = v2); logged `intent` feeds the retro |
 | Bash | `se_run` | full output kept in the call log under a citable ref |
 | WebFetch | `se_web_fetch` | HTML→text, paging offsets, declared truncation |
 | WebSearch | `se_web_search` | provider-backed (set `SE_BRAVE_API_KEY`); refuses honestly when unconfigured |
