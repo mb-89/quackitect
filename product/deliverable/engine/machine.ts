@@ -30,7 +30,10 @@ export interface EdgeDecl {
 
 export interface StateDecl {
   id: string;
-  kind: "work" | "gate" | "terminal";
+  /** start and end are MECHANICAL states every machine has: start is where
+   *  the machinery enters (auto-advanced), end closes the machine (terminal).
+   *  Nothing machine-specific belongs in them. */
+  kind: "work" | "gate" | "terminal" | "start" | "end";
   /** Diagram grouping, e.g. "boot" — presentation metadata, no run-time meaning. */
   group?: string;
   statement: string;
@@ -93,7 +96,7 @@ export function validateMachine(m: MachineDecl): void {
     if (s.filled_by === "engine" && !s.command) throw new Error(`${m.id}: ${s.id} is engine-filled but declares no command`);
   }
   // Reverse reachability from terminals.
-  const reachesTerminal = new Set(m.states.filter((s) => s.kind === "terminal").map((s) => s.id));
+  const reachesTerminal = new Set(m.states.filter((s) => s.kind === "terminal" || s.kind === "end").map((s) => s.id));
   if (reachesTerminal.size === 0) throw new Error(`${m.id}: no terminal state`);
   let grew = true;
   while (grew) {
@@ -263,7 +266,7 @@ export function completeState(
       // OR paths (alternative, recovery, fallback, error): activate directly.
       activated.push(e.to);
       const target = m.states.find((s) => s.id === e.to)!;
-      if (target.kind === "terminal") inst.status = "closed";
+      if (target.kind === "terminal" || target.kind === "end") inst.status = "closed";
     }
   }
   for (const s of m.states) {
@@ -277,7 +280,7 @@ export function completeState(
     if (!inbound.every((k) => inst.fired!.includes(k))) continue;
     inst.fired = inst.fired!.filter((k) => !inbound.includes(k)); // consume
     activated.push(s.id);
-    if (s.kind === "terminal") inst.status = "closed";
+    if (s.kind === "terminal" || s.kind === "end") inst.status = "closed";
   }
   inst.active = [...active, ...activated];
   inst.current = inst.active[0] ?? stateId;
@@ -315,7 +318,7 @@ export function advance(
         if (inst.claims) delete inst.claims[state.id];
       }
       const next = m.states.find((s) => s.id === e.to)!;
-      if (next.kind === "terminal") inst.status = "closed";
+      if (next.kind === "terminal" || next.kind === "end") inst.status = "closed";
       return { moved: true };
     }
   }

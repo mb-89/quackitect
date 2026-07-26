@@ -4,11 +4,11 @@
     "type": "split",
     "children": [
       {
-        "id": "7c254728307d1538",
+        "id": "b7c252897017d3c5",
         "type": "tabs",
         "children": [
           {
-            "id": "c57e70f9551809a5",
+            "id": "9e81788b3cde8434",
             "type": "leaf",
             "state": {
               "type": "empty",
@@ -176,15 +176,19 @@
       "bases:Create new base": false
     }
   },
-  "active": "c57e70f9551809a5",
+  "active": "1696153da3034759",
   "lastOpenFiles": [
-    "deliverable/machines/states/booted.md",
-    "deliverable/machines/states/prepare_idle.md",
-    "deliverable/machines/states/read_contract.md",
-    "deliverable/machines/states/start.md",
+    "deliverable/machines/states/end.md",
+    "deliverable/bin/se-manual.ts",
+    "deliverable/engine/render.ts",
     "deliverable/machines/CANVAS-GUIDE.md",
     "deliverable/machines/main.canvas",
     "deliverable/machines/boot.canvas",
+    "deliverable/machines/states/done.md",
+    "deliverable/machines/states/start.md",
+    "deliverable/machines/states/booted.md",
+    "deliverable/machines/states/prepare_idle.md",
+    "deliverable/machines/states/read_contract.md",
     "deliverable/machines/states/unbooted.md"
   ]
 }

@@ -102,10 +102,6 @@ export function compileMachine(root: string, canvasPath: string): MachineDecl {
   const machineId = canvasPath.replace(/\\/g, "/").split("/").pop()!.replace(/\.canvas$/, "");
   const canvas = loadCanvas(canvasPath);
   const fm = canvas.metadata?.frontmatter ?? {};
-  const entry = fm.entry;
-  if (typeof entry !== "string" || entry === "") {
-    throw new MachineCompileError(machineId, "frontmatter", "missing entry (the initial state)");
-  }
   const reentryRaw = fm.reentry ?? "restart";
   const reentry = reentryRaw === "restart" || reentryRaw === "resume" ? reentryRaw : null;
   if (reentry === null) {
@@ -198,10 +194,21 @@ export function compileMachine(root: string, canvasPath: string): MachineDecl {
     from.edges.push(decl);
   }
 
+  // start and end are MECHANICAL: every machine has exactly one of each.
+  // The machinery enters at start (no frontmatter entry needed) and the
+  // machine is done when end activates.
+  const starts = [...states.values()].filter((s) => s.kind === "start");
+  const ends = [...states.values()].filter((s) => s.kind === "end");
+  if (starts.length !== 1) {
+    throw new MachineCompileError(machineId, "machine", `every machine has exactly ONE start state (found ${starts.length})`);
+  }
+  if (ends.length !== 1) {
+    throw new MachineCompileError(machineId, "machine", `every machine has exactly ONE end state (found ${ends.length})`);
+  }
   const machine: MachineDecl = {
     id: machineId,
     reentry,
-    initial: entry,
+    initial: starts[0].id,
     states: [...states.values()],
   };
   try {
@@ -219,9 +226,10 @@ function stateFromNote(machineId: string, ref: string, notePath: string): StateD
   if (stateId === undefined || stateId === "") {
     throw new MachineCompileError(machineId, ref, "missing state (the state's id) in frontmatter");
   }
-  const kind = x.state_kind === "work" || x.state_kind === "gate" || x.state_kind === "terminal" ? x.state_kind : null;
+  const KINDS = ["work", "gate", "terminal", "start", "end"];
+  const kind = KINDS.includes(x.state_kind) ? (x.state_kind as "work" | "gate" | "terminal" | "start" | "end") : null;
   if (kind === null) {
-    throw new MachineCompileError(machineId, ref, `state_kind must be work | gate | terminal (got ${JSON.stringify(x.state_kind)})`);
+    throw new MachineCompileError(machineId, ref, `state_kind must be one of ${KINDS.join(" | ")} (got ${JSON.stringify(x.state_kind)})`);
   }
   // AGENT-FACING lives in FRONTMATTER; the body is prose for humans (owner
   // ruling 2026-07-26). guidance is a frontmatter field — short by design.

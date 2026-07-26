@@ -33,8 +33,14 @@ product/
 ## Run
 
 ```powershell
-.\RUNME.ps1   # preflight, deps, cage install, selftests, launch the caged agent
+.\RUNME.ps1           # preflight, deps, cage install, selftests, launch the caged agent
+.\RUNME.ps1 -Manual   # ...or open the MIRROR and walk the machines yourself, tick by tick
 ```
+
+**The tick** is the universal walk operation: tick without arguments =
+information about where the machine is; tick with arguments = complete the
+current state and move on. The agent (se_boot/se_exit), the manual Mirror
+buttons, and `POST /tick` on the manual server all drive the same core.
 
 ## The cage (how it blocks)
 
@@ -88,10 +94,12 @@ notably: file refs are VAULT-relative (the Obsidian vault root is
 `guidance`) live in the state note's FRONTMATTER while the body is prose
 for humans, and start/terminal states are drawn as pills.
 
-**The MAIN machine** (`main.canvas`) runs every session:
-`start → boot → idle → done`, where **boot is a sub-machine**
-(`boot.canvas`: `read_contract → prepare_idle → booted`) and future work
-states branch from idle. `se_boot` drives the sequence one step per call;
+**start and end are MECHANICAL** — every machine has exactly one of each,
+sharing the same two notes; the machinery walks out of start and the
+machine is done when end activates. **The MAIN machine** (`main.canvas`)
+runs every session: `start → boot → idle → end`, where **boot is a
+sub-machine** (`boot.canvas`: `start → read_contract → prepare_idle → end`)
+and future work states branch from idle. `se_boot` drives the sequence one step per call;
 the SessionStart hook makes the agent boot immediately and show the booted
 banner to the user; THE STATE GATE makes boot inevitable anyway — any
 pre-boot call is refused with `se_boot` as the remedy (SE-C-110). Each
@@ -105,8 +113,10 @@ gated; `se_exit` closes the session from idle.
       vault-relative refs), boot as a sub-machine with stepwise se_boot,
       THE STATE GATE wired into dispatch (per-state `legal_tools`, enforced
       not advisory), auto-boot SessionStart hook, banner, CANVAS-GUIDE.
-- [ ] M2 — the Mirror: an HTML projection, same renderer as the packet, so
-      the owner reads exactly what the agent reads. Next up.
+- [x] M2 (first cut) — the Mirror in manual mode: RUNME -Manual serves the
+      drawn machines as HTML (live position highlighted, the packet shown
+      verbatim — one source, two projections) with tick·info / tick·advance
+      buttons; manual ticks land in the call log.
 - [ ] Boot guidance — what the agent reads during read_contract (contract,
       voice, stance) and what prepare_idle actually checks: to be designed
       with the owner.

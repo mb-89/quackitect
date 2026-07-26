@@ -1,19 +1,21 @@
-// The session machine — every server process runs one instance of the MAIN
-// machine (product/deliverable/machines/main.canvas): start → boot(sub) →
-// idle → done. Future work branches from idle.
+// The session — every server process runs one instance of the MAIN machine
+// (product/deliverable/machines/main.canvas). start and end are MECHANICAL
+// states every machine has: the machinery auto-advances out of start, and a
+// machine is done when end activates.
 //
-// THE STATE GATE lives here: what is legal now is decided by the active
-// states' `legal_tools` lists (legal STATES are the machine's edges — the
-// gate is only about tools), enforced at dispatch.
+// THE TICK is the universal walk operation (owner ruling 2026-07-26):
+//   tick(advance=false) → information about where the machine is
+//   tick(advance=true)  → complete the current state, move on (seeding and
+//                         closing sub-machines as the walk crosses them)
+// The agent's se_boot and se_exit, and the manual walker (se-manual), all
+// drive the same tick core — one machinery, several hands.
 //
-// Boot is a SUB-MACHINE (boot.canvas): read_contract → prepare_idle →
-// booted. se_boot drives it: each call completes the current step and
-// returns the next step's packet, until the sub closes and the main machine
-// lands in idle with the booted banner.
+// THE STATE GATE lives here too: what is legal now is the active states'
+// `legal_tools` (legal STATES are the machine's edges — the gate is only
+// about tools), enforced at dispatch.
 //
 // State is in-memory: a server restart mid-session drops back to start, and
-// the next refused call's remedy re-boots the agent in one turn — the gate
-// makes boot inevitable, the SessionStart hook merely makes it prompt.
+// the next refused call's remedy re-boots the agent in one turn.
 import { join } from "node:path";
 import { CLAUSES, Rejection } from "./errors.ts";
 import {
@@ -27,6 +29,8 @@ import { compileMachine, resolveRef } from "./machines/compile.ts";
 
 /** Observability is never gated (v2: "the emit group is always safe to call"). */
 const ALWAYS_LEGAL: ReadonlySet<string> = new Set(["se_state"]);
+/** The machinery's drivers — legal in mechanical start states. */
+const MACHINERY: readonly string[] = ["se_boot"];
 
 export function mainMachinePath(root: string): string {
   return join(root, "product", "deliverable", "machines", "main.canvas");
@@ -71,17 +75,19 @@ export class Session {
     return s;
   }
 
-  /** The states whose legal_tools govern right now: the sub's while one runs. */
+  private subOpen(): boolean {
+    return this.sub !== undefined && this.sub.instance.status === "open";
+  }
+
+  /** The machine+states whose legal_tools govern right now. */
   private leaves(): { machine: MachineDecl; ids: string[] } {
-    if (this.sub !== undefined && this.sub.instance.status === "open") {
-      return { machine: this.sub.decl, ids: activeStates(this.sub.instance) };
-    }
+    if (this.subOpen()) return { machine: this.sub!.decl, ids: activeStates(this.sub!.instance) };
     return { machine: this.machine, ids: activeStates(this.instance) };
   }
 
   active(): string[] {
     const { ids } = this.leaves();
-    return this.sub !== undefined && this.sub.instance.status === "open" ? ids.map((s) => `${this.sub!.decl.id}/${s}`) : ids;
+    return this.subOpen() ? ids.map((s) => `${this.sub!.decl.id}/${s}`) : ids;
   }
 
   legal(): { all: boolean; tools: Set<string> } {
@@ -89,7 +95,9 @@ export class Session {
     const tools = new Set<string>();
     let all = false;
     for (const id of ids) {
-      for (const t of this.state(machine, id).legal_tools ?? []) {
+      const s = this.state(machine, id);
+      if (s.kind === "start") for (const t of MACHINERY) tools.add(t);
+      for (const t of s.legal_tools ?? []) {
         if (t === "all") all = true;
         else tools.add(t);
       }
@@ -106,7 +114,7 @@ export class Session {
       throw new Rejection({
         clause: CLAUSES.NOT_LEGAL_IN_STATE,
         expected: "an open session machine",
-        got: `${tool} after se_exit — the session machine is closed`,
+        got: `${tool} after the machine closed`,
         remedy: { tool: "se_state", args: {}, note: "only se_state answers now; a new session starts at the beginning" },
         source: "engine/session.ts gate",
       });
@@ -124,57 +132,108 @@ export class Session {
     });
   }
 
-  /** One boot step: advance the sequence, return the next packet or the banner. */
-  boot(): Record<string, unknown> {
-    const now = new Date().toISOString();
-    const mainActive = activeStates(this.instance);
+  // ── THE TICK ────────────────────────────────────────────────────────────
 
-    // 1. From start: complete it, seed the boot sub-machine.
-    if (this.sub === undefined && mainActive.includes(this.machine.initial)) {
-      completeState(this.machine, this.instance, this.machine.initial, "filled", now);
-      this.instance.history.push({ state: this.machine.initial, outcome: "filled", at: now });
-      const subState = activeStates(this.instance)
-        .map((s) => this.state(this.machine, s))
-        .find((s) => s.submachine !== undefined);
-      if (subState === undefined) {
-        // A main machine without a boot sub: land wherever start led.
-        return this.bootedPacket();
-      }
-      const subPath = resolveRef(this.root, mainMachinePath(this.root), subState.submachine!);
-      const decl = compileMachine(this.root, subPath);
-      this.sub = { decl, instance: newInstance(decl), parentState: subState.id };
-      return this.stepPacket();
-    }
-
-    // 2. Inside the sub: complete the current step.
-    if (this.sub !== undefined && this.sub.instance.status === "open") {
-      const current = activeStates(this.sub.instance)[0];
-      completeState(this.sub.decl, this.sub.instance, current, "filled", now);
-      this.sub.instance.history.push({ state: current, outcome: "filled", at: now });
-      this.instance.history.push({ state: `${this.sub.decl.id}/${current}`, outcome: "filled", at: now });
-      if (this.sub.instance.status !== "open") {
-        // Sub closed: the parent state is filled; the main machine moves on.
-        completeState(this.machine, this.instance, this.sub.parentState, "filled", now);
-        this.instance.history.push({ state: this.sub.parentState, outcome: "filled", at: now });
-        return this.bootedPacket();
-      }
-      return this.stepPacket();
-    }
-
-    throw new Rejection({
-      clause: CLAUSES.NOT_LEGAL_IN_STATE,
-      expected: "an unbooted session",
-      got: `se_boot in state [${this.active().join(", ")}]`,
-      remedy: { tool: "se_state", args: {}, note: "already booted — carry on through the lane" },
-      source: "engine/session.ts boot",
+  /** tick without arguments: information about where the machine is. */
+  tickInfo(): Record<string, unknown> {
+    const { machine, ids } = this.leaves();
+    const states = ids.map((id) => {
+      const s = this.state(machine, id);
+      return {
+        id: this.subOpen() ? `${machine.id}/${s.id}` : s.id,
+        kind: s.kind,
+        statement: s.statement,
+        guidance: s.guidance,
+        legal_tools: s.kind === "start" ? [...MACHINERY] : (s.legal_tools ?? []),
+        next: s.edges.map((e) => ({ to: e.to, role: e.role, ...(e.guard !== undefined ? { guard: e.guard } : {}) })),
+      };
     });
+    const { all, tools } = this.legal();
+    return {
+      machine: this.machine.id,
+      active: this.active(),
+      status: this.instance.status,
+      legal_tools: all ? "all" : [...ALWAYS_LEGAL, ...tools],
+      states,
+    };
   }
 
-  private stepPacket(): Record<string, unknown> {
-    const stateId = activeStates(this.sub!.instance)[0];
-    const s = this.state(this.sub!.decl, stateId);
+  /** tick with arguments: complete the current state and move on. */
+  tickAdvance(): Record<string, unknown> {
+    const now = new Date().toISOString();
+    if (this.instance.status === "closed") {
+      throw new Rejection({
+        clause: CLAUSES.NOT_LEGAL_IN_STATE,
+        expected: "an open machine",
+        got: "a tick after end",
+        remedy: { tool: "se_state", args: {}, note: "the machine is done; a new session starts at the beginning" },
+        source: "engine/session.ts tick",
+      });
+    }
+    if (this.subOpen()) {
+      const cur = activeStates(this.sub!.instance)[0];
+      completeState(this.sub!.decl, this.sub!.instance, cur, "filled", now);
+      this.sub!.instance.history.push({ state: cur, outcome: "filled", at: now });
+      this.instance.history.push({ state: `${this.sub!.decl.id}/${cur}`, outcome: "filled", at: now });
+      this.autoStart(this.sub!.decl, this.sub!.instance, now);
+      if (!this.subOpen()) {
+        // The sub reached its end: the parent state is filled, the main
+        // machine moves on.
+        completeState(this.machine, this.instance, this.sub!.parentState, "filled", now);
+        this.instance.history.push({ state: this.sub!.parentState, outcome: "filled", at: now });
+        this.seedSubs(now);
+      }
+      return this.tickInfo();
+    }
+    const cur = activeStates(this.instance)[0];
+    completeState(this.machine, this.instance, cur, "filled", now);
+    this.instance.history.push({ state: cur, outcome: "filled", at: now });
+    this.seedSubs(now);
+    return this.tickInfo();
+  }
+
+  /** Mechanical: a machine never rests ON start — the machinery walks out. */
+  private autoStart(m: MachineDecl, inst: MachineInstance, now: string): void {
+    for (const id of activeStates(inst)) {
+      if (this.state(m, id).kind === "start") {
+        completeState(m, inst, id, "filled", now);
+        inst.history.push({ state: id, outcome: "filled", at: now });
+      }
+    }
+  }
+
+  /** Seed any newly-active sub-machine state (and auto-walk its start). */
+  private seedSubs(now: string): void {
+    const subState = activeStates(this.instance)
+      .map((s) => this.state(this.machine, s))
+      .find((s) => s.submachine !== undefined);
+    if (subState === undefined) return;
+    const subPath = resolveRef(this.root, mainMachinePath(this.root), subState.submachine!);
+    const decl = compileMachine(this.root, subPath);
+    const instance = newInstance(decl);
+    this.sub = { decl, instance, parentState: subState.id };
+    this.autoStart(decl, instance, now);
+  }
+
+  // ── The agent's hands on the tick ───────────────────────────────────────
+
+  /** se_boot: one boot step per call, banner when idle is reached. */
+  boot(): Record<string, unknown> {
+    if (this.instance.status === "closed" || activeStates(this.instance).includes("idle")) {
+      throw new Rejection({
+        clause: CLAUSES.NOT_LEGAL_IN_STATE,
+        expected: "an unbooted session",
+        got: `se_boot in state [${this.active().join(", ")}]`,
+        remedy: { tool: "se_state", args: {}, note: "already booted — carry on through the lane" },
+        source: "engine/session.ts boot",
+      });
+    }
+    this.tickAdvance();
+    if (!this.subOpen() && activeStates(this.instance).includes("idle")) return this.bootedPacket();
+    const { machine, ids } = this.leaves();
+    const s = this.state(machine, ids[0]);
     return {
-      phase: `${this.sub!.decl.id}/${s.id}`,
+      phase: this.active()[0],
       statement: s.statement,
       guidance: s.guidance,
       action: "Do what the guidance says, then call se_boot again to complete this step.",
@@ -182,7 +241,7 @@ export class Session {
   }
 
   private bootedPacket(): Record<string, unknown> {
-    const idle = this.machine.states.find((s) => activeStates(this.instance).includes(s.id));
+    const idle = this.machine.states.find((s) => s.id === "idle");
     return {
       booted: true,
       machine: this.machine.id,
@@ -193,9 +252,9 @@ export class Session {
     };
   }
 
+  /** se_exit: from idle, walk into end. */
   exit(): Record<string, unknown> {
-    const now = new Date().toISOString();
-    if (!activeStates(this.instance).includes("idle") || (this.sub !== undefined && this.sub.instance.status === "open")) {
+    if (this.subOpen() || !activeStates(this.instance).includes("idle")) {
       throw new Rejection({
         clause: CLAUSES.NOT_LEGAL_IN_STATE,
         expected: "an idle session",
@@ -204,11 +263,10 @@ export class Session {
         source: "engine/session.ts exit",
       });
     }
-    completeState(this.machine, this.instance, "idle", "filled", now);
-    this.instance.history.push({ state: "idle", outcome: "filled", at: now });
+    this.tickAdvance();
     return {
       closed: true,
-      banner: "🦆 SE v3 session closed. The main machine is done; a new session starts at the beginning.",
+      banner: "🦆 SE v3 session closed. The main machine reached end; a new session starts at the beginning.",
     };
   }
 
@@ -217,9 +275,7 @@ export class Session {
     return {
       machine: this.machine.id,
       active: this.active(),
-      ...(this.sub !== undefined && this.sub.instance.status === "open"
-        ? { submachine: { id: this.sub.decl.id, active: activeStates(this.sub.instance) } }
-        : {}),
+      ...(this.subOpen() ? { submachine: { id: this.sub!.decl.id, active: activeStates(this.sub!.instance) } } : {}),
       status: this.instance.status,
       legal_tools: all ? "all" : [...ALWAYS_LEGAL, ...tools],
       history: this.instance.history.slice(-10),

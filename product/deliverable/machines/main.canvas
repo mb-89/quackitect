@@ -1,18 +1,36 @@
 {
 	"metadata":{
 		"version":"1.0-1.0",
-		"frontmatter":{"entry":"start","reentry":"restart"}
+		"frontmatter":{"reentry":"restart"}
 	},
 	"nodes":[
-		{"id":"n-comment","type":"text","text":"THE MAIN MACHINE — every session runs this. start locks the lane; boot is a sub-machine (boot.canvas: read_contract → prepare_idle → booted); idle is home — future work states branch from it; se_exit closes to done.","x":-1560,"y":-360,"width":700,"height":140},
-		{"id":"n-start","type":"file","file":"deliverable/machines/states/start.md","x":-1560,"y":80,"width":320,"height":160,"styleAttributes":{"shape":"pill"}},
+		{"id":"n-comment","type":"text","text":"THE MAIN MACHINE — every session runs this. start/end are mechanical (every machine has them); boot is a sub-machine (boot.canvas); idle is home — future work states branch from it; se_exit closes to end.","x":-1560,"y":-360,"width":700,"height":140},
 		{"id":"n-boot","type":"file","file":"deliverable/machines/boot.canvas","x":-1100,"y":-160,"width":620,"height":640},
 		{"id":"n-idle","type":"file","file":"deliverable/machines/states/idle.md","x":-340,"y":-160,"width":620,"height":640},
-		{"id":"n-done","type":"file","file":"deliverable/machines/states/done.md","x":420,"y":80,"width":320,"height":160,"styleAttributes":{"shape":"pill"}}
+		{
+			"id":"n-end",
+			"type":"file",
+			"file":"deliverable/machines/states/end.md",
+			"styleAttributes":{"shape":"pill"},
+			"x":420,
+			"y":80,
+			"width":160,
+			"height":160
+		},
+		{
+			"id":"n-start",
+			"type":"file",
+			"file":"deliverable/machines/states/start.md",
+			"styleAttributes":{"shape":"pill"},
+			"x":-1400,
+			"y":80,
+			"width":160,
+			"height":160
+		}
 	],
 	"edges":[
 		{"id":"e-start-boot","fromNode":"n-start","fromSide":"right","toNode":"n-boot","toSide":"left"},
 		{"id":"e-boot-idle","fromNode":"n-boot","fromSide":"right","toNode":"n-idle","toSide":"left"},
-		{"id":"e-idle-done","fromNode":"n-idle","fromSide":"right","toNode":"n-done","toSide":"left"}
+		{"id":"e-idle-end","fromNode":"n-idle","fromSide":"right","toNode":"n-end","toSide":"left"}
 	]
 }

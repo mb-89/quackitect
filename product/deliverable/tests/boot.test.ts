@@ -11,23 +11,21 @@ import { bootedServer, call, freshRoot } from "./helpers.ts";
 
 const REPO_ROOT = fileURLToPath(new URL("../../..", import.meta.url));
 
-test("the shipped main.canvas compiles: start entry, boot nested, pills drawn as terminals", () => {
+test("the shipped main.canvas compiles: mechanical start/end, boot nested", () => {
   const m = compileMachine(REPO_ROOT, mainMachinePath(REPO_ROOT));
   assert.equal(m.id, "main");
-  assert.equal(m.initial, "start");
-  const start = m.states.find((s) => s.id === "start")!;
-  assert.deepEqual(start.legal_tools, ["se_boot"]);
-  assert.ok(start.guidance.length > 0, "guidance is a frontmatter field and served");
+  assert.equal(m.initial, "start", "entry is the mechanical start state, not frontmatter");
+  assert.equal(m.states.find((s) => s.id === "start")!.kind, "start");
+  assert.equal(m.states.find((s) => s.id === "end")!.kind, "end");
   const boot = m.states.find((s) => s.id === "boot")!;
   assert.ok(boot.submachine?.endsWith("boot.canvas"), "boot is a sub-machine state");
   assert.deepEqual(m.states.find((s) => s.id === "idle")!.legal_tools, ["all"]);
-  assert.equal(m.states.find((s) => s.id === "done")!.kind, "terminal");
 });
 
-test("the boot sub-machine compiles: read_contract → prepare_idle → booted", () => {
+test("the boot sub-machine compiles with its own mechanical start/end", () => {
   const m = compileMachine(REPO_ROOT, mainMachinePath(REPO_ROOT).replace("main.canvas", "boot.canvas"));
-  assert.equal(m.initial, "read_contract");
-  assert.equal(m.states.find((s) => s.id === "booted")!.kind, "terminal");
+  assert.equal(m.initial, "start");
+  assert.equal(m.states.find((s) => s.id === "end")!.kind, "end");
   assert.deepEqual(m.states.find((s) => s.id === "read_contract")!.legal_tools, ["se_boot"]);
 });
 
@@ -94,4 +92,33 @@ test("the gate is logged like everything else — a refused pre-boot call lands 
   assert.equal(recs.length, 1);
   assert.equal(recs[0].tool, "se_run");
   assert.equal(recs[0].outcome, "rejected");
+});
+
+test("manual mode: tick info at start, ticks walk the whole machine to end", async () => {
+  const { Session } = await import("../engine/session.ts");
+  const s = new Session(freshRoot());
+  const info = s.tickInfo() as { active: string[]; states: { kind: string }[] };
+  assert.deepEqual(info.active, ["start"]);
+  assert.equal(info.states[0].kind, "start");
+  s.tickAdvance(); // start -> boot/read_contract (sub start auto-walked)
+  assert.deepEqual(s.active(), ["boot/read_contract"]);
+  s.tickAdvance();
+  assert.deepEqual(s.active(), ["boot/prepare_idle"]);
+  s.tickAdvance(); // sub reaches end, boot fills, idle
+  assert.deepEqual(s.active(), ["idle"]);
+  s.tickAdvance(); // idle -> end
+  assert.equal((s.describe() as { status: string }).status, "closed");
+});
+
+test("the mirror renders both machines with the live position highlighted", async () => {
+  const { Session } = await import("../engine/session.ts");
+  const { renderMirror } = await import("../engine/render.ts");
+  const root = freshRoot();
+  const s = new Session(root);
+  s.tickAdvance();
+  const html = renderMirror({ session: s, root, lastPacket: undefined, mode: "manual" });
+  for (const id of ["start", "boot", "idle", "end", "read_contract", "prepare_idle"]) {
+    assert.ok(html.includes(`>${id}</text>`), `renders ${id}`);
+  }
+  assert.ok(html.includes("what the agent gets"), "the packet panel is the shared projection");
 });

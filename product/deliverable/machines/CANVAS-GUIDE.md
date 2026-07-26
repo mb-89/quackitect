@@ -20,10 +20,22 @@ canvas is VAULT-RELATIVE:
 The compiler accepts the fallbacks, Obsidian does not. Author vault-relative,
 always.
 
+## start and end are MECHANICAL
+
+Every machine has exactly ONE start and ONE end state — they are machinery,
+not content: the machine enters at start (the machinery walks out of it on
+the first tick) and is done when everything before end has transitioned
+into it. ALL machines share the SAME two notes
+(`deliverable/machines/states/start.md` / `end.md`, `state_kind: start` /
+`end`) — never write machine-specific content into them, and never create
+per-machine start/end notes. Draw both as pills. The end state is called
+END (that is its state-machine name), not "done".
+
 ## The drawn form
 
-- A machine is one `.canvas` file. `metadata.frontmatter` carries `entry`
-  (the initial state id) and `reentry` (`restart` | `resume`).
+- A machine is one `.canvas` file. `metadata.frontmatter` carries `reentry`
+  (`restart` | `resume`); the entry is NOT declared — it is the machine's
+  start state, found mechanically.
 - **States are file nodes onto state notes** (`.md`). A file node onto
   another `.canvas` nests that machine as a sub-machine state (its id is the
   canvas filename).
@@ -35,7 +47,8 @@ always.
 - **Groups are geometric**: a state whose center sits inside a group
   rectangle carries its label. Presentation only.
 - **Escape and ask-human edges are never drawn** — the executor owns them.
-- Every machine needs a path to a **terminal** state or it refuses to load.
+- Every machine needs exactly one start and one end (its terminal) or it
+  refuses to load.
 
 ## State notes
 
@@ -45,7 +58,7 @@ Agent-facing lives in FRONTMATTER; the body is prose for humans. First
 ```
 ---
 state: idle                  # the state's id (required)
-state_kind: work             # work | gate | terminal (required)
+state_kind: work             # work | gate | terminal | start | end (required)
 legal_tools: se_boot, se_x   # THE STATE GATE: tools legal here; `all` opens the lane
 guidance: One or two short sentences the agent gets in its packet.
 ---

@@ -1,6 +1,10 @@
-# quackitect v3 — install-check, selftest, and caged-agent launch.
-#   .\RUNME.ps1            check prerequisites, run the engine selftests, start agent in the cage.
-
+# quackitect v3 — install-check, selftest, and launch.
+#   .\RUNME.ps1            preflight + selftests, then the caged agent in workspace\
+#   .\RUNME.ps1 -Manual    preflight + selftests, then the MIRROR in manual mode:
+#                          walk the machines yourself in the browser, tick by tick.
+param(
+  [switch]$Manual
+)
 $ErrorActionPreference = "Stop"
 $root = $PSScriptRoot
 
@@ -68,16 +72,24 @@ Push-Location (Join-Path $root "product\deliverable")
 try {
   node --test "tests/*.test.ts"
   if ($LASTEXITCODE -ne 0) {
-    Write-Host "Selftests FAILED - do not launch the agent on a red engine." -ForegroundColor Red
+    Write-Host "Selftests FAILED - do not launch on a red engine." -ForegroundColor Red
     exit 1
   }
 } finally {
   Pop-Location
 }
 
-# Launch Claude Code inside the cage. workspace/.claude/settings.json denies
-# the native tools by name (explicit blacklist); workspace/.mcp.json serves
-# the se lane. The agent's whole world is the MCP server.
+if ($Manual) {
+  # MANUAL MODE: the Mirror. Walk the machines yourself - tick by tick.
+  Write-Host "quackitect v3 - manual mode: the mirror at http://localhost:7333" -ForegroundColor Cyan
+  Start-Process "http://localhost:7333"
+  node (Join-Path $root "product\deliverable\bin\se-manual.ts") --root $root
+  exit 0
+}
+
+# AGENT MODE: launch Claude Code inside the cage. workspace/.claude/settings.json
+# denies the native tools by name (explicit blacklist); workspace/.mcp.json
+# serves the se lane. The agent's whole world is the MCP server.
 $claude = Get-Command claude -ErrorAction SilentlyContinue
 if ($null -eq $claude) {
   Write-Host "claude CLI not found. Install Claude Code first: https://code.claude.com/docs" -ForegroundColor Red
