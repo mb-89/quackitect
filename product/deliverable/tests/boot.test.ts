@@ -189,3 +189,26 @@ test("jump back: downstream superseded, evidence invalidated, re-walk earns it a
   // a never-filled state is not a jump target
   assert.throws(() => s.jumpBack("end"), (e) => (e as { clause?: string }).clause === "SE-C-110");
 });
+
+test("jump back leaves nothing green: the nested walk's record is superseded too", async () => {
+  const { Session } = await import("../engine/session.ts");
+  const s = new Session(freshRoot());
+  s.tickAdvance(); s.tickAdvance();
+  s.submitEvidence("read_contract", { read_confirmed: true });
+  s.tickAdvance(); s.tickAdvance(); s.tickAdvance();
+  s.jumpBack("boot");
+  const filled = s.instance.history.filter((h) => h.outcome === "filled").map((h) => h.state);
+  assert.ok(!filled.some((f) => f.startsWith("boot/")), `boot walk entries still filled: ${filled}`);
+});
+
+test("the agent can peek at any state without moving — the click, as a tool", async () => {
+  const server = buildServer(freshRoot());
+  const peek = await call(server, "se_tick", { state: "idle" });
+  assert.equal(peek.isError, false);
+  assert.equal(peek.body.id, "idle");
+  assert.ok(String(peek.body.statement).length > 0);
+  const still = await call(server, "se_tick");
+  assert.deepEqual(still.body.active, ["start"]);
+  const unknown = await call(server, "se_tick", { state: "nope" });
+  assert.equal(unknown.isError, true);
+});

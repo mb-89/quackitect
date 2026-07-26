@@ -370,6 +370,44 @@ export class Session {
     return this.landing();
   }
 
+  /** The agent's "click on a state": full information about any state of
+   *  the machine you are in (falling back to the main machine). Looking
+   *  never moves. */
+  stateInfo(id: string): Record<string, unknown> {
+    const { machine } = this.leaves();
+    const s = machine.states.find((st) => st.id === id) ?? this.machine.states.find((st) => st.id === id);
+    if (s === undefined) {
+      throw new Rejection({
+        clause: CLAUSES.NOT_LEGAL_IN_STATE,
+        expected: `a state of ${machine.id}${machine.id === this.machine.id ? "" : ` or ${this.machine.id}`}: ${[...new Set([...machine.states, ...this.machine.states].map((st) => st.id))].join(", ")}`,
+        got: id,
+        remedy: { tool: "se_tick", args: {}, note: "se_tick without arguments shows where you are" },
+        source: "engine/session.ts state-info",
+      });
+    }
+    const home = machine.states.includes(s) ? machine : this.machine;
+    return {
+      id: s.id,
+      kind: s.kind,
+      statement: s.statement,
+      guidance: s.guidance,
+      legal_tools: s.kind === "start" || s.kind === "end" ? [...MACHINERY] : (s.legal_tools ?? []),
+      leave_when: s.leave_when ?? "always",
+      leave_met: this.conditionMet(home, s, "leave"),
+      ...(s.read !== undefined ? { read: s.read } : {}),
+      ...(s.submachine !== undefined ? { submachine: s.submachine } : {}),
+      next: s.edges.map((e) => {
+        const t = home.states.find((st) => st.id === e.to);
+        return {
+          to: e.to,
+          role: e.role,
+          ...(e.guard !== undefined ? { guard: e.guard } : {}),
+          ...(t !== undefined ? { kind: t.kind, statement: t.statement } : {}),
+        };
+      }),
+    };
+  }
+
   /** Jump back to an EARLIER state of the machine you are in. Everything
    *  downstream is superseded (kept in the record, never erased) and its
    *  evidence and checks are invalidated — they are earned again on the
@@ -409,11 +447,19 @@ export class Session {
     }
     const { cone } = reopenStates(machine, inst, [target], "jump back", now);
     // Invalidate the cone's evidence and checks — including a nested
-    // machine's, when a sub-machine state is inside the cone.
+    // machine's, when a sub-machine state is inside the cone. And supersede
+    // the MAIN record's entries for the cone (the nested walk's included):
+    // a green state after a jump back would claim work that no longer stands.
     for (const id of cone) {
       this.evidence.delete(this.evidenceKey(machine, id));
       for (const key of [...this.evidence.keys()]) {
         if (key.startsWith(`${id}/`)) this.evidence.delete(key);
+      }
+      for (const h of this.instance.history) {
+        if (h.outcome !== "filled") continue;
+        if (h.state === `${machine.id}/${id}` || h.state.startsWith(`${id}/`)) {
+          (h as { outcome: string }).outcome = "superseded";
+        }
       }
       const s = machine.states.find((st) => st.id === id);
       if (s?.leave_when === "preflight" || s?.submachine !== undefined) this.preflightCache = undefined;

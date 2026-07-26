@@ -26,7 +26,7 @@ export function sessionTools(session: Session): ToolDef[] {
       name: "se_tick",
       title: "se.tick",
       description:
-        "THE TICK — the universal walk operation, legal in EVERY state. Without arguments: where the machine is (state, guidance, what to read, legal tools, next states). With arguments: advance — to: <state> picks the edge (optional when there is only one), confirm: true confirms you have READ everything the state lists under `read` (required by read_guidance leave conditions; logged as evidence), advance: true advances when no other argument applies, back: <state> returns to an earlier filled state (downstream is superseded, evidence invalidated). When a result carries a banner, show it to the user VERBATIM.",
+        "THE TICK — the universal walk operation, legal in EVERY state. Without arguments: where the machine is (state, guidance, what to read, legal tools, next states). With arguments: advance — to: <state> picks the edge (optional when there is only one), confirm: true confirms you have READ everything the state lists under `read` (required by read_guidance leave conditions; logged as evidence), advance: true advances when no other argument applies, back: <state> returns to an earlier filled state (downstream is superseded, evidence invalidated), state: <state> PEEKS at any state without moving — use it to choose among several ways forward. When a result carries a banner, show it to the user VERBATIM.",
       inputSchema: {
         type: "object",
         properties: {
@@ -34,9 +34,11 @@ export function sessionTools(session: Session): ToolDef[] {
           confirm: { type: "boolean", description: "confirm the current state's read list was actually read" },
           advance: { type: "boolean", description: "advance along the single drawn edge" },
           back: { type: "string", description: "jump BACK to an earlier filled state — everything downstream is superseded and its evidence invalidated" },
+          state: { type: "string", description: "PEEK at a named state (full info: statement, guidance, conditions, next) — looking never moves" },
         },
       },
       handler: (args) => {
+        if (args.state !== undefined) return session.stateInfo(String(args.state));
         if (args.back !== undefined) return session.jumpBack(String(args.back));
         const wantsAdvance = args.to !== undefined || args.confirm === true || args.advance === true;
         if (!wantsAdvance) return session.tickInfo();
