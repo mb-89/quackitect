@@ -249,6 +249,8 @@ function stateDetail(id) {
 document.addEventListener("click", async (ev) => {
   const c = ev.target.closest ? ev.target.closest(".confirm") : null;
   if (c) { await fetch("/evidence", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ state: c.dataset.state || CURRENT }) }); location.href = "/"; return; }
+  const rp = ev.target.closest ? ev.target.closest(".runpre") : null;
+  if (rp) { await fetch("/preflight", { method: "POST" }); location.href = "/"; return; }
   const dl = ev.target.closest ? ev.target.closest(".doclink") : null;
   if (dl) { openDoc(dl.dataset.path, dl.dataset.return); return; }
   const back = ev.target.closest ? ev.target.closest(".back") : null;
@@ -259,9 +261,10 @@ function condDetail(id) {
   const met = s.leave_met;
   let html = "";
   if (s.leave_when === "preflight") {
+    html += '<div style="padding:2px 0 10px"><button class="primary runpre" title="the engine runs the checks; the result is the evidence">' + (met ? "re-run checks" : "run checks") + "</button></div>";
     html += met
-      ? '<div style="padding:2px 0 10px;color:#4a7a55">preflight green ✓</div>'
-      : '<div style="padding:2px 0 10px;color:#e86a5f">preflight failures — engine-checked, a tick re-runs them:</div>' + jsonTable(s.preflight_failures || []);
+      ? '<div style="padding:2px 0 10px;color:#4a7a55">preflight green ✓ — exit condition met</div>'
+      : '<div style="padding:2px 0 10px;color:#e86a5f">failures:</div>' + jsonTable(s.preflight_failures || []);
     html += '<div class="comment-detail">' + (s.guidance || "").replace(/&/g,"&amp;").replace(/</g,"&lt;") + "</div>";
     return ["preflight · " + id, html];
   }

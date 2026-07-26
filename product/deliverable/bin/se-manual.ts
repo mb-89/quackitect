@@ -94,6 +94,14 @@ const server = createServer((req, res) => {
       });
       return;
     }
+    if (req.method === "POST" && url.pathname === "/preflight") {
+      const started = Date.now();
+      const failures = state.session.preflight(true);
+      log.append({ tool: "manual_preflight", args: {}, ok: failures.length === 0, outcome: "result", duration_ms: Date.now() - started, response: { failures } });
+      res.writeHead(303, { location: "/" });
+      res.end();
+      return;
+    }
     if (url.pathname === "/doc") {
       // Serve a guidance document, rendered — links in the details pane.
       const p = url.searchParams.get("path") ?? "";
