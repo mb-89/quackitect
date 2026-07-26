@@ -207,7 +207,8 @@ function jsonTable(v) {
   if (typeof v === "number") return '<span class="vnum">' + v + "</span>";
   if (typeof v === "boolean") return '<span class="vbool">' + v + "</span>";
   if (typeof v === "string") {
-    if (/^(workspace|product)\/[^ ]+\.[A-Za-z0-9]+$/.test(v)) {
+    const looksLikePath = (v.startsWith("workspace/") || v.startsWith("product/")) && !v.includes(" ") && v.lastIndexOf(".") > v.lastIndexOf("/");
+    if (looksLikePath) {
       return '<a class="doclink" data-path="' + v + '">' + v + "</a>";
     }
     return '<span class="vstr">' + v.replace(/&/g,"&amp;").replace(/</g,"&lt;") + "</span>";

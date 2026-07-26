@@ -4,24 +4,24 @@
     "type": "split",
     "children": [
       {
-        "id": "b7c252897017d3c5",
+        "id": "ac49e17e6026f4d0",
         "type": "tabs",
         "children": [
           {
-            "id": "9e81788b3cde8434",
+            "id": "fa3d3a77366da927",
             "type": "leaf",
             "state": {
               "type": "canvas",
               "state": {
-                "file": "deliverable/machines/boot.canvas",
+                "file": "deliverable/machines/main.canvas",
                 "viewState": {
-                  "x": -490,
-                  "y": 70,
-                  "zoom": -0.578846785582068
+                  "x": -410,
+                  "y": 40,
+                  "zoom": -0.4667364192605307
                 }
               },
               "icon": "lucide-layout-dashboard",
-              "title": "boot"
+              "title": "main"
             }
           }
         ]
@@ -97,7 +97,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "deliverable/machines/boot.canvas",
+                "file": "deliverable/machines/main.canvas",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -107,7 +107,7 @@
                 "unlinkedCollapsed": true
               },
               "icon": "links-coming-in",
-              "title": "Backlinks for boot"
+              "title": "Backlinks for main"
             }
           },
           {
@@ -116,12 +116,12 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "deliverable/machines/boot.canvas",
+                "file": "deliverable/machines/main.canvas",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               },
               "icon": "links-going-out",
-              "title": "Outgoing links from boot"
+              "title": "Outgoing links from main"
             }
           },
           {
@@ -159,13 +159,13 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "deliverable/machines/boot.canvas",
+                "file": "deliverable/machines/main.canvas",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
               },
               "icon": "lucide-list",
-              "title": "Outline of boot"
+              "title": "Outline of main"
             }
           }
         ]
@@ -186,8 +186,9 @@
       "bases:Create new base": false
     }
   },
-  "active": "9e81788b3cde8434",
+  "active": "fa3d3a77366da927",
   "lastOpenFiles": [
+    "deliverable/machines/boot.canvas",
     "deliverable/node_modules/marked/bin/marked.js",
     "deliverable/node_modules/marked/bin/main.js",
     "deliverable/node_modules/marked/bin",
@@ -201,11 +202,9 @@
     "deliverable/node_modules/marked/package.json",
     "deliverable/node_modules/marked/lib/marked.umd.js",
     "deliverable/node_modules/marked/marked.min.js",
-    "deliverable/node_modules/marked/lib/marked.esm.js",
     "deliverable/machines/guidance/voice.md",
     "deliverable/machines/guidance/contract.md",
     "deliverable/machines/main.canvas",
-    "deliverable/machines/boot.canvas",
     "deliverable/machines/states/start.md",
     "deliverable/machines/states/end.md",
     "deliverable/machines/states/idle.md",
