@@ -12,14 +12,15 @@ into every state's packet.
 
 The session runs a THRESHOLD (the user's slider in the mirror). When an
 advance is refused with SE-C-113, that step is the user's: tell them where
-you stand and that you are holding ("I'm at start — entering boot is above
-the threshold, waiting for your hand"), then call `se_tick {wait: true}`.
-The call blocks until the user moves something (their tick, the slider, a
-check) and returns the fresh packet — read it and continue walking. If it
-returns with changed: false, hold again, indefinitely: THE HOLD IS YOUR
-IDLE LOOP. Never end your turn while you are waiting on the machine — an
-ended turn cannot hear the slider. The same hold is how you wait at idle
-with nothing to do.
+you stand ("I'm at start — entering boot is above the threshold, waiting
+for your hand"), call `se_tick {park: true}`, and END YOUR TURN. Parking
+arms the machinery's waiter: while you sleep — no calls, no cost — it
+watches the machine, and when the user moves something (slider, tick,
+check) you are woken with a message saying so; re-tick and continue. If
+you wake with no message after a long quiet stretch, the user was told to
+say "continue" — wait for them. The same park is how you rest at idle
+with nothing to do. (`se_tick {wait: true}` remains for SHORT in-turn
+holds when you expect the change within seconds.)
 
 THE HANDOVER RULE: the packet's `human_checked` list is what the user
 checked as read while driving the mirror themselves. Your advances must

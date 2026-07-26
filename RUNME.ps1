@@ -152,9 +152,10 @@ Start-Job -ScriptBlock {
 
 # The agent only acts inside a turn, and no turn starts until a first
 # message - so RUNME sends it. The agent boots as far as the threshold
-# lets it, ANNOUNCES where it stands, and holds; raising the slider wakes
-# the held tick and it continues on its own.
-$kickoff = 'Session start. Tick the machine and walk as far as the threshold allows. Then report to me in one short message: where you stand, and why you stopped (threshold, condition, or idle). If you are held below the threshold or idle with nothing to do, say so and hold with se_tick {wait: true} - hold again every time it returns changed: false. The hold is your idle loop: my slider and my mirror clicks reach you through it. Do not end your turn while holding.'
+# lets it, ANNOUNCES where it stands, PARKS, and ends its turn; the Stop
+# hook watches the machine while it sleeps (no tokens) and wakes it with
+# a message when the slider or the mirror moves.
+$kickoff = 'Session start. Tick the machine and walk as far as the threshold allows. Then report to me in one short message: where you stand, and why you stopped (threshold, condition, or idle). If you are held below the threshold or idle with nothing to do, say so, call se_tick {park: true}, and end your turn - the machinery wakes you when my hand moves the slider or the machine. If nothing wakes you, I will say continue.'
 Push-Location (Join-Path $root "workspace")
 try {
   claude $kickoff

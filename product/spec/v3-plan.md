@@ -62,3 +62,17 @@ Supersedes the first draft where they differ. Owner rulings incorporated:
 - Prose rules do not change agent behavior; refusals do (P5, proven twice).
 - Each mechanism must name the failure it is load-bearing for; anything that
   cannot is deferred.
+
+## Forward: asynchronous lane tasks (owner question 2026-07-26)
+
+MCP's CALL is synchronous; the SERVER is not. Nothing stops the lane from
+growing a background arm: `se_run {background: true}` spawns and returns a
+ref immediately; a status tool (or the tick packet) reports progress; the
+full output lands in the call log under the ref, as ever. The elegant part
+is the wake path that now exists: task completion is a CHANGE — it fires
+notifyChange, which wakes a held `wait` and unparks a parked agent through
+the Stop hook. So an agent could start a long build, park, cost nothing
+while it runs, and be woken by its completion exactly like by the human's
+slider. What stays impossible: the server initiating a message mid-turn —
+the wake always lands at a turn boundary. Build when a real long-running
+task demands it, not before.

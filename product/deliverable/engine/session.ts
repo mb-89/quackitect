@@ -106,8 +106,28 @@ export class Session {
   //    nearest thing to "the machine sends an update to the agent". ────────
   private waiters: Array<() => void> = [];
 
+  /** THE PARK (owner ruling 2026-07-26): the agent, stopped by the
+   *  threshold or idle with nothing to do, marks itself parked and ENDS
+   *  its turn — no blocked call, no token-burning hold loop. The Stop
+   *  hook sees `parked`, quietly waits on the server, and wakes the agent
+   *  with a message when the human's hand moves. Any change unparks. */
+  private _parked = false;
+
+  get parked(): boolean {
+    return this._parked;
+  }
+
+  park(): Record<string, unknown> {
+    this._parked = true;
+    return {
+      parked: true,
+      note: "tell the user where you stand and STOP — end your turn. The machinery holds your wake-up: when their hand moves the slider or the machine, you are nudged awake with the news.",
+    };
+  }
+
   /** Wake every held wait — called on every successful change of the walk. */
   private notifyChange(): void {
+    this._parked = false; // the change is what the park was waiting for
     const held = this.waiters;
     this.waiters = [];
     for (const wake of held) wake();
@@ -156,7 +176,7 @@ export class Session {
           clause: CLAUSES.ABOVE_THRESHOLD,
           expected: `a state within the session threshold ${this._threshold}`,
           got: `${id} weighs ${t.priority} — this step is the human's`,
-          remedy: { tool: "se_tick", args: { wait: true }, note: "TELL the human this step waits for their hand (they advance it in the mirror, or raise the slider), then hold with se_tick {wait: true} — it returns when something moves. Never retry the advance blind." },
+          remedy: { tool: "se_tick", args: { park: true }, note: "TELL the human this step waits for their hand (they advance it in the mirror, or raise the slider), then park and END YOUR TURN — the machinery wakes you with a message when something moves. Never retry the advance blind." },
           source: "engine/session.ts threshold",
         });
       }

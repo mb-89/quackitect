@@ -126,7 +126,24 @@ export function startMirror(o: MirrorOptions): Server {
           threshold: state.session.threshold,
           active: state.session.active(),
           busy: state.session.busy(),
+          parked: state.session.parked,
         }));
+        return;
+      }
+      if (url.pathname === "/api/wait") {
+        // Long-poll for the Stop hook (the agent's zero-token waiter):
+        // resolves when the human's hand moves anything, or on timeout.
+        const ms = Math.min(Math.max(Number(url.searchParams.get("ms") ?? 25_000) || 25_000, 1), 120_000);
+        void state.session.waitForChange(ms).then((changed) => {
+          res.writeHead(200, { "content-type": "application/json; charset=utf-8" });
+          res.end(JSON.stringify({
+            changed,
+            status: state.session.instance.status,
+            threshold: state.session.threshold,
+            active: state.session.active(),
+            parked: state.session.parked,
+          }));
+        });
         return;
       }
       if (url.pathname === "/widget/machine" || url.pathname === "/widget/details") {

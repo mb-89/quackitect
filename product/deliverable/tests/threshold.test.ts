@@ -19,7 +19,7 @@ test("threshold 0 is manual mode: the agent's every step is refused, the human w
   assert.equal(r.isError, true);
   assert.equal(r.body.clause, "SE-C-113");
   assert.match(String(r.body.got), /boot/);
-  assert.match(String((r.body.remedy as { note: string }).note), /hold with se_tick/);
+  assert.match(String((r.body.remedy as { note: string }).note), /park and END YOUR TURN/);
   // Looking is never gated — tick-info still answers the agent.
   const look = await call(server, "se_tick");
   assert.equal(look.isError, false);
@@ -119,10 +119,11 @@ test("the hold: se_tick {wait} blocks until the slider moves, then the agent wal
     const session = new Session(root);
     session.setThreshold(0);
     const server = buildServer(root, session);
-    // The agent is refused, the remedy says hold.
+    // The agent is refused, the remedy says park (wait remains the
+    // short in-turn variant this test exercises).
     const refused = await call(server, "se_tick", { advance: true });
     assert.equal(refused.body.clause, "SE-C-113");
-    assert.equal((refused.body.remedy as { args: { wait: boolean } }).args.wait, true);
+    assert.equal((refused.body.remedy as { args: { park: boolean } }).args.park, true);
     // The agent holds; the human slides 120ms later; the hold wakes changed.
     const held = call(server, "se_tick", { wait: true });
     setTimeout(() => session.setThreshold(0.4), 120);
@@ -188,6 +189,60 @@ test("the mirror over HTTP: slider served, POST /threshold moves the gate, /api/
     const tick = await fetch(base + "/tick", { method: "POST", redirect: "manual", headers: { "content-type": "application/json" }, body: JSON.stringify({ advance: true }) });
     assert.equal(tick.status, 303);
     assert.deepEqual(session.active(), ["boot/start"]);
+  } finally {
+    server.close();
+  }
+});
+
+test("the park: agent marks itself waiting, any change unparks", async () => {
+  const root = freshRoot();
+  const session = new Session(root);
+  const server = buildServer(root, session);
+  const parked = await call(server, "se_tick", { park: true });
+  assert.equal(parked.body.parked, true);
+  assert.equal(session.parked, true);
+  session.setThreshold(0.7); // the human's hand — the change the park awaited
+  assert.equal(session.parked, false);
+});
+
+test("the stop hook: exits at once when nothing is parked, wakes the agent when the slider moves", async () => {
+  const { startMirror } = await import("../engine/mirror.ts");
+  const { CallLog } = await import("../engine/calllog.ts");
+  const { seDir } = await import("../engine/paths.ts");
+  const { spawn } = await import("node:child_process");
+  const { fileURLToPath } = await import("node:url");
+  const hookPath = fileURLToPath(new URL("../engine/bin/stop-hook.ts", import.meta.url));
+  const root = freshRoot();
+  const session = new Session(root);
+  const server = startMirror({ session, root, port: 0, log: new CallLog(seDir(root)), mode: "agent" });
+  await new Promise((r) => server.on("listening", r));
+  const port = (server.address() as { port: number }).port;
+  const runHook = (waitMs: number) => new Promise<{ out: string; ms: number }>((resolve) => {
+    const t0 = Date.now();
+    const child = spawn(process.execPath, [hookPath], { env: { ...process.env, SE_MIRROR_PORT: String(port), SE_STOP_WAIT_MS: String(waitMs) } });
+    let out = "";
+    child.stdout.on("data", (d) => { out += d; });
+    child.stdin.end("{}");
+    child.on("close", () => resolve({ out, ms: Date.now() - t0 }));
+  });
+  try {
+    // Not parked: the hook must NOT hold an ordinary stop.
+    const plain = await runHook(5000);
+    assert.equal(plain.out, "", "no block when nothing waits");
+    assert.ok(plain.ms < 2000, `exited at once, took ${plain.ms}ms`);
+    // Parked, nothing moves: budget spent, stop proceeds silently.
+    session.park();
+    const quiet = await runHook(700);
+    assert.equal(quiet.out, "", "timeout allows the stop");
+    // Parked, the slider moves mid-wait: the hook blocks the stop with the news.
+    session.park();
+    const waking = runHook(8000);
+    setTimeout(() => session.setThreshold(0.9), 250);
+    const woke = await waking;
+    const verdict = JSON.parse(woke.out) as { decision: string; reason: string };
+    assert.equal(verdict.decision, "block");
+    assert.match(verdict.reason, /the machine moved/);
+    assert.ok(woke.ms < 5000, `woke promptly, took ${woke.ms}ms`);
   } finally {
     server.close();
   }

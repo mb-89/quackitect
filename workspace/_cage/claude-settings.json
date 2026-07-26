@@ -20,13 +20,24 @@
   },
   "enableAllProjectMcpServers": true,
   "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node ../product/deliverable/engine/bin/stop-hook.ts",
+            "timeout": 960
+          }
+        ]
+      }
+    ],
     "SessionStart": [
       {
         "matcher": "startup|resume|clear",
         "hooks": [
           {
             "type": "command",
-            "command": "node -e \"console.log('[se] WALK THE MACHINE: your FIRST action is the se_tick tool with no arguments - it shows where you are, its guidance, and what to do. Advance with se_tick {advance:true} (or {to:...}). READ PROOF: transitions demand read_hashes: an object of path-to-hash covering the listed and pulled docs - each hash rides a se_file_read result and must match the doc as it stands; reading is the point, the hash only proves it. If an advance is refused as above the threshold (SE-C-113), TELL the user which step is waiting for their hand, then hold with se_tick {wait:true} - it returns when they move the slider or the machine. When a result carries a banner, show it to the user VERBATIM and proceed with their request. The lane is locked until the machine reaches idle.')\""
+            "command": "node -e \"console.log('[se] WALK THE MACHINE: your FIRST action is the se_tick tool with no arguments - it shows where you are, its guidance, and what to do. Advance with se_tick {advance:true} (or {to:...}). READ PROOF: transitions demand read_hashes: an object of path-to-hash covering the listed and pulled docs - each hash rides a se_file_read result and must match the doc as it stands; reading is the point, the hash only proves it. If an advance is refused as above the threshold (SE-C-113), TELL the user which step is waiting for their hand, then park (se_tick {park:true}) and END YOUR TURN - the machinery watches while you sleep and wakes you with a message when their hand moves. When a result carries a banner, show it to the user VERBATIM and proceed with their request. The lane is locked until the machine reaches idle.')\""
           }
         ]
       },
