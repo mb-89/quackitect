@@ -58,3 +58,31 @@ test("the mirror renders per-doc checkboxes and never locks reading itself", asy
   const after = renderMirror({ session: s, root, lastPacket: undefined, mode: "manual" });
   assert.match(after, /"checked":\s*true/);
 });
+
+test("THE HANDOVER: the human walks boot on checkboxes, raises the slider — the agent owes the same reading", async () => {
+  const root = freshRoot();
+  const { Session } = await import("../engine/session.ts");
+  const session = new Session(root);
+  session.setThreshold(0); // manual start
+  const server = buildServer(root, session);
+  // The human drives: checks the boot docs, walks through read_contract.
+  await session.tickAdvance(); await session.tickAdvance();
+  checkDocs(session);
+  await session.tickAdvance();
+  assert.deepEqual(session.active(), ["boot/prepare_idle"]);
+  // The packet tells the agent what the session has checked.
+  const info = session.tickInfo() as { human_checked: string[] };
+  assert.ok(info.human_checked.includes("workspace/AGENTS.md"));
+  // The slider rises; the agent advances — but its head holds none of it.
+  session.setThreshold(0.6);
+  const owed = await call(server, "se_tick", { advance: true });
+  assert.equal(owed.isError, true);
+  assert.equal(owed.body.clause, "SE-C-112");
+  assert.match(String(owed.body.expected), /match the human's checked list/);
+  assert.match(String(owed.body.expected), /AGENTS\.md/);
+  // Reading it all makes the advance flow — through to idle.
+  const hashes = readHashesFor(root);
+  await call(server, "se_tick", { advance: true, read_hashes: hashes }); // -> boot/end
+  const landed = await call(server, "se_tick", { advance: true, read_hashes: hashes }); // pop -> idle
+  assert.equal(landed.body.booted, true);
+});

@@ -438,6 +438,15 @@ export class Session {
     return hash !== "" && (this.humanChecks.get(path)?.has(hash) ?? false);
   }
 
+  /** Every doc the human has checked AT ITS CURRENT VERSION — the session's
+   *  reading list. Checks of edited (stale) versions drop out. */
+  humanCheckedPaths(): string[] {
+    return [...this.humanChecks.entries()]
+      .filter(([p, set]) => set.has(this.diskHash(p)))
+      .map(([p]) => p)
+      .sort();
+  }
+
   /** One doc, one channel, one verdict. The agent's supplied hash must
    *  match the doc AS IT STANDS — a stale token proves a stale read. */
   private readProven(channel: Channel, path: string, supplied: Record<string, string>): boolean {
@@ -491,6 +500,25 @@ export class Session {
       const missing = this.entryRequirements(m, t).filter((p) => !this.readProven(channel, p, supplied));
       if (missing.length > 0) this.refuseReads("entry", t.id, missing, channel);
     }
+    // THE HANDOVER RULE (owner ruling 2026-07-26): what the human checked
+    // is the SESSION's reading list. A human who walked read_contract on
+    // checkboxes and then raised the slider hands the walk to a head that
+    // never read — so the agent's every advance must prove the same list,
+    // even past transitions the human already spent.
+    this.assertHandover(channel, supplied);
+  }
+
+  private assertHandover(channel: Channel, supplied: Record<string, string>): void {
+    if (channel !== "agent") return;
+    const owed = this.humanCheckedPaths().filter((p) => !this.readProven("agent", p, supplied));
+    if (owed.length === 0) return;
+    throw new Rejection({
+      clause: CLAUSES.CONDITION_UNMET,
+      expected: `your reading to match the human's checked list: ${owed.join(", ")}`,
+      got: `no current hash supplied for: ${owed.join(", ")}`,
+      remedy: { tool: "se_file_read", args: { path: owed[0] }, note: "the human checked these as read while driving — your head must hold them too. Read each through the lane, then repeat the tick with their hashes in read_hashes." },
+      source: "engine/session.ts reads",
+    });
   }
 
   /** The mirror's ▶ lock: is entering `t` fully proven on the human's
@@ -617,6 +645,10 @@ export class Session {
       ...(this.bound !== undefined ? { expedition: this.bound.id } : {}),
       status: this.instance.status,
       threshold: this._threshold,
+      // The session's reading list: what the human checked while driving.
+      // Your advances must prove the same docs (paths only — the hashes
+      // are earned by reading).
+      human_checked: this.humanCheckedPaths(),
       legal_tools: all ? "all" : [...ALWAYS_LEGAL, ...tools],
       states,
     };
@@ -760,6 +792,7 @@ export class Session {
     const back = this.state(machine, target);
     const missing = this.entryRequirements(machine, back).filter((p) => !this.readProven(channel, p, readHashes));
     if (missing.length > 0) this.refuseReads("entry", target, missing, channel);
+    this.assertHandover(channel, readHashes);
     const { cone } = reopenStates(machine, inst, [target], "jump back", now);
     // Invalidate the cone's evidence and checks — including a nested
     // machine's, when a sub-machine state is inside the cone. And supersede

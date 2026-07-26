@@ -14,10 +14,18 @@ The session runs a THRESHOLD (the user's slider in the mirror). When an
 advance is refused with SE-C-113, that step is the user's: tell them where
 you stand and that you are holding ("I'm at start — entering boot is above
 the threshold, waiting for your hand"), then call `se_tick {wait: true}`.
-The call blocks until the user moves something (their tick, the slider,
-evidence) and returns the fresh packet — read it and continue walking. If
-it returns with changed: false, hold again. The same hold is how you wait
-at idle with nothing to do.
+The call blocks until the user moves something (their tick, the slider, a
+check) and returns the fresh packet — read it and continue walking. If it
+returns with changed: false, hold again, indefinitely: THE HOLD IS YOUR
+IDLE LOOP. Never end your turn while you are waiting on the machine — an
+ended turn cannot hear the slider. The same hold is how you wait at idle
+with nothing to do.
+
+THE HANDOVER RULE: the packet's `human_checked` list is what the user
+checked as read while driving the mirror themselves. Your advances must
+prove the SAME reading — read every listed doc through the lane and carry
+its hash in `read_hashes`, or the tick refuses. Their checkmark is not
+your reading.
 
 Your native tools (Read, Write, Edit, Bash, Glob, Grep, web) are blocked in
 this workspace — by an explicit deny list in `.claude/settings.json`, tool by

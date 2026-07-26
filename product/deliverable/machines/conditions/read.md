@@ -21,6 +21,12 @@ The proof is per hand:
   checkbox: one check per VERSION of the file. The check pins the doc's
   current hash; an edited doc unchecks itself and asks again.
 
+THE HANDOVER RULE: the human's checked docs are the SESSION's reading
+list (`human_checked` in every packet). When the agent takes over — the
+slider rises mid-walk — its advances must prove that same list by hash,
+even past transitions the human already walked: their checkmark is not
+the agent's reading.
+
 Sending a hash without reading defeats the machine's whole purpose — the
 hash proves the doc passed through your hands, not your head. Reading is
 what the machine is FOR.
