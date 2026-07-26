@@ -156,3 +156,36 @@ test("the view is independent of the walk: browse boot while standing at main/st
   assert.ok(main.includes("state inner"), "double border drawn");
   assert.ok(main.includes("crumb-menu"), "breadcrumb arrow lists selectable sub-machines");
 });
+
+test("conditions are worked only from inside the state — no pre-running", async () => {
+  const { Session } = await import("../engine/session.ts");
+  const s = new Session(freshRoot());
+  // preflight: rendering-time status is NOT RUN, and nothing runs it implicitly
+  assert.equal(s.preflightStatus(), undefined);
+  // evidence for a state you are not standing in is refused
+  assert.throws(() => s.submitEvidence("read_contract", { read_confirmed: true }), (e) => (e as { clause?: string }).clause === "SE-C-112");
+});
+
+test("jump back: downstream superseded, evidence invalidated, re-walk earns it again", async () => {
+  const { Session } = await import("../engine/session.ts");
+  const s = new Session(freshRoot());
+  // walk to idle
+  s.tickAdvance(); s.tickAdvance();
+  s.submitEvidence("read_contract", { read_confirmed: true });
+  s.tickAdvance(); s.tickAdvance(); s.tickAdvance();
+  assert.deepEqual(s.active(), ["idle"]);
+  // jump back into boot from main: re-enters at the sub's start
+  s.jumpBack("boot");
+  assert.deepEqual(s.active(), ["boot/start"]);
+  // the read confirmation is invalidated — the re-walk must earn it again
+  s.tickAdvance();
+  assert.deepEqual(s.active(), ["boot/read_contract"]);
+  assert.throws(() => s.tickAdvance(), (e) => (e as { clause?: string }).clause === "SE-C-112");
+  s.submitEvidence("read_contract", { read_confirmed: true });
+  s.tickAdvance();
+  assert.deepEqual(s.active(), ["boot/prepare_idle"]);
+  // the record survives: superseded entries, never erased
+  assert.ok(s.instance.history.some((h) => h.outcome === "superseded"));
+  // a never-filled state is not a jump target
+  assert.throws(() => s.jumpBack("end"), (e) => (e as { clause?: string }).clause === "SE-C-110");
+});

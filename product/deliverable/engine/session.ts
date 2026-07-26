@@ -21,6 +21,7 @@ import { CLAUSES, Rejection } from "./errors.ts";
 import {
   activeStates,
   completeState,
+  reopenStates,
   type MachineDecl,
   type MachineInstance,
   type StateDecl,
@@ -165,16 +166,24 @@ export class Session {
     if (cond === "read_guidance") {
       return this.evidence.get(this.evidenceKey(m, s.id))?.read_confirmed === true;
     }
-    if (cond === "preflight") return this.preflight().length === 0;
+    if (cond === "preflight") {
+      const c = this.preflightStatus();
+      return c !== undefined && c.length === 0;
+    }
     return false;
   }
 
   private preflightCache?: string[];
 
-  /** The engine-run preflight: failures by name, [] when green. Cached for
-   *  the session; a tick attempt re-runs it so a fixed failure clears. */
-  preflight(fresh = false): string[] {
-    if (this.preflightCache !== undefined && !fresh) return this.preflightCache;
+  /** What the last run found — undefined means NOT RUN YET. The checks
+   *  never run implicitly: entering the state arms them, running is an
+   *  explicit act (a tick attempt, or the mirror's run button). */
+  preflightStatus(): string[] | undefined {
+    return this.preflightCache;
+  }
+
+  /** RUN the preflight — legal only while standing in a preflight-gated state. */
+  preflightRun(): string[] {
     const failures: string[] = [];
     const machinesDir = join(this.root, "product", "deliverable", "machines");
     const decls: MachineDecl[] = [];
@@ -213,8 +222,22 @@ export class Session {
     return failures;
   }
 
-  /** Record evidence for a state in the CURRENT machine (walk position's machine). */
+  private assertStanding(stateId: string): void {
+    const { ids } = this.leaves();
+    if (ids.includes(stateId)) return;
+    throw new Rejection({
+      clause: CLAUSES.CONDITION_UNMET,
+      expected: `to be standing in ${stateId} — conditions are worked only from inside the state`,
+      got: `standing in [${this.active().join(", ")}]`,
+      remedy: { tool: "se_tick", args: {}, note: "walk to the state first (or jump back to it), then work its conditions" },
+      source: "engine/session.ts standing",
+    });
+  }
+
+  /** Record evidence — only for a state you are STANDING IN (you may have
+   *  to do things on disk first; entering the state is the arming step). */
   submitEvidence(stateId: string, data: Record<string, unknown>): Record<string, unknown> {
+    this.assertStanding(stateId);
     const { machine } = this.leaves();
     const s = this.state(machine, stateId);
     const key = this.evidenceKey(machine, s.id);
@@ -224,13 +247,13 @@ export class Session {
   }
 
   private assertConditions(m: MachineDecl, from: StateDecl, to?: string): void {
-    if (from.leave_when === "preflight") this.preflight(true); // a tick re-runs the checks
+    if (from.leave_when === "preflight") this.preflightRun(); // a tick attempt runs the checks
     if (!this.conditionMet(m, from, "leave")) {
       if (from.leave_when === "preflight") {
         throw new Rejection({
           clause: CLAUSES.CONDITION_UNMET,
           expected: `leave condition of ${from.id}: preflight — all checks green`,
-          got: this.preflight().join("; "),
+          got: (this.preflightStatus() ?? ["checks not run"]).join("; "),
           remedy: { tool: "se_tick", args: { advance: true }, note: "fix the named failures, then tick again — the checks re-run on every attempt" },
           source: "engine/session.ts conditions",
         });
@@ -274,12 +297,15 @@ export class Session {
         leave_when: s.leave_when ?? "always",
         leave_met: this.conditionMet(machine, s, "leave"),
         ...(s.read !== undefined ? { read: s.read } : {}),
+        // Enough to CHOOSE among several ways forward: what the target is,
+        // not just its name (the agent has no other way to peek).
         next: s.edges.map((e) => {
           const t = machine.states.find((st) => st.id === e.to);
           return {
             to: e.to,
             role: e.role,
             ...(e.guard !== undefined ? { guard: e.guard } : {}),
+            ...(t !== undefined ? { kind: t.kind, statement: t.statement } : {}),
             enter_when: t?.enter_when ?? "always",
             enter_met: t === undefined ? true : this.conditionMet(machine, t, "enter"),
           };
@@ -342,6 +368,63 @@ export class Session {
     this.instance.history.push({ state: cur, outcome: "filled", at: now });
     this.seedSubs();
     return this.landing();
+  }
+
+  /** Jump back to an EARLIER state of the machine you are in. Everything
+   *  downstream is superseded (kept in the record, never erased) and its
+   *  evidence and checks are invalidated — they are earned again on the
+   *  re-walk. Legal for the user and the agent alike, while the machine is
+   *  open. */
+  jumpBack(target: string): Record<string, unknown> {
+    const now = new Date().toISOString();
+    if (this.instance.status === "closed") {
+      throw new Rejection({
+        clause: CLAUSES.NOT_LEGAL_IN_STATE,
+        expected: "an open machine",
+        got: `a jump back after end`,
+        remedy: { tool: "se_tick", args: {}, note: "the machine is done; a new session starts at the beginning" },
+        source: "engine/session.ts jump",
+      });
+    }
+    const { machine, ids } = this.leaves();
+    const inst = this.inSub() ? this.sub!.instance : this.instance;
+    if (ids.includes(target)) {
+      throw new Rejection({
+        clause: CLAUSES.NOT_LEGAL_IN_STATE,
+        expected: "an EARLIER state",
+        got: `${target} is where you are standing`,
+        remedy: { tool: "se_tick", args: {}, note: "se_tick without arguments shows the position" },
+        source: "engine/session.ts jump",
+      });
+    }
+    const wasFilled = inst.history.some((h) => h.outcome === "filled" && h.state === target);
+    if (!wasFilled) {
+      throw new Rejection({
+        clause: CLAUSES.NOT_LEGAL_IN_STATE,
+        expected: `a state already walked in ${machine.id}`,
+        got: target,
+        remedy: { tool: "se_tick", args: {}, note: "only a filled state can be returned to" },
+        source: "engine/session.ts jump",
+      });
+    }
+    const { cone } = reopenStates(machine, inst, [target], "jump back", now);
+    // Invalidate the cone's evidence and checks — including a nested
+    // machine's, when a sub-machine state is inside the cone.
+    for (const id of cone) {
+      this.evidence.delete(this.evidenceKey(machine, id));
+      for (const key of [...this.evidence.keys()]) {
+        if (key.startsWith(`${id}/`)) this.evidence.delete(key);
+      }
+      const s = machine.states.find((st) => st.id === id);
+      if (s?.leave_when === "preflight" || s?.submachine !== undefined) this.preflightCache = undefined;
+    }
+    if (!this.inSub()) {
+      this.sub = undefined;
+      this.seedSubs(); // a reopened sub-machine state re-enters at its start
+    } else {
+      this.instance.history.push({ state: `${machine.id}/${target}`, outcome: "reopened", at: now });
+    }
+    return this.tickInfo();
   }
 
   /** The tick's result — plus the booted banner the first time idle lands. */

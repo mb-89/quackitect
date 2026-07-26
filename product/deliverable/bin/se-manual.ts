@@ -56,8 +56,21 @@ const server = createServer((req, res) => {
         const started = Date.now();
         let to: string | undefined;
         try {
-          const body = JSON.parse(Buffer.concat(chunks).toString("utf8") || "{}") as { to?: string; advance?: boolean };
+          const body = JSON.parse(Buffer.concat(chunks).toString("utf8") || "{}") as { to?: string; advance?: boolean; back?: string };
           to = body.to;
+          if (body.back !== undefined) {
+            try {
+              state.lastPacket = state.session.jumpBack(String(body.back));
+              log.append({ tool: "manual_tick", args: { back: body.back }, ok: true, outcome: "result", duration_ms: Date.now() - started, response: state.lastPacket });
+            } catch (e) {
+              if (!(e instanceof Rejection)) throw e;
+              state.lastPacket = e.toJSON();
+              log.append({ tool: "manual_tick", args: { back: body.back }, ok: false, outcome: "rejected", duration_ms: Date.now() - started, response: state.lastPacket });
+            }
+            res.writeHead(303, { location: "/" });
+            res.end();
+            return;
+          }
         } catch {
           to = undefined;
         }
@@ -96,7 +109,7 @@ const server = createServer((req, res) => {
     }
     if (req.method === "POST" && url.pathname === "/preflight") {
       const started = Date.now();
-      const failures = state.session.preflight(true);
+      const failures = state.session.preflightRun();
       log.append({ tool: "manual_preflight", args: {}, ok: failures.length === 0, outcome: "result", duration_ms: Date.now() - started, response: { failures } });
       res.writeHead(303, { location: "/" });
       res.end();

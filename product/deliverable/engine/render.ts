@@ -224,7 +224,7 @@ const WALK_HERE = D.viewingWalk;
 function nextTable(id, s) {
   const here = WALK_HERE && id === CURRENT;
   return '<table class="kv">' + s.next.map((n, i) => {
-    const inner = jsonTable({ to: n.to, role: n.role, ...(n.guard ? { guard: n.guard } : {}), ...(n.enter_when !== "always" ? { enter_when: n.enter_when } : {}) });
+    const inner = jsonTable({ to: n.to, ...(n.statement ? { statement: n.statement } : {}), role: n.role, ...(n.guard ? { guard: n.guard } : {}), ...(n.enter_when !== "always" ? { enter_when: n.enter_when } : {}) });
     const unlocked = here && s.leave_met && n.enter_met;
     const btn = here
       ? '<button class="primary go' + (unlocked ? "" : " locked") + '" data-to="' + n.to + '"' + (unlocked ? "" : " disabled") +
@@ -239,7 +239,11 @@ function stateDetail(id) {
   let html = jsonTable(bare);
   if (s.next && s.next.length > 0) {
     html += '<div class="meta" style="padding:8px 0 4px">next</div>' + nextTable(id, s);
-  } else if (WALK_HERE && id === CURRENT && s.kind === "end" && D.describe.breadcrumb.length > 1) {
+  }
+  if (WALK_HERE && s.was_filled && id !== CURRENT && D.describe.status === "open") {
+    html += '<div style="padding:8px 0"><button class="primary jump" data-state="' + id + '" title="everything downstream is superseded; its evidence and checks are invalidated">↩ return to this state</button></div>';
+  }
+  if (WALK_HERE && id === CURRENT && s.kind === "end" && (!s.next || s.next.length === 0) && D.describe.breadcrumb.length > 1) {
     const parent = D.describe.breadcrumb[0];
     html += '<div class="meta" style="padding:8px 0 4px">next</div>' +
       '<table class="kv"><tr><td class="v">return to ' + parent + '</td><td class="btncell"><button class="primary go" data-to="" title="tick: leave the sub-machine">▶</button></td></tr></table>';
@@ -249,6 +253,8 @@ function stateDetail(id) {
 document.addEventListener("click", async (ev) => {
   const c = ev.target.closest ? ev.target.closest(".confirm") : null;
   if (c) { await fetch("/evidence", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ state: c.dataset.state || CURRENT }) }); location.href = "/"; return; }
+  const j = ev.target.closest ? ev.target.closest(".jump") : null;
+  if (j) { await fetch("/tick", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ back: j.dataset.state }) }); location.href = "/"; return; }
   const rp = ev.target.closest ? ev.target.closest(".runpre") : null;
   if (rp) { await fetch("/preflight", { method: "POST" }); location.href = "/"; return; }
   const dl = ev.target.closest ? ev.target.closest(".doclink") : null;
@@ -260,15 +266,19 @@ function condDetail(id) {
   const s = D.states[id] ?? {};
   const met = s.leave_met;
   let html = "";
+  const standing = WALK_HERE && id === CURRENT;
   if (s.leave_when === "preflight") {
-    html += '<div style="padding:2px 0 10px"><button class="primary runpre" title="the engine runs the checks; the result is the evidence">' + (met ? "re-run checks" : "run checks") + "</button></div>";
-    html += met
-      ? '<div style="padding:2px 0 10px;color:#4a7a55">preflight green ✓ — exit condition met</div>'
-      : '<div style="padding:2px 0 10px;color:#e86a5f">failures:</div>' + jsonTable(s.preflight_failures || []);
+    if (standing) html += '<div style="padding:2px 0 10px"><button class="primary runpre" title="the engine runs the checks; the result is the evidence">' + (s.preflight_ran ? "re-run checks" : "run checks") + "</button></div>";
+    html += !s.preflight_ran
+      ? '<div style="padding:2px 0 10px;color:#7f8b96">not run yet' + (standing ? "" : " — enter the state to run the checks") + "</div>"
+      : met
+        ? '<div style="padding:2px 0 10px;color:#4a7a55">preflight green ✓ — exit condition met</div>'
+        : '<div style="padding:2px 0 10px;color:#e86a5f">failures:</div>' + jsonTable(s.preflight_failures || []);
     html += '<div class="comment-detail">' + (s.guidance || "").replace(/&/g,"&amp;").replace(/</g,"&lt;") + "</div>";
     return ["preflight · " + id, html];
   }
-  if (WALK_HERE && !met) html += '<div style="padding:2px 0 10px"><button class="primary confirm" data-state="' + id + '" title="the confirmation is logged as evidence">confirm</button></div>';
+  if (standing && !met) html += '<div style="padding:2px 0 10px"><button class="primary confirm" data-state="' + id + '" title="the confirmation is logged as evidence">confirm</button></div>';
+  if (!standing && !met) html += '<div style="padding:2px 0 10px;color:#7f8b96">worked from inside the state — enter it first</div>';
   if (met) html += '<div style="padding:2px 0 10px;color:#4a7a55">confirmed ✓</div>';
   html += '<div class="comment-detail">' + (s.guidance || "").replace(/&/g,"&amp;").replace(/</g,"&lt;") + "</div>";
   if (s.read && s.read.length > 0) {
@@ -378,10 +388,17 @@ export function renderMirror(m: MirrorState, widget?: "machine" | "details", vie
   const history = m.session.instance.history ?? [];
   const done = new Set(
     history
+      .filter((h) => h.outcome === "filled")
       .map((h) => h.state)
       .filter((s) => (decl.id === m.session.machine.id ? !s.includes("/") : s.startsWith(`${decl.id}/`)))
       .map((s) => s.split("/").pop()!),
   );
+  // An end state is never "filled" — it turns green when its machine completed.
+  const machineCompleted =
+    decl.id === m.session.machine.id
+      ? m.session.instance.status === "closed"
+      : history.some((h) => h.outcome === "filled" && h.state === decl.id);
+  if (machineCompleted) for (const s of decl.states) if (s.kind === "end") done.add(s.id);
   const subIds = new Set(decl.states.filter((s) => s.submachine !== undefined).map((s) => s.id));
   const meta: Record<string, StateMeta> = {};
   for (const s of decl.states) {
@@ -416,7 +433,10 @@ export function renderMirror(m: MirrorState, widget?: "machine" | "details", vie
       ...(s.submachine !== undefined ? { submachine: s.submachine } : {}),
       leave_when: s.leave_when ?? "always",
       leave_met: m.session.conditionMet(decl, s, "leave"),
-      ...(s.leave_when === "preflight" ? { preflight_failures: m.session.preflight() } : {}),
+      was_filled: done.has(s.id),
+      ...(s.leave_when === "preflight"
+        ? { preflight_ran: m.session.preflightStatus() !== undefined, preflight_failures: m.session.preflightStatus() ?? [] }
+        : {}),
       ...(s.read !== undefined ? { read: s.read } : {}),
       next: s.edges.map((e) => {
         const t = decl.states.find((st) => st.id === e.to);
@@ -424,6 +444,7 @@ export function renderMirror(m: MirrorState, widget?: "machine" | "details", vie
           to: e.to,
           role: e.role,
           ...(e.guard !== undefined ? { guard: e.guard } : {}),
+          ...(t !== undefined ? { kind: t.kind, statement: t.statement } : {}),
           enter_when: t?.enter_when ?? "always",
           enter_met: t === undefined ? true : m.session.conditionMet(decl, t, "enter"),
         };
