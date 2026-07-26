@@ -11,10 +11,17 @@
             "id": "9e81788b3cde8434",
             "type": "leaf",
             "state": {
-              "type": "empty",
-              "state": {},
-              "icon": "lucide-file",
-              "title": "New tab"
+              "type": "canvas",
+              "state": {
+                "file": "deliverable/machines/boot.canvas",
+                "viewState": {
+                  "x": -490,
+                  "y": 70,
+                  "zoom": -0.578846785582068
+                }
+              },
+              "icon": "lucide-layout-dashboard",
+              "title": "boot"
             }
           }
         ]
@@ -90,6 +97,7 @@
             "state": {
               "type": "backlink",
               "state": {
+                "file": "deliverable/machines/boot.canvas",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -99,7 +107,7 @@
                 "unlinkedCollapsed": true
               },
               "icon": "links-coming-in",
-              "title": "Backlinks"
+              "title": "Backlinks for boot"
             }
           },
           {
@@ -108,11 +116,12 @@
             "state": {
               "type": "outgoing-link",
               "state": {
+                "file": "deliverable/machines/boot.canvas",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               },
               "icon": "links-going-out",
-              "title": "Outgoing links"
+              "title": "Outgoing links from boot"
             }
           },
           {
@@ -150,12 +159,13 @@
             "state": {
               "type": "outline",
               "state": {
+                "file": "deliverable/machines/boot.canvas",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
               },
               "icon": "lucide-list",
-              "title": "Outline"
+              "title": "Outline of boot"
             }
           }
         ]
@@ -176,19 +186,20 @@
       "bases:Create new base": false
     }
   },
-  "active": "1696153da3034759",
+  "active": "9e81788b3cde8434",
   "lastOpenFiles": [
+    "deliverable/machines/states/start.md",
+    "deliverable/machines/boot.canvas",
     "deliverable/machines/states/end.md",
+    "deliverable/machines/states/idle.md",
+    "deliverable/machines/states/prepare_idle.md",
+    "deliverable/machines/states/read_contract.md",
+    "deliverable/machines/main.canvas",
     "deliverable/bin/se-manual.ts",
     "deliverable/engine/render.ts",
     "deliverable/machines/CANVAS-GUIDE.md",
-    "deliverable/machines/main.canvas",
-    "deliverable/machines/boot.canvas",
     "deliverable/machines/states/done.md",
-    "deliverable/machines/states/start.md",
     "deliverable/machines/states/booted.md",
-    "deliverable/machines/states/prepare_idle.md",
-    "deliverable/machines/states/read_contract.md",
     "deliverable/machines/states/unbooted.md"
   ]
 }

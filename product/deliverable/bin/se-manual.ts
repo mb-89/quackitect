@@ -21,6 +21,20 @@ function argValue(flag: string): string | undefined {
   return i >= 0 ? process.argv[i + 1] : undefined;
 }
 
+if (process.argv.some((a) => a === "--help" || a === "-h" || a === "-?")) {
+  process.stdout.write(`se-manual — walk the machines yourself (the Mirror, manual mode)
+
+  node bin/se-manual.ts --root <project root> [--port 7333]
+
+  GET  /            the mirror (tick · info implied: looking never moves)
+  POST /tick        tick with arguments: complete the current state, move on
+  GET  /api/tick    the tick info packet as JSON
+  GET  /widget/machine | /widget/details    single widgets (tab/window)
+  --help            this text (-h, -?)
+`);
+  process.exit(0);
+}
+
 const root = resolve(argValue("--root") ?? process.cwd());
 if (!existsSync(root)) {
   process.stderr.write(`se-manual: root does not exist: ${root}\n`);
@@ -51,6 +65,11 @@ const server = createServer((req, res) => {
     if (url.pathname === "/api/tick") {
       res.writeHead(200, { "content-type": "application/json; charset=utf-8" });
       res.end(JSON.stringify(state.session.tickInfo(), null, 2));
+      return;
+    }
+    if (url.pathname === "/widget/machine" || url.pathname === "/widget/details") {
+      res.writeHead(200, { "content-type": "text/html; charset=utf-8" });
+      res.end(renderMirror(state, url.pathname === "/widget/machine" ? "machine" : "details"));
       return;
     }
     // GET / — tick without arguments: information about where we are.

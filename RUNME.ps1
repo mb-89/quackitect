@@ -1,10 +1,32 @@
-# quackitect v3 — install-check, selftest, and launch.
-#   .\RUNME.ps1            preflight + selftests, then the caged agent in workspace\
-#   .\RUNME.ps1 -Manual    preflight + selftests, then the MIRROR in manual mode:
-#                          walk the machines yourself in the browser, tick by tick.
+<#
+.SYNOPSIS
+quackitect v3 — install-check, selftest, and launch.
+
+.DESCRIPTION
+Preflight (node/git/ripgrep hard deps), cage install, engine selftests, then
+either the caged agent (default) or the Mirror in manual mode.
+
+.PARAMETER Manual
+Open the Mirror instead of the agent: walk the machines yourself in the
+browser, tick by tick (http://localhost:7333).
+
+.PARAMETER Help
+Show this help (-h and -? work too).
+
+.EXAMPLE
+.\RUNME.ps1
+.EXAMPLE
+.\RUNME.ps1 -Manual
+#>
+[CmdletBinding()]
 param(
-  [switch]$Manual
+  [switch]$Manual,
+  [switch]$Help
 )
+if ($Help) {
+  Get-Help $PSCommandPath -Detailed
+  exit 0
+}
 $ErrorActionPreference = "Stop"
 $root = $PSScriptRoot
 

@@ -75,19 +75,31 @@ export class Session {
     return s;
   }
 
-  private subOpen(): boolean {
-    return this.sub !== undefined && this.sub.instance.status === "open";
+  /** The sub governs as long as it exists — including its visible end
+   *  position; it is cleared when its parent state completes. */
+  private inSub(): boolean {
+    return this.sub !== undefined;
   }
 
   /** The machine+states whose legal_tools govern right now. */
   private leaves(): { machine: MachineDecl; ids: string[] } {
-    if (this.subOpen()) return { machine: this.sub!.decl, ids: activeStates(this.sub!.instance) };
+    if (this.inSub()) return { machine: this.sub!.decl, ids: activeStates(this.sub!.instance) };
     return { machine: this.machine, ids: activeStates(this.instance) };
   }
 
   active(): string[] {
     const { ids } = this.leaves();
-    return this.subOpen() ? ids.map((s) => `${this.sub!.decl.id}/${s}`) : ids;
+    return this.inSub() ? ids.map((s) => `${this.sub!.decl.id}/${s}`) : ids;
+  }
+
+  /** Where the walk is, machine-wise: ["main"] or ["main", "boot"]. */
+  breadcrumb(): string[] {
+    return this.inSub() ? [this.machine.id, this.sub!.decl.id] : [this.machine.id];
+  }
+
+  /** The machine to DISPLAY: only ever one (owner ruling 2026-07-26). */
+  currentMachine(): MachineDecl {
+    return this.inSub() ? this.sub!.decl : this.machine;
   }
 
   legal(): { all: boolean; tools: Set<string> } {
@@ -96,7 +108,8 @@ export class Session {
     let all = false;
     for (const id of ids) {
       const s = this.state(machine, id);
-      if (s.kind === "start") for (const t of MACHINERY) tools.add(t);
+      // Mechanical states: the machinery's drivers are what is legal.
+      if (s.kind === "start" || s.kind === "end") for (const t of MACHINERY) tools.add(t);
       for (const t of s.legal_tools ?? []) {
         if (t === "all") all = true;
         else tools.add(t);
@@ -140,17 +153,18 @@ export class Session {
     const states = ids.map((id) => {
       const s = this.state(machine, id);
       return {
-        id: this.subOpen() ? `${machine.id}/${s.id}` : s.id,
+        id: this.inSub() ? `${machine.id}/${s.id}` : s.id,
         kind: s.kind,
         statement: s.statement,
         guidance: s.guidance,
-        legal_tools: s.kind === "start" ? [...MACHINERY] : (s.legal_tools ?? []),
+        legal_tools: s.kind === "start" || s.kind === "end" ? [...MACHINERY] : (s.legal_tools ?? []),
         next: s.edges.map((e) => ({ to: e.to, role: e.role, ...(e.guard !== undefined ? { guard: e.guard } : {}) })),
       };
     });
     const { all, tools } = this.legal();
     return {
       machine: this.machine.id,
+      breadcrumb: this.breadcrumb(),
       active: this.active(),
       status: this.instance.status,
       legal_tools: all ? "all" : [...ALWAYS_LEGAL, ...tools],
@@ -170,56 +184,49 @@ export class Session {
         source: "engine/session.ts tick",
       });
     }
-    if (this.subOpen()) {
+    // ONE VISIBLE STEP PER TICK (owner ruling 2026-07-26): you are only
+    // ever in one state, and a tick moves exactly one position — including
+    // the mechanical start/end positions of a sub-machine.
+    if (this.inSub()) {
+      if (this.sub!.instance.status !== "open") {
+        // Standing on the sub's end: this tick returns to the parent.
+        completeState(this.machine, this.instance, this.sub!.parentState, "filled", now);
+        this.instance.history.push({ state: this.sub!.parentState, outcome: "filled", at: now });
+        this.sub = undefined;
+        this.seedSubs();
+        return this.tickInfo();
+      }
       const cur = activeStates(this.sub!.instance)[0];
       completeState(this.sub!.decl, this.sub!.instance, cur, "filled", now);
       this.sub!.instance.history.push({ state: cur, outcome: "filled", at: now });
       this.instance.history.push({ state: `${this.sub!.decl.id}/${cur}`, outcome: "filled", at: now });
-      this.autoStart(this.sub!.decl, this.sub!.instance, now);
-      if (!this.subOpen()) {
-        // The sub reached its end: the parent state is filled, the main
-        // machine moves on.
-        completeState(this.machine, this.instance, this.sub!.parentState, "filled", now);
-        this.instance.history.push({ state: this.sub!.parentState, outcome: "filled", at: now });
-        this.seedSubs(now);
-      }
       return this.tickInfo();
     }
     const cur = activeStates(this.instance)[0];
     completeState(this.machine, this.instance, cur, "filled", now);
     this.instance.history.push({ state: cur, outcome: "filled", at: now });
-    this.seedSubs(now);
+    this.seedSubs();
     return this.tickInfo();
   }
 
-  /** Mechanical: a machine never rests ON start — the machinery walks out. */
-  private autoStart(m: MachineDecl, inst: MachineInstance, now: string): void {
-    for (const id of activeStates(inst)) {
-      if (this.state(m, id).kind === "start") {
-        completeState(m, inst, id, "filled", now);
-        inst.history.push({ state: id, outcome: "filled", at: now });
-      }
-    }
-  }
-
-  /** Seed any newly-active sub-machine state (and auto-walk its start). */
-  private seedSubs(now: string): void {
+  /** Enter any newly-active sub-machine state — the position becomes the
+   *  sub's mechanical start; nothing inside is walked yet. */
+  private seedSubs(): void {
     const subState = activeStates(this.instance)
       .map((s) => this.state(this.machine, s))
       .find((s) => s.submachine !== undefined);
     if (subState === undefined) return;
     const subPath = resolveRef(this.root, mainMachinePath(this.root), subState.submachine!);
     const decl = compileMachine(this.root, subPath);
-    const instance = newInstance(decl);
-    this.sub = { decl, instance, parentState: subState.id };
-    this.autoStart(decl, instance, now);
+    this.sub = { decl, instance: newInstance(decl), parentState: subState.id };
   }
 
   // ── The agent's hands on the tick ───────────────────────────────────────
 
-  /** se_boot: one boot step per call, banner when idle is reached. */
+  /** se_boot: one boot step per call — the agent's ticks skip straight
+   *  through mechanical start/end positions; banner when idle is reached. */
   boot(): Record<string, unknown> {
-    if (this.instance.status === "closed" || activeStates(this.instance).includes("idle")) {
+    if (this.instance.status === "closed" || (!this.inSub() && activeStates(this.instance).includes("idle"))) {
       throw new Rejection({
         clause: CLAUSES.NOT_LEGAL_IN_STATE,
         expected: "an unbooted session",
@@ -228,8 +235,15 @@ export class Session {
         source: "engine/session.ts boot",
       });
     }
-    this.tickAdvance();
-    if (!this.subOpen() && activeStates(this.instance).includes("idle")) return this.bootedPacket();
+    // Tick until a non-mechanical position (max a machine's worth of steps).
+    for (let i = 0; i < 16; i++) {
+      this.tickAdvance();
+      const { machine, ids } = this.leaves();
+      const kind = this.state(machine, ids[0]).kind;
+      if (kind !== "start" && kind !== "end") break;
+      if (this.instance.status === "closed") break;
+    }
+    if (!this.inSub() && activeStates(this.instance).includes("idle")) return this.bootedPacket();
     const { machine, ids } = this.leaves();
     const s = this.state(machine, ids[0]);
     return {
@@ -254,7 +268,7 @@ export class Session {
 
   /** se_exit: from idle, walk into end. */
   exit(): Record<string, unknown> {
-    if (this.subOpen() || !activeStates(this.instance).includes("idle")) {
+    if (this.inSub() || !activeStates(this.instance).includes("idle")) {
       throw new Rejection({
         clause: CLAUSES.NOT_LEGAL_IN_STATE,
         expected: "an idle session",
@@ -274,8 +288,9 @@ export class Session {
     const { all, tools } = this.legal();
     return {
       machine: this.machine.id,
+      breadcrumb: this.breadcrumb(),
       active: this.active(),
-      ...(this.subOpen() ? { submachine: { id: this.sub!.decl.id, active: activeStates(this.sub!.instance) } } : {}),
+      ...(this.inSub() ? { submachine: { id: this.sub!.decl.id, active: activeStates(this.sub!.instance) } } : {}),
       status: this.instance.status,
       legal_tools: all ? "all" : [...ALWAYS_LEGAL, ...tools],
       history: this.instance.history.slice(-10),

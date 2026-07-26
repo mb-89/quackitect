@@ -100,25 +100,35 @@ test("manual mode: tick info at start, ticks walk the whole machine to end", asy
   const info = s.tickInfo() as { active: string[]; states: { kind: string }[] };
   assert.deepEqual(info.active, ["start"]);
   assert.equal(info.states[0].kind, "start");
-  s.tickAdvance(); // start -> boot/read_contract (sub start auto-walked)
+  s.tickAdvance(); // main/start -> boot's mechanical start (one position per tick)
+  assert.deepEqual(s.active(), ["boot/start"]);
+  s.tickAdvance();
   assert.deepEqual(s.active(), ["boot/read_contract"]);
   s.tickAdvance();
   assert.deepEqual(s.active(), ["boot/prepare_idle"]);
-  s.tickAdvance(); // sub reaches end, boot fills, idle
+  s.tickAdvance(); // prepare_idle -> boot's visible end position
+  assert.deepEqual(s.active(), ["boot/end"]);
+  s.tickAdvance(); // pop back to main: boot filled, idle
   assert.deepEqual(s.active(), ["idle"]);
   s.tickAdvance(); // idle -> end
   assert.equal((s.describe() as { status: string }).status, "closed");
 });
 
-test("the mirror renders both machines with the live position highlighted", async () => {
+test("the mirror renders ONLY the current machine, with breadcrumbs", async () => {
   const { Session } = await import("../engine/session.ts");
   const { renderMirror } = await import("../engine/render.ts");
   const root = freshRoot();
   const s = new Session(root);
+  // At main/start: the main canvas only.
+  let html = renderMirror({ session: s, root, lastPacket: undefined, mode: "manual" });
+  assert.ok(html.includes(`>idle</text>`));
+  assert.ok(!html.includes(`>read_contract</text>`), "sub-machine states are NOT drawn while in main");
+  // Step into boot: the boot canvas only, breadcrumb main › boot.
   s.tickAdvance();
-  const html = renderMirror({ session: s, root, lastPacket: undefined, mode: "manual" });
-  for (const id of ["start", "boot", "idle", "end", "read_contract", "prepare_idle"]) {
-    assert.ok(html.includes(`>${id}</text>`), `renders ${id}`);
-  }
-  assert.ok(html.includes("what the agent gets"), "the packet panel is the shared projection");
+  html = renderMirror({ session: s, root, lastPacket: undefined, mode: "manual" });
+  assert.ok(html.includes(`>read_contract</text>`));
+  assert.ok(!html.includes(`>idle</text>`), "main states are NOT drawn while in the sub");
+  assert.ok(html.includes("class=\"here\">boot"), "breadcrumb marks the machine the walk is in");
+  assert.ok(html.includes("data-detail=\"state:read_contract\""), "states are clickable for details");
+  assert.ok(html.includes("class=\"expand\""), "widgets carry expand buttons");
 });

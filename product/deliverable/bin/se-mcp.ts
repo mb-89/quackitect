@@ -16,6 +16,18 @@ function argValue(flag: string): string | undefined {
   return i >= 0 ? process.argv[i + 1] : undefined;
 }
 
+if (process.argv.some((a) => a === "--help" || a === "-h" || a === "-?")) {
+  process.stdout.write(`se-mcp — the quackitect v3 MCP server (stdio JSON-RPC)
+
+  node bin/se-mcp.ts --root <project root>
+
+  --root   the quackitect project root (holds product/ and workspace/);
+           file lane serves that tree, call log lands in <root>/.se/
+  --help   this text (-h, -?)
+`);
+  process.exit(0);
+}
+
 const root = resolve(argValue("--root") ?? process.cwd());
 if (!existsSync(root)) {
   process.stderr.write(`se-mcp: root does not exist: ${root}\n`);
