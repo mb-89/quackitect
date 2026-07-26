@@ -188,7 +188,8 @@ const STYLE = `
   .cond.unmet circle { fill: #3a2f14; stroke: #e8b339; }
   .cond.met circle { fill: #1d2b20; stroke: #4a7a55; }
   .cond-label { font-size: 20px; text-anchor: middle; fill: #d8dde2; pointer-events: none; }
-  .doclist a { display: block; color: #7cc4e8; padding: 4px 0; cursor: pointer; text-decoration: underline; }
+  .doclist a { display: block; padding: 4px 0; }
+  a.doclink { color: #7cc4e8; cursor: pointer; text-decoration: underline; }
   .docview { font-size: 13.5px; line-height: 1.55; }
   .docview h1, .docview h2, .docview h3 { color: #e8b339; }
   .docview code { background: #22272c; padding: 1px 5px; border-radius: 4px; }
@@ -205,7 +206,12 @@ function jsonTable(v) {
   if (v === null || v === undefined) return '<span class="vnull">null</span>';
   if (typeof v === "number") return '<span class="vnum">' + v + "</span>";
   if (typeof v === "boolean") return '<span class="vbool">' + v + "</span>";
-  if (typeof v === "string") return '<span class="vstr">' + v.replace(/&/g,"&amp;").replace(/</g,"&lt;") + "</span>";
+  if (typeof v === "string") {
+    if (/^(workspace|product)\/[^ ]+\.[A-Za-z0-9]+$/.test(v)) {
+      return '<a class="doclink" data-path="' + v + '">' + v + "</a>";
+    }
+    return '<span class="vstr">' + v.replace(/&/g,"&amp;").replace(/</g,"&lt;") + "</span>";
+  }
   if (Array.isArray(v)) {
     if (v.length === 0) return '<span class="vnull">[]</span>';
     return '<table class="kv">' + v.map((x, i) => '<tr><td class="k">' + i + '</td><td class="v">' + jsonTable(x) + "</td></tr>").join("") + "</table>";
@@ -258,7 +264,7 @@ document.addEventListener("click", async (ev) => {
   const rp = ev.target.closest ? ev.target.closest(".runpre") : null;
   if (rp) { await fetch("/preflight", { method: "POST" }); location.href = "/"; return; }
   const dl = ev.target.closest ? ev.target.closest(".doclink") : null;
-  if (dl) { openDoc(dl.dataset.path, dl.dataset.return); return; }
+  if (dl) { openDoc(dl.dataset.path, dl.dataset.return || CURRENT_DETAIL || (CURRENT ? "state:" + CURRENT : "comment")); return; }
   const back = ev.target.closest ? ev.target.closest(".back") : null;
   if (back) { const [t, h] = detailFor(back.dataset.return); showDetails(t, h); return; }
 });
@@ -310,12 +316,13 @@ document.addEventListener("click", async (ev) => {
     location.href = "/";
   }
 });
+let CURRENT_DETAIL = null;
 document.addEventListener("click", (ev) => {
   const arrow = ev.target.closest ? ev.target.closest(".crumb-arrow") : null;
   document.querySelectorAll(".crumb-arrow.open").forEach((a) => { if (a !== arrow) a.classList.remove("open"); });
   if (arrow) { arrow.classList.toggle("open"); return; }
   const g = ev.target.closest ? ev.target.closest(".clickable") : null;
-  if (g && g.dataset.detail) { const [t, h] = detailFor(g.dataset.detail); showDetails(t, h); }
+  if (g && g.dataset.detail) { CURRENT_DETAIL = g.dataset.detail; const [t, h] = detailFor(g.dataset.detail); showDetails(t, h); }
 });
 // Double-click a sub-machine state: enter it as a VIEWER (walk unmoved).
 document.addEventListener("dblclick", (ev) => {
@@ -366,7 +373,7 @@ if (divider && aside) {
   window.addEventListener("mouseup", () => { drag = null; });
 }
 
-if (CURRENT && D.states[CURRENT] && WALK_HERE) showDetails("state: " + CURRENT, stateDetail(CURRENT));
+if (CURRENT && D.states[CURRENT] && WALK_HERE) { CURRENT_DETAIL = "state:" + CURRENT; showDetails("state: " + CURRENT, stateDetail(CURRENT)); }
 `;
 
 function widgetHead(title: string, widgetId: string, url: string): string {
