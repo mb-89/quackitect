@@ -287,13 +287,15 @@ export class Session {
     return `${m.id}/${stateId}`;
   }
 
-  /** One condition key of a state's entry/exit dictionary. For `read` this
-   *  is the HUMAN ledger's verdict (the mirror's truth): the agent's proof
-   *  is per-tick hashes and never stored, so it has no standing status. */
+  /** One condition key of a state's entry/exit dictionary. For `read` a
+   *  doc counts on EITHER ledger: the human's checks, or hashes the agent
+   *  presented on a passing tick — so the mirror's pill turns green from
+   *  the machine too. The GATE stays per-tick; a stored proof never
+   *  spares a re-read. */
   conditionKeyMet(m: MachineDecl, s: StateDecl, key: string, which: "enter" | "leave"): boolean {
     if (key === "read") {
       const docs = (which === "leave" ? s.exit : s.entry)?.read ?? [];
-      return docs.every((p) => this.readProven("human", p, {}));
+      return docs.every((p) => this.readProven("human", p, {}) || this.agentProven(p));
     }
     const ev = this.evidence.get(this.evidenceKey(m, s.id));
     if (key === "script") return (ev?.script_result as { ok?: boolean } | undefined)?.ok === true;
@@ -406,6 +408,17 @@ export class Session {
   //    IS the reading room where the first tokens are earned. ────────────
   private readonly humanChecks = new Map<string, Set<string>>();
 
+  /** The agent's standing ledger: hashes it PRESENTED on a tick that
+   *  passed the read gate — per version, like the human's checks. Feeds
+   *  the condition status (the mirror's pill) only; never the gate, and
+   *  never the checkboxes (those stay the human's alone). */
+  private readonly agentReads = new Map<string, Set<string>>();
+
+  private agentProven(path: string): boolean {
+    const hash = this.diskHash(path);
+    return hash !== "" && (this.agentReads.get(path)?.has(hash) ?? false);
+  }
+
   private diskHash(rel: string): string {
     try {
       const abs = resolveInRoot(this.root, rel, "engine/session.ts reads");
@@ -506,6 +519,15 @@ export class Session {
     // never read — so the agent's every advance must prove the same list,
     // even past transitions the human already spent.
     this.assertHandover(channel, supplied);
+    if (channel === "agent") {
+      for (const [p, h] of Object.entries(supplied)) {
+        if (h !== "" && h === this.diskHash(p)) {
+          const set = this.agentReads.get(p) ?? new Set<string>();
+          set.add(h);
+          this.agentReads.set(p, set);
+        }
+      }
+    }
   }
 
   private assertHandover(channel: Channel, supplied: Record<string, string>): void {
