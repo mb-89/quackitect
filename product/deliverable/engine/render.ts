@@ -13,8 +13,6 @@
 //   - geometry-true SVG, wheel-zoom, drag-pan; JSON as key/value tables
 // One source, two projections: the packet JSON shown here IS what the
 // agent receives.
-import { readdirSync } from "node:fs";
-import { join } from "node:path";
 import { loadCanvas, type CanvasData, type CanvasElement } from "./canvas.ts";
 import { CallLog, type CallRecord } from "./calllog.ts";
 import { type StrayNote } from "./inbox.ts";
@@ -432,12 +430,6 @@ document.addEventListener("click", async (ev) => {
     const out = document.getElementById("tool-result");
     if (out) out.innerHTML = jsonTable(data);
     refreshLog();
-    return;
-  }
-  const fb = ev.target.closest ? ev.target.closest("#forms-btn") : null;
-  if (fb) {
-    openModal("evidence forms", '<div class="comment-detail">Every form template. Click one to see its page — the bound expedition’s instance when one is open, the blank template otherwise.</div>' +
-      ((D.forms || []).map((n) => '<div style="padding:4px 0"><button class="ghost openform" data-form="' + n + '">' + escText(n) + "</button></div>").join("") || '<div class="vnull">no form templates</div>'));
     return;
   }
   const eb = ev.target.closest ? ev.target.closest("#escape-btn") : null;
@@ -1068,14 +1060,6 @@ export function renderMirror(m: MirrorState, widget?: "machine" | "details" | "l
     };
   }
   const comment = (canvas.nodes ?? []).find((n) => n.type === "text")?.text ?? "";
-  // Every form template rides the page — viewable from anywhere (owner
-  // ruling: forms may be inspected even when no gate demands them).
-  let forms: string[] = [];
-  try {
-    forms = readdirSync(join(m.session.workRoot(), "product", "deliverable", "machines", "forms")).filter((f) => f.endsWith(".md")).map((f) => f.slice(0, -3)).sort();
-  } catch {
-    forms = [];
-  }
   const data = `<script>window.SE_DATA = ${JSON.stringify({
     describe: m.session.describe(),
     packet: m.session.tickInfo(),
@@ -1083,7 +1067,6 @@ export function renderMirror(m: MirrorState, widget?: "machine" | "details" | "l
     states,
     comment,
     viewingWalk,
-    forms,
     viewed: { id: decl.id, reentry: decl.reentry, initial: decl.initial, states: decl.states.map((s) => s.id) },
     history: history.slice(-20),
     levels,
@@ -1104,7 +1087,7 @@ export function renderMirror(m: MirrorState, widget?: "machine" | "details" | "l
   // sub-machine other than boot is being walked.
   const crumbTrail = m.session.breadcrumb();
   const escapeBtn = crumbTrail.length > 1 && crumbTrail[1] !== "boot" ? `<button class="ghost" id="escape-btn" title="escape to idle — the machine is left standing, the reason is recorded">⤴ escape</button>` : "";
-  const machineWidget = `<div class="widget" id="w-machine"><div class="widget-head"><span class="crumbs">${crumbs}</span><span style="display:flex;align-items:center;gap:10px">${slider}${sdBar}${escapeBtn}<button class="ghost" id="forms-btn" title="evidence forms — view any template, requested or not">forms</button><button class="expand" data-widget="w-machine" data-url="/widget/machine?view=${encodeURIComponent(decl.id)}" title="expand · ctrl-click: new tab · shift-click: new window">⛶</button></span></div><div class="widget-body">${svg}</div></div>`;
+  const machineWidget = `<div class="widget" id="w-machine"><div class="widget-head"><span class="crumbs">${crumbs}</span><span style="display:flex;align-items:center;gap:10px">${slider}${sdBar}${escapeBtn}<button class="expand" data-widget="w-machine" data-url="/widget/machine?view=${encodeURIComponent(decl.id)}" title="expand · ctrl-click: new tab · shift-click: new window">⛶</button></span></div><div class="widget-body">${svg}</div></div>`;
   const detailsWidget = `<div class="widget" id="w-details">${widgetHead("details", "w-details", "/widget/details")}
     ${info.status === "closed" ? '<div class="meta" style="color:#e86a5f">machine closed</div>' : ""}
     <div class="meta" id="details-title">—</div>

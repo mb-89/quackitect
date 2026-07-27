@@ -7,7 +7,8 @@ condition: read
 Arguments: the documents (root-relative paths) that must be READ before the
 state can be left (exit) or entered (entry). Beyond the explicit lists, THE
 PULL is an entry condition everywhere outside boot: entering a state
-demands its pulled guidance proven read too.
+demands its pulled guidance proven read too. A left-behind session handover
+(.se/HANDOVER.md) joins boot read_contract's exit list while it exists.
 
 The proof is per hand:
 

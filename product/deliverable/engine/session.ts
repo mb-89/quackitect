@@ -49,7 +49,7 @@ const ALWAYS_LEGAL: ReadonlySet<string> = new Set(["se_tick", "se_note"]);
  *  se_note_drain is legal only in the retro's drain state (owner ruling
  *  2026-07-27: there is no point in draining anywhere else). */
 const RESTRICTED: ReadonlySet<string> = new Set(["se_note_drain"]);
-const MACHINERY: readonly string[] = ["se_tick"];
+const MACHINERY: readonly string[] = ["se_tick", "se_file_read"];
 
 export function mainMachinePath(root: string): string {
   return join(root, "product", "deliverable", "machines", "main.canvas");
@@ -439,9 +439,6 @@ export class Session {
   /** THE STATE GATE — a dispatch guard, throws the typed refusal. */
   gate(tool: string): void {
     if (ALWAYS_LEGAL.has(tool)) return;
-    const { all, tools } = this.legal();
-    if (tools.has(tool)) return;
-    if (all && !RESTRICTED.has(tool)) return;
     if (this.instance.status === "closed") {
       throw new Rejection({
         clause: CLAUSES.NOT_LEGAL_IN_STATE,
@@ -451,6 +448,9 @@ export class Session {
         source: "engine/session.ts gate",
       });
     }
+    const { all, tools } = this.legal();
+    if (tools.has(tool)) return;
+    if (all && !RESTRICTED.has(tool)) return;
     const active = this.active().join(", ");
     const legalList = [...tools].join(", ") || "(none)";
     throw new Rejection({
@@ -477,7 +477,8 @@ export class Session {
    *  spares a re-read. */
   conditionKeyMet(m: MachineDecl, s: StateDecl, key: string, which: "enter" | "leave"): boolean {
     if (key === "read") {
-      const docs = (which === "leave" ? s.exit : s.entry)?.read ?? [];
+      const authored = (which === "leave" ? s.exit : s.entry)?.read ?? [];
+      const docs = which === "leave" ? [...authored, ...this.handoverDemand(m, s)] : authored;
       return docs.every((p) => this.readProven("human", p, {}) || this.agentProven(p));
     }
     if (key === "evidence_form") {
@@ -718,7 +719,8 @@ export class Session {
     if (dict === undefined) return undefined;
     const out: Record<string, { args: string[]; met: boolean; note: string }> = {};
     for (const [k, args] of Object.entries(dict)) {
-      out[k] = { args, met: this.conditionKeyMet(m, s, k, which), note: conditionNotePath(k) };
+      const shown = k === "read" && which === "leave" ? [...args, ...this.handoverDemand(m, s)] : args;
+      out[k] = { args: shown, met: this.conditionKeyMet(m, s, k, which), note: conditionNotePath(k) };
     }
     return out;
   }
@@ -805,6 +807,15 @@ export class Session {
     return false;
   }
 
+  /** THE HANDOVER is a BOOT EXIT rule (owner ruling 2026-07-27): a
+   *  left-behind .se/HANDOVER.md joins read_contract's read list — read,
+   *  and checkable in the mirror, where the session's first reads happen.
+   *  Absent, nothing is demanded. */
+  private handoverDemand(m: MachineDecl, s: StateDecl): string[] {
+    if (m.id !== "boot" || s.id !== "read_contract") return [];
+    return existsSync(join(seDir(this.root), "HANDOVER.md")) ? [".se/HANDOVER.md"] : [];
+  }
+
   /** What entering `t` demands proven: its entry read list plus its pull —
    *  minus its own exit read list (that is the state's assignment, read
    *  INSIDE it, not before). */
@@ -812,8 +823,6 @@ export class Session {
     const req = new Set<string>(t.entry?.read ?? []);
     if (!this.pullGateExempt(m, t)) {
       for (const d of pulledFor(this.root, scanGuidance(this.root), m, t)) req.add(d.path);
-      // A left-behind handover is part of idle's entry reading.
-      if (t.id === "idle" && existsSync(join(seDir(this.root), "HANDOVER.md"))) req.add(".se/HANDOVER.md");
     }
     for (const p of t.exit?.read ?? []) req.delete(p);
     return [...req];
@@ -835,7 +844,8 @@ export class Session {
   /** THE READ GATE, both directions: the current state's exit read list,
    *  and the target's entry requirements (explicit reads + the pull). */
   private assertReads(m: MachineDecl, from: StateDecl, targetIds: string[], channel: Channel, supplied: Record<string, string>): void {
-    const missingExit = (from.exit?.read ?? []).filter((p) => !this.readProven(channel, p, supplied));
+    const exitReads = [...(from.exit?.read ?? []), ...this.handoverDemand(m, from)];
+    const missingExit = exitReads.filter((p) => !this.readProven(channel, p, supplied));
     if (missingExit.length > 0) this.refuseReads("exit", from.id, missingExit, channel);
     for (const id of targetIds) {
       const t = m.states.find((s) => s.id === id);
@@ -924,11 +934,9 @@ export class Session {
       const hash = d.hash !== "" ? d.hash : this.diskHash(d.path);
       return { ...d, hash, checked: this.humanChecked(d.path, hash) };
     });
-    // THE HANDOVER (owner ruling 2026-07-27): if a previous session left
-    // one, entering idle demands it read — same proof as any pulled doc.
-    // Absent, nothing is demanded; writing one stays a judgment call.
-    if (s.id === "idle" && existsSync(join(seDir(this.root), "HANDOVER.md"))) {
-      const rel = ".se/HANDOVER.md";
+    // THE HANDOVER rides boot's reading room — leaving read_contract
+    // demands it like the authored list; its checkbox lives here too.
+    for (const rel of this.handoverDemand(m, s)) {
       const hash = this.diskHash(rel);
       out.push({ path: rel, sources: ["handover"], hash, checked: this.humanChecked(rel, hash) });
     }
@@ -1135,6 +1143,18 @@ export class Session {
     const cur = activeStates(this.instance)[0];
     this.assertEdge(this.machine, cur, to);
     const target = to ?? this.state(this.machine, cur).edges[0]?.to;
+    // Main end closes the WHOLE session — below shutdown 4 (end-on-done)
+    // that door is the user's alone (owner ruling 2026-07-27, after a
+    // stale agent tick meant for a sub-machine's end ended the session).
+    if (target !== undefined && channel === "agent" && this._shutdown < 4 && this.state(this.machine, target).kind === "end") {
+      throw new Rejection({
+        clause: CLAUSES.ABOVE_THRESHOLD,
+        expected: "the user's hand — the main machine's end closes the whole session",
+        got: `an agent tick to ${target}`,
+        remedy: { tool: "se_tick", args: {}, note: "stay at idle and tell the user plainly: closing the session is theirs (mirror click, or shutdown level 4/5 makes done mean end)" },
+        source: "engine/session.ts tick",
+      });
+    }
     if (target !== undefined) this.gatePriority(this.machine, [target], channel);
     await this.assertConditions(this.machine, this.state(this.machine, cur), to, channel, readHashes);
     completeState(this.machine, this.instance, cur, "filled", now, to);

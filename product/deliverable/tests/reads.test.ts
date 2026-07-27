@@ -29,7 +29,7 @@ test("a check pins the VERSION: editing the doc unchecks it and the gate asks ag
   assert.deepEqual(s.active(), ["start_expedition/start"]);
 });
 
-test("THE HANDOVER: a left-behind .se/HANDOVER.md is demanded at idle entry — absent, nothing is", async () => {
+test("THE HANDOVER: a left-behind .se/HANDOVER.md is demanded leaving boot's reading room — absent, nothing is", async () => {
   const root = freshRoot();
   mkdirSync(join(root, ".se"), { recursive: true });
   writeFileSync(join(root, ".se", "HANDOVER.md"), "# Handover\n\nOpen threads for the next session.\n", "utf8");
@@ -40,16 +40,25 @@ test("THE HANDOVER: a left-behind .se/HANDOVER.md is demanded at idle entry — 
     last = await call(server, "se_tick", { advance: true, read_hashes: hashes });
     if (last.isError === true || last.body.booted === true) break;
   }
-  // The boot's last advance lands on idle — refused until the handover rides the proof.
+  // The walk stops LEAVING read_contract — the handover is a boot exit read.
   assert.equal(last!.isError, true);
   assert.equal(last!.body.clause, "SE-C-112");
+  assert.match(String(last!.body.expected), /read_contract/);
   assert.match(String(last!.body.expected), /HANDOVER/);
+  // The reading room offers it: pulled with source "handover" — the mirror's checkbox home.
+  const at = await call(server, "se_tick", {});
+  const state = (at.body.states as { pulled: { path: string; sources: string[] }[] }[])[0];
+  assert.ok(state.pulled.some((p) => p.path === ".se/HANDOVER.md" && p.sources.includes("handover")));
   const { contentHash } = await import("../engine/hash.ts");
   const { readFileSync } = await import("node:fs");
   const withHandover = { ...hashes, ".se/HANDOVER.md": contentHash(readFileSync(join(root, ".se", "HANDOVER.md"))) };
-  const entered = await call(server, "se_tick", { advance: true, read_hashes: withHandover });
-  assert.equal(entered.isError, false, JSON.stringify(entered.body));
-  assert.equal(entered.body.booted, true);
+  for (let i = 0; i < 8; i++) {
+    last = await call(server, "se_tick", { advance: true, read_hashes: withHandover });
+    if (last.isError === true || last.body.booted === true) break;
+  }
+  // Idle entry no longer demands it — boot already proved the reading.
+  assert.equal(last!.isError, false, JSON.stringify(last!.body));
+  assert.equal(last!.body.booted, true);
 });
 
 test("a stale agent hash proves a stale read: the edited doc must be re-read for a fresh token", async () => {

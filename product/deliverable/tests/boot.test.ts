@@ -5,7 +5,7 @@ import { strict as assert } from "node:assert";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 import { compileMachine } from "../engine/machines/compile.ts";
-import { mainMachinePath } from "../engine/session.ts";
+import { mainMachinePath, Session } from "../engine/session.ts";
 import { buildServer } from "../engine/tools.ts";
 import { bootedServer, call, checkDocs, freshRoot, readHashesFor } from "./helpers.ts";
 
@@ -30,12 +30,19 @@ test("the boot sub-machine compiles with its own mechanical start/end", () => {
   assert.deepEqual(rc.exit, { read: ["workspace/AGENTS.md", "product/guidance/contract.md", "product/guidance/voice.md", "product/guidance/walking.md"] });
 });
 
-test("at start every lane tool is refused with se_tick as the remedy", async () => {
+test("at start the lane beyond reading is refused with se_tick as the remedy", async () => {
   const server = buildServer(freshRoot());
   const r = await call(server, "se_file_list", { dir: "." });
   assert.equal(r.isError, true);
   assert.equal(r.body.clause, "SE-C-110");
   assert.equal((r.body.remedy as { tool: string }).tool, "se_tick");
+});
+
+test("reading is legal at the mechanical start/end states — proof tokens can be earned from anywhere", async () => {
+  const server = buildServer(freshRoot());
+  const r = await call(server, "se_file_read", { path: "product/guidance/contract.md" });
+  assert.equal(r.isError, false, JSON.stringify(r.body));
+  assert.ok(typeof r.body.hash === "string" && (r.body.hash as string).length > 0);
 });
 
 test("se_tick without arguments reports the current state — legal everywhere", async () => {
@@ -89,18 +96,43 @@ test("the agent's ticks walk boot, gated by HASH proof-of-read, banner on idle",
   assert.equal(info.body.booted, undefined);
 });
 
-test("idle opens the whole lane; a tick to end closes it; after end only tick-info answers", async () => {
+test("idle opens the whole lane; main end is the user's door — the agent's tick is refused, the human's closes", async () => {
   const root = freshRoot();
-  const server = await bootedServer(root);
+  const session = new Session(root);
+  const server = buildServer(root, session);
+  const hashes = readHashesFor(root);
+  for (let i = 0; i < 8; i++) {
+    const step = await call(server, "se_tick", { advance: true, read_hashes: hashes });
+    if (step.body.booted === true) break;
+  }
   const w = await call(server, "se_file_write", { path: "x.md", content: "hi", base_hash: null });
   assert.equal(w.isError, false);
-  const exit = await call(server, "se_tick", { to: "end" });
-  assert.equal(exit.isError, false);
+  // The agent cannot end the whole session below shutdown 4 (owner ruling 2026-07-27).
+  const refused = await call(server, "se_tick", { to: "end" });
+  assert.equal(refused.isError, true);
+  assert.equal(refused.body.clause, "SE-C-113");
+  // The human's hand closes it; after end only tick-info answers.
+  await session.tickAdvance("end");
   const after = await call(server, "se_file_read", { path: "x.md" });
   assert.equal(after.isError, true);
   assert.equal(after.body.clause, "SE-C-110");
   const state = await call(server, "se_tick");
   assert.equal(state.body.status, "closed");
+});
+
+test("at shutdown 4 done means end — the agent's deliberate tick to end is allowed", async () => {
+  const root = freshRoot();
+  const session = new Session(root);
+  session.setShutdown(4);
+  const server = buildServer(root, session);
+  const hashes = readHashesFor(root);
+  for (let i = 0; i < 8; i++) {
+    const step = await call(server, "se_tick", { advance: true, read_hashes: hashes });
+    if (step.body.booted === true) break;
+  }
+  const exit = await call(server, "se_tick", { to: "end" });
+  assert.equal(exit.isError, false, JSON.stringify(exit.body));
+  assert.equal(exit.body.session_over, true);
 });
 
 test("the gate is logged like everything else — a refused pre-boot call lands in the log", async () => {

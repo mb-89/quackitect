@@ -15,6 +15,8 @@ guidance: Read every document in the exit condition through se_file_read - each 
 
 The boot sequence's first step: the listed documents are read at every
 session start — never remembered from training or a previous session.
+A left-behind session handover (.se/HANDOVER.md) joins the read demand
+while it exists — the engine adds it here, where reading is legal.
 
 - AGENTS.md (the one rule; outside the vault, the engine serves it)
 - [[guidance/contract|contract]]
