@@ -27,6 +27,8 @@ try {
 process.env.SE_SELFTEST_SKIP = "1";
 // Never spawn keep-awake loops or OS shutdowns from a test session.
 process.env.SE_KEEPAWAKE_DISABLE = "1";
+// se_reload runs its canary but never exits the test process.
+process.env.SE_RELOAD_DRY = "1";
 
 export function freshRoot(): string {
   const root = mkdtempSync(join(tmpdir(), "se-v3-"));

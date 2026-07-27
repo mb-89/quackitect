@@ -167,7 +167,7 @@ export function expClose(root: string, e: Expedition, merge: boolean): { id: str
       });
     }
     const raw = readFileSync(recAbs, "utf8");
-    writeFileSync(recAbs, raw.replace(/^status: open$/m, `status: closed\nclosed: ${new Date().toISOString()}\nreport: ${merge ? "applied" : "dismissed"}`), "utf8");
+    writeFileSync(recAbs, raw.replace(/^status: open$/m, `status: closed\nclosed: ${new Date().toISOString()}\nruling: ${merge ? "applied" : "dismissed"}`), "utf8");
   }
   // Leftover changes are committed — a walk's work never silently vanishes.
   const dirty = git(e.path, ["status", "--porcelain"], "status").trim() !== "";

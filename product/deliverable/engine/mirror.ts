@@ -137,6 +137,12 @@ export function startMirror(o: MirrorOptions): Server {
         let raw = readFileSync(abs, "utf8");
         raw = raw.replace(/^---\r?\n[\s\S]*?\r?\n---\r?\n/, ""); // frontmatter is machine-facing
         const html = p.endsWith(".md") ? (marked.parse(raw) as string) : `<pre>${raw.replace(/&/g, "&amp;").replace(/</g, "&lt;")}</pre>`;
+        if (url.searchParams.get("page") === "1") {
+          // A standalone page — ctrl/shift-click targets (new tab, new window).
+          res.writeHead(200, { "content-type": "text/html; charset=utf-8" });
+          res.end(`<!doctype html><html><head><meta charset="utf-8"><title>${p}</title><style>body{font-family:ui-monospace,Consolas,monospace;background:#14171a;color:#d8dde2;padding:24px;max-width:900px;margin:0 auto}a{color:#e8b339}</style></head><body>${html}</body></html>`);
+          return;
+        }
         res.writeHead(200, { "content-type": "application/json; charset=utf-8" });
         res.end(JSON.stringify({ path: p, html }));
         return;

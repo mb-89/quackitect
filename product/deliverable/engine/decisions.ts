@@ -73,6 +73,15 @@ export function parseUpdate(v: unknown): DecisionOp {
   if (op === "fork" && (brief === undefined || brief.trim() === "")) throw malformed("fork without brief");
   if (op in CLOSES && node === undefined) throw malformed(`${op} without node`);
   if (op === "update" && (brief === undefined || brief.trim() === "")) throw malformed("update without brief");
+  // THE RENDER LINT (owner ruling 2026-07-27): the lane refuses what would
+  // render weird — mechanically, at the boundary.
+  const lintLine = (text: string, what: string): void => {
+    if (/[\r\n]/.test(text)) throw malformed(`${what} carries line breaks — one line only`);
+    if (text.length > 90) throw malformed(`${what} is ${text.length} chars — the feed renders 90; tighten it`);
+    if (text.split(/[,;]/).length >= 3) throw malformed(`${what} chains 3+ separator-joined parts — an unrendered list; use plan {items} or split`);
+  };
+  if (brief !== undefined) lintLine(brief, "brief");
+  for (const it of items ?? []) lintLine(it, "item");
   return { op: op as DecisionOp["op"], ...(brief !== undefined ? { brief } : {}), ...(items !== undefined ? { items } : {}), ...(node !== undefined ? { node } : {}) };
 }
 
@@ -196,7 +205,12 @@ export class Decisions {
       }
       case "update": {
         if (u.node !== undefined) this.activeId = this.openNode(u.node).id;
-        this.record({ op: "update", visit, node: this.activeId ?? null, brief: u.brief });
+        // EVERY update changes the RENDER (owner ruling 2026-07-27): the
+        // brief lands as a checked point under the active node — the log
+        // line and the tree always tell the same story, mechanically.
+        const point = this.add(visit, this.activeId ?? null, u.brief ?? "");
+        this.close(point, "done", undefined);
+        this.record({ op: "update", visit, node: point.id, brief: u.brief });
         break;
       }
     }
@@ -204,7 +218,9 @@ export class Decisions {
     return { update: u.op, active: this.activeId ?? null, open };
   }
 
-  /** One state visit's tree, insertion-ordered — the mirror renders this. */
+  /** One state visit's tree, insertion-ordered — the mirror renders this.
+   *  Every update op IS in the tree (a checked point), so the log and the
+   *  panel always tell the same story. */
   graph(visit: string): { visit: string; active: string | null; nodes: DecisionNode[] } {
     const nodes = [...this.nodes.values()].filter((n) => n.visit === visit);
     const active = this.activeId !== undefined && this.nodes.get(this.activeId)?.visit === visit ? this.activeId : null;

@@ -138,6 +138,34 @@ test("ticks are ATOMIC: a stale `from` is refused, the matching one moves", asyn
   assert.equal(onward.isError, false, JSON.stringify(onward.body));
 });
 
+test("se_reload: refused off-idle, dry-runs its canary at idle", async () => {
+  const server = buildServer(freshRoot());
+  const early = await call(server, "se_reload", {});
+  assert.equal(early.isError, true);
+  assert.equal(early.body.clause, "SE-C-110", "not legal before idle");
+  const booted = await bootedServer(freshRoot());
+  const r = await call(booted, "se_reload", {});
+  assert.equal(r.isError, false, JSON.stringify(r.body));
+  assert.equal(r.body.reload, "dry");
+});
+
+test("repair mode: a RED exit script arms the state's repair tools", async () => {
+  const root = freshRoot();
+  const session = new Session(root);
+  const server = buildServer(root, session);
+  await session.tickAdvance(); await session.tickAdvance();
+  checkDocs(session);
+  await session.tickAdvance();
+  assert.deepEqual(session.active(), ["boot/prepare_idle"]);
+  // Green or not-yet-run: the file lane stays shut.
+  const shut = await call(server, "se_file_write", { path: "x.md", content: "hi", base_hash: null });
+  assert.equal(shut.body.clause, "SE-C-110");
+  // The suite fails — the engine records it; the repair tools open up.
+  session.submitEvidence("prepare_idle", { script_result: { ok: false, output: "1 failing test" } });
+  const fix = await call(server, "se_file_write", { path: "x.md", content: "hi", base_hash: null });
+  assert.equal(fix.isError, false, JSON.stringify(fix.body));
+});
+
 test("the gate is logged like everything else — a refused pre-boot call lands in the log", async () => {
   const root = freshRoot();
   const server = buildServer(root);
@@ -368,12 +396,12 @@ test("expeditions: worktree lifecycle — new, bind, work lands in the worktree,
   // the close IS the ruling (owner 2026-07-27).
   const rec = readFileSync(join(root, "product", "spec", "expeditions", minted.created, "record.md"), "utf8");
   assert.match(rec, /^status: closed$/m);
-  assert.match(rec, /^report: applied$/m);
+  assert.match(rec, /^ruling: applied$/m);
   assert.equal((s.expeditionList() as { open: unknown[] }).open.length, 0);
-  const arch = (s.expeditionList() as { archive: { id: string; status?: string; report?: string }[] }).archive;
+  const arch = (s.expeditionList() as { archive: { id: string; status?: string; ruling?: string }[] }).archive;
   assert.equal(arch[0].id, minted.created);
   assert.equal(arch[0].status, "closed");
-  assert.equal(arch[0].report, "applied");
+  assert.equal(arch[0].ruling, "applied");
 });
 
 test("escape goes to idle and only to idle: the walk is left standing, the reason is recorded, boot is exempt", async () => {

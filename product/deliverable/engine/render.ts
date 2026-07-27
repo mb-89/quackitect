@@ -508,13 +508,17 @@ function stateDetail(id) {
   }
   if (s.archive_record !== undefined) {
     const e = s.archive_record;
-    html += '<div class="meta" style="padding:8px 0 4px">the record</div>';
+    // ONE rendering, in the table (owner ruling 2026-07-27): the ruling is
+    // its own key; report is a LINK opening the big modal (ctrl: tab,
+    // shift: window). No duplicate prose below.
     if (!e) html += '<div class="vnull">no record found</div>';
     else {
-      html += '<div style="padding:2px 0"><b>' + escText(e.id) + "</b></div>";
-      if (e.goal) html += '<div class="comment-text">' + escText(e.goal) + "</div>";
-      html += '<div class="meta">' + (e.status ? "status: " + escText(e.status) : "pre-record") + (e.report ? " · report: " + escText(e.report) : "") + "</div>";
-      html += '<div><a class="doclink" data-path="product/spec/expeditions/' + escText(e.id) + '/record.md">record</a> · <a class="doclink" data-path="product/spec/expeditions/' + escText(e.id) + '/report.md">report</a></div>';
+      html += '<table class="kv">'
+        + '<tr><td class="k">expedition</td><td class="v">' + escText(e.id) + "</td></tr>"
+        + (e.status ? '<tr><td class="k">status</td><td class="v">' + escText(e.status) + "</td></tr>" : "")
+        + ((e.ruling || e.report) ? '<tr><td class="k">ruling</td><td class="v">' + escText(e.ruling || e.report) + "</td></tr>" : "")
+        + '<tr><td class="k">report</td><td class="v"><a class="replink" data-path="product/spec/expeditions/' + escText(e.id) + '/report.md" data-title="report · ' + escText(e.id) + '" title="click: modal · ctrl-click: new tab · shift-click: new window">report.md</a></td></tr>'
+        + "</table>";
     }
   }
   if (s.next && s.next.length > 0) {
@@ -551,6 +555,16 @@ document.addEventListener("click", async (ev) => {
     rp.disabled = true; rp.classList.add("locked"); rp.textContent = "running…";
     await fetch("/script", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ state: rp.dataset.state || CURRENT }) });
     reloadKeep(CURRENT_DETAIL);
+    return;
+  }
+  const rpl = ev.target.closest ? ev.target.closest(".replink") : null;
+  if (rpl) {
+    const pageUrl = "/doc?path=" + encodeURIComponent(rpl.dataset.path) + "&page=1";
+    if (ev.ctrlKey || ev.metaKey) { window.open(pageUrl, "_blank"); return; }
+    if (ev.shiftKey) { window.open(pageUrl, "_blank", "popup,width=900,height=700"); return; }
+    const r = await fetch("/doc?path=" + encodeURIComponent(rpl.dataset.path));
+    const d = await r.json();
+    openModal(rpl.dataset.title || rpl.dataset.path, '<div class="docview">' + d.html + "</div>");
     return;
   }
   const dl = ev.target.closest ? ev.target.closest(".doclink") : null;

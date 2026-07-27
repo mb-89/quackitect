@@ -301,6 +301,7 @@ export function stateFromNote(machineId: string, ref: string, notePath: string, 
     throw new MachineCompileError(machineId, ref, "every state carries a priority (frontmatter `priority:` 0.01 mechanical .. 0.8 killer)");
   }
   const legalTools = asList(x.legal_tools);
+  const repairTools = asList(x.repair_tools);
   const entry = conditionDict(machineId, ref, root, "entry", x);
   const exit = conditionDict(machineId, ref, root, "exit", x);
   const tags = asList(x.tags);
@@ -314,6 +315,7 @@ export function stateFromNote(machineId: string, ref: string, notePath: string, 
     evidence_form: [...evidenceForm(machineId, ref, note.body), ...(kind === "gate" ? STANDARD_ROUNDS : [])],
     ...(submachine !== undefined && submachine !== "" ? { submachine } : {}),
     ...(legalTools !== undefined ? { legal_tools: legalTools } : {}),
+    ...(repairTools !== undefined ? { repair_tools: repairTools } : {}),
     ...(entry !== undefined ? { entry } : {}),
     ...(exit !== undefined ? { exit } : {}),
     ...(tags !== undefined ? { tags } : {}),

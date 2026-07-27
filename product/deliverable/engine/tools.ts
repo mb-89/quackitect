@@ -93,6 +93,14 @@ export function sessionTools(session: Session): ToolDef[] {
         return { opened: session.mirrorUrl, note: "the panel is opening in the user's browser" };
       },
     },
+    {
+      name: "se_reload",
+      title: "se.reload",
+      description:
+        "Reload the engine onto the current sources — legal only with the walk at idle. Canary-guarded: a tree that does not load is refused and the running engine survives. The reload reboots the walk (boot re-proves the engine green). Swaps NEVER fire on their own — this call, from either hand, is the only trigger.",
+      inputSchema: { type: "object", properties: {} },
+      handler: () => session.requestReload(),
+    },
   ];
 }
 

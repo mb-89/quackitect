@@ -32,14 +32,21 @@ Narration rides the walk (the unified log + the decision graph):
   on EVERY call that changes something (a write, a run, a move) — the
   5-minute toll is the enforcement floor, never the rhythm; the mirror's
   log should tell the story without gaps.
-  - plan `{items}` starts the state's checklist.
+  - plan `{items}` starts the state's checklist. THE RHYTHM: any
+    multi-step work opens with a plan, BEFORE the first edit — the
+    panel's checklist IS this graph, and a visit without a plan shows
+    the reader nothing to follow. Check items off with done AS each one
+    lands, never in bulk at the end.
   - fork `{brief, items?}` opens an unplanned branch where you are — a
     BLOCKING detour: the current item cannot continue until this is fixed;
     resolve it and return. Extra work that merely grows the scope is not a
     fork — append it to the checklist with another plan.
   - done | obsolete | revert `{node, brief}` resolves a node.
   - update `{brief, node?}` says what you are doing. An update is never
-    called a note — notes are the retro's strays (se_note).
+    called a note — notes are the retro's strays (se_note). Every update
+    CHANGES THE RENDER: the engine lands it as a checked point under the
+    node you are on — clicking the log line always shows what changed.
+    Work that should stay open gets plan or fork instead.
 - Everything started gets resolved. Abandoning is legal. Abandoning
   silently is not — the graph shows the drop.
 - The TOLL: after five silent minutes the next call carries a warning.
@@ -47,6 +54,8 @@ Narration rides the walk (the unified log + the decision graph):
   volunteered update is never stopped.
 - `se_note {text}`: capture a stray anywhere, keep walking (contract
   rule 4). Notes join the log feed; they drain at a retro, later.
+  In a LIVE discussion with the owner, do not note every exchange —
+  discuss first, write ONE consolidated note when the point settles.
 - The human sees it all live in the mirror's log pane. One line per act.
   Clicking an update line opens the decision tree.
 

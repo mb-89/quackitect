@@ -101,6 +101,15 @@ test("se_note is legal in EVERY state — a stray is captured where it strikes",
   assert.equal(n2.body.inbox, 2);
 });
 
+test("the render lint: the update lane refuses what renders weird", () => {
+  assert.throws(() => parseUpdate({ op: "update", brief: "line one\nline two" }), (e) => (e as { clause?: string }).clause === "SE-C-120");
+  assert.throws(() => parseUpdate({ op: "update", brief: "x".repeat(91) }), (e) => (e as { clause?: string }).clause === "SE-C-120");
+  assert.throws(() => parseUpdate({ op: "update", brief: "one, two, three" }), (e) => (e as { clause?: string }).clause === "SE-C-120");
+  assert.throws(() => parseUpdate({ op: "plan", items: ["fine", "also fine, still fine, too many"] }), (e) => (e as { clause?: string }).clause === "SE-C-120");
+  const ok = parseUpdate({ op: "update", brief: "short and clean — two parts, fine" });
+  assert.equal(ok.op, "update");
+});
+
 test("the unified feed derives src, type and brief — and the mirror carries the log pane", () => {
   const root = freshRoot();
   const session = new Session(root);

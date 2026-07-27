@@ -10,6 +10,7 @@ guidance: Idle is the ROUTER. The user's request decides the way out - ad hoc or
 
 Booted, no active process. The whole lane is legal, and the state routes:
 requests become expeditions (ad hoc) or iterations (planned). A backlog to
-pull from lands here later. Small fixes the owner orders in chat run
+pull from lands here later.
+ Small fixes the owner orders in chat run
 directly from here — no expedition while the project stays pre-ledger
 (owner ruling 2026-07-27).

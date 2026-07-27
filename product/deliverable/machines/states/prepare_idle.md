@@ -5,7 +5,8 @@ priority: 0.01
 exit_script:
   - product/deliverable/engine/bin/preflight.ts
   - product/deliverable/engine/bin/selftest.ts
-guidance: Preflight and the full selftest suite — the exit scripts run them. Tick to run; expect a few seconds. A failure is named in the refusal.
+repair_tools: se_file_read, se_file_search, se_file_glob, se_file_list, se_file_patch, se_file_write, se_run
+guidance: Preflight and the full selftest suite — the exit scripts run them. Tick to run; expect a few seconds. A failure is named in the refusal. While the suite stands red, the repair tools are legal HERE — fix what the output names, then tick again.
 ---
 
 # Prepare idle

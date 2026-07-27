@@ -64,6 +64,8 @@ export interface StateDecl {
    *  (legal STATES are the machine's edges — this is only about tools).
    *  ["all"] opens the whole lane. Enforced at dispatch, not advisory. */
   legal_tools?: string[];
+  /** Legal ONLY while the state's exit script stands red (repair mode). */
+  repair_tools?: string[];
   edges: EdgeDecl[];
 }
 

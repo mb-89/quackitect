@@ -36,7 +36,8 @@ import { pulledFor, scanGuidance, type GuidanceDoc, type PulledDoc } from "./pul
 import { expClose, expFind, expList, expNew, readRecord, type Expedition } from "./worktree.ts";
 import { generateContinueExpedition, generateExpeditionArchive, type GeneratedMachine } from "./expmachine.ts";
 import { type CanvasData } from "./canvas.ts";
-import { spawn } from "node:child_process";
+import { spawn, spawnSync } from "node:child_process";
+import { fileURLToPath, pathToFileURL } from "node:url";
 import { resolveInRoot, seDir } from "./paths.ts";
 import { Decisions } from "./decisions.ts";
 
@@ -256,6 +257,40 @@ export class Session {
     });
   }
 
+  /** THE ORDERED RELOAD (owner ruling 2026-07-27): engine swaps fire only
+   *  on request — never on their own — and only at idle. The canary
+   *  refuses to kill a running engine for a tree that does not load; then
+   *  the child exits 42 and the shim respawns it on the new sources. The
+   *  walk reboots — by design; boot re-proves the new engine green. */
+  requestReload(): Record<string, unknown> {
+    const leaf = this.active()[0] ?? "";
+    if (leaf !== "idle") {
+      throw new Rejection({
+        clause: CLAUSES.NOT_LEGAL_IN_STATE,
+        expected: "the walk at idle — a reload reboots it, nothing mid-flight may be lost",
+        got: `standing in ${leaf || "(nowhere)"}`,
+        remedy: { tool: "se_tick", args: {}, note: "walk to idle first, then se_reload" },
+        source: "engine/session.ts reload",
+      });
+    }
+    const engineDir = dirname(fileURLToPath(import.meta.url));
+    const entry = pathToFileURL(join(engineDir, "tools.ts")).href;
+    const probe = `import(${JSON.stringify(entry)}).then(()=>process.exit(0),(e)=>{console.error("se canary: "+(e&&e.message||e));process.exit(1)})`;
+    const r = spawnSync(process.execPath, ["-e", probe], { encoding: "utf8", timeout: 30_000, windowsHide: true });
+    if (r.status !== 0) {
+      throw new Rejection({
+        clause: CLAUSES.CONDITION_UNMET,
+        expected: "sources whose module graph LOADS — the canary never kills a running engine for a broken tree",
+        got: (r.stderr || "no canary output").trim().slice(0, 300),
+        remedy: { tool: "se_file_read", args: { path: "product/deliverable/engine/tools.ts" }, note: "fix the named error, then se_reload again" },
+        source: "engine/session.ts reload",
+      });
+    }
+    if (process.env.SE_RELOAD_DRY === "1") return { reload: "dry", note: "canary green — no exit (SE_RELOAD_DRY)" };
+    setTimeout(() => process.exit(42), 400);
+    return { reload: "armed", note: "the engine restarts in under a second on the NEW sources — the walk reboots at start; tick when the lane answers" };
+  }
+
   /** Where the LANE works: the bound expedition's worktree, else the root. */
   workRoot(): string {
     return this.bound?.path ?? this.root;
@@ -274,7 +309,8 @@ export class Session {
         id: e.id,
         ...(typeof fm?.goal === "string" ? { goal: fm.goal } : {}),
         ...(typeof fm?.status === "string" ? { status: fm.status } : {}),
-        ...(typeof fm?.report === "string" ? { report: fm.report } : {}),
+        // The close RULING (renamed from `report:` — old records still carry that key).
+        ...(typeof fm?.ruling === "string" ? { ruling: fm.ruling } : typeof fm?.report === "string" ? { ruling: fm.report } : {}),
       };
     };
     return {
@@ -449,6 +485,11 @@ export class Session {
       const s = this.state(machine, id);
       // Mechanical states: the machinery's drivers are what is legal.
       if (s.kind === "start" || s.kind === "end") for (const t of MACHINERY) tools.add(t);
+      // REPAIR MODE (owner ruling 2026-07-27): while the state's exit
+      // script stands RED, its repair tools are legal — the remedy "fix
+      // what the output names" must be dischargeable from inside.
+      const ev = this.evidence.get(this.evidenceKey(machine, id));
+      if ((ev?.script_result as { ok?: boolean } | undefined)?.ok === false) for (const t of s.repair_tools ?? []) tools.add(t);
       for (const t of s.legal_tools ?? []) {
         if (t === "all") all = true;
         else tools.add(t);
@@ -936,10 +977,12 @@ export class Session {
         return this.expeditionClose(args.merge !== false && args.merge !== "false");
       case "se_note_drain":
         return drainNote(seDir(this.root), String(args.ref ?? ""), String(args.disposition ?? ""), args.where === undefined ? undefined : String(args.where));
+      case "se_reload":
+        return this.requestReload();
       default:
         throw new Rejection({
           clause: CLAUSES.NOT_LEGAL_IN_STATE,
-          expected: "a human-callable tool: se_exp_new, se_exp_close, se_note_drain",
+          expected: "a human-callable tool: se_exp_new, se_exp_close, se_note_drain, se_reload",
           got: name,
           remedy: { tool: "se_tick", args: {}, note: "the state's other tools are the agent's lane" },
           source: "engine/session.ts parity",
