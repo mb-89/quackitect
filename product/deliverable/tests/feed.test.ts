@@ -138,9 +138,14 @@ test("the unified feed derives src, type and brief — and the mirror carries th
   const withLog = renderMirror({ session, root, lastPacket: undefined, mode: "manual", log });
   assert.ok(withLog.includes('id="w-log"'));
   assert.ok(withLog.includes('id="log-filter"'));
-  // The slider carries the authored levels as notches (shortcuts + help).
+  // The slider carries the authored levels as notches (shortcuts + help);
+  // the killer anchor sits at 0.9, ideation at 1.
   assert.ok(withLog.includes("thr-notch"));
   assert.ok(withLog.includes('id="thr-ticks"'));
+  assert.ok(withLog.includes('data-level="0.9"'));
+  // Parity surfaces: the modal, the human note input.
+  assert.ok(withLog.includes('id="modal"'));
+  assert.ok(withLog.includes('id="log-note"'));
   const bare = renderMirror({ session, root, lastPacket: undefined, mode: "manual" });
   assert.ok(!bare.includes('id="w-log"'));
   // The client script must PARSE — a syntax error would kill the whole

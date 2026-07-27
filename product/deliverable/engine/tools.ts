@@ -309,7 +309,7 @@ export function coreTools(rootOf: () => string, projectRoot: string): ToolDef[] 
         properties: { text: { type: "string" } },
         required: ["text"],
       },
-      handler: (args) => appendNote(seDir(projectRoot), String(args.text)),
+      handler: (args) => appendNote(seDir(projectRoot), String(args.text), "agent"),
     },
     {
       name: "se_log_query",

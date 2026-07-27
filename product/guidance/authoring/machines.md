@@ -126,9 +126,12 @@ The scale (calibrate against these anchors, don't invent new bands):
   undo: starting an expedition, choosing which one to continue.
 - **0.75 — consequential.** Hard to undo or shapes what follows: closing
   and merging an expedition, accepting a design.
-- **1 — killer / milestone.** The decisions the whole walk exists to
-  surface. Priority 1 does NOT mean "always human" — it means the human
-  holds it until they deliberately slide to 1.
+- **0.9 — killer / milestone.** The decisions the whole walk exists to
+  surface. 0.9 does NOT mean "always human" — it means the human holds it
+  until they deliberately slide there.
+- **1 — ideation.** No state carries priority 1; it is the slider's last
+  notch. At 1 the agent, left idle, finds its own work — pending notes,
+  backlog, research. (The behavior ships later; until then 1 acts as 0.9.)
 
 A sub-machine state's priority lives in the SUB-CANVAS's
 `metadata.frontmatter.priority` (the canvas is the state); the compiler

@@ -82,7 +82,9 @@ export function search(
 
 function rgSearch(root: string, query: string, opts: { path?: string; ignore_case?: boolean }): Match[] {
   const scope = opts.path === undefined ? resolve(root) : resolveInRoot(root, opts.path, "engine/search.ts");
-  const args = ["--line-number", "--no-heading", "--max-count", String(PER_FILE_CAP), "--max-columns", String(LINE_CAP)];
+  // --with-filename: rg drops the filename for a single-file scope, which
+  // starved the path:line:text parser — every match silently vanished.
+  const args = ["--line-number", "--no-heading", "--with-filename", "--max-count", String(PER_FILE_CAP), "--max-columns", String(LINE_CAP)];
   for (const d of [".se", "node_modules", ".worktrees"]) args.push("--glob", `!${d}/**`);
   if (opts.ignore_case === true) args.push("--ignore-case");
   args.push("--regexp", query, scope);

@@ -772,6 +772,44 @@ export class Session {
     return this.entryRequirements(m, t).every((p) => this.readProven("human", p, {}));
   }
 
+  /** WHAT still blocks the human's entry into `t` — the locked button's
+   *  tooltip names these instead of a bare "not met". */
+  entryMissingHuman(m: MachineDecl, t: StateDecl): string[] {
+    const out: string[] = [];
+    for (const [k, st] of Object.entries(this.conditionStatus(m, t, "enter") ?? {})) {
+      if (!st.met && k !== "read") out.push(`condition ${k}`);
+    }
+    for (const p of this.entryRequirements(m, t)) {
+      if (!this.readProven("human", p, {})) out.push(`read ${p}`);
+    }
+    return out;
+  }
+
+  /** The mirror's tool click (the HTML-parity law: the human can run the
+   *  machine alone). Same state gate the agent faces; a FIXED dispatch —
+   *  never arbitrary execution. */
+  humanTool(name: string, args: Record<string, unknown>): Record<string, unknown> {
+    this.gate(name);
+    switch (name) {
+      case "se_exp_new":
+        return this.expeditionNew(String(args.kind ?? ""), String(args.goal ?? ""));
+      case "se_exp_list":
+        return this.expeditionList();
+      case "se_exp_open":
+        return this.expeditionOpen(String(args.id ?? ""));
+      case "se_exp_close":
+        return this.expeditionClose(args.merge !== false && args.merge !== "false");
+      default:
+        throw new Rejection({
+          clause: CLAUSES.NOT_LEGAL_IN_STATE,
+          expected: "a human-callable tool: se_exp_new, se_exp_list, se_exp_open, se_exp_close",
+          got: name,
+          remedy: { tool: "se_tick", args: {}, note: "the state's other tools are the agent's lane" },
+          source: "engine/session.ts parity",
+        });
+    }
+  }
+
   /** THE PULL — derived, never authored; see engine/pull.ts. Re-scanned
    *  every time (no cache): an edited doc must show its fresh hash, or a
    *  stale check could pass forever. `checked` is the human's ledger. */
