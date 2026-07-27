@@ -3,7 +3,7 @@
 // one coming home completes the machine; empty runs start → end.
 import { strict as assert } from "node:assert";
 import { spawnSync } from "node:child_process";
-import { mkdirSync, writeFileSync } from "node:fs";
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { test } from "node:test";
 import { generateContinueExpedition, generateExpeditionArchive, shortId } from "../engine/expmachine.ts";
@@ -109,4 +109,20 @@ test("the archive: start reaches every closed expedition, each runs to end, brow
   assert.ok(gen.canvas.edges!.some((e) => e.fromNode === "n-start" && e.toNode === `n-${sid}`), "the drawing carries start → expedition");
   const empty = generateExpeditionArchive(join(root, ".no-such"));
   assert.deepEqual(empty.decl.states[0].edges.map((e) => e.to), ["end"], "nothing closed: start runs straight to end");
+  // The MERGED record is the truth: a retro flip on the main tree shows
+  // on the next open — the branch copy is frozen at close.
+  const recAbs = join(root, "product", "spec", "expeditions", a.created, "record.md");
+  writeFileSync(recAbs, readFileSync(recAbs, "utf8").replace(/^goal: .*$/m, 'goal: "Amended Goal"'), "utf8");
+  const amended = generateExpeditionArchive(root);
+  assert.equal(amended.decl.states.find((x) => x.id === sid)?.statement, "Amended Goal", "the archive reads the merged copy fresh");
+});
+
+test("forms are viewable unbound: formGet returns the template preview", () => {
+  const root = freshRoot();
+  const s = new Session(root);
+  const f = s.formGet("expedition-leave") as { preview?: boolean; status: string; met: boolean; fields: { name: string }[] };
+  assert.equal(f.preview, true);
+  assert.equal(f.status, "template");
+  assert.equal(f.met, false);
+  assert.ok(f.fields.length >= 4, "the template's fields ride the preview");
 });

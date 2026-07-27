@@ -13,6 +13,8 @@
 //   - geometry-true SVG, wheel-zoom, drag-pan; JSON as key/value tables
 // One source, two projections: the packet JSON shown here IS what the
 // agent receives.
+import { readdirSync } from "node:fs";
+import { join } from "node:path";
 import { loadCanvas, type CanvasData, type CanvasElement } from "./canvas.ts";
 import { CallLog, type CallRecord } from "./calllog.ts";
 import { type StrayNote } from "./inbox.ts";
@@ -434,6 +436,12 @@ document.addEventListener("click", async (ev) => {
     refreshLog();
     return;
   }
+  const fb = ev.target.closest ? ev.target.closest("#forms-btn") : null;
+  if (fb) {
+    openModal("evidence forms", '<div class="comment-detail">Every form template. Click one to see its page — the bound expedition’s instance when one is open, the blank template otherwise.</div>' +
+      ((D.forms || []).map((n) => '<div style="padding:4px 0"><button class="ghost openform" data-form="' + n + '">' + escText(n) + "</button></div>").join("") || '<div class="vnull">no form templates</div>'));
+    return;
+  }
   const eb = ev.target.closest ? ev.target.closest("#escape-btn") : null;
   if (eb) {
     openModal("escape — to idle", '<div class="comment-text">The machine is left standing; a later continue re-enters it. The reason is recorded as a failure.</div><textarea class="formfield" id="escape-reason" placeholder="why the walk cannot continue"></textarea><div style="padding:10px 0"><button class="primary" id="escape-go">escape</button></div>');
@@ -619,20 +627,24 @@ async function showForm(name) {
       (f.remedy && f.remedy.note ? '<div class="comment-text">' + escText(f.remedy.note) + "</div>" : ""));
     return;
   }
+  const ro = f.preview === true;
   let html = '<div class="comment-text">' + escText(f.statement || "") + "</div>";
-  html += '<div class="meta">' + escText(f.instance) + " · status: " + escText(f.status) + (f.met ? ' · <span style="color:#4a7a55">✓ passes</span>' : "") + "</div>";
+  html += '<div class="meta">' + escText(f.instance) + (ro ? " · template preview — filling happens inside an expedition" : " · status: " + escText(f.status) + (f.met ? ' · <span style="color:#4a7a55">✓ passes</span>' : "")) + "</div>";
   (f.fields || []).forEach((fl) => {
     html += '<div style="padding:8px 0 2px"><b>' + escText(fl.name) + "</b>" + (fl.required ? ' <span style="color:#e8b339">required</span>' : "") + "</div>";
     html += '<div class="comment-text">' + escText(fl.description) + "</div>";
+    if (ro) return;
     (fl.prefills || []).forEach((p, i) => {
       html += '<div class="prefill"><div class="comment-text">prefill — unconfirmed:</div><div>' + escText(p) + '</div><button class="primary confirmpre" data-form="' + name + '" data-field="' + escText(fl.name) + '" data-index="' + i + '">confirm</button></div>';
     });
     html += '<textarea class="formfield" data-field="' + escText(fl.name) + '">' + escText(fl.content) + "</textarea>";
   });
-  html += '<div class="meta" style="padding:6px 0 2px">files — <a class="doclink openfolder" data-form="' + name + '">open ' + escText(f.evidence_dir) + "</a></div>";
-  (f.files || []).forEach((fi) => { html += "<div>" + (fi.present ? "✓ " : '<span style="color:#e86a5f">✗ </span>') + escText(fi.name) + "</div>"; });
-  if (f.problems && f.problems.length) html += '<div style="color:#e8b339;padding:6px 0">' + f.problems.map(escText).join("<br>") + "</div>";
-  html += '<div style="padding:10px 0"><button class="primary saveform" data-form="' + name + '">save</button> <button class="primary doneform" data-form="' + name + '" title="sets status done and runs the lint">done</button></div>';
+  if (!ro) {
+    html += '<div class="meta" style="padding:6px 0 2px">files — <a class="doclink openfolder" data-form="' + name + '">open ' + escText(f.evidence_dir) + "</a></div>";
+    (f.files || []).forEach((fi) => { html += "<div>" + (fi.present ? "✓ " : '<span style="color:#e86a5f">✗ </span>') + escText(fi.name) + "</div>"; });
+    if (f.problems && f.problems.length) html += '<div style="color:#e8b339;padding:6px 0">' + f.problems.map(escText).join("<br>") + "</div>";
+    html += '<div style="padding:10px 0"><button class="primary saveform" data-form="' + name + '">save</button> <button class="primary doneform" data-form="' + name + '" title="sets status done and runs the lint">done</button></div>';
+  }
   openModal("form · " + name, html);
 }
 async function formPost(path, body) {
@@ -1058,6 +1070,14 @@ export function renderMirror(m: MirrorState, widget?: "machine" | "details" | "l
     };
   }
   const comment = (canvas.nodes ?? []).find((n) => n.type === "text")?.text ?? "";
+  // Every form template rides the page — viewable from anywhere (owner
+  // ruling: forms may be inspected even when no gate demands them).
+  let forms: string[] = [];
+  try {
+    forms = readdirSync(join(m.session.workRoot(), "product", "deliverable", "machines", "forms")).filter((f) => f.endsWith(".md")).map((f) => f.slice(0, -3)).sort();
+  } catch {
+    forms = [];
+  }
   const data = `<script>window.SE_DATA = ${JSON.stringify({
     describe: m.session.describe(),
     packet: m.session.tickInfo(),
@@ -1065,6 +1085,7 @@ export function renderMirror(m: MirrorState, widget?: "machine" | "details" | "l
     states,
     comment,
     viewingWalk,
+    forms,
     viewed: { id: decl.id, reentry: decl.reentry, initial: decl.initial, states: decl.states.map((s) => s.id) },
     history: history.slice(-20),
     levels,
@@ -1085,7 +1106,7 @@ export function renderMirror(m: MirrorState, widget?: "machine" | "details" | "l
   // sub-machine other than boot is being walked.
   const crumbTrail = m.session.breadcrumb();
   const escapeBtn = crumbTrail.length > 1 && crumbTrail[1] !== "boot" ? `<button class="ghost" id="escape-btn" title="escape to idle — the machine is left standing, the reason is recorded">⤴ escape</button>` : "";
-  const machineWidget = `<div class="widget" id="w-machine"><div class="widget-head"><span class="crumbs">${crumbs}</span><span style="display:flex;align-items:center;gap:10px">${slider}${sdBar}${escapeBtn}<button class="expand" data-widget="w-machine" data-url="/widget/machine?view=${encodeURIComponent(decl.id)}" title="expand · ctrl-click: new tab · shift-click: new window">⛶</button></span></div><div class="widget-body">${svg}</div></div>`;
+  const machineWidget = `<div class="widget" id="w-machine"><div class="widget-head"><span class="crumbs">${crumbs}</span><span style="display:flex;align-items:center;gap:10px">${slider}${sdBar}${escapeBtn}<button class="ghost" id="forms-btn" title="evidence forms — view any template, requested or not">forms</button><button class="expand" data-widget="w-machine" data-url="/widget/machine?view=${encodeURIComponent(decl.id)}" title="expand · ctrl-click: new tab · shift-click: new window">⛶</button></span></div><div class="widget-body">${svg}</div></div>`;
   const detailsWidget = `<div class="widget" id="w-details">${widgetHead("details", "w-details", "/widget/details")}
     ${info.status === "closed" ? '<div class="meta" style="color:#e86a5f">machine closed</div>' : ""}
     <div class="meta" id="details-title">—</div>
