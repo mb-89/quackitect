@@ -276,13 +276,13 @@ export class Session {
         clause: CLAUSES.NOT_LEGAL_IN_STATE,
         expected: "a bound expedition",
         got: "none open",
-        remedy: { tool: "se_exp_list", args: {}, note: "open one first" },
+        remedy: { tool: "se_tick", args: {}, note: "enter the expedition via continue_expedition first" },
         source: "engine/session.ts expedition",
       });
     }
     const result = expClose(this.root, this.bound, merge);
     this.unbind();
-    return { ...result, note: merge ? "merged back — iterations will replace this with design-input handover" : "left unmerged; the branch is the archive record" };
+    return { ...result, note: merge ? "applied — merged to trunk, archived" : "dismissed — archived unmerged" };
   }
 
   private unbind(): void {
@@ -519,7 +519,7 @@ export class Session {
         clause: CLAUSES.CONDITION_UNMET,
         expected: "a bound expedition — evidence forms live in its record",
         got: "no expedition bound",
-        remedy: { tool: "se_exp_list", args: {}, note: "open the expedition first (continue_expedition binds the lane)" },
+        remedy: { tool: "se_tick", args: {}, note: "open the expedition first (continue_expedition binds the lane)" },
         source: "engine/session.ts forms",
       });
     }
@@ -812,6 +812,8 @@ export class Session {
     const req = new Set<string>(t.entry?.read ?? []);
     if (!this.pullGateExempt(m, t)) {
       for (const d of pulledFor(this.root, scanGuidance(this.root), m, t)) req.add(d.path);
+      // A left-behind handover is part of idle's entry reading.
+      if (t.id === "idle" && existsSync(join(seDir(this.root), "HANDOVER.md"))) req.add(".se/HANDOVER.md");
     }
     for (const p of t.exit?.read ?? []) req.delete(p);
     return [...req];
@@ -899,10 +901,6 @@ export class Session {
     switch (name) {
       case "se_exp_new":
         return this.expeditionNew(String(args.kind ?? ""), String(args.goal ?? ""));
-      case "se_exp_list":
-        return this.expeditionList();
-      case "se_exp_open":
-        return this.expeditionOpen(String(args.id ?? ""));
       case "se_exp_close":
         return this.expeditionClose(args.merge !== false && args.merge !== "false");
       case "se_note_drain":
@@ -910,7 +908,7 @@ export class Session {
       default:
         throw new Rejection({
           clause: CLAUSES.NOT_LEGAL_IN_STATE,
-          expected: "a human-callable tool: se_exp_new, se_exp_list, se_exp_open, se_exp_close, se_note_drain",
+          expected: "a human-callable tool: se_exp_new, se_exp_close, se_note_drain",
           got: name,
           remedy: { tool: "se_tick", args: {}, note: "the state's other tools are the agent's lane" },
           source: "engine/session.ts parity",
@@ -922,10 +920,19 @@ export class Session {
    *  every time (no cache): an edited doc must show its fresh hash, or a
    *  stale check could pass forever. `checked` is the human's ledger. */
   pulled(m: MachineDecl, s: StateDecl): (PulledDoc & { checked: boolean })[] {
-    return pulledFor(this.root, scanGuidance(this.root), m, s).map((d) => {
+    const out = pulledFor(this.root, scanGuidance(this.root), m, s).map((d) => {
       const hash = d.hash !== "" ? d.hash : this.diskHash(d.path);
       return { ...d, hash, checked: this.humanChecked(d.path, hash) };
     });
+    // THE HANDOVER (owner ruling 2026-07-27): if a previous session left
+    // one, entering idle demands it read — same proof as any pulled doc.
+    // Absent, nothing is demanded; writing one stays a judgment call.
+    if (s.id === "idle" && existsSync(join(seDir(this.root), "HANDOVER.md"))) {
+      const rel = ".se/HANDOVER.md";
+      const hash = this.diskHash(rel);
+      out.push({ path: rel, sources: ["handover"], hash, checked: this.humanChecked(rel, hash) });
+    }
+    return out;
   }
 
   private assertStanding(stateId: string): void {

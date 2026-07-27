@@ -209,7 +209,7 @@ test("the mirror over HTTP: slider served, POST /autonomy moves the gate, /api/a
     assert.equal(noted.status, 303);
     const feed = await (await fetch(base + "/api/log")).json() as { rows: { type: string; src: string; brief: string }[] };
     assert.ok(feed.rows.some((r) => r.type === "note" && r.src === "human" && r.brief.includes("a human stray")));
-    const tool = await (await fetch(base + "/tool", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ name: "se_exp_list", args: {} }) })).json() as { clause?: string };
+    const tool = await (await fetch(base + "/tool", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ name: "se_exp_new", args: {} }) })).json() as { clause?: string };
     assert.equal(tool.clause, "SE-C-110", "the parity lane obeys the state gate");
   } finally {
     server.close();

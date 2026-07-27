@@ -2,7 +2,7 @@
 // checkboxes the human's — one check per doc VERSION. An edited doc
 // unchecks itself; a stale hash proves a stale read.
 import { strict as assert } from "node:assert";
-import { appendFileSync } from "node:fs";
+import { appendFileSync, mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { test } from "node:test";
 import { renderMirror } from "../engine/render.ts";
@@ -27,6 +27,29 @@ test("a check pins the VERSION: editing the doc unchecks it and the gate asks ag
   s.humanCheck("product/guidance/voice.md");
   await s.tickAdvance("start_expedition");
   assert.deepEqual(s.active(), ["start_expedition/start"]);
+});
+
+test("THE HANDOVER: a left-behind .se/HANDOVER.md is demanded at idle entry — absent, nothing is", async () => {
+  const root = freshRoot();
+  mkdirSync(join(root, ".se"), { recursive: true });
+  writeFileSync(join(root, ".se", "HANDOVER.md"), "# Handover\n\nOpen threads for the next session.\n", "utf8");
+  const server = buildServer(root);
+  const hashes = readHashesFor(root);
+  let last: Awaited<ReturnType<typeof call>> | undefined;
+  for (let i = 0; i < 8; i++) {
+    last = await call(server, "se_tick", { advance: true, read_hashes: hashes });
+    if (last.isError === true || last.body.booted === true) break;
+  }
+  // The boot's last advance lands on idle — refused until the handover rides the proof.
+  assert.equal(last!.isError, true);
+  assert.equal(last!.body.clause, "SE-C-112");
+  assert.match(String(last!.body.expected), /HANDOVER/);
+  const { contentHash } = await import("../engine/hash.ts");
+  const { readFileSync } = await import("node:fs");
+  const withHandover = { ...hashes, ".se/HANDOVER.md": contentHash(readFileSync(join(root, ".se", "HANDOVER.md"))) };
+  const entered = await call(server, "se_tick", { advance: true, read_hashes: withHandover });
+  assert.equal(entered.isError, false, JSON.stringify(entered.body));
+  assert.equal(entered.body.booted, true);
 });
 
 test("a stale agent hash proves a stale read: the edited doc must be re-read for a fresh token", async () => {

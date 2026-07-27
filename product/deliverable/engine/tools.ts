@@ -88,24 +88,10 @@ export function expeditionTools(session: Session): ToolDef[] {
       handler: (args) => session.expeditionNew(String(args.kind), String(args.goal)),
     },
     {
-      name: "se_exp_list",
-      title: "se.exp.list",
-      description: "Expeditions: open (worktree exists) and archive (merged/closed branches).",
-      inputSchema: { type: "object", properties: {} },
-      handler: () => session.expeditionList(),
-    },
-    {
-      name: "se_exp_open",
-      title: "se.exp.open",
-      description: "Bind the lane to an open expedition — file, search and run tools work in its worktree until you leave the machine or close it.",
-      inputSchema: { type: "object", properties: { id: { type: "string" } }, required: ["id"] },
-      handler: (args) => session.expeditionOpen(String(args.id)),
-    },
-    {
       name: "se_exp_close",
       title: "se.exp.close",
-      description: "Close the bound expedition: leftover changes are committed, the branch merges back (merge: false leaves it unmerged in the archive), the worktree is removed.",
-      inputSchema: { type: "object", properties: { merge: { type: "boolean", description: "default true — the bootstrap behavior until iterations receive changes as design input" } } },
+      description: "Close the bound expedition — the close IS the ruling: apply (merge: true, default) merges the changes to trunk, then archives; dismiss (merge: false) archives the branch unmerged. Leftovers are committed either way; the worktree is removed.",
+      inputSchema: { type: "object", properties: { merge: { type: "boolean", description: "true = apply (default); false = dismiss" } } },
       handler: (args) => session.expeditionClose(args.merge !== false),
     },
   ];

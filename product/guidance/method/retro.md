@@ -1,6 +1,6 @@
 ---
 id: method-retro
-statement: The retro — look back, drain the inbox, walk the backlog, adjudicate reports, emit durable improvements.
+statement: The retro — look back, drain the inbox, walk the backlog, emit durable improvements.
 ---
 
 # retro — the method
@@ -27,12 +27,7 @@ The trigger is a NOTE carrying "needs retro":
 
 1. Field feedback — open with it. Ask the owner what came back from the
    field since the last look. Capture every answer as a note.
-2. Adjudicate pending expedition reports. Present each pending report.
-   The owner rules per report:
-   - APPLY — the findings become design input. The record flips to
-     report: approved.
-   - DISMISS — read, no action. The record flips to report: dismissed.
-3. Drain the notes inbox. Walk EVERY pending note once. Disposition each
+2. Drain the notes inbox. Walk EVERY pending note once. Disposition each
    with se_note_drain — route it to exactly ONE home:
    - done — shipped or handled; say where.
    - obsolete — overtaken, wrong, or durably rejected; say why, so it is
@@ -42,22 +37,22 @@ The trigger is a NOTE carrying "needs retro":
    - backlog — future scope. where is REQUIRED: "ready when …" names the
      re-entry condition.
    Nothing stays pending after a retro.
-4. Walk the backlog (migration). Every parked note (disposition backlog
+3. Walk the backlog (migration). Every parked note (disposition backlog
    in .se/notes.jsonl): keep it (condition still unmet), pull it
    (re-drain as carried, into this round's scope), or drop it (re-drain
    as obsolete, reason recorded). Re-draining IS the migration mechanism.
-5. Hunt wasted effort. Rework, reversals, avoidable refactors,
+4. Hunt wasted effort. Rework, reversals, avoidable refactors,
    reinventing instead of reusing. Each one is a lead.
-6. Mine the record SINCE THE LAST RETRO — never the whole log.
+5. Mine the record SINCE THE LAST RETRO — never the whole log.
    se_log_query with filter {since: "last_retro"} scopes every query to
    what happened after the newest drain call. Rank refusal clauses by
    frequency; top tools; failure rates. A command that keeps failing or
    a refusal that keeps firing is a lead — the fix may be a tool, a
    refusal, or better guidance. The raw log is KEPT (owner ruling:
    forever-until-1GB; a garbage collector may harvest it later).
-7. Tally the previous retro's improvements. Promote the wins. Dismiss the
+6. Tally the previous retro's improvements. Promote the wins. Dismiss the
    duds WITH the reason recorded, so a dud is never re-proposed.
-8. Aim every improvement at a durable home: guidance, a machine, a
+7. Aim every improvement at a durable home: guidance, a machine, a
    condition note, a form template, an engine refusal. Emit only the few
    highest-leverage notes. Each one specific and checkable — a concrete
    change, never "improve X".
@@ -70,7 +65,7 @@ The trigger is a NOTE carrying "needs retro":
   whenever" is one tick away, inside the machine's discipline.
 - backlog notes stay on file (.se/notes.jsonl, disposition backlog) —
   the migration step re-drains them when their "ready when" comes true.
-- Report flips (approved | dismissed) are edits to the record's
-  frontmatter — markdown, human-editable, the truth.
+- Expedition reports are ruled AT CLOSE (applied | dismissed), not here —
+  the retro is out of the expedition loop (owner ruling 2026-07-27).
 - se_log_query is the query lane. Never an ad-hoc script.
   since: "last_retro" scopes it to the current retro period.

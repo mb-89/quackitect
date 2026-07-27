@@ -401,9 +401,7 @@ document.addEventListener("click", (ev) => {
 // takes the arguments and shows the result in place.
 const HUMAN_TOOLS = {
   se_exp_new: [{ name: "kind", hint: "spike | fix | explore" }, { name: "goal", hint: "what this expedition is after", long: true }],
-  se_exp_list: [],
-  se_exp_open: [{ name: "id", hint: "an open expedition id (se_exp_list shows them)" }],
-  se_exp_close: [{ name: "merge", hint: "true merges back (default); false archives unmerged" }],
+  se_exp_close: [{ name: "merge", hint: "true = apply: merge to trunk (default); false = dismiss: archive unmerged" }],
   se_note_drain: [{ name: "ref", hint: "the note's ref (note-…) — the feed shows it" }, { name: "disposition", hint: "done | obsolete | carried | backlog" }, { name: "where", hint: "where it landed or lives on — backlog REQUIRES it: ready when …" }],
 };
 function toolModal(name) {
