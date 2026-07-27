@@ -314,13 +314,13 @@ export function coreTools(rootOf: () => string, projectRoot: string): ToolDef[] 
     {
       name: "se_note_drain",
       title: "se.note.drain",
-      description: "The retro's mechanical half: mark a note drained with its disposition (done | obsolete | carried — where? names the follow-up home). Drained notes leave the inbox count and the pending feed. An unknown ref is refused.",
+      description: "The retro's mechanical half: mark a note drained with its disposition (done | obsolete | carried | backlog — where? names the follow-up home). backlog PARKS the note: where is REQUIRED as its 'ready when …' re-entry condition, and a later migration re-drains it. Drained notes leave the inbox count and the pending feed. An unknown ref is refused.",
       inputSchema: {
         type: "object",
         properties: {
           ref: { type: "string", description: "the note's ref (note-…)" },
-          disposition: { type: "string", description: "done | obsolete | carried" },
-          where: { type: "string", description: "for done/carried: where it landed or lives on" },
+          disposition: { type: "string", description: "done | obsolete | carried | backlog" },
+          where: { type: "string", description: "where it landed or lives on — backlog REQUIRES it: ready when …" },
         },
         required: ["ref", "disposition"],
       },
@@ -334,7 +334,7 @@ export function coreTools(rootOf: () => string, projectRoot: string): ToolDef[] 
         type: "object",
         properties: {
           ref: { type: "string", description: "fetch one record in full by ref" },
-          filter: { type: "object", description: "{tool?, ok?, since?}" },
+          filter: { type: "object", description: "{tool?, ok?, since?} — since: an ISO timestamp, or 'last_retro' (everything after the newest drain call)" },
           group_by: { type: "string", description: "e.g. 'tool' or 'outcome'" },
           limit: { type: "number", default: 20 },
         },

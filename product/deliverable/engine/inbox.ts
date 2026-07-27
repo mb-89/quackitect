@@ -15,7 +15,8 @@ export interface StrayNote {
   at: string;
   /** Whose hand captured it — agent | human (absent on old notes = agent). */
   by?: string;
-  /** Set by a retro's disposition — a drained note leaves the inbox. */
+  /** Set by a retro's disposition — a drained note leaves the inbox.
+   *  backlog PARKS it: a later migration re-drains it. */
   drained?: { at: string; disposition: string; where?: string };
 }
 
@@ -36,9 +37,30 @@ export function pendingNotes(seDirPath: string): StrayNote[] {
   return readNotes(seDirPath).filter((n) => n.drained === undefined);
 }
 
+const DISPOSITIONS = ["done", "obsolete", "carried", "backlog"];
+
 /** The retro's mechanical half (v2's req-retro-drain): disposition a note;
- *  drained notes leave the inbox count. An unknown ref is refused. */
+ *  drained notes leave the inbox count. An unknown ref is refused.
+ *  Re-draining is legal — that IS the backlog migration mechanism. */
 export function drainNote(seDirPath: string, ref: string, disposition: string, where?: string): { drained: string; disposition: string; inbox: number } {
+  if (!DISPOSITIONS.includes(disposition)) {
+    throw new Rejection({
+      clause: CLAUSES.REQUIRED_ARGS,
+      expected: `disposition: ${DISPOSITIONS.join(" | ")}`,
+      got: JSON.stringify(disposition),
+      remedy: { tool: "se_note_drain", args: { ref, disposition: "done" }, note: "backlog parks the note for a later migration — where: 'ready when …' is then required" },
+      source: "engine/inbox.ts drain",
+    });
+  }
+  if (disposition === "backlog" && (where === undefined || where.trim() === "")) {
+    throw new Rejection({
+      clause: CLAUSES.REQUIRED_ARGS,
+      expected: "where: 'ready when …' — the parked note's re-entry condition",
+      got: "no where",
+      remedy: { tool: "se_note_drain", args: { ref, disposition: "backlog", where: "ready when <condition>" }, note: "a parked note without a re-entry condition is never re-entered" },
+      source: "engine/inbox.ts drain",
+    });
+  }
   const all = readNotes(seDirPath);
   const hit = all.find((n) => n.ref === ref);
   if (hit === undefined) {
@@ -46,13 +68,18 @@ export function drainNote(seDirPath: string, ref: string, disposition: string, w
       clause: CLAUSES.NOTE_UNKNOWN,
       expected: "an existing note ref",
       got: ref,
-      remedy: { tool: "se_note_drain", args: { ref: "<a ref from the pending list>", disposition: "done | obsolete | carried" }, note: "the mirror's feed (filter: note) and .se/notes.jsonl carry the refs" },
+      remedy: { tool: "se_note_drain", args: { ref: "<a ref from the pending list>", disposition: "done | obsolete | carried | backlog" }, note: "the mirror's feed (filter: note) and .se/notes.jsonl carry the refs" },
       source: "engine/inbox.ts drain",
     });
   }
   hit.drained = { at: new Date().toISOString(), disposition, ...(where !== undefined && where !== "" ? { where } : {}) };
   writeFileSync(notesPath(seDirPath), all.map((n) => JSON.stringify(n)).join("\n") + "\n", "utf8");
   return { drained: ref, disposition, inbox: all.filter((n) => n.drained === undefined).length };
+}
+
+/** BACKLOG = parked notes — the retro's migration step walks these. */
+export function backlogNotes(seDirPath: string): StrayNote[] {
+  return readNotes(seDirPath).filter((n) => n.drained !== undefined && n.drained.disposition === "backlog");
 }
 
 export function readNotes(seDirPath: string): StrayNote[] {

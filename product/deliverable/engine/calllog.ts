@@ -69,11 +69,20 @@ export class CallLog {
   }): { total: number; groups?: Record<string, number>; records?: CallRecord[] } {
     const dig = (obj: unknown, path: string): unknown =>
       path.split(".").reduce<unknown>((v, k) => (v && typeof v === "object" ? (v as Record<string, unknown>)[k] : undefined), obj);
-    const records = this.records().filter((rec) => {
-      const f = q.filter ?? {};
+    const all = this.records();
+    const f = q.filter ?? {};
+    // since: "last_retro" — the newest drain call marks the previous retro;
+    // the retro mines only its own period (the raw log is kept, owner
+    // ruling: forever-until-1GB, a garbage collector may harvest later).
+    let since = f.since;
+    if (since === "last_retro") {
+      const drains = all.filter((r) => r.tool === "se_note_drain" && r.ok);
+      since = drains.length > 0 ? drains[drains.length - 1].ts : undefined;
+    }
+    const records = all.filter((rec) => {
       if (f.tool !== undefined && rec.tool !== f.tool) return false;
       if (f.ok !== undefined && rec.ok !== f.ok) return false;
-      if (f.since !== undefined && rec.ts < f.since) return false;
+      if (since !== undefined && rec.ts < since) return false;
       return true;
     });
     if (q.group_by !== undefined) {
