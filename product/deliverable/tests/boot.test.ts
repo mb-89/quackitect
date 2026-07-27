@@ -329,16 +329,16 @@ test("expeditions: worktree lifecycle — new, bind, work lands in the worktree,
   assert.equal(closed.merged, true);
   assert.equal(s.workRoot(), root);
   assert.equal(readFileSync(join(root, "scratch.md"), "utf8"), "expedition work");
-  // The merged record reads closed + report pending on the main tree —
-  // the retro adjudicates it later.
+  // The merged record reads closed + report applied on the main tree —
+  // the close IS the ruling (owner 2026-07-27).
   const rec = readFileSync(join(root, "product", "spec", "expeditions", minted.created, "record.md"), "utf8");
   assert.match(rec, /^status: closed$/m);
-  assert.match(rec, /^report: pending$/m);
+  assert.match(rec, /^report: applied$/m);
   assert.equal((s.expeditionList() as { open: unknown[] }).open.length, 0);
   const arch = (s.expeditionList() as { archive: { id: string; status?: string; report?: string }[] }).archive;
   assert.equal(arch[0].id, minted.created);
   assert.equal(arch[0].status, "closed");
-  assert.equal(arch[0].report, "pending");
+  assert.equal(arch[0].report, "applied");
 });
 
 test("escape goes to idle and only to idle: the walk is left standing, the reason is recorded, boot is exempt", async () => {

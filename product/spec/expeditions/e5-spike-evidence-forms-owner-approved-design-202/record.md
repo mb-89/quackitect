@@ -4,7 +4,7 @@ kind: spike
 status: closed
 opened: 2026-07-27T13:20:00.000Z
 closed: 2026-07-27T13:40:00.000Z
-report: dismissed
+report: applied
 goal: "Evidence forms, owner-approved design 2026-07-27: condition type evidence_form (template-referenced A3-style one-pagers), the mechanical lint, the prefill law, the expedition-leave form unified with the report, the mirror fill flow."
 ---
 

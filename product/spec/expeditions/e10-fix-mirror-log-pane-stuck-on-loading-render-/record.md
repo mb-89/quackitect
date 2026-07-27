@@ -3,7 +3,7 @@ id: e10-fix-mirror-log-pane-stuck-on-loading-render-
 kind: fix
 status: closed
 closed: 2026-07-27T16:01:19.044Z
-report: pending
+report: applied
 opened: 2026-07-27T15:24:07.486Z
 goal: "Mirror log pane stuck on loading (render.ts arrow typo breaks renderLog) + legal tools rendered as a kv table row, one line per tool"
 ---

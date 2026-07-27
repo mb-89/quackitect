@@ -1,8 +1,8 @@
 // Expeditions — ad hoc work as git worktrees (the context-manager model):
 // entering creates a worktree on its own branch, continuing binds the lane
-// to it, leaving merges back (until iterations exist to receive the
-// changes as design input). The worktree IS the record; the archive is
-// git history (merged exp/* branches).
+// to it, and the CLOSE IS THE RULING (owner 2026-07-27): apply merges the
+// changes to trunk, dismiss archives the branch unmerged. The worktree IS
+// the record; the archive is git history (exp/* branches).
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { spawnSync } from "node:child_process";
@@ -141,21 +141,21 @@ export function expFind(root: string, id: string): Expedition {
       clause: CLAUSES.PATH_ESCAPE,
       expected: `an OPEN expedition: ${open.join(", ") || "(none — start one first)"}`,
       got: id,
-      remedy: { tool: "se_exp_list", args: {}, note: "list the expeditions, then open one by id" },
+      remedy: { tool: "se_tick", args: {}, note: "continue_expedition lists the open expeditions — entering one binds it" },
       source: SRC,
     });
   }
   return e;
 }
 
-/** Close: commit leftovers, merge back (the bootstrap default until
- *  iterations exist), remove the worktree. Keep merge=false to archive
- *  the branch unmerged. */
+/** Close IS the ruling: apply (merge=true) merges the changes to trunk;
+ *  dismiss (merge=false) archives the branch unmerged. Leftovers are
+ *  committed either way; the worktree is removed. */
 export function expClose(root: string, e: Expedition, merge: boolean): { id: string; merged: boolean } {
   const recAbs = join(e.path, recordRel(e.id));
   if (existsSync(recAbs)) {
-    // The expedition ends with a REPORT (owner ruling 2026-07-27) — it
-    // stays `pending` on the record until a retro adjudicates it.
+    // The expedition ends with a REPORT (owner ruling 2026-07-27); the
+    // close ruling stamps it: applied (merged) or dismissed (unmerged).
     const repRel = `product/spec/expeditions/${e.id}/report.md`;
     if (!existsSync(join(e.path, repRel))) {
       throw new Rejection({
@@ -167,7 +167,7 @@ export function expClose(root: string, e: Expedition, merge: boolean): { id: str
       });
     }
     const raw = readFileSync(recAbs, "utf8");
-    writeFileSync(recAbs, raw.replace(/^status: open$/m, `status: closed\nclosed: ${new Date().toISOString()}\nreport: pending`), "utf8");
+    writeFileSync(recAbs, raw.replace(/^status: open$/m, `status: closed\nclosed: ${new Date().toISOString()}\nreport: ${merge ? "applied" : "dismissed"}`), "utf8");
   }
   // Leftover changes are committed — a walk's work never silently vanishes.
   const dirty = git(e.path, ["status", "--porcelain"], "status").trim() !== "";
