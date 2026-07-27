@@ -269,7 +269,7 @@ function conditionDict(machineId: string, ref: string, root: string, which: "ent
   return Object.keys(out).length > 0 ? out : undefined;
 }
 
-function stateFromNote(machineId: string, ref: string, notePath: string, root: string): StateDecl {
+export function stateFromNote(machineId: string, ref: string, notePath: string, root: string): StateDecl {
   const note = loadStateNote(notePath);
   const x = note.frontmatter;
   const stateId = asString(x.state);
