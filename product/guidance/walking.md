@@ -26,7 +26,10 @@ Narration rides the walk (the unified log + the decision graph):
 
 - `update: {...}` on ANY lane call carries a decision-graph op.
   - plan `{items}` starts the state's checklist.
-  - fork `{brief, items?}` opens an unplanned branch where you are.
+  - fork `{brief, items?}` opens an unplanned branch where you are — a
+    BLOCKING detour: the current item cannot continue until this is fixed;
+    resolve it and return. Extra work that merely grows the scope is not a
+    fork — append it to the checklist with another plan.
   - done | obsolete | revert `{node, brief}` resolves a node.
   - note `{brief, node?}` says what you are doing.
 - Everything started gets resolved. Abandoning is legal. Abandoning

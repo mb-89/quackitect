@@ -9,8 +9,9 @@ import { existsSync, readFileSync, statSync } from "node:fs";
 import { marked } from "marked";
 import { CallLog } from "./calllog.ts";
 import { Rejection } from "./errors.ts";
+import { readNotes } from "./inbox.ts";
 import { feedRows, renderMirror, type MirrorState } from "./render.ts";
-import { resolveInRoot } from "./paths.ts";
+import { resolveInRoot, seDir } from "./paths.ts";
 import { Session } from "./session.ts";
 
 export interface MirrorOptions {
@@ -106,10 +107,13 @@ export function startMirror(o: MirrorOptions): Server {
         const ref = url.searchParams.get("ref");
         res.writeHead(200, { "content-type": "application/json; charset=utf-8" });
         if (ref !== null) {
-          res.end(JSON.stringify(o.log.find(ref) ?? { missing: ref }));
+          // note- refs live in the inbox, not the call log — a pending
+          // stray's details come from its own record.
+          const rec = ref.startsWith("note-") ? readNotes(seDir(o.root)).find((n) => n.ref === ref) : o.log.find(ref);
+          res.end(JSON.stringify(rec ?? { missing: ref }));
           return;
         }
-        res.end(JSON.stringify(feedRows(o.log, state.session.startedTs)));
+        res.end(JSON.stringify(feedRows(o.log, state.session.startedTs, readNotes(seDir(o.root)))));
         return;
       }
       if (url.pathname === "/api/decisions") {

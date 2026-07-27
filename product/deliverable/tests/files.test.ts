@@ -1,7 +1,7 @@
 // The file lane's laws, each tested against the incident that ruled it.
 import { strict as assert } from "node:assert";
 import { spawnSync } from "node:child_process";
-import { mkdtempSync, readFileSync, writeFileSync } from "node:fs";
+import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { test } from "node:test";
@@ -144,6 +144,29 @@ test("ref search runs through git grep against a committed state (v2 parity)", (
   assert.equal(atRef.matches[0].path, "h.md");
   const inTree = search(root, "committed needle");
   assert.equal(inTree.total, 0);
+});
+
+test("ref READS reach committed states too: git show + ls-tree through the lane", () => {
+  const root = fresh();
+  const git = (...a: string[]) => {
+    const r = spawnSync("git", a, { cwd: root, encoding: "utf8" });
+    assert.equal(r.status, 0, `git ${a[0]}: ${r.stderr}`);
+  };
+  git("init", "-q", "-b", "main");
+  writeFileSync(join(root, "doc.md"), "the committed text\n");
+  git("add", "-A");
+  git("-c", "user.name=t", "-c", "user.email=t@t", "commit", "-q", "-m", "c1");
+  // The tree loses the file — the ref still serves it.
+  rmSync(join(root, "doc.md"));
+  const r = fileRead(root, "doc.md", { ref: "main" });
+  assert.match(r.content, /the committed text/);
+  assert.equal(r.ref, "main");
+  const g = fileGlob(root, "**/*.md", { ref: "main" });
+  assert.deepEqual(g.files, ["doc.md"]);
+  assert.equal(g.ref, "main");
+  // A missing path names the spec; an unknown ref names the ref.
+  assert.throws(() => fileRead(root, "nope.md", { ref: "main" }), (e) => (e as Rejection).clause === "SE-C-102");
+  assert.throws(() => fileGlob(root, "**", { ref: "nope" }), (e) => (e as Rejection).clause === "SE-C-102");
 });
 
 test("move fixes every reference form: root-relative, vault-relative, wiki link", async () => {

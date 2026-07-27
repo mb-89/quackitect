@@ -15,6 +15,7 @@
 // agent receives.
 import { loadCanvas, type CanvasData, type CanvasElement } from "./canvas.ts";
 import { CallLog, type CallRecord } from "./calllog.ts";
+import { type StrayNote } from "./inbox.ts";
 import { mainMachinePath, Session } from "./session.ts";
 import { compileMachine, resolveRef } from "./machines/compile.ts";
 import { type MachineDecl } from "./machine.ts";
@@ -169,9 +170,11 @@ function briefFor(rec: CallRecord): string {
   }
 }
 
-/** The session-scoped unified feed. Capped at the newest 500 rows — the
- *  cap is declared in the result, never silent. */
-export function feedRows(log: CallLog, since: string): { capped: boolean; rows: Array<Record<string, unknown>> } {
+/** The unified feed: this session's acts, capped at the newest 500 rows —
+ *  the cap is declared in the result, never silent. Pending strays from
+ *  EARLIER sessions ride on top (type "note"), so the inbox never falls
+ *  out of sight; this session's notes already ride as se_note calls. */
+export function feedRows(log: CallLog, since: string, pending: StrayNote[] = []): { capped: boolean; rows: Array<Record<string, unknown>> } {
   const q = log.query({ filter: { since }, limit: 501 });
   const records = q.records ?? [];
   const capped = records.length > 500;
@@ -179,13 +182,17 @@ export function feedRows(log: CallLog, since: string): { capped: boolean; rows: 
     ref: rec.ref,
     ts: rec.ts,
     src: rec.tool.startsWith("mirror_") ? "human" : "agent",
-    type: rec.tool === "se_update" ? "update" : rec.tool === "se_note" ? "note" : "call",
+    // An op-note update IS a note to the reader — italic, opens its text.
+    type: rec.tool === "se_update" ? ((rec.args as { op?: string }).op === "note" ? "note" : "update") : rec.tool === "se_note" ? "note" : "call",
     brief: briefFor(rec).slice(0, 90),
     ok: rec.ok,
     ...(rec.ok ? {} : { clause: (rec.response as { clause?: string } | undefined)?.clause }),
     ...(rec.tool === "se_update" ? { visit: (rec.args as { visit?: string }).visit } : {}),
   }));
-  return { capped, rows };
+  const noteRows = pending
+    .filter((n) => n.at < since)
+    .map((n) => ({ ref: n.ref, ts: n.at, src: "agent", type: "note", brief: n.text.slice(0, 90), ok: true, pending: true }));
+  return { capped, rows: [...noteRows, ...rows] };
 }
 
 /** Resolve a viewable machine by id: main itself, or one of its subs. */
@@ -199,6 +206,18 @@ function viewedMachine(m: MirrorState, view: string | undefined): { decl: Machin
   const path = resolveRef(m.root, mainPath, subState.submachine!);
   return { decl: compileMachine(m.root, path), canvas: loadCanvas(path) };
 }
+
+/** The human-involvement anchors (single prose source:
+ *  product/guidance/authoring/machines.md § Priority). Notches on the
+ *  threshold slider — a click is a shortcut to the level and surfaces its
+ *  help in the details pane. */
+const LEVELS = [
+  { value: 0.01, abbr: "M", name: "mechanical" },
+  { value: 0.25, abbr: "R", name: "routine" },
+  { value: 0.5, abbr: "E", name: "everyday decision" },
+  { value: 0.75, abbr: "C", name: "consequential" },
+  { value: 1, abbr: "K", name: "killer / milestone" },
+];
 
 const STYLE = `
   * { scrollbar-color: #3a4147 #14171a; }
@@ -272,6 +291,12 @@ const STYLE = `
   .threshold { display: flex; align-items: center; gap: 8px; color: #7f8b96; font-size: 12px; text-transform: none; letter-spacing: 0; }
   .threshold input { accent-color: #e8b339; width: 140px; }
   #thr-val { color: #e8b339; min-width: 4ch; }
+  .thr-help { cursor: pointer; }
+  .thr-help:hover { color: #e8b339; }
+  .thr-track { display: inline-flex; flex-direction: column; align-items: stretch; }
+  .thr-notches { position: relative; height: 11px; margin-top: -3px; }
+  .thr-notch { position: absolute; transform: translateX(-50%); font-size: 9px; line-height: 1; color: #7f8b96; cursor: pointer; padding: 1px 3px; }
+  .thr-notch:hover { color: #e8b339; }
   #w-log { flex: 0 0 42%; border-radius: 0; border: 0; border-bottom: 1px solid #2a2f34; }
   .log-filter-row { padding: 6px 12px 0; }
   #log-filter { width: 100%; box-sizing: border-box; background: #14171a; border: 1px solid #2a2f34; border-radius: 6px; color: #d8dde2; font: inherit; font-size: 12px; padding: 4px 8px; }
@@ -551,7 +576,7 @@ function renderLog() {
   const stick = logPanel.scrollHeight - logPanel.scrollTop - logPanel.clientHeight < 40;
   logPanel.innerHTML = rows.map((r) =>
     '<div class="logrow ' + r.type + (r.ok ? "" : " failed") + '" data-ref="' + r.ref + '">' +
-      '<span class="lt">' + r.ts.slice(11, 19) + "</span>" +
+      '<span class="lt">' + (r.pending ? r.ts.slice(5, 10) : r.ts.slice(11, 19)) + "</span>" +
       '<span class="lsrc ' + r.src + '">' + r.src + "</span>" +
       '<span class="lbrief">' + escText(r.brief) + "</span>" +
       '<span class="lok">' + (r.ok ? "✓" : "✗ " + (r.clause || "")) + "</span>" +
@@ -576,7 +601,10 @@ async function openLogDetail(ref) {
   CURRENT_DETAIL = "log:" + ref;
   const r = await fetch("/api/log?ref=" + encodeURIComponent(ref));
   const rec = await r.json();
+  if (rec.tool === "se_update" && rec.args && rec.args.op === "note") { showDetails("note · " + (rec.args.visit || rec.ref), jsonTable({ at: rec.ts, text: rec.args.brief, visit: rec.args.visit })); return; }
   if (rec.tool === "se_update" && rec.args && rec.args.visit) { await showDecisions(rec.args.visit, null); return; }
+  if (rec.tool === "se_note" && rec.args) { showDetails("note · " + ((rec.response && rec.response.captured) || rec.ref), jsonTable({ at: rec.ts, text: rec.args.text, pending: "until a retro drains it" })); return; }
+  if (rec.text !== undefined && rec.tool === undefined) { showDetails("note · " + rec.ref, jsonTable({ at: rec.at, text: rec.text, pending: "until a retro drains it" })); return; }
   showDetails("log · " + (rec.tool || ref), jsonTable({ at: rec.ts, request: { tool: rec.tool, args: rec.args }, response: rec.response === undefined ? null : rec.response, duration_ms: rec.duration_ms }));
 }
 async function showDecisions(visit, sel) {
@@ -619,6 +647,30 @@ if (thr) {
     await fetch("/threshold", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ value: Number(thr.value) }) });
   });
 }
+
+// THE NOTCHES — the authored involvement levels as shortcuts on the
+// slider: a click jumps the threshold there and surfaces the level's help
+// in the details pane (help is a detail, never a button).
+const THR_LEVELS = ${JSON.stringify(LEVELS)};
+function levelHelp(sel) {
+  const rows = THR_LEVELS.map((l) =>
+    '<tr' + (sel === l.value ? ' style="background:#22272c"' : "") + '><td class="k">' + l.abbr + " · " + l.value + '</td><td class="v">' + l.name + "</td></tr>").join("");
+  showDetails("the autonomy scale", '<table class="kv">' + rows + '</table><div style="padding:8px 0 0"><a class="doclink" data-path="product/guidance/authoring/machines.md">the full scale — machines.md · Priority</a></div>');
+}
+document.addEventListener("click", (ev) => {
+  const n = ev.target.closest ? ev.target.closest(".thr-notch") : null;
+  if (n && thr) {
+    const v = Number(n.dataset.level);
+    thr.value = v;
+    const lbl = document.getElementById("thr-val");
+    if (lbl) lbl.textContent = v.toFixed(2);
+    void fetch("/threshold", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ value: v }) });
+    levelHelp(v);
+    return;
+  }
+  const h = ev.target.closest ? ev.target.closest(".thr-help") : null;
+  if (h) levelHelp(null);
+});
 
 // SESSION OVER — anybody reaching end stops the whole session. The mirror
 // tries to close its window; where that is not allowed, the big red
@@ -770,7 +822,8 @@ export function renderMirror(m: MirrorState, widget?: "machine" | "details" | "l
   // (manual mode is just this); 1 = fully autonomous. Live: changes take
   // effect on the agent's next tick.
   const thr = m.session.threshold;
-  const slider = `<span class="threshold" title="the agent enters only states with priority ≤ threshold — 0: every step is yours, 1: fully autonomous"><span>agent ≤</span><input id="thr" type="range" min="0" max="1" step="0.01" value="${thr}"><span id="thr-val">${thr.toFixed(2)}</span></span>`;
+  const notches = LEVELS.map((l) => `<span class="thr-notch" data-level="${l.value}" style="left:${l.value * 100}%" title="${esc(l.name)} — click: threshold ${l.value}">${l.abbr}</span>`).join("");
+  const slider = `<span class="threshold" title="the agent enters only states with priority ≤ threshold — the notches are the authored levels, click one to jump there"><span class="thr-help" title="click: the scale, explained in details">agent ≤</span><span class="thr-track"><input id="thr" type="range" min="0" max="1" step="0.01" value="${thr}" list="thr-ticks"><datalist id="thr-ticks">${LEVELS.map((l) => `<option value="${l.value}"></option>`).join("")}</datalist><span class="thr-notches">${notches}</span></span><span id="thr-val">${thr.toFixed(2)}</span></span>`;
   const machineWidget = `<div class="widget" id="w-machine"><div class="widget-head"><span class="crumbs">${crumbs}</span>${slider}<button class="expand" data-widget="w-machine" data-url="/widget/machine?view=${encodeURIComponent(decl.id)}" title="expand · ctrl-click: new tab · shift-click: new window">⛶</button></div><div class="widget-body">${svg}</div></div>`;
   const detailsWidget = `<div class="widget" id="w-details">${widgetHead("details", "w-details", "/widget/details")}
     ${info.status === "closed" ? '<div class="meta" style="color:#e86a5f">machine closed</div>' : ""}

@@ -8,14 +8,12 @@
 //         never silently coerced (the String(undefined) incident).
 //   NEW — unknown args are refused too, naming the accepted set.
 //   §5  — honest truncation everywhere; results carry the remedy inline.
-import { appendFileSync, mkdirSync, readFileSync } from "node:fs";
-import { dirname, join } from "node:path";
-import { randomBytes } from "node:crypto";
 import { CLAUSES, Rejection } from "./errors.ts";
 import { CallLog } from "./calllog.ts";
 import { parseUpdate } from "./decisions.ts";
 import { Toll } from "./toll.ts";
 import { fileDelete, fileGlob, fileList, filePatch, fileRead, fileWrite, type PatchOp } from "./files.ts";
+import { appendNote } from "./inbox.ts";
 import { capJson } from "./jsonio.ts";
 import { McpServer, type ToolDef } from "./mcp.ts";
 import { fileMove } from "./move.ts";
@@ -117,13 +115,14 @@ export function coreTools(rootOf: () => string, projectRoot: string): ToolDef[] 
       name: "se_file_read",
       title: "se.file.read",
       description:
-        "Read a project file (root-relative path). Returns the CAS hash writes will demand. Pass offset (1-based line) / limit to read a large file in PARTS — an oversize whole-file read is refused with the remedy, never silently truncated.",
+        "Read a project file (root-relative path). Returns the CAS hash writes will demand. Pass offset (1-based line) / limit to read a large file in PARTS — an oversize whole-file read is refused with the remedy, never silently truncated. Pass ref to read the file AT A COMMITTED REF ('main' reaches v1, 'v2' reaches v2) — pair with se_file_search/se_file_glob at the same ref.",
       inputSchema: {
         type: "object",
         properties: {
           path: { type: "string" },
           offset: { type: "number", description: "1-based first line" },
           limit: { type: "number", description: "how many lines" },
+          ref: { type: "string", description: "read from this committed git ref instead of the working tree" },
         },
         required: ["path"],
       },
@@ -131,6 +130,7 @@ export function coreTools(rootOf: () => string, projectRoot: string): ToolDef[] 
         fileRead(rootOf(), String(args.path), {
           ...(args.offset !== undefined ? { offset: Number(args.offset) } : {}),
           ...(args.limit !== undefined ? { limit: Number(args.limit) } : {}),
+          ...(args.ref !== undefined ? { ref: String(args.ref) } : {}),
         }),
     },
     {
@@ -146,7 +146,8 @@ export function coreTools(rootOf: () => string, projectRoot: string): ToolDef[] 
         },
         required: ["path", "content", "base_hash"],
       },
-      handler: (args) => fileWrite(rootOf(), String(args.path), String(args.content), args.base_hash === null ? null : String(args.base_hash)),
+      // Some harnesses serialize the scalar null as its string — both mean CREATE.
+      handler: (args) => fileWrite(rootOf(), String(args.path), String(args.content), args.base_hash === null || args.base_hash === "null" ? null : String(args.base_hash)),
     },
     {
       name: "se_file_patch",
@@ -215,13 +216,13 @@ export function coreTools(rootOf: () => string, projectRoot: string): ToolDef[] 
     {
       name: "se_file_glob",
       title: "se.file.glob",
-      description: "List project files matching a glob (e.g. **/*.test.ts) — the 'where does this live' lane.",
+      description: "List project files matching a glob (e.g. **/*.test.ts) — the 'where does this live' lane. Pass ref to glob a committed ref's tree instead ('main' reaches v1, 'v2' reaches v2).",
       inputSchema: {
         type: "object",
-        properties: { glob: { type: "string" } },
+        properties: { glob: { type: "string" }, ref: { type: "string", description: "glob this committed git ref's tree instead of the working tree" } },
         required: ["glob"],
       },
-      handler: (args) => fileGlob(rootOf(), String(args.glob)),
+      handler: (args) => fileGlob(rootOf(), String(args.glob), { ...(args.ref !== undefined ? { ref: String(args.ref) } : {}) }),
     },
     {
       name: "se_file_search",
@@ -306,14 +307,7 @@ export function coreTools(rootOf: () => string, projectRoot: string): ToolDef[] 
         properties: { text: { type: "string" } },
         required: ["text"],
       },
-      handler: (args) => {
-        const p = join(seDir(projectRoot), "notes.jsonl");
-        const note = { ref: `note-${randomBytes(6).toString("hex")}`, text: String(args.text), at: new Date().toISOString() };
-        mkdirSync(dirname(p), { recursive: true });
-        appendFileSync(p, JSON.stringify(note) + "\n", "utf8");
-        const inbox = readFileSync(p, "utf8").split("\n").filter((l) => l.trim() !== "").length;
-        return { captured: note.ref, inbox };
-      },
+      handler: (args) => appendNote(seDir(projectRoot), String(args.text)),
     },
     {
       name: "se_log_query",

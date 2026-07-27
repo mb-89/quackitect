@@ -1,11 +1,16 @@
 // se-mcp — the v3 server entry. Node ≥22 runs this directly (native type
 // stripping); no build step. The workspace's .mcp.json points here.
 //
-//   node engine/bin/se-mcp.ts --root <project root> [--threshold 0.5] [--mirror-port 7333]
+//   node engine/bin/se-mcp.ts --root <project root> [--threshold 0.5] [--manual] [--mirror-port 7333]
 //
 // --root is the QUACKITECT PROJECT root (the folder holding product/ and
 // workspace/) — the file lane serves that whole tree, the call log lives in
 // <root>/.se/calls.jsonl.
+//
+// ONE FLAG REGISTRY: this file. The RUNME declares no flags of its own — it
+// forwards its whole command line through SE_ARGS (newline-separated),
+// because the cage's .mcp.json is fixed template text and cannot carry
+// per-launch arguments.
 //
 // TWO HANDS, ONE SESSION: the MCP lane (stdio) is the agent's hand, the
 // embedded mirror (HTTP) is the human's — the same Session, the same walk.
@@ -23,15 +28,19 @@ import { seDir } from "../paths.ts";
 import { Session } from "../session.ts";
 import { buildServer } from "../tools.ts";
 
+const argv = [
+  ...process.argv.slice(2),
+  ...(process.env.SE_ARGS ?? "").split("\n").map((s) => s.trim()).filter((s) => s !== ""),
+];
 function argValue(flag: string): string | undefined {
-  const i = process.argv.indexOf(flag);
-  return i >= 0 ? process.argv[i + 1] : undefined;
+  const i = argv.indexOf(flag);
+  return i >= 0 ? argv[i + 1] : undefined;
 }
 
-if (process.argv.some((a) => a === "--help" || a === "-h" || a === "-?")) {
+if (argv.some((a) => a === "--help" || a === "-h" || a === "-?")) {
   process.stdout.write(`se-mcp — the quackitect v3 MCP server (stdio JSON-RPC + embedded mirror)
 
-  node engine/bin/se-mcp.ts --root <project root> [--threshold 0.5] [--mirror-port 7333]
+  node engine/bin/se-mcp.ts --root <project root> [--threshold 0.5] [--manual] [--mirror-port 7333]
 
   --root         the quackitect project root (holds product/ and workspace/);
                  file lane serves that tree, call log lands in <root>/.se/
@@ -39,9 +48,13 @@ if (process.argv.some((a) => a === "--help" || a === "-h" || a === "-?")) {
                  threshold). 0: every step is the human's (manual mode);
                  1: fully autonomous. Default 0.5. Env: SE_THRESHOLD.
                  Live-adjustable in the mirror.
+  --manual       alias for --threshold 0 — you drive every step from the mirror
   --mirror-port  the embedded mirror's HTTP port (the human's hand on the
                  same walk). Default 7333. 0 disables. Env: SE_MIRROR_PORT.
   --help         this text (-h, -?)
+
+  The RUNME forwards its whole command line here (env SE_ARGS) — flags are
+  defined once, in this file.
 `);
   process.exit(0);
 }
@@ -52,7 +65,7 @@ if (!existsSync(root)) {
   process.exit(1);
 }
 
-const thresholdRaw = argValue("--threshold") ?? process.env.SE_THRESHOLD;
+const thresholdRaw = argValue("--threshold") ?? (argv.includes("--manual") ? "0" : undefined) ?? process.env.SE_THRESHOLD;
 const mirrorPort = Number(argValue("--mirror-port") ?? process.env.SE_MIRROR_PORT ?? 7333);
 
 const session = new Session(root); // fails fast on a misdrawn machine
