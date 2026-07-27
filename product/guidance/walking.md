@@ -56,6 +56,8 @@ Narration rides the walk (the unified log + the decision graph):
   rule 4). Notes join the log feed; they drain at a retro, later.
   In a LIVE discussion with the owner, do not note every exchange —
   discuss first, write ONE consolidated note when the point settles.
+  BEFORE building in an area, sweep the pending notes touching it —
+  a noted ruling must never be built around.
 - The human sees it all live in the mirror's log pane. One line per act.
   Clicking an update line opens the decision tree.
 
