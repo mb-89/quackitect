@@ -279,7 +279,13 @@ test("expeditions: worktree lifecycle — new, bind, work lands in the worktree,
   const s = new Session(root);
   const minted = s.expeditionNew("spike", "Try The Thing!") as { created: string };
   assert.match(minted.created, /^e1-spike-try-the-thing/);
-  assert.deepEqual((s.expeditionList() as { open: string[] }).open, [minted.created]);
+  // The RECORD is minted with the expedition, on its branch — the list
+  // serves its frontmatter.
+  const open1 = (s.expeditionList() as { open: { id: string; goal?: string; status?: string }[] }).open;
+  assert.equal(open1.length, 1);
+  assert.equal(open1[0].id, minted.created);
+  assert.equal(open1[0].goal, "Try The Thing!");
+  assert.equal(open1[0].status, "open");
 
   // bind: the lane's working root switches to the worktree
   s.expeditionOpen(minted.created);
@@ -289,11 +295,65 @@ test("expeditions: worktree lifecycle — new, bind, work lands in the worktree,
   assert.ok(existsSync(join(s.workRoot(), "scratch.md")));
   assert.ok(!existsSync(join(root, "scratch.md")), "main tree untouched while bound");
 
+  // While bound, decision ops land in the RECORD too (parts per visit).
+  s.decisions.apply("continue_expedition/work@0", { op: "note", brief: "working in the record" });
+  const recDir = join(s.workRoot(), "product", "spec", "expeditions", minted.created);
+  assert.ok(readFileSync(join(recDir, "decisions.jsonl"), "utf8").includes("working in the record"));
+
+  // Closing without a REPORT is refused — an expedition ends with one.
+  assert.throws(() => s.expeditionClose(true), (e) => (e as { clause?: string }).clause === "SE-C-112");
+  fileWrite(s.workRoot(), `product/spec/expeditions/${minted.created}/report.md`, "# Report\nBuilt the thing.", null);
+
   // close: leftovers committed, merged back, worktree gone, lane unbound
   const closed = s.expeditionClose(true) as { merged: boolean };
   assert.equal(closed.merged, true);
   assert.equal(s.workRoot(), root);
   assert.equal(readFileSync(join(root, "scratch.md"), "utf8"), "expedition work");
-  assert.deepEqual((s.expeditionList() as { open: string[] }).open, []);
-  assert.deepEqual((s.expeditionList() as { archive: string[] }).archive, [minted.created]);
+  // The merged record reads closed + report pending on the main tree —
+  // the retro adjudicates it later.
+  const rec = readFileSync(join(root, "product", "spec", "expeditions", minted.created, "record.md"), "utf8");
+  assert.match(rec, /^status: closed$/m);
+  assert.match(rec, /^report: pending$/m);
+  assert.equal((s.expeditionList() as { open: unknown[] }).open.length, 0);
+  const arch = (s.expeditionList() as { archive: { id: string; status?: string; report?: string }[] }).archive;
+  assert.equal(arch[0].id, minted.created);
+  assert.equal(arch[0].status, "closed");
+  assert.equal(arch[0].report, "pending");
+});
+
+test("escape goes to idle and only to idle: the walk is left standing, the reason is recorded, boot is exempt", async () => {
+  const { Session } = await import("../engine/session.ts");
+  const { buildServer } = await import("../engine/tools.ts");
+  const root = freshRoot();
+  const session = new Session(root);
+  const server = buildServer(root, session);
+  const hashes = readHashesFor(root);
+  // Into boot: escape is refused — boot must complete.
+  await call(server, "se_tick", { advance: true, read_hashes: hashes });
+  const noBoot = await call(server, "se_tick", { escape: "stuck" });
+  assert.equal(noBoot.isError, true);
+  assert.equal(noBoot.body.clause, "SE-C-110");
+  // Boot to idle, then enter a sub-machine and escape from inside it.
+  for (let i = 0; i < 8; i++) {
+    const step = await call(server, "se_tick", { advance: true, read_hashes: hashes });
+    if (step.body.booted === true) break;
+  }
+  session.setAutonomy(1);
+  await call(server, "se_tick", { to: "start_expedition", read_hashes: hashes });
+  assert.deepEqual(session.active(), ["start_expedition/start"]);
+  const esc = await call(server, "se_tick", { escape: "cannot continue: test blockage", read_hashes: hashes });
+  assert.equal(esc.isError, false, JSON.stringify(esc.body));
+  assert.deepEqual(session.active(), ["idle"], "escape lands at idle");
+  assert.equal(session.instance.escapes.length, 1);
+  assert.match(session.instance.escapes[0].exhausted_guard, /test blockage/);
+  assert.ok(session.instance.history.some((h) => h.outcome === "escaped"), "the escape is a recorded failure");
+  // The machine was LEFT STANDING — re-entering starts it over, gray.
+  assert.deepEqual(session.viewRun("start_expedition").done, []);
+  // An empty reason is refused; at the main machine there is nothing to escape.
+  const empty = await call(server, "se_tick", { escape: "  " });
+  assert.equal(empty.isError, true);
+  assert.equal(empty.body.clause, "SE-C-046");
+  const atMain = await call(server, "se_tick", { escape: "nope" });
+  assert.equal(atMain.isError, true);
+  assert.equal(atMain.body.clause, "SE-C-110");
 });

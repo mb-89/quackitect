@@ -108,17 +108,17 @@ entry demand (that is the state's assignment, read inside it).
 ## Priority — the human-involvement scale
 
 Every state carries a `priority`, the weight of the DECISION TO ENTER it.
-The session runs with a threshold (CLI at launch, slider in the Mirror,
+The session runs with an AUTONOMY (CLI at launch, the mirror's slider,
 live): the agent enters a state by itself only when
-`priority <= threshold`; the human always may, and work INSIDE a state is
-never gated — only entering is. So threshold 0 is manual mode (the human
-clicks through everything, even mechanical steps), 0.5 is everyday
-autonomy, 1 is fully autonomous — at 1 even the killers are the agent's.
+`priority <= autonomy`; the human always may, and work INSIDE a state is
+never gated — only entering is. So autonomy 0 is manual mode (the human
+clicks through everything, even mechanical steps), 0.5 is everyday work,
+1 is fully autonomous — at 1 even the killers are the agent's.
 
 The scale (calibrate against these anchors, don't invent new bands):
 
 - **0.01 — mechanical.** No decision content at all: start/end pills,
-  boot's steps, idle. The floor is 0.01, not 0, so that threshold 0 blocks
+  boot's steps, idle. The floor is 0.01, not 0, so that autonomy 0 blocks
   even these.
 - **0.25 — routine.** A step anyone would take the same way: listing,
   archiving, picking from an obvious set.

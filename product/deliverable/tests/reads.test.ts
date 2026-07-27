@@ -86,7 +86,7 @@ test("THE HANDOVER: the human walks boot on checkboxes, raises the slider — th
   const root = freshRoot();
   const { Session } = await import("../engine/session.ts");
   const session = new Session(root);
-  session.setThreshold(0); // manual start
+  session.setAutonomy(0); // manual start
   const server = buildServer(root, session);
   // The human drives: checks the boot docs, walks through read_contract.
   await session.tickAdvance(); await session.tickAdvance();
@@ -97,7 +97,7 @@ test("THE HANDOVER: the human walks boot on checkboxes, raises the slider — th
   const info = session.tickInfo() as { human_checked: string[] };
   assert.ok(info.human_checked.includes("workspace/AGENTS.md"));
   // The slider rises; the agent advances — but its head holds none of it.
-  session.setThreshold(0.6);
+  session.setAutonomy(0.6);
   const owed = await call(server, "se_tick", { advance: true });
   assert.equal(owed.isError, true);
   assert.equal(owed.body.clause, "SE-C-112");

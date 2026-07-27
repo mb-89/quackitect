@@ -86,9 +86,23 @@ export class Decisions {
     this.path = join(seDirPath, "decisions.jsonl");
   }
 
+  /** A second sink while a persistent record is bound (an expedition's
+   *  worktree): the reasoning is part of the record, reviewable after the
+   *  fact, parts per visit. */
+  private extraPath?: string;
+
+  setExtraSink(path?: string): void {
+    this.extraPath = path;
+  }
+
   private record(line: Record<string, unknown>): void {
+    const row = JSON.stringify({ ts: new Date().toISOString(), ...line }) + "\n";
     mkdirSync(dirname(this.path), { recursive: true });
-    appendFileSync(this.path, JSON.stringify({ ts: new Date().toISOString(), ...line }) + "\n", "utf8");
+    appendFileSync(this.path, row, "utf8");
+    if (this.extraPath !== undefined) {
+      mkdirSync(dirname(this.extraPath), { recursive: true });
+      appendFileSync(this.extraPath, row, "utf8");
+    }
   }
 
   private add(visit: string, parent: string | null, brief: string): DecisionNode {

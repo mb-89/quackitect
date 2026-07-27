@@ -1,7 +1,7 @@
 // se-mcp — the v3 server entry. Node ≥22 runs this directly (native type
 // stripping); no build step. The workspace's .mcp.json points here.
 //
-//   node engine/bin/se-mcp.ts --root <project root> [--threshold 0.5] [--manual] [--mirror-port 7333]
+//   node engine/bin/se-mcp.ts --root <project root> [--autonomy 0.5] [--manual] [--mirror-port 7333]
 //
 // --root is the QUACKITECT PROJECT root (the folder holding product/ and
 // workspace/) — the file lane serves that whole tree, the call log lives in
@@ -14,8 +14,8 @@
 //
 // TWO HANDS, ONE SESSION: the MCP lane (stdio) is the agent's hand, the
 // embedded mirror (HTTP) is the human's — the same Session, the same walk.
-// The threshold gates only the agent: it enters a state by itself only when
-// the state's priority <= threshold. The slider in the mirror moves it live.
+// The autonomy gates only the agent: it enters a state by itself only when
+// the state's priority <= autonomy. The slider in the mirror moves it live.
 //
 // SESSION OVER: anybody reaching end shuts the whole session down — the
 // process exits after the closing call is answered.
@@ -40,15 +40,16 @@ function argValue(flag: string): string | undefined {
 if (argv.some((a) => a === "--help" || a === "-h" || a === "-?")) {
   process.stdout.write(`se-mcp — the quackitect v3 MCP server (stdio JSON-RPC + embedded mirror)
 
-  node engine/bin/se-mcp.ts --root <project root> [--threshold 0.5] [--manual] [--mirror-port 7333]
+  node engine/bin/se-mcp.ts --root <project root> [--autonomy 0.5] [--manual] [--mirror-port 7333]
 
   --root         the quackitect project root (holds product/ and workspace/);
                  file lane serves that tree, call log lands in <root>/.se/
-  --threshold    0..1 — which states the AGENT enters by itself (priority <=
-                 threshold). 0: every step is the human's (manual mode);
-                 1: fully autonomous. Default 0.5. Env: SE_THRESHOLD.
-                 Live-adjustable in the mirror.
-  --manual       alias for --threshold 0 — you drive every step from the mirror
+  --autonomy     0..1 — which states the AGENT enters by itself (priority <=
+                 autonomy). 0: every step is the human's (manual mode);
+                 1: fully autonomous. Default 0.5. Env: SE_AUTONOMY.
+                 Live-adjustable in the mirror. (--threshold and
+                 SE_THRESHOLD are accepted as the old spelling.)
+  --manual       alias for --autonomy 0 — you drive every step from the mirror
   --mirror-port  the embedded mirror's HTTP port (the human's hand on the
                  same walk). Default 7333. 0 disables. Env: SE_MIRROR_PORT.
   --help         this text (-h, -?)
@@ -65,11 +66,12 @@ if (!existsSync(root)) {
   process.exit(1);
 }
 
-const thresholdRaw = argValue("--threshold") ?? (argv.includes("--manual") ? "0" : undefined) ?? process.env.SE_THRESHOLD;
+const autonomyRaw =
+  argValue("--autonomy") ?? argValue("--threshold") ?? (argv.includes("--manual") ? "0" : undefined) ?? process.env.SE_AUTONOMY ?? process.env.SE_THRESHOLD;
 const mirrorPort = Number(argValue("--mirror-port") ?? process.env.SE_MIRROR_PORT ?? 7333);
 
 const session = new Session(root); // fails fast on a misdrawn machine
-if (thresholdRaw !== undefined) session.setThreshold(Number(thresholdRaw)); // refuses out-of-range
+if (autonomyRaw !== undefined) session.setAutonomy(Number(autonomyRaw)); // refuses out-of-range
 // SESSION OVER — reaching end stops everything. The grace period lets the
 // closing tool response flush to stdout and the mirror serve its red page.
 session.onClosed = () => {
@@ -90,5 +92,5 @@ if (mirrorPort > 0) {
   });
 }
 
-process.stderr.write(`se-mcp 3.0.0-bootstrap root=${root} threshold=${session.threshold}\n`);
+process.stderr.write(`se-mcp 3.0.0-bootstrap root=${root} autonomy=${session.autonomy}\n`);
 runStdio(buildServer(root, session));

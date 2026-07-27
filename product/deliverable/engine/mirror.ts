@@ -92,12 +92,12 @@ export function startMirror(o: MirrorOptions): Server {
         }));
         return;
       }
-      if (req.method === "POST" && url.pathname === "/threshold") {
+      if (req.method === "POST" && url.pathname === "/autonomy") {
         // The slider — how much of the walk is the agent's. Logged like
         // every other hand on the machinery.
-        post(req, res, "mirror_threshold", (body) => ({
+        post(req, res, "mirror_autonomy", (body) => ({
           args: { value: body.value },
-          result: state.session.setThreshold(Number(body.value)),
+          result: state.session.setAutonomy(Number(body.value)),
         }));
         return;
       }
@@ -146,7 +146,7 @@ export function startMirror(o: MirrorOptions): Server {
         res.writeHead(200, { "content-type": "application/json; charset=utf-8" });
         res.end(JSON.stringify({
           status: state.session.instance.status,
-          threshold: state.session.threshold,
+          autonomy: state.session.autonomy,
           active: state.session.active(),
           busy: state.session.busy(),
           // A monotone change signal for the feed — the log file only grows.
