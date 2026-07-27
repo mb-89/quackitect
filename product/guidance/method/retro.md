@@ -48,7 +48,9 @@ conditions, forms, the engine. Never a person.
 ## The mechanical half
 
 - se_note_drain marks a note drained with its disposition; drained notes
-  leave the inbox count and the pending feed. Both hands may drain.
+  leave the inbox count and the pending feed. Both hands may drain —
+  where the state gate allows the tool (idle's open lane; a dedicated
+  retro scope arrives with the retro's trigger states).
 - Report flips (approved | dismissed) are edits to the record's
   frontmatter — markdown, human-editable, the truth.
 - se_log_query is the query lane. Never an ad-hoc script.

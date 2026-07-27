@@ -1,7 +1,7 @@
 ---
 state: read_contract
 state_kind: work
-priority: 0
+priority: 0.01
 legal_tools: se_file_read
 exit_read:
   - workspace/AGENTS.md

@@ -115,12 +115,13 @@ never gated — only entering is. So autonomy 0 is manual mode (the human
 clicks through everything, even mechanical steps), 0.5 is everyday work,
 1 is fully autonomous — at 1 even the killers are the agent's.
 
-The scale is UNIFORM — 0.2 per band (owner ruling 2026-07-27). Calibrate
+The scale is UNIFORM — 0.2 per band with a 0.01 floor — and it LIVES in
+machines/scale.md (Obsidian-editable; the engine reads it). Calibrate
 against these anchors, don't invent new bands:
 
-- **0 — mechanical.** No decision content at all: start/end pills, boot's
-  steps, idle. At autonomy 0 the agent still walks THESE by itself; every
-  judgment step is the human's.
+- **0.01 — mechanical.** No decision content at all: start/end pills,
+  boot's steps, idle. The floor is 0.01, not 0, so autonomy 0 blocks even
+  these.
 - **0.2 — routine.** A step anyone would take the same way: listing,
   archiving, picking from an obvious set.
 - **0.4 — everyday decision.** Judgment involved, wrong choice is cheap to

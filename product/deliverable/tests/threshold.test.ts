@@ -1,5 +1,5 @@
 // THE THRESHOLD (owner ruling 2026-07-26): every state carries a priority
-// (0 mechanical .. 0.8 killer, 1 ideation); the AGENT enters a state by itself only
+// (0.01 mechanical .. 0.8 killer, 1 ideation); the AGENT enters a state by itself only
 // when priority <= the session autonomy. The human always may — HTTP is
 // the human's hand, MCP is the agent's. Reaching end ends the SESSION:
 // onClosed fires, the server shuts down, the mirror turns red.
@@ -9,33 +9,25 @@ import { Session } from "../engine/session.ts";
 import { buildServer } from "../engine/tools.ts";
 import { call, checkDocs, freshRoot, readHashesFor } from "./helpers.ts";
 
-test("autonomy 0 is manual mode: mechanical steps stay the agent's, every judgment step is the human's", async () => {
+test("autonomy 0 is manual mode: the agent's every step is refused, the human walks freely", async () => {
   const root = freshRoot();
   const session = new Session(root);
   session.setAutonomy(0);
   const server = buildServer(root, session);
-  // Mechanical (priority 0) passes even at 0 — the uniform scale's floor.
+  // The agent's hand (MCP): even the mechanical first step outweighs 0 —
+  // the 0.01 floor exists exactly for this.
   const r = await call(server, "se_tick", { advance: true });
-  assert.equal(r.isError, false);
-  assert.deepEqual(r.body.active, ["boot/start"]);
+  assert.equal(r.isError, true);
+  assert.equal(r.body.clause, "SE-C-113");
+  assert.match(String(r.body.got), /boot/);
+  assert.match(String((r.body.remedy as { note: string }).note), /SEND YOU A MESSAGE/);
   // Looking is never gated — tick-info still answers the agent.
   const look = await call(server, "se_tick");
   assert.equal(look.isError, false);
   assert.equal(look.body.autonomy, 0);
-  // Boot through (all mechanical), then a JUDGMENT step refuses the agent…
-  const hashes = readHashesFor(root);
-  for (let i = 0; i < 8; i++) {
-    const step = await call(server, "se_tick", { advance: true, read_hashes: hashes });
-    if (step.body.booted === true) break;
-  }
-  const refused = await call(server, "se_tick", { to: "start_expedition", read_hashes: hashes });
-  assert.equal(refused.isError, true);
-  assert.equal(refused.body.clause, "SE-C-113");
-  assert.match(String((refused.body.remedy as { note: string }).note), /SEND YOU A MESSAGE/);
-  // … and the human's hand (default channel) just goes.
-  checkDocs(session);
-  await session.tickAdvance("start_expedition");
-  assert.deepEqual(session.active(), ["start_expedition/start"]);
+  // The human's hand (default channel): the same step just goes.
+  await session.tickAdvance();
+  assert.deepEqual(session.active(), ["boot/start"]);
 });
 
 test("the slider takes effect live: raise the autonomy and the agent's next tick passes", async () => {
@@ -104,10 +96,10 @@ test("priority and autonomy ride every packet — the agent can weigh its next s
   const session = new Session(freshRoot());
   const info = session.tickInfo() as { autonomy: number; states: { priority: number; next: { to: string; priority?: number }[] }[] };
   assert.equal(info.autonomy, 0.4);
-  assert.equal(info.states[0].priority, 0);
-  assert.equal(info.states[0].next[0].priority, 0); // boot, from its canvas frontmatter
+  assert.equal(info.states[0].priority, 0.01);
+  assert.equal(info.states[0].next[0].priority, 0.01); // boot, from its canvas frontmatter
   const peek = session.stateInfo("idle") as { priority: number; next: { to: string; priority?: number }[] };
-  assert.equal(peek.priority, 0);
+  assert.equal(peek.priority, 0.01);
   const exp = peek.next.find((n) => n.to === "start_expedition");
   assert.equal(exp?.priority, 0.4);
 });
