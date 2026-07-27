@@ -10,11 +10,11 @@
   {
    "id": "n-comment",
    "type": "text",
-   "text": "CONTINUE AD HOC WORK \u2014 bind an open expedition (context-manager enter), work freeform in its worktree, leave by closing (merge back) or keep it open.",
+   "text": "GENERATED AT ENTRY — this machine's states are the OPEN expeditions: one work → leave pair per expedition, instantiated from states/work.md and states/leave.md (the authored source). The engine seeds the real machine from the records; with nothing open, start runs to end. This drawing is the stub that carries the frontmatter.",
    "x": -1100,
    "y": -340,
    "width": 900,
-   "height": 120
+   "height": 160
   },
   {
    "id": "n-start",
@@ -27,33 +27,6 @@
    "styleAttributes": {
     "shape": "pill"
    }
-  },
-  {
-   "id": "n-pick",
-   "type": "file",
-   "file": "deliverable/machines/states/pick.md",
-   "x": -1100,
-   "y": -160,
-   "width": 620,
-   "height": 640
-  },
-  {
-   "id": "n-work",
-   "type": "file",
-   "file": "deliverable/machines/states/work.md",
-   "x": -340,
-   "y": -160,
-   "width": 620,
-   "height": 640
-  },
-  {
-   "id": "n-leave",
-   "type": "file",
-   "file": "deliverable/machines/states/leave.md",
-   "x": 420,
-   "y": -160,
-   "width": 620,
-   "height": 640
   },
   {
    "id": "n-end",
@@ -70,32 +43,9 @@
  ],
  "edges": [
   {
-   "id": "e-start-pick",
+   "id": "e-start-end",
    "fromNode": "n-start",
-   "fromSide": "right",
-   "toNode": "n-pick",
-   "toSide": "left"
-  },
-  {
-   "id": "e-pick-work",
-   "fromNode": "n-pick",
-   "fromSide": "right",
-   "toNode": "n-work",
-   "toSide": "left"
-  },
-  {
-   "id": "e-work-leave",
-   "fromNode": "n-work",
-   "fromSide": "right",
-   "toNode": "n-leave",
-   "toSide": "left"
-  },
-  {
-   "id": "e-leave-end",
-   "fromNode": "n-leave",
-   "fromSide": "right",
-   "toNode": "n-end",
-   "toSide": "left"
+   "toNode": "n-end"
   }
  ]
 }

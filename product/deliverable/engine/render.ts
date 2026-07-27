@@ -210,6 +210,9 @@ function viewedMachine(m: MirrorState, view: string | undefined): { decl: Machin
   }
   const subState = m.session.machine.states.find((s) => s.submachine !== undefined && s.id === view);
   if (subState === undefined) return { decl: m.session.machine, canvas: loadCanvas(mainPath) };
+  // Generated machines serve their own drawing (continue_expedition).
+  const generated = m.session.generatedView(subState.id);
+  if (generated !== undefined) return generated;
   const path = resolveRef(m.root, mainPath, subState.submachine!);
   return { decl: compileMachine(m.root, path), canvas: loadCanvas(path) };
 }
@@ -307,7 +310,7 @@ const STYLE = `
   .thr-notch:hover { color: #e8b339; }
   #w-log { flex: 0 0 42%; border-radius: 0; border: 0; border-bottom: 1px solid #2a2f34; }
   .log-filter-row { padding: 6px 12px 0; }
-  #log-filter { width: 100%; box-sizing: border-box; background: #14171a; border: 1px solid #2a2f34; border-radius: 6px; color: #d8dde2; font: inherit; font-size: 12px; padding: 4px 8px; }
+  .log-filter-row input { width: 100%; box-sizing: border-box; background: #14171a; border: 1px solid #2a2f34; border-radius: 6px; color: #d8dde2; font: inherit; font-size: 12px; padding: 4px 8px; }
   .log-panel { font-size: 12px; margin-top: 6px; }
   .logrow { display: flex; gap: 8px; padding: 2px 0; cursor: pointer; border-bottom: 1px dotted #22272c; align-items: baseline; }
   .logrow:hover { background: #22272c; }
@@ -334,7 +337,8 @@ const STYLE = `
   #modal { display: none; position: fixed; inset: 0; background: rgba(20,23,26,.8); z-index: 50; align-items: center; justify-content: center; }
   .modal-box { width: min(760px, 92vw); max-height: 86vh; display: flex; flex-direction: column; background: #191d21; border: 1px solid #3a4147; border-radius: 12px; }
   .modal-body { padding: 12px 16px; overflow: auto; font-size: 13px; }
-  .toollink { display: inline-block; margin: 2px 6px 2px 0; }
+  a.toollink { color: #7cc4e8; text-decoration: underline; cursor: pointer; margin-right: 10px; }
+  #toast { position: fixed; left: 14px; bottom: 14px; background: #22272c; border: 1px solid #3a4147; border-radius: 8px; padding: 8px 14px; color: #d8dde2; font-size: 12.5px; z-index: 90; display: none; }
   #over { position: fixed; inset: 0; background: rgba(20,23,26,.94); z-index: 100; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; }
   #over .over-box { color: #e8332a; font-size: 62px; font-weight: 800; letter-spacing: .12em; border: 6px solid #e8332a; border-radius: 18px; padding: 26px 52px; }
   #over .over-sub { color: #e86a5f; font-size: 15px; }
@@ -379,6 +383,15 @@ function openModal(title, html) {
   m.style.display = "flex";
 }
 function closeModal() { const m = document.getElementById("modal"); if (m) m.style.display = "none"; }
+let TOAST_TIMER = null;
+function toast(msg) {
+  const t = document.getElementById("toast");
+  if (!t) return;
+  t.textContent = msg;
+  t.style.display = "block";
+  clearTimeout(TOAST_TIMER);
+  TOAST_TIMER = setTimeout(() => { t.style.display = "none"; }, 1800);
+}
 document.addEventListener("click", (ev) => {
   if (ev.target && ev.target.id === "modal") { closeModal(); return; }
   const mc = ev.target.closest ? ev.target.closest("#modal-close") : null;
@@ -403,7 +416,14 @@ function toolModal(name) {
 }
 document.addEventListener("click", async (ev) => {
   const tl = ev.target.closest ? ev.target.closest(".toollink") : null;
-  if (tl) { toolModal(tl.dataset.tool); return; }
+  if (tl) {
+    // A tool link exists everywhere the tool is listed; it WORKS only
+    // where the state gate allows — elsewhere, a short toast.
+    const legal = D.packet.legal_tools;
+    const enabled = legal === "all" || (Array.isArray(legal) && legal.includes(tl.dataset.tool));
+    if (enabled) toolModal(tl.dataset.tool); else toast("tool disabled");
+    return;
+  }
   const rt = ev.target.closest ? ev.target.closest(".runtool") : null;
   if (rt) {
     const args = {};
@@ -440,8 +460,8 @@ function nextTable(id, s) {
     const title = unlocked
       ? "tick: leave " + id + ", enter " + n.to
       : !s.exit_met
-        ? "leaving " + id + " waits on: " + (exitMiss.join(", ") || "its exit conditions")
-        : "entering " + n.to + " waits on: " + ((n.missing || []).join(", ") || "its entry conditions");
+        ? "leaving " + id + " waits on:\\n" + (exitMiss.join("\\n") || "its exit conditions")
+        : "entering " + n.to + " waits on:\\n" + ((n.missing || []).join("\\n") || "its entry conditions");
     const btn = here
       ? '<button class="primary go' + (unlocked ? "" : " locked") + '" data-to="' + n.to + '"' + (unlocked ? "" : " disabled") +
         ' title="' + escText(title) + '">▶</button>'
@@ -466,15 +486,20 @@ function pulledView(pulled) {
 }
 function stateDetail(id) {
   const s = D.states[id] ?? {};
-  const bare = Object.assign({}, s); delete bare.next; delete bare.pulled; delete bare.script; delete bare.was_filled;
+  const bare = Object.assign({}, s); delete bare.next; delete bare.pulled; delete bare.script; delete bare.was_filled; delete bare.legal_tools;
   let html = jsonTable(bare);
-  // Human-callable tools of the CURRENT state — clickable (parity law).
-  if (WALK_HERE && id === CURRENT) {
-    const callable = (s.legal_tools || []).filter((t) => HUMAN_TOOLS[t] !== undefined);
-    if (callable.length > 0) {
-      html += '<div class="meta" style="padding:8px 0 4px">tools — your hand</div>' +
-        callable.map((t) => '<button class="ghost toollink" data-tool="' + t + '">' + t + "</button>").join(" ");
-    }
+  // Legal tools — human-callable ones are LINKS everywhere they appear
+  // (parity law); a link outside its state just toasts "tool disabled".
+  const tools = s.legal_tools || [];
+  if (tools.length > 0) {
+    const link = (t) => '<a class="toollink" data-tool="' + t + '">' + t + "</a>";
+    const plain = (t) => '<span style="margin-right:10px">' + escText(t) + "</span>";
+    // "all" stays written as all — and EXPANDS into the human-callable
+    // links (parity law), the same collapsible pattern the pull uses.
+    const inner = tools.includes("all")
+      ? '<details><summary style="cursor:pointer;color:#7f8b96">all — the human-callable set</summary><div style="padding:4px 0">' + Object.keys(HUMAN_TOOLS).map(link).join("") + "</div></details>"
+      : tools.map((t) => (HUMAN_TOOLS[t] !== undefined ? link(t) : plain(t))).join("");
+    html += '<div class="meta" style="padding:8px 0 4px">legal tools</div><div>' + inner + "</div>";
   }
   if (s.pulled && s.pulled.length > 0) {
     const row = '<tr><td class="k" title="derived by the machine, not authored">pulled</td><td class="v">' + pulledView(s.pulled) + "</td></tr></table>";
@@ -887,7 +912,7 @@ setInterval(async () => {
 }, 2000);
 `;
 
-const MODAL = '<div id="modal"><div class="modal-box"><div class="widget-head"><span id="modal-title"></span><button class="expand" id="modal-close">✕</button></div><div class="modal-body" id="modal-body"></div></div></div>';
+const MODAL = '<div id="modal"><div class="modal-box"><div class="widget-head"><span id="modal-title"></span><button class="expand" id="modal-close">✕</button></div><div class="modal-body" id="modal-body"></div></div></div><div id="toast"></div>';
 
 function widgetHead(title: string, widgetId: string, url: string): string {
   return `<div class="widget-head"><span>${esc(title)}</span><button class="expand" data-widget="${widgetId}" data-url="${esc(url)}" title="expand · ctrl-click: new tab · shift-click: new window">⛶</button></div>`;
@@ -993,7 +1018,7 @@ export function renderMirror(m: MirrorState, widget?: "machine" | "details" | "l
   // sub-machine other than boot is being walked.
   const crumbTrail = m.session.breadcrumb();
   const escapeBtn = crumbTrail.length > 1 && crumbTrail[1] !== "boot" ? `<button class="ghost" id="escape-btn" title="escape to idle — the machine is left standing, the reason is recorded">⤴ escape</button>` : "";
-  const machineWidget = `<div class="widget" id="w-machine"><div class="widget-head"><span class="crumbs">${crumbs}</span>${slider}${escapeBtn}<button class="expand" data-widget="w-machine" data-url="/widget/machine?view=${encodeURIComponent(decl.id)}" title="expand · ctrl-click: new tab · shift-click: new window">⛶</button></div><div class="widget-body">${svg}</div></div>`;
+  const machineWidget = `<div class="widget" id="w-machine"><div class="widget-head"><span class="crumbs">${crumbs}</span><span style="display:flex;align-items:center;gap:10px">${slider}${escapeBtn}<button class="expand" data-widget="w-machine" data-url="/widget/machine?view=${encodeURIComponent(decl.id)}" title="expand · ctrl-click: new tab · shift-click: new window">⛶</button></span></div><div class="widget-body">${svg}</div></div>`;
   const detailsWidget = `<div class="widget" id="w-details">${widgetHead("details", "w-details", "/widget/details")}
     ${info.status === "closed" ? '<div class="meta" style="color:#e86a5f">machine closed</div>' : ""}
     <div class="meta" id="details-title">—</div>

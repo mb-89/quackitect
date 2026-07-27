@@ -33,6 +33,8 @@ import { conditionNotePath } from "./conditions.ts";
 import { confirmPrefill, formTemplatePath, lintForm, parseFormTemplate, scaffoldInstance, withFieldContent, withStatus, type FormLint, type FormTemplate } from "./forms.ts";
 import { pulledFor, scanGuidance, type GuidanceDoc, type PulledDoc } from "./pull.ts";
 import { expClose, expFind, expList, expNew, readRecord, type Expedition } from "./worktree.ts";
+import { generateContinueExpedition, type GeneratedMachine } from "./expmachine.ts";
+import { type CanvasData } from "./canvas.ts";
 import { spawn } from "node:child_process";
 import { resolveInRoot, seDir } from "./paths.ts";
 import { Decisions } from "./decisions.ts";
@@ -65,6 +67,9 @@ interface SubRun {
   instance: MachineInstance;
   /** The main-machine state this sub fills. */
   parentState: string;
+  /** Present when the machine was GENERATED (continue_expedition): the
+   *  synthetic drawing and the state→expedition map ride the run. */
+  gen?: GeneratedMachine;
 }
 
 /** WHOSE HAND is on the tick. The channel rule (owner ruling 2026-07-26):
@@ -327,6 +332,28 @@ export class Session {
   /** The machine to DISPLAY: only ever one (owner ruling 2026-07-26). */
   currentMachine(): MachineDecl {
     return this.inSub() ? this.sub!.decl : this.machine;
+  }
+
+  /** Entering a GENERATED container's expedition states binds that
+   *  expedition's worktree — the click IS the pick (owner design
+   *  2026-07-27). The parent-return and escape paths unbind as ever. */
+  private autoBind(): void {
+    const gen = this.sub?.gen;
+    if (gen === undefined) return;
+    const leaf = activeStates(this.sub!.instance)[0];
+    const expId = leaf === undefined ? undefined : gen.expByState[leaf];
+    if (expId !== undefined && this.bound?.id !== expId) this.expeditionOpen(expId);
+  }
+
+  /** The mirror's view of a GENERATED machine: the walk's own instance
+   *  while standing in it, a fresh generation for browsing. */
+  generatedView(id: string): { decl: MachineDecl; canvas: CanvasData } | undefined {
+    if (id !== "continue_expedition") return undefined;
+    if (this.inSub() && this.sub!.decl.id === id && this.sub!.gen !== undefined) {
+      return { decl: this.sub!.gen.decl, canvas: this.sub!.gen.canvas };
+    }
+    const gen = generateContinueExpedition(this.root);
+    return { decl: gen.decl, canvas: gen.canvas };
   }
 
   /** The LIVE run for a machine view (owner ruling 2026-07-27: re-entry
@@ -1002,6 +1029,7 @@ export class Session {
       completeState(this.sub!.decl, this.sub!.instance, cur, "filled", now, to);
       this.sub!.instance.history.push({ state: cur, outcome: "filled", at: now });
       this.instance.history.push({ state: `${this.sub!.decl.id}/${cur}`, outcome: "filled", at: now });
+      this.autoBind();
       this.notifyChange();
       return this.tickInfo();
     }
@@ -1189,15 +1217,17 @@ export class Session {
       .map((s) => this.state(this.machine, s))
       .find((s) => s.submachine !== undefined);
     if (subState === undefined) return;
-    const subPath = resolveRef(this.root, mainMachinePath(this.root), subState.submachine!);
-    const decl = compileMachine(this.root, subPath);
+    // continue_expedition is GENERATED from the open expeditions — its
+    // drawn canvas is a stub (owner design 2026-07-27).
+    const gen = subState.id === "continue_expedition" ? generateContinueExpedition(this.root) : undefined;
+    const decl = gen !== undefined ? gen.decl : compileMachine(this.root, resolveRef(this.root, mainMachinePath(this.root), subState.submachine!));
     // RE-ENTRY RESETS (owner ruling 2026-07-27): a machine left through its
     // end starts over — evidence from the previous pass is cleared; the old
     // walk stays in the main record, the new walk earns its own.
     for (const key of [...this.evidence.keys()]) {
       if (key.startsWith(`${decl.id}/`)) this.evidence.delete(key);
     }
-    this.sub = { decl, instance: newInstance(decl), parentState: subState.id };
+    this.sub = { decl, instance: newInstance(decl), parentState: subState.id, ...(gen !== undefined ? { gen } : {}) };
   }
 
   // ── The agent's hands on the tick ───────────────────────────────────────
