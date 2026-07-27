@@ -53,7 +53,10 @@ The trigger is a NOTE carrying "needs retro":
    what happened after the newest drain call. Rank refusal clauses by
    frequency; top tools; failure rates. A command that keeps failing or
    a refusal that keeps firing is a lead — the fix may be a tool, a
-   refusal, or better guidance. The raw log is KEPT (owner ruling:
+   refusal, or better guidance. Walk the period's se_run commands too
+   (v1 law): every shell command is a candidate sign of a MISSING piece
+   — a determinizer tool, a guidance page, a prompt. Repeated or
+   process-relevant commands especially. The raw log is KEPT (owner ruling:
    forever-until-1GB; a garbage collector may harvest it later).
 7. Tally the previous retro's improvements. Promote the wins. Dismiss the
    duds WITH the reason recorded, so a dud is never re-proposed.

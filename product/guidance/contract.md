@@ -36,3 +36,10 @@ assumption poisons everything downstream.
 ## 6. Do not argue with the process while you walk it
 Walk the machine without debating its intent. If you disagree, note it and
 commit. The place to change the process is a retro — not the walk.
+
+## 7. The repo is the memory
+Do not write to the assistant's private memory. It lives outside the
+system; nothing here reads or checks it. Durable knowledge goes where the
+machine reads it: guidance, machines, condition notes, the spec. What the
+NEXT session must know goes to .se/HANDOVER.md — boot demands it read.
+The retro sweeps any memory that appears anyway into a repo home.
