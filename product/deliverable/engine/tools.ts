@@ -16,6 +16,7 @@ import { fileDelete, fileGlob, fileList, filePatch, fileRead, fileWrite, type Pa
 import { appendNote, drainNote } from "./inbox.ts";
 import { capJson } from "./jsonio.ts";
 import { McpServer, type ToolDef } from "./mcp.ts";
+import { gitLane } from "./gitlane.ts";
 import { fileMove } from "./move.ts";
 import { openPanel } from "./panel.ts";
 import { seDir } from "./paths.ts";
@@ -298,6 +299,18 @@ export function coreTools(rootOf: () => string, projectRoot: string): ToolDef[] 
           ...(args.timeout_ms !== undefined ? { timeout_ms: Number(args.timeout_ms) } : {}),
           ...(args.cwd !== undefined ? { cwd: String(args.cwd) } : {}),
         }),
+    },
+    {
+      name: "se_git",
+      title: "se.git",
+      description:
+        "Git through the lane, allowlisted: status, log, diff, show, add, commit, fetch, branch, rev-parse, restore (--staged only). No push — pushing is the user's act; no rebase. Runs in the bound worktree when an expedition is open, else the root.",
+      inputSchema: {
+        type: "object",
+        properties: { args: { type: "array", items: { type: "string" }, description: 'git arguments, e.g. ["status", "--porcelain"]' } },
+        required: ["args"],
+      },
+      handler: (args) => gitLane(rootOf(), (args.args as unknown[]) ?? []),
     },
     {
       name: "se_web_fetch",

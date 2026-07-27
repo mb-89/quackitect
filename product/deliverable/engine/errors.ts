@@ -54,6 +54,9 @@ export const CLAUSES = {
   CONDITION_UNMET: "SE-C-112", // enter/leave condition not met — evidence required
   ABOVE_THRESHOLD: "SE-C-113", // the state's priority exceeds the session threshold — the human advances
   STALE_POSITION: "SE-C-114", // the tick's `from` is not where the walk stands — the human's hand moved it
+  GIT_REWRITE: "SE-C-002", // carried from v2 — no rebase; superseded content lives in history
+  GIT_PUSH: "SE-C-003", // carried from v2 — the agent never pushes; the owner does
+  GIT_NOT_ALLOWLISTED: "SE-C-004", // carried from v2 — git beyond the allowlist stays engine-internal
   TOLL_DUE: "SE-C-040", // carried from v2 — update overdue; pay by resending the same call with the update field
   NOTE_UNKNOWN: "SE-C-073", // carried from v2 — draining an unknown note ref is refused
   UPDATE_MALFORMED: "SE-C-120", // the update field failed to parse as a decision-graph op

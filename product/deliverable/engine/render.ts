@@ -190,8 +190,9 @@ export function feedRows(log: CallLog, since: string, pending: StrayNote[] = [])
     ref: rec.ref,
     ts: rec.ts,
     src: rec.tool.startsWith("mirror_") ? "human" : "agent",
-    // An op-note update IS a note to the reader — italic, opens its text.
-    type: rec.tool === "se_update" ? ((rec.args as { op?: string }).op === "note" ? "note" : "update") : rec.tool === "se_note" || rec.tool === "mirror_note" ? "note" : "call",
+    // Updates are NARRATION (bold), whatever their op — only se_note
+    // strays are retro notes (italic). Two kinds, never conflated.
+    type: rec.tool === "se_update" ? "update" : rec.tool === "se_note" || rec.tool === "mirror_note" ? "note" : "call",
     brief: briefFor(rec).slice(0, 90),
     ok: rec.ok,
     ...(rec.ok ? {} : { clause: (rec.response as { clause?: string } | undefined)?.clause }),
@@ -942,7 +943,9 @@ setInterval(async () => {
   try {
     const r = await fetch("/api/alive");
     const a = await r.json();
-    aliveMisses = 0;
+    // Answers again after misses — that was an engine swap (hot reload):
+    // reload onto the new child instead of waiting for F5.
+    if (aliveMisses > 0) { aliveMisses = 0; location.reload(); return; }
     if (a.status === "closed") { sessionOver(); return; }
     if (thr && document.activeElement !== thr && Number(thr.value) !== a.autonomy) {
       thr.value = a.autonomy;
@@ -961,8 +964,9 @@ setInterval(async () => {
     if (pollBusy === true && a.busy === false) { reloadKeep(CURRENT_DETAIL); return; }
     pollBusy = a.busy;
   } catch (e) {
+    // A short outage can be an engine swap — only a long silence is death.
     aliveMisses++;
-    if (aliveMisses >= 2) sessionOver();
+    if (aliveMisses >= 8) sessionOver();
   } finally {
     pollInFlight = false;
   }

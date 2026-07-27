@@ -28,7 +28,10 @@ One tool drives everything: `se_tick`. It is legal in every state.
 
 Narration rides the walk (the unified log + the decision graph):
 
-- `update: {...}` on ANY lane call carries a decision-graph op.
+- `update: {...}` on ANY lane call carries a decision-graph op. Ride one
+  on EVERY call that changes something (a write, a run, a move) — the
+  5-minute toll is the enforcement floor, never the rhythm; the mirror's
+  log should tell the story without gaps.
   - plan `{items}` starts the state's checklist.
   - fork `{brief, items?}` opens an unplanned branch where you are — a
     BLOCKING detour: the current item cannot continue until this is fixed;

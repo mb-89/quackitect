@@ -115,9 +115,10 @@ test("the unified feed derives src, type and brief — and the mirror carries th
   assert.equal(capped, false);
   assert.equal(rows.length, 6);
   assert.deepEqual(rows.map((r) => r.src), ["agent", "human", "agent", "agent", "agent", "agent"]);
-  // An op-note update reads as a NOTE (owner ruling 2026-07-27): italic in
-  // the pane, click opens its text — only structural ops type "update".
-  assert.deepEqual(rows.map((r) => r.type), ["call", "call", "update", "note", "note", "call"]);
+  // Updates are NARRATION, whatever their op — bold in the pane (owner
+  // ruling 2026-07-27, superseding the op-note-as-note reading). Only
+  // se_note strays are retro notes (italic). Two kinds, never conflated.
+  assert.deepEqual(rows.map((r) => r.type), ["call", "call", "update", "update", "note", "call"]);
   assert.match(String(rows[0].brief), /read product\/x\.md/);
   assert.match(String(rows[1].brief), /check/);
   assert.match(String(rows[3].brief), /note: working/);

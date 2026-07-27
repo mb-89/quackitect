@@ -40,6 +40,7 @@ tool. The `se` lane replaces every one of them, as good or better:
 | Grep | `se_file_search` (state your intent — it is logged) |
 | ls | `se_file_list` |
 | Bash | `se_run` (output captured in full under the returned ref) |
+| git (via Bash) | `se_git` (allowlisted; push stays with the user) |
 | WebFetch | `se_web_fetch` |
 | WebSearch | `se_web_search` |
 | your own history | `se_log_query` |
