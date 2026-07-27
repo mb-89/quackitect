@@ -31,7 +31,7 @@ import {
 import { compileMachine, resolveRef } from "./machines/compile.ts";
 import { conditionNotePath } from "./conditions.ts";
 import { pulledFor, scanGuidance, type GuidanceDoc, type PulledDoc } from "./pull.ts";
-import { expClose, expFind, expList, expNew, type Expedition } from "./worktree.ts";
+import { expClose, expFind, expList, expNew, readRecord, type Expedition } from "./worktree.ts";
 import { spawn } from "node:child_process";
 import { resolveInRoot, seDir } from "./paths.ts";
 import { Decisions } from "./decisions.ts";
@@ -81,11 +81,12 @@ export class Session {
   private bound?: Expedition;
   /** Evidence store: "<machine>/<state>" → what was submitted. */
   private readonly evidence = new Map<string, Record<string, unknown>>();
-  /** THE THRESHOLD — which states the AGENT may enter by itself: only those
-   *  with priority <= threshold. 0 hands every step to the human (manual
-   *  mode); 1 is fully autonomous. Content work inside a state is never
-   *  gated — only ENTERING is. Live-adjustable (the mirror's slider). */
-  private _threshold = 0.5;
+  /** THE AUTONOMY (renamed from "threshold", owner ruling 2026-07-27) —
+   *  which states the AGENT may enter by itself: only those with
+   *  priority <= autonomy. 0 hands every step to the human (manual mode);
+   *  1 is fully autonomous. Content work inside a state is never gated —
+   *  only ENTERING is. Live-adjustable (the mirror's slider). */
+  private _autonomy = 0.5;
   /** Fires once, after the tick that closes the MAIN machine — the server
    *  entry hooks the session shutdown here. */
   onClosed?: () => void;
@@ -117,8 +118,8 @@ export class Session {
     return `${id}@${past}`;
   }
 
-  get threshold(): number {
-    return this._threshold;
+  get autonomy(): number {
+    return this._autonomy;
   }
 
   // ── THE WAIT — how the machine reaches a holding agent. MCP cannot push;
@@ -149,33 +150,33 @@ export class Session {
     });
   }
 
-  setThreshold(value: number): Record<string, unknown> {
+  setAutonomy(value: number): Record<string, unknown> {
     if (typeof value !== "number" || Number.isNaN(value) || value < 0 || value > 1) {
       throw new Rejection({
         clause: CLAUSES.REQUIRED_ARGS,
-        expected: "a threshold between 0 (every step is the human's) and 1 (fully autonomous)",
+        expected: "an autonomy between 0 (every step is the human's) and 1 (fully autonomous)",
         got: String(value),
-        remedy: { tool: "se_tick", args: {}, note: "the threshold is set from the mirror's slider or at launch (--threshold)" },
-        source: "engine/session.ts threshold",
+        remedy: { tool: "se_tick", args: {}, note: "the autonomy is set from the mirror's slider or at launch (--autonomy)" },
+        source: "engine/session.ts autonomy",
       });
     }
-    const was = this._threshold;
-    this._threshold = value;
+    const was = this._autonomy;
+    this._autonomy = value;
     this.notifyChange(); // a holding agent wakes and re-reads the packet
-    return { threshold: value, was };
+    return { autonomy: value, was };
   }
 
-  /** The threshold gate: an AGENT tick may enter a state only when its
-   *  priority <= the session threshold. The human's hand is never gated. */
+  /** The autonomy gate: an AGENT tick may enter a state only when its
+   *  priority <= the session autonomy. The human's hand is never gated. */
   private gatePriority(m: MachineDecl, targetIds: string[], channel: Channel): void {
     if (channel !== "agent") return;
     for (const id of targetIds) {
       const t = m.states.find((s) => s.id === id);
       if (t === undefined) continue;
-      if (t.priority > this._threshold) {
+      if (t.priority > this._autonomy) {
         throw new Rejection({
           clause: CLAUSES.ABOVE_THRESHOLD,
-          expected: `a state within the session threshold ${this._threshold}`,
+          expected: `a state within the session autonomy ${this._autonomy}`,
           got: `${id} weighs ${t.priority} — this step is the human's`,
           remedy: { tool: "se_tick", args: {}, note: "STOP and tell the human PLAINLY: this step waits for their hand (they advance it in the mirror, or raise the slider), and the slider alone cannot wake you — they must SEND YOU A MESSAGE (e.g. 'continue') after changing it. Then end your turn. Never retry the advance blind." },
           source: "engine/session.ts threshold",
@@ -196,14 +197,26 @@ export class Session {
 
   expeditionList(): Record<string, unknown> {
     const all = expList(this.root);
+    const describe = (e: Expedition): Record<string, unknown> => {
+      const fm = readRecord(this.root, e);
+      return {
+        id: e.id,
+        ...(typeof fm?.goal === "string" ? { goal: fm.goal } : {}),
+        ...(typeof fm?.status === "string" ? { status: fm.status } : {}),
+        ...(typeof fm?.report === "string" ? { report: fm.report } : {}),
+      };
+    };
     return {
-      open: all.filter((e) => e.open).map((e) => e.id),
-      archive: all.filter((e) => !e.open).map((e) => e.id),
+      open: all.filter((e) => e.open).map(describe),
+      archive: all.filter((e) => !e.open).map(describe),
     };
   }
 
   expeditionOpen(id: string): Record<string, unknown> {
     this.bound = expFind(this.root, id);
+    // While bound, decision ops ALSO land in the record: the reasoning is
+    // part of the persistent walk (owner ruling 2026-07-27), parts per visit.
+    this.decisions.setExtraSink(join(this.bound.path, "product", "spec", "expeditions", this.bound.id, "decisions.jsonl"));
     return { bound: this.bound.id, note: "the lane now works in this expedition's worktree" };
   }
 
@@ -218,12 +231,68 @@ export class Session {
       });
     }
     const result = expClose(this.root, this.bound, merge);
-    this.bound = undefined;
+    this.unbind();
     return { ...result, note: merge ? "merged back — iterations will replace this with design-input handover" : "left unmerged; the branch is the archive record" };
   }
 
   private unbind(): void {
     this.bound = undefined;
+    this.decisions.setExtraSink(undefined);
+  }
+
+  /** ESCAPE (owner ruling 2026-07-27): always to idle — "we cannot work our
+   *  way through this machine". The sub-machine is LEFT STANDING (nothing
+   *  fills); the escape is a recorded failure with its reason, and a later
+   *  continue re-enters from the beginning, fast-forwarding on stored
+   *  evidence. Boot is the one exception — it must complete. */
+  escape(reason: string, channel: Channel = "agent", readHashes: Record<string, string> = {}): Record<string, unknown> {
+    if (reason.trim() === "") {
+      throw new Rejection({
+        clause: CLAUSES.REQUIRED_ARGS,
+        expected: "a reason — an escape is a recorded failure, never a silent exit",
+        got: "an empty reason",
+        remedy: { tool: "se_tick", args: { escape: "<why the walk cannot continue>" } },
+        source: "engine/session.ts escape",
+      });
+    }
+    if (!this.inSub()) {
+      throw new Rejection({
+        clause: CLAUSES.NOT_LEGAL_IN_STATE,
+        expected: "a sub-machine to escape from",
+        got: `standing on the main machine [${this.active().join(", ")}]`,
+        remedy: { tool: "se_tick", args: {}, note: "escape leaves a stuck sub-machine walk; the main machine walks normally" },
+        source: "engine/session.ts escape",
+      });
+    }
+    if (this.sub!.decl.id === "boot") {
+      throw new Rejection({
+        clause: CLAUSES.NOT_LEGAL_IN_STATE,
+        expected: "a sub-machine other than boot",
+        got: "an escape from boot",
+        remedy: { tool: "se_tick", args: {}, note: "boot cannot be skipped — it must complete; if it is broken, tell the user" },
+        source: "engine/session.ts escape",
+      });
+    }
+    const now = new Date().toISOString();
+    this.gatePriority(this.machine, ["idle"], channel);
+    const idle = this.state(this.machine, "idle");
+    const missing = this.entryRequirements(this.machine, idle).filter((p) => !this.readProven(channel, p, readHashes));
+    if (missing.length > 0) this.refuseReads("entry", "idle", missing, channel);
+    this.assertHandover(channel, readHashes);
+    const stoodIn = this.active()[0];
+    const parent = this.sub!.parentState;
+    this.instance.history.push({ state: stoodIn, outcome: "escaped", at: now });
+    this.instance.escapes.push({ state: parent, exhausted_guard: reason.slice(0, 300), at: now });
+    this.instance.active = [...activeStates(this.instance).filter((s) => s !== parent), "idle"];
+    this.instance.current = "idle";
+    this.sub = undefined;
+    this.unbind();
+    this.notifyChange();
+    return {
+      ...this.tickInfo(),
+      escaped: { from: stoodIn, reason },
+      note: "escaped to idle — the machine was left standing. Tell the user PLAINLY what blocked the walk, then wait for their ruling.",
+    };
   }
 
   private state(m: MachineDecl, id: string): StateDecl {
@@ -257,6 +326,26 @@ export class Session {
   /** The machine to DISPLAY: only ever one (owner ruling 2026-07-26). */
   currentMachine(): MachineDecl {
     return this.inSub() ? this.sub!.decl : this.machine;
+  }
+
+  /** The LIVE run for a machine view (owner ruling 2026-07-27: re-entry
+   *  resets the drawing) — done states and completion of the CURRENT run
+   *  only. A machine not being walked shows gray; past passes live in the
+   *  main record, not on the drawing. */
+  viewRun(declId: string): { done: string[]; completed: boolean } {
+    if (declId === this.machine.id) {
+      return {
+        done: this.instance.history.filter((h) => h.outcome === "filled" && !h.state.includes("/")).map((h) => h.state),
+        completed: this.instance.status === "closed",
+      };
+    }
+    if (this.inSub() && this.sub!.decl.id === declId) {
+      return {
+        done: this.sub!.instance.history.filter((h) => h.outcome === "filled").map((h) => h.state),
+        completed: this.sub!.instance.status === "closed",
+      };
+    }
+    return { done: [], completed: false };
   }
 
   legal(): { all: boolean; tools: Set<string> } {
@@ -687,7 +776,7 @@ export class Session {
       active: this.active(),
       ...(this.bound !== undefined ? { expedition: this.bound.id } : {}),
       status: this.instance.status,
-      threshold: this._threshold,
+      autonomy: this._autonomy,
       // The session's reading list: what the human checked while driving.
       // Your advances must prove the same docs (paths only — the hashes
       // are earned by reading).
@@ -928,6 +1017,12 @@ export class Session {
     if (subState === undefined) return;
     const subPath = resolveRef(this.root, mainMachinePath(this.root), subState.submachine!);
     const decl = compileMachine(this.root, subPath);
+    // RE-ENTRY RESETS (owner ruling 2026-07-27): a machine left through its
+    // end starts over — evidence from the previous pass is cleared; the old
+    // walk stays in the main record, the new walk earns its own.
+    for (const key of [...this.evidence.keys()]) {
+      if (key.startsWith(`${decl.id}/`)) this.evidence.delete(key);
+    }
     this.sub = { decl, instance: newInstance(decl), parentState: subState.id };
   }
 
@@ -941,7 +1036,7 @@ export class Session {
       active: this.active(),
       ...(this.inSub() ? { submachine: { id: this.sub!.decl.id, active: activeStates(this.sub!.instance) } } : {}),
       status: this.instance.status,
-      threshold: this._threshold,
+      autonomy: this._autonomy,
       legal_tools: all ? "all" : [...ALWAYS_LEGAL, ...tools],
       history: this.instance.history.slice(-10),
     };

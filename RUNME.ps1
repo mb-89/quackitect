@@ -10,7 +10,7 @@ defined ONCE, in engine/bin/se-mcp.ts (--help lists them).
 .EXAMPLE
 .\RUNME.ps1
 .EXAMPLE
-.\RUNME.ps1 --threshold 0
+.\RUNME.ps1 --autonomy 0
 .EXAMPLE
 .\RUNME.ps1 --manual
 #>

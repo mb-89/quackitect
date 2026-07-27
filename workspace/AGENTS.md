@@ -10,7 +10,7 @@ machine directs — advance state by state until you reach idle or a refusal
 stops you. How walking works: product/guidance/walking.md — it is pulled
 into every state's packet.
 
-The session runs a THRESHOLD (the user's slider in the mirror). When an
+The session runs an AUTONOMY (the user's slider in the mirror). When an
 advance is refused with SE-C-113, that step is the user's — STOP, and
 tell them PLAINLY, in words like these: "I'm at start — entering boot is
 above the threshold. I'm stopping here. Changing the slider alone cannot

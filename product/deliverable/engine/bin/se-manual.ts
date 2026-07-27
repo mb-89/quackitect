@@ -23,9 +23,9 @@ if (process.argv.some((a) => a === "--help" || a === "-h" || a === "-?")) {
 
   GET  /            the mirror (tick · info implied: looking never moves)
   POST /tick        tick with arguments: complete the current state, move on
-  POST /threshold   move the session threshold (the slider posts here)
+  POST /autonomy    move the session autonomy (the slider posts here)
   GET  /api/tick    the tick info packet as JSON
-  GET  /api/alive   position + threshold — the mirror polls this
+  GET  /api/alive   position + autonomy — the mirror polls this
   GET  /widget/machine | /widget/details    single widgets (tab/window)
   --help            this text (-h, -?)
 

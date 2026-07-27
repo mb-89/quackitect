@@ -143,7 +143,7 @@ function briefFor(rec: CallRecord): string {
     case "mirror_tick":
       return a.back !== undefined ? `back → ${a.back}` : a.to !== undefined ? `tick → ${a.to}` : "tick advance";
     case "mirror_check": return `check ${a.path}`;
-    case "mirror_threshold": return `slider → ${a.value}`;
+    case "mirror_autonomy": return `autonomy → ${a.value}`;
     case "mirror_script": return `run scripts · ${a.state}`;
     case "se_update": {
       const items = Array.isArray(a.items) ? ` (+${a.items.length})` : "";
@@ -637,14 +637,14 @@ document.addEventListener("click", (ev) => {
   if (dn) { renderDecisions(dn.dataset.node); return; }
 });
 
-// THE THRESHOLD SLIDER — the human's live grip on how much of the walk is
+// THE AUTONOMY SLIDER — the human's live grip on how much of the walk is
 // the agent's. Takes effect on the agent's NEXT tick; logged server-side.
 const thr = document.getElementById("thr");
 if (thr) {
   const lbl = document.getElementById("thr-val");
   thr.addEventListener("input", () => { if (lbl) lbl.textContent = Number(thr.value).toFixed(2); });
   thr.addEventListener("change", async () => {
-    await fetch("/threshold", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ value: Number(thr.value) }) });
+    await fetch("/autonomy", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ value: Number(thr.value) }) });
   });
 }
 
@@ -664,7 +664,7 @@ document.addEventListener("click", (ev) => {
     thr.value = v;
     const lbl = document.getElementById("thr-val");
     if (lbl) lbl.textContent = v.toFixed(2);
-    void fetch("/threshold", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ value: v }) });
+    void fetch("/autonomy", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ value: v }) });
     levelHelp(v);
     return;
   }
@@ -700,10 +700,10 @@ setInterval(async () => {
     const a = await r.json();
     aliveMisses = 0;
     if (a.status === "closed") { sessionOver(); return; }
-    if (thr && document.activeElement !== thr && Number(thr.value) !== a.threshold) {
-      thr.value = a.threshold;
+    if (thr && document.activeElement !== thr && Number(thr.value) !== a.autonomy) {
+      thr.value = a.autonomy;
       const lbl = document.getElementById("thr-val");
-      if (lbl) lbl.textContent = Number(a.threshold).toFixed(2);
+      if (lbl) lbl.textContent = Number(a.autonomy).toFixed(2);
     }
     if (logPanel && a.acts !== lastActs) { lastActs = a.acts; refreshLog(); }
     if (JSON.stringify(a.active || []) !== ACTIVE_AT_RENDER) { location.reload(); return; }
@@ -737,19 +737,13 @@ export function renderMirror(m: MirrorState, widget?: "machine" | "details" | "l
     leafActive.add(m.session.breadcrumb()[1]);
   }
   const history = m.session.instance.history ?? [];
-  const done = new Set(
-    history
-      .filter((h) => h.outcome === "filled")
-      .map((h) => h.state)
-      .filter((s) => (decl.id === m.session.machine.id ? !s.includes("/") : s.startsWith(`${decl.id}/`)))
-      .map((s) => s.split("/").pop()!),
-  );
+  // RE-ENTRY RESETS (owner ruling 2026-07-27): the drawing shows the LIVE
+  // run only — a machine entered again starts gray; past passes live in
+  // the record, not on the drawing.
+  const run = m.session.viewRun(decl.id);
+  const done = new Set(run.done.map((s) => s.split("/").pop()!));
   // An end state is never "filled" — it turns green when its machine completed.
-  const machineCompleted =
-    decl.id === m.session.machine.id
-      ? m.session.instance.status === "closed"
-      : history.some((h) => h.outcome === "filled" && h.state === decl.id);
-  if (machineCompleted) for (const s of decl.states) if (s.kind === "end") done.add(s.id);
+  if (run.completed) for (const s of decl.states) if (s.kind === "end") done.add(s.id);
   const subIds = new Set(decl.states.filter((s) => s.submachine !== undefined).map((s) => s.id));
   const meta: Record<string, StateMeta> = {};
   for (const s of decl.states) {
@@ -817,13 +811,13 @@ export function renderMirror(m: MirrorState, widget?: "machine" | "details" | "l
     history: history.slice(-20),
   }).replace(/</g, "\\u003c")};</script>`;
 
-  // The slider — THE THRESHOLD: which states the agent enters by itself
-  // (priority <= threshold). 0 = the human clicks through everything
+  // The slider — THE AUTONOMY: which states the agent enters by itself
+  // (priority <= autonomy). 0 = the human clicks through everything
   // (manual mode is just this); 1 = fully autonomous. Live: changes take
   // effect on the agent's next tick.
-  const thr = m.session.threshold;
+  const thr = m.session.autonomy;
   const notches = LEVELS.map((l) => `<span class="thr-notch" data-level="${l.value}" style="left:${l.value * 100}%" title="${esc(l.name)} — click: threshold ${l.value}">${l.abbr}</span>`).join("");
-  const slider = `<span class="threshold" title="the agent enters only states with priority ≤ threshold — the notches are the authored levels, click one to jump there"><span class="thr-help" title="click: the scale, explained in details">agent ≤</span><span class="thr-track"><input id="thr" type="range" min="0" max="1" step="0.01" value="${thr}" list="thr-ticks"><datalist id="thr-ticks">${LEVELS.map((l) => `<option value="${l.value}"></option>`).join("")}</datalist><span class="thr-notches">${notches}</span></span><span id="thr-val">${thr.toFixed(2)}</span></span>`;
+  const slider = `<span class="threshold" title="the agent enters only states with priority ≤ autonomy — the notches are the authored levels, click one to jump there"><span class="thr-help" title="click: the scale, explained in details">autonomy</span><span class="thr-track"><input id="thr" type="range" min="0" max="1" step="0.01" value="${thr}" list="thr-ticks"><datalist id="thr-ticks">${LEVELS.map((l) => `<option value="${l.value}"></option>`).join("")}</datalist><span class="thr-notches">${notches}</span></span><span id="thr-val">${thr.toFixed(2)}</span></span>`;
   const machineWidget = `<div class="widget" id="w-machine"><div class="widget-head"><span class="crumbs">${crumbs}</span>${slider}<button class="expand" data-widget="w-machine" data-url="/widget/machine?view=${encodeURIComponent(decl.id)}" title="expand · ctrl-click: new tab · shift-click: new window">⛶</button></div><div class="widget-body">${svg}</div></div>`;
   const detailsWidget = `<div class="widget" id="w-details">${widgetHead("details", "w-details", "/widget/details")}
     ${info.status === "closed" ? '<div class="meta" style="color:#e86a5f">machine closed</div>' : ""}

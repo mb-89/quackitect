@@ -3,10 +3,11 @@
 // to it, leaving merges back (until iterations exist to receive the
 // changes as design input). The worktree IS the record; the archive is
 // git history (merged exp/* branches).
-import { existsSync, mkdirSync } from "node:fs";
-import { join } from "node:path";
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { dirname, join } from "node:path";
 import { spawnSync } from "node:child_process";
 import { CLAUSES, Rejection } from "./errors.ts";
+import { parseStateNote } from "./notes.ts";
 
 const SRC = "engine/worktree.ts";
 
@@ -37,6 +38,27 @@ export interface Expedition {
 
 export function worktreesDir(root: string): string {
   return join(root, ".worktrees");
+}
+
+/** The expedition's RECORD lives ON ITS BRANCH (owner ruling 2026-07-27:
+ *  work state rides the worktree) at a spec path — so the merge lands
+ *  closed records on the main tree as the browsable archive. */
+export function recordRel(id: string): string {
+  return `product/spec/expeditions/${id}/record.md`;
+}
+
+/** The record's frontmatter — from the worktree while open, from the
+ *  branch once closed. Undefined for pre-record expeditions (e1–e3). */
+export function readRecord(root: string, e: Expedition): Record<string, unknown> | undefined {
+  const rel = recordRel(e.id);
+  if (e.open) {
+    const abs = join(e.path, rel);
+    if (!existsSync(abs)) return undefined;
+    return parseStateNote(readFileSync(abs, "utf8")).frontmatter;
+  }
+  const r = spawnSync("git", ["show", `${e.branch}:${rel}`], { cwd: root, encoding: "utf8", maxBuffer: 8 * 1024 * 1024 });
+  if (r.status !== 0) return undefined;
+  return parseStateNote(r.stdout).frontmatter;
 }
 
 /** Open = the worktree exists. Closed (archive) = branch exp/* without one. */
@@ -73,6 +95,31 @@ export function expNew(root: string, kind: string, goal: string): Expedition {
   const path = join(worktreesDir(root), id);
   mkdirSync(worktreesDir(root), { recursive: true });
   git(root, ["worktree", "add", path, "-b", `exp/${id}`], "worktree add");
+  // Mint the record WITH the expedition — committed, so the branch carries
+  // it from the first moment. Frontmatter is the queryable surface; the
+  // body is the human's, free prose.
+  const recAbs = join(path, recordRel(id));
+  mkdirSync(dirname(recAbs), { recursive: true });
+  writeFileSync(
+    recAbs,
+    [
+      "---",
+      `id: ${id}`,
+      `kind: ${kind}`,
+      "status: open",
+      `opened: ${new Date().toISOString()}`,
+      `goal: ${JSON.stringify(goal)}`,
+      "---",
+      "",
+      `# ${id}`,
+      "",
+      "Free prose — the human head of the record. Machine-facing fields stay in the frontmatter.",
+      "",
+    ].join("\n"),
+    "utf8",
+  );
+  git(path, ["add", "-A"], "add");
+  git(path, ["commit", "-q", "-m", `expedition ${id}: open`], "commit");
   return { id, branch: `exp/${id}`, path, open: true };
 }
 
@@ -95,6 +142,23 @@ export function expFind(root: string, id: string): Expedition {
  *  iterations exist), remove the worktree. Keep merge=false to archive
  *  the branch unmerged. */
 export function expClose(root: string, e: Expedition, merge: boolean): { id: string; merged: boolean } {
+  const recAbs = join(e.path, recordRel(e.id));
+  if (existsSync(recAbs)) {
+    // The expedition ends with a REPORT (owner ruling 2026-07-27) — it
+    // stays `pending` on the record until a retro adjudicates it.
+    const repRel = `product/spec/expeditions/${e.id}/report.md`;
+    if (!existsSync(join(e.path, repRel))) {
+      throw new Rejection({
+        clause: CLAUSES.CONDITION_UNMET,
+        expected: `a report before closing: ${repRel} — what was built or found, for the retro to adjudicate`,
+        got: "no report.md in the expedition record",
+        remedy: { tool: "se_file_write", args: { path: repRel, content: "<goal · what shipped or was found · open threads>", base_hash: null }, note: "write the report, then close again" },
+        source: SRC,
+      });
+    }
+    const raw = readFileSync(recAbs, "utf8");
+    writeFileSync(recAbs, raw.replace(/^status: open$/m, `status: closed\nclosed: ${new Date().toISOString()}\nreport: pending`), "utf8");
+  }
   // Leftover changes are committed — a walk's work never silently vanishes.
   const dirty = git(e.path, ["status", "--porcelain"], "status").trim() !== "";
   if (dirty) {

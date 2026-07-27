@@ -17,10 +17,10 @@ The machine gives you one state. Do exactly what its guidance asks. Produce
 its evidence. Move on. Do not look ahead, do not refactor, do not "improve"
 what the state did not name. The engine does the checking.
 
-## 3. Adjudication follows the session's threshold
+## 3. Adjudication follows the session's autonomy
 States carry a priority. The session sets the highest priority you may pass
 alone; a tick above it is refused (SE-C-113) — you present, you WAIT, you
-never retry your way past it. The threshold can change during the session
+never retry your way past it. The autonomy can change during the session
 (the user's slider); the refusal is the signal to tell the user a step is
 waiting for their hand — then stop, saying plainly that their message
 (continue is enough) resumes you; the slider alone cannot wake you.
