@@ -1,0 +1,19 @@
+{"ts":"2026-07-27T15:24:48.864Z","op":"plan","visit":"continue_expedition/e10@0","parent":null,"nodes":[{"id":"d1","brief":"fix renderLog arrow typo (line 767)"},{"id":"d2","brief":"legal tools as kv table row, one line per tool"},{"id":"d3","brief":"verify in browser + tests"}]}
+{"ts":"2026-07-27T15:27:30.174Z","op":"note","visit":"continue_expedition/e10@0","node":"d1","brief":"patch field names were wrong (find/replace vs old_string/new_string) — re-applying the 8 render.ts edits"}
+{"ts":"2026-07-27T15:28:30.077Z","op":"note","visit":"continue_expedition/e10@0","node":"d1","brief":"running the full selftest suite over the three fixes (log pane arrow, legal-tools row, archive wiring)"}
+{"ts":"2026-07-27T15:30:55.691Z","op":"plan","visit":"continue_expedition/e10@0","parent":null,"nodes":[{"id":"d4","brief":"cache archive/record git reads per session (regen only on new closures)"},{"id":"d5","brief":"verify archive open is fast after caching"}]}
+{"ts":"2026-07-27T15:38:31.726Z","op":"plan","visit":"continue_expedition/e10@0","parent":null,"nodes":[{"id":"d6","brief":"auto-install worktree deps in expNew"},{"id":"d7","brief":"fix the escape dialog x button"},{"id":"d8","brief":"write e10 report so the owner can merge from the mirror"}]}
+{"ts":"2026-07-27T15:40:19.175Z","op":"done","visit":"continue_expedition/e10@0","node":"d8","brief":"report written — the owner can close e10 from the mirror"}
+{"ts":"2026-07-27T15:40:39.421Z","op":"done","visit":"continue_expedition/e10@0","node":"d1","brief":"arrow typo fixed, log pane renders and polls"}
+{"ts":"2026-07-27T15:40:43.189Z","op":"done","visit":"continue_expedition/e10@0","node":"d2","brief":"legal tools as kv row, one line per tool, deduped"}
+{"ts":"2026-07-27T15:40:46.309Z","op":"done","visit":"continue_expedition/e10@0","node":"d3","brief":"browser-verified on a worktree mirror; selftests green"}
+{"ts":"2026-07-27T15:40:49.714Z","op":"done","visit":"continue_expedition/e10@0","node":"d4","brief":"closed records: one cat-file --batch + session cache"}
+{"ts":"2026-07-27T15:40:53.214Z","op":"done","visit":"continue_expedition/e10@0","node":"d5","brief":"measured ~70ms cold / ~30ms warm for 10 records"}
+{"ts":"2026-07-27T15:40:59.395Z","op":"done","visit":"continue_expedition/e10@0","node":"d6","brief":"expNew installs deliverable deps into the fresh worktree"}
+{"ts":"2026-07-27T15:41:02.268Z","op":"done","visit":"continue_expedition/e10@0","node":"d7","brief":"modal ✕ unblocked — expand listener scoped to [data-widget]"}
+{"ts":"2026-07-27T15:46:29.981Z","op":"plan","visit":"continue_expedition/e10@0","parent":null,"nodes":[{"id":"d9","brief":"read v1 retro prompt + mechanics"},{"id":"d10","brief":"summarize v1 retro vs v3 for the owner"}]}
+{"ts":"2026-07-27T15:54:32.587Z","op":"plan","visit":"continue_expedition/e10@0","parent":null,"nodes":[{"id":"d11","brief":"check the v2 design doc on notes/retro"},{"id":"d12","brief":"port v1 homes+migration into retro.md"},{"id":"d13","brief":"engine: backlog disposition + listing"},{"id":"d14","brief":"selftest coverage"},{"id":"d15","brief":"report amend"}]}
+{"ts":"2026-07-27T15:58:03.706Z","op":"note","visit":"continue_expedition/e10@0","node":"d9","brief":"retro.md ported: v1 homes (backlog w/ ready-when), migration step, last_retro log scoping, emit-vs-adopt separation"}
+{"ts":"2026-07-27T15:59:22.166Z","op":"done","visit":"continue_expedition/e10@0","node":"d9","brief":"n/a"}
+{"ts":"2026-07-27T15:59:30.787Z","op":"done","visit":"continue_expedition/e10@0","node":"d10","brief":"retro.md ported: homes, migration, last_retro scoping, emit-vs-adopt"}
+{"ts":"2026-07-27T16:01:13.292Z","op":"done","visit":"continue_expedition/e10@0","node":"d11","brief":"engine backlog + last_retro shipped; leaving e10 under the raised slider"}

@@ -95,6 +95,12 @@ export function expNew(root: string, kind: string, goal: string): Expedition {
   const path = join(worktreesDir(root), id);
   mkdirSync(worktreesDir(root), { recursive: true });
   git(root, ["worktree", "add", path, "-b", `exp/${id}`], "worktree add");
+  // The engine's npm deps (ripgrep) do not ride a fresh worktree — without
+  // them the lane's search and the selftests fail there.
+  const deliverable = join(path, "product", "deliverable");
+  if (existsSync(join(deliverable, "package.json")) && !existsSync(join(deliverable, "node_modules"))) {
+    spawnSync("npm", ["install", "--no-audit", "--no-fund"], { cwd: deliverable, stdio: "ignore", shell: process.platform === "win32" });
+  }
   // Mint the record WITH the expedition — committed, so the branch carries
   // it from the first moment. Frontmatter is the queryable surface; the
   // body is the human's, free prose.

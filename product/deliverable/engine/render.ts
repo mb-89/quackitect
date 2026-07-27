@@ -307,8 +307,8 @@ const STYLE = `
   .thr-notch { position: absolute; transform: translateX(-50%); font-size: 9px; line-height: 1; color: #7f8b96; cursor: pointer; padding: 1px 3px; }
   .thr-notch:hover { color: #e8b339; }
   #w-log { flex: 0 0 42%; border-radius: 0; border: 0; border-bottom: 1px solid #2a2f34; }
-  .log-filter-row { padding: 6px 12px 0; }
-  .log-filter-row input { width: 100%; box-sizing: border-box; background: #14171a; border: 1px solid #2a2f34; border-radius: 6px; color: #d8dde2; font: inherit; font-size: 12px; padding: 4px 8px; }
+  .log-filter-row { padding: 6px 12px 0; display: flex; gap: 6px; }
+  .log-filter-row input { flex: 1 1 50%; min-width: 0; box-sizing: border-box; background: #14171a; border: 1px solid #2a2f34; border-radius: 6px; color: #d8dde2; font: inherit; font-size: 12px; padding: 4px 8px; }
   .log-panel { font-size: 12px; margin-top: 6px; }
   .logrow { display: flex; gap: 8px; padding: 2px 0; cursor: pointer; border-bottom: 1px dotted #22272c; align-items: baseline; }
   .logrow:hover { background: #22272c; }
@@ -402,7 +402,7 @@ const HUMAN_TOOLS = {
   se_exp_list: [],
   se_exp_open: [{ name: "id", hint: "an open expedition id (se_exp_list shows them)" }],
   se_exp_close: [{ name: "merge", hint: "true merges back (default); false archives unmerged" }],
-  se_note_drain: [{ name: "ref", hint: "the note's ref (note-…) — the feed shows it" }, { name: "disposition", hint: "done | obsolete | carried" }, { name: "where", hint: "optional — where it landed or lives on" }],
+  se_note_drain: [{ name: "ref", hint: "the note's ref (note-…) — the feed shows it" }, { name: "disposition", hint: "done | obsolete | carried | backlog" }, { name: "where", hint: "where it landed or lives on — backlog REQUIRES it: ready when …" }],
 };
 function toolModal(name) {
   const fields = HUMAN_TOOLS[name] || [];
@@ -489,20 +489,23 @@ function stateDetail(id) {
   let html = jsonTable(bare);
   // Legal tools — human-callable ones are LINKS everywhere they appear
   // (parity law); a link outside its state just toasts "tool disabled".
-  const tools = s.legal_tools || [];
+  const tools = [...new Set(s.legal_tools || [])];
+  let extra = "";
   if (tools.length > 0) {
     const link = (t) => '<a class="toollink" data-tool="' + t + '">' + t + "</a>";
-    const plain = (t) => '<span style="margin-right:10px">' + escText(t) + "</span>";
+    const line = (t) => '<div style="padding:2px 0 2px 14px">' + (HUMAN_TOOLS[t] !== undefined ? link(t) : escText(t)) + "</div>";
     // "all" stays written as all — and EXPANDS into the human-callable
     // links (parity law), the same collapsible pattern the pull uses.
     const inner = tools.includes("all")
-      ? '<details><summary style="cursor:pointer;color:#7f8b96">all — the human-callable set</summary><div style="padding:4px 0">' + Object.keys(HUMAN_TOOLS).map(link).join("") + "</div></details>"
-      : tools.map((t) => (HUMAN_TOOLS[t] !== undefined ? link(t) : plain(t))).join("");
-    html += '<div class="meta" style="padding:8px 0 4px">legal tools</div><div>' + inner + "</div>";
+      ? '<details><summary style="cursor:pointer;color:#7f8b96">all — the human-callable set</summary>' + Object.keys(HUMAN_TOOLS).map(line).join("") + "</details>"
+      : tools.map(line).join("");
+    extra += '<tr><td class="k">legal tools</td><td class="v">' + inner + "</td></tr>";
   }
   if (s.pulled && s.pulled.length > 0) {
-    const row = '<tr><td class="k" title="derived by the machine, not authored">pulled</td><td class="v">' + pulledView(s.pulled) + "</td></tr></table>";
-    html = html.endsWith("</table>") ? html.slice(0, -8) + row : html + '<table class="kv">' + row;
+    extra += '<tr><td class="k" title="derived by the machine, not authored">pulled</td><td class="v">' + pulledView(s.pulled) + "</td></tr>";
+  }
+  if (extra) {
+    html = html.endsWith("</table>") ? html.slice(0, -8) + extra + "</table>" : html + '<table class="kv">' + extra + "</table>";
   }
   if (s.archive_record !== undefined) {
     const e = s.archive_record;
@@ -698,7 +701,8 @@ document.addEventListener("dblclick", (ev) => {
   if (g && g.dataset.sub) location.href = "/?view=" + encodeURIComponent(g.dataset.sub);
 });
 
-document.querySelectorAll(".expand").forEach((btn) => {
+// Only real widget expanders — the modal's ✕ shares the style, not the job.
+document.querySelectorAll(".expand[data-widget]").forEach((btn) => {
   btn.addEventListener("click", (ev) => {
     ev.stopPropagation();
     const url = btn.dataset.url;
@@ -764,7 +768,7 @@ function renderLog() {
   // NEWEST ON TOP (owner ruling): the feed reads downward into the past;
   // the scroll pins to the top while the reader is there.
   const stick = logPanel.scrollTop < 40;
-  logPanel.innerHTML = rows.slice().reverse().map((r) =
+  logPanel.innerHTML = rows.slice().reverse().map((r) =>
     '<div class="logrow ' + r.type + (r.ok ? "" : " failed") + '" data-ref="' + r.ref + '">' +
       '<span class="lt">' + (r.pending ? r.ts.slice(5, 10) : r.ts.slice(11, 19)) + "</span>" +
       '<span class="lsrc ' + r.src + '">' + r.src + "</span>" +
@@ -787,7 +791,15 @@ if (logPanel) {
   const fEl = document.getElementById("log-filter");
   if (fEl) fEl.addEventListener("input", renderLog);
   // Help is a detail: touching a control explains it in the details pane.
-  if (fEl) fEl.addEventListener("focus", () => showDetails("the feed filter", '<div class="comment-detail">Substring match over time, source, type, brief and clause. Type note to list every pending note; a clause like SE-C-113 finds refusals.</div>'));
+  if (fEl) fEl.addEventListener("focus", () => showDetails("the feed filter", '<div class="comment-detail">Substring match over time, source, type, brief and clause. One example per filter kind:</div>' +
+    '<div style="padding:2px 0 2px 14px"><code>note</code> — pending notes only</div>' +
+    '<div style="padding:2px 0 2px 14px"><code>call</code> — tool calls</div>' +
+    '<div style="padding:2px 0 2px 14px"><code>update</code> — decision-graph updates</div>' +
+    '<div style="padding:2px 0 2px 14px"><code>human</code> — the human hand</div>' +
+    '<div style="padding:2px 0 2px 14px"><code>agent</code> — the agent hand</div>' +
+    '<div style="padding:2px 0 2px 14px"><code>SE-C-113</code> — refusals by clause</div>' +
+    '<div style="padding:2px 0 2px 14px"><code>15:2</code> — a time window (hh:mm prefix)</div>' +
+    '<div style="padding:2px 0 2px 14px"><code>tick</code> — any word in the brief</div>'));
   const nEl = document.getElementById("log-note");
   if (nEl) {
     nEl.addEventListener("focus", () => showDetails("drop a note", '<div class="comment-detail">A stray — an idea, a bug, a better way. Enter captures it to the inbox with your hand stamped; a retro drains it later.</div>'));
@@ -1082,8 +1094,7 @@ export function renderMirror(m: MirrorState, widget?: "machine" | "details" | "l
   // The unified feed sits ABOVE details (owner ruling 2026-07-26) — rows
   // load and refresh client-side off /api/log; only present with a log.
   const logWidget = m.log === undefined ? "" : `<div class="widget" id="w-log">${widgetHead("log", "w-log", "/widget/log")}
-    <div class="log-filter-row"><input id="log-filter" placeholder="filter the feed — substring over time/src/type/brief/clause"></div>
-    <div class="log-filter-row"><input id="log-note" placeholder="drop a note — Enter captures it to the inbox"></div>
+    <div class="log-filter-row"><input id="log-filter" placeholder="filter the feed"><input id="log-note" placeholder="drop a note — Enter captures it"></div>
     <div class="panel log-panel" id="log-rows"><div class="meta">loading…</div></div>
   </div>`;
 

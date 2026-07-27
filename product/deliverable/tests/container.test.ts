@@ -3,8 +3,10 @@
 // one coming home completes the machine; empty runs start → end.
 import { strict as assert } from "node:assert";
 import { spawnSync } from "node:child_process";
+import { mkdirSync, writeFileSync } from "node:fs";
+import { dirname, join } from "node:path";
 import { test } from "node:test";
-import { generateContinueExpedition, shortId } from "../engine/expmachine.ts";
+import { generateContinueExpedition, generateExpeditionArchive, shortId } from "../engine/expmachine.ts";
 import { Session } from "../engine/session.ts";
 import { checkDocs, freshRoot } from "./helpers.ts";
 
@@ -83,4 +85,28 @@ test("seeded container: expeditions are the states, entering BINDS, one ending c
   assert.deepEqual(s.viewRun("continue_expedition").done, []);
   const again = s.generatedView("continue_expedition")!;
   assert.deepEqual(again.decl.states.map((x) => x.id), ["start", sidA, `${sidA}-leave`, "end"]);
+});
+
+test("the archive: start reaches every closed expedition, each runs to end, browsing is human-only", async () => {
+  const root = freshRoot();
+  gitSeed(root);
+  const s = new Session(root);
+  await bootHuman(s);
+  const a = s.expeditionNew("spike", "Archived Thing") as { created: string };
+  const sid = shortId(a.created);
+  const rep = join(root, ".worktrees", a.created, "product", "spec", "expeditions", a.created, "report.md");
+  mkdirSync(dirname(rep), { recursive: true });
+  writeFileSync(rep, "goal · shipped · threads\n", "utf8");
+  s.expeditionOpen(a.created);
+  s.expeditionClose(true);
+  const gen = generateExpeditionArchive(root);
+  assert.deepEqual(gen.decl.states.map((x) => x.id), ["start", sid, "end"]);
+  assert.deepEqual(gen.decl.states[0].edges.map((e) => e.to), [sid], "start reaches the archived expedition");
+  const st = gen.decl.states.find((x) => x.id === sid)!;
+  assert.deepEqual(st.edges, [{ to: "end", role: "alternative" }], "the archived state runs to end");
+  assert.equal(st.priority, 1.5, "archive browsing sits above the whole slider — human-only");
+  assert.equal(st.statement, "Archived Thing", "the record's goal is the statement");
+  assert.ok(gen.canvas.edges!.some((e) => e.fromNode === "n-start" && e.toNode === `n-${sid}`), "the drawing carries start → expedition");
+  const empty = generateExpeditionArchive(join(root, ".no-such"));
+  assert.deepEqual(empty.decl.states[0].edges.map((e) => e.to), ["end"], "nothing closed: start runs straight to end");
 });
