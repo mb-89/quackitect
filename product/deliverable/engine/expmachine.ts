@@ -39,8 +39,17 @@ function mechanical(id: string, kind: "start" | "end"): StateDecl {
   };
 }
 
+/** expList needs a git repository — a bare root simply has none. */
+function safeExpList(root: string): ReturnType<typeof expList> {
+  try {
+    return expList(root);
+  } catch {
+    return [];
+  }
+}
+
 export function generateContinueExpedition(root: string): GeneratedMachine {
-  const open = expList(root).filter((e) => e.open);
+  const open = safeExpList(root).filter((e) => e.open);
   const notesDir = join(root, "product", "deliverable", "machines", "states");
   const workTpl = stateFromNote("continue_expedition", "states/work.md", join(notesDir, "work.md"), root);
   const leaveTpl = stateFromNote("continue_expedition", "states/leave.md", join(notesDir, "leave.md"), root);
@@ -88,6 +97,54 @@ export function generateContinueExpedition(root: string): GeneratedMachine {
     nodes: nodes as CanvasElement[],
     edges,
     metadata: { frontmatter: { reentry: "restart", priority: 0.4 } },
+  };
+  return { decl, canvas, expByState };
+}
+
+/** THE ARCHIVE, generated (owner design 2026-07-27): every CLOSED
+ *  expedition stands as its own read-only state — a gallery of dead
+ *  machines, all in parallel. None is reachable from start (the walk runs
+ *  start → end past them); each carries an edge to end so the drawing
+ *  validates. Clicking one shows what the expedition did. */
+export function generateExpeditionArchive(root: string): GeneratedMachine {
+  const closed = safeExpList(root).filter((e) => !e.open);
+  const start = mechanical("start", "start");
+  start.edges.push({ to: "end", role: "normal" });
+  const states: StateDecl[] = [start];
+  const expByState: Record<string, string> = {};
+  type GenNode = CanvasElement & { styleAttributes?: Record<string, unknown> };
+  const nodes: GenNode[] = [];
+  const edges: CanvasEdge[] = [];
+  const centerY = closed.length === 0 ? 80 : ((closed.length - 1) * 420) / 2 + 80;
+  nodes.push({ id: "n-start", type: "file", file: "start.md", x: -1400, y: centerY, width: 160, height: 160, styleAttributes: { shape: "pill" } });
+  nodes.push({ id: "n-end", type: "file", file: "end.md", x: 260, y: centerY, width: 160, height: 160, styleAttributes: { shape: "pill" } });
+  edges.push({ id: "e-start-end", fromNode: "n-start", toNode: "n-end" });
+  closed.forEach((e, i) => {
+    const sid = shortId(e.id);
+    const fm = readRecord(root, e);
+    const goal = typeof fm?.goal === "string" ? fm.goal : "";
+    expByState[sid] = e.id;
+    states.push({
+      id: sid,
+      kind: "work",
+      statement: goal !== "" ? goal : e.id,
+      guidance: "An archived expedition — read-only. Its record and report are in the details; the walk never enters here.",
+      evidence_form: [],
+      priority: 0.2,
+      tags: ["archive-record"],
+      edges: [{ to: "end", role: "alternative" }],
+    });
+    const y = i * 420;
+    nodes.push({ id: `n-${sid}`, type: "file", file: `${sid}.md`, x: -1100, y, width: 620, height: 360 });
+    edges.push({ id: `e-${sid}-end`, fromNode: `n-${sid}`, toNode: "n-end" });
+  });
+  states.push(mechanical("end", "end"));
+  const decl: MachineDecl = { id: "expedition_archive", reentry: "restart", initial: "start", states };
+  validateMachine(decl);
+  const canvas: CanvasData = {
+    nodes: nodes as CanvasElement[],
+    edges,
+    metadata: { frontmatter: { reentry: "restart", priority: 0.2 } },
   };
   return { decl, canvas, expByState };
 }

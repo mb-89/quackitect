@@ -504,15 +504,16 @@ function stateDetail(id) {
     const row = '<tr><td class="k" title="derived by the machine, not authored">pulled</td><td class="v">' + pulledView(s.pulled) + "</td></tr></table>";
     html = html.endsWith("</table>") ? html.slice(0, -8) + row : html + '<table class="kv">' + row;
   }
-  if (s.archive) {
-    html += '<div class="meta" style="padding:8px 0 4px">the archive</div>';
-    if (!s.archive.length) html += '<div class="vnull">nothing closed yet</div>';
-    s.archive.forEach((e) => {
-      html += '<div style="padding:6px 0 2px"><b>' + escText(e.id) + "</b></div>";
+  if (s.archive_record !== undefined) {
+    const e = s.archive_record;
+    html += '<div class="meta" style="padding:8px 0 4px">the record</div>';
+    if (!e) html += '<div class="vnull">no record found</div>';
+    else {
+      html += '<div style="padding:2px 0"><b>' + escText(e.id) + "</b></div>";
       if (e.goal) html += '<div class="comment-text">' + escText(e.goal) + "</div>";
       html += '<div class="meta">' + (e.status ? "status: " + escText(e.status) : "pre-record") + (e.report ? " · report: " + escText(e.report) : "") + "</div>";
-      if (e.status) html += '<div><a class="doclink" data-path="product/spec/expeditions/' + escText(e.id) + '/record.md">record</a> · <a class="doclink" data-path="product/spec/expeditions/' + escText(e.id) + '/report.md">report</a></div>';
-    });
+      html += '<div><a class="doclink" data-path="product/spec/expeditions/' + escText(e.id) + '/record.md">record</a> · <a class="doclink" data-path="product/spec/expeditions/' + escText(e.id) + '/report.md">report</a></div>';
+    }
   }
   if (s.next && s.next.length > 0) {
     html += '<div class="meta" style="padding:8px 0 4px">next</div>' + nextTable(id, s);
@@ -1020,8 +1021,10 @@ export function renderMirror(m: MirrorState, widget?: "machine" | "details" | "l
       ...(s.exit !== undefined ? { exit: m.session.conditionStatus(decl, s, "leave") } : {}),
       exit_met: m.session.conditionMet(decl, s, "leave"),
       was_filled: done.has(s.id),
-      // An archive-tagged state carries the closed records for its detail.
-      ...(s.tags?.includes("archive") ? { archive: (m.session.expeditionList() as { archive: unknown[] }).archive } : {}),
+      // An archive-record state carries ITS closed record for the detail.
+      ...(s.tags?.includes("archive-record")
+        ? { archive_record: (m.session.expeditionList() as { archive: { id: string }[] }).archive.find((e) => e.id === s.id || e.id.startsWith(`${s.id}-`)) ?? null }
+        : {}),
       ...(s.exit?.script !== undefined || s.entry?.script !== undefined
         ? { script: m.session.scriptStatus(decl, s) }
         : {}),

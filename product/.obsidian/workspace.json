@@ -15,9 +15,9 @@
               "state": {
                 "file": "deliverable/machines/main.canvas",
                 "viewState": {
-                  "x": -80,
-                  "y": -239.01630546491037,
-                  "zoom": -1.4564039259397292
+                  "x": 429.48799920271296,
+                  "y": 178.47926259072037,
+                  "zoom": -0.12307059260639608
                 }
               },
               "icon": "lucide-layout-dashboard",
@@ -188,6 +188,8 @@
   },
   "active": "5969142b02d143c4",
   "lastOpenFiles": [
+    "deliverable/machines/retro.canvas",
+    "deliverable/machines/main.canvas",
     "deliverable/machines/states/read_contract.md",
     "deliverable/tests/threshold.test.ts",
     "deliverable/engine/mirror.ts",
@@ -208,7 +210,6 @@
     "deliverable/machines/conditions/read.md",
     "deliverable/machines/conditions/script.md",
     "deliverable/machines/continue_iteration.canvas",
-    "deliverable/machines/main.canvas",
     "deliverable/machines/continue_expedition.canvas",
     "deliverable/machines/start_iteration.canvas",
     "guidance/authoring/machines.md",

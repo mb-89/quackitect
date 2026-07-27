@@ -11,10 +11,13 @@ conditions, forms, the engine. Never a person.
 
 ## When it fires
 
-- An iteration finishes. It writes a "retro required" note; the next
-  start_iteration refuses until a retro ran.
-- The owner asks for one.
-- At idle, freely. Allowed, never required.
+The trigger is a NOTE carrying "needs retro":
+
+- An iteration finishes — the agent writes a "needs retro" note.
+- The owner asks for one — the agent writes a "needs retro" note.
+- While such a note pends, start_iteration's entry gate refuses; the
+  retro's drain dispositions it and the gate opens.
+- At idle, freely, with no trigger note at all. Allowed, never required.
 
 ## The steps
 

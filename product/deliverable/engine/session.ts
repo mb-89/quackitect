@@ -30,11 +30,11 @@ import {
 } from "./machine.ts";
 import { compileMachine, resolveRef } from "./machines/compile.ts";
 import { conditionNotePath } from "./conditions.ts";
-import { drainNote } from "./inbox.ts";
+import { drainNote, pendingNotes } from "./inbox.ts";
 import { confirmPrefill, formTemplatePath, lintForm, parseFormTemplate, scaffoldInstance, withFieldContent, withStatus, type FormLint, type FormTemplate } from "./forms.ts";
 import { pulledFor, scanGuidance, type GuidanceDoc, type PulledDoc } from "./pull.ts";
 import { expClose, expFind, expList, expNew, readRecord, type Expedition } from "./worktree.ts";
-import { generateContinueExpedition, type GeneratedMachine } from "./expmachine.ts";
+import { generateContinueExpedition, generateExpeditionArchive, type GeneratedMachine } from "./expmachine.ts";
 import { type CanvasData } from "./canvas.ts";
 import { spawn } from "node:child_process";
 import { resolveInRoot, seDir } from "./paths.ts";
@@ -392,11 +392,11 @@ export class Session {
   /** The mirror's view of a GENERATED machine: the walk's own instance
    *  while standing in it, a fresh generation for browsing. */
   generatedView(id: string): { decl: MachineDecl; canvas: CanvasData } | undefined {
-    if (id !== "continue_expedition") return undefined;
+    if (id !== "continue_expedition" && id !== "expedition_archive") return undefined;
     if (this.inSub() && this.sub!.decl.id === id && this.sub!.gen !== undefined) {
       return { decl: this.sub!.gen.decl, canvas: this.sub!.gen.canvas };
     }
-    const gen = generateContinueExpedition(this.root);
+    const gen = id === "continue_expedition" ? generateContinueExpedition(this.root) : generateExpeditionArchive(this.root);
     return { decl: gen.decl, canvas: gen.canvas };
   }
 
@@ -484,6 +484,10 @@ export class Session {
       const names = (which === "leave" ? s.exit : s.entry)?.evidence_form ?? [];
       return this.formsMet(names);
     }
+    if (key === "no_pending_note") {
+      const markers = (which === "leave" ? s.exit : s.entry)?.no_pending_note ?? [];
+      return this.blockingNotes(markers).length === 0;
+    }
     const ev = this.evidence.get(this.evidenceKey(m, s.id));
     if (key === "script") return (ev?.script_result as { ok?: boolean } | undefined)?.ok === true;
     return false;
@@ -530,6 +534,15 @@ export class Session {
     const h = this.formHome(name);
     const raw = existsSync(h.instanceAbs) ? readFileSync(h.instanceAbs, "utf8") : undefined;
     return { ...lintForm(h.template, raw, h.evidenceAbs), instanceRel: h.instanceRel };
+  }
+
+  /** Pending notes whose text carries one of the markers — what a
+   *  no_pending_note condition holds against ("needs retro" gates
+   *  start_iteration; the retro's drain clears them). */
+  private blockingNotes(markers: string[]): { ref: string; text: string }[] {
+    return pendingNotes(seDir(this.root))
+      .filter((n) => markers.some((m) => n.text.toLowerCase().includes(m.toLowerCase())))
+      .map((n) => ({ ref: n.ref, text: n.text }));
   }
 
   private formsMet(names: string[]): boolean {
@@ -932,6 +945,16 @@ export class Session {
         source: "engine/session.ts conditions",
       });
     }
+    if (key === "no_pending_note") {
+      const blockers = this.blockingNotes(args);
+      throw new Rejection({
+        clause: CLAUSES.CONDITION_UNMET,
+        expected: `${which} condition 'no_pending_note' of ${stateId} — no pending note carrying: ${args.join(", ")} (see ${note})`,
+        got: blockers.map((b) => `${b.ref}: ${b.text.slice(0, 80)}`).join(" · ") || "unmet",
+        remedy: { tool: "se_tick", args: {}, note: "run the RETRO first (idle → retro): its drain dispositions these notes, then this gate opens" },
+        source: "engine/session.ts conditions",
+      });
+    }
     if (key === "evidence_form") {
       let got = "unmet";
       try {
@@ -1272,9 +1295,14 @@ export class Session {
       .map((s) => this.state(this.machine, s))
       .find((s) => s.submachine !== undefined);
     if (subState === undefined) return;
-    // continue_expedition is GENERATED from the open expeditions — its
-    // drawn canvas is a stub (owner design 2026-07-27).
-    const gen = subState.id === "continue_expedition" ? generateContinueExpedition(this.root) : undefined;
+    // continue_expedition and expedition_archive are GENERATED from the
+    // records — their drawn canvases are stubs (owner design 2026-07-27).
+    const gen =
+      subState.id === "continue_expedition"
+        ? generateContinueExpedition(this.root)
+        : subState.id === "expedition_archive"
+          ? generateExpeditionArchive(this.root)
+          : undefined;
     const decl = gen !== undefined ? gen.decl : compileMachine(this.root, resolveRef(this.root, mainMachinePath(this.root), subState.submachine!));
     // RE-ENTRY RESETS (owner ruling 2026-07-27): a machine left through its
     // end starts over — evidence from the previous pass is cleared; the old

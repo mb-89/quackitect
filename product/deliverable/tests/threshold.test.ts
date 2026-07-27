@@ -65,9 +65,8 @@ test("the gate weighs the TARGET: a 0.4 state refuses the agent at 0.2, the huma
   // may (with its read proof: entering demands the pull's hashes).
   const ok = await call(server, "se_tick", { to: "expedition_archive", read_hashes: readHashesFor(root) });
   assert.equal(ok.isError, false);
-  // Walk the archive machine (start → browse → end) back to idle on the
-  // human's hand …
-  await session.tickAdvance(); await session.tickAdvance(); await session.tickAdvance();
+  // Walk the (generated, empty) archive back to idle on the human's hand …
+  await session.tickAdvance(); await session.tickAdvance();
   assert.deepEqual(session.active(), ["idle"]);
   // … and the human enters the 0.4 state the agent was refused.
   await session.tickAdvance("start_expedition");
@@ -84,7 +83,7 @@ test("jump back is entering too: the agent's back-jump is weighed against the au
   // Walk a JUDGMENT state (the archive, 0.2) so there is something above
   // autonomy 0 to jump back to — mechanical states pass at 0 by design.
   await session.tickAdvance("expedition_archive");
-  await session.tickAdvance(); await session.tickAdvance(); await session.tickAdvance();
+  await session.tickAdvance(); await session.tickAdvance();
   assert.deepEqual(session.active(), ["idle"]);
   session.setAutonomy(0);
   const r = await call(server, "se_tick", { back: "expedition_archive" });

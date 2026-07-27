@@ -41,3 +41,34 @@ test("draining is retro-scoped: refused under 'all', legal in retro/drain — an
   assert.equal(missing.isError, true);
   assert.equal(missing.body.clause, "SE-C-073");
 });
+
+test("the needs-retro gate: a pending trigger note blocks start_iteration until the retro drains it", async () => {
+  const root = freshRoot();
+  const session = new Session(root);
+  const server = buildServer(root, session);
+  const hashes = readHashesFor(root);
+  for (let i = 0; i < 8; i++) {
+    const step = await call(server, "se_tick", { advance: true, read_hashes: hashes });
+    if (step.body.booted === true) break;
+  }
+  // The trigger: the owner asked for a retro (or an iteration finished).
+  const minted = await call(server, "se_note", { text: "needs retro — iteration wrapped" });
+  const ref = String(minted.body.captured);
+  // start_iteration refuses, NAMING the blocking note and the remedy.
+  const refused = await call(server, "se_tick", { to: "start_iteration", read_hashes: hashes });
+  assert.equal(refused.isError, true);
+  assert.equal(refused.body.clause, "SE-C-112");
+  assert.match(String(refused.body.got), /needs retro/);
+  assert.match(String((refused.body.remedy as { note: string }).note), /RETRO/);
+  // The retro drains it …
+  const method = "product/guidance/method/retro.md";
+  const withMethod = { ...hashes, [method]: contentHash(readFileSync(join(root, ...method.split("/")))) };
+  await call(server, "se_tick", { to: "retro", read_hashes: hashes });
+  await call(server, "se_tick", { to: "drain", read_hashes: withMethod });
+  await call(server, "se_note_drain", { ref, disposition: "done", where: "retro ran" });
+  await call(server, "se_tick", { to: "end", read_hashes: withMethod });
+  await call(server, "se_tick", { advance: true, read_hashes: hashes });
+  // … and the gate opens.
+  const open = await call(server, "se_tick", { to: "start_iteration", read_hashes: hashes });
+  assert.equal(open.isError, false, JSON.stringify(open.body));
+});

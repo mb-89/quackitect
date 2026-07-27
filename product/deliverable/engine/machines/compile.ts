@@ -135,6 +135,10 @@ export function compileMachine(root: string, canvasPath: string): MachineDecl {
       if (subPriority === undefined) {
         throw new MachineCompileError(machineId, `canvas node ${el.id}`, `${subId}.canvas declares no priority in its frontmatter — every state has one (0.01 mechanical .. 0.8 killer; 1 is the slider's ideation notch)`);
       }
+      // A sub-canvas may carry conditions in its frontmatter (flat keys,
+      // like a note) — e.g. start_iteration's needs-retro gate.
+      const subEntry = conditionDict(machineId, ref, root, "entry", subFm);
+      const subExit = conditionDict(machineId, ref, root, "exit", subFm);
       decl = {
         id: subId,
         kind: "work",
@@ -143,6 +147,8 @@ export function compileMachine(root: string, canvasPath: string): MachineDecl {
         evidence_form: [],
         submachine: ref,
         priority: subPriority,
+        ...(subEntry !== undefined ? { entry: subEntry } : {}),
+        ...(subExit !== undefined ? { exit: subExit } : {}),
         edges: [],
       };
     } else if (ref.endsWith(".md")) {

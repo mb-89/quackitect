@@ -1,7 +1,7 @@
 {
 	"metadata":{
 		"version":"1.0-1.0",
-		"frontmatter":{"reentry":"restart","priority":0.4}
+		"frontmatter":{"reentry":"restart","priority":0.4,"entry_no_pending_note":"needs retro"}
 	},
 	"nodes":[
 		{"id":"n-comment","type":"text","text":"START PLANNED WORK — plan a new iteration. EMPTY until persistence lands (spec/iterations/).","x":-1100,"y":-340,"width":660,"height":120},

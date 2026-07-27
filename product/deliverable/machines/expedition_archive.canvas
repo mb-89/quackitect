@@ -10,11 +10,11 @@
   {
    "id": "n-comment",
    "type": "text",
-   "text": "EXPEDITION ARCHIVE — closed expeditions, browsable: the browse state's details list every record with goal, status and report verdict.",
+   "text": "GENERATED AT ENTRY — every ARCHIVED expedition stands as its own read-only state, in parallel: a gallery of dead machines. None is walkable; click one for its record and report. This drawing is the stub that carries the frontmatter.",
    "x": -1100,
    "y": -340,
    "width": 660,
-   "height": 120
+   "height": 140
   },
   {
    "id": "n-start",
@@ -23,19 +23,10 @@
    "styleAttributes": {
     "shape": "pill"
    },
-   "x": -1400,
+   "x": -1100,
    "y": 80,
    "width": 160,
    "height": 160
-  },
-  {
-   "id": "n-browse",
-   "type": "file",
-   "file": "deliverable/machines/states/browse.md",
-   "x": -1100,
-   "y": -20,
-   "width": 620,
-   "height": 360
   },
   {
    "id": "n-end",
@@ -44,7 +35,7 @@
    "styleAttributes": {
     "shape": "pill"
    },
-   "x": -340,
+   "x": -700,
    "y": 80,
    "width": 160,
    "height": 160
@@ -52,15 +43,8 @@
  ],
  "edges": [
   {
-   "id": "e-start-browse",
+   "id": "e-start-end",
    "fromNode": "n-start",
-   "fromSide": "right",
-   "toNode": "n-browse",
-   "toSide": "left"
-  },
-  {
-   "id": "e-browse-end",
-   "fromNode": "n-browse",
    "fromSide": "right",
    "toNode": "n-end",
    "toSide": "left"
