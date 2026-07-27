@@ -3,12 +3,13 @@
 // per-state decision tree; the toll forces narration only after a lapse and
 // one ignored warning. No ETA anywhere — timestamps are the engine's.
 import { strict as assert } from "node:assert";
-import { mkdtempSync } from "node:fs";
+import { mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { test } from "node:test";
 import { CallLog } from "../engine/calllog.ts";
 import { Decisions, parseUpdate } from "../engine/decisions.ts";
+import { readNotes } from "../engine/inbox.ts";
 import { seDir } from "../engine/paths.ts";
 import { feedRows, renderMirror } from "../engine/render.ts";
 import { Session } from "../engine/session.ts";
@@ -106,23 +107,40 @@ test("the unified feed derives src, type and brief — and the mirror carries th
   const log = new CallLog(seDir(root));
   log.append({ tool: "se_file_read", args: { path: "product/x.md" }, ok: true, outcome: "result", duration_ms: 1 });
   log.append({ tool: "mirror_check", args: { path: "product/guidance/voice.md" }, ok: true, outcome: "result", duration_ms: 1 });
+  log.append({ tool: "se_update", args: { via: "se_tick", visit: "idle@0", op: "plan", nodes: [{ id: "d1", brief: "x" }] }, ok: true, outcome: "result", duration_ms: 0 });
   log.append({ tool: "se_update", args: { via: "se_tick", visit: "idle@0", op: "note", brief: "working" }, ok: true, outcome: "result", duration_ms: 0 });
   log.append({ tool: "se_note", args: { text: "stray" }, ok: true, outcome: "result", duration_ms: 0 });
   log.append({ tool: "se_run", args: { command: "boom" }, ok: false, outcome: "rejected", duration_ms: 1, response: { clause: "SE-C-046" } });
   const { rows, capped } = feedRows(log, "1970-01-01T00:00:00.000Z");
   assert.equal(capped, false);
-  assert.equal(rows.length, 5);
-  assert.deepEqual(rows.map((r) => r.src), ["agent", "human", "agent", "agent", "agent"]);
-  assert.deepEqual(rows.map((r) => r.type), ["call", "call", "update", "note", "call"]);
+  assert.equal(rows.length, 6);
+  assert.deepEqual(rows.map((r) => r.src), ["agent", "human", "agent", "agent", "agent", "agent"]);
+  // An op-note update reads as a NOTE (owner ruling 2026-07-27): italic in
+  // the pane, click opens its text — only structural ops type "update".
+  assert.deepEqual(rows.map((r) => r.type), ["call", "call", "update", "note", "note", "call"]);
   assert.match(String(rows[0].brief), /read product\/x\.md/);
   assert.match(String(rows[1].brief), /check/);
-  assert.match(String(rows[2].brief), /note: working/);
-  assert.equal(rows[2].visit, "idle@0");
-  assert.equal(rows[4].clause, "SE-C-046");
+  assert.match(String(rows[3].brief), /note: working/);
+  assert.equal(rows[3].visit, "idle@0");
+  assert.equal(rows[5].clause, "SE-C-046");
+  // PENDING STRAYS SURVIVE SESSIONS: an earlier session's note rides on top
+  // of the feed; one minted within the session window is not doubled (it
+  // already rides as its se_note call).
+  writeFileSync(join(seDir(root), "notes.jsonl"),
+    JSON.stringify({ ref: "note-old", text: "from an earlier session", at: "2000-01-02T03:04:05.000Z" }) + "\n" +
+    JSON.stringify({ ref: "note-new", text: "this session", at: "2999-01-01T00:00:00.000Z" }) + "\n");
+  const withPending = feedRows(log, "2020-01-01T00:00:00.000Z", readNotes(seDir(root)));
+  assert.equal(withPending.rows[0].ref, "note-old");
+  assert.equal(withPending.rows[0].type, "note");
+  assert.equal(withPending.rows[0].pending, true);
+  assert.equal(withPending.rows.filter((r) => r.ref === "note-new").length, 0);
   // The sidebar: log pane present WITH a log, absent without.
   const withLog = renderMirror({ session, root, lastPacket: undefined, mode: "manual", log });
   assert.ok(withLog.includes('id="w-log"'));
   assert.ok(withLog.includes('id="log-filter"'));
+  // The slider carries the authored levels as notches (shortcuts + help).
+  assert.ok(withLog.includes("thr-notch"));
+  assert.ok(withLog.includes('id="thr-ticks"'));
   const bare = renderMirror({ session, root, lastPacket: undefined, mode: "manual" });
   assert.ok(!bare.includes('id="w-log"'));
   // The client script must PARSE — a syntax error would kill the whole

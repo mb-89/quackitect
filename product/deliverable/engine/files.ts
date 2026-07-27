@@ -7,6 +7,7 @@
 //     checked before anything is written.
 //   - CAS on every write: read returns the hash, write demands it. This is
 //     also the read-before-write law, enforced mechanically.
+import { spawnSync } from "node:child_process";
 import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { dirname, join, relative, sep } from "node:path";
 import { CLAUSES, Rejection } from "./errors.ts";
@@ -43,22 +44,46 @@ export interface ReadResult {
   total_lines: number;
   /** Present on range reads: which slice this is. */
   range?: { offset: number; limit: number };
+  /** Present when the read came from a committed ref, not the working tree. */
+  ref?: string;
   content: string;
   truncated_lines?: number[];
 }
 
-export function fileRead(root: string, path: string, opts: { offset?: number; limit?: number } = {}): ReadResult {
-  const abs = mustExist(root, path, SRC);
-  if (statSync(abs).isDirectory()) {
+/** A committed blob: git show <ref>:<path>. The ref's tree layout may
+ *  differ from today's — the remedy globs the ref, not the working tree. */
+function gitShow(root: string, ref: string, path: string): string {
+  const spec = `${ref}:${path.replace(/\\/g, "/")}`;
+  const r = spawnSync("git", ["show", spec], { cwd: root, encoding: "utf8", maxBuffer: 64 * 1024 * 1024 });
+  if (r.status !== 0) {
     throw new Rejection({
       clause: CLAUSES.PATH_ESCAPE,
-      expected: "a file",
-      got: `${path} is a directory`,
-      remedy: { tool: "se_file_list", args: { dir: path } },
+      expected: "an existing <ref>:<path> in this repository",
+      got: `${spec} — ${(r.stderr ?? "").trim().split("\n")[0]}`,
+      remedy: { tool: "se_file_glob", args: { glob: "**/*", ref }, note: "glob the ref's tree first — the layout differs between versions ('main' reaches v1, 'v2' reaches v2)" },
       source: SRC,
     });
   }
-  const raw = readFileSync(abs, "utf8");
+  return r.stdout;
+}
+
+export function fileRead(root: string, path: string, opts: { offset?: number; limit?: number; ref?: string } = {}): ReadResult {
+  let raw: string;
+  if (opts.ref !== undefined) {
+    raw = gitShow(root, opts.ref, path);
+  } else {
+    const abs = mustExist(root, path, SRC);
+    if (statSync(abs).isDirectory()) {
+      throw new Rejection({
+        clause: CLAUSES.PATH_ESCAPE,
+        expected: "a file",
+        got: `${path} is a directory`,
+        remedy: { tool: "se_file_list", args: { dir: path } },
+        source: SRC,
+      });
+    }
+    raw = readFileSync(abs, "utf8");
+  }
   const hash = contentHash(raw);
   const lines = raw.split("\n");
   const wantsRange = opts.offset !== undefined || opts.limit !== undefined;
@@ -88,6 +113,7 @@ export function fileRead(root: string, path: string, opts: { offset?: number; li
     return `${String(offset + i).padStart(5)}\t${line}`;
   });
   const res: ReadResult = { path, hash, total_lines: lines.length, content: numbered.join("\n") };
+  if (opts.ref !== undefined) res.ref = opts.ref;
   if (wantsRange) res.range = { offset, limit };
   if (truncated.length > 0) res.truncated_lines = truncated;
   return res;
@@ -255,8 +281,23 @@ export function globToRegExp(glob: string): RegExp {
   return new RegExp(`^${re}$`);
 }
 
-export function fileGlob(root: string, glob: string, limit = 500): { glob: string; files: string[]; truncated: boolean } {
+export function fileGlob(root: string, glob: string, opts: { limit?: number; ref?: string } = {}): { glob: string; ref?: string; files: string[]; truncated: boolean } {
+  const limit = opts.limit ?? 500;
   const rx = globToRegExp(glob.replace(/\\/g, "/"));
+  if (opts.ref !== undefined) {
+    const r = spawnSync("git", ["ls-tree", "-r", "--name-only", opts.ref], { cwd: root, encoding: "utf8", maxBuffer: 64 * 1024 * 1024 });
+    if (r.status !== 0) {
+      throw new Rejection({
+        clause: CLAUSES.PATH_ESCAPE,
+        expected: "a known git ref",
+        got: `${opts.ref} — ${(r.stderr ?? "").trim().split("\n")[0]}`,
+        remedy: { tool: "se_run", args: { command: "git branch --all --list" }, note: "list the refs that exist, then glob again" },
+        source: SRC,
+      });
+    }
+    const files = r.stdout.split("\n").map((l) => l.trim()).filter((l) => l !== "" && rx.test(l)).sort();
+    return { glob, ref: opts.ref, files: files.slice(0, limit), truncated: files.length > limit };
+  }
   const out: string[] = [];
   const walk = (dir: string): void => {
     if (out.length > limit) return;

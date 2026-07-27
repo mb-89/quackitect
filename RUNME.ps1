@@ -4,43 +4,29 @@ quackitect v3 — install-check, selftest, and launch.
 
 .DESCRIPTION
 Preflight (node/git/ripgrep hard deps), cage install, engine selftests, then
-either the caged agent (default) or the Mirror in manual mode.
-
-.PARAMETER Manual
-Alias for -Threshold 0. The agent STILL launches in this console - it just
-may not enter any state by itself, announces that it is holding, and you
-walk the machine from the Mirror (http://localhost:7333). Slide up whenever
-you want it to take over; it wakes and continues on its own.
-
-.PARAMETER Threshold
-0..1 - which states the AGENT enters by itself (a state's priority must be
-<= the threshold). 0: every step is yours, click through in the Mirror.
-0.5 (default): the agent does the everyday steps, killers wait for you.
-1: fully autonomous. Live-adjustable via the Mirror's slider - a holding
-agent is woken by the change.
-
-.PARAMETER Help
-Show this help (-h and -? work too).
+the caged agent. EVERY argument is forwarded to the se server - flags are
+defined ONCE, in engine/bin/se-mcp.ts (--help lists them).
 
 .EXAMPLE
 .\RUNME.ps1
 .EXAMPLE
-.\RUNME.ps1 -Threshold 0
+.\RUNME.ps1 --threshold 0
 .EXAMPLE
-.\RUNME.ps1 -Manual
+.\RUNME.ps1 --manual
 #>
-[CmdletBinding()]
-param(
-  [switch]$Manual,
-  [ValidateRange(0.0, 1.0)][double]$Threshold = 0.5,
-  [switch]$Help
-)
-if ($Help) {
-  Get-Help $PSCommandPath -Detailed
-  exit 0
-}
 $ErrorActionPreference = "Stop"
 $root = $PSScriptRoot
+
+# The single flag registry is the server (engine/bin/se-mcp.ts). RUNME only
+# recognizes the help spellings, and answers them with the server's help.
+$forwarded = @($args | ForEach-Object { "$_" })
+if ($forwarded | Where-Object { $_ -in @("--help", "-h", "-?", "-Help") }) {
+  Write-Host "RUNME.ps1 - install-check, selftest, launch. Every argument is forwarded to the se server:" -ForegroundColor Cyan
+  $node = Get-Command node -ErrorAction SilentlyContinue
+  if ($node) { node (Join-Path $root "product\deliverable\engine\bin\se-mcp.ts") --help }
+  else { Write-Host "  (node not installed yet - the flags live in product\deliverable\engine\bin\se-mcp.ts)" }
+  exit 0
+}
 
 Write-Host "quackitect v3 - preflight" -ForegroundColor Cyan
 
@@ -116,23 +102,20 @@ try {
   Pop-Location
 }
 
-# MANUAL is an alias for threshold 0: the agent still launches, but every
-# step is yours - you drive from the Mirror, the agent holds and narrates.
-# (Walking with NO agent at all: node engine\bin\se-manual.ts directly.)
-if ($Manual) { $Threshold = 0 }
-
 # Launch Claude Code inside the cage. workspace/.claude/settings.json
 # denies the native tools by name (explicit blacklist); workspace/.mcp.json
 # serves the se lane. The agent's whole world is the MCP server - which also
 # embeds the Mirror (http://localhost:7333): YOUR hand on the same walk.
-# .mcp.json args are fixed template text, so the threshold rides the env.
+# .mcp.json args are fixed template text, so the forwarded command line
+# rides the env (newline-separated - argument values may carry spaces).
 $claude = Get-Command claude -ErrorAction SilentlyContinue
 if ($null -eq $claude) {
   Write-Host "claude CLI not found. Install Claude Code first: https://code.claude.com/docs" -ForegroundColor Red
   exit 1
 }
-$env:SE_THRESHOLD = $Threshold.ToString([System.Globalization.CultureInfo]::InvariantCulture)
-Write-Host "quackitect v3 - launching caged agent in workspace/ (threshold $env:SE_THRESHOLD)" -ForegroundColor Cyan
+$env:SE_ARGS = ($forwarded -join "`n")
+$argNote = if ($forwarded.Count -gt 0) { " (args: $($forwarded -join ' '))" } else { "" }
+Write-Host "quackitect v3 - launching caged agent in workspace/$argNote" -ForegroundColor Cyan
 Write-Host "quackitect v3 - the Mirror (your hand on the walk) opens at http://localhost:7333 once the server is up" -ForegroundColor Cyan
 
 # Open the Mirror in the browser AS SOON AS it answers. The server only
