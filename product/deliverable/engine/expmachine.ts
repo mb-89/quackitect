@@ -34,7 +34,7 @@ function mechanical(id: string, kind: "start" | "end"): StateDecl {
         ? "The seeded container: every open expedition stands as its own states. Pick ONE way forward — entering an expedition binds its worktree."
         : "One expedition came home (or nothing was open) — the machine is complete here. The others stay parked for the next entry.",
     evidence_form: [],
-    priority: 0,
+    priority: 0.01,
     edges: [],
   };
 }

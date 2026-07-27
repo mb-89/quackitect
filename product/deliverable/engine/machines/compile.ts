@@ -133,7 +133,7 @@ export function compileMachine(root: string, canvasPath: string): MachineDecl {
       const subFm = existsSync(subPath) ? (loadCanvas(subPath).metadata?.frontmatter ?? {}) : {};
       const subPriority = asPriority(subFm.priority);
       if (subPriority === undefined) {
-        throw new MachineCompileError(machineId, `canvas node ${el.id}`, `${subId}.canvas declares no priority in its frontmatter — every state has one (0 mechanical .. 0.8 killer; 1 is the slider's ideation notch)`);
+        throw new MachineCompileError(machineId, `canvas node ${el.id}`, `${subId}.canvas declares no priority in its frontmatter — every state has one (0.01 mechanical .. 0.8 killer; 1 is the slider's ideation notch)`);
       }
       decl = {
         id: subId,
@@ -292,7 +292,7 @@ export function stateFromNote(machineId: string, ref: string, notePath: string, 
   }
   const priority = asPriority(x.priority);
   if (priority === undefined) {
-    throw new MachineCompileError(machineId, ref, "every state carries a priority (frontmatter `priority:` 0 mechanical .. 0.8 killer)");
+    throw new MachineCompileError(machineId, ref, "every state carries a priority (frontmatter `priority:` 0.01 mechanical .. 0.8 killer)");
   }
   const legalTools = asList(x.legal_tools);
   const entry = conditionDict(machineId, ref, root, "entry", x);

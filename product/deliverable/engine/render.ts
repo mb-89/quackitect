@@ -16,6 +16,7 @@
 import { loadCanvas, type CanvasData, type CanvasElement } from "./canvas.ts";
 import { CallLog, type CallRecord } from "./calllog.ts";
 import { type StrayNote } from "./inbox.ts";
+import { loadLevels } from "./scale.ts";
 import { mainMachinePath, Session } from "./session.ts";
 import { compileMachine, resolveRef } from "./machines/compile.ts";
 import { type MachineDecl } from "./machine.ts";
@@ -216,19 +217,6 @@ function viewedMachine(m: MirrorState, view: string | undefined): { decl: Machin
   const path = resolveRef(m.root, mainPath, subState.submachine!);
   return { decl: compileMachine(m.root, path), canvas: loadCanvas(path) };
 }
-
-/** The human-involvement anchors (single prose source:
- *  product/guidance/authoring/machines.md § Priority). Notches on the
- *  threshold slider — a click is a shortcut to the level and surfaces its
- *  help in the details pane. */
-const LEVELS = [
-  { value: 0, abbr: "M", name: "mechanical" },
-  { value: 0.2, abbr: "R", name: "routine" },
-  { value: 0.4, abbr: "E", name: "everyday decision" },
-  { value: 0.6, abbr: "C", name: "consequential" },
-  { value: 0.8, abbr: "K", name: "killer / milestone" },
-  { value: 1, abbr: "I", name: "ideation — the agent finds its own work (behavior ships later)" },
-];
 
 /** The SHUTDOWN CONTROL's five notches (owner design): what happens
  *  around "done". Abbreviations on the bar; click for the explanations. */
@@ -864,7 +852,7 @@ if (thr) {
 // THE NOTCHES — the authored involvement levels as shortcuts on the
 // slider: a click jumps the threshold there and surfaces the level's help
 // in the details pane (help is a detail, never a button).
-const THR_LEVELS = ${JSON.stringify(LEVELS)};
+const THR_LEVELS = D.levels;
 function levelHelp(sel) {
   const rows = THR_LEVELS.map((l) =>
     '<tr' + (sel === l.value ? ' style="background:#22272c"' : "") + '><td class="k">' + l.abbr + " · " + l.value + '</td><td class="v">' + l.name + "</td></tr>").join("");
@@ -974,6 +962,9 @@ function widgetHead(title: string, widgetId: string, url: string): string {
 
 export function renderMirror(m: MirrorState, widget?: "machine" | "details" | "log", view?: string): string {
   const info = m.session.describe() as { active: string[]; status: string };
+  // The scale is READ from machines/scale.md — the Obsidian-editable
+  // truth; an owner edit shows on the next reload.
+  const levels = loadLevels(m.root);
   const walkMachine = m.session.currentMachine();
   const { decl, canvas } = viewedMachine(m, view ?? walkMachine.id);
   const viewingWalk = decl.id === walkMachine.id;
@@ -1061,6 +1052,7 @@ export function renderMirror(m: MirrorState, widget?: "machine" | "details" | "l
     viewingWalk,
     viewed: { id: decl.id, reentry: decl.reentry, initial: decl.initial, states: decl.states.map((s) => s.id) },
     history: history.slice(-20),
+    levels,
   }).replace(/</g, "\\u003c")};</script>`;
 
   // The slider — THE AUTONOMY: which states the agent enters by itself
@@ -1068,8 +1060,8 @@ export function renderMirror(m: MirrorState, widget?: "machine" | "details" | "l
   // (manual mode is just this); 1 = fully autonomous. Live: changes take
   // effect on the agent's next tick.
   const thr = m.session.autonomy;
-  const notches = LEVELS.map((l) => `<span class="thr-notch" data-level="${l.value}" style="left:${l.value * 100}%" title="${esc(l.name)} — click: autonomy ${l.value}">${l.abbr}</span>`).join("");
-  const slider = `<span class="threshold" title="the agent enters only states with priority ≤ autonomy — the notches are the authored levels, click one to jump there"><span class="thr-help" title="click: the scale, explained in details">autonomy</span><span class="thr-track"><input id="thr" type="range" min="0" max="1" step="0.01" value="${thr}" list="thr-ticks"><datalist id="thr-ticks">${LEVELS.map((l) => `<option value="${l.value}"></option>`).join("")}</datalist><span class="thr-notches">${notches}</span></span><span id="thr-val">${thr.toFixed(2)}</span></span>`;
+  const notches = levels.map((l) => `<span class="thr-notch" data-level="${l.value}" style="left:${l.value * 100}%" title="${esc(l.name)} — click: autonomy ${l.value}">${l.abbr}</span>`).join("");
+  const slider = `<span class="threshold" title="the agent enters only states with priority ≤ autonomy — the notches are the authored levels, click one to jump there"><span class="thr-help" title="click: the scale, explained in details">autonomy</span><span class="thr-track"><input id="thr" type="range" min="0" max="1" step="0.01" value="${thr}" list="thr-ticks"><datalist id="thr-ticks">${levels.map((l) => `<option value="${l.value}"></option>`).join("")}</datalist><span class="thr-notches">${notches}</span></span><span id="thr-val">${thr.toFixed(2)}</span></span>`;
   const sd = m.session.shutdown;
   const sdNotches = SHUTDOWN_LEVELS.map((l) => `<span class="sd-notch thr-notch" data-level="${l.value}" style="left:${((l.value - 1) / 4) * 100}%" title="${esc(l.name)}">${l.abbr}</span>`).join("");
   const sdAbbrNow = SHUTDOWN_LEVELS.find((l) => l.value === sd)?.abbr ?? String(sd);

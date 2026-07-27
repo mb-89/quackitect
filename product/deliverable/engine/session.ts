@@ -44,7 +44,11 @@ import { Decisions } from "./decisions.ts";
  *  arguments it reports (observability is never gated); with arguments it
  *  advances. se_note is legal everywhere too: a stray is captured where it
  *  strikes, never chased (contract rule 4). */
-const ALWAYS_LEGAL: ReadonlySet<string> = new Set(["se_tick", "se_note", "se_note_drain"]);
+const ALWAYS_LEGAL: ReadonlySet<string> = new Set(["se_tick", "se_note"]);
+/** RESTRICTED tools: "all" does NOT grant these — a state must name them.
+ *  se_note_drain is legal only in the retro's drain state (owner ruling
+ *  2026-07-27: there is no point in draining anywhere else). */
+const RESTRICTED: ReadonlySet<string> = new Set(["se_note_drain"]);
 const MACHINERY: readonly string[] = ["se_tick"];
 
 export function mainMachinePath(root: string): string {
@@ -436,7 +440,8 @@ export class Session {
   gate(tool: string): void {
     if (ALWAYS_LEGAL.has(tool)) return;
     const { all, tools } = this.legal();
-    if (all || tools.has(tool)) return;
+    if (tools.has(tool)) return;
+    if (all && !RESTRICTED.has(tool)) return;
     if (this.instance.status === "closed") {
       throw new Rejection({
         clause: CLAUSES.NOT_LEGAL_IN_STATE,
