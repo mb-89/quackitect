@@ -11,3 +11,4 @@
 {"ts":"2026-07-27T19:26:50.733Z","op":"update","visit":"continue_expedition/e13@0","node":"d22","brief":"leave.md guidance de-colonized — the YAML scalar parses again"}
 {"ts":"2026-07-27T19:26:57.849Z","op":"update","visit":"continue_expedition/e13@0","node":"d23","brief":"suite rerun after the YAML fix"}
 {"ts":"2026-07-27T19:27:40.285Z","op":"update","visit":"continue_expedition/e13@0","node":"d24","brief":"committing the seeding build on the e13 branch"}
+{"ts":"2026-07-27T19:28:30.227Z","op":"update","visit":"continue_expedition/e13@0","node":"d25","brief":"leave form filled and set done by the agent hand"}
