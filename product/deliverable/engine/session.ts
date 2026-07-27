@@ -34,12 +34,13 @@ import { drainNote, pendingNotes } from "./inbox.ts";
 import { confirmPrefill, formTemplatePath, lintForm, parseFormTemplate, scaffoldInstance, withFieldContent, withStatus, type FormLint, type FormTemplate } from "./forms.ts";
 import { pulledFor, scanGuidance, type GuidanceDoc, type PulledDoc } from "./pull.ts";
 import { expClose, expFind, expList, expNew, readRecord, type Expedition } from "./worktree.ts";
-import { generateContinueExpedition, generateExpeditionArchive, type GeneratedMachine } from "./expmachine.ts";
+import { generateContinueExpedition, generateExpeditionArchive, shortId, type GeneratedMachine } from "./expmachine.ts";
 import { type CanvasData } from "./canvas.ts";
 import { spawn, spawnSync } from "node:child_process";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { resolveInRoot, seDir } from "./paths.ts";
-import { Decisions } from "./decisions.ts";
+import { Decisions, replayFile } from "./decisions.ts";
+import { generateIterations, itFind, itSeed, markStarted } from "./iterations.ts";
 
 /** THE TICK is the machinery — one tool, legal in EVERY state. Without
  *  arguments it reports (observability is never gated); with arguments it
@@ -298,7 +299,20 @@ export class Session {
 
   expeditionNew(kind: string, goal: string): Record<string, unknown> {
     const e = expNew(this.root, kind, goal);
-    return { created: e.id, branch: e.branch, note: "back at idle, enter continue_expedition to work in it" };
+    return { created: e.id, branch: e.branch, note: "it stands in the expeditions container — enter there to work" };
+  }
+
+  iterationSeed(goal: string, vision: string, inputs: string[] = []): Record<string, unknown> {
+    const it = itSeed(this.root, goal, vision, inputs);
+    return { seeded: it.id, branch: it.branch, note: "it stands in the iterations container as its kickoff" };
+  }
+
+  iterationOpen(id: string): Record<string, unknown> {
+    const it = itFind(this.root, id);
+    this.bound = it;
+    markStarted(this.root, it);
+    this.decisions.setExtraSink(join(it.path, "product", "spec", "iterations", it.id, "decisions.jsonl"));
+    return { bound: it.id, note: "the lane now works in this iteration's worktree" };
   }
 
   expeditionList(): Record<string, unknown> {
@@ -442,18 +456,20 @@ export class Session {
     const gen = this.sub?.gen;
     if (gen === undefined) return;
     const leaf = activeStates(this.sub!.instance)[0];
-    const expId = leaf === undefined ? undefined : gen.expByState[leaf];
-    if (expId !== undefined && this.bound?.id !== expId) this.expeditionOpen(expId);
+    const boundId = leaf === undefined ? undefined : gen.expByState[leaf];
+    if (boundId === undefined || this.bound?.id === boundId) return;
+    if (this.sub!.decl.id === "iterations") this.iterationOpen(boundId);
+    else this.expeditionOpen(boundId);
   }
 
   /** The mirror's view of a GENERATED machine: the walk's own instance
    *  while standing in it, a fresh generation for browsing. */
   generatedView(id: string): { decl: MachineDecl; canvas: CanvasData } | undefined {
-    if (id !== "continue_expedition" && id !== "expedition_archive") return undefined;
+    if (id !== "expeditions" && id !== "expedition_archive" && id !== "iterations") return undefined;
     if (this.inSub() && this.sub!.decl.id === id && this.sub!.gen !== undefined) {
       return { decl: this.sub!.gen.decl, canvas: this.sub!.gen.canvas };
     }
-    const gen = id === "continue_expedition" ? generateContinueExpedition(this.root) : generateExpeditionArchive(this.root);
+    const gen = id === "expeditions" ? generateContinueExpedition(this.root) : id === "iterations" ? generateIterations(this.root) : generateExpeditionArchive(this.root);
     return { decl: gen.decl, canvas: gen.canvas };
   }
 
@@ -600,7 +616,19 @@ export class Session {
   private formLint(name: string): FormLint & { instanceRel: string } {
     const h = this.formHome(name);
     const raw = existsSync(h.instanceAbs) ? readFileSync(h.instanceAbs, "utf8") : undefined;
-    return { ...lintForm(h.template, raw, h.evidenceAbs), instanceRel: h.instanceRel };
+    const lint = { ...lintForm(h.template, raw, h.evidenceAbs), instanceRel: h.instanceRel };
+    // THE GRAPH IS EVIDENCE (owner ruling 2026-07-27): no point of this
+    // work's decision graph may stand OPEN when the evidence claims done.
+    // The RECORD's jsonl is the source — every live op lands there too,
+    // so the check survives engine reloads. Attached, never copied.
+    const sid = shortId(this.bound!.id);
+    const recorded = replayFile(join(this.bound!.path, "product", "spec", "expeditions", this.bound!.id, "decisions.jsonl"));
+    const open = recorded.open.filter((n) => [sid, `${sid}-leave`].some((p) => n.visit === p || n.visit.startsWith(`${p}@`)));
+    if (open.length > 0) {
+      lint.problems.push(`the decision graph holds ${open.length} open point(s) — resolve each (done | obsolete | revert | defer) before the evidence stands`);
+      lint.met = false;
+    }
+    return lint;
   }
 
   /** Pending notes whose text carries one of the markers — what a
@@ -646,7 +674,8 @@ export class Session {
       instance: h.instanceRel,
       evidence_dir: h.evidenceRel,
       exists: raw !== undefined,
-      ...lintForm(h.template, raw, h.evidenceAbs),
+      // The LINTED truth — the same check the gate runs (graph included).
+      ...this.formLint(name),
     };
   }
 
@@ -971,8 +1000,14 @@ export class Session {
   humanTool(name: string, args: Record<string, unknown>): Record<string, unknown> {
     this.gate(name);
     switch (name) {
-      case "se_exp_new":
+      case "se_seed_expedition":
         return this.expeditionNew(String(args.kind ?? ""), String(args.goal ?? ""));
+      case "se_seed_iteration":
+        return this.iterationSeed(
+          String(args.goal ?? ""),
+          String(args.vision ?? ""),
+          Array.isArray(args.inputs) ? args.inputs.map(String) : String(args.inputs ?? "").split(",").map((s) => s.trim()).filter((s) => s !== ""),
+        );
       case "se_exp_close":
         return this.expeditionClose(args.merge !== false && args.merge !== "false");
       case "se_note_drain":
@@ -982,7 +1017,7 @@ export class Session {
       default:
         throw new Rejection({
           clause: CLAUSES.NOT_LEGAL_IN_STATE,
-          expected: "a human-callable tool: se_exp_new, se_exp_close, se_note_drain, se_reload",
+          expected: "a human-callable tool: se_seed_expedition, se_seed_iteration, se_exp_close, se_note_drain, se_reload",
           got: name,
           remedy: { tool: "se_tick", args: {}, note: "the state's other tools are the agent's lane" },
           source: "engine/session.ts parity",
@@ -1398,11 +1433,13 @@ export class Session {
     // continue_expedition and expedition_archive are GENERATED from the
     // records — their drawn canvases are stubs (owner design 2026-07-27).
     const gen =
-      subState.id === "continue_expedition"
+      subState.id === "expeditions"
         ? generateContinueExpedition(this.root)
-        : subState.id === "expedition_archive"
-          ? generateExpeditionArchive(this.root)
-          : undefined;
+        : subState.id === "iterations"
+          ? generateIterations(this.root)
+          : subState.id === "expedition_archive"
+            ? generateExpeditionArchive(this.root)
+            : undefined;
     const decl = gen !== undefined ? gen.decl : compileMachine(this.root, resolveRef(this.root, mainMachinePath(this.root), subState.submachine!));
     // RE-ENTRY RESETS (owner ruling 2026-07-27): a machine left through its
     // end starts over — evidence from the previous pass is cleared; the old

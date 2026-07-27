@@ -1,0 +1,48 @@
+{"ts":"2026-07-27T19:09:29.963Z","op":"update","visit":"continue_expedition/e13@0","node":"d3","brief":"noted: checkbox collapse regressed, becomes a tested UX law in e13"}
+{"ts":"2026-07-27T19:13:15.891Z","op":"plan","visit":"continue_expedition/e13@0","parent":null,"nodes":[{"id":"d4","brief":"research: v2 opening states and the leave form"},{"id":"d5","brief":"seed tools for expeditions and iterations"},{"id":"d6","brief":"containers renamed and generated; start doors removed"},{"id":"d7","brief":"needs-retro gates first start inside the container"},{"id":"d8","brief":"report rendering: clickable modal + branch fallback"},{"id":"d9","brief":"UX law: reloadKeep regression fixed with a test"},{"id":"d10","brief":"suite green in the worktree"},{"id":"d11","brief":"demo: the backlog seeded as the first visible iteration"},{"id":"d12","brief":"leave form filled and close-applied"},{"id":"d13","brief":"post-merge reload and archive verification"}]}
+{"ts":"2026-07-27T19:14:57.581Z","op":"update","visit":"continue_expedition/e13@0","node":"d14","brief":"reading forms.ts for the instance format the lint expects"}
+{"ts":"2026-07-27T19:17:56.092Z","op":"update","visit":"continue_expedition/e13@0","node":"d15","brief":"iterations.ts written: seed + list + container generation with the first-start gate"}
+{"ts":"2026-07-27T19:22:31.832Z","op":"update","visit":"continue_expedition/e13@0","node":"d16","brief":"wave 2 landing — seeds wired for both hands and the containers renamed"}
+{"ts":"2026-07-27T19:22:54.370Z","op":"update","visit":"continue_expedition/e13@0","node":"d17","brief":"main.canvas: six doors, no start machines"}
+{"ts":"2026-07-27T19:23:29.184Z","op":"update","visit":"continue_expedition/e13@0","node":"d18","brief":"removing the four superseded machine drawings and the create state"}
+{"ts":"2026-07-27T19:25:14.399Z","op":"update","visit":"continue_expedition/e13@0","node":"d19","brief":"test sweep: containers renamed and the old door tests rewritten"}
+{"ts":"2026-07-27T19:25:41.304Z","op":"update","visit":"continue_expedition/e13@0","node":"d20","brief":"iterations tests written: visible seed + small-form refusal + the moved gate"}
+{"ts":"2026-07-27T19:25:48.011Z","op":"update","visit":"continue_expedition/e13@0","node":"d21","brief":"first suite run over the seeding build — in the e13 worktree"}
+{"ts":"2026-07-27T19:26:50.733Z","op":"update","visit":"continue_expedition/e13@0","node":"d22","brief":"leave.md guidance de-colonized — the YAML scalar parses again"}
+{"ts":"2026-07-27T19:26:57.849Z","op":"update","visit":"continue_expedition/e13@0","node":"d23","brief":"suite rerun after the YAML fix"}
+{"ts":"2026-07-27T19:27:40.285Z","op":"update","visit":"continue_expedition/e13@0","node":"d24","brief":"committing the seeding build on the e13 branch"}
+{"ts":"2026-07-27T19:28:30.227Z","op":"update","visit":"continue_expedition/e13@0","node":"d25","brief":"leave form filled and set done by the agent hand"}
+{"ts":"2026-07-27T19:28:56.426Z","op":"update","visit":"continue_expedition/e13@0","node":"d26","brief":"entering the leave gate — the form stands done"}
+{"ts":"2026-07-27T19:35:08.176Z","op":"update","visit":"continue_expedition/e13@0","node":"d27","brief":"graph-is-evidence rule: open points invalidate the leave form"}
+{"ts":"2026-07-27T19:35:26.036Z","op":"update","visit":"continue_expedition/e13@0","node":"d28","brief":"graph-is-evidence test added"}
+{"ts":"2026-07-27T19:35:46.042Z","op":"update","visit":"continue_expedition/e13@0","node":"d29","brief":"suite over the graph-is-evidence rule"}
+{"ts":"2026-07-27T19:36:50.080Z","op":"update","visit":"continue_expedition/e13@0","node":"d30","brief":"client string fixed and formGet now serves the gate-linted truth"}
+{"ts":"2026-07-27T19:38:24.109Z","op":"update","visit":"continue_expedition/e13@0","node":"d31","brief":"defer op built end to end with arrival materialization"}
+{"ts":"2026-07-27T19:38:43.105Z","op":"update","visit":"continue_expedition/e13@0","node":"d32","brief":"defer tests: parse shape and the park-and-arrive story"}
+{"ts":"2026-07-27T19:38:50.432Z","op":"update","visit":"continue_expedition/e13@0","node":"d33","brief":"suite over the graph-evidence rule and the defer op"}
+{"ts":"2026-07-27T19:39:40.234Z","op":"done","visit":"continue_expedition/e13@0","node":"d6","brief":"six doors live; the old machines deleted"}
+{"ts":"2026-07-27T19:39:48.250Z","op":"done","visit":"continue_expedition/e13@0","node":"d7","brief":"first-start gate proven in the walk test"}
+{"ts":"2026-07-27T19:39:58.509Z","op":"done","visit":"continue_expedition/e13@0","node":"d8","brief":"report opens in the modal; branch fallback serves dismissed ones"}
+{"ts":"2026-07-27T19:40:07.442Z","op":"done","visit":"continue_expedition/e13@0","node":"d9","brief":"folds survive the checkbox reload; the law stands in voice.md"}
+{"ts":"2026-07-27T19:40:14.859Z","op":"done","visit":"continue_expedition/e13@0","node":"d10","brief":"86 of 86 selftests and preflight green in the worktree"}
+{"ts":"2026-07-27T19:40:27.259Z","op":"obsolete","visit":"continue_expedition/e13@0","node":"d11","brief":"parked for idle post-merge — the demo seed needs the merged engine"}
+{"ts":"2026-07-27T19:40:40.296Z","op":"done","visit":"continue_expedition/e13@0","node":"d12","brief":"form filled and set done — the close itself is the leave act, owner-gated"}
+{"ts":"2026-07-27T19:40:48.206Z","op":"obsolete","visit":"continue_expedition/e13@0","node":"d13","brief":"parked for idle post-merge — verification runs on the reloaded engine"}
+{"ts":"2026-07-27T19:42:41.269Z","op":"done","visit":"continue_expedition/e13@0","node":"d4","brief":"research done early: v2 opening states and the form template read"}
+{"ts":"2026-07-27T19:42:48.439Z","op":"done","visit":"continue_expedition/e13@0","node":"d5","brief":"both seed tools shipped and test-pinned in the first e13 commit"}
+{"ts":"2026-07-27T19:46:54.589Z","op":"update","visit":"continue_expedition/e13@0","node":"d34","brief":"defer-round design captured: arrow not strike, per-visit to-do sections on the state"}
+{"ts":"2026-07-27T19:49:58.421Z","op":"update","visit":"continue_expedition/e13@0","node":"d35","brief":"replay built: parked defers re-arm at start; the evidence check reads the record file"}
+{"ts":"2026-07-27T19:50:13.547Z","op":"update","visit":"continue_expedition/e13@0","node":"d36","brief":"replay test: a fresh engine life re-arms the parked point"}
+{"ts":"2026-07-27T19:50:36.332Z","op":"update","visit":"continue_expedition/e13@0","node":"d37","brief":"replay test wired with the real imports"}
+{"ts":"2026-07-27T19:50:54.229Z","op":"update","visit":"continue_expedition/e13@0","node":"d38","brief":"suite over the replay build"}
+{"ts":"2026-07-27T19:51:26.576Z","op":"update","visit":"continue_expedition/e13@0","node":"d39","brief":"replay test asserts the before and after truths in order"}
+{"ts":"2026-07-27T19:51:33.515Z","op":"update","visit":"continue_expedition/e13@0","node":"d40","brief":"suite rerun over the fixed replay test"}
+{"ts":"2026-07-27T19:51:55.076Z","op":"update","visit":"continue_expedition/e13@0","node":"d41","brief":"committing the replay round on the e13 branch"}
+{"ts":"2026-07-27T19:55:42.652Z","op":"update","visit":"continue_expedition/e13@0","node":"d42","brief":"defer cap at three hops with the trail in the refusal"}
+{"ts":"2026-07-27T19:55:55.246Z","op":"update","visit":"continue_expedition/e13@0","node":"d43","brief":"cap test: the wanderer walks a-b-c-d and hits the wall"}
+{"ts":"2026-07-27T19:56:01.932Z","op":"update","visit":"continue_expedition/e13@0","node":"d44","brief":"suite over the cap"}
+{"ts":"2026-07-27T19:56:23.273Z","op":"update","visit":"continue_expedition/e13@0","node":"d45","brief":"replay assertion loosened to the fields that matter"}
+{"ts":"2026-07-27T19:56:30.154Z","op":"update","visit":"continue_expedition/e13@0","node":"d46","brief":"final e13 suite"}
+{"ts":"2026-07-27T19:56:50.840Z","op":"update","visit":"continue_expedition/e13@0","node":"d47","brief":"committing the cap; then walking the leave gate"}
+{"ts":"2026-07-27T19:57:05.611Z","op":"update","visit":"continue_expedition/e13@0","node":"d48","brief":"entering the leave gate on the raised slider"}
+{"ts":"2026-07-27T19:57:14.083Z","op":"update","visit":"continue_expedition/e13-leave@0","node":"d49","brief":"close is the ruling: applying e13 to trunk"}

@@ -199,13 +199,11 @@ test("manual mode: tick info at start, ticks walk the whole machine to end", asy
   assert.deepEqual(s.active(), ["idle"]);
   // idle is a hub now: an unnamed advance is refused, the tick must choose
   await assert.rejects(() => s.tickAdvance(), (e) => (e as { clause?: string }).clause === "SE-C-110");
-  // a round trip through an (empty) work machine and back
-  await s.tickAdvance("start_expedition");
-  assert.deepEqual(s.active(), ["start_expedition/start"]);
-  await s.tickAdvance();
-  assert.deepEqual(s.active(), ["start_expedition/create"]);
-  await s.tickAdvance(); // create is freely leavable (minting is optional here)
-  assert.deepEqual(s.active(), ["start_expedition/end"]);
+  // a round trip through an (empty) generated container and back
+  await s.tickAdvance("expeditions");
+  assert.deepEqual(s.active(), ["expeditions/start"]);
+  await s.tickAdvance(); // nothing open: start runs to end
+  assert.deepEqual(s.active(), ["expeditions/end"]);
   await s.tickAdvance(); // pop: filled, back at idle
   assert.deepEqual(s.active(), ["idle"]);
   await s.tickAdvance("end");
@@ -422,8 +420,8 @@ test("escape goes to idle and only to idle: the walk is left standing, the reaso
     if (step.body.booted === true) break;
   }
   session.setAutonomy(1);
-  await call(server, "se_tick", { to: "start_expedition", read_hashes: hashes });
-  assert.deepEqual(session.active(), ["start_expedition/start"]);
+  await call(server, "se_tick", { to: "expeditions", read_hashes: hashes });
+  assert.deepEqual(session.active(), ["expeditions/start"]);
   const esc = await call(server, "se_tick", { escape: "cannot continue: test blockage", read_hashes: hashes });
   assert.equal(esc.isError, false, JSON.stringify(esc.body));
   assert.deepEqual(session.active(), ["idle"], "escape lands at idle");
@@ -431,7 +429,7 @@ test("escape goes to idle and only to idle: the walk is left standing, the reaso
   assert.match(session.instance.escapes[0].exhausted_guard, /test blockage/);
   assert.ok(session.instance.history.some((h) => h.outcome === "escaped"), "the escape is a recorded failure");
   // The machine was LEFT STANDING — re-entering starts it over, gray.
-  assert.deepEqual(session.viewRun("start_expedition").done, []);
+  assert.deepEqual(session.viewRun("expeditions").done, []);
   // An empty reason is refused; at the main machine there is nothing to escape.
   const empty = await call(server, "se_tick", { escape: "  " });
   assert.equal(empty.isError, true);

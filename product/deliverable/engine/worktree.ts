@@ -87,7 +87,7 @@ export function expNew(root: string, kind: string, goal: string): Expedition {
       clause: CLAUSES.REQUIRED_ARGS,
       expected: `kind: ${KINDS.join(" | ")}`,
       got: JSON.stringify(kind),
-      remedy: { tool: "se_exp_new", args: { kind: "spike", goal }, note: "declare what kind of expedition this is" },
+      remedy: { tool: "se_seed_expedition", args: { kind: "spike", goal }, note: "declare what kind of expedition this is" },
       source: SRC,
     });
   }

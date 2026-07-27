@@ -58,6 +58,7 @@ Write plainly. These are rules, not suggestions. They bind every output: chat, d
 - Click for detail. Clicking an element shows its details: a dedicated surface if one exists, the details pane as the fallback.
 - Help is a detail, never a button. Clicking a control surfaces its context-sensitive help in the details pane. No dedicated help buttons or icons exist anywhere.
 - Panes hold their size. Content never resizes the layout. The maximize modal is the room to breathe.
+- Interacting with a field never collapses its surface. No fold closes, no scroll resets, no pane re-opens — the reader keeps their place through every click.
 - Color carries meaning, never decoration: green = pass, red = failure or rejection, yellow = attention.
 
 ### Do not repeat (DRY)

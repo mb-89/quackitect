@@ -40,11 +40,11 @@ test("the slider takes effect live: raise the autonomy and the agent's next tick
     if (step.body.booted === true) break;
   }
   session.setAutonomy(0.2);
-  assert.equal((await call(server, "se_tick", { to: "start_expedition", read_hashes: hashes })).isError, true);
+  assert.equal((await call(server, "se_tick", { to: "expeditions", read_hashes: hashes })).isError, true);
   session.setAutonomy(0.4); // the slider's POST lands here
-  const r = await call(server, "se_tick", { to: "start_expedition", read_hashes: hashes });
+  const r = await call(server, "se_tick", { to: "expeditions", read_hashes: hashes });
   assert.equal(r.isError, false);
-  assert.deepEqual(r.body.active, ["start_expedition/start"]);
+  assert.deepEqual(r.body.active, ["expeditions/start"]);
 });
 
 test("the gate weighs the TARGET: a 0.4 state refuses the agent at 0.2, the human may anyway", async () => {
@@ -57,8 +57,8 @@ test("the gate weighs the TARGET: a 0.4 state refuses the agent at 0.2, the huma
   await session.tickAdvance(); await session.tickAdvance(); await session.tickAdvance();
   assert.deepEqual(session.active(), ["idle"]);
   session.setAutonomy(0.2);
-  // start_expedition weighs 0.4 — above the agent's reach.
-  const r = await call(server, "se_tick", { to: "start_expedition" });
+  // expeditions weighs 0.4 — above the agent's reach.
+  const r = await call(server, "se_tick", { to: "expeditions" });
   assert.equal(r.isError, true);
   assert.equal(r.body.clause, "SE-C-113");
   // expedition_archive weighs 0.2 — exactly at the autonomy, the agent
@@ -69,8 +69,8 @@ test("the gate weighs the TARGET: a 0.4 state refuses the agent at 0.2, the huma
   await session.tickAdvance(); await session.tickAdvance();
   assert.deepEqual(session.active(), ["idle"]);
   // … and the human enters the 0.4 state the agent was refused.
-  await session.tickAdvance("start_expedition");
-  assert.deepEqual(session.active(), ["start_expedition/start"]);
+  await session.tickAdvance("expeditions");
+  assert.deepEqual(session.active(), ["expeditions/start"]);
 });
 
 test("jump back is entering too: the agent's back-jump is weighed against the autonomy", async () => {
@@ -99,7 +99,7 @@ test("priority and autonomy ride every packet — the agent can weigh its next s
   assert.equal(info.states[0].next[0].priority, 0.01); // boot, from its canvas frontmatter
   const peek = session.stateInfo("idle") as { priority: number; next: { to: string; priority?: number }[] };
   assert.equal(peek.priority, 0.01);
-  const exp = peek.next.find((n) => n.to === "start_expedition");
+  const exp = peek.next.find((n) => n.to === "expeditions");
   assert.equal(exp?.priority, 0.4);
 });
 
@@ -135,7 +135,7 @@ test("the hold: se_tick {wait} blocks until the slider moves, then the agent wal
     session.setAutonomy(0);
     // The agent is refused on a judgment state (0.4 > 0); the remedy says
     // stop and ask the user to message you.
-    const refused = await call(server, "se_tick", { to: "start_expedition", read_hashes: readHashesFor(root) });
+    const refused = await call(server, "se_tick", { to: "expeditions", read_hashes: readHashesFor(root) });
     assert.equal(refused.body.clause, "SE-C-113");
     assert.match(String((refused.body.remedy as { note: string }).note), /slider alone cannot wake you/);
     // The agent holds; the human slides 120ms later; the hold wakes changed.
@@ -146,9 +146,9 @@ test("the hold: se_tick {wait} blocks until the slider moves, then the agent wal
     assert.equal(woke.body.changed, true);
     assert.equal(woke.body.autonomy, 0.4);
     // And now the same advance just goes.
-    const r = await call(server, "se_tick", { to: "start_expedition", read_hashes: readHashesFor(root) });
+    const r = await call(server, "se_tick", { to: "expeditions", read_hashes: readHashesFor(root) });
     assert.equal(r.isError, false);
-    assert.deepEqual(r.body.active, ["start_expedition/start"]);
+    assert.deepEqual(r.body.active, ["expeditions/start"]);
   } finally {
     delete process.env.SE_WAIT_MS;
   }
@@ -209,7 +209,7 @@ test("the mirror over HTTP: slider served, POST /autonomy moves the gate, /api/a
     assert.equal(noted.status, 303);
     const feed = await (await fetch(base + "/api/log")).json() as { rows: { type: string; src: string; brief: string }[] };
     assert.ok(feed.rows.some((r) => r.type === "note" && r.src === "human" && r.brief.includes("a human stray")));
-    const tool = await (await fetch(base + "/tool", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ name: "se_exp_new", args: {} }) })).json() as { clause?: string };
+    const tool = await (await fetch(base + "/tool", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ name: "se_seed_expedition", args: {} }) })).json() as { clause?: string };
     assert.equal(tool.clause, "SE-C-110", "the parity lane obeys the state gate");
   } finally {
     server.close();

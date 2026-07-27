@@ -7,7 +7,7 @@
 // Ops arrive as the `update` field riding any lane call. The live graph is
 // in-memory (session-scoped, like the walk); every op also appends to
 // .se/decisions.jsonl — replayable, and the retro's raw material.
-import { appendFileSync, mkdirSync } from "node:fs";
+import { appendFileSync, existsSync, mkdirSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { CLAUSES, Rejection } from "./errors.ts";
 
@@ -16,17 +16,22 @@ export interface DecisionNode {
   visit: string;
   parent: string | null;
   brief: string;
-  status: "open" | "done" | "obsolete" | "reverted";
+  status: "open" | "done" | "obsolete" | "reverted" | "deferred";
+  /** How many defers carried this point here, and through which states. */
+  hops?: number;
+  trail?: string[];
   at: string;
   closed_at?: string;
   resolution?: string;
 }
 
 export interface DecisionOp {
-  op: "plan" | "fork" | "done" | "obsolete" | "revert" | "update";
+  op: "plan" | "fork" | "done" | "obsolete" | "revert" | "update" | "defer";
   brief?: string;
   items?: string[];
   node?: string;
+  /** defer only: the state id that can do the point — it arrives there. */
+  to?: string;
 }
 
 const CLOSES: Record<string, DecisionNode["status"]> = {
@@ -39,7 +44,47 @@ const SHAPE_NOTE =
   "ops: plan {items: [\"...\"]} starts the checklist (node = optional parent) · " +
   "fork {brief, items?} opens an unplanned branch where you are · " +
   "done|obsolete|revert {node, brief?} resolves a node (brief = resolution) · " +
-  "update {brief, node?} says what you are doing";
+  "update {brief, node?} says what you are doing · " +
+  "defer {node, to: <state>} parks a point for the state that can do it — it arrives there as an open to-do";
+
+/** REPLAY (owner ruling 2026-07-27): the jsonl re-arms what an engine
+ *  life left standing — parked defers that never arrived, and points
+ *  still open. Sequential; a re-minted node id shadows its ancestor (the
+ *  per-part history stays in the file for the retro). */
+export function replayFile(path: string): { parked: { state: string; brief: string; hops?: number; trail?: string[] }[]; open: { id: string; visit: string; brief: string }[] } {
+  if (!existsSync(path)) return { parked: [], open: [] };
+  const nodes = new Map<string, { visit: string; brief: string; open: boolean }>();
+  const parked: { state: string; brief: string; hops?: number; trail?: string[] }[] = [];
+  for (const line of readFileSync(path, "utf8").split("\n")) {
+    if (line.trim() === "") continue;
+    let rec: Record<string, unknown>;
+    try {
+      rec = JSON.parse(line) as Record<string, unknown>;
+    } catch {
+      continue;
+    }
+    const op = String(rec.op ?? "");
+    if (op === "plan" || op === "fork") {
+      const list = Array.isArray(rec.nodes) ? (rec.nodes as { id: string; brief: string }[]) : [];
+      for (const n of list) nodes.set(n.id, { visit: String(rec.visit ?? ""), brief: n.brief, open: true });
+      if (op === "fork" && rec.node !== undefined) nodes.set(String(rec.node), { visit: String(rec.visit ?? ""), brief: String(rec.brief ?? ""), open: true });
+    } else if (op === "done" || op === "obsolete" || op === "revert") {
+      const n = nodes.get(String(rec.node ?? ""));
+      if (n) n.open = false;
+    } else if (op === "defer") {
+      const n = nodes.get(String(rec.node ?? ""));
+      if (n) n.open = false;
+      parked.push({ state: String(rec.to ?? ""), brief: String(rec.brief ?? ""), hops: Number(rec.hops ?? 1), trail: Array.isArray(rec.trail) ? rec.trail.map(String) : undefined });
+    } else if (op === "defer_arrived") {
+      const brief = String(rec.brief ?? "");
+      const state = String(rec.visit ?? "").split("@")[0];
+      const i = parked.findIndex((p) => p.state === state && p.brief === brief);
+      if (i >= 0) parked.splice(i, 1);
+      if (rec.node !== undefined) nodes.set(String(rec.node), { visit: String(rec.visit ?? ""), brief, open: true });
+    }
+  }
+  return { parked, open: [...nodes.entries()].filter(([, n]) => n.open).map(([id, n]) => ({ id, visit: n.visit, brief: n.brief })) };
+}
 
 function malformed(got: string): Rejection {
   return new Rejection({
@@ -64,11 +109,13 @@ export function parseUpdate(v: unknown): DecisionOp {
   if (typeof v !== "object" || v === null || Array.isArray(v)) throw malformed(typeof v);
   const u = v as Record<string, unknown>;
   const op = String(u.op ?? "");
-  if (!(op in CLOSES) && op !== "plan" && op !== "fork" && op !== "update") throw malformed(`op: ${JSON.stringify(u.op)}`);
+  if (!(op in CLOSES) && op !== "plan" && op !== "fork" && op !== "update" && op !== "defer") throw malformed(`op: ${JSON.stringify(u.op)}`);
   const items = u.items === undefined ? undefined : Array.isArray(u.items) ? u.items.map(String).filter((s) => s.trim() !== "") : null;
   if (items === null) throw malformed("items is not an array of strings");
   const brief = u.brief === undefined ? undefined : String(u.brief);
   const node = u.node === undefined ? undefined : String(u.node);
+  const to = u.to === undefined ? undefined : String(u.to);
+  if (op === "defer" && (node === undefined || to === undefined || to.trim() === "")) throw malformed("defer needs node and to (the state that can do it)");
   if (op === "plan" && (items === undefined || items.length === 0)) throw malformed("plan without items");
   if (op === "fork" && (brief === undefined || brief.trim() === "")) throw malformed("fork without brief");
   if (op in CLOSES && node === undefined) throw malformed(`${op} without node`);
@@ -82,7 +129,7 @@ export function parseUpdate(v: unknown): DecisionOp {
   };
   if (brief !== undefined) lintLine(brief, "brief");
   for (const it of items ?? []) lintLine(it, "item");
-  return { op: op as DecisionOp["op"], ...(brief !== undefined ? { brief } : {}), ...(items !== undefined ? { items } : {}), ...(node !== undefined ? { node } : {}) };
+  return { op: op as DecisionOp["op"], ...(brief !== undefined ? { brief } : {}), ...(items !== undefined ? { items } : {}), ...(node !== undefined ? { node } : {}), ...(to !== undefined ? { to } : {}) };
 }
 
 export class Decisions {
@@ -93,6 +140,9 @@ export class Decisions {
 
   constructor(seDirPath: string) {
     this.path = join(seDirPath, "decisions.jsonl");
+    // Parked defers from earlier engine lives re-arm — a reload never
+    // loses a moved point (session file only; it stays out of git).
+    this.parked.push(...replayFile(this.path).parked);
   }
 
   /** A second sink while a persistent record is bound (an expedition's
@@ -165,7 +215,26 @@ export class Decisions {
     return undefined;
   }
 
+  /** Deferred points arrive when their state's visit is first touched —
+   *  a prefilled to-do, open like any planned item. */
+  private materialize(visit: string): void {
+    const state = visit.split("@")[0];
+    const due = this.parked.filter((p) => p.state === state);
+    if (due.length === 0) return;
+    const keep = this.parked.filter((p) => p.state !== state);
+    this.parked.splice(0, this.parked.length, ...keep);
+    for (const p of due) {
+      const n = this.add(visit, null, p.brief);
+      n.hops = p.hops ?? 1;
+      n.trail = p.trail ?? [state];
+      this.record({ op: "defer_arrived", visit, node: n.id, brief: n.brief, hops: n.hops, trail: n.trail });
+    }
+  }
+
+  private readonly parked: { state: string; brief: string; hops?: number; trail?: string[] }[] = [];
+
   apply(visit: string, u: DecisionOp): Record<string, unknown> {
+    this.materialize(visit);
     switch (u.op) {
       case "plan": {
         const parent = u.node === undefined ? null : this.openNode(u.node).id;
@@ -203,6 +272,36 @@ export class Decisions {
         this.record({ op: u.op, visit: n.visit, node: n.id, ...(u.brief !== undefined ? { brief: u.brief } : {}) });
         break;
       }
+      case "defer": {
+        const n = this.openNode(u.node!);
+        // THE CAP (owner ruling 2026-07-27): three defers, then the wall —
+        // the fourth forces a decision. Every out stays legal and honest.
+        const hops = (n.hops ?? 0) + 1;
+        const trail = [...(n.trail ?? [n.visit.split("@")[0]]), u.to!];
+        if (hops > 3) {
+          throw new Rejection({
+            clause: CLAUSES.DECISION_UNRESOLVED,
+            expected: `a DECISION — this point was deferred 3 times already (${trail.join(" → ")}); do it, obsolete it with the reason, or seed it as real work`,
+            got: `defer number ${hops}`,
+            remedy: { tool: "(the same call)", args: { update: { op: "done", node: n.id, brief: "<how it resolved>" } }, note: "chronic deferral is usually a seed in disguise — se_seed_iteration gives it a goal and a vision" },
+            source: "engine/decisions.ts defer",
+          });
+        }
+        if (this.openChildren(n.id).length > 0) {
+          throw new Rejection({
+            clause: CLAUSES.DECISION_UNRESOLVED,
+            expected: "no open children under a deferred point — resolve or defer each first",
+            got: `${n.id} still has open children`,
+            remedy: { tool: "(the same call)", args: { update: { op: "defer", node: "<child id>", to: u.to } }, note: SHAPE_NOTE },
+            source: "engine/decisions.ts defer",
+          });
+        }
+        this.close(n, "deferred", `deferred to ${u.to}`);
+        this.parked.push({ state: u.to!, brief: n.brief, hops, trail });
+        if (this.activeId === n.id) this.activeId = this.openAncestor(n);
+        this.record({ op: "defer", visit: n.visit, node: n.id, brief: n.brief, to: u.to, hops, trail });
+        break;
+      }
       case "update": {
         if (u.node !== undefined) this.activeId = this.openNode(u.node).id;
         // EVERY update changes the RENDER (owner ruling 2026-07-27): the
@@ -222,9 +321,16 @@ export class Decisions {
    *  Every update op IS in the tree (a checked point), so the log and the
    *  panel always tell the same story. */
   graph(visit: string): { visit: string; active: string | null; nodes: DecisionNode[] } {
+    this.materialize(visit);
     const nodes = [...this.nodes.values()].filter((n) => n.visit === visit);
     const active = this.activeId !== undefined && this.nodes.get(this.activeId)?.visit === visit ? this.activeId : null;
     return { visit, active, nodes };
+  }
+
+  /** Open nodes whose visit belongs to one of the given state ids — the
+   *  evidence check: no point may stand open when the work claims done. */
+  openFor(stateIds: string[]): DecisionNode[] {
+    return [...this.nodes.values()].filter((n) => n.status === "open" && stateIds.some((p) => n.visit === p || n.visit.startsWith(`${p}@`)));
   }
 
   /** Every visit that recorded decisions, in first-seen order. */

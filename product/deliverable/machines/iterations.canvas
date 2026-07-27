@@ -10,11 +10,11 @@
   {
    "id": "n-comment",
    "type": "text",
-   "text": "START AD HOC WORK \u2014 mint a new expedition: a git worktree on its own branch. Creating does not bind; continue_expedition is where the work happens.",
+   "text": "GENERATED AT ENTRY — this machine's states are the OPEN iterations, each standing as its KICKOFF (the rest of an iteration's machine is seeded by the kickoff's outcome; that lane is the next build). Seeding is a function (se_seed_iteration: goal + vision + inputs) — a seeded iteration stands here at once. A pending 'needs retro' note gates only the FIRST start of a never-walked iteration. With nothing open, start runs to end. This drawing is the stub that carries the frontmatter.",
    "x": -1100,
    "y": -340,
    "width": 900,
-   "height": 120
+   "height": 180
   },
   {
    "id": "n-start",
@@ -29,19 +29,10 @@
    }
   },
   {
-   "id": "n-create",
-   "type": "file",
-   "file": "deliverable/machines/states/create.md",
-   "x": -1100,
-   "y": -160,
-   "width": 620,
-   "height": 640
-  },
-  {
    "id": "n-end",
    "type": "file",
    "file": "deliverable/machines/states/end.md",
-   "x": -340,
+   "x": 1180,
    "y": 80,
    "width": 160,
    "height": 160,
@@ -52,18 +43,9 @@
  ],
  "edges": [
   {
-   "id": "e-start-create",
+   "id": "e-start-end",
    "fromNode": "n-start",
-   "fromSide": "right",
-   "toNode": "n-create",
-   "toSide": "left"
-  },
-  {
-   "id": "e-create-end",
-   "fromNode": "n-create",
-   "fromSide": "right",
-   "toNode": "n-end",
-   "toSide": "left"
+   "toNode": "n-end"
   }
  ]
 }

@@ -3,12 +3,12 @@
 // per-state decision tree; the toll forces narration only after a lapse and
 // one ignored warning. No ETA anywhere — timestamps are the engine's.
 import { strict as assert } from "node:assert";
-import { mkdtempSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { test } from "node:test";
 import { CallLog } from "../engine/calllog.ts";
-import { Decisions, parseUpdate } from "../engine/decisions.ts";
+import { Decisions, parseUpdate, replayFile } from "../engine/decisions.ts";
 import { readNotes } from "../engine/inbox.ts";
 import { seDir } from "../engine/paths.ts";
 import { feedRows, renderMirror } from "../engine/render.ts";
@@ -108,6 +108,72 @@ test("the render lint: the update lane refuses what renders weird", () => {
   assert.throws(() => parseUpdate({ op: "plan", items: ["fine", "also fine, still fine, too many"] }), (e) => (e as { clause?: string }).clause === "SE-C-120");
   const ok = parseUpdate({ op: "update", brief: "short and clean — two parts, fine" });
   assert.equal(ok.op, "update");
+  // defer demands node AND to.
+  assert.throws(() => parseUpdate({ op: "defer", node: "d1" }), (e) => (e as { clause?: string }).clause === "SE-C-120");
+  const d = parseUpdate({ op: "defer", node: "d1", to: "idle" });
+  assert.equal(d.to, "idle");
+});
+
+test("replay: parked defers and open points survive an engine life", () => {
+  const root = freshRoot();
+  const dir = seDir(root);
+  mkdirSync(dir, { recursive: true });
+  writeFileSync(join(dir, "decisions.jsonl"), [
+    JSON.stringify({ op: "plan", visit: "e1@0", nodes: [{ id: "d1", brief: "a" }, { id: "d2", brief: "b" }] }),
+    JSON.stringify({ op: "done", visit: "e1@0", node: "d1" }),
+    JSON.stringify({ op: "defer", visit: "e1@0", node: "d2", brief: "b", to: "idle" }),
+  ].join("\n") + "\n", "utf8");
+  // The file's replayed truth BEFORE arrival: nothing open, one parked.
+  const before = replayFile(join(dir, "decisions.jsonl"));
+  assert.equal(before.open.length, 0, "d1 done, d2 deferred — no open point");
+  assert.equal(before.parked.length, 1);
+  assert.equal(before.parked[0].state, "idle");
+  assert.equal(before.parked[0].brief, "b");
+  // A fresh engine life: the parked point re-arms and arrives at idle.
+  const s = new Session(root);
+  const arrived = s.decisions.graph("idle@0").nodes;
+  assert.equal(arrived.length, 1);
+  assert.equal(arrived[0].brief, "b");
+  assert.equal(arrived[0].status, "open");
+  // After arrival the file says so too: the to-do is open, nothing parked.
+  const after = replayFile(join(dir, "decisions.jsonl"));
+  assert.equal(after.parked.length, 0);
+  assert.equal(after.open.length, 1);
+  assert.equal(after.open[0].brief, "b");
+});
+
+test("defer parks a point for a later state — it arrives there as an open to-do", () => {
+  const s = new Session(freshRoot());
+  s.decisions.apply("e1@0", { op: "plan", items: ["doable here", "needs idle"] });
+  const park = s.decisions.graph("e1@0").nodes.find((n) => n.brief === "needs idle")!;
+  s.decisions.apply("e1@0", { op: "defer", node: park.id, to: "idle" });
+  assert.equal(s.decisions.graph("e1@0").nodes.find((n) => n.id === park.id)!.status, "deferred");
+  // Deferred is not open — the evidence check passes over it.
+  assert.equal(s.decisions.openFor(["e1"]).length, 1, "only the doable point stays open");
+  // First touch of the target state materializes it — once.
+  const arrived = s.decisions.graph("idle@0").nodes;
+  assert.equal(arrived.length, 1);
+  assert.equal(arrived[0].brief, "needs idle");
+  assert.equal(arrived[0].status, "open");
+  assert.equal(s.decisions.graph("idle@0").nodes.length, 1);
+});
+
+test("the defer cap: three hops, then the wall forces a decision", () => {
+  const s = new Session(freshRoot());
+  s.decisions.apply("a@0", { op: "plan", items: ["wanderer"] });
+  let node = s.decisions.graph("a@0").nodes[0];
+  s.decisions.apply("a@0", { op: "defer", node: node.id, to: "b" });
+  node = s.decisions.graph("b@0").nodes[0];
+  s.decisions.apply("b@0", { op: "defer", node: node.id, to: "c" });
+  node = s.decisions.graph("c@0").nodes[0];
+  s.decisions.apply("c@0", { op: "defer", node: node.id, to: "d" });
+  node = s.decisions.graph("d@0").nodes[0];
+  assert.equal(node.hops, 3);
+  assert.deepEqual(node.trail, ["a", "b", "c", "d"]);
+  assert.throws(
+    () => s.decisions.apply("d@0", { op: "defer", node: node.id, to: "e" }),
+    (e) => clause(e) === "SE-C-122" && /a → b → c → d/.test((e as { expected: string }).expected),
+  );
 });
 
 test("the unified feed derives src, type and brief — and the mirror carries the log pane", () => {

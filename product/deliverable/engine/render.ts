@@ -272,6 +272,7 @@ const STYLE = `
   .group-label { fill: #5b6772; font-size: 24px; font-family: inherit; letter-spacing: .06em; }
   .comment-text { color: #7f8b96; font-size: 13px; line-height: 1.35; }
   .comment-detail { font-size: 15px; line-height: 1.55; color: #d8dde2; padding: 2px 0 10px; }
+  .replink { color: #e8b339; cursor: pointer; text-decoration: underline dotted; }
   .bar { display: flex; gap: 10px; padding: 12px; }
   button.primary { background: #e8b339; color: #14171a; border: 0; border-radius: 8px; padding: 8px 14px; font: inherit; font-weight: 700; cursor: pointer; margin: 2px 4px 2px 0; }
   .panel { padding: 0 12px 12px; overflow: auto; }
@@ -317,7 +318,7 @@ const STYLE = `
   .logrow .lsrc { flex: 0 0 5.5ch; color: #7cc4e8; }
   .logrow .lsrc.human { color: #e8b339; }
   .logrow .lbrief { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .logrow.update .lbrief { font-weight: 700; }
+  .logrow.update .lbrief { font-weight: 700; color: #e8b339; }
   .logrow.note .lbrief { font-style: italic; }
   .logrow .lok { flex: 0 0 auto; color: #4a7a55; }
   .logrow.failed .lok { color: #e86a5f; }
@@ -399,7 +400,9 @@ document.addEventListener("click", (ev) => {
 // THE PARITY LAW — a state's human-callable tools as links; the modal
 // takes the arguments and shows the result in place.
 const HUMAN_TOOLS = {
-  se_exp_new: [{ name: "kind", hint: "spike | fix | explore" }, { name: "goal", hint: "what this expedition is after", long: true }],
+  se_seed_expedition: [{ name: "kind", hint: "spike | fix | explore" }, { name: "goal", hint: "what this expedition is after", long: true }],
+  se_seed_iteration: [{ name: "goal", hint: "what this iteration is after", long: true }, { name: "vision", hint: "roughly how — what done looks like", long: true }, { name: "inputs", hint: "context refs, comma-separated: an expedition id, note refs" }],
+  se_reload: [],
   se_exp_close: [{ name: "merge", hint: "true = apply: merge to trunk (default); false = dismiss: archive unmerged" }],
   se_note_drain: [{ name: "ref", hint: "the note's ref (note-…) — the feed shows it" }, { name: "disposition", hint: "done | obsolete | carried | backlog" }, { name: "where", hint: "where it landed or lives on — backlog REQUIRES it: ready when …" }],
 };
@@ -517,7 +520,8 @@ function stateDetail(id) {
         + '<tr><td class="k">expedition</td><td class="v">' + escText(e.id) + "</td></tr>"
         + (e.status ? '<tr><td class="k">status</td><td class="v">' + escText(e.status) + "</td></tr>" : "")
         + ((e.ruling || e.report) ? '<tr><td class="k">ruling</td><td class="v">' + escText(e.ruling || e.report) + "</td></tr>" : "")
-        + '<tr><td class="k">report</td><td class="v"><a class="replink" data-path="product/spec/expeditions/' + escText(e.id) + '/report.md" data-title="report · ' + escText(e.id) + '" title="click: modal · ctrl-click: new tab · shift-click: new window">report.md</a></td></tr>'
+        + '<tr><td class="k">report</td><td class="v"><a class="replink" data-exp="' + escText(e.id) + '" data-path="product/spec/expeditions/' + escText(e.id) + '/report.md" data-title="report · ' + escText(e.id) + '" title="click: modal · ctrl-click: new tab · shift-click: new window">report.md</a></td></tr>'
+        + '<tr><td class="k">decisions</td><td class="v"><a class="replink" data-exp="' + escText(e.id) + '" data-path="product/spec/expeditions/' + escText(e.id) + '/decisions.jsonl" data-title="decisions · ' + escText(e.id) + '" title="the decision graph — attached evidence">decisions.jsonl</a></td></tr>'
         + "</table>";
     }
   }
@@ -540,6 +544,9 @@ function stateDetail(id) {
 function reloadKeep(detail) {
   const q = new URLSearchParams(location.search);
   if (detail) q.set("detail", detail); else q.delete("detail");
+  // THE UX LAW: no fold closes across a reload — open <details> ride along.
+  const folds = [...document.querySelectorAll("#details details[open] summary")].map((s) => s.textContent.split(" (")[0].trim()).filter(Boolean);
+  if (folds.length) q.set("folds", folds.join("|")); else q.delete("folds");
   const qs = q.toString();
   location.href = location.pathname + (qs ? "?" + qs : "");
 }
@@ -559,10 +566,11 @@ document.addEventListener("click", async (ev) => {
   }
   const rpl = ev.target.closest ? ev.target.closest(".replink") : null;
   if (rpl) {
-    const pageUrl = "/doc?path=" + encodeURIComponent(rpl.dataset.path) + "&page=1";
+    const expQ = rpl.dataset.exp ? "&exp=" + encodeURIComponent(rpl.dataset.exp) : "";
+    const pageUrl = "/doc?path=" + encodeURIComponent(rpl.dataset.path) + expQ + "&page=1";
     if (ev.ctrlKey || ev.metaKey) { window.open(pageUrl, "_blank"); return; }
     if (ev.shiftKey) { window.open(pageUrl, "_blank", "popup,width=900,height=700"); return; }
-    const r = await fetch("/doc?path=" + encodeURIComponent(rpl.dataset.path));
+    const r = await fetch("/doc?path=" + encodeURIComponent(rpl.dataset.path) + expQ);
     const d = await r.json();
     openModal(rpl.dataset.title || rpl.dataset.path, '<div class="docview">' + d.html + "</div>");
     return;
@@ -766,6 +774,12 @@ if (CURRENT && D.states[CURRENT] && WALK_HERE) { CURRENT_DETAIL = "state:" + CUR
 // A reload that carried its detail along (reloadKeep) restores the pane.
 const DETAIL_PARAM = new URLSearchParams(location.search).get("detail");
 if (DETAIL_PARAM) { CURRENT_DETAIL = DETAIL_PARAM; const dp = detailFor(DETAIL_PARAM); showDetails(dp[0], dp[1]); }
+// Folds that were open before a reloadKeep stay open (the UX law).
+const FOLDS = (new URLSearchParams(location.search).get("folds") || "").split("|").filter(Boolean);
+if (FOLDS.length) document.querySelectorAll("#details details").forEach((d) => {
+  const s = d.querySelector("summary");
+  if (s && FOLDS.includes(s.textContent.split(" (")[0].trim())) d.open = true;
+});
 
 // THE UNIFIED FEED (owner ruling, v2 i9 notes; built in v3): every hand's
 // act, one line each — time | src | brief | result. Updates bold, notes
@@ -847,7 +861,7 @@ function renderDecisions(sel) {
   if (!g) return;
   const kids = {};
   g.nodes.forEach((n) => { (kids[n.parent || ""] = kids[n.parent || ""] || []).push(n); });
-  const badge = { open: "●", done: "✓", obsolete: "⊘", reverted: "↩" };
+  const badge = { open: "●", done: "✓", obsolete: "⊘", reverted: "↩", deferred: "→" };
   function tree(pid, depth) {
     return (kids[pid] || []).map((n) =>
       '<div class="dnode s-' + n.status + (n.id === g.active ? " dactive" : "") + (n.id === sel ? " dsel" : "") + '" data-node="' + n.id + '" style="margin-left:' + depth * 14 + 'px" title="' + n.id + " · " + n.status + '">' + badge[n.status] + " " + escText(n.brief) + "</div>" + tree(n.id, depth + 1)
