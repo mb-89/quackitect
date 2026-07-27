@@ -115,23 +115,24 @@ never gated — only entering is. So autonomy 0 is manual mode (the human
 clicks through everything, even mechanical steps), 0.5 is everyday work,
 1 is fully autonomous — at 1 even the killers are the agent's.
 
-The scale (calibrate against these anchors, don't invent new bands):
+The scale is UNIFORM — 0.2 per band (owner ruling 2026-07-27). Calibrate
+against these anchors, don't invent new bands:
 
-- **0.01 — mechanical.** No decision content at all: start/end pills,
-  boot's steps, idle. The floor is 0.01, not 0, so that autonomy 0 blocks
-  even these.
-- **0.25 — routine.** A step anyone would take the same way: listing,
+- **0 — mechanical.** No decision content at all: start/end pills, boot's
+  steps, idle. At autonomy 0 the agent still walks THESE by itself; every
+  judgment step is the human's.
+- **0.2 — routine.** A step anyone would take the same way: listing,
   archiving, picking from an obvious set.
-- **0.5 — everyday decision.** Judgment involved, wrong choice is cheap to
+- **0.4 — everyday decision.** Judgment involved, wrong choice is cheap to
   undo: starting an expedition, choosing which one to continue.
-- **0.75 — consequential.** Hard to undo or shapes what follows: closing
+- **0.6 — consequential.** Hard to undo or shapes what follows: closing
   and merging an expedition, accepting a design.
-- **0.9 — killer / milestone.** The decisions the whole walk exists to
-  surface. 0.9 does NOT mean "always human" — it means the human holds it
+- **0.8 — killer / milestone.** The decisions the whole walk exists to
+  surface. 0.8 does NOT mean "always human" — it means the human holds it
   until they deliberately slide there.
 - **1 — ideation.** No state carries priority 1; it is the slider's last
   notch. At 1 the agent, left idle, finds its own work — pending notes,
-  backlog, research. (The behavior ships later; until then 1 acts as 0.9.)
+  backlog, research. (The behavior ships later; until then 1 acts as 0.8.)
 
 A sub-machine state's priority lives in the SUB-CANVAS's
 `metadata.frontmatter.priority` (the canvas is the state); the compiler

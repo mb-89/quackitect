@@ -9,7 +9,7 @@ import { existsSync, readFileSync, statSync } from "node:fs";
 import { marked } from "marked";
 import { CallLog } from "./calllog.ts";
 import { Rejection } from "./errors.ts";
-import { appendNote, readNotes } from "./inbox.ts";
+import { appendNote, pendingNotes, readNotes } from "./inbox.ts";
 import { feedRows, renderMirror, type MirrorState } from "./render.ts";
 import { resolveInRoot, seDir } from "./paths.ts";
 import { Session } from "./session.ts";
@@ -92,6 +92,13 @@ export function startMirror(o: MirrorOptions): Server {
         }));
         return;
       }
+      if (req.method === "POST" && url.pathname === "/shutdown") {
+        post(req, res, "mirror_shutdown", (body) => ({
+          args: { value: body.value },
+          result: state.session.setShutdown(Number(body.value)),
+        }));
+        return;
+      }
       if (req.method === "POST" && url.pathname === "/autonomy") {
         // The slider — how much of the walk is the agent's. Logged like
         // every other hand on the machinery.
@@ -113,7 +120,7 @@ export function startMirror(o: MirrorOptions): Server {
           res.end(JSON.stringify(rec ?? { missing: ref }));
           return;
         }
-        res.end(JSON.stringify(feedRows(o.log, state.session.startedTs, readNotes(seDir(o.root)))));
+        res.end(JSON.stringify(feedRows(o.log, state.session.startedTs, pendingNotes(seDir(o.root)))));
         return;
       }
       if (url.pathname === "/api/decisions") {
@@ -230,6 +237,7 @@ export function startMirror(o: MirrorOptions): Server {
         res.end(JSON.stringify({
           status: state.session.instance.status,
           autonomy: state.session.autonomy,
+          shutdown: state.session.shutdown,
           active: state.session.active(),
           busy: state.session.busy(),
           // A monotone change signal for the feed — the log file only grows.

@@ -3,7 +3,7 @@
   "version": "1.0-1.0",
   "frontmatter": {
    "reentry": "restart",
-   "priority": 0.5
+   "priority": 0.4
   }
  },
  "nodes": [

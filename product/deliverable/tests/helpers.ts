@@ -25,6 +25,8 @@ try {
 // suite (engine/bin/selftest.ts) — without this guard every booted walk
 // would spawn the whole suite again, recursively.
 process.env.SE_SELFTEST_SKIP = "1";
+// Never spawn keep-awake loops or OS shutdowns from a test session.
+process.env.SE_KEEPAWAKE_DISABLE = "1";
 
 export function freshRoot(): string {
   const root = mkdtempSync(join(tmpdir(), "se-v3-"));

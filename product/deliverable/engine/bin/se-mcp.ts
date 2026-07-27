@@ -1,7 +1,7 @@
 // se-mcp — the v3 server entry. Node ≥22 runs this directly (native type
 // stripping); no build step. The workspace's .mcp.json points here.
 //
-//   node engine/bin/se-mcp.ts --root <project root> [--autonomy 0.5] [--manual] [--mirror-port 7333]
+//   node engine/bin/se-mcp.ts --root <project root> [--autonomy 0.4] [--manual] [--mirror-port 7333]
 //
 // --root is the QUACKITECT PROJECT root (the folder holding product/ and
 // workspace/) — the file lane serves that whole tree, the call log lives in
@@ -40,13 +40,13 @@ function argValue(flag: string): string | undefined {
 if (argv.some((a) => a === "--help" || a === "-h" || a === "-?")) {
   process.stdout.write(`se-mcp — the quackitect v3 MCP server (stdio JSON-RPC + embedded mirror)
 
-  node engine/bin/se-mcp.ts --root <project root> [--autonomy 0.5] [--manual] [--mirror-port 7333]
+  node engine/bin/se-mcp.ts --root <project root> [--autonomy 0.4] [--manual] [--mirror-port 7333]
 
   --root         the quackitect project root (holds product/ and workspace/);
                  file lane serves that tree, call log lands in <root>/.se/
   --autonomy     0..1 — which states the AGENT enters by itself (priority <=
                  autonomy). 0: every step is the human's (manual mode);
-                 1: fully autonomous. Default 0.5. Env: SE_AUTONOMY.
+                 1: fully autonomous. Default 0.4. Env: SE_AUTONOMY.
                  Live-adjustable in the mirror. (--threshold and
                  SE_THRESHOLD are accepted as the old spelling.)
   --manual       alias for --autonomy 0 — you drive every step from the mirror

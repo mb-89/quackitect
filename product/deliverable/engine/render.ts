@@ -222,12 +222,22 @@ function viewedMachine(m: MirrorState, view: string | undefined): { decl: Machin
  *  threshold slider — a click is a shortcut to the level and surfaces its
  *  help in the details pane. */
 const LEVELS = [
-  { value: 0.01, abbr: "M", name: "mechanical" },
-  { value: 0.25, abbr: "R", name: "routine" },
-  { value: 0.5, abbr: "E", name: "everyday decision" },
-  { value: 0.75, abbr: "C", name: "consequential" },
-  { value: 0.9, abbr: "K", name: "killer / milestone" },
+  { value: 0, abbr: "M", name: "mechanical" },
+  { value: 0.2, abbr: "R", name: "routine" },
+  { value: 0.4, abbr: "E", name: "everyday decision" },
+  { value: 0.6, abbr: "C", name: "consequential" },
+  { value: 0.8, abbr: "K", name: "killer / milestone" },
   { value: 1, abbr: "I", name: "ideation — the agent finds its own work (behavior ships later)" },
+];
+
+/** The SHUTDOWN CONTROL's five notches (owner design): what happens
+ *  around "done". Abbreviations on the bar; click for the explanations. */
+const SHUTDOWN_LEVELS = [
+  { value: 1, abbr: "N", name: "no shutdown control" },
+  { value: 2, abbr: "P", name: "shutdown prevention — the machine is kept awake while the walk runs" },
+  { value: 3, abbr: "PI", name: "prevention + idle-on-done — done with everything, stay at idle" },
+  { value: 4, abbr: "PE", name: "prevention + end-on-done — done → idle → end (session over; prevention ends with it)" },
+  { value: 5, abbr: "PS", name: "prevention + power-off-on-done — done → end → the machine powers off one minute later" },
 ];
 
 const STYLE = `
@@ -404,6 +414,7 @@ const HUMAN_TOOLS = {
   se_exp_list: [],
   se_exp_open: [{ name: "id", hint: "an open expedition id (se_exp_list shows them)" }],
   se_exp_close: [{ name: "merge", hint: "true merges back (default); false archives unmerged" }],
+  se_note_drain: [{ name: "ref", hint: "the note's ref (note-…) — the feed shows it" }, { name: "disposition", hint: "done | obsolete | carried" }, { name: "where", hint: "optional — where it landed or lives on" }],
 };
 function toolModal(name) {
   const fields = HUMAN_TOOLS[name] || [];
@@ -504,6 +515,16 @@ function stateDetail(id) {
   if (s.pulled && s.pulled.length > 0) {
     const row = '<tr><td class="k" title="derived by the machine, not authored">pulled</td><td class="v">' + pulledView(s.pulled) + "</td></tr></table>";
     html = html.endsWith("</table>") ? html.slice(0, -8) + row : html + '<table class="kv">' + row;
+  }
+  if (s.archive) {
+    html += '<div class="meta" style="padding:8px 0 4px">the archive</div>';
+    if (!s.archive.length) html += '<div class="vnull">nothing closed yet</div>';
+    s.archive.forEach((e) => {
+      html += '<div style="padding:6px 0 2px"><b>' + escText(e.id) + "</b></div>";
+      if (e.goal) html += '<div class="comment-text">' + escText(e.goal) + "</div>";
+      html += '<div class="meta">' + (e.status ? "status: " + escText(e.status) : "pre-record") + (e.report ? " · report: " + escText(e.report) : "") + "</div>";
+      if (e.status) html += '<div><a class="doclink" data-path="product/spec/expeditions/' + escText(e.id) + '/record.md">record</a> · <a class="doclink" data-path="product/spec/expeditions/' + escText(e.id) + '/report.md">report</a></div>';
+    });
   }
   if (s.next && s.next.length > 0) {
     html += '<div class="meta" style="padding:8px 0 4px">next</div>' + nextTable(id, s);
@@ -849,7 +870,35 @@ function levelHelp(sel) {
     '<tr' + (sel === l.value ? ' style="background:#22272c"' : "") + '><td class="k">' + l.abbr + " · " + l.value + '</td><td class="v">' + l.name + "</td></tr>").join("");
   showDetails("the autonomy scale", '<table class="kv">' + rows + '</table><div style="padding:8px 0 0"><a class="doclink" data-path="product/guidance/authoring/machines.md">the full scale — machines.md · Priority</a></div>');
 }
+// THE SHUTDOWN CONTROL — five notches; same grammar as the autonomy bar.
+const SD_LEVELS = ${JSON.stringify(SHUTDOWN_LEVELS)};
+const sdEl = document.getElementById("sd");
+function sdAbbr(v) { const l = SD_LEVELS.find((x) => x.value === Number(v)); return l ? l.abbr : String(v); }
+function sdHelp(sel) {
+  const rows = SD_LEVELS.map((l) =>
+    '<tr' + (sel === l.value ? ' style="background:#22272c"' : "") + '><td class="k">' + l.abbr + " · " + l.value + '</td><td class="v">' + escText(l.name) + "</td></tr>").join("");
+  showDetails("the shutdown control", '<table class="kv">' + rows + "</table>");
+}
+if (sdEl) {
+  const lbl2 = document.getElementById("sd-val");
+  sdEl.addEventListener("input", () => { if (lbl2) lbl2.textContent = sdAbbr(sdEl.value); });
+  sdEl.addEventListener("change", async () => {
+    await fetch("/shutdown", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ value: Number(sdEl.value) }) });
+  });
+}
 document.addEventListener("click", (ev) => {
+  const sn = ev.target.closest ? ev.target.closest(".sd-notch") : null;
+  if (sn && sdEl) {
+    const v = Number(sn.dataset.level);
+    sdEl.value = v;
+    const lbl2 = document.getElementById("sd-val");
+    if (lbl2) lbl2.textContent = sdAbbr(v);
+    void fetch("/shutdown", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ value: v }) });
+    sdHelp(v);
+    return;
+  }
+  const sh = ev.target.closest ? ev.target.closest(".sd-help") : null;
+  if (sh) { sdHelp(null); return; }
   const n = ev.target.closest ? ev.target.closest(".thr-notch") : null;
   if (n && thr) {
     const v = Number(n.dataset.level);
@@ -896,6 +945,11 @@ setInterval(async () => {
       thr.value = a.autonomy;
       const lbl = document.getElementById("thr-val");
       if (lbl) lbl.textContent = Number(a.autonomy).toFixed(2);
+    }
+    if (sdEl && document.activeElement !== sdEl && Number(sdEl.value) !== a.shutdown) {
+      sdEl.value = a.shutdown;
+      const lbl2 = document.getElementById("sd-val");
+      if (lbl2) lbl2.textContent = sdAbbr(a.shutdown);
     }
     if (logPanel && a.acts !== lastActs) { lastActs = a.acts; refreshLog(); }
     if (JSON.stringify(a.active || []) !== ACTIVE_AT_RENDER) { location.reload(); return; }
@@ -975,6 +1029,8 @@ export function renderMirror(m: MirrorState, widget?: "machine" | "details" | "l
       ...(s.exit !== undefined ? { exit: m.session.conditionStatus(decl, s, "leave") } : {}),
       exit_met: m.session.conditionMet(decl, s, "leave"),
       was_filled: done.has(s.id),
+      // An archive-tagged state carries the closed records for its detail.
+      ...(s.tags?.includes("archive") ? { archive: (m.session.expeditionList() as { archive: unknown[] }).archive } : {}),
       ...(s.exit?.script !== undefined || s.entry?.script !== undefined
         ? { script: m.session.scriptStatus(decl, s) }
         : {}),
@@ -1012,13 +1068,17 @@ export function renderMirror(m: MirrorState, widget?: "machine" | "details" | "l
   // (manual mode is just this); 1 = fully autonomous. Live: changes take
   // effect on the agent's next tick.
   const thr = m.session.autonomy;
-  const notches = LEVELS.map((l) => `<span class="thr-notch" data-level="${l.value}" style="left:${l.value * 100}%" title="${esc(l.name)} — click: threshold ${l.value}">${l.abbr}</span>`).join("");
+  const notches = LEVELS.map((l) => `<span class="thr-notch" data-level="${l.value}" style="left:${l.value * 100}%" title="${esc(l.name)} — click: autonomy ${l.value}">${l.abbr}</span>`).join("");
   const slider = `<span class="threshold" title="the agent enters only states with priority ≤ autonomy — the notches are the authored levels, click one to jump there"><span class="thr-help" title="click: the scale, explained in details">autonomy</span><span class="thr-track"><input id="thr" type="range" min="0" max="1" step="0.01" value="${thr}" list="thr-ticks"><datalist id="thr-ticks">${LEVELS.map((l) => `<option value="${l.value}"></option>`).join("")}</datalist><span class="thr-notches">${notches}</span></span><span id="thr-val">${thr.toFixed(2)}</span></span>`;
+  const sd = m.session.shutdown;
+  const sdNotches = SHUTDOWN_LEVELS.map((l) => `<span class="sd-notch thr-notch" data-level="${l.value}" style="left:${((l.value - 1) / 4) * 100}%" title="${esc(l.name)}">${l.abbr}</span>`).join("");
+  const sdAbbrNow = SHUTDOWN_LEVELS.find((l) => l.value === sd)?.abbr ?? String(sd);
+  const sdBar = `<span class="threshold" title="shutdown control — what happens around done"><span class="sd-help thr-help" title="click: the levels, explained in details">shutdown</span><span class="thr-track"><input id="sd" type="range" min="1" max="5" step="1" value="${sd}" list="sd-ticks"><datalist id="sd-ticks">${SHUTDOWN_LEVELS.map((l) => `<option value="${l.value}"></option>`).join("")}</datalist><span class="thr-notches">${sdNotches}</span></span><span id="sd-val">${esc(sdAbbrNow)}</span></span>`;
   // Escape has a hand-side affordance too (parity law): only while a
   // sub-machine other than boot is being walked.
   const crumbTrail = m.session.breadcrumb();
   const escapeBtn = crumbTrail.length > 1 && crumbTrail[1] !== "boot" ? `<button class="ghost" id="escape-btn" title="escape to idle — the machine is left standing, the reason is recorded">⤴ escape</button>` : "";
-  const machineWidget = `<div class="widget" id="w-machine"><div class="widget-head"><span class="crumbs">${crumbs}</span><span style="display:flex;align-items:center;gap:10px">${slider}${escapeBtn}<button class="expand" data-widget="w-machine" data-url="/widget/machine?view=${encodeURIComponent(decl.id)}" title="expand · ctrl-click: new tab · shift-click: new window">⛶</button></span></div><div class="widget-body">${svg}</div></div>`;
+  const machineWidget = `<div class="widget" id="w-machine"><div class="widget-head"><span class="crumbs">${crumbs}</span><span style="display:flex;align-items:center;gap:10px">${slider}${sdBar}${escapeBtn}<button class="expand" data-widget="w-machine" data-url="/widget/machine?view=${encodeURIComponent(decl.id)}" title="expand · ctrl-click: new tab · shift-click: new window">⛶</button></span></div><div class="widget-body">${svg}</div></div>`;
   const detailsWidget = `<div class="widget" id="w-details">${widgetHead("details", "w-details", "/widget/details")}
     ${info.status === "closed" ? '<div class="meta" style="color:#e86a5f">machine closed</div>' : ""}
     <div class="meta" id="details-title">—</div>

@@ -1,7 +1,7 @@
 ---
 state: create
 state_kind: work
-priority: 0.25
+priority: 0.2
 legal_tools: se_exp_new, se_exp_list
 guidance: Mint the expedition with se_exp_new (kind and goal). Then tick onward — back at idle, continue_expedition is where the work happens.
 ---

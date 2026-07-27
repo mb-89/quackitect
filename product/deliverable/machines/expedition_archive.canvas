@@ -3,14 +3,14 @@
   "version": "1.0-1.0",
   "frontmatter": {
    "reentry": "restart",
-   "priority": 0.25
+   "priority": 0.2
   }
  },
  "nodes": [
   {
    "id": "n-comment",
    "type": "text",
-   "text": "EXPEDITION ARCHIVE \u2014 closed expeditions. Browsing lives in the mirror; this machine stays minimal. EMPTY until persistence lands.",
+   "text": "EXPEDITION ARCHIVE — closed expeditions, browsable: the browse state's details list every record with goal, status and report verdict.",
    "x": -1100,
    "y": -340,
    "width": 660,
@@ -23,10 +23,19 @@
    "styleAttributes": {
     "shape": "pill"
    },
-   "x": -1100,
+   "x": -1400,
    "y": 80,
    "width": 160,
    "height": 160
+  },
+  {
+   "id": "n-browse",
+   "type": "file",
+   "file": "deliverable/machines/states/browse.md",
+   "x": -1100,
+   "y": -20,
+   "width": 620,
+   "height": 360
   },
   {
    "id": "n-end",
@@ -35,7 +44,7 @@
    "styleAttributes": {
     "shape": "pill"
    },
-   "x": -700,
+   "x": -340,
    "y": 80,
    "width": 160,
    "height": 160
@@ -43,8 +52,15 @@
  ],
  "edges": [
   {
-   "id": "e-start-end",
+   "id": "e-start-browse",
    "fromNode": "n-start",
+   "fromSide": "right",
+   "toNode": "n-browse",
+   "toSide": "left"
+  },
+  {
+   "id": "e-browse-end",
+   "fromNode": "n-browse",
    "fromSide": "right",
    "toNode": "n-end",
    "toSide": "left"

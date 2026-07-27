@@ -56,6 +56,7 @@ Write plainly. These are rules, not suggestions. They bind every output: chat, d
 
 ### Do not repeat (DRY)
 - Single source of truth. Each fact lives in one place. Everything else points to it.
+- Markdown is the truth. Anything whose truth lives in markdown keeps it Obsidian-compatible and human-editable IN THE REAL WORLD — a million-line file is not editable. Generated surfaces derive from the markdown, never the reverse. Log files are the one exception.
 - Do not repeat prose, data, or code. Not across files. Not across panels. Not within one screen.
 - If two places show the same thing, delete one. A detail view should not echo what its parent already shows.
 - Repeat only when strongly advised. Then say why.
