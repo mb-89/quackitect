@@ -521,6 +521,7 @@ function stateDetail(id) {
         + (e.status ? '<tr><td class="k">status</td><td class="v">' + escText(e.status) + "</td></tr>" : "")
         + ((e.ruling || e.report) ? '<tr><td class="k">ruling</td><td class="v">' + escText(e.ruling || e.report) + "</td></tr>" : "")
         + '<tr><td class="k">report</td><td class="v"><a class="replink" data-exp="' + escText(e.id) + '" data-path="product/spec/expeditions/' + escText(e.id) + '/report.md" data-title="report · ' + escText(e.id) + '" title="click: modal · ctrl-click: new tab · shift-click: new window">report.md</a></td></tr>'
+        + '<tr><td class="k">decisions</td><td class="v"><a class="replink" data-exp="' + escText(e.id) + '" data-path="product/spec/expeditions/' + escText(e.id) + '/decisions.jsonl" data-title="decisions · ' + escText(e.id) + '" title="the decision graph — attached evidence">decisions.jsonl</a></td></tr>'
         + "</table>";
     }
   }
@@ -860,7 +861,7 @@ function renderDecisions(sel) {
   if (!g) return;
   const kids = {};
   g.nodes.forEach((n) => { (kids[n.parent || ""] = kids[n.parent || ""] || []).push(n); });
-  const badge = { open: "●", done: "✓", obsolete: "⊘", reverted: "↩" };
+  const badge = { open: "●", done: "✓", obsolete: "⊘", reverted: "↩", deferred: "→" };
   function tree(pid, depth) {
     return (kids[pid] || []).map((n) =>
       '<div class="dnode s-' + n.status + (n.id === g.active ? " dactive" : "") + (n.id === sel ? " dsel" : "") + '" data-node="' + n.id + '" style="margin-left:' + depth * 14 + 'px" title="' + n.id + " · " + n.status + '">' + badge[n.status] + " " + escText(n.brief) + "</div>" + tree(n.id, depth + 1)

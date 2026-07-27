@@ -42,6 +42,9 @@ Narration rides the walk (the unified log + the decision graph):
     resolve it and return. Extra work that merely grows the scope is not a
     fork — append it to the checklist with another plan.
   - done | obsolete | revert `{node, brief}` resolves a node.
+  - defer `{node, to}` parks a point for the state that can do it —
+    entering that state materializes it as an open to-do. A point that
+    cannot be done HERE is deferred, never claimed or ignored.
   - update `{brief, node?}` says what you are doing. An update is never
     called a note — notes are the retro's strays (se_note). Every update
     CHANGES THE RENDER: the engine lands it as a checked point under the

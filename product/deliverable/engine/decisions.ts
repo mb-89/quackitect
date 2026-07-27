@@ -16,17 +16,19 @@ export interface DecisionNode {
   visit: string;
   parent: string | null;
   brief: string;
-  status: "open" | "done" | "obsolete" | "reverted";
+  status: "open" | "done" | "obsolete" | "reverted" | "deferred";
   at: string;
   closed_at?: string;
   resolution?: string;
 }
 
 export interface DecisionOp {
-  op: "plan" | "fork" | "done" | "obsolete" | "revert" | "update";
+  op: "plan" | "fork" | "done" | "obsolete" | "revert" | "update" | "defer";
   brief?: string;
   items?: string[];
   node?: string;
+  /** defer only: the state id that can do the point — it arrives there. */
+  to?: string;
 }
 
 const CLOSES: Record<string, DecisionNode["status"]> = {
@@ -39,7 +41,8 @@ const SHAPE_NOTE =
   "ops: plan {items: [\"...\"]} starts the checklist (node = optional parent) · " +
   "fork {brief, items?} opens an unplanned branch where you are · " +
   "done|obsolete|revert {node, brief?} resolves a node (brief = resolution) · " +
-  "update {brief, node?} says what you are doing";
+  "update {brief, node?} says what you are doing · " +
+  "defer {node, to: <state>} parks a point for the state that can do it — it arrives there as an open to-do";
 
 function malformed(got: string): Rejection {
   return new Rejection({
@@ -64,11 +67,13 @@ export function parseUpdate(v: unknown): DecisionOp {
   if (typeof v !== "object" || v === null || Array.isArray(v)) throw malformed(typeof v);
   const u = v as Record<string, unknown>;
   const op = String(u.op ?? "");
-  if (!(op in CLOSES) && op !== "plan" && op !== "fork" && op !== "update") throw malformed(`op: ${JSON.stringify(u.op)}`);
+  if (!(op in CLOSES) && op !== "plan" && op !== "fork" && op !== "update" && op !== "defer") throw malformed(`op: ${JSON.stringify(u.op)}`);
   const items = u.items === undefined ? undefined : Array.isArray(u.items) ? u.items.map(String).filter((s) => s.trim() !== "") : null;
   if (items === null) throw malformed("items is not an array of strings");
   const brief = u.brief === undefined ? undefined : String(u.brief);
   const node = u.node === undefined ? undefined : String(u.node);
+  const to = u.to === undefined ? undefined : String(u.to);
+  if (op === "defer" && (node === undefined || to === undefined || to.trim() === "")) throw malformed("defer needs node and to (the state that can do it)");
   if (op === "plan" && (items === undefined || items.length === 0)) throw malformed("plan without items");
   if (op === "fork" && (brief === undefined || brief.trim() === "")) throw malformed("fork without brief");
   if (op in CLOSES && node === undefined) throw malformed(`${op} without node`);
@@ -82,7 +87,7 @@ export function parseUpdate(v: unknown): DecisionOp {
   };
   if (brief !== undefined) lintLine(brief, "brief");
   for (const it of items ?? []) lintLine(it, "item");
-  return { op: op as DecisionOp["op"], ...(brief !== undefined ? { brief } : {}), ...(items !== undefined ? { items } : {}), ...(node !== undefined ? { node } : {}) };
+  return { op: op as DecisionOp["op"], ...(brief !== undefined ? { brief } : {}), ...(items !== undefined ? { items } : {}), ...(node !== undefined ? { node } : {}), ...(to !== undefined ? { to } : {}) };
 }
 
 export class Decisions {
@@ -165,7 +170,24 @@ export class Decisions {
     return undefined;
   }
 
+  /** Deferred points arrive when their state's visit is first touched —
+   *  a prefilled to-do, open like any planned item. */
+  private materialize(visit: string): void {
+    const state = visit.split("@")[0];
+    const due = this.parked.filter((p) => p.state === state);
+    if (due.length === 0) return;
+    const keep = this.parked.filter((p) => p.state !== state);
+    this.parked.splice(0, this.parked.length, ...keep);
+    for (const p of due) {
+      const n = this.add(visit, null, p.brief);
+      this.record({ op: "defer_arrived", visit, node: n.id, brief: n.brief });
+    }
+  }
+
+  private readonly parked: { state: string; brief: string }[] = [];
+
   apply(visit: string, u: DecisionOp): Record<string, unknown> {
+    this.materialize(visit);
     switch (u.op) {
       case "plan": {
         const parent = u.node === undefined ? null : this.openNode(u.node).id;
@@ -203,6 +225,23 @@ export class Decisions {
         this.record({ op: u.op, visit: n.visit, node: n.id, ...(u.brief !== undefined ? { brief: u.brief } : {}) });
         break;
       }
+      case "defer": {
+        const n = this.openNode(u.node!);
+        if (this.openChildren(n.id).length > 0) {
+          throw new Rejection({
+            clause: CLAUSES.DECISION_UNRESOLVED,
+            expected: "no open children under a deferred point — resolve or defer each first",
+            got: `${n.id} still has open children`,
+            remedy: { tool: "(the same call)", args: { update: { op: "defer", node: "<child id>", to: u.to } }, note: SHAPE_NOTE },
+            source: "engine/decisions.ts defer",
+          });
+        }
+        this.close(n, "deferred", `deferred to ${u.to}`);
+        this.parked.push({ state: u.to!, brief: n.brief });
+        if (this.activeId === n.id) this.activeId = this.openAncestor(n);
+        this.record({ op: "defer", visit: n.visit, node: n.id, brief: n.brief, to: u.to });
+        break;
+      }
       case "update": {
         if (u.node !== undefined) this.activeId = this.openNode(u.node).id;
         // EVERY update changes the RENDER (owner ruling 2026-07-27): the
@@ -222,9 +261,16 @@ export class Decisions {
    *  Every update op IS in the tree (a checked point), so the log and the
    *  panel always tell the same story. */
   graph(visit: string): { visit: string; active: string | null; nodes: DecisionNode[] } {
+    this.materialize(visit);
     const nodes = [...this.nodes.values()].filter((n) => n.visit === visit);
     const active = this.activeId !== undefined && this.nodes.get(this.activeId)?.visit === visit ? this.activeId : null;
     return { visit, active, nodes };
+  }
+
+  /** Open nodes whose visit belongs to one of the given state ids — the
+   *  evidence check: no point may stand open when the work claims done. */
+  openFor(stateIds: string[]): DecisionNode[] {
+    return [...this.nodes.values()].filter((n) => n.status === "open" && stateIds.some((p) => n.visit === p || n.visit.startsWith(`${p}@`)));
   }
 
   /** Every visit that recorded decisions, in first-seen order. */

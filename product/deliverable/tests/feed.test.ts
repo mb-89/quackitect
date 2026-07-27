@@ -108,6 +108,26 @@ test("the render lint: the update lane refuses what renders weird", () => {
   assert.throws(() => parseUpdate({ op: "plan", items: ["fine", "also fine, still fine, too many"] }), (e) => (e as { clause?: string }).clause === "SE-C-120");
   const ok = parseUpdate({ op: "update", brief: "short and clean — two parts, fine" });
   assert.equal(ok.op, "update");
+  // defer demands node AND to.
+  assert.throws(() => parseUpdate({ op: "defer", node: "d1" }), (e) => (e as { clause?: string }).clause === "SE-C-120");
+  const d = parseUpdate({ op: "defer", node: "d1", to: "idle" });
+  assert.equal(d.to, "idle");
+});
+
+test("defer parks a point for a later state — it arrives there as an open to-do", () => {
+  const s = new Session(freshRoot());
+  s.decisions.apply("e1@0", { op: "plan", items: ["doable here", "needs idle"] });
+  const park = s.decisions.graph("e1@0").nodes.find((n) => n.brief === "needs idle")!;
+  s.decisions.apply("e1@0", { op: "defer", node: park.id, to: "idle" });
+  assert.equal(s.decisions.graph("e1@0").nodes.find((n) => n.id === park.id)!.status, "deferred");
+  // Deferred is not open — the evidence check passes over it.
+  assert.equal(s.decisions.openFor(["e1"]).length, 1, "only the doable point stays open");
+  // First touch of the target state materializes it — once.
+  const arrived = s.decisions.graph("idle@0").nodes;
+  assert.equal(arrived.length, 1);
+  assert.equal(arrived[0].brief, "needs idle");
+  assert.equal(arrived[0].status, "open");
+  assert.equal(s.decisions.graph("idle@0").nodes.length, 1);
 });
 
 test("the unified feed derives src, type and brief — and the mirror carries the log pane", () => {

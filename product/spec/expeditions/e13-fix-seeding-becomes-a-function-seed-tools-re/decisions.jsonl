@@ -12,3 +12,12 @@
 {"ts":"2026-07-27T19:26:57.849Z","op":"update","visit":"continue_expedition/e13@0","node":"d23","brief":"suite rerun after the YAML fix"}
 {"ts":"2026-07-27T19:27:40.285Z","op":"update","visit":"continue_expedition/e13@0","node":"d24","brief":"committing the seeding build on the e13 branch"}
 {"ts":"2026-07-27T19:28:30.227Z","op":"update","visit":"continue_expedition/e13@0","node":"d25","brief":"leave form filled and set done by the agent hand"}
+{"ts":"2026-07-27T19:28:56.426Z","op":"update","visit":"continue_expedition/e13@0","node":"d26","brief":"entering the leave gate — the form stands done"}
+{"ts":"2026-07-27T19:35:08.176Z","op":"update","visit":"continue_expedition/e13@0","node":"d27","brief":"graph-is-evidence rule: open points invalidate the leave form"}
+{"ts":"2026-07-27T19:35:26.036Z","op":"update","visit":"continue_expedition/e13@0","node":"d28","brief":"graph-is-evidence test added"}
+{"ts":"2026-07-27T19:35:46.042Z","op":"update","visit":"continue_expedition/e13@0","node":"d29","brief":"suite over the graph-is-evidence rule"}
+{"ts":"2026-07-27T19:36:50.080Z","op":"update","visit":"continue_expedition/e13@0","node":"d30","brief":"client string fixed and formGet now serves the gate-linted truth"}
+{"ts":"2026-07-27T19:38:24.109Z","op":"update","visit":"continue_expedition/e13@0","node":"d31","brief":"defer op built end to end with arrival materialization"}
+{"ts":"2026-07-27T19:38:43.105Z","op":"update","visit":"continue_expedition/e13@0","node":"d32","brief":"defer tests: parse shape and the park-and-arrive story"}
+{"ts":"2026-07-27T19:38:50.432Z","op":"update","visit":"continue_expedition/e13@0","node":"d33","brief":"suite over the graph-evidence rule and the defer op"}
+{"ts":"2026-07-27T19:39:40.234Z","op":"done","visit":"continue_expedition/e13@0","node":"d6","brief":"six doors live; the old machines deleted"}

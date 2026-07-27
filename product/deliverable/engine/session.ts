@@ -34,7 +34,7 @@ import { drainNote, pendingNotes } from "./inbox.ts";
 import { confirmPrefill, formTemplatePath, lintForm, parseFormTemplate, scaffoldInstance, withFieldContent, withStatus, type FormLint, type FormTemplate } from "./forms.ts";
 import { pulledFor, scanGuidance, type GuidanceDoc, type PulledDoc } from "./pull.ts";
 import { expClose, expFind, expList, expNew, readRecord, type Expedition } from "./worktree.ts";
-import { generateContinueExpedition, generateExpeditionArchive, type GeneratedMachine } from "./expmachine.ts";
+import { generateContinueExpedition, generateExpeditionArchive, shortId, type GeneratedMachine } from "./expmachine.ts";
 import { type CanvasData } from "./canvas.ts";
 import { spawn, spawnSync } from "node:child_process";
 import { fileURLToPath, pathToFileURL } from "node:url";
@@ -616,7 +616,18 @@ export class Session {
   private formLint(name: string): FormLint & { instanceRel: string } {
     const h = this.formHome(name);
     const raw = existsSync(h.instanceAbs) ? readFileSync(h.instanceAbs, "utf8") : undefined;
-    return { ...lintForm(h.template, raw, h.evidenceAbs), instanceRel: h.instanceRel };
+    const lint = { ...lintForm(h.template, raw, h.evidenceAbs), instanceRel: h.instanceRel };
+    // THE GRAPH IS EVIDENCE (owner ruling 2026-07-27): no point of this
+    // work's decision graph may stand OPEN when the evidence claims done.
+    // The graph itself is attached, not copied — the record already
+    // carries decisions.jsonl in the worktree.
+    const sid = shortId(this.bound!.id);
+    const open = this.decisions.openFor([sid, `${sid}-leave`]);
+    if (open.length > 0) {
+      lint.problems.push(`the decision graph holds ${open.length} open point(s) — resolve each (done | obsolete | revert) before the evidence stands`);
+      lint.met = false;
+    }
+    return lint;
   }
 
   /** Pending notes whose text carries one of the markers — what a
@@ -662,7 +673,8 @@ export class Session {
       instance: h.instanceRel,
       evidence_dir: h.evidenceRel,
       exists: raw !== undefined,
-      ...lintForm(h.template, raw, h.evidenceAbs),
+      // The LINTED truth — the same check the gate runs (graph included).
+      ...this.formLint(name),
     };
   }
 

@@ -4,7 +4,7 @@
 // gate holds only the FIRST start of a never-walked iteration.
 import { strict as assert } from "node:assert";
 import { spawnSync } from "node:child_process";
-import { readFileSync } from "node:fs";
+import { readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { test } from "node:test";
 import { generateIterations, itSeed } from "../engine/iterations.ts";
@@ -36,6 +36,34 @@ test("a seed stands in the container at once — kickoff only, gate armed", () =
   // Not a git repo → an empty container that runs start to end.
   const empty = generateIterations(freshRoot());
   assert.deepEqual(empty.decl.states.find((s) => s.id === "start")!.edges, [{ to: "end", role: "normal" }]);
+});
+
+test("the graph is evidence: an open decision point blocks the leave form", () => {
+  const root = freshRoot();
+  gitInit(root);
+  const s = new Session(root);
+  const minted = s.expeditionNew("spike", "graph evidence") as { created: string };
+  s.expeditionOpen(minted.created);
+  const sid = minted.created.match(/^(e\d+)-/)![1];
+  // A filled, done form — but the graph still holds an open point.
+  const rel = join(root, ".worktrees", minted.created, "product", "spec", "expeditions", minted.created, "report.md");
+  const filled = [
+    "---", "form: expedition-leave", "status: done", "by: agent", "files:", "---", "",
+    "# t", "",
+    "## What was the goal", "", "x", "",
+    "## What was done", "", "x", "",
+    "## What settled it", "", "x", "",
+    "## What was not done", "", "nothing", "",
+  ].join("\n");
+  writeFileSync(rel, filled, "utf8");
+  s.decisions.apply(`${sid}@0`, { op: "plan", items: ["one open point"] });
+  let lint = s.formGet("expedition-leave") as { met: boolean; problems: string[] };
+  assert.equal(lint.met, false, "open point → the evidence does not stand");
+  assert.match(lint.problems.join(" | "), /open point/);
+  const node = s.decisions.graph(`${sid}@0`).nodes.find((n) => n.status === "open")!;
+  s.decisions.apply(`${sid}@0`, { op: "done", node: node.id, brief: "resolved" });
+  lint = s.formGet("expedition-leave") as { met: boolean; problems: string[] };
+  assert.equal(lint.met, true, JSON.stringify(lint.problems));
 });
 
 test("the seed refuses a missing vision — the seed is a small form", () => {
