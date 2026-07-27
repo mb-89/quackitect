@@ -38,3 +38,9 @@
 {"ts":"2026-07-27T19:51:26.576Z","op":"update","visit":"continue_expedition/e13@0","node":"d39","brief":"replay test asserts the before and after truths in order"}
 {"ts":"2026-07-27T19:51:33.515Z","op":"update","visit":"continue_expedition/e13@0","node":"d40","brief":"suite rerun over the fixed replay test"}
 {"ts":"2026-07-27T19:51:55.076Z","op":"update","visit":"continue_expedition/e13@0","node":"d41","brief":"committing the replay round on the e13 branch"}
+{"ts":"2026-07-27T19:55:42.652Z","op":"update","visit":"continue_expedition/e13@0","node":"d42","brief":"defer cap at three hops with the trail in the refusal"}
+{"ts":"2026-07-27T19:55:55.246Z","op":"update","visit":"continue_expedition/e13@0","node":"d43","brief":"cap test: the wanderer walks a-b-c-d and hits the wall"}
+{"ts":"2026-07-27T19:56:01.932Z","op":"update","visit":"continue_expedition/e13@0","node":"d44","brief":"suite over the cap"}
+{"ts":"2026-07-27T19:56:23.273Z","op":"update","visit":"continue_expedition/e13@0","node":"d45","brief":"replay assertion loosened to the fields that matter"}
+{"ts":"2026-07-27T19:56:30.154Z","op":"update","visit":"continue_expedition/e13@0","node":"d46","brief":"final e13 suite"}
+{"ts":"2026-07-27T19:56:50.840Z","op":"update","visit":"continue_expedition/e13@0","node":"d47","brief":"committing the cap; then walking the leave gate"}

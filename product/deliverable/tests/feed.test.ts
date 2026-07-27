@@ -126,7 +126,9 @@ test("replay: parked defers and open points survive an engine life", () => {
   // The file's replayed truth BEFORE arrival: nothing open, one parked.
   const before = replayFile(join(dir, "decisions.jsonl"));
   assert.equal(before.open.length, 0, "d1 done, d2 deferred — no open point");
-  assert.deepEqual(before.parked, [{ state: "idle", brief: "b" }]);
+  assert.equal(before.parked.length, 1);
+  assert.equal(before.parked[0].state, "idle");
+  assert.equal(before.parked[0].brief, "b");
   // A fresh engine life: the parked point re-arms and arrives at idle.
   const s = new Session(root);
   const arrived = s.decisions.graph("idle@0").nodes;
@@ -154,6 +156,24 @@ test("defer parks a point for a later state — it arrives there as an open to-d
   assert.equal(arrived[0].brief, "needs idle");
   assert.equal(arrived[0].status, "open");
   assert.equal(s.decisions.graph("idle@0").nodes.length, 1);
+});
+
+test("the defer cap: three hops, then the wall forces a decision", () => {
+  const s = new Session(freshRoot());
+  s.decisions.apply("a@0", { op: "plan", items: ["wanderer"] });
+  let node = s.decisions.graph("a@0").nodes[0];
+  s.decisions.apply("a@0", { op: "defer", node: node.id, to: "b" });
+  node = s.decisions.graph("b@0").nodes[0];
+  s.decisions.apply("b@0", { op: "defer", node: node.id, to: "c" });
+  node = s.decisions.graph("c@0").nodes[0];
+  s.decisions.apply("c@0", { op: "defer", node: node.id, to: "d" });
+  node = s.decisions.graph("d@0").nodes[0];
+  assert.equal(node.hops, 3);
+  assert.deepEqual(node.trail, ["a", "b", "c", "d"]);
+  assert.throws(
+    () => s.decisions.apply("d@0", { op: "defer", node: node.id, to: "e" }),
+    (e) => clause(e) === "SE-C-122" && /a → b → c → d/.test((e as { expected: string }).expected),
+  );
 });
 
 test("the unified feed derives src, type and brief — and the mirror carries the log pane", () => {

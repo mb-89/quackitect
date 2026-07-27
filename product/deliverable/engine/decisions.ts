@@ -17,6 +17,9 @@ export interface DecisionNode {
   parent: string | null;
   brief: string;
   status: "open" | "done" | "obsolete" | "reverted" | "deferred";
+  /** How many defers carried this point here, and through which states. */
+  hops?: number;
+  trail?: string[];
   at: string;
   closed_at?: string;
   resolution?: string;
@@ -48,10 +51,10 @@ const SHAPE_NOTE =
  *  life left standing — parked defers that never arrived, and points
  *  still open. Sequential; a re-minted node id shadows its ancestor (the
  *  per-part history stays in the file for the retro). */
-export function replayFile(path: string): { parked: { state: string; brief: string }[]; open: { id: string; visit: string; brief: string }[] } {
+export function replayFile(path: string): { parked: { state: string; brief: string; hops?: number; trail?: string[] }[]; open: { id: string; visit: string; brief: string }[] } {
   if (!existsSync(path)) return { parked: [], open: [] };
   const nodes = new Map<string, { visit: string; brief: string; open: boolean }>();
-  const parked: { state: string; brief: string }[] = [];
+  const parked: { state: string; brief: string; hops?: number; trail?: string[] }[] = [];
   for (const line of readFileSync(path, "utf8").split("\n")) {
     if (line.trim() === "") continue;
     let rec: Record<string, unknown>;
@@ -71,7 +74,7 @@ export function replayFile(path: string): { parked: { state: string; brief: stri
     } else if (op === "defer") {
       const n = nodes.get(String(rec.node ?? ""));
       if (n) n.open = false;
-      parked.push({ state: String(rec.to ?? ""), brief: String(rec.brief ?? "") });
+      parked.push({ state: String(rec.to ?? ""), brief: String(rec.brief ?? ""), hops: Number(rec.hops ?? 1), trail: Array.isArray(rec.trail) ? rec.trail.map(String) : undefined });
     } else if (op === "defer_arrived") {
       const brief = String(rec.brief ?? "");
       const state = String(rec.visit ?? "").split("@")[0];
@@ -222,11 +225,13 @@ export class Decisions {
     this.parked.splice(0, this.parked.length, ...keep);
     for (const p of due) {
       const n = this.add(visit, null, p.brief);
-      this.record({ op: "defer_arrived", visit, node: n.id, brief: n.brief });
+      n.hops = p.hops ?? 1;
+      n.trail = p.trail ?? [state];
+      this.record({ op: "defer_arrived", visit, node: n.id, brief: n.brief, hops: n.hops, trail: n.trail });
     }
   }
 
-  private readonly parked: { state: string; brief: string }[] = [];
+  private readonly parked: { state: string; brief: string; hops?: number; trail?: string[] }[] = [];
 
   apply(visit: string, u: DecisionOp): Record<string, unknown> {
     this.materialize(visit);
@@ -269,6 +274,19 @@ export class Decisions {
       }
       case "defer": {
         const n = this.openNode(u.node!);
+        // THE CAP (owner ruling 2026-07-27): three defers, then the wall —
+        // the fourth forces a decision. Every out stays legal and honest.
+        const hops = (n.hops ?? 0) + 1;
+        const trail = [...(n.trail ?? [n.visit.split("@")[0]]), u.to!];
+        if (hops > 3) {
+          throw new Rejection({
+            clause: CLAUSES.DECISION_UNRESOLVED,
+            expected: `a DECISION — this point was deferred 3 times already (${trail.join(" → ")}); do it, obsolete it with the reason, or seed it as real work`,
+            got: `defer number ${hops}`,
+            remedy: { tool: "(the same call)", args: { update: { op: "done", node: n.id, brief: "<how it resolved>" } }, note: "chronic deferral is usually a seed in disguise — se_seed_iteration gives it a goal and a vision" },
+            source: "engine/decisions.ts defer",
+          });
+        }
         if (this.openChildren(n.id).length > 0) {
           throw new Rejection({
             clause: CLAUSES.DECISION_UNRESOLVED,
@@ -279,9 +297,9 @@ export class Decisions {
           });
         }
         this.close(n, "deferred", `deferred to ${u.to}`);
-        this.parked.push({ state: u.to!, brief: n.brief });
+        this.parked.push({ state: u.to!, brief: n.brief, hops, trail });
         if (this.activeId === n.id) this.activeId = this.openAncestor(n);
-        this.record({ op: "defer", visit: n.visit, node: n.id, brief: n.brief, to: u.to });
+        this.record({ op: "defer", visit: n.visit, node: n.id, brief: n.brief, to: u.to, hops, trail });
         break;
       }
       case "update": {
