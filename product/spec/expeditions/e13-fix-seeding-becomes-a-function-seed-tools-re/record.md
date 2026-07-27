@@ -1,7 +1,9 @@
 ---
 id: e13-fix-seeding-becomes-a-function-seed-tools-re
 kind: fix
-status: open
+status: closed
+closed: 2026-07-27T19:57:14.085Z
+ruling: applied
 opened: 2026-07-27T19:06:32.153Z
 goal: "Seeding becomes a function: seed tools replace the start doors, seeded iterations stand visible in the containers, expeditions/iterations renamed"
 ---

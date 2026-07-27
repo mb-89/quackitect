@@ -44,3 +44,5 @@
 {"ts":"2026-07-27T19:56:23.273Z","op":"update","visit":"continue_expedition/e13@0","node":"d45","brief":"replay assertion loosened to the fields that matter"}
 {"ts":"2026-07-27T19:56:30.154Z","op":"update","visit":"continue_expedition/e13@0","node":"d46","brief":"final e13 suite"}
 {"ts":"2026-07-27T19:56:50.840Z","op":"update","visit":"continue_expedition/e13@0","node":"d47","brief":"committing the cap; then walking the leave gate"}
+{"ts":"2026-07-27T19:57:05.611Z","op":"update","visit":"continue_expedition/e13@0","node":"d48","brief":"entering the leave gate on the raised slider"}
+{"ts":"2026-07-27T19:57:14.083Z","op":"update","visit":"continue_expedition/e13-leave@0","node":"d49","brief":"close is the ruling: applying e13 to trunk"}
