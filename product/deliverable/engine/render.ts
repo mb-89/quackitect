@@ -369,9 +369,29 @@ function jsonTable(v) {
   return '<table class="kv">' + keys.map((k) => '<tr><td class="k">' + k + '</td><td class="v">' + jsonTable(v[k]) + "</td></tr>").join("") + "</table>";
 }
 
+async function loadRecDecisions() {
+  for (const el of document.querySelectorAll(".recdecisions[data-exp]:not([data-loaded])")) {
+    el.dataset.loaded = "1";
+    try {
+      const r = await fetch("/api/recdecisions?exp=" + encodeURIComponent(el.dataset.exp));
+      const d = await r.json();
+      const badge = { open: "●", done: "✓", obsolete: "⊘", reverted: "↩", deferred: "→" };
+      el.innerHTML = (d.visits || []).map((v) => {
+        const kids = {};
+        v.nodes.forEach((n) => { (kids[n.parent || ""] = kids[n.parent || ""] || []).push(n); });
+        const tree = (pid, depth) => (kids[pid] || []).map((n) =>
+          '<div class="dnode s-' + n.status + '" style="margin-left:' + depth * 14 + 'px" title="' + n.id + " · " + n.status + '">' + (badge[n.status] || "·") + " " + escText(n.brief) + "</div>" + tree(n.id, depth + 1)
+        ).join("");
+        return '<details class="visitdec"><summary style="cursor:pointer;color:#7f8b96;padding:6px 0 2px">' + escText(v.visit) + "</summary>" + (tree("", 0) || '<div class="vnull">no decisions</div>') + "</details>";
+      }).join("") || '<div class="vnull">no decisions recorded</div>';
+    } catch (e) {
+      el.innerHTML = '<div class="vnull">decisions unavailable</div>';
+    }
+  }
+}
 function showDetails(title, html) {
   const el = document.getElementById("details");
-  if (el) { document.getElementById("details-title").textContent = title; el.innerHTML = html; }
+  if (el) { document.getElementById("details-title").textContent = title; el.innerHTML = html; queueMicrotask(() => { void loadRecDecisions(); }); }
 }
 // THE MODAL — one surface over the grayed page (forms, tool calls,
 // escape). Click outside or ✕ returns to the layout untouched.
@@ -521,8 +541,10 @@ function stateDetail(id) {
         + (e.status ? '<tr><td class="k">status</td><td class="v">' + escText(e.status) + "</td></tr>" : "")
         + ((e.ruling || e.report) ? '<tr><td class="k">ruling</td><td class="v">' + escText(e.ruling || e.report) + "</td></tr>" : "")
         + '<tr><td class="k">report</td><td class="v"><a class="replink" data-exp="' + escText(e.id) + '" data-path="product/spec/expeditions/' + escText(e.id) + '/report.md" data-title="report · ' + escText(e.id) + '" title="click: modal · ctrl-click: new tab · shift-click: new window">report.md</a></td></tr>'
-        + '<tr><td class="k">decisions</td><td class="v"><a class="replink" data-exp="' + escText(e.id) + '" data-path="product/spec/expeditions/' + escText(e.id) + '/decisions.jsonl" data-title="decisions · ' + escText(e.id) + '" title="the decision graph — attached evidence">decisions.jsonl</a></td></tr>'
         + "</table>";
+      // The decision history, one expandable section per visit — the same
+      // tree the log click renders, collapsed by default (owner ruling).
+      html += '<div class="recdecisions" data-exp="' + escText(e.id) + '"><div class="meta">loading decisions…</div></div>';
     }
   }
   if (s.next && s.next.length > 0) {

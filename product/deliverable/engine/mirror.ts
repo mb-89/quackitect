@@ -9,6 +9,7 @@ import { spawnSync } from "node:child_process";
 import { existsSync, readFileSync, statSync } from "node:fs";
 import { marked } from "marked";
 import { CallLog } from "./calllog.ts";
+import { replayVisitsText } from "./decisions.ts";
 import { Rejection } from "./errors.ts";
 import { appendNote, pendingNotes, readNotes } from "./inbox.ts";
 import { feedRows, renderMirror, type MirrorState } from "./render.ts";
@@ -129,6 +130,22 @@ export function startMirror(o: MirrorOptions): Server {
         const visit = url.searchParams.get("visit") ?? state.session.currentVisit();
         res.writeHead(200, { "content-type": "application/json; charset=utf-8" });
         res.end(JSON.stringify({ ...state.session.decisions.graph(visit), visits: state.session.decisions.visits() }));
+        return;
+      }
+      if (url.pathname === "/api/recdecisions") {
+        // A record's decision history, per visit — tree copy first, the
+        // branch when only it holds the file (dismissed expeditions).
+        const expId = url.searchParams.get("exp") ?? "";
+        const rel = `product/spec/expeditions/${expId}/decisions.jsonl`;
+        const abs = resolveInRoot(o.root, rel, "mirror /api/recdecisions");
+        let raw = "";
+        if (existsSync(abs)) raw = readFileSync(abs, "utf8");
+        else {
+          const r = spawnSync("git", ["show", `exp/${expId}:${rel}`], { cwd: o.root, encoding: "utf8", maxBuffer: 8 * 1024 * 1024 });
+          raw = r.status === 0 ? r.stdout : "";
+        }
+        res.writeHead(200, { "content-type": "application/json; charset=utf-8" });
+        res.end(JSON.stringify({ exp: expId, visits: replayVisitsText(raw) }));
         return;
       }
       if (url.pathname === "/doc") {

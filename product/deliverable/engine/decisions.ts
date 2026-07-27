@@ -86,6 +86,63 @@ export function replayFile(path: string): { parked: { state: string; brief: stri
   return { parked, open: [...nodes.entries()].filter(([, n]) => n.open).map(([id, n]) => ({ id, visit: n.visit, brief: n.brief })) };
 }
 
+/** Full per-visit replay for RENDERING a record's decision history — the
+ *  archive shows each visit's tree, statuses included. */
+export function replayVisitsText(text: string): { visit: string; nodes: { id: string; parent: string | null; brief: string; status: string }[] }[] {
+  const byVisit = new Map<string, Map<string, { id: string; parent: string | null; brief: string; status: string }>>();
+  const home = new Map<string, string>();
+  const touch = (visit: string): Map<string, { id: string; parent: string | null; brief: string; status: string }> => {
+    let m = byVisit.get(visit);
+    if (!m) {
+      m = new Map();
+      byVisit.set(visit, m);
+    }
+    return m;
+  };
+  const setStatus = (id: string, status: string): void => {
+    const v = home.get(id);
+    if (v === undefined) return;
+    const n = byVisit.get(v)?.get(id);
+    if (n) n.status = status;
+  };
+  for (const line of text.split("\n")) {
+    if (line.trim() === "") continue;
+    let rec: Record<string, unknown>;
+    try {
+      rec = JSON.parse(line) as Record<string, unknown>;
+    } catch {
+      continue;
+    }
+    const op = String(rec.op ?? "");
+    const visit = String(rec.visit ?? "");
+    if (op === "plan" || op === "fork") {
+      const parent = rec.parent === undefined || rec.parent === null ? null : String(rec.parent);
+      if (op === "fork" && rec.node !== undefined) {
+        touch(visit).set(String(rec.node), { id: String(rec.node), parent, brief: String(rec.brief ?? ""), status: "open" });
+        home.set(String(rec.node), visit);
+      }
+      const under = op === "fork" && rec.node !== undefined ? String(rec.node) : parent;
+      for (const n of Array.isArray(rec.nodes) ? (rec.nodes as { id: string; brief: string }[]) : []) {
+        touch(visit).set(n.id, { id: n.id, parent: under, brief: n.brief, status: "open" });
+        home.set(n.id, visit);
+      }
+    } else if (op === "done" || op === "obsolete" || op === "revert") {
+      setStatus(String(rec.node ?? ""), op === "revert" ? "reverted" : op);
+    } else if (op === "update") {
+      const id = String(rec.node ?? "");
+      touch(visit).set(id, { id, parent: null, brief: String(rec.brief ?? ""), status: "done" });
+      home.set(id, visit);
+    } else if (op === "defer") {
+      setStatus(String(rec.node ?? ""), "deferred");
+    } else if (op === "defer_arrived") {
+      const id = String(rec.node ?? "");
+      touch(visit).set(id, { id, parent: null, brief: String(rec.brief ?? ""), status: "open" });
+      home.set(id, visit);
+    }
+  }
+  return [...byVisit.entries()].map(([visit, m]) => ({ visit, nodes: [...m.values()] }));
+}
+
 function malformed(got: string): Rejection {
   return new Rejection({
     clause: CLAUSES.UPDATE_MALFORMED,

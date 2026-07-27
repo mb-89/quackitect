@@ -8,7 +8,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { test } from "node:test";
 import { CallLog } from "../engine/calllog.ts";
-import { Decisions, parseUpdate, replayFile } from "../engine/decisions.ts";
+import { Decisions, parseUpdate, replayFile, replayVisitsText } from "../engine/decisions.ts";
 import { readNotes } from "../engine/inbox.ts";
 import { seDir } from "../engine/paths.ts";
 import { feedRows, renderMirror } from "../engine/render.ts";
@@ -156,6 +156,21 @@ test("defer parks a point for a later state — it arrives there as an open to-d
   assert.equal(arrived[0].brief, "needs idle");
   assert.equal(arrived[0].status, "open");
   assert.equal(s.decisions.graph("idle@0").nodes.length, 1);
+});
+
+test("replayVisitsText: a record's history renders per visit with statuses", () => {
+  const text = [
+    JSON.stringify({ op: "plan", visit: "e9@0", parent: null, nodes: [{ id: "d1", brief: "build" }, { id: "d2", brief: "verify" }] }),
+    JSON.stringify({ op: "done", visit: "e9@0", node: "d1" }),
+    JSON.stringify({ op: "update", visit: "e9-leave@0", node: "d3", brief: "closing" }),
+    JSON.stringify({ op: "defer", visit: "e9@0", node: "d2", brief: "verify", to: "idle" }),
+  ].join("\n") + "\n";
+  const visits = replayVisitsText(text);
+  assert.deepEqual(visits.map((v) => v.visit), ["e9@0", "e9-leave@0"]);
+  const e9 = visits[0].nodes;
+  assert.equal(e9.find((n) => n.id === "d1")!.status, "done");
+  assert.equal(e9.find((n) => n.id === "d2")!.status, "deferred");
+  assert.equal(visits[1].nodes[0].status, "done");
 });
 
 test("the defer cap: three hops, then the wall forces a decision", () => {

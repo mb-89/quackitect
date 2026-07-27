@@ -82,5 +82,6 @@ test("the served page ships the panel renderers", () => {
   const root = freshRoot();
   const html = renderMirror({ session: new Session(root), root, lastPacket: undefined, mode: "manual" });
   assert.ok(html.includes("renderDecisions"), "the decisions renderer ships");
+  assert.ok(html.includes("loadRecDecisions"), "the archive per-visit history renderer ships");
   assert.ok(html.includes("no decisions recorded"), "the honest empty state ships");
 });
