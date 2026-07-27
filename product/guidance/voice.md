@@ -47,6 +47,7 @@ Write plainly. These are rules, not suggestions. They bind every output: chat, d
 ### Visual design
 - The owner owns visual design. A sketch is a contract: render exactly what it shows.
 - Never add a visual element the sketch does not show. A missing affordance becomes a question to the owner, never a silent addition.
+- A prefill is a suggestion, never content. Anything the AI prefills for a person stays inert (commented out) until that person confirms it — one confirmation per prefill, never in bulk.
 - Every widget gets a maximize control. It opens the widget full-screen as a modal over the grayed page. Close returns to the layout.
 - Click for detail. Clicking an element shows its details: a dedicated surface if one exists, the details pane as the fallback.
 - Help is a detail, never a button. Clicking a control surfaces its context-sensitive help in the details pane. No dedicated help buttons or icons exist anywhere.

@@ -16,7 +16,7 @@
 //
 // State is in-memory: a server restart mid-session drops back to start, and
 // the next refused call's remedy re-boots the agent in one turn.
-import { readFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { contentHash } from "./hash.ts";
 import { CLAUSES, Rejection } from "./errors.ts";
@@ -30,6 +30,7 @@ import {
 } from "./machine.ts";
 import { compileMachine, resolveRef } from "./machines/compile.ts";
 import { conditionNotePath } from "./conditions.ts";
+import { confirmPrefill, formTemplatePath, lintForm, parseFormTemplate, scaffoldInstance, withFieldContent, withStatus, type FormLint, type FormTemplate } from "./forms.ts";
 import { pulledFor, scanGuidance, type GuidanceDoc, type PulledDoc } from "./pull.ts";
 import { expClose, expFind, expList, expNew, readRecord, type Expedition } from "./worktree.ts";
 import { spawn } from "node:child_process";
@@ -407,9 +408,120 @@ export class Session {
       const docs = (which === "leave" ? s.exit : s.entry)?.read ?? [];
       return docs.every((p) => this.readProven("human", p, {}) || this.agentProven(p));
     }
+    if (key === "evidence_form") {
+      const names = (which === "leave" ? s.exit : s.entry)?.evidence_form ?? [];
+      return this.formsMet(names);
+    }
     const ev = this.evidence.get(this.evidenceKey(m, s.id));
     if (key === "script") return (ev?.script_result as { ok?: boolean } | undefined)?.ok === true;
     return false;
+  }
+
+  // ── EVIDENCE FORMS (owner design 2026-07-27) — A3-shaped one-pagers in
+  //    the bound record; the condition is a MECHANICAL LINT over them.
+  //    Both hands use the same machinery: the agent writes the instance
+  //    through the lane, the human fills it through the mirror; done runs
+  //    the same checks either way. ────────────────────────────────
+
+  private formHome(name: string): { template: FormTemplate; instanceAbs: string; instanceRel: string; evidenceAbs: string; evidenceRel: string } {
+    if (this.bound === undefined) {
+      throw new Rejection({
+        clause: CLAUSES.CONDITION_UNMET,
+        expected: "a bound expedition — evidence forms live in its record",
+        got: "no expedition bound",
+        remedy: { tool: "se_exp_list", args: {}, note: "open the expedition first (continue_expedition binds the lane)" },
+        source: "engine/session.ts forms",
+      });
+    }
+    const tplAbs = join(this.workRoot(), ...formTemplatePath(name).split("/"));
+    if (!existsSync(tplAbs)) {
+      throw new Rejection({
+        clause: CLAUSES.CONDITION_UNMET,
+        expected: `a form template at ${formTemplatePath(name)}`,
+        got: "not found",
+        remedy: { tool: "se_file_glob", args: { glob: "product/deliverable/machines/forms/*" }, note: "the templates that exist" },
+        source: "engine/session.ts forms",
+      });
+    }
+    const template = parseFormTemplate(name, readFileSync(tplAbs, "utf8"));
+    const recRel = ["product", "spec", "expeditions", this.bound.id];
+    return {
+      template,
+      instanceAbs: join(this.workRoot(), ...recRel, template.instance),
+      instanceRel: [...recRel, template.instance].join("/"),
+      evidenceAbs: join(this.workRoot(), ...recRel, "evidence"),
+      evidenceRel: [...recRel, "evidence"].join("/"),
+    };
+  }
+
+  private formLint(name: string): FormLint & { instanceRel: string } {
+    const h = this.formHome(name);
+    const raw = existsSync(h.instanceAbs) ? readFileSync(h.instanceAbs, "utf8") : undefined;
+    return { ...lintForm(h.template, raw, h.evidenceAbs), instanceRel: h.instanceRel };
+  }
+
+  private formsMet(names: string[]): boolean {
+    try {
+      return names.every((n) => this.formLint(n).met);
+    } catch {
+      return false; // unbound or missing template — the tick's refusal names it
+    }
+  }
+
+  formGet(name: string): Record<string, unknown> {
+    const h = this.formHome(name);
+    const raw = existsSync(h.instanceAbs) ? readFileSync(h.instanceAbs, "utf8") : undefined;
+    return {
+      form: name,
+      statement: h.template.statement,
+      instance: h.instanceRel,
+      evidence_dir: h.evidenceRel,
+      exists: raw !== undefined,
+      ...lintForm(h.template, raw, h.evidenceAbs),
+    };
+  }
+
+  formSave(name: string, fields: Record<string, string>): Record<string, unknown> {
+    const h = this.formHome(name);
+    let raw = existsSync(h.instanceAbs) ? readFileSync(h.instanceAbs, "utf8") : scaffoldInstance(h.template, `${this.bound!.id} — ${name}`);
+    for (const [f, content] of Object.entries(fields)) raw = withFieldContent(raw, f, String(content));
+    mkdirSync(dirname(h.instanceAbs), { recursive: true });
+    writeFileSync(h.instanceAbs, raw, "utf8");
+    this.notifyChange();
+    return this.formGet(name);
+  }
+
+  formConfirm(name: string, field: string, index: number): Record<string, unknown> {
+    const h = this.formHome(name);
+    if (existsSync(h.instanceAbs)) {
+      writeFileSync(h.instanceAbs, confirmPrefill(readFileSync(h.instanceAbs, "utf8"), field, index), "utf8");
+      this.notifyChange();
+    }
+    return this.formGet(name);
+  }
+
+  formDone(name: string, by: Channel): Record<string, unknown> {
+    const h = this.formHome(name);
+    if (!existsSync(h.instanceAbs)) {
+      throw new Rejection({
+        clause: CLAUSES.CONDITION_UNMET,
+        expected: `an instance at ${h.instanceRel}`,
+        got: "no instance yet",
+        remedy: { tool: "se_file_write", args: { path: h.instanceRel, content: "<the filled page>", base_hash: null }, note: "write the page (or save it from the mirror), then set it done" },
+        source: "engine/session.ts forms",
+      });
+    }
+    writeFileSync(h.instanceAbs, withStatus(readFileSync(h.instanceAbs, "utf8"), "done", by), "utf8");
+    this.notifyChange();
+    return this.formGet(name); // the lint result rides back — problems visible
+  }
+
+  formFolder(name: string): Record<string, unknown> {
+    const h = this.formHome(name);
+    mkdirSync(h.evidenceAbs, { recursive: true });
+    const cmd = process.platform === "win32" ? "explorer" : process.platform === "darwin" ? "open" : "xdg-open";
+    spawn(cmd, [h.evidenceAbs], { detached: true, stdio: "ignore" }).unref();
+    return { opened: h.evidenceRel };
   }
 
   /** One script, ASYNC — spawnSync would freeze the whole server (and the
@@ -705,6 +817,30 @@ export class Session {
         expected: `${which} condition 'script' of ${stateId} — ${args.join(", ")} exits 0 (see ${note})`,
         got: st.ran ? st.output : "not run yet",
         remedy: { tool: "se_tick", args: { advance: true }, note: "fix what the output names, then tick again — the script re-runs on every attempt" },
+        source: "engine/session.ts conditions",
+      });
+    }
+    if (key === "evidence_form") {
+      let got = "unmet";
+      try {
+        got = args
+          .map((n) => {
+            const l = this.formLint(n);
+            return l.met ? `${n}: ok` : `${n} (${l.instanceRel}): ${l.problems.join("; ")}`;
+          })
+          .join(" · ");
+      } catch (e) {
+        got = e instanceof Rejection ? `${e.expected} — ${e.got}` : String(e);
+      }
+      throw new Rejection({
+        clause: CLAUSES.CONDITION_UNMET,
+        expected: `${which} condition 'evidence_form' of ${stateId} — the page(s) ${args.join(", ")} filled and done (see ${note})`,
+        got,
+        remedy: {
+          tool: "se_file_read",
+          args: { path: formTemplatePath(args[0] ?? "") },
+          note: "fill every required section with VISIBLE content (comments are prefills — a human confirms each), list real files, then set status: done",
+        },
         source: "engine/session.ts conditions",
       });
     }

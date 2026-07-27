@@ -320,6 +320,9 @@ const STYLE = `
   .dnode.dactive { font-weight: 700; }
   .dnode.dsel { background: #22272c; }
   .dinfo { margin-top: 10px; border-top: 1px solid #2a2f34; padding-top: 8px; }
+  .formfield { width: 100%; min-height: 70px; background: #14171a; border: 1px solid #2a2f34; border-radius: 6px; color: #d8dde2; font: inherit; font-size: 12.5px; padding: 6px; box-sizing: border-box; margin-top: 4px; }
+  .prefill { border: 1px dashed #e8b339; border-radius: 6px; padding: 6px 8px; margin: 4px 0; }
+  .prefill button { margin-top: 4px; }
   #over { position: fixed; inset: 0; background: rgba(20,23,26,.94); z-index: 100; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; }
   #over .over-box { color: #e8332a; font-size: 62px; font-weight: 800; letter-spacing: .12em; border: 6px solid #e8332a; border-radius: 18px; padding: 26px 52px; }
   #over .over-sub { color: #e86a5f; font-size: 15px; }
@@ -452,6 +455,10 @@ function condRows(id, dict, standing) {
       if (sc.running) row += '<div style="color:#e8b339">running — the page follows; the result lands here</div>';
       else if (sc.ran) row += '<div style="color:' + (sc.ok ? "#4a7a55" : "#e86a5f") + ';white-space:pre-wrap;font-size:12px">' + sc.output.replace(/&/g,"&amp;").replace(/</g,"&lt;") + "</div>";
       else row += '<div style="color:#7f8b96">not run yet</div>';
+    } else if (key === "evidence_form") {
+      // The A3 page: open it in the details pane — fill, confirm prefills,
+      // manage files, set done. One button per named template.
+      row += c.args.map((n) => '<div style="padding:4px 0"><button class="ghost openform" data-form="' + n + '">open form: ' + n + "</button></div>").join("");
     } else if (key === "read") {
       // One checkbox per doc — the human's proof, once per version. (The
       // agent proves the same docs by sending hashes on its tick.)
@@ -473,6 +480,60 @@ function condDetail(id) {
   html += '<div class="comment-detail">' + (s.guidance || "").replace(/&/g,"&amp;").replace(/</g,"&lt;") + "</div>";
   return ["conditions · " + id, html];
 }
+// THE FORM SURFACE — an evidence form rendered to fill: required fields
+// as textareas, each unconfirmed prefill with its OWN confirm button (the
+// prefill law: one confirmation per prefill, never in bulk), the evidence
+// folder one click away, done runs the same lint the agent's tick runs.
+async function showForm(name) {
+  CURRENT_DETAIL = "form:" + name;
+  const r = await fetch("/api/form?name=" + encodeURIComponent(name));
+  const f = await r.json();
+  if (f.kind === "rejected" || f.error) { showDetails("form · " + name, jsonTable(f)); return; }
+  let html = '<div class="comment-text">' + escText(f.statement || "") + "</div>";
+  html += '<div class="meta">' + escText(f.instance) + " · status: " + escText(f.status) + (f.met ? ' · <span style="color:#4a7a55">✓ passes</span>' : "") + "</div>";
+  (f.fields || []).forEach((fl) => {
+    html += '<div style="padding:8px 0 2px"><b>' + escText(fl.name) + "</b>" + (fl.required ? ' <span style="color:#e8b339">required</span>' : "") + "</div>";
+    html += '<div class="comment-text">' + escText(fl.description) + "</div>";
+    (fl.prefills || []).forEach((p, i) => {
+      html += '<div class="prefill"><div class="comment-text">prefill — unconfirmed:</div><div>' + escText(p) + '</div><button class="primary confirmpre" data-form="' + name + '" data-field="' + escText(fl.name) + '" data-index="' + i + '">confirm</button></div>';
+    });
+    html += '<textarea class="formfield" data-field="' + escText(fl.name) + '">' + escText(fl.content) + "</textarea>";
+  });
+  html += '<div class="meta" style="padding:6px 0 2px">files — <a class="doclink openfolder" data-form="' + name + '">open ' + escText(f.evidence_dir) + "</a></div>";
+  (f.files || []).forEach((fi) => { html += "<div>" + (fi.present ? "✓ " : '<span style="color:#e86a5f">✗ </span>') + escText(fi.name) + "</div>"; });
+  if (f.problems && f.problems.length) html += '<div style="color:#e8b339;padding:6px 0">' + f.problems.map(escText).join("<br>") + "</div>";
+  html += '<div style="padding:10px 0"><button class="primary saveform" data-form="' + name + '">save</button> <button class="primary doneform" data-form="' + name + '" title="sets status done and runs the lint">done</button></div>';
+  showDetails("form · " + name, html);
+}
+async function formPost(path, body) {
+  await fetch(path, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) });
+}
+document.addEventListener("click", async (ev) => {
+  const of = ev.target.closest ? ev.target.closest(".openform") : null;
+  if (of) { void showForm(of.dataset.form); return; }
+  const cp = ev.target.closest ? ev.target.closest(".confirmpre") : null;
+  if (cp) { await formPost("/form/confirm", { name: cp.dataset.form, field: cp.dataset.field, index: Number(cp.dataset.index) }); void showForm(cp.dataset.form); return; }
+  const sv = ev.target.closest ? ev.target.closest(".saveform") : null;
+  if (sv) {
+    const fields = {};
+    document.querySelectorAll(".formfield").forEach((t) => { fields[t.dataset.field] = t.value; });
+    await formPost("/form/save", { name: sv.dataset.form, fields });
+    void showForm(sv.dataset.form);
+    return;
+  }
+  const dn2 = ev.target.closest ? ev.target.closest(".doneform") : null;
+  if (dn2) {
+    const fields = {};
+    document.querySelectorAll(".formfield").forEach((t) => { fields[t.dataset.field] = t.value; });
+    await formPost("/form/save", { name: dn2.dataset.form, fields });
+    await formPost("/form/done", { name: dn2.dataset.form });
+    void showForm(dn2.dataset.form);
+    return;
+  }
+  const ofo = ev.target.closest ? ev.target.closest(".openfolder") : null;
+  if (ofo) { await formPost("/form/folder", { name: ofo.dataset.form }); return; }
+});
+
 async function openDoc(path, returnKey) {
   const r = await fetch("/doc?path=" + encodeURIComponent(path));
   const d = await r.json();
@@ -480,6 +541,7 @@ async function openDoc(path, returnKey) {
 }
 function detailFor(key) {
   if (key.startsWith("log:")) { void openLogDetail(key.slice(4)); return ["log entry", '<div class="meta">loading…</div>']; }
+  if (key.startsWith("form:")) { void showForm(key.slice(5)); return ["form", '<div class="meta">loading…</div>']; }
   if (key.startsWith("cond:")) return condDetail(key.slice(5));
   if (key === "comment") {
     const txt = (D.comment || "").replace(/&/g,"&amp;").replace(/</g,"&lt;");

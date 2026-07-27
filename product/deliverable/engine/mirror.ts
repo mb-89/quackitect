@@ -134,6 +134,47 @@ export function startMirror(o: MirrorOptions): Server {
         res.end(JSON.stringify({ path: p, html }));
         return;
       }
+      if (url.pathname === "/api/form") {
+        // One evidence form, lint state included — the details pane's fill
+        // surface. Errors (unbound, missing template) render as data.
+        const name = url.searchParams.get("name") ?? "";
+        res.writeHead(200, { "content-type": "application/json; charset=utf-8" });
+        try {
+          res.end(JSON.stringify(state.session.formGet(name)));
+        } catch (e) {
+          res.end(JSON.stringify(e instanceof Rejection ? e.toJSON() : { error: String(e) }));
+        }
+        return;
+      }
+      if (req.method === "POST" && url.pathname === "/form/save") {
+        post(req, res, "mirror_form_save", (body) => ({
+          args: { name: body.name, fields: Object.keys((body.fields as object | undefined) ?? {}) },
+          result: state.session.formSave(String(body.name ?? ""), (body.fields ?? {}) as Record<string, string>),
+        }));
+        return;
+      }
+      if (req.method === "POST" && url.pathname === "/form/confirm") {
+        // THE PREFILL LAW: one confirmation per prefill — this is that click.
+        post(req, res, "mirror_form_confirm", (body) => ({
+          args: { name: body.name, field: body.field, index: body.index },
+          result: state.session.formConfirm(String(body.name ?? ""), String(body.field ?? ""), Number(body.index ?? 0)),
+        }));
+        return;
+      }
+      if (req.method === "POST" && url.pathname === "/form/done") {
+        post(req, res, "mirror_form_done", (body) => ({
+          args: { name: body.name },
+          result: state.session.formDone(String(body.name ?? ""), "human"),
+        }));
+        return;
+      }
+      if (req.method === "POST" && url.pathname === "/form/folder") {
+        post(req, res, "mirror_form_folder", (body) => ({
+          args: { name: body.name },
+          result: state.session.formFolder(String(body.name ?? "")),
+        }));
+        return;
+      }
       if (url.pathname === "/api/tick") {
         res.writeHead(200, { "content-type": "application/json; charset=utf-8" });
         res.end(JSON.stringify(state.session.tickInfo(), null, 2));

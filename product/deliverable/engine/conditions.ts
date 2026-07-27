@@ -7,7 +7,7 @@
 // mirror, so "what does this condition want" is always one click away.
 import { join } from "node:path";
 
-export const CONDITION_TYPES: ReadonlySet<string> = new Set(["read", "script"]);
+export const CONDITION_TYPES: ReadonlySet<string> = new Set(["read", "script", "evidence_form"]);
 
 export function conditionNotePath(type: string): string {
   return ["product", "deliverable", "machines", "conditions", `${type}.md`].join("/");
