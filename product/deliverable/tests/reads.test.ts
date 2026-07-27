@@ -17,16 +17,16 @@ test("a check pins the VERSION: editing the doc unchecks it and the gate asks ag
   checkDocs(s);
   await s.tickAdvance(); await s.tickAdvance(); await s.tickAdvance();
   assert.deepEqual(s.active(), ["idle"]);
-  const idle = s.machine.states.find((x) => x.id === "start_expedition")!;
+  const idle = s.machine.states.find((x) => x.id === "expeditions")!;
   assert.equal(s.entryReadyHuman(s.machine, idle), true, "all pulled docs checked — entry ready");
   // The owner edits voice.md mid-session: the pinned hash no longer matches.
   appendFileSync(join(root, "product", "guidance", "voice.md"), "\nEdited mid-session.\n");
   assert.equal(s.entryReadyHuman(s.machine, idle), false, "the edited doc unchecked itself");
-  await assert.rejects(() => s.tickAdvance("start_expedition"), (e) => (e as { clause?: string }).clause === "SE-C-112");
+  await assert.rejects(() => s.tickAdvance("expeditions"), (e) => (e as { clause?: string }).clause === "SE-C-112");
   // One fresh check of the NEW version and the walk flows again.
   s.humanCheck("product/guidance/voice.md");
-  await s.tickAdvance("start_expedition");
-  assert.deepEqual(s.active(), ["start_expedition/start"]);
+  await s.tickAdvance("expeditions");
+  assert.deepEqual(s.active(), ["expeditions/start"]);
 });
 
 test("THE HANDOVER: a left-behind .se/HANDOVER.md is demanded leaving boot's reading room — absent, nothing is", async () => {
@@ -67,13 +67,13 @@ test("a stale agent hash proves a stale read: the edited doc must be re-read for
   const hashes = readHashesFor(root); // earned before the edit
   for (let i = 0; i < 5; i++) await call(server, "se_tick", { advance: true, read_hashes: hashes });
   appendFileSync(join(root, "product", "guidance", "contract.md"), "\nEdited mid-session.\n");
-  const refused = await call(server, "se_tick", { to: "start_expedition", read_hashes: hashes });
+  const refused = await call(server, "se_tick", { to: "expeditions", read_hashes: hashes });
   assert.equal(refused.isError, true);
   assert.equal(refused.body.clause, "SE-C-112");
   assert.match(String(refused.body.expected), /contract\.md/);
   // Re-earn the one token that went stale; the rest still stand.
   const fresh = { ...hashes, ...{ "product/guidance/contract.md": readHashesFor(root)["product/guidance/contract.md"] } };
-  const ok = await call(server, "se_tick", { to: "start_expedition", read_hashes: fresh });
+  const ok = await call(server, "se_tick", { to: "expeditions", read_hashes: fresh });
   assert.equal(ok.isError, false);
 });
 

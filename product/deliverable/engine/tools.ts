@@ -107,9 +107,9 @@ export function sessionTools(session: Session): ToolDef[] {
 export function expeditionTools(session: Session): ToolDef[] {
   return [
     {
-      name: "se_exp_new",
-      title: "se.exp.new",
-      description: "Mint a new expedition: a git worktree on its own branch (exp/<id>). Declare kind (spike | fix | explore) and goal. Creating does not bind — continue_expedition does.",
+      name: "se_seed_expedition",
+      title: "se.seed.expedition",
+      description: "Seed an expedition: mints its record and worktree (branch exp/<id>). Declare kind (spike | fix | explore) and goal. It stands in the expeditions container at once — entering there binds it.",
       inputSchema: {
         type: "object",
         properties: {
@@ -119,6 +119,22 @@ export function expeditionTools(session: Session): ToolDef[] {
         required: ["kind", "goal"],
       },
       handler: (args) => session.expeditionNew(String(args.kind), String(args.goal)),
+    },
+    {
+      name: "se_seed_iteration",
+      title: "se.seed.iteration",
+      description:
+        "Seed an iteration: goal + rough vision, plus input refs (an expedition id, retro note refs). Mints its record and worktree (branch it/<id>); it stands in the iterations container as its KICKOFF — the kickoff's outcome seeds the rest. A pending 'needs retro' note gates only the FIRST start of a never-walked iteration, never the seeding.",
+      inputSchema: {
+        type: "object",
+        properties: {
+          goal: { type: "string", description: "what this iteration is after" },
+          vision: { type: "string", description: "roughly how — what done looks like" },
+          inputs: { type: "array", items: { type: "string" }, description: "context refs: an expedition id, retro note refs" },
+        },
+        required: ["goal", "vision"],
+      },
+      handler: (args) => session.iterationSeed(String(args.goal), String(args.vision), Array.isArray(args.inputs) ? args.inputs.map(String) : []),
     },
     {
       name: "se_exp_close",

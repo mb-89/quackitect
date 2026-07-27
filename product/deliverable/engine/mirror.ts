@@ -5,6 +5,7 @@
 // MCP is the agent. The threshold gates only the agent; every route here
 // ticks with the human's hand, and POST /threshold moves the gate live.
 import { createServer, type Server } from "node:http";
+import { spawnSync } from "node:child_process";
 import { existsSync, readFileSync, statSync } from "node:fs";
 import { marked } from "marked";
 import { CallLog } from "./calllog.ts";
@@ -134,7 +135,16 @@ export function startMirror(o: MirrorOptions): Server {
         // Serve a guidance document, rendered — links in the details pane.
         const p = url.searchParams.get("path") ?? "";
         const abs = resolveInRoot(o.root, p, "mirror /doc");
-        let raw = readFileSync(abs, "utf8");
+        // A dismissed expedition's report lives only on its branch — read
+        // it there when the tree copy is absent.
+        const exp = url.searchParams.get("exp");
+        let raw: string;
+        if (!existsSync(abs) && exp !== null) {
+          const r = spawnSync("git", ["show", `exp/${exp}:${p}`], { cwd: o.root, encoding: "utf8", maxBuffer: 8 * 1024 * 1024 });
+          raw = r.status === 0 ? r.stdout : `report not found on branch exp/${exp}`;
+        } else {
+          raw = readFileSync(abs, "utf8");
+        }
         raw = raw.replace(/^---\r?\n[\s\S]*?\r?\n---\r?\n/, ""); // frontmatter is machine-facing
         const html = p.endsWith(".md") ? (marked.parse(raw) as string) : `<pre>${raw.replace(/&/g, "&amp;").replace(/</g, "&lt;")}</pre>`;
         if (url.searchParams.get("page") === "1") {

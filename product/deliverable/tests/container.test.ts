@@ -1,4 +1,4 @@
-// The generated continue_expedition container (owner design 2026-07-27):
+// The generated expeditions container (owner design 2026-07-27):
 // its states ARE the open expeditions; entering one binds its worktree;
 // one coming home completes the machine; empty runs start → end.
 import { strict as assert } from "node:assert";
@@ -39,10 +39,10 @@ test("empty container: nothing open → start runs straight to end", async () =>
   assert.deepEqual(gen.decl.states[0].edges.map((e) => e.to), ["end"]);
   const s = new Session(root);
   await bootHuman(s);
-  await s.tickAdvance("continue_expedition");
-  assert.deepEqual(s.active(), ["continue_expedition/start"]);
+  await s.tickAdvance("expeditions");
+  assert.deepEqual(s.active(), ["expeditions/start"]);
   await s.tickAdvance();
-  assert.deepEqual(s.active(), ["continue_expedition/end"]);
+  assert.deepEqual(s.active(), ["expeditions/end"]);
 });
 
 test("seeded container: expeditions are the states, entering BINDS, one ending completes, re-entry regenerates", async () => {
@@ -65,9 +65,9 @@ test("seeded container: expeditions are the states, entering BINDS, one ending c
 
   // Walk: enter the container, choose B — the click IS the pick, the
   // worktree binds on entry.
-  await s.tickAdvance("continue_expedition");
+  await s.tickAdvance("expeditions");
   await s.tickAdvance(sidB);
-  assert.deepEqual(s.active(), [`continue_expedition/${sidB}`]);
+  assert.deepEqual(s.active(), [`expeditions/${sidB}`]);
   assert.ok(s.workRoot().includes(b.created), "entering bound the worktree");
   // The leave gate holds until the page passes; then close, end, return.
   await assert.rejects(() => s.tickAdvance(`${sidB}-leave`), (e) => (e as { clause?: string }).clause === "SE-C-112");
@@ -76,14 +76,14 @@ test("seeded container: expeditions are the states, entering BINDS, one ending c
   await s.tickAdvance(`${sidB}-leave`);
   s.expeditionClose(true);
   await s.tickAdvance();
-  assert.deepEqual(s.active(), ["continue_expedition/end"]);
+  assert.deepEqual(s.active(), ["expeditions/end"]);
   await s.tickAdvance();
   assert.deepEqual(s.active(), ["idle"], "one expedition coming home completes the container");
 
   // Re-entry REGENERATES: only A remains, the drawing starts gray.
-  await s.tickAdvance("continue_expedition");
-  assert.deepEqual(s.viewRun("continue_expedition").done, []);
-  const again = s.generatedView("continue_expedition")!;
+  await s.tickAdvance("expeditions");
+  assert.deepEqual(s.viewRun("expeditions").done, []);
+  const again = s.generatedView("expeditions")!;
   assert.deepEqual(again.decl.states.map((x) => x.id), ["start", sidA, `${sidA}-leave`, "end"]);
 });
 

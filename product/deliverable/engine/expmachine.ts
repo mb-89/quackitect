@@ -54,8 +54,8 @@ function safeExpList(root: string): ReturnType<typeof expList> {
 export function generateContinueExpedition(root: string): GeneratedMachine {
   const open = safeExpList(root).filter((e) => e.open);
   const notesDir = join(root, "product", "deliverable", "machines", "states");
-  const workTpl = stateFromNote("continue_expedition", "states/work.md", join(notesDir, "work.md"), root);
-  const leaveTpl = stateFromNote("continue_expedition", "states/leave.md", join(notesDir, "leave.md"), root);
+  const workTpl = stateFromNote("expeditions", "states/work.md", join(notesDir, "work.md"), root);
+  const leaveTpl = stateFromNote("expeditions", "states/leave.md", join(notesDir, "leave.md"), root);
 
   const start = mechanical("start", "start");
   const states: StateDecl[] = [start];
@@ -94,7 +94,7 @@ export function generateContinueExpedition(root: string): GeneratedMachine {
   }
   states.push(mechanical("end", "end"));
 
-  const decl: MachineDecl = { id: "continue_expedition", reentry: "restart", initial: "start", states };
+  const decl: MachineDecl = { id: "expeditions", reentry: "restart", initial: "start", states };
   validateMachine(decl);
   const canvas: CanvasData = {
     nodes: nodes as CanvasElement[],
