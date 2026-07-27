@@ -302,7 +302,27 @@ test("expeditions: worktree lifecycle — new, bind, work lands in the worktree,
 
   // Closing without a REPORT is refused — an expedition ends with one.
   assert.throws(() => s.expeditionClose(true), (e) => (e as { clause?: string }).clause === "SE-C-112");
-  fileWrite(s.workRoot(), `product/spec/expeditions/${minted.created}/report.md`, "# Report\nBuilt the thing.", null);
+
+  // THE LEAVE GATE: entry_evidence_form on leave — unmet until the record's
+  // page passes the lint; filling it through the form machinery creates
+  // report.md, which also satisfies the close guard.
+  const { compileMachine } = await import("../engine/machines/compile.ts");
+  const ceDecl = compileMachine(root, join(root, "product", "deliverable", "machines", "continue_expedition.canvas"));
+  const leave = ceDecl.states.find((st) => st.id === "leave")!;
+  assert.deepEqual(leave.entry?.evidence_form, ["expedition-leave"]);
+  assert.equal(s.conditionKeyMet(ceDecl, leave, "evidence_form", "enter"), false, "no page yet");
+  // Agent PREFILL stays inert: the human confirms it, then the page passes.
+  s.formSave("expedition-leave", {
+    "What was the goal": "<!-- try the thing -->",
+    "What was done": "did it",
+    "What settled it": "the test run",
+    "What was not done": "nothing",
+  });
+  s.formDone("expedition-leave", "agent");
+  assert.equal(s.conditionKeyMet(ceDecl, leave, "evidence_form", "enter"), false, "unconfirmed prefill blocks the page");
+  s.formConfirm("expedition-leave", "What was the goal", 0);
+  s.formDone("expedition-leave", "human");
+  assert.equal(s.conditionKeyMet(ceDecl, leave, "evidence_form", "enter"), true, "confirmed + done passes the lint");
 
   // close: leftovers committed, merged back, worktree gone, lane unbound
   const closed = s.expeditionClose(true) as { merged: boolean };
