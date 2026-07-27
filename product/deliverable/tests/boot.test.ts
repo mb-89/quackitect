@@ -331,7 +331,7 @@ test("expeditions: worktree lifecycle — new, bind, work lands in the worktree,
   assert.ok(!existsSync(join(root, "scratch.md")), "main tree untouched while bound");
 
   // While bound, decision ops land in the RECORD too (parts per visit).
-  s.decisions.apply("continue_expedition/work@0", { op: "note", brief: "working in the record" });
+  s.decisions.apply("continue_expedition/work@0", { op: "update", brief: "working in the record" });
   const recDir = join(s.workRoot(), "product", "spec", "expeditions", minted.created);
   assert.ok(readFileSync(join(recDir, "decisions.jsonl"), "utf8").includes("working in the record"));
 

@@ -38,7 +38,8 @@ Narration rides the walk (the unified log + the decision graph):
     resolve it and return. Extra work that merely grows the scope is not a
     fork — append it to the checklist with another plan.
   - done | obsolete | revert `{node, brief}` resolves a node.
-  - note `{brief, node?}` says what you are doing.
+  - update `{brief, node?}` says what you are doing. An update is never
+    called a note — notes are the retro's strays (se_note).
 - Everything started gets resolved. Abandoning is legal. Abandoning
   silently is not — the graph shows the drop.
 - The TOLL: after five silent minutes the next call carries a warning.

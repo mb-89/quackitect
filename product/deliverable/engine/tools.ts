@@ -417,7 +417,7 @@ export function buildServer(root: string, session = new Session(root), tollOpts:
   const UPDATE_PROP = {
     type: "object",
     description:
-      "decision-graph update riding this call — narrate as you work. {op: plan|fork|done|obsolete|revert|note, brief?, items?, node?}: plan {items} starts the state's checklist; fork {brief, items?} opens an unplanned branch where you are; done|obsolete|revert {node, brief} resolves a node — everything started gets resolved, silently abandoning is illegal; note {brief, node?} says what you are doing. A volunteered update resets the toll; when the toll lapses, the next call must carry one.",
+      "decision-graph update riding this call — narrate as you work. {op: plan|fork|done|obsolete|revert|update, brief?, items?, node?}: plan {items} starts the state's checklist; fork {brief, items?} opens an unplanned branch where you are; done|obsolete|revert {node, brief} resolves a node — everything started gets resolved, silently abandoning is illegal; update {brief, node?} says what you are doing (an UPDATE, never a 'note' — notes are retro strays via se_note). A volunteered update resets the toll; when the toll lapses, the next call must carry one.",
   };
   for (const t of tools) (t.inputSchema.properties as Record<string, unknown>).update = UPDATE_PROP;
   const server = new McpServer({ name: "se-mcp", version: "3.0.0-bootstrap" }, tools);

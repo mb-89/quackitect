@@ -49,8 +49,8 @@ test("the decision graph: plan, fork, resolve — everything started gets resolv
   assert.throws(() => parseUpdate({ op: "sprint" }), (e) => clause(e) === "SE-C-120");
   assert.throws(() => parseUpdate("not json"), (e) => clause(e) === "SE-C-120");
   // The string form (a harness without the declared property) parses too.
-  const op = parseUpdate(JSON.stringify({ op: "note", brief: "still here" }));
-  assert.equal(op.op, "note");
+  const op = parseUpdate(JSON.stringify({ op: "update", brief: "still here" }));
+  assert.equal(op.op, "update");
   assert.deepEqual(d.visits(), ["s@0"]);
 });
 
@@ -108,7 +108,7 @@ test("the unified feed derives src, type and brief — and the mirror carries th
   log.append({ tool: "se_file_read", args: { path: "product/x.md" }, ok: true, outcome: "result", duration_ms: 1 });
   log.append({ tool: "mirror_check", args: { path: "product/guidance/voice.md" }, ok: true, outcome: "result", duration_ms: 1 });
   log.append({ tool: "se_update", args: { via: "se_tick", visit: "idle@0", op: "plan", nodes: [{ id: "d1", brief: "x" }] }, ok: true, outcome: "result", duration_ms: 0 });
-  log.append({ tool: "se_update", args: { via: "se_tick", visit: "idle@0", op: "note", brief: "working" }, ok: true, outcome: "result", duration_ms: 0 });
+  log.append({ tool: "se_update", args: { via: "se_tick", visit: "idle@0", op: "update", brief: "working" }, ok: true, outcome: "result", duration_ms: 0 });
   log.append({ tool: "se_note", args: { text: "stray" }, ok: true, outcome: "result", duration_ms: 0 });
   log.append({ tool: "se_run", args: { command: "boom" }, ok: false, outcome: "rejected", duration_ms: 1, response: { clause: "SE-C-046" } });
   const { rows, capped } = feedRows(log, "1970-01-01T00:00:00.000Z");
@@ -121,7 +121,7 @@ test("the unified feed derives src, type and brief — and the mirror carries th
   assert.deepEqual(rows.map((r) => r.type), ["call", "call", "update", "update", "note", "call"]);
   assert.match(String(rows[0].brief), /read product\/x\.md/);
   assert.match(String(rows[1].brief), /check/);
-  assert.match(String(rows[3].brief), /note: working/);
+  assert.match(String(rows[3].brief), /update: working/);
   assert.equal(rows[3].visit, "idle@0");
   assert.equal(rows[5].clause, "SE-C-046");
   // PENDING STRAYS SURVIVE SESSIONS: an earlier session's note rides on top

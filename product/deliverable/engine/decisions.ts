@@ -23,7 +23,7 @@ export interface DecisionNode {
 }
 
 export interface DecisionOp {
-  op: "plan" | "fork" | "done" | "obsolete" | "revert" | "note";
+  op: "plan" | "fork" | "done" | "obsolete" | "revert" | "update";
   brief?: string;
   items?: string[];
   node?: string;
@@ -39,14 +39,14 @@ const SHAPE_NOTE =
   "ops: plan {items: [\"...\"]} starts the checklist (node = optional parent) · " +
   "fork {brief, items?} opens an unplanned branch where you are · " +
   "done|obsolete|revert {node, brief?} resolves a node (brief = resolution) · " +
-  "note {brief, node?} says what you are doing";
+  "update {brief, node?} says what you are doing";
 
 function malformed(got: string): Rejection {
   return new Rejection({
     clause: CLAUSES.UPDATE_MALFORMED,
-    expected: "an update op: {op: plan|fork|done|obsolete|revert|note, brief?, items?, node?}",
+    expected: "an update op: {op: plan|fork|done|obsolete|revert|update, brief?, items?, node?}",
     got,
-    remedy: { tool: "(the same call)", args: { update: { op: "note", brief: "<one line: what you are doing>" } }, note: SHAPE_NOTE },
+    remedy: { tool: "(the same call)", args: { update: { op: "update", brief: "<one line: what you are doing>" } }, note: SHAPE_NOTE },
     source: "engine/decisions.ts parse",
   });
 }
@@ -64,7 +64,7 @@ export function parseUpdate(v: unknown): DecisionOp {
   if (typeof v !== "object" || v === null || Array.isArray(v)) throw malformed(typeof v);
   const u = v as Record<string, unknown>;
   const op = String(u.op ?? "");
-  if (!(op in CLOSES) && op !== "plan" && op !== "fork" && op !== "note") throw malformed(`op: ${JSON.stringify(u.op)}`);
+  if (!(op in CLOSES) && op !== "plan" && op !== "fork" && op !== "update") throw malformed(`op: ${JSON.stringify(u.op)}`);
   const items = u.items === undefined ? undefined : Array.isArray(u.items) ? u.items.map(String).filter((s) => s.trim() !== "") : null;
   if (items === null) throw malformed("items is not an array of strings");
   const brief = u.brief === undefined ? undefined : String(u.brief);
@@ -72,7 +72,7 @@ export function parseUpdate(v: unknown): DecisionOp {
   if (op === "plan" && (items === undefined || items.length === 0)) throw malformed("plan without items");
   if (op === "fork" && (brief === undefined || brief.trim() === "")) throw malformed("fork without brief");
   if (op in CLOSES && node === undefined) throw malformed(`${op} without node`);
-  if (op === "note" && (brief === undefined || brief.trim() === "")) throw malformed("note without brief");
+  if (op === "update" && (brief === undefined || brief.trim() === "")) throw malformed("update without brief");
   return { op: op as DecisionOp["op"], ...(brief !== undefined ? { brief } : {}), ...(items !== undefined ? { items } : {}), ...(node !== undefined ? { node } : {}) };
 }
 
@@ -124,7 +124,7 @@ export class Decisions {
         clause: CLAUSES.DECISION_NODE,
         expected: `an OPEN decision node — ${this.openBriefs()}`,
         got: n === undefined ? `unknown node: ${id}` : `${id} is already ${n.status}`,
-        remedy: { tool: "(the same call)", args: { update: { op: "note", node: "<an open node id>", brief: "..." } }, note: SHAPE_NOTE },
+        remedy: { tool: "(the same call)", args: { update: { op: "update", node: "<an open node id>", brief: "..." } }, note: SHAPE_NOTE },
         source: "engine/decisions.ts node",
       });
     }
@@ -194,9 +194,9 @@ export class Decisions {
         this.record({ op: u.op, visit: n.visit, node: n.id, ...(u.brief !== undefined ? { brief: u.brief } : {}) });
         break;
       }
-      case "note": {
+      case "update": {
         if (u.node !== undefined) this.activeId = this.openNode(u.node).id;
-        this.record({ op: "note", visit, node: this.activeId ?? null, brief: u.brief });
+        this.record({ op: "update", visit, node: this.activeId ?? null, brief: u.brief });
         break;
       }
     }

@@ -53,7 +53,7 @@ export class Toll {
       got: `last update ${this.minutes(silent)} min ago, warning ignored`,
       remedy: {
         tool,
-        args: { ...args, update: { op: "note", node: "<the open node you are on — or omit>", brief: "<one line: what you are doing right now>" } },
+        args: { ...args, update: { op: "update", node: "<the open node you are on — or omit>", brief: "<one line: what you are doing right now>" } },
         note: "pay by resending THIS call with the update field — any op pays: plan {items}, fork {brief}, done|obsolete|revert {node, brief}, note {brief}. A volunteered update is never stopped.",
       },
       source: "engine/toll.ts check",

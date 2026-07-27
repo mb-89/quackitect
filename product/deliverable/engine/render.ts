@@ -818,7 +818,6 @@ async function openLogDetail(ref) {
   CURRENT_DETAIL = "log:" + ref;
   const r = await fetch("/api/log?ref=" + encodeURIComponent(ref));
   const rec = await r.json();
-  if (rec.tool === "se_update" && rec.args && rec.args.op === "note") { showDetails("note · " + (rec.args.visit || rec.ref), jsonTable({ at: rec.ts, text: rec.args.brief, visit: rec.args.visit })); return; }
   if (rec.tool === "se_update" && rec.args && rec.args.visit) { await showDecisions(rec.args.visit, null); return; }
   if ((rec.tool === "se_note" || rec.tool === "mirror_note") && rec.args) { showDetails("note · " + ((rec.response && rec.response.captured) || rec.ref), jsonTable({ at: rec.ts, text: rec.args.text, pending: "until a retro drains it" })); return; }
   if (rec.text !== undefined && rec.tool === undefined) { showDetails("note · " + rec.ref, jsonTable({ at: rec.at, text: rec.text, pending: "until a retro drains it" })); return; }

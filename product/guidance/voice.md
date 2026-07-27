@@ -14,6 +14,12 @@ Write plainly. These are rules, not suggestions. They bind every output: chat, d
 - Split compound sentences. If you join clauses with "and", "but", "so", a semicolon, or a dash, write two sentences instead.
 - Cut filler. Say it once, in the fewest clear words.
 - Define a term the first time you use it.
+- A sentence chaining three or more comma- or semicolon-joined items is an unrendered list. Render it as a list. Two-item joins stay judgment.
+
+### Paragraphs
+- One thought group per paragraph. A new thought starts a new paragraph.
+- A wall of text is a defect. Readers are not native speakers. Their patience is limited. Structure is mercy.
+- Embedded prose fields follow the same rules. State guidance, tool descriptions, form help — short sentences, paragraphs, lists. Never one long block.
 
 ### Lists
 - Use a list for three or more items. Do not bury them in a sentence.
