@@ -4,6 +4,7 @@
 // state machine lands, run legality becomes a per-state decision.
 import { spawnSync } from "node:child_process";
 import { CLAUSES, Rejection } from "./errors.ts";
+import { resolveInRoot } from "./paths.ts";
 
 export interface RunResult {
   command: string;
@@ -21,8 +22,10 @@ export function run(root: string, command: string, opts: { timeout_ms?: number; 
   const timeout = Math.min(opts.timeout_ms ?? DEFAULT_TIMEOUT_MS, 600_000);
   const started = Date.now();
   const shell = process.platform === "win32" ? { file: "powershell.exe", args: ["-NoProfile", "-NonInteractive", "-Command", command] } : { file: "/bin/bash", args: ["-c", command] };
+  // cwd is root-relative — resolved against the ROOT, never the server's
+  // own working directory (a relative cwd once made spawn fail silently).
   const r = spawnSync(shell.file, shell.args, {
-    cwd: opts.cwd ?? root,
+    cwd: opts.cwd === undefined ? root : resolveInRoot(root, opts.cwd, "engine/run.ts"),
     encoding: "utf8",
     timeout,
     maxBuffer: 32 * 1024 * 1024,
@@ -35,6 +38,16 @@ export function run(root: string, command: string, opts: { timeout_ms?: number; 
       expected: `completion within ${timeout}ms`,
       got: `still running (killed)`,
       remedy: { tool: "se_run", args: { command, timeout_ms: timeout * 2 }, note: "raise the budget or split the command" },
+      source: "engine/run.ts",
+    });
+  }
+  if (r.error !== undefined) {
+    // A spawn failure is a refusal, never a silent exit-null result.
+    throw new Rejection({
+      clause: CLAUSES.NOT_CONFIGURED,
+      expected: "the shell to spawn",
+      got: String((r.error as Error).message),
+      remedy: { tool: "se_run", args: { command }, note: "check the cwd exists (root-relative) and the shell is available" },
       source: "engine/run.ts",
     });
   }

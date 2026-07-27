@@ -149,7 +149,14 @@ function briefFor(rec: CallRecord): string {
       const items = Array.isArray(a.items) ? ` (+${a.items.length})` : "";
       return `${a.op}${a.node !== undefined ? ` ${a.node}` : ""}${a.brief !== undefined ? `: ${a.brief}` : ""}${items}`;
     }
-    case "se_note": return String(a.text ?? "");
+    case "se_note":
+    case "mirror_note": return String(a.text ?? "");
+    case "mirror_tool": return `tool ${a.name}`;
+    case "mirror_escape": return `escape: ${a.reason}`;
+    case "mirror_form_save": return `form save ${a.name}`;
+    case "mirror_form_confirm": return `form confirm ${a.name} · ${a.field}`;
+    case "mirror_form_done": return `form done ${a.name}`;
+    case "mirror_form_folder": return "open evidence folder";
     case "se_file_read": return `read ${a.path}${a.offset !== undefined ? ` @${a.offset}` : ""}`;
     case "se_file_write": return `write ${a.path}`;
     case "se_file_patch": return `patch ${Array.isArray(a.ops) ? a.ops.length : 0} op(s)`;
@@ -183,7 +190,7 @@ export function feedRows(log: CallLog, since: string, pending: StrayNote[] = [])
     ts: rec.ts,
     src: rec.tool.startsWith("mirror_") ? "human" : "agent",
     // An op-note update IS a note to the reader — italic, opens its text.
-    type: rec.tool === "se_update" ? ((rec.args as { op?: string }).op === "note" ? "note" : "update") : rec.tool === "se_note" ? "note" : "call",
+    type: rec.tool === "se_update" ? ((rec.args as { op?: string }).op === "note" ? "note" : "update") : rec.tool === "se_note" || rec.tool === "mirror_note" ? "note" : "call",
     brief: briefFor(rec).slice(0, 90),
     ok: rec.ok,
     ...(rec.ok ? {} : { clause: (rec.response as { clause?: string } | undefined)?.clause }),
@@ -191,7 +198,7 @@ export function feedRows(log: CallLog, since: string, pending: StrayNote[] = [])
   }));
   const noteRows = pending
     .filter((n) => n.at < since)
-    .map((n) => ({ ref: n.ref, ts: n.at, src: "agent", type: "note", brief: n.text.slice(0, 90), ok: true, pending: true }));
+    .map((n) => ({ ref: n.ref, ts: n.at, src: n.by === "human" ? "human" : "agent", type: "note", brief: n.text.slice(0, 90), ok: true, pending: true }));
   return { capped, rows: [...noteRows, ...rows] };
 }
 
@@ -216,7 +223,8 @@ const LEVELS = [
   { value: 0.25, abbr: "R", name: "routine" },
   { value: 0.5, abbr: "E", name: "everyday decision" },
   { value: 0.75, abbr: "C", name: "consequential" },
-  { value: 1, abbr: "K", name: "killer / milestone" },
+  { value: 0.9, abbr: "K", name: "killer / milestone" },
+  { value: 1, abbr: "I", name: "ideation — the agent finds its own work (behavior ships later)" },
 ];
 
 const STYLE = `
@@ -323,6 +331,10 @@ const STYLE = `
   .formfield { width: 100%; min-height: 70px; background: #14171a; border: 1px solid #2a2f34; border-radius: 6px; color: #d8dde2; font: inherit; font-size: 12.5px; padding: 6px; box-sizing: border-box; margin-top: 4px; }
   .prefill { border: 1px dashed #e8b339; border-radius: 6px; padding: 6px 8px; margin: 4px 0; }
   .prefill button { margin-top: 4px; }
+  #modal { display: none; position: fixed; inset: 0; background: rgba(20,23,26,.8); z-index: 50; align-items: center; justify-content: center; }
+  .modal-box { width: min(760px, 92vw); max-height: 86vh; display: flex; flex-direction: column; background: #191d21; border: 1px solid #3a4147; border-radius: 12px; }
+  .modal-body { padding: 12px 16px; overflow: auto; font-size: 13px; }
+  .toollink { display: inline-block; margin: 2px 6px 2px 0; }
   #over { position: fixed; inset: 0; background: rgba(20,23,26,.94); z-index: 100; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; }
   #over .over-box { color: #e8332a; font-size: 62px; font-weight: 800; letter-spacing: .12em; border: 6px solid #e8332a; border-radius: 18px; padding: 26px 52px; }
   #over .over-sub { color: #e86a5f; font-size: 15px; }
@@ -357,6 +369,65 @@ function showDetails(title, html) {
   const el = document.getElementById("details");
   if (el) { document.getElementById("details-title").textContent = title; el.innerHTML = html; }
 }
+// THE MODAL — one surface over the grayed page (forms, tool calls,
+// escape). Click outside or ✕ returns to the layout untouched.
+function openModal(title, html) {
+  const m = document.getElementById("modal");
+  if (!m) return;
+  document.getElementById("modal-title").textContent = title;
+  document.getElementById("modal-body").innerHTML = html;
+  m.style.display = "flex";
+}
+function closeModal() { const m = document.getElementById("modal"); if (m) m.style.display = "none"; }
+document.addEventListener("click", (ev) => {
+  if (ev.target && ev.target.id === "modal") { closeModal(); return; }
+  const mc = ev.target.closest ? ev.target.closest("#modal-close") : null;
+  if (mc) closeModal();
+});
+// THE PARITY LAW — a state's human-callable tools as links; the modal
+// takes the arguments and shows the result in place.
+const HUMAN_TOOLS = {
+  se_exp_new: [{ name: "kind", hint: "spike | fix | explore" }, { name: "goal", hint: "what this expedition is after", long: true }],
+  se_exp_list: [],
+  se_exp_open: [{ name: "id", hint: "an open expedition id (se_exp_list shows them)" }],
+  se_exp_close: [{ name: "merge", hint: "true merges back (default); false archives unmerged" }],
+};
+function toolModal(name) {
+  const fields = HUMAN_TOOLS[name] || [];
+  let html = fields.map((f) =>
+    '<div style="padding:6px 0 2px"><b>' + f.name + '</b></div><div class="comment-text">' + escText(f.hint) + "</div>" +
+    (f.long ? '<textarea class="formfield toolarg" data-arg="' + f.name + '"></textarea>' : '<input class="formfield toolarg" style="min-height:0" data-arg="' + f.name + '">')
+  ).join("");
+  html += '<div style="padding:10px 0"><button class="primary runtool" data-tool="' + name + '">run</button></div><div id="tool-result"></div>';
+  openModal("tool · " + name, html);
+}
+document.addEventListener("click", async (ev) => {
+  const tl = ev.target.closest ? ev.target.closest(".toollink") : null;
+  if (tl) { toolModal(tl.dataset.tool); return; }
+  const rt = ev.target.closest ? ev.target.closest(".runtool") : null;
+  if (rt) {
+    const args = {};
+    document.querySelectorAll(".toolarg").forEach((i) => { if (i.value !== "") args[i.dataset.arg] = i.value; });
+    const r = await fetch("/tool", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ name: rt.dataset.tool, args }) });
+    const data = await r.json();
+    const out = document.getElementById("tool-result");
+    if (out) out.innerHTML = jsonTable(data);
+    refreshLog();
+    return;
+  }
+  const eb = ev.target.closest ? ev.target.closest("#escape-btn") : null;
+  if (eb) {
+    openModal("escape — to idle", '<div class="comment-text">The machine is left standing; a later continue re-enters it. The reason is recorded as a failure.</div><textarea class="formfield" id="escape-reason" placeholder="why the walk cannot continue"></textarea><div style="padding:10px 0"><button class="primary" id="escape-go">escape</button></div>');
+    return;
+  }
+  const eg = ev.target.closest ? ev.target.closest("#escape-go") : null;
+  if (eg) {
+    const reason = (document.getElementById("escape-reason") || {}).value || "";
+    await fetch("/escape", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ reason }) });
+    location.href = "/";
+    return;
+  }
+});
 const CURRENT = (D.describe.active && D.describe.active[0]) ? D.describe.active[0].split("/").pop() : null;
 const WALK_HERE = D.viewingWalk;
 function nextTable(id, s) {
@@ -364,9 +435,16 @@ function nextTable(id, s) {
   return '<table class="kv">' + s.next.map((n, i) => {
     const inner = jsonTable({ to: n.to, ...(n.statement ? { statement: n.statement } : {}), role: n.role, ...(n.guard ? { guard: n.guard } : {}) });
     const unlocked = here && s.exit_met && n.enter_met;
+    // The locked tooltip NAMES what is missing — never a bare "not met".
+    const exitMiss = s.exit ? Object.entries(s.exit).filter(([, c]) => !c.met).map(([k]) => "condition " + k) : [];
+    const title = unlocked
+      ? "tick: leave " + id + ", enter " + n.to
+      : !s.exit_met
+        ? "leaving " + id + " waits on: " + (exitMiss.join(", ") || "its exit conditions")
+        : "entering " + n.to + " waits on: " + ((n.missing || []).join(", ") || "its entry conditions");
     const btn = here
       ? '<button class="primary go' + (unlocked ? "" : " locked") + '" data-to="' + n.to + '"' + (unlocked ? "" : " disabled") +
-        ' title="' + (unlocked ? "tick: leave " + id + ", enter " + n.to : s.exit_met ? "entry condition of " + n.to + " not met" : "exit condition of " + id + " not met") + '">▶</button>'
+        ' title="' + escText(title) + '">▶</button>'
       : "";
     return '<tr><td class="k">' + i + '</td><td class="v">' + inner + '</td>' + (here ? '<td class="btncell">' + btn + "</td>" : "") + "</tr>";
   }).join("") + "</table>";
@@ -390,6 +468,14 @@ function stateDetail(id) {
   const s = D.states[id] ?? {};
   const bare = Object.assign({}, s); delete bare.next; delete bare.pulled; delete bare.script; delete bare.was_filled;
   let html = jsonTable(bare);
+  // Human-callable tools of the CURRENT state — clickable (parity law).
+  if (WALK_HERE && id === CURRENT) {
+    const callable = (s.legal_tools || []).filter((t) => HUMAN_TOOLS[t] !== undefined);
+    if (callable.length > 0) {
+      html += '<div class="meta" style="padding:8px 0 4px">tools — your hand</div>' +
+        callable.map((t) => '<button class="ghost toollink" data-tool="' + t + '">' + t + "</button>").join(" ");
+    }
+  }
   if (s.pulled && s.pulled.length > 0) {
     const row = '<tr><td class="k" title="derived by the machine, not authored">pulled</td><td class="v">' + pulledView(s.pulled) + "</td></tr></table>";
     html = html.endsWith("</table>") ? html.slice(0, -8) + row : html + '<table class="kv">' + row;
@@ -485,10 +571,16 @@ function condDetail(id) {
 // prefill law: one confirmation per prefill, never in bulk), the evidence
 // folder one click away, done runs the same lint the agent's tick runs.
 async function showForm(name) {
-  CURRENT_DETAIL = "form:" + name;
   const r = await fetch("/api/form?name=" + encodeURIComponent(name));
   const f = await r.json();
-  if (f.kind === "rejected" || f.error) { showDetails("form · " + name, jsonTable(f)); return; }
+  if (f.kind === "rejected" || f.error) {
+    // Plain words at the human — never raw rejection JSON.
+    openModal("form · " + name,
+      '<div class="comment-detail">' + escText(f.expected || f.error || "") + "</div>" +
+      '<div class="meta">' + escText(f.got || "") + "</div>" +
+      (f.remedy && f.remedy.note ? '<div class="comment-text">' + escText(f.remedy.note) + "</div>" : ""));
+    return;
+  }
   let html = '<div class="comment-text">' + escText(f.statement || "") + "</div>";
   html += '<div class="meta">' + escText(f.instance) + " · status: " + escText(f.status) + (f.met ? ' · <span style="color:#4a7a55">✓ passes</span>' : "") + "</div>";
   (f.fields || []).forEach((fl) => {
@@ -503,7 +595,7 @@ async function showForm(name) {
   (f.files || []).forEach((fi) => { html += "<div>" + (fi.present ? "✓ " : '<span style="color:#e86a5f">✗ </span>') + escText(fi.name) + "</div>"; });
   if (f.problems && f.problems.length) html += '<div style="color:#e8b339;padding:6px 0">' + f.problems.map(escText).join("<br>") + "</div>";
   html += '<div style="padding:10px 0"><button class="primary saveform" data-form="' + name + '">save</button> <button class="primary doneform" data-form="' + name + '" title="sets status done and runs the lint">done</button></div>';
-  showDetails("form · " + name, html);
+  openModal("form · " + name, html);
 }
 async function formPost(path, body) {
   await fetch(path, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) });
@@ -541,7 +633,6 @@ async function openDoc(path, returnKey) {
 }
 function detailFor(key) {
   if (key.startsWith("log:")) { void openLogDetail(key.slice(4)); return ["log entry", '<div class="meta">loading…</div>']; }
-  if (key.startsWith("form:")) { void showForm(key.slice(5)); return ["form", '<div class="meta">loading…</div>']; }
   if (key.startsWith("cond:")) return condDetail(key.slice(5));
   if (key === "comment") {
     const txt = (D.comment || "").replace(/&/g,"&amp;").replace(/</g,"&lt;");
@@ -635,15 +726,17 @@ function renderLog() {
   const fEl = document.getElementById("log-filter");
   const f = fEl ? fEl.value.toLowerCase() : "";
   const rows = LOG_ROWS.filter((r) => !f || (r.ts + " " + r.src + " " + r.type + " " + r.brief + " " + (r.clause || "")).toLowerCase().includes(f));
-  const stick = logPanel.scrollHeight - logPanel.scrollTop - logPanel.clientHeight < 40;
-  logPanel.innerHTML = rows.map((r) =>
+  // NEWEST ON TOP (owner ruling): the feed reads downward into the past;
+  // the scroll pins to the top while the reader is there.
+  const stick = logPanel.scrollTop < 40;
+  logPanel.innerHTML = rows.slice().reverse().map((r) =
     '<div class="logrow ' + r.type + (r.ok ? "" : " failed") + '" data-ref="' + r.ref + '">' +
       '<span class="lt">' + (r.pending ? r.ts.slice(5, 10) : r.ts.slice(11, 19)) + "</span>" +
       '<span class="lsrc ' + r.src + '">' + r.src + "</span>" +
       '<span class="lbrief">' + escText(r.brief) + "</span>" +
       '<span class="lok">' + (r.ok ? "✓" : "✗ " + (r.clause || "")) + "</span>" +
     "</div>").join("") || '<div class="meta">no acts' + (f ? " match the filter" : " this session yet") + "</div>";
-  if (stick) logPanel.scrollTop = logPanel.scrollHeight;
+  if (stick) logPanel.scrollTop = 0;
 }
 async function refreshLog() {
   if (!logPanel) return;
@@ -658,6 +751,18 @@ if (logPanel) {
   refreshLog();
   const fEl = document.getElementById("log-filter");
   if (fEl) fEl.addEventListener("input", renderLog);
+  // Help is a detail: touching a control explains it in the details pane.
+  if (fEl) fEl.addEventListener("focus", () => showDetails("the feed filter", '<div class="comment-detail">Substring match over time, source, type, brief and clause. Type note to list every pending note; a clause like SE-C-113 finds refusals.</div>'));
+  const nEl = document.getElementById("log-note");
+  if (nEl) {
+    nEl.addEventListener("focus", () => showDetails("drop a note", '<div class="comment-detail">A stray — an idea, a bug, a better way. Enter captures it to the inbox with your hand stamped; a retro drains it later.</div>'));
+    nEl.addEventListener("keydown", async (ev2) => {
+      if (ev2.key !== "Enter" || nEl.value.trim() === "") return;
+      await fetch("/note", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ text: nEl.value }) });
+      nEl.value = "";
+      refreshLog();
+    });
+  }
 }
 async function openLogDetail(ref) {
   CURRENT_DETAIL = "log:" + ref;
@@ -665,7 +770,7 @@ async function openLogDetail(ref) {
   const rec = await r.json();
   if (rec.tool === "se_update" && rec.args && rec.args.op === "note") { showDetails("note · " + (rec.args.visit || rec.ref), jsonTable({ at: rec.ts, text: rec.args.brief, visit: rec.args.visit })); return; }
   if (rec.tool === "se_update" && rec.args && rec.args.visit) { await showDecisions(rec.args.visit, null); return; }
-  if (rec.tool === "se_note" && rec.args) { showDetails("note · " + ((rec.response && rec.response.captured) || rec.ref), jsonTable({ at: rec.ts, text: rec.args.text, pending: "until a retro drains it" })); return; }
+  if ((rec.tool === "se_note" || rec.tool === "mirror_note") && rec.args) { showDetails("note · " + ((rec.response && rec.response.captured) || rec.ref), jsonTable({ at: rec.ts, text: rec.args.text, pending: "until a retro drains it" })); return; }
   if (rec.text !== undefined && rec.tool === undefined) { showDetails("note · " + rec.ref, jsonTable({ at: rec.at, text: rec.text, pending: "until a retro drains it" })); return; }
   showDetails("log · " + (rec.tool || ref), jsonTable({ at: rec.ts, request: { tool: rec.tool, args: rec.args }, response: rec.response === undefined ? null : rec.response, duration_ms: rec.duration_ms }));
 }
@@ -782,6 +887,8 @@ setInterval(async () => {
 }, 2000);
 `;
 
+const MODAL = '<div id="modal"><div class="modal-box"><div class="widget-head"><span id="modal-title"></span><button class="expand" id="modal-close">✕</button></div><div class="modal-body" id="modal-body"></div></div></div>';
+
 function widgetHead(title: string, widgetId: string, url: string): string {
   return `<div class="widget-head"><span>${esc(title)}</span><button class="expand" data-widget="${widgetId}" data-url="${esc(url)}" title="expand · ctrl-click: new tab · shift-click: new window">⛶</button></div>`;
 }
@@ -855,8 +962,10 @@ export function renderMirror(m: MirrorState, widget?: "machine" | "details" | "l
           ...(e.guard !== undefined ? { guard: e.guard } : {}),
           ...(t !== undefined ? { kind: t.kind, statement: t.statement, priority: t.priority } : {}),
           // The human's ▶ lock: explicit entry conditions AND the pull —
-          // every doc entering demands, checked at its current version.
+          // every doc entering demands, checked at its current version. A
+          // locked edge carries WHAT is missing (the tooltip names it).
           enter_met: t === undefined ? true : m.session.entryReadyHuman(decl, t),
+          ...(t !== undefined && !m.session.entryReadyHuman(decl, t) ? { missing: m.session.entryMissingHuman(decl, t) } : {}),
         };
       }),
     };
@@ -880,7 +989,11 @@ export function renderMirror(m: MirrorState, widget?: "machine" | "details" | "l
   const thr = m.session.autonomy;
   const notches = LEVELS.map((l) => `<span class="thr-notch" data-level="${l.value}" style="left:${l.value * 100}%" title="${esc(l.name)} — click: threshold ${l.value}">${l.abbr}</span>`).join("");
   const slider = `<span class="threshold" title="the agent enters only states with priority ≤ autonomy — the notches are the authored levels, click one to jump there"><span class="thr-help" title="click: the scale, explained in details">autonomy</span><span class="thr-track"><input id="thr" type="range" min="0" max="1" step="0.01" value="${thr}" list="thr-ticks"><datalist id="thr-ticks">${LEVELS.map((l) => `<option value="${l.value}"></option>`).join("")}</datalist><span class="thr-notches">${notches}</span></span><span id="thr-val">${thr.toFixed(2)}</span></span>`;
-  const machineWidget = `<div class="widget" id="w-machine"><div class="widget-head"><span class="crumbs">${crumbs}</span>${slider}<button class="expand" data-widget="w-machine" data-url="/widget/machine?view=${encodeURIComponent(decl.id)}" title="expand · ctrl-click: new tab · shift-click: new window">⛶</button></div><div class="widget-body">${svg}</div></div>`;
+  // Escape has a hand-side affordance too (parity law): only while a
+  // sub-machine other than boot is being walked.
+  const crumbTrail = m.session.breadcrumb();
+  const escapeBtn = crumbTrail.length > 1 && crumbTrail[1] !== "boot" ? `<button class="ghost" id="escape-btn" title="escape to idle — the machine is left standing, the reason is recorded">⤴ escape</button>` : "";
+  const machineWidget = `<div class="widget" id="w-machine"><div class="widget-head"><span class="crumbs">${crumbs}</span>${slider}${escapeBtn}<button class="expand" data-widget="w-machine" data-url="/widget/machine?view=${encodeURIComponent(decl.id)}" title="expand · ctrl-click: new tab · shift-click: new window">⛶</button></div><div class="widget-body">${svg}</div></div>`;
   const detailsWidget = `<div class="widget" id="w-details">${widgetHead("details", "w-details", "/widget/details")}
     ${info.status === "closed" ? '<div class="meta" style="color:#e86a5f">machine closed</div>' : ""}
     <div class="meta" id="details-title">—</div>
@@ -890,21 +1003,22 @@ export function renderMirror(m: MirrorState, widget?: "machine" | "details" | "l
   // load and refresh client-side off /api/log; only present with a log.
   const logWidget = m.log === undefined ? "" : `<div class="widget" id="w-log">${widgetHead("log", "w-log", "/widget/log")}
     <div class="log-filter-row"><input id="log-filter" placeholder="filter the feed — substring over time/src/type/brief/clause"></div>
+    <div class="log-filter-row"><input id="log-note" placeholder="drop a note — Enter captures it to the inbox"></div>
     <div class="panel log-panel" id="log-rows"><div class="meta">loading…</div></div>
   </div>`;
 
   if (widget === "log") {
     return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>se · log</title><style>${STYLE} #w-log{flex:1;border-bottom:0}</style></head>
-<body><div class="cols"><aside id="sidebar" style="width:100vw;max-width:100vw">${logWidget}</aside></div>${data}<script>${SCRIPT}</script></body></html>`;
+<body><div class="cols"><aside id="sidebar" style="width:100vw;max-width:100vw">${logWidget}</aside></div>${MODAL}${data}<script>${SCRIPT}</script></body></html>`;
   }
 
   if (widget === "machine") {
     return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>se · machine</title><style>${STYLE} main{padding:10px}</style></head>
-<body><div class="cols"><main>${machineWidget}</main></div>${data}<script>${SCRIPT}</script></body></html>`;
+<body><div class="cols"><main>${machineWidget}</main></div>${MODAL}${data}<script>${SCRIPT}</script></body></html>`;
   }
   if (widget === "details") {
     return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>se · details</title><style>${STYLE}</style></head>
-<body><div class="cols"><aside id="sidebar" style="width:100vw;max-width:100vw">${detailsWidget}</aside></div>${data}<script>${SCRIPT}</script></body></html>`;
+<body><div class="cols"><aside id="sidebar" style="width:100vw;max-width:100vw">${detailsWidget}</aside></div>${MODAL}${data}<script>${SCRIPT}</script></body></html>`;
   }
   return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>se mirror</title><style>${STYLE}</style></head>
 <body>
@@ -918,6 +1032,6 @@ export function renderMirror(m: MirrorState, widget?: "machine" | "details" | "l
     ${detailsWidget}
   </aside>
 </div>
-${data}<script>${SCRIPT}</script>
+${MODAL}${data}<script>${SCRIPT}</script>
 </body></html>`;
 }

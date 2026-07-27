@@ -125,6 +125,11 @@ test("search finds matches with locations (ripgrep — hard dependency, no fallb
   assert.equal(r.total, 1);
   assert.equal(r.matches[0].path, "s1.md");
   assert.equal(r.matches[0].line, 2);
+  // A SINGLE-FILE scope finds its matches too (rg omits the filename
+  // there — the parser starved and every match vanished).
+  const scoped = search(root, "needle", { path: "s1.md" });
+  assert.equal(scoped.total, 1);
+  assert.equal(scoped.matches[0].line, 2);
 });
 
 test("ref search runs through git grep against a committed state (v2 parity)", () => {

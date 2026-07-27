@@ -9,7 +9,7 @@ import { existsSync, readFileSync, statSync } from "node:fs";
 import { marked } from "marked";
 import { CallLog } from "./calllog.ts";
 import { Rejection } from "./errors.ts";
-import { readNotes } from "./inbox.ts";
+import { appendNote, readNotes } from "./inbox.ts";
 import { feedRows, renderMirror, type MirrorState } from "./render.ts";
 import { resolveInRoot, seDir } from "./paths.ts";
 import { Session } from "./session.ts";
@@ -165,6 +165,48 @@ export function startMirror(o: MirrorOptions): Server {
         post(req, res, "mirror_form_done", (body) => ({
           args: { name: body.name },
           result: state.session.formDone(String(body.name ?? ""), "human"),
+        }));
+        return;
+      }
+      if (req.method === "POST" && url.pathname === "/tool") {
+        // THE PARITY LAW: a state's tools, the human's hand — same gate.
+        // Answers JSON (no redirect): the modal shows the result in place.
+        const chunks: Buffer[] = [];
+        req.on("data", (c) => chunks.push(c));
+        req.on("end", () => {
+          const started = Date.now();
+          let body: Record<string, unknown> = {};
+          try {
+            body = JSON.parse(Buffer.concat(chunks).toString("utf8") || "{}") as Record<string, unknown>;
+          } catch {
+            body = {};
+          }
+          const name = String(body.name ?? "");
+          const toolArgs = (body.args ?? {}) as Record<string, unknown>;
+          res.writeHead(200, { "content-type": "application/json; charset=utf-8" });
+          try {
+            const result = state.session.humanTool(name, toolArgs);
+            o.log.append({ tool: "mirror_tool", args: { name, tool_args: toolArgs }, ok: true, outcome: "result", duration_ms: Date.now() - started, response: result });
+            res.end(JSON.stringify(result));
+          } catch (e) {
+            const payload = e instanceof Rejection ? e.toJSON() : { error: String(e) };
+            o.log.append({ tool: "mirror_tool", args: { name, tool_args: toolArgs }, ok: false, outcome: "rejected", duration_ms: Date.now() - started, response: payload });
+            res.end(JSON.stringify(payload));
+          }
+        });
+        return;
+      }
+      if (req.method === "POST" && url.pathname === "/note") {
+        post(req, res, "mirror_note", (body) => ({
+          args: { text: body.text },
+          result: appendNote(seDir(o.root), String(body.text ?? ""), "human"),
+        }));
+        return;
+      }
+      if (req.method === "POST" && url.pathname === "/escape") {
+        post(req, res, "mirror_escape", (body) => ({
+          args: { reason: body.reason },
+          result: state.session.escape(String(body.reason ?? ""), "human"),
         }));
         return;
       }
