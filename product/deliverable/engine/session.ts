@@ -499,16 +499,7 @@ export class Session {
   //    through the lane, the human fills it through the mirror; done runs
   //    the same checks either way. ────────────────────────────────
 
-  private formHome(name: string): { template: FormTemplate; instanceAbs: string; instanceRel: string; evidenceAbs: string; evidenceRel: string } {
-    if (this.bound === undefined) {
-      throw new Rejection({
-        clause: CLAUSES.CONDITION_UNMET,
-        expected: "a bound expedition — evidence forms live in its record",
-        got: "no expedition bound",
-        remedy: { tool: "se_exp_list", args: {}, note: "open the expedition first (continue_expedition binds the lane)" },
-        source: "engine/session.ts forms",
-      });
-    }
+  private loadFormTemplate(name: string): FormTemplate {
     const tplAbs = join(this.workRoot(), ...formTemplatePath(name).split("/"));
     if (!existsSync(tplAbs)) {
       throw new Rejection({
@@ -519,7 +510,20 @@ export class Session {
         source: "engine/session.ts forms",
       });
     }
-    const template = parseFormTemplate(name, readFileSync(tplAbs, "utf8"));
+    return parseFormTemplate(name, readFileSync(tplAbs, "utf8"));
+  }
+
+  private formHome(name: string): { template: FormTemplate; instanceAbs: string; instanceRel: string; evidenceAbs: string; evidenceRel: string } {
+    if (this.bound === undefined) {
+      throw new Rejection({
+        clause: CLAUSES.CONDITION_UNMET,
+        expected: "a bound expedition — evidence forms live in its record",
+        got: "no expedition bound",
+        remedy: { tool: "se_exp_list", args: {}, note: "open the expedition first (continue_expedition binds the lane)" },
+        source: "engine/session.ts forms",
+      });
+    }
+    const template = this.loadFormTemplate(name);
     const recRel = ["product", "spec", "expeditions", this.bound.id];
     return {
       template,
@@ -554,6 +558,23 @@ export class Session {
   }
 
   formGet(name: string): Record<string, unknown> {
+    if (this.bound === undefined) {
+      // No expedition bound — the TEMPLATE is still viewable (owner ruling:
+      // any form may be inspected at any time); filling needs a bound record.
+      const template = this.loadFormTemplate(name);
+      return {
+        form: name,
+        statement: template.statement,
+        instance: template.instance,
+        evidence_dir: "",
+        exists: false,
+        preview: true,
+        ...lintForm(template, undefined, ""),
+        status: "template",
+        problems: [],
+        met: false,
+      };
+    }
     const h = this.formHome(name);
     const raw = existsSync(h.instanceAbs) ? readFileSync(h.instanceAbs, "utf8") : undefined;
     return {

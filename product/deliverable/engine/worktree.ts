@@ -56,6 +56,10 @@ export function readRecord(root: string, e: Expedition): Record<string, unknown>
     if (!existsSync(abs)) return undefined;
     return parseStateNote(readFileSync(abs, "utf8")).frontmatter;
   }
+  // Closed: the MERGED copy is the truth — retro flips (report: approved |
+  // dismissed) land on the main tree; the branch is frozen at close.
+  const merged = join(root, rel);
+  if (existsSync(merged)) return parseStateNote(readFileSync(merged, "utf8")).frontmatter;
   const r = spawnSync("git", ["show", `${e.branch}:${rel}`], { cwd: root, encoding: "utf8", maxBuffer: 8 * 1024 * 1024 });
   if (r.status !== 0) return undefined;
   return parseStateNote(r.stdout).frontmatter;

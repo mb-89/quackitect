@@ -177,7 +177,25 @@ export function coreTools(rootOf: () => string, projectRoot: string): ToolDef[] 
         },
         required: ["ops"],
       },
-      handler: (args) => filePatch(rootOf(), args.ops as PatchOp[]),
+      handler: (args) => {
+        // Unknown op fields refuse BY NAME — a mistyped find/replace once
+        // read as "0 occurrences" and cost a round of misdiagnosis.
+        const KNOWN = new Set(["path", "old_string", "new_string", "base_hash", "replace_all"]);
+        const ALIAS: Record<string, string> = { find: "old_string", replace: "new_string", search: "old_string", old: "old_string", new: "new_string" };
+        (Array.isArray(args.ops) ? (args.ops as Record<string, unknown>[]) : []).forEach((op, i) => {
+          const unknown = Object.keys(op).filter((k) => !KNOWN.has(k));
+          if (unknown.length > 0) {
+            throw new Rejection({
+              clause: CLAUSES.REQUIRED_ARGS,
+              expected: "op fields: path, old_string, new_string, base_hash?, replace_all?",
+              got: `unknown field(s) on op ${i + 1}: ${unknown.map((k) => (ALIAS[k] !== undefined ? `${k} (use ${ALIAS[k]})` : k)).join(", ")}`,
+              remedy: { tool: "se_file_patch", args: { ops: [{ path: "<path>", old_string: "<exact text>", new_string: "<replacement>" }] }, note: "rename the fields and repeat — nothing was written" },
+              source: "engine/tools.ts se_file_patch",
+            });
+          }
+        });
+        return filePatch(rootOf(), args.ops as PatchOp[]);
+      },
     },
     {
       name: "se_file_move",
@@ -255,7 +273,7 @@ export function coreTools(rootOf: () => string, projectRoot: string): ToolDef[] 
       name: "se_run",
       title: "se.run",
       description:
-        "Run a shell command from the project root (bash on POSIX, PowerShell on Windows). Output is engine-captured and logged IN FULL under the returned call ref — a run is citable evidence. Default timeout 120s (timeout_ms to raise).",
+        "Run a shell command from the project root (bash on POSIX, PowerShell on Windows). Output is engine-captured and logged IN FULL under the returned call ref — a run is citable evidence. Default timeout 120s (timeout_ms to raise). NEVER call this session's own mirror over HTTP from here — the run blocks the server's event loop, the mirror cannot answer, and the command dies at the timeout.",
       inputSchema: {
         type: "object",
         properties: {

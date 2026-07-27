@@ -7,6 +7,7 @@
 // machine, the others stay parked. Nothing open: start runs to end.
 // The drawn continue_expedition.canvas is a stub saying exactly this.
 import { spawnSync } from "node:child_process";
+import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { type CanvasData, type CanvasEdge, type CanvasElement } from "./canvas.ts";
 import { validateMachine, type MachineDecl, type StateDecl } from "./machine.ts";
@@ -121,13 +122,29 @@ function closedRecords(root: string, closed: Expedition[]): Map<string, Record<s
     cache = new Map();
     recordCache.set(root, cache);
   }
-  const missing = closed.filter((e) => !cache.has(e.id));
-  if (missing.length === 0) return cache;
+  // The MERGED copy is the truth (retro flips land there) — read it fresh
+  // every time, it is one cheap file read; only the branch fallback caches.
+  const out = new Map<string, Record<string, unknown> | undefined>();
+  const missing: Expedition[] = [];
+  for (const e of closed) {
+    const merged = join(root, recordRel(e.id));
+    if (existsSync(merged)) {
+      out.set(e.id, parseStateNote(readFileSync(merged, "utf8")).frontmatter);
+    } else if (cache.has(e.id)) {
+      out.set(e.id, cache.get(e.id));
+    } else {
+      missing.push(e);
+    }
+  }
+  if (missing.length === 0) return out;
   const input = missing.map((e) => `${e.branch}:${recordRel(e.id)}`).join("\n") + "\n";
   const r = spawnSync("git", ["cat-file", "--batch"], { cwd: root, input, maxBuffer: 64 * 1024 * 1024 });
   if (r.status !== 0) {
-    for (const e of missing) cache.set(e.id, readRecord(root, e));
-    return cache;
+    for (const e of missing) {
+      cache.set(e.id, readRecord(root, e));
+      out.set(e.id, cache.get(e.id));
+    }
+    return out;
   }
   const buf: Buffer = r.stdout;
   let off = 0;
@@ -135,19 +152,22 @@ function closedRecords(root: string, closed: Expedition[]): Map<string, Record<s
     const nl = buf.indexOf(0x0a, off);
     if (nl < 0) {
       cache.set(e.id, undefined);
+      out.set(e.id, undefined);
       continue;
     }
     const header = buf.subarray(off, nl).toString("utf8").split(" ");
     off = nl + 1;
     if (header[1] !== "blob") {
       cache.set(e.id, undefined);
+      out.set(e.id, undefined);
       continue;
     }
     const size = Number(header[2]);
     cache.set(e.id, parseStateNote(buf.subarray(off, off + size).toString("utf8")).frontmatter);
+    out.set(e.id, cache.get(e.id));
     off += size + 1;
   }
-  return cache;
+  return out;
 }
 
 export function generateExpeditionArchive(root: string): GeneratedMachine {
