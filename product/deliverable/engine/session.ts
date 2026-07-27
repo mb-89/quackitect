@@ -30,6 +30,7 @@ import {
 } from "./machine.ts";
 import { compileMachine, resolveRef } from "./machines/compile.ts";
 import { conditionNotePath } from "./conditions.ts";
+import { drainNote } from "./inbox.ts";
 import { confirmPrefill, formTemplatePath, lintForm, parseFormTemplate, scaffoldInstance, withFieldContent, withStatus, type FormLint, type FormTemplate } from "./forms.ts";
 import { pulledFor, scanGuidance, type GuidanceDoc, type PulledDoc } from "./pull.ts";
 import { expClose, expFind, expList, expNew, readRecord, type Expedition } from "./worktree.ts";
@@ -43,7 +44,7 @@ import { Decisions } from "./decisions.ts";
  *  arguments it reports (observability is never gated); with arguments it
  *  advances. se_note is legal everywhere too: a stray is captured where it
  *  strikes, never chased (contract rule 4). */
-const ALWAYS_LEGAL: ReadonlySet<string> = new Set(["se_tick", "se_note"]);
+const ALWAYS_LEGAL: ReadonlySet<string> = new Set(["se_tick", "se_note", "se_note_drain"]);
 const MACHINERY: readonly string[] = ["se_tick"];
 
 export function mainMachinePath(root: string): string {
@@ -92,7 +93,7 @@ export class Session {
    *  priority <= autonomy. 0 hands every step to the human (manual mode);
    *  1 is fully autonomous. Content work inside a state is never gated —
    *  only ENTERING is. Live-adjustable (the mirror's slider). */
-  private _autonomy = 0.5;
+  private _autonomy = 0.4;
   /** Fires once, after the tick that closes the MAIN machine — the server
    *  entry hooks the session shutdown here. */
   onClosed?: () => void;
@@ -126,6 +127,45 @@ export class Session {
 
   get autonomy(): number {
     return this._autonomy;
+  }
+
+  /** SHUTDOWN CONTROL (owner design, five notches): 1 none · 2 keep-awake ·
+   *  3 keep-awake + idle-on-done · 4 + end-on-done · 5 + power-off-on-done.
+   *  Keep-awake holds the OS awake while the walk runs; level 5 arms a
+   *  one-minute OS shutdown when the machine reaches end. */
+  private _shutdown = 1;
+  private keepAwake?: ReturnType<typeof spawn>;
+
+  get shutdown(): number {
+    return this._shutdown;
+  }
+
+  setShutdown(value: number): Record<string, unknown> {
+    if (!Number.isInteger(value) || value < 1 || value > 5) {
+      throw new Rejection({
+        clause: CLAUSES.REQUIRED_ARGS,
+        expected: "a shutdown level 1..5 (none · keep-awake · +idle-on-done · +end-on-done · +power-off-on-done)",
+        got: String(value),
+        remedy: { tool: "se_tick", args: {}, note: "the mirror's shutdown bar sets it" },
+        source: "engine/session.ts shutdown",
+      });
+    }
+    const was = this._shutdown;
+    this._shutdown = value;
+    this.syncKeepAwake();
+    this.notifyChange();
+    return { shutdown: value, was };
+  }
+
+  private syncKeepAwake(): void {
+    const want = this._shutdown >= 2 && process.platform === "win32" && process.env.SE_KEEPAWAKE_DISABLE !== "1";
+    if (want && this.keepAwake === undefined) {
+      const src = "Add-Type -TypeDefinition 'using System.Runtime.InteropServices; public class KA { [DllImport(\"kernel32.dll\")] public static extern uint SetThreadExecutionState(uint f); }'; while ($true) { [KA]::SetThreadExecutionState(2147483651) | Out-Null; Start-Sleep -Seconds 30 }";
+      this.keepAwake = spawn("powershell.exe", ["-NoProfile", "-NonInteractive", "-Command", src], { stdio: "ignore", windowsHide: true });
+    } else if (!want && this.keepAwake !== undefined) {
+      this.keepAwake.kill();
+      this.keepAwake = undefined;
+    }
   }
 
   // ── THE WAIT — how the machine reaches a holding agent. MCP cannot push;
@@ -826,10 +866,12 @@ export class Session {
         return this.expeditionOpen(String(args.id ?? ""));
       case "se_exp_close":
         return this.expeditionClose(args.merge !== false && args.merge !== "false");
+      case "se_note_drain":
+        return drainNote(seDir(this.root), String(args.ref ?? ""), String(args.disposition ?? ""), args.where === undefined ? undefined : String(args.where));
       default:
         throw new Rejection({
           clause: CLAUSES.NOT_LEGAL_IN_STATE,
-          expected: "a human-callable tool: se_exp_new, se_exp_list, se_exp_open, se_exp_close",
+          expected: "a human-callable tool: se_exp_new, se_exp_list, se_exp_open, se_exp_close, se_note_drain",
           got: name,
           remedy: { tool: "se_tick", args: {}, note: "the state's other tools are the agent's lane" },
           source: "engine/session.ts parity",
@@ -978,6 +1020,7 @@ export class Session {
       ...(this.bound !== undefined ? { expedition: this.bound.id } : {}),
       status: this.instance.status,
       autonomy: this._autonomy,
+      shutdown: this._shutdown,
       // The session's reading list: what the human checked while driving.
       // Your advances must prove the same docs (paths only — the hashes
       // are earned by reading).
@@ -1163,6 +1206,13 @@ export class Session {
     this.notifyChange(); // every landing is a change a holding hand should see
     if (this.instance.status === "closed" && !this.closedFired) {
       this.closedFired = true;
+      // Shutdown control at END: the keep-awake dies with the session; at
+      // level 5 the machine powers off one minute later.
+      this.keepAwake?.kill();
+      this.keepAwake = undefined;
+      if (this._shutdown === 5 && process.platform === "win32" && process.env.SE_KEEPAWAKE_DISABLE !== "1") {
+        spawn("shutdown", ["/s", "/t", "60"], { stdio: "ignore", windowsHide: true, detached: true }).unref();
+      }
       const info = this.tickInfo();
       this.onClosed?.();
       return {
@@ -1241,6 +1291,7 @@ export class Session {
       ...(this.inSub() ? { submachine: { id: this.sub!.decl.id, active: activeStates(this.sub!.instance) } } : {}),
       status: this.instance.status,
       autonomy: this._autonomy,
+      shutdown: this._shutdown,
       legal_tools: all ? "all" : [...ALWAYS_LEGAL, ...tools],
       history: this.instance.history.slice(-10),
     };

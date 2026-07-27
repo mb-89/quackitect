@@ -1,7 +1,7 @@
 ---
 state: start
 state_kind: start
-priority: 0.01
+priority: 0
 guidance: This is the start state of a state machine. It has no dedicated function. Select the next state you want to enter.
 ---
 

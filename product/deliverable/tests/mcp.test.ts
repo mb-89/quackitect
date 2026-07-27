@@ -26,6 +26,7 @@ test("initialize and tools/list serve the full lane", async () => {
     "se_web_fetch",
     "se_web_search",
     "se_log_query",
+    "se_note_drain",
   ]) {
     assert.ok(names.includes(expected), `missing ${expected}`);
   }

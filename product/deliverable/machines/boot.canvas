@@ -1,7 +1,7 @@
 {
 	"metadata":{
 		"version":"1.0-1.0",
-		"frontmatter":{"reentry":"restart","priority":0.01}
+		"frontmatter":{"reentry":"restart","priority":0}
 	},
 	"nodes":[
 		{

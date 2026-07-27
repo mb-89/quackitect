@@ -13,7 +13,7 @@ import { CallLog } from "./calllog.ts";
 import { parseUpdate } from "./decisions.ts";
 import { Toll } from "./toll.ts";
 import { fileDelete, fileGlob, fileList, filePatch, fileRead, fileWrite, type PatchOp } from "./files.ts";
-import { appendNote } from "./inbox.ts";
+import { appendNote, drainNote } from "./inbox.ts";
 import { capJson } from "./jsonio.ts";
 import { McpServer, type ToolDef } from "./mcp.ts";
 import { fileMove } from "./move.ts";
@@ -310,6 +310,21 @@ export function coreTools(rootOf: () => string, projectRoot: string): ToolDef[] 
         required: ["text"],
       },
       handler: (args) => appendNote(seDir(projectRoot), String(args.text), "agent"),
+    },
+    {
+      name: "se_note_drain",
+      title: "se.note.drain",
+      description: "The retro's mechanical half: mark a note drained with its disposition (done | obsolete | carried — where? names the follow-up home). Drained notes leave the inbox count and the pending feed. An unknown ref is refused.",
+      inputSchema: {
+        type: "object",
+        properties: {
+          ref: { type: "string", description: "the note's ref (note-…)" },
+          disposition: { type: "string", description: "done | obsolete | carried" },
+          where: { type: "string", description: "for done/carried: where it landed or lives on" },
+        },
+        required: ["ref", "disposition"],
+      },
+      handler: (args) => drainNote(seDir(projectRoot), String(args.ref), String(args.disposition), args.where === undefined ? undefined : String(args.where)),
     },
     {
       name: "se_log_query",

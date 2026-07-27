@@ -1,7 +1,7 @@
 {
 	"metadata":{
 		"version":"1.0-1.0",
-		"frontmatter":{"reentry":"restart","priority":0.5}
+		"frontmatter":{"reentry":"restart","priority":0.4}
 	},
 	"nodes":[
 		{"id":"n-comment","type":"text","text":"CONTINUE PLANNED WORK — pick an open iteration and resume its walk. EMPTY until persistence lands.","x":-1100,"y":-340,"width":660,"height":120},

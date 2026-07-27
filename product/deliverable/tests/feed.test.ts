@@ -139,10 +139,12 @@ test("the unified feed derives src, type and brief — and the mirror carries th
   assert.ok(withLog.includes('id="w-log"'));
   assert.ok(withLog.includes('id="log-filter"'));
   // The slider carries the authored levels as notches (shortcuts + help);
-  // the killer anchor sits at 0.9, ideation at 1.
+  // uniform 0.2 bands: the killer anchor sits at 0.8, ideation at 1.
   assert.ok(withLog.includes("thr-notch"));
   assert.ok(withLog.includes('id="thr-ticks"'));
-  assert.ok(withLog.includes('data-level="0.9"'));
+  assert.ok(withLog.includes('data-level="0.8"'));
+  // The shutdown control rides beside it.
+  assert.ok(withLog.includes('id="sd"'));
   // Parity surfaces: the modal, the human note input.
   assert.ok(withLog.includes('id="modal"'));
   assert.ok(withLog.includes('id="log-note"'));

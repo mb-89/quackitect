@@ -1,7 +1,7 @@
 ---
 state: prepare_idle
 state_kind: work
-priority: 0.01
+priority: 0
 exit_script:
   - product/deliverable/engine/bin/preflight.ts
   - product/deliverable/engine/bin/selftest.ts
