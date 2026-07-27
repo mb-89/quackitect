@@ -178,9 +178,15 @@ export function generateExpeditionArchive(root: string): GeneratedMachine {
   type GenNode = CanvasElement & { styleAttributes?: Record<string, unknown> };
   const nodes: GenNode[] = [];
   const edges: CanvasEdge[] = [];
-  const centerY = closed.length === 0 ? 80 : ((closed.length - 1) * 420) / 2 + 80;
+  // DECADE GROUPS (owner ruling 2026-07-27): ten records per labeled
+  // column, decades stacked horizontally — the drawing never explodes.
+  // At a hundred, decades collapse into hundred-groups (build when the
+  // count nears; the rule is mechanical either way).
+  const col = closed.length === 0 ? 1 : Math.min(closed.length, 10);
+  const centerY = ((col - 1) * 420) / 2 + 80;
+  const decCount = Math.max(1, Math.ceil(closed.length / 10));
   nodes.push({ id: "n-start", type: "file", file: "start.md", x: -1400, y: centerY, width: 160, height: 160, styleAttributes: { shape: "pill" } });
-  nodes.push({ id: "n-end", type: "file", file: "end.md", x: 260, y: centerY, width: 160, height: 160, styleAttributes: { shape: "pill" } });
+  nodes.push({ id: "n-end", type: "file", file: "end.md", x: -1100 + decCount * 800 + 60, y: centerY, width: 160, height: 160, styleAttributes: { shape: "pill" } });
   const records = closedRecords(root, closed);
   closed.forEach((e, i) => {
     const sid = shortId(e.id);
@@ -201,11 +207,18 @@ export function generateExpeditionArchive(root: string): GeneratedMachine {
       edges: [{ to: "end", role: "alternative" }],
     });
     start.edges.push({ to: sid, role: "normal" });
-    const y = i * 420;
-    nodes.push({ id: `n-${sid}`, type: "file", file: `${sid}.md`, x: -1100, y, width: 620, height: 360 });
+    const x = -1100 + Math.floor(i / 10) * 800;
+    const y = (i % 10) * 420;
+    nodes.push({ id: `n-${sid}`, type: "file", file: `${sid}.md`, x, y, width: 620, height: 360 });
     edges.push({ id: `e-start-${sid}`, fromNode: "n-start", toNode: `n-${sid}` });
     edges.push({ id: `e-${sid}-end`, fromNode: `n-${sid}`, toNode: "n-end" });
   });
+  for (let d = 0; d * 10 < closed.length; d++) {
+    const first = shortId(closed[d * 10].id);
+    const last = shortId(closed[Math.min(d * 10 + 9, closed.length - 1)].id);
+    const count = Math.min(10, closed.length - d * 10);
+    nodes.push({ id: `g-dec-${d}`, type: "group", x: -1160 + d * 800, y: -60, width: 740, height: count * 420 + 80, label: `${first} – ${last}` });
+  }
   if (closed.length === 0) {
     start.edges.push({ to: "end", role: "normal" });
     edges.push({ id: "e-start-end", fromNode: "n-start", toNode: "n-end" });

@@ -68,7 +68,7 @@ export function itList(root: string): Iteration[] {
     const path = join(worktreesDir(root), id);
     out.push({ id, branch, path, open: existsSync(path) });
   }
-  return out;
+  return out.sort((a, b) => Number(a.id.match(/^i(\d+)/)?.[1] ?? 0) - Number(b.id.match(/^i(\d+)/)?.[1] ?? 0));
 }
 
 /** THE SEED: goal + rough vision, plus context inputs (an expedition id,

@@ -77,7 +77,9 @@ export function expList(root: string): Expedition[] {
     const path = join(worktreesDir(root), id);
     out.push({ id, branch, path, open: existsSync(path) });
   }
-  return out;
+  // NUMERIC order — git lists branches alphabetically (e1, e10, e11, …,
+  // e2), which reads as missing entries to a human scanning for e10.
+  return out.sort((a, b) => Number(a.id.match(/^e(\d+)/)?.[1] ?? 0) - Number(b.id.match(/^e(\d+)/)?.[1] ?? 0));
 }
 
 export function expNew(root: string, kind: string, goal: string): Expedition {

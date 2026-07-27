@@ -369,20 +369,22 @@ function jsonTable(v) {
   return '<table class="kv">' + keys.map((k) => '<tr><td class="k">' + k + '</td><td class="v">' + jsonTable(v[k]) + "</td></tr>").join("") + "</table>";
 }
 
+const REC_DECS = {};
 async function loadRecDecisions() {
   for (const el of document.querySelectorAll(".recdecisions[data-exp]:not([data-loaded])")) {
     el.dataset.loaded = "1";
     try {
       const r = await fetch("/api/recdecisions?exp=" + encodeURIComponent(el.dataset.exp));
       const d = await r.json();
+      REC_DECS[el.dataset.exp] = d.visits || [];
       const badge = { open: "●", done: "✓", obsolete: "⊘", reverted: "↩", deferred: "→" };
       el.innerHTML = (d.visits || []).map((v) => {
         const kids = {};
         v.nodes.forEach((n) => { (kids[n.parent || ""] = kids[n.parent || ""] || []).push(n); });
         const tree = (pid, depth) => (kids[pid] || []).map((n) =>
-          '<div class="dnode s-' + n.status + '" style="margin-left:' + depth * 14 + 'px" title="' + n.id + " · " + n.status + '">' + (badge[n.status] || "·") + " " + escText(n.brief) + "</div>" + tree(n.id, depth + 1)
+          '<div class="dnode recnode s-' + n.status + '" data-exp="' + escText(el.dataset.exp) + '" data-visit="' + escText(v.visit) + '" data-node="' + n.id + '" style="margin-left:' + depth * 14 + 'px" title="' + n.id + " · " + n.status + '">' + (badge[n.status] || "·") + " " + escText(n.brief) + "</div>" + tree(n.id, depth + 1)
         ).join("");
-        return '<details class="visitdec"><summary style="cursor:pointer;color:#7f8b96;padding:6px 0 2px">' + escText(v.visit) + "</summary>" + (tree("", 0) || '<div class="vnull">no decisions</div>') + "</details>";
+        return '<details class="visitdec"><summary class="meta" style="cursor:pointer;padding:8px 0 4px">' + escText(v.visit) + "</summary>" + (tree("", 0) || '<div class="vnull">no decisions</div>') + '<div class="recinfo"></div></details>';
       }).join("") || '<div class="vnull">no decisions recorded</div>';
     } catch (e) {
       el.innerHTML = '<div class="vnull">decisions unavailable</div>';
@@ -899,6 +901,19 @@ function renderDecisions(sel) {
 document.addEventListener("click", (ev) => {
   const lr = ev.target.closest ? ev.target.closest(".logrow") : null;
   if (lr) { void openLogDetail(lr.dataset.ref); return; }
+  const rn = ev.target.closest ? ev.target.closest(".recnode") : null;
+  if (rn) {
+    const v = (REC_DECS[rn.dataset.exp] || []).find((x) => x.visit === rn.dataset.visit);
+    const n = v && v.nodes.find((x) => x.id === rn.dataset.node);
+    const sec = rn.closest("details");
+    const box = sec && sec.querySelector(".recinfo");
+    if (n && box) {
+      sec.querySelectorAll(".recnode.dsel").forEach((x) => x.classList.remove("dsel"));
+      rn.classList.add("dsel");
+      box.innerHTML = '<div class="dinfo">' + jsonTable(Object.assign({ id: n.id, brief: n.brief, status: n.status }, n.resolution ? { resolution: n.resolution } : {}, n.at ? { opened: n.at } : {}, n.closed_at ? { closed: n.closed_at } : {})) + "</div>";
+    }
+    return;
+  }
   const dn = ev.target.closest ? ev.target.closest(".dnode") : null;
   if (dn) { renderDecisions(dn.dataset.node); return; }
 });
