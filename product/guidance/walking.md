@@ -6,6 +6,10 @@ One tool drives everything: `se_tick`. It is legal in every state.
   documents, next states.
 - `to: <state>`: complete the current state, enter that one. Required when
   several edges leave a state.
+- `from: <state>`: your assumed CURRENT state — send it on EVERY moving
+  tick. The human's hand moves the walk too; when `from` is not where the
+  machine stands, the move is refused (SE-C-114) and the refusal names
+  the real position. Continue from there — never replay the stale move.
 - `advance: true`: advance along a single drawn edge.
 - `read_hashes: {"<path>": "<hash>", ...}`: your proof-of-read for this
   tick. A transition demands it for the current state's read list and for

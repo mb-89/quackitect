@@ -41,18 +41,23 @@ The trigger is a NOTE carrying "needs retro":
    in .se/notes.jsonl): keep it (condition still unmet), pull it
    (re-drain as carried, into this round's scope), or drop it (re-drain
    as obsolete, reason recorded). Re-draining IS the migration mechanism.
-4. Hunt wasted effort. Rework, reversals, avoidable refactors,
+4. Sweep the assistant's persistent memory (owner rule 2026-07-27). Read
+   every memory entry: whatever holds project rules, project state, or
+   working guidance moves INTO the repo (guidance, machines, prompts) and
+   leaves the memory. Memory keeps only personal data and harness
+   mechanics the repo cannot hold.
+5. Hunt wasted effort. Rework, reversals, avoidable refactors,
    reinventing instead of reusing. Each one is a lead.
-5. Mine the record SINCE THE LAST RETRO — never the whole log.
+6. Mine the record SINCE THE LAST RETRO — never the whole log.
    se_log_query with filter {since: "last_retro"} scopes every query to
    what happened after the newest drain call. Rank refusal clauses by
    frequency; top tools; failure rates. A command that keeps failing or
    a refusal that keeps firing is a lead — the fix may be a tool, a
    refusal, or better guidance. The raw log is KEPT (owner ruling:
    forever-until-1GB; a garbage collector may harvest it later).
-6. Tally the previous retro's improvements. Promote the wins. Dismiss the
+7. Tally the previous retro's improvements. Promote the wins. Dismiss the
    duds WITH the reason recorded, so a dud is never re-proposed.
-7. Aim every improvement at a durable home: guidance, a machine, a
+8. Aim every improvement at a durable home: guidance, a machine, a
    condition note, a form template, an engine refusal. Emit only the few
    highest-leverage notes. Each one specific and checkable — a concrete
    change, never "improve X".

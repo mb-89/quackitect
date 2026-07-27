@@ -53,6 +53,7 @@ export const CLAUSES = {
   NOT_LEGAL_IN_STATE: "SE-C-110", // the state gate: tool not legal in the active state
   CONDITION_UNMET: "SE-C-112", // enter/leave condition not met — evidence required
   ABOVE_THRESHOLD: "SE-C-113", // the state's priority exceeds the session threshold — the human advances
+  STALE_POSITION: "SE-C-114", // the tick's `from` is not where the walk stands — the human's hand moved it
   TOLL_DUE: "SE-C-040", // carried from v2 — update overdue; pay by resending the same call with the update field
   NOTE_UNKNOWN: "SE-C-073", // carried from v2 — draining an unknown note ref is refused
   UPDATE_MALFORMED: "SE-C-120", // the update field failed to parse as a decision-graph op

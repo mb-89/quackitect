@@ -24,6 +24,7 @@ import { resolve } from "node:path";
 import { CallLog } from "../calllog.ts";
 import { runStdio } from "../mcp.ts";
 import { startMirror } from "../mirror.ts";
+import { openPanel } from "../panel.ts";
 import { seDir } from "../paths.ts";
 import { Session } from "../session.ts";
 import { buildServer } from "../tools.ts";
@@ -88,7 +89,12 @@ if (mirrorPort > 0) {
     process.stderr.write(`se-mcp: mirror not started (${(e as NodeJS.ErrnoException).code ?? e.message}) — pass --mirror-port to pick another port\n`);
   });
   mirror.on("listening", () => {
-    process.stderr.write(`se-mcp: mirror (the human's hand) at http://localhost:${mirrorPort}\n`);
+    const url = `http://localhost:${mirrorPort}/`;
+    session.mirrorUrl = url;
+    process.stderr.write(`se-mcp: mirror (the human's hand) at ${url}\n`);
+    // The server's first act once the panel exists: put it in front of the
+    // user (owner ruling 2026-07-27). se_panel reopens it any time.
+    openPanel(url);
   });
 }
 

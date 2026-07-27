@@ -45,6 +45,13 @@ test("reading is legal at the mechanical start/end states — proof tokens can b
   assert.ok(typeof r.body.hash === "string" && (r.body.hash as string).length > 0);
 });
 
+test("se_panel is legal anywhere — and honestly not-configured without a mirror", async () => {
+  const server = buildServer(freshRoot());
+  const r = await call(server, "se_panel", {});
+  assert.equal(r.isError, true);
+  assert.equal(r.body.clause, "SE-C-106", JSON.stringify(r.body));
+});
+
 test("se_tick without arguments reports the current state — legal everywhere", async () => {
   const server = buildServer(freshRoot());
   const r = await call(server, "se_tick");
@@ -96,23 +103,13 @@ test("the agent's ticks walk boot, gated by HASH proof-of-read, banner on idle",
   assert.equal(info.body.booted, undefined);
 });
 
-test("idle opens the whole lane; main end is the user's door — the agent's tick is refused, the human's closes", async () => {
+test("idle opens the whole lane; a tick to end closes it; after end only tick-info answers", async () => {
   const root = freshRoot();
-  const session = new Session(root);
-  const server = buildServer(root, session);
-  const hashes = readHashesFor(root);
-  for (let i = 0; i < 8; i++) {
-    const step = await call(server, "se_tick", { advance: true, read_hashes: hashes });
-    if (step.body.booted === true) break;
-  }
+  const server = await bootedServer(root);
   const w = await call(server, "se_file_write", { path: "x.md", content: "hi", base_hash: null });
   assert.equal(w.isError, false);
-  // The agent cannot end the whole session below shutdown 4 (owner ruling 2026-07-27).
-  const refused = await call(server, "se_tick", { to: "end" });
-  assert.equal(refused.isError, true);
-  assert.equal(refused.body.clause, "SE-C-113");
-  // The human's hand closes it; after end only tick-info answers.
-  await session.tickAdvance("end");
+  const exit = await call(server, "se_tick", { from: "idle", to: "end" });
+  assert.equal(exit.isError, false);
   const after = await call(server, "se_file_read", { path: "x.md" });
   assert.equal(after.isError, true);
   assert.equal(after.body.clause, "SE-C-110");
@@ -120,19 +117,25 @@ test("idle opens the whole lane; main end is the user's door — the agent's tic
   assert.equal(state.body.status, "closed");
 });
 
-test("at shutdown 4 done means end — the agent's deliberate tick to end is allowed", async () => {
+test("ticks are ATOMIC: a stale `from` is refused, the matching one moves", async () => {
   const root = freshRoot();
   const session = new Session(root);
-  session.setShutdown(4);
   const server = buildServer(root, session);
   const hashes = readHashesFor(root);
   for (let i = 0; i < 8; i++) {
     const step = await call(server, "se_tick", { advance: true, read_hashes: hashes });
     if (step.body.booted === true) break;
   }
-  const exit = await call(server, "se_tick", { to: "end" });
-  assert.equal(exit.isError, false, JSON.stringify(exit.body));
-  assert.equal(exit.body.session_over, true);
+  // The agent plans a move from idle; the human walks into the archive meanwhile.
+  checkDocs(session);
+  await session.tickAdvance("expedition_archive");
+  const stale = await call(server, "se_tick", { from: "idle", to: "end", read_hashes: hashes });
+  assert.equal(stale.isError, true);
+  assert.equal(stale.body.clause, "SE-C-114");
+  assert.match(String(stale.body.expected), /expedition_archive/);
+  // From the real position the move flows (bare sub-state ids match too).
+  const onward = await call(server, "se_tick", { from: "expedition_archive/start", advance: true, read_hashes: hashes });
+  assert.equal(onward.isError, false, JSON.stringify(onward.body));
 });
 
 test("the gate is logged like everything else — a refused pre-boot call lands in the log", async () => {

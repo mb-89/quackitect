@@ -17,6 +17,7 @@ import { appendNote, drainNote } from "./inbox.ts";
 import { capJson } from "./jsonio.ts";
 import { McpServer, type ToolDef } from "./mcp.ts";
 import { fileMove } from "./move.ts";
+import { openPanel } from "./panel.ts";
 import { seDir } from "./paths.ts";
 import { run } from "./run.ts";
 import { search } from "./search.ts";
@@ -30,11 +31,12 @@ export function sessionTools(session: Session): ToolDef[] {
       name: "se_tick",
       title: "se.tick",
       description:
-        "THE TICK — the universal walk operation, legal in EVERY state. Without arguments: where the machine is (state, guidance, what to read, legal tools, next states). With arguments: advance — to: <state> picks the edge (optional when there is only one), advance: true advances when no other argument applies, back: <state> returns to an earlier filled state (downstream is superseded, evidence invalidated), state: <state> PEEKS at any state without moving — use it to choose among several ways forward, wait: true is a SHORT in-turn hold: it blocks until the human moves something (slider, tick, check) and returns the fresh packet (changed: false on timeout) — use it only when you expect the change within seconds; otherwise STOP, telling the user plainly that they must message you (e.g. 'continue') after changing the slider, because the slider alone cannot wake a stopped agent. READ PROOF: entering a state (and leaving one with a read condition) demands read_hashes: {\"<path>\": \"<hash>\", ...} covering the listed docs — the hash rides every se_file_read result and must match the doc AS IT STANDS; it proves YOUR reading, every tick, so after a compaction re-read before advancing. When a result carries a banner, show it to the user VERBATIM.",
+        "THE TICK — the universal walk operation, legal in EVERY state. Without arguments: where the machine is (state, guidance, what to read, legal tools, next states). With arguments: advance — to: <state> picks the edge (optional when there is only one), advance: true advances when no other argument applies, back: <state> returns to an earlier filled state (downstream is superseded, evidence invalidated), state: <state> PEEKS at any state without moving — use it to choose among several ways forward, wait: true is a SHORT in-turn hold: it blocks until the human moves something (slider, tick, check) and returns the fresh packet (changed: false on timeout) — use it only when you expect the change within seconds; otherwise STOP, telling the user plainly that they must message you (e.g. 'continue') after changing the slider, because the slider alone cannot wake a stopped agent. READ PROOF: entering a state (and leaving one with a read condition) demands read_hashes: {\"<path>\": \"<hash>\", ...} covering the listed docs — the hash rides every se_file_read result and must match the doc AS IT STANDS; it proves YOUR reading, every tick, so after a compaction re-read before advancing. ATOMIC MOVES: send from: <your assumed current state> on every moving tick — the engine refuses (SE-C-114) when the walk stands elsewhere; the human's hand moves the walk too. When a result carries a banner, show it to the user VERBATIM.",
       inputSchema: {
         type: "object",
         properties: {
           to: { type: "string", description: "the next state to enter (one of the drawn edges)" },
+          from: { type: "string", description: "your assumed CURRENT state — send it on every moving tick; the engine refuses the move (SE-C-114) when the walk stands elsewhere (the human's hand moves it too)" },
           advance: { type: "boolean", description: "advance along the single drawn edge" },
           back: { type: "string", description: "jump BACK to an earlier filled state — everything downstream is superseded and its evidence invalidated" },
           state: { type: "string", description: "PEEK at a named state (full info: statement, guidance, conditions, next) — looking never moves" },
@@ -60,12 +62,34 @@ export function sessionTools(session: Session): ToolDef[] {
           };
         }
         const hashes = (typeof args.read_hashes === "object" && args.read_hashes !== null ? args.read_hashes : {}) as Record<string, string>;
+        // ATOMIC: a moving tick declares where it was planned — stale plans
+        // are refused before anything moves (peeking never needs it).
+        if (args.from !== undefined && args.state === undefined) session.assertFrom(String(args.from));
         if (args.escape !== undefined) return session.escape(String(args.escape), "agent", hashes);
         if (args.state !== undefined) return session.stateInfo(String(args.state));
         if (args.back !== undefined) return session.jumpBack(String(args.back), "agent", hashes);
         const wantsAdvance = args.to !== undefined || args.advance === true || Object.keys(hashes).length > 0;
         if (!wantsAdvance) return session.tickInfo();
         return session.tickAdvance(args.to === undefined ? undefined : String(args.to), "agent", hashes);
+      },
+    },
+    {
+      name: "se_panel",
+      title: "se.panel",
+      description: "Open the panel (the mirror — the human's hand on the walk) in the user's default browser. Legal in every state; the server also opens it once at start. Use it when the user cannot see the panel.",
+      inputSchema: { type: "object", properties: {} },
+      handler: () => {
+        if (session.mirrorUrl === undefined) {
+          throw new Rejection({
+            clause: CLAUSES.NOT_CONFIGURED,
+            expected: "a listening mirror (the panel)",
+            got: "no mirror on this session (port 0, or the bind failed)",
+            remedy: { tool: "se_tick", args: {}, note: "start the server with a mirror port (default 7333); the URL also prints on the server's stderr" },
+            source: "engine/tools.ts panel",
+          });
+        }
+        openPanel(session.mirrorUrl);
+        return { opened: session.mirrorUrl, note: "the panel is opening in the user's browser" };
       },
     },
   ];

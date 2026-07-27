@@ -44,7 +44,7 @@ import { Decisions } from "./decisions.ts";
  *  arguments it reports (observability is never gated); with arguments it
  *  advances. se_note is legal everywhere too: a stray is captured where it
  *  strikes, never chased (contract rule 4). */
-const ALWAYS_LEGAL: ReadonlySet<string> = new Set(["se_tick", "se_note"]);
+const ALWAYS_LEGAL: ReadonlySet<string> = new Set(["se_tick", "se_note", "se_panel"]);
 /** RESTRICTED tools: "all" does NOT grant these — a state must name them.
  *  se_note_drain is legal only in the retro's drain state (owner ruling
  *  2026-07-27: there is no point in draining anywhere else). */
@@ -140,6 +140,9 @@ export class Session {
   private _shutdown = 1;
   private keepAwake?: ReturnType<typeof spawn>;
 
+  /** The mirror's URL when one is listening — the panel se_panel opens. */
+  mirrorUrl?: string;
+
   get shutdown(): number {
     return this._shutdown;
   }
@@ -233,6 +236,24 @@ export class Session {
         });
       }
     }
+  }
+
+  /** ATOMIC TICKS (owner ruling 2026-07-27): the walk can be moved by the
+   *  human's hand at any moment, so a moving tick carries `from` — the
+   *  position it was planned at. A mismatch refuses the move; the refusal
+   *  names the real position. Bare sub-state ids match their prefixed
+   *  form. */
+  assertFrom(from: string): void {
+    const now = this.active()[0] ?? "";
+    const bare = now.includes("/") ? now.slice(now.indexOf("/") + 1) : now;
+    if (from === now || from === bare) return;
+    throw new Rejection({
+      clause: CLAUSES.STALE_POSITION,
+      expected: `a move from ${now} — where the walk stands`,
+      got: `a tick planned from ${from}`,
+      remedy: { tool: "se_tick", args: {}, note: "the walk moved (the human's hand does too) — read the fresh packet and continue from the real position; never replay a move planned elsewhere" },
+      source: "engine/session.ts atomic",
+    });
   }
 
   /** Where the LANE works: the bound expedition's worktree, else the root. */
@@ -1143,18 +1164,6 @@ export class Session {
     const cur = activeStates(this.instance)[0];
     this.assertEdge(this.machine, cur, to);
     const target = to ?? this.state(this.machine, cur).edges[0]?.to;
-    // Main end closes the WHOLE session — below shutdown 4 (end-on-done)
-    // that door is the user's alone (owner ruling 2026-07-27, after a
-    // stale agent tick meant for a sub-machine's end ended the session).
-    if (target !== undefined && channel === "agent" && this._shutdown < 4 && this.state(this.machine, target).kind === "end") {
-      throw new Rejection({
-        clause: CLAUSES.ABOVE_THRESHOLD,
-        expected: "the user's hand — the main machine's end closes the whole session",
-        got: `an agent tick to ${target}`,
-        remedy: { tool: "se_tick", args: {}, note: "stay at idle and tell the user plainly: closing the session is theirs (mirror click, or shutdown level 4/5 makes done mean end)" },
-        source: "engine/session.ts tick",
-      });
-    }
     if (target !== undefined) this.gatePriority(this.machine, [target], channel);
     await this.assertConditions(this.machine, this.state(this.machine, cur), to, channel, readHashes);
     completeState(this.machine, this.instance, cur, "filled", now, to);

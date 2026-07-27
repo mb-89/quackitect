@@ -116,22 +116,10 @@ if ($null -eq $claude) {
 $env:SE_ARGS = ($forwarded -join "`n")
 $argNote = if ($forwarded.Count -gt 0) { " (args: $($forwarded -join ' '))" } else { "" }
 Write-Host "quackitect v3 - launching caged agent in workspace/$argNote" -ForegroundColor Cyan
-Write-Host "quackitect v3 - the Mirror (your hand on the walk) opens at http://localhost:7333 once the server is up" -ForegroundColor Cyan
+Write-Host "quackitect v3 - the Mirror (your hand on the walk): the server opens http://localhost:7333 as soon as it is up" -ForegroundColor Cyan
 
-# Open the Mirror in the browser AS SOON AS it answers. The server only
-# exists once claude connects to the MCP lane, so a background job polls
-# /api/alive (up to 60s) and opens the browser on the first answer.
-Start-Job -ScriptBlock {
-  for ($i = 0; $i -lt 120; $i++) {
-    try {
-      Invoke-WebRequest -UseBasicParsing -TimeoutSec 1 "http://localhost:7333/api/alive" | Out-Null
-      Start-Process "http://localhost:7333"
-      break
-    } catch {
-      Start-Sleep -Milliseconds 500
-    }
-  }
-} | Out-Null
+# The server opens the Mirror itself as soon as it listens (se_panel
+# reopens it any time) - no polling job here.
 
 # The agent only acts inside a turn, and no turn starts until a first
 # message - so RUNME sends it. The agent boots as far as the threshold
@@ -143,5 +131,4 @@ try {
   claude $kickoff
 } finally {
   Pop-Location
-  Get-Job | Remove-Job -Force -ErrorAction SilentlyContinue
 }
