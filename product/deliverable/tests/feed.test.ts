@@ -3,12 +3,12 @@
 // per-state decision tree; the toll forces narration only after a lapse and
 // one ignored warning. No ETA anywhere — timestamps are the engine's.
 import { strict as assert } from "node:assert";
-import { mkdtempSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { test } from "node:test";
 import { CallLog } from "../engine/calllog.ts";
-import { Decisions, parseUpdate } from "../engine/decisions.ts";
+import { Decisions, parseUpdate, replayFile } from "../engine/decisions.ts";
 import { readNotes } from "../engine/inbox.ts";
 import { seDir } from "../engine/paths.ts";
 import { feedRows, renderMirror } from "../engine/render.ts";
@@ -112,6 +112,32 @@ test("the render lint: the update lane refuses what renders weird", () => {
   assert.throws(() => parseUpdate({ op: "defer", node: "d1" }), (e) => (e as { clause?: string }).clause === "SE-C-120");
   const d = parseUpdate({ op: "defer", node: "d1", to: "idle" });
   assert.equal(d.to, "idle");
+});
+
+test("replay: parked defers and open points survive an engine life", () => {
+  const root = freshRoot();
+  const dir = seDir(root);
+  mkdirSync(dir, { recursive: true });
+  writeFileSync(join(dir, "decisions.jsonl"), [
+    JSON.stringify({ op: "plan", visit: "e1@0", nodes: [{ id: "d1", brief: "a" }, { id: "d2", brief: "b" }] }),
+    JSON.stringify({ op: "done", visit: "e1@0", node: "d1" }),
+    JSON.stringify({ op: "defer", visit: "e1@0", node: "d2", brief: "b", to: "idle" }),
+  ].join("\n") + "\n", "utf8");
+  // The file's replayed truth BEFORE arrival: nothing open, one parked.
+  const before = replayFile(join(dir, "decisions.jsonl"));
+  assert.equal(before.open.length, 0, "d1 done, d2 deferred — no open point");
+  assert.deepEqual(before.parked, [{ state: "idle", brief: "b" }]);
+  // A fresh engine life: the parked point re-arms and arrives at idle.
+  const s = new Session(root);
+  const arrived = s.decisions.graph("idle@0").nodes;
+  assert.equal(arrived.length, 1);
+  assert.equal(arrived[0].brief, "b");
+  assert.equal(arrived[0].status, "open");
+  // After arrival the file says so too: the to-do is open, nothing parked.
+  const after = replayFile(join(dir, "decisions.jsonl"));
+  assert.equal(after.parked.length, 0);
+  assert.equal(after.open.length, 1);
+  assert.equal(after.open[0].brief, "b");
 });
 
 test("defer parks a point for a later state — it arrives there as an open to-do", () => {

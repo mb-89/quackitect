@@ -39,7 +39,7 @@ import { type CanvasData } from "./canvas.ts";
 import { spawn, spawnSync } from "node:child_process";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { resolveInRoot, seDir } from "./paths.ts";
-import { Decisions } from "./decisions.ts";
+import { Decisions, replayFile } from "./decisions.ts";
 import { generateIterations, itFind, itSeed, markStarted } from "./iterations.ts";
 
 /** THE TICK is the machinery — one tool, legal in EVERY state. Without
@@ -619,12 +619,13 @@ export class Session {
     const lint = { ...lintForm(h.template, raw, h.evidenceAbs), instanceRel: h.instanceRel };
     // THE GRAPH IS EVIDENCE (owner ruling 2026-07-27): no point of this
     // work's decision graph may stand OPEN when the evidence claims done.
-    // The graph itself is attached, not copied — the record already
-    // carries decisions.jsonl in the worktree.
+    // The RECORD's jsonl is the source — every live op lands there too,
+    // so the check survives engine reloads. Attached, never copied.
     const sid = shortId(this.bound!.id);
-    const open = this.decisions.openFor([sid, `${sid}-leave`]);
+    const recorded = replayFile(join(this.bound!.path, "product", "spec", "expeditions", this.bound!.id, "decisions.jsonl"));
+    const open = recorded.open.filter((n) => [sid, `${sid}-leave`].some((p) => n.visit === p || n.visit.startsWith(`${p}@`)));
     if (open.length > 0) {
-      lint.problems.push(`the decision graph holds ${open.length} open point(s) — resolve each (done | obsolete | revert) before the evidence stands`);
+      lint.problems.push(`the decision graph holds ${open.length} open point(s) — resolve each (done | obsolete | revert | defer) before the evidence stands`);
       lint.met = false;
     }
     return lint;

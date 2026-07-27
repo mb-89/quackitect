@@ -21,3 +21,20 @@
 {"ts":"2026-07-27T19:38:43.105Z","op":"update","visit":"continue_expedition/e13@0","node":"d32","brief":"defer tests: parse shape and the park-and-arrive story"}
 {"ts":"2026-07-27T19:38:50.432Z","op":"update","visit":"continue_expedition/e13@0","node":"d33","brief":"suite over the graph-evidence rule and the defer op"}
 {"ts":"2026-07-27T19:39:40.234Z","op":"done","visit":"continue_expedition/e13@0","node":"d6","brief":"six doors live; the old machines deleted"}
+{"ts":"2026-07-27T19:39:48.250Z","op":"done","visit":"continue_expedition/e13@0","node":"d7","brief":"first-start gate proven in the walk test"}
+{"ts":"2026-07-27T19:39:58.509Z","op":"done","visit":"continue_expedition/e13@0","node":"d8","brief":"report opens in the modal; branch fallback serves dismissed ones"}
+{"ts":"2026-07-27T19:40:07.442Z","op":"done","visit":"continue_expedition/e13@0","node":"d9","brief":"folds survive the checkbox reload; the law stands in voice.md"}
+{"ts":"2026-07-27T19:40:14.859Z","op":"done","visit":"continue_expedition/e13@0","node":"d10","brief":"86 of 86 selftests and preflight green in the worktree"}
+{"ts":"2026-07-27T19:40:27.259Z","op":"obsolete","visit":"continue_expedition/e13@0","node":"d11","brief":"parked for idle post-merge — the demo seed needs the merged engine"}
+{"ts":"2026-07-27T19:40:40.296Z","op":"done","visit":"continue_expedition/e13@0","node":"d12","brief":"form filled and set done — the close itself is the leave act, owner-gated"}
+{"ts":"2026-07-27T19:40:48.206Z","op":"obsolete","visit":"continue_expedition/e13@0","node":"d13","brief":"parked for idle post-merge — verification runs on the reloaded engine"}
+{"ts":"2026-07-27T19:42:41.269Z","op":"done","visit":"continue_expedition/e13@0","node":"d4","brief":"research done early: v2 opening states and the form template read"}
+{"ts":"2026-07-27T19:42:48.439Z","op":"done","visit":"continue_expedition/e13@0","node":"d5","brief":"both seed tools shipped and test-pinned in the first e13 commit"}
+{"ts":"2026-07-27T19:46:54.589Z","op":"update","visit":"continue_expedition/e13@0","node":"d34","brief":"defer-round design captured: arrow not strike, per-visit to-do sections on the state"}
+{"ts":"2026-07-27T19:49:58.421Z","op":"update","visit":"continue_expedition/e13@0","node":"d35","brief":"replay built: parked defers re-arm at start; the evidence check reads the record file"}
+{"ts":"2026-07-27T19:50:13.547Z","op":"update","visit":"continue_expedition/e13@0","node":"d36","brief":"replay test: a fresh engine life re-arms the parked point"}
+{"ts":"2026-07-27T19:50:36.332Z","op":"update","visit":"continue_expedition/e13@0","node":"d37","brief":"replay test wired with the real imports"}
+{"ts":"2026-07-27T19:50:54.229Z","op":"update","visit":"continue_expedition/e13@0","node":"d38","brief":"suite over the replay build"}
+{"ts":"2026-07-27T19:51:26.576Z","op":"update","visit":"continue_expedition/e13@0","node":"d39","brief":"replay test asserts the before and after truths in order"}
+{"ts":"2026-07-27T19:51:33.515Z","op":"update","visit":"continue_expedition/e13@0","node":"d40","brief":"suite rerun over the fixed replay test"}
+{"ts":"2026-07-27T19:51:55.076Z","op":"update","visit":"continue_expedition/e13@0","node":"d41","brief":"committing the replay round on the e13 branch"}

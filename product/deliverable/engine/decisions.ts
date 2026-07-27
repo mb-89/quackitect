@@ -7,7 +7,7 @@
 // Ops arrive as the `update` field riding any lane call. The live graph is
 // in-memory (session-scoped, like the walk); every op also appends to
 // .se/decisions.jsonl — replayable, and the retro's raw material.
-import { appendFileSync, mkdirSync } from "node:fs";
+import { appendFileSync, existsSync, mkdirSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { CLAUSES, Rejection } from "./errors.ts";
 
@@ -43,6 +43,45 @@ const SHAPE_NOTE =
   "done|obsolete|revert {node, brief?} resolves a node (brief = resolution) · " +
   "update {brief, node?} says what you are doing · " +
   "defer {node, to: <state>} parks a point for the state that can do it — it arrives there as an open to-do";
+
+/** REPLAY (owner ruling 2026-07-27): the jsonl re-arms what an engine
+ *  life left standing — parked defers that never arrived, and points
+ *  still open. Sequential; a re-minted node id shadows its ancestor (the
+ *  per-part history stays in the file for the retro). */
+export function replayFile(path: string): { parked: { state: string; brief: string }[]; open: { id: string; visit: string; brief: string }[] } {
+  if (!existsSync(path)) return { parked: [], open: [] };
+  const nodes = new Map<string, { visit: string; brief: string; open: boolean }>();
+  const parked: { state: string; brief: string }[] = [];
+  for (const line of readFileSync(path, "utf8").split("\n")) {
+    if (line.trim() === "") continue;
+    let rec: Record<string, unknown>;
+    try {
+      rec = JSON.parse(line) as Record<string, unknown>;
+    } catch {
+      continue;
+    }
+    const op = String(rec.op ?? "");
+    if (op === "plan" || op === "fork") {
+      const list = Array.isArray(rec.nodes) ? (rec.nodes as { id: string; brief: string }[]) : [];
+      for (const n of list) nodes.set(n.id, { visit: String(rec.visit ?? ""), brief: n.brief, open: true });
+      if (op === "fork" && rec.node !== undefined) nodes.set(String(rec.node), { visit: String(rec.visit ?? ""), brief: String(rec.brief ?? ""), open: true });
+    } else if (op === "done" || op === "obsolete" || op === "revert") {
+      const n = nodes.get(String(rec.node ?? ""));
+      if (n) n.open = false;
+    } else if (op === "defer") {
+      const n = nodes.get(String(rec.node ?? ""));
+      if (n) n.open = false;
+      parked.push({ state: String(rec.to ?? ""), brief: String(rec.brief ?? "") });
+    } else if (op === "defer_arrived") {
+      const brief = String(rec.brief ?? "");
+      const state = String(rec.visit ?? "").split("@")[0];
+      const i = parked.findIndex((p) => p.state === state && p.brief === brief);
+      if (i >= 0) parked.splice(i, 1);
+      if (rec.node !== undefined) nodes.set(String(rec.node), { visit: String(rec.visit ?? ""), brief, open: true });
+    }
+  }
+  return { parked, open: [...nodes.entries()].filter(([, n]) => n.open).map(([id, n]) => ({ id, visit: n.visit, brief: n.brief })) };
+}
 
 function malformed(got: string): Rejection {
   return new Rejection({
@@ -98,6 +137,9 @@ export class Decisions {
 
   constructor(seDirPath: string) {
     this.path = join(seDirPath, "decisions.jsonl");
+    // Parked defers from earlier engine lives re-arm — a reload never
+    // loses a moved point (session file only; it stays out of git).
+    this.parked.push(...replayFile(this.path).parked);
   }
 
   /** A second sink while a persistent record is bound (an expedition's
