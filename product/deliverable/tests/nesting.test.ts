@@ -9,8 +9,9 @@ import { join } from "node:path";
 import { test } from "node:test";
 import { Decisions, parseUpdate } from "../engine/decisions.ts";
 import { buildArchive, type ArchiveEntry } from "../engine/expmachine.ts";
+import { compileMachine } from "../engine/machines/compile.ts";
 import { renderMirror } from "../engine/render.ts";
-import { Session } from "../engine/session.ts";
+import { mainMachinePath, Session } from "../engine/session.ts";
 import { bootedServer, call, checkDocs, freshRoot } from "./helpers.ts";
 
 function entries(n: number): ArchiveEntry[] {
@@ -117,6 +118,23 @@ test("nesting: the walk descends into an archive decade and climbs back out", as
   assert.ok(html.includes('<b class="here">e11-e12</b>'), "the decade is the here-crumb");
   assert.ok(html.includes('href="/?view=expedition_archive"'), "its parent archive is a crumb link");
   assert.ok(html.includes('id="cur-state"'), "the header names the walk's current state");
+});
+
+test("the front desk and ideation stand as idle doors with their drawn shapes", () => {
+  const root = freshRoot();
+  const m = compileMachine(root, mainMachinePath(root));
+  const idle = m.states.find((s) => s.id === "idle")!;
+  assert.ok(idle.edges.some((e) => e.to === "front_desk"), "idle reaches the front desk");
+  assert.ok(idle.edges.some((e) => e.to === "ideation"), "idle reaches ideation");
+  const fd = m.states.find((s) => s.id === "front_desk")!;
+  assert.equal(fd.priority, 0.2);
+  assert.match(fd.statement, /in doubt, go here/i, "the door carries its subtitle");
+  const idea = m.states.find((s) => s.id === "ideation")!;
+  assert.equal(idea.priority, 1, "the ideation door sits at the slider's top notch");
+  const fdM = compileMachine(root, join(root, "product", "deliverable", "machines", "front_desk.canvas"));
+  assert.deepEqual(fdM.states.map((s) => s.id), ["start", "consult", "end"]);
+  const ideaM = compileMachine(root, join(root, "product", "deliverable", "machines", "ideation.canvas"));
+  assert.deepEqual(ideaM.states.map((s) => s.id), ["start", "frame", "diverge", "converge", "route", "end"]);
 });
 
 test("settings survive an engine life: a new session restores the store", () => {
