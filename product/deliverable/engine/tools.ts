@@ -12,7 +12,9 @@ import { CLAUSES, Rejection } from "./errors.ts";
 import { CallLog } from "./calllog.ts";
 import { parseUpdate } from "./decisions.ts";
 import { Toll } from "./toll.ts";
+import { readFileSync } from "node:fs";
 import { fileDelete, fileGlob, fileList, filePatch, fileRead, fileWrite, type PatchOp } from "./files.ts";
+import { LINT_CONFIG, lintProse } from "./lint.ts";
 import { appendNote, drainNote } from "./inbox.ts";
 import { capJson } from "./jsonio.ts";
 import { McpServer, type ToolDef } from "./mcp.ts";
@@ -402,6 +404,48 @@ export function coreTools(rootOf: () => string, projectRoot: string): ToolDef[] 
         required: ["text"],
       },
       handler: (args) => appendNote(seDir(projectRoot), String(args.text), "agent"),
+    },
+    {
+      name: "se_lint",
+      title: "se.lint",
+      description:
+        "The VOICE LINT, on demand: mechanical prose checks (walls of text, long sentences, comma chains, missing pyramid structure) over a text or a markdown file. Rule parameters are DATA (machines/lint/voice-lint.md) - edit thresholds without recompiling. Catches FORM, never meaning. Self-check your outputs before they ship; pruning sweeps it over everything later.",
+      inputSchema: {
+        type: "object",
+        properties: {
+          text: { type: "string", description: "prose to lint, verbatim" },
+          path: { type: "string", description: "a root-relative .md file to lint instead" },
+        },
+      },
+      handler: (args) => {
+        const root = rootOf();
+        if (args.path !== undefined) {
+          const p = String(args.path);
+          if (!p.endsWith(".md")) {
+            throw new Rejection({
+              clause: CLAUSES.REQUIRED_ARGS,
+              expected: "a prose file (.md) - the voice lint never reads code",
+              got: p,
+              remedy: { tool: "se_lint", args: { path: "<file>.md" }, note: "or pass text directly" },
+              source: "engine/tools.ts se_lint",
+            });
+          }
+          const abs = resolveInRoot(root, p, "engine/tools.ts se_lint");
+          const findings = lintProse(root, readFileSync(abs, "utf8"));
+          return { path: p, findings, count: findings.length, config: LINT_CONFIG };
+        }
+        if (typeof args.text === "string") {
+          const findings = lintProse(root, args.text);
+          return { findings, count: findings.length, config: LINT_CONFIG };
+        }
+        throw new Rejection({
+          clause: CLAUSES.REQUIRED_ARGS,
+          expected: "text OR path",
+          got: "neither",
+          remedy: { tool: "se_lint", args: { text: "<prose>" } },
+          source: "engine/tools.ts se_lint",
+        });
+      },
     },
     {
       name: "se_answer",

@@ -34,3 +34,13 @@
 {"ts":"2026-07-28T11:11:13.545Z","op":"update","visit":"expeditions/e16@0","node":"d33","brief":"escaping the newline check inside the served script"}
 {"ts":"2026-07-28T11:11:19.697Z","op":"update","visit":"expeditions/e16@0","node":"d34","brief":"suite rerun after the escape fix"}
 {"ts":"2026-07-28T11:11:41.319Z","op":"update","visit":"expeditions/e16@0","node":"d35","brief":"committing prewrap and the pyramid voice rules"}
+{"ts":"2026-07-28T11:18:06.577Z","op":"plan","visit":"expeditions/e16@0","parent":null,"nodes":[{"id":"d36","brief":"voice lint engine with parameters as data"},{"id":"d37","brief":"se_lint tool on demand"},{"id":"d38","brief":"engineering rules doc - data is not code"},{"id":"d39","brief":"progressive disclosure method card grounded and referenced"},{"id":"d40","brief":"lint tests and green suite - e16 stays open"}]}
+{"ts":"2026-07-28T11:18:11.409Z","op":"update","visit":"expeditions/e16@0","node":"d41","brief":"no search key - fetching the nielsen norman source directly"}
+{"ts":"2026-07-28T11:18:43.080Z","op":"update","visit":"expeditions/e16@0","node":"d42","brief":"lint engine written - parameters load from the config file"}
+{"ts":"2026-07-28T11:18:50.645Z","op":"update","visit":"expeditions/e16@0","node":"d43","brief":"the lint config file holds the thresholds"}
+{"ts":"2026-07-28T11:19:04.502Z","op":"update","visit":"expeditions/e16@0","node":"d44","brief":"se_lint tool joins the lane"}
+{"ts":"2026-07-28T11:19:12.347Z","op":"update","visit":"expeditions/e16@0","node":"d45","brief":"engineering rules doc carries data-is-not-code"}
+{"ts":"2026-07-28T11:19:24.937Z","op":"update","visit":"expeditions/e16@0","node":"d46","brief":"progressive disclosure joins the method shelf grounded"}
+{"ts":"2026-07-28T11:19:40.291Z","op":"update","visit":"expeditions/e16@0","node":"d47","brief":"lint test proves thresholds are live data"}
+{"ts":"2026-07-28T11:19:45.354Z","op":"update","visit":"expeditions/e16@0","node":"d48","brief":"suite over the lint round"}
+{"ts":"2026-07-28T11:20:07.353Z","op":"done","visit":"expeditions/e16@0","node":"d36","brief":"lint engine and config land with live thresholds"}

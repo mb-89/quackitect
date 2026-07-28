@@ -153,6 +153,22 @@ test("settings survive an engine life: a new session restores the store", () => 
   assert.equal(b.shutdown, 3);
 });
 
+test("the voice lint: walls, sentences, chains and the pyramid - thresholds are data", async () => {
+  const { lintProse } = await import("../engine/lint.ts");
+  const { writeFileSync } = await import("node:fs");
+  const root = freshRoot();
+  const wall = Array.from({ length: 9 }, (_, i) => `plain prose line number ${i} of the wall`).join("\n");
+  assert.ok(lintProse(root, wall).some((f) => f.rule === "wall"), "nine unbroken lines are a wall");
+  assert.ok(lintProse(root, `${"word ".repeat(30)}end.`).some((f) => f.rule === "long-sentence"));
+  assert.ok(lintProse(root, "we need alpha, beta, gamma, delta and epsilon.").some((f) => f.rule === "comma-chain"));
+  const five = Array.from({ length: 5 }, (_, i) => `paragraph ${i}.`).join("\n\n");
+  assert.ok(lintProse(root, five).some((f) => f.rule === "pyramid"), "five headingless paragraphs want the pyramid");
+  assert.equal(lintProse(root, "# Heading\n\nshort and clean.").length, 0, "clean prose passes");
+  // DATA, not code: raise the threshold in the config - the wall passes.
+  writeFileSync(join(root, "product", "deliverable", "machines", "lint", "voice-lint.md"), "---\nwall_paragraph_lines: 99\n---\n", "utf8");
+  assert.ok(!lintProse(root, wall).some((f) => f.rule === "wall"), "the edited threshold applies without a rebuild");
+});
+
 test("se_answer records an aq entry and the feed types it aq", async () => {
   const root = freshRoot();
   const server = await bootedServer(root);

@@ -107,7 +107,7 @@ Write plainly. These are rules, not suggestions. They bind every output: chat, d
 
 ### Structure
 - Progressive disclosure. Give the whole picture first. Then the detail. The reader stops when they have enough.
-- Longer texts (roughly five paragraphs and up) take the PYRAMID shape. A TLDR or abstract at the top. Then the high-level view. Then deepening detail. The fully detailed discussion sits at the bottom. A single paragraph needs none of this.
+- Longer texts (roughly five paragraphs and up) take the PYRAMID shape. A TLDR or abstract at the top. Then the high-level view. Then deepening detail. The fully detailed discussion sits at the bottom. A single paragraph needs none of this. The method card holds the depth - product/deliverable/machines/methods/progressive-disclosure.md.
 - Diátaxis (diataxis.fr) for docs. Keep the four modes apart: tutorial, how-to, reference, explanation. Do not blend them in one place.
 - Keep internals out of prose. The general reader does not care how the system works inside. Put internals and AI guidance in one guidance chapter. Link it with a `guidance:` frontmatter tag. The interested reader follows it. The average reader is not forced through it.
 - ENTRY documents carry no method jargon (owner law, 2026-07-12). The README and anything a stranger reads FIRST use plain language only - a method term (suspect, bless, cone, gate) may appear where its definition is one click away (the book's termrefs), never bare in the front door. The i17 red-team and the i19 cold-read both caught exactly this; the terms lint cannot see the README, so the rule holds by authorship.
