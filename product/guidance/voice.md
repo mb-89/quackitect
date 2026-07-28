@@ -19,6 +19,7 @@ Write plainly. These are rules, not suggestions. They bind every output: chat, d
 ### Paragraphs
 - One thought group per paragraph. A new thought starts a new paragraph.
 - A wall of text is a defect. Readers are not native speakers. Their patience is limited. Structure is mercy.
+- Long prose carries line breaks. Every HTML surface renders them (pre-wrap). The lane refuses a breakless wall mechanically (SE-C-125). The render cannot invent paragraphs — the author supplies them.
 - Embedded prose fields follow the same rules. State guidance, tool descriptions, form help — short sentences, paragraphs, lists. Never one long block.
 
 ### Lists

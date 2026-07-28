@@ -4,20 +4,20 @@
     "type": "split",
     "children": [
       {
-        "id": "bef63a4aeaf01db3",
+        "id": "8187625f08795410",
         "type": "tabs",
         "children": [
           {
-            "id": "5969142b02d143c4",
+            "id": "b4ae931dcf7ab0f2",
             "type": "leaf",
             "state": {
               "type": "canvas",
               "state": {
                 "file": "deliverable/machines/main.canvas",
                 "viewState": {
-                  "x": 429.48799920271296,
-                  "y": 178.47926259072037,
-                  "zoom": -0.12307059260639608
+                  "x": 1097.5424184838841,
+                  "y": 45.33051695733022,
+                  "zoom": -0.635570586440857
                 }
               },
               "icon": "lucide-layout-dashboard",
@@ -186,10 +186,11 @@
       "bases:Create new base": false
     }
   },
-  "active": "5969142b02d143c4",
+  "active": "b4ae931dcf7ab0f2",
   "lastOpenFiles": [
-    "deliverable/machines/retro.canvas",
+    "deliverable/machines/scale.md",
     "deliverable/machines/main.canvas",
+    "deliverable/machines/retro.canvas",
     "deliverable/machines/states/read_contract.md",
     "deliverable/tests/threshold.test.ts",
     "deliverable/engine/mirror.ts",
