@@ -43,11 +43,32 @@ const LABEL_CH = 15.6; // monospace advance at the .label size
 const SUB_CH = 10.2; // ditto at .sublabel
 const BOX_PAD = 26;
 
-/** The birth size of a drawn node: what its title and subtitle need, nothing
- *  more. This is a STARTING POINT a person then adjusts — never a size the
- *  render re-imposes later. */
+// A BOX IS SIZED BY THE TEXT IT SHOWS, NEVER BY THE TEXT IT HOLDS (owner
+// ruling 2026-07-28). A generated expedition's subtitle is its whole goal
+// statement — a thousand characters — while the drawing paints only the first
+// line of it. Sizing from the full statement made e20's box 10793px wide to
+// carry 48 visible characters, and no person can fix that in Obsidian because
+// the node is generated. Both ends now read the SAME shortened label.
+export const SUB_MAX = 48;
+
+/** The subtitle as it is actually DRAWN — the single source both the size and
+ *  the render measure. */
+export function subLabel(subtitle?: string): string | undefined {
+  if (subtitle === undefined || subtitle === "") return undefined;
+  return subtitle.length > SUB_MAX ? `${subtitle.slice(0, SUB_MAX - 1)}…` : subtitle;
+}
+
+// The ceiling, for the title's sake: a shortened subtitle cannot pass it, but
+// a generated id can be long, and a box wider than this is unreadable on any
+// screen the drawing is meant to fit.
+const MAX_W = 560;
+
+/** The birth size of a drawn node: what its title and shown subtitle need,
+ *  nothing more. This is a STARTING POINT a person then adjusts — never a size
+ *  the render re-imposes later. */
 export function nodeSize(title: string, subtitle?: string): { width: number; height: number } {
-  const sub = subtitle !== undefined && subtitle !== "" ? subtitle : undefined;
+  const sub = subLabel(subtitle);
   const wide = Math.max(title.length * LABEL_CH, (sub ?? "").length * SUB_CH);
-  return { width: Math.max(200, Math.ceil(wide) + BOX_PAD * 2), height: sub === undefined ? 72 : 100 };
+  const width = Math.min(MAX_W, Math.max(200, Math.ceil(wide) + BOX_PAD * 2));
+  return { width, height: sub === undefined ? 72 : 100 };
 }

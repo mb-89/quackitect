@@ -13,7 +13,7 @@
 import { strict as assert } from "node:assert";
 import { readFileSync } from "node:fs";
 import { test } from "node:test";
-import { nodeSize } from "../engine/canvas.ts";
+import { nodeSize, SUB_MAX, subLabel } from "../engine/canvas.ts";
 import { renderMirror } from "../engine/render.ts";
 import { Session } from "../engine/session.ts";
 import { freshRoot } from "./helpers.ts";
@@ -59,4 +59,27 @@ test("a new node is born the size of its title and subtitle", () => {
   assert.ok(nodeSize("a_very_long_state_identifier_indeed").width > bare.width, "a longer title needs a wider box");
   // The struck rule: nothing is born anywhere near 620x640 any more.
   assert.ok(withSub.height < 640, "the 620x640 birth size is struck");
+});
+
+// A GENERATED BOX IS SIZED BY WHAT IT SHOWS (owner ruling 2026-07-28). An
+// expedition's subtitle is its whole goal statement, and sizing from that made
+// e20's box 10793px wide to display 48 characters. Nobody could fix it in
+// Obsidian either, because the node is generated on every render.
+test("a long statement widens the box no further than the text it shows", () => {
+  const shown = "x".repeat(SUB_MAX);
+  const essay = "x".repeat(4000);
+  assert.equal(nodeSize("e20", essay).width, nodeSize("e20", shown).width, "past the cut, more text buys no more width");
+  assert.ok(nodeSize("e20", essay).width <= 560, "and no box is ever wider than the ceiling");
+  assert.ok(nodeSize("a_very_long_state_identifier_indeed_and_then_some_more").width <= 560, "a long title is capped too");
+});
+
+// One shortening, two readers. They drifted apart once already: the render cut
+// the subtitle at 48 while the size measured all thousand characters.
+test("the drawing and the size read the same shortened subtitle", () => {
+  const src = readFileSync(new URL("../engine/render.ts", import.meta.url), "utf8");
+  assert.ok(src.includes("subLabel("), "the render shortens through the shared helper");
+  assert.ok(!/slice\(0, *4[0-9]\)/.test(src), "and keeps no truncation of its own to drift");
+  assert.equal(subLabel("x".repeat(4000))!.length, SUB_MAX, "the shortened label is exactly the cut length");
+  assert.equal(subLabel("short"), "short", "a short subtitle passes through untouched");
+  assert.equal(subLabel(""), undefined, "an empty subtitle is no subtitle");
 });

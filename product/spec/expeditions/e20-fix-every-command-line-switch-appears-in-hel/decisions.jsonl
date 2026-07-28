@@ -35,3 +35,19 @@
 {"ts":"2026-07-28T17:59:57.618Z","op":"update","visit":"expeditions/e20@1","node":"d46","brief":"running the full suite with the compactor and its tool"}
 {"ts":"2026-07-28T18:00:22.625Z","op":"update","visit":"expeditions/e20@1","node":"d47","brief":"dry-running the compactor over every canvas"}
 {"ts":"2026-07-28T18:00:30.268Z","op":"update","visit":"expeditions/e20@1","node":"d48","brief":"committing the compactor to e20's branch"}
+{"ts":"2026-07-28T18:00:34.961Z","op":"update","visit":"expeditions/e20@1","node":"d49","brief":"compactor committed"}
+{"ts":"2026-07-28T18:00:41.295Z","op":"update","visit":"expeditions/e20@1","node":"d50","brief":"publishing the compactor to trunk for the restart"}
+{"ts":"2026-07-28T18:01:05.858Z","op":"update","visit":"expeditions/e20@1","node":"d51","brief":"the handover carries the compactor and its dry-run numbers"}
+{"ts":"2026-07-28T18:01:20.127Z","op":"update","visit":"expeditions/e20@1","node":"d52","brief":"handover TLDR reflects the compactor and 138 tests"}
+{"ts":"2026-07-28T18:45:46.191Z","op":"plan","visit":"expeditions/e20@0","parent":null,"nodes":[{"id":"d4","brief":"Read the sidebar width the owner dragged to, from the live mirror"},{"id":"d5","brief":"Bake that width in as the sidebar default"},{"id":"d6","brief":"Quit kills the detached pseudo-terminal host"},{"id":"d7","brief":"The mirror shows the session ended"},{"id":"d8","brief":"Preflight and selftest green"}]}
+{"ts":"2026-07-28T18:50:00.135Z","op":"update","visit":"expeditions/e20@0","node":"d9","brief":"checking the worktree state: render.ts here is ahead of trunk"}
+{"ts":"2026-07-28T18:50:35.850Z","op":"fork","visit":"expeditions/e20@0","parent":"d4","node":"d10","brief":"the e20 worktree is stale against trunk - sync before editing","nodes":[]}
+{"ts":"2026-07-28T18:50:46.850Z","op":"update","visit":"expeditions/e20@0","node":"d11","brief":"fast-forwarding the e20 worktree onto trunk"}
+{"ts":"2026-07-28T18:51:59.850Z","op":"update","visit":"expeditions/e20@0","node":"d12","brief":"box width now follows the shown subtitle, capped at 560px"}
+{"ts":"2026-07-28T18:52:41.395Z","op":"update","visit":"expeditions/e20@0","node":"d13","brief":"the expedition row geometry follows the box sizes now"}
+{"ts":"2026-07-28T18:52:56.877Z","op":"update","visit":"expeditions/e20@0","node":"d14","brief":"test pins the cap and the shared shortening"}
+{"ts":"2026-07-28T18:53:05.062Z","op":"update","visit":"expeditions/e20@0","node":"d15","brief":"the sidebar default is now 465px, the width the owner dragged to"}
+{"ts":"2026-07-28T18:55:01.846Z","op":"update","visit":"expeditions/e20@0","node":"d16","brief":"the mirror shows the session ended and never closes its own tab"}
+{"ts":"2026-07-28T18:56:29.412Z","op":"update","visit":"expeditions/e20@0","node":"d17","brief":"quit is announced to the mirror instead of inferred from silence"}
+{"ts":"2026-07-28T18:56:59.336Z","op":"update","visit":"expeditions/e20@0","node":"d18","brief":"running preflight and the full suite over all four changes"}
+{"ts":"2026-07-28T18:57:32.117Z","op":"update","visit":"expeditions/e20@0","node":"d19","brief":"staging the four changes"}

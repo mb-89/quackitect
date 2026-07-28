@@ -138,7 +138,11 @@ if (argv.includes("--child") || process.env.SE_HOT_DISABLE === "1") {
   }
 
   process.stderr.write(`se-mcp 3.0.0-bootstrap root=${root} autonomy=${session.autonomy}\n`);
-  runStdio(buildServer(root, session));
+  runStdio(buildServer(root, session), () => {
+    process.stderr.write("se-mcp: the console quit — telling the mirror, then shutting down\n");
+    session.markServerGone();
+    setTimeout(() => process.exit(0), 700);
+  });
 } else {
   // ── THE SHIM — dumb on purpose: it never imports the engine and never
   //    watches sources. It spawns the child, forwards lines, and respawns
@@ -207,8 +211,14 @@ if (argv.includes("--child") || process.env.SE_HOT_DISABLE === "1") {
     const drain = setInterval(() => {
       if (pending.size === 0 || Date.now() - started > 3000) {
         clearInterval(drain);
-        child?.kill();
-        process.exit(0);
+        // CLOSE THE LANE, DO NOT SHOOT THE ENGINE. Ending stdin is what tells
+        // the child the console quit, and it needs a breath to push that to
+        // every open mirror. The kill is only the backstop.
+        child?.stdin?.end();
+        setTimeout(() => {
+          child?.kill();
+          process.exit(0);
+        }, 1200);
       }
     }, 50);
   });

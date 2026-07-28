@@ -32,6 +32,8 @@ export function startMirror(o: MirrorOptions): Server {
    *  for the feed. One shape, served both as a poll and as a pushed event. */
   const aliveState = (): Record<string, unknown> => ({
     status: state.session.instance.status,
+    // The server is going away with the walk unfinished — a quit, not an end.
+    gone: state.session.serverGone,
     autonomy: state.session.autonomy,
     shutdown: state.session.shutdown,
     active: state.session.active(),

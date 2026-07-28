@@ -157,6 +157,34 @@ test("the terminal pane and its splitter ship hidden until a host answers", () =
   assert.ok(html.includes('document.querySelectorAll(".no-host").forEach((el) => el.classList.remove("no-host"));'), "a host that answers is what reveals them");
 });
 
+// THE END IS SHOWN, NOT GUESSED (owner ruling 2026-07-28). Quitting at the
+// console left a mirror that looked perfectly alive: the page tried to close
+// its own tab, the browsers that refused waited out a twenty-second timeout,
+// and the sentence it finally showed blamed an end the walk never reached.
+test("the mirror reports the end and never closes its own window", () => {
+  const root = freshRoot();
+  const html = renderMirror({ session: new Session(root), root, lastPacket: undefined, mode: "agent" });
+  assert.ok(!html.includes("window.close()"), "the page never closes the reader's tab");
+  assert.ok(html.includes("SESSION OVER"), "the end is stated in full");
+  assert.ok(html.includes("link-lost"), "and a dropped link says so at once, rather than in silence");
+  // Three ways a session can stop, three different sentences. They shared one
+  // before, which is how a quit came to report that the machine reached end.
+  assert.ok(html.includes("the machine reached end"), "reaching end reads as reaching end");
+  assert.ok(html.includes("the console quit"), "a quit reads as a quit");
+  assert.ok(html.includes("the server stopped answering"), "and an unannounced death reads as one");
+});
+
+// A QUIT IS ANNOUNCED, NOT INFERRED. The engine learns of it when the lane
+// closes, and it knows before any watcher could. Pushing it costs one message
+// and saves the reader the whole death timeout.
+test("the session's departure is a signal of its own, separate from end", () => {
+  const session = new Session(freshRoot());
+  assert.equal(session.serverGone, false, "a running session has not gone anywhere");
+  session.markServerGone();
+  assert.equal(session.serverGone, true, "the departure is recorded");
+  assert.equal(session.instance.status, "open", "and the unfinished walk is NOT recorded as complete");
+});
+
 // ONE SURFACE NEVER RESETS ANOTHER (owner ruling 2026-07-28). Switching the
 // machine on screen used to throw the details pane away, because the view URL
 // carried only the view. The reader had a log entry open; changing what they

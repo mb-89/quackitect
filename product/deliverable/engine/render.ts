@@ -13,7 +13,7 @@
 //   - geometry-true SVG, wheel-zoom, drag-pan; JSON as key/value tables
 // One source, two projections: the packet JSON shown here IS what the
 // agent receives.
-import { loadCanvas, type CanvasData, type CanvasElement } from "./canvas.ts";
+import { loadCanvas, subLabel, type CanvasData, type CanvasElement } from "./canvas.ts";
 import { CallLog, type CallRecord } from "./calllog.ts";
 import { type StrayNote } from "./inbox.ts";
 import { loadLevels } from "./scale.ts";
@@ -142,8 +142,7 @@ function machineSvg(source: CanvasData, activeIds: Set<string>, doneIds: Set<str
       // Sub-machine states carry a DOUBLE border.
       parts.push(`<rect x="${n.x + 8}" y="${n.y + 8}" width="${n.width - 16}" height="${n.height - 16}" rx="${Math.max(4, rx - 8)}" class="${cls} inner"/>`);
     }
-    const subFull = meta[sid]?.subtitle;
-    const sub = subFull !== undefined && subFull.length > 48 ? `${subFull.slice(0, 47)}…` : subFull;
+    const sub = subLabel(meta[sid]?.subtitle);
     parts.push(`<text x="${n.x + n.width / 2}" y="${n.y + n.height / 2 + (sub !== undefined ? -6 : 6)}" class="label">${esc(sid)}</text>`);
     if (sub !== undefined) parts.push(`<text x="${n.x + n.width / 2}" y="${n.y + n.height / 2 + 24}" class="sublabel">${esc(sub)}</text>`);
     parts.push("</g>");
@@ -285,7 +284,9 @@ const STYLE = `
   main { flex: 1; min-width: 0; display: flex; flex-direction: column; padding: 14px 18px; }
   .divider { width: 6px; cursor: col-resize; background: #2a2f34; flex: none; }
   .divider.horiz { width: auto; height: 6px; cursor: row-resize; }
-  aside { width: 620px; min-width: 320px; max-width: 80vw; display: flex; flex-direction: column; background: #191d21; }
+  /* 465px is the width the owner settled the sidebar at by dragging it, and
+     a default nobody re-drags is the only evidence a default is right. */
+  aside { width: 465px; min-width: 320px; max-width: 80vw; display: flex; flex-direction: column; background: #191d21; }
   /* THE LEFT COLUMN: the feed on top, the agent's terminal beneath it.
      SIZED FOR AN 80-COLUMN TERMINAL (owner ruling 2026-07-28). 820px was
      too wide; narrowing it without sizing the terminal would just have made
@@ -423,6 +424,7 @@ const STYLE = `
   .modal-body { padding: 12px 16px; overflow: auto; font-size: 13px; }
   a.toollink { color: #7cc4e8; text-decoration: underline; cursor: pointer; margin-right: 10px; }
   #toast { position: fixed; left: 14px; bottom: 14px; background: #22272c; border: 1px solid #3a4147; border-radius: 8px; padding: 8px 14px; color: #d8dde2; font-size: 12.5px; z-index: 90; display: none; }
+  #link-lost { position: fixed; left: 0; right: 0; top: 0; z-index: 99; background: #4a3a14; color: #e8b339; text-align: center; padding: 7px; font-size: 13px; letter-spacing: .04em; }
   #over { position: fixed; inset: 0; background: rgba(20,23,26,.94); z-index: 100; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; }
   #over .over-box { color: #e8332a; font-size: 62px; font-weight: 800; letter-spacing: .12em; border: 6px solid #e8332a; border-radius: 18px; padding: 26px 52px; }
   #over .over-sub { color: #e86a5f; font-size: 15px; }
@@ -1330,15 +1332,34 @@ document.addEventListener("click", (ev) => {
 // SESSION OVER — anybody reaching end stops the whole session. The mirror
 // tries to close its window; where that is not allowed, the big red
 // message stands (owner ruling 2026-07-26).
-function sessionOver() {
-  if (document.getElementById("over")) return;
+// THE WINDOW STAYS OPEN, AND IT SAYS SO (owner ruling 2026-07-28). This used
+// to try to close its own tab, which is exactly why the end was never seen:
+// quitting at the console left a page that either vanished or sat there
+// looking perfectly alive. Nothing closes itself now. The page reports.
+//
+// Losing the link is not the same as reaching end, and the two no longer
+// share one sentence. A dropped connection says so AT ONCE, because silence
+// reads as breakage; only a silence that outlasts an engine reload is death.
+function linkLost(on) {
+  const had = document.getElementById("link-lost");
+  if (!on) { if (had) had.remove(); return; }
+  if (had || document.getElementById("over")) return;
+  const d = document.createElement("div");
+  d.id = "link-lost";
+  d.textContent = "the link to the server is down — reconnecting";
+  document.body.appendChild(d);
+}
+function sessionOver(why) {
+  linkLost(false);
+  const had = document.getElementById("over");
+  if (had) return;
   const d = document.createElement("div");
   d.id = "over";
-  d.innerHTML = '<div class="over-box">SESSION OVER</div><div class="over-sub">the machine reached end — the server has shut down</div>';
+  d.innerHTML = '<div class="over-box">SESSION OVER</div><div class="over-sub"></div>';
+  d.querySelector(".over-sub").textContent = why;
   document.body.appendChild(d);
-  try { window.close(); } catch (e) { /* user-opened windows refuse */ }
 }
-if (D.describe.status === "closed") sessionOver();
+if (D.describe.status === "closed") sessionOver("the machine reached end — the walk is complete");
 
 // THE MIRROR IS PUSHED, NOT POLLED (owner ruling 2026-07-28). The walk
 // wakes every held hand, and /events forwards that wake here — so a change
@@ -1352,16 +1373,21 @@ let deathTimer = null;
 const es = new EventSource("/events");
 es.addEventListener("open", () => {
   if (deathTimer !== null) { clearTimeout(deathTimer); deathTimer = null; }
+  linkLost(false);
   if (sawError) { sawError = false; refresh(); }
 });
 es.addEventListener("error", () => {
   sawError = true;
-  if (deathTimer === null) deathTimer = setTimeout(sessionOver, 20000);
+  linkLost(true);
+  // Long enough that an ordered reload reconnects inside it, short enough
+  // that a reader who quit is not left guessing.
+  if (deathTimer === null) deathTimer = setTimeout(() => sessionOver("the server stopped answering — the session it served is gone"), 10000);
 });
 es.addEventListener("message", (ev) => {
   let a;
   try { a = JSON.parse(ev.data); } catch (e) { return; }
-  if (a.status === "closed") { sessionOver(); return; }
+  if (a.status === "closed") { sessionOver("the machine reached end — the walk is complete"); return; }
+  if (a.gone) { sessionOver("the console quit — the server has stopped, the walk was left standing"); return; }
   if (thr && document.activeElement !== thr && Number(thr.value) !== a.autonomy) {
     thr.value = a.autonomy;
     const lbl = document.getElementById("thr-val");

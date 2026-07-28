@@ -66,9 +66,17 @@ export function generateContinueExpedition(root: string): GeneratedMachine {
   const nodes: GenNode[] = [];
   const edges: CanvasEdge[] = [];
 
-  const centerY = open.length === 0 ? 80 : ((open.length - 1) * 560) / 2 + 100;
+  // THE ROW FOLLOWS THE BOXES, THE BOXES DO NOT FOLLOW THE ROW. These numbers
+  // were hand-tuned for the struck 620x360 birth size, so a box that shrank to
+  // its label left a group four times too wide around it.
+  const ROW_STEP = 300; // group height plus the gap between two expeditions
+  const GUTTER = 140; // between the work box and its leave box
+  const PAD = 60; // group border to box
+  const centerY = open.length === 0 ? 80 : ((open.length - 1) * ROW_STEP) / 2 + 50;
   nodes.push({ id: "n-start", type: "file", file: "start.md", x: -1400, y: centerY, width: 160, height: 160, styleAttributes: { shape: "pill" } });
-  nodes.push({ id: "n-end", type: "file", file: "end.md", x: 1240, y: centerY, width: 160, height: 160, styleAttributes: { shape: "pill" } });
+  const endNode: GenNode = { id: "n-end", type: "file", file: "end.md", x: 0, y: centerY, width: 160, height: 160, styleAttributes: { shape: "pill" } };
+  nodes.push(endNode);
+  let rightmost = -740;
 
   open.forEach((e, i) => {
     const sid = shortId(e.id);
@@ -82,14 +90,22 @@ export function generateContinueExpedition(root: string): GeneratedMachine {
     // for EVERY expedition, and one coming home is the whole point.
     states.push({ ...leaveTpl, id: leaveId, statement: "", edges: [{ to: "end", role: "alternative" }] });
     start.edges.push({ to: workId, role: "normal" });
-    const y = i * 560;
-    nodes.push({ id: `g-${sid}`, type: "group", x: -800, y: y - 60, width: 1720, height: 480, label: e.id });
-    nodes.push({ id: `n-${workId}`, type: "file", file: `${workId}.md`, x: -740, y, ...nodeSize(workId, goal) });
-    nodes.push({ id: `n-${leaveId}`, type: "file", file: `${leaveId}.md`, x: 140, y, ...nodeSize(leaveId) });
+    const y = i * ROW_STEP;
+    const workBox = nodeSize(workId, goal);
+    const leaveBox = nodeSize(leaveId);
+    const workX = -740;
+    const leaveX = workX + workBox.width + GUTTER;
+    const right = leaveX + leaveBox.width;
+    if (right > rightmost) rightmost = right;
+    const rowH = Math.max(workBox.height, leaveBox.height);
+    nodes.push({ id: `g-${sid}`, type: "group", x: workX - PAD, y: y - PAD, width: right + PAD - (workX - PAD), height: rowH + PAD * 2, label: e.id });
+    nodes.push({ id: `n-${workId}`, type: "file", file: `${workId}.md`, x: workX, y, ...workBox });
+    nodes.push({ id: `n-${leaveId}`, type: "file", file: `${leaveId}.md`, x: leaveX, y, ...leaveBox });
     edges.push({ id: `e-start-${workId}`, fromNode: "n-start", toNode: `n-${workId}` });
     edges.push({ id: `e-${workId}-${leaveId}`, fromNode: `n-${workId}`, toNode: `n-${leaveId}` });
     edges.push({ id: `e-${leaveId}-end`, fromNode: `n-${leaveId}`, toNode: "n-end" });
   });
+  endNode.x = rightmost + 260;
   if (open.length === 0) {
     start.edges.push({ to: "end", role: "normal" });
     edges.push({ id: "e-start-end", fromNode: "n-start", toNode: "n-end" });

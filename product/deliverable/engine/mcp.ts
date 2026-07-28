@@ -173,9 +173,13 @@ export class McpServer {
   }
 }
 
-/** stdio loop: one JSON message per line, UTF-8. */
-export function runStdio(server: McpServer): void {
+/** stdio loop: one JSON message per line, UTF-8. onGone fires when the lane
+ *  closes — the only notice the engine gets that the console quit. Without it
+ *  the mirror can only infer death from silence, and the reader waits out a
+ *  timeout for an answer the server already had. */
+export function runStdio(server: McpServer, onGone?: () => void): void {
   const rl = createInterface({ input: process.stdin, terminal: false });
+  rl.on("close", () => onGone?.());
   rl.on("line", (line) => {
     const trimmed = line.trim();
     if (trimmed === "") return;

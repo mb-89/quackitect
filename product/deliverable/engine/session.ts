@@ -211,6 +211,18 @@ export class Session {
   //    nearest thing to "the machine sends an update to the agent". ────────
   private waiters: Array<() => void> = [];
 
+  // THE CONSOLE QUIT — distinct from reaching end. The walk is unfinished, so
+  // the machine's own status stays open and honest; what ended is the SERVER.
+  // Conflating the two would record an abandoned walk as a completed one.
+  serverGone = false;
+
+  /** Announce the server's departure and wake every held hand at once, so an
+   *  open mirror hears it instead of waiting out the death timeout. */
+  markServerGone(): void {
+    this.serverGone = true;
+    this.notifyChange();
+  }
+
   /** Wake every held wait — called on every successful change of the walk. */
   private notifyChange(): void {
     const held = this.waiters;
