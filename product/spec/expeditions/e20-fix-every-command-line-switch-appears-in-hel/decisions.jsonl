@@ -15,3 +15,7 @@
 {"ts":"2026-07-28T17:42:45.902Z","op":"update","visit":"expeditions/e20@0","node":"d27","brief":"ideation moves into the main row; the end pill slides right"}
 {"ts":"2026-07-28T17:42:49.067Z","op":"done","visit":"expeditions/e20@0","node":"d23","brief":"the ideation-only row is closed; canvas still compiles"}
 {"ts":"2026-07-28T17:43:13.135Z","op":"done","visit":"expeditions/e20@0","node":"d19","brief":"the machine pane holds its size, because the columns beside it now do"}
+{"ts":"2026-07-28T17:43:18.430Z","op":"done","visit":"expeditions/e20@0","node":"d14","brief":"help.test.ts guards the rule end to end"}
+{"ts":"2026-07-28T17:51:04.024Z","op":"fork","visit":"expeditions/e20@0","parent":null,"node":"d28","brief":"size the left column for an 80-column terminal, not two thirds","nodes":[]}
+{"ts":"2026-07-28T17:51:17.969Z","op":"update","visit":"expeditions/e20@0","node":"d29","brief":"verifying the 80-column sizing against the suite"}
+{"ts":"2026-07-28T17:52:34.810Z","op":"update","visit":"expeditions/e20@0","node":"d30","brief":"committing the 80-column sizing to e20's branch"}

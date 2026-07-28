@@ -152,12 +152,20 @@ test("pane sizes are stored on release and restored on load", () => {
   assert.ok(html.includes("Math.min(px, room - 120)"), "a stored size is clamped to the room there actually is");
 });
 
-// The left column starts narrower than it used to (owner, 2026-07-28): two
-// thirds of the old 820px. It is only a starting point — the stored size wins.
-test("the left column's default width is two thirds of the old one", () => {
+// THE COLUMN IS SIZED BY THE TERMINAL IN IT (owner ruling 2026-07-28). 820px
+// was too wide, but narrowing it alone would only have made the agent wrap
+// early — the width and the column count are one decision, not two.
+test("the left column's default width holds an 80-column terminal", () => {
   const root = freshRoot();
   const html = renderMirror({ session: new Session(root), root, lastPacket: undefined, mode: "manual" });
-  assert.match(html, /#left \{ width: 547px;/, "820px was too wide by default");
+  const m = /#left \{ width: (\d+)px;/.exec(html);
+  assert.ok(m !== null, "the left column still declares a starting width");
+  // The client measures a real glyph and floors the division, so the column
+  // must clear 80 cells at the widest a 13px monospace cell gets.
+  const CELL_MAX = 8;
+  const SCROLLBAR = 10;
+  assert.ok(Number(m[1]) - SCROLLBAR >= 80 * CELL_MAX, `${m[1]}px cannot hold 80 columns`);
+  assert.ok(Number(m[1]) < 820, "and it is narrower than the 820px the owner called too wide");
 });
 
 // HUMAN-RUNNABLE TOOLS RIDE THE LEGAL-TOOLS LINKS (owner ruling 2026-07-28).

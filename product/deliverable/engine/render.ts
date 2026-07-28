@@ -387,9 +387,13 @@ const STYLE = `
   .divider.horiz { width: auto; height: 6px; cursor: row-resize; }
   aside { width: 620px; min-width: 320px; max-width: 80vw; display: flex; flex-direction: column; background: #191d21; }
   /* THE LEFT COLUMN: the feed on top, the agent's terminal beneath it.
-     This width is a STARTING POINT only. The divider moves it, and the size
-     the reader lands on is stored and reused from then on. */
-  #left { width: 547px; min-width: 360px; }
+     SIZED FOR AN 80-COLUMN TERMINAL (owner ruling 2026-07-28). 820px was
+     too wide; narrowing it without sizing the terminal would just have made
+     the agent wrap early. 80 columns x 8px + 10px for the scrollbar = 650.
+     8px is the UPPER bound for a 13px monospace cell, so 80 is a floor here,
+     never a target. The divider moves it, and the size the reader lands on
+     is stored and reused from then on. */
+  #left { width: 650px; min-width: 360px; }
   #left #w-log { flex: 1; min-height: 0; }
   /* HALF THE COLUMN TO START, then the reader's (owner ruling 2026-07-28).
      It used to be flex:none with no height, so the box was as tall as its
