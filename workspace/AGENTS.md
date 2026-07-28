@@ -42,7 +42,7 @@ tool. The `se` lane replaces every one of them, as good or better:
 | Bash | `se_run` (output captured in full under the returned ref) |
 | git (via Bash) | `se_git` (allowlisted; push stays with the user) |
 | WebFetch | `se_web_fetch` |
-| WebSearch | `se_web_search` |
+| WebSearch | ALLOWED natively (owner ruling 2026-07-28) — web search runs on the provider's backend and cannot be self-hosted keylessly. THE LOGGING DUTY rides the exception: after every native search, record the query and what it found as an update, so the mirror still tells the story. `se_web_search` stays for key-configured setups. |
 | your own history | `se_log_query` |
 
 Paths are root-relative to the project root (the folder holding `product/`
