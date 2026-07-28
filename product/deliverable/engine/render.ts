@@ -152,6 +152,7 @@ function briefFor(rec: CallRecord): string {
     }
     case "se_note":
     case "mirror_note": return String(a.text ?? "");
+    case "se_answer": return String(a.question ?? "");
     case "mirror_tool": return `tool ${a.name}`;
     case "mirror_escape": return `escape: ${a.reason}`;
     case "mirror_form_save": return `form save ${a.name}`;
@@ -192,7 +193,7 @@ export function feedRows(log: CallLog, since: string, pending: StrayNote[] = [])
     src: rec.tool.startsWith("mirror_") ? "human" : "agent",
     // Updates are NARRATION (bold), whatever their op — only se_note
     // strays are retro notes (italic). Two kinds, never conflated.
-    type: rec.tool === "se_update" ? "update" : rec.tool === "se_note" || rec.tool === "mirror_note" ? "note" : "call",
+    type: rec.tool === "se_update" ? "update" : rec.tool === "se_note" || rec.tool === "mirror_note" ? "note" : rec.tool === "se_answer" ? "aq" : "call",
     brief: briefFor(rec).slice(0, 90),
     ok: rec.ok,
     ...(rec.ok ? {} : { clause: (rec.response as { clause?: string } | undefined)?.clause }),
@@ -322,9 +323,12 @@ const STYLE = `
   .logrow .lt { color: #7f8b96; flex: 0 0 auto; }
   .logrow .lsrc { flex: 0 0 5.5ch; color: #7cc4e8; }
   .logrow .lsrc.human { color: #e8b339; }
+  .logrow .lkind { flex: 0 0 6.5ch; }
+  .logrow .lkind.k-call { color: #7f8b96; }
+  .logrow .lkind.k-update { font-weight: 700; color: #e8b339; }
+  .logrow .lkind.k-note { font-style: italic; color: #c58fe8; }
+  .logrow .lkind.k-aq { font-weight: 700; color: #7cc4e8; }
   .logrow .lbrief { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .logrow.update .lbrief { font-weight: 700; color: #e8b339; }
-  .logrow.note .lbrief { font-style: italic; }
   .logrow .lok { flex: 0 0 auto; color: #4a7a55; }
   .logrow.failed .lok { color: #e86a5f; }
   .dnode { cursor: pointer; padding: 2px 0; font-size: 13px; }
@@ -704,6 +708,9 @@ async function showForm(name) {
   }
   const ro = f.preview === true;
   let html = '<div class="comment-text">' + escText(f.statement || "") + "</div>";
+  // The GRAPH-IS-EVIDENCE gate, visible to the human: the page cannot
+  // pass over open decision points — they surface under problems below.
+  html += '<div class="meta">gate: every open decision point of this record must be resolved (done · obsolete · revert · defer) before this page passes</div>';
   html += '<div class="meta">' + escText(f.instance) + (ro ? " · template preview — filling happens inside an expedition" : " · status: " + escText(f.status) + (f.met ? ' · <span style="color:#4a7a55">✓ passes</span>' : "")) + "</div>";
   (f.fields || []).forEach((fl) => {
     html += '<div style="padding:8px 0 2px"><b>' + escText(fl.name) + "</b>" + (fl.required ? ' <span style="color:#e8b339">required</span>' : "") + "</div>";
@@ -882,6 +889,7 @@ function renderLog() {
     '<div class="logrow ' + r.type + (r.ok ? "" : " failed") + '" data-ref="' + r.ref + '">' +
       '<span class="lt">' + (r.pending ? r.ts.slice(5, 10) : r.ts.slice(11, 19)) + "</span>" +
       '<span class="lsrc ' + r.src + '">' + r.src + "</span>" +
+      '<span class="lkind k-' + r.type + '">' + r.type + "</span>" +
       '<span class="lbrief">' + escText(r.brief) + "</span>" +
       '<span class="lok">' + (r.ok ? "✓" : "✗ " + (r.clause || "")) + "</span>" +
     "</div>").join("") || '<div class="meta">no acts' + (f ? " match the filter" : " this session yet") + "</div>";

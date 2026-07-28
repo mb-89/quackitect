@@ -22,3 +22,13 @@
 {"ts":"2026-07-28T10:12:25.453Z","op":"update","visit":"expeditions/e15@0","node":"d23","brief":"lifecycle test now reads the record from its branch"}
 {"ts":"2026-07-28T10:12:41.096Z","op":"update","visit":"expeditions/e15@0","node":"d24","brief":"suite rerun after the lifecycle fix"}
 {"ts":"2026-07-28T10:13:04.021Z","op":"done","visit":"expeditions/e15@0","node":"d14","brief":"the rulings ledger overrides branch-frozen rulings"}
+{"ts":"2026-07-28T10:13:09.594Z","op":"done","visit":"expeditions/e15@0","node":"d15","brief":"persistence.md is gone — only the seams note survives"}
+{"ts":"2026-07-28T10:13:19.173Z","op":"done","visit":"expeditions/e15@0","node":"d16","brief":"e1 to e14 record dirs swept from the tree"}
+{"ts":"2026-07-28T10:18:26.128Z","op":"plan","visit":"expeditions/e15@0","parent":null,"nodes":[{"id":"d25","brief":"kind column carries the formatting after source"},{"id":"d26","brief":"aq entries: se_answer records question and answer"},{"id":"d27","brief":"voice rule: direct answers get an aq entry"},{"id":"d28","brief":"rulings ledger reverted — the review rules at close"},{"id":"d29","brief":"evidence form shows the open-points gate"}]}
+{"ts":"2026-07-28T10:19:22.859Z","op":"update","visit":"expeditions/e15@0","node":"d30","brief":"feed kind column and the visible form gate land in render"}
+{"ts":"2026-07-28T10:19:44.923Z","op":"update","visit":"expeditions/e15@0","node":"d31","brief":"se_answer ships and the rulings ledger reverts to close-only"}
+{"ts":"2026-07-28T10:20:07.713Z","op":"update","visit":"expeditions/e15@0","node":"d32","brief":"se_answer ships and the rulings ledger reverts to close-only"}
+{"ts":"2026-07-28T10:20:21.573Z","op":"done","visit":"expeditions/e15@0","node":"d28","brief":"rulings ledger reverted — the leave review is the adjudication"}
+{"ts":"2026-07-28T10:20:32.181Z","op":"done","visit":"expeditions/e15@0","node":"d27","brief":"the voice carries the answered-questions rule"}
+{"ts":"2026-07-28T10:20:36.423Z","op":"update","visit":"expeditions/e15@0","node":"d33","brief":"suite over the kind column and se_answer round"}
+{"ts":"2026-07-28T10:20:54.359Z","op":"done","visit":"expeditions/e15@0","node":"d25","brief":"the kind column carries all feed formatting now"}

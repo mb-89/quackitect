@@ -57,36 +57,14 @@ export function readRecord(root: string, e: Expedition): Record<string, unknown>
     return parseStateNote(readFileSync(abs, "utf8")).frontmatter;
   }
   // Closed: the record lives ON ITS BRANCH (owner ruling 2026-07-28 —
-  // history is git's, the tree carries only live work). The RULINGS
-  // LEDGER overrides the frozen ruling; a legacy merged copy still reads.
+  // history is git's, the tree carries only live work). The close stamped
+  // the ruling; the leave review IS the adjudication. A legacy merged
+  // copy still reads.
   const merged = join(root, rel);
-  let fm: Record<string, unknown> | undefined;
-  if (existsSync(merged)) {
-    fm = parseStateNote(readFileSync(merged, "utf8")).frontmatter;
-  } else {
-    const r = spawnSync("git", ["show", `${e.branch}:${rel}`], { cwd: root, encoding: "utf8", maxBuffer: 8 * 1024 * 1024 });
-    if (r.status !== 0) return undefined;
-    fm = parseStateNote(r.stdout).frontmatter;
-  }
-  const ruled = rulingFor(root, e.id);
-  if (fm !== undefined && ruled !== undefined) fm.ruling = ruled;
-  return fm;
-}
-
-/** THE RULINGS LEDGER — product/spec/expeditions/rulings.md, the retro's
- *  writable surface now that closed records live in git only. One bullet
- *  per expedition ("- e12: dismissed — why"), hand-editable in Obsidian;
- *  a listed ruling overrides the branch-frozen one. */
-export function rulingFor(root: string, id: string): string | undefined {
-  const sid = id.match(/^e\d+/)?.[0] ?? id;
-  try {
-    const raw = readFileSync(join(root, "product", "spec", "expeditions", "rulings.md"), "utf8");
-    for (const line of raw.split("\n")) {
-      const m = line.match(/^-\s*(e\d+)\s*:\s*(\S+)/);
-      if (m !== null && m[1] === sid) return m[2];
-    }
-  } catch { /* no ledger yet */ }
-  return undefined;
+  if (existsSync(merged)) return parseStateNote(readFileSync(merged, "utf8")).frontmatter;
+  const r = spawnSync("git", ["show", `${e.branch}:${rel}`], { cwd: root, encoding: "utf8", maxBuffer: 8 * 1024 * 1024 });
+  if (r.status !== 0) return undefined;
+  return parseStateNote(r.stdout).frontmatter;
 }
 
 /** Open = the worktree exists. Closed (archive) = branch exp/* without one. */

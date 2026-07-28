@@ -113,12 +113,9 @@ test("the archive: start reaches every closed expedition, each runs to end, brow
   // retires the record dir from the tree; the branch keeps serving it.
   assert.ok(!existsSync(join(root, "product", "spec", "expeditions", a.created)), "no closed record on the tree");
   assert.equal(generateExpeditionArchive(root).decl.states.find((x) => x.id === sid)?.statement, "Archived Thing", "the branch serves the archive");
-  // The RULINGS LEDGER is the retro's writable surface — a listed ruling
-  // overrides the branch-frozen one.
-  mkdirSync(join(root, "product", "spec", "expeditions"), { recursive: true });
-  writeFileSync(join(root, "product", "spec", "expeditions", "rulings.md"), `# Rulings\n\n- ${sid}: dismissed\n`, "utf8");
+  // The close stamped the ruling on the branch — the list serves it.
   const listed = s.expeditionList() as { archive: { id: string; ruling?: string }[] };
-  assert.equal(listed.archive.find((x) => x.id === a.created)?.ruling, "dismissed", "the ledger ruling wins");
+  assert.equal(listed.archive.find((x) => x.id === a.created)?.ruling, "applied", "the close IS the ruling");
 });
 
 test("forms are viewable unbound: formGet returns the template preview", () => {

@@ -129,6 +129,20 @@ test("settings survive an engine life: a new session restores the store", () => 
   assert.equal(b.shutdown, 3);
 });
 
+test("se_answer records an aq entry and the feed types it aq", async () => {
+  const root = freshRoot();
+  const server = await bootedServer(root);
+  const t = await call(server, "se_answer", { question: "Where does the ruling live?", answer: "On the branch — the close stamps it." });
+  assert.equal(t.isError, false, JSON.stringify(t.body));
+  const { CallLog } = await import("../engine/calllog.ts");
+  const { feedRows } = await import("../engine/render.ts");
+  const { seDir } = await import("../engine/paths.ts");
+  const rows = feedRows(new CallLog(seDir(root)), "2000-01-01").rows as { type: string; brief: string }[];
+  const aq = rows.find((r) => r.type === "aq");
+  assert.ok(aq !== undefined, "the aq row rides the feed");
+  assert.equal(aq!.brief, "Where does the ruling live?", "the feed line is the question");
+});
+
 test("se_test: one call runs both scripts with structured verdicts", async () => {
   const root = freshRoot();
   const server = await bootedServer(root);
