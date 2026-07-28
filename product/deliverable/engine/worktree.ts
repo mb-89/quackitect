@@ -180,7 +180,22 @@ export function expClose(root: string, e: Expedition, merge: boolean): { id: str
     git(e.path, ["commit", "-m", `expedition ${e.id}: close`], "commit");
   }
   if (merge) {
-    git(root, ["merge", "--no-ff", e.branch, "-m", `merge expedition ${e.id}`], "merge");
+    // ATOMIC (hit live 2026-07-28): a conflicting merge left the root
+    // mid-merge with markers inside main.canvas — the server died and the
+    // relaunch refused on the red canvas. The close now aborts the failed
+    // merge and refuses TYPED; the root tree is never left broken.
+    const m = spawnSync("git", ["merge", "--no-ff", e.branch, "-m", `merge expedition ${e.id}`], { cwd: root, encoding: "utf8", windowsHide: true });
+    if (m.status !== 0) {
+      const conflicts = (spawnSync("git", ["diff", "--name-only", "--diff-filter=U"], { cwd: root, encoding: "utf8", windowsHide: true }).stdout ?? "").trim().replace(/\n/g, ", ");
+      const aborted = spawnSync("git", ["merge", "--abort"], { cwd: root, windowsHide: true }).status === 0;
+      throw new Rejection({
+        clause: CLAUSES.CONDITION_UNMET,
+        expected: `the trunk merge of ${e.branch} to succeed`,
+        got: `conflicts in: ${conflicts || "(unknown)"}${aborted ? " — the merge was aborted, the root tree stands clean" : " — and the abort failed too; run git merge --abort by hand"}`,
+        remedy: { tool: "se_run", args: { command: "git merge <trunk-branch> --no-edit" }, note: "absorb trunk INTO the branch first: merge it in the worktree, resolve the named files there, commit, then close again" },
+        source: SRC,
+      });
+    }
     // CLOSED RECORDS LIVE IN GIT (owner ruling 2026-07-28): history is
     // git's; the tree carries only live work. The record rode the merge —
     // retire its dir in the same breath; the branch keeps serving it.

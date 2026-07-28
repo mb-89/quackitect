@@ -93,3 +93,11 @@
 {"ts":"2026-07-28T12:37:24.542Z","op":"update","visit":"expeditions/e16@3","node":"d59","brief":"reading the record and report before the leave"}
 {"ts":"2026-07-28T12:37:51.653Z","op":"update","visit":"expeditions/e16@3","node":"d60","brief":"report extended with the edit-safety fold-in"}
 {"ts":"2026-07-28T12:38:05.140Z","op":"done","visit":"expeditions/e16@3","node":"d51","brief":"report done; closing e16 with apply on the owner's word"}
+{"ts":"2026-07-28T12:38:17.619Z","op":"update","visit":"expeditions/e16-leave@0","node":"d61","brief":"close-merge failed; inspecting the conflict"}
+{"ts":"2026-07-28T12:49:15.472Z","op":"plan","visit":"expeditions/e16@0","parent":null,"nodes":[{"id":"d1","brief":"absorb trunk into the branch and resolve the conflicts"},{"id":"d2","brief":"build the atomic close with its test"},{"id":"d3","brief":"suite green and committed"},{"id":"d4","brief":"close e16 with apply and reload"}]}
+{"ts":"2026-07-28T12:49:28.990Z","op":"update","visit":"expeditions/e16@0","node":"d5","brief":"resolving: canvas takes the branch; voice gets the trunk laws re-applied"}
+{"ts":"2026-07-28T12:49:45.813Z","op":"update","visit":"expeditions/e16@0","node":"d6","brief":"re-applying the two trunk voice laws on the branch side"}
+{"ts":"2026-07-28T12:49:57.482Z","op":"done","visit":"expeditions/e16@0","node":"d1","brief":"trunk absorbed into the branch; both conflicts resolved deliberately"}
+{"ts":"2026-07-28T12:51:13.970Z","op":"update","visit":"expeditions/e16@0","node":"d7","brief":"atomic close patched with its conflict-probe regression test"}
+{"ts":"2026-07-28T12:51:21.233Z","op":"update","visit":"expeditions/e16@0","node":"d8","brief":"running the suite over the merge and the atomic close"}
+{"ts":"2026-07-28T12:51:52.310Z","op":"done","visit":"expeditions/e16@0","node":"d3","brief":"suite green at 106 with the conflict-probe test"}

@@ -71,6 +71,11 @@ defect. The fold-in, all engine plus tests:
   as beyond the slider.
 - The loading bar — view loads show feedback at once (the
   feedback-within-a-second law, also in the voice).
+- THE ATOMIC CLOSE — found when this very expedition's first close
+  attempt conflicted and left the root repo mid-merge (dead server,
+  red preflight, manual git rescue): the close now aborts a failed
+  merge and refuses typed, naming the conflicting files; the branch
+  absorbed trunk first so the retry merges clean.
 
 ## What settled it
 

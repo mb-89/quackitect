@@ -8,7 +8,10 @@ import { strict as assert } from "node:assert";
 import { readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { test } from "node:test";
+import { spawnSync } from "node:child_process";
+import { mkdirSync } from "node:fs";
 import { activeStates, completeState, type EdgeDecl, type MachineDecl, type MachineInstance, type StateDecl } from "../engine/machine.ts";
+import { expClose, expNew } from "../engine/worktree.ts";
 import { compileMachine } from "../engine/machines/compile.ts";
 import { Session, mainMachinePath } from "../engine/session.ts";
 import { buildServer } from "../engine/tools.ts";
@@ -146,6 +149,34 @@ test("escape before boot completes still refuses", async () => {
   assert.equal(r.isError, true);
   assert.equal(r.body.clause, "SE-C-110");
   assert.match(String(r.body.got), /before boot/);
+});
+
+test("the close is atomic: a conflicting merge aborts and refuses typed, the root stands clean", () => {
+  const root = freshRoot();
+  const g = (...a: string[]): void => {
+    const r = spawnSync("git", a, { cwd: root, encoding: "utf8", windowsHide: true });
+    if (r.status !== 0) throw new Error(`git ${a.join(" ")} failed: ${r.stderr}`);
+  };
+  g("init");
+  g("config", "user.email", "se@test.local");
+  g("config", "user.name", "se test");
+  g("add", "-A");
+  g("commit", "-q", "-m", "base");
+  const e = expNew(root, "fix", "conflict probe");
+  // Trunk and branch add the same file with different content — a
+  // guaranteed conflict at close-merge.
+  writeFileSync(join(root, "clash.md"), "trunk side\n");
+  g("add", "-A");
+  g("commit", "-q", "-m", "trunk edit");
+  writeFileSync(join(e.path, "clash.md"), "branch side\n");
+  mkdirSync(join(e.path, "product", "spec", "expeditions", e.id), { recursive: true });
+  writeFileSync(join(e.path, "product", "spec", "expeditions", e.id, "report.md"), "---\nform: expedition-leave\nstatus: done\n---\n\nprobe report\n");
+  assert.throws(
+    () => expClose(root, e, true),
+    (err) => (err as { clause?: string }).clause === "SE-C-112" && /clash\.md/.test(String((err as { got?: string }).got)),
+  );
+  const st = spawnSync("git", ["status"], { cwd: root, encoding: "utf8", windowsHide: true }).stdout;
+  assert.ok(!/Unmerged|MERGING|both added/.test(st), "the root tree stands clean after the refusal: " + st);
 });
 
 test("a broken sub-canvas refuses typed at entry; fixing it heals on the next tick", async () => {
