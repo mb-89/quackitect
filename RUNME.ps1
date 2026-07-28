@@ -4,9 +4,10 @@ quackitect v3 — install-check, selftest, and launch.
 
 .DESCRIPTION
 Preflight (node/git/ripgrep hard deps), cage install, engine selftests, then
-the caged agent, inside the Mirror's terminal pane. RUNME owns four flags of
-its own. EVERY other argument is forwarded to the se server, whose flags are
-defined ONCE, in engine/bin/se-mcp.ts. Run .\RUNME.ps1 --help for both lists.
+the caged agent, inside the Mirror's terminal pane. RUNME consumes the launch
+flags and forwards every other argument to the se server. ALL of them, launch
+and engine alike, are defined ONCE in engine/bin/se-mcp.ts and printed as ONE
+list. Run .\RUNME.ps1 --help.
 
 .EXAMPLE
 .\RUNME.ps1
@@ -24,34 +25,18 @@ $root = $PSScriptRoot
 # changes how the ENGINE runs. RUNME declares only the flags that change how
 # IT LAUNCHES - the server never sees those.
 $forwarded = @($args | ForEach-Object { "$_" })
-$HELP = @"
-RUNME.ps1 - install-check, selftest, launch.
-
-  .\RUNME.ps1 [--own-terminal] [--manual] [server flags...]
-
-  THE AGENT RUNS IN THE MIRROR'S TERMINAL PANE by default. Its host runs in
-  the background, so this window is free to close once the session is up.
-
-  --own-terminal run the agent in THIS window instead, on its own terminal.
-                 The Mirror's terminal pane stays empty.
-  --manual       no LLM: open the Mirror alone and walk every step yourself.
-                 This also happens by itself when no claude CLI is found.
-  --one-screen   the old spelling of today's default. Accepted, does nothing.
-  --help         this text (-h, -?, -Help)
-
-  RUNME owns the four flags above. EVERY OTHER ARGUMENT is forwarded to the
-  se server, whose own flags follow below.
-"@
-# The help goes to the OUTPUT stream. Write-Host writes to the host stream,
-# which a pipe or a redirect drops - and help you cannot capture is the same
-# defect as a flag nobody documented.
+# ONE HELP, NOT TWO (owner ruling 2026-07-28). RUNME used to print its own
+# list and then the server's, and a reader had to stitch them together. The
+# launcher's flags are now declared alongside the engine's in se-mcp.ts, so
+# there is a single text and this file just renders it.
+#
+# It goes to the OUTPUT stream. Write-Host writes to the host stream, which a
+# pipe or a redirect drops - help you cannot capture is the same defect as a
+# flag nobody documented.
 if ($forwarded | Where-Object { $_ -in @("--help", "-h", "-?", "-Help") }) {
-  Write-Output $HELP
   $node = Get-Command node -ErrorAction SilentlyContinue
   if ($node) { node (Join-Path $root "product\deliverable\engine\bin\se-mcp.ts") --help }
-  else { Write-Output "  (node not installed yet - the flags live in product\deliverable\engine\bin\se-mcp.ts)" }
-  Write-Output ""
-  Write-Output "  RUNME's own flags are listed at the TOP of this output."
+  else { Write-Output "  (node not installed yet - the whole help lives in product\deliverable\engine\bin\se-mcp.ts)" }
   exit 0
 }
 

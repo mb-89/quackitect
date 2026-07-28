@@ -77,63 +77,20 @@ export interface StateMeta {
   subtitle?: string;
 }
 
-/** THE RENDER IS A VIEW, THE CANVAS IS THE SOURCE (owner ruling 2026-07-28).
- *  Obsidian sizes a node so a person can read the note INSIDE it. Here a node
- *  carries a title and a subtitle, so most of that box is empty — and because
- *  the drawing scales to fit its pane, the emptiness is exactly what makes the
- *  text small. Shrinking the boxes makes the text bigger in the same space.
+/** THE DRAWING IS THE TRUTH, SIZE INCLUDED (owner ruling 2026-07-28).
  *
- *  The geometry is rebuilt from the drawing's ORDER, never from its
- *  magnitudes. Whoever was left of, right of, above or below whom stays that
- *  way. No layout algorithm runs: the hand-placed arrangement carries meaning
- *  the engine must not invent. This is why the render and Obsidian no longer
- *  look alike, and that is the point — the law binds what the engine ACCEPTS
- *  from a drawing, not what a view of it must look like.
+ *  The render used to compute its own box sizes, because a label needs less
+ *  room than a note and the drawing scales to fit its pane. That made the
+ *  render and Obsidian look nothing alike, and it meant a size the owner
+ *  fixed in Obsidian was overruled on the way to the screen.
+ *
+ *  So the render now takes the geometry VERBATIM — position and size both.
+ *  Fix it in Obsidian and it is fixed here. A node is instead born at the
+ *  size of its label (canvas.nodeSize), which is a starting point a person
+ *  adjusts, not a size anything re-imposes later.
  */
-const LABEL_CH = 15.6; // monospace advance at the .label size
-const SUB_CH = 10.2; // ditto at .sublabel
-const BOX_PAD = 26;
-/** How big a box has to be for what the RENDER puts in it. Obsidian sizes a
- *  node for the note inside it; the render shows a title and a subtitle, so
- *  the two sizes have nothing to do with each other. */
-function sizeOf(n: CanvasElement, meta: Record<string, StateMeta>): { w: number; h: number } {
-  if (n.type === "text") {
-    const len = (n.text ?? "").length;
-    return { w: 520, h: Math.max(120, Math.ceil(len / 62) * 24 + 28) };
-  }
-  if ((n as { styleAttributes?: { shape?: string } }).styleAttributes?.shape === "pill") {
-    return { w: 68, h: 68 }; // start and end are just symbols
-  }
-  const sid = stateIdOf(n) ?? "";
-  const subFull = meta[sid]?.subtitle;
-  const sub = subFull !== undefined && subFull.length > 48 ? `${subFull.slice(0, 47)}…` : subFull;
-  const wide = Math.max(sid.length * LABEL_CH, (sub ?? "").length * SUB_CH);
-  return { w: Math.max(200, Math.ceil(wide) + BOX_PAD * 2), h: sub === undefined ? 72 : 100 };
-}
-
-/** SIZE, NEVER MOVE (owner ruling 2026-07-28). The arrangement is the
- *  owner's, drawn by hand in Obsidian, and the render does not get a second
- *  opinion about it — a re-layout here made the drawing bigger than the one
- *  it was re-laying out. Each box takes the size its rendered label needs,
- *  around the CENTRE it was drawn at. Groups are frames somebody drew, so
- *  they are not touched at all. */
-export function sizeForRender(canvas: CanvasData, meta: Record<string, StateMeta>): CanvasData {
-  const source = canvas.nodes ?? [];
-  if (source.length === 0) return canvas;
-  const nodes = source.map((n) => ({ ...n })) as CanvasElement[];
-  for (const n of nodes) {
-    if (n.type === "group") continue;
-    const s = sizeOf(n, meta);
-    n.x += (n.width - s.w) / 2;
-    n.y += (n.height - s.h) / 2;
-    n.width = s.w;
-    n.height = s.h;
-  }
-  return { ...canvas, nodes };
-}
-
 function machineSvg(source: CanvasData, activeIds: Set<string>, doneIds: Set<string>, subIds: Set<string>, meta: Record<string, StateMeta>): string {
-  const canvas = sizeForRender(source, meta);
+  const canvas = source;
   const nodes = canvas.nodes ?? [];
   const pad = 60;
   const minX = Math.min(...nodes.map((n) => n.x)) - pad;
@@ -344,7 +301,9 @@ const STYLE = `
      height starts it at half, and the splitter above it takes over from there.
      No max: the owner asked to be able to drag it past half. */
   #w-terminal { height: 50%; flex: none; min-height: 140px; }
-  .term-panel { flex: 1; min-height: 0; overflow: auto; padding: 8px 10px; }
+  /* NEVER SCROLLS. xterm scrolls itself; a scrollbar here would steal from
+     clientWidth mid-measure and start the flicker over. */
+  .term-panel { flex: 1; min-height: 0; overflow: hidden; padding: 8px 10px; }
   /* Beats .widget's own display, whatever order the sheet ends up in. */
   .no-host { display: none !important; }
   .crumbs { font-size: 13px; color: #7f8b96; display: flex; align-items: center; gap: 4px; text-transform: none; letter-spacing: 0; }
@@ -1479,32 +1438,60 @@ async function bootTerminal() {
     m.remove();
     return { w: r.width / 100, h: r.height };
   };
-  // THE FLICKER WAS A FEEDBACK LOOP (owner report 2026-07-28). term.resize
-  // relays out INSIDE the pane, the ResizeObserver sees that relayout, and
-  // the two chase each other every time the box changed size. A browser
-  // fullscreen cycle cured it only because the loop settled somewhere new.
+  // THE FLICKER IS A 2-CYCLE (owner report 2026-07-28, second round). The
+  // first fix refused a resize that changed NOTHING, which only ever catches
+  // a fixed point. The real loop alternated between two sizes, so every step
+  // differed from the one before it and the guard never fired.
   //
-  // Two guards. Measure on the next frame, never mid-transition. And resize
-  // only when the grid actually changed — a resize that changes nothing is
-  // what feeds the loop.
+  // What drove it: clientWidth INCLUDES the pane's padding, so the grid was
+  // computed about three columns too wide. xterm laid out wider than its
+  // content box, the pane grew a scrollbar, clientWidth shrank, the grid
+  // narrowed, the scrollbar went away, and it started again.
+  //
+  // Three guards, each killing one link. The pane no longer scrolls (CSS),
+  // so a child can no longer change the parent's client box. The grid is
+  // measured against the CONTENT box, so xterm fits what it was given. And
+  // after our own resize the observer is ignored until the relayout has
+  // landed, with one trailing look so a drag that ends inside that window
+  // is not lost.
+  //
+  // Subtracting the padding is also what restores the 80 columns the left
+  // column is sized for — 650px minus 20px still measures 80 cells at 13px.
+  const inner = () => {
+    const s = getComputedStyle(pane);
+    return {
+      w: pane.clientWidth - parseFloat(s.paddingLeft) - parseFloat(s.paddingRight),
+      h: pane.clientHeight - parseFloat(s.paddingTop) - parseFloat(s.paddingBottom),
+    };
+  };
   let lastCols = 0;
   let lastRows = 0;
   let queued = false;
+  let settleUntil = 0;
+  let trailing = 0;
+  const apply = () => {
+    const c = cell();
+    const box = inner();
+    if (!(c.w > 0) || !(c.h > 0) || !(box.w > 0) || !(box.h > 0)) return;
+    const cols = Math.max(20, Math.floor(box.w / c.w));
+    const rows = Math.max(6, Math.floor(box.h / c.h));
+    if (cols === lastCols && rows === lastRows) return;
+    lastCols = cols;
+    lastRows = rows;
+    settleUntil = Date.now() + 250;
+    term.resize(cols, rows);
+    void fetch(base + "/pty/resize", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ cols, rows }) });
+  };
   const sync = () => {
+    const now = Date.now();
+    if (now < settleUntil) {
+      clearTimeout(trailing);
+      trailing = setTimeout(sync, settleUntil - now + 20);
+      return;
+    }
     if (queued) return;
     queued = true;
-    requestAnimationFrame(() => {
-      queued = false;
-      const c = cell();
-      if (!(c.w > 0) || !(c.h > 0)) return;
-      const cols = Math.max(20, Math.floor(pane.clientWidth / c.w));
-      const rows = Math.max(6, Math.floor(pane.clientHeight / c.h));
-      if (cols === lastCols && rows === lastRows) return;
-      lastCols = cols;
-      lastRows = rows;
-      term.resize(cols, rows);
-      void fetch(base + "/pty/resize", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ cols, rows }) });
-    });
+    requestAnimationFrame(() => { queued = false; apply(); });
   };
   new ResizeObserver(sync).observe(pane);
   sync();

@@ -45,31 +45,43 @@ function argValue(flag: string): string | undefined {
 }
 
 if (argv.some((a) => a === "--help" || a === "-h" || a === "-?")) {
-  process.stdout.write(`se-mcp — the quackitect v3 MCP server (stdio JSON-RPC + embedded mirror)
+  process.stdout.write(`se — quackitect v3. ONE help for the whole system.
 
-  node engine/bin/se-mcp.ts --root <project root> [--autonomy 0.4] [--mirror-port 7333]
+  .\\RUNME.ps1 [launch flags] [engine flags...]      — the normal way in
+  node engine/bin/se-mcp.ts --root <root> [--autonomy 0.4]   — the server alone
+
+LAUNCH — read by RUNME.ps1 before the server starts.
+
+  These are listed HERE, with everything else, because two half-lists are
+  worse than one whole one. RUNME consumes them and the server never sees
+  them; every other argument is forwarded on to the engine flags below.
+
+  --own-terminal run the agent in THIS window instead, on its own terminal.
+                 The Mirror's terminal pane stays empty.
+  --manual       no LLM: open the Mirror alone and walk every step yourself.
+                 This also happens by itself when no claude CLI is found.
+                 The engine's --autonomy 0 is a DIFFERENT thing: an agent
+                 is running, it just may not step by itself.
+  --one-screen   the old spelling of today's default. Accepted, does nothing.
+
+ENGINE — read by the server (this file is where they are defined).
 
   --root         the quackitect project root (holds product/ and workspace/);
                  file lane serves that tree, call log lands in <root>/.se/
   --autonomy     0..1 — which states the AGENT enters by itself (priority <=
-                 autonomy). 0: every step is the human's (manual mode);
-                 1: fully autonomous. Default 0.4. Env: SE_AUTONOMY.
-                 Live-adjustable in the mirror. (--threshold and
-                 SE_THRESHOLD are accepted as the old spelling.)
-                 RUNME's --manual is a DIFFERENT thing: no agent at all.
+                 autonomy). 0: every step is the human's; 1: fully autonomous.
+                 Default 0.4. Env: SE_AUTONOMY. Live-adjustable in the mirror.
+                 (--threshold and SE_THRESHOLD are the old spelling.)
   --mirror-port  the embedded mirror's HTTP port (the human's hand on the
                  same walk). Default 7333. 0 disables. Env: SE_MIRROR_PORT.
   --child        INTERNAL, never typed by hand. The shim spawns itself with
                  it to run the engine proper. SE_HOT_DISABLE=1 does the same
                  in one process.
-  --help         this text (-h, -?)
+  --help         this text (-h, -?, -Help)
 
   RELOAD: se_reload (agent or mirror hand, at idle only) restarts the
   engine onto the current sources without a reconnect — the walk reboots.
   Nothing ever swaps on its own. SE_HOT_DISABLE=1 runs in-process instead.
-
-  The RUNME forwards its whole command line here (env SE_ARGS) — flags are
-  defined once, in this file.
 `);
   process.exit(0);
 }

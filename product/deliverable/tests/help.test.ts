@@ -61,34 +61,54 @@ for (const file of ENTRY_POINTS) {
   });
 }
 
-// RUNME is checked STATICALLY. Running it needs PowerShell, and one test is
-// not worth binding the whole suite to one platform.
-test("every switch RUNME.ps1 parses appears in its help text", () => {
-  const src = readFileSync(join(repoRoot, "RUNME.ps1"), "utf8");
-
-  // PowerShell compares with -eq, -ne and -in, so the switches sit on those
-  // lines: `$_ -in @("--help", "-h")`, `$_ -eq "--manual"`.
+/** The switches RUNME.ps1 parses. PowerShell compares with -eq, -ne and -in,
+ *  so they sit on those lines: `$_ -in @("--help", "-h")`, `$_ -eq "--manual"`. */
+function runmeFlags(src: string): Set<string> {
   const flags = new Set<string>();
   for (const line of src.matchAll(/-(?:eq|ne|in)\b[^\r\n]*/g)) {
     for (const lit of line[0].matchAll(/"(-[^"\s]+)"/g)) flags.add(lit[1]);
   }
+  return flags;
+}
+
+// ONE HELP, NOT TWO (owner ruling 2026-07-28). RUNME printed its own list and
+// then the server's, and the reader had to stitch them together. The launch
+// flags are now declared next to the engine's in se-mcp.ts, which is the one
+// place anybody has to look — so that is where this guard checks for them.
+//
+// RUNME is read STATICALLY. Running it needs PowerShell, and one test is not
+// worth binding the whole suite to one platform.
+test("every switch RUNME.ps1 parses appears in the ONE help", () => {
+  const flags = runmeFlags(readFileSync(join(repoRoot, "RUNME.ps1"), "utf8"));
   assert.ok(flags.size > 0, "no switches extracted from RUNME.ps1 — the extractor is broken, not RUNME");
 
-  const help = /\$HELP\s*=\s*@"\r?\n([\s\S]*?)\r?\n"@/.exec(src);
-  assert.ok(help !== null, 'RUNME.ps1 must hold its help in ONE $HELP here-string, so this guard can find it');
+  const r = spawnSync(process.execPath, [join(binDir, "se-mcp.ts"), "--help"], {
+    encoding: "utf8",
+    windowsHide: true,
+    env: { ...process.env, SE_ARGS: "" },
+  });
+  assert.equal(r.status, 0, `se-mcp.ts --help must exit 0; stderr: ${r.stderr}`);
   for (const flag of [...flags].sort()) {
-    assert.ok(help[1].includes(flag), `RUNME.ps1: $HELP never mentions ${flag}. Every switch appears in help.`);
+    assert.ok(r.stdout.includes(flag), `the one help never mentions RUNME's ${flag}. Every switch appears in help.`);
   }
 });
 
-// Listing a flag is not enough if the listing never reaches the reader.
-// RUNME's own block was written with Write-Host, which goes to the host
-// stream — a pipe or a redirect drops it, and the server's help is all that
-// survives. That is how a documented flag still read as undocumented.
-test("RUNME prints its help on the OUTPUT stream, so a pipe or a redirect keeps it", () => {
+// The second list must not grow back. A here-string of its own is exactly how
+// the split started, and rendering the server's help is the whole mechanism.
+test("RUNME renders the one help and keeps no list of its own", () => {
   const src = readFileSync(join(repoRoot, "RUNME.ps1"), "utf8");
-  assert.match(src, /Write-Output \$HELP/, "RUNME.ps1 must Write-Output $HELP — Write-Host writes to the host stream, which a redirect drops");
-  assert.doesNotMatch(src, /Write-Host \$HELP/, "RUNME.ps1 must not Write-Host its help");
+  assert.doesNotMatch(src, /\$HELP/, "RUNME.ps1 must keep no help text of its own — the one help lives in se-mcp.ts");
+  assert.match(src, /se-mcp\.ts"\) --help/, "RUNME.ps1 must render the server's help");
+});
+
+// Listing a flag is not enough if the listing never reaches the reader.
+// Write-Host goes to the host stream, which a pipe or a redirect drops. That
+// is how a documented flag still read as undocumented.
+test("the one help reaches the OUTPUT stream, so a pipe or a redirect keeps it", () => {
+  const src = readFileSync(join(repoRoot, "RUNME.ps1"), "utf8");
+  assert.doesNotMatch(src, /Write-Host[^\r\n]*[Hh]elp/, "RUNME.ps1 must not Write-Host anything about help");
+  const mcp = readFileSync(join(binDir, "se-mcp.ts"), "utf8");
+  assert.match(mcp, /process\.stdout\.write\(`se — quackitect v3\. ONE help/, "the one help is written to stdout");
 });
 
 // The terminal pane is the DEFAULT launch, and that launch is the one that

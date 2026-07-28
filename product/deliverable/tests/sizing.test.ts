@@ -1,20 +1,22 @@
-// THE RENDER SIZES BOXES. IT NEVER MOVES THEM (owner ruling 2026-07-28).
+// THE DRAWING IS THE TRUTH, SIZE INCLUDED (owner ruling 2026-07-28).
 //
-// Obsidian sizes a node so a person can read the note inside it. The render
-// shows a title and a subtitle instead, so it computes its own size — that
-// part earns its keep.
+// The render used to compute its own box sizes, on the reasoning that a label
+// needs less room than a note. The cost was that the mirror and Obsidian
+// looked nothing alike, and a size the owner fixed in Obsidian was overruled
+// on the way to the screen. So the render now changes NO geometry at all.
 //
-// The arrangement is a different matter. A render-time re-layout used to band
-// everything into columns and rows, and it produced a drawing BIGGER than the
-// one it was tidying. The canvas is drawn by hand in Obsidian and that is
-// where it gets fixed, so nothing here rearranges it.
+// Sizing did not disappear, it moved to BIRTH. A new node is created just big
+// enough for its title and subtitle, and a person takes it from there.
 //
 // These are the invariants that must survive future edits, pinned here rather
 // than in a comment.
 import { strict as assert } from "node:assert";
 import { readFileSync } from "node:fs";
 import { test } from "node:test";
-import { sizeForRender } from "../engine/render.ts";
+import { nodeSize } from "../engine/canvas.ts";
+import { renderMirror } from "../engine/render.ts";
+import { Session } from "../engine/session.ts";
+import { freshRoot } from "./helpers.ts";
 
 interface Node { id: string; type?: string; x: number; y: number; width: number; height: number; file?: string; styleAttributes?: { shape?: string } }
 
@@ -22,48 +24,39 @@ function mainCanvas(): { nodes: Node[] } {
   return JSON.parse(readFileSync(new URL("../machines/main.canvas", import.meta.url), "utf8")) as { nodes: Node[] };
 }
 
-const centre = (n: Node): [number, number] => [n.x + n.width / 2, n.y + n.height / 2];
+// The render is a view. Nothing in it may re-derive a node's box: fix the
+// drawing in Obsidian and the mirror must agree.
+test("the render never re-sizes and never re-positions a node", () => {
+  const src = readFileSync(new URL("../engine/render.ts", import.meta.url), "utf8");
+  assert.ok(!src.includes("sizeForRender"), "the render-time resizer is gone, not merely unused");
+  assert.ok(!/n\.width = /.test(src), "no node's width is ever reassigned");
+  assert.ok(!/n\.height = /.test(src), "no node's height is ever reassigned");
+  assert.ok(!/n\.x \+=/.test(src), "no node is nudged horizontally");
+  assert.ok(!/n\.y \+=/.test(src), "no node is nudged vertically");
+});
 
-test("every box stays exactly where it was drawn", () => {
-  const before = mainCanvas();
-  const after = sizeForRender(before as never, {}) as unknown as { nodes: Node[] };
-  assert.equal(after.nodes.length, before.nodes.length, "no node is lost or invented");
-  const was = new Map(before.nodes.map((n) => [n.id, centre(n)]));
-  for (const n of after.nodes) {
-    const [x, y] = was.get(n.id)!;
-    const [nx, ny] = centre(n);
-    assert.ok(Math.abs(nx - x) < 0.001, `${n.id} kept the horizontal centre it was drawn at`);
-    assert.ok(Math.abs(ny - y) < 0.001, `${n.id} kept the vertical centre it was drawn at`);
+// The drawn numbers must reach the SVG untouched. The old render replaced
+// them with a computed label size, so the drawn ones simply were not there.
+test("the drawn geometry reaches the SVG verbatim", () => {
+  const root = freshRoot();
+  const html = renderMirror({ session: new Session(root), root, lastPacket: undefined, mode: "agent" });
+  const states = mainCanvas().nodes.filter((n) => n.type === "file");
+  assert.ok(states.length > 0, "the main machine carries state nodes");
+  for (const n of states) {
+    assert.ok(html.includes(`width="${n.width}"`), `${n.id} keeps the width it was drawn at`);
+    assert.ok(html.includes(`height="${n.height}"`), `${n.id} keeps the height it was drawn at`);
   }
 });
 
-test("a group is a frame somebody drew, so it is not touched at all", () => {
-  const before = mainCanvas();
-  const after = sizeForRender(before as never, {}) as unknown as { nodes: Node[] };
-  const groups = before.nodes.filter((n) => n.type === "group");
-  assert.ok(groups.length > 0, "the main machine carries groups");
-  for (const g of groups) {
-    const now = after.nodes.find((n) => n.id === g.id)!;
-    assert.deepEqual([now.x, now.y, now.width, now.height], [g.x, g.y, g.width, g.height], `${g.id} is untouched`);
-  }
-});
-
-test("start and end become symbols, and a subtitle makes a state taller", () => {
-  const canvas = mainCanvas();
-  const plain = sizeForRender(canvas as never, {}) as unknown as { nodes: Node[] };
-  const pill = plain.nodes.find((n) => n.styleAttributes?.shape === "pill")!;
-  assert.equal(pill.width, pill.height, "a pill is square, so it draws as a circle");
-  assert.ok(pill.width < 100, "start and end are symbols, not boxes");
-
-  const withSub = sizeForRender(canvas as never, { front_desk: { has_exit: false, exit_met: true, has_entry: false, entry_met: true, subtitle: "In doubt, go here." } }) as unknown as { nodes: Node[] };
-  const find = (c: { nodes: Node[] }): Node => c.nodes.find((n) => (n.file ?? "").endsWith("front_desk.md"))!;
-  assert.ok(find(withSub).height > find(plain).height, "the subtitle earns its line");
-});
-
-test("a box is never narrower than the label it has to show", () => {
-  const canvas = mainCanvas();
-  const after = sizeForRender(canvas as never, {}) as unknown as { nodes: Node[] };
-  const states = after.nodes.filter((n) => n.type !== "group" && n.type !== "text" && n.styleAttributes?.shape !== "pill");
-  assert.ok(states.length > 0, "the main machine carries states");
-  for (const n of states) assert.ok(n.width >= 200, `${n.id} is at least the minimum box width`);
+// Birth size: the label, and nothing more. This is where the struck 620x640
+// rule used to live.
+test("a new node is born the size of its title and subtitle", () => {
+  const bare = nodeSize("front_desk");
+  const withSub = nodeSize("front_desk", "In doubt, go here.");
+  assert.ok(withSub.height > bare.height, "the subtitle earns its line");
+  assert.ok(bare.width >= 200, "a box is never narrower than the minimum");
+  assert.ok(bare.height < 200, "and never as tall as the note-reading box the old rule made");
+  assert.ok(nodeSize("a_very_long_state_identifier_indeed").width > bare.width, "a longer title needs a wider box");
+  // The struck rule: nothing is born anywhere near 620x640 any more.
+  assert.ok(withSub.height < 640, "the 620x640 birth size is struck");
 });

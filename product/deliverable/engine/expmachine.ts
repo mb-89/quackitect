@@ -9,7 +9,7 @@
 import { spawnSync } from "node:child_process";
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
-import { type CanvasData, type CanvasEdge, type CanvasElement } from "./canvas.ts";
+import { nodeSize, type CanvasData, type CanvasEdge, type CanvasElement } from "./canvas.ts";
 import { validateMachine, type MachineDecl, type StateDecl } from "./machine.ts";
 import { stateFromNote } from "./machines/compile.ts";
 import { parseStateNote } from "./notes.ts";
@@ -84,8 +84,8 @@ export function generateContinueExpedition(root: string): GeneratedMachine {
     start.edges.push({ to: workId, role: "normal" });
     const y = i * 560;
     nodes.push({ id: `g-${sid}`, type: "group", x: -800, y: y - 60, width: 1720, height: 480, label: e.id });
-    nodes.push({ id: `n-${workId}`, type: "file", file: `${workId}.md`, x: -740, y, width: 620, height: 360 });
-    nodes.push({ id: `n-${leaveId}`, type: "file", file: `${leaveId}.md`, x: 140, y, width: 620, height: 360 });
+    nodes.push({ id: `n-${workId}`, type: "file", file: `${workId}.md`, x: -740, y, ...nodeSize(workId, goal) });
+    nodes.push({ id: `n-${leaveId}`, type: "file", file: `${leaveId}.md`, x: 140, y, ...nodeSize(leaveId) });
     edges.push({ id: `e-start-${workId}`, fromNode: "n-start", toNode: `n-${workId}` });
     edges.push({ id: `e-${workId}-${leaveId}`, fromNode: `n-${workId}`, toNode: `n-${leaveId}` });
     edges.push({ id: `e-${leaveId}-end`, fromNode: `n-${leaveId}`, toNode: "n-end" });
@@ -210,7 +210,7 @@ function buildRecordColumn(machineId: string, entries: ArchiveEntry[], kindWord:
     states.push(recordState(e, kindWord));
     start.edges.push({ to: e.sid, role: "normal" });
     const y = i * 420;
-    nodes.push({ id: `n-${e.sid}`, type: "file", file: `${e.sid}.md`, x: -1100, y, width: 620, height: 360 });
+    nodes.push({ id: `n-${e.sid}`, type: "file", file: `${e.sid}.md`, x: -1100, y, ...nodeSize(e.sid) });
     edges.push({ id: `e-start-${e.sid}`, fromNode: "n-start", toNode: `n-${e.sid}` });
     edges.push({ id: `e-${e.sid}-end`, fromNode: `n-${e.sid}`, toNode: "n-end" });
   });
@@ -254,7 +254,7 @@ function buildDecades(machineId: string, entries: ArchiveEntry[], kindWord: stri
     });
     subGen[decId] = () => buildRecordColumn(decId, slice, kindWord);
     start.edges.push({ to: decId, role: "normal" });
-    nodes.push({ id: `n-${decId}`, type: "file", file: `${decId}.md`, x: -1100, y: d * 420, width: 620, height: 360 });
+    nodes.push({ id: `n-${decId}`, type: "file", file: `${decId}.md`, x: -1100, y: d * 420, ...nodeSize(decId) });
     edges.push({ id: `e-start-${decId}`, fromNode: "n-start", toNode: `n-${decId}` });
     edges.push({ id: `e-${decId}-end`, fromNode: `n-${decId}`, toNode: "n-end" });
   }

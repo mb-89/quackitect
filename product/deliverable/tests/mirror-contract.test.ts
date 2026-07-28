@@ -110,8 +110,6 @@ test("the loading bar settles: it can come down, it times out, and one action lo
 
 // THE TERMINAL EARNS ITS SPACE (owner ruling 2026-07-28). It sat tiny because
 // flex:none with no height sizes to CONTENT, and max-height only capped that.
-// It also flickered: term.resize relaid out inside the pane, the observer saw
-// the relayout, and the two chased each other.
 test("the terminal starts at half its column, drags past half, and cannot chase its own resize", () => {
   const root = freshRoot();
   const html = renderMirror({ session: new Session(root), root, lastPacket: undefined, mode: "agent" });
@@ -119,9 +117,31 @@ test("the terminal starts at half its column, drags past half, and cannot chase 
   assert.ok(!/#w-terminal \{[^}]*max-height/.test(html), "no cap — the owner asked to drag past half");
   assert.ok(html.includes('data-axis="y"'), "the height splitter ships");
   assert.ok(html.includes("row-resize"), "and it looks draggable");
-  // The loop-breaker: a resize that changes no rows or columns must not fire.
   assert.ok(html.includes("if (cols === lastCols && rows === lastRows) return;"), "a no-op resize never happens");
   assert.ok(html.includes("requestAnimationFrame"), "the pane is measured on a settled frame");
+});
+
+// THE FLICKER CAME BACK, because the first fix caught the wrong loop shape
+// (owner report 2026-07-28, second round). It refused a resize that changed
+// NOTHING, but the loop alternated between two DIFFERENT sizes: padding made
+// the grid too wide, xterm overflowed, the pane grew a scrollbar, the box
+// shrank, and round it went. Each guard below cuts one link in that chain.
+test("the terminal pane cannot flicker between two sizes", () => {
+  const root = freshRoot();
+  const html = renderMirror({ session: new Session(root), root, lastPacket: undefined, mode: "agent" });
+  // Link one: the pane must never grow a scrollbar, or the child changes the
+  // parent's client box mid-measure.
+  assert.match(html, /\.term-panel \{[^}]*overflow: hidden/, "the terminal pane never scrolls — xterm scrolls itself");
+  assert.ok(!/\.term-panel \{[^}]*overflow: auto/.test(html), "and it is not the scroller it used to be");
+  // Link two: the grid is measured against the CONTENT box. clientWidth
+  // includes padding, which is what made the grid too wide to fit.
+  assert.ok(html.includes("parseFloat(s.paddingLeft)"), "padding comes off the measured width");
+  assert.ok(html.includes("parseFloat(s.paddingTop)"), "padding comes off the measured height");
+  assert.ok(!/Math\.floor\(pane\.clientWidth \/ c\.w\)/.test(html), "never the raw client box again");
+  // Link three: our own resize does not feed the observer that watches it.
+  assert.ok(html.includes("settleUntil = Date.now() + 250"), "a resize is given time to land");
+  assert.ok(html.includes("if (now < settleUntil)"), "and the observer is ignored until it has");
+  assert.ok(html.includes("trailing = setTimeout(sync"), "with one trailing look, so a drag ending in the window is not lost");
 });
 
 // THE PANE FOLLOWS THE HOST, NOT THE LAUNCH (owner ruling 2026-07-28). Manual

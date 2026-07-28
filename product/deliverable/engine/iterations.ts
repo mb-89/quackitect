@@ -8,7 +8,7 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { spawnSync } from "node:child_process";
-import { type CanvasData, type CanvasEdge, type CanvasElement } from "./canvas.ts";
+import { nodeSize, type CanvasData, type CanvasEdge, type CanvasElement } from "./canvas.ts";
 import { CLAUSES, Rejection } from "./errors.ts";
 import { validateMachine, type MachineDecl, type StateDecl } from "./machine.ts";
 import { parseStateNote } from "./notes.ts";
@@ -209,7 +209,7 @@ export function generateIterations(root: string): GeneratedMachine {
     });
     start.edges.push({ to: sid, role: "normal" });
     const y = i * 420;
-    nodes.push({ id: `n-${sid}`, type: "file", file: `${sid}.md`, x: -1100, y, width: 620, height: 360 });
+    nodes.push({ id: `n-${sid}`, type: "file", file: `${sid}.md`, x: -1100, y, ...nodeSize(sid) });
     edges.push({ id: `e-start-${sid}`, fromNode: "n-start", toNode: `n-${sid}` });
     edges.push({ id: `e-${sid}-end`, fromNode: `n-${sid}`, toNode: "n-end" });
   });

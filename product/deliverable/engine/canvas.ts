@@ -34,3 +34,20 @@ export interface CanvasData {
 export function loadCanvas(path: string): CanvasData {
   return JSON.parse(stripBom(readFileSync(path, "utf8"))) as CanvasData;
 }
+
+// A NEW NODE IS BORN THE SIZE OF ITS LABEL (owner ruling 2026-07-28). The old
+// rule made every new node roughly 620x640, which is a note-reading box, not a
+// label box. A node now starts just big enough for its title and subtitle. The
+// owner takes it from there in Obsidian, and what they draw is what renders.
+const LABEL_CH = 15.6; // monospace advance at the .label size
+const SUB_CH = 10.2; // ditto at .sublabel
+const BOX_PAD = 26;
+
+/** The birth size of a drawn node: what its title and subtitle need, nothing
+ *  more. This is a STARTING POINT a person then adjusts — never a size the
+ *  render re-imposes later. */
+export function nodeSize(title: string, subtitle?: string): { width: number; height: number } {
+  const sub = subtitle !== undefined && subtitle !== "" ? subtitle : undefined;
+  const wide = Math.max(title.length * LABEL_CH, (sub ?? "").length * SUB_CH);
+  return { width: Math.max(200, Math.ceil(wide) + BOX_PAD * 2), height: sub === undefined ? 72 : 100 };
+}

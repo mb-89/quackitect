@@ -24,8 +24,15 @@ A switch nobody can discover is a switch nobody has. `--one-screen` sat
 in the launcher for weeks, undocumented, because the launcher's help only
 forwarded to the server's help and the server had never heard of it.
 
-A program that forwards arguments to another still owns its OWN flags. It
-prints them first, then the other program's help.
+ONE HELP, NOT TWO (owner ruling 2026-07-28). A program that forwards
+arguments to another does NOT print a list of its own. It declares its
+flags in the same registry as the program it forwards to, and renders that
+one text. Two half-lists leave the reader stitching them together.
+
+The launcher's flags therefore live in `engine/bin/se-mcp.ts` beside the
+engine's, under a LAUNCH heading. The launcher consumes them and the server
+never sees them. Documenting them there costs nothing and it is the only
+place anybody has to look.
 
 HELP GOES TO THE OUTPUT STREAM. PowerShell's `Write-Host` writes to the
 host, and a pipe or a redirect drops it. The launcher's own block was
