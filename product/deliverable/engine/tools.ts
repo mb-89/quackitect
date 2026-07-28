@@ -10,6 +10,8 @@
 //   §5  — honest truncation everywhere; results carry the remedy inline.
 import { CLAUSES, Rejection, type RejectionPayload } from "./errors.ts";
 import { CallLog } from "./calllog.ts";
+import { DEFAULT_GAP, compactCanvas, type CanvasDoc } from "./compact.ts";
+import { contentHash } from "./hash.ts";
 import { parseUpdate } from "./decisions.ts";
 import { Toll } from "./toll.ts";
 import { readFileSync } from "node:fs";
@@ -469,6 +471,54 @@ export function coreTools(rootOf: (rel?: string) => string, projectRoot: string)
           remedy: { tool: "se_lint", args: { text: "<prose>" } },
           source: "engine/tools.ts se_lint",
         });
+      },
+    },
+    {
+      name: "se_canvas_compact",
+      title: "se.canvas.compact",
+      description:
+        "COMPACT A CANVAS, mechanically. It clusters the drawing (a group is a cluster; ungrouped nodes cluster by the arrows between them), collapses the empty bands inside each cluster to one gap, then pulls the clusters toward the centre until one gap apart. Clusters TRANSLATE, so orientation survives and nothing moves relative to its own cluster. Same canvas in, same coordinates out. DRY BY DEFAULT: it reports what would move; pass apply to write. The drawing is the owner's, so this never runs by itself.",
+      inputSchema: {
+        type: "object",
+        properties: {
+          path: { type: "string", description: "a root-relative .canvas file" },
+          apply: { type: "boolean", description: "write the new coordinates (default false: report only)" },
+          gap: { type: "number", description: "the space left between things (default 80)" },
+        },
+        required: ["path"],
+      },
+      handler: (args) => {
+        const root = rootOf();
+        const p = String(args.path);
+        if (!p.endsWith(".canvas")) {
+          throw new Rejection({
+            clause: CLAUSES.REQUIRED_ARGS,
+            expected: "a .canvas file — this moves drawn coordinates and nothing else",
+            got: p,
+            remedy: { tool: "se_canvas_compact", args: { path: "product/deliverable/machines/main.canvas" } },
+            source: "engine/tools.ts se_canvas_compact",
+          });
+        }
+        const abs = resolveInRoot(root, p, "engine/tools.ts se_canvas_compact");
+        const buf = readFileSync(abs);
+        const doc = JSON.parse(buf.toString("utf8")) as CanvasDoc;
+        const r = compactCanvas(doc, { gap: args.gap === undefined ? DEFAULT_GAP : Number(args.gap) });
+        // WRITING KEEPS EVERYTHING ELSE. Only x, y, width and height move;
+        // the file's own shape, its edges and every unknown field survive.
+        if (args.apply === true && r.moved.length > 0) {
+          const at = new Map(r.nodes.map((n) => [n.id, n]));
+          const out = { ...doc, nodes: (doc.nodes ?? []).map((n) => ({ ...n, x: at.get(n.id)!.x, y: at.get(n.id)!.y, width: at.get(n.id)!.width, height: at.get(n.id)!.height })) };
+          fileWrite(root, p, JSON.stringify(out, null, "\t") + "\n", contentHash(buf));
+        }
+        return {
+          path: p,
+          applied: args.apply === true && r.moved.length > 0,
+          clusters: r.clusters.map((c) => ({ id: c.id, members: c.members.length })),
+          moved: r.moved,
+          before: r.before,
+          after: r.after,
+          saved: { width: r.before.width - r.after.width, height: r.before.height - r.after.height },
+        };
       },
     },
     {

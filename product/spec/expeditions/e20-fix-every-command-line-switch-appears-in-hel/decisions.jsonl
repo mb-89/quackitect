@@ -19,3 +19,19 @@
 {"ts":"2026-07-28T17:51:04.024Z","op":"fork","visit":"expeditions/e20@0","parent":null,"node":"d28","brief":"size the left column for an 80-column terminal, not two thirds","nodes":[]}
 {"ts":"2026-07-28T17:51:17.969Z","op":"update","visit":"expeditions/e20@0","node":"d29","brief":"verifying the 80-column sizing against the suite"}
 {"ts":"2026-07-28T17:52:34.810Z","op":"update","visit":"expeditions/e20@0","node":"d30","brief":"committing the 80-column sizing to e20's branch"}
+{"ts":"2026-07-28T17:53:05.910Z","op":"fork","visit":"expeditions/e20@0","parent":"d28","node":"d31","brief":"publish e20 to trunk so the restart can show the detached launch","nodes":[]}
+{"ts":"2026-07-28T17:53:45.163Z","op":"update","visit":"expeditions/e20@0","node":"d32","brief":"writing the handover for the restart"}
+{"ts":"2026-07-28T17:54:06.712Z","op":"update","visit":"expeditions/e20@0","node":"d33","brief":"confirming the compaction is mechanical, and pinning the cluster rule"}
+{"ts":"2026-07-28T17:54:16.120Z","op":"update","visit":"expeditions/e20@0","node":"d34","brief":"the handover records the mechanical requirement and the cluster rule"}
+{"ts":"2026-07-28T17:54:38.031Z","op":"update","visit":"expeditions/e20@0","node":"d35","brief":"parking e20 open and returning to idle for the shutdown"}
+{"ts":"2026-07-28T17:54:58.638Z","op":"update","visit":"expeditions/e20@0","node":"d36","brief":"parking e20 open and returning to idle for the shutdown"}
+{"ts":"2026-07-28T17:57:46.342Z","op":"plan","visit":"expeditions/e20@1","parent":null,"nodes":[{"id":"d37","brief":"the compaction algorithm as engine code"},{"id":"d38","brief":"a lane tool that runs it, dry by default"},{"id":"d39","brief":"tests pinning cluster, squeeze and pull"}]}
+{"ts":"2026-07-28T17:58:29.721Z","op":"update","visit":"expeditions/e20@1","node":"d40","brief":"tests pinning the cluster rule, the squeeze and the pull"}
+{"ts":"2026-07-28T17:58:34.656Z","op":"update","visit":"expeditions/e20@1","node":"d41","brief":"running the compactor tests alone before the full suite"}
+{"ts":"2026-07-28T17:58:45.385Z","op":"update","visit":"expeditions/e20@1","node":"d42","brief":"correcting the expected height in the squeeze test"}
+{"ts":"2026-07-28T17:59:18.335Z","op":"update","visit":"expeditions/e20@1","node":"d43","brief":"wiring the compactor into the tool surface"}
+{"ts":"2026-07-28T17:59:33.890Z","op":"update","visit":"expeditions/e20@1","node":"d44","brief":"the compactor is registered as a lane tool"}
+{"ts":"2026-07-28T17:59:53.567Z","op":"update","visit":"expeditions/e20@1","node":"d45","brief":"the write goes through the file lane with the current hash"}
+{"ts":"2026-07-28T17:59:57.618Z","op":"update","visit":"expeditions/e20@1","node":"d46","brief":"running the full suite with the compactor and its tool"}
+{"ts":"2026-07-28T18:00:22.625Z","op":"update","visit":"expeditions/e20@1","node":"d47","brief":"dry-running the compactor over every canvas"}
+{"ts":"2026-07-28T18:00:30.268Z","op":"update","visit":"expeditions/e20@1","node":"d48","brief":"committing the compactor to e20's branch"}
