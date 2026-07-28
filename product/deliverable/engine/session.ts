@@ -116,13 +116,24 @@ export class Session {
     this.machine = compileMachine(root, mainMachinePath(root));
     this.instance = newInstance(this.machine);
     this.decisions = new Decisions(seDir(root));
-    // SETTINGS SURVIVE THE ENGINE (owner ruling 2026-07-28): the mirror's
-    // sliders restore across reloads like the decision graph — ONE store,
-    // restored wholesale, ready for settings still to come.
+    // SETTINGS SURVIVE THE ENGINE, NOT THE SESSION (owner rulings 2026-07-28).
+    // The mirror's sliders restore across a RELOAD like the decision graph —
+    // ONE store, restored wholesale, ready for settings still to come. But a
+    // session that ended and started again is a NEW session, and takes the
+    // defaults.
+    //
+    // The shim's life is the session, so it stamps each child with a token.
+    // Matching it is what tells the two apart, and it fails safe: an absent
+    // or unfamiliar stamp simply does not restore. There is no cleanup step
+    // to forget, so a crash or a power cut cannot leave the last session's
+    // sliders standing either.
     try {
-      const s = JSON.parse(readFileSync(join(seDir(root), "settings.json"), "utf8")) as { autonomy?: number; shutdown?: number };
-      if (typeof s.autonomy === "number" && s.autonomy >= 0 && s.autonomy <= 1) this._autonomy = s.autonomy;
-      if (typeof s.shutdown === "number" && Number.isInteger(s.shutdown) && s.shutdown >= 1 && s.shutdown <= 5) this._shutdown = s.shutdown;
+      const s = JSON.parse(readFileSync(join(seDir(root), "settings.json"), "utf8")) as { autonomy?: number; shutdown?: number; session?: string };
+      const mine = process.env.SE_SESSION;
+      if (mine !== undefined && mine !== "" && s.session === mine) {
+        if (typeof s.autonomy === "number" && s.autonomy >= 0 && s.autonomy <= 1) this._autonomy = s.autonomy;
+        if (typeof s.shutdown === "number" && Number.isInteger(s.shutdown) && s.shutdown >= 1 && s.shutdown <= 5) this._shutdown = s.shutdown;
+      }
     } catch { /* no store yet — the defaults stand */ }
     this.syncKeepAwake();
   }
@@ -130,7 +141,7 @@ export class Session {
   private persistSettings(): void {
     try {
       mkdirSync(seDir(this.root), { recursive: true });
-      writeFileSync(join(seDir(this.root), "settings.json"), JSON.stringify({ autonomy: this._autonomy, shutdown: this._shutdown }) + "\n", "utf8");
+      writeFileSync(join(seDir(this.root), "settings.json"), JSON.stringify({ session: process.env.SE_SESSION ?? null, autonomy: this._autonomy, shutdown: this._shutdown }) + "\n", "utf8");
     } catch { /* a failed save never blocks the slider */ }
   }
 

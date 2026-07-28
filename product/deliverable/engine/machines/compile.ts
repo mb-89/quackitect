@@ -206,6 +206,18 @@ export function compileMachine(root: string, canvasPath: string): MachineDecl {
       }
     }
     drawn.push({ from, decl: { to: to.id, role: role as EdgeRole, ...(guard !== "" ? { guard } : {}) }, declared: roleRaw !== null, id: edge.id });
+    // ONE ARROW, BOTH WAYS (owner ruling 2026-07-28). Drawing a forward edge
+    // and a return edge as two separate arrows is what Obsidian makes
+    // tedious; a DOUBLE-HEADED arrow is what a person naturally draws
+    // instead, and Obsidian offers it in its own editor. So it means exactly
+    // that pair.
+    //
+    // The return half is left UNDECLARED on purpose, so the depth rule below
+    // names it: forward is whichever end lies deeper from start, and the
+    // other way round is the return. Nothing new decides anything.
+    if ((edge as { fromEnd?: string }).fromEnd === "arrow" && ((edge as { toEnd?: string }).toEnd ?? "arrow") === "arrow") {
+      drawn.push({ from: to, decl: { to: from.id, role: "normal", ...(guard !== "" ? { guard } : {}) }, declared: false, id: `${edge.id}~return` });
+    }
   }
 
   // start and end are MECHANICAL: every machine has exactly one of each.

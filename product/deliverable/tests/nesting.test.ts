@@ -143,14 +143,49 @@ test("the front desk and ideation stand as idle doors with their drawn shapes", 
   assert.deepEqual(ideaM.states.map((s) => s.id), ["start", "frame", "diverge", "converge", "route", "end"]);
 });
 
-test("settings survive an engine life: a new session restores the store", () => {
+// SETTINGS BELONG TO A SESSION (owner rulings 2026-07-28). A RELOAD is the
+// same session and keeps the sliders; a session that ended and started again
+// is a new one and takes the defaults. The shim stamps each engine life with
+// the session's token, and matching it is what tells the two apart.
+test("settings survive a RELOAD: the same session restores the store", () => {
   const root = freshRoot();
-  const a = new Session(root);
-  a.setAutonomy(0.85);
-  a.setShutdown(3);
-  const b = new Session(root);
-  assert.equal(b.autonomy, 0.85);
-  assert.equal(b.shutdown, 3);
+  const was = process.env.SE_SESSION;
+  process.env.SE_SESSION = "session-under-test";
+  try {
+    const a = new Session(root);
+    a.setAutonomy(0.85);
+    a.setShutdown(3);
+    // A reload is a new engine life inside the SAME session.
+    const b = new Session(root);
+    assert.equal(b.autonomy, 0.85);
+    assert.equal(b.shutdown, 3);
+  } finally {
+    if (was === undefined) delete process.env.SE_SESSION; else process.env.SE_SESSION = was;
+  }
+});
+
+test("settings do NOT survive the session: a fresh start takes the defaults", () => {
+  const root = freshRoot();
+  const was = process.env.SE_SESSION;
+  try {
+    process.env.SE_SESSION = "the-session-that-ended";
+    const a = new Session(root);
+    a.setAutonomy(0.85);
+    a.setShutdown(3);
+    // A new session mints a new token, so last session's store does not apply.
+    process.env.SE_SESSION = "a-brand-new-session";
+    const b = new Session(root);
+    assert.equal(b.autonomy, 0.4, "autonomy is back to its default");
+    assert.equal(b.shutdown, 1, "shutdown is back to its default");
+    // It fails SAFE: no token at all restores nothing either, so a crash or a
+    // power cut cannot leave the last session's sliders standing.
+    delete process.env.SE_SESSION;
+    const c = new Session(root);
+    assert.equal(c.autonomy, 0.4);
+    assert.equal(c.shutdown, 1);
+  } finally {
+    if (was === undefined) delete process.env.SE_SESSION; else process.env.SE_SESSION = was;
+  }
 });
 
 test("the voice lint: walls, sentences, chains and the pyramid - thresholds are data", async () => {

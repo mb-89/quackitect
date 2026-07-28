@@ -48,6 +48,26 @@ function sidePoint(el: CanvasElement, side: string | undefined, other: CanvasEle
   }
 }
 
+/** THE FEED PALETTE — one colour per role, none shared (owner ruling
+ *  2026-07-28). The aq kind wore the agent's blue and the update kind wore
+ *  the human's amber, so two of the three columns said the same thing twice.
+ *
+ *  Green, red and amber are RESERVED by the voice for pass, failure and
+ *  attention, so no role may take them — a kind painted amber reads as a
+ *  verdict. Data, not scattered literals, and a test holds it true. */
+export const FEED_COLOURS: Record<string, string> = {
+  time: "#566068",
+  "src-agent": "#6fb3a8",
+  "src-human": "#e0834a",
+  "kind-call": "#8a97a3",
+  "kind-update": "#7cc4e8",
+  "kind-note": "#c58fe8",
+  "kind-aq": "#f0879a",
+};
+
+/** What the voice already spent: pass, failure, attention. */
+export const RESERVED_COLOURS: string[] = ["#4a7a55", "#e86a5f", "#e8b339"];
+
 export interface StateMeta {
   has_exit: boolean;
   exit_met: boolean;
@@ -57,7 +77,111 @@ export interface StateMeta {
   subtitle?: string;
 }
 
-function machineSvg(canvas: CanvasData, activeIds: Set<string>, doneIds: Set<string>, subIds: Set<string>, meta: Record<string, StateMeta>): string {
+/** THE RENDER IS A VIEW, THE CANVAS IS THE SOURCE (owner ruling 2026-07-28).
+ *  Obsidian sizes a node so a person can read the note INSIDE it. Here a node
+ *  carries a title and a subtitle, so most of that box is empty — and because
+ *  the drawing scales to fit its pane, the emptiness is exactly what makes the
+ *  text small. Shrinking the boxes makes the text bigger in the same space.
+ *
+ *  The geometry is rebuilt from the drawing's ORDER, never from its
+ *  magnitudes. Whoever was left of, right of, above or below whom stays that
+ *  way. No layout algorithm runs: the hand-placed arrangement carries meaning
+ *  the engine must not invent. This is why the render and Obsidian no longer
+ *  look alike, and that is the point — the law binds what the engine ACCEPTS
+ *  from a drawing, not what a view of it must look like.
+ */
+const LABEL_CH = 15.6; // monospace advance at the .label size
+const SUB_CH = 10.2; // ditto at .sublabel
+const BOX_PAD = 26;
+const GUTTER_X = 110; // room for the condition circles that ride the edges
+const GUTTER_Y = 70;
+
+function nearestBand(reps: number[], v: number): number {
+  let best = 0;
+  for (let i = 1; i < reps.length; i++) if (Math.abs(reps[i] - v) < Math.abs(reps[best] - v)) best = i;
+  return best;
+}
+
+function bandsOf(values: number[], tolerance: number): number[] {
+  const sorted = [...values].sort((a, b) => a - b);
+  const reps: number[] = [];
+  for (const v of sorted) if (reps.length === 0 || v - reps[reps.length - 1] > tolerance) reps.push(v);
+  return reps;
+}
+
+export function compact(canvas: CanvasData, meta: Record<string, StateMeta>): CanvasData {
+  const source = canvas.nodes ?? [];
+  if (source.length === 0) return canvas;
+  // Membership and banding both read the ORIGINAL rects, so capture them
+  // before anything moves.
+  const orig = new Map(source.map((n) => [n.id, { x: n.x, y: n.y, w: n.width, h: n.height }]));
+  const nodes = source.map((n) => ({ ...n })) as CanvasElement[];
+  const boxes = nodes.filter((n) => n.type !== "group");
+  if (boxes.length === 0) return canvas;
+
+  const sized = new Map<string, { w: number; h: number }>();
+  for (const n of boxes) {
+    if (n.type === "text") {
+      const len = (n.text ?? "").length;
+      sized.set(n.id, { w: 520, h: Math.max(120, Math.ceil(len / 62) * 24 + 28) });
+      continue;
+    }
+    if ((n as { styleAttributes?: { shape?: string } }).styleAttributes?.shape === "pill") {
+      sized.set(n.id, { w: 68, h: 68 }); // start and end are just symbols
+      continue;
+    }
+    const sid = stateIdOf(n) ?? "";
+    const subFull = meta[sid]?.subtitle;
+    const sub = subFull !== undefined && subFull.length > 48 ? `${subFull.slice(0, 47)}…` : subFull;
+    const wide = Math.max(sid.length * LABEL_CH, (sub ?? "").length * SUB_CH);
+    sized.set(n.id, { w: Math.max(200, Math.ceil(wide) + BOX_PAD * 2), h: sub === undefined ? 72 : 100 });
+  }
+
+  const cx = boxes.map((n) => orig.get(n.id)!.x + orig.get(n.id)!.w / 2);
+  const cy = boxes.map((n) => orig.get(n.id)!.y + orig.get(n.id)!.h / 2);
+  const cols = bandsOf(cx, 120);
+  const rows = bandsOf(cy, 120);
+  const colIdx = cx.map((v) => nearestBand(cols, v));
+  const rowIdx = cy.map((v) => nearestBand(rows, v));
+  const colW = cols.map((_, c) => Math.max(0, ...boxes.filter((_, i) => colIdx[i] === c).map((n) => sized.get(n.id)!.w)));
+  const rowH = rows.map((_, r) => Math.max(0, ...boxes.filter((_, i) => rowIdx[i] === r).map((n) => sized.get(n.id)!.h)));
+  const colX: number[] = [];
+  const rowY: number[] = [];
+  let ax = 0;
+  for (const w of colW) { colX.push(ax); ax += w + GUTTER_X; }
+  let ay = 0;
+  for (const h of rowH) { rowY.push(ay); ay += h + GUTTER_Y; }
+  boxes.forEach((n, i) => {
+    const s = sized.get(n.id)!;
+    n.x = colX[colIdx[i]] + (colW[colIdx[i]] - s.w) / 2;
+    n.y = rowY[rowIdx[i]] + (rowH[rowIdx[i]] - s.h) / 2;
+    n.width = s.w;
+    n.height = s.h;
+  });
+
+  // A group frames whatever it framed before, at wherever that now sits.
+  for (const g of nodes) {
+    if (g.type !== "group") continue;
+    const og = orig.get(g.id)!;
+    const members = boxes.filter((n) => {
+      const o = orig.get(n.id)!;
+      return o.x >= og.x && o.y >= og.y && o.x + o.w <= og.x + og.w && o.y + o.h <= og.y + og.h;
+    });
+    if (members.length === 0) continue;
+    const x1 = Math.min(...members.map((m) => m.x)) - 24;
+    const y1 = Math.min(...members.map((m) => m.y)) - 52; // headroom for the label
+    const x2 = Math.max(...members.map((m) => m.x + m.width)) + 24;
+    const y2 = Math.max(...members.map((m) => m.y + m.height)) + 24;
+    g.x = x1;
+    g.y = y1;
+    g.width = x2 - x1;
+    g.height = y2 - y1;
+  }
+  return { ...canvas, nodes };
+}
+
+function machineSvg(source: CanvasData, activeIds: Set<string>, doneIds: Set<string>, subIds: Set<string>, meta: Record<string, StateMeta>): string {
+  const canvas = compact(source, meta);
   const nodes = canvas.nodes ?? [];
   const pad = 60;
   const minX = Math.min(...nodes.map((n) => n.x)) - pad;
@@ -82,7 +206,10 @@ function machineSvg(canvas: CanvasData, activeIds: Set<string>, doneIds: Set<str
     if (a === undefined || b === undefined) continue;
     const [x1, y1] = sidePoint(a, (edge as { fromSide?: string }).fromSide, b);
     const [x2, y2] = sidePoint(b, (edge as { toSide?: string }).toSide, a);
-    parts.push(`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" class="edge" marker-end="url(#arrow)"/>`);
+    // A double-headed arrow is one edge meaning both ways, so it draws that
+    // way too — the marker already orients itself at a start.
+    const bothWays = (edge as { fromEnd?: string }).fromEnd === "arrow";
+    parts.push(`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" class="edge"${bothWays ? ' marker-start="url(#arrow)"' : ""} marker-end="url(#arrow)"/>`);
     if (edge.label !== undefined && edge.label !== "") {
       parts.push(`<text x="${(x1 + x2) / 2}" y="${(y1 + y2) / 2 - 8}" class="guard">${esc(edge.label)}</text>`);
     }
@@ -247,8 +374,17 @@ const STYLE = `
   body { font-family: ui-monospace, Consolas, monospace; background: #14171a; color: #d8dde2; margin: 0; height: 100vh; overflow: hidden; }
   .cols { display: flex; height: 100vh; }
   main { flex: 1; min-width: 0; display: flex; flex-direction: column; padding: 14px 18px; }
-  #divider { width: 6px; cursor: col-resize; background: #2a2f34; }
+  .divider { width: 6px; cursor: col-resize; background: #2a2f34; flex: none; }
   aside { width: 620px; min-width: 320px; max-width: 80vw; display: flex; flex-direction: column; background: #191d21; }
+  /* THE LEFT COLUMN: the feed on top, the agent's terminal beneath it.
+     A hundred monospace columns is what the terminal wants to start at; the
+     divider moves it from there and the width is the reader's from then on. */
+  #left { width: 820px; min-width: 360px; }
+  #left #w-log { flex: 1; min-height: 0; }
+  /* Half the VIEWPORT, never half the screen — the browser window is what the
+     reader actually has. Expand opens it over the page like any other widget. */
+  #w-terminal { max-height: 50vh; flex: none; min-height: 140px; }
+  .term-panel { flex: 1; min-height: 0; overflow: auto; padding: 8px 10px; }
   .crumbs { font-size: 13px; color: #7f8b96; display: flex; align-items: center; gap: 4px; text-transform: none; letter-spacing: 0; }
   .crumbs a { color: #d8dde2; text-decoration: none; }
   .crumbs a:hover { color: #e8b339; }
@@ -328,15 +464,15 @@ const STYLE = `
   .log-panel { font-size: 12px; margin-top: 6px; }
   .logrow { display: flex; gap: 8px; padding: 2px 0; cursor: pointer; border-bottom: 1px dotted #22272c; align-items: baseline; }
   .logrow:hover { background: #22272c; }
-  .logrow .lt { color: #7f8b96; flex: 0 0 auto; }
-  .logrow .lsrc { flex: 0 0 5.5ch; color: #7cc4e8; }
-  .logrow .lsrc.human { color: #e8b339; }
+  .logrow .lt { color: ${FEED_COLOURS.time}; flex: 0 0 auto; }
+  .logrow .lsrc { flex: 0 0 5.5ch; color: ${FEED_COLOURS["src-agent"]}; }
+  .logrow .lsrc.human { color: ${FEED_COLOURS["src-human"]}; }
   .logrow .lkind { flex: 0 0 6.5ch; }
-  .logrow .lkind.k-call { color: #7f8b96; }
-  .logrow .lkind.k-update { font-weight: 700; color: #e8b339; }
-  .logrow .lkind.k-note { font-style: italic; color: #c58fe8; }
-  .logrow .lkind.k-aq { font-weight: 700; color: #7cc4e8; }
-  .aq-q { font-weight: 700; color: #7cc4e8; padding: 6px 0; white-space: pre-wrap; }
+  .logrow .lkind.k-call { color: ${FEED_COLOURS["kind-call"]}; }
+  .logrow .lkind.k-update { font-weight: 700; color: ${FEED_COLOURS["kind-update"]}; }
+  .logrow .lkind.k-note { font-style: italic; color: ${FEED_COLOURS["kind-note"]}; }
+  .logrow .lkind.k-aq { font-weight: 700; color: ${FEED_COLOURS["kind-aq"]}; }
+  .aq-q { font-weight: 700; color: ${FEED_COLOURS["kind-aq"]}; padding: 6px 0; white-space: pre-wrap; }
   #loadbar { position: fixed; top: 0; left: 0; right: 0; height: 3px; background: #22272c; z-index: 99; display: none; }
   #loadbar .fill { height: 100%; width: 30%; background: #e8b339; animation: loadslide 1s linear infinite; }
   @keyframes loadslide { 0% { margin-left: -30%; } 100% { margin-left: 100%; } }
@@ -368,7 +504,8 @@ const STYLE = `
 `;
 
 const SCRIPT = `
-const D = window.SE_DATA;
+// Re-read after every morph — a morph never re-runs a script tag.
+let D = JSON.parse(document.getElementById("se-data").textContent);
 
 function jsonTable(v) {
   if (v === null || v === undefined) return '<span class="vnull">null</span>';
@@ -526,8 +663,8 @@ document.addEventListener("click", async (ev) => {
     return;
   }
 });
-const CURRENT = (D.describe.active && D.describe.active[0]) ? D.describe.active[0].split("/").pop() : null;
-const WALK_HERE = D.viewingWalk;
+let CURRENT = (D.describe.active && D.describe.active[0]) ? D.describe.active[0].split("/").pop() : null;
+let WALK_HERE = D.viewingWalk;
 function nextTable(id, s) {
   const here = WALK_HERE && id === CURRENT;
   return '<table class="kv">' + s.next.map((n, i) => {
@@ -618,25 +755,81 @@ function stateDetail(id) {
   }
   return html;
 }
-// Reload WITHOUT losing the view or the open details pane — a checkbox
-// click must not cost the user their place (found: four re-opens to set
-// four checks).
-function reloadKeep(detail) {
+// THE PAGE UPDATES IN PLACE (owner ruling 2026-07-28). A full reload cost
+// the reader their scroll, their selection and whatever they were typing.
+// The old workaround carried the view, the open pane and the open folds
+// through the URL and still lost the rest. Now an unchanged node is never
+// replaced, so there is nothing left to restore.
+//
+// Subtrees the CLIENT fills carry data-morph-ignore. The server sends them
+// empty, so morphing into them would wipe what the client just rendered.
+function sameNode(a, b) {
+  if (a.nodeType !== b.nodeType) return false;
+  if (a.nodeType !== 1) return true;
+  return a.tagName === b.tagName && (a.id || "") === (b.id || "");
+}
+function morph(from, to) {
+  if (from.nodeType !== 1) { if (from.nodeValue !== to.nodeValue) from.nodeValue = to.nodeValue; return; }
+  if (from.hasAttribute("data-morph-ignore")) return;
+  // A pane the reader has dragged owns its own width — the server never
+  // sent that style, so morphing would silently snap it back.
+  const keepsStyle = from.hasAttribute("data-keep-style");
+  for (const a of to.attributes) if (!(keepsStyle && a.name === "style") && from.getAttribute(a.name) !== a.value) from.setAttribute(a.name, a.value);
+  for (const a of [...from.attributes]) if (!to.hasAttribute(a.name) && !(keepsStyle && a.name === "style")) from.removeAttribute(a.name);
+  // A control under the reader's hand stays theirs until they leave it.
+  if (from.tagName === "INPUT" && from !== document.activeElement && to.hasAttribute("value")) from.value = to.getAttribute("value");
+  const byId = new Map();
+  for (const c of from.children) if (c.id !== "") byId.set(c.id, c);
+  let cur = from.firstChild;
+  for (const t of [...to.childNodes]) {
+    let match = t.nodeType === 1 && t.id !== "" ? byId.get(t.id) : undefined;
+    if (match === undefined && cur !== null && sameNode(cur, t)) match = cur;
+    if (match === undefined) { from.insertBefore(document.importNode(t, true), cur); continue; }
+    if (match !== cur) from.insertBefore(match, cur);
+    morph(match, t);
+    cur = match.nextSibling;
+  }
+  while (cur !== null) { const next = cur.nextSibling; from.removeChild(cur); cur = next; }
+}
+// Everything derived FROM a render has to be derived again after one.
+function rebind() {
+  const blob = document.getElementById("se-data");
+  if (blob) D = JSON.parse(blob.textContent);
+  CURRENT = (D.describe.active && D.describe.active[0]) ? D.describe.active[0].split("/").pop() : null;
+  WALK_HERE = D.viewingWalk;
+  // Without this the next poll compares against the OLD position forever.
+  ACTIVE_AT_RENDER = JSON.stringify(D.describe.active || []);
+  restoreViewBox();
+  if (CURRENT_DETAIL) { const dp = detailFor(CURRENT_DETAIL); showDetails(dp[0], dp[1]); }
+}
+let refreshInFlight = false;
+async function refresh(detail) {
+  if (detail !== undefined) CURRENT_DETAIL = detail;
   const q = new URLSearchParams(location.search);
   // THE VIEW HOLDS STILL (owner ruling 2026-07-28): finishing a state is
   // data change, and data change never jumps the reader — every refresh
   // pins the machine being looked at explicitly.
   q.set("view", D.viewed.id);
-  if (detail) q.set("detail", detail); else q.delete("detail");
-  // THE UX LAW: no fold closes across a reload — open <details> ride along.
-  const folds = [...document.querySelectorAll("#details details[open] summary")].map((s) => s.textContent.split(" (")[0].trim()).filter(Boolean);
-  if (folds.length) q.set("folds", folds.join("|")); else q.delete("folds");
+  if (CURRENT_DETAIL) q.set("detail", CURRENT_DETAIL); else q.delete("detail");
   const qs = q.toString();
-  location.href = location.pathname + (qs ? "?" + qs : "");
+  const url = location.pathname + (qs ? "?" + qs : "");
+  history.replaceState(null, "", url);
+  if (refreshInFlight) return;
+  refreshInFlight = true;
+  try {
+    const r = await fetch(url);
+    const doc = new DOMParser().parseFromString(await r.text(), "text/html");
+    morph(document.body, doc.body);
+    rebind();
+  } catch (e) {
+    location.href = url; // a failed morph must never strand the reader
+  } finally {
+    refreshInFlight = false;
+  }
 }
 document.addEventListener("click", async (ev) => {
   const c = ev.target.closest ? ev.target.closest(".docheck") : null;
-  if (c) { if (c.disabled) return; ev.preventDefault(); c.disabled = true; await fetch("/check", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ path: c.dataset.path }) }); reloadKeep(CURRENT_DETAIL); return; }
+  if (c) { if (c.disabled) return; ev.preventDefault(); c.disabled = true; await fetch("/check", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ path: c.dataset.path }) }); refresh(); return; }
   const j = ev.target.closest ? ev.target.closest(".jump") : null;
   if (j) { await fetch("/tick", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ back: j.dataset.state }) }); location.href = "/"; return; }
   const rp = ev.target.closest ? ev.target.closest(".runpre") : null;
@@ -645,7 +838,7 @@ document.addEventListener("click", async (ev) => {
     // server coalesces stray extra clicks into the one run anyway.
     rp.disabled = true; rp.classList.add("locked"); rp.textContent = "running…";
     await fetch("/script", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ state: rp.dataset.state || CURRENT }) });
-    reloadKeep(CURRENT_DETAIL);
+    refresh();
     return;
   }
   const rpl = ev.target.closest ? ev.target.closest(".replink") : null;
@@ -823,27 +1016,34 @@ document.addEventListener("dblclick", (ev) => {
 });
 
 // Only real widget expanders — the modal's ✕ shares the style, not the job.
-document.querySelectorAll(".expand[data-widget]").forEach((btn) => {
-  btn.addEventListener("click", (ev) => {
-    ev.stopPropagation();
-    const url = btn.dataset.url;
-    if (ev.ctrlKey || ev.metaKey) { window.open(url, "_blank"); return; }
-    if (ev.shiftKey) { window.open(url, "se-widget", "width=1100,height=800"); return; }
-    const w = document.getElementById(btn.dataset.widget);
-    if (w) { if (document.fullscreenElement === w) document.exitFullscreen(); else w.requestFullscreen(); }
-  });
+// Delegated, so a morph may replace a widget head without losing the button.
+document.addEventListener("click", (ev) => {
+  const btn = ev.target.closest ? ev.target.closest(".expand[data-widget]") : null;
+  if (!btn) return;
+  ev.stopPropagation();
+  const url = btn.dataset.url;
+  if (ev.ctrlKey || ev.metaKey) { window.open(url, "_blank"); return; }
+  if (ev.shiftKey) { window.open(url, "se-widget", "width=1100,height=800"); return; }
+  const w = document.getElementById(btn.dataset.widget);
+  if (w) { if (document.fullscreenElement === w) document.exitFullscreen(); else w.requestFullscreen(); }
 });
 
+// Pan/zoom survives every refresh, per machine — a walk-driven update must
+// not snap the reader's viewport back to the whole drawing. A morph rewrites
+// the viewBox attribute, so the saved view is re-applied after every one.
+function restoreViewBox() {
+  const s = document.getElementById("machine-svg");
+  if (!s) return;
+  try {
+    const saved = JSON.parse(sessionStorage.getItem("se-vb-" + D.viewed.id) || "null");
+    if (saved && saved.w > 0) { const v = s.viewBox.baseVal; v.x = saved.x; v.y = saved.y; v.width = saved.w; v.height = saved.h; }
+  } catch (e) { /* a broken save never blocks the drawing */ }
+}
 const svg = document.getElementById("machine-svg");
 if (svg) {
   let vb = svg.viewBox.baseVal;
-  // Pan/zoom survives every refresh, per machine — a walk-driven reload
-  // must not snap the reader's viewport back to the whole drawing.
   const VB_KEY = "se-vb-" + D.viewed.id;
-  try {
-    const saved = JSON.parse(sessionStorage.getItem(VB_KEY) || "null");
-    if (saved && saved.w > 0) { vb.x = saved.x; vb.y = saved.y; vb.width = saved.w; vb.height = saved.h; }
-  } catch (e) { /* a broken save never blocks the drawing */ }
+  restoreViewBox();
   const saveVb = () => { try { sessionStorage.setItem(VB_KEY, JSON.stringify({ x: vb.x, y: vb.y, w: vb.width, h: vb.height })); } catch (e) { /* storage full — the view just re-fits */ } };
   svg.addEventListener("wheel", (ev) => {
     ev.preventDefault();
@@ -866,25 +1066,26 @@ if (svg) {
   window.addEventListener("mouseup", () => { if (panning) saveVb(); panning = null; svg.classList.remove("panning"); });
 }
 
-const divider = document.getElementById("divider");
-const aside = document.getElementById("sidebar");
-if (divider && aside) {
+// Two columns to size now, so each divider names the pane it moves and
+// which way that pane grows.
+document.querySelectorAll(".divider").forEach((dv) => {
+  const pane = document.getElementById(dv.dataset.pane);
+  if (!pane) return;
   let drag = null;
-  divider.addEventListener("mousedown", (ev) => { drag = { x: ev.clientX, w: aside.offsetWidth }; ev.preventDefault(); });
-  window.addEventListener("mousemove", (ev) => { if (drag) aside.style.width = (drag.w - (ev.clientX - drag.x)) + "px"; });
+  dv.addEventListener("mousedown", (ev) => { drag = { x: ev.clientX, w: pane.offsetWidth }; ev.preventDefault(); });
+  window.addEventListener("mousemove", (ev) => {
+    if (!drag) return;
+    const dx = ev.clientX - drag.x;
+    pane.style.width = Math.max(160, drag.w + (dv.dataset.grow === "right" ? -dx : dx)) + "px";
+  });
   window.addEventListener("mouseup", () => { drag = null; });
-}
+});
 
 if (CURRENT && D.states[CURRENT] && WALK_HERE) { CURRENT_DETAIL = "state:" + CURRENT; showDetails("state: " + CURRENT, stateDetail(CURRENT)); }
-// A reload that carried its detail along (reloadKeep) restores the pane.
+// A bookmark or an F5 still deep-links to the pane that was open.
 const DETAIL_PARAM = new URLSearchParams(location.search).get("detail");
 if (DETAIL_PARAM) { CURRENT_DETAIL = DETAIL_PARAM; const dp = detailFor(DETAIL_PARAM); showDetails(dp[0], dp[1]); }
-// Folds that were open before a reloadKeep stay open (the UX law).
-const FOLDS = (new URLSearchParams(location.search).get("folds") || "").split("|").filter(Boolean);
-if (FOLDS.length) document.querySelectorAll("#details details").forEach((d) => {
-  const s = d.querySelector("summary");
-  if (s && FOLDS.includes(s.textContent.split(" (")[0].trim())) d.open = true;
-});
+// Open folds need no carrying now: the morph never replaces them.
 
 // THE UNIFIED FEED (owner ruling, v2 i9 notes; built in v3): every hand's
 // act, one line each — time | src | brief | result. Updates bold, notes
@@ -1088,6 +1289,23 @@ document.addEventListener("click", (ev) => {
   if (h) levelHelp(null);
 });
 
+// WHAT STANDS OPEN, for the person's own hand (owner ruling 2026-07-28).
+// The same question the agent asks with se_survey, answered by the same
+// code — it used to live inside the tool handler, so only the agent could
+// ask it and the owner had to go through them.
+document.addEventListener("click", async (ev) => {
+  const b = ev.target.closest ? ev.target.closest("#survey-btn") : null;
+  if (!b) return;
+  CURRENT_DETAIL = null;
+  showDetails("what stands open", '<div class="meta">asking…</div>');
+  try {
+    const r = await fetch("/api/survey");
+    showDetails("what stands open", jsonTable(await r.json()));
+  } catch (e) {
+    showDetails("what stands open", '<div class="meta">the survey did not answer</div>');
+  }
+});
+
 // SESSION OVER — anybody reaching end stops the whole session. The mirror
 // tries to close its window; where that is not allowed, the big red
 // message stands (owner ruling 2026-07-26).
@@ -1101,47 +1319,113 @@ function sessionOver() {
 }
 if (D.describe.status === "closed") sessionOver();
 
-// The mirror FOLLOWS the walk: poll the position — the agent's hand (or
-// another window) moves the machine under this page. A dead server reads
-// as session over.
-let aliveMisses = 0;
+// THE MIRROR IS PUSHED, NOT POLLED (owner ruling 2026-07-28). The walk
+// wakes every held hand, and /events forwards that wake here — so a change
+// lands at once instead of up to a poll late. EventSource reconnects by
+// itself; a reconnect after silence is how an engine swap arrives without
+// an F5, and a silence that never ends is death.
 let pollBusy = null;
-let pollInFlight = false;
-const ACTIVE_AT_RENDER = JSON.stringify(D.describe.active || []);
-setInterval(async () => {
-  if (pollInFlight) return; // never stack polls behind a slow server
-  pollInFlight = true;
-  try {
-    const r = await fetch("/api/alive");
-    const a = await r.json();
-    // Answers again after misses — that was an engine swap (hot reload):
-    // reload onto the new child instead of waiting for F5.
-    if (aliveMisses > 0) { aliveMisses = 0; reloadKeep(CURRENT_DETAIL); return; }
-    if (a.status === "closed") { sessionOver(); return; }
-    if (thr && document.activeElement !== thr && Number(thr.value) !== a.autonomy) {
-      thr.value = a.autonomy;
-      const lbl = document.getElementById("thr-val");
-      if (lbl) lbl.textContent = Number(a.autonomy).toFixed(2);
-    }
-    if (sdEl && document.activeElement !== sdEl && Number(sdEl.value) !== a.shutdown) {
-      sdEl.value = a.shutdown;
-      const lbl2 = document.getElementById("sd-val");
-      if (lbl2) lbl2.textContent = sdAbbr(a.shutdown);
-    }
-    if (logPanel && a.acts !== lastActs) { lastActs = a.acts; refreshLog(); }
-    if (JSON.stringify(a.active || []) !== ACTIVE_AT_RENDER) { reloadKeep(CURRENT_DETAIL); return; }
-    // A script run finishing elsewhere (agent tick, other window) lands
-    // its result — refresh, keeping the open pane.
-    if (pollBusy === true && a.busy === false) { reloadKeep(CURRENT_DETAIL); return; }
-    pollBusy = a.busy;
-  } catch (e) {
-    // A short outage can be an engine swap — only a long silence is death.
-    aliveMisses++;
-    if (aliveMisses >= 8) sessionOver();
-  } finally {
-    pollInFlight = false;
+let ACTIVE_AT_RENDER = JSON.stringify(D.describe.active || []);
+let sawError = false;
+let deathTimer = null;
+const es = new EventSource("/events");
+es.addEventListener("open", () => {
+  if (deathTimer !== null) { clearTimeout(deathTimer); deathTimer = null; }
+  if (sawError) { sawError = false; refresh(); }
+});
+es.addEventListener("error", () => {
+  sawError = true;
+  if (deathTimer === null) deathTimer = setTimeout(sessionOver, 20000);
+});
+es.addEventListener("message", (ev) => {
+  let a;
+  try { a = JSON.parse(ev.data); } catch (e) { return; }
+  if (a.status === "closed") { sessionOver(); return; }
+  if (thr && document.activeElement !== thr && Number(thr.value) !== a.autonomy) {
+    thr.value = a.autonomy;
+    const lbl = document.getElementById("thr-val");
+    if (lbl) lbl.textContent = Number(a.autonomy).toFixed(2);
   }
-}, 2000);
+  if (sdEl && document.activeElement !== sdEl && Number(sdEl.value) !== a.shutdown) {
+    sdEl.value = a.shutdown;
+    const lbl2 = document.getElementById("sd-val");
+    if (lbl2) lbl2.textContent = sdAbbr(a.shutdown);
+  }
+  if (logPanel && a.acts !== lastActs) { lastActs = a.acts; refreshLog(); }
+  if (JSON.stringify(a.active || []) !== ACTIVE_AT_RENDER) { refresh(); return; }
+  // A script run finishing elsewhere (agent tick, other window) lands its
+  // result — refresh, keeping the open pane.
+  if (pollBusy === true && a.busy === false) { refresh(); return; }
+  pollBusy = a.busy;
+});
+
+// THE AGENT'S TERMINAL. The pty host is a SIBLING process on its own port,
+// because this page's process is the agent's grandchild and a grandchild
+// cannot own its grandparent's terminal. The host holds the pseudo-terminal
+// and the scrollback, so attaching after a refresh replays what was already
+// there instead of losing the session. No host running: the placeholder
+// stands and nothing else happens.
+const TERM_PORT = 7334;
+function loadAsset(href, kind) {
+  return new Promise((resolve) => {
+    const el = kind === "css" ? document.createElement("link") : document.createElement("script");
+    if (kind === "css") { el.rel = "stylesheet"; el.href = href; } else { el.src = href; }
+    el.onload = resolve;
+    el.onerror = resolve;
+    document.head.appendChild(el);
+  });
+}
+async function bootTerminal() {
+  const pane = document.getElementById("term-body");
+  if (!pane || pane.dataset.booted) return;
+  const base = "http://" + (location.hostname || "localhost") + ":" + TERM_PORT;
+  try {
+    const ping = await fetch(base + "/pty/alive");
+    if (!ping.ok) return;
+  } catch (e) { return; }
+  pane.dataset.booted = "1";
+  await loadAsset(base + "/xterm.css", "css");
+  await loadAsset(base + "/xterm.js", "js");
+  if (!window.Terminal) { pane.dataset.booted = ""; return; }
+  pane.innerHTML = "";
+  const term = new window.Terminal({
+    fontFamily: "ui-monospace, Consolas, monospace",
+    fontSize: 13,
+    scrollback: 5000,
+    theme: { background: "#14171a", foreground: "#d8dde2" },
+  });
+  term.open(pane);
+  term.onData((d) => { void fetch(base + "/pty/input", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ d }) }); });
+  const stream = new EventSource(base + "/pty/stream");
+  stream.addEventListener("message", (ev) => {
+    const bin = atob(ev.data);
+    const arr = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
+    term.write(arr);
+  });
+  // The host must be told the real size, or the agent wraps at the wrong
+  // column. Measured from a real glyph rather than xterm's internals.
+  const cell = () => {
+    const m = document.createElement("span");
+    m.style.cssText = "position:absolute;visibility:hidden;white-space:pre;font-family:ui-monospace,Consolas,monospace;font-size:13px";
+    m.textContent = "0".repeat(100);
+    document.body.appendChild(m);
+    const r = m.getBoundingClientRect();
+    m.remove();
+    return { w: r.width / 100, h: r.height };
+  };
+  const sync = () => {
+    const c = cell();
+    if (!(c.w > 0) || !(c.h > 0)) return;
+    const cols = Math.max(20, Math.floor(pane.clientWidth / c.w));
+    const rows = Math.max(6, Math.floor(pane.clientHeight / c.h));
+    term.resize(cols, rows);
+    void fetch(base + "/pty/resize", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ cols, rows }) });
+  };
+  new ResizeObserver(sync).observe(pane);
+  sync();
+}
+void bootTerminal();
 `;
 
 const MODAL = '<div id="modal"><div class="modal-box"><div class="widget-head"><span id="modal-title"></span><button class="expand" id="modal-close">✕</button></div><div class="modal-body" id="modal-body"></div></div></div><div id="toast"></div>';
@@ -1150,7 +1434,7 @@ function widgetHead(title: string, widgetId: string, url: string): string {
   return `<div class="widget-head"><span>${esc(title)}</span><button class="expand" data-widget="${widgetId}" data-url="${esc(url)}" title="expand · ctrl-click: new tab · shift-click: new window">⛶</button></div>`;
 }
 
-export function renderMirror(m: MirrorState, widget?: "machine" | "details" | "log", view?: string): string {
+export function renderMirror(m: MirrorState, widget?: "machine" | "details" | "log" | "terminal", view?: string): string {
   const info = m.session.describe() as { active: string[]; status: string };
   // The scale is READ from machines/scale.md — the Obsidian-editable
   // truth; an owner edit shows on the next reload.
@@ -1249,7 +1533,7 @@ export function renderMirror(m: MirrorState, widget?: "machine" | "details" | "l
     };
   }
   const comment = (canvas.nodes ?? []).find((n) => n.type === "text")?.text ?? "";
-  const data = `<script>window.SE_DATA = ${JSON.stringify({
+  const data = `<script type="application/json" id="se-data">${JSON.stringify({
     describe: m.session.describe(),
     packet: m.session.tickInfo(),
     lastPacket: m.lastPacket ?? null,
@@ -1259,7 +1543,7 @@ export function renderMirror(m: MirrorState, widget?: "machine" | "details" | "l
     viewed: { id: decl.id, reentry: decl.reentry, initial: decl.initial, states: decl.states.map((s) => s.id) },
     history: history.slice(-20),
     levels,
-  }).replace(/</g, "\\u003c")};</script>`;
+  }).replace(/</g, "\\u003c")}</script>`;
 
   // The slider — THE AUTONOMY: which states the agent enters by itself
   // (priority <= autonomy). 0 = the human clicks through everything
@@ -1280,19 +1564,31 @@ export function renderMirror(m: MirrorState, widget?: "machine" | "details" | "l
   // the walk's position; clicking it jumps the view there.
   const curLeaf = info.active[0] ?? "";
   const curBtn = curLeaf === "" ? "" : `<button class="ghost" id="cur-state" data-machine="${esc(walkMachine.id)}" title="the walk stands here — click: jump the view to it">☉ ${esc(curLeaf)}</button>`;
-  const machineWidget = `<div class="widget" id="w-machine"><div class="widget-head"><span class="crumbs">${crumbs}</span><span style="display:flex;align-items:center;gap:10px">${curBtn}${slider}${sdBar}${escapeBtn}<button class="expand" data-widget="w-machine" data-url="/widget/machine?view=${encodeURIComponent(decl.id)}" title="expand · ctrl-click: new tab · shift-click: new window">⛶</button></span></div><div class="widget-body">${svg}</div></div>`;
+  const machineWidget = `<div class="widget" id="w-machine"><div class="widget-head"><span class="crumbs">${crumbs}</span><span style="display:flex;align-items:center;gap:10px"><button class="ghost" id="survey-btn" title="what stands open — expeditions, iterations, pending notes, parked backlog">◷ open</button>${curBtn}${slider}${sdBar}${escapeBtn}<button class="expand" data-widget="w-machine" data-url="/widget/machine?view=${encodeURIComponent(decl.id)}" title="expand · ctrl-click: new tab · shift-click: new window">⛶</button></span></div><div class="widget-body">${svg}</div></div>`;
   const detailsWidget = `<div class="widget" id="w-details">${widgetHead("details", "w-details", "/widget/details")}
     ${info.status === "closed" ? '<div class="meta" style="color:#e86a5f">machine closed</div>' : ""}
-    <div class="meta" id="details-title">—</div>
-    <div class="panel" id="details"></div>
+    <div class="meta" id="details-title" data-morph-ignore>—</div>
+    <div class="panel" id="details" data-morph-ignore></div>
   </div>`;
   // The unified feed sits ABOVE details (owner ruling 2026-07-26) — rows
   // load and refresh client-side off /api/log; only present with a log.
   const logWidget = m.log === undefined ? "" : `<div class="widget" id="w-log">${widgetHead("log", "w-log", "/widget/log")}
     <div class="log-filter-row"><input id="log-filter" placeholder="filter the feed"><input id="log-note" placeholder="drop a note — Enter captures it"></div>
-    <div class="panel log-panel" id="log-rows"><div class="meta">loading…</div></div>
+    <div class="panel log-panel" id="log-rows" data-morph-ignore><div class="meta">loading…</div></div>
+  </div>`;
+  // THE AGENT'S TERMINAL. The whole widget is morph-ignored: a morph that
+  // reached into a live terminal would wipe its scrollback and its focus.
+  // The pty host is a SIBLING process started by RUNME — the mirror only
+  // renders a client for it, because this page's process is the agent's
+  // grandchild and a grandchild cannot own its grandparent's terminal.
+  const terminalWidget = `<div class="widget" id="w-terminal" data-morph-ignore>${widgetHead("terminal", "w-terminal", "/widget/terminal")}
+    <div class="panel term-panel" id="term-body"><div class="meta">waiting for the pty host — RUNME starts it beside the agent</div></div>
   </div>`;
 
+  if (widget === "terminal") {
+    return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>se · terminal</title><style>${STYLE} #w-terminal{flex:1;max-height:none;border-bottom:0}</style></head>
+<body><div class="cols"><aside id="left" style="width:100vw;max-width:100vw">${terminalWidget}</aside></div>${MODAL}${data}<script>${SCRIPT}</script></body></html>`;
+  }
   if (widget === "log") {
     return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>se · log</title><style>${STYLE} #w-log{flex:1;border-bottom:0}</style></head>
 <body><div class="cols"><aside id="sidebar" style="width:100vw;max-width:100vw">${logWidget}</aside></div>${MODAL}${data}<script>${SCRIPT}</script></body></html>`;
@@ -1309,12 +1605,16 @@ export function renderMirror(m: MirrorState, widget?: "machine" | "details" | "l
   return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>se mirror</title><style>${STYLE}</style></head>
 <body>
 <div class="cols">
+  <aside id="left" data-keep-style>
+    ${logWidget}
+    ${terminalWidget}
+  </aside>
+  <div class="divider" id="div-left" data-pane="left" data-grow="left"></div>
   <main>
     ${machineWidget}
   </main>
-  <div id="divider"></div>
-  <aside id="sidebar">
-    ${logWidget}
+  <div class="divider" id="div-right" data-pane="sidebar" data-grow="right"></div>
+  <aside id="sidebar" data-keep-style>
     ${detailsWidget}
   </aside>
 </div>
