@@ -102,7 +102,7 @@ Write plainly. These are rules, not suggestions. They bind every output: chat, d
 ### Explaining a problem
 - Explain it plainly first, like to a smart outsider. What the parts do. What changed. Who is right.
 - Name each mechanism by what it does ("the checker", "the live table"). Not by its internal identifier.
-- Give the verdict in one sentence before any options ("the book is right, the checker is outdated").
+- Give the verdict in one sentence before any options ("the book is right, the checker is outdated"). This is BLUF - the bottom line up front; the method card holds the depth (product/deliverable/machines/methods/bluf.md).
 - Then ask the decision as short numbered questions. As few as possible.
 
 ### Structure

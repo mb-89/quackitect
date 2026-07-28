@@ -2,9 +2,9 @@
 
 **What.** Show the essential first; disclose depth only when the reader
 asks for it. A named, established method: Nielsen coined it for
-interaction design (nngroup.com/articles/progressive-disclosure, 2006);
-journalism's inverted pyramid and the military's BLUF (bottom line up
-front) are the same idea for text.
+interaction design (nngroup.com/articles/progressive-disclosure, 2006).
+Its siblings for TEXT — BLUF and the inverted pyramid — have their own
+card: methods/bluf.md.
 
 **When.** Any document past a few paragraphs, any report, any surface
 where readers differ in how much they need. The voice's pyramid rule is
