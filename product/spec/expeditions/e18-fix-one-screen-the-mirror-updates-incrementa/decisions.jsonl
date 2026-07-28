@@ -11,3 +11,5 @@
 {"ts":"2026-07-28T14:52:58.511Z","op":"update","visit":"expeditions/e18@0","node":"d63","brief":"Compaction pass rebuilds geometry from the drawing's order"}
 {"ts":"2026-07-28T14:54:19.740Z","op":"update","visit":"expeditions/e18@0","node":"d64","brief":"Test pins the compaction invariants against the real main canvas"}
 {"ts":"2026-07-28T14:55:11.769Z","op":"done","visit":"expeditions/e18@0","node":"d47","brief":"Compaction lands with four invariants pinned in the suite"}
+{"ts":"2026-07-28T14:56:15.043Z","op":"update","visit":"expeditions/e18@0","node":"d65","brief":"Left column with the log and terminal; details takes the right"}
+{"ts":"2026-07-28T14:57:05.259Z","op":"done","visit":"expeditions/e18@0","node":"d48","brief":"Log and terminal on the left, details alone on the right"}

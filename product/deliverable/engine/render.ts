@@ -351,8 +351,17 @@ const STYLE = `
   body { font-family: ui-monospace, Consolas, monospace; background: #14171a; color: #d8dde2; margin: 0; height: 100vh; overflow: hidden; }
   .cols { display: flex; height: 100vh; }
   main { flex: 1; min-width: 0; display: flex; flex-direction: column; padding: 14px 18px; }
-  #divider { width: 6px; cursor: col-resize; background: #2a2f34; }
+  .divider { width: 6px; cursor: col-resize; background: #2a2f34; flex: none; }
   aside { width: 620px; min-width: 320px; max-width: 80vw; display: flex; flex-direction: column; background: #191d21; }
+  /* THE LEFT COLUMN: the feed on top, the agent's terminal beneath it.
+     A hundred monospace columns is what the terminal wants to start at; the
+     divider moves it from there and the width is the reader's from then on. */
+  #left { width: 820px; min-width: 360px; }
+  #left #w-log { flex: 1; min-height: 0; }
+  /* Half the VIEWPORT, never half the screen — the browser window is what the
+     reader actually has. Expand opens it over the page like any other widget. */
+  #w-terminal { max-height: 50vh; flex: none; min-height: 140px; }
+  .term-panel { flex: 1; min-height: 0; overflow: auto; padding: 8px 10px; }
   .crumbs { font-size: 13px; color: #7f8b96; display: flex; align-items: center; gap: 4px; text-transform: none; letter-spacing: 0; }
   .crumbs a { color: #d8dde2; text-decoration: none; }
   .crumbs a:hover { color: #e8b339; }
@@ -739,8 +748,11 @@ function sameNode(a, b) {
 function morph(from, to) {
   if (from.nodeType !== 1) { if (from.nodeValue !== to.nodeValue) from.nodeValue = to.nodeValue; return; }
   if (from.hasAttribute("data-morph-ignore")) return;
-  for (const a of to.attributes) if (from.getAttribute(a.name) !== a.value) from.setAttribute(a.name, a.value);
-  for (const a of [...from.attributes]) if (!to.hasAttribute(a.name)) from.removeAttribute(a.name);
+  // A pane the reader has dragged owns its own width — the server never
+  // sent that style, so morphing would silently snap it back.
+  const keepsStyle = from.hasAttribute("data-keep-style");
+  for (const a of to.attributes) if (!(keepsStyle && a.name === "style") && from.getAttribute(a.name) !== a.value) from.setAttribute(a.name, a.value);
+  for (const a of [...from.attributes]) if (!to.hasAttribute(a.name) && !(keepsStyle && a.name === "style")) from.removeAttribute(a.name);
   // A control under the reader's hand stays theirs until they leave it.
   if (from.tagName === "INPUT" && from !== document.activeElement && to.hasAttribute("value")) from.value = to.getAttribute("value");
   const byId = new Map();
@@ -1031,14 +1043,20 @@ if (svg) {
   window.addEventListener("mouseup", () => { if (panning) saveVb(); panning = null; svg.classList.remove("panning"); });
 }
 
-const divider = document.getElementById("divider");
-const aside = document.getElementById("sidebar");
-if (divider && aside) {
+// Two columns to size now, so each divider names the pane it moves and
+// which way that pane grows.
+document.querySelectorAll(".divider").forEach((dv) => {
+  const pane = document.getElementById(dv.dataset.pane);
+  if (!pane) return;
   let drag = null;
-  divider.addEventListener("mousedown", (ev) => { drag = { x: ev.clientX, w: aside.offsetWidth }; ev.preventDefault(); });
-  window.addEventListener("mousemove", (ev) => { if (drag) aside.style.width = (drag.w - (ev.clientX - drag.x)) + "px"; });
+  dv.addEventListener("mousedown", (ev) => { drag = { x: ev.clientX, w: pane.offsetWidth }; ev.preventDefault(); });
+  window.addEventListener("mousemove", (ev) => {
+    if (!drag) return;
+    const dx = ev.clientX - drag.x;
+    pane.style.width = Math.max(160, drag.w + (dv.dataset.grow === "right" ? -dx : dx)) + "px";
+  });
   window.addEventListener("mouseup", () => { drag = null; });
-}
+});
 
 if (CURRENT && D.states[CURRENT] && WALK_HERE) { CURRENT_DETAIL = "state:" + CURRENT; showDetails("state: " + CURRENT, stateDetail(CURRENT)); }
 // A bookmark or an F5 still deep-links to the pane that was open.
@@ -1308,7 +1326,7 @@ function widgetHead(title: string, widgetId: string, url: string): string {
   return `<div class="widget-head"><span>${esc(title)}</span><button class="expand" data-widget="${widgetId}" data-url="${esc(url)}" title="expand · ctrl-click: new tab · shift-click: new window">⛶</button></div>`;
 }
 
-export function renderMirror(m: MirrorState, widget?: "machine" | "details" | "log", view?: string): string {
+export function renderMirror(m: MirrorState, widget?: "machine" | "details" | "log" | "terminal", view?: string): string {
   const info = m.session.describe() as { active: string[]; status: string };
   // The scale is READ from machines/scale.md — the Obsidian-editable
   // truth; an owner edit shows on the next reload.
@@ -1450,7 +1468,19 @@ export function renderMirror(m: MirrorState, widget?: "machine" | "details" | "l
     <div class="log-filter-row"><input id="log-filter" placeholder="filter the feed"><input id="log-note" placeholder="drop a note — Enter captures it"></div>
     <div class="panel log-panel" id="log-rows" data-morph-ignore><div class="meta">loading…</div></div>
   </div>`;
+  // THE AGENT'S TERMINAL. The whole widget is morph-ignored: a morph that
+  // reached into a live terminal would wipe its scrollback and its focus.
+  // The pty host is a SIBLING process started by RUNME — the mirror only
+  // renders a client for it, because this page's process is the agent's
+  // grandchild and a grandchild cannot own its grandparent's terminal.
+  const terminalWidget = `<div class="widget" id="w-terminal" data-morph-ignore>${widgetHead("terminal", "w-terminal", "/widget/terminal")}
+    <div class="panel term-panel" id="term-body"><div class="meta">waiting for the pty host — RUNME starts it beside the agent</div></div>
+  </div>`;
 
+  if (widget === "terminal") {
+    return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>se · terminal</title><style>${STYLE} #w-terminal{flex:1;max-height:none;border-bottom:0}</style></head>
+<body><div class="cols"><aside id="left" style="width:100vw;max-width:100vw">${terminalWidget}</aside></div>${MODAL}${data}<script>${SCRIPT}</script></body></html>`;
+  }
   if (widget === "log") {
     return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>se · log</title><style>${STYLE} #w-log{flex:1;border-bottom:0}</style></head>
 <body><div class="cols"><aside id="sidebar" style="width:100vw;max-width:100vw">${logWidget}</aside></div>${MODAL}${data}<script>${SCRIPT}</script></body></html>`;
@@ -1467,12 +1497,16 @@ export function renderMirror(m: MirrorState, widget?: "machine" | "details" | "l
   return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>se mirror</title><style>${STYLE}</style></head>
 <body>
 <div class="cols">
+  <aside id="left" data-keep-style>
+    ${logWidget}
+    ${terminalWidget}
+  </aside>
+  <div class="divider" id="div-left" data-pane="left" data-grow="left"></div>
   <main>
     ${machineWidget}
   </main>
-  <div id="divider"></div>
-  <aside id="sidebar">
-    ${logWidget}
+  <div class="divider" id="div-right" data-pane="sidebar" data-grow="right"></div>
+  <aside id="sidebar" data-keep-style>
     ${detailsWidget}
   </aside>
 </div>

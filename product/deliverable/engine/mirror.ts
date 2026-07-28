@@ -313,9 +313,9 @@ export function startMirror(o: MirrorOptions): Server {
         res.end(JSON.stringify(aliveState()));
         return;
       }
-      if (url.pathname === "/widget/machine" || url.pathname === "/widget/details" || url.pathname === "/widget/log") {
+      if (url.pathname === "/widget/machine" || url.pathname === "/widget/details" || url.pathname === "/widget/log" || url.pathname === "/widget/terminal") {
         res.writeHead(200, { "content-type": "text/html; charset=utf-8" });
-        res.end(renderMirror(state, url.pathname.slice("/widget/".length) as "machine" | "details" | "log", url.searchParams.get("view") ?? undefined));
+        res.end(renderMirror(state, url.pathname.slice("/widget/".length) as "machine" | "details" | "log" | "terminal", url.searchParams.get("view") ?? undefined));
         return;
       }
       // GET / — tick without arguments: information about where we are.
