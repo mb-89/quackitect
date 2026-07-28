@@ -296,6 +296,7 @@ const STYLE = `
   table.kv td.v { color: #d8dde2; word-break: break-word; }
   table.kv table.kv { margin: 2px 0; }
   .vnull { color: #7f8b96; } .vnum { color: #7cc4e8; } .vbool { color: #c58fe8; } .vstr { color: #a8c88f; }
+  .prewrap { white-space: pre-wrap; }
   td.btncell { text-align: center; vertical-align: middle !important; width: 1%; }
   button.go.locked { background: #2a2f34; color: #5b6772; cursor: not-allowed; }
   .cond circle { stroke-width: 2.5; }
@@ -372,7 +373,11 @@ function jsonTable(v) {
     if (looksLikePath) {
       return '<a class="doclink" data-path="' + v + '">' + v + "</a>";
     }
-    return '<span class="vstr">' + v.replace(/&/g,"&amp;").replace(/</g,"&lt;") + "</span>";
+    const escaped = v.replace(/&/g,"&amp;").replace(/</g,"&lt;");
+    // Paragraphs survive the pane: a multi-line string keeps its breaks
+    // (HTML collapses raw newlines - the wall-of-text bug, owner 2026-07-28).
+    if (v.includes("\\n")) return '<div class="vstr prewrap">' + escaped + "</div>";
+    return '<span class="vstr">' + escaped + "</span>";
   }
   if (Array.isArray(v)) {
     if (v.length === 0) return '<span class="vnull">[]</span>';

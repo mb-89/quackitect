@@ -29,3 +29,8 @@
 {"ts":"2026-07-28T11:05:04.315Z","op":"done","visit":"expeditions/e16@0","node":"d23","brief":"suite green at 97 - the record stays open as ruled"}
 {"ts":"2026-07-28T11:05:47.750Z","op":"update","visit":"expeditions/e16@0","node":"d29","brief":"voice rule added - question and answer are separate paragraphs"}
 {"ts":"2026-07-28T11:05:59.730Z","op":"update","visit":"expeditions/e16@0","node":"d30","brief":"committing the voice paragraph rule"}
+{"ts":"2026-07-28T11:10:37.531Z","op":"update","visit":"expeditions/e16@0","node":"d31","brief":"prewrap fixes the pane and the pyramid rule enters the voice"}
+{"ts":"2026-07-28T11:10:42.144Z","op":"update","visit":"expeditions/e16@0","node":"d32","brief":"suite over the prewrap and voice round"}
+{"ts":"2026-07-28T11:11:13.545Z","op":"update","visit":"expeditions/e16@0","node":"d33","brief":"escaping the newline check inside the served script"}
+{"ts":"2026-07-28T11:11:19.697Z","op":"update","visit":"expeditions/e16@0","node":"d34","brief":"suite rerun after the escape fix"}
+{"ts":"2026-07-28T11:11:41.319Z","op":"update","visit":"expeditions/e16@0","node":"d35","brief":"committing prewrap and the pyramid voice rules"}
