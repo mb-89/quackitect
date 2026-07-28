@@ -3,7 +3,7 @@
 // one coming home completes the machine; empty runs start → end.
 import { strict as assert } from "node:assert";
 import { spawnSync } from "node:child_process";
-import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { test } from "node:test";
 import { generateContinueExpedition, generateExpeditionArchive, shortId } from "../engine/expmachine.ts";
@@ -109,12 +109,16 @@ test("the archive: start reaches every closed expedition, each runs to end, brow
   assert.ok(gen.canvas.edges!.some((e) => e.fromNode === "n-start" && e.toNode === `n-${sid}`), "the drawing carries start → expedition");
   const empty = generateExpeditionArchive(join(root, ".no-such"));
   assert.deepEqual(empty.decl.states[0].edges.map((e) => e.to), ["end"], "nothing closed: start runs straight to end");
-  // The MERGED record is the truth: a retro flip on the main tree shows
-  // on the next open — the branch copy is frozen at close.
-  const recAbs = join(root, "product", "spec", "expeditions", a.created, "record.md");
-  writeFileSync(recAbs, readFileSync(recAbs, "utf8").replace(/^goal: .*$/m, 'goal: "Amended Goal"'), "utf8");
-  const amended = generateExpeditionArchive(root);
-  assert.equal(amended.decl.states.find((x) => x.id === sid)?.statement, "Amended Goal", "the archive reads the merged copy fresh");
+  // CLOSED RECORDS LIVE IN GIT (owner ruling 2026-07-28): the close
+  // retires the record dir from the tree; the branch keeps serving it.
+  assert.ok(!existsSync(join(root, "product", "spec", "expeditions", a.created)), "no closed record on the tree");
+  assert.equal(generateExpeditionArchive(root).decl.states.find((x) => x.id === sid)?.statement, "Archived Thing", "the branch serves the archive");
+  // The RULINGS LEDGER is the retro's writable surface — a listed ruling
+  // overrides the branch-frozen one.
+  mkdirSync(join(root, "product", "spec", "expeditions"), { recursive: true });
+  writeFileSync(join(root, "product", "spec", "expeditions", "rulings.md"), `# Rulings\n\n- ${sid}: dismissed\n`, "utf8");
+  const listed = s.expeditionList() as { archive: { id: string; ruling?: string }[] };
+  assert.equal(listed.archive.find((x) => x.id === a.created)?.ruling, "dismissed", "the ledger ruling wins");
 });
 
 test("forms are viewable unbound: formGet returns the template preview", () => {

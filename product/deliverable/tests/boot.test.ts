@@ -390,9 +390,11 @@ test("expeditions: worktree lifecycle — new, bind, work lands in the worktree,
   assert.equal(closed.merged, true);
   assert.equal(s.workRoot(), root);
   assert.equal(readFileSync(join(root, "scratch.md"), "utf8"), "expedition work");
-  // The merged record reads closed + report applied on the main tree —
-  // the close IS the ruling (owner 2026-07-27).
-  const rec = readFileSync(join(root, "product", "spec", "expeditions", minted.created, "record.md"), "utf8");
+  // CLOSED RECORDS LIVE IN GIT (owner ruling 2026-07-28): the close
+  // retires the record dir from the tree; the branch serves it, stamped
+  // closed + applied — the close IS the ruling (owner 2026-07-27).
+  assert.equal(existsSync(join(root, "product", "spec", "expeditions", minted.created)), false, "the record dir left the tree");
+  const rec = spawnSync("git", ["show", `exp/${minted.created}:product/spec/expeditions/${minted.created}/record.md`], { cwd: root, encoding: "utf8" }).stdout;
   assert.match(rec, /^status: closed$/m);
   assert.match(rec, /^ruling: applied$/m);
   assert.equal((s.expeditionList() as { open: unknown[] }).open.length, 0);

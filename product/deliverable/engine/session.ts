@@ -369,6 +369,18 @@ export class Session {
         source: "engine/session.ts expedition",
       });
     }
+    // THE GRAPH IS EVIDENCE at the close itself too — the leave gate can
+    // be bypassed (close is legal in the work state), the close cannot.
+    const open = this.openRecordPoints();
+    if (open.length > 0) {
+      throw new Rejection({
+        clause: CLAUSES.DECISION_UNRESOLVED,
+        expected: "no open decision point on this record — the graph is evidence",
+        got: open.slice(0, 8).map((n) => `${n.id}: ${n.brief}`).join(" · ") + (open.length > 8 ? ` · …and ${open.length - 8} more` : ""),
+        remedy: { tool: "se_tick", args: { update: { op: "done", node: open[0].id, brief: "<how it resolved>" } }, note: "resolve every point (done | obsolete | revert | defer), then close" },
+        source: "engine/session.ts close",
+      });
+    }
     const result = expClose(this.root, this.bound, merge);
     this.unbind();
     return { ...result, note: merge ? "applied — merged to trunk, archived" : "dismissed — archived unmerged" };
@@ -704,14 +716,21 @@ export class Session {
     // work's decision graph may stand OPEN when the evidence claims done.
     // The RECORD's jsonl is the source — every live op lands there too,
     // so the check survives engine reloads. Attached, never copied.
-    const sid = shortId(this.bound!.id);
-    const recorded = replayFile(join(this.bound!.path, "product", "spec", "expeditions", this.bound!.id, "decisions.jsonl"));
-    const open = recorded.open.filter((n) => [sid, `${sid}-leave`].some((p) => n.visit === p || n.visit.startsWith(`${p}@`)));
+    const open = this.openRecordPoints();
     if (open.length > 0) {
       lint.problems.push(`the decision graph holds ${open.length} open point(s) — resolve each (done | obsolete | revert | defer) before the evidence stands`);
       lint.met = false;
     }
     return lint;
+  }
+
+  /** Open points of the BOUND record's decision graph — the jsonl is the
+   *  source, so the check survives engine reloads. Scoped to the work's
+   *  own states. */
+  private openRecordPoints(): { id: string; visit: string; brief: string }[] {
+    const sid = shortId(this.bound!.id);
+    const recorded = replayFile(join(this.bound!.path, "product", "spec", "expeditions", this.bound!.id, "decisions.jsonl"));
+    return recorded.open.filter((n) => [sid, `${sid}-leave`].some((p) => n.visit === p || n.visit.startsWith(`${p}@`)));
   }
 
   /** Pending notes whose text carries one of the markers — what a

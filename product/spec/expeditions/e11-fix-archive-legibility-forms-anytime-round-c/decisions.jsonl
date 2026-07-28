@@ -1,5 +1,0 @@
-{"ts":"2026-07-27T16:12:06.650Z","op":"done","visit":"start_expedition/create@1","node":"d16","brief":"merged record preferred over frozen branch; e1-e3 backfilled"}
-{"ts":"2026-07-27T16:12:10.273Z","op":"done","visit":"start_expedition/create@1","node":"d18","brief":"unknown patch fields refuse by name with alias mapping"}
-{"ts":"2026-07-27T16:14:58.420Z","op":"done","visit":"start_expedition/create@1","node":"d17","brief":"forms button + unbound template preview verified in the browser"}
-{"ts":"2026-07-27T16:15:14.909Z","op":"done","visit":"start_expedition/create@1","node":"d19","brief":"se_run description warns about the self-mirror deadlock"}
-{"ts":"2026-07-27T16:15:19.470Z","op":"done","visit":"start_expedition/create@1","node":"d20","brief":"browser + 68/68 selftests verified; leaving to close"}

@@ -6,3 +6,19 @@
 {"ts":"2026-07-28T10:02:38.017Z","op":"update","visit":"expeditions/e15@0","node":"d11","brief":"tests appended for chain crumbs with layout and settings store"}
 {"ts":"2026-07-28T10:03:07.675Z","op":"update","visit":"expeditions/e15@0","node":"d12","brief":"suite run over the e15 changes"}
 {"ts":"2026-07-28T10:03:34.204Z","op":"done","visit":"expeditions/e15@0","node":"d3","brief":"reloads pin the view and pan/zoom persists per machine"}
+{"ts":"2026-07-28T10:03:39.283Z","op":"done","visit":"expeditions/e15@0","node":"d4","brief":"the header names the walk position and clicking jumps there"}
+{"ts":"2026-07-28T10:03:42.250Z","op":"done","visit":"expeditions/e15@0","node":"d5","brief":"suite green at 95 of 95 with the new asserts"}
+{"ts":"2026-07-28T10:03:45.448Z","op":"done","visit":"expeditions/e15@0","node":"d7","brief":"decades stack top to bottom in the shared builder"}
+{"ts":"2026-07-28T10:03:49.056Z","op":"done","visit":"expeditions/e15@0","node":"d8","brief":"the settings store restores sliders across engine lives"}
+{"ts":"2026-07-28T10:03:56.312Z","op":"done","visit":"expeditions/e15@0","node":"d10","brief":"crumbs walk the parent chain for nested machines"}
+{"ts":"2026-07-28T10:10:22.789Z","op":"plan","visit":"expeditions/e15@0","parent":null,"nodes":[{"id":"d13","brief":"closed records retire to git at close"},{"id":"d14","brief":"rulings ledger overrides frozen records"},{"id":"d15","brief":"persistence.md reduced to the seams note"},{"id":"d16","brief":"migration sweep of the merged record dirs"}]}
+{"ts":"2026-07-28T10:11:17.036Z","op":"update","visit":"expeditions/e15@0","node":"d17","brief":"close now refuses open points and closed records retire to git"}
+{"ts":"2026-07-28T10:11:27.741Z","op":"update","visit":"expeditions/e15@0","node":"d18","brief":"the rulings ledger file exists with its format note"}
+{"ts":"2026-07-28T10:11:38.739Z","op":"update","visit":"expeditions/e15@0","node":"d19","brief":"container test walks the retirement and the ledger override"}
+{"ts":"2026-07-28T10:11:43.412Z","op":"done","visit":"expeditions/e15@0","node":"d13","brief":"persistence.md deleted — the seams live on as note-471bac6ffbf6"}
+{"ts":"2026-07-28T10:11:51.139Z","op":"update","visit":"expeditions/e15@0","node":"d20","brief":"migration sweep: the merged record dirs of e1 to e14 retire"}
+{"ts":"2026-07-28T10:11:56.728Z","op":"update","visit":"expeditions/e15@0","node":"d21","brief":"suite over retirement, ledger and the close guard"}
+{"ts":"2026-07-28T10:12:13.321Z","op":"update","visit":"expeditions/e15@0","node":"d22","brief":"one red: the lifecycle test reads the merged record after close"}
+{"ts":"2026-07-28T10:12:25.453Z","op":"update","visit":"expeditions/e15@0","node":"d23","brief":"lifecycle test now reads the record from its branch"}
+{"ts":"2026-07-28T10:12:41.096Z","op":"update","visit":"expeditions/e15@0","node":"d24","brief":"suite rerun after the lifecycle fix"}
+{"ts":"2026-07-28T10:13:04.021Z","op":"done","visit":"expeditions/e15@0","node":"d14","brief":"the rulings ledger overrides branch-frozen rulings"}
