@@ -17,6 +17,7 @@ import { call, freshRoot, readHashesFor } from "./helpers.ts";
 test("draining is retro-scoped: refused under 'all', legal in the retro state â€” and the drain works", async () => {
   const root = freshRoot();
   const session = new Session(root);
+  session.setAutonomy(1); // the retro weighs 1.0 - lift the slider clear
   const server = buildServer(root, session);
   const hashes = readHashesFor(root);
   for (let i = 0; i < 8; i++) {
@@ -47,6 +48,7 @@ test("draining is retro-scoped: refused under 'all', legal in the retro state â€
 test("the backlog home (v1 port): backlog demands its ready-when, parks the note, and migration re-drains it", async () => {
   const root = freshRoot();
   const session = new Session(root);
+  session.setAutonomy(1); // the retro weighs 1.0 - lift the slider clear
   const server = buildServer(root, session);
   const hashes = readHashesFor(root);
   for (let i = 0; i < 8; i++) {
@@ -78,6 +80,7 @@ test("the backlog home (v1 port): backlog demands its ready-when, parks the note
 test("since last_retro: the log query scopes to the period after the newest drain call", async () => {
   const root = freshRoot();
   const session = new Session(root);
+  session.setAutonomy(1); // the retro weighs 1.0 - lift the slider clear
   const server = buildServer(root, session);
   const hashes = readHashesFor(root);
   for (let i = 0; i < 8; i++) {

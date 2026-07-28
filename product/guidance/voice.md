@@ -61,6 +61,9 @@ Write plainly. These are rules, not suggestions. They bind every output: chat, d
 - Help is a detail, never a button. Clicking a control surfaces its context-sensitive help in the details pane. No dedicated help buttons or icons exist anywhere.
 - Panes hold their size. Content never resizes the layout. The maximize modal is the room to breathe.
 - Interacting with a field never collapses its surface. No fold closes, no scroll resets, no pane re-opens — the reader keeps their place through every click.
+- ONE SURFACE NEVER RESETS ANOTHER. Acting in one pane says nothing about what the reader has open beside it. Changing which machine is on screen does not clear the details pane; checking a box does not scroll the feed.
+- Only content that is GENUINELY GONE may clear. If what they had open no longer exists, say so in its place. Never silently swap in something else, and never quietly close it.
+- Carry the reader's place through a navigation. A link that rebuilds the page takes the open selection with it, or it is the same reset wearing a different hat.
 - Color carries meaning, never decoration: green = pass, red = failure or rejection, yellow = attention.
 - Feedback within a second. Any interaction that can take longer than a second shows loading feedback at once. A progress bar with real progress where progress exists; an indeterminate bar otherwise. Silence reads as breakage.
 
@@ -88,6 +91,15 @@ Write plainly. These are rules, not suggestions. They bind every output: chat, d
 - On a long task chain, keep a visible todo list. Use the harness's task-list surface when it has one.
 - Check items off as you finish them. The reader sees where you are without asking.
 - Update the list when the plan changes. A stale list misleads worse than none.
+- Before any call expected to run long, say what is running and when it will be done. Give a CLOCK TIME ("done by 13:30"), never a minute count.
+- Never write a clock time from feel. Read the actual clock first. An uncalibrated guess drifts far and reads as carelessness.
+- Say what silence means. The reader must be able to tell working from stuck.
+
+### Reading the owner
+- The owner dictates by voice, and dictation misfires on short words.
+- A word that is odd, or that names a control or concept which does not exist, is probably a slip. Map it to the nearest sensible term in context.
+- Confirm in one line where it matters. Never build on the literal token.
+- Never invent an affordance to match a transcribed word.
 
 ### Answered questions
 - A direct question from a person gets its answer RECORDED, not only chatted. Use se_answer with the question and the full answer.

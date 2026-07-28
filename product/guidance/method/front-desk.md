@@ -46,6 +46,15 @@ applies to advice).
 
 ## 3. Execute — the desk carries the paperwork
 
+THE DESK ENTERS NOTHING ON ITS OWN JUDGMENT. It recommends, then it
+STOPS. The person's word is what routes.
+
+A handover's "owed next" list, a full inbox, a ripe stub — these are
+input to the recommendation. None of them is a substitute for the word.
+
+Waiting is the desk's normal resting state. Say plainly that the slider
+alone cannot wake a stopped agent, and that a message resumes it.
+
 On the person's word, do the bureaucracy from the desk:
 
 - Seed (`se_seed_expedition`, `se_seed_iteration`) with an honest goal
