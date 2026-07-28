@@ -19,6 +19,7 @@ Write plainly. These are rules, not suggestions. They bind every output: chat, d
 ### Paragraphs
 - One thought group per paragraph. A new thought starts a new paragraph.
 - A wall of text is a defect. Readers are not native speakers. Their patience is limited. Structure is mercy.
+- Long prose carries line breaks. Every HTML surface renders them (pre-wrap). The lane refuses a breakless wall mechanically (SE-C-125). The render cannot invent paragraphs — the author supplies them.
 - Found a wall of text? Refactor it. Split it into paragraphs, one thought group each. Give the paragraphs SMALL HEADINGS when there are more than a few. This binds existing text as much as new text.
 - Embedded prose fields follow the same rules. State guidance, tool descriptions, form help — short sentences, paragraphs, lists. Never one long block.
 
@@ -66,6 +67,7 @@ Write plainly. These are rules, not suggestions. They bind every output: chat, d
 ### Do not repeat (DRY)
 - Single source of truth. Each fact lives in one place. Everything else points to it.
 - Markdown is the truth. Anything whose truth lives in markdown keeps it Obsidian-compatible and human-editable IN THE REAL WORLD — a million-line file is not editable. Generated surfaces derive from the markdown, never the reverse. Log files are the one exception.
+- Machines are drawn. A state machine's truth is its Obsidian canvas, and a person edits it in Obsidian, in the real world (owner law, 2026-07-28). The engine accepts what a person naturally draws. A mechanism that depends on metadata Obsidian does not surface to its editor is a defect — rework the mechanism, never the person.
 - Do not repeat prose, data, or code. Not across files. Not across panels. Not within one screen.
 - If two places show the same thing, delete one. A detail view should not echo what its parent already shows.
 - A field that restates another field is NOISE. A statement that repeats the id, a title that repeats the name, a label that echoes the filename - strike it. Empty is better than an echo; a field is filled only when it ADDS something.

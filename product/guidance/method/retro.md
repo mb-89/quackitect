@@ -60,7 +60,12 @@ The trigger is a NOTE carrying "needs retro":
    forever-until-1GB; a garbage collector may harvest it later).
 7. Tally the previous retro's improvements. Promote the wins. Dismiss the
    duds WITH the reason recorded, so a dud is never re-proposed.
-8. Aim every improvement at a durable home: guidance, a machine, a
+8. Check the contract. Walk the contract rule by rule against the
+   period's recorded trail — the call log, the decision graph, the
+   notes. A violation is a lead: propose how the rule gets teeth (a
+   refusal, a lint, guidance) so it cannot recur. The check reads what
+   the lane recorded — private thinking is not in the store.
+9. Aim every improvement at a durable home: guidance, a machine, a
    condition note, a form template, an engine refusal. Emit only the few
    highest-leverage notes. Each one specific and checkable — a concrete
    change, never "improve X".
