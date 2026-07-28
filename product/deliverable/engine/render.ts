@@ -1318,6 +1318,74 @@ es.addEventListener("message", (ev) => {
   if (pollBusy === true && a.busy === false) { refresh(); return; }
   pollBusy = a.busy;
 });
+
+// THE AGENT'S TERMINAL. The pty host is a SIBLING process on its own port,
+// because this page's process is the agent's grandchild and a grandchild
+// cannot own its grandparent's terminal. The host holds the pseudo-terminal
+// and the scrollback, so attaching after a refresh replays what was already
+// there instead of losing the session. No host running: the placeholder
+// stands and nothing else happens.
+const TERM_PORT = 7334;
+function loadAsset(href, kind) {
+  return new Promise((resolve) => {
+    const el = kind === "css" ? document.createElement("link") : document.createElement("script");
+    if (kind === "css") { el.rel = "stylesheet"; el.href = href; } else { el.src = href; }
+    el.onload = resolve;
+    el.onerror = resolve;
+    document.head.appendChild(el);
+  });
+}
+async function bootTerminal() {
+  const pane = document.getElementById("term-body");
+  if (!pane || pane.dataset.booted) return;
+  const base = "http://" + (location.hostname || "localhost") + ":" + TERM_PORT;
+  try {
+    const ping = await fetch(base + "/pty/alive");
+    if (!ping.ok) return;
+  } catch (e) { return; }
+  pane.dataset.booted = "1";
+  await loadAsset(base + "/xterm.css", "css");
+  await loadAsset(base + "/xterm.js", "js");
+  if (!window.Terminal) { pane.dataset.booted = ""; return; }
+  pane.innerHTML = "";
+  const term = new window.Terminal({
+    fontFamily: "ui-monospace, Consolas, monospace",
+    fontSize: 13,
+    scrollback: 5000,
+    theme: { background: "#14171a", foreground: "#d8dde2" },
+  });
+  term.open(pane);
+  term.onData((d) => { void fetch(base + "/pty/input", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ d }) }); });
+  const stream = new EventSource(base + "/pty/stream");
+  stream.addEventListener("message", (ev) => {
+    const bin = atob(ev.data);
+    const arr = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
+    term.write(arr);
+  });
+  // The host must be told the real size, or the agent wraps at the wrong
+  // column. Measured from a real glyph rather than xterm's internals.
+  const cell = () => {
+    const m = document.createElement("span");
+    m.style.cssText = "position:absolute;visibility:hidden;white-space:pre;font-family:ui-monospace,Consolas,monospace;font-size:13px";
+    m.textContent = "0".repeat(100);
+    document.body.appendChild(m);
+    const r = m.getBoundingClientRect();
+    m.remove();
+    return { w: r.width / 100, h: r.height };
+  };
+  const sync = () => {
+    const c = cell();
+    if (!(c.w > 0) || !(c.h > 0)) return;
+    const cols = Math.max(20, Math.floor(pane.clientWidth / c.w));
+    const rows = Math.max(6, Math.floor(pane.clientHeight / c.h));
+    term.resize(cols, rows);
+    void fetch(base + "/pty/resize", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ cols, rows }) });
+  };
+  new ResizeObserver(sync).observe(pane);
+  sync();
+}
+void bootTerminal();
 `;
 
 const MODAL = '<div id="modal"><div class="modal-box"><div class="widget-head"><span id="modal-title"></span><button class="expand" id="modal-close">✕</button></div><div class="modal-body" id="modal-body"></div></div></div><div id="toast"></div>';

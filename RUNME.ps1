@@ -18,7 +18,8 @@ $ErrorActionPreference = "Stop"
 $root = $PSScriptRoot
 
 # The single flag registry is the server (engine/bin/se-mcp.ts). RUNME only
-# recognizes the help spellings, and answers them with the server's help.
+# recognizes the help spellings, and answers them with the server's help --
+# plus --one-screen, the one flag it owns, which the server never sees.
 $forwarded = @($args | ForEach-Object { "$_" })
 if ($forwarded | Where-Object { $_ -in @("--help", "-h", "-?", "-Help") }) {
   Write-Host "RUNME.ps1 - install-check, selftest, launch. Every argument is forwarded to the se server:" -ForegroundColor Cyan
@@ -113,6 +114,14 @@ if ($null -eq $claude) {
   Write-Host "claude CLI not found. Install Claude Code first: https://code.claude.com/docs" -ForegroundColor Red
   exit 1
 }
+# ONE SCREEN (opt-in): --one-screen runs the agent inside a pseudo-terminal
+# hosted beside it, so the Mirror can show the agent in its left column.
+# This is the ONE flag RUNME owns, because the server never sees it - it
+# changes how RUNME launches, not how the engine runs. Without the flag
+# nothing changes: a terminal that will not start must never cost you your
+# agent.
+$oneScreen = [bool]($forwarded | Where-Object { $_ -eq "--one-screen" })
+$forwarded = @($forwarded | Where-Object { $_ -ne "--one-screen" })
 $env:SE_ARGS = ($forwarded -join "`n")
 $argNote = if ($forwarded.Count -gt 0) { " (args: $($forwarded -join ' '))" } else { "" }
 Write-Host "quackitect v3 - launching caged agent in workspace/$argNote" -ForegroundColor Cyan
@@ -128,7 +137,12 @@ Write-Host "quackitect v3 - the Mirror (your hand on the walk): the server opens
 $kickoff = 'Session start. Tick the machine and walk as far as the threshold allows. Then report to me in one short message: where you stand, and why you stopped (threshold, condition, or idle). If you are held below the threshold or idle with nothing to do, stop - and make it clear to me that the slider alone cannot wake you: after I change it or move the machine in the mirror, I have to send you a message (continue is enough), and you pick up from wherever the machine stands.'
 Push-Location (Join-Path $root "workspace")
 try {
-  claude $kickoff
+  if ($oneScreen) {
+    Write-Host "quackitect v3 - one screen: the agent runs in the Mirror's terminal pane" -ForegroundColor Cyan
+    node (Join-Path $root "product\deliverable\engine\bin\se-pty.ts") --pty-port 7334 -- claude $kickoff
+  } else {
+    claude $kickoff
+  }
 } finally {
   Pop-Location
 }

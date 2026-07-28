@@ -13,3 +13,9 @@
 {"ts":"2026-07-28T14:55:11.769Z","op":"done","visit":"expeditions/e18@0","node":"d47","brief":"Compaction lands with four invariants pinned in the suite"}
 {"ts":"2026-07-28T14:56:15.043Z","op":"update","visit":"expeditions/e18@0","node":"d65","brief":"Left column with the log and terminal; details takes the right"}
 {"ts":"2026-07-28T14:57:05.259Z","op":"done","visit":"expeditions/e18@0","node":"d48","brief":"Log and terminal on the left, details alone on the right"}
+{"ts":"2026-07-28T14:58:08.692Z","op":"update","visit":"expeditions/e18@0","node":"d66","brief":"PTY host written as a sibling process with a fail-safe fallback"}
+{"ts":"2026-07-28T14:58:44.769Z","op":"update","visit":"expeditions/e18@0","node":"d67","brief":"Terminal client attaches to the host, replaying scrollback on load"}
+{"ts":"2026-07-28T14:59:21.579Z","op":"update","visit":"expeditions/e18@0","node":"d68","brief":"RUNME gains an opt-in one-screen launch through the pty host"}
+{"ts":"2026-07-28T14:59:30.052Z","op":"update","visit":"expeditions/e18@0","node":"d69","brief":"Verifying the terminal dependencies actually install"}
+{"ts":"2026-07-28T15:00:43.588Z","op":"update","visit":"expeditions/e18@0","node":"d70","brief":"PTY spawn goes through the shell on Windows so shims resolve"}
+{"ts":"2026-07-28T15:01:42.951Z","op":"done","visit":"expeditions/e18@0","node":"d49","brief":"PTY host verified end to end; only the browser side is untried"}
