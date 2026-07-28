@@ -33,3 +33,7 @@
 {"ts":"2026-07-28T16:56:15.686Z","op":"update","visit":"expeditions/e19@0","node":"d73","brief":"text keeps its row order, not its column order"}
 {"ts":"2026-07-28T16:56:57.057Z","op":"update","visit":"expeditions/e19@0","node":"d74","brief":"pinning that a comment claims no column"}
 {"ts":"2026-07-28T16:57:37.871Z","op":"done","visit":"expeditions/e19@0","node":"d43","brief":"layout packs 28% narrower with order intact"}
+{"ts":"2026-07-28T16:58:42.364Z","op":"defer","visit":"expeditions/e19@0","node":"d54","brief":"Bake the principle into the voice","to":"idle","hops":1,"trail":["expeditions/e19","idle"]}
+{"ts":"2026-07-28T16:59:08.419Z","op":"update","visit":"expeditions/e19@0","node":"d75","brief":"linting the report before the leave gate"}
+{"ts":"2026-07-28T16:59:15.830Z","op":"update","visit":"expeditions/e19@0","node":"d76","brief":"rendering the lint's comma chain as a list"}
+{"ts":"2026-07-28T16:59:24.612Z","op":"update","visit":"expeditions/e19@0","node":"d77","brief":"committing the report before the leave gate"}
