@@ -206,7 +206,10 @@ function machineSvg(source: CanvasData, activeIds: Set<string>, doneIds: Set<str
     if (a === undefined || b === undefined) continue;
     const [x1, y1] = sidePoint(a, (edge as { fromSide?: string }).fromSide, b);
     const [x2, y2] = sidePoint(b, (edge as { toSide?: string }).toSide, a);
-    parts.push(`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" class="edge" marker-end="url(#arrow)"/>`);
+    // A double-headed arrow is one edge meaning both ways, so it draws that
+    // way too — the marker already orients itself at a start.
+    const bothWays = (edge as { fromEnd?: string }).fromEnd === "arrow";
+    parts.push(`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" class="edge"${bothWays ? ' marker-start="url(#arrow)"' : ""} marker-end="url(#arrow)"/>`);
     if (edge.label !== undefined && edge.label !== "") {
       parts.push(`<text x="${(x1 + x2) / 2}" y="${(y1 + y2) / 2 - 8}" class="guard">${esc(edge.label)}</text>`);
     }

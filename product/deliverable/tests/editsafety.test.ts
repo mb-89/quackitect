@@ -68,9 +68,18 @@ test("a drawn JOIN synchronizes: a starving join refuses the tick, the walk stan
   const root = freshRoot();
   const p = mainMachinePath(root);
   const canvas = JSON.parse(readFileSync(p, "utf8")) as RawCanvas;
-  for (const e of canvas.edges) {
-    if (e.id === "e-ideation-idle") e.styleAttributes = { role: "normal" };
-  }
+  // The drawn machine now carries ONE double-headed arrow per pair, so the
+  // ideation return is derived rather than authored. Draw it explicitly as a
+  // NORMAL edge instead: the same pair drawn twice collapses to one, and an
+  // authored role wins, so idle gains a second inbound edge.
+  canvas.edges.push({
+    id: "e-ideation-idle",
+    fromNode: "n-ideation",
+    fromSide: "bottom",
+    toNode: "n-idle",
+    toSide: "top",
+    styleAttributes: { role: "normal" },
+  } as (typeof canvas.edges)[number]);
   writeFileSync(p, JSON.stringify(canvas));
   // idle becomes a drawn JOIN — it now waits for boot AND ideation.
   const idleNote = join(root, "product", "deliverable", "machines", "states", "idle.md");

@@ -33,3 +33,10 @@
 {"ts":"2026-07-28T15:08:46.263Z","op":"update","visit":"expeditions/e18@0","node":"d77","brief":"Struck the prose logging duty now the hook carries it</brief>"}
 {"ts":"2026-07-28T15:08:57.507Z","op":"update","visit":"expeditions/e18@0","node":"d78","brief":"Testing the hook logs a search and ignores other tools"}
 {"ts":"2026-07-28T15:09:33.500Z","op":"done","visit":"expeditions/e18@0","node":"d55","brief":"Web searches now reach the feed through a hook, not by remembering"}
+{"ts":"2026-07-28T15:10:48.870Z","op":"update","visit":"expeditions/e18@0","node":"d79","brief":"A double-headed arrow now compiles and draws as forward plus return"}
+{"ts":"2026-07-28T15:11:39.639Z","op":"update","visit":"expeditions/e18@0","node":"d80","brief":"Main canvas collapsed to one arrow per pair"}
+{"ts":"2026-07-28T15:12:14.198Z","op":"update","visit":"expeditions/e18@0","node":"d81","brief":"Main canvas collapsed to one arrow per pair"}
+{"ts":"2026-07-28T15:13:10.606Z","op":"update","visit":"expeditions/e18@0","node":"d82","brief":"Join test redrawn for the one-arrow notation"}
+{"ts":"2026-07-28T15:15:32.466Z","op":"update","visit":"expeditions/e18@0","node":"d83","brief":"Test pins that the notation changed and the meaning did not"}
+{"ts":"2026-07-28T15:16:17.097Z","op":"update","visit":"expeditions/e18@0","node":"d84","brief":"Fixed the arrows test import"}
+{"ts":"2026-07-28T15:16:54.131Z","op":"done","visit":"expeditions/e18@0","node":"d58","brief":"One drawn arrow now means forward and return, meaning unchanged"}
