@@ -11,3 +11,6 @@
 {"ts":"2026-07-28T10:59:32.584Z","op":"update","visit":"expeditions/e16@0","node":"d17","brief":"tests walk the plain retro and the converted desk"}
 {"ts":"2026-07-28T10:59:37.012Z","op":"update","visit":"expeditions/e16@0","node":"d18","brief":"suite over the one-state conversion"}
 {"ts":"2026-07-28T11:00:01.132Z","op":"done","visit":"expeditions/e16@0","node":"d2","brief":"retro and front desk stand as plain states on main"}
+{"ts":"2026-07-28T11:00:06.037Z","op":"done","visit":"expeditions/e16@0","node":"d3","brief":"subtitle field renders small under the node name"}
+{"ts":"2026-07-28T11:00:24.702Z","op":"done","visit":"expeditions/e16@0","node":"d4","brief":"the desk method is tag-pulled required reading"}
+{"ts":"2026-07-28T11:00:28.716Z","op":"done","visit":"expeditions/e16@0","node":"d5","brief":"authoring guidance carries the one-state rule"}
