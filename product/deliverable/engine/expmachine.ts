@@ -231,9 +231,13 @@ function buildDecades(machineId: string, entries: ArchiveEntry[], kindWord: stri
   type GenNode = CanvasElement & { styleAttributes?: Record<string, unknown> };
   const nodes: GenNode[] = [];
   const edges: CanvasEdge[] = [];
+  // TOP TO BOTTOM (owner ruling 2026-07-28): decades stack vertically —
+  // the reading direction for records is downward at every nesting level;
+  // a new decade lands at the bottom.
   const decCount = Math.ceil(entries.length / 10);
-  nodes.push({ id: "n-start", type: "file", file: "start.md", x: -1400, y: 80, width: 160, height: 160, styleAttributes: { shape: "pill" } });
-  nodes.push({ id: "n-end", type: "file", file: "end.md", x: -1100 + decCount * 800 + 60, y: 80, width: 160, height: 160, styleAttributes: { shape: "pill" } });
+  const centerY = ((decCount - 1) * 420) / 2 + 80;
+  nodes.push({ id: "n-start", type: "file", file: "start.md", x: -1400, y: centerY, width: 160, height: 160, styleAttributes: { shape: "pill" } });
+  nodes.push({ id: "n-end", type: "file", file: "end.md", x: -240, y: centerY, width: 160, height: 160, styleAttributes: { shape: "pill" } });
   for (let d = 0; d < decCount; d++) {
     const slice = entries.slice(d * 10, d * 10 + 10);
     const decId = `${slice[0].sid}-${slice[slice.length - 1].sid}`;
@@ -250,7 +254,7 @@ function buildDecades(machineId: string, entries: ArchiveEntry[], kindWord: stri
     });
     subGen[decId] = () => buildRecordColumn(decId, slice, kindWord);
     start.edges.push({ to: decId, role: "normal" });
-    nodes.push({ id: `n-${decId}`, type: "file", file: `${decId}.md`, x: -1100 + d * 800, y: 0, width: 620, height: 360 });
+    nodes.push({ id: `n-${decId}`, type: "file", file: `${decId}.md`, x: -1100, y: d * 420, width: 620, height: 360 });
     edges.push({ id: `e-start-${decId}`, fromNode: "n-start", toNode: `n-${decId}` });
     edges.push({ id: `e-${decId}-end`, fromNode: `n-${decId}`, toNode: "n-end" });
   }

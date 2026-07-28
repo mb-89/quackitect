@@ -9,6 +9,7 @@ import { join } from "node:path";
 import { test } from "node:test";
 import { Decisions, parseUpdate } from "../engine/decisions.ts";
 import { buildArchive, type ArchiveEntry } from "../engine/expmachine.ts";
+import { renderMirror } from "../engine/render.ts";
 import { Session } from "../engine/session.ts";
 import { bootedServer, call, checkDocs, freshRoot } from "./helpers.ts";
 
@@ -28,6 +29,10 @@ test("buildArchive: ten or fewer stay flat, more grows decade sub-machines", () 
   assert.equal(inner.decl.id, "e1-e10");
   assert.equal(inner.decl.states.length, 12, "start + the ten records + end");
   assert.equal(inner.decl.states.find((s) => s.id === "e5")?.tags?.includes("archive-record"), true);
+  const n1 = dec.canvas.nodes!.find((n) => n.id === "n-e1-e10")!;
+  const n2 = dec.canvas.nodes!.find((n) => n.id === "n-e11-e13")!;
+  assert.equal(n1.x, n2.x, "decades share one column");
+  assert.ok(n2.y! > n1.y!, "a new decade lands at the bottom");
 });
 
 test("the open map says …and N more past eight open points", () => {
@@ -106,6 +111,22 @@ test("nesting: the walk descends into an archive decade and climbs back out", as
   assert.ok(dec !== undefined);
   assert.equal(dec!.decl.states.length, 4, "start + two records + end");
   assert.ok(s.viewFor("expedition_archive") !== undefined);
+  // Breadcrumbs walk the PARENT CHAIN — a decade stands under its archive.
+  assert.deepEqual(s.viewChain("e11-e12"), ["main", "expedition_archive", "e11-e12"]);
+  const html = renderMirror({ session: s, root, lastPacket: undefined, mode: "manual", log: undefined }, undefined, "e11-e12");
+  assert.ok(html.includes('<b class="here">e11-e12</b>'), "the decade is the here-crumb");
+  assert.ok(html.includes('href="/?view=expedition_archive"'), "its parent archive is a crumb link");
+  assert.ok(html.includes('id="cur-state"'), "the header names the walk's current state");
+});
+
+test("settings survive an engine life: a new session restores the store", () => {
+  const root = freshRoot();
+  const a = new Session(root);
+  a.setAutonomy(0.85);
+  a.setShutdown(3);
+  const b = new Session(root);
+  assert.equal(b.autonomy, 0.85);
+  assert.equal(b.shutdown, 3);
 });
 
 test("se_test: one call runs both scripts with structured verdicts", async () => {

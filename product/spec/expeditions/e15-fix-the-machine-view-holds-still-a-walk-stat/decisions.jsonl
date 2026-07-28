@@ -1,0 +1,8 @@
+{"ts":"2026-07-28T09:57:57.709Z","op":"plan","visit":"expeditions/e15@0","parent":null,"nodes":[{"id":"d2","brief":"map the reload and follow behavior in the client script"},{"id":"d3","brief":"hold the view still across walk-driven reloads"},{"id":"d4","brief":"header button naming the current state that jumps to it"},{"id":"d5","brief":"tests plus green suite"},{"id":"d6","brief":"close the record"}]}
+{"ts":"2026-07-28T10:00:31.237Z","op":"done","visit":"expeditions/e15@0","node":"d2","brief":"mapped: the poll reload follows the walk and drops pan state"}
+{"ts":"2026-07-28T10:00:42.291Z","op":"plan","visit":"expeditions/e15@0","parent":null,"nodes":[{"id":"d7","brief":"decades stack top to bottom in both archives"},{"id":"d8","brief":"session settings persist across engine reloads"}]}
+{"ts":"2026-07-28T10:01:10.800Z","op":"update","visit":"expeditions/e15@0","node":"d9","brief":"settings store lands in session.ts — restored at construction"}
+{"ts":"2026-07-28T10:01:48.310Z","op":"plan","visit":"expeditions/e15@0","parent":null,"nodes":[{"id":"d10","brief":"breadcrumbs walk the parent chain for nested machines"}]}
+{"ts":"2026-07-28T10:02:38.017Z","op":"update","visit":"expeditions/e15@0","node":"d11","brief":"tests appended for chain crumbs with layout and settings store"}
+{"ts":"2026-07-28T10:03:07.675Z","op":"update","visit":"expeditions/e15@0","node":"d12","brief":"suite run over the e15 changes"}
+{"ts":"2026-07-28T10:03:34.204Z","op":"done","visit":"expeditions/e15@0","node":"d3","brief":"reloads pin the view and pan/zoom persists per machine"}

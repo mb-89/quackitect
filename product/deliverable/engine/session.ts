@@ -116,6 +116,22 @@ export class Session {
     this.machine = compileMachine(root, mainMachinePath(root));
     this.instance = newInstance(this.machine);
     this.decisions = new Decisions(seDir(root));
+    // SETTINGS SURVIVE THE ENGINE (owner ruling 2026-07-28): the mirror's
+    // sliders restore across reloads like the decision graph — ONE store,
+    // restored wholesale, ready for settings still to come.
+    try {
+      const s = JSON.parse(readFileSync(join(seDir(root), "settings.json"), "utf8")) as { autonomy?: number; shutdown?: number };
+      if (typeof s.autonomy === "number" && s.autonomy >= 0 && s.autonomy <= 1) this._autonomy = s.autonomy;
+      if (typeof s.shutdown === "number" && Number.isInteger(s.shutdown) && s.shutdown >= 1 && s.shutdown <= 5) this._shutdown = s.shutdown;
+    } catch { /* no store yet — the defaults stand */ }
+    this.syncKeepAwake();
+  }
+
+  private persistSettings(): void {
+    try {
+      mkdirSync(seDir(this.root), { recursive: true });
+      writeFileSync(join(seDir(this.root), "settings.json"), JSON.stringify({ autonomy: this._autonomy, shutdown: this._shutdown }) + "\n", "utf8");
+    } catch { /* a failed save never blocks the slider */ }
   }
 
   /** Boot is done — the toll arms on this; the reading room pays none. */
@@ -161,6 +177,7 @@ export class Session {
     }
     const was = this._shutdown;
     this._shutdown = value;
+    this.persistSettings();
     this.syncKeepAwake();
     this.notifyChange();
     return { shutdown: value, was };
@@ -217,6 +234,7 @@ export class Session {
     }
     const was = this._autonomy;
     this._autonomy = value;
+    this.persistSettings();
     this.notifyChange(); // a holding agent wakes and re-reads the packet
     return { autonomy: value, was };
   }
@@ -494,6 +512,23 @@ export class Session {
     if (id === "expedition_archive") return generateExpeditionArchive(this.root);
     if (id === "iteration_archive") return generateIterationArchive(this.root);
     return undefined;
+  }
+
+  /** The PARENT CHAIN of a viewable machine, main first — the mirror's
+   *  breadcrumbs render it, so a nested decade reads
+   *  main › expedition_archive › e1-e10 (owner ruling 2026-07-28). */
+  viewChain(id: string): string[] {
+    if (id === this.machine.id) return [this.machine.id];
+    const idx = this.subs.findIndex((s) => s.decl.id === id);
+    if (idx >= 0) return [this.machine.id, ...this.subs.slice(0, idx + 1).map((s) => s.decl.id)];
+    if (this.machine.states.some((s) => s.submachine !== undefined && s.id === id)) return [this.machine.id, id];
+    for (const sub of this.subs) {
+      if (sub.gen?.subGen?.[id] !== undefined) return [...this.viewChain(sub.decl.id), id];
+    }
+    for (const cid of ["expedition_archive", "iteration_archive"]) {
+      if (this.genFor(cid)?.subGen?.[id] !== undefined) return [this.machine.id, cid, id];
+    }
+    return [this.machine.id, id];
   }
 
   /** Resolve ANY machine id to a viewable drawing: the walked stack
