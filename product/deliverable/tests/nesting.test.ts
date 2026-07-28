@@ -129,13 +129,16 @@ test("the front desk and ideation stand as idle doors with their drawn shapes", 
   const fd = m.states.find((s) => s.id === "front_desk")!;
   assert.equal(fd.priority, 0.2);
   assert.equal(fd.submachine, undefined, "the one-state rule: the desk is a plain state");
-  assert.match(fd.subtitle ?? "", /in doubt, go here/i, "the door carries its subtitle");
+  assert.match(fd.statement, /in doubt, go here/i, "the statement IS the subtitle");
   assert.ok((fd.tags ?? []).includes("front-desk"), "the method doc pulls by this tag");
   const retro = m.states.find((s) => s.id === "retro")!;
   assert.equal(retro.submachine, undefined, "the retro converted under the same rule");
   assert.ok((retro.legal_tools ?? []).includes("se_note_drain"), "the legality zone rides legal_tools");
   const idea = m.states.find((s) => s.id === "ideation")!;
   assert.equal(idea.priority, 1, "the ideation door sits at the slider's top notch");
+  assert.equal(idea.statement, "Diverge on purpose.", "authored door statement rides up");
+  const idle2 = m.states.find((s) => s.id === "idle")!;
+  assert.equal(idle2.statement, "", "filler statements are struck - empty beats an echo");
   const ideaM = compileMachine(root, join(root, "product", "deliverable", "machines", "ideation.canvas"));
   assert.deepEqual(ideaM.states.map((s) => s.id), ["start", "frame", "diverge", "converge", "route", "end"]);
 });

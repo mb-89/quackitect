@@ -295,7 +295,7 @@ test("the agent can peek at any state without moving — the click, as a tool", 
   const peek = await call(server, "se_tick", { state: "idle" });
   assert.equal(peek.isError, false);
   assert.equal(peek.body.id, "idle");
-  assert.ok(String(peek.body.statement).length > 0);
+  assert.ok(String(peek.body.guidance).length > 0);
   const still = await call(server, "se_tick");
   assert.deepEqual(still.body.active, ["start"]);
   const unknown = await call(server, "se_tick", { state: "nope" });

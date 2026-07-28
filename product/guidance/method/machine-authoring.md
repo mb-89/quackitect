@@ -21,17 +21,25 @@ that are seeded dynamically (the containers). Retro and the front desk
 were converted under this rule; the boot keeps its machine because it
 has several states.
 
-## Subtitles
+## Statements are subtitles (owner ruling 2026-07-28)
 
-A state may carry `subtitle:` in its frontmatter — one short line drawn
-small under the node's name ("In doubt, go here."). Use it for doors
-whose purpose a newcomer must see at a glance. Never restate the name.
+ONE field: `statement:`. Authored in a state note's frontmatter (or a
+sub-canvas frontmatter for its door), rendered small under the drawn
+node's name, served in the packet's next lists. The rule is the voice's
+anti-noise law:
 
-## Door statements
+- A statement exists only when it ADDS meaning the id does not
+  ("In doubt, go here.", "Diverge on purpose.", a record's goal).
+- Filler is struck, never generated — no "The retro machine.", no
+  statement that restates the name. Empty is better than an echo.
+- The owner decides what deserves one, by filling or emptying the field.
 
-A sub-canvas may carry `statement:` in its frontmatter — the door state
-in the parent shows it instead of "The <id> machine.". Keep it one
-sentence.
+## Records are not confetti (owner ruling 2026-07-28)
+
+Expeditions and iterations stay OPEN and collect related work until they
+are fat enough to be worth an archive entry. Do not close a record the
+moment one item lands; do not seed a new record for every small fix. An
+archive reader wants a day's coherent story, not ten slivers.
 
 ## The standing cautions
 

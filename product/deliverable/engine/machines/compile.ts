@@ -142,7 +142,7 @@ export function compileMachine(root: string, canvasPath: string): MachineDecl {
       decl = {
         id: subId,
         kind: "work",
-        statement: typeof subFm.statement === "string" && subFm.statement !== "" ? subFm.statement : `The ${subId} machine.`,
+        statement: typeof subFm.statement === "string" ? subFm.statement : "",
         guidance: `A sub-machine: entering this state enters ${subId} at its start; this state completes when ${subId} reaches its end.`,
         evidence_form: [],
         submachine: ref,
@@ -306,12 +306,13 @@ export function stateFromNote(machineId: string, ref: string, notePath: string, 
   const exit = conditionDict(machineId, ref, root, "exit", x);
   const tags = asList(x.tags);
   const submachine = asString(x.submachine);
-  const subtitle = asString(x.subtitle);
   return {
     id: stateId,
     kind,
-    statement: note.statement,
-    ...(subtitle !== undefined && subtitle !== "" ? { subtitle } : {}),
+    // The statement is AUTHORED frontmatter, never derived from the H1 —
+    // it exists only when it adds meaning; the mirror shows it under the
+    // node's name.
+    statement: asString(x.statement) ?? "",
     guidance,
     priority,
     evidence_form: [...evidenceForm(machineId, ref, note.body), ...(kind === "gate" ? STANDARD_ROUNDS : [])],

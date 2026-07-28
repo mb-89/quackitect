@@ -175,7 +175,7 @@ export function generateIterations(root: string): GeneratedMachine {
   const start: StateDecl = {
     id: "start",
     kind: "start",
-    statement: "Start",
+    statement: "",
     guidance: "The seeded container: every open iteration stands as its KICKOFF. Entering one binds its worktree and stamps it started.",
     evidence_form: [],
     priority: 0.01,
@@ -220,7 +220,7 @@ export function generateIterations(root: string): GeneratedMachine {
   states.push({
     id: "end",
     kind: "end",
-    statement: "End",
+    statement: "",
     guidance: "Left the iterations container — running work parks where it stands; a seeded one waits for its first start.",
     evidence_form: [],
     priority: 0.01,

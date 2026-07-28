@@ -30,10 +30,14 @@ carries the vehicle judgment and the execute rules, and deliberately
 holds no door list and no vocabulary — those are read live so the desk
 stays current when lanes land.
 
-SUBTITLES: states may carry subtitle: in frontmatter — rendered as a
-small gray second line under the drawn node's name and served in the
-packet's next entries. The front desk says "In doubt, go here."; the
-retro says "Drain the inbox."; ideation's flourish was dropped.
+STATEMENTS ARE SUBTITLES (owner ruling, superseding the first cut): ONE
+authored field — statement: — rendered small under the drawn node's
+name and served in the packet's next lists. Filler is struck machine
+wide and never generated ("The retro machine." is gone; a note's H1 no
+longer leaks into the statement). The front desk says "In doubt, go
+here.", the retro "Drain the inbox.", ideation "Diverge on purpose.";
+goals stay as the containers' statements. The anti-noise law landed in
+the voice — a field that restates another field is struck.
 
 THE RULE'S HOME: product/guidance/method/machine-authoring.md — the
 one-state rule, the subtitle and door-statement conventions, and the

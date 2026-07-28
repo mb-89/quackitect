@@ -106,7 +106,8 @@ function machineSvg(canvas: CanvasData, activeIds: Set<string>, doneIds: Set<str
       // Sub-machine states carry a DOUBLE border.
       parts.push(`<rect x="${n.x + 8}" y="${n.y + 8}" width="${n.width - 16}" height="${n.height - 16}" rx="${Math.max(4, rx - 8)}" class="${cls} inner"/>`);
     }
-    const sub = meta[sid]?.subtitle;
+    const subFull = meta[sid]?.subtitle;
+    const sub = subFull !== undefined && subFull.length > 48 ? `${subFull.slice(0, 47)}…` : subFull;
     parts.push(`<text x="${n.x + n.width / 2}" y="${n.y + n.height / 2 + (sub !== undefined ? -6 : 6)}" class="label">${esc(sid)}</text>`);
     if (sub !== undefined) parts.push(`<text x="${n.x + n.width / 2}" y="${n.y + n.height / 2 + 24}" class="sublabel">${esc(sub)}</text>`);
     parts.push("</g>");
@@ -1143,7 +1144,9 @@ export function renderMirror(m: MirrorState, widget?: "machine" | "details" | "l
       exit_met: m.session.conditionMet(decl, s, "leave"),
       has_entry: s.entry !== undefined,
       entry_met: m.session.conditionMet(decl, s, "enter"),
-      ...(s.subtitle !== undefined ? { subtitle: s.subtitle } : {}),
+      // The STATEMENT is the subtitle (owner ruling 2026-07-28): authored
+      // meaning renders small under the name; empty renders nothing.
+      ...(s.statement !== "" && s.statement !== s.id ? { subtitle: s.statement } : {}),
     };
   }
   const svg = machineSvg(canvas, leafActive, done, subIds, meta);

@@ -33,7 +33,7 @@ function mechanical(id: string, kind: "start" | "end"): StateDecl {
   return {
     id,
     kind,
-    statement: kind === "start" ? "Start" : "End",
+    statement: "",
     guidance:
       kind === "start"
         ? "The seeded container: every open expedition stands as its own states. Pick ONE way forward — entering an expedition binds its worktree."
@@ -80,7 +80,7 @@ export function generateContinueExpedition(root: string): GeneratedMachine {
     states.push({ ...workTpl, id: workId, statement: goal !== "" ? goal : e.id, edges: [{ to: leaveId, role: "normal" }] });
     // ALTERNATIVE into end — normal edges would AND-join: end would wait
     // for EVERY expedition, and one coming home is the whole point.
-    states.push({ ...leaveTpl, id: leaveId, statement: `Leave ${sid}`, edges: [{ to: "end", role: "alternative" }] });
+    states.push({ ...leaveTpl, id: leaveId, statement: "", edges: [{ to: "end", role: "alternative" }] });
     start.edges.push({ to: workId, role: "normal" });
     const y = i * 560;
     nodes.push({ id: `g-${sid}`, type: "group", x: -800, y: y - 60, width: 1720, height: 480, label: e.id });

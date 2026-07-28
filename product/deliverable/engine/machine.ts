@@ -36,10 +36,11 @@ export interface StateDecl {
   kind: "work" | "gate" | "terminal" | "start" | "end";
   /** Diagram grouping, e.g. "boot" — presentation metadata, no run-time meaning. */
   group?: string;
+  /** AUTHORED meaning, or empty (owner ruling 2026-07-28): a statement
+   *  exists only when it says something the id does not ("In doubt, go
+   *  here."). The mirror renders it small under the node's name; filler
+   *  like "The retro machine." is struck, never generated. */
   statement: string;
-  /** A short second line under the drawn node's name — the door's hint
-   *  ("In doubt, go here."). Authored, never derived. */
-  subtitle?: string;
   /** Optional: a human might fill a state too (owner ruling — v3 drops the requirement). */
   filled_by?: "agent" | "engine";
   /** Declared on the state, never invented at run time (engine-filled only). */

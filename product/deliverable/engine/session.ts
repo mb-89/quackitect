@@ -1270,8 +1270,7 @@ export class Session {
             to: e.to,
             role: e.role,
             ...(e.guard !== undefined ? { guard: e.guard } : {}),
-            ...(t !== undefined ? { kind: t.kind, statement: t.statement, priority: t.priority } : {}),
-            ...(t?.subtitle !== undefined ? { subtitle: t.subtitle } : {}),
+            ...(t !== undefined ? { kind: t.kind, ...(t.statement !== "" ? { statement: t.statement } : {}), priority: t.priority } : {}),
             ...(t?.entry !== undefined ? { entry: this.conditionStatus(machine, t, "enter") } : {}),
             enter_met: t === undefined ? true : this.conditionMet(machine, t, "enter"),
           };
