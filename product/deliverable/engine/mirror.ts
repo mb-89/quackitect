@@ -27,6 +27,18 @@ export interface MirrorOptions {
 export function startMirror(o: MirrorOptions): Server {
   const state: MirrorState = { session: o.session, root: o.root, lastPacket: undefined, mode: o.mode, log: o.log };
 
+  /** What the page watches: position, the two sliders, and a growth signal
+   *  for the feed. One shape, served both as a poll and as a pushed event. */
+  const aliveState = (): Record<string, unknown> => ({
+    status: state.session.instance.status,
+    autonomy: state.session.autonomy,
+    shutdown: state.session.shutdown,
+    active: state.session.active(),
+    busy: state.session.busy(),
+    // A monotone change signal for the feed — the log file only grows.
+    acts: existsSync(o.log.path) ? statSync(o.log.path).size : 0,
+  });
+
   /** Collect a JSON body, run the handler (results may be async — script
    *  runs take seconds and must not block the server), log it, redirect. */
   const post = (req: import("node:http").IncomingMessage, res: import("node:http").ServerResponse, tool: string, handle: (body: Record<string, unknown>) => { args: Record<string, unknown>; result: unknown }): void => {
@@ -270,20 +282,35 @@ export function startMirror(o: MirrorOptions): Server {
         res.end(JSON.stringify(state.session.tickInfo(), null, 2));
         return;
       }
+      if (url.pathname === "/events") {
+        // THE MIRROR IS PUSHED, NOT POLLED (owner ruling 2026-07-28). The
+        // walk already wakes every held hand; this forwards that wake to
+        // the page. The wait's timeout doubles as the re-check for things
+        // that grow without moving the walk, like the log.
+        res.writeHead(200, {
+          "content-type": "text/event-stream; charset=utf-8",
+          "cache-control": "no-cache",
+          connection: "keep-alive",
+        });
+        let open = true;
+        req.on("close", () => { open = false; });
+        void (async () => {
+          let last = "";
+          while (open) {
+            const now = JSON.stringify(aliveState());
+            if (now !== last) { last = now; res.write(`data: ${now}\n\n`); }
+            await state.session.waitForChange(2000);
+          }
+          res.end();
+        })();
+        return;
+      }
       if (url.pathname === "/api/alive") {
         // The mirror polls this: position + threshold move under the page
         // (the agent's hand, or another window). Failing to answer at all
         // reads as "session over" client-side.
         res.writeHead(200, { "content-type": "application/json; charset=utf-8" });
-        res.end(JSON.stringify({
-          status: state.session.instance.status,
-          autonomy: state.session.autonomy,
-          shutdown: state.session.shutdown,
-          active: state.session.active(),
-          busy: state.session.busy(),
-          // A monotone change signal for the feed — the log file only grows.
-          acts: existsSync(o.log.path) ? statSync(o.log.path).size : 0,
-        }));
+        res.end(JSON.stringify(aliveState()));
         return;
       }
       if (url.pathname === "/widget/machine" || url.pathname === "/widget/details" || url.pathname === "/widget/log") {

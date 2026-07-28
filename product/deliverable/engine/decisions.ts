@@ -313,13 +313,28 @@ export class Decisions {
     switch (u.op) {
       case "plan": {
         const parent = u.node === undefined ? null : this.openNode(u.node).id;
-        const added = (u.items ?? []).map((b) => this.add(visit, parent, b, "planned"));
+        // IDEMPOTENT. The update rides BEFORE the call's verdict (tools.ts),
+        // and every refusal's remedy says to repeat the call — so a
+        // refused-then-retried plan arrives again. An item already standing
+        // open under this parent in this visit IS that item, not a second one.
+        const standing = (b: string) =>
+          [...this.nodes.values()].some((n) => n.visit === visit && n.parent === parent && n.brief === b && n.status === "open");
+        const added = (u.items ?? []).filter((b) => !standing(b)).map((b) => this.add(visit, parent, b, "planned"));
         if (this.activeId === undefined) this.activeId = added[0]?.id;
         this.record({ op: "plan", visit, parent, nodes: added.map((n) => ({ id: n.id, brief: n.brief })) });
         break;
       }
       case "fork": {
         const parent = u.node !== undefined ? this.openNode(u.node).id : (this.activeId !== undefined && this.nodes.get(this.activeId)?.status === "open" ? this.activeId : null);
+        // Idempotent for the same reason a plan is — a retried call must not
+        // open the same branch twice; it re-enters the one already standing.
+        const standingFork = [...this.nodes.values()].find(
+          (n) => n.visit === visit && n.parent === parent && n.brief === u.brief && n.status === "open" && n.origin === "fork",
+        );
+        if (standingFork !== undefined) {
+          this.activeId = standingFork.id;
+          break;
+        }
         const fork = this.add(visit, parent, u.brief!, "fork");
         const added = (u.items ?? []).map((b) => this.add(visit, fork.id, b, "planned"));
         this.activeId = fork.id;

@@ -368,7 +368,8 @@ const STYLE = `
 `;
 
 const SCRIPT = `
-const D = window.SE_DATA;
+// Re-read after every morph — a morph never re-runs a script tag.
+let D = JSON.parse(document.getElementById("se-data").textContent);
 
 function jsonTable(v) {
   if (v === null || v === undefined) return '<span class="vnull">null</span>';
@@ -526,8 +527,8 @@ document.addEventListener("click", async (ev) => {
     return;
   }
 });
-const CURRENT = (D.describe.active && D.describe.active[0]) ? D.describe.active[0].split("/").pop() : null;
-const WALK_HERE = D.viewingWalk;
+let CURRENT = (D.describe.active && D.describe.active[0]) ? D.describe.active[0].split("/").pop() : null;
+let WALK_HERE = D.viewingWalk;
 function nextTable(id, s) {
   const here = WALK_HERE && id === CURRENT;
   return '<table class="kv">' + s.next.map((n, i) => {
@@ -618,25 +619,78 @@ function stateDetail(id) {
   }
   return html;
 }
-// Reload WITHOUT losing the view or the open details pane — a checkbox
-// click must not cost the user their place (found: four re-opens to set
-// four checks).
-function reloadKeep(detail) {
+// THE PAGE UPDATES IN PLACE (owner ruling 2026-07-28). A full reload cost
+// the reader their scroll, their selection and whatever they were typing.
+// The old workaround carried the view, the open pane and the open folds
+// through the URL and still lost the rest. Now an unchanged node is never
+// replaced, so there is nothing left to restore.
+//
+// Subtrees the CLIENT fills carry data-morph-ignore. The server sends them
+// empty, so morphing into them would wipe what the client just rendered.
+function sameNode(a, b) {
+  if (a.nodeType !== b.nodeType) return false;
+  if (a.nodeType !== 1) return true;
+  return a.tagName === b.tagName && (a.id || "") === (b.id || "");
+}
+function morph(from, to) {
+  if (from.nodeType !== 1) { if (from.nodeValue !== to.nodeValue) from.nodeValue = to.nodeValue; return; }
+  if (from.hasAttribute("data-morph-ignore")) return;
+  for (const a of to.attributes) if (from.getAttribute(a.name) !== a.value) from.setAttribute(a.name, a.value);
+  for (const a of [...from.attributes]) if (!to.hasAttribute(a.name)) from.removeAttribute(a.name);
+  // A control under the reader's hand stays theirs until they leave it.
+  if (from.tagName === "INPUT" && from !== document.activeElement && to.hasAttribute("value")) from.value = to.getAttribute("value");
+  const byId = new Map();
+  for (const c of from.children) if (c.id !== "") byId.set(c.id, c);
+  let cur = from.firstChild;
+  for (const t of [...to.childNodes]) {
+    let match = t.nodeType === 1 && t.id !== "" ? byId.get(t.id) : undefined;
+    if (match === undefined && cur !== null && sameNode(cur, t)) match = cur;
+    if (match === undefined) { from.insertBefore(document.importNode(t, true), cur); continue; }
+    if (match !== cur) from.insertBefore(match, cur);
+    morph(match, t);
+    cur = match.nextSibling;
+  }
+  while (cur !== null) { const next = cur.nextSibling; from.removeChild(cur); cur = next; }
+}
+// Everything derived FROM a render has to be derived again after one.
+function rebind() {
+  const blob = document.getElementById("se-data");
+  if (blob) D = JSON.parse(blob.textContent);
+  CURRENT = (D.describe.active && D.describe.active[0]) ? D.describe.active[0].split("/").pop() : null;
+  WALK_HERE = D.viewingWalk;
+  // Without this the next poll compares against the OLD position forever.
+  ACTIVE_AT_RENDER = JSON.stringify(D.describe.active || []);
+  restoreViewBox();
+  if (CURRENT_DETAIL) { const dp = detailFor(CURRENT_DETAIL); showDetails(dp[0], dp[1]); }
+}
+let refreshInFlight = false;
+async function refresh(detail) {
+  if (detail !== undefined) CURRENT_DETAIL = detail;
   const q = new URLSearchParams(location.search);
   // THE VIEW HOLDS STILL (owner ruling 2026-07-28): finishing a state is
   // data change, and data change never jumps the reader — every refresh
   // pins the machine being looked at explicitly.
   q.set("view", D.viewed.id);
-  if (detail) q.set("detail", detail); else q.delete("detail");
-  // THE UX LAW: no fold closes across a reload — open <details> ride along.
-  const folds = [...document.querySelectorAll("#details details[open] summary")].map((s) => s.textContent.split(" (")[0].trim()).filter(Boolean);
-  if (folds.length) q.set("folds", folds.join("|")); else q.delete("folds");
+  if (CURRENT_DETAIL) q.set("detail", CURRENT_DETAIL); else q.delete("detail");
   const qs = q.toString();
-  location.href = location.pathname + (qs ? "?" + qs : "");
+  const url = location.pathname + (qs ? "?" + qs : "");
+  history.replaceState(null, "", url);
+  if (refreshInFlight) return;
+  refreshInFlight = true;
+  try {
+    const r = await fetch(url);
+    const doc = new DOMParser().parseFromString(await r.text(), "text/html");
+    morph(document.body, doc.body);
+    rebind();
+  } catch (e) {
+    location.href = url; // a failed morph must never strand the reader
+  } finally {
+    refreshInFlight = false;
+  }
 }
 document.addEventListener("click", async (ev) => {
   const c = ev.target.closest ? ev.target.closest(".docheck") : null;
-  if (c) { if (c.disabled) return; ev.preventDefault(); c.disabled = true; await fetch("/check", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ path: c.dataset.path }) }); reloadKeep(CURRENT_DETAIL); return; }
+  if (c) { if (c.disabled) return; ev.preventDefault(); c.disabled = true; await fetch("/check", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ path: c.dataset.path }) }); refresh(); return; }
   const j = ev.target.closest ? ev.target.closest(".jump") : null;
   if (j) { await fetch("/tick", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ back: j.dataset.state }) }); location.href = "/"; return; }
   const rp = ev.target.closest ? ev.target.closest(".runpre") : null;
@@ -645,7 +699,7 @@ document.addEventListener("click", async (ev) => {
     // server coalesces stray extra clicks into the one run anyway.
     rp.disabled = true; rp.classList.add("locked"); rp.textContent = "running…";
     await fetch("/script", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ state: rp.dataset.state || CURRENT }) });
-    reloadKeep(CURRENT_DETAIL);
+    refresh();
     return;
   }
   const rpl = ev.target.closest ? ev.target.closest(".replink") : null;
@@ -823,27 +877,34 @@ document.addEventListener("dblclick", (ev) => {
 });
 
 // Only real widget expanders — the modal's ✕ shares the style, not the job.
-document.querySelectorAll(".expand[data-widget]").forEach((btn) => {
-  btn.addEventListener("click", (ev) => {
-    ev.stopPropagation();
-    const url = btn.dataset.url;
-    if (ev.ctrlKey || ev.metaKey) { window.open(url, "_blank"); return; }
-    if (ev.shiftKey) { window.open(url, "se-widget", "width=1100,height=800"); return; }
-    const w = document.getElementById(btn.dataset.widget);
-    if (w) { if (document.fullscreenElement === w) document.exitFullscreen(); else w.requestFullscreen(); }
-  });
+// Delegated, so a morph may replace a widget head without losing the button.
+document.addEventListener("click", (ev) => {
+  const btn = ev.target.closest ? ev.target.closest(".expand[data-widget]") : null;
+  if (!btn) return;
+  ev.stopPropagation();
+  const url = btn.dataset.url;
+  if (ev.ctrlKey || ev.metaKey) { window.open(url, "_blank"); return; }
+  if (ev.shiftKey) { window.open(url, "se-widget", "width=1100,height=800"); return; }
+  const w = document.getElementById(btn.dataset.widget);
+  if (w) { if (document.fullscreenElement === w) document.exitFullscreen(); else w.requestFullscreen(); }
 });
 
+// Pan/zoom survives every refresh, per machine — a walk-driven update must
+// not snap the reader's viewport back to the whole drawing. A morph rewrites
+// the viewBox attribute, so the saved view is re-applied after every one.
+function restoreViewBox() {
+  const s = document.getElementById("machine-svg");
+  if (!s) return;
+  try {
+    const saved = JSON.parse(sessionStorage.getItem("se-vb-" + D.viewed.id) || "null");
+    if (saved && saved.w > 0) { const v = s.viewBox.baseVal; v.x = saved.x; v.y = saved.y; v.width = saved.w; v.height = saved.h; }
+  } catch (e) { /* a broken save never blocks the drawing */ }
+}
 const svg = document.getElementById("machine-svg");
 if (svg) {
   let vb = svg.viewBox.baseVal;
-  // Pan/zoom survives every refresh, per machine — a walk-driven reload
-  // must not snap the reader's viewport back to the whole drawing.
   const VB_KEY = "se-vb-" + D.viewed.id;
-  try {
-    const saved = JSON.parse(sessionStorage.getItem(VB_KEY) || "null");
-    if (saved && saved.w > 0) { vb.x = saved.x; vb.y = saved.y; vb.width = saved.w; vb.height = saved.h; }
-  } catch (e) { /* a broken save never blocks the drawing */ }
+  restoreViewBox();
   const saveVb = () => { try { sessionStorage.setItem(VB_KEY, JSON.stringify({ x: vb.x, y: vb.y, w: vb.width, h: vb.height })); } catch (e) { /* storage full — the view just re-fits */ } };
   svg.addEventListener("wheel", (ev) => {
     ev.preventDefault();
@@ -876,15 +937,10 @@ if (divider && aside) {
 }
 
 if (CURRENT && D.states[CURRENT] && WALK_HERE) { CURRENT_DETAIL = "state:" + CURRENT; showDetails("state: " + CURRENT, stateDetail(CURRENT)); }
-// A reload that carried its detail along (reloadKeep) restores the pane.
+// A bookmark or an F5 still deep-links to the pane that was open.
 const DETAIL_PARAM = new URLSearchParams(location.search).get("detail");
 if (DETAIL_PARAM) { CURRENT_DETAIL = DETAIL_PARAM; const dp = detailFor(DETAIL_PARAM); showDetails(dp[0], dp[1]); }
-// Folds that were open before a reloadKeep stay open (the UX law).
-const FOLDS = (new URLSearchParams(location.search).get("folds") || "").split("|").filter(Boolean);
-if (FOLDS.length) document.querySelectorAll("#details details").forEach((d) => {
-  const s = d.querySelector("summary");
-  if (s && FOLDS.includes(s.textContent.split(" (")[0].trim())) d.open = true;
-});
+// Open folds need no carrying now: the morph never replaces them.
 
 // THE UNIFIED FEED (owner ruling, v2 i9 notes; built in v3): every hand's
 // act, one line each — time | src | brief | result. Updates bold, notes
@@ -1101,47 +1157,45 @@ function sessionOver() {
 }
 if (D.describe.status === "closed") sessionOver();
 
-// The mirror FOLLOWS the walk: poll the position — the agent's hand (or
-// another window) moves the machine under this page. A dead server reads
-// as session over.
-let aliveMisses = 0;
+// THE MIRROR IS PUSHED, NOT POLLED (owner ruling 2026-07-28). The walk
+// wakes every held hand, and /events forwards that wake here — so a change
+// lands at once instead of up to a poll late. EventSource reconnects by
+// itself; a reconnect after silence is how an engine swap arrives without
+// an F5, and a silence that never ends is death.
 let pollBusy = null;
-let pollInFlight = false;
-const ACTIVE_AT_RENDER = JSON.stringify(D.describe.active || []);
-setInterval(async () => {
-  if (pollInFlight) return; // never stack polls behind a slow server
-  pollInFlight = true;
-  try {
-    const r = await fetch("/api/alive");
-    const a = await r.json();
-    // Answers again after misses — that was an engine swap (hot reload):
-    // reload onto the new child instead of waiting for F5.
-    if (aliveMisses > 0) { aliveMisses = 0; reloadKeep(CURRENT_DETAIL); return; }
-    if (a.status === "closed") { sessionOver(); return; }
-    if (thr && document.activeElement !== thr && Number(thr.value) !== a.autonomy) {
-      thr.value = a.autonomy;
-      const lbl = document.getElementById("thr-val");
-      if (lbl) lbl.textContent = Number(a.autonomy).toFixed(2);
-    }
-    if (sdEl && document.activeElement !== sdEl && Number(sdEl.value) !== a.shutdown) {
-      sdEl.value = a.shutdown;
-      const lbl2 = document.getElementById("sd-val");
-      if (lbl2) lbl2.textContent = sdAbbr(a.shutdown);
-    }
-    if (logPanel && a.acts !== lastActs) { lastActs = a.acts; refreshLog(); }
-    if (JSON.stringify(a.active || []) !== ACTIVE_AT_RENDER) { reloadKeep(CURRENT_DETAIL); return; }
-    // A script run finishing elsewhere (agent tick, other window) lands
-    // its result — refresh, keeping the open pane.
-    if (pollBusy === true && a.busy === false) { reloadKeep(CURRENT_DETAIL); return; }
-    pollBusy = a.busy;
-  } catch (e) {
-    // A short outage can be an engine swap — only a long silence is death.
-    aliveMisses++;
-    if (aliveMisses >= 8) sessionOver();
-  } finally {
-    pollInFlight = false;
+let ACTIVE_AT_RENDER = JSON.stringify(D.describe.active || []);
+let sawError = false;
+let deathTimer = null;
+const es = new EventSource("/events");
+es.addEventListener("open", () => {
+  if (deathTimer !== null) { clearTimeout(deathTimer); deathTimer = null; }
+  if (sawError) { sawError = false; refresh(); }
+});
+es.addEventListener("error", () => {
+  sawError = true;
+  if (deathTimer === null) deathTimer = setTimeout(sessionOver, 20000);
+});
+es.addEventListener("message", (ev) => {
+  let a;
+  try { a = JSON.parse(ev.data); } catch (e) { return; }
+  if (a.status === "closed") { sessionOver(); return; }
+  if (thr && document.activeElement !== thr && Number(thr.value) !== a.autonomy) {
+    thr.value = a.autonomy;
+    const lbl = document.getElementById("thr-val");
+    if (lbl) lbl.textContent = Number(a.autonomy).toFixed(2);
   }
-}, 2000);
+  if (sdEl && document.activeElement !== sdEl && Number(sdEl.value) !== a.shutdown) {
+    sdEl.value = a.shutdown;
+    const lbl2 = document.getElementById("sd-val");
+    if (lbl2) lbl2.textContent = sdAbbr(a.shutdown);
+  }
+  if (logPanel && a.acts !== lastActs) { lastActs = a.acts; refreshLog(); }
+  if (JSON.stringify(a.active || []) !== ACTIVE_AT_RENDER) { refresh(); return; }
+  // A script run finishing elsewhere (agent tick, other window) lands its
+  // result — refresh, keeping the open pane.
+  if (pollBusy === true && a.busy === false) { refresh(); return; }
+  pollBusy = a.busy;
+});
 `;
 
 const MODAL = '<div id="modal"><div class="modal-box"><div class="widget-head"><span id="modal-title"></span><button class="expand" id="modal-close">✕</button></div><div class="modal-body" id="modal-body"></div></div></div><div id="toast"></div>';
@@ -1249,7 +1303,7 @@ export function renderMirror(m: MirrorState, widget?: "machine" | "details" | "l
     };
   }
   const comment = (canvas.nodes ?? []).find((n) => n.type === "text")?.text ?? "";
-  const data = `<script>window.SE_DATA = ${JSON.stringify({
+  const data = `<script type="application/json" id="se-data">${JSON.stringify({
     describe: m.session.describe(),
     packet: m.session.tickInfo(),
     lastPacket: m.lastPacket ?? null,
@@ -1259,7 +1313,7 @@ export function renderMirror(m: MirrorState, widget?: "machine" | "details" | "l
     viewed: { id: decl.id, reentry: decl.reentry, initial: decl.initial, states: decl.states.map((s) => s.id) },
     history: history.slice(-20),
     levels,
-  }).replace(/</g, "\\u003c")};</script>`;
+  }).replace(/</g, "\\u003c")}</script>`;
 
   // The slider — THE AUTONOMY: which states the agent enters by itself
   // (priority <= autonomy). 0 = the human clicks through everything
@@ -1283,14 +1337,14 @@ export function renderMirror(m: MirrorState, widget?: "machine" | "details" | "l
   const machineWidget = `<div class="widget" id="w-machine"><div class="widget-head"><span class="crumbs">${crumbs}</span><span style="display:flex;align-items:center;gap:10px">${curBtn}${slider}${sdBar}${escapeBtn}<button class="expand" data-widget="w-machine" data-url="/widget/machine?view=${encodeURIComponent(decl.id)}" title="expand · ctrl-click: new tab · shift-click: new window">⛶</button></span></div><div class="widget-body">${svg}</div></div>`;
   const detailsWidget = `<div class="widget" id="w-details">${widgetHead("details", "w-details", "/widget/details")}
     ${info.status === "closed" ? '<div class="meta" style="color:#e86a5f">machine closed</div>' : ""}
-    <div class="meta" id="details-title">—</div>
-    <div class="panel" id="details"></div>
+    <div class="meta" id="details-title" data-morph-ignore>—</div>
+    <div class="panel" id="details" data-morph-ignore></div>
   </div>`;
   // The unified feed sits ABOVE details (owner ruling 2026-07-26) — rows
   // load and refresh client-side off /api/log; only present with a log.
   const logWidget = m.log === undefined ? "" : `<div class="widget" id="w-log">${widgetHead("log", "w-log", "/widget/log")}
     <div class="log-filter-row"><input id="log-filter" placeholder="filter the feed"><input id="log-note" placeholder="drop a note — Enter captures it"></div>
-    <div class="panel log-panel" id="log-rows"><div class="meta">loading…</div></div>
+    <div class="panel log-panel" id="log-rows" data-morph-ignore><div class="meta">loading…</div></div>
   </div>`;
 
   if (widget === "log") {
