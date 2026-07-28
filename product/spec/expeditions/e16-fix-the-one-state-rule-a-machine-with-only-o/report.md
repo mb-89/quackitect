@@ -43,12 +43,43 @@ THE RULE'S HOME: product/guidance/method/machine-authoring.md — the
 one-state rule, the subtitle and door-statement conventions, and the
 standing canvas cautions.
 
+## Folded in later the same day: EDIT SAFETY (owner order 2026-07-28)
+
+The owner's Obsidian redraw stranded the live walk and ruled the law:
+machines are REAL-WORLD editable in Obsidian — invisible metadata is a
+defect. The fold-in, all engine plus tests:
+
+- Return inference — a plain edge drawn opposite a forward edge
+  compiles as a return; the same pair drawn twice collapses to one
+  edge; an ambiguous reciprocal pair refuses with the edge named.
+- FAN-IN IS OR — any fired inbound activates a plain state. Only a
+  drawn JOIN (state_kind join) synchronizes, the UML join bar made a
+  state. Fuel into an active state is absorbed.
+- The wedge guard (SE-C-123) — a tick that would leave the machine
+  open with nothing active refuses and names the starving join.
+- The hatch always works — escape from the main machine lands at idle;
+  boot alone must complete.
+- A broken sub-canvas refuses typed (SE-C-124); the next tick retries.
+- The role picker — an Advanced Canvas custom style attribute snippet
+  ships enabled: edge roles are visible and clickable in Obsidian,
+  returns render dashed.
+- aq rows render as prose (question + answer, prewrap), and SE-C-125
+  refuses breakless walls at se_answer and se_note.
+- se_survey — what stands open in one call (expeditions, iterations,
+  notes, backlog); wired into the desk and the retro.
+- The archives are human-only at priority 1.5; above-1 is documented
+  as beyond the slider.
+- The loading bar — view loads show feedback at once (the
+  feedback-within-a-second law, also in the voice).
+
 ## What settled it
 
-The suite in this worktree: preflight green, 97/97 — the retro tests
+The suite in this worktree: preflight green, 105/105 — the retro tests
 walk the one-step entry (method hashes demanded at the door), the door
 test proves both conversions (no submachine, subtitle present, tag
-present, legality preserved), and the ideation shape still compiles.
+present, legality preserved), the ideation shape still compiles, and
+editsafety.test.ts replays the owner's exact redraw plus the OR/join
+pair.
 
 ## What was not done
 

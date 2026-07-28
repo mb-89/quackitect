@@ -90,3 +90,6 @@
 {"ts":"2026-07-28T12:36:33.167Z","op":"update","visit":"expeditions/e16@3","node":"d57","brief":"rewriting the archive-bound tests and adding the join tests"}
 {"ts":"2026-07-28T12:36:39.548Z","op":"update","visit":"expeditions/e16@3","node":"d58","brief":"running the suite over the whole batch"}
 {"ts":"2026-07-28T12:37:01.157Z","op":"done","visit":"expeditions/e16@3","node":"d50","brief":"105 tests green over the whole batch"}
+{"ts":"2026-07-28T12:37:24.542Z","op":"update","visit":"expeditions/e16@3","node":"d59","brief":"reading the record and report before the leave"}
+{"ts":"2026-07-28T12:37:51.653Z","op":"update","visit":"expeditions/e16@3","node":"d60","brief":"report extended with the edit-safety fold-in"}
+{"ts":"2026-07-28T12:38:05.140Z","op":"done","visit":"expeditions/e16@3","node":"d51","brief":"report done; closing e16 with apply on the owner's word"}
