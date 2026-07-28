@@ -48,6 +48,26 @@ function sidePoint(el: CanvasElement, side: string | undefined, other: CanvasEle
   }
 }
 
+/** THE FEED PALETTE — one colour per role, none shared (owner ruling
+ *  2026-07-28). The aq kind wore the agent's blue and the update kind wore
+ *  the human's amber, so two of the three columns said the same thing twice.
+ *
+ *  Green, red and amber are RESERVED by the voice for pass, failure and
+ *  attention, so no role may take them — a kind painted amber reads as a
+ *  verdict. Data, not scattered literals, and a test holds it true. */
+export const FEED_COLOURS: Record<string, string> = {
+  time: "#566068",
+  "src-agent": "#6fb3a8",
+  "src-human": "#e0834a",
+  "kind-call": "#8a97a3",
+  "kind-update": "#7cc4e8",
+  "kind-note": "#c58fe8",
+  "kind-aq": "#f0879a",
+};
+
+/** What the voice already spent: pass, failure, attention. */
+export const RESERVED_COLOURS: string[] = ["#4a7a55", "#e86a5f", "#e8b339"];
+
 export interface StateMeta {
   has_exit: boolean;
   exit_met: boolean;
@@ -441,15 +461,15 @@ const STYLE = `
   .log-panel { font-size: 12px; margin-top: 6px; }
   .logrow { display: flex; gap: 8px; padding: 2px 0; cursor: pointer; border-bottom: 1px dotted #22272c; align-items: baseline; }
   .logrow:hover { background: #22272c; }
-  .logrow .lt { color: #7f8b96; flex: 0 0 auto; }
-  .logrow .lsrc { flex: 0 0 5.5ch; color: #7cc4e8; }
-  .logrow .lsrc.human { color: #e8b339; }
+  .logrow .lt { color: ${FEED_COLOURS.time}; flex: 0 0 auto; }
+  .logrow .lsrc { flex: 0 0 5.5ch; color: ${FEED_COLOURS["src-agent"]}; }
+  .logrow .lsrc.human { color: ${FEED_COLOURS["src-human"]}; }
   .logrow .lkind { flex: 0 0 6.5ch; }
-  .logrow .lkind.k-call { color: #7f8b96; }
-  .logrow .lkind.k-update { font-weight: 700; color: #e8b339; }
-  .logrow .lkind.k-note { font-style: italic; color: #c58fe8; }
-  .logrow .lkind.k-aq { font-weight: 700; color: #7cc4e8; }
-  .aq-q { font-weight: 700; color: #7cc4e8; padding: 6px 0; white-space: pre-wrap; }
+  .logrow .lkind.k-call { color: ${FEED_COLOURS["kind-call"]}; }
+  .logrow .lkind.k-update { font-weight: 700; color: ${FEED_COLOURS["kind-update"]}; }
+  .logrow .lkind.k-note { font-style: italic; color: ${FEED_COLOURS["kind-note"]}; }
+  .logrow .lkind.k-aq { font-weight: 700; color: ${FEED_COLOURS["kind-aq"]}; }
+  .aq-q { font-weight: 700; color: ${FEED_COLOURS["kind-aq"]}; padding: 6px 0; white-space: pre-wrap; }
   #loadbar { position: fixed; top: 0; left: 0; right: 0; height: 3px; background: #22272c; z-index: 99; display: none; }
   #loadbar .fill { height: 100%; width: 30%; background: #e8b339; animation: loadslide 1s linear infinite; }
   @keyframes loadslide { 0% { margin-left: -30%; } 100% { margin-left: 100%; } }

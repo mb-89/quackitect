@@ -26,3 +26,10 @@
 {"ts":"2026-07-28T15:04:51.449Z","op":"done","visit":"expeditions/e18@0","node":"d53","brief":"The person can ask what stands open from the machine header"}
 {"ts":"2026-07-28T15:05:30.291Z","op":"update","visit":"expeditions/e18@0","node":"d72","brief":"Both halves of the settings rule pinned in the suite"}
 {"ts":"2026-07-28T15:05:55.268Z","op":"update","visit":"expeditions/e18@0","node":"d73","brief":"Committing the settings and survey work"}
+{"ts":"2026-07-28T15:07:31.300Z","op":"update","visit":"expeditions/e18@0","node":"d74","brief":"Feed palette became data with reserved colours named"}
+{"ts":"2026-07-28T15:07:45.216Z","op":"done","visit":"expeditions/e18@0","node":"d54","brief":"One colour per feed role, held by a lint rather than a comment"}
+{"ts":"2026-07-28T15:08:25.269Z","op":"update","visit":"expeditions/e18@0","node":"d75","brief":"Hook script appends every web search to the feed"}
+{"ts":"2026-07-28T15:08:34.332Z","op":"update","visit":"expeditions/e18@0","node":"d76","brief":"Cage template freed WebSearch and gained the mirroring hook"}
+{"ts":"2026-07-28T15:08:46.263Z","op":"update","visit":"expeditions/e18@0","node":"d77","brief":"Struck the prose logging duty now the hook carries it</brief>"}
+{"ts":"2026-07-28T15:08:57.507Z","op":"update","visit":"expeditions/e18@0","node":"d78","brief":"Testing the hook logs a search and ignores other tools"}
+{"ts":"2026-07-28T15:09:33.500Z","op":"done","visit":"expeditions/e18@0","node":"d55","brief":"Web searches now reach the feed through a hook, not by remembering"}
