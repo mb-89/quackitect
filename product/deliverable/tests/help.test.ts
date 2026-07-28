@@ -67,7 +67,7 @@ test("every switch RUNME.ps1 parses appears in its help text", () => {
   const src = readFileSync(join(repoRoot, "RUNME.ps1"), "utf8");
 
   // PowerShell compares with -eq, -ne and -in, so the switches sit on those
-  // lines: `$_ -in @("--help", "-h")`, `$_ -ne "--one-screen"`.
+  // lines: `$_ -in @("--help", "-h")`, `$_ -eq "--manual"`.
   const flags = new Set<string>();
   for (const line of src.matchAll(/-(?:eq|ne|in)\b[^\r\n]*/g)) {
     for (const lit of line[0].matchAll(/"(-[^"\s]+)"/g)) flags.add(lit[1]);
@@ -81,11 +81,29 @@ test("every switch RUNME.ps1 parses appears in its help text", () => {
   }
 });
 
-// The flag RUNME owns is the one that started this. It reaches se-pty as
-// --detach, and se-pty is what has to know about detaching.
-test("--one-screen launches the terminal host detached", () => {
+// Listing a flag is not enough if the listing never reaches the reader.
+// RUNME's own block was written with Write-Host, which goes to the host
+// stream — a pipe or a redirect drops it, and the server's help is all that
+// survives. That is how a documented flag still read as undocumented.
+test("RUNME prints its help on the OUTPUT stream, so a pipe or a redirect keeps it", () => {
   const src = readFileSync(join(repoRoot, "RUNME.ps1"), "utf8");
-  const oneScreen = /if \(\$oneScreen\) \{[\s\S]*?\n  \}/.exec(src);
-  assert.ok(oneScreen !== null, "RUNME.ps1 must still branch on $oneScreen");
-  assert.match(oneScreen[0], /se-pty\.ts[^\r\n]*--detach/, "the one-screen launch passes --detach, or closing the window kills the session");
+  assert.match(src, /Write-Output \$HELP/, "RUNME.ps1 must Write-Output $HELP — Write-Host writes to the host stream, which a redirect drops");
+  assert.doesNotMatch(src, /Write-Host \$HELP/, "RUNME.ps1 must not Write-Host its help");
+});
+
+// The terminal pane is the DEFAULT launch, and that launch is the one that
+// has to survive its window closing. --own-terminal is the way back.
+test("the default launch runs the terminal host detached", () => {
+  const src = readFileSync(join(repoRoot, "RUNME.ps1"), "utf8");
+  assert.match(src, /if \(\$ownTerminal\) \{/, "RUNME.ps1 must branch on $ownTerminal — the flag that keeps the agent in this window");
+  assert.match(src, /se-pty\.ts[^\r\n]*--detach/, "the default launch passes --detach, or closing the window kills the session");
+});
+
+// MANUAL MODE MEANS NO LLM: se-manual is the mirror standing alone, and a
+// missing claude CLI falls into it instead of ending the run.
+test("manual mode runs the mirror alone, and a missing LLM falls into it", () => {
+  const src = readFileSync(join(repoRoot, "RUNME.ps1"), "utf8");
+  assert.match(src, /se-manual\.ts/, "RUNME.ps1 must launch se-manual.ts for manual mode");
+  assert.match(src, /-eq \$claude\)[^\r\n]*\$manual/, "a missing claude CLI must fall back to manual mode");
+  assert.match(src, /\$manual = \$true/, "the no-LLM fallback must set manual mode, not exit");
 });

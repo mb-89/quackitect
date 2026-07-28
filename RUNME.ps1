@@ -4,9 +4,9 @@ quackitect v3 — install-check, selftest, and launch.
 
 .DESCRIPTION
 Preflight (node/git/ripgrep hard deps), cage install, engine selftests, then
-the caged agent. EVERY argument except --one-screen is forwarded to the se
-server - those flags are defined ONCE, in engine/bin/se-mcp.ts. Run
-.\RUNME.ps1 --help for both lists.
+the caged agent, inside the Mirror's terminal pane. RUNME owns four flags of
+its own. EVERY other argument is forwarded to the se server, whose flags are
+defined ONCE, in engine/bin/se-mcp.ts. Run .\RUNME.ps1 --help for both lists.
 
 .EXAMPLE
 .\RUNME.ps1
@@ -14,32 +14,44 @@ server - those flags are defined ONCE, in engine/bin/se-mcp.ts. Run
 .\RUNME.ps1 --autonomy 0
 .EXAMPLE
 .\RUNME.ps1 --manual
+.EXAMPLE
+.\RUNME.ps1 --own-terminal
 #>
 $ErrorActionPreference = "Stop"
 $root = $PSScriptRoot
 
-# The single flag registry is the server (engine/bin/se-mcp.ts). RUNME only
-# recognizes the help spellings, and answers them with the server's help --
-# plus --one-screen, the one flag it owns, which the server never sees.
+# The server (engine/bin/se-mcp.ts) is the registry for everything that
+# changes how the ENGINE runs. RUNME declares only the flags that change how
+# IT LAUNCHES - the server never sees those.
 $forwarded = @($args | ForEach-Object { "$_" })
 $HELP = @"
 RUNME.ps1 - install-check, selftest, launch.
 
-  .\RUNME.ps1 [--one-screen] [server flags...]
+  .\RUNME.ps1 [--own-terminal] [--manual] [server flags...]
 
-  --one-screen   run the agent inside a terminal hosted beside it, so the
-                 Mirror shows the agent in its left column. The host runs in
-                 the BACKGROUND, so this window is free to close afterwards.
-                 RUNME owns this flag - the server never sees it.
+  THE AGENT RUNS IN THE MIRROR'S TERMINAL PANE by default. Its host runs in
+  the background, so this window is free to close once the session is up.
+
+  --own-terminal run the agent in THIS window instead, on its own terminal.
+                 The Mirror's terminal pane stays empty.
+  --manual       no LLM: open the Mirror alone and walk every step yourself.
+                 This also happens by itself when no claude CLI is found.
+  --one-screen   the old spelling of today's default. Accepted, does nothing.
   --help         this text (-h, -?, -Help)
 
-  EVERY OTHER ARGUMENT is forwarded to the se server, whose own flags follow.
+  RUNME owns the four flags above. EVERY OTHER ARGUMENT is forwarded to the
+  se server, whose own flags follow below.
 "@
+# The help goes to the OUTPUT stream. Write-Host writes to the host stream,
+# which a pipe or a redirect drops - and help you cannot capture is the same
+# defect as a flag nobody documented.
 if ($forwarded | Where-Object { $_ -in @("--help", "-h", "-?", "-Help") }) {
-  Write-Host $HELP -ForegroundColor Cyan
+  Write-Output $HELP
   $node = Get-Command node -ErrorAction SilentlyContinue
   if ($node) { node (Join-Path $root "product\deliverable\engine\bin\se-mcp.ts") --help }
-  else { Write-Host "  (node not installed yet - the flags live in product\deliverable\engine\bin\se-mcp.ts)" }
+  else { Write-Output "  (node not installed yet - the flags live in product\deliverable\engine\bin\se-mcp.ts)" }
+  Write-Output ""
+  Write-Output "  RUNME's own flags are listed at the TOP of this output."
   exit 0
 }
 
@@ -123,23 +135,28 @@ try {
 # embeds the Mirror (http://localhost:7333): YOUR hand on the same walk.
 # .mcp.json args are fixed template text, so the forwarded command line
 # rides the env (newline-separated - argument values may carry spaces).
-$claude = Get-Command claude -ErrorAction SilentlyContinue
-if ($null -eq $claude) {
-  Write-Host "claude CLI not found. Install Claude Code first: https://code.claude.com/docs" -ForegroundColor Red
-  exit 1
+# THE FLAGS RUNME OWNS. They change how RUNME launches, not how the engine
+# runs, so they are taken out of the forwarded command line here.
+$ownTerminal = [bool]($forwarded | Where-Object { $_ -eq "--own-terminal" })
+$manual = [bool]($forwarded | Where-Object { $_ -eq "--manual" })
+$staleOneScreen = [bool]($forwarded | Where-Object { $_ -eq "--one-screen" })
+$forwarded = @($forwarded | Where-Object { $_ -notin @("--own-terminal", "--manual", "--one-screen") })
+if ($staleOneScreen) {
+  Write-Host "quackitect v3 - --one-screen is the default now; the flag did nothing" -ForegroundColor Yellow
 }
-# ONE SCREEN (opt-in): --one-screen runs the agent inside a pseudo-terminal
-# hosted beside it, so the Mirror can show the agent in its left column.
-# This is the ONE flag RUNME owns, because the server never sees it - it
-# changes how RUNME launches, not how the engine runs. Without the flag
-# nothing changes: a terminal that will not start must never cost you your
-# agent.
-#
-# The host is started DETACHED. With the terminal in the browser, this window
-# has nothing left to show, and leaving the session tied to it means closing
-# the window kills the agent - which happened for real on 2026-07-28.
-$oneScreen = [bool]($forwarded | Where-Object { $_ -eq "--one-screen" })
-$forwarded = @($forwarded | Where-Object { $_ -ne "--one-screen" })
+
+# MANUAL MODE MEANS NO LLM. Either you asked for it, or no claude CLI was
+# found - a missing agent must not stop you walking the machines yourself.
+$claude = Get-Command claude -ErrorAction SilentlyContinue
+if (($null -eq $claude) -and (-not $manual)) {
+  Write-Host "claude CLI not found - starting in manual mode. Install Claude Code for an agent: https://code.claude.com/docs" -ForegroundColor Yellow
+  $manual = $true
+}
+if ($manual) {
+  Write-Host "quackitect v3 - manual mode: no agent, the Mirror is yours" -ForegroundColor Cyan
+  node (Join-Path $root "product\deliverable\engine\bin\se-manual.ts") --root $root @forwarded
+  exit $LASTEXITCODE
+}
 $env:SE_ARGS = ($forwarded -join "`n")
 $argNote = if ($forwarded.Count -gt 0) { " (args: $($forwarded -join ' '))" } else { "" }
 Write-Host "quackitect v3 - launching caged agent in workspace/$argNote" -ForegroundColor Cyan
@@ -153,13 +170,21 @@ Write-Host "quackitect v3 - the Mirror (your hand on the walk): the server opens
 # lets it, ANNOUNCES where it stands, and stops; a stopped agent cannot
 # hear the slider - the user messages it (e.g. "continue") to resume.
 $kickoff = 'Session start. Tick the machine and walk as far as the threshold allows. Then report to me in one short message: where you stand, and why you stopped (threshold, condition, or idle). If you are held below the threshold or idle with nothing to do, stop - and make it clear to me that the slider alone cannot wake you: after I change it or move the machine in the mirror, I have to send you a message (continue is enough), and you pick up from wherever the machine stands.'
+# THE TERMINAL PANE IS THE DEFAULT. The agent runs inside a pseudo-terminal
+# hosted beside it, so the Mirror shows it in the left column. That host is
+# started DETACHED: with the terminal in the browser this window has nothing
+# left to show, and leaving the session tied to it means closing the window
+# kills the agent - which happened for real on 2026-07-28. When no terminal
+# binding is installed the host runs the agent on this terminal instead, so a
+# terminal that will not start still never costs you your agent.
 Push-Location (Join-Path $root "workspace")
 try {
-  if ($oneScreen) {
-    Write-Host "quackitect v3 - one screen: the agent runs in the Mirror's terminal pane, in the background" -ForegroundColor Cyan
-    node (Join-Path $root "product\deliverable\engine\bin\se-pty.ts") --pty-port 7334 --detach -- claude $kickoff
-  } else {
+  if ($ownTerminal) {
+    Write-Host "quackitect v3 - own terminal: the agent runs in THIS window; the Mirror's terminal pane stays empty" -ForegroundColor Cyan
     claude $kickoff
+  } else {
+    Write-Host "quackitect v3 - the agent runs in the Mirror's terminal pane, in the background" -ForegroundColor Cyan
+    node (Join-Path $root "product\deliverable\engine\bin\se-pty.ts") --pty-port 7334 --detach -- claude $kickoff
   }
 } finally {
   Pop-Location

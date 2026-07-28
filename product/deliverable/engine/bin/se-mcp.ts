@@ -2,7 +2,7 @@
 // Node ≥22 runs this directly (native type stripping); no build step. The
 // workspace's .mcp.json points here.
 //
-//   node engine/bin/se-mcp.ts --root <project root> [--autonomy 0.4] [--manual] [--mirror-port 7333]
+//   node engine/bin/se-mcp.ts --root <project root> [--autonomy 0.4] [--mirror-port 7333]
 //
 // --root is the QUACKITECT PROJECT root (the folder holding product/ and
 // workspace/) — the file lane serves that whole tree, the call log lives in
@@ -47,7 +47,7 @@ function argValue(flag: string): string | undefined {
 if (argv.some((a) => a === "--help" || a === "-h" || a === "-?")) {
   process.stdout.write(`se-mcp — the quackitect v3 MCP server (stdio JSON-RPC + embedded mirror)
 
-  node engine/bin/se-mcp.ts --root <project root> [--autonomy 0.4] [--manual] [--mirror-port 7333]
+  node engine/bin/se-mcp.ts --root <project root> [--autonomy 0.4] [--mirror-port 7333]
 
   --root         the quackitect project root (holds product/ and workspace/);
                  file lane serves that tree, call log lands in <root>/.se/
@@ -56,7 +56,7 @@ if (argv.some((a) => a === "--help" || a === "-h" || a === "-?")) {
                  1: fully autonomous. Default 0.4. Env: SE_AUTONOMY.
                  Live-adjustable in the mirror. (--threshold and
                  SE_THRESHOLD are accepted as the old spelling.)
-  --manual       alias for --autonomy 0 — you drive every step from the mirror
+                 RUNME's --manual is a DIFFERENT thing: no agent at all.
   --mirror-port  the embedded mirror's HTTP port (the human's hand on the
                  same walk). Default 7333. 0 disables. Env: SE_MIRROR_PORT.
   --child        INTERNAL, never typed by hand. The shim spawns itself with
@@ -95,7 +95,7 @@ if (argv.includes("--child") || process.env.SE_HOT_DISABLE === "1") {
   const { buildServer } = await import("../tools.ts");
 
   const autonomyRaw =
-    argValue("--autonomy") ?? argValue("--threshold") ?? (argv.includes("--manual") ? "0" : undefined) ?? process.env.SE_AUTONOMY ?? process.env.SE_THRESHOLD;
+    argValue("--autonomy") ?? argValue("--threshold") ?? process.env.SE_AUTONOMY ?? process.env.SE_THRESHOLD;
 
   const session = new Session(root); // fails fast on a misdrawn machine
   if (autonomyRaw !== undefined) session.setAutonomy(Number(autonomyRaw)); // refuses out-of-range

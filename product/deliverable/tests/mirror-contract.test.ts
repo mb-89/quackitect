@@ -114,7 +114,7 @@ test("the loading bar settles: it can come down, it times out, and one action lo
 // the relayout, and the two chased each other.
 test("the terminal starts at half its column, drags past half, and cannot chase its own resize", () => {
   const root = freshRoot();
-  const html = renderMirror({ session: new Session(root), root, lastPacket: undefined, mode: "manual" });
+  const html = renderMirror({ session: new Session(root), root, lastPacket: undefined, mode: "agent" });
   assert.match(html, /#w-terminal \{ height: 50%;/, "an explicit half, not a content-sized box under a cap");
   assert.ok(!/#w-terminal \{[^}]*max-height/.test(html), "no cap — the owner asked to drag past half");
   assert.ok(html.includes('data-axis="y"'), "the height splitter ships");
@@ -122,6 +122,19 @@ test("the terminal starts at half its column, drags past half, and cannot chase 
   // The loop-breaker: a resize that changes no rows or columns must not fire.
   assert.ok(html.includes("if (cols === lastCols && rows === lastRows) return;"), "a no-op resize never happens");
   assert.ok(html.includes("requestAnimationFrame"), "the pane is measured on a settled frame");
+});
+
+// THE PANE FOLLOWS THE HOST, NOT THE LAUNCH (owner ruling 2026-07-28). Manual
+// mode starts no terminal host, and --own-terminal leaves the agent in its own
+// window. Neither needs a flag here: the pane ships hidden, and only a host
+// that answers reveals it.
+test("the terminal pane and its splitter ship hidden until a host answers", () => {
+  const root = freshRoot();
+  const html = renderMirror({ session: new Session(root), root, lastPacket: undefined, mode: "agent" });
+  assert.match(html, /class="widget no-host" id="w-terminal"/, "the terminal pane ships hidden");
+  assert.match(html, /class="divider horiz no-host" id="div-term"/, "and so does its splitter");
+  assert.match(html, /\.no-host \{ display: none/, "hidden means not rendered at all, not an empty box");
+  assert.ok(html.includes('document.querySelectorAll(".no-host").forEach((el) => el.classList.remove("no-host"));'), "a host that answers is what reveals them");
 });
 
 // ONE SURFACE NEVER RESETS ANOTHER (owner ruling 2026-07-28). Switching the

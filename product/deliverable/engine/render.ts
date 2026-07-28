@@ -93,104 +93,47 @@ export interface StateMeta {
 const LABEL_CH = 15.6; // monospace advance at the .label size
 const SUB_CH = 10.2; // ditto at .sublabel
 const BOX_PAD = 26;
-const GUTTER_X = 80; // room for the condition circles that ride the edges
-const GUTTER_Y = 52;
-
-function nearestBand(reps: number[], v: number): number {
-  let best = 0;
-  for (let i = 1; i < reps.length; i++) if (Math.abs(reps[i] - v) < Math.abs(reps[best] - v)) best = i;
-  return best;
+/** How big a box has to be for what the RENDER puts in it. Obsidian sizes a
+ *  node for the note inside it; the render shows a title and a subtitle, so
+ *  the two sizes have nothing to do with each other. */
+function sizeOf(n: CanvasElement, meta: Record<string, StateMeta>): { w: number; h: number } {
+  if (n.type === "text") {
+    const len = (n.text ?? "").length;
+    return { w: 520, h: Math.max(120, Math.ceil(len / 62) * 24 + 28) };
+  }
+  if ((n as { styleAttributes?: { shape?: string } }).styleAttributes?.shape === "pill") {
+    return { w: 68, h: 68 }; // start and end are just symbols
+  }
+  const sid = stateIdOf(n) ?? "";
+  const subFull = meta[sid]?.subtitle;
+  const sub = subFull !== undefined && subFull.length > 48 ? `${subFull.slice(0, 47)}…` : subFull;
+  const wide = Math.max(sid.length * LABEL_CH, (sub ?? "").length * SUB_CH);
+  return { w: Math.max(200, Math.ceil(wide) + BOX_PAD * 2), h: sub === undefined ? 72 : 100 };
 }
 
-function bandsOf(values: number[], tolerance: number): number[] {
-  const sorted = [...values].sort((a, b) => a - b);
-  const reps: number[] = [];
-  for (const v of sorted) if (reps.length === 0 || v - reps[reps.length - 1] > tolerance) reps.push(v);
-  return reps;
-}
-
-export function compact(canvas: CanvasData, meta: Record<string, StateMeta>): CanvasData {
+/** SIZE, NEVER MOVE (owner ruling 2026-07-28). The arrangement is the
+ *  owner's, drawn by hand in Obsidian, and the render does not get a second
+ *  opinion about it — a re-layout here made the drawing bigger than the one
+ *  it was re-laying out. Each box takes the size its rendered label needs,
+ *  around the CENTRE it was drawn at. Groups are frames somebody drew, so
+ *  they are not touched at all. */
+export function sizeForRender(canvas: CanvasData, meta: Record<string, StateMeta>): CanvasData {
   const source = canvas.nodes ?? [];
   if (source.length === 0) return canvas;
-  // Membership and banding both read the ORIGINAL rects, so capture them
-  // before anything moves.
-  const orig = new Map(source.map((n) => [n.id, { x: n.x, y: n.y, w: n.width, h: n.height }]));
   const nodes = source.map((n) => ({ ...n })) as CanvasElement[];
-  const boxes = nodes.filter((n) => n.type !== "group");
-  if (boxes.length === 0) return canvas;
-
-  const sized = new Map<string, { w: number; h: number }>();
-  for (const n of boxes) {
-    if (n.type === "text") {
-      const len = (n.text ?? "").length;
-      sized.set(n.id, { w: 520, h: Math.max(120, Math.ceil(len / 62) * 24 + 28) });
-      continue;
-    }
-    if ((n as { styleAttributes?: { shape?: string } }).styleAttributes?.shape === "pill") {
-      sized.set(n.id, { w: 68, h: 68 }); // start and end are just symbols
-      continue;
-    }
-    const sid = stateIdOf(n) ?? "";
-    const subFull = meta[sid]?.subtitle;
-    const sub = subFull !== undefined && subFull.length > 48 ? `${subFull.slice(0, 47)}…` : subFull;
-    const wide = Math.max(sid.length * LABEL_CH, (sub ?? "").length * SUB_CH);
-    sized.set(n.id, { w: Math.max(200, Math.ceil(wide) + BOX_PAD * 2), h: sub === undefined ? 72 : 100 });
-  }
-
-  // A COMMENT IS AN ANNOTATION, NOT A STATE (owner report 2026-07-28). Text
-  // nodes are wide by nature, and letting one claim a COLUMN made every other
-  // row leave that column empty — 520px of nothing running the full height of
-  // the drawing, which is the empty column the owner saw. So text sits OUT of
-  // the column grid: it keeps its own ROW, so nothing can overlap it, and it
-  // starts at the left edge and overhangs as far as it likes.
-  const isText = (n: CanvasElement): boolean => n.type === "text";
-  const states = boxes.filter((n) => !isText(n));
-  const cx = states.map((n) => orig.get(n.id)!.x + orig.get(n.id)!.w / 2);
-  const cy = boxes.map((n) => orig.get(n.id)!.y + orig.get(n.id)!.h / 2);
-  const cols = bandsOf(cx, 120);
-  const rows = bandsOf(cy, 120);
-  const colOf = (n: CanvasElement): number => nearestBand(cols, orig.get(n.id)!.x + orig.get(n.id)!.w / 2);
-  const rowIdx = cy.map((v) => nearestBand(rows, v));
-  const colW = cols.map((_, c) => Math.max(0, ...states.filter((n) => colOf(n) === c).map((n) => sized.get(n.id)!.w)));
-  const rowH = rows.map((_, r) => Math.max(0, ...boxes.filter((_, i) => rowIdx[i] === r).map((n) => sized.get(n.id)!.h)));
-  const colX: number[] = [];
-  const rowY: number[] = [];
-  let ax = 0;
-  for (const w of colW) { colX.push(ax); ax += w + GUTTER_X; }
-  let ay = 0;
-  for (const h of rowH) { rowY.push(ay); ay += h + GUTTER_Y; }
-  boxes.forEach((n, i) => {
-    const s = sized.get(n.id)!;
-    const c = colOf(n);
-    n.x = isText(n) ? 0 : colX[c] + (colW[c] - s.w) / 2;
-    n.y = rowY[rowIdx[i]] + (rowH[rowIdx[i]] - s.h) / 2;
+  for (const n of nodes) {
+    if (n.type === "group") continue;
+    const s = sizeOf(n, meta);
+    n.x += (n.width - s.w) / 2;
+    n.y += (n.height - s.h) / 2;
     n.width = s.w;
     n.height = s.h;
-  });
-
-  // A group frames whatever it framed before, at wherever that now sits.
-  for (const g of nodes) {
-    if (g.type !== "group") continue;
-    const og = orig.get(g.id)!;
-    const members = boxes.filter((n) => {
-      const o = orig.get(n.id)!;
-      return o.x >= og.x && o.y >= og.y && o.x + o.w <= og.x + og.w && o.y + o.h <= og.y + og.h;
-    });
-    if (members.length === 0) continue;
-    const x1 = Math.min(...members.map((m) => m.x)) - 24;
-    const y1 = Math.min(...members.map((m) => m.y)) - 52; // headroom for the label
-    const x2 = Math.max(...members.map((m) => m.x + m.width)) + 24;
-    const y2 = Math.max(...members.map((m) => m.y + m.height)) + 24;
-    g.x = x1;
-    g.y = y1;
-    g.width = x2 - x1;
-    g.height = y2 - y1;
   }
   return { ...canvas, nodes };
 }
 
 function machineSvg(source: CanvasData, activeIds: Set<string>, doneIds: Set<string>, subIds: Set<string>, meta: Record<string, StateMeta>): string {
-  const canvas = compact(source, meta);
+  const canvas = sizeForRender(source, meta);
   const nodes = canvas.nodes ?? [];
   const pad = 60;
   const minX = Math.min(...nodes.map((n) => n.x)) - pad;
@@ -402,6 +345,8 @@ const STYLE = `
      No max: the owner asked to be able to drag it past half. */
   #w-terminal { height: 50%; flex: none; min-height: 140px; }
   .term-panel { flex: 1; min-height: 0; overflow: auto; padding: 8px 10px; }
+  /* Beats .widget's own display, whatever order the sheet ends up in. */
+  .no-host { display: none !important; }
   .crumbs { font-size: 13px; color: #7f8b96; display: flex; align-items: center; gap: 4px; text-transform: none; letter-spacing: 0; }
   .crumbs a { color: #d8dde2; text-decoration: none; }
   .crumbs a:hover { color: #e8b339; }
@@ -1500,6 +1445,9 @@ async function bootTerminal() {
     const ping = await fetch(base + "/pty/alive");
     if (!ping.ok) return;
   } catch (e) { return; }
+  // A HOST ANSWERED, so the pane earns its place. Until then it is not
+  // there at all: manual mode and --own-terminal both leave it hidden.
+  document.querySelectorAll(".no-host").forEach((el) => el.classList.remove("no-host"));
   pane.dataset.booted = "1";
   await loadAsset(base + "/xterm.css", "css");
   await loadAsset(base + "/xterm.js", "js");
@@ -1561,7 +1509,11 @@ async function bootTerminal() {
   new ResizeObserver(sync).observe(pane);
   sync();
 }
+// The host may come up after the page — RUNME detaches it, and it can be
+// restarted under a standing mirror. So the ping keeps asking until one
+// answers; bootTerminal returns at once once a terminal is attached.
 void bootTerminal();
+setInterval(() => { void bootTerminal(); }, 2000);
 `;
 
 const MODAL = '<div id="modal"><div class="modal-box"><div class="widget-head"><span id="modal-title"></span><button class="expand" id="modal-close">✕</button></div><div class="modal-body" id="modal-body"></div></div></div><div id="toast"></div>';
@@ -1717,13 +1669,21 @@ export function renderMirror(m: MirrorState, widget?: "machine" | "details" | "l
   // The pty host is a SIBLING process started by RUNME — the mirror only
   // renders a client for it, because this page's process is the agent's
   // grandchild and a grandchild cannot own its grandparent's terminal.
-  const terminalWidget = `<div class="widget" id="w-terminal" data-morph-ignore>${widgetHead("terminal", "w-terminal", "/widget/terminal")}
-    <div class="panel term-panel" id="term-body"><div class="meta">waiting for the pty host — RUNME starts it beside the agent</div></div>
+  //
+  // THE PANE FOLLOWS THE HOST, NOT THE LAUNCH (owner ruling 2026-07-28). It
+  // ships hidden and the client reveals it when the host answers. Manual mode
+  // starts none, and --own-terminal leaves the agent in its own window, so
+  // both simply never reveal it — one rule instead of a flag for each case.
+  // On its OWN page the pane stays visible, so a direct visit can say why it
+  // is empty rather than showing a blank tab.
+  const termWidget = (standalone: boolean) => `<div class="widget${standalone ? "" : " no-host"}" id="w-terminal" data-morph-ignore>${widgetHead("terminal", "w-terminal", "/widget/terminal")}
+    <div class="panel term-panel" id="term-body"><div class="meta">no terminal host answering — the pane appears when an agent runs in it</div></div>
   </div>`;
+  const terminalWidget = termWidget(false);
 
   if (widget === "terminal") {
     return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>se · terminal</title><style>${STYLE} #w-terminal{flex:1;height:auto;border-bottom:0}</style></head>
-<body><div class="cols"><aside id="left" style="width:100vw;max-width:100vw">${terminalWidget}</aside></div>${MODAL}${data}<script>${SCRIPT}</script></body></html>`;
+<body><div class="cols"><aside id="left" style="width:100vw;max-width:100vw">${termWidget(true)}</aside></div>${MODAL}${data}<script>${SCRIPT}</script></body></html>`;
   }
   if (widget === "log") {
     return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>se · log</title><style>${STYLE} #w-log{flex:1;border-bottom:0}</style></head>
@@ -1743,7 +1703,7 @@ export function renderMirror(m: MirrorState, widget?: "machine" | "details" | "l
 <div class="cols">
   <aside id="left" data-keep-style>
     ${logWidget}
-    <div class="divider horiz" id="div-term" data-pane="w-terminal" data-axis="y" data-grow="bottom"></div>
+    <div class="divider horiz no-host" id="div-term" data-pane="w-terminal" data-axis="y" data-grow="bottom"></div>
     ${terminalWidget}
   </aside>
   <div class="divider" id="div-left" data-pane="left" data-grow="left"></div>
