@@ -12,8 +12,12 @@ import { CLAUSES, Rejection } from "./errors.ts";
 import { CallLog } from "./calllog.ts";
 import { parseUpdate } from "./decisions.ts";
 import { Toll } from "./toll.ts";
+import { readFileSync } from "node:fs";
 import { fileDelete, fileGlob, fileList, filePatch, fileRead, fileWrite, type PatchOp } from "./files.ts";
-import { appendNote, drainNote } from "./inbox.ts";
+import { LINT_CONFIG, lintProse } from "./lint.ts";
+import { appendNote, backlogNotes, drainNote, pendingNotes } from "./inbox.ts";
+import { expList, readRecord } from "./worktree.ts";
+import { itList, readItRecord } from "./iterations.ts";
 import { capJson } from "./jsonio.ts";
 import { McpServer, type ToolDef } from "./mcp.ts";
 import { gitLane } from "./gitlane.ts";
@@ -401,7 +405,52 @@ export function coreTools(rootOf: () => string, projectRoot: string): ToolDef[] 
         properties: { text: { type: "string" } },
         required: ["text"],
       },
-      handler: (args) => appendNote(seDir(projectRoot), String(args.text), "agent"),
+      handler: (args) => {
+        refuseProseWall("se_note", "text", String(args.text));
+        return appendNote(seDir(projectRoot), String(args.text), "agent");
+      },
+    },
+    {
+      name: "se_lint",
+      title: "se.lint",
+      description:
+        "The VOICE LINT, on demand: mechanical prose checks (walls of text, long sentences, comma chains, missing pyramid structure) over a text or a markdown file. Rule parameters are DATA (machines/lint/voice-lint.md) - edit thresholds without recompiling. Catches FORM, never meaning. Self-check your outputs before they ship; pruning sweeps it over everything later.",
+      inputSchema: {
+        type: "object",
+        properties: {
+          text: { type: "string", description: "prose to lint, verbatim" },
+          path: { type: "string", description: "a root-relative .md file to lint instead" },
+        },
+      },
+      handler: (args) => {
+        const root = rootOf();
+        if (args.path !== undefined) {
+          const p = String(args.path);
+          if (!p.endsWith(".md")) {
+            throw new Rejection({
+              clause: CLAUSES.REQUIRED_ARGS,
+              expected: "a prose file (.md) - the voice lint never reads code",
+              got: p,
+              remedy: { tool: "se_lint", args: { path: "<file>.md" }, note: "or pass text directly" },
+              source: "engine/tools.ts se_lint",
+            });
+          }
+          const abs = resolveInRoot(root, p, "engine/tools.ts se_lint");
+          const findings = lintProse(root, readFileSync(abs, "utf8"));
+          return { path: p, findings, count: findings.length, config: LINT_CONFIG };
+        }
+        if (typeof args.text === "string") {
+          const findings = lintProse(root, args.text);
+          return { findings, count: findings.length, config: LINT_CONFIG };
+        }
+        throw new Rejection({
+          clause: CLAUSES.REQUIRED_ARGS,
+          expected: "text OR path",
+          got: "neither",
+          remedy: { tool: "se_lint", args: { text: "<prose>" } },
+          source: "engine/tools.ts se_lint",
+        });
+      },
     },
     {
       name: "se_answer",
@@ -416,7 +465,10 @@ export function coreTools(rootOf: () => string, projectRoot: string): ToolDef[] 
         },
         required: ["question", "answer"],
       },
-      handler: (args) => ({ recorded: "aq", question: String(args.question).slice(0, 90) }),
+      handler: (args) => {
+        refuseProseWall("se_answer", "answer", String(args.answer));
+        return { recorded: "aq", question: String(args.question).slice(0, 90) };
+      },
     },
     {
       name: "se_note_drain",
@@ -432,6 +484,27 @@ export function coreTools(rootOf: () => string, projectRoot: string): ToolDef[] 
         required: ["ref", "disposition"],
       },
       handler: (args) => drainNote(seDir(projectRoot), String(args.ref), String(args.disposition), args.where === undefined ? undefined : String(args.where)),
+    },
+    {
+      name: "se_survey",
+      title: "se.survey",
+      description:
+        "WHAT STANDS OPEN — one mechanical call: open expeditions, open iterations, pending notes, and parked backlog items with their ready-when. The front desk and the retro open with it; the mirror renders it clickable wherever it is legal.",
+      inputSchema: { type: "object", properties: {} },
+      handler: () => {
+        const firstLine = (t: string) => t.split("\n")[0].slice(0, 120);
+        const exps = expList(projectRoot).filter((e) => e.open).map((e) => ({ id: e.id, goal: firstLine(String((readRecord(projectRoot, e) ?? {}).goal ?? "")) }));
+        const its = itList(projectRoot).filter((i) => i.open).map((i) => ({ id: i.id, goal: firstLine(String((readItRecord(projectRoot, i) ?? {}).goal ?? "")) }));
+        const notes = pendingNotes(seDir(projectRoot)).map((n) => ({ ref: n.ref, at: n.at, brief: firstLine(n.text) }));
+        const backlog = backlogNotes(seDir(projectRoot)).map((n) => ({ ref: n.ref, ready_when: n.drained?.where ?? "", brief: firstLine(n.text) }));
+        return {
+          counts: { expeditions: exps.length, iterations: its.length, notes: notes.length, backlog: backlog.length },
+          expeditions: exps,
+          iterations: its,
+          notes,
+          backlog,
+        };
+      },
     },
     {
       name: "se_log_query",
@@ -474,6 +547,20 @@ export function coreTools(rootOf: () => string, projectRoot: string): ToolDef[] 
 /** Build the server: session machine + tools + guards + the raw call log.
  *  Guard order: arg shape → THE STATE GATE → handler. Pass a Session to
  *  share it with another hand (the embedded mirror drives the SAME walk). */
+/** THE PROSE-WALL LINT (owner law 2026-07-28): every HTML surface keeps
+ *  line breaks — so long prose MUST carry them. An authored wall is refused
+ *  at the tool boundary, mechanically. */
+function refuseProseWall(tool: string, field: string, text: string): void {
+  if (text.length <= 300 || text.includes("\n")) return;
+  throw new Rejection({
+    clause: CLAUSES.PROSE_WALL,
+    expected: `${field} broken into lines — paragraphs and list lines survive every render`,
+    got: `${text.length} chars without a single line break — renders as a wall`,
+    remedy: { tool, args: { [field]: "<the same text with real line breaks>" }, note: "shape it like prose: short paragraphs, one list item per line" },
+    source: "engine/tools.ts prose-wall",
+  });
+}
+
 export function buildServer(root: string, session = new Session(root), tollOpts: { windowMs?: number; now?: () => number } = {}): McpServer {
   // (a fresh Session fails fast on a misdrawn machine)
   const tools = [...sessionTools(session), ...expeditionTools(session), ...coreTools(() => session.workRoot(), root)];

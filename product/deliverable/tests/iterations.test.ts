@@ -96,8 +96,7 @@ test("needs-retro holds the FIRST start; draining opens it; a started iteration 
   const { contentHash } = await import("../engine/hash.ts");
   const method = "product/guidance/method/retro.md";
   const withMethod = { ...hashes, [method]: contentHash(readFileSync(join(root, ...method.split("/")))) };
-  await call(server, "se_tick", { to: "retro", read_hashes: hashes });
-  await call(server, "se_tick", { to: "drain", read_hashes: withMethod });
+  await call(server, "se_tick", { to: "retro", read_hashes: withMethod });
   const pending = (await call(server, "se_tick", {})).body; // position read; the note ref rides the notes file
   void pending;
   const notesRaw = readFileSync(join(root, ".se", "notes.jsonl"), "utf8");

@@ -1,0 +1,44 @@
+/* @advanced-canvas-edge-style
+key: role
+label: Role
+options:
+  -
+    label: Forward
+    value: null
+    icon: arrow-right
+  -
+    label: Return
+    value: alternative
+    icon: undo-2
+  -
+    label: Fallback
+    value: fallback
+    icon: corner-down-right
+  -
+    label: Recovery
+    value: recovery
+    icon: rotate-ccw
+  -
+    label: Approval
+    value: approval
+    icon: check
+  -
+    label: Error
+    value: error
+    icon: circle-x
+*/
+
+/* The drawing SHOWS the role — nothing about a machine is invisible in
+   Obsidian (owner law 2026-07-28). Returns run dashed and muted; failure
+   paths run finely dashed. An edge with no role set is a plain forward
+   edge, and the engine also infers returns from direction alone. */
+.canvas-edges path[data-role="alternative"] {
+  stroke-dasharray: 8, 6;
+  opacity: 0.65;
+}
+
+.canvas-edges path[data-role="fallback"],
+.canvas-edges path[data-role="recovery"],
+.canvas-edges path[data-role="error"] {
+  stroke-dasharray: 3, 5;
+}

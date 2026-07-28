@@ -53,6 +53,8 @@ export interface StateMeta {
   exit_met: boolean;
   has_entry: boolean;
   entry_met: boolean;
+  /** The state's authored second line — drawn small under the name. */
+  subtitle?: string;
 }
 
 function machineSvg(canvas: CanvasData, activeIds: Set<string>, doneIds: Set<string>, subIds: Set<string>, meta: Record<string, StateMeta>): string {
@@ -104,7 +106,11 @@ function machineSvg(canvas: CanvasData, activeIds: Set<string>, doneIds: Set<str
       // Sub-machine states carry a DOUBLE border.
       parts.push(`<rect x="${n.x + 8}" y="${n.y + 8}" width="${n.width - 16}" height="${n.height - 16}" rx="${Math.max(4, rx - 8)}" class="${cls} inner"/>`);
     }
-    parts.push(`<text x="${n.x + n.width / 2}" y="${n.y + n.height / 2 + 6}" class="label">${esc(sid)}</text></g>`);
+    const subFull = meta[sid]?.subtitle;
+    const sub = subFull !== undefined && subFull.length > 48 ? `${subFull.slice(0, 47)}…` : subFull;
+    parts.push(`<text x="${n.x + n.width / 2}" y="${n.y + n.height / 2 + (sub !== undefined ? -6 : 6)}" class="label">${esc(sid)}</text>`);
+    if (sub !== undefined) parts.push(`<text x="${n.x + n.width / 2}" y="${n.y + n.height / 2 + 24}" class="sublabel">${esc(sub)}</text>`);
+    parts.push("</g>");
     // Condition buttons ride the node's edges: enter on the LEFT (where the
     // arrow comes in), leave on the RIGHT (in front of the arrow out).
     const mt = meta[sid];
@@ -269,6 +275,7 @@ const STYLE = `
   .clickable { cursor: pointer; }
   .clickable:hover .state, .clickable:hover .comment { stroke: #8fa0b0; }
   .label { fill: #d8dde2; font-size: 26px; text-anchor: middle; font-family: inherit; pointer-events: none; }
+  .sublabel { fill: #7f8b96; font-size: 17px; text-anchor: middle; font-family: inherit; pointer-events: none; }
   .edge { stroke: #5b6772; stroke-width: 2.5; }
   .arrowhead { fill: #5b6772; }
   .guard { fill: #e8b339; font-size: 20px; text-anchor: middle; }
@@ -289,6 +296,7 @@ const STYLE = `
   table.kv td.v { color: #d8dde2; word-break: break-word; }
   table.kv table.kv { margin: 2px 0; }
   .vnull { color: #7f8b96; } .vnum { color: #7cc4e8; } .vbool { color: #c58fe8; } .vstr { color: #a8c88f; }
+  .prewrap { white-space: pre-wrap; }
   td.btncell { text-align: center; vertical-align: middle !important; width: 1%; }
   button.go.locked { background: #2a2f34; color: #5b6772; cursor: not-allowed; }
   .cond circle { stroke-width: 2.5; }
@@ -328,6 +336,12 @@ const STYLE = `
   .logrow .lkind.k-update { font-weight: 700; color: #e8b339; }
   .logrow .lkind.k-note { font-style: italic; color: #c58fe8; }
   .logrow .lkind.k-aq { font-weight: 700; color: #7cc4e8; }
+  .aq-q { font-weight: 700; color: #7cc4e8; padding: 6px 0; white-space: pre-wrap; }
+  #loadbar { position: fixed; top: 0; left: 0; right: 0; height: 3px; background: #22272c; z-index: 99; display: none; }
+  #loadbar .fill { height: 100%; width: 30%; background: #e8b339; animation: loadslide 1s linear infinite; }
+  @keyframes loadslide { 0% { margin-left: -30%; } 100% { margin-left: 100%; } }
+  #loadbar .lmsg { position: fixed; top: 8px; right: 12px; color: #e8b339; font-size: 12px; }
+  .aq-a { color: #cfd8dc; line-height: 1.5; padding: 4px 0; }
   .logrow .lbrief { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .logrow .lok { flex: 0 0 auto; color: #4a7a55; }
   .logrow.failed .lok { color: #e86a5f; }
@@ -365,7 +379,11 @@ function jsonTable(v) {
     if (looksLikePath) {
       return '<a class="doclink" data-path="' + v + '">' + v + "</a>";
     }
-    return '<span class="vstr">' + v.replace(/&/g,"&amp;").replace(/</g,"&lt;") + "</span>";
+    const escaped = v.replace(/&/g,"&amp;").replace(/</g,"&lt;");
+    // Paragraphs survive the pane: a multi-line string keeps its breaks
+    // (HTML collapses raw newlines - the wall-of-text bug, owner 2026-07-28).
+    if (v.includes("\\n")) return '<div class="vstr prewrap">' + escaped + "</div>";
+    return '<span class="vstr">' + escaped + "</span>";
   }
   if (Array.isArray(v)) {
     if (v.length === 0) return '<span class="vnull">[]</span>';
@@ -779,6 +797,7 @@ document.addEventListener("click", async (ev) => {
     // The quick way home: jump the view to the walk's machine, whole
     // drawing visible (the saved pan is dropped so the state shows).
     sessionStorage.removeItem("se-vb-" + cs.dataset.machine);
+    showLoading("loading " + cs.dataset.machine);
     location.href = "/?view=" + encodeURIComponent(cs.dataset.machine);
     return;
   }
@@ -800,7 +819,7 @@ document.addEventListener("click", (ev) => {
 // Double-click a sub-machine state: enter it as a VIEWER (walk unmoved).
 document.addEventListener("dblclick", (ev) => {
   const g = ev.target.closest ? ev.target.closest(".clickable") : null;
-  if (g && g.dataset.sub) location.href = "/?view=" + encodeURIComponent(g.dataset.sub);
+  if (g && g.dataset.sub) { showLoading("loading " + g.dataset.sub); location.href = "/?view=" + encodeURIComponent(g.dataset.sub); }
 });
 
 // Only real widget expanders — the modal's ✕ shares the style, not the job.
@@ -936,6 +955,13 @@ async function openLogDetail(ref) {
   if (rec.tool === "se_update" && rec.args && rec.args.visit) { await showDecisions(rec.args.visit, null); return; }
   if ((rec.tool === "se_note" || rec.tool === "mirror_note") && rec.args) { showDetails("note · " + ((rec.response && rec.response.captured) || rec.ref), jsonTable({ at: rec.ts, text: rec.args.text, pending: "until a retro drains it" })); return; }
   if (rec.text !== undefined && rec.tool === undefined) { showDetails("note · " + rec.ref, jsonTable({ at: rec.at, text: rec.text, pending: "until a retro drains it" })); return; }
+  if (rec.tool === "se_answer" && rec.args) {
+    // The aq click shows BOTH, as prose — never the raw call record.
+    showDetails("aq · answered question",
+      '<div class="aq-q">' + escText(String(rec.args.question || "")) + "</div>" +
+      '<div class="aq-a prewrap">' + escText(String(rec.args.answer || "")) + "</div>");
+    return;
+  }
   showDetails("log · " + (rec.tool || ref), jsonTable({ at: rec.ts, request: { tool: rec.tool, args: rec.args }, response: rec.response === undefined ? null : rec.response, duration_ms: rec.duration_ms }));
 }
 async function showDecisions(visit, sel) {
@@ -961,6 +987,24 @@ function renderDecisions(sel) {
   }
   showDetails("decisions · " + g.visit, html);
 }
+// FEEDBACK WITHIN A SECOND (owner law 2026-07-28): anything that can take
+// longer shows loading feedback at once. Full-page view loads get the bar
+// the moment they are clicked; the fresh page replaces it.
+function showLoading(label) {
+  let el = document.getElementById("loadbar");
+  if (!el) {
+    el = document.createElement("div");
+    el.id = "loadbar";
+    el.innerHTML = '<div class="fill"></div><div class="lmsg"></div>';
+    document.body.appendChild(el);
+  }
+  el.querySelector(".lmsg").textContent = label || "loading";
+  el.style.display = "block";
+}
+document.addEventListener("click", (ev) => {
+  const a = ev.target.closest ? ev.target.closest('a[href*="?view="]') : null;
+  if (a) showLoading("loading " + (a.textContent || "view"));
+}, true);
 document.addEventListener("click", (ev) => {
   const lr = ev.target.closest ? ev.target.closest(".logrow") : null;
   if (lr) { void openLogDetail(lr.dataset.ref); return; }
@@ -1137,6 +1181,9 @@ export function renderMirror(m: MirrorState, widget?: "machine" | "details" | "l
       exit_met: m.session.conditionMet(decl, s, "leave"),
       has_entry: s.entry !== undefined,
       entry_met: m.session.conditionMet(decl, s, "enter"),
+      // The STATEMENT is the subtitle (owner ruling 2026-07-28): authored
+      // meaning renders small under the name; empty renders nothing.
+      ...(s.statement !== "" && s.statement !== s.id ? { subtitle: s.statement } : {}),
     };
   }
   const svg = machineSvg(canvas, leafActive, done, subIds, meta);

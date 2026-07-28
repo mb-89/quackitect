@@ -20,6 +20,7 @@ Write plainly. These are rules, not suggestions. They bind every output: chat, d
 - One thought group per paragraph. A new thought starts a new paragraph.
 - A wall of text is a defect. Readers are not native speakers. Their patience is limited. Structure is mercy.
 - Long prose carries line breaks. Every HTML surface renders them (pre-wrap). The lane refuses a breakless wall mechanically (SE-C-125). The render cannot invent paragraphs — the author supplies them.
+- Found a wall of text? Refactor it. Split it into paragraphs, one thought group each. Give the paragraphs SMALL HEADINGS when there are more than a few. This binds existing text as much as new text.
 - Embedded prose fields follow the same rules. State guidance, tool descriptions, form help — short sentences, paragraphs, lists. Never one long block.
 
 ### Lists
@@ -61,6 +62,7 @@ Write plainly. These are rules, not suggestions. They bind every output: chat, d
 - Panes hold their size. Content never resizes the layout. The maximize modal is the room to breathe.
 - Interacting with a field never collapses its surface. No fold closes, no scroll resets, no pane re-opens — the reader keeps their place through every click.
 - Color carries meaning, never decoration: green = pass, red = failure or rejection, yellow = attention.
+- Feedback within a second. Any interaction that can take longer than a second shows loading feedback at once. A progress bar with real progress where progress exists; an indeterminate bar otherwise. Silence reads as breakage.
 
 ### Do not repeat (DRY)
 - Single source of truth. Each fact lives in one place. Everything else points to it.
@@ -68,6 +70,7 @@ Write plainly. These are rules, not suggestions. They bind every output: chat, d
 - Machines are drawn. A state machine's truth is its Obsidian canvas, and a person edits it in Obsidian, in the real world (owner law, 2026-07-28). The engine accepts what a person naturally draws. A mechanism that depends on metadata Obsidian does not surface to its editor is a defect — rework the mechanism, never the person.
 - Do not repeat prose, data, or code. Not across files. Not across panels. Not within one screen.
 - If two places show the same thing, delete one. A detail view should not echo what its parent already shows.
+- A field that restates another field is NOISE. A statement that repeats the id, a title that repeats the name, a label that echoes the filename - strike it. Empty is better than an echo; a field is filled only when it ADDS something.
 - Repeat only when strongly advised. Then say why.
 
 ### Comments & provenance
@@ -90,6 +93,7 @@ Write plainly. These are rules, not suggestions. They bind every output: chat, d
 - A direct question from a person gets its answer RECORDED, not only chatted. Use se_answer with the question and the full answer.
 - The log shows an aq entry. The feed line is the question. The click shows both.
 - Chat can be lost mid-turn. The harness may swallow an answer while you work. The log entry is the durable copy. Record it in the same breath as the chat answer.
+- The question and the answer are SEPARATE PARAGRAPHS wherever they appear together. In se_answer they are separate fields already. In a note or a report, a blank line divides them. Never one run-on blob.
 
 ### The sycophancy guard (applies to every assessment)
 - Praise is a signal, not a nicety. Endorse only what survives the disconfirming question.
@@ -101,11 +105,12 @@ Write plainly. These are rules, not suggestions. They bind every output: chat, d
 ### Explaining a problem
 - Explain it plainly first, like to a smart outsider. What the parts do. What changed. Who is right.
 - Name each mechanism by what it does ("the checker", "the live table"). Not by its internal identifier.
-- Give the verdict in one sentence before any options ("the book is right, the checker is outdated").
+- Give the verdict in one sentence before any options ("the book is right, the checker is outdated"). This is BLUF - the bottom line up front; the method card holds the depth (product/deliverable/machines/methods/bluf.md).
 - Then ask the decision as short numbered questions. As few as possible.
 
 ### Structure
 - Progressive disclosure. Give the whole picture first. Then the detail. The reader stops when they have enough.
+- Longer texts (roughly five paragraphs and up) take the PYRAMID shape. A TLDR or abstract at the top. Then the high-level view. Then deepening detail. The fully detailed discussion sits at the bottom. A single paragraph needs none of this. The method card holds the depth - product/deliverable/machines/methods/progressive-disclosure.md.
 - Diátaxis (diataxis.fr) for docs. Keep the four modes apart: tutorial, how-to, reference, explanation. Do not blend them in one place.
 - Keep internals out of prose. The general reader does not care how the system works inside. Put internals and AI guidance in one guidance chapter. Link it with a `guidance:` frontmatter tag. The interested reader follows it. The average reader is not forced through it.
 - ENTRY documents carry no method jargon (owner law, 2026-07-12). The README and anything a stranger reads FIRST use plain language only - a method term (suspect, bless, cone, gate) may appear where its definition is one click away (the book's termrefs), never bare in the front door. The i17 red-team and the i19 cold-read both caught exactly this; the terms lint cannot see the README, so the rule holds by authorship.

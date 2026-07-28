@@ -407,13 +407,45 @@ export class Session {
       });
     }
     if (!this.inSub()) {
-      throw new Rejection({
-        clause: CLAUSES.NOT_LEGAL_IN_STATE,
-        expected: "a sub-machine to escape from",
-        got: `standing on the main machine [${this.active().join(", ")}]`,
-        remedy: { tool: "se_tick", args: {}, note: "escape leaves a stuck sub-machine walk; the main machine walks normally" },
-        source: "engine/session.ts escape",
-      });
+      // THE HATCH ALWAYS WORKS (owner ruling 2026-07-28): a main-machine
+      // walk escapes to idle too; only boot's green-proving must complete.
+      const stood = this.active();
+      if (stood.includes("idle")) {
+        throw new Rejection({
+          clause: CLAUSES.NOT_LEGAL_IN_STATE,
+          expected: "a walk away from idle",
+          got: "standing at idle — idle IS the escape target",
+          remedy: { tool: "se_tick", args: {}, note: "nothing to escape; walk on normally" },
+          source: "engine/session.ts escape",
+        });
+      }
+      if (!this.instance.history.some((h) => h.state === "boot" && h.outcome === "filled")) {
+        throw new Rejection({
+          clause: CLAUSES.NOT_LEGAL_IN_STATE,
+          expected: "a booted walk",
+          got: `an escape before boot completed [${stood.join(", ")}]`,
+          remedy: { tool: "se_tick", args: {}, note: "boot cannot be skipped — it must complete; if it is broken, tell the user" },
+          source: "engine/session.ts escape",
+        });
+      }
+      const nowMain = new Date().toISOString();
+      this.gatePriority(this.machine, ["idle"], channel);
+      const idleState = this.state(this.machine, "idle");
+      const missingMain = this.entryRequirements(this.machine, idleState).filter((p) => !this.readProven(channel, p, readHashes));
+      if (missingMain.length > 0) this.refuseReads("entry", "idle", missingMain, channel);
+      this.assertHandover(channel, readHashes);
+      const stoodIn = stood[0] ?? "(no state)";
+      this.instance.history.push({ state: stoodIn, outcome: "escaped", at: nowMain });
+      this.instance.escapes.push({ state: stoodIn, exhausted_guard: reason.slice(0, 300), at: nowMain });
+      this.instance.active = ["idle"];
+      this.instance.current = "idle";
+      this.unbind();
+      this.notifyChange();
+      return {
+        ...this.tickInfo(),
+        escaped: { from: stoodIn, reason },
+        note: "escaped to idle — the walk was left standing. Tell the user PLAINLY what blocked it, then wait for their ruling.",
+      };
     }
     if (this.top()!.decl.id === "boot") {
       throw new Rejection({
@@ -450,6 +482,34 @@ export class Session {
     const s = m.states.find((st) => st.id === id);
     if (s === undefined) throw new Error(`undeclared state ${id}`);
     return s;
+  }
+
+  /** completeState with the WEDGE GUARD: a move that would leave an open
+   *  machine with NO active state is refused with the starving join named —
+   *  the walk stands instead of stranding. Found live 2026-07-28: plain
+   *  return edges compiled as normal made idle an AND-join, and completing
+   *  boot dropped the only token into nowhere. */
+  private completeGuarded(m: MachineDecl, inst: MachineInstance, stateId: string, outcome: "filled" | "failed", now: string, only?: string): void {
+    const snap = {
+      active: inst.active === undefined ? undefined : [...inst.active],
+      fired: inst.fired === undefined ? undefined : [...inst.fired],
+      current: inst.current,
+      status: inst.status,
+    };
+    completeState(m, inst, stateId, outcome, now, only);
+    if (activeStates(inst).length > 0 || inst.status !== "open") return;
+    const starving = [...new Set((inst.fired ?? []).map((k) => k.split("->")[1]))];
+    inst.active = snap.active;
+    inst.fired = snap.fired;
+    inst.current = snap.current;
+    inst.status = snap.status;
+    throw new Rejection({
+      clause: CLAUSES.DEAD_END,
+      expected: `completing ${stateId} activates a successor`,
+      got: `nothing activates — ${starving.join(", ") || "a join"} still waits for other inbound edges (the drawing makes it an AND-join)`,
+      remedy: { tool: "se_tick", args: {}, note: "every plain edge into the named state must fire before it activates. If those edges are returns, redraw them (a reverse-of-forward edge compiles as a return) — or walk the other branches first. The walk has not moved." },
+      source: "engine/session.ts wedge-guard",
+    });
   }
 
   /** A sub governs as long as it stands — including its visible end
@@ -1255,7 +1315,7 @@ export class Session {
         statement: s.statement,
         guidance: s.guidance,
         priority: s.priority,
-        legal_tools: s.kind === "start" || s.kind === "end" ? [...MACHINERY] : (s.legal_tools ?? []),
+        legal_tools: s.kind === "start" || s.kind === "end" || s.kind === "join" ? [...MACHINERY] : (s.legal_tools ?? []),
         ...(s.entry !== undefined ? { entry: this.conditionStatus(machine, s, "enter") } : {}),
         ...(s.exit !== undefined ? { exit: this.conditionStatus(machine, s, "leave") } : {}),
         exit_met: this.conditionMet(machine, s, "leave"),
@@ -1270,7 +1330,7 @@ export class Session {
             to: e.to,
             role: e.role,
             ...(e.guard !== undefined ? { guard: e.guard } : {}),
-            ...(t !== undefined ? { kind: t.kind, statement: t.statement, priority: t.priority } : {}),
+            ...(t !== undefined ? { kind: t.kind, ...(t.statement !== "" ? { statement: t.statement } : {}), priority: t.priority } : {}),
             ...(t?.entry !== undefined ? { entry: this.conditionStatus(machine, t, "enter") } : {}),
             enter_met: t === undefined ? true : this.conditionMet(machine, t, "enter"),
           };
@@ -1311,6 +1371,15 @@ export class Session {
         source: "engine/session.ts tick",
       });
     }
+    // Self-heal: a sub refused at entry (broken canvas) stands unseeded on
+    // its parent node — retry the seed first. A healed entry IS this tick's
+    // one visible step.
+    const depthBefore = this.subs.length;
+    this.seedSubs();
+    if (this.subs.length > depthBefore) {
+      this.notifyChange();
+      return this.tickInfo();
+    }
     // ONE VISIBLE STEP PER TICK (owner ruling 2026-07-26): you are only
     // ever in one state, and a tick moves exactly one position — including
     // the mechanical start/end positions of a sub-machine.
@@ -1324,7 +1393,7 @@ export class Session {
         const parent = this.state(pm, top.parentState);
         this.gatePriority(pm, parent.edges.map((e) => e.to), channel);
         this.assertReads(pm, parent, parent.edges.map((e) => e.to), channel, readHashes);
-        completeState(pm, pi, top.parentState, "filled", now);
+        this.completeGuarded(pm, pi, top.parentState, "filled", now);
         this.subs.pop();
         if (pi !== this.instance) pi.history.push({ state: top.parentState, outcome: "filled", at: now });
         const prefix = this.subs.map((s) => s.decl.id).join("/");
@@ -1338,7 +1407,7 @@ export class Session {
       const subTarget = to ?? this.state(top.decl, cur).edges[0]?.to;
       if (subTarget !== undefined) this.gatePriority(top.decl, [subTarget], channel);
       await this.assertConditions(top.decl, this.state(top.decl, cur), to, channel, readHashes);
-      completeState(top.decl, top.instance, cur, "filled", now, to);
+      this.completeGuarded(top.decl, top.instance, cur, "filled", now, to);
       top.instance.history.push({ state: cur, outcome: "filled", at: now });
       const prefix = this.subs.map((s) => s.decl.id).join("/");
       this.instance.history.push({ state: `${prefix}/${cur}`, outcome: "filled", at: now });
@@ -1352,7 +1421,7 @@ export class Session {
     const target = to ?? this.state(this.machine, cur).edges[0]?.to;
     if (target !== undefined) this.gatePriority(this.machine, [target], channel);
     await this.assertConditions(this.machine, this.state(this.machine, cur), to, channel, readHashes);
-    completeState(this.machine, this.instance, cur, "filled", now, to);
+    this.completeGuarded(this.machine, this.instance, cur, "filled", now, to);
     this.instance.history.push({ state: cur, outcome: "filled", at: now });
     this.seedSubs();
     return this.landing();
@@ -1380,7 +1449,7 @@ export class Session {
       statement: s.statement,
       guidance: s.guidance,
       priority: s.priority,
-      legal_tools: s.kind === "start" || s.kind === "end" ? [...MACHINERY] : (s.legal_tools ?? []),
+      legal_tools: s.kind === "start" || s.kind === "end" || s.kind === "join" ? [...MACHINERY] : (s.legal_tools ?? []),
       ...(s.entry !== undefined ? { entry: this.conditionStatus(home, s, "enter") } : {}),
       ...(s.exit !== undefined ? { exit: this.conditionStatus(home, s, "leave") } : {}),
       exit_met: this.conditionMet(home, s, "leave"),
@@ -1542,7 +1611,24 @@ export class Session {
     // are stubs (owner design 2026-07-27). A generated machine's own sub
     // states (archive decades) come from its parent's subGen.
     const gen = this.top()?.gen?.subGen?.[subState.id]?.() ?? this.genFor(subState.id);
-    const decl = gen !== undefined ? gen.decl : compileMachine(this.root, resolveRef(this.root, mainMachinePath(this.root), subState.submachine!));
+    let decl: MachineDecl;
+    if (gen !== undefined) {
+      decl = gen.decl;
+    } else {
+      try {
+        decl = compileMachine(this.root, resolveRef(this.root, mainMachinePath(this.root), subState.submachine!));
+      } catch (e) {
+        // A broken drawing refuses TYPED and the engine survives; the next
+        // tick retries the seed once the canvas is fixed.
+        throw new Rejection({
+          clause: CLAUSES.CANVAS_BROKEN,
+          expected: `${subState.id}'s canvas compiles`,
+          got: String((e as Error).message),
+          remedy: { tool: "se_tick", args: { advance: true }, note: "fix the drawing in Obsidian, then tick again — entering retries; back or escape also work" },
+          source: "engine/session.ts seed",
+        });
+      }
+    }
     // RE-ENTRY RESETS (owner ruling 2026-07-27): a machine left through its
     // end starts over — evidence from the previous pass is cleared; the old
     // walk stays in the main record, the new walk earns its own.

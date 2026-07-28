@@ -33,9 +33,13 @@ export interface StateDecl {
   /** start and end are MECHANICAL states every machine has: start is where
    *  the machinery enters (auto-advanced), end closes the machine (terminal).
    *  Nothing machine-specific belongs in them. */
-  kind: "work" | "gate" | "terminal" | "start" | "end";
+  kind: "work" | "gate" | "terminal" | "start" | "end" | "join";
   /** Diagram grouping, e.g. "boot" — presentation metadata, no run-time meaning. */
   group?: string;
+  /** AUTHORED meaning, or empty (owner ruling 2026-07-28): a statement
+   *  exists only when it says something the id does not ("In doubt, go
+   *  here."). The mirror renders it small under the node's name; filler
+   *  like "The retro machine." is struck, never generated. */
   statement: string;
   /** Optional: a human might fill a state too (owner ruling — v3 drops the requirement). */
   filled_by?: "agent" | "engine";
@@ -287,15 +291,23 @@ export function completeState(
       if (target.kind === "terminal" || target.kind === "end") inst.status = "closed";
     }
   }
+  // Fuel into an ACTIVE state is absorbed — one token per state, a second
+  // trigger during activity never re-runs it later.
+  inst.fired = inst.fired.filter((k) => !active.includes(k.split("->")[1]));
   for (const s of m.states) {
     if (active.includes(s.id) || activated.includes(s.id)) continue;
-    // Required inbound: normal and approval edges. Alternatives are OR paths
-    // and never hold a join hostage.
+    // Inbound counted: normal and approval edges (alternatives activate
+    // directly above). FAN-IN IS OR (owner ruling 2026-07-28): any fired
+    // inbound activates a plain state — what a person naturally draws.
+    // Only an explicit JOIN state (state_kind join) synchronizes: it waits
+    // for EVERY inbound edge — the drawn AND of the formalisms (UML join
+    // bar, BPMN parallel gateway, Petri transition).
     const inbound = m.states.flatMap((src) =>
       src.edges.filter((e) => e.to === s.id && (e.role === "normal" || e.role === "approval")).map(() => `${src.id}->${s.id}`),
     );
     if (inbound.length === 0) continue;
-    if (!inbound.every((k) => inst.fired!.includes(k))) continue;
+    const fired = inbound.filter((k) => inst.fired!.includes(k));
+    if (s.kind === "join" ? fired.length < inbound.length : fired.length === 0) continue;
     inst.fired = inst.fired!.filter((k) => !inbound.includes(k)); // consume
     activated.push(s.id);
     if (s.kind === "terminal" || s.kind === "end") inst.status = "closed";

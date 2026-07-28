@@ -128,11 +128,17 @@ test("the front desk and ideation stand as idle doors with their drawn shapes", 
   assert.ok(idle.edges.some((e) => e.to === "ideation"), "idle reaches ideation");
   const fd = m.states.find((s) => s.id === "front_desk")!;
   assert.equal(fd.priority, 0.2);
-  assert.match(fd.statement, /in doubt, go here/i, "the door carries its subtitle");
+  assert.equal(fd.submachine, undefined, "the one-state rule: the desk is a plain state");
+  assert.match(fd.statement, /in doubt, go here/i, "the statement IS the subtitle");
+  assert.ok((fd.tags ?? []).includes("front-desk"), "the method doc pulls by this tag");
+  const retro = m.states.find((s) => s.id === "retro")!;
+  assert.equal(retro.submachine, undefined, "the retro converted under the same rule");
+  assert.ok((retro.legal_tools ?? []).includes("se_note_drain"), "the legality zone rides legal_tools");
   const idea = m.states.find((s) => s.id === "ideation")!;
   assert.equal(idea.priority, 1, "the ideation door sits at the slider's top notch");
-  const fdM = compileMachine(root, join(root, "product", "deliverable", "machines", "front_desk.canvas"));
-  assert.deepEqual(fdM.states.map((s) => s.id), ["start", "consult", "end"]);
+  assert.equal(idea.statement, "Diverge on purpose.", "authored door statement rides up");
+  const idle2 = m.states.find((s) => s.id === "idle")!;
+  assert.equal(idle2.statement, "", "filler statements are struck - empty beats an echo");
   const ideaM = compileMachine(root, join(root, "product", "deliverable", "machines", "ideation.canvas"));
   assert.deepEqual(ideaM.states.map((s) => s.id), ["start", "frame", "diverge", "converge", "route", "end"]);
 });
@@ -145,6 +151,22 @@ test("settings survive an engine life: a new session restores the store", () => 
   const b = new Session(root);
   assert.equal(b.autonomy, 0.85);
   assert.equal(b.shutdown, 3);
+});
+
+test("the voice lint: walls, sentences, chains and the pyramid - thresholds are data", async () => {
+  const { lintProse } = await import("../engine/lint.ts");
+  const { writeFileSync } = await import("node:fs");
+  const root = freshRoot();
+  const wall = Array.from({ length: 9 }, (_, i) => `plain prose line number ${i} of the wall`).join("\n");
+  assert.ok(lintProse(root, wall).some((f) => f.rule === "wall"), "nine unbroken lines are a wall");
+  assert.ok(lintProse(root, `${"word ".repeat(30)}end.`).some((f) => f.rule === "long-sentence"));
+  assert.ok(lintProse(root, "we need alpha, beta, gamma, delta and epsilon.").some((f) => f.rule === "comma-chain"));
+  const five = Array.from({ length: 5 }, (_, i) => `paragraph ${i}.`).join("\n\n");
+  assert.ok(lintProse(root, five).some((f) => f.rule === "pyramid"), "five headingless paragraphs want the pyramid");
+  assert.equal(lintProse(root, "# Heading\n\nshort and clean.").length, 0, "clean prose passes");
+  // DATA, not code: raise the threshold in the config - the wall passes.
+  writeFileSync(join(root, "product", "deliverable", "machines", "lint", "voice-lint.md"), "---\nwall_paragraph_lines: 99\n---\n", "utf8");
+  assert.ok(!lintProse(root, wall).some((f) => f.rule === "wall"), "the edited threshold applies without a rebuild");
 });
 
 test("se_answer records an aq entry and the feed types it aq", async () => {
