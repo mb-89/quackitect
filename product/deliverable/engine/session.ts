@@ -1026,21 +1026,41 @@ export class Session {
     return hash !== "" && (this.agentReads.get(path)?.has(hash) ?? false);
   }
 
-  // PULLED DOCS ARE PROJECT-LEVEL, and the proof hashes them at the PROJECT
-  // ROOT — deliberately, and in one tree with the pulled LIST above and with
-  // the human's mirror checks, which are made before any expedition binds.
+  // THE PROOF HASHES THE DOC THE LANE SERVED (owner ruling 2026-07-28).
   //
-  // This is HALF a known bug (note-8b824a2d36de). se_file_read serves the
-  // worktree, so editing a pulled guidance doc inside an expedition still
-  // makes later ticks refuse. Preferring the worktree here is not the fix: it
-  // silently voids every check the human made before binding, and a worktree
-  // stands at a COMMIT, so its copy differs from the tree they were reading.
-  // Which tree owns guidance decides where an expedition's guidance edits
-  // LAND, and that is the owner's ruling to make, not this function's.
+  // It used to hash the PROJECT ROOT while se_file_read served the bound
+  // worktree. Two consequences, and the second is the serious one:
+  //
+  //  - Editing a pulled guidance doc inside an expedition made every later
+  //    tick refuse, because the hash you could honestly produce was never the
+  //    hash the engine wanted. Guidance could not ride a branch, though it
+  //    merges exactly like code.
+  //  - Worse, when the two trees differed the gate PASSED on the root's hash
+  //    for a document the lane never showed you. A proof you can satisfy with
+  //    a document you were never given is not a proof. Seen live in e19: a
+  //    whole expedition attested to a voice.md it had not read.
+  //
+  // Guidance is not special. It is branch content like any other file; only
+  // the read-proof ever made it look otherwise.
+  //
+  // The two trees agree whenever trunk is clean — a worktree branches from the
+  // last commit — and the close now commits the root's strays to keep it that
+  // way. Where they genuinely differ, the doc HAS changed, and a stale check
+  // being re-asked is the rule working: one check per version.
   private diskHash(rel: string): string {
     try {
-      const abs = resolveInRoot(this.root, rel, "engine/session.ts reads");
+      const abs = resolveInRoot(this.laneRoot(rel), rel, "engine/session.ts reads");
       return contentHash(readFileSync(abs));
+    } catch {
+      return "";
+    }
+  }
+
+  /** The copy the MIRROR serves — always the project root, because that is
+   *  where the human's checkboxes are made, bound expedition or not. */
+  private rootDiskHash(rel: string): string {
+    try {
+      return contentHash(readFileSync(resolveInRoot(this.root, rel, "engine/session.ts reads")));
     } catch {
       return "";
     }
@@ -1073,17 +1093,30 @@ export class Session {
    *  reading list. Checks of edited (stale) versions drop out. */
   humanCheckedPaths(): string[] {
     return [...this.humanChecks.entries()]
-      .filter(([p, set]) => set.has(this.diskHash(p)))
+      .filter(([p, set]) => set.has(this.diskHash(p)) || set.has(this.rootDiskHash(p)))
       .map(([p]) => p)
       .sort();
   }
 
-  /** One doc, one channel, one verdict. The agent's supplied hash must
-   *  match the doc AS IT STANDS — a stale token proves a stale read. */
+  /** One doc, one channel, one verdict.
+   *
+   *  EACH HAND PROVES THE COPY IT WAS SHOWN (owner ruling 2026-07-28).
+   *  The agent reads through the LANE, which serves the bound worktree, so
+   *  its supplied hash must match that copy exactly — a stale token proves a
+   *  stale read, and a hash from a tree it was never shown proves nothing.
+   *
+   *  The human checks in the MIRROR, which serves the project root. Their
+   *  checkbox counts against either copy. On Windows the two differ by line
+   *  endings alone after a checkout (core.autocrlf), so demanding the lane's
+   *  hash from a checkbox would void every check the moment an expedition
+   *  binds — a false invalidation that teaches people to ignore the gate. */
   private readProven(channel: Channel, path: string, supplied: Record<string, string>): boolean {
-    const hash = this.diskHash(path);
-    if (hash === "") return false;
-    return channel === "agent" ? supplied[path] === hash : this.humanChecked(path, hash);
+    const lane = this.diskHash(path);
+    if (channel === "agent") return lane !== "" && supplied[path] === lane;
+    const set = this.humanChecks.get(path);
+    if (set === undefined) return false;
+    const root = this.rootDiskHash(path);
+    return (lane !== "" && set.has(lane)) || (root !== "" && set.has(root));
   }
 
   /** Boot is exempt from the pull gate — it is where the first reads
