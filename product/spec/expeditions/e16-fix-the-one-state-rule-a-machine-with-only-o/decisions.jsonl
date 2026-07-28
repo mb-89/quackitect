@@ -68,3 +68,6 @@
 {"ts":"2026-07-28T11:55:15.479Z","op":"update","visit":"expeditions/e16@1","node":"d28","brief":"writing the edit-safety regression tests"}
 {"ts":"2026-07-28T11:55:26.083Z","op":"update","visit":"expeditions/e16@1","node":"d29","brief":"running preflight and the suite in the e16 worktree"}
 {"ts":"2026-07-28T11:56:00.678Z","op":"done","visit":"expeditions/e16@0","node":"d10","brief":"preflight and 104 tests green in the worktree"}
+{"ts":"2026-07-28T11:56:30.232Z","op":"done","visit":"expeditions/e16@0","node":"d6","brief":"wedge guard shipped and committed on e16"}
+{"ts":"2026-07-28T11:56:58.237Z","op":"update","visit":"expeditions/e16@1","node":"d30","brief":"found it: a CSS snippet makes edge roles visible and clickable in Obsidian"}
+{"ts":"2026-07-28T11:57:19.905Z","op":"update","visit":"expeditions/e16@1","node":"d31","brief":"enabling the snippet so the role picker appears without a settings hunt"}
