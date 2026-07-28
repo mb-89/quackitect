@@ -13,12 +13,34 @@ them there, and each is useful even if the next never lands.
 
 ## Where this stands
 
-- DONE — the mirror updates in place. Morphing replaced the full-page
-  reload, server-sent events replaced the poll loop. Committed, suite green
-  at 106 tests.
-- NEXT — the machine render compacts to content-sized nodes.
-- THEN — the log moves to a new left sidebar, with the terminal beneath it.
-- LAST — the PTY host, started by RUNME as a sibling of the agent.
+All of it landed, in six commits, with the suite green at 116 tests — ten
+more than it started with, because every ruling that could become a check
+became one.
+
+- The mirror updates in place. Morphing replaced the full-page reload and
+  server-sent events replaced the poll loop.
+- The machine render compacts to content-sized nodes.
+- The log moved to a new left column with the terminal beneath it.
+- The PTY host runs as a sibling of the agent, opt-in behind --one-screen.
+- Everything else settled this session went in alongside it.
+
+## What is verified, and what is not
+
+Verified here: the whole suite, the pseudo-terminal binding loading on
+Windows, both xterm assets resolving and serving, the host's alive, resize
+and input routes answering, a child's output reaching a freshly attached
+stream through the replay buffer, and the web-search hook logging a search
+while ignoring other tools.
+
+NOT verified, and it needs a real launch: xterm rendering in the browser,
+the agent itself running under the host, and the new left-column layout as
+it actually looks. Run `.\RUNME.ps1 --one-screen` to try it; plain
+`.\RUNME.ps1` is unchanged, so a terminal that will not start cannot cost
+anyone their agent.
+
+One bug was found by testing rather than by reasoning: Windows cannot spawn
+a bare name or an npm .cmd shim through a pseudo-terminal, so the command
+goes through the shell there.
 
 ## The layout the owner specified
 

@@ -40,3 +40,12 @@
 {"ts":"2026-07-28T15:15:32.466Z","op":"update","visit":"expeditions/e18@0","node":"d83","brief":"Test pins that the notation changed and the meaning did not"}
 {"ts":"2026-07-28T15:16:17.097Z","op":"update","visit":"expeditions/e18@0","node":"d84","brief":"Fixed the arrows test import"}
 {"ts":"2026-07-28T15:16:54.131Z","op":"done","visit":"expeditions/e18@0","node":"d58","brief":"One drawn arrow now means forward and return, meaning unchanged"}
+{"ts":"2026-07-28T15:17:25.434Z","op":"update","visit":"expeditions/e18@0","node":"d85","brief":"Record updated with what landed and what still needs a launch"}
+{"ts":"2026-07-28T15:17:29.680Z","op":"update","visit":"expeditions/e18@0","node":"d86","brief":"Checking what leaving the expedition demands"}
+{"ts":"2026-07-28T15:18:31.778Z","op":"update","visit":"expeditions/e18@0","node":"d87","brief":"Leave report written for the retro to adjudicate"}
+{"ts":"2026-07-28T15:18:39.424Z","op":"update","visit":"expeditions/e18@0","node":"d88","brief":"Leaving e18 open for the owner's ruling"}
+{"ts":"2026-07-28T15:19:02.759Z","op":"update","visit":"expeditions/e18@0","node":"d89","brief":"Leaving e18 open for the owner's ruling"}
+{"ts":"2026-07-28T15:19:21.127Z","op":"update","visit":"expeditions/e18-leave@0","node":"d90","brief":"Noted that read-proof and the file lane disagree inside a worktree"}
+{"ts":"2026-07-28T15:19:28.456Z","op":"update","visit":"expeditions/e18-leave@0","node":"d91","brief":"Leaving e18 open - the close is the owner's ruling"}
+{"ts":"2026-07-28T15:19:34.407Z","op":"update","visit":"expeditions/end@0","node":"d92","brief":"Returning to idle to write the handover"}
+{"ts":"2026-07-28T15:20:38.418Z","op":"update","visit":"expeditions/e18@1","node":"d97","brief":"Committing the record and the leave report"}
