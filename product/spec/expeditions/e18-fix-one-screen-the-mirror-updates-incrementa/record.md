@@ -1,7 +1,9 @@
 ---
 id: e18-fix-one-screen-the-mirror-updates-incrementa
 kind: fix
-status: open
+status: closed
+closed: 2026-07-28T15:34:22.400Z
+ruling: applied
 opened: 2026-07-28T14:42:26.680Z
 goal: "One screen: the mirror updates incrementally instead of reloading, the machine render compacts to content-sized nodes, and the agent's terminal becomes a left sidebar under the log"
 ---

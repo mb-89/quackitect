@@ -49,3 +49,12 @@
 {"ts":"2026-07-28T15:19:28.456Z","op":"update","visit":"expeditions/e18-leave@0","node":"d91","brief":"Leaving e18 open - the close is the owner's ruling"}
 {"ts":"2026-07-28T15:19:34.407Z","op":"update","visit":"expeditions/end@0","node":"d92","brief":"Returning to idle to write the handover"}
 {"ts":"2026-07-28T15:20:38.418Z","op":"update","visit":"expeditions/e18@1","node":"d97","brief":"Committing the record and the leave report"}
+{"ts":"2026-07-28T15:20:54.635Z","op":"update","visit":"expeditions/e18@1","node":"d98","brief":"Leaving e18 open again after committing"}
+{"ts":"2026-07-28T15:21:01.561Z","op":"update","visit":"expeditions/e18-leave@1","node":"d99","brief":"e18 stays open for the owner's ruling"}
+{"ts":"2026-07-28T15:21:07.439Z","op":"update","visit":"expeditions/end@0","node":"d100","brief":"Home at idle with the work committed and the handover written"}
+{"ts":"2026-07-28T15:33:21.655Z","op":"plan","visit":"expeditions/e18@0","parent":null,"nodes":[{"id":"d3","brief":"Clear trunk's dirty tree so the merge can run"},{"id":"d4","brief":"Close e18 with apply (merge to trunk)"},{"id":"d5","brief":"Write the handover for the restart"}]}
+{"ts":"2026-07-28T15:33:26.463Z","op":"update","visit":"expeditions/e18@0","node":"d6","brief":"Checking whether trunk's dirty files already match e18's branch"}
+{"ts":"2026-07-28T15:33:35.653Z","op":"update","visit":"expeditions/e18@0","node":"d7","brief":"Discarded trunk's three stray edits - all reproduced by the merge"}
+{"ts":"2026-07-28T15:33:44.352Z","op":"update","visit":"expeditions/e18@0","node":"d8","brief":"Running e18's suite in the worktree before the merge"}
+{"ts":"2026-07-28T15:34:17.555Z","op":"update","visit":"expeditions/e18@0","node":"d9","brief":"Suite green at 116 - taking e18 to the gate"}
+{"ts":"2026-07-28T15:34:22.397Z","op":"done","visit":"expeditions/e18@0","node":"d4","brief":"e18 applied - merged to trunk"}
