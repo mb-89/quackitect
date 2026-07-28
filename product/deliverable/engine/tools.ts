@@ -8,7 +8,7 @@
 //         never silently coerced (the String(undefined) incident).
 //   NEW — unknown args are refused too, naming the accepted set.
 //   §5  — honest truncation everywhere; results carry the remedy inline.
-import { CLAUSES, Rejection } from "./errors.ts";
+import { CLAUSES, Rejection, type RejectionPayload } from "./errors.ts";
 import { CallLog } from "./calllog.ts";
 import { parseUpdate } from "./decisions.ts";
 import { Toll } from "./toll.ts";
@@ -152,7 +152,11 @@ export function expeditionTools(session: Session): ToolDef[] {
   ];
 }
 
-export function coreTools(rootOf: () => string, projectRoot: string): ToolDef[] {
+// rootOf takes the path because ONE lane serves two trees: `.se/` is session
+// state at the project root, everything else follows the walk into its bound
+// worktree (Session.laneRoot, owner ruling 2026-07-28). Callers that act on no
+// single path — search, glob, run, git — pass nothing and get the work root.
+export function coreTools(rootOf: (rel?: string) => string, projectRoot: string): ToolDef[] {
   return [
     {
       name: "se_file_read",
@@ -170,7 +174,7 @@ export function coreTools(rootOf: () => string, projectRoot: string): ToolDef[] 
         required: ["path"],
       },
       handler: (args) =>
-        fileRead(rootOf(), String(args.path), {
+        fileRead(rootOf(String(args.path)), String(args.path), {
           ...(args.offset !== undefined ? { offset: Number(args.offset) } : {}),
           ...(args.limit !== undefined ? { limit: Number(args.limit) } : {}),
           ...(args.ref !== undefined ? { ref: String(args.ref) } : {}),
@@ -190,7 +194,7 @@ export function coreTools(rootOf: () => string, projectRoot: string): ToolDef[] 
         required: ["path", "content", "base_hash"],
       },
       // Some harnesses serialize the scalar null as its string — both mean CREATE.
-      handler: (args) => fileWrite(rootOf(), String(args.path), String(args.content), args.base_hash === null || args.base_hash === "null" ? null : String(args.base_hash)),
+      handler: (args) => fileWrite(rootOf(String(args.path)), String(args.path), String(args.content), args.base_hash === null || args.base_hash === "null" ? null : String(args.base_hash)),
     },
     {
       name: "se_file_patch",
@@ -235,7 +239,21 @@ export function coreTools(rootOf: () => string, projectRoot: string): ToolDef[] 
             });
           }
         });
-        return filePatch(rootOf(), args.ops as PatchOp[]);
+        const ops = args.ops as PatchOp[];
+        // A patch is ATOMIC under one root. Session state and project content
+        // resolve to different trees, so a batch spanning both has no single
+        // root to be atomic under — say so rather than writing half of it.
+        const roots = new Set(ops.map((o) => rootOf(String(o.path))));
+        if (roots.size > 1) {
+          throw new Rejection({
+            clause: CLAUSES.REQUIRED_ARGS,
+            expected: "one atomic patch per tree — .se/ is session state, everything else is project content",
+            got: `ops spanning ${roots.size} trees`,
+            remedy: { tool: "se_file_patch", args: { ops: "[…only the .se/ ops, then a second call for the rest…]" }, note: "split the batch; each call stays atomic within its own tree" },
+            source: "engine/tools.ts",
+          });
+        }
+        return filePatch(rootOf(ops.length > 0 ? String(ops[0].path) : undefined), ops);
       },
     },
     {
@@ -251,7 +269,7 @@ export function coreTools(rootOf: () => string, projectRoot: string): ToolDef[] 
         },
         required: ["from", "to"],
       },
-      handler: (args) => fileMove(rootOf(), String(args.from), String(args.to)),
+      handler: (args) => fileMove(rootOf(String(args.from)), String(args.from), String(args.to)),
     },
     {
       name: "se_file_delete",
@@ -262,7 +280,7 @@ export function coreTools(rootOf: () => string, projectRoot: string): ToolDef[] 
         properties: { path: { type: "string" }, base_hash: { type: "string" } },
         required: ["path", "base_hash"],
       },
-      handler: (args) => fileDelete(rootOf(), String(args.path), String(args.base_hash)),
+      handler: (args) => fileDelete(rootOf(String(args.path)), String(args.path), String(args.base_hash)),
     },
     {
       name: "se_file_list",
@@ -272,7 +290,7 @@ export function coreTools(rootOf: () => string, projectRoot: string): ToolDef[] 
         type: "object",
         properties: { dir: { type: "string", default: "." } },
       },
-      handler: (args) => fileList(rootOf(), String(args.dir ?? ".")),
+      handler: (args) => fileList(rootOf(String(args.dir ?? ".")), String(args.dir ?? ".")),
     },
     {
       name: "se_file_glob",
@@ -551,7 +569,7 @@ function refuseProseWall(tool: string, field: string, text: string): void {
 
 export function buildServer(root: string, session = new Session(root), tollOpts: { windowMs?: number; now?: () => number } = {}): McpServer {
   // (a fresh Session fails fast on a misdrawn machine)
-  const tools = [...sessionTools(session), ...expeditionTools(session), ...coreTools(() => session.workRoot(), root)];
+  const tools = [...sessionTools(session), ...expeditionTools(session), ...coreTools((rel) => session.laneRoot(rel), root)];
   // THE UPDATE FIELD — every lane tool accepts it: a decision-graph op
   // riding the call. Declared on every schema so harnesses send it as an
   // object (an undeclared property arrives as a JSON string — v2 lesson).
@@ -568,15 +586,35 @@ export function buildServer(root: string, session = new Session(root), tollOpts:
   // THE UPDATE RIDES FIRST — applied before any other verdict (the
   // narration stands even when the call itself is then refused), logged as
   // its own record, paying the toll. Stripped so handlers never see it.
+  //
+  // BUT A BAD UPDATE NEVER DESTROYS ITS CALL (owner ruling 2026-07-28).
+  // Narration is commentary, and commentary that vetoes the act it comments
+  // on has the causality backwards. A brief with one semicolon too many used
+  // to reject the whole call and take the payload with it — a four-thousand
+  // word answer, a four-file atomic patch, a finished note — all discarded
+  // over the punctuation of a label riding alongside. Measured at the retro:
+  // this mechanism caused 18 of 25 sampled refusals.
+  //
+  // The work lands. The complaint rides back on the result. And the toll goes
+  // UNPAID, so the rule keeps its teeth — it just bites the narration now,
+  // instead of the work.
+  let updateComplaint: RejectionPayload | undefined;
   server.addGuard((tool, args) => {
+    updateComplaint = undefined;
     if (args.update === undefined) return;
     const raw = args.update;
     delete args.update;
-    const op = parseUpdate(raw);
-    const visit = session.currentVisit();
-    const result = session.decisions.apply(visit, op);
-    log.append({ tool: "se_update", args: { via: tool, visit, ...op }, ok: true, outcome: "result", duration_ms: 0, response: result });
-    toll.paid();
+    try {
+      const op = parseUpdate(raw);
+      const visit = session.currentVisit();
+      const result = session.decisions.apply(visit, op);
+      log.append({ tool: "se_update", args: { via: tool, visit, ...op }, ok: true, outcome: "result", duration_ms: 0, response: result });
+      toll.paid();
+    } catch (e) {
+      if (!(e instanceof Rejection)) throw e;
+      updateComplaint = e.toJSON();
+      log.append({ tool: "se_update", args: { via: tool, refused: true }, ok: false, outcome: "rejected", duration_ms: 0, response: updateComplaint });
+    }
   });
 
   // THE TOLL — armed after boot; one grace warning, then the refusal.
@@ -587,6 +625,17 @@ export function buildServer(root: string, session = new Session(root), tollOpts:
     const w = toll.takeWarning();
     if (w === undefined || typeof result !== "object" || result === null || Array.isArray(result)) return result;
     return { ...(result as Record<string, unknown>), toll_warning: w };
+  });
+
+  // The refused update rides home on the call it could not stop.
+  server.addDecorator((_tool, result) => {
+    const c = updateComplaint;
+    updateComplaint = undefined;
+    if (c === undefined || typeof result !== "object" || result === null || Array.isArray(result)) return result;
+    return {
+      ...(result as Record<string, unknown>),
+      update_refused: { ...c, note: "THE CALL WENT THROUGH — this update did not. Carry a corrected one on your next call; the toll is unpaid until you do." },
+    };
   });
 
   // R8 + unknown-args: the declared shape is the accepted one (whitelist).

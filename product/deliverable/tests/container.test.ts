@@ -69,6 +69,13 @@ test("seeded container: expeditions are the states, entering BINDS, one ending c
   await s.tickAdvance(sidB);
   assert.deepEqual(s.active(), [`expeditions/${sidB}`]);
   assert.ok(s.workRoot().includes(b.created), "entering bound the worktree");
+  // ONE LANE, TWO TREES (owner ruling 2026-07-28). Project content follows the
+  // walk into the worktree; `.se/` is SESSION state and stays at the project
+  // root. The handover used to resolve into the worktree, which has no .se —
+  // so it was written where the next session never looks, and failed silently.
+  assert.equal(s.laneRoot("product/guidance/voice.md"), s.workRoot(), "project content rides the branch");
+  assert.equal(s.laneRoot(".se/HANDOVER.md"), root, "the handover belongs to the root, whatever branch we stand on");
+  assert.equal(s.laneRoot(), s.workRoot(), "no path named — the work root, as before");
   // The leave gate holds until the page passes; then close, end, return.
   await assert.rejects(() => s.tickAdvance(`${sidB}-leave`), (e) => (e as { clause?: string }).clause === "SE-C-112");
   s.formSave("expedition-leave", { "What was the goal": "second thing", "What was done": "it", "What settled it": "the container test", "What was not done": "nothing" });

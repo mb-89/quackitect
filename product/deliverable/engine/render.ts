@@ -93,8 +93,8 @@ export interface StateMeta {
 const LABEL_CH = 15.6; // monospace advance at the .label size
 const SUB_CH = 10.2; // ditto at .sublabel
 const BOX_PAD = 26;
-const GUTTER_X = 110; // room for the condition circles that ride the edges
-const GUTTER_Y = 70;
+const GUTTER_X = 80; // room for the condition circles that ride the edges
+const GUTTER_Y = 52;
 
 function nearestBand(reps: number[], v: number): number {
   let best = 0;
@@ -137,13 +137,21 @@ export function compact(canvas: CanvasData, meta: Record<string, StateMeta>): Ca
     sized.set(n.id, { w: Math.max(200, Math.ceil(wide) + BOX_PAD * 2), h: sub === undefined ? 72 : 100 });
   }
 
-  const cx = boxes.map((n) => orig.get(n.id)!.x + orig.get(n.id)!.w / 2);
+  // A COMMENT IS AN ANNOTATION, NOT A STATE (owner report 2026-07-28). Text
+  // nodes are wide by nature, and letting one claim a COLUMN made every other
+  // row leave that column empty — 520px of nothing running the full height of
+  // the drawing, which is the empty column the owner saw. So text sits OUT of
+  // the column grid: it keeps its own ROW, so nothing can overlap it, and it
+  // starts at the left edge and overhangs as far as it likes.
+  const isText = (n: CanvasElement): boolean => n.type === "text";
+  const states = boxes.filter((n) => !isText(n));
+  const cx = states.map((n) => orig.get(n.id)!.x + orig.get(n.id)!.w / 2);
   const cy = boxes.map((n) => orig.get(n.id)!.y + orig.get(n.id)!.h / 2);
   const cols = bandsOf(cx, 120);
   const rows = bandsOf(cy, 120);
-  const colIdx = cx.map((v) => nearestBand(cols, v));
+  const colOf = (n: CanvasElement): number => nearestBand(cols, orig.get(n.id)!.x + orig.get(n.id)!.w / 2);
   const rowIdx = cy.map((v) => nearestBand(rows, v));
-  const colW = cols.map((_, c) => Math.max(0, ...boxes.filter((_, i) => colIdx[i] === c).map((n) => sized.get(n.id)!.w)));
+  const colW = cols.map((_, c) => Math.max(0, ...states.filter((n) => colOf(n) === c).map((n) => sized.get(n.id)!.w)));
   const rowH = rows.map((_, r) => Math.max(0, ...boxes.filter((_, i) => rowIdx[i] === r).map((n) => sized.get(n.id)!.h)));
   const colX: number[] = [];
   const rowY: number[] = [];
@@ -153,7 +161,8 @@ export function compact(canvas: CanvasData, meta: Record<string, StateMeta>): Ca
   for (const h of rowH) { rowY.push(ay); ay += h + GUTTER_Y; }
   boxes.forEach((n, i) => {
     const s = sized.get(n.id)!;
-    n.x = colX[colIdx[i]] + (colW[colIdx[i]] - s.w) / 2;
+    const c = colOf(n);
+    n.x = isText(n) ? 0 : colX[c] + (colW[c] - s.w) / 2;
     n.y = rowY[rowIdx[i]] + (rowH[rowIdx[i]] - s.h) / 2;
     n.width = s.w;
     n.height = s.h;
@@ -375,15 +384,19 @@ const STYLE = `
   .cols { display: flex; height: 100vh; }
   main { flex: 1; min-width: 0; display: flex; flex-direction: column; padding: 14px 18px; }
   .divider { width: 6px; cursor: col-resize; background: #2a2f34; flex: none; }
+  .divider.horiz { width: auto; height: 6px; cursor: row-resize; }
   aside { width: 620px; min-width: 320px; max-width: 80vw; display: flex; flex-direction: column; background: #191d21; }
   /* THE LEFT COLUMN: the feed on top, the agent's terminal beneath it.
      A hundred monospace columns is what the terminal wants to start at; the
      divider moves it from there and the width is the reader's from then on. */
   #left { width: 820px; min-width: 360px; }
   #left #w-log { flex: 1; min-height: 0; }
-  /* Half the VIEWPORT, never half the screen — the browser window is what the
-     reader actually has. Expand opens it over the page like any other widget. */
-  #w-terminal { max-height: 50vh; flex: none; min-height: 140px; }
+  /* HALF THE COLUMN TO START, then the reader's (owner ruling 2026-07-28).
+     It used to be flex:none with no height, so the box was as tall as its
+     CONTENT and merely capped at half — which is why it sat tiny. An explicit
+     height starts it at half, and the splitter above it takes over from there.
+     No max: the owner asked to be able to drag it past half. */
+  #w-terminal { height: 50%; flex: none; min-height: 140px; }
   .term-panel { flex: 1; min-height: 0; overflow: auto; padding: 8px 10px; }
   .crumbs { font-size: 13px; color: #7f8b96; display: flex; align-items: center; gap: 4px; text-transform: none; letter-spacing: 0; }
   .crumbs a { color: #d8dde2; text-decoration: none; }
@@ -473,10 +486,14 @@ const STYLE = `
   .logrow .lkind.k-note { font-style: italic; color: ${FEED_COLOURS["kind-note"]}; }
   .logrow .lkind.k-aq { font-weight: 700; color: ${FEED_COLOURS["kind-aq"]}; }
   .aq-q { font-weight: 700; color: ${FEED_COLOURS["kind-aq"]}; padding: 6px 0; white-space: pre-wrap; }
-  #loadbar { position: fixed; top: 0; left: 0; right: 0; height: 3px; background: #22272c; z-index: 99; display: none; }
+  #loadbar { position: fixed; top: 0; left: 0; right: 0; height: 3px; background: #22272c; z-index: 99; }
   #loadbar .fill { height: 100%; width: 30%; background: #e8b339; animation: loadslide 1s linear infinite; }
   @keyframes loadslide { 0% { margin-left: -30%; } 100% { margin-left: 100%; } }
   #loadbar .lmsg { position: fixed; top: 8px; right: 12px; color: #e8b339; font-size: 12px; }
+  /* A load that never answered is a FAILURE, and the voice paints those red. */
+  #loadbar.stalled { cursor: pointer; }
+  #loadbar.stalled .fill { background: #e86a5f; animation: none; width: 100%; }
+  #loadbar.stalled .lmsg { color: #e86a5f; }
   .aq-a { color: #cfd8dc; line-height: 1.5; padding: 4px 0; }
   .logrow .lbrief { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .logrow .lok { flex: 0 0 auto; color: #4a7a55; }
@@ -617,6 +634,12 @@ const HUMAN_TOOLS = {
   se_seed_expedition: [{ name: "kind", hint: "spike | fix | explore" }, { name: "goal", hint: "what this expedition is after", long: true }],
   se_seed_iteration: [{ name: "goal", hint: "what this iteration is after", long: true }, { name: "vision", hint: "roughly how — what done looks like", long: true }, { name: "inputs", hint: "context refs, comma-separated: an expedition id, note refs" }],
   se_reload: [],
+  // No arguments — it just answers. It lives HERE and nowhere else (owner
+  // ruling 2026-07-28): human-runnable lane tools are offered through the
+  // legal-tools links, per state. None of them earns bespoke chrome. It had
+  // its own header button, which the owner never found among the crumbs, the
+  // slider and the escape control sharing that row.
+  se_survey: [],
   se_exp_close: [{ name: "merge", hint: "true = apply: merge to trunk (default); false = dismiss: archive unmerged" }],
   se_note_drain: [{ name: "ref", hint: "the note's ref (note-…) — the feed shows it" }, { name: "disposition", hint: "done | obsolete | carried | backlog" }, { name: "where", hint: "where it landed or lives on — backlog REQUIRES it: ready when …" }],
 };
@@ -803,7 +826,27 @@ function rebind() {
   if (CURRENT_DETAIL) { const dp = detailFor(CURRENT_DETAIL); showDetails(dp[0], dp[1]); }
 }
 let refreshInFlight = false;
+// ONE ACTION, ONE LOAD (owner 2026-07-28). A tick both navigates this page
+// and wakes /events, so the outgoing page used to fetch itself again on its
+// way out — the archive visibly loaded twice. Once we are leaving, we leave.
+let navigatingAway = false;
+function navigateTo(url, label) {
+  navigatingAway = true;
+  showLoading(label);
+  // THE READER KEEPS THEIR PLACE (owner ruling 2026-07-28). Changing WHICH
+  // MACHINE is on screen says nothing about what they had open beside it.
+  // This URL carried only the view, so every machine switch silently threw
+  // the details pane away. Only content that is genuinely gone may clear it,
+  // and detailFor says so in place when it is.
+  if (CURRENT_DETAIL) {
+    const u = new URL(url, location.href);
+    if (!u.searchParams.has("detail")) u.searchParams.set("detail", CURRENT_DETAIL);
+    url = u.pathname + u.search;
+  }
+  location.href = url;
+}
 async function refresh(detail) {
+  if (navigatingAway) return;
   if (detail !== undefined) CURRENT_DETAIL = detail;
   const q = new URLSearchParams(location.search);
   // THE VIEW HOLDS STILL (owner ruling 2026-07-28): finishing a state is
@@ -825,13 +868,14 @@ async function refresh(detail) {
     location.href = url; // a failed morph must never strand the reader
   } finally {
     refreshInFlight = false;
+    hideLoading(); // THE LOAD SETTLED — win or lose, the bar goes
   }
 }
 document.addEventListener("click", async (ev) => {
   const c = ev.target.closest ? ev.target.closest(".docheck") : null;
   if (c) { if (c.disabled) return; ev.preventDefault(); c.disabled = true; await fetch("/check", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ path: c.dataset.path }) }); refresh(); return; }
   const j = ev.target.closest ? ev.target.closest(".jump") : null;
-  if (j) { await fetch("/tick", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ back: j.dataset.state }) }); location.href = "/"; return; }
+  if (j) { showLoading("jumping back to " + j.dataset.state); await fetch("/tick", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ back: j.dataset.state }) }); navigateTo("/", "loading the walk"); return; }
   const rp = ev.target.closest ? ev.target.closest(".runpre") : null;
   if (rp) {
     // Grey IMMEDIATELY — no second run behind an unresponsive button; the
@@ -990,15 +1034,15 @@ document.addEventListener("click", async (ev) => {
     // The quick way home: jump the view to the walk's machine, whole
     // drawing visible (the saved pan is dropped so the state shows).
     sessionStorage.removeItem("se-vb-" + cs.dataset.machine);
-    showLoading("loading " + cs.dataset.machine);
-    location.href = "/?view=" + encodeURIComponent(cs.dataset.machine);
+    navigateTo("/?view=" + encodeURIComponent(cs.dataset.machine), "loading " + cs.dataset.machine);
     return;
   }
   const go = ev.target.closest ? ev.target.closest(".go") : null;
   if (go) {
     const body = go.dataset.to ? { to: go.dataset.to } : { advance: true };
+    showLoading("walking to " + (go.dataset.to || "the next state"));
     await fetch("/tick", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) });
-    location.href = "/";
+    navigateTo("/", "loading the walk");
   }
 });
 let CURRENT_DETAIL = null;
@@ -1012,7 +1056,7 @@ document.addEventListener("click", (ev) => {
 // Double-click a sub-machine state: enter it as a VIEWER (walk unmoved).
 document.addEventListener("dblclick", (ev) => {
   const g = ev.target.closest ? ev.target.closest(".clickable") : null;
-  if (g && g.dataset.sub) { showLoading("loading " + g.dataset.sub); location.href = "/?view=" + encodeURIComponent(g.dataset.sub); }
+  if (g && g.dataset.sub) navigateTo("/?view=" + encodeURIComponent(g.dataset.sub), "loading " + g.dataset.sub);
 });
 
 // Only real widget expanders — the modal's ✕ shares the style, not the job.
@@ -1066,17 +1110,28 @@ if (svg) {
   window.addEventListener("mouseup", () => { if (panning) saveVb(); panning = null; svg.classList.remove("panning"); });
 }
 
-// Two columns to size now, so each divider names the pane it moves and
-// which way that pane grows.
+// Each divider names the pane it moves and which side that pane sits on:
+// a divider on the pane's far side grows it as you drag TOWARDS the pane.
+// data-axis y makes it a horizontal splitter moving height instead of width.
 document.querySelectorAll(".divider").forEach((dv) => {
   const pane = document.getElementById(dv.dataset.pane);
-  if (!pane) return;
+  if (pane === null) return;
+  const vert = dv.dataset.axis === "y";
+  const away = dv.dataset.grow === "right" || dv.dataset.grow === "bottom";
   let drag = null;
-  dv.addEventListener("mousedown", (ev) => { drag = { x: ev.clientX, w: pane.offsetWidth }; ev.preventDefault(); });
+  dv.addEventListener("mousedown", (ev) => {
+    drag = { at: vert ? ev.clientY : ev.clientX, size: vert ? pane.offsetHeight : pane.offsetWidth };
+    ev.preventDefault();
+  });
   window.addEventListener("mousemove", (ev) => {
-    if (!drag) return;
-    const dx = ev.clientX - drag.x;
-    pane.style.width = Math.max(160, drag.w + (dv.dataset.grow === "right" ? -dx : dx)) + "px";
+    if (drag === null) return;
+    const moved = (vert ? ev.clientY : ev.clientX) - drag.at;
+    const want = drag.size + (away ? -moved : moved);
+    if (!vert) { pane.style.width = Math.max(160, want) + "px"; return; }
+    // The pane above must survive. Nothing caps this at half — dragging past
+    // half is exactly what the owner asked for.
+    const room = pane.parentElement === null ? want : pane.parentElement.clientHeight - 120;
+    pane.style.height = Math.max(140, Math.min(want, room)) + "px";
   });
   window.addEventListener("mouseup", () => { drag = null; });
 });
@@ -1189,22 +1244,56 @@ function renderDecisions(sel) {
   showDetails("decisions · " + g.visit, html);
 }
 // FEEDBACK WITHIN A SECOND (owner law 2026-07-28): anything that can take
-// longer shows loading feedback at once. Full-page view loads get the bar
-// the moment they are clicked; the fresh page replaces it.
-function showLoading(label) {
-  let el = document.getElementById("loadbar");
-  if (!el) {
-    el = document.createElement("div");
-    el.id = "loadbar";
-    el.innerHTML = '<div class="fill"></div><div class="lmsg"></div>';
-    document.body.appendChild(el);
-  }
-  el.querySelector(".lmsg").textContent = label || "loading";
-  el.style.display = "block";
+// longer shows loading feedback at once.
+//
+// THE BAR OWNS ITS LIFETIME (owner ruling 2026-07-28). It used to rely on
+// the navigation that followed to replace the whole page. Morphing then
+// replaced navigation, and a bar nobody hid simply stayed up. A bar that
+// outlives its load is worse than none: the reader learns to ignore it, and
+// it can no longer warn them when something really is slow. So every load
+// carries a token, settles exactly once, and cannot outlive its deadline.
+let loadToken = 0;
+let loadTimer = null;
+function hideLoading() {
+  loadToken++; // any timer still holding the old token is now a no-op
+  if (loadTimer !== null) { clearTimeout(loadTimer); loadTimer = null; }
+  const el = document.getElementById("loadbar");
+  if (el !== null) el.remove();
 }
+function showLoading(label) {
+  hideLoading(); // one load at a time; a second start supersedes the first
+  const mine = loadToken;
+  const el = document.createElement("div");
+  el.id = "loadbar";
+  el.innerHTML = '<div class="fill"></div><div class="lmsg"></div>';
+  el.querySelector(".lmsg").textContent = label || "loading";
+  document.body.appendChild(el);
+  // NOTHING SPINS FOREVER. If nobody settles this load, say so — an honest
+  // failure beats a confident bar in front of a page that finished long ago.
+  loadTimer = setTimeout(() => {
+    if (loadToken !== mine) return;
+    const cur = document.getElementById("loadbar");
+    if (cur === null) return;
+    cur.classList.add("stalled");
+    cur.querySelector(".lmsg").textContent = (label || "loading") + " — no answer; click to retry";
+  }, 8000);
+}
+// A page that was restored, or navigated back to, has no load in flight —
+// whatever it was showing when the reader left it.
+addEventListener("pageshow", hideLoading);
+addEventListener("popstate", hideLoading);
 document.addEventListener("click", (ev) => {
+  const stalled = ev.target.closest ? ev.target.closest("#loadbar.stalled") : null;
+  if (stalled !== null) { hideLoading(); location.reload(); return; }
   const a = ev.target.closest ? ev.target.closest('a[href*="?view="]') : null;
-  if (a) showLoading("loading " + (a.textContent || "view"));
+  if (a === null) return;
+  // A click that opens SOMEWHERE ELSE leaves this page untouched, so it
+  // starts no load here. Showing a bar for it is exactly the strand the
+  // owner hit: the expand controls advertise ctrl-click and shift-click.
+  if (ev.defaultPrevented || ev.button !== 0) return;
+  if (ev.ctrlKey || ev.metaKey || ev.shiftKey || ev.altKey) return;
+  if (a.target !== "" && a.target !== "_self") return;
+  showLoading("loading " + (a.textContent || "view"));
 }, true);
 document.addEventListener("click", (ev) => {
   const lr = ev.target.closest ? ev.target.closest(".logrow") : null;
@@ -1289,22 +1378,11 @@ document.addEventListener("click", (ev) => {
   if (h) levelHelp(null);
 });
 
-// WHAT STANDS OPEN, for the person's own hand (owner ruling 2026-07-28).
-// The same question the agent asks with se_survey, answered by the same
-// code — it used to live inside the tool handler, so only the agent could
-// ask it and the owner had to go through them.
-document.addEventListener("click", async (ev) => {
-  const b = ev.target.closest ? ev.target.closest("#survey-btn") : null;
-  if (!b) return;
-  CURRENT_DETAIL = null;
-  showDetails("what stands open", '<div class="meta">asking…</div>');
-  try {
-    const r = await fetch("/api/survey");
-    showDetails("what stands open", jsonTable(await r.json()));
-  } catch (e) {
-    showDetails("what stands open", '<div class="meta">the survey did not answer</div>');
-  }
-});
+// WHAT STANDS OPEN, for the person's own hand, now rides the LEGAL TOOLS
+// links like every other human-runnable tool (owner ruling 2026-07-28). It
+// had a button of its own in the machine header; the owner never found it
+// there, sharing a row with the crumbs, the slider and the escape control.
+// /api/survey stays — the mirror's own surfaces still ask it directly.
 
 // SESSION OVER — anybody reaching end stops the whole session. The mirror
 // tries to close its window; where that is not allowed, the big red
@@ -1414,13 +1492,32 @@ async function bootTerminal() {
     m.remove();
     return { w: r.width / 100, h: r.height };
   };
+  // THE FLICKER WAS A FEEDBACK LOOP (owner report 2026-07-28). term.resize
+  // relays out INSIDE the pane, the ResizeObserver sees that relayout, and
+  // the two chase each other every time the box changed size. A browser
+  // fullscreen cycle cured it only because the loop settled somewhere new.
+  //
+  // Two guards. Measure on the next frame, never mid-transition. And resize
+  // only when the grid actually changed — a resize that changes nothing is
+  // what feeds the loop.
+  let lastCols = 0;
+  let lastRows = 0;
+  let queued = false;
   const sync = () => {
-    const c = cell();
-    if (!(c.w > 0) || !(c.h > 0)) return;
-    const cols = Math.max(20, Math.floor(pane.clientWidth / c.w));
-    const rows = Math.max(6, Math.floor(pane.clientHeight / c.h));
-    term.resize(cols, rows);
-    void fetch(base + "/pty/resize", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ cols, rows }) });
+    if (queued) return;
+    queued = true;
+    requestAnimationFrame(() => {
+      queued = false;
+      const c = cell();
+      if (!(c.w > 0) || !(c.h > 0)) return;
+      const cols = Math.max(20, Math.floor(pane.clientWidth / c.w));
+      const rows = Math.max(6, Math.floor(pane.clientHeight / c.h));
+      if (cols === lastCols && rows === lastRows) return;
+      lastCols = cols;
+      lastRows = rows;
+      term.resize(cols, rows);
+      void fetch(base + "/pty/resize", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ cols, rows }) });
+    });
   };
   new ResizeObserver(sync).observe(pane);
   sync();
@@ -1564,7 +1661,7 @@ export function renderMirror(m: MirrorState, widget?: "machine" | "details" | "l
   // the walk's position; clicking it jumps the view there.
   const curLeaf = info.active[0] ?? "";
   const curBtn = curLeaf === "" ? "" : `<button class="ghost" id="cur-state" data-machine="${esc(walkMachine.id)}" title="the walk stands here — click: jump the view to it">☉ ${esc(curLeaf)}</button>`;
-  const machineWidget = `<div class="widget" id="w-machine"><div class="widget-head"><span class="crumbs">${crumbs}</span><span style="display:flex;align-items:center;gap:10px"><button class="ghost" id="survey-btn" title="what stands open — expeditions, iterations, pending notes, parked backlog">◷ open</button>${curBtn}${slider}${sdBar}${escapeBtn}<button class="expand" data-widget="w-machine" data-url="/widget/machine?view=${encodeURIComponent(decl.id)}" title="expand · ctrl-click: new tab · shift-click: new window">⛶</button></span></div><div class="widget-body">${svg}</div></div>`;
+  const machineWidget = `<div class="widget" id="w-machine"><div class="widget-head"><span class="crumbs">${crumbs}</span><span style="display:flex;align-items:center;gap:10px">${curBtn}${slider}${sdBar}${escapeBtn}<button class="expand" data-widget="w-machine" data-url="/widget/machine?view=${encodeURIComponent(decl.id)}" title="expand · ctrl-click: new tab · shift-click: new window">⛶</button></span></div><div class="widget-body">${svg}</div></div>`;
   const detailsWidget = `<div class="widget" id="w-details">${widgetHead("details", "w-details", "/widget/details")}
     ${info.status === "closed" ? '<div class="meta" style="color:#e86a5f">machine closed</div>' : ""}
     <div class="meta" id="details-title" data-morph-ignore>—</div>
@@ -1586,7 +1683,7 @@ export function renderMirror(m: MirrorState, widget?: "machine" | "details" | "l
   </div>`;
 
   if (widget === "terminal") {
-    return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>se · terminal</title><style>${STYLE} #w-terminal{flex:1;max-height:none;border-bottom:0}</style></head>
+    return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>se · terminal</title><style>${STYLE} #w-terminal{flex:1;height:auto;border-bottom:0}</style></head>
 <body><div class="cols"><aside id="left" style="width:100vw;max-width:100vw">${terminalWidget}</aside></div>${MODAL}${data}<script>${SCRIPT}</script></body></html>`;
   }
   if (widget === "log") {
@@ -1607,6 +1704,7 @@ export function renderMirror(m: MirrorState, widget?: "machine" | "details" | "l
 <div class="cols">
   <aside id="left" data-keep-style>
     ${logWidget}
+    <div class="divider horiz" id="div-term" data-pane="w-terminal" data-axis="y" data-grow="bottom"></div>
     ${terminalWidget}
   </aside>
   <div class="divider" id="div-left" data-pane="left" data-grow="left"></div>

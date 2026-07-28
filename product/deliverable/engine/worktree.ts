@@ -156,6 +156,37 @@ export function expFind(root: string, id: string): Expedition {
  *  dismiss (merge=false) archives the branch unmerged. Leftovers are
  *  committed either way; the worktree is removed. */
 export function expClose(root: string, e: Expedition, merge: boolean): { id: string; merged: boolean } {
+  // A DIRTY TRUNK IS CHECKED FIRST (found live 2026-07-28, closing e18).
+  // git merge refuses to overwrite uncommitted local changes, so the merge
+  // below failed — and the abort that follows it failed too, because no merge
+  // had started. The record was already stamped closed by then, leaving an
+  // expedition marked shut, unmerged, with its worktree still standing.
+  //
+  // Failing EARLY is the whole point: nothing is stamped by a close that
+  // cannot finish. Only the root's own changes matter; the worktree's
+  // leftovers get committed further down, on purpose.
+  if (merge) {
+    // TRACKED changes only. Those are what "local changes would be
+    // overwritten by merge" means, and they are what bit at e18's close.
+    // Untracked files are deliberately ignored: the .worktrees directory and
+    // every scratch file live there, so counting them would cry wolf at every
+    // single close — and a guard that cries wolf gets worked around, which is
+    // worse than no guard. An untracked file the incoming branch also creates
+    // still fails the merge below, which now aborts cleanly and says so.
+    const files = git(root, ["status", "--porcelain", "--untracked-files=no"], "status")
+      .split("\n")
+      .map((l) => l.slice(3).trim())
+      .filter((f) => f !== "");
+    if (files.length > 0) {
+      throw new Rejection({
+        clause: CLAUSES.CONDITION_UNMET,
+        expected: "a clean trunk before the merge — git refuses to overwrite uncommitted local changes",
+        got: `${files.length} uncommitted file(s) at the project root that the merge would overwrite: ${files.slice(0, 8).join(", ")}${files.length > 8 ? `, and ${files.length - 8} more` : ""}`,
+        remedy: { tool: "se_run", args: { command: `git -C ${root} add -A; git -C ${root} commit -m "<why these stand on trunk>"` }, note: "commit or discard the root's changes, then close again. se_git and se_run serve the BOUND WORKTREE while an expedition is open — reaching the root needs git -C." },
+        source: SRC,
+      });
+    }
+  }
   const recAbs = join(e.path, recordRel(e.id));
   if (existsSync(recAbs)) {
     // The expedition ends with a REPORT (owner ruling 2026-07-27); the
