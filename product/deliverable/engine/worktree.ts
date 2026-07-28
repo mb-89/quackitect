@@ -155,36 +155,35 @@ export function expFind(root: string, id: string): Expedition {
 /** Close IS the ruling: apply (merge=true) merges the changes to trunk;
  *  dismiss (merge=false) archives the branch unmerged. Leftovers are
  *  committed either way; the worktree is removed. */
-export function expClose(root: string, e: Expedition, merge: boolean): { id: string; merged: boolean } {
-  // A DIRTY TRUNK IS CHECKED FIRST (found live 2026-07-28, closing e18).
+export function expClose(root: string, e: Expedition, merge: boolean): { id: string; merged: boolean; trunk_committed?: string[] } {
+  // A DIRTY TRUNK IS SETTLED FIRST (found live 2026-07-28, closing e18).
   // git merge refuses to overwrite uncommitted local changes, so the merge
   // below failed — and the abort that follows it failed too, because no merge
   // had started. The record was already stamped closed by then, leaving an
   // expedition marked shut, unmerged, with its worktree still standing.
   //
-  // Failing EARLY is the whole point: nothing is stamped by a close that
-  // cannot finish. Only the root's own changes matter; the worktree's
-  // leftovers get committed further down, on purpose.
+  // The close COMMITS the root's strays rather than refusing (owner ruling
+  // 2026-07-28). It already does exactly this on the other side of the merge,
+  // on the principle that a walk's work never silently vanishes; the root
+  // deserves the same. Not a stash: a stash pop can conflict AFTER the merge
+  // has started, which strands uncommitted work halfway through a close.
+  //
+  // TRACKED changes only, via commit -a. Untracked files are left alone, so
+  // .worktrees and every scratch file stay out of it. An untracked file the
+  // incoming branch also creates still fails the merge below, which aborts
+  // cleanly and says so.
+  //
+  // Keeping trunk clean is also what keeps the READ-PROOF honest: a worktree
+  // branches from the last commit, so a dirty trunk is exactly when the tree
+  // the lane serves and the tree the proof hashes drift apart.
+  let trunkCommitted: string[] = [];
   if (merge) {
-    // TRACKED changes only. Those are what "local changes would be
-    // overwritten by merge" means, and they are what bit at e18's close.
-    // Untracked files are deliberately ignored: the .worktrees directory and
-    // every scratch file live there, so counting them would cry wolf at every
-    // single close — and a guard that cries wolf gets worked around, which is
-    // worse than no guard. An untracked file the incoming branch also creates
-    // still fails the merge below, which now aborts cleanly and says so.
-    const files = git(root, ["status", "--porcelain", "--untracked-files=no"], "status")
+    trunkCommitted = git(root, ["status", "--porcelain", "--untracked-files=no"], "status")
       .split("\n")
       .map((l) => l.slice(3).trim())
       .filter((f) => f !== "");
-    if (files.length > 0) {
-      throw new Rejection({
-        clause: CLAUSES.CONDITION_UNMET,
-        expected: "a clean trunk before the merge — git refuses to overwrite uncommitted local changes",
-        got: `${files.length} uncommitted file(s) at the project root that the merge would overwrite: ${files.slice(0, 8).join(", ")}${files.length > 8 ? `, and ${files.length - 8} more` : ""}`,
-        remedy: { tool: "se_run", args: { command: `git -C ${root} add -A; git -C ${root} commit -m "<why these stand on trunk>"` }, note: "commit or discard the root's changes, then close again. se_git and se_run serve the BOUND WORKTREE while an expedition is open — reaching the root needs git -C." },
-        source: SRC,
-      });
+    if (trunkCommitted.length > 0) {
+      git(root, ["commit", "-a", "-m", `trunk: strays committed by the close of ${e.id}`], "commit trunk");
     }
   }
   const recAbs = join(e.path, recordRel(e.id));
@@ -237,5 +236,7 @@ export function expClose(root: string, e: Expedition, merge: boolean): { id: str
     }
   }
   git(root, ["worktree", "remove", "--force", e.path], "worktree remove");
-  return { id: e.id, merged: merge };
+  // NEVER SILENT. Committing someone's uncommitted work on their behalf is a
+  // kindness only if they are told it happened, and which files it took.
+  return { id: e.id, merged: merge, ...(trunkCommitted.length > 0 ? { trunk_committed: trunkCommitted } : {}) };
 }

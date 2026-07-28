@@ -188,12 +188,14 @@ test("the close is atomic: a conflicting merge aborts and refuses typed, the roo
   assert.ok(!/Unmerged|MERGING|both added/.test(st), "the root tree stands clean after the refusal: " + st);
 });
 
-// A DIRTY TRUNK IS CAUGHT BEFORE ANYTHING IS STAMPED (found live 2026-07-28,
-// closing e18). git refuses to overwrite uncommitted local changes, so the
-// merge failed - and the abort after it failed too, because no merge had
-// started. The record was already marked closed by then, leaving an
-// expedition shut, unmerged, and still holding its worktree.
-test("the close refuses EARLY on a dirty trunk, and leaves the record open", () => {
+// A DIRTY TRUNK IS SETTLED, NOT REFUSED (owner ruling 2026-07-28). git will
+// not overwrite uncommitted local changes, so e18's close-merge failed - and
+// the abort after it failed too, because no merge had started. Refusing was
+// the first fix; the owner ruled it too blunt. The close already commits the
+// WORKTREE's leftovers on the principle that a walk's work never silently
+// vanishes, so the root gets the same treatment. Not a stash: a stash pop can
+// conflict after the merge has started, stranding the work mid-close.
+test("the close COMMITS the trunk's strays rather than refusing, and says which", () => {
   const root = freshRoot();
   const g = (...a: string[]) => spawnSync("git", a, { cwd: root, encoding: "utf8", windowsHide: true });
   g("init");
@@ -201,6 +203,12 @@ test("the close refuses EARLY on a dirty trunk, and leaves the record open", () 
   g("config", "user.name", "se test");
   g("add", "-A");
   g("commit", "-q", "-m", "base");
+  // The real repo ignores .worktrees/ and .se/. The fixture must too, or the
+  // worktree itself reads as tracked content and its removal shows up as a
+  // change - which is a property of the fixture, never of the close.
+  writeFileSync(join(root, ".gitignore"), ".worktrees/\n.se/\n");
+  g("add", "-A");
+  g("commit", "-q", "-m", "ignore machine-local paths");
   const e = expNew(root, "fix", "dirty trunk probe");
   mkdirSync(join(e.path, "product", "spec", "expeditions", e.id), { recursive: true });
   writeFileSync(join(e.path, "product", "spec", "expeditions", e.id, "report.md"), "---\nform: expedition-leave\nstatus: done\n---\n\nprobe report\n");
@@ -209,14 +217,17 @@ test("the close refuses EARLY on a dirty trunk, and leaves the record open", () 
   g("add", "-A");
   g("commit", "-q", "-m", "add readme");
   writeFileSync(join(root, "README.md"), "# tracked, and now edited\n");
-  assert.throws(
-    () => expClose(root, e, true),
-    (err) => (err as { clause?: string }).clause === "SE-C-112" && /README\.md/.test(String((err as { got?: string }).got)),
-  );
-  // NOTHING was stamped: the record must still read open, or a close that
-  // could not finish has already told the archive it did.
-  const rec = readFileSync(join(e.path, "product", "spec", "expeditions", e.id, "record.md"), "utf8");
-  assert.match(rec, /^status: open$/m, "a close that cannot finish stamps nothing");
+  const out = expClose(root, e, true);
+  assert.equal(out.merged, true, "the close went through instead of refusing");
+  assert.deepEqual(out.trunk_committed, ["README.md"], "and it names the strays it took — never silent");
+  // Trunk stands CLEAN afterwards. That is not tidiness: a worktree branches
+  // from the last commit, so a dirty trunk is exactly when the tree the lane
+  // serves and the tree the read-proof hashes drift apart.
+  const left = spawnSync("git", ["status", "--porcelain", "--untracked-files=no"], { cwd: root, encoding: "utf8", windowsHide: true }).stdout;
+  assert.equal(left.trim(), "", "nothing tracked is left uncommitted");
+  // The work landed in HISTORY, where it is findable - not in a stash.
+  const log = spawnSync("git", ["log", "--oneline", "-6"], { cwd: root, encoding: "utf8", windowsHide: true }).stdout;
+  assert.match(log, /strays committed by the close/, "the commit says why it exists");
 });
 
 test("a broken sub-canvas refuses typed at entry; fixing it heals on the next tick", async () => {
