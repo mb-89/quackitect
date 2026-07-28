@@ -181,6 +181,7 @@ export function compileMachine(root: string, canvasPath: string): MachineDecl {
     }
   }
 
+  const drawn: DrawnEdge[] = [];
   for (const edge of canvas.edges ?? []) {
     const from = byElement.get(edge.fromNode);
     const to = byElement.get(edge.toNode);
@@ -204,8 +205,7 @@ export function compileMachine(root: string, canvasPath: string): MachineDecl {
         );
       }
     }
-    const decl: EdgeDecl = { to: to.id, role: role as EdgeRole, ...(guard !== "" ? { guard } : {}) };
-    from.edges.push(decl);
+    drawn.push({ from, decl: { to: to.id, role: role as EdgeRole, ...(guard !== "" ? { guard } : {}) }, declared: roleRaw !== null, id: edge.id });
   }
 
   // start and end are MECHANICAL: every machine has exactly one of each.
@@ -219,6 +219,7 @@ export function compileMachine(root: string, canvasPath: string): MachineDecl {
   if (ends.length !== 1) {
     throw new MachineCompileError(machineId, "machine", `every machine has exactly ONE end state (found ${ends.length})`);
   }
+  for (const d of normalizeDrawnEdges(machineId, drawn, starts[0].id)) d.from.edges.push(d.decl);
   const machine: MachineDecl = {
     id: machineId,
     reentry,
@@ -231,6 +232,79 @@ export function compileMachine(root: string, canvasPath: string): MachineDecl {
     throw new MachineCompileError(machineId, "machine", String((e as Error).message));
   }
   return machine;
+}
+
+interface DrawnEdge {
+  from: StateDecl;
+  decl: EdgeDecl;
+  /** true when the drawing carries an explicit styleAttributes.role. */
+  declared: boolean;
+  id: string;
+}
+
+/** THE MACHINES-ARE-DRAWN LAW (owner ruling 2026-07-28): the engine accepts
+ *  what a person naturally draws in Obsidian — no invisible metadata.
+ *  - The same pair drawn twice collapses to one edge; an authored role wins.
+ *  - An undeclared edge running OPPOSITE a forward edge is a RETURN and
+ *    compiles as alternative. Forward is the edge whose target lies deeper
+ *    from start; equal depth is ambiguous and refuses with the edge named. */
+function normalizeDrawnEdges(machineId: string, drawn: DrawnEdge[], initial: string): DrawnEdge[] {
+  const byPair = new Map<string, DrawnEdge[]>();
+  for (const d of drawn) {
+    const key = `${d.from.id}->${d.decl.to}`;
+    const group = byPair.get(key);
+    if (group === undefined) byPair.set(key, [d]);
+    else group.push(d);
+  }
+  const kept: DrawnEdge[] = [];
+  for (const [key, group] of byPair) {
+    if (group.length === 1) {
+      kept.push(group[0]);
+      continue;
+    }
+    const authored = group.filter((d) => d.declared);
+    const roles = new Set(authored.map((d) => d.decl.role));
+    if (roles.size > 1) {
+      throw new MachineCompileError(
+        machineId,
+        `canvas edges ${group.map((d) => d.id).join(", ")}`,
+        `${key} is drawn ${group.length} times with conflicting roles (${[...roles].join(" vs ")})`,
+      );
+    }
+    kept.push(authored[0] ?? group[0]);
+  }
+  const depth = new Map<string, number>([[initial, 0]]);
+  let frontier = [initial];
+  while (frontier.length > 0) {
+    const next: string[] = [];
+    for (const id of frontier) {
+      for (const d of kept) {
+        if (d.from.id !== id || depth.has(d.decl.to)) continue;
+        depth.set(d.decl.to, (depth.get(id) ?? 0) + 1);
+        next.push(d.decl.to);
+      }
+    }
+    frontier = next;
+  }
+  const forward = (from: string, to: string) =>
+    kept.some((d) => d.from.id === from && d.decl.to === to && (d.decl.role === "normal" || d.decl.role === "approval"));
+  for (const d of kept) {
+    if (d.declared || d.decl.role !== "normal") continue;
+    if (!forward(d.decl.to, d.from.id)) continue;
+    const df = depth.get(d.from.id) ?? Infinity;
+    const dt = depth.get(d.decl.to) ?? Infinity;
+    if (dt < df) {
+      d.decl.role = "alternative";
+      continue;
+    }
+    if (df < dt) continue;
+    throw new MachineCompileError(
+      machineId,
+      `canvas edge ${d.id}`,
+      `${d.from.id} and ${d.decl.to} point at each other and neither lies closer to start — give the return edge a role`,
+    );
+  }
+  return kept;
 }
 
 function asString(v: unknown): string | undefined {

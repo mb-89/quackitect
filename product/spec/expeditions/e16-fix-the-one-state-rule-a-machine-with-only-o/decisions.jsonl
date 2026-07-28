@@ -55,3 +55,16 @@
 {"ts":"2026-07-28T11:24:36.308Z","op":"update","visit":"expeditions/e16@0","node":"d53","brief":"reading the cage before un-caging web search"}
 {"ts":"2026-07-28T11:24:44.464Z","op":"update","visit":"expeditions/e16@0","node":"d54","brief":"web search un-caged with the logging duty recorded"}
 {"ts":"2026-07-28T11:24:57.629Z","op":"update","visit":"expeditions/e16@0","node":"d55","brief":"committing the un-caging with its preflight"}
+{"ts":"2026-07-28T11:36:54.274Z","op":"plan","visit":"expeditions/e16@0","parent":null,"nodes":[{"id":"d3","brief":"sweep pending notes touching canvas edit safety"},{"id":"d4","brief":"map the engine's canvas parse and watcher and escape"},{"id":"d5","brief":"design the edit-safety changes"},{"id":"d6","brief":"implement last-good-graph with walk remap"},{"id":"d7","brief":"implement escape-anywhere"},{"id":"d8","brief":"implement return-edge inference and duplicate collapse"},{"id":"d9","brief":"tests for each failure seen today"},{"id":"d10","brief":"suite green in the worktree"}]}
+{"ts":"2026-07-28T11:37:04.394Z","op":"update","visit":"expeditions/e16@0","node":"d11","brief":"sweeping pending notes that touch canvas editing before building"}
+{"ts":"2026-07-28T11:37:24.633Z","op":"done","visit":"expeditions/e16@0","node":"d3","brief":"swept: only the two fresh strand and escape notes touch this area"}
+{"ts":"2026-07-28T11:37:38.753Z","op":"update","visit":"expeditions/e16@0","node":"d12","brief":"tracing compileMachine call sites to find the mid-walk rebuild"}
+{"ts":"2026-07-28T11:38:30.209Z","op":"update","visit":"expeditions/e16@0","node":"d13","brief":"reading machine.ts completeState to see how the pop lost the successor"}
+{"ts":"2026-07-28T11:39:32.571Z","op":"update","visit":"expeditions/e16@0","node":"d14","brief":"strand explained: plain return edges made idle an AND-join that starved"}
+{"ts":"2026-07-28T11:40:21.355Z","op":"update","visit":"expeditions/e16@0","node":"d15","brief":"escaping e16 on owner order — retro first; the walk stands for re-entry"}
+{"ts":"2026-07-28T11:48:00.982Z","op":"update","visit":"expeditions/e16@1","node":"d25","brief":"resuming e16: reading the compiler to build edge inference and dedupe"}
+{"ts":"2026-07-28T11:49:18.182Z","op":"update","visit":"expeditions/e16@1","node":"d26","brief":"reading seedSubs and landing before the engine patch"}
+{"ts":"2026-07-28T11:53:27.030Z","op":"update","visit":"expeditions/e16@1","node":"d27","brief":"patching the engine for edit safety across three files"}
+{"ts":"2026-07-28T11:55:15.479Z","op":"update","visit":"expeditions/e16@1","node":"d28","brief":"writing the edit-safety regression tests"}
+{"ts":"2026-07-28T11:55:26.083Z","op":"update","visit":"expeditions/e16@1","node":"d29","brief":"running preflight and the suite in the e16 worktree"}
+{"ts":"2026-07-28T11:56:00.678Z","op":"done","visit":"expeditions/e16@0","node":"d10","brief":"preflight and 104 tests green in the worktree"}

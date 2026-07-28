@@ -62,4 +62,6 @@ export const CLAUSES = {
   UPDATE_MALFORMED: "SE-C-120", // the update field failed to parse as a decision-graph op
   DECISION_NODE: "SE-C-121", // update names an unknown or already-resolved node
   DECISION_UNRESOLVED: "SE-C-122", // done over open children — everything started gets resolved
+  DEAD_END: "SE-C-123", // completing the state would leave the machine open with nothing active — a starved join in the drawing
+  CANVAS_BROKEN: "SE-C-124", // a canvas fails to compile mid-walk — the walk stands; fix the drawing
 } as const;
