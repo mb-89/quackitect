@@ -337,6 +337,10 @@ const STYLE = `
   .logrow .lkind.k-note { font-style: italic; color: #c58fe8; }
   .logrow .lkind.k-aq { font-weight: 700; color: #7cc4e8; }
   .aq-q { font-weight: 700; color: #7cc4e8; padding: 6px 0; white-space: pre-wrap; }
+  #loadbar { position: fixed; top: 0; left: 0; right: 0; height: 3px; background: #22272c; z-index: 99; display: none; }
+  #loadbar .fill { height: 100%; width: 30%; background: #e8b339; animation: loadslide 1s linear infinite; }
+  @keyframes loadslide { 0% { margin-left: -30%; } 100% { margin-left: 100%; } }
+  #loadbar .lmsg { position: fixed; top: 8px; right: 12px; color: #e8b339; font-size: 12px; }
   .aq-a { color: #cfd8dc; line-height: 1.5; padding: 4px 0; }
   .logrow .lbrief { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .logrow .lok { flex: 0 0 auto; color: #4a7a55; }
@@ -793,6 +797,7 @@ document.addEventListener("click", async (ev) => {
     // The quick way home: jump the view to the walk's machine, whole
     // drawing visible (the saved pan is dropped so the state shows).
     sessionStorage.removeItem("se-vb-" + cs.dataset.machine);
+    showLoading("loading " + cs.dataset.machine);
     location.href = "/?view=" + encodeURIComponent(cs.dataset.machine);
     return;
   }
@@ -814,7 +819,7 @@ document.addEventListener("click", (ev) => {
 // Double-click a sub-machine state: enter it as a VIEWER (walk unmoved).
 document.addEventListener("dblclick", (ev) => {
   const g = ev.target.closest ? ev.target.closest(".clickable") : null;
-  if (g && g.dataset.sub) location.href = "/?view=" + encodeURIComponent(g.dataset.sub);
+  if (g && g.dataset.sub) { showLoading("loading " + g.dataset.sub); location.href = "/?view=" + encodeURIComponent(g.dataset.sub); }
 });
 
 // Only real widget expanders — the modal's ✕ shares the style, not the job.
@@ -982,6 +987,24 @@ function renderDecisions(sel) {
   }
   showDetails("decisions · " + g.visit, html);
 }
+// FEEDBACK WITHIN A SECOND (owner law 2026-07-28): anything that can take
+// longer shows loading feedback at once. Full-page view loads get the bar
+// the moment they are clicked; the fresh page replaces it.
+function showLoading(label) {
+  let el = document.getElementById("loadbar");
+  if (!el) {
+    el = document.createElement("div");
+    el.id = "loadbar";
+    el.innerHTML = '<div class="fill"></div><div class="lmsg"></div>';
+    document.body.appendChild(el);
+  }
+  el.querySelector(".lmsg").textContent = label || "loading";
+  el.style.display = "block";
+}
+document.addEventListener("click", (ev) => {
+  const a = ev.target.closest ? ev.target.closest('a[href*="?view="]') : null;
+  if (a) showLoading("loading " + (a.textContent || "view"));
+}, true);
 document.addEventListener("click", (ev) => {
   const lr = ev.target.closest ? ev.target.closest(".logrow") : null;
   if (lr) { void openLogDetail(lr.dataset.ref); return; }

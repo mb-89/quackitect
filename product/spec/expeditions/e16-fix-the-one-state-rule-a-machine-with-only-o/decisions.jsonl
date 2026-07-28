@@ -80,3 +80,13 @@
 {"ts":"2026-07-28T12:16:02.801Z","op":"update","visit":"expeditions/e16@2","node":"d40","brief":"patching the aq view and the prose-wall lint across three files"}
 {"ts":"2026-07-28T12:16:10.727Z","op":"update","visit":"expeditions/e16@2","node":"d41","brief":"running the suite after the render and lint patch"}
 {"ts":"2026-07-28T12:16:29.435Z","op":"done","visit":"expeditions/e16@2","node":"d39","brief":"suite green at 104 after the render and lint patch"}
+{"ts":"2026-07-28T12:17:26.708Z","op":"done","visit":"expeditions/e16@2","node":"d37","brief":"prewrap now covers every prose surface in the pane"}
+{"ts":"2026-07-28T12:28:43.543Z","op":"plan","visit":"expeditions/e16@3","parent":null,"nodes":[{"id":"d47","brief":"fan-in becomes OR with an explicit join kind"},{"id":"d48","brief":"the survey tool listing everything open"},{"id":"d49","brief":"archive doors at 1.5 human-only"},{"id":"d50","brief":"tests updated and green"},{"id":"d51","brief":"report updated and e16 closed with apply"}]}
+{"ts":"2026-07-28T12:30:50.100Z","op":"update","visit":"expeditions/e16@3","node":"d52","brief":"new UX law: slow interactions show loading feedback"}
+{"ts":"2026-07-28T12:31:47.405Z","op":"update","visit":"expeditions/e16@3","node":"d53","brief":"reading the worktree threshold tests before the archive change"}
+{"ts":"2026-07-28T12:35:05.901Z","op":"update","visit":"expeditions/e16@3","node":"d54","brief":"applying the engine batch for the join and survey build"}
+{"ts":"2026-07-28T12:35:41.930Z","op":"update","visit":"expeditions/e16@3","node":"d55","brief":"applying the engine batch for the join and survey build"}
+{"ts":"2026-07-28T12:35:57.143Z","op":"update","visit":"expeditions/e16@3","node":"d56","brief":"notes and canvases: survey wiring plus human-only archives"}
+{"ts":"2026-07-28T12:36:33.167Z","op":"update","visit":"expeditions/e16@3","node":"d57","brief":"rewriting the archive-bound tests and adding the join tests"}
+{"ts":"2026-07-28T12:36:39.548Z","op":"update","visit":"expeditions/e16@3","node":"d58","brief":"running the suite over the whole batch"}
+{"ts":"2026-07-28T12:37:01.157Z","op":"done","visit":"expeditions/e16@3","node":"d50","brief":"105 tests green over the whole batch"}

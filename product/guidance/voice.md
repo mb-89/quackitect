@@ -61,6 +61,7 @@ Write plainly. These are rules, not suggestions. They bind every output: chat, d
 - Panes hold their size. Content never resizes the layout. The maximize modal is the room to breathe.
 - Interacting with a field never collapses its surface. No fold closes, no scroll resets, no pane re-opens — the reader keeps their place through every click.
 - Color carries meaning, never decoration: green = pass, red = failure or rejection, yellow = attention.
+- Feedback within a second. Any interaction that can take longer than a second shows loading feedback at once. A progress bar with real progress where progress exists; an indeterminate bar otherwise. Silence reads as breakage.
 
 ### Do not repeat (DRY)
 - Single source of truth. Each fact lives in one place. Everything else points to it.

@@ -8,6 +8,7 @@ import { strict as assert } from "node:assert";
 import { readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { test } from "node:test";
+import { activeStates, completeState, type EdgeDecl, type MachineDecl, type MachineInstance, type StateDecl } from "../engine/machine.ts";
 import { compileMachine } from "../engine/machines/compile.ts";
 import { Session, mainMachinePath } from "../engine/session.ts";
 import { buildServer } from "../engine/tools.ts";
@@ -60,7 +61,7 @@ test("the owner's redraw no longer strands the walk: boot completes into idle", 
   assert.deepEqual(landed.active, ["idle"], "the walk stands at idle, not on no state");
 });
 
-test("a declared AND-join that would strand refuses with the join named, the walk stands", async () => {
+test("a drawn JOIN synchronizes: a starving join refuses the tick, the walk stands", async () => {
   const root = freshRoot();
   const p = mainMachinePath(root);
   const canvas = JSON.parse(readFileSync(p, "utf8")) as RawCanvas;
@@ -68,6 +69,9 @@ test("a declared AND-join that would strand refuses with the join named, the wal
     if (e.id === "e-ideation-idle") e.styleAttributes = { role: "normal" };
   }
   writeFileSync(p, JSON.stringify(canvas));
+  // idle becomes a drawn JOIN — it now waits for boot AND ideation.
+  const idleNote = join(root, "product", "deliverable", "machines", "states", "idle.md");
+  writeFileSync(idleNote, readFileSync(idleNote, "utf8").replace("state_kind: work", "state_kind: join"));
   const session = new Session(root);
   await session.tickAdvance();
   await session.tickAdvance();
@@ -80,6 +84,35 @@ test("a declared AND-join that would strand refuses with the join named, the wal
     (e) => (e as { clause?: string }).clause === "SE-C-123" && /idle/.test(String((e as { got?: string }).got)),
   );
   assert.deepEqual(session.active(), ["boot/end"], "the wedge guard leaves the walk standing");
+});
+
+test("plain fan-in is an OR; only a drawn join is the AND", () => {
+  const st = (id: string, kind: StateDecl["kind"], edges: EdgeDecl[]): StateDecl => ({ id, kind, statement: "", guidance: "g", evidence_form: [], priority: 0.01, edges });
+  const mk = (mergeKind: StateDecl["kind"]): MachineDecl => ({
+    id: "t",
+    reentry: "restart",
+    initial: "s",
+    states: [
+      st("s", "start", [{ to: "a", role: "normal" }, { to: "b", role: "normal" }]),
+      st("a", "work", [{ to: "m", role: "normal" }]),
+      st("b", "work", [{ to: "m", role: "normal" }]),
+      st("m", mergeKind, [{ to: "end", role: "normal" }]),
+      st("end", "end", []),
+    ],
+  });
+  const fresh = (): MachineInstance => ({ machine: "t", iteration: "x", current: "a", active: ["a", "b"], counters: {}, history: [], escapes: [], status: "open" });
+  const or = mk("work");
+  const oi = fresh();
+  completeState(or, oi, "a", "filled", "t0");
+  assert.ok(activeStates(oi).includes("m"), "any fired inbound activates a plain state");
+  completeState(or, oi, "b", "filled", "t1");
+  assert.deepEqual(activeStates(oi).sort(), ["m"], "the second arrival is absorbed, never re-queued");
+  const andM = mk("join");
+  const ai = fresh();
+  completeState(andM, ai, "a", "filled", "t0");
+  assert.ok(!activeStates(ai).includes("m"), "the join waits for the second branch");
+  completeState(andM, ai, "b", "filled", "t1");
+  assert.ok(activeStates(ai).includes("m"), "all inbound fired — the join opens");
 });
 
 test("the hatch always works: a booted main-machine walk escapes to idle", async () => {

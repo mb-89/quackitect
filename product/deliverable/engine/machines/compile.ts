@@ -133,7 +133,7 @@ export function compileMachine(root: string, canvasPath: string): MachineDecl {
       const subFm = existsSync(subPath) ? (loadCanvas(subPath).metadata?.frontmatter ?? {}) : {};
       const subPriority = asPriority(subFm.priority);
       if (subPriority === undefined) {
-        throw new MachineCompileError(machineId, `canvas node ${el.id}`, `${subId}.canvas declares no priority in its frontmatter — every state has one (0.01 mechanical .. 0.8 killer; 1 is the slider's ideation notch)`);
+        throw new MachineCompileError(machineId, `canvas node ${el.id}`, `${subId}.canvas declares no priority in its frontmatter — every state has one (0.01 mechanical .. 0.8 killer; 1 ideation; above 1 human-only)`);
       }
       // A sub-canvas may carry conditions in its frontmatter (flat keys,
       // like a note) — e.g. start_iteration's needs-retro gate.
@@ -324,7 +324,9 @@ function asList(v: unknown): string[] | undefined {
 
 function asPriority(v: unknown): number | undefined {
   const n = typeof v === "number" ? v : typeof v === "string" && v !== "" ? Number(v) : NaN;
-  return Number.isFinite(n) && n >= 0 && n <= 1 ? n : undefined;
+  // Above 1 = beyond the slider: the agent can never enter, the human
+  // always may (the archives browse at 1.5).
+  return Number.isFinite(n) && n >= 0 && n <= 1.5 ? n : undefined;
 }
 
 /** Conditions are FLAT frontmatter keys — exit_read, exit_script,
@@ -356,9 +358,9 @@ export function stateFromNote(machineId: string, ref: string, notePath: string, 
   if (stateId === undefined || stateId === "") {
     throw new MachineCompileError(machineId, ref, "missing state (the state's id) in frontmatter");
   }
-  const KINDS = ["work", "gate", "terminal", "start", "end"];
+  const KINDS = ["work", "gate", "terminal", "start", "end", "join"];
   const kindRaw = asString(x.state_kind);
-  const kind = kindRaw !== undefined && KINDS.includes(kindRaw) ? (kindRaw as "work" | "gate" | "terminal" | "start" | "end") : null;
+  const kind = kindRaw !== undefined && KINDS.includes(kindRaw) ? (kindRaw as StateDecl["kind"]) : null;
   if (kind === null) {
     throw new MachineCompileError(machineId, ref, `state_kind must be one of ${KINDS.join(" | ")} (got ${JSON.stringify(x.state_kind)})`);
   }

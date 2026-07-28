@@ -15,7 +15,9 @@ import { Toll } from "./toll.ts";
 import { readFileSync } from "node:fs";
 import { fileDelete, fileGlob, fileList, filePatch, fileRead, fileWrite, type PatchOp } from "./files.ts";
 import { LINT_CONFIG, lintProse } from "./lint.ts";
-import { appendNote, drainNote } from "./inbox.ts";
+import { appendNote, backlogNotes, drainNote, pendingNotes } from "./inbox.ts";
+import { expList, readRecord } from "./worktree.ts";
+import { itList, readItRecord } from "./iterations.ts";
 import { capJson } from "./jsonio.ts";
 import { McpServer, type ToolDef } from "./mcp.ts";
 import { gitLane } from "./gitlane.ts";
@@ -482,6 +484,27 @@ export function coreTools(rootOf: () => string, projectRoot: string): ToolDef[] 
         required: ["ref", "disposition"],
       },
       handler: (args) => drainNote(seDir(projectRoot), String(args.ref), String(args.disposition), args.where === undefined ? undefined : String(args.where)),
+    },
+    {
+      name: "se_survey",
+      title: "se.survey",
+      description:
+        "WHAT STANDS OPEN — one mechanical call: open expeditions, open iterations, pending notes, and parked backlog items with their ready-when. The front desk and the retro open with it; the mirror renders it clickable wherever it is legal.",
+      inputSchema: { type: "object", properties: {} },
+      handler: () => {
+        const firstLine = (t: string) => t.split("\n")[0].slice(0, 120);
+        const exps = expList(projectRoot).filter((e) => e.open).map((e) => ({ id: e.id, goal: firstLine(String((readRecord(projectRoot, e) ?? {}).goal ?? "")) }));
+        const its = itList(projectRoot).filter((i) => i.open).map((i) => ({ id: i.id, goal: firstLine(String((readItRecord(projectRoot, i) ?? {}).goal ?? "")) }));
+        const notes = pendingNotes(seDir(projectRoot)).map((n) => ({ ref: n.ref, at: n.at, brief: firstLine(n.text) }));
+        const backlog = backlogNotes(seDir(projectRoot)).map((n) => ({ ref: n.ref, ready_when: n.drained?.where ?? "", brief: firstLine(n.text) }));
+        return {
+          counts: { expeditions: exps.length, iterations: its.length, notes: notes.length, backlog: backlog.length },
+          expeditions: exps,
+          iterations: its,
+          notes,
+          backlog,
+        };
+      },
     },
     {
       name: "se_log_query",
