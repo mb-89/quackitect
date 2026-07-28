@@ -57,7 +57,111 @@ export interface StateMeta {
   subtitle?: string;
 }
 
-function machineSvg(canvas: CanvasData, activeIds: Set<string>, doneIds: Set<string>, subIds: Set<string>, meta: Record<string, StateMeta>): string {
+/** THE RENDER IS A VIEW, THE CANVAS IS THE SOURCE (owner ruling 2026-07-28).
+ *  Obsidian sizes a node so a person can read the note INSIDE it. Here a node
+ *  carries a title and a subtitle, so most of that box is empty — and because
+ *  the drawing scales to fit its pane, the emptiness is exactly what makes the
+ *  text small. Shrinking the boxes makes the text bigger in the same space.
+ *
+ *  The geometry is rebuilt from the drawing's ORDER, never from its
+ *  magnitudes. Whoever was left of, right of, above or below whom stays that
+ *  way. No layout algorithm runs: the hand-placed arrangement carries meaning
+ *  the engine must not invent. This is why the render and Obsidian no longer
+ *  look alike, and that is the point — the law binds what the engine ACCEPTS
+ *  from a drawing, not what a view of it must look like.
+ */
+const LABEL_CH = 15.6; // monospace advance at the .label size
+const SUB_CH = 10.2; // ditto at .sublabel
+const BOX_PAD = 26;
+const GUTTER_X = 110; // room for the condition circles that ride the edges
+const GUTTER_Y = 70;
+
+function nearestBand(reps: number[], v: number): number {
+  let best = 0;
+  for (let i = 1; i < reps.length; i++) if (Math.abs(reps[i] - v) < Math.abs(reps[best] - v)) best = i;
+  return best;
+}
+
+function bandsOf(values: number[], tolerance: number): number[] {
+  const sorted = [...values].sort((a, b) => a - b);
+  const reps: number[] = [];
+  for (const v of sorted) if (reps.length === 0 || v - reps[reps.length - 1] > tolerance) reps.push(v);
+  return reps;
+}
+
+export function compact(canvas: CanvasData, meta: Record<string, StateMeta>): CanvasData {
+  const source = canvas.nodes ?? [];
+  if (source.length === 0) return canvas;
+  // Membership and banding both read the ORIGINAL rects, so capture them
+  // before anything moves.
+  const orig = new Map(source.map((n) => [n.id, { x: n.x, y: n.y, w: n.width, h: n.height }]));
+  const nodes = source.map((n) => ({ ...n })) as CanvasElement[];
+  const boxes = nodes.filter((n) => n.type !== "group");
+  if (boxes.length === 0) return canvas;
+
+  const sized = new Map<string, { w: number; h: number }>();
+  for (const n of boxes) {
+    if (n.type === "text") {
+      const len = (n.text ?? "").length;
+      sized.set(n.id, { w: 520, h: Math.max(120, Math.ceil(len / 62) * 24 + 28) });
+      continue;
+    }
+    if ((n as { styleAttributes?: { shape?: string } }).styleAttributes?.shape === "pill") {
+      sized.set(n.id, { w: 68, h: 68 }); // start and end are just symbols
+      continue;
+    }
+    const sid = stateIdOf(n) ?? "";
+    const subFull = meta[sid]?.subtitle;
+    const sub = subFull !== undefined && subFull.length > 48 ? `${subFull.slice(0, 47)}…` : subFull;
+    const wide = Math.max(sid.length * LABEL_CH, (sub ?? "").length * SUB_CH);
+    sized.set(n.id, { w: Math.max(200, Math.ceil(wide) + BOX_PAD * 2), h: sub === undefined ? 72 : 100 });
+  }
+
+  const cx = boxes.map((n) => orig.get(n.id)!.x + orig.get(n.id)!.w / 2);
+  const cy = boxes.map((n) => orig.get(n.id)!.y + orig.get(n.id)!.h / 2);
+  const cols = bandsOf(cx, 120);
+  const rows = bandsOf(cy, 120);
+  const colIdx = cx.map((v) => nearestBand(cols, v));
+  const rowIdx = cy.map((v) => nearestBand(rows, v));
+  const colW = cols.map((_, c) => Math.max(0, ...boxes.filter((_, i) => colIdx[i] === c).map((n) => sized.get(n.id)!.w)));
+  const rowH = rows.map((_, r) => Math.max(0, ...boxes.filter((_, i) => rowIdx[i] === r).map((n) => sized.get(n.id)!.h)));
+  const colX: number[] = [];
+  const rowY: number[] = [];
+  let ax = 0;
+  for (const w of colW) { colX.push(ax); ax += w + GUTTER_X; }
+  let ay = 0;
+  for (const h of rowH) { rowY.push(ay); ay += h + GUTTER_Y; }
+  boxes.forEach((n, i) => {
+    const s = sized.get(n.id)!;
+    n.x = colX[colIdx[i]] + (colW[colIdx[i]] - s.w) / 2;
+    n.y = rowY[rowIdx[i]] + (rowH[rowIdx[i]] - s.h) / 2;
+    n.width = s.w;
+    n.height = s.h;
+  });
+
+  // A group frames whatever it framed before, at wherever that now sits.
+  for (const g of nodes) {
+    if (g.type !== "group") continue;
+    const og = orig.get(g.id)!;
+    const members = boxes.filter((n) => {
+      const o = orig.get(n.id)!;
+      return o.x >= og.x && o.y >= og.y && o.x + o.w <= og.x + og.w && o.y + o.h <= og.y + og.h;
+    });
+    if (members.length === 0) continue;
+    const x1 = Math.min(...members.map((m) => m.x)) - 24;
+    const y1 = Math.min(...members.map((m) => m.y)) - 52; // headroom for the label
+    const x2 = Math.max(...members.map((m) => m.x + m.width)) + 24;
+    const y2 = Math.max(...members.map((m) => m.y + m.height)) + 24;
+    g.x = x1;
+    g.y = y1;
+    g.width = x2 - x1;
+    g.height = y2 - y1;
+  }
+  return { ...canvas, nodes };
+}
+
+function machineSvg(source: CanvasData, activeIds: Set<string>, doneIds: Set<string>, subIds: Set<string>, meta: Record<string, StateMeta>): string {
+  const canvas = compact(source, meta);
   const nodes = canvas.nodes ?? [];
   const pad = 60;
   const minX = Math.min(...nodes.map((n) => n.x)) - pad;

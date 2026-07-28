@@ -6,6 +6,91 @@ opened: 2026-07-28T14:42:26.680Z
 goal: "One screen: the mirror updates incrementally instead of reloading, the machine render compacts to content-sized nodes, and the agent's terminal becomes a left sidebar under the log"
 ---
 
-# e18-fix-one-screen-the-mirror-updates-incrementa
+# One screen
 
-Free prose — the human head of the record. Machine-facing fields stay in the frontmatter.
+The owner wants the agent and the machine on one screen. Three changes get
+them there, and each is useful even if the next never lands.
+
+## Where this stands
+
+- DONE — the mirror updates in place. Morphing replaced the full-page
+  reload, server-sent events replaced the poll loop. Committed, suite green
+  at 106 tests.
+- NEXT — the machine render compacts to content-sized nodes.
+- THEN — the log moves to a new left sidebar, with the terminal beneath it.
+- LAST — the PTY host, started by RUNME as a sibling of the agent.
+
+## The layout the owner specified
+
+- LEFT sidebar — the log on top, the terminal beneath it.
+- The terminal is capped at half the VIEWPORT height, with an expand
+  control that behaves like every other widget, including the new-tab and
+  new-window openings.
+- The terminal defaults to a hundred columns and gets a draggable divider.
+- MIDDLE — the machine.
+- RIGHT — details, full viewport height for now.
+
+## The compaction, as ruled
+
+Node sizes come from Obsidian, where you read a note's contents inside the
+node. Here a node holds a title and a subtitle, so most of the box is
+empty. Because the SVG scales to fit, that emptiness becomes unreadably
+small text. Shrinking the boxes makes the text bigger in the same space.
+
+- Derive the ordering from the canvas. Keep who is above, below, left and
+  right of whom. Never run a graph-layout algorithm — the hand-placed
+  arrangement carries meaning.
+- Start and end become the standard small circles.
+- A plain state becomes a box around its title and subtitle.
+- A SUB-MACHINE keeps a doubled border, the composite-state convention, so
+  you can see what you may descend into (owner ruling 2026-07-28).
+- Group frames stay around their members.
+
+This deliberately breaks WYSIWYG with Obsidian. The canvas is the SOURCE
+and the render is a VIEW; the law binds what the engine must ACCEPT from a
+drawing, not what the render must look like.
+
+## The terminal, as designed
+
+The mirror lives in Claude Code's grandchild, and a grandchild cannot own
+the terminal its grandparent runs in. So the PTY host is a SIBLING that
+RUNME starts, never a descendant. The mirror only renders a client for it.
+
+- The pseudo-terminal and its scrollback live in the host, which never
+  reloads. The browser reattaches and replays.
+- The terminal's container must carry data-morph-ignore, or a morph reaches
+  into the canvas and the session flickers.
+- Use a prebuilt-only PTY binding so RUNME's promise of no build step
+  anywhere survives.
+
+## Carried in from before the expedition
+
+Two fixes the owner ordered in chat, made at idle before this branch
+existed, and re-applied here so they cannot be stranded.
+
+- Idle is a switchboard. Its routing table moved to the front desk's
+  method, which deliberately carries no list of doors so it cannot go
+  stale.
+- Plan and fork are idempotent. An update rides BEFORE the call's verdict,
+  and every refusal tells you to repeat the call, so a retried plan used to
+  plant its whole checklist again.
+
+## Also folded in, by the owner's word
+
+Everything else settled in this session, so nothing is lost:
+
+- The settings store keyed to a session token, so a reload keeps the
+  sliders and a clean end resets them.
+- The survey made callable by the person, not only the agent.
+- One log colour per kind, none shared.
+- The web-search mirroring hook, so the query reaches the feed
+  mechanically rather than by the agent remembering.
+- The answer-once rule and the dated-guidance test, into the guidance.
+- The retro's statement, which today names its input and not its output.
+- Bidirectional canvas arrows, so one drawn arrow means forward and return.
+
+## Cautions found while working
+
+- The handover CANNOT be written from a bound expedition. The file lane
+  resolves into the worktree, which has no .se directory, so the write
+  lands where the next session never looks. Write it after leaving.

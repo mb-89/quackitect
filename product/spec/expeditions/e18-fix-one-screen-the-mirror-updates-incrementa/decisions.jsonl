@@ -6,3 +6,8 @@
 {"ts":"2026-07-28T14:49:31.804Z","op":"done","visit":"expeditions/e18@0","node":"d46","brief":"Server-sent events replace the poll loop, both hands sharing one shape"}
 {"ts":"2026-07-28T14:49:36.407Z","op":"done","visit":"expeditions/e18@0","node":"d45","brief":"The page morphs in place; the reload workaround is gone"}
 {"ts":"2026-07-28T14:50:01.949Z","op":"update","visit":"expeditions/e18@0","node":"d60","brief":"Committing the morph and events work before moving on"}
+{"ts":"2026-07-28T14:50:41.567Z","op":"update","visit":"expeditions/e18@0","node":"d61","brief":"Noted that the handover silently lands in the worktree from a bound expedition"}
+{"ts":"2026-07-28T14:51:32.249Z","op":"update","visit":"expeditions/e18@0","node":"d62","brief":"Session state written into the committed record so a restart recovers it"}
+{"ts":"2026-07-28T14:52:58.511Z","op":"update","visit":"expeditions/e18@0","node":"d63","brief":"Compaction pass rebuilds geometry from the drawing's order"}
+{"ts":"2026-07-28T14:54:19.740Z","op":"update","visit":"expeditions/e18@0","node":"d64","brief":"Test pins the compaction invariants against the real main canvas"}
+{"ts":"2026-07-28T14:55:11.769Z","op":"done","visit":"expeditions/e18@0","node":"d47","brief":"Compaction lands with four invariants pinned in the suite"}
