@@ -818,6 +818,16 @@ let navigatingAway = false;
 function navigateTo(url, label) {
   navigatingAway = true;
   showLoading(label);
+  // THE READER KEEPS THEIR PLACE (owner ruling 2026-07-28). Changing WHICH
+  // MACHINE is on screen says nothing about what they had open beside it.
+  // This URL carried only the view, so every machine switch silently threw
+  // the details pane away. Only content that is genuinely gone may clear it,
+  // and detailFor says so in place when it is.
+  if (CURRENT_DETAIL) {
+    const u = new URL(url, location.href);
+    if (!u.searchParams.has("detail")) u.searchParams.set("detail", CURRENT_DETAIL);
+    url = u.pathname + u.search;
+  }
   location.href = url;
 }
 async function refresh(detail) {

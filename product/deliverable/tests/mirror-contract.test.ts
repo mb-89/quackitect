@@ -123,3 +123,14 @@ test("the terminal starts at half its column, drags past half, and cannot chase 
   assert.ok(html.includes("if (cols === lastCols && rows === lastRows) return;"), "a no-op resize never happens");
   assert.ok(html.includes("requestAnimationFrame"), "the pane is measured on a settled frame");
 });
+
+// ONE SURFACE NEVER RESETS ANOTHER (owner ruling 2026-07-28). Switching the
+// machine on screen used to throw the details pane away, because the view URL
+// carried only the view. The reader had a log entry open; changing what they
+// were looking at NEXT to it is no reason to close it.
+test("a machine switch carries the reader's open detail with it", () => {
+  const root = freshRoot();
+  const html = renderMirror({ session: new Session(root), root, lastPacket: undefined, mode: "manual" });
+  assert.ok(html.includes('u.searchParams.set("detail", CURRENT_DETAIL)'), "the view jump carries the open detail");
+  assert.ok(html.includes('new URLSearchParams(location.search).get("detail")'), "and the page it lands on restores it");
+});

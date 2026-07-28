@@ -152,7 +152,11 @@ export function expeditionTools(session: Session): ToolDef[] {
   ];
 }
 
-export function coreTools(rootOf: () => string, projectRoot: string): ToolDef[] {
+// rootOf takes the path because ONE lane serves two trees: `.se/` is session
+// state at the project root, everything else follows the walk into its bound
+// worktree (Session.laneRoot, owner ruling 2026-07-28). Callers that act on no
+// single path — search, glob, run, git — pass nothing and get the work root.
+export function coreTools(rootOf: (rel?: string) => string, projectRoot: string): ToolDef[] {
   return [
     {
       name: "se_file_read",
@@ -170,7 +174,7 @@ export function coreTools(rootOf: () => string, projectRoot: string): ToolDef[] 
         required: ["path"],
       },
       handler: (args) =>
-        fileRead(rootOf(), String(args.path), {
+        fileRead(rootOf(String(args.path)), String(args.path), {
           ...(args.offset !== undefined ? { offset: Number(args.offset) } : {}),
           ...(args.limit !== undefined ? { limit: Number(args.limit) } : {}),
           ...(args.ref !== undefined ? { ref: String(args.ref) } : {}),
@@ -190,7 +194,7 @@ export function coreTools(rootOf: () => string, projectRoot: string): ToolDef[] 
         required: ["path", "content", "base_hash"],
       },
       // Some harnesses serialize the scalar null as its string — both mean CREATE.
-      handler: (args) => fileWrite(rootOf(), String(args.path), String(args.content), args.base_hash === null || args.base_hash === "null" ? null : String(args.base_hash)),
+      handler: (args) => fileWrite(rootOf(String(args.path)), String(args.path), String(args.content), args.base_hash === null || args.base_hash === "null" ? null : String(args.base_hash)),
     },
     {
       name: "se_file_patch",
@@ -235,7 +239,21 @@ export function coreTools(rootOf: () => string, projectRoot: string): ToolDef[] 
             });
           }
         });
-        return filePatch(rootOf(), args.ops as PatchOp[]);
+        const ops = args.ops as PatchOp[];
+        // A patch is ATOMIC under one root. Session state and project content
+        // resolve to different trees, so a batch spanning both has no single
+        // root to be atomic under — say so rather than writing half of it.
+        const roots = new Set(ops.map((o) => rootOf(String(o.path))));
+        if (roots.size > 1) {
+          throw new Rejection({
+            clause: CLAUSES.REQUIRED_ARGS,
+            expected: "one atomic patch per tree — .se/ is session state, everything else is project content",
+            got: `ops spanning ${roots.size} trees`,
+            remedy: { tool: "se_file_patch", args: { ops: "[…only the .se/ ops, then a second call for the rest…]" }, note: "split the batch; each call stays atomic within its own tree" },
+            source: "engine/tools.ts",
+          });
+        }
+        return filePatch(rootOf(ops.length > 0 ? String(ops[0].path) : undefined), ops);
       },
     },
     {
@@ -251,7 +269,7 @@ export function coreTools(rootOf: () => string, projectRoot: string): ToolDef[] 
         },
         required: ["from", "to"],
       },
-      handler: (args) => fileMove(rootOf(), String(args.from), String(args.to)),
+      handler: (args) => fileMove(rootOf(String(args.from)), String(args.from), String(args.to)),
     },
     {
       name: "se_file_delete",
@@ -262,7 +280,7 @@ export function coreTools(rootOf: () => string, projectRoot: string): ToolDef[] 
         properties: { path: { type: "string" }, base_hash: { type: "string" } },
         required: ["path", "base_hash"],
       },
-      handler: (args) => fileDelete(rootOf(), String(args.path), String(args.base_hash)),
+      handler: (args) => fileDelete(rootOf(String(args.path)), String(args.path), String(args.base_hash)),
     },
     {
       name: "se_file_list",
@@ -272,7 +290,7 @@ export function coreTools(rootOf: () => string, projectRoot: string): ToolDef[] 
         type: "object",
         properties: { dir: { type: "string", default: "." } },
       },
-      handler: (args) => fileList(rootOf(), String(args.dir ?? ".")),
+      handler: (args) => fileList(rootOf(String(args.dir ?? ".")), String(args.dir ?? ".")),
     },
     {
       name: "se_file_glob",
@@ -551,7 +569,7 @@ function refuseProseWall(tool: string, field: string, text: string): void {
 
 export function buildServer(root: string, session = new Session(root), tollOpts: { windowMs?: number; now?: () => number } = {}): McpServer {
   // (a fresh Session fails fast on a misdrawn machine)
-  const tools = [...sessionTools(session), ...expeditionTools(session), ...coreTools(() => session.workRoot(), root)];
+  const tools = [...sessionTools(session), ...expeditionTools(session), ...coreTools((rel) => session.laneRoot(rel), root)];
   // THE UPDATE FIELD — every lane tool accepts it: a decision-graph op
   // riding the call. Declared on every schema so harnesses send it as an
   // object (an undeclared property arrives as a JSON string — v2 lesson).

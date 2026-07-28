@@ -6,3 +6,12 @@
 {"ts":"2026-07-28T16:32:09.190Z","op":"update","visit":"expeditions/e19@0","node":"d51","brief":"terminal gets a real half-height plus a splitter, and the flicker loop is broken"}
 {"ts":"2026-07-28T16:32:20.704Z","op":"update","visit":"expeditions/e19@0","node":"d52","brief":"pinning the terminal height and the flicker guard with a test"}
 {"ts":"2026-07-28T16:33:04.805Z","op":"done","visit":"expeditions/e19@0","node":"d42","brief":"terminal starts at half and no longer flickers"}
+{"ts":"2026-07-28T16:34:00.325Z","op":"plan","visit":"expeditions/e19@0","parent":null,"nodes":[{"id":"d53","brief":"Details survive a machine switch"},{"id":"d54","brief":"Bake the principle into the voice"}]}
+{"ts":"2026-07-28T16:34:15.227Z","op":"update","visit":"expeditions/e19@0","node":"d55","brief":"pinning that a machine switch keeps the reader's open detail"}
+{"ts":"2026-07-28T16:36:02.703Z","op":"update","visit":"expeditions/e19@0","node":"d56","brief":"read-proof now hashes the tree the lane actually serves"}
+{"ts":"2026-07-28T16:36:21.898Z","op":"update","visit":"expeditions/e19@0","node":"d57","brief":"the file lane sends .se to the root and everything else to the worktree"}
+{"ts":"2026-07-28T16:37:40.670Z","op":"update","visit":"expeditions/e19@0","node":"d58","brief":"work root answers first, project root is the fallback"}
+{"ts":"2026-07-28T16:38:47.722Z","op":"update","visit":"expeditions/e19@0","node":"d59","brief":"keeping the unambiguous half; the guidance tree needs an owner ruling"}
+{"ts":"2026-07-28T16:39:32.058Z","op":"update","visit":"expeditions/e19@0","node":"d60","brief":"pinning that the handover resolves to the root while bound"}
+{"ts":"2026-07-28T16:40:12.320Z","op":"done","visit":"expeditions/e19@0","node":"d45","brief":"handover resolves to the root; the guidance tree is an owner ruling"}
+{"ts":"2026-07-28T16:40:22.888Z","op":"done","visit":"expeditions/e19@0","node":"d53","brief":"a machine switch now carries the reader's open detail"}

@@ -326,6 +326,19 @@ export class Session {
     return this.bound?.path ?? this.root;
   }
 
+  /** Where the lane resolves ONE path (owner ruling 2026-07-28).
+   *
+   *  `.se/` is SESSION state, never branch content. The handover, the notes
+   *  and the call log belong to the project root, and the NEXT session reads
+   *  them there whatever branch this one happened to stand on. Resolving them
+   *  into a worktree wrote them where nobody would ever look — silently.
+   *
+   *  Everything else follows the walk into its worktree, as it always did. */
+  laneRoot(rel?: string): string {
+    if (rel === undefined) return this.workRoot();
+    return rel.replace(/\\/g, "/").split("/")[0] === ".se" ? this.root : this.workRoot();
+  }
+
   expeditionNew(kind: string, goal: string): Record<string, unknown> {
     const e = expNew(this.root, kind, goal);
     return { created: e.id, branch: e.branch, note: "it stands in the expeditions container — enter there to work" };
@@ -1013,6 +1026,17 @@ export class Session {
     return hash !== "" && (this.agentReads.get(path)?.has(hash) ?? false);
   }
 
+  // PULLED DOCS ARE PROJECT-LEVEL, and the proof hashes them at the PROJECT
+  // ROOT — deliberately, and in one tree with the pulled LIST above and with
+  // the human's mirror checks, which are made before any expedition binds.
+  //
+  // This is HALF a known bug (note-8b824a2d36de). se_file_read serves the
+  // worktree, so editing a pulled guidance doc inside an expedition still
+  // makes later ticks refuse. Preferring the worktree here is not the fix: it
+  // silently voids every check the human made before binding, and a worktree
+  // stands at a COMMIT, so its copy differs from the tree they were reading.
+  // Which tree owns guidance decides where an expedition's guidance edits
+  // LAND, and that is the owner's ruling to make, not this function's.
   private diskHash(rel: string): string {
     try {
       const abs = resolveInRoot(this.root, rel, "engine/session.ts reads");
