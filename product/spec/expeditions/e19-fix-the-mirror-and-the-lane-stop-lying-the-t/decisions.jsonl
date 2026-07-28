@@ -37,3 +37,7 @@
 {"ts":"2026-07-28T16:59:08.419Z","op":"update","visit":"expeditions/e19@0","node":"d75","brief":"linting the report before the leave gate"}
 {"ts":"2026-07-28T16:59:15.830Z","op":"update","visit":"expeditions/e19@0","node":"d76","brief":"rendering the lint's comma chain as a list"}
 {"ts":"2026-07-28T16:59:24.612Z","op":"update","visit":"expeditions/e19@0","node":"d77","brief":"committing the report before the leave gate"}
+{"ts":"2026-07-28T16:59:36.545Z","op":"update","visit":"expeditions/e19@0","node":"d78","brief":"heading for the leave gate with the report written"}
+{"ts":"2026-07-28T17:00:17.068Z","op":"update","visit":"expeditions/e19@0","node":"d79","brief":"restructuring the report to the leave form's sections"}
+{"ts":"2026-07-28T17:00:28.455Z","op":"update","visit":"expeditions/e19@0","node":"d80","brief":"report fills the leave form; heading for the gate"}
+{"ts":"2026-07-28T17:00:59.075Z","op":"update","visit":"expeditions/e19-leave@0","node":"d81","brief":"closing e19 with apply"}
