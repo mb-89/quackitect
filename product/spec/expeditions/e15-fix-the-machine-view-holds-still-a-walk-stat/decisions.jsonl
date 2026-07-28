@@ -60,3 +60,8 @@
 {"ts":"2026-07-28T10:40:26.603Z","op":"done","visit":"expeditions/e15@0","node":"d39","brief":"suite green at 97 and everything committed"}
 {"ts":"2026-07-28T10:40:35.210Z","op":"done","visit":"expeditions/e15@0","node":"d6","brief":"closing now - the record grew fat enough and the owner wants the tree clean"}
 {"ts":"2026-07-28T10:40:39.821Z","op":"update","visit":"expeditions/e15-leave@0","node":"d57","brief":"close is the ruling - e15 applies to trunk"}
+{"ts":"2026-07-28T10:41:04.690Z","op":"fork","visit":"expeditions/e15-leave@0","parent":null,"node":"d58","brief":"merge blocked by an uncommitted trunk edit to main.canvas","nodes":[]}
+{"ts":"2026-07-28T10:41:19.713Z","op":"update","visit":"expeditions/e15@2","node":"d59","brief":"diagnosing the trunk-side main.canvas edit read-only"}
+{"ts":"2026-07-28T10:41:23.637Z","op":"update","visit":"expeditions/e15@2","node":"d60","brief":"reading the owner's canvas diff in full"}
+{"ts":"2026-07-28T10:42:14.697Z","op":"update","visit":"expeditions/e15@2","node":"d61","brief":"union canvas written - the owner's layout plus the two doors"}
+{"ts":"2026-07-28T10:42:20.304Z","op":"update","visit":"expeditions/e15@2","node":"d62","brief":"committing the union and clearing the trunk-side edit it absorbed"}
