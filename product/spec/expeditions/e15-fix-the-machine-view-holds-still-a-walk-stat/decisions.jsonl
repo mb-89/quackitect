@@ -53,3 +53,6 @@
 {"ts":"2026-07-28T10:39:15.951Z","op":"update","visit":"expeditions/e15@0","node":"d55","brief":"door test added for front desk and ideation"}
 {"ts":"2026-07-28T10:39:24.798Z","op":"update","visit":"expeditions/e15@0","node":"d56","brief":"suite over the front desk and ideation round"}
 {"ts":"2026-07-28T10:39:50.143Z","op":"done","visit":"expeditions/e15@0","node":"d34","brief":"front desk machine stands with its in-doubt door"}
+{"ts":"2026-07-28T10:39:54.996Z","op":"done","visit":"expeditions/e15@0","node":"d35","brief":"idle sends the unsure to the front desk"}
+{"ts":"2026-07-28T10:40:14.612Z","op":"done","visit":"expeditions/e15@0","node":"d36","brief":"ideation shipped as drawn - five states and the notch door"}
+{"ts":"2026-07-28T10:40:18.618Z","op":"done","visit":"expeditions/e15@0","node":"d37","brief":"eleven method cards stand on the shelf"}
