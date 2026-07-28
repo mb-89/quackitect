@@ -65,3 +65,5 @@
 {"ts":"2026-07-28T10:41:23.637Z","op":"update","visit":"expeditions/e15@2","node":"d60","brief":"reading the owner's canvas diff in full"}
 {"ts":"2026-07-28T10:42:14.697Z","op":"update","visit":"expeditions/e15@2","node":"d61","brief":"union canvas written - the owner's layout plus the two doors"}
 {"ts":"2026-07-28T10:42:20.304Z","op":"update","visit":"expeditions/e15@2","node":"d62","brief":"committing the union and clearing the trunk-side edit it absorbed"}
+{"ts":"2026-07-28T10:42:34.484Z","op":"done","visit":"expeditions/e15-leave@0","node":"d58","brief":"merge unblocked - the union carries the owner's layout"}
+{"ts":"2026-07-28T10:42:38.364Z","op":"update","visit":"expeditions/e15-leave@0","node":"d63","brief":"close is the ruling - e15 applies to trunk"}
