@@ -3,3 +3,6 @@
 {"ts":"2026-07-28T16:26:10.189Z","op":"update","visit":"expeditions/e19@0","node":"d49","brief":"one action now causes one load, not two"}
 {"ts":"2026-07-28T16:27:00.233Z","op":"update","visit":"expeditions/e19@0","node":"d50","brief":"pinning the bar's lifetime with a test rather than a comment"}
 {"ts":"2026-07-28T16:27:44.648Z","op":"done","visit":"expeditions/e19@0","node":"d41","brief":"the bar now tracks a real load and is pinned by a test"}
+{"ts":"2026-07-28T16:32:09.190Z","op":"update","visit":"expeditions/e19@0","node":"d51","brief":"terminal gets a real half-height plus a splitter, and the flicker loop is broken"}
+{"ts":"2026-07-28T16:32:20.704Z","op":"update","visit":"expeditions/e19@0","node":"d52","brief":"pinning the terminal height and the flicker guard with a test"}
+{"ts":"2026-07-28T16:33:04.805Z","op":"done","visit":"expeditions/e19@0","node":"d42","brief":"terminal starts at half and no longer flickers"}

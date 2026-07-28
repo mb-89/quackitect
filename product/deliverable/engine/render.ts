@@ -375,15 +375,19 @@ const STYLE = `
   .cols { display: flex; height: 100vh; }
   main { flex: 1; min-width: 0; display: flex; flex-direction: column; padding: 14px 18px; }
   .divider { width: 6px; cursor: col-resize; background: #2a2f34; flex: none; }
+  .divider.horiz { width: auto; height: 6px; cursor: row-resize; }
   aside { width: 620px; min-width: 320px; max-width: 80vw; display: flex; flex-direction: column; background: #191d21; }
   /* THE LEFT COLUMN: the feed on top, the agent's terminal beneath it.
      A hundred monospace columns is what the terminal wants to start at; the
      divider moves it from there and the width is the reader's from then on. */
   #left { width: 820px; min-width: 360px; }
   #left #w-log { flex: 1; min-height: 0; }
-  /* Half the VIEWPORT, never half the screen — the browser window is what the
-     reader actually has. Expand opens it over the page like any other widget. */
-  #w-terminal { max-height: 50vh; flex: none; min-height: 140px; }
+  /* HALF THE COLUMN TO START, then the reader's (owner ruling 2026-07-28).
+     It used to be flex:none with no height, so the box was as tall as its
+     CONTENT and merely capped at half — which is why it sat tiny. An explicit
+     height starts it at half, and the splitter above it takes over from there.
+     No max: the owner asked to be able to drag it past half. */
+  #w-terminal { height: 50%; flex: none; min-height: 140px; }
   .term-panel { flex: 1; min-height: 0; overflow: auto; padding: 8px 10px; }
   .crumbs { font-size: 13px; color: #7f8b96; display: flex; align-items: center; gap: 4px; text-transform: none; letter-spacing: 0; }
   .crumbs a { color: #d8dde2; text-decoration: none; }
@@ -1081,17 +1085,28 @@ if (svg) {
   window.addEventListener("mouseup", () => { if (panning) saveVb(); panning = null; svg.classList.remove("panning"); });
 }
 
-// Two columns to size now, so each divider names the pane it moves and
-// which way that pane grows.
+// Each divider names the pane it moves and which side that pane sits on:
+// a divider on the pane's far side grows it as you drag TOWARDS the pane.
+// data-axis y makes it a horizontal splitter moving height instead of width.
 document.querySelectorAll(".divider").forEach((dv) => {
   const pane = document.getElementById(dv.dataset.pane);
-  if (!pane) return;
+  if (pane === null) return;
+  const vert = dv.dataset.axis === "y";
+  const away = dv.dataset.grow === "right" || dv.dataset.grow === "bottom";
   let drag = null;
-  dv.addEventListener("mousedown", (ev) => { drag = { x: ev.clientX, w: pane.offsetWidth }; ev.preventDefault(); });
+  dv.addEventListener("mousedown", (ev) => {
+    drag = { at: vert ? ev.clientY : ev.clientX, size: vert ? pane.offsetHeight : pane.offsetWidth };
+    ev.preventDefault();
+  });
   window.addEventListener("mousemove", (ev) => {
-    if (!drag) return;
-    const dx = ev.clientX - drag.x;
-    pane.style.width = Math.max(160, drag.w + (dv.dataset.grow === "right" ? -dx : dx)) + "px";
+    if (drag === null) return;
+    const moved = (vert ? ev.clientY : ev.clientX) - drag.at;
+    const want = drag.size + (away ? -moved : moved);
+    if (!vert) { pane.style.width = Math.max(160, want) + "px"; return; }
+    // The pane above must survive. Nothing caps this at half — dragging past
+    // half is exactly what the owner asked for.
+    const room = pane.parentElement === null ? want : pane.parentElement.clientHeight - 120;
+    pane.style.height = Math.max(140, Math.min(want, room)) + "px";
   });
   window.addEventListener("mouseup", () => { drag = null; });
 });
@@ -1463,13 +1478,32 @@ async function bootTerminal() {
     m.remove();
     return { w: r.width / 100, h: r.height };
   };
+  // THE FLICKER WAS A FEEDBACK LOOP (owner report 2026-07-28). term.resize
+  // relays out INSIDE the pane, the ResizeObserver sees that relayout, and
+  // the two chase each other every time the box changed size. A browser
+  // fullscreen cycle cured it only because the loop settled somewhere new.
+  //
+  // Two guards. Measure on the next frame, never mid-transition. And resize
+  // only when the grid actually changed — a resize that changes nothing is
+  // what feeds the loop.
+  let lastCols = 0;
+  let lastRows = 0;
+  let queued = false;
   const sync = () => {
-    const c = cell();
-    if (!(c.w > 0) || !(c.h > 0)) return;
-    const cols = Math.max(20, Math.floor(pane.clientWidth / c.w));
-    const rows = Math.max(6, Math.floor(pane.clientHeight / c.h));
-    term.resize(cols, rows);
-    void fetch(base + "/pty/resize", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ cols, rows }) });
+    if (queued) return;
+    queued = true;
+    requestAnimationFrame(() => {
+      queued = false;
+      const c = cell();
+      if (!(c.w > 0) || !(c.h > 0)) return;
+      const cols = Math.max(20, Math.floor(pane.clientWidth / c.w));
+      const rows = Math.max(6, Math.floor(pane.clientHeight / c.h));
+      if (cols === lastCols && rows === lastRows) return;
+      lastCols = cols;
+      lastRows = rows;
+      term.resize(cols, rows);
+      void fetch(base + "/pty/resize", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ cols, rows }) });
+    });
   };
   new ResizeObserver(sync).observe(pane);
   sync();
@@ -1635,7 +1669,7 @@ export function renderMirror(m: MirrorState, widget?: "machine" | "details" | "l
   </div>`;
 
   if (widget === "terminal") {
-    return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>se · terminal</title><style>${STYLE} #w-terminal{flex:1;max-height:none;border-bottom:0}</style></head>
+    return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>se · terminal</title><style>${STYLE} #w-terminal{flex:1;height:auto;border-bottom:0}</style></head>
 <body><div class="cols"><aside id="left" style="width:100vw;max-width:100vw">${terminalWidget}</aside></div>${MODAL}${data}<script>${SCRIPT}</script></body></html>`;
   }
   if (widget === "log") {
@@ -1656,6 +1690,7 @@ export function renderMirror(m: MirrorState, widget?: "machine" | "details" | "l
 <div class="cols">
   <aside id="left" data-keep-style>
     ${logWidget}
+    <div class="divider horiz" id="div-term" data-pane="w-terminal" data-axis="y" data-grow="bottom"></div>
     ${terminalWidget}
   </aside>
   <div class="divider" id="div-left" data-pane="left" data-grow="left"></div>

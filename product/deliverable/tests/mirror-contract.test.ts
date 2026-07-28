@@ -107,3 +107,19 @@ test("the loading bar settles: it can come down, it times out, and one action lo
   const bare = html.match(/location\.href = "\/\?view=/g) ?? [];
   assert.equal(bare.length, 0, "view navigation goes through navigateTo, never a bare location.href");
 });
+
+// THE TERMINAL EARNS ITS SPACE (owner ruling 2026-07-28). It sat tiny because
+// flex:none with no height sizes to CONTENT, and max-height only capped that.
+// It also flickered: term.resize relaid out inside the pane, the observer saw
+// the relayout, and the two chased each other.
+test("the terminal starts at half its column, drags past half, and cannot chase its own resize", () => {
+  const root = freshRoot();
+  const html = renderMirror({ session: new Session(root), root, lastPacket: undefined, mode: "manual" });
+  assert.match(html, /#w-terminal \{ height: 50%;/, "an explicit half, not a content-sized box under a cap");
+  assert.ok(!/#w-terminal \{[^}]*max-height/.test(html), "no cap — the owner asked to drag past half");
+  assert.ok(html.includes('data-axis="y"'), "the height splitter ships");
+  assert.ok(html.includes("row-resize"), "and it looks draggable");
+  // The loop-breaker: a resize that changes no rows or columns must not fire.
+  assert.ok(html.includes("if (cols === lastCols && rows === lastRows) return;"), "a no-op resize never happens");
+  assert.ok(html.includes("requestAnimationFrame"), "the pane is measured on a settled frame");
+});
