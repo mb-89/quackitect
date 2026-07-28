@@ -93,8 +93,8 @@ export interface StateMeta {
 const LABEL_CH = 15.6; // monospace advance at the .label size
 const SUB_CH = 10.2; // ditto at .sublabel
 const BOX_PAD = 26;
-const GUTTER_X = 110; // room for the condition circles that ride the edges
-const GUTTER_Y = 70;
+const GUTTER_X = 80; // room for the condition circles that ride the edges
+const GUTTER_Y = 52;
 
 function nearestBand(reps: number[], v: number): number {
   let best = 0;
@@ -137,13 +137,21 @@ export function compact(canvas: CanvasData, meta: Record<string, StateMeta>): Ca
     sized.set(n.id, { w: Math.max(200, Math.ceil(wide) + BOX_PAD * 2), h: sub === undefined ? 72 : 100 });
   }
 
-  const cx = boxes.map((n) => orig.get(n.id)!.x + orig.get(n.id)!.w / 2);
+  // A COMMENT IS AN ANNOTATION, NOT A STATE (owner report 2026-07-28). Text
+  // nodes are wide by nature, and letting one claim a COLUMN made every other
+  // row leave that column empty — 520px of nothing running the full height of
+  // the drawing, which is the empty column the owner saw. So text sits OUT of
+  // the column grid: it keeps its own ROW, so nothing can overlap it, and it
+  // starts at the left edge and overhangs as far as it likes.
+  const isText = (n: CanvasElement): boolean => n.type === "text";
+  const states = boxes.filter((n) => !isText(n));
+  const cx = states.map((n) => orig.get(n.id)!.x + orig.get(n.id)!.w / 2);
   const cy = boxes.map((n) => orig.get(n.id)!.y + orig.get(n.id)!.h / 2);
   const cols = bandsOf(cx, 120);
   const rows = bandsOf(cy, 120);
-  const colIdx = cx.map((v) => nearestBand(cols, v));
+  const colOf = (n: CanvasElement): number => nearestBand(cols, orig.get(n.id)!.x + orig.get(n.id)!.w / 2);
   const rowIdx = cy.map((v) => nearestBand(rows, v));
-  const colW = cols.map((_, c) => Math.max(0, ...boxes.filter((_, i) => colIdx[i] === c).map((n) => sized.get(n.id)!.w)));
+  const colW = cols.map((_, c) => Math.max(0, ...states.filter((n) => colOf(n) === c).map((n) => sized.get(n.id)!.w)));
   const rowH = rows.map((_, r) => Math.max(0, ...boxes.filter((_, i) => rowIdx[i] === r).map((n) => sized.get(n.id)!.h)));
   const colX: number[] = [];
   const rowY: number[] = [];
@@ -153,7 +161,8 @@ export function compact(canvas: CanvasData, meta: Record<string, StateMeta>): Ca
   for (const h of rowH) { rowY.push(ay); ay += h + GUTTER_Y; }
   boxes.forEach((n, i) => {
     const s = sized.get(n.id)!;
-    n.x = colX[colIdx[i]] + (colW[colIdx[i]] - s.w) / 2;
+    const c = colOf(n);
+    n.x = isText(n) ? 0 : colX[c] + (colW[c] - s.w) / 2;
     n.y = rowY[rowIdx[i]] + (rowH[rowIdx[i]] - s.h) / 2;
     n.width = s.w;
     n.height = s.h;

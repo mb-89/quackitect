@@ -29,3 +29,7 @@
 {"ts":"2026-07-28T16:52:27.395Z","op":"update","visit":"expeditions/e19@0","node":"d70","brief":"removing the dead survey button handler"}
 {"ts":"2026-07-28T16:52:39.921Z","op":"update","visit":"expeditions/e19@0","node":"d71","brief":"pinning the survey as a legal tool with no bespoke button"}
 {"ts":"2026-07-28T16:53:19.905Z","op":"done","visit":"expeditions/e19@0","node":"d44","brief":"the survey is a legal-tools link now"}
+{"ts":"2026-07-28T16:54:58.900Z","op":"update","visit":"expeditions/e19@0","node":"d72","brief":"text leaves the column grid; the empty column goes with it"}
+{"ts":"2026-07-28T16:56:15.686Z","op":"update","visit":"expeditions/e19@0","node":"d73","brief":"text keeps its row order, not its column order"}
+{"ts":"2026-07-28T16:56:57.057Z","op":"update","visit":"expeditions/e19@0","node":"d74","brief":"pinning that a comment claims no column"}
+{"ts":"2026-07-28T16:57:37.871Z","op":"done","visit":"expeditions/e19@0","node":"d43","brief":"layout packs 28% narrower with order intact"}

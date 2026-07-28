@@ -19,12 +19,18 @@ function mainCanvas(): { nodes: Node[] } {
 
 const centre = (n: Node): [number, number] => [n.x + n.width / 2, n.y + n.height / 2];
 const boxesOf = (c: { nodes: Node[] }): Node[] => c.nodes.filter((n) => n.type !== "group");
+// A COMMENT IS AN ANNOTATION, NOT A STATE (owner report 2026-07-28). Text is
+// wide by nature, and pinning its COLUMN order made it claim a column of the
+// grid that every other row then left empty. Its ROW still means something -
+// a note on top stays on top - so only the left-right pin is lifted.
+const statesOf = (c: { nodes: Node[] }): Node[] => boxesOf(c).filter((n) => n.type !== "text");
 
 test("compaction keeps who is left of, right of, above and below whom", () => {
   const before = mainCanvas();
   const after = compact(before as never, {}) as unknown as { nodes: Node[] };
   const b = new Map(boxesOf(before).map((n) => [n.id, centre(n)]));
   const a = new Map(boxesOf(after).map((n) => [n.id, centre(n)]));
+  const states = new Set(statesOf(before).map((n) => n.id));
   assert.equal(a.size, b.size, "no node is lost or invented");
   for (const [idA, [bx1, by1]] of b) {
     for (const [idB, [bx2, by2]] of b) {
@@ -33,10 +39,28 @@ test("compaction keeps who is left of, right of, above and below whom", () => {
       const [ax2, ay2] = a.get(idB)!;
       // Only pairs that were CLEARLY apart are pinned; near-ties share a band
       // on purpose, which is what collapses the empty space.
-      if (Math.abs(bx1 - bx2) > 120) assert.equal(Math.sign(ax1 - ax2), Math.sign(bx1 - bx2), `${idA} vs ${idB} kept their left-right order`);
+      const bothStates = states.has(idA) && states.has(idB);
+      if (bothStates && Math.abs(bx1 - bx2) > 120) assert.equal(Math.sign(ax1 - ax2), Math.sign(bx1 - bx2), `${idA} vs ${idB} kept their left-right order`);
       if (Math.abs(by1 - by2) > 120) assert.equal(Math.sign(ay1 - ay2), Math.sign(by1 - by2), `${idA} vs ${idB} kept their up-down order`);
     }
   }
+});
+
+// THE GRID MUST NOT RESERVE SPACE NOTHING USES (owner report 2026-07-28, seen
+// live). The comment claimed a column 520 wide, and every other row left it
+// empty for the full height of the drawing. Text now sits out of the column
+// grid entirely: it keeps its own row, and starts at the left edge.
+test("a comment claims no column of its own", () => {
+  const after = compact(mainCanvas() as never, {}) as unknown as { nodes: Node[] };
+  const text = after.nodes.filter((n) => n.type === "text");
+  assert.ok(text.length > 0, "the main machine carries its comment");
+  for (const t of text) assert.equal(t.x, 0, "text anchors at the left edge instead of banding into a column");
+  // No state may sit in a column the comment alone would have created: every
+  // state's left edge is shared with at least one other state, or is the grid's.
+  const states = statesOf(after);
+  const widest = Math.max(...states.map((n) => n.x + n.width));
+  const textWidest = Math.max(...text.map((n) => n.width));
+  assert.ok(widest > textWidest, "the states span the drawing; the comment merely overhangs its row");
 });
 
 test("compaction leaves no two nodes overlapping", () => {
