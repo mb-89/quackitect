@@ -51,3 +51,10 @@
 {"ts":"2026-07-28T18:56:29.412Z","op":"update","visit":"expeditions/e20@0","node":"d17","brief":"quit is announced to the mirror instead of inferred from silence"}
 {"ts":"2026-07-28T18:56:59.336Z","op":"update","visit":"expeditions/e20@0","node":"d18","brief":"running preflight and the full suite over all four changes"}
 {"ts":"2026-07-28T18:57:32.117Z","op":"update","visit":"expeditions/e20@0","node":"d19","brief":"staging the four changes"}
+{"ts":"2026-07-28T18:57:41.113Z","op":"update","visit":"expeditions/e20@0","node":"d20","brief":"committing the four changes to e20"}
+{"ts":"2026-07-28T18:58:05.898Z","op":"update","visit":"expeditions/e20@0","node":"d21","brief":"checking trunk is clean before the fast-forward"}
+{"ts":"2026-07-28T18:58:09.478Z","op":"update","visit":"expeditions/e20@0","node":"d22","brief":"fast-forwarding trunk onto the e20 branch"}
+{"ts":"2026-07-28T19:00:08.543Z","op":"update","visit":"expeditions/e20@0","node":"d23","brief":"handover written, with the stale compactor claim corrected"}
+{"ts":"2026-07-28T19:00:39.837Z","op":"done","visit":"expeditions/e20@0","node":"d10","brief":"fast-forwarded the worktree from 5f0b109 to trunk at fb82160"}
+{"ts":"2026-07-28T19:01:22.957Z","op":"done","visit":"expeditions/e20@0","node":"d8","brief":"preflight green and 139 tests pass"}
+{"ts":"2026-07-28T19:01:32.843Z","op":"done","visit":"expeditions/e20@0","node":"d5","brief":"the sidebar default is 465px"}
