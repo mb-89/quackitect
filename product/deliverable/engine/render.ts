@@ -211,7 +211,11 @@ function viewedMachine(m: MirrorState, view: string | undefined): { decl: Machin
     return { decl: m.session.machine, canvas: loadCanvas(mainPath) };
   }
   const subState = m.session.machine.states.find((s) => s.submachine !== undefined && s.id === view);
-  if (subState === undefined) return { decl: m.session.machine, canvas: loadCanvas(mainPath) };
+  if (subState === undefined) {
+    // Nested generated machines (archive decades) are viewable too.
+    const nested = m.session.viewFor(view);
+    return nested ?? { decl: m.session.machine, canvas: loadCanvas(mainPath) };
+  }
   // Generated machines serve their own drawing (continue_expedition).
   const generated = m.session.generatedView(subState.id);
   if (generated !== undefined) return generated;
@@ -277,6 +281,7 @@ const STYLE = `
   button.primary { background: #e8b339; color: #14171a; border: 0; border-radius: 8px; padding: 8px 14px; font: inherit; font-weight: 700; cursor: pointer; margin: 2px 4px 2px 0; }
   .panel { padding: 0 12px 12px; overflow: auto; }
   .meta { color: #7f8b96; font-size: 12px; padding: 8px 12px; }
+  .todo-origin { color: #7f8b96; font-size: 11px; }
   table.kv { border-collapse: collapse; width: 100%; font-size: 12.5px; }
   table.kv td { border: 1px solid #2a2f34; padding: 4px 8px; vertical-align: top; }
   table.kv td.k { color: #e8b339; white-space: nowrap; width: 1%; }
@@ -384,16 +389,44 @@ async function loadRecDecisions() {
         const tree = (pid, depth) => (kids[pid] || []).map((n) =>
           '<div class="dnode recnode s-' + n.status + '" data-exp="' + escText(el.dataset.exp) + '" data-visit="' + escText(v.visit) + '" data-node="' + n.id + '" style="margin-left:' + depth * 14 + 'px" title="' + n.id + " · " + n.status + '">' + (badge[n.status] || "·") + " " + escText(n.brief) + "</div>" + tree(n.id, depth + 1)
         ).join("");
-        return '<details class="visitdec"><summary class="meta" style="cursor:pointer;padding:8px 0 4px">' + escText(v.visit) + "</summary>" + (tree("", 0) || '<div class="vnull">no decisions</div>') + '<div class="recinfo"></div></details>';
-      }).join("") || '<div class="vnull">no decisions recorded</div>';
+        return '<details class="visitdec"><summary class="meta" style="cursor:pointer;padding:8px 0 4px">' + escText(v.visit) + "</summary>" + (tree("", 0) || '<div class="meta">no decisions</div>') + '<div class="recinfo"></div></details>';
+      }).join("") || '<div class="meta">no decisions recorded</div>';
     } catch (e) {
-      el.innerHTML = '<div class="vnull">decisions unavailable</div>';
+      el.innerHTML = '<div class="meta">decisions unavailable</div>';
+    }
+  }
+}
+// THE VISIT TO-DOS (owner design 2026-07-27): clicking a state shows,
+// below its details, one collapsed fold per visit; every item names its
+// ORIGIN (planned here | deferred from X | fork). Parked points that have
+// not arrived yet get their own fold.
+async function loadStateTodos() {
+  for (const el of document.querySelectorAll(".statetodos[data-state]:not([data-loaded])")) {
+    el.dataset.loaded = "1";
+    try {
+      const r = await fetch("/api/statetodos?state=" + encodeURIComponent(el.dataset.state));
+      const d = await r.json();
+      const badge = { open: "●", done: "✓", obsolete: "⊘", reverted: "↩", deferred: "→" };
+      const origin = (n) => n.origin === "deferred" && n.trail && n.trail.length > 1 ? "deferred from " + n.trail[n.trail.length - 2] : n.origin === "fork" ? "fork" : "planned here";
+      let html = (d.visits || []).map((v) => {
+        const items = v.nodes.map((n) =>
+          '<div class="dnode s-' + n.status + '" title="' + n.id + " · " + n.status + '">' + (badge[n.status] || "·") + " " + escText(n.brief) + ' <span class="todo-origin">' + escText(origin(n)) + "</span></div>"
+        ).join("");
+        return '<details class="visitdec"><summary class="meta" style="cursor:pointer;padding:8px 0 4px">to-dos · entry ' + (v.visit.split("@")[1] || "0") + "</summary>" + items + "</details>";
+      }).join("");
+      if ((d.parked || []).length) {
+        html += '<details class="visitdec"><summary class="meta" style="cursor:pointer;padding:8px 0 4px">parked — arrives on entry</summary>' +
+          d.parked.map((p) => '<div class="dnode s-deferred">→ ' + escText(p.brief) + ' <span class="todo-origin">' + escText(p.trail && p.trail.length > 1 ? "deferred from " + p.trail[p.trail.length - 2] : "deferred here") + "</span></div>").join("") + "</details>";
+      }
+      el.innerHTML = html;
+    } catch (e) {
+      el.innerHTML = "";
     }
   }
 }
 function showDetails(title, html) {
   const el = document.getElementById("details");
-  if (el) { document.getElementById("details-title").textContent = title; el.innerHTML = html; queueMicrotask(() => { void loadRecDecisions(); }); }
+  if (el) { document.getElementById("details-title").textContent = title; el.innerHTML = html; queueMicrotask(() => { void loadRecDecisions(); void loadStateTodos(); }); }
 }
 // THE MODAL — one surface over the grayed page (forms, tool calls,
 // escape). Click outside or ✕ returns to the layout untouched.
@@ -549,6 +582,7 @@ function stateDetail(id) {
       html += '<div class="recdecisions" data-exp="' + escText(e.id) + '"><div class="meta">loading decisions…</div></div>';
     }
   }
+  html += '<div class="statetodos" data-state="' + id + '"></div>';
   if (s.next && s.next.length > 0) {
     html += '<div class="meta" style="padding:8px 0 4px">next</div>' + nextTable(id, s);
   }
@@ -891,7 +925,7 @@ function renderDecisions(sel) {
       '<div class="dnode s-' + n.status + (n.id === g.active ? " dactive" : "") + (n.id === sel ? " dsel" : "") + '" data-node="' + n.id + '" style="margin-left:' + depth * 14 + 'px" title="' + n.id + " · " + n.status + '">' + badge[n.status] + " " + escText(n.brief) + "</div>" + tree(n.id, depth + 1)
     ).join("");
   }
-  let html = tree("", 0) || '<div class="vnull">no decisions recorded for ' + escText(g.visit) + "</div>";
+  let html = tree("", 0) || '<div class="meta">no decisions recorded for ' + escText(g.visit) + "</div>";
   if (sel) {
     const n = g.nodes.find((x) => x.id === sel);
     if (n) html += '<div class="dinfo">' + jsonTable(Object.assign({ id: n.id, brief: n.brief, status: n.status }, n.resolution ? { resolution: n.resolution } : {}, { opened: n.at }, n.closed_at ? { closed: n.closed_at } : {})) + "</div>";

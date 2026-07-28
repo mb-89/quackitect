@@ -17,6 +17,8 @@ export interface DecisionNode {
   parent: string | null;
   brief: string;
   status: "open" | "done" | "obsolete" | "reverted" | "deferred";
+  /** Where the point came from — the state's to-do list names it. */
+  origin?: "planned" | "fork" | "deferred";
   /** How many defers carried this point here, and through which states. */
   hops?: number;
   trail?: string[];
@@ -235,8 +237,8 @@ export class Decisions {
     }
   }
 
-  private add(visit: string, parent: string | null, brief: string): DecisionNode {
-    const node: DecisionNode = { id: `d${++this.seq}`, visit, parent, brief, status: "open", at: new Date().toISOString() };
+  private add(visit: string, parent: string | null, brief: string, origin?: DecisionNode["origin"]): DecisionNode {
+    const node: DecisionNode = { id: `d${++this.seq}`, visit, parent, brief, status: "open", at: new Date().toISOString(), ...(origin !== undefined ? { origin } : {}) };
     this.nodes.set(node.id, node);
     return node;
   }
@@ -244,7 +246,9 @@ export class Decisions {
   /** The remedy's map: what is still open, so a wrong ref heals in one turn. */
   private openBriefs(): string {
     const open = [...this.nodes.values()].filter((n) => n.status === "open");
-    return open.length === 0 ? "(none open — plan or fork first)" : open.map((n) => `${n.id}: ${n.brief}`).slice(-8).join(" · ");
+    if (open.length === 0) return "(none open — plan or fork first)";
+    const shown = open.slice(-8).map((n) => `${n.id}: ${n.brief}`).join(" · ");
+    return open.length > 8 ? `${shown} · …and ${open.length - 8} more` : shown;
   }
 
   private openNode(id: string): DecisionNode {
@@ -295,7 +299,7 @@ export class Decisions {
     const keep = this.parked.filter((p) => p.state !== state);
     this.parked.splice(0, this.parked.length, ...keep);
     for (const p of due) {
-      const n = this.add(visit, null, p.brief);
+      const n = this.add(visit, null, p.brief, "deferred");
       n.hops = p.hops ?? 1;
       n.trail = p.trail ?? [state];
       this.record({ op: "defer_arrived", visit, node: n.id, brief: n.brief, hops: n.hops, trail: n.trail });
@@ -309,15 +313,15 @@ export class Decisions {
     switch (u.op) {
       case "plan": {
         const parent = u.node === undefined ? null : this.openNode(u.node).id;
-        const added = (u.items ?? []).map((b) => this.add(visit, parent, b));
+        const added = (u.items ?? []).map((b) => this.add(visit, parent, b, "planned"));
         if (this.activeId === undefined) this.activeId = added[0]?.id;
         this.record({ op: "plan", visit, parent, nodes: added.map((n) => ({ id: n.id, brief: n.brief })) });
         break;
       }
       case "fork": {
         const parent = u.node !== undefined ? this.openNode(u.node).id : (this.activeId !== undefined && this.nodes.get(this.activeId)?.status === "open" ? this.activeId : null);
-        const fork = this.add(visit, parent, u.brief!);
-        const added = (u.items ?? []).map((b) => this.add(visit, fork.id, b));
+        const fork = this.add(visit, parent, u.brief!, "fork");
+        const added = (u.items ?? []).map((b) => this.add(visit, fork.id, b, "planned"));
         this.activeId = fork.id;
         this.record({ op: "fork", visit, parent, node: fork.id, brief: fork.brief, nodes: added.map((n) => ({ id: n.id, brief: n.brief })) });
         break;
@@ -396,6 +400,23 @@ export class Decisions {
     const nodes = [...this.nodes.values()].filter((n) => n.visit === visit);
     const active = this.activeId !== undefined && this.nodes.get(this.activeId)?.visit === visit ? this.activeId : null;
     return { visit, active, nodes };
+  }
+
+  /** A state's decision history across its visits, plus points still
+   *  parked for it — the details pane's to-do sections. READ-ONLY:
+   *  looking never materializes a parked defer. */
+  stateTodos(stateId: string): { visits: { visit: string; nodes: DecisionNode[] }[]; parked: { brief: string; hops?: number; trail?: string[] }[] } {
+    const byVisit = new Map<string, DecisionNode[]>();
+    for (const n of this.nodes.values()) {
+      if (n.visit !== stateId && !n.visit.startsWith(`${stateId}@`)) continue;
+      const list = byVisit.get(n.visit) ?? [];
+      list.push(n);
+      byVisit.set(n.visit, list);
+    }
+    return {
+      visits: [...byVisit.entries()].map(([visit, nodes]) => ({ visit, nodes })),
+      parked: this.parked.filter((p) => p.state === stateId).map((p) => ({ brief: p.brief, ...(p.hops !== undefined ? { hops: p.hops } : {}), ...(p.trail !== undefined ? { trail: p.trail } : {}) })),
+    };
   }
 
   /** Open nodes whose visit belongs to one of the given state ids — the

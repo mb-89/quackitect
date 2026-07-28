@@ -20,6 +20,8 @@ export interface GeneratedMachine {
   canvas: CanvasData;
   /** state id (e5, e5-leave) → the full expedition id it belongs to. */
   expByState: Record<string, string>;
+  /** Nested generated machines: state id → its generator (archive decades). */
+  subGen?: Record<string, () => GeneratedMachine>;
 }
 
 export function shortId(expId: string): string {
@@ -170,66 +172,108 @@ function closedRecords(root: string, closed: Expedition[]): Map<string, Record<s
   return out;
 }
 
-export function generateExpeditionArchive(root: string): GeneratedMachine {
-  const closed = safeExpList(root).filter((e) => !e.open);
+/** One archive entry, whatever the record kind. */
+export interface ArchiveEntry {
+  sid: string;
+  full: string;
+  goal: string;
+}
+
+function recordState(e: ArchiveEntry, kindWord: string): StateDecl {
+  return {
+    id: e.sid,
+    kind: "work",
+    statement: e.goal !== "" ? e.goal : e.full,
+    guidance: `An archived ${kindWord} — read-only. Its record and report are in the details.`,
+    evidence_form: [],
+    // Human-only (owner ruling 2026-07-27): 1.5 sits above the whole
+    // slider — there is nothing for an agent to do in the archive, so no
+    // autonomy ever admits it.
+    priority: 1.5,
+    tags: kindWord === "expedition" ? ["archive-record"] : [],
+    edges: [{ to: "end", role: "alternative" }],
+  };
+}
+
+function buildRecordColumn(machineId: string, entries: ArchiveEntry[], kindWord: string): GeneratedMachine {
   const start = mechanical("start", "start");
   const states: StateDecl[] = [start];
   const expByState: Record<string, string> = {};
   type GenNode = CanvasElement & { styleAttributes?: Record<string, unknown> };
   const nodes: GenNode[] = [];
   const edges: CanvasEdge[] = [];
-  // DECADE GROUPS (owner ruling 2026-07-27): ten records per labeled
-  // column, decades stacked horizontally — the drawing never explodes.
-  // At a hundred, decades collapse into hundred-groups (build when the
-  // count nears; the rule is mechanical either way).
-  const col = closed.length === 0 ? 1 : Math.min(closed.length, 10);
-  const centerY = ((col - 1) * 420) / 2 + 80;
-  const decCount = Math.max(1, Math.ceil(closed.length / 10));
+  const centerY = entries.length === 0 ? 80 : ((entries.length - 1) * 420) / 2 + 80;
   nodes.push({ id: "n-start", type: "file", file: "start.md", x: -1400, y: centerY, width: 160, height: 160, styleAttributes: { shape: "pill" } });
-  nodes.push({ id: "n-end", type: "file", file: "end.md", x: -1100 + decCount * 800 + 60, y: centerY, width: 160, height: 160, styleAttributes: { shape: "pill" } });
-  const records = closedRecords(root, closed);
-  closed.forEach((e, i) => {
-    const sid = shortId(e.id);
-    const fm = records.get(e.id);
-    const goal = typeof fm?.goal === "string" ? fm.goal : "";
-    expByState[sid] = e.id;
-    states.push({
-      id: sid,
-      kind: "work",
-      statement: goal !== "" ? goal : e.id,
-      guidance: "An archived expedition — read-only. Its record and report are in the details.",
-      evidence_form: [],
-      // Human-only (owner ruling 2026-07-27): 1.5 sits above the whole
-      // slider — there is nothing for an agent to do in the archive, so no
-      // autonomy ever admits it.
-      priority: 1.5,
-      tags: ["archive-record"],
-      edges: [{ to: "end", role: "alternative" }],
-    });
-    start.edges.push({ to: sid, role: "normal" });
-    const x = -1100 + Math.floor(i / 10) * 800;
-    const y = (i % 10) * 420;
-    nodes.push({ id: `n-${sid}`, type: "file", file: `${sid}.md`, x, y, width: 620, height: 360 });
-    edges.push({ id: `e-start-${sid}`, fromNode: "n-start", toNode: `n-${sid}` });
-    edges.push({ id: `e-${sid}-end`, fromNode: `n-${sid}`, toNode: "n-end" });
+  nodes.push({ id: "n-end", type: "file", file: "end.md", x: -240, y: centerY, width: 160, height: 160, styleAttributes: { shape: "pill" } });
+  entries.forEach((e, i) => {
+    expByState[e.sid] = e.full;
+    states.push(recordState(e, kindWord));
+    start.edges.push({ to: e.sid, role: "normal" });
+    const y = i * 420;
+    nodes.push({ id: `n-${e.sid}`, type: "file", file: `${e.sid}.md`, x: -1100, y, width: 620, height: 360 });
+    edges.push({ id: `e-start-${e.sid}`, fromNode: "n-start", toNode: `n-${e.sid}` });
+    edges.push({ id: `e-${e.sid}-end`, fromNode: `n-${e.sid}`, toNode: "n-end" });
   });
-  for (let d = 0; d * 10 < closed.length; d++) {
-    const first = shortId(closed[d * 10].id);
-    const last = shortId(closed[Math.min(d * 10 + 9, closed.length - 1)].id);
-    const count = Math.min(10, closed.length - d * 10);
-    nodes.push({ id: `g-dec-${d}`, type: "group", x: -1160 + d * 800, y: -60, width: 740, height: count * 420 + 80, label: `${first} – ${last}` });
-  }
-  if (closed.length === 0) {
+  if (entries.length === 0) {
     start.edges.push({ to: "end", role: "normal" });
     edges.push({ id: "e-start-end", fromNode: "n-start", toNode: "n-end" });
   }
   states.push(mechanical("end", "end"));
-  const decl: MachineDecl = { id: "expedition_archive", reentry: "restart", initial: "start", states };
+  const decl: MachineDecl = { id: machineId, reentry: "restart", initial: "start", states };
   validateMachine(decl);
-  const canvas: CanvasData = {
-    nodes: nodes as CanvasElement[],
-    edges,
-    metadata: { frontmatter: { reentry: "restart", priority: 0.2 } },
-  };
-  return { decl, canvas, expByState };
+  return { decl, canvas: { nodes: nodes as CanvasElement[], edges, metadata: { frontmatter: { reentry: "restart", priority: 0.2 } } }, expByState };
+}
+
+function buildDecades(machineId: string, entries: ArchiveEntry[], kindWord: string): GeneratedMachine {
+  const start = mechanical("start", "start");
+  const states: StateDecl[] = [start];
+  const subGen: Record<string, () => GeneratedMachine> = {};
+  type GenNode = CanvasElement & { styleAttributes?: Record<string, unknown> };
+  const nodes: GenNode[] = [];
+  const edges: CanvasEdge[] = [];
+  const decCount = Math.ceil(entries.length / 10);
+  nodes.push({ id: "n-start", type: "file", file: "start.md", x: -1400, y: 80, width: 160, height: 160, styleAttributes: { shape: "pill" } });
+  nodes.push({ id: "n-end", type: "file", file: "end.md", x: -1100 + decCount * 800 + 60, y: 80, width: 160, height: 160, styleAttributes: { shape: "pill" } });
+  for (let d = 0; d < decCount; d++) {
+    const slice = entries.slice(d * 10, d * 10 + 10);
+    const decId = `${slice[0].sid}-${slice[slice.length - 1].sid}`;
+    states.push({
+      id: decId,
+      kind: "work",
+      statement: `${slice[0].sid} – ${slice[slice.length - 1].sid} (${slice.length} records)`,
+      guidance: `A decade of archived ${kindWord}s — click into it; the records stand inside as their own states.`,
+      evidence_form: [],
+      priority: 1.5,
+      tags: ["archive-decade"],
+      submachine: "generated",
+      edges: [{ to: "end", role: "alternative" }],
+    });
+    subGen[decId] = () => buildRecordColumn(decId, slice, kindWord);
+    start.edges.push({ to: decId, role: "normal" });
+    nodes.push({ id: `n-${decId}`, type: "file", file: `${decId}.md`, x: -1100 + d * 800, y: 0, width: 620, height: 360 });
+    edges.push({ id: `e-start-${decId}`, fromNode: "n-start", toNode: `n-${decId}` });
+    edges.push({ id: `e-${decId}-end`, fromNode: `n-${decId}`, toNode: "n-end" });
+  }
+  states.push(mechanical("end", "end"));
+  const decl: MachineDecl = { id: machineId, reentry: "restart", initial: "start", states };
+  validateMachine(decl);
+  return { decl, canvas: { nodes: nodes as CanvasElement[], edges, metadata: { frontmatter: { reentry: "restart", priority: 0.2 } } }, expByState: {}, subGen };
+}
+
+/** ONE archive shape for both record kinds (owner ruling 2026-07-27, both
+ *  archives). Ten or fewer: every record its own state. More: DECADE
+ *  SUB-MACHINES — ten records per group, each group a state you CLICK
+ *  INTO; hundreds nest the same way. */
+export function buildArchive(machineId: string, entries: ArchiveEntry[], kindWord: string): GeneratedMachine {
+  return entries.length > 10 ? buildDecades(machineId, entries, kindWord) : buildRecordColumn(machineId, entries, kindWord);
+}
+
+export function generateExpeditionArchive(root: string): GeneratedMachine {
+  const closed = safeExpList(root).filter((e) => !e.open);
+  const records = closedRecords(root, closed);
+  const entries = closed.map((e) => {
+    const fm = records.get(e.id);
+    return { sid: shortId(e.id), full: e.id, goal: typeof fm?.goal === "string" ? fm.goal : "" };
+  });
+  return buildArchive("expedition_archive", entries, "expedition");
 }

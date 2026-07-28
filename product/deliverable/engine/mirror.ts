@@ -132,6 +132,14 @@ export function startMirror(o: MirrorOptions): Server {
         res.end(JSON.stringify({ ...state.session.decisions.graph(visit), visits: state.session.decisions.visits() }));
         return;
       }
+      if (url.pathname === "/api/statetodos") {
+        // A state's per-visit to-do lists plus points parked for it —
+        // rendered below the state's details, one fold per visit.
+        const id = url.searchParams.get("state") ?? "";
+        res.writeHead(200, { "content-type": "application/json; charset=utf-8" });
+        res.end(JSON.stringify(state.session.decisions.stateTodos(id)));
+        return;
+      }
       if (url.pathname === "/api/recdecisions") {
         // A record's decision history, per visit — tree copy first, the
         // branch when only it holds the file (dismissed expeditions).
