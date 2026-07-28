@@ -27,6 +27,11 @@ forwarded to the server's help and the server had never heard of it.
 A program that forwards arguments to another still owns its OWN flags. It
 prints them first, then the other program's help.
 
+HELP GOES TO THE OUTPUT STREAM. PowerShell's `Write-Host` writes to the
+host, and a pipe or a redirect drops it. The launcher's own block was
+written that way, so anyone capturing the help saw only the forwarded
+half and read a documented flag as undocumented.
+
 THE RULE IS A TEST, NOT A SENTENCE (the linter law, below). The guard
 reads the switches each entry point parses out of its source, runs it with
 `--help`, and demands every one of them in the output:
