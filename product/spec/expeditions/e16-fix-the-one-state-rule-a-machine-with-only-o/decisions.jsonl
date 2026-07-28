@@ -71,3 +71,12 @@
 {"ts":"2026-07-28T11:56:30.232Z","op":"done","visit":"expeditions/e16@0","node":"d6","brief":"wedge guard shipped and committed on e16"}
 {"ts":"2026-07-28T11:56:58.237Z","op":"update","visit":"expeditions/e16@1","node":"d30","brief":"found it: a CSS snippet makes edge roles visible and clickable in Obsidian"}
 {"ts":"2026-07-28T11:57:19.905Z","op":"update","visit":"expeditions/e16@1","node":"d31","brief":"enabling the snippet so the role picker appears without a settings hunt"}
+{"ts":"2026-07-28T11:57:39.033Z","op":"done","visit":"expeditions/e16@0","node":"d5","brief":"design settled: inference in the engine plus the visible role picker"}
+{"ts":"2026-07-28T11:57:43.058Z","op":"done","visit":"expeditions/e16@0","node":"d7","brief":"escape-anywhere shipped with tests"}
+{"ts":"2026-07-28T11:57:46.896Z","op":"done","visit":"expeditions/e16@0","node":"d8","brief":"return inference and duplicate collapse shipped in the compiler"}
+{"ts":"2026-07-28T11:57:53.746Z","op":"done","visit":"expeditions/e16@0","node":"d9","brief":"six edit-safety regression tests ride the suite"}
+{"ts":"2026-07-28T12:13:22.775Z","op":"plan","visit":"expeditions/e16@2","parent":null,"nodes":[{"id":"d36","brief":"find every HTML surface that drops whitespace of multi-line strings"},{"id":"d37","brief":"apply pre-wrap wherever prose strings render"},{"id":"d38","brief":"give the aq row a real question-and-answer view"},{"id":"d39","brief":"suite green and committed"}]}
+{"ts":"2026-07-28T12:15:06.102Z","op":"done","visit":"expeditions/e16@2","node":"d36","brief":"diagnosed: render keeps breaks; the walls are breakless authoring plus raw aq"}
+{"ts":"2026-07-28T12:16:02.801Z","op":"update","visit":"expeditions/e16@2","node":"d40","brief":"patching the aq view and the prose-wall lint across three files"}
+{"ts":"2026-07-28T12:16:10.727Z","op":"update","visit":"expeditions/e16@2","node":"d41","brief":"running the suite after the render and lint patch"}
+{"ts":"2026-07-28T12:16:29.435Z","op":"done","visit":"expeditions/e16@2","node":"d39","brief":"suite green at 104 after the render and lint patch"}

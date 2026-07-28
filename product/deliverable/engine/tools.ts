@@ -403,7 +403,10 @@ export function coreTools(rootOf: () => string, projectRoot: string): ToolDef[] 
         properties: { text: { type: "string" } },
         required: ["text"],
       },
-      handler: (args) => appendNote(seDir(projectRoot), String(args.text), "agent"),
+      handler: (args) => {
+        refuseProseWall("se_note", "text", String(args.text));
+        return appendNote(seDir(projectRoot), String(args.text), "agent");
+      },
     },
     {
       name: "se_lint",
@@ -460,7 +463,10 @@ export function coreTools(rootOf: () => string, projectRoot: string): ToolDef[] 
         },
         required: ["question", "answer"],
       },
-      handler: (args) => ({ recorded: "aq", question: String(args.question).slice(0, 90) }),
+      handler: (args) => {
+        refuseProseWall("se_answer", "answer", String(args.answer));
+        return { recorded: "aq", question: String(args.question).slice(0, 90) };
+      },
     },
     {
       name: "se_note_drain",
@@ -518,6 +524,20 @@ export function coreTools(rootOf: () => string, projectRoot: string): ToolDef[] 
 /** Build the server: session machine + tools + guards + the raw call log.
  *  Guard order: arg shape → THE STATE GATE → handler. Pass a Session to
  *  share it with another hand (the embedded mirror drives the SAME walk). */
+/** THE PROSE-WALL LINT (owner law 2026-07-28): every HTML surface keeps
+ *  line breaks — so long prose MUST carry them. An authored wall is refused
+ *  at the tool boundary, mechanically. */
+function refuseProseWall(tool: string, field: string, text: string): void {
+  if (text.length <= 300 || text.includes("\n")) return;
+  throw new Rejection({
+    clause: CLAUSES.PROSE_WALL,
+    expected: `${field} broken into lines — paragraphs and list lines survive every render`,
+    got: `${text.length} chars without a single line break — renders as a wall`,
+    remedy: { tool, args: { [field]: "<the same text with real line breaks>" }, note: "shape it like prose: short paragraphs, one list item per line" },
+    source: "engine/tools.ts prose-wall",
+  });
+}
+
 export function buildServer(root: string, session = new Session(root), tollOpts: { windowMs?: number; now?: () => number } = {}): McpServer {
   // (a fresh Session fails fast on a misdrawn machine)
   const tools = [...sessionTools(session), ...expeditionTools(session), ...coreTools(() => session.workRoot(), root)];

@@ -336,6 +336,8 @@ const STYLE = `
   .logrow .lkind.k-update { font-weight: 700; color: #e8b339; }
   .logrow .lkind.k-note { font-style: italic; color: #c58fe8; }
   .logrow .lkind.k-aq { font-weight: 700; color: #7cc4e8; }
+  .aq-q { font-weight: 700; color: #7cc4e8; padding: 6px 0; white-space: pre-wrap; }
+  .aq-a { color: #cfd8dc; line-height: 1.5; padding: 4px 0; }
   .logrow .lbrief { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .logrow .lok { flex: 0 0 auto; color: #4a7a55; }
   .logrow.failed .lok { color: #e86a5f; }
@@ -948,6 +950,13 @@ async function openLogDetail(ref) {
   if (rec.tool === "se_update" && rec.args && rec.args.visit) { await showDecisions(rec.args.visit, null); return; }
   if ((rec.tool === "se_note" || rec.tool === "mirror_note") && rec.args) { showDetails("note · " + ((rec.response && rec.response.captured) || rec.ref), jsonTable({ at: rec.ts, text: rec.args.text, pending: "until a retro drains it" })); return; }
   if (rec.text !== undefined && rec.tool === undefined) { showDetails("note · " + rec.ref, jsonTable({ at: rec.at, text: rec.text, pending: "until a retro drains it" })); return; }
+  if (rec.tool === "se_answer" && rec.args) {
+    // The aq click shows BOTH, as prose — never the raw call record.
+    showDetails("aq · answered question",
+      '<div class="aq-q">' + escText(String(rec.args.question || "")) + "</div>" +
+      '<div class="aq-a prewrap">' + escText(String(rec.args.answer || "")) + "</div>");
+    return;
+  }
   showDetails("log · " + (rec.tool || ref), jsonTable({ at: rec.ts, request: { tool: rec.tool, args: rec.args }, response: rec.response === undefined ? null : rec.response, duration_ms: rec.duration_ms }));
 }
 async function showDecisions(visit, sel) {
