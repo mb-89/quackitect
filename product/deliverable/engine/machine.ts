@@ -37,6 +37,9 @@ export interface StateDecl {
   /** Diagram grouping, e.g. "boot" — presentation metadata, no run-time meaning. */
   group?: string;
   statement: string;
+  /** A short second line under the drawn node's name — the door's hint
+   *  ("In doubt, go here."). Authored, never derived. */
+  subtitle?: string;
   /** Optional: a human might fill a state too (owner ruling — v3 drops the requirement). */
   filled_by?: "agent" | "engine";
   /** Declared on the state, never invented at run time (engine-filled only). */

@@ -1,0 +1,13 @@
+{"ts":"2026-07-28T10:55:37.925Z","op":"plan","visit":"expeditions/e16@0","parent":null,"nodes":[{"id":"d2","brief":"retro and front desk become plain states on main"},{"id":"d3","brief":"explicit subtitle field rendered on the drawn node"},{"id":"d4","brief":"front-desk method doc tag-pulled as required reading"},{"id":"d5","brief":"authoring guidance carries the one-state rule"},{"id":"d6","brief":"tests updated and the suite green"},{"id":"d7","brief":"close and reload"}]}
+{"ts":"2026-07-28T10:56:13.146Z","op":"update","visit":"expeditions/e16@0","node":"d8","brief":"sweeping the last retro references before converting"}
+{"ts":"2026-07-28T10:57:19.370Z","op":"update","visit":"expeditions/e16@0","node":"d9","brief":"subtitle field lands across the engine surfaces"}
+{"ts":"2026-07-28T10:57:37.144Z","op":"update","visit":"expeditions/e16@0","node":"d10","brief":"retrying the subtitle batch with the worktree hash"}
+{"ts":"2026-07-28T10:57:47.364Z","op":"update","visit":"expeditions/e16@0","node":"d11","brief":"front desk becomes a plain state with tag-pulled method"}
+{"ts":"2026-07-28T10:57:55.109Z","op":"update","visit":"expeditions/e16@0","node":"d12","brief":"retro becomes a plain state keeping its legality zone"}
+{"ts":"2026-07-28T10:58:07.335Z","op":"update","visit":"expeditions/e16@0","node":"d13","brief":"main canvas points at the plain states and ideation drops its subtitle"}
+{"ts":"2026-07-28T10:58:24.246Z","op":"update","visit":"expeditions/e16@0","node":"d14","brief":"the four retired machine files are gone"}
+{"ts":"2026-07-28T10:58:41.998Z","op":"update","visit":"expeditions/e16@0","node":"d15","brief":"the desk method doc is written and tag-pulled"}
+{"ts":"2026-07-28T10:59:00.838Z","op":"update","visit":"expeditions/e16@0","node":"d16","brief":"the one-state rule lands in authoring guidance"}
+{"ts":"2026-07-28T10:59:32.584Z","op":"update","visit":"expeditions/e16@0","node":"d17","brief":"tests walk the plain retro and the converted desk"}
+{"ts":"2026-07-28T10:59:37.012Z","op":"update","visit":"expeditions/e16@0","node":"d18","brief":"suite over the one-state conversion"}
+{"ts":"2026-07-28T11:00:01.132Z","op":"done","visit":"expeditions/e16@0","node":"d2","brief":"retro and front desk stand as plain states on main"}

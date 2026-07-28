@@ -1,6 +1,7 @@
 // The retro's scope (owner ruling 2026-07-27): draining is legal in the
-// retro's drain state and NOWHERE else — "all" never grants a RESTRICTED
-// tool. Entering the drain demands the method read.
+// retro state and NOWHERE else — "all" never grants a RESTRICTED tool.
+// The retro is a PLAIN STATE (the one-state rule, owner 2026-07-28);
+// entering it demands the method read.
 import { strict as assert } from "node:assert";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
@@ -13,7 +14,7 @@ import { Session } from "../engine/session.ts";
 import { buildServer } from "../engine/tools.ts";
 import { call, freshRoot, readHashesFor } from "./helpers.ts";
 
-test("draining is retro-scoped: refused under 'all', legal in retro/drain — and the drain works", async () => {
+test("draining is retro-scoped: refused under 'all', legal in the retro state — and the drain works", async () => {
   const root = freshRoot();
   const session = new Session(root);
   const server = buildServer(root, session);
@@ -28,13 +29,11 @@ test("draining is retro-scoped: refused under 'all', legal in retro/drain — an
   const refused = await call(server, "se_note_drain", { ref, disposition: "done" });
   assert.equal(refused.isError, true);
   assert.equal(refused.body.clause, "SE-C-110");
-  // Enter the retro; its drain state demands the METHOD read.
+  // Enter the retro — one plain state; entering demands the METHOD read.
   const method = "product/guidance/method/retro.md";
   const withMethod = { ...hashes, [method]: contentHash(readFileSync(join(root, ...method.split("/")))) };
-  const intoRetro = await call(server, "se_tick", { to: "retro", read_hashes: hashes });
+  const intoRetro = await call(server, "se_tick", { to: "retro", read_hashes: withMethod });
   assert.equal(intoRetro.isError, false, JSON.stringify(intoRetro.body));
-  const inDrain = await call(server, "se_tick", { to: "drain", read_hashes: withMethod });
-  assert.equal(inDrain.isError, false, JSON.stringify(inDrain.body));
   // Here — and only here — the drain works; the note leaves the inbox.
   const drained = await call(server, "se_note_drain", { ref, disposition: "done", where: "test" });
   assert.equal(drained.isError, false, JSON.stringify(drained.body));
@@ -58,8 +57,7 @@ test("the backlog home (v1 port): backlog demands its ready-when, parks the note
   const ref = String(minted.body.captured);
   const method = "product/guidance/method/retro.md";
   const withMethod = { ...hashes, [method]: contentHash(readFileSync(join(root, ...method.split("/")))) };
-  await call(server, "se_tick", { to: "retro", read_hashes: hashes });
-  await call(server, "se_tick", { to: "drain", read_hashes: withMethod });
+  await call(server, "se_tick", { to: "retro", read_hashes: withMethod });
   // A made-up disposition refuses; backlog without its ready-when refuses.
   const bad = await call(server, "se_note_drain", { ref, disposition: "later" });
   assert.equal(bad.isError, true);
@@ -94,8 +92,7 @@ test("since last_retro: the log query scopes to the period after the newest drai
   const minted = await call(server, "se_note", { text: "marker" });
   const method = "product/guidance/method/retro.md";
   const withMethod = { ...hashes, [method]: contentHash(readFileSync(join(root, ...method.split("/")))) };
-  await call(server, "se_tick", { to: "retro", read_hashes: hashes });
-  await call(server, "se_tick", { to: "drain", read_hashes: withMethod });
+  await call(server, "se_tick", { to: "retro", read_hashes: withMethod });
   await call(server, "se_note_drain", { ref: String(minted.body.captured), disposition: "done", where: "test" });
   // … then act once more: the scoped query sees only the tail.
   await call(server, "se_tick", {});

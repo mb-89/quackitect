@@ -53,6 +53,8 @@ export interface StateMeta {
   exit_met: boolean;
   has_entry: boolean;
   entry_met: boolean;
+  /** The state's authored second line — drawn small under the name. */
+  subtitle?: string;
 }
 
 function machineSvg(canvas: CanvasData, activeIds: Set<string>, doneIds: Set<string>, subIds: Set<string>, meta: Record<string, StateMeta>): string {
@@ -104,7 +106,10 @@ function machineSvg(canvas: CanvasData, activeIds: Set<string>, doneIds: Set<str
       // Sub-machine states carry a DOUBLE border.
       parts.push(`<rect x="${n.x + 8}" y="${n.y + 8}" width="${n.width - 16}" height="${n.height - 16}" rx="${Math.max(4, rx - 8)}" class="${cls} inner"/>`);
     }
-    parts.push(`<text x="${n.x + n.width / 2}" y="${n.y + n.height / 2 + 6}" class="label">${esc(sid)}</text></g>`);
+    const sub = meta[sid]?.subtitle;
+    parts.push(`<text x="${n.x + n.width / 2}" y="${n.y + n.height / 2 + (sub !== undefined ? -6 : 6)}" class="label">${esc(sid)}</text>`);
+    if (sub !== undefined) parts.push(`<text x="${n.x + n.width / 2}" y="${n.y + n.height / 2 + 24}" class="sublabel">${esc(sub)}</text>`);
+    parts.push("</g>");
     // Condition buttons ride the node's edges: enter on the LEFT (where the
     // arrow comes in), leave on the RIGHT (in front of the arrow out).
     const mt = meta[sid];
@@ -269,6 +274,7 @@ const STYLE = `
   .clickable { cursor: pointer; }
   .clickable:hover .state, .clickable:hover .comment { stroke: #8fa0b0; }
   .label { fill: #d8dde2; font-size: 26px; text-anchor: middle; font-family: inherit; pointer-events: none; }
+  .sublabel { fill: #7f8b96; font-size: 17px; text-anchor: middle; font-family: inherit; pointer-events: none; }
   .edge { stroke: #5b6772; stroke-width: 2.5; }
   .arrowhead { fill: #5b6772; }
   .guard { fill: #e8b339; font-size: 20px; text-anchor: middle; }
@@ -1137,6 +1143,7 @@ export function renderMirror(m: MirrorState, widget?: "machine" | "details" | "l
       exit_met: m.session.conditionMet(decl, s, "leave"),
       has_entry: s.entry !== undefined,
       entry_met: m.session.conditionMet(decl, s, "enter"),
+      ...(s.subtitle !== undefined ? { subtitle: s.subtitle } : {}),
     };
   }
   const svg = machineSvg(canvas, leafActive, done, subIds, meta);

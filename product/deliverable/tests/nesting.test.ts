@@ -128,11 +128,14 @@ test("the front desk and ideation stand as idle doors with their drawn shapes", 
   assert.ok(idle.edges.some((e) => e.to === "ideation"), "idle reaches ideation");
   const fd = m.states.find((s) => s.id === "front_desk")!;
   assert.equal(fd.priority, 0.2);
-  assert.match(fd.statement, /in doubt, go here/i, "the door carries its subtitle");
+  assert.equal(fd.submachine, undefined, "the one-state rule: the desk is a plain state");
+  assert.match(fd.subtitle ?? "", /in doubt, go here/i, "the door carries its subtitle");
+  assert.ok((fd.tags ?? []).includes("front-desk"), "the method doc pulls by this tag");
+  const retro = m.states.find((s) => s.id === "retro")!;
+  assert.equal(retro.submachine, undefined, "the retro converted under the same rule");
+  assert.ok((retro.legal_tools ?? []).includes("se_note_drain"), "the legality zone rides legal_tools");
   const idea = m.states.find((s) => s.id === "ideation")!;
   assert.equal(idea.priority, 1, "the ideation door sits at the slider's top notch");
-  const fdM = compileMachine(root, join(root, "product", "deliverable", "machines", "front_desk.canvas"));
-  assert.deepEqual(fdM.states.map((s) => s.id), ["start", "consult", "end"]);
   const ideaM = compileMachine(root, join(root, "product", "deliverable", "machines", "ideation.canvas"));
   assert.deepEqual(ideaM.states.map((s) => s.id), ["start", "frame", "diverge", "converge", "route", "end"]);
 });

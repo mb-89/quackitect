@@ -306,10 +306,12 @@ export function stateFromNote(machineId: string, ref: string, notePath: string, 
   const exit = conditionDict(machineId, ref, root, "exit", x);
   const tags = asList(x.tags);
   const submachine = asString(x.submachine);
+  const subtitle = asString(x.subtitle);
   return {
     id: stateId,
     kind,
     statement: note.statement,
+    ...(subtitle !== undefined && subtitle !== "" ? { subtitle } : {}),
     guidance,
     priority,
     evidence_form: [...evidenceForm(machineId, ref, note.body), ...(kind === "gate" ? STANDARD_ROUNDS : [])],

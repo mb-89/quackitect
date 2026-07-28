@@ -1,7 +1,7 @@
 {
 	"metadata":{
 		"version":"1.0-1.0",
-		"frontmatter":{"reentry":"restart","priority":1,"statement":"The ideation machine - diverge on purpose."}
+		"frontmatter":{"reentry":"restart","priority":1,"statement":"The ideation machine."}
 	},
 	"nodes":[
 		{"id":"n-comment","type":"text","text":"IDEATION - frame the hunt, diverge over the method-card catalog (machines/methods/), converge with a quick Pugh, route everything with a recorded reason (default - a note). The door sits at the slider's ideation notch (priority 1) - the person fires it deliberately.","x":-1560,"y":-340,"width":700,"height":140},
