@@ -89,6 +89,7 @@ Write plainly. These are rules, not suggestions. They bind every output: chat, d
 - A direct question from a person gets its answer RECORDED, not only chatted. Use se_answer with the question and the full answer.
 - The log shows an aq entry. The feed line is the question. The click shows both.
 - Chat can be lost mid-turn. The harness may swallow an answer while you work. The log entry is the durable copy. Record it in the same breath as the chat answer.
+- The question and the answer are SEPARATE PARAGRAPHS wherever they appear together. In se_answer they are separate fields already. In a note or a report, a blank line divides them. Never one run-on blob.
 
 ### The sycophancy guard (applies to every assessment)
 - Praise is a signal, not a nicety. Endorse only what survives the disconfirming question.
