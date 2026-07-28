@@ -101,3 +101,4 @@
 {"ts":"2026-07-28T12:51:13.970Z","op":"update","visit":"expeditions/e16@0","node":"d7","brief":"atomic close patched with its conflict-probe regression test"}
 {"ts":"2026-07-28T12:51:21.233Z","op":"update","visit":"expeditions/e16@0","node":"d8","brief":"running the suite over the merge and the atomic close"}
 {"ts":"2026-07-28T12:51:52.310Z","op":"done","visit":"expeditions/e16@0","node":"d3","brief":"suite green at 106 with the conflict-probe test"}
+{"ts":"2026-07-28T12:52:23.250Z","op":"done","visit":"expeditions/e16@0","node":"d4","brief":"closing e16 with apply — the branch absorbed trunk, the merge is clean"}
