@@ -344,6 +344,15 @@ export class Decisions {
       case "done":
       case "obsolete":
       case "revert": {
+        // IDEMPOTENT, for the reason plan and fork already are: the update
+        // rides BEFORE the call's verdict, and every refusal's remedy says to
+        // repeat the call. So a call refused for some UNRELATED reason comes
+        // back with its resolution already applied, and the retry used to be
+        // refused for a second, more confusing reason. Re-resolving a node the
+        // SAME way is the state we were asked for; only a CONFLICTING
+        // re-resolution is a real disagreement worth refusing.
+        const already = this.nodes.get(u.node!);
+        if (already !== undefined && already.status === CLOSES[u.op]) break;
         const n = this.openNode(u.node!);
         if (u.op === "done") {
           const open = this.openChildren(n.id);

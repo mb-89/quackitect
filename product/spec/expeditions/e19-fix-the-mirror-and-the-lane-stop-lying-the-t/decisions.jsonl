@@ -15,3 +15,8 @@
 {"ts":"2026-07-28T16:39:32.058Z","op":"update","visit":"expeditions/e19@0","node":"d60","brief":"pinning that the handover resolves to the root while bound"}
 {"ts":"2026-07-28T16:40:12.320Z","op":"done","visit":"expeditions/e19@0","node":"d45","brief":"handover resolves to the root; the guidance tree is an owner ruling"}
 {"ts":"2026-07-28T16:40:22.888Z","op":"done","visit":"expeditions/e19@0","node":"d53","brief":"a machine switch now carries the reader's open detail"}
+{"ts":"2026-07-28T16:41:39.335Z","op":"update","visit":"expeditions/e19@0","node":"d61","brief":"narration can no longer veto the work it narrates"}
+{"ts":"2026-07-28T16:41:47.145Z","op":"update","visit":"expeditions/e19@0","node":"d62","brief":"importing the rejection payload type for the complaint"}
+{"ts":"2026-07-28T16:42:42.344Z","op":"update","visit":"expeditions/e19@0","node":"d63","brief":"the feed test now pins the new law instead of the old one"}
+{"ts":"2026-07-28T16:42:53.340Z","op":"update","visit":"expeditions/e19@0","node":"d64","brief":"pinning idempotent resolution and the conflicting case"}
+{"ts":"2026-07-28T16:43:38.598Z","op":"done","visit":"expeditions/e19@0","node":"d47","brief":"a bad brief no longer destroys its call"}

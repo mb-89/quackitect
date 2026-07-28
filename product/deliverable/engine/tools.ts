@@ -8,7 +8,7 @@
 //         never silently coerced (the String(undefined) incident).
 //   NEW — unknown args are refused too, naming the accepted set.
 //   §5  — honest truncation everywhere; results carry the remedy inline.
-import { CLAUSES, Rejection } from "./errors.ts";
+import { CLAUSES, Rejection, type RejectionPayload } from "./errors.ts";
 import { CallLog } from "./calllog.ts";
 import { parseUpdate } from "./decisions.ts";
 import { Toll } from "./toll.ts";
@@ -586,15 +586,35 @@ export function buildServer(root: string, session = new Session(root), tollOpts:
   // THE UPDATE RIDES FIRST — applied before any other verdict (the
   // narration stands even when the call itself is then refused), logged as
   // its own record, paying the toll. Stripped so handlers never see it.
+  //
+  // BUT A BAD UPDATE NEVER DESTROYS ITS CALL (owner ruling 2026-07-28).
+  // Narration is commentary, and commentary that vetoes the act it comments
+  // on has the causality backwards. A brief with one semicolon too many used
+  // to reject the whole call and take the payload with it — a four-thousand
+  // word answer, a four-file atomic patch, a finished note — all discarded
+  // over the punctuation of a label riding alongside. Measured at the retro:
+  // this mechanism caused 18 of 25 sampled refusals.
+  //
+  // The work lands. The complaint rides back on the result. And the toll goes
+  // UNPAID, so the rule keeps its teeth — it just bites the narration now,
+  // instead of the work.
+  let updateComplaint: RejectionPayload | undefined;
   server.addGuard((tool, args) => {
+    updateComplaint = undefined;
     if (args.update === undefined) return;
     const raw = args.update;
     delete args.update;
-    const op = parseUpdate(raw);
-    const visit = session.currentVisit();
-    const result = session.decisions.apply(visit, op);
-    log.append({ tool: "se_update", args: { via: tool, visit, ...op }, ok: true, outcome: "result", duration_ms: 0, response: result });
-    toll.paid();
+    try {
+      const op = parseUpdate(raw);
+      const visit = session.currentVisit();
+      const result = session.decisions.apply(visit, op);
+      log.append({ tool: "se_update", args: { via: tool, visit, ...op }, ok: true, outcome: "result", duration_ms: 0, response: result });
+      toll.paid();
+    } catch (e) {
+      if (!(e instanceof Rejection)) throw e;
+      updateComplaint = e.toJSON();
+      log.append({ tool: "se_update", args: { via: tool, refused: true }, ok: false, outcome: "rejected", duration_ms: 0, response: updateComplaint });
+    }
   });
 
   // THE TOLL — armed after boot; one grace warning, then the refusal.
@@ -605,6 +625,17 @@ export function buildServer(root: string, session = new Session(root), tollOpts:
     const w = toll.takeWarning();
     if (w === undefined || typeof result !== "object" || result === null || Array.isArray(result)) return result;
     return { ...(result as Record<string, unknown>), toll_warning: w };
+  });
+
+  // The refused update rides home on the call it could not stop.
+  server.addDecorator((_tool, result) => {
+    const c = updateComplaint;
+    updateComplaint = undefined;
+    if (c === undefined || typeof result !== "object" || result === null || Array.isArray(result)) return result;
+    return {
+      ...(result as Record<string, unknown>),
+      update_refused: { ...c, note: "THE CALL WENT THROUGH — this update did not. Carry a corrected one on your next call; the toll is unpaid until you do." },
+    };
   });
 
   // R8 + unknown-args: the declared shape is the accepted one (whitelist).
