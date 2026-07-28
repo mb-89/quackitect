@@ -4,8 +4,9 @@ quackitect v3 — install-check, selftest, and launch.
 
 .DESCRIPTION
 Preflight (node/git/ripgrep hard deps), cage install, engine selftests, then
-the caged agent. EVERY argument is forwarded to the se server - flags are
-defined ONCE, in engine/bin/se-mcp.ts (--help lists them).
+the caged agent. EVERY argument except --one-screen is forwarded to the se
+server - those flags are defined ONCE, in engine/bin/se-mcp.ts. Run
+.\RUNME.ps1 --help for both lists.
 
 .EXAMPLE
 .\RUNME.ps1
@@ -21,8 +22,21 @@ $root = $PSScriptRoot
 # recognizes the help spellings, and answers them with the server's help --
 # plus --one-screen, the one flag it owns, which the server never sees.
 $forwarded = @($args | ForEach-Object { "$_" })
+$HELP = @"
+RUNME.ps1 - install-check, selftest, launch.
+
+  .\RUNME.ps1 [--one-screen] [server flags...]
+
+  --one-screen   run the agent inside a terminal hosted beside it, so the
+                 Mirror shows the agent in its left column. The host runs in
+                 the BACKGROUND, so this window is free to close afterwards.
+                 RUNME owns this flag - the server never sees it.
+  --help         this text (-h, -?, -Help)
+
+  EVERY OTHER ARGUMENT is forwarded to the se server, whose own flags follow.
+"@
 if ($forwarded | Where-Object { $_ -in @("--help", "-h", "-?", "-Help") }) {
-  Write-Host "RUNME.ps1 - install-check, selftest, launch. Every argument is forwarded to the se server:" -ForegroundColor Cyan
+  Write-Host $HELP -ForegroundColor Cyan
   $node = Get-Command node -ErrorAction SilentlyContinue
   if ($node) { node (Join-Path $root "product\deliverable\engine\bin\se-mcp.ts") --help }
   else { Write-Host "  (node not installed yet - the flags live in product\deliverable\engine\bin\se-mcp.ts)" }
@@ -120,6 +134,10 @@ if ($null -eq $claude) {
 # changes how RUNME launches, not how the engine runs. Without the flag
 # nothing changes: a terminal that will not start must never cost you your
 # agent.
+#
+# The host is started DETACHED. With the terminal in the browser, this window
+# has nothing left to show, and leaving the session tied to it means closing
+# the window kills the agent - which happened for real on 2026-07-28.
 $oneScreen = [bool]($forwarded | Where-Object { $_ -eq "--one-screen" })
 $forwarded = @($forwarded | Where-Object { $_ -ne "--one-screen" })
 $env:SE_ARGS = ($forwarded -join "`n")
@@ -138,8 +156,8 @@ $kickoff = 'Session start. Tick the machine and walk as far as the threshold all
 Push-Location (Join-Path $root "workspace")
 try {
   if ($oneScreen) {
-    Write-Host "quackitect v3 - one screen: the agent runs in the Mirror's terminal pane" -ForegroundColor Cyan
-    node (Join-Path $root "product\deliverable\engine\bin\se-pty.ts") --pty-port 7334 -- claude $kickoff
+    Write-Host "quackitect v3 - one screen: the agent runs in the Mirror's terminal pane, in the background" -ForegroundColor Cyan
+    node (Join-Path $root "product\deliverable\engine\bin\se-pty.ts") --pty-port 7334 --detach -- claude $kickoff
   } else {
     claude $kickoff
   }

@@ -59,6 +59,9 @@ if (argv.some((a) => a === "--help" || a === "-h" || a === "-?")) {
   --manual       alias for --autonomy 0 — you drive every step from the mirror
   --mirror-port  the embedded mirror's HTTP port (the human's hand on the
                  same walk). Default 7333. 0 disables. Env: SE_MIRROR_PORT.
+  --child        INTERNAL, never typed by hand. The shim spawns itself with
+                 it to run the engine proper. SE_HOT_DISABLE=1 does the same
+                 in one process.
   --help         this text (-h, -?)
 
   RELOAD: se_reload (agent or mirror hand, at idle only) restarts the

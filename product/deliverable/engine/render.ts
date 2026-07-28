@@ -387,9 +387,9 @@ const STYLE = `
   .divider.horiz { width: auto; height: 6px; cursor: row-resize; }
   aside { width: 620px; min-width: 320px; max-width: 80vw; display: flex; flex-direction: column; background: #191d21; }
   /* THE LEFT COLUMN: the feed on top, the agent's terminal beneath it.
-     A hundred monospace columns is what the terminal wants to start at; the
-     divider moves it from there and the width is the reader's from then on. */
-  #left { width: 820px; min-width: 360px; }
+     This width is a STARTING POINT only. The divider moves it, and the size
+     the reader lands on is stored and reused from then on. */
+  #left { width: 547px; min-width: 360px; }
   #left #w-log { flex: 1; min-height: 0; }
   /* HALF THE COLUMN TO START, then the reader's (owner ruling 2026-07-28).
      It used to be flex:none with no height, so the box was as tall as its
@@ -1110,6 +1110,37 @@ if (svg) {
   window.addEventListener("mouseup", () => { if (panning) saveVb(); panning = null; svg.classList.remove("panning"); });
 }
 
+// A PANE THE READER SIZED KEEPS THAT SIZE (owner ruling 2026-07-28).
+//
+// Walking into a sub-state is a full page load, and a width set by dragging
+// is an inline style, which no page load survives. So every entry into a
+// sub-machine snapped the whole layout back to its defaults — the machine
+// drawing included, because it takes whatever the two columns leave it.
+//
+// A pane size is a PREFERENCE, not a view of something: it is about how the
+// reader likes to work, not about which machine is on screen. So it outlives
+// the tab in localStorage, while the per-machine viewBox stays in
+// sessionStorage, where a view of one drawing belongs.
+const PANE_KEY = "se-pane-";
+function savePaneSize(pane, axis, px) {
+  try { localStorage.setItem(PANE_KEY + pane.id + "-" + axis, String(Math.round(px))); } catch (e) { /* storage full — the pane just re-defaults */ }
+}
+function restorePaneSizes() {
+  document.querySelectorAll(".divider").forEach((dv) => {
+    const pane = document.getElementById(dv.dataset.pane);
+    if (pane === null) return;
+    const axis = dv.dataset.axis === "y" ? "height" : "width";
+    let px = 0;
+    try { px = Number(localStorage.getItem(PANE_KEY + pane.id + "-" + axis) || "0"); } catch (e) { /* no storage — the defaults stand */ }
+    if (!(px > 0)) return;
+    // A size saved on a wider screen must not push the rest of the layout
+    // off a narrower one, so the stored value is a wish, not a command.
+    const room = axis === "width" ? window.innerWidth : (pane.parentElement === null ? px : pane.parentElement.clientHeight);
+    pane.style[axis] = Math.max(140, Math.min(px, room - 120)) + "px";
+  });
+}
+restorePaneSizes();
+
 // Each divider names the pane it moves and which side that pane sits on:
 // a divider on the pane's far side grows it as you drag TOWARDS the pane.
 // data-axis y makes it a horizontal splitter moving height instead of width.
@@ -1133,7 +1164,11 @@ document.querySelectorAll(".divider").forEach((dv) => {
     const room = pane.parentElement === null ? want : pane.parentElement.clientHeight - 120;
     pane.style.height = Math.max(140, Math.min(want, room)) + "px";
   });
-  window.addEventListener("mouseup", () => { drag = null; });
+  window.addEventListener("mouseup", () => {
+    if (drag === null) return;
+    drag = null;
+    savePaneSize(pane, vert ? "height" : "width", vert ? pane.offsetHeight : pane.offsetWidth);
+  });
 });
 
 if (CURRENT && D.states[CURRENT] && WALK_HERE) { CURRENT_DETAIL = "state:" + CURRENT; showDetails("state: " + CURRENT, stateDetail(CURRENT)); }

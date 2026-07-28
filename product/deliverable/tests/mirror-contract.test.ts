@@ -135,6 +135,31 @@ test("a machine switch carries the reader's open detail with it", () => {
   assert.ok(html.includes('new URLSearchParams(location.search).get("detail")'), "and the page it lands on restores it");
 });
 
+// A PANE THE READER SIZED KEEPS THAT SIZE (owner ruling 2026-07-28). Walking
+// into a sub-state is a full page load, and a dragged width is an inline
+// style, which no page load survives. Every entry into a sub-machine snapped
+// the layout back to its defaults, the machine drawing with it.
+test("pane sizes are stored on release and restored on load", () => {
+  const root = freshRoot();
+  const html = renderMirror({ session: new Session(root), root, lastPacket: undefined, mode: "manual" });
+  assert.ok(html.includes("function savePaneSize"), "a released divider stores the size");
+  assert.ok(html.includes("restorePaneSizes();"), "and the next page load puts it back");
+  // localStorage, not sessionStorage: how the reader likes to work outlives
+  // the tab, unlike the per-machine viewBox beside it.
+  assert.match(html, /localStorage\.setItem\(PANE_KEY/, "the size is a preference, so it survives the tab");
+  assert.match(html, /sessionStorage\.setItem\(VB_KEY/, "while the view of one drawing stays session-scoped");
+  // A size saved on a wider screen must not push the layout off a narrow one.
+  assert.ok(html.includes("Math.min(px, room - 120)"), "a stored size is clamped to the room there actually is");
+});
+
+// The left column starts narrower than it used to (owner, 2026-07-28): two
+// thirds of the old 820px. It is only a starting point — the stored size wins.
+test("the left column's default width is two thirds of the old one", () => {
+  const root = freshRoot();
+  const html = renderMirror({ session: new Session(root), root, lastPacket: undefined, mode: "manual" });
+  assert.match(html, /#left \{ width: 547px;/, "820px was too wide by default");
+});
+
 // HUMAN-RUNNABLE TOOLS RIDE THE LEGAL-TOOLS LINKS (owner ruling 2026-07-28).
 // The survey had a button of its own in the machine header, and the owner
 // never found it there among the crumbs, the slider and the escape control.

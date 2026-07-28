@@ -18,7 +18,13 @@ function argValue(flag: string): string | undefined {
   return i >= 0 ? process.argv[i + 1] : undefined;
 }
 if (process.argv.some((a) => a === "--help" || a === "-h" || a === "-?")) {
-  process.stdout.write("preflight — the boot checks; exit 0 when green\n\n  node engine/bin/preflight.ts --root <project root>\n");
+  process.stdout.write(`preflight — the boot checks; exit 0 when green
+
+  node engine/bin/preflight.ts --root <project root>
+
+  --root  the quackitect project root. Default: the current directory.
+  --help  this text (-h, -?)
+`);
   process.exit(0);
 }
 

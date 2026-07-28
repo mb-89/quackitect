@@ -5,7 +5,10 @@
 // in. So this process is a SIBLING: RUNME starts it, it starts the agent
 // inside a pseudo-terminal, and the mirror only renders a client for it.
 //
-//   node engine/bin/se-pty.ts [--pty-port 7334] -- <command> [args...]
+//   node engine/bin/se-pty.ts [--pty-port 7334] [--detach] -- <command> [args...]
+//
+// --detach re-execs this file as a BACKGROUND process, so the window that
+// launched the session can be closed without taking the session down.
 //
 // The pseudo-terminal and its scrollback live HERE, in a process that never
 // reloads, so a browser refresh reattaches and replays instead of losing the
@@ -22,6 +25,7 @@ import { createServer, type IncomingMessage, type ServerResponse } from "node:ht
 import { spawn } from "node:child_process";
 import { createRequire } from "node:module";
 import { readFileSync } from "node:fs";
+import { fileURLToPath } from "node:url";
 
 const argv = process.argv.slice(2);
 const dashdash = argv.indexOf("--");
@@ -33,7 +37,31 @@ const flagValue = (name: string): string | undefined => {
   const i = flags.indexOf(name);
   return i >= 0 ? flags[i + 1] : undefined;
 };
+
+if (flags.some((a) => a === "--help" || a === "-h" || a === "-?")) {
+  process.stdout.write(`se-pty — the terminal host, so the agent and the machine share one screen
+
+  node engine/bin/se-pty.ts [--pty-port 7334] [--detach] -- <command> [args...]
+
+  --pty-port     the port the terminal is served on. Default 7334.
+                 Env: SE_PTY_PORT.
+  --detach       run the terminal host in the BACKGROUND and return at once,
+                 so the window that launched the session can be closed
+                 without taking the session down. Ignored when no terminal
+                 binding is installed: the command then runs on the inherited
+                 terminal, and a background process has none.
+  --help         this text (-h, -?)
+  --             everything after it is the command to run in the terminal
+
+  The mirror only renders a client for this host. The scrollback lives here,
+  in a process that never reloads, so a browser refresh reattaches and
+  replays instead of losing the session.
+`);
+  process.exit(0);
+}
+
 const port = Number(flagValue("--pty-port") ?? process.env.SE_PTY_PORT ?? 7334);
+const detach = flags.includes("--detach");
 
 if (command.length === 0) {
   process.stderr.write("se-pty: nothing to run — pass the command after --\n");
@@ -140,16 +168,68 @@ function startServer(): void {
   server.listen(port, () => process.stderr.write(`se-pty: the agent's terminal is served on http://localhost:${port}\n`));
 }
 
+/** Does a terminal host already answer on this port? Asked BEFORE detaching.
+ *  A second host would fail to listen and die unseen, while the poll below
+ *  found the OLD one and called it success. */
+async function portAnswers(): Promise<boolean> {
+  try {
+    return (await fetch(`http://localhost:${port}/pty/alive`)).ok;
+  } catch {
+    return false;
+  }
+}
+
+/** Wait for the background host to start listening. */
+async function waitForAlive(timeoutMs: number, now: () => number): Promise<boolean> {
+  const until = now() + timeoutMs;
+  while (now() < until) {
+    if (await portAnswers()) return true;
+    await new Promise((r) => setTimeout(r, 100));
+  }
+  return false;
+}
+
 async function main(): Promise<void> {
   let nodePty: { spawn: (file: string, args: string[], opts: Record<string, unknown>) => { onData: (f: (d: string) => void) => void; onExit: (f: (e: { exitCode: number }) => void) => void; write: (d: string) => void; resize: (c: number, r: number) => void } };
   try {
     nodePty = (await import("@lydell/node-pty")) as never;
   } catch {
     // FAIL SAFE — the owner still gets their agent, just not in the browser.
+    // DETACHING IS SKIPPED ON THIS PATH DELIBERATELY. Without a terminal
+    // binding the command runs on the terminal it inherited, and a background
+    // process has none — detaching would hand back a session nobody can type
+    // into. Losing the browser terminal is a downgrade; losing the agent is a
+    // dead session.
     process.stderr.write("se-pty: no pseudo-terminal binding installed — running on this terminal instead\n");
     const child = spawn(command[0], command.slice(1), { stdio: "inherit", shell: process.platform === "win32" });
     child.on("exit", (code) => process.exit(code ?? 0));
     return;
+  }
+
+  // THE DETACH — re-exec as a background process and hand the window back.
+  // The terminal host owns the agent, so the host is what has to survive; the
+  // env stamp is what stops the background copy from detaching again.
+  if (detach && process.env.SE_PTY_DETACHED !== "1") {
+    if (await portAnswers()) {
+      process.stderr.write(`se-pty: a terminal host already answers on ${port} — stop it, or pass --pty-port to pick another\n`);
+      process.exit(1);
+    }
+    const bg = spawn(process.execPath, [fileURLToPath(import.meta.url), ...process.argv.slice(2)], {
+      detached: true,
+      stdio: "ignore",
+      windowsHide: true,
+      env: { ...process.env, SE_PTY_DETACHED: "1" },
+    });
+    bg.unref();
+    // PROVE IT CAME UP. A detached process writes nowhere, so silence here
+    // would be indistinguishable from a crash.
+    if (!(await waitForAlive(10_000, () => Date.now()))) {
+      process.stderr.write(`se-pty: the background terminal host did not answer on ${port} within 10s\n`);
+      process.exit(1);
+    }
+    process.stderr.write(`se-pty: the agent's terminal is served on http://localhost:${port} — background process, pid ${bg.pid}\n`);
+    process.stderr.write("se-pty: this window is free to close; stop the session from the mirror, or kill that pid\n");
+    process.exit(0);
   }
   // Windows cannot start a bare name or an npm .cmd shim through a
   // pseudo-terminal — CreateProcess wants a real file. The shell resolves

@@ -14,6 +14,24 @@ thresholds live in `machines/lint/voice-lint.md`; edit the file and the
 next `se_lint` call uses it, with no rebuild and no reload. The rules'
 LOGIC stays code — only their parameters are data.
 
+## Every switch appears in help (owner ruling 2026-07-28)
+
+Every command-line switch a program parses is listed by that program's
+`--help`. No exceptions, including internal ones — mark those as internal
+rather than hiding them.
+
+A switch nobody can discover is a switch nobody has. `--one-screen` sat
+in the launcher for weeks, undocumented, because the launcher's help only
+forwarded to the server's help and the server had never heard of it.
+
+A program that forwards arguments to another still owns its OWN flags. It
+prints them first, then the other program's help.
+
+THE RULE IS A TEST, NOT A SENTENCE (the linter law, below). The guard
+reads the switches each entry point parses out of its source, runs it with
+`--help`, and demands every one of them in the output:
+`product/deliverable/tests/help.test.ts`.
+
 ## The linter law (P5, field-proven twice)
 
 Prose rules do not change agent behavior; refusals and tool-boundary
