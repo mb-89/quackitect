@@ -43,3 +43,10 @@ system; nothing here reads or checks it. Durable knowledge goes where the
 machine reads it: guidance, machines, condition notes, the spec. What the
 NEXT session must know goes to .se/HANDOVER.md — boot demands it read.
 The retro sweeps any memory that appears anyway into a repo home.
+
+## 8. Walk, do not ruminate
+While a state is in your hand, do the state's work — nothing else. Do
+not philosophize about the step's point or purpose. Do not reflect on
+the process mid-walk. Do not re-derive settled decisions. Doubt is a
+note (rule 4). Disagreement is a note (rule 6). Reflection belongs to
+the retro.
