@@ -56,8 +56,10 @@ export function readRecord(root: string, e: Expedition): Record<string, unknown>
     if (!existsSync(abs)) return undefined;
     return parseStateNote(readFileSync(abs, "utf8")).frontmatter;
   }
-  // Closed: the MERGED copy is the truth — retro flips (report: approved |
-  // dismissed) land on the main tree; the branch is frozen at close.
+  // Closed: the record lives ON ITS BRANCH (owner ruling 2026-07-28 —
+  // history is git's, the tree carries only live work). The close stamped
+  // the ruling; the leave review IS the adjudication. A legacy merged
+  // copy still reads.
   const merged = join(root, rel);
   if (existsSync(merged)) return parseStateNote(readFileSync(merged, "utf8")).frontmatter;
   const r = spawnSync("git", ["show", `${e.branch}:${rel}`], { cwd: root, encoding: "utf8", maxBuffer: 8 * 1024 * 1024 });
@@ -177,7 +179,17 @@ export function expClose(root: string, e: Expedition, merge: boolean): { id: str
     git(e.path, ["add", "-A"], "add");
     git(e.path, ["commit", "-m", `expedition ${e.id}: close`], "commit");
   }
-  if (merge) git(root, ["merge", "--no-ff", e.branch, "-m", `merge expedition ${e.id}`], "merge");
+  if (merge) {
+    git(root, ["merge", "--no-ff", e.branch, "-m", `merge expedition ${e.id}`], "merge");
+    // CLOSED RECORDS LIVE IN GIT (owner ruling 2026-07-28): history is
+    // git's; the tree carries only live work. The record rode the merge —
+    // retire its dir in the same breath; the branch keeps serving it.
+    const dirRel = `product/spec/expeditions/${e.id}`;
+    git(root, ["rm", "-r", "-q", "--ignore-unmatch", dirRel], "rm record");
+    if (spawnSync("git", ["diff", "--cached", "--quiet", "--", dirRel], { cwd: root }).status === 1) {
+      git(root, ["commit", "-q", "-m", `expedition ${e.id}: record retires to its branch`, "--", dirRel], "commit");
+    }
+  }
   git(root, ["worktree", "remove", "--force", e.path], "worktree remove");
   return { id: e.id, merged: merge };
 }

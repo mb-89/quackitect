@@ -1,7 +1,0 @@
-{"ts":"2026-07-27T14:57:07.201Z","op":"note","visit":"idle@5","node":"d15","brief":"scale.md truth + live load, M floor restored, drain off always-legal"}
-{"ts":"2026-07-27T14:57:35.571Z","op":"note","visit":"idle@5","node":"d15","brief":"M floor restored in tests/messages; e5–e8 reports dismissed per owner ruling"}
-{"ts":"2026-07-27T14:58:38.442Z","op":"plan","visit":"idle@5","parent":null,"nodes":[{"id":"d20","brief":"retro sub-machine off idle + restricted-tools rule (drain only in retro), with tests"},{"id":"d21","brief":"backfill e4 + e5 records as closed/dismissed"}]}
-{"ts":"2026-07-27T14:59:45.788Z","op":"note","visit":"idle@5","node":"d15","brief":"retro machine wired off idle; restricted rule: all never grants drain"}
-{"ts":"2026-07-27T15:00:32.459Z","op":"note","visit":"idle@5","node":"d15","brief":"restricted-tools rule in the gate; retro machine wired; container test extension next"}
-{"ts":"2026-07-27T15:01:15.844Z","op":"note","visit":"idle@5","node":"d15","brief":"selftest over the retro scope, scale truth-file and record flips"}
-{"ts":"2026-07-27T15:04:47.017Z","op":"done","visit":"idle@4","node":"d15","brief":"retro machine + restricted rule shipped and tested; M floor restored; scale.md truth live; reports dismissed + records backfilled"}

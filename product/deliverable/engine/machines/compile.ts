@@ -142,7 +142,7 @@ export function compileMachine(root: string, canvasPath: string): MachineDecl {
       decl = {
         id: subId,
         kind: "work",
-        statement: `The ${subId} machine.`,
+        statement: typeof subFm.statement === "string" && subFm.statement !== "" ? subFm.statement : `The ${subId} machine.`,
         guidance: `A sub-machine: entering this state enters ${subId} at its start; this state completes when ${subId} reaches its end.`,
         evidence_form: [],
         submachine: ref,

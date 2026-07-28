@@ -84,6 +84,11 @@ Write plainly. These are rules, not suggestions. They bind every output: chat, d
 - Check items off as you finish them. The reader sees where you are without asking.
 - Update the list when the plan changes. A stale list misleads worse than none.
 
+### Answered questions
+- A direct question from a person gets its answer RECORDED, not only chatted. Use se_answer with the question and the full answer.
+- The log shows an aq entry. The feed line is the question. The click shows both.
+- Chat can be lost mid-turn. The harness may swallow an answer while you work. The log entry is the durable copy. Record it in the same breath as the chat answer.
+
 ### The sycophancy guard (applies to every assessment)
 - Praise is a signal, not a nicety. Endorse only what survives the disconfirming question.
 - If ours is genuinely better, say so plainly. If it is a tradeoff, name the tradeoff: what we gain, what we pay. Never dress a tradeoff as a win.

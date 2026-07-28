@@ -116,6 +116,22 @@ export class Session {
     this.machine = compileMachine(root, mainMachinePath(root));
     this.instance = newInstance(this.machine);
     this.decisions = new Decisions(seDir(root));
+    // SETTINGS SURVIVE THE ENGINE (owner ruling 2026-07-28): the mirror's
+    // sliders restore across reloads like the decision graph — ONE store,
+    // restored wholesale, ready for settings still to come.
+    try {
+      const s = JSON.parse(readFileSync(join(seDir(root), "settings.json"), "utf8")) as { autonomy?: number; shutdown?: number };
+      if (typeof s.autonomy === "number" && s.autonomy >= 0 && s.autonomy <= 1) this._autonomy = s.autonomy;
+      if (typeof s.shutdown === "number" && Number.isInteger(s.shutdown) && s.shutdown >= 1 && s.shutdown <= 5) this._shutdown = s.shutdown;
+    } catch { /* no store yet — the defaults stand */ }
+    this.syncKeepAwake();
+  }
+
+  private persistSettings(): void {
+    try {
+      mkdirSync(seDir(this.root), { recursive: true });
+      writeFileSync(join(seDir(this.root), "settings.json"), JSON.stringify({ autonomy: this._autonomy, shutdown: this._shutdown }) + "\n", "utf8");
+    } catch { /* a failed save never blocks the slider */ }
   }
 
   /** Boot is done — the toll arms on this; the reading room pays none. */
@@ -161,6 +177,7 @@ export class Session {
     }
     const was = this._shutdown;
     this._shutdown = value;
+    this.persistSettings();
     this.syncKeepAwake();
     this.notifyChange();
     return { shutdown: value, was };
@@ -217,6 +234,7 @@ export class Session {
     }
     const was = this._autonomy;
     this._autonomy = value;
+    this.persistSettings();
     this.notifyChange(); // a holding agent wakes and re-reads the packet
     return { autonomy: value, was };
   }
@@ -349,6 +367,18 @@ export class Session {
         got: "none open",
         remedy: { tool: "se_tick", args: {}, note: "enter the expedition via continue_expedition first" },
         source: "engine/session.ts expedition",
+      });
+    }
+    // THE GRAPH IS EVIDENCE at the close itself too — the leave gate can
+    // be bypassed (close is legal in the work state), the close cannot.
+    const open = this.openRecordPoints();
+    if (open.length > 0) {
+      throw new Rejection({
+        clause: CLAUSES.DECISION_UNRESOLVED,
+        expected: "no open decision point on this record — the graph is evidence",
+        got: open.slice(0, 8).map((n) => `${n.id}: ${n.brief}`).join(" · ") + (open.length > 8 ? ` · …and ${open.length - 8} more` : ""),
+        remedy: { tool: "se_tick", args: { update: { op: "done", node: open[0].id, brief: "<how it resolved>" } }, note: "resolve every point (done | obsolete | revert | defer), then close" },
+        source: "engine/session.ts close",
       });
     }
     const result = expClose(this.root, this.bound, merge);
@@ -494,6 +524,23 @@ export class Session {
     if (id === "expedition_archive") return generateExpeditionArchive(this.root);
     if (id === "iteration_archive") return generateIterationArchive(this.root);
     return undefined;
+  }
+
+  /** The PARENT CHAIN of a viewable machine, main first — the mirror's
+   *  breadcrumbs render it, so a nested decade reads
+   *  main › expedition_archive › e1-e10 (owner ruling 2026-07-28). */
+  viewChain(id: string): string[] {
+    if (id === this.machine.id) return [this.machine.id];
+    const idx = this.subs.findIndex((s) => s.decl.id === id);
+    if (idx >= 0) return [this.machine.id, ...this.subs.slice(0, idx + 1).map((s) => s.decl.id)];
+    if (this.machine.states.some((s) => s.submachine !== undefined && s.id === id)) return [this.machine.id, id];
+    for (const sub of this.subs) {
+      if (sub.gen?.subGen?.[id] !== undefined) return [...this.viewChain(sub.decl.id), id];
+    }
+    for (const cid of ["expedition_archive", "iteration_archive"]) {
+      if (this.genFor(cid)?.subGen?.[id] !== undefined) return [this.machine.id, cid, id];
+    }
+    return [this.machine.id, id];
   }
 
   /** Resolve ANY machine id to a viewable drawing: the walked stack
@@ -669,14 +716,21 @@ export class Session {
     // work's decision graph may stand OPEN when the evidence claims done.
     // The RECORD's jsonl is the source — every live op lands there too,
     // so the check survives engine reloads. Attached, never copied.
-    const sid = shortId(this.bound!.id);
-    const recorded = replayFile(join(this.bound!.path, "product", "spec", "expeditions", this.bound!.id, "decisions.jsonl"));
-    const open = recorded.open.filter((n) => [sid, `${sid}-leave`].some((p) => n.visit === p || n.visit.startsWith(`${p}@`)));
+    const open = this.openRecordPoints();
     if (open.length > 0) {
       lint.problems.push(`the decision graph holds ${open.length} open point(s) — resolve each (done | obsolete | revert | defer) before the evidence stands`);
       lint.met = false;
     }
     return lint;
+  }
+
+  /** Open points of the BOUND record's decision graph — the jsonl is the
+   *  source, so the check survives engine reloads. Scoped to the work's
+   *  own states. */
+  private openRecordPoints(): { id: string; visit: string; brief: string }[] {
+    const sid = shortId(this.bound!.id);
+    const recorded = replayFile(join(this.bound!.path, "product", "spec", "expeditions", this.bound!.id, "decisions.jsonl"));
+    return recorded.open.filter((n) => [sid, `${sid}-leave`].some((p) => n.visit === p || n.visit.startsWith(`${p}@`)));
   }
 
   /** Pending notes whose text carries one of the markers — what a

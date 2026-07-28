@@ -152,6 +152,7 @@ function briefFor(rec: CallRecord): string {
     }
     case "se_note":
     case "mirror_note": return String(a.text ?? "");
+    case "se_answer": return String(a.question ?? "");
     case "mirror_tool": return `tool ${a.name}`;
     case "mirror_escape": return `escape: ${a.reason}`;
     case "mirror_form_save": return `form save ${a.name}`;
@@ -192,7 +193,7 @@ export function feedRows(log: CallLog, since: string, pending: StrayNote[] = [])
     src: rec.tool.startsWith("mirror_") ? "human" : "agent",
     // Updates are NARRATION (bold), whatever their op — only se_note
     // strays are retro notes (italic). Two kinds, never conflated.
-    type: rec.tool === "se_update" ? "update" : rec.tool === "se_note" || rec.tool === "mirror_note" ? "note" : "call",
+    type: rec.tool === "se_update" ? "update" : rec.tool === "se_note" || rec.tool === "mirror_note" ? "note" : rec.tool === "se_answer" ? "aq" : "call",
     brief: briefFor(rec).slice(0, 90),
     ok: rec.ok,
     ...(rec.ok ? {} : { clause: (rec.response as { clause?: string } | undefined)?.clause }),
@@ -322,9 +323,12 @@ const STYLE = `
   .logrow .lt { color: #7f8b96; flex: 0 0 auto; }
   .logrow .lsrc { flex: 0 0 5.5ch; color: #7cc4e8; }
   .logrow .lsrc.human { color: #e8b339; }
+  .logrow .lkind { flex: 0 0 6.5ch; }
+  .logrow .lkind.k-call { color: #7f8b96; }
+  .logrow .lkind.k-update { font-weight: 700; color: #e8b339; }
+  .logrow .lkind.k-note { font-style: italic; color: #c58fe8; }
+  .logrow .lkind.k-aq { font-weight: 700; color: #7cc4e8; }
   .logrow .lbrief { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .logrow.update .lbrief { font-weight: 700; color: #e8b339; }
-  .logrow.note .lbrief { font-style: italic; }
   .logrow .lok { flex: 0 0 auto; color: #4a7a55; }
   .logrow.failed .lok { color: #e86a5f; }
   .dnode { cursor: pointer; padding: 2px 0; font-size: 13px; }
@@ -601,6 +605,10 @@ function stateDetail(id) {
 // four checks).
 function reloadKeep(detail) {
   const q = new URLSearchParams(location.search);
+  // THE VIEW HOLDS STILL (owner ruling 2026-07-28): finishing a state is
+  // data change, and data change never jumps the reader — every refresh
+  // pins the machine being looked at explicitly.
+  q.set("view", D.viewed.id);
   if (detail) q.set("detail", detail); else q.delete("detail");
   // THE UX LAW: no fold closes across a reload — open <details> ride along.
   const folds = [...document.querySelectorAll("#details details[open] summary")].map((s) => s.textContent.split(" (")[0].trim()).filter(Boolean);
@@ -700,6 +708,9 @@ async function showForm(name) {
   }
   const ro = f.preview === true;
   let html = '<div class="comment-text">' + escText(f.statement || "") + "</div>";
+  // The GRAPH-IS-EVIDENCE gate, visible to the human: the page cannot
+  // pass over open decision points — they surface under problems below.
+  html += '<div class="meta">gate: every open decision point of this record must be resolved (done · obsolete · revert · defer) before this page passes</div>';
   html += '<div class="meta">' + escText(f.instance) + (ro ? " · template preview — filling happens inside an expedition" : " · status: " + escText(f.status) + (f.met ? ' · <span style="color:#4a7a55">✓ passes</span>' : "")) + "</div>";
   (f.fields || []).forEach((fl) => {
     html += '<div style="padding:8px 0 2px"><b>' + escText(fl.name) + "</b>" + (fl.required ? ' <span style="color:#e8b339">required</span>' : "") + "</div>";
@@ -763,6 +774,14 @@ function detailFor(key) {
   return [key, jsonTable({})];
 }
 document.addEventListener("click", async (ev) => {
+  const cs = ev.target.closest ? ev.target.closest("#cur-state") : null;
+  if (cs) {
+    // The quick way home: jump the view to the walk's machine, whole
+    // drawing visible (the saved pan is dropped so the state shows).
+    sessionStorage.removeItem("se-vb-" + cs.dataset.machine);
+    location.href = "/?view=" + encodeURIComponent(cs.dataset.machine);
+    return;
+  }
   const go = ev.target.closest ? ev.target.closest(".go") : null;
   if (go) {
     const body = go.dataset.to ? { to: go.dataset.to } : { advance: true };
@@ -799,6 +818,14 @@ document.querySelectorAll(".expand[data-widget]").forEach((btn) => {
 const svg = document.getElementById("machine-svg");
 if (svg) {
   let vb = svg.viewBox.baseVal;
+  // Pan/zoom survives every refresh, per machine — a walk-driven reload
+  // must not snap the reader's viewport back to the whole drawing.
+  const VB_KEY = "se-vb-" + D.viewed.id;
+  try {
+    const saved = JSON.parse(sessionStorage.getItem(VB_KEY) || "null");
+    if (saved && saved.w > 0) { vb.x = saved.x; vb.y = saved.y; vb.width = saved.w; vb.height = saved.h; }
+  } catch (e) { /* a broken save never blocks the drawing */ }
+  const saveVb = () => { try { sessionStorage.setItem(VB_KEY, JSON.stringify({ x: vb.x, y: vb.y, w: vb.width, h: vb.height })); } catch (e) { /* storage full — the view just re-fits */ } };
   svg.addEventListener("wheel", (ev) => {
     ev.preventDefault();
     const scale = ev.deltaY > 0 ? 1.12 : 1 / 1.12;
@@ -807,6 +834,7 @@ if (svg) {
     vb.x = p.x - (p.x - vb.x) * scale;
     vb.y = p.y - (p.y - vb.y) * scale;
     vb.width *= scale; vb.height *= scale;
+    saveVb();
   }, { passive: false });
   let panning = null;
   svg.addEventListener("mousedown", (ev) => { panning = { x: ev.clientX, y: ev.clientY, vx: vb.x, vy: vb.y }; svg.classList.add("panning"); });
@@ -816,7 +844,7 @@ if (svg) {
     vb.x = panning.vx - (ev.clientX - panning.x) * (vb.width / r.width);
     vb.y = panning.vy - (ev.clientY - panning.y) * (vb.height / r.height);
   });
-  window.addEventListener("mouseup", () => { panning = null; svg.classList.remove("panning"); });
+  window.addEventListener("mouseup", () => { if (panning) saveVb(); panning = null; svg.classList.remove("panning"); });
 }
 
 const divider = document.getElementById("divider");
@@ -861,6 +889,7 @@ function renderLog() {
     '<div class="logrow ' + r.type + (r.ok ? "" : " failed") + '" data-ref="' + r.ref + '">' +
       '<span class="lt">' + (r.pending ? r.ts.slice(5, 10) : r.ts.slice(11, 19)) + "</span>" +
       '<span class="lsrc ' + r.src + '">' + r.src + "</span>" +
+      '<span class="lkind k-' + r.type + '">' + r.type + "</span>" +
       '<span class="lbrief">' + escText(r.brief) + "</span>" +
       '<span class="lok">' + (r.ok ? "✓" : "✗ " + (r.clause || "")) + "</span>" +
     "</div>").join("") || '<div class="meta">no acts' + (f ? " match the filter" : " this session yet") + "</div>";
@@ -1043,7 +1072,7 @@ setInterval(async () => {
     const a = await r.json();
     // Answers again after misses — that was an engine swap (hot reload):
     // reload onto the new child instead of waiting for F5.
-    if (aliveMisses > 0) { aliveMisses = 0; location.reload(); return; }
+    if (aliveMisses > 0) { aliveMisses = 0; reloadKeep(CURRENT_DETAIL); return; }
     if (a.status === "closed") { sessionOver(); return; }
     if (thr && document.activeElement !== thr && Number(thr.value) !== a.autonomy) {
       thr.value = a.autonomy;
@@ -1056,7 +1085,7 @@ setInterval(async () => {
       if (lbl2) lbl2.textContent = sdAbbr(a.shutdown);
     }
     if (logPanel && a.acts !== lastActs) { lastActs = a.acts; refreshLog(); }
-    if (JSON.stringify(a.active || []) !== ACTIVE_AT_RENDER) { location.reload(); return; }
+    if (JSON.stringify(a.active || []) !== ACTIVE_AT_RENDER) { reloadKeep(CURRENT_DETAIL); return; }
     // A script run finishing elsewhere (agent tick, other window) lands
     // its result — refresh, keeping the open pane.
     if (pollBusy === true && a.busy === false) { reloadKeep(CURRENT_DETAIL); return; }
@@ -1118,10 +1147,21 @@ export function renderMirror(m: MirrorState, widget?: "machine" | "details" | "l
     subs.length === 0
       ? ""
       : `<span class="crumb-arrow">›<span class="crumb-menu">${subs.map((s) => `<a href="/?view=${encodeURIComponent(s)}">${esc(s)}</a>`).join("")}</span></span>`;
-  let crumbs =
-    decl.id === m.session.machine.id
-      ? `<b class="here">${esc(m.session.machine.id)}</b>${crumbArrow(mainSubs)}`
-      : `<a href="/?view=${encodeURIComponent(m.session.machine.id)}">${esc(m.session.machine.id)}</a>${crumbArrow(mainSubs)}<b class="here">${esc(decl.id)}</b>${crumbArrow(decl.states.filter((s) => s.submachine !== undefined).map((s) => s.id))}`;
+  // The crumbs walk the PARENT CHAIN — a nested machine shows under its
+  // real parent, never directly under main (owner ruling 2026-07-28).
+  const chain = m.session.viewChain(decl.id);
+  let crumbs = chain
+    .map((id, i) => {
+      const label = i === chain.length - 1 ? `<b class="here">${esc(id)}</b>` : `<a href="/?view=${encodeURIComponent(id)}">${esc(id)}</a>`;
+      const arrow =
+        i === 0
+          ? crumbArrow(mainSubs)
+          : i === chain.length - 1
+            ? crumbArrow(decl.states.filter((s) => s.submachine !== undefined).map((s) => s.id))
+            : '<span style="color:#7f8b96;padding:0 3px">›</span>';
+      return label + arrow;
+    })
+    .join("");
 
   const states: Record<string, unknown> = {};
   for (const s of decl.states) {
@@ -1189,7 +1229,11 @@ export function renderMirror(m: MirrorState, widget?: "machine" | "details" | "l
   // sub-machine other than boot is being walked.
   const crumbTrail = m.session.breadcrumb();
   const escapeBtn = crumbTrail.length > 1 && crumbTrail[1] !== "boot" ? `<button class="ghost" id="escape-btn" title="escape to idle — the machine is left standing, the reason is recorded">⤴ escape</button>` : "";
-  const machineWidget = `<div class="widget" id="w-machine"><div class="widget-head"><span class="crumbs">${crumbs}</span><span style="display:flex;align-items:center;gap:10px">${slider}${sdBar}${escapeBtn}<button class="expand" data-widget="w-machine" data-url="/widget/machine?view=${encodeURIComponent(decl.id)}" title="expand · ctrl-click: new tab · shift-click: new window">⛶</button></span></div><div class="widget-body">${svg}</div></div>`;
+  // The way home when the view holds still elsewhere: the header names
+  // the walk's position; clicking it jumps the view there.
+  const curLeaf = info.active[0] ?? "";
+  const curBtn = curLeaf === "" ? "" : `<button class="ghost" id="cur-state" data-machine="${esc(walkMachine.id)}" title="the walk stands here — click: jump the view to it">☉ ${esc(curLeaf)}</button>`;
+  const machineWidget = `<div class="widget" id="w-machine"><div class="widget-head"><span class="crumbs">${crumbs}</span><span style="display:flex;align-items:center;gap:10px">${curBtn}${slider}${sdBar}${escapeBtn}<button class="expand" data-widget="w-machine" data-url="/widget/machine?view=${encodeURIComponent(decl.id)}" title="expand · ctrl-click: new tab · shift-click: new window">⛶</button></span></div><div class="widget-body">${svg}</div></div>`;
   const detailsWidget = `<div class="widget" id="w-details">${widgetHead("details", "w-details", "/widget/details")}
     ${info.status === "closed" ? '<div class="meta" style="color:#e86a5f">machine closed</div>' : ""}
     <div class="meta" id="details-title">—</div>

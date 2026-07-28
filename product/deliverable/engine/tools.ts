@@ -404,6 +404,21 @@ export function coreTools(rootOf: () => string, projectRoot: string): ToolDef[] 
       handler: (args) => appendNote(seDir(projectRoot), String(args.text), "agent"),
     },
     {
+      name: "se_answer",
+      title: "se.answer",
+      description:
+        "Record an answered question (kind 'aq' in the log): the person's question and your answer, verbatim. The voice rule: EVERY direct question answered in chat is ALSO recorded here — chat can be lost mid-turn, the log never loses it. The feed line shows the question; clicking it shows both.",
+      inputSchema: {
+        type: "object",
+        properties: {
+          question: { type: "string", description: "the question, short form — becomes the feed line" },
+          answer: { type: "string", description: "the answer, complete — shown on click" },
+        },
+        required: ["question", "answer"],
+      },
+      handler: (args) => ({ recorded: "aq", question: String(args.question).slice(0, 90) }),
+    },
+    {
       name: "se_note_drain",
       title: "se.note.drain",
       description: "The retro's mechanical half: mark a note drained with its disposition (done | obsolete | carried | backlog — where? names the follow-up home). backlog PARKS the note: where is REQUIRED as its 'ready when …' re-entry condition, and a later migration re-drains it. Drained notes leave the inbox count and the pending feed. An unknown ref is refused.",
