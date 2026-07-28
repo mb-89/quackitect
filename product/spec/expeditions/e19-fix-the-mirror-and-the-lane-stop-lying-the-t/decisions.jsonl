@@ -1,0 +1,5 @@
+{"ts":"2026-07-28T16:22:42.168Z","op":"plan","visit":"expeditions/e19@0","parent":null,"nodes":[{"id":"d41","brief":"The loading bar must track a real load"},{"id":"d42","brief":"Terminal height splitter and resize flicker"},{"id":"d43","brief":"Machine layout packs tighter"},{"id":"d44","brief":"Survey moves into the legal-tools links"},{"id":"d45","brief":"Handover and read-proof resolve to the root"},{"id":"d46","brief":"Close refuses early on a dirty trunk"},{"id":"d47","brief":"A malformed brief stops destroying its call"}]}
+{"ts":"2026-07-28T16:25:21.732Z","op":"update","visit":"expeditions/e19@0","node":"d48","brief":"the loading bar now owns its lifetime and cannot outlive its load"}
+{"ts":"2026-07-28T16:26:10.189Z","op":"update","visit":"expeditions/e19@0","node":"d49","brief":"one action now causes one load, not two"}
+{"ts":"2026-07-28T16:27:00.233Z","op":"update","visit":"expeditions/e19@0","node":"d50","brief":"pinning the bar's lifetime with a test rather than a comment"}
+{"ts":"2026-07-28T16:27:44.648Z","op":"done","visit":"expeditions/e19@0","node":"d41","brief":"the bar now tracks a real load and is pinned by a test"}

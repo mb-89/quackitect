@@ -473,10 +473,14 @@ const STYLE = `
   .logrow .lkind.k-note { font-style: italic; color: ${FEED_COLOURS["kind-note"]}; }
   .logrow .lkind.k-aq { font-weight: 700; color: ${FEED_COLOURS["kind-aq"]}; }
   .aq-q { font-weight: 700; color: ${FEED_COLOURS["kind-aq"]}; padding: 6px 0; white-space: pre-wrap; }
-  #loadbar { position: fixed; top: 0; left: 0; right: 0; height: 3px; background: #22272c; z-index: 99; display: none; }
+  #loadbar { position: fixed; top: 0; left: 0; right: 0; height: 3px; background: #22272c; z-index: 99; }
   #loadbar .fill { height: 100%; width: 30%; background: #e8b339; animation: loadslide 1s linear infinite; }
   @keyframes loadslide { 0% { margin-left: -30%; } 100% { margin-left: 100%; } }
   #loadbar .lmsg { position: fixed; top: 8px; right: 12px; color: #e8b339; font-size: 12px; }
+  /* A load that never answered is a FAILURE, and the voice paints those red. */
+  #loadbar.stalled { cursor: pointer; }
+  #loadbar.stalled .fill { background: #e86a5f; animation: none; width: 100%; }
+  #loadbar.stalled .lmsg { color: #e86a5f; }
   .aq-a { color: #cfd8dc; line-height: 1.5; padding: 4px 0; }
   .logrow .lbrief { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .logrow .lok { flex: 0 0 auto; color: #4a7a55; }
@@ -803,7 +807,17 @@ function rebind() {
   if (CURRENT_DETAIL) { const dp = detailFor(CURRENT_DETAIL); showDetails(dp[0], dp[1]); }
 }
 let refreshInFlight = false;
+// ONE ACTION, ONE LOAD (owner 2026-07-28). A tick both navigates this page
+// and wakes /events, so the outgoing page used to fetch itself again on its
+// way out — the archive visibly loaded twice. Once we are leaving, we leave.
+let navigatingAway = false;
+function navigateTo(url, label) {
+  navigatingAway = true;
+  showLoading(label);
+  location.href = url;
+}
 async function refresh(detail) {
+  if (navigatingAway) return;
   if (detail !== undefined) CURRENT_DETAIL = detail;
   const q = new URLSearchParams(location.search);
   // THE VIEW HOLDS STILL (owner ruling 2026-07-28): finishing a state is
@@ -825,13 +839,14 @@ async function refresh(detail) {
     location.href = url; // a failed morph must never strand the reader
   } finally {
     refreshInFlight = false;
+    hideLoading(); // THE LOAD SETTLED — win or lose, the bar goes
   }
 }
 document.addEventListener("click", async (ev) => {
   const c = ev.target.closest ? ev.target.closest(".docheck") : null;
   if (c) { if (c.disabled) return; ev.preventDefault(); c.disabled = true; await fetch("/check", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ path: c.dataset.path }) }); refresh(); return; }
   const j = ev.target.closest ? ev.target.closest(".jump") : null;
-  if (j) { await fetch("/tick", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ back: j.dataset.state }) }); location.href = "/"; return; }
+  if (j) { showLoading("jumping back to " + j.dataset.state); await fetch("/tick", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ back: j.dataset.state }) }); navigateTo("/", "loading the walk"); return; }
   const rp = ev.target.closest ? ev.target.closest(".runpre") : null;
   if (rp) {
     // Grey IMMEDIATELY — no second run behind an unresponsive button; the
@@ -990,15 +1005,15 @@ document.addEventListener("click", async (ev) => {
     // The quick way home: jump the view to the walk's machine, whole
     // drawing visible (the saved pan is dropped so the state shows).
     sessionStorage.removeItem("se-vb-" + cs.dataset.machine);
-    showLoading("loading " + cs.dataset.machine);
-    location.href = "/?view=" + encodeURIComponent(cs.dataset.machine);
+    navigateTo("/?view=" + encodeURIComponent(cs.dataset.machine), "loading " + cs.dataset.machine);
     return;
   }
   const go = ev.target.closest ? ev.target.closest(".go") : null;
   if (go) {
     const body = go.dataset.to ? { to: go.dataset.to } : { advance: true };
+    showLoading("walking to " + (go.dataset.to || "the next state"));
     await fetch("/tick", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) });
-    location.href = "/";
+    navigateTo("/", "loading the walk");
   }
 });
 let CURRENT_DETAIL = null;
@@ -1012,7 +1027,7 @@ document.addEventListener("click", (ev) => {
 // Double-click a sub-machine state: enter it as a VIEWER (walk unmoved).
 document.addEventListener("dblclick", (ev) => {
   const g = ev.target.closest ? ev.target.closest(".clickable") : null;
-  if (g && g.dataset.sub) { showLoading("loading " + g.dataset.sub); location.href = "/?view=" + encodeURIComponent(g.dataset.sub); }
+  if (g && g.dataset.sub) navigateTo("/?view=" + encodeURIComponent(g.dataset.sub), "loading " + g.dataset.sub);
 });
 
 // Only real widget expanders — the modal's ✕ shares the style, not the job.
@@ -1189,22 +1204,56 @@ function renderDecisions(sel) {
   showDetails("decisions · " + g.visit, html);
 }
 // FEEDBACK WITHIN A SECOND (owner law 2026-07-28): anything that can take
-// longer shows loading feedback at once. Full-page view loads get the bar
-// the moment they are clicked; the fresh page replaces it.
-function showLoading(label) {
-  let el = document.getElementById("loadbar");
-  if (!el) {
-    el = document.createElement("div");
-    el.id = "loadbar";
-    el.innerHTML = '<div class="fill"></div><div class="lmsg"></div>';
-    document.body.appendChild(el);
-  }
-  el.querySelector(".lmsg").textContent = label || "loading";
-  el.style.display = "block";
+// longer shows loading feedback at once.
+//
+// THE BAR OWNS ITS LIFETIME (owner ruling 2026-07-28). It used to rely on
+// the navigation that followed to replace the whole page. Morphing then
+// replaced navigation, and a bar nobody hid simply stayed up. A bar that
+// outlives its load is worse than none: the reader learns to ignore it, and
+// it can no longer warn them when something really is slow. So every load
+// carries a token, settles exactly once, and cannot outlive its deadline.
+let loadToken = 0;
+let loadTimer = null;
+function hideLoading() {
+  loadToken++; // any timer still holding the old token is now a no-op
+  if (loadTimer !== null) { clearTimeout(loadTimer); loadTimer = null; }
+  const el = document.getElementById("loadbar");
+  if (el !== null) el.remove();
 }
+function showLoading(label) {
+  hideLoading(); // one load at a time; a second start supersedes the first
+  const mine = loadToken;
+  const el = document.createElement("div");
+  el.id = "loadbar";
+  el.innerHTML = '<div class="fill"></div><div class="lmsg"></div>';
+  el.querySelector(".lmsg").textContent = label || "loading";
+  document.body.appendChild(el);
+  // NOTHING SPINS FOREVER. If nobody settles this load, say so — an honest
+  // failure beats a confident bar in front of a page that finished long ago.
+  loadTimer = setTimeout(() => {
+    if (loadToken !== mine) return;
+    const cur = document.getElementById("loadbar");
+    if (cur === null) return;
+    cur.classList.add("stalled");
+    cur.querySelector(".lmsg").textContent = (label || "loading") + " — no answer; click to retry";
+  }, 8000);
+}
+// A page that was restored, or navigated back to, has no load in flight —
+// whatever it was showing when the reader left it.
+addEventListener("pageshow", hideLoading);
+addEventListener("popstate", hideLoading);
 document.addEventListener("click", (ev) => {
+  const stalled = ev.target.closest ? ev.target.closest("#loadbar.stalled") : null;
+  if (stalled !== null) { hideLoading(); location.reload(); return; }
   const a = ev.target.closest ? ev.target.closest('a[href*="?view="]') : null;
-  if (a) showLoading("loading " + (a.textContent || "view"));
+  if (a === null) return;
+  // A click that opens SOMEWHERE ELSE leaves this page untouched, so it
+  // starts no load here. Showing a bar for it is exactly the strand the
+  // owner hit: the expand controls advertise ctrl-click and shift-click.
+  if (ev.defaultPrevented || ev.button !== 0) return;
+  if (ev.ctrlKey || ev.metaKey || ev.shiftKey || ev.altKey) return;
+  if (a.target !== "" && a.target !== "_self") return;
+  showLoading("loading " + (a.textContent || "view"));
 }, true);
 document.addEventListener("click", (ev) => {
   const lr = ev.target.closest ? ev.target.closest(".logrow") : null;

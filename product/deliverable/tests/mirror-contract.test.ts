@@ -85,3 +85,25 @@ test("the served page ships the panel renderers", () => {
   assert.ok(html.includes("loadRecDecisions"), "the archive per-visit history renderer ships");
   assert.ok(html.includes("no decisions recorded"), "the honest empty state ships");
 });
+
+// THE LOADING BAR MUST NOT LIE (owner ruling 2026-07-28, seen live in the
+// expedition archive). It stayed up for good, because showLoading had no
+// counterpart — it leaned on a full page load to replace it, and morphing
+// had already replaced full page loads. The same visit also loaded TWICE,
+// because the page on its way out still answered the /events wake.
+test("the loading bar settles: it can come down, it times out, and one action loads once", () => {
+  const root = freshRoot();
+  const html = renderMirror({ session: new Session(root), root, lastPacket: undefined, mode: "manual" });
+  assert.ok(html.includes("function hideLoading("), "the bar has a way down, not only a way up");
+  assert.match(html, /finally \{[^}]*hideLoading\(\)/, "a settled refresh always drops the bar");
+  assert.ok(html.includes("stalled"), "a load that never answers says so instead of spinning");
+  assert.ok(html.includes('addEventListener("pageshow", hideLoading)'), "a restored page carries no stale bar");
+  // Navigation that leaves THIS page starts no load on it — the modifier
+  // clicks the expand controls advertise were what stranded the bar.
+  assert.ok(html.includes("ev.ctrlKey || ev.metaKey || ev.shiftKey"), "a click that opens elsewhere raises no bar here");
+  // ONE ACTION, ONE LOAD. Every view jump goes through navigateTo, which
+  // latches the flag that stops the outgoing page fetching itself again.
+  assert.ok(html.includes("if (navigatingAway) return;"), "a page on its way out does not refresh itself");
+  const bare = html.match(/location\.href = "\/\?view=/g) ?? [];
+  assert.equal(bare.length, 0, "view navigation goes through navigateTo, never a bare location.href");
+});
