@@ -188,6 +188,37 @@ test("the close is atomic: a conflicting merge aborts and refuses typed, the roo
   assert.ok(!/Unmerged|MERGING|both added/.test(st), "the root tree stands clean after the refusal: " + st);
 });
 
+// A DIRTY TRUNK IS CAUGHT BEFORE ANYTHING IS STAMPED (found live 2026-07-28,
+// closing e18). git refuses to overwrite uncommitted local changes, so the
+// merge failed - and the abort after it failed too, because no merge had
+// started. The record was already marked closed by then, leaving an
+// expedition shut, unmerged, and still holding its worktree.
+test("the close refuses EARLY on a dirty trunk, and leaves the record open", () => {
+  const root = freshRoot();
+  const g = (...a: string[]) => spawnSync("git", a, { cwd: root, encoding: "utf8", windowsHide: true });
+  g("init");
+  g("config", "user.email", "se@test.local");
+  g("config", "user.name", "se test");
+  g("add", "-A");
+  g("commit", "-q", "-m", "base");
+  const e = expNew(root, "fix", "dirty trunk probe");
+  mkdirSync(join(e.path, "product", "spec", "expeditions", e.id), { recursive: true });
+  writeFileSync(join(e.path, "product", "spec", "expeditions", e.id, "report.md"), "---\nform: expedition-leave\nstatus: done\n---\n\nprobe report\n");
+  // A TRACKED file, modified and left uncommitted on trunk.
+  writeFileSync(join(root, "README.md"), "# tracked\n");
+  g("add", "-A");
+  g("commit", "-q", "-m", "add readme");
+  writeFileSync(join(root, "README.md"), "# tracked, and now edited\n");
+  assert.throws(
+    () => expClose(root, e, true),
+    (err) => (err as { clause?: string }).clause === "SE-C-112" && /README\.md/.test(String((err as { got?: string }).got)),
+  );
+  // NOTHING was stamped: the record must still read open, or a close that
+  // could not finish has already told the archive it did.
+  const rec = readFileSync(join(e.path, "product", "spec", "expeditions", e.id, "record.md"), "utf8");
+  assert.match(rec, /^status: open$/m, "a close that cannot finish stamps nothing");
+});
+
 test("a broken sub-canvas refuses typed at entry; fixing it heals on the next tick", async () => {
   const root = freshRoot();
   const session = new Session(root);

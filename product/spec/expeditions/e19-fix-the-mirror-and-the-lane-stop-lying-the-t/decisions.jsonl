@@ -20,3 +20,8 @@
 {"ts":"2026-07-28T16:42:42.344Z","op":"update","visit":"expeditions/e19@0","node":"d63","brief":"the feed test now pins the new law instead of the old one"}
 {"ts":"2026-07-28T16:42:53.340Z","op":"update","visit":"expeditions/e19@0","node":"d64","brief":"pinning idempotent resolution and the conflicting case"}
 {"ts":"2026-07-28T16:43:38.598Z","op":"done","visit":"expeditions/e19@0","node":"d47","brief":"a bad brief no longer destroys its call"}
+{"ts":"2026-07-28T16:47:15.039Z","op":"update","visit":"expeditions/e19@0","node":"d65","brief":"the close now checks trunk before it stamps anything"}
+{"ts":"2026-07-28T16:48:49.776Z","op":"update","visit":"expeditions/e19@0","node":"d66","brief":"the guard now names only what git would truly refuse"}
+{"ts":"2026-07-28T16:50:02.813Z","op":"update","visit":"expeditions/e19@0","node":"d67","brief":"guard blocks on tracked changes only, never on scratch"}
+{"ts":"2026-07-28T16:50:49.671Z","op":"update","visit":"expeditions/e19@0","node":"d68","brief":"pinning that a dirty trunk refuses before the record is stamped"}
+{"ts":"2026-07-28T16:51:19.266Z","op":"done","visit":"expeditions/e19@0","node":"d46","brief":"a dirty trunk now refuses before the record is stamped"}
