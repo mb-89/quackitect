@@ -40,7 +40,7 @@ import { spawn, spawnSync } from "node:child_process";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { resolveInRoot, seDir } from "./paths.ts";
 import { Decisions, replayFile } from "./decisions.ts";
-import { generateIterations, itFind, itSeed, markStarted } from "./iterations.ts";
+import { generateIterationArchive, generateIterations, itFind, itSeed, markStarted } from "./iterations.ts";
 
 /** THE TICK is the machinery — one tool, legal in EVERY state. Without
  *  arguments it reports (observability is never gated); with arguments it
@@ -72,7 +72,7 @@ function newInstance(m: MachineDecl): MachineInstance {
 interface SubRun {
   decl: MachineDecl;
   instance: MachineInstance;
-  /** The main-machine state this sub fills. */
+  /** The PARENT machine's state this sub fills — one level up the stack. */
   parentState: string;
   /** Present when the machine was GENERATED (continue_expedition): the
    *  synthetic drawing and the state→expedition map ride the run. */
@@ -88,7 +88,7 @@ export class Session {
   private readonly root: string;
   readonly machine: MachineDecl;
   readonly instance: MachineInstance;
-  private sub?: SubRun;
+  private subs: SubRun[] = [];
   private bannerShown = false;
   /** The bound expedition — while set, the lane works in its worktree. */
   private bound?: Expedition;
@@ -247,7 +247,7 @@ export class Session {
    *  form. */
   assertFrom(from: string): void {
     const now = this.active()[0] ?? "";
-    const bare = now.includes("/") ? now.slice(now.indexOf("/") + 1) : now;
+    const bare = now.includes("/") ? now.slice(now.lastIndexOf("/") + 1) : now;
     if (from === now || from === bare) return;
     throw new Rejection({
       clause: CLAUSES.STALE_POSITION,
@@ -385,7 +385,7 @@ export class Session {
         source: "engine/session.ts escape",
       });
     }
-    if (this.sub!.decl.id === "boot") {
+    if (this.top()!.decl.id === "boot") {
       throw new Rejection({
         clause: CLAUSES.NOT_LEGAL_IN_STATE,
         expected: "a sub-machine other than boot",
@@ -401,12 +401,12 @@ export class Session {
     if (missing.length > 0) this.refuseReads("entry", "idle", missing, channel);
     this.assertHandover(channel, readHashes);
     const stoodIn = this.active()[0];
-    const parent = this.sub!.parentState;
+    const parent = this.subs[0].parentState;
     this.instance.history.push({ state: stoodIn, outcome: "escaped", at: now });
     this.instance.escapes.push({ state: parent, exhausted_guard: reason.slice(0, 300), at: now });
     this.instance.active = [...activeStates(this.instance).filter((s) => s !== parent), "idle"];
     this.instance.current = "idle";
-    this.sub = undefined;
+    this.subs = [];
     this.unbind();
     this.notifyChange();
     return {
@@ -422,55 +422,101 @@ export class Session {
     return s;
   }
 
-  /** The sub governs as long as it exists — including its visible end
-   *  position; it is cleared when its parent state completes. */
+  /** A sub governs as long as it stands — including its visible end
+   *  position; it is popped when its parent state completes. Machines
+   *  nest to ANY depth (owner order 2026-07-28): the walk is a stack. */
   private inSub(): boolean {
-    return this.sub !== undefined;
+    return this.subs.length > 0;
+  }
+
+  private top(): SubRun | undefined {
+    return this.subs[this.subs.length - 1];
+  }
+
+  /** The machine one level up from the top sub — where its parent state lives. */
+  private parentOfTop(): { machine: MachineDecl; instance: MachineInstance } {
+    const below = this.subs[this.subs.length - 2];
+    return below === undefined ? { machine: this.machine, instance: this.instance } : { machine: below.decl, instance: below.instance };
   }
 
   /** The machine+states whose legal_tools govern right now. */
   private leaves(): { machine: MachineDecl; ids: string[] } {
-    if (this.inSub()) return { machine: this.sub!.decl, ids: activeStates(this.sub!.instance) };
+    const top = this.top();
+    if (top !== undefined) return { machine: top.decl, ids: activeStates(top.instance) };
     return { machine: this.machine, ids: activeStates(this.instance) };
   }
 
   active(): string[] {
     const { ids } = this.leaves();
-    return this.inSub() ? ids.map((s) => `${this.sub!.decl.id}/${s}`) : ids;
+    if (!this.inSub()) return ids;
+    const prefix = this.subs.map((s) => s.decl.id).join("/");
+    return ids.map((s) => `${prefix}/${s}`);
   }
 
-  /** Where the walk is, machine-wise: ["main"] or ["main", "boot"]. */
+  /** Where the walk is, machine-wise: ["main"] or ["main", "boot", …]. */
   breadcrumb(): string[] {
-    return this.inSub() ? [this.machine.id, this.sub!.decl.id] : [this.machine.id];
+    return [this.machine.id, ...this.subs.map((s) => s.decl.id)];
   }
 
   /** The machine to DISPLAY: only ever one (owner ruling 2026-07-26). */
   currentMachine(): MachineDecl {
-    return this.inSub() ? this.sub!.decl : this.machine;
+    return this.top()?.decl ?? this.machine;
   }
 
   /** Entering a GENERATED container's expedition states binds that
    *  expedition's worktree — the click IS the pick (owner design
    *  2026-07-27). The parent-return and escape paths unbind as ever. */
   private autoBind(): void {
-    const gen = this.sub?.gen;
-    if (gen === undefined) return;
-    const leaf = activeStates(this.sub!.instance)[0];
+    const top = this.top();
+    const gen = top?.gen;
+    if (top === undefined || gen === undefined) return;
+    const leaf = activeStates(top.instance)[0];
     const boundId = leaf === undefined ? undefined : gen.expByState[leaf];
     if (boundId === undefined || this.bound?.id === boundId) return;
-    if (this.sub!.decl.id === "iterations") this.iterationOpen(boundId);
-    else this.expeditionOpen(boundId);
+    // Only the WORK containers bind — archives browse read-only.
+    if (top.decl.id === "iterations") this.iterationOpen(boundId);
+    else if (top.decl.id === "expeditions") this.expeditionOpen(boundId);
   }
 
   /** The mirror's view of a GENERATED machine: the walk's own instance
    *  while standing in it, a fresh generation for browsing. */
   generatedView(id: string): { decl: MachineDecl; canvas: CanvasData } | undefined {
-    if (id !== "expeditions" && id !== "expedition_archive" && id !== "iterations") return undefined;
-    if (this.inSub() && this.sub!.decl.id === id && this.sub!.gen !== undefined) {
-      return { decl: this.sub!.gen.decl, canvas: this.sub!.gen.canvas };
+    for (const sub of this.subs) {
+      if (sub.decl.id === id && sub.gen !== undefined) return { decl: sub.gen.decl, canvas: sub.gen.canvas };
     }
-    const gen = id === "expeditions" ? generateContinueExpedition(this.root) : id === "iterations" ? generateIterations(this.root) : generateExpeditionArchive(this.root);
-    return { decl: gen.decl, canvas: gen.canvas };
+    const gen = this.genFor(id);
+    return gen === undefined ? undefined : { decl: gen.decl, canvas: gen.canvas };
+  }
+
+  private genFor(id: string): GeneratedMachine | undefined {
+    if (id === "expeditions") return generateContinueExpedition(this.root);
+    if (id === "iterations") return generateIterations(this.root);
+    if (id === "expedition_archive") return generateExpeditionArchive(this.root);
+    if (id === "iteration_archive") return generateIterationArchive(this.root);
+    return undefined;
+  }
+
+  /** Resolve ANY machine id to a viewable drawing: the walked stack
+   *  first, then the top-level containers, then their nested generated
+   *  sub-machines (archive decades). */
+  viewFor(id: string): { decl: MachineDecl; canvas: CanvasData } | undefined {
+    const direct = this.generatedView(id);
+    if (direct !== undefined) return direct;
+    for (const sub of this.subs) {
+      const nested = sub.gen?.subGen?.[id];
+      if (nested !== undefined) {
+        const g = nested();
+        return { decl: g.decl, canvas: g.canvas };
+      }
+    }
+    for (const cid of ["expedition_archive", "iteration_archive"]) {
+      const nested = this.genFor(cid)?.subGen?.[id];
+      if (nested !== undefined) {
+        const g = nested();
+        return { decl: g.decl, canvas: g.canvas };
+      }
+    }
+    return undefined;
   }
 
   /** The LIVE run for a machine view (owner ruling 2026-07-27: re-entry
@@ -484,11 +530,13 @@ export class Session {
         completed: this.instance.status === "closed",
       };
     }
-    if (this.inSub() && this.sub!.decl.id === declId) {
-      return {
-        done: this.sub!.instance.history.filter((h) => h.outcome === "filled").map((h) => h.state),
-        completed: this.sub!.instance.status === "closed",
-      };
+    for (const sub of this.subs) {
+      if (sub.decl.id === declId) {
+        return {
+          done: sub.instance.history.filter((h) => h.outcome === "filled").map((h) => h.state),
+          completed: sub.instance.status === "closed",
+        };
+      }
     }
     return { done: [], completed: false };
   }
@@ -1213,28 +1261,34 @@ export class Session {
     // ever in one state, and a tick moves exactly one position — including
     // the mechanical start/end positions of a sub-machine.
     if (this.inSub()) {
-      if (this.sub!.instance.status !== "open") {
+      const top = this.top()!;
+      if (top.instance.status !== "open") {
         // Standing on the sub's end: this tick returns to the parent —
         // whatever the parent's edges enter is what the threshold weighs
         // and what the read gate demands proven.
-        const parent = this.state(this.machine, this.sub!.parentState);
-        this.gatePriority(this.machine, parent.edges.map((e) => e.to), channel);
-        this.assertReads(this.machine, parent, parent.edges.map((e) => e.to), channel, readHashes);
-        completeState(this.machine, this.instance, this.sub!.parentState, "filled", now);
-        this.instance.history.push({ state: this.sub!.parentState, outcome: "filled", at: now });
-        this.sub = undefined;
-        this.unbind(); // leaving the sub leaves the context (worktree stays)
+        const { machine: pm, instance: pi } = this.parentOfTop();
+        const parent = this.state(pm, top.parentState);
+        this.gatePriority(pm, parent.edges.map((e) => e.to), channel);
+        this.assertReads(pm, parent, parent.edges.map((e) => e.to), channel, readHashes);
+        completeState(pm, pi, top.parentState, "filled", now);
+        this.subs.pop();
+        if (pi !== this.instance) pi.history.push({ state: top.parentState, outcome: "filled", at: now });
+        const prefix = this.subs.map((s) => s.decl.id).join("/");
+        this.instance.history.push({ state: prefix === "" ? top.parentState : `${prefix}/${top.parentState}`, outcome: "filled", at: now });
+        if (!this.inSub()) this.unbind(); // leaving the outermost sub leaves the context (worktree stays)
         this.seedSubs();
         return this.landing();
       }
-      const cur = activeStates(this.sub!.instance)[0];
-      this.assertEdge(this.sub!.decl, cur, to);
-      const subTarget = to ?? this.state(this.sub!.decl, cur).edges[0]?.to;
-      if (subTarget !== undefined) this.gatePriority(this.sub!.decl, [subTarget], channel);
-      await this.assertConditions(this.sub!.decl, this.state(this.sub!.decl, cur), to, channel, readHashes);
-      completeState(this.sub!.decl, this.sub!.instance, cur, "filled", now, to);
-      this.sub!.instance.history.push({ state: cur, outcome: "filled", at: now });
-      this.instance.history.push({ state: `${this.sub!.decl.id}/${cur}`, outcome: "filled", at: now });
+      const cur = activeStates(top.instance)[0];
+      this.assertEdge(top.decl, cur, to);
+      const subTarget = to ?? this.state(top.decl, cur).edges[0]?.to;
+      if (subTarget !== undefined) this.gatePriority(top.decl, [subTarget], channel);
+      await this.assertConditions(top.decl, this.state(top.decl, cur), to, channel, readHashes);
+      completeState(top.decl, top.instance, cur, "filled", now, to);
+      top.instance.history.push({ state: cur, outcome: "filled", at: now });
+      const prefix = this.subs.map((s) => s.decl.id).join("/");
+      this.instance.history.push({ state: `${prefix}/${cur}`, outcome: "filled", at: now });
+      this.seedSubs(); // a sub state may itself host a sub-machine — nesting is arbitrary
       this.autoBind();
       this.notifyChange();
       return this.tickInfo();
@@ -1308,7 +1362,7 @@ export class Session {
       });
     }
     const { machine, ids } = this.leaves();
-    const inst = this.inSub() ? this.sub!.instance : this.instance;
+    const inst = this.top()?.instance ?? this.instance;
     if (ids.includes(target)) {
       throw new Rejection({
         clause: CLAUSES.NOT_LEGAL_IN_STATE,
@@ -1351,7 +1405,7 @@ export class Session {
       }
     }
     if (!this.inSub()) {
-      this.sub = undefined;
+      this.subs = [];
       this.seedSubs(); // a reopened sub-machine state re-enters at its start
     } else {
       this.instance.history.push({ state: `${machine.id}/${target}`, outcome: "reopened", at: now });
@@ -1423,23 +1477,17 @@ export class Session {
     });
   }
 
-  /** Enter any newly-active sub-machine state — the position becomes the
-   *  sub's mechanical start; nothing inside is walked yet. */
+  /** Enter any newly-active sub-machine state AT THE CURRENT LEAF LEVEL —
+   *  the position becomes the new sub's mechanical start; nothing inside
+   *  is walked yet. Machines nest to any depth: each level pushes. */
   private seedSubs(): void {
-    const subState = activeStates(this.instance)
-      .map((s) => this.state(this.machine, s))
-      .find((s) => s.submachine !== undefined);
+    const { machine, ids } = this.leaves();
+    const subState = ids.map((s) => this.state(machine, s)).find((s) => s.submachine !== undefined);
     if (subState === undefined) return;
-    // continue_expedition and expedition_archive are GENERATED from the
-    // records — their drawn canvases are stubs (owner design 2026-07-27).
-    const gen =
-      subState.id === "expeditions"
-        ? generateContinueExpedition(this.root)
-        : subState.id === "iterations"
-          ? generateIterations(this.root)
-          : subState.id === "expedition_archive"
-            ? generateExpeditionArchive(this.root)
-            : undefined;
+    // The containers are GENERATED from the records — their drawn canvases
+    // are stubs (owner design 2026-07-27). A generated machine's own sub
+    // states (archive decades) come from its parent's subGen.
+    const gen = this.top()?.gen?.subGen?.[subState.id]?.() ?? this.genFor(subState.id);
     const decl = gen !== undefined ? gen.decl : compileMachine(this.root, resolveRef(this.root, mainMachinePath(this.root), subState.submachine!));
     // RE-ENTRY RESETS (owner ruling 2026-07-27): a machine left through its
     // end starts over — evidence from the previous pass is cleared; the old
@@ -1447,7 +1495,7 @@ export class Session {
     for (const key of [...this.evidence.keys()]) {
       if (key.startsWith(`${decl.id}/`)) this.evidence.delete(key);
     }
-    this.sub = { decl, instance: newInstance(decl), parentState: subState.id, ...(gen !== undefined ? { gen } : {}) };
+    this.subs.push({ decl, instance: newInstance(decl), parentState: subState.id, ...(gen !== undefined ? { gen } : {}) });
   }
 
   // ── The agent's hands on the tick ───────────────────────────────────────
@@ -1458,7 +1506,7 @@ export class Session {
       machine: this.machine.id,
       breadcrumb: this.breadcrumb(),
       active: this.active(),
-      ...(this.inSub() ? { submachine: { id: this.sub!.decl.id, active: activeStates(this.sub!.instance) } } : {}),
+      ...(this.inSub() ? { submachine: { id: this.top()!.decl.id, active: activeStates(this.top()!.instance) } } : {}),
       status: this.instance.status,
       autonomy: this._autonomy,
       shutdown: this._shutdown,

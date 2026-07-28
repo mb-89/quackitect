@@ -18,8 +18,9 @@ import { capJson } from "./jsonio.ts";
 import { McpServer, type ToolDef } from "./mcp.ts";
 import { gitLane } from "./gitlane.ts";
 import { fileMove } from "./move.ts";
+import { spawn } from "node:child_process";
 import { openPanel } from "./panel.ts";
-import { seDir } from "./paths.ts";
+import { resolveInRoot, seDir } from "./paths.ts";
 import { run } from "./run.ts";
 import { search } from "./search.ts";
 import { Session } from "./session.ts";
@@ -323,6 +324,32 @@ export function coreTools(rootOf: () => string, projectRoot: string): ToolDef[] 
           ...(args.timeout_ms !== undefined ? { timeout_ms: Number(args.timeout_ms) } : {}),
           ...(args.cwd !== undefined ? { cwd: String(args.cwd) } : {}),
         }),
+    },
+    {
+      name: "se_test",
+      title: "se.test",
+      description:
+        "Run the engine's own checks in ONE call: the preflight and the full selftest suite, each with structured pass/fail and captured output. Runs in the bound worktree when one is open. Replaces the free-form se_run pair.",
+      inputSchema: { type: "object", properties: {} },
+      handler: async () => {
+        const root = rootOf();
+        const scripts = ["product/deliverable/engine/bin/preflight.ts", "product/deliverable/engine/bin/selftest.ts"];
+        const results: { script: string; ok: boolean; exit: number | null; output: string }[] = [];
+        for (const rel of scripts) {
+          const abs = resolveInRoot(root, rel, "engine/tools.ts se_test");
+          const r = await new Promise<{ status: number | null; out: string }>((resolve) => {
+            const child = spawn("node", [abs, "--root", root], { cwd: root });
+            let out = "";
+            child.stdout.on("data", (d: Buffer) => { out += d; });
+            child.stderr.on("data", (d: Buffer) => { out += d; });
+            const timer = setTimeout(() => child.kill(), 150_000);
+            child.on("error", (e) => { clearTimeout(timer); resolve({ status: null, out: String(e) }); });
+            child.on("close", (code) => { clearTimeout(timer); resolve({ status: code, out }); });
+          });
+          results.push({ script: rel, ok: r.status === 0, exit: r.status, output: r.out.trim().slice(0, 4000) });
+        }
+        return { ok: results.every((x) => x.ok), results };
+      },
     },
     {
       name: "se_git",

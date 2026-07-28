@@ -12,7 +12,7 @@ import { type CanvasData, type CanvasEdge, type CanvasElement } from "./canvas.t
 import { CLAUSES, Rejection } from "./errors.ts";
 import { validateMachine, type MachineDecl, type StateDecl } from "./machine.ts";
 import { parseStateNote } from "./notes.ts";
-import { type GeneratedMachine } from "./expmachine.ts";
+import { buildArchive, type GeneratedMachine } from "./expmachine.ts";
 import { slug, worktreesDir } from "./worktree.ts";
 
 const SRC = "engine/iterations.ts";
@@ -234,4 +234,20 @@ export function generateIterations(root: string): GeneratedMachine {
     metadata: { frontmatter: { reentry: "restart", priority: 0.4 } },
   };
   return { decl, canvas, expByState };
+}
+
+/** THE ITERATION ARCHIVE, generated like the expedition archive — the
+ *  same decade shape (owner ruling: both archives). */
+export function generateIterationArchive(root: string): GeneratedMachine {
+  let closed: Iteration[] = [];
+  try {
+    closed = itList(root).filter((it) => !it.open);
+  } catch {
+    closed = [];
+  }
+  const entries = closed.map((it) => {
+    const fm = readItRecord(root, it);
+    return { sid: itShortId(it.id), full: it.id, goal: typeof fm?.goal === "string" ? fm.goal : "" };
+  });
+  return buildArchive("iteration_archive", entries, "iteration");
 }
