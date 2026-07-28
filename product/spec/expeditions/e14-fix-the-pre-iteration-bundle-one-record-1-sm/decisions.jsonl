@@ -10,3 +10,10 @@
 {"ts":"2026-07-28T09:53:15.345Z","op":"update","visit":"expeditions/e14@0","node":"d19","brief":"nesting test file: decades with todos and se_test covered"}
 {"ts":"2026-07-28T09:54:13.130Z","op":"done","visit":"expeditions/e14@0","node":"d3","brief":"se_test shipped in tools.ts with its own test"}
 {"ts":"2026-07-28T09:54:17.685Z","op":"done","visit":"expeditions/e14@0","node":"d4","brief":"report links were already shipped in 765e412 — verified in mirror.ts"}
+{"ts":"2026-07-28T09:54:22.180Z","op":"done","visit":"expeditions/e14@0","node":"d5","brief":"placeholders now render meta-sized like their gray siblings"}
+{"ts":"2026-07-28T09:54:26.608Z","op":"done","visit":"expeditions/e14@0","node":"d6","brief":"the open map now says and-N-more past eight"}
+{"ts":"2026-07-28T09:54:29.684Z","op":"done","visit":"expeditions/e14@0","node":"d7","brief":"visit to-do folds with origins render under every state's details"}
+{"ts":"2026-07-28T09:54:41.611Z","op":"done","visit":"expeditions/e14@0","node":"d8","brief":"the depth-one sub is now a stack across walk and views"}
+{"ts":"2026-07-28T09:54:59.618Z","op":"done","visit":"expeditions/e14@0","node":"d9","brief":"both archives grow decades as clickable sub-machines"}
+{"ts":"2026-07-28T09:55:19.063Z","op":"done","visit":"expeditions/e14@0","node":"d10","brief":"preflight green with 94 of 94 selftests in the worktree"}
+{"ts":"2026-07-28T09:55:38.318Z","op":"update","visit":"expeditions/e14@0","node":"d20","brief":"report written — committing the record before the leave attempt"}
