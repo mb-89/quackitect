@@ -1266,6 +1266,23 @@ document.addEventListener("click", (ev) => {
   if (h) levelHelp(null);
 });
 
+// WHAT STANDS OPEN, for the person's own hand (owner ruling 2026-07-28).
+// The same question the agent asks with se_survey, answered by the same
+// code — it used to live inside the tool handler, so only the agent could
+// ask it and the owner had to go through them.
+document.addEventListener("click", async (ev) => {
+  const b = ev.target.closest ? ev.target.closest("#survey-btn") : null;
+  if (!b) return;
+  CURRENT_DETAIL = null;
+  showDetails("what stands open", '<div class="meta">asking…</div>');
+  try {
+    const r = await fetch("/api/survey");
+    showDetails("what stands open", jsonTable(await r.json()));
+  } catch (e) {
+    showDetails("what stands open", '<div class="meta">the survey did not answer</div>');
+  }
+});
+
 // SESSION OVER — anybody reaching end stops the whole session. The mirror
 // tries to close its window; where that is not allowed, the big red
 // message stands (owner ruling 2026-07-26).
@@ -1524,7 +1541,7 @@ export function renderMirror(m: MirrorState, widget?: "machine" | "details" | "l
   // the walk's position; clicking it jumps the view there.
   const curLeaf = info.active[0] ?? "";
   const curBtn = curLeaf === "" ? "" : `<button class="ghost" id="cur-state" data-machine="${esc(walkMachine.id)}" title="the walk stands here — click: jump the view to it">☉ ${esc(curLeaf)}</button>`;
-  const machineWidget = `<div class="widget" id="w-machine"><div class="widget-head"><span class="crumbs">${crumbs}</span><span style="display:flex;align-items:center;gap:10px">${curBtn}${slider}${sdBar}${escapeBtn}<button class="expand" data-widget="w-machine" data-url="/widget/machine?view=${encodeURIComponent(decl.id)}" title="expand · ctrl-click: new tab · shift-click: new window">⛶</button></span></div><div class="widget-body">${svg}</div></div>`;
+  const machineWidget = `<div class="widget" id="w-machine"><div class="widget-head"><span class="crumbs">${crumbs}</span><span style="display:flex;align-items:center;gap:10px"><button class="ghost" id="survey-btn" title="what stands open — expeditions, iterations, pending notes, parked backlog">◷ open</button>${curBtn}${slider}${sdBar}${escapeBtn}<button class="expand" data-widget="w-machine" data-url="/widget/machine?view=${encodeURIComponent(decl.id)}" title="expand · ctrl-click: new tab · shift-click: new window">⛶</button></span></div><div class="widget-body">${svg}</div></div>`;
   const detailsWidget = `<div class="widget" id="w-details">${widgetHead("details", "w-details", "/widget/details")}
     ${info.status === "closed" ? '<div class="meta" style="color:#e86a5f">machine closed</div>' : ""}
     <div class="meta" id="details-title" data-morph-ignore>—</div>

@@ -15,6 +15,7 @@ import { appendNote, pendingNotes, readNotes } from "./inbox.ts";
 import { feedRows, renderMirror, type MirrorState } from "./render.ts";
 import { resolveInRoot, seDir } from "./paths.ts";
 import { Session } from "./session.ts";
+import { survey } from "./survey.ts";
 
 export interface MirrorOptions {
   session: Session;
@@ -280,6 +281,13 @@ export function startMirror(o: MirrorOptions): Server {
       if (url.pathname === "/api/tick") {
         res.writeHead(200, { "content-type": "application/json; charset=utf-8" });
         res.end(JSON.stringify(state.session.tickInfo(), null, 2));
+        return;
+      }
+      if (url.pathname === "/api/survey") {
+        // BOTH HANDS ASK IT (owner ruling 2026-07-28): the agent through
+        // se_survey, the person through the machine header's button.
+        res.writeHead(200, { "content-type": "application/json; charset=utf-8" });
+        res.end(JSON.stringify(survey(o.root)));
         return;
       }
       if (url.pathname === "/events") {

@@ -19,3 +19,10 @@
 {"ts":"2026-07-28T14:59:30.052Z","op":"update","visit":"expeditions/e18@0","node":"d69","brief":"Verifying the terminal dependencies actually install"}
 {"ts":"2026-07-28T15:00:43.588Z","op":"update","visit":"expeditions/e18@0","node":"d70","brief":"PTY spawn goes through the shell on Windows so shims resolve"}
 {"ts":"2026-07-28T15:01:42.951Z","op":"done","visit":"expeditions/e18@0","node":"d49","brief":"PTY host verified end to end; only the browser side is untried"}
+{"ts":"2026-07-28T15:02:31.068Z","op":"done","visit":"expeditions/e18@0","node":"d52","brief":"Settings keyed to a session token, so only a reload keeps the sliders"}
+{"ts":"2026-07-28T15:03:15.554Z","op":"done","visit":"expeditions/e18@0","node":"d57","brief":"Retro now states its output, not its input"}
+{"ts":"2026-07-28T15:03:42.929Z","op":"done","visit":"expeditions/e18@0","node":"d56","brief":"Answer-once and the dated-guidance test are in the voice"}
+{"ts":"2026-07-28T15:04:18.163Z","op":"update","visit":"expeditions/e18@0","node":"d71","brief":"Survey extracted so both hands can ask the same question"}
+{"ts":"2026-07-28T15:04:51.449Z","op":"done","visit":"expeditions/e18@0","node":"d53","brief":"The person can ask what stands open from the machine header"}
+{"ts":"2026-07-28T15:05:30.291Z","op":"update","visit":"expeditions/e18@0","node":"d72","brief":"Both halves of the settings rule pinned in the suite"}
+{"ts":"2026-07-28T15:05:55.268Z","op":"update","visit":"expeditions/e18@0","node":"d73","brief":"Committing the settings and survey work"}

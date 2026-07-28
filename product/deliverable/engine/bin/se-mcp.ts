@@ -131,13 +131,18 @@ if (argv.includes("--child") || process.env.SE_HOT_DISABLE === "1") {
   const binDir = dirname(fileURLToPath(import.meta.url));
   let child: ChildProcess | null = null;
   let spawnedOnce = false;
+  // THE SESSION'S NAME. The shim's life IS the session: it survives every
+  // reload (exit 42) and dies with a deliberate end (exit 0). Stamping the
+  // settings store with this makes a reload keep the sliders while a fresh
+  // start falls back to the defaults — with no cleanup step to forget.
+  const sessionToken = `${process.pid}-${Date.now().toString(36)}`;
   const pending = new Set<number | string>();
 
   const ensureChild = (): ChildProcess => {
     if (child === null) {
       const c = spawn(process.execPath, [join(binDir, "se-mcp.ts"), ...process.argv.slice(2), "--child"], {
         stdio: ["pipe", "pipe", "inherit"],
-        env: { ...process.env, ...(spawnedOnce ? { SE_PANEL_SUPPRESS: "1" } : {}) },
+        env: { ...process.env, SE_SESSION: sessionToken, ...(spawnedOnce ? { SE_PANEL_SUPPRESS: "1" } : {}) },
         windowsHide: true,
       });
       spawnedOnce = true;
