@@ -134,3 +134,14 @@ test("a machine switch carries the reader's open detail with it", () => {
   assert.ok(html.includes('u.searchParams.set("detail", CURRENT_DETAIL)'), "the view jump carries the open detail");
   assert.ok(html.includes('new URLSearchParams(location.search).get("detail")'), "and the page it lands on restores it");
 });
+
+// HUMAN-RUNNABLE TOOLS RIDE THE LEGAL-TOOLS LINKS (owner ruling 2026-07-28).
+// The survey had a button of its own in the machine header, and the owner
+// never found it there among the crumbs, the slider and the escape control.
+// No lane tool earns bespoke chrome; the per-state list is the surface.
+test("the survey is offered as a legal tool, not as a button of its own", () => {
+  const root = freshRoot();
+  const html = renderMirror({ session: new Session(root), root, lastPacket: undefined, mode: "manual" });
+  assert.match(html, /^\s*se_survey: \[\],$/m, "it is registered human-callable, with no arguments to give");
+  assert.ok(!html.includes("survey-btn"), "and its bespoke button is gone, handler and all");
+});

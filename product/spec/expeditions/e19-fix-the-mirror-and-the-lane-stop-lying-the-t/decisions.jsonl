@@ -25,3 +25,7 @@
 {"ts":"2026-07-28T16:50:02.813Z","op":"update","visit":"expeditions/e19@0","node":"d67","brief":"guard blocks on tracked changes only, never on scratch"}
 {"ts":"2026-07-28T16:50:49.671Z","op":"update","visit":"expeditions/e19@0","node":"d68","brief":"pinning that a dirty trunk refuses before the record is stamped"}
 {"ts":"2026-07-28T16:51:19.266Z","op":"done","visit":"expeditions/e19@0","node":"d46","brief":"a dirty trunk now refuses before the record is stamped"}
+{"ts":"2026-07-28T16:52:00.563Z","op":"update","visit":"expeditions/e19@0","node":"d69","brief":"survey joins the legal-tools links and loses its button"}
+{"ts":"2026-07-28T16:52:27.395Z","op":"update","visit":"expeditions/e19@0","node":"d70","brief":"removing the dead survey button handler"}
+{"ts":"2026-07-28T16:52:39.921Z","op":"update","visit":"expeditions/e19@0","node":"d71","brief":"pinning the survey as a legal tool with no bespoke button"}
+{"ts":"2026-07-28T16:53:19.905Z","op":"done","visit":"expeditions/e19@0","node":"d44","brief":"the survey is a legal-tools link now"}

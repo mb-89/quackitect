@@ -625,6 +625,12 @@ const HUMAN_TOOLS = {
   se_seed_expedition: [{ name: "kind", hint: "spike | fix | explore" }, { name: "goal", hint: "what this expedition is after", long: true }],
   se_seed_iteration: [{ name: "goal", hint: "what this iteration is after", long: true }, { name: "vision", hint: "roughly how — what done looks like", long: true }, { name: "inputs", hint: "context refs, comma-separated: an expedition id, note refs" }],
   se_reload: [],
+  // No arguments — it just answers. It lives HERE and nowhere else (owner
+  // ruling 2026-07-28): human-runnable lane tools are offered through the
+  // legal-tools links, per state. None of them earns bespoke chrome. It had
+  // its own header button, which the owner never found among the crumbs, the
+  // slider and the escape control sharing that row.
+  se_survey: [],
   se_exp_close: [{ name: "merge", hint: "true = apply: merge to trunk (default); false = dismiss: archive unmerged" }],
   se_note_drain: [{ name: "ref", hint: "the note's ref (note-…) — the feed shows it" }, { name: "disposition", hint: "done | obsolete | carried | backlog" }, { name: "where", hint: "where it landed or lives on — backlog REQUIRES it: ready when …" }],
 };
@@ -1363,22 +1369,11 @@ document.addEventListener("click", (ev) => {
   if (h) levelHelp(null);
 });
 
-// WHAT STANDS OPEN, for the person's own hand (owner ruling 2026-07-28).
-// The same question the agent asks with se_survey, answered by the same
-// code — it used to live inside the tool handler, so only the agent could
-// ask it and the owner had to go through them.
-document.addEventListener("click", async (ev) => {
-  const b = ev.target.closest ? ev.target.closest("#survey-btn") : null;
-  if (!b) return;
-  CURRENT_DETAIL = null;
-  showDetails("what stands open", '<div class="meta">asking…</div>');
-  try {
-    const r = await fetch("/api/survey");
-    showDetails("what stands open", jsonTable(await r.json()));
-  } catch (e) {
-    showDetails("what stands open", '<div class="meta">the survey did not answer</div>');
-  }
-});
+// WHAT STANDS OPEN, for the person's own hand, now rides the LEGAL TOOLS
+// links like every other human-runnable tool (owner ruling 2026-07-28). It
+// had a button of its own in the machine header; the owner never found it
+// there, sharing a row with the crumbs, the slider and the escape control.
+// /api/survey stays — the mirror's own surfaces still ask it directly.
 
 // SESSION OVER — anybody reaching end stops the whole session. The mirror
 // tries to close its window; where that is not allowed, the big red
@@ -1657,7 +1652,7 @@ export function renderMirror(m: MirrorState, widget?: "machine" | "details" | "l
   // the walk's position; clicking it jumps the view there.
   const curLeaf = info.active[0] ?? "";
   const curBtn = curLeaf === "" ? "" : `<button class="ghost" id="cur-state" data-machine="${esc(walkMachine.id)}" title="the walk stands here — click: jump the view to it">☉ ${esc(curLeaf)}</button>`;
-  const machineWidget = `<div class="widget" id="w-machine"><div class="widget-head"><span class="crumbs">${crumbs}</span><span style="display:flex;align-items:center;gap:10px"><button class="ghost" id="survey-btn" title="what stands open — expeditions, iterations, pending notes, parked backlog">◷ open</button>${curBtn}${slider}${sdBar}${escapeBtn}<button class="expand" data-widget="w-machine" data-url="/widget/machine?view=${encodeURIComponent(decl.id)}" title="expand · ctrl-click: new tab · shift-click: new window">⛶</button></span></div><div class="widget-body">${svg}</div></div>`;
+  const machineWidget = `<div class="widget" id="w-machine"><div class="widget-head"><span class="crumbs">${crumbs}</span><span style="display:flex;align-items:center;gap:10px">${curBtn}${slider}${sdBar}${escapeBtn}<button class="expand" data-widget="w-machine" data-url="/widget/machine?view=${encodeURIComponent(decl.id)}" title="expand · ctrl-click: new tab · shift-click: new window">⛶</button></span></div><div class="widget-body">${svg}</div></div>`;
   const detailsWidget = `<div class="widget" id="w-details">${widgetHead("details", "w-details", "/widget/details")}
     ${info.status === "closed" ? '<div class="meta" style="color:#e86a5f">machine closed</div>' : ""}
     <div class="meta" id="details-title" data-morph-ignore>—</div>
