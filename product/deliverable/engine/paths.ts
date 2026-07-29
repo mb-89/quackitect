@@ -18,25 +18,38 @@ export const EXCLUDED_DIRS = new Set([".git", "node_modules", ".se", ".venv", "_
 /** True for a path addressing a declared root, e.g. "@desktop/sketch.png". */
 export const isRootRef = (p: string): boolean => p.startsWith("@");
 
-/** The owner's declared roots, read LIVE so an edit binds the very next call. */
-export function declaredRoots(root: string): Record<string, string> {
+/** The owner's declared roots, read LIVE so an edit binds the very next call.
+ *
+ *  A DECLARATION THAT CANNOT BE READ MUST NEVER READ AS "NONE DECLARED" (found
+ *  live 2026-07-29): PowerShell wrote this file with a UTF-8 BOM, JSON.parse
+ *  refused it, and a swallowing catch reported the owner's root as undeclared.
+ *  The BOM is stripped, and a broken file is now a LOUD refusal. */
+export function declaredRoots(root: string, source = "engine/paths.ts"): Record<string, string> {
+  const p = join(root, ".se", "roots.json");
+  if (!existsSync(p)) return {};
+  const raw = readFileSync(p, "utf8").replace(/^\uFEFF/, "");
+  let parsed: Record<string, unknown>;
   try {
-    const p = join(root, ".se", "roots.json");
-    if (!existsSync(p)) return {};
-    const parsed = JSON.parse(readFileSync(p, "utf8")) as Record<string, unknown>;
-    const map = (typeof parsed.roots === "object" && parsed.roots !== null ? parsed.roots : parsed) as Record<string, unknown>;
-    const out: Record<string, string> = {};
-    for (const [k, v] of Object.entries(map)) if (typeof v === "string") out[k] = v;
-    return out;
-  } catch {
-    return {};
+    parsed = JSON.parse(raw) as Record<string, unknown>;
+  } catch (e) {
+    throw new Rejection({
+      clause: CLAUSES.UNDECLARED_ROOT,
+      expected: 'a readable .se/roots.json, e.g. {"desktop": "C:\\\\Users\\\\you\\\\Desktop"}',
+      got: `.se/roots.json does not parse: ${(e as Error).message}`,
+      remedy: { tool: "se_tick", args: {}, note: "ask the OWNER to fix the file — a declaration that cannot be read must never pass for none declared" },
+      source,
+    });
   }
+  const map = (typeof parsed.roots === "object" && parsed.roots !== null ? parsed.roots : parsed) as Record<string, unknown>;
+  const out: Record<string, string> = {};
+  for (const [k, v] of Object.entries(map)) if (typeof v === "string") out[k] = v;
+  return out;
 }
 
 /** Resolve "@name/rest" against the declared roots. Read lanes only. */
 export function resolveDeclaredRoot(root: string, p: string, source: string): string {
   const [name, ...rest] = p.slice(1).split(/[\\/]+/);
-  const roots = declaredRoots(root);
+  const roots = declaredRoots(root, source);
   const target = roots[name];
   if (target === undefined) {
     throw new Rejection({

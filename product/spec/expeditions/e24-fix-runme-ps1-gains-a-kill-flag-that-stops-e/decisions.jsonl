@@ -36,3 +36,9 @@
 {"ts":"2026-07-29T16:07:20.481Z","op":"update","visit":"expeditions/e24@0","node":"d44","brief":"fixing a missing import in the declared-roots test"}
 {"ts":"2026-07-29T16:07:24.880Z","op":"update","visit":"expeditions/e24@0","node":"d45","brief":"running the suite with the declared-roots cases"}
 {"ts":"2026-07-29T16:08:21.796Z","op":"done","visit":"expeditions/e24@0","node":"d38","brief":"pause added as escape's neutral sibling"}
+{"ts":"2026-07-29T16:08:31.863Z","op":"done","visit":"expeditions/e24@0","node":"d39","brief":"pause proven to leave the machine standing with no escape record"}
+{"ts":"2026-07-29T16:08:41.670Z","op":"done","visit":"expeditions/e24@0","node":"d42","brief":"declared roots ported from v2 into the read lane"}
+{"ts":"2026-07-29T16:08:54.010Z","op":"done","visit":"expeditions/e24@0","node":"d43","brief":"declared roots proven; undeclared refuses and names what exists"}
+{"ts":"2026-07-29T16:12:37.812Z","op":"update","visit":"expeditions/e24@0","node":"d3","brief":"BOM stripped and a broken roots.json now refuses loudly"}
+{"ts":"2026-07-29T16:12:43.630Z","op":"update","visit":"expeditions/e24@0","node":"d4","brief":"running the suite with the BOM and broken-file cases"}
+{"ts":"2026-07-29T16:13:32.675Z","op":"update","visit":"expeditions/e24@0","node":"d5","brief":"193 pass; staging the fix"}
