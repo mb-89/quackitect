@@ -70,3 +70,10 @@
 {"ts":"2026-07-29T16:30:31.701Z","op":"update","visit":"expeditions/e24@0","node":"d31","brief":"test regex missed negative canvas coordinates"}
 {"ts":"2026-07-29T16:30:36.571Z","op":"update","visit":"expeditions/e24@0","node":"d32","brief":"re-running the suite after the regex fix"}
 {"ts":"2026-07-29T16:31:48.641Z","op":"update","visit":"expeditions/e24@0","node":"d33","brief":"staging the route redraw"}
+{"ts":"2026-07-29T16:32:04.149Z","op":"done","visit":"expeditions/e24@0","node":"d9","brief":"route redraw committed"}
+{"ts":"2026-07-29T16:32:10.256Z","op":"update","visit":"expeditions/e24@0","node":"d34","brief":"reading promoteCard before wiring the number badge"}
+{"ts":"2026-07-29T16:33:08.581Z","op":"plan","visit":"expeditions/e24@0","parent":"d10","nodes":[{"id":"d35","brief":"Make the card number promote on click"},{"id":"d36","brief":"Rename pruning to overhaul"}]}
+{"ts":"2026-07-29T16:33:42.901Z","op":"obsolete","visit":"expeditions/e24@0","node":"d36","brief":"duplicate of d10"}
+{"ts":"2026-07-29T16:37:26.805Z","op":"update","visit":"expeditions/e24@0","node":"d37","brief":"guarding the badge click and fixing two pinned assertions"}
+{"ts":"2026-07-29T16:37:31.707Z","op":"update","visit":"expeditions/e24@0","node":"d38","brief":"running the suite on the badge wiring"}
+{"ts":"2026-07-29T16:38:20.566Z","op":"update","visit":"expeditions/e24@0","node":"d39","brief":"staging the badge click"}

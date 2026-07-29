@@ -435,7 +435,8 @@ const STYLE = `
   #div-cards { grid-column: 2; grid-row: 1 / -1; width: 6px; cursor: col-resize; background: #2a2f34; border-radius: 3px; }
   /* The head reserves room so the number never lands on the title. */
   .card > .widget > .widget-head { padding-left: 34px; }
-  .cardnum { position: absolute; top: 7px; left: 10px; z-index: 2; display: inline-flex; align-items: center; justify-content: center; width: 17px; height: 17px; border: 1px solid #3a4147; border-radius: 4px; font-size: 11px; color: #7f8b96; }
+  .cardnum { position: absolute; top: 7px; left: 10px; z-index: 2; display: inline-flex; align-items: center; justify-content: center; width: 17px; height: 17px; border: 1px solid #3a4147; border-radius: 4px; font-size: 11px; color: #7f8b96; cursor: pointer; }
+  .cardnum:hover { color: #e8b339; border-color: #e8b339; }
   .card.main .cardnum { color: #e8b339; border-color: #e8b339; }
   .legend-row { display: flex; gap: 10px; padding: 3px 12px; font-size: 12px; }
   .legend-key { color: #e8b339; min-width: 92px; flex: none; }
@@ -1341,6 +1342,17 @@ addEventListener("keydown", (ev) => {
   ev.preventDefault();
   promoteCard(card.id);
 });
+// THE NUMBER IS A CONTROL, NOT A LABEL (owner 2026-07-29). Whatever the key
+// does, clicking the badge does — including the press-again toggle back.
+addEventListener("click", (ev) => {
+  const badge = ev.target !== null && ev.target.closest !== undefined ? ev.target.closest(".cardnum") : null;
+  if (badge === null) return;
+  const card = badge.closest(".card");
+  if (card === null) return;
+  ev.preventDefault();
+  ev.stopPropagation();
+  promoteCard(card.id.replace(/^card-/, ""));
+});
 // 58/42 to start (owner 2026-07-29), then wherever the reader drags it,
 // remembered exactly the way every other pane already is.
 const CARDS_KEY = PANE_KEY + "cards-main";
@@ -2087,7 +2099,7 @@ export function renderMirror(m: MirrorState, widget?: "machine" | "details" | "l
   const nothingYet = (title: string): string =>
     `<div class="widget"><div class="widget-head"><span>${esc(title)}</span></div><div class="widget-body"><div class="meta" style="padding:10px 12px">not built yet — the slot is held so the numbers never shift</div></div></div>`;
   const cardsHtml = cardList
-    .map((c, i) => `<div class="card${c.id === now ? " main" : ""}" id="card-${esc(c.id)}" style="${cellAt(i)}"><span class="cardnum">${c.n}</span>${filled(c) ? byWidget[c.widget as string] : nothingYet(c.title)}</div>`)
+    .map((c, i) => `<div class="card${c.id === now ? " main" : ""}" id="card-${esc(c.id)}" style="${cellAt(i)}"><span class="cardnum" title="promote this card — the same as pressing ${c.n}">${c.n}</span>${filled(c) ? byWidget[c.widget as string] : nothingYet(c.title)}</div>`)
     .join("\n  ");
   // THE LEGEND RENDERS FROM THE REGISTRY. Declare a key there and it shows up
   // here by itself; a hand-kept list drifts, and a stale legend is worse than

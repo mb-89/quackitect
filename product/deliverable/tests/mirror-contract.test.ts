@@ -173,7 +173,7 @@ test("every card carries its number and the legend takes the empty slot", () => 
   const html = renderMirror({ session: new Session(root), root, lastPacket: undefined, mode: "manual" });
   assert.match(html, /id="card-legend"/, "the legend is a card of its own");
   assert.match(html, /grid-template-rows:repeat\(3,1fr\)/, "six cards make a two-by-three grid");
-  assert.match(html, /<span class="cardnum">2<\/span>/, "cards carry the number that promotes them");
+  assert.match(html, /<span class="cardnum"[^>]*>2<\/span>/, "cards carry the number that promotes them");
   // The default main card is the first AVAILABLE one — one rule, no exception
   // list. With no agent connected, the state machine leads.
   assert.match(html, /class="card main" id="card-state-machine"/, "the state machine leads when chat is empty");
@@ -189,6 +189,11 @@ test("the number keys yield to a text field and pin their choice in the URL", ()
   assert.ok(html.includes('q.set("card", id)'), "the promoted card is pinned in the URL");
   // Same key again is the way back: the loop is chat, look at something, chat.
   assert.ok(html.includes("if (id === CARD_NOW) { if (CARD_PREV !== null) promoteCard(CARD_PREV); return; }"), "the same key returns to the previous card");
+  // THE NUMBER IS A CONTROL, NOT A LABEL (owner 2026-07-29). A badge that
+  // names a shortcut but does nothing when clicked is a label pretending.
+  assert.ok(html.includes('ev.target.closest(".cardnum")'), "the badge is wired to the click");
+  assert.ok(html.includes('promoteCard(card.id.replace(/^card-/, ""))'), "and it promotes the card it sits on");
+  assert.match(html, /\.cardnum \{[^}]*cursor: pointer/, "and it looks clickable");
 });
 
 // NEVER CHANGE ANYTHING THE LAST CHANGE DID NOT TOUCH (owner, note-4ba204a85769,
@@ -276,7 +281,7 @@ test("the chat card holds its slot and its number with no agent connected", () =
   assert.ok(!/class="widget no-host" id="w-terminal"/.test(html), "and it is NOT hidden when nothing answers");
   assert.ok(html.includes("no agent connected"), "it says plainly why it is empty");
   assert.match(html, /id="card-chat"/, "the slot is there under its own id");
-  assert.match(html, /<span class="cardnum">1<\/span>/, "carrying the number that promotes it");
+  assert.match(html, /<span class="cardnum"[^>]*>1<\/span>/, "carrying the number that promotes it");
 });
 
 // THE END IS SHOWN, NOT GUESSED (owner ruling 2026-07-28). Quitting at the
