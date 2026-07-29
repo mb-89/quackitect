@@ -46,5 +46,7 @@ This applies to every citation, and to your own instincts.
 
 - Size work by its CONTENT, never by an agent's time estimate. Those estimates overshoot wildly and have done so repeatedly — a day claimed, an hour spent. Do not parrot an inherited size claim either.
 - Never say how long something will take unless you have a measurement. "Roughly a day" from feel is not an estimate; it is a guess wearing one's clothes.
+- Size the vehicle before choosing it. An expedition and an iteration are each worth ROUGHLY A DAY of agent work. Anything smaller goes INSIDE one.
 - Never spam the archives with many small records. Bundle related small work into ONE expedition or iteration. An archive reader does not care about ten-per-day granularity.
+- A single small fix never earns its own record. It is a commit inside an expedition that is already open, or inside one opened to hold the day's work.
 - Commits stay fine-grained. Records do not. The two answer different questions.

@@ -63,6 +63,11 @@ LAUNCH — read by RUNME.ps1 before the server starts.
                  The engine's --autonomy 0 is a DIFFERENT thing: an agent
                  is running, it just may not step by itself.
   --one-screen   the old spelling of today's default. Accepted, does nothing.
+  --kill         stop every leftover quackitect process and exit, launching
+                 nothing (-Kill). Finds the server, the terminal host and the
+                 manual mirror by command line AND by listening port (7333,
+                 7334), kills each with its children, then checks the ports
+                 really came free. Finding nothing running is a success.
 
 ENGINE — read by the server (this file is where they are defined).
 

@@ -17,6 +17,8 @@ list. Run .\RUNME.ps1 --help.
 .\RUNME.ps1 --manual
 .EXAMPLE
 .\RUNME.ps1 --own-terminal
+.EXAMPLE
+.\RUNME.ps1 --kill
 #>
 $ErrorActionPreference = "Stop"
 $root = $PSScriptRoot
@@ -37,6 +39,90 @@ if ($forwarded | Where-Object { $_ -in @("--help", "-h", "-?", "-Help") }) {
   $node = Get-Command node -ErrorAction SilentlyContinue
   if ($node) { node (Join-Path $root "product\deliverable\engine\bin\se-mcp.ts") --help }
   else { Write-Output "  (node not installed yet - the whole help lives in product\deliverable\engine\bin\se-mcp.ts)" }
+  exit 0
+}
+
+# THE KILL. A stale server still holding the Mirror's port stops the next
+# launch dead, and the terminal host is started DETACHED so it outlives the
+# window that made it. This runs BEFORE preflight and then exits: clearing a
+# port must never wait on npm install, and nothing is launched afterwards.
+if ($forwarded | Where-Object { $_ -in @("--kill", "-Kill") }) {
+  Write-Host "quackitect v3 - kill: looking for leftovers" -ForegroundColor Cyan
+  $entryPoints = @("se-mcp.ts", "se-pty.ts", "se-manual.ts")
+  $ports = @(7333, 7334)
+
+  # TWO WAYS OF BEING FOUND, because either one alone has a blind spot. The
+  # command line catches an instance running on a non-default port. The
+  # listening port catches one whose command line cannot be read.
+  $found = [ordered]@{}
+  foreach ($p in @(Get-CimInstance Win32_Process -Filter "Name='node.exe'" -ErrorAction SilentlyContinue)) {
+    if ([string]::IsNullOrEmpty($p.CommandLine)) { continue }
+    $hit = @($entryPoints | Where-Object { $p.CommandLine -like "*$_*" })
+    # THE PID KEY IS A STRING ON PURPOSE. An ordered dictionary indexed by an
+    # integer reads it as a POSITION rather than a key, so a real pid throws.
+    if ($hit.Count -gt 0) { $found["$($p.ProcessId)"] = "node $($hit[0])" }
+  }
+  foreach ($port in $ports) {
+    foreach ($conn in @(Get-NetTCPConnection -State Listen -LocalPort $port -ErrorAction SilentlyContinue)) {
+      $owner = "$($conn.OwningProcess)"
+      if ($found.Contains($owner)) {
+        $found[$owner] = "$($found[$owner]), port $port"
+      } else {
+        $name = (Get-Process -Id ([int]$owner) -ErrorAction SilentlyContinue).ProcessName
+        $found[$owner] = if ($name) { "port $port ($name)" } else { "port $port" }
+      }
+    }
+  }
+
+  if ($found.Count -eq 0) {
+    Write-Host "  nothing was running - ports $($ports -join ' and ') are free" -ForegroundColor Green
+    exit 0
+  }
+
+  # NEVER KILL YOUR OWN SESSION. A caged agent told to clear the ports would
+  # otherwise taskkill the very server serving it, halfway through its turn.
+  # Anything in this process's own ancestry is reported and left standing.
+  $ancestry = @()
+  $walk = $PID
+  for ($i = 0; ($i -lt 16) -and ($walk -gt 0); $i++) {
+    $proc = Get-CimInstance Win32_Process -Filter "ProcessId=$walk" -ErrorAction SilentlyContinue
+    if ($null -eq $proc) { break }
+    $ancestry += "$($proc.ProcessId)"
+    $walk = [int]$proc.ParentProcessId
+  }
+
+  $killed = 0
+  $spared = 0
+  # taskkill writes to stderr for a process that died on its own, and a Stop
+  # preference turns that into a terminating error mid-sweep.
+  $prevEap = $ErrorActionPreference
+  $ErrorActionPreference = "Continue"
+  foreach ($entry in $found.GetEnumerator()) {
+    if ($ancestry -contains $entry.Key) {
+      Write-Host "  SPARED $($entry.Key) - $($entry.Value) - it is running this script" -ForegroundColor Yellow
+      $spared++
+      continue
+    }
+    Write-Host "  killing $($entry.Key) - $($entry.Value)"
+    # /T takes the CHILDREN with it. The terminal host spawns the caged agent,
+    # so killing only the parent leaves that agent orphaned and alive.
+    taskkill /PID $entry.Key /T /F 2>&1 | Out-Null
+    $killed++
+  }
+  $ErrorActionPreference = $prevEap
+
+  # SAY WHETHER IT WORKED, not whether it ran. A kill reporting success over a
+  # port that is still held is the exact failure this flag exists to end.
+  Start-Sleep -Milliseconds 400
+  $held = @($ports | Where-Object { Get-NetTCPConnection -State Listen -LocalPort $_ -ErrorAction SilentlyContinue })
+  if ($held.Count -gt 0) {
+    Write-Host "  killed $killed, but port(s) $($held -join ', ') are STILL HELD" -ForegroundColor Red
+    if ($spared -gt 0) {
+      Write-Host "  $spared spared as this script's own ancestors - run --kill from a plain terminal" -ForegroundColor Yellow
+    }
+    exit 1
+  }
+  Write-Host "  killed $killed - ports $($ports -join ' and ') are free" -ForegroundColor Green
   exit 0
 }
 

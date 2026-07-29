@@ -28,10 +28,22 @@ land or change.
 
 ## 2. The vehicle judgment
 
+SIZE FIRST, THEN VEHICLE. An expedition and an iteration are each worth
+roughly A DAY of agent work. Neither is a per-fix record. Sizes and the
+bundling law live in software.md, under sizing and records.
+
+NEVER SEED A RECORD FOR A SINGLE SMALL FIX. This is the failure mode the
+section exists to stop, and it has happened for real. A bug fix is a
+commit inside an expedition. It is never an expedition of its own.
+
 Recommend the smallest vehicle that honors the derisking gates:
 
-- A small concrete fix — an expedition. Bundle related small fixes into
-  ONE expedition; the archives are for readers, not for confetti.
+- An expedition already open — put the work THERE. Check this first. It
+  is the usual answer, because an open expedition is a day's bundle.
+- Nothing open, work is small — open ONE expedition to hold today's
+  work. It closes at the end of the day, not at the end of the fix.
+- Nothing open, work has a clear goal of its own — an expedition for
+  that goal.
 - Roughly a day of thematically bundled, non-urgent work — an iteration
   stub; seed to-dos into it and start it when it is fat enough.
 - A vague itch, a "we should think about" — ideation, or a note.
@@ -43,6 +55,9 @@ Recommend the smallest vehicle that honors the derisking gates:
 Name the recommendation plainly, say why in one or two sentences, and
 name the second-best option with its tradeoff (the sycophancy guard
 applies to advice).
+
+LANDING WORK DOES NOT NEED A CLOSE. Work reaches trunk while its
+expedition stays open, so a day's bundle keeps collecting.
 
 ## 3. Execute — the desk carries the paperwork
 
