@@ -13,15 +13,15 @@
             "state": {
               "type": "canvas",
               "state": {
-                "file": "deliverable/machines/main.canvas",
+                "file": "deliverable/machines/expedition_archive.canvas",
                 "viewState": {
-                  "x": 1097.5424184838841,
-                  "y": 45.33051695733022,
-                  "zoom": -0.635570586440857
+                  "x": -770,
+                  "y": -50,
+                  "zoom": 0
                 }
               },
               "icon": "lucide-layout-dashboard",
-              "title": "main"
+              "title": "expedition_archive"
             }
           }
         ]
@@ -188,8 +188,13 @@
   },
   "active": "b4ae931dcf7ab0f2",
   "lastOpenFiles": [
-    "deliverable/machines/scale.md",
     "deliverable/machines/main.canvas",
+    "deliverable/machines/iteration_archive.canvas",
+    "deliverable/machines/iterations.canvas",
+    "deliverable/machines/expedition_archive.canvas",
+    "deliverable/machines/expeditions.canvas",
+    "deliverable/machines/ideation.canvas",
+    "deliverable/machines/scale.md",
     "deliverable/machines/retro.canvas",
     "deliverable/machines/states/read_contract.md",
     "deliverable/tests/threshold.test.ts",

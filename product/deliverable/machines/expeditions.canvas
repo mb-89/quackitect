@@ -1,51 +1,32 @@
 {
- "metadata": {
-  "version": "1.0-1.0",
-  "frontmatter": {
-   "reentry": "restart",
-   "priority": 0.4
-  }
- },
- "nodes": [
-  {
-   "id": "n-comment",
-   "type": "text",
-   "text": "GENERATED AT ENTRY — this machine's states are the OPEN expeditions: one work → leave pair per expedition, instantiated from states/work.md and states/leave.md (the authored source). Seeding is a function (se_seed_expedition, anywhere it is legal); a fresh seed stands here on the next entry. With nothing open, start runs to end. This drawing is the stub that carries the frontmatter.",
-   "x": -1100,
-   "y": -340,
-   "width": 900,
-   "height": 160
-  },
-  {
-   "id": "n-start",
-   "type": "file",
-   "file": "deliverable/machines/states/start.md",
-   "x": -1400,
-   "y": 80,
-   "width": 160,
-   "height": 160,
-   "styleAttributes": {
-    "shape": "pill"
-   }
-  },
-  {
-   "id": "n-end",
-   "type": "file",
-   "file": "deliverable/machines/states/end.md",
-   "x": 1180,
-   "y": 80,
-   "width": 160,
-   "height": 160,
-   "styleAttributes": {
-    "shape": "pill"
-   }
-  }
- ],
- "edges": [
-  {
-   "id": "e-start-end",
-   "fromNode": "n-start",
-   "toNode": "n-end"
-  }
- ]
+	"metadata":{
+		"version":"1.0-1.0",
+		"frontmatter":{"reentry":"restart","priority":0.4}
+	},
+	"nodes":[
+		{"id":"n-comment","type":"text","text":"GENERATED AT ENTRY — this machine's states are the OPEN expeditions: one work → leave pair per expedition, instantiated from states/work.md and states/leave.md (the authored source). Seeding is a function (se_seed_expedition, anywhere it is legal); a fresh seed stands here on the next entry. With nothing open, start runs to end. This drawing is the stub that carries the frontmatter.","x":-1100,"y":-340,"width":900,"height":160},
+		{
+			"id":"n-start",
+			"type":"file",
+			"file":"deliverable/machines/states/start.md",
+			"x":-1400,
+			"y":80,
+			"width":160,
+			"height":160,
+			"styleAttributes":{"shape":"pill"}
+		},
+		{
+			"id":"n-end",
+			"type":"file",
+			"file":"deliverable/machines/states/end.md",
+			"x":1180,
+			"y":80,
+			"width":160,
+			"height":160,
+			"styleAttributes":{"shape":"pill"}
+		}
+	],
+	"edges":[
+		{"id":"e-start-end","fromNode":"n-start","toNode":"n-end","fromSide":"right","toSide":"left"}
+	]
 }
