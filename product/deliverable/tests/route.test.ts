@@ -184,6 +184,19 @@ test("a blocked route draws a closure, and the way past it is FADED", async () =
   assert.ok(html.includes("above the session autonomy"), "and the barrier says why");
 });
 
+// A TARGET YOU CANNOT NAME IS NOT A TARGET (found live 2026-07-29). The search
+// expands a submachine into its inner states, so the container's own id was
+// never a node in the graph. Aiming at "expeditions" was refused as unreachable
+// from idle -- a hop the walk offers directly and the agent had just taken.
+test("a submachine can be aimed at by its container name", () => {
+  const s = new Session(freshRoot());
+  const r = s.route("expeditions");
+  assert.equal(r.found, true, "the container names a place the drawing can reach");
+  assert.equal(s.setTarget("expeditions").target, "expeditions", "and it is stored as the reader named it");
+  // A plain state is untouched by the normalisation.
+  assert.equal(s.route("front_desk").found, true);
+});
+
 test("the preview MOVES NOTHING", () => {
   const s = new Session(freshRoot());
   const before = s.active();

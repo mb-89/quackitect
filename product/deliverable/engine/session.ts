@@ -744,7 +744,10 @@ export class Session {
       });
     }
     this._target = to;
-    return { target: to, ...r };
+    // The reader's OWN name wins the report. route() answers with the
+    // normalised aim so the render can place the dot, and spreading it last
+    // would hand "expeditions/start" back to someone who said "expeditions".
+    return { ...r, target: to };
   }
 
   /** Conditions no agent can discharge alone. A script it can run; a read
@@ -767,7 +770,16 @@ export class Session {
     stops_at?: { at: string; why: string };
   } {
     const from = this.active()[0] ?? this.machine.initial;
-    const r = computeRoute(from, target, (q) => this.expandNode(q));
+    // A SUBMACHINE IS NAMED BY ITS CONTAINER, but the search graph never holds
+    // that name: expandNode replaces the container with its inner states. So
+    // aiming at "expeditions" found no path to a state the reader had just
+    // walked into, which made the target useless for half the drawing (found
+    // live 2026-07-29, the moment the mirror got a key for setting it).
+    // Aim at its start. The render maps that back to the container node, so
+    // the destination dot still lands exactly where the reader pointed.
+    const decl = this.machine.states.find((s) => s.id === target);
+    const aim = decl?.submachine !== undefined ? `${target}/start` : target;
+    const r = computeRoute(from, aim, (q) => this.expandNode(q));
     const judgments: { at: string; needs: string; why: string }[] = [];
     for (const s of r.steps) {
       // The slider is weighed HOP BY HOP. A route that walks past a state
