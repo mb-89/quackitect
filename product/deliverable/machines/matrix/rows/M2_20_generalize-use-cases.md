@@ -1,0 +1,15 @@
+---
+kind: matrix-row
+statement: "Generalize the stories into Cockburn-shape use cases."
+state_kind: work
+filled_by: agent
+depends_on: [write-stories]
+---
+
+## Guidance
+
+Per [[meth-cockburn-use-case]]. Every story maps into a scenario path; extensions from numbered steps; no UI mechanics. M3 derives the requirements from these steps and extensions.
+
+## Evidence form
+
+- use_cases | the generalized set, every story covered | required

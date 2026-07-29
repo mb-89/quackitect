@@ -1,0 +1,25 @@
+# The rigor matrix
+
+One full-battery process, tailored down by change size. This folder is the
+single source: the seeder reads it live, and the spec's structure derives
+from it.
+
+- `rows/` — the steps of the full state machine, one file each. The file
+  name orders the walk (`M<gate>_<step><letter>_<title>`, sparse numbers,
+  letters mark parallel branches). The frontmatter `depends_on` is the
+  truth; the name is only the readable projection. References use the
+  stable short title (`draft-vision`), never the numbered prefix.
+- `cells/` — how each row applies at each change size, one file per cell
+  (`<row>--<column>.md`). Columns: `patch`, `minor`, `major`, `product`,
+  `specification`. A cell that does not apply is an EXPLICIT file saying
+  so with its reason — absence means not yet written.
+
+The row file carries the step at FULL battery: statement, dependencies,
+guidance, evidence form. The `product` cell adds only what the standing
+whole-product level demands beyond that. The change-size cells tailor
+down; the `specification` cell says how the step's output becomes its
+part of the documentation.
+
+Strikes are proposals. The owner adjudicates every cell that reduces a
+step. The floor law binds: kickoff, green verification, docs-match and
+the accepted handover are never struck, at any size.
