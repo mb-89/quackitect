@@ -4,24 +4,17 @@
     "type": "split",
     "children": [
       {
-        "id": "8187625f08795410",
+        "id": "c5b56dd32a693941",
         "type": "tabs",
         "children": [
           {
-            "id": "b4ae931dcf7ab0f2",
+            "id": "c07847f318fa619a",
             "type": "leaf",
             "state": {
-              "type": "canvas",
-              "state": {
-                "file": "deliverable/machines/expedition_archive.canvas",
-                "viewState": {
-                  "x": -770,
-                  "y": -50,
-                  "zoom": 0
-                }
-              },
-              "icon": "lucide-layout-dashboard",
-              "title": "expedition_archive"
+              "type": "empty",
+              "state": {},
+              "icon": "lucide-file",
+              "title": "New tab"
             }
           }
         ]
@@ -186,8 +179,11 @@
       "bases:Create new base": false
     }
   },
-  "active": "b4ae931dcf7ab0f2",
+  "active": "c07847f318fa619a",
   "lastOpenFiles": [
+    "deliverable/machines/main.canvas",
+    "deliverable/machines/scale.md",
+    "deliverable/machines/expedition_archive.canvas",
     "spec/expeditions/e21-explore-rebuild-the-mirror-as-a-card-matrix-one-/report.md",
     "spec/expeditions/e21-explore-rebuild-the-mirror-as-a-card-matrix-one-/record.md",
     "spec/expeditions/e21-explore-rebuild-the-mirror-as-a-card-matrix-one-/decisions.jsonl",
@@ -199,13 +195,10 @@
     "deliverable/machines/states/pruning.md",
     "deliverable/engine/cards.ts",
     "cards.md",
-    "deliverable/machines/main.canvas",
     "deliverable/machines/iteration_archive.canvas",
     "deliverable/machines/iterations.canvas",
-    "deliverable/machines/expedition_archive.canvas",
     "deliverable/machines/expeditions.canvas",
     "deliverable/machines/ideation.canvas",
-    "deliverable/machines/scale.md",
     "deliverable/machines/retro.canvas",
     "deliverable/machines/states/read_contract.md",
     "deliverable/tests/threshold.test.ts",
@@ -232,7 +225,6 @@
     "deliverable/machines/guidance/voice.md",
     "deliverable/machines/guidance/contract.md",
     "deliverable/machines/states/start.md",
-    "deliverable/machines/states/end.md",
-    "deliverable/machines/states/idle.md"
+    "deliverable/machines/states/end.md"
   ]
 }
