@@ -223,10 +223,13 @@ function buildRecordColumn(machineId: string, entries: ArchiveEntry[], kindWord:
   nodes.push({ id: "n-end", type: "file", file: "end.md", x: -240, y: centerY, width: 160, height: 160, styleAttributes: { shape: "pill" } });
   entries.forEach((e, i) => {
     expByState[e.sid] = e.full;
-    states.push(recordState(e, kindWord));
+    const st = recordState(e, kindWord);
+    states.push(st);
     start.edges.push({ to: e.sid, role: "normal" });
     const y = i * 420;
-    nodes.push({ id: `n-${e.sid}`, type: "file", file: `${e.sid}.md`, x: -1100, y, ...nodeSize(e.sid) });
+    // SIZED BY THE TEXT IT SHOWS. Measuring the id alone made every archive
+    // box 200x72 while the drawing painted the goal underneath it.
+    nodes.push({ id: `n-${e.sid}`, type: "file", file: `${e.sid}.md`, x: -1100, y, ...nodeSize(e.sid, st.statement) });
     edges.push({ id: `e-start-${e.sid}`, fromNode: "n-start", toNode: `n-${e.sid}` });
     edges.push({ id: `e-${e.sid}-end`, fromNode: `n-${e.sid}`, toNode: "n-end" });
   });

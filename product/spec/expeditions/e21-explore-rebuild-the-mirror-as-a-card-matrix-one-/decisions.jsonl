@@ -17,3 +17,13 @@
 {"ts":"2026-07-29T10:41:25.699Z","op":"update","visit":"expeditions/e21@0","node":"d30","brief":"adding the pruning node and its idle edge to the drawn machine"}
 {"ts":"2026-07-29T10:41:28.875Z","op":"update","visit":"expeditions/e21@0","node":"d31","brief":"verifying the machine still compiles with pruning added"}
 {"ts":"2026-07-29T10:42:00.616Z","op":"done","visit":"expeditions/e21@0","node":"d12","brief":"prior art gathered from four fields, synthesised into the SORTED criteria"}
+{"ts":"2026-07-29T10:42:03.804Z","op":"done","visit":"expeditions/e21@0","node":"d13","brief":"pruning drawn as one state with its method doc, preflight green"}
+{"ts":"2026-07-29T10:42:10.918Z","op":"update","visit":"expeditions/e21@0","node":"d32","brief":"checking whether 560 clamps a hand-set width or only seeds new boxes"}
+{"ts":"2026-07-29T10:42:33.111Z","op":"update","visit":"expeditions/e21@0","node":"d33","brief":"archive nodes may be sized without their goal, which would explain small boxes"}
+{"ts":"2026-07-29T10:42:55.086Z","op":"update","visit":"expeditions/e21@0","node":"d34","brief":"archive box is born 200x72 from the id alone; checking the iteration twin"}
+{"ts":"2026-07-29T10:43:21.059Z","op":"update","visit":"expeditions/e21@0","node":"d35","brief":"sizing archive and kickoff boxes by the goal they display"}
+{"ts":"2026-07-29T10:43:46.240Z","op":"update","visit":"expeditions/e21@0","node":"d36","brief":"reading test conventions to pin the archive box size"}
+{"ts":"2026-07-29T10:44:13.224Z","op":"update","visit":"expeditions/e21@0","node":"d37","brief":"pinning the archive box size so it cannot shrink back"}
+{"ts":"2026-07-29T10:44:31.219Z","op":"update","visit":"expeditions/e21@0","node":"d38","brief":"running the suite with the archive and sizing guards added"}
+{"ts":"2026-07-29T10:45:07.622Z","op":"update","visit":"expeditions/e21@0","node":"d39","brief":"the guard matched its own comment; matching the call instead"}
+{"ts":"2026-07-29T10:45:11.627Z","op":"update","visit":"expeditions/e21@0","node":"d40","brief":"re-running the suite after tightening the guard"}

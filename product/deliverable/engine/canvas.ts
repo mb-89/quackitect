@@ -58,10 +58,12 @@ export function subLabel(subtitle?: string): string | undefined {
   return subtitle.length > SUB_MAX ? `${subtitle.slice(0, SUB_MAX - 1)}…` : subtitle;
 }
 
-// The ceiling, for the title's sake: a shortened subtitle cannot pass it, but
-// a generated id can be long, and a box wider than this is unreadable on any
-// screen the drawing is meant to fit.
-const MAX_W = 560;
+// The widest a box is ever BORN (owner confirmed 2026-07-29). A shortened
+// subtitle cannot reach it; it is here for long generated ids, because a box
+// wider than this is unreadable on any screen the drawing is meant to fit.
+// IT IS NOT A CLAMP. A width the owner sets in Obsidian is theirs, and the
+// render never re-imposes this one.
+const BIRTH_MAX_W = 560;
 
 /** The birth size of a drawn node: what its title and shown subtitle need,
  *  nothing more. This is a STARTING POINT a person then adjusts — never a size
@@ -69,6 +71,6 @@ const MAX_W = 560;
 export function nodeSize(title: string, subtitle?: string): { width: number; height: number } {
   const sub = subLabel(subtitle);
   const wide = Math.max(title.length * LABEL_CH, (sub ?? "").length * SUB_CH);
-  const width = Math.min(MAX_W, Math.max(200, Math.ceil(wide) + BOX_PAD * 2));
+  const width = Math.min(BIRTH_MAX_W, Math.max(200, Math.ceil(wide) + BOX_PAD * 2));
   return { width, height: sub === undefined ? 72 : 100 };
 }
