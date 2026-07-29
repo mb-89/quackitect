@@ -2,7 +2,7 @@
 // recorded raw in the call log under the returned ref, so a run is citable
 // evidence, never a claim. This lane is the future breakout seam: when the
 // state machine lands, run legality becomes a per-state decision.
-import { spawnSync } from "node:child_process";
+import { spawn } from "node:child_process";
 import { CLAUSES, Rejection } from "./errors.ts";
 import { resolveInRoot } from "./paths.ts";
 
@@ -18,18 +18,49 @@ export interface RunResult {
 const OUT_CAP = 30_000;
 const DEFAULT_TIMEOUT_MS = 120_000;
 
-export function run(root: string, command: string, opts: { timeout_ms?: number; cwd?: string } = {}): RunResult {
+// ASYNC, NEVER spawnSync (owner, 2026-07-29: the mirror froze for seconds at
+// a time while the agent ran the test suite). spawnSync holds Node's event
+// loop for the WHOLE command, and this server IS the mirror — so every long
+// run served nothing: no page, no feed, no click.
+//
+// It is the same defect the expedition archive had, where 380 blocking git
+// spawns hung the server rather than just the archive. The script runner was
+// converted for exactly this reason; se_run was left behind.
+//
+// The blocking version also made the freeze look like a rendering bug, since
+// the symptom lands wherever the reader happens to click.
+export async function run(root: string, command: string, opts: { timeout_ms?: number; cwd?: string } = {}): Promise<RunResult> {
   const timeout = Math.min(opts.timeout_ms ?? DEFAULT_TIMEOUT_MS, 600_000);
   const started = Date.now();
   const shell = process.platform === "win32" ? { file: "powershell.exe", args: ["-NoProfile", "-NonInteractive", "-Command", command] } : { file: "/bin/bash", args: ["-c", command] };
   // cwd is root-relative — resolved against the ROOT, never the server's
   // own working directory (a relative cwd once made spawn fail silently).
-  const r = spawnSync(shell.file, shell.args, {
-    cwd: opts.cwd === undefined ? root : resolveInRoot(root, opts.cwd, "engine/run.ts"),
-    encoding: "utf8",
-    timeout,
-    maxBuffer: 32 * 1024 * 1024,
-    env: process.env,
+  const r = await new Promise<{ status: number | null; stdout: string; stderr: string; error?: Error }>((resolve) => {
+    let child;
+    try {
+      child = spawn(shell.file, shell.args, {
+        cwd: opts.cwd === undefined ? root : resolveInRoot(root, opts.cwd, "engine/run.ts"),
+        env: process.env,
+        windowsHide: true,
+      });
+    } catch (e) {
+      resolve({ status: null, stdout: "", stderr: "", error: e as Error });
+      return;
+    }
+    let out = "";
+    let err = "";
+    let timedOut = false;
+    const timer = setTimeout(() => { timedOut = true; child.kill(); }, timeout);
+    child.stdout?.setEncoding("utf8");
+    child.stderr?.setEncoding("utf8");
+    child.stdout?.on("data", (c) => { out += c; });
+    child.stderr?.on("data", (c) => { err += c; });
+    child.on("error", (e) => { clearTimeout(timer); resolve({ status: null, stdout: out, stderr: err, error: e }); });
+    child.on("close", (code) => {
+      clearTimeout(timer);
+      const e = timedOut ? Object.assign(new Error("timed out"), { code: "ETIMEDOUT" }) : undefined;
+      resolve({ status: code, stdout: out, stderr: err, error: e as Error | undefined });
+    });
   });
   const duration = Date.now() - started;
   if (r.error !== undefined && (r.error as NodeJS.ErrnoException).code === "ETIMEDOUT") {

@@ -42,8 +42,30 @@ export class CallLog {
     return rec;
   }
 
+  /** ONE PARSE, NOT FOUR THOUSAND (owner, 2026-07-29: clicking a log line
+   *  took seconds). This walked records(), which JSON.parses EVERY line of
+   *  the whole log into an object, to return exactly one of them. At five
+   *  megabytes that is thousands of parses per click, synchronously, on the
+   *  server's event loop — so the mirror froze for the duration.
+   *
+   *  A ref is a fixed token, so a substring test rules out almost every line
+   *  for the price of a scan. Only a line that could hold it is parsed.
+   *
+   *  Newest first: a reader clicks what they just saw, and the feed shows the
+   *  newest at the top. */
   find(ref: string): CallRecord | undefined {
-    for (const rec of this.records()) if (rec.ref === ref) return rec;
+    if (!existsSync(this.path)) return undefined;
+    const lines = stripBom(readFileSync(this.path, "utf8")).split("\n");
+    for (let i = lines.length - 1; i >= 0; i--) {
+      const line = lines[i];
+      if (!line.includes(ref)) continue;
+      try {
+        const rec = JSON.parse(line) as CallRecord;
+        if (rec.ref === ref) return rec;
+      } catch {
+        continue;
+      }
+    }
     return undefined;
   }
 
