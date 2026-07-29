@@ -123,3 +123,10 @@
 {"ts":"2026-07-29T17:13:34.159Z","op":"update","visit":"expeditions/e24@1","node":"d120","brief":"giving the autonomous-run policy a durable home"}
 {"ts":"2026-07-29T17:13:40.739Z","op":"update","visit":"expeditions/e24@1","node":"d121","brief":"checking the new guidance file passes preflight"}
 {"ts":"2026-07-29T17:14:51.841Z","op":"update","visit":"expeditions/e24@1","node":"d122","brief":"staging the autonomous-run card"}
+{"ts":"2026-07-29T17:15:03.223Z","op":"done","visit":"idle@2","node":"d93","brief":"ideation stands; its missing piece was the run policy"}
+{"ts":"2026-07-29T17:15:34.904Z","op":"update","visit":"expeditions/e24@1","node":"d123","brief":"stepping out to land and reload"}
+{"ts":"2026-07-29T17:15:45.051Z","op":"update","visit":"expeditions/e24@1","node":"d124","brief":"the worktree's walking.md is behind trunk"}
+{"ts":"2026-07-29T17:15:54.229Z","op":"update","visit":"expeditions/e24@1","node":"d125","brief":"stepping out to land and reload"}
+{"ts":"2026-07-29T17:18:16.281Z","op":"update","visit":"expeditions/e24@0","node":"d3","brief":"syncing the worktree with trunk through the plain lane"}
+{"ts":"2026-07-29T17:18:31.319Z","op":"done","visit":"expeditions/start@0","node":"d1","brief":"the tools are proven by the suite but invisible to this client"}
+{"ts":"2026-07-29T17:18:38.488Z","op":"update","visit":"expeditions/e24@0","node":"d4","brief":"stepping out to hand over"}
