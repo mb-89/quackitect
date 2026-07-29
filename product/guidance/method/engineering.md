@@ -79,7 +79,7 @@ architecture.
 "Smallest diff", "big ripple" and "schema stability" may break a tie.
 They never trump correctness or the owner's ruling.
 
-This is the dated-guidance test applied (voice.md). Churn-aversion
+This is the dated-guidance test applied (software.md). Churn-aversion
 rations human LABOUR, and that cost collapsed. Where a decision defers
 churn anyway, record the sunset — deferred means scheduled, not avoided.
 

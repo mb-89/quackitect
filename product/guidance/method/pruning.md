@@ -57,7 +57,7 @@ So split every finding along one seam.
 If pruning finds the same thing twice, it was always a lint. Write the
 lint. Move on.
 
-This mirrors the dated-guidance rule in voice.md. Guidance that rations
+This mirrors the dated-guidance rule in software.md. Guidance that rations
 LABOUR is suspect, because a machine does that work now. Guidance that
 rations JUDGEMENT still holds.
 
