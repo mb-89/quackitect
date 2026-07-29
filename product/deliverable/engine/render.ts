@@ -1595,6 +1595,12 @@ export function renderMirror(m: MirrorState, widget?: "machine" | "details" | "l
     })
     .join("");
 
+  // ONE LIST FOR THE WHOLE RENDER. expeditionList() spawns git per record
+  // and does not vary per state; calling it inside the loop made the archive
+  // cost a spawn for every record TIMES every record, blocking the server.
+  const archived = decl.states.some((s) => s.tags?.includes("archive-record"))
+    ? (m.session.expeditionList() as { archive: { id: string }[] }).archive
+    : [];
   const states: Record<string, unknown> = {};
   for (const s of decl.states) {
     states[s.id] = {
@@ -1611,7 +1617,7 @@ export function renderMirror(m: MirrorState, widget?: "machine" | "details" | "l
       was_filled: done.has(s.id),
       // An archive-record state carries ITS closed record for the detail.
       ...(s.tags?.includes("archive-record")
-        ? { archive_record: (m.session.expeditionList() as { archive: { id: string }[] }).archive.find((e) => e.id === s.id || e.id.startsWith(`${s.id}-`)) ?? null }
+        ? { archive_record: archived.find((e) => e.id === s.id || e.id.startsWith(`${s.id}-`)) ?? null }
         : {}),
       ...(s.exit?.script !== undefined || s.entry?.script !== undefined
         ? { script: m.session.scriptStatus(decl, s) }
