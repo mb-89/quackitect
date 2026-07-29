@@ -53,11 +53,17 @@ Narration rides the walk (the unified log + the decision graph):
   - defer `{node, to}` parks a point for the state that can do it —
     entering that state materializes it as an open to-do. A point that
     cannot be done HERE is deferred, never claimed or ignored.
-  - update `{brief, node?}` says what you are doing. An update is never
-    called a note — notes are the retro's strays (se_note). Every update
-    CHANGES THE RENDER: the engine lands it as a checked point under the
-    node you are on — clicking the log line always shows what changed.
-    Work that should stay open gets plan or fork instead.
+  - update `{node, brief}` says what you are doing, ON a checklist item.
+    An update is never called a note — notes are the retro's strays
+    (se_note). Every update CHANGES THE RENDER: the engine lands it as a
+    checked point under that node — clicking the log line always shows
+    what changed. Work that should stay open gets plan or fork instead.
+    THE NODE IS REQUIRED WHILE A CHECKLIST STANDS. An update floating
+    free of every item is narration wearing progress's clothes: the board
+    fills with checked leaves while the items it should be moving stay
+    open. With nothing open there is nothing to attach to, and a bare
+    update is exactly right. The open node map rides home on every call,
+    so naming one costs a glance.
 - Everything started gets resolved. Abandoning is legal. Abandoning
   silently is not — the graph shows the drop.
 - The TOLL: after five silent minutes the next call carries a warning.

@@ -26,6 +26,8 @@ bug somewhere else.
 - A sketch is a contract: render exactly what it shows.
 - Never add a visual element the sketch does not show. A missing affordance becomes a question to the owner, never a silent addition.
 - A prefill is a suggestion, never content. Anything the AI prefills for a person stays inert (commented out) until that person confirms it — one confirmation per prefill, never in bulk.
+- INPUT IS NOT EVIDENCE, and only evidence is guarded. Prefill hard at the ENTRY of work — a seed's goal, an iteration's vision, a kickoff brief. A wrong value there goes visibly wrong at once, with the person right beside it. The guard belongs at the EXIT, where a report CLAIMS work was done and checked, because that is where an agent would be signing its own homework.
+- A PREFILL IS NOT A LAW. The secretary fills the form to the best of their knowledge and sends you on your way; whoever receives it still checks whether the prefilling was right. A prefilled value carries where it came from, and the state that receives it JUDGES it. It is never obeyed because it was already written down.
 - Color carries meaning, never decoration: green = pass, red = failure or rejection, yellow = attention.
 
 ## The reader keeps their place

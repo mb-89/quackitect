@@ -17,6 +17,7 @@ import { readFileSync } from "node:fs";
 import { fileDelete, fileGlob, fileList, filePatch, fileRead, fileWrite, type PatchOp } from "./files.ts";
 import { LINT_CONFIG, lintProse } from "./lint.ts";
 import { appendNote, backlogNotes, drainNote, pendingNotes } from "./inbox.ts";
+import { parseStateNote } from "./notes.ts";
 import { expList, readRecord } from "./worktree.ts";
 import { survey } from "./survey.ts";
 import { itList, readItRecord } from "./iterations.ts";
@@ -51,6 +52,9 @@ export function sessionTools(session: Session): ToolDef[] {
           wait: { type: "boolean", description: "short in-turn HOLD: blocks until the human's hand moves the walk or the slider, then returns the fresh packet (changed: false on timeout). For longer waits STOP instead and ask the user to message you" },
           escape: { type: "string", description: "ESCAPE to idle with this reason — the stuck sub-machine walk is left standing (a later continue re-enters it); the escape is a recorded failure. Boot cannot be escaped" },
           read_hashes: { type: "object", description: "proof-of-read for this tick: {\"<root-relative path>\": \"<hash from se_file_read>\", ...} — must cover the docs the transition demands, each hash matching the doc as it stands now" },
+          route: { type: "string", description: "THE BLUE LINE — the way from here to this target state: every hop, its priority, and what it will ask for. Moves NOTHING. Lists EVERY judgment on the way, so a person can answer them all at once and leave the walk to run" },
+          sweep: { type: "boolean", description: "WALK the route to `to` in one call rather than one tick per hop. Collapses round trips ONLY - every hop still weighs the slider, proves its reads and runs its scripts. Stops at the first hop that will not pass and says which and why; the route recomputes after each hop, so a detour is followed rather than fallen off" },
+          target: { type: "string", description: "Set the session's TARGET state - the blue line the mirror draws. Defaults to the front desk at every engine start" },
         },
       },
       handler: async (args) => {
@@ -69,7 +73,11 @@ export function sessionTools(session: Session): ToolDef[] {
               : `nothing moved in ${ms}ms — call se_tick {wait: true} again to keep holding`,
           };
         }
+        // Looking never moves, so the route answers before anything else.
+        if (args.route !== undefined) return session.route(String(args.route));
+        if (args.target !== undefined) return session.setTarget(String(args.target));
         const hashes = (typeof args.read_hashes === "object" && args.read_hashes !== null ? args.read_hashes : {}) as Record<string, string>;
+        if (args.sweep === true) return session.sweep(String(args.to ?? session.target), "agent", hashes);
         // ATOMIC: a moving tick declares where it was planned — stale plans
         // are refused before anything moves (peeking never needs it).
         if (args.from !== undefined && args.state === undefined) session.assertFrom(String(args.from));
@@ -455,10 +463,24 @@ export function coreTools(rootOf: (rel?: string) => string, projectRoot: string,
         if (args.glob !== undefined) {
           const g = fileGlob(root, String(args.glob));
           const md = g.files.filter((f) => f.endsWith(".md"));
-          const files = md
-            .map((p) => ({ path: p, findings: lintProse(root, readFileSync(resolveInRoot(root, p, "engine/tools.ts se_lint"), "utf8")) }))
-            .map((f) => ({ path: f.path, count: f.findings.length, findings: f.findings }))
-            .filter((f) => f.count > 0);
+          // A STATE NOTE KEEPS ITS PROSE IN THE FRONTMATTER. `guidance` is
+          // read by an agent on every single visit, so it is the prose that
+          // matters most - and the lint had never seen a word of it, because
+          // lintProse strips frontmatter before it starts.
+          const lintFile = (p: string): { path: string; count: number; findings: unknown[] } => {
+            const raw = readFileSync(resolveInRoot(root, p, "engine/tools.ts se_lint"), "utf8");
+            const findings: unknown[] = lintProse(root, raw).map((f) => ({ ...f, where: "body" }));
+            try {
+              const fm = parseStateNote(raw).frontmatter;
+              for (const key of ["guidance", "statement"]) {
+                const v = fm[key];
+                if (typeof v !== "string" || v.trim() === "") continue;
+                for (const f of lintProse(root, v)) findings.push({ ...f, where: key });
+              }
+            } catch { /* a note that will not parse is the canvas lint's problem, not the prose lint's */ }
+            return { path: p, count: findings.length, findings };
+          };
+          const files = md.map(lintFile).filter((f) => f.count > 0);
           return {
             glob: String(args.glob),
             swept: md.length,
@@ -603,7 +625,7 @@ export function buildServer(root: string, session = new Session(root), tollOpts:
   const UPDATE_PROP = {
     type: "object",
     description:
-      "decision-graph update riding this call — narrate as you work. {op: plan|fork|done|obsolete|revert|update, brief?, items?, node?}: plan {items} starts the state's checklist; fork {brief, items?} opens an unplanned branch where you are; done|obsolete|revert {node, brief} resolves a node — everything started gets resolved, silently abandoning is illegal; update {brief, node?} says what you are doing (an UPDATE, never a 'note' — notes are retro strays via se_note); defer {node, to} parks a point for the state that can do it — it arrives there as an open to-do. A volunteered update resets the toll; when the toll lapses, the next call must carry one.",
+      "decision-graph update riding this call — narrate as you work. {op: plan|fork|done|obsolete|revert|update, brief?, items?, node?}: plan {items} starts the state's checklist; fork {brief, items?} opens an unplanned branch where you are; done|obsolete|revert {node, brief} resolves a node — everything started gets resolved, silently abandoning is illegal; update {node, brief} says what you are doing ON an item — the node is REQUIRED while any item stands open, because an update that moves nothing on the checklist is narration, not progress (with nothing open, a bare update is right); defer {node, to} parks a point for the state that can do it — it arrives there as an open to-do. Every call answers with update_result, carrying the open node map and any nudge. A volunteered update resets the toll; when the toll lapses, the next call must carry one.",
   };
   for (const t of tools) (t.inputSchema.properties as Record<string, unknown>).update = UPDATE_PROP;
   const server = new McpServer({ name: "se-mcp", version: "3.0.0-bootstrap" }, tools);
@@ -626,8 +648,10 @@ export function buildServer(root: string, session = new Session(root), tollOpts:
   // UNPAID, so the rule keeps its teeth — it just bites the narration now,
   // instead of the work.
   let updateComplaint: RejectionPayload | undefined;
+  let updateResult: Record<string, unknown> | undefined;
   server.addGuard((tool, args) => {
     updateComplaint = undefined;
+    updateResult = undefined;
     if (args.update === undefined) return;
     const raw = args.update;
     delete args.update;
@@ -635,6 +659,7 @@ export function buildServer(root: string, session = new Session(root), tollOpts:
       const op = parseUpdate(raw);
       const visit = session.currentVisit();
       const result = session.decisions.apply(visit, op);
+      updateResult = result as unknown as Record<string, unknown>;
       log.append({ tool: "se_update", args: { via: tool, visit, ...op }, ok: true, outcome: "result", duration_ms: 0, response: result });
       toll.paid();
     } catch (e) {
@@ -652,6 +677,21 @@ export function buildServer(root: string, session = new Session(root), tollOpts:
     const w = toll.takeWarning();
     if (w === undefined || typeof result !== "object" || result === null || Array.isArray(result)) return result;
     return { ...(result as Record<string, unknown>), toll_warning: w };
+  });
+
+  // AND SO DOES THE ACCEPTED ONE (note-792c32b5425e item 5; the hole it
+  // left was found live on 2026-07-29). The update's answer went only to
+  // the LOG. So the node ids needed to resolve anything were invisible
+  // unless you deliberately named a node that does not exist and read the
+  // refusal — and the checklist nudge fired TEN times into a void, seen by
+  // nobody, including the agent it was nudging.
+  //
+  // A guard nobody can hear is not a guard. It rides the result now.
+  server.addDecorator((_tool, result) => {
+    const u = updateResult;
+    updateResult = undefined;
+    if (u === undefined || typeof result !== "object" || result === null || Array.isArray(result)) return result;
+    return { ...(result as Record<string, unknown>), update_result: u };
   });
 
   // The refused update rides home on the call it could not stop.

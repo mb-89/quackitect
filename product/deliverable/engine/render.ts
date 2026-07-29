@@ -90,7 +90,50 @@ export interface StateMeta {
  *  size of its label (canvas.nodeSize), which is a starting point a person
  *  adjusts, not a size anything re-imposes later.
  */
-function machineSvg(source: CanvasData, activeIds: Set<string>, doneIds: Set<string>, subIds: Set<string>, meta: Record<string, StateMeta>): string {
+/** THE ROUTE, REDUCED TO ONE DRAWING (owner design 2026-07-29). The walk's
+ *  route is a list of qualified hops; a canvas shows one machine. So each
+ *  hop is projected onto the machine being VIEWED:
+ *
+ *  - both ends land on different states here — the edge between them is on
+ *    the route, and the blue line runs along it;
+ *  - both ends land on the SAME state here — the route is running around
+ *    INSIDE it, so that state is a WAYPOINT. Navigation systems put a point
+ *    on the line for somewhere you pass through, and a submachine entered
+ *    and left again is exactly that. Click it to zoom in.
+ *  - neither end is here — the hop belongs to another drawing. */
+export function routeOverlay(
+  steps: { from: string; to: string }[],
+  viewId: string,
+  mainId: string,
+): { edges: Set<string>; waypoints: Set<string> } {
+  const prefix = viewId === mainId ? "" : viewId;
+  const local = (q: string): string | undefined => {
+    if (prefix === "") return q.split("/")[0];
+    if (!q.startsWith(`${prefix}/`)) return undefined;
+    return q.slice(prefix.length + 1).split("/")[0];
+  };
+  const edges = new Set<string>();
+  const waypoints = new Set<string>();
+  for (const s of steps) {
+    const a = local(s.from);
+    const b = local(s.to);
+    if (a === undefined || b === undefined) continue;
+    if (a === b) waypoints.add(a);
+    else edges.add(`${a}->${b}`);
+  }
+  return { edges, waypoints };
+}
+
+interface RouteMarks {
+  edges: Set<string>;
+  waypoints: Set<string>;
+  /** Where the walk stands, in THIS drawing's terms. A small arrow. */
+  here?: string;
+  /** The destination, if it is in this drawing. A dot the line runs into. */
+  target?: string;
+}
+
+function machineSvg(source: CanvasData, activeIds: Set<string>, doneIds: Set<string>, subIds: Set<string>, meta: Record<string, StateMeta>, route?: RouteMarks): string {
   const canvas = source;
   const nodes = canvas.nodes ?? [];
   const pad = 60;
@@ -119,7 +162,13 @@ function machineSvg(source: CanvasData, activeIds: Set<string>, doneIds: Set<str
     // A double-headed arrow is one edge meaning both ways, so it draws that
     // way too — the marker already orients itself at a start.
     const bothWays = (edge as { fromEnd?: string }).fromEnd === "arrow";
-    parts.push(`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" class="edge"${bothWays ? ' marker-start="url(#arrow)"' : ""} marker-end="url(#arrow)"/>`);
+    // THE BLUE LINE RUNS ALONG THE DRAWN EDGES (owner ruling 2026-07-29),
+    // never point to point. A line that took a shortcut would cross states
+    // the walk never enters, and stop being a picture of the machine.
+    const aId = stateIdOf(a);
+    const bId = stateIdOf(b);
+    const onRoute = aId !== undefined && bId !== undefined && route?.edges.has(`${aId}->${bId}`) === true;
+    parts.push(`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" class="edge${onRoute ? " onroute" : ""}"${bothWays ? ' marker-start="url(#arrow)"' : ""} marker-end="url(#arrow)"/>`);
     if (edge.label !== undefined && edge.label !== "") {
       parts.push(`<text x="${(x1 + x2) / 2}" y="${(y1 + y2) / 2 - 8}" class="guard">${esc(edge.label)}</text>`);
     }
@@ -147,6 +196,22 @@ function machineSvg(source: CanvasData, activeIds: Set<string>, doneIds: Set<str
     parts.push(`<text x="${n.x + n.width / 2}" y="${n.y + n.height / 2 + (sub !== undefined ? -6 : 6)}" class="label">${esc(sid)}</text>`);
     if (sub !== undefined) parts.push(`<text x="${n.x + n.width / 2}" y="${n.y + n.height / 2 + 24}" class="sublabel">${esc(sub)}</text>`);
     parts.push("</g>");
+    // THE MAP'S THREE MARKS, all above the node so nothing collides with
+    // the condition buttons on its sides.
+    const mx = n.x + n.width / 2;
+    const my = n.y - 14;
+    if (route?.target === sid) {
+      // THE DESTINATION: a dot the line runs into.
+      parts.push(`<circle cx="${mx}" cy="${my}" r="9" class="route-target"/>`);
+    } else if (route?.waypoints.has(sid) === true) {
+      // A WAYPOINT: passed through, not arrived at. Hollow, so the eye
+      // reads it as a stop on the way rather than an end.
+      parts.push(`<circle cx="${mx}" cy="${my}" r="8" class="route-waypoint"/>`);
+    }
+    if (route?.here === sid) {
+      // YOU ARE HERE: the arrow a map puts under your car.
+      parts.push(`<path d="M ${mx - 9} ${my + 8} L ${mx} ${my - 9} L ${mx + 9} ${my + 8} L ${mx} ${my + 3} Z" class="route-here"/>`);
+    }
     // Condition buttons ride the node's edges: enter on the LEFT (where the
     // arrow comes in), leave on the RIGHT (in front of the arrow out).
     const mt = meta[sid];
@@ -353,6 +418,12 @@ const STYLE = `
   .sublabel { fill: #7f8b96; font-size: 17px; text-anchor: middle; font-family: inherit; pointer-events: none; }
   .edge { stroke: #5b6772; stroke-width: 2.5; }
   .arrowhead { fill: #5b6772; }
+  /* THE BLUE LINE. Blue on purpose: the voice reserves green, red and
+     yellow for verdicts, and a route is not a verdict. It is a way. */
+  .edge.onroute { stroke: #4a90d9; stroke-width: 5.5; }
+  .route-target { fill: #4a90d9; stroke: #9ecbf2; stroke-width: 2; }
+  .route-waypoint { fill: #14171a; stroke: #4a90d9; stroke-width: 3; }
+  .route-here { fill: #9ecbf2; }
   .guard { fill: #e8b339; font-size: 20px; text-anchor: middle; }
   .comment { fill: #1c2025; stroke: #2a2f34; }
   .group { fill: #1a1e22; stroke: #333a41; stroke-dasharray: 10 6; stroke-width: 2; }
@@ -1784,7 +1855,26 @@ export function renderMirror(m: MirrorState, widget?: "machine" | "details" | "l
       ...(s.statement !== "" && s.statement !== s.id ? { subtitle: s.statement } : {}),
     };
   }
-  const svg = machineSvg(canvas, leafActive, done, subIds, meta);
+  // THE ROUTE, PROJECTED ONTO THIS DRAWING. A broken or unreachable target
+  // must never take the picture down with it, so the marks simply go
+  // missing and the machine still renders.
+  let marks: RouteMarks | undefined;
+  try {
+    const r = m.session.route(m.session.target);
+    const mainId = m.session.machine.id;
+    const { edges, waypoints } = routeOverlay(r.steps, decl.id, mainId);
+    const localOf = (q: string): string | undefined => {
+      if (decl.id === mainId) return q.split("/")[0];
+      return q.startsWith(`${decl.id}/`) ? q.slice(decl.id.length + 1).split("/")[0] : undefined;
+    };
+    marks = {
+      edges,
+      waypoints,
+      ...(localOf(r.from) !== undefined ? { here: localOf(r.from) } : {}),
+      ...(r.found && localOf(r.target) !== undefined ? { target: localOf(r.target) } : {}),
+    };
+  } catch { /* no route, no marks - the drawing stands either way */ }
+  const svg = machineSvg(canvas, leafActive, done, subIds, meta, marks);
 
   // Breadcrumbs describe the VIEW: main [›subs] [ › sub [›its subs] ].
   const mainSubs = m.session.machine.states.filter((s) => s.submachine !== undefined).map((s) => s.id);

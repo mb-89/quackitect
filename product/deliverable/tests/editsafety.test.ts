@@ -13,8 +13,10 @@ import { test } from "node:test";
 import { spawnSync } from "node:child_process";
 import { mkdirSync } from "node:fs";
 import { activeStates, completeState, type EdgeDecl, type MachineDecl, type MachineInstance, type StateDecl } from "../engine/machine.ts";
-import { expClose, expNew } from "../engine/worktree.ts";
+import { expClose, expNew, readRecord } from "../engine/worktree.ts";
+import { generateContinueExpedition } from "../engine/expmachine.ts";
 import { compileMachine } from "../engine/machines/compile.ts";
+import { parseStateNote } from "../engine/notes.ts";
 import { Session, mainMachinePath } from "../engine/session.ts";
 import { buildServer } from "../engine/tools.ts";
 import { call, checkDocs, freshRoot, readHashesFor } from "./helpers.ts";
@@ -284,16 +286,54 @@ test("closing on an unconfirmed report is refused, and the override is recorded"
   }, "an agent-finished report cannot close silently");
 
   // The same close goes through WITH the override, and the record says so.
-  const out = expClose(root, a, true, "the owner, in chat: run the whole expedition without me");
+  // THE OVERRIDE IS FREE PROSE, so it carries colons and quotes. Unquoted,
+  // "in chat, 2026-07-29: after reading" is a nested mapping and the whole
+  // record stops parsing — which is what happened to e22. The old test
+  // regex-matched the raw text and never parsed it, so it never noticed.
+  const authority = 'the owner, in chat, 2026-07-29: "run the whole expedition without me"';
+  const out = expClose(root, a, true, authority);
   assert.equal(out.merged, true, "the override lets the legitimate close through");
   assert.match(String(out.override), /run the whole expedition without me/);
   const rec = spawnSync("git", ["show", `${a.branch}:product/spec/expeditions/${a.id}/record.md`], { cwd: root, encoding: "utf8", windowsHide: true }).stdout;
-  assert.match(rec, /report_override: the owner, in chat/, "the archive shows it mechanically, not by the agent's goodwill");
+  const fm = parseStateNote(rec).frontmatter;
+  assert.equal(fm.report_override, authority, "the record PARSES, and gives the authority back verbatim");
+  assert.equal(fm.status, "closed", "and the fields after it survived too");
 
   // A report a PERSON confirmed needs no override at all.
   const b = expNew(root, "fix", "confirmed probe");
   report(b, "human");
   assert.equal(expClose(root, b, true).merged, true, "a confirmed report closes plainly");
+});
+
+// ONE BAD RECORD MUST NOT TAKE THE CONTAINER DOWN. An override written
+// unquoted made e22's record invalid YAML, and every surface that LISTS
+// what stands broke with it - the expeditions machine, the archive, the
+// survey, the route. A malformed record is shown as malformed instead.
+test("a record that will not parse is marked, and the container still stands", () => {
+  const root = freshRoot();
+  const g = (...a: string[]) => spawnSync("git", a, { cwd: root, encoding: "utf8", windowsHide: true });
+  g("init");
+  g("config", "user.email", "se@test.local");
+  g("config", "user.name", "se test");
+  writeFileSync(join(root, ".gitignore"), ".worktrees/\n.se/\n");
+  g("add", "-A");
+  g("commit", "-q", "-m", "base");
+  const good = expNew(root, "fix", "a readable one");
+  const bad = expNew(root, "fix", "the broken one");
+  const rec = join(bad.path, "product", "spec", "expeditions", bad.id, "record.md");
+  // Exactly the shape that broke it: free prose carrying a colon and a space.
+  writeFileSync(rec, readFileSync(rec, "utf8").replace(/^status: open$/m, "status: open\nnote_from_a_person: the owner, in chat, 2026-07-29: run it without me"), "utf8");
+  const fm = readRecord(root, bad);
+  assert.equal(typeof fm?.unreadable, "string", "it comes back MARKED, not thrown and not empty");
+  assert.match(String(fm?.unreadable), /does not parse/);
+  // The generator still produces the machine, and both expeditions are in it.
+  const gen = generateContinueExpedition(root);
+  const short = (id: string): string => id.split("-")[0];
+  const ids = gen.decl.states.map((s) => s.id);
+  assert.ok(ids.includes(short(good.id)), `the readable expedition is there - got ${ids.join(",")}`);
+  assert.ok(ids.includes(short(bad.id)), "and so is the broken one - a hole would be worse");
+  const broken = gen.decl.states.find((s) => s.id === short(bad.id))!;
+  assert.match(broken.statement, /does not parse/, "and it says what is wrong with it");
 });
 
 // vanishes, so the root gets the same treatment. Not a stash: a stash pop can

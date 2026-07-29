@@ -28,9 +28,15 @@ export interface Survey {
 // complete while the field saying WHAT it is was not. Both hands weigh the
 // inbox through this call and nothing else can read a note, so a cut here
 // is the whole view.
+// A record that will not parse is SHOWN as unreadable, never as an empty
+// goal. An empty goal reads as an expedition nobody bothered to describe;
+// the truth is a broken file, and only the truth gets it fixed.
+const goalOf = (fm: Record<string, unknown> | undefined): string =>
+  fm?.unreadable !== undefined ? `⚠ ${String(fm.unreadable)}` : String(fm?.goal ?? "");
+
 export function survey(projectRoot: string): Survey {
-  const exps = expList(projectRoot).filter((e) => e.open).map((e) => ({ id: e.id, goal: String((readRecord(projectRoot, e) ?? {}).goal ?? "") }));
-  const its = itList(projectRoot).filter((i) => i.open).map((i) => ({ id: i.id, goal: String((readItRecord(projectRoot, i) ?? {}).goal ?? "") }));
+  const exps = expList(projectRoot).filter((e) => e.open).map((e) => ({ id: e.id, goal: goalOf(readRecord(projectRoot, e)) }));
+  const its = itList(projectRoot).filter((i) => i.open).map((i) => ({ id: i.id, goal: goalOf(readItRecord(projectRoot, i)) }));
   const notes = pendingNotes(seDir(projectRoot)).map((n) => ({ ref: n.ref, at: n.at, text: n.text }));
   const backlog = backlogNotes(seDir(projectRoot)).map((n) => ({ ref: n.ref, ready_when: n.drained?.where ?? "", text: n.text }));
   return {

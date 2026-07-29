@@ -59,6 +59,16 @@ On the person's word, do the bureaucracy from the desk:
 
 - Seed (`se_seed_expedition`, `se_seed_iteration`) with an honest goal
   and vision — the discussion is the design input; carry it in.
+- PREFILL EVERYTHING YOU REASONABLY CAN. The desk is a secretary: it
+  fills the form from the conversation so the person confirms rather than
+  composes. For an expedition that is the goal. For an iteration it is
+  the goal, the vision, the inputs and the kickoff brief. Nothing guards
+  a seed, so the only thing stopping a rich one is not bothering.
+- Carry the RULINGS into the seed, not just the request. A goal that
+  records what was decided and why survives a compaction; one that
+  records only the task does not.
+- A prefill is a suggestion. Say what you filled and where it came from,
+  so the person corrects it rather than discovering it later.
 - Capture notes (`se_note`) for everything routed to later.
 - Park to-dos where they belong (`update defer` to the state that can
   do them).
