@@ -24,3 +24,15 @@
 {"ts":"2026-07-29T15:52:46.479Z","op":"done","visit":"expeditions/e24@0","node":"d27","brief":"image types return an MCP image block; transport splits it from the log"}
 {"ts":"2026-07-29T15:55:32.846Z","op":"done","visit":"expeditions/e24@0","node":"d29","brief":"cap refuses rather than downscales; the lane has no resizer"}
 {"ts":"2026-07-29T15:55:37.090Z","op":"update","visit":"expeditions/e24@0","node":"d34","brief":"running the suite with six new read-lane cases"}
+{"ts":"2026-07-29T15:57:06.831Z","op":"done","visit":"expeditions/e24@0","node":"d30","brief":"190 pass and text hashes are unmoved"}
+{"ts":"2026-07-29T15:57:20.716Z","op":"done","visit":"expeditions/e24@0","node":"d28","brief":"SE-C-126 refuses non-image binary with size and hash"}
+{"ts":"2026-07-29T15:57:32.867Z","op":"update","visit":"expeditions/e24@0","node":"d35","brief":"sketch placed in the gitignored .se/sketches inbox"}
+{"ts":"2026-07-29T15:58:08.521Z","op":"defer","visit":"expeditions/e24@0","node":"d31","brief":"Read the owner's sketch through the lane","to":"idle","hops":1,"trail":["expeditions/e24","idle"]}
+{"ts":"2026-07-29T15:58:30.639Z","op":"update","visit":"expeditions/e24@0","node":"d36","brief":"recorded the reload-inside-an-expedition trap"}
+{"ts":"2026-07-29T15:59:00.069Z","op":"update","visit":"expeditions/e24@0","node":"d37","brief":"answered why the desktop is out of the reader's reach"}
+{"ts":"2026-07-29T16:03:20.234Z","op":"plan","visit":"expeditions/e24@0","parent":null,"nodes":[{"id":"d38","brief":"Add a neutral pause beside escape"},{"id":"d39","brief":"Prove pause leaves the machine standing"},{"id":"d40","brief":"Land it and step out to reload"}]}
+{"ts":"2026-07-29T16:03:40.361Z","op":"update","visit":"expeditions/e24@0","node":"d41","brief":"running the suite with the pause test"}
+{"ts":"2026-07-29T16:07:08.852Z","op":"plan","visit":"expeditions/e24@0","parent":null,"nodes":[{"id":"d42","brief":"Port v2 declared roots into the read lane"},{"id":"d43","brief":"Prove declared serves and undeclared refuses"}]}
+{"ts":"2026-07-29T16:07:20.481Z","op":"update","visit":"expeditions/e24@0","node":"d44","brief":"fixing a missing import in the declared-roots test"}
+{"ts":"2026-07-29T16:07:24.880Z","op":"update","visit":"expeditions/e24@0","node":"d45","brief":"running the suite with the declared-roots cases"}
+{"ts":"2026-07-29T16:08:21.796Z","op":"done","visit":"expeditions/e24@0","node":"d38","brief":"pause added as escape's neutral sibling"}

@@ -440,3 +440,39 @@ test("escape goes to idle and only to idle: the walk is left standing, the reaso
   assert.equal(atMain.isError, true);
   assert.equal(atMain.body.clause, "SE-C-110");
 });
+
+// PAUSE IS NOT ESCAPE (owner ruling 2026-07-29). An expedition is a day's
+// bucket and is MEANT to stay open, so stepping out of one is ordinary work.
+// Escape's MOVE was already right; its RECORD was wrong. It files an
+// exhausted_guard, and the retro mines those for genuine blockages — so
+// routine stepping-out would have drowned the signal it depends on.
+test("pause leaves the machine standing like escape, but records no failure", async () => {
+  const { Session } = await import("../engine/session.ts");
+  const { buildServer } = await import("../engine/tools.ts");
+  const root = freshRoot();
+  const session = new Session(root);
+  const server = buildServer(root, session);
+  const hashes = readHashesFor(root);
+  for (let i = 0; i < 9; i++) {
+    const step = await call(server, "se_tick", { advance: true, read_hashes: hashes });
+    if (step.body.booted === true) break;
+  }
+  session.setAutonomy(1);
+  await call(server, "se_tick", { to: "expeditions", read_hashes: hashes });
+  assert.deepEqual(session.active(), ["expeditions/start"]);
+
+  const p = await call(server, "se_tick", { pause: "stepping out to reload the engine, picking this up later", read_hashes: hashes });
+  assert.equal(p.isError, false, JSON.stringify(p.body));
+  assert.deepEqual(session.active(), ["idle"], "pause lands at idle, exactly like escape");
+  // The MOVE is identical — the machine is left standing, nothing filled.
+  assert.deepEqual(session.viewRun("expeditions").done, []);
+  // The RECORD is not. This is the entire point of the op.
+  assert.equal(session.instance.escapes.length, 0, "a pause is not an exhausted guard");
+  assert.ok(session.instance.history.some((h) => h.outcome === "paused"));
+  assert.equal(session.instance.history.some((h) => h.outcome === "escaped"), false);
+
+  // Same discipline as escape: never a silent exit.
+  const empty = await call(server, "se_tick", { pause: "   " });
+  assert.equal(empty.isError, true);
+  assert.equal(empty.body.clause, "SE-C-046");
+});

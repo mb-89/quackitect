@@ -446,13 +446,37 @@ export class Session {
    *  continue re-enters from the beginning, fast-forwarding on stored
    *  evidence. Boot is the one exception — it must complete. */
   escape(reason: string, channel: Channel = "agent", readHashes: Record<string, string> = {}): Record<string, unknown> {
+    return this.exitToIdle(reason, channel, readHashes, "escaped");
+  }
+
+  /** PAUSE (owner ruling 2026-07-29): escape's move, recorded as ordinary
+   *  work. An expedition is a day's bucket and is MEANT to stay open, so
+   *  stepping out to pick it up later is normal. Filing that as an escape
+   *  writes a false failure — and the retro mines escapes for the real ones. */
+  pause(reason: string, channel: Channel = "agent", readHashes: Record<string, string> = {}): Record<string, unknown> {
+    return this.exitToIdle(reason, channel, readHashes, "paused");
+  }
+
+  private exitToIdle(
+    reason: string,
+    channel: Channel,
+    readHashes: Record<string, string>,
+    kind: "escaped" | "paused",
+  ): Record<string, unknown> {
+    const verb = kind === "escaped" ? "escape" : "pause";
     if (reason.trim() === "") {
       throw new Rejection({
         clause: CLAUSES.REQUIRED_ARGS,
-        expected: "a reason — an escape is a recorded failure, never a silent exit",
+        expected:
+          kind === "escaped"
+            ? "a reason — an escape is a recorded failure, never a silent exit"
+            : "a reason — say what you are stepping out of, so the walk reads back",
         got: "an empty reason",
-        remedy: { tool: "se_tick", args: { escape: "<why the walk cannot continue>" } },
-        source: "engine/session.ts escape",
+        remedy: {
+          tool: "se_tick",
+          args: kind === "escaped" ? { escape: "<why the walk cannot continue>" } : { pause: "<what you are stepping out of>" },
+        },
+        source: `engine/session.ts ${verb}`,
       });
     }
     if (!this.inSub()) {
@@ -463,18 +487,18 @@ export class Session {
         throw new Rejection({
           clause: CLAUSES.NOT_LEGAL_IN_STATE,
           expected: "a walk away from idle",
-          got: "standing at idle — idle IS the escape target",
-          remedy: { tool: "se_tick", args: {}, note: "nothing to escape; walk on normally" },
-          source: "engine/session.ts escape",
+          got: `standing at idle — idle IS the ${verb} target`,
+          remedy: { tool: "se_tick", args: {}, note: `nothing to ${verb}; walk on normally` },
+          source: `engine/session.ts ${verb}`,
         });
       }
       if (!this.instance.history.some((h) => h.state === "boot" && h.outcome === "filled")) {
         throw new Rejection({
           clause: CLAUSES.NOT_LEGAL_IN_STATE,
           expected: "a booted walk",
-          got: `an escape before boot completed [${stood.join(", ")}]`,
+          got: `a ${verb} before boot completed [${stood.join(", ")}]`,
           remedy: { tool: "se_tick", args: {}, note: "boot cannot be skipped — it must complete; if it is broken, tell the user" },
-          source: "engine/session.ts escape",
+          source: `engine/session.ts ${verb}`,
         });
       }
       const nowMain = new Date().toISOString();
@@ -484,25 +508,28 @@ export class Session {
       if (missingMain.length > 0) this.refuseReads("entry", "idle", missingMain, channel);
       this.assertHandover(channel, readHashes);
       const stoodIn = stood[0] ?? "(no state)";
-      this.instance.history.push({ state: stoodIn, outcome: "escaped", at: nowMain });
-      this.instance.escapes.push({ state: stoodIn, exhausted_guard: reason.slice(0, 300), at: nowMain });
+      this.instance.history.push({ state: stoodIn, outcome: kind, at: nowMain });
+      if (kind === "escaped") this.instance.escapes.push({ state: stoodIn, exhausted_guard: reason.slice(0, 300), at: nowMain });
       this.instance.active = ["idle"];
       this.instance.current = "idle";
       this.unbind();
       this.notifyChange();
       return {
         ...this.tickInfo(),
-        escaped: { from: stoodIn, reason },
-        note: "escaped to idle — the walk was left standing. Tell the user PLAINLY what blocked it, then wait for their ruling.",
+        [kind]: { from: stoodIn, reason },
+        note:
+          kind === "escaped"
+            ? "escaped to idle — the walk was left standing. Tell the user PLAINLY what blocked it, then wait for their ruling."
+            : "paused to idle — the walk was left standing, and a later continue re-enters it. Nothing failed.",
       };
     }
     if (this.top()!.decl.id === "boot") {
       throw new Rejection({
         clause: CLAUSES.NOT_LEGAL_IN_STATE,
         expected: "a sub-machine other than boot",
-        got: "an escape from boot",
+        got: `a ${verb} from boot`,
         remedy: { tool: "se_tick", args: {}, note: "boot cannot be skipped — it must complete; if it is broken, tell the user" },
-        source: "engine/session.ts escape",
+        source: `engine/session.ts ${verb}`,
       });
     }
     const now = new Date().toISOString();
@@ -513,8 +540,8 @@ export class Session {
     this.assertHandover(channel, readHashes);
     const stoodIn = this.active()[0];
     const parent = this.subs[0].parentState;
-    this.instance.history.push({ state: stoodIn, outcome: "escaped", at: now });
-    this.instance.escapes.push({ state: parent, exhausted_guard: reason.slice(0, 300), at: now });
+    this.instance.history.push({ state: stoodIn, outcome: kind, at: now });
+    if (kind === "escaped") this.instance.escapes.push({ state: parent, exhausted_guard: reason.slice(0, 300), at: now });
     this.instance.active = [...activeStates(this.instance).filter((s) => s !== parent), "idle"];
     this.instance.current = "idle";
     this.subs = [];
@@ -522,8 +549,11 @@ export class Session {
     this.notifyChange();
     return {
       ...this.tickInfo(),
-      escaped: { from: stoodIn, reason },
-      note: "escaped to idle — the machine was left standing. Tell the user PLAINLY what blocked the walk, then wait for their ruling.",
+      [kind]: { from: stoodIn, reason },
+      note:
+        kind === "escaped"
+          ? "escaped to idle — the machine was left standing. Tell the user PLAINLY what blocked the walk, then wait for their ruling."
+          : "paused to idle — the machine was left standing, and a later continue re-enters it. Nothing failed.",
     };
   }
 

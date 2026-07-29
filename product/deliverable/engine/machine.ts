@@ -98,7 +98,7 @@ export interface MachineInstance {
   // record, not by deleting it. A superseded fill happened and did not survive
   // review; erasing it would make a reopen indistinguishable from work that was
   // never done, which is exactly the history a reader needs most.
-  history: { state: string; outcome: "filled" | "failed" | "escaped" | "abandoned" | "superseded" | "reopened"; evidence?: string; at: string }[];
+  history: { state: string; outcome: "filled" | "failed" | "escaped" | "paused" | "abandoned" | "superseded" | "reopened"; evidence?: string; at: string }[];
   /** Escape records which guard was exhausted. */
   escapes: { state: string; exhausted_guard: string; at: string }[];
   status: "open" | "closed" | "abandoned";

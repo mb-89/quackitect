@@ -12,7 +12,7 @@ import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, statSync, wri
 import { dirname, extname, join, relative, sep } from "node:path";
 import { CLAUSES, Rejection } from "./errors.ts";
 import { contentHash } from "./hash.ts";
-import { isExcluded, resolveInRoot } from "./paths.ts";
+import { isExcluded, isRootRef, resolveForRead, resolveInRoot } from "./paths.ts";
 
 /** Whole-file read budget (chars). Beyond this, offset/limit is required. */
 export const READ_BUDGET = 50_000;
@@ -35,10 +35,10 @@ const IMAGE_TYPES: Record<string, string> = {
 
 const SRC = "engine/files.ts";
 
-function mustExist(root: string, path: string, source: string): string {
-  const abs = resolveInRoot(root, path, source);
+function mustExist(root: string, path: string, source: string, allowDeclared = false): string {
+  const abs = allowDeclared ? resolveForRead(root, path, source) : resolveInRoot(root, path, source);
   if (!existsSync(abs)) {
-    const dir = dirname(relative(root, abs));
+    const dir = isRootRef(path) ? path.split(/[\\/]+/).slice(0, -1).join("/") : dirname(relative(root, abs));
     throw new Rejection({
       clause: CLAUSES.PATH_ESCAPE,
       expected: "an existing file",
@@ -122,7 +122,7 @@ export function fileRead(root: string, path: string, opts: { offset?: number; li
   if (opts.ref !== undefined) {
     bytes = gitShow(root, opts.ref, path);
   } else {
-    const abs = mustExist(root, path, SRC);
+    const abs = mustExist(root, path, SRC, true);
     if (statSync(abs).isDirectory()) {
       throw new Rejection({
         clause: CLAUSES.PATH_ESCAPE,

@@ -50,7 +50,8 @@ export function sessionTools(session: Session): ToolDef[] {
           back: { type: "string", description: "jump BACK to an earlier filled state — everything downstream is superseded and its evidence invalidated" },
           state: { type: "string", description: "PEEK at a named state (full info: statement, guidance, conditions, next) — looking never moves" },
           wait: { type: "boolean", description: "short in-turn HOLD: blocks until the human's hand moves the walk or the slider, then returns the fresh packet (changed: false on timeout). For longer waits STOP instead and ask the user to message you" },
-          escape: { type: "string", description: "ESCAPE to idle with this reason — the stuck sub-machine walk is left standing (a later continue re-enters it); the escape is a recorded failure. Boot cannot be escaped" },
+          escape: { type: "string", description: "ESCAPE to idle with this reason — the STUCK sub-machine walk is left standing (a later continue re-enters it); the escape is a recorded FAILURE. Stepping out of healthy work is `pause`, not this. Boot cannot be escaped" },
+          pause: { type: "string", description: "PAUSE to idle with this reason — the same move as escape, recorded as ordinary work. The machine is left standing and a later continue re-enters it. Use this to step out of an expedition or iteration you mean to pick up later: an expedition is a day's bucket and is MEANT to stay open, so leaving one is not a failure. Boot cannot be paused" },
           read_hashes: { type: "object", description: "proof-of-read for this tick: {\"<root-relative path>\": \"<hash from se_file_read>\", ...} — must cover the docs the transition demands, each hash matching the doc as it stands now" },
           route: { type: "string", description: "THE BLUE LINE — the way from here to this target state: every hop, its priority, and what it will ask for. Moves NOTHING. Lists EVERY judgment on the way, so a person can answer them all at once and leave the walk to run" },
           sweep: { type: "boolean", description: "WALK the route to `to` in one call rather than one tick per hop. Collapses round trips ONLY - every hop still weighs the slider, proves its reads and runs its scripts. Stops at the first hop that will not pass and says which and why; the route recomputes after each hop, so a detour is followed rather than fallen off" },
@@ -82,6 +83,7 @@ export function sessionTools(session: Session): ToolDef[] {
         // are refused before anything moves (peeking never needs it).
         if (args.from !== undefined && args.state === undefined) session.assertFrom(String(args.from));
         if (args.escape !== undefined) return session.escape(String(args.escape), "agent", hashes);
+        if (args.pause !== undefined) return session.pause(String(args.pause), "agent", hashes);
         if (args.state !== undefined) return session.stateInfo(String(args.state));
         if (args.back !== undefined) return session.jumpBack(String(args.back), "agent", hashes);
         const wantsAdvance = args.to !== undefined || args.advance === true || Object.keys(hashes).length > 0;
@@ -174,7 +176,7 @@ export function coreTools(rootOf: (rel?: string) => string, projectRoot: string,
       name: "se_file_read",
       title: "se.file.read",
       description:
-        "Read a project file (root-relative path) — TEXT OR IMAGE. Returns the CAS hash writes will demand. Text comes back as numbered lines; pass offset (1-based line) / limit to read a large file in PARTS — an oversize whole-file read is refused with the remedy, never silently truncated. An IMAGE (png, jpg, gif, webp) comes back as the picture itself, so a sketch can be LOOKED AT rather than described to you. Any other binary is refused. Pass ref to read AT A COMMITTED REF ('main' reaches v1, 'v2' reaches v2) — pair with se_file_search/se_file_glob at the same ref.",
+        "Read a project file (root-relative path) — TEXT OR IMAGE. Returns the CAS hash writes will demand. Text comes back as numbered lines; pass offset (1-based line) / limit to read a large file in PARTS — an oversize whole-file read is refused with the remedy, never silently truncated. An IMAGE (png, jpg, gif, webp) comes back as the picture itself, so a sketch can be LOOKED AT rather than described to you. Any other binary is refused. A DECLARED ROOT is reachable as '@name/rest' (the owner declares roots in .se/roots.json; they are read-only). Pass ref to read AT A COMMITTED REF ('main' reaches v1, 'v2' reaches v2) — pair with se_file_search/se_file_glob at the same ref.",
       inputSchema: {
         type: "object",
         properties: {
