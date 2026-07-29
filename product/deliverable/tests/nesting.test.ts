@@ -56,7 +56,10 @@ test("stateTodos: origins ride the nodes and parked defers show without material
   const a = d.stateTodos("a");
   assert.equal(a.visits.length, 1);
   assert.equal(a.visits[0].nodes.find((n) => n.id === "d2")?.origin, "planned");
-  d.apply("b@0", parseUpdate({ op: "update", brief: "arrived" }));
+  // Entering b materializes the parked defer as an open to-do, so the
+  // update names it. An update floating free of the checklist it should be
+  // moving is exactly what the node requirement exists to stop.
+  d.apply("b@0", parseUpdate({ op: "update", node: "d3", brief: "arrived" }));
   const after = d.stateTodos("b");
   assert.equal(after.parked.length, 0);
   assert.ok(after.visits.some((v) => v.nodes.some((n) => n.origin === "deferred")), "the arrived point knows it was deferred");

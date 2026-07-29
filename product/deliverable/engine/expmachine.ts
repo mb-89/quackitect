@@ -13,7 +13,7 @@ import { nodeSize, type CanvasData, type CanvasEdge, type CanvasElement } from "
 import { validateMachine, type MachineDecl, type StateDecl } from "./machine.ts";
 import { stateFromNote } from "./machines/compile.ts";
 import { parseStateNote } from "./notes.ts";
-import { expList, readRecord, recordRel, type Expedition } from "./worktree.ts";
+import { expList, frontmatterOf, readRecord, recordRel, type Expedition } from "./worktree.ts";
 
 export interface GeneratedMachine {
   decl: MachineDecl;
@@ -80,7 +80,10 @@ export function generateContinueExpedition(root: string): GeneratedMachine {
 
   open.forEach((e, i) => {
     const sid = shortId(e.id);
-    const goal = String(readRecord(root, e)?.goal ?? "");
+    const fm = readRecord(root, e);
+    // A record that will not parse still gets a node, saying so. Dropping it
+    // would leave a hole where an expedition used to be.
+    const goal = fm?.unreadable !== undefined ? `⚠ ${String(fm.unreadable)}` : String(fm?.goal ?? "");
     const workId = sid;
     const leaveId = `${sid}-leave`;
     expByState[workId] = e.id;
@@ -147,7 +150,7 @@ function closedRecords(root: string, closed: Expedition[]): Map<string, Record<s
   for (const e of closed) {
     const merged = join(root, recordRel(e.id));
     if (existsSync(merged)) {
-      out.set(e.id, parseStateNote(readFileSync(merged, "utf8")).frontmatter);
+      out.set(e.id, frontmatterOf(readFileSync(merged, "utf8"), `${e.id} record`));
     } else if (cache.has(e.id)) {
       out.set(e.id, cache.get(e.id));
     } else {
@@ -181,7 +184,7 @@ function closedRecords(root: string, closed: Expedition[]): Map<string, Record<s
       continue;
     }
     const size = Number(header[2]);
-    cache.set(e.id, parseStateNote(buf.subarray(off, off + size).toString("utf8")).frontmatter);
+    cache.set(e.id, frontmatterOf(buf.subarray(off, off + size).toString("utf8"), `${e.id} record`));
     out.set(e.id, cache.get(e.id));
     off += size + 1;
   }

@@ -409,6 +409,26 @@ export class Decisions {
         break;
       }
       case "update": {
+        // AN UPDATE THAT MOVES NOTHING ON THE CHECKLIST IS NARRATION WEARING
+        // progress's clothes (owner, 2026-07-29, watching a board of thirteen
+        // yellow items collect a pile of checked leaves underneath).
+        //
+        // So when a checklist STANDS, an update says which item it is about.
+        // With none open there is nothing to attach to and a bare update is
+        // exactly right. This is only affordable because the open node map
+        // now rides home on every call - naming one costs a glance.
+        // SCOPED TO THIS VISIT. Another state's open checklist is not this
+        // state's business, and a walk that had moved on would be refused
+        // over items it can no longer reach.
+        if (u.node === undefined && [...this.nodes.values()].some((n) => n.visit === visit && n.status === "open")) {
+          throw new Rejection({
+            clause: CLAUSES.DECISION_NODE,
+            expected: `update {node, brief} - which item is this about? ${this.openBriefs()}`,
+            got: "an update naming no node, with a checklist standing open",
+            remedy: { tool: "(the same call)", args: { update: { op: "update", node: "<an open node id>", brief: "..." } }, note: "or resolve one instead - done | obsolete | revert. A fork opens a new branch where you are" },
+            source: "engine/decisions.ts update",
+          });
+        }
         if (u.node !== undefined) this.activeId = this.openNode(u.node).id;
         // EVERY update changes the RENDER (owner ruling 2026-07-27): the
         // brief lands as a checked point under the active node — the log
@@ -421,14 +441,20 @@ export class Decisions {
     }
     if (u.op === "update") this.sinceResolve++;
     else if (u.op === "done" || u.op === "obsolete" || u.op === "revert" || u.op === "defer") this.sinceResolve = 0;
-    const open = [...this.nodes.values()].filter((n) => n.status === "open").length;
+    // THE MAP RIDES EVERY UPDATE (note-792c32b5425e item 5). Resolving a
+    // node needs its id, and the id was only ever printed by a REFUSAL. So
+    // the way to see the checklist was to name a node that does not exist
+    // and read the rejection - done four times in e22 alone. The answer
+    // carries the map, so the next call can be right.
+    const openNodes = [...this.nodes.values()].filter((n) => n.status === "open").map((n) => ({ id: n.id, brief: n.brief }));
+    const open = openNodes.length;
     // A NUDGE, never a refusal. Narration that outruns the checklist is bad
     // rhythm, not a broken call, and refusing the work over its commentary
     // is the mistake the update field already learned once.
     const nudge = this.sinceResolve >= Decisions.NUDGE_AFTER && open > 0
       ? `${this.sinceResolve} updates since anything closed, with ${open} still open — the checklist is a PROGRESS view. Close what is genuinely done on the NEXT call, not at the end.`
       : undefined;
-    return { update: u.op, active: this.activeId ?? null, open, ...(nudge !== undefined ? { nudge } : {}) };
+    return { update: u.op, active: this.activeId ?? null, open, open_nodes: openNodes, ...(nudge !== undefined ? { nudge } : {}) };
   }
 
   /** One state visit's tree, insertion-ordered — the mirror renders this.

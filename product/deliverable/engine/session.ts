@@ -29,6 +29,7 @@ import {
   type StateDecl,
 } from "./machine.ts";
 import { compileMachine, compileMachineCached, resolveRef } from "./machines/compile.ts";
+import { computeRoute, type RouteNode, type RouteResult } from "./route.ts";
 import { conditionNotePath } from "./conditions.ts";
 import { drainNote, pendingNotes } from "./inbox.ts";
 import { confirmPrefill, formTemplatePath, lintForm, parseFormTemplate, scaffoldInstance, withFieldContent, withStatus, type FormLint, type FormTemplate } from "./forms.ts";
@@ -619,6 +620,93 @@ export class Session {
    *  the one place that may park a note or carry it (engine/inbox.ts). */
   inRetro(): boolean {
     return this.active().some((id) => id === "retro" || id.endsWith("/retro"));
+  }
+
+  /** The machine standing behind a qualified prefix ("" is main). A prefix
+   *  segment is a SUBMACHINE's id, which is also its state's id in every
+   *  machine drawn so far; a mismatch resolves to nothing and the route
+   *  reports no path rather than a wrong one. */
+  private declForPrefix(prefix: string): MachineDecl | undefined {
+    if (prefix === "") return this.machine;
+    let decl = this.machine;
+    let gen: GeneratedMachine | undefined;
+    for (const seg of prefix.split("/")) {
+      const st = decl.states.find((s) => s.id === seg);
+      if (st?.submachine === undefined) return undefined;
+      const g = gen?.subGen?.[seg]?.() ?? this.genFor(seg);
+      if (g !== undefined) {
+        decl = g.decl;
+        gen = g;
+        continue;
+      }
+      try {
+        decl = compileMachineCached(this.root, resolveRef(this.root, mainMachinePath(this.root), st.submachine));
+      } catch {
+        return undefined;
+      }
+      gen = undefined;
+    }
+    return decl;
+  }
+
+  private static qual(prefix: string, id: string): string {
+    return prefix === "" ? id : `${prefix}/${id}`;
+  }
+
+  /** One node of the flattened walk graph, for the route's search. Two
+   *  moves are not drawn anywhere and have to be modelled here:
+   *  - entering a state that CARRIES a submachine lands on that machine's
+   *    own start, not on the state;
+   *  - reaching a submachine's END and advancing pops back out and follows
+   *    the parent state's edges. One tick, two moves. */
+  private expandNode(q: string): RouteNode | undefined {
+    const cut = q.lastIndexOf("/");
+    const prefix = cut < 0 ? "" : q.slice(0, cut);
+    const id = cut < 0 ? q : q.slice(cut + 1);
+    const decl = this.declForPrefix(prefix);
+    const st = decl?.states.find((s) => s.id === id);
+    if (decl === undefined || st === undefined) return undefined;
+    const nexts: RouteNode["nexts"] = [];
+    for (const e of st.edges) {
+      const t = decl.states.find((s) => s.id === e.to);
+      if (t === undefined) continue;
+      const landed = Session.qual(prefix, t.id);
+      if (t.submachine !== undefined) {
+        const inner = this.declForPrefix(landed);
+        if (inner !== undefined) {
+          nexts.push({ to: Session.qual(landed, inner.initial), tick: { from: q, to: e.to } });
+          continue;
+        }
+      }
+      nexts.push({ to: landed, tick: { from: q, to: e.to } });
+    }
+    if (st.kind === "end" && prefix !== "") {
+      const pcut = prefix.lastIndexOf("/");
+      const pprefix = pcut < 0 ? "" : prefix.slice(0, pcut);
+      const pid = pcut < 0 ? prefix : prefix.slice(pcut + 1);
+      const pst = this.declForPrefix(pprefix)?.states.find((s) => s.id === pid);
+      for (const e of pst?.edges ?? []) nexts.push({ to: Session.qual(pprefix, e.to), tick: { from: q, advance: true } });
+    }
+    return { priority: st.priority, demands: { ...(st.entry ?? {}) }, nexts };
+  }
+
+  /** THE BLUE LINE. Where the walk stands, where it is headed, and every
+   *  hop between — with what each will ask for. It MOVES NOTHING. */
+  route(target: string): RouteResult & { from: string; autonomy: number; stops_at?: { at: string; why: string } } {
+    const from = this.active()[0] ?? this.machine.initial;
+    const r = computeRoute(from, target, (q) => this.expandNode(q));
+    // The slider is weighed HOP BY HOP. A route that walks past a state the
+    // agent may not enter would be a hole straight through contract rule 3,
+    // so the preview names where it will stop before anything moves.
+    const blocked = r.steps.find((s) => s.priority > this._autonomy);
+    return {
+      ...r,
+      from,
+      autonomy: this._autonomy,
+      ...(blocked !== undefined
+        ? { stops_at: { at: blocked.to, why: `entering ${blocked.to} weighs ${blocked.priority}, above the session autonomy ${this._autonomy} — the person's hand advances it` } }
+        : {}),
+    };
   }
 
   /** Where the walk is, machine-wise: ["main"] or ["main", "boot", …]. */

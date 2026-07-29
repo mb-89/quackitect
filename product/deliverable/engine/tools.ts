@@ -51,6 +51,7 @@ export function sessionTools(session: Session): ToolDef[] {
           wait: { type: "boolean", description: "short in-turn HOLD: blocks until the human's hand moves the walk or the slider, then returns the fresh packet (changed: false on timeout). For longer waits STOP instead and ask the user to message you" },
           escape: { type: "string", description: "ESCAPE to idle with this reason — the stuck sub-machine walk is left standing (a later continue re-enters it); the escape is a recorded failure. Boot cannot be escaped" },
           read_hashes: { type: "object", description: "proof-of-read for this tick: {\"<root-relative path>\": \"<hash from se_file_read>\", ...} — must cover the docs the transition demands, each hash matching the doc as it stands now" },
+          route: { type: "string", description: "THE BLUE LINE — the way from here to this target state: every hop, its priority, and what it will ask for. Moves NOTHING. Names where the walk would stop and why" },
         },
       },
       handler: async (args) => {
@@ -69,6 +70,8 @@ export function sessionTools(session: Session): ToolDef[] {
               : `nothing moved in ${ms}ms — call se_tick {wait: true} again to keep holding`,
           };
         }
+        // Looking never moves, so the route answers before anything else.
+        if (args.route !== undefined) return session.route(String(args.route));
         const hashes = (typeof args.read_hashes === "object" && args.read_hashes !== null ? args.read_hashes : {}) as Record<string, string>;
         // ATOMIC: a moving tick declares where it was planned — stale plans
         // are refused before anything moves (peeking never needs it).
@@ -603,7 +606,7 @@ export function buildServer(root: string, session = new Session(root), tollOpts:
   const UPDATE_PROP = {
     type: "object",
     description:
-      "decision-graph update riding this call — narrate as you work. {op: plan|fork|done|obsolete|revert|update, brief?, items?, node?}: plan {items} starts the state's checklist; fork {brief, items?} opens an unplanned branch where you are; done|obsolete|revert {node, brief} resolves a node — everything started gets resolved, silently abandoning is illegal; update {brief, node?} says what you are doing (an UPDATE, never a 'note' — notes are retro strays via se_note); defer {node, to} parks a point for the state that can do it — it arrives there as an open to-do. A volunteered update resets the toll; when the toll lapses, the next call must carry one.",
+      "decision-graph update riding this call — narrate as you work. {op: plan|fork|done|obsolete|revert|update, brief?, items?, node?}: plan {items} starts the state's checklist; fork {brief, items?} opens an unplanned branch where you are; done|obsolete|revert {node, brief} resolves a node — everything started gets resolved, silently abandoning is illegal; update {node, brief} says what you are doing ON an item — the node is REQUIRED while any item stands open, because an update that moves nothing on the checklist is narration, not progress (with nothing open, a bare update is right); defer {node, to} parks a point for the state that can do it — it arrives there as an open to-do. Every call answers with update_result, carrying the open node map and any nudge. A volunteered update resets the toll; when the toll lapses, the next call must carry one.",
   };
   for (const t of tools) (t.inputSchema.properties as Record<string, unknown>).update = UPDATE_PROP;
   const server = new McpServer({ name: "se-mcp", version: "3.0.0-bootstrap" }, tools);
@@ -626,8 +629,10 @@ export function buildServer(root: string, session = new Session(root), tollOpts:
   // UNPAID, so the rule keeps its teeth — it just bites the narration now,
   // instead of the work.
   let updateComplaint: RejectionPayload | undefined;
+  let updateResult: Record<string, unknown> | undefined;
   server.addGuard((tool, args) => {
     updateComplaint = undefined;
+    updateResult = undefined;
     if (args.update === undefined) return;
     const raw = args.update;
     delete args.update;
@@ -635,6 +640,7 @@ export function buildServer(root: string, session = new Session(root), tollOpts:
       const op = parseUpdate(raw);
       const visit = session.currentVisit();
       const result = session.decisions.apply(visit, op);
+      updateResult = result as unknown as Record<string, unknown>;
       log.append({ tool: "se_update", args: { via: tool, visit, ...op }, ok: true, outcome: "result", duration_ms: 0, response: result });
       toll.paid();
     } catch (e) {
@@ -652,6 +658,21 @@ export function buildServer(root: string, session = new Session(root), tollOpts:
     const w = toll.takeWarning();
     if (w === undefined || typeof result !== "object" || result === null || Array.isArray(result)) return result;
     return { ...(result as Record<string, unknown>), toll_warning: w };
+  });
+
+  // AND SO DOES THE ACCEPTED ONE (note-792c32b5425e item 5; the hole it
+  // left was found live on 2026-07-29). The update's answer went only to
+  // the LOG. So the node ids needed to resolve anything were invisible
+  // unless you deliberately named a node that does not exist and read the
+  // refusal — and the checklist nudge fired TEN times into a void, seen by
+  // nobody, including the agent it was nudging.
+  //
+  // A guard nobody can hear is not a guard. It rides the result now.
+  server.addDecorator((_tool, result) => {
+    const u = updateResult;
+    updateResult = undefined;
+    if (u === undefined || typeof result !== "object" || result === null || Array.isArray(result)) return result;
+    return { ...(result as Record<string, unknown>), update_result: u };
   });
 
   // The refused update rides home on the call it could not stop.

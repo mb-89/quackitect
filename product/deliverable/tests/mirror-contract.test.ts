@@ -49,8 +49,9 @@ test("/api/decisions serves the panel's whole contract over HTTP", async () => {
   const { startMirror } = await import("../engine/mirror.ts");
   const root = freshRoot();
   const session = new Session(root);
-  session.decisions.apply("idle@0", { op: "plan", items: ["item one"] });
-  session.decisions.apply("idle@0", { op: "update", brief: "narrating" });
+  const planned = session.decisions.apply("idle@0", { op: "plan", items: ["item one"] }) as Record<string, unknown>;
+  const only = (planned.open_nodes as { id: string }[])[0].id;
+  session.decisions.apply("idle@0", { op: "update", node: only, brief: "narrating" });
   const server = startMirror({ session, root, port: 0, log: new CallLog(seDir(root)), mode: "agent" });
   await new Promise((r) => server.on("listening", r));
   const port = (server.address() as { port: number }).port;
@@ -376,11 +377,59 @@ test("the survey is offered as a legal tool, not as a button of its own", () => 
 // A CHECKLIST IS A PROGRESS VIEW (owner 2026-07-29, after watching one sit
 // untouched for an hour and then close fourteen items in a minute). The
 // rule was already in walking.md and prose lost, so the engine says it.
+// THE MAP RIDES EVERY UPDATE (note-792c32b5425e item 5). Resolving a node
+// needs its id, and the id used to be printed only by a REFUSAL - so the
+// way to see your own checklist was to name a node that does not exist.
+test("an update answers with the open nodes, so an id is never guessed", () => {
+  const s = new Session(freshRoot());
+  const planned = s.decisions.apply("idle@0", { op: "plan", items: ["first", "second"] }) as Record<string, unknown>;
+  const map = planned.open_nodes as { id: string; brief: string }[];
+  assert.equal(map.length, 2, "the plan answers with what it opened");
+  assert.deepEqual(map.map((n) => n.brief), ["first", "second"]);
+  assert.ok(map.every((n) => /^d\d+$/.test(n.id)), "each carries the id a resolution needs");
+  // Closing one takes it off the map, so the map is never stale.
+  const after = s.decisions.apply("idle@0", { op: "done", node: map[0].id, brief: "landed" }) as Record<string, unknown>;
+  const left = after.open_nodes as { id: string; brief: string }[];
+  assert.deepEqual(left.map((n) => n.brief), ["second"]);
+  assert.equal(after.open, 1, "and the count still agrees with the map");
+});
+
+// AN UPDATE THAT MOVES NOTHING ON THE CHECKLIST IS NARRATION WEARING
+// progress's clothes (owner, 2026-07-29, watching a board of yellow items
+// collect checked leaves underneath). This is only affordable because the
+// open node map now rides home on every call.
+test("an update names its item while a checklist stands, and is free when none does", () => {
+  const s = new Session(freshRoot());
+  // Nothing open - there is nothing to attach to, so a bare update is right.
+  const bare = s.decisions.apply("idle@0", { op: "update", brief: "before any plan" }) as Record<string, unknown>;
+  assert.equal(bare.update, "update");
+  const planned = s.decisions.apply("idle@0", { op: "plan", items: ["the item"] }) as Record<string, unknown>;
+  const only = (planned.open_nodes as { id: string }[])[0].id;
+  assert.throws(() => s.decisions.apply("idle@0", { op: "update", brief: "floating free" }), (err: unknown) => {
+    const r = err as { clause?: string; expected?: string };
+    assert.equal(r.clause, "SE-C-121");
+    assert.match(String(r.expected), /which item is this about/);
+    assert.match(String(r.expected), /the item/, "and the refusal names what is open");
+    return true;
+  });
+  // Named, it lands under the item it narrates.
+  s.decisions.apply("idle@0", { op: "update", node: only, brief: "on it" });
+  const nested = s.decisions.graph("idle@0").nodes.find((n) => n.brief === "on it")!;
+  assert.equal(nested.parent, only);
+  // ANOTHER STATE'S checklist is not this state's business.
+  const elsewhere = s.decisions.apply("front_desk@0", { op: "update", brief: "a different visit" }) as Record<string, unknown>;
+  assert.equal(elsewhere.update, "update", "an open list in another visit never blocks this one");
+});
+
 test("the checklist nudges when narration outruns it, and never refuses", () => {
   const s = new Session(freshRoot());
   s.decisions.apply("idle@0", { op: "plan", items: ["first", "second"] });
+  // Each update NAMES its item - narration that moves nothing on the
+  // checklist is refused outright. The nudge is about the item never
+  // CLOSING, which is a different failure and still worth saying.
+  const items = (s.decisions.apply("idle@0", { op: "update", node: "d1", brief: "starting" }) as Record<string, unknown>).open_nodes as { id: string }[];
   let last: Record<string, unknown> = {};
-  for (let i = 0; i < 5; i++) last = s.decisions.apply("idle@0", { op: "update", brief: "working " + i }) as Record<string, unknown>;
+  for (let i = 0; i < 5; i++) last = s.decisions.apply("idle@0", { op: "update", node: items[0].id, brief: "working " + i }) as Record<string, unknown>;
   assert.ok(typeof last.nudge === "string", "five updates with nothing closed earns the nudge");
   assert.match(String(last.nudge), /PROGRESS view/);
   assert.equal(last.update, "update", "and the update itself still lands - a nudge is never a refusal");
@@ -388,7 +437,7 @@ test("the checklist nudges when narration outruns it, and never refuses", () => 
   const open = s.decisions.graph("idle@0").nodes.filter((n) => n.status === "open");
   const closed = s.decisions.apply("idle@0", { op: "done", node: open[0].id, brief: "landed" }) as Record<string, unknown>;
   assert.equal(closed.nudge, undefined, "closing something clears it");
-  const after = s.decisions.apply("idle@0", { op: "update", brief: "on to the next" }) as Record<string, unknown>;
+  const after = s.decisions.apply("idle@0", { op: "update", node: open[1].id, brief: "on to the next" }) as Record<string, unknown>;
   assert.equal(after.nudge, undefined, "and the count starts again from there");
 });
 

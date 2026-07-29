@@ -9,6 +9,12 @@ import { spawnSync } from "node:child_process";
 import { CLAUSES, Rejection } from "./errors.ts";
 import { parseStateNote } from "./notes.ts";
 
+/** Free prose as a YAML scalar. Backslashes first, then quotes — the other
+ *  order doubles the escape it just added. */
+function yamlScalar(s: string): string {
+  return `"${s.replace(/\r?\n/g, " ").replace(/\\/g, "\\\\").replace(/"/g, '\\"')}"`;
+}
+
 const SRC = "engine/worktree.ts";
 
 function git(root: string, args: string[], what: string): string {
@@ -52,6 +58,19 @@ export function recordRel(id: string): string {
  *  flips land there, so that one is re-read every time. */
 const branchRecords = new Map<string, Record<string, unknown> | undefined>();
 
+/** A record that does not PARSE must not take the container down with it.
+ *  One malformed record broke the expeditions machine, and with it the
+ *  archive, the survey and the route — everything that lists what stands.
+ *  It comes back MARKED instead, so a reader sees the damage rather than a
+ *  hole where an expedition used to be. */
+export function frontmatterOf(raw: string, where: string): Record<string, unknown> {
+  try {
+    return parseStateNote(raw).frontmatter;
+  } catch (err) {
+    return { unreadable: `${where} does not parse — ${String((err as Error).message).split("\n")[0]}` };
+  }
+}
+
 /** The record's frontmatter — from the worktree while open, from the
  *  branch once closed. Undefined for pre-record expeditions (e1–e3). */
 export function readRecord(root: string, e: Expedition): Record<string, unknown> | undefined {
@@ -59,14 +78,14 @@ export function readRecord(root: string, e: Expedition): Record<string, unknown>
   if (e.open) {
     const abs = join(e.path, rel);
     if (!existsSync(abs)) return undefined;
-    return parseStateNote(readFileSync(abs, "utf8")).frontmatter;
+    return frontmatterOf(readFileSync(abs, "utf8"), rel);
   }
   // Closed: the record lives ON ITS BRANCH (owner ruling 2026-07-28 —
   // history is git's, the tree carries only live work). The close stamped
   // the ruling; the leave review IS the adjudication. A legacy merged
   // copy still reads.
   const merged = join(root, rel);
-  if (existsSync(merged)) return parseStateNote(readFileSync(merged, "utf8")).frontmatter;
+  if (existsSync(merged)) return frontmatterOf(readFileSync(merged, "utf8"), rel);
   // THE SEPARATOR IS AN ESCAPE, NEVER A RAW BYTE. A literal NUL in the source
   // makes ripgrep call the whole FILE binary, and se_file_search then returns
   // nothing for it — silently, with no note that a file was skipped. This file
@@ -74,7 +93,7 @@ export function readRecord(root: string, e: Expedition): Record<string, unknown>
   const key = `${root}\u0000${e.branch}`;
   if (branchRecords.has(key)) return branchRecords.get(key);
   const r = spawnSync("git", ["show", `${e.branch}:${rel}`], { cwd: root, encoding: "utf8", maxBuffer: 8 * 1024 * 1024 });
-  const fm = r.status !== 0 ? undefined : parseStateNote(r.stdout).frontmatter;
+  const fm = r.status !== 0 ? undefined : frontmatterOf(r.stdout, `${e.branch}:${rel}`);
   branchRecords.set(key, fm);
   return fm;
 }
@@ -235,9 +254,14 @@ export function expClose(root: string, e: Expedition, merge: boolean, override?:
         source: SRC,
       });
     }
+    // QUOTED, because the writer controls the field and NOT its content.
+    // An override is free prose from a person, so it carries colons, quotes
+    // and line breaks. Unquoted, "in chat, 2026-07-29: after reading" is a
+    // nested mapping and the WHOLE record stops parsing. That happened for
+    // real on e22 and took the record down with it.
     const stamped = (override ?? "").trim();
     const raw = readFileSync(recAbs, "utf8");
-    writeFileSync(recAbs, raw.replace(/^status: open$/m, `status: closed\nclosed: ${new Date().toISOString()}\nruling: ${merge ? "applied" : "dismissed"}${stamped === "" ? "" : `\nreport_override: ${stamped.replace(/\r?\n/g, " ")}`}`), "utf8");
+    writeFileSync(recAbs, raw.replace(/^status: open$/m, `status: closed\nclosed: ${new Date().toISOString()}\nruling: ${merge ? "applied" : "dismissed"}${stamped === "" ? "" : `\nreport_override: ${yamlScalar(stamped)}`}`), "utf8");
   }
   // Leftover changes are committed — a walk's work never silently vanishes.
   const dirty = git(e.path, ["status", "--porcelain"], "status").trim() !== "";
