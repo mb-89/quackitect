@@ -296,7 +296,7 @@ const STYLE = `
      never a target. The divider moves it, and the size the reader lands on
      is stored and reused from then on. */
   #left { width: 650px; min-width: 360px; }
-  #left #w-log { flex: 1; min-height: 0; }
+
   /* THE TERMINAL FILLS ITS CARD (owner 2026-07-29), superseding the half-a-
      column rule the old left column needed. It once sat tiny because flex:none
      with no height sizes to CONTENT; in the grid the card decides the box and
@@ -397,7 +397,9 @@ const STYLE = `
   .thr-notches { position: relative; height: 11px; margin-top: -3px; }
   .thr-notch { position: absolute; transform: translateX(-50%); font-size: 9px; line-height: 1; color: #7f8b96; cursor: pointer; padding: 1px 3px; }
   .thr-notch:hover { color: #e8b339; }
-  #w-log { flex: 0 0 42%; border-radius: 0; border: 0; border-bottom: 1px solid #2a2f34; }
+  /* The log used to be the top 42% of a shared column, borderless so it read
+     as one surface with the terminal below it. As a card of its own it takes
+     the whole card and wears the normal widget border. */
   .log-filter-row { padding: 6px 12px 0; display: flex; gap: 6px; }
   .log-filter-row input { flex: 1 1 50%; min-width: 0; box-sizing: border-box; background: #14171a; border: 1px solid #2a2f34; border-radius: 6px; color: #d8dde2; font: inherit; font-size: 12px; padding: 4px 8px; }
   .log-panel { font-size: 12px; margin-top: 6px; }

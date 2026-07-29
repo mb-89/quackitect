@@ -60,3 +60,7 @@
 {"ts":"2026-07-29T11:01:10.292Z","op":"update","visit":"expeditions/e21@0","node":"d69","brief":"the client promotes chat when an agent actually answers"}
 {"ts":"2026-07-29T11:01:13.448Z","op":"update","visit":"expeditions/e21@0","node":"d70","brief":"verifying the default main card is the state machine with no agent"}
 {"ts":"2026-07-29T11:01:37.262Z","op":"update","visit":"expeditions/e21@0","node":"d71","brief":"committing the card matrix layout"}
+{"ts":"2026-07-29T11:01:41.225Z","op":"done","visit":"expeditions/e21@0","node":"d19","brief":"morph preservation and the card contract are pinned by tests"}
+{"ts":"2026-07-29T11:02:18.280Z","op":"update","visit":"expeditions/e21@0","node":"d72","brief":"log fills its card instead of 42% of an old column"}
+{"ts":"2026-07-29T11:02:21.042Z","op":"update","visit":"expeditions/e21@0","node":"d73","brief":"verifying the suite after the log card styling fix"}
+{"ts":"2026-07-29T11:02:50.015Z","op":"done","visit":"expeditions/e21@0","node":"d10","brief":"card matrix designed as one grid so promotion never re-parents a widget"}
