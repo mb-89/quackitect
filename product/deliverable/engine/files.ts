@@ -9,7 +9,7 @@
 //     also the read-before-write law, enforced mechanically.
 import { spawnSync } from "node:child_process";
 import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from "node:fs";
-import { dirname, join, relative, sep } from "node:path";
+import { dirname, extname, join, relative, sep } from "node:path";
 import { CLAUSES, Rejection } from "./errors.ts";
 import { contentHash } from "./hash.ts";
 import { isExcluded, resolveInRoot } from "./paths.ts";
@@ -20,6 +20,18 @@ export const READ_BUDGET = 50_000;
 export const RANGE_DEFAULT_LIMIT = 2000;
 /** A single line longer than this is truncated with an honest marker. */
 const LINE_CAP = 2000;
+/** Image bytes handed to a model. Base64 costs about a third more again in context. */
+export const IMAGE_BUDGET = 1_500_000;
+
+// The reader is general. Text comes back as numbered lines; an image comes back
+// as the picture itself. Anything else is refused rather than base64'd blindly.
+const IMAGE_TYPES: Record<string, string> = {
+  ".png": "image/png",
+  ".jpg": "image/jpeg",
+  ".jpeg": "image/jpeg",
+  ".gif": "image/gif",
+  ".webp": "image/webp",
+};
 
 const SRC = "engine/files.ts";
 
@@ -41,25 +53,30 @@ function mustExist(root: string, path: string, source: string): string {
 export interface ReadResult {
   path: string;
   hash: string;
-  total_lines: number;
+  /** Text reads only — an image has no lines. */
+  total_lines?: number;
   /** Present on range reads: which slice this is. */
   range?: { offset: number; limit: number };
   /** Present when the read came from a committed ref, not the working tree. */
   ref?: string;
   content: string;
   truncated_lines?: number[];
+  media_type?: string;
+  bytes?: number;
+  /** Extra MCP content blocks; the transport splits these out (engine/mcp.ts). */
+  _attachments?: { type: "image"; data: string; mimeType: string }[];
 }
 
 /** A committed blob: git show <ref>:<path>. The ref's tree layout may
  *  differ from today's — the remedy globs the ref, not the working tree. */
-function gitShow(root: string, ref: string, path: string): string {
+function gitShow(root: string, ref: string, path: string): Buffer {
   const spec = `${ref}:${path.replace(/\\/g, "/")}`;
-  const r = spawnSync("git", ["show", spec], { cwd: root, encoding: "utf8", maxBuffer: 64 * 1024 * 1024 });
+  const r = spawnSync("git", ["show", spec], { cwd: root, maxBuffer: 64 * 1024 * 1024 });
   if (r.status !== 0) {
     throw new Rejection({
       clause: CLAUSES.PATH_ESCAPE,
       expected: "an existing <ref>:<path> in this repository",
-      got: `${spec} — ${(r.stderr ?? "").trim().split("\n")[0]}`,
+      got: `${spec} — ${(r.stderr ?? Buffer.alloc(0)).toString("utf8").trim().split("\n")[0]}`,
       remedy: { tool: "se_file_glob", args: { glob: "**/*", ref }, note: "glob the ref's tree first — the layout differs between versions ('main' reaches v1, 'v2' reaches v2)" },
       source: SRC,
     });
@@ -67,10 +84,43 @@ function gitShow(root: string, ref: string, path: string): string {
   return r.stdout;
 }
 
+function looksBinary(bytes: Buffer): boolean {
+  const n = Math.min(bytes.length, 8000);
+  for (let i = 0; i < n; i++) if (bytes[i] === 0) return true;
+  return false;
+}
+
+function imageRead(path: string, bytes: Buffer, mimeType: string, ref?: string): ReadResult {
+  const hash = contentHash(bytes);
+  if (bytes.length > IMAGE_BUDGET) {
+    throw new Rejection({
+      clause: CLAUSES.OVERSIZE_READ,
+      expected: `an image under ${IMAGE_BUDGET} bytes — this one is ${bytes.length}`,
+      got: `image read of ${path}`,
+      remedy: {
+        tool: "se_run",
+        args: { command: `# shrink ${path} below ${IMAGE_BUDGET} bytes, then read it again` },
+        note: "the lane has no resizer, so an oversize image is refused rather than silently downscaled",
+      },
+      source: SRC,
+    });
+  }
+  const res: ReadResult = {
+    path,
+    hash,
+    bytes: bytes.length,
+    media_type: mimeType,
+    content: `${mimeType}, ${bytes.length} bytes — the image itself rides with this result`,
+    _attachments: [{ type: "image", data: bytes.toString("base64"), mimeType }],
+  };
+  if (ref !== undefined) res.ref = ref;
+  return res;
+}
+
 export function fileRead(root: string, path: string, opts: { offset?: number; limit?: number; ref?: string } = {}): ReadResult {
-  let raw: string;
+  let bytes: Buffer;
   if (opts.ref !== undefined) {
-    raw = gitShow(root, opts.ref, path);
+    bytes = gitShow(root, opts.ref, path);
   } else {
     const abs = mustExist(root, path, SRC);
     if (statSync(abs).isDirectory()) {
@@ -82,8 +132,24 @@ export function fileRead(root: string, path: string, opts: { offset?: number; li
         source: SRC,
       });
     }
-    raw = readFileSync(abs, "utf8");
+    bytes = readFileSync(abs);
   }
+  const mimeType = IMAGE_TYPES[extname(path).toLowerCase()];
+  if (mimeType !== undefined) return imageRead(path, bytes, mimeType, opts.ref);
+  if (looksBinary(bytes)) {
+    throw new Rejection({
+      clause: CLAUSES.UNREADABLE_BYTES,
+      expected: "text, or an image the lane can show (png, jpg, gif, webp)",
+      got: `${path} — ${bytes.length} bytes of binary, hash ${contentHash(bytes)}`,
+      remedy: {
+        tool: "se_run",
+        args: { command: `# inspect ${path} with a tool that understands its format` },
+        note: "base64 of arbitrary bytes tells a model nothing and costs a fortune in context",
+      },
+      source: SRC,
+    });
+  }
+  const raw = bytes.toString("utf8");
   const hash = contentHash(raw);
   const lines = raw.split("\n");
   const wantsRange = opts.offset !== undefined || opts.limit !== undefined;

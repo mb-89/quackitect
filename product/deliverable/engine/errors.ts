@@ -65,4 +65,5 @@ export const CLAUSES = {
   DEAD_END: "SE-C-123", // completing the state would leave the machine open with nothing active — a starved join in the drawing
   CANVAS_BROKEN: "SE-C-124", // a canvas fails to compile mid-walk — the walk stands; fix the drawing
   PROSE_WALL: "SE-C-125", // long prose without a line break renders as a wall — break it into lines
+  UNREADABLE_BYTES: "SE-C-126", // a binary the lane cannot show a model — images travel, arbitrary bytes do not
 } as const;

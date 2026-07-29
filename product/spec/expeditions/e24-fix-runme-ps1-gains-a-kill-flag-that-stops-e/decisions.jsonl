@@ -1,0 +1,26 @@
+{"ts":"2026-07-29T15:21:07.253Z","op":"plan","visit":"expeditions/e24@0","parent":null,"nodes":[{"id":"d2","brief":"Read the flag registry in se-mcp.ts"},{"id":"d3","brief":"Write --kill into RUNME.ps1"},{"id":"d4","brief":"Declare the flag in the one help"},{"id":"d5","brief":"Run it and prove it finds the leftovers"},{"id":"d6","brief":"Commit and land on trunk"}]}
+{"ts":"2026-07-29T15:21:11.654Z","op":"update","visit":"expeditions/e24@0","node":"d7","brief":"reading the one-help flag registry"}
+{"ts":"2026-07-29T15:23:14.652Z","op":"done","visit":"expeditions/e24@0","node":"d2","brief":"flag registry read - the one help lives in se-mcp.ts"}
+{"ts":"2026-07-29T15:24:01.666Z","op":"update","visit":"expeditions/e24@0","node":"d8","brief":"parse-check plus a dry run of the real block"}
+{"ts":"2026-07-29T15:24:45.090Z","op":"fork","visit":"expeditions/e24@0","parent":"d3","node":"d9","brief":"ordered dict indexed by int pid throws - keys must be strings","nodes":[]}
+{"ts":"2026-07-29T15:24:52.922Z","op":"update","visit":"expeditions/e24@0","node":"d10","brief":"re-running the dry run against the string-key fix"}
+{"ts":"2026-07-29T15:25:14.425Z","op":"done","visit":"expeditions/e24@0","node":"d9","brief":"string keys fix it - discovery now finds all three"}
+{"ts":"2026-07-29T15:25:52.938Z","op":"done","visit":"expeditions/e24@0","node":"d3","brief":"--kill written and proven against the real processes"}
+{"ts":"2026-07-29T15:26:13.160Z","op":"done","visit":"expeditions/e24@0","node":"d4","brief":"the flag is declared in the one help and renders"}
+{"ts":"2026-07-29T15:26:16.425Z","op":"done","visit":"expeditions/e24@0","node":"d5","brief":"dry run found all three instances and spared the right two"}
+{"ts":"2026-07-29T15:27:00.941Z","op":"fork","visit":"expeditions/e24@0","parent":null,"node":"d11","brief":"the help test caught the missing -Kill alias","nodes":[]}
+{"ts":"2026-07-29T15:27:07.920Z","op":"update","visit":"expeditions/e24@0","node":"d12","brief":"re-running the suite after adding the alias"}
+{"ts":"2026-07-29T15:27:52.143Z","op":"done","visit":"expeditions/e24@0","node":"d11","brief":"alias declared and the suite is green at 184"}
+{"ts":"2026-07-29T15:27:55.088Z","op":"update","visit":"expeditions/e24@0","node":"d13","brief":"staging the fix and the guidance"}
+{"ts":"2026-07-29T15:28:01.931Z","op":"update","visit":"expeditions/e24@0","node":"d14","brief":"committing on the expedition branch"}
+{"ts":"2026-07-29T15:28:15.254Z","op":"update","visit":"expeditions/e24@0","node":"d15","brief":"checking trunk is clean before the merge"}
+{"ts":"2026-07-29T15:28:33.507Z","op":"update","visit":"expeditions/e24@0","node":"d16","brief":"inspecting the real root before touching trunk"}
+{"ts":"2026-07-29T15:28:45.350Z","op":"update","visit":"expeditions/e24@0","node":"d17","brief":"fast-forwarding trunk onto the expedition commit"}
+{"ts":"2026-07-29T15:28:53.346Z","op":"done","visit":"expeditions/e24@0","node":"d6","brief":"trunk fast-forwarded to a1abe05, e24 left open"}
+{"ts":"2026-07-29T15:48:32.561Z","op":"plan","visit":"expeditions/e24@0","parent":null,"nodes":[{"id":"d26","brief":"Find how se_file_read reads and returns a file"},{"id":"d27","brief":"Return an image block for image types"},{"id":"d28","brief":"Refuse other binary with size and hash"},{"id":"d29","brief":"Cap image bytes and downscale above it"},{"id":"d30","brief":"Test the new read paths"},{"id":"d31","brief":"Read the owner's sketch through the lane"}]}
+{"ts":"2026-07-29T15:49:19.933Z","op":"update","visit":"expeditions/e24@0","node":"d32","brief":"answered the naming question while the reader search returns"}
+{"ts":"2026-07-29T15:51:08.208Z","op":"update","visit":"expeditions/e24@0","node":"d33","brief":"captured the overhaul ruling before returning to the reader"}
+{"ts":"2026-07-29T15:52:40.803Z","op":"done","visit":"expeditions/e24@0","node":"d26","brief":"reader was readFileSync utf8; results wrap as one JSON text block"}
+{"ts":"2026-07-29T15:52:46.479Z","op":"done","visit":"expeditions/e24@0","node":"d27","brief":"image types return an MCP image block; transport splits it from the log"}
+{"ts":"2026-07-29T15:55:32.846Z","op":"done","visit":"expeditions/e24@0","node":"d29","brief":"cap refuses rather than downscales; the lane has no resizer"}
+{"ts":"2026-07-29T15:55:37.090Z","op":"update","visit":"expeditions/e24@0","node":"d34","brief":"running the suite with six new read-lane cases"}

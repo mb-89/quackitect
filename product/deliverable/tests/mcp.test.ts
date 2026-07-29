@@ -98,6 +98,39 @@ test("rejections are results (isError: true), not protocol errors — and carry 
   assert.equal(remedy.tool, "se_file_list");
 });
 
+test("an image rides to the model as a real block, and never into the log", async () => {
+  const root = fresh();
+  const server = await bootedServer(root);
+  const png = Buffer.from(
+    "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==",
+    "base64",
+  );
+  writeFileSync(join(root, "sketch.png"), png);
+  const res = await server.handle({
+    jsonrpc: "2.0",
+    id: 9,
+    method: "tools/call",
+    params: { name: "se_file_read", arguments: { path: "sketch.png" } },
+  });
+  const content = (res?.result as { content: { type: string; text?: string; data?: string; mimeType?: string }[] }).content;
+  assert.equal(content.length, 2, "the JSON result, then the picture itself");
+  assert.equal(content[1].type, "image");
+  assert.equal(content[1].mimeType, "image/png");
+  assert.ok(Buffer.from(String(content[1].data), "base64").equals(png));
+
+  // The payload keeps the facts and sheds the bytes.
+  const body = JSON.parse(String(content[0].text)) as Record<string, unknown>;
+  assert.equal(body.media_type, "image/png");
+  assert.equal(body.hash !== undefined, true);
+  assert.equal(body._attachments, undefined, "base64 must not reach the JSON payload");
+
+  // And the log stays readable — base64 in calls.jsonl serves no reader.
+  const logPath = join(root, ".se", "calls.jsonl");
+  assert.ok(existsSync(logPath));
+  const log = readFileSync(logPath, "utf8");
+  assert.equal(log.includes(String(content[1].data).slice(0, 40)), false, "base64 must not reach calls.jsonl");
+});
+
 test("unconfigured web search refuses with setup instructions, never fakes", async () => {
   const prev = process.env.SE_BRAVE_API_KEY;
   delete process.env.SE_BRAVE_API_KEY;

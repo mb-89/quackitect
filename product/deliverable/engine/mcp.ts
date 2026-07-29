@@ -134,9 +134,12 @@ export class McpServer {
             for (const guard of this.guards) guard(name, args);
             let result = await tool.handler(args);
             for (const d of this.decorators) result = d(name, result);
-            this.observe({ tool: name, args, ok: true, duration_ms: Date.now() - started, outcome: "result", response: result });
+            // Attachments are split off BEFORE the log sees them: base64 in
+            // calls.jsonl would bloat it for no reader's benefit.
+            const { payload, blocks } = this.splitAttachments(result);
+            this.observe({ tool: name, args, ok: true, duration_ms: Date.now() - started, outcome: "result", response: payload });
             return this.ok(id, {
-              content: [{ type: "text", text: JSON.stringify(result, null, 1) }],
+              content: [{ type: "text", text: JSON.stringify(payload, null, 1) }, ...blocks],
               isError: false,
             });
           } catch (e) {
@@ -162,6 +165,15 @@ export class McpServer {
     } catch (e) {
       return this.err(id, -32603, `internal: ${String((e as Error).message)}`);
     }
+  }
+
+  /** A result may carry extra MCP content blocks in _attachments — an image
+   *  read does. They travel to the model but never into the JSON payload. */
+  private splitAttachments(result: unknown): { payload: unknown; blocks: unknown[] } {
+    if (result === null || typeof result !== "object") return { payload: result, blocks: [] };
+    const { _attachments, ...rest } = result as Record<string, unknown>;
+    if (!Array.isArray(_attachments)) return { payload: result, blocks: [] };
+    return { payload: rest, blocks: _attachments };
   }
 
   private ok(id: number | string, result: unknown): JsonRpcResponse {
