@@ -1,5 +1,5 @@
 // The VOICE LINT — mechanical checks over PROSE, on demand (se_lint) and
-// later swept by pruning. Catches FORM, never meaning. The rules' LOGIC
+// later swept by the overhaul. Catches FORM, never meaning. The rules' LOGIC
 // lives here; the rules' PARAMETERS are DATA (owner ruling 2026-07-28,
 // guidance/method/engineering.md): machines/lint/voice-lint.md — edit a
 // threshold there and the next call uses it, no recompile, no reload.
