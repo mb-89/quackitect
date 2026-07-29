@@ -13,7 +13,7 @@
 import { spawnSync } from "node:child_process";
 import { createRequire } from "node:module";
 import { relative, resolve, sep } from "node:path";
-import { resolveInRoot } from "./paths.ts";
+import { isRootRef, resolveDeclaredRoot, resolveForRead } from "./paths.ts";
 
 export interface Match {
   path: string;
@@ -94,7 +94,17 @@ export function search(
 }
 
 function rgSearch(root: string, query: string, opts: { path?: string; ignore_case?: boolean }, unreadable: string[] = []): Match[] {
-  const scope = opts.path === undefined ? resolve(root) : resolveInRoot(root, opts.path, "engine/search.ts");
+  const scope = opts.path === undefined ? resolve(root) : resolveForRead(root, opts.path, "engine/search.ts");
+  // A hit inside a declared root reports as "@name/rel", never as a pile of
+  // ../.. — what the search returns, the reader accepts unchanged.
+  const rootRef = opts.path !== undefined && isRootRef(opts.path);
+  const rootName = rootRef ? opts.path!.slice(1).split(/[\\/]+/)[0] : "";
+  const base = rootRef ? resolveDeclaredRoot(root, `@${rootName}`, "engine/search.ts") : resolve(root);
+  const prefix = rootRef ? `@${rootName}/` : "";
+  const show = (abs: string): string => {
+    const rel = relative(base, abs).split(sep).join("/");
+    return rel === "" ? abs : prefix + rel;
+  };
   // --with-filename: rg drops the filename for a single-file scope, which
   // starved the path:line:text parser — every match silently vanished.
   // --binary: without it ripgrep skips a binary file in a DIRECTORY search
@@ -115,14 +125,12 @@ function rgSearch(root: string, query: string, opts: { path?: string; ignore_cas
     // which has no line number and so never parsed. Catch it before the drop.
     const bin = line.match(/^(.+?): binary file matches/);
     if (bin !== null) {
-      const relBin = relative(root, bin[1]).split(sep).join("/");
-      unreadable.push(relBin === "" ? bin[1] : relBin);
+      unreadable.push(show(bin[1]));
       continue;
     }
     const m = line.match(/^(.{1,}?):(\d+):(.*)$/s);
     if (m === null) continue;
-    const rel = relative(root, m[1]).split(sep).join("/");
-    out.push({ path: rel === "" ? m[1] : rel, line: Number(m[2]), text: m[3].slice(0, LINE_CAP) });
+    out.push({ path: show(m[1]), line: Number(m[2]), text: m[3].slice(0, LINE_CAP) });
   }
   return out;
 }

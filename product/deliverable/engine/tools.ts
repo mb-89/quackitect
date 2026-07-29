@@ -299,7 +299,7 @@ export function coreTools(rootOf: (rel?: string) => string, projectRoot: string,
     {
       name: "se_file_list",
       title: "se.file.list",
-      description: "List entries under a project directory (root-relative; '.' is the project root).",
+      description: "List entries under a project directory (root-relative; '.' is the project root). A DECLARED ROOT is browsable as '@name' or '@name/sub' — the owner declares roots in .se/roots.json.",
       inputSchema: {
         type: "object",
         properties: { dir: { type: "string", default: "." } },
@@ -309,7 +309,7 @@ export function coreTools(rootOf: (rel?: string) => string, projectRoot: string,
     {
       name: "se_file_glob",
       title: "se.file.glob",
-      description: "List project files matching a glob (e.g. **/*.test.ts) — the 'where does this live' lane. Pass ref to glob a committed ref's tree instead ('main' reaches v1, 'v2' reaches v2).",
+      description: "List project files matching a glob (e.g. **/*.test.ts) — the 'where does this live' lane. Glob a DECLARED ROOT as '@name/**/*.md'; hits come back as '@name/...', the same address the reader takes. Pass ref to glob a committed ref's tree instead ('main' reaches v1, 'v2' reaches v2).",
       inputSchema: {
         type: "object",
         properties: { glob: { type: "string" }, ref: { type: "string", description: "glob this committed git ref's tree instead of the working tree" } },
@@ -321,7 +321,7 @@ export function coreTools(rootOf: (rel?: string) => string, projectRoot: string,
       name: "se_file_search",
       title: "se.file.search",
       description:
-        "Regex search across the working tree (ripgrep) OR any git ref (pass ref — a branch or tag; this repo is a branch of quack, so 'main' reaches v1 and 'v2' reaches v2). Returns match LOCATIONS with an intent trail; read around a hit with se_file_read offset/limit.",
+        "Regex search across the working tree (ripgrep) OR any git ref (pass ref — a branch or tag; this repo is a branch of quack, so 'main' reaches v1 and 'v2' reaches v2). Scope it to a DECLARED ROOT with path: '@name'; hits come back as '@name/...', the same address the reader takes. Returns match LOCATIONS with an intent trail; read around a hit with se_file_read offset/limit.",
       inputSchema: {
         type: "object",
         properties: {

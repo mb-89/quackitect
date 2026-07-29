@@ -42,3 +42,14 @@
 {"ts":"2026-07-29T16:12:37.812Z","op":"update","visit":"expeditions/e24@0","node":"d3","brief":"BOM stripped and a broken roots.json now refuses loudly"}
 {"ts":"2026-07-29T16:12:43.630Z","op":"update","visit":"expeditions/e24@0","node":"d4","brief":"running the suite with the BOM and broken-file cases"}
 {"ts":"2026-07-29T16:13:32.675Z","op":"update","visit":"expeditions/e24@0","node":"d5","brief":"193 pass; staging the fix"}
+{"ts":"2026-07-29T16:13:48.501Z","op":"done","visit":"idle@0","node":"d2","brief":"the silent failure is gone, proven by two tests"}
+{"ts":"2026-07-29T16:13:54.958Z","op":"update","visit":"expeditions/e24@0","node":"d6","brief":"landing the roots fix on trunk"}
+{"ts":"2026-07-29T16:19:41.786Z","op":"update","visit":"expeditions/e24@0","node":"d7","brief":"reading the search lane to widen it to declared roots"}
+{"ts":"2026-07-29T16:20:52.590Z","op":"plan","visit":"expeditions/e24@0","parent":null,"nodes":[{"id":"d8","brief":"Browse declared roots from every read lane"},{"id":"d9","brief":"Draw the route over the nodes"},{"id":"d10","brief":"Rename pruning to overhaul"}]}
+{"ts":"2026-07-29T16:21:54.430Z","op":"update","visit":"expeditions/e24@0","node":"d11","brief":"194 pass; updating the tool descriptions"}
+{"ts":"2026-07-29T16:21:59.370Z","op":"update","visit":"expeditions/e24@0","node":"d12","brief":"reading the list description before editing it"}
+{"ts":"2026-07-29T16:22:12.869Z","op":"update","visit":"expeditions/e24@0","node":"d13","brief":"descriptions now name the declared-root address"}
+{"ts":"2026-07-29T16:22:29.733Z","op":"update","visit":"expeditions/e24@0","node":"d14","brief":"locating the exact description text after a patch miss"}
+{"ts":"2026-07-29T16:22:36.379Z","op":"update","visit":"expeditions/e24@0","node":"d15","brief":"reading the glob and search descriptions verbatim"}
+{"ts":"2026-07-29T16:23:09.611Z","op":"update","visit":"expeditions/e24@0","node":"d16","brief":"descriptions now name the declared-root address"}
+{"ts":"2026-07-29T16:23:18.151Z","op":"update","visit":"expeditions/e24@0","node":"d17","brief":"staging the browse widening"}

@@ -12,7 +12,7 @@ import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, statSync, wri
 import { dirname, extname, join, relative, sep } from "node:path";
 import { CLAUSES, Rejection } from "./errors.ts";
 import { contentHash } from "./hash.ts";
-import { isExcluded, isRootRef, resolveForRead, resolveInRoot } from "./paths.ts";
+import { isExcluded, isRootRef, resolveDeclaredRoot, resolveForRead, resolveInRoot } from "./paths.ts";
 
 /** Whole-file read budget (chars). Beyond this, offset/limit is required. */
 export const READ_BUDGET = 50_000;
@@ -318,11 +318,12 @@ export interface ListEntry {
 }
 
 export function fileList(root: string, dir: string): { dir: string; entries: ListEntry[] } {
-  const abs = mustExist(root, dir === "" ? "." : dir, SRC);
+  const abs = mustExist(root, dir === "" ? "." : dir, SRC, true);
   const entries: ListEntry[] = [];
   for (const e of readdirSync(abs, { withFileTypes: true })) {
-    const rel = relative(root, join(abs, e.name));
-    if (isExcluded(rel)) continue;
+    // Inside a declared root a project-relative path is meaningless, so the
+    // exclusion weighs the entry's own name.
+    if (isExcluded(isRootRef(dir) ? e.name : relative(root, join(abs, e.name)))) continue;
     if (e.isDirectory()) entries.push({ name: e.name, type: "dir" });
     else entries.push({ name: e.name, type: "file", bytes: statSync(join(abs, e.name)).size });
   }
@@ -349,7 +350,23 @@ export function globToRegExp(glob: string): RegExp {
 
 export function fileGlob(root: string, glob: string, opts: { limit?: number; ref?: string } = {}): { glob: string; ref?: string; files: string[]; truncated: boolean } {
   const limit = opts.limit ?? 500;
-  const rx = globToRegExp(glob.replace(/\\/g, "/"));
+  // A declared root is globbed as "@name/pattern", and every hit carries the
+  // prefix back — what the glob returns, the reader accepts unchanged.
+  const rootRef = isRootRef(glob);
+  const rootName = rootRef ? glob.slice(1).split(/[\\/]+/)[0] : "";
+  const base = rootRef ? resolveDeclaredRoot(root, `@${rootName}`, SRC) : root;
+  const prefix = rootRef ? `@${rootName}/` : "";
+  const pattern = rootRef ? glob.slice(1).split(/[\\/]+/).slice(1).join("/") || "**" : glob;
+  const rx = globToRegExp(pattern.replace(/\\/g, "/"));
+  if (rootRef && opts.ref !== undefined) {
+    throw new Rejection({
+      clause: CLAUSES.UNDECLARED_ROOT,
+      expected: "a declared root OR a committed ref, not both",
+      got: `${glob} at ref ${opts.ref}`,
+      remedy: { tool: "se_file_glob", args: { glob }, note: "a declared root is a folder on disk; it has no git history here" },
+      source: SRC,
+    });
+  }
   if (opts.ref !== undefined) {
     const r = spawnSync("git", ["ls-tree", "-r", "--name-only", opts.ref], { cwd: root, encoding: "utf8", maxBuffer: 64 * 1024 * 1024 });
     if (r.status !== 0) {
@@ -369,13 +386,13 @@ export function fileGlob(root: string, glob: string, opts: { limit?: number; ref
     if (out.length > limit) return;
     for (const e of readdirSync(dir, { withFileTypes: true })) {
       const abs = join(dir, e.name);
-      const rel = relative(root, abs).split(sep).join("/");
-      if (isExcluded(relative(root, abs))) continue;
+      const rel = relative(base, abs).split(sep).join("/");
+      if (isExcluded(rootRef ? e.name : relative(root, abs))) continue;
       if (e.isDirectory()) walk(abs);
-      else if (rx.test(rel)) out.push(rel);
+      else if (rx.test(rel)) out.push(prefix + rel);
     }
   };
-  walk(root);
+  walk(base);
   out.sort();
   const truncated = out.length > limit;
   return { glob, files: out.slice(0, limit), truncated };
