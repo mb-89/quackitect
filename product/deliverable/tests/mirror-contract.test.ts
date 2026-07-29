@@ -219,6 +219,46 @@ test("the details pane is not rewritten when its content did not change", () => 
   assert.ok(html.includes("if (DETAIL_TITLE === title && DETAIL_HTML === html) return;"), "an unchanged details render touches no DOM at all");
   assert.ok(html.includes("const top = sameSubject ? el.scrollTop : 0;"), "and a changed one still keeps the reader's place");
   assert.ok(html.includes("el.scrollTop = top;"), "the kept position is actually restored");
+  // The feed polls constantly, so it repaints far more often than anything
+  // else. A reader scrolled down into the past was snapped to the top by a
+  // poll that found nothing new.
+  assert.ok(html.includes("if (html === LOG_HTML) return;"), "an unchanged feed repaints nothing");
+  assert.ok(html.includes("logPanel.scrollTop = stick ? 0 : top;"), "and a changed feed keeps the reader where they were");
+});
+
+// THE CLASS, NOT THE INSTANCE (owner, 2026-07-29). The reader's place has now
+// been thrown away four different ways, and the rule against it was written in
+// prose four times. Prose is the weakest guard this repo has.
+//
+// The failure was always one shape: a NEW pinned surface arrives, and the
+// hand-written list of things to carry never learns about it. The list is
+// declared once now, and this test refuses any param the client pins that is
+// missing from it. Register a param and every navigation carries it for free.
+test("every place the reader can pin is registered, so navigation carries it", () => {
+  const root = freshRoot();
+  const html = renderMirror({ session: new Session(root), root, lastPacket: undefined, mode: "manual" });
+  const registry = /const PLACE = \[([^\]]*(?:\][^;]*?)*?)\n\];/.exec(html);
+  assert.ok(registry, "the reader's place is declared in one registry");
+  const registered = new Set([...registry[1].matchAll(/\["([a-z]+)"/g)].map((m) => m[1]));
+  assert.ok(registered.has("detail"), "the details pane is a place");
+  assert.ok(registered.has("card"), "the promoted card is a place");
+
+  // Everything the client writes into the URL by name. "view" is the
+  // navigation TARGET rather than something carried alongside it, so it is
+  // the one exemption. Anything else the reader can pin must be registered,
+  // or the next link they click silently drops it.
+  const pinned = [...html.matchAll(/(?:q|u\.searchParams)\.set\("([a-z]+)"/g)].map((m) => m[1]);
+  assert.ok(pinned.includes("view"), "the sweep found the pin sites at all");
+  for (const p of pinned) {
+    if (p === "view") continue;
+    assert.ok(registered.has(p), p + " is pinned into the URL but is not a registered place");
+  }
+
+  // Both consumers go through the registry. A fourth hand-written list is
+  // how this broke the first three times.
+  assert.ok(html.includes("function withPlace(url)"), "navigating away carries the place");
+  assert.ok(html.includes("function pinPlace(q)"), "staying put pins the place");
+  assert.ok(html.includes("pinPlace(q);"), "and the refresh path uses it instead of its own list");
 });
 
 // THE CHAT CARD KEEPS ITS SLOT (owner 2026-07-29). This SUPERSEDES the earlier
@@ -273,8 +313,13 @@ test("the session's departure is a signal of its own, separate from end", () => 
 test("a machine switch carries the reader's open detail with it", () => {
   const root = freshRoot();
   const html = renderMirror({ session: new Session(root), root, lastPacket: undefined, mode: "manual" });
-  assert.ok(html.includes('u.searchParams.set("detail", CURRENT_DETAIL)'), "the view jump carries the open detail");
-  assert.ok(html.includes('new URLSearchParams(location.search).get("detail")'), "and the page it lands on restores it");
+  // This used to pin the one line that carried the detail. That pinned HOW
+  // rather than WHAT, and it broke the moment the carrying became general
+  // while the behaviour it guarded was untouched. It now names the place and
+  // the mechanism that carries every place.
+  assert.ok(html.includes('["detail", () => CURRENT_DETAIL]'), "the open detail is a registered place");
+  assert.ok(html.includes("if (v && !u.searchParams.has(p[0])) u.searchParams.set(p[0], v);"), "and a view jump carries every registered place");
+  assert.ok(html.includes('new URLSearchParams(location.search).get("detail")'), "the page it lands on restores it");
 });
 
 // A PANE THE READER SIZED KEEPS THAT SIZE (owner ruling 2026-07-28). Walking

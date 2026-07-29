@@ -778,19 +778,49 @@ let refreshInFlight = false;
 // and wakes /events, so the outgoing page used to fetch itself again on its
 // way out — the archive visibly loaded twice. Once we are leaving, we leave.
 let navigatingAway = false;
+// THE READER KEEPS THEIR PLACE (owner ruling 2026-07-28, extended 2026-07-29).
+// Changing WHICH MACHINE is on screen says nothing about what they had open
+// beside it, nor about which card they had promoted. A view URL carrying only
+// the view throws both away.
+//
+// The card half was missed because the matrix landed after this rule did: the
+// detail param was carried, the card param did not exist yet, and nobody came
+// back. Entering a sub-state demoted the machine out of the main slot under
+// the reader's hand.
+//
+// EVERY pinned place goes through here, so the next one added is carried by
+// construction rather than by somebody remembering.
+// THE READER'S PLACE, DECLARED ONCE. Every surface the reader can put
+// somewhere gets ONE entry here. The card bug happened because this list
+// lived in people's heads and in three separate hand-written copies: detail
+// was carried, card arrived a month later, and the two never met.
+//
+// Add a param here and every navigation carries it by construction. A test
+// refuses any param the client pins that is not registered.
+const PLACE = [
+  ["detail", () => CURRENT_DETAIL],
+  ["card", () => CARD_NOW],
+];
+/** Carry the place onto a URL the reader is NAVIGATING to. */
+function withPlace(url) {
+  const u = new URL(url, location.href);
+  for (const p of PLACE) {
+    const v = p[1]();
+    if (v && !u.searchParams.has(p[0])) u.searchParams.set(p[0], v);
+  }
+  return u.pathname + u.search;
+}
+/** Pin the place onto the URL of the page the reader is ALREADY on. */
+function pinPlace(q) {
+  for (const p of PLACE) {
+    const v = p[1]();
+    if (v) q.set(p[0], v); else q.delete(p[0]);
+  }
+}
 function navigateTo(url, label) {
   navigatingAway = true;
   showLoading(label);
-  // THE READER KEEPS THEIR PLACE (owner ruling 2026-07-28). Changing WHICH
-  // MACHINE is on screen says nothing about what they had open beside it.
-  // This URL carried only the view, so every machine switch silently threw
-  // the details pane away. Only content that is genuinely gone may clear it,
-  // and detailFor says so in place when it is.
-  if (CURRENT_DETAIL) {
-    const u = new URL(url, location.href);
-    if (!u.searchParams.has("detail")) u.searchParams.set("detail", CURRENT_DETAIL);
-    url = u.pathname + u.search;
-  }
+  url = withPlace(url);
   location.href = url;
 }
 async function refresh(detail) {
@@ -801,7 +831,7 @@ async function refresh(detail) {
   // data change, and data change never jumps the reader — every refresh
   // pins the machine being looked at explicitly.
   q.set("view", D.viewed.id);
-  if (CURRENT_DETAIL) q.set("detail", CURRENT_DETAIL); else q.delete("detail");
+  pinPlace(q);
   const qs = q.toString();
   const url = location.pathname + (qs ? "?" + qs : "");
   history.replaceState(null, "", url);
@@ -1216,6 +1246,7 @@ const logPanel = document.getElementById("log-rows");
 let LOG_ROWS = [];
 let lastActs = null;
 let DECISION_GRAPH = null;
+let LOG_HTML = null;
 function renderLog() {
   if (!logPanel) return;
   const fEl = document.getElementById("log-filter");
@@ -1224,7 +1255,7 @@ function renderLog() {
   // NEWEST ON TOP (owner ruling): the feed reads downward into the past;
   // the scroll pins to the top while the reader is there.
   const stick = logPanel.scrollTop < 40;
-  logPanel.innerHTML = rows.slice().reverse().map((r) =>
+  const html = rows.slice().reverse().map((r) =>
     '<div class="logrow ' + r.type + (r.ok ? "" : " failed") + '" data-ref="' + r.ref + '">' +
       '<span class="lt">' + (r.pending ? r.ts.slice(5, 10) : r.ts.slice(11, 19)) + "</span>" +
       '<span class="lsrc ' + r.src + '">' + r.src + "</span>" +
@@ -1232,7 +1263,16 @@ function renderLog() {
       '<span class="lbrief">' + escText(r.brief) + "</span>" +
       '<span class="lok">' + (r.ok ? "✓" : "✗ " + (r.clause || "")) + "</span>" +
     "</div>").join("") || '<div class="meta">no acts' + (f ? " match the filter" : " this session yet") + "</div>";
-  if (stick) logPanel.scrollTop = 0;
+  // NOTHING CHANGED, NOTHING MOVES. The feed polls constantly, and it used to
+  // rewrite itself whole every time. A reader scrolled down into the past was
+  // snapped back to the top by a poll that found nothing new — the same defect
+  // as the details pane, on a surface that repaints far more often.
+  if (html === LOG_HTML) return;
+  LOG_HTML = html;
+  const top = logPanel.scrollTop;
+  logPanel.innerHTML = html;
+  // Sticking to the top is the reader's place TOO, when that is where they are.
+  logPanel.scrollTop = stick ? 0 : top;
 }
 async function refreshLog() {
   if (!logPanel) return;
@@ -1351,6 +1391,12 @@ document.addEventListener("click", (ev) => {
   if (stalled !== null) { hideLoading(); location.reload(); return; }
   const a = ev.target.closest ? ev.target.closest('a[href*="?view="]') : null;
   if (a === null) return;
+  // SERVER-RENDERED LINKS NEVER PASS THROUGH navigateTo. The crumb chain and
+  // its menu are plain anchors, and the server cannot know which card the
+  // reader promoted or what they have open. So the place is stitched on here,
+  // at the click, before the browser follows the href. A new tab gets it too,
+  // which is why this runs BEFORE the modifier-key returns below.
+  a.setAttribute("href", withPlace(a.getAttribute("href")));
   // A click that opens SOMEWHERE ELSE leaves this page untouched, so it
   // starts no load here. Showing a bar for it is exactly the strand the
   // owner hit: the expand controls advertise ctrl-click and shift-click.
