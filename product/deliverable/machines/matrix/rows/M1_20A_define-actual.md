@@ -1,5 +1,6 @@
 ---
 kind: matrix-row
+name: define-actual
 statement: "Define the actual: the as-is, one paragraph per pain, witnesses named."
 state_kind: work
 filled_by: agent

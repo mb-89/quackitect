@@ -1,5 +1,6 @@
 ---
 kind: matrix-row
+name: sweep-consistency
 statement: "Sweep the describing surfaces: everything this iteration changed is re-documented where it is taught."
 state_kind: work
 filled_by: agent

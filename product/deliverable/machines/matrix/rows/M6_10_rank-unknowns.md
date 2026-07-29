@@ -1,5 +1,6 @@
 ---
 kind: matrix-row
+name: rank-unknowns
 statement: "Rank the unknowns and timebox the spikes - seeded from RAID, tripwires and doubtful verify methods."
 state_kind: work
 filled_by: agent

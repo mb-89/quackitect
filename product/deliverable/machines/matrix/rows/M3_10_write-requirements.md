@@ -1,5 +1,6 @@
 ---
 kind: matrix-row
+name: write-requirements
 statement: "Write the requirements in full: EARS, four kinds, detail included - verify_method named on every one."
 state_kind: work
 filled_by: agent

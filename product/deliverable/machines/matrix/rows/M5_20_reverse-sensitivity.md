@@ -1,5 +1,6 @@
 ---
 kind: matrix-row
+name: reverse-sensitivity
 statement: "Reverse the sensitivity: find the first plausible world where the winner loses."
 state_kind: work
 filled_by: agent

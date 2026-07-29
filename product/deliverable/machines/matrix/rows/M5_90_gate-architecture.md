@@ -1,5 +1,6 @@
 ---
 kind: matrix-row
+name: gate-architecture
 statement: "GATE architecture: the matrix review - the owner adjudicates the decomposition itself."
 state_kind: gate
 filled_by: agent

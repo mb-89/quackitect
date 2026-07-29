@@ -1,5 +1,6 @@
 ---
 kind: matrix-row
+name: observe-red
 statement: "Observe RED: every new check runs and fails before the build."
 state_kind: work
 filled_by: agent

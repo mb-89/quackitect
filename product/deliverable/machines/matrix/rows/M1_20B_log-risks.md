@@ -1,5 +1,6 @@
 ---
 kind: matrix-row
+name: log-risks
 statement: "Log the top risks: the RAID register opens."
 state_kind: work
 filled_by: agent

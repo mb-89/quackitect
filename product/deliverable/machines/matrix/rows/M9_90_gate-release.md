@@ -1,5 +1,6 @@
 ---
 kind: matrix-row
+name: gate-release
 statement: "GATE release: docs match the surface, the handover is accepted - the bless ships it."
 state_kind: gate
 filled_by: agent

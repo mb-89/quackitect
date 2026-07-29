@@ -1,5 +1,6 @@
 ---
 kind: matrix-row
+name: ship-review
 statement: "The ship review: dependency flips, divergence flags, upstream proposals."
 state_kind: work
 filled_by: agent

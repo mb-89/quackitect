@@ -1,5 +1,6 @@
 ---
 kind: matrix-row
+name: plan-build
 statement: "Plan the build: seed the iteration's chunk machine - small resumable chunks, dependencies as edges, realization kind per chunk."
 state_kind: work
 filled_by: agent

@@ -1,5 +1,6 @@
 ---
 kind: matrix-row
+name: write-stories
 statement: "Write the user stories as slideshows - concrete examples realizing the value props; evidence sides stay empty until validation."
 state_kind: work
 filled_by: agent

@@ -1,5 +1,6 @@
 ---
 kind: matrix-row
+name: gate-candidates
 statement: "GATE candidates: the front is blessed, never a winner."
 state_kind: gate
 filled_by: agent

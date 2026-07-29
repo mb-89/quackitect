@@ -1,5 +1,6 @@
 ---
 kind: matrix-row
+name: fold-back
 statement: "Fold the spike evidence back: the design advances; the ripple reopens what the evidence invalidates."
 state_kind: work
 filled_by: agent

@@ -1,5 +1,6 @@
 ---
 kind: matrix-row
+name: gate-requirements
 statement: "GATE requirements: the end of design input - the binding register blessed."
 state_kind: gate
 filled_by: agent

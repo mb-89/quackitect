@@ -1,5 +1,6 @@
 ---
 kind: matrix-row
+name: finalize-docs
 statement: "Finalize the docs: the book emits as a projection; docs match the shipped surface."
 state_kind: work
 filled_by: agent

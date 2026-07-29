@@ -1,5 +1,6 @@
 ---
 kind: matrix-row
+name: generalize-use-cases
 statement: "Generalize the stories into Cockburn-shape use cases."
 state_kind: work
 filled_by: agent

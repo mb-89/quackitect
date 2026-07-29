@@ -1,5 +1,6 @@
 ---
 kind: matrix-row
+name: evaluate-baseline
 statement: "Evaluate the baseline: the ATAM-lite walk of the quality scenarios."
 state_kind: work
 filled_by: agent

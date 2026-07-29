@@ -1,5 +1,6 @@
 ---
 kind: matrix-row
+name: converge-pugh
 statement: "Converge on the winner: Pugh controlled convergence over the front."
 state_kind: work
 filled_by: agent

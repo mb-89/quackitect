@@ -1,5 +1,6 @@
 ---
 kind: matrix-row
+name: map-stakeholders
 statement: "Map the stakeholders by role, and surface their tensions."
 state_kind: work
 filled_by: agent

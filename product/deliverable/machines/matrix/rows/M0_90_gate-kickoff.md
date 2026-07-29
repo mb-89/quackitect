@@ -1,5 +1,6 @@
 ---
 kind: matrix-row
+name: gate-kickoff
 statement: "GATE kickoff: one handover carries the plan and the rigor column; the owner blesses - past it the iteration is set."
 state_kind: gate
 filled_by: agent

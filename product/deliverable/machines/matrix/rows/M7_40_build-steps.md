@@ -1,5 +1,6 @@
 ---
 kind: matrix-row
+name: build-steps
 statement: "Build steps: the placeholder the seeded chunk machine fills - the real steps run here, in parallel where independent."
 state_kind: work
 filled_by: agent

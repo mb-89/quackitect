@@ -1,5 +1,6 @@
 ---
 kind: matrix-row
+name: fill-story-evidence
 statement: "Fill the stories: every slide's evidence side, all stories, all iterations - and seed the killer demonstrations."
 state_kind: work
 filled_by: agent

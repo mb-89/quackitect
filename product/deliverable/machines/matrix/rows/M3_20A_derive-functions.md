@@ -1,5 +1,6 @@
 ---
 kind: matrix-row
+name: derive-functions
 statement: "Derive the solution-neutral function structure from the requirements."
 state_kind: work
 filled_by: agent

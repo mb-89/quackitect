@@ -1,5 +1,6 @@
 ---
 kind: matrix-row
+name: consolidate-baseline
 statement: "Consolidate the baseline: the winner's matrices ARE the architecture."
 state_kind: work
 filled_by: agent

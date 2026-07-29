@@ -1,5 +1,6 @@
 ---
 kind: matrix-row
+name: gate-motivation
 statement: "GATE motivation: the one interestingness discussion - past this gate the vision is axiomatic."
 state_kind: gate
 filled_by: agent

@@ -1,5 +1,6 @@
 ---
 kind: matrix-row
+name: probe-assumptions
 statement: "Field-probe every environment assumption a requirement builds on."
 state_kind: work
 filled_by: agent

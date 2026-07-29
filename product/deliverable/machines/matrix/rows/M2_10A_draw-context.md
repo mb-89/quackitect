@@ -1,5 +1,6 @@
 ---
 kind: matrix-row
+name: draw-context
 statement: "Draw the context: boundary, neighbours, intended use - and the binding excluded-from-intended-use list."
 state_kind: work
 filled_by: agent

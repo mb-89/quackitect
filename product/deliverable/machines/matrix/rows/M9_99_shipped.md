@@ -1,5 +1,6 @@
 ---
 kind: matrix-row
+name: shipped
 statement: "Shipped."
 state_kind: terminal
 filled_by: agent

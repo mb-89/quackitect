@@ -1,5 +1,6 @@
 ---
 kind: matrix-row
+name: partition-functions
 statement: "Partition the functions: the shared function DSM before any enumeration."
 state_kind: work
 filled_by: agent

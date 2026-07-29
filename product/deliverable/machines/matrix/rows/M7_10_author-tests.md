@@ -1,5 +1,6 @@
 ---
 kind: matrix-row
+name: author-tests
 statement: "Author an executable check for every requirement in scope; examples turn assertive."
 state_kind: work
 filled_by: agent

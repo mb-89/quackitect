@@ -1,5 +1,6 @@
 ---
 kind: matrix-row
+name: fix-findings
 statement: "Fix the battery's findings: all of them, in one pass."
 state_kind: work
 filled_by: agent

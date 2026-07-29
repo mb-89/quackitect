@@ -1,5 +1,6 @@
 ---
 kind: matrix-row
+name: record-adrs
 statement: "Record the deciding ADRs, each addressing the requirements it shapes."
 state_kind: work
 filled_by: agent

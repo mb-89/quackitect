@@ -1,5 +1,6 @@
 ---
 kind: matrix-row
+name: gate-inputs
 statement: "GATE inputs: did we understand the users - adjudicated against the M1 frame."
 state_kind: gate
 filled_by: agent

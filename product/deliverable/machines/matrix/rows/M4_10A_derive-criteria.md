@@ -1,5 +1,6 @@
 ---
 kind: matrix-row
+name: derive-criteria
 statement: "Derive the vital-few weighted decision criteria from the requirements."
 state_kind: work
 filled_by: agent

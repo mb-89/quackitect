@@ -1,5 +1,6 @@
 ---
 kind: matrix-row
+name: scope-non-goals
 statement: "Scope and non-goals, informed by the delta."
 state_kind: work
 filled_by: agent

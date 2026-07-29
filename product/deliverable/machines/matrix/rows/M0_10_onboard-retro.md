@@ -1,5 +1,6 @@
 ---
 kind: matrix-row
+name: onboard-retro
 statement: "Onboarding opens with the retro: the field-feedback question first, then the notes inbox drains."
 state_kind: work
 filled_by: agent
