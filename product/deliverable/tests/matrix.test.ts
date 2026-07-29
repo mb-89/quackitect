@@ -114,6 +114,17 @@ test("compileColumn minor: the tailoring strikes exactly the M4-M5 exploration",
   assert.equal(decl.states.length, 41);
 });
 
+test("the columns are monotone: what a smaller column walks, every larger column walks", () => {
+  const m = readMatrix(ROOT);
+  const applied = (col: string) =>
+    new Set(m.rows.filter((r) => m.cells.get(r.name)?.get(col)?.applies !== "none").map((r) => r.name));
+  const patch = applied("patch");
+  const minor = applied("minor");
+  const major = applied("major");
+  for (const name of patch) assert.ok(minor.has(name), `${name} applies at patch but not at minor`);
+  for (const name of minor) assert.ok(major.has(name), `${name} applies at minor but not at major`);
+});
+
 test("compileColumn: cell guidance rides the seeded state", () => {
   const m = readMatrix(ROOT);
   const decl = compileColumn(m, "patch");

@@ -54,3 +54,9 @@
 {"ts":"2026-07-29T19:14:46.019Z","op":"update","visit":"expeditions/e25@0","node":"d81","brief":"Running the matrix tests against the new module"}
 {"ts":"2026-07-29T19:14:54.607Z","op":"done","visit":"expeditions/e25@0","node":"d74","brief":"Red observed, then eight matrix tests green"}
 {"ts":"2026-07-29T19:16:07.941Z","op":"done","visit":"expeditions/e25@0","node":"d72","brief":"Reader lands with the explicit-N/A refusal"}
+{"ts":"2026-07-29T19:16:13.311Z","op":"done","visit":"expeditions/e25@0","node":"d73","brief":"Compiler contracts struck dependencies and validates its output"}
+{"ts":"2026-07-29T19:16:18.040Z","op":"done","visit":"expeditions/e25@0","node":"d75","brief":"Battery green at 207 and the seeder core landed on trunk"}
+{"ts":"2026-07-29T19:23:21.376Z","op":"plan","visit":"expeditions/e25@0","parent":null,"nodes":[{"id":"d82","brief":"Prove column monotonicity as a standing test"},{"id":"d83","brief":"Write the kickoff-seeding proposal into the record"},{"id":"d84","brief":"Report the proposal to the owner"}]}
+{"ts":"2026-07-29T19:23:26.302Z","op":"update","visit":"expeditions/e25@0","node":"d85","brief":"Running the monotonicity test against the live matrix"}
+{"ts":"2026-07-29T19:24:00.248Z","op":"done","visit":"expeditions/e25@0","node":"d82","brief":"Monotonicity proven and standing in the suite"}
+{"ts":"2026-07-29T19:24:04.510Z","op":"done","visit":"expeditions/e25@0","node":"d83","brief":"Proposal written into the expedition record"}
