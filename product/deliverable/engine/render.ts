@@ -529,9 +529,28 @@ async function loadStateTodos() {
     }
   }
 }
+let DETAIL_TITLE = null;
+let DETAIL_HTML = null;
 function showDetails(title, html) {
   const el = document.getElementById("details");
-  if (el) { document.getElementById("details-title").textContent = title; el.innerHTML = html; queueMicrotask(() => { void loadRecDecisions(); void loadStateTodos(); }); }
+  if (!el) return;
+  // NOTHING CHANGED, NOTHING MOVES. rebind() re-derives this pane after every
+  // morph. Rewriting identical markup flickered it and threw the reader's
+  // scroll position away while they were reading. The pane carries
+  // data-morph-ignore for exactly this reason; this is the same guard on the
+  // path the morph does not own.
+  if (DETAIL_TITLE === title && DETAIL_HTML === html) return;
+  const sameSubject = DETAIL_TITLE === title;
+  DETAIL_TITLE = title;
+  DETAIL_HTML = html;
+  // Same subject with new content keeps the reader's place. A DIFFERENT
+  // subject starts at the top, because a position in the old one means
+  // nothing here.
+  const top = sameSubject ? el.scrollTop : 0;
+  document.getElementById("details-title").textContent = title;
+  el.innerHTML = html;
+  el.scrollTop = top;
+  queueMicrotask(() => { void loadRecDecisions(); void loadStateTodos(); });
 }
 // THE MODAL — one surface over the grayed page (forms, tool calls,
 // escape). Click outside or ✕ returns to the layout untouched.

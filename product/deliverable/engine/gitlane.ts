@@ -22,7 +22,11 @@ export function git(cwd: string, ...args: string[]): GitResult {
   return { ok: r.status === 0, code: r.status ?? -1, stdout: (r.stdout ?? "").trim(), stderr: (r.stderr ?? "").trim() };
 }
 
-const ALLOWED = new Set(["status", "log", "diff", "show", "add", "commit", "fetch", "branch", "rev-parse", "restore"]);
+// MERGE IS ALLOWED, REBASE IS NOT (owner ruling 2026-07-29). The asymmetry
+// is history: a rebase rewrites it, a merge only adds a commit that can be
+// reverted. The rebase refusal below already named merge as its remedy while
+// the allowlist forbade it, so the lane pointed at a door it had locked.
+const ALLOWED = new Set(["status", "log", "diff", "show", "add", "commit", "fetch", "branch", "rev-parse", "restore", "merge"]);
 
 export function gitLane(cwd: string, rawArgs: unknown[]): Record<string, unknown> {
   const args = rawArgs.map(String);

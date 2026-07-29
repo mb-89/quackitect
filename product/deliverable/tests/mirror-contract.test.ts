@@ -208,6 +208,19 @@ test("a morph leaves untouched everything the change did not touch", () => {
   assert.ok(html.includes("if (stalled !== null) { hideLoading(); location.reload(); return; }"), "and that place is the reader asking for it");
 });
 
+// THE SAME RULE, ON THE PATH THE MORPH DOES NOT OWN (owner, 2026-07-29, seen
+// live). The details pane is morph-ignored, so the morph left it alone — and
+// then rebind() rewrote it from scratch after every render anyway. The reader
+// watched it flicker and lost their scroll position mid-read. A guard with a
+// second door into the same room is not a guard.
+test("the details pane is not rewritten when its content did not change", () => {
+  const root = freshRoot();
+  const html = renderMirror({ session: new Session(root), root, lastPacket: undefined, mode: "manual" });
+  assert.ok(html.includes("if (DETAIL_TITLE === title && DETAIL_HTML === html) return;"), "an unchanged details render touches no DOM at all");
+  assert.ok(html.includes("const top = sameSubject ? el.scrollTop : 0;"), "and a changed one still keeps the reader's place");
+  assert.ok(html.includes("el.scrollTop = top;"), "the kept position is actually restored");
+});
+
 // THE CHAT CARD KEEPS ITS SLOT (owner 2026-07-29). This SUPERSEDES the earlier
 // rule that the terminal pane ships hidden until a host answers. Hiding was
 // safe while the pane lived in a column of its own. As a numbered card it is

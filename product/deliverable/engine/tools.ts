@@ -379,7 +379,7 @@ export function coreTools(rootOf: (rel?: string) => string, projectRoot: string)
       name: "se_git",
       title: "se.git",
       description:
-        "Git through the lane, allowlisted: status, log, diff, show, add, commit, fetch, branch, rev-parse, restore (--staged only). No push — pushing is the user's act; no rebase. Runs in the bound worktree when an expedition is open, else the root.",
+        "Git through the lane, allowlisted: status, log, diff, show, add, commit, fetch, branch, rev-parse, restore (--staged only), merge (--abort to back out a conflict). No push — pushing is the user's act; no rebase — a diverged branch reconciles by merge, which only adds a revertable commit. Runs in the bound worktree when an expedition is open, else the root.",
       inputSchema: {
         type: "object",
         properties: { args: { type: "array", items: { type: "string" }, description: 'git arguments, e.g. ["status", "--porcelain"]' } },
