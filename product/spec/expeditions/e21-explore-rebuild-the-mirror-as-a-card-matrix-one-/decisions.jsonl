@@ -73,3 +73,6 @@
 {"ts":"2026-07-29T11:04:34.605Z","op":"update","visit":"expeditions/e21@0","node":"d80","brief":"splitting the wall the voice lint caught"}
 {"ts":"2026-07-29T11:04:37.858Z","op":"update","visit":"expeditions/e21@0","node":"d81","brief":"re-linting the report"}
 {"ts":"2026-07-29T11:04:42.596Z","op":"done","visit":"expeditions/e21@0","node":"d74","brief":"leave report written and voice-lint clean"}
+{"ts":"2026-07-29T11:04:46.489Z","op":"update","visit":"expeditions/e21@0","node":"d82","brief":"committing the report before the leave tick"}
+{"ts":"2026-07-29T11:04:55.072Z","op":"update","visit":"expeditions/e21@0","node":"d83","brief":"entering the leave gate"}
+{"ts":"2026-07-29T11:05:07.848Z","op":"update","visit":"expeditions/e21-leave@0","node":"d84","brief":"applying e21 to trunk"}
