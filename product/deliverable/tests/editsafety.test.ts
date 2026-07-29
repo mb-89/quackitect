@@ -179,7 +179,7 @@ test("the close is atomic: a conflicting merge aborts and refuses typed, the roo
   g("commit", "-q", "-m", "trunk edit");
   writeFileSync(join(e.path, "clash.md"), "branch side\n");
   mkdirSync(join(e.path, "product", "spec", "expeditions", e.id), { recursive: true });
-  writeFileSync(join(e.path, "product", "spec", "expeditions", e.id, "report.md"), "---\nform: expedition-leave\nstatus: done\n---\n\nprobe report\n");
+  writeFileSync(join(e.path, "product", "spec", "expeditions", e.id, "report.md"), "---\nform: expedition-leave\nstatus: done\nby: human\n---\n\nprobe report\n");
   assert.throws(
     () => expClose(root, e, true),
     (err) => (err as { clause?: string }).clause === "SE-C-112" && /clash\.md/.test(String((err as { got?: string }).got)),
@@ -193,6 +193,50 @@ test("the close is atomic: a conflicting merge aborts and refuses typed, the roo
 // the abort after it failed too, because no merge had started. Refusing was
 // the first fix; the owner ruled it too blunt. The close already commits the
 // WORKTREE's leftovers on the principle that a walk's work never silently
+// AN OVERRIDE IS LOUDER THAN COMPLIANCE (owner ruling 2026-07-29, option 1).
+// The report stamps whose hand finished it, and for two expeditions nothing
+// read that stamp: e20 and e21 were closed on reports the agent wrote and
+// finished itself, on the owner's word in chat, and the archive kept no trace
+// of the difference. The only evidence was a line the agent CHOSE to write,
+// so an agent that stayed quiet left a cleaner-looking record than one that
+// owned up. That is the wrong way round.
+test("closing on an unconfirmed report is refused, and the override is recorded", () => {
+  const root = freshRoot();
+  const g = (...a: string[]) => spawnSync("git", a, { cwd: root, encoding: "utf8", windowsHide: true });
+  g("init");
+  g("config", "user.email", "se@test.local");
+  g("config", "user.name", "se test");
+  writeFileSync(join(root, ".gitignore"), ".worktrees/\n.se/\n");
+  g("add", "-A");
+  g("commit", "-q", "-m", "base");
+  const report = (e: { path: string; id: string }, by: string): void => {
+    mkdirSync(join(e.path, "product", "spec", "expeditions", e.id), { recursive: true });
+    writeFileSync(join(e.path, "product", "spec", "expeditions", e.id, "report.md"), `---\nform: expedition-leave\nstatus: done\nby: ${by}\n---\n\nprobe report\n`);
+  };
+
+  // The agent finished its own report. No person ever confirmed it.
+  const a = expNew(root, "fix", "unconfirmed probe");
+  report(a, "agent");
+  assert.throws(() => expClose(root, a, true), (err: unknown) => {
+    const r = err as { clause?: string; got?: string };
+    assert.equal(typeof r.clause, "string", "a typed refusal, not a bare crash");
+    assert.match(String(r.got), /finished by the agent/);
+    return true;
+  }, "an agent-finished report cannot close silently");
+
+  // The same close goes through WITH the override, and the record says so.
+  const out = expClose(root, a, true, "the owner, in chat: run the whole expedition without me");
+  assert.equal(out.merged, true, "the override lets the legitimate close through");
+  assert.match(String(out.override), /run the whole expedition without me/);
+  const rec = spawnSync("git", ["show", `${a.branch}:product/spec/expeditions/${a.id}/record.md`], { cwd: root, encoding: "utf8", windowsHide: true }).stdout;
+  assert.match(rec, /report_override: the owner, in chat/, "the archive shows it mechanically, not by the agent's goodwill");
+
+  // A report a PERSON confirmed needs no override at all.
+  const b = expNew(root, "fix", "confirmed probe");
+  report(b, "human");
+  assert.equal(expClose(root, b, true).merged, true, "a confirmed report closes plainly");
+});
+
 // vanishes, so the root gets the same treatment. Not a stash: a stash pop can
 // conflict after the merge has started, stranding the work mid-close.
 test("the close COMMITS the trunk's strays rather than refusing, and says which", () => {
@@ -211,7 +255,7 @@ test("the close COMMITS the trunk's strays rather than refusing, and says which"
   g("commit", "-q", "-m", "ignore machine-local paths");
   const e = expNew(root, "fix", "dirty trunk probe");
   mkdirSync(join(e.path, "product", "spec", "expeditions", e.id), { recursive: true });
-  writeFileSync(join(e.path, "product", "spec", "expeditions", e.id, "report.md"), "---\nform: expedition-leave\nstatus: done\n---\n\nprobe report\n");
+  writeFileSync(join(e.path, "product", "spec", "expeditions", e.id, "report.md"), "---\nform: expedition-leave\nstatus: done\nby: human\n---\n\nprobe report\n");
   // A TRACKED file, modified and left uncommitted on trunk.
   writeFileSync(join(root, "README.md"), "# tracked\n");
   g("add", "-A");

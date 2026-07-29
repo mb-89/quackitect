@@ -146,9 +146,9 @@ export function expeditionTools(session: Session): ToolDef[] {
     {
       name: "se_exp_close",
       title: "se.exp.close",
-      description: "Close the bound expedition — the close IS the ruling: apply (merge: true, default) merges the changes to trunk, then archives; dismiss (merge: false) archives the branch unmerged. Leftovers are committed either way; the worktree is removed.",
-      inputSchema: { type: "object", properties: { merge: { type: "boolean", description: "true = apply (default); false = dismiss" } } },
-      handler: (args) => session.expeditionClose(args.merge !== false),
+      description: "Close the bound expedition — the close IS the ruling: apply (merge: true, default) merges the changes to trunk, then archives; dismiss (merge: false) archives the branch unmerged. Leftovers are committed either way; the worktree is removed. THE REPORT MUST BE CONFIRMED BY A PERSON, in the mirror. Closing on a report the agent finished itself is refused unless `override` says who authorised it — and the override is stamped on the record, so the archive shows which reports carry a person's judgement and which do not.",
+      inputSchema: { type: "object", properties: { merge: { type: "boolean", description: "true = apply (default); false = dismiss" }, override: { type: "string", description: "who lifted the confirmation requirement, and where they said it — required when the report was not confirmed by a person; recorded on the record" } } },
+      handler: (args) => session.expeditionClose(args.merge !== false, args.override === undefined ? undefined : String(args.override)),
     },
   ];
 }

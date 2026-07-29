@@ -79,7 +79,9 @@ test("seeded container: expeditions are the states, entering BINDS, one ending c
   // The leave gate holds until the page passes; then close, end, return.
   await assert.rejects(() => s.tickAdvance(`${sidB}-leave`), (e) => (e as { clause?: string }).clause === "SE-C-112");
   s.formSave("expedition-leave", { "What was the goal": "second thing", "What was done": "it", "What settled it": "the container test", "What was not done": "nothing" });
-  s.formDone("expedition-leave", "agent");
+  // A PERSON confirms the report; the close then needs no override. The guard
+  // itself is tested in editsafety.test.ts — this one is about the archive.
+  s.formDone("expedition-leave", "human");
   await s.tickAdvance(`${sidB}-leave`);
   s.expeditionClose(true);
   await s.tickAdvance();
@@ -103,7 +105,7 @@ test("the archive: start reaches every closed expedition, each runs to end, brow
   const sid = shortId(a.created);
   const rep = join(root, ".worktrees", a.created, "product", "spec", "expeditions", a.created, "report.md");
   mkdirSync(dirname(rep), { recursive: true });
-  writeFileSync(rep, "goal · shipped · threads\n", "utf8");
+  writeFileSync(rep, "---\nform: expedition-leave\nstatus: done\nby: human\n---\n\ngoal · shipped · threads\n", "utf8");
   s.expeditionOpen(a.created);
   s.expeditionClose(true);
   const gen = generateExpeditionArchive(root);

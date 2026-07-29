@@ -395,7 +395,7 @@ export class Session {
     return { bound: this.bound.id, note: "the lane now works in this expedition's worktree" };
   }
 
-  expeditionClose(merge: boolean): Record<string, unknown> {
+  expeditionClose(merge: boolean, override?: string): Record<string, unknown> {
     if (this.bound === undefined) {
       throw new Rejection({
         clause: CLAUSES.NOT_LEGAL_IN_STATE,
@@ -417,9 +417,13 @@ export class Session {
         source: "engine/session.ts close",
       });
     }
-    const result = expClose(this.root, this.bound, merge);
+    const result = expClose(this.root, this.bound, merge, override);
     this.unbind();
-    return { ...result, note: merge ? "applied — merged to trunk, archived" : "dismissed — archived unmerged" };
+    return {
+      ...result,
+      note: merge ? "applied — merged to trunk, archived" : "dismissed — archived unmerged",
+      ...(result.override === undefined ? {} : { override_note: "the report was NOT confirmed by a person — this close is recorded as an override on the record" }),
+    };
   }
 
   private unbind(): void {

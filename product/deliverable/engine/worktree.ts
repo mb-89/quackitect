@@ -167,7 +167,7 @@ export function expFind(root: string, id: string): Expedition {
 /** Close IS the ruling: apply (merge=true) merges the changes to trunk;
  *  dismiss (merge=false) archives the branch unmerged. Leftovers are
  *  committed either way; the worktree is removed. */
-export function expClose(root: string, e: Expedition, merge: boolean): { id: string; merged: boolean; trunk_committed?: string[] } {
+export function expClose(root: string, e: Expedition, merge: boolean, override?: string): { id: string; merged: boolean; trunk_committed?: string[]; override?: string } {
   // A DIRTY TRUNK IS SETTLED FIRST (found live 2026-07-28, closing e18).
   // git merge refuses to overwrite uncommitted local changes, so the merge
   // below failed — and the abort that follows it failed too, because no merge
@@ -212,8 +212,32 @@ export function expClose(root: string, e: Expedition, merge: boolean): { id: str
         source: SRC,
       });
     }
+    // THE PREFILL GUARD WAS LIFTED BY A SENTENCE IN CHAT, TWICE (e20 and e21,
+    // note-c93953578cde and note-afd649b506a0). The report stamps whose hand
+    // finished it, human or agent, and NOTHING had ever read that stamp. A
+    // report the agent wrote and finished itself passed exactly like one a
+    // person walked through field by field.
+    //
+    // Both lifts were legitimate — the owner asked for an unattended run. The
+    // defect was that the record could not SHOW it, so the only evidence was a
+    // line the agent chose to write. That punished honesty: an agent that said
+    // nothing left a cleaner-looking archive than one that owned up.
+    //
+    // The override is a lane act now, and it is stamped on the record. An
+    // override is LOUDER than compliance, never quieter.
+    const finishedBy = /^by: *(\w+)/m.exec(readFileSync(join(e.path, repRel), "utf8"))?.[1];
+    if (finishedBy !== "human" && (override ?? "").trim() === "") {
+      throw new Rejection({
+        clause: CLAUSES.CONDITION_UNMET,
+        expected: "a report a person confirmed, or a recorded override naming who lifted the guard",
+        got: `the report was finished by the ${finishedBy ?? "agent"}`,
+        remedy: { tool: "se_exp_close", args: { merge, override: "<who authorised the unattended close, and where they said it>" }, note: "confirm the report in the mirror, or close with the override — it is stamped on the record and shows in the archive" },
+        source: SRC,
+      });
+    }
+    const stamped = (override ?? "").trim();
     const raw = readFileSync(recAbs, "utf8");
-    writeFileSync(recAbs, raw.replace(/^status: open$/m, `status: closed\nclosed: ${new Date().toISOString()}\nruling: ${merge ? "applied" : "dismissed"}`), "utf8");
+    writeFileSync(recAbs, raw.replace(/^status: open$/m, `status: closed\nclosed: ${new Date().toISOString()}\nruling: ${merge ? "applied" : "dismissed"}${stamped === "" ? "" : `\nreport_override: ${stamped.replace(/\r?\n/g, " ")}`}`), "utf8");
   }
   // Leftover changes are committed — a walk's work never silently vanishes.
   const dirty = git(e.path, ["status", "--porcelain"], "status").trim() !== "";
@@ -250,5 +274,5 @@ export function expClose(root: string, e: Expedition, merge: boolean): { id: str
   git(root, ["worktree", "remove", "--force", e.path], "worktree remove");
   // NEVER SILENT. Committing someone's uncommitted work on their behalf is a
   // kindness only if they are told it happened, and which files it took.
-  return { id: e.id, merged: merge, ...(trunkCommitted.length > 0 ? { trunk_committed: trunkCommitted } : {}) };
+  return { id: e.id, merged: merge, ...(trunkCommitted.length > 0 ? { trunk_committed: trunkCommitted } : {}), ...((override ?? "").trim() === "" ? {} : { override: (override ?? "").trim() }) };
 }
