@@ -18,10 +18,11 @@ interface Cfg {
   long_sentence_words: number;
   wall_paragraph_lines: number;
   comma_chain_items: number;
+  dash_chain_items: number;
   pyramid_paragraphs: number;
 }
 
-const DEFAULTS: Cfg = { long_sentence_words: 28, wall_paragraph_lines: 8, comma_chain_items: 3, pyramid_paragraphs: 5 };
+const DEFAULTS: Cfg = { long_sentence_words: 28, wall_paragraph_lines: 8, comma_chain_items: 3, dash_chain_items: 3, pyramid_paragraphs: 5 };
 
 export const LINT_CONFIG = "product/deliverable/machines/lint/voice-lint.md";
 
@@ -29,7 +30,7 @@ function loadCfg(root: string): Cfg {
   try {
     const fm = parseStateNote(readFileSync(join(root, ...LINT_CONFIG.split("/")), "utf8")).frontmatter;
     const num = (k: keyof Cfg): number => (typeof fm[k] === "number" && (fm[k] as number) > 0 ? (fm[k] as number) : DEFAULTS[k]);
-    return { long_sentence_words: num("long_sentence_words"), wall_paragraph_lines: num("wall_paragraph_lines"), comma_chain_items: num("comma_chain_items"), pyramid_paragraphs: num("pyramid_paragraphs") };
+    return { long_sentence_words: num("long_sentence_words"), wall_paragraph_lines: num("wall_paragraph_lines"), comma_chain_items: num("comma_chain_items"), dash_chain_items: num("dash_chain_items"), pyramid_paragraphs: num("pyramid_paragraphs") };
   } catch {
     return { ...DEFAULTS };
   }
@@ -73,6 +74,13 @@ export function lintProse(root: string, text: string): LintFinding[] {
       }
       if (s.split(/[,;]/).length > cfg.comma_chain_items) {
         findings.push({ rule: "comma-chain", line: i + 1, excerpt: s.slice(0, 60), hint: "chained items are an unrendered list — render a list" });
+      }
+      // DASH CHAINS, not dashes. A single dash sets off an aside and is
+      // house style; a sentence hinged on several is a run-on wearing
+      // punctuation. Flagging every dash would be noise, and an advisory
+      // nobody heeds gets deleted rather than obeyed.
+      if (s.split(/\s[—–-]\s/).length > cfg.dash_chain_items) {
+        findings.push({ rule: "dash-chain", line: i + 1, excerpt: s.slice(0, 60), hint: "clauses hinged on several dashes — write separate sentences" });
       }
     }
   });

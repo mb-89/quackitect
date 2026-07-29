@@ -1,5 +1,7 @@
 // EDIT SAFETY — the machines-are-drawn law (owner ruling 2026-07-28): the
-// engine accepts what a person naturally draws in Obsidian. Regression
+// engine accepts what a person naturally draws in Obsidian, and (owner
+// ruling 2026-07-29) reads it LIVE — a drawing edited on disk binds the
+// running lane on its next call, with no reload. Regression
 // suite for the live 2026-07-28 strand: the owner re-drew two return edges
 // as plain lines (no styleAttributes role) and drew one of them twice; the
 // compiled graph made idle an AND-join and completing boot dropped the only
@@ -19,6 +21,63 @@ import { call, checkDocs, freshRoot, readHashesFor } from "./helpers.ts";
 
 interface RawEdge { id: string; styleAttributes?: Record<string, unknown>; fromNode: string; fromSide?: string; toNode: string; toSide?: string }
 interface RawCanvas { nodes: { type: string; file?: string }[]; edges: RawEdge[] }
+
+test("the drawing is data: a state note edited on disk binds the next call, no reload", async () => {
+  const root = freshRoot();
+  const session = new Session(root);
+  const server = buildServer(root, session);
+  const hashes = readHashesFor(root);
+  for (let i = 0; i < 8; i++) {
+    const step = await call(server, "se_tick", { advance: true, read_hashes: hashes });
+    if (step.body.booted === true) break;
+  }
+  const notePath = join(root, "product", "deliverable", "machines", "states", "idle.md");
+  const before = readFileSync(notePath, "utf8");
+  assert.match(before, /^priority: 0\.01$/m, "idle costs nothing to enter");
+  // SAME BYTE COUNT ON PURPOSE — a cache stamped by size and mtime would
+  // sail straight past this edit. The content hash is what catches it.
+  const after = before.replace(/^priority: 0\.01$/m, "priority: 0.75");
+  assert.equal(after.length, before.length, "the edit changes no byte count");
+  writeFileSync(notePath, after);
+  const seen = await call(server, "se_tick", {});
+  assert.equal(seen.isError, false, JSON.stringify(seen.body));
+  const idle = (seen.body.states as { id: string; priority: number }[]).find((s) => s.id === "idle");
+  assert.equal(idle?.priority, 0.75, "the running lane reads the edited note");
+});
+
+test("a drawing that will not compile leaves the last good one standing", async () => {
+  const root = freshRoot();
+  const session = new Session(root);
+  const server = buildServer(root, session);
+  const hashes = readHashesFor(root);
+  for (let i = 0; i < 8; i++) {
+    const step = await call(server, "se_tick", { advance: true, read_hashes: hashes });
+    if (step.body.booted === true) break;
+  }
+  writeFileSync(mainMachinePath(root), "{ this is not a canvas");
+  const survived = await call(server, "se_tick", {});
+  assert.equal(survived.isError, false, "a broken drawing never stops the walk");
+  assert.deepEqual(survived.body.active, ["idle"], "and the walk stands where it stood");
+});
+
+test("an edit that deletes the state the walk stands in waits until it has moved on", async () => {
+  const root = freshRoot();
+  const session = new Session(root);
+  const server = buildServer(root, session);
+  const hashes = readHashesFor(root);
+  for (let i = 0; i < 8; i++) {
+    const step = await call(server, "se_tick", { advance: true, read_hashes: hashes });
+    if (step.body.booted === true) break;
+  }
+  // Drop idle out of the drawing while the walk is standing in it.
+  const canvasPath = mainMachinePath(root);
+  const raw = JSON.parse(readFileSync(canvasPath, "utf8")) as RawCanvas;
+  raw.nodes = raw.nodes.filter((n) => n.file === undefined || !n.file.endsWith("idle.md"));
+  writeFileSync(canvasPath, JSON.stringify(raw, null, "\t"));
+  const stood = await call(server, "se_tick", {});
+  assert.equal(stood.isError, false, "the walk is not stranded");
+  assert.deepEqual(stood.body.active, ["idle"], "idle still holds it, because it still holds the walk");
+});
 
 /** Redraw main.canvas the way the owner's Obsidian hand did on 2026-07-28:
  *  strip the roles from the ideation and front_desk returns, and draw the

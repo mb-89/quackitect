@@ -28,7 +28,7 @@ import {
   type MachineInstance,
   type StateDecl,
 } from "./machine.ts";
-import { compileMachine, resolveRef } from "./machines/compile.ts";
+import { compileMachine, compileMachineCached, resolveRef } from "./machines/compile.ts";
 import { conditionNotePath } from "./conditions.ts";
 import { drainNote, pendingNotes } from "./inbox.ts";
 import { confirmPrefill, formTemplatePath, lintForm, parseFormTemplate, scaffoldInstance, withFieldContent, withStatus, type FormLint, type FormTemplate } from "./forms.ts";
@@ -48,8 +48,9 @@ import { generateIterationArchive, generateIterations, itFind, itSeed, markStart
  *  strikes, never chased (contract rule 4). */
 const ALWAYS_LEGAL: ReadonlySet<string> = new Set(["se_tick", "se_note", "se_panel"]);
 /** RESTRICTED tools: "all" does NOT grant these — a state must name them.
- *  se_note_drain is legal only in the retro's drain state (owner ruling
- *  2026-07-27: there is no point in draining anywhere else). */
+ *  se_note_drain stays restricted, so a state earns it by saying so. The
+ *  retro and the front desk both name it; what they may DO with it differs,
+ *  and that split lives in engine/inbox.ts, not here. */
 const RESTRICTED: ReadonlySet<string> = new Set(["se_note_drain"]);
 const MACHINERY: readonly string[] = ["se_tick", "se_file_read"];
 
@@ -86,7 +87,9 @@ export type Channel = "human" | "agent";
 
 export class Session {
   private readonly root: string;
-  readonly machine: MachineDecl;
+  /** Last good main machine — what the walk stands on when the live one
+   *  cannot be had. Read through `machine`, never directly. */
+  private _machine: MachineDecl;
   readonly instance: MachineInstance;
   private subs: SubRun[] = [];
   private bannerShown = false;
@@ -113,8 +116,8 @@ export class Session {
     this.root = root;
     // Fail fast at server start: a misdrawn machine must not silently serve
     // an ungated lane.
-    this.machine = compileMachine(root, mainMachinePath(root));
-    this.instance = newInstance(this.machine);
+    this._machine = compileMachine(root, mainMachinePath(root));
+    this.instance = newInstance(this._machine);
     this.decisions = new Decisions(seDir(root));
     // SETTINGS SURVIVE THE ENGINE, NOT THE SESSION (owner rulings 2026-07-28).
     // The mirror's sliders restore across a RELOAD like the decision graph —
@@ -576,11 +579,46 @@ export class Session {
     return { machine: this.machine, ids: activeStates(this.instance) };
   }
 
+  /** THE MACHINE IS READ LIVE (owner ruling 2026-07-29). Editing a state
+   *  note — its legal tools, its priority, its guidance — takes effect on
+   *  the next call. The markdown is the single truth, so a running lane
+   *  that enforces yesterday's copy of it is enforcing a lie.
+   *
+   *  se_reload is still the door for ENGINE CODE, which Node caches as
+   *  modules and no re-read can reach.
+   *
+   *  TWO THINGS NEVER MOVE THE GROUND UNDER THE WALK:
+   *  - A drawing that will not compile. The last good one stands and the
+   *    walk continues — the same bargain SE-C-124 already makes.
+   *  - A drawing that no longer holds a state the walk is standing in.
+   *    Deleting the active state out from under a live walk would strand
+   *    it, so the edit waits until the walk has moved on. */
+  get machine(): MachineDecl {
+    let fresh: MachineDecl;
+    try {
+      fresh = compileMachineCached(this.root, mainMachinePath(this.root));
+    } catch {
+      return this._machine;
+    }
+    if (fresh === this._machine) return fresh;
+    if (this.instance !== undefined && !activeStates(this.instance).every((id) => fresh.states.some((s) => s.id === id))) {
+      return this._machine;
+    }
+    this._machine = fresh;
+    return fresh;
+  }
+
   active(): string[] {
     const { ids } = this.leaves();
     if (!this.inSub()) return ids;
     const prefix = this.subs.map((s) => s.decl.id).join("/");
     return ids.map((s) => `${prefix}/${s}`);
+  }
+
+  /** Standing in the retro — the one place holding the whole picture, so
+   *  the one place that may park a note or carry it (engine/inbox.ts). */
+  inRetro(): boolean {
+    return this.active().some((id) => id === "retro" || id.endsWith("/retro"));
   }
 
   /** Where the walk is, machine-wise: ["main"] or ["main", "boot", …]. */
@@ -1257,7 +1295,9 @@ export class Session {
       case "se_exp_close":
         return this.expeditionClose(args.merge !== false && args.merge !== "false");
       case "se_note_drain":
-        return drainNote(seDir(this.root), String(args.ref ?? ""), String(args.disposition ?? ""), args.where === undefined ? undefined : String(args.where));
+        // THE CHANNEL RULE: this is the mirror, so it is the person's own
+        // hand. Every disposition stands, wherever the walk happens to be.
+        return drainNote(seDir(this.root), String(args.ref ?? ""), String(args.disposition ?? ""), args.where === undefined ? undefined : String(args.where), true);
       case "se_reload":
         return this.requestReload();
       default:

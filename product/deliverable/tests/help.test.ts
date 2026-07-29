@@ -120,10 +120,34 @@ test("the default launch runs the terminal host detached", () => {
 });
 
 // MANUAL MODE MEANS NO LLM: se-manual is the mirror standing alone, and a
-// missing claude CLI falls into it instead of ending the run.
+// missing agent CLI falls into it instead of ending the run.
 test("manual mode runs the mirror alone, and a missing LLM falls into it", () => {
   const src = readFileSync(join(repoRoot, "RUNME.ps1"), "utf8");
   assert.match(src, /se-manual\.ts/, "RUNME.ps1 must launch se-manual.ts for manual mode");
-  assert.match(src, /-eq \$claude\)[^\r\n]*\$manual/, "a missing claude CLI must fall back to manual mode");
+  assert.match(src, /-eq \$agentHost\)[^\r\n]*\$manual/, "no agent CLI at all must fall back to manual mode");
   assert.match(src, /\$manual = \$true/, "the no-LLM fallback must set manual mode, not exit");
+});
+
+// TWO HOSTS (owner 2026-07-29): the project ships to a colleague running
+// GitHub Copilot CLI on Windows. Claude wins when both are installed.
+test("the launcher detects its agent host, and Claude wins when both are there", () => {
+  const src = readFileSync(join(repoRoot, "RUNME.ps1"), "utf8");
+  const pick = /\$agentHost = "claude" \} elseif[^\r\n]*copilot[^\r\n]*\$agentHost = "copilot"/;
+  assert.match(src, pick, "claude is tested FIRST, so it is the default when both answer");
+  assert.match(src, /\$agentHost -eq "copilot"/, "and the launch branches on the host it found");
+  // Copilot has no opening-prompt argument, so the kickoff is typed in.
+  assert.match(src, /se-pty\.ts[^\r\n]*--send \$kickoff[^\r\n]*copilot/, "copilot gets its kickoff typed, because it takes none on the command line");
+});
+
+// THE CAGE IS WHAT ENFORCES CONTRACT RULE 1. Claude's is a settings file;
+// Copilot denies tools on the command line, so that half is DATA the
+// colleague can correct without touching code.
+test("each host gets a cage, and Copilot's flags live in data", () => {
+  const src = readFileSync(join(repoRoot, "RUNME.ps1"), "utf8");
+  assert.match(src, /claude-settings\.json/, "Claude's deny list is installed");
+  assert.match(src, /copilot-mcp-config\.json/, "Copilot's MCP config is installed");
+  assert.match(src, /copilot-cage\.json[^\r\n]*|ConvertFrom-Json/, "and its deny flags are read from data, not hard-coded");
+  const cage = JSON.parse(readFileSync(join(repoRoot, "workspace", "_cage", "copilot-cage.json"), "utf8")) as { _readme: string[]; deny_args: string[] };
+  assert.ok(cage.deny_args.length > 0, "the cage denies something");
+  assert.ok(cage._readme.join(" ").includes("UNVERIFIED"), "and it says plainly that the flags were never run against a live CLI");
 });

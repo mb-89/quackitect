@@ -38,17 +38,40 @@ export function pendingNotes(seDirPath: string): StrayNote[] {
 }
 
 const DISPOSITIONS = ["done", "obsolete", "carried", "backlog"];
+/** The two that decide what work MEANS and when it comes back. Everything
+ *  else is a check anyone can run: superseded by a named note, already in
+ *  the code, ruled on since it was parked. */
+const JUDGMENT: ReadonlySet<string> = new Set(["carried", "backlog"]);
 
 /** The retro's mechanical half (v2's req-retro-drain): disposition a note;
  *  drained notes leave the inbox count. An unknown ref is refused.
- *  Re-draining is legal — that IS the backlog migration mechanism. */
-export function drainNote(seDirPath: string, ref: string, disposition: string, where?: string): { drained: string; disposition: string; inbox: number } {
+ *  Re-draining is legal — that IS the backlog migration mechanism.
+ *
+ *  judgmentAllowed SPLITS IT (owner discussion 2026-07-29). The drain was
+ *  retro-only, so the front desk could ADD to the inbox and never take
+ *  anything out — and the desk's own method opens by weighing an inbox it
+ *  was not allowed to correct. The ceremony is worth keeping where a
+ *  judgment is actually made, and nowhere else. */
+export function drainNote(seDirPath: string, ref: string, disposition: string, where: string | undefined, judgmentAllowed: boolean): { drained: string; disposition: string; inbox: number } {
   if (!DISPOSITIONS.includes(disposition)) {
     throw new Rejection({
       clause: CLAUSES.REQUIRED_ARGS,
       expected: `disposition: ${DISPOSITIONS.join(" | ")}`,
       got: JSON.stringify(disposition),
       remedy: { tool: "se_note_drain", args: { ref, disposition: "done" }, note: "backlog parks the note for a later migration — where: 'ready when …' is then required" },
+      source: "engine/inbox.ts drain",
+    });
+  }
+  if (!judgmentAllowed && JUDGMENT.has(disposition)) {
+    throw new Rejection({
+      clause: CLAUSES.NOT_LEGAL_IN_STATE,
+      expected: "disposition: done | obsolete — the mechanical ones",
+      got: `${disposition} outside the retro`,
+      remedy: {
+        tool: "se_tick",
+        args: { to: "retro" },
+        note: "carried and backlog decide what the work MEANS and when it returns, which wants the whole picture. done and obsolete are checks anyone can run, so they drain wherever the tool is legal",
+      },
       source: "engine/inbox.ts drain",
     });
   }

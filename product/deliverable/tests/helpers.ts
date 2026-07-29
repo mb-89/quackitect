@@ -62,10 +62,14 @@ export async function call(server: Server, name: string, args: Record<string, un
   return { isError: r.isError, body: JSON.parse(r.content[0].text) as Record<string, unknown> };
 }
 
-/** The boot read list + the root guidance the pull demands at entry. */
+/** The boot read list + the root guidance the pull demands at entry.
+ *  Anything sitting directly in product/guidance/ is pulled ALWAYS, so a
+ *  new document there joins this list or every walk in the suite stalls. */
 export const READ_DOCS = [
   "workspace/AGENTS.md",
   "product/guidance/contract.md",
+  "product/guidance/software.md",
+  "product/guidance/ux.md",
   "product/guidance/voice.md",
   "product/guidance/walking.md",
 ] as const;

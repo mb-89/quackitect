@@ -12,9 +12,10 @@
 //   - text nodes are comments — a drawing may annotate itself
 //   - escape and ask-human edges are never drawn — the executor owns them
 //   - canvas frontmatter: entry (initial state), reentry (restart|resume)
-import { existsSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { dirname, isAbsolute, join, resolve } from "node:path";
 import { loadCanvas, type CanvasElement } from "../canvas.ts";
+import { contentHash } from "../hash.ts";
 import { loadStateNote, section } from "../notes.ts";
 import { CONDITION_TYPES, conditionNoteAbs, conditionNotePath } from "../conditions.ts";
 import {
@@ -99,8 +100,52 @@ export function resolveRef(root: string, canvasPath: string, ref: string): strin
   return join(resolve(root), ref);
 }
 
-export function compileMachine(root: string, canvasPath: string): MachineDecl {
+// THE DRAWING IS DATA, AND DATA IS LIVE (owner ruling 2026-07-29). Editing a
+// state note used to do nothing until se_reload, which contradicts the law
+// that the markdown is the single truth: the file said one thing and the
+// running lane enforced another.
+//
+// Compiling on every gate would re-read a canvas and a dozen notes per call,
+// so the result is cached against the SOURCES it was built from. Anything
+// the compile touched is watched; a changed size or mtime rebuilds. The
+// canvas is always among them, so a state ADDED to the drawing invalidates
+// too — which a watch on the notes alone would miss.
+const CACHE = new Map<string, { decl: MachineDecl; sources: string[]; stamp: string }>();
+
+// STAMPED BY CONTENT, not by size and mtime. Those two are the usual cheap
+// answer and they are wrong here: a priority edited from 0.01 to 0.75 keeps
+// the byte count exactly, so a same-size edit inside one filesystem
+// timestamp tick would go unseen. Hashing a dozen small notes costs far less
+// than the compile it skips, and it cannot miss.
+function stampOf(paths: readonly string[]): string {
+  return paths
+    .map((p) => {
+      try {
+        return `${p}@${contentHash(readFileSync(p))}`;
+      } catch {
+        return `${p}@gone`;
+      }
+    })
+    .join("|");
+}
+
+/** compileMachine, memoised on the files it read. Same answer, same object,
+ *  until one of those files moves. */
+export function compileMachineCached(root: string, canvasPath: string): MachineDecl {
+  const key = `${resolve(root)}::${canvasPath}`;
+  const hit = CACHE.get(key);
+  if (hit !== undefined && stampOf(hit.sources) === hit.stamp) return hit.decl;
+  const sources: string[] = [];
+  const decl = compileMachine(root, canvasPath, sources);
+  CACHE.set(key, { decl, sources, stamp: stampOf(sources) });
+  return decl;
+}
+
+/** sources, when given, collects every file this compile read — the cache's
+ *  watch list. Compiling without it is unchanged. */
+export function compileMachine(root: string, canvasPath: string, sources?: string[]): MachineDecl {
   const machineId = canvasPath.replace(/\\/g, "/").split("/").pop()!.replace(/\.canvas$/, "");
+  sources?.push(canvasPath);
   const canvas = loadCanvas(canvasPath);
   const fm = canvas.metadata?.frontmatter ?? {};
   const reentryRaw = fm.reentry ?? "restart";
@@ -130,6 +175,7 @@ export function compileMachine(root: string, canvasPath: string): MachineDecl {
       // sub-canvas frontmatter (it has no note).
       const subId = ref.replace(/\\/g, "/").split("/").pop()!.replace(/\.canvas$/, "");
       const subPath = resolveRef(root, canvasPath, ref);
+      sources?.push(subPath);
       const subFm = existsSync(subPath) ? (loadCanvas(subPath).metadata?.frontmatter ?? {}) : {};
       const subPriority = asPriority(subFm.priority);
       if (subPriority === undefined) {
@@ -153,6 +199,7 @@ export function compileMachine(root: string, canvasPath: string): MachineDecl {
       };
     } else if (ref.endsWith(".md")) {
       const notePath = resolveRef(root, canvasPath, ref);
+      sources?.push(notePath);
       if (!existsSync(notePath)) {
         throw new MachineCompileError(machineId, `canvas node ${el.id}`, `dangling reference: ${ref} not found`);
       }

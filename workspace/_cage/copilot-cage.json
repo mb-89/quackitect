@@ -1,0 +1,33 @@
+{
+  "_readme": [
+    "THE COPILOT CAGE, AS DATA. Claude Code is caged by a settings file that",
+    "names the denied tools. GitHub Copilot CLI has no such file - it takes",
+    "the denial on the COMMAND LINE, so the cage here is a list of arguments",
+    "RUNME passes at launch.",
+    "",
+    "UNVERIFIED, AND SAID SO ON PURPOSE. Copilot CLI was not installed on the",
+    "machine that wrote this, so these flags were taken from GitHub's",
+    "documentation and never run. They are DATA precisely so you can correct",
+    "them without touching code: edit this file, relaunch, done.",
+    "",
+    "HOW TO CHECK, in one command: run `copilot --help` and compare. If a",
+    "flag below is not listed there, it is wrong, and a wrong deny flag is",
+    "worse than none because it reads as protection that is not there.",
+    "",
+    "CONTRACT RULE 1 IS WHAT THIS ENFORCES: everything the agent does runs",
+    "through the se lane. If the flags do not hold, the cage is ADVISORY on",
+    "this host - the agent is asked rather than prevented. Know that before",
+    "you trust it."
+  ],
+  "deny_args": [
+    "--deny-tool", "shell",
+    "--deny-tool", "write",
+    "--deny-tool", "edit",
+    "--deny-tool", "str_replace",
+    "--deny-tool", "view",
+    "--deny-tool", "read",
+    "--deny-tool", "search",
+    "--deny-tool", "url"
+  ],
+  "extra_args": []
+}

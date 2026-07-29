@@ -372,3 +372,55 @@ test("the survey is offered as a legal tool, not as a button of its own", () => 
   assert.match(html, /^\s*se_survey: \[\],$/m, "it is registered human-callable, with no arguments to give");
   assert.ok(!html.includes("survey-btn"), "and its bespoke button is gone, handler and all");
 });
+
+// A CHECKLIST IS A PROGRESS VIEW (owner 2026-07-29, after watching one sit
+// untouched for an hour and then close fourteen items in a minute). The
+// rule was already in walking.md and prose lost, so the engine says it.
+test("the checklist nudges when narration outruns it, and never refuses", () => {
+  const s = new Session(freshRoot());
+  s.decisions.apply("idle@0", { op: "plan", items: ["first", "second"] });
+  let last: Record<string, unknown> = {};
+  for (let i = 0; i < 5; i++) last = s.decisions.apply("idle@0", { op: "update", brief: "working " + i }) as Record<string, unknown>;
+  assert.ok(typeof last.nudge === "string", "five updates with nothing closed earns the nudge");
+  assert.match(String(last.nudge), /PROGRESS view/);
+  assert.equal(last.update, "update", "and the update itself still lands - a nudge is never a refusal");
+  // Closing something resets it: the rhythm is what is being asked for.
+  const open = s.decisions.graph("idle@0").nodes.filter((n) => n.status === "open");
+  const closed = s.decisions.apply("idle@0", { op: "done", node: open[0].id, brief: "landed" }) as Record<string, unknown>;
+  assert.equal(closed.nudge, undefined, "closing something clears it");
+  const after = s.decisions.apply("idle@0", { op: "update", brief: "on to the next" }) as Record<string, unknown>;
+  assert.equal(after.nudge, undefined, "and the count starts again from there");
+});
+
+// DEFERRED MUST NEVER LOOK KILLED (owner design). A parked point is still
+// owed; it is simply owed in another state. The badge and the origin line
+// were already built, so this pins the one thing that was not: the style.
+test("a deferred point reads as owed elsewhere, never as struck out", () => {
+  const root = freshRoot();
+  const html = renderMirror({ session: new Session(root), root, lastPacket: undefined, mode: "manual" });
+  const rule = /\.dnode\.s-deferred \{([^}]*)\}/.exec(html);
+  assert.ok(rule, "deferred has a style of its own, not the default nothing");
+  assert.ok(!/line-through/.test(rule[1]), "a strike is what says a point died");
+  assert.match(rule[1], /#e8b339/, "it keeps the open colour, because it is still owed");
+  assert.match(rule[1], /italic/, "and leans, because it is owed somewhere else");
+  // The arrow, distinct from the strike obsolete carries.
+  assert.match(html, /deferred: "→"/, "the badge is an arrow");
+});
+
+// A POPPED-OUT CARD IS A SNAPSHOT (owner ruling 2026-07-29). The pop-out
+// opened a URL baked in at draw time, so it showed the server's default
+// while the live card showed whatever the reader had clicked — a state
+// against an answered question. Fifth time the reader's place was lost.
+test("a popped-out card opens on what it was showing, and then holds still", () => {
+  const root = freshRoot();
+  const html = renderMirror({ session: new Session(root), root, lastPacket: undefined, mode: "manual" });
+  // The place rides every pop-out; the bare, subject-less open is gone.
+  assert.ok(!/window\.open\(url,/.test(html), "no pop-out opens its baked-in URL raw");
+  assert.match(html, /window\.open\(frozenUrl\(url\), "_blank"\)/, "the reader's place rides along");
+  assert.ok(!html.includes('"se-widget"'), "and no NAMED window — five snapshots need five windows, not one reused");
+  // Frozen is the absence of liveness, in both directions.
+  assert.match(html, /if \(!FROZEN\) \{\nconst es = new EventSource/, "a frozen window never opens the event stream");
+  assert.match(html, /async function refresh\(detail\) \{\n  if \(FROZEN\) return;/, "and never redraws itself");
+  // It says so, quietly — a snapshot that looks live is a trap.
+  assert.match(html, /frozen-bar/, "the frozen window carries its own marker");
+});

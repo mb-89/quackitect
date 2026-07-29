@@ -97,6 +97,13 @@ New-Item -ItemType Directory -Force -Path (Join-Path $ws ".claude") | Out-Null
 Copy-Item (Join-Path $ws "_cage\mcp.json") (Join-Path $ws ".mcp.json") -Force
 Copy-Item (Join-Path $ws "_cage\claude-settings.json") (Join-Path $ws ".claude\settings.json") -Force
 Write-Host "  workspace\.mcp.json + workspace\.claude\settings.json in place"
+# COPILOT'S CAGE IS SHAPED DIFFERENTLY. Its MCP config is a file like
+# Claude's, so it is placed here the same way. Its tool DENIAL is not a
+# file at all - Copilot takes that on the command line, so that half rides
+# the launch and lives in _cage\copilot-cage.json as data you can correct.
+New-Item -ItemType Directory -Force -Path (Join-Path $ws ".copilot") | Out-Null
+Copy-Item (Join-Path $ws "_cage\copilot-mcp-config.json") (Join-Path $ws ".copilot\mcp-config.json") -Force
+Write-Host "  workspace\.copilot\mcp-config.json in place"
 
 # The FAST gate only (sub-second): canvases compile, hard deps answer, the
 # log location is writable. The FULL test suite is not run here - it runs
@@ -130,11 +137,15 @@ if ($staleOneScreen) {
   Write-Host "quackitect v3 - --one-screen is the default now; the flag did nothing" -ForegroundColor Yellow
 }
 
-# MANUAL MODE MEANS NO LLM. Either you asked for it, or no claude CLI was
+# WHICH AGENT HOST. Claude wins when both are installed (owner ruling).
+# MANUAL MODE MEANS NO LLM. Either you asked for it, or neither CLI was
 # found - a missing agent must not stop you walking the machines yourself.
-$claude = Get-Command claude -ErrorAction SilentlyContinue
-if (($null -eq $claude) -and (-not $manual)) {
-  Write-Host "claude CLI not found - starting in manual mode. Install Claude Code for an agent: https://code.claude.com/docs" -ForegroundColor Yellow
+$agentHost = $null
+if (Get-Command claude -ErrorAction SilentlyContinue) { $agentHost = "claude" } elseif (Get-Command copilot -ErrorAction SilentlyContinue) { $agentHost = "copilot" }
+if (($null -eq $agentHost) -and (-not $manual)) {
+  Write-Host "no agent CLI found - starting in manual mode." -ForegroundColor Yellow
+  Write-Host "  Claude Code:  https://code.claude.com/docs" -ForegroundColor Yellow
+  Write-Host "  Copilot CLI:  https://docs.github.com/copilot/how-tos/copilot-cli" -ForegroundColor Yellow
   $manual = $true
 }
 if ($manual) {
@@ -164,7 +175,24 @@ $kickoff = 'Session start. Tick the machine and walk as far as the threshold all
 # terminal that will not start still never costs you your agent.
 Push-Location (Join-Path $root "workspace")
 try {
-  if ($ownTerminal) {
+  if ($agentHost -eq "copilot") {
+    # COPILOT TAKES NO OPENING PROMPT. Bare `copilot` starts a session;
+    # `copilot -p` answers once and exits, which is not a session. So the
+    # kickoff is TYPED into the terminal host instead of passed as an
+    # argument. The deny flags are read from data - see copilot-cage.json,
+    # which says plainly that they are unverified against a live CLI.
+    $cage = Get-Content (Join-Path $ws "_cage\copilot-cage.json") -Raw | ConvertFrom-Json
+    $cageArgs = @($cage.deny_args) + @($cage.extra_args)
+    Write-Host "quackitect v3 - agent host: GitHub Copilot CLI" -ForegroundColor Cyan
+    if ($ownTerminal) {
+      Write-Host "quackitect v3 - own terminal: Copilot takes no opening prompt, so PASTE the line below into it" -ForegroundColor Yellow
+      Write-Host $kickoff
+      copilot @cageArgs
+    } else {
+      Write-Host "quackitect v3 - the agent runs in the Mirror's terminal pane, in the background" -ForegroundColor Cyan
+      node (Join-Path $root "product\deliverable\engine\bin\se-pty.ts") --pty-port 7334 --detach --send $kickoff -- copilot @cageArgs
+    }
+  } elseif ($ownTerminal) {
     Write-Host "quackitect v3 - own terminal: the agent runs in THIS window; the Mirror's terminal pane stays empty" -ForegroundColor Cyan
     claude $kickoff
   } else {

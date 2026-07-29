@@ -307,6 +307,13 @@ export class Decisions {
   }
 
   private readonly parked: { state: string; brief: string; hops?: number; trail?: string[] }[] = [];
+  /** Updates landed since anything last CLOSED. The checklist is a progress
+   *  view, so a run of narration over a checklist that never moves is the
+   *  thing worth saying out loud (owner 2026-07-29). Prose said this
+   *  already and prose lost, which is the case for a mechanical nudge.
+   *  High enough that ordinary narration passes untouched. */
+  private sinceResolve = 0;
+  private static readonly NUDGE_AFTER = 5;
 
   apply(visit: string, u: DecisionOp): Record<string, unknown> {
     this.materialize(visit);
@@ -412,8 +419,16 @@ export class Decisions {
         break;
       }
     }
+    if (u.op === "update") this.sinceResolve++;
+    else if (u.op === "done" || u.op === "obsolete" || u.op === "revert" || u.op === "defer") this.sinceResolve = 0;
     const open = [...this.nodes.values()].filter((n) => n.status === "open").length;
-    return { update: u.op, active: this.activeId ?? null, open };
+    // A NUDGE, never a refusal. Narration that outruns the checklist is bad
+    // rhythm, not a broken call, and refusing the work over its commentary
+    // is the mistake the update field already learned once.
+    const nudge = this.sinceResolve >= Decisions.NUDGE_AFTER && open > 0
+      ? `${this.sinceResolve} updates since anything closed, with ${open} still open — the checklist is a PROGRESS view. Close what is genuinely done on the NEXT call, not at the end.`
+      : undefined;
+    return { update: u.op, active: this.activeId ?? null, open, ...(nudge !== undefined ? { nudge } : {}) };
   }
 
   /** One state visit's tree, insertion-ordered — the mirror renders this.

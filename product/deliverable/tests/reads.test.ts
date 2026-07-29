@@ -8,7 +8,44 @@ import { test } from "node:test";
 import { renderMirror } from "../engine/render.ts";
 import { Session } from "../engine/session.ts";
 import { buildServer } from "../engine/tools.ts";
-import { call, checkDocs, freshRoot, readHashesFor } from "./helpers.ts";
+import { readFileSync } from "node:fs";
+import { call, checkDocs, freshRoot, READ_DOCS, readHashesFor } from "./helpers.ts";
+
+// THREE HOMES, NOT ONE (owner ruling 2026-07-29). voice.md is about HOW YOU
+// TALK. It had accumulated rules about writing SOFTWARE and building
+// INTERFACES, and a reader looking for one had to sift the other two.
+//
+// The split is only half the ruling. A guidance nobody pulls is a guidance
+// nobody reads, so each home sits directly in product/guidance/ where the
+// pull serves it always.
+test("the guidance splits three ways, and every home is pulled", () => {
+  const root = freshRoot();
+  const s = new Session(root);
+  const idle = s.machine.states.find((x) => x.id === "idle")!;
+  const pulled = s.pulled(s.machine, idle).map((p) => p.path);
+  for (const home of ["product/guidance/voice.md", "product/guidance/software.md", "product/guidance/ux.md"]) {
+    assert.ok(pulled.includes(home), home + " is not pulled — a guidance nobody pulls is a guidance nobody reads");
+    assert.ok(READ_DOCS.includes(home as (typeof READ_DOCS)[number]), home + " is pulled but the suite never proves reading it");
+  }
+  const read = (p: string): string => readFileSync(join(root, ...p.split("/")), "utf8");
+  const voice = read("product/guidance/voice.md");
+  const software = read("product/guidance/software.md");
+  const ux = read("product/guidance/ux.md");
+  // Each rule sits in exactly one home. Two copies is how they drift apart.
+  assert.match(software, /Do not repeat \(DRY\)/, "DRY is a software rule");
+  assert.match(software, /Comments and provenance/, "so is how you comment");
+  assert.match(software, /Dated guidance/, "so is judging dated advice");
+  assert.match(ux, /Nothing ever hangs/, "the interface rule the owner added leads the UX home");
+  assert.match(ux, /NEVER BLOCK THE PROCESS THAT DRAWS THE INTERFACE/, "including the half that actually bites");
+  assert.match(ux, /ONE SURFACE NEVER RESETS ANOTHER/, "and the place rules");
+  for (const moved of [/Do not repeat \(DRY\)/, /Comments & provenance/, /### Visual design/, /### Figures/]) {
+    assert.ok(!moved.test(voice), "voice.md kept " + String(moved) + " — it belongs to a sibling now");
+  }
+  // What voice.md is FOR stays in it.
+  assert.match(voice, /### Sentences/);
+  assert.match(voice, /### Answered questions/);
+  assert.match(voice, /The sycophancy guard/);
+});
 
 test("a check pins the VERSION: editing the doc unchecks it and the gate asks again", async () => {
   const root = freshRoot();

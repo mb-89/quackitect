@@ -157,7 +157,10 @@ export function expeditionTools(session: Session): ToolDef[] {
 // state at the project root, everything else follows the walk into its bound
 // worktree (Session.laneRoot, owner ruling 2026-07-28). Callers that act on no
 // single path — search, glob, run, git — pass nothing and get the work root.
-export function coreTools(rootOf: (rel?: string) => string, projectRoot: string): ToolDef[] {
+// judgmentDrainAllowed answers ONE question for se_note_drain: may this
+// caller park a note or carry it, or only record the mechanical verdicts.
+// It is a thunk because the walk moves under a built tool list.
+export function coreTools(rootOf: (rel?: string) => string, projectRoot: string, judgmentDrainAllowed: () => boolean = () => true): ToolDef[] {
   return [
     {
       name: "se_file_read",
@@ -434,16 +437,39 @@ export function coreTools(rootOf: (rel?: string) => string, projectRoot: string)
       name: "se_lint",
       title: "se.lint",
       description:
-        "The VOICE LINT, on demand: mechanical prose checks (walls of text, long sentences, comma chains, missing pyramid structure) over a text or a markdown file. Rule parameters are DATA (machines/lint/voice-lint.md) - edit thresholds without recompiling. Catches FORM, never meaning. Self-check your outputs before they ship; pruning sweeps it over everything later.",
+        "The VOICE LINT, on demand: mechanical prose checks (walls of text, long sentences, comma chains, dash chains, missing pyramid structure) over a text, a markdown file, or a whole GLOB of them. Rule parameters are DATA (machines/lint/voice-lint.md) - edit thresholds without recompiling. Catches FORM, never meaning. Self-check your outputs before they ship; sweep a tree with glob before it ships.",
       inputSchema: {
         type: "object",
         properties: {
           text: { type: "string", description: "prose to lint, verbatim" },
           path: { type: "string", description: "a root-relative .md file to lint instead" },
+          glob: { type: "string", description: "sweep every markdown file matching this glob, e.g. product/guidance/**/*.md" },
         },
       },
       handler: (args) => {
         const root = rootOf();
+        // THE SWEEP. Linting one file at a time is why nothing was ever
+        // linted: the tool could only be pointed at prose somebody already
+        // suspected. Only files WITH findings come back, so a clean tree
+        // answers small, and anything dropped is named rather than implied.
+        if (args.glob !== undefined) {
+          const g = fileGlob(root, String(args.glob));
+          const md = g.files.filter((f) => f.endsWith(".md"));
+          const files = md
+            .map((p) => ({ path: p, findings: lintProse(root, readFileSync(resolveInRoot(root, p, "engine/tools.ts se_lint"), "utf8")) }))
+            .map((f) => ({ path: f.path, count: f.findings.length, findings: f.findings }))
+            .filter((f) => f.count > 0);
+          return {
+            glob: String(args.glob),
+            swept: md.length,
+            ...(md.length < g.files.length ? { skipped_not_markdown: g.files.length - md.length } : {}),
+            ...(g.truncated ? { truncated: true, note: "the glob hit its cap - narrow it and sweep the rest" } : {}),
+            clean: md.length - files.length,
+            files,
+            count: files.reduce((n, f) => n + f.count, 0),
+            config: LINT_CONFIG,
+          };
+        }
         if (args.path !== undefined) {
           const p = String(args.path);
           if (!p.endsWith(".md")) {
@@ -465,9 +491,9 @@ export function coreTools(rootOf: (rel?: string) => string, projectRoot: string)
         }
         throw new Rejection({
           clause: CLAUSES.REQUIRED_ARGS,
-          expected: "text OR path",
-          got: "neither",
-          remedy: { tool: "se_lint", args: { text: "<prose>" } },
+          expected: "text, path OR glob",
+          got: "none of them",
+          remedy: { tool: "se_lint", args: { glob: "product/guidance/**/*.md" }, note: "text lints one block, path one file, glob a whole tree" },
           source: "engine/tools.ts se_lint",
         });
       },
@@ -493,7 +519,7 @@ export function coreTools(rootOf: (rel?: string) => string, projectRoot: string)
     {
       name: "se_note_drain",
       title: "se.note.drain",
-      description: "The retro's mechanical half: mark a note drained with its disposition (done | obsolete | carried | backlog — where? names the follow-up home). backlog PARKS the note: where is REQUIRED as its 'ready when …' re-entry condition, and a later migration re-drains it. Drained notes leave the inbox count and the pending feed. An unknown ref is refused.",
+      description: "Mark a note drained with its disposition. done | obsolete are MECHANICAL — superseded, already built, ruled on since — and drain wherever this tool is legal, the front desk included. carried | backlog are JUDGMENT and belong to the retro, which is the only place with the whole picture. backlog PARKS the note: where is REQUIRED as its 'ready when …' re-entry condition, and a later migration re-drains it. Drained notes leave the inbox count and the pending feed. An unknown ref is refused.",
       inputSchema: {
         type: "object",
         properties: {
@@ -503,7 +529,7 @@ export function coreTools(rootOf: (rel?: string) => string, projectRoot: string)
         },
         required: ["ref", "disposition"],
       },
-      handler: (args) => drainNote(seDir(projectRoot), String(args.ref), String(args.disposition), args.where === undefined ? undefined : String(args.where)),
+      handler: (args) => drainNote(seDir(projectRoot), String(args.ref), String(args.disposition), args.where === undefined ? undefined : String(args.where), judgmentDrainAllowed()),
     },
     {
       name: "se_survey",
@@ -570,7 +596,7 @@ function refuseProseWall(tool: string, field: string, text: string): void {
 
 export function buildServer(root: string, session = new Session(root), tollOpts: { windowMs?: number; now?: () => number } = {}): McpServer {
   // (a fresh Session fails fast on a misdrawn machine)
-  const tools = [...sessionTools(session), ...expeditionTools(session), ...coreTools((rel) => session.laneRoot(rel), root)];
+  const tools = [...sessionTools(session), ...expeditionTools(session), ...coreTools((rel) => session.laneRoot(rel), root, () => session.inRetro())];
   // THE UPDATE FIELD — every lane tool accepts it: a decision-graph op
   // riding the call. Declared on every schema so harnesses send it as an
   // object (an undeclared property arrives as a JSON string — v2 lesson).

@@ -1,9 +1,15 @@
 ---
 id: voice
-scope: always
 statement: How to write every output — chat and artifact alike — for a general-engineer audience.
 ---
-## Guide (load on demand)
+
+# voice — how you talk
+
+This document is about WORDS. Two siblings carry what used to live here:
+
+- `software.md` — how you write code and record work.
+- `ux.md` — how you build an interface.
+
 Audience: engineers in general. Not software developers. Assume average competence. Assume English is a second language.
 
 Write plainly. These are rules, not suggestions. They bind every output: chat, docs, spec, report, and code comments.
@@ -47,42 +53,6 @@ Write plainly. These are rules, not suggestions. They bind every output: chat, d
 - The author owns all published content, whatever the AI share. "The AI wrote it, I did not review it" is unacceptable.
 - Quality with AI ratchets up. Never trade quality for speed or comfort. That trade ends in slop.
 
-### Figures
-- Prefer a diagram over prose when it transports the information better. Use figures generously.
-- Author every figure in a text-based form: inline SVG with real text, Mermaid, or ASCII. A machine must be able to read it.
-- Give each figure one line saying what to see in it.
-
-### Visual design
-- The owner owns visual design. A sketch is a contract: render exactly what it shows.
-- Never add a visual element the sketch does not show. A missing affordance becomes a question to the owner, never a silent addition.
-- A prefill is a suggestion, never content. Anything the AI prefills for a person stays inert (commented out) until that person confirms it — one confirmation per prefill, never in bulk.
-- Every widget gets a maximize control. It opens the widget full-screen as a modal over the grayed page. Close returns to the layout.
-- Click for detail. Clicking an element shows its details: a dedicated surface if one exists, the details pane as the fallback.
-- Help is a detail, never a button. Clicking a control surfaces its context-sensitive help in the details pane. No dedicated help buttons or icons exist anywhere.
-- Panes hold their size. Content never resizes the layout. The maximize modal is the room to breathe.
-- Interacting with a field never collapses its surface. No fold closes, no scroll resets, no pane re-opens — the reader keeps their place through every click.
-- ONE SURFACE NEVER RESETS ANOTHER. Acting in one pane says nothing about what the reader has open beside it. Changing which machine is on screen does not clear the details pane; checking a box does not scroll the feed.
-- Only content that is GENUINELY GONE may clear. If what they had open no longer exists, say so in its place. Never silently swap in something else, and never quietly close it.
-- Carry the reader's place through a navigation. A link that rebuilds the page takes the open selection with it, or it is the same reset wearing a different hat.
-- Color carries meaning, never decoration: green = pass, red = failure or rejection, yellow = attention.
-- Feedback within a second. Any interaction that can take longer than a second shows loading feedback at once. A progress bar with real progress where progress exists; an indeterminate bar otherwise. Silence reads as breakage.
-
-### Do not repeat (DRY)
-- Single source of truth. Each fact lives in one place. Everything else points to it.
-- Markdown is the truth. Anything whose truth lives in markdown keeps it Obsidian-compatible and human-editable IN THE REAL WORLD — a million-line file is not editable. Generated surfaces derive from the markdown, never the reverse. Log files are the one exception.
-- Machines are drawn. A state machine's truth is its Obsidian canvas, and a person edits it in Obsidian, in the real world (owner law, 2026-07-28). The engine accepts what a person naturally draws. A mechanism that depends on metadata Obsidian does not surface to its editor is a defect — rework the mechanism, never the person.
-- Do not repeat prose, data, or code. Not across files. Not across panels. Not within one screen.
-- If two places show the same thing, delete one. A detail view should not echo what its parent already shows.
-- A field that restates another field is NOISE. A statement that repeats the id, a title that repeats the name, a label that echoes the filename - strike it. Empty is better than an echo; a field is filled only when it ADDS something.
-- Repeat only when strongly advised. Then say why.
-
-### Comments & provenance
-- Write comments the way people write them: only where a reader would be surprised.
-- A comment states a constraint the artifact cannot show itself. Nothing else.
-- Never comment that a rule was followed, who ruled it, or when. No dates. No step numbers. No law citations at application sites.
-- The why lives ONCE, in its designated home: an ADR, a `decided_via`, an evidence doc, a note, the ledger. Everywhere else, the artifact just IS the consequence.
-- A deliberate choice that must survive future edits gets a TEST or a LINT, not a comment. A comment is the weakest guard.
-
 ### People & privacy
 - No personal data in anything stored or published. That covers spec, evidence docs, trace nodes, reports, and entry files. Use the stakeholder ROLE instead: the owner, the adjudicator, the driving agent, the maintainer.
 - Do not write "human vs agent" in prose. Say "people" or "persons", or name the role. The engine's actor stamp is a recorded metric with fixed vocabulary. Prose is not.
@@ -116,13 +86,6 @@ Write plainly. These are rules, not suggestions. They bind every output: chat, d
 - In any comparison, state what the other side does better first. Then what ours does.
 - A validation-shaped question finds validation. Say so, and offer the falsifying question.
 - If the ledger records a risk against the design, cite it in the same breath as any praise.
-
-### Dated guidance (applies to every citation, and to your own instincts)
-- Do not ask how OLD a piece of guidance is. Ask which resource it was RATIONING.
-- Rations human LABOUR: suspect it. That cost collapsed once a machine started doing the work.
-- Rations human JUDGEMENT or ATTENTION: it still holds. There is still one owner, and they still have to look at the diff.
-- Most guidance predates AI and was written for human teams. Split it along that seam instead of quoting or discarding it whole.
-- This binds the assistant's own instincts too. The training assumes writing the code is the expensive part. Where a recommendation rests on that assumption, say so rather than asserting it.
 
 ### Explaining a problem
 - Explain it plainly first, like to a smart outsider. What the parts do. What changed. Who is right.

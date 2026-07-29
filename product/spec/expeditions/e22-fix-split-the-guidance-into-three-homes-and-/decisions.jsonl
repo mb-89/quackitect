@@ -1,0 +1,81 @@
+{"ts":"2026-07-29T13:18:18.563Z","op":"plan","visit":"expeditions/e22@0","parent":null,"nodes":[{"id":"d14","brief":"Survey returns full notes (survey.ts:22)"},{"id":"d15","brief":"se_note_drain legal at the front desk for done/obsolete"},{"id":"d16","brief":"Split guidance into voice + software + UX, wire the pull config"},{"id":"d17","brief":"Port the v1 voice lint"},{"id":"d18","brief":"DEFERRED gets its own icon, distinct from obsolete"},{"id":"d19","brief":"Details popped to a new tab shows the card's subject"},{"id":"d20","brief":"Copilot host detection in RUNME and the cage templates"},{"id":"d21","brief":"Drain the five stale backlog items"}]}
+{"ts":"2026-07-29T13:19:30.309Z","op":"update","visit":"expeditions/e22@0","node":"d22","brief":"survey returns full note text; the 120-char first-line cut is gone"}
+{"ts":"2026-07-29T13:21:36.987Z","op":"update","visit":"expeditions/e22@0","node":"d23","brief":"drainNote splits mechanical dispositions from judgment ones"}
+{"ts":"2026-07-29T13:22:13.203Z","op":"update","visit":"expeditions/e22@0","node":"d24","brief":"wired the drain split; the mirror keeps every disposition"}
+{"ts":"2026-07-29T13:22:29.672Z","op":"update","visit":"expeditions/e22@0","node":"d25","brief":"front desk names the drain; Session gained inRetro"}
+{"ts":"2026-07-29T13:23:36.687Z","op":"update","visit":"expeditions/e22@0","node":"d26","brief":"diagnosed the pop-out: it never carries the reader's selection"}
+{"ts":"2026-07-29T13:23:46.348Z","op":"update","visit":"expeditions/e22@0","node":"d27","brief":"running the suite over the survey and drain changes"}
+{"ts":"2026-07-29T13:24:55.179Z","op":"update","visit":"expeditions/e22@0","node":"d28","brief":"tests pin the drain split and the survey answering in full"}
+{"ts":"2026-07-29T13:26:57.687Z","op":"fork","visit":"expeditions/e22@0","parent":"d10","node":"d29","brief":"machine markdown goes live: a compile cached on the files it read","nodes":[]}
+{"ts":"2026-07-29T13:27:23.462Z","op":"update","visit":"expeditions/e22@0","node":"d30","brief":"session reads the main machine live, guarded twice"}
+{"ts":"2026-07-29T13:27:30.838Z","op":"update","visit":"expeditions/e22@0","node":"d31","brief":"running the suite over the live-machine change"}
+{"ts":"2026-07-29T13:28:17.268Z","op":"update","visit":"expeditions/e22@0","node":"d32","brief":"survey test needs a git root; the survey asks git what stands open"}
+{"ts":"2026-07-29T13:28:59.240Z","op":"update","visit":"expeditions/e22@0","node":"d33","brief":"cache stamps by content hash; size and mtime would miss a same-size edit"}
+{"ts":"2026-07-29T13:29:23.610Z","op":"update","visit":"expeditions/e22@0","node":"d34","brief":"three tests pin the live drawing and both of its guards"}
+{"ts":"2026-07-29T13:29:27.492Z","op":"update","visit":"expeditions/e22@0","node":"d35","brief":"re-running the suite with the live-drawing tests"}
+{"ts":"2026-07-29T13:30:08.442Z","op":"update","visit":"expeditions/e22@0","node":"d36","brief":"staging the survey, drain and live-drawing changes"}
+{"ts":"2026-07-29T13:30:18.929Z","op":"update","visit":"expeditions/e22@0","node":"d37","brief":"committed the first three items"}
+{"ts":"2026-07-29T13:30:40.615Z","op":"update","visit":"expeditions/e22@0","node":"d38","brief":"answered the reload question; the live drawing is built and committed"}
+{"ts":"2026-07-29T13:32:16.919Z","op":"update","visit":"expeditions/e22@0","node":"d39","brief":"pop-out carries the reader's selection and opens frozen"}
+{"ts":"2026-07-29T13:32:39.011Z","op":"update","visit":"expeditions/e22@0","node":"d40","brief":"pop-out carries the reader's selection and opens frozen"}
+{"ts":"2026-07-29T13:33:05.875Z","op":"update","visit":"expeditions/e22@0","node":"d41","brief":"test pins the pop-out carrying the place and holding still"}
+{"ts":"2026-07-29T13:33:09.398Z","op":"update","visit":"expeditions/e22@0","node":"d42","brief":"running the suite over the pop-out change"}
+{"ts":"2026-07-29T13:34:02.980Z","op":"update","visit":"expeditions/e22@0","node":"d43","brief":"frozen joins the place registry instead of dodging it"}
+{"ts":"2026-07-29T13:34:07.909Z","op":"update","visit":"expeditions/e22@0","node":"d44","brief":"re-running after registering frozen as a place"}
+{"ts":"2026-07-29T13:34:52.654Z","op":"update","visit":"expeditions/e22@0","node":"d45","brief":"committed the pop-out fix"}
+{"ts":"2026-07-29T13:36:52.869Z","op":"update","visit":"expeditions/e22@0","node":"d46","brief":"ux guidance written, opening with the rule that nothing ever hangs"}
+{"ts":"2026-07-29T13:37:38.885Z","op":"update","visit":"expeditions/e22@0","node":"d47","brief":"voice.md is about words again; two siblings took the rest"}
+{"ts":"2026-07-29T13:38:07.860Z","op":"update","visit":"expeditions/e22@0","node":"d48","brief":"citations follow the moved sections; test roots read the new docs"}
+{"ts":"2026-07-29T13:38:11.151Z","op":"update","visit":"expeditions/e22@0","node":"d49","brief":"running the suite over the guidance split"}
+{"ts":"2026-07-29T13:39:07.794Z","op":"update","visit":"expeditions/e22@0","node":"d50","brief":"test pins the three homes and that each is pulled"}
+{"ts":"2026-07-29T13:39:14.495Z","op":"update","visit":"expeditions/e22@0","node":"d51","brief":"running the suite with the guidance-split test"}
+{"ts":"2026-07-29T13:40:03.084Z","op":"update","visit":"expeditions/e22@0","node":"d52","brief":"committed the guidance split"}
+{"ts":"2026-07-29T13:41:10.890Z","op":"update","visit":"expeditions/e22@0","node":"d53","brief":"lint gains the dash-chain rule the port note asked for"}
+{"ts":"2026-07-29T13:41:36.094Z","op":"update","visit":"expeditions/e22@0","node":"d54","brief":"se_lint sweeps a whole tree, not one file at a time"}
+{"ts":"2026-07-29T13:41:40.648Z","op":"update","visit":"expeditions/e22@0","node":"d55","brief":"running the suite over the lint changes"}
+{"ts":"2026-07-29T13:42:27.762Z","op":"update","visit":"expeditions/e22@0","node":"d56","brief":"sweeping the guidance tree with the lint"}
+{"ts":"2026-07-29T13:42:49.501Z","op":"update","visit":"expeditions/e22@0","node":"d57","brief":"cleared the lint's findings in my own new guidance"}
+{"ts":"2026-07-29T13:43:25.225Z","op":"update","visit":"expeditions/e22@0","node":"d58","brief":"dash-chain assertions added to the lint test"}
+{"ts":"2026-07-29T13:43:38.390Z","op":"update","visit":"expeditions/e22@0","node":"d59","brief":"test pins the tree sweep and its honest skip count"}
+{"ts":"2026-07-29T13:43:41.954Z","op":"update","visit":"expeditions/e22@0","node":"d60","brief":"running the suite over the lint sweep"}
+{"ts":"2026-07-29T13:44:28.314Z","op":"update","visit":"expeditions/e22@0","node":"d61","brief":"committed the lint work"}
+{"ts":"2026-07-29T13:47:45.151Z","op":"update","visit":"expeditions/e22@0","node":"d62","brief":"checking whether copilot is installed here to verify its flags"}
+{"ts":"2026-07-29T13:48:04.534Z","op":"update","visit":"expeditions/e22@0","node":"d63","brief":"pty host can type an opening prompt for hosts that take none"}
+{"ts":"2026-07-29T13:48:09.129Z","op":"update","visit":"expeditions/e22@0","node":"d64","brief":"copilot mcp config template added"}
+{"ts":"2026-07-29T13:48:21.421Z","op":"update","visit":"expeditions/e22@0","node":"d65","brief":"copilot cage flags live in data, and say they are unverified"}
+{"ts":"2026-07-29T13:49:13.343Z","op":"update","visit":"expeditions/e22@0","node":"d66","brief":"RUNME detects the agent host and cages each one its own way"}
+{"ts":"2026-07-29T13:49:21.697Z","op":"update","visit":"expeditions/e22@0","node":"d67","brief":"checking the launcher parses and the new switch is in help"}
+{"ts":"2026-07-29T13:49:26.798Z","op":"update","visit":"expeditions/e22@0","node":"d68","brief":"re-checking the launcher parse with a valid ref variable"}
+{"ts":"2026-07-29T13:49:33.334Z","op":"update","visit":"expeditions/e22@0","node":"d69","brief":"checking the cage data parses and running the suite"}
+{"ts":"2026-07-29T13:50:46.411Z","op":"update","visit":"expeditions/e22@0","node":"d70","brief":"tests pin host detection and each host's cage"}
+{"ts":"2026-07-29T13:50:54.974Z","op":"update","visit":"expeditions/e22@0","node":"d71","brief":"running the suite over the copilot port"}
+{"ts":"2026-07-29T13:51:37.382Z","op":"update","visit":"expeditions/e22@0","node":"d72","brief":"dropped an assertion my own comment tripped"}
+{"ts":"2026-07-29T13:51:41.439Z","op":"update","visit":"expeditions/e22@0","node":"d73","brief":"re-running the suite over the copilot port"}
+{"ts":"2026-07-29T13:52:33.290Z","op":"update","visit":"expeditions/e22@0","node":"d74","brief":"committed the copilot port and the deferred style"}
+{"ts":"2026-07-29T13:53:00.268Z","op":"update","visit":"expeditions/e22@0","node":"d75","brief":"recorded what the copilot port could not prove"}
+{"ts":"2026-07-29T13:53:28.235Z","op":"done","visit":"expeditions/e22@0","node":"d15","brief":"drain split by disposition; the mirror keeps all four"}
+{"ts":"2026-07-29T13:53:32.154Z","op":"done","visit":"expeditions/e22@0","node":"d16","brief":"three homes, both new ones pulled at the guidance root"}
+{"ts":"2026-07-29T13:53:37.774Z","op":"done","visit":"expeditions/e22@0","node":"d17","brief":"mostly built already; dash chains and a tree sweep were missing"}
+{"ts":"2026-07-29T13:53:42.091Z","op":"done","visit":"expeditions/e22@0","node":"d18","brief":"only the style was missing; badge and origin already shipped"}
+{"ts":"2026-07-29T13:53:47.010Z","op":"done","visit":"expeditions/e22@0","node":"d19","brief":"pop-out carries the place and opens frozen"}
+{"ts":"2026-07-29T13:53:50.409Z","op":"done","visit":"expeditions/e22@0","node":"d20","brief":"host detection built; the deny flags stay unverified and say so"}
+{"ts":"2026-07-29T13:53:55.050Z","op":"defer","visit":"expeditions/e22@0","node":"d21","brief":"Drain the five stale backlog items","to":"front_desk","hops":1,"trail":["expeditions/e22","front_desk"]}
+{"ts":"2026-07-29T13:54:02.502Z","op":"done","visit":"expeditions/e22@0","node":"d29","brief":"the drawing is read live, cached on the content of its sources"}
+{"ts":"2026-07-29T13:54:13.657Z","op":"done","visit":"expeditions/e22@0","node":"d14","brief":"the survey answers in full; the 120-char cut is gone"}
+{"ts":"2026-07-29T13:54:17.314Z","op":"done","visit":"front_desk@0","node":"d10","brief":"diagnosed and fixed; the pop-out never carried the selection"}
+{"ts":"2026-07-29T13:54:20.362Z","op":"obsolete","visit":"front_desk@0","node":"d7","brief":"the owner was right; the survey owns that view and now answers in full"}
+{"ts":"2026-07-29T13:54:25.799Z","op":"done","visit":"front_desk@0","node":"d3","brief":"all sixteen shown, grouped by what they wait on"}
+{"ts":"2026-07-29T13:54:32.856Z","op":"done","visit":"front_desk@0","node":"d4","brief":"read via a ranged sweep of the note store, which is what caught the survey cut"}
+{"ts":"2026-07-29T13:54:35.756Z","op":"done","visit":"front_desk@0","node":"d5","brief":"e22 seeded with the owner's full scope"}
+{"ts":"2026-07-29T13:54:44.861Z","op":"update","visit":"expeditions/e22@0","node":"d76","brief":"checking the branch is clean before reporting"}
+{"ts":"2026-07-29T13:55:12.702Z","op":"plan","visit":"expeditions/e22@0","parent":null,"nodes":[{"id":"d77","brief":"Sharpen walking.md on WHY the checklist moves as you work"},{"id":"d78","brief":"Give the rule teeth - nudge when a checklist stops moving"},{"id":"d79","brief":"Test the nudge"}]}
+{"ts":"2026-07-29T13:55:22.722Z","op":"done","visit":"expeditions/e22@0","node":"d77","brief":"walking.md now says WHY, not just what"}
+{"ts":"2026-07-29T13:55:45.541Z","op":"update","visit":"expeditions/e22@0","node":"d80","brief":"nudge built; hunting the right constant anchor"}
+{"ts":"2026-07-29T13:55:58.753Z","op":"done","visit":"expeditions/e22@0","node":"d78","brief":"the engine says it when narration outruns the checklist"}
+{"ts":"2026-07-29T13:56:16.105Z","op":"done","visit":"expeditions/e22@0","node":"d79","brief":"test pins the nudge and that it never refuses"}
+{"ts":"2026-07-29T13:56:20.441Z","op":"update","visit":"expeditions/e22@0","node":"d81","brief":"running the suite over the checklist nudge"}
+{"ts":"2026-07-29T13:57:05.395Z","op":"update","visit":"expeditions/e22@0","node":"d82","brief":"committed the checklist nudge"}
+{"ts":"2026-07-29T14:00:00.651Z","op":"plan","visit":"expeditions/e22@0","parent":null,"nodes":[{"id":"d83","brief":"Fill the expedition-leave form"},{"id":"d84","brief":"Close e22 and merge to trunk"},{"id":"d85","brief":"Reload so the desk can drain"},{"id":"d86","brief":"Clean out the notes at the front desk"}]}
+{"ts":"2026-07-29T14:01:17.147Z","op":"done","visit":"expeditions/e22@0","node":"d84","brief":"leave report written, including what it could not prove"}
+{"ts":"2026-07-29T14:01:22.125Z","op":"update","visit":"expeditions/e22@0","node":"d87","brief":"moving to the leave state with the report filled"}
+{"ts":"2026-07-29T14:01:32.329Z","op":"done","visit":"expeditions/e22@0","node":"d85","brief":"closing e22 and merging to trunk on the owner's word"}

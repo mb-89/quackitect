@@ -50,6 +50,12 @@ if (flags.some((a) => a === "--help" || a === "-h" || a === "-?")) {
                  without taking the session down. Ignored when no terminal
                  binding is installed: the command then runs on the inherited
                  terminal, and a background process has none.
+  --send TEXT    type TEXT into the agent once it has started, then Enter.
+                 For hosts with no way to take an opening prompt on the
+                 command line - GitHub Copilot CLI starts interactive with
+                 no argument, and its -p flag answers once and exits, which
+                 is not a session. Sent ONCE, after the first output and a
+                 short settle, so it does not land before the agent reads.
   --help         this text (-h, -?)
   --             everything after it is the command to run in the terminal
 
@@ -62,6 +68,7 @@ if (flags.some((a) => a === "--help" || a === "-h" || a === "-?")) {
 
 const port = Number(flagValue("--pty-port") ?? process.env.SE_PTY_PORT ?? 7334);
 const detach = flags.includes("--detach");
+const send = flagValue("--send");
 
 if (command.length === 0) {
   process.stderr.write("se-pty: nothing to run — pass the command after --\n");
@@ -253,6 +260,21 @@ async function main(): Promise<void> {
   });
   write = (d) => term.write(d);
   resize = (c, r) => term.resize(c, r);
+  // THE OPENING PROMPT, TYPED. Claude takes it as an argument and starts a
+  // session; Copilot has no such form, so the only way in is the keyboard.
+  //
+  // Waiting a fixed number of seconds would be a guess about how long a TUI
+  // takes to draw. Waiting for the FIRST OUTPUT and then settling briefly
+  // keys on the agent actually being there.
+  if (send !== undefined && send !== "") {
+    let sent = false;
+    const armed = term.onData(() => {
+      if (sent) return;
+      sent = true;
+      armed.dispose();
+      setTimeout(() => term.write(send + "\r"), 1500);
+    });
+  }
   startServer();
 }
 
