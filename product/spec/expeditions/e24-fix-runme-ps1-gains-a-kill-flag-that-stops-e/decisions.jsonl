@@ -91,3 +91,35 @@
 {"ts":"2026-07-29T16:41:33.489Z","op":"update","visit":"expeditions/e24@0","node":"d50","brief":"colon-space in frontmatter prose broke the YAML"}
 {"ts":"2026-07-29T16:41:38.127Z","op":"update","visit":"expeditions/e24@0","node":"d51","brief":"re-running after the frontmatter fix"}
 {"ts":"2026-07-29T16:42:25.660Z","op":"update","visit":"expeditions/e24@0","node":"d52","brief":"staging the rename"}
+{"ts":"2026-07-29T16:42:36.665Z","op":"done","visit":"expeditions/e24@0","node":"d10","brief":"overhaul renamed and widened across state, drawing and method"}
+{"ts":"2026-07-29T16:42:42.763Z","op":"update","visit":"expeditions/e24@0","node":"d53","brief":"landing four commits on trunk"}
+{"ts":"2026-07-29T16:43:07.827Z","op":"update","visit":"expeditions/e24@0","node":"d54","brief":"pausing out of e24 rather than escaping"}
+{"ts":"2026-07-29T16:59:23.603Z","op":"update","visit":"expeditions/e24@1","node":"d96","brief":"finding how a blocked hop is reported"}
+{"ts":"2026-07-29T17:00:39.381Z","op":"update","visit":"expeditions/e24@1","node":"d97","brief":"line fades past the closure, barrier carries the reason"}
+{"ts":"2026-07-29T17:00:46.761Z","op":"update","visit":"expeditions/e24@1","node":"d98","brief":"testing the closure render"}
+{"ts":"2026-07-29T17:02:02.927Z","op":"update","visit":"expeditions/e24@1","node":"d99","brief":"a substring count over CSS and markup was brittle"}
+{"ts":"2026-07-29T17:02:07.203Z","op":"update","visit":"expeditions/e24@1","node":"d100","brief":"re-running with the element-count fix"}
+{"ts":"2026-07-29T17:03:27.215Z","op":"update","visit":"expeditions/e24@1","node":"d101","brief":"staging the road closure"}
+{"ts":"2026-07-29T17:03:40.902Z","op":"done","visit":"idle@2","node":"d92","brief":"the closure fades the way past it and says why"}
+{"ts":"2026-07-29T17:03:47.029Z","op":"update","visit":"expeditions/e24@1","node":"d102","brief":"locating the log boundary and the git allowlist"}
+{"ts":"2026-07-29T17:03:54.111Z","op":"update","visit":"expeditions/e24@1","node":"d103","brief":"reading how last_retro is resolved"}
+{"ts":"2026-07-29T17:04:07.601Z","op":"update","visit":"expeditions/e24@1","node":"d104","brief":"checking whether a log record knows its state"}
+{"ts":"2026-07-29T17:04:31.934Z","op":"update","visit":"expeditions/e24@1","node":"d105","brief":"reading the log-query dispatch"}
+{"ts":"2026-07-29T17:04:49.820Z","op":"update","visit":"expeditions/e24@1","node":"d106","brief":"reading the git lane before adding land and sync"}
+{"ts":"2026-07-29T17:05:32.103Z","op":"update","visit":"expeditions/e24@1","node":"d107","brief":"finding where se_git registers"}
+{"ts":"2026-07-29T17:05:39.441Z","op":"update","visit":"expeditions/e24@1","node":"d108","brief":"reading the se_git block verbatim"}
+{"ts":"2026-07-29T17:06:54.024Z","op":"update","visit":"expeditions/e24@1","node":"d109","brief":"adding land and sync to the git lane"}
+{"ts":"2026-07-29T17:07:11.861Z","op":"update","visit":"expeditions/e24@1","node":"d110","brief":"registering the tools and fixing the boundary"}
+{"ts":"2026-07-29T17:07:54.809Z","op":"update","visit":"expeditions/e24@1","node":"d111","brief":"checking the gitlane test scaffolding"}
+{"ts":"2026-07-29T17:08:43.168Z","op":"update","visit":"expeditions/e24@1","node":"d112","brief":"guarding all three gaps with tests"}
+{"ts":"2026-07-29T17:08:50.648Z","op":"update","visit":"expeditions/e24@1","node":"d113","brief":"running the suite on the three gaps"}
+{"ts":"2026-07-29T17:10:07.947Z","op":"update","visit":"expeditions/e24@1","node":"d114","brief":"removing the raw NUL that hid the test file from search"}
+{"ts":"2026-07-29T17:10:13.614Z","op":"update","visit":"expeditions/e24@1","node":"d115","brief":"re-running after clearing the raw NUL"}
+{"ts":"2026-07-29T17:11:04.230Z","op":"update","visit":"expeditions/e24@1","node":"d116","brief":"staging the three gaps"}
+{"ts":"2026-07-29T17:11:40.338Z","op":"done","visit":"idle@2","node":"d91","brief":"land and sync landed with the boundary and binary guard"}
+{"ts":"2026-07-29T17:11:51.210Z","op":"update","visit":"expeditions/e24@1","node":"d117","brief":"listing the ideation machine's states"}
+{"ts":"2026-07-29T17:12:00.755Z","op":"update","visit":"expeditions/e24@1","node":"d118","brief":"listing the machines tree"}
+{"ts":"2026-07-29T17:12:23.876Z","op":"update","visit":"expeditions/e24@1","node":"d119","brief":"reading diverge, the heart of ideation"}
+{"ts":"2026-07-29T17:13:34.159Z","op":"update","visit":"expeditions/e24@1","node":"d120","brief":"giving the autonomous-run policy a durable home"}
+{"ts":"2026-07-29T17:13:40.739Z","op":"update","visit":"expeditions/e24@1","node":"d121","brief":"checking the new guidance file passes preflight"}
+{"ts":"2026-07-29T17:14:51.841Z","op":"update","visit":"expeditions/e24@1","node":"d122","brief":"staging the autonomous-run card"}

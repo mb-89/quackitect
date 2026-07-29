@@ -131,6 +131,27 @@ test("an image rides to the model as a real block, and never into the log", asyn
   assert.equal(log.includes(String(content[1].data).slice(0, 40)), false, "base64 must not reach calls.jsonl");
 });
 
+// THE RETRO'S BOUNDARY (found live 2026-07-29). "last_retro" meant the newest
+// drain of any kind. Then e22 let the FRONT DESK drain too, so a desk drain
+// minutes old handed the retro a window far too short and nothing said so.
+// Only a retro may park or carry a note, so those dispositions mark it exactly.
+test("last_retro means the previous RETRO, not the last desk drain", async () => {
+  const { CallLog } = await import("../engine/calllog.ts");
+  const root = fresh();
+  const log = new CallLog(join(root, ".se"));
+  const drain = (disposition: string) =>
+    log.append({ tool: "se_note_drain", args: { disposition }, ok: true, outcome: "result", duration_ms: 1 });
+
+  drain("backlog"); // a RETRO: the desk is refused this disposition
+  log.append({ tool: "se_tick", args: {}, ok: true, outcome: "result", duration_ms: 1 });
+  drain("obsolete"); // the front desk may do this one
+  log.append({ tool: "se_run", args: {}, ok: true, outcome: "result", duration_ms: 1 });
+
+  // All four, because the window opens at the retro. Before the fix the desk
+  // drain moved it and only two records survived.
+  assert.equal(log.query({ filter: { since: "last_retro" } }).total, 4);
+});
+
 test("unconfigured web search refuses with setup instructions, never fakes", async () => {
   const prev = process.env.SE_BRAVE_API_KEY;
   delete process.env.SE_BRAVE_API_KEY;

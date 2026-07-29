@@ -23,7 +23,7 @@ import { survey } from "./survey.ts";
 import { itList, readItRecord } from "./iterations.ts";
 import { capJson } from "./jsonio.ts";
 import { McpServer, type ToolDef } from "./mcp.ts";
-import { gitLane } from "./gitlane.ts";
+import { gitLand, gitLane, gitSync } from "./gitlane.ts";
 import { fileMove } from "./move.ts";
 import { spawn } from "node:child_process";
 import { openPanel } from "./panel.ts";
@@ -401,6 +401,22 @@ export function coreTools(rootOf: (rel?: string) => string, projectRoot: string,
       handler: (args) => gitLane(rootOf(), (args.args as unknown[]) ?? []),
     },
     {
+      name: "se_git_land",
+      title: "se.git.land",
+      description:
+        "LAND the bound expedition's commits on trunk and LEAVE IT OPEN — an expedition is a day's bucket and does not close to ship. Fast-forwards where it can, merges where it cannot, and on conflict ABORTS and refuses typed, so nothing is half-done. Reports what went across.",
+      inputSchema: { type: "object", properties: {} },
+      handler: () => gitLand(projectRoot, rootOf()),
+    },
+    {
+      name: "se_git_sync",
+      title: "se.git.sync",
+      description:
+        "SYNC trunk INTO the bound expedition, so a worktree is never silently stale — its branch was cut when the expedition was SEEDED, which may be days before it was entered. On conflict it ABORTS and refuses typed. Reports what came in.",
+      inputSchema: { type: "object", properties: {} },
+      handler: () => gitSync(projectRoot, rootOf()),
+    },
+    {
       name: "se_web_fetch",
       title: "se.web.fetch",
       description: "Fetch a URL as readable text (HTML reduced). Large pages page through offset; truncation is always declared.",
@@ -571,7 +587,7 @@ export function coreTools(rootOf: (rel?: string) => string, projectRoot: string,
         type: "object",
         properties: {
           ref: { type: "string", description: "fetch one record in full by ref" },
-          filter: { type: "object", description: "{tool?, ok?, since?} — since: an ISO timestamp, or 'last_retro' (everything after the newest drain call)" },
+          filter: { type: "object", description: "{tool?, ok?, since?} — since: an ISO timestamp, or 'last_retro' (everything after the previous retro, which is the newest carried/backlog drain — the desk cannot make those)" },
           group_by: { type: "string", description: "e.g. 'tool' or 'outcome'" },
           limit: { type: "number", default: 20 },
         },

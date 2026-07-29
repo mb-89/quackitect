@@ -96,10 +96,21 @@ export class CallLog {
     // since: "last_retro" — the newest drain call marks the previous retro;
     // the retro mines only its own period (the raw log is kept, owner
     // ruling: forever-until-1GB, a garbage collector may harvest later).
+    // It used to mean the newest drain of ANY kind, and e22 broke that by
+    // letting the FRONT DESK drain too: a desk drain minutes ago handed the
+    // retro a window far too short, and nothing said so (found live
+    // 2026-07-29). carried and backlog are JUDGMENT dispositions and the desk
+    // is refused them, so the newest of those marks a retro and nothing else
+    // can. Any drain is still the fallback, for logs written before this.
     let since = f.since;
     if (since === "last_retro") {
       const drains = all.filter((r) => r.tool === "se_note_drain" && r.ok);
-      since = drains.length > 0 ? drains[drains.length - 1].ts : undefined;
+      const judged = drains.filter((r) => {
+        const d = String((r.args as { disposition?: unknown }).disposition ?? "");
+        return d === "carried" || d === "backlog";
+      });
+      const marks = judged.length > 0 ? judged : drains;
+      since = marks.length > 0 ? marks[marks.length - 1].ts : undefined;
     }
     const records = all.filter((rec) => {
       if (f.tool !== undefined && rec.tool !== f.tool) return false;

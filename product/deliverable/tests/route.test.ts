@@ -155,12 +155,33 @@ test("the drawing carries the route: a spline OVER the nodes, its stops, an arro
   // A waypoint and the destination are the SAME mark: boot and front_desk,
   // plus the one stylesheet rule. idle is a stop the line merely crosses, so
   // it carries none — the owner's invisible waypoint.
-  assert.equal(html.split("route-stop").length - 1, 3);
+  // Count the ELEMENTS, not every mention — the stylesheet names the class too.
+  assert.equal(html.split('class="route-stop"').length - 1, 2);
   assert.equal(html.split("route-here").length - 1, 2, "an arrow says where you are");
   assert.match(html, /class="route-here" transform="translate\(-?[\d.]+ -?[\d.]+\) rotate\(-?[\d.]+\)"/, "and it faces the way the line goes");
 
   // Blue, because the voice keeps green, red and yellow for verdicts.
   assert.match(html, /\.route-line \{ fill: none; stroke: #4a90d9/);
+});
+
+// THE ONE MOMENT THE MAP LIES (owner ruling 2026-07-29). An unbroken blue
+// line to the destination says the whole way is open. When the slider blocks a
+// hop it is not, and the reader has no way to see that the walk will stop
+// short and wait for their hand.
+test("a blocked route draws a closure, and the way past it is FADED", async () => {
+  const { renderMirror } = await import("../engine/render.ts");
+  const root = freshRoot();
+  const s = new Session(root);
+  s.setAutonomy(0.1); // the front desk sits at 0.2
+  assert.equal(s.route("front_desk").stops_at?.at, "front_desk");
+  const html = renderMirror({ session: s, root, lastPacket: undefined, mode: "manual" });
+
+  assert.match(html, /class="route-line"\/>/, "the open part is drawn normally");
+  assert.match(html, /class="route-line shut"\/>/, "and the way past the closure carries its own class");
+  assert.match(html, /class="route-shut"/, "with a barrier laid across the line");
+  // Faded, never hidden: the way EXISTS, it is shut.
+  assert.match(html, /\.route-line\.shut \{ opacity: \.28; \}/);
+  assert.ok(html.includes("above the session autonomy"), "and the barrier says why");
 });
 
 test("the preview MOVES NOTHING", () => {
