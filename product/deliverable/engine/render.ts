@@ -432,6 +432,10 @@ const STYLE = `
   .dnode.s-open { color: #e8b339; }
   .dnode.s-obsolete { color: #5b6772; text-decoration: line-through; }
   .dnode.s-reverted { color: #e86a5f; text-decoration: line-through; }
+  /* DEFERRED IS NOT KILLED. It is still owed, so it keeps the open colour;
+     it is owed SOMEWHERE ELSE, so it leans. Never struck through - the
+     strike is what says a point died, and this one did not. */
+  .dnode.s-deferred { color: #e8b339; font-style: italic; text-decoration: none; }
   .dnode.dactive { font-weight: 700; }
   .dnode.dsel { background: #22272c; }
   .dinfo { margin-top: 10px; border-top: 1px solid #2a2f34; padding-top: 8px; }

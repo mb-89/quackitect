@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "se": {
+      "command": "node",
+      "args": [
+        "../product/deliverable/engine/bin/se-mcp.ts",
+        "--root",
+        ".."
+      ]
+    }
+  }
+}

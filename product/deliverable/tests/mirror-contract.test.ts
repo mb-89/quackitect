@@ -373,6 +373,21 @@ test("the survey is offered as a legal tool, not as a button of its own", () => 
   assert.ok(!html.includes("survey-btn"), "and its bespoke button is gone, handler and all");
 });
 
+// DEFERRED MUST NEVER LOOK KILLED (owner design). A parked point is still
+// owed; it is simply owed in another state. The badge and the origin line
+// were already built, so this pins the one thing that was not: the style.
+test("a deferred point reads as owed elsewhere, never as struck out", () => {
+  const root = freshRoot();
+  const html = renderMirror({ session: new Session(root), root, lastPacket: undefined, mode: "manual" });
+  const rule = /\.dnode\.s-deferred \{([^}]*)\}/.exec(html);
+  assert.ok(rule, "deferred has a style of its own, not the default nothing");
+  assert.ok(!/line-through/.test(rule[1]), "a strike is what says a point died");
+  assert.match(rule[1], /#e8b339/, "it keeps the open colour, because it is still owed");
+  assert.match(rule[1], /italic/, "and leans, because it is owed somewhere else");
+  // The arrow, distinct from the strike obsolete carries.
+  assert.match(html, /deferred: "→"/, "the badge is an arrow");
+});
+
 // A POPPED-OUT CARD IS A SNAPSHOT (owner ruling 2026-07-29). The pop-out
 // opened a URL baked in at draw time, so it showed the server's default
 // while the live card showed whatever the reader had clicked — a state
