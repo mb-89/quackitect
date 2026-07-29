@@ -50,8 +50,13 @@ The trigger is a NOTE carrying "needs retro":
    reinventing instead of reusing. Each one is a lead.
 6. Mine the record SINCE THE LAST RETRO — never the whole log.
    se_log_query with filter {since: "last_retro"} scopes every query to
-   what happened after the newest drain call. Rank refusal clauses by
-   frequency; top tools; failure rates. A command that keeps failing or
+   what happened after the newest drain call.
+   MIND THE ORDER, or this step reads nothing. The boundary IS the newest
+   drain call, and step 2 drains. Once you have drained, "last_retro"
+   means YOUR OWN retro, and the window is empty. Read the boundary
+   timestamp BEFORE draining, then mine with that explicit timestamp.
+   Rank refusal clauses by frequency; top tools; failure rates.
+   A command that keeps failing or
    a refusal that keeps firing is a lead — the fix may be a tool, a
    refusal, or better guidance. Walk the period's se_run commands too
    (v1 law): every shell command is a candidate sign of a MISSING piece
