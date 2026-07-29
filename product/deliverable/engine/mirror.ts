@@ -266,6 +266,13 @@ export function startMirror(o: MirrorOptions): Server {
         }));
         return;
       }
+      if (req.method === "POST" && url.pathname === "/target") {
+        post(req, res, "mirror_target", (body) => ({
+          args: { to: body.to },
+          result: state.session.setTarget(String(body.to ?? "")),
+        }));
+        return;
+      }
       if (req.method === "POST" && url.pathname === "/escape") {
         post(req, res, "mirror_escape", (body) => ({
           args: { reason: body.reason },

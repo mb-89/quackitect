@@ -194,6 +194,16 @@ test("the number keys yield to a text field and pin their choice in the URL", ()
   assert.ok(html.includes('ev.target.closest(".cardnum")'), "the badge is wired to the click");
   assert.ok(html.includes('promoteCard(card.id.replace(/^card-/, ""))'), "and it promotes the card it sits on");
   assert.match(html, /\.cardnum \{[^}]*cursor: pointer/, "and it looks clickable");
+
+  // AIMING THE LINE had no surface: the route could be drawn but not pointed.
+  // The key is registered, so the legend renders it without a hand-kept list.
+  assert.match(html, /<span class="legend-key">t<\/span>/, "the target key is in the legend");
+  assert.ok(html.includes('fetch("/target"'), "and it posts the selected state");
+
+  // A ROUTE LINE MUST NOT DEPEND ON CSS TO AVOID FILLING. An unstyled SVG path
+  // paints solid black, and the morph used to leave a stale stylesheet behind.
+  assert.match(html, /<path d="[^"]+" fill="none" class="route-line"/, "fill=none is an attribute, not only a rule");
+  assert.ok(html.includes('doc.querySelector("head style")'), "and the morph refreshes the stylesheet");
 });
 
 // NEVER CHANGE ANYTHING THE LAST CHANGE DID NOT TOUCH (owner, note-4ba204a85769,

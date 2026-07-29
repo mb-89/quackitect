@@ -96,5 +96,10 @@ export function bindings(cards: Card[]): Binding[] {
   }));
   out.push({ keys: "same key again", label: "back to the card you came from", scope: "cards" });
   out.push({ keys: "esc", label: "close the expanded card", scope: "view" });
+  // SETTING THE TARGET HAD NO SURFACE AT ALL — the blue line could be drawn
+  // but not aimed. A key beats a button here: the reader is already clicking
+  // states to read them, so the selection they want is the one under their
+  // hand. It only aims the line; the agent still has to be told to walk.
+  out.push({ keys: "t", label: "aim the blue line at the selected state", scope: "walk" });
   return out;
 }

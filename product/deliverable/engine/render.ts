@@ -259,8 +259,13 @@ function machineSvg(source: CanvasData, activeIds: Set<string>, doneIds: Set<str
     const shut = route?.blocked === undefined ? -1 : stops.findIndex((s) => s.id === route.blocked?.at);
     const open = shut > 0 ? stops.slice(0, shut) : stops;
     const past = shut > 0 ? stops.slice(shut - 1) : [];
-    if (open.length >= 2) parts.push(`<path d="${splinePath(open.map(xy))}" class="route-line"/>`);
-    if (past.length >= 2) parts.push(`<path d="${splinePath(past.map(xy))}" class="route-line shut"/>`);
+    // fill="none" is an ATTRIBUTE, not just a class rule. An SVG path with no
+    // fill declared paints SOLID BLACK, so the one time the stylesheet is not
+    // there the route becomes a black blob swallowing the drawing. That is not
+    // hypothetical: it is exactly what a reader saw, because the mirror morphs
+    // the body and never re-sent the <style>. The attribute survives that.
+    if (open.length >= 2) parts.push(`<path d="${splinePath(open.map(xy))}" fill="none" class="route-line"/>`);
+    if (past.length >= 2) parts.push(`<path d="${splinePath(past.map(xy))}" fill="none" class="route-line shut"/>`);
     // A waypoint and the destination are the SAME filled dot. The owner's
     // sketch drew the destination as a ring; that was the pen, not the intent.
     for (const [i, s] of stops.entries()) {
@@ -1002,6 +1007,14 @@ async function refresh(detail) {
   try {
     const r = await fetch(url);
     const doc = new DOMParser().parseFromString(await r.text(), "text/html");
+    // THE STYLESHEET MORPHS TOO (found live 2026-07-29). It lives in <head>,
+    // which the morph never touched, so a tab open since before a CSS change
+    // kept the OLD sheet for as long as it stayed open. Anything shipped after
+    // that matched no rule at all — and an unstyled SVG path fills black.
+    // The reader saw it; the agent, on a fresh tab, could not reproduce it.
+    const freshCss = doc.querySelector("head style");
+    const liveCss = document.querySelector("head style");
+    if (freshCss && liveCss && liveCss.textContent !== freshCss.textContent) liveCss.textContent = freshCss.textContent;
     morph(document.body, doc.body);
     rebind();
   } catch (e) {
@@ -1364,6 +1377,16 @@ addEventListener("keydown", (ev) => {
   if (ev.ctrlKey || ev.metaKey || ev.altKey) return;
   const t = ev.target;
   if (t !== null && (t.tagName === "INPUT" || t.tagName === "TEXTAREA" || t.isContentEditable)) return;
+  // T AIMS THE BLUE LINE at whatever state the reader has open. It only sets
+  // the destination; the walk still waits to be told to go, which is the
+  // whole point of a target being separate from a tick.
+  if (ev.key === "t" || ev.key === "T") {
+    if (typeof CURRENT_DETAIL !== "string" || !CURRENT_DETAIL.startsWith("state:")) return;
+    const to = CURRENT_DETAIL.slice(6);
+    ev.preventDefault();
+    void fetch("/target", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ to }) });
+    return;
+  }
   if (!/^[0-9]$/.test(ev.key)) return;
   const card = CARDS.list[Number(ev.key) - 1];
   if (card === undefined) return;

@@ -150,7 +150,7 @@ test("the drawing carries the route: a spline OVER the nodes, its stops, an arro
   // edges read as the graph highlighting itself, which is not a route.
   assert.equal(html.split("onroute").length - 1, 0, "the route no longer rides the edges");
   // Canvas coordinates go NEGATIVE — the drawing's origin is not its corner.
-  assert.match(html, /<path d="M -?[\d.]+ -?[\d.]+ C [^"]+" class="route-line"\/>/, "one spline through the stops");
+  assert.match(html, /<path d="M -?[\d.]+ -?[\d.]+ C [^"]+" fill="none" class="route-line"\/>/, "one spline through the stops");
 
   // A waypoint and the destination are the SAME mark: boot and front_desk,
   // plus the one stylesheet rule. idle is a stop the line merely crosses, so
