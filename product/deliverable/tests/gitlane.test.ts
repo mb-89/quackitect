@@ -8,6 +8,19 @@ import { join } from "node:path";
 import { test } from "node:test";
 import { bootedServer, call, freshRoot } from "./helpers.ts";
 
+// LAND and SYNC reconcile a worktree WITH trunk, so both need two trees. At
+// the root there is only one, and a silent no-op there would be worse than a
+// refusal — the caller would believe their work had gone across.
+test("land and sync refuse when nothing is bound", async () => {
+  const server = await bootedServer(freshRoot());
+  for (const tool of ["se_git_land", "se_git_sync"]) {
+    const r = await call(server, tool, {});
+    assert.equal(r.isError, true, `${tool} must refuse at the root`);
+    assert.equal(r.body.clause, "SE-C-004");
+    assert.match(String(r.body.got), /with nothing bound/);
+  }
+});
+
 function gitInit(root: string): void {
   const g = (...a: string[]): void => {
     const r = spawnSync("git", a, { cwd: root, encoding: "utf8", windowsHide: true });

@@ -100,3 +100,19 @@
 {"ts":"2026-07-29T17:02:02.927Z","op":"update","visit":"expeditions/e24@1","node":"d99","brief":"a substring count over CSS and markup was brittle"}
 {"ts":"2026-07-29T17:02:07.203Z","op":"update","visit":"expeditions/e24@1","node":"d100","brief":"re-running with the element-count fix"}
 {"ts":"2026-07-29T17:03:27.215Z","op":"update","visit":"expeditions/e24@1","node":"d101","brief":"staging the road closure"}
+{"ts":"2026-07-29T17:03:40.902Z","op":"done","visit":"idle@2","node":"d92","brief":"the closure fades the way past it and says why"}
+{"ts":"2026-07-29T17:03:47.029Z","op":"update","visit":"expeditions/e24@1","node":"d102","brief":"locating the log boundary and the git allowlist"}
+{"ts":"2026-07-29T17:03:54.111Z","op":"update","visit":"expeditions/e24@1","node":"d103","brief":"reading how last_retro is resolved"}
+{"ts":"2026-07-29T17:04:07.601Z","op":"update","visit":"expeditions/e24@1","node":"d104","brief":"checking whether a log record knows its state"}
+{"ts":"2026-07-29T17:04:31.934Z","op":"update","visit":"expeditions/e24@1","node":"d105","brief":"reading the log-query dispatch"}
+{"ts":"2026-07-29T17:04:49.820Z","op":"update","visit":"expeditions/e24@1","node":"d106","brief":"reading the git lane before adding land and sync"}
+{"ts":"2026-07-29T17:05:32.103Z","op":"update","visit":"expeditions/e24@1","node":"d107","brief":"finding where se_git registers"}
+{"ts":"2026-07-29T17:05:39.441Z","op":"update","visit":"expeditions/e24@1","node":"d108","brief":"reading the se_git block verbatim"}
+{"ts":"2026-07-29T17:06:54.024Z","op":"update","visit":"expeditions/e24@1","node":"d109","brief":"adding land and sync to the git lane"}
+{"ts":"2026-07-29T17:07:11.861Z","op":"update","visit":"expeditions/e24@1","node":"d110","brief":"registering the tools and fixing the boundary"}
+{"ts":"2026-07-29T17:07:54.809Z","op":"update","visit":"expeditions/e24@1","node":"d111","brief":"checking the gitlane test scaffolding"}
+{"ts":"2026-07-29T17:08:43.168Z","op":"update","visit":"expeditions/e24@1","node":"d112","brief":"guarding all three gaps with tests"}
+{"ts":"2026-07-29T17:08:50.648Z","op":"update","visit":"expeditions/e24@1","node":"d113","brief":"running the suite on the three gaps"}
+{"ts":"2026-07-29T17:10:07.947Z","op":"update","visit":"expeditions/e24@1","node":"d114","brief":"removing the raw NUL that hid the test file from search"}
+{"ts":"2026-07-29T17:10:13.614Z","op":"update","visit":"expeditions/e24@1","node":"d115","brief":"re-running after clearing the raw NUL"}
+{"ts":"2026-07-29T17:11:04.230Z","op":"update","visit":"expeditions/e24@1","node":"d116","brief":"staging the three gaps"}
