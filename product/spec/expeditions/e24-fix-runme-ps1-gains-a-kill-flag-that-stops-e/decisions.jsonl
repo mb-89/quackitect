@@ -53,3 +53,20 @@
 {"ts":"2026-07-29T16:22:36.379Z","op":"update","visit":"expeditions/e24@0","node":"d15","brief":"reading the glob and search descriptions verbatim"}
 {"ts":"2026-07-29T16:23:09.611Z","op":"update","visit":"expeditions/e24@0","node":"d16","brief":"descriptions now name the declared-root address"}
 {"ts":"2026-07-29T16:23:18.151Z","op":"update","visit":"expeditions/e24@0","node":"d17","brief":"staging the browse widening"}
+{"ts":"2026-07-29T16:23:25.384Z","op":"done","visit":"expeditions/e24@0","node":"d8","brief":"all three read lanes reach a declared root, round trip proven"}
+{"ts":"2026-07-29T16:23:39.690Z","op":"update","visit":"expeditions/e24@0","node":"d18","brief":"locating the current route drawing"}
+{"ts":"2026-07-29T16:24:01.376Z","op":"update","visit":"expeditions/e24@0","node":"d19","brief":"reading the overlay and node drawing"}
+{"ts":"2026-07-29T16:24:59.313Z","op":"update","visit":"expeditions/e24@0","node":"d20","brief":"checking which route assertions the redraw would break"}
+{"ts":"2026-07-29T16:25:05.597Z","op":"update","visit":"expeditions/e24@0","node":"d21","brief":"reading the route render test to rewrite it honestly"}
+{"ts":"2026-07-29T16:25:15.668Z","op":"update","visit":"expeditions/e24@0","node":"d22","brief":"reading the route call site"}
+{"ts":"2026-07-29T16:25:39.133Z","op":"update","visit":"expeditions/e24@0","node":"d23","brief":"finding where the node loop ends so the line draws on top"}
+{"ts":"2026-07-29T16:27:24.224Z","op":"update","visit":"expeditions/e24@0","node":"d24","brief":"spline over the nodes replaces the edge highlighting"}
+{"ts":"2026-07-29T16:27:28.094Z","op":"update","visit":"expeditions/e24@0","node":"d25","brief":"running the suite on the redrawn route"}
+{"ts":"2026-07-29T16:28:52.968Z","op":"update","visit":"expeditions/e24@0","node":"d26","brief":"running the route test alone for a readable failure"}
+{"ts":"2026-07-29T16:29:21.026Z","op":"update","visit":"expeditions/e24@0","node":"d27","brief":"checking how a canvas node maps to a state id"}
+{"ts":"2026-07-29T16:29:25.774Z","op":"update","visit":"expeditions/e24@0","node":"d28","brief":"reading stateIdOf"}
+{"ts":"2026-07-29T16:29:50.654Z","op":"update","visit":"expeditions/e24@0","node":"d29","brief":"dumping the rendered route elements"}
+{"ts":"2026-07-29T16:30:01.418Z","op":"update","visit":"expeditions/e24@0","node":"d30","brief":"retrying the diagnostic with correct import paths"}
+{"ts":"2026-07-29T16:30:31.701Z","op":"update","visit":"expeditions/e24@0","node":"d31","brief":"test regex missed negative canvas coordinates"}
+{"ts":"2026-07-29T16:30:36.571Z","op":"update","visit":"expeditions/e24@0","node":"d32","brief":"re-running the suite after the regex fix"}
+{"ts":"2026-07-29T16:31:48.641Z","op":"update","visit":"expeditions/e24@0","node":"d33","brief":"staging the route redraw"}

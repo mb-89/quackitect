@@ -135,24 +135,32 @@ test("the sweep stops at the slider, and the target defaults to the front desk",
   assert.equal(s.target, "front_desk", "so the blue line never points at nowhere");
 });
 
-test("the drawing carries the route: line on the drawn edges, waypoint, destination", async () => {
+test("the drawing carries the route: a spline OVER the nodes, its stops, an arrow", async () => {
   const { renderMirror, routeOverlay } = await import("../engine/render.ts");
   const root = freshRoot();
   const s = new Session(root);
-  // The projection: hops that cross states here are EDGES; hops that run
-  // around inside one state make it a WAYPOINT, which is what a submachine
-  // entered and left again is.
-  const { edges, waypoints } = routeOverlay(s.route("front_desk").steps, "main", s.machine.id);
-  assert.deepEqual([...edges], ["start->boot", "boot->idle", "idle->front_desk"]);
+  // The projection gives the ORDERED stops. Hops running around inside one
+  // state make it a WAYPOINT, which is what a submachine entered and left is.
+  const { waypoints, path } = routeOverlay(s.route("front_desk").steps, "main", s.machine.id);
+  assert.deepEqual(path, ["start", "boot", "idle", "front_desk"]);
   assert.deepEqual([...waypoints], ["boot"], "boot is passed through, so it is a waypoint");
   const html = renderMirror({ session: s, root, lastPacket: undefined, mode: "manual" });
-  // One rule in the stylesheet, one class per route edge.
-  assert.equal(html.split("onroute").length - 1, 1 + edges.size, "the line runs along every drawn edge of the route");
-  assert.equal(html.split("route-waypoint").length - 1, 2, "the waypoint is marked");
-  assert.equal(html.split("route-target").length - 1, 2, "the destination is a dot");
-  assert.equal(html.split("route-here").length - 1, 2, "and an arrow says where you are");
+
+  // THE LINE IS DRAWN OVER THE NODES, never along the drawn edges. Riding the
+  // edges read as the graph highlighting itself, which is not a route.
+  assert.equal(html.split("onroute").length - 1, 0, "the route no longer rides the edges");
+  // Canvas coordinates go NEGATIVE — the drawing's origin is not its corner.
+  assert.match(html, /<path d="M -?[\d.]+ -?[\d.]+ C [^"]+" class="route-line"\/>/, "one spline through the stops");
+
+  // A waypoint and the destination are the SAME mark: boot and front_desk,
+  // plus the one stylesheet rule. idle is a stop the line merely crosses, so
+  // it carries none — the owner's invisible waypoint.
+  assert.equal(html.split("route-stop").length - 1, 3);
+  assert.equal(html.split("route-here").length - 1, 2, "an arrow says where you are");
+  assert.match(html, /class="route-here" transform="translate\(-?[\d.]+ -?[\d.]+\) rotate\(-?[\d.]+\)"/, "and it faces the way the line goes");
+
   // Blue, because the voice keeps green, red and yellow for verdicts.
-  assert.match(html, /\.edge\.onroute \{ stroke: #4a90d9/);
+  assert.match(html, /\.route-line \{ fill: none; stroke: #4a90d9/);
 });
 
 test("the preview MOVES NOTHING", () => {

@@ -92,45 +92,69 @@ export interface StateMeta {
  */
 /** THE ROUTE, REDUCED TO ONE DRAWING (owner design 2026-07-29). The walk's
  *  route is a list of qualified hops; a canvas shows one machine. So each
- *  hop is projected onto the machine being VIEWED:
+ *  hop is projected onto the machine being VIEWED, giving the ORDERED stops
+ *  the line runs through:
  *
- *  - both ends land on different states here — the edge between them is on
- *    the route, and the blue line runs along it;
+ *  - both ends land on different states here — both are stops on the way;
  *  - both ends land on the SAME state here — the route is running around
  *    INSIDE it, so that state is a WAYPOINT. Navigation systems put a point
  *    on the line for somewhere you pass through, and a submachine entered
  *    and left again is exactly that. Click it to zoom in.
- *  - neither end is here — the hop belongs to another drawing. */
+ *  - neither end is here — the hop belongs to another drawing.
+ *
+ *  A stop that is not a waypoint carries NO mark. The line runs through its
+ *  anchor all the same, which is what the owner called an invisible waypoint. */
 export function routeOverlay(
   steps: { from: string; to: string }[],
   viewId: string,
   mainId: string,
-): { edges: Set<string>; waypoints: Set<string> } {
+): { waypoints: Set<string>; path: string[] } {
   const prefix = viewId === mainId ? "" : viewId;
   const local = (q: string): string | undefined => {
     if (prefix === "") return q.split("/")[0];
     if (!q.startsWith(`${prefix}/`)) return undefined;
     return q.slice(prefix.length + 1).split("/")[0];
   };
-  const edges = new Set<string>();
   const waypoints = new Set<string>();
+  const path: string[] = [];
+  const visit = (id: string): void => {
+    if (path[path.length - 1] !== id) path.push(id);
+  };
   for (const s of steps) {
     const a = local(s.from);
     const b = local(s.to);
     if (a === undefined || b === undefined) continue;
+    visit(a);
     if (a === b) waypoints.add(a);
-    else edges.add(`${a}->${b}`);
+    else visit(b);
   }
-  return { edges, waypoints };
+  return { waypoints, path };
 }
 
 interface RouteMarks {
-  edges: Set<string>;
   waypoints: Set<string>;
-  /** Where the walk stands, in THIS drawing's terms. A small arrow. */
-  here?: string;
-  /** The destination, if it is in this drawing. A dot the line runs into. */
+  /** The stops in order. The spline runs through their anchors. */
+  path: string[];
+  /** The destination, if it is in this drawing. */
   target?: string;
+}
+
+/** A Catmull-Rom spline through every stop, emitted as cubic Beziers — the
+ *  line BENDS through the stops instead of hinging at them. */
+function splinePath(p: [number, number][]): string {
+  if (p.length < 2) return "";
+  const f = (v: number): string => v.toFixed(1);
+  let d = `M ${f(p[0][0])} ${f(p[0][1])}`;
+  for (let i = 0; i < p.length - 1; i++) {
+    const p0 = p[i - 1] ?? p[i];
+    const p1 = p[i];
+    const p2 = p[i + 1];
+    const p3 = p[i + 2] ?? p2;
+    d += ` C ${f(p1[0] + (p2[0] - p0[0]) / 6)} ${f(p1[1] + (p2[1] - p0[1]) / 6)}`;
+    d += ` ${f(p2[0] - (p3[0] - p1[0]) / 6)} ${f(p2[1] - (p3[1] - p1[1]) / 6)}`;
+    d += ` ${f(p2[0])} ${f(p2[1])}`;
+  }
+  return d;
 }
 
 function machineSvg(source: CanvasData, activeIds: Set<string>, doneIds: Set<string>, subIds: Set<string>, meta: Record<string, StateMeta>, route?: RouteMarks): string {
@@ -142,6 +166,11 @@ function machineSvg(source: CanvasData, activeIds: Set<string>, doneIds: Set<str
   const maxX = Math.max(...nodes.map((n) => n.x + n.width)) + pad;
   const maxY = Math.max(...nodes.map((n) => n.y + n.height)) + pad;
   const byId = new Map(nodes.map((n) => [n.id, n]));
+  const nodeOfState = new Map<string, (typeof nodes)[number]>();
+  for (const n of nodes) {
+    const s = stateIdOf(n);
+    if (s !== undefined) nodeOfState.set(s, n);
+  }
   const parts: string[] = [];
 
   // Groups first — presentation only, drawn behind everything.
@@ -162,13 +191,7 @@ function machineSvg(source: CanvasData, activeIds: Set<string>, doneIds: Set<str
     // A double-headed arrow is one edge meaning both ways, so it draws that
     // way too — the marker already orients itself at a start.
     const bothWays = (edge as { fromEnd?: string }).fromEnd === "arrow";
-    // THE BLUE LINE RUNS ALONG THE DRAWN EDGES (owner ruling 2026-07-29),
-    // never point to point. A line that took a shortcut would cross states
-    // the walk never enters, and stop being a picture of the machine.
-    const aId = stateIdOf(a);
-    const bId = stateIdOf(b);
-    const onRoute = aId !== undefined && bId !== undefined && route?.edges.has(`${aId}->${bId}`) === true;
-    parts.push(`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" class="edge${onRoute ? " onroute" : ""}"${bothWays ? ' marker-start="url(#arrow)"' : ""} marker-end="url(#arrow)"/>`);
+    parts.push(`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" class="edge"${bothWays ? ' marker-start="url(#arrow)"' : ""} marker-end="url(#arrow)"/>`);
     if (edge.label !== undefined && edge.label !== "") {
       parts.push(`<text x="${(x1 + x2) / 2}" y="${(y1 + y2) / 2 - 8}" class="guard">${esc(edge.label)}</text>`);
     }
@@ -196,22 +219,6 @@ function machineSvg(source: CanvasData, activeIds: Set<string>, doneIds: Set<str
     parts.push(`<text x="${n.x + n.width / 2}" y="${n.y + n.height / 2 + (sub !== undefined ? -6 : 6)}" class="label">${esc(sid)}</text>`);
     if (sub !== undefined) parts.push(`<text x="${n.x + n.width / 2}" y="${n.y + n.height / 2 + 24}" class="sublabel">${esc(sub)}</text>`);
     parts.push("</g>");
-    // THE MAP'S THREE MARKS, all above the node so nothing collides with
-    // the condition buttons on its sides.
-    const mx = n.x + n.width / 2;
-    const my = n.y - 14;
-    if (route?.target === sid) {
-      // THE DESTINATION: a dot the line runs into.
-      parts.push(`<circle cx="${mx}" cy="${my}" r="9" class="route-target"/>`);
-    } else if (route?.waypoints.has(sid) === true) {
-      // A WAYPOINT: passed through, not arrived at. Hollow, so the eye
-      // reads it as a stop on the way rather than an end.
-      parts.push(`<circle cx="${mx}" cy="${my}" r="8" class="route-waypoint"/>`);
-    }
-    if (route?.here === sid) {
-      // YOU ARE HERE: the arrow a map puts under your car.
-      parts.push(`<path d="M ${mx - 9} ${my + 8} L ${mx} ${my - 9} L ${mx + 9} ${my + 8} L ${mx} ${my + 3} Z" class="route-here"/>`);
-    }
     // Condition buttons ride the node's edges: enter on the LEFT (where the
     // arrow comes in), leave on the RIGHT (in front of the arrow out).
     const mt = meta[sid];
@@ -224,6 +231,35 @@ function machineSvg(source: CanvasData, activeIds: Set<string>, doneIds: Set<str
         parts.push(`<g class="clickable cond ${mt.exit_met ? "met" : "unmet"}" data-detail="cond:${esc(sid)}"><circle cx="${n.x + n.width}" cy="${cy}" r="18"/><text x="${n.x + n.width}" y="${cy + 7}" class="cond-label">${mt.exit_met ? "✓" : "!"}</text></g>`);
       }
     }
+  }
+
+  // THE ROUTE IS DRAWN OVER THE NODES (owner ruling 2026-07-29), reversing
+  // the along-the-edges ruling of the same day. Riding the edges read as the
+  // graph highlighting itself; a navigation system lays its line ON the map.
+  // It is pushed LAST so it covers the boxes, exactly as a route does.
+  //
+  // ARRIVED MEANS CLEAR: with fewer than two stops there is no way left to
+  // show, so neither line nor arrow is drawn.
+  const stops: { id: string; cx: number; cy: number }[] = [];
+  for (const id of route?.path ?? []) {
+    const n = nodeOfState.get(id);
+    // The anchor: centred across the node and a quarter down — the band
+    // between its top edge and its title, so the line never crosses the words.
+    if (n !== undefined) stops.push({ id, cx: n.x + n.width / 2, cy: n.y + n.height / 4 });
+  }
+  if (stops.length >= 2) {
+    parts.push(`<path d="${splinePath(stops.map((s) => [s.cx, s.cy]))}" class="route-line"/>`);
+    // A waypoint and the destination are the SAME filled dot. The owner's
+    // sketch drew the destination as a ring; that was the pen, not the intent.
+    for (const s of stops) {
+      if (route?.target === s.id || route?.waypoints.has(s.id) === true) {
+        parts.push(`<circle cx="${s.cx}" cy="${s.cy}" r="8" class="route-stop"/>`);
+      }
+    }
+    // YOU ARE HERE: the arrow a map puts under your car, turned to face the
+    // way the line is going.
+    const heading = (Math.atan2(stops[1].cy - stops[0].cy, stops[1].cx - stops[0].cx) * 180) / Math.PI + 90;
+    parts.push(`<path d="M 0 -12 L 10 9 L 0 4 L -10 9 Z" class="route-here" transform="translate(${stops[0].cx} ${stops[0].cy}) rotate(${heading.toFixed(1)})"/>`);
   }
 
   return `<svg id="machine-svg" viewBox="${minX} ${minY} ${maxX - minX} ${maxY - minY}">
@@ -420,10 +456,9 @@ const STYLE = `
   .arrowhead { fill: #5b6772; }
   /* THE BLUE LINE. Blue on purpose: the voice reserves green, red and
      yellow for verdicts, and a route is not a verdict. It is a way. */
-  .edge.onroute { stroke: #4a90d9; stroke-width: 5.5; }
-  .route-target { fill: #4a90d9; stroke: #9ecbf2; stroke-width: 2; }
-  .route-waypoint { fill: #14171a; stroke: #4a90d9; stroke-width: 3; }
-  .route-here { fill: #9ecbf2; }
+  .route-line { fill: none; stroke: #4a90d9; stroke-width: 6; stroke-linecap: round; stroke-linejoin: round; }
+  .route-stop { fill: #4a90d9; stroke: #9ecbf2; stroke-width: 2; }
+  .route-here { fill: #4a90d9; stroke: #9ecbf2; stroke-width: 2; }
   .guard { fill: #e8b339; font-size: 20px; text-anchor: middle; }
   .comment { fill: #1c2025; stroke: #2a2f34; }
   .group { fill: #1a1e22; stroke: #333a41; stroke-dasharray: 10 6; stroke-width: 2; }
@@ -1862,15 +1897,14 @@ export function renderMirror(m: MirrorState, widget?: "machine" | "details" | "l
   try {
     const r = m.session.route(m.session.target);
     const mainId = m.session.machine.id;
-    const { edges, waypoints } = routeOverlay(r.steps, decl.id, mainId);
+    const { waypoints, path: hops } = routeOverlay(r.steps, decl.id, mainId);
     const localOf = (q: string): string | undefined => {
       if (decl.id === mainId) return q.split("/")[0];
       return q.startsWith(`${decl.id}/`) ? q.slice(decl.id.length + 1).split("/")[0] : undefined;
     };
     marks = {
-      edges,
       waypoints,
-      ...(localOf(r.from) !== undefined ? { here: localOf(r.from) } : {}),
+      path: hops,
       ...(r.found && localOf(r.target) !== undefined ? { target: localOf(r.target) } : {}),
     };
   } catch { /* no route, no marks - the drawing stands either way */ }
