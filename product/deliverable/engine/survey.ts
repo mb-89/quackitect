@@ -15,17 +15,24 @@ export interface Survey {
   counts: { expeditions: number; iterations: number; notes: number; backlog: number };
   expeditions: { id: string; goal: string }[];
   iterations: { id: string; goal: string }[];
-  notes: { ref: string; at: string; brief: string }[];
-  backlog: { ref: string; ready_when: string; brief: string }[];
+  notes: { ref: string; at: string; text: string }[];
+  backlog: { ref: string; ready_when: string; text: string }[];
 }
 
-const firstLine = (t: string): string => t.split("\n")[0].slice(0, 120);
-
+// IT ANSWERS IN FULL (owner ruling 2026-07-29). Every field used to pass
+// through a first-line-then-120-characters cut. Notes open with a heading
+// line and carry their substance below it, so the survey reliably showed a
+// title and discarded the content — and cut the title mid-word.
+//
+// The tell was ready_when: the field saying WHEN a note comes back was
+// complete while the field saying WHAT it is was not. Both hands weigh the
+// inbox through this call and nothing else can read a note, so a cut here
+// is the whole view.
 export function survey(projectRoot: string): Survey {
-  const exps = expList(projectRoot).filter((e) => e.open).map((e) => ({ id: e.id, goal: firstLine(String((readRecord(projectRoot, e) ?? {}).goal ?? "")) }));
-  const its = itList(projectRoot).filter((i) => i.open).map((i) => ({ id: i.id, goal: firstLine(String((readItRecord(projectRoot, i) ?? {}).goal ?? "")) }));
-  const notes = pendingNotes(seDir(projectRoot)).map((n) => ({ ref: n.ref, at: n.at, brief: firstLine(n.text) }));
-  const backlog = backlogNotes(seDir(projectRoot)).map((n) => ({ ref: n.ref, ready_when: n.drained?.where ?? "", brief: firstLine(n.text) }));
+  const exps = expList(projectRoot).filter((e) => e.open).map((e) => ({ id: e.id, goal: String((readRecord(projectRoot, e) ?? {}).goal ?? "") }));
+  const its = itList(projectRoot).filter((i) => i.open).map((i) => ({ id: i.id, goal: String((readItRecord(projectRoot, i) ?? {}).goal ?? "") }));
+  const notes = pendingNotes(seDir(projectRoot)).map((n) => ({ ref: n.ref, at: n.at, text: n.text }));
+  const backlog = backlogNotes(seDir(projectRoot)).map((n) => ({ ref: n.ref, ready_when: n.drained?.where ?? "", text: n.text }));
   return {
     counts: { expeditions: exps.length, iterations: its.length, notes: notes.length, backlog: backlog.length },
     expeditions: exps,

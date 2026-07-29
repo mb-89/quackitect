@@ -157,7 +157,10 @@ export function expeditionTools(session: Session): ToolDef[] {
 // state at the project root, everything else follows the walk into its bound
 // worktree (Session.laneRoot, owner ruling 2026-07-28). Callers that act on no
 // single path — search, glob, run, git — pass nothing and get the work root.
-export function coreTools(rootOf: (rel?: string) => string, projectRoot: string): ToolDef[] {
+// judgmentDrainAllowed answers ONE question for se_note_drain: may this
+// caller park a note or carry it, or only record the mechanical verdicts.
+// It is a thunk because the walk moves under a built tool list.
+export function coreTools(rootOf: (rel?: string) => string, projectRoot: string, judgmentDrainAllowed: () => boolean = () => true): ToolDef[] {
   return [
     {
       name: "se_file_read",
@@ -493,7 +496,7 @@ export function coreTools(rootOf: (rel?: string) => string, projectRoot: string)
     {
       name: "se_note_drain",
       title: "se.note.drain",
-      description: "The retro's mechanical half: mark a note drained with its disposition (done | obsolete | carried | backlog — where? names the follow-up home). backlog PARKS the note: where is REQUIRED as its 'ready when …' re-entry condition, and a later migration re-drains it. Drained notes leave the inbox count and the pending feed. An unknown ref is refused.",
+      description: "Mark a note drained with its disposition. done | obsolete are MECHANICAL — superseded, already built, ruled on since — and drain wherever this tool is legal, the front desk included. carried | backlog are JUDGMENT and belong to the retro, which is the only place with the whole picture. backlog PARKS the note: where is REQUIRED as its 'ready when …' re-entry condition, and a later migration re-drains it. Drained notes leave the inbox count and the pending feed. An unknown ref is refused.",
       inputSchema: {
         type: "object",
         properties: {
@@ -503,7 +506,7 @@ export function coreTools(rootOf: (rel?: string) => string, projectRoot: string)
         },
         required: ["ref", "disposition"],
       },
-      handler: (args) => drainNote(seDir(projectRoot), String(args.ref), String(args.disposition), args.where === undefined ? undefined : String(args.where)),
+      handler: (args) => drainNote(seDir(projectRoot), String(args.ref), String(args.disposition), args.where === undefined ? undefined : String(args.where), judgmentDrainAllowed()),
     },
     {
       name: "se_survey",
@@ -570,7 +573,7 @@ function refuseProseWall(tool: string, field: string, text: string): void {
 
 export function buildServer(root: string, session = new Session(root), tollOpts: { windowMs?: number; now?: () => number } = {}): McpServer {
   // (a fresh Session fails fast on a misdrawn machine)
-  const tools = [...sessionTools(session), ...expeditionTools(session), ...coreTools((rel) => session.laneRoot(rel), root)];
+  const tools = [...sessionTools(session), ...expeditionTools(session), ...coreTools((rel) => session.laneRoot(rel), root, () => session.inRetro())];
   // THE UPDATE FIELD — every lane tool accepts it: a decision-graph op
   // riding the call. Declared on every schema so harnesses send it as an
   // object (an undeclared property arrives as a JSON string — v2 lesson).
