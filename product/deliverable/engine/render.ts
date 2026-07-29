@@ -137,6 +137,8 @@ interface RouteMarks {
   path: string[];
   /** The destination, if it is in this drawing. */
   target?: string;
+  /** The hop the walk cannot pass, and why. Drawn as a road closure. */
+  blocked?: { at: string; why: string };
 }
 
 /** A Catmull-Rom spline through every stop, emitted as cubic Beziers — the
@@ -248,13 +250,33 @@ function machineSvg(source: CanvasData, activeIds: Set<string>, doneIds: Set<str
     if (n !== undefined) stops.push({ id, cx: n.x + n.width / 2, cy: n.y + n.height / 4 });
   }
   if (stops.length >= 2) {
-    parts.push(`<path d="${splinePath(stops.map((s) => [s.cx, s.cy]))}" class="route-line"/>`);
+    // A ROAD CLOSURE (owner ruling 2026-07-29). The route already knows the hop
+    // the walk cannot pass — usually a state sitting above the autonomy slider.
+    // Drawn as one unbroken line the map says the whole way is open, which is
+    // the one moment it lies. So the line runs normally up to the closure and
+    // FADES past it: the way exists, it is shut.
+    const xy = (s: { cx: number; cy: number }): [number, number] => [s.cx, s.cy];
+    const shut = route?.blocked === undefined ? -1 : stops.findIndex((s) => s.id === route.blocked?.at);
+    const open = shut > 0 ? stops.slice(0, shut) : stops;
+    const past = shut > 0 ? stops.slice(shut - 1) : [];
+    if (open.length >= 2) parts.push(`<path d="${splinePath(open.map(xy))}" class="route-line"/>`);
+    if (past.length >= 2) parts.push(`<path d="${splinePath(past.map(xy))}" class="route-line shut"/>`);
     // A waypoint and the destination are the SAME filled dot. The owner's
     // sketch drew the destination as a ring; that was the pen, not the intent.
-    for (const s of stops) {
+    for (const [i, s] of stops.entries()) {
       if (route?.target === s.id || route?.waypoints.has(s.id) === true) {
-        parts.push(`<circle cx="${s.cx}" cy="${s.cy}" r="8" class="route-stop"/>`);
+        parts.push(`<circle cx="${s.cx}" cy="${s.cy}" r="8" class="route-stop${shut > 0 && i >= shut ? " shut" : ""}"/>`);
       }
+    }
+    // THE BARRIER, laid ACROSS the line where it shuts, carrying the reason.
+    if (shut > 0) {
+      const a = stops[shut - 1];
+      const b = stops[shut];
+      const across = (Math.atan2(b.cy - a.cy, b.cx - a.cx) * 180) / Math.PI;
+      parts.push(
+        `<g class="clickable" data-detail="state:${esc(b.id)}"><title>${esc(route?.blocked?.why ?? "")}</title>` +
+          `<line x1="0" y1="-15" x2="0" y2="15" class="route-shut" transform="translate(${b.cx} ${b.cy}) rotate(${across.toFixed(1)})"/></g>`,
+      );
     }
     // YOU ARE HERE: the arrow a map puts under your car, turned to face the
     // way the line is going.
@@ -458,7 +480,13 @@ const STYLE = `
   /* THE BLUE LINE. Blue on purpose: the voice reserves green, red and
      yellow for verdicts, and a route is not a verdict. It is a way. */
   .route-line { fill: none; stroke: #4a90d9; stroke-width: 6; stroke-linecap: round; stroke-linejoin: round; }
+  /* Past a closure the way is FADED, never hidden: it exists, it is shut.
+     The barrier itself is yellow, because yellow is attention and a shut
+     road wants the reader's hand on the slider. */
+  .route-line.shut { opacity: .28; }
+  .route-shut { stroke: #e8b339; stroke-width: 7; stroke-linecap: round; }
   .route-stop { fill: #4a90d9; stroke: #9ecbf2; stroke-width: 2; }
+  .route-stop.shut { opacity: .28; }
   .route-here { fill: #4a90d9; stroke: #9ecbf2; stroke-width: 2; }
   .guard { fill: #e8b339; font-size: 20px; text-anchor: middle; }
   .comment { fill: #1c2025; stroke: #2a2f34; }
@@ -1914,10 +1942,12 @@ export function renderMirror(m: MirrorState, widget?: "machine" | "details" | "l
       if (decl.id === mainId) return q.split("/")[0];
       return q.startsWith(`${decl.id}/`) ? q.slice(decl.id.length + 1).split("/")[0] : undefined;
     };
+    const shutAt = r.stops_at === undefined ? undefined : localOf(r.stops_at.at);
     marks = {
       waypoints,
       path: hops,
       ...(r.found && localOf(r.target) !== undefined ? { target: localOf(r.target) } : {}),
+      ...(shutAt !== undefined && r.stops_at !== undefined ? { blocked: { at: shutAt, why: r.stops_at.why } } : {}),
     };
   } catch { /* no route, no marks - the drawing stands either way */ }
   const svg = machineSvg(canvas, leafActive, done, subIds, meta, marks);

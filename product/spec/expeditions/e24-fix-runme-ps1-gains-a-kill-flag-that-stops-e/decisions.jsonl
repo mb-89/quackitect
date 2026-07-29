@@ -91,3 +91,12 @@
 {"ts":"2026-07-29T16:41:33.489Z","op":"update","visit":"expeditions/e24@0","node":"d50","brief":"colon-space in frontmatter prose broke the YAML"}
 {"ts":"2026-07-29T16:41:38.127Z","op":"update","visit":"expeditions/e24@0","node":"d51","brief":"re-running after the frontmatter fix"}
 {"ts":"2026-07-29T16:42:25.660Z","op":"update","visit":"expeditions/e24@0","node":"d52","brief":"staging the rename"}
+{"ts":"2026-07-29T16:42:36.665Z","op":"done","visit":"expeditions/e24@0","node":"d10","brief":"overhaul renamed and widened across state, drawing and method"}
+{"ts":"2026-07-29T16:42:42.763Z","op":"update","visit":"expeditions/e24@0","node":"d53","brief":"landing four commits on trunk"}
+{"ts":"2026-07-29T16:43:07.827Z","op":"update","visit":"expeditions/e24@0","node":"d54","brief":"pausing out of e24 rather than escaping"}
+{"ts":"2026-07-29T16:59:23.603Z","op":"update","visit":"expeditions/e24@1","node":"d96","brief":"finding how a blocked hop is reported"}
+{"ts":"2026-07-29T17:00:39.381Z","op":"update","visit":"expeditions/e24@1","node":"d97","brief":"line fades past the closure, barrier carries the reason"}
+{"ts":"2026-07-29T17:00:46.761Z","op":"update","visit":"expeditions/e24@1","node":"d98","brief":"testing the closure render"}
+{"ts":"2026-07-29T17:02:02.927Z","op":"update","visit":"expeditions/e24@1","node":"d99","brief":"a substring count over CSS and markup was brittle"}
+{"ts":"2026-07-29T17:02:07.203Z","op":"update","visit":"expeditions/e24@1","node":"d100","brief":"re-running with the element-count fix"}
+{"ts":"2026-07-29T17:03:27.215Z","op":"update","visit":"expeditions/e24@1","node":"d101","brief":"staging the road closure"}
