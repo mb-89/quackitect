@@ -5,15 +5,13 @@ statement: How to write code and record work. The universal rules; the project's
 
 # software — how you write it
 
-These rules bind every artifact you build. They are separate from how you
-TALK about it, which is voice.md, and from how you build an INTERFACE,
-which is ux.md.
+These rules bind every artifact you build.
 
-The project's own engineering rulings — commit what is on disk, data is not
-code, every switch appears in help, the linter law, churn is acceptable,
-the rule of cool, method tooling lives in the lane — live in
-`product/guidance/method/engineering.md`. Read that when you touch those
-subjects. This document carries what binds everything.
+How you TALK about it is voice.md. How you build an INTERFACE is ux.md.
+
+This document carries what binds every piece of work. The project's own
+engineering rulings live in `product/guidance/method/engineering.md`. Read
+that one when you touch what it covers.
 
 ## Do not repeat (DRY)
 

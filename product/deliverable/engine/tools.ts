@@ -437,16 +437,39 @@ export function coreTools(rootOf: (rel?: string) => string, projectRoot: string,
       name: "se_lint",
       title: "se.lint",
       description:
-        "The VOICE LINT, on demand: mechanical prose checks (walls of text, long sentences, comma chains, missing pyramid structure) over a text or a markdown file. Rule parameters are DATA (machines/lint/voice-lint.md) - edit thresholds without recompiling. Catches FORM, never meaning. Self-check your outputs before they ship; pruning sweeps it over everything later.",
+        "The VOICE LINT, on demand: mechanical prose checks (walls of text, long sentences, comma chains, dash chains, missing pyramid structure) over a text, a markdown file, or a whole GLOB of them. Rule parameters are DATA (machines/lint/voice-lint.md) - edit thresholds without recompiling. Catches FORM, never meaning. Self-check your outputs before they ship; sweep a tree with glob before it ships.",
       inputSchema: {
         type: "object",
         properties: {
           text: { type: "string", description: "prose to lint, verbatim" },
           path: { type: "string", description: "a root-relative .md file to lint instead" },
+          glob: { type: "string", description: "sweep every markdown file matching this glob, e.g. product/guidance/**/*.md" },
         },
       },
       handler: (args) => {
         const root = rootOf();
+        // THE SWEEP. Linting one file at a time is why nothing was ever
+        // linted: the tool could only be pointed at prose somebody already
+        // suspected. Only files WITH findings come back, so a clean tree
+        // answers small, and anything dropped is named rather than implied.
+        if (args.glob !== undefined) {
+          const g = fileGlob(root, String(args.glob));
+          const md = g.files.filter((f) => f.endsWith(".md"));
+          const files = md
+            .map((p) => ({ path: p, findings: lintProse(root, readFileSync(resolveInRoot(root, p, "engine/tools.ts se_lint"), "utf8")) }))
+            .map((f) => ({ path: f.path, count: f.findings.length, findings: f.findings }))
+            .filter((f) => f.count > 0);
+          return {
+            glob: String(args.glob),
+            swept: md.length,
+            ...(md.length < g.files.length ? { skipped_not_markdown: g.files.length - md.length } : {}),
+            ...(g.truncated ? { truncated: true, note: "the glob hit its cap - narrow it and sweep the rest" } : {}),
+            clean: md.length - files.length,
+            files,
+            count: files.reduce((n, f) => n + f.count, 0),
+            config: LINT_CONFIG,
+          };
+        }
         if (args.path !== undefined) {
           const p = String(args.path);
           if (!p.endsWith(".md")) {
@@ -468,9 +491,9 @@ export function coreTools(rootOf: (rel?: string) => string, projectRoot: string,
         }
         throw new Rejection({
           clause: CLAUSES.REQUIRED_ARGS,
-          expected: "text OR path",
-          got: "neither",
-          remedy: { tool: "se_lint", args: { text: "<prose>" } },
+          expected: "text, path OR glob",
+          got: "none of them",
+          remedy: { tool: "se_lint", args: { glob: "product/guidance/**/*.md" }, note: "text lints one block, path one file, glob a whole tree" },
           source: "engine/tools.ts se_lint",
         });
       },

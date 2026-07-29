@@ -2,6 +2,7 @@
 long_sentence_words: 28
 wall_paragraph_lines: 8
 comma_chain_items: 3
+dash_chain_items: 3
 pyramid_paragraphs: 5
 ---
 
@@ -17,5 +18,8 @@ in engine/lint.ts; only parameters belong here.
   are a wall.
 - `comma_chain_items` — a sentence chaining more than this many
   comma-separated parts is an unrendered list.
+- `dash_chain_items` — a sentence hinged on more than this many
+  dash-separated parts is a run-on. One dash sets off an aside and is
+  never flagged.
 - `pyramid_paragraphs` — a document with this many paragraphs and no
   headings wants the pyramid shape.

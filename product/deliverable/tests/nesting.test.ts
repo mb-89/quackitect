@@ -196,12 +196,43 @@ test("the voice lint: walls, sentences, chains and the pyramid - thresholds are 
   assert.ok(lintProse(root, wall).some((f) => f.rule === "wall"), "nine unbroken lines are a wall");
   assert.ok(lintProse(root, `${"word ".repeat(30)}end.`).some((f) => f.rule === "long-sentence"));
   assert.ok(lintProse(root, "we need alpha, beta, gamma, delta and epsilon.").some((f) => f.rule === "comma-chain"));
+  // DASH CHAINS, not dashes. One dash sets off an aside and is house style
+  // here; flagging every one would be an advisory nobody heeds.
+  assert.ok(lintProse(root, "we need alpha — then beta — then gamma — then delta.").some((f) => f.rule === "dash-chain"));
+  assert.ok(!lintProse(root, "we need alpha — the obvious one — before anything else.").some((f) => f.rule === "dash-chain"), "a single aside is not a chain");
   const five = Array.from({ length: 5 }, (_, i) => `paragraph ${i}.`).join("\n\n");
   assert.ok(lintProse(root, five).some((f) => f.rule === "pyramid"), "five headingless paragraphs want the pyramid");
   assert.equal(lintProse(root, "# Heading\n\nshort and clean.").length, 0, "clean prose passes");
   // DATA, not code: raise the threshold in the config - the wall passes.
   writeFileSync(join(root, "product", "deliverable", "machines", "lint", "voice-lint.md"), "---\nwall_paragraph_lines: 99\n---\n", "utf8");
   assert.ok(!lintProse(root, wall).some((f) => f.rule === "wall"), "the edited threshold applies without a rebuild");
+});
+
+// THE SWEEP. Linting one file per call is why nothing was ever linted: the
+// tool could only be aimed at prose somebody already suspected.
+test("the voice lint sweeps a whole tree and reports what it left out", async () => {
+  const root = freshRoot();
+  const server = await bootedServer(root);
+  const { writeFileSync, mkdirSync } = await import("node:fs");
+  const dir = join(root, "product", "guidance", "sweeptest");
+  mkdirSync(dir, { recursive: true });
+  writeFileSync(join(dir, "dirty.md"), "we need alpha, beta, gamma, delta and epsilon.\n", "utf8");
+  writeFileSync(join(dir, "clean.md"), "# Heading\n\nshort and clean.\n", "utf8");
+  writeFileSync(join(dir, "notprose.txt"), "never read by a prose lint\n", "utf8");
+  const swept = await call(server, "se_lint", { glob: "product/guidance/sweeptest/*" });
+  assert.equal(swept.isError, false, JSON.stringify(swept.body));
+  assert.equal(swept.body.swept, 2, "both markdown files were read");
+  assert.equal(swept.body.skipped_not_markdown, 1, "and the one it skipped is named, not implied");
+  assert.equal(swept.body.clean, 1, "the clean file is counted");
+  const files = swept.body.files as { path: string; count: number }[];
+  assert.equal(files.length, 1, "only files WITH findings come back");
+  assert.match(files[0].path, /dirty\.md$/);
+  // Neither of the older forms is disturbed by the new one.
+  const one = await call(server, "se_lint", { text: "alpha, beta, gamma, delta and epsilon." });
+  assert.equal(one.body.count, 1, "a single block still lints");
+  const none = await call(server, "se_lint", {});
+  assert.equal(none.isError, true);
+  assert.match(String(none.body.expected), /glob/, "and the refusal offers the sweep");
 });
 
 test("se_answer records an aq entry and the feed types it aq", async () => {
