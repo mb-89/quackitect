@@ -32,6 +32,13 @@ The trigger is a NOTE carrying "needs retro":
    drains. Once you have drained, the phrase points at your own retro
    and the window is empty. The boundary must be taken while it still
    names the PREVIOUS retro.
+   AND THE DESK DRAINS TOO. Since e22, done and obsolete drain wherever
+   the tool is legal, the front desk included. So "last_retro" can
+   already name a desk drain from an hour ago, and the window it hands
+   you is far too short. CHECK IT rather than trusting it. Query the
+   drains, look at the newest one, and ask whether it happened in a
+   retro. If it did not, take the newest drain BEFORE it and pass that
+   timestamp explicitly from then on.
 2. Field feedback. Ask the owner what came back from the
    field since the last look. Capture every answer as a note.
 3. Drain the notes inbox. Walk EVERY pending note once. Disposition each

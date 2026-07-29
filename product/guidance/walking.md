@@ -64,6 +64,13 @@ Narration rides the walk (the unified log + the decision graph):
     open. With nothing open there is nothing to attach to, and a bare
     update is exactly right. The open node map rides home on every call,
     so naming one costs a glance.
+- THE BRIEF IS ONE SHORT LINE. Ninety characters at most. It may not
+  chain three or more separator-joined parts, because a chain is an
+  unrendered list. The engine refuses one (SE-C-120). The rule binds
+  PLAN ITEMS exactly as it binds briefs.
+  THIS IS THE LANE'S MOST-HIT REFUSAL. Ten of the thirteen update
+  failures on 2026-07-29 were this one, across two different sessions.
+  If a brief wants commas, it wanted to be a plan.
 - Everything started gets resolved. Abandoning is legal. Abandoning
   silently is not — the graph shows the drop.
 - The TOLL: after five silent minutes the next call carries a warning.
