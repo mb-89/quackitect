@@ -85,3 +85,5 @@
 {"ts":"2026-07-29T11:06:43.761Z","op":"update","visit":"expeditions/e21@2","node":"d91","brief":"resolving the canvas with the owner's geometry plus the pruning door"}
 {"ts":"2026-07-29T11:06:47.179Z","op":"update","visit":"expeditions/e21@2","node":"d92","brief":"verifying the merged canvas compiles and the suite holds"}
 {"ts":"2026-07-29T11:07:12.202Z","op":"update","visit":"expeditions/e21@2","node":"d93","brief":"committing the resolved merge"}
+{"ts":"2026-07-29T11:07:17.367Z","op":"update","visit":"expeditions/e21@2","node":"d94","brief":"re-entering the leave gate after the merge"}
+{"ts":"2026-07-29T11:07:20.855Z","op":"update","visit":"expeditions/e21-leave@0","node":"d95","brief":"applying e21 to trunk"}
