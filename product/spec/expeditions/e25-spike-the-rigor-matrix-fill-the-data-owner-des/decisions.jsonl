@@ -1,0 +1,56 @@
+{"ts":"2026-07-29T18:38:56.972Z","op":"plan","visit":"expeditions/e25@0","parent":null,"nodes":[{"id":"d28","brief":"Extract the v2 machine states and dependencies"},{"id":"d29","brief":"Decide the matrix home folder and frontmatter vocabulary"},{"id":"d30","brief":"Write the row state files with sparse M-numbering"},{"id":"d31","brief":"Report the row skeleton to the owner"}]}
+{"ts":"2026-07-29T18:39:07.747Z","op":"update","visit":"expeditions/e25@0","node":"d32","brief":"Reading the v2 systematic canvas for edges and parallel branches"}
+{"ts":"2026-07-29T18:40:29.776Z","op":"done","visit":"expeditions/e25@0","node":"d28","brief":"48 states extracted with edges and the three sub-machine seams"}
+{"ts":"2026-07-29T18:40:49.831Z","op":"update","visit":"expeditions/e25@0","node":"d33","brief":"Reading the remaining v2 state notes in batches"}
+{"ts":"2026-07-29T18:41:06.552Z","op":"update","visit":"expeditions/e25@0","node":"d34","brief":"Final batch of v2 state notes — M5 through M9"}
+{"ts":"2026-07-29T18:42:47.513Z","op":"done","visit":"expeditions/e25@0","node":"d29","brief":"Home is machines/matrix with rows and cells folders"}
+{"ts":"2026-07-29T18:43:34.283Z","op":"update","visit":"expeditions/e25@0","node":"d35","brief":"Writing rows M2 through M4"}
+{"ts":"2026-07-29T18:44:22.106Z","op":"update","visit":"expeditions/e25@0","node":"d36","brief":"Writing rows M5 through M7"}
+{"ts":"2026-07-29T18:45:14.177Z","op":"update","visit":"expeditions/e25@0","node":"d37","brief":"Writing rows M8 and M9 — the last batch"}
+{"ts":"2026-07-29T18:45:44.168Z","op":"done","visit":"expeditions/e25@0","node":"d30","brief":"All 48 rows written with sparse numbering and parallel letters"}
+{"ts":"2026-07-29T18:47:05.311Z","op":"plan","visit":"expeditions/e25@0","parent":null,"nodes":[{"id":"d38","brief":"Write the patch column cells"},{"id":"d39","brief":"Write the minor column cells"},{"id":"d40","brief":"Write the major column cells"},{"id":"d41","brief":"Write the product column cells"},{"id":"d42","brief":"Write the specification column cells"},{"id":"d43","brief":"Commit the cells and write the leave report"}]}
+{"ts":"2026-07-29T18:47:11.109Z","op":"done","visit":"expeditions/e25@0","node":"d31","brief":"Skeleton reported in chat with the commit reference"}
+{"ts":"2026-07-29T18:47:50.662Z","op":"update","visit":"expeditions/e25@0","node":"d44","brief":"Patch cells for M3 through M9"}
+{"ts":"2026-07-29T18:48:28.258Z","op":"update","visit":"expeditions/e25@0","node":"d45","brief":"Patch cells for the delivery half — M7 to M9"}
+{"ts":"2026-07-29T18:49:06.995Z","op":"done","visit":"expeditions/e25@0","node":"d38","brief":"Patch column filled — 48 cells with escalation tripwires"}
+{"ts":"2026-07-29T18:49:44.555Z","op":"update","visit":"expeditions/e25@0","node":"d46","brief":"Minor cells for M3 through M6"}
+{"ts":"2026-07-29T18:50:22.882Z","op":"update","visit":"expeditions/e25@0","node":"d47","brief":"Minor cells for M6 through M9"}
+{"ts":"2026-07-29T18:51:08.638Z","op":"done","visit":"expeditions/e25@0","node":"d39","brief":"Minor column filled — the M4 tripwire carries the escalation"}
+{"ts":"2026-07-29T18:51:49.141Z","op":"update","visit":"expeditions/e25@0","node":"d48","brief":"Major cells for M3 through M9"}
+{"ts":"2026-07-29T18:52:26.362Z","op":"update","visit":"expeditions/e25@0","node":"d49","brief":"Major cells for the delivery half"}
+{"ts":"2026-07-29T18:53:04.896Z","op":"done","visit":"expeditions/e25@0","node":"d40","brief":"Major column filled — full walk over the changed cone"}
+{"ts":"2026-07-29T18:53:50.976Z","op":"update","visit":"expeditions/e25@0","node":"d50","brief":"Product cells for M4 through M6"}
+{"ts":"2026-07-29T18:54:28.415Z","op":"update","visit":"expeditions/e25@0","node":"d51","brief":"Product cells for the delivery half"}
+{"ts":"2026-07-29T18:55:04.120Z","op":"done","visit":"expeditions/e25@0","node":"d41","brief":"Product column filled — standing artifacts named per row"}
+{"ts":"2026-07-29T18:55:47.631Z","op":"update","visit":"expeditions/e25@0","node":"d52","brief":"Specification cells for M3 through M9"}
+{"ts":"2026-07-29T18:56:23.659Z","op":"update","visit":"expeditions/e25@0","node":"d53","brief":"Final specification cells — delivery and ship"}
+{"ts":"2026-07-29T18:57:01.621Z","op":"done","visit":"expeditions/e25@0","node":"d42","brief":"Specification column filled — every row's document form named"}
+{"ts":"2026-07-29T18:57:18.247Z","op":"update","visit":"expeditions/e25@0","node":"d54","brief":"Committing the 240 cells"}
+{"ts":"2026-07-29T18:57:24.570Z","op":"done","visit":"expeditions/e25@0","node":"d43","brief":"Cells committed on the expedition branch — e25 stays open for review"}
+{"ts":"2026-07-29T19:00:30.232Z","op":"plan","visit":"expeditions/e25@0","parent":null,"nodes":[{"id":"d55","brief":"Verify Bases syntax against docs and v1 examples"},{"id":"d56","brief":"Give each row a stable name field as the join key"},{"id":"d57","brief":"Write the matrix.base grid and strike-review views"},{"id":"d58","brief":"Harvest the meth cards the rows link to"}]}
+{"ts":"2026-07-29T19:00:40.446Z","op":"update","visit":"expeditions/e25@0","node":"d59","brief":"Reading v1 base files for the house style"}
+{"ts":"2026-07-29T19:00:50.496Z","op":"update","visit":"expeditions/e25@0","node":"d60","brief":"Fetching the Bases function reference from the help repo"}
+{"ts":"2026-07-29T19:02:05.258Z","op":"done","visit":"expeditions/e25@0","node":"d55","brief":"Bases syntax verified: link plus asFile properties makes the pivot native"}
+{"ts":"2026-07-29T19:02:19.058Z","op":"done","visit":"expeditions/e25@0","node":"d56","brief":"All 48 rows carry their stable name as the join key"}
+{"ts":"2026-07-29T19:02:25.070Z","op":"done","visit":"expeditions/e25@0","node":"d57","brief":"matrix.base written with four views over rows and cells"}
+{"ts":"2026-07-29T19:02:51.026Z","op":"update","visit":"expeditions/e25@0","node":"d61","brief":"Landing the matrix on trunk so the vault can render it"}
+{"ts":"2026-07-29T19:03:27.796Z","op":"update","visit":"expeditions/e25@0","node":"d62","brief":"Reading the 41 v2 method cards in batches"}
+{"ts":"2026-07-29T19:03:43.623Z","op":"update","visit":"expeditions/e25@0","node":"d63","brief":"Reading method cards batch two"}
+{"ts":"2026-07-29T19:03:59.336Z","op":"update","visit":"expeditions/e25@0","node":"d64","brief":"Reading method cards final batch"}
+{"ts":"2026-07-29T19:04:34.695Z","op":"update","visit":"expeditions/e25@0","node":"d65","brief":"Recovering the truncated review-rounds card via git show"}
+{"ts":"2026-07-29T19:04:47.995Z","op":"update","visit":"expeditions/e25@0","node":"d66","brief":"Writing the harvested cards batch one"}
+{"ts":"2026-07-29T19:05:53.631Z","op":"update","visit":"expeditions/e25@0","node":"d67","brief":"Writing the harvested cards batch two"}
+{"ts":"2026-07-29T19:06:57.169Z","op":"update","visit":"expeditions/e25@0","node":"d68","brief":"Writing the harvested cards final batch"}
+{"ts":"2026-07-29T19:08:06.853Z","op":"update","visit":"expeditions/e25@0","node":"d69","brief":"Committing the harvested method cards"}
+{"ts":"2026-07-29T19:08:12.272Z","op":"done","visit":"expeditions/e25@0","node":"d58","brief":"Forty cards harvested with review-rounds restructured into a body"}
+{"ts":"2026-07-29T19:08:16.685Z","op":"update","visit":"expeditions/e25@0","node":"d70","brief":"Landing the method cards on trunk"}
+{"ts":"2026-07-29T19:11:20.541Z","op":"plan","visit":"expeditions/e25@0","parent":null,"nodes":[{"id":"d71","brief":"Read the machine kernel's StateDecl contract"},{"id":"d72","brief":"Write the matrix reader with completeness refusals"},{"id":"d73","brief":"Write the column compiler with dependency contraction"},{"id":"d74","brief":"Test-first: author the matrix tests and observe red"},{"id":"d75","brief":"Run the suite green and land"}]}
+{"ts":"2026-07-29T19:11:25.137Z","op":"update","visit":"expeditions/e25@0","node":"d76","brief":"Reading the kernel's declaration types"}
+{"ts":"2026-07-29T19:12:02.771Z","op":"done","visit":"expeditions/e25@0","node":"d71","brief":"Kernel contract read: forward edges with roles and guards"}
+{"ts":"2026-07-29T19:12:44.331Z","op":"update","visit":"expeditions/e25@0","node":"d77","brief":"Battery command and loop guard become row data"}
+{"ts":"2026-07-29T19:13:13.465Z","op":"update","visit":"expeditions/e25@0","node":"d78","brief":"Matrix tests authored — observing red next"}
+{"ts":"2026-07-29T19:13:23.081Z","op":"update","visit":"expeditions/e25@0","node":"d79","brief":"Running the matrix tests to observe red"}
+{"ts":"2026-07-29T19:14:40.178Z","op":"update","visit":"expeditions/e25@0","node":"d80","brief":"Reader and compiler written in one module"}
+{"ts":"2026-07-29T19:14:46.019Z","op":"update","visit":"expeditions/e25@0","node":"d81","brief":"Running the matrix tests against the new module"}
+{"ts":"2026-07-29T19:14:54.607Z","op":"done","visit":"expeditions/e25@0","node":"d74","brief":"Red observed, then eight matrix tests green"}
+{"ts":"2026-07-29T19:16:07.941Z","op":"done","visit":"expeditions/e25@0","node":"d72","brief":"Reader lands with the explicit-N/A refusal"}

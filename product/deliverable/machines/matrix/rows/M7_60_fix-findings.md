@@ -6,6 +6,7 @@ state_kind: work
 filled_by: agent
 depends_on: [verification]
 edge_role: fallback
+guard: "verification_attempts < 3"
 ---
 
 ## Guidance
