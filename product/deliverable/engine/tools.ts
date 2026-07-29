@@ -17,6 +17,7 @@ import { readFileSync } from "node:fs";
 import { fileDelete, fileGlob, fileList, filePatch, fileRead, fileWrite, type PatchOp } from "./files.ts";
 import { LINT_CONFIG, lintProse } from "./lint.ts";
 import { appendNote, backlogNotes, drainNote, pendingNotes } from "./inbox.ts";
+import { parseStateNote } from "./notes.ts";
 import { expList, readRecord } from "./worktree.ts";
 import { survey } from "./survey.ts";
 import { itList, readItRecord } from "./iterations.ts";
@@ -462,10 +463,24 @@ export function coreTools(rootOf: (rel?: string) => string, projectRoot: string,
         if (args.glob !== undefined) {
           const g = fileGlob(root, String(args.glob));
           const md = g.files.filter((f) => f.endsWith(".md"));
-          const files = md
-            .map((p) => ({ path: p, findings: lintProse(root, readFileSync(resolveInRoot(root, p, "engine/tools.ts se_lint"), "utf8")) }))
-            .map((f) => ({ path: f.path, count: f.findings.length, findings: f.findings }))
-            .filter((f) => f.count > 0);
+          // A STATE NOTE KEEPS ITS PROSE IN THE FRONTMATTER. `guidance` is
+          // read by an agent on every single visit, so it is the prose that
+          // matters most - and the lint had never seen a word of it, because
+          // lintProse strips frontmatter before it starts.
+          const lintFile = (p: string): { path: string; count: number; findings: unknown[] } => {
+            const raw = readFileSync(resolveInRoot(root, p, "engine/tools.ts se_lint"), "utf8");
+            const findings: unknown[] = lintProse(root, raw).map((f) => ({ ...f, where: "body" }));
+            try {
+              const fm = parseStateNote(raw).frontmatter;
+              for (const key of ["guidance", "statement"]) {
+                const v = fm[key];
+                if (typeof v !== "string" || v.trim() === "") continue;
+                for (const f of lintProse(root, v)) findings.push({ ...f, where: key });
+              }
+            } catch { /* a note that will not parse is the canvas lint's problem, not the prose lint's */ }
+            return { path: p, count: findings.length, findings };
+          };
+          const files = md.map(lintFile).filter((f) => f.count > 0);
           return {
             glob: String(args.glob),
             swept: md.length,

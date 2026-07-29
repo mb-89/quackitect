@@ -222,14 +222,20 @@ test("the voice lint sweeps a whole tree and reports what it left out", async ()
   writeFileSync(join(dir, "dirty.md"), "we need alpha, beta, gamma, delta and epsilon.\n", "utf8");
   writeFileSync(join(dir, "clean.md"), "# Heading\n\nshort and clean.\n", "utf8");
   writeFileSync(join(dir, "notprose.txt"), "never read by a prose lint\n", "utf8");
+  // A STATE NOTE keeps its prose in the FRONTMATTER, where lintProse never
+  // looked - and `guidance` is read by an agent on every single visit.
+  writeFileSync(join(dir, "astate.md"), "---\nstate: probe\nguidance: we need alpha, beta, gamma, delta and epsilon.\n---\n\nclean body.\n", "utf8");
   const swept = await call(server, "se_lint", { glob: "product/guidance/sweeptest/*" });
   assert.equal(swept.isError, false, JSON.stringify(swept.body));
-  assert.equal(swept.body.swept, 2, "both markdown files were read");
+  assert.equal(swept.body.swept, 3, "every markdown file was read");
   assert.equal(swept.body.skipped_not_markdown, 1, "and the one it skipped is named, not implied");
   assert.equal(swept.body.clean, 1, "the clean file is counted");
-  const files = swept.body.files as { path: string; count: number }[];
-  assert.equal(files.length, 1, "only files WITH findings come back");
-  assert.match(files[0].path, /dirty\.md$/);
+  const files = swept.body.files as { path: string; count: number; findings: { where: string }[] }[];
+  assert.equal(files.length, 2, "only files WITH findings come back");
+  assert.ok(files.some((f) => /dirty\.md$/.test(f.path)), "the one with a bad body");
+  const stateNote = files.find((f) => /astate\.md$/.test(f.path))!;
+  assert.ok(stateNote !== undefined, "and the one whose only bad prose is in its frontmatter");
+  assert.equal(stateNote.findings[0].where, "guidance", "each finding says WHICH prose it is in");
   // Neither of the older forms is disturbed by the new one.
   const one = await call(server, "se_lint", { text: "alpha, beta, gamma, delta and epsilon." });
   assert.equal(one.body.count, 1, "a single block still lints");

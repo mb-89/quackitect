@@ -57,3 +57,21 @@
 {"ts":"2026-07-29T15:00:41.611Z","op":"done","visit":"expeditions/e23@0","node":"d15","brief":"the sweep walks the whole way in one call"}
 {"ts":"2026-07-29T15:00:50.802Z","op":"update","visit":"expeditions/e23@0","node":"d27","brief":"suite run over the sweep and target"}
 {"ts":"2026-07-29T15:01:48.398Z","op":"update","visit":"expeditions/e23@0","node":"d28","brief":"captured the reverse-engineering idea for later"}
+{"ts":"2026-07-29T15:02:15.265Z","op":"update","visit":"expeditions/e23@0","node":"d29","brief":"committed the sweep and the target"}
+{"ts":"2026-07-29T15:03:47.492Z","op":"update","visit":"expeditions/e23@0","node":"d30","brief":"the svg draws the line, the waypoints and the destination"}
+{"ts":"2026-07-29T15:04:08.966Z","op":"update","visit":"expeditions/e23@0","node":"d31","brief":"the blue line is wired into the render"}
+{"ts":"2026-07-29T15:04:14.571Z","op":"update","visit":"expeditions/e23@0","node":"d32","brief":"suite run over the render change"}
+{"ts":"2026-07-29T15:05:08.152Z","op":"update","visit":"expeditions/e23@0","node":"d33","brief":"checking the marks actually reach the drawing"}
+{"ts":"2026-07-29T15:05:22.825Z","op":"update","visit":"expeditions/e23@0","node":"d34","brief":"checking the overlay projection"}
+{"ts":"2026-07-29T15:05:41.685Z","op":"update","visit":"expeditions/e23@0","node":"d35","brief":"reading the canvas edge directions"}
+{"ts":"2026-07-29T15:06:01.405Z","op":"update","visit":"expeditions/e23@0","node":"d36","brief":"counting onroute in the rendered svg"}
+{"ts":"2026-07-29T15:06:10.626Z","op":"update","visit":"expeditions/e23@0","node":"d37","brief":"simpler probe of the rendered line tags"}
+{"ts":"2026-07-29T15:06:27.515Z","op":"done","visit":"expeditions/e23@0","node":"d17","brief":"the blue line renders on the drawn edges with its waypoint"}
+{"ts":"2026-07-29T15:06:46.813Z","op":"update","visit":"expeditions/e23@0","node":"d38","brief":"captured the pruning-as-refactoring question for discussion"}
+{"ts":"2026-07-29T15:07:02.603Z","op":"done","visit":"expeditions/e23@0","node":"d18","brief":"input is not evidence, and a prefill is not a law"}
+{"ts":"2026-07-29T15:07:22.869Z","op":"done","visit":"expeditions/e23@0","node":"d19","brief":"the desk's method now says to prefill from the conversation"}
+{"ts":"2026-07-29T15:07:32.036Z","op":"update","visit":"expeditions/e23@0","node":"d39","brief":"first lint sweep over the state guidance fields"}
+{"ts":"2026-07-29T15:08:24.413Z","op":"update","visit":"expeditions/e23@0","node":"d40","brief":"captured the tour skill and the highlight capability it needs"}
+{"ts":"2026-07-29T15:08:38.549Z","op":"done","visit":"expeditions/e23@0","node":"d20","brief":"the lint reads state guidance fields now, and says where"}
+{"ts":"2026-07-29T15:08:46.937Z","op":"update","visit":"expeditions/e23@0","node":"d41","brief":"suite run over the guidance-field lint"}
+{"ts":"2026-07-29T15:09:53.790Z","op":"defer","visit":"expeditions/e23@0","node":"d21","brief":"Judge the thirteen standing prose findings","to":"pruning","hops":1,"trail":["expeditions/e23","pruning"]}
