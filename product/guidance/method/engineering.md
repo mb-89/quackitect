@@ -5,6 +5,25 @@ statement: General software rules the project builds by - referenced, never pull
 
 # Engineering rules
 
+## Commit what is on disk (owner ruling 2026-07-29)
+
+A dirty tree left behind is not caution. It is unfinished work.
+
+Commit everything that stands, including files you did not write. The
+owner's Obsidian layouts, canvases and installed plugins are part of the
+project. Leaving them out because they are someone else's does nothing
+but hand the next session a mess.
+
+Say in the commit message whose work it was and that you took it. Never
+silently, and never selectively without saying what you left.
+
+This is not licence to commit SECRETS or generated junk. That is what
+`.gitignore` is for, and it already carries them.
+
+The close already works this way — it commits trunk's strays before it
+merges, and names every file it took. The principle is the same one:
+a walk's work never silently vanishes, and neither does anyone else's.
+
 ## Data is not code (owner ruling 2026-07-28)
 
 Configuration lives in DATA the running system reads — never in
