@@ -42,3 +42,21 @@
 {"ts":"2026-07-29T10:50:05.871Z","op":"update","visit":"expeditions/e21@0","node":"d51","brief":"parsing the card list from nested frontmatter instead of a table"}
 {"ts":"2026-07-29T10:50:09.218Z","op":"update","visit":"expeditions/e21@0","node":"d52","brief":"verifying the nested-frontmatter card loader against its tests"}
 {"ts":"2026-07-29T10:50:36.606Z","op":"update","visit":"expeditions/e21@0","node":"d53","brief":"committing the card config and registry"}
+{"ts":"2026-07-29T10:50:42.788Z","op":"update","visit":"expeditions/e21@0","node":"d54","brief":"card config and hotkey registry landed with tests"}
+{"ts":"2026-07-29T10:52:29.519Z","op":"update","visit":"expeditions/e21@0","node":"d55","brief":"reading the divider and pane-size contract before the layout swap"}
+{"ts":"2026-07-29T10:54:05.311Z","op":"update","visit":"expeditions/e21@0","node":"d56","brief":"reading the import block before the layout patch"}
+{"ts":"2026-07-29T10:55:15.739Z","op":"update","visit":"expeditions/e21@0","node":"d57","brief":"adding the card grid styles, the promotion keys and the split handle"}
+{"ts":"2026-07-29T10:55:37.399Z","op":"update","visit":"expeditions/e21@0","node":"d58","brief":"replacing the three-column shell with the card grid"}
+{"ts":"2026-07-29T10:55:59.013Z","op":"update","visit":"expeditions/e21@0","node":"d59","brief":"replacing the three-column shell with the card grid"}
+{"ts":"2026-07-29T10:56:05.082Z","op":"update","visit":"expeditions/e21@0","node":"d60","brief":"running the suite against the new card layout"}
+{"ts":"2026-07-29T10:56:43.827Z","op":"update","visit":"expeditions/e21@0","node":"d61","brief":"layout tests encode prior rulings; finding each before touching them"}
+{"ts":"2026-07-29T10:57:47.405Z","op":"update","visit":"expeditions/e21@0","node":"d62","brief":"carrying both prior rulings into the card layout rather than dropping them"}
+{"ts":"2026-07-29T10:57:51.409Z","op":"update","visit":"expeditions/e21@0","node":"d63","brief":"re-running the suite with the reconciled layout tests"}
+{"ts":"2026-07-29T10:58:16.832Z","op":"update","visit":"expeditions/e21@0","node":"d64","brief":"reading the terminal-sizing test the grid supersedes"}
+{"ts":"2026-07-29T10:58:53.492Z","op":"update","visit":"expeditions/e21@0","node":"d65","brief":"terminal fills its card now that the column splitter is retired"}
+{"ts":"2026-07-29T10:58:58.381Z","op":"update","visit":"expeditions/e21@0","node":"d66","brief":"re-running the suite after the terminal card fix"}
+{"ts":"2026-07-29T11:00:06.833Z","op":"update","visit":"expeditions/e21@0","node":"d67","brief":"pinning the card contract and the morph preservation rules"}
+{"ts":"2026-07-29T11:00:11.741Z","op":"update","visit":"expeditions/e21@0","node":"d68","brief":"running the card and morph contract tests"}
+{"ts":"2026-07-29T11:01:10.292Z","op":"update","visit":"expeditions/e21@0","node":"d69","brief":"the client promotes chat when an agent actually answers"}
+{"ts":"2026-07-29T11:01:13.448Z","op":"update","visit":"expeditions/e21@0","node":"d70","brief":"verifying the default main card is the state machine with no agent"}
+{"ts":"2026-07-29T11:01:37.262Z","op":"update","visit":"expeditions/e21@0","node":"d71","brief":"committing the card matrix layout"}
