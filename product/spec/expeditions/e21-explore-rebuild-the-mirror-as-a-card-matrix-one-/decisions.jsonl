@@ -27,3 +27,18 @@
 {"ts":"2026-07-29T10:44:31.219Z","op":"update","visit":"expeditions/e21@0","node":"d38","brief":"running the suite with the archive and sizing guards added"}
 {"ts":"2026-07-29T10:45:07.622Z","op":"update","visit":"expeditions/e21@0","node":"d39","brief":"the guard matched its own comment; matching the call instead"}
 {"ts":"2026-07-29T10:45:11.627Z","op":"update","visit":"expeditions/e21@0","node":"d40","brief":"re-running the suite after tightening the guard"}
+{"ts":"2026-07-29T10:45:41.396Z","op":"done","visit":"expeditions/e21@0","node":"d18","brief":"560 was already a birth default rather than a clamp, now named so"}
+{"ts":"2026-07-29T10:45:53.062Z","op":"done","visit":"expeditions/e21@0","node":"d17","brief":"archive boxes now born at their goal width, pinned by a test"}
+{"ts":"2026-07-29T10:45:59.094Z","op":"update","visit":"expeditions/e21@0","node":"d41","brief":"reading the page shell to see the panes the matrix replaces"}
+{"ts":"2026-07-29T10:46:19.757Z","op":"update","visit":"expeditions/e21@0","node":"d42","brief":"four of the six cards already exist as widgets"}
+{"ts":"2026-07-29T10:46:22.974Z","op":"update","visit":"expeditions/e21@0","node":"d43","brief":"reading the layout CSS the matrix replaces"}
+{"ts":"2026-07-29T10:47:04.251Z","op":"update","visit":"expeditions/e21@0","node":"d44","brief":"checking what the frontmatter parser supports before choosing a config shape"}
+{"ts":"2026-07-29T10:47:34.339Z","op":"update","visit":"expeditions/e21@0","node":"d45","brief":"writing the per-project card config as an Obsidian-editable table"}
+{"ts":"2026-07-29T10:48:03.155Z","op":"update","visit":"expeditions/e21@0","node":"d46","brief":"writing the card loader and the hotkey registry"}
+{"ts":"2026-07-29T10:48:25.169Z","op":"update","visit":"expeditions/e21@0","node":"d47","brief":"pinning the card order and the registry-driven legend"}
+{"ts":"2026-07-29T10:48:28.227Z","op":"update","visit":"expeditions/e21@0","node":"d48","brief":"running the suite with the card loader and its tests"}
+{"ts":"2026-07-29T10:49:22.240Z","op":"update","visit":"expeditions/e21@0","node":"d49","brief":"owner prefers nested YAML; checking the vault's plugin set"}
+{"ts":"2026-07-29T10:49:50.279Z","op":"update","visit":"expeditions/e21@0","node":"d50","brief":"moving the card config to nested YAML frontmatter"}
+{"ts":"2026-07-29T10:50:05.871Z","op":"update","visit":"expeditions/e21@0","node":"d51","brief":"parsing the card list from nested frontmatter instead of a table"}
+{"ts":"2026-07-29T10:50:09.218Z","op":"update","visit":"expeditions/e21@0","node":"d52","brief":"verifying the nested-frontmatter card loader against its tests"}
+{"ts":"2026-07-29T10:50:36.606Z","op":"update","visit":"expeditions/e21@0","node":"d53","brief":"committing the card config and registry"}
