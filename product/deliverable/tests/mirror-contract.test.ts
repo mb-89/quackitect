@@ -372,3 +372,21 @@ test("the survey is offered as a legal tool, not as a button of its own", () => 
   assert.match(html, /^\s*se_survey: \[\],$/m, "it is registered human-callable, with no arguments to give");
   assert.ok(!html.includes("survey-btn"), "and its bespoke button is gone, handler and all");
 });
+
+// A POPPED-OUT CARD IS A SNAPSHOT (owner ruling 2026-07-29). The pop-out
+// opened a URL baked in at draw time, so it showed the server's default
+// while the live card showed whatever the reader had clicked — a state
+// against an answered question. Fifth time the reader's place was lost.
+test("a popped-out card opens on what it was showing, and then holds still", () => {
+  const root = freshRoot();
+  const html = renderMirror({ session: new Session(root), root, lastPacket: undefined, mode: "manual" });
+  // The place rides every pop-out; the bare, subject-less open is gone.
+  assert.ok(!/window\.open\(url,/.test(html), "no pop-out opens its baked-in URL raw");
+  assert.match(html, /window\.open\(frozenUrl\(url\), "_blank"\)/, "the reader's place rides along");
+  assert.ok(!html.includes('"se-widget"'), "and no NAMED window — five snapshots need five windows, not one reused");
+  // Frozen is the absence of liveness, in both directions.
+  assert.match(html, /if \(!FROZEN\) \{\nconst es = new EventSource/, "a frozen window never opens the event stream");
+  assert.match(html, /async function refresh\(detail\) \{\n  if \(FROZEN\) return;/, "and never redraws itself");
+  // It says so, quietly — a snapshot that looks live is a trap.
+  assert.match(html, /frozen-bar/, "the frozen window carries its own marker");
+});

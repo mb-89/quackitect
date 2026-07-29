@@ -800,6 +800,10 @@ let navigatingAway = false;
 const PLACE = [
   ["detail", () => CURRENT_DETAIL],
   ["card", () => CARD_NOW],
+  // Frozen is a place too: a snapshot window that follows a link inside
+  // itself stays a snapshot. A live window reports null and never picks it
+  // up, so the flag spreads nowhere it does not belong.
+  ["frozen", () => (FROZEN ? "1" : null)],
 ];
 /** Carry the place onto a URL the reader is NAVIGATING to. */
 function withPlace(url) {
@@ -817,6 +821,24 @@ function pinPlace(q) {
     if (v) q.set(p[0], v); else q.delete(p[0]);
   }
 }
+// A POPPED-OUT CARD IS A SNAPSHOT (owner ruling 2026-07-29). Two things
+// were wrong with the pop-out, and they are separate.
+//
+// It carried NOTHING. The button holds a URL baked in when the page was
+// drawn, so the new tab asked for "the details card" with no subject named
+// and the server answered with its own default. Meanwhile the live card was
+// showing whatever the reader last clicked, which lives only in this
+// browser. A reader looking at an answered question got a state.
+//
+// And it must not follow the walk. The reader pops several out to compare
+// them side by side, so each one holds what it was opened on. Frozen means
+// no event stream and no refresh, ever.
+const FROZEN = new URLSearchParams(location.search).has("frozen");
+function frozenUrl(url) {
+  const u = new URL(withPlace(url), location.href);
+  u.searchParams.set("frozen", "1");
+  return u.pathname + u.search;
+}
 function navigateTo(url, label) {
   navigatingAway = true;
   showLoading(label);
@@ -824,6 +846,7 @@ function navigateTo(url, label) {
   location.href = url;
 }
 async function refresh(detail) {
+  if (FROZEN) return;
   if (navigatingAway) return;
   if (detail !== undefined) CURRENT_DETAIL = detail;
   const q = new URLSearchParams(location.search);
@@ -1044,8 +1067,10 @@ document.addEventListener("click", (ev) => {
   if (!btn) return;
   ev.stopPropagation();
   const url = btn.dataset.url;
-  if (ev.ctrlKey || ev.metaKey) { window.open(url, "_blank"); return; }
-  if (ev.shiftKey) { window.open(url, "se-widget", "width=1100,height=800"); return; }
+  // A NEW window every time, never a named one. The whole point is several
+  // standing side by side, and a shared name reuses the first one forever.
+  if (ev.ctrlKey || ev.metaKey) { window.open(frozenUrl(url), "_blank"); return; }
+  if (ev.shiftKey) { window.open(frozenUrl(url), "_blank", "popup,width=1100,height=800"); return; }
   const w = document.getElementById(btn.dataset.widget);
   if (w) { if (document.fullscreenElement === w) document.exitFullscreen(); else w.requestFullscreen(); }
 });
@@ -1234,6 +1259,15 @@ if (CURRENT && D.states[CURRENT] && WALK_HERE) { CURRENT_DETAIL = "state:" + CUR
 // A bookmark or an F5 still deep-links to the pane that was open.
 const DETAIL_PARAM = new URLSearchParams(location.search).get("detail");
 if (DETAIL_PARAM) { CURRENT_DETAIL = DETAIL_PARAM; const dp = detailFor(DETAIL_PARAM); showDetails(dp[0], dp[1]); }
+// A frozen window says so. Not a warning — a quiet line, so a reader with
+// one live pane and four snapshots can tell which is which at a glance.
+if (FROZEN) {
+  const fbar = document.createElement("div");
+  fbar.id = "frozen-bar";
+  fbar.textContent = "frozen — this window keeps what it was opened on and does not follow the walk";
+  fbar.style.cssText = "padding:6px 10px;font-size:12px;opacity:0.7;border-bottom:1px solid rgba(128,128,128,0.3)";
+  document.body.insertBefore(fbar, document.body.firstChild);
+}
 // Open folds need no carrying now: the morph never replaces them.
 
 // THE UNIFIED FEED (owner ruling, v2 i9 notes; built in v3): every hand's
@@ -1535,6 +1569,8 @@ let pollBusy = null;
 let ACTIVE_AT_RENDER = JSON.stringify(D.describe.active || []);
 let sawError = false;
 let deathTimer = null;
+// A frozen window never opens the stream — that is the whole of freezing.
+if (!FROZEN) {
 const es = new EventSource("/events");
 es.addEventListener("open", () => {
   if (deathTimer !== null) { clearTimeout(deathTimer); deathTimer = null; }
@@ -1570,6 +1606,7 @@ es.addEventListener("message", (ev) => {
   if (pollBusy === true && a.busy === false) { refresh(); return; }
   pollBusy = a.busy;
 });
+}
 
 // THE AGENT'S TERMINAL. The pty host is a SIBLING process on its own port,
 // because this page's process is the agent's grandchild and a grandchild
@@ -1704,7 +1741,7 @@ setInterval(() => { void bootTerminal(); }, 2000);
 const MODAL = '<div id="modal"><div class="modal-box"><div class="widget-head"><span id="modal-title"></span><button class="expand" id="modal-close">✕</button></div><div class="modal-body" id="modal-body"></div></div></div><div id="toast"></div>';
 
 function widgetHead(title: string, widgetId: string, url: string): string {
-  return `<div class="widget-head"><span>${esc(title)}</span><button class="expand" data-widget="${widgetId}" data-url="${esc(url)}" title="expand · ctrl-click: new tab · shift-click: new window">⛶</button></div>`;
+  return `<div class="widget-head"><span>${esc(title)}</span><button class="expand" data-widget="${widgetId}" data-url="${esc(url)}" title="expand · ctrl-click: new tab · shift-click: new window — both open frozen on what this card is showing">⛶</button></div>`;
 }
 
 export function renderMirror(m: MirrorState, widget?: "machine" | "details" | "log" | "terminal", view?: string, card?: string): string {
@@ -1843,7 +1880,7 @@ export function renderMirror(m: MirrorState, widget?: "machine" | "details" | "l
   // the walk's position; clicking it jumps the view there.
   const curLeaf = info.active[0] ?? "";
   const curBtn = curLeaf === "" ? "" : `<button class="ghost" id="cur-state" data-machine="${esc(walkMachine.id)}" title="the walk stands here — click: jump the view to it">☉ ${esc(curLeaf)}</button>`;
-  const machineWidget = `<div class="widget" id="w-machine"><div class="widget-head"><span class="crumbs">${crumbs}</span><span style="display:flex;align-items:center;gap:10px">${curBtn}${slider}${sdBar}${escapeBtn}<button class="expand" data-widget="w-machine" data-url="/widget/machine?view=${encodeURIComponent(decl.id)}" title="expand · ctrl-click: new tab · shift-click: new window">⛶</button></span></div><div class="widget-body">${svg}</div></div>`;
+  const machineWidget = `<div class="widget" id="w-machine"><div class="widget-head"><span class="crumbs">${crumbs}</span><span style="display:flex;align-items:center;gap:10px">${curBtn}${slider}${sdBar}${escapeBtn}<button class="expand" data-widget="w-machine" data-url="/widget/machine?view=${encodeURIComponent(decl.id)}" title="expand · ctrl-click: new tab · shift-click: new window — both open frozen on what this card is showing">⛶</button></span></div><div class="widget-body">${svg}</div></div>`;
   const detailsWidget = `<div class="widget" id="w-details">${widgetHead("details", "w-details", "/widget/details")}
     ${info.status === "closed" ? '<div class="meta" style="color:#e86a5f">machine closed</div>' : ""}
     <div class="meta" id="details-title" data-morph-ignore>—</div>
