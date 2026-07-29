@@ -75,3 +75,8 @@
 {"ts":"2026-07-29T15:08:38.549Z","op":"done","visit":"expeditions/e23@0","node":"d20","brief":"the lint reads state guidance fields now, and says where"}
 {"ts":"2026-07-29T15:08:46.937Z","op":"update","visit":"expeditions/e23@0","node":"d41","brief":"suite run over the guidance-field lint"}
 {"ts":"2026-07-29T15:09:53.790Z","op":"defer","visit":"expeditions/e23@0","node":"d21","brief":"Judge the thirteen standing prose findings","to":"pruning","hops":1,"trail":["expeditions/e23","pruning"]}
+{"ts":"2026-07-29T15:10:15.414Z","op":"update","visit":"expeditions/e23@0","node":"d42","brief":"committed the render and the lint work"}
+{"ts":"2026-07-29T15:10:57.707Z","op":"update","visit":"expeditions/e23@0","node":"d43","brief":"leave report written"}
+{"ts":"2026-07-29T15:11:05.543Z","op":"update","visit":"expeditions/e23@0","node":"d44","brief":"moving to the leave state"}
+{"ts":"2026-07-29T15:11:22.322Z","op":"update","visit":"expeditions/e23@0","node":"d45","brief":"moving to the leave state"}
+{"ts":"2026-07-29T15:11:28.509Z","op":"done","visit":"expeditions/e23@0","node":"d22","brief":"closing e23 and merging on the owner's standing word"}
