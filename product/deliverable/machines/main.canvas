@@ -6,7 +6,7 @@
 	"nodes":[
 		{"id":"g-adhoc","type":"group","x":-1160,"y":-1020,"width":1520,"height":800,"label":"ad hoc"},
 		{"id":"g-planned","type":"group","x":-1160,"y":560,"width":1520,"height":800,"label":"planned"},
-		{"id":"n-comment","type":"text","text":"THE MAIN MACHINE — every session runs this. start/end are mechanical; boot is a sub-machine; idle is home. Seeding is a FUNCTION (se_seed_expedition, se_seed_iteration) — no start doors. Above idle: the ad hoc pair (archive · expeditions). Below: the planned pair. On the right: retro and the FRONT DESK — plain states per the ONE-STATE RULE. Beside idle: ideation (the slider's top notch).","x":-380,"y":-1200,"width":700,"height":140},
+		{"id":"n-comment","type":"text","text":"THE MAIN MACHINE — every session runs this. start/end are mechanical; boot is a sub-machine; idle is home. Seeding is a FUNCTION (se_seed_expedition, se_seed_iteration) — no start doors. Above idle: the ad hoc pair (archive · expeditions). Below: the planned pair. On the right, top to bottom: pruning, retro and the FRONT DESK — plain states per the ONE-STATE RULE — then ideation, a sub-machine. Pruning sits directly above retro because they are a pair: the retro moves the standard, pruning catches the system up to it.","x":-380,"y":-1200,"width":700,"height":140},
 		{
 			"id":"n-start",
 			"type":"file",
@@ -21,6 +21,7 @@
 		{"id":"n-idle","type":"file","file":"deliverable/machines/states/idle.md","x":-340,"y":-160,"width":620,"height":640},
 		{"id":"n-expedition_archive","type":"file","file":"deliverable/machines/expedition_archive.canvas","x":-1100,"y":-960,"width":620,"height":640},
 		{"id":"n-expeditions","type":"file","file":"deliverable/machines/expeditions.canvas","x":-340,"y":-960,"width":620,"height":640},
+		{"id":"n-pruning","type":"file","file":"deliverable/machines/states/pruning.md","x":600,"y":-1340,"width":420,"height":260},
 		{"id":"n-retro","type":"file","file":"deliverable/machines/states/retro.md","x":600,"y":-1000,"width":420,"height":260},
 		{"id":"n-front_desk","type":"file","file":"deliverable/machines/states/front_desk.md","x":600,"y":-660,"width":420,"height":260},
 		{
@@ -41,6 +42,7 @@
 		{"id":"e-start-boot","fromNode":"n-start","fromSide":"right","toNode":"n-boot","toSide":"left"},
 		{"id":"e-boot-idle","fromNode":"n-boot","fromSide":"right","toNode":"n-idle","toSide":"left"},
 		{"id":"e-idle-end","fromNode":"n-idle","fromSide":"right","toNode":"n-end","toSide":"left"},
+		{"id":"e-idle-pruning","fromNode":"n-idle","fromSide":"right","toNode":"n-pruning","toSide":"left","fromEnd":"arrow"},
 		{"id":"e-idle-retro","fromNode":"n-idle","fromSide":"right","toNode":"n-retro","toSide":"left","fromEnd":"arrow"},
 		{"id":"e-idle-front_desk","fromNode":"n-idle","fromSide":"right","toNode":"n-front_desk","toSide":"left","fromEnd":"arrow"},
 		{"id":"e-idle-ideation","fromNode":"n-idle","fromSide":"right","toNode":"n-ideation","toSide":"left","fromEnd":"arrow"},

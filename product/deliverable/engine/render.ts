@@ -13,6 +13,7 @@
 //   - geometry-true SVG, wheel-zoom, drag-pan; JSON as key/value tables
 // One source, two projections: the packet JSON shown here IS what the
 // agent receives.
+import { bindings, loadCards } from "./cards.ts";
 import { loadCanvas, subLabel, type CanvasData, type CanvasElement } from "./canvas.ts";
 import { CallLog, type CallRecord } from "./calllog.ts";
 import { type StrayNote } from "./inbox.ts";
@@ -295,13 +296,13 @@ const STYLE = `
      never a target. The divider moves it, and the size the reader lands on
      is stored and reused from then on. */
   #left { width: 650px; min-width: 360px; }
-  #left #w-log { flex: 1; min-height: 0; }
-  /* HALF THE COLUMN TO START, then the reader's (owner ruling 2026-07-28).
-     It used to be flex:none with no height, so the box was as tall as its
-     CONTENT and merely capped at half — which is why it sat tiny. An explicit
-     height starts it at half, and the splitter above it takes over from there.
-     No max: the owner asked to be able to drag it past half. */
-  #w-terminal { height: 50%; flex: none; min-height: 140px; }
+
+  /* THE TERMINAL FILLS ITS CARD (owner 2026-07-29), superseding the half-a-
+     column rule the old left column needed. It once sat tiny because flex:none
+     with no height sizes to CONTENT; in the grid the card decides the box and
+     the terminal takes all of it. Still no max — promoted, it gets the big
+     slot, which is far more room than the splitter ever gave it. */
+  #w-terminal { min-height: 140px; }
   /* NEVER SCROLLS. xterm scrolls itself; a scrollbar here would steal from
      clientWidth mid-measure and start the flicker over. */
   .term-panel { flex: 1; min-height: 0; overflow: hidden; padding: 8px 10px; }
@@ -322,6 +323,22 @@ const STYLE = `
   .widget-body { flex: 1; min-height: 0; overflow: auto; }
   .expand { background: none; border: 1px solid #3a4147; color: #7f8b96; border-radius: 6px; cursor: pointer; font: inherit; padding: 2px 8px; }
   .expand:hover { color: #e8b339; border-color: #e8b339; }
+  /* THE CARD MATRIX (owner design 2026-07-29). One BIG card beside a two-wide
+     grid of the rest. It is ONE grid across the whole viewport, so promoting a
+     card is a class change and nothing ever moves in the DOM — a moved widget
+     is a recreated widget, and a recreated terminal loses its scrollback. */
+  .cards { display: grid; height: 100vh; box-sizing: border-box; gap: 8px; padding: 8px; grid-template-columns: var(--main-w, 58%) 6px 1fr 1fr; }
+  .card { position: relative; display: flex; min-width: 0; min-height: 0; grid-column: var(--col); grid-row: var(--row); }
+  .card > .widget { flex: 1; min-width: 0; }
+  .card.main { grid-column: 1; grid-row: 1 / -1; }
+  #div-cards { grid-column: 2; grid-row: 1 / -1; width: 6px; cursor: col-resize; background: #2a2f34; border-radius: 3px; }
+  /* The head reserves room so the number never lands on the title. */
+  .card > .widget > .widget-head { padding-left: 34px; }
+  .cardnum { position: absolute; top: 7px; left: 10px; z-index: 2; display: inline-flex; align-items: center; justify-content: center; width: 17px; height: 17px; border: 1px solid #3a4147; border-radius: 4px; font-size: 11px; color: #7f8b96; }
+  .card.main .cardnum { color: #e8b339; border-color: #e8b339; }
+  .legend-row { display: flex; gap: 10px; padding: 3px 12px; font-size: 12px; }
+  .legend-key { color: #e8b339; min-width: 92px; flex: none; }
+  .legend-what { color: #d8dde2; }
   #w-machine { flex: 1; }
   #w-machine .widget-body { display: flex; }
   svg { width: 100%; height: 100%; cursor: grab; }
@@ -380,7 +397,9 @@ const STYLE = `
   .thr-notches { position: relative; height: 11px; margin-top: -3px; }
   .thr-notch { position: absolute; transform: translateX(-50%); font-size: 9px; line-height: 1; color: #7f8b96; cursor: pointer; padding: 1px 3px; }
   .thr-notch:hover { color: #e8b339; }
-  #w-log { flex: 0 0 42%; border-radius: 0; border: 0; border-bottom: 1px solid #2a2f34; }
+  /* The log used to be the top 42% of a shared column, borderless so it read
+     as one surface with the terminal below it. As a card of its own it takes
+     the whole card and wears the normal widget border. */
   .log-filter-row { padding: 6px 12px 0; display: flex; gap: 6px; }
   .log-filter-row input { flex: 1 1 50%; min-width: 0; box-sizing: border-box; background: #14171a; border: 1px solid #2a2f34; border-radius: 6px; color: #d8dde2; font: inherit; font-size: 12px; padding: 4px 8px; }
   .log-panel { font-size: 12px; margin-top: 6px; }
@@ -1081,6 +1100,87 @@ document.querySelectorAll(".divider").forEach((dv) => {
   });
 });
 
+// THE CARDS. Promotion swaps a class and two CSS variables. Nothing moves, so
+// every widget stays live — which is the whole reason the layout is one grid.
+const CARDBLOB = document.getElementById("se-cards");
+const CARDS = CARDBLOB === null ? { list: [], now: "" } : JSON.parse(CARDBLOB.textContent);
+let CARD_NOW = new URLSearchParams(location.search).get("card") || CARDS.now;
+let CARD_PREV = null;
+// Chat is promoted once, the first time a host answers. Not on every poll.
+let CHAT_LED = false;
+function cardCell(id) {
+  const i = CARDS.list.findIndex((c) => c.id === id);
+  const at = i < 0 ? 0 : i;
+  return { col: 3 + (at % 2), row: 1 + Math.floor(at / 2) };
+}
+function applyCards() {
+  for (const c of CARDS.list) {
+    const el = document.getElementById("card-" + c.id);
+    if (el === null) continue;
+    const cell = cardCell(c.id);
+    el.style.setProperty("--col", String(cell.col));
+    el.style.setProperty("--row", String(cell.row));
+    el.classList.toggle("main", c.id === CARD_NOW);
+  }
+  // The legend takes the vacated slot, so where it sits IS the answer to
+  // "which card is up front". The jump is the indicator, not a cost.
+  const leg = document.getElementById("card-legend");
+  if (leg !== null) {
+    const cell = cardCell(CARD_NOW);
+    leg.style.setProperty("--col", String(cell.col));
+    leg.style.setProperty("--row", String(cell.row));
+  }
+}
+function promoteCard(id) {
+  if (!CARDS.list.some((c) => c.id === id)) return;
+  // The same key again is the way back — the loop is chat, look, chat.
+  if (id === CARD_NOW) { if (CARD_PREV !== null) promoteCard(CARD_PREV); return; }
+  CARD_PREV = CARD_NOW;
+  CARD_NOW = id;
+  applyCards();
+  // Pinned in the URL like view and detail, so the next morph agrees with
+  // what the reader just did, and an F5 lands on the same card.
+  const q = new URLSearchParams(location.search);
+  q.set("card", id);
+  history.replaceState(null, "", location.pathname + "?" + q.toString());
+}
+// NUMBER KEYS, NOT FUNCTION KEYS (owner 2026-07-29). F1, F5, F6, F11 and F12
+// belong to the browser, and a laptop needs an Fn chord for them. A key never
+// fires while the reader is typing — chat is a card you type in.
+addEventListener("keydown", (ev) => {
+  if (ev.ctrlKey || ev.metaKey || ev.altKey) return;
+  const t = ev.target;
+  if (t !== null && (t.tagName === "INPUT" || t.tagName === "TEXTAREA" || t.isContentEditable)) return;
+  if (!/^[0-9]$/.test(ev.key)) return;
+  const card = CARDS.list[Number(ev.key) - 1];
+  if (card === undefined) return;
+  ev.preventDefault();
+  promoteCard(card.id);
+});
+// 58/42 to start (owner 2026-07-29), then wherever the reader drags it,
+// remembered exactly the way every other pane already is.
+const CARDS_KEY = PANE_KEY + "cards-main";
+const cardsEl = document.querySelector(".cards");
+if (cardsEl !== null) {
+  let saved = 0;
+  try { saved = Number(localStorage.getItem(CARDS_KEY) || "0"); } catch (e) { /* no storage — the default stands */ }
+  if (saved > 0) cardsEl.style.setProperty("--main-w", Math.max(240, Math.min(saved, window.innerWidth - 260)) + "px");
+  const cdv = document.getElementById("div-cards");
+  let cdrag = false;
+  if (cdv !== null) {
+    cdv.addEventListener("mousedown", (ev) => { cdrag = true; ev.preventDefault(); });
+    window.addEventListener("mousemove", (ev) => {
+      if (!cdrag) return;
+      cardsEl.style.setProperty("--main-w", Math.max(240, Math.min(ev.clientX, window.innerWidth - 260)) + "px");
+    });
+    window.addEventListener("mouseup", () => {
+      if (!cdrag) return;
+      cdrag = false;
+      const px = parseInt(cardsEl.style.getPropertyValue("--main-w"), 10);
+      if (px > 0) { try { localStorage.setItem(CARDS_KEY, String(px)); } catch (e) { /* storage full */ } }
+    });
+  }
+}
 if (CURRENT && D.states[CURRENT] && WALK_HERE) { CURRENT_DETAIL = "state:" + CURRENT; showDetails("state: " + CURRENT, stateDetail(CURRENT)); }
 // A bookmark or an F5 still deep-links to the pane that was open.
 const DETAIL_PARAM = new URLSearchParams(location.search).get("detail");
@@ -1433,6 +1533,13 @@ async function bootTerminal() {
   // A HOST ANSWERED, so the pane earns its place. Until then it is not
   // there at all: manual mode and --own-terminal both leave it hidden.
   document.querySelectorAll(".no-host").forEach((el) => el.classList.remove("no-host"));
+  // AN AGENT ANSWERED, so chat becomes the main card — but only if the reader
+  // has not already chosen one. Their choice outranks ours, always.
+  if (!new URLSearchParams(location.search).has("card") && !CHAT_LED) {
+    CHAT_LED = true;
+    const chat = CARDS.list.find((c) => c.id === "chat");
+    if (chat !== undefined) promoteCard(chat.id);
+  }
   pane.dataset.booted = "1";
   await loadAsset(base + "/xterm.css", "css");
   await loadAsset(base + "/xterm.js", "js");
@@ -1535,7 +1642,7 @@ function widgetHead(title: string, widgetId: string, url: string): string {
   return `<div class="widget-head"><span>${esc(title)}</span><button class="expand" data-widget="${widgetId}" data-url="${esc(url)}" title="expand · ctrl-click: new tab · shift-click: new window">⛶</button></div>`;
 }
 
-export function renderMirror(m: MirrorState, widget?: "machine" | "details" | "log" | "terminal", view?: string): string {
+export function renderMirror(m: MirrorState, widget?: "machine" | "details" | "log" | "terminal", view?: string, card?: string): string {
   const info = m.session.describe() as { active: string[]; status: string };
   // The scale is READ from machines/scale.md — the Obsidian-editable
   // truth; an owner edit shows on the next reload.
@@ -1595,6 +1702,12 @@ export function renderMirror(m: MirrorState, widget?: "machine" | "details" | "l
     })
     .join("");
 
+  // ONE LIST FOR THE WHOLE RENDER. expeditionList() spawns git per record
+  // and does not vary per state; calling it inside the loop made the archive
+  // cost a spawn for every record TIMES every record, blocking the server.
+  const archived = decl.states.some((s) => s.tags?.includes("archive-record"))
+    ? (m.session.expeditionList() as { archive: { id: string }[] }).archive
+    : [];
   const states: Record<string, unknown> = {};
   for (const s of decl.states) {
     states[s.id] = {
@@ -1611,7 +1724,7 @@ export function renderMirror(m: MirrorState, widget?: "machine" | "details" | "l
       was_filled: done.has(s.id),
       // An archive-record state carries ITS closed record for the detail.
       ...(s.tags?.includes("archive-record")
-        ? { archive_record: (m.session.expeditionList() as { archive: { id: string }[] }).archive.find((e) => e.id === s.id || e.id.startsWith(`${s.id}-`)) ?? null }
+        ? { archive_record: archived.find((e) => e.id === s.id || e.id.startsWith(`${s.id}-`)) ?? null }
         : {}),
       ...(s.exit?.script !== undefined || s.entry?.script !== undefined
         ? { script: m.session.scriptStatus(decl, s) }
@@ -1690,9 +1803,13 @@ export function renderMirror(m: MirrorState, widget?: "machine" | "details" | "l
   // On its OWN page the pane stays visible, so a direct visit can say why it
   // is empty rather than showing a blank tab.
   const termWidget = (standalone: boolean) => `<div class="widget${standalone ? "" : " no-host"}" id="w-terminal" data-morph-ignore>${widgetHead("terminal", "w-terminal", "/widget/terminal")}
-    <div class="panel term-panel" id="term-body"><div class="meta">no terminal host answering — the pane appears when an agent runs in it</div></div>
+    <div class="panel term-panel" id="term-body"><div class="meta" style="padding:10px 12px">no agent connected — the card keeps its slot, so no number ever shifts</div></div>
   </div>`;
-  const terminalWidget = termWidget(false);
+  // THE CHAT CARD KEEPS ITS SLOT (owner 2026-07-29), superseding the older
+  // rule that the pane ships hidden until a host answers. An agent can connect
+  // or drop MID-SESSION, and a card that vanishes renumbers every card after
+  // it — under the reader's hand, while they are using the numbers.
+  const terminalWidget = termWidget(true);
 
   if (widget === "terminal") {
     return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>se · terminal</title><style>${STYLE} #w-terminal{flex:1;height:auto;border-bottom:0}</style></head>
@@ -1711,23 +1828,54 @@ export function renderMirror(m: MirrorState, widget?: "machine" | "details" | "l
     return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>se · details</title><style>${STYLE}</style></head>
 <body><div class="cols"><aside id="sidebar" style="width:100vw;max-width:100vw">${detailsWidget}</aside></div>${MODAL}${data}<script>${SCRIPT}</script></body></html>`;
   }
+  // THE CARD MATRIX (owner design 2026-07-29). The card list and its ORDER are
+  // the product's, in product/cards.md — v3 exists to work on other products,
+  // and another product wants other cards.
+  const cardList = loadCards(m.root);
+  const byWidget: Record<string, string> = {
+    terminal: terminalWidget,
+    machine: machineWidget,
+    log: logWidget,
+    details: detailsWidget,
+  };
+  const filled = (c: { widget?: string }): boolean => c.widget !== undefined && (byWidget[c.widget] ?? "") !== "";
+  // THE DEFAULT MAIN CARD IS THE FIRST AVAILABLE ONE — one rule instead of a
+  // list of exceptions. The book is not built, so it cannot lead.
+  //
+  // Chat is the exception the server CANNOT judge: whether an agent answers is
+  // known only to the client, which polls the pty host. So the server leads
+  // with the first card it can vouch for, and the client promotes chat once a
+  // host actually answers. With no agent, the state machine leads — which is
+  // exactly what the owner asked for, arrived at without a special case.
+  const vouched = (c: { widget?: string }): boolean => filled(c) && c.widget !== "terminal";
+  const asked = card === undefined ? undefined : cardList.find((c) => c.id === card);
+  const now = (asked ?? cardList.find(vouched) ?? cardList.find(filled) ?? cardList[0])?.id ?? "";
+  const rows = Math.max(1, Math.ceil(cardList.length / 2));
+  // Two columns, filled in the order the product declared. An EVEN number of
+  // cards fills the grid exactly; an odd one leaves a single hole.
+  const cellAt = (i: number): string => `--col:${3 + (i % 2)};--row:${1 + Math.floor(i / 2)}`;
+  const nothingYet = (title: string): string =>
+    `<div class="widget"><div class="widget-head"><span>${esc(title)}</span></div><div class="widget-body"><div class="meta" style="padding:10px 12px">not built yet — the slot is held so the numbers never shift</div></div></div>`;
+  const cardsHtml = cardList
+    .map((c, i) => `<div class="card${c.id === now ? " main" : ""}" id="card-${esc(c.id)}" style="${cellAt(i)}"><span class="cardnum">${c.n}</span>${filled(c) ? byWidget[c.widget as string] : nothingYet(c.title)}</div>`)
+    .join("\n  ");
+  // THE LEGEND RENDERS FROM THE REGISTRY. Declare a key there and it shows up
+  // here by itself; a hand-kept list drifts, and a stale legend is worse than
+  // none. It sits in the promoted card's vacated slot, so its position also
+  // says which card is up front.
+  const legendRows = bindings(cardList)
+    .map((b) => `<div class="legend-row"><span class="legend-key">${esc(b.keys)}</span><span class="legend-what">${esc(b.label)}</span></div>`)
+    .join("");
+  const nowAt = Math.max(0, cardList.findIndex((c) => c.id === now));
+  const legendHtml = `<div class="card" id="card-legend" style="${cellAt(nowAt)}"><div class="widget" id="w-legend"><div class="widget-head"><span>keys</span></div><div class="widget-body">${legendRows}</div></div></div>`;
+  const cardData = `<script type="application/json" id="se-cards">${JSON.stringify({ list: cardList.map((c) => ({ n: c.n, id: c.id, title: c.title })), now })}</script>`;
   return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>se mirror</title><style>${STYLE}</style></head>
 <body>
-<div class="cols">
-  <aside id="left" data-keep-style>
-    ${logWidget}
-    <div class="divider horiz no-host" id="div-term" data-pane="w-terminal" data-axis="y" data-grow="bottom"></div>
-    ${terminalWidget}
-  </aside>
-  <div class="divider" id="div-left" data-pane="left" data-grow="left"></div>
-  <main>
-    ${machineWidget}
-  </main>
-  <div class="divider" id="div-right" data-pane="sidebar" data-grow="right"></div>
-  <aside id="sidebar" data-keep-style>
-    ${detailsWidget}
-  </aside>
+<div class="cards" data-keep-style style="grid-template-rows:repeat(${rows},1fr)">
+  ${cardsHtml}
+  ${legendHtml}
+  <div class="divider" id="div-cards"></div>
 </div>
-${MODAL}${data}<script>${SCRIPT}</script>
+${MODAL}${data}${cardData}<script>${SCRIPT}</script>
 </body></html>`;
 }

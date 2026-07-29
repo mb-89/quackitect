@@ -332,7 +332,7 @@ export function startMirror(o: MirrorOptions): Server {
       // ?view=<machine> browses a machine without moving the walk.
       state.lastPacket = state.session.tickInfo();
       res.writeHead(200, { "content-type": "text/html; charset=utf-8" });
-      res.end(renderMirror(state, undefined, url.searchParams.get("view") ?? undefined));
+      res.end(renderMirror(state, undefined, url.searchParams.get("view") ?? undefined, url.searchParams.get("card") ?? undefined));
     } catch (e) {
       res.writeHead(500, { "content-type": "text/plain; charset=utf-8" });
       res.end(String((e as Error).stack ?? e));

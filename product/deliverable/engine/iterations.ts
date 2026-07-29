@@ -209,7 +209,7 @@ export function generateIterations(root: string): GeneratedMachine {
     });
     start.edges.push({ to: sid, role: "normal" });
     const y = i * 420;
-    nodes.push({ id: `n-${sid}`, type: "file", file: `${sid}.md`, x: -1100, y, ...nodeSize(sid) });
+    nodes.push({ id: `n-${sid}`, type: "file", file: `${sid}.md`, x: -1100, y, ...nodeSize(sid, goal) });
     edges.push({ id: `e-start-${sid}`, fromNode: "n-start", toNode: `n-${sid}` });
     edges.push({ id: `e-${sid}-end`, fromNode: `n-${sid}`, toNode: "n-end" });
   });

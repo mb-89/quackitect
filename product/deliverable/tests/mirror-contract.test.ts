@@ -110,13 +110,18 @@ test("the loading bar settles: it can come down, it times out, and one action lo
 
 // THE TERMINAL EARNS ITS SPACE (owner ruling 2026-07-28). It sat tiny because
 // flex:none with no height sizes to CONTENT, and max-height only capped that.
-test("the terminal starts at half its column, drags past half, and cannot chase its own resize", () => {
+//
+// The half-a-column splitter that fixed it is retired with the column itself
+// (owner 2026-07-29). The ruling survives in a stronger form: the terminal
+// fills its whole card, and promoted it takes the big slot — more room than
+// the splitter ever gave it. What must never come back is a rule that sizes
+// it to its content or caps it.
+test("the terminal fills its card, uncapped, and cannot chase its own resize", () => {
   const root = freshRoot();
   const html = renderMirror({ session: new Session(root), root, lastPacket: undefined, mode: "agent" });
-  assert.match(html, /#w-terminal \{ height: 50%;/, "an explicit half, not a content-sized box under a cap");
-  assert.ok(!/#w-terminal \{[^}]*max-height/.test(html), "no cap — the owner asked to drag past half");
-  assert.ok(html.includes('data-axis="y"'), "the height splitter ships");
-  assert.ok(html.includes("row-resize"), "and it looks draggable");
+  assert.ok(!/#w-terminal \{[^}]*max-height/.test(html), "no cap on how big it gets");
+  assert.ok(!/#w-terminal \{[^}]*flex: none/.test(html), "and never content-sized, which is how it sat tiny");
+  assert.match(html, /\.card > \.widget \{ flex: 1/, "a card's widget takes the whole card");
   assert.ok(html.includes("if (cols === lastCols && rows === lastRows) return;"), "a no-op resize never happens");
   assert.ok(html.includes("requestAnimationFrame"), "the pane is measured on a settled frame");
 });
@@ -144,17 +149,80 @@ test("the terminal pane cannot flicker between two sizes", () => {
   assert.ok(html.includes("trailing = setTimeout(sync"), "with one trailing look, so a drag ending in the window is not lost");
 });
 
-// THE PANE FOLLOWS THE HOST, NOT THE LAUNCH (owner ruling 2026-07-28). Manual
-// mode starts no terminal host, and --own-terminal leaves the agent in its own
-// window. Neither needs a flag here: the pane ships hidden, and only a host
-// that answers reveals it.
-test("the terminal pane and its splitter ship hidden until a host answers", () => {
+// PROMOTION MOVES NOTHING (owner design 2026-07-29). The whole layout is ONE
+// grid, so a card grows by changing CLASS, never by changing parent. This is
+// the reason it is a grid and not two panes: a moved widget is a recreated
+// widget, and a recreated terminal loses its scrollback and its focus.
+test("promoting a card changes a class, never the DOM", () => {
+  const root = freshRoot();
+  const html = renderMirror({ session: new Session(root), root, lastPacket: undefined, mode: "manual" });
+  assert.ok(html.includes('el.classList.toggle("main"'), "the promoted card is marked by class");
+  const from = html.indexOf("function applyCards");
+  const to = html.indexOf("addEventListener(\"keydown\"");
+  assert.ok(from !== -1 && to > from, "the card logic is present");
+  const cardJs = html.slice(from, to);
+  assert.ok(!cardJs.includes("appendChild"), "no card is ever re-parented");
+  assert.ok(!cardJs.includes("insertBefore"), "nor spliced into a new position");
+  assert.ok(!cardJs.includes("innerHTML"), "nor rebuilt from markup");
+});
+
+// THE NUMBERS ARE THE PRODUCT'S, AND THE LEGEND FILLS THE VACATED SLOT.
+test("every card carries its number and the legend takes the empty slot", () => {
+  const root = freshRoot();
+  const html = renderMirror({ session: new Session(root), root, lastPacket: undefined, mode: "manual" });
+  assert.match(html, /id="card-legend"/, "the legend is a card of its own");
+  assert.match(html, /grid-template-rows:repeat\(3,1fr\)/, "six cards make a two-by-three grid");
+  assert.match(html, /<span class="cardnum">2<\/span>/, "cards carry the number that promotes them");
+  // The default main card is the first AVAILABLE one — one rule, no exception
+  // list. With no agent connected, the state machine leads.
+  assert.match(html, /class="card main" id="card-state-machine"/, "the state machine leads when chat is empty");
+});
+
+// A KEY NEVER FIRES WHILE THE READER IS TYPING. Chat is a card you type in,
+// so this is load-bearing rather than an edge case.
+test("the number keys yield to a text field and pin their choice in the URL", () => {
+  const root = freshRoot();
+  const html = renderMirror({ session: new Session(root), root, lastPacket: undefined, mode: "manual" });
+  assert.ok(html.includes('t.tagName === "INPUT"'), "typing in a field is not a shortcut");
+  assert.ok(html.includes("t.isContentEditable"), "nor typing in anything else editable");
+  assert.ok(html.includes('q.set("card", id)'), "the promoted card is pinned in the URL");
+  // Same key again is the way back: the loop is chat, look at something, chat.
+  assert.ok(html.includes("if (id === CARD_NOW) { if (CARD_PREV !== null) promoteCard(CARD_PREV); return; }"), "the same key returns to the previous card");
+});
+
+// NEVER CHANGE ANYTHING THE LAST CHANGE DID NOT TOUCH (owner, note-4ba204a85769,
+// restated in general form). The rule had been written in prose three times and
+// broken three times, which is the case for a mechanical check instead. These
+// are the four things a morph must leave alone.
+test("a morph leaves untouched everything the change did not touch", () => {
+  const root = freshRoot();
+  const html = renderMirror({ session: new Session(root), root, lastPacket: undefined, mode: "manual" });
+  assert.ok(html.includes('from.hasAttribute("data-morph-ignore")'), "client-filled subtrees are never overwritten");
+  assert.ok(html.includes('from.hasAttribute("data-keep-style")'), "a size the reader dragged is never snapped back");
+  assert.ok(html.includes("from !== document.activeElement"), "a control under the reader's hand stays theirs");
+  assert.match(html, /<div class="cards" data-keep-style/, "the card split is a dragged size, so it is kept");
+  // A full reload throws away every one of the above at once. Exactly one
+  // survives, as the manual retry on a stalled loading bar.
+  const reloads = html.match(/location\.reload\(\)/g) ?? [];
+  assert.equal(reloads.length, 1, "the page reloads itself in one place only");
+  assert.ok(html.includes("if (stalled !== null) { hideLoading(); location.reload(); return; }"), "and that place is the reader asking for it");
+});
+
+// THE CHAT CARD KEEPS ITS SLOT (owner 2026-07-29). This SUPERSEDES the earlier
+// rule that the terminal pane ships hidden until a host answers. Hiding was
+// safe while the pane lived in a column of its own. As a numbered card it is
+// not: an agent can connect or drop MID-SESSION, and a card that vanishes
+// renumbers every card after it while the reader is using those numbers.
+//
+// Its splitter is retired outright — the card grid sizes the card now.
+test("the chat card holds its slot and its number with no agent connected", () => {
   const root = freshRoot();
   const html = renderMirror({ session: new Session(root), root, lastPacket: undefined, mode: "agent" });
-  assert.match(html, /class="widget no-host" id="w-terminal"/, "the terminal pane ships hidden");
-  assert.match(html, /class="divider horiz no-host" id="div-term"/, "and so does its splitter");
-  assert.match(html, /\.no-host \{ display: none/, "hidden means not rendered at all, not an empty box");
-  assert.ok(html.includes('document.querySelectorAll(".no-host").forEach((el) => el.classList.remove("no-host"));'), "a host that answers is what reveals them");
+  assert.match(html, /id="w-terminal"/, "the chat card is rendered");
+  assert.ok(!/class="widget no-host" id="w-terminal"/.test(html), "and it is NOT hidden when nothing answers");
+  assert.ok(html.includes("no agent connected"), "it says plainly why it is empty");
+  assert.match(html, /id="card-chat"/, "the slot is there under its own id");
+  assert.match(html, /<span class="cardnum">1<\/span>/, "carrying the number that promotes it");
 });
 
 // THE END IS SHOWN, NOT GUESSED (owner ruling 2026-07-28). Quitting at the
@@ -213,20 +281,27 @@ test("pane sizes are stored on release and restored on load", () => {
   assert.ok(html.includes("Math.min(px, room - 120)"), "a stored size is clamped to the room there actually is");
 });
 
-// THE COLUMN IS SIZED BY THE TERMINAL IN IT (owner ruling 2026-07-28). 820px
-// was too wide, but narrowing it alone would only have made the agent wrap
-// early — the width and the column count are one decision, not two.
-test("the left column's default width holds an 80-column terminal", () => {
+// THE MAIN CARD IS SIZED BY THE TERMINAL IN IT (owner ruling 2026-07-28,
+// carried into the card layout). 820px was too wide, but narrowing alone would
+// only have made the agent wrap early — the width and the column count are one
+// decision, not two.
+//
+// The column it used to guard is gone. The ruling is not: when chat is the
+// PROMOTED card it must still clear 80 columns, and the default split is what
+// decides that. A small card cannot hold 80 columns and is not meant to.
+test("the default split gives a promoted terminal its 80 columns", () => {
   const root = freshRoot();
   const html = renderMirror({ session: new Session(root), root, lastPacket: undefined, mode: "manual" });
-  const m = /#left \{ width: (\d+)px;/.exec(html);
-  assert.ok(m !== null, "the left column still declares a starting width");
-  // The client measures a real glyph and floors the division, so the column
-  // must clear 80 cells at the widest a 13px monospace cell gets.
+  const m = /--main-w, (\d+)%/.exec(html);
+  assert.ok(m !== null, "the main card declares a default share of the width");
+  // The client measures a real glyph and floors the division, so the card must
+  // clear 80 cells at the widest a 13px monospace cell gets.
   const CELL_MAX = 8;
   const SCROLLBAR = 10;
-  assert.ok(Number(m[1]) - SCROLLBAR >= 80 * CELL_MAX, `${m[1]}px cannot hold 80 columns`);
-  assert.ok(Number(m[1]) < 820, "and it is narrower than the 820px the owner called too wide");
+  const NARROW = 1280; // a small laptop, not a wide desktop
+  const got = (NARROW * Number(m[1])) / 100 - SCROLLBAR;
+  assert.ok(got >= 80 * CELL_MAX, `${Math.round(got)}px cannot hold 80 columns on a ${NARROW}px screen`);
+  assert.ok(Number(m[1]) >= 50, "and the main card is the bigger half, which is the point of promoting it");
 });
 
 // HUMAN-RUNNABLE TOOLS RIDE THE LEGAL-TOOLS LINKS (owner ruling 2026-07-28).

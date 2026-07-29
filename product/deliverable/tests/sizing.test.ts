@@ -73,6 +73,19 @@ test("a long statement widens the box no further than the text it shows", () => 
   assert.ok(nodeSize("a_very_long_state_identifier_indeed_and_then_some_more").width <= 560, "a long title is capped too");
 });
 
+// AN ARCHIVE BOX IS SIZED BY THE GOAL IT SHOWS (owner, 2026-07-29: the
+// archive boxes are too small). Measuring the id `e20` alone bore every
+// archive record at 200x72, the floor width, while the drawing painted the
+// goal underneath it. The same rule as e20's, applied to the path it missed.
+test("an archive record is sized by the goal it displays", () => {
+  const idOnly = nodeSize("e20");
+  const withGoal = nodeSize("e20", "rebuild the mirror as a card matrix");
+  assert.ok(withGoal.width > idOnly.width, "the goal earns the width it needs");
+  assert.ok(withGoal.height > idOnly.height, "and the line it is drawn on");
+  const src = readFileSync(new URL("../engine/expmachine.ts", import.meta.url), "utf8");
+  assert.ok(!/nodeSize\(e\.sid\)/.test(src), "the archive never sizes from the id alone");
+});
+
 // One shortening, two readers. They drifted apart once already: the render cut
 // the subtitle at 48 while the size measured all thousand characters.
 test("the drawing and the size read the same shortened subtitle", () => {
