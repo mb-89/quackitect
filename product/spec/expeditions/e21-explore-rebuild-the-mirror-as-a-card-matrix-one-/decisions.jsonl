@@ -76,3 +76,12 @@
 {"ts":"2026-07-29T11:04:46.489Z","op":"update","visit":"expeditions/e21@0","node":"d82","brief":"committing the report before the leave tick"}
 {"ts":"2026-07-29T11:04:55.072Z","op":"update","visit":"expeditions/e21@0","node":"d83","brief":"entering the leave gate"}
 {"ts":"2026-07-29T11:05:07.848Z","op":"update","visit":"expeditions/e21-leave@0","node":"d84","brief":"applying e21 to trunk"}
+{"ts":"2026-07-29T11:05:25.381Z","op":"update","visit":"expeditions/e21-leave@0","node":"d85","brief":"absorbing trunk into the branch to resolve the canvas conflict"}
+{"ts":"2026-07-29T11:05:34.626Z","op":"update","visit":"expeditions/e21-leave@0","node":"d86","brief":"stepping back to the work state to resolve the canvas conflict"}
+{"ts":"2026-07-29T11:05:39.575Z","op":"update","visit":"expeditions/e21@2","node":"d87","brief":"absorbing trunk into the branch to resolve the canvas conflict"}
+{"ts":"2026-07-29T11:05:47.576Z","op":"update","visit":"expeditions/e21@2","node":"d88","brief":"confirming which tree se_run stands in"}
+{"ts":"2026-07-29T11:05:52.689Z","op":"update","visit":"expeditions/e21@2","node":"d89","brief":"merging trunk into the branch to resolve the conflict here"}
+{"ts":"2026-07-29T11:06:02.418Z","op":"update","visit":"expeditions/e21@2","node":"d90","brief":"reading the conflicted canvas so the owner's geometry wins"}
+{"ts":"2026-07-29T11:06:43.761Z","op":"update","visit":"expeditions/e21@2","node":"d91","brief":"resolving the canvas with the owner's geometry plus the pruning door"}
+{"ts":"2026-07-29T11:06:47.179Z","op":"update","visit":"expeditions/e21@2","node":"d92","brief":"verifying the merged canvas compiles and the suite holds"}
+{"ts":"2026-07-29T11:07:12.202Z","op":"update","visit":"expeditions/e21@2","node":"d93","brief":"committing the resolved merge"}
