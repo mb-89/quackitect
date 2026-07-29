@@ -37,6 +37,14 @@ Narration rides the walk (the unified log + the decision graph):
     panel's checklist IS this graph, and a visit without a plan shows
     the reader nothing to follow. Check items off with done AS each one
     lands, never in bulk at the end.
+    WHY, because the rule keeps getting broken: the checklist is a
+    PROGRESS view, not a completion record. A reader watching it wants
+    to know where you are while you are still there. Fourteen items
+    ticked in the last minute of an hour's work tell them nothing they
+    could not have read from the commit. If an item is genuinely done,
+    close it in the same breath as the work — the next call, not the
+    last one. Only genuinely simultaneous work closes together.
+    The engine nudges when updates keep landing and nothing closes.
   - fork `{brief, items?}` opens an unplanned branch where you are — a
     BLOCKING detour: the current item cannot continue until this is fixed;
     resolve it and return. Extra work that merely grows the scope is not a

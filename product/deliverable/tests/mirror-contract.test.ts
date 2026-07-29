@@ -373,6 +373,25 @@ test("the survey is offered as a legal tool, not as a button of its own", () => 
   assert.ok(!html.includes("survey-btn"), "and its bespoke button is gone, handler and all");
 });
 
+// A CHECKLIST IS A PROGRESS VIEW (owner 2026-07-29, after watching one sit
+// untouched for an hour and then close fourteen items in a minute). The
+// rule was already in walking.md and prose lost, so the engine says it.
+test("the checklist nudges when narration outruns it, and never refuses", () => {
+  const s = new Session(freshRoot());
+  s.decisions.apply("idle@0", { op: "plan", items: ["first", "second"] });
+  let last: Record<string, unknown> = {};
+  for (let i = 0; i < 5; i++) last = s.decisions.apply("idle@0", { op: "update", brief: "working " + i }) as Record<string, unknown>;
+  assert.ok(typeof last.nudge === "string", "five updates with nothing closed earns the nudge");
+  assert.match(String(last.nudge), /PROGRESS view/);
+  assert.equal(last.update, "update", "and the update itself still lands - a nudge is never a refusal");
+  // Closing something resets it: the rhythm is what is being asked for.
+  const open = s.decisions.graph("idle@0").nodes.filter((n) => n.status === "open");
+  const closed = s.decisions.apply("idle@0", { op: "done", node: open[0].id, brief: "landed" }) as Record<string, unknown>;
+  assert.equal(closed.nudge, undefined, "closing something clears it");
+  const after = s.decisions.apply("idle@0", { op: "update", brief: "on to the next" }) as Record<string, unknown>;
+  assert.equal(after.nudge, undefined, "and the count starts again from there");
+});
+
 // DEFERRED MUST NEVER LOOK KILLED (owner design). A parked point is still
 // owed; it is simply owed in another state. The badge and the origin line
 // were already built, so this pins the one thing that was not: the style.
