@@ -64,3 +64,12 @@
 {"ts":"2026-07-29T11:02:18.280Z","op":"update","visit":"expeditions/e21@0","node":"d72","brief":"log fills its card instead of 42% of an old column"}
 {"ts":"2026-07-29T11:02:21.042Z","op":"update","visit":"expeditions/e21@0","node":"d73","brief":"verifying the suite after the log card styling fix"}
 {"ts":"2026-07-29T11:02:50.015Z","op":"done","visit":"expeditions/e21@0","node":"d10","brief":"card matrix designed as one grid so promotion never re-parents a widget"}
+{"ts":"2026-07-29T11:02:58.289Z","op":"done","visit":"expeditions/e21@0","node":"d11","brief":"card matrix built and green at 150 tests"}
+{"ts":"2026-07-29T11:03:03.041Z","op":"plan","visit":"expeditions/e21@0","parent":null,"nodes":[{"id":"d74","brief":"Fill the leave report"},{"id":"d75","brief":"Close and merge e21"},{"id":"d76","brief":"Write the handover"}]}
+{"ts":"2026-07-29T11:03:38.741Z","op":"done","visit":"expeditions/e21@0","node":"d9","brief":"mirror survey complete, the render already morphs"}
+{"ts":"2026-07-29T11:03:41.993Z","op":"update","visit":"expeditions/e21@0","node":"d77","brief":"reading the record before writing the leave page"}
+{"ts":"2026-07-29T11:04:23.214Z","op":"update","visit":"expeditions/e21@0","node":"d78","brief":"writing the leave page"}
+{"ts":"2026-07-29T11:04:26.280Z","op":"update","visit":"expeditions/e21@0","node":"d79","brief":"voice-linting the report before the close"}
+{"ts":"2026-07-29T11:04:34.605Z","op":"update","visit":"expeditions/e21@0","node":"d80","brief":"splitting the wall the voice lint caught"}
+{"ts":"2026-07-29T11:04:37.858Z","op":"update","visit":"expeditions/e21@0","node":"d81","brief":"re-linting the report"}
+{"ts":"2026-07-29T11:04:42.596Z","op":"done","visit":"expeditions/e21@0","node":"d74","brief":"leave report written and voice-lint clean"}
