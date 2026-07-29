@@ -28,6 +28,9 @@ export interface SearchResult {
   matches: Match[];
   total: number;
   truncated: boolean;
+  /** Files ripgrep refused to read as text. Present only when non-empty:
+   *  an unreadable file must never be indistinguishable from no matches. */
+  unreadable?: string[];
 }
 
 const LINE_CAP = 300;
@@ -69,7 +72,8 @@ export function search(
   opts: { path?: string; ref?: string; ignore_case?: boolean; limit?: number } = {},
 ): SearchResult {
   const limit = opts.limit ?? 100;
-  const matches = opts.ref === undefined ? rgSearch(root, query, opts) : gitGrepSearch(root, query, opts.ref, opts);
+  const unreadable: string[] = [];
+  const matches = opts.ref === undefined ? rgSearch(root, query, opts, unreadable) : gitGrepSearch(root, query, opts.ref, opts);
   return {
     query,
     engine: opts.ref === undefined ? "ripgrep" : "git-grep",
@@ -77,14 +81,28 @@ export function search(
     matches: matches.slice(0, limit),
     total: matches.length,
     truncated: matches.length > limit,
+    // A FILE THAT CANNOT BE SEARCHED SAYS SO (found live 2026-07-29).
+    // engine/worktree.ts carried one raw NUL byte as a cache-key separator.
+    // ripgrep called the whole file binary and reported it on a line this
+    // parser did not understand, so the line was dropped and the search
+    // returned an empty, confident "no matches".
+    //
+    // The file was invisible to every search in the lane, and nothing ever
+    // said so. An empty result and an unreadable file must never look alike.
+    ...(unreadable.length > 0 ? { unreadable } : {}),
   };
 }
 
-function rgSearch(root: string, query: string, opts: { path?: string; ignore_case?: boolean }): Match[] {
+function rgSearch(root: string, query: string, opts: { path?: string; ignore_case?: boolean }, unreadable: string[] = []): Match[] {
   const scope = opts.path === undefined ? resolve(root) : resolveInRoot(root, opts.path, "engine/search.ts");
   // --with-filename: rg drops the filename for a single-file scope, which
   // starved the path:line:text parser — every match silently vanished.
-  const args = ["--line-number", "--no-heading", "--with-filename", "--max-count", String(PER_FILE_CAP), "--max-columns", String(LINE_CAP)];
+  // --binary: without it ripgrep skips a binary file in a DIRECTORY search
+  // and says nothing whatsoever — no line, no warning, no exit code. With it,
+  // the file is named on a "binary file matches" line, which the loop below
+  // turns into `unreadable`. --text was the alternative and was rejected: it
+  // would search real binaries as text and spray them through the results.
+  const args = ["--line-number", "--no-heading", "--with-filename", "--binary", "--max-count", String(PER_FILE_CAP), "--max-columns", String(LINE_CAP)];
   for (const d of [".se", "node_modules", ".worktrees"]) args.push("--glob", `!${d}/**`);
   if (opts.ignore_case === true) args.push("--ignore-case");
   args.push("--regexp", query, scope);
@@ -93,6 +111,14 @@ function rgSearch(root: string, query: string, opts: { path?: string; ignore_cas
   const out: Match[] = [];
   for (const line of (r.stdout ?? "").split("\n")) {
     if (line.trim() === "") continue;
+    // ripgrep announces a skipped file as "<path>: binary file matches (...)",
+    // which has no line number and so never parsed. Catch it before the drop.
+    const bin = line.match(/^(.+?): binary file matches/);
+    if (bin !== null) {
+      const relBin = relative(root, bin[1]).split(sep).join("/");
+      unreadable.push(relBin === "" ? bin[1] : relBin);
+      continue;
+    }
     const m = line.match(/^(.{1,}?):(\d+):(.*)$/s);
     if (m === null) continue;
     const rel = relative(root, m[1]).split(sep).join("/");
