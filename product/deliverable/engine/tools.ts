@@ -51,7 +51,9 @@ export function sessionTools(session: Session): ToolDef[] {
           wait: { type: "boolean", description: "short in-turn HOLD: blocks until the human's hand moves the walk or the slider, then returns the fresh packet (changed: false on timeout). For longer waits STOP instead and ask the user to message you" },
           escape: { type: "string", description: "ESCAPE to idle with this reason — the stuck sub-machine walk is left standing (a later continue re-enters it); the escape is a recorded failure. Boot cannot be escaped" },
           read_hashes: { type: "object", description: "proof-of-read for this tick: {\"<root-relative path>\": \"<hash from se_file_read>\", ...} — must cover the docs the transition demands, each hash matching the doc as it stands now" },
-          route: { type: "string", description: "THE BLUE LINE — the way from here to this target state: every hop, its priority, and what it will ask for. Moves NOTHING. Names where the walk would stop and why" },
+          route: { type: "string", description: "THE BLUE LINE — the way from here to this target state: every hop, its priority, and what it will ask for. Moves NOTHING. Lists EVERY judgment on the way, so a person can answer them all at once and leave the walk to run" },
+          sweep: { type: "boolean", description: "WALK the route to `to` in one call rather than one tick per hop. Collapses round trips ONLY - every hop still weighs the slider, proves its reads and runs its scripts. Stops at the first hop that will not pass and says which and why; the route recomputes after each hop, so a detour is followed rather than fallen off" },
+          target: { type: "string", description: "Set the session's TARGET state - the blue line the mirror draws. Defaults to the front desk at every engine start" },
         },
       },
       handler: async (args) => {
@@ -72,7 +74,9 @@ export function sessionTools(session: Session): ToolDef[] {
         }
         // Looking never moves, so the route answers before anything else.
         if (args.route !== undefined) return session.route(String(args.route));
+        if (args.target !== undefined) return session.setTarget(String(args.target));
         const hashes = (typeof args.read_hashes === "object" && args.read_hashes !== null ? args.read_hashes : {}) as Record<string, string>;
+        if (args.sweep === true) return session.sweep(String(args.to ?? session.target), "agent", hashes);
         // ATOMIC: a moving tick declares where it was planned — stale plans
         // are refused before anything moves (peeking never needs it).
         if (args.from !== undefined && args.state === undefined) session.assertFrom(String(args.from));

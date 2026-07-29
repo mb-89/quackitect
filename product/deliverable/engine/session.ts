@@ -104,6 +104,11 @@ export class Session {
    *  1 is fully autonomous. Content work inside a state is never gated —
    *  only ENTERING is. Live-adjustable (the mirror's slider). */
   private _autonomy = 0.4;
+  /** THE TARGET — where the walk is headed, and the blue line the mirror
+   *  draws. Every engine start aims at the front desk (owner ruling
+   *  2026-07-29): the desk is where a person says what they want, so it is
+   *  the destination unless somebody names another. */
+  private _target = "front_desk";
   /** Fires once, after the tick that closes the MAIN machine — the server
    *  entry hooks the session shutdown here. */
   onClosed?: () => void;
@@ -687,26 +692,122 @@ export class Session {
       const pst = this.declForPrefix(pprefix)?.states.find((s) => s.id === pid);
       for (const e of pst?.edges ?? []) nexts.push({ to: Session.qual(pprefix, e.to), tick: { from: q, advance: true } });
     }
-    return { priority: st.priority, demands: { ...(st.entry ?? {}) }, nexts };
+    return { priority: st.priority, demands: { ...(st.entry ?? {}) }, exit_demands: { ...(st.exit ?? {}) }, nexts };
   }
 
+  get target(): string {
+    return this._target;
+  }
+
+  /** Aim the walk somewhere else. Setting a target moves nothing — it says
+   *  where the way is drawn to. An unreachable one is refused rather than
+   *  stored, so the blue line never points at nowhere. */
+  setTarget(to: string): Record<string, unknown> {
+    const r = this.route(to);
+    if (!r.found && to !== this.active()[0]) {
+      throw new Rejection({
+        clause: CLAUSES.NOT_LEGAL_IN_STATE,
+        expected: "a state the drawing can reach from here",
+        got: `${to} — ${r.note ?? "no path"}`,
+        remedy: { tool: "se_tick", args: { route: "front_desk" }, note: "peek a route before aiming at it; the drawn edges are the only ways" },
+        source: "engine/session.ts target",
+      });
+    }
+    this._target = to;
+    return { target: to, ...r };
+  }
+
+  /** Conditions no agent can discharge alone. A script it can run; a read
+   *  it can prove. A form wants a person's confirmation, by design. */
+  private static readonly PERSON_CONDITIONS: ReadonlySet<string> = new Set(["evidence_form"]);
+
   /** THE BLUE LINE. Where the walk stands, where it is headed, and every
-   *  hop between — with what each will ask for. It MOVES NOTHING. */
-  route(target: string): RouteResult & { from: string; autonomy: number; stops_at?: { at: string; why: string } } {
+   *  hop between — with what each will ask for. It MOVES NOTHING.
+   *
+   *  EVERY JUDGMENT IS COLLECTED UP FRONT (owner ruling 2026-07-29). Not
+   *  just the first blocker: the whole list, so a person can answer all of
+   *  them in one sitting and then leave the walk to run alone. Stopping at
+   *  each one in turn is how a five-minute errand becomes an afternoon of
+   *  being asked one question at a time. */
+  route(target: string): RouteResult & {
+    from: string;
+    autonomy: number;
+    judgments: { at: string; needs: string; why: string }[];
+    reads: string[];
+    stops_at?: { at: string; why: string };
+  } {
     const from = this.active()[0] ?? this.machine.initial;
     const r = computeRoute(from, target, (q) => this.expandNode(q));
-    // The slider is weighed HOP BY HOP. A route that walks past a state the
-    // agent may not enter would be a hole straight through contract rule 3,
-    // so the preview names where it will stop before anything moves.
-    const blocked = r.steps.find((s) => s.priority > this._autonomy);
+    const judgments: { at: string; needs: string; why: string }[] = [];
+    for (const s of r.steps) {
+      // The slider is weighed HOP BY HOP. A route that walks past a state
+      // the agent may not enter is a hole straight through contract rule 3.
+      if (s.priority > this._autonomy) {
+        judgments.push({
+          at: s.to,
+          needs: "the slider, or the person's own hand",
+          why: `entering ${s.to} weighs ${s.priority}, above the session autonomy ${this._autonomy}`,
+        });
+      }
+      for (const key of Object.keys(s.demands)) {
+        if (!Session.PERSON_CONDITIONS.has(key)) continue;
+        judgments.push({ at: s.to, needs: key, why: `${s.to} asks for ${key}: ${(s.demands[key] ?? []).join(", ")}` });
+      }
+    }
+    // EVERY DOCUMENT THE WHOLE WAY DEMANDS, gathered once. This is what
+    // makes a sweep one call rather than one per hop: read this list, hash
+    // it, and hand the lot over. A route is also PULLED guidance, which the
+    // entry conditions never name, so both are collected.
+    const reads = new Set<string>();
+    for (const s of r.steps) {
+      for (const p of s.demands.read ?? []) reads.add(p);
+      const cut = s.to.lastIndexOf("/");
+      const decl = this.declForPrefix(cut < 0 ? "" : s.to.slice(0, cut));
+      const st = decl?.states.find((x) => x.id === (cut < 0 ? s.to : s.to.slice(cut + 1)));
+      if (decl !== undefined && st !== undefined) for (const d of this.pulled(decl, st)) reads.add(d.path);
+    }
     return {
       ...r,
       from,
       autonomy: this._autonomy,
-      ...(blocked !== undefined
-        ? { stops_at: { at: blocked.to, why: `entering ${blocked.to} weighs ${blocked.priority}, above the session autonomy ${this._autonomy} — the person's hand advances it` } }
-        : {}),
+      judgments,
+      reads: [...reads].sort(),
+      ...(judgments.length > 0 ? { stops_at: { at: judgments[0].at, why: judgments[0].why } } : {}),
     };
+  }
+
+  /** THE SWEEP — the route, walked. It collapses ROUND TRIPS and nothing
+   *  else: every hop still enters its state, still weighs the slider, still
+   *  proves its reads, still runs its scripts, still writes its own line to
+   *  the feed. The first hop that will not pass stops it, and says so.
+   *
+   *  THE ROUTE IS RECOMPUTED AFTER EVERY HOP, which is the detour: if the
+   *  ground moved, the way is worked out again FROM WHERE THE WALK NOW
+   *  STANDS rather than followed off a cliff. */
+  async sweep(target: string, channel: Channel, readHashes: Record<string, string>): Promise<Record<string, unknown>> {
+    const walked: string[] = [];
+    for (let guard = 0; guard < 64; guard++) {
+      const r = this.route(target);
+      if (r.steps.length === 0) {
+        return { ...this.tickInfo(), swept: walked, arrived: r.found, ...(r.found ? {} : { note: r.note }) };
+      }
+      const step = r.steps[0];
+      try {
+        await this.tickAdvance(step.tick.to === undefined ? undefined : String(step.tick.to), channel, readHashes);
+      } catch (e) {
+        if (!(e instanceof Rejection)) throw e;
+        return {
+          ...this.tickInfo(),
+          swept: walked,
+          arrived: false,
+          stopped_at: step.to,
+          refusal: e.toJSON(),
+          note: `swept ${walked.length} hop(s), then ${step.to} refused — answer it and sweep again; the route recomputes from here`,
+        };
+      }
+      walked.push(step.to);
+    }
+    return { ...this.tickInfo(), swept: walked, arrived: false, note: "64 hops without arriving — the sweep stops rather than looping" };
   }
 
   /** Where the walk is, machine-wise: ["main"] or ["main", "boot", …]. */
@@ -1558,6 +1659,9 @@ export class Session {
       status: this.instance.status,
       autonomy: this._autonomy,
       shutdown: this._shutdown,
+      // WHERE THIS IS HEADED. Carried on every packet so neither hand has
+      // to ask, and so a walk that drifts off the way is visibly off it.
+      target: this._target,
       // The session's reading list: what the human checked while driving.
       // Your advances must prove the same docs (paths only — the hashes
       // are earned by reading).

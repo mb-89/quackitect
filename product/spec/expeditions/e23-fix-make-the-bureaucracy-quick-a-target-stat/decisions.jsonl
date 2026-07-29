@@ -46,3 +46,14 @@
 {"ts":"2026-07-29T14:46:46.725Z","op":"update","visit":"expeditions/e23@0","node":"d10","brief":"suite run after the HTTP contract fix"}
 {"ts":"2026-07-29T14:47:44.979Z","op":"update","visit":"expeditions/e23@0","node":"d11","brief":"test pins the update-names-its-item rule"}
 {"ts":"2026-07-29T14:47:55.196Z","op":"update","visit":"expeditions/e23@0","node":"d12","brief":"final suite run for this batch"}
+{"ts":"2026-07-29T14:48:55.938Z","op":"update","visit":"expeditions/e23@0","node":"d13","brief":"committed the route and the update-visibility fixes"}
+{"ts":"2026-07-29T14:56:07.515Z","op":"plan","visit":"expeditions/e23@0","parent":null,"nodes":[{"id":"d14","brief":"Route collects every judgment up front"},{"id":"d15","brief":"The sweep advances hop by hop and recomputes"},{"id":"d16","brief":"A session target defaulting to the front desk"},{"id":"d17","brief":"The blue line in the mirror on the drawn edges"},{"id":"d18","brief":"Sharpen the prefill rule in ux.md"},{"id":"d19","brief":"The desk prefills a seed"},{"id":"d20","brief":"Lint the state guidance fields"},{"id":"d21","brief":"Judge the thirteen standing prose findings"},{"id":"d22","brief":"Close out and hand over"}]}
+{"ts":"2026-07-29T14:57:34.532Z","op":"done","visit":"expeditions/e23@0","node":"d14","brief":"judgments are collected up front now"}
+{"ts":"2026-07-29T14:58:20.164Z","op":"done","visit":"expeditions/e23@0","node":"d16","brief":"a session target, aimed at the front desk on every start"}
+{"ts":"2026-07-29T14:58:32.835Z","op":"update","visit":"expeditions/e23@0","node":"d23","brief":"first sweep from a cold start"}
+{"ts":"2026-07-29T14:59:02.527Z","op":"update","visit":"expeditions/e23@0","node":"d24","brief":"a hop demands both ends of its transition, not just the target"}
+{"ts":"2026-07-29T14:59:20.328Z","op":"update","visit":"expeditions/e23@0","node":"d25","brief":"the route lists every document the whole way demands"}
+{"ts":"2026-07-29T14:59:30.598Z","op":"update","visit":"expeditions/e23@0","node":"d26","brief":"sweeping with one read pass over the whole route"}
+{"ts":"2026-07-29T15:00:41.611Z","op":"done","visit":"expeditions/e23@0","node":"d15","brief":"the sweep walks the whole way in one call"}
+{"ts":"2026-07-29T15:00:50.802Z","op":"update","visit":"expeditions/e23@0","node":"d27","brief":"suite run over the sweep and target"}
+{"ts":"2026-07-29T15:01:48.398Z","op":"update","visit":"expeditions/e23@0","node":"d28","brief":"captured the reverse-engineering idea for later"}

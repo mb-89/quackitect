@@ -29,7 +29,12 @@ export interface RouteStep {
 
 export interface RouteNode {
   priority: number;
+  /** What ENTERING this state asks for. */
   demands: Record<string, string[]>;
+  /** What LEAVING it asks for. A transition checks both ends, so a route
+   *  that only looked at entry conditions would under-report every exit
+   *  read — which is most of them in the boot lane. */
+  exit_demands: Record<string, string[]>;
   nexts: { to: string; tick: Record<string, unknown> }[];
 }
 
@@ -71,7 +76,7 @@ export function computeRoute(
           to: e.to,
           tick: e.tick,
           priority: arriving?.priority ?? 0,
-          demands: arriving?.demands ?? {},
+          demands: mergeDemands(node.exit_demands, arriving?.demands),
         });
         if (e.to === target) return { target, found: true, steps: trace(cameFrom, start, target) };
         next.push(e.to);
@@ -80,6 +85,16 @@ export function computeRoute(
     frontier = next;
   }
   return { target, found: false, steps: [], note: `no drawn path from ${start} to ${target}` };
+}
+
+/** Both ends of a transition, under one key each. A doc demanded by the
+ *  leaving state and the arriving one is listed once. */
+function mergeDemands(a?: Record<string, string[]>, b?: Record<string, string[]>): Record<string, string[]> {
+  const out: Record<string, string[]> = {};
+  for (const src of [a, b]) {
+    for (const [k, v] of Object.entries(src ?? {})) out[k] = [...new Set([...(out[k] ?? []), ...v])];
+  }
+  return out;
 }
 
 function trace(cameFrom: Map<string, RouteStep>, start: string, target: string): RouteStep[] {

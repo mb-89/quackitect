@@ -2,7 +2,10 @@
 // It is SCHEDULING ONLY: it removes no guard and no autonomy rule, it
 // collapses round trips. The preview moves nothing at all.
 import { strict as assert } from "node:assert";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { test } from "node:test";
+import { contentHash } from "../engine/hash.ts";
 import { computeRoute, type RouteNode } from "../engine/route.ts";
 import { Session } from "../engine/session.ts";
 import { freshRoot } from "./helpers.ts";
@@ -70,6 +73,66 @@ test("the route weighs the slider hop by hop and names where it stops", () => {
   // the threshold would be a hole straight through contract rule 3.
   s.setAutonomy(1);
   assert.equal(s.route("front_desk").stops_at, undefined);
+});
+
+test("the route collects every judgment and every document up front", () => {
+  const s = new Session(freshRoot());
+  s.setAutonomy(1);
+  const clear = s.route("front_desk");
+  assert.deepEqual(clear.judgments, [], "nothing to ask at full autonomy");
+  // EVERY doc the whole way demands, gathered once - this is what lets a
+  // sweep be one call. Exit conditions count: most of the boot lane's
+  // reads are demanded on the way OUT of a state, not into it.
+  assert.ok(clear.reads.includes("workspace/AGENTS.md"), "an exit-condition read is collected");
+  assert.ok(clear.reads.includes("product/guidance/method/front-desk.md"), "and guidance the target PULLS, which no condition names");
+  // Lowered, every hop needing a person is listed - not just the first, so
+  // they can all be answered in one sitting.
+  s.setAutonomy(0);
+  const asked = s.route("front_desk");
+  assert.ok(asked.judgments.length >= 2, `every blocked hop is named, got ${asked.judgments.length}`);
+  assert.equal(asked.stops_at?.at, asked.judgments[0].at, "and the first one is where it stops");
+});
+
+test("the sweep walks the whole way in one call, and every guard still fires", async () => {
+  const root = freshRoot();
+  const s = new Session(root);
+  s.setAutonomy(1);
+  // WITHOUT the reads it stops, typed, exactly where the guard is.
+  const short = await s.sweep("front_desk", "agent", {});
+  assert.equal(short.arrived, false, "the read proof is not waived by sweeping");
+  assert.equal((short.refusal as { clause: string }).clause, "SE-C-112");
+  assert.ok((short.swept as string[]).length > 0, "and the hops it DID make stand");
+  assert.deepEqual(s.active(), ["boot/read_contract"], "the walk stands where it got to, never rolled back");
+  // WITH them, the same call arrives.
+  const hashes: Record<string, string> = {};
+  for (const p of s.route("front_desk").reads) {
+    try {
+      hashes[p] = contentHash(readFileSync(join(root, ...p.split("/"))));
+    } catch { /* a listed doc that does not exist is not a read */ }
+  }
+  const done = await s.sweep("front_desk", "agent", hashes);
+  assert.equal(done.arrived, true, JSON.stringify(done.refusal ?? done.note));
+  assert.deepEqual(s.active(), ["front_desk"]);
+});
+
+test("the sweep stops at the slider, and the target defaults to the front desk", async () => {
+  const root = freshRoot();
+  const s = new Session(root);
+  assert.equal(s.target, "front_desk", "every engine start aims at the desk");
+  s.setAutonomy(0.1);
+  const hashes: Record<string, string> = {};
+  for (const p of s.route("front_desk").reads) {
+    try {
+      hashes[p] = contentHash(readFileSync(join(root, ...p.split("/"))));
+    } catch { /* not a read */ }
+  }
+  const out = await s.sweep("front_desk", "agent", hashes);
+  assert.equal(out.arrived, false, "a sweep never walks past the slider");
+  assert.deepEqual(s.active(), ["idle"], "it goes as far as it may and stops there");
+  assert.equal((out.refusal as { clause: string }).clause, "SE-C-113");
+  // Aiming somewhere the drawing cannot reach is refused, not stored.
+  assert.throws(() => s.setTarget("nowhere-at-all"));
+  assert.equal(s.target, "front_desk", "so the blue line never points at nowhere");
 });
 
 test("the preview MOVES NOTHING", () => {
