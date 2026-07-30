@@ -67,6 +67,19 @@ try {
   failures.push(String((e as Error).message));
 }
 if (spawnSync("git", ["--version"], { stdio: "ignore" }).status !== 0) failures.push("git does not answer — it is a hard dependency");
+// THE SHELL IS NOT COVERED BY THE SUITE. Nothing imports extension.js, so a
+// syntax error in it ships GREEN and VS Code then loads no extension at all,
+// silently. That happened on 2026-07-30: a backtick inside a comment ended
+// the template literal the webview's script lives in. Parsing the file is the
+// whole guard, and it costs one spawn.
+const shell = join(root, "product", "deliverable", "vscode", "extension.js");
+if (existsSync(shell)) {
+  const parsed = spawnSync(process.execPath, ["--check", shell], { encoding: "utf8" });
+  if (parsed.status !== 0) {
+    const line = String(parsed.stderr ?? "").split("\n").map((l) => l.trim()).find((l) => l.includes("Error"));
+    failures.push(`the VS Code shell does not parse: ${line ?? "run node --check on it"}`);
+  }
+}
 try {
   mkdirSync(seDir(root), { recursive: true });
   accessSync(dirname(join(seDir(root), "calls.jsonl")), constants.W_OK);

@@ -139,3 +139,6 @@
 {"ts":"2026-07-30T20:11:36.984Z","op":"done","visit":"expeditions/e26@0","node":"d17","brief":"Handover rewritten and the search caution corrected"}
 {"ts":"2026-07-30T20:12:07.995Z","op":"done","visit":"expeditions/e26@0","node":"d18","brief":"Answered how the reconnect actually works"}
 {"ts":"2026-07-30T20:16:20.720Z","op":"plan","visit":"expeditions/e26@0","parent":null,"nodes":[{"id":"d20","brief":"Fix the backtick that ended the template literal"},{"id":"d21","brief":"Make preflight parse the extension so this cannot ship again"}]}
+{"ts":"2026-07-30T20:16:48.911Z","op":"done","visit":"expeditions/e26@0","node":"d20","brief":"The extension parses again and is reinstalled"}
+{"ts":"2026-07-30T20:17:18.407Z","op":"update","visit":"expeditions/e26@0","node":"d22","brief":"Guard proven: green when good, red on the reintroduced fault"}
+{"ts":"2026-07-30T20:18:07.743Z","op":"done","visit":"expeditions/e26@0","node":"d21","brief":"Preflight parses the shell and boot now catches it"}
