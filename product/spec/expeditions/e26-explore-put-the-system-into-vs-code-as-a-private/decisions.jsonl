@@ -114,3 +114,27 @@
 {"ts":"2026-07-30T19:37:56.086Z","op":"done","visit":"expeditions/e26@1","node":"d83","brief":"the wire key and the tree kill are consistent on both sides"}
 {"ts":"2026-07-30T19:38:01.909Z","op":"update","visit":"expeditions/e26@1","node":"d94","brief":"checking the merge is clean before committing"}
 {"ts":"2026-07-30T19:38:17.032Z","op":"update","visit":"expeditions/e26@1","node":"d95","brief":"running the suite against the merged tree"}
+{"ts":"2026-07-30T19:39:40.547Z","op":"update","visit":"expeditions/e26@1","node":"d96","brief":"installing the library on trunk"}
+{"ts":"2026-07-30T19:48:55.301Z","op":"plan","visit":"expeditions/e26@0","parent":null,"nodes":[{"id":"d1","brief":"Blue for the active state in the machine drawing"},{"id":"d2","brief":"Blue for states already visited"},{"id":"d3","brief":"Label the pulled-docs tree node pull"},{"id":"d4","brief":"Redraw the next-states table the new way"},{"id":"d5","brief":"Tighten line spacing in the receipt details"},{"id":"d6","brief":"Run the suite and commit"}]}
+{"ts":"2026-07-30T19:49:13.744Z","op":"plan","visit":"expeditions/e26@0","parent":null,"nodes":[{"id":"d7","brief":"Clicks do not open anything in Details"}]}
+{"ts":"2026-07-30T19:49:55.180Z","op":"update","visit":"expeditions/e26@0","node":"d8","brief":"The black is a 22% colour-mix against transparent over a dark pane"}
+{"ts":"2026-07-30T19:50:03.189Z","op":"plan","visit":"expeditions/e26@0","parent":null,"nodes":[{"id":"d9","brief":"Rename the feed filter to name the logs"}]}
+{"ts":"2026-07-30T19:55:45.009Z","op":"update","visit":"expeditions/e26@0","node":"d10","brief":"Blue replaces the black fill across the drawing and the panes"}
+{"ts":"2026-07-30T19:57:31.140Z","op":"update","visit":"expeditions/e26@0","node":"d11","brief":"Blue replaces the black fill across the drawing and the panes"}
+{"ts":"2026-07-30T19:57:33.896Z","op":"update","visit":"expeditions/e26@0","node":"d12","brief":"Preflight and the full suite over the edited render"}
+{"ts":"2026-07-30T19:58:25.959Z","op":"done","visit":"expeditions/e26@0","node":"d1","brief":"The active state now fills with the walk blue"}
+{"ts":"2026-07-30T19:58:33.653Z","op":"done","visit":"expeditions/e26@0","node":"d2","brief":"Visited states wear the same blue, quieter by weight"}
+{"ts":"2026-07-30T19:58:48.295Z","op":"done","visit":"expeditions/e26@0","node":"d3","brief":"The root fold now reads pull"}
+{"ts":"2026-07-30T19:59:33.410Z","op":"update","visit":"expeditions/e26@0","node":"d13","brief":"Install trunk's extension into the folder install"}
+{"ts":"2026-07-30T20:00:01.409Z","op":"done","visit":"expeditions/e26@0","node":"d9","brief":"The filter box and its help now say logs"}
+{"ts":"2026-07-30T20:00:24.318Z","op":"done","visit":"expeditions/e26@0","node":"d4","brief":"The next states render as host elements, not a nested table"}
+{"ts":"2026-07-30T20:00:40.713Z","op":"done","visit":"expeditions/e26@0","node":"d5","brief":"The receipt front matter sits tighter in both renderings"}
+{"ts":"2026-07-30T20:01:36.635Z","op":"update","visit":"expeditions/e26@0","node":"d14","brief":"An unacked subject now reloads the frame and re-delivers"}
+{"ts":"2026-07-30T20:01:39.932Z","op":"update","visit":"expeditions/e26@0","node":"d15","brief":"Second suite run over the relay recovery and the ruling"}
+{"ts":"2026-07-30T20:02:26.069Z","op":"done","visit":"expeditions/e26@0","node":"d7","brief":"The relay recovers a page that stopped answering"}
+{"ts":"2026-07-30T20:02:44.008Z","op":"done","visit":"expeditions/e26@0","node":"d6","brief":"Suite green twice, both rounds landed on trunk and installed"}
+{"ts":"2026-07-30T20:07:22.525Z","op":"plan","visit":"expeditions/e26@0","parent":null,"nodes":[{"id":"d16","brief":"Verify every factual claim in the handover"},{"id":"d17","brief":"Rewrite it against what is actually true"},{"id":"d18","brief":"Answer whether a killed engine gets me back"}]}
+{"ts":"2026-07-30T20:07:38.704Z","op":"update","visit":"expeditions/e26@0","node":"d19","brief":"Ripgrep and the Copilot CLI are both genuinely absent"}
+{"ts":"2026-07-30T20:09:04.174Z","op":"done","visit":"expeditions/e26@0","node":"d16","brief":"Six claims checked and five of them were wrong or stale"}
+{"ts":"2026-07-30T20:11:36.984Z","op":"done","visit":"expeditions/e26@0","node":"d17","brief":"Handover rewritten and the search caution corrected"}
+{"ts":"2026-07-30T20:12:07.995Z","op":"done","visit":"expeditions/e26@0","node":"d18","brief":"Answered how the reconnect actually works"}
