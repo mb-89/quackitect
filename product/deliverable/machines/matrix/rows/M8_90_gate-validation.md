@@ -4,7 +4,11 @@ name: gate-validation
 statement: "GATE validation: meets the need - and this bless IS the sign-off."
 state_kind: gate
 filled_by: agent
-depends_on: [fill-story-evidence, sweep-consistency, log-gaps]
+depends_on:
+  - fill-story-evidence
+  - sweep-consistency
+  - log-gaps
+COMMENT: "state: ok"
 ---
 
 ## Guidance

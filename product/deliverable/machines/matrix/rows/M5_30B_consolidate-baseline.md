@@ -4,7 +4,9 @@ name: consolidate-baseline
 statement: "Consolidate the baseline: the winner's matrices ARE the architecture."
 state_kind: work
 filled_by: agent
-depends_on: [reverse-sensitivity]
+depends_on:
+  - reverse-sensitivity
+COMMENT: "state: ok"
 ---
 
 ## Guidance

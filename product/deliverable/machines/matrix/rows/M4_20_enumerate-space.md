@@ -4,8 +4,10 @@ name: enumerate-space
 statement: "Enumerate the design space: the morphological chart over the partitioned functions; the shortlist seeds the parallel candidates."
 state_kind: work
 filled_by: agent
-depends_on: [partition-functions]
+depends_on:
+  - partition-functions
 seeds: candidates
+COMMENT: "state: ok"
 ---
 
 ## Guidance

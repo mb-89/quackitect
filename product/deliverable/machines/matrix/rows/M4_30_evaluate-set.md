@@ -4,7 +4,10 @@ name: evaluate-set
 statement: "Evaluate the candidate set: multi-objective scores, the Pareto front, eliminations recorded."
 state_kind: work
 filled_by: agent
-depends_on: [enumerate-space, derive-criteria]
+depends_on:
+  - enumerate-space
+  - derive-criteria
+COMMENT: "state: ok"
 ---
 
 ## Guidance

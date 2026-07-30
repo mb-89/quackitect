@@ -4,7 +4,9 @@ name: write-requirements
 statement: "Write the requirements in full: EARS, four kinds, detail included - verify_method named on every one."
 state_kind: work
 filled_by: agent
-depends_on: [gate-inputs]
+depends_on:
+  - gate-inputs
+COMMENT: "state: ok, but in general: is the evidence form prose enough to generate evidence forms? lets discuss"
 ---
 
 ## Guidance

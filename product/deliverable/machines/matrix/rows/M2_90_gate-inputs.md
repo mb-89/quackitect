@@ -4,7 +4,11 @@ name: gate-inputs
 statement: "GATE inputs: did we understand the users - adjudicated against the M1 frame."
 state_kind: gate
 filled_by: agent
-depends_on: [draw-context, map-stakeholders, generalize-use-cases]
+depends_on:
+  - draw-context
+  - map-stakeholders
+  - generalize-use-cases
+COMMENT: "state: ok"
 ---
 
 ## Guidance

@@ -4,7 +4,9 @@ name: fold-back
 statement: "Fold the spike evidence back: the design advances; the ripple reopens what the evidence invalidates."
 state_kind: work
 filled_by: agent
-depends_on: [rank-unknowns]
+depends_on:
+  - rank-unknowns
+COMMENT: "state: ok, related: twin peaks?"
 ---
 
 ## Guidance

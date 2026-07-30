@@ -4,7 +4,9 @@ name: ship-review
 statement: "The ship review: dependency flips, divergence flags, upstream proposals."
 state_kind: work
 filled_by: agent
-depends_on: [package]
+depends_on:
+  - package
+COMMENT: "state: ok"
 ---
 
 ## Guidance

@@ -4,7 +4,9 @@ name: gate-prototype
 statement: "GATE prototype: the riskiest assumptions are validated by evidence."
 state_kind: gate
 filled_by: agent
-depends_on: [fold-back]
+depends_on:
+  - fold-back
+COMMENT: "state: ok"
 ---
 
 ## Guidance

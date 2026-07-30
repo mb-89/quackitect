@@ -4,7 +4,9 @@ name: observe-red
 statement: "Observe RED: every new check runs and fails before the build."
 state_kind: work
 filled_by: agent
-depends_on: [plan-build]
+depends_on:
+  - plan-build
+COMMENT: "state: ok"
 ---
 
 ## Guidance

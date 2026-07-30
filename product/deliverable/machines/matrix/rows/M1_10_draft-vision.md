@@ -4,7 +4,9 @@ name: draft-vision
 statement: "Draft the vision packet: the big idea, the to-be world, the goal system, the Moore pitch."
 state_kind: work
 filled_by: agent
-depends_on: [gate-kickoff]
+depends_on:
+  - gate-kickoff
+COMMENT: "state: ok"
 ---
 
 ## Guidance

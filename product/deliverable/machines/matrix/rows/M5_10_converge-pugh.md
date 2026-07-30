@@ -4,7 +4,9 @@ name: converge-pugh
 statement: "Converge on the winner: Pugh controlled convergence over the front."
 state_kind: work
 filled_by: agent
-depends_on: [gate-candidates]
+depends_on:
+  - gate-candidates
+COMMENT: "state: ok. generally: all sources should be proper references. see v2 (or maybe v1)"
 ---
 
 ## Guidance

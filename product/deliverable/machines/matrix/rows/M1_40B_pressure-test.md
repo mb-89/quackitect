@@ -1,10 +1,12 @@
 ---
 kind: matrix-row
 name: pressure-test
-statement: "Pressure-test the drafted packet with a working-backwards PR-FAQ."
+statement: Pressure-test the drafted packet with a working-backwards PR-FAQ.
 state_kind: work
 filled_by: agent
-depends_on: [frame-delta]
+depends_on:
+  - frame-delta
+COMMENT: "state: ok"
 ---
 
 ## Guidance

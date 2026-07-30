@@ -4,7 +4,11 @@ name: gate-motivation
 statement: "GATE motivation: the one interestingness discussion - past this gate the vision is axiomatic."
 state_kind: gate
 filled_by: agent
-depends_on: [scope-non-goals, log-risks, pressure-test]
+depends_on:
+  - scope-non-goals
+  - log-risks
+  - pressure-test
+COMMENT: "state: ok"
 ---
 
 ## Guidance

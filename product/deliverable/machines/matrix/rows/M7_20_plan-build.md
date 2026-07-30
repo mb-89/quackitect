@@ -4,8 +4,10 @@ name: plan-build
 statement: "Plan the build: seed the iteration's chunk machine - small resumable chunks, dependencies as edges, realization kind per chunk."
 state_kind: work
 filled_by: agent
-depends_on: [author-tests]
+depends_on:
+  - author-tests
 seeds: build-chunks
+COMMENT: 'state: ok. not sure if mentioned: there are probably strategies here, like: build spines first, get to "breakthrough" early, "get it to run first, improve later", stuff like this.'
 ---
 
 ## Guidance

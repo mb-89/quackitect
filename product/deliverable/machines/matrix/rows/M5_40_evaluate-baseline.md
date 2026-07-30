@@ -4,7 +4,9 @@ name: evaluate-baseline
 statement: "Evaluate the baseline: the ATAM-lite walk of the quality scenarios."
 state_kind: work
 filled_by: agent
-depends_on: [consolidate-baseline]
+depends_on:
+  - consolidate-baseline
+COMMENT: "state: ok"
 ---
 
 ## Guidance
