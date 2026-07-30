@@ -1,10 +1,12 @@
 ---
 kind: matrix-row
 name: log-gaps
-statement: "Log the validation gaps into RAID."
+statement: Log the validation gaps into RAID.
 state_kind: work
 filled_by: agent
-depends_on: [fill-story-evidence]
+depends_on:
+  - fill-story-evidence
+COMMENT: "state: ok"
 ---
 
 ## Guidance

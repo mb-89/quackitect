@@ -1,10 +1,12 @@
 ---
 kind: matrix-row
 name: map-stakeholders
-statement: "Map the stakeholders by role, and surface their tensions."
+statement: Map the stakeholders by role, and surface their tensions.
 state_kind: work
 filled_by: agent
-depends_on: [gate-motivation]
+depends_on:
+  - gate-motivation
+COMMENT: "state: I feel the method guidance is not enough. sya has more"
 ---
 
 ## Guidance

@@ -4,7 +4,9 @@ name: define-actual
 statement: "Define the actual: the as-is, one paragraph per pain, witnesses named."
 state_kind: work
 filled_by: agent
-depends_on: [draft-vision]
+depends_on:
+  - draft-vision
+COMMENT: state:schouldnt focus only on pains. the pains get clearer in the delta, where we describe what we want to fix. here, we state where we are, good and bad.
 ---
 
 ## Guidance

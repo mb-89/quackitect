@@ -4,7 +4,9 @@ name: partition-functions
 statement: "Partition the functions: the shared function DSM before any enumeration."
 state_kind: work
 filled_by: agent
-depends_on: [gate-requirements]
+depends_on:
+  - gate-requirements
+COMMENT: "state: ok"
 ---
 
 ## Guidance

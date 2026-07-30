@@ -4,7 +4,9 @@ name: log-risks
 statement: "Log the top risks: the RAID register opens."
 state_kind: work
 filled_by: agent
-depends_on: [draft-vision]
+depends_on:
+  - draft-vision
+COMMENT: "state: ok"
 ---
 
 ## Guidance

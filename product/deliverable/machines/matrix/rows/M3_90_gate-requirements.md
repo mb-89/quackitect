@@ -4,7 +4,10 @@ name: gate-requirements
 statement: "GATE requirements: the end of design input - the binding register blessed."
 state_kind: gate
 filled_by: agent
-depends_on: [derive-functions, probe-assumptions]
+depends_on:
+  - derive-functions
+  - probe-assumptions
+COMMENT: 'state: "Everything after this gate is solution space" really? are functions?'
 ---
 
 ## Guidance

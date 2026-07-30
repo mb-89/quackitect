@@ -1,6 +1,6 @@
 ---
 kind: method
-statement: "Stakeholders by role, and the tensions between them - surfaced as pairs, each requirement sourcing to a row."
+statement: Stakeholders by role, and the tensions between them - surfaced as pairs, each requirement sourcing to a row.
 ---
 
 ## Situation

@@ -4,7 +4,9 @@ name: package
 statement: "Package: versioned artifact, baselined configuration, README and the one-script entry."
 state_kind: work
 filled_by: agent
-depends_on: [finalize-docs]
+depends_on:
+  - finalize-docs
+COMMENT: "state: ok"
 ---
 
 ## Guidance

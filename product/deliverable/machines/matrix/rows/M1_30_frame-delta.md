@@ -4,7 +4,9 @@ name: frame-delta
 statement: "Frame the delta: the gap as a claim, the why-now, and the value-prop one-pagers with pass lines on the needs."
 state_kind: work
 filled_by: agent
-depends_on: [define-actual]
+depends_on:
+  - define-actual
+COMMENT: "state: ok"
 ---
 
 ## Guidance

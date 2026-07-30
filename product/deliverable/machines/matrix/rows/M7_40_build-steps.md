@@ -4,8 +4,10 @@ name: build-steps
 statement: "Build steps: the placeholder the seeded chunk machine fills - the real steps run here, in parallel where independent."
 state_kind: work
 filled_by: agent
-depends_on: [observe-red]
+depends_on:
+  - observe-red
 seeds: build-chunks-run
+COMMENT: "state: ok, should fail if not replaced (mechanically)"
 ---
 
 ## Guidance

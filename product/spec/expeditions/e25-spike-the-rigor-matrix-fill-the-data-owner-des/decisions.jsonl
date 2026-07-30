@@ -63,3 +63,4 @@
 {"ts":"2026-07-29T19:24:17.076Z","op":"done","visit":"expeditions/e25@0","node":"d84","brief":"Proposal reported — three questions wait on the owner"}
 {"ts":"2026-07-30T06:49:42.249Z","op":"update","visit":"expeditions/e25@0","node":"d12","brief":"syncing trunk into e25's worktree"}
 {"ts":"2026-07-30T06:49:53.807Z","op":"update","visit":"expeditions/e25@0","node":"d13","brief":"retrying the trunk sync after committing the trail"}
+{"ts":"2026-07-30T06:50:24.390Z","op":"update","visit":"expeditions/e25@0","node":"d14","brief":"settling the two merge conflicts, both sides kept"}

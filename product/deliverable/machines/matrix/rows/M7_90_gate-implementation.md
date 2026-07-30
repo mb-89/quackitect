@@ -4,7 +4,9 @@ name: gate-implementation
 statement: "GATE implementation: built inside the baseline, verified green across all iterations."
 state_kind: gate
 filled_by: agent
-depends_on: [verification]
+depends_on:
+  - verification
+COMMENT: "state: ok. Risks: added to raid?"
 ---
 
 ## Guidance

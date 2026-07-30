@@ -1,12 +1,14 @@
 ---
 kind: matrix-row
 name: verification
-statement: "The full battery runs mechanically - once, at the gate side, across all iterations."
+statement: The full battery runs mechanically - once, at the gate side, across all iterations.
 state_kind: work
 filled_by: engine
 command: npm --prefix product/deliverable test
-depends_on: [build-steps]
+depends_on:
+  - build-steps
 floor: true
+COMMENT: "state: ok"
 ---
 
 ## Guidance

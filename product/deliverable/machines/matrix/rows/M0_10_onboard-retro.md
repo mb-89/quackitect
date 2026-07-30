@@ -5,6 +5,7 @@ statement: "Onboarding opens with the retro: the field-feedback question first, 
 state_kind: work
 filled_by: agent
 depends_on: []
+COMMENT: "state: doesnt need its own content. we already have a retro method. reference it, merge whats new here in it"
 ---
 
 ## Guidance

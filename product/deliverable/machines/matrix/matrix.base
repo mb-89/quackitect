@@ -1,9 +1,9 @@
 formulas:
-  patch: 'link(name + "--patch", if(link(name + "--patch").asFile().properties.applies, link(name + "--patch").asFile().properties.applies, "cell"))'
-  minor: 'link(name + "--minor", if(link(name + "--minor").asFile().properties.applies, link(name + "--minor").asFile().properties.applies, "cell"))'
-  major: 'link(name + "--major", if(link(name + "--major").asFile().properties.applies, link(name + "--major").asFile().properties.applies, "cell"))'
-  product: 'link(name + "--product", if(link(name + "--product").asFile().properties.applies, link(name + "--product").asFile().properties.applies, "cell"))'
-  specification: 'link(name + "--specification", if(link(name + "--specification").asFile().properties.applies, link(name + "--specification").asFile().properties.applies, "cell"))'
+  patch: link(name + "--patch", if(link(name + "--patch").asFile().properties.applies, link(name + "--patch").asFile().properties.applies, "cell"))
+  minor: link(name + "--minor", if(link(name + "--minor").asFile().properties.applies, link(name + "--minor").asFile().properties.applies, "cell"))
+  major: link(name + "--major", if(link(name + "--major").asFile().properties.applies, link(name + "--major").asFile().properties.applies, "cell"))
+  product: link(name + "--product", if(link(name + "--product").asFile().properties.applies, link(name + "--product").asFile().properties.applies, "cell"))
+  specification: link(name + "--specification", if(link(name + "--specification").asFile().properties.applies, link(name + "--specification").asFile().properties.applies, "cell"))
 properties:
   file.name:
     displayName: State
@@ -30,7 +30,7 @@ views:
     name: The matrix
     filters:
       and:
-        - 'kind == "matrix-row"'
+        - kind == "matrix-row"
     order:
       - file.name
       - state_kind
@@ -39,6 +39,7 @@ views:
       - formula.major
       - formula.product
       - formula.specification
+      - COMMENT
     sort:
       - property: file.name
         direction: ASC
@@ -46,8 +47,8 @@ views:
     name: Strike proposals
     filters:
       and:
-        - 'kind == "matrix-cell"'
-        - 'applies == "none"'
+        - kind == "matrix-cell"
+        - applies == "none"
     order:
       - file.name
       - row
@@ -61,7 +62,7 @@ views:
     name: All cells
     filters:
       and:
-        - 'kind == "matrix-cell"'
+        - kind == "matrix-cell"
     groupBy:
       property: column
       direction: ASC
@@ -76,7 +77,7 @@ views:
     name: Rows in detail
     filters:
       and:
-        - 'kind == "matrix-row"'
+        - kind == "matrix-row"
     order:
       - file.name
       - state_kind

@@ -4,9 +4,11 @@ name: fix-findings
 statement: "Fix the battery's findings: all of them, in one pass."
 state_kind: work
 filled_by: agent
-depends_on: [verification]
+depends_on:
+  - verification
 edge_role: fallback
 guard: "verification_attempts < 3"
+COMMENT: "state: ok"
 ---
 
 ## Guidance

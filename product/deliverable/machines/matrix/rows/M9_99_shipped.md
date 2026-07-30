@@ -1,10 +1,12 @@
 ---
 kind: matrix-row
 name: shipped
-statement: "Shipped."
+statement: Shipped.
 state_kind: terminal
 filled_by: agent
-depends_on: [gate-release]
+depends_on:
+  - gate-release
+COMMENT: "state: there is no retro here. we just seed the note that a retro is needed."
 ---
 
 ## Guidance

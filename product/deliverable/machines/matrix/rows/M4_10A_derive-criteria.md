@@ -1,10 +1,12 @@
 ---
 kind: matrix-row
 name: derive-criteria
-statement: "Derive the vital-few weighted decision criteria from the requirements."
+statement: Derive the vital-few weighted decision criteria from the requirements.
 state_kind: work
 filled_by: agent
-depends_on: [gate-requirements]
+depends_on:
+  - gate-requirements
+COMMENT: are criteria their own items, or do the most important requirements get promoted to crits?
 ---
 
 ## Guidance

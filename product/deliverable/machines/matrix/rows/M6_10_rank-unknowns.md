@@ -1,11 +1,13 @@
 ---
 kind: matrix-row
 name: rank-unknowns
-statement: "Rank the unknowns and timebox the spikes - seeded from RAID, tripwires and doubtful verify methods."
+statement: Rank the unknowns and timebox the spikes - seeded from RAID, tripwires and doubtful verify methods.
 state_kind: work
 filled_by: agent
-depends_on: [gate-architecture]
+depends_on:
+  - gate-architecture
 seeds: spikes
+COMMENT: 'state: research "risk based testing", may apply here, method can be harvested'
 ---
 
 ## Guidance

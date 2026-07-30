@@ -4,8 +4,10 @@ name: gate-kickoff
 statement: "GATE kickoff: one handover carries the plan and the rigor column; the owner blesses - past it the iteration is set."
 state_kind: gate
 filled_by: agent
-depends_on: [onboard-retro]
+depends_on:
+  - onboard-retro
 floor: true
+COMMENT: doesnt need its own content. we already have a retro method. reference it, merge whats new here in itIsnt this what would seed the iteration? THen the seeded statemachine is part of its output
 ---
 
 ## Guidance
