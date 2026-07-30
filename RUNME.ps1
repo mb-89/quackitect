@@ -67,9 +67,16 @@ if ($exportIx -ge 0) {
   # worktree, the session state, node_modules and the generated cage dirs.
   # /XF drops the generated MCP config; the _cage templates travel (their
   # file is mcp.json, a different name) and RUNME regenerates on launch.
-  robocopy $root $dest /E /NFL /NDL /NJH /NJS /NP /XD .git .worktrees .se node_modules .claude .copilot /XF .mcp.json | Out-Null
+  # .git rides BOTH lists: in a normal checkout it is a directory (/XD), in
+  # a git WORKTREE the root carries a .git FILE (/XF) — missing that file
+  # made an export re-use the live repository (found in the smoke test).
+  robocopy $root $dest /E /NFL /NDL /NJH /NJS /NP /XD .git .worktrees .se node_modules .claude .copilot /XF .git .mcp.json | Out-Null
   if ($LASTEXITCODE -ge 8) {
     Write-Host "copy FAILED (robocopy $LASTEXITCODE)" -ForegroundColor Red
+    exit 1
+  }
+  if (Test-Path (Join-Path $dest ".git")) {
+    Write-Host "a .git survived the copy - refusing to init over live history" -ForegroundColor Red
     exit 1
   }
   Push-Location $dest

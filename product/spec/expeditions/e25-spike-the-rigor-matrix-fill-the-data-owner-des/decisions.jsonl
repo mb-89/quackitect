@@ -151,3 +151,8 @@
 {"ts":"2026-07-30T08:40:59.657Z","op":"done","visit":"expeditions/e25@0","node":"d30","brief":"demo list captured as note-a9e240663691"}
 {"ts":"2026-07-30T08:42:29.220Z","op":"update","visit":"expeditions/e25@0","node":"d35","brief":"the export flag lands in RUNME and the one help"}
 {"ts":"2026-07-30T08:42:45.392Z","op":"update","visit":"expeditions/e25@0","node":"d36","brief":"export smoke test against a temp target"}
+{"ts":"2026-07-30T08:43:42.875Z","op":"update","visit":"expeditions/e25@0","node":"d37","brief":"amending the stray commit to say what it holds"}
+{"ts":"2026-07-30T08:43:53.958Z","op":"update","visit":"expeditions/e25@0","node":"d38","brief":"the worktree .git file is excluded and guarded"}
+{"ts":"2026-07-30T08:44:11.667Z","op":"update","visit":"expeditions/e25@0","node":"d39","brief":"second smoke run over the fixed export"}
+{"ts":"2026-07-30T08:44:21.788Z","op":"update","visit":"expeditions/e25@0","node":"d40","brief":"battery over the export flag"}
+{"ts":"2026-07-30T08:45:36.202Z","op":"done","visit":"expeditions/e25@0","node":"d31","brief":"full-rigor answer recorded earlier as aq"}
