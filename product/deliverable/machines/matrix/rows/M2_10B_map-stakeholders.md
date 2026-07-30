@@ -15,4 +15,4 @@ evidence:
 
 ## Guidance
 
-Per [[meth-stakeholder-tensions]]. Roles, never names. Stakeholders are nodes; the matrices surface them by edge filter; requirements will source to them at M3.
+Per [[meth-stakeholder-analysis]]; the tensions per [[meth-stakeholder-tensions]]. Roles, never names. Stakeholders are nodes; the matrices surface them by edge filter; requirements will source to them at M3.
