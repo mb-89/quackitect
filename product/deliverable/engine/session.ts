@@ -42,6 +42,7 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 import { resolveInRoot, seDir } from "./paths.ts";
 import { Decisions, replayFile } from "./decisions.ts";
 import { generateIterationArchive, generateIterations, itFind, itPinRel, itRecordRel, itSeed, markStarted, pinIteration, readItRecord } from "./iterations.ts";
+import { parseStateNote, section } from "./notes.ts";
 
 /** THE TICK is the machinery — one tool, legal in EVERY state. Without
  *  arguments it reports (observability is never gated); with arguments it
@@ -201,6 +202,71 @@ export class Session {
     this.syncKeepAwake();
     this.notifyChange();
     return { shutdown: value, was };
+  }
+
+  /** THE MILESTONE REVIEW REPORT (owner ruling 2026-07-30): the one thing
+   *  a person reads most, so it is the gate's MECHANICAL demand. The
+   *  scaffold generates from the gate's OWN evidence fields (the matrix,
+   *  live) plus v1's field-tested review tail: verify, validate, red_team,
+   *  verdict. Prefilled comments never count as content (the prefill law).
+   *  A standing PASSED report is the durable bless — a restart re-walk
+   *  passes on it without re-asking. */
+  private gateReportRel(gateId: string): string {
+    return `product/spec/iterations/${this.bound!.id}/reviews/${gateId}.md`;
+  }
+
+  private assertGateReport(gateId: string, s: StateDecl): void {
+    const rel = this.gateReportRel(gateId);
+    const abs = join(this.bound!.path, rel);
+    const REVIEW_TAIL: readonly { name: string; hint: string }[] = [
+      { name: "verify", hint: "did each input deliver against its referent?" },
+      { name: "validate", hint: "does the milestone meet the frame and the vision?" },
+      { name: "red_team", hint: "argue the opposing case; a significant decision carries a kill criterion" },
+    ];
+    if (!existsSync(abs)) {
+      const scaffold = [
+        "---",
+        "form: milestone-review",
+        `gate: ${gateId}`,
+        "status: draft",
+        "by: ",
+        "verdict: ",
+        "---",
+        "",
+        `# ${gateId} — milestone review`,
+        "",
+        ...s.evidence_form.flatMap((f) => [`## ${f.name}`, "", `<!-- ${f.description}${f.required ? "" : " (optional)"}${f.killer === true ? " (KILLER: unmet alone fails the gate)" : ""} -->`, ""]),
+        ...REVIEW_TAIL.flatMap((t) => [`## ${t.name}`, "", `<!-- ${t.hint} -->`, ""]),
+      ].join("\n");
+      throw new Rejection({
+        clause: CLAUSES.CONDITION_UNMET,
+        expected: `the milestone review report — no gate passes without one (${rel})`,
+        got: "no review report in the record",
+        remedy: { tool: "se_file_write", args: { path: rel, content: scaffold, base_hash: null }, note: "fill every section — this report is what a person reads most; a prefilled comment counts as empty until real text replaces it" },
+        source: "engine/session.ts gate",
+      });
+    }
+    const note = parseStateNote(readFileSync(abs, "utf8"));
+    const problems: string[] = [];
+    const filledText = (name: string): string => section(note.body, name).replace(/<!--[\s\S]*?-->/g, "").trim();
+    for (const f of s.evidence_form) {
+      if (f.required && filledText(f.name) === "") problems.push(`${f.name} is empty`);
+    }
+    for (const t of REVIEW_TAIL) {
+      if (filledText(t.name) === "") problems.push(`${t.name} is empty`);
+    }
+    if (note.frontmatter.status !== "done") problems.push("status is not done");
+    const verdict = typeof note.frontmatter.verdict === "string" ? note.frontmatter.verdict.trim().toUpperCase() : "";
+    if (!verdict.startsWith("PASS")) problems.push(`the verdict is "${String(note.frontmatter.verdict ?? "")}" — PASS passes, anything else holds the gate`);
+    if (problems.length > 0) {
+      throw new Rejection({
+        clause: CLAUSES.CONDITION_UNMET,
+        expected: `a complete, PASSED milestone review at ${rel}`,
+        got: problems.join(" · "),
+        remedy: { tool: "se_file_read", args: { path: rel }, note: "fill what is empty, set status: done and the verdict, then tick again" },
+        source: "engine/session.ts gate",
+      });
+    }
   }
 
   /** THE PING (owner, 2026-07-30): the agent points at a mirror surface and
@@ -1830,6 +1896,13 @@ export class Session {
       await this.assertConditions(top.decl, this.state(top.decl, cur), to, channel, readHashes);
       if (top.decl.id === "iterations" && (this.state(top.decl, cur).tags?.includes("iteration-kickoff") ?? false)) {
         this.pinKickoff(top.gen?.expByState[cur]);
+      }
+      // NO GATE PASSES WITHOUT A REVIEW REPORT (owner ruling 2026-07-30):
+      // inside a pinned walk, leaving a gate demands its milestone review
+      // report — complete and PASSED. The report is the durable bless: a
+      // re-walk finds it standing and passes quickly.
+      if (this.bound !== undefined && top.decl.id.endsWith("-walk") && this.state(top.decl, cur).kind === "gate") {
+        this.assertGateReport(cur, this.state(top.decl, cur));
       }
       this.completeGuarded(top.decl, top.instance, cur, "filled", now, to);
       top.instance.history.push({ state: cur, outcome: "filled", at: now });

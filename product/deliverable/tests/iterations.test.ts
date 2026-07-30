@@ -215,6 +215,25 @@ test("the bless pins the machine and the container expands to the pinned walk", 
   const walk = await call(server, "se_tick", { advance: true, read_hashes: wtHashes });
   assert.equal(walk.isError, false, JSON.stringify(walk.body));
   assert.deepEqual(walk.body.breadcrumb, ["main", "iterations", `${sid}-walk`], "the walk descended into the pinned machine");
+  // NO GATE PASSES WITHOUT A REVIEW REPORT (owner ruling): walk to the
+  // first gate and try to leave — held until the report stands, then quick.
+  const pin2 = JSON.parse(readFileSync(join(root, ".worktrees", id, itPinRel(id)), "utf8")) as { machine: MachineDecl };
+  const gate = pin2.machine.states.find((s) => s.id === "gate-kickoff")!;
+  await call(server, "se_tick", { to: "gate-kickoff", read_hashes: wtHashes });
+  const held = await call(server, "se_tick", { to: gate.edges[0].to, read_hashes: wtHashes });
+  assert.equal(held.isError, true, JSON.stringify(held.body));
+  assert.match(String(held.body.expected), /review report/);
+  const review = join(root, ".worktrees", id, "product", "spec", "iterations", id, "reviews", "gate-kickoff.md");
+  mkdirSync(dirname(review), { recursive: true });
+  const sections = [
+    ...gate.evidence_form.map((f) => `## ${f.name}\n\nfilled for the test\n`),
+    "## verify\n\neach input checked against its referent\n",
+    "## validate\n\nthe milestone fits the frame\n",
+    "## red_team\n\nthe opposing case was argued\n",
+  ].join("\n");
+  writeFileSync(review, `---\nform: milestone-review\ngate: gate-kickoff\nstatus: done\nby: test\nverdict: PASS\n---\n\n# gate-kickoff — milestone review\n\n${sections}`, "utf8");
+  const passedGate = await call(server, "se_tick", { to: gate.edges[0].to, read_hashes: wtHashes });
+  assert.equal(passedGate.isError, false, JSON.stringify(passedGate.body));
 });
 
 test("the kickoff serves the matrix's live evidence form", () => {

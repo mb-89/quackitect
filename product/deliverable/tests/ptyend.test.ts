@@ -15,7 +15,10 @@ test("POST /pty/end ends the agent: settle, /exit, then the insist kill", async 
   // down, and the host must exit with it.
   const child = spawn(
     process.execPath,
-    [PTY, "--pty-port", String(port), "--", process.execPath, "-e", "process.stdin.resume(); console.log('agent up'); setInterval(() => {}, 1000)"],
+    // NO SHELL METACHARACTERS in the inline script: the host runs the
+    // command through cmd /c on Windows, and an arrow function's => {}
+    // becomes a redirect that drops a junk file named {} in the cwd.
+    [PTY, "--pty-port", String(port), "--", process.execPath, "-e", "process.stdin.resume(); console.log('agent up'); setInterval(function tick() { return; }, 1000)"],
     {
       env: { ...process.env, SE_PTY_END_QUIET_MS: "200", SE_PTY_END_INSIST_MS: "500", SE_PTY_END_CAP_MS: "3000" },
       stdio: ["ignore", "ignore", "pipe"],
