@@ -24,7 +24,17 @@
       "quackitect": [
         {
           "id": "quackitect.tools",
-          "name": "Quackitect",
+          "name": "Features",
+          "type": "webview"
+        },
+        {
+          "id": "quackitect.controls",
+          "name": "Controls",
+          "type": "webview"
+        },
+        {
+          "id": "quackitect.details",
+          "name": "Details",
           "type": "webview"
         }
       ]
@@ -50,6 +60,11 @@
         "title": "Quackitect: What This Is",
         "icon": "$(question)"
       },
+      {
+        "command": "quackitect.expandDetails",
+        "title": "Quackitect: Expand the Details",
+        "icon": "$(screen-full)"
+      },
       { "command": "quackitect.openCard1", "title": "Quackitect: Open Card 1" },
       { "command": "quackitect.openCard2", "title": "Quackitect: Open Card 2" },
       { "command": "quackitect.openCard3", "title": "Quackitect: Open Card 3" },
@@ -59,6 +74,15 @@
       { "command": "quackitect.openCard7", "title": "Quackitect: Open Card 7" },
       { "command": "quackitect.openCard8", "title": "Quackitect: Open Card 8" }
     ],
+    "menus": {
+      "view/title": [
+        {
+          "command": "quackitect.expandDetails",
+          "when": "view == quackitect.details",
+          "group": "navigation@1"
+        }
+      ]
+    },
     "keybindings": [
       { "command": "quackitect.help", "key": "ctrl+alt+/" },
       { "command": "quackitect.startAgent", "key": "ctrl+alt+enter" },

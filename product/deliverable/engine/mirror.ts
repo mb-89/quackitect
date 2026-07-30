@@ -14,8 +14,9 @@ import { Rejection } from "./errors.ts";
 import { appendNote, pendingNotes, readNotes } from "./inbox.ts";
 import { loadCards } from "./cards.ts";
 import { handleHttp, type McpServer } from "./mcp.ts";
-import { feedRows, renderMirror, type MirrorState } from "./render.ts";
+import { feedRows, renderMirror, SHUTDOWN_LEVELS, type MirrorState } from "./render.ts";
 import { resolveInRoot, seDir } from "./paths.ts";
+import { loadLevels } from "./scale.ts";
 import { Session } from "./session.ts";
 import { survey } from "./survey.ts";
 
@@ -308,6 +309,14 @@ export function startMirror(o: MirrorOptions): Server {
       if (url.pathname === "/api/tick") {
         res.writeHead(200, { "content-type": "application/json; charset=utf-8" });
         res.end(JSON.stringify(state.session.tickInfo(), null, 2));
+        return;
+      }
+      if (url.pathname === "/api/levels") {
+        // A HOST DRAWING THE CONTROLS READS THE SAME SCALES THE MIRROR DOES.
+        // The autonomy scale is authored in machines/scale.md, so a host that
+        // kept its own copy of the notches would drift the moment it is edited.
+        res.writeHead(200, { "content-type": "application/json; charset=utf-8", "access-control-allow-origin": "*" });
+        res.end(JSON.stringify({ autonomy: loadLevels(state.root), shutdown: SHUTDOWN_LEVELS }));
         return;
       }
       if (url.pathname === "/api/cards") {

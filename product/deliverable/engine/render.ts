@@ -396,7 +396,7 @@ function viewedMachine(m: MirrorState, view: string | undefined): { decl: Machin
 
 /** The SHUTDOWN CONTROL's five notches (owner design): what happens
  *  around "done". Abbreviations on the bar; click for the explanations. */
-const SHUTDOWN_LEVELS = [
+export const SHUTDOWN_LEVELS = [
   { value: 1, abbr: "N", name: "no shutdown control" },
   { value: 2, abbr: "P", name: "shutdown prevention — the machine is kept awake while the walk runs" },
   { value: 3, abbr: "PI", name: "prevention + idle-on-done — done with everything, stay at idle" },
@@ -2025,22 +2025,24 @@ function widgetHead(title: string, widgetId: string, url: string): string {
  *  corners, the host's fonts, the host's palette. Our own look belongs to
  *  the standalone mirror. Semantic colours stay ours everywhere.
  *
- *  A SOLO card drops its frame — the host already draws a titled, bordered
- *  pane around it, and two frames read as a bug.
+ *  A SOLO card drops its head and its frame — the host already draws a
+ *  titled, bordered pane around it, and two frames read as a bug.
  *
- *  ITS HEAD GOES ONLY WHERE THE HEAD IS PURE TITLE. A head carrying CONTROLS
- *  keeps them: standing alone in its own window, the machine card is the only
- *  place its crumbs, sliders and escape can live. Dropping that row left the
- *  card unusable — the whole reason a card may stand alone is that it is
- *  self-sufficient. Only the expand button goes, because the host maximizes
- *  its own window. */
+ *  THE HOST OWNS THE WALK'S CONTROLS when embedded (owner ruling 2026-07-30).
+ *  The sliders and escape steer the whole walk and a card may be closed, so
+ *  they belong to the host's sidebar rather than to any one card.
+ *
+ *  THE CRUMBS ARE NOT CONTROLS. They navigate the DRAWING — which machine is
+ *  on screen — so they stay with the drawing, and the machine card keeps its
+ *  head for them alone. */
 const NATIVE = `
   body { font-family: var(--vscode-font-family, ui-monospace, Consolas, monospace); }
   * { border-radius: 0 !important; }
   .label, .sublabel, .group-label, .cond-label, pre, code, table.kv, .logrow, .legend-key { font-family: var(--vscode-editor-font-family, ui-monospace, Consolas, monospace); }
   body.solo .widget { border: 0; }
-  body.solo .widget-head:not(.controls) { display: none; }
-  body.solo .widget-head.controls .expand { display: none; }
+  body.solo .widget-head { display: none; }
+  body.solo #w-machine .widget-head { display: flex; }
+  body.solo #w-machine .head-controls { display: none; }
   body.solo aside, body.solo main { background: transparent; }
 `;
 
@@ -2202,7 +2204,7 @@ export function renderMirror(m: MirrorState, widget?: "machine" | "details" | "l
   // the walk's position; clicking it jumps the view there.
   const curLeaf = info.active[0] ?? "";
   const curBtn = curLeaf === "" ? "" : `<button class="ghost" id="cur-state" data-machine="${esc(walkMachine.id)}" title="the walk stands here — click: jump the view to it">☉ ${esc(curLeaf)}</button>`;
-  const machineWidget = `<div class="widget" id="w-machine"><div class="widget-head controls"><span class="crumbs">${crumbs}</span><span style="display:flex;align-items:center;gap:10px">${curBtn}${slider}${sdBar}${escapeBtn}<button class="expand" data-widget="w-machine" data-url="/widget/machine?view=${encodeURIComponent(decl.id)}" title="expand · ctrl-click: new tab · shift-click: new window — both open frozen on what this card is showing">⛶</button></span></div><div class="widget-body">${svg}</div></div>`;
+  const machineWidget = `<div class="widget" id="w-machine"><div class="widget-head"><span class="crumbs">${crumbs}</span><span class="head-controls" style="display:flex;align-items:center;gap:10px">${curBtn}${slider}${sdBar}${escapeBtn}<button class="expand" data-widget="w-machine" data-url="/widget/machine?view=${encodeURIComponent(decl.id)}" title="expand · ctrl-click: new tab · shift-click: new window — both open frozen on what this card is showing">⛶</button></span></div><div class="widget-body">${svg}</div></div>`;
   const detailsWidget = `<div class="widget" id="w-details">${widgetHead("details", "w-details", "/widget/details")}
     ${info.status === "closed" ? '<div class="meta" style="color:#e86a5f">machine closed</div>' : ""}
     <div class="meta" id="details-title" data-morph-ignore>—</div>

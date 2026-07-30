@@ -3,18 +3,20 @@
 // Plain JavaScript, also on purpose: the extension host does not strip
 // TypeScript types, and the project runs with no build step anywhere.
 //
-// What the shell owns:
-// - the se engine process: spawned headless on activation, killed on
-//   deactivate — the engine lives and dies with VS Code
-// - the attach configs: placed declaratively on every activation, the
-//   same way RUNME places them for a terminal launch
-// - ONE EDITOR WINDOW PER CARD (owner ruling 2026-07-30). A card is a real
-//   editor tab, so VS Code's own docking applies: split it, drag it to any
-//   side, float it, put it in another window. The person composes whatever
-//   control panel they want out of these, and VS Code remembers the layout
-//   per folder — which is why the shell offers no arrangement of its own.
-// - an ICON STRIP, and nothing but icons. Words would force the pane wide.
-//   The icons run TOP TO BOTTOM at the size of the activity bar's own.
+// WHERE THINGS LIVE (owner rulings 2026-07-30):
+// - THE SIDEBAR HAS THREE GROUPS. Features on top: one labelled row per
+//   thing you can do. Controls in the middle: the walk's sliders and its
+//   escape. Details at the bottom: whatever you clicked, explained.
+// - THE CONTROLS ARE THE HOST'S, not a card's. They steer the whole walk
+//   and any card may be closed, so they cannot live inside one.
+// - THE CRUMBS ARE NOT CONTROLS. They navigate the drawing, so they stay
+//   in the machine window with the drawing.
+// - EVERY OTHER CARD IS AN EDITOR WINDOW. Split it, drag it, float it —
+//   VS Code owns the docking and remembers it per folder.
+// - THE LOG SITS BESIDE THE TERMINAL. A terminal can be created IN the
+//   editor area, so the agent's console takes one column and the log takes
+//   the next. This is the only way to get them side by side; the bottom
+//   panel shows one tab at a time.
 //
 // THE HOST OWNS THE LOOK. Docked here, the pages are VS Code surfaces: the
 // editor's fonts and palette are forwarded in, square corners, no frame of
@@ -30,12 +32,18 @@ const SERVER = "http://localhost:" + PORT;
 // per number rather than per shown card. Eight covers the list with room.
 const SLOTS = 8;
 const VIEW_TYPE = (slot) => "quackitect.card" + slot;
+const POLL_MS = 1000;
 
 let child = null;
 let output = null;
 let disposed = false;
 let cards = [];
+let levels = null;
+let packet = null;
 let strip = null;
+let controls = null;
+let detailsView = null;
+let poller = null;
 /** slot number → CardWindow. A slot is absent when its window is closed. */
 const windows = new Map();
 // The session's name survives engine reloads (exit 42): the settings store
@@ -80,20 +88,29 @@ function placeConfigs(root) {
   place("claude-settings.json", path.join(ws, ".claude"), "settings.json"); // the cage
 }
 
-async function probeServer() {
+/**
+ * Every call to the engine goes through the EXTENSION HOST, over Node.
+ *
+ * A webview fetching the engine itself would need CORS on every route and a
+ * preflight on every POST. The host has no origin, so it needs neither.
+ */
+async function api(pathname, init) {
   try {
-    const r = await fetch(SERVER + "/api/alive", { signal: AbortSignal.timeout(800) });
-    if (!r.ok) return { state: "down" };
-    let body = {};
-    try {
-      body = await r.json();
-    } catch {
-      body = {};
-    }
-    return { state: "up", root: typeof body.root === "string" ? body.root : null };
+    const r = await fetch(SERVER + pathname, { signal: AbortSignal.timeout(2500), ...init });
+    if (!r.ok) return null;
+    return await r.json();
   } catch {
-    return { state: "down" };
+    return null;
   }
+}
+
+const post = (pathname, body) =>
+  api(pathname, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) });
+
+async function probeServer() {
+  const body = await api("/api/alive");
+  if (body === null) return { state: "down" };
+  return { state: "up", root: typeof body.root === "string" ? body.root : null };
 }
 
 function ensureDeps(root) {
@@ -176,21 +193,21 @@ async function ensureServer() {
 
 // ── THE CARDS ────────────────────────────────────────────────────────────
 // Read from the engine, never listed here: product/cards.md is the truth,
-// so a card added there grows an icon here without an extension edit.
+// so a card added there grows a row here without an extension edit.
 async function fetchCards() {
-  try {
-    const r = await fetch(SERVER + "/api/cards", { signal: AbortSignal.timeout(2000) });
-    if (!r.ok) return [];
-    const body = await r.json();
-    return Array.isArray(body.cards) ? body.cards : [];
-  } catch {
-    return [];
-  }
+  const body = await api("/api/cards");
+  return body !== null && Array.isArray(body.cards) ? body.cards : [];
 }
 
 // The chat card is the agent's own terminal. VS Code already has one, and a
 // second picture of it beside the editor is an echo — owner ruling.
 const shown = (c) => c !== undefined && c.widget !== "terminal";
+// The details card has a permanent home in the sidebar, so a row that only
+// reveals it would restate what is already on screen.
+const inStrip = (c) => shown(c) && c.widget !== "details";
+const cardBySlot = (n) => cards.find((c) => c.n === n);
+const detailsCard = () => cards.find((c) => c.widget === "details");
+const logCard = () => cards.find((c) => c.widget === "log");
 
 async function refreshCards() {
   cards = await fetchCards();
@@ -206,6 +223,24 @@ function titleOf(card) {
   return card.title.charAt(0).toUpperCase() + card.title.slice(1);
 }
 
+// ── THE WALK'S STATE ─────────────────────────────────────────────────────
+// Polled, not streamed. The engine has an event stream, but a poll on
+// localhost costs nothing and cannot get stuck half-open. If the controls
+// ever feel laggy, the stream is the upgrade.
+async function pollWalk() {
+  if (levels === null) levels = await api("/api/levels");
+  const p = await api("/api/tick");
+  if (p === null) return;
+  packet = p;
+  if (controls !== null) controls.send();
+}
+
+function startPolling() {
+  if (poller !== null) return;
+  poller = setInterval(() => void pollWalk(), POLL_MS);
+  void pollWalk();
+}
+
 // ── THE PAGES ────────────────────────────────────────────────────────────
 function escapeHtml(s) {
   return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
@@ -218,7 +253,7 @@ function messagePage(text) {
 </style></head><body>${escapeHtml(text)}</body></html>`;
 }
 
-/** A window showing one page of the engine, themed by the editor. */
+/** A surface showing one page of the engine, themed by the editor. */
 function framePage(url) {
   return `<!DOCTYPE html><html><head><meta charset="utf-8">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; frame-src ${SERVER}; connect-src ${SERVER}; script-src 'unsafe-inline'; style-src 'unsafe-inline'">
@@ -258,9 +293,6 @@ function framePage(url) {
   function sendTheme() {
     if (frame.contentWindow) frame.contentWindow.postMessage({ quackitect: "theme", vars: themeVars() }, "*");
   }
-  // The iframe navigates within itself; every load gets the theme again
-  // (and once more late, for scripts that read the palette on boot). Help
-  // that arrived before the page existed is delivered on the same beat.
   frame.addEventListener("load", () => {
     sendTheme();
     setTimeout(sendTheme, 400);
@@ -281,9 +313,9 @@ function framePage(url) {
   window.addEventListener("message", (ev) => {
     const d = ev.data;
     if (!d) return;
-    if (d.quackitect === "open") { vsapi.postMessage(d); return; } // iframe → extension
-    if (d.quackitect === "theme-changed") { sendTheme(); return; } // extension → iframe
-    if (d.quackitect === "up") { show(); return; } // extension → here: the engine answers
+    if (d.quackitect === "open") { vsapi.postMessage(d); return; }
+    if (d.quackitect === "theme-changed") { sendTheme(); return; }
+    if (d.quackitect === "up") { show(); return; }
     if (d.quackitect === "help") {
       if (up && frame.contentWindow) frame.contentWindow.postMessage(d, "*");
       else pendingHelp = d;
@@ -292,7 +324,7 @@ function framePage(url) {
   });
   // TWO WAKE PATHS, deliberately. The extension host probes over Node, where
   // no origin rule applies. This page probes too, as a backstop. Whichever
-  // lands first reveals the window; the reader never watches a dead line.
+  // lands first reveals the surface; the reader never watches a dead line.
   (async function boot() {
     const started = Date.now();
     for (;;) {
@@ -321,7 +353,6 @@ const ICON = {
   graph: '<svg viewBox="0 0 16 16"><path d="M2.2 2.4v11.2h11.6"/><path d="M4.4 11.2 7 7.1l2.4 2.3 3.6-5"/></svg>',
   book: '<svg viewBox="0 0 16 16"><path d="M2.4 3.1h3.9c.9 0 1.6.4 1.7.9.1-.5.8-.9 1.7-.9h3.9v9.3H9.7c-.9 0-1.6.4-1.7.9-.1-.5-.8-.9-1.7-.9H2.4z"/><path d="M8 4v9.3"/></svg>',
   log: '<svg viewBox="0 0 16 16"><path d="M2.6 4.2h10.8M2.6 8h10.8M2.6 11.8h6.8"/></svg>',
-  details: '<svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="6.2"/><path d="M8 7.3v4.1"/><circle cx="8" cy="4.9" r=".75" fill="currentColor" stroke="none"/></svg>',
   card: '<svg viewBox="0 0 16 16"><rect x="2.6" y="2.6" width="10.8" height="10.8"/></svg>',
   restart: '<svg viewBox="0 0 16 16"><path d="M13.2 8a5.2 5.2 0 1 1-1.7-3.85"/><path d="M13.6 1.9v3.3h-3.3"/></svg>',
 };
@@ -329,22 +360,19 @@ const ICON = {
 function cardIcon(card) {
   if (card.widget === "machine") return ICON.machine;
   if (card.widget === "log") return ICON.log;
-  if (card.widget === "details") return ICON.details;
   if (card.id.indexOf("graph") >= 0) return ICON.graph;
   if (card.id.indexOf("book") >= 0) return ICON.book;
   return ICON.card;
 }
 
 // ── THE HELP ─────────────────────────────────────────────────────────────
-// Plain language, short sentences. It lands in the details window, so it is
-// HTML there and nowhere else.
 const SYSTEM_HELP = `<p>Quackitect walks a state machine with you. The machine says which step is in hand, what to read, and what to produce.</p>
 <p>The engine runs on this computer only. Nothing leaves it.</p>
-<p>The icons on the left, top to bottom: this help, start the agent, then one icon per card. The last one restarts the engine.</p>
-<p>Every card opens as its own editor window. Split it, drag it to any side, or move it to a second window — whatever you build is your control panel.</p>
+<p>The sidebar has three groups. Features is what you can do. Controls steers the walk. Details is this — whatever you click explains itself here.</p>
+<p>Every card except this one opens as its own editor window. Split it, drag it to any side, or move it to a second window.</p>
 <p>VS Code remembers that layout for this folder. Open the folder again and your windows come back where you left them.</p>
-<p>This window is the details. Whatever you click elsewhere explains itself here.</p>
-<p>The play icon starts your agent in a terminal, with the opening prompt already sent. Several agents may attach; give the wheel to one at a time.</p>`;
+<p>The play button starts your agent in a terminal beside the log, with the opening prompt already sent.</p>
+<p>Several agents may attach at once. Give the wheel to one at a time.</p>`;
 
 function cardHelp(card) {
   if (!card.widget) {
@@ -352,9 +380,9 @@ function cardHelp(card) {
 <p>The slot is held so the card numbers never shift under your hand.</p>`;
   }
   const what = {
-    machine: "The machine being walked. Each box is a state; the blue line is where the walk is aimed. Click a state to read it here. Its own crumbs, sliders and escape sit along the top of the window.",
-    log: "Every act in this session, newest first. Click a line to see what it changed.",
-    details: "This window. Whatever you click elsewhere explains itself here.",
+    machine: "The machine being walked. Each box is a state; the blue line is where the walk is aimed. Click a state to read it here. The crumbs along its top navigate between machines.",
+    log: "Every act in this session, newest first. Click a line to see what it changed. It opens beside the agent's terminal.",
+    details: "This group. Whatever you click elsewhere explains itself here.",
   };
   return `<p><b>${escapeHtml(titleOf(card))}</b> is card ${card.n}.</p>
 <p>${escapeHtml(what[card.widget] ?? "A card of the control panel.")}</p>
@@ -364,7 +392,8 @@ function cardHelp(card) {
 const HELP = {
   "quackitect.startAgent": {
     title: "Start the agent",
-    html: `<p>Starts the engine if it is not running, then opens a terminal and starts your agent CLI in it.</p>
+    html: `<p>Starts the engine if it is not running, then opens a terminal in the editor area and starts your agent CLI in it.</p>
+<p>The log opens beside it, so the conversation is on the left and what it did is on the right.</p>
 <p>The opening prompt is sent for you. You never paste it.</p>
 <p>Claude Code is used when it is installed; otherwise the Copilot CLI, in its cage.</p>`,
   },
@@ -388,15 +417,16 @@ function onWebviewMessage(m) {
   if (m.quackitect === "open") openInEditor(m.path);
 }
 
-/** One card, living in an editor window. VS Code owns where it sits. */
-class CardWindow {
-  constructor(slot, panel) {
-    this.slot = slot;
-    this.panel = panel;
-    panel.webview.options = { enableScripts: true };
-    panel.webview.onDidReceiveMessage(onWebviewMessage);
-    panel.onDidDispose(() => windows.delete(slot));
-    windows.set(slot, this);
+/** Anything that shows an engine page and can be told the theme changed. */
+class Surface {
+  constructor(page) {
+    this.page = page;
+    this.web = null;
+  }
+  attach(webview) {
+    this.web = webview;
+    webview.options = { enableScripts: true };
+    webview.onDidReceiveMessage(onWebviewMessage);
     this.render();
     void ensureServer().then(async (ok) => {
       if (!ok) return;
@@ -405,19 +435,11 @@ class CardWindow {
       this.up();
     });
   }
-  page() {
-    const card = cards.find((c) => c.n === this.slot);
-    if (card === undefined) return messagePage("Connecting to the engine…");
-    if (!card.widget) return messagePage("Not built yet. The slot is held so the numbers never shift.");
-    return framePage(SERVER + "/widget/" + card.widget + "?embed=1");
-  }
   render() {
-    const card = cards.find((c) => c.n === this.slot);
-    if (card !== undefined) this.panel.title = titleOf(card);
-    this.panel.webview.html = this.page();
+    if (this.web !== null) this.web.html = this.page();
   }
   post(msg) {
-    void this.panel.webview.postMessage(msg);
+    if (this.web !== null) void this.web.postMessage(msg);
   }
   up() {
     this.post({ quackitect: "up" });
@@ -430,76 +452,123 @@ class CardWindow {
   }
 }
 
+/** The details group — a permanent home in the sidebar (owner ruling). */
+class DetailsView extends Surface {
+  constructor() {
+    super(() => framePage(SERVER + "/widget/details?embed=1"));
+  }
+  resolveWebviewView(view) {
+    view.onDidDispose(() => {
+      this.web = null;
+    });
+    this.attach(view.webview);
+  }
+}
+
+/** One card, living in an editor window. VS Code owns where it sits. */
+class CardWindow extends Surface {
+  constructor(slot, panel) {
+    super(() => {
+      const card = cardBySlot(slot);
+      if (card === undefined) return messagePage("Connecting to the engine…");
+      if (!card.widget) return messagePage("Not built yet. The slot is held so the numbers never shift.");
+      return framePage(SERVER + "/widget/" + card.widget + "?embed=1");
+    });
+    this.slot = slot;
+    this.panel = panel;
+    panel.onDidDispose(() => windows.delete(slot));
+    windows.set(slot, this);
+    this.attach(panel.webview);
+  }
+  render() {
+    const card = cardBySlot(this.slot);
+    if (card !== undefined) this.panel.title = titleOf(card);
+    super.render();
+  }
+}
+
 /**
  * Open a card's window, or bring the open one forward.
  *
  * preserveFocus keeps the reader's place: a card that opens because THEY
  * asked takes the focus, one that opens as a side effect never does.
  */
-function openWindow(slot, preserveFocus) {
+function openWindow(slot, preserveFocus, column) {
   const existing = windows.get(slot);
   if (existing !== undefined) {
     existing.panel.reveal(existing.panel.viewColumn, preserveFocus);
     return existing;
   }
-  const card = cards.find((c) => c.n === slot);
+  const card = cardBySlot(slot);
   const panel = vscode.window.createWebviewPanel(
     VIEW_TYPE(slot),
     card === undefined ? "Card " + slot : titleOf(card),
-    { viewColumn: vscode.ViewColumn.Active, preserveFocus: preserveFocus === true },
+    { viewColumn: column ?? vscode.ViewColumn.Active, preserveFocus: preserveFocus === true },
     { enableScripts: true, retainContextWhenHidden: true },
   );
   return new CardWindow(slot, panel);
 }
 
 /**
- * Put help in the details window — help is a detail, never a button.
+ * Put help in the details group — help is a detail, never a button.
  *
- * The question mark ASKS for it, so that call reveals and focuses. Every
- * other control merely explains itself, so it writes into the window
- * without taking the reader's focus away from what they were doing.
+ * The question mark ASKS for it, so that call reveals the group. Every other
+ * control merely explains itself, so it writes without taking the focus.
+ * An expanded copy in an editor window is fed the same text, because two
+ * surfaces showing details must never disagree.
  */
 async function showHelp(title, html, reveal) {
   await ensureCards();
-  const card = cards.find((c) => c.widget === "details");
-  if (card === undefined) return;
-  const win = openWindow(card.n, reveal !== true);
-  win.help(title, html);
+  if (reveal === true) await vscode.commands.executeCommand("quackitect.details.focus");
+  if (detailsView !== null) detailsView.help(title, html);
+  const card = detailsCard();
+  if (card !== undefined) {
+    const expanded = windows.get(card.n);
+    if (expanded !== undefined) expanded.help(title, html);
+  }
 }
 
-/** The icon strip. Icons only, top to bottom — the pane stays narrow. */
+// ── THE SIDEBAR GROUPS ───────────────────────────────────────────────────
+const GROUP_STYLE = `
+  body { margin: 0; padding: 4px 0; background: var(--vscode-sideBar-background); color: var(--vscode-foreground); font-family: var(--vscode-font-family); font-size: var(--vscode-font-size); }
+  svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.2; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+`;
+
+/** The features group: one labelled row per thing you can do. */
 class Strip {
   constructor() {
     this.view = null;
   }
   tools() {
     const list = [
-      { cmd: "quackitect.help", icon: ICON.help, label: "What this is — ctrl+alt+/" },
-      { cmd: "quackitect.startAgent", icon: ICON.play, label: "Start the agent — ctrl+alt+enter" },
+      { cmd: "quackitect.help", icon: ICON.help, label: "What this is", key: "ctrl+alt+/" },
+      { cmd: "quackitect.startAgent", icon: ICON.play, label: "Start the agent", key: "ctrl+alt+enter" },
     ];
     for (const c of cards) {
-      if (!shown(c)) continue;
-      list.push({ cmd: "quackitect.openCard" + c.n, icon: cardIcon(c), label: titleOf(c) + " — ctrl+alt+" + c.n });
+      if (!inStrip(c)) continue;
+      list.push({ cmd: "quackitect.openCard" + c.n, icon: cardIcon(c), label: titleOf(c), key: "ctrl+alt+" + c.n });
     }
-    list.push({ cmd: "quackitect.restartServer", icon: ICON.restart, label: "Restart the engine" });
+    list.push({ cmd: "quackitect.restartServer", icon: ICON.restart, label: "Restart the engine", key: "" });
     return list;
   }
   page() {
-    const buttons = this.tools()
-      .map((t) => `<button class="tool" data-cmd="${escapeHtml(t.cmd)}" title="${escapeHtml(t.label)}" aria-label="${escapeHtml(t.label)}">${t.icon}</button>`)
+    // WORDS, NOT BARE ICONS (owner ruling 2026-07-30). The pane is as wide as
+    // the controls beneath it need, so an icon alone left it looking empty
+    // and made every row a guess.
+    const rows = this.tools()
+      .map(
+        (t) => `<button class="tool" data-cmd="${escapeHtml(t.cmd)}" title="${escapeHtml(t.key === "" ? t.label : t.label + " — " + t.key)}">
+      ${t.icon}<span class="label">${escapeHtml(t.label)}</span><span class="key">${escapeHtml(t.key)}</span></button>`,
+      )
       .join("");
-    // COLUMN, NOT ROW (owner ruling 2026-07-30). Wrapping icons sideways
-    // pushed the pane wide, which is the one thing an icon strip exists to
-    // avoid. Stacked, they also carry the activity bar's own icon size.
-    return `<!DOCTYPE html><html><head><meta charset="utf-8"><style>
-  body { margin: 0; padding: 4px 0; background: var(--vscode-sideBar-background); }
-  .strip { display: flex; flex-direction: column; align-items: center; gap: 2px; }
-  button.tool { width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; padding: 0; background: none; border: 0; color: var(--vscode-icon-foreground); cursor: pointer; }
-  button.tool:hover { background: var(--vscode-toolbar-hoverBackground); }
+    return `<!DOCTYPE html><html><head><meta charset="utf-8"><style>${GROUP_STYLE}
+  button.tool { width: 100%; display: flex; align-items: center; gap: 8px; padding: 4px 10px; background: none; border: 0; color: var(--vscode-foreground); cursor: pointer; text-align: left; font: inherit; height: 26px; }
+  button.tool:hover { background: var(--vscode-list-hoverBackground); }
   button.tool:focus-visible { outline: 1px solid var(--vscode-focusBorder); outline-offset: -1px; }
-  svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 1.1; stroke-linecap: round; stroke-linejoin: round; }
+  .label { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .key { color: var(--vscode-descriptionForeground); font-size: .9em; opacity: .8; }
 </style></head><body>
-<div class="strip">${buttons}</div>
+<div class="strip">${rows}</div>
 <script>
   const vsapi = acquireVsCodeApi();
   document.addEventListener("click", (ev) => {
@@ -524,6 +593,141 @@ class Strip {
   }
 }
 
+/**
+ * The controls group: the walk's own steering.
+ *
+ * The scales are the ENGINE's (machines/scale.md), fetched rather than
+ * copied — a host keeping its own notches drifts the moment they are edited.
+ */
+class Controls {
+  constructor() {
+    this.view = null;
+  }
+  page() {
+    return `<!DOCTYPE html><html><head><meta charset="utf-8"><style>${GROUP_STYLE}
+  .box { padding: 2px 10px 8px; }
+  .row { display: flex; align-items: baseline; justify-content: space-between; margin-top: 8px; }
+  .name { color: var(--vscode-descriptionForeground); text-transform: uppercase; letter-spacing: .07em; font-size: .85em; }
+  .val { font-family: var(--vscode-editor-font-family); }
+  input[type=range] { width: 100%; margin: 2px 0 0; accent-color: var(--vscode-focusBorder); }
+  .notches { display: flex; justify-content: space-between; color: var(--vscode-descriptionForeground); font-size: .8em; }
+  .notch { cursor: pointer; }
+  .notch:hover { color: var(--vscode-foreground); }
+  .where { margin-top: 10px; color: var(--vscode-descriptionForeground); font-size: .9em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .where b { color: var(--vscode-foreground); font-weight: 600; }
+  button.act { margin-top: 10px; width: 100%; padding: 4px; background: var(--vscode-button-secondaryBackground); color: var(--vscode-button-secondaryForeground); border: 0; cursor: pointer; font: inherit; }
+  button.act:hover { background: var(--vscode-button-secondaryHoverBackground); }
+  button.act:disabled { opacity: .4; cursor: default; }
+</style></head><body>
+<div class="box">
+  <div class="row"><span class="name">Autonomy</span><span class="val" id="a-val">—</span></div>
+  <input type="range" id="a" min="0" max="1" step="0.01" value="0">
+  <div class="notches" id="a-notches"></div>
+
+  <div class="row"><span class="name">Shutdown</span><span class="val" id="s-val">—</span></div>
+  <input type="range" id="s" min="1" max="5" step="1" value="1">
+  <div class="notches" id="s-notches"></div>
+
+  <div class="where" id="where">not connected</div>
+  <button class="act" id="esc" disabled>Escape to idle</button>
+</div>
+<script>
+  const vsapi = acquireVsCodeApi();
+  const $ = (id) => document.getElementById(id);
+  let lv = null;
+  // A drag must not fight the poll: while the thumb is held, incoming state
+  // never rewrites the slider under the hand.
+  let holding = null;
+  for (const id of ["a", "s"]) {
+    $(id).addEventListener("pointerdown", () => { holding = id; });
+    $(id).addEventListener("input", () => { paint(id); });
+    $(id).addEventListener("change", () => {
+      holding = null;
+      vsapi.postMessage({ quackitect: id === "a" ? "autonomy" : "shutdown", value: Number($(id).value) });
+    });
+  }
+  $("esc").addEventListener("click", () => vsapi.postMessage({ quackitect: "escape" }));
+  function sdAbbr(v) {
+    if (lv === null || !Array.isArray(lv.shutdown)) return String(v);
+    const l = lv.shutdown.find((x) => Number(x.value) === Number(v));
+    return l ? l.abbr : String(v);
+  }
+  function paint(which) {
+    if (which !== "s") $("a-val").textContent = Number($("a").value).toFixed(2);
+    if (which !== "a") $("s-val").textContent = sdAbbr($("s").value);
+  }
+  function notches(el, list, set) {
+    el.innerHTML = "";
+    for (const l of list) {
+      const s = document.createElement("span");
+      s.className = "notch";
+      s.textContent = l.abbr;
+      s.title = l.name + " — click to jump here";
+      s.addEventListener("click", () => { set(l.value); });
+      el.appendChild(s);
+    }
+  }
+  window.addEventListener("message", (ev) => {
+    const d = ev.data;
+    if (!d || d.quackitect !== "state") return;
+    if (d.levels && lv === null) {
+      lv = d.levels;
+      if (Array.isArray(lv.autonomy)) notches($("a-notches"), lv.autonomy, (v) => {
+        $("a").value = v; paint("a"); vsapi.postMessage({ quackitect: "autonomy", value: Number(v) });
+      });
+      if (Array.isArray(lv.shutdown)) notches($("s-notches"), lv.shutdown, (v) => {
+        $("s").value = v; paint("s"); vsapi.postMessage({ quackitect: "shutdown", value: Number(v) });
+      });
+    }
+    const p = d.packet;
+    if (!p) { $("where").textContent = "not connected"; return; }
+    if (holding !== "a") { $("a").value = p.autonomy; }
+    if (holding !== "s") { $("s").value = p.shutdown; }
+    paint();
+    const at = Array.isArray(p.active) && p.active.length > 0 ? p.active[0] : "—";
+    const exp = p.expedition ? " · " + p.expedition.split("-")[0] : "";
+    $("where").innerHTML = "at <b>" + String(at).replace(/&/g, "&amp;").replace(/</g, "&lt;") + "</b>" + exp;
+    const crumbs = Array.isArray(p.breadcrumb) ? p.breadcrumb : [];
+    $("esc").disabled = !(crumbs.length > 1 && crumbs[1] !== "boot");
+  });
+</script></body></html>`;
+  }
+  send() {
+    if (this.view === null) return;
+    void this.view.webview.postMessage({ quackitect: "state", packet, levels });
+  }
+  resolveWebviewView(view) {
+    this.view = view;
+    view.webview.options = { enableScripts: true };
+    view.onDidDispose(() => {
+      this.view = null;
+    });
+    view.webview.onDidReceiveMessage(async (m) => {
+      if (!m) return;
+      if (m.quackitect === "autonomy") await post("/autonomy", { value: m.value });
+      else if (m.quackitect === "shutdown") await post("/shutdown", { value: m.value });
+      else if (m.quackitect === "escape") {
+        const reason = await vscode.window.showInputBox({
+          title: "Escape to idle",
+          prompt: "Why? The machine is left standing and the reason is recorded as a failure.",
+          ignoreFocusOut: true,
+        });
+        if (reason === undefined || reason.trim() === "") return;
+        await post("/escape", { reason });
+      }
+      await pollWalk();
+    });
+    this.render();
+    startPolling();
+  }
+  render() {
+    if (this.view !== null) {
+      this.view.webview.html = this.page();
+      this.send();
+    }
+  }
+}
+
 // The same choice RUNME makes: Claude wins when both are installed. The
 // kickoff text is read from the one file both launchers share.
 function agentLaunch(root) {
@@ -539,6 +743,13 @@ function agentLaunch(root) {
   return null;
 }
 
+/**
+ * Start the agent with the log beside it (owner ruling 2026-07-30).
+ *
+ * The terminal is created IN THE EDITOR AREA, which is the only way to get
+ * a terminal and a webview side by side — the bottom panel shows one tab at
+ * a time, whatever is in it.
+ */
 async function startAgent() {
   const root = projectRoot();
   if (root === null || !(await ensureServer())) return;
@@ -548,22 +759,32 @@ async function startAgent() {
     void vscode.window.showErrorMessage("Quackitect: no agent CLI found — install Claude Code (or Copilot CLI), then retry.");
     return;
   }
-  const term = vscode.window.createTerminal({ name: "Quackitect agent", cwd: path.join(root, "workspace") });
+  const term = vscode.window.createTerminal({
+    name: "Quackitect agent",
+    cwd: path.join(root, "workspace"),
+    location: { viewColumn: vscode.ViewColumn.One },
+  });
   term.show();
   term.sendText(command, true);
+  const log = logCard();
+  if (log !== undefined) openWindow(log.n, true, vscode.ViewColumn.Two);
 }
 
 async function openCard(n) {
   if (!(await ensureServer())) return;
   await ensureCards();
-  const card = cards.find((c) => c.n === n);
+  const card = cardBySlot(n);
   if (!shown(card)) {
     void vscode.window.showInformationMessage("Quackitect: product/cards.md declares no card " + n + ".");
     return;
   }
-  // The card explains itself in details, then takes the focus itself.
+  // Details has a permanent home; opening it means revealing that group.
+  if (card.widget === "details") {
+    await vscode.commands.executeCommand("quackitect.details.focus");
+    return;
+  }
   await showHelp(titleOf(card), cardHelp(card), false);
-  openWindow(n, false);
+  openWindow(n, false, card.widget === "log" ? vscode.ViewColumn.Beside : undefined);
 }
 
 function showAttach() {
@@ -573,7 +794,7 @@ function showAttach() {
   void vscode.commands.executeCommand("markdown.showPreview", doc);
 }
 
-/** Run a command from the strip, and say in the details window what it was. */
+/** Run a command from the features group, and say in details what it was. */
 function withHelp(cmd, run) {
   return async (...args) => {
     const h = HELP[cmd];
@@ -585,12 +806,22 @@ function withHelp(cmd, run) {
 function activate(context) {
   output = vscode.window.createOutputChannel("Quackitect Engine");
   strip = new Strip();
+  controls = new Controls();
+  detailsView = new DetailsView();
+  const keepAlive = { webviewOptions: { retainContextWhenHidden: true } };
   context.subscriptions.push(
     output,
-    vscode.window.registerWebviewViewProvider("quackitect.tools", strip, { webviewOptions: { retainContextWhenHidden: true } }),
+    vscode.window.registerWebviewViewProvider("quackitect.tools", strip, keepAlive),
+    vscode.window.registerWebviewViewProvider("quackitect.controls", controls, keepAlive),
+    vscode.window.registerWebviewViewProvider("quackitect.details", detailsView, keepAlive),
     vscode.commands.registerCommand("quackitect.help", () => void showHelp("Quackitect", SYSTEM_HELP, true)),
     vscode.commands.registerCommand("quackitect.startAgent", withHelp("quackitect.startAgent", startAgent)),
     vscode.commands.registerCommand("quackitect.howToAttach", showAttach),
+    vscode.commands.registerCommand("quackitect.expandDetails", async () => {
+      await ensureCards();
+      const card = detailsCard();
+      if (card !== undefined) openWindow(card.n, false);
+    }),
     vscode.commands.registerCommand(
       "quackitect.restartServer",
       withHelp("quackitect.restartServer", async () => {
@@ -599,14 +830,20 @@ function activate(context) {
           child = null;
         }
         if (!(await ensureServer())) return;
+        levels = null;
         await refreshCards();
+        await pollWalk();
+        detailsView.up();
         for (const w of windows.values()) w.up();
       }),
     ),
     vscode.window.onDidChangeActiveColorTheme(() => {
       strip.render();
+      controls.render();
+      detailsView.theme();
       for (const w of windows.values()) w.theme();
     }),
+    { dispose: () => { if (poller !== null) clearInterval(poller); } },
   );
   for (let n = 1; n <= SLOTS; n++) {
     context.subscriptions.push(
@@ -618,22 +855,24 @@ function activate(context) {
       // and not for the contents.
       vscode.window.registerWebviewPanelSerializer(VIEW_TYPE(n), {
         deserializeWebviewPanel: async (panel) => {
-          panel.webview.options = { enableScripts: true };
           new CardWindow(n, panel);
         },
       }),
     );
   }
-  // The strip must be usable before anything is clicked, so the engine comes
-  // up with the window rather than on the first card.
+  // The sidebar must be usable before anything is clicked, so the engine
+  // comes up with the window rather than on the first card.
   void ensureServer().then(async (ok) => {
-    if (ok) await refreshCards();
+    if (!ok) return;
+    await refreshCards();
+    startPolling();
   });
 }
 
 function deactivate() {
   // The engine lives and dies with VS Code — deliberately.
   disposed = true;
+  if (poller !== null) clearInterval(poller);
   if (child !== null) child.kill();
 }
 
