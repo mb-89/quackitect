@@ -173,3 +173,6 @@
 {"ts":"2026-07-30T09:00:36.281Z","op":"update","visit":"expeditions/e25@0","node":"d53","brief":"the ping test rides beside the panel test"}
 {"ts":"2026-07-30T09:00:49.852Z","op":"update","visit":"expeditions/e25@0","node":"d54","brief":"the ping test holds its own root handle"}
 {"ts":"2026-07-30T09:01:00.683Z","op":"update","visit":"expeditions/e25@0","node":"d55","brief":"full battery over ping and the clean end"}
+{"ts":"2026-07-30T09:02:38.459Z","op":"done","visit":"expeditions/e25@0","node":"d45","brief":"the clean end and the ping are built"}
+{"ts":"2026-07-30T09:02:52.490Z","op":"update","visit":"expeditions/e25@0","node":"d56","brief":"inspecting the stray {} file before removing it"}
+{"ts":"2026-07-30T09:03:05.664Z","op":"update","visit":"expeditions/e25@0","node":"d57","brief":"deleting the empty stray artifact"}
