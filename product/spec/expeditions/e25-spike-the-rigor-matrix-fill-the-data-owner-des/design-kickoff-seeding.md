@@ -56,11 +56,15 @@ walks, every larger column also walks. That makes escalation mechanical:
   full — plus the evidence spec); the re-pin compares old against new and
   lists the GROWN steps as `reopened`, whose evidence is re-earned.
   Guidance-only wording changes never reopen.
-- THE BLESS IS EVIDENCE (owner ruling 2026-07-30): a passed gate leaves
-  its milestone report as a durable file — a re-walk passes on the
-  standing report, never re-blessing. Invalidation by OUTSIDE method
-  change is ON PROBATION: the milestone could not prepare for it, so the
-  owner may remove that trigger if it hurts in practice.
+- REPORT AND BLESS, TWO THINGS (owner rulings 2026-07-30): no gate
+  passes without its milestone review report — complete, PASSED, the
+  gate's own evidence fields plus verify/validate/red_team. The BLESS is
+  the separate act of passing the gate ON that report: the tick, human
+  below the 0.6 slider, stamped durably in a sidecar pinning the
+  report's version and whose hand it was. An edited report drops its
+  bless; a standing bless lets a re-walk pass without re-asking.
+  Invalidation by OUTSIDE method change stays ON PROBATION: the
+  milestone could not prepare for it — removed if it hurts in practice.
 - De-escalating mid-walk is refused. A prediction that proved too big is
   finished at its size; the record notes the misjudgment for the retro.
 

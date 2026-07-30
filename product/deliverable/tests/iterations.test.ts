@@ -234,6 +234,11 @@ test("the bless pins the machine and the container expands to the pinned walk", 
   writeFileSync(review, `---\nform: milestone-review\ngate: gate-kickoff\nstatus: done\nby: test\nverdict: PASS\n---\n\n# gate-kickoff — milestone review\n\n${sections}`, "utf8");
   const passedGate = await call(server, "se_tick", { to: gate.edges[0].to, read_hashes: wtHashes });
   assert.equal(passedGate.isError, false, JSON.stringify(passedGate.body));
+  // THE BLESS IS SEPARATE AND DURABLE: the passing tick stamped the
+  // sidecar with the report's version and whose hand it was.
+  const bless = JSON.parse(readFileSync(review.replace(/\.md$/, ".bless.json"), "utf8")) as { hash: string; by: string };
+  assert.equal(bless.by, "agent");
+  assert.match(bless.hash, /^[0-9a-f]+$/);
 });
 
 test("the kickoff serves the matrix's live evidence form", () => {

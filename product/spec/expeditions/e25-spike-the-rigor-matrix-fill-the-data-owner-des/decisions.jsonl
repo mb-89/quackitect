@@ -189,3 +189,7 @@
 {"ts":"2026-07-30T09:19:10.032Z","op":"update","visit":"expeditions/e25@0","node":"d66","brief":"220 green, committing the gate report demand"}
 {"ts":"2026-07-30T09:21:06.243Z","op":"update","visit":"expeditions/e25@0","node":"d67","brief":"the inline test script drops its cmd metacharacters"}
 {"ts":"2026-07-30T09:21:29.111Z","op":"update","visit":"expeditions/e25@0","node":"d68","brief":"the junk file leaves again, its source fixed"}
+{"ts":"2026-07-30T09:24:08.869Z","op":"update","visit":"expeditions/e25@0","node":"d69","brief":"amending so the junk never lands"}
+{"ts":"2026-07-30T09:29:39.189Z","op":"plan","visit":"expeditions/e25@0","parent":null,"nodes":[{"id":"d70","brief":"the bless becomes a durable sidecar stamped with the hand"},{"id":"d71","brief":"the e2e test proves bless and quick re-pass"}]}
+{"ts":"2026-07-30T09:30:04.833Z","op":"done","visit":"expeditions/e25@0","node":"d70","brief":"the sidecar bless is built and version-pinned"}
+{"ts":"2026-07-30T09:31:20.511Z","op":"done","visit":"expeditions/e25@0","node":"d71","brief":"220 green with the bless stamp asserted"}

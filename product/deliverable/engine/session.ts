@@ -204,18 +204,23 @@ export class Session {
     return { shutdown: value, was };
   }
 
-  /** THE MILESTONE REVIEW REPORT (owner ruling 2026-07-30): the one thing
+  /** THE MILESTONE REVIEW REPORT (owner rulings 2026-07-30): the one thing
    *  a person reads most, so it is the gate's MECHANICAL demand. The
    *  scaffold generates from the gate's OWN evidence fields (the matrix,
    *  live) plus v1's field-tested review tail: verify, validate, red_team,
    *  verdict. Prefilled comments never count as content (the prefill law).
-   *  A standing PASSED report is the durable bless — a restart re-walk
-   *  passes on it without re-asking. */
+   *
+   *  REPORT AND BLESS ARE SEPARATE THINGS. The report is the artifact; the
+   *  BLESS is the act of passing the gate on it — the tick, weighed by the
+   *  autonomy slider as ever (below the gate's 0.6 the hand is human). The
+   *  bless lands DURABLY as a sidecar pinning the report's version and
+   *  whose hand it was; an EDITED report drops its bless (one bless per
+   *  version), and a standing bless lets a re-walk pass without re-asking. */
   private gateReportRel(gateId: string): string {
     return `product/spec/iterations/${this.bound!.id}/reviews/${gateId}.md`;
   }
 
-  private assertGateReport(gateId: string, s: StateDecl): void {
+  private assertGateReport(gateId: string, s: StateDecl, channel: Channel): void {
     const rel = this.gateReportRel(gateId);
     const abs = join(this.bound!.path, rel);
     const REVIEW_TAIL: readonly { name: string; hint: string }[] = [
@@ -246,7 +251,20 @@ export class Session {
         source: "engine/session.ts gate",
       });
     }
-    const note = parseStateNote(readFileSync(abs, "utf8"));
+    const raw = readFileSync(abs, "utf8");
+    // A STANDING BLESS passes at once: the sidecar pins the report's exact
+    // version — the quick re-walk the owner asked for.
+    const blessAbs = abs.replace(/\.md$/, ".bless.json");
+    const reportHash = contentHash(Buffer.from(raw, "utf8"));
+    if (existsSync(blessAbs)) {
+      try {
+        const b = JSON.parse(readFileSync(blessAbs, "utf8")) as { hash?: string };
+        if (b.hash === reportHash) return;
+      } catch {
+        // an unreadable bless is no bless — fall through and re-earn it
+      }
+    }
+    const note = parseStateNote(raw);
     const problems: string[] = [];
     const filledText = (name: string): string => section(note.body, name).replace(/<!--[\s\S]*?-->/g, "").trim();
     for (const f of s.evidence_form) {
@@ -267,6 +285,10 @@ export class Session {
         source: "engine/session.ts gate",
       });
     }
+    // THE BLESS: this passing tick is the act, and it lands durably — the
+    // report's version pinned, the hand recorded. Below 0.6 the slider made
+    // that hand human; at or above, the delegation is stamped honestly.
+    writeFileSync(blessAbs, JSON.stringify({ hash: reportHash, by: channel, at: new Date().toISOString() }) + "\n", "utf8");
   }
 
   /** THE PING (owner, 2026-07-30): the agent points at a mirror surface and
@@ -1902,7 +1924,7 @@ export class Session {
       // report — complete and PASSED. The report is the durable bless: a
       // re-walk finds it standing and passes quickly.
       if (this.bound !== undefined && top.decl.id.endsWith("-walk") && this.state(top.decl, cur).kind === "gate") {
-        this.assertGateReport(cur, this.state(top.decl, cur));
+        this.assertGateReport(cur, this.state(top.decl, cur), channel);
       }
       this.completeGuarded(top.decl, top.instance, cur, "filled", now, to);
       top.instance.history.push({ state: cur, outcome: "filled", at: now });
