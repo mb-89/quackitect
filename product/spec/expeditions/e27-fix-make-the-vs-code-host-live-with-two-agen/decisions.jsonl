@@ -1,0 +1,6 @@
+{"ts":"2026-07-30T14:26:27.619Z","op":"plan","visit":"expeditions/e27@0","parent":null,"nodes":[{"id":"d3","brief":"Diagnose the webview hang (Starting the server… forever)"},{"id":"d4","brief":"Two agents at once: rework the attach design"},{"id":"d5","brief":"Mirror view opens on the right side bar"},{"id":"d6","brief":"Console card leaves the mirror in VS Code"},{"id":"d7","brief":"Start affordance: detect the agent CLI and launch it in the terminal"},{"id":"d8","brief":"Eyes: serve-web in Chrome and a live proof"},{"id":"d9","brief":"Suite green and landed on trunk"}]}
+{"ts":"2026-07-30T14:27:53.162Z","op":"update","visit":"expeditions/e27@0","node":"d10","brief":"CORS missing on /api/alive is the hang; checking who holds 7333"}
+{"ts":"2026-07-30T14:29:34.169Z","op":"update","visit":"expeditions/e27@0","node":"d11","brief":"answered the model-fallback question; back to the fix"}
+{"ts":"2026-07-30T14:34:36.919Z","op":"update","visit":"expeditions/e27@0","node":"d12","brief":"kickoff text moved to one shared file in the cage"}
+{"ts":"2026-07-30T14:35:51.129Z","op":"update","visit":"expeditions/e27@0","node":"d13","brief":"running preflight and the full suite in the e27 worktree"}
+{"ts":"2026-07-30T14:37:16.364Z","op":"done","visit":"expeditions/e27@0","node":"d3","brief":"CORS on /api/alive + host up-message; suite green"}

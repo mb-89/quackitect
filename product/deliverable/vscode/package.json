@@ -38,10 +38,24 @@
         "title": "Quackitect: How to Attach Your Agent"
       },
       {
+        "command": "quackitect.startAgent",
+        "title": "Quackitect: Start the Agent",
+        "icon": "$(play)"
+      },
+      {
         "command": "quackitect.restartServer",
         "title": "Quackitect: Restart the se Server"
       }
     ],
+    "menus": {
+      "view/title": [
+        {
+          "command": "quackitect.startAgent",
+          "when": "view == quackitect.mirror",
+          "group": "navigation"
+        }
+      ]
+    },
     "keybindings": [
       {
         "command": "quackitect.openMirror",

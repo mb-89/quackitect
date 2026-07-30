@@ -16,14 +16,20 @@ pane. Clicking a record in it opens the real file in the editor.
 The connection files are already in place. The extension writes them every
 time it starts.
 
-- Claude Code: open the integrated terminal, go to the `workspace` folder,
+- The ▶ button on the Mirror view starts your agent for you: it finds
+  Claude Code (or Copilot CLI), opens the integrated terminal, and sends
+  the start command with the opening prompt.
+- By hand instead: open the integrated terminal in the `workspace` folder
   and run `claude`. It finds the running server through `.mcp.json`.
 - Copilot agent mode in this window: it finds the same server through
   `.vscode/mcp.json`. Its built-in tools stay visible — tell it to follow
   `workspace/AGENTS.md`, which says to use only the se tools.
 
-One assistant at a time, please. Two assistants on the same machine at
-once is not supported.
+Several assistants may attach at once. They share the one server and the
+one walk. The machine arbitrates the hands: a move made from a stale
+position is refused, so nobody silently overwrites anybody. Still, give
+the wheel to ONE assistant at a time and let the others watch or advise —
+two drivers make a noisy log.
 
 ## If something is stuck
 

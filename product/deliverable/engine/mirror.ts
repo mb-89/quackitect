@@ -34,6 +34,9 @@ export function startMirror(o: MirrorOptions): Server {
   /** What the page watches: position, the two sliders, and a growth signal
    *  for the feed. One shape, served both as a poll and as a pushed event. */
   const aliveState = (): Record<string, unknown> => ({
+    // Which project this server walks — an attaching shim or host refuses
+    // to join a stranger's walk on a matching port.
+    root: o.root,
     status: state.session.instance.status,
     // The server is going away with the walk unfinished — a quit, not an end.
     gone: state.session.serverGone,
@@ -339,8 +342,10 @@ export function startMirror(o: MirrorOptions): Server {
       if (url.pathname === "/api/alive") {
         // The mirror polls this: position + threshold move under the page
         // (the agent's hand, or another window). Failing to answer at all
-        // reads as "session over" client-side.
-        res.writeHead(200, { "content-type": "application/json; charset=utf-8" });
+        // reads as "session over" client-side. CORS is open because an
+        // EMBEDDER's page (the VS Code webview) polls from its own origin;
+        // the server never leaves localhost.
+        res.writeHead(200, { "content-type": "application/json; charset=utf-8", "access-control-allow-origin": "*" });
         res.end(JSON.stringify(aliveState()));
         return;
       }
@@ -353,7 +358,7 @@ export function startMirror(o: MirrorOptions): Server {
       // ?view=<machine> browses a machine without moving the walk.
       state.lastPacket = state.session.tickInfo();
       res.writeHead(200, { "content-type": "text/html; charset=utf-8" });
-      res.end(renderMirror(state, undefined, url.searchParams.get("view") ?? undefined, url.searchParams.get("card") ?? undefined));
+      res.end(renderMirror(state, undefined, url.searchParams.get("view") ?? undefined, url.searchParams.get("card") ?? undefined, url.searchParams.get("embed") === "1"));
     } catch (e) {
       res.writeHead(500, { "content-type": "text/plain; charset=utf-8" });
       res.end(String((e as Error).stack ?? e));

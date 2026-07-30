@@ -957,6 +957,10 @@ let navigatingAway = false;
 //
 // Add a param here and every navigation carries it by construction. A test
 // refuses any param the client pins that is not registered.
+// Embedded in a host (the VS Code webview): the flag arrives on the iframe
+// URL and rides every navigation, so the server keeps serving the embedded
+// card set instead of resetting to the standalone one.
+const EMBED_Q = new URLSearchParams(location.search).has("embed");
 const PLACE = [
   ["detail", () => CURRENT_DETAIL],
   ["card", () => CARD_NOW],
@@ -964,6 +968,7 @@ const PLACE = [
   // itself stays a snapshot. A live window reports null and never picks it
   // up, so the flag spreads nowhere it does not belong.
   ["frozen", () => (FROZEN ? "1" : null)],
+  ["embed", () => (EMBED_Q ? "1" : null)],
 ];
 /** Carry the place onto a URL the reader is NAVIGATING to. */
 function withPlace(url) {
@@ -2010,7 +2015,7 @@ function widgetHead(title: string, widgetId: string, url: string): string {
   return `<div class="widget-head"><span>${esc(title)}</span><button class="expand" data-widget="${widgetId}" data-url="${esc(url)}" title="expand · ctrl-click: new tab · shift-click: new window — both open frozen on what this card is showing">⛶</button></div>`;
 }
 
-export function renderMirror(m: MirrorState, widget?: "machine" | "details" | "log" | "terminal", view?: string, card?: string): string {
+export function renderMirror(m: MirrorState, widget?: "machine" | "details" | "log" | "terminal", view?: string, card?: string, embed?: boolean): string {
   const info = m.session.describe() as { active: string[]; status: string };
   // The scale is READ from machines/scale.md — the Obsidian-editable
   // truth; an owner edit shows on the next reload.
@@ -2219,7 +2224,11 @@ export function renderMirror(m: MirrorState, widget?: "machine" | "details" | "l
   // THE CARD MATRIX (owner design 2026-07-29). The card list and its ORDER are
   // the product's, in product/cards.md — v3 exists to work on other products,
   // and another product wants other cards.
-  const cardList = loadCards(m.root);
+  // EMBEDDED, the console card leaves (owner ruling 2026-07-30): the host's
+  // integrated terminal is where the agent lives, and a second picture of it
+  // beside the editor is an echo. The grid closes over the gap.
+  const allCards = loadCards(m.root);
+  const cardList = embed === true ? allCards.filter((c) => c.widget !== "terminal") : allCards;
   const byWidget: Record<string, string> = {
     terminal: terminalWidget,
     machine: machineWidget,

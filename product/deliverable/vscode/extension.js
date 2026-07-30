@@ -12,7 +12,7 @@
 //   is forwarded in, record-open messages are forwarded out
 const vscode = require("vscode");
 const { spawn, spawnSync } = require("node:child_process");
-const { copyFileSync, existsSync, mkdirSync } = require("node:fs");
+const { copyFileSync, existsSync, mkdirSync, readFileSync } = require("node:fs");
 const path = require("node:path");
 
 const MIRROR_PORT = 7333;
@@ -63,12 +63,19 @@ function placeConfigs(root) {
   place("claude-settings.json", path.join(ws, ".claude"), "settings.json"); // the cage
 }
 
-async function alive() {
+async function probeServer() {
   try {
     const r = await fetch(MIRROR + "/api/alive", { signal: AbortSignal.timeout(800) });
-    return r.ok;
+    if (!r.ok) return { state: "down" };
+    let body = {};
+    try {
+      body = await r.json();
+    } catch {
+      body = {};
+    }
+    return { state: "up", root: typeof body.root === "string" ? body.root : null };
   } catch {
-    return false;
+    return { state: "down" };
   }
 }
 
@@ -122,8 +129,16 @@ async function ensureServer() {
   }
   placeConfigs(root);
   // A server already answering (another window, a terminal launch) is THE
-  // server — attach to it, never raise a second walk beside it.
-  if (await alive()) return true;
+  // server — attach to it, never raise a second walk beside it. Unless it
+  // walks ANOTHER project on our port: that is a loud error, not an attach.
+  const probe = await probeServer();
+  if (probe.state === "up") {
+    if (probe.root !== null && path.resolve(probe.root) !== path.resolve(root)) {
+      void vscode.window.showErrorMessage("Quackitect: port " + MIRROR_PORT + " already serves another project (" + probe.root + ") — close that session first.");
+      return false;
+    }
+    return true;
+  }
   const runner = nodeRunner();
   if (runner === null) {
     void vscode.window.showErrorMessage("Quackitect needs Node 22.6 or newer — install it, then retry: winget install OpenJS.NodeJS.LTS");
@@ -135,7 +150,7 @@ async function ensureServer() {
   }
   startServer(root, runner);
   for (let i = 0; i < 75; i++) {
-    if (await alive()) return true;
+    if ((await probeServer()).state === "up") return true;
     await new Promise((r) => setTimeout(r, 200));
   }
   void vscode.window.showErrorMessage("Quackitect: the se server did not come up — details in Output → Quackitect Server.");
@@ -189,18 +204,29 @@ function mirrorHtml() {
     if (!d) return;
     if (d.quackitect === "open") vsapi.postMessage(d); // iframe → extension
     if (d.quackitect === "theme-changed") sendTheme(); // extension → iframe
+    if (d.quackitect === "up") showMirror(); // extension host: the server answers
   });
-  (async function boot() {
-    for (;;) {
-      try {
-        const r = await fetch(MIRROR + "/api/alive");
-        if (r.ok) break;
-      } catch { /* not up yet */ }
-      await new Promise((r) => setTimeout(r, 500));
-    }
-    frame.src = MIRROR + "/";
+  // TWO WAKE PATHS, deliberately. The extension host posts "up" when its own
+  // probe succeeds — Node fetch, where CORS does not bind. The page also
+  // polls as a backstop; its fetch is cross-origin and works once the engine
+  // sends the CORS header on /api/alive. Either path reveals the mirror.
+  let shown = false;
+  function showMirror() {
+    if (shown) return;
+    shown = true;
+    frame.src = MIRROR + "/?embed=1"; // the embedded card set — no console card
     wait.style.display = "none";
     frame.style.display = "block";
+  }
+  (async function boot() {
+    for (;;) {
+      if (shown) return;
+      try {
+        const r = await fetch(MIRROR + "/api/alive");
+        if (r.ok) { showMirror(); return; }
+      } catch { /* not up yet, or an engine without the CORS header */ }
+      await new Promise((r) => setTimeout(r, 500));
+    }
   })();
 </script></body></html>`;
 }
@@ -213,8 +239,38 @@ class MirrorViewProvider {
     view.webview.onDidReceiveMessage((m) => {
       if (m && m.quackitect === "open") openInEditor(m.path);
     });
-    void ensureServer();
+    void ensureServer().then((ok) => {
+      if (ok && this.view) void this.view.webview.postMessage({ quackitect: "up" });
+    });
   }
+}
+
+// The same choice RUNME makes: Claude wins when both are installed. The
+// kickoff text is read from the one file both launchers share.
+function agentLaunch(root) {
+  const cageDir = path.join(root, "workspace", "_cage");
+  const kickoff = readFileSync(path.join(cageDir, "kickoff.txt"), "utf8").trim();
+  const has = (cmd) => spawnSync(cmd, ["--version"], { encoding: "utf8", shell: true }).status === 0;
+  if (has("claude")) return "claude '" + kickoff + "'";
+  if (has("copilot")) {
+    const cage = JSON.parse(readFileSync(path.join(cageDir, "copilot-cage.json"), "utf8"));
+    const args = [].concat(cage.mcp_args, cage.exclude_args, cage.allow_args, cage.deny_args, cage.extra_args);
+    return "copilot " + args.join(" ") + " -i '" + kickoff + "'";
+  }
+  return null;
+}
+
+async function startAgent() {
+  const root = projectRoot();
+  if (root === null || !(await ensureServer())) return;
+  const command = agentLaunch(root);
+  if (command === null) {
+    void vscode.window.showErrorMessage("Quackitect: no agent CLI found — install Claude Code (or Copilot CLI), then retry.");
+    return;
+  }
+  const term = vscode.window.createTerminal({ name: "Quackitect agent", cwd: path.join(root, "workspace") });
+  term.show();
+  term.sendText(command, true);
 }
 
 function showAttach() {
@@ -232,6 +288,7 @@ function activate(context) {
     vscode.window.registerWebviewViewProvider("quackitect.mirror", provider),
     vscode.commands.registerCommand("quackitect.openMirror", () => vscode.commands.executeCommand("quackitect.mirror.focus")),
     vscode.commands.registerCommand("quackitect.howToAttach", showAttach),
+    vscode.commands.registerCommand("quackitect.startAgent", () => void startAgent()),
     vscode.commands.registerCommand("quackitect.restartServer", async () => {
       if (child !== null) {
         child.kill();

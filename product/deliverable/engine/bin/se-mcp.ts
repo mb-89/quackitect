@@ -230,40 +230,83 @@ if (argv.includes("--child") || process.env.SE_HOT_DISABLE === "1") {
     return child;
   };
 
-  // HEADLESS: no harness on stdio — the child serves /mcp and the shim only
-  // keeps the reload (exit 42) and session-over (exit 0) contract alive.
-  if (!argv.includes("--headless")) {
+  // A SERVER ALREADY WALKS THIS ROOT (another window, the VS Code
+  // extension): raising a second engine beside it would split the walk's
+  // brain — two sessions writing one .se. The shim degrades into a PROXY:
+  // every stdio line is POSTed to the live server's /mcp and the answer
+  // flows home. One engine, many hands; the machine arbitrates the hands
+  // (SE-C-114). An engine too old to report its root gets the old
+  // behaviour: an own engine, the mirror port yielded.
+  const target = `http://localhost:${mirrorPort}`;
+  const liveServerForThisRoot = async (): Promise<boolean> => {
+    if (mirrorPort <= 0) return false;
+    try {
+      const r = await fetch(`${target}/api/alive`, { signal: AbortSignal.timeout(800) });
+      if (!r.ok) return false;
+      const body = (await r.json()) as { root?: string };
+      return typeof body.root === "string" && resolve(body.root) === root;
+    } catch {
+      return false;
+    }
+  };
+
+  if (!argv.includes("--headless") && (await liveServerForThisRoot())) {
+    process.stderr.write(`se-mcp shim: a server already walks this root — attaching to ${target}/mcp as a proxy, not raising a second engine\n`);
     const rl = createInterface({ input: process.stdin, terminal: false });
     rl.on("line", (line) => {
       if (line.trim() === "") return;
-      const c = ensureChild();
-      try {
-        const id = (JSON.parse(line) as { id?: number | string | null }).id;
-        if (id !== undefined && id !== null) pending.add(id);
-      } catch {
-        // the child answers parse errors itself
-      }
-      c.stdin!.write(line + "\n");
-    });
-    rl.on("close", () => {
-      // Drain: answers already owed still flow home before the lights go out.
-      const started = Date.now();
-      const drain = setInterval(() => {
-        if (pending.size === 0 || Date.now() - started > 3000) {
-          clearInterval(drain);
-          // CLOSE THE LANE, DO NOT SHOOT THE ENGINE. Ending stdin is what
-          // tells the child the console quit, and it needs a breath to push
-          // that to every open mirror. The kill is only the backstop.
-          child?.stdin?.end();
-          setTimeout(() => {
-            child?.kill();
-            process.exit(0);
-          }, 1200);
+      void (async () => {
+        try {
+          const r = await fetch(`${target}/mcp`, { method: "POST", headers: { "content-type": "application/json" }, body: line });
+          if (r.status === 200) process.stdout.write(`${await r.text()}\n`);
+        } catch (e) {
+          let id: number | string | null = null;
+          try {
+            id = (JSON.parse(line) as { id?: number | string | null }).id ?? null;
+          } catch {
+            // unparseable — the server would have answered the parse error; gone, nobody can
+          }
+          if (id !== null) process.stdout.write(`${JSON.stringify({ jsonrpc: "2.0", id, error: { code: -32000, message: `the attached se server went away: ${String(e)}` } })}\n`);
         }
-      }, 50);
+      })();
     });
-  }
+    rl.on("close", () => process.exit(0));
+  } else {
+    // HEADLESS: no harness on stdio — the child serves /mcp and the shim only
+    // keeps the reload (exit 42) and session-over (exit 0) contract alive.
+    if (!argv.includes("--headless")) {
+      const rl = createInterface({ input: process.stdin, terminal: false });
+      rl.on("line", (line) => {
+        if (line.trim() === "") return;
+        const c = ensureChild();
+        try {
+          const id = (JSON.parse(line) as { id?: number | string | null }).id;
+          if (id !== undefined && id !== null) pending.add(id);
+        } catch {
+          // the child answers parse errors itself
+        }
+        c.stdin!.write(line + "\n");
+      });
+      rl.on("close", () => {
+        // Drain: answers already owed still flow home before the lights go out.
+        const started = Date.now();
+        const drain = setInterval(() => {
+          if (pending.size === 0 || Date.now() - started > 3000) {
+            clearInterval(drain);
+            // CLOSE THE LANE, DO NOT SHOOT THE ENGINE. Ending stdin is what
+            // tells the child the console quit, and it needs a breath to push
+            // that to every open mirror. The kill is only the backstop.
+            child?.stdin?.end();
+            setTimeout(() => {
+              child?.kill();
+              process.exit(0);
+            }, 1200);
+          }
+        }, 50);
+      });
+    }
 
-  process.stderr.write(`se-mcp shim: ordered reloads only (se_reload at idle) root=${root}\n`);
-  ensureChild(); // eager: the mirror and the panel come up before the first request
+    process.stderr.write(`se-mcp shim: ordered reloads only (se_reload at idle) root=${root}\n`);
+    ensureChild(); // eager: the mirror and the panel come up before the first request
+  }
 }
