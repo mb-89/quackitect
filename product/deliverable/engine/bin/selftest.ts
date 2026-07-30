@@ -22,7 +22,7 @@ if (process.argv.some((a) => a === "--help" || a === "-h" || a === "-?")) {
 
   node engine/bin/selftest.ts --root <project root>
 
-  --root  the quackitect project root. Default: the current directory.
+  --root  the project root. Default: the current directory.
   --help  this text (-h, -?)
 `);
   process.exit(0);

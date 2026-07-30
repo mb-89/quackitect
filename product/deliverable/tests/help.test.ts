@@ -108,7 +108,7 @@ test("the one help reaches the OUTPUT stream, so a pipe or a redirect keeps it",
   const src = readFileSync(join(repoRoot, "RUNME.ps1"), "utf8");
   assert.doesNotMatch(src, /Write-Host[^\r\n]*[Hh]elp/, "RUNME.ps1 must not Write-Host anything about help");
   const mcp = readFileSync(join(binDir, "se-mcp.ts"), "utf8");
-  assert.match(mcp, /process\.stdout\.write\(`se — quackitect v3\. ONE help/, "the one help is written to stdout");
+  assert.match(mcp, /process\.stdout\.write\(`se — ONE help/, "the one help is written to stdout");
 });
 
 // The terminal pane is the DEFAULT launch, and that launch is the one that

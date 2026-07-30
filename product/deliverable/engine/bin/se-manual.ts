@@ -24,7 +24,7 @@ if (process.argv.some((a) => a === "--help" || a === "-h" || a === "-?")) {
 
   node engine/bin/se-manual.ts --root <project root> [--port 7333]
 
-  --root            the quackitect project root (holds product/ and workspace/)
+  --root            the project root (holds product/ and workspace/)
   --port            the mirror's HTTP port. Default 7333.
   --mirror-port     the same port under se-mcp's spelling, so one RUNME
                     command line works in both modes. Env: SE_MIRROR_PORT.

@@ -1,9 +1,9 @@
 {
-  "name": "quackitect-v3-engine",
+  "name": "se-engine",
   "version": "3.0.0-bootstrap",
   "private": true,
   "type": "module",
-  "description": "quackitect v3 — the se MCP server: caged-agent tool lane, call log, state machine kernel.",
+  "description": "The se MCP server: caged-agent tool lane, call log, state machine kernel.",
   "engines": {
     "node": ">=22.6"
   },

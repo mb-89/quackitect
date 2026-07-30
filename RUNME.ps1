@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-quackitect v3 — install-check, selftest, and launch.
+The system's install-check, selftest, and launch.
 
 .DESCRIPTION
 Preflight (node/git/ripgrep hard deps), cage install, engine selftests, then
@@ -18,12 +18,19 @@ list. Run .\RUNME.ps1 --help.
 .EXAMPLE
 .\RUNME.ps1 --own-terminal
 .EXAMPLE
-.\RUNME.ps1 --vscode
+.\RUNME.ps1 --classic
 .EXAMPLE
 .\RUNME.ps1 --kill
 #>
 $ErrorActionPreference = "Stop"
 $root = $PSScriptRoot
+
+# THE PRODUCT NAME IS ONE FACT (brand.json at the root). Nothing below spells
+# it out, so an export renames the whole system by writing that one file.
+$brandFile = Join-Path $root "brand.json"
+$brand = if (Test-Path $brandFile) { Get-Content $brandFile -Raw | ConvertFrom-Json } else { [pscustomobject]@{ name = "se"; id = "se"; abbr = $null } }
+$P = $brand.name
+$brandId = $brand.id
 
 # The server (engine/bin/se-mcp.ts) is the registry for everything that
 # changes how the ENGINE runs. RUNME declares only the flags that change how
@@ -50,9 +57,26 @@ if ($forwarded | Where-Object { $_ -in @("--help", "-h", "-?", "-Help") }) {
 # Runs before preflight and exits - exporting must never wait on npm.
 $exportIx = [array]::IndexOf($forwarded, "--export")
 if ($exportIx -ge 0) {
-  $dest = if ($exportIx + 1 -lt $forwarded.Count) { $forwarded[$exportIx + 1] } else { $null }
-  if ([string]::IsNullOrWhiteSpace($dest)) {
-    Write-Host "--export needs a target folder: .\RUNME.ps1 --export C:\path\to\empty" -ForegroundColor Red
+  # THE EXPORT RENAMES. Folder, name and abbreviation are all required -
+  # there is no fallback to this project's own name, because a forgotten
+  # argument would ship it to somebody else.
+  $dest    = if ($exportIx + 1 -lt $forwarded.Count) { $forwarded[$exportIx + 1] } else { $null }
+  $newName = if ($exportIx + 2 -lt $forwarded.Count) { $forwarded[$exportIx + 2] } else { $null }
+  $newAbbr = if ($exportIx + 3 -lt $forwarded.Count) { $forwarded[$exportIx + 3] } else { $null }
+  if ([string]::IsNullOrWhiteSpace($dest) -or [string]::IsNullOrWhiteSpace($newName) -or [string]::IsNullOrWhiteSpace($newAbbr)) {
+    Write-Host "--export needs a folder, a name and an abbreviation:" -ForegroundColor Red
+    Write-Host "  .\RUNME.ps1 --export C:\path\to\empty 'Blue Heron' BH" -ForegroundColor Yellow
+    exit 1
+  }
+  if ($newAbbr.Length -lt 2 -or $newAbbr.Length -gt 3) {
+    Write-Host "the abbreviation is two or three letters - got '$newAbbr'" -ForegroundColor Red
+    exit 1
+  }
+  # The id has to survive being a folder name, an npm name and a VS Code
+  # command id, so it is reduced to what all three accept.
+  $newId = ($newName.ToLower() -replace '[^a-z0-9]+', '-').Trim('-')
+  if ([string]::IsNullOrWhiteSpace($newId)) {
+    Write-Host "'$newName' has no letters or digits to make an id from" -ForegroundColor Red
     exit 1
   }
   if ((Test-Path $dest) -and (@(Get-ChildItem $dest -Force).Count -gt 0)) {
@@ -63,7 +87,7 @@ if ($exportIx -ge 0) {
     Write-Host "git not found - the export creates a fresh repo. winget install Git.Git and re-run." -ForegroundColor Red
     exit 1
   }
-  Write-Host "quackitect v3 - exporting the working tree (history stays home)" -ForegroundColor Cyan
+  Write-Host "$P - exporting as '$newName' ($($newAbbr.ToUpper())) - history stays home" -ForegroundColor Cyan
   New-Item -ItemType Directory -Force -Path $dest | Out-Null
   # /XD excludes by NAME wherever it appears: the repo history, every
   # worktree, the session state, node_modules and the generated cage dirs.
@@ -72,28 +96,79 @@ if ($exportIx -ge 0) {
   # .git rides BOTH lists: in a normal checkout it is a directory (/XD), in
   # a git WORKTREE the root carries a .git FILE (/XF) — missing that file
   # made an export re-use the live repository (found in the smoke test).
-  robocopy $root $dest /E /NFL /NDL /NJH /NJS /NP /XD .git .worktrees .se node_modules .claude .copilot /XF .git .mcp.json | Out-Null
+  # THE RECORDS STAY HOME TOO. product/spec is this project's own expedition
+  # and iteration history. It is noise to whoever receives the copy, and
+  # confusing noise, because it describes work they never did.
+  $specDir = Join-Path $root "product\spec"
+  robocopy $root $dest /E /NFL /NDL /NJH /NJS /NP /XD .git .worktrees .se node_modules .claude .copilot $specDir /XF .git .mcp.json | Out-Null
   if ($LASTEXITCODE -ge 8) {
     Write-Host "copy FAILED (robocopy $LASTEXITCODE)" -ForegroundColor Red
     exit 1
   }
+  # The machine writes its records here, so the home exists from the start.
+  New-Item -ItemType Directory -Force -Path (Join-Path $dest "product\spec") | Out-Null
   if (Test-Path (Join-Path $dest ".git")) {
     Write-Host "a .git survived the copy - refusing to init over live history" -ForegroundColor Red
     exit 1
   }
   Push-Location $dest
   try {
+    # git WARNS on stderr - line endings, for one - and a Stop preference
+    # turns any such warning into a terminating error mid-export. The exit
+    # codes are what decide here, not the chatter.
+    $prevEap = $ErrorActionPreference
+    $ErrorActionPreference = "Continue"
     git init -q -b main
     # A LOCAL identity rides .git/config, so the engine's own commits work
     # on a machine that never configured git.
-    git config user.name "quackitect"
-    git config user.email "export@quackitect.local"
+    # ONE FILE RENAMES THE WHOLE SYSTEM. Every branded surface renders from
+    # this at launch, so nothing else in the tree had to be rewritten.
+    # WRITTEN WITHOUT A BOM. Set-Content -Encoding utf8 emits one on Windows
+    # PowerShell, and JSON.parse refuses the file it produces.
+    $utf8NoBom = New-Object System.Text.UTF8Encoding $false
+    $brandJson = @{ name = $newName; id = $newId; abbr = $newAbbr.ToUpper() } | ConvertTo-Json
+    [System.IO.File]::WriteAllText((Join-Path $dest "brand.json"), $brandJson, $utf8NoBom)
+    # A FRESH FRONT DOOR. This repo's README is about THIS repo - its branch
+    # layout, its history - which is noise to whoever receives the copy.
+    $readme = @"
+# $newName
+
+$newName runs inside VS Code. You walk a state machine with an AI agent, and
+a mirror beside your editor shows where the walk stands.
+
+## Start it
+
+    .\RUNME.ps1
+
+That installs whatever is missing, places the extension, and opens VS Code.
+The $($newAbbr.ToUpper()) button in the left bar opens the mirror.
+
+## What is in here
+
+- product/deliverable - the engine, the machines, the VS Code extension.
+- product/guidance - the rules the agent is bound by.
+- product/spec - where your own records get written.
+- workspace/ - where the agent runs, fenced in.
+- brand.json - the product name. Change it, and every surface follows.
+
+## Attaching an agent
+
+Open the command palette and run "$($newName): How to Attach Your Agent".
+"@
+    [System.IO.File]::WriteAllText((Join-Path $dest "README.md"), $readme, $utf8NoBom)
+    git config user.name "$newName"
+    git config user.email "export@$newId.local"
     git add -A
-    git commit -q -m "quackitect export - a fresh start, history stays home"
+    git commit -q -m "$newName - a fresh start, history stays home"
+    if ($LASTEXITCODE -ne 0) {
+      Write-Host "the fresh repository could not be committed - see above" -ForegroundColor Red
+      exit 1
+    }
+    $ErrorActionPreference = $prevEap
   } finally {
     Pop-Location
   }
-  Write-Host "  exported to $dest - a fresh repo, one commit, no history" -ForegroundColor Green
+  Write-Host "  exported to $dest as '$newName' - a fresh repo, one commit, no history" -ForegroundColor Green
   Write-Host "  next: cd $dest ; .\RUNME.ps1" -ForegroundColor Cyan
   exit 0
 }
@@ -103,7 +178,7 @@ if ($exportIx -ge 0) {
 # window that made it. This runs BEFORE preflight and then exits: clearing a
 # port must never wait on npm install, and nothing is launched afterwards.
 if ($forwarded | Where-Object { $_ -in @("--kill", "-Kill") }) {
-  Write-Host "quackitect v3 - kill: looking for leftovers" -ForegroundColor Cyan
+  Write-Host "$P - kill: looking for leftovers" -ForegroundColor Cyan
   $entryPoints = @("se-mcp.ts", "se-pty.ts", "se-manual.ts")
   $ports = @(7333, 7334)
 
@@ -182,7 +257,7 @@ if ($forwarded | Where-Object { $_ -in @("--kill", "-Kill") }) {
   exit 0
 }
 
-Write-Host "quackitect v3 - preflight" -ForegroundColor Cyan
+Write-Host "$P - preflight" -ForegroundColor Cyan
 
 # RUNME INSTALLS ITS OWN HARD DEPENDENCIES (owner, 2026-07-30: a fresh
 # machine said "node not found" and stopped - installing was the whole
@@ -235,18 +310,30 @@ Write-Host "  $((git --version))  OK"
 # in place, open the workspace - the extension owns the rest: the server,
 # the attach configs, the engine's npm install. A session already running is
 # fine - the extension attaches to it instead of spawning a second one.
-if ($forwarded | Where-Object { $_ -eq "--vscode" }) {
+# It is the DEFAULT now, not a flag (owner, 2026-07-30). --classic is the
+# opt-out and takes the old terminal-and-browser path further down.
+$classic = [bool]($forwarded | Where-Object { $_ -eq "--classic" })
+$forwarded = @($forwarded | Where-Object { $_ -notin @("--classic", "--vscode") })
+if (-not $classic) {
   if (-not (Ensure-Tool "code" "Microsoft.VisualStudioCode" "VS Code")) { exit 1 }
   $extSrc = Join-Path $root "product\deliverable\vscode"
-  $extDest = Join-Path $env:USERPROFILE ".vscode\extensions\quackitect.quackitect-0.1.0"
+  $extDest = Join-Path $env:USERPROFILE ".vscode\extensions\$brandId.$brandId-0.1.0"
   New-Item -ItemType Directory -Force -Path $extDest | Out-Null
   robocopy $extSrc $extDest /MIR /NFL /NDL /NJH /NJS /NP | Out-Null
   if ($LASTEXITCODE -ge 8) {
     Write-Host "extension copy FAILED (robocopy $LASTEXITCODE)" -ForegroundColor Red
     exit 1
   }
-  Write-Host "  extension in place - $extDest" -ForegroundColor Green
-  Write-Host "quackitect v3 - opening VS Code on workspace\ - the extension takes it from here" -ForegroundColor Cyan
+  # THE COPY IS WHAT CARRIES A NAME. The source keeps its placeholders, so
+  # there is one tree and a rename stays one file.
+  $rendered = node (Join-Path $root "product\deliverable\engine\bin\brand.ts") --root $root --dest $extDest
+  if ($LASTEXITCODE -ne 0) {
+    Write-Host "naming the extension FAILED - see above" -ForegroundColor Red
+    exit 1
+  }
+  Write-Host "  extension in place - $rendered" -ForegroundColor Green
+  Write-Host "  $extDest" -ForegroundColor DarkGray
+  Write-Host "$P - opening VS Code on workspace\ - the extension takes it from here" -ForegroundColor Cyan
   code (Join-Path $root "workspace")
   exit 0
 }
@@ -260,7 +347,7 @@ foreach ($port in 7333, 7334) {
   if (Get-NetTCPConnection -State Listen -LocalPort $port -ErrorAction SilentlyContinue) { $busy += $port }
 }
 if ($busy.Count -gt 0) {
-  Write-Host "a quackitect session is still running - port(s) $($busy -join ', ') are held." -ForegroundColor Red
+  Write-Host "a $P session is still running - port(s) $($busy -join ', ') are held." -ForegroundColor Red
   Write-Host ""
   Write-Host "  to stop it, run:      .\RUNME.ps1 --kill" -ForegroundColor Yellow
   Write-Host "  then launch again:    .\RUNME.ps1" -ForegroundColor Yellow
@@ -270,7 +357,7 @@ if ($busy.Count -gt 0) {
 }
 
 # Engine dependencies. @vscode/ripgrep ships the rg binary via npm.
-Write-Host "quackitect v3 - installing engine dependencies" -ForegroundColor Cyan
+Write-Host "$P - installing engine dependencies" -ForegroundColor Cyan
 Push-Location (Join-Path $root "product\deliverable")
 try {
   npm install --no-audit --no-fund --loglevel=error
@@ -295,7 +382,7 @@ try {
 # Install the cage. .mcp.json and .claude\settings.json cannot be written by
 # remote tools (desktop security rule), so they ship as templates in
 # workspace\_cage and are placed locally here - declaratively, every run.
-Write-Host "quackitect v3 - installing cage config" -ForegroundColor Cyan
+Write-Host "$P - installing cage config" -ForegroundColor Cyan
 $ws = Join-Path $root "workspace"
 New-Item -ItemType Directory -Force -Path (Join-Path $ws ".claude") | Out-Null
 Copy-Item (Join-Path $ws "_cage\mcp.json") (Join-Path $ws ".mcp.json") -Force
@@ -313,7 +400,7 @@ Write-Host "  workspace\.copilot\mcp-config.json in place"
 # log location is writable. The FULL test suite is not run here - it runs
 # INSIDE boot (prepare_idle's selftest exit script), engine-observed, so
 # launching stays instant and the walk still proves the engine green.
-Write-Host "quackitect v3 - preflight (full selftests run in boot)" -ForegroundColor Cyan
+Write-Host "$P - preflight (full selftests run in boot)" -ForegroundColor Cyan
 Push-Location (Join-Path $root "product\deliverable")
 try {
   node engine\bin\preflight.ts --root $root
@@ -338,7 +425,7 @@ $manual = [bool]($forwarded | Where-Object { $_ -eq "--manual" })
 $staleOneScreen = [bool]($forwarded | Where-Object { $_ -eq "--one-screen" })
 $forwarded = @($forwarded | Where-Object { $_ -notin @("--own-terminal", "--manual", "--one-screen") })
 if ($staleOneScreen) {
-  Write-Host "quackitect v3 - --one-screen is the default now; the flag did nothing" -ForegroundColor Yellow
+  Write-Host "$P - --one-screen is the default now; the flag did nothing" -ForegroundColor Yellow
 }
 
 # WHICH AGENT HOST. Claude wins when both are installed (owner ruling).
@@ -353,14 +440,14 @@ if (($null -eq $agentHost) -and (-not $manual)) {
   $manual = $true
 }
 if ($manual) {
-  Write-Host "quackitect v3 - manual mode: no agent, the Mirror is yours" -ForegroundColor Cyan
+  Write-Host "$P - manual mode: no agent, the Mirror is yours" -ForegroundColor Cyan
   node (Join-Path $root "product\deliverable\engine\bin\se-manual.ts") --root $root @forwarded
   exit $LASTEXITCODE
 }
 $env:SE_ARGS = ($forwarded -join "`n")
 $argNote = if ($forwarded.Count -gt 0) { " (args: $($forwarded -join ' '))" } else { "" }
-Write-Host "quackitect v3 - launching caged agent in workspace/$argNote" -ForegroundColor Cyan
-Write-Host "quackitect v3 - the Mirror (your hand on the walk): the server opens http://localhost:7333 as soon as it is up" -ForegroundColor Cyan
+Write-Host "$P - launching caged agent in workspace/$argNote" -ForegroundColor Cyan
+Write-Host "$P - the Mirror (your hand on the walk): the server opens http://localhost:7333 as soon as it is up" -ForegroundColor Cyan
 
 # The server opens the Mirror itself as soon as it listens (se_panel
 # reopens it any time) - no polling job here.
@@ -396,19 +483,19 @@ try {
     # live CLI and carrying the record of what was wrong before.
     $cage = Get-Content (Join-Path $ws "_cage\copilot-cage.json") -Raw | ConvertFrom-Json
     $cageArgs = @($cage.mcp_args) + @($cage.exclude_args) + @($cage.allow_args) + @($cage.deny_args) + @($cage.extra_args)
-    Write-Host "quackitect v3 - agent host: GitHub Copilot CLI" -ForegroundColor Cyan
+    Write-Host "$P - agent host: GitHub Copilot CLI" -ForegroundColor Cyan
     if ($ownTerminal) {
-      Write-Host "quackitect v3 - own terminal: the agent runs in THIS window, kickoff included" -ForegroundColor Cyan
+      Write-Host "$P - own terminal: the agent runs in THIS window, kickoff included" -ForegroundColor Cyan
       copilot @cageArgs -i $kickoff
     } else {
-      Write-Host "quackitect v3 - the agent runs in the Mirror's terminal pane, in the background" -ForegroundColor Cyan
+      Write-Host "$P - the agent runs in the Mirror's terminal pane, in the background" -ForegroundColor Cyan
       node (Join-Path $root "product\deliverable\engine\bin\se-pty.ts") --pty-port 7334 --detach -- copilot @cageArgs -i $kickoff
     }
   } elseif ($ownTerminal) {
-    Write-Host "quackitect v3 - own terminal: the agent runs in THIS window; the Mirror's terminal pane stays empty" -ForegroundColor Cyan
+    Write-Host "$P - own terminal: the agent runs in THIS window; the Mirror's terminal pane stays empty" -ForegroundColor Cyan
     claude $kickoff
   } else {
-    Write-Host "quackitect v3 - the agent runs in the Mirror's terminal pane, in the background" -ForegroundColor Cyan
+    Write-Host "$P - the agent runs in the Mirror's terminal pane, in the background" -ForegroundColor Cyan
     node (Join-Path $root "product\deliverable\engine\bin\se-pty.ts") --pty-port 7334 --detach -- claude $kickoff
   }
 } finally {

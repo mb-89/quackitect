@@ -1,9 +1,9 @@
 {
-  "name": "quackitect",
-  "displayName": "Quackitect",
+  "name": "$PRODUCT_ID$",
+  "displayName": "$PRODUCT$",
   "description": "The se machine in VS Code — the mirror beside your editor, the records as real files.",
   "version": "0.1.0",
-  "publisher": "quackitect",
+  "publisher": "$PRODUCT_ID$",
   "private": true,
   "engines": {
     "vscode": "^1.90.0"
@@ -13,38 +13,38 @@
     "viewsContainers": {
       "activitybar": [
         {
-          "id": "quackitect",
-          "title": "Quackitect",
+          "id": "$PRODUCT_ID$",
+          "title": "$PRODUCT$",
           "icon": "media/icon.svg"
         }
       ]
     },
     "views": {
-      "quackitect": [
+      "$PRODUCT_ID$": [
         {
           "type": "webview",
-          "id": "quackitect.mirror",
+          "id": "$PRODUCT_ID$.mirror",
           "name": "Mirror"
         }
       ]
     },
     "commands": [
       {
-        "command": "quackitect.openMirror",
-        "title": "Quackitect: Open the Mirror"
+        "command": "$PRODUCT_ID$.openMirror",
+        "title": "$PRODUCT$: Open the Mirror"
       },
       {
-        "command": "quackitect.howToAttach",
-        "title": "Quackitect: How to Attach Your Agent"
+        "command": "$PRODUCT_ID$.howToAttach",
+        "title": "$PRODUCT$: How to Attach Your Agent"
       },
       {
-        "command": "quackitect.restartServer",
-        "title": "Quackitect: Restart the se Server"
+        "command": "$PRODUCT_ID$.restartServer",
+        "title": "$PRODUCT$: Restart the se Server"
       }
     ],
     "keybindings": [
       {
-        "command": "quackitect.openMirror",
+        "command": "$PRODUCT_ID$.openMirror",
         "key": "ctrl+alt+q"
       }
     ]

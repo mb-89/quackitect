@@ -1048,7 +1048,7 @@ let EMBED = false;
 try { EMBED = sessionStorage.getItem("se-embed") === "1"; } catch { EMBED = false; }
 window.addEventListener("message", (ev) => {
   const d = ev.data;
-  if (!d || d.quackitect !== "theme") return;
+  if (!d || d.se !== "theme") return;
   EMBED = true;
   try { sessionStorage.setItem("se-embed", "1"); } catch { /* storage denied — the flag just will not survive navigation */ }
   const vars = d.vars || {};
@@ -1059,7 +1059,7 @@ function cssPalette(name) {
 }
 function embedOpen(path) {
   if (!EMBED || !path) return false;
-  window.parent.postMessage({ quackitect: "open", path: path }, "*");
+  window.parent.postMessage({ se: "open", path: path }, "*");
   return true;
 }
 document.addEventListener("click", async (ev) => {

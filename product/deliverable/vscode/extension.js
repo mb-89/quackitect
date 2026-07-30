@@ -1,4 +1,4 @@
-// The Quackitect shell for VS Code — THIN on purpose: the engine and the
+// The $PRODUCT$ shell for VS Code — THIN on purpose: the engine and the
 // mirror live in the repository and change without touching this file.
 // Plain JavaScript, also on purpose: the extension host does not strip
 // TypeScript types, and the project runs with no build step anywhere.
@@ -76,7 +76,7 @@ function ensureDeps(root) {
   const deliverable = path.join(root, "product", "deliverable");
   if (existsSync(path.join(deliverable, "node_modules"))) return Promise.resolve(true);
   return vscode.window.withProgress(
-    { location: vscode.ProgressLocation.Notification, title: "Quackitect: first run — installing engine dependencies" },
+    { location: vscode.ProgressLocation.Notification, title: "$PRODUCT$: first run — installing engine dependencies" },
     () =>
       new Promise((resolve) => {
         const npm = spawn("npm", ["install", "--no-audit", "--no-fund", "--loglevel=error"], { cwd: deliverable, shell: true });
@@ -92,7 +92,7 @@ function startServer(root, runner) {
   const entry = path.join(root, "product", "deliverable", "engine", "bin", "se-mcp.ts");
   child = spawn(runner.cmd, [entry, "--root", root, "--child", "--headless"], {
     cwd: root,
-    env: { ...process.env, ...runner.env, SE_SESSION: sessionToken, SE_PANEL_SUPPRESS: "1" },
+    env: { ...process.env, ...runner.env, SE_SESSION: sessionToken, SE_PARENT_PID: String(process.pid), SE_PANEL_SUPPRESS: "1" },
     stdio: ["ignore", "pipe", "pipe"],
     shell: runner.shell,
     windowsHide: true,
@@ -117,7 +117,7 @@ function startServer(root, runner) {
 async function ensureServer() {
   const root = projectRoot();
   if (root === null) {
-    void vscode.window.showErrorMessage("Quackitect: open the project's workspace folder (or the project root) first.");
+    void vscode.window.showErrorMessage("$PRODUCT$: open the project's workspace folder (or the project root) first.");
     return false;
   }
   placeConfigs(root);
@@ -126,11 +126,11 @@ async function ensureServer() {
   if (await alive()) return true;
   const runner = nodeRunner();
   if (runner === null) {
-    void vscode.window.showErrorMessage("Quackitect needs Node 22.6 or newer — install it, then retry: winget install OpenJS.NodeJS.LTS");
+    void vscode.window.showErrorMessage("$PRODUCT$ needs Node 22.6 or newer — install it, then retry: winget install OpenJS.NodeJS.LTS");
     return false;
   }
   if (!(await ensureDeps(root))) {
-    void vscode.window.showErrorMessage("Quackitect: npm install failed — details in Output → Quackitect Server.");
+    void vscode.window.showErrorMessage("$PRODUCT$: npm install failed — details in Output → $PRODUCT$ Server.");
     return false;
   }
   startServer(root, runner);
@@ -138,7 +138,7 @@ async function ensureServer() {
     if (await alive()) return true;
     await new Promise((r) => setTimeout(r, 200));
   }
-  void vscode.window.showErrorMessage("Quackitect: the se server did not come up — details in Output → Quackitect Server.");
+  void vscode.window.showErrorMessage("$PRODUCT$: the se server did not come up — details in Output → $PRODUCT$ Server.");
   return false;
 }
 
@@ -179,7 +179,7 @@ function mirrorHtml() {
     };
   }
   function sendTheme() {
-    if (frame.contentWindow) frame.contentWindow.postMessage({ quackitect: "theme", vars: themeVars() }, "*");
+    if (frame.contentWindow) frame.contentWindow.postMessage({ se: "theme", vars: themeVars() }, "*");
   }
   // The iframe navigates within itself; every load gets the theme again
   // (and once more late, for scripts that read the palette on boot).
@@ -187,8 +187,8 @@ function mirrorHtml() {
   window.addEventListener("message", (ev) => {
     const d = ev.data;
     if (!d) return;
-    if (d.quackitect === "open") vsapi.postMessage(d); // iframe → extension
-    if (d.quackitect === "theme-changed") sendTheme(); // extension → iframe
+    if (d.se === "open") vsapi.postMessage(d); // iframe → extension
+    if (d.se === "theme-changed") sendTheme(); // extension → iframe
   });
   (async function boot() {
     for (;;) {
@@ -211,7 +211,7 @@ class MirrorViewProvider {
     view.webview.options = { enableScripts: true };
     view.webview.html = mirrorHtml();
     view.webview.onDidReceiveMessage((m) => {
-      if (m && m.quackitect === "open") openInEditor(m.path);
+      if (m && m.se === "open") openInEditor(m.path);
     });
     void ensureServer();
   }
@@ -225,14 +225,14 @@ function showAttach() {
 }
 
 function activate(context) {
-  output = vscode.window.createOutputChannel("Quackitect Server");
+  output = vscode.window.createOutputChannel("$PRODUCT$ Server");
   const provider = new MirrorViewProvider();
   context.subscriptions.push(
     output,
-    vscode.window.registerWebviewViewProvider("quackitect.mirror", provider),
-    vscode.commands.registerCommand("quackitect.openMirror", () => vscode.commands.executeCommand("quackitect.mirror.focus")),
-    vscode.commands.registerCommand("quackitect.howToAttach", showAttach),
-    vscode.commands.registerCommand("quackitect.restartServer", async () => {
+    vscode.window.registerWebviewViewProvider("$PRODUCT_ID$.mirror", provider),
+    vscode.commands.registerCommand("$PRODUCT_ID$.openMirror", () => vscode.commands.executeCommand("$PRODUCT_ID$.mirror.focus")),
+    vscode.commands.registerCommand("$PRODUCT_ID$.howToAttach", showAttach),
+    vscode.commands.registerCommand("$PRODUCT_ID$.restartServer", async () => {
       if (child !== null) {
         child.kill();
         child = null;
@@ -241,11 +241,11 @@ function activate(context) {
       if (provider.view) provider.view.webview.html = mirrorHtml();
     }),
     vscode.window.onDidChangeActiveColorTheme(() => {
-      if (provider.view) provider.view.webview.postMessage({ quackitect: "theme-changed" });
+      if (provider.view) provider.view.webview.postMessage({ se: "theme-changed" });
     }),
   );
-  if (context.globalState.get("quackitect.greeted") !== true) {
-    void context.globalState.update("quackitect.greeted", true);
+  if (context.globalState.get("$PRODUCT_ID$.greeted") !== true) {
+    void context.globalState.update("$PRODUCT_ID$.greeted", true);
     showAttach();
   }
 }
@@ -253,7 +253,19 @@ function activate(context) {
 function deactivate() {
   // The server lives and dies with VS Code — deliberately.
   disposed = true;
-  if (child !== null) child.kill();
+  if (child === null) return;
+  // KILL THE TREE, NOT THE HANDLE. On Windows the handle is the shell we
+  // spawned through, so killing it leaves the node process behind — along
+  // with everything that process started — still holding the port.
+  const pid = child.pid;
+  child.kill();
+  if (process.platform === "win32" && pid !== undefined) {
+    try {
+      spawnSync("taskkill", ["/PID", String(pid), "/T", "/F"], { windowsHide: true });
+    } catch {
+      // The server's own parent watchdog is the belt for this.
+    }
+  }
 }
 
 module.exports = { activate, deactivate };

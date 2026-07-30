@@ -4,7 +4,7 @@
 //
 //   node engine/bin/se-mcp.ts --root <project root> [--autonomy 0.4] [--mirror-port 7333]
 //
-// --root is the QUACKITECT PROJECT root (the folder holding product/ and
+// --root is the PROJECT root (the folder holding product/ and
 // workspace/) — the file lane serves that whole tree, the call log lives in
 // <root>/.se/calls.jsonl.
 //
@@ -45,12 +45,15 @@ function argValue(flag: string): string | undefined {
 }
 
 if (argv.some((a) => a === "--help" || a === "-h" || a === "-?")) {
-  process.stdout.write(`se — quackitect v3. ONE help for the whole system.
+  process.stdout.write(`se — ONE help for the whole system.
 
   .\\RUNME.ps1 [launch flags] [engine flags...]      — the normal way in
   node engine/bin/se-mcp.ts --root <root> [--autonomy 0.4]   — the server alone
 
 LAUNCH — read by RUNME.ps1 before the server starts.
+
+  VS CODE IS THE DEFAULT HOST. Plain .\\RUNME.ps1 installs what it needs and
+  opens VS Code; no flag asks for it.
 
   These are listed HERE, with everything else, because two half-lists are
   worse than one whole one. RUNME consumes them and the server never sees
@@ -63,25 +66,33 @@ LAUNCH — read by RUNME.ps1 before the server starts.
                  The engine's --autonomy 0 is a DIFFERENT thing: an agent
                  is running, it just may not step by itself.
   --one-screen   the old spelling of today's default. Accepted, does nothing.
-  --kill         stop every leftover quackitect process and exit, launching
+  --kill         stop every leftover engine process and exit, launching
                  nothing (-Kill). Finds the server, the terminal host and the
                  manual mirror by command line AND by listening port (7333,
                  7334), kills each with its children, then checks the ports
                  really came free. Finding nothing running is a success.
-  --vscode       VS Code as the host: install VS Code if missing, place the
-                 extension (a folder copy — no marketplace), and open VS
-                 Code on workspace\\. The extension owns the server from
-                 there: engine npm install, attach configs, headless lane.
-  --export <dir> copy the WORKING TREE into <dir> as a fresh single-commit
-                 repository and exit, launching nothing. History stays home:
+  --classic      the OLD way in: the agent on a terminal and the Mirror in
+                 your browser, with no VS Code. It still works exactly as it
+                 did. It is simply no longer what you get by default.
+  --vscode       accepted, does nothing. VS Code is the default host now.
+  --export <dir> <Name> <ABBR>
+                 copy the WORKING TREE into <dir> as a fresh single-commit
+                 repository under a NEW NAME, then exit. History stays home:
                  .git, .worktrees, .se, node_modules and the generated cage
-                 files are left behind; the target must be empty. The new
-                 repo carries a local commit identity, so it runs anywhere:
+                 files are left behind, and the target must be empty.
+                 <Name>  what a reader sees — window titles, the activity
+                         bar, every notification.
+                 <ABBR>  two or three letters, drawn as the activity-bar
+                         icon.
+                 BOTH ARE REQUIRED. There is no fallback to this project's
+                 own name: a forgotten argument would ship it to somebody
+                 else. The new repo carries a local commit identity, so it
+                 runs anywhere:
                  cd <dir>; .\\RUNME.ps1
 
 ENGINE — read by the server (this file is where they are defined).
 
-  --root         the quackitect project root (holds product/ and workspace/);
+  --root         the project root (holds product/ and workspace/);
                  file lane serves that tree, call log lands in <root>/.se/
   --autonomy     0..1 — which states the AGENT enters by itself (priority <=
                  autonomy). 0: every step is the human's; 1: fully autonomous.
@@ -117,6 +128,28 @@ if (argv.includes("--child") || process.env.SE_HOT_DISABLE === "1") {
   // ── THE CHILD — the engine proper. Dynamic imports keep the shim free
   //    of the engine's module graph: a broken engine breaks the child (the
   //    reload canary catches it first), never the standing connection. ────
+  // THE WINDOW THAT STARTED US OWNS US. A host's goodbye cannot be trusted:
+  // VS Code only calls deactivate on an orderly close, so a killed or crashed
+  // window never says anything. The survivor keeps the port AND its in-memory
+  // session, so the next morning reopened yesterday's autonomy and yesterday's
+  // checked documents (found live 2026-07-30). Watch the parent instead.
+  //
+  // Only a host that CLAIMS a parent gets this. The classic launcher detaches
+  // its terminal host on purpose and must go on outliving its window.
+  const parentPid = Number(process.env.SE_PARENT_PID ?? 0);
+  if (Number.isInteger(parentPid) && parentPid > 0) {
+    // Signal 0 delivers nothing; it only asks whether the process is there.
+    const watch = setInterval(() => {
+      try {
+        process.kill(parentPid, 0);
+      } catch {
+        process.stderr.write("se-mcp: the window that started this server is gone — exiting\n");
+        process.exit(0);
+      }
+    }, 5_000);
+    watch.unref();
+  }
+
   const { CallLog } = await import("../calllog.ts");
   const { runStdio } = await import("../mcp.ts");
   const { startMirror } = await import("../mirror.ts");

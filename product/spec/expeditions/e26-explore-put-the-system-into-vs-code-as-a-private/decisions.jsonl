@@ -28,3 +28,40 @@
 {"ts":"2026-07-30T14:08:00.075Z","op":"update","visit":"expeditions/e26@0","node":"d28","brief":"installing the extension folder into the user's VS Code"}
 {"ts":"2026-07-30T14:15:02.894Z","op":"done","visit":"expeditions/e26@0","node":"d11","brief":"folder install proven in the user's VS Code; vsix deferred to vsce"}
 {"ts":"2026-07-30T14:15:06.869Z","op":"done","visit":"expeditions/e26@0","node":"d12","brief":"suite 226 green and six commits landed on trunk"}
+{"ts":"2026-07-30T18:12:12.394Z","op":"plan","visit":"expeditions/e26@0","parent":null,"nodes":[{"id":"d15","brief":"export takes a new name and an abbreviation"},{"id":"d16","brief":"the exported copy carries no quackitect branding"},{"id":"d17","brief":"RUNME with no arguments opens VS Code"},{"id":"d18","brief":"the server dies with the window that started it"},{"id":"d19","brief":"prove it: tests and a real export"}]}
+{"ts":"2026-07-30T18:12:30.298Z","op":"update","visit":"expeditions/e26@0","node":"d20","brief":"sizing where the quackitect name is actually shown"}
+{"ts":"2026-07-30T18:13:11.959Z","op":"fork","visit":"expeditions/e26@0","parent":"d16","node":"d21","brief":"search returns zero matches in the bound worktree while read and glob work","nodes":[]}
+{"ts":"2026-07-30T18:14:12.084Z","op":"update","visit":"expeditions/e26@0","node":"d22","brief":"confirming the worktree path and which ripgrep is in play"}
+{"ts":"2026-07-30T18:16:32.580Z","op":"update","visit":"expeditions/e26@0","node":"d23","brief":"anchor ripgrep's exclusion globs to the tree being searched"}
+{"ts":"2026-07-30T18:17:20.565Z","op":"update","visit":"expeditions/e26@0","node":"d24","brief":"pinning the blind-search failure with three cases"}
+{"ts":"2026-07-30T18:17:43.304Z","op":"update","visit":"expeditions/e26@0","node":"d25","brief":"reverting the fix to check the new test actually fails"}
+{"ts":"2026-07-30T18:17:58.637Z","op":"update","visit":"expeditions/e26@0","node":"d26","brief":"restoring the anchored cwd after the negative check"}
+{"ts":"2026-07-30T18:18:27.762Z","op":"done","visit":"expeditions/e26@0","node":"d21","brief":"search anchors its exclusion globs to the tree being searched"}
+{"ts":"2026-07-30T18:20:08.180Z","op":"update","visit":"expeditions/e26@0","node":"d27","brief":"the product name becomes one fact in brand.json"}
+{"ts":"2026-07-30T18:20:34.316Z","op":"update","visit":"expeditions/e26@0","node":"d28","brief":"a render step fills the name into the installed extension copy"}
+{"ts":"2026-07-30T18:20:46.122Z","op":"update","visit":"expeditions/e26@0","node":"d29","brief":"the extension manifest carries placeholders instead of a name"}
+{"ts":"2026-07-30T18:21:32.825Z","op":"update","visit":"expeditions/e26@0","node":"d30","brief":"the extension and mirror carry placeholders, the wire key is named for the lane"}
+{"ts":"2026-07-30T18:22:03.226Z","op":"update","visit":"expeditions/e26@0","node":"d31","brief":"help text and the user agent lose the brand instead of templating it"}
+{"ts":"2026-07-30T18:22:14.426Z","op":"update","visit":"expeditions/e26@0","node":"d32","brief":"the engine npm package sheds the brand too"}
+{"ts":"2026-07-30T18:22:46.462Z","op":"update","visit":"expeditions/e26@0","node":"d33","brief":"the one help says VS Code is the default and classic is the opt-out"}
+{"ts":"2026-07-30T18:23:22.932Z","op":"update","visit":"expeditions/e26@0","node":"d34","brief":"RUNME reads the brand instead of spelling the name out"}
+{"ts":"2026-07-30T18:24:02.365Z","op":"update","visit":"expeditions/e26@0","node":"d35","brief":"the export takes a folder, a name and an abbreviation"}
+{"ts":"2026-07-30T18:24:31.953Z","op":"update","visit":"expeditions/e26@0","node":"d36","brief":"plain RUNME opens VS Code, classic is the opt-out"}
+{"ts":"2026-07-30T18:25:09.028Z","op":"update","visit":"expeditions/e26@0","node":"d37","brief":"the export writes the receiver a front door of their own"}
+{"ts":"2026-07-30T18:25:17.743Z","op":"update","visit":"expeditions/e26@0","node":"d38","brief":"running a real export to a scratch folder"}
+{"ts":"2026-07-30T18:26:04.540Z","op":"update","visit":"expeditions/e26@0","node":"d39","brief":"a missing brand file falls back to the lane's word, not a product"}
+{"ts":"2026-07-30T18:26:18.185Z","op":"update","visit":"expeditions/e26@0","node":"d40","brief":"a missing brand file falls back to the lane's word, not a product"}
+{"ts":"2026-07-30T18:26:35.220Z","op":"update","visit":"expeditions/e26@0","node":"d41","brief":"the export leaves this project's records behind"}
+{"ts":"2026-07-30T18:27:11.885Z","op":"update","visit":"expeditions/e26@0","node":"d42","brief":"a BOM must not be able to break the rename"}
+{"ts":"2026-07-30T18:27:45.682Z","op":"update","visit":"expeditions/e26@0","node":"d43","brief":"a git warning can no longer abort the export"}
+{"ts":"2026-07-30T18:28:18.483Z","op":"done","visit":"expeditions/e26@0","node":"d15","brief":"the export renames on a real run"}
+{"ts":"2026-07-30T18:29:21.904Z","op":"update","visit":"expeditions/e26@0","node":"d44","brief":"the server watches its parent and the shell tree is killed"}
+{"ts":"2026-07-30T18:29:32.268Z","op":"update","visit":"expeditions/e26@0","node":"d45","brief":"clearing a stray key from the spawn environment"}
+{"ts":"2026-07-30T18:30:11.248Z","op":"update","visit":"expeditions/e26@0","node":"d46","brief":"pinning that the server outlives nothing"}
+{"ts":"2026-07-30T18:30:39.137Z","op":"update","visit":"expeditions/e26@0","node":"d47","brief":"waiting on the watchdog test"}
+{"ts":"2026-07-30T18:31:49.164Z","op":"update","visit":"expeditions/e26@0","node":"d48","brief":"the slow test harness is hanging; checking the mechanism directly"}
+{"ts":"2026-07-30T18:32:37.774Z","op":"update","visit":"expeditions/e26@0","node":"d49","brief":"keeping the wiring test and recording the withdrawn one"}
+{"ts":"2026-07-30T18:32:48.147Z","op":"done","visit":"expeditions/e26@0","node":"d16","brief":"no quackitect survives an export, proven on a real run"}
+{"ts":"2026-07-30T18:34:07.307Z","op":"done","visit":"expeditions/e26@0","node":"d17","brief":"plain RUNME opens VS Code, classic is the opt-out"}
+{"ts":"2026-07-30T18:34:37.099Z","op":"update","visit":"expeditions/e26@0","node":"d50","brief":"waiting on the full suite"}
+{"ts":"2026-07-30T18:35:58.973Z","op":"done","visit":"expeditions/e26@0","node":"d18","brief":"the server watches its parent and the tree is killed"}

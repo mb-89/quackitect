@@ -1,6 +1,6 @@
-# Quackitect in VS Code
+# $PRODUCT$ in VS Code
 
-The Quackitect button in the left bar opens the mirror. The mirror is the
+The $PRODUCT$ button in the left bar opens the mirror. The mirror is the
 live picture of the project: the machine drawing, the log, and the details
 pane. Clicking a record in it opens the real file in the editor.
 
@@ -27,5 +27,5 @@ once is not supported.
 
 ## If something is stuck
 
-- Command palette → "Quackitect: Restart the se Server".
-- The server's own words: Output panel → "Quackitect Server".
+- Command palette → "$PRODUCT$: Restart the se Server".
+- The server's own words: Output panel → "$PRODUCT$ Server".

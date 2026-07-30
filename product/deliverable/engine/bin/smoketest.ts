@@ -40,7 +40,7 @@ if (help) {
 
   node engine/bin/smoketest.ts --root <project root>
 
-  --root  the quackitect project root. Default: the current directory.
+  --root  the project root. Default: the current directory.
   --help  this text (-h, -?)
 
 Proves the engine loads and answers. The FULL battery is selftest.ts,
