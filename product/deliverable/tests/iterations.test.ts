@@ -4,10 +4,10 @@
 // gate holds only the FIRST start of a never-walked iteration.
 import { strict as assert } from "node:assert";
 import { spawnSync } from "node:child_process";
-import { existsSync, readFileSync, writeFileSync } from "node:fs";
-import { join } from "node:path";
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { dirname, join } from "node:path";
 import { test } from "node:test";
-import { generateIterations, itPinRel, itSeed, pinIteration } from "../engine/iterations.ts";
+import { generateChunks, generateIterations, itChunksRel, itPinRel, itSeed, pinIteration } from "../engine/iterations.ts";
 import { validateMachine, type MachineDecl } from "../engine/machine.ts";
 import { readMatrix } from "../engine/matrix.ts";
 import { Session } from "../engine/session.ts";
@@ -94,6 +94,49 @@ test("the pin: the bless compiles the change size live; escalation only grows it
   assert.throws(() => pinIteration(root, it, "minor"), /ESCALATION/);
   // An unknown size refuses with the vocabulary.
   assert.throws(() => pinIteration(root, it, "product"), /patch \| minor \| major/);
+});
+
+test("the chunk machine: refused when unseeded, compiled with realization tags and the join", () => {
+  const root = freshRoot();
+  gitInit(root);
+  const it = itSeed(root, "chunks compile", "the drawing becomes the machine");
+  // Unseeded: the typed refusal, never a plain serve.
+  assert.throws(() => generateChunks(root, it, "build-steps"), /without visible steps/);
+  const abs = join(it.path, itChunksRel(it.id));
+  mkdirSync(dirname(abs), { recursive: true });
+  writeFileSync(
+    abs,
+    [
+      "---",
+      "chunks:",
+      "  - id: core",
+      '    statement: "the spine"',
+      "    depends_on: []",
+      "    realization: software",
+      "  - id: docs",
+      '    statement: "the chapter"',
+      "    depends_on:",
+      "      - core",
+      "    realization: document",
+      "  - id: probe",
+      '    statement: "the rig"',
+      "    depends_on:",
+      "      - core",
+      "    realization: electrical",
+      "---",
+      "",
+    ].join("\n"),
+    "utf8",
+  );
+  const g = generateChunks(root, it, "build-steps");
+  validateMachine(g.decl);
+  const core = g.decl.states.find((s) => s.id === "core")!;
+  assert.deepEqual(core.tags, ["realization-software"], "the realization kind is the tag the pull serves");
+  assert.deepEqual(core.edges.map((e) => e.to).sort(), ["docs", "probe"], "independent chunks fan out");
+  const docs = g.decl.states.find((s) => s.id === "docs")!;
+  assert.deepEqual(docs.tags, ["realization-document"]);
+  assert.deepEqual(docs.edges, [{ to: "all-built", role: "normal" }]);
+  assert.equal(g.decl.states.find((s) => s.id === "all-built")?.kind, "join", "one finished chunk is not a finished build");
 });
 
 test("escalation reopens exactly the grown steps", () => {

@@ -31,8 +31,10 @@ export interface MatrixRow {
   filled_by: "agent" | "engine";
   command?: string;
   depends_on: string[];
-  /** Set when the state seeds an iteration-local sub-machine. */
+  /** Set when the state SEEDS (authors) an iteration-local sub-machine. */
   seeds?: string;
+  /** Set when the state RUNS a seeded sub-machine — the walk descends here. */
+  runs?: string;
   floor: boolean;
   edge_role?: string;
   guard?: string;
@@ -125,6 +127,7 @@ export function readMatrix(root: string): Matrix {
       command: typeof fm.command === "string" ? fm.command : undefined,
       depends_on: asList(fm.depends_on),
       seeds: typeof fm.seeds === "string" ? fm.seeds : undefined,
+      runs: typeof fm.runs === "string" ? fm.runs : undefined,
       floor: fm.floor === true,
       edge_role: typeof fm.edge_role === "string" ? fm.edge_role : undefined,
       guard: typeof fm.guard === "string" ? fm.guard : undefined,
@@ -239,7 +242,7 @@ export function compileColumn(matrix: Matrix, column: ChangeColumn): MachineDecl
       ...(row.command ? { command: row.command } : {}),
       guidance: [cell.body, row.guidance].filter(Boolean).join("\n\n"),
       evidence_form: row.evidence_form,
-      ...(row.seeds ? { submachine: "iteration" } : {}),
+      ...(row.runs ? { submachine: "generated" } : {}),
       priority: priorityOf(row),
       edges: edgesFrom.get(row.name) ?? [],
     });

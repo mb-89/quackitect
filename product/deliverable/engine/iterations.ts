@@ -162,6 +162,135 @@ export function itPinRel(id: string): string {
   return `product/spec/iterations/${id}/machines/seeded.json`;
 }
 
+export function itChunksRel(id: string): string {
+  return `product/spec/iterations/${id}/machines/chunks.md`;
+}
+
+/** THE CHUNK MACHINE (owner design 2026-07-30): plan-build AUTHORS the
+ *  chunk drawing as markdown data in the record; build-steps RUNS it — the
+ *  walk descends into this compiled machine. Each chunk's realization kind
+ *  becomes a TAG on its state, so the existing tag-pull serves each
+ *  builder its discipline's guidance (software pulls software guidance, a
+ *  document pulls documentation guidance). An absent or empty drawing is a
+ *  TYPED REFUSAL, never a plain serve — a build without visible steps is
+ *  a defect. */
+function chunkList(v: unknown): string[] {
+  if (Array.isArray(v)) return v.map(String);
+  if (typeof v === "string" && v.trim() !== "") return v.split(",").map((s) => s.trim());
+  return [];
+}
+
+export function generateChunks(root: string, it: Iteration, machineId: string): GeneratedMachine {
+  const abs = join(it.path, itChunksRel(it.id));
+  const scaffold = "---\nchunks:\n  - id: <chunk>\n    statement: \"<what this chunk builds>\"\n    depends_on: []\n    realization: software\n---\n";
+  if (!existsSync(abs)) {
+    throw new Rejection({
+      clause: CLAUSES.CONDITION_UNMET,
+      expected: "a seeded chunk drawing — plan-build writes machines/chunks.md (frontmatter chunks: id, statement, depends_on, realization)",
+      got: "no chunks.md in the iteration record — a build without visible steps is a defect",
+      remedy: { tool: "se_file_write", args: { path: itChunksRel(it.id), content: scaffold, base_hash: null }, note: "seed the drawing at plan-build, then tick again" },
+      source: SRC,
+    });
+  }
+  const fm = parseStateNote(readFileSync(abs, "utf8")).frontmatter;
+  const raw = Array.isArray(fm.chunks) ? fm.chunks : [];
+  interface Chunk {
+    id: string;
+    statement: string;
+    depends_on: string[];
+    realization: string;
+  }
+  const chunks: Chunk[] = raw.map((entry, i) => {
+    const c = (entry ?? {}) as Record<string, unknown>;
+    if (typeof c.id !== "string" || c.id.trim() === "") {
+      throw new Rejection({
+        clause: CLAUSES.CONDITION_UNMET,
+        expected: `chunk ${i + 1} declares an id`,
+        got: "a chunk without an id",
+        remedy: { tool: "se_file_read", args: { path: itChunksRel(it.id) }, note: "every chunk carries id, statement, depends_on, realization" },
+        source: SRC,
+      });
+    }
+    return {
+      id: c.id,
+      statement: typeof c.statement === "string" ? c.statement : "",
+      depends_on: chunkList(c.depends_on),
+      realization: typeof c.realization === "string" && c.realization !== "" ? c.realization : "software",
+    };
+  });
+  if (chunks.length === 0) {
+    throw new Rejection({
+      clause: CLAUSES.CONDITION_UNMET,
+      expected: "at least one chunk in the drawing",
+      got: "chunks.md carries an empty chunks list",
+      remedy: { tool: "se_file_patch", args: { ops: [{ path: itChunksRel(it.id), old_string: "chunks:", new_string: "chunks:\n  - id: <chunk>" }] }, note: "a build without visible steps is a defect" },
+      source: SRC,
+    });
+  }
+  const ids = new Set(chunks.map((c) => c.id));
+  const start: StateDecl = {
+    id: "start",
+    kind: "start",
+    statement: "",
+    guidance: "The seeded chunk machine — the build plan as states, parallel where independent.",
+    evidence_form: [],
+    priority: 0.01,
+    edges: [],
+  };
+  const states: StateDecl[] = [start];
+  const dependents = new Set(chunks.flatMap((c) => c.depends_on));
+  for (const c of chunks) {
+    for (const d of c.depends_on) {
+      if (!ids.has(d)) {
+        throw new Rejection({
+          clause: CLAUSES.CONDITION_UNMET,
+          expected: `chunk ${c.id} depends on a declared chunk`,
+          got: d,
+          remedy: { tool: "se_file_read", args: { path: itChunksRel(it.id) }, note: "dependencies name chunk ids from the same drawing" },
+          source: SRC,
+        });
+      }
+    }
+    if (c.depends_on.length === 0) start.edges.push({ to: c.id, role: "normal" });
+    states.push({
+      id: c.id,
+      kind: "work",
+      statement: c.statement,
+      guidance: `A build chunk — realization: ${c.realization}. The tag pulls the discipline's guidance.`,
+      evidence_form: [{ name: "built", description: "what was built and where — the commit or artifact", required: true }],
+      priority: 0.2,
+      tags: [`realization-${c.realization}`],
+      edges: [
+        ...chunks.filter((o) => o.depends_on.includes(c.id)).map((o) => ({ to: o.id, role: "normal" as const })),
+        ...(dependents.has(c.id) ? [] : [{ to: "all-built", role: "normal" as const }]),
+      ],
+    });
+  }
+  // The JOIN: a build is done when EVERY leaf chunk is — plain fan-in
+  // would be an OR, and one finished chunk is not a finished build.
+  states.push({
+    id: "all-built",
+    kind: "join",
+    statement: "",
+    guidance: "Every chunk is built — the join releases the walk.",
+    evidence_form: [],
+    priority: 0.01,
+    edges: [{ to: "end", role: "normal" }],
+  });
+  states.push({
+    id: "end",
+    kind: "end",
+    statement: "",
+    guidance: "The chunk machine is complete — tick once more to return to the walk.",
+    evidence_form: [],
+    priority: 0.01,
+    edges: [],
+  });
+  const decl: MachineDecl = { id: machineId, reentry: "resume", initial: "start", states };
+  validateMachine(decl);
+  return { decl, canvas: pinnedCanvas(decl), expByState: {} };
+}
+
 const SIZE_ORDER = ["patch", "minor", "major"];
 
 /** THE PIN (owner verdicts 2026-07-30): the kickoff bless compiles the
@@ -344,7 +473,16 @@ export function generateIterations(root: string): GeneratedMachine {
         submachine: "generated",
         edges: [{ to: "end", role: "alternative" }],
       });
-      subGen[walkId] = () => ({ decl: { ...m, id: walkId }, canvas: pinnedCanvas(m), expByState: {} });
+      subGen[walkId] = () => ({
+        decl: { ...m, id: walkId },
+        canvas: pinnedCanvas(m),
+        expByState: {},
+        // The walk's own seed points: a state that RUNS a seeded machine
+        // descends into it here — or refuses typed when nothing was seeded.
+        subGen: Object.fromEntries(
+          m.states.filter((s) => s.submachine === "generated").map((s) => [s.id, () => generateChunks(root, it, s.id)]),
+        ),
+      });
     }
     start.edges.push({ to: sid, role: "normal" });
     const y = i * 420;

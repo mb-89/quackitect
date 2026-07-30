@@ -6,7 +6,7 @@ state_kind: work
 filled_by: agent
 depends_on:
   - observe-red
-seeds: build-chunks-run
+runs: build-chunks
 evidence:
   - name: build_record
     description: "the chunk machine's run: chunks filled, actors, the sub-record file"

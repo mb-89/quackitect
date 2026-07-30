@@ -47,7 +47,9 @@ test("compileColumn major: every row seeds; the machine validates", () => {
   validateMachine(decl);
   // 48 rows + the mechanical start.
   assert.equal(decl.states.length, 49);
-  assert.ok(decl.states.some((s) => s.id === "enumerate-space" && s.submachine === "iteration"));
+  // Only a state that RUNS a seeded machine descends; authoring states do not.
+  assert.ok(decl.states.some((s) => s.id === "build-steps" && s.submachine === "generated"));
+  assert.ok(decl.states.every((s) => s.id === "build-steps" || s.submachine === undefined));
   const shipped = decl.states.find((s) => s.id === "shipped");
   assert.equal(shipped?.kind, "terminal");
 });
