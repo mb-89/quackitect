@@ -182,8 +182,9 @@ export function pinIteration(root: string, it: Iteration, changeSize: string): R
     });
   }
   const pinAbs = join(it.path, itPinRel(it.id));
+  let prev: ParsedPin | undefined;
   if (existsSync(pinAbs)) {
-    const prev = parsePin(readFileSync(pinAbs, "utf8"));
+    prev = parsePin(readFileSync(pinAbs, "utf8"));
     const from = SIZE_ORDER.indexOf(String(prev.change_size));
     const to = SIZE_ORDER.indexOf(changeSize);
     if (to <= from) {
@@ -196,23 +197,65 @@ export function pinIteration(root: string, it: Iteration, changeSize: string): R
       });
     }
   }
-  const machine = compileColumn(readMatrix(root), changeSize as ChangeColumn);
+  const matrix = readMatrix(root);
+  const machine = compileColumn(matrix, changeSize as ChangeColumn);
+  // THE DEMANDS LEDGER: what each applied step asks at this pin — the
+  // ordinal applies plus the evidence spec. The next escalation compares
+  // against it.
+  const demands: Record<string, StepDemand> = {};
+  for (const row of matrix.rows) {
+    const cell = matrix.cells.get(row.name)!.get(changeSize as ChangeColumn)!;
+    if (cell.applies === "none") continue;
+    demands[row.name] = { applies: cell.applies, evidence: JSON.stringify(row.evidence_form) };
+  }
+  // REOPEN (owner verdict 2026-07-30): a filled step survives the
+  // escalation only while its demand stands. applies stepped up, or the
+  // evidence spec changed — the step reopens and its evidence is
+  // re-earned. Guidance-only wording never reopens.
+  const reopened = Object.keys(prev?.demands ?? {})
+    .filter((id) => {
+      const o = prev!.demands![id];
+      const n = demands[id];
+      return n !== undefined && ((APPLIES_RANK[n.applies] ?? 0) > (APPLIES_RANK[o.applies] ?? 0) || n.evidence !== o.evidence);
+    })
+    .sort();
   const pin = {
     change_size: changeSize,
     matrix_hash: matrixContentHash(root),
     pinned_at: new Date().toISOString(),
+    ...(reopened.length > 0 ? { reopened } : {}),
+    demands,
     machine,
   };
   mkdirSync(dirname(pinAbs), { recursive: true });
   writeFileSync(pinAbs, JSON.stringify(pin, null, 2), "utf8");
   git(it.path, ["add", "-A"], "add");
   git(it.path, ["commit", "-q", "-m", `iteration ${it.id}: pin ${changeSize}`], "commit");
-  return { pinned: changeSize, matrix_hash: pin.matrix_hash, states: machine.states.length };
+  return {
+    pinned: changeSize,
+    matrix_hash: pin.matrix_hash,
+    states: machine.states.length,
+    ...(reopened.length > 0 ? { reopened } : {}),
+  };
 }
 
-function parsePin(raw: string): { change_size?: string } {
+interface StepDemand {
+  applies: string;
+  evidence: string;
+}
+
+/** tailored is always tailored DOWN (owner ruling 2026-07-30); inherit
+ *  defers to the fuller content, so it ranks with full. */
+const APPLIES_RANK: Record<string, number> = { none: 0, tailored: 1, inherit: 2, full: 2 };
+
+interface ParsedPin {
+  change_size?: string;
+  demands?: Record<string, StepDemand>;
+}
+
+function parsePin(raw: string): ParsedPin {
   try {
-    return JSON.parse(raw) as { change_size?: string };
+    return JSON.parse(raw) as ParsedPin;
   } catch {
     return {};
   }

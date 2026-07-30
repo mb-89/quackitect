@@ -9,6 +9,7 @@ import { join } from "node:path";
 import { test } from "node:test";
 import { generateIterations, itPinRel, itSeed, pinIteration } from "../engine/iterations.ts";
 import { validateMachine, type MachineDecl } from "../engine/machine.ts";
+import { readMatrix } from "../engine/matrix.ts";
 import { Session } from "../engine/session.ts";
 import { buildServer } from "../engine/tools.ts";
 import { call, freshRoot, readHashesFor } from "./helpers.ts";
@@ -93,6 +94,30 @@ test("the pin: the bless compiles the change size live; escalation only grows it
   assert.throws(() => pinIteration(root, it, "minor"), /ESCALATION/);
   // An unknown size refuses with the vocabulary.
   assert.throws(() => pinIteration(root, it, "product"), /patch \| minor \| major/);
+});
+
+test("escalation reopens exactly the grown steps", () => {
+  const root = freshRoot();
+  gitInit(root);
+  const it = itSeed(root, "reopen the grown steps", "escalation re-earns thin evidence");
+  pinIteration(root, it, "patch");
+  // The expectation comes from the matrix itself: steps applied at both
+  // sizes whose applies rank grew (tailored is always tailored DOWN).
+  const m = readMatrix(root);
+  const rank: Record<string, number> = { none: 0, tailored: 1, inherit: 2, full: 2 };
+  const expected = m.rows
+    .filter((r) => {
+      const p = m.cells.get(r.name)!.get("patch")!.applies;
+      const mi = m.cells.get(r.name)!.get("minor")!.applies;
+      return p !== "none" && mi !== "none" && (rank[mi] ?? 0) > (rank[p] ?? 0);
+    })
+    .map((r) => r.name)
+    .sort();
+  assert.ok(expected.includes("gate-kickoff"), "the real matrix grows gate-kickoff from patch to minor");
+  const res = pinIteration(root, it, "minor") as { reopened?: string[] };
+  assert.deepEqual(res.reopened ?? [], expected);
+  const pin = JSON.parse(readFileSync(join(it.path, itPinRel(it.id)), "utf8")) as { reopened?: string[] };
+  assert.deepEqual(pin.reopened ?? [], expected, "the reopen list rides the pin itself");
 });
 
 test("the bless pins the machine and the container expands to the pinned walk", async () => {

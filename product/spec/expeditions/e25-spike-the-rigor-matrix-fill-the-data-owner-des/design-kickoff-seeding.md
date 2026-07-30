@@ -50,6 +50,12 @@ walks, every larger column also walks. That makes escalation mechanical:
   FILLED state exists in the new machine and keeps its history; the new
   machine only ADDS states and re-draws contracted edges.
 - The walk resumes where it stood; the added states are simply open.
+- REOPEN (owner verdict 2026-07-30, comparison-based — no numeric scale):
+  a filled state survives only while its DEMAND stands. The pin records
+  each step's demands (the ordinal applies — none < tailored < inherit =
+  full — plus the evidence spec); the re-pin compares old against new and
+  lists the GROWN steps as `reopened`, whose evidence is re-earned.
+  Guidance-only wording changes never reopen.
 - De-escalating mid-walk is refused. A prediction that proved too big is
   finished at its size; the record notes the misjudgment for the retro.
 

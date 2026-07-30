@@ -120,3 +120,17 @@
 {"ts":"2026-07-30T07:59:24.162Z","op":"update","visit":"expeditions/e25@0","node":"d5","brief":"meth-test-design written from the tactics deck"}
 {"ts":"2026-07-30T08:00:31.810Z","op":"update","visit":"expeditions/e25@0","node":"d6","brief":"five cards linked from their rows"}
 {"ts":"2026-07-30T08:00:38.083Z","op":"update","visit":"expeditions/e25@0","node":"d7","brief":"battery over the harvest"}
+{"ts":"2026-07-30T08:01:54.210Z","op":"done","visit":"expeditions/e25@0","node":"d2","brief":"harvest landed, 215 green"}
+{"ts":"2026-07-30T08:08:00.263Z","op":"plan","visit":"expeditions/e25@0","parent":null,"nodes":[{"id":"d8","brief":"answer the three explain questions"},{"id":"d9","brief":"note the design-guidance-by-realization-tag ruling"},{"id":"d10","brief":"put the escalation reopen proposal to the owner"}]}
+{"ts":"2026-07-30T08:08:09.514Z","op":"update","visit":"expeditions/e25@0","node":"d11","brief":"form wiring answered: links plus three small widenings"}
+{"ts":"2026-07-30T08:08:26.132Z","op":"done","visit":"expeditions/e25@0","node":"d8","brief":"all three questions answered and recorded"}
+{"ts":"2026-07-30T08:08:36.378Z","op":"done","visit":"expeditions/e25@0","node":"d9","brief":"the realization-tag ruling is recorded"}
+{"ts":"2026-07-30T08:08:52.756Z","op":"done","visit":"expeditions/e25@0","node":"d10","brief":"the reopen proposal is captured for the verdict"}
+{"ts":"2026-07-30T08:17:38.131Z","op":"plan","visit":"expeditions/e25@0","parent":null,"nodes":[{"id":"d12","brief":"capture the forms-pass ruling"},{"id":"d13","brief":"answer what reopen means"},{"id":"d14","brief":"build comparison-based reopen at re-pin"},{"id":"d15","brief":"prove it against the real matrix"}]}
+{"ts":"2026-07-30T08:17:54.710Z","op":"done","visit":"expeditions/e25@0","node":"d12","brief":"forms ruling captured as note-9a0b8b64a2fc"}
+{"ts":"2026-07-30T08:18:13.000Z","op":"update","visit":"expeditions/e25@0","node":"d16","brief":"listing which steps grow from patch to minor"}
+{"ts":"2026-07-30T08:18:58.497Z","op":"update","visit":"expeditions/e25@0","node":"d17","brief":"the pin gains its demands ledger and the reopen list"}
+{"ts":"2026-07-30T08:19:11.344Z","op":"update","visit":"expeditions/e25@0","node":"d18","brief":"the reopen test derives its expectation from the matrix"}
+{"ts":"2026-07-30T08:19:19.835Z","op":"done","visit":"expeditions/e25@0","node":"d13","brief":"reopen defined in the aq log and the proposal doc"}
+{"ts":"2026-07-30T08:19:28.373Z","op":"update","visit":"expeditions/e25@0","node":"d19","brief":"full battery over the reopen"}
+{"ts":"2026-07-30T08:20:57.983Z","op":"done","visit":"expeditions/e25@0","node":"d14","brief":"reopen built, 216 green"}
