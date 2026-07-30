@@ -6,12 +6,11 @@ state_kind: work
 filled_by: agent
 depends_on:
   - gate-motivation
-COMMENT: "state: Note: neighbours are nodes that are referenced later, for example in structure models. needs templates"
 ---
 
 ## Guidance
 
-Per [[meth-context-boundary]]. The excluded list is the scope-creep guard - system-level and binding, sharper than M1's vision-level non-goals.
+Per [[meth-context-boundary]]. The excluded list is the scope-creep guard - system-level and binding, sharper than M1's vision-level non-goals. Neighbours are NODES: later artifacts reference them, the structure models among them.
 
 ## Evidence form
 

@@ -8,7 +8,6 @@ depends_on:
   - scope-non-goals
   - log-risks
   - pressure-test
-COMMENT: "state: ok"
 ---
 
 ## Guidance

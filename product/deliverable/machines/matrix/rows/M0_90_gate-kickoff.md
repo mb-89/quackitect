@@ -7,12 +7,11 @@ filled_by: agent
 depends_on:
   - onboard-retro
 floor: true
-COMMENT: doesnt need its own content. we already have a retro method. reference it, merge whats new here in itIsnt this what would seed the iteration? THen the seeded statemachine is part of its output
 ---
 
 ## Guidance
 
-Review per [[meth-gate-review]]. The kickoff handover is ONE brief carrying everything: the drained retro, the iteration goal, the scope as pulled-in/left-out, and the CHANGE-SIZE COLUMN with its reasoning - strikes named when a cell reduces the walk. The agent bakes scope and column into the brief - no separate confirmation rounds before the gate. One bless sets the iteration; a rejection names what to redo. The column choice is a prediction: the walk escalates visibly when the work outgrows it, never silently.
+Review per [[meth-gate-review]]. The kickoff handover is ONE brief carrying everything: the drained retro, the iteration goal, the scope as pulled-in/left-out, and the CHANGE-SIZE COLUMN with its reasoning - strikes named when a cell reduces the walk. The agent bakes scope and column into the brief - no separate confirmation rounds before the gate. One bless sets the iteration; a rejection names what to redo. The column choice is a prediction: the walk escalates visibly when the work outgrows it, never silently. The bless SEEDS the iteration: the engine compiles the blessed column into the iteration's state machine and pins it to the record - the seeded machine is part of this gate's output.
 
 ## Evidence form
 

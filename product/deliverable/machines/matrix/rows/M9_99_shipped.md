@@ -6,9 +6,8 @@ state_kind: terminal
 filled_by: agent
 depends_on:
   - gate-release
-COMMENT: "state: there is no retro here. we just seed the note that a retro is needed."
 ---
 
 ## Guidance
 
-Terminal. The retro is the seam into the next start.
+Terminal. No retro runs here - shipping seeds the "needs retro" note, and the next kickoff's onboard-retro drains it.

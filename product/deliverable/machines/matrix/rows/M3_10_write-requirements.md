@@ -6,7 +6,6 @@ state_kind: work
 filled_by: agent
 depends_on:
   - gate-inputs
-COMMENT: "state: ok, but in general: is the evidence form prose enough to generate evidence forms? lets discuss"
 ---
 
 ## Guidance

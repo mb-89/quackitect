@@ -7,7 +7,6 @@ filled_by: agent
 depends_on:
   - fill-story-evidence
 floor: true
-COMMENT: "state: ok"
 ---
 
 ## Guidance

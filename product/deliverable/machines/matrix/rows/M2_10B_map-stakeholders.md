@@ -6,7 +6,6 @@ state_kind: work
 filled_by: agent
 depends_on:
   - gate-motivation
-COMMENT: "state: I feel the method guidance is not enough. sya has more"
 ---
 
 ## Guidance

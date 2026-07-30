@@ -6,7 +6,6 @@ state_kind: work
 filled_by: agent
 depends_on:
   - write-stories
-COMMENT: "state: I would want a deterministic template for the usecases. also goes for stories, neighbours, ..., probably a llot"
 ---
 
 ## Guidance

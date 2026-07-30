@@ -7,7 +7,6 @@ filled_by: agent
 depends_on:
   - enumerate-space
   - derive-criteria
-COMMENT: "state: ok"
 ---
 
 ## Guidance

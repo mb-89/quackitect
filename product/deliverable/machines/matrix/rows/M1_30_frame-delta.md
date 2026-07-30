@@ -6,7 +6,6 @@ state_kind: work
 filled_by: agent
 depends_on:
   - define-actual
-COMMENT: "state: ok"
 ---
 
 ## Guidance

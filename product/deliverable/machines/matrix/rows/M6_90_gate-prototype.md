@@ -6,7 +6,6 @@ state_kind: gate
 filled_by: agent
 depends_on:
   - fold-back
-COMMENT: "state: ok"
 ---
 
 ## Guidance

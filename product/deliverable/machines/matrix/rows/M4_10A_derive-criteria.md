@@ -6,7 +6,6 @@ state_kind: work
 filled_by: agent
 depends_on:
   - gate-requirements
-COMMENT: are criteria their own items, or do the most important requirements get promoted to crits?
 ---
 
 ## Guidance

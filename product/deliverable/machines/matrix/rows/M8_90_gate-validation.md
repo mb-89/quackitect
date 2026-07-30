@@ -8,7 +8,6 @@ depends_on:
   - fill-story-evidence
   - sweep-consistency
   - log-gaps
-COMMENT: "state: ok"
 ---
 
 ## Guidance

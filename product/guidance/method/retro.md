@@ -64,7 +64,7 @@ The trigger is a NOTE carrying "needs retro":
    reinventing instead of reusing. Each one is a lead.
 7. Mine the record, using the timestamp step 1 stored — never the whole
    log, and never "last_retro" again by this point.
-   Rank refusal clauses by frequency; top tools; failure rates.
+   Rank refusal clauses by frequency; top tools; failure rates; slow calls.
    A command that keeps failing or
    a refusal that keeps firing is a lead — the fix may be a tool, a
    refusal, or better guidance. Walk the period's se_run commands too
@@ -83,6 +83,10 @@ The trigger is a NOTE carrying "needs retro":
    condition note, a form template, an engine refusal. Emit only the few
    highest-leverage notes. Each one specific and checkable — a concrete
    change, never "improve X".
+
+Standing question, every retro: has the process itself gone stale against
+the state of the art? That is the process dimension of the
+state-of-the-art method (product/deliverable/machines/methods/meth-state-of-the-art.md).
 
 ## The mechanical half
 

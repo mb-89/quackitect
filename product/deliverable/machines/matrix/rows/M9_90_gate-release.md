@@ -7,7 +7,6 @@ filled_by: agent
 depends_on:
   - ship-review
 floor: true
-COMMENT: "state: ok"
 ---
 
 ## Guidance

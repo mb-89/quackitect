@@ -7,12 +7,11 @@ filled_by: agent
 depends_on:
   - observe-red
 seeds: build-chunks-run
-COMMENT: "state: ok, should fail if not replaced (mechanically)"
 ---
 
 ## Guidance
 
-The placeholder between the red observation and verification: plan-build seeds the iteration's chunk drawing, and entering this state runs it - one state per chunk, parallel builders on independent chunks, every fill recorded with its actor. Without an iteration drawing the state serves plain, but a build without visible steps is a defect: seed the drawing at plan-build, always.
+The placeholder between the red observation and verification: plan-build seeds the iteration's chunk drawing, and entering this state runs it - one state per chunk, parallel builders on independent chunks, every fill recorded with its actor. An unreplaced placeholder FAILS MECHANICALLY: the compiled machine refuses to serve this state plain when no drawing was seeded. Seed the drawing at plan-build, always.
 
 ## Evidence form
 

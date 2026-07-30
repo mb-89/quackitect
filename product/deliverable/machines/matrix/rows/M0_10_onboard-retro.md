@@ -5,12 +5,11 @@ statement: "Onboarding opens with the retro: the field-feedback question first, 
 state_kind: work
 filled_by: agent
 depends_on: []
-COMMENT: "state: doesnt need its own content. we already have a retro method. reference it, merge whats new here in it"
 ---
 
 ## Guidance
 
-Blameless: fix the system, never a person. Open with the field-feedback question - what came back from the field since the last ship - before anything else. Then drain the notes inbox: every note gets a disposition (pull into this iteration, route to a durable home, or reject with a recorded reason). Mine the call history since the last retro: aggregate the call log - tool counts, rejection rate per clause, slow calls. A repeated miss, rejection, or hand-rolled workaround is a determinizer lead. Hunt wasted effort in the record: rework, reversals, reinventing. Standing question, every iteration: has the process itself gone stale against the state of the art ([[meth-state-of-the-art]], process dimension). Aim each improvement at a durable home - a prompt, a template, an engine refusal - never at a memory.
+The retro method is the truth here - product/guidance/method/retro.md; do not restate it. This row adds only the seam: onboarding OPENS with the retro, the field-feedback question first, and the kickoff gate refuses while the inbox pends.
 
 ## Evidence form
 

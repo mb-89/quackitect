@@ -7,7 +7,6 @@ filled_by: agent
 depends_on:
   - partition-functions
 seeds: candidates
-COMMENT: "state: ok"
 ---
 
 ## Guidance

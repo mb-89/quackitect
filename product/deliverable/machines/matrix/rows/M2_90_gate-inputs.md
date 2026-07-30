@@ -8,7 +8,6 @@ depends_on:
   - draw-context
   - map-stakeholders
   - generalize-use-cases
-COMMENT: "state: ok"
 ---
 
 ## Guidance

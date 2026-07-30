@@ -6,7 +6,6 @@ state_kind: gate
 filled_by: agent
 depends_on:
   - evaluate-set
-COMMENT: "state: ok. I said i wouldnt, but ill do it again: we need good templates and metadata lints, so alot of this can be mechanical. Also, the evidence forms need to be good editors so humans can do it"
 ---
 
 ## Guidance

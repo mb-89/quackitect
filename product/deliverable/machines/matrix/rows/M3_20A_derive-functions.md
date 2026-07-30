@@ -6,7 +6,6 @@ state_kind: work
 filled_by: agent
 depends_on:
   - write-requirements
-COMMENT: "state: ok, but again: functions should have a template. wont mention templates again, lets sweep to find which we need."
 ---
 
 ## Guidance

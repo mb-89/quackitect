@@ -6,12 +6,11 @@ state_kind: work
 filled_by: agent
 depends_on:
   - rank-unknowns
-COMMENT: "state: ok, related: twin peaks?"
 ---
 
 ## Guidance
 
-Evidence updates requirements and architecture; the suspect mechanics reopen exactly what it invalidates - through the gates' reopen path, never silently. Keepers headed for the build are marked for promotion ([[meth-expedition-promotion]]).
+Evidence updates requirements and architecture; the suspect mechanics reopen exactly what it invalidates - through the gates' reopen path, never silently. The fold-back is the twin-peaks descent ([[meth-twin-peaks]]): each peak informs the other. Keepers headed for the build are marked for promotion ([[meth-expedition-promotion]]).
 
 ## Evidence form
 

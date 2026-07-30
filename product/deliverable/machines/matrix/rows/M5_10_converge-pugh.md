@@ -6,7 +6,6 @@ state_kind: work
 filled_by: agent
 depends_on:
   - gate-candidates
-COMMENT: "state: ok. generally: all sources should be proper references. see v2 (or maybe v1)"
 ---
 
 ## Guidance

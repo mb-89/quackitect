@@ -6,7 +6,6 @@ state_kind: gate
 filled_by: agent
 depends_on:
   - verification
-COMMENT: "state: ok. Risks: added to raid?"
 ---
 
 ## Guidance
@@ -21,4 +20,4 @@ Review per [[meth-gate-review]]. Models-adhered-to is a matrix check: the build 
 - designs_realized | every requirement has a realized design | required
 - verification_green | the battery passes, all iterations | required
 - quality_ok | internal quality reviewed | required
-- risks_acceptable | implementation risks judged | required
+- risks_acceptable | implementation risks judged and folded into the RAID register | required

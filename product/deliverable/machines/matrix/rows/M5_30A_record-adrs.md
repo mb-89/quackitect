@@ -6,7 +6,6 @@ state_kind: work
 filled_by: agent
 depends_on:
   - reverse-sensitivity
-COMMENT: "state: I wonder if adrs should just go in the raid register. i tend yes, lets discuss"
 ---
 
 ## Guidance

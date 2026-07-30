@@ -6,7 +6,6 @@ state_kind: work
 filled_by: agent
 depends_on:
   - finalize-docs
-COMMENT: "state: ok"
 ---
 
 ## Guidance

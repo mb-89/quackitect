@@ -6,7 +6,6 @@ state_kind: work
 filled_by: agent
 depends_on:
   - reverse-sensitivity
-COMMENT: "state: ok"
 ---
 
 ## Guidance

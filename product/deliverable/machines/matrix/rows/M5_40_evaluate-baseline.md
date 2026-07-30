@@ -6,7 +6,6 @@ state_kind: work
 filled_by: agent
 depends_on:
   - consolidate-baseline
-COMMENT: "state: ok"
 ---
 
 ## Guidance

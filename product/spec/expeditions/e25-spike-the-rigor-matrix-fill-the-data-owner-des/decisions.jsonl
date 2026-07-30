@@ -64,3 +64,8 @@
 {"ts":"2026-07-30T06:49:42.249Z","op":"update","visit":"expeditions/e25@0","node":"d12","brief":"syncing trunk into e25's worktree"}
 {"ts":"2026-07-30T06:49:53.807Z","op":"update","visit":"expeditions/e25@0","node":"d13","brief":"retrying the trunk sync after committing the trail"}
 {"ts":"2026-07-30T06:50:24.390Z","op":"update","visit":"expeditions/e25@0","node":"d14","brief":"settling the two merge conflicts, both sides kept"}
+{"ts":"2026-07-30T06:50:34.890Z","op":"update","visit":"expeditions/e25@0","node":"d15","brief":"landing e25's commits on trunk"}
+{"ts":"2026-07-30T06:50:41.524Z","op":"done","visit":"front_desk@0","node":"d4","brief":"trunk reconciled and e25's five commits landed"}
+{"ts":"2026-07-30T06:56:35.765Z","op":"update","visit":"expeditions/e25@0","node":"d16","brief":"one atomic patch: 48 comments consumed, edits worked in"}
+{"ts":"2026-07-30T06:56:47.290Z","op":"update","visit":"expeditions/e25@0","node":"d17","brief":"meth-risk-based-testing card written"}
+{"ts":"2026-07-30T06:57:12.957Z","op":"update","visit":"expeditions/e25@0","node":"d18","brief":"running the full battery over the edited matrix"}

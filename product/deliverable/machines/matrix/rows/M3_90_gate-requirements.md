@@ -7,12 +7,11 @@ filled_by: agent
 depends_on:
   - derive-functions
   - probe-assumptions
-COMMENT: 'state: "Everything after this gate is solution space" really? are functions?'
 ---
 
 ## Guidance
 
-Everything after this gate is solution space. Review per [[meth-gate-review]].
+The design input ends here: the requirements and the solution-neutral function structure stand blessed. Everything after is solution space; the functions belong to the input - they name WHAT, never HOW. Review per [[meth-gate-review]].
 
 ## Evidence form
 

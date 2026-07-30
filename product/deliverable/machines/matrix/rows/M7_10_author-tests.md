@@ -6,7 +6,6 @@ state_kind: work
 filled_by: agent
 depends_on:
   - gate-prototype
-COMMENT: "state: ok, but guidance light on how good tests look. sya has more, so does the web. the test design can also be benchmarks y/n, how to group tests, etc. => needs more methods."
 ---
 
 ## Guidance

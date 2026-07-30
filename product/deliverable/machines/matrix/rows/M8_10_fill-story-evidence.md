@@ -7,7 +7,6 @@ filled_by: agent
 depends_on:
   - gate-implementation
 seeds: demos
-COMMENT: "state: ok"
 ---
 
 ## Guidance

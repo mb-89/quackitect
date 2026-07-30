@@ -7,7 +7,6 @@ filled_by: agent
 depends_on:
   - record-adrs
   - evaluate-baseline
-COMMENT: "state: ok"
 ---
 
 ## Guidance

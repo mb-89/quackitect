@@ -8,7 +8,6 @@ depends_on:
   - verification
 edge_role: fallback
 guard: "verification_attempts < 3"
-COMMENT: "state: ok"
 ---
 
 ## Guidance

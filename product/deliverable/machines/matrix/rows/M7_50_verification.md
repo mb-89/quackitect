@@ -8,7 +8,6 @@ command: npm --prefix product/deliverable test
 depends_on:
   - build-steps
 floor: true
-COMMENT: "state: ok"
 ---
 
 ## Guidance
