@@ -8,4 +8,65 @@ goal: "Put the system into VS Code as a private extension (no marketplace; local
 
 # e26-explore-put-the-system-into-vs-code-as-a-private
 
-Free prose — the human head of the record. Machine-facing fields stay in the frontmatter.
+## The shipping day — desk rulings, 2026-07-30
+
+The day's aim is a hand-off. The system goes to a colleague as a VS Code
+plugin, carrying no quackitect branding and no repository history.
+
+### The export takes a name and an abbreviation
+
+`RUNME.ps1 --export <folder> <Name> <ABC>`. Both arguments are required.
+
+There is no fallback to the quackitect name. A forgotten argument would
+ship the owner's branding to somebody else, so the export refuses instead
+of guessing.
+
+The abbreviation is two or three letters. It becomes the activity-bar icon
+in VS Code.
+
+What already works stays: the export copies the working tree, makes a fresh
+repository, commits once, and leaves the history at home.
+
+### VS Code is the default interface
+
+This AMENDS decision d10, which kept the classic path as the default and
+put VS Code behind a `--vscode` flag. The default inverts.
+
+Running `RUNME.ps1` with no arguments opens VS Code. It installs whatever
+VS Code needs, without being asked and without a flag.
+
+The classic path survives this expedition. It is no longer what a person
+gets by default.
+
+### The `.vsix` is out of scope today
+
+The owner does not need it for the hand-off. A folder install carries the
+extension well enough.
+
+### The stray process is the settings bug
+
+The reported symptom was a new session starting with the previous day's
+autonomy, and with documents still marked as checked.
+
+The settings store is NOT at fault. It restores only when the shim's
+session token matches, and both shims mint that token fresh from the
+process id and the clock.
+
+The document checks live in an in-memory map and are written to no file. A
+restarted process cannot bring them back. They came back, so the process
+never restarted.
+
+One old server was still running, and the new session attached to it. That
+breaches ruling (2) above, which already requires the server to stop on
+deactivate. The classic path needs the same guarantee: a shim must not
+outlive the terminal that launched it.
+
+The ruling of 2026-07-28 stands unchanged. Settings survive the ENGINE, not
+the SESSION.
+
+### Deferred, not today
+
+- Throwing out the classic server and its browser mirror entirely.
+- The project-folder shape: any folder with a git repository becomes a
+  project, and the workspace concept retires.
+
