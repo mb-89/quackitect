@@ -156,3 +156,5 @@
 {"ts":"2026-07-30T08:44:11.667Z","op":"update","visit":"expeditions/e25@0","node":"d39","brief":"second smoke run over the fixed export"}
 {"ts":"2026-07-30T08:44:21.788Z","op":"update","visit":"expeditions/e25@0","node":"d40","brief":"battery over the export flag"}
 {"ts":"2026-07-30T08:45:36.202Z","op":"done","visit":"expeditions/e25@0","node":"d31","brief":"full-rigor answer recorded earlier as aq"}
+{"ts":"2026-07-30T08:45:58.769Z","op":"update","visit":"expeditions/e25@0","node":"d41","brief":"checking the trunk stray that blocks the land"}
+{"ts":"2026-07-30T08:46:11.919Z","op":"update","visit":"expeditions/e25@0","node":"d42","brief":"committing the zero-risk Obsidian stray on trunk"}
