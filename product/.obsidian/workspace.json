@@ -11,14 +11,17 @@
             "id": "c07847f318fa619a",
             "type": "leaf",
             "state": {
-              "type": "markdown",
+              "type": "canvas",
               "state": {
-                "file": "cards.md",
-                "mode": "source",
-                "source": false
+                "file": "deliverable/machines/main.canvas",
+                "viewState": {
+                  "x": -190,
+                  "y": 80,
+                  "zoom": -1.1007804177444105
+                }
               },
-              "icon": "lucide-file",
-              "title": "cards"
+              "icon": "lucide-layout-dashboard",
+              "title": "main"
             }
           }
         ]
@@ -185,6 +188,14 @@
   },
   "active": "c07847f318fa619a",
   "lastOpenFiles": [
+    "deliverable/machines/boot.canvas",
+    "deliverable/machines/expedition_archive.canvas",
+    "deliverable/machines/expeditions.canvas",
+    "deliverable/machines/ideation.canvas",
+    "deliverable/machines/iteration_archive.canvas",
+    "deliverable/machines/iterations.canvas",
+    "deliverable/machines/main.canvas",
+    "cards.md",
     "deliverable/machines/matrix/matrix.base",
     "deliverable/machines/matrix/README.md",
     "deliverable/machines/matrix/rows/M0_10_onboard-retro.md",
@@ -210,19 +221,12 @@
     "deliverable/machines/matrix/rows/M5_90_gate-architecture.md",
     "deliverable/machines/matrix/rows/M5_40_evaluate-baseline.md",
     "deliverable/machines/matrix/rows/M5_30B_consolidate-baseline.md",
-    "deliverable/machines/matrix/rows/M5_30A_record-adrs.md",
-    "deliverable/machines/main.canvas",
-    "deliverable/machines/expedition_archive.canvas",
     "spec/expeditions/e21-explore-rebuild-the-mirror-as-a-card-matrix-one-/decisions.jsonl",
     "spec/expeditions/e21-explore-rebuild-the-mirror-as-a-card-matrix-one-",
     "spec/expeditions",
     "deliverable/tests/cards.test.ts",
     "deliverable/tests/archive.test.ts",
     "deliverable/engine/cards.ts",
-    "deliverable/machines/iteration_archive.canvas",
-    "deliverable/machines/iterations.canvas",
-    "deliverable/machines/expeditions.canvas",
-    "deliverable/machines/ideation.canvas",
     "deliverable/machines/retro.canvas",
     "deliverable/tests/threshold.test.ts",
     "deliverable/engine/mirror.ts",
