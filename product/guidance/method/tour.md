@@ -16,18 +16,32 @@ Never describe from memory. Before every stop, LOOK: survey the
 containers, tick-peek the states, read the record you are about to show.
 What you say is what stands, this minute.
 
-## Pointing, until the highlight channel exists
+## Pointing
 
-The agent cannot yet point at the mirror (the highlight channel is a
-planned mirror surface). So DIRECT the reader instead:
+The agent HAS a finger: `se_panel {ping: "<surface>"}` pulses the named
+surface yellow in every open mirror window. Targets: a card id (machine,
+log, details, terminal, chat), a drawn state id, or an element id.
 
-- Name the pane plainly: the drawing, the feed, the details pane, the
-  terminal, the autonomy slider.
+- Ping WITH words, never instead of them - a pulse without a sentence is
+  a mystery. Say what pulses and why it matters, then ping it.
 - Say what to click, then WAIT for their go before the next stop.
 - One stop per message. A tour that scrolls past its reader is a lecture.
 
+## The shape: progressive disclosure
+
+The pyramid, spoken. FIRST the whole thing in one breath - what this
+system is and why it exists. THEN the elements of the interface, each in
+a sentence. ONLY THEN the details, and only where the listener leans in.
+The listener stops the descent whenever they have enough - never the
+guide.
+
 ## The stops, in order
 
+0. THE WHOLE THING. One breath, no jargon: an AI does engineering work
+   here, but every step runs through a state machine that logs it, gates
+   it, and demands evidence - and the human holds a slider that decides
+   how far the AI may walk alone. Everything on screen is that machine,
+   live.
 1. THE MIRROR. The drawing is the machine; the arrow is where the walk
    stands. The feed is everything that happened, one line per act -
    click a line for its detail. The slider is the human's grip: it sets

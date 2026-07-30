@@ -40,6 +40,8 @@ export function startMirror(o: MirrorOptions): Server {
     busy: state.session.busy(),
     // A monotone change signal for the feed — the log file only grows.
     acts: existsSync(o.log.path) ? statSync(o.log.path).size : 0,
+    // The agent's pointing finger — the page pulses the target on a new seq.
+    ...(state.session.ping === undefined ? {} : { ping: state.session.ping }),
   });
 
   /** Collect a JSON body, run the handler (results may be async — script

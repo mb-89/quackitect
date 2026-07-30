@@ -126,6 +126,16 @@ if (argv.includes("--child") || process.env.SE_HOT_DISABLE === "1") {
   // closing tool response flush to stdout and the mirror serve its red page.
   session.onClosed = () => {
     process.stderr.write("se-mcp: the machine reached end — session over, shutting down\n");
+    // THE SESSION CLEANS UP AFTER ITSELF (owner, 2026-07-30): tell the
+    // terminal host to end the agent — politely, then by force — so end
+    // leaves no strays holding the ports. No host answering is fine:
+    // own-terminal and manual runs have nothing to clean.
+    const ptyPort = Number(process.env.SE_PTY_PORT ?? 7334);
+    void fetch(`http://localhost:${ptyPort}/pty/end`, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ reason: "the machine reached end" }),
+    }).catch(() => {});
     setTimeout(() => process.exit(0), 1500);
   };
 

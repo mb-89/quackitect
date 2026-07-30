@@ -162,3 +162,14 @@
 {"ts":"2026-07-30T08:47:44.795Z","op":"update","visit":"expeditions/e25@0","node":"d43","brief":"the tour method card is written"}
 {"ts":"2026-07-30T08:47:58.157Z","op":"update","visit":"expeditions/e25@0","node":"d44","brief":"the desk points tour requests at the card"}
 {"ts":"2026-07-30T08:48:05.357Z","op":"done","visit":"expeditions/e25@0","node":"d33","brief":"minimal tour shipped as a method card the desk serves"}
+{"ts":"2026-07-30T08:48:44.680Z","op":"done","visit":"expeditions/e25@0","node":"d34","brief":"copilot and push advice goes in the report"}
+{"ts":"2026-07-30T08:53:53.389Z","op":"plan","visit":"expeditions/e25@0","parent":null,"nodes":[{"id":"d45","brief":"end tells the pty host to end the agent"},{"id":"d46","brief":"the host settles then exits then insists"},{"id":"d47","brief":"RUNME refuses to launch over a live session"},{"id":"d48","brief":"a test drives the end route"}]}
+{"ts":"2026-07-30T08:54:34.377Z","op":"plan","visit":"expeditions/e25@0","parent":null,"nodes":[]}
+{"ts":"2026-07-30T08:55:27.286Z","op":"update","visit":"expeditions/e25@0","node":"d49","brief":"the end-route test drives an agent that will not leave"}
+{"ts":"2026-07-30T08:55:50.912Z","op":"done","visit":"expeditions/e25@0","node":"d47","brief":"the refusal names the kill command with examples"}
+{"ts":"2026-07-30T08:56:06.996Z","op":"update","visit":"expeditions/e25@0","node":"d50","brief":"running the end-route test alone first"}
+{"ts":"2026-07-30T08:59:36.514Z","op":"update","visit":"expeditions/e25@0","node":"d51","brief":"the ping rides session, mirror payload and se_panel"}
+{"ts":"2026-07-30T08:59:56.959Z","op":"update","visit":"expeditions/e25@0","node":"d52","brief":"the page pulses on ping and the tour uses the finger"}
+{"ts":"2026-07-30T09:00:36.281Z","op":"update","visit":"expeditions/e25@0","node":"d53","brief":"the ping test rides beside the panel test"}
+{"ts":"2026-07-30T09:00:49.852Z","op":"update","visit":"expeditions/e25@0","node":"d54","brief":"the ping test holds its own root handle"}
+{"ts":"2026-07-30T09:01:00.683Z","op":"update","visit":"expeditions/e25@0","node":"d55","brief":"full battery over ping and the clean end"}

@@ -203,6 +203,24 @@ if ($null -eq $git) {
 }
 Write-Host "  $((git --version))  OK"
 
+# A SESSION ALREADY RUNNING must be seen BEFORE launching over it (owner,
+# 2026-07-30). The mirror losing its port only WARNS, so a stale server
+# made every next launch quietly mirror-less. Refuse loudly instead - and
+# never auto-kill: what holds the port may be a live session doing work.
+$busy = @()
+foreach ($port in 7333, 7334) {
+  if (Get-NetTCPConnection -State Listen -LocalPort $port -ErrorAction SilentlyContinue) { $busy += $port }
+}
+if ($busy.Count -gt 0) {
+  Write-Host "a quackitect session is still running - port(s) $($busy -join ', ') are held." -ForegroundColor Red
+  Write-Host ""
+  Write-Host "  to stop it, run:      .\RUNME.ps1 --kill" -ForegroundColor Yellow
+  Write-Host "  then launch again:    .\RUNME.ps1" -ForegroundColor Yellow
+  Write-Host ""
+  Write-Host "  (meant to keep it? the running session is in your browser: http://localhost:7333)" -ForegroundColor Cyan
+  exit 1
+}
+
 # Engine dependencies. @vscode/ripgrep ships the rg binary via npm.
 Write-Host "quackitect v3 - installing engine dependencies" -ForegroundColor Cyan
 Push-Location (Join-Path $root "product\deliverable")

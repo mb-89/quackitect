@@ -61,7 +61,9 @@ if (flags.some((a) => a === "--help" || a === "-h" || a === "-?")) {
 
   The mirror only renders a client for this host. The scrollback lives here,
   in a process that never reloads, so a browser refresh reattaches and
-  replays instead of losing the session.
+  replays instead of losing the session. When the machine reaches end the
+  server posts /pty/end and the host ends its agent — politely first, then
+  by force — and exits with it: no strays.
 `);
   process.exit(0);
 }
@@ -80,8 +82,10 @@ if (command.length === 0) {
 const CAP = 256 * 1024;
 let buffer = "";
 const listeners = new Set<ServerResponse>();
+let lastData = Date.now();
 
 function broadcast(chunk: Buffer): void {
+  lastData = Date.now();
   const b64 = chunk.toString("base64");
   buffer += chunk.toString("binary");
   if (buffer.length > CAP) buffer = buffer.slice(buffer.length - CAP);
@@ -90,6 +94,7 @@ function broadcast(chunk: Buffer): void {
 
 let write: (d: string) => void = () => {};
 let resize: (cols: number, rows: number) => void = () => {};
+let endAgent: (reason: string) => void = () => {};
 let alive = true;
 
 const require = createRequire(import.meta.url);
@@ -151,6 +156,19 @@ function startServer(): void {
       req.on("close", () => listeners.delete(res));
       return;
     }
+    // THE SESSION CLEANS UP AFTER ITSELF (owner, 2026-07-30): when the
+    // machine reaches end, the server posts here. The host waits for the
+    // agent's output to settle (its goodbye must not be cut), asks it to
+    // leave with /exit, and only an agent that will not leave gets its
+    // tree killed. The host itself exits with the agent, as it always did.
+    if (url.pathname === "/pty/end" && req.method === "POST") {
+      void body(req).then((b) => {
+        res.writeHead(200, { "content-type": "application/json", "access-control-allow-origin": "*" });
+        res.end(JSON.stringify({ ending: true }));
+        endAgent(typeof b.reason === "string" && b.reason !== "" ? b.reason : "asked to end");
+      });
+      return;
+    }
     if (url.pathname === "/pty/input" && req.method === "POST") {
       void body(req).then((b) => {
         if (typeof b.d === "string") write(b.d);
@@ -197,7 +215,7 @@ async function waitForAlive(timeoutMs: number, now: () => number): Promise<boole
 }
 
 async function main(): Promise<void> {
-  let nodePty: { spawn: (file: string, args: string[], opts: Record<string, unknown>) => { onData: (f: (d: string) => void) => void; onExit: (f: (e: { exitCode: number }) => void) => void; write: (d: string) => void; resize: (c: number, r: number) => void } };
+  let nodePty: { spawn: (file: string, args: string[], opts: Record<string, unknown>) => { onData: (f: (d: string) => void) => { dispose: () => void }; onExit: (f: (e: { exitCode: number }) => void) => void; write: (d: string) => void; resize: (c: number, r: number) => void; kill: () => void; pid: number } };
   try {
     nodePty = (await import("@lydell/node-pty")) as never;
   } catch {
@@ -260,6 +278,39 @@ async function main(): Promise<void> {
   });
   write = (d) => term.write(d);
   resize = (c, r) => term.resize(c, r);
+  // THE GRACEFUL END. Quiet-wait so the agent's last message lands whole;
+  // /exit is the polite word; the insist kill is for an agent that ignores
+  // it. Env-tunable knobs, so a test need not wait real seconds.
+  const QUIET_MS = Number(process.env.SE_PTY_END_QUIET_MS ?? 3000);
+  const INSIST_MS = Number(process.env.SE_PTY_END_INSIST_MS ?? 10_000);
+  const CAP_MS = Number(process.env.SE_PTY_END_CAP_MS ?? 60_000);
+  let ending = false;
+  endAgent = (reason) => {
+    if (ending || !alive) return;
+    ending = true;
+    process.stderr.write(`se-pty: ${reason} — ending the agent once its output settles\n`);
+    const started = Date.now();
+    const poll = setInterval(() => {
+      if (!alive) {
+        clearInterval(poll);
+        return;
+      }
+      const quiet = Date.now() - lastData >= QUIET_MS;
+      const capped = Date.now() - started >= CAP_MS;
+      if (!quiet && !capped) return;
+      clearInterval(poll);
+      term.write("/exit\r");
+      setTimeout(() => {
+        if (!alive) return;
+        process.stderr.write("se-pty: the agent did not leave — killing its tree\n");
+        if (process.platform === "win32") {
+          spawn("taskkill", ["/PID", String(term.pid), "/T", "/F"], { stdio: "ignore", windowsHide: true });
+        } else {
+          term.kill();
+        }
+      }, INSIST_MS);
+    }, 250);
+  };
   // THE OPENING PROMPT, TYPED. Claude takes it as an argument and starts a
   // session; Copilot has no such form, so the only way in is the keyboard.
   //

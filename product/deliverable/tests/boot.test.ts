@@ -52,6 +52,24 @@ test("se_panel is legal anywhere — and honestly not-configured without a mirro
   assert.equal(r.body.clause, "SE-C-106", JSON.stringify(r.body));
 });
 
+test("se_panel ping: the agent points and every open window is told", async () => {
+  const root = freshRoot();
+  const session = new Session(root);
+  session.mirrorUrl = "http://localhost:0/"; // a listening mirror, as far as the tool checks
+  const server = buildServer(root, session);
+  const r = await call(server, "se_panel", { ping: "log", note: "look at the feed" });
+  assert.equal(r.isError, false, JSON.stringify(r.body));
+  assert.equal(r.body.pinged, "log");
+  assert.deepEqual(session.ping, { target: "log", note: "look at the feed", seq: 1 });
+  // A second ping bumps the seq — the page pulses on every new one.
+  await call(server, "se_panel", { ping: "gate-kickoff" });
+  assert.equal(session.ping?.seq, 2);
+  assert.equal(session.ping?.target, "gate-kickoff");
+  // An empty target refuses — pointing at nothing is a mistake, not a pulse.
+  const empty = await call(server, "se_panel", { ping: "  " });
+  assert.equal(empty.isError, true);
+});
+
 test("se_tick without arguments reports the current state — legal everywhere", async () => {
   const server = buildServer(freshRoot());
   const r = await call(server, "se_tick");

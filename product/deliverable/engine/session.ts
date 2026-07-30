@@ -203,6 +203,30 @@ export class Session {
     return { shutdown: value, was };
   }
 
+  /** THE PING (owner, 2026-07-30): the agent points at a mirror surface and
+   *  it pulses YELLOW in every open window — the tour's pointing finger,
+   *  and "look HERE" for refusals and diffs. Targets: a card id (machine,
+   *  log, details, terminal, chat), a drawn state id, or an element id.
+   *  Pointing is advisory — an unknown target pulses nothing and fails
+   *  nothing. */
+  ping?: { target: string; note?: string; seq: number };
+  private pingSeq = 0;
+  pingSurface(target: string, note?: string): Record<string, unknown> {
+    const t = target.trim();
+    if (t === "") {
+      throw new Rejection({
+        clause: CLAUSES.REQUIRED_ARGS,
+        expected: "a surface to ping: a card id (machine, log, details, terminal, chat), a drawn state id, or an element id",
+        got: "an empty target",
+        remedy: { tool: "se_panel", args: { ping: "log" }, note: "name what the reader should look at" },
+        source: "engine/session.ts ping",
+      });
+    }
+    this.ping = { target: t, ...(note === undefined || note.trim() === "" ? {} : { note: note.trim() }), seq: ++this.pingSeq };
+    this.notifyChange();
+    return { pinged: t, note: "the surface pulses yellow in every open mirror window" };
+  }
+
   private syncKeepAwake(): void {
     const want = this._shutdown >= 2 && process.platform === "win32" && process.env.SE_KEEPAWAKE_DISABLE !== "1";
     if (want && this.keepAwake === undefined) {

@@ -94,9 +94,15 @@ export function sessionTools(session: Session): ToolDef[] {
     {
       name: "se_panel",
       title: "se.panel",
-      description: "Open the panel (the mirror — the human's hand on the walk) in the user's default browser. Legal in every state; the server also opens it once at start. Use it when the user cannot see the panel.",
-      inputSchema: { type: "object", properties: {} },
-      handler: () => {
+      description: "Open the panel (the mirror — the human's hand on the walk) in the user's default browser, or POINT AT IT: with ping, the named surface pulses YELLOW in every open window — the tour's pointing finger, and 'look HERE' for a refusal or a diff. Legal in every state.",
+      inputSchema: {
+        type: "object",
+        properties: {
+          ping: { type: "string", description: "pulse this surface instead of opening the panel: a card id (machine, log, details, terminal, chat), a drawn state id, or an element id" },
+          note: { type: "string", description: "optional one-liner recorded with the ping" },
+        },
+      },
+      handler: (args) => {
         if (session.mirrorUrl === undefined) {
           throw new Rejection({
             clause: CLAUSES.NOT_CONFIGURED,
@@ -105,6 +111,9 @@ export function sessionTools(session: Session): ToolDef[] {
             remedy: { tool: "se_tick", args: {}, note: "start the server with a mirror port (default 7333); the URL also prints on the server's stderr" },
             source: "engine/tools.ts panel",
           });
+        }
+        if (args.ping !== undefined) {
+          return session.pingSurface(String(args.ping), args.note === undefined ? undefined : String(args.note));
         }
         openPanel(session.mirrorUrl);
         return { opened: session.mirrorUrl, note: "the panel is opening in the user's browser" };

@@ -557,6 +557,12 @@ const STYLE = `
   #loadbar { position: fixed; top: 0; left: 0; right: 0; height: 3px; background: #22272c; z-index: 99; }
   #loadbar .fill { height: 100%; width: 30%; background: #e8b339; animation: loadslide 1s linear infinite; }
   @keyframes loadslide { 0% { margin-left: -30%; } 100% { margin-left: 100%; } }
+  /* THE PING — the agent's pointing finger (owner, 2026-07-30): v2's pulse,
+     made yellow. A card blinks its outline; an SVG node blinks its opacity. */
+  .se-ping { outline: 3px solid #e8b339; outline-offset: 2px; animation: se-ping-blink 1.2s ease-in-out 3; }
+  .se-ping-svg { animation: se-ping-fade 1.2s ease-in-out 3; }
+  @keyframes se-ping-blink { 50% { outline-color: transparent; } }
+  @keyframes se-ping-fade { 50% { opacity: .25; } }
   #loadbar .lmsg { position: fixed; top: 8px; right: 12px; color: #e8b339; font-size: 12px; }
   /* A load that never answered is a FAILURE, and the voice paints those red. */
   #loadbar.stalled { cursor: pointer; }
@@ -1738,6 +1744,22 @@ if (D.describe.status === "closed") sessionOver("the machine reached end — the
 // lands at once instead of up to a poll late. EventSource reconnects by
 // itself; a reconnect after silence is how an engine swap arrives without
 // an F5, and a silence that never ends is death.
+// THE PING (owner, 2026-07-30): the agent points, the surface pulses yellow.
+// Lookup order: a card id, a raw element id, a drawn state node.
+let lastPingSeq = 0;
+function pingSurface(target) {
+  const escaped = window.CSS && CSS.escape ? CSS.escape(target) : target;
+  const el = document.getElementById("card-" + target)
+    || document.getElementById(target)
+    || document.querySelector('[data-detail="state:' + escaped + '"]');
+  if (!el) return; // pointing is advisory — an unknown target fails nothing
+  const cls = el.ownerSVGElement ? "se-ping-svg" : "se-ping";
+  el.classList.remove(cls);
+  void el.getBoundingClientRect(); // restart the animation
+  el.classList.add(cls);
+  setTimeout(() => el.classList.remove(cls), 4000);
+  if (el.scrollIntoView) el.scrollIntoView({ block: "nearest", behavior: "smooth" });
+}
 let pollBusy = null;
 let ACTIVE_AT_RENDER = JSON.stringify(D.describe.active || []);
 let sawError = false;
@@ -1772,6 +1794,7 @@ es.addEventListener("message", (ev) => {
     const lbl2 = document.getElementById("sd-val");
     if (lbl2) lbl2.textContent = sdAbbr(a.shutdown);
   }
+  if (a.ping && a.ping.seq !== lastPingSeq) { lastPingSeq = a.ping.seq; pingSurface(a.ping.target); }
   if (logPanel && a.acts !== lastActs) { lastActs = a.acts; refreshLog(); }
   if (JSON.stringify(a.active || []) !== ACTIVE_AT_RENDER) { refresh(); return; }
   // A script run finishing elsewhere (agent tick, other window) lands its
