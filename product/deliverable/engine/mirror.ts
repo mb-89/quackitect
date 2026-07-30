@@ -147,16 +147,26 @@ export function startMirror(o: MirrorOptions): Server {
       if (url.pathname === "/api/log") {
         // The unified feed — session-scoped; ?ref= fetches one record in
         // full (request AND response — the details pane's combined object).
+        // BUILD THE BODY BEFORE THE HEAD. A throw after writeHead leaves the
+        // response open for ever: the browser waits on it, the promise behind
+        // the click never settles, and from the page that is indistinguishable
+        // from a click nothing was listening for.
         const ref = url.searchParams.get("ref");
-        res.writeHead(200, { "content-type": "application/json; charset=utf-8" });
-        if (ref !== null) {
-          // note- refs live in the inbox, not the call log — a pending
-          // stray's details come from its own record.
-          const rec = ref.startsWith("note-") ? readNotes(seDir(o.root)).find((n) => n.ref === ref) : o.log.find(ref);
-          res.end(JSON.stringify(rec ?? { missing: ref }));
-          return;
+        let body: string;
+        try {
+          if (ref !== null) {
+            // note- refs live in the inbox, not the call log — a pending
+            // stray's details come from its own record.
+            const rec = ref.startsWith("note-") ? readNotes(seDir(o.root)).find((n) => n.ref === ref) : o.log.find(ref);
+            body = JSON.stringify(rec ?? { missing: ref });
+          } else {
+            body = JSON.stringify(feedRows(o.log, state.session.startedTs, pendingNotes(seDir(o.root))));
+          }
+        } catch (e) {
+          body = JSON.stringify({ error: e instanceof Error ? e.message : String(e), ref });
         }
-        res.end(JSON.stringify(feedRows(o.log, state.session.startedTs, pendingNotes(seDir(o.root)))));
+        res.writeHead(200, { "content-type": "application/json; charset=utf-8" });
+        res.end(body);
         return;
       }
       if (url.pathname === "/api/decisions") {

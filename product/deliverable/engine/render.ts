@@ -1617,8 +1617,11 @@ if (logPanel) {
 }
 async function openLogDetail(ref) {
   CURRENT_DETAIL = "log:" + ref;
+  hostTrace("openLogDetail asking for " + ref);
   const r = await fetch("/api/log?ref=" + encodeURIComponent(ref));
+  hostTrace("openLogDetail status " + r.status + " for " + ref);
   const rec = await r.json();
+  hostTrace("openLogDetail parsed " + ref + " tool=" + String(rec.tool) + " err=" + String(rec.error));
   if (rec.tool === "se_update" && rec.args && rec.args.visit) { await showDecisions(rec.args.visit, null); return; }
   if ((rec.tool === "se_note" || rec.tool === "mirror_note") && rec.args) { showDetails("note · " + ((rec.response && rec.response.captured) || rec.ref), jsonTable({ at: rec.ts, text: rec.args.text, pending: "until a retro drains it" })); return; }
   if (rec.text !== undefined && rec.tool === undefined) { showDetails("note · " + rec.ref, jsonTable({ at: rec.at, text: rec.text, pending: "until a retro drains it" })); return; }
