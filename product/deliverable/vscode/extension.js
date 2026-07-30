@@ -58,6 +58,8 @@ let logFilter = "";
 let logAnchored = false;
 let logSeq = 0;
 let lastWalk = "";
+/** Known-up means a card can start loading at once instead of waiting. */
+let engineUp = false;
 const logSeen = new Set();
 /** The subject details is showing — what an expanded copy is a snapshot OF. */
 let lastDetails = null;
@@ -148,6 +150,7 @@ const post = (pathname, body) =>
 
 async function probeServer() {
   const body = await api("/api/alive");
+  engineUp = body !== null;
   if (body === null) return { state: "down" };
   return { state: "up", root: typeof body.root === "string" ? body.root : null };
 }
@@ -313,6 +316,10 @@ function framePage(url) {
 <div id="wait">Starting the engine…<div id="hint"></div></div>
 <iframe id="frame"></iframe>
 <script>
+  // THE ENGINE IS USUALLY ALREADY UP by the time a card is opened. Waiting for
+  // a round trip to rediscover that put a visible pause in front of every
+  // card. When the host already knows, the page starts loading at once.
+  const START_NOW = ${engineUp ? "true" : "false"};
   const vsapi = acquireVsCodeApi();
   window.addEventListener("error", (e) => vsapi.postMessage({ quackitect: "trace", text: "host page ERROR " + (e.message || "?") }));
   const SERVER = ${JSON.stringify(SERVER)};
@@ -388,6 +395,7 @@ function framePage(url) {
   // TWO WAKE PATHS, deliberately. The extension host probes over Node, where
   // no origin rule applies. This page probes too, as a backstop. Whichever
   // lands first reveals the surface; the reader never watches a dead line.
+  if (START_NOW) show();
   (async function boot() {
     const started = Date.now();
     for (;;) {
@@ -521,6 +529,7 @@ class Surface {
   constructor(page) {
     this.page = page;
     this.web = null;
+    this.lastHtml = null;
   }
   attach(webview, onReady) {
     this.web = webview;
@@ -532,13 +541,20 @@ class Surface {
       await ensureCards();
       this.render();
       this.up();
-      // The page is re-rendered above, so anything posted before now would be
-      // thrown away with the document that was listening for it.
-      if (typeof onReady === "function") setTimeout(onReady, 500);
+      // No wait here: the relay buffers anything that arrives before the
+      // iframe has loaded, and delivers it on the load.
+      if (typeof onReady === "function") onReady();
     });
   }
   render() {
-    if (this.web !== null) this.web.html = this.page();
+    if (this.web === null) return;
+    const html = this.page();
+    // NOTHING CHANGED, NOTHING MOVES. Setting the html reloads the whole page
+    // and its iframe. Rendering twice on open — once waiting, once for real —
+    // is what made a card take about a second to appear.
+    if (html === this.lastHtml) return;
+    this.lastHtml = html;
+    this.web.html = html;
   }
   post(msg) {
     if (this.web !== null) void this.web.postMessage(msg);
