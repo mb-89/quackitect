@@ -7,6 +7,7 @@
 import { createServer, type Server } from "node:http";
 import { spawnSync } from "node:child_process";
 import { existsSync, readFileSync, statSync } from "node:fs";
+import { createRequire } from "node:module";
 import { marked } from "marked";
 import { CallLog } from "./calllog.ts";
 import { replayVisitsText } from "./decisions.ts";
@@ -209,6 +210,27 @@ export function startMirror(o: MirrorOptions): Server {
         }
         res.writeHead(200, { "content-type": "application/json; charset=utf-8" });
         res.end(JSON.stringify({ path: p, html }));
+        return;
+      }
+      if (url.pathname === "/vendor/vscode-elements.js") {
+        // THE COMPONENT LIBRARY, served from the engine's own dependencies.
+        // The mirror is a page we serve ourselves rather than a webview asset,
+        // so this is an ordinary script tag: no nonce, no bundler, no build.
+        // Resolved from the ENGINE's OWN dependencies, never from the project
+        // root. The engine can serve a tree it was not installed into, and a
+        // test root has no node_modules at all. This is the same idiom the
+        // search lane uses to find ripgrep.
+        let bundle;
+        try {
+          bundle = createRequire(import.meta.url).resolve("@vscode-elements/elements/dist/bundled.js");
+        } catch {
+          // Say which install is missing. A blank page teaches nothing.
+          res.writeHead(404, { "content-type": "text/plain; charset=utf-8" });
+          res.end("vscode-elements is not installed — run npm install in product/deliverable");
+          return;
+        }
+        res.writeHead(200, { "content-type": "text/javascript; charset=utf-8" });
+        res.end(readFileSync(bundle));
         return;
       }
       if (url.pathname === "/api/form") {

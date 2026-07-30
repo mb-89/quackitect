@@ -12,11 +12,12 @@
     "serve": "node engine/bin/se-mcp.ts --root ../.."
   },
   "dependencies": {
+    "@lydell/node-pty": "^1.1.0",
+    "@vscode-elements/elements": "^2.5.1",
     "@vscode/ripgrep": "^1.15.9",
-    "marked": "^15.0.0",
-    "yaml": "^2.9.0",
     "@xterm/xterm": "^5.5.0",
-    "@lydell/node-pty": "^1.1.0"
+    "marked": "^15.0.0",
+    "yaml": "^2.9.0"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",

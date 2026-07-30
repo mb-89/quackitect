@@ -533,6 +533,11 @@ const STYLE = `
   button.ghost { background: var(--se-raised); color: var(--se-fg); border: 1px solid #4a545e; border-radius: 8px; padding: 6px 12px; font: inherit; cursor: pointer; }
   #w-details { flex: 1; border-radius: 0; border: 0; }
   .docheck { accent-color: #e8b339; cursor: pointer; }
+  .docline { display: flex; align-items: center; gap: 6px; padding: 3px 0; }
+  .collbody { padding: 4px 10px 8px; }
+  .fval { min-width: 0; overflow-wrap: anywhere; }
+  vscode-icon.ok { color: var(--vscode-testing-iconPassed, #4a7a55); }
+  vscode-icon.no { color: var(--se-muted); }
   .threshold { display: flex; align-items: center; gap: 8px; color: var(--se-muted); font-size: 12px; text-transform: none; letter-spacing: 0; }
   .threshold input { accent-color: #e8b339; width: 140px; }
   #thr-val { color: #e8b339; min-width: 4ch; }
@@ -809,50 +814,84 @@ function nextTable(id, s) {
         ? "leaving " + id + " waits on:\\n" + (exitMiss.join("\\n") || "its exit conditions")
         : "entering " + n.to + " waits on:\\n" + ((n.missing || []).join("\\n") || "its entry conditions");
     const btn = here
-      ? '<button class="primary go' + (unlocked ? "" : " locked") + '" data-to="' + n.to + '"' + (unlocked ? "" : " disabled") +
-        ' title="' + escText(title) + '">▶</button>'
+      ? '<vscode-button class="go" icon="play" icon-only data-to="' + n.to + '"' + (unlocked ? "" : " disabled") +
+        ' title="' + escText(title) + '"></vscode-button>'
       : "";
     return '<tr><td class="k">' + i + '</td><td class="v">' + inner + '</td>' + (here ? '<td class="btncell">' + btn + "</td>" : "") + "</tr>";
   }).join("") + "</table>";
 }
+// THE CHECK IS THE READER'S PROOF, AND IT IS PER VERSION — an edited doc
+// unchecks itself. A doc named by a CONDITION is not always in that state's
+// own pulled list, and looking it up only there left the box permanently
+// unchecked however often it was clicked (found live 2026-07-30). The
+// session's checked list is the truth, and it is already version-scoped.
+function docChecked(p) {
+  return p.checked === true || (D.checkedDocs || []).indexOf(p.path) >= 0;
+}
 function docRow(p) {
-  // One doc, one row: the human's proof-of-read checkbox (one per VERSION
-  // - an edited doc unchecks itself) plus the readable link.
-  const box = '<input type="checkbox" class="docheck" data-path="' + p.path + '" title="' + (p.checked ? "read (this version)" : "check = I read this version") + '"' + (p.checked ? " checked disabled" : "") + ">";
-  return '<div style="padding:2px 0 2px 14px">' + box + ' <a class="doclink" data-path="' + p.path + '">' + p.path + "</a></div>";
+  // The link sits BESIDE the box, never inside its label: a label swallows
+  // the click, and the reader would open nothing while checking by accident.
+  const on = docChecked(p);
+  return '<div class="docline">'
+    + '<vscode-checkbox class="docheck" data-path="' + p.path + '"' + (on ? " checked disabled" : "")
+    + ' title="' + (on ? "read (this version)" : "check = I read this version") + '"></vscode-checkbox>'
+    + '<a class="doclink" data-path="' + p.path + '">' + p.path + "</a></div>";
 }
 function pulledView(pulled) {
   const bySource = {};
   for (const p of pulled) for (const src of p.sources) (bySource[src] ??= []).push(p);
   return Object.entries(bySource).map(([srcName, docs]) => {
-    const done = docs.filter((d) => d.checked).length;
-    return '<details><summary style="cursor:pointer;color:var(--se-muted)">' + srcName + " (" + done + "/" + docs.length + " read)</summary>" +
-      docs.map(docRow).join("") + "</details>";
+    const done = docs.filter(docChecked).length;
+    // Open while there is still something to read; folded once it is done.
+    return '<vscode-collapsible title="' + escText(srcName) + '" description="' + done + "/" + docs.length + ' read"' + (done < docs.length ? " open" : "") + ">"
+      + '<div class="collbody">' + docs.map(docRow).join("") + "</div></vscode-collapsible>";
   }).join("");
+}
+// The state's own fields. A scalar is one labelled row; prose folds into its
+// own section, because guidance is paragraphs and does not belong in a cell.
+function factsView(o) {
+  const PROSE = { statement: 1, guidance: 1 };
+  let rows = "";
+  let prose = "";
+  for (const k in o) {
+    const v = o[k];
+    if (v === undefined || v === null || v === "") continue;
+    if (PROSE[k]) {
+      prose += '<vscode-collapsible title="' + escText(k) + '" open><div class="collbody comment-detail">' + escText(String(v)) + "</div></vscode-collapsible>";
+      continue;
+    }
+    // A boolean is a state, not a word. The host's own pass icon carries it,
+    // so the colour follows the reader's theme rather than our palette.
+    let cell;
+    if (typeof v === "boolean") cell = '<vscode-icon name="' + (v ? "pass" : "circle-slash") + '" class="' + (v ? "ok" : "no") + '" label="' + (v ? "yes" : "no") + '"></vscode-icon>';
+    else if (typeof v === "object") cell = escText(JSON.stringify(v));
+    else cell = escText(String(v));
+    rows += '<vscode-form-group variant="horizontal"><vscode-label>' + escText(k) + "</vscode-label>"
+      + '<div class="fval">' + cell + "</div></vscode-form-group>";
+  }
+  return rows + prose;
 }
 function stateDetail(id) {
   const s = D.states[id] ?? {};
   const bare = Object.assign({}, s); delete bare.next; delete bare.pulled; delete bare.script; delete bare.was_filled; delete bare.legal_tools;
-  let html = jsonTable(bare);
+  let html = factsView(bare);
   // Legal tools — human-callable ones are LINKS everywhere they appear
   // (parity law); a link outside its state just toasts "tool disabled".
   const tools = [...new Set(s.legal_tools || [])];
-  let extra = "";
   if (tools.length > 0) {
     const link = (t) => '<a class="toollink" data-tool="' + t + '">' + t + "</a>";
-    const line = (t) => '<div style="padding:2px 0 2px 14px">' + (HUMAN_TOOLS[t] !== undefined ? link(t) : escText(t)) + "</div>";
+    const line = (t) => '<div class="docline">' + (HUMAN_TOOLS[t] !== undefined ? link(t) : escText(t)) + "</div>";
     // "all" stays written as all — and EXPANDS into the human-callable
-    // links (parity law), the same collapsible pattern the pull uses.
-    const inner = tools.includes("all")
-      ? '<details><summary style="cursor:pointer;color:var(--se-muted)">all — the human-callable set</summary>' + Object.keys(HUMAN_TOOLS).map(line).join("") + "</details>"
-      : tools.map(line).join("");
-    extra += '<tr><td class="k">legal tools</td><td class="v">' + inner + "</td></tr>";
+    // links (parity law), the same fold the pull uses.
+    const all = tools.includes("all");
+    const inner = all ? Object.keys(HUMAN_TOOLS).map(line).join("") : tools.map(line).join("");
+    html += '<vscode-collapsible title="legal tools" description="' + (all ? "all — the human-callable set" : tools.length + " listed") + '">'
+      + '<div class="collbody">' + inner + "</div></vscode-collapsible>";
   }
   if (s.pulled && s.pulled.length > 0) {
-    extra += '<tr><td class="k" title="derived by the machine, not authored">pulled</td><td class="v">' + pulledView(s.pulled) + "</td></tr>";
-  }
-  if (extra) {
-    html = html.endsWith("</table>") ? html.slice(0, -8) + extra + "</table>" : html + '<table class="kv">' + extra + "</table>";
+    // One fold per source rather than a fold inside a fold — the reader is
+    // after the documents, not the nesting.
+    html += '<div class="meta" style="padding:8px 0 4px" title="derived by the machine, not authored">pulled</div>' + pulledView(s.pulled);
   }
   if (s.archive_record !== undefined) {
     const e = s.archive_record;
@@ -877,12 +916,12 @@ function stateDetail(id) {
     html += '<div class="meta" style="padding:8px 0 4px">next</div>' + nextTable(id, s);
   }
   if (WALK_HERE && s.was_filled && id !== CURRENT && D.describe.status === "open") {
-    html += '<div style="padding:8px 0"><button class="primary jump" data-state="' + id + '" title="everything downstream is superseded; its evidence and checks are invalidated">↩ return to this state</button></div>';
+    html += '<div style="padding:8px 0"><vscode-button class="jump" secondary icon="discard" data-state="' + id + '" title="everything downstream is superseded; its evidence and checks are invalidated">return to this state</vscode-button></div>';
   }
   if (WALK_HERE && id === CURRENT && s.kind === "end" && (!s.next || s.next.length === 0) && D.describe.breadcrumb.length > 1) {
     const parent = D.describe.breadcrumb[0];
     html += '<div class="meta" style="padding:8px 0 4px">next</div>' +
-      '<table class="kv"><tr><td class="v">return to ' + parent + '</td><td class="btncell"><button class="primary go" data-to="" title="tick: leave the sub-machine">▶</button></td></tr></table>';
+      '<table class="kv"><tr><td class="v">return to ' + parent + '</td><td class="btncell"><vscode-button class="go" icon="play" icon-only data-to="" title="tick: leave the sub-machine"></vscode-button></td></tr></table>';
   }
   return html;
 }
@@ -1064,7 +1103,21 @@ function embedOpen(path) {
 }
 document.addEventListener("click", async (ev) => {
   const c = ev.target.closest ? ev.target.closest(".docheck") : null;
-  if (c) { if (c.disabled) return; ev.preventDefault(); c.disabled = true; await fetch("/check", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ path: c.dataset.path }) }); refresh(); return; }
+  if (c) {
+    // FEEDBACK FIRST. The old handler cancelled the click and waited on a
+    // round trip, so the box sat unchecked for a second and then a full
+    // refresh rebuilt the pane under the reader, who lost what they had open.
+    if (c.hasAttribute("disabled")) return;
+    const path = c.dataset.path;
+    c.setAttribute("checked", "");
+    c.setAttribute("disabled", "");
+    if (!D.checkedDocs) D.checkedDocs = [];
+    if (D.checkedDocs.indexOf(path) < 0) D.checkedDocs.push(path);
+    // No refresh here. The poll sees the log grow and redraws in its own
+    // time; forcing it now is what threw the reader out of the details pane.
+    await fetch("/check", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ path: path }) });
+    return;
+  }
   const j = ev.target.closest ? ev.target.closest(".jump") : null;
   if (j) { showLoading("jumping back to " + j.dataset.state); await fetch("/tick", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ back: j.dataset.state }) }); navigateTo("/", "loading the walk"); return; }
   const rp = ev.target.closest ? ev.target.closest(".runpre") : null;
@@ -1231,6 +1284,10 @@ document.addEventListener("click", async (ev) => {
   }
   const go = ev.target.closest ? ev.target.closest(".go") : null;
   if (go) {
+    // THE GUARD IS EXPLICIT. A native button swallows its own click when
+    // disabled; a component decides that for itself, and a locked edge must
+    // not walk because the library changed its mind about pointer events.
+    if (go.hasAttribute("disabled")) return;
     const body = go.dataset.to ? { to: go.dataset.to } : { advance: true };
     showLoading("walking to " + (go.dataset.to || "the next state"));
     await fetch("/tick", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) });
@@ -2145,6 +2202,10 @@ export function renderMirror(m: MirrorState, widget?: "machine" | "details" | "l
     viewed: { id: decl.id, reentry: decl.reentry, initial: decl.initial, states: decl.states.map((s) => s.id) },
     history: history.slice(-20),
     levels,
+    // Every doc the reader has checked AT ITS CURRENT VERSION. A condition
+    // names docs that are not always in the state's own pulled list, so the
+    // page needs the session's list rather than a per-state one.
+    checkedDocs: m.session.humanCheckedPaths(),
   }).replace(/</g, "\\u003c")}</script>`;
 
   // The slider — THE AUTONOMY: which states the agent enters by itself
@@ -2200,20 +2261,20 @@ export function renderMirror(m: MirrorState, widget?: "machine" | "details" | "l
   const terminalWidget = termWidget(true);
 
   if (widget === "terminal") {
-    return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>se · terminal</title><style>${STYLE} #w-terminal{flex:1;height:auto;border-bottom:0}</style></head>
+    return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>se · terminal</title><style>${STYLE} #w-terminal{flex:1;height:auto;border-bottom:0}</style><script type="module" src="/vendor/vscode-elements.js"></script></head>
 <body><div class="cols"><aside id="left" style="width:100vw;max-width:100vw">${termWidget(true)}</aside></div>${MODAL}${data}<script>${SCRIPT}</script></body></html>`;
   }
   if (widget === "log") {
-    return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>se · log</title><style>${STYLE} #w-log{flex:1;border-bottom:0}</style></head>
+    return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>se · log</title><style>${STYLE} #w-log{flex:1;border-bottom:0}</style><script type="module" src="/vendor/vscode-elements.js"></script></head>
 <body><div class="cols"><aside id="sidebar" style="width:100vw;max-width:100vw">${logWidget}</aside></div>${MODAL}${data}<script>${SCRIPT}</script></body></html>`;
   }
 
   if (widget === "machine") {
-    return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>se · machine</title><style>${STYLE} main{padding:10px}</style></head>
+    return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>se · machine</title><style>${STYLE} main{padding:10px}</style><script type="module" src="/vendor/vscode-elements.js"></script></head>
 <body><div class="cols"><main>${machineWidget}</main></div>${MODAL}${data}<script>${SCRIPT}</script></body></html>`;
   }
   if (widget === "details") {
-    return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>se · details</title><style>${STYLE}</style></head>
+    return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>se · details</title><style>${STYLE}</style><script type="module" src="/vendor/vscode-elements.js"></script></head>
 <body><div class="cols"><aside id="sidebar" style="width:100vw;max-width:100vw">${detailsWidget}</aside></div>${MODAL}${data}<script>${SCRIPT}</script></body></html>`;
   }
   // THE CARD MATRIX (owner design 2026-07-29). The card list and its ORDER are
@@ -2257,7 +2318,7 @@ export function renderMirror(m: MirrorState, widget?: "machine" | "details" | "l
   const nowAt = Math.max(0, cardList.findIndex((c) => c.id === now));
   const legendHtml = `<div class="card" id="card-legend" style="${cellAt(nowAt)}"><div class="widget" id="w-legend"><div class="widget-head"><span>keys</span></div><div class="widget-body">${legendRows}</div></div></div>`;
   const cardData = `<script type="application/json" id="se-cards">${JSON.stringify({ list: cardList.map((c) => ({ n: c.n, id: c.id, title: c.title })), now })}</script>`;
-  return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>se mirror</title><style>${STYLE}</style></head>
+  return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>se mirror</title><style>${STYLE}</style><script type="module" src="/vendor/vscode-elements.js"></script></head>
 <body>
 <div class="cards" data-keep-style style="grid-template-rows:repeat(${rows},1fr)">
   ${cardsHtml}

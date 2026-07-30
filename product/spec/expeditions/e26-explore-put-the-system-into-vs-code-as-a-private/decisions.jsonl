@@ -65,3 +65,24 @@
 {"ts":"2026-07-30T18:34:07.307Z","op":"done","visit":"expeditions/e26@0","node":"d17","brief":"plain RUNME opens VS Code, classic is the opt-out"}
 {"ts":"2026-07-30T18:34:37.099Z","op":"update","visit":"expeditions/e26@0","node":"d50","brief":"waiting on the full suite"}
 {"ts":"2026-07-30T18:35:58.973Z","op":"done","visit":"expeditions/e26@0","node":"d18","brief":"the server watches its parent and the tree is killed"}
+{"ts":"2026-07-30T18:36:29.854Z","op":"done","visit":"expeditions/e26@0","node":"d19","brief":"233 tests pass and a real export was audited"}
+{"ts":"2026-07-30T18:44:58.659Z","op":"update","visit":"expeditions/e26@0","node":"d51","brief":"checking whether the VS Code webview component library is still alive"}
+{"ts":"2026-07-30T18:45:59.539Z","op":"update","visit":"expeditions/e26@0","node":"d52","brief":"answering what VS Code offers in place of hand-rolled HTML"}
+{"ts":"2026-07-30T18:53:38.890Z","op":"update","visit":"expeditions/e26@0","node":"d53","brief":"answering what a symbol provider can and cannot do"}
+{"ts":"2026-07-30T18:59:36.643Z","op":"update","visit":"expeditions/e26@0","node":"d54","brief":"checking the vscode-elements component list against our surfaces"}
+{"ts":"2026-07-30T19:00:32.349Z","op":"update","visit":"expeditions/e26@0","node":"d55","brief":"confirming the component set covers the forms and details"}
+{"ts":"2026-07-30T19:07:25.522Z","op":"plan","visit":"expeditions/e26@0","parent":null,"nodes":[{"id":"d56","brief":"diagnose the guidance checkmark that never registers"},{"id":"d57","brief":"vendor vscode-elements into the mirror"},{"id":"d58","brief":"rebuild the state details as a form"},{"id":"d59","brief":"keep the links and the reader's place working"},{"id":"d60","brief":"prove it and show the owner"}]}
+{"ts":"2026-07-30T19:08:29.334Z","op":"update","visit":"expeditions/e26@0","node":"d61","brief":"installing vscode-elements"}
+{"ts":"2026-07-30T19:10:03.576Z","op":"update","visit":"expeditions/e26@0","node":"d62","brief":"reading the component manifest for exact attributes"}
+{"ts":"2026-07-30T19:11:01.344Z","op":"done","visit":"expeditions/e26@0","node":"d57","brief":"the library is served from the engine's own dependencies"}
+{"ts":"2026-07-30T19:11:23.610Z","op":"update","visit":"expeditions/e26@0","node":"d63","brief":"docs, folds and facts move onto the library's components"}
+{"ts":"2026-07-30T19:12:00.662Z","op":"update","visit":"expeditions/e26@0","node":"d64","brief":"state facts and tools render as labelled rows and folds"}
+{"ts":"2026-07-30T19:12:41.433Z","op":"done","visit":"expeditions/e26@0","node":"d56","brief":"the check reads the session's list, not one state's pull"}
+{"ts":"2026-07-30T19:12:51.493Z","op":"update","visit":"expeditions/e26@0","node":"d65","brief":"running the mirror contract tests"}
+{"ts":"2026-07-30T19:14:12.877Z","op":"update","visit":"expeditions/e26@0","node":"d66","brief":"probing the served page for the components"}
+{"ts":"2026-07-30T19:14:50.801Z","op":"update","visit":"expeditions/e26@0","node":"d67","brief":"re-probing after the resolve fix"}
+{"ts":"2026-07-30T19:15:09.732Z","op":"update","visit":"expeditions/e26@0","node":"d68","brief":"restarting the suite after the resolve fix"}
+{"ts":"2026-07-30T19:15:31.132Z","op":"update","visit":"expeditions/e26@0","node":"d69","brief":"removing the scratch probe"}
+{"ts":"2026-07-30T19:15:47.923Z","op":"update","visit":"expeditions/e26@0","node":"d70","brief":"running the new element tests"}
+{"ts":"2026-07-30T19:16:07.363Z","op":"done","visit":"expeditions/e26@0","node":"d58","brief":"the state details render as library components"}
+{"ts":"2026-07-30T19:17:26.215Z","op":"done","visit":"expeditions/e26@0","node":"d59","brief":"links stay plain anchors in the light DOM"}
