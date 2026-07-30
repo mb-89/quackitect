@@ -400,6 +400,19 @@ function framePage(url) {
       pendingHelp = d;
       if (loaded && frame.contentWindow) frame.contentWindow.postMessage(d, "*");
       show();
+      // AND IF NOTHING COMES BACK, THE PAGE IS GONE — whatever the reason.
+      // Seen live 2026-07-30: delivery stopped at 19:42 and never resumed,
+      // with no navigation in between, while the relay still read loaded=true.
+      // Reloading the frame re-delivers on load. It is the one recovery that
+      // does not depend on knowing why the page went quiet. One reload per
+      // subject, never a loop: the load path re-posts without re-arming this.
+      const mine = d;
+      setTimeout(() => {
+        if (pendingHelp !== mine) return;
+        vsapi.postMessage({ se: "trace", text: "relay unacked after 800ms — reloading the frame" });
+        loaded = false;
+        frame.src = PAGE;
+      }, 800);
     }
   });
   // TWO WAKE PATHS, deliberately. The extension host probes over Node, where

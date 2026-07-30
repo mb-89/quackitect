@@ -31,6 +31,11 @@ bug somewhere else.
 - Color carries meaning, never decoration: green = pass, red = failure or rejection, yellow = attention.
 - TAKE THE COLOUR FROM THE HOST. Running inside another application, use that application's palette for anything it already names — a primary action, a passing check, a warning. Our own hex is the last resort, for a meaning the host has no colour for. A palette we maintain ourselves drifts, and drifts worst against a theme we do not control.
 - AN OUTSIDE CONVENTION CAN BEAT THE HOST. The route line stays BLUE, because every map application has already taught that meaning and no editor theme outweighs it. Claiming an exception means naming the convention it rests on.
+- COLOUR IS CONFIGURATION, NEVER CODE (owner ruling 2026-07-30).
+  - One palette file holds every colour the product chooses.
+  - A person edits that file. Changing a colour never means changing code.
+  - The surfaces read it LIVE. An edit shows without reloading the machinery.
+  - A colour written at the place it is used is a defect.
 
 ## The reader keeps their place
 
