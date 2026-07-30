@@ -116,7 +116,16 @@ function rgSearch(root: string, query: string, opts: { path?: string; ignore_cas
   for (const d of [".se", "node_modules", ".worktrees"]) args.push("--glob", `!${d}/**`);
   if (opts.ignore_case === true) args.push("--ignore-case");
   args.push("--regexp", query, scope);
-  const r = spawnSync(rgPath(), args, { encoding: "utf8", maxBuffer: 16 * 1024 * 1024 });
+  // THE EXCLUSION GLOBS ARE RELATIVE TO THE WORKING DIRECTORY, never to the
+  // search target. Without a cwd of its own, ripgrep resolved them against
+  // the SERVER's cwd — and a bound expedition worktree lives under
+  // .worktrees, so `!.worktrees/**` excluded every file of the very tree the
+  // search was pointed at. Every directory search in an open expedition
+  // returned a confident, empty "no matches" (found live 2026-07-30).
+  // A single named FILE survived it, because ripgrep never applies these
+  // filters to a target it was handed explicitly — which is what made the
+  // failure look like a parser bug rather than a scoping one.
+  const r = spawnSync(rgPath(), args, { cwd: base, encoding: "utf8", maxBuffer: 16 * 1024 * 1024 });
   if (r.status !== 0 && r.status !== 1) throw new Error(`ripgrep failed: ${r.stderr}`);
   const out: Match[] = [];
   for (const line of (r.stdout ?? "").split("\n")) {
