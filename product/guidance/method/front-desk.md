@@ -10,6 +10,29 @@ The desk is the router with a brain. Its worth is measured by one test:
 asked cold "what should I do next", its answer cites the actual current
 state of the system — never this document alone.
 
+## 0. The greeting — a session's first visit
+
+The FIRST time a session enters the desk, do NOT survey and do NOT list
+open points. A newcomer must never be met by a backlog. Print the
+greeting below VERBATIM — this file is where its wording lives, so the
+owner edits it here and it always looks the same — then stop and wait:
+
+> Welcome to the front desk. Tell me what you need — in your own words.
+>
+> New here? I can give you a tour of the whole system. Just say "tour".
+>
+> Otherwise, the usual ways forward:
+>
+> - continue what already stands open
+> - start something new — I do the paperwork
+> - look back: a retro turns what happened into rules
+> - or just ask a question
+>
+> The slider next to the drawing sets how much I do on my own.
+
+Every LATER visit in the same session works as the sections below say —
+sweep, advise, execute.
+
 ## 1. Sweep before advising
 
 Read the LIVE machinery, in this order. Never answer from memory.

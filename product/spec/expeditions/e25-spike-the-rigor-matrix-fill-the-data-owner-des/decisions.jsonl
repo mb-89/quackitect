@@ -176,3 +176,5 @@
 {"ts":"2026-07-30T09:02:38.459Z","op":"done","visit":"expeditions/e25@0","node":"d45","brief":"the clean end and the ping are built"}
 {"ts":"2026-07-30T09:02:52.490Z","op":"update","visit":"expeditions/e25@0","node":"d56","brief":"inspecting the stray {} file before removing it"}
 {"ts":"2026-07-30T09:03:05.664Z","op":"update","visit":"expeditions/e25@0","node":"d57","brief":"deleting the empty stray artifact"}
+{"ts":"2026-07-30T09:03:55.414Z","op":"update","visit":"expeditions/e25@0","node":"d58","brief":"the desk greets first, owner-editable and verbatim"}
+{"ts":"2026-07-30T09:04:15.130Z","op":"update","visit":"expeditions/e25@0","node":"d59","brief":"the desk greets first, owner-editable and verbatim"}
