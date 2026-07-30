@@ -4,3 +4,18 @@
 {"ts":"2026-07-30T14:34:36.919Z","op":"update","visit":"expeditions/e27@0","node":"d12","brief":"kickoff text moved to one shared file in the cage"}
 {"ts":"2026-07-30T14:35:51.129Z","op":"update","visit":"expeditions/e27@0","node":"d13","brief":"running preflight and the full suite in the e27 worktree"}
 {"ts":"2026-07-30T14:37:16.364Z","op":"done","visit":"expeditions/e27@0","node":"d3","brief":"CORS on /api/alive + host up-message; suite green"}
+{"ts":"2026-07-30T14:37:20.538Z","op":"done","visit":"expeditions/e27@0","node":"d4","brief":"shim proxies /mcp when a server walks the root; ATTACH rewritten"}
+{"ts":"2026-07-30T14:37:44.203Z","op":"update","visit":"expeditions/e27@0","node":"d14","brief":"refreshing the installed extension folder from trunk"}
+{"ts":"2026-07-30T14:37:58.416Z","op":"update","visit":"expeditions/e27@0","node":"d15","brief":"starting code serve-web on 8300 as the agent's window"}
+{"ts":"2026-07-30T14:40:20.276Z","op":"update","visit":"expeditions/e27@0","node":"d16","brief":"serve-web has no duck: hunting its extensions dir"}
+{"ts":"2026-07-30T14:40:40.380Z","op":"update","visit":"expeditions/e27@0","node":"d17","brief":"extension copied into the serve-web extensions dir"}
+{"ts":"2026-07-30T14:42:38.789Z","op":"update","visit":"expeditions/e27@0","node":"d18","brief":"serve-web restarted for a clean extension scan"}
+{"ts":"2026-07-30T14:45:56.998Z","op":"update","visit":"expeditions/e27@0","node":"d19","brief":"stale extensions.user.cache suspected; deleting and restarting"}
+{"ts":"2026-07-30T14:46:39.019Z","op":"update","visit":"expeditions/e27@0","node":"d20","brief":"extensionKind workspace: the shell runs where the project lives"}
+{"ts":"2026-07-30T14:48:56.000Z","op":"update","visit":"expeditions/e27@0","node":"d21","brief":"folder drop ignored by web workbench; building a real vsix"}
+{"ts":"2026-07-30T14:49:51.368Z","op":"update","visit":"expeditions/e27@0","node":"d22","brief":"installing the vsix through the server's own CLI"}
+{"ts":"2026-07-30T14:50:20.861Z","op":"update","visit":"expeditions/e27@0","node":"d23","brief":"vsix installed clean; server back up for the look"}
+{"ts":"2026-07-30T14:53:40.486Z","op":"done","visit":"expeditions/e27@0","node":"d5","brief":"right bar has no API — ATTACH documents the one remembered drag"}
+{"ts":"2026-07-30T14:54:17.987Z","op":"update","visit":"expeditions/e27@0","node":"d24","brief":"checking the CORS header on the worktree engine directly"}
+{"ts":"2026-07-30T14:55:48.906Z","op":"done","visit":"expeditions/e27@0","node":"d6","brief":"console card absent at ?embed=1 — seen live on the worktree mirror"}
+{"ts":"2026-07-30T14:57:03.920Z","op":"done","visit":"expeditions/e27@0","node":"d7","brief":"play button built and suite-green; the click proof is the owner's"}

@@ -1,6 +1,11 @@
 # Quackitect in VS Code
 
-The Quackitect button in the left bar opens the mirror. The mirror is the
+The Quackitect button in the left bar opens the mirror. Prefer it on the
+RIGHT? Drag the duck icon into the right side bar once — VS Code
+remembers the spot. No setting or API can preset this; the drag is the
+way.
+
+The mirror is the
 live picture of the project: the machine drawing, the log, and the details
 pane. Clicking a record in it opens the real file in the editor.
 
