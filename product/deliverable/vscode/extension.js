@@ -57,6 +57,7 @@ let logRows = [];
 let logFilter = "";
 let logAnchored = false;
 let logSeq = 0;
+let lastWalk = "";
 const logSeen = new Set();
 /** The subject details is showing — what an expanded copy is a snapshot OF. */
 let lastDetails = null;
@@ -268,9 +269,17 @@ async function pollWalk() {
   if (levels === null) levels = await api("/api/levels");
   const p = await api("/api/tick");
   if (p === null) return;
+  const moved = JSON.stringify(p.active ?? null) + "|" + String(p.status) !== lastWalk;
+  lastWalk = JSON.stringify(p.active ?? null) + "|" + String(p.status);
   packet = p;
   if (controls !== null) controls.send();
   if (logTerm !== null) await pollLog();
+  // THE CARDS ARE WOKEN FROM HERE, because they no longer hold a stream of
+  // their own. One poll over Node replaces one browser socket per card.
+  if (moved) {
+    if (detailsView !== null) detailsView.post({ quackitect: "wake" });
+    for (const w of windows.values()) w.post({ quackitect: "wake" });
+  }
 }
 
 function startPolling() {
@@ -368,6 +377,7 @@ function framePage(url) {
     if (d.quackitect === "details") { vsapi.postMessage(d); return; } // a click in THIS card, bound for the details group
     if (d.quackitect === "theme-changed") { sendTheme(); return; }
     if (d.quackitect === "up") { show(); return; }
+    if (d.quackitect === "wake") { if (loaded && frame.contentWindow) frame.contentWindow.postMessage(d, "*"); return; }
     if (d.quackitect === "help" || d.quackitect === "logref") {
       vsapi.postMessage({ quackitect: "trace", text: "relay " + d.quackitect + " loaded=" + loaded + " frame=" + (frame.contentWindow ? "yes" : "no") });
       if (loaded && frame.contentWindow) frame.contentWindow.postMessage(d, "*");

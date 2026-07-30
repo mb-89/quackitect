@@ -1099,6 +1099,8 @@ window.addEventListener("message", (ev) => {
   // HELP IS A DETAIL, NEVER A BUTTON (ux rule). A host with an icon strip
   // has no room to explain itself, so what an icon means arrives HERE, in
   // the details pane, the one place the reader already looks for meaning.
+  // The host saw the walk move. Embedded, this replaces the event stream.
+  if (d.quackitect === "wake") { refresh(); return; }
   if (d.quackitect === "help") { hostTrace("page got help"); showDetails(d.title, d.html); return; }
   // A LOG LINE CLICKED IN THE HOST'S TERMINAL. The record is rendered HERE,
   // by the same code the mirror uses, so a host never grows a second
@@ -1913,7 +1915,15 @@ let ACTIVE_AT_RENDER = JSON.stringify(D.describe.active || []);
 let sawError = false;
 let deathTimer = null;
 // A frozen window never opens the stream — that is the whole of freezing.
-if (!FROZEN) {
+//
+// AND NEITHER DOES AN EMBEDDED CARD. A browser allows only a handful of
+// connections to one host, and a permanent event stream per card ate one
+// each. Past that limit EVERY other request to the engine queues instead of
+// going out — so a click did nothing at all, and then four minutes later the
+// whole backlog arrived at once. The host polls the engine over its own
+// runtime, where no such limit applies, and wakes the cards through the
+// channel they already have.
+if (!FROZEN && window.parent === window) {
 const es = new EventSource("/events");
 es.addEventListener("open", () => {
   if (deathTimer !== null) { clearTimeout(deathTimer); deathTimer = null; }
