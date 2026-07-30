@@ -1674,6 +1674,9 @@ function hostTrace(what) {
 // simply does nothing — which is the hardest fault to chase.
 window.addEventListener("error", (e) => hostTrace("ERROR " + (e.message || "?") + " @" + (e.lineno || 0)));
 window.addEventListener("unhandledrejection", (e) => hostTrace("REJECTED " + String((e.reason && e.reason.message) || e.reason || "?")));
+// WHICH PAGE THIS ACTUALLY IS. A navigation that fires and then lands on the
+// wrong thing looks identical, from outside, to one that never fired.
+hostTrace("loaded " + location.pathname + location.search);
 function hostBusy(on, label) {
   if (window.parent !== window) window.parent.postMessage({ quackitect: "busy", on: on, label: label || "" }, "*");
 }

@@ -50,6 +50,7 @@ let logTerm = null;
 let logEmitter = null;
 let logRows = [];
 let logFilter = "";
+let logAnchored = false;
 /** The subject details is showing — what an expanded copy is a snapshot OF. */
 let lastDetails = null;
 const snapshots = new Set();
@@ -976,9 +977,10 @@ function makeLogTerminal(parent) {
   // terminal launch, another window — split beside whatever terminal is
   // there, because a log in a group of its own is the one place it must not
   // be. Only with no terminal at all does it stand alone.
-  const anchor = parent ?? vscode.window.activeTerminal ?? vscode.window.terminals[0] ?? null;
-  if (anchor !== null && anchor !== undefined) opts.location = { parentTerminal: anchor };
-  trace("log terminal: anchor=" + (anchor === null || anchor === undefined ? "none" : anchor.name));
+  const anchor = parent ?? vscode.window.activeTerminal ?? vscode.window.terminals.find((t) => t !== logTerm) ?? null;
+  logAnchored = anchor !== null && anchor !== undefined;
+  if (logAnchored) opts.location = { parentTerminal: anchor };
+  trace("log terminal: anchor=" + (logAnchored ? anchor.name : "none"));
   logTerm = vscode.window.createTerminal(opts);
   return logTerm;
 }
@@ -1116,6 +1118,14 @@ function activate(context) {
         trace("link clicked ref=" + String(link.ref));
         void showLogRef(link.ref);
       },
+    }),
+    // A LOG THAT HAD NOTHING TO SIT BESIDE gets re-split the moment a terminal
+    // appears. Otherwise it stays in a group of its own forever, which is what
+    // happens whenever the agent was started outside this window.
+    vscode.window.onDidOpenTerminal((t) => {
+      if (logTerm === null || t === logTerm || logAnchored) return;
+      trace("log re-splitting beside " + t.name);
+      void showLog(true);
     }),
     vscode.window.onDidCloseTerminal((t) => {
       if (t === agentTerm) agentTerm = null;
