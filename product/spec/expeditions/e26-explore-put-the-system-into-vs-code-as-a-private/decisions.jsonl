@@ -24,3 +24,7 @@
 {"ts":"2026-07-30T14:06:23.033Z","op":"update","visit":"expeditions/e26@0","node":"d25","brief":"fixing two stale assertions inherited from the local-fixes commit"}
 {"ts":"2026-07-30T14:06:26.152Z","op":"update","visit":"expeditions/e26@0","node":"d26","brief":"re-running preflight and the full suite"}
 {"ts":"2026-07-30T14:07:36.862Z","op":"done","visit":"expeditions/e26@0","node":"d7","brief":"palette variables in — suite confirms the mirror renders"}
+{"ts":"2026-07-30T14:07:53.808Z","op":"update","visit":"expeditions/e26@0","node":"d27","brief":"landing e26 on trunk"}
+{"ts":"2026-07-30T14:08:00.075Z","op":"update","visit":"expeditions/e26@0","node":"d28","brief":"installing the extension folder into the user's VS Code"}
+{"ts":"2026-07-30T14:15:02.894Z","op":"done","visit":"expeditions/e26@0","node":"d11","brief":"folder install proven in the user's VS Code; vsix deferred to vsce"}
+{"ts":"2026-07-30T14:15:06.869Z","op":"done","visit":"expeditions/e26@0","node":"d12","brief":"suite 226 green and six commits landed on trunk"}
