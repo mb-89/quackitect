@@ -10,7 +10,8 @@ import { dirname, join } from "node:path";
 import { spawnSync } from "node:child_process";
 import { nodeSize, type CanvasData, type CanvasEdge, type CanvasElement } from "./canvas.ts";
 import { CLAUSES, Rejection } from "./errors.ts";
-import { validateMachine, type MachineDecl, type StateDecl } from "./machine.ts";
+import { validateMachine, type EvidenceField, type MachineDecl, type StateDecl } from "./machine.ts";
+import { CHANGE_COLUMNS, compileColumn, matrixContentHash, readMatrix, type ChangeColumn } from "./matrix.ts";
 import { parseStateNote } from "./notes.ts";
 import { buildArchive, type GeneratedMachine } from "./expmachine.ts";
 import { slug, worktreesDir } from "./worktree.ts";
@@ -157,6 +158,66 @@ export function markStarted(root: string, it: Iteration): void {
   git(it.path, ["commit", "-q", "-m", `iteration ${it.id}: started`], "commit");
 }
 
+export function itPinRel(id: string): string {
+  return `product/spec/iterations/${id}/machines/seeded.json`;
+}
+
+const SIZE_ORDER = ["patch", "minor", "major"];
+
+/** THE PIN (owner verdicts 2026-07-30): the kickoff bless compiles the
+ *  blessed change size from the LIVE matrix and pins the machine into the
+ *  record with the matrix content hash. Matrix edits reach the NEXT
+ *  kickoff, never a running walk; drift stays silent until asked.
+ *  Escalation = re-pinning with a LARGER size — monotonicity guarantees
+ *  every filled state survives. De-escalation is refused: a prediction
+ *  that proved too big is finished at its size. */
+export function pinIteration(root: string, it: Iteration, changeSize: string): Record<string, unknown> {
+  if (!(CHANGE_COLUMNS as readonly string[]).includes(changeSize)) {
+    throw new Rejection({
+      clause: CLAUSES.REQUIRED_ARGS,
+      expected: `a change size: ${CHANGE_COLUMNS.join(" | ")}`,
+      got: changeSize,
+      remedy: { tool: "se_tick", args: {}, note: "the kickoff's change_size field carries the choice" },
+      source: SRC,
+    });
+  }
+  const pinAbs = join(it.path, itPinRel(it.id));
+  if (existsSync(pinAbs)) {
+    const prev = parsePin(readFileSync(pinAbs, "utf8"));
+    const from = SIZE_ORDER.indexOf(String(prev.change_size));
+    const to = SIZE_ORDER.indexOf(changeSize);
+    if (to <= from) {
+      throw new Rejection({
+        clause: CLAUSES.CONDITION_UNMET,
+        expected: `an ESCALATION — the pin stands at ${String(prev.change_size)}, and only a larger size re-opens it; a prediction that proved too big is finished at its size`,
+        got: changeSize,
+        remedy: { tool: "se_tick", args: {}, note: "walk the pinned machine as it stands" },
+        source: SRC,
+      });
+    }
+  }
+  const machine = compileColumn(readMatrix(root), changeSize as ChangeColumn);
+  const pin = {
+    change_size: changeSize,
+    matrix_hash: matrixContentHash(root),
+    pinned_at: new Date().toISOString(),
+    machine,
+  };
+  mkdirSync(dirname(pinAbs), { recursive: true });
+  writeFileSync(pinAbs, JSON.stringify(pin, null, 2), "utf8");
+  git(it.path, ["add", "-A"], "add");
+  git(it.path, ["commit", "-q", "-m", `iteration ${it.id}: pin ${changeSize}`], "commit");
+  return { pinned: changeSize, matrix_hash: pin.matrix_hash, states: machine.states.length };
+}
+
+function parsePin(raw: string): { change_size?: string } {
+  try {
+    return JSON.parse(raw) as { change_size?: string };
+  } catch {
+    return {};
+  }
+}
+
 export function itShortId(itId: string): string {
   const m = itId.match(/^(i\d+)-/);
   return m ? m[1] : itId;
@@ -183,6 +244,15 @@ export function generateIterations(root: string): GeneratedMachine {
   };
   const states: StateDecl[] = [start];
   const expByState: Record<string, string> = {};
+  // The kickoff's evidence form is the matrix's OWN gate-kickoff row, read
+  // live (seed-from-source). An unreadable matrix never takes the
+  // container down — the kickoff then serves without a form.
+  let kickoffEvidence: EvidenceField[] = [];
+  try {
+    kickoffEvidence = readMatrix(root).rows.find((r) => r.name === "gate-kickoff")?.evidence_form ?? [];
+  } catch {
+    kickoffEvidence = [];
+  }
   type GenNode = CanvasElement & { styleAttributes?: Record<string, unknown> };
   const nodes: GenNode[] = [];
   const edges: CanvasEdge[] = [];
@@ -200,8 +270,8 @@ export function generateIterations(root: string): GeneratedMachine {
       kind: "work",
       statement: goal,
       guidance:
-        "KICKOFF — one brief carries plan and rigor; the owner blesses, and past it the iteration is set. Its outcome seeds the REST of this machine (the iteration lane builds that next). Goal, vision and inputs live in the record.",
-      evidence_form: [],
+        "KICKOFF — one brief carries plan and rigor; the owner blesses, and past it the iteration is set. The bless SEEDS the rest: the engine compiles the blessed change_size from the live matrix and pins the machine into the record. Goal, vision and inputs live in the record.",
+      evidence_form: kickoffEvidence,
       priority: 0.6,
       ...(started ? {} : { entry: { no_pending_note: ["needs retro"] } }),
       tags: ["iteration-kickoff"],

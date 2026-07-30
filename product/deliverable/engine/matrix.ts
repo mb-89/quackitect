@@ -6,6 +6,7 @@
 // compiles a change-size column into an iteration machine the kernel can
 // run. Struck states (applies: none) vanish; their dependencies CONTRACT
 // through them, so the seeded machine stays connected.
+import { createHash } from "node:crypto";
 import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { parseStateNote, section } from "./notes.ts";
@@ -87,6 +88,21 @@ function parseEvidence(fm: Record<string, unknown>, file: string, body: string):
 
 export function matrixDir(root: string): string {
   return join(root, "product", "deliverable", "machines", "matrix");
+}
+
+/** The matrix CONTENT hash — a pin records it, so drift between a pinned
+ *  machine and the live matrix stays detectable (and silent until asked —
+ *  owner verdict 2026-07-30). Data only; the Bases view is presentation. */
+export function matrixContentHash(root: string): string {
+  const dir = matrixDir(root);
+  const h = createHash("sha256");
+  for (const sub of ["rows", "cells"]) {
+    for (const file of readdirSync(join(dir, sub)).filter((f) => f.endsWith(".md")).sort()) {
+      h.update(`${sub}/${file}\n`);
+      h.update(readFileSync(join(dir, sub, file)));
+    }
+  }
+  return h.digest("hex").slice(0, 12);
 }
 
 export function readMatrix(root: string): Matrix {

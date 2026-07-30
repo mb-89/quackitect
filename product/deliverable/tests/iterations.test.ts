@@ -7,7 +7,8 @@ import { spawnSync } from "node:child_process";
 import { readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { test } from "node:test";
-import { generateIterations, itSeed } from "../engine/iterations.ts";
+import { generateIterations, itPinRel, itSeed, pinIteration } from "../engine/iterations.ts";
+import { validateMachine, type MachineDecl } from "../engine/machine.ts";
 import { Session } from "../engine/session.ts";
 import { buildServer } from "../engine/tools.ts";
 import { call, freshRoot, readHashesFor } from "./helpers.ts";
@@ -64,6 +65,44 @@ test("the graph is evidence: an open decision point blocks the leave form", () =
   s.decisions.apply(`${sid}@0`, { op: "done", node: node.id, brief: "resolved" });
   lint = s.formGet("expedition-leave") as { met: boolean; problems: string[] };
   assert.equal(lint.met, true, JSON.stringify(lint.problems));
+});
+
+test("the pin: the bless compiles the change size live; escalation only grows it", () => {
+  const root = freshRoot();
+  gitInit(root);
+  const it = itSeed(root, "pin the machine", "the kickoff compiles and pins");
+  const res = pinIteration(root, it, "patch") as { pinned: string; matrix_hash: string };
+  assert.equal(res.pinned, "patch");
+  assert.match(res.matrix_hash, /^[0-9a-f]{12}$/);
+  const pin = JSON.parse(readFileSync(join(it.path, itPinRel(it.id)), "utf8")) as {
+    change_size: string;
+    matrix_hash: string;
+    machine: MachineDecl;
+  };
+  assert.equal(pin.change_size, "patch");
+  validateMachine(pin.machine);
+  // ESCALATION re-pins larger — monotonicity: every patch state survives.
+  const patchIds = pin.machine.states.map((s) => s.id);
+  pinIteration(root, it, "minor");
+  const pin2 = JSON.parse(readFileSync(join(it.path, itPinRel(it.id)), "utf8")) as { machine: MachineDecl };
+  for (const id of patchIds) {
+    assert.ok(pin2.machine.states.some((s) => s.id === id), `${id} was filled at patch and must survive the escalation`);
+  }
+  // DE-ESCALATION (and a same-size re-pin) refused — drift never reaches a running walk.
+  assert.throws(() => pinIteration(root, it, "patch"), /ESCALATION/);
+  assert.throws(() => pinIteration(root, it, "minor"), /ESCALATION/);
+  // An unknown size refuses with the vocabulary.
+  assert.throws(() => pinIteration(root, it, "product"), /patch \| minor \| major/);
+});
+
+test("the kickoff serves the matrix's live evidence form", () => {
+  const root = freshRoot();
+  gitInit(root);
+  itSeed(root, "the form rides", "the kickoff carries the gate fields");
+  const gen = generateIterations(root);
+  const kick = gen.decl.states.find((s) => s.id === "i1")!;
+  assert.ok(kick.evidence_form.some((f) => f.name === "change_size" && f.required));
+  assert.ok(kick.evidence_form.some((f) => f.name === "retro_drained" && f.killer === true));
 });
 
 test("the seed refuses a missing vision — the seed is a small form", () => {
