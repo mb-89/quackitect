@@ -140,3 +140,10 @@
 {"ts":"2026-07-30T08:24:19.258Z","op":"done","visit":"expeditions/e25@0","node":"d22","brief":"the pinned walk serves the chunk machine through its subGen"}
 {"ts":"2026-07-30T08:24:24.936Z","op":"done","visit":"expeditions/e25@0","node":"d20","brief":"runs field landed in row and compiler"}
 {"ts":"2026-07-30T08:25:58.692Z","op":"done","visit":"expeditions/e25@0","node":"d23","brief":"217 green, chunk machine proven"}
+{"ts":"2026-07-30T08:30:30.499Z","op":"plan","visit":"expeditions/e25@0","parent":null,"nodes":[{"id":"d24","brief":"read the authoring rows' cell profiles"},{"id":"d25","brief":"two run rows with their ten cells"},{"id":"d26","brief":"generalize the seeded machine to spikes and candidates"},{"id":"d27","brief":"retarget the downstream dependencies"},{"id":"d28","brief":"tests and counts catch up"}]}
+{"ts":"2026-07-30T08:31:45.950Z","op":"done","visit":"expeditions/e25@0","node":"d24","brief":"profiles read: spikes mirror rank-unknowns, candidates enumerate-space"}
+{"ts":"2026-07-30T08:31:56.314Z","op":"update","visit":"expeditions/e25@0","node":"d29","brief":"writing the ten run-row cells"}
+{"ts":"2026-07-30T08:33:19.156Z","op":"done","visit":"expeditions/e25@0","node":"d26","brief":"one generator serves chunks, spikes and candidates"}
+{"ts":"2026-07-30T08:34:52.521Z","op":"done","visit":"expeditions/e25@0","node":"d27","brief":"fold-back and evaluate-set now follow the run states"}
+{"ts":"2026-07-30T08:34:57.472Z","op":"done","visit":"expeditions/e25@0","node":"d25","brief":"rows and cells stand, battery running"}
+{"ts":"2026-07-30T08:36:15.765Z","op":"done","visit":"expeditions/e25@0","node":"d28","brief":"218 green including the none pass-through"}

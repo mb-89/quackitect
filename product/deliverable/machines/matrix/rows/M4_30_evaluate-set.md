@@ -5,7 +5,7 @@ statement: "Evaluate the candidate set: multi-objective scores, the Pareto front
 state_kind: work
 filled_by: agent
 depends_on:
-  - enumerate-space
+  - run-candidates
   - derive-criteria
 evidence:
   - name: scores

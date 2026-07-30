@@ -5,7 +5,7 @@ statement: "Fold the spike evidence back: the design advances; the ripple reopen
 state_kind: work
 filled_by: agent
 depends_on:
-  - rank-unknowns
+  - run-spikes
 evidence:
   - name: folded
     description: "what each spike's evidence changed upstream"

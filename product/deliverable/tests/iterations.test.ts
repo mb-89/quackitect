@@ -7,7 +7,7 @@ import { spawnSync } from "node:child_process";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { test } from "node:test";
-import { generateChunks, generateIterations, itChunksRel, itPinRel, itSeed, pinIteration } from "../engine/iterations.ts";
+import { generateIterations, generateSeeded, itPinRel, itSeed, itSeededRel, pinIteration } from "../engine/iterations.ts";
 import { validateMachine, type MachineDecl } from "../engine/machine.ts";
 import { readMatrix } from "../engine/matrix.ts";
 import { Session } from "../engine/session.ts";
@@ -101,8 +101,8 @@ test("the chunk machine: refused when unseeded, compiled with realization tags a
   gitInit(root);
   const it = itSeed(root, "chunks compile", "the drawing becomes the machine");
   // Unseeded: the typed refusal, never a plain serve.
-  assert.throws(() => generateChunks(root, it, "build-steps"), /without visible steps/);
-  const abs = join(it.path, itChunksRel(it.id));
+  assert.throws(() => generateSeeded(root, it, "build-steps", "build-chunks"), /without visible steps/);
+  const abs = join(it.path, itSeededRel(it.id, "build-chunks"));
   mkdirSync(dirname(abs), { recursive: true });
   writeFileSync(
     abs,
@@ -128,7 +128,7 @@ test("the chunk machine: refused when unseeded, compiled with realization tags a
     ].join("\n"),
     "utf8",
   );
-  const g = generateChunks(root, it, "build-steps");
+  const g = generateSeeded(root, it, "build-steps", "build-chunks");
   validateMachine(g.decl);
   const core = g.decl.states.find((s) => s.id === "core")!;
   assert.deepEqual(core.tags, ["realization-software"], "the realization kind is the tag the pull serves");
@@ -137,6 +137,22 @@ test("the chunk machine: refused when unseeded, compiled with realization tags a
   assert.deepEqual(docs.tags, ["realization-document"]);
   assert.deepEqual(docs.edges, [{ to: "all-built", role: "normal" }]);
   assert.equal(g.decl.states.find((s) => s.id === "all-built")?.kind, "join", "one finished chunk is not a finished build");
+});
+
+test("an explicit none in the drawing passes the run state without ceremony", () => {
+  const root = freshRoot();
+  gitInit(root);
+  const it = itSeed(root, "no unknowns", "zero spikes is a normal outcome");
+  const abs = join(it.path, itSeededRel(it.id, "spikes"));
+  mkdirSync(dirname(abs), { recursive: true });
+  // Empty WITHOUT a reason: refused — absence must say why.
+  writeFileSync(abs, "---\nsteps: []\n---\n", "utf8");
+  assert.throws(() => generateSeeded(root, it, "run-spikes", "spikes"), /absence must say why|at least one step/);
+  // Empty WITH the reason: a trivial pass-through carrying it.
+  writeFileSync(abs, '---\nsteps: []\nnone: "no unknowns worth a spike"\n---\n', "utf8");
+  const g = generateSeeded(root, it, "run-spikes", "spikes");
+  assert.deepEqual(g.decl.states.map((s) => s.id), ["start", "end"]);
+  assert.match(g.decl.states[0].guidance, /no unknowns worth a spike/);
 });
 
 test("escalation reopens exactly the grown steps", () => {

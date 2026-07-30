@@ -242,7 +242,7 @@ export function compileColumn(matrix: Matrix, column: ChangeColumn): MachineDecl
       ...(row.command ? { command: row.command } : {}),
       guidance: [cell.body, row.guidance].filter(Boolean).join("\n\n"),
       evidence_form: row.evidence_form,
-      ...(row.runs ? { submachine: "generated" } : {}),
+      ...(row.runs ? { submachine: row.runs } : {}),
       priority: priorityOf(row),
       edges: edgesFrom.get(row.name) ?? [],
     });

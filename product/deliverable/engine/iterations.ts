@@ -162,38 +162,38 @@ export function itPinRel(id: string): string {
   return `product/spec/iterations/${id}/machines/seeded.json`;
 }
 
-export function itChunksRel(id: string): string {
-  return `product/spec/iterations/${id}/machines/chunks.md`;
+export function itSeededRel(id: string, kind: string): string {
+  return `product/spec/iterations/${id}/machines/${kind}.md`;
 }
 
-/** THE CHUNK MACHINE (owner design 2026-07-30): plan-build AUTHORS the
- *  chunk drawing as markdown data in the record; build-steps RUNS it — the
- *  walk descends into this compiled machine. Each chunk's realization kind
- *  becomes a TAG on its state, so the existing tag-pull serves each
- *  builder its discipline's guidance (software pulls software guidance, a
- *  document pulls documentation guidance). An absent or empty drawing is a
- *  TYPED REFUSAL, never a plain serve — a build without visible steps is
- *  a defect. */
+/** THE SEEDED MACHINE (owner design 2026-07-30): an authoring state writes
+ *  the drawing as markdown data in the record (machines/<kind>.md), and the
+ *  matching runs-state descends into its compilation — build-chunks, spikes
+ *  and candidates all share this one shape. Each step's realization kind
+ *  becomes a TAG on its state, so the existing tag-pull serves each builder
+ *  its discipline's guidance. An absent or empty drawing is a TYPED
+ *  REFUSAL, never a plain serve — unless it carries an explicit none with
+ *  its reason, which passes the run state without ceremony. */
 function chunkList(v: unknown): string[] {
   if (Array.isArray(v)) return v.map(String);
   if (typeof v === "string" && v.trim() !== "") return v.split(",").map((s) => s.trim());
   return [];
 }
 
-export function generateChunks(root: string, it: Iteration, machineId: string): GeneratedMachine {
-  const abs = join(it.path, itChunksRel(it.id));
-  const scaffold = "---\nchunks:\n  - id: <chunk>\n    statement: \"<what this chunk builds>\"\n    depends_on: []\n    realization: software\n---\n";
+export function generateSeeded(root: string, it: Iteration, machineId: string, kind: string): GeneratedMachine {
+  const abs = join(it.path, itSeededRel(it.id, kind));
+  const scaffold = '---\nsteps:\n  - id: <step>\n    statement: "<what this step builds or settles>"\n    depends_on: []\n    realization: software\n---\n';
   if (!existsSync(abs)) {
     throw new Rejection({
       clause: CLAUSES.CONDITION_UNMET,
-      expected: "a seeded chunk drawing — plan-build writes machines/chunks.md (frontmatter chunks: id, statement, depends_on, realization)",
-      got: "no chunks.md in the iteration record — a build without visible steps is a defect",
-      remedy: { tool: "se_file_write", args: { path: itChunksRel(it.id), content: scaffold, base_hash: null }, note: "seed the drawing at plan-build, then tick again" },
+      expected: `a seeded drawing — the authoring state writes ${itSeededRel(it.id, kind)} (frontmatter steps: id, statement, depends_on, realization — or none: "<why nothing runs>")`,
+      got: `no ${kind}.md in the iteration record — a run without visible steps is a defect`,
+      remedy: { tool: "se_file_write", args: { path: itSeededRel(it.id, kind), content: scaffold, base_hash: null }, note: "seed the drawing at the authoring state, then tick again" },
       source: SRC,
     });
   }
   const fm = parseStateNote(readFileSync(abs, "utf8")).frontmatter;
-  const raw = Array.isArray(fm.chunks) ? fm.chunks : [];
+  const raw = Array.isArray(fm.steps) ? fm.steps : Array.isArray(fm.chunks) ? fm.chunks : [];
   interface Chunk {
     id: string;
     statement: string;
@@ -205,9 +205,9 @@ export function generateChunks(root: string, it: Iteration, machineId: string): 
     if (typeof c.id !== "string" || c.id.trim() === "") {
       throw new Rejection({
         clause: CLAUSES.CONDITION_UNMET,
-        expected: `chunk ${i + 1} declares an id`,
-        got: "a chunk without an id",
-        remedy: { tool: "se_file_read", args: { path: itChunksRel(it.id) }, note: "every chunk carries id, statement, depends_on, realization" },
+        expected: `step ${i + 1} declares an id`,
+        got: "a step without an id",
+        remedy: { tool: "se_file_read", args: { path: itSeededRel(it.id, kind) }, note: "every step carries id, statement, depends_on, realization" },
         source: SRC,
       });
     }
@@ -219,11 +219,26 @@ export function generateChunks(root: string, it: Iteration, machineId: string): 
     };
   });
   if (chunks.length === 0) {
+    // AN EXPLICIT NONE passes the run state without ceremony — zero spikes
+    // is a normal outcome when the drawing says WHY (the explicit-absence law).
+    if (typeof fm.none === "string" && fm.none.trim() !== "") {
+      const decl: MachineDecl = {
+        id: machineId,
+        reentry: "resume",
+        initial: "start",
+        states: [
+          { id: "start", kind: "start", statement: "", guidance: `Nothing was seeded, explicitly: ${fm.none}`, evidence_form: [], priority: 0.01, edges: [{ to: "end", role: "normal" }] },
+          { id: "end", kind: "end", statement: "", guidance: "The explicit none is recorded — tick once more to return to the walk.", evidence_form: [], priority: 0.01, edges: [] },
+        ],
+      };
+      validateMachine(decl);
+      return { decl, canvas: pinnedCanvas(decl), expByState: {} };
+    }
     throw new Rejection({
       clause: CLAUSES.CONDITION_UNMET,
-      expected: "at least one chunk in the drawing",
-      got: "chunks.md carries an empty chunks list",
-      remedy: { tool: "se_file_patch", args: { ops: [{ path: itChunksRel(it.id), old_string: "chunks:", new_string: "chunks:\n  - id: <chunk>" }] }, note: "a build without visible steps is a defect" },
+      expected: 'at least one step in the drawing, or an explicit none: "<why nothing runs>"',
+      got: `${kind}.md carries an empty steps list with no reason`,
+      remedy: { tool: "se_file_patch", args: { ops: [{ path: itSeededRel(it.id, kind), old_string: "steps:", new_string: "steps:\n  - id: <step>" }] }, note: "a run without visible steps is a defect — absence must say why" },
       source: SRC,
     });
   }
@@ -480,7 +495,7 @@ export function generateIterations(root: string): GeneratedMachine {
         // The walk's own seed points: a state that RUNS a seeded machine
         // descends into it here — or refuses typed when nothing was seeded.
         subGen: Object.fromEntries(
-          m.states.filter((s) => s.submachine === "generated").map((s) => [s.id, () => generateChunks(root, it, s.id)]),
+          m.states.filter((s) => s.submachine !== undefined).map((s) => [s.id, () => generateSeeded(root, it, s.id, s.submachine!)]),
         ),
       });
     }

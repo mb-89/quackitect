@@ -14,7 +14,7 @@ const ROOT = join(import.meta.dirname, "..", "..", "..");
 
 test("readMatrix: the real matrix is complete", () => {
   const m = readMatrix(ROOT);
-  assert.equal(m.rows.length, 48);
+  assert.equal(m.rows.length, 50);
   for (const row of m.rows) {
     for (const col of ["patch", "minor", "major", "product", "specification"]) {
       const cell = m.cells.get(row.name)?.get(col);
@@ -45,11 +45,13 @@ test("compileColumn major: every row seeds; the machine validates", () => {
   const m = readMatrix(ROOT);
   const decl = compileColumn(m, "major");
   validateMachine(decl);
-  // 48 rows + the mechanical start.
-  assert.equal(decl.states.length, 49);
+  // 50 rows + the mechanical start.
+  assert.equal(decl.states.length, 51);
   // Only a state that RUNS a seeded machine descends; authoring states do not.
-  assert.ok(decl.states.some((s) => s.id === "build-steps" && s.submachine === "generated"));
-  assert.ok(decl.states.every((s) => s.id === "build-steps" || s.submachine === undefined));
+  assert.ok(decl.states.some((s) => s.id === "build-steps" && s.submachine === "build-chunks"));
+  assert.ok(decl.states.some((s) => s.id === "run-spikes" && s.submachine === "spikes"));
+  assert.ok(decl.states.some((s) => s.id === "run-candidates" && s.submachine === "candidates"));
+  assert.ok(decl.states.every((s) => s.submachine === undefined || ["build-steps", "run-spikes", "run-candidates"].includes(s.id)));
   const shipped = decl.states.find((s) => s.id === "shipped");
   assert.equal(shipped?.kind, "terminal");
 });
@@ -112,8 +114,8 @@ test("compileColumn minor: the tailoring strikes exactly the M4-M5 exploration",
   for (const struck of ["pressure-test", "derive-criteria", "partition-functions", "enumerate-space", "evaluate-set", "gate-candidates", "converge-pugh", "reverse-sensitivity"]) {
     assert.ok(!ids.has(struck), `minor should strike ${struck}`);
   }
-  // 40 applied rows + start.
-  assert.equal(decl.states.length, 41);
+  // 41 applied rows + start (run-spikes rides rank-unknowns into minor).
+  assert.equal(decl.states.length, 42);
 });
 
 test("the columns are monotone: what a smaller column walks, every larger column walks", () => {
