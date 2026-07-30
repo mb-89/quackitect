@@ -68,6 +68,10 @@ LAUNCH — read by RUNME.ps1 before the server starts.
                  manual mirror by command line AND by listening port (7333,
                  7334), kills each with its children, then checks the ports
                  really came free. Finding nothing running is a success.
+  --vscode       VS Code as the host: install VS Code if missing, place the
+                 extension (a folder copy — no marketplace), and open VS
+                 Code on workspace\\. The extension owns the server from
+                 there: engine npm install, attach configs, headless lane.
   --export <dir> copy the WORKING TREE into <dir> as a fresh single-commit
                  repository and exit, launching nothing. History stays home:
                  .git, .worktrees, .se, node_modules and the generated cage

@@ -135,8 +135,9 @@ test("the launcher detects its agent host, and Claude wins when both are there",
   const pick = /\$agentHost = "claude" \} elseif[^\r\n]*copilot[^\r\n]*\$agentHost = "copilot"/;
   assert.match(src, pick, "claude is tested FIRST, so it is the default when both answer");
   assert.match(src, /\$agentHost -eq "copilot"/, "and the launch branches on the host it found");
-  // Copilot has no opening-prompt argument, so the kickoff is typed in.
-  assert.match(src, /se-pty\.ts[^\r\n]*--send \$kickoff[^\r\n]*copilot/, "copilot gets its kickoff typed, because it takes none on the command line");
+  // Copilot takes the kickoff on its own command line: -i starts an
+  // interactive session and runs that text as its first turn.
+  assert.match(src, /copilot[^\r\n]*-i \$kickoff/, "copilot gets the kickoff on its command line, one command like claude");
 });
 
 // THE CAGE IS WHAT ENFORCES CONTRACT RULE 1. Claude's is a settings file;
@@ -149,5 +150,5 @@ test("each host gets a cage, and Copilot's flags live in data", () => {
   assert.match(src, /copilot-cage\.json[^\r\n]*|ConvertFrom-Json/, "and its deny flags are read from data, not hard-coded");
   const cage = JSON.parse(readFileSync(join(repoRoot, "workspace", "_cage", "copilot-cage.json"), "utf8")) as { _readme: string[]; deny_args: string[] };
   assert.ok(cage.deny_args.length > 0, "the cage denies something");
-  assert.ok(cage._readme.join(" ").includes("UNVERIFIED"), "and it says plainly that the flags were never run against a live CLI");
+  assert.ok(cage._readme.join(" ").includes("VERIFIED AGAINST A LIVE CLI"), "and it records that the flags were proven against a live CLI");
 });

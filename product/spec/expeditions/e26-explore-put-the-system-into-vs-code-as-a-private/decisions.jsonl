@@ -8,3 +8,19 @@
 {"ts":"2026-07-30T13:52:56.218Z","op":"update","visit":"expeditions/e26@0","node":"d15","brief":"HTTP transport and headless mode written into the engine"}
 {"ts":"2026-07-30T13:53:13.165Z","op":"update","visit":"expeditions/e26@0","node":"d16","brief":"contract tests for the HTTP lane written"}
 {"ts":"2026-07-30T13:53:19.454Z","op":"update","visit":"expeditions/e26@0","node":"d17","brief":"running the new HTTP-lane tests"}
+{"ts":"2026-07-30T13:54:28.588Z","op":"done","visit":"expeditions/e26@0","node":"d4","brief":"HTTP lane live — five contract tests green"}
+{"ts":"2026-07-30T13:55:53.005Z","op":"update","visit":"expeditions/e26@0","node":"d18","brief":"taking the hex inventory of the mirror stylesheet"}
+{"ts":"2026-07-30T13:58:03.750Z","op":"update","visit":"expeditions/e26@0","node":"d19","brief":"chrome hexes swapped for palette variables"}
+{"ts":"2026-07-30T13:58:18.532Z","op":"update","visit":"expeditions/e26@0","node":"d20","brief":"palette root and embed bridge added to the mirror page"}
+{"ts":"2026-07-30T13:58:42.544Z","op":"update","visit":"expeditions/e26@0","node":"d21","brief":"running the mirror-facing test files"}
+{"ts":"2026-07-30T14:00:05.764Z","op":"update","visit":"expeditions/e26@0","node":"d22","brief":"writing the extension shell while tests run"}
+{"ts":"2026-07-30T14:01:15.882Z","op":"update","visit":"expeditions/e26@0","node":"d23","brief":"extension manifest written"}
+{"ts":"2026-07-30T14:01:58.818Z","op":"done","visit":"expeditions/e26@0","node":"d6","brief":"record links open in the editor — bridge on both sides"}
+{"ts":"2026-07-30T14:02:12.004Z","op":"done","visit":"expeditions/e26@0","node":"d8","brief":"ATTACH.md written — opened on first activation and by command"}
+{"ts":"2026-07-30T14:02:49.606Z","op":"done","visit":"expeditions/e26@0","node":"d5","brief":"shell complete with manifest and host script"}
+{"ts":"2026-07-30T14:03:22.967Z","op":"done","visit":"expeditions/e26@0","node":"d9","brief":"first activation installs npm deps and writes attach configs"}
+{"ts":"2026-07-30T14:03:27.425Z","op":"done","visit":"expeditions/e26@0","node":"d10","brief":"RUNME --vscode bootstraps VS Code and the extension; classic path stays until proven"}
+{"ts":"2026-07-30T14:03:42.784Z","op":"update","visit":"expeditions/e26@0","node":"d24","brief":"running preflight and the full selftest suite"}
+{"ts":"2026-07-30T14:06:23.033Z","op":"update","visit":"expeditions/e26@0","node":"d25","brief":"fixing two stale assertions inherited from the local-fixes commit"}
+{"ts":"2026-07-30T14:06:26.152Z","op":"update","visit":"expeditions/e26@0","node":"d26","brief":"re-running preflight and the full suite"}
+{"ts":"2026-07-30T14:07:36.862Z","op":"done","visit":"expeditions/e26@0","node":"d7","brief":"palette variables in — suite confirms the mirror renders"}

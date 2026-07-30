@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "se": {
+      "type": "http",
+      "url": "http://localhost:7333/mcp"
+    }
+  }
+}

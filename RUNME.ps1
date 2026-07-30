@@ -18,6 +18,8 @@ list. Run .\RUNME.ps1 --help.
 .EXAMPLE
 .\RUNME.ps1 --own-terminal
 .EXAMPLE
+.\RUNME.ps1 --vscode
+.EXAMPLE
 .\RUNME.ps1 --kill
 #>
 $ErrorActionPreference = "Stop"
@@ -228,6 +230,26 @@ Write-Host "  node $nodeVersion  OK"
 # git is a HARD dependency (ref search runs through git grep; v3 is a branch of quack).
 if (-not (Ensure-Tool "git" "Git.Git" "git")) { exit 1 }
 Write-Host "  $((git --version))  OK"
+
+# VS CODE IS THE HOST (owner, 2026-07-30). Ensure VS Code, put the extension
+# in place, open the workspace - the extension owns the rest: the server,
+# the attach configs, the engine's npm install. A session already running is
+# fine - the extension attaches to it instead of spawning a second one.
+if ($forwarded | Where-Object { $_ -eq "--vscode" }) {
+  if (-not (Ensure-Tool "code" "Microsoft.VisualStudioCode" "VS Code")) { exit 1 }
+  $extSrc = Join-Path $root "product\deliverable\vscode"
+  $extDest = Join-Path $env:USERPROFILE ".vscode\extensions\quackitect.quackitect-0.1.0"
+  New-Item -ItemType Directory -Force -Path $extDest | Out-Null
+  robocopy $extSrc $extDest /MIR /NFL /NDL /NJH /NJS /NP | Out-Null
+  if ($LASTEXITCODE -ge 8) {
+    Write-Host "extension copy FAILED (robocopy $LASTEXITCODE)" -ForegroundColor Red
+    exit 1
+  }
+  Write-Host "  extension in place - $extDest" -ForegroundColor Green
+  Write-Host "quackitect v3 - opening VS Code on workspace\ - the extension takes it from here" -ForegroundColor Cyan
+  code (Join-Path $root "workspace")
+  exit 0
+}
 
 # A SESSION ALREADY RUNNING must be seen BEFORE launching over it (owner,
 # 2026-07-30). The mirror losing its port only WARNS, so a stale server

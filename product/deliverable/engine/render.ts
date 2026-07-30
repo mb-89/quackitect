@@ -405,17 +405,22 @@ const SHUTDOWN_LEVELS = [
 ];
 
 const STYLE = `
-  * { scrollbar-color: #3a4147 #14171a; }
-  ::-webkit-scrollbar { width: 10px; height: 10px; background: #14171a; }
-  ::-webkit-scrollbar-thumb { background: #3a4147; border-radius: 5px; }
-  body { font-family: ui-monospace, Consolas, monospace; background: #14171a; color: #d8dde2; margin: 0; height: 100vh; overflow: hidden; }
+  /* THE CHROME PALETTE — one place. A hosting webview (the VS Code
+     extension) overrides these from the editor theme; semantic colors
+     (green pass, red fail, yellow attention) are meaning, not chrome,
+     and stay fixed. */
+  :root { --se-bg:#14171a; --se-bg-side:#191d21; --se-raised:#22272c; --se-border:#2a2f34; --se-border-strong:#3a4147; --se-fg:#d8dde2; --se-muted:#7f8b96; --se-dim:#5b6772; }
+  * { scrollbar-color: var(--se-border-strong) var(--se-bg); }
+  ::-webkit-scrollbar { width: 10px; height: 10px; background: var(--se-bg); }
+  ::-webkit-scrollbar-thumb { background: var(--se-border-strong); border-radius: 5px; }
+  body { font-family: ui-monospace, Consolas, monospace; background: var(--se-bg); color: var(--se-fg); margin: 0; height: 100vh; overflow: hidden; }
   .cols { display: flex; height: 100vh; }
   main { flex: 1; min-width: 0; display: flex; flex-direction: column; padding: 14px 18px; }
-  .divider { width: 6px; cursor: col-resize; background: #2a2f34; flex: none; }
+  .divider { width: 6px; cursor: col-resize; background: var(--se-border); flex: none; }
   .divider.horiz { width: auto; height: 6px; cursor: row-resize; }
   /* 465px is the width the owner settled the sidebar at by dragging it, and
      a default nobody re-drags is the only evidence a default is right. */
-  aside { width: 465px; min-width: 320px; max-width: 80vw; display: flex; flex-direction: column; background: #191d21; }
+  aside { width: 465px; min-width: 320px; max-width: 80vw; display: flex; flex-direction: column; background: var(--se-bg-side); }
   /* THE LEFT COLUMN: the feed on top, the agent's terminal beneath it.
      SIZED FOR AN 80-COLUMN TERMINAL (owner ruling 2026-07-28). 820px was
      too wide; narrowing it without sizing the terminal would just have made
@@ -436,20 +441,20 @@ const STYLE = `
   .term-panel { flex: 1; min-height: 0; overflow: hidden; padding: 8px 10px; }
   /* Beats .widget's own display, whatever order the sheet ends up in. */
   .no-host { display: none !important; }
-  .crumbs { font-size: 13px; color: #7f8b96; display: flex; align-items: center; gap: 4px; text-transform: none; letter-spacing: 0; }
-  .crumbs a { color: #d8dde2; text-decoration: none; }
+  .crumbs { font-size: 13px; color: var(--se-muted); display: flex; align-items: center; gap: 4px; text-transform: none; letter-spacing: 0; }
+  .crumbs a { color: var(--se-fg); text-decoration: none; }
   .crumbs a:hover { color: #e8b339; }
   .crumbs .here { color: #e8b339; }
-  .crumb-arrow { position: relative; cursor: pointer; color: #7f8b96; padding: 0 3px; }
+  .crumb-arrow { position: relative; cursor: pointer; color: var(--se-muted); padding: 0 3px; }
   .crumb-arrow:hover { color: #e8b339; }
-  .crumb-menu { display: none; position: absolute; top: 18px; left: 0; z-index: 10; background: #22272c; border: 1px solid #3a4147; border-radius: 8px; min-width: 160px; padding: 4px; }
+  .crumb-menu { display: none; position: absolute; top: 18px; left: 0; z-index: 10; background: var(--se-raised); border: 1px solid var(--se-border-strong); border-radius: 8px; min-width: 160px; padding: 4px; }
   .crumb-arrow.open .crumb-menu { display: block; }
   .crumb-menu a { display: block; padding: 6px 10px; border-radius: 6px; }
   .crumb-menu a:hover { background: #2a3138; }
-  .widget { display: flex; flex-direction: column; border: 1px solid #2a2f34; border-radius: 10px; background: #191d21; min-height: 0; }
-  .widget-head { display: flex; align-items: center; justify-content: space-between; padding: 6px 12px; border-bottom: 1px solid #2a2f34; color: #7f8b96; font-size: 12px; text-transform: uppercase; letter-spacing: .08em; }
+  .widget { display: flex; flex-direction: column; border: 1px solid var(--se-border); border-radius: 10px; background: var(--se-bg-side); min-height: 0; }
+  .widget-head { display: flex; align-items: center; justify-content: space-between; padding: 6px 12px; border-bottom: 1px solid var(--se-border); color: var(--se-muted); font-size: 12px; text-transform: uppercase; letter-spacing: .08em; }
   .widget-body { flex: 1; min-height: 0; overflow: auto; }
-  .expand { background: none; border: 1px solid #3a4147; color: #7f8b96; border-radius: 6px; cursor: pointer; font: inherit; padding: 2px 8px; }
+  .expand { background: none; border: 1px solid var(--se-border-strong); color: var(--se-muted); border-radius: 6px; cursor: pointer; font: inherit; padding: 2px 8px; }
   .expand:hover { color: #e8b339; border-color: #e8b339; }
   /* THE CARD MATRIX (owner design 2026-07-29). One BIG card beside a two-wide
      grid of the rest. It is ONE grid across the whole viewport, so promoting a
@@ -459,29 +464,29 @@ const STYLE = `
   .card { position: relative; display: flex; min-width: 0; min-height: 0; grid-column: var(--col); grid-row: var(--row); }
   .card > .widget { flex: 1; min-width: 0; }
   .card.main { grid-column: 1; grid-row: 1 / -1; }
-  #div-cards { grid-column: 2; grid-row: 1 / -1; width: 6px; cursor: col-resize; background: #2a2f34; border-radius: 3px; }
+  #div-cards { grid-column: 2; grid-row: 1 / -1; width: 6px; cursor: col-resize; background: var(--se-border); border-radius: 3px; }
   /* The head reserves room so the number never lands on the title. */
   .card > .widget > .widget-head { padding-left: 34px; }
-  .cardnum { position: absolute; top: 7px; left: 10px; z-index: 2; display: inline-flex; align-items: center; justify-content: center; width: 17px; height: 17px; border: 1px solid #3a4147; border-radius: 4px; font-size: 11px; color: #7f8b96; cursor: pointer; }
+  .cardnum { position: absolute; top: 7px; left: 10px; z-index: 2; display: inline-flex; align-items: center; justify-content: center; width: 17px; height: 17px; border: 1px solid var(--se-border-strong); border-radius: 4px; font-size: 11px; color: var(--se-muted); cursor: pointer; }
   .cardnum:hover { color: #e8b339; border-color: #e8b339; }
   .card.main .cardnum { color: #e8b339; border-color: #e8b339; }
   .legend-row { display: flex; gap: 10px; padding: 3px 12px; font-size: 12px; }
   .legend-key { color: #e8b339; min-width: 92px; flex: none; }
-  .legend-what { color: #d8dde2; }
+  .legend-what { color: var(--se-fg); }
   #w-machine { flex: 1; }
   #w-machine .widget-body { display: flex; }
   svg { width: 100%; height: 100%; cursor: grab; }
   svg.panning { cursor: grabbing; }
-  .state { fill: #22272c; stroke: #4a545e; stroke-width: 2; }
+  .state { fill: var(--se-raised); stroke: #4a545e; stroke-width: 2; }
   .state.active { fill: #3a2f14; stroke: #e8b339; stroke-width: 3.5; }
   .state.done { fill: #1d2b20; stroke: #4a7a55; }
   .state.inner { fill: none; }
   .clickable { cursor: pointer; }
   .clickable:hover .state, .clickable:hover .comment { stroke: #8fa0b0; }
-  .label { fill: #d8dde2; font-size: 26px; text-anchor: middle; font-family: inherit; pointer-events: none; }
-  .sublabel { fill: #7f8b96; font-size: 17px; text-anchor: middle; font-family: inherit; pointer-events: none; }
-  .edge { stroke: #5b6772; stroke-width: 2.5; }
-  .arrowhead { fill: #5b6772; }
+  .label { fill: var(--se-fg); font-size: 26px; text-anchor: middle; font-family: inherit; pointer-events: none; }
+  .sublabel { fill: var(--se-muted); font-size: 17px; text-anchor: middle; font-family: inherit; pointer-events: none; }
+  .edge { stroke: var(--se-dim); stroke-width: 2.5; }
+  .arrowhead { fill: var(--se-dim); }
   /* THE BLUE LINE. Blue on purpose: the voice reserves green, red and
      yellow for verdicts, and a route is not a verdict. It is a way. */
   .route-line { fill: none; stroke: #4a90d9; stroke-width: 6; stroke-linecap: round; stroke-linejoin: round; }
@@ -494,57 +499,57 @@ const STYLE = `
   .route-stop.shut { opacity: .28; }
   .route-here { fill: #4a90d9; stroke: #9ecbf2; stroke-width: 2; }
   .guard { fill: #e8b339; font-size: 20px; text-anchor: middle; }
-  .comment { fill: #1c2025; stroke: #2a2f34; }
+  .comment { fill: #1c2025; stroke: var(--se-border); }
   .group { fill: #1a1e22; stroke: #333a41; stroke-dasharray: 10 6; stroke-width: 2; }
-  .group-label { fill: #5b6772; font-size: 24px; font-family: inherit; letter-spacing: .06em; }
-  .comment-text { color: #7f8b96; font-size: 13px; line-height: 1.35; }
-  .comment-detail { font-size: 15px; line-height: 1.55; color: #d8dde2; padding: 2px 0 10px; }
+  .group-label { fill: var(--se-dim); font-size: 24px; font-family: inherit; letter-spacing: .06em; }
+  .comment-text { color: var(--se-muted); font-size: 13px; line-height: 1.35; }
+  .comment-detail { font-size: 15px; line-height: 1.55; color: var(--se-fg); padding: 2px 0 10px; }
   .replink { color: #e8b339; cursor: pointer; text-decoration: underline dotted; }
   .bar { display: flex; gap: 10px; padding: 12px; }
-  button.primary { background: #e8b339; color: #14171a; border: 0; border-radius: 8px; padding: 8px 14px; font: inherit; font-weight: 700; cursor: pointer; margin: 2px 4px 2px 0; }
+  button.primary { background: #e8b339; color: var(--se-bg); border: 0; border-radius: 8px; padding: 8px 14px; font: inherit; font-weight: 700; cursor: pointer; margin: 2px 4px 2px 0; }
   .panel { padding: 0 12px 12px; overflow: auto; }
-  .meta { color: #7f8b96; font-size: 12px; padding: 8px 12px; }
-  .todo-origin { color: #7f8b96; font-size: 11px; }
+  .meta { color: var(--se-muted); font-size: 12px; padding: 8px 12px; }
+  .todo-origin { color: var(--se-muted); font-size: 11px; }
   table.kv { border-collapse: collapse; width: 100%; font-size: 12.5px; }
-  table.kv td { border: 1px solid #2a2f34; padding: 4px 8px; vertical-align: top; }
+  table.kv td { border: 1px solid var(--se-border); padding: 4px 8px; vertical-align: top; }
   table.kv td.k { color: #e8b339; white-space: nowrap; width: 1%; }
-  table.kv td.v { color: #d8dde2; word-break: break-word; }
+  table.kv td.v { color: var(--se-fg); word-break: break-word; }
   table.kv table.kv { margin: 2px 0; }
-  .vnull { color: #7f8b96; } .vnum { color: #7cc4e8; } .vbool { color: #c58fe8; } .vstr { color: #a8c88f; }
+  .vnull { color: var(--se-muted); } .vnum { color: #7cc4e8; } .vbool { color: #c58fe8; } .vstr { color: #a8c88f; }
   .prewrap { white-space: pre-wrap; }
   td.btncell { text-align: center; vertical-align: middle !important; width: 1%; }
-  button.go.locked { background: #2a2f34; color: #5b6772; cursor: not-allowed; }
+  button.go.locked { background: var(--se-border); color: var(--se-dim); cursor: not-allowed; }
   .cond circle { stroke-width: 2.5; }
   .cond.unmet circle { fill: #3a2f14; stroke: #e8b339; }
   .cond.met circle { fill: #1d2b20; stroke: #4a7a55; }
-  .cond-label { font-size: 20px; text-anchor: middle; fill: #d8dde2; pointer-events: none; }
+  .cond-label { font-size: 20px; text-anchor: middle; fill: var(--se-fg); pointer-events: none; }
   .doclist a { display: block; padding: 4px 0; }
   a.doclink { color: #7cc4e8; cursor: pointer; text-decoration: underline; }
   .docview { font-size: 13.5px; line-height: 1.55; }
   .docview h1, .docview h2, .docview h3 { color: #e8b339; }
-  .docview code { background: #22272c; padding: 1px 5px; border-radius: 4px; }
-  .docview pre { background: #14171a; border: 1px solid #2a2f34; border-radius: 8px; padding: 10px; overflow: auto; }
+  .docview code { background: var(--se-raised); padding: 1px 5px; border-radius: 4px; }
+  .docview pre { background: var(--se-bg); border: 1px solid var(--se-border); border-radius: 8px; padding: 10px; overflow: auto; }
   .docview a { color: #7cc4e8; }
-  button.ghost { background: #22272c; color: #d8dde2; border: 1px solid #4a545e; border-radius: 8px; padding: 6px 12px; font: inherit; cursor: pointer; }
+  button.ghost { background: var(--se-raised); color: var(--se-fg); border: 1px solid #4a545e; border-radius: 8px; padding: 6px 12px; font: inherit; cursor: pointer; }
   #w-details { flex: 1; border-radius: 0; border: 0; }
   .docheck { accent-color: #e8b339; cursor: pointer; }
-  .threshold { display: flex; align-items: center; gap: 8px; color: #7f8b96; font-size: 12px; text-transform: none; letter-spacing: 0; }
+  .threshold { display: flex; align-items: center; gap: 8px; color: var(--se-muted); font-size: 12px; text-transform: none; letter-spacing: 0; }
   .threshold input { accent-color: #e8b339; width: 140px; }
   #thr-val { color: #e8b339; min-width: 4ch; }
   .thr-help { cursor: pointer; }
   .thr-help:hover { color: #e8b339; }
   .thr-track { display: inline-flex; flex-direction: column; align-items: stretch; }
   .thr-notches { position: relative; height: 11px; margin-top: -3px; }
-  .thr-notch { position: absolute; transform: translateX(-50%); font-size: 9px; line-height: 1; color: #7f8b96; cursor: pointer; padding: 1px 3px; }
+  .thr-notch { position: absolute; transform: translateX(-50%); font-size: 9px; line-height: 1; color: var(--se-muted); cursor: pointer; padding: 1px 3px; }
   .thr-notch:hover { color: #e8b339; }
   /* The log used to be the top 42% of a shared column, borderless so it read
      as one surface with the terminal below it. As a card of its own it takes
      the whole card and wears the normal widget border. */
   .log-filter-row { padding: 6px 12px 0; display: flex; gap: 6px; }
-  .log-filter-row input { flex: 1 1 50%; min-width: 0; box-sizing: border-box; background: #14171a; border: 1px solid #2a2f34; border-radius: 6px; color: #d8dde2; font: inherit; font-size: 12px; padding: 4px 8px; }
+  .log-filter-row input { flex: 1 1 50%; min-width: 0; box-sizing: border-box; background: var(--se-bg); border: 1px solid var(--se-border); border-radius: 6px; color: var(--se-fg); font: inherit; font-size: 12px; padding: 4px 8px; }
   .log-panel { font-size: 12px; margin-top: 6px; }
-  .logrow { display: flex; gap: 8px; padding: 2px 0; cursor: pointer; border-bottom: 1px dotted #22272c; align-items: baseline; }
-  .logrow:hover { background: #22272c; }
+  .logrow { display: flex; gap: 8px; padding: 2px 0; cursor: pointer; border-bottom: 1px dotted var(--se-raised); align-items: baseline; }
+  .logrow:hover { background: var(--se-raised); }
   .logrow .lt { color: ${FEED_COLOURS.time}; flex: 0 0 auto; }
   .logrow .lsrc { flex: 0 0 5.5ch; color: ${FEED_COLOURS["src-agent"]}; }
   .logrow .lsrc.human { color: ${FEED_COLOURS["src-human"]}; }
@@ -554,7 +559,7 @@ const STYLE = `
   .logrow .lkind.k-note { font-style: italic; color: ${FEED_COLOURS["kind-note"]}; }
   .logrow .lkind.k-aq { font-weight: 700; color: ${FEED_COLOURS["kind-aq"]}; }
   .aq-q { font-weight: 700; color: ${FEED_COLOURS["kind-aq"]}; padding: 6px 0; white-space: pre-wrap; }
-  #loadbar { position: fixed; top: 0; left: 0; right: 0; height: 3px; background: #22272c; z-index: 99; }
+  #loadbar { position: fixed; top: 0; left: 0; right: 0; height: 3px; background: var(--se-raised); z-index: 99; }
   #loadbar .fill { height: 100%; width: 30%; background: #e8b339; animation: loadslide 1s linear infinite; }
   @keyframes loadslide { 0% { margin-left: -30%; } 100% { margin-left: 100%; } }
   /* A BAR THAT MEASURES SOMETHING (owner ruling, 2026-07-30). Work that can
@@ -578,26 +583,26 @@ const STYLE = `
   .logrow .lok { flex: 0 0 auto; color: #4a7a55; }
   .logrow.failed .lok { color: #e86a5f; }
   .dnode { cursor: pointer; padding: 2px 0; font-size: 13px; }
-  .dnode:hover { background: #22272c; }
+  .dnode:hover { background: var(--se-raised); }
   .dnode.s-done { color: #4a7a55; }
   .dnode.s-open { color: #e8b339; }
-  .dnode.s-obsolete { color: #5b6772; text-decoration: line-through; }
+  .dnode.s-obsolete { color: var(--se-dim); text-decoration: line-through; }
   .dnode.s-reverted { color: #e86a5f; text-decoration: line-through; }
   /* DEFERRED IS NOT KILLED. It is still owed, so it keeps the open colour;
      it is owed SOMEWHERE ELSE, so it leans. Never struck through - the
      strike is what says a point died, and this one did not. */
   .dnode.s-deferred { color: #e8b339; font-style: italic; text-decoration: none; }
   .dnode.dactive { font-weight: 700; }
-  .dnode.dsel { background: #22272c; }
-  .dinfo { margin-top: 10px; border-top: 1px solid #2a2f34; padding-top: 8px; }
-  .formfield { width: 100%; min-height: 70px; background: #14171a; border: 1px solid #2a2f34; border-radius: 6px; color: #d8dde2; font: inherit; font-size: 12.5px; padding: 6px; box-sizing: border-box; margin-top: 4px; }
+  .dnode.dsel { background: var(--se-raised); }
+  .dinfo { margin-top: 10px; border-top: 1px solid var(--se-border); padding-top: 8px; }
+  .formfield { width: 100%; min-height: 70px; background: var(--se-bg); border: 1px solid var(--se-border); border-radius: 6px; color: var(--se-fg); font: inherit; font-size: 12.5px; padding: 6px; box-sizing: border-box; margin-top: 4px; }
   .prefill { border: 1px dashed #e8b339; border-radius: 6px; padding: 6px 8px; margin: 4px 0; }
   .prefill button { margin-top: 4px; }
   #modal { display: none; position: fixed; inset: 0; background: rgba(20,23,26,.8); z-index: 50; align-items: center; justify-content: center; }
-  .modal-box { width: min(760px, 92vw); max-height: 86vh; display: flex; flex-direction: column; background: #191d21; border: 1px solid #3a4147; border-radius: 12px; }
+  .modal-box { width: min(760px, 92vw); max-height: 86vh; display: flex; flex-direction: column; background: var(--se-bg-side); border: 1px solid var(--se-border-strong); border-radius: 12px; }
   .modal-body { padding: 12px 16px; overflow: auto; font-size: 13px; }
   a.toollink { color: #7cc4e8; text-decoration: underline; cursor: pointer; margin-right: 10px; }
-  #toast { position: fixed; left: 14px; bottom: 14px; background: #22272c; border: 1px solid #3a4147; border-radius: 8px; padding: 8px 14px; color: #d8dde2; font-size: 12.5px; z-index: 90; display: none; }
+  #toast { position: fixed; left: 14px; bottom: 14px; background: var(--se-raised); border: 1px solid var(--se-border-strong); border-radius: 8px; padding: 8px 14px; color: var(--se-fg); font-size: 12.5px; z-index: 90; display: none; }
   #link-lost { position: fixed; left: 0; right: 0; top: 0; z-index: 99; background: #4a3a14; color: #e8b339; text-align: center; padding: 7px; font-size: 13px; letter-spacing: .04em; }
   #over { position: fixed; inset: 0; background: rgba(20,23,26,.94); z-index: 100; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; }
   #over .over-box { color: #e8332a; font-size: 62px; font-weight: 800; letter-spacing: .12em; border: 6px solid #e8332a; border-radius: 18px; padding: 26px 52px; }
@@ -626,7 +631,7 @@ function jsonTable(v) {
   if (Array.isArray(v)) {
     if (v.length === 0) return '<span class="vnull">[]</span>';
     const table = '<table class="kv">' + v.map((x, i) => '<tr><td class="k">' + i + '</td><td class="v">' + jsonTable(x) + "</td></tr>").join("") + "</table>";
-    if (v.length > 3) return '<details><summary style="cursor:pointer;color:#7f8b96">' + v.length + " items</summary>" + table + "</details>";
+    if (v.length > 3) return '<details><summary style="cursor:pointer;color:var(--se-muted)">' + v.length + " items</summary>" + table + "</details>";
     return table;
   }
   const keys = Object.keys(v);
@@ -821,7 +826,7 @@ function pulledView(pulled) {
   for (const p of pulled) for (const src of p.sources) (bySource[src] ??= []).push(p);
   return Object.entries(bySource).map(([srcName, docs]) => {
     const done = docs.filter((d) => d.checked).length;
-    return '<details><summary style="cursor:pointer;color:#7f8b96">' + srcName + " (" + done + "/" + docs.length + " read)</summary>" +
+    return '<details><summary style="cursor:pointer;color:var(--se-muted)">' + srcName + " (" + done + "/" + docs.length + " read)</summary>" +
       docs.map(docRow).join("") + "</details>";
   }).join("");
 }
@@ -839,7 +844,7 @@ function stateDetail(id) {
     // "all" stays written as all — and EXPANDS into the human-callable
     // links (parity law), the same collapsible pattern the pull uses.
     const inner = tools.includes("all")
-      ? '<details><summary style="cursor:pointer;color:#7f8b96">all — the human-callable set</summary>' + Object.keys(HUMAN_TOOLS).map(line).join("") + "</details>"
+      ? '<details><summary style="cursor:pointer;color:var(--se-muted)">all — the human-callable set</summary>' + Object.keys(HUMAN_TOOLS).map(line).join("") + "</details>"
       : tools.map(line).join("");
     extra += '<tr><td class="k">legal tools</td><td class="v">' + inner + "</td></tr>";
   }
@@ -1035,6 +1040,28 @@ async function refresh(detail) {
     hideLoading(); // THE LOAD SETTLED — win or lose, the bar goes
   }
 }
+// VS CODE EMBED. The hosting webview says hello with a theme message: the
+// palette follows the editor from then on, and record links open as real
+// files THERE. Help stays a detail HERE — the ux rule. The flag survives
+// in-page navigation; the host re-sends the theme on every iframe load.
+let EMBED = false;
+try { EMBED = sessionStorage.getItem("se-embed") === "1"; } catch { EMBED = false; }
+window.addEventListener("message", (ev) => {
+  const d = ev.data;
+  if (!d || d.quackitect !== "theme") return;
+  EMBED = true;
+  try { sessionStorage.setItem("se-embed", "1"); } catch { /* storage denied — the flag just will not survive navigation */ }
+  const vars = d.vars || {};
+  for (const k in vars) if (vars[k]) document.documentElement.style.setProperty(k, vars[k]);
+});
+function cssPalette(name) {
+  return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+}
+function embedOpen(path) {
+  if (!EMBED || !path) return false;
+  window.parent.postMessage({ quackitect: "open", path: path }, "*");
+  return true;
+}
 document.addEventListener("click", async (ev) => {
   const c = ev.target.closest ? ev.target.closest(".docheck") : null;
   if (c) { if (c.disabled) return; ev.preventDefault(); c.disabled = true; await fetch("/check", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ path: c.dataset.path }) }); refresh(); return; }
@@ -1051,6 +1078,7 @@ document.addEventListener("click", async (ev) => {
   }
   const rpl = ev.target.closest ? ev.target.closest(".replink") : null;
   if (rpl) {
+    if (embedOpen(rpl.dataset.path)) return;
     const expQ = rpl.dataset.exp ? "&exp=" + encodeURIComponent(rpl.dataset.exp) : "";
     const pageUrl = "/doc?path=" + encodeURIComponent(rpl.dataset.path) + expQ + "&page=1";
     if (ev.ctrlKey || ev.metaKey) { window.open(pageUrl, "_blank"); return; }
@@ -1084,7 +1112,7 @@ function condRows(id, dict, standing) {
       row += '<div style="padding:6px 0">' + btn + "</div>";
       if (sc.running) row += '<div style="color:#e8b339">running — the page follows; the result lands here</div>';
       else if (sc.ran) row += '<div style="color:' + (sc.ok ? "#4a7a55" : "#e86a5f") + ';white-space:pre-wrap;font-size:12px">' + sc.output.replace(/&/g,"&amp;").replace(/</g,"&lt;") + "</div>";
-      else row += '<div style="color:#7f8b96">not run yet</div>';
+      else row += '<div style="color:var(--se-muted)">not run yet</div>';
     } else if (key === "evidence_form") {
       // The A3 page: open it in the details pane — fill, confirm prefills,
       // manage files, set done. One button per named template.
@@ -1676,7 +1704,7 @@ if (thr) {
 const THR_LEVELS = D.levels;
 function levelHelp(sel) {
   const rows = THR_LEVELS.map((l) =>
-    '<tr' + (sel === l.value ? ' style="background:#22272c"' : "") + '><td class="k">' + l.abbr + " · " + l.value + '</td><td class="v">' + l.name + "</td></tr>").join("");
+    '<tr' + (sel === l.value ? ' style="background:var(--se-raised)"' : "") + '><td class="k">' + l.abbr + " · " + l.value + '</td><td class="v">' + l.name + "</td></tr>").join("");
   showDetails("the autonomy scale", '<table class="kv">' + rows + '</table><div style="padding:8px 0 0"><a class="doclink" data-path="product/guidance/authoring/machines.md">the full scale — machines.md · Priority</a></div>');
 }
 // THE SHUTDOWN CONTROL — five notches; same grammar as the autonomy bar.
@@ -1685,7 +1713,7 @@ const sdEl = document.getElementById("sd");
 function sdAbbr(v) { const l = SD_LEVELS.find((x) => x.value === Number(v)); return l ? l.abbr : String(v); }
 function sdHelp(sel) {
   const rows = SD_LEVELS.map((l) =>
-    '<tr' + (sel === l.value ? ' style="background:#22272c"' : "") + '><td class="k">' + l.abbr + " · " + l.value + '</td><td class="v">' + escText(l.name) + "</td></tr>").join("");
+    '<tr' + (sel === l.value ? ' style="background:var(--se-raised)"' : "") + '><td class="k">' + l.abbr + " · " + l.value + '</td><td class="v">' + escText(l.name) + "</td></tr>").join("");
   showDetails("the shutdown control", '<table class="kv">' + rows + "</table>");
 }
 if (sdEl) {
@@ -1889,7 +1917,7 @@ async function bootTerminal() {
     fontFamily: "ui-monospace, Consolas, monospace",
     fontSize: 13,
     scrollback: 5000,
-    theme: { background: "#14171a", foreground: "#d8dde2" },
+    theme: { background: cssPalette("--se-bg"), foreground: cssPalette("--se-fg") },
   });
   term.open(pane);
   term.onData((d) => { void fetch(base + "/pty/input", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ d }) }); });
@@ -2057,7 +2085,7 @@ export function renderMirror(m: MirrorState, widget?: "machine" | "details" | "l
           ? crumbArrow(mainSubs)
           : i === chain.length - 1
             ? crumbArrow(decl.states.filter((s) => s.submachine !== undefined).map((s) => s.id))
-            : '<span style="color:#7f8b96;padding:0 3px">›</span>';
+            : '<span style="color:var(--se-muted);padding:0 3px">›</span>';
       return label + arrow;
     })
     .join("");

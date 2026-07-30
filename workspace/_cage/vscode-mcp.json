@@ -2,16 +2,13 @@
   "_readme": [
     "THE VS CODE MCP CONFIG. VS Code agent mode reads .vscode/mcp.json and",
     "ignores every other host's file, so the se lane needs its own copy.",
-    "RUNME places it at workspace/.vscode/mcp.json, the same way it places",
-    "Claude's .mcp.json and Copilot CLI's .copilot/mcp-config.json.",
+    "The extension places it at workspace/.vscode/mcp.json on every",
+    "activation, the same declarative way RUNME places the other cages.",
     "",
-    "THE SHAPE IS NOT THE SAME as the other two. VS Code wants `servers`,",
-    "not `mcpServers`, and it wants an explicit `type`. Copying one of the",
-    "sibling files here would load nothing and say nothing about why.",
-    "",
-    "PATHS ARE RELATIVE TO THE WORKSPACE FOLDER. Open VS Code ON workspace/,",
-    "not on the repo root, or the server starts with the wrong root and the",
-    "walk cannot find product/.",
+    "IT ATTACHES, IT DOES NOT SPAWN. The extension owns the ONE se server",
+    "(HTTP on localhost:7333); agent mode connects to /mcp there. A spawn",
+    "here would raise a second engine with a second walk beside the real",
+    "one - the exact split the shared server exists to prevent.",
     "",
     "THE CAGE DOES NOT COME WITH IT. Claude is caged by a settings file and",
     "the Copilot CLI by --excluded-tools; VS Code agent mode has no",
@@ -25,13 +22,8 @@
   ],
   "servers": {
     "se": {
-      "type": "stdio",
-      "command": "node",
-      "args": [
-        "../product/deliverable/engine/bin/se-mcp.ts",
-        "--root",
-        ".."
-      ]
+      "type": "http",
+      "url": "http://localhost:7333/mcp"
     }
   }
 }
