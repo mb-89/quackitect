@@ -90,3 +90,9 @@
 {"ts":"2026-07-30T19:20:11.597Z","op":"fork","visit":"expeditions/e26@0","parent":null,"node":"d71","brief":"the VS Code restart left the old server standing too","nodes":[]}
 {"ts":"2026-07-30T19:20:17.178Z","op":"update","visit":"expeditions/e26@0","node":"d72","brief":"checking the tree kill refactor"}
 {"ts":"2026-07-30T19:20:24.581Z","op":"done","visit":"expeditions/e26@0","node":"d71","brief":"every stop path takes the process tree"}
+{"ts":"2026-07-30T19:22:35.523Z","op":"fork","visit":"expeditions/e26@1","parent":null,"node":"d73","brief":"the engine reads trunk, so the work has to land to be visible","nodes":[]}
+{"ts":"2026-07-30T19:23:04.449Z","op":"update","visit":"expeditions/e26@1","node":"d74","brief":"committing the desk edit that was blocking the land"}
+{"ts":"2026-07-30T19:23:08.389Z","op":"update","visit":"expeditions/e26@1","node":"d75","brief":"landing the expedition's commits on trunk"}
+{"ts":"2026-07-30T19:23:17.577Z","op":"update","visit":"expeditions/e26@1","node":"d76","brief":"syncing trunk into the expedition"}
+{"ts":"2026-07-30T19:23:22.795Z","op":"update","visit":"expeditions/e26@1","node":"d77","brief":"checking what is uncommitted in the worktree"}
+{"ts":"2026-07-30T19:23:26.910Z","op":"update","visit":"expeditions/e26@1","node":"d78","brief":"committing the decision trail before the sync"}
