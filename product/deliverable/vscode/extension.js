@@ -43,9 +43,16 @@ let packet = null;
 let strip = null;
 let controls = null;
 let detailsView = null;
-let logView = null;
 let poller = null;
 let busyDone = null;
+let agentTerm = null;
+let logTerm = null;
+let logEmitter = null;
+let logRows = [];
+let logFilter = "";
+/** The subject details is showing — what an expanded copy is a snapshot OF. */
+let lastDetails = null;
+const snapshots = new Set();
 /** slot number → CardWindow. A slot is absent when its window is closed. */
 const windows = new Map();
 // The session's name survives engine reloads (exit 42): the settings store
@@ -209,7 +216,6 @@ const shown = (c) => c !== undefined && c.widget !== "terminal";
 const inStrip = (c) => shown(c) && c.widget !== "details";
 const cardBySlot = (n) => cards.find((c) => c.n === n);
 const detailsCard = () => cards.find((c) => c.widget === "details");
-const logCard = () => cards.find((c) => c.widget === "log");
 
 async function refreshCards() {
   cards = await fetchCards();
@@ -235,6 +241,7 @@ async function pollWalk() {
   if (p === null) return;
   packet = p;
   if (controls !== null) controls.send();
+  if (logTerm !== null) await pollLog();
 }
 
 function startPolling() {
@@ -289,6 +296,11 @@ function framePage(url) {
       "--se-dim": cssVar("--vscode-disabledForeground"),
       "--vscode-font-family": cssVar("--vscode-font-family"),
       "--vscode-editor-font-family": cssVar("--vscode-editor-font-family"),
+      // The MEANINGS the drawing maps to. Not every theme defines the testing
+      // colour, so the chart green stands in rather than nothing at all.
+      "--vscode-button-background": cssVar("--vscode-button-background"),
+      "--vscode-testing-iconPassed": cssVar("--vscode-testing-iconPassed") || cssVar("--vscode-charts-green"),
+      "--vscode-editorWarning-foreground": cssVar("--vscode-editorWarning-foreground"),
     };
   }
   let pendingHelp = null;
@@ -319,7 +331,7 @@ function framePage(url) {
     if (d.quackitect === "details") { vsapi.postMessage(d); return; } // a click in THIS card, bound for the details group
     if (d.quackitect === "theme-changed") { sendTheme(); return; }
     if (d.quackitect === "up") { show(); return; }
-    if (d.quackitect === "help") {
+    if (d.quackitect === "help" || d.quackitect === "logref") {
       if (up && frame.contentWindow) frame.contentWindow.postMessage(d, "*");
       else pendingHelp = d;
       show();
@@ -459,7 +471,7 @@ class Surface {
     this.page = page;
     this.web = null;
   }
-  attach(webview) {
+  attach(webview, onReady) {
     this.web = webview;
     webview.options = { enableScripts: true };
     webview.onDidReceiveMessage(onWebviewMessage);
@@ -469,6 +481,9 @@ class Surface {
       await ensureCards();
       this.render();
       this.up();
+      // The page is re-rendered above, so anything posted before now would be
+      // thrown away with the document that was listening for it.
+      if (typeof onReady === "function") setTimeout(onReady, 500);
     });
   }
   render() {
@@ -561,13 +576,58 @@ function openWindow(slot, preserveFocus, column) {
  */
 async function showHelp(title, html, reveal) {
   await ensureCards();
+  lastDetails = { title, html };
   if (reveal === true) await vscode.commands.executeCommand("quackitect.details.focus");
   if (detailsView !== null) detailsView.help(title, html);
+  // Snapshots are deliberately not told. They hold what they were opened on.
+}
+
+/**
+ * Expand the details into a window that HOLDS STILL (owner ruling 2026-07-30).
+ *
+ * A snapshot keeps its subject and does not follow the reader, so five or six
+ * can stand side by side — which is the whole reason to expand one. It says
+ * so in its title, because a snapshot that looks live is a trap.
+ */
+async function expandDetails() {
+  await ensureCards();
   const card = detailsCard();
-  if (card !== undefined) {
-    const expanded = windows.get(card.n);
-    if (expanded !== undefined) expanded.help(title, html);
+  if (card === undefined) return;
+  if (lastDetails === null) {
+    void vscode.window.showInformationMessage("Quackitect: click something first — a snapshot needs a subject.");
+    return;
   }
+  const shot = lastDetails;
+  const panel = vscode.window.createWebviewPanel(
+    "quackitect.snapshot",
+    "Details · " + shot.title,
+    vscode.ViewColumn.Active,
+    { enableScripts: true, retainContextWhenHidden: true },
+  );
+  // frozen=1 is the engine's own word for it: no event stream, no refresh.
+  const surface = new Surface(() => framePage(SERVER + "/widget/" + card.widget + "?embed=1&frozen=1"));
+  snapshots.add(surface);
+  panel.onDidDispose(() => snapshots.delete(surface));
+  surface.attach(panel.webview, () => surface.help(shot.title, shot.html));
+}
+
+/** The two fields that came over from the log, explained where they now live. */
+async function showFieldHelp(which) {
+  if (which === "filter") {
+    await showHelp(
+      "the feed filter",
+      "<p>Substring match over an act's time, hand, kind, brief and refusal clause.</p>" +
+        "<p>The log is a terminal, so filtering redraws it. Clear the box to see everything again.</p>",
+      false,
+    );
+    return;
+  }
+  await showHelp(
+    "drop a note",
+    "<p>A stray: an idea, a bug, a better way. Enter captures it with your hand stamped on it.</p>" +
+      "<p>It joins the feed at once and a retro drains it later.</p>",
+    false,
+  );
 }
 
 /**
@@ -679,8 +739,10 @@ class Controls {
   .notches { position: relative; height: 2.7em; color: var(--vscode-descriptionForeground); font-size: .8em; }
   .notch { position: absolute; transform: translateX(-50%); cursor: pointer; white-space: nowrap; }
   .notch:hover { color: var(--vscode-foreground); }
-  .where { margin-top: 10px; color: var(--vscode-descriptionForeground); font-size: .9em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .where b { color: var(--vscode-foreground); font-weight: 600; }
+  .sep { height: 1px; background: var(--vscode-panel-border); margin: 10px 0 2px; }
+  input[type=text] { width: 100%; box-sizing: border-box; margin-top: 6px; padding: 3px 6px; background: var(--vscode-input-background); color: var(--vscode-input-foreground); border: 1px solid var(--vscode-input-border, transparent); font: inherit; }
+  input[type=text]::placeholder { color: var(--vscode-input-placeholderForeground); }
+  input[type=text]:focus { outline: 1px solid var(--vscode-focusBorder); outline-offset: -1px; }
 </style></head><body>
 <div class="box">
   <div class="row"><span class="name" id="a-name" title="click: the scale, explained in details">Autonomy</span><span class="val" id="a-val">—</span></div>
@@ -691,7 +753,9 @@ class Controls {
   <input type="range" id="s" min="1" max="5" step="1" value="1">
   <div class="notches" id="s-notches"></div>
 
-  <div class="where" id="where">not connected</div>
+  <div class="sep"></div>
+  <input id="filter" type="text" placeholder="filter the feed">
+  <input id="note" type="text" placeholder="drop a note — Enter captures it">
 </div>
 <script>
   const vsapi = acquireVsCodeApi();
@@ -710,6 +774,17 @@ class Controls {
   }
   $("a-name").addEventListener("click", () => vsapi.postMessage({ quackitect: "scale-help", which: "autonomy" }));
   $("s-name").addEventListener("click", () => vsapi.postMessage({ quackitect: "scale-help", which: "shutdown" }));
+  // THE LOG'S TWO LINE EDITS LIVE HERE (owner ruling 2026-07-30). The log is a
+  // terminal now, and a terminal has nowhere to put a field, so they moved to
+  // the nearest surface that does.
+  $("filter").addEventListener("input", () => vsapi.postMessage({ quackitect: "log-filter", text: $("filter").value }));
+  $("filter").addEventListener("focus", () => vsapi.postMessage({ quackitect: "field-help", which: "filter" }));
+  $("note").addEventListener("focus", () => vsapi.postMessage({ quackitect: "field-help", which: "note" }));
+  $("note").addEventListener("keydown", (ev) => {
+    if (ev.key !== "Enter" || $("note").value.trim() === "") return;
+    vsapi.postMessage({ quackitect: "note", text: $("note").value });
+    $("note").value = "";
+  });
   function sdAbbr(v) {
     if (lv === null || !Array.isArray(lv.shutdown)) return String(v);
     const l = lv.shutdown.find((x) => Number(x.value) === Number(v));
@@ -728,6 +803,9 @@ class Controls {
     el.innerHTML = "";
     let last = -99, row = 0;
     for (const l of list) {
+      // The blocked notch is not drawn (owner ruling): the slider still drags
+      // to 0.00, and a label at the very edge only crowded the one beside it.
+      if (which === "a" && Number(l.value) === 0) continue;
       const pct = pctOf(which, l.value);
       // Two levels a hair apart would print on top of each other, so the
       // second drops to a line below rather than becoming unreadable.
@@ -759,13 +837,10 @@ class Controls {
       if (Array.isArray(lv.shutdown)) notches("s", lv.shutdown);
     }
     const p = d.packet;
-    if (!p) { $("where").textContent = "not connected"; return; }
+    if (!p) return;
     if (holding !== "a") { $("a").value = p.autonomy; }
     if (holding !== "s") { $("s").value = p.shutdown; }
     paint();
-    const at = Array.isArray(p.active) && p.active.length > 0 ? p.active[0] : "—";
-    const exp = p.expedition ? " · " + p.expedition.split("-")[0] : "";
-    $("where").innerHTML = "at <b>" + String(at).replace(/&/g, "&amp;").replace(/</g, "&lt;") + "</b>" + exp;
   });
 </script></body></html>`;
   }
@@ -781,6 +856,9 @@ class Controls {
     });
     view.webview.onDidReceiveMessage(async (m) => {
       if (!m) return;
+      if (m.quackitect === "log-filter") { logFilter = String(m.text ?? ""); redrawLog(); return; }
+      if (m.quackitect === "note") { await post("/note", { text: m.text }); await pollLog(); return; }
+      if (m.quackitect === "field-help") { await showFieldHelp(m.which); return; }
       if (m.quackitect === "scale-help") { await showScaleHelp(m.which, m.level); return; }
       if (m.quackitect === "autonomy") await post("/autonomy", { value: m.value });
       else if (m.quackitect === "shutdown") await post("/shutdown", { value: m.value });
@@ -795,6 +873,91 @@ class Controls {
       this.send();
     }
   }
+}
+
+// ── THE LOG, AS A TERMINAL ──────────────────────────────────────────
+// The log sits BESIDE the agent's console (owner ruling 2026-07-30), and the
+// only thing that can sit beside a terminal is another terminal. So the
+// shell owns one and writes the feed into it.
+//
+// It is not dead text. Every row ends in a short reference, and a terminal
+// link provider makes that clickable — the record then lands in Details,
+// drawn by the engine's own renderer rather than a second one written here.
+const REF_RE = /\[#([0-9a-zA-Z_-]{3,})\]/g;
+const DIM = (s) => "[2m" + s + "[0m";
+
+function logRow(r) {
+  const ts = String(r.ts ?? "");
+  const when = r.pending === true ? ts.slice(5, 10) : ts.slice(11, 19);
+  const ok = r.ok === false ? "[31m✗[0m" : "[32m✓[0m";
+  const clause = r.ok === false && r.clause ? " " + String(r.clause) : "";
+  return `${DIM(when)} ${DIM(String(r.src ?? ""))} ${String(r.type ?? "")} ${String(r.brief ?? "")}${clause} ${ok} ${DIM("[#" + String(r.ref ?? "") + "]")}`;
+}
+
+function redrawLog() {
+  if (logEmitter === null) return;
+  const f = logFilter.trim().toLowerCase();
+  const rows = logRows.filter(
+    (r) => f === "" || `${r.ts} ${r.src} ${r.type} ${r.brief} ${r.clause ?? ""}`.toLowerCase().includes(f),
+  );
+  const body = rows.slice(-500).map(logRow).join("\r\n");
+  // CLEAR AND REPRINT. A terminal cannot take back a line it already showed,
+  // so filtering means drawing the whole feed again — which is precisely what
+  // makes a filter possible in here at all.
+  logEmitter.fire("[2J[3J[H" + (body === "" ? DIM("no acts match") : body) + "\r\n");
+}
+
+async function pollLog() {
+  const body = await api("/api/log");
+  if (body === null || !Array.isArray(body.rows)) return;
+  logRows = body.rows;
+  redrawLog();
+}
+
+function makeLogTerminal(parent) {
+  const emitter = new vscode.EventEmitter();
+  logEmitter = emitter;
+  const opts = {
+    name: "Quackitect log",
+    pty: {
+      onDidWrite: emitter.event,
+      open: () => void pollLog(),
+      close: () => {
+        logEmitter = null;
+        logTerm = null;
+      },
+      handleInput: () => { /* the feed is read-only — the note box is in Controls */ },
+    },
+  };
+  if (parent !== null) opts.location = { parentTerminal: parent };
+  logTerm = vscode.window.createTerminal(opts);
+  return logTerm;
+}
+
+/**
+ * Show the log, always to the RIGHT of the agent's console.
+ *
+ * VS Code splits a terminal to the right of a parent and has no way to put
+ * one to its left. So when an agent starts beside a log that is already
+ * standing alone, the log is thrown away and re-split. That costs nothing:
+ * the feed is redrawn from the engine either way.
+ */
+async function showLog(rebuild) {
+  if (!(await ensureServer())) return;
+  if (rebuild === true && logTerm !== null) {
+    logTerm.dispose();
+    logTerm = null;
+    logEmitter = null;
+  }
+  if (logTerm === null) makeLogTerminal(agentTerm);
+  logTerm.show(true);
+  await pollLog();
+}
+
+/** A reference clicked in the log terminal explains itself in Details. */
+async function showLogRef(ref) {
+  await vscode.commands.executeCommand("quackitect.details.focus");
+  if (detailsView !== null) detailsView.post({ quackitect: "logref", ref });
 }
 
 // The same choice RUNME makes: Claude wins when both are installed. The
@@ -828,9 +991,11 @@ async function startAgent() {
     void vscode.window.showErrorMessage("Quackitect: no agent CLI found — install Claude Code (or Copilot CLI), then retry.");
     return;
   }
-  const term = vscode.window.createTerminal({ name: "Quackitect agent", cwd: path.join(root, "workspace") });
-  term.show();
-  term.sendText(command, true);
+  agentTerm = vscode.window.createTerminal({ name: "Quackitect agent", cwd: path.join(root, "workspace") });
+  agentTerm.show();
+  agentTerm.sendText(command, true);
+  // Rebuilt, so the log lands to the agent's RIGHT whatever stood there before.
+  await showLog(true);
 }
 
 async function openCard(n) {
@@ -849,7 +1014,7 @@ async function openCard(n) {
     return;
   }
   if (card.widget === "log") {
-    await vscode.commands.executeCommand("quackitect.log.focus");
+    await showLog(false);
     return;
   }
   openWindow(n, false);
@@ -876,27 +1041,38 @@ function activate(context) {
   strip = new Strip();
   controls = new Controls();
   detailsView = new CardView("details");
-  logView = new CardView("log");
   const keepAlive = { webviewOptions: { retainContextWhenHidden: true } };
   context.subscriptions.push(
     output,
     vscode.window.registerWebviewViewProvider("quackitect.tools", strip, keepAlive),
     vscode.window.registerWebviewViewProvider("quackitect.controls", controls, keepAlive),
     vscode.window.registerWebviewViewProvider("quackitect.details", detailsView, keepAlive),
-    vscode.window.registerWebviewViewProvider("quackitect.log", logView, keepAlive),
-    vscode.commands.registerCommand("quackitect.expandLog", async () => {
-      await ensureCards();
-      const card = logCard();
-      if (card !== undefined) openWindow(card.n, false);
+    // A REFERENCE IN THE LOG TERMINAL IS A LINK. This is what buys back the
+    // clicking a webview log had, without a second log to keep in step.
+    vscode.window.registerTerminalLinkProvider({
+      provideTerminalLinks: (ctx) => {
+        const out = [];
+        REF_RE.lastIndex = 0;
+        let m = REF_RE.exec(ctx.line);
+        while (m !== null) {
+          out.push({ startIndex: m.index, length: m[0].length, tooltip: "show this act in Details", ref: m[1] });
+          m = REF_RE.exec(ctx.line);
+        }
+        return out;
+      },
+      handleTerminalLink: (link) => void showLogRef(link.ref),
+    }),
+    vscode.window.onDidCloseTerminal((t) => {
+      if (t === agentTerm) agentTerm = null;
+      if (t === logTerm) {
+        logTerm = null;
+        logEmitter = null;
+      }
     }),
     vscode.commands.registerCommand("quackitect.help", () => void showHelp("Quackitect", SYSTEM_HELP, true)),
     vscode.commands.registerCommand("quackitect.startAgent", withHelp("quackitect.startAgent", startAgent)),
     vscode.commands.registerCommand("quackitect.howToAttach", showAttach),
-    vscode.commands.registerCommand("quackitect.expandDetails", async () => {
-      await ensureCards();
-      const card = detailsCard();
-      if (card !== undefined) openWindow(card.n, false);
-    }),
+    vscode.commands.registerCommand("quackitect.expandDetails", () => void expandDetails()),
     vscode.commands.registerCommand(
       "quackitect.restartServer",
       withHelp("quackitect.restartServer", async () => {
@@ -909,7 +1085,7 @@ function activate(context) {
         await refreshCards();
         await pollWalk();
         detailsView.up();
-        logView.up();
+        if (logTerm !== null) await pollLog();
         for (const w of windows.values()) w.up();
       }),
     ),
@@ -917,7 +1093,7 @@ function activate(context) {
       strip.render();
       controls.render();
       detailsView.theme();
-      logView.theme();
+      for (const s of snapshots) s.theme();
       for (const w of windows.values()) w.theme();
     }),
     { dispose: () => { if (poller !== null) clearInterval(poller); } },

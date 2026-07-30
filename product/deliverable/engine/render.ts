@@ -273,14 +273,16 @@ function machineSvg(source: CanvasData, activeIds: Set<string>, doneIds: Set<str
         parts.push(`<circle cx="${s.cx}" cy="${s.cy}" r="8" class="route-stop${shut > 0 && i >= shut ? " shut" : ""}"/>`);
       }
     }
-    // THE BARRIER, laid ACROSS the line where it shuts, carrying the reason.
+    // THE CLOSURE MARK, on the hop that shuts, carrying the reason. An
+    // exclamation in a ring rather than a bar across the line: a bar reads as
+    // part of the road, and it stays upright whichever way the road runs.
     if (shut > 0) {
-      const a = stops[shut - 1];
       const b = stops[shut];
-      const across = (Math.atan2(b.cy - a.cy, b.cx - a.cx) * 180) / Math.PI;
       parts.push(
         `<g class="clickable" data-detail="state:${esc(b.id)}"><title>${esc(route?.blocked?.why ?? "")}</title>` +
-          `<line x1="0" y1="-15" x2="0" y2="15" class="route-shut" transform="translate(${b.cx} ${b.cy}) rotate(${across.toFixed(1)})"/></g>`,
+          `<g class="route-shut" transform="translate(${b.cx} ${b.cy})">` +
+          `<circle r="12" class="shut-ring"/><path d="M 0 -6.5 L 0 2.5" class="shut-bang"/><circle cy="7" r="1.7" class="shut-dot"/>` +
+          `</g></g>`,
       );
     }
     // YOU ARE HERE: the arrow a map puts under your car, turned to face the
@@ -410,6 +412,11 @@ const STYLE = `
      (green pass, red fail, yellow attention) are meaning, not chrome,
      and stay fixed. */
   :root { --se-bg:#14171a; --se-bg-side:#191d21; --se-raised:#22272c; --se-border:#2a2f34; --se-border-strong:#3a4147; --se-fg:#d8dde2; --se-muted:#7f8b96; --se-dim:#5b6772; }
+  /* THE MEANINGS. Named once here and overridden by a host that has its own
+     colour for the same meaning (see NATIVE). Standalone, these are ours.
+     THE ROUTE IS NOT AMONG THEM and stays a literal blue: it is the declared
+     exception, the one colour no host gets to reinterpret. A test pins it. */
+  :root { --se-accent:#e8b339; --se-accent-bg:#3a2f14; --se-ok:#4a7a55; --se-ok-bg:#1d2b20; --se-warn:#e8b339; }
   * { scrollbar-color: var(--se-border-strong) var(--se-bg); }
   ::-webkit-scrollbar { width: 10px; height: 10px; background: var(--se-bg); }
   ::-webkit-scrollbar-thumb { background: var(--se-border-strong); border-radius: 5px; }
@@ -478,8 +485,8 @@ const STYLE = `
   svg { width: 100%; height: 100%; cursor: grab; }
   svg.panning { cursor: grabbing; }
   .state { fill: var(--se-raised); stroke: var(--se-border-strong); stroke-width: 2; }
-  .state.active { fill: #3a2f14; stroke: #e8b339; stroke-width: 3.5; }
-  .state.done { fill: #1d2b20; stroke: #4a7a55; }
+  .state.active { fill: var(--se-accent-bg); stroke: var(--se-accent); stroke-width: 3.5; }
+  .state.done { fill: var(--se-ok-bg); stroke: var(--se-ok); }
   .state.inner { fill: none; }
   .clickable { cursor: pointer; }
   .clickable:hover .state, .clickable:hover .comment { stroke: var(--se-fg); }
@@ -487,6 +494,7 @@ const STYLE = `
   .sublabel { fill: var(--se-muted); font-size: 17px; text-anchor: middle; font-family: inherit; pointer-events: none; }
   .edge { stroke: var(--se-dim); stroke-width: 2.5; }
   .arrowhead { fill: var(--se-dim); }
+  button.ghost:disabled { opacity: .45; cursor: default; }
   /* THE BLUE LINE. Blue on purpose: the voice reserves green, red and
      yellow for verdicts, and a route is not a verdict. It is a way. */
   .route-line { fill: none; stroke: #4a90d9; stroke-width: 6; stroke-linecap: round; stroke-linejoin: round; }
@@ -494,7 +502,10 @@ const STYLE = `
      The barrier itself is yellow, because yellow is attention and a shut
      road wants the reader's hand on the slider. */
   .route-line.shut { opacity: .28; }
-  .route-shut { stroke: #e8b339; stroke-width: 7; stroke-linecap: round; }
+  .route-shut { stroke: var(--se-warn); fill: none; stroke-width: 2.4; }
+  .route-shut .shut-ring { fill: var(--se-bg); }
+  .route-shut .shut-bang { stroke-width: 3; stroke-linecap: round; }
+  .route-shut .shut-dot { fill: var(--se-warn); stroke: none; }
   .route-stop { fill: #4a90d9; stroke: #9ecbf2; stroke-width: 2; }
   .route-stop.shut { opacity: .28; }
   .route-here { fill: #4a90d9; stroke: #9ecbf2; stroke-width: 2; }
@@ -1012,12 +1023,33 @@ function frozenUrl(url) {
   u.searchParams.set("frozen", "1");
   return u.pathname + u.search;
 }
+// A SOLO CARD STAYS A CARD. Going to "/" replaced one card with the WHOLE
+// mirror inside it — which is what broke double-clicking into a sub-machine,
+// and what left the bar waiting on a page that was never the right one.
+// Only the mirror's own root is rewritten; a document link still goes where
+// it says.
+function keepCard(url) {
+  const here = location.pathname;
+  if (!here.startsWith("/widget/")) return url;
+  if (url !== "/" && url.slice(0, 2) !== "/?") return url;
+  const q = url.indexOf("?");
+  return here + (q < 0 ? "" : url.slice(q));
+}
 function navigateTo(url, label) {
   navigatingAway = true;
   showLoading(label);
-  url = withPlace(url);
+  url = withPlace(keepCard(url));
   location.href = url;
 }
+// The crumbs are plain anchors, so a solo card would follow one straight out
+// to the whole mirror. Capture them and route them through the same rule.
+document.addEventListener("click", (ev) => {
+  if (!location.pathname.startsWith("/widget/")) return;
+  const a = ev.target.closest ? ev.target.closest("a[href^='/?']") : null;
+  if (a === null) return;
+  ev.preventDefault();
+  navigateTo(a.getAttribute("href"), "loading " + (a.textContent || "view"));
+}, true);
 async function refresh(detail) {
   if (FROZEN) return;
   if (navigatingAway) return;
@@ -1066,6 +1098,10 @@ window.addEventListener("message", (ev) => {
   // has no room to explain itself, so what an icon means arrives HERE, in
   // the details pane, the one place the reader already looks for meaning.
   if (d.quackitect === "help") { showDetails(d.title, d.html); return; }
+  // A LOG LINE CLICKED IN THE HOST'S TERMINAL. The record is rendered HERE,
+  // by the same code the mirror uses, so a host never grows a second
+  // renderer for what this page already knows how to draw.
+  if (d.quackitect === "logref") { void openLogDetail(d.ref); return; }
   if (d.quackitect !== "theme") return;
   EMBED = true;
   try { sessionStorage.setItem("se-embed", "1"); } catch { /* storage denied — the flag just will not survive navigation */ }
@@ -2058,12 +2094,16 @@ function widgetHead(title: string, widgetId: string, url: string): string {
  *  would be the same control in two places. */
 const NATIVE = `
   body { font-family: var(--vscode-font-family, ui-monospace, Consolas, monospace); }
+  /* THE HOST ALREADY NAMES THESE MEANINGS, so they are taken from its theme
+     instead of our palette. The ROUTE stays ours: a blue line for the way
+     ahead is a map convention no editor theme outweighs. */
+  body.embed { --se-accent: var(--vscode-button-background); --se-accent-bg: color-mix(in srgb, var(--vscode-button-background) 22%, transparent); --se-ok: var(--vscode-testing-iconPassed); --se-ok-bg: color-mix(in srgb, var(--vscode-testing-iconPassed) 20%, transparent); --se-warn: var(--vscode-editorWarning-foreground); }
   * { border-radius: 0 !important; }
   .label, .sublabel, .group-label, .cond-label, pre, code, table.kv, .logrow, .legend-key { font-family: var(--vscode-editor-font-family, ui-monospace, Consolas, monospace); }
   body.solo .widget { border: 0; }
   body.solo .widget-head { display: none; }
   body.solo #w-machine .widget-head { display: flex; }
-  body.solo #w-machine .head-sliders { display: none; }
+  body.solo #w-machine .head-sliders { display: none !important; }
   body.solo #w-machine .expand { display: none; }
   body.solo aside, body.solo main { background: transparent; }
 `;
@@ -2221,7 +2261,11 @@ export function renderMirror(m: MirrorState, widget?: "machine" | "details" | "l
   // Escape has a hand-side affordance too (parity law): only while a
   // sub-machine other than boot is being walked.
   const crumbTrail = m.session.breadcrumb();
-  const escapeBtn = crumbTrail.length > 1 && crumbTrail[1] !== "boot" ? `<button class="ghost" id="escape-btn" title="escape to idle — the machine is left standing, the reason is recorded">⤴ escape</button>` : "";
+  // ESCAPE STANDS BESIDE THE POSITION, ALWAYS (owner ruling 2026-07-30). It
+  // used to appear and vanish with the walk, which moved everything else in
+  // the row under the reader's hand. Not applicable is DISABLED, not absent.
+  const canEscape = crumbTrail.length > 1 && crumbTrail[1] !== "boot";
+  const escapeBtn = `<button class="ghost" id="escape-btn"${canEscape ? "" : " disabled"} title="${canEscape ? "escape to idle — the machine is left standing, the reason is recorded" : "nothing to escape — the walk is not inside a sub-machine"}">⤴ escape</button>`;
   // The way home when the view holds still elsewhere: the header names
   // the walk's position; clicking it jumps the view there.
   const curLeaf = info.active[0] ?? "";

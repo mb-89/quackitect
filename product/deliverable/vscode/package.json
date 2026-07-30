@@ -18,13 +18,6 @@
           "title": "Quackitect",
           "icon": "media/icon.svg"
         }
-      ],
-      "panel": [
-        {
-          "id": "quackitect-bottom",
-          "title": "Quackitect log",
-          "icon": "media/icon.svg"
-        }
       ]
     },
     "views": {
@@ -42,13 +35,6 @@
         {
           "id": "quackitect.details",
           "name": "Details",
-          "type": "webview"
-        }
-      ],
-      "quackitect-bottom": [
-        {
-          "id": "quackitect.log",
-          "name": "Log",
           "type": "webview"
         }
       ]
@@ -79,11 +65,6 @@
         "title": "Quackitect: Expand the Details",
         "icon": "$(screen-full)"
       },
-      {
-        "command": "quackitect.expandLog",
-        "title": "Quackitect: Expand the Log",
-        "icon": "$(screen-full)"
-      },
       { "command": "quackitect.openCard1", "title": "Quackitect: Open Card 1" },
       { "command": "quackitect.openCard2", "title": "Quackitect: Open Card 2" },
       { "command": "quackitect.openCard3", "title": "Quackitect: Open Card 3" },
@@ -98,11 +79,6 @@
         {
           "command": "quackitect.expandDetails",
           "when": "view == quackitect.details",
-          "group": "navigation@1"
-        },
-        {
-          "command": "quackitect.expandLog",
-          "when": "view == quackitect.log",
           "group": "navigation@1"
         }
       ]

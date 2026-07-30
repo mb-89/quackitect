@@ -27,4 +27,4 @@ the next reload.
 - 0.4 | E | everyday decision
 - 0.6 | C | consequential
 - 0.8 | K | killer / milestone
-- 1 | I | ideation — the agent finds its own work (behavior ships later)
+- 1 | I | ideation — the agent finds its own work
