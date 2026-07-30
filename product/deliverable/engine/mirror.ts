@@ -12,6 +12,7 @@ import { CallLog } from "./calllog.ts";
 import { replayVisitsText } from "./decisions.ts";
 import { Rejection } from "./errors.ts";
 import { appendNote, pendingNotes, readNotes } from "./inbox.ts";
+import { loadCards } from "./cards.ts";
 import { handleHttp, type McpServer } from "./mcp.ts";
 import { feedRows, renderMirror, type MirrorState } from "./render.ts";
 import { resolveInRoot, seDir } from "./paths.ts";
@@ -309,6 +310,15 @@ export function startMirror(o: MirrorOptions): Server {
         res.end(JSON.stringify(state.session.tickInfo(), null, 2));
         return;
       }
+      if (url.pathname === "/api/cards") {
+        // THE HOST READS THE CARDS FROM HERE (owner design 2026-07-30). A host
+        // that draws one button per card must not keep its own copy of the
+        // list — product/cards.md stays the single truth, and a card added
+        // there appears in VS Code without touching the extension.
+        res.writeHead(200, { "content-type": "application/json; charset=utf-8", "access-control-allow-origin": "*" });
+        res.end(JSON.stringify({ cards: loadCards(o.root) }));
+        return;
+      }
       if (url.pathname === "/api/survey") {
         // BOTH HANDS ASK IT (owner ruling 2026-07-28): the agent through
         // se_survey, the person through the machine header's button.
@@ -351,7 +361,7 @@ export function startMirror(o: MirrorOptions): Server {
       }
       if (url.pathname === "/widget/machine" || url.pathname === "/widget/details" || url.pathname === "/widget/log" || url.pathname === "/widget/terminal") {
         res.writeHead(200, { "content-type": "text/html; charset=utf-8" });
-        res.end(renderMirror(state, url.pathname.slice("/widget/".length) as "machine" | "details" | "log" | "terminal", url.searchParams.get("view") ?? undefined));
+        res.end(renderMirror(state, url.pathname.slice("/widget/".length) as "machine" | "details" | "log" | "terminal", url.searchParams.get("view") ?? undefined, undefined, url.searchParams.get("embed") === "1"));
         return;
       }
       // GET / — tick without arguments: information about where we are.

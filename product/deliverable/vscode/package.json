@@ -1,7 +1,7 @@
 {
   "name": "quackitect",
   "displayName": "Quackitect",
-  "description": "The se machine in VS Code — the mirror beside your editor, the records as real files.",
+  "description": "The se machine in VS Code — the control panel beside your editor, the records as real files.",
   "version": "0.1.0",
   "publisher": "quackitect",
   "private": true,
@@ -23,45 +23,135 @@
     "views": {
       "quackitect": [
         {
+          "id": "quackitect.tools",
+          "name": "Quackitect",
+          "type": "webview"
+        },
+        {
+          "id": "quackitect.panel",
+          "name": "Control panel",
           "type": "webview",
-          "id": "quackitect.mirror",
-          "name": "Mirror"
+          "visibility": "collapsed"
+        },
+        {
+          "id": "quackitect.card1",
+          "name": "Card 1",
+          "type": "webview",
+          "visibility": "collapsed",
+          "when": "quackitect.card1"
+        },
+        {
+          "id": "quackitect.card2",
+          "name": "Card 2",
+          "type": "webview",
+          "visibility": "collapsed",
+          "when": "quackitect.card2"
+        },
+        {
+          "id": "quackitect.card3",
+          "name": "Card 3",
+          "type": "webview",
+          "visibility": "collapsed",
+          "when": "quackitect.card3"
+        },
+        {
+          "id": "quackitect.card4",
+          "name": "Card 4",
+          "type": "webview",
+          "visibility": "collapsed",
+          "when": "quackitect.card4"
+        },
+        {
+          "id": "quackitect.card5",
+          "name": "Card 5",
+          "type": "webview",
+          "visibility": "collapsed",
+          "when": "quackitect.card5"
+        },
+        {
+          "id": "quackitect.card6",
+          "name": "Card 6",
+          "type": "webview",
+          "visibility": "collapsed",
+          "when": "quackitect.card6"
+        },
+        {
+          "id": "quackitect.card7",
+          "name": "Card 7",
+          "type": "webview",
+          "visibility": "collapsed",
+          "when": "quackitect.card7"
+        },
+        {
+          "id": "quackitect.card8",
+          "name": "Card 8",
+          "type": "webview",
+          "visibility": "collapsed",
+          "when": "quackitect.card8"
         }
       ]
     },
     "commands": [
-      {
-        "command": "quackitect.openMirror",
-        "title": "Quackitect: Open the Mirror"
-      },
-      {
-        "command": "quackitect.howToAttach",
-        "title": "Quackitect: How to Attach Your Agent"
-      },
       {
         "command": "quackitect.startAgent",
         "title": "Quackitect: Start the Agent",
         "icon": "$(play)"
       },
       {
+        "command": "quackitect.openPanel",
+        "title": "Quackitect: Open the Control Panel",
+        "icon": "$(layout)"
+      },
+      {
         "command": "quackitect.restartServer",
-        "title": "Quackitect: Restart the se Server"
-      }
+        "title": "Quackitect: Restart the Engine",
+        "icon": "$(debug-restart)"
+      },
+      {
+        "command": "quackitect.howToAttach",
+        "title": "Quackitect: How to Attach Your Agent",
+        "icon": "$(question)"
+      },
+      {
+        "command": "quackitect.help",
+        "title": "Quackitect: What This Is",
+        "icon": "$(question)"
+      },
+      { "command": "quackitect.openCard1", "title": "Quackitect: Open Card 1" },
+      { "command": "quackitect.openCard2", "title": "Quackitect: Open Card 2" },
+      { "command": "quackitect.openCard3", "title": "Quackitect: Open Card 3" },
+      { "command": "quackitect.openCard4", "title": "Quackitect: Open Card 4" },
+      { "command": "quackitect.openCard5", "title": "Quackitect: Open Card 5" },
+      { "command": "quackitect.openCard6", "title": "Quackitect: Open Card 6" },
+      { "command": "quackitect.openCard7", "title": "Quackitect: Open Card 7" },
+      { "command": "quackitect.openCard8", "title": "Quackitect: Open Card 8" }
     ],
     "menus": {
       "view/title": [
         {
           "command": "quackitect.startAgent",
-          "when": "view == quackitect.mirror",
-          "group": "navigation"
+          "when": "view == quackitect.tools",
+          "group": "navigation@1"
+        },
+        {
+          "command": "quackitect.restartServer",
+          "when": "view == quackitect.tools",
+          "group": "navigation@2"
         }
       ]
     },
     "keybindings": [
-      {
-        "command": "quackitect.openMirror",
-        "key": "ctrl+alt+q"
-      }
+      { "command": "quackitect.openPanel", "key": "ctrl+alt+q" },
+      { "command": "quackitect.help", "key": "ctrl+alt+/" },
+      { "command": "quackitect.startAgent", "key": "ctrl+alt+enter" },
+      { "command": "quackitect.openCard1", "key": "ctrl+alt+1" },
+      { "command": "quackitect.openCard2", "key": "ctrl+alt+2" },
+      { "command": "quackitect.openCard3", "key": "ctrl+alt+3" },
+      { "command": "quackitect.openCard4", "key": "ctrl+alt+4" },
+      { "command": "quackitect.openCard5", "key": "ctrl+alt+5" },
+      { "command": "quackitect.openCard6", "key": "ctrl+alt+6" },
+      { "command": "quackitect.openCard7", "key": "ctrl+alt+7" },
+      { "command": "quackitect.openCard8", "key": "ctrl+alt+8" }
     ]
   }
 }

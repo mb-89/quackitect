@@ -477,12 +477,12 @@ const STYLE = `
   #w-machine .widget-body { display: flex; }
   svg { width: 100%; height: 100%; cursor: grab; }
   svg.panning { cursor: grabbing; }
-  .state { fill: var(--se-raised); stroke: #4a545e; stroke-width: 2; }
+  .state { fill: var(--se-raised); stroke: var(--se-border-strong); stroke-width: 2; }
   .state.active { fill: #3a2f14; stroke: #e8b339; stroke-width: 3.5; }
   .state.done { fill: #1d2b20; stroke: #4a7a55; }
   .state.inner { fill: none; }
   .clickable { cursor: pointer; }
-  .clickable:hover .state, .clickable:hover .comment { stroke: #8fa0b0; }
+  .clickable:hover .state, .clickable:hover .comment { stroke: var(--se-fg); }
   .label { fill: var(--se-fg); font-size: 26px; text-anchor: middle; font-family: inherit; pointer-events: none; }
   .sublabel { fill: var(--se-muted); font-size: 17px; text-anchor: middle; font-family: inherit; pointer-events: none; }
   .edge { stroke: var(--se-dim); stroke-width: 2.5; }
@@ -499,8 +499,8 @@ const STYLE = `
   .route-stop.shut { opacity: .28; }
   .route-here { fill: #4a90d9; stroke: #9ecbf2; stroke-width: 2; }
   .guard { fill: #e8b339; font-size: 20px; text-anchor: middle; }
-  .comment { fill: #1c2025; stroke: var(--se-border); }
-  .group { fill: #1a1e22; stroke: #333a41; stroke-dasharray: 10 6; stroke-width: 2; }
+  .comment { fill: var(--se-bg-side); stroke: var(--se-border); }
+  .group { fill: var(--se-bg-side); stroke: var(--se-border); stroke-dasharray: 10 6; stroke-width: 2; }
   .group-label { fill: var(--se-dim); font-size: 24px; font-family: inherit; letter-spacing: .06em; }
   .comment-text { color: var(--se-muted); font-size: 13px; line-height: 1.35; }
   .comment-detail { font-size: 15px; line-height: 1.55; color: var(--se-fg); padding: 2px 0 10px; }
@@ -530,7 +530,7 @@ const STYLE = `
   .docview code { background: var(--se-raised); padding: 1px 5px; border-radius: 4px; }
   .docview pre { background: var(--se-bg); border: 1px solid var(--se-border); border-radius: 8px; padding: 10px; overflow: auto; }
   .docview a { color: #7cc4e8; }
-  button.ghost { background: var(--se-raised); color: var(--se-fg); border: 1px solid #4a545e; border-radius: 8px; padding: 6px 12px; font: inherit; cursor: pointer; }
+  button.ghost { background: var(--se-raised); color: var(--se-fg); border: 1px solid var(--se-border-strong); border-radius: 8px; padding: 6px 12px; font: inherit; cursor: pointer; }
   #w-details { flex: 1; border-radius: 0; border: 0; }
   .docheck { accent-color: #e8b339; cursor: pointer; }
   .threshold { display: flex; align-items: center; gap: 8px; color: var(--se-muted); font-size: 12px; text-transform: none; letter-spacing: 0; }
@@ -1053,7 +1053,12 @@ let EMBED = false;
 try { EMBED = sessionStorage.getItem("se-embed") === "1"; } catch { EMBED = false; }
 window.addEventListener("message", (ev) => {
   const d = ev.data;
-  if (!d || d.quackitect !== "theme") return;
+  if (!d) return;
+  // HELP IS A DETAIL, NEVER A BUTTON (ux rule). A host with an icon strip
+  // has no room to explain itself, so what an icon means arrives HERE, in
+  // the details pane, the one place the reader already looks for meaning.
+  if (d.quackitect === "help") { showDetails(d.title, d.html); return; }
+  if (d.quackitect !== "theme") return;
   EMBED = true;
   try { sessionStorage.setItem("se-embed", "1"); } catch { /* storage denied — the flag just will not survive navigation */ }
   const vars = d.vars || {};
@@ -2015,7 +2020,25 @@ function widgetHead(title: string, widgetId: string, url: string): string {
   return `<div class="widget-head"><span>${esc(title)}</span><button class="expand" data-widget="${widgetId}" data-url="${esc(url)}" title="expand · ctrl-click: new tab · shift-click: new window — both open frozen on what this card is showing">⛶</button></div>`;
 }
 
+/** THE NATIVE SKIN (owner ruling 2026-07-30). Docked inside a host, this is
+ *  not our own window any more, so it stops looking like one: square
+ *  corners, the host's fonts, the host's palette. Our own look belongs to
+ *  the standalone mirror. Semantic colours stay ours everywhere.
+ *
+ *  A SOLO card drops its head and its frame — the host already draws a
+ *  titled, bordered pane around it, and two frames read as a bug. */
+const NATIVE = `
+  body { font-family: var(--vscode-font-family, ui-monospace, Consolas, monospace); }
+  * { border-radius: 0 !important; }
+  .label, .sublabel, .group-label, .cond-label, pre, code, table.kv, .logrow, .legend-key { font-family: var(--vscode-editor-font-family, ui-monospace, Consolas, monospace); }
+  body.solo .widget { border: 0; }
+  body.solo .widget-head { display: none; }
+  body.solo aside, body.solo main { background: transparent; }
+`;
+
 export function renderMirror(m: MirrorState, widget?: "machine" | "details" | "log" | "terminal", view?: string, card?: string, embed?: boolean): string {
+  const skin = embed === true ? NATIVE : "";
+  const bodyClass = embed === true ? ` class="embed${widget === undefined ? "" : " solo"}"` : "";
   const info = m.session.describe() as { active: string[]; status: string };
   // The scale is READ from machines/scale.md — the Obsidian-editable
   // truth; an owner edit shows on the next reload.
@@ -2205,21 +2228,21 @@ export function renderMirror(m: MirrorState, widget?: "machine" | "details" | "l
   const terminalWidget = termWidget(true);
 
   if (widget === "terminal") {
-    return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>se · terminal</title><style>${STYLE} #w-terminal{flex:1;height:auto;border-bottom:0}</style></head>
-<body><div class="cols"><aside id="left" style="width:100vw;max-width:100vw">${termWidget(true)}</aside></div>${MODAL}${data}<script>${SCRIPT}</script></body></html>`;
+    return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>se · terminal</title><style>${STYLE} #w-terminal{flex:1;height:auto;border-bottom:0}${skin}</style></head>
+<body${bodyClass}><div class="cols"><aside id="left" style="width:100vw;max-width:100vw">${termWidget(true)}</aside></div>${MODAL}${data}<script>${SCRIPT}</script></body></html>`;
   }
   if (widget === "log") {
-    return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>se · log</title><style>${STYLE} #w-log{flex:1;border-bottom:0}</style></head>
-<body><div class="cols"><aside id="sidebar" style="width:100vw;max-width:100vw">${logWidget}</aside></div>${MODAL}${data}<script>${SCRIPT}</script></body></html>`;
+    return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>se · log</title><style>${STYLE} #w-log{flex:1;border-bottom:0}${skin}</style></head>
+<body${bodyClass}><div class="cols"><aside id="sidebar" style="width:100vw;max-width:100vw">${logWidget}</aside></div>${MODAL}${data}<script>${SCRIPT}</script></body></html>`;
   }
 
   if (widget === "machine") {
-    return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>se · machine</title><style>${STYLE} main{padding:10px}</style></head>
-<body><div class="cols"><main>${machineWidget}</main></div>${MODAL}${data}<script>${SCRIPT}</script></body></html>`;
+    return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>se · machine</title><style>${STYLE} main{padding:10px}${skin}</style></head>
+<body${bodyClass}><div class="cols"><main>${machineWidget}</main></div>${MODAL}${data}<script>${SCRIPT}</script></body></html>`;
   }
   if (widget === "details") {
-    return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>se · details</title><style>${STYLE}</style></head>
-<body><div class="cols"><aside id="sidebar" style="width:100vw;max-width:100vw">${detailsWidget}</aside></div>${MODAL}${data}<script>${SCRIPT}</script></body></html>`;
+    return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>se · details</title><style>${STYLE}${skin}</style></head>
+<body${bodyClass}><div class="cols"><aside id="sidebar" style="width:100vw;max-width:100vw">${detailsWidget}</aside></div>${MODAL}${data}<script>${SCRIPT}</script></body></html>`;
   }
   // THE CARD MATRIX (owner design 2026-07-29). The card list and its ORDER are
   // the product's, in product/cards.md — v3 exists to work on other products,
@@ -2266,8 +2289,8 @@ export function renderMirror(m: MirrorState, widget?: "machine" | "details" | "l
   const nowAt = Math.max(0, cardList.findIndex((c) => c.id === now));
   const legendHtml = `<div class="card" id="card-legend" style="${cellAt(nowAt)}"><div class="widget" id="w-legend"><div class="widget-head"><span>keys</span></div><div class="widget-body">${legendRows}</div></div></div>`;
   const cardData = `<script type="application/json" id="se-cards">${JSON.stringify({ list: cardList.map((c) => ({ n: c.n, id: c.id, title: c.title })), now })}</script>`;
-  return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>se mirror</title><style>${STYLE}</style></head>
-<body>
+  return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>se mirror</title><style>${STYLE}${skin}</style></head>
+<body${bodyClass}>
 <div class="cards" data-keep-style style="grid-template-rows:repeat(${rows},1fr)">
   ${cardsHtml}
   ${legendHtml}

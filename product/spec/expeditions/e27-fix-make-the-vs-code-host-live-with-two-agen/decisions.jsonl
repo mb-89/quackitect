@@ -19,3 +19,19 @@
 {"ts":"2026-07-30T14:54:17.987Z","op":"update","visit":"expeditions/e27@0","node":"d24","brief":"checking the CORS header on the worktree engine directly"}
 {"ts":"2026-07-30T14:55:48.906Z","op":"done","visit":"expeditions/e27@0","node":"d6","brief":"console card absent at ?embed=1 — seen live on the worktree mirror"}
 {"ts":"2026-07-30T14:57:03.920Z","op":"done","visit":"expeditions/e27@0","node":"d7","brief":"play button built and suite-green; the click proof is the owner's"}
+{"ts":"2026-07-30T14:57:08.504Z","op":"done","visit":"expeditions/e27@0","node":"d8","brief":"engine fixes proven live in Chrome; the shell runs only on desktop"}
+{"ts":"2026-07-30T14:57:19.727Z","op":"done","visit":"expeditions/e27@0","node":"d9","brief":"landed on trunk twice, suite green both times"}
+{"ts":"2026-07-30T15:08:06.743Z","op":"plan","visit":"expeditions/e27@0","parent":null,"nodes":[{"id":"d25","brief":"Serve the card list so the shell reads one truth"},{"id":"d26","brief":"One dockable VS Code view per card"},{"id":"d27","brief":"Left bar becomes a labelled tool list, play first"},{"id":"d28","brief":"Rename mirror to control panel in what a person reads"},{"id":"d29","brief":"Native VS Code look in embed mode, no rounded corners"},{"id":"d30","brief":"Shortcuts for every card button"},{"id":"d31","brief":"Suite green and landed on trunk"}]}
+{"ts":"2026-07-30T15:08:55.980Z","op":"update","visit":"expeditions/e27@0","node":"d32","brief":"reading the page shells to inject the native skin"}
+{"ts":"2026-07-30T15:09:37.084Z","op":"done","visit":"expeditions/e27@0","node":"d25","brief":"/api/cards serves product/cards.md as the one truth"}
+{"ts":"2026-07-30T15:10:48.498Z","op":"done","visit":"expeditions/e27@0","node":"d30","brief":"every card button carries a remappable shortcut"}
+{"ts":"2026-07-30T15:12:37.481Z","op":"done","visit":"expeditions/e27@0","node":"d27","brief":"the left bar is a labelled tool list, play first"}
+{"ts":"2026-07-30T15:14:04.374Z","op":"update","visit":"expeditions/e27@0","node":"d33","brief":"engine takes a help message into the details pane"}
+{"ts":"2026-07-30T15:16:43.610Z","op":"done","visit":"expeditions/e27@0","node":"d26","brief":"one dockable view per card, opened from the icon strip"}
+{"ts":"2026-07-30T15:16:56.194Z","op":"update","visit":"expeditions/e27@0","node":"d34","brief":"syntax-checking the rewritten shell"}
+{"ts":"2026-07-30T15:17:12.885Z","op":"done","visit":"expeditions/e27@0","node":"d28","brief":"the panel is called the control panel wherever a person reads it"}
+{"ts":"2026-07-30T15:17:21.770Z","op":"update","visit":"expeditions/e27@0","node":"d35","brief":"test engine up on 7444 to look at the native skin"}
+{"ts":"2026-07-30T15:17:45.059Z","op":"update","visit":"expeditions/e27@0","node":"d36","brief":"running the suite over the engine and shell changes"}
+{"ts":"2026-07-30T15:19:03.040Z","op":"update","visit":"expeditions/e27@0","node":"d37","brief":"checking the skin and the card list over HTTP"}
+{"ts":"2026-07-30T15:19:49.807Z","op":"done","visit":"expeditions/e27@0","node":"d29","brief":"native skin done; the drawing now rides the palette"}
+{"ts":"2026-07-30T15:21:01.882Z","op":"update","visit":"expeditions/e27@0","node":"d38","brief":"226 green after the skin change; committing"}
