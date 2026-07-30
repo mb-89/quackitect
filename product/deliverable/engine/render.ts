@@ -693,7 +693,15 @@ let DETAIL_TITLE = null;
 let DETAIL_HTML = null;
 function showDetails(title, html) {
   const el = document.getElementById("details");
-  if (!el) return;
+  if (!el) {
+    // A SOLO CARD HAS NO DETAILS PANE OF ITS OWN. Embedded, details are a
+    // surface the HOST owns, so the subject travels out to it. Dropping it
+    // here is what made clicking a state do nothing at all.
+    // Being IN A FRAME is the test, not the embed flag: this runs before the
+    // flag is initialised, and a frame is exactly when a host is listening.
+    if (window.parent !== window) window.parent.postMessage({ quackitect: "details", title: title, html: html }, "*");
+    return;
+  }
   // NOTHING CHANGED, NOTHING MOVES. rebind() re-derives this pane after every
   // morph. Rewriting identical markup flickered it and threw the reader's
   // scroll position away while they were reading. The pane carries

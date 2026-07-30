@@ -314,6 +314,7 @@ function framePage(url) {
     const d = ev.data;
     if (!d) return;
     if (d.quackitect === "open") { vsapi.postMessage(d); return; }
+    if (d.quackitect === "details") { vsapi.postMessage(d); return; } // a click in THIS card, bound for the details group
     if (d.quackitect === "theme-changed") { sendTheme(); return; }
     if (d.quackitect === "up") { show(); return; }
     if (d.quackitect === "help") {
@@ -415,6 +416,10 @@ function openInEditor(rel) {
 function onWebviewMessage(m) {
   if (!m) return;
   if (m.quackitect === "open") openInEditor(m.path);
+  // CLICKING ANYTHING EXPLAINS IT IN DETAILS (ux rule). Split across windows,
+  // the card that was clicked and the group that explains it are two separate
+  // documents, so the subject is relayed rather than shown in place.
+  else if (m.quackitect === "details") void showHelp(m.title, m.html, false);
 }
 
 /** Anything that shows an engine page and can be told the theme changed. */
