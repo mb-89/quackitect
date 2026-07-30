@@ -345,6 +345,9 @@ function framePage(url) {
       // The MEANINGS the drawing maps to. Not every theme defines the testing
       // colour, so the chart green stands in rather than nothing at all.
       "--vscode-button-background": cssVar("--vscode-button-background"),
+      // The walk's blue. The editor names no colour for "where the walk is",
+      // so a theme without a chart palette falls back in the sheet itself.
+      "--vscode-charts-blue": cssVar("--vscode-charts-blue"),
       "--vscode-testing-iconPassed": cssVar("--vscode-testing-iconPassed") || cssVar("--vscode-charts-green"),
       "--vscode-editorWarning-foreground": cssVar("--vscode-editorWarning-foreground"),
     };
@@ -363,8 +366,9 @@ function framePage(url) {
     sendTheme();
     setTimeout(sendTheme, 400);
     if (pendingHelp !== null) {
+      // It stays pending until the page ACKNOWLEDGES it, so a document that is
+      // replaced again mid-delivery still gets the subject on the next load.
       const h = pendingHelp;
-      pendingHelp = null;
       setTimeout(() => frame.contentWindow && frame.contentWindow.postMessage(h, "*"), 450);
     }
   });
@@ -385,10 +389,16 @@ function framePage(url) {
     if (d.se === "theme-changed") { sendTheme(); return; }
     if (d.se === "up") { show(); return; }
     if (d.se === "wake") { if (loaded && frame.contentWindow) frame.contentWindow.postMessage(d, "*"); return; }
+    // THE PAGE ACKNOWLEDGES, AND UNTIL IT DOES THE SUBJECT STAYS PENDING.
+    // `loaded` only says that a document once finished loading. It says
+    // nothing about the one being replaced right this moment, and a post
+    // into a dying document is swallowed silently.
+    if (d.se === "ack") { pendingHelp = null; return; }
+    if (d.se === "nav") { loaded = false; return; }
     if (d.se === "help" || d.se === "logref") {
       vsapi.postMessage({ se: "trace", text: "relay " + d.se + " loaded=" + loaded + " frame=" + (frame.contentWindow ? "yes" : "no") });
+      pendingHelp = d;
       if (loaded && frame.contentWindow) frame.contentWindow.postMessage(d, "*");
-      else pendingHelp = d;
       show();
     }
   });
@@ -682,7 +692,7 @@ async function expandDetails() {
 async function showFieldHelp(which) {
   if (which === "filter") {
     await showHelp(
-      "the feed filter",
+      "the log filter",
       "<p>Substring match over an act's time, hand, kind, brief and refusal clause.</p>" +
         "<p>The log is a terminal, so filtering redraws it. Clear the box to see everything again.</p>",
       false,
@@ -821,7 +831,7 @@ class Controls {
   <div class="notches" id="s-notches"></div>
 
   <div class="sep"></div>
-  <input id="filter" type="text" placeholder="filter the feed">
+  <input id="filter" type="text" placeholder="filter the logs">
   <input id="note" type="text" placeholder="drop a note — Enter captures it">
 </div>
 <script>

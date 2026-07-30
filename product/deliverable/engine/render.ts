@@ -422,6 +422,12 @@ const STYLE = `
      THE ROUTE IS NOT AMONG THEM and stays a literal blue: it is the declared
      exception, the one colour no host gets to reinterpret. A test pins it. */
   :root { --se-accent:#e8b339; --se-accent-bg:#3a2f14; --se-ok:#4a7a55; --se-ok-bg:#1d2b20; --se-warn:#e8b339; }
+  /* THE WALK'S OWN COLOUR (owner ruling 2026-07-30). Where the walk stands
+     and where it has BEEN are blue, on the same map convention the route
+     line rests on. Having been somewhere is not a verdict, so it never
+     wears green. The fill mixes into the surface behind it and never into
+     transparent: a translucent fill over a dark pane reads as black. */
+  :root { --se-walk:#4a90d9; --se-walk-bg:#1b2a3a; --se-walk-soft:#161f28; }
   * { scrollbar-color: var(--se-border-strong) var(--se-bg); }
   ::-webkit-scrollbar { width: 10px; height: 10px; background: var(--se-bg); }
   ::-webkit-scrollbar-thumb { background: var(--se-border-strong); border-radius: 5px; }
@@ -490,8 +496,10 @@ const STYLE = `
   svg { width: 100%; height: 100%; cursor: grab; }
   svg.panning { cursor: grabbing; }
   .state { fill: var(--se-raised); stroke: var(--se-border-strong); stroke-width: 2; }
-  .state.active { fill: var(--se-accent-bg); stroke: var(--se-accent); stroke-width: 3.5; }
-  .state.done { fill: var(--se-ok-bg); stroke: var(--se-ok); }
+  .state.active { fill: var(--se-walk-bg); stroke: var(--se-walk); stroke-width: 3.5; }
+  /* Been there, not here: the same blue, quieter. The reader tells the two
+     apart by weight, never by hue. */
+  .state.done { fill: var(--se-walk-soft); stroke: var(--se-walk); stroke-width: 2; }
   .state.inner { fill: none; }
   .clickable { cursor: pointer; }
   .clickable:hover .state, .clickable:hover .comment { stroke: var(--se-fg); }
@@ -527,7 +535,7 @@ const STYLE = `
   .meta { color: var(--se-muted); font-size: 12px; padding: 8px 12px; }
   .todo-origin { color: var(--se-muted); font-size: 11px; }
   table.kv { border-collapse: collapse; width: 100%; font-size: 12.5px; }
-  table.kv td { border: 1px solid var(--se-border); padding: 4px 8px; vertical-align: top; }
+  table.kv td { border: 1px solid var(--se-border); padding: 2px 6px; line-height: 1.35; vertical-align: top; }
   table.kv td.k { color: #e8b339; white-space: nowrap; width: 1%; }
   table.kv td.v { color: var(--se-fg); word-break: break-word; }
   table.kv table.kv { margin: 2px 0; }
@@ -551,7 +559,17 @@ const STYLE = `
   .docheck { accent-color: #e8b339; cursor: pointer; }
   .docline { display: flex; align-items: center; gap: 6px; padding: 3px 0; }
   .collbody { padding: 4px 10px 8px; }
-  .fval { min-width: 0; overflow-wrap: anywhere; }
+  .fval { min-width: 0; overflow-wrap: anywhere; line-height: 1.35; }
+  /* THE FRONT MATTER SITS TIGHT (owner ruling 2026-07-30). The element
+     library spaces a form group for a settings page. A receipt is a dense
+     record, and the reader wants more of it on screen at once. */
+  vscode-form-group { margin: 0 !important; padding: 0 !important; }
+  vscode-form-group vscode-label { line-height: 1.35; }
+  /* THE NEXT STATES, one block each. */
+  .nextitem { border: 1px solid var(--se-border); margin: 4px 0; }
+  .nextitem.open { border-color: var(--se-walk); }
+  .nexthead { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 3px 8px; background: var(--se-raised); }
+  .nextto { color: var(--se-accent); overflow-wrap: anywhere; }
   vscode-icon.ok { color: var(--vscode-testing-iconPassed, #4a7a55); }
   vscode-icon.no { color: var(--se-muted); }
   .threshold { display: flex; align-items: center; gap: 8px; color: var(--se-muted); font-size: 12px; text-transform: none; letter-spacing: 0; }
@@ -827,8 +845,13 @@ let CURRENT = (D.describe.active && D.describe.active[0]) ? D.describe.active[0]
 let WALK_HERE = D.viewingWalk;
 function nextTable(id, s) {
   const here = WALK_HERE && id === CURRENT;
-  return '<table class="kv">' + s.next.map((n, i) => {
-    const inner = jsonTable({ to: n.to, ...(n.statement ? { statement: n.statement } : {}), role: n.role, ...(n.guard ? { guard: n.guard } : {}) });
+  // THE NEW WAY (owner ruling 2026-07-30): the host's own elements, the same
+  // ones the facts and the pull already use. A bordered table nested inside
+  // another bordered table was the last of the old rendering left in here.
+  const field = (k, v) => (v === undefined || v === null || v === "") ? ""
+    : '<vscode-form-group variant="horizontal"><vscode-label>' + k + "</vscode-label>"
+      + '<div class="fval">' + escText(String(v)) + "</div></vscode-form-group>";
+  return s.next.map((n) => {
     const unlocked = here && s.exit_met && n.enter_met;
     // The locked tooltip NAMES what is missing — never a bare "not met".
     const exitMiss = s.exit ? Object.entries(s.exit).filter(([, c]) => !c.met).map(([k]) => "condition " + k) : [];
@@ -841,8 +864,11 @@ function nextTable(id, s) {
       ? '<vscode-button class="go" icon="play" icon-only data-to="' + n.to + '"' + (unlocked ? "" : " disabled") +
         ' title="' + escText(title) + '"></vscode-button>'
       : "";
-    return '<tr><td class="k">' + i + '</td><td class="v">' + inner + '</td>' + (here ? '<td class="btncell">' + btn + "</td>" : "") + "</tr>";
-  }).join("") + "</table>";
+    return '<div class="nextitem' + (unlocked ? " open" : "") + '">'
+      + '<div class="nexthead"><span class="nextto">' + escText(n.to) + "</span>" + btn + "</div>"
+      + field("role", n.role) + field("guard", n.guard) + field("statement", n.statement)
+      + "</div>";
+  }).join("");
 }
 // THE CHECK IS THE READER'S PROOF, AND IT IS PER VERSION — an edited doc
 // unchecks itself. A doc named by a CONDITION is not always in that state's
@@ -864,10 +890,13 @@ function docRow(p) {
 function pulledView(pulled) {
   const bySource = {};
   for (const p of pulled) for (const src of p.sources) (bySource[src] ??= []).push(p);
+  // The engine calls the always-on set "root". The reader sees a PULL, and
+  // that is the word the fold wears (owner ruling 2026-07-30).
+  const SRC_LABEL = { root: "pull" };
   return Object.entries(bySource).map(([srcName, docs]) => {
     const done = docs.filter(docChecked).length;
     // Open while there is still something to read; folded once it is done.
-    return '<vscode-collapsible title="' + escText(srcName) + '" description="' + done + "/" + docs.length + ' read"' + (done < docs.length ? " open" : "") + ">"
+    return '<vscode-collapsible title="' + escText(SRC_LABEL[srcName] || srcName) + '" description="' + done + "/" + docs.length + ' read"' + (done < docs.length ? " open" : "") + ">"
       + '<div class="collbody">' + docs.map(docRow).join("") + "</div></vscode-collapsible>";
   }).join("");
 }
@@ -945,7 +974,7 @@ function stateDetail(id) {
   if (WALK_HERE && id === CURRENT && s.kind === "end" && (!s.next || s.next.length === 0) && D.describe.breadcrumb.length > 1) {
     const parent = D.describe.breadcrumb[0];
     html += '<div class="meta" style="padding:8px 0 4px">next</div>' +
-      '<table class="kv"><tr><td class="v">return to ' + parent + '</td><td class="btncell"><vscode-button class="go" icon="play" icon-only data-to="" title="tick: leave the sub-machine"></vscode-button></td></tr></table>';
+      '<div class="nextitem open"><div class="nexthead"><span class="nextto">return to ' + escText(parent) + '</span><vscode-button class="go" icon="play" icon-only data-to="" title="tick: leave the sub-machine"></vscode-button></div></div>';
   }
   return html;
 }
@@ -1084,6 +1113,9 @@ function navigateTo(url, label) {
   showLoading(label);
   url = withPlace(keepCard(url));
   hostTrace("navigateTo " + url);
+  // This document is about to be replaced, so the host must stop posting
+  // into it. A post that lands in a dying document is swallowed whole.
+  if (window.parent !== window) window.parent.postMessage({ se: "nav" }, "*");
   location.href = url;
 }
 // The crumbs are plain anchors, so a solo card would follow one straight out
@@ -1145,13 +1177,13 @@ window.addEventListener("message", (ev) => {
   // the details pane, the one place the reader already looks for meaning.
   // The host saw the walk move. Embedded, this replaces the event stream.
   if (d.se === "wake") { refresh(); return; }
-  if (d.se === "help") { hostTrace("page got help"); showDetails(d.title, d.html); return; }
+  if (d.se === "help") { hostTrace("page got help"); showDetails(d.title, d.html); hostAck(); return; }
   // A LOG LINE CLICKED IN THE HOST'S TERMINAL. The record is rendered HERE,
   // by the same code the mirror uses, so a host never grows a second
   // renderer for what this page already knows how to draw.
   if (d.se === "logref") {
     hostTrace("page got logref " + d.ref + " on " + location.pathname);
-    void openLogDetail(d.ref).then(() => hostTrace("logref rendered " + d.ref), (e) => hostTrace("logref FAILED " + String((e && e.message) || e)));
+    void openLogDetail(d.ref).then(() => { hostTrace("logref rendered " + d.ref); hostAck(); }, (e) => hostTrace("logref FAILED " + String((e && e.message) || e)));
     return;
   }
   if (d.se !== "theme") return;
@@ -1167,6 +1199,11 @@ function embedOpen(path) {
   if (!EMBED || !path) return false;
   window.parent.postMessage({ se: "open", path: path }, "*");
   return true;
+}
+// THE HOST HOLDS THE SUBJECT UNTIL THIS ARRIVES. Without it the relay had to
+// infer from a load event whether this page was still there to receive.
+function hostAck() {
+  if (window.parent !== window) window.parent.postMessage({ se: "ack" }, "*");
 }
 document.addEventListener("click", async (ev) => {
   const c = ev.target.closest ? ev.target.closest(".docheck") : null;
@@ -2192,7 +2229,11 @@ const NATIVE = `
   /* THE HOST ALREADY NAMES THESE MEANINGS, so they are taken from its theme
      instead of our palette. The ROUTE stays ours: a blue line for the way
      ahead is a map convention no editor theme outweighs. */
-  body.embed { --se-accent: var(--vscode-button-background); --se-accent-bg: color-mix(in srgb, var(--vscode-button-background) 22%, transparent); --se-ok: var(--vscode-testing-iconPassed); --se-ok-bg: color-mix(in srgb, var(--vscode-testing-iconPassed) 20%, transparent); --se-warn: var(--vscode-editorWarning-foreground); }
+  /* MIX INTO THE SURFACE, NEVER INTO TRANSPARENT. Inside the iframe no
+     --vscode-* variable exists; --se-bg carries the forwarded editor
+     background, so it is what a translucent fill has to blend with. */
+  body.embed { --se-accent: var(--vscode-button-background); --se-accent-bg: color-mix(in srgb, var(--vscode-button-background) 22%, var(--se-bg)); --se-ok: var(--vscode-testing-iconPassed); --se-ok-bg: color-mix(in srgb, var(--vscode-testing-iconPassed) 20%, var(--se-bg)); --se-warn: var(--vscode-editorWarning-foreground); }
+  body.embed { --se-walk: var(--vscode-charts-blue, #4a90d9); --se-walk-bg: color-mix(in srgb, var(--se-walk) 30%, var(--se-bg)); --se-walk-soft: color-mix(in srgb, var(--se-walk) 14%, var(--se-bg)); }
   * { border-radius: 0 !important; }
   .label, .sublabel, .group-label, .cond-label, pre, code, table.kv, .logrow, .legend-key { font-family: var(--vscode-editor-font-family, ui-monospace, Consolas, monospace); }
   body.solo .widget { border: 0; }
