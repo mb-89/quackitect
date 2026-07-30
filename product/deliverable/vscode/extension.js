@@ -234,7 +234,7 @@ function activate(context) {
     vscode.commands.registerCommand("$PRODUCT_ID$.howToAttach", showAttach),
     vscode.commands.registerCommand("$PRODUCT_ID$.restartServer", async () => {
       if (child !== null) {
-        child.kill();
+        killTree(child);
         child = null;
       }
       await ensureServer();
@@ -250,15 +250,15 @@ function activate(context) {
   }
 }
 
-function deactivate() {
-  // The server lives and dies with VS Code — deliberately.
-  disposed = true;
-  if (child === null) return;
-  // KILL THE TREE, NOT THE HANDLE. On Windows the handle is the shell we
-  // spawned through, so killing it leaves the node process behind — along
-  // with everything that process started — still holding the port.
-  const pid = child.pid;
-  child.kill();
+// KILL THE TREE, NOT THE HANDLE. On Windows the handle is the shell we
+// spawned through, so killing it leaves the node process behind — along with
+// everything that process started — still holding the port. Every place that
+// stops the server goes through here; a restart that leaves the old one
+// standing is the same stray by another name.
+function killTree(proc) {
+  if (proc === null || proc === undefined) return;
+  const pid = proc.pid;
+  proc.kill();
   if (process.platform === "win32" && pid !== undefined) {
     try {
       spawnSync("taskkill", ["/PID", String(pid), "/T", "/F"], { windowsHide: true });
@@ -266,6 +266,12 @@ function deactivate() {
       // The server's own parent watchdog is the belt for this.
     }
   }
+}
+
+function deactivate() {
+  // The server lives and dies with VS Code — deliberately.
+  disposed = true;
+  killTree(child);
 }
 
 module.exports = { activate, deactivate };

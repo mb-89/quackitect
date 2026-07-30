@@ -86,3 +86,7 @@
 {"ts":"2026-07-30T19:15:47.923Z","op":"update","visit":"expeditions/e26@0","node":"d70","brief":"running the new element tests"}
 {"ts":"2026-07-30T19:16:07.363Z","op":"done","visit":"expeditions/e26@0","node":"d58","brief":"the state details render as library components"}
 {"ts":"2026-07-30T19:17:26.215Z","op":"done","visit":"expeditions/e26@0","node":"d59","brief":"links stay plain anchors in the light DOM"}
+{"ts":"2026-07-30T19:17:36.344Z","op":"done","visit":"expeditions/e26@0","node":"d60","brief":"237 tests pass and the served page was inspected"}
+{"ts":"2026-07-30T19:20:11.597Z","op":"fork","visit":"expeditions/e26@0","parent":null,"node":"d71","brief":"the VS Code restart left the old server standing too","nodes":[]}
+{"ts":"2026-07-30T19:20:17.178Z","op":"update","visit":"expeditions/e26@0","node":"d72","brief":"checking the tree kill refactor"}
+{"ts":"2026-07-30T19:20:24.581Z","op":"done","visit":"expeditions/e26@0","node":"d71","brief":"every stop path takes the process tree"}
