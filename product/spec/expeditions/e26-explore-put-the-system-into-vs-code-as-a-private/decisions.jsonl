@@ -138,3 +138,4 @@
 {"ts":"2026-07-30T20:09:04.174Z","op":"done","visit":"expeditions/e26@0","node":"d16","brief":"Six claims checked and five of them were wrong or stale"}
 {"ts":"2026-07-30T20:11:36.984Z","op":"done","visit":"expeditions/e26@0","node":"d17","brief":"Handover rewritten and the search caution corrected"}
 {"ts":"2026-07-30T20:12:07.995Z","op":"done","visit":"expeditions/e26@0","node":"d18","brief":"Answered how the reconnect actually works"}
+{"ts":"2026-07-30T20:16:20.720Z","op":"plan","visit":"expeditions/e26@0","parent":null,"nodes":[{"id":"d20","brief":"Fix the backtick that ended the template literal"},{"id":"d21","brief":"Make preflight parse the extension so this cannot ship again"}]}

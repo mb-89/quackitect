@@ -390,9 +390,11 @@ function framePage(url) {
     if (d.se === "up") { show(); return; }
     if (d.se === "wake") { if (loaded && frame.contentWindow) frame.contentWindow.postMessage(d, "*"); return; }
     // THE PAGE ACKNOWLEDGES, AND UNTIL IT DOES THE SUBJECT STAYS PENDING.
-    // `loaded` only says that a document once finished loading. It says
-    // nothing about the one being replaced right this moment, and a post
-    // into a dying document is swallowed silently.
+    // The loaded flag only says that a document once finished loading. It
+    // says nothing about the one being replaced right this moment, and a
+    // post into a dying document is swallowed silently.
+    // NO BACKTICKS ANYWHERE IN HERE: this block lives inside a template
+    // literal, and one backtick ends the string. It shipped broken once.
     if (d.se === "ack") { pendingHelp = null; return; }
     if (d.se === "nav") { loaded = false; return; }
     if (d.se === "help" || d.se === "logref") {
