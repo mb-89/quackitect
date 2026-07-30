@@ -97,3 +97,6 @@
 {"ts":"2026-07-30T19:23:22.795Z","op":"update","visit":"expeditions/e26@1","node":"d77","brief":"checking what is uncommitted in the worktree"}
 {"ts":"2026-07-30T19:23:26.910Z","op":"update","visit":"expeditions/e26@1","node":"d78","brief":"committing the decision trail before the sync"}
 {"ts":"2026-07-30T19:23:41.913Z","op":"update","visit":"expeditions/e26@1","node":"d79","brief":"syncing trunk into the expedition"}
+{"ts":"2026-07-30T19:26:31.142Z","op":"update","visit":"expeditions/e26@1","node":"d80","brief":"package.json takes trunk's shell with the placeholders"}
+{"ts":"2026-07-30T19:27:01.324Z","op":"done","visit":"expeditions/e26@1","node":"d73","brief":"merge backed out; the branch is stale enough to need a decision"}
+{"ts":"2026-07-30T19:33:04.343Z","op":"plan","visit":"expeditions/e26@1","parent":null,"nodes":[{"id":"d81","brief":"merge trunk in, resolving by taking its side"},{"id":"d82","brief":"re-apply the placeholders to trunk's shell"},{"id":"d83","brief":"re-apply the watchdog and the tree kill"},{"id":"d84","brief":"land it and reload so the renderers show"}]}
