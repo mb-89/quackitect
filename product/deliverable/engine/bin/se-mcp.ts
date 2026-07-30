@@ -85,6 +85,10 @@ ENGINE — read by the server (this file is where they are defined).
                  (--threshold and SE_THRESHOLD are the old spelling.)
   --mirror-port  the embedded mirror's HTTP port (the human's hand on the
                  same walk). Default 7333. 0 disables. Env: SE_MIRROR_PORT.
+  --headless     no stdio lane — agents attach over HTTP instead, at /mcp
+                 on the mirror port. For a host that OWNS the process and
+                 lets harnesses attach (the VS Code extension spawns the
+                 server this way). The mirror stays enabled.
   --child        INTERNAL, never typed by hand. The shim spawns itself with
                  it to run the engine proper. SE_HOT_DISABLE=1 does the same
                  in one process.
@@ -139,9 +143,15 @@ if (argv.includes("--child") || process.env.SE_HOT_DISABLE === "1") {
     setTimeout(() => process.exit(0), 1500);
   };
 
+  const headless = argv.includes("--headless");
+  if (headless && mirrorPort <= 0) {
+    process.stderr.write("se-mcp: --headless serves the lane at /mcp on the mirror port — it cannot run with the mirror disabled\n");
+    process.exit(1);
+  }
+  const mcpServer = buildServer(root, session);
   if (mirrorPort > 0) {
     const log = new CallLog(seDir(root));
-    const mirror = startMirror({ session, root, port: mirrorPort, log, mode: "agent" });
+    const mirror = startMirror({ session, root, port: mirrorPort, log, mode: "agent", mcp: mcpServer });
     // A second agent on the same machine (worktree concurrency) must not die
     // over the mirror port — the MCP lane matters more than the window.
     mirror.on("error", (e) => {
@@ -158,12 +168,14 @@ if (argv.includes("--child") || process.env.SE_HOT_DISABLE === "1") {
     });
   }
 
-  process.stderr.write(`se-mcp 3.0.0-bootstrap root=${root} autonomy=${session.autonomy}\n`);
-  runStdio(buildServer(root, session), () => {
-    process.stderr.write("se-mcp: the console quit — telling the mirror, then shutting down\n");
-    session.markServerGone();
-    setTimeout(() => process.exit(0), 700);
-  });
+  process.stderr.write(`se-mcp 3.0.0-bootstrap root=${root} autonomy=${session.autonomy}${headless ? " headless" : ""}\n`);
+  if (!headless) {
+    runStdio(mcpServer, () => {
+      process.stderr.write("se-mcp: the console quit — telling the mirror, then shutting down\n");
+      session.markServerGone();
+      setTimeout(() => process.exit(0), 700);
+    });
+  }
 } else {
   // ── THE SHIM — dumb on purpose: it never imports the engine and never
   //    watches sources. It spawns the child, forwards lines, and respawns
@@ -214,35 +226,39 @@ if (argv.includes("--child") || process.env.SE_HOT_DISABLE === "1") {
     return child;
   };
 
-  const rl = createInterface({ input: process.stdin, terminal: false });
-  rl.on("line", (line) => {
-    if (line.trim() === "") return;
-    const c = ensureChild();
-    try {
-      const id = (JSON.parse(line) as { id?: number | string | null }).id;
-      if (id !== undefined && id !== null) pending.add(id);
-    } catch {
-      // the child answers parse errors itself
-    }
-    c.stdin!.write(line + "\n");
-  });
-  rl.on("close", () => {
-    // Drain: answers already owed still flow home before the lights go out.
-    const started = Date.now();
-    const drain = setInterval(() => {
-      if (pending.size === 0 || Date.now() - started > 3000) {
-        clearInterval(drain);
-        // CLOSE THE LANE, DO NOT SHOOT THE ENGINE. Ending stdin is what tells
-        // the child the console quit, and it needs a breath to push that to
-        // every open mirror. The kill is only the backstop.
-        child?.stdin?.end();
-        setTimeout(() => {
-          child?.kill();
-          process.exit(0);
-        }, 1200);
+  // HEADLESS: no harness on stdio — the child serves /mcp and the shim only
+  // keeps the reload (exit 42) and session-over (exit 0) contract alive.
+  if (!argv.includes("--headless")) {
+    const rl = createInterface({ input: process.stdin, terminal: false });
+    rl.on("line", (line) => {
+      if (line.trim() === "") return;
+      const c = ensureChild();
+      try {
+        const id = (JSON.parse(line) as { id?: number | string | null }).id;
+        if (id !== undefined && id !== null) pending.add(id);
+      } catch {
+        // the child answers parse errors itself
       }
-    }, 50);
-  });
+      c.stdin!.write(line + "\n");
+    });
+    rl.on("close", () => {
+      // Drain: answers already owed still flow home before the lights go out.
+      const started = Date.now();
+      const drain = setInterval(() => {
+        if (pending.size === 0 || Date.now() - started > 3000) {
+          clearInterval(drain);
+          // CLOSE THE LANE, DO NOT SHOOT THE ENGINE. Ending stdin is what
+          // tells the child the console quit, and it needs a breath to push
+          // that to every open mirror. The kill is only the backstop.
+          child?.stdin?.end();
+          setTimeout(() => {
+            child?.kill();
+            process.exit(0);
+          }, 1200);
+        }
+      }, 50);
+    });
+  }
 
   process.stderr.write(`se-mcp shim: ordered reloads only (se_reload at idle) root=${root}\n`);
   ensureChild(); // eager: the mirror and the panel come up before the first request

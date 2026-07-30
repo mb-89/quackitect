@@ -12,6 +12,7 @@ import { CallLog } from "./calllog.ts";
 import { replayVisitsText } from "./decisions.ts";
 import { Rejection } from "./errors.ts";
 import { appendNote, pendingNotes, readNotes } from "./inbox.ts";
+import { handleHttp, type McpServer } from "./mcp.ts";
 import { feedRows, renderMirror, type MirrorState } from "./render.ts";
 import { resolveInRoot, seDir } from "./paths.ts";
 import { Session } from "./session.ts";
@@ -23,6 +24,8 @@ export interface MirrorOptions {
   port: number;
   log: CallLog;
   mode: "manual" | "agent";
+  /** When given, /mcp serves the agent lane over HTTP — same dispatch as stdio. */
+  mcp?: McpServer;
 }
 
 export function startMirror(o: MirrorOptions): Server {
@@ -83,6 +86,14 @@ export function startMirror(o: MirrorOptions): Server {
   const server = createServer((req, res) => {
     const url = new URL(req.url ?? "/", `http://localhost:${o.port}`);
     try {
+      if (url.pathname === "/mcp" && o.mcp !== undefined) {
+        // THE AGENT'S LANE ON THE SHARED PORT. Every other route here is the
+        // human's hand; this one is MCP over HTTP — the same dispatch as
+        // stdio, so a harness inside VS Code and a CLI in the terminal
+        // attach to the ONE walk instead of spawning private engines.
+        handleHttp(o.mcp, req, res);
+        return;
+      }
       if (req.method === "POST" && url.pathname === "/tick") {
         post(req, res, "mirror_tick", (body) => {
           if (body.back !== undefined) {

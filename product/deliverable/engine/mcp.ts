@@ -10,6 +10,7 @@
 //
 // Wire names use underscores (se_get_node): the Anthropic API rejects dots
 // in tool names, so dotted names live in titles/descriptions only.
+import type { IncomingMessage, ServerResponse } from "node:http";
 import { createInterface } from "node:readline";
 import { Rejection } from "./errors.ts";
 
@@ -207,5 +208,49 @@ export function runStdio(server: McpServer, onGone?: () => void): void {
     void server.handle(msg).then((res) => {
       if (res) process.stdout.write(JSON.stringify(res) + "\n");
     });
+  });
+}
+
+/** MCP over HTTP: one POST in, one JSON answer out — the SAME dispatch as
+ *  stdio, so every attached harness shares the one session and walk. GET
+ *  would be the protocol's optional server-push stream; it is not served,
+ *  and clients carry on with plain POSTs. */
+export function handleHttp(server: McpServer, req: IncomingMessage, res: ServerResponse): void {
+  if (req.method === "DELETE") {
+    // A client closing its session. Nothing is held per client — the walk
+    // belongs to the process, not to whoever attached.
+    res.writeHead(200);
+    res.end();
+    return;
+  }
+  if (req.method !== "POST") {
+    res.writeHead(405, { allow: "POST, DELETE" });
+    res.end();
+    return;
+  }
+  const chunks: Buffer[] = [];
+  req.on("data", (c: Buffer) => chunks.push(c));
+  req.on("end", () => {
+    void (async () => {
+      let parsed: unknown;
+      try {
+        parsed = JSON.parse(Buffer.concat(chunks).toString("utf8"));
+      } catch {
+        res.writeHead(400, { "content-type": "application/json; charset=utf-8" });
+        res.end(JSON.stringify({ jsonrpc: "2.0", id: null, error: { code: -32700, message: "parse error" } }));
+        return;
+      }
+      const batch = Array.isArray(parsed);
+      const msgs = (batch ? parsed : [parsed]) as JsonRpcRequest[];
+      const answers = (await Promise.all(msgs.map((m) => server.handle(m)))).filter((r) => r !== null);
+      if (answers.length === 0) {
+        // Notifications only — accepted, nothing to say back.
+        res.writeHead(202);
+        res.end();
+        return;
+      }
+      res.writeHead(200, { "content-type": "application/json; charset=utf-8" });
+      res.end(JSON.stringify(batch ? answers : answers[0]));
+    })();
   });
 }
