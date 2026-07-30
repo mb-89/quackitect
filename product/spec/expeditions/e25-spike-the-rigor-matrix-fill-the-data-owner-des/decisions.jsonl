@@ -60,3 +60,5 @@
 {"ts":"2026-07-29T19:23:26.302Z","op":"update","visit":"expeditions/e25@0","node":"d85","brief":"Running the monotonicity test against the live matrix"}
 {"ts":"2026-07-29T19:24:00.248Z","op":"done","visit":"expeditions/e25@0","node":"d82","brief":"Monotonicity proven and standing in the suite"}
 {"ts":"2026-07-29T19:24:04.510Z","op":"done","visit":"expeditions/e25@0","node":"d83","brief":"Proposal written into the expedition record"}
+{"ts":"2026-07-29T19:24:17.076Z","op":"done","visit":"expeditions/e25@0","node":"d84","brief":"Proposal reported — three questions wait on the owner"}
+{"ts":"2026-07-30T06:49:42.249Z","op":"update","visit":"expeditions/e25@0","node":"d12","brief":"syncing trunk into e25's worktree"}
