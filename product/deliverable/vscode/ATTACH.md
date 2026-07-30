@@ -3,38 +3,51 @@
 Click the duck in the left bar. A narrow strip of icons opens.
 
 The strip is icons only, on purpose. It stays out of your way. What an
-icon means shows up in the details pane when you click it, so nothing has
-to be labelled.
+icon means shows up in the details window when you click it, so nothing
+has to be labelled.
+
+The icons run top to bottom, at the size of the icons in the bar itself.
 
 ## The icons, in order
 
-- **?** — what this system is. The explanation appears in the details pane.
+- **?** — what this system is. It opens the details window and explains
+  the system there.
 - **▶** — start the agent. It starts the engine first if it is not running,
   opens a terminal, and sends the opening prompt for you.
-- **Panel** — the control panel: every card on one surface.
 - **One icon per card** — the state machine, the log, the details, and any
   other card the project declares.
 - **Restart** — stop the engine and start it again on the current files.
 
 Every icon also has a keyboard shortcut. Cards are `ctrl+alt+` their
-number, the control panel is `ctrl+alt+q`, and this help is `ctrl+alt+/`.
-Change any of them in the Keyboard Shortcuts editor.
+number, and this help is `ctrl+alt+/`. Change any of them in the Keyboard
+Shortcuts editor.
 
-## Put the panes where you want them
+## Build the layout you want
 
-Each card opens as its own pane. Drag it anywhere: the right side, the
-bottom, beside your code. VS Code remembers where you put it.
+Each card opens as an EDITOR WINDOW, the same as a file you open. So every
+editing arrangement works on it. Split it left or right. Drag it to the
+bottom. Move it into a second window. Put four side by side.
 
-Prefer the whole thing on the right? Drag the duck icon into the right
-side bar once. VS Code remembers that too. No setting can preset it; the
-drag is the way.
+There is no fixed control panel any more. You build the one you want out
+of these windows.
+
+VS Code remembers the arrangement for this folder. Close it, open it
+again, and the windows come back where you left them.
+
+The state machine window carries its own controls along its top: the
+breadcrumbs, the autonomy slider, the shutdown control and escape. It
+stands alone, so everything it needs travels with it.
+
+Prefer the strip on the right? Drag the duck icon into the right side bar
+once. VS Code remembers that too. No setting can preset it; the drag is
+the way.
 
 ## What is running
 
 - The engine started with this window. It stops when VS Code closes.
 - It runs on your computer only. Nothing leaves it.
 - Restarting VS Code is safe. The state lives in files, and the next start
-  picks up where things stand.
+  picks up where things stand. Your card windows come back too.
 
 ## Connect your assistant
 

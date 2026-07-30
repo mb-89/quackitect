@@ -1,5 +1,5 @@
 // The Quackitect shell for VS Code — THIN on purpose: the engine and the
-// control panel live in the repository and change without touching this file.
+// cards live in the repository and change without touching this file.
 // Plain JavaScript, also on purpose: the extension host does not strip
 // TypeScript types, and the project runs with no build step anywhere.
 //
@@ -8,18 +8,17 @@
 //   deactivate — the engine lives and dies with VS Code
 // - the attach configs: placed declaratively on every activation, the
 //   same way RUNME places them for a terminal launch
-// - one VIEW PER CARD, so VS Code's own docking decides where each card
-//   sits and remembers it. The card list is not kept here: it is read from
-//   the engine, whose truth is product/cards.md.
-// - an ICON STRIP, and nothing but icons (owner ruling 2026-07-30). Words
-//   would force the pane wide; icons keep it narrow. What an icon MEANS
-//   arrives in the details pane when it is clicked — help is a detail,
-//   never a button, and the question mark leads because the reader who
-//   knows nothing yet reaches for it first.
+// - ONE EDITOR WINDOW PER CARD (owner ruling 2026-07-30). A card is a real
+//   editor tab, so VS Code's own docking applies: split it, drag it to any
+//   side, float it, put it in another window. The person composes whatever
+//   control panel they want out of these, and VS Code remembers the layout
+//   per folder — which is why the shell offers no arrangement of its own.
+// - an ICON STRIP, and nothing but icons. Words would force the pane wide.
+//   The icons run TOP TO BOTTOM at the size of the activity bar's own.
 //
 // THE HOST OWNS THE LOOK. Docked here, the pages are VS Code surfaces: the
 // editor's fonts and palette are forwarded in, square corners, no frame of
-// our own around a pane VS Code already frames.
+// our own around a window VS Code already frames.
 const vscode = require("vscode");
 const { spawn, spawnSync } = require("node:child_process");
 const { copyFileSync, existsSync, mkdirSync, readFileSync } = require("node:fs");
@@ -30,14 +29,15 @@ const SERVER = "http://localhost:" + PORT;
 // Card numbers are muscle memory (product/cards.md), so a slot is reserved
 // per number rather than per shown card. Eight covers the list with room.
 const SLOTS = 8;
+const VIEW_TYPE = (slot) => "quackitect.card" + slot;
 
 let child = null;
 let output = null;
 let disposed = false;
 let cards = [];
-const cardViews = [];
 let strip = null;
-let panel = null;
+/** slot number → CardWindow. A slot is absent when its window is closed. */
+const windows = new Map();
 // The session's name survives engine reloads (exit 42): the settings store
 // keeps its sliders across a reload and falls back to defaults on a fresh
 // start. The same contract the stdio shim keeps.
@@ -194,11 +194,8 @@ const shown = (c) => c !== undefined && c.widget !== "terminal";
 
 async function refreshCards() {
   cards = await fetchCards();
-  for (let n = 1; n <= SLOTS; n++) {
-    await vscode.commands.executeCommand("setContext", "quackitect.card" + n, shown(cards.find((c) => c.n === n)));
-  }
   if (strip !== null) strip.render();
-  for (const v of cardViews) v.render();
+  for (const w of windows.values()) w.render();
 }
 
 async function ensureCards() {
@@ -221,12 +218,12 @@ function messagePage(text) {
 </style></head><body>${escapeHtml(text)}</body></html>`;
 }
 
-/** A pane showing one page of the engine, themed by the editor. */
+/** A window showing one page of the engine, themed by the editor. */
 function framePage(url) {
   return `<!DOCTYPE html><html><head><meta charset="utf-8">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; frame-src ${SERVER}; connect-src ${SERVER}; script-src 'unsafe-inline'; style-src 'unsafe-inline'">
 <style>
-  html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: var(--vscode-sideBar-background); }
+  html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: var(--vscode-editor-background); }
   iframe { border: 0; width: 100%; height: 100%; display: none; }
   #wait { font-family: var(--vscode-font-family); font-size: var(--vscode-font-size); color: var(--vscode-descriptionForeground); padding: 10px 12px; }
   #hint { margin-top: 6px; display: none; }
@@ -295,7 +292,7 @@ function framePage(url) {
   });
   // TWO WAKE PATHS, deliberately. The extension host probes over Node, where
   // no origin rule applies. This page probes too, as a backstop. Whichever
-  // lands first reveals the pane; the reader never watches a dead line.
+  // lands first reveals the window; the reader never watches a dead line.
   (async function boot() {
     const started = Date.now();
     for (;;) {
@@ -320,7 +317,6 @@ function framePage(url) {
 const ICON = {
   help: '<svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="6.2"/><path d="M6.2 6.1a1.85 1.85 0 1 1 2.1 2.2v1.1" /><circle cx="8.3" cy="11.4" r=".75" fill="currentColor" stroke="none"/></svg>',
   play: '<svg viewBox="0 0 16 16"><path d="M4.2 2.6 13 8l-8.8 5.4z" fill="currentColor" stroke="none"/></svg>',
-  panel: '<svg viewBox="0 0 16 16"><rect x="1.8" y="2.8" width="12.4" height="10.4"/><path d="M6.6 2.8v10.4M6.6 8h7.6"/></svg>',
   machine: '<svg viewBox="0 0 16 16"><circle cx="3.4" cy="8" r="1.9"/><circle cx="12.6" cy="4.2" r="1.9"/><circle cx="12.6" cy="11.8" r="1.9"/><path d="M5.2 7.3 10.8 4.9M5.2 8.7l5.6 2.4"/></svg>',
   graph: '<svg viewBox="0 0 16 16"><path d="M2.2 2.4v11.2h11.6"/><path d="M4.4 11.2 7 7.1l2.4 2.3 3.6-5"/></svg>',
   book: '<svg viewBox="0 0 16 16"><path d="M2.4 3.1h3.9c.9 0 1.6.4 1.7.9.1-.5.8-.9 1.7-.9h3.9v9.3H9.7c-.9 0-1.6.4-1.7.9-.1-.5-.8-.9-1.7-.9H2.4z"/><path d="M8 4v9.3"/></svg>',
@@ -340,12 +336,14 @@ function cardIcon(card) {
 }
 
 // ── THE HELP ─────────────────────────────────────────────────────────────
-// Plain language, short sentences. It lands in the details pane, so it is
+// Plain language, short sentences. It lands in the details window, so it is
 // HTML there and nowhere else.
 const SYSTEM_HELP = `<p>Quackitect walks a state machine with you. The machine says which step is in hand, what to read, and what to produce.</p>
 <p>The engine runs on this computer only. Nothing leaves it.</p>
-<p>The icons on the left, in order: this help, start the agent, the control panel, then one icon per card. The last one restarts the engine.</p>
-<p>Every card opens as its own pane. Drag a pane anywhere — another side, the bottom, beside the editor. VS Code remembers where you put it.</p>
+<p>The icons on the left, top to bottom: this help, start the agent, then one icon per card. The last one restarts the engine.</p>
+<p>Every card opens as its own editor window. Split it, drag it to any side, or move it to a second window — whatever you build is your control panel.</p>
+<p>VS Code remembers that layout for this folder. Open the folder again and your windows come back where you left them.</p>
+<p>This window is the details. Whatever you click elsewhere explains itself here.</p>
 <p>The play icon starts your agent in a terminal, with the opening prompt already sent. Several agents may attach; give the wheel to one at a time.</p>`;
 
 function cardHelp(card) {
@@ -354,13 +352,13 @@ function cardHelp(card) {
 <p>The slot is held so the card numbers never shift under your hand.</p>`;
   }
   const what = {
-    machine: "The machine being walked. Each box is a state; the blue line is where the walk is aimed. Click a state to read it here.",
+    machine: "The machine being walked. Each box is a state; the blue line is where the walk is aimed. Click a state to read it here. Its own crumbs, sliders and escape sit along the top of the window.",
     log: "Every act in this session, newest first. Click a line to see what it changed.",
-    details: "This pane. Whatever you click elsewhere explains itself here.",
+    details: "This window. Whatever you click elsewhere explains itself here.",
   };
   return `<p><b>${escapeHtml(titleOf(card))}</b> is card ${card.n}.</p>
 <p>${escapeHtml(what[card.widget] ?? "A card of the control panel.")}</p>
-<p>Open it with ctrl+alt+${card.n}. Drag its pane wherever you like; VS Code remembers.</p>`;
+<p>Open it with ctrl+alt+${card.n}. It is an editor window, so put it wherever you like; VS Code remembers.</p>`;
 }
 
 const HELP = {
@@ -370,11 +368,6 @@ const HELP = {
 <p>The opening prompt is sent for you. You never paste it.</p>
 <p>Claude Code is used when it is installed; otherwise the Copilot CLI, in its cage.</p>`,
   },
-  "quackitect.openPanel": {
-    title: "Control panel",
-    html: `<p>Every card on one surface, the way the browser window shows them.</p>
-<p>Use it when you want the whole picture. Use the single cards when you want to place them yourself.</p>`,
-  },
   "quackitect.restartServer": {
     title: "Restart the engine",
     html: `<p>Stops the engine and starts it again on the current sources.</p>
@@ -382,23 +375,11 @@ const HELP = {
   },
 };
 
-/** Put help in the details pane. It is a detail, never a button. */
-async function showHelp(title, html, reveal) {
-  await ensureCards();
-  const card = cards.find((c) => c.widget === "details");
-  if (card === undefined) return;
-  const pane = cardViews[card.n - 1];
-  // Revealing steals focus, so it happens only when the pane does not exist
-  // yet — or when help IS what was asked for.
-  if (pane.view === null || reveal === true) await vscode.commands.executeCommand("quackitect.card" + card.n + ".focus");
-  pane.help(title, html);
-}
-
 function openInEditor(rel) {
   const root = projectRoot();
   if (root === null || typeof rel !== "string" || rel === "") return;
   const abs = path.normalize(path.join(root, ...rel.split("/")));
-  if (!abs.startsWith(path.normalize(root))) return; // the panel sends root-relative paths; anything else is dropped
+  if (!abs.startsWith(path.normalize(root))) return; // the pages send root-relative paths; anything else is dropped
   void vscode.commands.executeCommand("vscode.open", vscode.Uri.file(abs), { preview: false });
 }
 
@@ -407,31 +388,36 @@ function onWebviewMessage(m) {
   if (m.quackitect === "open") openInEditor(m.path);
 }
 
-/** One dockable pane. VS Code decides where it sits and remembers it. */
-class Pane {
-  constructor(page) {
-    this.page = page; // () => html
-    this.view = null;
-  }
-  resolveWebviewView(view) {
-    this.view = view;
-    view.webview.options = { enableScripts: true };
-    view.webview.onDidReceiveMessage(onWebviewMessage);
-    view.onDidDispose(() => {
-      this.view = null;
-    });
+/** One card, living in an editor window. VS Code owns where it sits. */
+class CardWindow {
+  constructor(slot, panel) {
+    this.slot = slot;
+    this.panel = panel;
+    panel.webview.options = { enableScripts: true };
+    panel.webview.onDidReceiveMessage(onWebviewMessage);
+    panel.onDidDispose(() => windows.delete(slot));
+    windows.set(slot, this);
     this.render();
     void ensureServer().then(async (ok) => {
       if (!ok) return;
       await ensureCards();
+      this.render();
       this.up();
     });
   }
+  page() {
+    const card = cards.find((c) => c.n === this.slot);
+    if (card === undefined) return messagePage("Connecting to the engine…");
+    if (!card.widget) return messagePage("Not built yet. The slot is held so the numbers never shift.");
+    return framePage(SERVER + "/widget/" + card.widget + "?embed=1");
+  }
   render() {
-    if (this.view !== null) this.view.webview.html = this.page();
+    const card = cards.find((c) => c.n === this.slot);
+    if (card !== undefined) this.panel.title = titleOf(card);
+    this.panel.webview.html = this.page();
   }
   post(msg) {
-    if (this.view !== null) void this.view.webview.postMessage(msg);
+    void this.panel.webview.postMessage(msg);
   }
   up() {
     this.post({ quackitect: "up" });
@@ -444,35 +430,52 @@ class Pane {
   }
 }
 
-/** A card pane: which card it shows comes from the engine, by number. */
-class CardPane extends Pane {
-  constructor(slot) {
-    super(() => {
-      const card = cards.find((c) => c.n === slot);
-      if (card === undefined) return messagePage("Connecting to the engine…");
-      if (!card.widget) return messagePage("Not built yet. The slot is held so the numbers never shift.");
-      return framePage(SERVER + "/widget/" + card.widget + "?embed=1");
-    });
-    this.slot = slot;
+/**
+ * Open a card's window, or bring the open one forward.
+ *
+ * preserveFocus keeps the reader's place: a card that opens because THEY
+ * asked takes the focus, one that opens as a side effect never does.
+ */
+function openWindow(slot, preserveFocus) {
+  const existing = windows.get(slot);
+  if (existing !== undefined) {
+    existing.panel.reveal(existing.panel.viewColumn, preserveFocus);
+    return existing;
   }
-  render() {
-    if (this.view === null) return;
-    const card = cards.find((c) => c.n === this.slot);
-    if (card !== undefined) this.view.title = titleOf(card);
-    super.render();
-  }
+  const card = cards.find((c) => c.n === slot);
+  const panel = vscode.window.createWebviewPanel(
+    VIEW_TYPE(slot),
+    card === undefined ? "Card " + slot : titleOf(card),
+    { viewColumn: vscode.ViewColumn.Active, preserveFocus: preserveFocus === true },
+    { enableScripts: true, retainContextWhenHidden: true },
+  );
+  return new CardWindow(slot, panel);
 }
 
-/** The icon strip. Icons only — the pane stays as narrow as VS Code allows. */
+/**
+ * Put help in the details window — help is a detail, never a button.
+ *
+ * The question mark ASKS for it, so that call reveals and focuses. Every
+ * other control merely explains itself, so it writes into the window
+ * without taking the reader's focus away from what they were doing.
+ */
+async function showHelp(title, html, reveal) {
+  await ensureCards();
+  const card = cards.find((c) => c.widget === "details");
+  if (card === undefined) return;
+  const win = openWindow(card.n, reveal !== true);
+  win.help(title, html);
+}
+
+/** The icon strip. Icons only, top to bottom — the pane stays narrow. */
 class Strip {
   constructor() {
     this.view = null;
   }
   tools() {
     const list = [
-      { cmd: "quackitect.help", icon: ICON.help, label: "What this is" },
+      { cmd: "quackitect.help", icon: ICON.help, label: "What this is — ctrl+alt+/" },
       { cmd: "quackitect.startAgent", icon: ICON.play, label: "Start the agent — ctrl+alt+enter" },
-      { cmd: "quackitect.openPanel", icon: ICON.panel, label: "Control panel — ctrl+alt+q" },
     ];
     for (const c of cards) {
       if (!shown(c)) continue;
@@ -485,13 +488,16 @@ class Strip {
     const buttons = this.tools()
       .map((t) => `<button class="tool" data-cmd="${escapeHtml(t.cmd)}" title="${escapeHtml(t.label)}" aria-label="${escapeHtml(t.label)}">${t.icon}</button>`)
       .join("");
+    // COLUMN, NOT ROW (owner ruling 2026-07-30). Wrapping icons sideways
+    // pushed the pane wide, which is the one thing an icon strip exists to
+    // avoid. Stacked, they also carry the activity bar's own icon size.
     return `<!DOCTYPE html><html><head><meta charset="utf-8"><style>
-  body { margin: 0; padding: 3px; background: var(--vscode-sideBar-background); }
-  .strip { display: flex; flex-wrap: wrap; gap: 1px; }
-  button.tool { width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; padding: 0; background: none; border: 0; color: var(--vscode-icon-foreground); cursor: pointer; }
+  body { margin: 0; padding: 4px 0; background: var(--vscode-sideBar-background); }
+  .strip { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+  button.tool { width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; padding: 0; background: none; border: 0; color: var(--vscode-icon-foreground); cursor: pointer; }
   button.tool:hover { background: var(--vscode-toolbar-hoverBackground); }
   button.tool:focus-visible { outline: 1px solid var(--vscode-focusBorder); outline-offset: -1px; }
-  svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.25; stroke-linecap: round; stroke-linejoin: round; }
+  svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 1.1; stroke-linecap: round; stroke-linejoin: round; }
 </style></head><body>
 <div class="strip">${buttons}</div>
 <script>
@@ -555,9 +561,9 @@ async function openCard(n) {
     void vscode.window.showInformationMessage("Quackitect: product/cards.md declares no card " + n + ".");
     return;
   }
-  // Help first, then the card — so the card is what ends up focused.
+  // The card explains itself in details, then takes the focus itself.
   await showHelp(titleOf(card), cardHelp(card), false);
-  await vscode.commands.executeCommand("quackitect.card" + n + ".focus");
+  openWindow(n, false);
 }
 
 function showAttach() {
@@ -567,7 +573,7 @@ function showAttach() {
   void vscode.commands.executeCommand("markdown.showPreview", doc);
 }
 
-/** Run a command from the strip, and say in the details pane what it was. */
+/** Run a command from the strip, and say in the details window what it was. */
 function withHelp(cmd, run) {
   return async (...args) => {
     const h = HELP[cmd];
@@ -579,20 +585,11 @@ function withHelp(cmd, run) {
 function activate(context) {
   output = vscode.window.createOutputChannel("Quackitect Engine");
   strip = new Strip();
-  panel = new Pane(() => framePage(SERVER + "/?embed=1"));
-  const webviewOptions = { webviewOptions: { retainContextWhenHidden: true } };
   context.subscriptions.push(
     output,
-    vscode.window.registerWebviewViewProvider("quackitect.tools", strip, webviewOptions),
-    vscode.window.registerWebviewViewProvider("quackitect.panel", panel, webviewOptions),
+    vscode.window.registerWebviewViewProvider("quackitect.tools", strip, { webviewOptions: { retainContextWhenHidden: true } }),
     vscode.commands.registerCommand("quackitect.help", () => void showHelp("Quackitect", SYSTEM_HELP, true)),
     vscode.commands.registerCommand("quackitect.startAgent", withHelp("quackitect.startAgent", startAgent)),
-    vscode.commands.registerCommand(
-      "quackitect.openPanel",
-      withHelp("quackitect.openPanel", async () => {
-        if (await ensureServer()) await vscode.commands.executeCommand("quackitect.panel.focus");
-      }),
-    ),
     vscode.commands.registerCommand("quackitect.howToAttach", showAttach),
     vscode.commands.registerCommand(
       "quackitect.restartServer",
@@ -603,30 +600,32 @@ function activate(context) {
         }
         if (!(await ensureServer())) return;
         await refreshCards();
-        panel.render();
-        panel.up();
-        for (const v of cardViews) {
-          v.render();
-          v.up();
-        }
+        for (const w of windows.values()) w.up();
       }),
     ),
     vscode.window.onDidChangeActiveColorTheme(() => {
-      panel.theme();
       strip.render();
-      for (const v of cardViews) v.theme();
+      for (const w of windows.values()) w.theme();
     }),
   );
   for (let n = 1; n <= SLOTS; n++) {
-    const view = new CardPane(n);
-    cardViews.push(view);
     context.subscriptions.push(
-      vscode.window.registerWebviewViewProvider("quackitect.card" + n, view, webviewOptions),
       vscode.commands.registerCommand("quackitect.openCard" + n, () => void openCard(n)),
+      // WITHOUT THIS THE LAYOUT IS A LIE. VS Code drops every webview editor
+      // on a window reload unless its type can be deserialized — so the
+      // windows a person arranged would come back empty, and the promise
+      // that VS Code remembers their layout would hold for the positions
+      // and not for the contents.
+      vscode.window.registerWebviewPanelSerializer(VIEW_TYPE(n), {
+        deserializeWebviewPanel: async (panel) => {
+          panel.webview.options = { enableScripts: true };
+          new CardWindow(n, panel);
+        },
+      }),
     );
   }
   // The strip must be usable before anything is clicked, so the engine comes
-  // up with the window rather than on the first pane.
+  // up with the window rather than on the first card.
   void ensureServer().then(async (ok) => {
     if (ok) await refreshCards();
   });
