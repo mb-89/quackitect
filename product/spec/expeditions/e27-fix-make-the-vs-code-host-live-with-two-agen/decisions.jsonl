@@ -110,3 +110,14 @@
 {"ts":"2026-07-30T16:14:21.140Z","op":"update","visit":"expeditions/e27@0","node":"d74","brief":"installing the shell with the details relay"}
 {"ts":"2026-07-30T16:15:07.337Z","op":"plan","visit":"expeditions/e27@0","parent":null,"nodes":[{"id":"d75","brief":"Land e27 on trunk"},{"id":"d76","brief":"Restart the engine on the landed sources"},{"id":"d77","brief":"Close e27 once the threshold allows"}]}
 {"ts":"2026-07-30T16:15:14.160Z","op":"update","visit":"expeditions/e27@0","node":"d78","brief":"committing the record so the tree is clean to land"}
+{"ts":"2026-07-30T16:15:53.274Z","op":"done","visit":"expeditions/e27@0","node":"d75","brief":"Four commits landed on trunk by fast-forward"}
+{"ts":"2026-07-30T16:16:23.730Z","op":"update","visit":"expeditions/e27@0","node":"d79","brief":"the close is refused above the threshold and waits for the owner"}
+{"ts":"2026-07-30T16:18:18.937Z","op":"update","visit":"expeditions/e27@0","node":"d80","brief":"checking the threshold after the owner moved the slider"}
+{"ts":"2026-07-30T16:18:28.898Z","op":"update","visit":"expeditions/e27@0","node":"d81","brief":"reading the leave form before drafting it"}
+{"ts":"2026-07-30T16:18:38.624Z","op":"update","visit":"expeditions/e27@0","node":"d82","brief":"reading how the form condition is satisfied"}
+{"ts":"2026-07-30T16:18:54.353Z","op":"update","visit":"expeditions/e27@0","node":"d83","brief":"looking at the record before writing the report"}
+{"ts":"2026-07-30T16:19:23.262Z","op":"update","visit":"expeditions/e27@0","node":"d84","brief":"drafting the leave report short, as asked"}
+{"ts":"2026-07-30T16:19:35.485Z","op":"update","visit":"expeditions/e27@0","node":"d85","brief":"entering the leave state with the report filled"}
+{"ts":"2026-07-30T16:19:46.204Z","op":"update","visit":"expeditions/e27@0","node":"d86","brief":"re-reading the contract after today's two new rules"}
+{"ts":"2026-07-30T16:19:54.668Z","op":"update","visit":"expeditions/e27@0","node":"d87","brief":"entering the leave state with the report filled"}
+{"ts":"2026-07-30T16:20:05.080Z","op":"done","visit":"expeditions/e27@0","node":"d77","brief":"e27 closed and applied, with the waiver on the record"}
