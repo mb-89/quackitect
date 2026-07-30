@@ -182,25 +182,51 @@ if ($forwarded | Where-Object { $_ -in @("--kill", "-Kill") }) {
 
 Write-Host "quackitect v3 - preflight" -ForegroundColor Cyan
 
-# Node >= 22.6 (native TypeScript type stripping - no build step anywhere).
-$node = Get-Command node -ErrorAction SilentlyContinue
-if ($null -eq $node) {
-  Write-Host "node not found. Install Node 22+ (winget install OpenJS.NodeJS.LTS) and re-run." -ForegroundColor Red
-  exit 1
+# RUNME INSTALLS ITS OWN HARD DEPENDENCIES (owner, 2026-07-30: a fresh
+# machine said "node not found" and stopped - installing was the whole
+# idea). It tries winget itself, pulls the new PATH into THIS window, and
+# only falls back to instructions where winget cannot help.
+function Ensure-Tool([string]$cmd, [string]$wingetId, [string]$label) {
+  if (Get-Command $cmd -ErrorAction SilentlyContinue) { return $true }
+  if ($null -eq (Get-Command winget -ErrorAction SilentlyContinue)) {
+    Write-Host "$label not found, and winget is not available to install it." -ForegroundColor Red
+    Write-Host "  install $label yourself, then re-run: winget install $wingetId" -ForegroundColor Yellow
+    return $false
+  }
+  Write-Host "$label not found - installing it now (winget $wingetId)..." -ForegroundColor Yellow
+  winget install -e --id $wingetId --accept-package-agreements --accept-source-agreements
+  # A fresh install lands on the PATH of NEW processes only - pull the
+  # machine and user PATH into this window so the launch continues HERE,
+  # never asking for a restart.
+  $env:Path = [Environment]::GetEnvironmentVariable("Path", "Machine") + ";" + [Environment]::GetEnvironmentVariable("Path", "User")
+  if (Get-Command $cmd -ErrorAction SilentlyContinue) { return $true }
+  # Some installers miss the registry PATH until a relog - probe the usual
+  # homes directly before ever bothering the user.
+  foreach ($dir in @("$env:ProgramFiles\nodejs", "$env:ProgramFiles\Git\cmd", "$env:LOCALAPPDATA\Microsoft\WindowsApps")) {
+    if (Test-Path (Join-Path $dir "$cmd.exe")) { $env:Path = "$dir;" + $env:Path }
+  }
+  if (Get-Command $cmd -ErrorAction SilentlyContinue) { return $true }
+  Write-Host "$label installed, but no shell can see it yet - as a last resort, open a NEW terminal and run .\RUNME.ps1 again." -ForegroundColor Yellow
+  return $false
 }
+
+# Node >= 22.6 (native TypeScript type stripping - no build step anywhere).
+if (-not (Ensure-Tool "node" "OpenJS.NodeJS.LTS" "node")) { exit 1 }
 $nodeVersion = (node --version).TrimStart("v")
 if ([version]$nodeVersion -lt [version]"22.6.0") {
-  Write-Host "node $nodeVersion is too old - need >= 22.6 for native TS. Update and re-run." -ForegroundColor Red
-  exit 1
+  Write-Host "node $nodeVersion is too old - need >= 22.6 for native TS. Upgrading (winget)..." -ForegroundColor Yellow
+  winget upgrade -e --id OpenJS.NodeJS.LTS --accept-package-agreements --accept-source-agreements
+  $env:Path = [Environment]::GetEnvironmentVariable("Path", "Machine") + ";" + [Environment]::GetEnvironmentVariable("Path", "User")
+  $nodeVersion = (node --version).TrimStart("v")
+  if ([version]$nodeVersion -lt [version]"22.6.0") {
+    Write-Host "node is still $nodeVersion - open a NEW terminal and run .\RUNME.ps1 again (or update Node yourself)." -ForegroundColor Red
+    exit 1
+  }
 }
 Write-Host "  node $nodeVersion  OK"
 
 # git is a HARD dependency (ref search runs through git grep; v3 is a branch of quack).
-$git = Get-Command git -ErrorAction SilentlyContinue
-if ($null -eq $git) {
-  Write-Host "git not found - it is a hard dependency. winget install Git.Git and re-run." -ForegroundColor Red
-  exit 1
-}
+if (-not (Ensure-Tool "git" "Git.Git" "git")) { exit 1 }
 Write-Host "  $((git --version))  OK"
 
 # A SESSION ALREADY RUNNING must be seen BEFORE launching over it (owner,
@@ -233,11 +259,9 @@ try {
   # ripgrep is a HARD dependency (owner ruling 2026-07-26): no fallback engine.
   $rgPath = node -p "try { require('@vscode/ripgrep').rgPath } catch { '' }"
   if ([string]::IsNullOrWhiteSpace($rgPath) -or -not (Test-Path $rgPath)) {
-    $rgOnPath = Get-Command rg -ErrorAction SilentlyContinue
-    if ($null -eq $rgOnPath) {
-      Write-Host "ripgrep not found - it is a hard dependency. npm install should have provided it (or: winget install BurntSushi.ripgrep.MSVC). Re-run." -ForegroundColor Red
-      exit 1
-    }
+    # npm should have provided it; when it did not, RUNME installs the
+    # system ripgrep itself - hard dependencies install, never instruct.
+    if (-not (Ensure-Tool "rg" "BurntSushi.ripgrep.MSVC" "ripgrep")) { exit 1 }
     Write-Host "  ripgrep (PATH) $((rg --version) -split "`n" | Select-Object -First 1)  OK"
   } else {
     Write-Host "  ripgrep (npm) $rgPath  OK"
