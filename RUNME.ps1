@@ -42,6 +42,53 @@ if ($forwarded | Where-Object { $_ -in @("--help", "-h", "-?", "-Help") }) {
   exit 0
 }
 
+# THE EXPORT. The system must run on another machine WITHOUT this repo's
+# history (owner requirement 2026-07-30): copy the working tree, minus the
+# history and the session state, into a fresh single-commit repository.
+# Runs before preflight and exits - exporting must never wait on npm.
+$exportIx = [array]::IndexOf($forwarded, "--export")
+if ($exportIx -ge 0) {
+  $dest = if ($exportIx + 1 -lt $forwarded.Count) { $forwarded[$exportIx + 1] } else { $null }
+  if ([string]::IsNullOrWhiteSpace($dest)) {
+    Write-Host "--export needs a target folder: .\RUNME.ps1 --export C:\path\to\empty" -ForegroundColor Red
+    exit 1
+  }
+  if ((Test-Path $dest) -and (@(Get-ChildItem $dest -Force).Count -gt 0)) {
+    Write-Host "--export target must be EMPTY - refusing to write over $dest" -ForegroundColor Red
+    exit 1
+  }
+  if ($null -eq (Get-Command git -ErrorAction SilentlyContinue)) {
+    Write-Host "git not found - the export creates a fresh repo. winget install Git.Git and re-run." -ForegroundColor Red
+    exit 1
+  }
+  Write-Host "quackitect v3 - exporting the working tree (history stays home)" -ForegroundColor Cyan
+  New-Item -ItemType Directory -Force -Path $dest | Out-Null
+  # /XD excludes by NAME wherever it appears: the repo history, every
+  # worktree, the session state, node_modules and the generated cage dirs.
+  # /XF drops the generated MCP config; the _cage templates travel (their
+  # file is mcp.json, a different name) and RUNME regenerates on launch.
+  robocopy $root $dest /E /NFL /NDL /NJH /NJS /NP /XD .git .worktrees .se node_modules .claude .copilot /XF .mcp.json | Out-Null
+  if ($LASTEXITCODE -ge 8) {
+    Write-Host "copy FAILED (robocopy $LASTEXITCODE)" -ForegroundColor Red
+    exit 1
+  }
+  Push-Location $dest
+  try {
+    git init -q -b main
+    # A LOCAL identity rides .git/config, so the engine's own commits work
+    # on a machine that never configured git.
+    git config user.name "quackitect"
+    git config user.email "export@quackitect.local"
+    git add -A
+    git commit -q -m "quackitect export - a fresh start, history stays home"
+  } finally {
+    Pop-Location
+  }
+  Write-Host "  exported to $dest - a fresh repo, one commit, no history" -ForegroundColor Green
+  Write-Host "  next: cd $dest ; .\RUNME.ps1" -ForegroundColor Cyan
+  exit 0
+}
+
 # THE KILL. A stale server still holding the Mirror's port stops the next
 # launch dead, and the terminal host is started DETACHED so it outlives the
 # window that made it. This runs BEFORE preflight and then exits: clearing a
