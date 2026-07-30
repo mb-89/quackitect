@@ -244,6 +244,7 @@ export function generateIterations(root: string): GeneratedMachine {
   };
   const states: StateDecl[] = [start];
   const expByState: Record<string, string> = {};
+  const subGen: Record<string, () => GeneratedMachine> = {};
   // The kickoff's evidence form is the matrix's OWN gate-kickoff row, read
   // live (seed-from-source). An unreadable matrix never takes the
   // container down — the kickoff then serves without a form.
@@ -265,6 +266,16 @@ export function generateIterations(root: string): GeneratedMachine {
     const goal = typeof fm?.goal === "string" ? fm.goal : it.id;
     const started = typeof fm?.started === "string";
     expByState[sid] = it.id;
+    // A PINNED iteration expands: the kickoff leads into the pinned machine
+    // (a generated sub the reader clicks into), not straight to end.
+    let pinned: { change_size?: string; machine?: MachineDecl } | undefined;
+    try {
+      pinned = JSON.parse(readFileSync(join(it.path, itPinRel(it.id)), "utf8")) as { change_size?: string; machine?: MachineDecl };
+    } catch {
+      pinned = undefined;
+    }
+    const walkId = `${sid}-walk`;
+    const hasWalk = pinned?.machine !== undefined;
     states.push({
       id: sid,
       kind: "work",
@@ -275,13 +286,34 @@ export function generateIterations(root: string): GeneratedMachine {
       priority: 0.6,
       ...(started ? {} : { entry: { no_pending_note: ["needs retro"] } }),
       tags: ["iteration-kickoff"],
-      edges: [{ to: "end", role: "alternative" }],
+      edges: [hasWalk ? { to: walkId, role: "normal" as const } : { to: "end", role: "alternative" as const }],
     });
+    if (hasWalk) {
+      const m = pinned!.machine!;
+      expByState[walkId] = it.id;
+      states.push({
+        id: walkId,
+        kind: "work",
+        statement: `the pinned ${String(pinned!.change_size)} walk (${m.states.length} states)`,
+        guidance: "The pinned machine — compiled from the matrix at the kickoff bless, pinned to the record. Click in; the walk continues inside. Matrix edits reach the NEXT kickoff, never this walk.",
+        evidence_form: [],
+        priority: 0.2,
+        submachine: "generated",
+        edges: [{ to: "end", role: "alternative" }],
+      });
+      subGen[walkId] = () => ({ decl: { ...m, id: walkId }, canvas: pinnedCanvas(m), expByState: {} });
+    }
     start.edges.push({ to: sid, role: "normal" });
     const y = i * 420;
     nodes.push({ id: `n-${sid}`, type: "file", file: `${sid}.md`, x: -1100, y, ...nodeSize(sid, goal) });
     edges.push({ id: `e-start-${sid}`, fromNode: "n-start", toNode: `n-${sid}` });
-    edges.push({ id: `e-${sid}-end`, fromNode: `n-${sid}`, toNode: "n-end" });
+    if (hasWalk) {
+      nodes.push({ id: `n-${walkId}`, type: "file", file: `${walkId}.md`, x: -560, y, ...nodeSize(walkId) });
+      edges.push({ id: `e-${sid}-${walkId}`, fromNode: `n-${sid}`, toNode: `n-${walkId}` });
+      edges.push({ id: `e-${walkId}-end`, fromNode: `n-${walkId}`, toNode: "n-end" });
+    } else {
+      edges.push({ id: `e-${sid}-end`, fromNode: `n-${sid}`, toNode: "n-end" });
+    }
   });
   if (open.length === 0) {
     start.edges.push({ to: "end", role: "normal" });
@@ -303,7 +335,33 @@ export function generateIterations(root: string): GeneratedMachine {
     edges,
     metadata: { frontmatter: { reentry: "restart", priority: 0.4 } },
   };
-  return { decl, canvas, expByState };
+  return { decl, canvas, expByState, ...(Object.keys(subGen).length > 0 ? { subGen } : {}) };
+}
+
+/** A drawn view of a pinned machine: milestone columns, states stacked in
+ *  reading order — generated, like every container view. */
+function pinnedCanvas(m: MachineDecl): CanvasData {
+  const cols: string[] = [];
+  for (const s of m.states) {
+    const g = s.kind === "start" ? "" : (s.group ?? "?");
+    if (!cols.includes(g)) cols.push(g);
+  }
+  const nodes: CanvasElement[] = [];
+  const edges: CanvasEdge[] = [];
+  const rows: Record<string, number> = {};
+  for (const s of m.states) {
+    const g = s.kind === "start" ? "" : (s.group ?? "?");
+    const col = cols.indexOf(g);
+    const row = rows[g] ?? 0;
+    rows[g] = row + 1;
+    nodes.push({ id: `n-${s.id}`, type: "file", file: `${s.id}.md`, x: col * 560, y: row * 260, ...nodeSize(s.id, s.statement) });
+  }
+  for (const s of m.states) {
+    for (const e of s.edges) {
+      edges.push({ id: `e-${s.id}-${e.to}`, fromNode: `n-${s.id}`, toNode: `n-${e.to}` });
+    }
+  }
+  return { nodes, edges, metadata: { frontmatter: { reentry: "resume", priority: 0.2 } } };
 }
 
 /** THE ITERATION ARCHIVE, generated like the expedition archive — the

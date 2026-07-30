@@ -41,7 +41,7 @@ import { spawn, spawnSync } from "node:child_process";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { resolveInRoot, seDir } from "./paths.ts";
 import { Decisions, replayFile } from "./decisions.ts";
-import { generateIterationArchive, generateIterations, itFind, itSeed, markStarted } from "./iterations.ts";
+import { generateIterationArchive, generateIterations, itFind, itPinRel, itRecordRel, itSeed, markStarted, pinIteration, readItRecord } from "./iterations.ts";
 
 /** THE TICK is the machinery — one tool, legal in EVERY state. Without
  *  arguments it reports (observability is never gated); with arguments it
@@ -357,6 +357,10 @@ export class Session {
    *  Everything else follows the walk into its worktree, as it always did. */
   laneRoot(rel?: string): string {
     if (rel === undefined) return this.workRoot();
+    // A DECLARED ROOT is session state exactly like .se/ — its declaration
+    // lives in the project root's .se/roots.json, so a bound worktree must
+    // never make the owner's roots read as undeclared (found live 2026-07-30).
+    if (rel.startsWith("@")) return this.root;
     return rel.replace(/\\/g, "/").split("/")[0] === ".se" ? this.root : this.workRoot();
   }
 
@@ -376,6 +380,41 @@ export class Session {
     markStarted(this.root, it);
     this.decisions.setExtraSink(join(it.path, "product", "spec", "iterations", it.id, "decisions.jsonl"));
     return { bound: it.id, note: "the lane now works in this iteration's worktree" };
+  }
+
+  /** THE BLESS PINS (owner verdicts 2026-07-30): leaving an iteration
+   *  kickoff compiles the record's blessed change_size from the LIVE matrix
+   *  and pins the machine into the record. No change size, no pass — the
+   *  demand is mechanical. An existing same-size pin walks on untouched;
+   *  a larger size escalates; pinIteration refuses de-escalation itself. */
+  private pinKickoff(fullId: string | undefined): void {
+    if (fullId === undefined) return;
+    const it = itFind(this.root, fullId);
+    const rec = readItRecord(this.root, it);
+    const size = typeof rec?.change_size === "string" ? rec.change_size : undefined;
+    const pinAbs = join(it.path, itPinRel(it.id));
+    if (size === undefined) {
+      if (existsSync(pinAbs)) return; // blessed in an earlier pass — walk on
+      throw new Rejection({
+        clause: CLAUSES.CONDITION_UNMET,
+        expected: "a change_size in the iteration record (patch | minor | major) — the bless compiles the column and pins the machine",
+        got: "no change_size in the record's frontmatter",
+        remedy: {
+          tool: "se_file_patch",
+          args: { ops: [{ path: itRecordRel(it.id), old_string: "status:", new_string: "change_size: <patch | minor | major>\nstatus:" }] },
+          note: "prefill it from the goal with its reasoning — the person's bless is the tick itself",
+        },
+        source: "engine/session.ts kickoff",
+      });
+    }
+    if (existsSync(pinAbs)) {
+      try {
+        if ((JSON.parse(readFileSync(pinAbs, "utf8")) as { change_size?: string }).change_size === size) return;
+      } catch {
+        // an unreadable pin falls through and is re-pinned
+      }
+    }
+    pinIteration(this.root, it, size);
   }
 
   expeditionList(): Record<string, unknown> {
@@ -1765,6 +1804,9 @@ export class Session {
       const subTarget = to ?? this.state(top.decl, cur).edges[0]?.to;
       if (subTarget !== undefined) this.gatePriority(top.decl, [subTarget], channel);
       await this.assertConditions(top.decl, this.state(top.decl, cur), to, channel, readHashes);
+      if (top.decl.id === "iterations" && (this.state(top.decl, cur).tags?.includes("iteration-kickoff") ?? false)) {
+        this.pinKickoff(top.gen?.expByState[cur]);
+      }
       this.completeGuarded(top.decl, top.instance, cur, "filled", now, to);
       top.instance.history.push({ state: cur, outcome: "filled", at: now });
       const prefix = this.subs.map((s) => s.decl.id).join("/");

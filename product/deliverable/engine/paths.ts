@@ -2,12 +2,14 @@
 // the project root is refused. The jail is checked at the resolver — no tool
 // implements its own path handling.
 //
-// DECLARED ROOTS (ported from v2's req-search-roots; owner ruling 2026-07-29).
-// A read may address a declared root as "@name/rest". The rule the fence
-// actually protects is DECLARED, NEVER ARBITRARY: the agent cannot widen its
-// own reach, and every read stays logged. Roots are READ surfaces, never write
-// targets, and they live in .se/roots.json — machine-local on purpose, because
-// an absolute path means nothing on anyone else's machine.
+// DECLARED ROOTS (ported from v2's req-search-roots; owner rulings 2026-07-29
+// and 2026-07-30). A read may address a declared root as "@name/rest". The
+// rule the fence protects is DECLARED, NEVER ARBITRARY: every reachable
+// folder stands in .se/roots.json, and every read stays logged. The AGENT
+// writes the declaration itself, through the lane — a person is never asked
+// to hand-edit a dotfile they cannot be expected to understand. Roots are
+// READ surfaces, never write targets, machine-local on purpose (an absolute
+// path means nothing on anyone else's machine).
 import { existsSync, readFileSync } from "node:fs";
 import { isAbsolute, join, relative, resolve, sep } from "node:path";
 import { CLAUSES, Rejection } from "./errors.ts";
@@ -57,9 +59,9 @@ export function resolveDeclaredRoot(root: string, p: string, source: string): st
       expected: `a declared root (${Object.keys(roots).join(", ") || "none declared"})`,
       got: `@${name}`,
       remedy: {
-        tool: "se_tick",
-        args: {},
-        note: "ask the OWNER to declare it in .se/roots.json — an agent never widens its own reach",
+        tool: "se_file_write",
+        args: { path: ".se/roots.json", content: `{\n  "${name}": "<absolute path>"\n}`, base_hash: null },
+        note: "declare it yourself through the lane (read the file first if it exists) — the declaration is logged; never send a person to hand-edit a dotfile",
       },
       source,
     });

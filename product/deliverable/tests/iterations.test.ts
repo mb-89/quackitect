@@ -4,7 +4,7 @@
 // gate holds only the FIRST start of a never-walked iteration.
 import { strict as assert } from "node:assert";
 import { spawnSync } from "node:child_process";
-import { readFileSync, writeFileSync } from "node:fs";
+import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { test } from "node:test";
 import { generateIterations, itPinRel, itSeed, pinIteration } from "../engine/iterations.ts";
@@ -93,6 +93,44 @@ test("the pin: the bless compiles the change size live; escalation only grows it
   assert.throws(() => pinIteration(root, it, "minor"), /ESCALATION/);
   // An unknown size refuses with the vocabulary.
   assert.throws(() => pinIteration(root, it, "product"), /patch \| minor \| major/);
+});
+
+test("the bless pins the machine and the container expands to the pinned walk", async () => {
+  const root = freshRoot();
+  gitInit(root);
+  const session = new Session(root);
+  const server = buildServer(root, session);
+  const hashes = readHashesFor(root);
+  for (let i = 0; i < 8; i++) {
+    const step = await call(server, "se_tick", { advance: true, read_hashes: hashes });
+    if (step.body.booted === true) break;
+  }
+  session.setAutonomy(1);
+  const seeded = session.iterationSeed("walk the pinned machine", "the bless compiles and pins");
+  const id = String(seeded.seeded);
+  const sid = id.match(/^(i\d+)-/)![1];
+  // While BOUND, the lane serves the WORKTREE — the agent's proof must hash
+  // that copy (on Windows the two differ by line endings after checkout).
+  const wtHashes = readHashesFor(join(root, ".worktrees", id));
+  await call(server, "se_tick", { to: "iterations", read_hashes: hashes });
+  await call(server, "se_tick", { to: sid, read_hashes: hashes });
+  // No change_size in the record: the bless refuses, mechanically.
+  const refused = await call(server, "se_tick", { advance: true, read_hashes: wtHashes });
+  assert.equal(refused.isError, true, JSON.stringify(refused.body));
+  assert.match(JSON.stringify(refused.body), /change_size/);
+  // The prefill lands in the record; the tick is the bless.
+  const rec = join(root, ".worktrees", id, "product", "spec", "iterations", id, "record.md");
+  writeFileSync(rec, readFileSync(rec, "utf8").replace(/^status: /m, "change_size: patch\nstatus: "), "utf8");
+  const blessed = await call(server, "se_tick", { advance: true, read_hashes: wtHashes });
+  assert.equal(blessed.isError, false, JSON.stringify(blessed.body));
+  assert.ok(existsSync(join(root, ".worktrees", id, itPinRel(id))), "the pin exists");
+  // Re-entering the container serves the walk: kickoff → the pinned machine.
+  await call(server, "se_tick", { advance: true, read_hashes: wtHashes });
+  await call(server, "se_tick", { to: "iterations", read_hashes: hashes });
+  await call(server, "se_tick", { to: sid, read_hashes: hashes });
+  const walk = await call(server, "se_tick", { advance: true, read_hashes: wtHashes });
+  assert.equal(walk.isError, false, JSON.stringify(walk.body));
+  assert.deepEqual(walk.body.breadcrumb, ["main", "iterations", `${sid}-walk`], "the walk descended into the pinned machine");
 });
 
 test("the kickoff serves the matrix's live evidence form", () => {

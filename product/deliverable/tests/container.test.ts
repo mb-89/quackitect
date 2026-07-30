@@ -3,7 +3,8 @@
 // one coming home completes the machine; empty runs start → end.
 import { strict as assert } from "node:assert";
 import { spawnSync } from "node:child_process";
-import { existsSync, mkdirSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { test } from "node:test";
 import { generateContinueExpedition, generateExpeditionArchive, shortId } from "../engine/expmachine.ts";
@@ -30,6 +31,27 @@ function gitSeed(root: string): void {
   g("config", "user.name", "t");
   g("config", "user.email", "t@t");
 }
+
+// ROOTS ARE SESSION STATE (found live 2026-07-30): the declaration lives in
+// the project root's .se/roots.json, and a bound worktree carries no .se —
+// resolving @refs against the worktree made every declared root read as
+// undeclared the moment an expedition was entered.
+test("a declared root survives a bound worktree", async () => {
+  const root = freshRoot();
+  gitSeed(root);
+  const outside = mkdtempSync(join(tmpdir(), "se-root-"));
+  writeFileSync(join(outside, "a.md"), "# from beyond the fence\n");
+  mkdirSync(join(root, ".se"), { recursive: true });
+  writeFileSync(join(root, ".se", "roots.json"), JSON.stringify({ out: outside }));
+  const s = new Session(root);
+  await bootHuman(s);
+  const e = s.expeditionNew("spike", "roots survive binding") as { created: string };
+  s.expeditionOpen(e.created);
+  assert.equal(s.laneRoot("@out/a.md"), root, "a @ref resolves against the project root, never the worktree");
+  const { fileRead } = await import("../engine/files.ts");
+  assert.ok(fileRead(s.laneRoot("@out/a.md"), "@out/a.md").content.includes("from beyond the fence"));
+  rmSync(outside, { recursive: true, force: true });
+});
 
 test("empty container: nothing open → start runs straight to end", async () => {
   const root = freshRoot();
