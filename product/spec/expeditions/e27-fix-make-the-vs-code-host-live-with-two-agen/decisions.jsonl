@@ -107,3 +107,6 @@
 {"ts":"2026-07-30T16:13:19.576Z","op":"done","visit":"expeditions/e27@0","node":"d69","brief":"A clicked subject now reaches the details group across windows"}
 {"ts":"2026-07-30T16:13:24.185Z","op":"update","visit":"expeditions/e27@0","node":"d72","brief":"proving the details relay did not break the suite"}
 {"ts":"2026-07-30T16:14:14.874Z","op":"update","visit":"expeditions/e27@0","node":"d73","brief":"committing the details relay"}
+{"ts":"2026-07-30T16:14:21.140Z","op":"update","visit":"expeditions/e27@0","node":"d74","brief":"installing the shell with the details relay"}
+{"ts":"2026-07-30T16:15:07.337Z","op":"plan","visit":"expeditions/e27@0","parent":null,"nodes":[{"id":"d75","brief":"Land e27 on trunk"},{"id":"d76","brief":"Restart the engine on the landed sources"},{"id":"d77","brief":"Close e27 once the threshold allows"}]}
+{"ts":"2026-07-30T16:15:14.160Z","op":"update","visit":"expeditions/e27@0","node":"d78","brief":"committing the record so the tree is clean to land"}
