@@ -193,3 +193,5 @@
 {"ts":"2026-07-30T09:29:39.189Z","op":"plan","visit":"expeditions/e25@0","parent":null,"nodes":[{"id":"d70","brief":"the bless becomes a durable sidecar stamped with the hand"},{"id":"d71","brief":"the e2e test proves bless and quick re-pass"}]}
 {"ts":"2026-07-30T09:30:04.833Z","op":"done","visit":"expeditions/e25@0","node":"d70","brief":"the sidecar bless is built and version-pinned"}
 {"ts":"2026-07-30T09:31:20.511Z","op":"done","visit":"expeditions/e25@0","node":"d71","brief":"220 green with the bless stamp asserted"}
+{"ts":"2026-07-30T09:36:31.064Z","op":"plan","visit":"expeditions/e25@0","parent":null,"nodes":[{"id":"d72","brief":"write the leave report"},{"id":"d73","brief":"close e25 on the owner's word"},{"id":"d74","brief":"return to the desk"}]}
+{"ts":"2026-07-30T09:36:42.651Z","op":"done","visit":"expeditions/e25@0","node":"d72","brief":"the leave report stands in the record"}
