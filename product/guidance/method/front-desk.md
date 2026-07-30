@@ -92,3 +92,9 @@ On the person's word, do the bureaucracy from the desk:
 
 Never walk another machine from the desk. Seed and defer; the walk
 follows after leaving.
+
+## 4. The tour
+
+A newcomer asking for a tour gets one FROM THE LIVE STATE - read
+product/guidance/method/tour.md and follow its stops. The card holds the
+order; the machinery holds the content.

@@ -158,3 +158,7 @@
 {"ts":"2026-07-30T08:45:36.202Z","op":"done","visit":"expeditions/e25@0","node":"d31","brief":"full-rigor answer recorded earlier as aq"}
 {"ts":"2026-07-30T08:45:58.769Z","op":"update","visit":"expeditions/e25@0","node":"d41","brief":"checking the trunk stray that blocks the land"}
 {"ts":"2026-07-30T08:46:11.919Z","op":"update","visit":"expeditions/e25@0","node":"d42","brief":"committing the zero-risk Obsidian stray on trunk"}
+{"ts":"2026-07-30T08:46:35.252Z","op":"done","visit":"expeditions/e25@0","node":"d32","brief":"export flag proven and landing on trunk"}
+{"ts":"2026-07-30T08:47:44.795Z","op":"update","visit":"expeditions/e25@0","node":"d43","brief":"the tour method card is written"}
+{"ts":"2026-07-30T08:47:58.157Z","op":"update","visit":"expeditions/e25@0","node":"d44","brief":"the desk points tour requests at the card"}
+{"ts":"2026-07-30T08:48:05.357Z","op":"done","visit":"expeditions/e25@0","node":"d33","brief":"minimal tour shipped as a method card the desk serves"}
