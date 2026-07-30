@@ -1,8 +1,8 @@
 # Proposal — the kickoff seeds the iteration machine
 
-Status: PROPOSAL for the owner. Nothing here is built except where marked
-BUILT. The compiler core and the monotonicity law are in the suite already;
-everything else waits for the owner's word.
+Status: RULED (owner, 2026-07-30) — the three open questions are decided,
+see the verdicts at the bottom. Nothing is built except where marked
+BUILT. The compiler core and the monotonicity law are in the suite already.
 
 ## The flow, end to end
 
@@ -78,11 +78,13 @@ mechanical checks everywhere, human judgment only at the gate.
    spikes, build chunks) — the matrix rows carry `seeds:` already; the
    kernel's submachine field is waiting.
 
-## Open questions for the owner
+## The verdicts (owner, 2026-07-30)
 
-1. The pin's drift advisory: silent until asked, or a visible mirror
-   badge on the running iteration?
-2. May an agent propose an ESCALATION on its own (the bless still
-   human below 0.6), or is noticing the tripwire also the owner's?
-3. The kickoff column field's name: `column` (the matrix word) or
-   `change_size` (the plain phrase)?
+1. DRIFT: SILENT until asked. No mirror badge. The kickoff FREEZES the
+   system - that is clear and accepted; a change mid-walk never reworks
+   the running machine.
+2. ESCALATION: the agent MAY propose one (escalation = the impact was
+   underestimated). The engine may notice the tripwire too - but it
+   NEVER prohibits. Advisory only, no hard block: early on the
+   calibration may simply be wrong.
+3. FIELD NAME: `change_size`.

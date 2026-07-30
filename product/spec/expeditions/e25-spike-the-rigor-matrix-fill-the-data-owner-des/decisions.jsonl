@@ -69,3 +69,7 @@
 {"ts":"2026-07-30T06:56:35.765Z","op":"update","visit":"expeditions/e25@0","node":"d16","brief":"one atomic patch: 48 comments consumed, edits worked in"}
 {"ts":"2026-07-30T06:56:47.290Z","op":"update","visit":"expeditions/e25@0","node":"d17","brief":"meth-risk-based-testing card written"}
 {"ts":"2026-07-30T06:57:12.957Z","op":"update","visit":"expeditions/e25@0","node":"d18","brief":"running the full battery over the edited matrix"}
+{"ts":"2026-07-30T06:58:54.245Z","op":"done","visit":"front_desk@0","node":"d5","brief":"comments worked in and landed on trunk"}
+{"ts":"2026-07-30T06:59:00.280Z","op":"done","visit":"front_desk@0","node":"d6","brief":"verdict report recorded as aq and delivered in chat"}
+{"ts":"2026-07-30T07:05:03.617Z","op":"plan","visit":"expeditions/e25@0","parent":null,"nodes":[{"id":"d19","brief":"record the three verdicts in the proposal doc"},{"id":"d20","brief":"walk the comment questions with the owner one by one"}]}
+{"ts":"2026-07-30T07:05:07.485Z","op":"done","visit":"expeditions/e25@0","node":"d19","brief":"verdicts recorded in the proposal, committing"}
