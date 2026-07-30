@@ -96,3 +96,4 @@
 {"ts":"2026-07-30T19:23:17.577Z","op":"update","visit":"expeditions/e26@1","node":"d76","brief":"syncing trunk into the expedition"}
 {"ts":"2026-07-30T19:23:22.795Z","op":"update","visit":"expeditions/e26@1","node":"d77","brief":"checking what is uncommitted in the worktree"}
 {"ts":"2026-07-30T19:23:26.910Z","op":"update","visit":"expeditions/e26@1","node":"d78","brief":"committing the decision trail before the sync"}
+{"ts":"2026-07-30T19:23:41.913Z","op":"update","visit":"expeditions/e26@1","node":"d79","brief":"syncing trunk into the expedition"}
