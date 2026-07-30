@@ -130,3 +130,6 @@
 {"ts":"2026-07-29T17:18:16.281Z","op":"update","visit":"expeditions/e24@0","node":"d3","brief":"syncing the worktree with trunk through the plain lane"}
 {"ts":"2026-07-29T17:18:31.319Z","op":"done","visit":"expeditions/start@0","node":"d1","brief":"the tools are proven by the suite but invisible to this client"}
 {"ts":"2026-07-29T17:18:38.488Z","op":"update","visit":"expeditions/e24@0","node":"d4","brief":"stepping out to hand over"}
+{"ts":"2026-07-30T06:48:19.552Z","op":"update","visit":"expeditions/e24@0","node":"d8","brief":"closing e24 with merge, owner-authorized override"}
+{"ts":"2026-07-30T06:48:52.311Z","op":"update","visit":"expeditions/e24@0","node":"d9","brief":"writing the missing report.md for the close"}
+{"ts":"2026-07-30T06:49:00.806Z","op":"update","visit":"expeditions/e24@0","node":"d10","brief":"closing e24 with merge, report written"}
