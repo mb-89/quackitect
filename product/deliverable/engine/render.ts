@@ -273,14 +273,16 @@ function machineSvg(source: CanvasData, activeIds: Set<string>, doneIds: Set<str
         parts.push(`<circle cx="${s.cx}" cy="${s.cy}" r="8" class="route-stop${shut > 0 && i >= shut ? " shut" : ""}"/>`);
       }
     }
-    // THE BARRIER, laid ACROSS the line where it shuts, carrying the reason.
+    // THE CLOSURE MARK, on the hop that shuts, carrying the reason. An
+    // exclamation in a ring rather than a bar across the line: a bar reads as
+    // part of the road, and it stays upright whichever way the road runs.
     if (shut > 0) {
-      const a = stops[shut - 1];
       const b = stops[shut];
-      const across = (Math.atan2(b.cy - a.cy, b.cx - a.cx) * 180) / Math.PI;
       parts.push(
         `<g class="clickable" data-detail="state:${esc(b.id)}"><title>${esc(route?.blocked?.why ?? "")}</title>` +
-          `<line x1="0" y1="-15" x2="0" y2="15" class="route-shut" transform="translate(${b.cx} ${b.cy}) rotate(${across.toFixed(1)})"/></g>`,
+          `<g class="route-shut" transform="translate(${b.cx} ${b.cy})">` +
+          `<circle r="12" class="shut-ring"/><path d="M 0 -6.5 L 0 2.5" class="shut-bang"/><circle cy="7" r="1.7" class="shut-dot"/>` +
+          `</g></g>`,
       );
     }
     // YOU ARE HERE: the arrow a map puts under your car, turned to face the
@@ -396,7 +398,7 @@ function viewedMachine(m: MirrorState, view: string | undefined): { decl: Machin
 
 /** The SHUTDOWN CONTROL's five notches (owner design): what happens
  *  around "done". Abbreviations on the bar; click for the explanations. */
-const SHUTDOWN_LEVELS = [
+export const SHUTDOWN_LEVELS = [
   { value: 1, abbr: "N", name: "no shutdown control" },
   { value: 2, abbr: "P", name: "shutdown prevention — the machine is kept awake while the walk runs" },
   { value: 3, abbr: "PI", name: "prevention + idle-on-done — done with everything, stay at idle" },
@@ -404,12 +406,22 @@ const SHUTDOWN_LEVELS = [
   { value: 5, abbr: "PS", name: "prevention + power-off-on-done — done → end → the machine powers off one minute later" },
 ];
 
+// THE COMPONENT LIBRARY, on every page the mirror serves. The engine serves
+// the bundle itself (mirror.ts, /vendor), so this is an ordinary script tag
+// rather than a webview asset URI — no bundler and no build step.
+const ELEMENTS = '<script type="module" src="/vendor/vscode-elements.js"></script>';
+
 const STYLE = `
   /* THE CHROME PALETTE — one place. A hosting webview (the VS Code
      extension) overrides these from the editor theme; semantic colors
      (green pass, red fail, yellow attention) are meaning, not chrome,
      and stay fixed. */
   :root { --se-bg:#14171a; --se-bg-side:#191d21; --se-raised:#22272c; --se-border:#2a2f34; --se-border-strong:#3a4147; --se-fg:#d8dde2; --se-muted:#7f8b96; --se-dim:#5b6772; }
+  /* THE MEANINGS. Named once here and overridden by a host that has its own
+     colour for the same meaning (see NATIVE). Standalone, these are ours.
+     THE ROUTE IS NOT AMONG THEM and stays a literal blue: it is the declared
+     exception, the one colour no host gets to reinterpret. A test pins it. */
+  :root { --se-accent:#e8b339; --se-accent-bg:#3a2f14; --se-ok:#4a7a55; --se-ok-bg:#1d2b20; --se-warn:#e8b339; }
   * { scrollbar-color: var(--se-border-strong) var(--se-bg); }
   ::-webkit-scrollbar { width: 10px; height: 10px; background: var(--se-bg); }
   ::-webkit-scrollbar-thumb { background: var(--se-border-strong); border-radius: 5px; }
@@ -477,16 +489,17 @@ const STYLE = `
   #w-machine .widget-body { display: flex; }
   svg { width: 100%; height: 100%; cursor: grab; }
   svg.panning { cursor: grabbing; }
-  .state { fill: var(--se-raised); stroke: #4a545e; stroke-width: 2; }
-  .state.active { fill: #3a2f14; stroke: #e8b339; stroke-width: 3.5; }
-  .state.done { fill: #1d2b20; stroke: #4a7a55; }
+  .state { fill: var(--se-raised); stroke: var(--se-border-strong); stroke-width: 2; }
+  .state.active { fill: var(--se-accent-bg); stroke: var(--se-accent); stroke-width: 3.5; }
+  .state.done { fill: var(--se-ok-bg); stroke: var(--se-ok); }
   .state.inner { fill: none; }
   .clickable { cursor: pointer; }
-  .clickable:hover .state, .clickable:hover .comment { stroke: #8fa0b0; }
+  .clickable:hover .state, .clickable:hover .comment { stroke: var(--se-fg); }
   .label { fill: var(--se-fg); font-size: 26px; text-anchor: middle; font-family: inherit; pointer-events: none; }
   .sublabel { fill: var(--se-muted); font-size: 17px; text-anchor: middle; font-family: inherit; pointer-events: none; }
   .edge { stroke: var(--se-dim); stroke-width: 2.5; }
   .arrowhead { fill: var(--se-dim); }
+  button.ghost:disabled { opacity: .45; cursor: default; }
   /* THE BLUE LINE. Blue on purpose: the voice reserves green, red and
      yellow for verdicts, and a route is not a verdict. It is a way. */
   .route-line { fill: none; stroke: #4a90d9; stroke-width: 6; stroke-linecap: round; stroke-linejoin: round; }
@@ -494,13 +507,16 @@ const STYLE = `
      The barrier itself is yellow, because yellow is attention and a shut
      road wants the reader's hand on the slider. */
   .route-line.shut { opacity: .28; }
-  .route-shut { stroke: #e8b339; stroke-width: 7; stroke-linecap: round; }
+  .route-shut { stroke: var(--se-warn); fill: none; stroke-width: 2.4; }
+  .route-shut .shut-ring { fill: var(--se-bg); }
+  .route-shut .shut-bang { stroke-width: 3; stroke-linecap: round; }
+  .route-shut .shut-dot { fill: var(--se-warn); stroke: none; }
   .route-stop { fill: #4a90d9; stroke: #9ecbf2; stroke-width: 2; }
   .route-stop.shut { opacity: .28; }
   .route-here { fill: #4a90d9; stroke: #9ecbf2; stroke-width: 2; }
   .guard { fill: #e8b339; font-size: 20px; text-anchor: middle; }
-  .comment { fill: #1c2025; stroke: var(--se-border); }
-  .group { fill: #1a1e22; stroke: #333a41; stroke-dasharray: 10 6; stroke-width: 2; }
+  .comment { fill: var(--se-bg-side); stroke: var(--se-border); }
+  .group { fill: var(--se-bg-side); stroke: var(--se-border); stroke-dasharray: 10 6; stroke-width: 2; }
   .group-label { fill: var(--se-dim); font-size: 24px; font-family: inherit; letter-spacing: .06em; }
   .comment-text { color: var(--se-muted); font-size: 13px; line-height: 1.35; }
   .comment-detail { font-size: 15px; line-height: 1.55; color: var(--se-fg); padding: 2px 0 10px; }
@@ -530,7 +546,7 @@ const STYLE = `
   .docview code { background: var(--se-raised); padding: 1px 5px; border-radius: 4px; }
   .docview pre { background: var(--se-bg); border: 1px solid var(--se-border); border-radius: 8px; padding: 10px; overflow: auto; }
   .docview a { color: #7cc4e8; }
-  button.ghost { background: var(--se-raised); color: var(--se-fg); border: 1px solid #4a545e; border-radius: 8px; padding: 6px 12px; font: inherit; cursor: pointer; }
+  button.ghost { background: var(--se-raised); color: var(--se-fg); border: 1px solid var(--se-border-strong); border-radius: 8px; padding: 6px 12px; font: inherit; cursor: pointer; }
   #w-details { flex: 1; border-radius: 0; border: 0; }
   .docheck { accent-color: #e8b339; cursor: pointer; }
   .docline { display: flex; align-items: center; gap: 6px; padding: 3px 0; }
@@ -698,7 +714,15 @@ let DETAIL_TITLE = null;
 let DETAIL_HTML = null;
 function showDetails(title, html) {
   const el = document.getElementById("details");
-  if (!el) return;
+  if (!el) {
+    // A SOLO CARD HAS NO DETAILS PANE OF ITS OWN. Embedded, details are a
+    // surface the HOST owns, so the subject travels out to it. Dropping it
+    // here is what made clicking a state do nothing at all.
+    // Being IN A FRAME is the test, not the embed flag: this runs before the
+    // flag is initialised, and a frame is exactly when a host is listening.
+    if (window.parent !== window) window.parent.postMessage({ se: "details", title: title, html: html }, "*");
+    return;
+  }
   // NOTHING CHANGED, NOTHING MOVES. rebind() re-derives this pane after every
   // morph. Rewriting identical markup flickered it and threw the reader's
   // scroll position away while they were reading. The pane carries
@@ -996,6 +1020,10 @@ let navigatingAway = false;
 //
 // Add a param here and every navigation carries it by construction. A test
 // refuses any param the client pins that is not registered.
+// Embedded in a host (the VS Code webview): the flag arrives on the iframe
+// URL and rides every navigation, so the server keeps serving the embedded
+// card set instead of resetting to the standalone one.
+const EMBED_Q = new URLSearchParams(location.search).has("embed");
 const PLACE = [
   ["detail", () => CURRENT_DETAIL],
   ["card", () => CARD_NOW],
@@ -1003,6 +1031,7 @@ const PLACE = [
   // itself stays a snapshot. A live window reports null and never picks it
   // up, so the flag spreads nowhere it does not belong.
   ["frozen", () => (FROZEN ? "1" : null)],
+  ["embed", () => (EMBED_Q ? "1" : null)],
 ];
 /** Carry the place onto a URL the reader is NAVIGATING to. */
 function withPlace(url) {
@@ -1038,12 +1067,35 @@ function frozenUrl(url) {
   u.searchParams.set("frozen", "1");
   return u.pathname + u.search;
 }
+// A SOLO CARD STAYS A CARD. Going to "/" replaced one card with the WHOLE
+// mirror inside it — which is what broke double-clicking into a sub-machine,
+// and what left the bar waiting on a page that was never the right one.
+// Only the mirror's own root is rewritten; a document link still goes where
+// it says.
+function keepCard(url) {
+  const here = location.pathname;
+  if (!here.startsWith("/widget/")) return url;
+  if (url !== "/" && url.slice(0, 2) !== "/?") return url;
+  const q = url.indexOf("?");
+  return here + (q < 0 ? "" : url.slice(q));
+}
 function navigateTo(url, label) {
   navigatingAway = true;
   showLoading(label);
-  url = withPlace(url);
+  url = withPlace(keepCard(url));
+  hostTrace("navigateTo " + url);
   location.href = url;
 }
+// The crumbs are plain anchors, so a solo card would follow one straight out
+// to the whole mirror. Capture them and route them through the same rule.
+document.addEventListener("click", (ev) => {
+  if (!location.pathname.startsWith("/widget/")) return;
+  const a = ev.target.closest ? ev.target.closest("a[href^='/?']") : null;
+  hostTrace("anchor hit=" + (a === null ? "none" : String(a.getAttribute("href"))));
+  if (a === null) return;
+  ev.preventDefault();
+  navigateTo(a.getAttribute("href"), "loading " + (a.textContent || "view"));
+}, true);
 async function refresh(detail) {
   if (FROZEN) return;
   if (navigatingAway) return;
@@ -1087,7 +1139,22 @@ let EMBED = false;
 try { EMBED = sessionStorage.getItem("se-embed") === "1"; } catch { EMBED = false; }
 window.addEventListener("message", (ev) => {
   const d = ev.data;
-  if (!d || d.se !== "theme") return;
+  if (!d) return;
+  // HELP IS A DETAIL, NEVER A BUTTON (ux rule). A host with an icon strip
+  // has no room to explain itself, so what an icon means arrives HERE, in
+  // the details pane, the one place the reader already looks for meaning.
+  // The host saw the walk move. Embedded, this replaces the event stream.
+  if (d.se === "wake") { refresh(); return; }
+  if (d.se === "help") { hostTrace("page got help"); showDetails(d.title, d.html); return; }
+  // A LOG LINE CLICKED IN THE HOST'S TERMINAL. The record is rendered HERE,
+  // by the same code the mirror uses, so a host never grows a second
+  // renderer for what this page already knows how to draw.
+  if (d.se === "logref") {
+    hostTrace("page got logref " + d.ref + " on " + location.pathname);
+    void openLogDetail(d.ref).then(() => hostTrace("logref rendered " + d.ref), (e) => hostTrace("logref FAILED " + String((e && e.message) || e)));
+    return;
+  }
+  if (d.se !== "theme") return;
   EMBED = true;
   try { sessionStorage.setItem("se-embed", "1"); } catch { /* storage denied — the flag just will not survive navigation */ }
   const vars = d.vars || {};
@@ -1305,6 +1372,7 @@ document.addEventListener("click", (ev) => {
 // Double-click a sub-machine state: enter it as a VIEWER (walk unmoved).
 document.addEventListener("dblclick", (ev) => {
   const g = ev.target.closest ? ev.target.closest(".clickable") : null;
+  hostTrace("dblclick hit=" + (g === null ? "none" : "clickable") + " sub=" + (g === null ? "-" : String(g.dataset.sub)));
   if (g && g.dataset.sub) navigateTo("/?view=" + encodeURIComponent(g.dataset.sub), "loading " + g.dataset.sub);
 });
 
@@ -1613,8 +1681,11 @@ if (logPanel) {
 }
 async function openLogDetail(ref) {
   CURRENT_DETAIL = "log:" + ref;
+  hostTrace("openLogDetail asking for " + ref);
   const r = await fetch("/api/log?ref=" + encodeURIComponent(ref));
+  hostTrace("openLogDetail status " + r.status + " for " + ref);
   const rec = await r.json();
+  hostTrace("openLogDetail parsed " + ref + " tool=" + String(rec.tool) + " err=" + String(rec.error));
   if (rec.tool === "se_update" && rec.args && rec.args.visit) { await showDecisions(rec.args.visit, null); return; }
   if ((rec.tool === "se_note" || rec.tool === "mirror_note") && rec.args) { showDetails("note · " + ((rec.response && rec.response.captured) || rec.ref), jsonTable({ at: rec.ts, text: rec.args.text, pending: "until a retro drains it" })); return; }
   if (rec.text !== undefined && rec.tool === undefined) { showDetails("note · " + rec.ref, jsonTable({ at: rec.at, text: rec.text, pending: "until a retro drains it" })); return; }
@@ -1661,14 +1732,36 @@ function renderDecisions(sel) {
 // carries a token, settles exactly once, and cannot outlive its deadline.
 let loadToken = 0;
 let loadTimer = null;
+// A HOST DRAWS ITS OWN PROGRESS. Framed inside an editor, the host already
+// has a progress affordance of its own, and two bars for one wait is one too
+// many. The page REPORTS that it is busy; the host decides how to show it.
+// The page's half of the trace. Nobody can watch a webview run, so it says
+// what it just did and the host writes it down.
+function hostTrace(what) {
+  if (window.parent !== window) window.parent.postMessage({ se: "trace", text: what }, "*");
+}
+// A THROW IN HERE IS INVISIBLE otherwise. There is no console anybody can
+// read from outside, so a failure would look exactly like a control that
+// simply does nothing — which is the hardest fault to chase.
+window.addEventListener("error", (e) => hostTrace("ERROR " + (e.message || "?") + " @" + (e.lineno || 0)));
+window.addEventListener("unhandledrejection", (e) => hostTrace("REJECTED " + String((e.reason && e.reason.message) || e.reason || "?")));
+// WHICH PAGE THIS ACTUALLY IS. A navigation that fires and then lands on the
+// wrong thing looks identical, from outside, to one that never fired.
+hostTrace("loaded " + location.pathname + location.search);
+function hostBusy(on, label) {
+  if (window.parent !== window) window.parent.postMessage({ se: "busy", on: on, label: label || "" }, "*");
+}
 function hideLoading() {
   loadToken++; // any timer still holding the old token is now a no-op
   if (loadTimer !== null) { clearTimeout(loadTimer); loadTimer = null; }
   const el = document.getElementById("loadbar");
   if (el !== null) el.remove();
+  hostBusy(false);
 }
 function showLoading(label) {
   hideLoading(); // one load at a time; a second start supersedes the first
+  hostBusy(true, label);
+  if (window.parent !== window) return;
   const mine = loadToken;
   const el = document.createElement("div");
   el.id = "loadbar";
@@ -1689,6 +1782,7 @@ function showLoading(label) {
 // "##progress done total label" and the fill follows it. Boot's checks are
 // the first customer — nobody should watch a still page and guess.
 function showProgress(label, done, total) {
+  if (window.parent !== window) { hostBusy(true, label + " — " + done + "/" + total); return; }
   let el = document.getElementById("loadbar");
   if (el === null) { showLoading(label); el = document.getElementById("loadbar"); }
   if (el === null) return;
@@ -1883,7 +1977,15 @@ let ACTIVE_AT_RENDER = JSON.stringify(D.describe.active || []);
 let sawError = false;
 let deathTimer = null;
 // A frozen window never opens the stream — that is the whole of freezing.
-if (!FROZEN) {
+//
+// AND NEITHER DOES AN EMBEDDED CARD. A browser allows only a handful of
+// connections to one host, and a permanent event stream per card ate one
+// each. Past that limit EVERY other request to the engine queues instead of
+// going out — so a click did nothing at all, and then four minutes later the
+// whole backlog arrived at once. The host polls the engine over its own
+// runtime, where no such limit applies, and wakes the cards through the
+// channel they already have.
+if (!FROZEN && window.parent === window) {
 const es = new EventSource("/events");
 es.addEventListener("open", () => {
   if (deathTimer !== null) { clearTimeout(deathTimer); deathTimer = null; }
@@ -2067,7 +2169,43 @@ function widgetHead(title: string, widgetId: string, url: string): string {
   return `<div class="widget-head"><span>${esc(title)}</span><button class="expand" data-widget="${widgetId}" data-url="${esc(url)}" title="expand · ctrl-click: new tab · shift-click: new window — both open frozen on what this card is showing">⛶</button></div>`;
 }
 
-export function renderMirror(m: MirrorState, widget?: "machine" | "details" | "log" | "terminal", view?: string, card?: string): string {
+/** THE NATIVE SKIN (owner ruling 2026-07-30). Docked inside a host, this is
+ *  not our own window any more, so it stops looking like one: square
+ *  corners, the host's fonts, the host's palette. Our own look belongs to
+ *  the standalone mirror. Semantic colours stay ours everywhere.
+ *
+ *  A SOLO card drops its head and its frame — the host already draws a
+ *  titled, bordered pane around it, and two frames read as a bug.
+ *
+ *  THE HOST OWNS THE WALK'S CONTROLS when embedded (owner ruling 2026-07-30).
+ *  The sliders and escape steer the whole walk and a card may be closed, so
+ *  they belong to the host's sidebar rather than to any one card.
+ *
+ *  THE CRUMBS ARE NOT CONTROLS. They navigate the DRAWING — which machine is
+ *  on screen — so they stay with the drawing.
+ *
+ *  ESCAPE STAYS TOO (owner ruling 2026-07-30), and lives ONLY here: it acts
+ *  on the walk the drawing shows, and repeating it in the host's sidebar
+ *  would be the same control in two places. */
+const NATIVE = `
+  body { font-family: var(--vscode-font-family, ui-monospace, Consolas, monospace); }
+  /* THE HOST ALREADY NAMES THESE MEANINGS, so they are taken from its theme
+     instead of our palette. The ROUTE stays ours: a blue line for the way
+     ahead is a map convention no editor theme outweighs. */
+  body.embed { --se-accent: var(--vscode-button-background); --se-accent-bg: color-mix(in srgb, var(--vscode-button-background) 22%, transparent); --se-ok: var(--vscode-testing-iconPassed); --se-ok-bg: color-mix(in srgb, var(--vscode-testing-iconPassed) 20%, transparent); --se-warn: var(--vscode-editorWarning-foreground); }
+  * { border-radius: 0 !important; }
+  .label, .sublabel, .group-label, .cond-label, pre, code, table.kv, .logrow, .legend-key { font-family: var(--vscode-editor-font-family, ui-monospace, Consolas, monospace); }
+  body.solo .widget { border: 0; }
+  body.solo .widget-head { display: none; }
+  body.solo #w-machine .widget-head { display: flex; }
+  body.solo #w-machine .head-sliders { display: none !important; }
+  body.solo #w-machine .expand { display: none; }
+  body.solo aside, body.solo main { background: transparent; }
+`;
+
+export function renderMirror(m: MirrorState, widget?: "machine" | "details" | "log" | "terminal", view?: string, card?: string, embed?: boolean): string {
+  const skin = embed === true ? NATIVE : "";
+  const bodyClass = embed === true ? ` class="embed${widget === undefined ? "" : " solo"}"` : "";
   const info = m.session.describe() as { active: string[]; status: string };
   // The scale is READ from machines/scale.md — the Obsidian-editable
   // truth; an owner edit shows on the next reload.
@@ -2222,12 +2360,16 @@ export function renderMirror(m: MirrorState, widget?: "machine" | "details" | "l
   // Escape has a hand-side affordance too (parity law): only while a
   // sub-machine other than boot is being walked.
   const crumbTrail = m.session.breadcrumb();
-  const escapeBtn = crumbTrail.length > 1 && crumbTrail[1] !== "boot" ? `<button class="ghost" id="escape-btn" title="escape to idle — the machine is left standing, the reason is recorded">⤴ escape</button>` : "";
+  // ESCAPE STANDS BESIDE THE POSITION, ALWAYS (owner ruling 2026-07-30). It
+  // used to appear and vanish with the walk, which moved everything else in
+  // the row under the reader's hand. Not applicable is DISABLED, not absent.
+  const canEscape = crumbTrail.length > 1 && crumbTrail[1] !== "boot";
+  const escapeBtn = `<button class="ghost" id="escape-btn"${canEscape ? "" : " disabled"} title="${canEscape ? "escape to idle — the machine is left standing, the reason is recorded" : "nothing to escape — the walk is not inside a sub-machine"}">⤴ escape</button>`;
   // The way home when the view holds still elsewhere: the header names
   // the walk's position; clicking it jumps the view there.
   const curLeaf = info.active[0] ?? "";
   const curBtn = curLeaf === "" ? "" : `<button class="ghost" id="cur-state" data-machine="${esc(walkMachine.id)}" title="the walk stands here — click: jump the view to it">☉ ${esc(curLeaf)}</button>`;
-  const machineWidget = `<div class="widget" id="w-machine"><div class="widget-head"><span class="crumbs">${crumbs}</span><span style="display:flex;align-items:center;gap:10px">${curBtn}${slider}${sdBar}${escapeBtn}<button class="expand" data-widget="w-machine" data-url="/widget/machine?view=${encodeURIComponent(decl.id)}" title="expand · ctrl-click: new tab · shift-click: new window — both open frozen on what this card is showing">⛶</button></span></div><div class="widget-body">${svg}</div></div>`;
+  const machineWidget = `<div class="widget" id="w-machine"><div class="widget-head"><span class="crumbs">${crumbs}</span><span class="head-controls" style="display:flex;align-items:center;gap:10px">${curBtn}<span class="head-sliders" style="display:flex;align-items:center;gap:10px">${slider}${sdBar}</span>${escapeBtn}<button class="expand" data-widget="w-machine" data-url="/widget/machine?view=${encodeURIComponent(decl.id)}" title="expand · ctrl-click: new tab · shift-click: new window — both open frozen on what this card is showing">⛶</button></span></div><div class="widget-body">${svg}</div></div>`;
   const detailsWidget = `<div class="widget" id="w-details">${widgetHead("details", "w-details", "/widget/details")}
     ${info.status === "closed" ? '<div class="meta" style="color:#e86a5f">machine closed</div>' : ""}
     <div class="meta" id="details-title" data-morph-ignore>—</div>
@@ -2261,26 +2403,32 @@ export function renderMirror(m: MirrorState, widget?: "machine" | "details" | "l
   const terminalWidget = termWidget(true);
 
   if (widget === "terminal") {
-    return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>se · terminal</title><style>${STYLE} #w-terminal{flex:1;height:auto;border-bottom:0}</style><script type="module" src="/vendor/vscode-elements.js"></script></head>
-<body><div class="cols"><aside id="left" style="width:100vw;max-width:100vw">${termWidget(true)}</aside></div>${MODAL}${data}<script>${SCRIPT}</script></body></html>`;
+    return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>se · terminal</title><style>${STYLE} #w-terminal{flex:1;height:auto;border-bottom:0}${skin}</style>${ELEMENTS}</head>
+<body${bodyClass}><div class="cols"><aside id="left" style="width:100vw;max-width:100vw">${termWidget(true)}</aside></div>${MODAL}${data}<script>${SCRIPT}</script></body></html>`;
   }
   if (widget === "log") {
-    return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>se · log</title><style>${STYLE} #w-log{flex:1;border-bottom:0}</style><script type="module" src="/vendor/vscode-elements.js"></script></head>
-<body><div class="cols"><aside id="sidebar" style="width:100vw;max-width:100vw">${logWidget}</aside></div>${MODAL}${data}<script>${SCRIPT}</script></body></html>`;
+    // The widget asks for flex:1, so its parent has to BE a column with a
+    // height — without that the panel collapses and the page reads as blank.
+    return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>se · log</title><style>${STYLE} #w-log{flex:1;border-bottom:0;min-height:0} body.solo #sidebar{display:flex;flex-direction:column;height:100vh} #log-rows{flex:1;min-height:0}${skin}</style>${ELEMENTS}</head>
+<body${bodyClass}><div class="cols"><aside id="sidebar" style="width:100vw;max-width:100vw">${logWidget}</aside></div>${MODAL}${data}<script>${SCRIPT}</script></body></html>`;
   }
 
   if (widget === "machine") {
-    return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>se · machine</title><style>${STYLE} main{padding:10px}</style><script type="module" src="/vendor/vscode-elements.js"></script></head>
-<body><div class="cols"><main>${machineWidget}</main></div>${MODAL}${data}<script>${SCRIPT}</script></body></html>`;
+    return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>se · machine</title><style>${STYLE} main{padding:10px}${skin}</style>${ELEMENTS}</head>
+<body${bodyClass}><div class="cols"><main>${machineWidget}</main></div>${MODAL}${data}<script>${SCRIPT}</script></body></html>`;
   }
   if (widget === "details") {
-    return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>se · details</title><style>${STYLE}</style><script type="module" src="/vendor/vscode-elements.js"></script></head>
-<body><div class="cols"><aside id="sidebar" style="width:100vw;max-width:100vw">${detailsWidget}</aside></div>${MODAL}${data}<script>${SCRIPT}</script></body></html>`;
+    return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>se · details</title><style>${STYLE}${skin}</style>${ELEMENTS}</head>
+<body${bodyClass}><div class="cols"><aside id="sidebar" style="width:100vw;max-width:100vw">${detailsWidget}</aside></div>${MODAL}${data}<script>${SCRIPT}</script></body></html>`;
   }
   // THE CARD MATRIX (owner design 2026-07-29). The card list and its ORDER are
   // the product's, in product/cards.md — v3 exists to work on other products,
   // and another product wants other cards.
-  const cardList = loadCards(m.root);
+  // EMBEDDED, the console card leaves (owner ruling 2026-07-30): the host's
+  // integrated terminal is where the agent lives, and a second picture of it
+  // beside the editor is an echo. The grid closes over the gap.
+  const allCards = loadCards(m.root);
+  const cardList = embed === true ? allCards.filter((c) => c.widget !== "terminal") : allCards;
   const byWidget: Record<string, string> = {
     terminal: terminalWidget,
     machine: machineWidget,
@@ -2318,8 +2466,8 @@ export function renderMirror(m: MirrorState, widget?: "machine" | "details" | "l
   const nowAt = Math.max(0, cardList.findIndex((c) => c.id === now));
   const legendHtml = `<div class="card" id="card-legend" style="${cellAt(nowAt)}"><div class="widget" id="w-legend"><div class="widget-head"><span>keys</span></div><div class="widget-body">${legendRows}</div></div></div>`;
   const cardData = `<script type="application/json" id="se-cards">${JSON.stringify({ list: cardList.map((c) => ({ n: c.n, id: c.id, title: c.title })), now })}</script>`;
-  return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>se mirror</title><style>${STYLE}</style><script type="module" src="/vendor/vscode-elements.js"></script></head>
-<body>
+  return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>se mirror</title><style>${STYLE}${skin}</style>${ELEMENTS}</head>
+<body${bodyClass}>
 <div class="cards" data-keep-style style="grid-template-rows:repeat(${rows},1fr)">
   ${cardsHtml}
   ${legendHtml}

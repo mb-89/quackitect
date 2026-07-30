@@ -456,7 +456,9 @@ Write-Host "$P - the Mirror (your hand on the walk): the server opens http://loc
 # message - so RUNME sends it. The agent boots as far as the threshold
 # lets it, ANNOUNCES where it stands, and stops; a stopped agent cannot
 # hear the slider - the user messages it (e.g. "continue") to resume.
-$kickoff = 'Session start. Tick the machine and walk as far as the threshold allows. Then report to me in one short message: where you stand, and why you stopped (threshold, condition, or idle). If you are held below the threshold or idle with nothing to do, stop - and make it clear to me that the slider alone cannot wake you: after I change it or move the machine in the mirror, I have to send you a message (continue is enough), and you pick up from wherever the machine stands.'
+# THE KICKOFF LIVES IN ONE FILE - workspace/_cage/kickoff.txt. The VS Code
+# extension sends the same text, so the wording cannot fork.
+$kickoff = (Get-Content (Join-Path $ws "_cage\kickoff.txt") -Raw).Trim()
 # THE TERMINAL PANE IS THE DEFAULT. The agent runs inside a pseudo-terminal
 # hosted beside it, so the Mirror shows it in the left column. That host is
 # started DETACHED: with the terminal in the browser this window has nothing

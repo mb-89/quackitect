@@ -29,6 +29,8 @@ bug somewhere else.
 - INPUT IS NOT EVIDENCE, and only evidence is guarded. Prefill hard at the ENTRY of work — a seed's goal, an iteration's vision, a kickoff brief. A wrong value there goes visibly wrong at once, with the person right beside it. The guard belongs at the EXIT, where a report CLAIMS work was done and checked, because that is where an agent would be signing its own homework.
 - A PREFILL IS NOT A LAW. The secretary fills the form to the best of their knowledge and sends you on your way; whoever receives it still checks whether the prefilling was right. A prefilled value carries where it came from, and the state that receives it JUDGES it. It is never obeyed because it was already written down.
 - Color carries meaning, never decoration: green = pass, red = failure or rejection, yellow = attention.
+- TAKE THE COLOUR FROM THE HOST. Running inside another application, use that application's palette for anything it already names — a primary action, a passing check, a warning. Our own hex is the last resort, for a meaning the host has no colour for. A palette we maintain ourselves drifts, and drifts worst against a theme we do not control.
+- AN OUTSIDE CONVENTION CAN BEAT THE HOST. The route line stays BLUE, because every map application has already taught that meaning and no editor theme outweighs it. Claiming an exception means naming the convention it rests on.
 
 ## The reader keeps their place
 

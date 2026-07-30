@@ -483,7 +483,15 @@ test("a popped-out card opens on what it was showing, and then holds still", () 
   assert.match(html, /window\.open\(frozenUrl\(url\), "_blank"\)/, "the reader's place rides along");
   assert.ok(!html.includes('"se-widget"'), "and no NAMED window — five snapshots need five windows, not one reused");
   // Frozen is the absence of liveness, in both directions.
-  assert.match(html, /if \(!FROZEN\) \{\nconst es = new EventSource/, "a frozen window never opens the event stream");
+  // A BROWSER ALLOWS ONLY A HANDFUL OF CONNECTIONS TO ONE HOST, and a stream
+  // is permanent. One per embedded card exhausted the pool, after which every
+  // other request queued instead of going out. So the guard covers both: a
+  // frozen window, and any page running inside a frame.
+  assert.match(
+    html,
+    /if \(!FROZEN && window\.parent === window\) \{\nconst es = new EventSource/,
+    "only a top-level, unfrozen window opens the event stream",
+  );
   assert.match(html, /async function refresh\(detail\) \{\n  if \(FROZEN\) return;/, "and never redraws itself");
   // It says so, quietly — a snapshot that looks live is a trap.
   assert.match(html, /frozen-bar/, "the frozen window carries its own marker");

@@ -100,3 +100,16 @@
 {"ts":"2026-07-30T19:26:31.142Z","op":"update","visit":"expeditions/e26@1","node":"d80","brief":"package.json takes trunk's shell with the placeholders"}
 {"ts":"2026-07-30T19:27:01.324Z","op":"done","visit":"expeditions/e26@1","node":"d73","brief":"merge backed out; the branch is stale enough to need a decision"}
 {"ts":"2026-07-30T19:33:04.343Z","op":"plan","visit":"expeditions/e26@1","parent":null,"nodes":[{"id":"d81","brief":"merge trunk in, resolving by taking its side"},{"id":"d82","brief":"re-apply the placeholders to trunk's shell"},{"id":"d83","brief":"re-apply the watchdog and the tree kill"},{"id":"d84","brief":"land it and reload so the renderers show"}]}
+{"ts":"2026-07-30T19:33:34.718Z","op":"update","visit":"expeditions/e26@1","node":"d85","brief":"package.json resolved onto trunk's shell"}
+{"ts":"2026-07-30T19:33:53.359Z","op":"update","visit":"expeditions/e26@1","node":"d86","brief":"ATTACH.md resolved, and the duck loses its name"}
+{"ts":"2026-07-30T19:34:16.827Z","op":"update","visit":"expeditions/e26@1","node":"d87","brief":"the message handler takes trunk's cases under the new key"}
+{"ts":"2026-07-30T19:35:00.887Z","op":"update","visit":"expeditions/e26@1","node":"d88","brief":"the widget pages take trunk's skin and keep the library tag"}
+{"ts":"2026-07-30T19:35:19.949Z","op":"done","visit":"expeditions/e26@1","node":"d81","brief":"render.ts resolved onto trunk"}
+{"ts":"2026-07-30T19:36:05.152Z","op":"update","visit":"expeditions/e26@1","node":"d89","brief":"first five shell conflicts take trunk"}
+{"ts":"2026-07-30T19:36:26.524Z","op":"update","visit":"expeditions/e26@1","node":"d90","brief":"activate takes trunk's three-view registration"}
+{"ts":"2026-07-30T19:36:45.376Z","op":"update","visit":"expeditions/e26@1","node":"d91","brief":"theme fan-out and card slots take trunk"}
+{"ts":"2026-07-30T19:36:59.611Z","op":"done","visit":"expeditions/e26@1","node":"d82","brief":"all nine shell conflicts settled on trunk"}
+{"ts":"2026-07-30T19:37:26.680Z","op":"update","visit":"expeditions/e26@1","node":"d92","brief":"checking the wire-key spellings before renaming"}
+{"ts":"2026-07-30T19:37:37.274Z","op":"update","visit":"expeditions/e26@1","node":"d93","brief":"the shell takes placeholders across trunk's version"}
+{"ts":"2026-07-30T19:37:56.086Z","op":"done","visit":"expeditions/e26@1","node":"d83","brief":"the wire key and the tree kill are consistent on both sides"}
+{"ts":"2026-07-30T19:38:01.909Z","op":"update","visit":"expeditions/e26@1","node":"d94","brief":"checking the merge is clean before committing"}
