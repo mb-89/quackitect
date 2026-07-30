@@ -20,11 +20,14 @@ Change any shortcut in the Keyboard Shortcuts editor.
 This is where you steer the walk.
 
 - **Autonomy** — how much the agent does on its own. It enters only steps
-  at or below this level. The words under the slider are the named levels;
-  click one to jump there.
-- **Shutdown** — what happens when the work is done.
-- **Escape to idle** — leave the machine standing and go back to idle. It
-  asks why, and the reason is recorded. Available only inside a sub-machine.
+  at or below this level. At 0 nothing moves without you.
+- **Shutdown** — what happens once there is nothing left to do.
+
+The short words under each slider are the named levels, each sitting at the
+place it actually means. Click one to jump there.
+
+Clicking a slider's name, or any level, explains the whole scale in the
+details group.
 
 Under them, one line says where the walk stands and which record is open.
 
@@ -47,16 +50,17 @@ There is no fixed control panel. You build the one you want.
 VS Code remembers the arrangement for this folder. Close it, open it again,
 and the windows come back where you left them.
 
-## The log sits beside the terminal
+## The log lives at the bottom
 
-Starting the agent puts its terminal in the EDITOR AREA rather than the
-bottom panel, and opens the log next to it. The conversation is on the
-left, what it did is on the right.
+The log is a tab in the bottom panel, beside Terminal and Problems. It stays
+there. Clicking it in Features reveals it down there rather than opening it
+somewhere else.
 
-This is the only way to see both at once. The bottom panel shows one tab at
-a time, so a log down there would hide the terminal.
+The button in its title bar opens it as a full editor window, for when you
+want it large or beside something.
 
-Drag either one wherever you prefer. VS Code remembers that too.
+Starting the agent opens its terminal where terminals go, in that same
+panel. It does not take over whichever card you were looking at.
 
 ## The state machine
 
@@ -64,8 +68,12 @@ Its drawing carries the breadcrumbs along the top. They navigate between
 machines — click one to look at a different machine without moving the
 walk.
 
-The sliders are not there. They steer the whole walk, not that one card, so
-they live in the sidebar where they are always reachable.
+**Escape to idle** is there too, and only there. It leaves the machine
+standing and returns to idle, asks why, and records the reason. It acts on
+the walk the drawing shows, so it belongs with the drawing.
+
+The sliders are not there. They steer the whole walk rather than that one
+card, so they live in the sidebar where they are always reachable.
 
 ## What is running
 

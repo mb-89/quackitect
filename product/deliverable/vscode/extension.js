@@ -43,7 +43,9 @@ let packet = null;
 let strip = null;
 let controls = null;
 let detailsView = null;
+let logView = null;
 let poller = null;
+let busyDone = null;
 /** slot number → CardWindow. A slot is absent when its window is closed. */
 const windows = new Map();
 // The session's name survives engine reloads (exit 42): the settings store
@@ -413,9 +415,38 @@ function openInEditor(rel) {
   void vscode.commands.executeCommand("vscode.open", vscode.Uri.file(abs), { preview: false });
 }
 
+/**
+ * The host draws the waiting, not the page.
+ *
+ * VS Code has a progress notification of its own, so an embedded page reports
+ * that it is busy and this turns it into one. Nothing spins forever: a page
+ * that never reports done still has its notification taken away.
+ */
+function setBusy(on, label) {
+  if (busyDone !== null) {
+    busyDone();
+    busyDone = null;
+  }
+  if (on !== true) return;
+  void vscode.window.withProgress(
+    { location: vscode.ProgressLocation.Notification, title: label === "" ? "Quackitect" : label },
+    () =>
+      new Promise((resolve) => {
+        busyDone = resolve;
+        setTimeout(() => {
+          if (busyDone === resolve) {
+            busyDone = null;
+            resolve();
+          }
+        }, 20000);
+      }),
+  );
+}
+
 function onWebviewMessage(m) {
   if (!m) return;
   if (m.quackitect === "open") openInEditor(m.path);
+  else if (m.quackitect === "busy") setBusy(m.on === true, String(m.label ?? ""));
   // CLICKING ANYTHING EXPLAINS IT IN DETAILS (ux rule). Split across windows,
   // the card that was clicked and the group that explains it are two separate
   // documents, so the subject is relayed rather than shown in place.
@@ -457,10 +488,16 @@ class Surface {
   }
 }
 
-/** The details group — a permanent home in the sidebar (owner ruling). */
-class DetailsView extends Surface {
-  constructor() {
-    super(() => framePage(SERVER + "/widget/details?embed=1"));
+/**
+ * A card with a PERMANENT home in the host's chrome, not an editor window.
+ *
+ * Details lives at the bottom of the sidebar and the log lives in the bottom
+ * panel beside the terminal (owner rulings). Both are always in reach, so
+ * neither is opened as a window unless the reader expands it deliberately.
+ */
+class CardView extends Surface {
+  constructor(widget) {
+    super(() => framePage(SERVER + "/widget/" + widget + "?embed=1"));
   }
   resolveWebviewView(view) {
     view.onDidDispose(() => {
@@ -531,6 +568,29 @@ async function showHelp(title, html, reveal) {
     const expanded = windows.get(card.n);
     if (expanded !== undefined) expanded.help(title, html);
   }
+}
+
+/**
+ * Explain a scale in details, built from the ENGINE's own levels.
+ *
+ * The scale is authored in machines/scale.md and fetched, never copied — a
+ * host holding its own list of levels drifts the moment that file is edited.
+ */
+async function showScaleHelp(which, level) {
+  if (levels === null) levels = await api("/api/levels");
+  const list = (levels === null ? null : levels[which]) ?? [];
+  const rows = list
+    .map((l) => {
+      const here = level !== undefined && Number(l.value) === Number(level);
+      return `<tr${here ? ' style="font-weight:600"' : ""}><td>${escapeHtml(l.abbr)} · ${escapeHtml(String(l.value))}</td><td>${escapeHtml(l.name)}</td></tr>`;
+    })
+    .join("");
+  const lead =
+    which === "autonomy"
+      ? "<p>The agent enters a step only when that step weighs no more than this. At 0 nothing moves without you.</p>"
+      : "<p>What happens once there is nothing left to do.</p>";
+  const title = which === "autonomy" ? "the autonomy scale" : "the shutdown scale";
+  await showHelp(title, lead + '<table class="kv">' + rows + "</table>", false);
 }
 
 // ── THE SIDEBAR GROUPS ───────────────────────────────────────────────────
@@ -612,29 +672,26 @@ class Controls {
     return `<!DOCTYPE html><html><head><meta charset="utf-8"><style>${GROUP_STYLE}
   .box { padding: 2px 10px 8px; }
   .row { display: flex; align-items: baseline; justify-content: space-between; margin-top: 8px; }
-  .name { color: var(--vscode-descriptionForeground); text-transform: uppercase; letter-spacing: .07em; font-size: .85em; }
+  .name { color: var(--vscode-descriptionForeground); text-transform: uppercase; letter-spacing: .07em; font-size: .85em; cursor: pointer; }
+  .name:hover { color: var(--vscode-foreground); }
   .val { font-family: var(--vscode-editor-font-family); }
   input[type=range] { width: 100%; margin: 2px 0 0; accent-color: var(--vscode-focusBorder); }
-  .notches { display: flex; justify-content: space-between; color: var(--vscode-descriptionForeground); font-size: .8em; }
-  .notch { cursor: pointer; }
+  .notches { position: relative; height: 2.7em; color: var(--vscode-descriptionForeground); font-size: .8em; }
+  .notch { position: absolute; transform: translateX(-50%); cursor: pointer; white-space: nowrap; }
   .notch:hover { color: var(--vscode-foreground); }
   .where { margin-top: 10px; color: var(--vscode-descriptionForeground); font-size: .9em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .where b { color: var(--vscode-foreground); font-weight: 600; }
-  button.act { margin-top: 10px; width: 100%; padding: 4px; background: var(--vscode-button-secondaryBackground); color: var(--vscode-button-secondaryForeground); border: 0; cursor: pointer; font: inherit; }
-  button.act:hover { background: var(--vscode-button-secondaryHoverBackground); }
-  button.act:disabled { opacity: .4; cursor: default; }
 </style></head><body>
 <div class="box">
-  <div class="row"><span class="name">Autonomy</span><span class="val" id="a-val">—</span></div>
+  <div class="row"><span class="name" id="a-name" title="click: the scale, explained in details">Autonomy</span><span class="val" id="a-val">—</span></div>
   <input type="range" id="a" min="0" max="1" step="0.01" value="0">
   <div class="notches" id="a-notches"></div>
 
-  <div class="row"><span class="name">Shutdown</span><span class="val" id="s-val">—</span></div>
+  <div class="row"><span class="name" id="s-name" title="click: the levels, explained in details">Shutdown</span><span class="val" id="s-val">—</span></div>
   <input type="range" id="s" min="1" max="5" step="1" value="1">
   <div class="notches" id="s-notches"></div>
 
   <div class="where" id="where">not connected</div>
-  <button class="act" id="esc" disabled>Escape to idle</button>
 </div>
 <script>
   const vsapi = acquireVsCodeApi();
@@ -651,7 +708,8 @@ class Controls {
       vsapi.postMessage({ quackitect: id === "a" ? "autonomy" : "shutdown", value: Number($(id).value) });
     });
   }
-  $("esc").addEventListener("click", () => vsapi.postMessage({ quackitect: "escape" }));
+  $("a-name").addEventListener("click", () => vsapi.postMessage({ quackitect: "scale-help", which: "autonomy" }));
+  $("s-name").addEventListener("click", () => vsapi.postMessage({ quackitect: "scale-help", which: "shutdown" }));
   function sdAbbr(v) {
     if (lv === null || !Array.isArray(lv.shutdown)) return String(v);
     const l = lv.shutdown.find((x) => Number(x.value) === Number(v));
@@ -661,14 +719,34 @@ class Controls {
     if (which !== "s") $("a-val").textContent = Number($("a").value).toFixed(2);
     if (which !== "a") $("s-val").textContent = sdAbbr($("s").value);
   }
-  function notches(el, list, set) {
+  // A NOTCH SITS AT ITS VALUE, never at an even share of the width. Spacing
+  // them evenly put every label somewhere the thumb would never land, so
+  // clicking one looked like the slider jumped to the wrong place.
+  function pctOf(which, v) { return which === "a" ? Number(v) * 100 : ((Number(v) - 1) / 4) * 100; }
+  function notches(which, list) {
+    const el = $(which + "-notches");
     el.innerHTML = "";
+    let last = -99, row = 0;
     for (const l of list) {
+      const pct = pctOf(which, l.value);
+      // Two levels a hair apart would print on top of each other, so the
+      // second drops to a line below rather than becoming unreadable.
+      row = pct - last < 8 ? 1 - row : 0;
+      last = pct;
       const s = document.createElement("span");
       s.className = "notch";
       s.textContent = l.abbr;
-      s.title = l.name + " — click to jump here";
-      s.addEventListener("click", () => { set(l.value); });
+      s.title = l.name + " — " + l.value;
+      s.style.left = pct + "%";
+      s.style.top = row * 1.3 + "em";
+      if (pct <= 2) s.style.transform = "translateX(0)";
+      else if (pct >= 98) s.style.transform = "translateX(-100%)";
+      s.addEventListener("click", () => {
+        $(which).value = l.value;
+        paint();
+        vsapi.postMessage({ quackitect: which === "a" ? "autonomy" : "shutdown", value: Number(l.value) });
+        vsapi.postMessage({ quackitect: "scale-help", which: which === "a" ? "autonomy" : "shutdown", level: l.value });
+      });
       el.appendChild(s);
     }
   }
@@ -677,12 +755,8 @@ class Controls {
     if (!d || d.quackitect !== "state") return;
     if (d.levels && lv === null) {
       lv = d.levels;
-      if (Array.isArray(lv.autonomy)) notches($("a-notches"), lv.autonomy, (v) => {
-        $("a").value = v; paint("a"); vsapi.postMessage({ quackitect: "autonomy", value: Number(v) });
-      });
-      if (Array.isArray(lv.shutdown)) notches($("s-notches"), lv.shutdown, (v) => {
-        $("s").value = v; paint("s"); vsapi.postMessage({ quackitect: "shutdown", value: Number(v) });
-      });
+      if (Array.isArray(lv.autonomy)) notches("a", lv.autonomy);
+      if (Array.isArray(lv.shutdown)) notches("s", lv.shutdown);
     }
     const p = d.packet;
     if (!p) { $("where").textContent = "not connected"; return; }
@@ -692,8 +766,6 @@ class Controls {
     const at = Array.isArray(p.active) && p.active.length > 0 ? p.active[0] : "—";
     const exp = p.expedition ? " · " + p.expedition.split("-")[0] : "";
     $("where").innerHTML = "at <b>" + String(at).replace(/&/g, "&amp;").replace(/</g, "&lt;") + "</b>" + exp;
-    const crumbs = Array.isArray(p.breadcrumb) ? p.breadcrumb : [];
-    $("esc").disabled = !(crumbs.length > 1 && crumbs[1] !== "boot");
   });
 </script></body></html>`;
   }
@@ -709,17 +781,9 @@ class Controls {
     });
     view.webview.onDidReceiveMessage(async (m) => {
       if (!m) return;
+      if (m.quackitect === "scale-help") { await showScaleHelp(m.which, m.level); return; }
       if (m.quackitect === "autonomy") await post("/autonomy", { value: m.value });
       else if (m.quackitect === "shutdown") await post("/shutdown", { value: m.value });
-      else if (m.quackitect === "escape") {
-        const reason = await vscode.window.showInputBox({
-          title: "Escape to idle",
-          prompt: "Why? The machine is left standing and the reason is recorded as a failure.",
-          ignoreFocusOut: true,
-        });
-        if (reason === undefined || reason.trim() === "") return;
-        await post("/escape", { reason });
-      }
       await pollWalk();
     });
     this.render();
@@ -749,11 +813,11 @@ function agentLaunch(root) {
 }
 
 /**
- * Start the agent with the log beside it (owner ruling 2026-07-30).
+ * Start the agent in THE TERMINAL (owner ruling 2026-07-30).
  *
- * The terminal is created IN THE EDITOR AREA, which is the only way to get
- * a terminal and a webview side by side — the bottom panel shows one tab at
- * a time, whatever is in it.
+ * It goes where terminals go. Placing it in the editor area put it wherever
+ * the reader happened to be standing, which meant starting an agent shoved
+ * aside the card they were looking at.
  */
 async function startAgent() {
   const root = projectRoot();
@@ -764,15 +828,9 @@ async function startAgent() {
     void vscode.window.showErrorMessage("Quackitect: no agent CLI found — install Claude Code (or Copilot CLI), then retry.");
     return;
   }
-  const term = vscode.window.createTerminal({
-    name: "Quackitect agent",
-    cwd: path.join(root, "workspace"),
-    location: { viewColumn: vscode.ViewColumn.One },
-  });
+  const term = vscode.window.createTerminal({ name: "Quackitect agent", cwd: path.join(root, "workspace") });
   term.show();
   term.sendText(command, true);
-  const log = logCard();
-  if (log !== undefined) openWindow(log.n, true, vscode.ViewColumn.Two);
 }
 
 async function openCard(n) {
@@ -783,13 +841,18 @@ async function openCard(n) {
     void vscode.window.showInformationMessage("Quackitect: product/cards.md declares no card " + n + ".");
     return;
   }
-  // Details has a permanent home; opening it means revealing that group.
+  await showHelp(titleOf(card), cardHelp(card), false);
+  // A card with a permanent home is REVEALED there, never opened elsewhere.
+  // Expanding it into a window stays a deliberate act, on its own control.
   if (card.widget === "details") {
     await vscode.commands.executeCommand("quackitect.details.focus");
     return;
   }
-  await showHelp(titleOf(card), cardHelp(card), false);
-  openWindow(n, false, card.widget === "log" ? vscode.ViewColumn.Beside : undefined);
+  if (card.widget === "log") {
+    await vscode.commands.executeCommand("quackitect.log.focus");
+    return;
+  }
+  openWindow(n, false);
 }
 
 function showAttach() {
@@ -812,13 +875,20 @@ function activate(context) {
   output = vscode.window.createOutputChannel("Quackitect Engine");
   strip = new Strip();
   controls = new Controls();
-  detailsView = new DetailsView();
+  detailsView = new CardView("details");
+  logView = new CardView("log");
   const keepAlive = { webviewOptions: { retainContextWhenHidden: true } };
   context.subscriptions.push(
     output,
     vscode.window.registerWebviewViewProvider("quackitect.tools", strip, keepAlive),
     vscode.window.registerWebviewViewProvider("quackitect.controls", controls, keepAlive),
     vscode.window.registerWebviewViewProvider("quackitect.details", detailsView, keepAlive),
+    vscode.window.registerWebviewViewProvider("quackitect.log", logView, keepAlive),
+    vscode.commands.registerCommand("quackitect.expandLog", async () => {
+      await ensureCards();
+      const card = logCard();
+      if (card !== undefined) openWindow(card.n, false);
+    }),
     vscode.commands.registerCommand("quackitect.help", () => void showHelp("Quackitect", SYSTEM_HELP, true)),
     vscode.commands.registerCommand("quackitect.startAgent", withHelp("quackitect.startAgent", startAgent)),
     vscode.commands.registerCommand("quackitect.howToAttach", showAttach),
@@ -839,6 +909,7 @@ function activate(context) {
         await refreshCards();
         await pollWalk();
         detailsView.up();
+        logView.up();
         for (const w of windows.values()) w.up();
       }),
     ),
@@ -846,6 +917,7 @@ function activate(context) {
       strip.render();
       controls.render();
       detailsView.theme();
+      logView.theme();
       for (const w of windows.values()) w.theme();
     }),
     { dispose: () => { if (poller !== null) clearInterval(poller); } },

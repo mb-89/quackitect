@@ -1622,14 +1622,23 @@ function renderDecisions(sel) {
 // carries a token, settles exactly once, and cannot outlive its deadline.
 let loadToken = 0;
 let loadTimer = null;
+// A HOST DRAWS ITS OWN PROGRESS. Framed inside an editor, the host already
+// has a progress affordance of its own, and two bars for one wait is one too
+// many. The page REPORTS that it is busy; the host decides how to show it.
+function hostBusy(on, label) {
+  if (window.parent !== window) window.parent.postMessage({ quackitect: "busy", on: on, label: label || "" }, "*");
+}
 function hideLoading() {
   loadToken++; // any timer still holding the old token is now a no-op
   if (loadTimer !== null) { clearTimeout(loadTimer); loadTimer = null; }
   const el = document.getElementById("loadbar");
   if (el !== null) el.remove();
+  hostBusy(false);
 }
 function showLoading(label) {
   hideLoading(); // one load at a time; a second start supersedes the first
+  hostBusy(true, label);
+  if (window.parent !== window) return;
   const mine = loadToken;
   const el = document.createElement("div");
   el.id = "loadbar";
@@ -1650,6 +1659,7 @@ function showLoading(label) {
 // "##progress done total label" and the fill follows it. Boot's checks are
 // the first customer — nobody should watch a still page and guess.
 function showProgress(label, done, total) {
+  if (window.parent !== window) { hostBusy(true, label + " — " + done + "/" + total); return; }
   let el = document.getElementById("loadbar");
   if (el === null) { showLoading(label); el = document.getElementById("loadbar"); }
   if (el === null) return;
@@ -2041,8 +2051,11 @@ function widgetHead(title: string, widgetId: string, url: string): string {
  *  they belong to the host's sidebar rather than to any one card.
  *
  *  THE CRUMBS ARE NOT CONTROLS. They navigate the DRAWING — which machine is
- *  on screen — so they stay with the drawing, and the machine card keeps its
- *  head for them alone. */
+ *  on screen — so they stay with the drawing.
+ *
+ *  ESCAPE STAYS TOO (owner ruling 2026-07-30), and lives ONLY here: it acts
+ *  on the walk the drawing shows, and repeating it in the host's sidebar
+ *  would be the same control in two places. */
 const NATIVE = `
   body { font-family: var(--vscode-font-family, ui-monospace, Consolas, monospace); }
   * { border-radius: 0 !important; }
@@ -2050,7 +2063,8 @@ const NATIVE = `
   body.solo .widget { border: 0; }
   body.solo .widget-head { display: none; }
   body.solo #w-machine .widget-head { display: flex; }
-  body.solo #w-machine .head-controls { display: none; }
+  body.solo #w-machine .head-sliders { display: none; }
+  body.solo #w-machine .expand { display: none; }
   body.solo aside, body.solo main { background: transparent; }
 `;
 
@@ -2212,7 +2226,7 @@ export function renderMirror(m: MirrorState, widget?: "machine" | "details" | "l
   // the walk's position; clicking it jumps the view there.
   const curLeaf = info.active[0] ?? "";
   const curBtn = curLeaf === "" ? "" : `<button class="ghost" id="cur-state" data-machine="${esc(walkMachine.id)}" title="the walk stands here — click: jump the view to it">☉ ${esc(curLeaf)}</button>`;
-  const machineWidget = `<div class="widget" id="w-machine"><div class="widget-head"><span class="crumbs">${crumbs}</span><span class="head-controls" style="display:flex;align-items:center;gap:10px">${curBtn}${slider}${sdBar}${escapeBtn}<button class="expand" data-widget="w-machine" data-url="/widget/machine?view=${encodeURIComponent(decl.id)}" title="expand · ctrl-click: new tab · shift-click: new window — both open frozen on what this card is showing">⛶</button></span></div><div class="widget-body">${svg}</div></div>`;
+  const machineWidget = `<div class="widget" id="w-machine"><div class="widget-head"><span class="crumbs">${crumbs}</span><span class="head-controls" style="display:flex;align-items:center;gap:10px">${curBtn}<span class="head-sliders" style="display:flex;align-items:center;gap:10px">${slider}${sdBar}</span>${escapeBtn}<button class="expand" data-widget="w-machine" data-url="/widget/machine?view=${encodeURIComponent(decl.id)}" title="expand · ctrl-click: new tab · shift-click: new window — both open frozen on what this card is showing">⛶</button></span></div><div class="widget-body">${svg}</div></div>`;
   const detailsWidget = `<div class="widget" id="w-details">${widgetHead("details", "w-details", "/widget/details")}
     ${info.status === "closed" ? '<div class="meta" style="color:#e86a5f">machine closed</div>' : ""}
     <div class="meta" id="details-title" data-morph-ignore>—</div>
@@ -2250,7 +2264,9 @@ export function renderMirror(m: MirrorState, widget?: "machine" | "details" | "l
 <body${bodyClass}><div class="cols"><aside id="left" style="width:100vw;max-width:100vw">${termWidget(true)}</aside></div>${MODAL}${data}<script>${SCRIPT}</script></body></html>`;
   }
   if (widget === "log") {
-    return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>se · log</title><style>${STYLE} #w-log{flex:1;border-bottom:0}${skin}</style></head>
+    // The widget asks for flex:1, so its parent has to BE a column with a
+    // height — without that the panel collapses and the page reads as blank.
+    return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>se · log</title><style>${STYLE} #w-log{flex:1;border-bottom:0;min-height:0} body.solo #sidebar{display:flex;flex-direction:column;height:100vh} #log-rows{flex:1;min-height:0}${skin}</style></head>
 <body${bodyClass}><div class="cols"><aside id="sidebar" style="width:100vw;max-width:100vw">${logWidget}</aside></div>${MODAL}${data}<script>${SCRIPT}</script></body></html>`;
   }
 
