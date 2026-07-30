@@ -23,7 +23,7 @@
 // our own around a window VS Code already frames.
 const vscode = require("vscode");
 const { spawn, spawnSync } = require("node:child_process");
-const { copyFileSync, existsSync, mkdirSync, readFileSync } = require("node:fs");
+const { appendFileSync, copyFileSync, existsSync, mkdirSync, readFileSync } = require("node:fs");
 const path = require("node:path");
 
 const PORT = 7333;
@@ -59,6 +59,27 @@ const windows = new Map();
 // keeps its sliders across a reload and falls back to defaults on a fresh
 // start. The same contract the stdio shim keeps.
 const sessionToken = process.pid + "-" + Date.now().toString(36);
+
+/**
+ * THE TRACE. A line per act, appended to .se/vscode-debug.log.
+ *
+ * Nobody can watch this shell run: the extension host has no console the
+ * driving agent can read, and a webview's console is further away still. So
+ * the shell writes what it did to a file, and whoever is fixing it reads that
+ * instead of guessing from the outside. Cheap, and it never needs a reader.
+ */
+let traceFile = null;
+function trace(what) {
+  try {
+    if (traceFile === null) {
+      const root = projectRoot();
+      if (root === null) return;
+      mkdirSync(path.join(root, ".se"), { recursive: true });
+      traceFile = path.join(root, ".se", "vscode-debug.log");
+    }
+    appendFileSync(traceFile, new Date().toISOString().slice(11, 23) + " " + what + "\n");
+  } catch { /* a trace that throws would be worse than no trace */ }
+}
 
 function projectRoot() {
   for (const f of vscode.workspace.workspaceFolders ?? []) {
@@ -276,6 +297,7 @@ function framePage(url) {
 <iframe id="frame"></iframe>
 <script>
   const vsapi = acquireVsCodeApi();
+  window.addEventListener("error", (e) => vsapi.postMessage({ quackitect: "trace", text: "host page ERROR " + (e.message || "?") }));
   const SERVER = ${JSON.stringify(SERVER)};
   const PAGE = ${JSON.stringify(url)};
   const frame = document.getElementById("frame");
@@ -304,10 +326,16 @@ function framePage(url) {
     };
   }
   let pendingHelp = null;
+  // LOADED IS NOT THE SAME AS UP. "up" only means the engine answered; the
+  // iframe still has to fetch and parse its page. Posting between the two
+  // delivered into a document that was about to be replaced, which is why an
+  // expanded snapshot arrived with a title and nothing under it.
+  let loaded = false;
   function sendTheme() {
     if (frame.contentWindow) frame.contentWindow.postMessage({ quackitect: "theme", vars: themeVars() }, "*");
   }
   frame.addEventListener("load", () => {
+    loaded = true;
     sendTheme();
     setTimeout(sendTheme, 400);
     if (pendingHelp !== null) {
@@ -328,11 +356,12 @@ function framePage(url) {
     const d = ev.data;
     if (!d) return;
     if (d.quackitect === "open") { vsapi.postMessage(d); return; }
+    if (d.quackitect === "trace") { vsapi.postMessage(d); return; } // the page reporting what it just did
     if (d.quackitect === "details") { vsapi.postMessage(d); return; } // a click in THIS card, bound for the details group
     if (d.quackitect === "theme-changed") { sendTheme(); return; }
     if (d.quackitect === "up") { show(); return; }
     if (d.quackitect === "help" || d.quackitect === "logref") {
-      if (up && frame.contentWindow) frame.contentWindow.postMessage(d, "*");
+      if (loaded && frame.contentWindow) frame.contentWindow.postMessage(d, "*");
       else pendingHelp = d;
       show();
     }
@@ -457,6 +486,8 @@ function setBusy(on, label) {
 
 function onWebviewMessage(m) {
   if (!m) return;
+  if (m.quackitect === "trace") { trace("page: " + String(m.text ?? "")); return; }
+  trace("webview: " + String(m.quackitect));
   if (m.quackitect === "open") openInEditor(m.path);
   else if (m.quackitect === "busy") setBusy(m.on === true, String(m.label ?? ""));
   // CLICKING ANYTHING EXPLAINS IT IN DETAILS (ux rule). Split across windows,
@@ -883,15 +914,20 @@ class Controls {
 // It is not dead text. Every row ends in a short reference, and a terminal
 // link provider makes that clickable — the record then lands in Details,
 // drawn by the engine's own renderer rather than a second one written here.
-const REF_RE = /\[#([0-9a-zA-Z_-]{3,})\]/g;
+// A SHORT LINK. The record's own reference is long and says nothing to a
+// reader, so the row carries a small ordinal instead and the shell keeps the
+// map from it to the real reference. The ordinals are per DRAW, which is fine
+// because the map is rebuilt in the same breath as the text.
+const REF_RE = /\[(\d{1,4})\]/g;
+const logRefs = new Map();
 const DIM = (s) => "[2m" + s + "[0m";
 
-function logRow(r) {
+function logRow(r, n) {
   const ts = String(r.ts ?? "");
   const when = r.pending === true ? ts.slice(5, 10) : ts.slice(11, 19);
   const ok = r.ok === false ? "[31m✗[0m" : "[32m✓[0m";
   const clause = r.ok === false && r.clause ? " " + String(r.clause) : "";
-  return `${DIM(when)} ${DIM(String(r.src ?? ""))} ${String(r.type ?? "")} ${String(r.brief ?? "")}${clause} ${ok} ${DIM("[#" + String(r.ref ?? "") + "]")}`;
+  return `${DIM("[" + n + "]")} ${DIM(when)} ${DIM(String(r.src ?? ""))} ${String(r.type ?? "")} ${String(r.brief ?? "")}${clause} ${ok}`;
 }
 
 function redrawLog() {
@@ -900,7 +936,14 @@ function redrawLog() {
   const rows = logRows.filter(
     (r) => f === "" || `${r.ts} ${r.src} ${r.type} ${r.brief} ${r.clause ?? ""}`.toLowerCase().includes(f),
   );
-  const body = rows.slice(-500).map(logRow).join("\r\n");
+  const shown = rows.slice(-500);
+  logRefs.clear();
+  const body = shown
+    .map((r, i) => {
+      logRefs.set(String(i + 1), String(r.ref ?? ""));
+      return logRow(r, i + 1);
+    })
+    .join("\r\n");
   // CLEAR AND REPRINT. A terminal cannot take back a line it already showed,
   // so filtering means drawing the whole feed again — which is precisely what
   // makes a filter possible in here at all.
@@ -929,7 +972,13 @@ function makeLogTerminal(parent) {
       handleInput: () => { /* the feed is read-only — the note box is in Controls */ },
     },
   };
-  if (parent !== null) opts.location = { parentTerminal: parent };
+  // Split beside the agent when WE started it. When somebody else did — a
+  // terminal launch, another window — split beside whatever terminal is
+  // there, because a log in a group of its own is the one place it must not
+  // be. Only with no terminal at all does it stand alone.
+  const anchor = parent ?? vscode.window.activeTerminal ?? vscode.window.terminals[0] ?? null;
+  if (anchor !== null && anchor !== undefined) opts.location = { parentTerminal: anchor };
+  trace("log terminal: anchor=" + (anchor === null || anchor === undefined ? "none" : anchor.name));
   logTerm = vscode.window.createTerminal(opts);
   return logTerm;
 }
@@ -956,6 +1005,7 @@ async function showLog(rebuild) {
 
 /** A reference clicked in the log terminal explains itself in Details. */
 async function showLogRef(ref) {
+  trace("showLogRef " + ref + " detailsView=" + (detailsView === null ? "null" : "ready"));
   await vscode.commands.executeCommand("quackitect.details.focus");
   if (detailsView !== null) detailsView.post({ quackitect: "logref", ref });
 }
@@ -1055,12 +1105,17 @@ function activate(context) {
         REF_RE.lastIndex = 0;
         let m = REF_RE.exec(ctx.line);
         while (m !== null) {
-          out.push({ startIndex: m.index, length: m[0].length, tooltip: "show this act in Details", ref: m[1] });
+          const ref = logRefs.get(m[1]);
+          if (ref !== undefined && ref !== "") out.push({ startIndex: m.index, length: m[0].length, tooltip: "show this act in Details", ref });
           m = REF_RE.exec(ctx.line);
         }
+        trace("links asked line=" + JSON.stringify(ctx.line.slice(0, 50)) + " gave=" + out.length + " known=" + logRefs.size);
         return out;
       },
-      handleTerminalLink: (link) => void showLogRef(link.ref),
+      handleTerminalLink: (link) => {
+        trace("link clicked ref=" + String(link.ref));
+        void showLogRef(link.ref);
+      },
     }),
     vscode.window.onDidCloseTerminal((t) => {
       if (t === agentTerm) agentTerm = null;

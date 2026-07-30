@@ -1039,6 +1039,7 @@ function navigateTo(url, label) {
   navigatingAway = true;
   showLoading(label);
   url = withPlace(keepCard(url));
+  hostTrace("navigateTo " + url);
   location.href = url;
 }
 // The crumbs are plain anchors, so a solo card would follow one straight out
@@ -1046,6 +1047,7 @@ function navigateTo(url, label) {
 document.addEventListener("click", (ev) => {
   if (!location.pathname.startsWith("/widget/")) return;
   const a = ev.target.closest ? ev.target.closest("a[href^='/?']") : null;
+  hostTrace("anchor hit=" + (a === null ? "none" : String(a.getAttribute("href"))));
   if (a === null) return;
   ev.preventDefault();
   navigateTo(a.getAttribute("href"), "loading " + (a.textContent || "view"));
@@ -1302,6 +1304,7 @@ document.addEventListener("click", (ev) => {
 // Double-click a sub-machine state: enter it as a VIEWER (walk unmoved).
 document.addEventListener("dblclick", (ev) => {
   const g = ev.target.closest ? ev.target.closest(".clickable") : null;
+  hostTrace("dblclick hit=" + (g === null ? "none" : "clickable") + " sub=" + (g === null ? "-" : String(g.dataset.sub)));
   if (g && g.dataset.sub) navigateTo("/?view=" + encodeURIComponent(g.dataset.sub), "loading " + g.dataset.sub);
 });
 
@@ -1661,6 +1664,16 @@ let loadTimer = null;
 // A HOST DRAWS ITS OWN PROGRESS. Framed inside an editor, the host already
 // has a progress affordance of its own, and two bars for one wait is one too
 // many. The page REPORTS that it is busy; the host decides how to show it.
+// The page's half of the trace. Nobody can watch a webview run, so it says
+// what it just did and the host writes it down.
+function hostTrace(what) {
+  if (window.parent !== window) window.parent.postMessage({ quackitect: "trace", text: what }, "*");
+}
+// A THROW IN HERE IS INVISIBLE otherwise. There is no console anybody can
+// read from outside, so a failure would look exactly like a control that
+// simply does nothing — which is the hardest fault to chase.
+window.addEventListener("error", (e) => hostTrace("ERROR " + (e.message || "?") + " @" + (e.lineno || 0)));
+window.addEventListener("unhandledrejection", (e) => hostTrace("REJECTED " + String((e.reason && e.reason.message) || e.reason || "?")));
 function hostBusy(on, label) {
   if (window.parent !== window) window.parent.postMessage({ quackitect: "busy", on: on, label: label || "" }, "*");
 }
