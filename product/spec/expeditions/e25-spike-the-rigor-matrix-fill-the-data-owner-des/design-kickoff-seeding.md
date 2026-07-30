@@ -56,6 +56,11 @@ walks, every larger column also walks. That makes escalation mechanical:
   full — plus the evidence spec); the re-pin compares old against new and
   lists the GROWN steps as `reopened`, whose evidence is re-earned.
   Guidance-only wording changes never reopen.
+- THE BLESS IS EVIDENCE (owner ruling 2026-07-30): a passed gate leaves
+  its milestone report as a durable file — a re-walk passes on the
+  standing report, never re-blessing. Invalidation by OUTSIDE method
+  change is ON PROBATION: the milestone could not prepare for it, so the
+  owner may remove that trigger if it hurts in practice.
 - De-escalating mid-walk is refused. A prediction that proved too big is
   finished at its size; the record notes the misjudgment for the retro.
 

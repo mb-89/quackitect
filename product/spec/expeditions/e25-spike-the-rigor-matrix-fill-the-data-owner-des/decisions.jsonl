@@ -181,3 +181,5 @@
 {"ts":"2026-07-30T09:04:34.640Z","op":"done","visit":"expeditions/e25@0","node":"d46","brief":"the pty test proves the whole settle-and-insist path"}
 {"ts":"2026-07-30T09:04:49.581Z","op":"done","visit":"expeditions/e25@0","node":"d48","brief":"the end route and the ping both proven in the battery"}
 {"ts":"2026-07-30T09:05:42.120Z","op":"update","visit":"expeditions/e25@0","node":"d60","brief":"the greeting stays fixed, the options list turns generated"}
+{"ts":"2026-07-30T09:07:44.062Z","op":"update","visit":"expeditions/e25@0","node":"d61","brief":"correcting the gate-rebless claim on the owner's ruling"}
+{"ts":"2026-07-30T09:08:34.082Z","op":"update","visit":"expeditions/e25@0","node":"d62","brief":"the bless-is-evidence ruling rides the proposal"}
