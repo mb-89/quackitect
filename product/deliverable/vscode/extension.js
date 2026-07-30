@@ -56,6 +56,8 @@ let logEmitter = null;
 let logRows = [];
 let logFilter = "";
 let logAnchored = false;
+let logSeq = 0;
+const logSeen = new Set();
 /** The subject details is showing — what an expanded copy is a snapshot OF. */
 let lastDetails = null;
 const snapshots = new Set();
@@ -367,6 +369,7 @@ function framePage(url) {
     if (d.quackitect === "theme-changed") { sendTheme(); return; }
     if (d.quackitect === "up") { show(); return; }
     if (d.quackitect === "help" || d.quackitect === "logref") {
+      vsapi.postMessage({ quackitect: "trace", text: "relay " + d.quackitect + " loaded=" + loaded + " frame=" + (frame.contentWindow ? "yes" : "no") });
       if (loaded && frame.contentWindow) frame.contentWindow.postMessage(d, "*");
       else pendingHelp = d;
       show();
@@ -928,40 +931,81 @@ class Controls {
 const REF_RE = /\[(\d{1,4})\]/g;
 const logRefs = new Map();
 const DIM = (s) => "[2m" + s + "[0m";
+// THE TERMINAL'S OWN PALETTE. These are the theme's ansi slots, so the log
+// follows whatever the reader picked, exactly like the rest of the shell.
+// Green and red are spent on pass and fail, so a kind never takes one.
+const KIND_COLOUR = { call: "34", update: "35", note: "33", aq: "36" };
+const paint = (code, s) => (code === undefined ? s : "[" + code + "m" + s + "[0m");
 
 function logRow(r, n) {
   const ts = String(r.ts ?? "");
   const when = r.pending === true ? ts.slice(5, 10) : ts.slice(11, 19);
+  const src = String(r.src ?? "");
+  const kind = String(r.type ?? "");
+  // THE BRIEF OFTEN OPENS WITH ITS OWN KIND, and the column beside it has
+  // just said that. One word, once.
+  let brief = String(r.brief ?? "");
+  if (brief.toLowerCase().startsWith(kind.toLowerCase() + " ")) brief = brief.slice(kind.length + 1);
   const ok = r.ok === false ? "[31m✗[0m" : "[32m✓[0m";
   const clause = r.ok === false && r.clause ? " " + String(r.clause) : "";
-  return `${DIM("[" + n + "]")} ${DIM(when)} ${DIM(String(r.src ?? ""))} ${String(r.type ?? "")} ${String(r.brief ?? "")}${clause} ${ok}`;
+  // PADDED TO A FIXED WIDTH so the columns line up and the eye can run down
+  // them. The colour codes are zero-width, so they never shift the alignment.
+  const kindCol = paint(KIND_COLOUR[kind], kind.padEnd(6).slice(0, 6));
+  // The agent stays grey because most rows are the agent's. The person's own
+  // acts are the rare ones, so they are the ones worth making bright.
+  const srcCol = src === "human" ? paint("97", src.padEnd(5)) : DIM(src.padEnd(5));
+  return `${DIM("[" + n + "]")} ${DIM(when)} ${srcCol} ${kindCol} ${brief}${clause} ${ok}`;
 }
 
+function matchesFilter(r) {
+  const f = logFilter.trim().toLowerCase();
+  return f === "" || `${r.ts} ${r.src} ${r.type} ${r.brief} ${r.clause ?? ""}`.toLowerCase().includes(f);
+}
+
+/**
+ * APPEND ONLY. Redrawing the whole feed every second wiped the terminal under
+ * the reader's hand: scrollback gone, any selection gone, and a line replaced
+ * between the moment it was hovered and the moment it was clicked. A log is
+ * chronological, so a new act is simply added to the end.
+ */
+function appendLog() {
+  if (logEmitter === null) return;
+  const out = [];
+  for (const r of logRows) {
+    const ref = String(r.ref ?? "");
+    if (ref === "" || logSeen.has(ref)) continue;
+    logSeen.add(ref);
+    if (!matchesFilter(r)) continue;
+    logSeq += 1;
+    logRefs.set(String(logSeq), ref);
+    out.push(logRow(r, logSeq));
+  }
+  if (out.length > 0) logEmitter.fire(out.join("\r\n") + "\r\n");
+}
+
+/** A FILTER CHANGE is the one case that must draw the whole feed again. */
 function redrawLog() {
   if (logEmitter === null) return;
-  const f = logFilter.trim().toLowerCase();
-  const rows = logRows.filter(
-    (r) => f === "" || `${r.ts} ${r.src} ${r.type} ${r.brief} ${r.clause ?? ""}`.toLowerCase().includes(f),
-  );
-  const shown = rows.slice(-500);
+  logSeen.clear();
   logRefs.clear();
-  const body = shown
-    .map((r, i) => {
-      logRefs.set(String(i + 1), String(r.ref ?? ""));
-      return logRow(r, i + 1);
-    })
-    .join("\r\n");
-  // CLEAR AND REPRINT. A terminal cannot take back a line it already showed,
-  // so filtering means drawing the whole feed again — which is precisely what
-  // makes a filter possible in here at all.
-  logEmitter.fire("[2J[3J[H" + (body === "" ? DIM("no acts match") : body) + "\r\n");
+  logSeq = 0;
+  const out = [];
+  for (const r of logRows) {
+    const ref = String(r.ref ?? "");
+    if (ref !== "") logSeen.add(ref);
+    if (!matchesFilter(r)) continue;
+    logSeq += 1;
+    logRefs.set(String(logSeq), ref);
+    out.push(logRow(r, logSeq));
+  }
+  logEmitter.fire("[2J[3J[H" + (out.length === 0 ? DIM("no acts match") : out.join("\r\n")) + "\r\n");
 }
 
 async function pollLog() {
   const body = await api("/api/log");
   if (body === null || !Array.isArray(body.rows)) return;
   logRows = body.rows;
-  redrawLog();
+  appendLog();
 }
 
 function makeLogTerminal(parent) {
@@ -971,7 +1015,15 @@ function makeLogTerminal(parent) {
     name: "Quackitect log",
     pty: {
       onDidWrite: emitter.event,
-      open: () => void pollLog(),
+      open: () => {
+        // The first paint draws everything; every poll after it only appends.
+        logSeen.clear();
+        logSeq = 0;
+        void api("/api/log").then((b) => {
+          if (b !== null && Array.isArray(b.rows)) logRows = b.rows;
+          redrawLog();
+        });
+      },
       close: () => {
         logEmitter = null;
         logTerm = null;

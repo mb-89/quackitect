@@ -1099,11 +1099,15 @@ window.addEventListener("message", (ev) => {
   // HELP IS A DETAIL, NEVER A BUTTON (ux rule). A host with an icon strip
   // has no room to explain itself, so what an icon means arrives HERE, in
   // the details pane, the one place the reader already looks for meaning.
-  if (d.quackitect === "help") { showDetails(d.title, d.html); return; }
+  if (d.quackitect === "help") { hostTrace("page got help"); showDetails(d.title, d.html); return; }
   // A LOG LINE CLICKED IN THE HOST'S TERMINAL. The record is rendered HERE,
   // by the same code the mirror uses, so a host never grows a second
   // renderer for what this page already knows how to draw.
-  if (d.quackitect === "logref") { void openLogDetail(d.ref); return; }
+  if (d.quackitect === "logref") {
+    hostTrace("page got logref " + d.ref + " on " + location.pathname);
+    void openLogDetail(d.ref).then(() => hostTrace("logref rendered " + d.ref), (e) => hostTrace("logref FAILED " + String((e && e.message) || e)));
+    return;
+  }
   if (d.quackitect !== "theme") return;
   EMBED = true;
   try { sessionStorage.setItem("se-embed", "1"); } catch { /* storage denied — the flag just will not survive navigation */ }
