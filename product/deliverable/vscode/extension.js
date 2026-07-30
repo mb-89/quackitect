@@ -23,7 +23,7 @@
 // our own around a window VS Code already frames.
 const vscode = require("vscode");
 const { spawn, spawnSync } = require("node:child_process");
-const { appendFileSync, copyFileSync, existsSync, mkdirSync, readFileSync } = require("node:fs");
+const { appendFileSync, copyFileSync, existsSync, mkdirSync, readFileSync, statSync } = require("node:fs");
 const path = require("node:path");
 
 const PORT = 7333;
@@ -33,6 +33,11 @@ const SERVER = "http://localhost:" + PORT;
 const SLOTS = 8;
 const VIEW_TYPE = (slot) => "quackitect.card" + slot;
 const POLL_MS = 1000;
+// WHICH BUILD IS ACTUALLY RUNNING. A shell that was never reloaded behaves
+// exactly like one that was reloaded and still fails, and telling those two
+// apart by argument wastes a round trip every time. The file's own timestamp
+// cannot go stale, because installing it is what changes it.
+let BUILD = "unknown";
 
 let child = null;
 let output = null;
@@ -411,7 +416,8 @@ function cardIcon(card) {
 }
 
 // ── THE HELP ─────────────────────────────────────────────────────────────
-const SYSTEM_HELP = `<p>Quackitect walks a state machine with you. The machine says which step is in hand, what to read, and what to produce.</p>
+const systemHelp = () => `<p><b>Shell build ${escapeHtml(BUILD)}</b> — if this is older than the fix you are testing, the window was not reloaded.</p>
+<p>Quackitect walks a state machine with you. The machine says which step is in hand, what to read, and what to produce.</p>
 <p>The engine runs on this computer only. Nothing leaves it.</p>
 <p>The sidebar has three groups. Features is what you can do. Controls steers the walk. Details is this — whatever you click explains itself here.</p>
 <p>Every card except this one opens as its own editor window. Split it, drag it to any side, or move it to a second window.</p>
@@ -1089,6 +1095,10 @@ function withHelp(cmd, run) {
 }
 
 function activate(context) {
+  try {
+    BUILD = new Date(statSync(__filename).mtime).toISOString().slice(0, 16).replace("T", " ");
+  } catch { /* an unknown build is still better than a wrong one */ }
+  trace("ACTIVATE build=" + BUILD);
   output = vscode.window.createOutputChannel("Quackitect Engine");
   strip = new Strip();
   controls = new Controls();
@@ -1134,7 +1144,7 @@ function activate(context) {
         logEmitter = null;
       }
     }),
-    vscode.commands.registerCommand("quackitect.help", () => void showHelp("Quackitect", SYSTEM_HELP, true)),
+    vscode.commands.registerCommand("quackitect.help", () => void showHelp("Quackitect", systemHelp(), true)),
     vscode.commands.registerCommand("quackitect.startAgent", withHelp("quackitect.startAgent", startAgent)),
     vscode.commands.registerCommand("quackitect.howToAttach", showAttach),
     vscode.commands.registerCommand("quackitect.expandDetails", () => void expandDetails()),

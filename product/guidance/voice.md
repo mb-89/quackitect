@@ -42,6 +42,13 @@ Write plainly. These are rules, not suggestions. They bind every output: chat, d
 - Lead each item with its key word.
 - Link the referent. An item that points at a file, note, or URL carries it as a link.
 
+### No teasers
+- Never announce that something is coming. Say the thing.
+- Cut every opener that rates the news before delivering it. "Something you will want to hear", "this will surprise you", "the interesting part is", "one of these will change your mind" — all clickbait, all wasting the reader's first line.
+- A finding leads with the finding. A verdict leads with the verdict. The reader decides whether it is interesting.
+- Do not tell the reader how to feel about a result. Report it plainly.
+- This binds headings and section openers exactly as it binds sentences.
+
 ### Identifiers
 - Expand every identifier in the message that uses it. Never assume an id travels.
 - The reader adjudicates from chat and the board. They have not read the evidence files where the ids live.
