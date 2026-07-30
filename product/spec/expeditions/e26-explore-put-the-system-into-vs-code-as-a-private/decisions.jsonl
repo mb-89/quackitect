@@ -113,3 +113,4 @@
 {"ts":"2026-07-30T19:37:37.274Z","op":"update","visit":"expeditions/e26@1","node":"d93","brief":"the shell takes placeholders across trunk's version"}
 {"ts":"2026-07-30T19:37:56.086Z","op":"done","visit":"expeditions/e26@1","node":"d83","brief":"the wire key and the tree kill are consistent on both sides"}
 {"ts":"2026-07-30T19:38:01.909Z","op":"update","visit":"expeditions/e26@1","node":"d94","brief":"checking the merge is clean before committing"}
+{"ts":"2026-07-30T19:38:17.032Z","op":"update","visit":"expeditions/e26@1","node":"d95","brief":"running the suite against the merged tree"}
