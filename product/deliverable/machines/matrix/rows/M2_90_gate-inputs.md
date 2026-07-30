@@ -8,16 +8,19 @@ depends_on:
   - draw-context
   - map-stakeholders
   - generalize-use-cases
+evidence:
+  - name: props_realized
+    description: "every value prop realized by at least one story"
+  - name: stories_generalized
+    description: "every story inside a use case"
+  - name: roles_covered
+    description: "no stakeholder role left out; tensions named"
+  - name: excluded_stated
+    description: "the binding excluded-use list exists"
+  - name: examples_formulated
+    description: "scenario paths and slides identified as the formulated examples"
 ---
 
 ## Guidance
 
 The user-level picture stops here for judgment before any system-level writing starts - requirements written on unblessed stories propagate garbage. Review per [[meth-gate-review]].
-
-## Evidence form
-
-- props_realized | every value prop realized by at least one story | required
-- stories_generalized | every story inside a use case | required
-- roles_covered | no stakeholder role left out; tensions named | required
-- excluded_stated | the binding excluded-use list exists | required
-- examples_formulated | scenario paths and slides identified as the formulated examples | required

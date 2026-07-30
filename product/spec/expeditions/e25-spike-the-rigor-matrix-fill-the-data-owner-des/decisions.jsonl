@@ -73,3 +73,17 @@
 {"ts":"2026-07-30T06:59:00.280Z","op":"done","visit":"front_desk@0","node":"d6","brief":"verdict report recorded as aq and delivered in chat"}
 {"ts":"2026-07-30T07:05:03.617Z","op":"plan","visit":"expeditions/e25@0","parent":null,"nodes":[{"id":"d19","brief":"record the three verdicts in the proposal doc"},{"id":"d20","brief":"walk the comment questions with the owner one by one"}]}
 {"ts":"2026-07-30T07:05:07.485Z","op":"done","visit":"expeditions/e25@0","node":"d19","brief":"verdicts recorded in the proposal, committing"}
+{"ts":"2026-07-30T07:10:11.737Z","op":"update","visit":"expeditions/e25@0","node":"d21","brief":"question 1 discussed: prose is not enough, frontmatter YAML proposed"}
+{"ts":"2026-07-30T07:18:44.390Z","op":"update","visit":"expeditions/e25@0","node":"d22","brief":"Q2 ruled: criteria row rewritten to the promotion model"}
+{"ts":"2026-07-30T07:19:00.631Z","op":"update","visit":"expeditions/e25@0","node":"d23","brief":"Q2 answer recorded, moving to Q3"}
+{"ts":"2026-07-30T07:25:28.094Z","op":"plan","visit":"expeditions/e25@0","parent":null,"nodes":[{"id":"d24","brief":"record the ADR and comments rulings"},{"id":"d25","brief":"rework record-adrs and gate-kickoff rows to the rulings"},{"id":"d26","brief":"migrate all row evidence forms into frontmatter YAML"},{"id":"d27","brief":"guard the evidence blocks with a test"},{"id":"d28","brief":"harvest the v1/v2 decision-matrix form shape"},{"id":"d29","brief":"start the kickoff wiring on the ruled verdicts"}]}
+{"ts":"2026-07-30T07:25:38.964Z","op":"done","visit":"expeditions/e25@0","node":"d24","brief":"rulings noted, aq trail carries the discussion"}
+{"ts":"2026-07-30T07:25:47.179Z","op":"done","visit":"expeditions/e25@0","node":"d20","brief":"all four comment questions settled with the owner"}
+{"ts":"2026-07-30T07:27:19.019Z","op":"update","visit":"expeditions/e25@0","node":"d30","brief":"migration script written, running it next"}
+{"ts":"2026-07-30T07:27:24.639Z","op":"update","visit":"expeditions/e25@0","node":"d31","brief":"running the evidence migration over the 47 rows"}
+{"ts":"2026-07-30T07:27:28.869Z","op":"update","visit":"expeditions/e25@0","node":"d32","brief":"spot-checking a migrated row"}
+{"ts":"2026-07-30T07:28:57.252Z","op":"update","visit":"expeditions/e25@0","node":"d33","brief":"one-off script removed, the diff is the record"}
+{"ts":"2026-07-30T07:29:31.060Z","op":"done","visit":"expeditions/e25@0","node":"d26","brief":"47 rows migrated, the engine reads frontmatter evidence"}
+{"ts":"2026-07-30T07:29:48.635Z","op":"update","visit":"expeditions/e25@0","node":"d34","brief":"battery over the migrated matrix and new guards"}
+{"ts":"2026-07-30T07:31:07.022Z","op":"done","visit":"expeditions/e25@0","node":"d27","brief":"211 green, the evidence guards stand"}
+{"ts":"2026-07-30T07:31:13.291Z","op":"done","visit":"expeditions/e25@0","node":"d25","brief":"the ruling edits rode the earlier patch, committing all"}

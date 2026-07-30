@@ -33,7 +33,7 @@ test("readMatrix: a missing cell refuses with the row and column named", () => {
     mkdirSync(join(dir, "product", "deliverable", "machines", "matrix", "cells"), { recursive: true });
     writeFileSync(
       join(dir, "product", "deliverable", "machines", "matrix", "rows", "M0_10_lonely.md"),
-      '---\nkind: matrix-row\nname: lonely\nstatement: "A row with no cells."\nstate_kind: work\nfilled_by: agent\ndepends_on: []\n---\n\n## Guidance\nNothing.\n',
+      '---\nkind: matrix-row\nname: lonely\nstatement: "A row with no cells."\nstate_kind: work\nfilled_by: agent\ndepends_on: []\nevidence:\n  - name: proof\n    description: "anything"\n---\n\n## Guidance\nNothing.\n',
     );
     assert.throws(() => readMatrix(dir), /lonely.*patch/);
   } finally {
@@ -123,6 +123,50 @@ test("the columns are monotone: what a smaller column walks, every larger column
   const major = applied("major");
   for (const name of patch) assert.ok(minor.has(name), `${name} applies at patch but not at minor`);
   for (const name of minor) assert.ok(major.has(name), `${name} applies at minor but not at major`);
+});
+
+test("evidence is frontmatter data: every non-terminal row carries fields, killers are flags", () => {
+  const m = readMatrix(ROOT);
+  for (const row of m.rows) {
+    if (row.state_kind === "terminal") continue;
+    assert.ok(row.evidence_form.length > 0, `${row.name} carries no evidence fields`);
+    for (const f of row.evidence_form) {
+      assert.ok(!f.description.includes("(killer)"), `${row.name}.${f.name} smuggles the killer mark in prose`);
+    }
+  }
+  const kickoff = m.rows.find((r) => r.name === "gate-kickoff");
+  assert.ok(kickoff?.evidence_form.some((f) => f.name === "retro_drained" && f.killer === true));
+  assert.ok(kickoff?.evidence_form.some((f) => f.name === "change_size" && f.required));
+});
+
+test("a body evidence section is refused — the frontmatter block is the single truth", () => {
+  const dir = mkdtempSync(join(tmpdir(), "se-matrix-"));
+  try {
+    mkdirSync(join(dir, "product", "deliverable", "machines", "matrix", "rows"), { recursive: true });
+    mkdirSync(join(dir, "product", "deliverable", "machines", "matrix", "cells"), { recursive: true });
+    writeFileSync(
+      join(dir, "product", "deliverable", "machines", "matrix", "rows", "M0_10_echo.md"),
+      '---\nkind: matrix-row\nname: echo\nstate_kind: work\nfilled_by: agent\ndepends_on: []\nevidence:\n  - name: proof\n---\n\n## Guidance\nNothing.\n\n## Evidence form\n\n- proof | twice | required\n',
+    );
+    assert.throws(() => readMatrix(dir), /single truth/);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test("a non-terminal row without evidence refuses — leaving a state demands evidence", () => {
+  const dir = mkdtempSync(join(tmpdir(), "se-matrix-"));
+  try {
+    mkdirSync(join(dir, "product", "deliverable", "machines", "matrix", "rows"), { recursive: true });
+    mkdirSync(join(dir, "product", "deliverable", "machines", "matrix", "cells"), { recursive: true });
+    writeFileSync(
+      join(dir, "product", "deliverable", "machines", "matrix", "rows", "M0_10_bare.md"),
+      '---\nkind: matrix-row\nname: bare\nstate_kind: work\nfilled_by: agent\ndepends_on: []\n---\n\n## Guidance\nNothing.\n',
+    );
+    assert.throws(() => readMatrix(dir), /carries no evidence/);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
 });
 
 test("compileColumn: cell guidance rides the seeded state", () => {

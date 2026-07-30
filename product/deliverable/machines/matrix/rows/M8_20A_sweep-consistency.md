@@ -7,12 +7,11 @@ filled_by: agent
 depends_on:
   - fill-story-evidence
 floor: true
+evidence:
+  - name: swept
+    description: "the changes and the surfaces updated for each"
 ---
 
 ## Guidance
 
 Per [[meth-consistency-sweep]]. A doc that still teaches the superseded way is a defect here, not a later surprise.
-
-## Evidence form
-
-- swept | the changes and the surfaces updated for each | required

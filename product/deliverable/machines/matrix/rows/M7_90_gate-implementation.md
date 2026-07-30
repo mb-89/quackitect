@@ -6,18 +6,24 @@ state_kind: gate
 filled_by: agent
 depends_on:
   - verification
+evidence:
+  - name: build_planned
+    description: "the seeded chunk machine exists and was walked"
+    killer: true
+  - name: models_adhered
+    description: "the build fills the allocated elements - no unsanctioned element"
+  - name: red_observed
+    description: "every new check failed before the build"
+  - name: designs_realized
+    description: "every requirement has a realized design"
+  - name: verification_green
+    description: "the battery passes, all iterations"
+  - name: quality_ok
+    description: "internal quality reviewed"
+  - name: risks_acceptable
+    description: "implementation risks judged and folded into the RAID register"
 ---
 
 ## Guidance
 
 Review per [[meth-gate-review]]. Models-adhered-to is a matrix check: the build filled the allocated elements and only those; a genuinely-needed new element goes back through the architecture gate.
-
-## Evidence form
-
-- build_planned | (killer) the seeded chunk machine exists and was walked | required
-- models_adhered | the build fills the allocated elements - no unsanctioned element | required
-- red_observed | every new check failed before the build | required
-- designs_realized | every requirement has a realized design | required
-- verification_green | the battery passes, all iterations | required
-- quality_ok | internal quality reviewed | required
-- risks_acceptable | implementation risks judged and folded into the RAID register | required

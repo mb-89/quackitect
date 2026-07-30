@@ -8,12 +8,11 @@ command: npm --prefix product/deliverable test
 depends_on:
   - build-steps
 floor: true
+evidence:
+  - name: battery
+    description: "the run reference and its verdict"
 ---
 
 ## Guidance
 
 Engine-filled. The one place the full battery runs ([[meth-test-first]]). Failure opens the fallback into fix-findings - collect everything, fix in one pass, one confirm run. The command is the project's battery; each project declares its own.
-
-## Evidence form
-
-- battery | the run reference and its verdict | required

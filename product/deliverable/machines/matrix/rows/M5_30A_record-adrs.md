@@ -6,12 +6,11 @@ state_kind: work
 filled_by: agent
 depends_on:
   - reverse-sensitivity
+evidence:
+  - name: adrs
+    description: "the decision records, each traced"
 ---
 
 ## Guidance
 
-The why lives once, here. Every architecture decision addresses the quality or requirement that forced it (addresses edge); the rejected options stay recorded as history.
-
-## Evidence form
-
-- adrs | the decision records, each traced | required
+The why lives once, here. Every decision is its OWN FILE (kind: decision - id, one-line decision, status, the addresses edge to the requirement or risk that forced it; the body holds context, options and consequences). The RAID register view includes the decisions beside the risks and assumptions ([[meth-raid]]) - one surface to read, files apart underneath. The rejected options stay recorded as history.

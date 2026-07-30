@@ -58,17 +58,31 @@ function asList(v: unknown): string[] {
   return [];
 }
 
-function parseEvidenceForm(body: string): EvidenceField[] {
-  const text = section(body, "Evidence form");
-  const fields: EvidenceField[] = [];
-  for (const line of text.split("\n")) {
-    const t = line.trim();
-    if (!t.startsWith("- ")) continue;
-    const parts = t.slice(2).split("|").map((p) => p.trim());
-    if (parts.length < 2) continue;
-    fields.push({ name: parts[0], description: parts[1] ?? "", required: (parts[2] ?? "required") === "required" });
+// Evidence lives in FRONTMATTER (owner ruling 2026-07-30): a nested YAML
+// list the form machinery consumes directly. A body "## Evidence form"
+// section is refused — one truth, no echo.
+function parseEvidence(fm: Record<string, unknown>, file: string, body: string): EvidenceField[] {
+  if (section(body, "Evidence form")) {
+    throw new Error(`matrix row ${file} carries a body evidence section — the frontmatter evidence block is the single truth`);
   }
-  return fields;
+  const raw = fm.evidence;
+  if (raw === undefined) return [];
+  if (!Array.isArray(raw)) throw new Error(`matrix row ${file} evidence block is not a list`);
+  return raw.map((entry, i) => {
+    if (entry === null || typeof entry !== "object" || Array.isArray(entry)) {
+      throw new Error(`matrix row ${file} evidence entry ${i + 1} is not a mapping`);
+    }
+    const f = entry as Record<string, unknown>;
+    if (typeof f.name !== "string" || f.name.trim() === "") {
+      throw new Error(`matrix row ${file} evidence entry ${i + 1} declares no name`);
+    }
+    return {
+      name: f.name,
+      description: typeof f.description === "string" ? f.description : "",
+      required: f.required !== false,
+      ...(f.killer === true ? { killer: true } : {}),
+    };
+  });
 }
 
 export function matrixDir(root: string): string {
@@ -99,8 +113,11 @@ export function readMatrix(root: string): Matrix {
       edge_role: typeof fm.edge_role === "string" ? fm.edge_role : undefined,
       guard: typeof fm.guard === "string" ? fm.guard : undefined,
       guidance: section(note.body, "Guidance"),
-      evidence_form: parseEvidenceForm(note.body),
+      evidence_form: parseEvidence(fm, file, note.body),
     };
+    if (row.state_kind !== "terminal" && row.evidence_form.length === 0) {
+      throw new Error(`matrix row ${row.name} carries no evidence — leaving a state demands evidence; only a terminal is exempt`);
+    }
     rows.push(row);
     byName.set(name, row);
   }

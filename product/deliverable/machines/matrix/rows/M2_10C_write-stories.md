@@ -6,12 +6,11 @@ state_kind: work
 filled_by: agent
 depends_on:
   - gate-motivation
+evidence:
+  - name: stories
+    description: "the slideshows, each realizing a named prop, killers marked"
 ---
 
 ## Guidance
 
 Per [[meth-story-slideshow]]. Every value prop is realized by at least one story; killer stories marked. The slides' formulated scenarios are the examples' birth ([[meth-examples-checkable]]) - roles for now, nodes later.
-
-## Evidence form
-
-- stories | the slideshows, each realizing a named prop, killers marked | required

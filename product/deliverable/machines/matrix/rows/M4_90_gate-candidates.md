@@ -6,16 +6,20 @@ state_kind: gate
 filled_by: agent
 depends_on:
   - evaluate-set
+evidence:
+  - name: viable_set
+    description: "at least two viable candidates survive, or the no-real-alternatives case is argued and recorded"
+    killer: true
+  - name: complete_allocation
+    description: "every candidate allocates ALL functions; interfaces and rationale recorded"
+  - name: criteria_traced
+    description: "weights derived from requirements and tensions"
+  - name: front_recorded
+    description: "the Pareto front with every elimination reasoned"
+  - name: feasibility_checked
+    description: "rough checks per survivor"
 ---
 
 ## Guidance
 
 Set-based discipline: convergence happens at M5, not here. Review per [[meth-gate-review]].
-
-## Evidence form
-
-- viable_set | (killer) at least two viable candidates survive, or the no-real-alternatives case is argued and recorded | required
-- complete_allocation | every candidate allocates ALL functions; interfaces and rationale recorded | required
-- criteria_traced | weights derived from requirements and tensions | required
-- front_recorded | the Pareto front with every elimination reasoned | required
-- feasibility_checked | rough checks per survivor | required
