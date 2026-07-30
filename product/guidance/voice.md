@@ -48,6 +48,12 @@ Write plainly. These are rules, not suggestions. They bind every output: chat, d
 - A finding leads with the finding. A verdict leads with the verdict. The reader decides whether it is interesting.
 - Do not tell the reader how to feel about a result. Report it plainly.
 - This binds headings and section openers exactly as it binds sentences.
+- DELETE YOUR FIRST SENTENCE. If nothing is lost, it was a teaser. Apply this test to every message, every time.
+- Never open with commentary ABOUT the message. "Two things here", "the second one matters more", "before I answer that" — the reader can see the message. Write it.
+- Never rate your own finding. "That settles it", "this changes everything", "the interesting part" — the reader decides that, not the writer.
+- Never open with an agreement preamble. "Fair point", "good catch", "you're right to ask" — agree by acting on it, not by announcing that you agree.
+- A correction opens with WHAT IS NOW TRUE. Not with the news that a correction is coming.
+- This is the most-broken rule on this page. Broken again, it wants a LINT rather than another sentence.
 
 ### Identifiers
 - Expand every identifier in the message that uses it. Never assume an id travels.
