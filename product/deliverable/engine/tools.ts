@@ -28,7 +28,7 @@ import { fileMove } from "./move.ts";
 import { spawn } from "node:child_process";
 import { openPanel } from "./panel.ts";
 import { resolveInRoot, seDir } from "./paths.ts";
-import { run } from "./run.ts";
+import { jobList, jobStatus, jobStop, run, runBackground, runOrHandoff } from "./run.ts";
 import { search } from "./search.ts";
 import { Session } from "./session.ts";
 import { webFetch, webSearch } from "./web.ts";
@@ -94,11 +94,11 @@ export function sessionTools(session: Session): ToolDef[] {
     {
       name: "se_panel",
       title: "se.panel",
-      description: "Open the panel (the mirror — the human's hand on the walk) in the user's default browser, or POINT AT IT: with ping, the named surface pulses YELLOW in every open window — the tour's pointing finger, and 'look HERE' for a refusal or a diff. Legal in every state.",
+      description: "Open the panel (the mirror — the human's hand on the walk) in the user's default browser, or POINT AT IT: with ping, the named surface lights YELLOW in every open window and STAYS lit until you point somewhere else — the tour's pointing finger, and 'look HERE' for a refusal or a diff. Legal in every state.",
       inputSchema: {
         type: "object",
         properties: {
-          ping: { type: "string", description: "pulse this surface instead of opening the panel: a card id (machine, log, details, terminal, chat), a drawn state id, or an element id" },
+          ping: { type: "string", description: "light this surface instead of opening the panel, and leave it lit until the next ping: a card id (its title from product/cards.md, slugged — e.g. state-machine, chat, log, details), the widget a card shows (machine, terminal), a drawn state id, or an element id" },
           note: { type: "string", description: "optional one-liner recorded with the ping" },
         },
       },
@@ -355,21 +355,39 @@ export function coreTools(rootOf: (rel?: string) => string, projectRoot: string,
       name: "se_run",
       title: "se.run",
       description:
-        "Run a shell command from the project root (bash on POSIX, PowerShell on Windows). Output is engine-captured and logged IN FULL under the returned call ref — a run is citable evidence. Default timeout 120s (timeout_ms to raise). NEVER call this session's own mirror over HTTP from here — the run blocks the server's event loop, the mirror cannot answer, and the command dies at the timeout.",
+        "Run a shell command from the project root (bash on POSIX, PowerShell on Windows). Output is engine-captured and logged IN FULL under the returned call ref — a run is citable evidence.\n\nNOBODY WAITS. A command still running after 20s is HANDED OFF to the background and you get a job handle at once; ask again with {job} for its output so far, and {job, stop: true} to kill it and everything it spawned. Start long work in the background yourself with {background: true}. {jobs: true} lists this session's jobs.\n\nNEVER call this session's own mirror over HTTP from here — the run blocks the server's event loop, so the mirror cannot answer itself.",
       inputSchema: {
         type: "object",
         properties: {
           command: { type: "string" },
+          background: { type: "boolean", description: "start it detached and return a job handle IMMEDIATELY — for work you know is long" },
+          job: { type: "string", description: "ask an existing job how it is doing: its output so far, whether it still runs" },
+          stop: { type: "boolean", description: "with job: kill it and every process it spawned" },
+          jobs: { type: "boolean", description: "list every job this session started, newest first" },
+          handoff_ms: { type: "number", description: "how long to wait inline before handing off to the background (default 20000)" },
           timeout_ms: { type: "number" },
           cwd: { type: "string", description: "root-relative working directory" },
         },
-        required: ["command"],
       },
-      handler: (args) =>
-        run(rootOf(), String(args.command), {
-          ...(args.timeout_ms !== undefined ? { timeout_ms: Number(args.timeout_ms) } : {}),
-          ...(args.cwd !== undefined ? { cwd: String(args.cwd) } : {}),
-        }),
+      handler: (args) => {
+        if (args.jobs === true) return { jobs: jobList() };
+        if (args.job !== undefined) return args.stop === true ? jobStop(String(args.job)) : jobStatus(String(args.job));
+        if (args.command === undefined) {
+          throw new Rejection({
+            clause: CLAUSES.REQUIRED_ARGS,
+            expected: "a command to run, or a job to ask about",
+            got: "neither",
+            remedy: { tool: "se_run", args: { command: "<the command>" }, note: "pass command, or job to check one already running" },
+            source: "engine/tools.ts se_run",
+          });
+        }
+        const cwd = args.cwd !== undefined ? { cwd: String(args.cwd) } : {};
+        if (args.background === true) return runBackground(rootOf(), String(args.command), cwd);
+        return runOrHandoff(rootOf(), String(args.command), {
+          ...cwd,
+          ...(args.handoff_ms !== undefined ? { handoff_ms: Number(args.handoff_ms) } : {}),
+        });
+      },
     },
     {
       name: "se_test",

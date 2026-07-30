@@ -358,21 +358,29 @@ $kickoff = 'Session start. Tick the machine and walk as far as the threshold all
 Push-Location (Join-Path $root "workspace")
 try {
   if ($agentHost -eq "copilot") {
-    # COPILOT TAKES NO OPENING PROMPT. Bare `copilot` starts a session;
-    # `copilot -p` answers once and exits, which is not a session. So the
-    # kickoff is TYPED into the terminal host instead of passed as an
-    # argument. The deny flags are read from data - see copilot-cage.json,
-    # which says plainly that they are unverified against a live CLI.
+    # COPILOT DOES TAKE AN OPENING PROMPT - `copilot -i "<text>"` starts an
+    # INTERACTIVE session and runs that text as its first turn. This file
+    # used to claim otherwise and made the human paste the kickoff by hand
+    # every single launch (owner, 2026-07-30: "we cant copy it in everytime.
+    # this is not acceptable"). `-p` is the one that answers and exits; `-i`
+    # is the session. Both hosts are now started the same way: one command,
+    # kickoff included, nothing to paste.
+    #
+    # THE KICKOFF IS A BELT, NOT THE TROUSERS. workspace/AGENTS.md carries
+    # the same first action, and Copilot reads it from the cwd - so an agent
+    # started by hand, with no flags at all, still knows to tick.
+    #
+    # The cage is read from data - see copilot-cage.json, verified against a
+    # live CLI and carrying the record of what was wrong before.
     $cage = Get-Content (Join-Path $ws "_cage\copilot-cage.json") -Raw | ConvertFrom-Json
-    $cageArgs = @($cage.deny_args) + @($cage.extra_args)
+    $cageArgs = @($cage.mcp_args) + @($cage.exclude_args) + @($cage.allow_args) + @($cage.deny_args) + @($cage.extra_args)
     Write-Host "quackitect v3 - agent host: GitHub Copilot CLI" -ForegroundColor Cyan
     if ($ownTerminal) {
-      Write-Host "quackitect v3 - own terminal: Copilot takes no opening prompt, so PASTE the line below into it" -ForegroundColor Yellow
-      Write-Host $kickoff
-      copilot @cageArgs
+      Write-Host "quackitect v3 - own terminal: the agent runs in THIS window, kickoff included" -ForegroundColor Cyan
+      copilot @cageArgs -i $kickoff
     } else {
       Write-Host "quackitect v3 - the agent runs in the Mirror's terminal pane, in the background" -ForegroundColor Cyan
-      node (Join-Path $root "product\deliverable\engine\bin\se-pty.ts") --pty-port 7334 --detach --send $kickoff -- copilot @cageArgs
+      node (Join-Path $root "product\deliverable\engine\bin\se-pty.ts") --pty-port 7334 --detach -- copilot @cageArgs -i $kickoff
     }
   } elseif ($ownTerminal) {
     Write-Host "quackitect v3 - own terminal: the agent runs in THIS window; the Mirror's terminal pane stays empty" -ForegroundColor Cyan

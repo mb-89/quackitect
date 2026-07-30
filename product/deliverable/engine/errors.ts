@@ -67,4 +67,5 @@ export const CLAUSES = {
   PROSE_WALL: "SE-C-125", // long prose without a line break renders as a wall — break it into lines
   UNREADABLE_BYTES: "SE-C-126", // a binary the lane cannot show a model — images travel, arbitrary bytes do not
   UNDECLARED_ROOT: "SE-C-127", // @name addresses a root the owner has not declared — declared, never arbitrary
+  JOB_UNKNOWN: "SE-C-128", // a background job ref this session never started
 } as const;

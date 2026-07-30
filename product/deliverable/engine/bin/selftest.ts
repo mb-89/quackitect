@@ -27,7 +27,6 @@ if (process.argv.some((a) => a === "--help" || a === "-h" || a === "-?")) {
 `);
   process.exit(0);
 }
-
 // RECURSION GUARD: the suite itself walks boot machines in temp roots,
 // and those walks hit prepare_idle's exit scripts — which would spawn the
 // suite again, forever. The test helpers set this before any walk.
