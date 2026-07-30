@@ -304,7 +304,7 @@ export class Session {
     if (t === "") {
       throw new Rejection({
         clause: CLAUSES.REQUIRED_ARGS,
-        expected: "a surface to ping: a card id (machine, log, details, terminal, chat), a drawn state id, or an element id",
+        expected: "a surface to ping: a card id (its slugged title from product/cards.md), the widget a card shows, a drawn state id, or an element id",
         got: "an empty target",
         remedy: { tool: "se_panel", args: { ping: "log" }, note: "name what the reader should look at" },
         source: "engine/session.ts ping",
@@ -312,7 +312,7 @@ export class Session {
     }
     this.ping = { target: t, ...(note === undefined || note.trim() === "" ? {} : { note: note.trim() }), seq: ++this.pingSeq };
     this.notifyChange();
-    return { pinged: t, note: "the surface pulses yellow in every open mirror window" };
+    return { pinged: t, note: "the surface is lit yellow in every open mirror window, and stays lit until the next ping" };
   }
 
   private syncKeepAwake(): void {
@@ -1351,11 +1351,29 @@ export class Session {
     return new Promise((resolve) => {
       const child = spawn("node", [abs, "--root", this.root], { cwd: this.root });
       let out = "";
-      child.stdout.on("data", (d: Buffer) => { out += d; });
+      let pending = "";
+      // A SCRIPT REPORTS ITS OWN PROGRESS on stdout, as
+      //   ##progress <done> <total> <label>
+      // The lines drive the mirror's bar and never reach the evidence: the
+      // reader wants the verdict, not the ticker. A script that says
+      // nothing still works — the bar just falls back to indeterminate.
+      const eat = (chunk: string): string => {
+        pending += chunk;
+        const lines = pending.split(/\r?\n/);
+        pending = lines.pop() ?? "";
+        const keep: string[] = [];
+        for (const l of lines) {
+          const m = /^##progress\s+(\d+)\s+(\d+)\s*(.*)$/.exec(l);
+          if (m === null) { keep.push(l); continue; }
+          this.setProgress(Number(m[1]), Number(m[2]), (m[3] ?? "").trim());
+        }
+        return keep.length === 0 ? "" : `${keep.join("\n")}\n`;
+      };
+      child.stdout.on("data", (d: Buffer) => { out += eat(String(d)); });
       child.stderr.on("data", (d: Buffer) => { out += d; });
       const timer = setTimeout(() => child.kill(), 120_000);
-      child.on("error", (e) => { clearTimeout(timer); resolve({ status: null, out: String(e) }); });
-      child.on("close", (code) => { clearTimeout(timer); resolve({ status: code, out }); });
+      child.on("error", (e) => { clearTimeout(timer); this.clearProgress(); resolve({ status: null, out: String(e) }); });
+      child.on("close", (code) => { clearTimeout(timer); this.clearProgress(); resolve({ status: code, out: out + pending }); });
     });
   }
 
@@ -1407,6 +1425,27 @@ export class Session {
   /** Any condition script currently running — the mirror's follow signal. */
   busy(): boolean {
     return this.scriptRuns.size > 0;
+  }
+
+  /** THE WAIT BAR MEASURES SOMETHING (owner ruling, 2026-07-30). A running
+   *  script reports its own steps; indeterminate is the FALLBACK, for work
+   *  that genuinely cannot count itself, never the default. */
+  private progressAt: { done: number; total: number; label: string } | undefined;
+
+  private setProgress(done: number, total: number, label: string): void {
+    if (total <= 0) return;
+    this.progressAt = { done, total, label };
+    this.notifyChange();
+  }
+
+  private clearProgress(): void {
+    if (this.progressAt === undefined) return;
+    this.progressAt = undefined;
+    this.notifyChange();
+  }
+
+  progress(): { done: number; total: number; label: string } | undefined {
+    return this.progressAt;
   }
 
   scriptStatus(m: MachineDecl, s: StateDecl): { ran: boolean; ok: boolean; output: string; running: boolean } {

@@ -557,10 +557,15 @@ const STYLE = `
   #loadbar { position: fixed; top: 0; left: 0; right: 0; height: 3px; background: #22272c; z-index: 99; }
   #loadbar .fill { height: 100%; width: 30%; background: #e8b339; animation: loadslide 1s linear infinite; }
   @keyframes loadslide { 0% { margin-left: -30%; } 100% { margin-left: 100%; } }
+  /* A BAR THAT MEASURES SOMETHING (owner ruling, 2026-07-30). Work that can
+     count its steps says so, and the fill shows how far it has got. The
+     sliding animation is the FALLBACK, for work that genuinely cannot. */
+  #loadbar .fill.determinate { animation: none; margin-left: 0; transition: width .18s linear; }
   /* THE PING — the agent's pointing finger (owner, 2026-07-30): v2's pulse,
-     made yellow. A card blinks its outline; an SVG node blinks its opacity. */
-  .se-ping { outline: 3px solid #e8b339; outline-offset: 2px; animation: se-ping-blink 1.2s ease-in-out 3; }
-  .se-ping-svg { animation: se-ping-fade 1.2s ease-in-out 3; }
+     made yellow. A card blinks its outline; an SVG node blinks its opacity.
+     It PULSES ON, and stays lit while the guide talks about it. */
+  .se-ping { outline: 3px solid #e8b339; outline-offset: 2px; animation: se-ping-blink 1.6s ease-in-out infinite; }
+  .se-ping-svg { animation: se-ping-fade 1.6s ease-in-out infinite; }
   @keyframes se-ping-blink { 50% { outline-color: transparent; } }
   @keyframes se-ping-fade { 50% { opacity: .25; } }
   #loadbar .lmsg { position: fixed; top: 8px; right: 12px; color: #e8b339; font-size: 12px; }
@@ -1595,6 +1600,22 @@ function showLoading(label) {
     cur.querySelector(".lmsg").textContent = (label || "loading") + " — no answer; click to retry";
   }, 8000);
 }
+// THE ENGINE'S OWN WORK drives the same bar: a running script reports
+// "##progress done total label" and the fill follows it. Boot's checks are
+// the first customer — nobody should watch a still page and guess.
+function showProgress(label, done, total) {
+  let el = document.getElementById("loadbar");
+  if (el === null) { showLoading(label); el = document.getElementById("loadbar"); }
+  if (el === null) return;
+  // Progress ARRIVING cancels the stall timer: something is plainly alive.
+  if (loadTimer !== null) { clearTimeout(loadTimer); loadTimer = null; }
+  el.classList.remove("stalled");
+  const fill = el.querySelector(".fill");
+  fill.classList.add("determinate");
+  const pct = total > 0 ? Math.round((done / total) * 100) : 0;
+  fill.style.width = pct + "%";
+  el.querySelector(".lmsg").textContent = label + " — " + done + "/" + total + " (" + pct + "%)";
+}
 // A page that was restored, or navigated back to, has no load in flight —
 // whatever it was showing when the reader left it.
 addEventListener("pageshow", hideLoading);
@@ -1744,21 +1765,33 @@ if (D.describe.status === "closed") sessionOver("the machine reached end — the
 // lands at once instead of up to a poll late. EventSource reconnects by
 // itself; a reconnect after silence is how an engine swap arrives without
 // an F5, and a silence that never ends is death.
-// THE PING (owner, 2026-07-30): the agent points, the surface pulses yellow.
-// Lookup order: a card id, a raw element id, a drawn state node.
+// THE PING (owner, 2026-07-30): the agent points, the surface lights yellow
+// and STAYS lit while the guide talks about it. Pointing somewhere else puts
+// the old one out, so exactly ONE surface is lit at a time.
+// Lookup order: a card id, the widget a card shows, a raw element id, a
+// drawn state node. The widget name is accepted because a card's id is its
+// slugged TITLE, and the two rarely match.
 let lastPingSeq = 0;
-function pingSurface(target) {
+let litTarget = null;
+function findPingEl(target) {
   const escaped = window.CSS && CSS.escape ? CSS.escape(target) : target;
-  const el = document.getElementById("card-" + target)
+  return document.getElementById("card-" + target)
+    || document.querySelector('[data-widget="' + escaped + '"]')
     || document.getElementById(target)
     || document.querySelector('[data-detail="state:' + escaped + '"]');
+}
+function applyPing() {
+  for (const n of document.querySelectorAll(".se-ping, .se-ping-svg")) n.classList.remove("se-ping", "se-ping-svg");
+  if (litTarget === null) return;
+  const el = findPingEl(litTarget);
   if (!el) return; // pointing is advisory — an unknown target fails nothing
-  const cls = el.ownerSVGElement ? "se-ping-svg" : "se-ping";
-  el.classList.remove(cls);
-  void el.getBoundingClientRect(); // restart the animation
-  el.classList.add(cls);
-  setTimeout(() => el.classList.remove(cls), 4000);
-  if (el.scrollIntoView) el.scrollIntoView({ block: "nearest", behavior: "smooth" });
+  el.classList.add(el.ownerSVGElement ? "se-ping-svg" : "se-ping");
+  return el;
+}
+function pingSurface(target) {
+  litTarget = target;
+  const el = applyPing();
+  if (el && el.scrollIntoView) el.scrollIntoView({ block: "nearest", behavior: "smooth" });
 }
 let pollBusy = null;
 let ACTIVE_AT_RENDER = JSON.stringify(D.describe.active || []);
@@ -1795,10 +1828,19 @@ es.addEventListener("message", (ev) => {
     if (lbl2) lbl2.textContent = sdAbbr(a.shutdown);
   }
   if (a.ping && a.ping.seq !== lastPingSeq) { lastPingSeq = a.ping.seq; pingSurface(a.ping.target); }
+  // A re-render drops the class. Put the light back rather than losing it
+  // mid-sentence — the ping outlives the DOM that carried it.
+  else if (litTarget !== null && !document.querySelector(".se-ping, .se-ping-svg")) applyPing();
   if (logPanel && a.acts !== lastActs) { lastActs = a.acts; refreshLog(); }
   if (JSON.stringify(a.active || []) !== ACTIVE_AT_RENDER) { refresh(); return; }
   // A script run finishing elsewhere (agent tick, other window) lands its
   // result — refresh, keeping the open pane.
+  // THE BAR FOLLOWS THE ENGINE, not just this page's clicks. A script the
+  // AGENT started (boot's checks, most of all) shows here too, with real
+  // progress when it reports any and a moving bar when it does not.
+  if (a.progress) showProgress(a.progress.label || "working", a.progress.done, a.progress.total);
+  else if (a.busy === true && pollBusy !== true) showLoading("running checks");
+  else if (a.busy === false && pollBusy === true) hideLoading();
   if (pollBusy === true && a.busy === false) { refresh(); return; }
   pollBusy = a.busy;
 });
@@ -2175,7 +2217,7 @@ export function renderMirror(m: MirrorState, widget?: "machine" | "details" | "l
   const nothingYet = (title: string): string =>
     `<div class="widget"><div class="widget-head"><span>${esc(title)}</span></div><div class="widget-body"><div class="meta" style="padding:10px 12px">not built yet — the slot is held so the numbers never shift</div></div></div>`;
   const cardsHtml = cardList
-    .map((c, i) => `<div class="card${c.id === now ? " main" : ""}" id="card-${esc(c.id)}" style="${cellAt(i)}"><span class="cardnum" title="promote this card — the same as pressing ${c.n}">${c.n}</span>${filled(c) ? byWidget[c.widget as string] : nothingYet(c.title)}</div>`)
+    .map((c, i) => `<div class="card${c.id === now ? " main" : ""}" id="card-${esc(c.id)}"${c.widget ? ` data-widget="${esc(c.widget)}"` : ""} style="${cellAt(i)}"><span class="cardnum" title="promote this card — the same as pressing ${c.n}">${c.n}</span>${filled(c) ? byWidget[c.widget as string] : nothingYet(c.title)}</div>`)
     .join("\n  ");
   // THE LEGEND RENDERS FROM THE REGISTRY. Declare a key there and it shows up
   // here by itself; a hand-kept list drifts, and a stale legend is worse than

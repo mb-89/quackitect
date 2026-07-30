@@ -10,6 +10,14 @@ machine directs — advance state by state until you reach idle or a refusal
 stops you. How walking works: product/guidance/walking.md — it is pulled
 into every state's packet.
 
+Do this AT THE START OF EVERY SESSION, unasked. Whatever the user's first
+message says — even if it says nothing about the machine — your first tool
+call is `se_tick`. Walk as far as the autonomy allows, then report in ONE
+short message: where you stand, and why you stopped (autonomy, condition,
+or idle). The launcher may also send you an opening prompt saying exactly
+this; the two agree on purpose, so that an agent started by hand, with no
+prompt at all, still boots the same way.
+
 The session runs an AUTONOMY (the user's slider in the mirror). When an
 advance is refused with SE-C-113, that step is the user's — STOP, and
 tell them PLAINLY, in words like these: "I'm at start — entering boot is
@@ -28,8 +36,12 @@ its hash in `read_hashes`, or the tick refuses. Their checkmark is not
 your reading.
 
 Your native tools (Read, Write, Edit, Bash, Glob, Grep, web) are blocked in
-this workspace — by an explicit deny list in `.claude/settings.json`, tool by
-tool. The `se` lane replaces every one of them, as good or better:
+this workspace — tool by tool, by an explicit list. Which file holds that
+list depends on the host: Claude Code reads `.claude/settings.json`, and
+GitHub Copilot CLI takes the same list on its command line from
+`_cage/copilot-cage.json` (Copilot's `--excluded-tools`; its `--deny-tool`
+only gates approval and hides nothing). Either way the effect is the one
+rule: the `se` lane replaces every native tool, as good or better:
 
 | you would reach for | use instead |
 | --- | --- |

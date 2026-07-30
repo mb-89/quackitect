@@ -10,20 +10,29 @@ This card holds the ORDER and the emphasis; the CONTENT comes from the
 machinery as it stands right now. A hand-authored tour would be stale by
 tomorrow; a generated one cannot be.
 
-## The one rule
+## The two rules
 
 Never describe from memory. Before every stop, LOOK: survey the
 containers, tick-peek the states, read the record you are about to show.
 What you say is what stands, this minute.
 
+Never CHANGE anything. The tour is read-only. It seeds no expedition, no
+iteration and no record, and it writes nothing but the notes a finding
+earns. A newcomer who wants real work started is handed to the front
+desk, after the tour ends.
+
 ## Pointing
 
-The agent HAS a finger: `se_panel {ping: "<surface>"}` pulses the named
-surface yellow in every open mirror window. Targets: a card id (machine,
-log, details, terminal, chat), a drawn state id, or an element id.
+The agent HAS a finger: `se_panel {ping: "<surface>"}` lights the named
+surface yellow in every open mirror window. Targets: a card id (its title
+from `product/cards.md`, slugged), the widget a card shows, a drawn state
+id, or an element id.
 
 - Ping WITH words, never instead of them - a pulse without a sentence is
   a mystery. Say what pulses and why it matters, then ping it.
+- The light STAYS ON while you talk about that surface. Pointing at the
+  next one puts the old one out, so exactly ONE surface is lit at a time.
+  A single flash is not pointing.
 - Say what to click, then WAIT for their go before the next stop.
 - One stop per message. A tour that scrolls past its reader is a lecture.
 
@@ -55,11 +64,12 @@ guide.
    columns of change size. A cell says what a step demands at that size;
    a struck cell says why it does not apply. The machine the walk runs
    is COMPILED from this, live, at every kickoff.
-5. THE FULL-RIGOR WALK. Seed an iteration, bless its change size at the
-   kickoff, and watch the container expand into the compiled machine.
-   The walk descends into candidates, spikes and build chunks as it
-   reaches them - each seeded as a small drawing, each refusing when
-   absent. This is the finale: the whole system, moving.
+5. THE COMPILED MACHINE, WITHOUT BUILDING ONE. Read the matrix column for
+   one change size and say what a kickoff would compile from it. A record
+   that already exists shows its pinned machine; click in and the walk
+   continues inside. Nothing is seeded to make this stop work.
+   No records yet? Say so plainly. An empty shelf is the honest answer,
+   and the front desk is where a newcomer starts filling it.
 
 ## Emphasis
 

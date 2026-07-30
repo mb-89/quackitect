@@ -21,7 +21,7 @@ const binDir = join(here, "..", "engine", "bin");
 const repoRoot = join(here, "..", "..", "..");
 
 // Every file a person can type a switch at.
-const ENTRY_POINTS = ["se-mcp.ts", "se-pty.ts", "se-manual.ts", "preflight.ts", "selftest.ts"];
+const ENTRY_POINTS = ["se-mcp.ts", "se-pty.ts", "se-manual.ts", "preflight.ts", "smoketest.ts", "selftest.ts"];
 
 /** The switches a source PARSES, read from the three shapes the entry points
  *  use to look at argv.

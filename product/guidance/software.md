@@ -42,6 +42,63 @@ This applies to every citation, and to your own instincts.
 - Most guidance predates AI and was written for human teams. Split it along that seam instead of quoting or discarding it whole.
 - This binds the assistant's own instincts too. The training assumes writing the code is the expensive part. Where a recommendation rests on that assumption, say so rather than asserting it.
 
+## Use the cores
+
+The target machine has MANY cores, and always will. Twelve is the floor,
+not the expectation. Work that leaves nineteen of twenty idle is a defect,
+not a slow machine.
+
+- Parallelise anything that can be parallelised. Independent work runs at
+  once, by default. Sequential is the exception, and it says why.
+- Size the fan-out from the machine, never from a constant. Read the core
+  count at run time.
+- A single-threaded step that dominates a wall clock gets SPLIT until it
+  fits the cores. A test file with fifty sequential cases is one such step.
+- Measure before and after. A parallel version that is not faster is
+  hiding a shared resource, and the sharing is the real bug.
+
+This binds tests hardest, because a suite is the most parallel workload a
+project owns and the one whose slowness is felt every day.
+
+## Writing tests
+
+A suite has THREE speeds, and choosing between them is the whole craft.
+
+- ACROSS FILES is real parallelism. The runner gives each file its own
+  process, so files use every core. This is the only lever that beats a
+  CPU-bound suite.
+- WITHIN A FILE is cooperative. Cases share one thread, so concurrency
+  there only helps work that WAITS on something outside the process. It
+  buys nothing for pure computation.
+- SEQUENTIAL is the exception, and it names its reason in a comment.
+
+What decides the speed is SHARED PROCESS-GLOBAL STATE, nothing else:
+
+- A case with its own temp root, its own server and its own fixtures is
+  independent. It runs concurrently.
+- A case that writes `process.env`, changes the working directory, binds a
+  fixed port, or mutates the real repository is not. Its siblings would
+  see the change, and the failure would be a rare one — the worst kind.
+
+So the rules:
+
+- PREFER MANY SMALL FILES to one large one. Files are the only unit that
+  reaches a second core. A file that dominates the wall clock gets split
+  by theme, and the split is worth more than any cleverness inside it.
+- QUARANTINE the global-state cases in their OWN file. One case touching
+  `process.env` holds a whole file sequential; move it out and the rest
+  goes concurrent.
+- Where every case in a file is isolated, wrap them so they run together
+  and say so at the top of the file.
+- NEVER share a fixture between cases to save setup. A fresh root per case
+  is what makes the parallelism legal, and setup is cheap.
+- MEASURE before and after. A concurrent file that is no faster was
+  CPU-bound, and wanted splitting instead.
+
+And the suite is not one thing. BOOT runs a SMOKE test — seconds, proving
+the engine loads and answers. The full battery proves behaviour, and that
+question belongs to validation, at the end of a piece of work.
+
 ## Sizing and records
 
 - Size work by its CONTENT, never by an agent's time estimate. Those estimates overshoot wildly and have done so repeatedly — a day claimed, an hour spent. Do not parrot an inherited size claim either.

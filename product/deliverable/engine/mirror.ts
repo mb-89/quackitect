@@ -38,6 +38,7 @@ export function startMirror(o: MirrorOptions): Server {
     shutdown: state.session.shutdown,
     active: state.session.active(),
     busy: state.session.busy(),
+    ...(state.session.progress() === undefined ? {} : { progress: state.session.progress() }),
     // A monotone change signal for the feed — the log file only grows.
     acts: existsSync(o.log.path) ? statSync(o.log.path).size : 0,
     // The agent's pointing finger — the page pulses the target on a new seq.
