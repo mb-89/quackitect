@@ -64,12 +64,19 @@ test("the agent's ticks walk boot, gated by HASH proof-of-read, banner on idle",
   await call(server, "se_tick", { advance: true }); // -> read_contract
   const at = await call(server, "se_tick");
   assert.deepEqual(at.body.active, ["boot/read_contract"]);
-  const state = (at.body.states as { exit?: Record<string, { args: string[] }>; pulled?: Record<string, unknown>[] }[])[0];
+  const state = (at.body.states as {
+    exit?: Record<string, { args: string[] }>;
+    pulled?: Record<string, unknown>[];
+    lookahead_read?: string[];
+    next?: { to: string; entry_read?: string[] }[];
+  }[])[0];
   assert.ok(state.exit !== undefined && state.exit.read.args.length === 4, "the exit dictionary rides the packet");
   assert.ok(state.pulled !== undefined && state.pulled.length >= 2, "the pull rides the packet");
   // The hash IS the proof — the agent's packet must never print it.
   assert.ok(state.pulled!.every((p) => !("hash" in p)), "packets never hand the agent the hashes");
   assert.ok(state.pulled!.some((p) => (p.sources as string[]).includes("root")), "root guidance pulled always");
+  assert.ok(Array.isArray(state.lookahead_read), "packet carries preread hint field");
+  assert.ok((state.next ?? []).some((n) => n.to === "prepare_idle" && Array.isArray(n.entry_read)), "each next edge carries its own read requirement list");
   const shut = await call(server, "se_run", { command: "echo nope" });
   assert.equal(shut.body.clause, "SE-C-110");
   // the read gate bites: a tick WITHOUT hashes is refused, remedy = read
@@ -85,16 +92,18 @@ test("the agent's ticks walk boot, gated by HASH proof-of-read, banner on idle",
   const rc = await call(server, "se_file_read", { path: "product/guidance/voice.md" });
   assert.equal(rc.isError, false, "se_file_read is legal in read_contract");
   assert.equal(rc.body.hash, readHashesFor(root)["product/guidance/voice.md"], "the lane's hash is the proof token");
+  const afterRead = await call(server, "se_tick");
+  const hinted = ((afterRead.body.states as { next?: { to: string; entry_read?: string[] }[] }[])[0].next ?? []).find((n) => n.to === "prepare_idle");
+  assert.ok(!(hinted?.entry_read ?? []).includes("product/guidance/voice.md"), "already-buffered docs are omitted from preread hints");
   const s2 = await call(server, "se_tick", { advance: true, read_hashes: readHashesFor(root) });
   assert.deepEqual(s2.body.active, ["boot/prepare_idle"]);
   await call(server, "se_tick", { advance: true }); // -> boot/end
-  // the pop into idle demands the pull proven AGAIN (hashes, every time)
+  // Boot can now reuse fresh buffered proofs and pop into idle without
+  // resupplying the same hashes in this same read version.
   const bare = await call(server, "se_tick", { advance: true });
-  assert.equal(bare.isError, true);
-  assert.equal(bare.body.clause, "SE-C-112");
-  const landed = await call(server, "se_tick", { advance: true, read_hashes: readHashesFor(root) });
-  assert.equal(landed.body.booted, true);
-  assert.ok(String(landed.body.banner).includes("main machine @ idle"));
+  assert.equal(bare.isError, false);
+  assert.equal(bare.body.booted, true);
+  assert.ok(String(bare.body.banner).includes("Main machine is live"));
   // the banner shows once; a later tick-info is plain
   const info = await call(server, "se_tick");
   assert.equal(info.body.booted, undefined);

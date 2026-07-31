@@ -197,6 +197,30 @@ test("a submachine can be aimed at by its container name", () => {
   assert.equal(s.route("front_desk").found, true);
 });
 
+test("a target clears itself once reached", async () => {
+  const root = freshRoot();
+  const s = new Session(root);
+  s.setAutonomy(1);
+  const hashes: Record<string, string> = {};
+  for (const p of s.route("front_desk").reads) {
+    try {
+      hashes[p] = contentHash(readFileSync(join(root, ...p.split("/"))));
+    } catch { /* not a read */ }
+  }
+  const out = await s.sweep("front_desk", "agent", hashes);
+  assert.equal(out.arrived, true, JSON.stringify(out.refusal ?? out.note));
+  assert.deepEqual(s.active(), ["front_desk"]);
+  assert.equal(s.target, "", "one-shot target should clear after arrival");
+});
+
+test("an empty target clears the current aim explicitly", () => {
+  const s = new Session(freshRoot());
+  s.setTarget("front_desk");
+  const cleared = s.setTarget("");
+  assert.equal(cleared.target, "");
+  assert.equal(s.target, "");
+});
+
 test("the preview MOVES NOTHING", () => {
   const s = new Session(freshRoot());
   const before = s.active();

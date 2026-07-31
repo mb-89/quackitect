@@ -6,12 +6,27 @@ the whole rule.
 # First action
 
 Tick. Call `se_tick` with no arguments. It shows where the machine stands.
-Then keep walking as it directs, until you reach idle or a refusal stops
-you.
+Then keep walking as it directs. If a target is set, keep moving toward it
+per walking.md. Stop only on refusal, condition, or no reachable
+in-threshold progress toward target.
 
 Do this at the START OF EVERY SESSION, unasked. Whatever the first message
 says, even if it says nothing about the machine, your first tool call is
 `se_tick`.
+
+Immediately after that first tick, call
+`activate_file_navigation_and_search_tools`. In VS Code agent mode these
+`se` file/search tools can be present but not registered yet; activating the
+group up front prevents `se_file_read` startup failures in boot.
+
+Boot stability pattern for VS Code:
+- Keep boot calls serial. Do not start parallel search/read batches in boot.
+- Keep reads small (offset/limit) to avoid oversized host payloads.
+- Cache read hashes by path for the whole session. Reuse cached hashes in
+  read_hashes on later ticks instead of re-reading.
+- Re-read only when a refusal (for example SE-C-112) names missing/current
+  hashes, or when a path is first seen.
+- If the current state allows no tools, do not read or search there. Tick.
 
 Then report in ONE short message: where you stand, and why you stopped.
 

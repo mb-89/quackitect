@@ -35,6 +35,19 @@ export interface SearchResult {
 
 const LINE_CAP = 300;
 const PER_FILE_CAP = 50;
+const UNBOUNDED_FILE_CAP = 1_000_000;
+
+function normalizeLimit(limit: number | undefined): number {
+  if (limit === undefined || Number.isFinite(limit) === false) return 100;
+  if (limit <= 0) return Number.MAX_SAFE_INTEGER;
+  return Math.floor(limit);
+}
+
+function perFileCap(limit: number | undefined): number {
+  if (limit === undefined || Number.isFinite(limit) === false) return PER_FILE_CAP;
+  if (limit <= 0) return UNBOUNDED_FILE_CAP;
+  return Math.max(PER_FILE_CAP, Math.floor(limit));
+}
 
 let rgPathCached: string | undefined;
 
@@ -71,7 +84,7 @@ export function search(
   query: string,
   opts: { path?: string; ref?: string; ignore_case?: boolean; limit?: number } = {},
 ): SearchResult {
-  const limit = opts.limit ?? 100;
+  const limit = normalizeLimit(opts.limit);
   const unreadable: string[] = [];
   const matches = opts.ref === undefined ? rgSearch(root, query, opts, unreadable) : gitGrepSearch(root, query, opts.ref, opts);
   return {
@@ -93,7 +106,7 @@ export function search(
   };
 }
 
-function rgSearch(root: string, query: string, opts: { path?: string; ignore_case?: boolean }, unreadable: string[] = []): Match[] {
+function rgSearch(root: string, query: string, opts: { path?: string; ignore_case?: boolean; limit?: number }, unreadable: string[] = []): Match[] {
   const scope = opts.path === undefined ? resolve(root) : resolveForRead(root, opts.path, "engine/search.ts");
   // A hit inside a declared root reports as "@name/rel", never as a pile of
   // ../.. — what the search returns, the reader accepts unchanged.
@@ -112,7 +125,7 @@ function rgSearch(root: string, query: string, opts: { path?: string; ignore_cas
   // the file is named on a "binary file matches" line, which the loop below
   // turns into `unreadable`. --text was the alternative and was rejected: it
   // would search real binaries as text and spray them through the results.
-  const args = ["--line-number", "--no-heading", "--with-filename", "--binary", "--max-count", String(PER_FILE_CAP), "--max-columns", String(LINE_CAP)];
+  const args = ["--line-number", "--no-heading", "--with-filename", "--binary", "--max-count", String(perFileCap(opts.limit)), "--max-columns", String(LINE_CAP)];
   for (const d of [".se", "node_modules", ".worktrees"]) args.push("--glob", `!${d}/**`);
   if (opts.ignore_case === true) args.push("--ignore-case");
   args.push("--regexp", query, scope);
@@ -145,8 +158,8 @@ function rgSearch(root: string, query: string, opts: { path?: string; ignore_cas
 }
 
 /** Search a committed state: git grep at a ref. Path scope is a pathspec. */
-function gitGrepSearch(root: string, query: string, ref: string, opts: { path?: string; ignore_case?: boolean }): Match[] {
-  const args = ["grep", "-n", "-I", "-E", "--max-count", String(PER_FILE_CAP)];
+function gitGrepSearch(root: string, query: string, ref: string, opts: { path?: string; ignore_case?: boolean; limit?: number }): Match[] {
+  const args = ["grep", "-n", "-I", "-E", "--max-count", String(perFileCap(opts.limit))];
   if (opts.ignore_case === true) args.push("-i");
   args.push(query, ref);
   if (opts.path !== undefined) args.push("--", opts.path);

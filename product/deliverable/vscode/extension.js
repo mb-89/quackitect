@@ -51,6 +51,7 @@ let detailsView = null;
 let poller = null;
 let busyDone = null;
 let agentTerm = null;
+let agentStarting = false;
 let logTerm = null;
 let logEmitter = null;
 let logRows = [];
@@ -115,6 +116,45 @@ function nodeRunner() {
     return { cmd: process.execPath, shell: false, env: { ELECTRON_RUN_AS_NODE: "1" } };
   }
   return null;
+}
+
+function listeningPids(port) {
+  if (!Number.isFinite(port) || port <= 0) return [];
+  if (process.platform === "win32") {
+    const script = `$p=${port}; Get-NetTCPConnection -State Listen -LocalPort $p -ErrorAction SilentlyContinue | Select-Object -ExpandProperty OwningProcess -Unique`;
+    const r = spawnSync("powershell", ["-NoProfile", "-Command", script], { encoding: "utf8", windowsHide: true });
+    if (r.status !== 0) return [];
+    return String(r.stdout ?? "")
+      .split(/\r?\n/)
+      .map((s) => Number(s.trim()))
+      .filter((n) => Number.isInteger(n) && n > 0);
+  }
+  const lsof = spawnSync("lsof", ["-nP", `-iTCP:${port}`, "-sTCP:LISTEN", "-t"], { encoding: "utf8" });
+  if (lsof.status !== 0) return [];
+  return String(lsof.stdout ?? "")
+    .split(/\r?\n/)
+    .map((s) => Number(s.trim()))
+    .filter((n) => Number.isInteger(n) && n > 0);
+}
+
+function evictPort(port) {
+  const killed = [];
+  for (const pid of listeningPids(port)) {
+    if (!Number.isInteger(pid) || pid <= 0) continue;
+    if (pid === process.pid || pid === process.ppid) continue;
+    try {
+      if (process.platform === "win32") {
+        const r = spawnSync("taskkill", ["/PID", String(pid), "/T", "/F"], { encoding: "utf8", windowsHide: true });
+        if (r.status === 0) killed.push(pid);
+      } else {
+        process.kill(pid, "SIGTERM");
+        killed.push(pid);
+      }
+    } catch {
+      // best-effort cleanup for presentation-mode startup
+    }
+  }
+  return [...new Set(killed)].sort((a, b) => a - b);
 }
 
 function placeConfigs(root) {
@@ -210,10 +250,17 @@ async function ensureServer() {
   const probe = await probeServer();
   if (probe.state === "up") {
     if (probe.root !== null && path.resolve(probe.root) !== path.resolve(root)) {
-      void vscode.window.showErrorMessage("$PRODUCT$: port " + PORT + " already serves another project (" + probe.root + ") — close that session first.");
-      return false;
+      const killed = evictPort(PORT);
+      if (killed.length > 0) {
+        output.appendLine("se: mirror port " + PORT + " was occupied by another project; stopped pid(s) " + killed.join(", "));
+        await new Promise((r) => setTimeout(r, 250));
+      } else {
+        void vscode.window.showErrorMessage("$PRODUCT$: port " + PORT + " already serves another project (" + probe.root + ") and could not be reclaimed automatically.");
+        return false;
+      }
+    } else {
+      return true;
     }
-    return true;
   }
   const runner = nodeRunner();
   if (runner === null) {
@@ -468,7 +515,7 @@ const systemHelp = () => `<p><b>Shell build ${escapeHtml(BUILD)}</b> — if this
 <p>The sidebar has three groups. Features is what you can do. Controls steers the walk. Details is this — whatever you click explains itself here.</p>
 <p>Every card except this one opens as its own editor window. Split it, drag it to any side, or move it to a second window.</p>
 <p>VS Code remembers that layout for this folder. Open the folder again and your windows come back where you left them.</p>
-<p>The play button starts your agent in a terminal beside the log, with the opening prompt already sent.</p>
+<p>The play button starts Claude in a terminal, or opens Copilot in Chat agent mode, with the opening prompt already sent.</p>
 <p>Several agents may attach at once. Give the wheel to one at a time.</p>`;
 
 function cardHelp(card) {
@@ -489,15 +536,11 @@ function cardHelp(card) {
 const HELP = {
   "$PRODUCT_ID$.startAgent": {
     title: "Start the agent",
-    html: `<p>Starts the engine if it is not running, then opens a terminal in the editor area and starts your agent CLI in it.</p>
-<p>The log opens beside it, so the conversation is on the left and what it did is on the right.</p>
+    html: `<p>Starts the engine if it is not running, then launches your agent.</p>
+<p>Claude starts in a terminal. Copilot tries to start in Chat agent mode with the same kickoff prompt and mapped tool exclusions; if unavailable, it falls back to terminal launch.</p>
+<p>The log opens beside the active terminal when one exists.</p>
 <p>The opening prompt is sent for you. You never paste it.</p>
 <p>Claude Code is used when it is installed; otherwise the Copilot CLI, in its cage.</p>`,
-  },
-  "$PRODUCT_ID$.restartServer": {
-    title: "Restart the engine",
-    html: `<p>Stops the engine and starts it again on the current sources.</p>
-<p>The walk is on disk, so nothing is lost. An attached agent must reconnect.</p>`,
   },
 };
 
@@ -765,7 +808,6 @@ class Strip {
       if (!inStrip(c)) continue;
       list.push({ cmd: "$PRODUCT_ID$.openCard" + c.n, icon: cardIcon(c), label: titleOf(c), key: "ctrl+alt+" + c.n });
     }
-    list.push({ cmd: "$PRODUCT_ID$.restartServer", icon: ICON.restart, label: "Restart the engine", key: "" });
     return list;
   }
   page() {
@@ -1123,15 +1165,54 @@ async function showLogRef(ref) {
 
 // The same choice RUNME makes: Claude wins when both are installed. The
 // kickoff text is read from the one file both launchers share.
+function psq(text) {
+  return "'" + String(text).replace(/'/g, "''") + "'";
+}
+
+function parseExcludedToolsFromCage(cage) {
+  const args = Array.isArray(cage?.exclude_args) ? cage.exclude_args : [];
+  const i = args.indexOf("--excluded-tools");
+  if (i < 0) return [];
+  const out = [];
+  for (let n = i + 1; n < args.length; n++) {
+    const a = String(args[n] ?? "").trim();
+    if (a === "" || a.startsWith("--")) break;
+    out.push(a);
+  }
+  return out;
+}
+
+async function openCopilotInChat(kickoff, cage) {
+  const all = await vscode.commands.getCommands(true);
+  if (!all.includes("workbench.action.chat.open")) return false;
+  const toolsExclude = parseExcludedToolsFromCage(cage);
+  try {
+    await vscode.commands.executeCommand("workbench.action.chat.open", {
+      mode: "agent",
+      query: kickoff,
+      isPartialQuery: false,
+      toolsExclude,
+    });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 function agentLaunch(root) {
   const cageDir = path.join(root, "workspace", "_cage");
   const kickoff = readFileSync(path.join(cageDir, "kickoff.txt"), "utf8").trim();
   const has = (cmd) => spawnSync(cmd, ["--version"], { encoding: "utf8", shell: true }).status === 0;
-  if (has("claude")) return "claude '" + kickoff + "'";
+  if (has("claude")) return { host: "claude", kickoff, command: "claude " + psq(kickoff) };
   if (has("copilot")) {
     const cage = JSON.parse(readFileSync(path.join(cageDir, "copilot-cage.json"), "utf8"));
     const args = [].concat(cage.mcp_args, cage.exclude_args, cage.allow_args, cage.deny_args, cage.extra_args);
-    return "copilot " + args.join(" ") + " -i '" + kickoff + "'";
+    return {
+      host: "copilot",
+      kickoff,
+      cage,
+      command: "copilot " + args.map((a) => psq(a)).join(" ") + " -i " + psq(kickoff),
+    };
   }
   return null;
 }
@@ -1144,19 +1225,59 @@ function agentLaunch(root) {
  * aside the card they were looking at.
  */
 async function startAgent() {
-  const root = projectRoot();
-  if (root === null || !(await ensureServer())) return;
-  await ensureCards();
-  const command = agentLaunch(root);
-  if (command === null) {
-    void vscode.window.showErrorMessage("$PRODUCT$: no agent CLI found — install Claude Code (or Copilot CLI), then retry.");
+  if (agentStarting) {
+    void vscode.window.showInformationMessage("$PRODUCT$: agent is already starting — check '$PRODUCT$ agent' and '$PRODUCT$ log' terminals.");
     return;
   }
-  agentTerm = vscode.window.createTerminal({ name: "$PRODUCT$ agent", cwd: path.join(root, "workspace") });
-  agentTerm.show();
-  agentTerm.sendText(command, true);
-  // Rebuilt, so the log lands to the agent's RIGHT whatever stood there before.
-  await showLog(true);
+  agentStarting = true;
+  try {
+    const ok = await vscode.window.withProgress(
+      {
+        location: vscode.ProgressLocation.Notification,
+        title: "$PRODUCT$: starting agent — check the terminals",
+        cancellable: false,
+      },
+      async (progress) => {
+        progress.report({ message: "Preparing engine and launch command..." });
+        const root = projectRoot();
+        if (root === null || !(await ensureServer())) return false;
+        await ensureCards();
+        const command = agentLaunch(root);
+        if (command === null) {
+          void vscode.window.showErrorMessage("$PRODUCT$: no agent CLI found — install Claude Code (or Copilot CLI), then retry.");
+          return false;
+        }
+        progress.report({ message: "Opening terminals and launching agent..." });
+        if (command.host === "copilot") {
+          progress.report({ message: "Opening Copilot Chat and sending kickoff..." });
+          const launchedInChat = await openCopilotInChat(command.kickoff, command.cage);
+          if (launchedInChat) {
+            agentTerm = null;
+            await showLog(false);
+            return true;
+          }
+          progress.report({ message: "Chat launch unavailable, falling back to terminal launch..." });
+        }
+        // Host-agnostic layout: both stay in the terminal panel. The log is
+        // split from the agent where the terminal API allows it.
+        agentTerm = vscode.window.createTerminal({
+          name: "$PRODUCT$ agent",
+          cwd: path.join(root, "workspace"),
+        });
+        agentTerm.sendText(command.command, true);
+        // Rebuilt, so the log lands to the agent's RIGHT whatever stood there before.
+        await showLog(true);
+        // Keep the agent visible after the log is created/shown.
+        agentTerm.show(true);
+        return true;
+      },
+    );
+    if (ok) {
+      void vscode.window.setStatusBarMessage("$PRODUCT$: agent started — check Chat for Copilot or '$PRODUCT$ agent' terminal; logs are in '$PRODUCT$ log'.", 5000);
+    }
+  } finally {
+    agentStarting = false;
+  }
 }
 
 async function openCard(n) {
@@ -1251,22 +1372,6 @@ function activate(context) {
     vscode.commands.registerCommand("$PRODUCT_ID$.startAgent", withHelp("$PRODUCT_ID$.startAgent", startAgent)),
     vscode.commands.registerCommand("$PRODUCT_ID$.howToAttach", showAttach),
     vscode.commands.registerCommand("$PRODUCT_ID$.expandDetails", () => void expandDetails()),
-    vscode.commands.registerCommand(
-      "$PRODUCT_ID$.restartServer",
-      withHelp("$PRODUCT_ID$.restartServer", async () => {
-        if (child !== null) {
-          killTree(child);
-          child = null;
-        }
-        if (!(await ensureServer())) return;
-        levels = null;
-        await refreshCards();
-        await pollWalk();
-        detailsView.up();
-        if (logTerm !== null) await pollLog();
-        for (const w of windows.values()) w.up();
-      }),
-    ),
     vscode.window.onDidChangeActiveColorTheme(() => {
       strip.render();
       controls.render();

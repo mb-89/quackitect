@@ -25,6 +25,24 @@ One tool drives everything: `se_tick`. It is legal in every state.
 - `state: <id>`: peek at any state without moving.
 - `back: <state>`: return to an earlier filled state. Everything downstream
   is superseded; its evidence is invalidated and earned again.
+- `target: <state>`: set the destination the route line tracks.
+
+Default movement rule:
+
+- If a target is set, keep walking toward it.
+- Prefer any `enter_met` edge that advances toward that target.
+- Stop at idle only when no reachable in-threshold step advances toward target.
+- A refusal still stops the walk. Follow its remedy.
+- SE-C-113 means user handoff. Report and wait for a message.
+
+Read-ahead discipline (every state):
+
+- Treat `pulled` and `lookahead_read` as pre-read work. Read new paths as soon as they appear.
+- Keep a session cache of path -> hash from `se_file_read`.
+- Reuse cached hashes in every moving `se_tick` through `read_hashes`.
+- Re-read only when a refusal says the hash is missing or stale, or when the path appears for the first time.
+- If a target is set, run `se_tick {route: "<target>"}` and pre-read every path in `reads` before the walk.
+- If a state allows no tools, do not read there. Tick only.
 
 Narration rides the walk (the unified log + the decision graph):
 

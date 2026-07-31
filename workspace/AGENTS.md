@@ -5,29 +5,45 @@ the whole rule.
 
 # First action
 
-Tick. `se_tick` with no arguments shows where you are; keep walking as the
-machine directs — advance state by state until you reach idle or a refusal
-stops you. How walking works: product/guidance/walking.md — it is pulled
-into every state's packet.
+Tick. `se_tick` with no arguments shows where you are. Keep walking as the
+machine directs. If a target is set, keep moving toward it as walking.md
+specifies. Stop only on refusal, condition, or no reachable in-threshold
+progress toward target. How walking works: product/guidance/walking.md — it
+is pulled into every state's packet.
 
 Do this AT THE START OF EVERY SESSION, unasked. Whatever the user's first
 message says — even if it says nothing about the machine — your first tool
-call is `se_tick`. Walk as far as the autonomy allows, then report in ONE
-short message: where you stand, and why you stopped (autonomy, condition,
-or idle). The launcher may also send you an opening prompt saying exactly
-this; the two agree on purpose, so that an agent started by hand, with no
-prompt at all, still boots the same way.
+call is `se_tick`. Immediately after that first tick, call
+`activate_file_navigation_and_search_tools` so the `se` file/search lane is
+registered before boot read gates. Walk as far as the autonomy allows, then
+report in ONE short message: where you stand, and why you stopped (autonomy,
+condition, or idle). The launcher may also send you an opening prompt saying
+exactly this; the two agree on purpose, so that an agent started by hand,
+with no prompt at all, still boots the same way.
 
 The session runs an AUTONOMY (the user's slider in the mirror). When an
-advance is refused with SE-C-113, that step is the user's — STOP, and
-tell them PLAINLY, in words like these: "I'm at start — entering boot is
+advance is refused with SE-C-113, that step is the user's - STOP, and
+tell them PLAINLY, in words like these: "I'm at start - entering boot is
 above the threshold. I'm stopping here. Changing the slider alone cannot
 wake me: after you adjust it (or advance the machine in the mirror), send
-me a message — 'continue' is enough — and I pick up from wherever the
+me a message - 'continue' is enough - and I pick up from wherever the
 machine stands." Then end your turn. The same message is how you rest at
-idle with nothing to do. (`se_tick {wait: true}` exists for SHORT in-turn
-holds when you expect the user's change within seconds — never as a
+idle with nothing to do — meaning no reachable in-threshold step that
+advances toward target. (`se_tick {wait: true}` exists for SHORT in-turn
+holds when you expect the user's change within seconds - never as a
 parking loop.)
+
+BOOT STABILITY FOR THIS HOST:
+- Keep boot calls serial. Do not run parallel search/read batches.
+- Keep reads small with offset/limit to avoid oversized host payloads.
+- Cache read hashes by path for the session. Reuse them in read_hashes.
+- On every packet, pre-read paths from `pulled` and `lookahead_read` once,
+  then keep reusing those hashes while they stay current.
+- If a target is set, call `se_tick {route: "<target>"}` and pre-read every
+  path in `reads` before moving.
+- Re-read only when a refusal names missing/current hashes, or when a path
+  appears for the first time.
+- If a state allows no tools, do not call read/search there. Tick only.
 
 THE HANDOVER RULE: the packet's `human_checked` list is what the user
 checked as read while driving the mirror themselves. Your advances must

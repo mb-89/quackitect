@@ -28,6 +28,13 @@ if (process.argv.some((a) => a === "--help" || a === "-h" || a === "-?")) {
   process.exit(0);
 }
 
+// During the suite run, every boot walk would run preflight again.
+// Skip it there; the suite's top-level preflight already covers this check.
+if (process.env.SE_SELFTEST_SKIP === "1") {
+  process.stdout.write("preflight skipped — already inside a selftest run\n");
+  process.exit(0);
+}
+
 const root = resolve(argValue("--root") ?? process.cwd());
 const failures: string[] = [];
 

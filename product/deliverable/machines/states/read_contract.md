@@ -2,13 +2,14 @@
 state: read_contract
 state_kind: work
 priority: 0.01
+tags: boot
 legal_tools: se_file_read
 exit_read:
   - workspace/AGENTS.md
   - product/guidance/contract.md
   - product/guidance/voice.md
   - product/guidance/walking.md
-guidance: Read every document in the exit condition through se_file_read - each result carries its hash. Leaving demands those hashes as proof (se_tick with read_hashes); keep them, later states demand them again at entry.
+guidance: BOOT METHOD rides in from guidance/method/boot.md by tag - follow it. Read every document in the exit condition through se_file_read - each result carries its hash. Leaving demands those hashes as proof (se_tick with read_hashes); keep them and reuse them unless a refusal says they are missing or stale.
 ---
 
 # Read the contract

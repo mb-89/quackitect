@@ -114,6 +114,41 @@ test("a stale agent hash proves a stale read: the edited doc must be re-read for
   assert.equal(ok.isError, false);
 });
 
+test("the read buffer auto-fills tick proofs from prior lane reads", async () => {
+  const root = freshRoot();
+  const server = buildServer(root);
+  // Walk into boot/read_contract where the read gate starts applying.
+  await call(server, "se_tick", { advance: true });
+  await call(server, "se_tick", { advance: true });
+  // Earn proofs through the lane once; later ticks send no read_hashes.
+  for (const path of READ_DOCS) {
+    const rr = await call(server, "se_file_read", { path, offset: 1, limit: 1 });
+    assert.equal(rr.isError, false, JSON.stringify(rr.body));
+  }
+  let last: Awaited<ReturnType<typeof call>> | undefined;
+  for (let i = 0; i < 8; i++) {
+    last = await call(server, "se_tick", { advance: true });
+    if (last.isError || last.body.booted === true) break;
+  }
+  assert.equal(last?.isError, false, JSON.stringify(last?.body));
+  assert.equal(last?.body.booted, true, "buffered proofs should carry the boot walk to idle");
+});
+
+test("startup clears any preseeded read buffer before boot reading", async () => {
+  const root = freshRoot();
+  const session = new Session(root);
+  const seeded = readHashesFor(root);
+  for (const [path, hash] of Object.entries(seeded)) session.rememberRead(path, hash);
+  const server = buildServer(root, session);
+  // First move enters boot and mechanically clears stale/leftover buffer state.
+  await call(server, "se_tick", { advance: true }); // start -> boot/start
+  await call(server, "se_tick", { advance: true }); // boot/start -> read_contract
+  const refused = await call(server, "se_tick", { advance: true }); // leaving read_contract needs fresh read
+  assert.equal(refused.isError, true);
+  assert.equal(refused.body.clause, "SE-C-112");
+  assert.match(String(refused.body.expected), /read_contract/);
+});
+
 test("the mirror renders per-doc checkboxes and never locks reading itself", async () => {
   const root = freshRoot();
   const s = new Session(root);
