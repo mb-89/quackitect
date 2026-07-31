@@ -165,3 +165,71 @@
 {"ts":"2026-07-31T07:42:46.994Z","op":"done","visit":"expeditions/e26@0","node":"d26","brief":"exported copy runs 237/237 green with preflight and smoke"}
 {"ts":"2026-07-31T07:42:55.400Z","op":"update","visit":"expeditions/e26@0","node":"d44","brief":"checking whether RUNME prints a usage listing the export"}
 {"ts":"2026-07-31T07:43:18.767Z","op":"update","visit":"expeditions/e26@0","node":"d45","brief":"staging the README export section"}
+{"ts":"2026-07-31T07:43:40.271Z","op":"done","visit":"expeditions/e26@0","node":"d27","brief":"README now carries the export, its arguments and its exclusions"}
+{"ts":"2026-07-31T07:43:46.198Z","op":"update","visit":"expeditions/e26@0","node":"d46","brief":"landing the README export section on v3 so the push carries it"}
+{"ts":"2026-07-31T07:44:00.172Z","op":"update","visit":"expeditions/e26@0","node":"d47","brief":"counting what now waits to be pushed on v3"}
+{"ts":"2026-07-31T07:44:10.516Z","op":"update","visit":"expeditions/e26@0","node":"d48","brief":"fetching so the unpushed count is measured, not guessed"}
+{"ts":"2026-07-31T07:44:14.794Z","op":"update","visit":"expeditions/e26@0","node":"d49","brief":"recounting unpushed commits after the fetch"}
+{"ts":"2026-07-31T07:44:45.258Z","op":"update","visit":"expeditions/e26@0","node":"d50","brief":"correcting the handover's claim that the export was never built"}
+{"ts":"2026-07-31T07:45:10.893Z","op":"update","visit":"expeditions/e26@0","node":"d51","brief":"recording the day's rigor-ladder changes in the handover"}
+{"ts":"2026-07-31T07:45:28.380Z","op":"update","visit":"expeditions/e26@0","node":"d52","brief":"testing the export from the root checkout, not just the worktree"}
+{"ts":"2026-07-31T07:45:53.896Z","op":"update","visit":"expeditions/e26@0","node":"d53","brief":"noting that the generated README omits the export"}
+{"ts":"2026-07-31T07:45:59.872Z","op":"update","visit":"expeditions/e26@0","node":"d54","brief":"clearing the two test exports from the scratchpad"}
+{"ts":"2026-07-31T07:47:26.393Z","op":"plan","visit":"expeditions/e26@0","parent":null,"nodes":[{"id":"d55","brief":"Read how the handover is read and written today"},{"id":"d56","brief":"Design the consume-then-delete change"},{"id":"d57","brief":"Make the end state demand a fresh handover"},{"id":"d58","brief":"Carry the durable points out of prose"},{"id":"d59","brief":"Fence it with tests"}]}
+{"ts":"2026-07-31T07:47:29.125Z","op":"update","visit":"expeditions/e26@0","node":"d60","brief":"reading the state that demands the handover"}
+{"ts":"2026-07-31T07:47:39.301Z","op":"update","visit":"expeditions/e26@0","node":"d61","brief":"finding every engine touchpoint for the handover"}
+{"ts":"2026-07-31T07:47:43.679Z","op":"update","visit":"expeditions/e26@0","node":"d62","brief":"reading the engine's handover read-demand"}
+{"ts":"2026-07-31T07:47:51.872Z","op":"update","visit":"expeditions/e26@0","node":"d63","brief":"reading where boot enforces the handover on exit"}
+{"ts":"2026-07-31T07:48:06.821Z","op":"update","visit":"expeditions/e26@0","node":"d64","brief":"locating the exit read-proof check"}
+{"ts":"2026-07-31T07:48:11.531Z","op":"update","visit":"expeditions/e26@0","node":"d65","brief":"reading the exit-read gate that clears boot"}
+{"ts":"2026-07-31T07:48:38.624Z","op":"done","visit":"expeditions/e26@0","node":"d55","brief":"handover is an engine-added boot read; idle's prose asks for the write"}
+{"ts":"2026-07-31T07:48:56.965Z","op":"update","visit":"expeditions/e26@0","node":"d66","brief":"looking for a session clock to judge handover freshness"}
+{"ts":"2026-07-31T07:49:03.084Z","op":"update","visit":"expeditions/e26@0","node":"d67","brief":"finding the transition path to hook consume and demand"}
+{"ts":"2026-07-31T07:49:06.524Z","op":"update","visit":"expeditions/e26@0","node":"d68","brief":"reading assertConditions to place both hooks"}
+{"ts":"2026-07-31T07:49:17.052Z","op":"update","visit":"expeditions/e26@0","node":"d69","brief":"reading the commit path of a tick"}
+{"ts":"2026-07-31T07:49:43.429Z","op":"done","visit":"expeditions/e26@0","node":"d56","brief":"consume on leaving read_contract; demand entering main's end"}
+{"ts":"2026-07-31T07:50:02.541Z","op":"update","visit":"expeditions/e26@0","node":"d70","brief":"adding consume and the fresh-handover demand to the engine"}
+{"ts":"2026-07-31T07:50:11.220Z","op":"update","visit":"expeditions/e26@0","node":"d71","brief":"wiring consume and demand into the tick's commit path"}
+{"ts":"2026-07-31T07:50:16.283Z","op":"update","visit":"expeditions/e26@0","node":"d72","brief":"reading idle's handover prose before rewriting it"}
+{"ts":"2026-07-31T07:50:32.436Z","op":"update","visit":"expeditions/e26@0","node":"d73","brief":"rewriting the read and write ends of the handover rule"}
+{"ts":"2026-07-31T07:50:39.205Z","op":"update","visit":"expeditions/e26@0","node":"d74","brief":"updating the read condition note on the handover"}
+{"ts":"2026-07-31T07:50:46.851Z","op":"done","visit":"expeditions/e26@0","node":"d58","brief":"read_contract, idle and the read condition all carry the new law"}
+{"ts":"2026-07-31T07:50:59.560Z","op":"update","visit":"expeditions/e26@0","node":"d75","brief":"reading the existing handover test to match its shape"}
+{"ts":"2026-07-31T07:51:28.196Z","op":"update","visit":"expeditions/e26@0","node":"d76","brief":"finding tests that tick to end and will now refuse"}
+{"ts":"2026-07-31T07:51:49.008Z","op":"update","visit":"expeditions/e26@0","node":"d77","brief":"fencing both halves of the handover law"}
+{"ts":"2026-07-31T07:51:58.051Z","op":"update","visit":"expeditions/e26@0","node":"d78","brief":"running the suite against the new handover law"}
+{"ts":"2026-07-31T07:53:09.665Z","op":"update","visit":"expeditions/e26@0","node":"d79","brief":"removing the colon-space that broke both canvases"}
+{"ts":"2026-07-31T07:53:17.761Z","op":"update","visit":"expeditions/e26@0","node":"d80","brief":"checking the canvases compile again"}
+{"ts":"2026-07-31T07:53:24.915Z","op":"update","visit":"expeditions/e26@0","node":"d81","brief":"finding where frontmatter becomes conditions"}
+{"ts":"2026-07-31T07:53:28.676Z","op":"update","visit":"expeditions/e26@0","node":"d82","brief":"reading the condition parser to place the consume declaration"}
+{"ts":"2026-07-31T07:53:53.822Z","op":"update","visit":"expeditions/e26@0","node":"d83","brief":"reading how the read condition reports met"}
+{"ts":"2026-07-31T07:54:07.846Z","op":"update","visit":"expeditions/e26@0","node":"d84","brief":"checking who keys off the handover source label"}
+{"ts":"2026-07-31T07:54:41.868Z","op":"update","visit":"expeditions/e26@0","node":"d85","brief":"checking the StateDecl condition type"}
+{"ts":"2026-07-31T07:54:53.916Z","op":"update","visit":"expeditions/e26@0","node":"d86","brief":"writing the read_consume condition note"}
+{"ts":"2026-07-31T07:55:00.464Z","op":"update","visit":"expeditions/e26@0","node":"d87","brief":"declaring the handover as a consumed read"}
+{"ts":"2026-07-31T07:55:21.271Z","op":"update","visit":"expeditions/e26@0","node":"d88","brief":"replacing the hardcoded handover rule with the declaration"}
+{"ts":"2026-07-31T07:55:38.793Z","op":"update","visit":"expeditions/e26@0","node":"d89","brief":"wiring consume into both commit paths and the status display"}
+{"ts":"2026-07-31T07:55:44.542Z","op":"update","visit":"expeditions/e26@0","node":"d90","brief":"updating the test for the generic consume source"}
+{"ts":"2026-07-31T07:55:46.816Z","op":"update","visit":"expeditions/e26@0","node":"d91","brief":"running the suite against the declarative consume"}
+{"ts":"2026-07-31T07:56:31.626Z","op":"update","visit":"expeditions/e26@0","node":"d92","brief":"reading the onClosed test that now needs a handover"}
+{"ts":"2026-07-31T07:56:47.696Z","op":"update","visit":"expeditions/e26@0","node":"d93","brief":"the onClosed test now writes its handover before ending"}
+{"ts":"2026-07-31T07:56:52.199Z","op":"update","visit":"expeditions/e26@0","node":"d94","brief":"re-running the suite to find what else ticks to end"}
+{"ts":"2026-07-31T07:57:16.206Z","op":"update","visit":"expeditions/e26@0","node":"d95","brief":"collecting the suite result"}
+{"ts":"2026-07-31T07:57:18.778Z","op":"update","visit":"expeditions/e26@0","node":"d96","brief":"running preflight and suite through the lane instead"}
+{"ts":"2026-07-31T07:58:06.899Z","op":"update","visit":"expeditions/e26@0","node":"d97","brief":"reading the boot test that reaches end"}
+{"ts":"2026-07-31T07:58:13.886Z","op":"update","visit":"expeditions/e26@0","node":"d98","brief":"getting both end-ticking boot tests in view"}
+{"ts":"2026-07-31T07:58:23.982Z","op":"update","visit":"expeditions/e26@0","node":"d99","brief":"locating the shared test helpers"}
+{"ts":"2026-07-31T07:58:28.052Z","op":"update","visit":"expeditions/e26@0","node":"d100","brief":"reading helpers to add the handover helper in style"}
+{"ts":"2026-07-31T07:58:35.317Z","op":"update","visit":"expeditions/e26@0","node":"d101","brief":"adding a shared handOver helper for tests that walk out"}
+{"ts":"2026-07-31T07:58:39.573Z","op":"update","visit":"expeditions/e26@0","node":"d102","brief":"checking helpers imports for the new helper"}
+{"ts":"2026-07-31T07:58:50.775Z","op":"update","visit":"expeditions/e26@0","node":"d103","brief":"importing writeFileSync for the handover helper"}
+{"ts":"2026-07-31T07:59:00.011Z","op":"update","visit":"expeditions/e26@0","node":"d104","brief":"reading boot test imports"}
+{"ts":"2026-07-31T07:59:04.313Z","op":"update","visit":"expeditions/e26@0","node":"d105","brief":"reading the helpers import line in the boot test"}
+{"ts":"2026-07-31T07:59:13.961Z","op":"update","visit":"expeditions/e26@0","node":"d106","brief":"pointing the end-ticking tests at the shared helper"}
+{"ts":"2026-07-31T07:59:19.232Z","op":"update","visit":"expeditions/e26@0","node":"d107","brief":"checking the threshold test import line"}
+{"ts":"2026-07-31T07:59:23.056Z","op":"update","visit":"expeditions/e26@0","node":"d108","brief":"importing handOver in the threshold test"}
+{"ts":"2026-07-31T07:59:27.011Z","op":"update","visit":"expeditions/e26@0","node":"d109","brief":"running the suite with the shared handover helper"}
+{"ts":"2026-07-31T08:00:10.217Z","op":"update","visit":"expeditions/e26@0","node":"d110","brief":"reading the structural assertion on read_contract"}
+{"ts":"2026-07-31T08:00:17.212Z","op":"update","visit":"expeditions/e26@0","node":"d111","brief":"asserting the declared consume on read_contract"}
+{"ts":"2026-07-31T08:00:20.959Z","op":"update","visit":"expeditions/e26@0","node":"d112","brief":"re-running the suite after the structural fix"}
+{"ts":"2026-07-31T08:01:14.918Z","op":"done","visit":"expeditions/e26@0","node":"d57","brief":"end refuses without a handover written this session"}

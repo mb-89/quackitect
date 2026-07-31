@@ -8,7 +8,10 @@ Arguments: the documents (root-relative paths) that must be READ before the
 state can be left (exit) or entered (entry). Beyond the explicit lists, THE
 PULL is an entry condition everywhere outside boot: entering a state
 demands its pulled guidance proven read too. A left-behind session handover
-(.se/HANDOVER.md) joins boot read_contract's exit list while it exists.
+(.se/HANDOVER.md) joins boot read_contract's exit list while it exists — and
+the engine DESTROYS it as that state is left, so it is read exactly once
+(owner ruling 2026-07-31). The matching demand sits at the other end: the
+main machine refuses to reach `end` without a handover written that session.
 
 The proof is per hand:
 

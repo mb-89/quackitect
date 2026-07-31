@@ -16,7 +16,7 @@
 //
 // State is in-memory: a server restart mid-session drops back to start, and
 // the next refused call's remedy re-boots the agent in one turn.
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, statSync, unlinkSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { contentHash } from "./hash.ts";
 import { CLAUSES, Rejection } from "./errors.ts";
@@ -1170,9 +1170,11 @@ export class Session {
    *  spares a re-read. */
   conditionKeyMet(m: MachineDecl, s: StateDecl, key: string, which: "enter" | "leave"): boolean {
     if (key === "read") {
-      const authored = (which === "leave" ? s.exit : s.entry)?.read ?? [];
-      const docs = which === "leave" ? [...authored, ...this.handoverDemand(m, s)] : authored;
+      const docs = (which === "leave" ? s.exit : s.entry)?.read ?? [];
       return docs.every((p) => this.readProven("human", p, {}) || this.agentProven(p));
+    }
+    if (key === "read_consume") {
+      return this.consumeDemand(s).every((p) => this.readProven("human", p, {}) || this.agentProven(p));
     }
     if (key === "evidence_form") {
       const names = (which === "leave" ? s.exit : s.entry)?.evidence_form ?? [];
@@ -1471,7 +1473,7 @@ export class Session {
     if (dict === undefined) return undefined;
     const out: Record<string, { args: string[]; met: boolean; note: string }> = {};
     for (const [k, args] of Object.entries(dict)) {
-      const shown = k === "read" && which === "leave" ? [...args, ...this.handoverDemand(m, s)] : args;
+      const shown = k === "read_consume" ? this.consumeDemand(s) : args;
       out[k] = { args: shown, met: this.conditionKeyMet(m, s, k, which), note: conditionNotePath(k) };
     }
     return out;
@@ -1603,13 +1605,52 @@ export class Session {
     return false;
   }
 
-  /** THE HANDOVER is a BOOT EXIT rule (owner ruling 2026-07-27): a
-   *  left-behind .se/HANDOVER.md joins read_contract's read list — read,
-   *  and checkable in the mirror, where the session's first reads happen.
-   *  Absent, nothing is demanded. */
-  private handoverDemand(m: MachineDecl, s: StateDecl): string[] {
-    if (m.id !== "boot" || s.id !== "read_contract") return [];
-    return existsSync(join(seDir(this.root), "HANDOVER.md")) ? [".se/HANDOVER.md"] : [];
+  /** THE CONSUME LIST (condition read_consume) — documents the state reads
+   *  and then DESTROYS. A listed path that is not there demands nothing, so
+   *  a state may name a document that is only sometimes present; the
+   *  session handover is exactly that.
+   *
+   *  This used to be a hardcoded boot rule. It is a declaration now, so the
+   *  drawing says what happens rather than the engine knowing a state by
+   *  name (owner ruling 2026-07-31). */
+  private consumeDemand(s: StateDecl): string[] {
+    return (s.exit?.read_consume ?? []).filter((rel) => existsSync(this.consumeAbs(rel)));
+  }
+
+  private consumeAbs(rel: string): string {
+    return join(this.laneRoot(rel), rel);
+  }
+
+  private handoverPath(): string {
+    return join(seDir(this.root), "HANDOVER.md");
+  }
+
+  /** Leaving the state destroys what it consumed. A briefing that cannot
+   *  survive its own reading cannot go stale and cannot be believed twice. */
+  private consumeDocs(s: StateDecl): void {
+    for (const rel of this.consumeDemand(s)) unlinkSync(this.consumeAbs(rel));
+  }
+
+  /** The other half of the same law: the way OUT writes the next one.
+   *  Demanded mechanically, because the duty was prose before and prose is
+   *  what kept being skipped. Written BEFORE this session started is a
+   *  leftover, not a handover, so the clock decides — not the file's
+   *  existence. */
+  private assertHandoverWritten(channel: Channel): void {
+    const p = this.handoverPath();
+    const writtenMs = existsSync(p) ? statSync(p).mtimeMs : -1;
+    if (writtenMs >= Date.parse(this.startedTs)) return;
+    throw new Rejection({
+      clause: CLAUSES.CONDITION_UNMET,
+      expected: "a handover written THIS session — ending the session writes .se/HANDOVER.md for the next one",
+      got: writtenMs < 0 ? "no .se/HANDOVER.md" : "a .se/HANDOVER.md left over from before this session started",
+      remedy: {
+        tool: "se_file_write",
+        args: { path: ".se/HANDOVER.md", base_hash: null, content: "# Handover — <date>\n\n<what the next session must know>\n" },
+        note: "write what the NEXT session cannot get from the repo or the records. It is read once and destroyed at their boot, so nothing here can go stale — but nothing here survives either. Anything durable belongs in guidance, a note or a record.",
+      },
+      source: "engine/session.ts handover",
+    });
   }
 
   /** What entering `t` demands proven: its entry read list plus its pull —
@@ -1640,7 +1681,7 @@ export class Session {
   /** THE READ GATE, both directions: the current state's exit read list,
    *  and the target's entry requirements (explicit reads + the pull). */
   private assertReads(m: MachineDecl, from: StateDecl, targetIds: string[], channel: Channel, supplied: Record<string, string>): void {
-    const exitReads = [...(from.exit?.read ?? []), ...this.handoverDemand(m, from)];
+    const exitReads = [...(from.exit?.read ?? []), ...this.consumeDemand(from)];
     const missingExit = exitReads.filter((p) => !this.readProven(channel, p, supplied));
     if (missingExit.length > 0) this.refuseReads("exit", from.id, missingExit, channel);
     for (const id of targetIds) {
@@ -1740,11 +1781,11 @@ export class Session {
       const hash = d.hash !== "" ? d.hash : this.diskHash(d.path);
       return { ...d, hash, checked: this.humanChecked(d.path, hash) };
     });
-    // THE HANDOVER rides boot's reading room — leaving read_contract
-    // demands it like the authored list; its checkbox lives here too.
-    for (const rel of this.handoverDemand(m, s)) {
+    // A CONSUMED document rides the reading room like the authored list —
+    // it is demanded the same way and its checkbox lives here too.
+    for (const rel of this.consumeDemand(s)) {
       const hash = this.diskHash(rel);
-      out.push({ path: rel, sources: ["handover"], hash, checked: this.humanChecked(rel, hash) });
+      out.push({ path: rel, sources: ["consume"], hash, checked: this.humanChecked(rel, hash) });
     }
     return out;
   }
@@ -1833,16 +1874,19 @@ export class Session {
   private async assertConditions(m: MachineDecl, from: StateDecl, to: string | undefined, channel: Channel, supplied: Record<string, string>): Promise<void> {
     if (from.exit?.script !== undefined) await this.scriptRun(from.id); // a tick attempt runs the script
     for (const [key, args] of Object.entries(from.exit ?? {})) {
-      if (key === "read") continue; // read is channel-proven below, not evidence
+      if (key === "read" || key === "read_consume") continue; // channel-proven below, not evidence
       if (!this.conditionKeyMet(m, from, key, "leave")) this.refuseCondition(m, from, "exit", key, args);
     }
     const targetId = to ?? (from.edges.length === 1 ? from.edges[0].to : undefined);
     this.assertReads(m, from, targetId === undefined ? [] : [targetId], channel, supplied);
+    // Leaving through the main machine's end is where the next handover is
+    // owed. Sub-machines have their own end and owe nothing.
+    if (m.id === this.machine.id && targetId === "end") this.assertHandoverWritten(channel);
     if (targetId === undefined) return;
     const target = m.states.find((s) => s.id === targetId);
     if (target === undefined) return;
     for (const [key, args] of Object.entries(target.entry ?? {})) {
-      if (key === "read") continue;
+      if (key === "read" || key === "read_consume") continue;
       if (!this.conditionKeyMet(m, target, key, "enter")) this.refuseCondition(m, target, "entry", key, args);
     }
   }
@@ -1966,6 +2010,8 @@ export class Session {
         this.assertGateReport(cur, this.state(top.decl, cur), channel);
       }
       this.completeGuarded(top.decl, top.instance, cur, "filled", now, to);
+      // Leaving the state is what destroys what it consumed.
+      this.consumeDocs(this.state(top.decl, cur));
       top.instance.history.push({ state: cur, outcome: "filled", at: now });
       const prefix = this.subs.map((s) => s.decl.id).join("/");
       this.instance.history.push({ state: `${prefix}/${cur}`, outcome: "filled", at: now });
@@ -1980,6 +2026,7 @@ export class Session {
     if (target !== undefined) this.gatePriority(this.machine, [target], channel);
     await this.assertConditions(this.machine, this.state(this.machine, cur), to, channel, readHashes);
     this.completeGuarded(this.machine, this.instance, cur, "filled", now, to);
+    this.consumeDocs(this.state(this.machine, cur));
     this.instance.history.push({ state: cur, outcome: "filled", at: now });
     this.seedSubs();
     return this.landing();
