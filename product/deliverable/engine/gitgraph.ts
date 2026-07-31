@@ -45,6 +45,18 @@ export const MARK: Record<string, string> = {
   deferred: "→",
 };
 
+/** THE DOT ITSELF CARRIES THE VERDICT.
+ *
+ *  Mermaid cannot draw text inside a commit circle — there is no such thing
+ *  in the grammar. What it does have is a commit TYPE, and a colour for the
+ *  highlighted ones. So a settled point becomes a HIGHLIGHT commit in green,
+ *  and the tick leaves the label.
+ *
+ *  gitInv0..7 are per-branch, and mermaid reuses them cyclically past eight,
+ *  so every one is set to the same green and any branch reads alike. */
+const DONE_GREEN = "#3fb950";
+const GIT_INV = ["gitInv0", "gitInv1", "gitInv2", "gitInv3", "gitInv4", "gitInv5", "gitInv6", "gitInv7"];
+
 /** A BRANCH NAME IS A TOKEN. Mermaid's checkout takes one identifier, so a
  *  trunk called "the plan" makes `checkout the plan` a parse error at the
  *  second word — which is exactly how this was found. */
@@ -56,7 +68,17 @@ export function decisionsAsGitGraph(nodes: readonly DecisionNode[], trunkName = 
   const trunk = token(trunkName);
   // TB reads as a CHECKLIST — top to bottom, one line per point, with the
   // text horizontal beside its dot.
-  const init = `%%{init: {'gitGraph': {'rotateCommitLabel': false, 'mainBranchName': '${trunk}'}}}%%`;
+  //
+  // parallelCommits drops mermaid's TEMPORAL spacing, which pads rows apart
+  // by how far apart in time they were. Every point already owns a row, so
+  // that padding buys nothing and costs the screen.
+  //
+  // The theme is NOT set. ux.md says take the colour from the host, and
+  // naming a theme here would fight the editor's own light or dark.
+  const init =
+    `%%{init: {'themeVariables': {'commitLabelFontSize': '11px', ` +
+    GIT_INV.map((v) => `'${v}': '${DONE_GREEN}'`).join(", ") +
+    `}, 'gitGraph': {'rotateCommitLabel': false, 'parallelCommits': true, 'mainBranchName': '${trunk}'}}}%%`;
   const out: string[] = [init, "gitGraph TB:"];
   if (nodes.length === 0) {
     out.push(`  commit id: "nothing decided yet"`);
@@ -75,9 +97,16 @@ export function decisionsAsGitGraph(nodes: readonly DecisionNode[], trunkName = 
   }
   roots.sort(byTime);
 
+  /** done paints the dot, so its tick leaves the words. The others keep a
+   *  glyph, because a shape alone cannot say WHY something did not land. */
+  const commit = (status: string, brief: string): string => {
+    const done = status === "done";
+    const mark = done ? "" : `${MARK[status] ?? MARK.open} `;
+    return `  commit id: "${mark}${label(brief)}"${done ? " type: HIGHLIGHT" : ""}`;
+  };
+
   for (const point of roots) {
-    const mark = MARK[point.status] ?? MARK.open;
-    out.push(`  commit id: "${mark} ${label(point.brief)}"`);
+    out.push(commit(point.status, point.brief));
 
     // Everything reported under this point, however deeply — the graph shows
     // ONE branch per point, because a branch per nesting level draws a
@@ -95,11 +124,10 @@ export function decisionsAsGitGraph(nodes: readonly DecisionNode[], trunkName = 
     const branch = token(point.id);
     out.push(`  branch ${branch}`);
     told.forEach((k, i) => {
-      // The last one settled the point, so it wears the point's mark. The
-      // rest are the work, and stay unmarked.
+      // The last one settled the point, so it wears the point's verdict. The
+      // rest are the work, and stay plain.
       const last = i === told.length - 1;
-      const m = last ? mark : MARK.open;
-      out.push(`  commit id: "${m} ${label(k.brief)}"`);
+      out.push(last ? commit(point.status, k.brief) : `  commit id: "${MARK.open} ${label(k.brief)}"`);
     });
     // NO MERGE. The branch is where the point was worked, not a detour that
     // came home, and a merge line would claim a return that never happened.

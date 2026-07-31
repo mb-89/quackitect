@@ -51,9 +51,10 @@ test("the last update wears the point's mark, and so does the trunk bubble", () 
     node({ id: "d1.1", at: "2026-07-31T10:01:00Z", parent: "d1", brief: "first move" }),
     node({ id: "d1.2", at: "2026-07-31T10:02:00Z", parent: "d1", brief: "what settled it" }),
   ]);
-  assert.ok(g.includes(`commit id: "${MARK.done} the point"`), "the checklist line is ticked");
-  assert.ok(g.includes(`commit id: "${MARK.done} what settled it"`), "the last update is ticked too");
-  assert.ok(g.includes(`commit id: "${MARK.open} first move"`), "and the ones before it are not");
+  assert.ok(g.includes('commit id: "the point" type: HIGHLIGHT'), "the checklist dot carries the verdict");
+  assert.ok(g.includes('commit id: "what settled it" type: HIGHLIGHT'), "and so does the update that settled it");
+  assert.ok(g.includes(`commit id: "${MARK.open} first move"`), "the ones before it stay plain");
+  assert.ok(!g.includes(MARK.done!), "a done point spends no characters on a tick");
 });
 
 test("a point that did not land is marked, not ticked", () => {
@@ -61,8 +62,8 @@ test("a point that did not land is marked, not ticked", () => {
     const g = decisionsAsGitGraph([
       node({ id: "d1", at: "2026-07-31T10:00:00Z", brief: "dropped", status: status as "obsolete", closed_at: "2026-07-31T10:01:00Z" }),
     ]);
-    assert.ok(g.includes(`commit id: "${mark} dropped"`), `${status} carries its own mark`);
-    assert.ok(!g.includes(MARK.done!), `${status} is never a tick`);
+    assert.ok(g.includes(`commit id: "${mark} dropped"`), `${status} keeps a glyph, because a shape cannot say why`);
+    assert.ok(!g.includes("type: HIGHLIGHT"), `${status} never paints the dot green`);
   }
 });
 
@@ -93,6 +94,13 @@ test("a long brief is cut at a word, so the column stays narrow", () => {
 
 test("an empty graph renders rather than throwing", () => {
   assert.match(decisionsAsGitGraph([]), /gitGraph TB:/);
+});
+
+test("the diagram asks for tight rows and does not name a theme", () => {
+  const g = decisionsAsGitGraph([node({ id: "d1", at: "2026-07-31T10:00:00Z" })]);
+  assert.match(g, /parallelCommits': true/, "temporal padding buys nothing when every point owns a row");
+  assert.doesNotMatch(g, /'theme':/, "ux.md: take the colour from the host, never fight the editor's own");
+  assert.match(g, /gitInv0': '#3fb950'/, "and a settled dot is green");
 });
 
 test("the markdown page fences the graph so the preview renders it", () => {

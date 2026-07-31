@@ -509,3 +509,13 @@
 {"ts":"2026-07-31T17:26:00.649Z","op":"done","visit":"expeditions/e26@0","node":"d96","brief":"emitter rebuilt around non-returning branches"}
 {"ts":"2026-07-31T17:26:41.965Z","op":"plan","visit":"expeditions/e26@0","parent":null,"nodes":[{"id":"d107","brief":"check whether a mermaid parser is available to test against"}]}
 {"ts":"2026-07-31T17:27:16.680Z","op":"update","visit":"expeditions/e26@0","node":"d108","brief":"mermaid is not installed here"}
+{"ts":"2026-07-31T17:27:24.443Z","op":"done","visit":"expeditions/e26@0","node":"d107","brief":"no parser available without a new dependency"}
+{"ts":"2026-07-31T17:28:14.102Z","op":"plan","visit":"expeditions/e26@0","parent":null,"nodes":[{"id":"d109","brief":"note the fork finding for the retro"}]}
+{"ts":"2026-07-31T17:28:23.587Z","op":"done","visit":"expeditions/e26@0","node":"d109","brief":"fork finding captured as a should"}
+{"ts":"2026-07-31T17:35:25.852Z","op":"plan","visit":"expeditions/e26@0","parent":null,"nodes":[{"id":"d110","brief":"read the gitGraph config options"},{"id":"d111","brief":"answer what is impossible explicitly"}]}
+{"ts":"2026-07-31T17:36:01.480Z","op":"done","visit":"expeditions/e26@0","node":"d110","brief":"config list read from the mermaid source"}
+{"ts":"2026-07-31T17:36:45.961Z","op":"update","visit":"expeditions/e26@0","node":"d112","brief":"the dot carries the verdict, the label loses the tick"}
+{"ts":"2026-07-31T17:37:14.823Z","op":"update","visit":"expeditions/e26@0","node":"d113","brief":"tests follow the dot-carries-verdict change"}
+{"ts":"2026-07-31T17:37:31.128Z","op":"update","visit":"expeditions/e26@0","node":"d114","brief":"running the condensed graph"}
+{"ts":"2026-07-31T17:38:10.792Z","op":"done","visit":"expeditions/e26@0","node":"d111","brief":"condensed, and the dot carries the verdict"}
+{"ts":"2026-07-31T17:38:29.895Z","op":"plan","visit":"expeditions/e26@0","parent":null,"nodes":[{"id":"d115","brief":"land the graph condensing"}]}
