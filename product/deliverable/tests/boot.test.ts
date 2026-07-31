@@ -9,7 +9,7 @@ import { fileURLToPath } from "node:url";
 import { compileMachine } from "../engine/machines/compile.ts";
 import { mainMachinePath, Session } from "../engine/session.ts";
 import { buildServer } from "../engine/tools.ts";
-import { bootedServer, call, checkDocs, freshRoot, readHashesFor } from "./helpers.ts";
+import { bootedServer, call, checkDocs, freshRoot, handOver, readHashesFor } from "./helpers.ts";
 
 const REPO_ROOT = fileURLToPath(new URL("../../..", import.meta.url));
 
@@ -31,7 +31,12 @@ test("the boot sub-machine compiles with its own mechanical start/end", () => {
   assert.equal(m.initial, "start");
   assert.equal(m.states.find((s) => s.id === "end")!.kind, "end");
   const rc = m.states.find((s) => s.id === "read_contract")!;
-  assert.deepEqual(rc.exit, { read: ["workspace/AGENTS.md", "product/guidance/contract.md", "product/guidance/voice.md", "product/guidance/walking.md"] });
+  assert.deepEqual(rc.exit, {
+    read: ["workspace/AGENTS.md", "product/guidance/contract.md", "product/guidance/voice.md", "product/guidance/walking.md"],
+    // The handover is DECLARED here, not known by the engine: read on the
+    // way out, and destroyed by the same move.
+    read_consume: [".se/HANDOVER.md"],
+  });
 });
 
 test("at start the lane beyond reading is refused with se_tick as the remedy", async () => {
@@ -105,6 +110,7 @@ test("idle opens the whole lane; a tick to end closes it; after end only tick-in
   const server = await bootedServer(root);
   const w = await call(server, "se_file_write", { path: "x.md", content: "hi", base_hash: null });
   assert.equal(w.isError, false);
+  handOver(root); // the way out writes the next session's briefing
   const exit = await call(server, "se_tick", { from: "idle", to: "end" });
   assert.equal(exit.isError, false);
   const after = await call(server, "se_file_read", { path: "x.md" });
@@ -128,7 +134,8 @@ test("the gate is logged like everything else — a refused pre-boot call lands 
 
 test("manual mode: tick info at start, ticks walk the whole machine to end", async () => {
   const { Session } = await import("../engine/session.ts");
-  const s = new Session(freshRoot());
+  const root = freshRoot();
+  const s = new Session(root);
   const info = s.tickInfo() as { active: string[]; states: { kind: string }[] };
   assert.deepEqual(info.active, ["start"]);
   assert.equal(info.states[0].kind, "start");
@@ -154,6 +161,7 @@ test("manual mode: tick info at start, ticks walk the whole machine to end", asy
   assert.deepEqual(s.active(), ["expeditions/end"]);
   await s.tickAdvance(); // pop: filled, back at idle
   assert.deepEqual(s.active(), ["idle"]);
+  handOver(root);
   await s.tickAdvance("end");
   assert.equal((s.describe() as { status: string }).status, "closed");
 });

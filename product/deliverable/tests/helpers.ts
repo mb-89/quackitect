@@ -1,7 +1,7 @@
 // Test scaffolding: a fresh temp project root carrying the REAL boot
 // machine (copied from this repo), so buildServer() compiles the same
 // drawing the shipped server does.
-import { chmodSync, cpSync, existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, renameSync, rmSync, statSync, symlinkSync } from "node:fs";
+import { chmodSync, cpSync, existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, renameSync, rmSync, statSync, symlinkSync, writeFileSync } from "node:fs";
 import { createRequire } from "node:module";
 import { tmpdir } from "node:os";
 import { join, sep } from "node:path";
@@ -204,6 +204,13 @@ export function readHashesFor(root: string): Record<string, string> {
 /** The human's side of the same proof: check every boot doc in the mirror. */
 export function checkDocs(session: { humanCheck: (p: string) => unknown }): void {
   for (const p of READ_DOCS) session.humanCheck(p);
+}
+
+/** Leaving through main's end demands a handover written THIS session
+ *  (owner ruling 2026-07-31). Any test that walks out writes one first. */
+export function handOver(root: string): void {
+  mkdirSync(join(root, ".se"), { recursive: true });
+  writeFileSync(join(root, ".se", "HANDOVER.md"), "# Handover\n\nNothing outstanding.\n", "utf8");
 }
 
 /** A server ticked through the whole boot walk into idle — supplying the

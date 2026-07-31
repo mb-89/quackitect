@@ -10,7 +10,7 @@ import { buildServer } from "../engine/tools.ts";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { contentHash } from "../engine/hash.ts";
-import { call, checkDocs, freshRoot, readHashesFor } from "./helpers.ts";
+import { call, checkDocs, freshRoot, handOver, readHashesFor } from "./helpers.ts";
 
 /** The desk pulls its method doc by tag — entering demands its hash too. */
 function deskHashes(root: string): Record<string, string> {
@@ -127,12 +127,14 @@ test("the autonomy refuses garbage: out-of-range values are typed rejections", (
 });
 
 test("reaching end fires onClosed once and the closing packet says session over", async () => {
-  const session = new Session(freshRoot());
+  const root = freshRoot();
+  const session = new Session(root);
   let fired = 0;
   session.onClosed = () => fired++;
   await session.tickAdvance(); await session.tickAdvance();
   checkDocs(session);
   await session.tickAdvance(); await session.tickAdvance(); await session.tickAdvance();
+  handOver(root); // the way out writes the next session's briefing
   const over = (await session.tickAdvance("end")) as { session_over?: boolean; banner?: string };
   assert.equal(over.session_over, true);
   assert.match(String(over.banner), /session over/i);
