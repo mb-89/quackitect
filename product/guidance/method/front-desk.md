@@ -55,6 +55,19 @@ SIZE FIRST, THEN VEHICLE. An expedition and an iteration are each worth
 roughly A DAY of agent work. Neither is a per-fix record. Sizes and the
 bundling law live in software.md, under sizing and records.
 
+TWO THINGS ARE CALLED SIZE, AND THE DESK OWNS ONLY ONE.
+
+- THE VEHICLE SIZE is this section's question. Is the work an expedition,
+  an iteration, a note? The desk judges it and recommends.
+- THE CHANGE SIZE is the rigor column: patch, minor, major or product. The
+  desk NEVER touches it, and seeding never asks for it.
+
+Seeding an iteration is always the same call, whatever the work turns out
+to be: a goal, a vision, its inputs. The way to the kickoff is always the
+same. At the kickoff the agent PROPOSES a change size with its reasoning
+and the person decides. An agent that picks the change size has taken the
+person's decision, and the archive keeps it.
+
 NEVER SEED A RECORD FOR A SINGLE SMALL FIX. This is the failure mode the
 section exists to stop, and it has happened for real. A bug fix is a
 commit inside an expedition. It is never an expedition of its own.

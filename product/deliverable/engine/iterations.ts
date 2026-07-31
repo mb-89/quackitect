@@ -438,8 +438,15 @@ export function generateIterations(root: string): GeneratedMachine {
   // read live (seed-from-source). An unreadable rigor matrix never takes the
   // container down — the kickoff then serves without a form.
   let kickoffEvidence: EvidenceField[] = [];
+  // ITS TOOLS COME FROM THE SAME ROW. The container's kickoff is the matrix's
+  // gate-kickoff standing one machine higher, so it may call exactly what that
+  // row declares. Taking the form and leaving the tools behind is what left a
+  // seeded iteration unable to read the record it is about to fill in.
+  let kickoffTools: string[] | undefined;
   try {
-    kickoffEvidence = readRigorMatrix(root).rows.find((r) => r.name === "gate-kickoff")?.evidence_form ?? [];
+    const kickoffRow = readRigorMatrix(root).rows.find((r) => r.name === "gate-kickoff");
+    kickoffEvidence = kickoffRow?.evidence_form ?? [];
+    kickoffTools = kickoffRow?.legal_tools;
   } catch {
     kickoffEvidence = [];
   }
@@ -470,8 +477,9 @@ export function generateIterations(root: string): GeneratedMachine {
       kind: "work",
       statement: goal,
       guidance:
-        "KICKOFF — one brief carries plan and rigor; the owner blesses, and past it the iteration is set. The bless SEEDS the rest: the engine compiles the blessed change_size from the live rigor matrix and pins the machine into the record. Goal, vision and inputs live in the record.",
+        "KICKOFF — one brief carries plan and rigor; the owner blesses, and past it the iteration is set. THE CHANGE SIZE IS NOT YOURS TO PICK. You PROPOSE one with your reasoning; the person decides, and their bless is the decision. Seeding never asked for a size and never needed to — every iteration reaches this state the same way, and the size is chosen here or nowhere. The bless SEEDS the rest: the engine compiles the blessed change_size from the live rigor matrix and pins the machine into the record. Goal, vision and inputs live in the record.",
       evidence_form: kickoffEvidence,
+      ...(kickoffTools !== undefined ? { legal_tools: kickoffTools } : {}),
       priority: 0.6,
       ...(started ? {} : { entry: { no_pending_note: ["needs retro"] } }),
       tags: ["iteration-kickoff"],
