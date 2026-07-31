@@ -27,6 +27,33 @@ evidence:
     description: "every need carries its pass lines"
   - name: risks_logged
     description: "the register is open with owners and triggers"
+major: full
+minor: tailored
+patch: none
+product: full
+specification: tailored
+major_note: |
+  Applies in full. A major re-argues its worth: the delta is real, the
+  cost of moving architecture is justified, the risks are logged. The
+  resident vision stays axiom unless the packet amended it - then the
+  amendment is exactly what this gate adjudicates.
+minor_note: |
+  Tailored to the delta: is THIS extension worth having - argued in one
+  short exchange, not the full interestingness discussion. The resident
+  vision is axiom and stays out of scope. The killer survives scaled:
+  the delta is real and worth building.
+patch_note: |
+  Does not apply. The vision axiom is not re-litigated for a behavior fix.
+  The kickoff's one-line reason carries the whole motivation burden at
+  this size. STRIKE PROPOSAL - owner adjudicates.
+product_note: |
+  The product-level bless of the frame: the one record that says the
+  problem is real and worth this product. It stands until a major amends
+  the packet - then this gate re-adjudicates the amendment.
+specification_note: |
+  DOCUMENT FORM: the gate record - the filled evidence form and the
+  bless, hash-bound. Gate records render as the milestone acceptance
+  table in the project chapter, derived, never hand-written.
 ---
 
 ## Guidance

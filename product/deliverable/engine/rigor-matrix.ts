@@ -102,11 +102,9 @@ export function matrixDir(root: string): string {
 export function rigorMatrixContentHash(root: string): string {
   const dir = matrixDir(root);
   const h = createHash("sha256");
-  for (const sub of ["rows", "cells"]) {
-    for (const file of readdirSync(join(dir, sub)).filter((f) => f.endsWith(".md")).sort()) {
-      h.update(`${sub}/${file}\n`);
-      h.update(readFileSync(join(dir, sub, file)));
-    }
+  for (const file of readdirSync(join(dir, "rows")).filter((f) => f.endsWith(".md")).sort()) {
+    h.update(`rows/${file}\n`);
+    h.update(readFileSync(join(dir, "rows", file)));
   }
   return h.digest("hex").slice(0, 12);
 }
@@ -132,6 +130,7 @@ function readRigorMatrixFresh(root: string): RigorMatrix {
   const dir = matrixDir(root);
   const rows: RigorMatrixRow[] = [];
   const byName = new Map<string, RigorMatrixRow>();
+  const fmByName = new Map<string, Record<string, unknown>>();
   for (const file of readdirSync(join(dir, "rows")).filter((f) => f.endsWith(".md")).sort()) {
     const note = parseStateNote(readFileSync(join(dir, "rows", file), "utf8"));
     const fm = note.frontmatter;
@@ -161,32 +160,42 @@ function readRigorMatrixFresh(root: string): RigorMatrix {
     }
     rows.push(row);
     byName.set(name, row);
+    fmByName.set(name, fm);
   }
   for (const row of rows) {
     for (const d of row.depends_on) {
       if (!byName.has(d)) throw new Error(`matrix row ${row.name} depends on undeclared row ${d}`);
     }
   }
+  // A CELL IS FRONTMATTER ON ITS ROW. It used to be a file of its own, and
+  // three of that file's four keys echoed its own name — kind, row and
+  // column all restated what the filename already said. Only `applies`
+  // carried anything, so the file was mostly noise (software.md).
+  //
+  // The column value is the cell; `<column>_note` is its prose. Both are
+  // scalars, because a Bases table edits a cell inline and cannot edit a
+  // nested map.
   const cells = new Map<string, Map<string, RigorMatrixCell>>();
-  for (const file of readdirSync(join(dir, "cells")).filter((f) => f.endsWith(".md")).sort()) {
-    const note = parseStateNote(readFileSync(join(dir, "cells", file), "utf8"));
-    const fm = note.frontmatter;
-    const rowName = typeof fm.row === "string" ? fm.row : "";
-    const column = typeof fm.column === "string" ? fm.column : "";
-    if (!byName.has(rowName)) throw new Error(`matrix cell ${file} names undeclared row ${rowName}`);
-    if (!(ALL_COLUMNS as readonly string[]).includes(column)) throw new Error(`matrix cell ${file} names unknown column ${column}`);
-    const applies = typeof fm.applies === "string" ? fm.applies : "";
-    if (!APPLIES.has(applies)) throw new Error(`matrix cell ${file} carries unknown applies value "${applies}"`);
-    let per = cells.get(rowName);
-    if (!per) cells.set(rowName, (per = new Map()));
-    if (per.has(column)) throw new Error(`matrix cell for ${rowName} at ${column} is declared twice`);
-    per.set(column, { row: rowName, column: column as RigorMatrixColumn, applies: applies as RigorMatrixCell["applies"], body: note.body.trim() });
-  }
-  // The explicit-N/A law: absence is "not yet written" and refuses loudly.
   for (const row of rows) {
+    const fm = fmByName.get(row.name)!;
+    const per = new Map<string, RigorMatrixCell>();
     for (const col of ALL_COLUMNS) {
-      if (!cells.get(row.name)?.has(col)) throw new Error(`matrix row ${row.name} is missing its ${col} cell — an N/A is an explicit file, never an absence`);
+      // The explicit-N/A law survives the move: a missing key is "not yet
+      // written" and refuses loudly, exactly as a missing file did.
+      const applies = fm[col];
+      if (typeof applies !== "string" || applies === "") {
+        throw new Error(`matrix row ${row.name} is missing its ${col} cell — an N/A is an explicit value, never an absence`);
+      }
+      if (!APPLIES.has(applies)) throw new Error(`matrix row ${row.name} carries unknown applies value "${applies}" at ${col}`);
+      const note = fm[`${col}_note`];
+      per.set(col, {
+        row: row.name,
+        column: col as RigorMatrixColumn,
+        applies: applies as RigorMatrixCell["applies"],
+        body: typeof note === "string" ? note.trim() : "",
+      });
     }
+    cells.set(row.name, per);
   }
   return { rows, cells };
 }

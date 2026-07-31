@@ -22,6 +22,28 @@ evidence:
     description: "the versioned artifact with its contents listed"
   - name: entry_script
     description: "the one-script entry, or the recorded skip"
+major: full
+minor: full
+patch: tailored
+product: full
+specification: full
+major_note: |
+  Applies in full: major version bump, versioned artifact, baselined
+  configuration, README and entry script current.
+minor_note: |
+  Applies: minor version bump, versioned artifact, baselined
+  configuration, README and entry script current.
+patch_note: |
+  The patch version bump and its changelog line. Nothing repackages beyond
+  what the release lane already does; configuration stays baselined.
+product_note: |
+  STANDING ARTIFACT: the released package - versioned, configuration
+  baselined, README and one-script entry that actually work on a fresh
+  machine. The product at rest is installable, not just correct.
+specification_note: |
+  DOCUMENT FORM: README and the RUNME-equivalent entry script, shipped
+  IN the package; release notes per version. The README is an ENTRY
+  document - plain language, no method jargon (owner law).
 ---
 
 ## Guidance

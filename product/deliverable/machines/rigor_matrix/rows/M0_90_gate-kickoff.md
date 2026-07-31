@@ -30,6 +30,39 @@ evidence:
     description: "what explicitly stays out, and where it went"
   - name: change_size
     description: "patch, minor, major or product, with reasoning; strikes named"
+major: full
+minor: full
+patch: tailored
+product: full
+specification: tailored
+major_note: |
+  FLOOR - applies in full. The column argument for major names the
+  architectural suspicion: WHICH part of the baseline the change is
+  expected to move, so the walk downstream knows its cone.
+minor_note: |
+  FLOOR - applies in full. The brief carries the drained retro, the goal,
+  pulled-in/left-out, and the column choice with its reasoning. The
+  column argument for minor states the PREDICTION explicitly: which
+  requirements move, and why the architecture holds.
+patch_note: |
+  FLOOR - never struck. Tailored to one breath: the one-line goal, the
+  column choice (patch) with its one-line reason, and what stays out.
+  No retro rides in. The bless can ride the expedition's normal flow;
+  a rejection names what to redo, exactly as at full size.
+
+  ESCALATE when the goal cannot be said in one line, or the reason for
+  patch does not survive writing it down - that is a minor wearing a
+  patch's clothes.
+product_note: |
+  At product scale this is the FOUNDING BRIEF: the project's own kickoff,
+  blessed once, standing as the record of why the product exists as a
+  driven effort. Every iteration kickoff diffs against it implicitly.
+specification_note: |
+  DOCUMENT FORM: the kickoff brief as the iteration record's opening -
+  goal, pulled-in/left-out, column with reasoning. Renders in the archive
+  per iteration, never in the book's reader chapters. Template: the
+  evidence form of the row, one instance per iteration, prefills
+  commented until confirmed.
 ---
 
 ## Guidance

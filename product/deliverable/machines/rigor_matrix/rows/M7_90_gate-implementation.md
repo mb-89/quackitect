@@ -30,6 +30,33 @@ evidence:
     description: "internal quality reviewed"
   - name: risks_acceptable
     description: "implementation risks judged and folded into the RAID register"
+major: full
+minor: full
+patch: tailored
+product: full
+specification: tailored
+major_note: |
+  Applies in full: built inside the NEW baseline, no unsanctioned
+  element, red observed, designs realized, battery green, quality and
+  risks judged.
+minor_note: |
+  Applies in full: build planned and walked, models adhered, red observed,
+  designs realized for every new requirement, battery green, quality and
+  risks judged. The delivery gate does not scale down.
+patch_note: |
+  Tailored to three checks: the battery is green, the reproduction failed
+  first, and the fix stayed inside the allocated elements. The rest of the
+  form assumes a planned build that did not happen here.
+
+  ESCALATE: an unsanctioned element in the diff sends the work to major
+  through the architecture gate - the same law as at every size.
+product_note: |
+  Standing obligation: the code and the baseline agree - the
+  models-adhered check has held at every size, so no unsanctioned element
+  exists. The product-level audit of this claim is the overhaul's job.
+specification_note: |
+  DOCUMENT FORM: the gate record into the derived milestone table, as at
+  every gate.
 ---
 
 ## Guidance

@@ -19,6 +19,33 @@ legal_tools:
 evidence:
   - name: checks
     description: "every in-scope requirement with its authored check"
+major: full
+minor: full
+patch: tailored
+product: full
+specification: full
+major_note: |
+  Applies in full: every requirement in scope gets its check; the M5
+  fitness candidates automate where measurable.
+minor_note: |
+  DELIVERY NEVER SHRINKS. Every new requirement's verify_method becomes a
+  concrete check, mechanical where possible. The delta's checkable
+  examples wrap into assertions.
+patch_note: |
+  DELIVERY NEVER SHRINKS. Tailored to the fix: one check that reproduces
+  the wrong behavior. Test-first holds at every size - the reproduction IS
+  the requirement's voice for a patch. A behavior fix with no reproducing
+  check is the lazy work the process exists to stop.
+product_note: |
+  STANDING ARTIFACT: the check suite - every requirement's verify_method
+  realized, mechanical where possible, review-class residue named. At
+  rest the suite IS the register's mirror: a requirement without its
+  check, or a check without its requirement, is an orphan.
+specification_note: |
+  DOCUMENT FORM: test nodes verifying their requirements (verifies
+  edges); the verification chapter derives the requirement-to-check
+  table. The checks themselves live in the code; the spec carries the
+  mapping, never copies of the code.
 ---
 
 ## Guidance

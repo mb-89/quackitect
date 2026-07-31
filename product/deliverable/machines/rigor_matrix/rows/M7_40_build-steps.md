@@ -22,6 +22,28 @@ legal_tools:
 evidence:
   - name: build_record
     description: "the chunk machine's run: chunks filled, actors, the sub-record file"
+major: full
+minor: full
+patch: tailored
+product: full
+specification: tailored
+major_note: |
+  Applies in full: the seeded chunk machine runs, parallel where
+  independent, every fill recorded.
+minor_note: |
+  Applies in full: the seeded chunk machine runs here, parallel builders
+  on independent chunks, every fill recorded with its actor.
+patch_note: |
+  The fix itself, as one chunk. Commits stay fine-grained; the walk is
+  plain - no sub-machine runs.
+product_note: |
+  Standing obligation: the shipped code is the sum of recorded builds -
+  every element's content entered through a walked chunk, at whatever
+  column.
+specification_note: |
+  DOCUMENT FORM: the walked chunk record - fills, actors, the sub-record
+  file - in the iteration archive. The commits are the fine grain; the
+  record is the readable summary.
 ---
 
 ## Guidance

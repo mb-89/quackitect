@@ -23,6 +23,28 @@ evidence:
     description: "the surviving set"
   - name: eliminations
     description: "each dominated candidate with its reason"
+major: full
+minor: none
+patch: none
+product: full
+specification: full
+major_note: |
+  Applies in full: scores on the weighted criteria and matrix metrics,
+  the Pareto front, every elimination reasoned, examples exercised
+  through each candidate. No winner here.
+minor_note: |
+  Does not apply. No candidate set at this size. STRIKE PROPOSAL - owner
+  adjudicates.
+patch_note: |
+  Does not apply. No candidate set exists at this size. STRIKE PROPOSAL -
+  owner adjudicates.
+product_note: |
+  STANDING ARTIFACT: the score table and the Pareto front with every
+  elimination reasoned. History, kept: it is what makes the next major's
+  "why not X" answerable without re-arguing.
+specification_note: |
+  DOCUMENT FORM: the score table (candidates x criteria) derived, the
+  front named, eliminations as one-line reasons under it.
 ---
 
 ## Guidance

@@ -22,6 +22,38 @@ evidence:
     description: "one honest paragraph"
   - name: excluded_use
     description: "the does-NOT-do list"
+major: full
+minor: inherit
+patch: none
+product: full
+specification: full
+major_note: |
+  Applies in full: boundary, neighbours, intended and excluded use,
+  redrawn for the change. Architecture moves ripple to the boundary more
+  often than predicted - this is the cheap place to catch it.
+minor_note: |
+  INHERIT unless the delta touches the boundary. A new neighbour or a
+  changed interface is redrawn and the excluded-use list re-checked;
+  otherwise the resident context stands by pointer.
+
+  ESCALATE: a boundary that moves structurally - new system, new
+  integration seam - is major territory.
+patch_note: |
+  Does not apply. Boundary and neighbours do not move for a behavior fix.
+  STRIKE PROPOSAL - owner adjudicates.
+
+  ESCALATE: a patch that touches an interface to a neighbour is a minor at
+  least - the boundary is the tell.
+product_note: |
+  STANDING ARTIFACT: the context - boundary, neighbours, intended use,
+  and the BINDING excluded-use list. The context figure in the book
+  derives from it. At rest every real neighbour appears; an integration
+  the code has that the context lacks is a standing defect.
+specification_note: |
+  DOCUMENT FORM: the context FIGURE - derived inline SVG with real text
+  (v1's context-model kind), built from boundary and neighbour nodes.
+  The intended-use paragraph as marked prose; the excluded-use list
+  verbatim. One line under the figure saying what to see.
 ---
 
 ## Guidance

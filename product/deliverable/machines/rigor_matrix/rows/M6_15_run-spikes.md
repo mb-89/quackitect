@@ -20,6 +20,26 @@ legal_tools:
 evidence:
   - name: spike_records
     description: "each spike: its question, its timebox, its verdict - evidence, never opinion"
+major: full
+minor: tailored
+patch: none
+product: tailored
+specification: tailored
+major_note: |
+  Applies in full: every seeded spike runs here, parallel, each within
+  its timebox; the machine joins before the evidence folds back.
+minor_note: |
+  Runs whatever the tailored ranking seeded - often nothing: an explicit
+  none in the drawing passes this state without ceremony.
+patch_note: |
+  Does not apply - rank-unknowns is struck at patch, so there is no
+  drawing to run. STRIKE PROPOSAL - owner adjudicates.
+product_note: |
+  STANDING ARTIFACT: the spike records - question, timebox, verdict -
+  retained with their iteration; RAID carries what stayed open.
+specification_note: |
+  DOCUMENT FORM: each spike record linked from the ranking table; the
+  book carries the fold-back's outcome, never the runs themselves.
 ---
 
 ## Guidance

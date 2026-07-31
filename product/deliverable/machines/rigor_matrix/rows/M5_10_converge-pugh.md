@@ -20,6 +20,27 @@ evidence:
     description: "the recorded runs with datum choices"
   - name: winner
     description: "the selected candidate and the why beyond the arithmetic"
+major: full
+minor: none
+patch: none
+product: full
+specification: full
+major_note: |
+  Applies in full: controlled convergence over the front, datum the
+  strongest rival, the why beyond the arithmetic recorded.
+minor_note: |
+  Does not apply. No convergence without candidates. STRIKE PROPOSAL -
+  owner adjudicates.
+patch_note: |
+  Does not apply. No convergence without candidates. STRIKE PROPOSAL -
+  owner adjudicates.
+product_note: |
+  STANDING ARTIFACT: the recorded convergence runs and the winner's why
+  beyond the arithmetic. Lives with the deciding ADRs.
+specification_note: |
+  DOCUMENT FORM: the convergence record - runs, datum choices, winner and
+  its why - as the decision section the ADRs cite. Lives with the
+  decisions chapter.
 ---
 
 ## Guidance

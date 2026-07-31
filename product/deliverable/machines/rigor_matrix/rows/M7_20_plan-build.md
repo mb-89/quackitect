@@ -21,6 +21,33 @@ evidence:
     description: "the seeded chunk drawing: chunks, dependencies, realization kinds"
   - name: promotions_placed
     description: "promoted spike output positioned, or none"
+major: full
+minor: full
+patch: none
+product: full
+specification: tailored
+major_note: |
+  Applies in full: the chunk machine seeded - chunks, dependency edges,
+  realization kinds, promoted spikes placed.
+minor_note: |
+  Applies. The delta's build is chunked: small resumable chunks,
+  dependency edges, realization kind each, promoted spikes as pre-verified
+  chunks. A minor is exactly the size where an unplanned build starts
+  sprawling.
+patch_note: |
+  Does not apply. A patch is one chunk by definition; no chunk machine is
+  seeded. STRIKE PROPOSAL - owner adjudicates.
+
+  ESCALATE: a fix that wants a build plan is not one chunk, and not a
+  patch.
+product_note: |
+  Standing obligation: every build the product ever ran left its chunk
+  record - the build history is reconstructable from the records, not
+  from memory.
+specification_note: |
+  DOCUMENT FORM: the chunk drawing in the iteration record - chunks,
+  edges, realization kinds. Archive material; the book does not teach
+  build plans.
 ---
 
 ## Guidance

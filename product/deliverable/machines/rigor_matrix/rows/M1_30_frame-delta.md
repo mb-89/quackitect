@@ -25,6 +25,41 @@ evidence:
   - name: business_case
     description: "what the effort buys, in whose currency - skip with a recorded reason where no acquirer exists"
     required: false
+major: full
+minor: tailored
+patch: tailored
+product: full
+specification: full
+major_note: |
+  Applies in full for the change: the gap claim for what the major
+  answers, the why-now, the value props it extends or creates, needs with
+  pass lines. The resident frame inherits where the change does not touch
+  it. This is where a major proves it deserves its cost.
+minor_note: |
+  THE CENTER OF GRAVITY BEGINS HERE. The delta's new needs are written in
+  full: which value prop they extend (or the one new prop they create),
+  their need|outcome lines, and their PASS LINES - a criterion nothing
+  will check is not a criterion, at any size. The resident gap claim and
+  why-now are inherited by pointer.
+patch_note: |
+  CLARIFICATION ONLY. The one design-input act a patch may perform: where
+  the design output went wrong because the input was unclear, fix the
+  unclear sentence IN PLACE - the gap claim, a pass line, a value-prop
+  wording. No new needs, no new pass lines.
+
+  ESCALATE: a new need or a changed meaning is a minor. The tell: you are
+  adding a line rather than repairing one.
+product_note: |
+  STANDING ARTIFACT: the gap claim, the why-now, and the VALUE-PROP
+  ONE-PAGERS with every need and its pass lines. The whole trace anchors
+  here at rest - a need without a pass line, or a prop no story realizes,
+  is a standing defect the orphan check should surface.
+specification_note: |
+  DOCUMENT FORM: the motivation chapter's gap and why-now as marked
+  prose; each VALUE PROP as its own DIN-A4 one-pager section (audience,
+  need, outcome, alternative, difference, validation_signal), needs as
+  need|outcome lines with pass lines attached. Needs are nodes; the
+  trace tables derive from them.
 ---
 
 ## Guidance

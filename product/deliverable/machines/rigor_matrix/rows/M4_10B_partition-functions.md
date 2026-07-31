@@ -18,6 +18,33 @@ legal_tools:
 evidence:
   - name: partitioning
     description: "the clustered function DSM: relation meaning, coupling reasons, clusters"
+major: full
+minor: none
+patch: none
+product: full
+specification: full
+major_note: |
+  Applies in full for the change's cone: the DSM re-clusters where the
+  move lands; untouched clusters inherit. One relation meaning, coupling
+  reasons classified, qualities assigned - the shared partitioning every
+  candidate builds on.
+minor_note: |
+  Does not apply - AND THIS IS MINOR'S TRIPWIRE. The prediction behind
+  the minor column is that new functions land in EXISTING clusters. The
+  moment the DSM wants re-clustering, the prediction failed: STOP,
+  escalate to major, walk M4 in full there. Never silently. STRIKE
+  PROPOSAL - owner adjudicates.
+patch_note: |
+  Does not apply. The function DSM stands untouched. STRIKE PROPOSAL -
+  owner adjudicates.
+product_note: |
+  STANDING ARTIFACT: the clustered function DSM - relation meaning,
+  coupling reasons, quality classes. It is the shared ground every future
+  candidate stands on, so it stays current with the function structure.
+specification_note: |
+  DOCUMENT FORM: the function DSM as a DERIVED FIGURE from the function
+  nodes' edges - clusters visible, coupling reasons on hover or in the
+  legend. One what-to-see line. Never a hand-drawn matrix.
 ---
 
 ## Guidance

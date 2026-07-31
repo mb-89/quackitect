@@ -23,6 +23,33 @@ evidence:
     description: "the morphological chart: rows, options, pruned cells with reasons"
   - name: shortlist
     description: "the seeded combinations, one line each"
+major: full
+minor: none
+patch: none
+product: full
+specification: full
+major_note: |
+  Applies in full: the morphological chart over the re-partitioned
+  functions, options from catalogs, patterns and reference architectures.
+  SEEDS the candidate machine - one parallel compose state per
+  shortlisted combination, exactly as the row draws it. The unchanged
+  part of the baseline enters every candidate as a fixed block.
+minor_note: |
+  Does not apply. No design space opens while the architecture holds; no
+  candidate machine is seeded. STRIKE PROPOSAL - owner adjudicates.
+patch_note: |
+  Does not apply. No design space opens for a behavior fix; no candidate
+  machine is seeded. STRIKE PROPOSAL - owner adjudicates.
+product_note: |
+  STANDING ARTIFACT: the morphological chart with its pruned cells and
+  reasons, and the candidate one-pagers. The design space CONSIDERED is
+  part of the product's record - the rejected roads explain the taken
+  one.
+specification_note: |
+  DOCUMENT FORM: the morphological chart as a table (rows, options,
+  pruned cells greyed with reasons); each shortlisted candidate as a
+  one-pager with its matrices. The design-output chapter links the
+  candidates; only the chart inlines.
 ---
 
 ## Guidance

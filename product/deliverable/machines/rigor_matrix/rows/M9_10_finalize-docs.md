@@ -19,6 +19,33 @@ legal_tools:
 evidence:
   - name: docs
     description: "the emitted set and the match against the surface"
+major: full
+minor: full
+patch: none
+product: full
+specification: full
+major_note: |
+  Applies in full: the book emits and is read against the actual surface.
+  A major is precisely when the documentation earns its keep.
+minor_note: |
+  Applies: the book re-emits at every minor - the accumulated patches
+  ride along - and the emitted set is read against the actual surface.
+patch_note: |
+  Does not apply. The book does not re-emit per patch; the next minor or
+  major emit carries the accumulated patches. The sweep already fixed the
+  teaching surfaces. STRIKE PROPOSAL - owner adjudicates.
+product_note: |
+  STANDING ARTIFACT: THE BOOK - the full documentation, emitted
+  deterministically from the spec sources, published copies byte-equal to
+  a fresh render, nothing orphaned. The product column of this whole
+  matrix is, in the end, what the book must contain.
+specification_note: |
+  DOCUMENT FORM: this row's output IS the document - the book, emitted
+  deterministically: chapters from manifests, order from the toc, tables
+  from queries, figures derived, glossary from used terms, provenance
+  marks throughout, published copies byte-equal (drift law), nothing
+  orphaned (orphan law). Harvest v1's book pipeline as the reference
+  implementation.
 ---
 
 ## Guidance

@@ -26,6 +26,32 @@ evidence:
     description: "the binding excluded-use list exists"
   - name: examples_formulated
     description: "scenario paths and slides identified as the formulated examples"
+major: full
+minor: tailored
+patch: none
+product: full
+specification: tailored
+major_note: |
+  Applies in full, scoped to the change and everything it invalidated:
+  props realized, stories generalized, roles covered, excluded-use list
+  current. The gate's reason is strongest exactly here - system-level
+  writing on a wrong user picture is what a major cannot afford.
+minor_note: |
+  Applies, scoped to the delta: the new needs are realized by stories,
+  the stories sit in use cases, no new role is missed. Requirements
+  written on unblessed stories propagate garbage at every size - the
+  gate holds, only its scope shrinks.
+patch_note: |
+  Does not apply. The user-level picture did not move, so there is nothing
+  for the gate to judge. STRIKE PROPOSAL - owner adjudicates.
+product_note: |
+  The product-level bless of the user picture. Standing obligation: the
+  picture stays blessed - an invalidated story or a new unblessed role
+  reopens this gate through the suspect path.
+specification_note: |
+  DOCUMENT FORM: the gate record, as at every gate - filled form plus
+  bless, rendered into the derived milestone table. No prose chapter of
+  its own.
 ---
 
 ## Guidance

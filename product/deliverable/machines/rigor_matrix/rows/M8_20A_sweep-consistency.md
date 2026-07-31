@@ -20,6 +20,28 @@ legal_tools:
 evidence:
   - name: swept
     description: "the changes and the surfaces updated for each"
+major: full
+minor: full
+patch: full
+product: full
+specification: tailored
+major_note: |
+  FLOOR - never struck. An architecture move touches many teaching
+  surfaces; the sweep is correspondingly wide.
+minor_note: |
+  FLOOR - never struck. Everything the iteration changed is re-documented
+  where it is taught, in full.
+patch_note: |
+  FLOOR - never struck. A fix that changes behavior a document teaches
+  leaves that document lying until the sweep runs. The sweep is scoped to
+  what the patch touched, and it always runs.
+product_note: |
+  FLOOR, standing: every describing surface teaches the current behavior.
+  The product-level check is the book's drift law - same state, same
+  bytes, and what it teaches is what ships.
+specification_note: |
+  DOCUMENT FORM: the swept-surfaces list in the record. The sweep's real
+  output IS the corrected documents themselves.
 ---
 
 ## Guidance

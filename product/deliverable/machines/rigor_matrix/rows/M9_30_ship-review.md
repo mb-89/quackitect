@@ -22,6 +22,32 @@ evidence:
     description: "the dependency list with rulings; new asks answered"
   - name: upstream
     description: "proposals deposited, or none owed"
+major: full
+minor: tailored
+patch: none
+product: full
+specification: tailored
+major_note: |
+  Applies in full: dependency flips displayed, divergences flagged,
+  upstream proposals deposited. Architecture moves shift dependencies
+  more often than any other size.
+minor_note: |
+  Applies where dependencies moved: flips displayed, new asks answered,
+  diverged deps flagged. With no dependency movement the sticky rulings
+  carry it in one line.
+patch_note: |
+  Does not apply. Dependencies did not move for a behavior fix; sticky
+  rulings hold. STRIKE PROPOSAL - owner adjudicates.
+
+  ESCALATE: a patch that bumps a dependency is a minor - the dependency
+  IS a requirement moving.
+product_note: |
+  STANDING ARTIFACT: the dependency rulings - sticky, recorded, honored.
+  At rest every dependency has a ruling; diverged ones are flagged, not
+  hidden.
+specification_note: |
+  DOCUMENT FORM: the dependency ruling list in the ship record; diverged
+  deps flagged in the release notes.
 ---
 
 ## Guidance

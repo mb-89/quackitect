@@ -20,6 +20,31 @@ legal_tools:
 evidence:
   - name: as_is
     description: "where we stand, good and bad, witnesses named"
+major: tailored
+minor: inherit
+patch: none
+product: full
+specification: full
+major_note: |
+  The as-is EXTENDS: the pains the change answers are stated fresh, with
+  witnesses - a major usually exists because the recorded as-is no longer
+  tells the whole story. The untouched baseline inherits by pointer.
+minor_note: |
+  INHERIT the resident baseline; state only the NEW pains the delta
+  answers, one paragraph each, witnesses named. The v2 state-inheritance
+  note already carried this rule - it becomes the default at this size.
+patch_note: |
+  Does not apply. The as-is baseline stands; a patch changes behavior, not
+  the recorded pains. STRIKE PROPOSAL - owner adjudicates.
+product_note: |
+  STANDING ARTIFACT: the as-is baseline - every pain with its witness.
+  The inherit-pointers of minor and major land here, so this document
+  rots first when neglected: a pain that has been answered stays marked
+  answered, with the iteration that answered it.
+specification_note: |
+  DOCUMENT FORM: the motivation chapter's as-is section - one paragraph
+  per pain, witness cited inline. Marked prose. The pains are NODES so
+  the trace can source needs to them; the chapter transcludes them.
 ---
 
 ## Guidance

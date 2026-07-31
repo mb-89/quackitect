@@ -18,6 +18,30 @@ legal_tools:
 evidence:
   - name: criteria
     description: "the vital-few high-weight requirements, each with weight and scoring definition"
+major: full
+minor: none
+patch: none
+product: full
+specification: full
+major_note: |
+  Applies in full - this is major's own territory. The vital few, weighted,
+  each with definition and requirement lineage. Standing criteria are
+  reused where they still measure what matters; the change usually adds
+  one or two of its own.
+minor_note: |
+  Does not apply. Criteria weigh architecture candidates, and none are
+  enumerated at this size. STRIKE PROPOSAL - owner adjudicates.
+patch_note: |
+  Does not apply. Decision criteria exist to weigh architectures; a patch
+  weighs nothing. STRIKE PROPOSAL - owner adjudicates.
+product_note: |
+  STANDING ARTIFACT: the weighted decision criteria with their lineage.
+  They outlive the decision that minted them - the next major reuses and
+  re-weighs them instead of inventing a fresh set.
+specification_note: |
+  DOCUMENT FORM: criteria as a derived table - name, definition,
+  requirement id, weight - in the design-output chapter, feeding the
+  decision records that cite them.
 ---
 
 ## Guidance

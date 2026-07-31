@@ -435,3 +435,12 @@
 {"ts":"2026-07-31T16:23:14.478Z","op":"done","visit":"expeditions/e26@0","node":"d42","brief":"trial view added to the base"}
 {"ts":"2026-07-31T16:23:18.221Z","op":"done","visit":"expeditions/e26@0","node":"d43","brief":"old cell files untouched, nothing lost"}
 {"ts":"2026-07-31T16:24:06.095Z","op":"done","visit":"expeditions/e26@0","node":"d39","brief":"nested lists already survive; scalars are the real need"}
+{"ts":"2026-07-31T16:30:53.202Z","op":"plan","visit":"expeditions/e26@0","parent":null,"nodes":[{"id":"d46","brief":"find every reader of cells/"},{"id":"d47","brief":"write a migration script"},{"id":"d48","brief":"run it and verify"}]}
+{"ts":"2026-07-31T16:31:00.815Z","op":"update","visit":"expeditions/e26@0","node":"d49","brief":"tracing the matrix loader"}
+{"ts":"2026-07-31T16:31:06.213Z","op":"update","visit":"expeditions/e26@0","node":"d50","brief":"reading the loader and the content hash"}
+{"ts":"2026-07-31T16:31:39.625Z","op":"done","visit":"expeditions/e26@0","node":"d46","brief":"only rigor-matrix.ts reads cells/, via a row-column map"}
+{"ts":"2026-07-31T16:31:49.013Z","op":"done","visit":"expeditions/e26@0","node":"d47","brief":"migration script written, idempotent"}
+{"ts":"2026-07-31T16:32:21.764Z","op":"update","visit":"expeditions/e26@0","node":"d51","brief":"loader reads cells from row frontmatter"}
+{"ts":"2026-07-31T16:32:26.366Z","op":"update","visit":"expeditions/e26@0","node":"d52","brief":"testing the loader against the migrated rows"}
+{"ts":"2026-07-31T16:33:16.748Z","op":"update","visit":"expeditions/e26@0","node":"d53","brief":"spot-checking a migrated body before deleting"}
+{"ts":"2026-07-31T16:33:33.766Z","op":"done","visit":"expeditions/e26@0","node":"d48","brief":"49 rows migrated, 261 tests green"}

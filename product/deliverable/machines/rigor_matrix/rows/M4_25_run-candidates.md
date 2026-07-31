@@ -20,6 +20,27 @@ legal_tools:
 evidence:
   - name: candidate_records
     description: "each composed candidate: allocation, interfaces, metrics, rationale - one record per compose state"
+major: full
+minor: none
+patch: none
+product: tailored
+specification: tailored
+major_note: |
+  Applies in full: one compose state per shortlisted combination,
+  parallel; the unchanged baseline enters each as a fixed block; the
+  join hands the composed set to evaluate-set.
+minor_note: |
+  Does not apply - the architecture holds and enumerate-space is struck,
+  so nothing is seeded to run. STRIKE PROPOSAL - owner adjudicates.
+patch_note: |
+  Does not apply - no design space opens for a behavior fix, so nothing
+  is seeded to run. STRIKE PROPOSAL - owner adjudicates.
+product_note: |
+  STANDING ARTIFACT: the composed candidate records the chart's
+  one-pagers are built from.
+specification_note: |
+  DOCUMENT FORM: rides enumerate-space's chapter - the one-pagers are
+  this run's output; no separate section.
 ---
 
 ## Guidance

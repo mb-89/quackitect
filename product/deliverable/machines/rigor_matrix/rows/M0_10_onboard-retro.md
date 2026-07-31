@@ -28,6 +28,32 @@ evidence:
     required: false
   - name: process_stale
     description: "the standing state-of-the-art check on the process itself"
+major: full
+minor: full
+patch: none
+product: full
+specification: tailored
+major_note: |
+  Applies in full: field feedback, inbox drained, call history mined. A
+  major deserves the cleanest possible start.
+minor_note: |
+  Applies. A minor is an iteration, and every iteration opens with the
+  retro: field feedback first, inbox drained, call history mined. The
+  cadence exists exactly for work of this size.
+patch_note: |
+  Does not apply. The retro belongs to the session cadence, not to a patch.
+  A patch rides an open expedition; the retro that covers it is the day's,
+  not its own. STRIKE PROPOSAL - owner adjudicates.
+product_note: |
+  STANDING STATE: the retro cadence itself. At rest the product shows a
+  near-empty notes inbox, a drained backlog with ready-when conditions,
+  and a process that has been checked against the state of the art within
+  living memory. An inbox that only ever grows is this cell failing.
+specification_note: |
+  Leaves no book chapter. The retro's trace is the drained notes and the
+  log; the book does not teach process history. What DOES surface: rules
+  the retro minted land in their guidance homes, which the book's
+  guidance chapter lists.
 ---
 
 ## Guidance

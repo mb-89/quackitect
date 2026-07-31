@@ -25,6 +25,28 @@ evidence:
     description: "the Pareto front with every elimination reasoned"
   - name: feasibility_checked
     description: "rough checks per survivor"
+major: full
+minor: none
+patch: none
+product: full
+specification: tailored
+major_note: |
+  Applies in full: at least two viable candidates or the no-alternatives
+  case argued, complete allocation each, criteria traced, front recorded,
+  feasibility checked. Set-based discipline holds.
+minor_note: |
+  Does not apply. Nothing enumerated, nothing to bless. STRIKE PROPOSAL -
+  owner adjudicates.
+patch_note: |
+  Does not apply. Nothing to bless where nothing was enumerated. STRIKE
+  PROPOSAL - owner adjudicates.
+product_note: |
+  The bless of the front, standing as the record that alternatives were
+  real. Its evidence ages but never expires - it is the proof against
+  decision theater.
+specification_note: |
+  DOCUMENT FORM: the gate record into the derived milestone table, as at
+  every gate.
 ---
 
 ## Guidance

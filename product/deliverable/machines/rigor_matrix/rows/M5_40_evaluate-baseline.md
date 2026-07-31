@@ -20,6 +20,29 @@ evidence:
     description: "each quality scenario with its verdict and carrying decision"
   - name: fitness_candidates
     description: "the measurable scenarios that could automate at M7"
+major: full
+minor: tailored
+patch: none
+product: full
+specification: full
+major_note: |
+  Applies in full: every quality scenario walked through the new
+  matrices, verdicts recorded, fitness candidates named for M7.
+minor_note: |
+  Walk ONLY the quality scenarios the delta touches through the standing
+  matrices; record addressed / at-risk / unaddressed for those. The full
+  walk is not repeated.
+patch_note: |
+  Does not apply. The quality-scenario walk holds as evaluated. STRIKE
+  PROPOSAL - owner adjudicates.
+product_note: |
+  STANDING ARTIFACT: the quality-scenario walk - every scenario with its
+  verdict and carrying decision. The at-risk list is a standing input to
+  rank-unknowns, and the fitness candidates to author-tests.
+specification_note: |
+  DOCUMENT FORM: the quality-scenario walk as a derived table - scenario,
+  verdict, carrying decision - in the architecture chapter, after the
+  figures it judges.
 ---
 
 ## Guidance

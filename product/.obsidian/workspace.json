@@ -11,17 +11,14 @@
             "id": "c07847f318fa619a",
             "type": "leaf",
             "state": {
-              "type": "canvas",
+              "type": "markdown",
               "state": {
-                "file": "deliverable/machines/main.canvas",
-                "viewState": {
-                  "x": -190,
-                  "y": 80,
-                  "zoom": -1.1007804177444105
-                }
+                "file": "deliverable/machines/rigor_matrix/rows/M3_10_write-requirements.md",
+                "mode": "source",
+                "source": false
               },
-              "icon": "lucide-layout-dashboard",
-              "title": "main"
+              "icon": "lucide-file",
+              "title": "M3_10_write-requirements"
             }
           }
         ]
@@ -188,13 +185,15 @@
   },
   "active": "c07847f318fa619a",
   "lastOpenFiles": [
+    "deliverable/machines/rigor_matrix/matrix.base",
+    "deliverable/machines/rigor_matrix/rows/M3_10_write-requirements.md",
+    "deliverable/machines/main.canvas",
     "deliverable/machines/boot.canvas",
     "deliverable/machines/expedition_archive.canvas",
     "deliverable/machines/expeditions.canvas",
     "deliverable/machines/ideation.canvas",
     "deliverable/machines/iteration_archive.canvas",
     "deliverable/machines/iterations.canvas",
-    "deliverable/machines/main.canvas",
     "cards.md",
     "deliverable/machines/matrix/matrix.base",
     "deliverable/machines/matrix/README.md",
@@ -220,7 +219,6 @@
     "deliverable/machines/matrix/rows/M6_10_rank-unknowns.md",
     "deliverable/machines/matrix/rows/M5_90_gate-architecture.md",
     "deliverable/machines/matrix/rows/M5_40_evaluate-baseline.md",
-    "deliverable/machines/matrix/rows/M5_30B_consolidate-baseline.md",
     "spec/expeditions/e21-explore-rebuild-the-mirror-as-a-card-matrix-one-/decisions.jsonl",
     "spec/expeditions/e21-explore-rebuild-the-mirror-as-a-card-matrix-one-",
     "spec/expeditions",
@@ -230,9 +228,7 @@
     "deliverable/machines/retro.canvas",
     "deliverable/tests/threshold.test.ts",
     "deliverable/engine/mirror.ts",
-    "deliverable/node_modules/yaml/dist/schema/tags.d.ts",
     "deliverable/machines/continue_iteration.canvas",
-    "deliverable/machines/continue_expedition.canvas",
-    "deliverable/machines/start_iteration.canvas"
+    "deliverable/machines/continue_expedition.canvas"
   ]
 }

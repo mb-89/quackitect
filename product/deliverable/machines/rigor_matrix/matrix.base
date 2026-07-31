@@ -58,9 +58,12 @@ views:
       - minor
       - major
       - product
+      - evidence
       - specification
       - patch_note
       - minor_note
+    columnSize:
+      note.evidence: 546
   - type: table
     name: The matrix
     filters:

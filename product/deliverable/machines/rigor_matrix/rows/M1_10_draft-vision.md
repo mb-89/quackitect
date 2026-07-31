@@ -26,6 +26,39 @@ evidence:
     description: "goals, conflicts named openly, priority order ruled"
   - name: moore_pitch
     description: "all five slots filled"
+major: tailored
+minor: inherit
+patch: none
+product: full
+specification: full
+major_note: |
+  INHERIT-WITH-JUDGMENT: point to the resident vision and argue in one
+  paragraph whether the change bends it. A major that leaves the vision
+  untouched inherits; one that shifts a goal or a conflict rewrites the
+  affected part of the packet, and only that part.
+minor_note: |
+  INHERIT with a delta note. Point to the resident vision; state in one
+  paragraph how the delta serves it. The axiom is not re-derived.
+
+  ESCALATE: a delta the resident vision cannot absorb reframes the
+  product - that is major at least, and the vision walks in full there.
+patch_note: |
+  Does not apply. The vision is axiomatic and a patch never touches it.
+  STRIKE PROPOSAL - owner adjudicates.
+
+  ESCALATE: a patch that finds itself wanting to reword the vision is not
+  a patch.
+product_note: |
+  STANDING ARTIFACT: the vision packet - big idea, to-be world, goal
+  system, pitch. It is the spec's opening chapter and the axiom every
+  smaller column inherits by pointer. At rest it reads true; the moment
+  it does not, the product owes itself a major.
+specification_note: |
+  DOCUMENT FORM: the book's opening chapter. The big idea and to-be world
+  as marked prose (ai-involvement marks, no unmarked path in); the goal
+  system as a list with conflicts named; the Moore pitch verbatim in its
+  five-slot shape. Harvest v1's M1 template with its fill comments - the
+  comments guide the author and are stripped at render.
 ---
 
 ## Guidance

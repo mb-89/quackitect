@@ -23,6 +23,28 @@ legal_tools:
 evidence:
   - name: findings_fixed
     description: "every finding and its fix, one pass"
+major: full
+minor: full
+patch: full
+product: full
+specification: tailored
+major_note: |
+  Applies as drawn: collect all, one pass, one confirm run, escape when
+  the guard exhausts.
+minor_note: |
+  Applies as drawn: collect all, fix in one pass, one confirm run, escape
+  when the guard exhausts.
+patch_note: |
+  Applies as drawn: collect everything, fix in one pass, one confirm run,
+  escape to a human when the guard exhausts. The loop does not shrink
+  because the change was small.
+product_note: |
+  Standing obligation: findings get fixed in collected passes, never
+  one-at-a-time whack-a-mole; the exhausted guard escapes to a human and
+  that escape is a recorded signal, mined at the retro.
+specification_note: |
+  DOCUMENT FORM: the findings-and-fixes list in the run record. Archive
+  material only.
 ---
 
 ## Guidance

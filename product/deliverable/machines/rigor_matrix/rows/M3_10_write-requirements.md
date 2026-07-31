@@ -9,7 +9,7 @@ minor: full
 major: full
 product: full
 specification: full
-patch_note: |
+patch_note: |-
   CLARIFICATION ONLY, the same law as frame-delta at this size: an unclear
   requirement whose wording produced the wrong output is repaired in place.
   EARS shape and verify_method survive the edit; breaks_if_removed stays.
@@ -18,7 +18,7 @@ patch_note: |
   ESCALATE: a repair that changes what the requirement DEMANDS - not how
   clearly it says it - is a minor. The diff is the tell: a reworded line
   is a patch, a new or deleted line is not.
-minor_note: |
+minor_note: |-
   APPLIES IN FULL for the delta - this row is what a minor IS. Every new
   or changed requirement: EARS shape, its kind, verify_method named,
   breaks_if_removed filled, source_refs to the new stories. No TBD
@@ -54,7 +54,7 @@ evidence:
   - name: register
     description: "the requirement set: EARS, kinds, verify_method and breaks_if_removed on every row"
   - name: set_criteria
-    description: "complete, consistent, affordable, bounded - argued"
+    description: complete, consistent, affordable, bounded - argued
 ---
 
 ## Guidance

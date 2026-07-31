@@ -31,6 +31,31 @@ evidence:
   - name: market_tier
     description: "(market) the real-world checks green - required only when the iteration is declared to market"
     required: false
+major: full
+minor: tailored
+patch: none
+product: full
+specification: tailored
+major_note: |
+  Applies in full: every need's pass lines demonstrated, killers
+  exercised end to end, acceptance scenarios converted, sweep done, gaps
+  logged. The bless is the sign-off.
+minor_note: |
+  The killer holds scoped: the DELTA's pass lines demonstrated, its
+  killer use cases exercised end to end, sweep done, gaps logged. The
+  bless is the acceptance, as ever. The full all-stories walk belongs to
+  product cadence, not to every minor.
+patch_note: |
+  Does not apply. The green battery, the refreshed slide and the sweep
+  carry the validation burden at this size; the owner's look at the leave
+  form is the acceptance. STRIKE PROPOSAL - owner adjudicates.
+product_note: |
+  The product-level acceptance: every need's pass lines demonstrated
+  across all iterations. Standing: the demonstrations are repeatable -
+  the killer demos live as runnable scenarios, not as one-time theater.
+specification_note: |
+  DOCUMENT FORM: the gate record - the bless IS the sign-off, hash-bound,
+  no second artifact. Renders into the derived milestone table.
 ---
 
 ## Guidance
