@@ -1,5 +1,5 @@
-// The rigor matrix: reader + column compiler (engine/matrix.ts).
-// The matrix is read LIVE from machines/matrix (seed-from-source law);
+// The rigor matrix: reader + column compiler (engine/rigor-matrix.ts).
+// It is read LIVE from machines/rigor_matrix (seed-from-source law);
 // compiling a change-size column yields a valid iteration machine with
 // struck states contracted out of the dependency graph.
 import { strict as assert } from "node:assert";
@@ -7,13 +7,13 @@ import { test } from "node:test";
 import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { readMatrix, compileColumn } from "../engine/matrix.ts";
+import { readRigorMatrix, compileColumn } from "../engine/rigor-matrix.ts";
 import { validateMachine } from "../engine/machine.ts";
 
 const ROOT = join(import.meta.dirname, "..", "..", "..");
 
 test("readMatrix: the real matrix is complete", () => {
-  const m = readMatrix(ROOT);
+  const m = readRigorMatrix(ROOT);
   assert.equal(m.rows.length, 50);
   for (const row of m.rows) {
     for (const col of ["patch", "minor", "major", "product", "specification"]) {
@@ -29,20 +29,20 @@ test("readMatrix: the real matrix is complete", () => {
 test("readMatrix: a missing cell refuses with the row and column named", () => {
   const dir = mkdtempSync(join(tmpdir(), "se-matrix-"));
   try {
-    mkdirSync(join(dir, "product", "deliverable", "machines", "matrix", "rows"), { recursive: true });
-    mkdirSync(join(dir, "product", "deliverable", "machines", "matrix", "cells"), { recursive: true });
+    mkdirSync(join(dir, "product", "deliverable", "machines", "rigor_matrix", "rows"), { recursive: true });
+    mkdirSync(join(dir, "product", "deliverable", "machines", "rigor_matrix", "cells"), { recursive: true });
     writeFileSync(
-      join(dir, "product", "deliverable", "machines", "matrix", "rows", "M0_10_lonely.md"),
+      join(dir, "product", "deliverable", "machines", "rigor_matrix", "rows", "M0_10_lonely.md"),
       '---\nkind: matrix-row\nname: lonely\nstatement: "A row with no cells."\nstate_kind: work\nfilled_by: agent\ndepends_on: []\nevidence:\n  - name: proof\n    description: "anything"\n---\n\n## Guidance\nNothing.\n',
     );
-    assert.throws(() => readMatrix(dir), /lonely.*patch/);
+    assert.throws(() => readRigorMatrix(dir), /lonely.*patch/);
   } finally {
     rmSync(dir, { recursive: true, force: true });
   }
 });
 
 test("compileColumn major: every row seeds; the machine validates", () => {
-  const m = readMatrix(ROOT);
+  const m = readRigorMatrix(ROOT);
   const decl = compileColumn(m, "major");
   validateMachine(decl);
   // 50 rows + the mechanical start.
@@ -57,7 +57,7 @@ test("compileColumn major: every row seeds; the machine validates", () => {
 });
 
 test("compileColumn patch: struck states vanish and dependencies contract", () => {
-  const m = readMatrix(ROOT);
+  const m = readRigorMatrix(ROOT);
   const decl = compileColumn(m, "patch");
   validateMachine(decl);
   const ids = new Set(decl.states.map((s) => s.id));
@@ -81,7 +81,7 @@ test("compileColumn patch: struck states vanish and dependencies contract", () =
 });
 
 test("compileColumn: the verification loop compiles as fallback and recovery", () => {
-  const m = readMatrix(ROOT);
+  const m = readRigorMatrix(ROOT);
   for (const col of ["patch", "minor", "major"] as const) {
     const decl = compileColumn(m, col);
     const verification = decl.states.find((s) => s.id === "verification");
@@ -98,7 +98,7 @@ test("compileColumn: the verification loop compiles as fallback and recovery", (
 });
 
 test("compileColumn: a gate's outgoing edges are approvals", () => {
-  const m = readMatrix(ROOT);
+  const m = readRigorMatrix(ROOT);
   const decl = compileColumn(m, "minor");
   const gate = decl.states.find((s) => s.id === "gate-requirements");
   assert.ok(gate);
@@ -107,7 +107,7 @@ test("compileColumn: a gate's outgoing edges are approvals", () => {
 });
 
 test("compileColumn minor: the tailoring strikes exactly the M4-M5 exploration", () => {
-  const m = readMatrix(ROOT);
+  const m = readRigorMatrix(ROOT);
   const decl = compileColumn(m, "minor");
   validateMachine(decl);
   const ids = new Set(decl.states.map((s) => s.id));
@@ -119,7 +119,7 @@ test("compileColumn minor: the tailoring strikes exactly the M4-M5 exploration",
 });
 
 test("the columns are monotone: what a smaller column walks, every larger column walks", () => {
-  const m = readMatrix(ROOT);
+  const m = readRigorMatrix(ROOT);
   const applied = (col: string) =>
     new Set(m.rows.filter((r) => m.cells.get(r.name)?.get(col)?.applies !== "none").map((r) => r.name));
   const patch = applied("patch");
@@ -130,7 +130,7 @@ test("the columns are monotone: what a smaller column walks, every larger column
 });
 
 test("evidence is frontmatter data: every non-terminal row carries fields, killers are flags", () => {
-  const m = readMatrix(ROOT);
+  const m = readRigorMatrix(ROOT);
   for (const row of m.rows) {
     if (row.state_kind === "terminal") continue;
     assert.ok(row.evidence_form.length > 0, `${row.name} carries no evidence fields`);
@@ -146,13 +146,13 @@ test("evidence is frontmatter data: every non-terminal row carries fields, kille
 test("a body evidence section is refused — the frontmatter block is the single truth", () => {
   const dir = mkdtempSync(join(tmpdir(), "se-matrix-"));
   try {
-    mkdirSync(join(dir, "product", "deliverable", "machines", "matrix", "rows"), { recursive: true });
-    mkdirSync(join(dir, "product", "deliverable", "machines", "matrix", "cells"), { recursive: true });
+    mkdirSync(join(dir, "product", "deliverable", "machines", "rigor_matrix", "rows"), { recursive: true });
+    mkdirSync(join(dir, "product", "deliverable", "machines", "rigor_matrix", "cells"), { recursive: true });
     writeFileSync(
-      join(dir, "product", "deliverable", "machines", "matrix", "rows", "M0_10_echo.md"),
+      join(dir, "product", "deliverable", "machines", "rigor_matrix", "rows", "M0_10_echo.md"),
       '---\nkind: matrix-row\nname: echo\nstate_kind: work\nfilled_by: agent\ndepends_on: []\nevidence:\n  - name: proof\n---\n\n## Guidance\nNothing.\n\n## Evidence form\n\n- proof | twice | required\n',
     );
-    assert.throws(() => readMatrix(dir), /single truth/);
+    assert.throws(() => readRigorMatrix(dir), /single truth/);
   } finally {
     rmSync(dir, { recursive: true, force: true });
   }
@@ -161,20 +161,20 @@ test("a body evidence section is refused — the frontmatter block is the single
 test("a non-terminal row without evidence refuses — leaving a state demands evidence", () => {
   const dir = mkdtempSync(join(tmpdir(), "se-matrix-"));
   try {
-    mkdirSync(join(dir, "product", "deliverable", "machines", "matrix", "rows"), { recursive: true });
-    mkdirSync(join(dir, "product", "deliverable", "machines", "matrix", "cells"), { recursive: true });
+    mkdirSync(join(dir, "product", "deliverable", "machines", "rigor_matrix", "rows"), { recursive: true });
+    mkdirSync(join(dir, "product", "deliverable", "machines", "rigor_matrix", "cells"), { recursive: true });
     writeFileSync(
-      join(dir, "product", "deliverable", "machines", "matrix", "rows", "M0_10_bare.md"),
+      join(dir, "product", "deliverable", "machines", "rigor_matrix", "rows", "M0_10_bare.md"),
       '---\nkind: matrix-row\nname: bare\nstate_kind: work\nfilled_by: agent\ndepends_on: []\n---\n\n## Guidance\nNothing.\n',
     );
-    assert.throws(() => readMatrix(dir), /carries no evidence/);
+    assert.throws(() => readRigorMatrix(dir), /carries no evidence/);
   } finally {
     rmSync(dir, { recursive: true, force: true });
   }
 });
 
 test("compileColumn: cell guidance rides the seeded state", () => {
-  const m = readMatrix(ROOT);
+  const m = readRigorMatrix(ROOT);
   const decl = compileColumn(m, "patch");
   const at = decl.states.find((s) => s.id === "author-tests");
   assert.ok(at?.guidance.includes("DELIVERY NEVER SHRINKS"), "the patch cell's tailoring is in the guidance");

@@ -4,7 +4,7 @@
 		"frontmatter":{"reentry":"restart","priority":0.4}
 	},
 	"nodes":[
-		{"id":"n-comment","type":"text","text":"GENERATED AT ENTRY — this machine's states are the OPEN iterations, each standing as its KICKOFF. The bless COMPILES the rest: the engine pins the blessed rigor column from the live matrix, and the walk continues inside it as a generated sub-machine. Seeding is a function (se_seed_iteration: goal + vision + inputs) — a seeded iteration stands here at once. A pending 'needs retro' note gates only the FIRST start of a never-walked iteration. With nothing open, start runs to end. This drawing is the stub that carries the frontmatter.","x":-1100,"y":-340,"width":900,"height":180},
+		{"id":"n-comment","type":"text","text":"GENERATED AT ENTRY — this machine's states are the OPEN iterations, each standing as its KICKOFF. The bless COMPILES the rest: the engine pins the blessed column from the live rigor matrix, and the walk continues inside it as a generated sub-machine. Seeding is a function (se_seed_iteration: goal + vision + inputs) — a seeded iteration stands here at once. A pending 'needs retro' note gates only the FIRST start of a never-walked iteration. With nothing open, start runs to end. This drawing is the stub that carries the frontmatter.","x":-1100,"y":-340,"width":900,"height":180},
 		{
 			"id":"n-start",
 			"type":"file",

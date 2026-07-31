@@ -206,7 +206,7 @@ export class Session {
 
   /** THE MILESTONE REVIEW REPORT (owner rulings 2026-07-30): the one thing
    *  a person reads most, so it is the gate's MECHANICAL demand. The
-   *  scaffold generates from the gate's OWN evidence fields (the matrix,
+   *  scaffold generates from the gate's OWN evidence fields (the rigor matrix,
    *  live) plus v1's field-tested review tail: verify, validate, red_team,
    *  verdict. Prefilled comments never count as content (the prefill law).
    *
@@ -495,7 +495,7 @@ export class Session {
   }
 
   /** THE BLESS PINS (owner verdicts 2026-07-30): leaving an iteration
-   *  kickoff compiles the record's blessed change_size from the LIVE matrix
+   *  kickoff compiles the record's blessed change_size from the LIVE rigor matrix
    *  and pins the machine into the record. No change size, no pass — the
    *  demand is mechanical. An existing same-size pin walks on untouched;
    *  a larger size escalates; pinIteration refuses de-escalation itself. */

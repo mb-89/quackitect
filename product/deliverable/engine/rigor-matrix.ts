@@ -1,6 +1,6 @@
 // The rigor matrix — reader and column compiler (owner design 2026-07-29).
 //
-// The matrix folder (machines/matrix) is the single source: rows are the
+// The folder (machines/rigor_matrix) is the single source: rows are the
 // full-battery steps, cells tailor each step per change size. This module
 // reads it LIVE (seed-from-source: no baked copy exists to drift) and
 // compiles a change-size column into an iteration machine the kernel can
@@ -17,11 +17,11 @@ import { validateMachine, type EdgeDecl, type EvidenceField, type MachineDecl, t
 export const CHANGE_COLUMNS = ["patch", "minor", "major", "product"] as const;
 export const ALL_COLUMNS = [...CHANGE_COLUMNS, "specification"] as const;
 export type ChangeColumn = (typeof CHANGE_COLUMNS)[number];
-export type MatrixColumn = (typeof ALL_COLUMNS)[number];
+export type RigorRigorMatrixColumn = (typeof ALL_COLUMNS)[number];
 
 const APPLIES = new Set(["full", "tailored", "inherit", "none"]);
 
-export interface MatrixRow {
+export interface RigorRigorMatrixRow {
   /** The stable short name — the join key cells and dependencies use. */
   name: string;
   /** The ordering projection: M<gate>_<step><letter>_<title>. */
@@ -44,17 +44,17 @@ export interface MatrixRow {
   evidence_form: EvidenceField[];
 }
 
-export interface MatrixCell {
+export interface RigorRigorMatrixCell {
   row: string;
-  column: MatrixColumn;
+  column: RigorMatrixColumn;
   applies: "full" | "tailored" | "inherit" | "none";
   body: string;
 }
 
-export interface Matrix {
-  rows: MatrixRow[];
+export interface RigorMatrix {
+  rows: RigorMatrixRow[];
   /** row name -> column -> cell */
-  cells: Map<string, Map<string, MatrixCell>>;
+  cells: Map<string, Map<string, RigorMatrixCell>>;
 }
 
 function asList(v: unknown): string[] {
@@ -91,13 +91,13 @@ function parseEvidence(fm: Record<string, unknown>, file: string, body: string):
 }
 
 export function matrixDir(root: string): string {
-  return join(root, "product", "deliverable", "machines", "matrix");
+  return join(root, "product", "deliverable", "machines", "rigor_matrix");
 }
 
 /** The matrix CONTENT hash — a pin records it, so drift between a pinned
  *  machine and the live matrix stays detectable (and silent until asked —
  *  owner verdict 2026-07-30). Data only; the Bases view is presentation. */
-export function matrixContentHash(root: string): string {
+export function rigorMatrixContentHash(root: string): string {
   const dir = matrixDir(root);
   const h = createHash("sha256");
   for (const sub of ["rows", "cells"]) {
@@ -109,17 +109,17 @@ export function matrixContentHash(root: string): string {
   return h.digest("hex").slice(0, 12);
 }
 
-export function readMatrix(root: string): Matrix {
+export function readRigorMatrix(root: string): Matrix {
   const dir = matrixDir(root);
-  const rows: MatrixRow[] = [];
-  const byName = new Map<string, MatrixRow>();
+  const rows: RigorMatrixRow[] = [];
+  const byName = new Map<string, RigorMatrixRow>();
   for (const file of readdirSync(join(dir, "rows")).filter((f) => f.endsWith(".md")).sort()) {
     const note = parseStateNote(readFileSync(join(dir, "rows", file), "utf8"));
     const fm = note.frontmatter;
     const name = typeof fm.name === "string" ? fm.name : "";
     if (!name) throw new Error(`matrix row ${file} declares no name`);
     if (byName.has(name)) throw new Error(`matrix row name ${name} is declared twice (${byName.get(name)?.file} and ${file})`);
-    const row: MatrixRow = {
+    const row: RigorMatrixRow = {
       name,
       file,
       milestone: file.split("_")[0] ?? "",
@@ -147,7 +147,7 @@ export function readMatrix(root: string): Matrix {
       if (!byName.has(d)) throw new Error(`matrix row ${row.name} depends on undeclared row ${d}`);
     }
   }
-  const cells = new Map<string, Map<string, MatrixCell>>();
+  const cells = new Map<string, Map<string, RigorMatrixCell>>();
   for (const file of readdirSync(join(dir, "cells")).filter((f) => f.endsWith(".md")).sort()) {
     const note = parseStateNote(readFileSync(join(dir, "cells", file), "utf8"));
     const fm = note.frontmatter;
@@ -160,7 +160,7 @@ export function readMatrix(root: string): Matrix {
     let per = cells.get(rowName);
     if (!per) cells.set(rowName, (per = new Map()));
     if (per.has(column)) throw new Error(`matrix cell for ${rowName} at ${column} is declared twice`);
-    per.set(column, { row: rowName, column: column as MatrixColumn, applies: applies as MatrixCell["applies"], body: note.body.trim() });
+    per.set(column, { row: rowName, column: column as RigorMatrixColumn, applies: applies as RigorMatrixCell["applies"], body: note.body.trim() });
   }
   // The explicit-N/A law: absence is "not yet written" and refuses loudly.
   for (const row of rows) {
@@ -172,7 +172,7 @@ export function readMatrix(root: string): Matrix {
 }
 
 /** Priority anchors per state kind (the autonomy scale's bands). */
-function priorityOf(row: MatrixRow): number {
+function priorityOf(row: RigorMatrixRow): number {
   if (row.state_kind === "terminal") return 0.01;
   if (row.filled_by === "engine") return 0.01;
   if (row.state_kind === "gate") return 0.6;
