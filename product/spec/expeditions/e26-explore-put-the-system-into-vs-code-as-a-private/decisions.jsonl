@@ -271,3 +271,16 @@
 {"ts":"2026-07-31T08:16:30.772Z","op":"update","visit":"expeditions/e26@0","node":"d147","brief":"finding callers of the entry requirement computation"}
 {"ts":"2026-07-31T08:17:04.406Z","op":"update","visit":"expeditions/e26@0","node":"d148","brief":"one accessor answers what a state demands read, both directions"}
 {"ts":"2026-07-31T08:17:08.288Z","op":"update","visit":"expeditions/e26@0","node":"d149","brief":"verifying the unified reading list changed no behaviour"}
+{"ts":"2026-07-31T08:17:56.230Z","op":"done","visit":"expeditions/e26@0","node":"d120","brief":"pull and read unified with no behaviour change"}
+{"ts":"2026-07-31T08:18:07.397Z","op":"update","visit":"expeditions/e26@0","node":"d150","brief":"counting unpushed commits for the handover"}
+{"ts":"2026-07-31T08:18:25.954Z","op":"update","visit":"expeditions/e26@0","node":"d151","brief":"bringing the handover up to date with the day's work"}
+{"ts":"2026-07-31T08:21:52.320Z","op":"plan","visit":"expeditions/e26@0","parent":null,"nodes":[{"id":"d152","brief":"Move both config files under product"},{"id":"d153","brief":"Repoint the engine and RUNME"},{"id":"d154","brief":"Prove the export and the suite still pass"},{"id":"d155","brief":"Write the folder rule down"}]}
+{"ts":"2026-07-31T08:21:55.858Z","op":"done","visit":"expeditions/e26@0","node":"d152","brief":"both config files now sit beside cards.md"}
+{"ts":"2026-07-31T08:22:07.366Z","op":"update","visit":"expeditions/e26@0","node":"d156","brief":"repointing the engine and RUNME at the new homes"}
+{"ts":"2026-07-31T08:22:29.372Z","op":"update","visit":"expeditions/e26@0","node":"d157","brief":"noting that the mover leaves code references dangling silently"}
+{"ts":"2026-07-31T08:22:36.169Z","op":"done","visit":"expeditions/e26@0","node":"d153","brief":"nine references repointed by hand across four files"}
+{"ts":"2026-07-31T08:22:46.870Z","op":"update","visit":"expeditions/e26@0","node":"d158","brief":"checking the engine finds both files at their new homes"}
+{"ts":"2026-07-31T08:22:57.129Z","op":"update","visit":"expeditions/e26@0","node":"d159","brief":"exporting to prove the rename still lands in the new home"}
+{"ts":"2026-07-31T08:23:06.413Z","op":"update","visit":"expeditions/e26@0","node":"d160","brief":"running the suite after the move"}
+{"ts":"2026-07-31T08:24:15.398Z","op":"update","visit":"expeditions/e26@0","node":"d161","brief":"writing the level rule into software guidance"}
+{"ts":"2026-07-31T08:24:21.014Z","op":"done","visit":"expeditions/e26@0","node":"d155","brief":"the level rule now stands in software guidance"}

@@ -27,7 +27,7 @@ $root = $PSScriptRoot
 
 # THE PRODUCT NAME IS ONE FACT (brand.json at the root). Nothing below spells
 # it out, so an export renames the whole system by writing that one file.
-$brandFile = Join-Path $root "brand.json"
+$brandFile = Join-Path $root "product\brand.json"
 $brand = if (Test-Path $brandFile) { Get-Content $brandFile -Raw | ConvertFrom-Json } else { [pscustomobject]@{ name = "se"; id = "se"; abbr = $null } }
 $P = $brand.name
 $brandId = $brand.id
@@ -127,7 +127,7 @@ if ($exportIx -ge 0) {
     # PowerShell, and JSON.parse refuses the file it produces.
     $utf8NoBom = New-Object System.Text.UTF8Encoding $false
     $brandJson = @{ name = $newName; id = $newId; abbr = $newAbbr.ToUpper() } | ConvertTo-Json
-    [System.IO.File]::WriteAllText((Join-Path $dest "brand.json"), $brandJson, $utf8NoBom)
+    [System.IO.File]::WriteAllText((Join-Path $dest "product\brand.json"), $brandJson, $utf8NoBom)
     # A FRESH FRONT DOOR. This repo's README is about THIS repo - its branch
     # layout, its history - which is noise to whoever receives the copy.
     $readme = @"
@@ -149,8 +149,8 @@ The $($newAbbr.ToUpper()) button in the left bar opens the mirror.
 - product/guidance - the rules the agent is bound by.
 - product/spec - where your own records get written.
 - workspace/ - where the agent runs, fenced in.
-- brand.json - the product name. Change it, and every surface follows.
-- palette.css - every colour. Edit it. No code change, no restart.
+- product/brand.json - the product name. Change it, and every surface follows.
+- product/palette.css - every colour. Edit it. No code change, no restart.
 
 ## Attaching an agent
 
