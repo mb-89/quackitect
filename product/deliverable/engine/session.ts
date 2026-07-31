@@ -42,6 +42,7 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 import { resolveInRoot, seDir } from "./paths.ts";
 import { Decisions, replayFile } from "./decisions.ts";
 import { generateIterationArchive, generateIterations, itFind, itPinRel, itRecordRel, itSeed, markStarted, pinIteration, readItRecord } from "./iterations.ts";
+import { CHANGE_COLUMNS } from "./rigor-matrix.ts";
 import { parseStateNote, section } from "./notes.ts";
 
 /** THE TICK is the machinery — one tool, legal in EVERY state. Without
@@ -509,11 +510,11 @@ export class Session {
       if (existsSync(pinAbs)) return; // blessed in an earlier pass — walk on
       throw new Rejection({
         clause: CLAUSES.CONDITION_UNMET,
-        expected: "a change_size in the iteration record (patch | minor | major) — the bless compiles the column and pins the machine",
+        expected: `a change_size in the iteration record (${CHANGE_COLUMNS.join(" | ")}) — the bless compiles the column and pins the machine`,
         got: "no change_size in the record's frontmatter",
         remedy: {
           tool: "se_file_patch",
-          args: { ops: [{ path: itRecordRel(it.id), old_string: "status:", new_string: "change_size: <patch | minor | major>\nstatus:" }] },
+          args: { ops: [{ path: itRecordRel(it.id), old_string: "status:", new_string: `change_size: <${CHANGE_COLUMNS.join(" | ")}>\nstatus:` }] },
           note: "prefill it from the goal with its reasoning — the person's bless is the tick itself",
         },
         source: "engine/session.ts kickoff",
