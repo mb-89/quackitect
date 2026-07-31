@@ -73,7 +73,6 @@ export function itList(root: string): Iteration[] {
  *  retro note refs). Mints the record on its own branch and worktree —
  *  the iteration stands in the container at once. */
 export function itSeed(root: string, goal: string, vision: string, inputs: string[] = []): Iteration {
-  bustBranchList();
   if (goal.trim() === "" || vision.trim() === "") {
     throw new Rejection({
       clause: CLAUSES.REQUIRED_ARGS,
@@ -91,6 +90,10 @@ export function itSeed(root: string, goal: string, vision: string, inputs: strin
   const path = join(worktreesDir(root), id);
   mkdirSync(worktreesDir(root), { recursive: true });
   git(root, ["worktree", "add", path, "-b", `it/${id}`], "worktree add");
+  // AFTER the branch exists, never before. Busting first only refills the
+  // cache from the old listing, and the new iteration then stays invisible
+  // for the length of the window.
+  bustBranchList();
   const deliverable = join(path, "product", "deliverable");
   if (existsSync(join(deliverable, "package.json")) && !existsSync(join(deliverable, "node_modules"))) {
     spawnSync("npm", ["install", "--no-audit", "--no-fund"], { cwd: deliverable, stdio: "ignore", shell: process.platform === "win32" });
@@ -435,19 +438,31 @@ export function generateIterations(root: string): GeneratedMachine {
   // The kickoff's evidence form is the rigor matrix's OWN gate-kickoff row,
   // read live (seed-from-source). An unreadable rigor matrix never takes the
   // container down — the kickoff then serves without a form.
-  let kickoffEvidence: EvidenceField[] = [];
-  // ITS TOOLS COME FROM THE SAME ROW. The container's kickoff is the matrix's
-  // gate-kickoff standing one machine higher, so it may call exactly what that
+  // THE MATRIX IS READ ONLY IF SOMETHING ACTUALLY STANDS HERE, and it used to
+  // be read on every render regardless. The container wants exactly ONE row
+  // out of fifty rows and two hundred and fifty cells - gate-kickoff, for its
+  // form and its tools - and it wants that only while an iteration is open.
+  // With nothing open this never runs, and the whole read disappears.
+  //
+  // ITS TOOLS COME FROM THAT SAME ROW. The container's kickoff is the matrix's
+  // gate-kickoff standing one machine higher, so it may call exactly what the
   // row declares. Taking the form and leaving the tools behind is what left a
   // seeded iteration unable to read the record it is about to fill in.
-  let kickoffTools: string[] | undefined;
-  try {
-    const kickoffRow = readRigorMatrix(root).rows.find((r) => r.name === "gate-kickoff");
-    kickoffEvidence = kickoffRow?.evidence_form ?? [];
-    kickoffTools = kickoffRow?.legal_tools;
-  } catch {
-    kickoffEvidence = [];
-  }
+  let kickoffRow: { evidence_form: EvidenceField[]; legal_tools?: string[] } | undefined;
+  let kickoffLooked = false;
+  const kickoff = (): { evidence_form: EvidenceField[]; legal_tools?: string[] } | undefined => {
+    if (!kickoffLooked) {
+      kickoffLooked = true;
+      // An unreadable matrix never takes the container down; the kickoff then
+      // serves without a form.
+      try {
+        kickoffRow = readRigorMatrix(root).rows.find((r) => r.name === "gate-kickoff");
+      } catch {
+        kickoffRow = undefined;
+      }
+    }
+    return kickoffRow;
+  };
   type GenNode = CanvasElement & { styleAttributes?: Record<string, unknown> };
   const nodes: GenNode[] = [];
   const edges: CanvasEdge[] = [];
@@ -476,8 +491,8 @@ export function generateIterations(root: string): GeneratedMachine {
       statement: goal,
       guidance:
         "KICKOFF — one brief carries plan and rigor; the owner blesses, and past it the iteration is set. THE CHANGE SIZE IS NOT YOURS TO PICK. You PROPOSE one with your reasoning; the person decides, and their bless is the decision. Seeding never asked for a size and never needed to — every iteration reaches this state the same way, and the size is chosen here or nowhere. The bless SEEDS the rest: the engine compiles the blessed change_size from the live rigor matrix and pins the machine into the record. Goal, vision and inputs live in the record.",
-      evidence_form: kickoffEvidence,
-      ...(kickoffTools !== undefined ? { legal_tools: kickoffTools } : {}),
+      evidence_form: kickoff()?.evidence_form ?? [],
+      ...(kickoff()?.legal_tools !== undefined ? { legal_tools: kickoff()!.legal_tools } : {}),
       priority: 0.6,
       ...(started ? {} : { entry: { no_pending_note: ["needs retro"] } }),
       tags: ["iteration-kickoff"],
