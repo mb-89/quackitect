@@ -349,3 +349,12 @@
 {"ts":"2026-07-31T08:53:19.521Z","op":"update","visit":"expeditions/e26@0","node":"d218","brief":"running the feed tests"}
 {"ts":"2026-07-31T08:53:29.250Z","op":"done","visit":"expeditions/e26@0","node":"d214","brief":"the refusal's wording is now fenced"}
 {"ts":"2026-07-31T08:54:16.386Z","op":"update","visit":"expeditions/e26@0","node":"d219","brief":"committing the clearer refusal"}
+{"ts":"2026-07-31T08:54:21.440Z","op":"update","visit":"expeditions/e26@0","node":"d220","brief":"landing the clearer refusal"}
+{"ts":"2026-07-31T08:54:58.710Z","op":"plan","visit":"expeditions/e26@0","parent":null,"nodes":[{"id":"d221","brief":"Document the three undocumented tick verbs"},{"id":"d222","brief":"Say that reads go out in parallel"},{"id":"d223","brief":"Fix the two other places that omit them"}]}
+{"ts":"2026-07-31T08:55:19.553Z","op":"done","visit":"expeditions/e26@0","node":"d222","brief":"walking.md now says reads go out in parallel"}
+{"ts":"2026-07-31T08:55:27.991Z","op":"update","visit":"expeditions/e26@0","node":"d224","brief":"the agent contract names the route verbs too"}
+{"ts":"2026-07-31T08:55:33.517Z","op":"update","visit":"expeditions/e26@0","node":"d225","brief":"reading the hook text before touching the cage folder"}
+{"ts":"2026-07-31T08:55:46.065Z","op":"done","visit":"expeditions/e26@0","node":"d223","brief":"the boot hook and the contract both name the route verbs"}
+{"ts":"2026-07-31T08:55:52.463Z","op":"done","visit":"expeditions/e26@0","node":"d221","brief":"route, sweep and target documented where agents read"}
+{"ts":"2026-07-31T08:55:56.358Z","op":"update","visit":"expeditions/e26@0","node":"d226","brief":"running the suite after the guidance change"}
+{"ts":"2026-07-31T08:56:44.061Z","op":"update","visit":"expeditions/e26@0","node":"d227","brief":"committing the walk documentation"}

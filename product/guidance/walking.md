@@ -26,6 +26,29 @@ One tool drives everything: `se_tick`. It is legal in every state.
 - `back: <state>`: return to an earlier filled state. Everything downstream
   is superseded; its evidence is invalidated and earned again.
 
+Three more arguments exist and only make sense together — they are how you
+walk a KNOWN way without one round trip per hop:
+
+- `target: <state>`: set the blue line the mirror draws. The session already
+  has one at engine start, pointing at the front desk.
+- `route: <state>`: the way from here to there — every hop, its priority, and
+  what each will ask for. It MOVES NOTHING. Read it to answer every judgment
+  on the way at once, before committing to the walk.
+- `sweep: true` with `to:`: WALK THAT ROUTE IN ONE CALL instead of one tick
+  per hop. It collapses round trips and nothing else — every hop still weighs
+  the slider, proves its reads and runs its scripts, and it stops at the
+  first hop that will not pass, saying which and why.
+
+A WORD OF WARNING ON "SWEEP", because this page uses it three other ways:
+the desk sweeps the machinery before advising, the overhaul sweeps what is
+active, and you sweep the pending notes before building. Those are all the
+ordinary English word. Only `sweep: true` on a tick is the verb.
+
+READ IN PARALLEL. Several `se_file_read` calls go out in ONE message. Boot
+demands seven or eight documents and reading them one after another pays a
+round trip for each. The reads themselves do not collapse and should not —
+proof-of-read is the point — but the WAITING does.
+
 Narration rides the walk (the unified log + the decision graph):
 
 - `update: {...}` on ANY lane call carries a decision-graph op. Ride one
