@@ -196,12 +196,25 @@ export function parseUpdate(v: unknown): DecisionOp {
   // THE RENDER LINT (owner ruling 2026-07-27): the lane refuses what would
   // render weird — mechanically, at the boundary.
   const lintLine = (text: string, what: string): void => {
-    if (/[\r\n]/.test(text)) throw malformed(`${what} carries line breaks — one line only`);
-    if (text.length > 90) throw malformed(`${what} is ${text.length} chars — the feed renders 90; tighten it`);
-    if (text.split(/[,;]/).length >= 3) throw malformed(`${what} chains 3+ separator-joined parts — an unrendered list; use plan {items} or split`);
+    if (/[\r\n]/.test(text)) throw malformed(`${what} carries line breaks — one line only. Got ${JSON.stringify(text)}`);
+    if (text.length > 90) throw malformed(`${what} is ${text.length} chars — the feed renders 90; tighten it. Got ${JSON.stringify(text)}`);
+    // THE LANE'S MOST-HIT REFUSAL. Ten of thirteen update failures in one
+    // day were this one, across two sessions. It refused correctly and named
+    // neither the text nor the parts, so the caller guessed — and guessed
+    // wrong often enough to hit it again on the very next call.
+    //
+    // The parts ARE the remedy, so they are written out. A chain that wanted
+    // to be a list is handed back as that list.
+    const raw = text.split(/[,;]/);
+    if (raw.length >= 3) {
+      const parts = raw.map((p) => p.trim()).filter((p) => p !== "");
+      throw malformed(`${what} chains ${raw.length} separator-joined parts — an unrendered list. Got ${JSON.stringify(text)} — as a plan that is items: [${parts.map((p) => JSON.stringify(p)).join(", ")}]`);
+    }
   };
   if (brief !== undefined) lintLine(brief, "brief");
-  for (const it of items ?? []) lintLine(it, "item");
+  // WHICH item, not just "an item". A five-item plan refused on "item" left
+  // the caller re-reading all five to find the one that tripped.
+  (items ?? []).forEach((it, i) => lintLine(it, `item ${i + 1}`));
   return { op: op as DecisionOp["op"], ...(brief !== undefined ? { brief } : {}), ...(items !== undefined ? { items } : {}), ...(node !== undefined ? { node } : {}), ...(to !== undefined ? { to } : {}) };
 }
 
