@@ -1219,6 +1219,52 @@ async function openCopilotInChat(kickoff, cage) {
   }
 }
 
+/**
+ * Start Claude in the SIDE BAR rather than a terminal.
+ *
+ * The extension's own command id is not documented anywhere we could find,
+ * so this PROBES for it instead of guessing. Whatever it finds is written to
+ * the output channel, which turns an unknown into data we can hard-code once
+ * we have seen a real list.
+ *
+ * The kickoff is the constraint. A terminal launch sends the opening prompt;
+ * a side-bar launch that cannot is a REGRESSION, not an improvement. So this
+ * only claims success when it can pass the prompt, and otherwise reports what
+ * it saw and lets the terminal path run.
+ */
+async function openClaudeInSideBar(kickoff) {
+  const all = await vscode.commands.getCommands(true);
+  const found = all.filter((c) => /claude/i.test(c));
+  if (found.length > 0) trace("claude commands seen: " + found.join(", "));
+
+  // Ordered by how much they do, not by how likely they are: a command that
+  // takes the prompt beats one that only opens the pane.
+  const withPrompt = found.filter((c) => /(run|prompt|query|ask|send|new)/i.test(c));
+  const sideBar = found.filter((c) => /(sidebar|side_bar|sideBar)/i.test(c));
+
+  for (const cmd of withPrompt) {
+    try {
+      await vscode.commands.executeCommand(cmd, kickoff);
+      for (const open of sideBar) {
+        try {
+          await vscode.commands.executeCommand(open);
+          break;
+        } catch {
+          // The pane may already be where the person wants it.
+        }
+      }
+      trace("claude started in the side bar via " + cmd);
+      return true;
+    } catch {
+      // Wrong argument shape, most likely. Try the next candidate.
+    }
+  }
+
+  if (found.length === 0) trace("no claude commands are registered — the extension is absent or inactive");
+  else trace("no claude command accepted the kickoff — staying in the terminal, where the prompt does arrive");
+  return false;
+}
+
 function agentLaunch(root) {
   const cageDir = path.join(root, "workspace", "_cage");
   const kickoff = readFileSync(path.join(cageDir, "kickoff.txt"), "utf8").trim();
@@ -1268,6 +1314,15 @@ async function startAgent() {
           return false;
         }
         progress.report({ message: "Opening terminals and launching agent..." });
+        if (command.host === "claude") {
+          progress.report({ message: "Opening Claude in the side bar..." });
+          if (await openClaudeInSideBar(command.kickoff)) {
+            agentTerm = null;
+            await showLog(false);
+            return true;
+          }
+          progress.report({ message: "Side bar unavailable, falling back to terminal launch..." });
+        }
         if (command.host === "copilot") {
           progress.report({ message: "Opening Copilot Chat and sending kickoff..." });
           const launchedInChat = await openCopilotInChat(command.kickoff, command.cage);

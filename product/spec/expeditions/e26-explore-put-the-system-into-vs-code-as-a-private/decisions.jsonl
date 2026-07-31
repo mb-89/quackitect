@@ -450,3 +450,13 @@
 {"ts":"2026-07-31T16:34:28.470Z","op":"done","visit":"expeditions/e26@0","node":"d55","brief":"README describes the new shape"}
 {"ts":"2026-07-31T16:34:34.332Z","op":"update","visit":"expeditions/e26@0","node":"d58","brief":"final check before landing the migration"}
 {"ts":"2026-07-31T16:35:08.277Z","op":"update","visit":"expeditions/e26@0","node":"d59","brief":"staging the cell removal"}
+{"ts":"2026-07-31T16:35:17.729Z","op":"done","visit":"expeditions/e26@0","node":"d40","brief":"migration complete and tested"}
+{"ts":"2026-07-31T16:36:20.649Z","op":"done","visit":"expeditions/e26@0","node":"d56","brief":"markdown-it plugins render; editing is the hard half"}
+{"ts":"2026-07-31T16:40:47.656Z","op":"plan","visit":"expeditions/e26@0","parent":null,"nodes":[{"id":"d60","brief":"land the matrix migration"},{"id":"d61","brief":"find the extension's agent-start code"},{"id":"d62","brief":"wire Claude to the side bar"}]}
+{"ts":"2026-07-31T16:41:01.565Z","op":"done","visit":"expeditions/e26@0","node":"d60","brief":"matrix migration landed on trunk"}
+{"ts":"2026-07-31T16:41:09.355Z","op":"update","visit":"expeditions/e26@0","node":"d63","brief":"reading startAgent and the Copilot chat path"}
+{"ts":"2026-07-31T16:41:45.233Z","op":"update","visit":"expeditions/e26@0","node":"d64","brief":"claude tries the side bar, terminal stays the fallback"}
+{"ts":"2026-07-31T16:42:05.492Z","op":"done","visit":"expeditions/e26@0","node":"d61","brief":"startAgent read; trace is the log helper"}
+{"ts":"2026-07-31T16:42:10.388Z","op":"update","visit":"expeditions/e26@0","node":"d65","brief":"syntax-checking the extension"}
+{"ts":"2026-07-31T16:42:14.344Z","op":"update","visit":"expeditions/e26@0","node":"d66","brief":"full suite before landing"}
+{"ts":"2026-07-31T16:42:48.664Z","op":"done","visit":"expeditions/e26@0","node":"d62","brief":"side bar wired, terminal keeps the kickoff guarantee"}
