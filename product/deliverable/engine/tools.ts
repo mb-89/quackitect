@@ -16,7 +16,7 @@ import { Toll } from "./toll.ts";
 import { readFileSync } from "node:fs";
 import { fileDelete, fileGlob, fileList, filePatch, fileRead, fileWrite, type PatchOp } from "./files.ts";
 import { LINT_CONFIG, lintProse } from "./lint.ts";
-import { appendNote, backlogNotes, drainNote, pendingNotes, readNotes } from "./inbox.ts";
+import { appendNote, backlogNotes, drainNote, pendingNotes, readNotes, type Priority } from "./inbox.ts";
 import { parseStateNote } from "./notes.ts";
 import { expList, readRecord } from "./worktree.ts";
 import { survey } from "./survey.ts";
@@ -560,15 +560,29 @@ export function coreTools(rootOf: (rel?: string) => string, projectRoot: string,
       name: "se_note",
       title: "se.note",
       description:
-        "Capture a stray — an idea, a bug, a better way — without leaving the state (contract rule 4). Machine-local (.se/notes.jsonl), never committed; joins the mirror's log feed; drained at a retro, later.",
+        "Capture a stray — an idea, a bug, a better way — without leaving the state (contract rule 4). Machine-local (.se/notes.jsonl), never committed; joins the mirror's log feed; drained at a retro, later. CAPTURING IS MEANT TO BE CHEAP: give it a title, judge the priority yourself, and keep walking. Never ask the person what a stray is worth.",
       inputSchema: {
         type: "object",
-        properties: { text: { type: "string" } },
-        required: ["text"],
+        properties: {
+          text: { type: "string", description: "the body — leave it out when the title already says it" },
+          title: { type: "string", description: "one line naming the stray; taken from the first line of text when absent" },
+          priority: { type: "string", enum: ["must", "should", "could"], description: "MoSCoW. YOU judge it, never the person. Defaults to could." },
+        },
       },
       handler: (args) => {
-        refuseProseWall("se_note", "text", String(args.text));
-        return appendNote(seDir(projectRoot), String(args.text), "agent");
+        const title = args.title !== undefined ? String(args.title) : "";
+        const text = args.text !== undefined ? String(args.text) : title;
+        if (text.trim() === "") {
+          throw new Rejection({
+            clause: CLAUSES.REQUIRED_ARGS,
+            expected: "text, or a title standing in for it",
+            got: "neither",
+            remedy: { tool: "se_note", args: { title: "<one line>", priority: "could" }, note: "a title alone is a legal note — the body is what you add when one line is not enough" },
+            source: "engine/tools.ts se_note",
+          });
+        }
+        refuseProseWall("se_note", "text", text);
+        return appendNote(seDir(projectRoot), text, "agent", title, args.priority as Priority | undefined);
       },
     },
     {
@@ -687,11 +701,11 @@ export function coreTools(rootOf: (rel?: string) => string, projectRoot: string,
       name: "se_survey",
       title: "se.survey",
       description:
-        "WHAT STANDS OPEN — one mechanical call: open expeditions, open iterations, pending notes, and parked backlog items with their ready-when. The front desk and the retro open with it. The person asks the same question in the mirror, from the machine's header.",
+        "WHAT STANDS OPEN — one mechanical call: open expeditions, open iterations, pending notes, and parked backlog items with their ready-when. Everything that can be up is here, so there is only ever ONE inbox to understand. Notes and backlog list as title plus MoSCoW priority, highest first; read any one in full with se_log_query {ref}. The front desk and the retro open with it. The person asks the same question in the mirror, from the machine's header.",
       inputSchema: {
         type: "object",
         properties: {
-          detail: { type: "string", enum: ["full", "brief"], description: "brief gives each note's opening PARAGRAPH instead of its whole text — for scanning a large inbox. Default full." },
+          detail: { type: "string", enum: ["full", "brief"], description: "full adds every note's whole body. The default lists title and priority only." },
           limit: { type: "number", description: "window the notes list; counts stay complete and the result says what remains" },
           offset: { type: "number", description: "how many notes to skip — 0 is the oldest" },
         },

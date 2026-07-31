@@ -15,3 +15,22 @@
 {"ts":"2026-07-31T15:00:18.175Z","op":"update","visit":"expeditions/e17@0","node":"d32","brief":"committed the pivot so the sync can run"}
 {"ts":"2026-07-31T15:00:21.467Z","op":"update","visit":"expeditions/e17@0","node":"d33","brief":"pulling trunk into the e17 worktree"}
 {"ts":"2026-07-31T15:00:25.379Z","op":"update","visit":"expeditions/e17@0","node":"d34","brief":"one file still dirty after the commit"}
+{"ts":"2026-07-31T15:00:56.814Z","op":"done","visit":"expeditions/e17@0","node":"d27","brief":"worktree current: 261 commits merged in"}
+{"ts":"2026-07-31T15:01:06.956Z","op":"update","visit":"expeditions/e17@0","node":"d35","brief":"reading the note record and its inbox helpers"}
+{"ts":"2026-07-31T15:02:46.918Z","op":"update","visit":"expeditions/e17@0","node":"d36","brief":"note record gains title and MoSCoW priority"}
+{"ts":"2026-07-31T15:03:18.563Z","op":"done","visit":"expeditions/e17@0","node":"d28","brief":"the fabricated ruling comment is gone"}
+{"ts":"2026-07-31T15:03:48.353Z","op":"done","visit":"expeditions/e17@0","node":"d29","brief":"se_note takes a title and a priority"}
+{"ts":"2026-07-31T15:03:56.315Z","op":"update","visit":"expeditions/e17@0","node":"d37","brief":"running preflight and the suite against the change"}
+{"ts":"2026-07-31T15:06:10.607Z","op":"update","visit":"expeditions/e17@0","node":"d38","brief":"tests follow the new contract, keeping the mid-word guard"}
+{"ts":"2026-07-31T15:06:30.848Z","op":"update","visit":"expeditions/e17@0","node":"d39","brief":"added tests for titles, sorting and title-only notes"}
+{"ts":"2026-07-31T15:06:33.796Z","op":"update","visit":"expeditions/e17@0","node":"d40","brief":"re-running the suite"}
+{"ts":"2026-07-31T15:07:33.539Z","op":"update","visit":"expeditions/e17@0","node":"d41","brief":"checking whether the two failures touch anything I changed"}
+{"ts":"2026-07-31T15:08:22.111Z","op":"done","visit":"expeditions/e17@0","node":"d31","brief":"the possible Obsidian exit is captured as a note"}
+{"ts":"2026-07-31T15:09:05.065Z","op":"update","visit":"expeditions/e17@0","node":"d42","brief":"report says what was actually built"}
+{"ts":"2026-07-31T15:09:14.556Z","op":"done","visit":"expeditions/e17@0","node":"d30","brief":"survey rebuilt, tests green except two env failures"}
+{"ts":"2026-07-31T15:10:20.313Z","op":"update","visit":"expeditions/e17@0","node":"d43","brief":"answered the chat surface question, routed to e26"}
+{"ts":"2026-07-31T15:12:11.967Z","op":"plan","visit":"expeditions/e17@0","parent":null,"nodes":[{"id":"d44","brief":"uncomment the report prefills on the owner's word"},{"id":"d45","brief":"close e17"},{"id":"d46","brief":"walk back to the front desk"}]}
+{"ts":"2026-07-31T15:12:39.009Z","op":"done","visit":"expeditions/e17@0","node":"d44","brief":"report filled and two stale claims corrected"}
+{"ts":"2026-07-31T15:12:43.965Z","op":"update","visit":"expeditions/e17@0","node":"d47","brief":"drawing the way out before walking it"}
+{"ts":"2026-07-31T15:15:43.103Z","op":"update","visit":"expeditions/e17@1","node":"d55","brief":"listing everything uncommitted before staging"}
+{"ts":"2026-07-31T15:15:48.193Z","op":"update","visit":"expeditions/e17@1","node":"d56","brief":"staging all nine"}

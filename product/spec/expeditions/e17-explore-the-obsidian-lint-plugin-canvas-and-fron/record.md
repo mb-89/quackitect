@@ -36,8 +36,13 @@ So the diagnostics idea is not cancelled. Its home is.
 
 ### What was built here
 
-Nothing. HEAD is the opening commit. There is no work to carry and no code to
-land, so closing costs nothing.
+Nothing toward the Obsidian goal. HEAD was the opening commit when this was
+entered, so the pivot cost nothing to make.
+
+The session's OWN work then landed here on the owner's word, rather than in a
+second record: the survey rebuilt around note titles and MoSCoW priorities.
+The report carries it. The goal above no longer describes the contents, and
+the owner waived that deliberately.
 
 ### Where the thinking went instead
 

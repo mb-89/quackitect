@@ -1,15 +1,17 @@
-// The survey answers in full, and can still be walked when full is too much.
+// The survey LISTS what stands open, and can still be walked when the list
+// is long.
 //
-// Answering in full was the right ruling and was not enough on its own: at
-// 43 pending notes the whole survey ran past the token ceiling and landed
-// outside the project root, where the lane could not read it back.
+// Answering in full was never enough on its own: at 43 pending notes the
+// whole survey ran past the token ceiling and landed outside the project
+// root, where the lane could not read it back. A listing carries a title and
+// a priority; the body is one se_log_query {ref} away.
 import { strict as assert } from "node:assert";
 import { test } from "node:test";
 import { bootedServer, call, freshRoot, gitInit } from "./helpers.ts";
 
 interface Survey {
   counts: { notes: number };
-  notes: { ref: string; text: string }[];
+  notes: { ref: string; title: string; priority: string; text?: string }[];
   notes_window?: { offset: number; shown: number; remaining: number };
 }
 
@@ -46,17 +48,42 @@ test("se_survey windows its notes, and the counts stay whole", async () => {
   assert.equal(past.notes_window?.remaining, 0);
 });
 
-test("se_survey brief gives the opening PARAGRAPH, never a cut-off line", async () => {
+test("se_survey lists title and priority; the body rides only on detail: full", async () => {
   const server = await withNotes(2);
-  const full = (await call(server, "se_survey", {})).body as unknown as Survey;
-  assert.match(full.notes[0].text, /substance lives down here/, "full means full");
+  const listed = (await call(server, "se_survey", {})).body as unknown as Survey;
+  assert.match(listed.notes[0].title, /the heading line\./, "an untitled note is listed by its first line");
+  assert.equal(listed.notes[0].text, undefined, "and the body stays out of the listing");
+  assert.equal(listed.notes[0].priority, "could", "an unmarked stray is a could");
 
-  const brief = (await call(server, "se_survey", { detail: "brief" })).body as unknown as Survey;
-  assert.match(brief.notes[0].text, /the heading line\./, "the whole opening paragraph survives");
-  assert.doesNotMatch(brief.notes[0].text, /substance lives down here/, "later paragraphs do not");
-  // The old defect was a 120-character slice that cut mid-word. A paragraph
-  // ends where the author ended it.
-  assert.ok(!brief.notes[0].text.endsWith("…") && !brief.notes[0].text.endsWith("..."), "nothing is elided");
+  const full = (await call(server, "se_survey", { detail: "full" })).body as unknown as Survey;
+  assert.match(String(full.notes[0].text), /substance lives down here/, "full still means full");
+});
+
+test("a note carries its own title and priority, and the listing sorts by it", async () => {
+  const root = freshRoot();
+  gitInit(root);
+  const server = await bootedServer(root);
+  await call(server, "se_note", { title: "a could", text: "body", priority: "could" });
+  await call(server, "se_note", { title: "a must", text: "body", priority: "must" });
+  await call(server, "se_note", { title: "a should", text: "body", priority: "should" });
+
+  const listed = (await call(server, "se_survey", {})).body as unknown as Survey;
+  assert.deepEqual(listed.notes.map((n) => n.priority), ["must", "should", "could"], "highest first");
+  assert.deepEqual(listed.notes.map((n) => n.title), ["a must", "a should", "a could"], "the author's title, not a derived one");
+});
+
+test("a title alone is a legal note, and an empty call still refuses", async () => {
+  const root = freshRoot();
+  gitInit(root);
+  const server = await bootedServer(root);
+  const made = await call(server, "se_note", { title: "the title says it all" });
+  assert.equal(made.isError, false, JSON.stringify(made.body));
+
+  const listed = (await call(server, "se_survey", {})).body as unknown as Survey;
+  assert.equal(listed.notes[0].title, "the title says it all");
+
+  const empty = await call(server, "se_note", {});
+  assert.equal(empty.isError, true, "neither text nor title is not a note");
 });
 
 test("se_log_query answers for a note ref, so a reference can be followed", async () => {
