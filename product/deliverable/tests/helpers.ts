@@ -58,7 +58,10 @@ process.env.SE_RELOAD_DRY = "1";
 // engine module produces a different name and a fresh build. A stale
 // template cannot be used, because it cannot be found.
 const BORROWED = [join("product", "deliverable", "engine")];
-const COPIED = [join("product", "deliverable", "machines"), "product/guidance".replace("/", sep)];
+// A test root should look like a real product, or the checks it runs are
+// checking something else. brand.json and palette.css are what a product IS
+// configured by, and preflight now demands both.
+const COPIED = [join("product", "deliverable", "machines"), "product/guidance".replace("/", sep), join("product", "brand.json"), join("product", "palette.css")];
 // A linked engine resolves its imports from where it REALLY lives, which
 // is the template — so the yaml package has to sit above it THERE. Copied
 // into the template once, instead of into every case.

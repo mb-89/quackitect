@@ -296,3 +296,11 @@
 {"ts":"2026-07-31T08:27:36.689Z","op":"update","visit":"expeditions/e26@0","node":"d170","brief":"making the assertion line-ending agnostic"}
 {"ts":"2026-07-31T08:27:39.430Z","op":"update","visit":"expeditions/e26@0","node":"d171","brief":"re-running the suite"}
 {"ts":"2026-07-31T08:28:24.298Z","op":"done","visit":"expeditions/e26@0","node":"d164","brief":"239 green; the conflict lane is fenced"}
+{"ts":"2026-07-31T08:28:28.318Z","op":"update","visit":"expeditions/e26@0","node":"d172","brief":"landing the conflict lane on v3"}
+{"ts":"2026-07-31T08:28:45.798Z","op":"update","visit":"expeditions/e26@0","node":"d173","brief":"handover carries the day's later work and the incoming merge"}
+{"ts":"2026-07-31T08:28:58.513Z","op":"update","visit":"expeditions/e26@0","node":"d174","brief":"counting what waits to be pushed"}
+{"ts":"2026-07-31T08:33:57.011Z","op":"plan","visit":"expeditions/e26@0","parent":null,"nodes":[{"id":"d175","brief":"Make preflight guard the product configuration"},{"id":"d176","brief":"Give test roots a name and a palette"},{"id":"d177","brief":"Prove the guard fires"}]}
+{"ts":"2026-07-31T08:34:02.238Z","op":"done","visit":"expeditions/e26@0","node":"d175","brief":"preflight now names a missing brand or palette"}
+{"ts":"2026-07-31T08:34:15.457Z","op":"update","visit":"expeditions/e26@0","node":"d178","brief":"hiding each config file to see the guard fire"}
+{"ts":"2026-07-31T08:34:27.328Z","op":"done","visit":"expeditions/e26@0","node":"d177","brief":"guard proven red on each file and green restored"}
+{"ts":"2026-07-31T08:35:14.659Z","op":"done","visit":"expeditions/e26@0","node":"d176","brief":"test roots now carry a name and a palette"}
