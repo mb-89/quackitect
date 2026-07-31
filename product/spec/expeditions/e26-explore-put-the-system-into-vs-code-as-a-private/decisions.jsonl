@@ -142,3 +142,26 @@
 {"ts":"2026-07-30T20:16:48.911Z","op":"done","visit":"expeditions/e26@0","node":"d20","brief":"The extension parses again and is reinstalled"}
 {"ts":"2026-07-30T20:17:18.407Z","op":"update","visit":"expeditions/e26@0","node":"d22","brief":"Guard proven: green when good, red on the reintroduced fault"}
 {"ts":"2026-07-30T20:18:07.743Z","op":"done","visit":"expeditions/e26@0","node":"d21","brief":"Preflight parses the shell and boot now catches it"}
+{"ts":"2026-07-31T07:36:11.260Z","op":"plan","visit":"expeditions/e26@0","parent":null,"nodes":[{"id":"d23","brief":"Map what a fresh folder needs"},{"id":"d24","brief":"Name what must never travel"},{"id":"d25","brief":"Write the export command"},{"id":"d26","brief":"Prove the copy boots green"},{"id":"d27","brief":"Document the path for a stranger"}]}
+{"ts":"2026-07-31T07:36:27.014Z","op":"update","visit":"expeditions/e26@0","node":"d28","brief":"reading what git already refuses to track"}
+{"ts":"2026-07-31T07:36:37.268Z","op":"update","visit":"expeditions/e26@0","node":"d29","brief":"breaking the tracked tree down by area"}
+{"ts":"2026-07-31T07:36:42.878Z","op":"update","visit":"expeditions/e26@0","node":"d30","brief":"locating where expedition records live in the tree"}
+{"ts":"2026-07-31T07:36:53.126Z","op":"update","visit":"expeditions/e26@0","node":"d31","brief":"breaking down the deliverable and hunting the records dir"}
+{"ts":"2026-07-31T07:37:08.461Z","op":"update","visit":"expeditions/e26@0","node":"d32","brief":"confirming the lane's working tree and the spec contents"}
+{"ts":"2026-07-31T07:37:38.333Z","op":"done","visit":"expeditions/e26@0","node":"d23","brief":"tracked tree is the system; records sit in product/spec/expeditions"}
+{"ts":"2026-07-31T07:37:45.503Z","op":"update","visit":"expeditions/e26@0","node":"d33","brief":"checking whether RUNME itself creates the git repo"}
+{"ts":"2026-07-31T07:37:53.268Z","op":"update","visit":"expeditions/e26@0","node":"d34","brief":"reading the export path RUNME already carries"}
+{"ts":"2026-07-31T07:38:09.808Z","op":"done","visit":"expeditions/e26@0","node":"d24","brief":"RUNME's export already names every exclusion"}
+{"ts":"2026-07-31T07:38:34.163Z","op":"obsolete","visit":"expeditions/e26@0","node":"d25","brief":"the export exists in RUNME; proving it replaces writing it"}
+{"ts":"2026-07-31T07:38:58.220Z","op":"update","visit":"expeditions/e26@0","node":"d35","brief":"verifying the exported copy carries no history or records"}
+{"ts":"2026-07-31T07:40:43.085Z","op":"update","visit":"expeditions/e26@0","node":"d36","brief":"diffing the export against the source index for stowaways"}
+{"ts":"2026-07-31T07:40:57.737Z","op":"update","visit":"expeditions/e26@0","node":"d37","brief":"checking for ignored stowaways and old-name leaks on disk"}
+{"ts":"2026-07-31T07:41:14.943Z","op":"update","visit":"expeditions/e26@0","node":"d38","brief":"installing engine dependencies inside the exported copy"}
+{"ts":"2026-07-31T07:41:27.595Z","op":"update","visit":"expeditions/e26@0","node":"d39","brief":"running preflight and smoke inside the exported copy"}
+{"ts":"2026-07-31T07:41:39.476Z","op":"update","visit":"expeditions/e26@0","node":"d40","brief":"running the full suite inside the exported copy"}
+{"ts":"2026-07-31T07:42:11.617Z","op":"update","visit":"expeditions/e26@0","node":"d41","brief":"checking whether the export is documented in the front door"}
+{"ts":"2026-07-31T07:42:16.228Z","op":"update","visit":"expeditions/e26@0","node":"d42","brief":"reading the front door to place the export section"}
+{"ts":"2026-07-31T07:42:30.129Z","op":"update","visit":"expeditions/e26@0","node":"d43","brief":"collecting the suite result from the exported copy"}
+{"ts":"2026-07-31T07:42:46.994Z","op":"done","visit":"expeditions/e26@0","node":"d26","brief":"exported copy runs 237/237 green with preflight and smoke"}
+{"ts":"2026-07-31T07:42:55.400Z","op":"update","visit":"expeditions/e26@0","node":"d44","brief":"checking whether RUNME prints a usage listing the export"}
+{"ts":"2026-07-31T07:43:18.767Z","op":"update","visit":"expeditions/e26@0","node":"d45","brief":"staging the README export section"}
