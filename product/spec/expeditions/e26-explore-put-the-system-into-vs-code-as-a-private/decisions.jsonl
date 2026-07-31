@@ -376,3 +376,19 @@
 {"ts":"2026-07-31T09:05:15.603Z","op":"update","visit":"expeditions/e26@0","node":"d242","brief":"the palette fallback stops being a second copy"}
 {"ts":"2026-07-31T09:05:23.787Z","op":"update","visit":"expeditions/e26@0","node":"d243","brief":"running the suite after trimming the fallback"}
 {"ts":"2026-07-31T09:06:46.953Z","op":"update","visit":"expeditions/e26@0","node":"d244","brief":"committing the fallback trim"}
+{"ts":"2026-07-31T09:07:07.097Z","op":"update","visit":"expeditions/e26@0","node":"d245","brief":"landing the fallback trim"}
+{"ts":"2026-07-31T09:08:00.736Z","op":"update","visit":"expeditions/e26@0","node":"d246","brief":"recording what the sweep closed and what was already done"}
+{"ts":"2026-07-31T09:08:19.387Z","op":"update","visit":"expeditions/e26@0","node":"d247","brief":"handover carries the set read and the sweep finding"}
+{"ts":"2026-07-31T09:08:25.347Z","op":"update","visit":"expeditions/e26@0","node":"d248","brief":"counting what waits to be pushed"}
+{"ts":"2026-07-31T09:09:23.019Z","op":"update","visit":"expeditions/e26@0","node":"d249","brief":"pausing e26 to walk the retro"}
+{"ts":"2026-07-31T09:09:29.365Z","op":"update","visit":"expeditions/e26@0","node":"d250","brief":"re-reading the root guidance for fresh hashes"}
+{"ts":"2026-07-31T09:09:34.646Z","op":"update","visit":"expeditions/e26@0","node":"d251","brief":"re-reading software guidance after today's edit"}
+{"ts":"2026-07-31T09:09:40.166Z","op":"update","visit":"expeditions/e26@0","node":"d252","brief":"re-reading walking after today's edit"}
+{"ts":"2026-07-31T09:09:44.593Z","op":"update","visit":"expeditions/e26@0","node":"d253","brief":"reading the retro method before entering it"}
+{"ts":"2026-07-31T09:10:00.136Z","op":"update","visit":"expeditions/e26@0","node":"d254","brief":"checking nothing still fills a visited state"}
+{"ts":"2026-07-31T09:10:16.721Z","op":"update","visit":"expeditions/e26@0","node":"d255","brief":"rendering a walked machine to inspect the drawn classes"}
+{"ts":"2026-07-31T09:10:37.932Z","op":"update","visit":"expeditions/e26@0","node":"d256","brief":"writing a throwaway render probe"}
+{"ts":"2026-07-31T09:10:43.826Z","op":"update","visit":"expeditions/e26@0","node":"d257","brief":"running the render probe"}
+{"ts":"2026-07-31T09:11:01.683Z","op":"update","visit":"expeditions/e26@0","node":"d258","brief":"checking the root checkout the extension actually runs"}
+{"ts":"2026-07-31T09:11:21.623Z","op":"update","visit":"expeditions/e26@0","node":"d259","brief":"pausing e26 to walk the retro"}
+{"ts":"2026-07-31T15:41:35.144Z","op":"update","visit":"expeditions/e26@0","node":"d8","brief":"checking what stands uncommitted in e26"}
