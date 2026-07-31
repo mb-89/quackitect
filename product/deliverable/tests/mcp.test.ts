@@ -32,6 +32,19 @@ test("initialize and tools/list serve the full lane", async () => {
   }
 });
 
+// A RELOAD CAN CHANGE BEHAVIOUR BUT NOT SURFACE, unless the client is told.
+// se_git_land and se_git_sync were built, landed and reloaded onto, and the
+// agent still could not call them: the client had cached tools/list at
+// connect time and nothing asked it to look again. Declaring listChanged is
+// the half of the fix that lives in the server; the shim sends the
+// notification after it respawns the engine.
+test("the server declares listChanged, so a reload can add a tool", async () => {
+  const server = buildServer(fresh());
+  const init = await server.handle({ jsonrpc: "2.0", id: 1, method: "initialize", params: {} });
+  const caps = (init?.result as { capabilities: { tools?: { listChanged?: boolean } } }).capabilities;
+  assert.equal(caps.tools?.listChanged, true, "without this a client may ignore the notification");
+});
+
 test("required args enforced at dispatch (R8) — missing arg refused with remedy", async () => {
   const server = await bootedServer(fresh());
   // se_answer is the example because both its fields are genuinely required.

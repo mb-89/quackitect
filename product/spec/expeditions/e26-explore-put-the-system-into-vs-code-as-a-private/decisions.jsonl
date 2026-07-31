@@ -392,3 +392,8 @@
 {"ts":"2026-07-31T09:11:01.683Z","op":"update","visit":"expeditions/e26@0","node":"d258","brief":"checking the root checkout the extension actually runs"}
 {"ts":"2026-07-31T09:11:21.623Z","op":"update","visit":"expeditions/e26@0","node":"d259","brief":"pausing e26 to walk the retro"}
 {"ts":"2026-07-31T15:41:35.144Z","op":"update","visit":"expeditions/e26@0","node":"d8","brief":"checking what stands uncommitted in e26"}
+{"ts":"2026-07-31T15:41:49.961Z","op":"update","visit":"expeditions/e26@0","node":"d9","brief":"reading the reload note in full"}
+{"ts":"2026-07-31T15:42:57.035Z","op":"update","visit":"expeditions/e26@0","node":"d10","brief":"capability declared and the shim notifies on reload"}
+{"ts":"2026-07-31T15:43:15.789Z","op":"update","visit":"expeditions/e26@0","node":"d11","brief":"test guards the capability declaration"}
+{"ts":"2026-07-31T15:43:20.125Z","op":"update","visit":"expeditions/e26@0","node":"d12","brief":"running the suite on the reload fix"}
+{"ts":"2026-07-31T15:44:11.734Z","op":"done","visit":"front_desk@0","node":"d4","brief":"reload notifies the client, 261 tests green"}

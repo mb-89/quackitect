@@ -111,7 +111,11 @@ export class McpServer {
         case "initialize":
           return this.ok(id, {
             protocolVersion: PROTOCOL_VERSION,
-            capabilities: { tools: {} },
+            // listChanged is what lets a RELOAD add a tool. Without it a
+            // client may ignore the notification and keep the tool list it
+            // cached at connect time, so a newly built tool stays invisible
+            // until the session restarts.
+            capabilities: { tools: { listChanged: true } },
             serverInfo: this.serverInfo,
           });
         case "ping":

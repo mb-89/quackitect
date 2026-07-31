@@ -283,6 +283,13 @@ if (argv.includes("--child") || process.env.SE_HOT_DISABLE === "1") {
   const sessionToken = `${process.pid}-${Date.now().toString(36)}`;
   const pending = new Set<number | string>();
 
+  /** Tell the client its tool list is stale. The shim owns the standing
+   *  connection, so it is the only side that can say so — the child that
+   *  knew about the change has already exited by now. */
+  const notifyToolListChanged = (): void => {
+    process.stdout.write(JSON.stringify({ jsonrpc: "2.0", method: "notifications/tools/list_changed" }) + "\n");
+  };
+
   const ensureChild = (): ChildProcess => {
     if (child === null) {
       const c = spawn(process.execPath, [join(binDir, "se-mcp.ts"), ...process.argv.slice(2), "--child"], {
@@ -297,7 +304,15 @@ if (argv.includes("--child") || process.env.SE_HOT_DISABLE === "1") {
           // se_reload: respawn EAGERLY so the mirror is back before the
           // next request or F5.
           process.stderr.write("se-mcp: reload ordered — respawning the engine on the current sources\n");
-          setTimeout(() => void ensureChild(), 100);
+          setTimeout(() => {
+            void ensureChild();
+            // A reload changes BEHAVIOUR immediately, because the client
+            // already holds the schema. It cannot change the SURFACE: the
+            // client cached tools/list at connect time, and only this
+            // notification asks it to look again. Without it a tool built
+            // and landed mid-session stays invisible until a restart.
+            notifyToolListChanged();
+          }, 100);
         } else if (code === 0) {
           // Deliberate exit = SESSION OVER (the machine reached end).
           setTimeout(() => process.exit(0), 200);
