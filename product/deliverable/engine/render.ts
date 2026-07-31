@@ -414,9 +414,10 @@ export const SHUTDOWN_LEVELS = [
 const ELEMENTS = '<script type="module" src="/vendor/vscode-elements.js"></script>';
 
 // THE PALETTE IS CONFIGURATION, NEVER CODE (owner ruling 2026-07-30). Every
-// colour the product chooses lives in palette.css at the project root, where
-// a person edits it without touching code. It is read on EVERY render, so an
-// edit shows on the next page load and the engine never restarts for a colour.
+// colour the product chooses lives in product/palette.css, beside the other
+// product configuration, where a person edits it without touching code. It is
+// read on EVERY render, so an edit shows on the next page load and the engine
+// never restarts for a colour.
 //
 // The fallback is a safety net for a tree that lost the file, nothing more.
 // palette.css is the truth, and preflight says so when it is gone.
@@ -425,7 +426,7 @@ const PALETTE_FALLBACK =
 
 export function palette(root: string): string {
   try {
-    return readFileSync(join(root, "palette.css"), "utf8");
+    return readFileSync(join(root, "product", "palette.css"), "utf8");
   } catch {
     return PALETTE_FALLBACK;
   }

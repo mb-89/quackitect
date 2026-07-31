@@ -13,7 +13,7 @@ function arg(name: string): string | undefined {
 if (process.argv.includes("--help")) {
   process.stdout.write(`brand — fill the product name into an installed extension copy.
 
-  --root  the project root (holds brand.json). Default: the current directory.
+  --root  the project root (holds product/brand.json). Default: the current directory.
   --dest  the copied extension folder to render in place. Required.
 
 Prints the name it rendered, so a launch log says which product started.

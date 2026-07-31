@@ -1,4 +1,4 @@
-// THE PRODUCT NAME IS ONE FACT. It lives in brand.json at the project root
+// THE PRODUCT NAME IS ONE FACT. It lives in product/brand.json, beside the
 // and nothing else spells it out. Every surface a person reads carries a
 // placeholder instead, and this module fills it in.
 //
@@ -27,7 +27,7 @@ export interface Brand {
 const FALLBACK: Brand = { name: "se", id: "se", abbr: null };
 
 export function brandPath(root: string): string {
-  return join(root, "brand.json");
+  return join(root, "product", "brand.json");
 }
 
 /** Read live (owner ruling 2026-07-29): a running system holding a stale copy
