@@ -1225,6 +1225,9 @@ async function openCopilotInChat(kickoff, cage) {
 // kickoff fits through.
 const CLAUDE_SIDEBAR_COMMAND = "claude-vscode.sidebar.open";
 const CLAUDE_EDITOR_COMMAND = "claude-vscode.editor.open";
+// Claude's own "Focus input": the visible webview answers it by focusing its
+// input box, and inserts text only when an editor selection supplies some.
+const CLAUDE_FOCUS_COMMAND = "claude-vscode.focus";
 
 /**
  * Start Claude in ONE surface, kickoff included.
@@ -1237,26 +1240,31 @@ const CLAUDE_EDITOR_COMMAND = "claude-vscode.editor.open";
  * arguments, and the side bar's own view is built with no prompt and no
  * session, so nothing can be handed to it.
  *
- * NOTHING INSIDE VS CODE SUBMITS THE KICKOFF. The prompt lands in the input
- * box and stops. No Claude command sends one, and an extension cannot type
- * into another extension's webview. pressEnterInClaude finishes it from
- * outside, so a launch stays one click.
+ * THE SIDE BAR IS THE PLACEMENT (owner ruling). It takes no prompt argument,
+ * so the kickoff travels by clipboard and keystroke instead.
+ *
+ * AND THE KEYSTROKES ARE AIMED BY CLAUDE ITSELF. claude-vscode.focus is
+ * Claude's own "Focus input" command: its webview answers by focusing the
+ * input box and inserting nothing. So the keyboard is put where the keys are
+ * going by the extension that owns that box, not by our guess about where
+ * focus drifted. That is what makes a blind paste defensible.
  */
 async function openClaudeInSideBar(kickoff) {
   const all = await vscode.commands.getCommands(true);
   try {
-    if (all.includes(CLAUDE_EDITOR_COMMAND)) {
-      await vscode.commands.executeCommand(CLAUDE_EDITOR_COMMAND, undefined, kickoff);
-      // The command has returned, so the panel exists. Put the keyboard where
-      // the keys are going before the burst starts.
-      await vscode.commands.executeCommand("workbench.action.focusActiveEditorGroup");
-      pressEnterInClaude();
-      trace("claude opened in one editor tab with the kickoff; Enter follows");
-      return true;
-    }
     if (all.includes(CLAUDE_SIDEBAR_COMMAND)) {
       await vscode.commands.executeCommand(CLAUDE_SIDEBAR_COMMAND);
-      trace("claude opened in the side bar with no kickoff — " + CLAUDE_EDITOR_COMMAND + " is absent");
+      await sendKickoffToClaude(kickoff);
+      trace("claude opened in the side bar; kickoff pasted and sent");
+      return true;
+    }
+    // No side bar to open: the editor door takes the prompt as an argument,
+    // so only the Enter has to be hacked, and the window title aims it.
+    if (all.includes(CLAUDE_EDITOR_COMMAND)) {
+      await vscode.commands.executeCommand(CLAUDE_EDITOR_COMMAND, undefined, kickoff);
+      await vscode.commands.executeCommand("workbench.action.focusActiveEditorGroup");
+      pressEnterInClaude(false);
+      trace("claude opened in one editor tab with the kickoff; Enter follows");
       return true;
     }
     trace("no Claude Code command is registered — the extension is absent or inactive");
@@ -1268,6 +1276,37 @@ async function openClaudeInSideBar(kickoff) {
 }
 
 /**
+ * Hand the side bar its kickoff: clipboard, then Claude's own focus, then
+ * paste and send.
+ *
+ * THE FOCUS COMMAND IS ASKED SEVERAL TIMES because only a VISIBLE webview
+ * answers it, and the side-bar view is still mounting when the open command
+ * returns. Asking again costs nothing: with no editor selection the command
+ * carries no text, so every extra call only re-focuses the same box.
+ *
+ * THE CLIPBOARD IS PUT BACK. It is the reader's, borrowed for a second.
+ */
+async function sendKickoffToClaude(kickoff) {
+  const previous = await vscode.env.clipboard.readText();
+  await vscode.env.clipboard.writeText(kickoff);
+  const focus = async () => {
+    try {
+      await vscode.commands.executeCommand(CLAUDE_FOCUS_COMMAND);
+    } catch (err) {
+      trace("focus attempt failed (the view may still be mounting): " + String(err));
+    }
+  };
+  await focus();
+  setTimeout(() => void focus(), 400);
+  setTimeout(() => void focus(), 800);
+  setTimeout(() => {
+    void focus();
+    pressEnterInClaude(true);
+  }, 1100);
+  setTimeout(() => void vscode.env.clipboard.writeText(previous), 6000);
+}
+
+/**
  * PRESS ENTER FOR THE READER — the last inch, and it is a HACK.
  *
  * The Claude Code extension prefills its input box and stops there. No
@@ -1276,18 +1315,26 @@ async function openClaudeInSideBar(kickoff) {
  * owner ruled that a hack beats two clicks, so this goes out through the
  * operating system: SendKeys to whatever window is in front.
  *
- * IT ONLY FIRES INTO OUR OWN WINDOW. The foreground process is checked to be
- * VS Code first, and a stray Enter into someone else's application is worse
- * than no Enter at all. It still cannot see WHICH control has focus — that
- * is the residual risk, and it is why the delay is generous: the webview
- * focuses its input as the session opens, and the reader has just clicked
- * our button, so their hands are nowhere else.
+ * IT ONLY FIRES INTO OUR OWN WINDOW. The foreground process is checked before
+ * every key, and a stray keystroke in someone else's application is worse
+ * than none at all.
+ *
+ * WHAT THE PROCESS CHECK CANNOT SEE is which control holds the focus. Nothing
+ * outside can: VS Code exposes no named accessibility tree, so every pane
+ * under the window reads as an unnamed Chromium pane. Probed and confirmed.
+ * So the caller asks CLAUDE to place the focus first, through its own
+ * Focus-input command, instead of trusting a delay. In the editor case the
+ * window title carries the active tab's name, and the keys are aimed by that
+ * as well.
+ *
+ * PASTE MODE sends one Ctrl+V before the Enter burst. The side bar has no way
+ * to be handed a prompt, so the text goes in as a keystroke or not at all.
  *
  * WHAT WOULD RETIRE THIS: an initialPrompt argument that submits, upstream.
  */
-function pressEnterInClaude() {
+function pressEnterInClaude(paste) {
   if (process.platform !== "win32") {
-    trace("auto-Enter is Windows-only so far — the kickoff is waiting in the box, press Enter");
+    trace("the auto-send is Windows-only so far — the kickoff is on the clipboard, paste it and press Enter");
     return;
   }
   // A BURST, NOT ONE LONG WAIT. Nothing outside the webview can see when its
@@ -1309,19 +1356,28 @@ function pressEnterInClaude() {
   const script = [
     "Add-Type -AssemblyName System.Windows.Forms",
     "Add-Type -Namespace Se -Name Fg -MemberDefinition '[DllImport(\"user32.dll\")] public static extern System.IntPtr GetForegroundWindow(); [DllImport(\"user32.dll\")] public static extern int GetWindowThreadProcessId(System.IntPtr h, out int pid); [DllImport(\"user32.dll\", CharSet = System.Runtime.InteropServices.CharSet.Unicode)] public static extern int GetWindowTextW(System.IntPtr h, System.Text.StringBuilder s, int n);'",
-    "Start-Sleep -Milliseconds 150",
-    "for ($i = 0; $i -lt 8; $i++) {",
+    "function Test-Ours {",
     "  $h = [Se.Fg]::GetForegroundWindow()",
     "  $pid2 = 0",
     "  [void][Se.Fg]::GetWindowThreadProcessId($h, [ref]$pid2)",
     "  $name = (Get-Process -Id $pid2 -ErrorAction SilentlyContinue).ProcessName",
     "  $sb = New-Object System.Text.StringBuilder 512",
     "  [void][Se.Fg]::GetWindowTextW($h, $sb, 512)",
-    "  $title = $sb.ToString()",
-    "  if ($name -like 'Code*' -and $title -like 'Claude*') { [System.Windows.Forms.SendKeys]::SendWait('{ENTER}'); Start-Sleep -Milliseconds 60; break }",
+    "  return @($name -like 'Code*', $sb.ToString())",
+    "}",
+    "Start-Sleep -Milliseconds 150",
+    // ONE PASTE ONLY. A second would append rather than replace, and the
+    // select-all that would fix that is the one keystroke we must never send
+    // blind — in an editor it would put the whole file under the paste.
+    paste === true ? "$ours = Test-Ours; if ($ours[0]) { [System.Windows.Forms.SendKeys]::SendWait('^v'); Start-Sleep -Milliseconds 250 }" : "",
+    "for ($i = 0; $i -lt 8; $i++) {",
+    "  $ours = Test-Ours",
+    paste === true
+      ? "  if ($ours[0]) { [System.Windows.Forms.SendKeys]::SendWait('{ENTER}'); Start-Sleep -Milliseconds 60; break }"
+      : "  if ($ours[0] -and $ours[1] -like 'Claude*') { [System.Windows.Forms.SendKeys]::SendWait('{ENTER}'); Start-Sleep -Milliseconds 60; break }",
     "  Start-Sleep -Milliseconds 70",
     "}",
-  ].join("\n");
+  ].filter((l) => l !== "").join("\n");
   const child = spawn("powershell.exe", ["-NoProfile", "-NonInteractive", "-WindowStyle", "Hidden", "-Command", script], {
     detached: true,
     stdio: "ignore",
