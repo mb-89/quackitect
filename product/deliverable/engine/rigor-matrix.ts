@@ -249,12 +249,11 @@ export function compileColumn(matrix: Matrix, column: ChangeColumn): MachineDecl
       evidence_form: row.evidence_form,
       ...(row.runs ? { submachine: row.runs } : {}),
       priority: priorityOf(row),
-      // A state with no declared tools gets only the always-legal three, so a
-      // compiled row could not read or write anything — the kickoff could not
-      // even edit the record it demands. The matrix says WHAT each step does;
-      // caging the lane is not its job, so the default opens and a row that
-      // wants less says so.
-      legal_tools: row.legal_tools ?? ["all"],
+      // Absent stays minimal — the always-legal three and nothing else. The
+      // kickoff sets each state's rights, so a row opens only what it declares.
+      // A state must declare enough to execute the remedy its own refusal hands
+      // back, or SE-C-112 answers with SE-C-110 and the walk cannot recover.
+      ...(row.legal_tools !== undefined ? { legal_tools: row.legal_tools } : {}),
       edges: edgesFrom.get(row.name) ?? [],
     });
   }

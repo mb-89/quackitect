@@ -7,6 +7,17 @@ filled_by: agent
 depends_on:
   - onboard-retro
 floor: true
+legal_tools:
+  - se_survey
+  - se_note_drain
+  - se_file_read
+  - se_file_write
+  - se_file_patch
+  - se_file_search
+  - se_file_glob
+  - se_file_list
+  - se_log_query
+  - se_answer
 evidence:
   - name: retro_drained
     description: "every inbox note has a recorded disposition"
