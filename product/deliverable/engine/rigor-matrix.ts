@@ -111,7 +111,24 @@ export function rigorMatrixContentHash(root: string): string {
   return h.digest("hex").slice(0, 12);
 }
 
+const MATRIX_CACHE = new Map<string, { stamp: string; matrix: Matrix }>();
+
+/** CACHED AGAINST CONTENT, never against size and modification time
+ *  (software.md). Hashing the 150 source files costs about a quarter of
+ *  parsing them, and a single render asks for the matrix several times over
+ *  - it was the largest read cost in the profile.
+ *
+ *  THE RETURNED MATRIX IS SHARED. Nothing may mutate it. */
 export function readRigorMatrix(root: string): Matrix {
+  const stamp = rigorMatrixContentHash(root);
+  const hit = MATRIX_CACHE.get(root);
+  if (hit !== undefined && hit.stamp === stamp) return hit.matrix;
+  const matrix = readRigorMatrixFresh(root);
+  MATRIX_CACHE.set(root, { stamp, matrix });
+  return matrix;
+}
+
+function readRigorMatrixFresh(root: string): Matrix {
   const dir = matrixDir(root);
   const rows: RigorMatrixRow[] = [];
   const byName = new Map<string, RigorMatrixRow>();

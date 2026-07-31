@@ -14,7 +14,7 @@ import { validateMachine, type EvidenceField, type MachineDecl, type StateDecl }
 import { CHANGE_COLUMNS, compileColumn, rigorMatrixContentHash, readRigorMatrix, type ChangeColumn } from "./rigor-matrix.ts";
 import { parseStateNote } from "./notes.ts";
 import { buildArchive, type GeneratedMachine } from "./expmachine.ts";
-import { slug, worktreesDir } from "./worktree.ts";
+import { bustBranchList, listBranches, slug, worktreesDir } from "./worktree.ts";
 
 const SRC = "engine/iterations.ts";
 
@@ -60,10 +60,7 @@ export function readItRecord(root: string, it: Iteration): Record<string, unknow
 /** Open = the worktree exists. Closed = branch it/* without one. */
 export function itList(root: string): Iteration[] {
   const out: Iteration[] = [];
-  const branches = git(root, ["branch", "--list", "it/*", "--format=%(refname:short)"], "branch --list")
-    .split("\n")
-    .map((b) => b.trim())
-    .filter((b) => b !== "");
+  const branches = listBranches(root, "it/*");
   for (const branch of branches) {
     const id = branch.slice("it/".length);
     const path = join(worktreesDir(root), id);
@@ -76,6 +73,7 @@ export function itList(root: string): Iteration[] {
  *  retro note refs). Mints the record on its own branch and worktree —
  *  the iteration stands in the container at once. */
 export function itSeed(root: string, goal: string, vision: string, inputs: string[] = []): Iteration {
+  bustBranchList();
   if (goal.trim() === "" || vision.trim() === "") {
     throw new Rejection({
       clause: CLAUSES.REQUIRED_ARGS,
