@@ -85,10 +85,11 @@ export class CallLog {
 
   /** Generic aggregation: filter, group, count — the retro's query lane. */
   query(q: {
-    filter?: { tool?: string; ok?: boolean; since?: string };
+    filter?: { tool?: string; ok?: boolean; since?: string; text?: string };
     group_by?: string;
     limit?: number;
-  }): { total: number; groups?: Record<string, number>; records?: CallRecord[] } {
+    offset?: number;
+  }): { total: number; groups?: Record<string, number>; records?: CallRecord[]; offset?: number; older?: number } {
     const dig = (obj: unknown, path: string): unknown =>
       path.split(".").reduce<unknown>((v, k) => (v && typeof v === "object" ? (v as Record<string, unknown>)[k] : undefined), obj);
     const all = this.records();
@@ -116,6 +117,10 @@ export class CallLog {
       if (f.tool !== undefined && rec.tool !== f.tool) return false;
       if (f.ok !== undefined && rec.ok !== f.ok) return false;
       if (since !== undefined && rec.ts < since) return false;
+      // TEXT narrows before the window does. Scanning fifty whole records to
+      // find one topic is the wrong shape when a substring match would do,
+      // and it is what pushed a query past the token ceiling.
+      if (f.text !== undefined && !JSON.stringify(rec).toLowerCase().includes(f.text.toLowerCase())) return false;
       return true;
     });
     if (q.group_by !== undefined) {
@@ -126,7 +131,18 @@ export class CallLog {
       }
       return { total: records.length, groups };
     }
-    return { total: records.length, records: records.slice(-(q.limit ?? 20)) };
+    // NEWEST FIRST, PAGED BACKWARDS. offset 0 is the newest page; offset 20
+    // is the twenty before those. A window with no way to ask for the next
+    // one is not a door onto the log — a fifty-record answer once blew the
+    // token ceiling and was saved where the lane could not read it.
+    //
+    // `older` says how many remain behind this window, so a caller never has
+    // to guess whether it saw everything.
+    const limit = q.limit ?? 20;
+    const offset = Math.max(0, q.offset ?? 0);
+    const end = Math.max(0, records.length - offset);
+    const start = Math.max(0, end - limit);
+    return { total: records.length, offset, older: start, records: records.slice(start, end) };
   }
 
   /** ~1 GB: surface a cleanup decision, never auto-delete (owner ruling, v2). */

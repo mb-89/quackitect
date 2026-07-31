@@ -609,14 +609,15 @@ export function coreTools(rootOf: (rel?: string) => string, projectRoot: string,
     {
       name: "se_log_query",
       title: "se.log.query",
-      description: "Query the call log (your own trail): filter by tool/ok/since, group_by a field, or fetch a se_run ref's full output.",
+      description: "Query the call log (your own trail): filter by tool/ok/since/text, group_by a field, or fetch a se_run ref's full output. Pages NEWEST FIRST — offset 0 is the newest window, and the result says how many `older` records stand behind it.",
       inputSchema: {
         type: "object",
         properties: {
           ref: { type: "string", description: "fetch one record in full by ref" },
-          filter: { type: "object", description: "{tool?, ok?, since?} — since: an ISO timestamp, or 'last_retro' (everything after the previous retro, which is the newest carried/backlog drain — the desk cannot make those)" },
+          filter: { type: "object", description: "{tool?, ok?, since?, text?} — since: an ISO timestamp, or 'last_retro' (everything after the previous retro, which is the newest carried/backlog drain — the desk cannot make those). text: a case-insensitive substring over the whole record, for finding a TOPIC without reading every hit" },
           group_by: { type: "string", description: "e.g. 'tool' or 'outcome'" },
           limit: { type: "number", default: 20 },
+          offset: { type: "number", description: "how many records back from the newest to start — 0 is the newest window" },
         },
       },
       handler: (args) => {
@@ -638,6 +639,7 @@ export function coreTools(rootOf: (rel?: string) => string, projectRoot: string,
           ...(args.filter !== undefined ? { filter: args.filter as { tool?: string; ok?: boolean; since?: string } } : {}),
           ...(args.group_by !== undefined ? { group_by: String(args.group_by) } : {}),
           ...(args.limit !== undefined ? { limit: Number(args.limit) } : {}),
+          ...(args.offset !== undefined ? { offset: Number(args.offset) } : {}),
         });
       },
     },

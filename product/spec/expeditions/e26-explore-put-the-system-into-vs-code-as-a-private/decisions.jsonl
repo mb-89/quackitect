@@ -304,3 +304,23 @@
 {"ts":"2026-07-31T08:34:15.457Z","op":"update","visit":"expeditions/e26@0","node":"d178","brief":"hiding each config file to see the guard fire"}
 {"ts":"2026-07-31T08:34:27.328Z","op":"done","visit":"expeditions/e26@0","node":"d177","brief":"guard proven red on each file and green restored"}
 {"ts":"2026-07-31T08:35:14.659Z","op":"done","visit":"expeditions/e26@0","node":"d176","brief":"test roots now carry a name and a palette"}
+{"ts":"2026-07-31T08:35:25.099Z","op":"update","visit":"expeditions/e26@0","node":"d179","brief":"landing the preflight guard"}
+{"ts":"2026-07-31T08:35:39.922Z","op":"update","visit":"expeditions/e26@0","node":"d180","brief":"recording five inbox notes verified already done"}
+{"ts":"2026-07-31T08:35:55.231Z","op":"plan","visit":"expeditions/e26@0","parent":null,"nodes":[{"id":"d181","brief":"Compare the Copilot cage against the Claude cage"},{"id":"d182","brief":"Fix or report any drift"}]}
+{"ts":"2026-07-31T08:36:06.598Z","op":"update","visit":"expeditions/e26@0","node":"d183","brief":"reading both cage lists to compare"}
+{"ts":"2026-07-31T08:36:21.874Z","op":"update","visit":"expeditions/e26@0","node":"d184","brief":"reading the Copilot exclusion arguments"}
+{"ts":"2026-07-31T08:36:48.312Z","op":"update","visit":"expeditions/e26@0","node":"d185","brief":"reading the cage file's own explanation"}
+{"ts":"2026-07-31T08:37:12.621Z","op":"done","visit":"expeditions/e26@0","node":"d181","brief":"the cage data is sound and CLI-verified; no drift to fix"}
+{"ts":"2026-07-31T08:37:32.733Z","op":"done","visit":"expeditions/e26@0","node":"d182","brief":"no drift found; the negative result is recorded"}
+{"ts":"2026-07-31T08:37:45.093Z","op":"update","visit":"expeditions/e26@0","node":"d186","brief":"counting what waits to be pushed"}
+{"ts":"2026-07-31T08:44:28.423Z","op":"plan","visit":"expeditions/e26@0","parent":null,"nodes":[{"id":"d187","brief":"Give se_log_query an offset"},{"id":"d188","brief":"Report what was cut, honestly"},{"id":"d189","brief":"Fence it with a test"}]}
+{"ts":"2026-07-31T08:44:32.869Z","op":"update","visit":"expeditions/e26@0","node":"d190","brief":"reading the call log query to add paging"}
+{"ts":"2026-07-31T08:44:37.087Z","op":"update","visit":"expeditions/e26@0","node":"d191","brief":"reading the query body before changing it"}
+{"ts":"2026-07-31T08:45:09.617Z","op":"done","visit":"expeditions/e26@0","node":"d187","brief":"se_log_query pages backwards and filters by text"}
+{"ts":"2026-07-31T08:45:13.713Z","op":"done","visit":"expeditions/e26@0","node":"d188","brief":"the result reports offset and how many older records remain"}
+{"ts":"2026-07-31T08:45:40.498Z","op":"update","visit":"expeditions/e26@0","node":"d192","brief":"writing the paging and text-filter tests"}
+{"ts":"2026-07-31T08:45:45.793Z","op":"update","visit":"expeditions/e26@0","node":"d193","brief":"running the new test file alone first"}
+{"ts":"2026-07-31T08:46:38.208Z","op":"update","visit":"expeditions/e26@0","node":"d194","brief":"rewriting the assertions to survive the self-logging"}
+{"ts":"2026-07-31T08:46:49.701Z","op":"update","visit":"expeditions/e26@0","node":"d195","brief":"re-running the log query tests"}
+{"ts":"2026-07-31T08:46:57.233Z","op":"update","visit":"expeditions/e26@0","node":"d196","brief":"running the full suite with the new file"}
+{"ts":"2026-07-31T08:47:45.928Z","op":"done","visit":"expeditions/e26@0","node":"d189","brief":"241 green; paging and text fenced by a new test file"}
