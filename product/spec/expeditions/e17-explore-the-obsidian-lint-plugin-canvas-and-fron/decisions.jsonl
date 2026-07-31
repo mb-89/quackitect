@@ -12,3 +12,6 @@
 {"ts":"2026-07-31T14:59:47.343Z","op":"update","visit":"expeditions/e17@0","node":"d26","brief":"re-reading the slider before continuing"}
 {"ts":"2026-07-31T15:00:03.169Z","op":"plan","visit":"expeditions/e17@0","parent":null,"nodes":[{"id":"d27","brief":"sync the e17 worktree to trunk"},{"id":"d28","brief":"delete the fabricated ruling comment in survey.ts"},{"id":"d29","brief":"give notes a title and a MoSCoW priority"},{"id":"d30","brief":"shrink the survey payload"},{"id":"d31","brief":"record the possible Obsidian exit"}]}
 {"ts":"2026-07-31T15:00:14.690Z","op":"plan","visit":"expeditions/e17@0","parent":null,"nodes":[]}
+{"ts":"2026-07-31T15:00:18.175Z","op":"update","visit":"expeditions/e17@0","node":"d32","brief":"committed the pivot so the sync can run"}
+{"ts":"2026-07-31T15:00:21.467Z","op":"update","visit":"expeditions/e17@0","node":"d33","brief":"pulling trunk into the e17 worktree"}
+{"ts":"2026-07-31T15:00:25.379Z","op":"update","visit":"expeditions/e17@0","node":"d34","brief":"one file still dirty after the commit"}
