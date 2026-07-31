@@ -68,3 +68,21 @@ test("a single named file is searchable wherever it lives", () => {
     rmSync(tmp, { recursive: true, force: true });
   }
 });
+
+test("limit above fifty is honored in one file", () => {
+  const tmp = mkdtempSync(join(tmpdir(), "se-search-"));
+  try {
+    const lines = Array.from({ length: 80 }, (_v, i) => `needle ${i + 1}`).join("\n") + "\n";
+    writeFileSync(join(tmp, "many.md"), lines, "utf8");
+
+    const capped = search(tmp, "needle", { limit: 70 });
+    assert.equal(capped.matches.length, 70, "limit above fifty should be honored");
+
+    const unbounded = search(tmp, "needle", { limit: 0 });
+    assert.equal(unbounded.total, 80);
+    assert.equal(unbounded.matches.length, 80);
+    assert.equal(unbounded.truncated, false);
+  } finally {
+    rmSync(tmp, { recursive: true, force: true });
+  }
+});

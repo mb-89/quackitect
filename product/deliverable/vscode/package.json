@@ -46,11 +46,6 @@
         "icon": "$(play)"
       },
       {
-        "command": "$PRODUCT_ID$.restartServer",
-        "title": "$PRODUCT$: Restart the Engine",
-        "icon": "$(debug-restart)"
-      },
-      {
         "command": "$PRODUCT_ID$.howToAttach",
         "title": "$PRODUCT$: How to Attach Your Agent",
         "icon": "$(question)"

@@ -2,6 +2,7 @@
 state: read_contract
 state_kind: work
 priority: 0.01
+tags: boot
 legal_tools: se_file_read, se_note
 exit_read:
   - workspace/AGENTS.md
@@ -10,7 +11,7 @@ exit_read:
   - product/guidance/walking.md
 exit_read_consume:
   - .se/HANDOVER.md
-guidance: Read every document in the exit condition through se_file_read - each result carries its hash. Leaving demands those hashes as proof (se_tick with read_hashes); keep them, later states demand them again at entry. THE HANDOVER IS CONSUMED HERE. A left-behind .se/HANDOVER.md joins the read list, and the engine DESTROYS it the moment you leave this state. So read it as a briefing that is about to vanish. Anything in it that must outlive this session gets carried out BEFORE you tick - a note (se_note is legal here for exactly this), a parked to-do, an edit to guidance where the fact really belongs. Treat every claim in it as dated - check it before you build on it, and never carry a stale one forward.
+guidance: BOOT METHOD rides in from guidance/method/boot.md by tag - follow it. Read every document in the exit condition through se_file_read - each result carries its hash. Leaving demands those hashes as proof (se_tick with read_hashes); keep them and reuse them unless a refusal says they are missing or stale. THE HANDOVER IS CONSUMED HERE. A left-behind .se/HANDOVER.md joins the read list, and the engine DESTROYS it the moment you leave this state. So read it as a briefing that is about to vanish. Anything in it that must outlive this session gets carried out BEFORE you tick - a note (se_note is legal here for exactly this), a parked to-do, an edit to guidance where the fact really belongs. Treat every claim in it as dated - check it before you build on it, and never carry a stale one forward.
 ---
 
 # Read the contract

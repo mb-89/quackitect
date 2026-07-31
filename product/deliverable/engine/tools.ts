@@ -55,7 +55,7 @@ export function sessionTools(session: Session): ToolDef[] {
           read_hashes: { type: "object", description: "proof-of-read for this tick: {\"<root-relative path>\": \"<hash from se_file_read>\", ...} — must cover the docs the transition demands, each hash matching the doc as it stands now" },
           route: { type: "string", description: "THE BLUE LINE — the way from here to this target state: every hop, its priority, and what it will ask for. Moves NOTHING. Lists EVERY judgment on the way, so a person can answer them all at once and leave the walk to run" },
           sweep: { type: "boolean", description: "WALK the route to `to` in one call rather than one tick per hop. Collapses round trips ONLY - every hop still weighs the slider, proves its reads and runs its scripts. Stops at the first hop that will not pass and says which and why; the route recomputes after each hop, so a detour is followed rather than fallen off" },
-          target: { type: "string", description: "Set the session's TARGET state - the blue line the mirror draws. Defaults to the front desk at every engine start" },
+          target: { type: "string", description: "Set the session's TARGET state - the blue line the mirror draws. Defaults to the front desk at every engine start, then clears itself once reached" },
         },
       },
       handler: async (args) => {
@@ -78,7 +78,19 @@ export function sessionTools(session: Session): ToolDef[] {
         if (args.route !== undefined) return session.route(String(args.route));
         if (args.target !== undefined) return session.setTarget(String(args.target));
         const hashes = (typeof args.read_hashes === "object" && args.read_hashes !== null ? args.read_hashes : {}) as Record<string, string>;
-        if (args.sweep === true) return session.sweep(String(args.to ?? session.target), "agent", hashes);
+        if (args.sweep === true) {
+          const aimed = args.to === undefined ? session.target : String(args.to);
+          if (aimed === "") {
+            throw new Rejection({
+              clause: CLAUSES.REQUIRED_ARGS,
+              expected: "a non-empty sweep target (set one with se_tick {target: ...}, or pass to)",
+              got: "no current target",
+              remedy: { tool: "se_tick", args: { to: "front_desk", sweep: true }, note: "or aim first: se_tick { target: \"front_desk\" }" },
+              source: "engine/tools.ts se_tick sweep",
+            });
+          }
+          return session.sweep(aimed, "agent", hashes);
+        }
         // ATOMIC: a moving tick declares where it was planned — stale plans
         // are refused before anything moves (peeking never needs it).
         if (args.from !== undefined && args.state === undefined) session.assertFrom(String(args.from));
@@ -767,6 +779,18 @@ export function buildServer(root: string, session = new Session(root), tollOpts:
   const server = new McpServer({ name: "se-mcp", version: "3.0.0-bootstrap" }, tools);
   const log = new CallLog(seDir(root));
   const toll = new Toll(tollOpts);
+
+  // Session read buffer: live se_file_read results feed later tick proofs.
+  // Reads at a git ref are intentionally excluded.
+  server.addDecorator((tool, result) => {
+    if (tool !== "se_file_read") return result;
+    if (result === null || typeof result !== "object" || Array.isArray(result)) return result;
+    const r = result as Record<string, unknown>;
+    if (typeof r.path === "string" && typeof r.hash === "string") {
+      session.rememberRead(r.path, r.hash, typeof r.ref === "string" ? r.ref : undefined);
+    }
+    return result;
+  });
 
   // THE UPDATE RIDES FIRST — applied before any other verdict (the
   // narration stands even when the call itself is then refused), logged as

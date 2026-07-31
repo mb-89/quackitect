@@ -339,6 +339,46 @@ if (-not $classic) {
     Write-Host "naming the extension FAILED - see above" -ForegroundColor Red
     exit 1
   }
+  # SOME VS CODE BUILDS TRUST extensions.json once it exists and do not
+  # discover new folder copies automatically. Upsert this local extension so
+  # copy-based install works consistently without packaging.
+  $extReg = Join-Path $env:USERPROFILE ".vscode\extensions\extensions.json"
+  $extPkg = [System.IO.File]::ReadAllText((Join-Path $extDest "package.json")) | ConvertFrom-Json
+  $extId = "$($extPkg.publisher).$($extPkg.name)"
+  $extFolder = Split-Path $extDest -Leaf
+  $extPath = "/" + ($extDest -replace "\\", "/")
+  $entry = [pscustomobject]@{
+    identifier = [pscustomobject]@{ id = $extId }
+    version = [string]$extPkg.version
+    location = [pscustomobject]@{ '$mid' = 1; path = $extPath; scheme = "file" }
+    relativeLocation = $extFolder
+  }
+  $entries = @()
+  if (Test-Path $extReg) {
+    try {
+      $parsed = [System.IO.File]::ReadAllText($extReg) | ConvertFrom-Json
+      $entries = @($parsed)
+    } catch {
+      Write-Host "extensions.json could not be read - rebuilding it with this extension entry" -ForegroundColor Yellow
+      $entries = @()
+    }
+  }
+  $entries = @($entries | Where-Object { $_.identifier.id -ne $extId })
+  $entries += $entry
+  $utf8NoBom = New-Object System.Text.UTF8Encoding $false
+  $registered = $false
+  try {
+    [System.IO.File]::WriteAllText($extReg, ($entries | ConvertTo-Json -Depth 8 -Compress), $utf8NoBom)
+    $verify = @([System.IO.File]::ReadAllText($extReg) | ConvertFrom-Json)
+    $registered = [bool]($verify | Where-Object { $_.identifier.id -eq $extId })
+  } catch {
+    $registered = $false
+  }
+  if (-not $registered) {
+    Write-Host "extension registry update FAILED - VS Code may ignore the copied extension on this machine." -ForegroundColor Yellow
+    Write-Host "  next: close all VS Code windows, run .\RUNME.ps1 again, then check: code --list-extensions --show-versions | Select-String '$extId'" -ForegroundColor Yellow
+    Write-Host "  fallback for this machine: build/install a VSIX (npm exec --yes --package @vscode/vsce -- vsce package ; code --install-extension .\\$($extFolder.Split('-')[0])-0.1.0.vsix --force)" -ForegroundColor DarkYellow
+  }
   Write-Host "  extension in place - $rendered" -ForegroundColor Green
   Write-Host "  $extDest" -ForegroundColor DarkGray
   Write-Host "$P - opening VS Code on workspace\ - the extension takes it from here" -ForegroundColor Cyan
