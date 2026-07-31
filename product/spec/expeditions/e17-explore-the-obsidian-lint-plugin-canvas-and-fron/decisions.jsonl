@@ -34,3 +34,6 @@
 {"ts":"2026-07-31T15:12:43.965Z","op":"update","visit":"expeditions/e17@0","node":"d47","brief":"drawing the way out before walking it"}
 {"ts":"2026-07-31T15:15:43.103Z","op":"update","visit":"expeditions/e17@1","node":"d55","brief":"listing everything uncommitted before staging"}
 {"ts":"2026-07-31T15:15:48.193Z","op":"update","visit":"expeditions/e17@1","node":"d56","brief":"staging all nine"}
+{"ts":"2026-07-31T15:15:58.685Z","op":"done","visit":"front_desk@1","node":"d50","brief":"nine files committed on the e17 branch"}
+{"ts":"2026-07-31T15:16:48.716Z","op":"update","visit":"expeditions/e17@1","node":"d57","brief":"reading the leave state instead of sweeping past it"}
+{"ts":"2026-07-31T15:17:13.916Z","op":"done","visit":"front_desk@1","node":"d51","brief":"closing with apply, which merges then archives"}
