@@ -24,7 +24,7 @@ test("a detour that comes home draws a branch AND a merge", () => {
   assert.match(g, /branch d2/, "the detour leaves the trunk");
   assert.match(g, /merge d2/, "and comes back — this is what a tree cannot say");
   assert.ok(g.indexOf("branch d2") < g.indexOf("merge d2"), "it must leave before it returns");
-  assert.ok(g.indexOf("merge d2") < g.lastIndexOf("d3"), "and return before the trunk carries on");
+  assert.ok(g.indexOf("merge d2") < g.indexOf("back on the trunk"), "and return before the trunk carries on");
 });
 
 test("a detour that never came home is left hanging, not merged", () => {
@@ -36,7 +36,7 @@ test("a detour that never came home is left hanging, not merged", () => {
     ]);
     assert.match(g, /branch d2/, `${status} still branches`);
     assert.doesNotMatch(g, /merge d2/, `${status} did NOT land, so nothing may claim it did`);
-    assert.ok(g.includes(`tag: "${mark}"`), `${status} is marked, and not as a tick`);
+    assert.ok(g.includes(`"${mark} `), `${status} is marked in the label, and not as a tick`);
   }
 });
 
@@ -46,21 +46,26 @@ test("the graph reads top to bottom, with the text beside the dot", () => {
   assert.match(g, /rotateCommitLabel': false/, "and the label stays horizontal");
 });
 
-test("a done point carries a tick, an open one carries nothing", () => {
+test("the tick rides in the label, so no pennant tag is drawn", () => {
   const g = decisionsAsGitGraph([
-    node({ id: "d1", at: "2026-07-31T10:00:00Z", status: "done", closed_at: "2026-07-31T10:01:00Z" }),
-    node({ id: "d2", at: "2026-07-31T10:02:00Z" }),
+    node({ id: "d1", at: "2026-07-31T10:00:00Z", brief: "landed", status: "done", closed_at: "2026-07-31T10:01:00Z" }),
+    node({ id: "d2", at: "2026-07-31T10:02:00Z", brief: "still going" }),
   ]);
-  const lines = g.split("\n");
-  assert.ok(lines.find((l) => l.includes("d1"))?.includes('tag: "✓"'), "done is ticked");
-  assert.equal(lines.find((l) => l.includes("d2"))?.includes("tag:"), false, "open is found by the absence of a mark");
+  assert.ok(g.includes('commit id: "✓ landed"'), "done reads as a ticked checklist line");
+  assert.doesNotMatch(g, /tag:/, "and nothing is drawn as a tag");
+  assert.match(g, /still going/, "an open point still shows");
+});
+
+test("the trunk is named, so the pill says something", () => {
+  const g = decisionsAsGitGraph([node({ id: "d1", at: "2026-07-31T10:00:00Z" })], "e26 day two");
+  assert.match(g, /mainBranchName': 'e26 day two'/);
 });
 
 test("a long brief is cut at a word, so the column stays narrow", () => {
   const g = decisionsAsGitGraph([
     node({ id: "d1", at: "2026-07-31T10:00:00Z", brief: "a brief long enough that it would push the checklist column far wider than anyone wants to read across" }),
   ]);
-  const line = g.split("\n").find((l) => l.includes("d1")) ?? "";
+  const line = g.split("\n").find((l) => l.includes("a brief long enough")) ?? "";
   assert.match(line, /…"/, "it says it was cut");
   assert.ok(line.length < 80, "and the line stays short: " + line.length);
 });

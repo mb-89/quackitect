@@ -483,3 +483,14 @@
 {"ts":"2026-07-31T17:07:13.409Z","op":"update","visit":"expeditions/e26@0","node":"d85","brief":"re-rendering the same file to look at"}
 {"ts":"2026-07-31T17:07:32.059Z","op":"update","visit":"expeditions/e26@0","node":"d86","brief":"checking encoding and the branch count"}
 {"ts":"2026-07-31T17:07:55.026Z","op":"done","visit":"expeditions/e26@0","node":"d79","brief":"the replay bug is found and fixed"}
+{"ts":"2026-07-31T17:13:13.765Z","op":"plan","visit":"expeditions/e26@0","parent":null,"nodes":[{"id":"d87","brief":"make an update a child again"},{"id":"d88","brief":"put the tick in the label and drop tags"}]}
+{"ts":"2026-07-31T17:13:40.256Z","op":"done","visit":"expeditions/e26@0","node":"d88","brief":"the tick moves into the label and the tags go"}
+{"ts":"2026-07-31T17:13:56.748Z","op":"update","visit":"expeditions/e26@0","node":"d89","brief":"tests follow the label-carried mark"}
+{"ts":"2026-07-31T17:14:03.532Z","op":"update","visit":"expeditions/e26@0","node":"d90","brief":"running with updates as children again"}
+{"ts":"2026-07-31T17:14:48.194Z","op":"update","visit":"expeditions/e26@0","node":"d91","brief":"tests key on the text now, not the id"}
+{"ts":"2026-07-31T17:14:54.053Z","op":"done","visit":"expeditions/e26@0","node":"d87","brief":"an update is a child of its point again"}
+{"ts":"2026-07-31T17:15:32.591Z","op":"plan","visit":"expeditions/e26@0","parent":null,"nodes":[{"id":"d92","brief":"re-render and check the nesting appears"}]}
+{"ts":"2026-07-31T17:16:06.699Z","op":"update","visit":"expeditions/e26@0","node":"d93","brief":"checkout names the renamed trunk"}
+{"ts":"2026-07-31T17:16:20.759Z","op":"update","visit":"expeditions/e26@0","node":"d94","brief":"checking the trunk rename fix"}
+{"ts":"2026-07-31T17:17:02.156Z","op":"done","visit":"expeditions/e26@0","node":"d92","brief":"nesting renders, no invented points"}
+{"ts":"2026-07-31T17:17:09.205Z","op":"plan","visit":"expeditions/e26@0","parent":null,"nodes":[{"id":"d95","brief":"land the graph fixes"}]}

@@ -10,7 +10,7 @@ import type { DecisionNode } from "./decisions.ts";
 
 /** A node's branch. Top-level points ride the trunk; anything opened UNDER
  *  something else is a detour and gets a branch of its own, named for it. */
-const branchOf = (n: DecisionNode): string => (n.parent === null ? "main" : n.id);
+const branchOf = (n: DecisionNode, trunk: string): string => (n.parent === null ? trunk : n.id);
 
 /** How long a point's line may be. The graph is read as a checklist, and a
  *  full brief pushes the column so wide the shape stops being visible. */
@@ -25,10 +25,17 @@ const label = (text: string): string => {
   return `${(space > LABEL_CAP * 0.6 ? cut.slice(0, space) : cut).trimEnd()}…`;
 };
 
-/** A tick for what landed, and a distinct mark for what did not. An open
- *  point carries nothing, so the eye finds it by the absence. */
-const MARK: Record<string, string | undefined> = {
-  open: undefined,
+/** THE MARK RIDES IN THE LABEL, not in a tag.
+ *
+ *  Mermaid draws a tag as a pennant on the far side of the dot, which reads
+ *  as decoration and puts the tick away from the words it belongs to. The
+ *  details pane already shows the right shape — tick, then text, one line
+ *  per point — so the label carries the mark and no tag is emitted.
+ *
+ *  An open point is marked too, with a space, so every line starts at the
+ *  same column and the ticked ones stand out down the edge. */
+const MARK: Record<string, string> = {
+  open: " ",
   done: "✓",
   obsolete: "✗",
   reverted: "↩",
@@ -46,12 +53,16 @@ interface Event {
  *  that never did. Those branches stay hanging, which is the truth. */
 const RETURNS = new Set(["done"]);
 
-export function decisionsAsGitGraph(nodes: readonly DecisionNode[]): string {
+export function decisionsAsGitGraph(nodes: readonly DecisionNode[], trunk = "the plan"): string {
   const byId = new Map(nodes.map((n) => [n.id, n]));
   // TB reads as a CHECKLIST — top to bottom, one line per point, with the
   // text horizontal beside its dot. Left-to-right turns the labels on their
   // side and stops being readable past a handful of points.
-  const out: string[] = ["%%{init: {'gitGraph': {'rotateCommitLabel': false}}}%%", "gitGraph TB:"];
+  //
+  // The trunk is NAMED rather than left as "main", because the pill at the
+  // top is real estate and "main" says nothing a reader did not know.
+  const init = `%%{init: {'gitGraph': {'rotateCommitLabel': false, 'mainBranchName': '${trunk.replace(/'/g, "")}'}}}%%`;
+  const out: string[] = [init, "gitGraph TB:"];
   if (nodes.length === 0) {
     out.push(`  commit id: "nothing decided yet"`);
     return out.join("\n");
@@ -69,13 +80,16 @@ export function decisionsAsGitGraph(nodes: readonly DecisionNode[]): string {
   }
   events.sort((a, b) => a.at.localeCompare(b.at) || (a.kind === b.kind ? a.node.id.localeCompare(b.node.id) : a.kind === "open" ? -1 : 1));
 
+  // Mermaid RENAMES the trunk when mainBranchName is set, so every checkout
+  // has to name it. Emitting "checkout main" against a renamed trunk draws
+  // nothing at all.
   const parentBranch = (n: DecisionNode): string => {
-    if (n.parent === null) return "main";
+    if (n.parent === null) return trunk;
     const p = byId.get(n.parent);
-    return p === undefined ? "main" : branchOf(p);
+    return p === undefined ? trunk : branchOf(p, trunk);
   };
 
-  let current = "main";
+  let current = trunk;
   const opened = new Set<string>();
   const checkout = (branch: string): void => {
     if (current === branch) return;
@@ -86,18 +100,16 @@ export function decisionsAsGitGraph(nodes: readonly DecisionNode[]): string {
   for (const ev of events) {
     const n = ev.node;
     if (ev.kind === "open") {
-      const branch = branchOf(n);
-      if (branch === "main") {
-        checkout("main");
+      const branch = branchOf(n, trunk);
+      if (branch === trunk) {
+        checkout(trunk);
       } else {
         checkout(parentBranch(n));
         out.push(`  branch ${branch}`); // branch also checks the new one out
         current = branch;
         opened.add(branch);
       }
-      const mark = MARK[n.status];
-      const tag = mark === undefined ? "" : ` tag: "${mark}"`;
-      out.push(`  commit id: "${label(`${n.id} ${n.brief}`)}"${tag}`);
+      out.push(`  commit id: "${MARK[n.status] ?? " "} ${label(n.brief)}"`);
     } else {
       // A detour that came home. Merging from the parent's branch is what
       // draws the line back, and it is the whole point of this renderer.
@@ -111,7 +123,7 @@ export function decisionsAsGitGraph(nodes: readonly DecisionNode[]): string {
 
 /** The frame-buffer page: one markdown file the details surface opens, with
  *  the graph in a fence VS Code renders itself. */
-export function decisionsAsMarkdown(nodes: readonly DecisionNode[], heading: string): string {
+export function decisionsAsMarkdown(nodes: readonly DecisionNode[], heading: string, trunk = "the plan"): string {
   const open = nodes.filter((n) => n.status === "open").length;
   return [
     `# ${heading}`,
@@ -119,7 +131,7 @@ export function decisionsAsMarkdown(nodes: readonly DecisionNode[], heading: str
     `${nodes.length} points, ${open} still open.`,
     "",
     "```mermaid",
-    decisionsAsGitGraph(nodes),
+    decisionsAsGitGraph(nodes, trunk),
     "```",
     "",
   ].join("\n");

@@ -103,6 +103,7 @@ export interface ReplayNode {
 export function replayVisitsText(text: string): { visit: string; nodes: ReplayNode[] }[] {
   const byVisit = new Map<string, Map<string, ReplayNode>>();
   const home = new Map<string, string>();
+  let updateSeq = 0;
   const touch = (visit: string): Map<string, ReplayNode> => {
     let m = byVisit.get(visit);
     if (!m) {
@@ -151,12 +152,19 @@ export function replayVisitsText(text: string): { visit: string; nodes: ReplayNo
       // work that was still open and a flat list where nesting stood.
       const id = String(rec.node ?? "");
       if (id === "") continue;
-      const known = byVisit.get(home.get(id) ?? visit)?.get(id);
-      if (known !== undefined) continue;
-      // An update naming a node this log never opened still deserves a line,
-      // because the point is real and lives in another visit.
-      touch(visit).set(id, { id, parent: null, brief: String(rec.brief ?? ""), status: "done", at: ts, closed_at: ts });
-      home.set(id, visit);
+      // AN UPDATE LANDS AS A CHECKED POINT UNDER ITS NODE (walking.md). It
+      // is a child, with an id of its own. Writing it AT the target's id
+      // overwrote the target, which marked open work done and flattened the
+      // nesting; dropping it instead lost the trail. Neither is the point.
+      // A target this log never opened belongs to another engine life — the
+      // id counter restarts on a reload, so d74 in one visit is not d74 in
+      // the next. Hang the update on the trunk rather than invent a point
+      // that was never planned.
+      const owner = home.get(id) ?? visit;
+      const parent = byVisit.get(owner)?.get(id) === undefined ? null : id;
+      const childId = `${id}.${++updateSeq}`;
+      touch(owner).set(childId, { id: childId, parent, brief: String(rec.brief ?? ""), status: "done", at: ts, closed_at: ts });
+      home.set(childId, owner);
     } else if (op === "defer") {
       setStatus(String(rec.node ?? ""), "deferred", ts, `deferred to ${String(rec.to ?? "?")}`);
     } else if (op === "defer_arrived") {
