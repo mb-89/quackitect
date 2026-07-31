@@ -321,7 +321,7 @@ Write-Host "  $((git --version))  OK"
 # It is the DEFAULT now, not a flag (owner, 2026-07-30). --classic is the
 # opt-out and takes the old terminal-and-browser path further down.
 $classic = [bool]($forwarded | Where-Object { $_ -eq "--classic" })
-$forwarded = @($forwarded | Where-Object { $_ -notin @("--classic", "--vscode") })
+$forwarded = @($forwarded | Where-Object { $_ -notin @("--classic") })
 if (-not $classic) {
   if (-not (Ensure-Tool "code" "Microsoft.VisualStudioCode" "VS Code")) { exit 1 }
   $extSrc = Join-Path $root "product\deliverable\vscode"
@@ -470,11 +470,7 @@ try {
 # runs, so they are taken out of the forwarded command line here.
 $ownTerminal = [bool]($forwarded | Where-Object { $_ -eq "--own-terminal" })
 $manual = [bool]($forwarded | Where-Object { $_ -eq "--manual" })
-$staleOneScreen = [bool]($forwarded | Where-Object { $_ -eq "--one-screen" })
-$forwarded = @($forwarded | Where-Object { $_ -notin @("--own-terminal", "--manual", "--one-screen") })
-if ($staleOneScreen) {
-  Write-Host "$P - --one-screen is the default now; the flag did nothing" -ForegroundColor Yellow
-}
+$forwarded = @($forwarded | Where-Object { $_ -notin @("--own-terminal", "--manual") })
 
 # WHICH AGENT HOST. Claude wins when both are installed (owner ruling).
 # MANUAL MODE MEANS NO LLM. Either you asked for it, or neither CLI was

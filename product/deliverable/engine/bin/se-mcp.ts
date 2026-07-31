@@ -107,7 +107,6 @@ LAUNCH — read by RUNME.ps1 before the server starts.
                  This also happens by itself when no claude CLI is found.
                  The engine's --autonomy 0 is a DIFFERENT thing: an agent
                  is running, it just may not step by itself.
-  --one-screen   the old spelling of today's default. Accepted, does nothing.
   --kill         stop every leftover engine process and exit, launching
                  nothing (-Kill). Finds the server, the terminal host and the
                  manual mirror by command line AND by listening port (7333,
@@ -116,7 +115,6 @@ LAUNCH — read by RUNME.ps1 before the server starts.
   --classic      the OLD way in: the agent on a terminal and the Mirror in
                  your browser, with no VS Code. It still works exactly as it
                  did. It is simply no longer what you get by default.
-  --vscode       accepted, does nothing. VS Code is the default host now.
   --export <dir> <Name> <ABBR>
                  copy the WORKING TREE into <dir> as a fresh single-commit
                  repository under a NEW NAME, then exit. History stays home:
