@@ -92,8 +92,14 @@ test("the pin: the bless compiles the change size live; escalation only grows it
   // DE-ESCALATION (and a same-size re-pin) refused — drift never reaches a running walk.
   assert.throws(() => pinIteration(root, it, "patch"), /ESCALATION/);
   assert.throws(() => pinIteration(root, it, "minor"), /ESCALATION/);
-  // An unknown size refuses with the vocabulary.
-  assert.throws(() => pinIteration(root, it, "product"), /patch \| minor \| major/);
+  // product SITS ABOVE major: the first iteration of a product authors the
+  // vision, the stakeholders and the actual state every later one inherits.
+  pinIteration(root, it, "product");
+  const pin3 = JSON.parse(readFileSync(join(it.path, itPinRel(it.id)), "utf8")) as { change_size: string; machine: MachineDecl };
+  assert.equal(pin3.change_size, "product");
+  validateMachine(pin3.machine);
+  // specification is read and validated as a column, never pinned as a walk.
+  assert.throws(() => pinIteration(root, it, "specification"), /patch \| minor \| major \| product/);
 });
 
 test("the chunk machine: refused when unseeded, compiled with realization tags and the join", () => {

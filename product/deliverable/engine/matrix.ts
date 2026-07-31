@@ -12,8 +12,10 @@ import { join } from "node:path";
 import { parseStateNote, section } from "./notes.ts";
 import { validateMachine, type EdgeDecl, type EvidenceField, type MachineDecl, type StateDecl } from "./machine.ts";
 
-export const CHANGE_COLUMNS = ["patch", "minor", "major"] as const;
-export const ALL_COLUMNS = ["patch", "minor", "major", "product", "specification"] as const;
+// specification is not a rigor level: it says how a step's output becomes
+// documentation. It is read and validated like any column, never pinned.
+export const CHANGE_COLUMNS = ["patch", "minor", "major", "product"] as const;
+export const ALL_COLUMNS = [...CHANGE_COLUMNS, "specification"] as const;
 export type ChangeColumn = (typeof CHANGE_COLUMNS)[number];
 export type MatrixColumn = (typeof ALL_COLUMNS)[number];
 

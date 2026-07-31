@@ -306,7 +306,9 @@ export function generateSeeded(root: string, it: Iteration, machineId: string, k
   return { decl, canvas: pinnedCanvas(decl), expByState: {} };
 }
 
-const SIZE_ORDER = ["patch", "minor", "major"];
+/** The escalation ladder IS the column list — one source, so the two cannot
+ *  drift apart. */
+const SIZE_ORDER = CHANGE_COLUMNS as readonly string[];
 
 /** THE PIN (owner verdicts 2026-07-30): the kickoff bless compiles the
  *  blessed change size from the LIVE matrix and pins the machine into the
