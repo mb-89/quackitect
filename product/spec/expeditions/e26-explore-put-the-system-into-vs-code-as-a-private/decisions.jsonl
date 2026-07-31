@@ -261,3 +261,10 @@
 {"ts":"2026-07-31T08:12:39.009Z","op":"update","visit":"expeditions/e26@0","node":"d139","brief":"the test pins the meaning, not the hex"}
 {"ts":"2026-07-31T08:12:41.819Z","op":"update","visit":"expeditions/e26@0","node":"d140","brief":"re-running after the test now pins the variable"}
 {"ts":"2026-07-31T08:13:27.711Z","op":"update","visit":"expeditions/e26@0","node":"d141","brief":"staging the palette and the walk colour change"}
+{"ts":"2026-07-31T08:13:38.480Z","op":"done","visit":"expeditions/e26@0","node":"d118","brief":"palette.css is the truth; 36 accent sites read it"}
+{"ts":"2026-07-31T08:13:58.096Z","op":"update","visit":"expeditions/e26@0","node":"d142","brief":"landing the colour work before sweeping the notes"}
+{"ts":"2026-07-31T08:14:05.066Z","op":"update","visit":"expeditions/e26@0","node":"d143","brief":"listing the inbox to find small actionable fixes"}
+{"ts":"2026-07-31T08:14:37.091Z","op":"update","visit":"expeditions/e26@0","node":"d144","brief":"exported README documents the export; stale canvas comment corrected"}
+{"ts":"2026-07-31T08:14:49.369Z","op":"update","visit":"expeditions/e26@0","node":"d145","brief":"documenting the export in the exported README"}
+{"ts":"2026-07-31T08:15:02.366Z","op":"update","visit":"expeditions/e26@0","node":"d146","brief":"re-proving the export after the README and palette changes"}
+{"ts":"2026-07-31T08:15:38.927Z","op":"done","visit":"expeditions/e26@0","node":"d119","brief":"export self-documents; stale drawing comment corrected"}

@@ -150,10 +150,18 @@ The $($newAbbr.ToUpper()) button in the left bar opens the mirror.
 - product/spec - where your own records get written.
 - workspace/ - where the agent runs, fenced in.
 - brand.json - the product name. Change it, and every surface follows.
+- palette.css - every colour. Edit it. No code change, no restart.
 
 ## Attaching an agent
 
 Open the command palette and run "$($newName): How to Attach Your Agent".
+
+## Give it to someone else
+
+    .\RUNME.ps1 --export C:\path\to\empty "Their Name" TN
+
+That makes a fresh copy under a new name, with its own empty git repo. Your
+history and your records stay here.
 "@
     [System.IO.File]::WriteAllText((Join-Path $dest "README.md"), $readme, $utf8NoBom)
     git config user.name "$newName"
