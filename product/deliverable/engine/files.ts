@@ -265,10 +265,25 @@ export function filePatch(root: string, ops: PatchOp[]): PatchResult {
     }
     const count = current.split(op.old_string).length - 1;
     if (count === 0 || (count > 1 && op.replace_all !== true)) {
+      // WHY it did not match, not merely that it did not. This refusal fired
+      // twelve times in one period, and its commonest cause is INVISIBLE: a
+      // CRLF file against an old_string written with LF. "Copy the exact
+      // text" is useless advice when the difference cannot be seen, so the
+      // engine looks for the near-miss and names it.
+      let why = "";
+      if (count === 0) {
+        const lf = (s: string): string => s.replace(/\r\n/g, "\n");
+        const flat = (s: string): string => lf(s).replace(/[ \t]+/g, " ");
+        if (lf(current).includes(lf(op.old_string))) {
+          why = " — but it MATCHES with line endings normalised: this file is CRLF and your old_string is LF";
+        } else if (flat(current).includes(flat(op.old_string))) {
+          why = " — but it MATCHES with runs of spaces and tabs collapsed: the indentation differs";
+        }
+      }
       throw new Rejection({
         clause: CLAUSES.PATCH_AMBIGUOUS,
         expected: count === 0 ? `old_string to occur in ${op.path}` : `old_string to occur exactly once in ${op.path} (or pass replace_all: true)`,
-        got: `${count} occurrences (op ${i + 1}/${ops.length}) — nothing was written`,
+        got: `${count} occurrences (op ${i + 1}/${ops.length}) — nothing was written${why}`,
         remedy: {
           tool: "se_file_read",
           args: { path: op.path },

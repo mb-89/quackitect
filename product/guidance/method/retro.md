@@ -42,7 +42,16 @@ The trigger is a NOTE carrying "needs retro":
 2. Field feedback. Ask the owner what came back from the
    field since the last look. Capture every answer as a note.
 3. Drain the notes inbox. Walk EVERY pending note once. Disposition each
-   with se_note_drain — route it to exactly ONE home:
+   with se_note_drain — route it to exactly ONE home.
+   CHECK BEFORE YOU JUDGE, and check CHEAPLY. Most of what pends is often
+   ALREADY BUILT — on 2026-07-31 the twelve smallest notes were sampled and
+   most had shipped, some days earlier. A note describing a gap is a claim
+   about the code, and the code answers in seconds: call the tool, grep the
+   fix, read the state. Record the check beside the disposition, so the
+   next retro re-runs it instead of re-reading the note.
+   THE INBOX IS NOT A BACKLOG. Left undrained it becomes history, and the
+   desk and the retro both weigh it as if it were work.
+   The homes:
    - done — shipped or handled; say where.
    - obsolete — overtaken, wrong, or durably rejected; say why, so it is
      never re-litigated.

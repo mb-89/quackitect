@@ -122,4 +122,5 @@ level that shows twenty things has stopped helping them choose.
 - Size the vehicle before choosing it. An expedition and an iteration are each worth ROUGHLY A DAY of agent work. Anything smaller goes INSIDE one.
 - Never spam the archives with many small records. Bundle related small work into ONE expedition or iteration. An archive reader does not care about ten-per-day granularity.
 - A single small fix never earns its own record. It is a commit inside an expedition that is already open, or inside one opened to hold the day's work.
+- AN EXPEDITION THAT BECOMES THE DAY'S BUCKET SAYS SO IN ITS GOAL. Bundling is right, and it quietly makes the goal a lie: an expedition opened to put the system into VS Code ended up holding a handover law, a rigor column, log paging and a palette file. Nobody looking for those would look there. Amend the goal when the bundle grows past it, or the archive keeps the work and loses the thread.
 - Commits stay fine-grained. Records do not. The two answer different questions.

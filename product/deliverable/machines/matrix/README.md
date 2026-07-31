@@ -23,3 +23,8 @@ part of the documentation.
 Strikes are proposals. The owner adjudicates every cell that reduces a
 step. The floor law binds: kickoff, green verification, docs-match and
 the accepted handover are never struck, at any size.
+
+A `comment` in a row's or a cell's frontmatter is the owner's OPEN REVIEW
+CHANNEL. An agent may work a comment IN, and may not delete the field until
+the owner says the round is done. The first round's comments were consumed
+before this was written; git history holds them.
