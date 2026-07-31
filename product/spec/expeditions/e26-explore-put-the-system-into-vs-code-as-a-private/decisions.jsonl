@@ -340,3 +340,12 @@
 {"ts":"2026-07-31T08:50:43.843Z","op":"update","visit":"expeditions/e26@0","node":"d210","brief":"re-running the survey window tests"}
 {"ts":"2026-07-31T08:50:50.727Z","op":"done","visit":"expeditions/e26@0","node":"d201","brief":"window, brief form and note refs all fenced"}
 {"ts":"2026-07-31T08:51:38.743Z","op":"update","visit":"expeditions/e26@0","node":"d211","brief":"committing the inbox window and note lookup"}
+{"ts":"2026-07-31T08:51:43.198Z","op":"update","visit":"expeditions/e26@0","node":"d212","brief":"landing the inbox window and note lookup"}
+{"ts":"2026-07-31T08:52:14.519Z","op":"plan","visit":"expeditions/e26@0","parent":null,"nodes":[{"id":"d213","brief":"Make the brief refusal show what tripped it"},{"id":"d214","brief":"Fence it with a test"}]}
+{"ts":"2026-07-31T08:52:45.064Z","op":"done","visit":"expeditions/e26@0","node":"d213","brief":"the refusal names the text, the parts and which item"}
+{"ts":"2026-07-31T08:52:51.797Z","op":"update","visit":"expeditions/e26@0","node":"d215","brief":"checking for an existing lint test"}
+{"ts":"2026-07-31T08:52:58.426Z","op":"update","visit":"expeditions/e26@0","node":"d216","brief":"reading the existing lint test to extend it"}
+{"ts":"2026-07-31T08:53:14.159Z","op":"update","visit":"expeditions/e26@0","node":"d217","brief":"holding the refusal's wording to account"}
+{"ts":"2026-07-31T08:53:19.521Z","op":"update","visit":"expeditions/e26@0","node":"d218","brief":"running the feed tests"}
+{"ts":"2026-07-31T08:53:29.250Z","op":"done","visit":"expeditions/e26@0","node":"d214","brief":"the refusal's wording is now fenced"}
+{"ts":"2026-07-31T08:54:16.386Z","op":"update","visit":"expeditions/e26@0","node":"d219","brief":"committing the clearer refusal"}

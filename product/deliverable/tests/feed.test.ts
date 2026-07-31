@@ -114,6 +114,36 @@ test("the render lint: the update lane refuses what renders weird", () => {
   assert.equal(d.to, "idle");
 });
 
+// THE MOST-HIT REFUSAL IN THE LANE, so its WORDS are held to account here.
+// Refusing correctly while saying neither which text nor which parts is how
+// a caller hits the same wall twice in a row.
+test("the render lint hands back the list the chain wanted to be", () => {
+  const got = (fn: () => unknown): string => {
+    try {
+      fn();
+    } catch (e) {
+      return String((e as { got?: string }).got ?? (e as Error).message);
+    }
+    throw new Error("expected a refusal");
+  };
+
+  const chain = got(() => parseUpdate({ op: "update", brief: "one, two, three" }));
+  assert.match(chain, /one, two, three/, "the offending text is quoted back");
+  assert.match(chain, /items:/, "and the remedy is named");
+  for (const part of ["one", "two", "three"]) {
+    assert.match(chain, new RegExp(`"${part}"`), `${part} comes back as its own item`);
+  }
+
+  // WHICH item. A five-item plan refused on a bare "item" left the caller
+  // re-reading all five to find the one that tripped.
+  const item = got(() => parseUpdate({ op: "plan", items: ["fine", "fine too", "a, b, c"] }));
+  assert.match(item, /item 3/, "the failing item is numbered");
+
+  // The other two lints quote the text too.
+  assert.match(got(() => parseUpdate({ op: "update", brief: "a\nb" })), /\\n/, "the line break is shown, escaped");
+  assert.match(got(() => parseUpdate({ op: "update", brief: "y".repeat(91) })), /91 chars/);
+});
+
 test("replay: parked defers and open points survive an engine life", () => {
   const root = freshRoot();
   const dir = seDir(root);
