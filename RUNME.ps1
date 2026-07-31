@@ -89,6 +89,11 @@ if ($exportIx -ge 0) {
   }
   Write-Host "$P - exporting as '$newName' ($($newAbbr.ToUpper())) - history stays home" -ForegroundColor Cyan
   New-Item -ItemType Directory -Force -Path $dest | Out-Null
+  # ABSOLUTE FROM HERE. Push-Location below moves the working directory into
+  # the destination, so a RELATIVE $dest would resolve against the destination
+  # itself from that point on - brand.json and the README were written to
+  # <dest>\<dest>\... and the write failed with a path not found.
+  $dest = (Resolve-Path -LiteralPath $dest).Path
   # /XD excludes by NAME wherever it appears: the repo history, every
   # worktree, the session state, node_modules and the generated cage dirs.
   # /XF drops the generated MCP config; the _cage templates travel (their
