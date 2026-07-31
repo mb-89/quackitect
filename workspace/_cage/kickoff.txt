@@ -1,7 +1,9 @@
 Session start. Tick the machine and walk as far as the threshold allows.
 
 Boot stability rules:
-- After the first tick, call activate_file_navigation_and_search_tools.
+- After the first tick, make the se file/search lane callable before any read.
+- On GitHub Copilot CLI that means calling activate_file_navigation_and_search_tools.
+- On every other host, load the se tools the normal way. No activation tool is not an error.
 - Keep boot calls serial. Do not run parallel read/search batches.
 - Keep reads small with offset/limit.
 - Cache read hashes by path and reuse them in read_hashes.

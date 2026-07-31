@@ -11,7 +11,7 @@ Boot exists to reach idle fast and clean.
 ## Startup order
 
 - First call is `se_tick` with no arguments.
-- Immediately activate file and search lane tools.
+- Immediately make the file and search lane callable. How depends on the host — workspace/AGENTS.md says which way per host.
 - Then follow the machine one state at a time.
 
 ## Stability pattern

@@ -20,9 +20,18 @@ to cancel itself on them, so serial is what works everywhere.
 
 Do this AT THE START OF EVERY SESSION, unasked. Whatever the user's first
 message says — even if it says nothing about the machine — your first tool
-call is `se_tick`. Immediately after that first tick, call
-`activate_file_navigation_and_search_tools` so the `se` file/search lane is
-registered before boot read gates. Walk as far as the autonomy allows, then
+call is `se_tick`. Immediately after that first tick, make the `se`
+file/search lane callable. Boot's read gates need it. HOW depends on the
+host, so do whichever applies:
+
+- GITHUB COPILOT CLI hides the lane behind an activation tool. Call
+  `activate_file_navigation_and_search_tools` right after the first tick.
+- EVERY OTHER HOST offers the `se` tools directly, or defers them by name.
+  Load them the way that host loads deferred tools.
+- NO ACTIVATION TOOL IS NOT A BOOT FAILURE. Do not hunt for it. Its absence
+  means the host is not Copilot.
+
+Walk as far as the autonomy allows, then
 report in ONE short message: where you stand, and why you stopped (autonomy,
 condition, or idle). The launcher may also send you an opening prompt saying
 exactly this; the two agree on purpose, so that an agent started by hand,

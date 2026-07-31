@@ -19,6 +19,12 @@ Immediately after that first tick, call
 `se` file/search tools can be present but not registered yet; activating the
 group up front prevents `se_file_read` startup failures in boot.
 
+This file and `workspace/_cage/kickoff.txt` deliberately repeat what
+`AGENTS.md` says. They have to. The lane is not callable yet when they are
+read, so they cannot point at a file the agent cannot open. `AGENTS.md` is
+still the source of truth — change it there first, then carry the change
+into these two.
+
 READ SERIALLY, THE WHOLE SESSION — not only in boot. Send `se_file_read`
 calls one after another, never as a parallel batch. This host appears to
 cancel its own MCP calls when they go out in parallel, which surfaces as
