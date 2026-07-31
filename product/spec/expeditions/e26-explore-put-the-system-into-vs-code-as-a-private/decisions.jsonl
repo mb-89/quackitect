@@ -566,3 +566,6 @@
 {"ts":"2026-07-31T18:35:05.479Z","op":"done","visit":"expeditions/e26@0","node":"d11","brief":"the start button now hands Claude its kickoff through the editor door"}
 {"ts":"2026-07-31T18:35:19.924Z","op":"update","visit":"expeditions/e26@0","node":"d18","brief":"running the engine checks over the day's edits"}
 {"ts":"2026-07-31T18:36:26.535Z","op":"done","visit":"expeditions/e26@0","node":"d13","brief":"goal amended, and the verification gap is captured"}
+{"ts":"2026-07-31T18:38:10.411Z","op":"plan","visit":"expeditions/e26@0","parent":null,"nodes":[{"id":"d19","brief":"Compose the leave report as prefills for confirmation"}]}
+{"ts":"2026-07-31T18:39:15.817Z","op":"done","visit":"expeditions/e26@0","node":"d19","brief":"report confirmed on the owner's explicit word"}
+{"ts":"2026-07-31T18:43:47.218Z","op":"plan","visit":"expeditions/e26-leave@0","parent":null,"nodes":[{"id":"d20","brief":"Close e26 and merge the day's work to trunk"}]}
