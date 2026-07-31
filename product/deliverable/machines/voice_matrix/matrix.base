@@ -1,0 +1,75 @@
+properties:
+  file.name:
+    displayName: Rule set
+  statement:
+    displayName: Statement
+  tier:
+    displayName: Tier
+  brief:
+    displayName: Brief
+  refusal:
+    displayName: Refusal
+  note:
+    displayName: Note
+  answer:
+    displayName: Answer
+  guidance:
+    displayName: Guidance
+  record:
+    displayName: Record
+  document:
+    displayName: Document
+  comment:
+    displayName: Comment
+views:
+  - type: table
+    name: The matrix
+    filters:
+      and:
+        - kind == "voice-row"
+    order:
+      - file.name
+      - brief
+      - refusal
+      - note
+      - answer
+      - guidance
+      - record
+      - document
+      - COMMENT
+    sort:
+      - property: file.name
+        direction: ASC
+  - type: table
+    name: Runs at every write
+    filters:
+      and:
+        - kind == "voice-row"
+        - tier == "one"
+    order:
+      - file.name
+      - statement
+    sort:
+      - property: file.name
+        direction: ASC
+  - type: table
+    name: Needs a tagger, runs at review
+    filters:
+      and:
+        - kind == "voice-row"
+        - tier == "two"
+    order:
+      - file.name
+      - statement
+    sort:
+      - property: file.name
+        direction: ASC
+  - type: table
+    name: Open review comments
+    filters:
+      and:
+        - kind == "voice-row"
+        - comment
+    order:
+      - file.name
+      - comment
