@@ -21,8 +21,11 @@ Boot exists to reach idle fast and clean.
 - Keep reads small with `offset` and `limit`.
 - Cache read hashes by path for this session.
 - Reuse cached hashes in `read_hashes` on later ticks.
-- Read every path in `pulled` and `lookahead_read` as soon as it first appears.
-- If a target is set, call `se_tick {route: "<target>"}` and read every path in its `reads` list before advancing.
+- The packet carries `route_reads` whenever a target is set. It lists every document the way there demands.
+- Read that whole list in ONE `se_file_read`. That is the only reading call boot needs.
+- You do not have to ask for it. You do not have to know any route syntax.
+- Keep the hashes. Send them in `read_hashes` on every tick.
+- With no target set, read `pulled` and `lookahead_read` as each path first appears.
 
 ## Re-read rules
 

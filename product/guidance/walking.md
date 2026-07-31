@@ -42,7 +42,8 @@ Read-ahead discipline (every state):
 - Keep a session cache of path -> hash from `se_file_read`.
 - Reuse cached hashes in every moving `se_tick` through `read_hashes`.
 - Re-read only when a refusal says the hash is missing or stale, or when the path appears for the first time.
-- If a target is set, run `se_tick {route: "<target>"}` and pre-read every path in `reads` before the walk.
+- A target set means the packet carries `route_reads`. That is every document the whole way demands, gathered once. Read it in ONE call and keep the hashes.
+- The target can be set by you, by the person, or by the machine at start. The list follows whichever set it.
 - If a state allows no tools, do not read there. Tick only.
 
 Two more arguments go with `target`, and only make sense beside it — they

@@ -53,10 +53,12 @@ BOOT STABILITY FOR THIS HOST:
 - Keep boot calls serial. Do not run parallel search/read batches.
 - Keep reads small with offset/limit to avoid oversized host payloads.
 - Cache read hashes by path for the session. Reuse them in read_hashes.
-- On every packet, pre-read paths from `pulled` and `lookahead_read` once,
-  then keep reusing those hashes while they stay current.
-- If a target is set, call `se_tick {route: "<target>"}` and pre-read every
-  path in `reads` before moving.
+- The packet carries `route_reads` when a target is set. It names every
+  document the whole way there demands, gathered once.
+- Read that entire list in ONE `se_file_read`. Nothing else needs asking
+  for, and no route syntax needs remembering.
+- Keep those hashes and reuse them while they stay current.
+- With no target set, pre-read `pulled` and `lookahead_read` as they appear.
 - Re-read only when a refusal names missing/current hashes, or when a path
   appears for the first time.
 - If a state allows no tools, do not call read/search there. Tick only.

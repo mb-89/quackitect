@@ -541,3 +541,14 @@
 {"ts":"2026-07-31T17:58:51.140Z","op":"update","visit":"expeditions/e26@0","node":"d7","brief":"Calling the real side-bar command instead of probing"}
 {"ts":"2026-07-31T17:58:57.912Z","op":"update","visit":"expeditions/e26@0","node":"d8","brief":"Running preflight and the full suite over the edit"}
 {"ts":"2026-07-31T18:00:47.590Z","op":"done","visit":"expeditions/e26@0","node":"d3","brief":"Probe replaced; suite green at 271 and the file parses"}
+{"ts":"2026-07-31T18:01:17.661Z","op":"update","visit":"expeditions/e26@0","node":"d9","brief":"Blocked on a window reload; checking the reading question meanwhile"}
+{"ts":"2026-07-31T18:07:20.084Z","op":"plan","visit":"expeditions/e26@0","parent":null,"nodes":[{"id":"d10","brief":"Confirm route already unions every hop's reads"},{"id":"d11","brief":"Put the route read list into the packet when a target is set"},{"id":"d12","brief":"Test that start hands over all eleven boot docs"},{"id":"d13","brief":"Land it so one RUNME picks up both fixes"}]}
+{"ts":"2026-07-31T18:07:32.215Z","op":"done","visit":"expeditions/e26@0","node":"d10","brief":"route() unions demands.read plus pulled across every hop"}
+{"ts":"2026-07-31T18:08:21.632Z","op":"update","visit":"expeditions/e26@0","node":"d14","brief":"Packet now carries route_reads whenever a target is set"}
+{"ts":"2026-07-31T18:08:30.068Z","op":"update","visit":"expeditions/e26@0","node":"d15","brief":"Checking the packet change against the suite"}
+{"ts":"2026-07-31T18:10:11.044Z","op":"update","visit":"expeditions/e26@0","node":"d16","brief":"route_reads now covers consumed documents that exist"}
+{"ts":"2026-07-31T18:10:46.547Z","op":"update","visit":"expeditions/e26@0","node":"d17","brief":"Writing the one-read one-sweep proof"}
+{"ts":"2026-07-31T18:11:35.707Z","op":"done","visit":"expeditions/e26@0","node":"d12","brief":"One read plus one sweep reaches the target; three tests pass"}
+{"ts":"2026-07-31T18:11:52.484Z","op":"done","visit":"expeditions/e26@0","node":"d11","brief":"Packet, guidance and tool description all hand the list over"}
+{"ts":"2026-07-31T18:11:56.664Z","op":"update","visit":"expeditions/e26@0","node":"d18","brief":"Full suite before landing"}
+{"ts":"2026-07-31T18:12:53.324Z","op":"update","visit":"expeditions/e26@0","node":"d19","brief":"Voice lint over the edited guidance"}

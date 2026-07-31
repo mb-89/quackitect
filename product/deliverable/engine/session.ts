@@ -985,7 +985,11 @@ export class Session {
       const cut = s.to.lastIndexOf("/");
       const decl = this.declForPrefix(cut < 0 ? "" : s.to.slice(0, cut));
       const st = decl?.states.find((x) => x.id === (cut < 0 ? s.to : s.to.slice(cut + 1)));
-      if (decl !== undefined && st !== undefined) for (const d of this.pulled(decl, st)) reads.add(d.path);
+      if (decl === undefined || st === undefined) continue;
+      for (const d of this.pulled(decl, st)) reads.add(d.path);
+      // A consumed document is read like any other. Only one that is really
+      // there joins the list — the handover usually is not.
+      for (const p of this.consumeDemand(st)) reads.add(p);
     }
     return {
       ...r,
@@ -995,6 +999,18 @@ export class Session {
       reads: [...reads].sort(),
       ...(judgments.length > 0 ? { stops_at: { at: judgments[0].at, why: judgments[0].why } } : {}),
     };
+  }
+
+  /** The whole way's reading list, for the packet to carry unasked.
+   *  Empty with no target, and empty when the way cannot be drawn — a
+   *  target no edge reaches must not take the packet down with it. */
+  private routeReads(): string[] {
+    if (this._target === "") return [];
+    try {
+      return this.route(this._target).reads;
+    } catch {
+      return [];
+    }
   }
 
   /** THE SWEEP — the route, walked. It collapses ROUND TRIPS and nothing
@@ -2027,6 +2043,9 @@ export class Session {
     });
     this.clearTargetIfArrived();
     const { all, tools } = this.legal();
+    // AFTER the arrival check, never before: reaching the target clears it,
+    // and a list for a way already walked is worse than none.
+    const routeReads = this.routeReads();
     return {
       machine: this.machine.id,
       breadcrumb: this.breadcrumb(),
@@ -2038,6 +2057,12 @@ export class Session {
       // WHERE THIS IS HEADED. Carried on every packet so neither hand has
       // to ask, and so a walk that drifts off the way is visibly off it.
       target: this._target,
+      // EVERY DOCUMENT THE WAY AHEAD DEMANDS, gathered once and handed over
+      // unasked. The target is known, so the reading it takes to reach it is
+      // known with it; revealing that one state at a time costs a round trip
+      // per wave for nothing. Read the lot in ONE se_file_read, keep the
+      // hashes, and skip whatever the cache already holds.
+      ...(routeReads.length > 0 ? { route_reads: routeReads } : {}),
       // The session's reading list: what the human checked while driving.
       // Your advances must prove the same docs (paths only — the hashes
       // are earned by reading).
