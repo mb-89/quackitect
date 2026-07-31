@@ -2,6 +2,7 @@
 // machine (copied from this repo), so buildServer() compiles the same
 // drawing the shipped server does.
 import { chmodSync, cpSync, existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, renameSync, rmSync, statSync, symlinkSync, writeFileSync } from "node:fs";
+import { spawnSync } from "node:child_process";
 import { createRequire } from "node:module";
 import { tmpdir } from "node:os";
 import { join, sep } from "node:path";
@@ -207,6 +208,18 @@ export function readHashesFor(root: string): Record<string, string> {
 /** The human's side of the same proof: check every boot doc in the mirror. */
 export function checkDocs(session: { humanCheck: (p: string) => unknown }): void {
   for (const p of READ_DOCS) session.humanCheck(p);
+}
+
+/** A test root with a real repository in it. Anything that lists
+ *  expeditions runs git, and a root without .git refuses before it answers. */
+export function gitInit(root: string): void {
+  const g = (...a: string[]): void => {
+    const r = spawnSync("git", a, { cwd: root, encoding: "utf8", windowsHide: true });
+    if (r.status !== 0) throw new Error(`git ${a.join(" ")} failed: ${r.stderr}`);
+  };
+  g("init");
+  g("config", "user.email", "se@test.local");
+  g("config", "user.name", "se test");
 }
 
 /** Leaving through main's end demands a handover written THIS session

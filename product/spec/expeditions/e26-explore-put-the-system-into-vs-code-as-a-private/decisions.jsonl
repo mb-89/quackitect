@@ -324,3 +324,19 @@
 {"ts":"2026-07-31T08:46:49.701Z","op":"update","visit":"expeditions/e26@0","node":"d195","brief":"re-running the log query tests"}
 {"ts":"2026-07-31T08:46:57.233Z","op":"update","visit":"expeditions/e26@0","node":"d196","brief":"running the full suite with the new file"}
 {"ts":"2026-07-31T08:47:45.928Z","op":"done","visit":"expeditions/e26@0","node":"d189","brief":"241 green; paging and text fenced by a new test file"}
+{"ts":"2026-07-31T08:47:50.410Z","op":"update","visit":"expeditions/e26@0","node":"d197","brief":"landing the log paging on v3"}
+{"ts":"2026-07-31T08:48:02.861Z","op":"update","visit":"expeditions/e26@0","node":"d198","brief":"reading the ruling on how notes should be readable"}
+{"ts":"2026-07-31T08:48:23.488Z","op":"plan","visit":"expeditions/e26@0","parent":null,"nodes":[{"id":"d199","brief":"Give the survey real note content"},{"id":"d200","brief":"Let a note be read by its ref"},{"id":"d201","brief":"Fence both with tests"}]}
+{"ts":"2026-07-31T08:48:55.470Z","op":"update","visit":"expeditions/e26@0","node":"d202","brief":"checking the notes store API before paging it"}
+{"ts":"2026-07-31T08:49:17.208Z","op":"done","visit":"expeditions/e26@0","node":"d199","brief":"the survey windows its notes and can answer briefly"}
+{"ts":"2026-07-31T08:49:29.331Z","op":"update","visit":"expeditions/e26@0","node":"d203","brief":"the by-ref lookup now answers for notes too"}
+{"ts":"2026-07-31T08:49:35.619Z","op":"update","visit":"expeditions/e26@0","node":"d204","brief":"checking the inbox import in tools"}
+{"ts":"2026-07-31T08:49:41.046Z","op":"done","visit":"expeditions/e26@0","node":"d200","brief":"note refs resolve through se_log_query"}
+{"ts":"2026-07-31T08:50:00.662Z","op":"update","visit":"expeditions/e26@0","node":"d205","brief":"writing tests for the window, the brief form and note refs"}
+{"ts":"2026-07-31T08:50:04.540Z","op":"update","visit":"expeditions/e26@0","node":"d206","brief":"running the survey window tests"}
+{"ts":"2026-07-31T08:50:15.061Z","op":"update","visit":"expeditions/e26@0","node":"d207","brief":"probing the actual survey response shape"}
+{"ts":"2026-07-31T08:50:34.530Z","op":"update","visit":"expeditions/e26@0","node":"d208","brief":"giving the test roots a real repository"}
+{"ts":"2026-07-31T08:50:40.127Z","op":"update","visit":"expeditions/e26@0","node":"d209","brief":"importing spawnSync for the shared gitInit"}
+{"ts":"2026-07-31T08:50:43.843Z","op":"update","visit":"expeditions/e26@0","node":"d210","brief":"re-running the survey window tests"}
+{"ts":"2026-07-31T08:50:50.727Z","op":"done","visit":"expeditions/e26@0","node":"d201","brief":"window, brief form and note refs all fenced"}
+{"ts":"2026-07-31T08:51:38.743Z","op":"update","visit":"expeditions/e26@0","node":"d211","brief":"committing the inbox window and note lookup"}
