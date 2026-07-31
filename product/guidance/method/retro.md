@@ -81,6 +81,20 @@ The trigger is a NOTE carrying "needs retro":
    — a determinizer tool, a guidance page, a prompt. Repeated or
    process-relevant commands especially. The raw log is KEPT (owner ruling:
    forever-until-1GB; a garbage collector may harvest it later).
+   THEN MINE THE TEST TIMINGS (owner ruling 2026-07-31). Every run records
+   every test's duration to .se/test-timings.jsonl — file, name, ms, pass.
+   Rank them, and rank the files by their summed cost.
+   A TEST FAR ABOVE ITS SIBLINGS OWES AN EXPLANATION. Sometimes there is a
+   good one: it drives a real server, or it walks a whole machine end to
+   end. Sometimes there is not, and then it is a lead like any other. The
+   usual culprits, in the order they are worth trying:
+   - A fresh template copied per case, where the cases never mutate it.
+   - A real dependency where a stub would prove the same thing.
+   - Sequential cases inside ONE file, which is the only unit that reaches
+     a second core (software.md). A file dominating the wall clock gets
+     SPLIT before anything clever is attempted inside it.
+   COMPARE ACROSS RUNS, not within one. The record appends, so a test that
+   has been getting slower for a fortnight is visible here and nowhere else.
 8. Tally the previous retro's improvements. Promote the wins. Dismiss the
    duds WITH the reason recorded, so a dud is never re-proposed.
 9. Check the contract. Walk the contract rule by rule against the

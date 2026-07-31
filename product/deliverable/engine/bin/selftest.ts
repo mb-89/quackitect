@@ -12,6 +12,7 @@
 import { existsSync, readdirSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { spawnSync } from "node:child_process";
+import { pathToFileURL } from "node:url";
 
 function argValue(flag: string): string | undefined {
   const i = process.argv.indexOf(flag);
@@ -45,7 +46,19 @@ if (!existsSync(testsDir)) {
 const files = readdirSync(testsDir)
   .filter((f) => f.endsWith(".test.ts"))
   .map((f) => join("tests", f));
-const r = spawnSync(process.execPath, ["--test", ...files], {
+// EVERY RUN IS TIMED (owner ruling 2026-07-31). Two reporters: the ordinary
+// one keeps the human output exactly as it was, and test-timings writes the
+// per-test record to .se/ for the retro to read. A suite whose cost is only
+// visible when somebody goes looking is a suite nobody measures.
+const REPORTERS = [
+  "--test-reporter=spec",
+  "--test-reporter-destination=stdout",
+  // A file:// URL, not a path. On Windows the ESM loader reads a bare
+  // absolute path as the protocol "c:" and refuses.
+  `--test-reporter=${pathToFileURL(join(dir, "engine", "bin", "test-timings.mjs")).href}`,
+  "--test-reporter-destination=stderr",
+];
+const r = spawnSync(process.execPath, ["--test", ...REPORTERS, ...files], {
   cwd: dir,
   encoding: "utf8",
   timeout: 110_000,
@@ -55,9 +68,18 @@ const r = spawnSync(process.execPath, ["--test", ...files], {
 const out = `${r.stdout ?? ""}${r.stderr ?? ""}`;
 // The condition's evidence is the verdict, not the firehose: failures by
 // name plus the tallies. (scriptRun caps output anyway — cap honestly.)
+// BOTH REPORTER DIALECTS. TAP writes "not ok" and "# pass"; the spec
+// reporter writes "✖" and "ℹ pass". This matched TAP only, and node's default
+// moved to spec — so it quietly matched NOTHING and every run fell back to
+// the last 1500 characters. A summary that stops summarising without saying
+// so is worse than no summary, because the caller cannot tell.
 const summary = out
   .split("\n")
-  .filter((l) => l.startsWith("not ok") || /^# (tests|suites|pass|fail) /.test(l))
+  .map((l) => l.trimEnd())
+  .filter((l) => {
+    const t = l.trimStart();
+    return l.startsWith("not ok") || t.startsWith("✖") || /^[#ℹ] (tests|suites|pass|fail) /.test(t);
+  })
   .join("\n");
 process.stdout.write(`${summary || out.slice(-1500)}\n`);
 process.exit(r.status ?? 1);
