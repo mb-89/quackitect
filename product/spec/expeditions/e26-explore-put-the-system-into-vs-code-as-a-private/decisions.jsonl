@@ -233,3 +233,31 @@
 {"ts":"2026-07-31T08:00:17.212Z","op":"update","visit":"expeditions/e26@0","node":"d111","brief":"asserting the declared consume on read_contract"}
 {"ts":"2026-07-31T08:00:20.959Z","op":"update","visit":"expeditions/e26@0","node":"d112","brief":"re-running the suite after the structural fix"}
 {"ts":"2026-07-31T08:01:14.918Z","op":"done","visit":"expeditions/e26@0","node":"d57","brief":"end refuses without a handover written this session"}
+{"ts":"2026-07-31T08:01:24.164Z","op":"done","visit":"expeditions/e26@0","node":"d59","brief":"238 green; both halves fenced by tests"}
+{"ts":"2026-07-31T08:01:37.198Z","op":"update","visit":"expeditions/e26@0","node":"d113","brief":"landing the handover law on v3"}
+{"ts":"2026-07-31T08:01:51.306Z","op":"update","visit":"expeditions/e26@0","node":"d114","brief":"recording the pull-versus-read answer"}
+{"ts":"2026-07-31T08:02:01.690Z","op":"update","visit":"expeditions/e26@0","node":"d115","brief":"noting the pull-read merge as design input"}
+{"ts":"2026-07-31T08:06:11.050Z","op":"plan","visit":"expeditions/e26@0","parent":null,"nodes":[{"id":"d116","brief":"Read the palette design note"},{"id":"d117","brief":"Colour only the state we stand in"},{"id":"d118","brief":"Move every colour into a config file"},{"id":"d119","brief":"Sweep the notes for other small fixes"},{"id":"d120","brief":"Merge pull and read into one concept"}]}
+{"ts":"2026-07-31T08:06:16.280Z","op":"update","visit":"expeditions/e26@0","node":"d121","brief":"reading the palette note from the root notes file"}
+{"ts":"2026-07-31T08:06:26.164Z","op":"done","visit":"expeditions/e26@0","node":"d116","brief":"palette note read; the owner just chose CSS over markdown"}
+{"ts":"2026-07-31T08:06:30.389Z","op":"update","visit":"expeditions/e26@0","node":"d122","brief":"reading the palette block and the walk colours"}
+{"ts":"2026-07-31T08:06:39.620Z","op":"update","visit":"expeditions/e26@0","node":"d123","brief":"finding every use of the walk colours"}
+{"ts":"2026-07-31T08:06:45.541Z","op":"update","visit":"expeditions/e26@0","node":"d124","brief":"reading the state styles to see the plain colour"}
+{"ts":"2026-07-31T08:07:01.694Z","op":"update","visit":"expeditions/e26@0","node":"d125","brief":"finding the static route to serve a palette file"}
+{"ts":"2026-07-31T08:07:05.974Z","op":"update","visit":"expeditions/e26@0","node":"d126","brief":"reading the vendor route to model the palette route on it"}
+{"ts":"2026-07-31T08:07:47.815Z","op":"update","visit":"expeditions/e26@0","node":"d127","brief":"writing the palette as an editable CSS file"}
+{"ts":"2026-07-31T08:08:00.701Z","op":"update","visit":"expeditions/e26@0","node":"d128","brief":"reading the page builders to inject the palette"}
+{"ts":"2026-07-31T08:08:17.710Z","op":"update","visit":"expeditions/e26@0","node":"d129","brief":"checking render imports for the palette reader"}
+{"ts":"2026-07-31T08:08:22.161Z","op":"update","visit":"expeditions/e26@0","node":"d130","brief":"listing render imports"}
+{"ts":"2026-07-31T08:09:05.214Z","op":"update","visit":"expeditions/e26@0","node":"d131","brief":"moving the palette out of code and dropping the been-there colour"}
+{"ts":"2026-07-31T08:09:13.339Z","op":"update","visit":"expeditions/e26@0","node":"d132","brief":"sweeping for colours still written in code"}
+{"ts":"2026-07-31T08:09:51.882Z","op":"done","visit":"expeditions/e26@0","node":"d117","brief":"past states keep the ordinary colour; only the walk's position is blue"}
+{"ts":"2026-07-31T08:10:45.449Z","op":"update","visit":"expeditions/e26@0","node":"d133","brief":"proving the palette file is what the page reads"}
+{"ts":"2026-07-31T08:10:58.214Z","op":"update","visit":"expeditions/e26@0","node":"d134","brief":"listing the accent literals to replace"}
+{"ts":"2026-07-31T08:11:32.711Z","op":"update","visit":"expeditions/e26@0","node":"d135","brief":"pointing every accent use at the palette variable"}
+{"ts":"2026-07-31T08:11:40.766Z","op":"update","visit":"expeditions/e26@0","node":"d136","brief":"checking nothing nested or lost in the sweep"}
+{"ts":"2026-07-31T08:11:45.650Z","op":"update","visit":"expeditions/e26@0","node":"d137","brief":"running the suite after the colour sweep"}
+{"ts":"2026-07-31T08:12:30.737Z","op":"update","visit":"expeditions/e26@0","node":"d138","brief":"reading the test that pins the accent literal"}
+{"ts":"2026-07-31T08:12:39.009Z","op":"update","visit":"expeditions/e26@0","node":"d139","brief":"the test pins the meaning, not the hex"}
+{"ts":"2026-07-31T08:12:41.819Z","op":"update","visit":"expeditions/e26@0","node":"d140","brief":"re-running after the test now pins the variable"}
+{"ts":"2026-07-31T08:13:27.711Z","op":"update","visit":"expeditions/e26@0","node":"d141","brief":"staging the palette and the walk colour change"}

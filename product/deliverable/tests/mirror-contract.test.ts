@@ -465,7 +465,9 @@ test("a deferred point reads as owed elsewhere, never as struck out", () => {
   const rule = /\.dnode\.s-deferred \{([^}]*)\}/.exec(html);
   assert.ok(rule, "deferred has a style of its own, not the default nothing");
   assert.ok(!/line-through/.test(rule[1]), "a strike is what says a point died");
-  assert.match(rule[1], /#e8b339/, "it keeps the open colour, because it is still owed");
+  // The VARIABLE, not a literal: colour is configuration now, and a test
+  // pinning a hex would refuse the palette file the right to change it.
+  assert.match(rule[1], /var\(--se-accent\)/, "it keeps the open colour, because it is still owed");
   assert.match(rule[1], /italic/, "and leans, because it is owed somewhere else");
   // The arrow, distinct from the strike obsolete carries.
   assert.match(html, /deferred: "→"/, "the badge is an arrow");

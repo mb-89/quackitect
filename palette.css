@@ -1,0 +1,45 @@
+/* THE PALETTE — every colour the product chooses, in one file.
+ *
+ * A person edits this. Changing a colour never means changing code.
+ * The surfaces read it live, so an edit shows on the next page load;
+ * the engine does not need restarting.
+ *
+ * Edit the values. Do not rename the variables — the surfaces ask for
+ * them by name.
+ */
+
+/* THE CHROME. A hosting webview (the VS Code extension) overrides these
+ * from the editor's own theme, so inside the editor these are the
+ * fallback rather than the answer. */
+:root {
+  --se-bg: #14171a;
+  --se-bg-side: #191d21;
+  --se-raised: #22272c;
+  --se-border: #2a2f34;
+  --se-border-strong: #3a4147;
+  --se-fg: #d8dde2;
+  --se-muted: #7f8b96;
+  --se-dim: #5b6772;
+}
+
+/* THE MEANINGS. Green passes, red fails, yellow wants attention. A host
+ * that names the same meaning overrides these; standalone they are ours. */
+:root {
+  --se-accent: #e8b339;
+  --se-accent-bg: #3a2f14;
+  --se-ok: #4a7a55;
+  --se-ok-bg: #1d2b20;
+  --se-warn: #e8b339;
+}
+
+/* THE WALK. Only where the walk STANDS is coloured (owner ruling
+ * 2026-07-31). Where it has been keeps the ordinary state colour: two
+ * shades of one blue asked the reader to compare hues, and that is not a
+ * difference the eye reads reliably.
+ *
+ * Blue on purpose, and the one colour no host reinterprets — every map
+ * application has already taught what a blue route line means. */
+:root {
+  --se-walk: #4a90d9;
+  --se-walk-bg: #1b2a3a;
+}
