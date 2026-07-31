@@ -831,7 +831,7 @@ export function buildServer(root: string, session = new Session(root), tollOpts:
   for (const t of tools) (t.inputSchema.properties as Record<string, unknown>).update = UPDATE_PROP;
   const server = new McpServer({ name: "se-mcp", version: "3.0.0-bootstrap" }, tools);
   const log = new CallLog(seDir(root));
-  const toll = new Toll(tollOpts);
+  const toll = new Toll({ ...tollOpts, level: () => session.narration });
 
   // Session read buffer: live se_file_read results feed later tick proofs.
   // Reads at a git ref are intentionally excluded.

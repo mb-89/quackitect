@@ -16,6 +16,7 @@ import { appendNote, pendingNotes, readNotes } from "./inbox.ts";
 import { loadCards } from "./cards.ts";
 import { handleHttp, type McpServer } from "./mcp.ts";
 import { feedRows, renderMirror, SHUTDOWN_LEVELS, type MirrorState } from "./render.ts";
+import { NARRATION_LEVELS } from "./toll.ts";
 import { resolveInRoot, seDir } from "./paths.ts";
 import { loadLevels } from "./scale.ts";
 import { Session } from "./session.ts";
@@ -133,6 +134,14 @@ export function startMirror(o: MirrorOptions): Server {
         post(req, res, "mirror_shutdown", (body) => ({
           args: { value: body.value },
           result: state.session.setShutdown(Number(body.value)),
+        }));
+        return;
+      }
+      if (req.method === "POST" && url.pathname === "/narration") {
+        // How often narration is OWED. The reader's hand, logged like the rest.
+        post(req, res, "mirror_narration", (body) => ({
+          args: { value: body.value },
+          result: state.session.setNarration(Number(body.value)),
         }));
         return;
       }
@@ -348,7 +357,7 @@ export function startMirror(o: MirrorOptions): Server {
         // The autonomy scale is authored in machines/scale.md, so a host that
         // kept its own copy of the notches would drift the moment it is edited.
         res.writeHead(200, { "content-type": "application/json; charset=utf-8", "access-control-allow-origin": "*" });
-        res.end(JSON.stringify({ autonomy: loadLevels(state.root), shutdown: SHUTDOWN_LEVELS }));
+        res.end(JSON.stringify({ autonomy: loadLevels(state.root), shutdown: SHUTDOWN_LEVELS, narration: NARRATION_LEVELS }));
         return;
       }
       if (url.pathname === "/api/cards") {

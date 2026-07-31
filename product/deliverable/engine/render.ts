@@ -23,6 +23,7 @@ import { loadLevels } from "./scale.ts";
 import { mainMachinePath, Session } from "./session.ts";
 import { compileMachineCached, resolveRef } from "./machines/compile.ts";
 import { type MachineDecl } from "./machine.ts";
+import { NARRATION_LEVELS } from "./toll.ts";
 
 function esc(s: string): string {
   return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
@@ -319,6 +320,7 @@ function briefFor(rec: CallRecord): string {
       return a.back !== undefined ? `back → ${a.back}` : a.to !== undefined ? `tick → ${a.to}` : "tick advance";
     case "mirror_check": return `check ${a.path}`;
     case "mirror_autonomy": return `autonomy → ${a.value}`;
+    case "mirror_narration": return `updates → ${a.value}`;
     case "mirror_script": return `run scripts · ${a.state}`;
     case "se_update": {
       const items = Array.isArray(a.items) ? ` (+${a.items.length})` : "";
@@ -1767,7 +1769,7 @@ async function openLogDetail(ref) {
   hostTrace("openLogDetail status " + r.status + " for " + ref);
   const rec = await r.json();
   hostTrace("openLogDetail parsed " + ref + " tool=" + String(rec.tool) + " err=" + String(rec.error));
-  if (rec.tool === "se_update" && rec.args && rec.args.visit) { await showDecisions(rec.args.visit, null); return; }
+  if (rec.tool === "se_update" && rec.args) { await showUpdateDetail(rec); return; }
   if ((rec.tool === "se_note" || rec.tool === "mirror_note") && rec.args) { showDetails("note · " + ((rec.response && rec.response.captured) || rec.ref), jsonTable({ at: rec.ts, text: rec.args.text, pending: "until a retro drains it" })); return; }
   if (rec.text !== undefined && rec.tool === undefined) { showDetails("note · " + rec.ref, jsonTable({ at: rec.at, text: rec.text, pending: "until a retro drains it" })); return; }
   if (rec.tool === "se_answer" && rec.args) {
@@ -1784,9 +1786,9 @@ async function showDecisions(visit, sel) {
   DECISION_GRAPH = await r.json();
   renderDecisions(sel);
 }
-function renderDecisions(sel) {
+function decisionsHtml(sel) {
   const g = DECISION_GRAPH;
-  if (!g) return;
+  if (!g) return "";
   const kids = {};
   g.nodes.forEach((n) => { (kids[n.parent || ""] = kids[n.parent || ""] || []).push(n); });
   const badge = { open: "●", done: "✓", obsolete: "⊘", reverted: "↩", deferred: "→" };
@@ -1795,12 +1797,54 @@ function renderDecisions(sel) {
       '<div class="dnode s-' + n.status + (n.id === g.active ? " dactive" : "") + (n.id === sel ? " dsel" : "") + '" data-node="' + n.id + '" style="margin-left:' + depth * 14 + 'px" title="' + n.id + " · " + n.status + '">' + badge[n.status] + " " + escText(n.brief) + "</div>" + tree(n.id, depth + 1)
     ).join("");
   }
-  let html = tree("", 0) || '<div class="meta">no decisions recorded for ' + escText(g.visit) + "</div>";
+  let html = tree("", 0) || '<div class="meta">no checklist stands at ' + escText(g.visit) + "</div>";
   if (sel) {
     const n = g.nodes.find((x) => x.id === sel);
     if (n) html += '<div class="dinfo">' + jsonTable(Object.assign({ id: n.id, brief: n.brief, status: n.status }, n.resolution ? { resolution: n.resolution } : {}, { opened: n.at }, n.closed_at ? { closed: n.closed_at } : {})) + "</div>";
   }
-  showDetails("decisions · " + g.visit, html);
+  return html;
+}
+function renderDecisions(sel) {
+  if (!DECISION_GRAPH) return;
+  showDetails("decisions · " + DECISION_GRAPH.visit, decisionsHtml(sel));
+}
+// A CLICKED UPDATE SHOWS WHAT IT CHANGED, always.
+//
+// It used to jump straight to the visit's tree and show nothing else. So an
+// update recorded where no checklist stands — a bare update, a refused one,
+// a plan on a state nobody had planned — opened on "no decisions recorded"
+// and read as broken. Which kind of update you clicked decided whether the
+// pane said anything, which is exactly backwards.
+//
+// The op itself comes first now, from the log record, so a line always
+// explains itself. The tree follows underneath when there is one, with the
+// point this update touched selected.
+async function showUpdateDetail(rec) {
+  const a = rec.args || {};
+  const res = rec.response || {};
+  const refused = a.refused === true || rec.ok === false;
+  const rows = {};
+  rows.op = refused ? "refused" : (a.op || "update");
+  rows.rode_on = a.via;
+  if (a.visit) rows.at = a.visit;
+  if (a.node) rows.node = a.node;
+  if (a.brief) rows.brief = a.brief;
+  if (a.to) rows.deferred_to = a.to;
+  if (Array.isArray(a.items)) rows.items = a.items;
+  if (res.active) rows.now_active = res.active;
+  if (res.open !== undefined) rows.still_open = res.open;
+  if (res.nudge) rows.nudge = res.nudge;
+  if (refused) rows.why = (res.expected ? String(res.expected) : "") + (res.got ? " — got " + String(res.got) : "") || "the narration was refused; the call it rode on still landed";
+  rows.at_time = rec.ts;
+  let html = '<div class="dinfo">' + jsonTable(rows) + "</div>";
+  if (a.visit) {
+    try {
+      const r = await fetch("/api/decisions?visit=" + encodeURIComponent(a.visit));
+      DECISION_GRAPH = await r.json();
+      html += decisionsHtml(a.node || res.active || null);
+    } catch (e) { html += '<div class="meta">the checklist could not be read: ' + escText(String((e && e.message) || e)) + "</div>"; }
+  }
+  showDetails("update · " + rows.op + (a.node ? " " + a.node : ""), html);
 }
 // FEEDBACK WITHIN A SECOND (owner law 2026-07-28): anything that can take
 // longer shows loading feedback at once.
@@ -1939,6 +1983,23 @@ function levelHelp(sel) {
     '<tr' + (sel === l.value ? ' style="background:var(--se-raised)"' : "") + '><td class="k">' + l.abbr + " · " + l.value + '</td><td class="v">' + l.name + "</td></tr>").join("");
   showDetails("the autonomy scale", '<table class="kv">' + rows + '</table><div style="padding:8px 0 0"><a class="doclink" data-path="product/guidance/authoring/machines.md">the full scale — machines.md · Priority</a></div>');
 }
+// THE UPDATE CADENCE — five notches; same grammar again. The top notch owes
+// nothing at all, and a volunteered update still lands there.
+const NR_LEVELS = ${JSON.stringify(NARRATION_LEVELS)};
+const nrEl = document.getElementById("nr");
+function nrAbbr(v) { const l = NR_LEVELS.find((x) => x.value === Number(v)); return l ? l.abbr : String(v); }
+function nrHelp(sel) {
+  const rows = NR_LEVELS.map((l) =>
+    '<tr' + (sel === l.value ? ' style="background:var(--se-raised)"' : "") + '><td class="k">' + l.abbr + " · " + l.value + '</td><td class="v">' + escText(l.name) + "</td></tr>").join("");
+  showDetails("how often updates are owed", '<table class="kv">' + rows + '</table><div class="meta" style="padding:8px 0 0">Whichever comes first falls due, minutes or calls. A volunteered update always pays and always resets both.</div>');
+}
+if (nrEl) {
+  const lbl3 = document.getElementById("nr-val");
+  nrEl.addEventListener("input", () => { if (lbl3) lbl3.textContent = nrAbbr(nrEl.value); });
+  nrEl.addEventListener("change", async () => {
+    await fetch("/narration", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ value: Number(nrEl.value) }) });
+  });
+}
 // THE SHUTDOWN CONTROL — five notches; same grammar as the autonomy bar.
 const SD_LEVELS = ${JSON.stringify(SHUTDOWN_LEVELS)};
 const sdEl = document.getElementById("sd");
@@ -1956,6 +2017,18 @@ if (sdEl) {
   });
 }
 document.addEventListener("click", (ev) => {
+  const nn = ev.target.closest ? ev.target.closest(".nr-notch") : null;
+  if (nn && nrEl) {
+    const v = Number(nn.dataset.level);
+    nrEl.value = v;
+    const lbl3 = document.getElementById("nr-val");
+    if (lbl3) lbl3.textContent = nrAbbr(v);
+    void fetch("/narration", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ value: v }) });
+    nrHelp(v);
+    return;
+  }
+  const nh = ev.target.closest ? ev.target.closest(".nr-help") : null;
+  if (nh) { nrHelp(null); return; }
   const sn = ev.target.closest ? ev.target.closest(".sd-notch") : null;
   if (sn && sdEl) {
     const v = Number(sn.dataset.level);
@@ -2445,6 +2518,12 @@ export function renderMirror(m: MirrorState, widget?: "machine" | "details" | "l
   const sdNotches = SHUTDOWN_LEVELS.map((l) => `<span class="sd-notch thr-notch" data-level="${l.value}" style="left:${((l.value - 1) / 4) * 100}%" title="${esc(l.name)}">${l.abbr}</span>`).join("");
   const sdAbbrNow = SHUTDOWN_LEVELS.find((l) => l.value === sd)?.abbr ?? String(sd);
   const sdBar = `<span class="threshold" title="shutdown control — what happens around done"><span class="sd-help thr-help" title="click: the levels, explained in details">shutdown</span><span class="thr-track"><input id="sd" type="range" min="1" max="5" step="1" value="${sd}" list="sd-ticks"><datalist id="sd-ticks">${SHUTDOWN_LEVELS.map((l) => `<option value="${l.value}"></option>`).join("")}</datalist><span class="thr-notches">${sdNotches}</span></span><span id="sd-val">${esc(sdAbbrNow)}</span></span>`;
+  // THE UPDATE CADENCE — how often the agent OWES a line about what it is
+  // doing. Same grammar as the other two bars; the top notch owes nothing.
+  const nr = m.session.narration;
+  const nrNotches = NARRATION_LEVELS.map((l) => `<span class="nr-notch thr-notch" data-level="${l.value}" style="left:${((l.value - 1) / 4) * 100}%" title="${esc(l.name)}">${l.abbr}</span>`).join("");
+  const nrAbbrNow = NARRATION_LEVELS.find((l) => l.value === nr)?.abbr ?? String(nr);
+  const nrBar = `<span class="threshold" title="how often the agent owes an update — whichever comes first, minutes or calls"><span class="nr-help thr-help" title="click: the levels, explained in details">updates</span><span class="thr-track"><input id="nr" type="range" min="1" max="5" step="1" value="${nr}" list="nr-ticks"><datalist id="nr-ticks">${NARRATION_LEVELS.map((l) => `<option value="${l.value}"></option>`).join("")}</datalist><span class="thr-notches">${nrNotches}</span></span><span id="nr-val">${esc(nrAbbrNow)}</span></span>`;
   // Escape has a hand-side affordance too (parity law): only while a
   // sub-machine other than boot is being walked.
   const crumbTrail = m.session.breadcrumb();
@@ -2457,7 +2536,7 @@ export function renderMirror(m: MirrorState, widget?: "machine" | "details" | "l
   // the walk's position; clicking it jumps the view there.
   const curLeaf = info.active[0] ?? "";
   const curBtn = curLeaf === "" ? "" : `<button class="ghost" id="cur-state" data-machine="${esc(walkMachine.id)}" title="the walk stands here — click: jump the view to it">☉ ${esc(curLeaf)}</button>`;
-  const machineWidget = `<div class="widget" id="w-machine"><div class="widget-head"><span class="crumbs">${crumbs}</span><span class="head-controls" style="display:flex;align-items:center;gap:10px">${curBtn}<span class="head-sliders" style="display:flex;align-items:center;gap:10px">${slider}${sdBar}</span>${escapeBtn}<button class="expand" data-widget="w-machine" data-url="/widget/machine?view=${encodeURIComponent(decl.id)}" title="expand · ctrl-click: new tab · shift-click: new window — both open frozen on what this card is showing">⛶</button></span></div><div class="widget-body">${svg}</div></div>`;
+  const machineWidget = `<div class="widget" id="w-machine"><div class="widget-head"><span class="crumbs">${crumbs}</span><span class="head-controls" style="display:flex;align-items:center;gap:10px">${curBtn}<span class="head-sliders" style="display:flex;align-items:center;gap:10px">${slider}${sdBar}${nrBar}</span>${escapeBtn}<button class="expand" data-widget="w-machine" data-url="/widget/machine?view=${encodeURIComponent(decl.id)}" title="expand · ctrl-click: new tab · shift-click: new window — both open frozen on what this card is showing">⛶</button></span></div><div class="widget-body">${svg}</div></div>`;
   const detailsWidget = `<div class="widget" id="w-details">${widgetHead("details", "w-details", "/widget/details")}
     ${info.status === "closed" ? '<div class="meta" style="color:#e86a5f">machine closed</div>' : ""}
     <div class="meta" id="details-title" data-morph-ignore>—</div>

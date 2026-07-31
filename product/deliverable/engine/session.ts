@@ -44,6 +44,7 @@ import { Decisions, replayFile } from "./decisions.ts";
 import { generateIterationArchive, generateIterations, itFind, itPinRel, itRecordRel, itSeed, markStarted, pinIteration, readItRecord } from "./iterations.ts";
 import { CHANGE_COLUMNS } from "./rigor-matrix.ts";
 import { parseStateNote, section } from "./notes.ts";
+import { NARRATION_DEFAULT, narrationLevel } from "./toll.ts";
 
 /** THE TICK is the machinery — one tool, legal in EVERY state. Without
  *  arguments it reports (observability is never gated); with arguments it
@@ -139,11 +140,12 @@ export class Session {
     // to forget, so a crash or a power cut cannot leave the last session's
     // sliders standing either.
     try {
-      const s = JSON.parse(readFileSync(join(seDir(root), "settings.json"), "utf8")) as { autonomy?: number; shutdown?: number; session?: string };
+      const s = JSON.parse(readFileSync(join(seDir(root), "settings.json"), "utf8")) as { autonomy?: number; shutdown?: number; narration?: number; session?: string };
       const mine = process.env.SE_SESSION;
       if (mine !== undefined && mine !== "" && s.session === mine) {
         if (typeof s.autonomy === "number" && s.autonomy >= 0 && s.autonomy <= 1) this._autonomy = s.autonomy;
         if (typeof s.shutdown === "number" && Number.isInteger(s.shutdown) && s.shutdown >= 1 && s.shutdown <= 5) this._shutdown = s.shutdown;
+        if (typeof s.narration === "number" && Number.isInteger(s.narration) && s.narration >= 1 && s.narration <= 5) this._narration = s.narration;
       }
     } catch { /* no store yet — the defaults stand */ }
     this.syncKeepAwake();
@@ -152,7 +154,7 @@ export class Session {
   private persistSettings(): void {
     try {
       mkdirSync(seDir(this.root), { recursive: true });
-      writeFileSync(join(seDir(this.root), "settings.json"), JSON.stringify({ session: process.env.SE_SESSION ?? null, autonomy: this._autonomy, shutdown: this._shutdown }) + "\n", "utf8");
+      writeFileSync(join(seDir(this.root), "settings.json"), JSON.stringify({ session: process.env.SE_SESSION ?? null, autonomy: this._autonomy, shutdown: this._shutdown, narration: this._narration }) + "\n", "utf8");
     } catch { /* a failed save never blocks the slider */ }
   }
 
@@ -203,6 +205,33 @@ export class Session {
     this.syncKeepAwake();
     this.notifyChange();
     return { shutdown: value, was };
+  }
+
+  /** THE UPDATE CADENCE (owner design 2026-07-31): how often narration is
+   *  OWED, on the same bar as the other two controls. The reader watches
+   *  from a different surface on every host, so they set the rhythm rather
+   *  than living with one number baked into the engine. 5 owes nothing. */
+  private _narration = NARRATION_DEFAULT;
+
+  get narration(): number {
+    return this._narration;
+  }
+
+  setNarration(value: number): Record<string, unknown> {
+    if (!Number.isInteger(value) || value < 1 || value > 5) {
+      throw new Rejection({
+        clause: CLAUSES.REQUIRED_ARGS,
+        expected: "an update-cadence level 1..5 (1 constant · 3 normal · 5 off)",
+        got: String(value),
+        remedy: { tool: "se_tick", args: {}, note: "the mirror's updates bar sets it" },
+        source: "engine/session.ts narration",
+      });
+    }
+    const was = this._narration;
+    this._narration = value;
+    this.persistSettings();
+    this.notifyChange();
+    return { narration: value, was, means: narrationLevel(value).name };
   }
 
   /** THE MILESTONE REVIEW REPORT (owner rulings 2026-07-30): the one thing
@@ -2148,6 +2177,7 @@ export class Session {
       status: this.instance.status,
       autonomy: this._autonomy,
       shutdown: this._shutdown,
+      narration: this._narration,
       // WHERE THIS IS HEADED. Carried on every packet so neither hand has
       // to ask, and so a walk that drifts off the way is visibly off it.
       target: this._target,
@@ -2497,6 +2527,7 @@ export class Session {
       status: this.instance.status,
       autonomy: this._autonomy,
       shutdown: this._shutdown,
+      narration: this._narration,
       legal_tools: all ? "all" : [...ALWAYS_LEGAL, ...tools],
       history: this.instance.history.slice(-10),
     };

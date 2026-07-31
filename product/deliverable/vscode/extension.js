@@ -1247,7 +1247,10 @@ async function openClaudeInSideBar(kickoff) {
   try {
     if (all.includes(CLAUDE_EDITOR_COMMAND)) {
       await vscode.commands.executeCommand(CLAUDE_EDITOR_COMMAND, undefined, kickoff);
-      pressEnterInClaude(2500);
+      // The command has returned, so the panel exists. Put the keyboard where
+      // the keys are going before the burst starts.
+      await vscode.commands.executeCommand("workbench.action.focusActiveEditorGroup");
+      pressEnterInClaude();
       trace("claude opened in one editor tab with the kickoff; Enter follows");
       return true;
     }
@@ -1282,20 +1285,43 @@ async function openClaudeInSideBar(kickoff) {
  *
  * WHAT WOULD RETIRE THIS: an initialPrompt argument that submits, upstream.
  */
-function pressEnterInClaude(delayMs) {
+function pressEnterInClaude() {
   if (process.platform !== "win32") {
     trace("auto-Enter is Windows-only so far — the kickoff is waiting in the box, press Enter");
     return;
   }
+  // A BURST, NOT ONE LONG WAIT. Nothing outside the webview can see when its
+  // input is ready, so a single delay is a guess, and a long guess is dead
+  // time on every launch. Short repeats cover the same uncertainty in a
+  // fraction of the time.
+  //
+  // THE REPEATS ARE SAFE BECAUSE AN EMPTY BOX IGNORES ENTER. Early keys land
+  // before the kickoff is inserted and do nothing. One key sends it. Later
+  // keys land in a box that is empty again and do nothing. The whole burst
+  // has exactly one effect whichever key wins.
+  //
+  // AND EVERY KEY IS AIMED, not just timed. Before each one it asks Windows
+  // which window is in front and what it is called. VS Code puts the active
+  // editor's name in the title bar, so a title starting with Claude means
+  // the Claude tab is the one with the keyboard. Click away and the title
+  // changes and the burst goes quiet. That is the whole guard, and it is why
+  // firing several times costs nothing.
   const script = [
-    `Start-Sleep -Milliseconds ${delayMs}`,
     "Add-Type -AssemblyName System.Windows.Forms",
-    "Add-Type -Namespace Se -Name Fg -MemberDefinition '[DllImport(\"user32.dll\")] public static extern System.IntPtr GetForegroundWindow(); [DllImport(\"user32.dll\")] public static extern int GetWindowThreadProcessId(System.IntPtr h, out int pid);'",
-    "$pid2 = 0",
-    "[void][Se.Fg]::GetWindowThreadProcessId([Se.Fg]::GetForegroundWindow(), [ref]$pid2)",
-    "$name = (Get-Process -Id $pid2 -ErrorAction SilentlyContinue).ProcessName",
-    "if ($name -like 'Code*') { [System.Windows.Forms.SendKeys]::SendWait('{ENTER}') } else { exit 3 }",
-  ].join("; ");
+    "Add-Type -Namespace Se -Name Fg -MemberDefinition '[DllImport(\"user32.dll\")] public static extern System.IntPtr GetForegroundWindow(); [DllImport(\"user32.dll\")] public static extern int GetWindowThreadProcessId(System.IntPtr h, out int pid); [DllImport(\"user32.dll\", CharSet = System.Runtime.InteropServices.CharSet.Unicode)] public static extern int GetWindowTextW(System.IntPtr h, System.Text.StringBuilder s, int n);'",
+    "Start-Sleep -Milliseconds 150",
+    "for ($i = 0; $i -lt 8; $i++) {",
+    "  $h = [Se.Fg]::GetForegroundWindow()",
+    "  $pid2 = 0",
+    "  [void][Se.Fg]::GetWindowThreadProcessId($h, [ref]$pid2)",
+    "  $name = (Get-Process -Id $pid2 -ErrorAction SilentlyContinue).ProcessName",
+    "  $sb = New-Object System.Text.StringBuilder 512",
+    "  [void][Se.Fg]::GetWindowTextW($h, $sb, 512)",
+    "  $title = $sb.ToString()",
+    "  if ($name -like 'Code*' -and $title -like 'Claude*') { [System.Windows.Forms.SendKeys]::SendWait('{ENTER}'); Start-Sleep -Milliseconds 60; break }",
+    "  Start-Sleep -Milliseconds 70",
+    "}",
+  ].join("\n");
   const child = spawn("powershell.exe", ["-NoProfile", "-NonInteractive", "-WindowStyle", "Hidden", "-Command", script], {
     detached: true,
     stdio: "ignore",
@@ -1303,12 +1329,34 @@ function pressEnterInClaude(delayMs) {
   });
   child.on("error", (err) => trace("auto-Enter could not start: " + String(err)));
   child.unref();
-  trace("auto-Enter armed for " + delayMs + "ms after the kickoff landed");
+  trace("auto-Enter: 8 keys over ~1s, each checked against the foreground window");
+}
+
+/**
+ * NAME THE SESSION IN ITS FIRST LINE.
+ *
+ * VS Code's title bar shows the active editor's name, and Claude names its
+ * tab after the conversation. So the whole window ends up called whatever
+ * the kickoff happens to be about — "Configure machine boot s." for a prompt
+ * that was mostly boot rules. Every session looked like its own topic, and
+ * none of them said WHEN.
+ *
+ * The tab's name is Claude's to choose and we cannot set it. What we can do
+ * is give the conversation an obvious title to take: a dated session line,
+ * first, before anything about the work.
+ *
+ * The date is stamped at LAUNCH, never stored in kickoff.txt, so it is the
+ * day the session actually runs.
+ */
+function sessionHeader(now) {
+  const d = now ?? new Date();
+  const p = (n) => String(n).padStart(2, "0");
+  return `Session ${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}`;
 }
 
 function agentLaunch(root) {
   const cageDir = path.join(root, "workspace", "_cage");
-  const kickoff = readFileSync(path.join(cageDir, "kickoff.txt"), "utf8").trim();
+  const kickoff = sessionHeader() + "\n\n" + readFileSync(path.join(cageDir, "kickoff.txt"), "utf8").trim();
   const has = (cmd) => spawnSync(cmd, ["--version"], { encoding: "utf8", shell: true }).status === 0;
   if (has("claude")) return { host: "claude", kickoff, command: "claude " + psq(kickoff) };
   if (has("copilot")) {

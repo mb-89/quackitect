@@ -136,9 +136,20 @@ Narration rides the walk (the unified log + the decision graph):
   If a brief wants commas, it wanted to be a plan.
 - Everything started gets resolved. Abandoning is legal. Abandoning
   silently is not — the graph shows the drop.
-- The TOLL: after five silent minutes the next call carries a warning.
+- The TOLL: when the cadence lapses the next call carries a warning.
   Ignore it, and the call after is refused until an update rides. A
-  volunteered update is never stopped.
+  volunteered update is never stopped, and always resets the count.
+- HOW OFTEN IS THE PERSON'S CONTROL, on the mirror's bar beside the
+  autonomy and the shutdown level. Five notches, and BOTH clocks run:
+  minutes and calls, whichever falls due first.
+  - `1m` — an update every minute, or every 5 calls.
+  - `2m` — every 2 minutes, or every 10 calls.
+  - `5m` — every 5 minutes, or every 20 calls. The default.
+  - `15m` — every 15 minutes, or every 60 calls.
+  - `off` — nothing is ever owed.
+  The setting rides every packet as `narration`. A low notch is the
+  person asking to see the work, not a tax to pay with filler: say what
+  you are actually doing, on the item you are actually on.
 - `se_note {text}`: capture a stray anywhere, keep walking (contract
   rule 4). Notes join the log feed; they drain at a retro, later.
   In a LIVE discussion with the owner, do not note every exchange —
