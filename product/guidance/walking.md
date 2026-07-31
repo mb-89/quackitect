@@ -36,14 +36,23 @@ Default movement rule:
 - A refusal still stops the walk. Follow its remedy.
 - SE-C-113 means user handoff. Report and wait for a message.
 
+THE READING — one document, one call:
+
+- Whenever anything is owed, the packet carries `reading`. It names ONE file: `.se/reading.md`.
+- That file holds every document the way ahead still demands, concatenated.
+- Read it. That is the whole reading step. There is no second call.
+- Reading it CREDITS every document inside it. You do not read them again.
+- You do not carry their hashes either. The engine credited them; `read_hashes` has nothing left to prove.
+- It holds only what you have NOT read. It shrinks as you walk, and disappears when nothing is owed.
+- Too large for one call, it pages like any other file with `offset` and `limit`. Each page credits the documents it showed WHOLE. A document split across two pages is credited by neither, so page on generous limits.
+- The engine wrote it, so it is regenerated on every read. It is never stale.
+
 Read-ahead discipline (every state):
 
-- Treat `pulled` and `lookahead_read` as pre-read work. Read new paths as soon as they appear.
+- `route_reads` and `lookahead_read` NAME what is owed. `reading` HANDS IT OVER. Prefer the reading.
+- Read a named path directly only when you want that one document for its own sake.
 - Keep a session cache of path -> hash from `se_file_read`.
-- Reuse cached hashes in every moving `se_tick` through `read_hashes`.
-- Re-read only when a refusal says the hash is missing or stale, or when the path appears for the first time.
-- A target set means the packet carries `route_reads`. That is every document the whole way demands, gathered once. Read it in ONE call and keep the hashes.
-- The target can be set by you, by the person, or by the machine at start. The list follows whichever set it.
+- Re-read only when a refusal says the hash is missing or stale.
 - If a state allows no tools, do not read there. Tick only.
 
 Two more arguments go with `target`, and only make sense beside it — they
@@ -138,6 +147,17 @@ Narration rides the walk (the unified log + the decision graph):
   a noted ruling must never be built around.
 - The human sees it all live in the mirror's log pane. One line per act.
   Clicking an update line opens the decision tree.
+
+THE MACHINE COMMITS, NOT YOU (owner ruling):
+
+- NEVER ask whether something needs committing. The machine does it.
+- A dirty tree is not a loose end. Never report one as a risk or a caveat.
+- The states that own the git work do it themselves. An expedition's close
+  commits whatever is left before it merges, which is exactly why `se_git`
+  is not legal in the leave state.
+- You MAY commit when you want a checkpoint. You never have to.
+- A tool being illegal where you stand is the machine holding that job, not
+  an obstacle to route around.
 
 Conditions gate movement. Every `entry`/`exit` key is a condition type; its
 note (linked in every refusal) says what it wants. A condition is worked

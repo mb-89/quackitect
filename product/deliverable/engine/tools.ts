@@ -234,13 +234,24 @@ function readMany(rootOf: (rel?: string) => string, entries: unknown[], ref: str
   return { files, ...(failed > 0 ? { failed } : {}) };
 }
 
-export function coreTools(rootOf: (rel?: string) => string, projectRoot: string, judgmentDrainAllowed: () => boolean = () => true): ToolDef[] {
+/** The reading is engine-written, so its ceiling is the engine's to set.
+ *  Past it the read pages like any other large file, and each page credits
+ *  the documents it fully showed. */
+const READING_BUDGET = 120_000;
+
+export interface ReadingHook {
+  path: string;
+  build(): string[];
+  credit(offset: number, lines: number): string[];
+}
+
+export function coreTools(rootOf: (rel?: string) => string, projectRoot: string, judgmentDrainAllowed: () => boolean = () => true, reading?: ReadingHook): ToolDef[] {
   return [
     {
       name: "se_file_read",
       title: "se.file.read",
       description:
-        "Read a project file (root-relative path) — TEXT OR IMAGE. Returns the CAS hash writes will demand. Text comes back as numbered lines; pass offset (1-based line) / limit to read a large file in PARTS — an oversize whole-file read is refused with the remedy, never silently truncated. An IMAGE (png, jpg, gif, webp) comes back as the picture itself, so a sketch can be LOOKED AT rather than described to you. Any other binary is refused. A DECLARED ROOT is reachable as '@name/rest' (the owner declares roots in .se/roots.json; they are read-only). Pass ref to read AT A COMMITTED REF ('main' reaches v1, 'v2' reaches v2) — pair with se_file_search/se_file_glob at the same ref. Pass optional: true for a file that is ALLOWED to be missing (the handover): absence answers exists: false rather than refusing.",
+        "Read a project file (root-relative path) — TEXT OR IMAGE. Returns the CAS hash writes will demand. Text comes back as numbered lines; pass offset (1-based line) / limit to read a large file in PARTS — an oversize whole-file read is refused with the remedy, never silently truncated. An IMAGE (png, jpg, gif, webp) comes back as the picture itself, so a sketch can be LOOKED AT rather than described to you. Any other binary is refused. A DECLARED ROOT is reachable as '@name/rest' (the owner declares roots in .se/roots.json; they are read-only). Pass ref to read AT A COMMITTED REF ('main' reaches v1, 'v2' reaches v2) — pair with se_file_search/se_file_glob at the same ref. Pass optional: true for a file that is ALLOWED to be missing (the handover): absence answers exists: false rather than refusing. THE READING (.se/reading.md) is the one path the ENGINE writes: it holds every document the way ahead still demands, concatenated, and reading it CREDITS them all — one call instead of one per document, and no read_hashes to carry afterwards. The packet names it whenever anything is owed.",
       inputSchema: {
         type: "object",
         properties: {
@@ -259,6 +270,22 @@ export function coreTools(rootOf: (rel?: string) => string, projectRoot: string,
       handler: (args) => {
         const ref = args.ref !== undefined ? String(args.ref) : undefined;
         const optional = args.optional === true;
+        // THE READING is written the moment it is asked for, then served like
+        // any other file — same numbered lines, same hash, same offset/limit.
+        // What it showed is credited on the way out, so the documents inside
+        // it never have to be asked for again.
+        if (reading !== undefined && ref === undefined && args.paths === undefined && String(args.path ?? "").replace(/\\/g, "/") === reading.path) {
+          reading.build();
+          const res = fileRead(rootOf(reading.path), reading.path, {
+            ...(args.offset !== undefined ? { offset: Number(args.offset) } : {}),
+            ...(args.limit !== undefined ? { limit: Number(args.limit) } : {}),
+            maxChars: READING_BUDGET,
+          }) as unknown as Record<string, unknown>;
+          const range = res.range as { offset: number; limit: number } | undefined;
+          const offset = range?.offset ?? 1;
+          const lines = range?.limit ?? Number(res.total_lines ?? 0);
+          return { ...res, credited: reading.credit(offset, lines) };
+        }
         if (args.paths !== undefined) {
           if (!Array.isArray(args.paths)) {
             throw new Rejection({
@@ -784,7 +811,15 @@ function refuseProseWall(tool: string, field: string, text: string): void {
 
 export function buildServer(root: string, session = new Session(root), tollOpts: { windowMs?: number; now?: () => number } = {}): McpServer {
   // (a fresh Session fails fast on a misdrawn machine)
-  const tools = [...sessionTools(session), ...expeditionTools(session), ...coreTools((rel) => session.laneRoot(rel), root, () => session.inRetro())];
+  const tools = [
+    ...sessionTools(session),
+    ...expeditionTools(session),
+    ...coreTools((rel) => session.laneRoot(rel), root, () => session.inRetro(), {
+      path: Session.READING_PATH,
+      build: () => session.buildReading(),
+      credit: (offset, lines) => session.creditReading(offset, lines),
+    }),
+  ];
   // THE UPDATE FIELD — every lane tool accepts it: a decision-graph op
   // riding the call. Declared on every schema so harnesses send it as an
   // object (an undeclared property arrives as a JSON string — v2 lesson).
@@ -804,9 +839,19 @@ export function buildServer(root: string, session = new Session(root), tollOpts:
     if (tool !== "se_file_read") return result;
     if (result === null || typeof result !== "object" || Array.isArray(result)) return result;
     const r = result as Record<string, unknown>;
-    if (typeof r.path === "string" && typeof r.hash === "string") {
-      session.rememberRead(r.path, r.hash, typeof r.ref === "string" ? r.ref : undefined);
+    const remember = (o: Record<string, unknown>): void => {
+      if (typeof o.path === "string" && typeof o.hash === "string") {
+        session.rememberRead(o.path, o.hash, typeof o.ref === "string" ? o.ref : undefined);
+      }
+    };
+    // A MULTI-READ IS STILL A READ. Only the single-path shape was
+    // remembered, so a set fetched in one call proved nothing and every
+    // later tick had to carry its hashes by hand.
+    if (Array.isArray(r.files)) {
+      for (const f of r.files) if (f !== null && typeof f === "object") remember(f as Record<string, unknown>);
+      return result;
     }
+    remember(r);
     return result;
   });
 

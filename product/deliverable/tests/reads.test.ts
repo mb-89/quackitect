@@ -161,17 +161,29 @@ test("the read buffer auto-fills tick proofs from prior lane reads", async () =>
   assert.equal(last?.body.booted, true, "buffered proofs should carry the boot walk to idle");
 });
 
-test("startup clears any preseeded read buffer before boot reading", async () => {
+// BOOT IS THE READING ROOM, AND IT CLEARS THE BUFFER ON THE WAY BACK IN.
+//
+// It used to clear on EVERY entry, which caught the one read that matters:
+// the reading is handed over at start, so wiping it there made a single-call
+// boot impossible. A first entry now keeps what start earned. Going BACK and
+// walking boot again still earns its tokens afresh.
+test("re-entering boot clears the buffer, so a second walk earns its reading again", async () => {
   const root = freshRoot();
   const session = new Session(root);
-  const seeded = readHashesFor(root);
-  for (const [path, hash] of Object.entries(seeded)) session.rememberRead(path, hash);
   const server = buildServer(root, session);
-  // First move enters boot and mechanically clears stale/leftover buffer state.
+
+  // First entry: what start earned through the lane carries the boot walk.
+  await call(server, "se_file_read", { path: ".se/reading.md" });
+  const first = await call(server, "se_tick", { to: "front_desk", sweep: true });
+  assert.deepEqual(first.body.active, ["front_desk"], JSON.stringify(first.body.refusal));
+
+  // Back to the beginning: the walk starts over, and so does the reading.
+  const back = await call(server, "se_tick", { back: "start" });
+  assert.equal(back.isError, false, JSON.stringify(back.body));
   await call(server, "se_tick", { advance: true }); // start -> boot/start
   await call(server, "se_tick", { advance: true }); // boot/start -> read_contract
-  const refused = await call(server, "se_tick", { advance: true }); // leaving read_contract needs fresh read
-  assert.equal(refused.isError, true);
+  const refused = await call(server, "se_tick", { advance: true });
+  assert.equal(refused.isError, true, "a second pass through boot proves its reading again");
   assert.equal(refused.body.clause, "SE-C-112");
   assert.match(String(refused.body.expected), /read_contract/);
 });

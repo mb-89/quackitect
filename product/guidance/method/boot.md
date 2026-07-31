@@ -18,14 +18,11 @@ Boot exists to reach idle fast and clean.
 
 - Keep boot calls serial.
 - Avoid parallel search and read batches in boot.
-- Keep reads small with `offset` and `limit`.
-- Cache read hashes by path for this session.
-- Reuse cached hashes in `read_hashes` on later ticks.
-- The packet carries `route_reads` whenever a target is set. It lists every document the way there demands.
-- Read that whole list in ONE `se_file_read`. That is the only reading call boot needs.
-- You do not have to ask for it. You do not have to know any route syntax.
-- Keep the hashes. Send them in `read_hashes` on every tick.
-- With no target set, read `pulled` and `lookahead_read` as each path first appears.
+- BOOT READS ONCE. The packet carries `reading`, naming `.se/reading.md`. Read that one file.
+- It holds every document the way demands, and reading it credits them all.
+- Do not split it into several calls. "Keep reads small" is about `offset`/`limit` inside a big file, never about how many documents ride in one envelope.
+- Do not send `read_hashes` for what the reading credited. There is nothing left to prove.
+- Page it with `offset`/`limit` only when a read is refused as oversize. Use generous limits: a document split across two pages is credited by neither.
 
 ## Re-read rules
 

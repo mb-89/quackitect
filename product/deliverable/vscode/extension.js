@@ -1227,36 +1227,83 @@ const CLAUDE_SIDEBAR_COMMAND = "claude-vscode.sidebar.open";
 const CLAUDE_EDITOR_COMMAND = "claude-vscode.editor.open";
 
 /**
- * Start Claude in the SIDE BAR rather than a terminal, kickoff included.
+ * Start Claude in ONE surface, kickoff included.
  *
- * The session is STARTED through the editor door, because that is the command
- * carrying a prompt, and then moved left. Opening the side bar first leaves
- * nothing to pass the kickoff to.
+ * EXACTLY ONE COMMAND RUNS. Calling the editor door and then the side-bar door
+ * opened two Claude surfaces: an editor tab holding the kickoff, and a second,
+ * empty side bar beside it.
  *
- * A VS Code manifest never declares command arguments. This function used to
- * claim no Claude command took a prompt, reasoning from the manifest, and the
- * kickoff was pasted by hand every launch.
+ * THE KICKOFF ONLY FITS THROUGH THE EDITOR DOOR. The side-bar command takes no
+ * arguments, and the side bar's own view is built with no prompt and no
+ * session, so nothing can be handed to it.
+ *
+ * NOTHING INSIDE VS CODE SUBMITS THE KICKOFF. The prompt lands in the input
+ * box and stops. No Claude command sends one, and an extension cannot type
+ * into another extension's webview. pressEnterInClaude finishes it from
+ * outside, so a launch stays one click.
  */
 async function openClaudeInSideBar(kickoff) {
   const all = await vscode.commands.getCommands(true);
-  if (!all.includes(CLAUDE_SIDEBAR_COMMAND)) {
-    trace(CLAUDE_SIDEBAR_COMMAND + " is not registered — the Claude Code extension is absent or inactive");
-    return false;
-  }
   try {
     if (all.includes(CLAUDE_EDITOR_COMMAND)) {
       await vscode.commands.executeCommand(CLAUDE_EDITOR_COMMAND, undefined, kickoff);
-      await vscode.commands.executeCommand(CLAUDE_SIDEBAR_COMMAND);
-      trace("claude started with the kickoff, then moved to the side bar");
+      pressEnterInClaude(2500);
+      trace("claude opened in one editor tab with the kickoff; Enter follows");
       return true;
     }
-    await vscode.commands.executeCommand(CLAUDE_SIDEBAR_COMMAND);
-    trace("claude opened in the side bar with no kickoff — " + CLAUDE_EDITOR_COMMAND + " is absent");
-    return true;
+    if (all.includes(CLAUDE_SIDEBAR_COMMAND)) {
+      await vscode.commands.executeCommand(CLAUDE_SIDEBAR_COMMAND);
+      trace("claude opened in the side bar with no kickoff — " + CLAUDE_EDITOR_COMMAND + " is absent");
+      return true;
+    }
+    trace("no Claude Code command is registered — the extension is absent or inactive");
+    return false;
   } catch (err) {
-    trace(CLAUDE_SIDEBAR_COMMAND + " failed: " + String(err));
+    trace("opening claude failed: " + String(err));
     return false;
   }
+}
+
+/**
+ * PRESS ENTER FOR THE READER — the last inch, and it is a HACK.
+ *
+ * The Claude Code extension prefills its input box and stops there. No
+ * command submits a prompt, and one extension cannot type into another
+ * extension's webview, so nothing inside VS Code can finish the job. The
+ * owner ruled that a hack beats two clicks, so this goes out through the
+ * operating system: SendKeys to whatever window is in front.
+ *
+ * IT ONLY FIRES INTO OUR OWN WINDOW. The foreground process is checked to be
+ * VS Code first, and a stray Enter into someone else's application is worse
+ * than no Enter at all. It still cannot see WHICH control has focus — that
+ * is the residual risk, and it is why the delay is generous: the webview
+ * focuses its input as the session opens, and the reader has just clicked
+ * our button, so their hands are nowhere else.
+ *
+ * WHAT WOULD RETIRE THIS: an initialPrompt argument that submits, upstream.
+ */
+function pressEnterInClaude(delayMs) {
+  if (process.platform !== "win32") {
+    trace("auto-Enter is Windows-only so far — the kickoff is waiting in the box, press Enter");
+    return;
+  }
+  const script = [
+    `Start-Sleep -Milliseconds ${delayMs}`,
+    "Add-Type -AssemblyName System.Windows.Forms",
+    "Add-Type -Namespace Se -Name Fg -MemberDefinition '[DllImport(\"user32.dll\")] public static extern System.IntPtr GetForegroundWindow(); [DllImport(\"user32.dll\")] public static extern int GetWindowThreadProcessId(System.IntPtr h, out int pid);'",
+    "$pid2 = 0",
+    "[void][Se.Fg]::GetWindowThreadProcessId([Se.Fg]::GetForegroundWindow(), [ref]$pid2)",
+    "$name = (Get-Process -Id $pid2 -ErrorAction SilentlyContinue).ProcessName",
+    "if ($name -like 'Code*') { [System.Windows.Forms.SendKeys]::SendWait('{ENTER}') } else { exit 3 }",
+  ].join("; ");
+  const child = spawn("powershell.exe", ["-NoProfile", "-NonInteractive", "-WindowStyle", "Hidden", "-Command", script], {
+    detached: true,
+    stdio: "ignore",
+    windowsHide: true,
+  });
+  child.on("error", (err) => trace("auto-Enter could not start: " + String(err)));
+  child.unref();
+  trace("auto-Enter armed for " + delayMs + "ms after the kickoff landed");
 }
 
 function agentLaunch(root) {
@@ -1309,13 +1356,13 @@ async function startAgent() {
         }
         progress.report({ message: "Opening terminals and launching agent..." });
         if (command.host === "claude") {
-          progress.report({ message: "Opening Claude in the side bar..." });
+          progress.report({ message: "Opening Claude and handing it the kickoff..." });
           if (await openClaudeInSideBar(command.kickoff)) {
             agentTerm = null;
             await showLog(false);
             return true;
           }
-          progress.report({ message: "Side bar unavailable, falling back to terminal launch..." });
+          progress.report({ message: "Claude Code extension unavailable, falling back to terminal launch..." });
         }
         if (command.host === "copilot") {
           progress.report({ message: "Opening Copilot Chat and sending kickoff..." });
@@ -1342,7 +1389,7 @@ async function startAgent() {
       },
     );
     if (ok) {
-      void vscode.window.setStatusBarMessage("$PRODUCT$: agent started — check the side bar for Claude, Chat for Copilot, or the '$PRODUCT$ agent' terminal; logs are in '$PRODUCT$ log'.", 5000);
+      void vscode.window.setStatusBarMessage("$PRODUCT$: agent started — Claude runs the kickoff itself; Copilot runs in Chat; logs are in '$PRODUCT$ log'.", 5000);
     }
   } finally {
     agentStarting = false;

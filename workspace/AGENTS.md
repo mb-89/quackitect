@@ -51,16 +51,16 @@ parking loop.)
 
 BOOT STABILITY FOR THIS HOST:
 - Keep boot calls serial. Do not run parallel search/read batches.
-- Keep reads small with offset/limit to avoid oversized host payloads.
-- Cache read hashes by path for the session. Reuse them in read_hashes.
-- The packet carries `route_reads` when a target is set. It names every
-  document the whole way there demands, gathered once.
-- Read that entire list in ONE `se_file_read`. Nothing else needs asking
-  for, and no route syntax needs remembering.
-- Keep those hashes and reuse them while they stay current.
-- With no target set, pre-read `pulled` and `lookahead_read` as they appear.
-- Re-read only when a refusal names missing/current hashes, or when a path
-  appears for the first time.
+- ONE READ IS THE WHOLE READING. The packet carries `reading`, naming
+  `.se/reading.md`. That file holds every document the way ahead demands,
+  concatenated by the engine. Read it, and every document in it is credited.
+- Do not split it across calls. Do not send `read_hashes` for what it
+  credited. The proof is already recorded.
+- "Keep reads small" means `offset`/`limit` INSIDE one large file. It has
+  never meant fewer documents per call.
+- Page the reading only if a read is refused as oversize, and page it with
+  generous limits: a document split across two pages is credited by neither.
+- Re-read only when a refusal names missing or stale hashes.
 - If a state allows no tools, do not call read/search there. Tick only.
 - A document that is ALLOWED to be missing is read with `optional: true`.
   Absence answers `exists: false` rather than refusing. The handover is the

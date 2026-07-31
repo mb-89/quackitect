@@ -1013,6 +1013,96 @@ export class Session {
     }
   }
 
+  // ── THE READING (owner design 2026-07-31) ──────────────────────────
+  //
+  // ONE DOCUMENT, NOT A LIST OF THEM. The engine knows both halves already:
+  // what the way ahead demands, and what the head already holds. So it hands
+  // over the DIFFERENCE as a single file. One read instead of eight, and
+  // reading it credits every document inside it.
+  //
+  // NAMING THE LIST WAS NOT ENOUGH. route_reads gathered the paths in one
+  // place and the reading still cost a call per batch, because a list of
+  // eight paths is still eight documents to ask for.
+  //
+  // ONLY THE UNREAD PART IS GATHERED, so nothing is read twice and the
+  // reading shrinks to nothing as the walk proceeds.
+  //
+  // EACH PART CARRIES ITS OWN HASH in its header, and crediting re-hashes
+  // from disk: a document that moved between the gathering and the crediting
+  // is skipped and simply demanded again. A stale credit would be a proof of
+  // reading something nobody was shown.
+  static readonly READING_PATH = ".se/reading.md";
+
+  private readingParts: ReadonlyArray<{ path: string; hash: string; from: number; to: number }> = [];
+
+  /** Every document the way ahead still wants — unread only, in walk order.
+   *  With no target set it falls back to where you stand: what this state
+   *  pulls, plus what its neighbours demand at entry. */
+  readingList(): string[] {
+    const want: string[] = [];
+    const add = (p: string): void => {
+      if (p !== "" && !p.startsWith("@") && !want.includes(p)) want.push(p);
+    };
+    for (const p of this.routeReads()) add(p);
+    if (want.length === 0) {
+      const { machine, ids } = this.leaves();
+      for (const id of ids) {
+        const s = this.state(machine, id);
+        for (const d of this.pulled(machine, s)) add(d.path);
+        for (const p of this.lookaheadRequirements(machine, s)) add(p);
+      }
+    }
+    return want.filter((p) => !this.bufferedCurrent(p));
+  }
+
+  /** Write the reading, and remember which lines came from which document. */
+  buildReading(): string[] {
+    const paths = this.readingList();
+    const parts: { path: string; hash: string; from: number; to: number }[] = [];
+    const out: string[] = [
+      "# The reading",
+      "",
+      paths.length === 0
+        ? "Nothing is owed. Every document the way ahead demands is already in your head."
+        : `${paths.length} document(s) the way ahead demands, gathered here. Reading this file credits every one of them: you do not read them again, and you do not send their hashes.`,
+      "",
+    ];
+    for (const rel of paths) {
+      let body: string;
+      let hash: string;
+      try {
+        body = readFileSync(resolveInRoot(this.laneRoot(rel), rel, "engine/session.ts reading")).toString("utf8");
+        hash = contentHash(body);
+      } catch {
+        continue; // unreadable here: it stays owed, and says so where it is asked for
+      }
+      out.push(`<!-- ${rel} · ${hash} -->`, "", `## ${rel}`, "");
+      const from = out.length + 1;
+      out.push(...body.split("\n"));
+      parts.push({ path: rel, hash, from, to: out.length });
+      out.push("");
+    }
+    mkdirSync(seDir(this.root), { recursive: true });
+    writeFileSync(join(seDir(this.root), "reading.md"), out.join("\n"), "utf8");
+    this.readingParts = parts;
+    return paths;
+  }
+
+  /** Credit what the served window actually showed. A part counts only when
+   *  the window covered ALL of it — half a document is not a read — and only
+   *  when it still hashes as it did when gathered. */
+  creditReading(offset: number, lines: number): string[] {
+    const last = offset + lines - 1;
+    const credited: string[] = [];
+    for (const p of this.readingParts) {
+      if (p.from < offset || p.to > last) continue;
+      if (this.diskHash(p.path) !== p.hash) continue;
+      this.readBuffer.set(p.path, p.hash);
+      credited.push(p.path);
+    }
+    return credited;
+  }
+
   /** THE SWEEP — the route, walked. It collapses ROUND TRIPS and nothing
    *  else: every hop still enters its state, still weighs the slider, still
    *  proves its reads, still runs its scripts, still writes its own line to
@@ -1555,6 +1645,9 @@ export class Session {
     this.readBuffer.clear();
   }
 
+  /** Whether the walk has passed through boot once already. */
+  private bootEntered = false;
+
   private readProofs(channel: Channel, supplied: Record<string, string>): Record<string, string> {
     if (channel !== "agent") return supplied;
     const merged: Record<string, string> = {};
@@ -2046,6 +2139,7 @@ export class Session {
     // AFTER the arrival check, never before: reaching the target clears it,
     // and a list for a way already walked is worse than none.
     const routeReads = this.routeReads();
+    const reading = this.readingList();
     return {
       machine: this.machine.id,
       breadcrumb: this.breadcrumb(),
@@ -2060,9 +2154,19 @@ export class Session {
       // EVERY DOCUMENT THE WAY AHEAD DEMANDS, gathered once and handed over
       // unasked. The target is known, so the reading it takes to reach it is
       // known with it; revealing that one state at a time costs a round trip
-      // per wave for nothing. Read the lot in ONE se_file_read, keep the
-      // hashes, and skip whatever the cache already holds.
+      // per wave for nothing.
       ...(routeReads.length > 0 ? { route_reads: routeReads } : {}),
+      // AND GATHERED INTO ONE DOCUMENT, so the whole way costs ONE read.
+      // Naming the paths was never the expensive part; asking for them was.
+      ...(reading.length > 0
+        ? {
+            reading: {
+              path: Session.READING_PATH,
+              documents: reading.length,
+              note: "read THIS ONE FILE. It holds every document still owed, and reading it credits them all — no second call, no read_hashes to carry.",
+            },
+          }
+        : {}),
       // The session's reading list: what the human checked while driving.
       // Your advances must prove the same docs (paths only — the hashes
       // are earned by reading).
@@ -2149,7 +2253,15 @@ export class Session {
     const cur = activeStates(this.instance)[0];
     this.assertEdge(this.machine, cur, to);
     const target = to ?? this.state(this.machine, cur).edges[0]?.to;
-    if (this.machine.id === "main" && cur === this.machine.initial && target === "boot") this.clearReadBuffer();
+    // BOOT IS THE READING ROOM, so RE-ENTERING it earns its tokens again: a
+    // walk sent back to start proves its reading afresh. The FIRST entry
+    // keeps the buffer. The only reads it can hold were made moments ago at
+    // start, which is exactly where the packet hands over the reading and
+    // asks for them — wiping those made the one-document reading pointless.
+    if (this.machine.id === "main" && cur === this.machine.initial && target === "boot") {
+      if (this.bootEntered) this.clearReadBuffer();
+      this.bootEntered = true;
+    }
     if (target !== undefined) this.gatePriority(this.machine, [target], channel);
     await this.assertConditions(this.machine, this.state(this.machine, cur), to, channel, supplied);
     this.completeGuarded(this.machine, this.instance, cur, "filled", now, to);

@@ -121,7 +121,7 @@ function imageRead(path: string, bytes: Buffer, mimeType: string, ref?: string):
   return res;
 }
 
-export function fileRead(root: string, path: string, opts: { offset?: number; limit?: number; ref?: string; optional?: boolean } = {}): ReadResult {
+export function fileRead(root: string, path: string, opts: { offset?: number; limit?: number; ref?: string; optional?: boolean; maxChars?: number } = {}): ReadResult {
   // AN OPTIONAL READ FORGIVES ABSENCE AND NOTHING ELSE. Some documents are
   // allowed not to exist — the handover is why this exists, and a boot that
   // refuses over a file nobody promised is a boot that looks broken. The path
@@ -172,10 +172,13 @@ export function fileRead(root: string, path: string, opts: { offset?: number; li
   const hash = contentHash(raw);
   const lines = raw.split("\n");
   const wantsRange = opts.offset !== undefined || opts.limit !== undefined;
-  if (!wantsRange && raw.length > READ_BUDGET) {
+  // The budget is raisable for a document the ENGINE wrote, because the
+  // engine chose what went into it. Nothing the agent asks for moves it.
+  const budget = opts.maxChars ?? READ_BUDGET;
+  if (!wantsRange && raw.length > budget) {
     throw new Rejection({
       clause: CLAUSES.OVERSIZE_READ,
-      expected: `a whole-file read under ${READ_BUDGET} chars — this file is ${raw.length} chars / ${lines.length} lines`,
+      expected: `a whole-file read under ${budget} chars — this file is ${raw.length} chars / ${lines.length} lines`,
       got: `whole-file read of ${path}`,
       remedy: {
         tool: "se_file_read",

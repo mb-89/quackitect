@@ -333,7 +333,16 @@ function briefFor(rec: CallRecord): string {
     case "mirror_form_confirm": return `form confirm ${a.name} · ${a.field}`;
     case "mirror_form_done": return `form done ${a.name}`;
     case "mirror_form_folder": return "open evidence folder";
-    case "se_file_read": return `read ${a.path}${a.offset !== undefined ? ` @${a.offset}` : ""}`;
+    case "se_file_read": {
+      // A multi-read has no `path`, so naming only that one printed "read
+      // undefined" and the reader could not tell one read from another.
+      if (Array.isArray(a.paths)) {
+        const names = a.paths.map((p) => (typeof p === "string" ? p : String((p as { path?: unknown }).path ?? "?")));
+        const head = names.slice(0, 3).join(", ");
+        return `read ${names.length} · ${head}${names.length > 3 ? `, +${names.length - 3} more` : ""}`;
+      }
+      return `read ${a.path}${a.offset !== undefined ? ` @${a.offset}` : ""}`;
+    }
     case "se_file_write": return `write ${a.path}`;
     case "se_file_patch": return `patch ${Array.isArray(a.ops) ? a.ops.length : 0} op(s)`;
     case "se_file_move": return `move ${a.from} → ${a.to}`;
