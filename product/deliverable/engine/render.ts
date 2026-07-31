@@ -341,7 +341,7 @@ function briefFor(rec: CallRecord): string {
     case "se_file_list": return `list ${a.dir ?? "."}`;
     case "se_file_glob": return `glob ${a.glob}`;
     case "se_file_search": return `search /${a.query}/`;
-    case "se_run": return `run: ${String(a.command ?? "").replace(/\s+/g, " ").slice(0, 70)}`;
+    case "se_run": return `run: ${String(a.command ?? "")}`;
     case "se_web_fetch": return `fetch ${a.url}`;
     case "se_web_search": return `web: ${a.query}`;
     case "se_log_query": return a.ref !== undefined ? `log ref ${a.ref}` : "log query";
@@ -357,6 +357,24 @@ function briefFor(rec: CallRecord): string {
  *  the cap is declared in the result, never silent. Pending strays from
  *  EARLIER sessions ride on top (type "note"), so the inbox never falls
  *  out of sight; this session's notes already ride as se_note calls. */
+/** A FEED ROW IS ONE LINE, ALWAYS (owner ruling 2026-07-31). Note text is
+ *  free prose with paragraphs and list items, and slicing it without
+ *  flattening let every newline through - one note could stand a dozen rows
+ *  tall and push the rest of the feed off the screen.
+ *
+ *  ONE RULE, NOT ONE PER KIND. briefFor returns whatever each tool's line
+ *  should say and NOTHING else: no flattening, no truncating, no per-case
+ *  cleverness. Every row leaves through here, so a new tool cannot forget
+ *  the rule and se_run no longer carries its own private version of it.
+ *  Change FEED_BRIEF_CHARS to change the width; it is the only place the
+ *  number lives. */
+const FEED_BRIEF_CHARS = 90;
+
+function oneLine(s: string): string {
+  const flat = String(s).replace(/\s+/g, " ").trim();
+  return flat.length > FEED_BRIEF_CHARS ? `${flat.slice(0, FEED_BRIEF_CHARS - 1)}…` : flat;
+}
+
 export function feedRows(log: CallLog, since: string, pending: StrayNote[] = []): { capped: boolean; rows: Array<Record<string, unknown>> } {
   const q = log.query({ filter: { since }, limit: 501 });
   const records = q.records ?? [];
@@ -368,14 +386,14 @@ export function feedRows(log: CallLog, since: string, pending: StrayNote[] = [])
     // Updates are NARRATION (bold), whatever their op — only se_note
     // strays are retro notes (italic). Two kinds, never conflated.
     type: rec.tool === "se_update" ? "update" : rec.tool === "se_note" || rec.tool === "mirror_note" ? "note" : rec.tool === "se_answer" ? "aq" : "call",
-    brief: briefFor(rec).slice(0, 90),
+    brief: oneLine(briefFor(rec)),
     ok: rec.ok,
     ...(rec.ok ? {} : { clause: (rec.response as { clause?: string } | undefined)?.clause }),
     ...(rec.tool === "se_update" ? { visit: (rec.args as { visit?: string }).visit } : {}),
   }));
   const noteRows = pending
     .filter((n) => n.at < since)
-    .map((n) => ({ ref: n.ref, ts: n.at, src: n.by === "human" ? "human" : "agent", type: "note", brief: n.text.slice(0, 90), ok: true, pending: true }));
+    .map((n) => ({ ref: n.ref, ts: n.at, src: n.by === "human" ? "human" : "agent", type: "note", brief: oneLine(n.text), ok: true, pending: true }));
   return { capped, rows: [...noteRows, ...rows] };
 }
 
