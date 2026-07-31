@@ -56,7 +56,6 @@ let logEmitter = null;
 let logRows = [];
 let logFilter = "";
 let logAnchored = false;
-let logSeq = 0;
 let lastWalk = "";
 /** Known-up means a card can start loading at once instead of waiting. */
 let engineUp = false;
@@ -975,11 +974,18 @@ class Controls {
 // It is not dead text. Every row ends in a short reference, and a terminal
 // link provider makes that clickable — the record then lands in Details,
 // drawn by the engine's own renderer rather than a second one written here.
-// A SHORT LINK. The record's own reference is long and says nothing to a
-// reader, so the row carries a small ordinal instead and the shell keeps the
-// map from it to the real reference. The ordinals are per DRAW, which is fine
-// because the map is rebuilt in the same breath as the text.
-const REF_RE = /\[(\d{1,4})\]/g;
+// A LINK HAS TO LOOK LIKE ONE (owner ruling 2026-07-31). The row used to
+// open with a small ordinal in brackets, and nothing about a bracketed
+// number says "click me" — not its shape and not its colour. It carries the
+// link glyph instead, which needs no explaining.
+//
+// The ordinal was doing a second job: it was the KEY into the reference map.
+// With every row now showing the same glyph, the ROW TEXT is the key. It is
+// unique in practice (a timestamp to the second, plus the brief) and it is
+// exactly what the link provider is handed, which the ordinal never was.
+const REF_RE = /\[🔗\]/g;
+const LINK = "[🔗]";
+const PLAIN = (s) => s.replace(/\[[0-9;]*m/g, "").trimEnd();
 const logRefs = new Map();
 const DIM = (s) => "[2m" + s + "[0m";
 // THE TERMINAL'S OWN PALETTE. These are the theme's ansi slots, so the log
@@ -988,7 +994,7 @@ const DIM = (s) => "[2m" + s + "[0m";
 const KIND_COLOUR = { call: "34", update: "35", note: "33", aq: "36" };
 const paint = (code, s) => (code === undefined ? s : "[" + code + "m" + s + "[0m");
 
-function logRow(r, n) {
+function logRow(r) {
   const ts = String(r.ts ?? "");
   const when = r.pending === true ? ts.slice(5, 10) : ts.slice(11, 19);
   const src = String(r.src ?? "");
@@ -1005,7 +1011,9 @@ function logRow(r, n) {
   // The agent stays grey because most rows are the agent's. The person's own
   // acts are the rare ones, so they are the ones worth making bright.
   const srcCol = src === "human" ? paint("97", src.padEnd(5)) : DIM(src.padEnd(5));
-  return `${DIM("[" + n + "]")} ${DIM(when)} ${srcCol} ${kindCol} ${brief}${clause} ${ok}`;
+  // The glyph stays UNDIMMED. Everything dim on this row is context; the one
+  // thing the reader can act on should not look like more of it.
+  return `${LINK} ${DIM(when)} ${srcCol} ${kindCol} ${brief}${clause} ${ok}`;
 }
 
 function matchesFilter(r) {
@@ -1027,9 +1035,9 @@ function appendLog() {
     if (ref === "" || logSeen.has(ref)) continue;
     logSeen.add(ref);
     if (!matchesFilter(r)) continue;
-    logSeq += 1;
-    logRefs.set(String(logSeq), ref);
-    out.push(logRow(r, logSeq));
+    const row = logRow(r);
+    logRefs.set(PLAIN(row), ref);
+    out.push(row);
   }
   if (out.length > 0) logEmitter.fire(out.join("\r\n") + "\r\n");
 }
@@ -1039,15 +1047,14 @@ function redrawLog() {
   if (logEmitter === null) return;
   logSeen.clear();
   logRefs.clear();
-  logSeq = 0;
   const out = [];
   for (const r of logRows) {
     const ref = String(r.ref ?? "");
     if (ref !== "") logSeen.add(ref);
     if (!matchesFilter(r)) continue;
-    logSeq += 1;
-    logRefs.set(String(logSeq), ref);
-    out.push(logRow(r, logSeq));
+    const row = logRow(r);
+    logRefs.set(PLAIN(row), ref);
+    out.push(row);
   }
   logEmitter.fire("[2J[3J[H" + (out.length === 0 ? DIM("no acts match") : out.join("\r\n")) + "\r\n");
 }
@@ -1069,8 +1076,7 @@ function makeLogTerminal(parent) {
       open: () => {
         // The first paint draws everything; every poll after it only appends.
         logSeen.clear();
-        logSeq = 0;
-        void api("/api/log").then((b) => {
+              void api("/api/log").then((b) => {
           if (b !== null && Array.isArray(b.rows)) logRows = b.rows;
           redrawLog();
         });
@@ -1220,7 +1226,7 @@ function activate(context) {
         REF_RE.lastIndex = 0;
         let m = REF_RE.exec(ctx.line);
         while (m !== null) {
-          const ref = logRefs.get(m[1]);
+          const ref = logRefs.get(PLAIN(ctx.line));
           if (ref !== undefined && ref !== "") out.push({ startIndex: m.index, length: m[0].length, tooltip: "show this act in Details", ref });
           m = REF_RE.exec(ctx.line);
         }
