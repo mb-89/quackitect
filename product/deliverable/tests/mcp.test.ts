@@ -34,13 +34,13 @@ test("initialize and tools/list serve the full lane", async () => {
 
 test("required args enforced at dispatch (R8) — missing arg refused with remedy", async () => {
   const server = await bootedServer(fresh());
-  // se_note is the example because its `text` is genuinely required.
-  // se_file_read used to be, and stopped when it learned to take a SET:
-  // either `path` or `paths` satisfies it, which no `required` list can say.
-  const r = await call(server, "se_note", {});
+  // se_answer is the example because both its fields are genuinely required.
+  // se_note used to be, and stopped when a TITLE became able to stand in for
+  // the body — either satisfies it, which no `required` list can say.
+  const r = await call(server, "se_answer", {});
   assert.equal(r.isError, true);
   assert.equal(r.body.clause, "SE-C-046");
-  assert.ok(String(r.body.got).includes("missing: text"), String(r.body.got));
+  assert.ok(String(r.body.got).includes("missing: question"), String(r.body.got));
 });
 
 test("a tool with ALTERNATIVE required args refuses in its handler, and says both", async () => {
@@ -49,6 +49,12 @@ test("a tool with ALTERNATIVE required args refuses in its handler, and says bot
   assert.equal(r.isError, true);
   assert.match(String(r.body.expected), /path .*or paths/, "the refusal names both ways to satisfy it");
   assert.ok(r.body.remedy, "and carries a remedy like every other refusal");
+
+  // se_note joined this shape when a title became able to stand in for a body.
+  const n = await call(server, "se_note", {});
+  assert.equal(n.isError, true);
+  assert.match(String(n.body.expected), /text, or a title/, "and it names both ways too");
+  assert.ok(n.body.remedy);
 });
 
 test("unknown arg NAME refused — the String(undefined) incident cannot recur", async () => {

@@ -138,7 +138,7 @@ test("the desk drains the mechanical verdicts and is refused the judgment ones",
   assert.equal(carried.body.clause, "SE-C-110");
 });
 
-test("the survey answers in full — a note keeps its substance, which sits below its heading", async () => {
+test("the survey lists a note by title — cut at a word, never mid-word, and never lost", async () => {
   const root = freshRoot();
   // The survey asks git what expeditions stand, so the root must be a repo.
   for (const a of [["init"], ["config", "user.email", "se@test.local"], ["config", "user.name", "se test"]]) {
@@ -153,18 +153,27 @@ test("the survey answers in full — a note keeps its substance, which sits belo
     if (step.body.booted === true) break;
   }
   // Every real note opens with a heading and carries its content below it.
-  // The old cut took the first line and then 120 characters of it, so the
-  // survey showed a truncated title and none of the substance.
+  // The old defect took the first line and then 120 characters of it, so the
+  // survey showed a title cut mid-word and none of the substance. A listing
+  // is fine; cutting a word in half and dropping the body is not.
   const heading = "A HEADING LINE LONG ENOUGH THAT ONE HUNDRED AND TWENTY CHARACTERS WOULD END IT SOMEWHERE IN THE MIDDLE OF A WORD RATHER THAN AT ITS END.";
   const substance = "The substance lives down here, which is the only reason anyone reads a note at all.";
   const ref = String((await call(server, "se_note", { text: heading + "\n\n" + substance })).body.captured);
   assert.ok(heading.length > 120, "the heading alone outruns the old slice");
   const answered = await call(server, "se_survey", {});
   assert.equal(answered.isError, false, JSON.stringify(answered.body));
-  const note = (answered.body.notes as { ref: string; text: string }[]).find((n) => n.ref === ref);
+  const note = (answered.body.notes as { ref: string; title: string; text?: string }[]).find((n) => n.ref === ref);
   assert.ok(note !== undefined, "the pending note is in the survey");
-  assert.ok(note.text.includes(substance), "the content below the heading survives");
-  assert.ok(note.text.includes(heading), "and the heading is not cut mid-word");
+
+  const shown = note.title.replace(/…$/, "");
+  assert.ok(heading.startsWith(shown), "the title is a prefix of the heading the author wrote");
+  assert.ok(heading[shown.length] === undefined || heading[shown.length] === " ", "and it ends at a word boundary, never inside a word");
+
+  // The substance is not in the listing, and that is the point — it is one
+  // ref away rather than in every survey anyone ever runs.
+  assert.equal(note.text, undefined, "the body stays out of the listing");
+  const whole = await call(server, "se_log_query", { ref });
+  assert.ok(String((whole.body as unknown as { text: string }).text).includes(substance), "and the whole note comes back by ref");
 });
 
 // The needs-retro gate moved (owner design 2026-07-27): it holds the FIRST
