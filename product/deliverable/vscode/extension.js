@@ -164,7 +164,12 @@ function placeConfigs(root) {
     copyFileSync(path.join(cage, src), path.join(destDir, destName));
   };
   place("mcp-http.json", ws, ".mcp.json"); // a claude run in the terminal attaches
+  place("mcp-http.json", path.join(ws, ".copilot"), "mcp-config.json"); // a copilot run attaches
   place("vscode-mcp.json", path.join(ws, ".vscode"), "mcp.json"); // agent mode attaches
+  // AGENT MODE READS ITS ORDERS FROM .github. Without this the VS Code agent
+  // gets no first action, no tool activation and no serial-read rule — which
+  // is exactly how a fresh machine looks like it is broken.
+  place("vscode-instructions.md", path.join(ws, ".github"), "copilot-instructions.md");
   place("claude-settings.json", path.join(ws, ".claude"), "settings.json"); // the cage
 }
 
@@ -269,6 +274,15 @@ async function ensureServer() {
   if (!(await ensureDeps(root))) {
     void vscode.window.showErrorMessage("$PRODUCT$: npm install failed — details in Output → $PRODUCT$ Engine.");
     return false;
+  }
+  // NOTHING ELSE MAY HOLD THIS PORT. The window is the entry point now, so a
+  // listener the probe cannot recognise must not stall the walk behind a
+  // silent EADDRINUSE. An engine serving THIS project already returned above,
+  // so whatever is still here is not ours.
+  const squatters = evictPort(PORT);
+  if (squatters.length > 0) {
+    output.appendLine("se: mirror port " + PORT + " was held by pid(s) " + squatters.join(", ") + " — stopped them");
+    await new Promise((r) => setTimeout(r, 250));
   }
   startServer(root, runner);
   for (let i = 0; i < 75; i++) {

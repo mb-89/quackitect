@@ -18,4 +18,5 @@ Thumbs.db
 workspace/.mcp.json
 workspace/.claude/settings.json
 workspace/.copilot/
+workspace/.github/
 workspace/HANDOVER.md

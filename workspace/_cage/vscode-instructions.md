@@ -19,8 +19,14 @@ Immediately after that first tick, call
 `se` file/search tools can be present but not registered yet; activating the
 group up front prevents `se_file_read` startup failures in boot.
 
-Boot stability pattern for VS Code:
-- Keep boot calls serial. Do not start parallel search/read batches in boot.
+READ SERIALLY, THE WHOLE SESSION — not only in boot. Send `se_file_read`
+calls one after another, never as a parallel batch. This host appears to
+cancel its own MCP calls when they go out in parallel, which surfaces as
+"the call was cancelled" with nothing wrong on the server. The lane serves
+parallel reads fine. The fault is on this side, so serial is what works.
+
+Stability pattern for VS Code:
+- Keep calls serial. Do not start parallel search/read batches, ever.
 - Keep reads small (offset/limit) to avoid oversized host payloads.
 - Cache read hashes by path for the whole session. Reuse cached hashes in
   read_hashes on later ticks instead of re-reading.
