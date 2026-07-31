@@ -460,3 +460,17 @@
 {"ts":"2026-07-31T16:42:10.388Z","op":"update","visit":"expeditions/e26@0","node":"d65","brief":"syntax-checking the extension"}
 {"ts":"2026-07-31T16:42:14.344Z","op":"update","visit":"expeditions/e26@0","node":"d66","brief":"full suite before landing"}
 {"ts":"2026-07-31T16:42:48.664Z","op":"done","visit":"expeditions/e26@0","node":"d62","brief":"side bar wired, terminal keeps the kickoff guarantee"}
+{"ts":"2026-07-31T16:43:58.777Z","op":"plan","visit":"expeditions/e26@0","parent":null,"nodes":[{"id":"d67","brief":"check if proposed API runs on stable VS Code"},{"id":"d68","brief":"judge whether the decision graph fits a commit graph"}]}
+{"ts":"2026-07-31T16:44:47.356Z","op":"done","visit":"expeditions/e26@0","node":"d67","brief":"proposed API is Insiders-only; my earlier claim was wrong"}
+{"ts":"2026-07-31T16:51:30.282Z","op":"done","visit":"expeditions/e26@0","node":"d68","brief":"mermaid gitGraph shows branch and merge, on stable"}
+{"ts":"2026-07-31T16:54:21.449Z","op":"plan","visit":"expeditions/e26@0","parent":null,"nodes":[{"id":"d69","brief":"learn the decision node shape"},{"id":"d70","brief":"emit mermaid gitGraph from the graph"},{"id":"d71","brief":"test it"}]}
+{"ts":"2026-07-31T16:54:26.426Z","op":"update","visit":"expeditions/e26@0","node":"d72","brief":"reading the node and op interfaces"}
+{"ts":"2026-07-31T16:55:42.614Z","op":"update","visit":"expeditions/e26@0","node":"d73","brief":"emitter written as a pure function"}
+{"ts":"2026-07-31T16:55:47.334Z","op":"done","visit":"expeditions/e26@0","node":"d69","brief":"the node model is understood"}
+{"ts":"2026-07-31T16:56:32.108Z","op":"done","visit":"expeditions/e26@0","node":"d71","brief":"six tests, green on the first run"}
+{"ts":"2026-07-31T16:56:45.365Z","op":"update","visit":"expeditions/e26@0","node":"d74","brief":"a renderer so the graph can be looked at"}
+{"ts":"2026-07-31T16:56:52.259Z","op":"update","visit":"expeditions/e26@0","node":"d75","brief":"rendering this session's real graph"}
+{"ts":"2026-07-31T16:56:58.992Z","op":"update","visit":"expeditions/e26@0","node":"d76","brief":"checking the real output before showing it"}
+{"ts":"2026-07-31T16:57:11.824Z","op":"update","visit":"expeditions/e26@0","node":"d77","brief":"showing the rendered graph"}
+{"ts":"2026-07-31T16:57:21.042Z","op":"update","visit":"expeditions/e26@0","node":"d78","brief":"checking the real graph for branches"}
+{"ts":"2026-07-31T16:57:38.830Z","op":"done","visit":"expeditions/e26@0","node":"d70","brief":"emitter, renderer and tests all land"}
