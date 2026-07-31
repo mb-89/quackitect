@@ -17,11 +17,11 @@ import { validateMachine, type EdgeDecl, type EvidenceField, type MachineDecl, t
 export const CHANGE_COLUMNS = ["patch", "minor", "major", "product"] as const;
 export const ALL_COLUMNS = [...CHANGE_COLUMNS, "specification"] as const;
 export type ChangeColumn = (typeof CHANGE_COLUMNS)[number];
-export type RigorRigorMatrixColumn = (typeof ALL_COLUMNS)[number];
+export type RigorMatrixColumn = (typeof ALL_COLUMNS)[number];
 
 const APPLIES = new Set(["full", "tailored", "inherit", "none"]);
 
-export interface RigorRigorMatrixRow {
+export interface RigorMatrixRow {
   /** The stable short name — the join key cells and dependencies use. */
   name: string;
   /** The ordering projection: M<gate>_<step><letter>_<title>. */
@@ -46,7 +46,7 @@ export interface RigorRigorMatrixRow {
   legal_tools?: string[];
 }
 
-export interface RigorRigorMatrixCell {
+export interface RigorMatrixCell {
   row: string;
   column: RigorMatrixColumn;
   applies: "full" | "tailored" | "inherit" | "none";
@@ -111,7 +111,7 @@ export function rigorMatrixContentHash(root: string): string {
   return h.digest("hex").slice(0, 12);
 }
 
-const MATRIX_CACHE = new Map<string, { stamp: string; matrix: Matrix }>();
+const MATRIX_CACHE = new Map<string, { stamp: string; matrix: RigorMatrix }>();
 
 /** CACHED AGAINST CONTENT, never against size and modification time
  *  (software.md). Hashing the 150 source files costs about a quarter of
@@ -119,7 +119,7 @@ const MATRIX_CACHE = new Map<string, { stamp: string; matrix: Matrix }>();
  *  - it was the largest read cost in the profile.
  *
  *  THE RETURNED MATRIX IS SHARED. Nothing may mutate it. */
-export function readRigorMatrix(root: string): Matrix {
+export function readRigorMatrix(root: string): RigorMatrix {
   const stamp = rigorMatrixContentHash(root);
   const hit = MATRIX_CACHE.get(root);
   if (hit !== undefined && hit.stamp === stamp) return hit.matrix;
@@ -128,7 +128,7 @@ export function readRigorMatrix(root: string): Matrix {
   return matrix;
 }
 
-function readRigorMatrixFresh(root: string): Matrix {
+function readRigorMatrixFresh(root: string): RigorMatrix {
   const dir = matrixDir(root);
   const rows: RigorMatrixRow[] = [];
   const byName = new Map<string, RigorMatrixRow>();
@@ -202,7 +202,7 @@ function priorityOf(row: RigorMatrixRow): number {
 /** Compile one change-size column into an iteration machine. Struck rows
  *  vanish; each surviving row's dependencies contract transitively through
  *  the struck ones, so the walk stays connected without them. */
-export function compileColumn(matrix: Matrix, column: ChangeColumn): MachineDecl {
+export function compileColumn(matrix: RigorMatrix, column: ChangeColumn): MachineDecl {
   const byName = new Map(matrix.rows.map((r) => [r.name, r]));
   const applied = new Set(
     matrix.rows.filter((r) => matrix.cells.get(r.name)?.get(column)?.applies !== "none").map((r) => r.name),
