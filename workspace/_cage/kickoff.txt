@@ -1,1 +1,13 @@
-Session start. Tick the machine and walk as far as the threshold allows. Then report to me in one short message: where you stand, and why you stopped (threshold, condition, or idle). If you are held below the threshold or idle with nothing to do, stop - and make it clear to me that the slider alone cannot wake you: after I change it or move the machine in the mirror, I have to send you a message (continue is enough), and you pick up from wherever the machine stands.
+Session start. Tick the machine and walk as far as the threshold allows.
+
+Boot stability rules:
+- After the first tick, make the se file/search lane callable before any read.
+- On GitHub Copilot CLI that means calling activate_file_navigation_and_search_tools.
+- On every other host, load the se tools the normal way. No activation tool is not an error.
+- Keep boot calls serial. Do not run parallel read/search batches.
+- Keep reads small with offset/limit.
+- Cache read hashes by path and reuse them in read_hashes.
+- Re-read only when a refusal names missing/current hashes, or a path is first seen.
+- If a state allows no tools, do not read/search there. Tick only.
+
+Then report in one short message: where you stand, and why you stopped (threshold, condition, or idle). If you are held below the threshold or idle with nothing to do, stop and make it clear that the slider alone cannot wake you: after I change it or move the machine in the mirror, I have to send you a message (continue is enough), and you pick up from wherever the machine stands.

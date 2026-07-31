@@ -87,8 +87,8 @@ which runs at validation, never at boot.
     {
       label: "rigor matrix reads",
       run: async () => {
-        const { readMatrix } = await import(url(engineDir, "matrix.ts"));
-        if (readMatrix(root).rows.length === 0) throw new Error("the matrix has no rows — no machine could be compiled from it");
+        const { readRigorMatrix } = await import(url(engineDir, "rigor-matrix.ts"));
+        if (readRigorMatrix(root).rows.length === 0) throw new Error("the rigor matrix has no rows — no machine could be compiled from it");
       },
     },
   ];

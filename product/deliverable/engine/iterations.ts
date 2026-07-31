@@ -11,10 +11,10 @@ import { spawnSync } from "node:child_process";
 import { nodeSize, type CanvasData, type CanvasEdge, type CanvasElement } from "./canvas.ts";
 import { CLAUSES, Rejection } from "./errors.ts";
 import { validateMachine, type EvidenceField, type MachineDecl, type StateDecl } from "./machine.ts";
-import { CHANGE_COLUMNS, compileColumn, matrixContentHash, readMatrix, type ChangeColumn } from "./matrix.ts";
+import { CHANGE_COLUMNS, compileColumn, rigorMatrixContentHash, readRigorMatrix, type ChangeColumn } from "./rigor-matrix.ts";
 import { parseStateNote } from "./notes.ts";
 import { buildArchive, type GeneratedMachine } from "./expmachine.ts";
-import { slug, worktreesDir } from "./worktree.ts";
+import { bustBranchList, listBranches, slug, worktreesDir } from "./worktree.ts";
 
 const SRC = "engine/iterations.ts";
 
@@ -60,10 +60,7 @@ export function readItRecord(root: string, it: Iteration): Record<string, unknow
 /** Open = the worktree exists. Closed = branch it/* without one. */
 export function itList(root: string): Iteration[] {
   const out: Iteration[] = [];
-  const branches = git(root, ["branch", "--list", "it/*", "--format=%(refname:short)"], "branch --list")
-    .split("\n")
-    .map((b) => b.trim())
-    .filter((b) => b !== "");
+  const branches = listBranches(root, "it/*");
   for (const branch of branches) {
     const id = branch.slice("it/".length);
     const path = join(worktreesDir(root), id);
@@ -93,6 +90,10 @@ export function itSeed(root: string, goal: string, vision: string, inputs: strin
   const path = join(worktreesDir(root), id);
   mkdirSync(worktreesDir(root), { recursive: true });
   git(root, ["worktree", "add", path, "-b", `it/${id}`], "worktree add");
+  // AFTER the branch exists, never before. Busting first only refills the
+  // cache from the old listing, and the new iteration then stays invisible
+  // for the length of the window.
+  bustBranchList();
   const deliverable = join(path, "product", "deliverable");
   if (existsSync(join(deliverable, "package.json")) && !existsSync(join(deliverable, "node_modules"))) {
     spawnSync("npm", ["install", "--no-audit", "--no-fund"], { cwd: deliverable, stdio: "ignore", shell: process.platform === "win32" });
@@ -306,11 +307,13 @@ export function generateSeeded(root: string, it: Iteration, machineId: string, k
   return { decl, canvas: pinnedCanvas(decl), expByState: {} };
 }
 
-const SIZE_ORDER = ["patch", "minor", "major"];
+/** The escalation ladder IS the column list — one source, so the two cannot
+ *  drift apart. */
+const SIZE_ORDER = CHANGE_COLUMNS as readonly string[];
 
 /** THE PIN (owner verdicts 2026-07-30): the kickoff bless compiles the
- *  blessed change size from the LIVE matrix and pins the machine into the
- *  record with the matrix content hash. Matrix edits reach the NEXT
+ *  blessed change size from the LIVE rigor matrix and pins the machine into
+ *  the record with its content hash. Rigor matrix edits reach the NEXT
  *  kickoff, never a running walk; drift stays silent until asked.
  *  Escalation = re-pinning with a LARGER size — monotonicity guarantees
  *  every filled state survives. De-escalation is refused: a prediction
@@ -341,14 +344,14 @@ export function pinIteration(root: string, it: Iteration, changeSize: string): R
       });
     }
   }
-  const matrix = readMatrix(root);
-  const machine = compileColumn(matrix, changeSize as ChangeColumn);
+  const rigorMatrix = readRigorMatrix(root);
+  const machine = compileColumn(rigorMatrix, changeSize as ChangeColumn);
   // THE DEMANDS LEDGER: what each applied step asks at this pin — the
   // ordinal applies plus the evidence spec. The next escalation compares
   // against it.
   const demands: Record<string, StepDemand> = {};
-  for (const row of matrix.rows) {
-    const cell = matrix.cells.get(row.name)!.get(changeSize as ChangeColumn)!;
+  for (const row of rigorMatrix.rows) {
+    const cell = rigorMatrix.cells.get(row.name)!.get(changeSize as ChangeColumn)!;
     if (cell.applies === "none") continue;
     demands[row.name] = { applies: cell.applies, evidence: JSON.stringify(row.evidence_form) };
   }
@@ -365,7 +368,7 @@ export function pinIteration(root: string, it: Iteration, changeSize: string): R
     .sort();
   const pin = {
     change_size: changeSize,
-    matrix_hash: matrixContentHash(root),
+    rigor_matrix_hash: rigorMatrixContentHash(root),
     pinned_at: new Date().toISOString(),
     ...(reopened.length > 0 ? { reopened } : {}),
     demands,
@@ -377,7 +380,7 @@ export function pinIteration(root: string, it: Iteration, changeSize: string): R
   git(it.path, ["commit", "-q", "-m", `iteration ${it.id}: pin ${changeSize}`], "commit");
   return {
     pinned: changeSize,
-    matrix_hash: pin.matrix_hash,
+    rigor_matrix_hash: pin.rigor_matrix_hash,
     states: machine.states.length,
     ...(reopened.length > 0 ? { reopened } : {}),
   };
@@ -432,15 +435,34 @@ export function generateIterations(root: string): GeneratedMachine {
   const states: StateDecl[] = [start];
   const expByState: Record<string, string> = {};
   const subGen: Record<string, () => GeneratedMachine> = {};
-  // The kickoff's evidence form is the matrix's OWN gate-kickoff row, read
-  // live (seed-from-source). An unreadable matrix never takes the
+  // The kickoff's evidence form is the rigor matrix's OWN gate-kickoff row,
+  // read live (seed-from-source). An unreadable rigor matrix never takes the
   // container down — the kickoff then serves without a form.
-  let kickoffEvidence: EvidenceField[] = [];
-  try {
-    kickoffEvidence = readMatrix(root).rows.find((r) => r.name === "gate-kickoff")?.evidence_form ?? [];
-  } catch {
-    kickoffEvidence = [];
-  }
+  // THE MATRIX IS READ ONLY IF SOMETHING ACTUALLY STANDS HERE, and it used to
+  // be read on every render regardless. The container wants exactly ONE row
+  // out of fifty rows and two hundred and fifty cells - gate-kickoff, for its
+  // form and its tools - and it wants that only while an iteration is open.
+  // With nothing open this never runs, and the whole read disappears.
+  //
+  // ITS TOOLS COME FROM THAT SAME ROW. The container's kickoff is the matrix's
+  // gate-kickoff standing one machine higher, so it may call exactly what the
+  // row declares. Taking the form and leaving the tools behind is what left a
+  // seeded iteration unable to read the record it is about to fill in.
+  let kickoffRow: { evidence_form: EvidenceField[]; legal_tools?: string[] } | undefined;
+  let kickoffLooked = false;
+  const kickoff = (): { evidence_form: EvidenceField[]; legal_tools?: string[] } | undefined => {
+    if (!kickoffLooked) {
+      kickoffLooked = true;
+      // An unreadable matrix never takes the container down; the kickoff then
+      // serves without a form.
+      try {
+        kickoffRow = readRigorMatrix(root).rows.find((r) => r.name === "gate-kickoff");
+      } catch {
+        kickoffRow = undefined;
+      }
+    }
+    return kickoffRow;
+  };
   type GenNode = CanvasElement & { styleAttributes?: Record<string, unknown> };
   const nodes: GenNode[] = [];
   const edges: CanvasEdge[] = [];
@@ -468,8 +490,9 @@ export function generateIterations(root: string): GeneratedMachine {
       kind: "work",
       statement: goal,
       guidance:
-        "KICKOFF — one brief carries plan and rigor; the owner blesses, and past it the iteration is set. The bless SEEDS the rest: the engine compiles the blessed change_size from the live matrix and pins the machine into the record. Goal, vision and inputs live in the record.",
-      evidence_form: kickoffEvidence,
+        "KICKOFF — one brief carries plan and rigor; the owner blesses, and past it the iteration is set. THE CHANGE SIZE IS NOT YOURS TO PICK. You PROPOSE one with your reasoning; the person decides, and their bless is the decision. Seeding never asked for a size and never needed to — every iteration reaches this state the same way, and the size is chosen here or nowhere. The bless SEEDS the rest: the engine compiles the blessed change_size from the live rigor matrix and pins the machine into the record. Goal, vision and inputs live in the record.",
+      evidence_form: kickoff()?.evidence_form ?? [],
+      ...(kickoff()?.legal_tools !== undefined ? { legal_tools: kickoff()!.legal_tools } : {}),
       priority: 0.6,
       ...(started ? {} : { entry: { no_pending_note: ["needs retro"] } }),
       tags: ["iteration-kickoff"],
@@ -482,7 +505,7 @@ export function generateIterations(root: string): GeneratedMachine {
         id: walkId,
         kind: "work",
         statement: `the pinned ${String(pinned!.change_size)} walk (${m.states.length} states)`,
-        guidance: "The pinned machine — compiled from the matrix at the kickoff bless, pinned to the record. Click in; the walk continues inside. Matrix edits reach the NEXT kickoff, never this walk.",
+        guidance: "The pinned machine — compiled from the rigor matrix at the kickoff bless, pinned to the record. Click in; the walk continues inside. Rigor matrix edits reach the NEXT kickoff, never this walk.",
         evidence_form: [],
         priority: 0.2,
         submachine: "generated",

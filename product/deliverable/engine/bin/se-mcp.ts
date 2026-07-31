@@ -29,7 +29,7 @@
 //
 // SESSION OVER: anybody reaching end shuts the whole session down — the
 // child exits deliberately (code 0) and the shim follows it down.
-import { spawn, type ChildProcess } from "node:child_process";
+import { spawn, spawnSync, type ChildProcess } from "node:child_process";
 import { existsSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { createInterface } from "node:readline";
@@ -42,6 +42,48 @@ const argv = [
 function argValue(flag: string): string | undefined {
   const i = argv.indexOf(flag);
   return i >= 0 ? argv[i + 1] : undefined;
+}
+
+function listeningPids(port: number): number[] {
+  if (!Number.isFinite(port) || port <= 0) return [];
+  if (process.platform === "win32") {
+    const script = `$p=${port}; Get-NetTCPConnection -State Listen -LocalPort $p -ErrorAction SilentlyContinue | Select-Object -ExpandProperty OwningProcess -Unique`;
+    const r = spawnSync("powershell", ["-NoProfile", "-Command", script], { encoding: "utf8", windowsHide: true });
+    if (r.status !== 0) return [];
+    return String(r.stdout ?? "")
+      .split(/\r?\n/)
+      .map((s) => Number(s.trim()))
+      .filter((n) => Number.isInteger(n) && n > 0);
+  }
+  const lsof = spawnSync("lsof", ["-nP", `-iTCP:${port}`, "-sTCP:LISTEN", "-t"], { encoding: "utf8" });
+  if (lsof.status !== 0) return [];
+  return String(lsof.stdout ?? "")
+    .split(/\r?\n/)
+    .map((s) => Number(s.trim()))
+    .filter((n) => Number.isInteger(n) && n > 0);
+}
+
+function killPidTree(pid: number): boolean {
+  if (!Number.isInteger(pid) || pid <= 0) return false;
+  if (pid === process.pid || pid === process.ppid) return false;
+  if (process.platform === "win32") {
+    const r = spawnSync("taskkill", ["/PID", String(pid), "/T", "/F"], { encoding: "utf8", windowsHide: true });
+    return r.status === 0;
+  }
+  try {
+    process.kill(pid, "SIGTERM");
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function evictMirrorPort(port: number): number[] {
+  const killed: number[] = [];
+  for (const pid of listeningPids(port)) {
+    if (killPidTree(pid)) killed.push(pid);
+  }
+  return [...new Set(killed)].sort((a, b) => a - b);
 }
 
 if (argv.some((a) => a === "--help" || a === "-h" || a === "-?")) {
@@ -65,7 +107,6 @@ LAUNCH — read by RUNME.ps1 before the server starts.
                  This also happens by itself when no claude CLI is found.
                  The engine's --autonomy 0 is a DIFFERENT thing: an agent
                  is running, it just may not step by itself.
-  --one-screen   the old spelling of today's default. Accepted, does nothing.
   --kill         stop every leftover engine process and exit, launching
                  nothing (-Kill). Finds the server, the terminal host and the
                  manual mirror by command line AND by listening port (7333,
@@ -74,7 +115,6 @@ LAUNCH — read by RUNME.ps1 before the server starts.
   --classic      the OLD way in: the agent on a terminal and the Mirror in
                  your browser, with no VS Code. It still works exactly as it
                  did. It is simply no longer what you get by default.
-  --vscode       accepted, does nothing. VS Code is the default host now.
   --export <dir> <Name> <ABBR>
                  copy the WORKING TREE into <dir> as a fresh single-commit
                  repository under a NEW NAME, then exit. History stays home:
@@ -188,21 +228,37 @@ if (argv.includes("--child") || process.env.SE_HOT_DISABLE === "1") {
   const mcpServer = buildServer(root, session);
   if (mirrorPort > 0) {
     const log = new CallLog(seDir(root));
-    const mirror = startMirror({ session, root, port: mirrorPort, log, mode: "agent", mcp: mcpServer });
-    // A second agent on the same machine (worktree concurrency) must not die
-    // over the mirror port — the MCP lane matters more than the window.
-    mirror.on("error", (e) => {
-      process.stderr.write(`se-mcp: mirror not started (${(e as NodeJS.ErrnoException).code ?? e.message}) — pass --mirror-port to pick another port\n`);
-    });
-    mirror.on("listening", () => {
-      const url = `http://localhost:${mirrorPort}/`;
-      session.mirrorUrl = url;
-      process.stderr.write(`se-mcp: mirror (the human's hand) at ${url}\n`);
-      // The server's first act once the panel exists: put it in front of
-      // the user — but only once per session, not on every reload (the
-      // open page reloads itself). se_panel reopens it any time.
-      if (process.env.SE_PANEL_SUPPRESS !== "1") openPanel(url);
-    });
+    let retriedMirrorStart = false;
+    const bootMirror = (): void => {
+      const mirror = startMirror({ session, root, port: mirrorPort, log, mode: "agent", mcp: mcpServer });
+      // A second agent on the same machine (worktree concurrency) must not die
+      // over the mirror port — the MCP lane matters more than the window.
+      mirror.on("error", (e) => {
+        const code = (e as NodeJS.ErrnoException).code ?? "";
+        if (code === "EADDRINUSE" && !retriedMirrorStart) {
+          retriedMirrorStart = true;
+          const killed = evictMirrorPort(mirrorPort);
+          if (killed.length > 0) {
+            process.stderr.write(`se-mcp: mirror port ${mirrorPort} was busy — stopped pid(s) ${killed.join(", ")} and retrying\n`);
+          } else {
+            process.stderr.write(`se-mcp: mirror port ${mirrorPort} is busy and owner could not be stopped — retrying once\n`);
+          }
+          setTimeout(() => bootMirror(), 200);
+          return;
+        }
+        process.stderr.write(`se-mcp: mirror not started (${code || e.message}) — pass --mirror-port to pick another port\n`);
+      });
+      mirror.on("listening", () => {
+        const url = `http://localhost:${mirrorPort}/`;
+        session.mirrorUrl = url;
+        process.stderr.write(`se-mcp: mirror (the human's hand) at ${url}\n`);
+        // The server's first act once the panel exists: put it in front of
+        // the user — but only once per session, not on every reload (the
+        // open page reloads itself). se_panel reopens it any time.
+        if (process.env.SE_PANEL_SUPPRESS !== "1") openPanel(url);
+      });
+    };
+    bootMirror();
   }
 
   process.stderr.write(`se-mcp 3.0.0-bootstrap root=${root} autonomy=${session.autonomy}${headless ? " headless" : ""}\n`);

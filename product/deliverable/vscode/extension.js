@@ -51,12 +51,12 @@ let detailsView = null;
 let poller = null;
 let busyDone = null;
 let agentTerm = null;
+let agentStarting = false;
 let logTerm = null;
 let logEmitter = null;
 let logRows = [];
 let logFilter = "";
 let logAnchored = false;
-let logSeq = 0;
 let lastWalk = "";
 /** Known-up means a card can start loading at once instead of waiting. */
 let engineUp = false;
@@ -117,6 +117,45 @@ function nodeRunner() {
   return null;
 }
 
+function listeningPids(port) {
+  if (!Number.isFinite(port) || port <= 0) return [];
+  if (process.platform === "win32") {
+    const script = `$p=${port}; Get-NetTCPConnection -State Listen -LocalPort $p -ErrorAction SilentlyContinue | Select-Object -ExpandProperty OwningProcess -Unique`;
+    const r = spawnSync("powershell", ["-NoProfile", "-Command", script], { encoding: "utf8", windowsHide: true });
+    if (r.status !== 0) return [];
+    return String(r.stdout ?? "")
+      .split(/\r?\n/)
+      .map((s) => Number(s.trim()))
+      .filter((n) => Number.isInteger(n) && n > 0);
+  }
+  const lsof = spawnSync("lsof", ["-nP", `-iTCP:${port}`, "-sTCP:LISTEN", "-t"], { encoding: "utf8" });
+  if (lsof.status !== 0) return [];
+  return String(lsof.stdout ?? "")
+    .split(/\r?\n/)
+    .map((s) => Number(s.trim()))
+    .filter((n) => Number.isInteger(n) && n > 0);
+}
+
+function evictPort(port) {
+  const killed = [];
+  for (const pid of listeningPids(port)) {
+    if (!Number.isInteger(pid) || pid <= 0) continue;
+    if (pid === process.pid || pid === process.ppid) continue;
+    try {
+      if (process.platform === "win32") {
+        const r = spawnSync("taskkill", ["/PID", String(pid), "/T", "/F"], { encoding: "utf8", windowsHide: true });
+        if (r.status === 0) killed.push(pid);
+      } else {
+        process.kill(pid, "SIGTERM");
+        killed.push(pid);
+      }
+    } catch {
+      // best-effort cleanup for presentation-mode startup
+    }
+  }
+  return [...new Set(killed)].sort((a, b) => a - b);
+}
+
 function placeConfigs(root) {
   const ws = path.join(root, "workspace");
   const cage = path.join(ws, "_cage");
@@ -125,7 +164,12 @@ function placeConfigs(root) {
     copyFileSync(path.join(cage, src), path.join(destDir, destName));
   };
   place("mcp-http.json", ws, ".mcp.json"); // a claude run in the terminal attaches
+  place("mcp-http.json", path.join(ws, ".copilot"), "mcp-config.json"); // a copilot run attaches
   place("vscode-mcp.json", path.join(ws, ".vscode"), "mcp.json"); // agent mode attaches
+  // AGENT MODE READS ITS ORDERS FROM .github. Without this the VS Code agent
+  // gets no first action, no tool activation and no serial-read rule — which
+  // is exactly how a fresh machine looks like it is broken.
+  place("vscode-instructions.md", path.join(ws, ".github"), "copilot-instructions.md");
   place("claude-settings.json", path.join(ws, ".claude"), "settings.json"); // the cage
 }
 
@@ -210,10 +254,17 @@ async function ensureServer() {
   const probe = await probeServer();
   if (probe.state === "up") {
     if (probe.root !== null && path.resolve(probe.root) !== path.resolve(root)) {
-      void vscode.window.showErrorMessage("$PRODUCT$: port " + PORT + " already serves another project (" + probe.root + ") — close that session first.");
-      return false;
+      const killed = evictPort(PORT);
+      if (killed.length > 0) {
+        output.appendLine("se: mirror port " + PORT + " was occupied by another project; stopped pid(s) " + killed.join(", "));
+        await new Promise((r) => setTimeout(r, 250));
+      } else {
+        void vscode.window.showErrorMessage("$PRODUCT$: port " + PORT + " already serves another project (" + probe.root + ") and could not be reclaimed automatically.");
+        return false;
+      }
+    } else {
+      return true;
     }
-    return true;
   }
   const runner = nodeRunner();
   if (runner === null) {
@@ -223,6 +274,15 @@ async function ensureServer() {
   if (!(await ensureDeps(root))) {
     void vscode.window.showErrorMessage("$PRODUCT$: npm install failed — details in Output → $PRODUCT$ Engine.");
     return false;
+  }
+  // NOTHING ELSE MAY HOLD THIS PORT. The window is the entry point now, so a
+  // listener the probe cannot recognise must not stall the walk behind a
+  // silent EADDRINUSE. An engine serving THIS project already returned above,
+  // so whatever is still here is not ours.
+  const squatters = evictPort(PORT);
+  if (squatters.length > 0) {
+    output.appendLine("se: mirror port " + PORT + " was held by pid(s) " + squatters.join(", ") + " — stopped them");
+    await new Promise((r) => setTimeout(r, 250));
   }
   startServer(root, runner);
   for (let i = 0; i < 75; i++) {
@@ -468,7 +528,7 @@ const systemHelp = () => `<p><b>Shell build ${escapeHtml(BUILD)}</b> — if this
 <p>The sidebar has three groups. Features is what you can do. Controls steers the walk. Details is this — whatever you click explains itself here.</p>
 <p>Every card except this one opens as its own editor window. Split it, drag it to any side, or move it to a second window.</p>
 <p>VS Code remembers that layout for this folder. Open the folder again and your windows come back where you left them.</p>
-<p>The play button starts your agent in a terminal beside the log, with the opening prompt already sent.</p>
+<p>The play button starts Claude in a terminal, or opens Copilot in Chat agent mode, with the opening prompt already sent.</p>
 <p>Several agents may attach at once. Give the wheel to one at a time.</p>`;
 
 function cardHelp(card) {
@@ -489,15 +549,11 @@ function cardHelp(card) {
 const HELP = {
   "$PRODUCT_ID$.startAgent": {
     title: "Start the agent",
-    html: `<p>Starts the engine if it is not running, then opens a terminal in the editor area and starts your agent CLI in it.</p>
-<p>The log opens beside it, so the conversation is on the left and what it did is on the right.</p>
+    html: `<p>Starts the engine if it is not running, then launches your agent.</p>
+<p>Claude starts in a terminal. Copilot tries to start in Chat agent mode with the same kickoff prompt and mapped tool exclusions; if unavailable, it falls back to terminal launch.</p>
+<p>The log opens beside the active terminal when one exists.</p>
 <p>The opening prompt is sent for you. You never paste it.</p>
 <p>Claude Code is used when it is installed; otherwise the Copilot CLI, in its cage.</p>`,
-  },
-  "$PRODUCT_ID$.restartServer": {
-    title: "Restart the engine",
-    html: `<p>Stops the engine and starts it again on the current sources.</p>
-<p>The walk is on disk, so nothing is lost. An attached agent must reconnect.</p>`,
   },
 };
 
@@ -765,7 +821,6 @@ class Strip {
       if (!inStrip(c)) continue;
       list.push({ cmd: "$PRODUCT_ID$.openCard" + c.n, icon: cardIcon(c), label: titleOf(c), key: "ctrl+alt+" + c.n });
     }
-    list.push({ cmd: "$PRODUCT_ID$.restartServer", icon: ICON.restart, label: "Restart the engine", key: "" });
     return list;
   }
   page() {
@@ -975,11 +1030,18 @@ class Controls {
 // It is not dead text. Every row ends in a short reference, and a terminal
 // link provider makes that clickable — the record then lands in Details,
 // drawn by the engine's own renderer rather than a second one written here.
-// A SHORT LINK. The record's own reference is long and says nothing to a
-// reader, so the row carries a small ordinal instead and the shell keeps the
-// map from it to the real reference. The ordinals are per DRAW, which is fine
-// because the map is rebuilt in the same breath as the text.
-const REF_RE = /\[(\d{1,4})\]/g;
+// A LINK HAS TO LOOK LIKE ONE (owner ruling 2026-07-31). The row used to
+// open with a small ordinal in brackets, and nothing about a bracketed
+// number says "click me" — not its shape and not its colour. It carries the
+// link glyph instead, which needs no explaining.
+//
+// The ordinal was doing a second job: it was the KEY into the reference map.
+// With every row now showing the same glyph, the ROW TEXT is the key. It is
+// unique in practice (a timestamp to the second, plus the brief) and it is
+// exactly what the link provider is handed, which the ordinal never was.
+const REF_RE = /\[🔗\]/g;
+const LINK = "[🔗]";
+const PLAIN = (s) => s.replace(/\[[0-9;]*m/g, "").trimEnd();
 const logRefs = new Map();
 const DIM = (s) => "[2m" + s + "[0m";
 // THE TERMINAL'S OWN PALETTE. These are the theme's ansi slots, so the log
@@ -988,7 +1050,7 @@ const DIM = (s) => "[2m" + s + "[0m";
 const KIND_COLOUR = { call: "34", update: "35", note: "33", aq: "36" };
 const paint = (code, s) => (code === undefined ? s : "[" + code + "m" + s + "[0m");
 
-function logRow(r, n) {
+function logRow(r) {
   const ts = String(r.ts ?? "");
   const when = r.pending === true ? ts.slice(5, 10) : ts.slice(11, 19);
   const src = String(r.src ?? "");
@@ -1005,7 +1067,9 @@ function logRow(r, n) {
   // The agent stays grey because most rows are the agent's. The person's own
   // acts are the rare ones, so they are the ones worth making bright.
   const srcCol = src === "human" ? paint("97", src.padEnd(5)) : DIM(src.padEnd(5));
-  return `${DIM("[" + n + "]")} ${DIM(when)} ${srcCol} ${kindCol} ${brief}${clause} ${ok}`;
+  // The glyph stays UNDIMMED. Everything dim on this row is context; the one
+  // thing the reader can act on should not look like more of it.
+  return `${LINK} ${DIM(when)} ${srcCol} ${kindCol} ${brief}${clause} ${ok}`;
 }
 
 function matchesFilter(r) {
@@ -1027,9 +1091,9 @@ function appendLog() {
     if (ref === "" || logSeen.has(ref)) continue;
     logSeen.add(ref);
     if (!matchesFilter(r)) continue;
-    logSeq += 1;
-    logRefs.set(String(logSeq), ref);
-    out.push(logRow(r, logSeq));
+    const row = logRow(r);
+    logRefs.set(PLAIN(row), ref);
+    out.push(row);
   }
   if (out.length > 0) logEmitter.fire(out.join("\r\n") + "\r\n");
 }
@@ -1039,15 +1103,14 @@ function redrawLog() {
   if (logEmitter === null) return;
   logSeen.clear();
   logRefs.clear();
-  logSeq = 0;
   const out = [];
   for (const r of logRows) {
     const ref = String(r.ref ?? "");
     if (ref !== "") logSeen.add(ref);
     if (!matchesFilter(r)) continue;
-    logSeq += 1;
-    logRefs.set(String(logSeq), ref);
-    out.push(logRow(r, logSeq));
+    const row = logRow(r);
+    logRefs.set(PLAIN(row), ref);
+    out.push(row);
   }
   logEmitter.fire("[2J[3J[H" + (out.length === 0 ? DIM("no acts match") : out.join("\r\n")) + "\r\n");
 }
@@ -1069,8 +1132,7 @@ function makeLogTerminal(parent) {
       open: () => {
         // The first paint draws everything; every poll after it only appends.
         logSeen.clear();
-        logSeq = 0;
-        void api("/api/log").then((b) => {
+              void api("/api/log").then((b) => {
           if (b !== null && Array.isArray(b.rows)) logRows = b.rows;
           redrawLog();
         });
@@ -1123,15 +1185,54 @@ async function showLogRef(ref) {
 
 // The same choice RUNME makes: Claude wins when both are installed. The
 // kickoff text is read from the one file both launchers share.
+function psq(text) {
+  return "'" + String(text).replace(/'/g, "''") + "'";
+}
+
+function parseExcludedToolsFromCage(cage) {
+  const args = Array.isArray(cage?.exclude_args) ? cage.exclude_args : [];
+  const i = args.indexOf("--excluded-tools");
+  if (i < 0) return [];
+  const out = [];
+  for (let n = i + 1; n < args.length; n++) {
+    const a = String(args[n] ?? "").trim();
+    if (a === "" || a.startsWith("--")) break;
+    out.push(a);
+  }
+  return out;
+}
+
+async function openCopilotInChat(kickoff, cage) {
+  const all = await vscode.commands.getCommands(true);
+  if (!all.includes("workbench.action.chat.open")) return false;
+  const toolsExclude = parseExcludedToolsFromCage(cage);
+  try {
+    await vscode.commands.executeCommand("workbench.action.chat.open", {
+      mode: "agent",
+      query: kickoff,
+      isPartialQuery: false,
+      toolsExclude,
+    });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 function agentLaunch(root) {
   const cageDir = path.join(root, "workspace", "_cage");
   const kickoff = readFileSync(path.join(cageDir, "kickoff.txt"), "utf8").trim();
   const has = (cmd) => spawnSync(cmd, ["--version"], { encoding: "utf8", shell: true }).status === 0;
-  if (has("claude")) return "claude '" + kickoff + "'";
+  if (has("claude")) return { host: "claude", kickoff, command: "claude " + psq(kickoff) };
   if (has("copilot")) {
     const cage = JSON.parse(readFileSync(path.join(cageDir, "copilot-cage.json"), "utf8"));
     const args = [].concat(cage.mcp_args, cage.exclude_args, cage.allow_args, cage.deny_args, cage.extra_args);
-    return "copilot " + args.join(" ") + " -i '" + kickoff + "'";
+    return {
+      host: "copilot",
+      kickoff,
+      cage,
+      command: "copilot " + args.map((a) => psq(a)).join(" ") + " -i " + psq(kickoff),
+    };
   }
   return null;
 }
@@ -1144,19 +1245,59 @@ function agentLaunch(root) {
  * aside the card they were looking at.
  */
 async function startAgent() {
-  const root = projectRoot();
-  if (root === null || !(await ensureServer())) return;
-  await ensureCards();
-  const command = agentLaunch(root);
-  if (command === null) {
-    void vscode.window.showErrorMessage("$PRODUCT$: no agent CLI found — install Claude Code (or Copilot CLI), then retry.");
+  if (agentStarting) {
+    void vscode.window.showInformationMessage("$PRODUCT$: agent is already starting — check '$PRODUCT$ agent' and '$PRODUCT$ log' terminals.");
     return;
   }
-  agentTerm = vscode.window.createTerminal({ name: "$PRODUCT$ agent", cwd: path.join(root, "workspace") });
-  agentTerm.show();
-  agentTerm.sendText(command, true);
-  // Rebuilt, so the log lands to the agent's RIGHT whatever stood there before.
-  await showLog(true);
+  agentStarting = true;
+  try {
+    const ok = await vscode.window.withProgress(
+      {
+        location: vscode.ProgressLocation.Notification,
+        title: "$PRODUCT$: starting agent — check the terminals",
+        cancellable: false,
+      },
+      async (progress) => {
+        progress.report({ message: "Preparing engine and launch command..." });
+        const root = projectRoot();
+        if (root === null || !(await ensureServer())) return false;
+        await ensureCards();
+        const command = agentLaunch(root);
+        if (command === null) {
+          void vscode.window.showErrorMessage("$PRODUCT$: no agent CLI found — install Claude Code (or Copilot CLI), then retry.");
+          return false;
+        }
+        progress.report({ message: "Opening terminals and launching agent..." });
+        if (command.host === "copilot") {
+          progress.report({ message: "Opening Copilot Chat and sending kickoff..." });
+          const launchedInChat = await openCopilotInChat(command.kickoff, command.cage);
+          if (launchedInChat) {
+            agentTerm = null;
+            await showLog(false);
+            return true;
+          }
+          progress.report({ message: "Chat launch unavailable, falling back to terminal launch..." });
+        }
+        // Host-agnostic layout: both stay in the terminal panel. The log is
+        // split from the agent where the terminal API allows it.
+        agentTerm = vscode.window.createTerminal({
+          name: "$PRODUCT$ agent",
+          cwd: path.join(root, "workspace"),
+        });
+        agentTerm.sendText(command.command, true);
+        // Rebuilt, so the log lands to the agent's RIGHT whatever stood there before.
+        await showLog(true);
+        // Keep the agent visible after the log is created/shown.
+        agentTerm.show(true);
+        return true;
+      },
+    );
+    if (ok) {
+      void vscode.window.setStatusBarMessage("$PRODUCT$: agent started — check Chat for Copilot or '$PRODUCT$ agent' terminal; logs are in '$PRODUCT$ log'.", 5000);
+    }
+  } finally {
+    agentStarting = false;
+  }
 }
 
 async function openCard(n) {
@@ -1220,7 +1361,7 @@ function activate(context) {
         REF_RE.lastIndex = 0;
         let m = REF_RE.exec(ctx.line);
         while (m !== null) {
-          const ref = logRefs.get(m[1]);
+          const ref = logRefs.get(PLAIN(ctx.line));
           if (ref !== undefined && ref !== "") out.push({ startIndex: m.index, length: m[0].length, tooltip: "show this act in Details", ref });
           m = REF_RE.exec(ctx.line);
         }
@@ -1251,22 +1392,6 @@ function activate(context) {
     vscode.commands.registerCommand("$PRODUCT_ID$.startAgent", withHelp("$PRODUCT_ID$.startAgent", startAgent)),
     vscode.commands.registerCommand("$PRODUCT_ID$.howToAttach", showAttach),
     vscode.commands.registerCommand("$PRODUCT_ID$.expandDetails", () => void expandDetails()),
-    vscode.commands.registerCommand(
-      "$PRODUCT_ID$.restartServer",
-      withHelp("$PRODUCT_ID$.restartServer", async () => {
-        if (child !== null) {
-          killTree(child);
-          child = null;
-        }
-        if (!(await ensureServer())) return;
-        levels = null;
-        await refreshCards();
-        await pollWalk();
-        detailsView.up();
-        if (logTerm !== null) await pollLog();
-        for (const w of windows.values()) w.up();
-      }),
-    ),
     vscode.window.onDidChangeActiveColorTheme(() => {
       strip.render();
       controls.render();

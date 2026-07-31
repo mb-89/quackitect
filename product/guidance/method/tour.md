@@ -64,7 +64,7 @@ guide.
    columns of change size. A cell says what a step demands at that size;
    a struck cell says why it does not apply. The machine the walk runs
    is COMPILED from this, live, at every kickoff.
-5. THE COMPILED MACHINE, WITHOUT BUILDING ONE. Read the matrix column for
+5. THE COMPILED MACHINE, WITHOUT BUILDING ONE. Read the rigor matrix column for
    one change size and say what a kickoff would compile from it. A record
    that already exists shows its pinned machine; click in and the walk
    continues inside. Nothing is seeded to make this stop work.

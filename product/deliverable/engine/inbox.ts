@@ -9,10 +9,26 @@ import { randomBytes } from "node:crypto";
 import { CLAUSES, Rejection } from "./errors.ts";
 import { stripBom } from "./jsonio.ts";
 
+/** MoSCoW, minus the fourth bucket. "Won't" already exists here as a drain
+ *  disposition, so a note never needs to carry it. */
+export type Priority = "must" | "should" | "could";
+export const PRIORITIES: readonly Priority[] = ["must", "should", "could"];
+
+/** An unmarked note is a COULD. A stray is noticed in passing, and defaulting
+ *  to the middle would flatten the sort the priority exists to give. */
+export const DEFAULT_PRIORITY: Priority = "could";
+
+const RANK: Record<Priority, number> = { must: 0, should: 1, could: 2 };
+const TITLE_CAP = 80;
+
 export interface StrayNote {
   ref: string;
   text: string;
   at: string;
+  /** The author's own one-line title. Absent on notes written before titles
+   *  existed, and derived from the first line for those. */
+  title?: string;
+  priority?: Priority;
   /** Whose hand captured it — agent | human (absent on old notes = agent). */
   by?: string;
   /** Set by a retro's disposition — a drained note leaves the inbox.
@@ -24,9 +40,44 @@ function notesPath(seDirPath: string): string {
   return join(seDirPath, "notes.jsonl");
 }
 
-export function appendNote(seDirPath: string, text: string, by = "agent"): { captured: string; inbox: number } {
+/** One line from a long value, cut at a WORD boundary and marked as cut.
+ *  Shared by the note title and the survey's goals, because a mid-word cut
+ *  was the specific complaint that made the survey answer in full. */
+export function headline(t: string, cap: number): string {
+  const flat = t.replace(/\s+/g, " ").trim();
+  if (flat.length <= cap) return flat;
+  const cut = flat.slice(0, cap);
+  const space = cut.lastIndexOf(" ");
+  return `${(space > cap * 0.6 ? cut.slice(0, space) : cut).trimEnd()}…`;
+}
+
+/** The note's own title, or its first line where an older note has none.
+ *  A derived title POINTS AT the text and never replaces it — the whole note
+ *  stays readable with se_log_query {ref}. */
+export function titleOf(n: StrayNote): string {
+  if (n.title !== undefined && n.title.trim() !== "") return n.title.trim();
+  const first = n.text.split("\n").find((l) => l.trim() !== "") ?? "";
+  return headline(first.replace(/^#+\s*/, ""), TITLE_CAP);
+}
+
+export function priorityOf(n: StrayNote): Priority {
+  return n.priority !== undefined && PRIORITIES.includes(n.priority) ? n.priority : DEFAULT_PRIORITY;
+}
+
+export function byPriority(a: StrayNote, b: StrayNote): number {
+  return RANK[priorityOf(a)] - RANK[priorityOf(b)];
+}
+
+export function appendNote(seDirPath: string, text: string, by = "agent", title?: string, priority?: Priority): { captured: string; inbox: number } {
   const p = notesPath(seDirPath);
-  const note: StrayNote = { ref: `note-${randomBytes(6).toString("hex")}`, text, at: new Date().toISOString(), by };
+  const note: StrayNote = {
+    ref: `note-${randomBytes(6).toString("hex")}`,
+    text,
+    at: new Date().toISOString(),
+    ...(title !== undefined && title.trim() !== "" ? { title: title.trim() } : {}),
+    ...(priority !== undefined ? { priority } : {}),
+    by,
+  };
   mkdirSync(dirname(p), { recursive: true });
   appendFileSync(p, JSON.stringify(note) + "\n", "utf8");
   return { captured: note.ref, inbox: pendingNotes(seDirPath).length };

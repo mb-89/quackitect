@@ -42,6 +42,7 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 import { resolveInRoot, seDir } from "./paths.ts";
 import { Decisions, replayFile } from "./decisions.ts";
 import { generateIterationArchive, generateIterations, itFind, itPinRel, itRecordRel, itSeed, markStarted, pinIteration, readItRecord } from "./iterations.ts";
+import { CHANGE_COLUMNS } from "./rigor-matrix.ts";
 import { parseStateNote, section } from "./notes.ts";
 
 /** THE TICK is the machinery — one tool, legal in EVERY state. Without
@@ -206,7 +207,7 @@ export class Session {
 
   /** THE MILESTONE REVIEW REPORT (owner rulings 2026-07-30): the one thing
    *  a person reads most, so it is the gate's MECHANICAL demand. The
-   *  scaffold generates from the gate's OWN evidence fields (the matrix,
+   *  scaffold generates from the gate's OWN evidence fields (the rigor matrix,
    *  live) plus v1's field-tested review tail: verify, validate, red_team,
    *  verdict. Prefilled comments never count as content (the prefill law).
    *
@@ -495,7 +496,7 @@ export class Session {
   }
 
   /** THE BLESS PINS (owner verdicts 2026-07-30): leaving an iteration
-   *  kickoff compiles the record's blessed change_size from the LIVE matrix
+   *  kickoff compiles the record's blessed change_size from the LIVE rigor matrix
    *  and pins the machine into the record. No change size, no pass — the
    *  demand is mechanical. An existing same-size pin walks on untouched;
    *  a larger size escalates; pinIteration refuses de-escalation itself. */
@@ -509,11 +510,11 @@ export class Session {
       if (existsSync(pinAbs)) return; // blessed in an earlier pass — walk on
       throw new Rejection({
         clause: CLAUSES.CONDITION_UNMET,
-        expected: "a change_size in the iteration record (patch | minor | major) — the bless compiles the column and pins the machine",
+        expected: `a change_size in the iteration record (${CHANGE_COLUMNS.join(" | ")}) — the bless compiles the column and pins the machine`,
         got: "no change_size in the record's frontmatter",
         remedy: {
           tool: "se_file_patch",
-          args: { ops: [{ path: itRecordRel(it.id), old_string: "status:", new_string: "change_size: <patch | minor | major>\nstatus:" }] },
+          args: { ops: [{ path: itRecordRel(it.id), old_string: "status:", new_string: `change_size: <${CHANGE_COLUMNS.join(" | ")}>\nstatus:` }] },
           note: "prefill it from the goal with its reasoning — the person's bless is the tick itself",
         },
         source: "engine/session.ts kickoff",
@@ -614,6 +615,7 @@ export class Session {
     readHashes: Record<string, string>,
     kind: "escaped" | "paused",
   ): Record<string, unknown> {
+    const supplied = this.readProofs(channel, readHashes);
     const verb = kind === "escaped" ? "escape" : "pause";
     if (reason.trim() === "") {
       throw new Rejection({
@@ -655,9 +657,9 @@ export class Session {
       const nowMain = new Date().toISOString();
       this.gatePriority(this.machine, ["idle"], channel);
       const idleState = this.state(this.machine, "idle");
-      const missingMain = this.entryRequirements(this.machine, idleState).filter((p) => !this.readProven(channel, p, readHashes));
+      const missingMain = this.entryRequirements(this.machine, idleState).filter((p) => !this.readProven(channel, p, supplied));
       if (missingMain.length > 0) this.refuseReads("entry", "idle", missingMain, channel);
-      this.assertHandover(channel, readHashes);
+      this.assertHandover(channel, supplied);
       const stoodIn = stood[0] ?? "(no state)";
       this.instance.history.push({ state: stoodIn, outcome: kind, at: nowMain });
       if (kind === "escaped") this.instance.escapes.push({ state: stoodIn, exhausted_guard: reason.slice(0, 300), at: nowMain });
@@ -686,9 +688,9 @@ export class Session {
     const now = new Date().toISOString();
     this.gatePriority(this.machine, ["idle"], channel);
     const idle = this.state(this.machine, "idle");
-    const missing = this.entryRequirements(this.machine, idle).filter((p) => !this.readProven(channel, p, readHashes));
+    const missing = this.entryRequirements(this.machine, idle).filter((p) => !this.readProven(channel, p, supplied));
     if (missing.length > 0) this.refuseReads("entry", "idle", missing, channel);
-    this.assertHandover(channel, readHashes);
+    this.assertHandover(channel, supplied);
     const stoodIn = this.active()[0];
     const parent = this.subs[0].parentState;
     this.instance.history.push({ state: stoodIn, outcome: kind, at: now });
@@ -880,25 +882,51 @@ export class Session {
     return this._target;
   }
 
+  /** A one-shot target clears itself the moment the walk stands on it. */
+  /** ARRIVAL IS A COMPARISON, NEVER A SEARCH. This once asked route() whether
+   *  the way here was empty, and route() expands the drawing — which for a
+   *  generated container means WRITING it, against the project root, on every
+   *  packet the engine builds. A bound worktree then walked a container that
+   *  was being regenerated underneath it. Reading where you stand must never
+   *  change where you stand. */
+  private clearTargetIfArrived(): void {
+    if (this._target === "") return;
+    const here = this.active()[0];
+    if (here === undefined) return;
+    // A submachine is aimed at by its container name; route() lands on its
+    // start, so arrival compares against the same normalised id.
+    const decl = this.machine.states.find((s) => s.id === this._target);
+    const aim = decl?.submachine !== undefined ? `${this._target}/start` : this._target;
+    if (here === aim) this._target = "";
+  }
+
   /** Aim the walk somewhere else. Setting a target moves nothing — it says
    *  where the way is drawn to. An unreachable one is refused rather than
-   *  stored, so the blue line never points at nowhere. */
+   *  stored, so the blue line never points at nowhere.
+   *
+   *  Passing an empty string clears the target explicitly. */
   setTarget(to: string): Record<string, unknown> {
-    const r = this.route(to);
-    if (!r.found && to !== this.active()[0]) {
+    const wanted = to.trim();
+    if (wanted === "") {
+      this._target = "";
+      return { ...this.route(this.active()[0] ?? this.machine.initial), target: this._target };
+    }
+    const r = this.route(wanted);
+    if (!r.found && wanted !== this.active()[0]) {
       throw new Rejection({
         clause: CLAUSES.NOT_LEGAL_IN_STATE,
         expected: "a state the drawing can reach from here",
-        got: `${to} — ${r.note ?? "no path"}`,
+        got: `${wanted} — ${r.note ?? "no path"}`,
         remedy: { tool: "se_tick", args: { route: "front_desk" }, note: "peek a route before aiming at it; the drawn edges are the only ways" },
         source: "engine/session.ts target",
       });
     }
-    this._target = to;
+    this._target = wanted;
+    this.clearTargetIfArrived();
     // The reader's OWN name wins the report. route() answers with the
     // normalised aim so the render can place the dot, and spreading it last
     // would hand "expeditions/start" back to someone who said "expeditions".
-    return { ...r, target: to };
+    return { ...r, target: this._target };
   }
 
   /** Conditions no agent can discharge alone. A script it can run; a read
@@ -1497,6 +1525,38 @@ export class Session {
    *  the condition status (the mirror's pill) only; never the gate, and
    *  never the checkboxes (those stay the human's alone). */
   private readonly agentReads = new Map<string, Set<string>>();
+  /** Session-local read buffer: latest lane hash per path, auto-filled by
+   *  se_file_read and re-used for later ticks unless stale. */
+  private readonly readBuffer = new Map<string, string>();
+
+  rememberRead(path: string, hash: string, ref?: string): void {
+    if (ref !== undefined || path.trim() === "" || hash.trim() === "" || path.startsWith("@")) return;
+    const lane = this.diskHash(path);
+    if (lane !== "" && lane === hash) this.readBuffer.set(path, hash);
+  }
+
+  clearReadBuffer(): void {
+    this.readBuffer.clear();
+  }
+
+  private readProofs(channel: Channel, supplied: Record<string, string>): Record<string, string> {
+    if (channel !== "agent") return supplied;
+    const merged: Record<string, string> = {};
+    for (const [p, h] of this.readBuffer.entries()) merged[p] = h;
+    for (const [p, h] of Object.entries(supplied)) {
+      if (typeof h === "string" && h !== "") merged[p] = h;
+    }
+    for (const [p, h] of Object.entries(merged)) {
+      const lane = this.diskHash(p);
+      if (lane !== "" && h === lane) {
+        this.readBuffer.set(p, h);
+      } else {
+        delete merged[p];
+        this.readBuffer.delete(p);
+      }
+    }
+    return merged;
+  }
 
   private agentProven(path: string): boolean {
     const hash = this.diskHash(path);
@@ -1675,6 +1735,29 @@ export class Session {
     }
     for (const p of t.exit?.read ?? []) req.delete(p);
     return [...req];
+  }
+
+  private bufferedCurrent(path: string): boolean {
+    const lane = this.diskHash(path);
+    return lane !== "" && this.readBuffer.get(path) === lane;
+  }
+
+  /** One neighbor state's entry requirements, minus docs already present in
+   *  the current read buffer at their latest hash. */
+  private unreadEntryRequirements(m: MachineDecl, t: StateDecl): string[] {
+    return this.entryRequirements(m, t).filter((p) => !this.bufferedCurrent(p)).sort();
+  }
+
+  /** The docs worth pre-reading from HERE: every immediate neighbor state's
+   *  unread entry requirements, deduplicated and sorted for stable packets. */
+  private lookaheadRequirements(m: MachineDecl, from: StateDecl): string[] {
+    const req = new Set<string>();
+    for (const e of from.edges) {
+      const t = m.states.find((s) => s.id === e.to);
+      if (t === undefined) continue;
+      for (const p of this.unreadEntryRequirements(m, t)) req.add(p);
+    }
+    return [...req].sort();
   }
 
   private refuseReads(which: "exit" | "entry", stateId: string, missing: string[], channel: Channel): never {
@@ -1923,6 +2006,9 @@ export class Session {
         // The agent's packet names the pulled docs but NEVER their hashes —
         // the hash is the proof-of-read, obtainable only via se_file_read.
         pulled: this.pulled(machine, s).map((p) => ({ path: p.path, sources: p.sources })),
+        // Pre-read map from where you stand: every immediate neighbor's
+        // entry requirements, so the head can read once before moving.
+        lookahead_read: this.lookaheadRequirements(machine, s),
         // Enough to CHOOSE among several ways forward: what the target is,
         // not just its name (the agent has no other way to peek).
         next: s.edges.map((e) => {
@@ -1933,11 +2019,13 @@ export class Session {
             ...(e.guard !== undefined ? { guard: e.guard } : {}),
             ...(t !== undefined ? { kind: t.kind, ...(t.statement !== "" ? { statement: t.statement } : {}), priority: t.priority } : {}),
             ...(t?.entry !== undefined ? { entry: this.conditionStatus(machine, t, "enter") } : {}),
+            ...(t !== undefined ? { entry_read: this.unreadEntryRequirements(machine, t) } : {}),
             enter_met: t === undefined ? true : this.conditionMet(machine, t, "enter"),
           };
         }),
       };
     });
+    this.clearTargetIfArrived();
     const { all, tools } = this.legal();
     return {
       machine: this.machine.id,
@@ -1966,6 +2054,7 @@ export class Session {
    *  each matching the doc as it stands; the human proves via checkboxes). */
   async tickAdvance(to?: string, channel: Channel = "human", readHashes: Record<string, string> = {}): Promise<Record<string, unknown>> {
     const now = new Date().toISOString();
+    const supplied = this.readProofs(channel, readHashes);
     if (this.instance.status === "closed") {
       throw new Rejection({
         clause: CLAUSES.NOT_LEGAL_IN_STATE,
@@ -1996,7 +2085,7 @@ export class Session {
         const { machine: pm, instance: pi } = this.parentOfTop();
         const parent = this.state(pm, top.parentState);
         this.gatePriority(pm, parent.edges.map((e) => e.to), channel);
-        this.assertReads(pm, parent, parent.edges.map((e) => e.to), channel, readHashes);
+        this.assertReads(pm, parent, parent.edges.map((e) => e.to), channel, supplied);
         this.completeGuarded(pm, pi, top.parentState, "filled", now);
         this.subs.pop();
         if (pi !== this.instance) pi.history.push({ state: top.parentState, outcome: "filled", at: now });
@@ -2010,7 +2099,7 @@ export class Session {
       this.assertEdge(top.decl, cur, to);
       const subTarget = to ?? this.state(top.decl, cur).edges[0]?.to;
       if (subTarget !== undefined) this.gatePriority(top.decl, [subTarget], channel);
-      await this.assertConditions(top.decl, this.state(top.decl, cur), to, channel, readHashes);
+      await this.assertConditions(top.decl, this.state(top.decl, cur), to, channel, supplied);
       if (top.decl.id === "iterations" && (this.state(top.decl, cur).tags?.includes("iteration-kickoff") ?? false)) {
         this.pinKickoff(top.gen?.expByState[cur]);
       }
@@ -2035,8 +2124,9 @@ export class Session {
     const cur = activeStates(this.instance)[0];
     this.assertEdge(this.machine, cur, to);
     const target = to ?? this.state(this.machine, cur).edges[0]?.to;
+    if (this.machine.id === "main" && cur === this.machine.initial && target === "boot") this.clearReadBuffer();
     if (target !== undefined) this.gatePriority(this.machine, [target], channel);
-    await this.assertConditions(this.machine, this.state(this.machine, cur), to, channel, readHashes);
+    await this.assertConditions(this.machine, this.state(this.machine, cur), to, channel, supplied);
     this.completeGuarded(this.machine, this.instance, cur, "filled", now, to);
     this.consumeDocs(this.state(this.machine, cur));
     this.instance.history.push({ state: cur, outcome: "filled", at: now });
@@ -2071,6 +2161,7 @@ export class Session {
       ...(s.exit !== undefined ? { exit: this.conditionStatus(home, s, "leave") } : {}),
       exit_met: this.conditionMet(home, s, "leave"),
       pulled: this.pulled(home, s).map((p) => ({ path: p.path, sources: p.sources })),
+      lookahead_read: this.lookaheadRequirements(home, s),
       ...(s.submachine !== undefined ? { submachine: s.submachine } : {}),
       next: s.edges.map((e) => {
         const t = home.states.find((st) => st.id === e.to);
@@ -2079,6 +2170,7 @@ export class Session {
           role: e.role,
           ...(e.guard !== undefined ? { guard: e.guard } : {}),
           ...(t !== undefined ? { kind: t.kind, statement: t.statement, priority: t.priority } : {}),
+          ...(t !== undefined ? { entry_read: this.unreadEntryRequirements(home, t) } : {}),
         };
       }),
     };
@@ -2092,6 +2184,7 @@ export class Session {
    *  the read gate applies (jumping back ENTERS the target). */
   jumpBack(target: string, channel: Channel = "human", readHashes: Record<string, string> = {}): Record<string, unknown> {
     const now = new Date().toISOString();
+    const supplied = this.readProofs(channel, readHashes);
     if (this.instance.status === "closed") {
       throw new Rejection({
         clause: CLAUSES.NOT_LEGAL_IN_STATE,
@@ -2124,9 +2217,9 @@ export class Session {
     }
     this.gatePriority(machine, [target], channel);
     const back = this.state(machine, target);
-    const missing = this.entryRequirements(machine, back).filter((p) => !this.readProven(channel, p, readHashes));
+    const missing = this.entryRequirements(machine, back).filter((p) => !this.readProven(channel, p, supplied));
     if (missing.length > 0) this.refuseReads("entry", target, missing, channel);
-    this.assertHandover(channel, readHashes);
+    this.assertHandover(channel, supplied);
     const { cone } = reopenStates(machine, inst, [target], "jump back", now);
     // Invalidate the cone's evidence and checks — including a nested
     // machine's, when a sub-machine state is inside the cone. And supersede
@@ -2185,7 +2278,7 @@ export class Session {
       return {
         ...info,
         booted: true,
-        banner: "🦆 SE v3 booted — main machine @ idle. All work runs through the se lane; every call is logged. se_tick shows where you are.",
+        banner: "🦆 SE v3 booted. Main machine is live. All work runs through the se lane; every call is logged. se_tick shows where you are.",
         display: "Show the banner above to the user VERBATIM as your first output, then proceed with their request.",
       };
     }
@@ -2233,7 +2326,7 @@ export class Session {
       decl = gen.decl;
     } else {
       try {
-        decl = compileMachine(this.root, resolveRef(this.root, mainMachinePath(this.root), subState.submachine!));
+        decl = compileMachineCached(this.root, resolveRef(this.root, mainMachinePath(this.root), subState.submachine!));
       } catch (e) {
         // A broken drawing refuses TYPED and the engine survives; the next
         // tick retries the seed once the canvas is fixed.

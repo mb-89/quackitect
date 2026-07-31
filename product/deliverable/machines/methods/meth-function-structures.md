@@ -9,7 +9,7 @@ M3, after the requirements (task clarification first, then functions - Pahl & Be
 ## Procedure
 - Abstract to the essential problems; state the overall function; decompose into sub-functions - verb + noun, solution-neutral (never naming a technology).
 - Cross-check top-down against bottom-up: FAST (how-down / why-up) catches functions without a why; use-case steps catch functions nobody asked for.
-- Every requirement maps to at least one function (`requires` edge); every use-case step is covered - both are matrix filters at the gate.
+- Every requirement maps to at least one function (`requires` edge); every use-case step is covered - both are coverage-matrix filters at the gate.
 - Functions carry inputs, outputs and controls where they matter (IDEF0 discipline, lightly).
 - Expect iteration with the requirements ([[meth-twin-peaks]]).
 

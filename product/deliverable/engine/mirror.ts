@@ -401,18 +401,35 @@ export function startMirror(o: MirrorOptions): Server {
         return;
       }
       if (url.pathname === "/widget/machine" || url.pathname === "/widget/details" || url.pathname === "/widget/log" || url.pathname === "/widget/terminal") {
+        // RENDER FIRST, THEN WRITE THE HEAD. See the note at the catch below.
+        const widget = renderMirror(state, url.pathname.slice("/widget/".length) as "machine" | "details" | "log" | "terminal", url.searchParams.get("view") ?? undefined, undefined, url.searchParams.get("embed") === "1");
         res.writeHead(200, { "content-type": "text/html; charset=utf-8" });
-        res.end(renderMirror(state, url.pathname.slice("/widget/".length) as "machine" | "details" | "log" | "terminal", url.searchParams.get("view") ?? undefined, undefined, url.searchParams.get("embed") === "1"));
+        res.end(widget);
         return;
       }
       // GET / — tick without arguments: information about where we are.
       // ?view=<machine> browses a machine without moving the walk.
       state.lastPacket = state.session.tickInfo();
+      const page = renderMirror(state, undefined, url.searchParams.get("view") ?? undefined, url.searchParams.get("card") ?? undefined, url.searchParams.get("embed") === "1");
       res.writeHead(200, { "content-type": "text/html; charset=utf-8" });
-      res.end(renderMirror(state, undefined, url.searchParams.get("view") ?? undefined, url.searchParams.get("card") ?? undefined, url.searchParams.get("embed") === "1"));
+      res.end(page);
     } catch (e) {
+      // A BLACK WINDOW IS THE WORST WAY TO REPORT A FAULT, and it is what this
+      // used to do. The 200 head went out BEFORE the render ran, so a throw
+      // left the headers already sent, this writeHead threw in turn, and the
+      // reader got an empty 200 - which paints black. A broken canvas looked
+      // exactly like a dead server.
+      //
+      // Every route above now renders into a variable first, so a failure is
+      // still headerless when it arrives here and can be reported honestly.
+      // headersSent stays checked because a future route may stream.
+      const body = String((e as Error).stack ?? e);
+      if (res.headersSent) {
+        res.end(`\n\n<!-- render failed after headers were sent -->\n${body}`);
+        return;
+      }
       res.writeHead(500, { "content-type": "text/plain; charset=utf-8" });
-      res.end(String((e as Error).stack ?? e));
+      res.end(body);
     }
   });
 

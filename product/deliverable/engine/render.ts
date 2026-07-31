@@ -21,7 +21,7 @@ import { CallLog, type CallRecord } from "./calllog.ts";
 import { type StrayNote } from "./inbox.ts";
 import { loadLevels } from "./scale.ts";
 import { mainMachinePath, Session } from "./session.ts";
-import { compileMachine, resolveRef } from "./machines/compile.ts";
+import { compileMachineCached, resolveRef } from "./machines/compile.ts";
 import { type MachineDecl } from "./machine.ts";
 
 function esc(s: string): string {
@@ -341,7 +341,7 @@ function briefFor(rec: CallRecord): string {
     case "se_file_list": return `list ${a.dir ?? "."}`;
     case "se_file_glob": return `glob ${a.glob}`;
     case "se_file_search": return `search /${a.query}/`;
-    case "se_run": return `run: ${String(a.command ?? "").replace(/\s+/g, " ").slice(0, 70)}`;
+    case "se_run": return `run: ${String(a.command ?? "")}`;
     case "se_web_fetch": return `fetch ${a.url}`;
     case "se_web_search": return `web: ${a.query}`;
     case "se_log_query": return a.ref !== undefined ? `log ref ${a.ref}` : "log query";
@@ -357,6 +357,24 @@ function briefFor(rec: CallRecord): string {
  *  the cap is declared in the result, never silent. Pending strays from
  *  EARLIER sessions ride on top (type "note"), so the inbox never falls
  *  out of sight; this session's notes already ride as se_note calls. */
+/** A FEED ROW IS ONE LINE, ALWAYS (owner ruling 2026-07-31). Note text is
+ *  free prose with paragraphs and list items, and slicing it without
+ *  flattening let every newline through - one note could stand a dozen rows
+ *  tall and push the rest of the feed off the screen.
+ *
+ *  ONE RULE, NOT ONE PER KIND. briefFor returns whatever each tool's line
+ *  should say and NOTHING else: no flattening, no truncating, no per-case
+ *  cleverness. Every row leaves through here, so a new tool cannot forget
+ *  the rule and se_run no longer carries its own private version of it.
+ *  Change FEED_BRIEF_CHARS to change the width; it is the only place the
+ *  number lives. */
+const FEED_BRIEF_CHARS = 90;
+
+function oneLine(s: string): string {
+  const flat = String(s).replace(/\s+/g, " ").trim();
+  return flat.length > FEED_BRIEF_CHARS ? `${flat.slice(0, FEED_BRIEF_CHARS - 1)}…` : flat;
+}
+
 export function feedRows(log: CallLog, since: string, pending: StrayNote[] = []): { capped: boolean; rows: Array<Record<string, unknown>> } {
   const q = log.query({ filter: { since }, limit: 501 });
   const records = q.records ?? [];
@@ -368,14 +386,14 @@ export function feedRows(log: CallLog, since: string, pending: StrayNote[] = [])
     // Updates are NARRATION (bold), whatever their op — only se_note
     // strays are retro notes (italic). Two kinds, never conflated.
     type: rec.tool === "se_update" ? "update" : rec.tool === "se_note" || rec.tool === "mirror_note" ? "note" : rec.tool === "se_answer" ? "aq" : "call",
-    brief: briefFor(rec).slice(0, 90),
+    brief: oneLine(briefFor(rec)),
     ok: rec.ok,
     ...(rec.ok ? {} : { clause: (rec.response as { clause?: string } | undefined)?.clause }),
     ...(rec.tool === "se_update" ? { visit: (rec.args as { visit?: string }).visit } : {}),
   }));
   const noteRows = pending
     .filter((n) => n.at < since)
-    .map((n) => ({ ref: n.ref, ts: n.at, src: n.by === "human" ? "human" : "agent", type: "note", brief: n.text.slice(0, 90), ok: true, pending: true }));
+    .map((n) => ({ ref: n.ref, ts: n.at, src: n.by === "human" ? "human" : "agent", type: "note", brief: oneLine(n.text), ok: true, pending: true }));
   return { capped, rows: [...noteRows, ...rows] };
 }
 
@@ -395,7 +413,12 @@ function viewedMachine(m: MirrorState, view: string | undefined): { decl: Machin
   const generated = m.session.generatedView(subState.id);
   if (generated !== undefined) return generated;
   const path = resolveRef(m.root, mainPath, subState.submachine!);
-  return { decl: compileMachine(m.root, path), canvas: loadCanvas(path) };
+  // CACHED, and live all the same. compileMachineCached memoises against the
+  // CONTENT of every file the compile read, so an edited canvas or state note
+  // recompiles on the next render and an untouched one does not. The mirror
+  // re-renders on every poll, and recompiling the machine each time cost a
+  // full second per render — paid by the VS Code panel, not just the tests.
+  return { decl: compileMachineCached(m.root, path), canvas: loadCanvas(path) };
 }
 
 /** The SHUTDOWN CONTROL's five notches (owner design): what happens
@@ -1047,7 +1070,7 @@ let navigatingAway = false;
 // beside it, nor about which card they had promoted. A view URL carrying only
 // the view throws both away.
 //
-// The card half was missed because the matrix landed after this rule did: the
+// The card half was missed because the card matrix landed after this rule did: the
 // detail param was carried, the card param did not exist yet, and nobody came
 // back. Entering a sub-state demoted the machine out of the main slot under
 // the reader's hand.
@@ -2368,6 +2391,7 @@ export function renderMirror(m: MirrorState, widget?: "machine" | "details" | "l
       pulled: m.session.pulled(decl, s),
       next: s.edges.map((e) => {
         const t = decl.states.find((st) => st.id === e.to);
+        const ready = t === undefined ? true : m.session.entryReadyHuman(decl, t);
         return {
           to: e.to,
           role: e.role,
@@ -2376,8 +2400,10 @@ export function renderMirror(m: MirrorState, widget?: "machine" | "details" | "l
           // The human's ▶ lock: explicit entry conditions AND the pull —
           // every doc entering demands, checked at its current version. A
           // locked edge carries WHAT is missing (the tooltip names it).
-          enter_met: t === undefined ? true : m.session.entryReadyHuman(decl, t),
-          ...(t !== undefined && !m.session.entryReadyHuman(decl, t) ? { missing: m.session.entryMissingHuman(decl, t) } : {}),
+          // ASKED ONCE. This ran entryReadyHuman twice per edge, and each
+          // call walks the target's whole reading list.
+          enter_met: ready,
+          ...(t !== undefined && !ready ? { missing: m.session.entryMissingHuman(decl, t) } : {}),
         };
       }),
     };

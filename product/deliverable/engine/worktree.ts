@@ -98,13 +98,41 @@ export function readRecord(root: string, e: Expedition): Record<string, unknown>
   return fm;
 }
 
-/** Open = the worktree exists. Closed (archive) = branch exp/* without one. */
-export function expList(root: string): Expedition[] {
-  const out: Expedition[] = [];
-  const branches = git(root, ["branch", "--list", "exp/*", "--format=%(refname:short)"], "branch --list")
+/** THE BRANCH LISTING IS A SPAWNED PROCESS, AND ONE RENDER ASKS FOUR TIMES.
+ *  The expeditions container, the expedition archive, the iterations
+ *  container and the iteration archive each want a list, so each render paid
+ *  four git processes - 4.9 seconds of one profiled session sat inside
+ *  spawnSync under exactly these two callers.
+ *
+ *  This is git's ref store, not a markdown truth, so the read-it-live law
+ *  does not bind it. Staleness is still bounded: a second is far below what
+ *  a person notices, and far above the burst of renders it collapses.
+ *  Anything in the lane that moves a ref calls bustBranchList and the window
+ *  never applies. */
+const BRANCH_TTL_MS = 1000;
+const branchList = new Map<string, { at: number; branches: string[] }>();
+
+export function bustBranchList(): void {
+  branchList.clear();
+}
+
+export function listBranches(root: string, glob: string): string[] {
+  const key = `${root} :: ${glob}`;
+  const hit = branchList.get(key);
+  const now = Date.now();
+  if (hit !== undefined && now - hit.at < BRANCH_TTL_MS) return hit.branches;
+  const branches = git(root, ["branch", "--list", glob, "--format=%(refname:short)"], "branch --list")
     .split("\n")
     .map((b) => b.trim())
     .filter((b) => b !== "");
+  branchList.set(key, { at: now, branches });
+  return branches;
+}
+
+/** Open = the worktree exists. Closed (archive) = branch exp/* without one. */
+export function expList(root: string): Expedition[] {
+  const out: Expedition[] = [];
+  const branches = listBranches(root, "exp/*");
   for (const branch of branches) {
     const id = branch.slice("exp/".length);
     const path = join(worktreesDir(root), id);
@@ -134,6 +162,10 @@ export function expNew(root: string, kind: string, goal: string): Expedition {
   const path = join(worktreesDir(root), id);
   mkdirSync(worktreesDir(root), { recursive: true });
   git(root, ["worktree", "add", path, "-b", `exp/${id}`], "worktree add");
+  // AFTER the branch exists, never before. Busting first only refills the
+  // cache from the old listing, and the new expedition then stays invisible
+  // for the length of the window.
+  bustBranchList();
   // The engine's npm deps (ripgrep) do not ride a fresh worktree — without
   // them the lane's search and the selftests fail there.
   const deliverable = join(path, "product", "deliverable");

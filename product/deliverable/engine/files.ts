@@ -13,6 +13,7 @@ import { dirname, extname, join, relative, sep } from "node:path";
 import { CLAUSES, Rejection } from "./errors.ts";
 import { contentHash } from "./hash.ts";
 import { isExcluded, isRootRef, resolveDeclaredRoot, resolveForRead, resolveInRoot } from "./paths.ts";
+import { parseStateNote } from "./notes.ts";
 
 /** Whole-file read budget (chars). Beyond this, offset/limit is required. */
 export const READ_BUDGET = 50_000;
@@ -53,6 +54,9 @@ function mustExist(root: string, path: string, source: string, allowDeclared = f
 export interface ReadResult {
   path: string;
   hash: string;
+  /** Only ever false, and only when an OPTIONAL read found nothing. A read
+   *  that succeeded does not carry it. */
+  exists?: boolean;
   /** Text reads only — an image has no lines. */
   total_lines?: number;
   /** Present on range reads: which slice this is. */
@@ -117,7 +121,22 @@ function imageRead(path: string, bytes: Buffer, mimeType: string, ref?: string):
   return res;
 }
 
-export function fileRead(root: string, path: string, opts: { offset?: number; limit?: number; ref?: string } = {}): ReadResult {
+export function fileRead(root: string, path: string, opts: { offset?: number; limit?: number; ref?: string; optional?: boolean } = {}): ReadResult {
+  // AN OPTIONAL READ FORGIVES ABSENCE AND NOTHING ELSE. Some documents are
+  // allowed not to exist — the handover is why this exists, and a boot that
+  // refuses over a file nobody promised is a boot that looks broken. The path
+  // still goes through resolveForRead, so escaping the root still refuses.
+  if (opts.optional === true && opts.ref === undefined && !existsSync(resolveForRead(root, path, SRC))) {
+    return {
+      path,
+      // Empty, because there is no content to prove. It matches no real
+      // document, so it cannot satisfy a read-proof by accident.
+      hash: "",
+      exists: false,
+      bytes: 0,
+      content: `${path} does not exist. The read asked for it as optional, so this is not a failure.`,
+    };
+  }
   let bytes: Buffer;
   if (opts.ref !== undefined) {
     bytes = gitShow(root, opts.ref, path);
@@ -185,6 +204,37 @@ export function fileRead(root: string, path: string, opts: { offset?: number; li
   return res;
 }
 
+/** A MACHINE NOTE THAT WILL NOT PARSE IS NEVER SAVED.
+ *
+ *  A ": " inside an unquoted frontmatter scalar starts a nested mapping, so
+ *  one sentence of prose in a `guidance:` line stops a canvas compiling.
+ *  When that canvas is boot's, NOTHING repairs it from inside the lane: boot
+ *  allows no tools, start allows only reading, and every state that can write
+ *  sits behind boot. A person with an editor is the only way back.
+ *
+ *  So the guard sits at the WRITE, the last moment anything can still act.
+ *  This happened for real and took the mirror black; the compiler caught it
+ *  only once the walk was already trapped behind it. */
+function guardMachineNote(path: string, content: string): void {
+  const p = path.replace(/\\/g, "/");
+  if (!p.includes("deliverable/machines/") || !p.endsWith(".md")) return;
+  try {
+    parseStateNote(content);
+  } catch (e) {
+    throw new Rejection({
+      clause: CLAUSES.CANVAS_BROKEN,
+      expected: "frontmatter that parses as YAML — nothing was written",
+      got: `${path}: ${String((e as Error).message).split("\n")[0]}`,
+      remedy: {
+        tool: "se_file_read",
+        args: { path },
+        note: "a ': ' inside an unquoted scalar starts a nested mapping. Quote the whole value, or move the prose into the body under '## Guidance', where a colon is harmless.",
+      },
+      source: SRC,
+    });
+  }
+}
+
 export interface WriteResult {
   path: string;
   hash: string;
@@ -225,6 +275,7 @@ export function fileWrite(root: string, path: string, content: string, baseHash:
       });
     }
   }
+  guardMachineNote(path, content);
   mkdirSync(dirname(abs), { recursive: true });
   writeFileSync(abs, content, "utf8");
   return { path, hash: contentHash(content), bytes: Buffer.byteLength(content, "utf8"), created: !exists };
@@ -265,10 +316,25 @@ export function filePatch(root: string, ops: PatchOp[]): PatchResult {
     }
     const count = current.split(op.old_string).length - 1;
     if (count === 0 || (count > 1 && op.replace_all !== true)) {
+      // WHY it did not match, not merely that it did not. This refusal fired
+      // twelve times in one period, and its commonest cause is INVISIBLE: a
+      // CRLF file against an old_string written with LF. "Copy the exact
+      // text" is useless advice when the difference cannot be seen, so the
+      // engine looks for the near-miss and names it.
+      let why = "";
+      if (count === 0) {
+        const lf = (s: string): string => s.replace(/\r\n/g, "\n");
+        const flat = (s: string): string => lf(s).replace(/[ \t]+/g, " ");
+        if (lf(current).includes(lf(op.old_string))) {
+          why = " — but it MATCHES with line endings normalised: this file is CRLF and your old_string is LF";
+        } else if (flat(current).includes(flat(op.old_string))) {
+          why = " — but it MATCHES with runs of spaces and tabs collapsed: the indentation differs";
+        }
+      }
       throw new Rejection({
         clause: CLAUSES.PATCH_AMBIGUOUS,
         expected: count === 0 ? `old_string to occur in ${op.path}` : `old_string to occur exactly once in ${op.path} (or pass replace_all: true)`,
-        got: `${count} occurrences (op ${i + 1}/${ops.length}) — nothing was written`,
+        got: `${count} occurrences (op ${i + 1}/${ops.length}) — nothing was written${why}`,
         remedy: {
           tool: "se_file_read",
           args: { path: op.path },
@@ -287,6 +353,9 @@ export function filePatch(root: string, ops: PatchOp[]): PatchResult {
     const prev = byFile.get(s.abs);
     byFile.set(s.abs, { path: s.path, next: s.next, replacements: (prev?.replacements ?? 0) + s.replacements });
   }
+  // This one belongs with the other guards: every file in the batch, before
+  // the first byte of any of them lands.
+  for (const f of byFile.values()) guardMachineNote(f.path, f.next);
   const applied = [...byFile.values()].map((f) => {
     const abs = resolveInRoot(root, f.path, SRC);
     writeFileSync(abs, f.next, "utf8");

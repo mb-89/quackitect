@@ -8,7 +8,7 @@ M2. Stakeholders are nodes; requirements carry source_refs edges to them; the tr
 
 ## Procedure
 - List roles, not names (privacy law): the owner, the operator, the maintainer, the regulator.
-- Coverage: no role left out - the matrix filter over source_refs must show no empty row at the gate.
+- Coverage: no role left out - the coverage-matrix filter over source_refs must show no empty row at the gate.
 - Where two roles pull against each other, record the tension as a pair with its reasoning - tensions feed criteria weights at M4.
 
 ## Sources

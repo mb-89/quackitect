@@ -89,6 +89,11 @@ if ($exportIx -ge 0) {
   }
   Write-Host "$P - exporting as '$newName' ($($newAbbr.ToUpper())) - history stays home" -ForegroundColor Cyan
   New-Item -ItemType Directory -Force -Path $dest | Out-Null
+  # ABSOLUTE FROM HERE. Push-Location below moves the working directory into
+  # the destination, so a RELATIVE $dest would resolve against the destination
+  # itself from that point on - brand.json and the README were written to
+  # <dest>\<dest>\... and the write failed with a path not found.
+  $dest = (Resolve-Path -LiteralPath $dest).Path
   # /XD excludes by NAME wherever it appears: the repo history, every
   # worktree, the session state, node_modules and the generated cage dirs.
   # /XF drops the generated MCP config; the _cage templates travel (their
@@ -136,12 +141,19 @@ if ($exportIx -ge 0) {
 $newName runs inside VS Code. You walk a state machine with an AI agent, and
 a mirror beside your editor shows where the walk stands.
 
-## Start it
+## Install it, once
 
     .\RUNME.ps1
 
-That installs whatever is missing, places the extension, and opens VS Code.
+Run that ONE time. It installs whatever is missing, places the VS Code
+extension, and opens VS Code.
+
+## Then work in VS Code
+
+After that first run, open this folder in VS Code like any other project.
 The $($newAbbr.ToUpper()) button in the left bar opens the mirror.
+
+You do not run RUNME.ps1 again. It is the installer, not the way in.
 
 ## What is in here
 
@@ -321,7 +333,7 @@ Write-Host "  $((git --version))  OK"
 # It is the DEFAULT now, not a flag (owner, 2026-07-30). --classic is the
 # opt-out and takes the old terminal-and-browser path further down.
 $classic = [bool]($forwarded | Where-Object { $_ -eq "--classic" })
-$forwarded = @($forwarded | Where-Object { $_ -notin @("--classic", "--vscode") })
+$forwarded = @($forwarded | Where-Object { $_ -notin @("--classic") })
 if (-not $classic) {
   if (-not (Ensure-Tool "code" "Microsoft.VisualStudioCode" "VS Code")) { exit 1 }
   $extSrc = Join-Path $root "product\deliverable\vscode"
@@ -338,6 +350,46 @@ if (-not $classic) {
   if ($LASTEXITCODE -ne 0) {
     Write-Host "naming the extension FAILED - see above" -ForegroundColor Red
     exit 1
+  }
+  # SOME VS CODE BUILDS TRUST extensions.json once it exists and do not
+  # discover new folder copies automatically. Upsert this local extension so
+  # copy-based install works consistently without packaging.
+  $extReg = Join-Path $env:USERPROFILE ".vscode\extensions\extensions.json"
+  $extPkg = [System.IO.File]::ReadAllText((Join-Path $extDest "package.json")) | ConvertFrom-Json
+  $extId = "$($extPkg.publisher).$($extPkg.name)"
+  $extFolder = Split-Path $extDest -Leaf
+  $extPath = "/" + ($extDest -replace "\\", "/")
+  $entry = [pscustomobject]@{
+    identifier = [pscustomobject]@{ id = $extId }
+    version = [string]$extPkg.version
+    location = [pscustomobject]@{ '$mid' = 1; path = $extPath; scheme = "file" }
+    relativeLocation = $extFolder
+  }
+  $entries = @()
+  if (Test-Path $extReg) {
+    try {
+      $parsed = [System.IO.File]::ReadAllText($extReg) | ConvertFrom-Json
+      $entries = @($parsed)
+    } catch {
+      Write-Host "extensions.json could not be read - rebuilding it with this extension entry" -ForegroundColor Yellow
+      $entries = @()
+    }
+  }
+  $entries = @($entries | Where-Object { $_.identifier.id -ne $extId })
+  $entries += $entry
+  $utf8NoBom = New-Object System.Text.UTF8Encoding $false
+  $registered = $false
+  try {
+    [System.IO.File]::WriteAllText($extReg, ($entries | ConvertTo-Json -Depth 8 -Compress), $utf8NoBom)
+    $verify = @([System.IO.File]::ReadAllText($extReg) | ConvertFrom-Json)
+    $registered = [bool]($verify | Where-Object { $_.identifier.id -eq $extId })
+  } catch {
+    $registered = $false
+  }
+  if (-not $registered) {
+    Write-Host "extension registry update FAILED - VS Code may ignore the copied extension on this machine." -ForegroundColor Yellow
+    Write-Host "  next: close all VS Code windows, run .\RUNME.ps1 again, then check: code --list-extensions --show-versions | Select-String '$extId'" -ForegroundColor Yellow
+    Write-Host "  fallback for this machine: build/install a VSIX (npm exec --yes --package @vscode/vsce -- vsce package ; code --install-extension .\\$($extFolder.Split('-')[0])-0.1.0.vsix --force)" -ForegroundColor DarkYellow
   }
   Write-Host "  extension in place - $rendered" -ForegroundColor Green
   Write-Host "  $extDest" -ForegroundColor DarkGray
@@ -430,11 +482,7 @@ try {
 # runs, so they are taken out of the forwarded command line here.
 $ownTerminal = [bool]($forwarded | Where-Object { $_ -eq "--own-terminal" })
 $manual = [bool]($forwarded | Where-Object { $_ -eq "--manual" })
-$staleOneScreen = [bool]($forwarded | Where-Object { $_ -eq "--one-screen" })
-$forwarded = @($forwarded | Where-Object { $_ -notin @("--own-terminal", "--manual", "--one-screen") })
-if ($staleOneScreen) {
-  Write-Host "$P - --one-screen is the default now; the flag did nothing" -ForegroundColor Yellow
-}
+$forwarded = @($forwarded | Where-Object { $_ -notin @("--own-terminal", "--manual") })
 
 # WHICH AGENT HOST. Claude wins when both are installed (owner ruling).
 # MANUAL MODE MEANS NO LLM. Either you asked for it, or neither CLI was

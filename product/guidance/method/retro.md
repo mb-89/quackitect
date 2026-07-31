@@ -32,17 +32,28 @@ The trigger is a NOTE carrying "needs retro":
    drains. Once you have drained, the phrase points at your own retro
    and the window is empty. The boundary must be taken while it still
    names the PREVIOUS retro.
-   AND THE DESK DRAINS TOO. Since e22, done and obsolete drain wherever
-   the tool is legal, the front desk included. So "last_retro" can
-   already name a desk drain from an hour ago, and the window it hands
-   you is far too short. CHECK IT rather than trusting it. Query the
-   drains, look at the newest one, and ask whether it happened in a
-   retro. If it did not, take the newest drain BEFORE it and pass that
-   timestamp explicitly from then on.
+   THE DESK'S OWN DRAINS NO LONGER POISON IT. Since e22 the front desk
+   drains too, and a desk drain from an hour ago used to hand the retro a
+   window far too short. The engine settles this now: "last_retro" means
+   the newest CARRIED or BACKLOG drain, and those are judgment
+   dispositions the desk is refused, so only a retro can set the mark
+   (engine/calllog.ts). Any drain is still the fallback for logs written
+   before the fix.
+   Take the timestamp and use it. Checking it by hand is no longer work
+   this step owes.
 2. Field feedback. Ask the owner what came back from the
    field since the last look. Capture every answer as a note.
 3. Drain the notes inbox. Walk EVERY pending note once. Disposition each
-   with se_note_drain — route it to exactly ONE home:
+   with se_note_drain — route it to exactly ONE home.
+   CHECK BEFORE YOU JUDGE, and check CHEAPLY. Most of what pends is often
+   ALREADY BUILT — on 2026-07-31 the twelve smallest notes were sampled and
+   most had shipped, some days earlier. A note describing a gap is a claim
+   about the code, and the code answers in seconds: call the tool, grep the
+   fix, read the state. Record the check beside the disposition, so the
+   next retro re-runs it instead of re-reading the note.
+   THE INBOX IS NOT A BACKLOG. Left undrained it becomes history, and the
+   desk and the retro both weigh it as if it were work.
+   The homes:
    - done — shipped or handled; say where.
    - obsolete — overtaken, wrong, or durably rejected; say why, so it is
      never re-litigated.
@@ -72,6 +83,20 @@ The trigger is a NOTE carrying "needs retro":
    — a determinizer tool, a guidance page, a prompt. Repeated or
    process-relevant commands especially. The raw log is KEPT (owner ruling:
    forever-until-1GB; a garbage collector may harvest it later).
+   THEN MINE THE TEST TIMINGS (owner ruling 2026-07-31). Every run records
+   every test's duration to .se/test-timings.jsonl — file, name, ms, pass.
+   Rank them, and rank the files by their summed cost.
+   A TEST FAR ABOVE ITS SIBLINGS OWES AN EXPLANATION. Sometimes there is a
+   good one: it drives a real server, or it walks a whole machine end to
+   end. Sometimes there is not, and then it is a lead like any other. The
+   usual culprits, in the order they are worth trying:
+   - A fresh template copied per case, where the cases never mutate it.
+   - A real dependency where a stub would prove the same thing.
+   - Sequential cases inside ONE file, which is the only unit that reaches
+     a second core (software.md). A file dominating the wall clock gets
+     SPLIT before anything clever is attempted inside it.
+   COMPARE ACROSS RUNS, not within one. The record appends, so a test that
+   has been getting slower for a fortnight is visible here and nowhere else.
 8. Tally the previous retro's improvements. Promote the wins. Dismiss the
    duds WITH the reason recorded, so a dud is never re-proposed.
 9. Check the contract. Walk the contract rule by rule against the

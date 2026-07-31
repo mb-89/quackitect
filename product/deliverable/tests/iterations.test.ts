@@ -9,7 +9,7 @@ import { dirname, join } from "node:path";
 import { test } from "node:test";
 import { generateIterations, generateSeeded, itPinRel, itSeed, itSeededRel, pinIteration } from "../engine/iterations.ts";
 import { validateMachine, type MachineDecl } from "../engine/machine.ts";
-import { readMatrix } from "../engine/matrix.ts";
+import { readRigorMatrix } from "../engine/rigor-matrix.ts";
 import { Session } from "../engine/session.ts";
 import { buildServer } from "../engine/tools.ts";
 import { call, freshRoot, readHashesFor } from "./helpers.ts";
@@ -72,12 +72,12 @@ test("the pin: the bless compiles the change size live; escalation only grows it
   const root = freshRoot();
   gitInit(root);
   const it = itSeed(root, "pin the machine", "the kickoff compiles and pins");
-  const res = pinIteration(root, it, "patch") as { pinned: string; matrix_hash: string };
+  const res = pinIteration(root, it, "patch") as { pinned: string; rigor_matrix_hash: string };
   assert.equal(res.pinned, "patch");
-  assert.match(res.matrix_hash, /^[0-9a-f]{12}$/);
+  assert.match(res.rigor_matrix_hash, /^[0-9a-f]{12}$/);
   const pin = JSON.parse(readFileSync(join(it.path, itPinRel(it.id)), "utf8")) as {
     change_size: string;
-    matrix_hash: string;
+    rigor_matrix_hash: string;
     machine: MachineDecl;
   };
   assert.equal(pin.change_size, "patch");
@@ -92,8 +92,14 @@ test("the pin: the bless compiles the change size live; escalation only grows it
   // DE-ESCALATION (and a same-size re-pin) refused — drift never reaches a running walk.
   assert.throws(() => pinIteration(root, it, "patch"), /ESCALATION/);
   assert.throws(() => pinIteration(root, it, "minor"), /ESCALATION/);
-  // An unknown size refuses with the vocabulary.
-  assert.throws(() => pinIteration(root, it, "product"), /patch \| minor \| major/);
+  // product SITS ABOVE major: the first iteration of a product authors the
+  // vision, the stakeholders and the actual state every later one inherits.
+  pinIteration(root, it, "product");
+  const pin3 = JSON.parse(readFileSync(join(it.path, itPinRel(it.id)), "utf8")) as { change_size: string; machine: MachineDecl };
+  assert.equal(pin3.change_size, "product");
+  validateMachine(pin3.machine);
+  // specification is read and validated as a column, never pinned as a walk.
+  assert.throws(() => pinIteration(root, it, "specification"), /patch \| minor \| major \| product/);
 });
 
 test("the chunk machine: refused when unseeded, compiled with realization tags and the join", () => {
@@ -160,9 +166,9 @@ test("escalation reopens exactly the grown steps", () => {
   gitInit(root);
   const it = itSeed(root, "reopen the grown steps", "escalation re-earns thin evidence");
   pinIteration(root, it, "patch");
-  // The expectation comes from the matrix itself: steps applied at both
+  // The expectation comes from the rigor matrix itself: steps applied at both
   // sizes whose applies rank grew (tailored is always tailored DOWN).
-  const m = readMatrix(root);
+  const m = readRigorMatrix(root);
   const rank: Record<string, number> = { none: 0, tailored: 1, inherit: 2, full: 2 };
   const expected = m.rows
     .filter((r) => {
@@ -172,7 +178,7 @@ test("escalation reopens exactly the grown steps", () => {
     })
     .map((r) => r.name)
     .sort();
-  assert.ok(expected.includes("gate-kickoff"), "the real matrix grows gate-kickoff from patch to minor");
+  assert.ok(expected.includes("gate-kickoff"), "the real rigor matrix grows gate-kickoff from patch to minor");
   const res = pinIteration(root, it, "minor") as { reopened?: string[] };
   assert.deepEqual(res.reopened ?? [], expected);
   const pin = JSON.parse(readFileSync(join(it.path, itPinRel(it.id)), "utf8")) as { reopened?: string[] };
@@ -241,7 +247,7 @@ test("the bless pins the machine and the container expands to the pinned walk", 
   assert.match(bless.hash, /^[0-9a-f]+$/);
 });
 
-test("the kickoff serves the matrix's live evidence form", () => {
+test("the kickoff serves the rigor matrix's live evidence form", () => {
   const root = freshRoot();
   gitInit(root);
   itSeed(root, "the form rides", "the kickoff carries the gate fields");

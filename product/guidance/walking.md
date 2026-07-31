@@ -25,12 +25,29 @@ One tool drives everything: `se_tick`. It is legal in every state.
 - `state: <id>`: peek at any state without moving.
 - `back: <state>`: return to an earlier filled state. Everything downstream
   is superseded; its evidence is invalidated and earned again.
+- `target: <state>`: set the destination the route line tracks. The session
+  already has one at engine start, pointing at the front desk.
 
-Three more arguments exist and only make sense together — they are how you
-walk a KNOWN way without one round trip per hop:
+Default movement rule:
 
-- `target: <state>`: set the blue line the mirror draws. The session already
-  has one at engine start, pointing at the front desk.
+- If a target is set, keep walking toward it.
+- Prefer any `enter_met` edge that advances toward that target.
+- Stop at idle only when no reachable in-threshold step advances toward target.
+- A refusal still stops the walk. Follow its remedy.
+- SE-C-113 means user handoff. Report and wait for a message.
+
+Read-ahead discipline (every state):
+
+- Treat `pulled` and `lookahead_read` as pre-read work. Read new paths as soon as they appear.
+- Keep a session cache of path -> hash from `se_file_read`.
+- Reuse cached hashes in every moving `se_tick` through `read_hashes`.
+- Re-read only when a refusal says the hash is missing or stale, or when the path appears for the first time.
+- If a target is set, run `se_tick {route: "<target>"}` and pre-read every path in `reads` before the walk.
+- If a state allows no tools, do not read there. Tick only.
+
+Two more arguments go with `target`, and only make sense beside it — they
+are how you walk a KNOWN way without one round trip per hop:
+
 - `route: <state>`: the way from here to there — every hop, its priority, and
   what each will ask for. It MOVES NOTHING. Read it to answer every judgment
   on the way at once, before committing to the walk.
@@ -44,10 +61,23 @@ the desk sweeps the machinery before advising, the overhaul sweeps what is
 active, and you sweep the pending notes before building. Those are all the
 ordinary English word. Only `sweep: true` on a tick is the verb.
 
-READ IN PARALLEL. Several `se_file_read` calls go out in ONE message. Boot
-demands seven or eight documents and reading them one after another pays a
-round trip for each. The reads themselves do not collapse and should not —
-proof-of-read is the point — but the WAITING does.
+READ SERIALLY FOR NOW. Send `se_file_read` calls one after another, not as a
+parallel batch. This is a RETREAT, not a preference, and it is written down
+so nobody re-optimises it back by accident.
+
+WHY, and be precise about where the fault is. Parallel reads work: the lane
+serves them, and they work on Claude Code today. A COPILOT HARNESS appears
+to cancel itself when calls go out in parallel — observed on 2026-07-31, not
+yet proven to the mechanism. Nothing about the MCP server or the lane is
+implicated.
+
+So the cost is real and accepted. Boot demands seven or eight documents and
+serial reads pay a round trip for each. A boot that COMPLETES on every host
+beats a faster one that dies on one of them.
+
+WHEN THIS LIFTS: when the harness bug is understood and fixed, or when the
+host can be detected reliably enough to batch only where it is safe. Until
+then the slow way is the only way that works everywhere.
 
 Narration rides the walk (the unified log + the decision graph):
 

@@ -14,7 +14,7 @@ M2: use cases GENERALIZE the stories (edge: generalizes). Where a story is one c
 ## Procedure
 - One actor, one goal per use case; a second goal is a second use case.
 - Every story maps into a scenario path; every extension is a candidate example.
-- M3 derives requirements from the steps and extensions - a step no requirement covers is a hole, visible in the matrix.
+- M3 derives requirements from the steps and extensions - a step no requirement covers is a hole, visible in the coverage matrix.
 
 ## Sources
 Cockburn, Writing Effective Use Cases; SyA RE deck.
