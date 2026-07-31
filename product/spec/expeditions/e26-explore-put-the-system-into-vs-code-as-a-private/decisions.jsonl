@@ -494,3 +494,18 @@
 {"ts":"2026-07-31T17:16:20.759Z","op":"update","visit":"expeditions/e26@0","node":"d94","brief":"checking the trunk rename fix"}
 {"ts":"2026-07-31T17:17:02.156Z","op":"done","visit":"expeditions/e26@0","node":"d92","brief":"nesting renders, no invented points"}
 {"ts":"2026-07-31T17:17:09.205Z","op":"plan","visit":"expeditions/e26@0","parent":null,"nodes":[{"id":"d95","brief":"land the graph fixes"}]}
+{"ts":"2026-07-31T17:17:16.164Z","op":"done","visit":"expeditions/e26@0","node":"d95","brief":"graph fixes landed"}
+{"ts":"2026-07-31T17:22:19.841Z","op":"plan","visit":"expeditions/e26@0","parent":null,"nodes":[{"id":"d96","brief":"rebuild the emitter around branches that do not return"},{"id":"d97","brief":"prove every branch name is a token"}]}
+{"ts":"2026-07-31T17:23:20.238Z","op":"done","visit":"expeditions/e26@0","node":"d97","brief":"a shape test replaces the string test"}
+{"ts":"2026-07-31T17:23:26.949Z","op":"update","visit":"expeditions/e26@0","node":"d98","brief":"running the rebuilt emitter"}
+{"ts":"2026-07-31T17:24:12.296Z","op":"update","visit":"expeditions/e26@0","node":"d99","brief":"checking the open mark character"}
+{"ts":"2026-07-31T17:24:27.670Z","op":"update","visit":"expeditions/e26@0","node":"d100","brief":"a scratch print to see the real lines"}
+{"ts":"2026-07-31T17:24:34.457Z","op":"update","visit":"expeditions/e26@0","node":"d101","brief":"printing the emitted lines"}
+{"ts":"2026-07-31T17:24:45.008Z","op":"update","visit":"expeditions/e26@0","node":"d102","brief":"reading the real assertion message"}
+{"ts":"2026-07-31T17:24:53.048Z","op":"update","visit":"expeditions/e26@0","node":"d103","brief":"getting the failing assertion's message"}
+{"ts":"2026-07-31T17:25:12.298Z","op":"update","visit":"expeditions/e26@0","node":"d104","brief":"probing each assertion directly"}
+{"ts":"2026-07-31T17:25:19.045Z","op":"update","visit":"expeditions/e26@0","node":"d105","brief":"running the probe"}
+{"ts":"2026-07-31T17:25:45.962Z","op":"update","visit":"expeditions/e26@0","node":"d106","brief":"the mark is exported so tests stop retyping it"}
+{"ts":"2026-07-31T17:26:00.649Z","op":"done","visit":"expeditions/e26@0","node":"d96","brief":"emitter rebuilt around non-returning branches"}
+{"ts":"2026-07-31T17:26:41.965Z","op":"plan","visit":"expeditions/e26@0","parent":null,"nodes":[{"id":"d107","brief":"check whether a mermaid parser is available to test against"}]}
+{"ts":"2026-07-31T17:27:16.680Z","op":"update","visit":"expeditions/e26@0","node":"d108","brief":"mermaid is not installed here"}

@@ -1,18 +1,23 @@
 // THE DECISION GRAPH IS NOT A TREE, and drawing it as one loses the only
 // interesting part. walking.md defines a fork as "a BLOCKING detour: the
 // current item cannot continue until this is fixed; resolve it and RETURN".
-// The return is a merge. A tree has no way to say it — its leaves just stop.
 //
-// So the graph emits as a Mermaid gitGraph: trunk, branches off it, and a
-// merge back when a detour resolves. VS Code renders Mermaid in its built-in
-// Markdown preview since 1.121, so nothing here needs a renderer of ours.
+// So the graph emits as a Mermaid gitGraph. VS Code renders Mermaid in its
+// built-in Markdown preview since 1.121, so nothing here needs a renderer.
+//
+// THE SHAPE (owner design, 2026-07-31):
+//
+// - The trunk is the checklist. One commit per point, top to bottom.
+// - The updates on a point become a BRANCH off it, and that branch does not
+//   come back. Work reported on a point is not a detour that returns; it is
+//   the story of that point, and merging it would draw a return that never
+//   happened.
+// - The LAST update is the one that settled the point, so it carries the
+//   closing mark. The trunk bubble carries it too, so the checklist reads
+//   straight down without following every branch.
 import type { DecisionNode } from "./decisions.ts";
 
-/** A node's branch. Top-level points ride the trunk; anything opened UNDER
- *  something else is a detour and gets a branch of its own, named for it. */
-const branchOf = (n: DecisionNode, trunk: string): string => (n.parent === null ? trunk : n.id);
-
-/** How long a point's line may be. The graph is read as a checklist, and a
+/** How long a point's line may be. The graph reads as a checklist, and a
  *  full brief pushes the column so wide the shape stops being visible. */
 const LABEL_CAP = 52;
 
@@ -25,16 +30,14 @@ const label = (text: string): string => {
   return `${(space > LABEL_CAP * 0.6 ? cut.slice(0, space) : cut).trimEnd()}…`;
 };
 
-/** THE MARK RIDES IN THE LABEL, not in a tag.
+/** A tick for what landed, and a distinct mark for what did not. An open
+ *  point carries a FIGURE SPACE (U+2007) — a blank the width of a digit that
+ *  HTML will not collapse, so every line starts at the same column and the
+ *  eye finds the unfinished one by the gap.
  *
- *  Mermaid draws a tag as a pennant on the far side of the dot, which reads
- *  as decoration and puts the tick away from the words it belongs to. The
- *  details pane already shows the right shape — tick, then text, one line
- *  per point — so the label carries the mark and no tag is emitted.
- *
- *  An open point is marked too, with a space, so every line starts at the
- *  same column and the ticked ones stand out down the edge. */
-const MARK: Record<string, string> = {
+ *  EXPORTED so nothing has to retype it. A test that spelled the blank as an
+ *  ordinary space failed against a line that looked identical on screen. */
+export const MARK: Record<string, string> = {
   open: " ",
   done: "✓",
   obsolete: "✗",
@@ -42,81 +45,65 @@ const MARK: Record<string, string> = {
   deferred: "→",
 };
 
-interface Event {
-  at: string;
-  kind: "open" | "close";
-  node: DecisionNode;
-}
+/** A BRANCH NAME IS A TOKEN. Mermaid's checkout takes one identifier, so a
+ *  trunk called "the plan" makes `checkout the plan` a parse error at the
+ *  second word — which is exactly how this was found. */
+const token = (text: string): string => text.replace(/[^A-Za-z0-9_-]+/g, "-").replace(/^-+|-+$/g, "") || "trunk";
 
-/** ONLY `done` MERGES. A point that was obsoleted, reverted or deferred did
- *  not come home, and a graph that merged it anyway would claim work landed
- *  that never did. Those branches stay hanging, which is the truth. */
-const RETURNS = new Set(["done"]);
+const byTime = (a: DecisionNode, b: DecisionNode): number => a.at.localeCompare(b.at) || a.id.localeCompare(b.id);
 
-export function decisionsAsGitGraph(nodes: readonly DecisionNode[], trunk = "the plan"): string {
-  const byId = new Map(nodes.map((n) => [n.id, n]));
+export function decisionsAsGitGraph(nodes: readonly DecisionNode[], trunkName = "the plan"): string {
+  const trunk = token(trunkName);
   // TB reads as a CHECKLIST — top to bottom, one line per point, with the
-  // text horizontal beside its dot. Left-to-right turns the labels on their
-  // side and stops being readable past a handful of points.
-  //
-  // The trunk is NAMED rather than left as "main", because the pill at the
-  // top is real estate and "main" says nothing a reader did not know.
-  const init = `%%{init: {'gitGraph': {'rotateCommitLabel': false, 'mainBranchName': '${trunk.replace(/'/g, "")}'}}}%%`;
+  // text horizontal beside its dot.
+  const init = `%%{init: {'gitGraph': {'rotateCommitLabel': false, 'mainBranchName': '${trunk}'}}}%%`;
   const out: string[] = [init, "gitGraph TB:"];
   if (nodes.length === 0) {
     out.push(`  commit id: "nothing decided yet"`);
     return out.join("\n");
   }
 
-  // The graph is a TIMELINE, so opening and closing are separate events and
-  // both are sorted by when they happened. Emitting a node's whole life at
-  // once would draw merges before the work they enclose.
-  const events: Event[] = [];
-  for (const node of nodes) {
-    events.push({ at: node.at, kind: "open", node });
-    if (node.closed_at !== undefined && RETURNS.has(node.status) && node.parent !== null) {
-      events.push({ at: node.closed_at, kind: "close", node });
+  const children = new Map<string, DecisionNode[]>();
+  const roots: DecisionNode[] = [];
+  for (const n of nodes) {
+    if (n.parent === null) roots.push(n);
+    else {
+      let kids = children.get(n.parent);
+      if (!kids) children.set(n.parent, (kids = []));
+      kids.push(n);
     }
   }
-  events.sort((a, b) => a.at.localeCompare(b.at) || (a.kind === b.kind ? a.node.id.localeCompare(b.node.id) : a.kind === "open" ? -1 : 1));
+  roots.sort(byTime);
 
-  // Mermaid RENAMES the trunk when mainBranchName is set, so every checkout
-  // has to name it. Emitting "checkout main" against a renamed trunk draws
-  // nothing at all.
-  const parentBranch = (n: DecisionNode): string => {
-    if (n.parent === null) return trunk;
-    const p = byId.get(n.parent);
-    return p === undefined ? trunk : branchOf(p, trunk);
-  };
+  for (const point of roots) {
+    const mark = MARK[point.status] ?? MARK.open;
+    out.push(`  commit id: "${mark} ${label(point.brief)}"`);
 
-  let current = trunk;
-  const opened = new Set<string>();
-  const checkout = (branch: string): void => {
-    if (current === branch) return;
-    out.push(`  checkout ${branch}`);
-    current = branch;
-  };
-
-  for (const ev of events) {
-    const n = ev.node;
-    if (ev.kind === "open") {
-      const branch = branchOf(n, trunk);
-      if (branch === trunk) {
-        checkout(trunk);
-      } else {
-        checkout(parentBranch(n));
-        out.push(`  branch ${branch}`); // branch also checks the new one out
-        current = branch;
-        opened.add(branch);
+    // Everything reported under this point, however deeply — the graph shows
+    // ONE branch per point, because a branch per nesting level draws a
+    // staircase nobody can read.
+    const told: DecisionNode[] = [];
+    const gather = (id: string): void => {
+      for (const k of (children.get(id) ?? []).slice().sort(byTime)) {
+        told.push(k);
+        gather(k.id);
       }
-      out.push(`  commit id: "${MARK[n.status] ?? " "} ${label(n.brief)}"`);
-    } else {
-      // A detour that came home. Merging from the parent's branch is what
-      // draws the line back, and it is the whole point of this renderer.
-      if (!opened.has(n.id)) continue;
-      checkout(parentBranch(n));
-      out.push(`  merge ${n.id}`);
-    }
+    };
+    gather(point.id);
+    if (told.length === 0) continue;
+
+    const branch = token(point.id);
+    out.push(`  branch ${branch}`);
+    told.forEach((k, i) => {
+      // The last one settled the point, so it wears the point's mark. The
+      // rest are the work, and stay unmarked.
+      const last = i === told.length - 1;
+      const m = last ? mark : MARK.open;
+      out.push(`  commit id: "${m} ${label(k.brief)}"`);
+    });
+    // NO MERGE. The branch is where the point was worked, not a detour that
+    // came home, and a merge line would claim a return that never happened.
+    out.push(`  checkout ${trunk}`);
   }
   return out.join("\n");
 }
