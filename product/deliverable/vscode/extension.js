@@ -550,9 +550,10 @@ const HELP = {
   "$PRODUCT_ID$.startAgent": {
     title: "Start the agent",
     html: `<p>Starts the engine if it is not running, then launches your agent.</p>
-<p>Claude starts in a terminal. Copilot tries to start in Chat agent mode with the same kickoff prompt and mapped tool exclusions; if unavailable, it falls back to terminal launch.</p>
+<p>Claude opens in the side bar. If that fails it falls back to a terminal.</p>
+<p>Copilot tries to start in Chat agent mode with the same kickoff prompt and mapped tool exclusions; if unavailable, it falls back to terminal launch.</p>
 <p>The log opens beside the active terminal when one exists.</p>
-<p>The opening prompt is sent for you. You never paste it.</p>
+<p>A terminal or Chat launch is sent the opening prompt for you. A side-bar launch is not: Claude Code accepts no prompt through a command, and the agent's instructions start it unasked.</p>
 <p>Claude Code is used when it is installed; otherwise the Copilot CLI, in its cage.</p>`,
   },
 };
@@ -1219,50 +1220,31 @@ async function openCopilotInChat(kickoff, cage) {
   }
 }
 
+// Claude Code's own id for its side-bar view. It takes no arguments.
+const CLAUDE_SIDEBAR_COMMAND = "claude-vscode.sidebar.open";
+
 /**
  * Start Claude in the SIDE BAR rather than a terminal.
  *
- * The extension's own command id is not documented anywhere we could find,
- * so this PROBES for it instead of guessing. Whatever it finds is written to
- * the output channel, which turns an unknown into data we can hard-code once
- * we have seen a real list.
- *
- * The kickoff is the constraint. A terminal launch sends the opening prompt;
- * a side-bar launch that cannot is a REGRESSION, not an improvement. So this
- * only claims success when it can pass the prompt, and otherwise reports what
- * it saw and lets the terminal path run.
+ * No Claude Code command carries a prompt. Its manifest contributes none that
+ * take one, and its URI handler serves plugin installs only. So the kickoff
+ * cannot ride in, and it does not need to: workspace/AGENTS.md makes ticking
+ * the agent's first act unasked, so a launch with no prompt boots the same.
  */
-async function openClaudeInSideBar(kickoff) {
+async function openClaudeInSideBar() {
   const all = await vscode.commands.getCommands(true);
-  const found = all.filter((c) => /claude/i.test(c));
-  if (found.length > 0) trace("claude commands seen: " + found.join(", "));
-
-  // Ordered by how much they do, not by how likely they are: a command that
-  // takes the prompt beats one that only opens the pane.
-  const withPrompt = found.filter((c) => /(run|prompt|query|ask|send|new)/i.test(c));
-  const sideBar = found.filter((c) => /(sidebar|side_bar|sideBar)/i.test(c));
-
-  for (const cmd of withPrompt) {
-    try {
-      await vscode.commands.executeCommand(cmd, kickoff);
-      for (const open of sideBar) {
-        try {
-          await vscode.commands.executeCommand(open);
-          break;
-        } catch {
-          // The pane may already be where the person wants it.
-        }
-      }
-      trace("claude started in the side bar via " + cmd);
-      return true;
-    } catch {
-      // Wrong argument shape, most likely. Try the next candidate.
-    }
+  if (!all.includes(CLAUDE_SIDEBAR_COMMAND)) {
+    trace(CLAUDE_SIDEBAR_COMMAND + " is not registered — the Claude Code extension is absent or inactive");
+    return false;
   }
-
-  if (found.length === 0) trace("no claude commands are registered — the extension is absent or inactive");
-  else trace("no claude command accepted the kickoff — staying in the terminal, where the prompt does arrive");
-  return false;
+  try {
+    await vscode.commands.executeCommand(CLAUDE_SIDEBAR_COMMAND);
+    trace("claude opened in the side bar; no kickoff is sent, AGENTS.md carries the opening");
+    return true;
+  } catch (err) {
+    trace(CLAUDE_SIDEBAR_COMMAND + " failed: " + String(err));
+    return false;
+  }
 }
 
 function agentLaunch(root) {
@@ -1316,7 +1298,7 @@ async function startAgent() {
         progress.report({ message: "Opening terminals and launching agent..." });
         if (command.host === "claude") {
           progress.report({ message: "Opening Claude in the side bar..." });
-          if (await openClaudeInSideBar(command.kickoff)) {
+          if (await openClaudeInSideBar()) {
             agentTerm = null;
             await showLog(false);
             return true;
@@ -1348,7 +1330,7 @@ async function startAgent() {
       },
     );
     if (ok) {
-      void vscode.window.setStatusBarMessage("$PRODUCT$: agent started — check Chat for Copilot or '$PRODUCT$ agent' terminal; logs are in '$PRODUCT$ log'.", 5000);
+      void vscode.window.setStatusBarMessage("$PRODUCT$: agent started — check the side bar for Claude, Chat for Copilot, or the '$PRODUCT$ agent' terminal; logs are in '$PRODUCT$ log'.", 5000);
     }
   } finally {
     agentStarting = false;

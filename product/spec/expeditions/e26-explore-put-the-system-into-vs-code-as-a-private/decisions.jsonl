@@ -526,3 +526,18 @@
 {"ts":"2026-07-31T17:45:26.659Z","op":"done","visit":"expeditions/e26@0","node":"d117","brief":"the browser lane is not connected here"}
 {"ts":"2026-07-31T17:50:40.346Z","op":"plan","visit":"expeditions/e26@0","parent":null,"nodes":[{"id":"d119","brief":"keep the unproven checker off trunk"},{"id":"d120","brief":"confirm trunk carries the sidebar change"}]}
 {"ts":"2026-07-31T17:50:48.061Z","op":"update","visit":"expeditions/e26@0","node":"d121","brief":"staging only the decision trail"}
+{"ts":"2026-07-31T17:50:54.690Z","op":"done","visit":"expeditions/e26@0","node":"d119","brief":"the unproven checker stays untracked"}
+{"ts":"2026-07-31T17:51:00.871Z","op":"update","visit":"expeditions/e26@0","node":"d122","brief":"landing the trail"}
+{"ts":"2026-07-31T17:51:13.126Z","op":"update","visit":"expeditions/e26@0","node":"d123","brief":"checking trunk carries the sidebar code"}
+{"ts":"2026-07-31T17:51:48.879Z","op":"done","visit":"expeditions/e26@0","node":"d120","brief":"trunk carries the sidebar probe"}
+{"ts":"2026-07-31T17:51:58.281Z","op":"plan","visit":"expeditions/e26@0","parent":null,"nodes":[{"id":"d124","brief":"put the handover where boot reads it"}]}
+{"ts":"2026-07-31T17:52:10.305Z","op":"update","visit":"expeditions/e26@0","node":"d125","brief":"se_run runs in the worktree, not the root"}
+{"ts":"2026-07-31T17:52:22.014Z","op":"done","visit":"expeditions/e26@0","node":"d124","brief":"the handover was already at the root"}
+{"ts":"2026-07-31T17:56:42.583Z","op":"plan","visit":"expeditions/e26@0","parent":null,"nodes":[{"id":"d1","brief":"Read how the play button opens Claude today"},{"id":"d2","brief":"Find the real Claude Code sidebar command id"},{"id":"d3","brief":"Replace the probe with the proven command"},{"id":"d4","brief":"Prove the chat opens in the side bar"}]}
+{"ts":"2026-07-31T17:56:46.182Z","op":"update","visit":"expeditions/e26@0","node":"d5","brief":"Locating the play-button path in the extension"}
+{"ts":"2026-07-31T17:56:57.651Z","op":"done","visit":"expeditions/e26@0","node":"d1","brief":"The play button probes for any command matching /claude/i"}
+{"ts":"2026-07-31T17:57:02.787Z","op":"update","visit":"expeditions/e26@0","node":"d6","brief":"Reading the installed extension manifest for its real ids"}
+{"ts":"2026-07-31T17:58:08.027Z","op":"done","visit":"expeditions/e26@0","node":"d2","brief":"claude-vscode.sidebar.open — takes no args, no command carries a prompt"}
+{"ts":"2026-07-31T17:58:51.140Z","op":"update","visit":"expeditions/e26@0","node":"d7","brief":"Calling the real side-bar command instead of probing"}
+{"ts":"2026-07-31T17:58:57.912Z","op":"update","visit":"expeditions/e26@0","node":"d8","brief":"Running preflight and the full suite over the edit"}
+{"ts":"2026-07-31T18:00:47.590Z","op":"done","visit":"expeditions/e26@0","node":"d3","brief":"Probe replaced; suite green at 271 and the file parses"}
