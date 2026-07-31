@@ -5,9 +5,15 @@ condition: read
 # read — proven reading of the listed documents
 
 Arguments: the documents (root-relative paths) that must be READ before the
-state can be left (exit) or entered (entry). Beyond the explicit lists, THE
-PULL is an entry condition everywhere outside boot: entering a state
-demands its pulled guidance proven read too. A left-behind session handover
+state can be left (exit) or entered (entry).
+
+A PULLED DOCUMENT IS A READ DEMAND. There is no second kind of obligation
+(owner ruling 2026-07-31). Guidance bound to a state by a tag or by the root
+joins the same list, is proven the same way, and is refused the same way.
+What differs is only PROVENANCE, and every document carries its own
+`sources` saying what put it there — authored on the state, bound by a tag,
+or consumed. Boot is the one exemption, and it is a bootstrap rule: guidance
+cannot be demanded before the contract explaining guidance has been read. A left-behind session handover
 (.se/HANDOVER.md) joins boot read_contract's exit list while it exists — and
 the engine DESTROYS it as that state is left, so it is read exactly once
 (owner ruling 2026-07-31). The matching demand sits at the other end: the
