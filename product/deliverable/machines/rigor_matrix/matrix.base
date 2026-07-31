@@ -1,30 +1,10 @@
-formulas:
-  patch: link(name + "--patch", if(link(name + "--patch").asFile().properties.applies, link(name + "--patch").asFile().properties.applies, "cell"))
-  minor: link(name + "--minor", if(link(name + "--minor").asFile().properties.applies, link(name + "--minor").asFile().properties.applies, "cell"))
-  major: link(name + "--major", if(link(name + "--major").asFile().properties.applies, link(name + "--major").asFile().properties.applies, "cell"))
-  product: link(name + "--product", if(link(name + "--product").asFile().properties.applies, link(name + "--product").asFile().properties.applies, "cell"))
-  specification: link(name + "--specification", if(link(name + "--specification").asFile().properties.applies, link(name + "--specification").asFile().properties.applies, "cell"))
 properties:
   file.name:
     displayName: State
   state_kind:
     displayName: Kind
-  formula.patch:
-    displayName: Patch
-  formula.minor:
-    displayName: Minor
-  formula.major:
-    displayName: Major
-  formula.product:
-    displayName: Product
-  formula.specification:
-    displayName: Specification
-  row:
-    displayName: Row
-  column:
-    displayName: Column
-  applies:
-    displayName: Applies
+  statement:
+    displayName: Statement
   patch:
     displayName: Patch
   minor:
@@ -45,25 +25,9 @@ properties:
     displayName: Product note
   specification_note:
     displayName: Specification note
+  comment:
+    displayName: Comment
 views:
-  - type: table
-    name: TRIAL - cells as frontmatter
-    filters:
-      and:
-        - kind == "matrix-row"
-        - patch
-    order:
-      - file.name
-      - patch
-      - minor
-      - major
-      - product
-      - evidence
-      - specification
-      - patch_note
-      - minor_note
-    columnSize:
-      note.evidence: 546
   - type: table
     name: The matrix
     filters:
@@ -72,57 +36,59 @@ views:
     order:
       - file.name
       - state_kind
-      - formula.patch
-      - formula.minor
-      - formula.major
-      - formula.product
-      - formula.specification
-      - COMMENT
+      - patch
+      - minor
+      - major
+      - product
+      - specification
     sort:
       - property: file.name
         direction: ASC
   - type: table
-    name: Strike proposals
-    filters:
-      and:
-        - kind == "matrix-cell"
-        - applies == "none"
-    order:
-      - file.name
-      - row
-      - column
-    sort:
-      - property: column
-        direction: ASC
-      - property: row
-        direction: ASC
-  - type: table
-    name: All cells
-    filters:
-      and:
-        - kind == "matrix-cell"
-    groupBy:
-      property: column
-      direction: ASC
-    order:
-      - file.name
-      - row
-      - applies
-    sort:
-      - property: row
-        direction: ASC
-  - type: table
-    name: Rows in detail
+    name: The tailoring, in full
     filters:
       and:
         - kind == "matrix-row"
     order:
       - file.name
-      - state_kind
-      - filled_by
-      - depends_on
-      - seeds
-      - statement
+      - patch_note
+      - minor_note
+      - major_note
+      - product_note
+      - specification_note
     sort:
       - property: file.name
         direction: ASC
+  - type: table
+    name: Struck at patch
+    filters:
+      and:
+        - kind == "matrix-row"
+        - patch == "none"
+    order:
+      - file.name
+      - patch_note
+    sort:
+      - property: file.name
+        direction: ASC
+  - type: table
+    name: Struck at minor
+    filters:
+      and:
+        - kind == "matrix-row"
+        - minor == "none"
+    order:
+      - file.name
+      - minor_note
+    sort:
+      - property: file.name
+        direction: ASC
+  - type: table
+    name: Open review comments
+    filters:
+      and:
+        - kind == "matrix-row"
+        - comment
+    order:
+      - file.name
+      - comment

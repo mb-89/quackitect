@@ -9,10 +9,17 @@ from it.
   letters mark parallel branches). The frontmatter `depends_on` is the
   truth; the name is only the readable projection. References use the
   stable short title (`draft-vision`), never the numbered prefix.
-- `cells/` — how each row applies at each change size, one file per cell
-  (`<row>--<column>.md`). Columns: `patch`, `minor`, `major`, `product`,
-  `specification`. A cell that does not apply is an EXPLICIT file saying
-  so with its reason — absence means not yet written.
+- The CELLS ARE FRONTMATTER on the row. `patch`, `minor`, `major`,
+  `product` and `specification` carry how the row applies at that change
+  size; `<column>_note` carries the prose. A cell that does not apply is an
+  EXPLICIT `none` with its reason — absence means not yet written, and the
+  loader refuses it.
+
+  They were files once (`cells/<row>--<column>.md`). Three of each file's
+  four frontmatter keys echoed its own filename, which is the noise rule in
+  software.md, and a reviewer had to open five files to read one row. Both
+  values are scalars because a Bases table edits a cell inline and cannot
+  edit a nested map.
 
 The row file carries the step at FULL battery: statement, dependencies,
 guidance, evidence form. The `product` cell adds only what the standing
@@ -24,7 +31,6 @@ Strikes are proposals. The owner adjudicates every cell that reduces a
 step. The floor law binds: kickoff, green verification, docs-match and
 the accepted handover are never struck, at any size.
 
-A `comment` in a row's or a cell's frontmatter is the owner's OPEN REVIEW
-CHANNEL. An agent may work a comment IN, and may not delete the field until
+A `comment` in a row's frontmatter is the owner's OPEN REVIEW CHANNEL. An agent may work a comment IN, and may not delete the field until
 the owner says the round is done. The first round's comments were consumed
 before this was written; git history holds them.
