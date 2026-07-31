@@ -16,7 +16,7 @@ import { Toll } from "./toll.ts";
 import { readFileSync } from "node:fs";
 import { fileDelete, fileGlob, fileList, filePatch, fileRead, fileWrite, type PatchOp } from "./files.ts";
 import { LINT_CONFIG, lintProse } from "./lint.ts";
-import { appendNote, backlogNotes, drainNote, pendingNotes } from "./inbox.ts";
+import { appendNote, backlogNotes, drainNote, pendingNotes, readNotes } from "./inbox.ts";
 import { parseStateNote } from "./notes.ts";
 import { expList, readRecord } from "./worktree.ts";
 import { survey } from "./survey.ts";
@@ -603,8 +603,20 @@ export function coreTools(rootOf: (rel?: string) => string, projectRoot: string,
       title: "se.survey",
       description:
         "WHAT STANDS OPEN — one mechanical call: open expeditions, open iterations, pending notes, and parked backlog items with their ready-when. The front desk and the retro open with it. The person asks the same question in the mirror, from the machine's header.",
-      inputSchema: { type: "object", properties: {} },
-      handler: () => survey(projectRoot),
+      inputSchema: {
+        type: "object",
+        properties: {
+          detail: { type: "string", enum: ["full", "brief"], description: "brief gives each note's opening PARAGRAPH instead of its whole text — for scanning a large inbox. Default full." },
+          limit: { type: "number", description: "window the notes list; counts stay complete and the result says what remains" },
+          offset: { type: "number", description: "how many notes to skip — 0 is the oldest" },
+        },
+      },
+      handler: (args) =>
+        survey(projectRoot, {
+          ...(args.detail !== undefined ? { detail: String(args.detail) as "full" | "brief" } : {}),
+          ...(args.limit !== undefined ? { limit: Number(args.limit) } : {}),
+          ...(args.offset !== undefined ? { offset: Number(args.offset) } : {}),
+        }),
     },
     {
       name: "se_log_query",
@@ -624,10 +636,18 @@ export function coreTools(rootOf: (rel?: string) => string, projectRoot: string,
         const log = new CallLog(seDir(projectRoot));
         if (args.ref !== undefined) {
           const rec = log.find(String(args.ref));
+          // A NOTE REF RESOLVES HERE TOO. Notes reference each other
+          // constantly, and the referenced one is usually DRAINED, so the
+          // survey cannot show it. This is already the by-ref lookup; making
+          // it answer for notes costs no new tool and no new vocabulary.
+          if (rec === undefined) {
+            const note = readNotes(seDir(projectRoot)).find((n) => n.ref === String(args.ref));
+            if (note !== undefined) return note;
+          }
           if (rec === undefined) {
             throw new Rejection({
               clause: CLAUSES.REQUIRED_ARGS,
-              expected: "an existing call ref",
+              expected: "an existing call ref, or a note ref",
               got: String(args.ref),
               remedy: { tool: "se_log_query", args: { limit: 20 }, note: "list recent calls to find the ref" },
               source: "engine/tools.ts se_log_query",
