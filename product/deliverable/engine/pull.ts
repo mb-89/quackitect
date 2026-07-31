@@ -40,11 +40,25 @@ function list(v: unknown): string[] {
     : [];
 }
 
+/** MEMOISED ON CONTENT, never on mtime (software.md). The pull is read LIVE
+ *  and has to stay so — an edited doc must show its fresh hash, or a stale
+ *  check could pass forever. A same-length edit walks straight past a
+ *  size-and-mtime cache, so the stamp is the bytes themselves.
+ *
+ *  READING is cheap; PARSING the frontmatter is what costs. So every call
+ *  still reads every file to build the stamp, and only a miss parses.
+ *
+ *  Why it matters: the mirror asks for the pull once per state and again per
+ *  edge, twice over, so a single render called this well over a hundred
+ *  times. That was a full second per render — paid by the VS Code panel on
+ *  every poll, not only by the tests that made it visible. */
+const SCAN_CACHE = new Map<string, { docs: GuidanceDoc[]; stamp: string }>();
+
 /** Scan the guidance tree — frontmatter only, prose never parsed. */
 export function scanGuidance(root: string): GuidanceDoc[] {
   const dir = guidanceDir(root);
   if (!existsSync(dir)) return [];
-  const out: GuidanceDoc[] = [];
+  const found: { abs: string; raw: string }[] = [];
   const walk = (d: string): void => {
     for (const e of readdirSync(d, { withFileTypes: true })) {
       const abs = join(d, e.name);
@@ -53,20 +67,27 @@ export function scanGuidance(root: string): GuidanceDoc[] {
         continue;
       }
       if (!e.name.endsWith(".md")) continue;
-      const raw = readFileSync(abs, "utf8");
-      const note = parseStateNote(raw);
-      const fm = note.frontmatter;
-      out.push({
-        path: relative(root, abs).split(sep).join("/"),
-        hash: contentHash(raw),
-        ...(typeof fm.applies === "string" ? { applies: fm.applies } : {}),
-        applies_to: list(fm.applies_to),
-        tags: list(fm.tags),
-      });
+      found.push({ abs, raw: readFileSync(abs, "utf8") });
     }
   };
   walk(dir);
+  found.sort((a, b) => a.abs.localeCompare(b.abs));
+  const hashes = found.map((f) => contentHash(f.raw));
+  const stamp = found.map((f, i) => `${f.abs}@${hashes[i]}`).join("|");
+  const hit = SCAN_CACHE.get(root);
+  if (hit !== undefined && hit.stamp === stamp) return hit.docs;
+  const out: GuidanceDoc[] = found.map((f, i) => {
+    const fm = parseStateNote(f.raw).frontmatter;
+    return {
+      path: relative(root, f.abs).split(sep).join("/"),
+      hash: hashes[i],
+      ...(typeof fm.applies === "string" ? { applies: fm.applies } : {}),
+      applies_to: list(fm.applies_to),
+      tags: list(fm.tags),
+    };
+  });
   out.sort((a, b) => a.path.localeCompare(b.path));
+  SCAN_CACHE.set(root, { docs: out, stamp });
   return out;
 }
 

@@ -2233,7 +2233,7 @@ export class Session {
       decl = gen.decl;
     } else {
       try {
-        decl = compileMachine(this.root, resolveRef(this.root, mainMachinePath(this.root), subState.submachine!));
+        decl = compileMachineCached(this.root, resolveRef(this.root, mainMachinePath(this.root), subState.submachine!));
       } catch (e) {
         // A broken drawing refuses TYPED and the engine survives; the next
         // tick retries the seed once the canvas is fixed.

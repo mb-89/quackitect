@@ -21,7 +21,7 @@ import { CallLog, type CallRecord } from "./calllog.ts";
 import { type StrayNote } from "./inbox.ts";
 import { loadLevels } from "./scale.ts";
 import { mainMachinePath, Session } from "./session.ts";
-import { compileMachine, resolveRef } from "./machines/compile.ts";
+import { compileMachineCached, resolveRef } from "./machines/compile.ts";
 import { type MachineDecl } from "./machine.ts";
 
 function esc(s: string): string {
@@ -395,7 +395,12 @@ function viewedMachine(m: MirrorState, view: string | undefined): { decl: Machin
   const generated = m.session.generatedView(subState.id);
   if (generated !== undefined) return generated;
   const path = resolveRef(m.root, mainPath, subState.submachine!);
-  return { decl: compileMachine(m.root, path), canvas: loadCanvas(path) };
+  // CACHED, and live all the same. compileMachineCached memoises against the
+  // CONTENT of every file the compile read, so an edited canvas or state note
+  // recompiles on the next render and an untouched one does not. The mirror
+  // re-renders on every poll, and recompiling the machine each time cost a
+  // full second per render — paid by the VS Code panel, not just the tests.
+  return { decl: compileMachineCached(m.root, path), canvas: loadCanvas(path) };
 }
 
 /** The SHUTDOWN CONTROL's five notches (owner design): what happens
@@ -2368,6 +2373,7 @@ export function renderMirror(m: MirrorState, widget?: "machine" | "details" | "l
       pulled: m.session.pulled(decl, s),
       next: s.edges.map((e) => {
         const t = decl.states.find((st) => st.id === e.to);
+        const ready = t === undefined ? true : m.session.entryReadyHuman(decl, t);
         return {
           to: e.to,
           role: e.role,
@@ -2376,8 +2382,10 @@ export function renderMirror(m: MirrorState, widget?: "machine" | "details" | "l
           // The human's ▶ lock: explicit entry conditions AND the pull —
           // every doc entering demands, checked at its current version. A
           // locked edge carries WHAT is missing (the tooltip names it).
-          enter_met: t === undefined ? true : m.session.entryReadyHuman(decl, t),
-          ...(t !== undefined && !m.session.entryReadyHuman(decl, t) ? { missing: m.session.entryMissingHuman(decl, t) } : {}),
+          // ASKED ONCE. This ran entryReadyHuman twice per edge, and each
+          // call walks the target's whole reading list.
+          enter_met: ready,
+          ...(t !== undefined && !ready ? { missing: m.session.entryMissingHuman(decl, t) } : {}),
         };
       }),
     };
