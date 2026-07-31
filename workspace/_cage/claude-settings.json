@@ -17,6 +17,9 @@
       "mcp__se__*"
     ]
   },
+  "env": {
+    "MAX_MCP_OUTPUT_TOKENS": "100000"
+  },
   "enableAllProjectMcpServers": true,
   "hooks": {
     "PostToolUse": [
