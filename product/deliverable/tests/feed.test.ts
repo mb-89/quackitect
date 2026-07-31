@@ -114,6 +114,36 @@ test("the render lint: the update lane refuses what renders weird", () => {
   assert.equal(d.to, "idle");
 });
 
+// THE MOST-HIT REFUSAL IN THE LANE, so its WORDS are held to account here.
+// Refusing correctly while saying neither which text nor which parts is how
+// a caller hits the same wall twice in a row.
+test("the render lint hands back the list the chain wanted to be", () => {
+  const got = (fn: () => unknown): string => {
+    try {
+      fn();
+    } catch (e) {
+      return String((e as { got?: string }).got ?? (e as Error).message);
+    }
+    throw new Error("expected a refusal");
+  };
+
+  const chain = got(() => parseUpdate({ op: "update", brief: "one, two, three" }));
+  assert.match(chain, /one, two, three/, "the offending text is quoted back");
+  assert.match(chain, /items:/, "and the remedy is named");
+  for (const part of ["one", "two", "three"]) {
+    assert.match(chain, new RegExp(`"${part}"`), `${part} comes back as its own item`);
+  }
+
+  // WHICH item. A five-item plan refused on a bare "item" left the caller
+  // re-reading all five to find the one that tripped.
+  const item = got(() => parseUpdate({ op: "plan", items: ["fine", "fine too", "a, b, c"] }));
+  assert.match(item, /item 3/, "the failing item is numbered");
+
+  // The other two lints quote the text too.
+  assert.match(got(() => parseUpdate({ op: "update", brief: "a\nb" })), /\\n/, "the line break is shown, escaped");
+  assert.match(got(() => parseUpdate({ op: "update", brief: "y".repeat(91) })), /91 chars/);
+});
+
 test("replay: parked defers and open points survive an engine life", () => {
   const root = freshRoot();
   const dir = seDir(root);
@@ -261,8 +291,32 @@ test("the update rides any tool call, is stripped before the handler, and never 
   const r = await call(server, "se_file_list", { dir: ".", update: { op: "fork", brief: "looking around" } });
   assert.equal(r.isError, false, JSON.stringify(r.body));
   assert.equal(session.decisions.graph(session.currentVisit()).nodes.length, 1);
-  // A malformed update refuses the CALL with the shape in the remedy.
+  // A MALFORMED UPDATE NEVER DESTROYS ITS CALL (owner ruling 2026-07-28).
+  // This used to refuse the whole call, throwing the payload away over the
+  // punctuation of a label riding beside it. The work lands; the complaint
+  // rides home on the result, carrying the shape in its remedy as before.
   const bad = await call(server, "se_file_list", { dir: ".", update: { op: "sprint" } });
-  assert.equal(bad.isError, true);
-  assert.equal(bad.body.clause, "SE-C-120");
+  assert.equal(bad.isError, false, "the call it rode on still went through");
+  assert.equal(bad.body.update_refused.clause, "SE-C-120", "and the update was refused, visibly");
+  assert.ok(String(bad.body.update_refused.note).includes("THE CALL WENT THROUGH"), "the reader is told which half failed");
+  assert.equal(session.decisions.graph(session.currentVisit()).nodes.length, 1, "a refused update changed no graph");
+});
+
+// RESOLVING TWICE THE SAME WAY IS THE STATE WE WERE ASKED FOR (owner ruling
+// 2026-07-28). The update rides before the call's verdict, and every remedy
+// says to repeat the call — so a retry arrives with its resolution already
+// applied. That used to refuse with a second, more confusing reason, and it
+// was the single commonest refusal of the whole period.
+test("a repeated resolution is a no-op; a conflicting one still refuses", () => {
+  const s = new Session(freshRoot());
+  s.decisions.apply("idle@0", { op: "plan", items: ["the one item"] });
+  const item = s.decisions.graph("idle@0").nodes.find((n) => n.status === "open")!;
+  s.decisions.apply("idle@0", { op: "done", node: item.id, brief: "shipped" });
+  // The retry: same node, same disposition. It simply stands.
+  s.decisions.apply("idle@0", { op: "done", node: item.id, brief: "shipped" });
+  const after = s.decisions.graph("idle@0").nodes.filter((n) => n.id === item.id);
+  assert.equal(after.length, 1, "no second node, no second resolution");
+  assert.equal(after[0].status, "done");
+  // A DIFFERENT disposition is a real disagreement, and still refuses.
+  assert.throws(() => s.decisions.apply("idle@0", { op: "obsolete", node: item.id, brief: "actually dropped" }), (e: unknown) => (e as { clause?: string }).clause === "SE-C-121");
 });

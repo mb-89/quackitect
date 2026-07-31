@@ -16,7 +16,7 @@
 //
 // State is in-memory: a server restart mid-session drops back to start, and
 // the next refused call's remedy re-boots the agent in one turn.
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, statSync, unlinkSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { contentHash } from "./hash.ts";
 import { CLAUSES, Rejection } from "./errors.ts";
@@ -28,7 +28,8 @@ import {
   type MachineInstance,
   type StateDecl,
 } from "./machine.ts";
-import { compileMachine, resolveRef } from "./machines/compile.ts";
+import { compileMachine, compileMachineCached, resolveRef } from "./machines/compile.ts";
+import { computeRoute, type RouteNode, type RouteResult } from "./route.ts";
 import { conditionNotePath } from "./conditions.ts";
 import { drainNote, pendingNotes } from "./inbox.ts";
 import { confirmPrefill, formTemplatePath, lintForm, parseFormTemplate, scaffoldInstance, withFieldContent, withStatus, type FormLint, type FormTemplate } from "./forms.ts";
@@ -40,7 +41,9 @@ import { spawn, spawnSync } from "node:child_process";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { resolveInRoot, seDir } from "./paths.ts";
 import { Decisions, replayFile } from "./decisions.ts";
-import { generateIterationArchive, generateIterations, itFind, itSeed, markStarted } from "./iterations.ts";
+import { generateIterationArchive, generateIterations, itFind, itPinRel, itRecordRel, itSeed, markStarted, pinIteration, readItRecord } from "./iterations.ts";
+import { CHANGE_COLUMNS } from "./rigor-matrix.ts";
+import { parseStateNote, section } from "./notes.ts";
 
 /** THE TICK is the machinery — one tool, legal in EVERY state. Without
  *  arguments it reports (observability is never gated); with arguments it
@@ -48,8 +51,9 @@ import { generateIterationArchive, generateIterations, itFind, itSeed, markStart
  *  strikes, never chased (contract rule 4). */
 const ALWAYS_LEGAL: ReadonlySet<string> = new Set(["se_tick", "se_note", "se_panel"]);
 /** RESTRICTED tools: "all" does NOT grant these — a state must name them.
- *  se_note_drain is legal only in the retro's drain state (owner ruling
- *  2026-07-27: there is no point in draining anywhere else). */
+ *  se_note_drain stays restricted, so a state earns it by saying so. The
+ *  retro and the front desk both name it; what they may DO with it differs,
+ *  and that split lives in engine/inbox.ts, not here. */
 const RESTRICTED: ReadonlySet<string> = new Set(["se_note_drain"]);
 const MACHINERY: readonly string[] = ["se_tick", "se_file_read"];
 
@@ -86,7 +90,9 @@ export type Channel = "human" | "agent";
 
 export class Session {
   private readonly root: string;
-  readonly machine: MachineDecl;
+  /** Last good main machine — what the walk stands on when the live one
+   *  cannot be had. Read through `machine`, never directly. */
+  private _machine: MachineDecl;
   readonly instance: MachineInstance;
   private subs: SubRun[] = [];
   private bannerShown = false;
@@ -100,6 +106,11 @@ export class Session {
    *  1 is fully autonomous. Content work inside a state is never gated —
    *  only ENTERING is. Live-adjustable (the mirror's slider). */
   private _autonomy = 0.4;
+  /** THE TARGET — where the walk is headed, and the blue line the mirror
+   *  draws. Every engine start aims at the front desk (owner ruling
+   *  2026-07-29): the desk is where a person says what they want, so it is
+   *  the destination unless somebody names another. */
+  private _target = "front_desk";
   /** Fires once, after the tick that closes the MAIN machine — the server
    *  entry hooks the session shutdown here. */
   onClosed?: () => void;
@@ -113,16 +124,27 @@ export class Session {
     this.root = root;
     // Fail fast at server start: a misdrawn machine must not silently serve
     // an ungated lane.
-    this.machine = compileMachine(root, mainMachinePath(root));
-    this.instance = newInstance(this.machine);
+    this._machine = compileMachine(root, mainMachinePath(root));
+    this.instance = newInstance(this._machine);
     this.decisions = new Decisions(seDir(root));
-    // SETTINGS SURVIVE THE ENGINE (owner ruling 2026-07-28): the mirror's
-    // sliders restore across reloads like the decision graph — ONE store,
-    // restored wholesale, ready for settings still to come.
+    // SETTINGS SURVIVE THE ENGINE, NOT THE SESSION (owner rulings 2026-07-28).
+    // The mirror's sliders restore across a RELOAD like the decision graph —
+    // ONE store, restored wholesale, ready for settings still to come. But a
+    // session that ended and started again is a NEW session, and takes the
+    // defaults.
+    //
+    // The shim's life is the session, so it stamps each child with a token.
+    // Matching it is what tells the two apart, and it fails safe: an absent
+    // or unfamiliar stamp simply does not restore. There is no cleanup step
+    // to forget, so a crash or a power cut cannot leave the last session's
+    // sliders standing either.
     try {
-      const s = JSON.parse(readFileSync(join(seDir(root), "settings.json"), "utf8")) as { autonomy?: number; shutdown?: number };
-      if (typeof s.autonomy === "number" && s.autonomy >= 0 && s.autonomy <= 1) this._autonomy = s.autonomy;
-      if (typeof s.shutdown === "number" && Number.isInteger(s.shutdown) && s.shutdown >= 1 && s.shutdown <= 5) this._shutdown = s.shutdown;
+      const s = JSON.parse(readFileSync(join(seDir(root), "settings.json"), "utf8")) as { autonomy?: number; shutdown?: number; session?: string };
+      const mine = process.env.SE_SESSION;
+      if (mine !== undefined && mine !== "" && s.session === mine) {
+        if (typeof s.autonomy === "number" && s.autonomy >= 0 && s.autonomy <= 1) this._autonomy = s.autonomy;
+        if (typeof s.shutdown === "number" && Number.isInteger(s.shutdown) && s.shutdown >= 1 && s.shutdown <= 5) this._shutdown = s.shutdown;
+      }
     } catch { /* no store yet — the defaults stand */ }
     this.syncKeepAwake();
   }
@@ -130,7 +152,7 @@ export class Session {
   private persistSettings(): void {
     try {
       mkdirSync(seDir(this.root), { recursive: true });
-      writeFileSync(join(seDir(this.root), "settings.json"), JSON.stringify({ autonomy: this._autonomy, shutdown: this._shutdown }) + "\n", "utf8");
+      writeFileSync(join(seDir(this.root), "settings.json"), JSON.stringify({ session: process.env.SE_SESSION ?? null, autonomy: this._autonomy, shutdown: this._shutdown }) + "\n", "utf8");
     } catch { /* a failed save never blocks the slider */ }
   }
 
@@ -183,6 +205,117 @@ export class Session {
     return { shutdown: value, was };
   }
 
+  /** THE MILESTONE REVIEW REPORT (owner rulings 2026-07-30): the one thing
+   *  a person reads most, so it is the gate's MECHANICAL demand. The
+   *  scaffold generates from the gate's OWN evidence fields (the rigor matrix,
+   *  live) plus v1's field-tested review tail: verify, validate, red_team,
+   *  verdict. Prefilled comments never count as content (the prefill law).
+   *
+   *  REPORT AND BLESS ARE SEPARATE THINGS. The report is the artifact; the
+   *  BLESS is the act of passing the gate on it — the tick, weighed by the
+   *  autonomy slider as ever (below the gate's 0.6 the hand is human). The
+   *  bless lands DURABLY as a sidecar pinning the report's version and
+   *  whose hand it was; an EDITED report drops its bless (one bless per
+   *  version), and a standing bless lets a re-walk pass without re-asking. */
+  private gateReportRel(gateId: string): string {
+    return `product/spec/iterations/${this.bound!.id}/reviews/${gateId}.md`;
+  }
+
+  private assertGateReport(gateId: string, s: StateDecl, channel: Channel): void {
+    const rel = this.gateReportRel(gateId);
+    const abs = join(this.bound!.path, rel);
+    const REVIEW_TAIL: readonly { name: string; hint: string }[] = [
+      { name: "verify", hint: "did each input deliver against its referent?" },
+      { name: "validate", hint: "does the milestone meet the frame and the vision?" },
+      { name: "red_team", hint: "argue the opposing case; a significant decision carries a kill criterion" },
+    ];
+    if (!existsSync(abs)) {
+      const scaffold = [
+        "---",
+        "form: milestone-review",
+        `gate: ${gateId}`,
+        "status: draft",
+        "by: ",
+        "verdict: ",
+        "---",
+        "",
+        `# ${gateId} — milestone review`,
+        "",
+        ...s.evidence_form.flatMap((f) => [`## ${f.name}`, "", `<!-- ${f.description}${f.required ? "" : " (optional)"}${f.killer === true ? " (KILLER: unmet alone fails the gate)" : ""} -->`, ""]),
+        ...REVIEW_TAIL.flatMap((t) => [`## ${t.name}`, "", `<!-- ${t.hint} -->`, ""]),
+      ].join("\n");
+      throw new Rejection({
+        clause: CLAUSES.CONDITION_UNMET,
+        expected: `the milestone review report — no gate passes without one (${rel})`,
+        got: "no review report in the record",
+        remedy: { tool: "se_file_write", args: { path: rel, content: scaffold, base_hash: null }, note: "fill every section — this report is what a person reads most; a prefilled comment counts as empty until real text replaces it" },
+        source: "engine/session.ts gate",
+      });
+    }
+    const raw = readFileSync(abs, "utf8");
+    // A STANDING BLESS passes at once: the sidecar pins the report's exact
+    // version — the quick re-walk the owner asked for.
+    const blessAbs = abs.replace(/\.md$/, ".bless.json");
+    const reportHash = contentHash(Buffer.from(raw, "utf8"));
+    if (existsSync(blessAbs)) {
+      try {
+        const b = JSON.parse(readFileSync(blessAbs, "utf8")) as { hash?: string };
+        if (b.hash === reportHash) return;
+      } catch {
+        // an unreadable bless is no bless — fall through and re-earn it
+      }
+    }
+    const note = parseStateNote(raw);
+    const problems: string[] = [];
+    const filledText = (name: string): string => section(note.body, name).replace(/<!--[\s\S]*?-->/g, "").trim();
+    for (const f of s.evidence_form) {
+      if (f.required && filledText(f.name) === "") problems.push(`${f.name} is empty`);
+    }
+    for (const t of REVIEW_TAIL) {
+      if (filledText(t.name) === "") problems.push(`${t.name} is empty`);
+    }
+    if (note.frontmatter.status !== "done") problems.push("status is not done");
+    const verdict = typeof note.frontmatter.verdict === "string" ? note.frontmatter.verdict.trim().toUpperCase() : "";
+    if (!verdict.startsWith("PASS")) problems.push(`the verdict is "${String(note.frontmatter.verdict ?? "")}" — PASS passes, anything else holds the gate`);
+    if (problems.length > 0) {
+      throw new Rejection({
+        clause: CLAUSES.CONDITION_UNMET,
+        expected: `a complete, PASSED milestone review at ${rel}`,
+        got: problems.join(" · "),
+        remedy: { tool: "se_file_read", args: { path: rel }, note: "fill what is empty, set status: done and the verdict, then tick again" },
+        source: "engine/session.ts gate",
+      });
+    }
+    // THE BLESS: this passing tick is the act, and it lands durably — the
+    // report's version pinned, the hand recorded. Below 0.6 the slider made
+    // that hand human; at or above, the delegation is stamped honestly.
+    writeFileSync(blessAbs, JSON.stringify({ hash: reportHash, by: channel, at: new Date().toISOString() }) + "\n", "utf8");
+  }
+
+  /** THE PING (owner, 2026-07-30): the agent points at a mirror surface and
+   *  it pulses YELLOW in every open window — the tour's pointing finger,
+   *  and "look HERE" for refusals and diffs. Targets: a card id (machine,
+   *  log, details, terminal, chat), a drawn state id, or an element id.
+   *  Pointing is advisory — an unknown target pulses nothing and fails
+   *  nothing. */
+  ping?: { target: string; note?: string; seq: number };
+  private pingSeq = 0;
+  pingSurface(target: string, note?: string): Record<string, unknown> {
+    const t = target.trim();
+    if (t === "") {
+      throw new Rejection({
+        clause: CLAUSES.REQUIRED_ARGS,
+        expected: "a surface to ping: a card id (its slugged title from product/cards.md), the widget a card shows, a drawn state id, or an element id",
+        got: "an empty target",
+        remedy: { tool: "se_panel", args: { ping: "log" }, note: "name what the reader should look at" },
+        source: "engine/session.ts ping",
+      });
+    }
+    this.ping = { target: t, ...(note === undefined || note.trim() === "" ? {} : { note: note.trim() }), seq: ++this.pingSeq };
+    this.notifyChange();
+    return { pinged: t, note: "the surface is lit yellow in every open mirror window, and stays lit until the next ping" };
+  }
+
   private syncKeepAwake(): void {
     const want = this._shutdown >= 2 && process.platform === "win32" && process.env.SE_KEEPAWAKE_DISABLE !== "1";
     if (want && this.keepAwake === undefined) {
@@ -199,6 +332,18 @@ export class Session {
   //    something (slider, tick, evidence) and returns the fresh packet — the
   //    nearest thing to "the machine sends an update to the agent". ────────
   private waiters: Array<() => void> = [];
+
+  // THE CONSOLE QUIT — distinct from reaching end. The walk is unfinished, so
+  // the machine's own status stays open and honest; what ended is the SERVER.
+  // Conflating the two would record an abandoned walk as a completed one.
+  serverGone = false;
+
+  /** Announce the server's departure and wake every held hand at once, so an
+   *  open mirror hears it instead of waiting out the death timeout. */
+  markServerGone(): void {
+    this.serverGone = true;
+    this.notifyChange();
+  }
 
   /** Wake every held wait — called on every successful change of the walk. */
   private notifyChange(): void {
@@ -315,6 +460,23 @@ export class Session {
     return this.bound?.path ?? this.root;
   }
 
+  /** Where the lane resolves ONE path (owner ruling 2026-07-28).
+   *
+   *  `.se/` is SESSION state, never branch content. The handover, the notes
+   *  and the call log belong to the project root, and the NEXT session reads
+   *  them there whatever branch this one happened to stand on. Resolving them
+   *  into a worktree wrote them where nobody would ever look — silently.
+   *
+   *  Everything else follows the walk into its worktree, as it always did. */
+  laneRoot(rel?: string): string {
+    if (rel === undefined) return this.workRoot();
+    // A DECLARED ROOT is session state exactly like .se/ — its declaration
+    // lives in the project root's .se/roots.json, so a bound worktree must
+    // never make the owner's roots read as undeclared (found live 2026-07-30).
+    if (rel.startsWith("@")) return this.root;
+    return rel.replace(/\\/g, "/").split("/")[0] === ".se" ? this.root : this.workRoot();
+  }
+
   expeditionNew(kind: string, goal: string): Record<string, unknown> {
     const e = expNew(this.root, kind, goal);
     return { created: e.id, branch: e.branch, note: "it stands in the expeditions container — enter there to work" };
@@ -331,6 +493,41 @@ export class Session {
     markStarted(this.root, it);
     this.decisions.setExtraSink(join(it.path, "product", "spec", "iterations", it.id, "decisions.jsonl"));
     return { bound: it.id, note: "the lane now works in this iteration's worktree" };
+  }
+
+  /** THE BLESS PINS (owner verdicts 2026-07-30): leaving an iteration
+   *  kickoff compiles the record's blessed change_size from the LIVE rigor matrix
+   *  and pins the machine into the record. No change size, no pass — the
+   *  demand is mechanical. An existing same-size pin walks on untouched;
+   *  a larger size escalates; pinIteration refuses de-escalation itself. */
+  private pinKickoff(fullId: string | undefined): void {
+    if (fullId === undefined) return;
+    const it = itFind(this.root, fullId);
+    const rec = readItRecord(this.root, it);
+    const size = typeof rec?.change_size === "string" ? rec.change_size : undefined;
+    const pinAbs = join(it.path, itPinRel(it.id));
+    if (size === undefined) {
+      if (existsSync(pinAbs)) return; // blessed in an earlier pass — walk on
+      throw new Rejection({
+        clause: CLAUSES.CONDITION_UNMET,
+        expected: `a change_size in the iteration record (${CHANGE_COLUMNS.join(" | ")}) — the bless compiles the column and pins the machine`,
+        got: "no change_size in the record's frontmatter",
+        remedy: {
+          tool: "se_file_patch",
+          args: { ops: [{ path: itRecordRel(it.id), old_string: "status:", new_string: `change_size: <${CHANGE_COLUMNS.join(" | ")}>\nstatus:` }] },
+          note: "prefill it from the goal with its reasoning — the person's bless is the tick itself",
+        },
+        source: "engine/session.ts kickoff",
+      });
+    }
+    if (existsSync(pinAbs)) {
+      try {
+        if ((JSON.parse(readFileSync(pinAbs, "utf8")) as { change_size?: string }).change_size === size) return;
+      } catch {
+        // an unreadable pin falls through and is re-pinned
+      }
+    }
+    pinIteration(this.root, it, size);
   }
 
   expeditionList(): Record<string, unknown> {
@@ -359,7 +556,7 @@ export class Session {
     return { bound: this.bound.id, note: "the lane now works in this expedition's worktree" };
   }
 
-  expeditionClose(merge: boolean): Record<string, unknown> {
+  expeditionClose(merge: boolean, override?: string): Record<string, unknown> {
     if (this.bound === undefined) {
       throw new Rejection({
         clause: CLAUSES.NOT_LEGAL_IN_STATE,
@@ -381,9 +578,13 @@ export class Session {
         source: "engine/session.ts close",
       });
     }
-    const result = expClose(this.root, this.bound, merge);
+    const result = expClose(this.root, this.bound, merge, override);
     this.unbind();
-    return { ...result, note: merge ? "applied — merged to trunk, archived" : "dismissed — archived unmerged" };
+    return {
+      ...result,
+      note: merge ? "applied — merged to trunk, archived" : "dismissed — archived unmerged",
+      ...(result.override === undefined ? {} : { override_note: "the report was NOT confirmed by a person — this close is recorded as an override on the record" }),
+    };
   }
 
   private unbind(): void {
@@ -397,43 +598,103 @@ export class Session {
    *  continue re-enters from the beginning, fast-forwarding on stored
    *  evidence. Boot is the one exception — it must complete. */
   escape(reason: string, channel: Channel = "agent", readHashes: Record<string, string> = {}): Record<string, unknown> {
+    return this.exitToIdle(reason, channel, readHashes, "escaped");
+  }
+
+  /** PAUSE (owner ruling 2026-07-29): escape's move, recorded as ordinary
+   *  work. An expedition is a day's bucket and is MEANT to stay open, so
+   *  stepping out to pick it up later is normal. Filing that as an escape
+   *  writes a false failure — and the retro mines escapes for the real ones. */
+  pause(reason: string, channel: Channel = "agent", readHashes: Record<string, string> = {}): Record<string, unknown> {
+    return this.exitToIdle(reason, channel, readHashes, "paused");
+  }
+
+  private exitToIdle(
+    reason: string,
+    channel: Channel,
+    readHashes: Record<string, string>,
+    kind: "escaped" | "paused",
+  ): Record<string, unknown> {
+    const supplied = this.readProofs(channel, readHashes);
+    const verb = kind === "escaped" ? "escape" : "pause";
     if (reason.trim() === "") {
       throw new Rejection({
         clause: CLAUSES.REQUIRED_ARGS,
-        expected: "a reason — an escape is a recorded failure, never a silent exit",
+        expected:
+          kind === "escaped"
+            ? "a reason — an escape is a recorded failure, never a silent exit"
+            : "a reason — say what you are stepping out of, so the walk reads back",
         got: "an empty reason",
-        remedy: { tool: "se_tick", args: { escape: "<why the walk cannot continue>" } },
-        source: "engine/session.ts escape",
+        remedy: {
+          tool: "se_tick",
+          args: kind === "escaped" ? { escape: "<why the walk cannot continue>" } : { pause: "<what you are stepping out of>" },
+        },
+        source: `engine/session.ts ${verb}`,
       });
     }
     if (!this.inSub()) {
-      throw new Rejection({
-        clause: CLAUSES.NOT_LEGAL_IN_STATE,
-        expected: "a sub-machine to escape from",
-        got: `standing on the main machine [${this.active().join(", ")}]`,
-        remedy: { tool: "se_tick", args: {}, note: "escape leaves a stuck sub-machine walk; the main machine walks normally" },
-        source: "engine/session.ts escape",
-      });
+      // THE HATCH ALWAYS WORKS (owner ruling 2026-07-28): a main-machine
+      // walk escapes to idle too; only boot's green-proving must complete.
+      const stood = this.active();
+      if (stood.includes("idle")) {
+        throw new Rejection({
+          clause: CLAUSES.NOT_LEGAL_IN_STATE,
+          expected: "a walk away from idle",
+          got: `standing at idle — idle IS the ${verb} target`,
+          remedy: { tool: "se_tick", args: {}, note: `nothing to ${verb}; walk on normally` },
+          source: `engine/session.ts ${verb}`,
+        });
+      }
+      if (!this.instance.history.some((h) => h.state === "boot" && h.outcome === "filled")) {
+        throw new Rejection({
+          clause: CLAUSES.NOT_LEGAL_IN_STATE,
+          expected: "a booted walk",
+          got: `a ${verb} before boot completed [${stood.join(", ")}]`,
+          remedy: { tool: "se_tick", args: {}, note: "boot cannot be skipped — it must complete; if it is broken, tell the user" },
+          source: `engine/session.ts ${verb}`,
+        });
+      }
+      const nowMain = new Date().toISOString();
+      this.gatePriority(this.machine, ["idle"], channel);
+      const idleState = this.state(this.machine, "idle");
+      const missingMain = this.entryRequirements(this.machine, idleState).filter((p) => !this.readProven(channel, p, supplied));
+      if (missingMain.length > 0) this.refuseReads("entry", "idle", missingMain, channel);
+      this.assertHandover(channel, supplied);
+      const stoodIn = stood[0] ?? "(no state)";
+      this.instance.history.push({ state: stoodIn, outcome: kind, at: nowMain });
+      if (kind === "escaped") this.instance.escapes.push({ state: stoodIn, exhausted_guard: reason.slice(0, 300), at: nowMain });
+      this.instance.active = ["idle"];
+      this.instance.current = "idle";
+      this.unbind();
+      this.notifyChange();
+      return {
+        ...this.tickInfo(),
+        [kind]: { from: stoodIn, reason },
+        note:
+          kind === "escaped"
+            ? "escaped to idle — the walk was left standing. Tell the user PLAINLY what blocked it, then wait for their ruling."
+            : "paused to idle — the walk was left standing, and a later continue re-enters it. Nothing failed.",
+      };
     }
     if (this.top()!.decl.id === "boot") {
       throw new Rejection({
         clause: CLAUSES.NOT_LEGAL_IN_STATE,
         expected: "a sub-machine other than boot",
-        got: "an escape from boot",
+        got: `a ${verb} from boot`,
         remedy: { tool: "se_tick", args: {}, note: "boot cannot be skipped — it must complete; if it is broken, tell the user" },
-        source: "engine/session.ts escape",
+        source: `engine/session.ts ${verb}`,
       });
     }
     const now = new Date().toISOString();
     this.gatePriority(this.machine, ["idle"], channel);
     const idle = this.state(this.machine, "idle");
-    const missing = this.entryRequirements(this.machine, idle).filter((p) => !this.readProven(channel, p, readHashes));
+    const missing = this.entryRequirements(this.machine, idle).filter((p) => !this.readProven(channel, p, supplied));
     if (missing.length > 0) this.refuseReads("entry", "idle", missing, channel);
-    this.assertHandover(channel, readHashes);
+    this.assertHandover(channel, supplied);
     const stoodIn = this.active()[0];
     const parent = this.subs[0].parentState;
-    this.instance.history.push({ state: stoodIn, outcome: "escaped", at: now });
-    this.instance.escapes.push({ state: parent, exhausted_guard: reason.slice(0, 300), at: now });
+    this.instance.history.push({ state: stoodIn, outcome: kind, at: now });
+    if (kind === "escaped") this.instance.escapes.push({ state: parent, exhausted_guard: reason.slice(0, 300), at: now });
     this.instance.active = [...activeStates(this.instance).filter((s) => s !== parent), "idle"];
     this.instance.current = "idle";
     this.subs = [];
@@ -441,8 +702,11 @@ export class Session {
     this.notifyChange();
     return {
       ...this.tickInfo(),
-      escaped: { from: stoodIn, reason },
-      note: "escaped to idle — the machine was left standing. Tell the user PLAINLY what blocked the walk, then wait for their ruling.",
+      [kind]: { from: stoodIn, reason },
+      note:
+        kind === "escaped"
+          ? "escaped to idle — the machine was left standing. Tell the user PLAINLY what blocked the walk, then wait for their ruling."
+          : "paused to idle — the machine was left standing, and a later continue re-enters it. Nothing failed.",
     };
   }
 
@@ -450,6 +714,34 @@ export class Session {
     const s = m.states.find((st) => st.id === id);
     if (s === undefined) throw new Error(`undeclared state ${id}`);
     return s;
+  }
+
+  /** completeState with the WEDGE GUARD: a move that would leave an open
+   *  machine with NO active state is refused with the starving join named —
+   *  the walk stands instead of stranding. Found live 2026-07-28: plain
+   *  return edges compiled as normal made idle an AND-join, and completing
+   *  boot dropped the only token into nowhere. */
+  private completeGuarded(m: MachineDecl, inst: MachineInstance, stateId: string, outcome: "filled" | "failed", now: string, only?: string): void {
+    const snap = {
+      active: inst.active === undefined ? undefined : [...inst.active],
+      fired: inst.fired === undefined ? undefined : [...inst.fired],
+      current: inst.current,
+      status: inst.status,
+    };
+    completeState(m, inst, stateId, outcome, now, only);
+    if (activeStates(inst).length > 0 || inst.status !== "open") return;
+    const starving = [...new Set((inst.fired ?? []).map((k) => k.split("->")[1]))];
+    inst.active = snap.active;
+    inst.fired = snap.fired;
+    inst.current = snap.current;
+    inst.status = snap.status;
+    throw new Rejection({
+      clause: CLAUSES.DEAD_END,
+      expected: `completing ${stateId} activates a successor`,
+      got: `nothing activates — ${starving.join(", ") || "a join"} still waits for other inbound edges (the drawing makes it an AND-join)`,
+      remedy: { tool: "se_tick", args: {}, note: "every plain edge into the named state must fire before it activates. If those edges are returns, redraw them (a reverse-of-forward edge compiles as a return) — or walk the other branches first. The walk has not moved." },
+      source: "engine/session.ts wedge-guard",
+    });
   }
 
   /** A sub governs as long as it stands — including its visible end
@@ -476,11 +768,267 @@ export class Session {
     return { machine: this.machine, ids: activeStates(this.instance) };
   }
 
+  /** THE MACHINE IS READ LIVE (owner ruling 2026-07-29). Editing a state
+   *  note — its legal tools, its priority, its guidance — takes effect on
+   *  the next call. The markdown is the single truth, so a running lane
+   *  that enforces yesterday's copy of it is enforcing a lie.
+   *
+   *  se_reload is still the door for ENGINE CODE, which Node caches as
+   *  modules and no re-read can reach.
+   *
+   *  TWO THINGS NEVER MOVE THE GROUND UNDER THE WALK:
+   *  - A drawing that will not compile. The last good one stands and the
+   *    walk continues — the same bargain SE-C-124 already makes.
+   *  - A drawing that no longer holds a state the walk is standing in.
+   *    Deleting the active state out from under a live walk would strand
+   *    it, so the edit waits until the walk has moved on. */
+  get machine(): MachineDecl {
+    let fresh: MachineDecl;
+    try {
+      fresh = compileMachineCached(this.root, mainMachinePath(this.root));
+    } catch {
+      return this._machine;
+    }
+    if (fresh === this._machine) return fresh;
+    if (this.instance !== undefined && !activeStates(this.instance).every((id) => fresh.states.some((s) => s.id === id))) {
+      return this._machine;
+    }
+    this._machine = fresh;
+    return fresh;
+  }
+
   active(): string[] {
     const { ids } = this.leaves();
     if (!this.inSub()) return ids;
     const prefix = this.subs.map((s) => s.decl.id).join("/");
     return ids.map((s) => `${prefix}/${s}`);
+  }
+
+  /** Standing in the retro — the one place holding the whole picture, so
+   *  the one place that may park a note or carry it (engine/inbox.ts). */
+  inRetro(): boolean {
+    return this.active().some((id) => id === "retro" || id.endsWith("/retro"));
+  }
+
+  /** The machine standing behind a qualified prefix ("" is main). A prefix
+   *  segment is a SUBMACHINE's id, which is also its state's id in every
+   *  machine drawn so far; a mismatch resolves to nothing and the route
+   *  reports no path rather than a wrong one. */
+  private declForPrefix(prefix: string): MachineDecl | undefined {
+    if (prefix === "") return this.machine;
+    let decl = this.machine;
+    let gen: GeneratedMachine | undefined;
+    for (const seg of prefix.split("/")) {
+      const st = decl.states.find((s) => s.id === seg);
+      if (st?.submachine === undefined) return undefined;
+      const g = gen?.subGen?.[seg]?.() ?? this.genFor(seg);
+      if (g !== undefined) {
+        decl = g.decl;
+        gen = g;
+        continue;
+      }
+      try {
+        decl = compileMachineCached(this.root, resolveRef(this.root, mainMachinePath(this.root), st.submachine));
+      } catch {
+        return undefined;
+      }
+      gen = undefined;
+    }
+    return decl;
+  }
+
+  private static qual(prefix: string, id: string): string {
+    return prefix === "" ? id : `${prefix}/${id}`;
+  }
+
+  /** One node of the flattened walk graph, for the route's search. Two
+   *  moves are not drawn anywhere and have to be modelled here:
+   *  - entering a state that CARRIES a submachine lands on that machine's
+   *    own start, not on the state;
+   *  - reaching a submachine's END and advancing pops back out and follows
+   *    the parent state's edges. One tick, two moves. */
+  private expandNode(q: string): RouteNode | undefined {
+    const cut = q.lastIndexOf("/");
+    const prefix = cut < 0 ? "" : q.slice(0, cut);
+    const id = cut < 0 ? q : q.slice(cut + 1);
+    const decl = this.declForPrefix(prefix);
+    const st = decl?.states.find((s) => s.id === id);
+    if (decl === undefined || st === undefined) return undefined;
+    const nexts: RouteNode["nexts"] = [];
+    for (const e of st.edges) {
+      const t = decl.states.find((s) => s.id === e.to);
+      if (t === undefined) continue;
+      const landed = Session.qual(prefix, t.id);
+      if (t.submachine !== undefined) {
+        const inner = this.declForPrefix(landed);
+        if (inner !== undefined) {
+          nexts.push({ to: Session.qual(landed, inner.initial), tick: { from: q, to: e.to } });
+          continue;
+        }
+      }
+      nexts.push({ to: landed, tick: { from: q, to: e.to } });
+    }
+    if (st.kind === "end" && prefix !== "") {
+      const pcut = prefix.lastIndexOf("/");
+      const pprefix = pcut < 0 ? "" : prefix.slice(0, pcut);
+      const pid = pcut < 0 ? prefix : prefix.slice(pcut + 1);
+      const pst = this.declForPrefix(pprefix)?.states.find((s) => s.id === pid);
+      for (const e of pst?.edges ?? []) nexts.push({ to: Session.qual(pprefix, e.to), tick: { from: q, advance: true } });
+    }
+    return { priority: st.priority, demands: { ...(st.entry ?? {}) }, exit_demands: { ...(st.exit ?? {}) }, nexts };
+  }
+
+  get target(): string {
+    return this._target;
+  }
+
+  /** A one-shot target clears itself the moment the walk stands on it. */
+  /** ARRIVAL IS A COMPARISON, NEVER A SEARCH. This once asked route() whether
+   *  the way here was empty, and route() expands the drawing — which for a
+   *  generated container means WRITING it, against the project root, on every
+   *  packet the engine builds. A bound worktree then walked a container that
+   *  was being regenerated underneath it. Reading where you stand must never
+   *  change where you stand. */
+  private clearTargetIfArrived(): void {
+    if (this._target === "") return;
+    const here = this.active()[0];
+    if (here === undefined) return;
+    // A submachine is aimed at by its container name; route() lands on its
+    // start, so arrival compares against the same normalised id.
+    const decl = this.machine.states.find((s) => s.id === this._target);
+    const aim = decl?.submachine !== undefined ? `${this._target}/start` : this._target;
+    if (here === aim) this._target = "";
+  }
+
+  /** Aim the walk somewhere else. Setting a target moves nothing — it says
+   *  where the way is drawn to. An unreachable one is refused rather than
+   *  stored, so the blue line never points at nowhere.
+   *
+   *  Passing an empty string clears the target explicitly. */
+  setTarget(to: string): Record<string, unknown> {
+    const wanted = to.trim();
+    if (wanted === "") {
+      this._target = "";
+      return { ...this.route(this.active()[0] ?? this.machine.initial), target: this._target };
+    }
+    const r = this.route(wanted);
+    if (!r.found && wanted !== this.active()[0]) {
+      throw new Rejection({
+        clause: CLAUSES.NOT_LEGAL_IN_STATE,
+        expected: "a state the drawing can reach from here",
+        got: `${wanted} — ${r.note ?? "no path"}`,
+        remedy: { tool: "se_tick", args: { route: "front_desk" }, note: "peek a route before aiming at it; the drawn edges are the only ways" },
+        source: "engine/session.ts target",
+      });
+    }
+    this._target = wanted;
+    this.clearTargetIfArrived();
+    // The reader's OWN name wins the report. route() answers with the
+    // normalised aim so the render can place the dot, and spreading it last
+    // would hand "expeditions/start" back to someone who said "expeditions".
+    return { ...r, target: this._target };
+  }
+
+  /** Conditions no agent can discharge alone. A script it can run; a read
+   *  it can prove. A form wants a person's confirmation, by design. */
+  private static readonly PERSON_CONDITIONS: ReadonlySet<string> = new Set(["evidence_form"]);
+
+  /** THE BLUE LINE. Where the walk stands, where it is headed, and every
+   *  hop between — with what each will ask for. It MOVES NOTHING.
+   *
+   *  EVERY JUDGMENT IS COLLECTED UP FRONT (owner ruling 2026-07-29). Not
+   *  just the first blocker: the whole list, so a person can answer all of
+   *  them in one sitting and then leave the walk to run alone. Stopping at
+   *  each one in turn is how a five-minute errand becomes an afternoon of
+   *  being asked one question at a time. */
+  route(target: string): RouteResult & {
+    from: string;
+    autonomy: number;
+    judgments: { at: string; needs: string; why: string }[];
+    reads: string[];
+    stops_at?: { at: string; why: string };
+  } {
+    const from = this.active()[0] ?? this.machine.initial;
+    // A SUBMACHINE IS NAMED BY ITS CONTAINER, but the search graph never holds
+    // that name: expandNode replaces the container with its inner states. So
+    // aiming at "expeditions" found no path to a state the reader had just
+    // walked into, which made the target useless for half the drawing (found
+    // live 2026-07-29, the moment the mirror got a key for setting it).
+    // Aim at its start. The render maps that back to the container node, so
+    // the destination dot still lands exactly where the reader pointed.
+    const decl = this.machine.states.find((s) => s.id === target);
+    const aim = decl?.submachine !== undefined ? `${target}/start` : target;
+    const r = computeRoute(from, aim, (q) => this.expandNode(q));
+    const judgments: { at: string; needs: string; why: string }[] = [];
+    for (const s of r.steps) {
+      // The slider is weighed HOP BY HOP. A route that walks past a state
+      // the agent may not enter is a hole straight through contract rule 3.
+      if (s.priority > this._autonomy) {
+        judgments.push({
+          at: s.to,
+          needs: "the slider, or the person's own hand",
+          why: `entering ${s.to} weighs ${s.priority}, above the session autonomy ${this._autonomy}`,
+        });
+      }
+      for (const key of Object.keys(s.demands)) {
+        if (!Session.PERSON_CONDITIONS.has(key)) continue;
+        judgments.push({ at: s.to, needs: key, why: `${s.to} asks for ${key}: ${(s.demands[key] ?? []).join(", ")}` });
+      }
+    }
+    // EVERY DOCUMENT THE WHOLE WAY DEMANDS, gathered once. This is what
+    // makes a sweep one call rather than one per hop: read this list, hash
+    // it, and hand the lot over. A route is also PULLED guidance, which the
+    // entry conditions never name, so both are collected.
+    const reads = new Set<string>();
+    for (const s of r.steps) {
+      for (const p of s.demands.read ?? []) reads.add(p);
+      const cut = s.to.lastIndexOf("/");
+      const decl = this.declForPrefix(cut < 0 ? "" : s.to.slice(0, cut));
+      const st = decl?.states.find((x) => x.id === (cut < 0 ? s.to : s.to.slice(cut + 1)));
+      if (decl !== undefined && st !== undefined) for (const d of this.pulled(decl, st)) reads.add(d.path);
+    }
+    return {
+      ...r,
+      from,
+      autonomy: this._autonomy,
+      judgments,
+      reads: [...reads].sort(),
+      ...(judgments.length > 0 ? { stops_at: { at: judgments[0].at, why: judgments[0].why } } : {}),
+    };
+  }
+
+  /** THE SWEEP — the route, walked. It collapses ROUND TRIPS and nothing
+   *  else: every hop still enters its state, still weighs the slider, still
+   *  proves its reads, still runs its scripts, still writes its own line to
+   *  the feed. The first hop that will not pass stops it, and says so.
+   *
+   *  THE ROUTE IS RECOMPUTED AFTER EVERY HOP, which is the detour: if the
+   *  ground moved, the way is worked out again FROM WHERE THE WALK NOW
+   *  STANDS rather than followed off a cliff. */
+  async sweep(target: string, channel: Channel, readHashes: Record<string, string>): Promise<Record<string, unknown>> {
+    const walked: string[] = [];
+    for (let guard = 0; guard < 64; guard++) {
+      const r = this.route(target);
+      if (r.steps.length === 0) {
+        return { ...this.tickInfo(), swept: walked, arrived: r.found, ...(r.found ? {} : { note: r.note }) };
+      }
+      const step = r.steps[0];
+      try {
+        await this.tickAdvance(step.tick.to === undefined ? undefined : String(step.tick.to), channel, readHashes);
+      } catch (e) {
+        if (!(e instanceof Rejection)) throw e;
+        return {
+          ...this.tickInfo(),
+          swept: walked,
+          arrived: false,
+          stopped_at: step.to,
+          refusal: e.toJSON(),
+          note: `swept ${walked.length} hop(s), then ${step.to} refused — answer it and sweep again; the route recomputes from here`,
+        };
+      }
+      walked.push(step.to);
+    }
+    return { ...this.tickInfo(), swept: walked, arrived: false, note: "64 hops without arriving — the sweep stops rather than looping" };
   }
 
   /** Where the walk is, machine-wise: ["main"] or ["main", "boot", …]. */
@@ -650,9 +1198,11 @@ export class Session {
    *  spares a re-read. */
   conditionKeyMet(m: MachineDecl, s: StateDecl, key: string, which: "enter" | "leave"): boolean {
     if (key === "read") {
-      const authored = (which === "leave" ? s.exit : s.entry)?.read ?? [];
-      const docs = which === "leave" ? [...authored, ...this.handoverDemand(m, s)] : authored;
+      const docs = (which === "leave" ? s.exit : s.entry)?.read ?? [];
       return docs.every((p) => this.readProven("human", p, {}) || this.agentProven(p));
+    }
+    if (key === "read_consume") {
+      return this.consumeDemand(s).every((p) => this.readProven("human", p, {}) || this.agentProven(p));
     }
     if (key === "evidence_form") {
       const names = (which === "leave" ? s.exit : s.entry)?.evidence_form ?? [];
@@ -831,11 +1381,29 @@ export class Session {
     return new Promise((resolve) => {
       const child = spawn("node", [abs, "--root", this.root], { cwd: this.root });
       let out = "";
-      child.stdout.on("data", (d: Buffer) => { out += d; });
+      let pending = "";
+      // A SCRIPT REPORTS ITS OWN PROGRESS on stdout, as
+      //   ##progress <done> <total> <label>
+      // The lines drive the mirror's bar and never reach the evidence: the
+      // reader wants the verdict, not the ticker. A script that says
+      // nothing still works — the bar just falls back to indeterminate.
+      const eat = (chunk: string): string => {
+        pending += chunk;
+        const lines = pending.split(/\r?\n/);
+        pending = lines.pop() ?? "";
+        const keep: string[] = [];
+        for (const l of lines) {
+          const m = /^##progress\s+(\d+)\s+(\d+)\s*(.*)$/.exec(l);
+          if (m === null) { keep.push(l); continue; }
+          this.setProgress(Number(m[1]), Number(m[2]), (m[3] ?? "").trim());
+        }
+        return keep.length === 0 ? "" : `${keep.join("\n")}\n`;
+      };
+      child.stdout.on("data", (d: Buffer) => { out += eat(String(d)); });
       child.stderr.on("data", (d: Buffer) => { out += d; });
       const timer = setTimeout(() => child.kill(), 120_000);
-      child.on("error", (e) => { clearTimeout(timer); resolve({ status: null, out: String(e) }); });
-      child.on("close", (code) => { clearTimeout(timer); resolve({ status: code, out }); });
+      child.on("error", (e) => { clearTimeout(timer); this.clearProgress(); resolve({ status: null, out: String(e) }); });
+      child.on("close", (code) => { clearTimeout(timer); this.clearProgress(); resolve({ status: code, out: out + pending }); });
     });
   }
 
@@ -889,6 +1457,27 @@ export class Session {
     return this.scriptRuns.size > 0;
   }
 
+  /** THE WAIT BAR MEASURES SOMETHING (owner ruling, 2026-07-30). A running
+   *  script reports its own steps; indeterminate is the FALLBACK, for work
+   *  that genuinely cannot count itself, never the default. */
+  private progressAt: { done: number; total: number; label: string } | undefined;
+
+  private setProgress(done: number, total: number, label: string): void {
+    if (total <= 0) return;
+    this.progressAt = { done, total, label };
+    this.notifyChange();
+  }
+
+  private clearProgress(): void {
+    if (this.progressAt === undefined) return;
+    this.progressAt = undefined;
+    this.notifyChange();
+  }
+
+  progress(): { done: number; total: number; label: string } | undefined {
+    return this.progressAt;
+  }
+
   scriptStatus(m: MachineDecl, s: StateDecl): { ran: boolean; ok: boolean; output: string; running: boolean } {
     const r = this.evidence.get(this.evidenceKey(m, s.id))?.script_result as { ok?: boolean; output?: string } | undefined;
     return {
@@ -912,7 +1501,7 @@ export class Session {
     if (dict === undefined) return undefined;
     const out: Record<string, { args: string[]; met: boolean; note: string }> = {};
     for (const [k, args] of Object.entries(dict)) {
-      const shown = k === "read" && which === "leave" ? [...args, ...this.handoverDemand(m, s)] : args;
+      const shown = k === "read_consume" ? this.consumeDemand(s) : args;
       out[k] = { args: shown, met: this.conditionKeyMet(m, s, k, which), note: conditionNotePath(k) };
     }
     return out;
@@ -936,16 +1525,79 @@ export class Session {
    *  the condition status (the mirror's pill) only; never the gate, and
    *  never the checkboxes (those stay the human's alone). */
   private readonly agentReads = new Map<string, Set<string>>();
+  /** Session-local read buffer: latest lane hash per path, auto-filled by
+   *  se_file_read and re-used for later ticks unless stale. */
+  private readonly readBuffer = new Map<string, string>();
+
+  rememberRead(path: string, hash: string, ref?: string): void {
+    if (ref !== undefined || path.trim() === "" || hash.trim() === "" || path.startsWith("@")) return;
+    const lane = this.diskHash(path);
+    if (lane !== "" && lane === hash) this.readBuffer.set(path, hash);
+  }
+
+  clearReadBuffer(): void {
+    this.readBuffer.clear();
+  }
+
+  private readProofs(channel: Channel, supplied: Record<string, string>): Record<string, string> {
+    if (channel !== "agent") return supplied;
+    const merged: Record<string, string> = {};
+    for (const [p, h] of this.readBuffer.entries()) merged[p] = h;
+    for (const [p, h] of Object.entries(supplied)) {
+      if (typeof h === "string" && h !== "") merged[p] = h;
+    }
+    for (const [p, h] of Object.entries(merged)) {
+      const lane = this.diskHash(p);
+      if (lane !== "" && h === lane) {
+        this.readBuffer.set(p, h);
+      } else {
+        delete merged[p];
+        this.readBuffer.delete(p);
+      }
+    }
+    return merged;
+  }
 
   private agentProven(path: string): boolean {
     const hash = this.diskHash(path);
     return hash !== "" && (this.agentReads.get(path)?.has(hash) ?? false);
   }
 
+  // THE PROOF HASHES THE DOC THE LANE SERVED (owner ruling 2026-07-28).
+  //
+  // It used to hash the PROJECT ROOT while se_file_read served the bound
+  // worktree. Two consequences, and the second is the serious one:
+  //
+  //  - Editing a pulled guidance doc inside an expedition made every later
+  //    tick refuse, because the hash you could honestly produce was never the
+  //    hash the engine wanted. Guidance could not ride a branch, though it
+  //    merges exactly like code.
+  //  - Worse, when the two trees differed the gate PASSED on the root's hash
+  //    for a document the lane never showed you. A proof you can satisfy with
+  //    a document you were never given is not a proof. Seen live in e19: a
+  //    whole expedition attested to a voice.md it had not read.
+  //
+  // Guidance is not special. It is branch content like any other file; only
+  // the read-proof ever made it look otherwise.
+  //
+  // The two trees agree whenever trunk is clean — a worktree branches from the
+  // last commit — and the close now commits the root's strays to keep it that
+  // way. Where they genuinely differ, the doc HAS changed, and a stale check
+  // being re-asked is the rule working: one check per version.
   private diskHash(rel: string): string {
     try {
-      const abs = resolveInRoot(this.root, rel, "engine/session.ts reads");
+      const abs = resolveInRoot(this.laneRoot(rel), rel, "engine/session.ts reads");
       return contentHash(readFileSync(abs));
+    } catch {
+      return "";
+    }
+  }
+
+  /** The copy the MIRROR serves — always the project root, because that is
+   *  where the human's checkboxes are made, bound expedition or not. */
+  private rootDiskHash(rel: string): string {
+    try {
+      return contentHash(readFileSync(resolveInRoot(this.root, rel, "engine/session.ts reads")));
     } catch {
       return "";
     }
@@ -978,17 +1630,30 @@ export class Session {
    *  reading list. Checks of edited (stale) versions drop out. */
   humanCheckedPaths(): string[] {
     return [...this.humanChecks.entries()]
-      .filter(([p, set]) => set.has(this.diskHash(p)))
+      .filter(([p, set]) => set.has(this.diskHash(p)) || set.has(this.rootDiskHash(p)))
       .map(([p]) => p)
       .sort();
   }
 
-  /** One doc, one channel, one verdict. The agent's supplied hash must
-   *  match the doc AS IT STANDS — a stale token proves a stale read. */
+  /** One doc, one channel, one verdict.
+   *
+   *  EACH HAND PROVES THE COPY IT WAS SHOWN (owner ruling 2026-07-28).
+   *  The agent reads through the LANE, which serves the bound worktree, so
+   *  its supplied hash must match that copy exactly — a stale token proves a
+   *  stale read, and a hash from a tree it was never shown proves nothing.
+   *
+   *  The human checks in the MIRROR, which serves the project root. Their
+   *  checkbox counts against either copy. On Windows the two differ by line
+   *  endings alone after a checkout (core.autocrlf), so demanding the lane's
+   *  hash from a checkbox would void every check the moment an expedition
+   *  binds — a false invalidation that teaches people to ignore the gate. */
   private readProven(channel: Channel, path: string, supplied: Record<string, string>): boolean {
-    const hash = this.diskHash(path);
-    if (hash === "") return false;
-    return channel === "agent" ? supplied[path] === hash : this.humanChecked(path, hash);
+    const lane = this.diskHash(path);
+    if (channel === "agent") return lane !== "" && supplied[path] === lane;
+    const set = this.humanChecks.get(path);
+    if (set === undefined) return false;
+    const root = this.rootDiskHash(path);
+    return (lane !== "" && set.has(lane)) || (root !== "" && set.has(root));
   }
 
   /** Boot is exempt from the pull gate — it is where the first reads
@@ -1000,18 +1665,69 @@ export class Session {
     return false;
   }
 
-  /** THE HANDOVER is a BOOT EXIT rule (owner ruling 2026-07-27): a
-   *  left-behind .se/HANDOVER.md joins read_contract's read list — read,
-   *  and checkable in the mirror, where the session's first reads happen.
-   *  Absent, nothing is demanded. */
-  private handoverDemand(m: MachineDecl, s: StateDecl): string[] {
-    if (m.id !== "boot" || s.id !== "read_contract") return [];
-    return existsSync(join(seDir(this.root), "HANDOVER.md")) ? [".se/HANDOVER.md"] : [];
+  /** THE CONSUME LIST (condition read_consume) — documents the state reads
+   *  and then DESTROYS. A listed path that is not there demands nothing, so
+   *  a state may name a document that is only sometimes present; the
+   *  session handover is exactly that.
+   *
+   *  This used to be a hardcoded boot rule. It is a declaration now, so the
+   *  drawing says what happens rather than the engine knowing a state by
+   *  name (owner ruling 2026-07-31). */
+  private consumeDemand(s: StateDecl): string[] {
+    return (s.exit?.read_consume ?? []).filter((rel) => existsSync(this.consumeAbs(rel)));
   }
 
-  /** What entering `t` demands proven: its entry read list plus its pull —
-   *  minus its own exit read list (that is the state's assignment, read
-   *  INSIDE it, not before). */
+  private consumeAbs(rel: string): string {
+    return join(this.laneRoot(rel), rel);
+  }
+
+  private handoverPath(): string {
+    return join(seDir(this.root), "HANDOVER.md");
+  }
+
+  /** Leaving the state destroys what it consumed. A briefing that cannot
+   *  survive its own reading cannot go stale and cannot be believed twice. */
+  private consumeDocs(s: StateDecl): void {
+    for (const rel of this.consumeDemand(s)) unlinkSync(this.consumeAbs(rel));
+  }
+
+  /** The other half of the same law: the way OUT writes the next one.
+   *  Demanded mechanically, because the duty was prose before and prose is
+   *  what kept being skipped. Written BEFORE this session started is a
+   *  leftover, not a handover, so the clock decides — not the file's
+   *  existence. */
+  private assertHandoverWritten(channel: Channel): void {
+    const p = this.handoverPath();
+    const writtenMs = existsSync(p) ? statSync(p).mtimeMs : -1;
+    if (writtenMs >= Date.parse(this.startedTs)) return;
+    throw new Rejection({
+      clause: CLAUSES.CONDITION_UNMET,
+      expected: "a handover written THIS session — ending the session writes .se/HANDOVER.md for the next one",
+      got: writtenMs < 0 ? "no .se/HANDOVER.md" : "a .se/HANDOVER.md left over from before this session started",
+      remedy: {
+        tool: "se_file_write",
+        args: { path: ".se/HANDOVER.md", base_hash: null, content: "# Handover — <date>\n\n<what the next session must know>\n" },
+        note: "write what the NEXT session cannot get from the repo or the records. It is read once and destroyed at their boot, so nothing here can go stale — but nothing here survives either. Anything durable belongs in guidance, a note or a record.",
+      },
+      source: "engine/session.ts handover",
+    });
+  }
+
+  /** ONE READING LIST (owner ruling 2026-07-31). A document a state NAMES
+   *  and a document a tag BINDS to it are not two kinds of thing: both are
+   *  read, both are proven by the same hash or the same checkbox, both are
+   *  refused the same way. Only the PROVENANCE differs, and that rides in
+   *  each document's `sources`.
+   *
+   *  What genuinely differs is WHEN, so that is the only axis left here. */
+  private reading(m: MachineDecl, s: StateDecl, which: "enter" | "leave"): string[] {
+    if (which === "leave") return [...(s.exit?.read ?? []), ...this.consumeDemand(s)];
+    return this.entryRequirements(m, s);
+  }
+
+  /** The enter half: the state's own entry list plus everything bound to it —
+   *  minus its exit list, which is the state's assignment, read INSIDE it
+   *  rather than before it. */
   private entryRequirements(m: MachineDecl, t: StateDecl): string[] {
     const req = new Set<string>(t.entry?.read ?? []);
     if (!this.pullGateExempt(m, t)) {
@@ -1019,6 +1735,29 @@ export class Session {
     }
     for (const p of t.exit?.read ?? []) req.delete(p);
     return [...req];
+  }
+
+  private bufferedCurrent(path: string): boolean {
+    const lane = this.diskHash(path);
+    return lane !== "" && this.readBuffer.get(path) === lane;
+  }
+
+  /** One neighbor state's entry requirements, minus docs already present in
+   *  the current read buffer at their latest hash. */
+  private unreadEntryRequirements(m: MachineDecl, t: StateDecl): string[] {
+    return this.entryRequirements(m, t).filter((p) => !this.bufferedCurrent(p)).sort();
+  }
+
+  /** The docs worth pre-reading from HERE: every immediate neighbor state's
+   *  unread entry requirements, deduplicated and sorted for stable packets. */
+  private lookaheadRequirements(m: MachineDecl, from: StateDecl): string[] {
+    const req = new Set<string>();
+    for (const e of from.edges) {
+      const t = m.states.find((s) => s.id === e.to);
+      if (t === undefined) continue;
+      for (const p of this.unreadEntryRequirements(m, t)) req.add(p);
+    }
+    return [...req].sort();
   }
 
   private refuseReads(which: "exit" | "entry", stateId: string, missing: string[], channel: Channel): never {
@@ -1037,13 +1776,13 @@ export class Session {
   /** THE READ GATE, both directions: the current state's exit read list,
    *  and the target's entry requirements (explicit reads + the pull). */
   private assertReads(m: MachineDecl, from: StateDecl, targetIds: string[], channel: Channel, supplied: Record<string, string>): void {
-    const exitReads = [...(from.exit?.read ?? []), ...this.handoverDemand(m, from)];
+    const exitReads = this.reading(m, from, "leave");
     const missingExit = exitReads.filter((p) => !this.readProven(channel, p, supplied));
     if (missingExit.length > 0) this.refuseReads("exit", from.id, missingExit, channel);
     for (const id of targetIds) {
       const t = m.states.find((s) => s.id === id);
       if (t === undefined) continue;
-      const missing = this.entryRequirements(m, t).filter((p) => !this.readProven(channel, p, supplied));
+      const missing = this.reading(m, t, "enter").filter((p) => !this.readProven(channel, p, supplied));
       if (missing.length > 0) this.refuseReads("entry", t.id, missing, channel);
     }
     // THE HANDOVER RULE (owner ruling 2026-07-26): what the human checked
@@ -1113,7 +1852,9 @@ export class Session {
       case "se_exp_close":
         return this.expeditionClose(args.merge !== false && args.merge !== "false");
       case "se_note_drain":
-        return drainNote(seDir(this.root), String(args.ref ?? ""), String(args.disposition ?? ""), args.where === undefined ? undefined : String(args.where));
+        // THE CHANNEL RULE: this is the mirror, so it is the person's own
+        // hand. Every disposition stands, wherever the walk happens to be.
+        return drainNote(seDir(this.root), String(args.ref ?? ""), String(args.disposition ?? ""), args.where === undefined ? undefined : String(args.where), true);
       case "se_reload":
         return this.requestReload();
       default:
@@ -1135,11 +1876,11 @@ export class Session {
       const hash = d.hash !== "" ? d.hash : this.diskHash(d.path);
       return { ...d, hash, checked: this.humanChecked(d.path, hash) };
     });
-    // THE HANDOVER rides boot's reading room — leaving read_contract
-    // demands it like the authored list; its checkbox lives here too.
-    for (const rel of this.handoverDemand(m, s)) {
+    // A CONSUMED document rides the reading room like the authored list —
+    // it is demanded the same way and its checkbox lives here too.
+    for (const rel of this.consumeDemand(s)) {
       const hash = this.diskHash(rel);
-      out.push({ path: rel, sources: ["handover"], hash, checked: this.humanChecked(rel, hash) });
+      out.push({ path: rel, sources: ["consume"], hash, checked: this.humanChecked(rel, hash) });
     }
     return out;
   }
@@ -1228,16 +1969,19 @@ export class Session {
   private async assertConditions(m: MachineDecl, from: StateDecl, to: string | undefined, channel: Channel, supplied: Record<string, string>): Promise<void> {
     if (from.exit?.script !== undefined) await this.scriptRun(from.id); // a tick attempt runs the script
     for (const [key, args] of Object.entries(from.exit ?? {})) {
-      if (key === "read") continue; // read is channel-proven below, not evidence
+      if (key === "read" || key === "read_consume") continue; // channel-proven below, not evidence
       if (!this.conditionKeyMet(m, from, key, "leave")) this.refuseCondition(m, from, "exit", key, args);
     }
     const targetId = to ?? (from.edges.length === 1 ? from.edges[0].to : undefined);
     this.assertReads(m, from, targetId === undefined ? [] : [targetId], channel, supplied);
+    // Leaving through the main machine's end is where the next handover is
+    // owed. Sub-machines have their own end and owe nothing.
+    if (m.id === this.machine.id && targetId === "end") this.assertHandoverWritten(channel);
     if (targetId === undefined) return;
     const target = m.states.find((s) => s.id === targetId);
     if (target === undefined) return;
     for (const [key, args] of Object.entries(target.entry ?? {})) {
-      if (key === "read") continue;
+      if (key === "read" || key === "read_consume") continue;
       if (!this.conditionKeyMet(m, target, key, "enter")) this.refuseCondition(m, target, "entry", key, args);
     }
   }
@@ -1255,13 +1999,16 @@ export class Session {
         statement: s.statement,
         guidance: s.guidance,
         priority: s.priority,
-        legal_tools: s.kind === "start" || s.kind === "end" ? [...MACHINERY] : (s.legal_tools ?? []),
+        legal_tools: s.kind === "start" || s.kind === "end" || s.kind === "join" ? [...MACHINERY] : (s.legal_tools ?? []),
         ...(s.entry !== undefined ? { entry: this.conditionStatus(machine, s, "enter") } : {}),
         ...(s.exit !== undefined ? { exit: this.conditionStatus(machine, s, "leave") } : {}),
         exit_met: this.conditionMet(machine, s, "leave"),
         // The agent's packet names the pulled docs but NEVER their hashes —
         // the hash is the proof-of-read, obtainable only via se_file_read.
         pulled: this.pulled(machine, s).map((p) => ({ path: p.path, sources: p.sources })),
+        // Pre-read map from where you stand: every immediate neighbor's
+        // entry requirements, so the head can read once before moving.
+        lookahead_read: this.lookaheadRequirements(machine, s),
         // Enough to CHOOSE among several ways forward: what the target is,
         // not just its name (the agent has no other way to peek).
         next: s.edges.map((e) => {
@@ -1270,13 +2017,15 @@ export class Session {
             to: e.to,
             role: e.role,
             ...(e.guard !== undefined ? { guard: e.guard } : {}),
-            ...(t !== undefined ? { kind: t.kind, statement: t.statement, priority: t.priority } : {}),
+            ...(t !== undefined ? { kind: t.kind, ...(t.statement !== "" ? { statement: t.statement } : {}), priority: t.priority } : {}),
             ...(t?.entry !== undefined ? { entry: this.conditionStatus(machine, t, "enter") } : {}),
+            ...(t !== undefined ? { entry_read: this.unreadEntryRequirements(machine, t) } : {}),
             enter_met: t === undefined ? true : this.conditionMet(machine, t, "enter"),
           };
         }),
       };
     });
+    this.clearTargetIfArrived();
     const { all, tools } = this.legal();
     return {
       machine: this.machine.id,
@@ -1286,6 +2035,9 @@ export class Session {
       status: this.instance.status,
       autonomy: this._autonomy,
       shutdown: this._shutdown,
+      // WHERE THIS IS HEADED. Carried on every packet so neither hand has
+      // to ask, and so a walk that drifts off the way is visibly off it.
+      target: this._target,
       // The session's reading list: what the human checked while driving.
       // Your advances must prove the same docs (paths only — the hashes
       // are earned by reading).
@@ -1302,6 +2054,7 @@ export class Session {
    *  each matching the doc as it stands; the human proves via checkboxes). */
   async tickAdvance(to?: string, channel: Channel = "human", readHashes: Record<string, string> = {}): Promise<Record<string, unknown>> {
     const now = new Date().toISOString();
+    const supplied = this.readProofs(channel, readHashes);
     if (this.instance.status === "closed") {
       throw new Rejection({
         clause: CLAUSES.NOT_LEGAL_IN_STATE,
@@ -1310,6 +2063,15 @@ export class Session {
         remedy: { tool: "se_tick", args: {}, note: "the machine is done; a new session starts at the beginning" },
         source: "engine/session.ts tick",
       });
+    }
+    // Self-heal: a sub refused at entry (broken canvas) stands unseeded on
+    // its parent node — retry the seed first. A healed entry IS this tick's
+    // one visible step.
+    const depthBefore = this.subs.length;
+    this.seedSubs();
+    if (this.subs.length > depthBefore) {
+      this.notifyChange();
+      return this.tickInfo();
     }
     // ONE VISIBLE STEP PER TICK (owner ruling 2026-07-26): you are only
     // ever in one state, and a tick moves exactly one position — including
@@ -1323,8 +2085,8 @@ export class Session {
         const { machine: pm, instance: pi } = this.parentOfTop();
         const parent = this.state(pm, top.parentState);
         this.gatePriority(pm, parent.edges.map((e) => e.to), channel);
-        this.assertReads(pm, parent, parent.edges.map((e) => e.to), channel, readHashes);
-        completeState(pm, pi, top.parentState, "filled", now);
+        this.assertReads(pm, parent, parent.edges.map((e) => e.to), channel, supplied);
+        this.completeGuarded(pm, pi, top.parentState, "filled", now);
         this.subs.pop();
         if (pi !== this.instance) pi.history.push({ state: top.parentState, outcome: "filled", at: now });
         const prefix = this.subs.map((s) => s.decl.id).join("/");
@@ -1337,8 +2099,20 @@ export class Session {
       this.assertEdge(top.decl, cur, to);
       const subTarget = to ?? this.state(top.decl, cur).edges[0]?.to;
       if (subTarget !== undefined) this.gatePriority(top.decl, [subTarget], channel);
-      await this.assertConditions(top.decl, this.state(top.decl, cur), to, channel, readHashes);
-      completeState(top.decl, top.instance, cur, "filled", now, to);
+      await this.assertConditions(top.decl, this.state(top.decl, cur), to, channel, supplied);
+      if (top.decl.id === "iterations" && (this.state(top.decl, cur).tags?.includes("iteration-kickoff") ?? false)) {
+        this.pinKickoff(top.gen?.expByState[cur]);
+      }
+      // NO GATE PASSES WITHOUT A REVIEW REPORT (owner ruling 2026-07-30):
+      // inside a pinned walk, leaving a gate demands its milestone review
+      // report — complete and PASSED. The report is the durable bless: a
+      // re-walk finds it standing and passes quickly.
+      if (this.bound !== undefined && top.decl.id.endsWith("-walk") && this.state(top.decl, cur).kind === "gate") {
+        this.assertGateReport(cur, this.state(top.decl, cur), channel);
+      }
+      this.completeGuarded(top.decl, top.instance, cur, "filled", now, to);
+      // Leaving the state is what destroys what it consumed.
+      this.consumeDocs(this.state(top.decl, cur));
       top.instance.history.push({ state: cur, outcome: "filled", at: now });
       const prefix = this.subs.map((s) => s.decl.id).join("/");
       this.instance.history.push({ state: `${prefix}/${cur}`, outcome: "filled", at: now });
@@ -1350,9 +2124,11 @@ export class Session {
     const cur = activeStates(this.instance)[0];
     this.assertEdge(this.machine, cur, to);
     const target = to ?? this.state(this.machine, cur).edges[0]?.to;
+    if (this.machine.id === "main" && cur === this.machine.initial && target === "boot") this.clearReadBuffer();
     if (target !== undefined) this.gatePriority(this.machine, [target], channel);
-    await this.assertConditions(this.machine, this.state(this.machine, cur), to, channel, readHashes);
-    completeState(this.machine, this.instance, cur, "filled", now, to);
+    await this.assertConditions(this.machine, this.state(this.machine, cur), to, channel, supplied);
+    this.completeGuarded(this.machine, this.instance, cur, "filled", now, to);
+    this.consumeDocs(this.state(this.machine, cur));
     this.instance.history.push({ state: cur, outcome: "filled", at: now });
     this.seedSubs();
     return this.landing();
@@ -1380,11 +2156,12 @@ export class Session {
       statement: s.statement,
       guidance: s.guidance,
       priority: s.priority,
-      legal_tools: s.kind === "start" || s.kind === "end" ? [...MACHINERY] : (s.legal_tools ?? []),
+      legal_tools: s.kind === "start" || s.kind === "end" || s.kind === "join" ? [...MACHINERY] : (s.legal_tools ?? []),
       ...(s.entry !== undefined ? { entry: this.conditionStatus(home, s, "enter") } : {}),
       ...(s.exit !== undefined ? { exit: this.conditionStatus(home, s, "leave") } : {}),
       exit_met: this.conditionMet(home, s, "leave"),
       pulled: this.pulled(home, s).map((p) => ({ path: p.path, sources: p.sources })),
+      lookahead_read: this.lookaheadRequirements(home, s),
       ...(s.submachine !== undefined ? { submachine: s.submachine } : {}),
       next: s.edges.map((e) => {
         const t = home.states.find((st) => st.id === e.to);
@@ -1393,6 +2170,7 @@ export class Session {
           role: e.role,
           ...(e.guard !== undefined ? { guard: e.guard } : {}),
           ...(t !== undefined ? { kind: t.kind, statement: t.statement, priority: t.priority } : {}),
+          ...(t !== undefined ? { entry_read: this.unreadEntryRequirements(home, t) } : {}),
         };
       }),
     };
@@ -1406,6 +2184,7 @@ export class Session {
    *  the read gate applies (jumping back ENTERS the target). */
   jumpBack(target: string, channel: Channel = "human", readHashes: Record<string, string> = {}): Record<string, unknown> {
     const now = new Date().toISOString();
+    const supplied = this.readProofs(channel, readHashes);
     if (this.instance.status === "closed") {
       throw new Rejection({
         clause: CLAUSES.NOT_LEGAL_IN_STATE,
@@ -1438,9 +2217,9 @@ export class Session {
     }
     this.gatePriority(machine, [target], channel);
     const back = this.state(machine, target);
-    const missing = this.entryRequirements(machine, back).filter((p) => !this.readProven(channel, p, readHashes));
+    const missing = this.entryRequirements(machine, back).filter((p) => !this.readProven(channel, p, supplied));
     if (missing.length > 0) this.refuseReads("entry", target, missing, channel);
-    this.assertHandover(channel, readHashes);
+    this.assertHandover(channel, supplied);
     const { cone } = reopenStates(machine, inst, [target], "jump back", now);
     // Invalidate the cone's evidence and checks — including a nested
     // machine's, when a sub-machine state is inside the cone. And supersede
@@ -1499,7 +2278,7 @@ export class Session {
       return {
         ...info,
         booted: true,
-        banner: "🦆 SE v3 booted — main machine @ idle. All work runs through the se lane; every call is logged. se_tick shows where you are.",
+        banner: "🦆 SE v3 booted. Main machine is live. All work runs through the se lane; every call is logged. se_tick shows where you are.",
         display: "Show the banner above to the user VERBATIM as your first output, then proceed with their request.",
       };
     }
@@ -1542,7 +2321,24 @@ export class Session {
     // are stubs (owner design 2026-07-27). A generated machine's own sub
     // states (archive decades) come from its parent's subGen.
     const gen = this.top()?.gen?.subGen?.[subState.id]?.() ?? this.genFor(subState.id);
-    const decl = gen !== undefined ? gen.decl : compileMachine(this.root, resolveRef(this.root, mainMachinePath(this.root), subState.submachine!));
+    let decl: MachineDecl;
+    if (gen !== undefined) {
+      decl = gen.decl;
+    } else {
+      try {
+        decl = compileMachineCached(this.root, resolveRef(this.root, mainMachinePath(this.root), subState.submachine!));
+      } catch (e) {
+        // A broken drawing refuses TYPED and the engine survives; the next
+        // tick retries the seed once the canvas is fixed.
+        throw new Rejection({
+          clause: CLAUSES.CANVAS_BROKEN,
+          expected: `${subState.id}'s canvas compiles`,
+          got: String((e as Error).message),
+          remedy: { tool: "se_tick", args: { advance: true }, note: "fix the drawing in Obsidian, then tick again — entering retries; back or escape also work" },
+          source: "engine/session.ts seed",
+        });
+      }
+    }
     // RE-ENTRY RESETS (owner ruling 2026-07-27): a machine left through its
     // end starts over — evidence from the previous pass is cleared; the old
     // walk stays in the main record, the new walk earns its own.

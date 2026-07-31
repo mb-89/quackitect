@@ -56,7 +56,10 @@ test("stateTodos: origins ride the nodes and parked defers show without material
   const a = d.stateTodos("a");
   assert.equal(a.visits.length, 1);
   assert.equal(a.visits[0].nodes.find((n) => n.id === "d2")?.origin, "planned");
-  d.apply("b@0", parseUpdate({ op: "update", brief: "arrived" }));
+  // Entering b materializes the parked defer as an open to-do, so the
+  // update names it. An update floating free of the checklist it should be
+  // moving is exactly what the node requirement exists to stop.
+  d.apply("b@0", parseUpdate({ op: "update", node: "d3", brief: "arrived" }));
   const after = d.stateTodos("b");
   assert.equal(after.parked.length, 0);
   assert.ok(after.visits.some((v) => v.nodes.some((n) => n.origin === "deferred")), "the arrived point knows it was deferred");
@@ -128,23 +131,117 @@ test("the front desk and ideation stand as idle doors with their drawn shapes", 
   assert.ok(idle.edges.some((e) => e.to === "ideation"), "idle reaches ideation");
   const fd = m.states.find((s) => s.id === "front_desk")!;
   assert.equal(fd.priority, 0.2);
-  assert.match(fd.statement, /in doubt, go here/i, "the door carries its subtitle");
+  assert.equal(fd.submachine, undefined, "the one-state rule: the desk is a plain state");
+  assert.match(fd.statement, /in doubt, go here/i, "the statement IS the subtitle");
+  assert.ok((fd.tags ?? []).includes("front-desk"), "the method doc pulls by this tag");
+  const retro = m.states.find((s) => s.id === "retro")!;
+  assert.equal(retro.submachine, undefined, "the retro converted under the same rule");
+  assert.ok((retro.legal_tools ?? []).includes("se_note_drain"), "the legality zone rides legal_tools");
   const idea = m.states.find((s) => s.id === "ideation")!;
   assert.equal(idea.priority, 1, "the ideation door sits at the slider's top notch");
-  const fdM = compileMachine(root, join(root, "product", "deliverable", "machines", "front_desk.canvas"));
-  assert.deepEqual(fdM.states.map((s) => s.id), ["start", "consult", "end"]);
+  assert.equal(idea.statement, "Diverge on purpose.", "authored door statement rides up");
+  const idle2 = m.states.find((s) => s.id === "idle")!;
+  assert.equal(idle2.statement, "", "filler statements are struck - empty beats an echo");
   const ideaM = compileMachine(root, join(root, "product", "deliverable", "machines", "ideation.canvas"));
   assert.deepEqual(ideaM.states.map((s) => s.id), ["start", "frame", "diverge", "converge", "route", "end"]);
 });
 
-test("settings survive an engine life: a new session restores the store", () => {
+// SETTINGS BELONG TO A SESSION (owner rulings 2026-07-28). A RELOAD is the
+// same session and keeps the sliders; a session that ended and started again
+// is a new one and takes the defaults. The shim stamps each engine life with
+// the session's token, and matching it is what tells the two apart.
+test("settings survive a RELOAD: the same session restores the store", () => {
   const root = freshRoot();
-  const a = new Session(root);
-  a.setAutonomy(0.85);
-  a.setShutdown(3);
-  const b = new Session(root);
-  assert.equal(b.autonomy, 0.85);
-  assert.equal(b.shutdown, 3);
+  const was = process.env.SE_SESSION;
+  process.env.SE_SESSION = "session-under-test";
+  try {
+    const a = new Session(root);
+    a.setAutonomy(0.85);
+    a.setShutdown(3);
+    // A reload is a new engine life inside the SAME session.
+    const b = new Session(root);
+    assert.equal(b.autonomy, 0.85);
+    assert.equal(b.shutdown, 3);
+  } finally {
+    if (was === undefined) delete process.env.SE_SESSION; else process.env.SE_SESSION = was;
+  }
+});
+
+test("settings do NOT survive the session: a fresh start takes the defaults", () => {
+  const root = freshRoot();
+  const was = process.env.SE_SESSION;
+  try {
+    process.env.SE_SESSION = "the-session-that-ended";
+    const a = new Session(root);
+    a.setAutonomy(0.85);
+    a.setShutdown(3);
+    // A new session mints a new token, so last session's store does not apply.
+    process.env.SE_SESSION = "a-brand-new-session";
+    const b = new Session(root);
+    assert.equal(b.autonomy, 0.4, "autonomy is back to its default");
+    assert.equal(b.shutdown, 1, "shutdown is back to its default");
+    // It fails SAFE: no token at all restores nothing either, so a crash or a
+    // power cut cannot leave the last session's sliders standing.
+    delete process.env.SE_SESSION;
+    const c = new Session(root);
+    assert.equal(c.autonomy, 0.4);
+    assert.equal(c.shutdown, 1);
+  } finally {
+    if (was === undefined) delete process.env.SE_SESSION; else process.env.SE_SESSION = was;
+  }
+});
+
+test("the voice lint: walls, sentences, chains and the pyramid - thresholds are data", async () => {
+  const { lintProse } = await import("../engine/lint.ts");
+  const { writeFileSync } = await import("node:fs");
+  const root = freshRoot();
+  const wall = Array.from({ length: 9 }, (_, i) => `plain prose line number ${i} of the wall`).join("\n");
+  assert.ok(lintProse(root, wall).some((f) => f.rule === "wall"), "nine unbroken lines are a wall");
+  assert.ok(lintProse(root, `${"word ".repeat(30)}end.`).some((f) => f.rule === "long-sentence"));
+  assert.ok(lintProse(root, "we need alpha, beta, gamma, delta and epsilon.").some((f) => f.rule === "comma-chain"));
+  // DASH CHAINS, not dashes. One dash sets off an aside and is house style
+  // here; flagging every one would be an advisory nobody heeds.
+  assert.ok(lintProse(root, "we need alpha — then beta — then gamma — then delta.").some((f) => f.rule === "dash-chain"));
+  assert.ok(!lintProse(root, "we need alpha — the obvious one — before anything else.").some((f) => f.rule === "dash-chain"), "a single aside is not a chain");
+  const five = Array.from({ length: 5 }, (_, i) => `paragraph ${i}.`).join("\n\n");
+  assert.ok(lintProse(root, five).some((f) => f.rule === "pyramid"), "five headingless paragraphs want the pyramid");
+  assert.equal(lintProse(root, "# Heading\n\nshort and clean.").length, 0, "clean prose passes");
+  // DATA, not code: raise the threshold in the config - the wall passes.
+  writeFileSync(join(root, "product", "deliverable", "machines", "lint", "voice-lint.md"), "---\nwall_paragraph_lines: 99\n---\n", "utf8");
+  assert.ok(!lintProse(root, wall).some((f) => f.rule === "wall"), "the edited threshold applies without a rebuild");
+});
+
+// THE SWEEP. Linting one file per call is why nothing was ever linted: the
+// tool could only be aimed at prose somebody already suspected.
+test("the voice lint sweeps a whole tree and reports what it left out", async () => {
+  const root = freshRoot();
+  const server = await bootedServer(root);
+  const { writeFileSync, mkdirSync } = await import("node:fs");
+  const dir = join(root, "product", "guidance", "sweeptest");
+  mkdirSync(dir, { recursive: true });
+  writeFileSync(join(dir, "dirty.md"), "we need alpha, beta, gamma, delta and epsilon.\n", "utf8");
+  writeFileSync(join(dir, "clean.md"), "# Heading\n\nshort and clean.\n", "utf8");
+  writeFileSync(join(dir, "notprose.txt"), "never read by a prose lint\n", "utf8");
+  // A STATE NOTE keeps its prose in the FRONTMATTER, where lintProse never
+  // looked - and `guidance` is read by an agent on every single visit.
+  writeFileSync(join(dir, "astate.md"), "---\nstate: probe\nguidance: we need alpha, beta, gamma, delta and epsilon.\n---\n\nclean body.\n", "utf8");
+  const swept = await call(server, "se_lint", { glob: "product/guidance/sweeptest/*" });
+  assert.equal(swept.isError, false, JSON.stringify(swept.body));
+  assert.equal(swept.body.swept, 3, "every markdown file was read");
+  assert.equal(swept.body.skipped_not_markdown, 1, "and the one it skipped is named, not implied");
+  assert.equal(swept.body.clean, 1, "the clean file is counted");
+  const files = swept.body.files as { path: string; count: number; findings: { where: string }[] }[];
+  assert.equal(files.length, 2, "only files WITH findings come back");
+  assert.ok(files.some((f) => /dirty\.md$/.test(f.path)), "the one with a bad body");
+  const stateNote = files.find((f) => /astate\.md$/.test(f.path))!;
+  assert.ok(stateNote !== undefined, "and the one whose only bad prose is in its frontmatter");
+  assert.equal(stateNote.findings[0].where, "guidance", "each finding says WHICH prose it is in");
+  // Neither of the older forms is disturbed by the new one.
+  const one = await call(server, "se_lint", { text: "alpha, beta, gamma, delta and epsilon." });
+  assert.equal(one.body.count, 1, "a single block still lints");
+  const none = await call(server, "se_lint", {});
+  assert.equal(none.isError, true);
+  assert.match(String(none.body.expected), /glob/, "and the refusal offers the sweep");
 });
 
 test("se_answer records an aq entry and the feed types it aq", async () => {

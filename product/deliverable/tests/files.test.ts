@@ -1,17 +1,98 @@
 // The file lane's laws, each tested against the incident that ruled it.
 import { strict as assert } from "node:assert";
 import { spawnSync } from "node:child_process";
-import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { test } from "node:test";
 import { Rejection } from "../engine/errors.ts";
-import { fileDelete, fileGlob, filePatch, fileRead, fileWrite, globToRegExp, READ_BUDGET } from "../engine/files.ts";
+import { fileDelete, fileGlob, fileList, filePatch, fileRead, fileWrite, globToRegExp, IMAGE_BUDGET, READ_BUDGET } from "../engine/files.ts";
+import { contentHash } from "../engine/hash.ts";
 import { search } from "../engine/search.ts";
+import { run } from "../engine/run.ts";
 
 function fresh(): string {
   return mkdtempSync(join(tmpdir(), "se-v3-"));
 }
+
+// A FIGURE IS AUTHORED IN TEXT (ux.md), because a machine must be able to read
+// it, and markdown is the truth (software.md). A PNG was copied into the repo
+// on 2026-07-29 and had to be taken straight out again. Both rules existed;
+// neither was applied. ux.md's own closing rule says a prose rule that keeps
+// breaking wants a LINT or a TEST rather than another sentence — so here it is.
+// The owner's reason, in their words: if it is not human readable it is not a
+// first-class artifact.
+test("no binary file lives under product/ — an unreadable figure is not an artifact", () => {
+  const skip = new Set(["node_modules", ".git", ".obsidian", ".worktrees"]);
+  const offenders: string[] = [];
+  const walk = (dir: URL, rel: string): void => {
+    for (const e of readdirSync(dir, { withFileTypes: true })) {
+      if (skip.has(e.name)) continue;
+      if (e.isDirectory()) walk(new URL(`${e.name}/`, dir), `${rel}${e.name}/`);
+      else if (readFileSync(new URL(e.name, dir)).includes(0)) offenders.push(rel + e.name);
+    }
+  };
+  walk(new URL("../../", import.meta.url), "product/");
+  assert.deepEqual(offenders, [], "author figures as inline SVG, Mermaid or ASCII; a binary is input, never evidence");
+});
+
+// AN EMPTY RESULT AND AN UNREADABLE FILE MUST NEVER LOOK ALIKE (found live
+// 2026-07-29). engine/worktree.ts carried ONE raw NUL byte, used as a
+// cache-key separator. ripgrep called the whole file binary and said so on a
+// line the parser did not understand, so it was dropped and every search over
+// that file returned a confident "no matches".
+//
+// The file was invisible to the lane for as long as it had existed, and
+// nothing ever announced it. The searcher was reasoning from a hole.
+test("a file too binary to search is REPORTED, never silently empty", () => {
+  const root = fresh();
+  writeFileSync(join(root, "plain.ts"), "const marker = 1;\n");
+  // The same shape as the real defect: readable source with one NUL in it.
+  writeFileSync(join(root, "withnul.ts"), "const marker = 2;\nconst k = `aNULb`;\n".replace("NUL", String.fromCharCode(0)));
+  const r = search(root, "marker");
+  assert.ok(r.matches.some((m) => m.path === "plain.ts"), "the readable file still matches");
+  // Either ripgrep read it, or it said it could not. Silence is the bug.
+  const found = r.matches.some((m) => m.path === "withnul.ts");
+  const announced = (r.unreadable ?? []).includes("withnul.ts");
+  assert.ok(found || announced, "a file the search cannot read is named in unreadable");
+  rmSync(root, { recursive: true, force: true });
+});
+
+// The separator that caused it stays an ESCAPE in the source. Written as a raw
+// byte it costs the whole file its searchability, for no runtime difference.
+test("no engine source carries a raw NUL byte", () => {
+  const here = new URL("../engine/", import.meta.url);
+  for (const f of ["worktree.ts", "search.ts", "session.ts", "render.ts"]) {
+    const buf = readFileSync(new URL(f, here));
+    assert.equal(buf.includes(0), false, f + " carries a raw NUL and would be invisible to search");
+  }
+});
+
+// THE SERVER IS THE MIRROR (owner, 2026-07-29: "it takes forever to render,
+// maybe that was because you were running something in the background"). It
+// was. se_run used spawnSync, which holds Node's event loop for the WHOLE
+// command, so every long run served nothing at all — no page, no feed, no
+// click. A 30-second test run froze the reader's whole interface.
+//
+// Same defect as the expedition archive, where 380 blocking git spawns hung
+// the server rather than just the archive. The script runner was converted
+// then and se_run was left behind.
+//
+// The freeze is nasty because the symptom lands wherever the reader happens
+// to click, so it reads as a rendering bug anywhere but here.
+test("se_run does not block the event loop", async () => {
+  const root = fresh();
+  let ticks = 0;
+  const beat = setInterval(() => { ticks++; }, 20);
+  const sleep = process.platform === "win32" ? "Start-Sleep -Milliseconds 400" : "sleep 0.4";
+  const r = await run(root, sleep);
+  clearInterval(beat);
+  assert.equal(r.exit, 0, "the command still ran to completion");
+  assert.ok(r.duration_ms >= 300, "and it really did take time to do it");
+  // spawnSync scores exactly 0 here: nothing else gets to run at all.
+  assert.ok(ticks > 3, `the loop kept turning while it ran (ticks: ${ticks})`);
+  rmSync(root, { recursive: true, force: true });
+});
 
 test("read returns hash and numbered lines", () => {
   const root = fresh();
@@ -188,4 +269,155 @@ test("move fixes every reference form: root-relative, vault-relative, wiki link"
   // no silent overwrite
   fileWrite(root, "product/guidance/other.md", "x", null);
   assert.throws(() => fileMove(root, "product/guidance/other.md", "product/guidance/new/doc.md"), (e) => (e as Rejection).clause === "SE-C-104");
+});
+
+// A SKETCH IS A CONTRACT (ux.md) and the reader could not open one. It read
+// every file as utf8, so the owner had to describe a drawing the agent was
+// holding the path to. Nothing ever ruled the reader text-only; it was only
+// ever written that way (owner, 2026-07-29).
+const PNG_1X1 = Buffer.from(
+  "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==",
+  "base64",
+);
+
+test("an image reads back as the PICTURE, not as lines", () => {
+  const root = fresh();
+  writeFileSync(join(root, "sketch.png"), PNG_1X1);
+  const r = fileRead(root, "sketch.png");
+  assert.equal(r.media_type, "image/png");
+  assert.equal(r.bytes, PNG_1X1.length);
+  assert.equal(r.total_lines, undefined, "an image has no lines to count");
+  const blocks = r._attachments ?? [];
+  assert.equal(blocks.length, 1);
+  assert.equal(blocks[0].type, "image");
+  assert.equal(blocks[0].mimeType, "image/png");
+  // The bytes travel intact — a corrupted picture is worse than no picture.
+  assert.ok(Buffer.from(blocks[0].data, "base64").equals(PNG_1X1));
+  rmSync(root, { recursive: true, force: true });
+});
+
+test("an image carries a hash, so it can satisfy a read condition like any doc", () => {
+  const root = fresh();
+  writeFileSync(join(root, "a.png"), PNG_1X1);
+  writeFileSync(join(root, "b.png"), PNG_1X1);
+  assert.equal(fileRead(root, "a.png").hash, contentHash(PNG_1X1));
+  assert.equal(fileRead(root, "a.png").hash, fileRead(root, "b.png").hash);
+  rmSync(root, { recursive: true, force: true });
+});
+
+test("an oversize image is refused, never silently downscaled", () => {
+  const root = fresh();
+  writeFileSync(join(root, "huge.png"), Buffer.alloc(IMAGE_BUDGET + 1));
+  assert.throws(() => fileRead(root, "huge.png"), (e) => (e as Rejection).clause === "SE-C-103");
+  rmSync(root, { recursive: true, force: true });
+});
+
+test("a binary that is not an image is refused with its size and hash", () => {
+  const root = fresh();
+  const blob = Buffer.from([0x00, 0x01, 0x02, 0x00, 0x03]);
+  writeFileSync(join(root, "thing.bin"), blob);
+  assert.throws(
+    () => fileRead(root, "thing.bin"),
+    (e) => {
+      const r = e as Rejection;
+      return r.clause === "SE-C-126" && r.got.includes(String(blob.length)) && r.got.includes(contentHash(blob));
+    },
+  );
+  rmSync(root, { recursive: true, force: true });
+});
+
+// The widening must not move a single existing hash — every read-proof in the
+// system is one of these strings.
+// DECLARED, NEVER ARBITRARY (owner ruling 2026-07-29, porting v2's
+// req-search-roots). The fence was never meant to stop the owner pointing the
+// lane at a folder — only to stop the AGENT widening its own reach. A root the
+// owner declares is as legitimate a read surface as the project itself.
+test("a declared root serves reads; an undeclared one refuses with the vocabulary", () => {
+  const root = fresh();
+  const outside = fresh(); // a folder that is emphatically NOT the project
+  writeFileSync(join(outside, "sketch.md"), "# from beyond the fence\n");
+  mkdirSync(join(root, ".se"), { recursive: true });
+  writeFileSync(join(root, ".se", "roots.json"), JSON.stringify({ desk: outside }));
+
+  assert.ok(fileRead(root, "@desk/sketch.md").content.includes("from beyond the fence"));
+
+  // An undeclared name refuses, and the refusal NAMES what is on offer.
+  assert.throws(
+    () => fileRead(root, "@nope/x.md"),
+    (e) => (e as Rejection).clause === "SE-C-127" && (e as Rejection).expected.includes("desk"),
+  );
+  // No climbing out of a declared root.
+  assert.throws(() => fileRead(root, "@desk/../beyond.md"), (e) => (e as Rejection).clause === "SE-C-102");
+  // A declared root is a READ surface. Writing to one is refused, and never
+  // silently creates a literal "@desk" folder inside the project.
+  assert.throws(() => fileWrite(root, "@desk/new.md", "x", null), (e) => (e as Rejection).clause === "SE-C-102");
+  assert.equal(existsSync(join(root, "@desk")), false);
+
+  rmSync(root, { recursive: true, force: true });
+  rmSync(outside, { recursive: true, force: true });
+});
+
+// A DECLARATION THAT CANNOT BE READ MUST NEVER READ AS "NONE DECLARED" (found
+// live the day this landed). PowerShell wrote roots.json with a UTF-8 BOM,
+// JSON.parse refused it, and a swallowing catch reported the owner's own root
+// as undeclared. Two failures in one: the BOM, and the silence about it.
+// A ROOT YOU CANNOT BROWSE IS HALF A FEATURE (owner, 2026-07-29). Reading by
+// exact path is useless for a folder you are exploring, so list, glob and
+// search all reach a declared root — and every one of them reports hits in the
+// SAME "@name/rel" address the reader accepts back.
+test("a declared root can be browsed: list, glob and search all reach it", () => {
+  const root = fresh();
+  const outside = fresh();
+  mkdirSync(join(outside, "docs"), { recursive: true });
+  writeFileSync(join(outside, "docs", "a.md"), "# alpha\nneedle here\n");
+  writeFileSync(join(outside, "b.txt"), "nothing to find\n");
+  mkdirSync(join(root, ".se"), { recursive: true });
+  writeFileSync(join(root, ".se", "roots.json"), JSON.stringify({ ai: outside }));
+
+  assert.ok(fileList(root, "@ai").entries.some((e) => e.name === "docs" && e.type === "dir"));
+  assert.deepEqual(fileGlob(root, "@ai/**/*.md").files, ["@ai/docs/a.md"]);
+
+  const found = search(root, "needle", { path: "@ai" });
+  assert.equal(found.matches.length, 1);
+  assert.equal(found.matches[0].path, "@ai/docs/a.md");
+
+  // THE ROUND TRIP is the point: what search returns, read accepts.
+  assert.ok(fileRead(root, found.matches[0].path).content.includes("needle"));
+
+  rmSync(root, { recursive: true, force: true });
+  rmSync(outside, { recursive: true, force: true });
+});
+
+test("roots.json survives a BOM, and a broken one refuses LOUDLY", () => {
+  const root = fresh();
+  const outside = fresh();
+  writeFileSync(join(outside, "x.md"), "# reachable\n");
+  mkdirSync(join(root, ".se"), { recursive: true });
+  const cfg = join(root, ".se", "roots.json");
+
+  // Notepad and PowerShell both write this byte order mark. It must not bite.
+  writeFileSync(cfg, "﻿" + JSON.stringify({ desk: outside }), "utf8");
+  assert.ok(fileRead(root, "@desk/x.md").content.includes("reachable"));
+
+  // Broken JSON is a refusal naming the file, NOT a quiet "none declared".
+  writeFileSync(cfg, "{ this is not json", "utf8");
+  assert.throws(
+    () => fileRead(root, "@desk/x.md"),
+    (e) => (e as Rejection).clause === "SE-C-127" && (e as Rejection).got.includes("roots.json"),
+  );
+
+  rmSync(root, { recursive: true, force: true });
+  rmSync(outside, { recursive: true, force: true });
+});
+
+test("text reading is untouched: same lines, same hash, no attachment", () => {
+  const root = fresh();
+  writeFileSync(join(root, "doc.md"), "# Title\nbody\n");
+  const r = fileRead(root, "doc.md");
+  assert.equal(r.hash, contentHash("# Title\nbody\n"));
+  assert.equal(r.total_lines, 3);
+  assert.equal(r._attachments, undefined);
+  assert.equal(r.media_type, undefined);
+  assert.ok(r.content.includes("# Title"));
+  rmSync(root, { recursive: true, force: true });
 });

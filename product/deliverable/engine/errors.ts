@@ -62,4 +62,10 @@ export const CLAUSES = {
   UPDATE_MALFORMED: "SE-C-120", // the update field failed to parse as a decision-graph op
   DECISION_NODE: "SE-C-121", // update names an unknown or already-resolved node
   DECISION_UNRESOLVED: "SE-C-122", // done over open children — everything started gets resolved
+  DEAD_END: "SE-C-123", // completing the state would leave the machine open with nothing active — a starved join in the drawing
+  CANVAS_BROKEN: "SE-C-124", // a canvas fails to compile mid-walk — the walk stands; fix the drawing
+  PROSE_WALL: "SE-C-125", // long prose without a line break renders as a wall — break it into lines
+  UNREADABLE_BYTES: "SE-C-126", // a binary the lane cannot show a model — images travel, arbitrary bytes do not
+  UNDECLARED_ROOT: "SE-C-127", // @name addresses a root the owner has not declared — declared, never arbitrary
+  JOB_UNKNOWN: "SE-C-128", // a background job ref this session never started
 } as const;

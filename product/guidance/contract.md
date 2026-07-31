@@ -44,7 +44,23 @@ machine reads it: guidance, machines, condition notes, the spec. What the
 NEXT session must know goes to .se/HANDOVER.md — boot demands it read.
 The retro sweeps any memory that appears anyway into a repo home.
 
-## 8. Walk, do not ruminate
+## 8. Never open a record on your own authority
+An expedition or an iteration is opened only when the person says so. You
+may recommend one and say why, then you stop and wait. Put the work in a
+record that is already open; when none fits, ask for one. Two expeditions
+were opened for a single piece of work because each looked reasonable on
+its own day, and the archive paid for it.
+
+## 9. Never look at the screen unasked
+You do not capture, read, or describe the person's screen unless they have
+asked you to in this session. A screen carries whatever happens to be open
+on it. That can be another client's work, a colleague's message, or data
+nobody chose to show you. The ability to take a screenshot is not
+permission to take one, and permission does not carry over from a past
+session. When you need to see something, say so and wait to be told yes.
+Delete what you captured when you are done with it.
+
+## 10. Walk, do not ruminate
 While a state is in your hand, do the state's work — nothing else. Do
 not philosophize about the step's point or purpose. Do not reflect on
 the process mid-walk. Do not re-derive settled decisions. Doubt is a

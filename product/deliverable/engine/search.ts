@@ -13,7 +13,7 @@
 import { spawnSync } from "node:child_process";
 import { createRequire } from "node:module";
 import { relative, resolve, sep } from "node:path";
-import { resolveInRoot } from "./paths.ts";
+import { isRootRef, resolveDeclaredRoot, resolveForRead } from "./paths.ts";
 
 export interface Match {
   path: string;
@@ -28,10 +28,26 @@ export interface SearchResult {
   matches: Match[];
   total: number;
   truncated: boolean;
+  /** Files ripgrep refused to read as text. Present only when non-empty:
+   *  an unreadable file must never be indistinguishable from no matches. */
+  unreadable?: string[];
 }
 
 const LINE_CAP = 300;
 const PER_FILE_CAP = 50;
+const UNBOUNDED_FILE_CAP = 1_000_000;
+
+function normalizeLimit(limit: number | undefined): number {
+  if (limit === undefined || Number.isFinite(limit) === false) return 100;
+  if (limit <= 0) return Number.MAX_SAFE_INTEGER;
+  return Math.floor(limit);
+}
+
+function perFileCap(limit: number | undefined): number {
+  if (limit === undefined || Number.isFinite(limit) === false) return PER_FILE_CAP;
+  if (limit <= 0) return UNBOUNDED_FILE_CAP;
+  return Math.max(PER_FILE_CAP, Math.floor(limit));
+}
 
 let rgPathCached: string | undefined;
 
@@ -68,8 +84,9 @@ export function search(
   query: string,
   opts: { path?: string; ref?: string; ignore_case?: boolean; limit?: number } = {},
 ): SearchResult {
-  const limit = opts.limit ?? 100;
-  const matches = opts.ref === undefined ? rgSearch(root, query, opts) : gitGrepSearch(root, query, opts.ref, opts);
+  const limit = normalizeLimit(opts.limit);
+  const unreadable: string[] = [];
+  const matches = opts.ref === undefined ? rgSearch(root, query, opts, unreadable) : gitGrepSearch(root, query, opts.ref, opts);
   return {
     query,
     engine: opts.ref === undefined ? "ripgrep" : "git-grep",
@@ -77,33 +94,72 @@ export function search(
     matches: matches.slice(0, limit),
     total: matches.length,
     truncated: matches.length > limit,
+    // A FILE THAT CANNOT BE SEARCHED SAYS SO (found live 2026-07-29).
+    // engine/worktree.ts carried one raw NUL byte as a cache-key separator.
+    // ripgrep called the whole file binary and reported it on a line this
+    // parser did not understand, so the line was dropped and the search
+    // returned an empty, confident "no matches".
+    //
+    // The file was invisible to every search in the lane, and nothing ever
+    // said so. An empty result and an unreadable file must never look alike.
+    ...(unreadable.length > 0 ? { unreadable } : {}),
   };
 }
 
-function rgSearch(root: string, query: string, opts: { path?: string; ignore_case?: boolean }): Match[] {
-  const scope = opts.path === undefined ? resolve(root) : resolveInRoot(root, opts.path, "engine/search.ts");
+function rgSearch(root: string, query: string, opts: { path?: string; ignore_case?: boolean; limit?: number }, unreadable: string[] = []): Match[] {
+  const scope = opts.path === undefined ? resolve(root) : resolveForRead(root, opts.path, "engine/search.ts");
+  // A hit inside a declared root reports as "@name/rel", never as a pile of
+  // ../.. — what the search returns, the reader accepts unchanged.
+  const rootRef = opts.path !== undefined && isRootRef(opts.path);
+  const rootName = rootRef ? opts.path!.slice(1).split(/[\\/]+/)[0] : "";
+  const base = rootRef ? resolveDeclaredRoot(root, `@${rootName}`, "engine/search.ts") : resolve(root);
+  const prefix = rootRef ? `@${rootName}/` : "";
+  const show = (abs: string): string => {
+    const rel = relative(base, abs).split(sep).join("/");
+    return rel === "" ? abs : prefix + rel;
+  };
   // --with-filename: rg drops the filename for a single-file scope, which
   // starved the path:line:text parser — every match silently vanished.
-  const args = ["--line-number", "--no-heading", "--with-filename", "--max-count", String(PER_FILE_CAP), "--max-columns", String(LINE_CAP)];
+  // --binary: without it ripgrep skips a binary file in a DIRECTORY search
+  // and says nothing whatsoever — no line, no warning, no exit code. With it,
+  // the file is named on a "binary file matches" line, which the loop below
+  // turns into `unreadable`. --text was the alternative and was rejected: it
+  // would search real binaries as text and spray them through the results.
+  const args = ["--line-number", "--no-heading", "--with-filename", "--binary", "--max-count", String(perFileCap(opts.limit)), "--max-columns", String(LINE_CAP)];
   for (const d of [".se", "node_modules", ".worktrees"]) args.push("--glob", `!${d}/**`);
   if (opts.ignore_case === true) args.push("--ignore-case");
   args.push("--regexp", query, scope);
-  const r = spawnSync(rgPath(), args, { encoding: "utf8", maxBuffer: 16 * 1024 * 1024 });
+  // THE EXCLUSION GLOBS ARE RELATIVE TO THE WORKING DIRECTORY, never to the
+  // search target. Without a cwd of its own, ripgrep resolved them against
+  // the SERVER's cwd — and a bound expedition worktree lives under
+  // .worktrees, so `!.worktrees/**` excluded every file of the very tree the
+  // search was pointed at. Every directory search in an open expedition
+  // returned a confident, empty "no matches" (found live 2026-07-30).
+  // A single named FILE survived it, because ripgrep never applies these
+  // filters to a target it was handed explicitly — which is what made the
+  // failure look like a parser bug rather than a scoping one.
+  const r = spawnSync(rgPath(), args, { cwd: base, encoding: "utf8", maxBuffer: 16 * 1024 * 1024 });
   if (r.status !== 0 && r.status !== 1) throw new Error(`ripgrep failed: ${r.stderr}`);
   const out: Match[] = [];
   for (const line of (r.stdout ?? "").split("\n")) {
     if (line.trim() === "") continue;
+    // ripgrep announces a skipped file as "<path>: binary file matches (...)",
+    // which has no line number and so never parsed. Catch it before the drop.
+    const bin = line.match(/^(.+?): binary file matches/);
+    if (bin !== null) {
+      unreadable.push(show(bin[1]));
+      continue;
+    }
     const m = line.match(/^(.{1,}?):(\d+):(.*)$/s);
     if (m === null) continue;
-    const rel = relative(root, m[1]).split(sep).join("/");
-    out.push({ path: rel === "" ? m[1] : rel, line: Number(m[2]), text: m[3].slice(0, LINE_CAP) });
+    out.push({ path: show(m[1]), line: Number(m[2]), text: m[3].slice(0, LINE_CAP) });
   }
   return out;
 }
 
 /** Search a committed state: git grep at a ref. Path scope is a pathspec. */
-function gitGrepSearch(root: string, query: string, ref: string, opts: { path?: string; ignore_case?: boolean }): Match[] {
-  const args = ["grep", "-n", "-I", "-E", "--max-count", String(PER_FILE_CAP)];
+function gitGrepSearch(root: string, query: string, ref: string, opts: { path?: string; ignore_case?: boolean; limit?: number }): Match[] {
+  const args = ["grep", "-n", "-I", "-E", "--max-count", String(perFileCap(opts.limit))];
   if (opts.ignore_case === true) args.push("-i");
   args.push(query, ref);
   if (opts.path !== undefined) args.push("--", opts.path);

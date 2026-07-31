@@ -7,14 +7,19 @@
 import { createServer, type Server } from "node:http";
 import { spawnSync } from "node:child_process";
 import { existsSync, readFileSync, statSync } from "node:fs";
+import { createRequire } from "node:module";
 import { marked } from "marked";
 import { CallLog } from "./calllog.ts";
 import { replayVisitsText } from "./decisions.ts";
 import { Rejection } from "./errors.ts";
 import { appendNote, pendingNotes, readNotes } from "./inbox.ts";
-import { feedRows, renderMirror, type MirrorState } from "./render.ts";
+import { loadCards } from "./cards.ts";
+import { handleHttp, type McpServer } from "./mcp.ts";
+import { feedRows, renderMirror, SHUTDOWN_LEVELS, type MirrorState } from "./render.ts";
 import { resolveInRoot, seDir } from "./paths.ts";
+import { loadLevels } from "./scale.ts";
 import { Session } from "./session.ts";
+import { survey } from "./survey.ts";
 
 export interface MirrorOptions {
   session: Session;
@@ -22,10 +27,32 @@ export interface MirrorOptions {
   port: number;
   log: CallLog;
   mode: "manual" | "agent";
+  /** When given, /mcp serves the agent lane over HTTP — same dispatch as stdio. */
+  mcp?: McpServer;
 }
 
 export function startMirror(o: MirrorOptions): Server {
   const state: MirrorState = { session: o.session, root: o.root, lastPacket: undefined, mode: o.mode, log: o.log };
+
+  /** What the page watches: position, the two sliders, and a growth signal
+   *  for the feed. One shape, served both as a poll and as a pushed event. */
+  const aliveState = (): Record<string, unknown> => ({
+    // Which project this server walks — an attaching shim or host refuses
+    // to join a stranger's walk on a matching port.
+    root: o.root,
+    status: state.session.instance.status,
+    // The server is going away with the walk unfinished — a quit, not an end.
+    gone: state.session.serverGone,
+    autonomy: state.session.autonomy,
+    shutdown: state.session.shutdown,
+    active: state.session.active(),
+    busy: state.session.busy(),
+    ...(state.session.progress() === undefined ? {} : { progress: state.session.progress() }),
+    // A monotone change signal for the feed — the log file only grows.
+    acts: existsSync(o.log.path) ? statSync(o.log.path).size : 0,
+    // The agent's pointing finger — the page pulses the target on a new seq.
+    ...(state.session.ping === undefined ? {} : { ping: state.session.ping }),
+  });
 
   /** Collect a JSON body, run the handler (results may be async — script
    *  runs take seconds and must not block the server), log it, redirect. */
@@ -65,6 +92,14 @@ export function startMirror(o: MirrorOptions): Server {
   const server = createServer((req, res) => {
     const url = new URL(req.url ?? "/", `http://localhost:${o.port}`);
     try {
+      if (url.pathname === "/mcp" && o.mcp !== undefined) {
+        // THE AGENT'S LANE ON THE SHARED PORT. Every other route here is the
+        // human's hand; this one is MCP over HTTP — the same dispatch as
+        // stdio, so a harness inside VS Code and a CLI in the terminal
+        // attach to the ONE walk instead of spawning private engines.
+        handleHttp(o.mcp, req, res);
+        return;
+      }
       if (req.method === "POST" && url.pathname === "/tick") {
         post(req, res, "mirror_tick", (body) => {
           if (body.back !== undefined) {
@@ -113,16 +148,26 @@ export function startMirror(o: MirrorOptions): Server {
       if (url.pathname === "/api/log") {
         // The unified feed — session-scoped; ?ref= fetches one record in
         // full (request AND response — the details pane's combined object).
+        // BUILD THE BODY BEFORE THE HEAD. A throw after writeHead leaves the
+        // response open for ever: the browser waits on it, the promise behind
+        // the click never settles, and from the page that is indistinguishable
+        // from a click nothing was listening for.
         const ref = url.searchParams.get("ref");
-        res.writeHead(200, { "content-type": "application/json; charset=utf-8" });
-        if (ref !== null) {
-          // note- refs live in the inbox, not the call log — a pending
-          // stray's details come from its own record.
-          const rec = ref.startsWith("note-") ? readNotes(seDir(o.root)).find((n) => n.ref === ref) : o.log.find(ref);
-          res.end(JSON.stringify(rec ?? { missing: ref }));
-          return;
+        let body: string;
+        try {
+          if (ref !== null) {
+            // note- refs live in the inbox, not the call log — a pending
+            // stray's details come from its own record.
+            const rec = ref.startsWith("note-") ? readNotes(seDir(o.root)).find((n) => n.ref === ref) : o.log.find(ref);
+            body = JSON.stringify(rec ?? { missing: ref });
+          } else {
+            body = JSON.stringify(feedRows(o.log, state.session.startedTs, pendingNotes(seDir(o.root))));
+          }
+        } catch (e) {
+          body = JSON.stringify({ error: e instanceof Error ? e.message : String(e), ref });
         }
-        res.end(JSON.stringify(feedRows(o.log, state.session.startedTs, pendingNotes(seDir(o.root)))));
+        res.writeHead(200, { "content-type": "application/json; charset=utf-8" });
+        res.end(body);
         return;
       }
       if (url.pathname === "/api/decisions") {
@@ -180,6 +225,27 @@ export function startMirror(o: MirrorOptions): Server {
         }
         res.writeHead(200, { "content-type": "application/json; charset=utf-8" });
         res.end(JSON.stringify({ path: p, html }));
+        return;
+      }
+      if (url.pathname === "/vendor/vscode-elements.js") {
+        // THE COMPONENT LIBRARY, served from the engine's own dependencies.
+        // The mirror is a page we serve ourselves rather than a webview asset,
+        // so this is an ordinary script tag: no nonce, no bundler, no build.
+        // Resolved from the ENGINE's OWN dependencies, never from the project
+        // root. The engine can serve a tree it was not installed into, and a
+        // test root has no node_modules at all. This is the same idiom the
+        // search lane uses to find ripgrep.
+        let bundle;
+        try {
+          bundle = createRequire(import.meta.url).resolve("@vscode-elements/elements/dist/bundled.js");
+        } catch {
+          // Say which install is missing. A blank page teaches nothing.
+          res.writeHead(404, { "content-type": "text/plain; charset=utf-8" });
+          res.end("vscode-elements is not installed — run npm install in product/deliverable");
+          return;
+        }
+        res.writeHead(200, { "content-type": "text/javascript; charset=utf-8" });
+        res.end(readFileSync(bundle));
         return;
       }
       if (url.pathname === "/api/form") {
@@ -251,6 +317,13 @@ export function startMirror(o: MirrorOptions): Server {
         }));
         return;
       }
+      if (req.method === "POST" && url.pathname === "/target") {
+        post(req, res, "mirror_target", (body) => ({
+          args: { to: body.to },
+          result: state.session.setTarget(String(body.to ?? "")),
+        }));
+        return;
+      }
       if (req.method === "POST" && url.pathname === "/escape") {
         post(req, res, "mirror_escape", (body) => ({
           args: { reason: body.reason },
@@ -270,35 +343,93 @@ export function startMirror(o: MirrorOptions): Server {
         res.end(JSON.stringify(state.session.tickInfo(), null, 2));
         return;
       }
+      if (url.pathname === "/api/levels") {
+        // A HOST DRAWING THE CONTROLS READS THE SAME SCALES THE MIRROR DOES.
+        // The autonomy scale is authored in machines/scale.md, so a host that
+        // kept its own copy of the notches would drift the moment it is edited.
+        res.writeHead(200, { "content-type": "application/json; charset=utf-8", "access-control-allow-origin": "*" });
+        res.end(JSON.stringify({ autonomy: loadLevels(state.root), shutdown: SHUTDOWN_LEVELS }));
+        return;
+      }
+      if (url.pathname === "/api/cards") {
+        // THE HOST READS THE CARDS FROM HERE (owner design 2026-07-30). A host
+        // that draws one button per card must not keep its own copy of the
+        // list — product/cards.md stays the single truth, and a card added
+        // there appears in VS Code without touching the extension.
+        res.writeHead(200, { "content-type": "application/json; charset=utf-8", "access-control-allow-origin": "*" });
+        res.end(JSON.stringify({ cards: loadCards(o.root) }));
+        return;
+      }
+      if (url.pathname === "/api/survey") {
+        // BOTH HANDS ASK IT (owner ruling 2026-07-28): the agent through
+        // se_survey, the person through the machine header's button.
+        res.writeHead(200, { "content-type": "application/json; charset=utf-8" });
+        res.end(JSON.stringify(survey(o.root)));
+        return;
+      }
+      if (url.pathname === "/events") {
+        // THE MIRROR IS PUSHED, NOT POLLED (owner ruling 2026-07-28). The
+        // walk already wakes every held hand; this forwards that wake to
+        // the page. The wait's timeout doubles as the re-check for things
+        // that grow without moving the walk, like the log.
+        res.writeHead(200, {
+          "content-type": "text/event-stream; charset=utf-8",
+          "cache-control": "no-cache",
+          connection: "keep-alive",
+        });
+        let open = true;
+        req.on("close", () => { open = false; });
+        void (async () => {
+          let last = "";
+          while (open) {
+            const now = JSON.stringify(aliveState());
+            if (now !== last) { last = now; res.write(`data: ${now}\n\n`); }
+            await state.session.waitForChange(2000);
+          }
+          res.end();
+        })();
+        return;
+      }
       if (url.pathname === "/api/alive") {
         // The mirror polls this: position + threshold move under the page
         // (the agent's hand, or another window). Failing to answer at all
-        // reads as "session over" client-side.
-        res.writeHead(200, { "content-type": "application/json; charset=utf-8" });
-        res.end(JSON.stringify({
-          status: state.session.instance.status,
-          autonomy: state.session.autonomy,
-          shutdown: state.session.shutdown,
-          active: state.session.active(),
-          busy: state.session.busy(),
-          // A monotone change signal for the feed — the log file only grows.
-          acts: existsSync(o.log.path) ? statSync(o.log.path).size : 0,
-        }));
+        // reads as "session over" client-side. CORS is open because an
+        // EMBEDDER's page (the VS Code webview) polls from its own origin;
+        // the server never leaves localhost.
+        res.writeHead(200, { "content-type": "application/json; charset=utf-8", "access-control-allow-origin": "*" });
+        res.end(JSON.stringify(aliveState()));
         return;
       }
-      if (url.pathname === "/widget/machine" || url.pathname === "/widget/details" || url.pathname === "/widget/log") {
+      if (url.pathname === "/widget/machine" || url.pathname === "/widget/details" || url.pathname === "/widget/log" || url.pathname === "/widget/terminal") {
+        // RENDER FIRST, THEN WRITE THE HEAD. See the note at the catch below.
+        const widget = renderMirror(state, url.pathname.slice("/widget/".length) as "machine" | "details" | "log" | "terminal", url.searchParams.get("view") ?? undefined, undefined, url.searchParams.get("embed") === "1");
         res.writeHead(200, { "content-type": "text/html; charset=utf-8" });
-        res.end(renderMirror(state, url.pathname.slice("/widget/".length) as "machine" | "details" | "log", url.searchParams.get("view") ?? undefined));
+        res.end(widget);
         return;
       }
       // GET / — tick without arguments: information about where we are.
       // ?view=<machine> browses a machine without moving the walk.
       state.lastPacket = state.session.tickInfo();
+      const page = renderMirror(state, undefined, url.searchParams.get("view") ?? undefined, url.searchParams.get("card") ?? undefined, url.searchParams.get("embed") === "1");
       res.writeHead(200, { "content-type": "text/html; charset=utf-8" });
-      res.end(renderMirror(state, undefined, url.searchParams.get("view") ?? undefined));
+      res.end(page);
     } catch (e) {
+      // A BLACK WINDOW IS THE WORST WAY TO REPORT A FAULT, and it is what this
+      // used to do. The 200 head went out BEFORE the render ran, so a throw
+      // left the headers already sent, this writeHead threw in turn, and the
+      // reader got an empty 200 - which paints black. A broken canvas looked
+      // exactly like a dead server.
+      //
+      // Every route above now renders into a variable first, so a failure is
+      // still headerless when it arrives here and can be reported honestly.
+      // headersSent stays checked because a future route may stream.
+      const body = String((e as Error).stack ?? e);
+      if (res.headersSent) {
+        res.end(`\n\n<!-- render failed after headers were sent -->\n${body}`);
+        return;
+      }
       res.writeHead(500, { "content-type": "text/plain; charset=utf-8" });
-      res.end(String((e as Error).stack ?? e));
+      res.end(body);
     }
   });
 

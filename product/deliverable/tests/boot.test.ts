@@ -1,16 +1,20 @@
-// The main machine and the state gate — the session's first law: nothing
-// before boot, the boot sub-machine one step at a time, everything logged,
-// nothing after exit.
+// the gate and the walk: what is legal before boot, and boot walked end to end
+//
+// SMALL FILES ON PURPOSE (owner ruling, 2026-07-30). A test file is the
+// only unit that reaches a second core, so themes get their own file and
+// the suite uses the machine it runs on. See guidance/software.md.
 import { strict as assert } from "node:assert";
-import { test } from "node:test";
+import { describe, test } from "node:test";
 import { fileURLToPath } from "node:url";
 import { compileMachine } from "../engine/machines/compile.ts";
 import { mainMachinePath, Session } from "../engine/session.ts";
 import { buildServer } from "../engine/tools.ts";
-import { bootedServer, call, checkDocs, freshRoot, readHashesFor } from "./helpers.ts";
+import { bootedServer, call, checkDocs, freshRoot, handOver, readHashesFor } from "./helpers.ts";
 
 const REPO_ROOT = fileURLToPath(new URL("../../..", import.meta.url));
 
+// Concurrent: every case builds its own root and touches no global.
+describe("boot", { concurrency: true }, () => {
 test("the shipped main.canvas compiles: mechanical start/end, boot nested", () => {
   const m = compileMachine(REPO_ROOT, mainMachinePath(REPO_ROOT));
   assert.equal(m.id, "main");
@@ -27,7 +31,12 @@ test("the boot sub-machine compiles with its own mechanical start/end", () => {
   assert.equal(m.initial, "start");
   assert.equal(m.states.find((s) => s.id === "end")!.kind, "end");
   const rc = m.states.find((s) => s.id === "read_contract")!;
-  assert.deepEqual(rc.exit, { read: ["workspace/AGENTS.md", "product/guidance/contract.md", "product/guidance/voice.md", "product/guidance/walking.md"] });
+  assert.deepEqual(rc.exit, {
+    read: ["workspace/AGENTS.md", "product/guidance/contract.md", "product/guidance/voice.md", "product/guidance/walking.md"],
+    // The handover is DECLARED here, not known by the engine: read on the
+    // way out, and destroyed by the same move.
+    read_consume: [".se/HANDOVER.md"],
+  });
 });
 
 test("at start the lane beyond reading is refused with se_tick as the remedy", async () => {
@@ -45,13 +54,6 @@ test("reading is legal at the mechanical start/end states — proof tokens can b
   assert.ok(typeof r.body.hash === "string" && (r.body.hash as string).length > 0);
 });
 
-test("se_panel is legal anywhere — and honestly not-configured without a mirror", async () => {
-  const server = buildServer(freshRoot());
-  const r = await call(server, "se_panel", {});
-  assert.equal(r.isError, true);
-  assert.equal(r.body.clause, "SE-C-106", JSON.stringify(r.body));
-});
-
 test("se_tick without arguments reports the current state — legal everywhere", async () => {
   const server = buildServer(freshRoot());
   const r = await call(server, "se_tick");
@@ -67,12 +69,19 @@ test("the agent's ticks walk boot, gated by HASH proof-of-read, banner on idle",
   await call(server, "se_tick", { advance: true }); // -> read_contract
   const at = await call(server, "se_tick");
   assert.deepEqual(at.body.active, ["boot/read_contract"]);
-  const state = (at.body.states as { exit?: Record<string, { args: string[] }>; pulled?: Record<string, unknown>[] }[])[0];
+  const state = (at.body.states as {
+    exit?: Record<string, { args: string[] }>;
+    pulled?: Record<string, unknown>[];
+    lookahead_read?: string[];
+    next?: { to: string; entry_read?: string[] }[];
+  }[])[0];
   assert.ok(state.exit !== undefined && state.exit.read.args.length === 4, "the exit dictionary rides the packet");
   assert.ok(state.pulled !== undefined && state.pulled.length >= 2, "the pull rides the packet");
   // The hash IS the proof — the agent's packet must never print it.
   assert.ok(state.pulled!.every((p) => !("hash" in p)), "packets never hand the agent the hashes");
   assert.ok(state.pulled!.some((p) => (p.sources as string[]).includes("root")), "root guidance pulled always");
+  assert.ok(Array.isArray(state.lookahead_read), "packet carries preread hint field");
+  assert.ok((state.next ?? []).some((n) => n.to === "prepare_idle" && Array.isArray(n.entry_read)), "each next edge carries its own read requirement list");
   const shut = await call(server, "se_run", { command: "echo nope" });
   assert.equal(shut.body.clause, "SE-C-110");
   // the read gate bites: a tick WITHOUT hashes is refused, remedy = read
@@ -88,16 +97,18 @@ test("the agent's ticks walk boot, gated by HASH proof-of-read, banner on idle",
   const rc = await call(server, "se_file_read", { path: "product/guidance/voice.md" });
   assert.equal(rc.isError, false, "se_file_read is legal in read_contract");
   assert.equal(rc.body.hash, readHashesFor(root)["product/guidance/voice.md"], "the lane's hash is the proof token");
+  const afterRead = await call(server, "se_tick");
+  const hinted = ((afterRead.body.states as { next?: { to: string; entry_read?: string[] }[] }[])[0].next ?? []).find((n) => n.to === "prepare_idle");
+  assert.ok(!(hinted?.entry_read ?? []).includes("product/guidance/voice.md"), "already-buffered docs are omitted from preread hints");
   const s2 = await call(server, "se_tick", { advance: true, read_hashes: readHashesFor(root) });
   assert.deepEqual(s2.body.active, ["boot/prepare_idle"]);
   await call(server, "se_tick", { advance: true }); // -> boot/end
-  // the pop into idle demands the pull proven AGAIN (hashes, every time)
+  // Boot can now reuse fresh buffered proofs and pop into idle without
+  // resupplying the same hashes in this same read version.
   const bare = await call(server, "se_tick", { advance: true });
-  assert.equal(bare.isError, true);
-  assert.equal(bare.body.clause, "SE-C-112");
-  const landed = await call(server, "se_tick", { advance: true, read_hashes: readHashesFor(root) });
-  assert.equal(landed.body.booted, true);
-  assert.ok(String(landed.body.banner).includes("main machine @ idle"));
+  assert.equal(bare.isError, false);
+  assert.equal(bare.body.booted, true);
+  assert.ok(String(bare.body.banner).includes("Main machine is live"));
   // the banner shows once; a later tick-info is plain
   const info = await call(server, "se_tick");
   assert.equal(info.body.booted, undefined);
@@ -108,6 +119,7 @@ test("idle opens the whole lane; a tick to end closes it; after end only tick-in
   const server = await bootedServer(root);
   const w = await call(server, "se_file_write", { path: "x.md", content: "hi", base_hash: null });
   assert.equal(w.isError, false);
+  handOver(root); // the way out writes the next session's briefing
   const exit = await call(server, "se_tick", { from: "idle", to: "end" });
   assert.equal(exit.isError, false);
   const after = await call(server, "se_file_read", { path: "x.md" });
@@ -115,55 +127,6 @@ test("idle opens the whole lane; a tick to end closes it; after end only tick-in
   assert.equal(after.body.clause, "SE-C-110");
   const state = await call(server, "se_tick");
   assert.equal(state.body.status, "closed");
-});
-
-test("ticks are ATOMIC: a stale `from` is refused, the matching one moves", async () => {
-  const root = freshRoot();
-  const session = new Session(root);
-  const server = buildServer(root, session);
-  const hashes = readHashesFor(root);
-  for (let i = 0; i < 8; i++) {
-    const step = await call(server, "se_tick", { advance: true, read_hashes: hashes });
-    if (step.body.booted === true) break;
-  }
-  // The agent plans a move from idle; the human walks into the archive meanwhile.
-  checkDocs(session);
-  await session.tickAdvance("expedition_archive");
-  const stale = await call(server, "se_tick", { from: "idle", to: "end", read_hashes: hashes });
-  assert.equal(stale.isError, true);
-  assert.equal(stale.body.clause, "SE-C-114");
-  assert.match(String(stale.body.expected), /expedition_archive/);
-  // From the real position the move flows (bare sub-state ids match too).
-  const onward = await call(server, "se_tick", { from: "expedition_archive/start", advance: true, read_hashes: hashes });
-  assert.equal(onward.isError, false, JSON.stringify(onward.body));
-});
-
-test("se_reload: refused off-idle, dry-runs its canary at idle", async () => {
-  const server = buildServer(freshRoot());
-  const early = await call(server, "se_reload", {});
-  assert.equal(early.isError, true);
-  assert.equal(early.body.clause, "SE-C-110", "not legal before idle");
-  const booted = await bootedServer(freshRoot());
-  const r = await call(booted, "se_reload", {});
-  assert.equal(r.isError, false, JSON.stringify(r.body));
-  assert.equal(r.body.reload, "dry");
-});
-
-test("repair mode: a RED exit script arms the state's repair tools", async () => {
-  const root = freshRoot();
-  const session = new Session(root);
-  const server = buildServer(root, session);
-  await session.tickAdvance(); await session.tickAdvance();
-  checkDocs(session);
-  await session.tickAdvance();
-  assert.deepEqual(session.active(), ["boot/prepare_idle"]);
-  // Green or not-yet-run: the file lane stays shut.
-  const shut = await call(server, "se_file_write", { path: "x.md", content: "hi", base_hash: null });
-  assert.equal(shut.body.clause, "SE-C-110");
-  // The suite fails — the engine records it; the repair tools open up.
-  session.submitEvidence("prepare_idle", { script_result: { ok: false, output: "1 failing test" } });
-  const fix = await call(server, "se_file_write", { path: "x.md", content: "hi", base_hash: null });
-  assert.equal(fix.isError, false, JSON.stringify(fix.body));
 });
 
 test("the gate is logged like everything else — a refused pre-boot call lands in the log", async () => {
@@ -180,7 +143,8 @@ test("the gate is logged like everything else — a refused pre-boot call lands 
 
 test("manual mode: tick info at start, ticks walk the whole machine to end", async () => {
   const { Session } = await import("../engine/session.ts");
-  const s = new Session(freshRoot());
+  const root = freshRoot();
+  const s = new Session(root);
   const info = s.tickInfo() as { active: string[]; states: { kind: string }[] };
   assert.deepEqual(info.active, ["start"]);
   assert.equal(info.states[0].kind, "start");
@@ -206,237 +170,9 @@ test("manual mode: tick info at start, ticks walk the whole machine to end", asy
   assert.deepEqual(s.active(), ["expeditions/end"]);
   await s.tickAdvance(); // pop: filled, back at idle
   assert.deepEqual(s.active(), ["idle"]);
+  handOver(root);
   await s.tickAdvance("end");
   assert.equal((s.describe() as { status: string }).status, "closed");
 });
 
-test("the mirror renders ONLY the current machine, with breadcrumbs", async () => {
-  const { Session } = await import("../engine/session.ts");
-  const { renderMirror } = await import("../engine/render.ts");
-  const root = freshRoot();
-  const s = new Session(root);
-  // At main/start: the main canvas only.
-  let html = renderMirror({ session: s, root, lastPacket: undefined, mode: "manual" });
-  assert.ok(html.includes(`>idle</text>`));
-  assert.ok(!html.includes(`>read_contract</text>`), "sub-machine states are NOT drawn while in main");
-  // Step into boot: the boot canvas only, breadcrumb main › boot.
-  await s.tickAdvance();
-  html = renderMirror({ session: s, root, lastPacket: undefined, mode: "manual" });
-  assert.ok(html.includes(`>read_contract</text>`));
-  assert.ok(!html.includes(`>idle</text>`), "main states are NOT drawn while in the sub");
-  assert.ok(html.includes("class=\"here\">boot"), "breadcrumb marks the machine the walk is in");
-  assert.ok(html.includes("data-detail=\"state:read_contract\""), "states are clickable for details");
-  assert.ok(html.includes("class=\"expand\""), "widgets carry expand buttons");
-});
-
-test("the view is independent of the walk: browse boot while standing at main/start", async () => {
-  const { Session } = await import("../engine/session.ts");
-  const { renderMirror } = await import("../engine/render.ts");
-  const root = freshRoot();
-  const s = new Session(root); // walk at main/start
-  const html = renderMirror({ session: s, root, lastPacket: undefined, mode: "manual" }, undefined, "boot");
-  assert.ok(html.includes(`>read_contract</text>`), "viewer entered boot");
-  assert.ok(!html.includes("state active"), "no live highlight — the walk is not here");
-  assert.ok(html.includes(`href="/?view=main"`), "breadcrumb navigates back out");
-  // and on main, the sub state is drawn with a double border + crumb menu lists it
-  const main = renderMirror({ session: s, root, lastPacket: undefined, mode: "manual" });
-  assert.ok(main.includes(`data-sub="boot"`), "sub-machine state is double-click enterable");
-  assert.ok(main.includes("state inner"), "double border drawn");
-  assert.ok(main.includes("crumb-menu"), "breadcrumb arrow lists selectable sub-machines");
-});
-
-test("conditions are worked only from inside the state — no pre-running", async () => {
-  const { Session } = await import("../engine/session.ts");
-  const s = new Session(freshRoot());
-  // the condition script never pre-runs, and running it from outside is refused
-  await assert.rejects(() => s.scriptRun("prepare_idle"), (e) => (e as { clause?: string }).clause === "SE-C-112");
-  // evidence for a state you are not standing in is refused
-  assert.throws(() => s.submitEvidence("read_contract", { read_confirmed: true }), (e) => (e as { clause?: string }).clause === "SE-C-112");
-});
-
-test("jump back: downstream superseded, script evidence invalidated; human checks persist per version", async () => {
-  const { Session } = await import("../engine/session.ts");
-  const s = new Session(freshRoot());
-  // walk to idle
-  await s.tickAdvance(); await s.tickAdvance();
-  checkDocs(s);
-  await s.tickAdvance(); await s.tickAdvance(); await s.tickAdvance();
-  assert.deepEqual(s.active(), ["idle"]);
-  // jump back into boot from main: re-enters at the sub's start
-  s.jumpBack("boot");
-  assert.deepEqual(s.active(), ["boot/start"]);
-  // the CHECKS persist (one per doc version — the docs did not change),
-  // so the human re-walk flows; the preflight script must re-earn its 0.
-  await s.tickAdvance();
-  assert.deepEqual(s.active(), ["boot/read_contract"]);
-  await s.tickAdvance();
-  assert.deepEqual(s.active(), ["boot/prepare_idle"]);
-  const prepare = s.currentMachine().states.find((x) => x.id === "prepare_idle")!;
-  assert.equal(s.scriptStatus(s.currentMachine(), prepare).ran, false, "script evidence was invalidated by the jump");
-  // the record survives: superseded entries, never erased
-  assert.ok(s.instance.history.some((h) => h.outcome === "superseded"));
-  // a never-filled state is not a jump target
-  assert.throws(() => s.jumpBack("end"), (e) => (e as { clause?: string }).clause === "SE-C-110");
-});
-
-test("jump back leaves nothing green: the nested walk's record is superseded too", async () => {
-  const { Session } = await import("../engine/session.ts");
-  const s = new Session(freshRoot());
-  await s.tickAdvance(); await s.tickAdvance();
-  checkDocs(s);
-  await s.tickAdvance(); await s.tickAdvance(); await s.tickAdvance();
-  s.jumpBack("boot");
-  const filled = s.instance.history.filter((h) => h.outcome === "filled").map((h) => h.state);
-  assert.ok(!filled.some((f) => f.startsWith("boot/")), `boot walk entries still filled: ${filled}`);
-});
-
-test("the agent can peek at any state without moving — the click, as a tool", async () => {
-  const server = buildServer(freshRoot());
-  const peek = await call(server, "se_tick", { state: "idle" });
-  assert.equal(peek.isError, false);
-  assert.equal(peek.body.id, "idle");
-  assert.ok(String(peek.body.statement).length > 0);
-  const still = await call(server, "se_tick");
-  assert.deepEqual(still.body.active, ["start"]);
-  const unknown = await call(server, "se_tick", { state: "nope" });
-  assert.equal(unknown.isError, true);
-});
-
-test("every script block the mirror serves is valid JavaScript — a broken block kills all handlers", async () => {
-  const { Session } = await import("../engine/session.ts");
-  const { renderMirror } = await import("../engine/render.ts");
-  const root = freshRoot();
-  const s = new Session(root);
-  const pages = [
-    renderMirror({ session: s, root, lastPacket: undefined, mode: "manual" }),
-    renderMirror({ session: s, root, lastPacket: undefined, mode: "manual" }, undefined, "boot"),
-    renderMirror({ session: s, root, lastPacket: undefined, mode: "manual" }, "machine"),
-    renderMirror({ session: s, root, lastPacket: undefined, mode: "manual" }, "details"),
-  ];
-  for (const [p, page] of pages.entries()) {
-    const blocks = [...page.matchAll(/<script>([\s\S]*?)<\/script>/g)].map((m) => m[1]);
-    assert.ok(blocks.length >= 1, `page ${p} serves scripts`);
-    for (const [b, code] of blocks.entries()) {
-      assert.doesNotThrow(() => new Function(code), `page ${p} script block ${b} must parse`);
-    }
-  }
-});
-
-test("expeditions: worktree lifecycle — new, bind, work lands in the worktree, close merges", async () => {
-  const { Session } = await import("../engine/session.ts");
-  const { spawnSync } = await import("node:child_process");
-  const { readFileSync, existsSync } = await import("node:fs");
-  const { join } = await import("node:path");
-  const root = freshRoot();
-  const g = (...a: string[]) => {
-    const r = spawnSync("git", a, { cwd: root, encoding: "utf8" });
-    assert.equal(r.status, 0, `git ${a.join(" ")}: ${r.stderr}`);
-  };
-  g("init", "-q", "-b", "v3");
-  g("add", "-A");
-  g("-c", "user.name=t", "-c", "user.email=t@t", "commit", "-q", "-m", "seed");
-  g("config", "user.name", "t"); g("config", "user.email", "t@t");
-
-  const s = new Session(root);
-  const minted = s.expeditionNew("spike", "Try The Thing!") as { created: string };
-  assert.match(minted.created, /^e1-spike-try-the-thing/);
-  // The RECORD is minted with the expedition, on its branch — the list
-  // serves its frontmatter.
-  const open1 = (s.expeditionList() as { open: { id: string; goal?: string; status?: string }[] }).open;
-  assert.equal(open1.length, 1);
-  assert.equal(open1[0].id, minted.created);
-  assert.equal(open1[0].goal, "Try The Thing!");
-  assert.equal(open1[0].status, "open");
-
-  // bind: the lane's working root switches to the worktree
-  s.expeditionOpen(minted.created);
-  assert.ok(s.workRoot().includes(".worktrees"), "bound root is the worktree");
-  const { fileWrite } = await import("../engine/files.ts");
-  fileWrite(s.workRoot(), "scratch.md", "expedition work", null);
-  assert.ok(existsSync(join(s.workRoot(), "scratch.md")));
-  assert.ok(!existsSync(join(root, "scratch.md")), "main tree untouched while bound");
-
-  // While bound, decision ops land in the RECORD too (parts per visit).
-  s.decisions.apply("continue_expedition/work@0", { op: "update", brief: "working in the record" });
-  const recDir = join(s.workRoot(), "product", "spec", "expeditions", minted.created);
-  assert.ok(readFileSync(join(recDir, "decisions.jsonl"), "utf8").includes("working in the record"));
-
-  // Closing without a REPORT is refused — an expedition ends with one.
-  assert.throws(() => s.expeditionClose(true), (e) => (e as { clause?: string }).clause === "SE-C-112");
-
-  // THE LEAVE GATE: entry_evidence_form on leave — unmet until the record's
-  // page passes the lint; filling it through the form machinery creates
-  // report.md, which also satisfies the close guard.
-  const { generateContinueExpedition, shortId } = await import("../engine/expmachine.ts");
-  const gen = generateContinueExpedition(root);
-  const leave = gen.decl.states.find((st) => st.id === `${shortId(minted.created)}-leave`)!;
-  assert.deepEqual(leave.entry?.evidence_form, ["expedition-leave"]);
-  assert.equal(s.conditionKeyMet(gen.decl, leave, "evidence_form", "enter"), false, "no page yet");
-  // Agent PREFILL stays inert: the human confirms it, then the page passes.
-  s.formSave("expedition-leave", {
-    "What was the goal": "<!-- try the thing -->",
-    "What was done": "did it",
-    "What settled it": "the test run",
-    "What was not done": "nothing",
-  });
-  s.formDone("expedition-leave", "agent");
-  assert.equal(s.conditionKeyMet(gen.decl, leave, "evidence_form", "enter"), false, "unconfirmed prefill blocks the page");
-  s.formConfirm("expedition-leave", "What was the goal", 0);
-  s.formDone("expedition-leave", "human");
-  assert.equal(s.conditionKeyMet(gen.decl, leave, "evidence_form", "enter"), true, "confirmed + done passes the lint");
-
-  // close: leftovers committed, merged back, worktree gone, lane unbound
-  const closed = s.expeditionClose(true) as { merged: boolean };
-  assert.equal(closed.merged, true);
-  assert.equal(s.workRoot(), root);
-  assert.equal(readFileSync(join(root, "scratch.md"), "utf8"), "expedition work");
-  // CLOSED RECORDS LIVE IN GIT (owner ruling 2026-07-28): the close
-  // retires the record dir from the tree; the branch serves it, stamped
-  // closed + applied — the close IS the ruling (owner 2026-07-27).
-  assert.equal(existsSync(join(root, "product", "spec", "expeditions", minted.created)), false, "the record dir left the tree");
-  const rec = spawnSync("git", ["show", `exp/${minted.created}:product/spec/expeditions/${minted.created}/record.md`], { cwd: root, encoding: "utf8" }).stdout;
-  assert.match(rec, /^status: closed$/m);
-  assert.match(rec, /^ruling: applied$/m);
-  assert.equal((s.expeditionList() as { open: unknown[] }).open.length, 0);
-  const arch = (s.expeditionList() as { archive: { id: string; status?: string; ruling?: string }[] }).archive;
-  assert.equal(arch[0].id, minted.created);
-  assert.equal(arch[0].status, "closed");
-  assert.equal(arch[0].ruling, "applied");
-});
-
-test("escape goes to idle and only to idle: the walk is left standing, the reason is recorded, boot is exempt", async () => {
-  const { Session } = await import("../engine/session.ts");
-  const { buildServer } = await import("../engine/tools.ts");
-  const root = freshRoot();
-  const session = new Session(root);
-  const server = buildServer(root, session);
-  const hashes = readHashesFor(root);
-  // Into boot: escape is refused — boot must complete.
-  await call(server, "se_tick", { advance: true, read_hashes: hashes });
-  const noBoot = await call(server, "se_tick", { escape: "stuck" });
-  assert.equal(noBoot.isError, true);
-  assert.equal(noBoot.body.clause, "SE-C-110");
-  // Boot to idle, then enter a sub-machine and escape from inside it.
-  for (let i = 0; i < 8; i++) {
-    const step = await call(server, "se_tick", { advance: true, read_hashes: hashes });
-    if (step.body.booted === true) break;
-  }
-  session.setAutonomy(1);
-  await call(server, "se_tick", { to: "expeditions", read_hashes: hashes });
-  assert.deepEqual(session.active(), ["expeditions/start"]);
-  const esc = await call(server, "se_tick", { escape: "cannot continue: test blockage", read_hashes: hashes });
-  assert.equal(esc.isError, false, JSON.stringify(esc.body));
-  assert.deepEqual(session.active(), ["idle"], "escape lands at idle");
-  assert.equal(session.instance.escapes.length, 1);
-  assert.match(session.instance.escapes[0].exhausted_guard, /test blockage/);
-  assert.ok(session.instance.history.some((h) => h.outcome === "escaped"), "the escape is a recorded failure");
-  // The machine was LEFT STANDING — re-entering starts it over, gray.
-  assert.deepEqual(session.viewRun("expeditions").done, []);
-  // An empty reason is refused; at the main machine there is nothing to escape.
-  const empty = await call(server, "se_tick", { escape: "  " });
-  assert.equal(empty.isError, true);
-  assert.equal(empty.body.clause, "SE-C-046");
-  const atMain = await call(server, "se_tick", { escape: "nope" });
-  assert.equal(atMain.isError, true);
-  assert.equal(atMain.body.clause, "SE-C-110");
 });

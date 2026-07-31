@@ -1,0 +1,100 @@
+{
+  "_readme": [
+    "THE COPILOT CAGE, AS DATA. Claude Code is caged by a settings file that",
+    "names the denied tools. GitHub Copilot CLI has no such file - it takes",
+    "the cage on the COMMAND LINE, so the cage here is a list of arguments",
+    "RUNME passes at launch.",
+    "",
+    "VERIFIED AGAINST A LIVE CLI on 2026-07-30 (Copilot CLI 1.0.76) by asking",
+    "a real caged session to list the tools it could see. The previous",
+    "version of this file was written blind and was WRONG in three ways;",
+    "each is recorded here because the wrong shape reads exactly like the",
+    "right one:",
+    "",
+    "1. --deny-tool DOES NOT HIDE A TOOL. It only decides whether a call",
+    "   needs approval, and its patterns accept four kinds only - shell(),",
+    "   write(), url() and <mcp-server>(). Names like view, read, search,",
+    "   edit and str_replace are not kinds at all: they were accepted in",
+    "   silence and did nothing. A probe run with the old deny_args still",
+    "   saw powershell, view, create, edit, grep, glob, web_fetch, task and",
+    "   sql. The cage was decoration.",
+    "2. --excluded-tools IS the analogue of Claude's bare-name deny: it",
+    "   removes the tool from the model's context entirely. That is what",
+    "   exclude_args below does, and the same probe then saw the se lane",
+    "   and NOTHING else.",
+    "3. THE SERVER WAS NOT EVEN LOADING. Copilot does not read a project's",
+    "   .copilot/mcp-config.json by itself - it reads ~/.copilot/mcp-config.json.",
+    "   The workspace file has to be handed over with --additional-mcp-config,",
+    "   which is what mcp_args does. Without it the agent had no se tools",
+    "   at all, only its native ones - the exact inverse of the design.",
+    "",
+    "THE BLACKLIST IS EXPLICIT, by the same owner ruling that shapes the",
+    "Claude cage: a tool Copilot ADDS IN A FUTURE VERSION is not blocked",
+    "automatically. Blocking it is a deliberate edit to exclude_args.",
+    "",
+    "HOW TO RE-CHECK after a CLI update, in one command, from workspace/:",
+    "  copilot -p \"List the EXACT names of every tool you can currently see, one per line, nothing else.\" -s --additional-mcp-config \"@.copilot/mcp-config.json\" --disable-builtin-mcps --no-custom-instructions --excluded-tools <the list below>",
+    "Anything in that output which is not an se_ tool is a hole in the cage.",
+    "",
+    "CONTRACT RULE 1 IS WHAT THIS ENFORCES: everything the agent does runs",
+    "through the se lane. If these flags do not hold, the cage is ADVISORY",
+    "on this host - the agent is asked rather than prevented."
+  ],
+
+  "_mcp_args": [
+    "The se server, handed over explicitly. --disable-builtin-mcps drops",
+    "github-mcp-server, whose 17 tools are a second uncaged lane (the Claude",
+    "cage never had it). Without it the agent can read any repo on the host",
+    "without one line reaching .se/calls.jsonl."
+  ],
+  "mcp_args": [
+    "--additional-mcp-config", "@.copilot/mcp-config.json",
+    "--disable-builtin-mcps"
+  ],
+
+  "_exclude_args": [
+    "THE CAGE PROPER - these names vanish from the model's context.",
+    "Grouped as they map onto the Claude deny list.",
+    "",
+    "task is excluded where Claude keeps it. Claude's subagents inherit the",
+    "parent's deny list, so they are caged too; a Copilot subagent is a",
+    "SEPARATE session that does not inherit --excluded-tools, so leaving it",
+    "would hand the agent an uncaged twin - the one hole big enough to walk",
+    "the whole cage through. Restore it only alongside a verified way to",
+    "cage the child."
+  ],
+  "exclude_args": [
+    "--excluded-tools",
+    "powershell", "read_powershell", "stop_powershell", "list_powershell",
+    "view", "create", "edit",
+    "grep", "glob",
+    "web_fetch",
+    "sql", "session_store_sql",
+    "skill",
+    "task", "read_agent", "list_agents", "write_agent",
+    "fetch_copilot_cli_documentation"
+  ],
+
+  "_allow_args": [
+    "The se lane is pre-approved, so the walk is not a wall of prompts -",
+    "this is Copilot's `mcp__se__*` allow. `se` is the server name as it is",
+    "written in .copilot/mcp-config.json; change one and change the other.",
+    "NOT --allow-all-tools: that would pre-approve anything a future CLI",
+    "adds, which is the opposite of an explicit list."
+  ],
+  "allow_args": [
+    "--allow-tool", "se"
+  ],
+
+  "_deny_args": [
+    "DEFENCE IN DEPTH, not the cage. Every kind here is a real one, so if a",
+    "shell or a write ever reaches the agent by another road, it still stops",
+    "to ask. These are the only four kinds --deny-tool understands."
+  ],
+  "deny_args": [
+    "--deny-tool", "shell",
+    "--deny-tool", "write"
+  ],
+
+  "extra_args": []
+}

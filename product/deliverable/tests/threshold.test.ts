@@ -7,7 +7,16 @@ import { strict as assert } from "node:assert";
 import { test } from "node:test";
 import { Session } from "../engine/session.ts";
 import { buildServer } from "../engine/tools.ts";
-import { call, checkDocs, freshRoot, readHashesFor } from "./helpers.ts";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
+import { contentHash } from "../engine/hash.ts";
+import { call, checkDocs, freshRoot, handOver, readHashesFor } from "./helpers.ts";
+
+/** The desk pulls its method doc by tag — entering demands its hash too. */
+function deskHashes(root: string): Record<string, string> {
+  const p = "product/guidance/method/front-desk.md";
+  return { ...readHashesFor(root), [p]: contentHash(readFileSync(join(root, ...p.split("/")))) };
+}
 
 test("autonomy 0 is manual mode: the agent's every step is refused, the human walks freely", async () => {
   const root = freshRoot();
@@ -61,12 +70,18 @@ test("the gate weighs the TARGET: a 0.4 state refuses the agent at 0.2, the huma
   const r = await call(server, "se_tick", { to: "expeditions" });
   assert.equal(r.isError, true);
   assert.equal(r.body.clause, "SE-C-113");
-  // expedition_archive weighs 0.2 — exactly at the autonomy, the agent
-  // may (with its read proof: entering demands the pull's hashes).
-  const ok = await call(server, "se_tick", { to: "expedition_archive", read_hashes: readHashesFor(root) });
+  // The archives sit ABOVE the whole slider (1.5, human-only browsing) —
+  // the agent is refused at ANY autonomy.
+  const arch = await call(server, "se_tick", { to: "expedition_archive", read_hashes: readHashesFor(root) });
+  assert.equal(arch.isError, true);
+  assert.equal(arch.body.clause, "SE-C-113");
+  // The front desk weighs 0.2 — exactly at the autonomy, the agent may
+  // (with its read proof: entering demands the pull's hashes).
+  session.humanCheck("product/guidance/method/front-desk.md");
+  const ok = await call(server, "se_tick", { to: "front_desk", read_hashes: deskHashes(root) });
   assert.equal(ok.isError, false);
-  // Walk the (generated, empty) archive back to idle on the human's hand …
-  await session.tickAdvance(); await session.tickAdvance();
+  // Walk the desk back to idle on the human's hand …
+  await session.tickAdvance();
   assert.deepEqual(session.active(), ["idle"]);
   // … and the human enters the 0.4 state the agent was refused.
   await session.tickAdvance("expeditions");
@@ -80,13 +95,14 @@ test("jump back is entering too: the agent's back-jump is weighed against the au
   await session.tickAdvance(); await session.tickAdvance();
   checkDocs(session);
   await session.tickAdvance(); await session.tickAdvance(); await session.tickAdvance();
-  // Walk a JUDGMENT state (the archive, 0.2) so there is something above
+  // Walk a JUDGMENT state (the desk, 0.2) so there is something above
   // autonomy 0 to jump back to — mechanical states pass at 0 by design.
-  await session.tickAdvance("expedition_archive");
-  await session.tickAdvance(); await session.tickAdvance();
+  session.humanCheck("product/guidance/method/front-desk.md");
+  await session.tickAdvance("front_desk");
+  await session.tickAdvance();
   assert.deepEqual(session.active(), ["idle"]);
   session.setAutonomy(0);
-  const r = await call(server, "se_tick", { back: "expedition_archive" });
+  const r = await call(server, "se_tick", { back: "front_desk" });
   assert.equal(r.isError, true);
   assert.equal(r.body.clause, "SE-C-113");
 });
@@ -111,12 +127,14 @@ test("the autonomy refuses garbage: out-of-range values are typed rejections", (
 });
 
 test("reaching end fires onClosed once and the closing packet says session over", async () => {
-  const session = new Session(freshRoot());
+  const root = freshRoot();
+  const session = new Session(root);
   let fired = 0;
   session.onClosed = () => fired++;
   await session.tickAdvance(); await session.tickAdvance();
   checkDocs(session);
   await session.tickAdvance(); await session.tickAdvance(); await session.tickAdvance();
+  handOver(root); // the way out writes the next session's briefing
   const over = (await session.tickAdvance("end")) as { session_over?: boolean; banner?: string };
   assert.equal(over.session_over, true);
   assert.match(String(over.banner), /session over/i);

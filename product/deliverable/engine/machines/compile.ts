@@ -12,9 +12,10 @@
 //   - text nodes are comments — a drawing may annotate itself
 //   - escape and ask-human edges are never drawn — the executor owns them
 //   - canvas frontmatter: entry (initial state), reentry (restart|resume)
-import { existsSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { dirname, isAbsolute, join, resolve } from "node:path";
 import { loadCanvas, type CanvasElement } from "../canvas.ts";
+import { contentHash } from "../hash.ts";
 import { loadStateNote, section } from "../notes.ts";
 import { CONDITION_TYPES, conditionNoteAbs, conditionNotePath } from "../conditions.ts";
 import {
@@ -99,8 +100,52 @@ export function resolveRef(root: string, canvasPath: string, ref: string): strin
   return join(resolve(root), ref);
 }
 
-export function compileMachine(root: string, canvasPath: string): MachineDecl {
+// THE DRAWING IS DATA, AND DATA IS LIVE (owner ruling 2026-07-29). Editing a
+// state note used to do nothing until se_reload, which contradicts the law
+// that the markdown is the single truth: the file said one thing and the
+// running lane enforced another.
+//
+// Compiling on every gate would re-read a canvas and a dozen notes per call,
+// so the result is cached against the SOURCES it was built from. Anything
+// the compile touched is watched; a changed size or mtime rebuilds. The
+// canvas is always among them, so a state ADDED to the drawing invalidates
+// too — which a watch on the notes alone would miss.
+const CACHE = new Map<string, { decl: MachineDecl; sources: string[]; stamp: string }>();
+
+// STAMPED BY CONTENT, not by size and mtime. Those two are the usual cheap
+// answer and they are wrong here: a priority edited from 0.01 to 0.75 keeps
+// the byte count exactly, so a same-size edit inside one filesystem
+// timestamp tick would go unseen. Hashing a dozen small notes costs far less
+// than the compile it skips, and it cannot miss.
+function stampOf(paths: readonly string[]): string {
+  return paths
+    .map((p) => {
+      try {
+        return `${p}@${contentHash(readFileSync(p))}`;
+      } catch {
+        return `${p}@gone`;
+      }
+    })
+    .join("|");
+}
+
+/** compileMachine, memoised on the files it read. Same answer, same object,
+ *  until one of those files moves. */
+export function compileMachineCached(root: string, canvasPath: string): MachineDecl {
+  const key = `${resolve(root)}::${canvasPath}`;
+  const hit = CACHE.get(key);
+  if (hit !== undefined && stampOf(hit.sources) === hit.stamp) return hit.decl;
+  const sources: string[] = [];
+  const decl = compileMachine(root, canvasPath, sources);
+  CACHE.set(key, { decl, sources, stamp: stampOf(sources) });
+  return decl;
+}
+
+/** sources, when given, collects every file this compile read — the cache's
+ *  watch list. Compiling without it is unchanged. */
+export function compileMachine(root: string, canvasPath: string, sources?: string[]): MachineDecl {
   const machineId = canvasPath.replace(/\\/g, "/").split("/").pop()!.replace(/\.canvas$/, "");
+  sources?.push(canvasPath);
   const canvas = loadCanvas(canvasPath);
   const fm = canvas.metadata?.frontmatter ?? {};
   const reentryRaw = fm.reentry ?? "restart";
@@ -130,10 +175,11 @@ export function compileMachine(root: string, canvasPath: string): MachineDecl {
       // sub-canvas frontmatter (it has no note).
       const subId = ref.replace(/\\/g, "/").split("/").pop()!.replace(/\.canvas$/, "");
       const subPath = resolveRef(root, canvasPath, ref);
+      sources?.push(subPath);
       const subFm = existsSync(subPath) ? (loadCanvas(subPath).metadata?.frontmatter ?? {}) : {};
       const subPriority = asPriority(subFm.priority);
       if (subPriority === undefined) {
-        throw new MachineCompileError(machineId, `canvas node ${el.id}`, `${subId}.canvas declares no priority in its frontmatter — every state has one (0.01 mechanical .. 0.8 killer; 1 is the slider's ideation notch)`);
+        throw new MachineCompileError(machineId, `canvas node ${el.id}`, `${subId}.canvas declares no priority in its frontmatter — every state has one (0.01 mechanical .. 0.8 killer; 1 ideation; above 1 human-only)`);
       }
       // A sub-canvas may carry conditions in its frontmatter (flat keys,
       // like a note) — e.g. start_iteration's needs-retro gate.
@@ -142,7 +188,7 @@ export function compileMachine(root: string, canvasPath: string): MachineDecl {
       decl = {
         id: subId,
         kind: "work",
-        statement: typeof subFm.statement === "string" && subFm.statement !== "" ? subFm.statement : `The ${subId} machine.`,
+        statement: typeof subFm.statement === "string" ? subFm.statement : "",
         guidance: `A sub-machine: entering this state enters ${subId} at its start; this state completes when ${subId} reaches its end.`,
         evidence_form: [],
         submachine: ref,
@@ -153,6 +199,7 @@ export function compileMachine(root: string, canvasPath: string): MachineDecl {
       };
     } else if (ref.endsWith(".md")) {
       const notePath = resolveRef(root, canvasPath, ref);
+      sources?.push(notePath);
       if (!existsSync(notePath)) {
         throw new MachineCompileError(machineId, `canvas node ${el.id}`, `dangling reference: ${ref} not found`);
       }
@@ -181,6 +228,7 @@ export function compileMachine(root: string, canvasPath: string): MachineDecl {
     }
   }
 
+  const drawn: DrawnEdge[] = [];
   for (const edge of canvas.edges ?? []) {
     const from = byElement.get(edge.fromNode);
     const to = byElement.get(edge.toNode);
@@ -204,8 +252,19 @@ export function compileMachine(root: string, canvasPath: string): MachineDecl {
         );
       }
     }
-    const decl: EdgeDecl = { to: to.id, role: role as EdgeRole, ...(guard !== "" ? { guard } : {}) };
-    from.edges.push(decl);
+    drawn.push({ from, decl: { to: to.id, role: role as EdgeRole, ...(guard !== "" ? { guard } : {}) }, declared: roleRaw !== null, id: edge.id });
+    // ONE ARROW, BOTH WAYS (owner ruling 2026-07-28). Drawing a forward edge
+    // and a return edge as two separate arrows is what Obsidian makes
+    // tedious; a DOUBLE-HEADED arrow is what a person naturally draws
+    // instead, and Obsidian offers it in its own editor. So it means exactly
+    // that pair.
+    //
+    // The return half is left UNDECLARED on purpose, so the depth rule below
+    // names it: forward is whichever end lies deeper from start, and the
+    // other way round is the return. Nothing new decides anything.
+    if ((edge as { fromEnd?: string }).fromEnd === "arrow" && ((edge as { toEnd?: string }).toEnd ?? "arrow") === "arrow") {
+      drawn.push({ from: to, decl: { to: from.id, role: "normal", ...(guard !== "" ? { guard } : {}) }, declared: false, id: `${edge.id}~return` });
+    }
   }
 
   // start and end are MECHANICAL: every machine has exactly one of each.
@@ -219,6 +278,7 @@ export function compileMachine(root: string, canvasPath: string): MachineDecl {
   if (ends.length !== 1) {
     throw new MachineCompileError(machineId, "machine", `every machine has exactly ONE end state (found ${ends.length})`);
   }
+  for (const d of normalizeDrawnEdges(machineId, drawn, starts[0].id)) d.from.edges.push(d.decl);
   const machine: MachineDecl = {
     id: machineId,
     reentry,
@@ -231,6 +291,79 @@ export function compileMachine(root: string, canvasPath: string): MachineDecl {
     throw new MachineCompileError(machineId, "machine", String((e as Error).message));
   }
   return machine;
+}
+
+interface DrawnEdge {
+  from: StateDecl;
+  decl: EdgeDecl;
+  /** true when the drawing carries an explicit styleAttributes.role. */
+  declared: boolean;
+  id: string;
+}
+
+/** THE MACHINES-ARE-DRAWN LAW (owner ruling 2026-07-28): the engine accepts
+ *  what a person naturally draws in Obsidian — no invisible metadata.
+ *  - The same pair drawn twice collapses to one edge; an authored role wins.
+ *  - An undeclared edge running OPPOSITE a forward edge is a RETURN and
+ *    compiles as alternative. Forward is the edge whose target lies deeper
+ *    from start; equal depth is ambiguous and refuses with the edge named. */
+function normalizeDrawnEdges(machineId: string, drawn: DrawnEdge[], initial: string): DrawnEdge[] {
+  const byPair = new Map<string, DrawnEdge[]>();
+  for (const d of drawn) {
+    const key = `${d.from.id}->${d.decl.to}`;
+    const group = byPair.get(key);
+    if (group === undefined) byPair.set(key, [d]);
+    else group.push(d);
+  }
+  const kept: DrawnEdge[] = [];
+  for (const [key, group] of byPair) {
+    if (group.length === 1) {
+      kept.push(group[0]);
+      continue;
+    }
+    const authored = group.filter((d) => d.declared);
+    const roles = new Set(authored.map((d) => d.decl.role));
+    if (roles.size > 1) {
+      throw new MachineCompileError(
+        machineId,
+        `canvas edges ${group.map((d) => d.id).join(", ")}`,
+        `${key} is drawn ${group.length} times with conflicting roles (${[...roles].join(" vs ")})`,
+      );
+    }
+    kept.push(authored[0] ?? group[0]);
+  }
+  const depth = new Map<string, number>([[initial, 0]]);
+  let frontier = [initial];
+  while (frontier.length > 0) {
+    const next: string[] = [];
+    for (const id of frontier) {
+      for (const d of kept) {
+        if (d.from.id !== id || depth.has(d.decl.to)) continue;
+        depth.set(d.decl.to, (depth.get(id) ?? 0) + 1);
+        next.push(d.decl.to);
+      }
+    }
+    frontier = next;
+  }
+  const forward = (from: string, to: string) =>
+    kept.some((d) => d.from.id === from && d.decl.to === to && (d.decl.role === "normal" || d.decl.role === "approval"));
+  for (const d of kept) {
+    if (d.declared || d.decl.role !== "normal") continue;
+    if (!forward(d.decl.to, d.from.id)) continue;
+    const df = depth.get(d.from.id) ?? Infinity;
+    const dt = depth.get(d.decl.to) ?? Infinity;
+    if (dt < df) {
+      d.decl.role = "alternative";
+      continue;
+    }
+    if (df < dt) continue;
+    throw new MachineCompileError(
+      machineId,
+      `canvas edge ${d.id}`,
+      `${d.from.id} and ${d.decl.to} point at each other and neither lies closer to start — give the return edge a role`,
+    );
+  }
+  return kept;
 }
 
 function asString(v: unknown): string | undefined {
@@ -250,7 +383,9 @@ function asList(v: unknown): string[] | undefined {
 
 function asPriority(v: unknown): number | undefined {
   const n = typeof v === "number" ? v : typeof v === "string" && v !== "" ? Number(v) : NaN;
-  return Number.isFinite(n) && n >= 0 && n <= 1 ? n : undefined;
+  // Above 1 = beyond the slider: the agent can never enter, the human
+  // always may (the archives browse at 1.5).
+  return Number.isFinite(n) && n >= 0 && n <= 1.5 ? n : undefined;
 }
 
 /** Conditions are FLAT frontmatter keys — exit_read, exit_script,
@@ -282,9 +417,9 @@ export function stateFromNote(machineId: string, ref: string, notePath: string, 
   if (stateId === undefined || stateId === "") {
     throw new MachineCompileError(machineId, ref, "missing state (the state's id) in frontmatter");
   }
-  const KINDS = ["work", "gate", "terminal", "start", "end"];
+  const KINDS = ["work", "gate", "terminal", "start", "end", "join"];
   const kindRaw = asString(x.state_kind);
-  const kind = kindRaw !== undefined && KINDS.includes(kindRaw) ? (kindRaw as "work" | "gate" | "terminal" | "start" | "end") : null;
+  const kind = kindRaw !== undefined && KINDS.includes(kindRaw) ? (kindRaw as StateDecl["kind"]) : null;
   if (kind === null) {
     throw new MachineCompileError(machineId, ref, `state_kind must be one of ${KINDS.join(" | ")} (got ${JSON.stringify(x.state_kind)})`);
   }
@@ -309,7 +444,10 @@ export function stateFromNote(machineId: string, ref: string, notePath: string, 
   return {
     id: stateId,
     kind,
-    statement: note.statement,
+    // The statement is AUTHORED frontmatter, never derived from the H1 —
+    // it exists only when it adds meaning; the mirror shows it under the
+    // node's name.
+    statement: asString(x.statement) ?? "",
     guidance,
     priority,
     evidence_form: [...evidenceForm(machineId, ref, note.body), ...(kind === "gate" ? STANDARD_ROUNDS : [])],

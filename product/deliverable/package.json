@@ -1,9 +1,9 @@
 {
-  "name": "quackitect-v3-engine",
+  "name": "se-engine",
   "version": "3.0.0-bootstrap",
   "private": true,
   "type": "module",
-  "description": "quackitect v3 — the se MCP server: caged-agent tool lane, call log, state machine kernel.",
+  "description": "The se MCP server: caged-agent tool lane, call log, state machine kernel.",
   "engines": {
     "node": ">=22.6"
   },
@@ -12,7 +12,10 @@
     "serve": "node engine/bin/se-mcp.ts --root ../.."
   },
   "dependencies": {
+    "@lydell/node-pty": "^1.1.0",
+    "@vscode-elements/elements": "^2.5.1",
     "@vscode/ripgrep": "^1.15.9",
+    "@xterm/xterm": "^5.5.0",
     "marked": "^15.0.0",
     "yaml": "^2.9.0"
   },

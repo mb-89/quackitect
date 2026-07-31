@@ -149,9 +149,13 @@ visibility — only conditions gate. Never author `pulled`.
 
 ## Layout and sizing
 
-- Size a state node to DISPLAY its whole note: state notes as written here
-  need roughly **620 × 640**. Compute, don't guess: ~28px per rendered line
-  plus ~120px chrome, and keep nodes square-ish.
+- A NEW NODE IS BORN THE SIZE OF ITS LABEL. Make it just big enough for the
+  title and the subtitle. Nothing more.
+- The old rule sized a node to display its whole NOTE, around 620 × 640. It
+  is struck (owner ruling 2026-07-28). A note-reading box is far too big for
+  what a machine drawing shows.
+- THE SIZE YOU DRAW IS THE SIZE THAT RENDERS. The render takes the geometry
+  verbatim now. Adjust a node in Obsidian and the mirror agrees on reload.
 - **Start and terminal states are pills**: `"styleAttributes":{"shape":"pill"}`,
   around **320 × 160** — the state-machine start/end glyph. (Advanced Canvas
   shapes: `pill`, `diamond`, `parallelogram`, `circle`, `predefined-process`,

@@ -9,11 +9,11 @@
 import { spawnSync } from "node:child_process";
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
-import { type CanvasData, type CanvasEdge, type CanvasElement } from "./canvas.ts";
+import { nodeSize, type CanvasData, type CanvasEdge, type CanvasElement } from "./canvas.ts";
 import { validateMachine, type MachineDecl, type StateDecl } from "./machine.ts";
 import { stateFromNote } from "./machines/compile.ts";
 import { parseStateNote } from "./notes.ts";
-import { expList, readRecord, recordRel, type Expedition } from "./worktree.ts";
+import { expList, frontmatterOf, readRecord, recordRel, type Expedition } from "./worktree.ts";
 
 export interface GeneratedMachine {
   decl: MachineDecl;
@@ -33,7 +33,7 @@ function mechanical(id: string, kind: "start" | "end"): StateDecl {
   return {
     id,
     kind,
-    statement: kind === "start" ? "Start" : "End",
+    statement: "",
     guidance:
       kind === "start"
         ? "The seeded container: every open expedition stands as its own states. Pick ONE way forward — entering an expedition binds its worktree."
@@ -66,13 +66,24 @@ export function generateContinueExpedition(root: string): GeneratedMachine {
   const nodes: GenNode[] = [];
   const edges: CanvasEdge[] = [];
 
-  const centerY = open.length === 0 ? 80 : ((open.length - 1) * 560) / 2 + 100;
+  // THE ROW FOLLOWS THE BOXES, THE BOXES DO NOT FOLLOW THE ROW. These numbers
+  // were hand-tuned for the struck 620x360 birth size, so a box that shrank to
+  // its label left a group four times too wide around it.
+  const ROW_STEP = 300; // group height plus the gap between two expeditions
+  const GUTTER = 140; // between the work box and its leave box
+  const PAD = 60; // group border to box
+  const centerY = open.length === 0 ? 80 : ((open.length - 1) * ROW_STEP) / 2 + 50;
   nodes.push({ id: "n-start", type: "file", file: "start.md", x: -1400, y: centerY, width: 160, height: 160, styleAttributes: { shape: "pill" } });
-  nodes.push({ id: "n-end", type: "file", file: "end.md", x: 1240, y: centerY, width: 160, height: 160, styleAttributes: { shape: "pill" } });
+  const endNode: GenNode = { id: "n-end", type: "file", file: "end.md", x: 0, y: centerY, width: 160, height: 160, styleAttributes: { shape: "pill" } };
+  nodes.push(endNode);
+  let rightmost = -740;
 
   open.forEach((e, i) => {
     const sid = shortId(e.id);
-    const goal = String(readRecord(root, e)?.goal ?? "");
+    const fm = readRecord(root, e);
+    // A record that will not parse still gets a node, saying so. Dropping it
+    // would leave a hole where an expedition used to be.
+    const goal = fm?.unreadable !== undefined ? `⚠ ${String(fm.unreadable)}` : String(fm?.goal ?? "");
     const workId = sid;
     const leaveId = `${sid}-leave`;
     expByState[workId] = e.id;
@@ -80,16 +91,24 @@ export function generateContinueExpedition(root: string): GeneratedMachine {
     states.push({ ...workTpl, id: workId, statement: goal !== "" ? goal : e.id, edges: [{ to: leaveId, role: "normal" }] });
     // ALTERNATIVE into end — normal edges would AND-join: end would wait
     // for EVERY expedition, and one coming home is the whole point.
-    states.push({ ...leaveTpl, id: leaveId, statement: `Leave ${sid}`, edges: [{ to: "end", role: "alternative" }] });
+    states.push({ ...leaveTpl, id: leaveId, statement: "", edges: [{ to: "end", role: "alternative" }] });
     start.edges.push({ to: workId, role: "normal" });
-    const y = i * 560;
-    nodes.push({ id: `g-${sid}`, type: "group", x: -800, y: y - 60, width: 1720, height: 480, label: e.id });
-    nodes.push({ id: `n-${workId}`, type: "file", file: `${workId}.md`, x: -740, y, width: 620, height: 360 });
-    nodes.push({ id: `n-${leaveId}`, type: "file", file: `${leaveId}.md`, x: 140, y, width: 620, height: 360 });
+    const y = i * ROW_STEP;
+    const workBox = nodeSize(workId, goal);
+    const leaveBox = nodeSize(leaveId);
+    const workX = -740;
+    const leaveX = workX + workBox.width + GUTTER;
+    const right = leaveX + leaveBox.width;
+    if (right > rightmost) rightmost = right;
+    const rowH = Math.max(workBox.height, leaveBox.height);
+    nodes.push({ id: `g-${sid}`, type: "group", x: workX - PAD, y: y - PAD, width: right + PAD - (workX - PAD), height: rowH + PAD * 2, label: e.id });
+    nodes.push({ id: `n-${workId}`, type: "file", file: `${workId}.md`, x: workX, y, ...workBox });
+    nodes.push({ id: `n-${leaveId}`, type: "file", file: `${leaveId}.md`, x: leaveX, y, ...leaveBox });
     edges.push({ id: `e-start-${workId}`, fromNode: "n-start", toNode: `n-${workId}` });
     edges.push({ id: `e-${workId}-${leaveId}`, fromNode: `n-${workId}`, toNode: `n-${leaveId}` });
     edges.push({ id: `e-${leaveId}-end`, fromNode: `n-${leaveId}`, toNode: "n-end" });
   });
+  endNode.x = rightmost + 260;
   if (open.length === 0) {
     start.edges.push({ to: "end", role: "normal" });
     edges.push({ id: "e-start-end", fromNode: "n-start", toNode: "n-end" });
@@ -131,7 +150,7 @@ function closedRecords(root: string, closed: Expedition[]): Map<string, Record<s
   for (const e of closed) {
     const merged = join(root, recordRel(e.id));
     if (existsSync(merged)) {
-      out.set(e.id, parseStateNote(readFileSync(merged, "utf8")).frontmatter);
+      out.set(e.id, frontmatterOf(readFileSync(merged, "utf8"), `${e.id} record`));
     } else if (cache.has(e.id)) {
       out.set(e.id, cache.get(e.id));
     } else {
@@ -165,7 +184,7 @@ function closedRecords(root: string, closed: Expedition[]): Map<string, Record<s
       continue;
     }
     const size = Number(header[2]);
-    cache.set(e.id, parseStateNote(buf.subarray(off, off + size).toString("utf8")).frontmatter);
+    cache.set(e.id, frontmatterOf(buf.subarray(off, off + size).toString("utf8"), `${e.id} record`));
     out.set(e.id, cache.get(e.id));
     off += size + 1;
   }
@@ -207,10 +226,13 @@ function buildRecordColumn(machineId: string, entries: ArchiveEntry[], kindWord:
   nodes.push({ id: "n-end", type: "file", file: "end.md", x: -240, y: centerY, width: 160, height: 160, styleAttributes: { shape: "pill" } });
   entries.forEach((e, i) => {
     expByState[e.sid] = e.full;
-    states.push(recordState(e, kindWord));
+    const st = recordState(e, kindWord);
+    states.push(st);
     start.edges.push({ to: e.sid, role: "normal" });
     const y = i * 420;
-    nodes.push({ id: `n-${e.sid}`, type: "file", file: `${e.sid}.md`, x: -1100, y, width: 620, height: 360 });
+    // SIZED BY THE TEXT IT SHOWS. Measuring the id alone made every archive
+    // box 200x72 while the drawing painted the goal underneath it.
+    nodes.push({ id: `n-${e.sid}`, type: "file", file: `${e.sid}.md`, x: -1100, y, ...nodeSize(e.sid, st.statement) });
     edges.push({ id: `e-start-${e.sid}`, fromNode: "n-start", toNode: `n-${e.sid}` });
     edges.push({ id: `e-${e.sid}-end`, fromNode: `n-${e.sid}`, toNode: "n-end" });
   });
@@ -254,7 +276,7 @@ function buildDecades(machineId: string, entries: ArchiveEntry[], kindWord: stri
     });
     subGen[decId] = () => buildRecordColumn(decId, slice, kindWord);
     start.edges.push({ to: decId, role: "normal" });
-    nodes.push({ id: `n-${decId}`, type: "file", file: `${decId}.md`, x: -1100, y: d * 420, width: 620, height: 360 });
+    nodes.push({ id: `n-${decId}`, type: "file", file: `${decId}.md`, x: -1100, y: d * 420, ...nodeSize(decId) });
     edges.push({ id: `e-start-${decId}`, fromNode: "n-start", toNode: `n-${decId}` });
     edges.push({ id: `e-${decId}-end`, fromNode: `n-${decId}`, toNode: "n-end" });
   }

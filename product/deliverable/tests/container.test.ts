@@ -3,7 +3,8 @@
 // one coming home completes the machine; empty runs start → end.
 import { strict as assert } from "node:assert";
 import { spawnSync } from "node:child_process";
-import { existsSync, mkdirSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { test } from "node:test";
 import { generateContinueExpedition, generateExpeditionArchive, shortId } from "../engine/expmachine.ts";
@@ -30,6 +31,27 @@ function gitSeed(root: string): void {
   g("config", "user.name", "t");
   g("config", "user.email", "t@t");
 }
+
+// ROOTS ARE SESSION STATE (found live 2026-07-30): the declaration lives in
+// the project root's .se/roots.json, and a bound worktree carries no .se —
+// resolving @refs against the worktree made every declared root read as
+// undeclared the moment an expedition was entered.
+test("a declared root survives a bound worktree", async () => {
+  const root = freshRoot();
+  gitSeed(root);
+  const outside = mkdtempSync(join(tmpdir(), "se-root-"));
+  writeFileSync(join(outside, "a.md"), "# from beyond the fence\n");
+  mkdirSync(join(root, ".se"), { recursive: true });
+  writeFileSync(join(root, ".se", "roots.json"), JSON.stringify({ out: outside }));
+  const s = new Session(root);
+  await bootHuman(s);
+  const e = s.expeditionNew("spike", "roots survive binding") as { created: string };
+  s.expeditionOpen(e.created);
+  assert.equal(s.laneRoot("@out/a.md"), root, "a @ref resolves against the project root, never the worktree");
+  const { fileRead } = await import("../engine/files.ts");
+  assert.ok(fileRead(s.laneRoot("@out/a.md"), "@out/a.md").content.includes("from beyond the fence"));
+  rmSync(outside, { recursive: true, force: true });
+});
 
 test("empty container: nothing open → start runs straight to end", async () => {
   const root = freshRoot();
@@ -69,10 +91,19 @@ test("seeded container: expeditions are the states, entering BINDS, one ending c
   await s.tickAdvance(sidB);
   assert.deepEqual(s.active(), [`expeditions/${sidB}`]);
   assert.ok(s.workRoot().includes(b.created), "entering bound the worktree");
+  // ONE LANE, TWO TREES (owner ruling 2026-07-28). Project content follows the
+  // walk into the worktree; `.se/` is SESSION state and stays at the project
+  // root. The handover used to resolve into the worktree, which has no .se —
+  // so it was written where the next session never looks, and failed silently.
+  assert.equal(s.laneRoot("product/guidance/voice.md"), s.workRoot(), "project content rides the branch");
+  assert.equal(s.laneRoot(".se/HANDOVER.md"), root, "the handover belongs to the root, whatever branch we stand on");
+  assert.equal(s.laneRoot(), s.workRoot(), "no path named — the work root, as before");
   // The leave gate holds until the page passes; then close, end, return.
   await assert.rejects(() => s.tickAdvance(`${sidB}-leave`), (e) => (e as { clause?: string }).clause === "SE-C-112");
   s.formSave("expedition-leave", { "What was the goal": "second thing", "What was done": "it", "What settled it": "the container test", "What was not done": "nothing" });
-  s.formDone("expedition-leave", "agent");
+  // A PERSON confirms the report; the close then needs no override. The guard
+  // itself is tested in editsafety.test.ts — this one is about the archive.
+  s.formDone("expedition-leave", "human");
   await s.tickAdvance(`${sidB}-leave`);
   s.expeditionClose(true);
   await s.tickAdvance();
@@ -96,7 +127,7 @@ test("the archive: start reaches every closed expedition, each runs to end, brow
   const sid = shortId(a.created);
   const rep = join(root, ".worktrees", a.created, "product", "spec", "expeditions", a.created, "report.md");
   mkdirSync(dirname(rep), { recursive: true });
-  writeFileSync(rep, "goal · shipped · threads\n", "utf8");
+  writeFileSync(rep, "---\nform: expedition-leave\nstatus: done\nby: human\n---\n\ngoal · shipped · threads\n", "utf8");
   s.expeditionOpen(a.created);
   s.expeditionClose(true);
   const gen = generateExpeditionArchive(root);

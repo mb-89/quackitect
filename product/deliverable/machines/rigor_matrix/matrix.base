@@ -1,0 +1,90 @@
+formulas:
+  patch: link(name + "--patch", if(link(name + "--patch").asFile().properties.applies, link(name + "--patch").asFile().properties.applies, "cell"))
+  minor: link(name + "--minor", if(link(name + "--minor").asFile().properties.applies, link(name + "--minor").asFile().properties.applies, "cell"))
+  major: link(name + "--major", if(link(name + "--major").asFile().properties.applies, link(name + "--major").asFile().properties.applies, "cell"))
+  product: link(name + "--product", if(link(name + "--product").asFile().properties.applies, link(name + "--product").asFile().properties.applies, "cell"))
+  specification: link(name + "--specification", if(link(name + "--specification").asFile().properties.applies, link(name + "--specification").asFile().properties.applies, "cell"))
+properties:
+  file.name:
+    displayName: State
+  state_kind:
+    displayName: Kind
+  formula.patch:
+    displayName: Patch
+  formula.minor:
+    displayName: Minor
+  formula.major:
+    displayName: Major
+  formula.product:
+    displayName: Product
+  formula.specification:
+    displayName: Specification
+  row:
+    displayName: Row
+  column:
+    displayName: Column
+  applies:
+    displayName: Applies
+views:
+  - type: table
+    name: The matrix
+    filters:
+      and:
+        - kind == "matrix-row"
+    order:
+      - file.name
+      - state_kind
+      - formula.patch
+      - formula.minor
+      - formula.major
+      - formula.product
+      - formula.specification
+      - COMMENT
+    sort:
+      - property: file.name
+        direction: ASC
+  - type: table
+    name: Strike proposals
+    filters:
+      and:
+        - kind == "matrix-cell"
+        - applies == "none"
+    order:
+      - file.name
+      - row
+      - column
+    sort:
+      - property: column
+        direction: ASC
+      - property: row
+        direction: ASC
+  - type: table
+    name: All cells
+    filters:
+      and:
+        - kind == "matrix-cell"
+    groupBy:
+      property: column
+      direction: ASC
+    order:
+      - file.name
+      - row
+      - applies
+    sort:
+      - property: row
+        direction: ASC
+  - type: table
+    name: Rows in detail
+    filters:
+      and:
+        - kind == "matrix-row"
+    order:
+      - file.name
+      - state_kind
+      - filled_by
+      - depends_on
+      - seeds
+      - statement
+    sort:
+      - property: file.name
+        direction: ASC

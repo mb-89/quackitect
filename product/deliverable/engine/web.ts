@@ -28,7 +28,7 @@ export async function webFetch(url: string, opts: { offset?: number } = {}): Pro
       source: "engine/web.ts",
     });
   }
-  const res = await fetch(u, { redirect: "follow", headers: { "user-agent": "quackitect-v3-se", accept: "text/html,text/plain,application/json;q=0.9,*/*;q=0.5" }, signal: AbortSignal.timeout(30_000) });
+  const res = await fetch(u, { redirect: "follow", headers: { "user-agent": "se-web-fetch", accept: "text/html,text/plain,application/json;q=0.9,*/*;q=0.5" }, signal: AbortSignal.timeout(30_000) });
   const type = res.headers.get("content-type") ?? "";
   const body = await res.text();
   const text = type.includes("html") ? htmlToText(body) : body;

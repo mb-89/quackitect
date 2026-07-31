@@ -10,6 +10,7 @@
 //
 // Wire names use underscores (se_get_node): the Anthropic API rejects dots
 // in tool names, so dotted names live in titles/descriptions only.
+import type { IncomingMessage, ServerResponse } from "node:http";
 import { createInterface } from "node:readline";
 import { Rejection } from "./errors.ts";
 
@@ -134,9 +135,12 @@ export class McpServer {
             for (const guard of this.guards) guard(name, args);
             let result = await tool.handler(args);
             for (const d of this.decorators) result = d(name, result);
-            this.observe({ tool: name, args, ok: true, duration_ms: Date.now() - started, outcome: "result", response: result });
+            // Attachments are split off BEFORE the log sees them: base64 in
+            // calls.jsonl would bloat it for no reader's benefit.
+            const { payload, blocks } = this.splitAttachments(result);
+            this.observe({ tool: name, args, ok: true, duration_ms: Date.now() - started, outcome: "result", response: payload });
             return this.ok(id, {
-              content: [{ type: "text", text: JSON.stringify(result, null, 1) }],
+              content: [{ type: "text", text: JSON.stringify(payload, null, 1) }, ...blocks],
               isError: false,
             });
           } catch (e) {
@@ -164,6 +168,15 @@ export class McpServer {
     }
   }
 
+  /** A result may carry extra MCP content blocks in _attachments — an image
+   *  read does. They travel to the model but never into the JSON payload. */
+  private splitAttachments(result: unknown): { payload: unknown; blocks: unknown[] } {
+    if (result === null || typeof result !== "object") return { payload: result, blocks: [] };
+    const { _attachments, ...rest } = result as Record<string, unknown>;
+    if (!Array.isArray(_attachments)) return { payload: result, blocks: [] };
+    return { payload: rest, blocks: _attachments };
+  }
+
   private ok(id: number | string, result: unknown): JsonRpcResponse {
     return { jsonrpc: "2.0", id, result };
   }
@@ -173,9 +186,13 @@ export class McpServer {
   }
 }
 
-/** stdio loop: one JSON message per line, UTF-8. */
-export function runStdio(server: McpServer): void {
+/** stdio loop: one JSON message per line, UTF-8. onGone fires when the lane
+ *  closes — the only notice the engine gets that the console quit. Without it
+ *  the mirror can only infer death from silence, and the reader waits out a
+ *  timeout for an answer the server already had. */
+export function runStdio(server: McpServer, onGone?: () => void): void {
   const rl = createInterface({ input: process.stdin, terminal: false });
+  rl.on("close", () => onGone?.());
   rl.on("line", (line) => {
     const trimmed = line.trim();
     if (trimmed === "") return;
@@ -191,5 +208,49 @@ export function runStdio(server: McpServer): void {
     void server.handle(msg).then((res) => {
       if (res) process.stdout.write(JSON.stringify(res) + "\n");
     });
+  });
+}
+
+/** MCP over HTTP: one POST in, one JSON answer out — the SAME dispatch as
+ *  stdio, so every attached harness shares the one session and walk. GET
+ *  would be the protocol's optional server-push stream; it is not served,
+ *  and clients carry on with plain POSTs. */
+export function handleHttp(server: McpServer, req: IncomingMessage, res: ServerResponse): void {
+  if (req.method === "DELETE") {
+    // A client closing its session. Nothing is held per client — the walk
+    // belongs to the process, not to whoever attached.
+    res.writeHead(200);
+    res.end();
+    return;
+  }
+  if (req.method !== "POST") {
+    res.writeHead(405, { allow: "POST, DELETE" });
+    res.end();
+    return;
+  }
+  const chunks: Buffer[] = [];
+  req.on("data", (c: Buffer) => chunks.push(c));
+  req.on("end", () => {
+    void (async () => {
+      let parsed: unknown;
+      try {
+        parsed = JSON.parse(Buffer.concat(chunks).toString("utf8"));
+      } catch {
+        res.writeHead(400, { "content-type": "application/json; charset=utf-8" });
+        res.end(JSON.stringify({ jsonrpc: "2.0", id: null, error: { code: -32700, message: "parse error" } }));
+        return;
+      }
+      const batch = Array.isArray(parsed);
+      const msgs = (batch ? parsed : [parsed]) as JsonRpcRequest[];
+      const answers = (await Promise.all(msgs.map((m) => server.handle(m)))).filter((r) => r !== null);
+      if (answers.length === 0) {
+        // Notifications only — accepted, nothing to say back.
+        res.writeHead(202);
+        res.end();
+        return;
+      }
+      res.writeHead(200, { "content-type": "application/json; charset=utf-8" });
+      res.end(JSON.stringify(batch ? answers : answers[0]));
+    })();
   });
 }

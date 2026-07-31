@@ -13,12 +13,15 @@
 //   - geometry-true SVG, wheel-zoom, drag-pan; JSON as key/value tables
 // One source, two projections: the packet JSON shown here IS what the
 // agent receives.
-import { loadCanvas, type CanvasData, type CanvasElement } from "./canvas.ts";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
+import { bindings, loadCards } from "./cards.ts";
+import { loadCanvas, subLabel, type CanvasData, type CanvasElement } from "./canvas.ts";
 import { CallLog, type CallRecord } from "./calllog.ts";
 import { type StrayNote } from "./inbox.ts";
 import { loadLevels } from "./scale.ts";
 import { mainMachinePath, Session } from "./session.ts";
-import { compileMachine, resolveRef } from "./machines/compile.ts";
+import { compileMachineCached, resolveRef } from "./machines/compile.ts";
 import { type MachineDecl } from "./machine.ts";
 
 function esc(s: string): string {
@@ -48,14 +51,118 @@ function sidePoint(el: CanvasElement, side: string | undefined, other: CanvasEle
   }
 }
 
+/** THE FEED PALETTE — one colour per role, none shared (owner ruling
+ *  2026-07-28). The aq kind wore the agent's blue and the update kind wore
+ *  the human's amber, so two of the three columns said the same thing twice.
+ *
+ *  Green, red and amber are RESERVED by the voice for pass, failure and
+ *  attention, so no role may take them — a kind painted amber reads as a
+ *  verdict. Data, not scattered literals, and a test holds it true. */
+export const FEED_COLOURS: Record<string, string> = {
+  time: "#566068",
+  "src-agent": "#6fb3a8",
+  "src-human": "#e0834a",
+  "kind-call": "#8a97a3",
+  "kind-update": "#7cc4e8",
+  "kind-note": "#c58fe8",
+  "kind-aq": "#f0879a",
+};
+
+/** What the voice already spent: pass, failure, attention. */
+export const RESERVED_COLOURS: string[] = ["#4a7a55", "#e86a5f", "#e8b339"];
+
 export interface StateMeta {
   has_exit: boolean;
   exit_met: boolean;
   has_entry: boolean;
   entry_met: boolean;
+  /** The state's authored second line — drawn small under the name. */
+  subtitle?: string;
 }
 
-function machineSvg(canvas: CanvasData, activeIds: Set<string>, doneIds: Set<string>, subIds: Set<string>, meta: Record<string, StateMeta>): string {
+/** THE DRAWING IS THE TRUTH, SIZE INCLUDED (owner ruling 2026-07-28).
+ *
+ *  The render used to compute its own box sizes, because a label needs less
+ *  room than a note and the drawing scales to fit its pane. That made the
+ *  render and Obsidian look nothing alike, and it meant a size the owner
+ *  fixed in Obsidian was overruled on the way to the screen.
+ *
+ *  So the render now takes the geometry VERBATIM — position and size both.
+ *  Fix it in Obsidian and it is fixed here. A node is instead born at the
+ *  size of its label (canvas.nodeSize), which is a starting point a person
+ *  adjusts, not a size anything re-imposes later.
+ */
+/** THE ROUTE, REDUCED TO ONE DRAWING (owner design 2026-07-29). The walk's
+ *  route is a list of qualified hops; a canvas shows one machine. So each
+ *  hop is projected onto the machine being VIEWED, giving the ORDERED stops
+ *  the line runs through:
+ *
+ *  - both ends land on different states here — both are stops on the way;
+ *  - both ends land on the SAME state here — the route is running around
+ *    INSIDE it, so that state is a WAYPOINT. Navigation systems put a point
+ *    on the line for somewhere you pass through, and a submachine entered
+ *    and left again is exactly that. Click it to zoom in.
+ *  - neither end is here — the hop belongs to another drawing.
+ *
+ *  A stop that is not a waypoint carries NO mark. The line runs through its
+ *  anchor all the same, which is what the owner called an invisible waypoint. */
+export function routeOverlay(
+  steps: { from: string; to: string }[],
+  viewId: string,
+  mainId: string,
+): { waypoints: Set<string>; path: string[] } {
+  const prefix = viewId === mainId ? "" : viewId;
+  const local = (q: string): string | undefined => {
+    if (prefix === "") return q.split("/")[0];
+    if (!q.startsWith(`${prefix}/`)) return undefined;
+    return q.slice(prefix.length + 1).split("/")[0];
+  };
+  const waypoints = new Set<string>();
+  const path: string[] = [];
+  const visit = (id: string): void => {
+    if (path[path.length - 1] !== id) path.push(id);
+  };
+  for (const s of steps) {
+    const a = local(s.from);
+    const b = local(s.to);
+    if (a === undefined || b === undefined) continue;
+    visit(a);
+    if (a === b) waypoints.add(a);
+    else visit(b);
+  }
+  return { waypoints, path };
+}
+
+interface RouteMarks {
+  waypoints: Set<string>;
+  /** The stops in order. The spline runs through their anchors. */
+  path: string[];
+  /** The destination, if it is in this drawing. */
+  target?: string;
+  /** The hop the walk cannot pass, and why. Drawn as a road closure. */
+  blocked?: { at: string; why: string };
+}
+
+/** A Catmull-Rom spline through every stop, emitted as cubic Beziers — the
+ *  line BENDS through the stops instead of hinging at them. */
+function splinePath(p: [number, number][]): string {
+  if (p.length < 2) return "";
+  const f = (v: number): string => v.toFixed(1);
+  let d = `M ${f(p[0][0])} ${f(p[0][1])}`;
+  for (let i = 0; i < p.length - 1; i++) {
+    const p0 = p[i - 1] ?? p[i];
+    const p1 = p[i];
+    const p2 = p[i + 1];
+    const p3 = p[i + 2] ?? p2;
+    d += ` C ${f(p1[0] + (p2[0] - p0[0]) / 6)} ${f(p1[1] + (p2[1] - p0[1]) / 6)}`;
+    d += ` ${f(p2[0] - (p3[0] - p1[0]) / 6)} ${f(p2[1] - (p3[1] - p1[1]) / 6)}`;
+    d += ` ${f(p2[0])} ${f(p2[1])}`;
+  }
+  return d;
+}
+
+function machineSvg(source: CanvasData, activeIds: Set<string>, doneIds: Set<string>, subIds: Set<string>, meta: Record<string, StateMeta>, route?: RouteMarks): string {
+  const canvas = source;
   const nodes = canvas.nodes ?? [];
   const pad = 60;
   const minX = Math.min(...nodes.map((n) => n.x)) - pad;
@@ -63,6 +170,11 @@ function machineSvg(canvas: CanvasData, activeIds: Set<string>, doneIds: Set<str
   const maxX = Math.max(...nodes.map((n) => n.x + n.width)) + pad;
   const maxY = Math.max(...nodes.map((n) => n.y + n.height)) + pad;
   const byId = new Map(nodes.map((n) => [n.id, n]));
+  const nodeOfState = new Map<string, (typeof nodes)[number]>();
+  for (const n of nodes) {
+    const s = stateIdOf(n);
+    if (s !== undefined) nodeOfState.set(s, n);
+  }
   const parts: string[] = [];
 
   // Groups first — presentation only, drawn behind everything.
@@ -80,7 +192,10 @@ function machineSvg(canvas: CanvasData, activeIds: Set<string>, doneIds: Set<str
     if (a === undefined || b === undefined) continue;
     const [x1, y1] = sidePoint(a, (edge as { fromSide?: string }).fromSide, b);
     const [x2, y2] = sidePoint(b, (edge as { toSide?: string }).toSide, a);
-    parts.push(`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" class="edge" marker-end="url(#arrow)"/>`);
+    // A double-headed arrow is one edge meaning both ways, so it draws that
+    // way too — the marker already orients itself at a start.
+    const bothWays = (edge as { fromEnd?: string }).fromEnd === "arrow";
+    parts.push(`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" class="edge"${bothWays ? ' marker-start="url(#arrow)"' : ""} marker-end="url(#arrow)"/>`);
     if (edge.label !== undefined && edge.label !== "") {
       parts.push(`<text x="${(x1 + x2) / 2}" y="${(y1 + y2) / 2 - 8}" class="guard">${esc(edge.label)}</text>`);
     }
@@ -104,7 +219,10 @@ function machineSvg(canvas: CanvasData, activeIds: Set<string>, doneIds: Set<str
       // Sub-machine states carry a DOUBLE border.
       parts.push(`<rect x="${n.x + 8}" y="${n.y + 8}" width="${n.width - 16}" height="${n.height - 16}" rx="${Math.max(4, rx - 8)}" class="${cls} inner"/>`);
     }
-    parts.push(`<text x="${n.x + n.width / 2}" y="${n.y + n.height / 2 + 6}" class="label">${esc(sid)}</text></g>`);
+    const sub = subLabel(meta[sid]?.subtitle);
+    parts.push(`<text x="${n.x + n.width / 2}" y="${n.y + n.height / 2 + (sub !== undefined ? -6 : 6)}" class="label">${esc(sid)}</text>`);
+    if (sub !== undefined) parts.push(`<text x="${n.x + n.width / 2}" y="${n.y + n.height / 2 + 24}" class="sublabel">${esc(sub)}</text>`);
+    parts.push("</g>");
     // Condition buttons ride the node's edges: enter on the LEFT (where the
     // arrow comes in), leave on the RIGHT (in front of the arrow out).
     const mt = meta[sid];
@@ -117,6 +235,62 @@ function machineSvg(canvas: CanvasData, activeIds: Set<string>, doneIds: Set<str
         parts.push(`<g class="clickable cond ${mt.exit_met ? "met" : "unmet"}" data-detail="cond:${esc(sid)}"><circle cx="${n.x + n.width}" cy="${cy}" r="18"/><text x="${n.x + n.width}" y="${cy + 7}" class="cond-label">${mt.exit_met ? "✓" : "!"}</text></g>`);
       }
     }
+  }
+
+  // THE ROUTE IS DRAWN OVER THE NODES (owner ruling 2026-07-29), reversing
+  // the along-the-edges ruling of the same day. Riding the edges read as the
+  // graph highlighting itself; a navigation system lays its line ON the map.
+  // It is pushed LAST so it covers the boxes, exactly as a route does.
+  //
+  // ARRIVED MEANS CLEAR: with fewer than two stops there is no way left to
+  // show, so neither line nor arrow is drawn.
+  const stops: { id: string; cx: number; cy: number }[] = [];
+  for (const id of route?.path ?? []) {
+    const n = nodeOfState.get(id);
+    // The anchor: centred across the node and a quarter down — the band
+    // between its top edge and its title, so the line never crosses the words.
+    if (n !== undefined) stops.push({ id, cx: n.x + n.width / 2, cy: n.y + n.height / 4 });
+  }
+  if (stops.length >= 2) {
+    // A ROAD CLOSURE (owner ruling 2026-07-29). The route already knows the hop
+    // the walk cannot pass — usually a state sitting above the autonomy slider.
+    // Drawn as one unbroken line the map says the whole way is open, which is
+    // the one moment it lies. So the line runs normally up to the closure and
+    // FADES past it: the way exists, it is shut.
+    const xy = (s: { cx: number; cy: number }): [number, number] => [s.cx, s.cy];
+    const shut = route?.blocked === undefined ? -1 : stops.findIndex((s) => s.id === route.blocked?.at);
+    const open = shut > 0 ? stops.slice(0, shut) : stops;
+    const past = shut > 0 ? stops.slice(shut - 1) : [];
+    // fill="none" is an ATTRIBUTE, not just a class rule. An SVG path with no
+    // fill declared paints SOLID BLACK, so the one time the stylesheet is not
+    // there the route becomes a black blob swallowing the drawing. That is not
+    // hypothetical: it is exactly what a reader saw, because the mirror morphs
+    // the body and never re-sent the <style>. The attribute survives that.
+    if (open.length >= 2) parts.push(`<path d="${splinePath(open.map(xy))}" fill="none" class="route-line"/>`);
+    if (past.length >= 2) parts.push(`<path d="${splinePath(past.map(xy))}" fill="none" class="route-line shut"/>`);
+    // A waypoint and the destination are the SAME filled dot. The owner's
+    // sketch drew the destination as a ring; that was the pen, not the intent.
+    for (const [i, s] of stops.entries()) {
+      if (route?.target === s.id || route?.waypoints.has(s.id) === true) {
+        parts.push(`<circle cx="${s.cx}" cy="${s.cy}" r="8" class="route-stop${shut > 0 && i >= shut ? " shut" : ""}"/>`);
+      }
+    }
+    // THE CLOSURE MARK, on the hop that shuts, carrying the reason. An
+    // exclamation in a ring rather than a bar across the line: a bar reads as
+    // part of the road, and it stays upright whichever way the road runs.
+    if (shut > 0) {
+      const b = stops[shut];
+      parts.push(
+        `<g class="clickable" data-detail="state:${esc(b.id)}"><title>${esc(route?.blocked?.why ?? "")}</title>` +
+          `<g class="route-shut" transform="translate(${b.cx} ${b.cy})">` +
+          `<circle r="12" class="shut-ring"/><path d="M 0 -6.5 L 0 2.5" class="shut-bang"/><circle cy="7" r="1.7" class="shut-dot"/>` +
+          `</g></g>`,
+      );
+    }
+    // YOU ARE HERE: the arrow a map puts under your car, turned to face the
+    // way the line is going.
+    const heading = (Math.atan2(stops[1].cy - stops[0].cy, stops[1].cx - stops[0].cx) * 180) / Math.PI + 90;
+    parts.push(`<path d="M 0 -12 L 10 9 L 0 4 L -10 9 Z" class="route-here" transform="translate(${stops[0].cx} ${stops[0].cy}) rotate(${heading.toFixed(1)})"/>`);
   }
 
   return `<svg id="machine-svg" viewBox="${minX} ${minY} ${maxX - minX} ${maxY - minY}">
@@ -221,12 +395,17 @@ function viewedMachine(m: MirrorState, view: string | undefined): { decl: Machin
   const generated = m.session.generatedView(subState.id);
   if (generated !== undefined) return generated;
   const path = resolveRef(m.root, mainPath, subState.submachine!);
-  return { decl: compileMachine(m.root, path), canvas: loadCanvas(path) };
+  // CACHED, and live all the same. compileMachineCached memoises against the
+  // CONTENT of every file the compile read, so an edited canvas or state note
+  // recompiles on the next render and an untouched one does not. The mirror
+  // re-renders on every poll, and recompiling the machine each time cost a
+  // full second per render — paid by the VS Code panel, not just the tests.
+  return { decl: compileMachineCached(m.root, path), canvas: loadCanvas(path) };
 }
 
 /** The SHUTDOWN CONTROL's five notches (owner design): what happens
  *  around "done". Abbreviations on the bar; click for the explanations. */
-const SHUTDOWN_LEVELS = [
+export const SHUTDOWN_LEVELS = [
   { value: 1, abbr: "N", name: "no shutdown control" },
   { value: 2, abbr: "P", name: "shutdown prevention — the machine is kept awake while the walk runs" },
   { value: 3, abbr: "PI", name: "prevention + idle-on-done — done with everything, stay at idle" },
@@ -234,127 +413,261 @@ const SHUTDOWN_LEVELS = [
   { value: 5, abbr: "PS", name: "prevention + power-off-on-done — done → end → the machine powers off one minute later" },
 ];
 
+// THE COMPONENT LIBRARY, on every page the mirror serves. The engine serves
+// the bundle itself (mirror.ts, /vendor), so this is an ordinary script tag
+// rather than a webview asset URI — no bundler and no build step.
+const ELEMENTS = '<script type="module" src="/vendor/vscode-elements.js"></script>';
+
+// THE PALETTE IS CONFIGURATION, NEVER CODE (owner ruling 2026-07-30). Every
+// colour the product chooses lives in product/palette.css, beside the other
+// product configuration, where a person edits it without touching code. It is
+// read on EVERY render, so an edit shows on the next page load and the engine
+// never restarts for a colour.
+//
+// THE FALLBACK IS A LEGIBILITY FLOOR, NOT A SECOND PALETTE. It carries only
+// what keeps a page readable when the file is gone — something to draw on,
+// something to draw with. Copying all fifteen values here would put every
+// colour in two places, and the copy would go stale the first time somebody
+// edited the real one.
+//
+// Nothing renders from this in a working install: preflight refuses to go
+// green without product/palette.css, so a tree reaching here is already
+// known-broken and only has to stay readable enough to say so.
+const PALETTE_FALLBACK = ":root{--se-bg:#14171a;--se-fg:#d8dde2}";
+
+export function palette(root: string): string {
+  try {
+    return readFileSync(join(root, "product", "palette.css"), "utf8");
+  } catch {
+    return PALETTE_FALLBACK;
+  }
+}
+
 const STYLE = `
-  * { scrollbar-color: #3a4147 #14171a; }
-  ::-webkit-scrollbar { width: 10px; height: 10px; background: #14171a; }
-  ::-webkit-scrollbar-thumb { background: #3a4147; border-radius: 5px; }
-  body { font-family: ui-monospace, Consolas, monospace; background: #14171a; color: #d8dde2; margin: 0; height: 100vh; overflow: hidden; }
+  * { scrollbar-color: var(--se-border-strong) var(--se-bg); }
+  ::-webkit-scrollbar { width: 10px; height: 10px; background: var(--se-bg); }
+  ::-webkit-scrollbar-thumb { background: var(--se-border-strong); border-radius: 5px; }
+  body { font-family: ui-monospace, Consolas, monospace; background: var(--se-bg); color: var(--se-fg); margin: 0; height: 100vh; overflow: hidden; }
   .cols { display: flex; height: 100vh; }
   main { flex: 1; min-width: 0; display: flex; flex-direction: column; padding: 14px 18px; }
-  #divider { width: 6px; cursor: col-resize; background: #2a2f34; }
-  aside { width: 620px; min-width: 320px; max-width: 80vw; display: flex; flex-direction: column; background: #191d21; }
-  .crumbs { font-size: 13px; color: #7f8b96; display: flex; align-items: center; gap: 4px; text-transform: none; letter-spacing: 0; }
-  .crumbs a { color: #d8dde2; text-decoration: none; }
-  .crumbs a:hover { color: #e8b339; }
-  .crumbs .here { color: #e8b339; }
-  .crumb-arrow { position: relative; cursor: pointer; color: #7f8b96; padding: 0 3px; }
-  .crumb-arrow:hover { color: #e8b339; }
-  .crumb-menu { display: none; position: absolute; top: 18px; left: 0; z-index: 10; background: #22272c; border: 1px solid #3a4147; border-radius: 8px; min-width: 160px; padding: 4px; }
+  .divider { width: 6px; cursor: col-resize; background: var(--se-border); flex: none; }
+  .divider.horiz { width: auto; height: 6px; cursor: row-resize; }
+  /* 465px is the width the owner settled the sidebar at by dragging it, and
+     a default nobody re-drags is the only evidence a default is right. */
+  aside { width: 465px; min-width: 320px; max-width: 80vw; display: flex; flex-direction: column; background: var(--se-bg-side); }
+  /* THE LEFT COLUMN: the feed on top, the agent's terminal beneath it.
+     SIZED FOR AN 80-COLUMN TERMINAL (owner ruling 2026-07-28). 820px was
+     too wide; narrowing it without sizing the terminal would just have made
+     the agent wrap early. 80 columns x 8px + 10px for the scrollbar = 650.
+     8px is the UPPER bound for a 13px monospace cell, so 80 is a floor here,
+     never a target. The divider moves it, and the size the reader lands on
+     is stored and reused from then on. */
+  #left { width: 650px; min-width: 360px; }
+
+  /* THE TERMINAL FILLS ITS CARD (owner 2026-07-29), superseding the half-a-
+     column rule the old left column needed. It once sat tiny because flex:none
+     with no height sizes to CONTENT; in the grid the card decides the box and
+     the terminal takes all of it. Still no max — promoted, it gets the big
+     slot, which is far more room than the splitter ever gave it. */
+  #w-terminal { min-height: 140px; }
+  /* NEVER SCROLLS. xterm scrolls itself; a scrollbar here would steal from
+     clientWidth mid-measure and start the flicker over. */
+  .term-panel { flex: 1; min-height: 0; overflow: hidden; padding: 8px 10px; }
+  /* Beats .widget's own display, whatever order the sheet ends up in. */
+  .no-host { display: none !important; }
+  .crumbs { font-size: 13px; color: var(--se-muted); display: flex; align-items: center; gap: 4px; text-transform: none; letter-spacing: 0; }
+  .crumbs a { color: var(--se-fg); text-decoration: none; }
+  .crumbs a:hover { color: var(--se-accent); }
+  .crumbs .here { color: var(--se-accent); }
+  .crumb-arrow { position: relative; cursor: pointer; color: var(--se-muted); padding: 0 3px; }
+  .crumb-arrow:hover { color: var(--se-accent); }
+  .crumb-menu { display: none; position: absolute; top: 18px; left: 0; z-index: 10; background: var(--se-raised); border: 1px solid var(--se-border-strong); border-radius: 8px; min-width: 160px; padding: 4px; }
   .crumb-arrow.open .crumb-menu { display: block; }
   .crumb-menu a { display: block; padding: 6px 10px; border-radius: 6px; }
   .crumb-menu a:hover { background: #2a3138; }
-  .widget { display: flex; flex-direction: column; border: 1px solid #2a2f34; border-radius: 10px; background: #191d21; min-height: 0; }
-  .widget-head { display: flex; align-items: center; justify-content: space-between; padding: 6px 12px; border-bottom: 1px solid #2a2f34; color: #7f8b96; font-size: 12px; text-transform: uppercase; letter-spacing: .08em; }
+  .widget { display: flex; flex-direction: column; border: 1px solid var(--se-border); border-radius: 10px; background: var(--se-bg-side); min-height: 0; }
+  .widget-head { display: flex; align-items: center; justify-content: space-between; padding: 6px 12px; border-bottom: 1px solid var(--se-border); color: var(--se-muted); font-size: 12px; text-transform: uppercase; letter-spacing: .08em; }
   .widget-body { flex: 1; min-height: 0; overflow: auto; }
-  .expand { background: none; border: 1px solid #3a4147; color: #7f8b96; border-radius: 6px; cursor: pointer; font: inherit; padding: 2px 8px; }
-  .expand:hover { color: #e8b339; border-color: #e8b339; }
+  .expand { background: none; border: 1px solid var(--se-border-strong); color: var(--se-muted); border-radius: 6px; cursor: pointer; font: inherit; padding: 2px 8px; }
+  .expand:hover { color: var(--se-accent); border-color: var(--se-accent); }
+  /* THE CARD MATRIX (owner design 2026-07-29). One BIG card beside a two-wide
+     grid of the rest. It is ONE grid across the whole viewport, so promoting a
+     card is a class change and nothing ever moves in the DOM — a moved widget
+     is a recreated widget, and a recreated terminal loses its scrollback. */
+  .cards { display: grid; height: 100vh; box-sizing: border-box; gap: 8px; padding: 8px; grid-template-columns: var(--main-w, 58%) 6px 1fr 1fr; }
+  .card { position: relative; display: flex; min-width: 0; min-height: 0; grid-column: var(--col); grid-row: var(--row); }
+  .card > .widget { flex: 1; min-width: 0; }
+  .card.main { grid-column: 1; grid-row: 1 / -1; }
+  #div-cards { grid-column: 2; grid-row: 1 / -1; width: 6px; cursor: col-resize; background: var(--se-border); border-radius: 3px; }
+  /* The head reserves room so the number never lands on the title. */
+  .card > .widget > .widget-head { padding-left: 34px; }
+  .cardnum { position: absolute; top: 7px; left: 10px; z-index: 2; display: inline-flex; align-items: center; justify-content: center; width: 17px; height: 17px; border: 1px solid var(--se-border-strong); border-radius: 4px; font-size: 11px; color: var(--se-muted); cursor: pointer; }
+  .cardnum:hover { color: var(--se-accent); border-color: var(--se-accent); }
+  .card.main .cardnum { color: var(--se-accent); border-color: var(--se-accent); }
+  .legend-row { display: flex; gap: 10px; padding: 3px 12px; font-size: 12px; }
+  .legend-key { color: var(--se-accent); min-width: 92px; flex: none; }
+  .legend-what { color: var(--se-fg); }
   #w-machine { flex: 1; }
   #w-machine .widget-body { display: flex; }
   svg { width: 100%; height: 100%; cursor: grab; }
   svg.panning { cursor: grabbing; }
-  .state { fill: #22272c; stroke: #4a545e; stroke-width: 2; }
-  .state.active { fill: #3a2f14; stroke: #e8b339; stroke-width: 3.5; }
-  .state.done { fill: #1d2b20; stroke: #4a7a55; }
+  .state { fill: var(--se-raised); stroke: var(--se-border-strong); stroke-width: 2; }
+  /* ONLY WHERE THE WALK STANDS IS COLOURED (owner ruling 2026-07-31). Where
+     it has BEEN keeps the ordinary state colour: two shades of one blue asked
+     the reader to compare hues, and the eye does not read that difference
+     reliably. There is no .state.done rule, on purpose. */
+  .state.active { fill: var(--se-walk-bg); stroke: var(--se-walk); stroke-width: 3.5; }
   .state.inner { fill: none; }
   .clickable { cursor: pointer; }
-  .clickable:hover .state, .clickable:hover .comment { stroke: #8fa0b0; }
-  .label { fill: #d8dde2; font-size: 26px; text-anchor: middle; font-family: inherit; pointer-events: none; }
-  .edge { stroke: #5b6772; stroke-width: 2.5; }
-  .arrowhead { fill: #5b6772; }
-  .guard { fill: #e8b339; font-size: 20px; text-anchor: middle; }
-  .comment { fill: #1c2025; stroke: #2a2f34; }
-  .group { fill: #1a1e22; stroke: #333a41; stroke-dasharray: 10 6; stroke-width: 2; }
-  .group-label { fill: #5b6772; font-size: 24px; font-family: inherit; letter-spacing: .06em; }
-  .comment-text { color: #7f8b96; font-size: 13px; line-height: 1.35; }
-  .comment-detail { font-size: 15px; line-height: 1.55; color: #d8dde2; padding: 2px 0 10px; }
-  .replink { color: #e8b339; cursor: pointer; text-decoration: underline dotted; }
+  .clickable:hover .state, .clickable:hover .comment { stroke: var(--se-fg); }
+  .label { fill: var(--se-fg); font-size: 26px; text-anchor: middle; font-family: inherit; pointer-events: none; }
+  .sublabel { fill: var(--se-muted); font-size: 17px; text-anchor: middle; font-family: inherit; pointer-events: none; }
+  .edge { stroke: var(--se-dim); stroke-width: 2.5; }
+  .arrowhead { fill: var(--se-dim); }
+  button.ghost:disabled { opacity: .45; cursor: default; }
+  /* THE BLUE LINE. Blue on purpose: the voice reserves green, red and
+     yellow for verdicts, and a route is not a verdict. It is a way. */
+  .route-line { fill: none; stroke: #4a90d9; stroke-width: 6; stroke-linecap: round; stroke-linejoin: round; }
+  /* Past a closure the way is FADED, never hidden: it exists, it is shut.
+     The barrier itself is yellow, because yellow is attention and a shut
+     road wants the reader's hand on the slider. */
+  .route-line.shut { opacity: .28; }
+  .route-shut { stroke: var(--se-warn); fill: none; stroke-width: 2.4; }
+  .route-shut .shut-ring { fill: var(--se-bg); }
+  .route-shut .shut-bang { stroke-width: 3; stroke-linecap: round; }
+  .route-shut .shut-dot { fill: var(--se-warn); stroke: none; }
+  .route-stop { fill: #4a90d9; stroke: #9ecbf2; stroke-width: 2; }
+  .route-stop.shut { opacity: .28; }
+  .route-here { fill: #4a90d9; stroke: #9ecbf2; stroke-width: 2; }
+  .guard { fill: var(--se-accent); font-size: 20px; text-anchor: middle; }
+  .comment { fill: var(--se-bg-side); stroke: var(--se-border); }
+  .group { fill: var(--se-bg-side); stroke: var(--se-border); stroke-dasharray: 10 6; stroke-width: 2; }
+  .group-label { fill: var(--se-dim); font-size: 24px; font-family: inherit; letter-spacing: .06em; }
+  .comment-text { color: var(--se-muted); font-size: 13px; line-height: 1.35; }
+  .comment-detail { font-size: 15px; line-height: 1.55; color: var(--se-fg); padding: 2px 0 10px; }
+  .replink { color: var(--se-accent); cursor: pointer; text-decoration: underline dotted; }
   .bar { display: flex; gap: 10px; padding: 12px; }
-  button.primary { background: #e8b339; color: #14171a; border: 0; border-radius: 8px; padding: 8px 14px; font: inherit; font-weight: 700; cursor: pointer; margin: 2px 4px 2px 0; }
+  button.primary { background: var(--se-accent); color: var(--se-bg); border: 0; border-radius: 8px; padding: 8px 14px; font: inherit; font-weight: 700; cursor: pointer; margin: 2px 4px 2px 0; }
   .panel { padding: 0 12px 12px; overflow: auto; }
-  .meta { color: #7f8b96; font-size: 12px; padding: 8px 12px; }
-  .todo-origin { color: #7f8b96; font-size: 11px; }
+  .meta { color: var(--se-muted); font-size: 12px; padding: 8px 12px; }
+  .todo-origin { color: var(--se-muted); font-size: 11px; }
   table.kv { border-collapse: collapse; width: 100%; font-size: 12.5px; }
-  table.kv td { border: 1px solid #2a2f34; padding: 4px 8px; vertical-align: top; }
-  table.kv td.k { color: #e8b339; white-space: nowrap; width: 1%; }
-  table.kv td.v { color: #d8dde2; word-break: break-word; }
+  table.kv td { border: 1px solid var(--se-border); padding: 2px 6px; line-height: 1.35; vertical-align: top; }
+  table.kv td.k { color: var(--se-accent); white-space: nowrap; width: 1%; }
+  table.kv td.v { color: var(--se-fg); word-break: break-word; }
   table.kv table.kv { margin: 2px 0; }
-  .vnull { color: #7f8b96; } .vnum { color: #7cc4e8; } .vbool { color: #c58fe8; } .vstr { color: #a8c88f; }
+  .vnull { color: var(--se-muted); } .vnum { color: #7cc4e8; } .vbool { color: #c58fe8; } .vstr { color: #a8c88f; }
+  .prewrap { white-space: pre-wrap; }
   td.btncell { text-align: center; vertical-align: middle !important; width: 1%; }
-  button.go.locked { background: #2a2f34; color: #5b6772; cursor: not-allowed; }
+  button.go.locked { background: var(--se-border); color: var(--se-dim); cursor: not-allowed; }
   .cond circle { stroke-width: 2.5; }
-  .cond.unmet circle { fill: #3a2f14; stroke: #e8b339; }
-  .cond.met circle { fill: #1d2b20; stroke: #4a7a55; }
-  .cond-label { font-size: 20px; text-anchor: middle; fill: #d8dde2; pointer-events: none; }
+  .cond.unmet circle { fill: var(--se-accent-bg); stroke: var(--se-accent); }
+  .cond.met circle { fill: var(--se-ok-bg); stroke: var(--se-ok); }
+  .cond-label { font-size: 20px; text-anchor: middle; fill: var(--se-fg); pointer-events: none; }
   .doclist a { display: block; padding: 4px 0; }
   a.doclink { color: #7cc4e8; cursor: pointer; text-decoration: underline; }
   .docview { font-size: 13.5px; line-height: 1.55; }
-  .docview h1, .docview h2, .docview h3 { color: #e8b339; }
-  .docview code { background: #22272c; padding: 1px 5px; border-radius: 4px; }
-  .docview pre { background: #14171a; border: 1px solid #2a2f34; border-radius: 8px; padding: 10px; overflow: auto; }
+  .docview h1, .docview h2, .docview h3 { color: var(--se-accent); }
+  .docview code { background: var(--se-raised); padding: 1px 5px; border-radius: 4px; }
+  .docview pre { background: var(--se-bg); border: 1px solid var(--se-border); border-radius: 8px; padding: 10px; overflow: auto; }
   .docview a { color: #7cc4e8; }
-  button.ghost { background: #22272c; color: #d8dde2; border: 1px solid #4a545e; border-radius: 8px; padding: 6px 12px; font: inherit; cursor: pointer; }
+  button.ghost { background: var(--se-raised); color: var(--se-fg); border: 1px solid var(--se-border-strong); border-radius: 8px; padding: 6px 12px; font: inherit; cursor: pointer; }
   #w-details { flex: 1; border-radius: 0; border: 0; }
-  .docheck { accent-color: #e8b339; cursor: pointer; }
-  .threshold { display: flex; align-items: center; gap: 8px; color: #7f8b96; font-size: 12px; text-transform: none; letter-spacing: 0; }
-  .threshold input { accent-color: #e8b339; width: 140px; }
-  #thr-val { color: #e8b339; min-width: 4ch; }
+  .docheck { accent-color: var(--se-accent); cursor: pointer; }
+  .docline { display: flex; align-items: center; gap: 6px; padding: 3px 0; }
+  .collbody { padding: 4px 10px 8px; }
+  .fval { min-width: 0; overflow-wrap: anywhere; line-height: 1.35; }
+  /* THE FRONT MATTER SITS TIGHT (owner ruling 2026-07-30). The element
+     library spaces a form group for a settings page. A receipt is a dense
+     record, and the reader wants more of it on screen at once. */
+  vscode-form-group { margin: 0 !important; padding: 0 !important; }
+  vscode-form-group vscode-label { line-height: 1.35; }
+  /* THE NEXT STATES, one block each. */
+  .nextitem { border: 1px solid var(--se-border); margin: 4px 0; }
+  .nextitem.open { border-color: var(--se-walk); }
+  .nexthead { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 3px 8px; background: var(--se-raised); }
+  .nextto { color: var(--se-accent); overflow-wrap: anywhere; }
+  vscode-icon.ok { color: var(--vscode-testing-iconPassed, #4a7a55); }
+  vscode-icon.no { color: var(--se-muted); }
+  .threshold { display: flex; align-items: center; gap: 8px; color: var(--se-muted); font-size: 12px; text-transform: none; letter-spacing: 0; }
+  .threshold input { accent-color: var(--se-accent); width: 140px; }
+  #thr-val { color: var(--se-accent); min-width: 4ch; }
   .thr-help { cursor: pointer; }
-  .thr-help:hover { color: #e8b339; }
+  .thr-help:hover { color: var(--se-accent); }
   .thr-track { display: inline-flex; flex-direction: column; align-items: stretch; }
   .thr-notches { position: relative; height: 11px; margin-top: -3px; }
-  .thr-notch { position: absolute; transform: translateX(-50%); font-size: 9px; line-height: 1; color: #7f8b96; cursor: pointer; padding: 1px 3px; }
-  .thr-notch:hover { color: #e8b339; }
-  #w-log { flex: 0 0 42%; border-radius: 0; border: 0; border-bottom: 1px solid #2a2f34; }
+  .thr-notch { position: absolute; transform: translateX(-50%); font-size: 9px; line-height: 1; color: var(--se-muted); cursor: pointer; padding: 1px 3px; }
+  .thr-notch:hover { color: var(--se-accent); }
+  /* The log used to be the top 42% of a shared column, borderless so it read
+     as one surface with the terminal below it. As a card of its own it takes
+     the whole card and wears the normal widget border. */
   .log-filter-row { padding: 6px 12px 0; display: flex; gap: 6px; }
-  .log-filter-row input { flex: 1 1 50%; min-width: 0; box-sizing: border-box; background: #14171a; border: 1px solid #2a2f34; border-radius: 6px; color: #d8dde2; font: inherit; font-size: 12px; padding: 4px 8px; }
+  .log-filter-row input { flex: 1 1 50%; min-width: 0; box-sizing: border-box; background: var(--se-bg); border: 1px solid var(--se-border); border-radius: 6px; color: var(--se-fg); font: inherit; font-size: 12px; padding: 4px 8px; }
   .log-panel { font-size: 12px; margin-top: 6px; }
-  .logrow { display: flex; gap: 8px; padding: 2px 0; cursor: pointer; border-bottom: 1px dotted #22272c; align-items: baseline; }
-  .logrow:hover { background: #22272c; }
-  .logrow .lt { color: #7f8b96; flex: 0 0 auto; }
-  .logrow .lsrc { flex: 0 0 5.5ch; color: #7cc4e8; }
-  .logrow .lsrc.human { color: #e8b339; }
+  .logrow { display: flex; gap: 8px; padding: 2px 0; cursor: pointer; border-bottom: 1px dotted var(--se-raised); align-items: baseline; }
+  .logrow:hover { background: var(--se-raised); }
+  .logrow .lt { color: ${FEED_COLOURS.time}; flex: 0 0 auto; }
+  .logrow .lsrc { flex: 0 0 5.5ch; color: ${FEED_COLOURS["src-agent"]}; }
+  .logrow .lsrc.human { color: ${FEED_COLOURS["src-human"]}; }
   .logrow .lkind { flex: 0 0 6.5ch; }
-  .logrow .lkind.k-call { color: #7f8b96; }
-  .logrow .lkind.k-update { font-weight: 700; color: #e8b339; }
-  .logrow .lkind.k-note { font-style: italic; color: #c58fe8; }
-  .logrow .lkind.k-aq { font-weight: 700; color: #7cc4e8; }
+  .logrow .lkind.k-call { color: ${FEED_COLOURS["kind-call"]}; }
+  .logrow .lkind.k-update { font-weight: 700; color: ${FEED_COLOURS["kind-update"]}; }
+  .logrow .lkind.k-note { font-style: italic; color: ${FEED_COLOURS["kind-note"]}; }
+  .logrow .lkind.k-aq { font-weight: 700; color: ${FEED_COLOURS["kind-aq"]}; }
+  .aq-q { font-weight: 700; color: ${FEED_COLOURS["kind-aq"]}; padding: 6px 0; white-space: pre-wrap; }
+  #loadbar { position: fixed; top: 0; left: 0; right: 0; height: 3px; background: var(--se-raised); z-index: 99; }
+  #loadbar .fill { height: 100%; width: 30%; background: var(--se-accent); animation: loadslide 1s linear infinite; }
+  @keyframes loadslide { 0% { margin-left: -30%; } 100% { margin-left: 100%; } }
+  /* A BAR THAT MEASURES SOMETHING (owner ruling, 2026-07-30). Work that can
+     count its steps says so, and the fill shows how far it has got. The
+     sliding animation is the FALLBACK, for work that genuinely cannot. */
+  #loadbar .fill.determinate { animation: none; margin-left: 0; transition: width .18s linear; }
+  /* THE PING — the agent's pointing finger (owner, 2026-07-30): v2's pulse,
+     made yellow. A card blinks its outline; an SVG node blinks its opacity.
+     It PULSES ON, and stays lit while the guide talks about it. */
+  .se-ping { outline: 3px solid var(--se-accent); outline-offset: 2px; animation: se-ping-blink 1.6s ease-in-out infinite; }
+  .se-ping-svg { animation: se-ping-fade 1.6s ease-in-out infinite; }
+  @keyframes se-ping-blink { 50% { outline-color: transparent; } }
+  @keyframes se-ping-fade { 50% { opacity: .25; } }
+  #loadbar .lmsg { position: fixed; top: 8px; right: 12px; color: var(--se-accent); font-size: 12px; }
+  /* A load that never answered is a FAILURE, and the voice paints those red. */
+  #loadbar.stalled { cursor: pointer; }
+  #loadbar.stalled .fill { background: #e86a5f; animation: none; width: 100%; }
+  #loadbar.stalled .lmsg { color: #e86a5f; }
+  .aq-a { color: #cfd8dc; line-height: 1.5; padding: 4px 0; }
   .logrow .lbrief { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .logrow .lok { flex: 0 0 auto; color: #4a7a55; }
   .logrow.failed .lok { color: #e86a5f; }
   .dnode { cursor: pointer; padding: 2px 0; font-size: 13px; }
-  .dnode:hover { background: #22272c; }
+  .dnode:hover { background: var(--se-raised); }
   .dnode.s-done { color: #4a7a55; }
-  .dnode.s-open { color: #e8b339; }
-  .dnode.s-obsolete { color: #5b6772; text-decoration: line-through; }
+  .dnode.s-open { color: var(--se-accent); }
+  .dnode.s-obsolete { color: var(--se-dim); text-decoration: line-through; }
   .dnode.s-reverted { color: #e86a5f; text-decoration: line-through; }
+  /* DEFERRED IS NOT KILLED. It is still owed, so it keeps the open colour;
+     it is owed SOMEWHERE ELSE, so it leans. Never struck through - the
+     strike is what says a point died, and this one did not. */
+  .dnode.s-deferred { color: var(--se-accent); font-style: italic; text-decoration: none; }
   .dnode.dactive { font-weight: 700; }
-  .dnode.dsel { background: #22272c; }
-  .dinfo { margin-top: 10px; border-top: 1px solid #2a2f34; padding-top: 8px; }
-  .formfield { width: 100%; min-height: 70px; background: #14171a; border: 1px solid #2a2f34; border-radius: 6px; color: #d8dde2; font: inherit; font-size: 12.5px; padding: 6px; box-sizing: border-box; margin-top: 4px; }
-  .prefill { border: 1px dashed #e8b339; border-radius: 6px; padding: 6px 8px; margin: 4px 0; }
+  .dnode.dsel { background: var(--se-raised); }
+  .dinfo { margin-top: 10px; border-top: 1px solid var(--se-border); padding-top: 8px; }
+  .formfield { width: 100%; min-height: 70px; background: var(--se-bg); border: 1px solid var(--se-border); border-radius: 6px; color: var(--se-fg); font: inherit; font-size: 12.5px; padding: 6px; box-sizing: border-box; margin-top: 4px; }
+  .prefill { border: 1px dashed var(--se-accent); border-radius: 6px; padding: 6px 8px; margin: 4px 0; }
   .prefill button { margin-top: 4px; }
   #modal { display: none; position: fixed; inset: 0; background: rgba(20,23,26,.8); z-index: 50; align-items: center; justify-content: center; }
-  .modal-box { width: min(760px, 92vw); max-height: 86vh; display: flex; flex-direction: column; background: #191d21; border: 1px solid #3a4147; border-radius: 12px; }
+  .modal-box { width: min(760px, 92vw); max-height: 86vh; display: flex; flex-direction: column; background: var(--se-bg-side); border: 1px solid var(--se-border-strong); border-radius: 12px; }
   .modal-body { padding: 12px 16px; overflow: auto; font-size: 13px; }
   a.toollink { color: #7cc4e8; text-decoration: underline; cursor: pointer; margin-right: 10px; }
-  #toast { position: fixed; left: 14px; bottom: 14px; background: #22272c; border: 1px solid #3a4147; border-radius: 8px; padding: 8px 14px; color: #d8dde2; font-size: 12.5px; z-index: 90; display: none; }
+  #toast { position: fixed; left: 14px; bottom: 14px; background: var(--se-raised); border: 1px solid var(--se-border-strong); border-radius: 8px; padding: 8px 14px; color: var(--se-fg); font-size: 12.5px; z-index: 90; display: none; }
+  #link-lost { position: fixed; left: 0; right: 0; top: 0; z-index: 99; background: #4a3a14; color: var(--se-accent); text-align: center; padding: 7px; font-size: 13px; letter-spacing: .04em; }
   #over { position: fixed; inset: 0; background: rgba(20,23,26,.94); z-index: 100; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; }
   #over .over-box { color: #e8332a; font-size: 62px; font-weight: 800; letter-spacing: .12em; border: 6px solid #e8332a; border-radius: 18px; padding: 26px 52px; }
   #over .over-sub { color: #e86a5f; font-size: 15px; }
 `;
 
 const SCRIPT = `
-const D = window.SE_DATA;
+// Re-read after every morph — a morph never re-runs a script tag.
+let D = JSON.parse(document.getElementById("se-data").textContent);
 
 function jsonTable(v) {
   if (v === null || v === undefined) return '<span class="vnull">null</span>';
@@ -365,12 +678,16 @@ function jsonTable(v) {
     if (looksLikePath) {
       return '<a class="doclink" data-path="' + v + '">' + v + "</a>";
     }
-    return '<span class="vstr">' + v.replace(/&/g,"&amp;").replace(/</g,"&lt;") + "</span>";
+    const escaped = v.replace(/&/g,"&amp;").replace(/</g,"&lt;");
+    // Paragraphs survive the pane: a multi-line string keeps its breaks
+    // (HTML collapses raw newlines - the wall-of-text bug, owner 2026-07-28).
+    if (v.includes("\\n")) return '<div class="vstr prewrap">' + escaped + "</div>";
+    return '<span class="vstr">' + escaped + "</span>";
   }
   if (Array.isArray(v)) {
     if (v.length === 0) return '<span class="vnull">[]</span>';
     const table = '<table class="kv">' + v.map((x, i) => '<tr><td class="k">' + i + '</td><td class="v">' + jsonTable(x) + "</td></tr>").join("") + "</table>";
-    if (v.length > 3) return '<details><summary style="cursor:pointer;color:#7f8b96">' + v.length + " items</summary>" + table + "</details>";
+    if (v.length > 3) return '<details><summary style="cursor:pointer;color:var(--se-muted)">' + v.length + " items</summary>" + table + "</details>";
     return table;
   }
   const keys = Object.keys(v);
@@ -428,9 +745,36 @@ async function loadStateTodos() {
     }
   }
 }
+let DETAIL_TITLE = null;
+let DETAIL_HTML = null;
 function showDetails(title, html) {
   const el = document.getElementById("details");
-  if (el) { document.getElementById("details-title").textContent = title; el.innerHTML = html; queueMicrotask(() => { void loadRecDecisions(); void loadStateTodos(); }); }
+  if (!el) {
+    // A SOLO CARD HAS NO DETAILS PANE OF ITS OWN. Embedded, details are a
+    // surface the HOST owns, so the subject travels out to it. Dropping it
+    // here is what made clicking a state do nothing at all.
+    // Being IN A FRAME is the test, not the embed flag: this runs before the
+    // flag is initialised, and a frame is exactly when a host is listening.
+    if (window.parent !== window) window.parent.postMessage({ se: "details", title: title, html: html }, "*");
+    return;
+  }
+  // NOTHING CHANGED, NOTHING MOVES. rebind() re-derives this pane after every
+  // morph. Rewriting identical markup flickered it and threw the reader's
+  // scroll position away while they were reading. The pane carries
+  // data-morph-ignore for exactly this reason; this is the same guard on the
+  // path the morph does not own.
+  if (DETAIL_TITLE === title && DETAIL_HTML === html) return;
+  const sameSubject = DETAIL_TITLE === title;
+  DETAIL_TITLE = title;
+  DETAIL_HTML = html;
+  // Same subject with new content keeps the reader's place. A DIFFERENT
+  // subject starts at the top, because a position in the old one means
+  // nothing here.
+  const top = sameSubject ? el.scrollTop : 0;
+  document.getElementById("details-title").textContent = title;
+  el.innerHTML = html;
+  el.scrollTop = top;
+  queueMicrotask(() => { void loadRecDecisions(); void loadStateTodos(); });
 }
 // THE MODAL — one surface over the grayed page (forms, tool calls,
 // escape). Click outside or ✕ returns to the layout untouched.
@@ -462,6 +806,12 @@ const HUMAN_TOOLS = {
   se_seed_expedition: [{ name: "kind", hint: "spike | fix | explore" }, { name: "goal", hint: "what this expedition is after", long: true }],
   se_seed_iteration: [{ name: "goal", hint: "what this iteration is after", long: true }, { name: "vision", hint: "roughly how — what done looks like", long: true }, { name: "inputs", hint: "context refs, comma-separated: an expedition id, note refs" }],
   se_reload: [],
+  // No arguments — it just answers. It lives HERE and nowhere else (owner
+  // ruling 2026-07-28): human-runnable lane tools are offered through the
+  // legal-tools links, per state. None of them earns bespoke chrome. It had
+  // its own header button, which the owner never found among the crumbs, the
+  // slider and the escape control sharing that row.
+  se_survey: [],
   se_exp_close: [{ name: "merge", hint: "true = apply: merge to trunk (default); false = dismiss: archive unmerged" }],
   se_note_drain: [{ name: "ref", hint: "the note's ref (note-…) — the feed shows it" }, { name: "disposition", hint: "done | obsolete | carried | backlog" }, { name: "where", hint: "where it landed or lives on — backlog REQUIRES it: ready when …" }],
 };
@@ -508,12 +858,17 @@ document.addEventListener("click", async (ev) => {
     return;
   }
 });
-const CURRENT = (D.describe.active && D.describe.active[0]) ? D.describe.active[0].split("/").pop() : null;
-const WALK_HERE = D.viewingWalk;
+let CURRENT = (D.describe.active && D.describe.active[0]) ? D.describe.active[0].split("/").pop() : null;
+let WALK_HERE = D.viewingWalk;
 function nextTable(id, s) {
   const here = WALK_HERE && id === CURRENT;
-  return '<table class="kv">' + s.next.map((n, i) => {
-    const inner = jsonTable({ to: n.to, ...(n.statement ? { statement: n.statement } : {}), role: n.role, ...(n.guard ? { guard: n.guard } : {}) });
+  // THE NEW WAY (owner ruling 2026-07-30): the host's own elements, the same
+  // ones the facts and the pull already use. A bordered table nested inside
+  // another bordered table was the last of the old rendering left in here.
+  const field = (k, v) => (v === undefined || v === null || v === "") ? ""
+    : '<vscode-form-group variant="horizontal"><vscode-label>' + k + "</vscode-label>"
+      + '<div class="fval">' + escText(String(v)) + "</div></vscode-form-group>";
+  return s.next.map((n) => {
     const unlocked = here && s.exit_met && n.enter_met;
     // The locked tooltip NAMES what is missing — never a bare "not met".
     const exitMiss = s.exit ? Object.entries(s.exit).filter(([, c]) => !c.met).map(([k]) => "condition " + k) : [];
@@ -523,50 +878,90 @@ function nextTable(id, s) {
         ? "leaving " + id + " waits on:\\n" + (exitMiss.join("\\n") || "its exit conditions")
         : "entering " + n.to + " waits on:\\n" + ((n.missing || []).join("\\n") || "its entry conditions");
     const btn = here
-      ? '<button class="primary go' + (unlocked ? "" : " locked") + '" data-to="' + n.to + '"' + (unlocked ? "" : " disabled") +
-        ' title="' + escText(title) + '">▶</button>'
+      ? '<vscode-button class="go" icon="play" icon-only data-to="' + n.to + '"' + (unlocked ? "" : " disabled") +
+        ' title="' + escText(title) + '"></vscode-button>'
       : "";
-    return '<tr><td class="k">' + i + '</td><td class="v">' + inner + '</td>' + (here ? '<td class="btncell">' + btn + "</td>" : "") + "</tr>";
-  }).join("") + "</table>";
+    return '<div class="nextitem' + (unlocked ? " open" : "") + '">'
+      + '<div class="nexthead"><span class="nextto">' + escText(n.to) + "</span>" + btn + "</div>"
+      + field("role", n.role) + field("guard", n.guard) + field("statement", n.statement)
+      + "</div>";
+  }).join("");
+}
+// THE CHECK IS THE READER'S PROOF, AND IT IS PER VERSION — an edited doc
+// unchecks itself. A doc named by a CONDITION is not always in that state's
+// own pulled list, and looking it up only there left the box permanently
+// unchecked however often it was clicked (found live 2026-07-30). The
+// session's checked list is the truth, and it is already version-scoped.
+function docChecked(p) {
+  return p.checked === true || (D.checkedDocs || []).indexOf(p.path) >= 0;
 }
 function docRow(p) {
-  // One doc, one row: the human's proof-of-read checkbox (one per VERSION
-  // - an edited doc unchecks itself) plus the readable link.
-  const box = '<input type="checkbox" class="docheck" data-path="' + p.path + '" title="' + (p.checked ? "read (this version)" : "check = I read this version") + '"' + (p.checked ? " checked disabled" : "") + ">";
-  return '<div style="padding:2px 0 2px 14px">' + box + ' <a class="doclink" data-path="' + p.path + '">' + p.path + "</a></div>";
+  // The link sits BESIDE the box, never inside its label: a label swallows
+  // the click, and the reader would open nothing while checking by accident.
+  const on = docChecked(p);
+  return '<div class="docline">'
+    + '<vscode-checkbox class="docheck" data-path="' + p.path + '"' + (on ? " checked disabled" : "")
+    + ' title="' + (on ? "read (this version)" : "check = I read this version") + '"></vscode-checkbox>'
+    + '<a class="doclink" data-path="' + p.path + '">' + p.path + "</a></div>";
 }
 function pulledView(pulled) {
   const bySource = {};
   for (const p of pulled) for (const src of p.sources) (bySource[src] ??= []).push(p);
+  // The engine calls the always-on set "root". The reader sees a PULL, and
+  // that is the word the fold wears (owner ruling 2026-07-30).
+  const SRC_LABEL = { root: "pull" };
   return Object.entries(bySource).map(([srcName, docs]) => {
-    const done = docs.filter((d) => d.checked).length;
-    return '<details><summary style="cursor:pointer;color:#7f8b96">' + srcName + " (" + done + "/" + docs.length + " read)</summary>" +
-      docs.map(docRow).join("") + "</details>";
+    const done = docs.filter(docChecked).length;
+    // Open while there is still something to read; folded once it is done.
+    return '<vscode-collapsible title="' + escText(SRC_LABEL[srcName] || srcName) + '" description="' + done + "/" + docs.length + ' read"' + (done < docs.length ? " open" : "") + ">"
+      + '<div class="collbody">' + docs.map(docRow).join("") + "</div></vscode-collapsible>";
   }).join("");
+}
+// The state's own fields. A scalar is one labelled row; prose folds into its
+// own section, because guidance is paragraphs and does not belong in a cell.
+function factsView(o) {
+  const PROSE = { statement: 1, guidance: 1 };
+  let rows = "";
+  let prose = "";
+  for (const k in o) {
+    const v = o[k];
+    if (v === undefined || v === null || v === "") continue;
+    if (PROSE[k]) {
+      prose += '<vscode-collapsible title="' + escText(k) + '" open><div class="collbody comment-detail">' + escText(String(v)) + "</div></vscode-collapsible>";
+      continue;
+    }
+    // A boolean is a state, not a word. The host's own pass icon carries it,
+    // so the colour follows the reader's theme rather than our palette.
+    let cell;
+    if (typeof v === "boolean") cell = '<vscode-icon name="' + (v ? "pass" : "circle-slash") + '" class="' + (v ? "ok" : "no") + '" label="' + (v ? "yes" : "no") + '"></vscode-icon>';
+    else if (typeof v === "object") cell = escText(JSON.stringify(v));
+    else cell = escText(String(v));
+    rows += '<vscode-form-group variant="horizontal"><vscode-label>' + escText(k) + "</vscode-label>"
+      + '<div class="fval">' + cell + "</div></vscode-form-group>";
+  }
+  return rows + prose;
 }
 function stateDetail(id) {
   const s = D.states[id] ?? {};
   const bare = Object.assign({}, s); delete bare.next; delete bare.pulled; delete bare.script; delete bare.was_filled; delete bare.legal_tools;
-  let html = jsonTable(bare);
+  let html = factsView(bare);
   // Legal tools — human-callable ones are LINKS everywhere they appear
   // (parity law); a link outside its state just toasts "tool disabled".
   const tools = [...new Set(s.legal_tools || [])];
-  let extra = "";
   if (tools.length > 0) {
     const link = (t) => '<a class="toollink" data-tool="' + t + '">' + t + "</a>";
-    const line = (t) => '<div style="padding:2px 0 2px 14px">' + (HUMAN_TOOLS[t] !== undefined ? link(t) : escText(t)) + "</div>";
+    const line = (t) => '<div class="docline">' + (HUMAN_TOOLS[t] !== undefined ? link(t) : escText(t)) + "</div>";
     // "all" stays written as all — and EXPANDS into the human-callable
-    // links (parity law), the same collapsible pattern the pull uses.
-    const inner = tools.includes("all")
-      ? '<details><summary style="cursor:pointer;color:#7f8b96">all — the human-callable set</summary>' + Object.keys(HUMAN_TOOLS).map(line).join("") + "</details>"
-      : tools.map(line).join("");
-    extra += '<tr><td class="k">legal tools</td><td class="v">' + inner + "</td></tr>";
+    // links (parity law), the same fold the pull uses.
+    const all = tools.includes("all");
+    const inner = all ? Object.keys(HUMAN_TOOLS).map(line).join("") : tools.map(line).join("");
+    html += '<vscode-collapsible title="legal tools" description="' + (all ? "all — the human-callable set" : tools.length + " listed") + '">'
+      + '<div class="collbody">' + inner + "</div></vscode-collapsible>";
   }
   if (s.pulled && s.pulled.length > 0) {
-    extra += '<tr><td class="k" title="derived by the machine, not authored">pulled</td><td class="v">' + pulledView(s.pulled) + "</td></tr>";
-  }
-  if (extra) {
-    html = html.endsWith("</table>") ? html.slice(0, -8) + extra + "</table>" : html + '<table class="kv">' + extra + "</table>";
+    // One fold per source rather than a fold inside a fold — the reader is
+    // after the documents, not the nesting.
+    html += '<div class="meta" style="padding:8px 0 4px" title="derived by the machine, not authored">pulled</div>' + pulledView(s.pulled);
   }
   if (s.archive_record !== undefined) {
     const e = s.archive_record;
@@ -591,47 +986,273 @@ function stateDetail(id) {
     html += '<div class="meta" style="padding:8px 0 4px">next</div>' + nextTable(id, s);
   }
   if (WALK_HERE && s.was_filled && id !== CURRENT && D.describe.status === "open") {
-    html += '<div style="padding:8px 0"><button class="primary jump" data-state="' + id + '" title="everything downstream is superseded; its evidence and checks are invalidated">↩ return to this state</button></div>';
+    html += '<div style="padding:8px 0"><vscode-button class="jump" secondary icon="discard" data-state="' + id + '" title="everything downstream is superseded; its evidence and checks are invalidated">return to this state</vscode-button></div>';
   }
   if (WALK_HERE && id === CURRENT && s.kind === "end" && (!s.next || s.next.length === 0) && D.describe.breadcrumb.length > 1) {
     const parent = D.describe.breadcrumb[0];
     html += '<div class="meta" style="padding:8px 0 4px">next</div>' +
-      '<table class="kv"><tr><td class="v">return to ' + parent + '</td><td class="btncell"><button class="primary go" data-to="" title="tick: leave the sub-machine">▶</button></td></tr></table>';
+      '<div class="nextitem open"><div class="nexthead"><span class="nextto">return to ' + escText(parent) + '</span><vscode-button class="go" icon="play" icon-only data-to="" title="tick: leave the sub-machine"></vscode-button></div></div>';
   }
   return html;
 }
-// Reload WITHOUT losing the view or the open details pane — a checkbox
-// click must not cost the user their place (found: four re-opens to set
-// four checks).
-function reloadKeep(detail) {
+// THE PAGE UPDATES IN PLACE (owner ruling 2026-07-28). A full reload cost
+// the reader their scroll, their selection and whatever they were typing.
+// The old workaround carried the view, the open pane and the open folds
+// through the URL and still lost the rest. Now an unchanged node is never
+// replaced, so there is nothing left to restore.
+//
+// Subtrees the CLIENT fills carry data-morph-ignore. The server sends them
+// empty, so morphing into them would wipe what the client just rendered.
+function sameNode(a, b) {
+  if (a.nodeType !== b.nodeType) return false;
+  if (a.nodeType !== 1) return true;
+  return a.tagName === b.tagName && (a.id || "") === (b.id || "");
+}
+function morph(from, to) {
+  if (from.nodeType !== 1) { if (from.nodeValue !== to.nodeValue) from.nodeValue = to.nodeValue; return; }
+  if (from.hasAttribute("data-morph-ignore")) return;
+  // A pane the reader has dragged owns its own width — the server never
+  // sent that style, so morphing would silently snap it back.
+  const keepsStyle = from.hasAttribute("data-keep-style");
+  for (const a of to.attributes) if (!(keepsStyle && a.name === "style") && from.getAttribute(a.name) !== a.value) from.setAttribute(a.name, a.value);
+  for (const a of [...from.attributes]) if (!to.hasAttribute(a.name) && !(keepsStyle && a.name === "style")) from.removeAttribute(a.name);
+  // A control under the reader's hand stays theirs until they leave it.
+  if (from.tagName === "INPUT" && from !== document.activeElement && to.hasAttribute("value")) from.value = to.getAttribute("value");
+  const byId = new Map();
+  for (const c of from.children) if (c.id !== "") byId.set(c.id, c);
+  let cur = from.firstChild;
+  for (const t of [...to.childNodes]) {
+    let match = t.nodeType === 1 && t.id !== "" ? byId.get(t.id) : undefined;
+    if (match === undefined && cur !== null && sameNode(cur, t)) match = cur;
+    if (match === undefined) { from.insertBefore(document.importNode(t, true), cur); continue; }
+    if (match !== cur) from.insertBefore(match, cur);
+    morph(match, t);
+    cur = match.nextSibling;
+  }
+  while (cur !== null) { const next = cur.nextSibling; from.removeChild(cur); cur = next; }
+}
+// Everything derived FROM a render has to be derived again after one.
+function rebind() {
+  const blob = document.getElementById("se-data");
+  if (blob) D = JSON.parse(blob.textContent);
+  CURRENT = (D.describe.active && D.describe.active[0]) ? D.describe.active[0].split("/").pop() : null;
+  WALK_HERE = D.viewingWalk;
+  // Without this the next poll compares against the OLD position forever.
+  ACTIVE_AT_RENDER = JSON.stringify(D.describe.active || []);
+  restoreViewBox();
+  if (CURRENT_DETAIL) { const dp = detailFor(CURRENT_DETAIL); showDetails(dp[0], dp[1]); }
+}
+let refreshInFlight = false;
+// ONE ACTION, ONE LOAD (owner 2026-07-28). A tick both navigates this page
+// and wakes /events, so the outgoing page used to fetch itself again on its
+// way out — the archive visibly loaded twice. Once we are leaving, we leave.
+let navigatingAway = false;
+// THE READER KEEPS THEIR PLACE (owner ruling 2026-07-28, extended 2026-07-29).
+// Changing WHICH MACHINE is on screen says nothing about what they had open
+// beside it, nor about which card they had promoted. A view URL carrying only
+// the view throws both away.
+//
+// The card half was missed because the card matrix landed after this rule did: the
+// detail param was carried, the card param did not exist yet, and nobody came
+// back. Entering a sub-state demoted the machine out of the main slot under
+// the reader's hand.
+//
+// EVERY pinned place goes through here, so the next one added is carried by
+// construction rather than by somebody remembering.
+// THE READER'S PLACE, DECLARED ONCE. Every surface the reader can put
+// somewhere gets ONE entry here. The card bug happened because this list
+// lived in people's heads and in three separate hand-written copies: detail
+// was carried, card arrived a month later, and the two never met.
+//
+// Add a param here and every navigation carries it by construction. A test
+// refuses any param the client pins that is not registered.
+// Embedded in a host (the VS Code webview): the flag arrives on the iframe
+// URL and rides every navigation, so the server keeps serving the embedded
+// card set instead of resetting to the standalone one.
+const EMBED_Q = new URLSearchParams(location.search).has("embed");
+const PLACE = [
+  ["detail", () => CURRENT_DETAIL],
+  ["card", () => CARD_NOW],
+  // Frozen is a place too: a snapshot window that follows a link inside
+  // itself stays a snapshot. A live window reports null and never picks it
+  // up, so the flag spreads nowhere it does not belong.
+  ["frozen", () => (FROZEN ? "1" : null)],
+  ["embed", () => (EMBED_Q ? "1" : null)],
+];
+/** Carry the place onto a URL the reader is NAVIGATING to. */
+function withPlace(url) {
+  const u = new URL(url, location.href);
+  for (const p of PLACE) {
+    const v = p[1]();
+    if (v && !u.searchParams.has(p[0])) u.searchParams.set(p[0], v);
+  }
+  return u.pathname + u.search;
+}
+/** Pin the place onto the URL of the page the reader is ALREADY on. */
+function pinPlace(q) {
+  for (const p of PLACE) {
+    const v = p[1]();
+    if (v) q.set(p[0], v); else q.delete(p[0]);
+  }
+}
+// A POPPED-OUT CARD IS A SNAPSHOT (owner ruling 2026-07-29). Two things
+// were wrong with the pop-out, and they are separate.
+//
+// It carried NOTHING. The button holds a URL baked in when the page was
+// drawn, so the new tab asked for "the details card" with no subject named
+// and the server answered with its own default. Meanwhile the live card was
+// showing whatever the reader last clicked, which lives only in this
+// browser. A reader looking at an answered question got a state.
+//
+// And it must not follow the walk. The reader pops several out to compare
+// them side by side, so each one holds what it was opened on. Frozen means
+// no event stream and no refresh, ever.
+const FROZEN = new URLSearchParams(location.search).has("frozen");
+function frozenUrl(url) {
+  const u = new URL(withPlace(url), location.href);
+  u.searchParams.set("frozen", "1");
+  return u.pathname + u.search;
+}
+// A SOLO CARD STAYS A CARD. Going to "/" replaced one card with the WHOLE
+// mirror inside it — which is what broke double-clicking into a sub-machine,
+// and what left the bar waiting on a page that was never the right one.
+// Only the mirror's own root is rewritten; a document link still goes where
+// it says.
+function keepCard(url) {
+  const here = location.pathname;
+  if (!here.startsWith("/widget/")) return url;
+  if (url !== "/" && url.slice(0, 2) !== "/?") return url;
+  const q = url.indexOf("?");
+  return here + (q < 0 ? "" : url.slice(q));
+}
+function navigateTo(url, label) {
+  navigatingAway = true;
+  showLoading(label);
+  url = withPlace(keepCard(url));
+  hostTrace("navigateTo " + url);
+  // This document is about to be replaced, so the host must stop posting
+  // into it. A post that lands in a dying document is swallowed whole.
+  if (window.parent !== window) window.parent.postMessage({ se: "nav" }, "*");
+  location.href = url;
+}
+// The crumbs are plain anchors, so a solo card would follow one straight out
+// to the whole mirror. Capture them and route them through the same rule.
+document.addEventListener("click", (ev) => {
+  if (!location.pathname.startsWith("/widget/")) return;
+  const a = ev.target.closest ? ev.target.closest("a[href^='/?']") : null;
+  hostTrace("anchor hit=" + (a === null ? "none" : String(a.getAttribute("href"))));
+  if (a === null) return;
+  ev.preventDefault();
+  navigateTo(a.getAttribute("href"), "loading " + (a.textContent || "view"));
+}, true);
+async function refresh(detail) {
+  if (FROZEN) return;
+  if (navigatingAway) return;
+  if (detail !== undefined) CURRENT_DETAIL = detail;
   const q = new URLSearchParams(location.search);
   // THE VIEW HOLDS STILL (owner ruling 2026-07-28): finishing a state is
   // data change, and data change never jumps the reader — every refresh
   // pins the machine being looked at explicitly.
   q.set("view", D.viewed.id);
-  if (detail) q.set("detail", detail); else q.delete("detail");
-  // THE UX LAW: no fold closes across a reload — open <details> ride along.
-  const folds = [...document.querySelectorAll("#details details[open] summary")].map((s) => s.textContent.split(" (")[0].trim()).filter(Boolean);
-  if (folds.length) q.set("folds", folds.join("|")); else q.delete("folds");
+  pinPlace(q);
   const qs = q.toString();
-  location.href = location.pathname + (qs ? "?" + qs : "");
+  const url = location.pathname + (qs ? "?" + qs : "");
+  history.replaceState(null, "", url);
+  if (refreshInFlight) return;
+  refreshInFlight = true;
+  try {
+    const r = await fetch(url);
+    const doc = new DOMParser().parseFromString(await r.text(), "text/html");
+    // THE STYLESHEET MORPHS TOO (found live 2026-07-29). It lives in <head>,
+    // which the morph never touched, so a tab open since before a CSS change
+    // kept the OLD sheet for as long as it stayed open. Anything shipped after
+    // that matched no rule at all — and an unstyled SVG path fills black.
+    // The reader saw it; the agent, on a fresh tab, could not reproduce it.
+    const freshCss = doc.querySelector("head style");
+    const liveCss = document.querySelector("head style");
+    if (freshCss && liveCss && liveCss.textContent !== freshCss.textContent) liveCss.textContent = freshCss.textContent;
+    morph(document.body, doc.body);
+    rebind();
+  } catch (e) {
+    location.href = url; // a failed morph must never strand the reader
+  } finally {
+    refreshInFlight = false;
+    hideLoading(); // THE LOAD SETTLED — win or lose, the bar goes
+  }
+}
+// VS CODE EMBED. The hosting webview says hello with a theme message: the
+// palette follows the editor from then on, and record links open as real
+// files THERE. Help stays a detail HERE — the ux rule. The flag survives
+// in-page navigation; the host re-sends the theme on every iframe load.
+let EMBED = false;
+try { EMBED = sessionStorage.getItem("se-embed") === "1"; } catch { EMBED = false; }
+window.addEventListener("message", (ev) => {
+  const d = ev.data;
+  if (!d) return;
+  // HELP IS A DETAIL, NEVER A BUTTON (ux rule). A host with an icon strip
+  // has no room to explain itself, so what an icon means arrives HERE, in
+  // the details pane, the one place the reader already looks for meaning.
+  // The host saw the walk move. Embedded, this replaces the event stream.
+  if (d.se === "wake") { refresh(); return; }
+  if (d.se === "help") { hostTrace("page got help"); showDetails(d.title, d.html); hostAck(); return; }
+  // A LOG LINE CLICKED IN THE HOST'S TERMINAL. The record is rendered HERE,
+  // by the same code the mirror uses, so a host never grows a second
+  // renderer for what this page already knows how to draw.
+  if (d.se === "logref") {
+    hostTrace("page got logref " + d.ref + " on " + location.pathname);
+    void openLogDetail(d.ref).then(() => { hostTrace("logref rendered " + d.ref); hostAck(); }, (e) => hostTrace("logref FAILED " + String((e && e.message) || e)));
+    return;
+  }
+  if (d.se !== "theme") return;
+  EMBED = true;
+  try { sessionStorage.setItem("se-embed", "1"); } catch { /* storage denied — the flag just will not survive navigation */ }
+  const vars = d.vars || {};
+  for (const k in vars) if (vars[k]) document.documentElement.style.setProperty(k, vars[k]);
+});
+function cssPalette(name) {
+  return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+}
+function embedOpen(path) {
+  if (!EMBED || !path) return false;
+  window.parent.postMessage({ se: "open", path: path }, "*");
+  return true;
+}
+// THE HOST HOLDS THE SUBJECT UNTIL THIS ARRIVES. Without it the relay had to
+// infer from a load event whether this page was still there to receive.
+function hostAck() {
+  if (window.parent !== window) window.parent.postMessage({ se: "ack" }, "*");
 }
 document.addEventListener("click", async (ev) => {
   const c = ev.target.closest ? ev.target.closest(".docheck") : null;
-  if (c) { if (c.disabled) return; ev.preventDefault(); c.disabled = true; await fetch("/check", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ path: c.dataset.path }) }); reloadKeep(CURRENT_DETAIL); return; }
+  if (c) {
+    // FEEDBACK FIRST. The old handler cancelled the click and waited on a
+    // round trip, so the box sat unchecked for a second and then a full
+    // refresh rebuilt the pane under the reader, who lost what they had open.
+    if (c.hasAttribute("disabled")) return;
+    const path = c.dataset.path;
+    c.setAttribute("checked", "");
+    c.setAttribute("disabled", "");
+    if (!D.checkedDocs) D.checkedDocs = [];
+    if (D.checkedDocs.indexOf(path) < 0) D.checkedDocs.push(path);
+    // No refresh here. The poll sees the log grow and redraws in its own
+    // time; forcing it now is what threw the reader out of the details pane.
+    await fetch("/check", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ path: path }) });
+    return;
+  }
   const j = ev.target.closest ? ev.target.closest(".jump") : null;
-  if (j) { await fetch("/tick", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ back: j.dataset.state }) }); location.href = "/"; return; }
+  if (j) { showLoading("jumping back to " + j.dataset.state); await fetch("/tick", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ back: j.dataset.state }) }); navigateTo("/", "loading the walk"); return; }
   const rp = ev.target.closest ? ev.target.closest(".runpre") : null;
   if (rp) {
     // Grey IMMEDIATELY — no second run behind an unresponsive button; the
     // server coalesces stray extra clicks into the one run anyway.
     rp.disabled = true; rp.classList.add("locked"); rp.textContent = "running…";
     await fetch("/script", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ state: rp.dataset.state || CURRENT }) });
-    reloadKeep(CURRENT_DETAIL);
+    refresh();
     return;
   }
   const rpl = ev.target.closest ? ev.target.closest(".replink") : null;
   if (rpl) {
+    if (embedOpen(rpl.dataset.path)) return;
     const expQ = rpl.dataset.exp ? "&exp=" + encodeURIComponent(rpl.dataset.exp) : "";
     const pageUrl = "/doc?path=" + encodeURIComponent(rpl.dataset.path) + expQ + "&page=1";
     if (ev.ctrlKey || ev.metaKey) { window.open(pageUrl, "_blank"); return; }
@@ -649,7 +1270,7 @@ document.addEventListener("click", async (ev) => {
 function condRows(id, dict, standing) {
   return Object.entries(dict).map(([key, c]) => {
     let row = '<div style="padding:6px 0 2px"><a class="doclink" data-path="' + c.note + '">' + key + "</a> ";
-    row += c.met ? '<span style="color:#4a7a55">✓ met</span>' : '<span style="color:#e8b339">! unmet</span>';
+    row += c.met ? '<span style="color:var(--se-ok)">✓ met</span>' : '<span style="color:var(--se-accent)">! unmet</span>';
     row += "</div>";
     if (key === "script") {
       if (c.args.length > 0) row += jsonTable(c.args);
@@ -663,9 +1284,9 @@ function condRows(id, dict, standing) {
       else if (sc.ran && sc.ok) btn = '<button class="primary go locked" disabled title="exit 0 — the condition is met">✓ ran</button>';
       else btn = '<button class="primary runpre" data-state="' + id + '">' + (sc.ran ? "re-run" : "run") + "</button>";
       row += '<div style="padding:6px 0">' + btn + "</div>";
-      if (sc.running) row += '<div style="color:#e8b339">running — the page follows; the result lands here</div>';
+      if (sc.running) row += '<div style="color:var(--se-accent)">running — the page follows; the result lands here</div>';
       else if (sc.ran) row += '<div style="color:' + (sc.ok ? "#4a7a55" : "#e86a5f") + ';white-space:pre-wrap;font-size:12px">' + sc.output.replace(/&/g,"&amp;").replace(/</g,"&lt;") + "</div>";
-      else row += '<div style="color:#7f8b96">not run yet</div>';
+      else row += '<div style="color:var(--se-muted)">not run yet</div>';
     } else if (key === "evidence_form") {
       // The A3 page: open it in the details pane — fill, confirm prefills,
       // manage files, set done. One button per named template.
@@ -711,9 +1332,9 @@ async function showForm(name) {
   // The GRAPH-IS-EVIDENCE gate, visible to the human: the page cannot
   // pass over open decision points — they surface under problems below.
   html += '<div class="meta">gate: every open decision point of this record must be resolved (done · obsolete · revert · defer) before this page passes</div>';
-  html += '<div class="meta">' + escText(f.instance) + (ro ? " · template preview — filling happens inside an expedition" : " · status: " + escText(f.status) + (f.met ? ' · <span style="color:#4a7a55">✓ passes</span>' : "")) + "</div>";
+  html += '<div class="meta">' + escText(f.instance) + (ro ? " · template preview — filling happens inside an expedition" : " · status: " + escText(f.status) + (f.met ? ' · <span style="color:var(--se-ok)">✓ passes</span>' : "")) + "</div>";
   (f.fields || []).forEach((fl) => {
-    html += '<div style="padding:8px 0 2px"><b>' + escText(fl.name) + "</b>" + (fl.required ? ' <span style="color:#e8b339">required</span>' : "") + "</div>";
+    html += '<div style="padding:8px 0 2px"><b>' + escText(fl.name) + "</b>" + (fl.required ? ' <span style="color:var(--se-accent)">required</span>' : "") + "</div>";
     html += '<div class="comment-text">' + escText(fl.description) + "</div>";
     if (ro) return;
     (fl.prefills || []).forEach((p, i) => {
@@ -724,7 +1345,7 @@ async function showForm(name) {
   if (!ro) {
     html += '<div class="meta" style="padding:6px 0 2px">files — <a class="doclink openfolder" data-form="' + name + '">open ' + escText(f.evidence_dir) + "</a></div>";
     (f.files || []).forEach((fi) => { html += "<div>" + (fi.present ? "✓ " : '<span style="color:#e86a5f">✗ </span>') + escText(fi.name) + "</div>"; });
-    if (f.problems && f.problems.length) html += '<div style="color:#e8b339;padding:6px 0">' + f.problems.map(escText).join("<br>") + "</div>";
+    if (f.problems && f.problems.length) html += '<div style="color:var(--se-accent);padding:6px 0">' + f.problems.map(escText).join("<br>") + "</div>";
     html += '<div style="padding:10px 0"><button class="primary saveform" data-form="' + name + '">save</button> <button class="primary doneform" data-form="' + name + '" title="sets status done and runs the lint">done</button></div>';
   }
   openModal("form · " + name, html);
@@ -779,14 +1400,19 @@ document.addEventListener("click", async (ev) => {
     // The quick way home: jump the view to the walk's machine, whole
     // drawing visible (the saved pan is dropped so the state shows).
     sessionStorage.removeItem("se-vb-" + cs.dataset.machine);
-    location.href = "/?view=" + encodeURIComponent(cs.dataset.machine);
+    navigateTo("/?view=" + encodeURIComponent(cs.dataset.machine), "loading " + cs.dataset.machine);
     return;
   }
   const go = ev.target.closest ? ev.target.closest(".go") : null;
   if (go) {
+    // THE GUARD IS EXPLICIT. A native button swallows its own click when
+    // disabled; a component decides that for itself, and a locked edge must
+    // not walk because the library changed its mind about pointer events.
+    if (go.hasAttribute("disabled")) return;
     const body = go.dataset.to ? { to: go.dataset.to } : { advance: true };
+    showLoading("walking to " + (go.dataset.to || "the next state"));
     await fetch("/tick", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) });
-    location.href = "/";
+    navigateTo("/", "loading the walk");
   }
 });
 let CURRENT_DETAIL = null;
@@ -800,31 +1426,41 @@ document.addEventListener("click", (ev) => {
 // Double-click a sub-machine state: enter it as a VIEWER (walk unmoved).
 document.addEventListener("dblclick", (ev) => {
   const g = ev.target.closest ? ev.target.closest(".clickable") : null;
-  if (g && g.dataset.sub) location.href = "/?view=" + encodeURIComponent(g.dataset.sub);
+  hostTrace("dblclick hit=" + (g === null ? "none" : "clickable") + " sub=" + (g === null ? "-" : String(g.dataset.sub)));
+  if (g && g.dataset.sub) navigateTo("/?view=" + encodeURIComponent(g.dataset.sub), "loading " + g.dataset.sub);
 });
 
 // Only real widget expanders — the modal's ✕ shares the style, not the job.
-document.querySelectorAll(".expand[data-widget]").forEach((btn) => {
-  btn.addEventListener("click", (ev) => {
-    ev.stopPropagation();
-    const url = btn.dataset.url;
-    if (ev.ctrlKey || ev.metaKey) { window.open(url, "_blank"); return; }
-    if (ev.shiftKey) { window.open(url, "se-widget", "width=1100,height=800"); return; }
-    const w = document.getElementById(btn.dataset.widget);
-    if (w) { if (document.fullscreenElement === w) document.exitFullscreen(); else w.requestFullscreen(); }
-  });
+// Delegated, so a morph may replace a widget head without losing the button.
+document.addEventListener("click", (ev) => {
+  const btn = ev.target.closest ? ev.target.closest(".expand[data-widget]") : null;
+  if (!btn) return;
+  ev.stopPropagation();
+  const url = btn.dataset.url;
+  // A NEW window every time, never a named one. The whole point is several
+  // standing side by side, and a shared name reuses the first one forever.
+  if (ev.ctrlKey || ev.metaKey) { window.open(frozenUrl(url), "_blank"); return; }
+  if (ev.shiftKey) { window.open(frozenUrl(url), "_blank", "popup,width=1100,height=800"); return; }
+  const w = document.getElementById(btn.dataset.widget);
+  if (w) { if (document.fullscreenElement === w) document.exitFullscreen(); else w.requestFullscreen(); }
 });
 
+// Pan/zoom survives every refresh, per machine — a walk-driven update must
+// not snap the reader's viewport back to the whole drawing. A morph rewrites
+// the viewBox attribute, so the saved view is re-applied after every one.
+function restoreViewBox() {
+  const s = document.getElementById("machine-svg");
+  if (!s) return;
+  try {
+    const saved = JSON.parse(sessionStorage.getItem("se-vb-" + D.viewed.id) || "null");
+    if (saved && saved.w > 0) { const v = s.viewBox.baseVal; v.x = saved.x; v.y = saved.y; v.width = saved.w; v.height = saved.h; }
+  } catch (e) { /* a broken save never blocks the drawing */ }
+}
 const svg = document.getElementById("machine-svg");
 if (svg) {
   let vb = svg.viewBox.baseVal;
-  // Pan/zoom survives every refresh, per machine — a walk-driven reload
-  // must not snap the reader's viewport back to the whole drawing.
   const VB_KEY = "se-vb-" + D.viewed.id;
-  try {
-    const saved = JSON.parse(sessionStorage.getItem(VB_KEY) || "null");
-    if (saved && saved.w > 0) { vb.x = saved.x; vb.y = saved.y; vb.width = saved.w; vb.height = saved.h; }
-  } catch (e) { /* a broken save never blocks the drawing */ }
+  restoreViewBox();
   const saveVb = () => { try { sessionStorage.setItem(VB_KEY, JSON.stringify({ x: vb.x, y: vb.y, w: vb.width, h: vb.height })); } catch (e) { /* storage full — the view just re-fits */ } };
   svg.addEventListener("wheel", (ev) => {
     ev.preventDefault();
@@ -847,25 +1483,183 @@ if (svg) {
   window.addEventListener("mouseup", () => { if (panning) saveVb(); panning = null; svg.classList.remove("panning"); });
 }
 
-const divider = document.getElementById("divider");
-const aside = document.getElementById("sidebar");
-if (divider && aside) {
-  let drag = null;
-  divider.addEventListener("mousedown", (ev) => { drag = { x: ev.clientX, w: aside.offsetWidth }; ev.preventDefault(); });
-  window.addEventListener("mousemove", (ev) => { if (drag) aside.style.width = (drag.w - (ev.clientX - drag.x)) + "px"; });
-  window.addEventListener("mouseup", () => { drag = null; });
+// A PANE THE READER SIZED KEEPS THAT SIZE (owner ruling 2026-07-28).
+//
+// Walking into a sub-state is a full page load, and a width set by dragging
+// is an inline style, which no page load survives. So every entry into a
+// sub-machine snapped the whole layout back to its defaults — the machine
+// drawing included, because it takes whatever the two columns leave it.
+//
+// A pane size is a PREFERENCE, not a view of something: it is about how the
+// reader likes to work, not about which machine is on screen. So it outlives
+// the tab in localStorage, while the per-machine viewBox stays in
+// sessionStorage, where a view of one drawing belongs.
+const PANE_KEY = "se-pane-";
+function savePaneSize(pane, axis, px) {
+  try { localStorage.setItem(PANE_KEY + pane.id + "-" + axis, String(Math.round(px))); } catch (e) { /* storage full — the pane just re-defaults */ }
 }
+function restorePaneSizes() {
+  document.querySelectorAll(".divider").forEach((dv) => {
+    const pane = document.getElementById(dv.dataset.pane);
+    if (pane === null) return;
+    const axis = dv.dataset.axis === "y" ? "height" : "width";
+    let px = 0;
+    try { px = Number(localStorage.getItem(PANE_KEY + pane.id + "-" + axis) || "0"); } catch (e) { /* no storage — the defaults stand */ }
+    if (!(px > 0)) return;
+    // A size saved on a wider screen must not push the rest of the layout
+    // off a narrower one, so the stored value is a wish, not a command.
+    const room = axis === "width" ? window.innerWidth : (pane.parentElement === null ? px : pane.parentElement.clientHeight);
+    pane.style[axis] = Math.max(140, Math.min(px, room - 120)) + "px";
+  });
+}
+restorePaneSizes();
 
+// Each divider names the pane it moves and which side that pane sits on:
+// a divider on the pane's far side grows it as you drag TOWARDS the pane.
+// data-axis y makes it a horizontal splitter moving height instead of width.
+document.querySelectorAll(".divider").forEach((dv) => {
+  const pane = document.getElementById(dv.dataset.pane);
+  if (pane === null) return;
+  const vert = dv.dataset.axis === "y";
+  const away = dv.dataset.grow === "right" || dv.dataset.grow === "bottom";
+  let drag = null;
+  dv.addEventListener("mousedown", (ev) => {
+    drag = { at: vert ? ev.clientY : ev.clientX, size: vert ? pane.offsetHeight : pane.offsetWidth };
+    ev.preventDefault();
+  });
+  window.addEventListener("mousemove", (ev) => {
+    if (drag === null) return;
+    const moved = (vert ? ev.clientY : ev.clientX) - drag.at;
+    const want = drag.size + (away ? -moved : moved);
+    if (!vert) { pane.style.width = Math.max(160, want) + "px"; return; }
+    // The pane above must survive. Nothing caps this at half — dragging past
+    // half is exactly what the owner asked for.
+    const room = pane.parentElement === null ? want : pane.parentElement.clientHeight - 120;
+    pane.style.height = Math.max(140, Math.min(want, room)) + "px";
+  });
+  window.addEventListener("mouseup", () => {
+    if (drag === null) return;
+    drag = null;
+    savePaneSize(pane, vert ? "height" : "width", vert ? pane.offsetHeight : pane.offsetWidth);
+  });
+});
+
+// THE CARDS. Promotion swaps a class and two CSS variables. Nothing moves, so
+// every widget stays live — which is the whole reason the layout is one grid.
+const CARDBLOB = document.getElementById("se-cards");
+const CARDS = CARDBLOB === null ? { list: [], now: "" } : JSON.parse(CARDBLOB.textContent);
+let CARD_NOW = new URLSearchParams(location.search).get("card") || CARDS.now;
+let CARD_PREV = null;
+// Chat is promoted once, the first time a host answers. Not on every poll.
+let CHAT_LED = false;
+function cardCell(id) {
+  const i = CARDS.list.findIndex((c) => c.id === id);
+  const at = i < 0 ? 0 : i;
+  return { col: 3 + (at % 2), row: 1 + Math.floor(at / 2) };
+}
+function applyCards() {
+  for (const c of CARDS.list) {
+    const el = document.getElementById("card-" + c.id);
+    if (el === null) continue;
+    const cell = cardCell(c.id);
+    el.style.setProperty("--col", String(cell.col));
+    el.style.setProperty("--row", String(cell.row));
+    el.classList.toggle("main", c.id === CARD_NOW);
+  }
+  // The legend takes the vacated slot, so where it sits IS the answer to
+  // "which card is up front". The jump is the indicator, not a cost.
+  const leg = document.getElementById("card-legend");
+  if (leg !== null) {
+    const cell = cardCell(CARD_NOW);
+    leg.style.setProperty("--col", String(cell.col));
+    leg.style.setProperty("--row", String(cell.row));
+  }
+}
+function promoteCard(id) {
+  if (!CARDS.list.some((c) => c.id === id)) return;
+  // The same key again is the way back — the loop is chat, look, chat.
+  if (id === CARD_NOW) { if (CARD_PREV !== null) promoteCard(CARD_PREV); return; }
+  CARD_PREV = CARD_NOW;
+  CARD_NOW = id;
+  applyCards();
+  // Pinned in the URL like view and detail, so the next morph agrees with
+  // what the reader just did, and an F5 lands on the same card.
+  const q = new URLSearchParams(location.search);
+  q.set("card", id);
+  history.replaceState(null, "", location.pathname + "?" + q.toString());
+}
+// NUMBER KEYS, NOT FUNCTION KEYS (owner 2026-07-29). F1, F5, F6, F11 and F12
+// belong to the browser, and a laptop needs an Fn chord for them. A key never
+// fires while the reader is typing — chat is a card you type in.
+addEventListener("keydown", (ev) => {
+  if (ev.ctrlKey || ev.metaKey || ev.altKey) return;
+  const t = ev.target;
+  if (t !== null && (t.tagName === "INPUT" || t.tagName === "TEXTAREA" || t.isContentEditable)) return;
+  // T AIMS THE BLUE LINE at whatever state the reader has open. It only sets
+  // the destination; the walk still waits to be told to go, which is the
+  // whole point of a target being separate from a tick.
+  if (ev.key === "t" || ev.key === "T") {
+    if (typeof CURRENT_DETAIL !== "string" || !CURRENT_DETAIL.startsWith("state:")) return;
+    const to = CURRENT_DETAIL.slice(6);
+    ev.preventDefault();
+    void fetch("/target", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ to }) });
+    return;
+  }
+  if (!/^[0-9]$/.test(ev.key)) return;
+  const card = CARDS.list[Number(ev.key) - 1];
+  if (card === undefined) return;
+  ev.preventDefault();
+  promoteCard(card.id);
+});
+// THE NUMBER IS A CONTROL, NOT A LABEL (owner 2026-07-29). Whatever the key
+// does, clicking the badge does — including the press-again toggle back.
+addEventListener("click", (ev) => {
+  const badge = ev.target !== null && ev.target.closest !== undefined ? ev.target.closest(".cardnum") : null;
+  if (badge === null) return;
+  const card = badge.closest(".card");
+  if (card === null) return;
+  ev.preventDefault();
+  ev.stopPropagation();
+  promoteCard(card.id.replace(/^card-/, ""));
+});
+// 58/42 to start (owner 2026-07-29), then wherever the reader drags it,
+// remembered exactly the way every other pane already is.
+const CARDS_KEY = PANE_KEY + "cards-main";
+const cardsEl = document.querySelector(".cards");
+if (cardsEl !== null) {
+  let saved = 0;
+  try { saved = Number(localStorage.getItem(CARDS_KEY) || "0"); } catch (e) { /* no storage — the default stands */ }
+  if (saved > 0) cardsEl.style.setProperty("--main-w", Math.max(240, Math.min(saved, window.innerWidth - 260)) + "px");
+  const cdv = document.getElementById("div-cards");
+  let cdrag = false;
+  if (cdv !== null) {
+    cdv.addEventListener("mousedown", (ev) => { cdrag = true; ev.preventDefault(); });
+    window.addEventListener("mousemove", (ev) => {
+      if (!cdrag) return;
+      cardsEl.style.setProperty("--main-w", Math.max(240, Math.min(ev.clientX, window.innerWidth - 260)) + "px");
+    });
+    window.addEventListener("mouseup", () => {
+      if (!cdrag) return;
+      cdrag = false;
+      const px = parseInt(cardsEl.style.getPropertyValue("--main-w"), 10);
+      if (px > 0) { try { localStorage.setItem(CARDS_KEY, String(px)); } catch (e) { /* storage full */ } }
+    });
+  }
+}
 if (CURRENT && D.states[CURRENT] && WALK_HERE) { CURRENT_DETAIL = "state:" + CURRENT; showDetails("state: " + CURRENT, stateDetail(CURRENT)); }
-// A reload that carried its detail along (reloadKeep) restores the pane.
+// A bookmark or an F5 still deep-links to the pane that was open.
 const DETAIL_PARAM = new URLSearchParams(location.search).get("detail");
 if (DETAIL_PARAM) { CURRENT_DETAIL = DETAIL_PARAM; const dp = detailFor(DETAIL_PARAM); showDetails(dp[0], dp[1]); }
-// Folds that were open before a reloadKeep stay open (the UX law).
-const FOLDS = (new URLSearchParams(location.search).get("folds") || "").split("|").filter(Boolean);
-if (FOLDS.length) document.querySelectorAll("#details details").forEach((d) => {
-  const s = d.querySelector("summary");
-  if (s && FOLDS.includes(s.textContent.split(" (")[0].trim())) d.open = true;
-});
+// A frozen window says so. Not a warning — a quiet line, so a reader with
+// one live pane and four snapshots can tell which is which at a glance.
+if (FROZEN) {
+  const fbar = document.createElement("div");
+  fbar.id = "frozen-bar";
+  fbar.textContent = "frozen — this window keeps what it was opened on and does not follow the walk";
+  fbar.style.cssText = "padding:6px 10px;font-size:12px;opacity:0.7;border-bottom:1px solid rgba(128,128,128,0.3)";
+  document.body.insertBefore(fbar, document.body.firstChild);
+}
+// Open folds need no carrying now: the morph never replaces them.
 
 // THE UNIFIED FEED (owner ruling, v2 i9 notes; built in v3): every hand's
 // act, one line each — time | src | brief | result. Updates bold, notes
@@ -877,6 +1671,7 @@ const logPanel = document.getElementById("log-rows");
 let LOG_ROWS = [];
 let lastActs = null;
 let DECISION_GRAPH = null;
+let LOG_HTML = null;
 function renderLog() {
   if (!logPanel) return;
   const fEl = document.getElementById("log-filter");
@@ -885,7 +1680,7 @@ function renderLog() {
   // NEWEST ON TOP (owner ruling): the feed reads downward into the past;
   // the scroll pins to the top while the reader is there.
   const stick = logPanel.scrollTop < 40;
-  logPanel.innerHTML = rows.slice().reverse().map((r) =>
+  const html = rows.slice().reverse().map((r) =>
     '<div class="logrow ' + r.type + (r.ok ? "" : " failed") + '" data-ref="' + r.ref + '">' +
       '<span class="lt">' + (r.pending ? r.ts.slice(5, 10) : r.ts.slice(11, 19)) + "</span>" +
       '<span class="lsrc ' + r.src + '">' + r.src + "</span>" +
@@ -893,7 +1688,16 @@ function renderLog() {
       '<span class="lbrief">' + escText(r.brief) + "</span>" +
       '<span class="lok">' + (r.ok ? "✓" : "✗ " + (r.clause || "")) + "</span>" +
     "</div>").join("") || '<div class="meta">no acts' + (f ? " match the filter" : " this session yet") + "</div>";
-  if (stick) logPanel.scrollTop = 0;
+  // NOTHING CHANGED, NOTHING MOVES. The feed polls constantly, and it used to
+  // rewrite itself whole every time. A reader scrolled down into the past was
+  // snapped back to the top by a poll that found nothing new — the same defect
+  // as the details pane, on a surface that repaints far more often.
+  if (html === LOG_HTML) return;
+  LOG_HTML = html;
+  const top = logPanel.scrollTop;
+  logPanel.innerHTML = html;
+  // Sticking to the top is the reader's place TOO, when that is where they are.
+  logPanel.scrollTop = stick ? 0 : top;
 }
 async function refreshLog() {
   if (!logPanel) return;
@@ -931,11 +1735,21 @@ if (logPanel) {
 }
 async function openLogDetail(ref) {
   CURRENT_DETAIL = "log:" + ref;
+  hostTrace("openLogDetail asking for " + ref);
   const r = await fetch("/api/log?ref=" + encodeURIComponent(ref));
+  hostTrace("openLogDetail status " + r.status + " for " + ref);
   const rec = await r.json();
+  hostTrace("openLogDetail parsed " + ref + " tool=" + String(rec.tool) + " err=" + String(rec.error));
   if (rec.tool === "se_update" && rec.args && rec.args.visit) { await showDecisions(rec.args.visit, null); return; }
   if ((rec.tool === "se_note" || rec.tool === "mirror_note") && rec.args) { showDetails("note · " + ((rec.response && rec.response.captured) || rec.ref), jsonTable({ at: rec.ts, text: rec.args.text, pending: "until a retro drains it" })); return; }
   if (rec.text !== undefined && rec.tool === undefined) { showDetails("note · " + rec.ref, jsonTable({ at: rec.at, text: rec.text, pending: "until a retro drains it" })); return; }
+  if (rec.tool === "se_answer" && rec.args) {
+    // The aq click shows BOTH, as prose — never the raw call record.
+    showDetails("aq · answered question",
+      '<div class="aq-q">' + escText(String(rec.args.question || "")) + "</div>" +
+      '<div class="aq-a prewrap">' + escText(String(rec.args.answer || "")) + "</div>");
+    return;
+  }
   showDetails("log · " + (rec.tool || ref), jsonTable({ at: rec.ts, request: { tool: rec.tool, args: rec.args }, response: rec.response === undefined ? null : rec.response, duration_ms: rec.duration_ms }));
 }
 async function showDecisions(visit, sel) {
@@ -961,6 +1775,103 @@ function renderDecisions(sel) {
   }
   showDetails("decisions · " + g.visit, html);
 }
+// FEEDBACK WITHIN A SECOND (owner law 2026-07-28): anything that can take
+// longer shows loading feedback at once.
+//
+// THE BAR OWNS ITS LIFETIME (owner ruling 2026-07-28). It used to rely on
+// the navigation that followed to replace the whole page. Morphing then
+// replaced navigation, and a bar nobody hid simply stayed up. A bar that
+// outlives its load is worse than none: the reader learns to ignore it, and
+// it can no longer warn them when something really is slow. So every load
+// carries a token, settles exactly once, and cannot outlive its deadline.
+let loadToken = 0;
+let loadTimer = null;
+// A HOST DRAWS ITS OWN PROGRESS. Framed inside an editor, the host already
+// has a progress affordance of its own, and two bars for one wait is one too
+// many. The page REPORTS that it is busy; the host decides how to show it.
+// The page's half of the trace. Nobody can watch a webview run, so it says
+// what it just did and the host writes it down.
+function hostTrace(what) {
+  if (window.parent !== window) window.parent.postMessage({ se: "trace", text: what }, "*");
+}
+// A THROW IN HERE IS INVISIBLE otherwise. There is no console anybody can
+// read from outside, so a failure would look exactly like a control that
+// simply does nothing — which is the hardest fault to chase.
+window.addEventListener("error", (e) => hostTrace("ERROR " + (e.message || "?") + " @" + (e.lineno || 0)));
+window.addEventListener("unhandledrejection", (e) => hostTrace("REJECTED " + String((e.reason && e.reason.message) || e.reason || "?")));
+// WHICH PAGE THIS ACTUALLY IS. A navigation that fires and then lands on the
+// wrong thing looks identical, from outside, to one that never fired.
+hostTrace("loaded " + location.pathname + location.search);
+function hostBusy(on, label) {
+  if (window.parent !== window) window.parent.postMessage({ se: "busy", on: on, label: label || "" }, "*");
+}
+function hideLoading() {
+  loadToken++; // any timer still holding the old token is now a no-op
+  if (loadTimer !== null) { clearTimeout(loadTimer); loadTimer = null; }
+  const el = document.getElementById("loadbar");
+  if (el !== null) el.remove();
+  hostBusy(false);
+}
+function showLoading(label) {
+  hideLoading(); // one load at a time; a second start supersedes the first
+  hostBusy(true, label);
+  if (window.parent !== window) return;
+  const mine = loadToken;
+  const el = document.createElement("div");
+  el.id = "loadbar";
+  el.innerHTML = '<div class="fill"></div><div class="lmsg"></div>';
+  el.querySelector(".lmsg").textContent = label || "loading";
+  document.body.appendChild(el);
+  // NOTHING SPINS FOREVER. If nobody settles this load, say so — an honest
+  // failure beats a confident bar in front of a page that finished long ago.
+  loadTimer = setTimeout(() => {
+    if (loadToken !== mine) return;
+    const cur = document.getElementById("loadbar");
+    if (cur === null) return;
+    cur.classList.add("stalled");
+    cur.querySelector(".lmsg").textContent = (label || "loading") + " — no answer; click to retry";
+  }, 8000);
+}
+// THE ENGINE'S OWN WORK drives the same bar: a running script reports
+// "##progress done total label" and the fill follows it. Boot's checks are
+// the first customer — nobody should watch a still page and guess.
+function showProgress(label, done, total) {
+  if (window.parent !== window) { hostBusy(true, label + " — " + done + "/" + total); return; }
+  let el = document.getElementById("loadbar");
+  if (el === null) { showLoading(label); el = document.getElementById("loadbar"); }
+  if (el === null) return;
+  // Progress ARRIVING cancels the stall timer: something is plainly alive.
+  if (loadTimer !== null) { clearTimeout(loadTimer); loadTimer = null; }
+  el.classList.remove("stalled");
+  const fill = el.querySelector(".fill");
+  fill.classList.add("determinate");
+  const pct = total > 0 ? Math.round((done / total) * 100) : 0;
+  fill.style.width = pct + "%";
+  el.querySelector(".lmsg").textContent = label + " — " + done + "/" + total + " (" + pct + "%)";
+}
+// A page that was restored, or navigated back to, has no load in flight —
+// whatever it was showing when the reader left it.
+addEventListener("pageshow", hideLoading);
+addEventListener("popstate", hideLoading);
+document.addEventListener("click", (ev) => {
+  const stalled = ev.target.closest ? ev.target.closest("#loadbar.stalled") : null;
+  if (stalled !== null) { hideLoading(); location.reload(); return; }
+  const a = ev.target.closest ? ev.target.closest('a[href*="?view="]') : null;
+  if (a === null) return;
+  // SERVER-RENDERED LINKS NEVER PASS THROUGH navigateTo. The crumb chain and
+  // its menu are plain anchors, and the server cannot know which card the
+  // reader promoted or what they have open. So the place is stitched on here,
+  // at the click, before the browser follows the href. A new tab gets it too,
+  // which is why this runs BEFORE the modifier-key returns below.
+  a.setAttribute("href", withPlace(a.getAttribute("href")));
+  // A click that opens SOMEWHERE ELSE leaves this page untouched, so it
+  // starts no load here. Showing a bar for it is exactly the strand the
+  // owner hit: the expand controls advertise ctrl-click and shift-click.
+  if (ev.defaultPrevented || ev.button !== 0) return;
+  if (ev.ctrlKey || ev.metaKey || ev.shiftKey || ev.altKey) return;
+  if (a.target !== "" && a.target !== "_self") return;
+  showLoading("loading " + (a.textContent || "view"));
+}, true);
 document.addEventListener("click", (ev) => {
   const lr = ev.target.closest ? ev.target.closest(".logrow") : null;
   if (lr) { void openLogDetail(lr.dataset.ref); return; }
@@ -998,7 +1909,7 @@ if (thr) {
 const THR_LEVELS = D.levels;
 function levelHelp(sel) {
   const rows = THR_LEVELS.map((l) =>
-    '<tr' + (sel === l.value ? ' style="background:#22272c"' : "") + '><td class="k">' + l.abbr + " · " + l.value + '</td><td class="v">' + l.name + "</td></tr>").join("");
+    '<tr' + (sel === l.value ? ' style="background:var(--se-raised)"' : "") + '><td class="k">' + l.abbr + " · " + l.value + '</td><td class="v">' + l.name + "</td></tr>").join("");
   showDetails("the autonomy scale", '<table class="kv">' + rows + '</table><div style="padding:8px 0 0"><a class="doclink" data-path="product/guidance/authoring/machines.md">the full scale — machines.md · Priority</a></div>');
 }
 // THE SHUTDOWN CONTROL — five notches; same grammar as the autonomy bar.
@@ -1007,7 +1918,7 @@ const sdEl = document.getElementById("sd");
 function sdAbbr(v) { const l = SD_LEVELS.find((x) => x.value === Number(v)); return l ? l.abbr : String(v); }
 function sdHelp(sel) {
   const rows = SD_LEVELS.map((l) =>
-    '<tr' + (sel === l.value ? ' style="background:#22272c"' : "") + '><td class="k">' + l.abbr + " · " + l.value + '</td><td class="v">' + escText(l.name) + "</td></tr>").join("");
+    '<tr' + (sel === l.value ? ' style="background:var(--se-raised)"' : "") + '><td class="k">' + l.abbr + " · " + l.value + '</td><td class="v">' + escText(l.name) + "</td></tr>").join("");
   showDetails("the shutdown control", '<table class="kv">' + rows + "</table>");
 }
 if (sdEl) {
@@ -1044,69 +1955,315 @@ document.addEventListener("click", (ev) => {
   if (h) levelHelp(null);
 });
 
+// WHAT STANDS OPEN, for the person's own hand, now rides the LEGAL TOOLS
+// links like every other human-runnable tool (owner ruling 2026-07-28). It
+// had a button of its own in the machine header; the owner never found it
+// there, sharing a row with the crumbs, the slider and the escape control.
+// /api/survey stays — the mirror's own surfaces still ask it directly.
+
 // SESSION OVER — anybody reaching end stops the whole session. The mirror
 // tries to close its window; where that is not allowed, the big red
 // message stands (owner ruling 2026-07-26).
-function sessionOver() {
-  if (document.getElementById("over")) return;
+// THE WINDOW STAYS OPEN, AND IT SAYS SO (owner ruling 2026-07-28). This used
+// to try to close its own tab, which is exactly why the end was never seen:
+// quitting at the console left a page that either vanished or sat there
+// looking perfectly alive. Nothing closes itself now. The page reports.
+//
+// Losing the link is not the same as reaching end, and the two no longer
+// share one sentence. A dropped connection says so AT ONCE, because silence
+// reads as breakage; only a silence that outlasts an engine reload is death.
+function linkLost(on) {
+  const had = document.getElementById("link-lost");
+  if (!on) { if (had) had.remove(); return; }
+  if (had || document.getElementById("over")) return;
+  const d = document.createElement("div");
+  d.id = "link-lost";
+  d.textContent = "the link to the server is down — reconnecting";
+  document.body.appendChild(d);
+}
+function sessionOver(why) {
+  linkLost(false);
+  const had = document.getElementById("over");
+  if (had) return;
   const d = document.createElement("div");
   d.id = "over";
-  d.innerHTML = '<div class="over-box">SESSION OVER</div><div class="over-sub">the machine reached end — the server has shut down</div>';
+  d.innerHTML = '<div class="over-box">SESSION OVER</div><div class="over-sub"></div>';
+  d.querySelector(".over-sub").textContent = why;
   document.body.appendChild(d);
-  try { window.close(); } catch (e) { /* user-opened windows refuse */ }
 }
-if (D.describe.status === "closed") sessionOver();
+if (D.describe.status === "closed") sessionOver("the machine reached end — the walk is complete");
 
-// The mirror FOLLOWS the walk: poll the position — the agent's hand (or
-// another window) moves the machine under this page. A dead server reads
-// as session over.
-let aliveMisses = 0;
+// THE MIRROR IS PUSHED, NOT POLLED (owner ruling 2026-07-28). The walk
+// wakes every held hand, and /events forwards that wake here — so a change
+// lands at once instead of up to a poll late. EventSource reconnects by
+// itself; a reconnect after silence is how an engine swap arrives without
+// an F5, and a silence that never ends is death.
+// THE PING (owner, 2026-07-30): the agent points, the surface lights yellow
+// and STAYS lit while the guide talks about it. Pointing somewhere else puts
+// the old one out, so exactly ONE surface is lit at a time.
+// Lookup order: a card id, the widget a card shows, a raw element id, a
+// drawn state node. The widget name is accepted because a card's id is its
+// slugged TITLE, and the two rarely match.
+let lastPingSeq = 0;
+let litTarget = null;
+function findPingEl(target) {
+  const escaped = window.CSS && CSS.escape ? CSS.escape(target) : target;
+  return document.getElementById("card-" + target)
+    || document.querySelector('[data-widget="' + escaped + '"]')
+    || document.getElementById(target)
+    || document.querySelector('[data-detail="state:' + escaped + '"]');
+}
+function applyPing() {
+  for (const n of document.querySelectorAll(".se-ping, .se-ping-svg")) n.classList.remove("se-ping", "se-ping-svg");
+  if (litTarget === null) return;
+  const el = findPingEl(litTarget);
+  if (!el) return; // pointing is advisory — an unknown target fails nothing
+  el.classList.add(el.ownerSVGElement ? "se-ping-svg" : "se-ping");
+  return el;
+}
+function pingSurface(target) {
+  litTarget = target;
+  const el = applyPing();
+  if (el && el.scrollIntoView) el.scrollIntoView({ block: "nearest", behavior: "smooth" });
+}
 let pollBusy = null;
-let pollInFlight = false;
-const ACTIVE_AT_RENDER = JSON.stringify(D.describe.active || []);
-setInterval(async () => {
-  if (pollInFlight) return; // never stack polls behind a slow server
-  pollInFlight = true;
-  try {
-    const r = await fetch("/api/alive");
-    const a = await r.json();
-    // Answers again after misses — that was an engine swap (hot reload):
-    // reload onto the new child instead of waiting for F5.
-    if (aliveMisses > 0) { aliveMisses = 0; reloadKeep(CURRENT_DETAIL); return; }
-    if (a.status === "closed") { sessionOver(); return; }
-    if (thr && document.activeElement !== thr && Number(thr.value) !== a.autonomy) {
-      thr.value = a.autonomy;
-      const lbl = document.getElementById("thr-val");
-      if (lbl) lbl.textContent = Number(a.autonomy).toFixed(2);
-    }
-    if (sdEl && document.activeElement !== sdEl && Number(sdEl.value) !== a.shutdown) {
-      sdEl.value = a.shutdown;
-      const lbl2 = document.getElementById("sd-val");
-      if (lbl2) lbl2.textContent = sdAbbr(a.shutdown);
-    }
-    if (logPanel && a.acts !== lastActs) { lastActs = a.acts; refreshLog(); }
-    if (JSON.stringify(a.active || []) !== ACTIVE_AT_RENDER) { reloadKeep(CURRENT_DETAIL); return; }
-    // A script run finishing elsewhere (agent tick, other window) lands
-    // its result — refresh, keeping the open pane.
-    if (pollBusy === true && a.busy === false) { reloadKeep(CURRENT_DETAIL); return; }
-    pollBusy = a.busy;
-  } catch (e) {
-    // A short outage can be an engine swap — only a long silence is death.
-    aliveMisses++;
-    if (aliveMisses >= 8) sessionOver();
-  } finally {
-    pollInFlight = false;
+let ACTIVE_AT_RENDER = JSON.stringify(D.describe.active || []);
+let sawError = false;
+let deathTimer = null;
+// A frozen window never opens the stream — that is the whole of freezing.
+//
+// AND NEITHER DOES AN EMBEDDED CARD. A browser allows only a handful of
+// connections to one host, and a permanent event stream per card ate one
+// each. Past that limit EVERY other request to the engine queues instead of
+// going out — so a click did nothing at all, and then four minutes later the
+// whole backlog arrived at once. The host polls the engine over its own
+// runtime, where no such limit applies, and wakes the cards through the
+// channel they already have.
+if (!FROZEN && window.parent === window) {
+const es = new EventSource("/events");
+es.addEventListener("open", () => {
+  if (deathTimer !== null) { clearTimeout(deathTimer); deathTimer = null; }
+  linkLost(false);
+  if (sawError) { sawError = false; refresh(); }
+});
+es.addEventListener("error", () => {
+  sawError = true;
+  linkLost(true);
+  // Long enough that an ordered reload reconnects inside it, short enough
+  // that a reader who quit is not left guessing.
+  if (deathTimer === null) deathTimer = setTimeout(() => sessionOver("the server stopped answering — the session it served is gone"), 10000);
+});
+es.addEventListener("message", (ev) => {
+  let a;
+  try { a = JSON.parse(ev.data); } catch (e) { return; }
+  if (a.status === "closed") { sessionOver("the machine reached end — the walk is complete"); return; }
+  if (a.gone) { sessionOver("the console quit — the server has stopped, the walk was left standing"); return; }
+  if (thr && document.activeElement !== thr && Number(thr.value) !== a.autonomy) {
+    thr.value = a.autonomy;
+    const lbl = document.getElementById("thr-val");
+    if (lbl) lbl.textContent = Number(a.autonomy).toFixed(2);
   }
-}, 2000);
+  if (sdEl && document.activeElement !== sdEl && Number(sdEl.value) !== a.shutdown) {
+    sdEl.value = a.shutdown;
+    const lbl2 = document.getElementById("sd-val");
+    if (lbl2) lbl2.textContent = sdAbbr(a.shutdown);
+  }
+  if (a.ping && a.ping.seq !== lastPingSeq) { lastPingSeq = a.ping.seq; pingSurface(a.ping.target); }
+  // A re-render drops the class. Put the light back rather than losing it
+  // mid-sentence — the ping outlives the DOM that carried it.
+  else if (litTarget !== null && !document.querySelector(".se-ping, .se-ping-svg")) applyPing();
+  if (logPanel && a.acts !== lastActs) { lastActs = a.acts; refreshLog(); }
+  if (JSON.stringify(a.active || []) !== ACTIVE_AT_RENDER) { refresh(); return; }
+  // A script run finishing elsewhere (agent tick, other window) lands its
+  // result — refresh, keeping the open pane.
+  // THE BAR FOLLOWS THE ENGINE, not just this page's clicks. A script the
+  // AGENT started (boot's checks, most of all) shows here too, with real
+  // progress when it reports any and a moving bar when it does not.
+  if (a.progress) showProgress(a.progress.label || "working", a.progress.done, a.progress.total);
+  else if (a.busy === true && pollBusy !== true) showLoading("running checks");
+  else if (a.busy === false && pollBusy === true) hideLoading();
+  if (pollBusy === true && a.busy === false) { refresh(); return; }
+  pollBusy = a.busy;
+});
+}
+
+// THE AGENT'S TERMINAL. The pty host is a SIBLING process on its own port,
+// because this page's process is the agent's grandchild and a grandchild
+// cannot own its grandparent's terminal. The host holds the pseudo-terminal
+// and the scrollback, so attaching after a refresh replays what was already
+// there instead of losing the session. No host running: the placeholder
+// stands and nothing else happens.
+const TERM_PORT = 7334;
+function loadAsset(href, kind) {
+  return new Promise((resolve) => {
+    const el = kind === "css" ? document.createElement("link") : document.createElement("script");
+    if (kind === "css") { el.rel = "stylesheet"; el.href = href; } else { el.src = href; }
+    el.onload = resolve;
+    el.onerror = resolve;
+    document.head.appendChild(el);
+  });
+}
+async function bootTerminal() {
+  const pane = document.getElementById("term-body");
+  if (!pane || pane.dataset.booted) return;
+  const base = "http://" + (location.hostname || "localhost") + ":" + TERM_PORT;
+  try {
+    const ping = await fetch(base + "/pty/alive");
+    if (!ping.ok) return;
+  } catch (e) { return; }
+  // A HOST ANSWERED, so the pane earns its place. Until then it is not
+  // there at all: manual mode and --own-terminal both leave it hidden.
+  document.querySelectorAll(".no-host").forEach((el) => el.classList.remove("no-host"));
+  // AN AGENT ANSWERED, so chat becomes the main card — but only if the reader
+  // has not already chosen one. Their choice outranks ours, always.
+  if (!new URLSearchParams(location.search).has("card") && !CHAT_LED) {
+    CHAT_LED = true;
+    const chat = CARDS.list.find((c) => c.id === "chat");
+    if (chat !== undefined) promoteCard(chat.id);
+  }
+  pane.dataset.booted = "1";
+  await loadAsset(base + "/xterm.css", "css");
+  await loadAsset(base + "/xterm.js", "js");
+  if (!window.Terminal) { pane.dataset.booted = ""; return; }
+  pane.innerHTML = "";
+  const term = new window.Terminal({
+    fontFamily: "ui-monospace, Consolas, monospace",
+    fontSize: 13,
+    scrollback: 5000,
+    theme: { background: cssPalette("--se-bg"), foreground: cssPalette("--se-fg") },
+  });
+  term.open(pane);
+  term.onData((d) => { void fetch(base + "/pty/input", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ d }) }); });
+  const stream = new EventSource(base + "/pty/stream");
+  stream.addEventListener("message", (ev) => {
+    const bin = atob(ev.data);
+    const arr = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
+    term.write(arr);
+  });
+  // The host must be told the real size, or the agent wraps at the wrong
+  // column. Measured from a real glyph rather than xterm's internals.
+  const cell = () => {
+    const m = document.createElement("span");
+    m.style.cssText = "position:absolute;visibility:hidden;white-space:pre;font-family:ui-monospace,Consolas,monospace;font-size:13px";
+    m.textContent = "0".repeat(100);
+    document.body.appendChild(m);
+    const r = m.getBoundingClientRect();
+    m.remove();
+    return { w: r.width / 100, h: r.height };
+  };
+  // THE FLICKER IS A 2-CYCLE (owner report 2026-07-28, second round). The
+  // first fix refused a resize that changed NOTHING, which only ever catches
+  // a fixed point. The real loop alternated between two sizes, so every step
+  // differed from the one before it and the guard never fired.
+  //
+  // What drove it: clientWidth INCLUDES the pane's padding, so the grid was
+  // computed about three columns too wide. xterm laid out wider than its
+  // content box, the pane grew a scrollbar, clientWidth shrank, the grid
+  // narrowed, the scrollbar went away, and it started again.
+  //
+  // Three guards, each killing one link. The pane no longer scrolls (CSS),
+  // so a child can no longer change the parent's client box. The grid is
+  // measured against the CONTENT box, so xterm fits what it was given. And
+  // after our own resize the observer is ignored until the relayout has
+  // landed, with one trailing look so a drag that ends inside that window
+  // is not lost.
+  //
+  // Subtracting the padding is also what restores the 80 columns the left
+  // column is sized for — 650px minus 20px still measures 80 cells at 13px.
+  const inner = () => {
+    const s = getComputedStyle(pane);
+    return {
+      w: pane.clientWidth - parseFloat(s.paddingLeft) - parseFloat(s.paddingRight),
+      h: pane.clientHeight - parseFloat(s.paddingTop) - parseFloat(s.paddingBottom),
+    };
+  };
+  let lastCols = 0;
+  let lastRows = 0;
+  let queued = false;
+  let settleUntil = 0;
+  let trailing = 0;
+  const apply = () => {
+    const c = cell();
+    const box = inner();
+    if (!(c.w > 0) || !(c.h > 0) || !(box.w > 0) || !(box.h > 0)) return;
+    const cols = Math.max(20, Math.floor(box.w / c.w));
+    const rows = Math.max(6, Math.floor(box.h / c.h));
+    if (cols === lastCols && rows === lastRows) return;
+    lastCols = cols;
+    lastRows = rows;
+    settleUntil = Date.now() + 250;
+    term.resize(cols, rows);
+    void fetch(base + "/pty/resize", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ cols, rows }) });
+  };
+  const sync = () => {
+    const now = Date.now();
+    if (now < settleUntil) {
+      clearTimeout(trailing);
+      trailing = setTimeout(sync, settleUntil - now + 20);
+      return;
+    }
+    if (queued) return;
+    queued = true;
+    requestAnimationFrame(() => { queued = false; apply(); });
+  };
+  new ResizeObserver(sync).observe(pane);
+  sync();
+}
+// The host may come up after the page — RUNME detaches it, and it can be
+// restarted under a standing mirror. So the ping keeps asking until one
+// answers; bootTerminal returns at once once a terminal is attached.
+void bootTerminal();
+setInterval(() => { void bootTerminal(); }, 2000);
 `;
 
 const MODAL = '<div id="modal"><div class="modal-box"><div class="widget-head"><span id="modal-title"></span><button class="expand" id="modal-close">✕</button></div><div class="modal-body" id="modal-body"></div></div></div><div id="toast"></div>';
 
 function widgetHead(title: string, widgetId: string, url: string): string {
-  return `<div class="widget-head"><span>${esc(title)}</span><button class="expand" data-widget="${widgetId}" data-url="${esc(url)}" title="expand · ctrl-click: new tab · shift-click: new window">⛶</button></div>`;
+  return `<div class="widget-head"><span>${esc(title)}</span><button class="expand" data-widget="${widgetId}" data-url="${esc(url)}" title="expand · ctrl-click: new tab · shift-click: new window — both open frozen on what this card is showing">⛶</button></div>`;
 }
 
-export function renderMirror(m: MirrorState, widget?: "machine" | "details" | "log", view?: string): string {
+/** THE NATIVE SKIN (owner ruling 2026-07-30). Docked inside a host, this is
+ *  not our own window any more, so it stops looking like one: square
+ *  corners, the host's fonts, the host's palette. Our own look belongs to
+ *  the standalone mirror. Semantic colours stay ours everywhere.
+ *
+ *  A SOLO card drops its head and its frame — the host already draws a
+ *  titled, bordered pane around it, and two frames read as a bug.
+ *
+ *  THE HOST OWNS THE WALK'S CONTROLS when embedded (owner ruling 2026-07-30).
+ *  The sliders and escape steer the whole walk and a card may be closed, so
+ *  they belong to the host's sidebar rather than to any one card.
+ *
+ *  THE CRUMBS ARE NOT CONTROLS. They navigate the DRAWING — which machine is
+ *  on screen — so they stay with the drawing.
+ *
+ *  ESCAPE STAYS TOO (owner ruling 2026-07-30), and lives ONLY here: it acts
+ *  on the walk the drawing shows, and repeating it in the host's sidebar
+ *  would be the same control in two places. */
+const NATIVE = `
+  body { font-family: var(--vscode-font-family, ui-monospace, Consolas, monospace); }
+  /* THE HOST ALREADY NAMES THESE MEANINGS, so they are taken from its theme
+     instead of our palette. The ROUTE stays ours: a blue line for the way
+     ahead is a map convention no editor theme outweighs. */
+  /* MIX INTO THE SURFACE, NEVER INTO TRANSPARENT. Inside the iframe no
+     --vscode-* variable exists; --se-bg carries the forwarded editor
+     background, so it is what a translucent fill has to blend with. */
+  body.embed { --se-accent: var(--vscode-button-background); --se-accent-bg: color-mix(in srgb, var(--vscode-button-background) 22%, var(--se-bg)); --se-ok: var(--vscode-testing-iconPassed); --se-ok-bg: color-mix(in srgb, var(--vscode-testing-iconPassed) 20%, var(--se-bg)); --se-warn: var(--vscode-editorWarning-foreground); }
+  body.embed { --se-walk: var(--vscode-charts-blue, #4a90d9); --se-walk-bg: color-mix(in srgb, var(--se-walk) 30%, var(--se-bg)); }
+  * { border-radius: 0 !important; }
+  .label, .sublabel, .group-label, .cond-label, pre, code, table.kv, .logrow, .legend-key { font-family: var(--vscode-editor-font-family, ui-monospace, Consolas, monospace); }
+  body.solo .widget { border: 0; }
+  body.solo .widget-head { display: none; }
+  body.solo #w-machine .widget-head { display: flex; }
+  body.solo #w-machine .head-sliders { display: none !important; }
+  body.solo #w-machine .expand { display: none; }
+  body.solo aside, body.solo main { background: transparent; }
+`;
+
+export function renderMirror(m: MirrorState, widget?: "machine" | "details" | "log" | "terminal", view?: string, card?: string, embed?: boolean): string {
+  const skin = embed === true ? NATIVE : "";
+  const bodyClass = embed === true ? ` class="embed${widget === undefined ? "" : " solo"}"` : "";
   const info = m.session.describe() as { active: string[]; status: string };
   // The scale is READ from machines/scale.md — the Obsidian-editable
   // truth; an owner edit shows on the next reload.
@@ -1137,9 +2294,32 @@ export function renderMirror(m: MirrorState, widget?: "machine" | "details" | "l
       exit_met: m.session.conditionMet(decl, s, "leave"),
       has_entry: s.entry !== undefined,
       entry_met: m.session.conditionMet(decl, s, "enter"),
+      // The STATEMENT is the subtitle (owner ruling 2026-07-28): authored
+      // meaning renders small under the name; empty renders nothing.
+      ...(s.statement !== "" && s.statement !== s.id ? { subtitle: s.statement } : {}),
     };
   }
-  const svg = machineSvg(canvas, leafActive, done, subIds, meta);
+  // THE ROUTE, PROJECTED ONTO THIS DRAWING. A broken or unreachable target
+  // must never take the picture down with it, so the marks simply go
+  // missing and the machine still renders.
+  let marks: RouteMarks | undefined;
+  try {
+    const r = m.session.route(m.session.target);
+    const mainId = m.session.machine.id;
+    const { waypoints, path: hops } = routeOverlay(r.steps, decl.id, mainId);
+    const localOf = (q: string): string | undefined => {
+      if (decl.id === mainId) return q.split("/")[0];
+      return q.startsWith(`${decl.id}/`) ? q.slice(decl.id.length + 1).split("/")[0] : undefined;
+    };
+    const shutAt = r.stops_at === undefined ? undefined : localOf(r.stops_at.at);
+    marks = {
+      waypoints,
+      path: hops,
+      ...(r.found && localOf(r.target) !== undefined ? { target: localOf(r.target) } : {}),
+      ...(shutAt !== undefined && r.stops_at !== undefined ? { blocked: { at: shutAt, why: r.stops_at.why } } : {}),
+    };
+  } catch { /* no route, no marks - the drawing stands either way */ }
+  const svg = machineSvg(canvas, leafActive, done, subIds, meta, marks);
 
   // Breadcrumbs describe the VIEW: main [›subs] [ › sub [›its subs] ].
   const mainSubs = m.session.machine.states.filter((s) => s.submachine !== undefined).map((s) => s.id);
@@ -1158,11 +2338,17 @@ export function renderMirror(m: MirrorState, widget?: "machine" | "details" | "l
           ? crumbArrow(mainSubs)
           : i === chain.length - 1
             ? crumbArrow(decl.states.filter((s) => s.submachine !== undefined).map((s) => s.id))
-            : '<span style="color:#7f8b96;padding:0 3px">›</span>';
+            : '<span style="color:var(--se-muted);padding:0 3px">›</span>';
       return label + arrow;
     })
     .join("");
 
+  // ONE LIST FOR THE WHOLE RENDER. expeditionList() spawns git per record
+  // and does not vary per state; calling it inside the loop made the archive
+  // cost a spawn for every record TIMES every record, blocking the server.
+  const archived = decl.states.some((s) => s.tags?.includes("archive-record"))
+    ? (m.session.expeditionList() as { archive: { id: string }[] }).archive
+    : [];
   const states: Record<string, unknown> = {};
   for (const s of decl.states) {
     states[s.id] = {
@@ -1179,7 +2365,7 @@ export function renderMirror(m: MirrorState, widget?: "machine" | "details" | "l
       was_filled: done.has(s.id),
       // An archive-record state carries ITS closed record for the detail.
       ...(s.tags?.includes("archive-record")
-        ? { archive_record: (m.session.expeditionList() as { archive: { id: string }[] }).archive.find((e) => e.id === s.id || e.id.startsWith(`${s.id}-`)) ?? null }
+        ? { archive_record: archived.find((e) => e.id === s.id || e.id.startsWith(`${s.id}-`)) ?? null }
         : {}),
       ...(s.exit?.script !== undefined || s.entry?.script !== undefined
         ? { script: m.session.scriptStatus(decl, s) }
@@ -1187,6 +2373,7 @@ export function renderMirror(m: MirrorState, widget?: "machine" | "details" | "l
       pulled: m.session.pulled(decl, s),
       next: s.edges.map((e) => {
         const t = decl.states.find((st) => st.id === e.to);
+        const ready = t === undefined ? true : m.session.entryReadyHuman(decl, t);
         return {
           to: e.to,
           role: e.role,
@@ -1195,14 +2382,16 @@ export function renderMirror(m: MirrorState, widget?: "machine" | "details" | "l
           // The human's ▶ lock: explicit entry conditions AND the pull —
           // every doc entering demands, checked at its current version. A
           // locked edge carries WHAT is missing (the tooltip names it).
-          enter_met: t === undefined ? true : m.session.entryReadyHuman(decl, t),
-          ...(t !== undefined && !m.session.entryReadyHuman(decl, t) ? { missing: m.session.entryMissingHuman(decl, t) } : {}),
+          // ASKED ONCE. This ran entryReadyHuman twice per edge, and each
+          // call walks the target's whole reading list.
+          enter_met: ready,
+          ...(t !== undefined && !ready ? { missing: m.session.entryMissingHuman(decl, t) } : {}),
         };
       }),
     };
   }
   const comment = (canvas.nodes ?? []).find((n) => n.type === "text")?.text ?? "";
-  const data = `<script>window.SE_DATA = ${JSON.stringify({
+  const data = `<script type="application/json" id="se-data">${JSON.stringify({
     describe: m.session.describe(),
     packet: m.session.tickInfo(),
     lastPacket: m.lastPacket ?? null,
@@ -1212,7 +2401,11 @@ export function renderMirror(m: MirrorState, widget?: "machine" | "details" | "l
     viewed: { id: decl.id, reentry: decl.reentry, initial: decl.initial, states: decl.states.map((s) => s.id) },
     history: history.slice(-20),
     levels,
-  }).replace(/</g, "\\u003c")};</script>`;
+    // Every doc the reader has checked AT ITS CURRENT VERSION. A condition
+    // names docs that are not always in the state's own pulled list, so the
+    // page needs the session's list rather than a per-state one.
+    checkedDocs: m.session.humanCheckedPaths(),
+  }).replace(/</g, "\\u003c")}</script>`;
 
   // The slider — THE AUTONOMY: which states the agent enters by itself
   // (priority <= autonomy). 0 = the human clicks through everything
@@ -1228,49 +2421,121 @@ export function renderMirror(m: MirrorState, widget?: "machine" | "details" | "l
   // Escape has a hand-side affordance too (parity law): only while a
   // sub-machine other than boot is being walked.
   const crumbTrail = m.session.breadcrumb();
-  const escapeBtn = crumbTrail.length > 1 && crumbTrail[1] !== "boot" ? `<button class="ghost" id="escape-btn" title="escape to idle — the machine is left standing, the reason is recorded">⤴ escape</button>` : "";
+  // ESCAPE STANDS BESIDE THE POSITION, ALWAYS (owner ruling 2026-07-30). It
+  // used to appear and vanish with the walk, which moved everything else in
+  // the row under the reader's hand. Not applicable is DISABLED, not absent.
+  const canEscape = crumbTrail.length > 1 && crumbTrail[1] !== "boot";
+  const escapeBtn = `<button class="ghost" id="escape-btn"${canEscape ? "" : " disabled"} title="${canEscape ? "escape to idle — the machine is left standing, the reason is recorded" : "nothing to escape — the walk is not inside a sub-machine"}">⤴ escape</button>`;
   // The way home when the view holds still elsewhere: the header names
   // the walk's position; clicking it jumps the view there.
   const curLeaf = info.active[0] ?? "";
   const curBtn = curLeaf === "" ? "" : `<button class="ghost" id="cur-state" data-machine="${esc(walkMachine.id)}" title="the walk stands here — click: jump the view to it">☉ ${esc(curLeaf)}</button>`;
-  const machineWidget = `<div class="widget" id="w-machine"><div class="widget-head"><span class="crumbs">${crumbs}</span><span style="display:flex;align-items:center;gap:10px">${curBtn}${slider}${sdBar}${escapeBtn}<button class="expand" data-widget="w-machine" data-url="/widget/machine?view=${encodeURIComponent(decl.id)}" title="expand · ctrl-click: new tab · shift-click: new window">⛶</button></span></div><div class="widget-body">${svg}</div></div>`;
+  const machineWidget = `<div class="widget" id="w-machine"><div class="widget-head"><span class="crumbs">${crumbs}</span><span class="head-controls" style="display:flex;align-items:center;gap:10px">${curBtn}<span class="head-sliders" style="display:flex;align-items:center;gap:10px">${slider}${sdBar}</span>${escapeBtn}<button class="expand" data-widget="w-machine" data-url="/widget/machine?view=${encodeURIComponent(decl.id)}" title="expand · ctrl-click: new tab · shift-click: new window — both open frozen on what this card is showing">⛶</button></span></div><div class="widget-body">${svg}</div></div>`;
   const detailsWidget = `<div class="widget" id="w-details">${widgetHead("details", "w-details", "/widget/details")}
     ${info.status === "closed" ? '<div class="meta" style="color:#e86a5f">machine closed</div>' : ""}
-    <div class="meta" id="details-title">—</div>
-    <div class="panel" id="details"></div>
+    <div class="meta" id="details-title" data-morph-ignore>—</div>
+    <div class="panel" id="details" data-morph-ignore></div>
   </div>`;
   // The unified feed sits ABOVE details (owner ruling 2026-07-26) — rows
   // load and refresh client-side off /api/log; only present with a log.
   const logWidget = m.log === undefined ? "" : `<div class="widget" id="w-log">${widgetHead("log", "w-log", "/widget/log")}
     <div class="log-filter-row"><input id="log-filter" placeholder="filter the feed"><input id="log-note" placeholder="drop a note — Enter captures it"></div>
-    <div class="panel log-panel" id="log-rows"><div class="meta">loading…</div></div>
+    <div class="panel log-panel" id="log-rows" data-morph-ignore><div class="meta">loading…</div></div>
   </div>`;
+  // THE AGENT'S TERMINAL. The whole widget is morph-ignored: a morph that
+  // reached into a live terminal would wipe its scrollback and its focus.
+  // The pty host is a SIBLING process started by RUNME — the mirror only
+  // renders a client for it, because this page's process is the agent's
+  // grandchild and a grandchild cannot own its grandparent's terminal.
+  //
+  // THE PANE FOLLOWS THE HOST, NOT THE LAUNCH (owner ruling 2026-07-28). It
+  // ships hidden and the client reveals it when the host answers. Manual mode
+  // starts none, and --own-terminal leaves the agent in its own window, so
+  // both simply never reveal it — one rule instead of a flag for each case.
+  // On its OWN page the pane stays visible, so a direct visit can say why it
+  // is empty rather than showing a blank tab.
+  const termWidget = (standalone: boolean) => `<div class="widget${standalone ? "" : " no-host"}" id="w-terminal" data-morph-ignore>${widgetHead("terminal", "w-terminal", "/widget/terminal")}
+    <div class="panel term-panel" id="term-body"><div class="meta" style="padding:10px 12px">no agent connected — the card keeps its slot, so no number ever shifts</div></div>
+  </div>`;
+  // THE CHAT CARD KEEPS ITS SLOT (owner 2026-07-29), superseding the older
+  // rule that the pane ships hidden until a host answers. An agent can connect
+  // or drop MID-SESSION, and a card that vanishes renumbers every card after
+  // it — under the reader's hand, while they are using the numbers.
+  const terminalWidget = termWidget(true);
+  // Read per render, so editing palette.css needs no restart.
+  const pal = palette(m.root);
 
+  if (widget === "terminal") {
+    return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>se · terminal</title><style>${pal}${STYLE} #w-terminal{flex:1;height:auto;border-bottom:0}${skin}</style>${ELEMENTS}</head>
+<body${bodyClass}><div class="cols"><aside id="left" style="width:100vw;max-width:100vw">${termWidget(true)}</aside></div>${MODAL}${data}<script>${SCRIPT}</script></body></html>`;
+  }
   if (widget === "log") {
-    return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>se · log</title><style>${STYLE} #w-log{flex:1;border-bottom:0}</style></head>
-<body><div class="cols"><aside id="sidebar" style="width:100vw;max-width:100vw">${logWidget}</aside></div>${MODAL}${data}<script>${SCRIPT}</script></body></html>`;
+    // The widget asks for flex:1, so its parent has to BE a column with a
+    // height — without that the panel collapses and the page reads as blank.
+    return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>se · log</title><style>${pal}${STYLE} #w-log{flex:1;border-bottom:0;min-height:0} body.solo #sidebar{display:flex;flex-direction:column;height:100vh} #log-rows{flex:1;min-height:0}${skin}</style>${ELEMENTS}</head>
+<body${bodyClass}><div class="cols"><aside id="sidebar" style="width:100vw;max-width:100vw">${logWidget}</aside></div>${MODAL}${data}<script>${SCRIPT}</script></body></html>`;
   }
 
   if (widget === "machine") {
-    return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>se · machine</title><style>${STYLE} main{padding:10px}</style></head>
-<body><div class="cols"><main>${machineWidget}</main></div>${MODAL}${data}<script>${SCRIPT}</script></body></html>`;
+    return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>se · machine</title><style>${pal}${STYLE} main{padding:10px}${skin}</style>${ELEMENTS}</head>
+<body${bodyClass}><div class="cols"><main>${machineWidget}</main></div>${MODAL}${data}<script>${SCRIPT}</script></body></html>`;
   }
   if (widget === "details") {
-    return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>se · details</title><style>${STYLE}</style></head>
-<body><div class="cols"><aside id="sidebar" style="width:100vw;max-width:100vw">${detailsWidget}</aside></div>${MODAL}${data}<script>${SCRIPT}</script></body></html>`;
+    return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>se · details</title><style>${pal}${STYLE}${skin}</style>${ELEMENTS}</head>
+<body${bodyClass}><div class="cols"><aside id="sidebar" style="width:100vw;max-width:100vw">${detailsWidget}</aside></div>${MODAL}${data}<script>${SCRIPT}</script></body></html>`;
   }
-  return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>se mirror</title><style>${STYLE}</style></head>
-<body>
-<div class="cols">
-  <main>
-    ${machineWidget}
-  </main>
-  <div id="divider"></div>
-  <aside id="sidebar">
-    ${logWidget}
-    ${detailsWidget}
-  </aside>
+  // THE CARD MATRIX (owner design 2026-07-29). The card list and its ORDER are
+  // the product's, in product/cards.md — v3 exists to work on other products,
+  // and another product wants other cards.
+  // EMBEDDED, the console card leaves (owner ruling 2026-07-30): the host's
+  // integrated terminal is where the agent lives, and a second picture of it
+  // beside the editor is an echo. The grid closes over the gap.
+  const allCards = loadCards(m.root);
+  const cardList = embed === true ? allCards.filter((c) => c.widget !== "terminal") : allCards;
+  const byWidget: Record<string, string> = {
+    terminal: terminalWidget,
+    machine: machineWidget,
+    log: logWidget,
+    details: detailsWidget,
+  };
+  const filled = (c: { widget?: string }): boolean => c.widget !== undefined && (byWidget[c.widget] ?? "") !== "";
+  // THE DEFAULT MAIN CARD IS THE FIRST AVAILABLE ONE — one rule instead of a
+  // list of exceptions. The book is not built, so it cannot lead.
+  //
+  // Chat is the exception the server CANNOT judge: whether an agent answers is
+  // known only to the client, which polls the pty host. So the server leads
+  // with the first card it can vouch for, and the client promotes chat once a
+  // host actually answers. With no agent, the state machine leads — which is
+  // exactly what the owner asked for, arrived at without a special case.
+  const vouched = (c: { widget?: string }): boolean => filled(c) && c.widget !== "terminal";
+  const asked = card === undefined ? undefined : cardList.find((c) => c.id === card);
+  const now = (asked ?? cardList.find(vouched) ?? cardList.find(filled) ?? cardList[0])?.id ?? "";
+  const rows = Math.max(1, Math.ceil(cardList.length / 2));
+  // Two columns, filled in the order the product declared. An EVEN number of
+  // cards fills the grid exactly; an odd one leaves a single hole.
+  const cellAt = (i: number): string => `--col:${3 + (i % 2)};--row:${1 + Math.floor(i / 2)}`;
+  const nothingYet = (title: string): string =>
+    `<div class="widget"><div class="widget-head"><span>${esc(title)}</span></div><div class="widget-body"><div class="meta" style="padding:10px 12px">not built yet — the slot is held so the numbers never shift</div></div></div>`;
+  const cardsHtml = cardList
+    .map((c, i) => `<div class="card${c.id === now ? " main" : ""}" id="card-${esc(c.id)}"${c.widget ? ` data-widget="${esc(c.widget)}"` : ""} style="${cellAt(i)}"><span class="cardnum" title="promote this card — the same as pressing ${c.n}">${c.n}</span>${filled(c) ? byWidget[c.widget as string] : nothingYet(c.title)}</div>`)
+    .join("\n  ");
+  // THE LEGEND RENDERS FROM THE REGISTRY. Declare a key there and it shows up
+  // here by itself; a hand-kept list drifts, and a stale legend is worse than
+  // none. It sits in the promoted card's vacated slot, so its position also
+  // says which card is up front.
+  const legendRows = bindings(cardList)
+    .map((b) => `<div class="legend-row"><span class="legend-key">${esc(b.keys)}</span><span class="legend-what">${esc(b.label)}</span></div>`)
+    .join("");
+  const nowAt = Math.max(0, cardList.findIndex((c) => c.id === now));
+  const legendHtml = `<div class="card" id="card-legend" style="${cellAt(nowAt)}"><div class="widget" id="w-legend"><div class="widget-head"><span>keys</span></div><div class="widget-body">${legendRows}</div></div></div>`;
+  const cardData = `<script type="application/json" id="se-cards">${JSON.stringify({ list: cardList.map((c) => ({ n: c.n, id: c.id, title: c.title })), now })}</script>`;
+  return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>se mirror</title><style>${pal}${STYLE}${skin}</style>${ELEMENTS}</head>
+<body${bodyClass}>
+<div class="cards" data-keep-style style="grid-template-rows:repeat(${rows},1fr)">
+  ${cardsHtml}
+  ${legendHtml}
+  <div class="divider" id="div-cards"></div>
 </div>
-${MODAL}${data}<script>${SCRIPT}</script>
+${MODAL}${data}${cardData}<script>${SCRIPT}</script>
 </body></html>`;
 }

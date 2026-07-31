@@ -1,53 +1,32 @@
 {
- "metadata": {
-  "version": "1.0-1.0",
-  "frontmatter": {
-   "reentry": "restart",
-   "priority": 0.2
-  }
- },
- "nodes": [
-  {
-   "id": "n-comment",
-   "type": "text",
-   "text": "ITERATION ARCHIVE \u2014 closed iterations. Browsing lives in the mirror; this machine stays minimal. EMPTY until persistence lands.",
-   "x": -1100,
-   "y": -340,
-   "width": 660,
-   "height": 120
-  },
-  {
-   "id": "n-start",
-   "type": "file",
-   "file": "deliverable/machines/states/start.md",
-   "styleAttributes": {
-    "shape": "pill"
-   },
-   "x": -1100,
-   "y": 80,
-   "width": 160,
-   "height": 160
-  },
-  {
-   "id": "n-end",
-   "type": "file",
-   "file": "deliverable/machines/states/end.md",
-   "styleAttributes": {
-    "shape": "pill"
-   },
-   "x": -700,
-   "y": 80,
-   "width": 160,
-   "height": 160
-  }
- ],
- "edges": [
-  {
-   "id": "e-start-end",
-   "fromNode": "n-start",
-   "fromSide": "right",
-   "toNode": "n-end",
-   "toSide": "left"
-  }
- ]
+	"metadata":{
+		"version":"1.0-1.0",
+		"frontmatter":{"reentry":"restart","priority":1.5}
+	},
+	"nodes":[
+		{"id":"n-comment","type":"text","text":"ITERATION ARCHIVE — closed iterations. Browsing lives in the mirror; this machine stays minimal. EMPTY until persistence lands.","x":-1100,"y":-340,"width":660,"height":120},
+		{
+			"id":"n-start",
+			"type":"file",
+			"file":"deliverable/machines/states/start.md",
+			"styleAttributes":{"shape":"pill"},
+			"x":-1100,
+			"y":80,
+			"width":160,
+			"height":160
+		},
+		{
+			"id":"n-end",
+			"type":"file",
+			"file":"deliverable/machines/states/end.md",
+			"styleAttributes":{"shape":"pill"},
+			"x":-700,
+			"y":80,
+			"width":160,
+			"height":160
+		}
+	],
+	"edges":[
+		{"id":"e-start-end","fromNode":"n-start","fromSide":"right","toNode":"n-end","toSide":"left"}
+	]
 }

@@ -1,7 +1,12 @@
-// The retro's scope (owner ruling 2026-07-27): draining is legal in the
-// retro's drain state and NOWHERE else — "all" never grants a RESTRICTED
-// tool. Entering the drain demands the method read.
+// The retro's scope: draining is RESTRICTED, so "all" never grants it and a
+// state earns it by naming it. The retro is a PLAIN STATE (the one-state
+// rule, owner 2026-07-28); entering it demands the method read.
+//
+// THE SPLIT (owner 2026-07-29): the front desk names the drain too, but only
+// for the mechanical verdicts. The desk could add to the inbox and never
+// take anything out, while its own method opens by weighing that inbox.
 import { strict as assert } from "node:assert";
+import { spawnSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { test } from "node:test";
@@ -13,9 +18,10 @@ import { Session } from "../engine/session.ts";
 import { buildServer } from "../engine/tools.ts";
 import { call, freshRoot, readHashesFor } from "./helpers.ts";
 
-test("draining is retro-scoped: refused under 'all', legal in retro/drain — and the drain works", async () => {
+test("draining is retro-scoped: refused under 'all', legal in the retro state — and the drain works", async () => {
   const root = freshRoot();
   const session = new Session(root);
+  session.setAutonomy(1); // the retro weighs 1.0 - lift the slider clear
   const server = buildServer(root, session);
   const hashes = readHashesFor(root);
   for (let i = 0; i < 8; i++) {
@@ -28,13 +34,11 @@ test("draining is retro-scoped: refused under 'all', legal in retro/drain — an
   const refused = await call(server, "se_note_drain", { ref, disposition: "done" });
   assert.equal(refused.isError, true);
   assert.equal(refused.body.clause, "SE-C-110");
-  // Enter the retro; its drain state demands the METHOD read.
+  // Enter the retro — one plain state; entering demands the METHOD read.
   const method = "product/guidance/method/retro.md";
   const withMethod = { ...hashes, [method]: contentHash(readFileSync(join(root, ...method.split("/")))) };
-  const intoRetro = await call(server, "se_tick", { to: "retro", read_hashes: hashes });
+  const intoRetro = await call(server, "se_tick", { to: "retro", read_hashes: withMethod });
   assert.equal(intoRetro.isError, false, JSON.stringify(intoRetro.body));
-  const inDrain = await call(server, "se_tick", { to: "drain", read_hashes: withMethod });
-  assert.equal(inDrain.isError, false, JSON.stringify(inDrain.body));
   // Here — and only here — the drain works; the note leaves the inbox.
   const drained = await call(server, "se_note_drain", { ref, disposition: "done", where: "test" });
   assert.equal(drained.isError, false, JSON.stringify(drained.body));
@@ -48,6 +52,7 @@ test("draining is retro-scoped: refused under 'all', legal in retro/drain — an
 test("the backlog home (v1 port): backlog demands its ready-when, parks the note, and migration re-drains it", async () => {
   const root = freshRoot();
   const session = new Session(root);
+  session.setAutonomy(1); // the retro weighs 1.0 - lift the slider clear
   const server = buildServer(root, session);
   const hashes = readHashesFor(root);
   for (let i = 0; i < 8; i++) {
@@ -58,8 +63,7 @@ test("the backlog home (v1 port): backlog demands its ready-when, parks the note
   const ref = String(minted.body.captured);
   const method = "product/guidance/method/retro.md";
   const withMethod = { ...hashes, [method]: contentHash(readFileSync(join(root, ...method.split("/")))) };
-  await call(server, "se_tick", { to: "retro", read_hashes: hashes });
-  await call(server, "se_tick", { to: "drain", read_hashes: withMethod });
+  await call(server, "se_tick", { to: "retro", read_hashes: withMethod });
   // A made-up disposition refuses; backlog without its ready-when refuses.
   const bad = await call(server, "se_note_drain", { ref, disposition: "later" });
   assert.equal(bad.isError, true);
@@ -80,6 +84,7 @@ test("the backlog home (v1 port): backlog demands its ready-when, parks the note
 test("since last_retro: the log query scopes to the period after the newest drain call", async () => {
   const root = freshRoot();
   const session = new Session(root);
+  session.setAutonomy(1); // the retro weighs 1.0 - lift the slider clear
   const server = buildServer(root, session);
   const hashes = readHashesFor(root);
   for (let i = 0; i < 8; i++) {
@@ -94,14 +99,72 @@ test("since last_retro: the log query scopes to the period after the newest drai
   const minted = await call(server, "se_note", { text: "marker" });
   const method = "product/guidance/method/retro.md";
   const withMethod = { ...hashes, [method]: contentHash(readFileSync(join(root, ...method.split("/")))) };
-  await call(server, "se_tick", { to: "retro", read_hashes: hashes });
-  await call(server, "se_tick", { to: "drain", read_hashes: withMethod });
+  await call(server, "se_tick", { to: "retro", read_hashes: withMethod });
   await call(server, "se_note_drain", { ref: String(minted.body.captured), disposition: "done", where: "test" });
   // … then act once more: the scoped query sees only the tail.
   await call(server, "se_tick", {});
   const scoped = log.query({ filter: { since: "last_retro" } });
   assert.ok(scoped.total < log.query({}).total, "the floor cuts the earlier period off");
   assert.ok(scoped.total >= 1, "the tail after the drain is visible");
+});
+
+test("the desk drains the mechanical verdicts and is refused the judgment ones", async () => {
+  const root = freshRoot();
+  const session = new Session(root);
+  const server = buildServer(root, session);
+  const hashes = readHashesFor(root);
+  for (let i = 0; i < 8; i++) {
+    const step = await call(server, "se_tick", { advance: true, read_hashes: hashes });
+    if (step.body.booted === true) break;
+  }
+  const stale = String((await call(server, "se_note", { text: "a later note supersedes this one" })).body.captured);
+  const judged = String((await call(server, "se_note", { text: "what this means is the retro's call" })).body.captured);
+  // The desk weighs 0.2 — the default slider clears it; entering wants the method.
+  const method = "product/guidance/method/front-desk.md";
+  const withMethod = { ...hashes, [method]: contentHash(readFileSync(join(root, ...method.split("/")))) };
+  const desk = await call(server, "se_tick", { to: "front_desk", read_hashes: withMethod });
+  assert.equal(desk.isError, false, JSON.stringify(desk.body));
+  // MECHANICAL — superseded, already built, ruled on since. Anyone may check it.
+  const dropped = await call(server, "se_note_drain", { ref: stale, disposition: "obsolete", where: "superseded" });
+  assert.equal(dropped.isError, false, JSON.stringify(dropped.body));
+  assert.equal(dropped.body.inbox, 1, "it leaves the inbox, and the other note stays");
+  // JUDGMENT — parking and carrying decide what work MEANS. Refused, typed.
+  const parked = await call(server, "se_note_drain", { ref: judged, disposition: "backlog", where: "ready when later" });
+  assert.equal(parked.isError, true);
+  assert.equal(parked.body.clause, "SE-C-110");
+  assert.match(String(parked.body.remedy.args.to), /retro/, "the remedy names the state that may");
+  const carried = await call(server, "se_note_drain", { ref: judged, disposition: "carried", where: "this round" });
+  assert.equal(carried.isError, true);
+  assert.equal(carried.body.clause, "SE-C-110");
+});
+
+test("the survey answers in full — a note keeps its substance, which sits below its heading", async () => {
+  const root = freshRoot();
+  // The survey asks git what expeditions stand, so the root must be a repo.
+  for (const a of [["init"], ["config", "user.email", "se@test.local"], ["config", "user.name", "se test"]]) {
+    const r = spawnSync("git", a, { cwd: root, encoding: "utf8", windowsHide: true });
+    if (r.status !== 0) throw new Error(`git ${a.join(" ")} failed: ${r.stderr}`);
+  }
+  const session = new Session(root);
+  const server = buildServer(root, session);
+  const hashes = readHashesFor(root);
+  for (let i = 0; i < 8; i++) {
+    const step = await call(server, "se_tick", { advance: true, read_hashes: hashes });
+    if (step.body.booted === true) break;
+  }
+  // Every real note opens with a heading and carries its content below it.
+  // The old cut took the first line and then 120 characters of it, so the
+  // survey showed a truncated title and none of the substance.
+  const heading = "A HEADING LINE LONG ENOUGH THAT ONE HUNDRED AND TWENTY CHARACTERS WOULD END IT SOMEWHERE IN THE MIDDLE OF A WORD RATHER THAN AT ITS END.";
+  const substance = "The substance lives down here, which is the only reason anyone reads a note at all.";
+  const ref = String((await call(server, "se_note", { text: heading + "\n\n" + substance })).body.captured);
+  assert.ok(heading.length > 120, "the heading alone outruns the old slice");
+  const answered = await call(server, "se_survey", {});
+  assert.equal(answered.isError, false, JSON.stringify(answered.body));
+  const note = (answered.body.notes as { ref: string; text: string }[]).find((n) => n.ref === ref);
+  assert.ok(note !== undefined, "the pending note is in the survey");
+  assert.ok(note.text.includes(substance), "the content below the heading survives");
+  assert.ok(note.text.includes(heading), "and the heading is not cut mid-word");
 });
 
 // The needs-retro gate moved (owner design 2026-07-27): it holds the FIRST

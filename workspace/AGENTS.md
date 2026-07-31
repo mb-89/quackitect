@@ -5,21 +5,64 @@ the whole rule.
 
 # First action
 
-Tick. `se_tick` with no arguments shows where you are; keep walking as the
-machine directs — advance state by state until you reach idle or a refusal
-stops you. How walking works: product/guidance/walking.md — it is pulled
-into every state's packet.
+Tick. `se_tick` with no arguments shows where you are. Keep walking as the
+machine directs. If a target is set, keep moving toward it as walking.md
+specifies. Stop only on refusal, condition, or no reachable in-threshold
+progress toward target. How walking works: product/guidance/walking.md — it
+is pulled into every state's packet.
+
+You do not have to walk a known way one hop at a time. `se_tick {route: X}`
+draws the way to X without moving, and `se_tick {to: X, sweep: true}` walks
+it in one call — every hop still weighs the slider and proves its reads.
+Read SERIALLY though, never as a parallel batch — see the boot-stability
+rules below. The lane serves parallel reads fine; a Copilot harness appears
+to cancel itself on them, so serial is what works everywhere.
+
+Do this AT THE START OF EVERY SESSION, unasked. Whatever the user's first
+message says — even if it says nothing about the machine — your first tool
+call is `se_tick`. Immediately after that first tick, make the `se`
+file/search lane callable. Boot's read gates need it. HOW depends on the
+host, so do whichever applies:
+
+- GITHUB COPILOT CLI hides the lane behind an activation tool. Call
+  `activate_file_navigation_and_search_tools` right after the first tick.
+- EVERY OTHER HOST offers the `se` tools directly, or defers them by name.
+  Load them the way that host loads deferred tools.
+- NO ACTIVATION TOOL IS NOT A BOOT FAILURE. Do not hunt for it. Its absence
+  means the host is not Copilot.
+
+Walk as far as the autonomy allows, then
+report in ONE short message: where you stand, and why you stopped (autonomy,
+condition, or idle). The launcher may also send you an opening prompt saying
+exactly this; the two agree on purpose, so that an agent started by hand,
+with no prompt at all, still boots the same way.
 
 The session runs an AUTONOMY (the user's slider in the mirror). When an
-advance is refused with SE-C-113, that step is the user's — STOP, and
-tell them PLAINLY, in words like these: "I'm at start — entering boot is
+advance is refused with SE-C-113, that step is the user's - STOP, and
+tell them PLAINLY, in words like these: "I'm at start - entering boot is
 above the threshold. I'm stopping here. Changing the slider alone cannot
 wake me: after you adjust it (or advance the machine in the mirror), send
-me a message — 'continue' is enough — and I pick up from wherever the
+me a message - 'continue' is enough - and I pick up from wherever the
 machine stands." Then end your turn. The same message is how you rest at
-idle with nothing to do. (`se_tick {wait: true}` exists for SHORT in-turn
-holds when you expect the user's change within seconds — never as a
+idle with nothing to do — meaning no reachable in-threshold step that
+advances toward target. (`se_tick {wait: true}` exists for SHORT in-turn
+holds when you expect the user's change within seconds - never as a
 parking loop.)
+
+BOOT STABILITY FOR THIS HOST:
+- Keep boot calls serial. Do not run parallel search/read batches.
+- Keep reads small with offset/limit to avoid oversized host payloads.
+- Cache read hashes by path for the session. Reuse them in read_hashes.
+- On every packet, pre-read paths from `pulled` and `lookahead_read` once,
+  then keep reusing those hashes while they stay current.
+- If a target is set, call `se_tick {route: "<target>"}` and pre-read every
+  path in `reads` before moving.
+- Re-read only when a refusal names missing/current hashes, or when a path
+  appears for the first time.
+- If a state allows no tools, do not call read/search there. Tick only.
+- A document that is ALLOWED to be missing is read with `optional: true`.
+  Absence answers `exists: false` rather than refusing. The handover is the
+  case this exists for. Boot should produce no errors at all.
 
 THE HANDOVER RULE: the packet's `human_checked` list is what the user
 checked as read while driving the mirror themselves. Your advances must
@@ -28,8 +71,12 @@ its hash in `read_hashes`, or the tick refuses. Their checkmark is not
 your reading.
 
 Your native tools (Read, Write, Edit, Bash, Glob, Grep, web) are blocked in
-this workspace — by an explicit deny list in `.claude/settings.json`, tool by
-tool. The `se` lane replaces every one of them, as good or better:
+this workspace — tool by tool, by an explicit list. Which file holds that
+list depends on the host: Claude Code reads `.claude/settings.json`, and
+GitHub Copilot CLI takes the same list on its command line from
+`_cage/copilot-cage.json` (Copilot's `--excluded-tools`; its `--deny-tool`
+only gates approval and hides nothing). Either way the effect is the one
+rule: the `se` lane replaces every native tool, as good or better:
 
 | you would reach for | use instead |
 | --- | --- |
@@ -42,7 +89,7 @@ tool. The `se` lane replaces every one of them, as good or better:
 | Bash | `se_run` (output captured in full under the returned ref) |
 | git (via Bash) | `se_git` (allowlisted; push stays with the user) |
 | WebFetch | `se_web_fetch` |
-| WebSearch | `se_web_search` |
+| WebSearch | ALLOWED natively (owner ruling 2026-07-28) — web search runs on the provider's backend and cannot be self-hosted keylessly. Every query reaches the feed MECHANICALLY, through a PostToolUse hook, so there is no logging duty to remember. `se_web_search` stays for key-configured setups. |
 | your own history | `se_log_query` |
 
 Paths are root-relative to the project root (the folder holding `product/`

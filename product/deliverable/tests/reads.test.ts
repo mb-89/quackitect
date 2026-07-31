@@ -8,7 +8,44 @@ import { test } from "node:test";
 import { renderMirror } from "../engine/render.ts";
 import { Session } from "../engine/session.ts";
 import { buildServer } from "../engine/tools.ts";
-import { call, checkDocs, freshRoot, readHashesFor } from "./helpers.ts";
+import { readFileSync } from "node:fs";
+import { call, checkDocs, freshRoot, READ_DOCS, readHashesFor } from "./helpers.ts";
+
+// THREE HOMES, NOT ONE (owner ruling 2026-07-29). voice.md is about HOW YOU
+// TALK. It had accumulated rules about writing SOFTWARE and building
+// INTERFACES, and a reader looking for one had to sift the other two.
+//
+// The split is only half the ruling. A guidance nobody pulls is a guidance
+// nobody reads, so each home sits directly in product/guidance/ where the
+// pull serves it always.
+test("the guidance splits three ways, and every home is pulled", () => {
+  const root = freshRoot();
+  const s = new Session(root);
+  const idle = s.machine.states.find((x) => x.id === "idle")!;
+  const pulled = s.pulled(s.machine, idle).map((p) => p.path);
+  for (const home of ["product/guidance/voice.md", "product/guidance/software.md", "product/guidance/ux.md"]) {
+    assert.ok(pulled.includes(home), home + " is not pulled — a guidance nobody pulls is a guidance nobody reads");
+    assert.ok(READ_DOCS.includes(home as (typeof READ_DOCS)[number]), home + " is pulled but the suite never proves reading it");
+  }
+  const read = (p: string): string => readFileSync(join(root, ...p.split("/")), "utf8");
+  const voice = read("product/guidance/voice.md");
+  const software = read("product/guidance/software.md");
+  const ux = read("product/guidance/ux.md");
+  // Each rule sits in exactly one home. Two copies is how they drift apart.
+  assert.match(software, /Do not repeat \(DRY\)/, "DRY is a software rule");
+  assert.match(software, /Comments and provenance/, "so is how you comment");
+  assert.match(software, /Dated guidance/, "so is judging dated advice");
+  assert.match(ux, /Nothing ever hangs/, "the interface rule the owner added leads the UX home");
+  assert.match(ux, /NEVER BLOCK THE PROCESS THAT DRAWS THE INTERFACE/, "including the half that actually bites");
+  assert.match(ux, /ONE SURFACE NEVER RESETS ANOTHER/, "and the place rules");
+  for (const moved of [/Do not repeat \(DRY\)/, /Comments & provenance/, /### Visual design/, /### Figures/]) {
+    assert.ok(!moved.test(voice), "voice.md kept " + String(moved) + " — it belongs to a sibling now");
+  }
+  // What voice.md is FOR stays in it.
+  assert.match(voice, /### Sentences/);
+  assert.match(voice, /### Answered questions/);
+  assert.match(voice, /The sycophancy guard/);
+});
 
 test("a check pins the VERSION: editing the doc unchecks it and the gate asks again", async () => {
   const root = freshRoot();
@@ -45,10 +82,10 @@ test("THE HANDOVER: a left-behind .se/HANDOVER.md is demanded leaving boot's rea
   assert.equal(last!.body.clause, "SE-C-112");
   assert.match(String(last!.body.expected), /read_contract/);
   assert.match(String(last!.body.expected), /HANDOVER/);
-  // The reading room offers it: pulled with source "handover" — the mirror's checkbox home.
+  // The reading room offers it: pulled with source "consume" — the mirror's checkbox home.
   const at = await call(server, "se_tick", {});
   const state = (at.body.states as { pulled: { path: string; sources: string[] }[] }[])[0];
-  assert.ok(state.pulled.some((p) => p.path === ".se/HANDOVER.md" && p.sources.includes("handover")));
+  assert.ok(state.pulled.some((p) => p.path === ".se/HANDOVER.md" && p.sources.includes("consume")));
   const { contentHash } = await import("../engine/hash.ts");
   const { readFileSync } = await import("node:fs");
   const withHandover = { ...hashes, ".se/HANDOVER.md": contentHash(readFileSync(join(root, ".se", "HANDOVER.md"))) };
@@ -59,6 +96,33 @@ test("THE HANDOVER: a left-behind .se/HANDOVER.md is demanded leaving boot's rea
   // Idle entry no longer demands it — boot already proved the reading.
   assert.equal(last!.isError, false, JSON.stringify(last!.body));
   assert.equal(last!.body.booted, true);
+  // CONSUMED, NOT KEPT (owner ruling 2026-07-31): being read is what destroys
+  // it. A handover that survives gets believed a second time, unmeasured.
+  const { existsSync } = await import("node:fs");
+  assert.equal(existsSync(join(root, ".se", "HANDOVER.md")), false, "the handover did not survive the reading room");
+});
+
+test("THE HANDOVER: the way out writes the next one — end is refused without one from this session", async () => {
+  const root = freshRoot();
+  const server = buildServer(root);
+  const hashes = readHashesFor(root);
+  let last: Awaited<ReturnType<typeof call>> | undefined;
+  for (let i = 0; i < 8; i++) {
+    last = await call(server, "se_tick", { advance: true, read_hashes: hashes });
+    if (last.isError === true || last.body.booted === true) break;
+  }
+  assert.equal(last!.body.booted, true, JSON.stringify(last!.body));
+  // Nothing was written for whoever comes next, so the door does not open.
+  const refused = await call(server, "se_tick", { from: "idle", to: "end", read_hashes: hashes });
+  assert.equal(refused.isError, true);
+  assert.match(String(refused.body.expected), /handover written THIS session/);
+  assert.match(String(refused.body.got), /no \.se\/HANDOVER\.md/);
+  // Write one and the way out opens.
+  const { writeFileSync: write, mkdirSync: mkdir } = await import("node:fs");
+  mkdir(join(root, ".se"), { recursive: true });
+  write(join(root, ".se", "HANDOVER.md"), "# Handover\n\nWhat the next session cannot read from the repo.\n", "utf8");
+  const ok = await call(server, "se_tick", { from: "idle", to: "end", read_hashes: hashes });
+  assert.equal(ok.isError, false, JSON.stringify(ok.body));
 });
 
 test("a stale agent hash proves a stale read: the edited doc must be re-read for a fresh token", async () => {
@@ -75,6 +139,41 @@ test("a stale agent hash proves a stale read: the edited doc must be re-read for
   const fresh = { ...hashes, ...{ "product/guidance/contract.md": readHashesFor(root)["product/guidance/contract.md"] } };
   const ok = await call(server, "se_tick", { to: "expeditions", read_hashes: fresh });
   assert.equal(ok.isError, false);
+});
+
+test("the read buffer auto-fills tick proofs from prior lane reads", async () => {
+  const root = freshRoot();
+  const server = buildServer(root);
+  // Walk into boot/read_contract where the read gate starts applying.
+  await call(server, "se_tick", { advance: true });
+  await call(server, "se_tick", { advance: true });
+  // Earn proofs through the lane once; later ticks send no read_hashes.
+  for (const path of READ_DOCS) {
+    const rr = await call(server, "se_file_read", { path, offset: 1, limit: 1 });
+    assert.equal(rr.isError, false, JSON.stringify(rr.body));
+  }
+  let last: Awaited<ReturnType<typeof call>> | undefined;
+  for (let i = 0; i < 8; i++) {
+    last = await call(server, "se_tick", { advance: true });
+    if (last.isError || last.body.booted === true) break;
+  }
+  assert.equal(last?.isError, false, JSON.stringify(last?.body));
+  assert.equal(last?.body.booted, true, "buffered proofs should carry the boot walk to idle");
+});
+
+test("startup clears any preseeded read buffer before boot reading", async () => {
+  const root = freshRoot();
+  const session = new Session(root);
+  const seeded = readHashesFor(root);
+  for (const [path, hash] of Object.entries(seeded)) session.rememberRead(path, hash);
+  const server = buildServer(root, session);
+  // First move enters boot and mechanically clears stale/leftover buffer state.
+  await call(server, "se_tick", { advance: true }); // start -> boot/start
+  await call(server, "se_tick", { advance: true }); // boot/start -> read_contract
+  const refused = await call(server, "se_tick", { advance: true }); // leaving read_contract needs fresh read
+  assert.equal(refused.isError, true);
+  assert.equal(refused.body.clause, "SE-C-112");
+  assert.match(String(refused.body.expected), /read_contract/);
 });
 
 test("the mirror renders per-doc checkboxes and never locks reading itself", async () => {

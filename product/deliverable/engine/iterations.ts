@@ -8,12 +8,13 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { spawnSync } from "node:child_process";
-import { type CanvasData, type CanvasEdge, type CanvasElement } from "./canvas.ts";
+import { nodeSize, type CanvasData, type CanvasEdge, type CanvasElement } from "./canvas.ts";
 import { CLAUSES, Rejection } from "./errors.ts";
-import { validateMachine, type MachineDecl, type StateDecl } from "./machine.ts";
+import { validateMachine, type EvidenceField, type MachineDecl, type StateDecl } from "./machine.ts";
+import { CHANGE_COLUMNS, compileColumn, rigorMatrixContentHash, readRigorMatrix, type ChangeColumn } from "./rigor-matrix.ts";
 import { parseStateNote } from "./notes.ts";
 import { buildArchive, type GeneratedMachine } from "./expmachine.ts";
-import { slug, worktreesDir } from "./worktree.ts";
+import { bustBranchList, listBranches, slug, worktreesDir } from "./worktree.ts";
 
 const SRC = "engine/iterations.ts";
 
@@ -59,10 +60,7 @@ export function readItRecord(root: string, it: Iteration): Record<string, unknow
 /** Open = the worktree exists. Closed = branch it/* without one. */
 export function itList(root: string): Iteration[] {
   const out: Iteration[] = [];
-  const branches = git(root, ["branch", "--list", "it/*", "--format=%(refname:short)"], "branch --list")
-    .split("\n")
-    .map((b) => b.trim())
-    .filter((b) => b !== "");
+  const branches = listBranches(root, "it/*");
   for (const branch of branches) {
     const id = branch.slice("it/".length);
     const path = join(worktreesDir(root), id);
@@ -92,6 +90,10 @@ export function itSeed(root: string, goal: string, vision: string, inputs: strin
   const path = join(worktreesDir(root), id);
   mkdirSync(worktreesDir(root), { recursive: true });
   git(root, ["worktree", "add", path, "-b", `it/${id}`], "worktree add");
+  // AFTER the branch exists, never before. Busting first only refills the
+  // cache from the old listing, and the new iteration then stays invisible
+  // for the length of the window.
+  bustBranchList();
   const deliverable = join(path, "product", "deliverable");
   if (existsSync(join(deliverable, "package.json")) && !existsSync(join(deliverable, "node_modules"))) {
     spawnSync("npm", ["install", "--no-audit", "--no-fund"], { cwd: deliverable, stdio: "ignore", shell: process.platform === "win32" });
@@ -157,6 +159,255 @@ export function markStarted(root: string, it: Iteration): void {
   git(it.path, ["commit", "-q", "-m", `iteration ${it.id}: started`], "commit");
 }
 
+export function itPinRel(id: string): string {
+  return `product/spec/iterations/${id}/machines/seeded.json`;
+}
+
+export function itSeededRel(id: string, kind: string): string {
+  return `product/spec/iterations/${id}/machines/${kind}.md`;
+}
+
+/** THE SEEDED MACHINE (owner design 2026-07-30): an authoring state writes
+ *  the drawing as markdown data in the record (machines/<kind>.md), and the
+ *  matching runs-state descends into its compilation — build-chunks, spikes
+ *  and candidates all share this one shape. Each step's realization kind
+ *  becomes a TAG on its state, so the existing tag-pull serves each builder
+ *  its discipline's guidance. An absent or empty drawing is a TYPED
+ *  REFUSAL, never a plain serve — unless it carries an explicit none with
+ *  its reason, which passes the run state without ceremony. */
+function chunkList(v: unknown): string[] {
+  if (Array.isArray(v)) return v.map(String);
+  if (typeof v === "string" && v.trim() !== "") return v.split(",").map((s) => s.trim());
+  return [];
+}
+
+export function generateSeeded(root: string, it: Iteration, machineId: string, kind: string): GeneratedMachine {
+  const abs = join(it.path, itSeededRel(it.id, kind));
+  const scaffold = '---\nsteps:\n  - id: <step>\n    statement: "<what this step builds or settles>"\n    depends_on: []\n    realization: software\n---\n';
+  if (!existsSync(abs)) {
+    throw new Rejection({
+      clause: CLAUSES.CONDITION_UNMET,
+      expected: `a seeded drawing — the authoring state writes ${itSeededRel(it.id, kind)} (frontmatter steps: id, statement, depends_on, realization — or none: "<why nothing runs>")`,
+      got: `no ${kind}.md in the iteration record — a run without visible steps is a defect`,
+      remedy: { tool: "se_file_write", args: { path: itSeededRel(it.id, kind), content: scaffold, base_hash: null }, note: "seed the drawing at the authoring state, then tick again" },
+      source: SRC,
+    });
+  }
+  const fm = parseStateNote(readFileSync(abs, "utf8")).frontmatter;
+  const raw = Array.isArray(fm.steps) ? fm.steps : Array.isArray(fm.chunks) ? fm.chunks : [];
+  interface Chunk {
+    id: string;
+    statement: string;
+    depends_on: string[];
+    realization: string;
+  }
+  const chunks: Chunk[] = raw.map((entry, i) => {
+    const c = (entry ?? {}) as Record<string, unknown>;
+    if (typeof c.id !== "string" || c.id.trim() === "") {
+      throw new Rejection({
+        clause: CLAUSES.CONDITION_UNMET,
+        expected: `step ${i + 1} declares an id`,
+        got: "a step without an id",
+        remedy: { tool: "se_file_read", args: { path: itSeededRel(it.id, kind) }, note: "every step carries id, statement, depends_on, realization" },
+        source: SRC,
+      });
+    }
+    return {
+      id: c.id,
+      statement: typeof c.statement === "string" ? c.statement : "",
+      depends_on: chunkList(c.depends_on),
+      realization: typeof c.realization === "string" && c.realization !== "" ? c.realization : "software",
+    };
+  });
+  if (chunks.length === 0) {
+    // AN EXPLICIT NONE passes the run state without ceremony — zero spikes
+    // is a normal outcome when the drawing says WHY (the explicit-absence law).
+    if (typeof fm.none === "string" && fm.none.trim() !== "") {
+      const decl: MachineDecl = {
+        id: machineId,
+        reentry: "resume",
+        initial: "start",
+        states: [
+          { id: "start", kind: "start", statement: "", guidance: `Nothing was seeded, explicitly: ${fm.none}`, evidence_form: [], priority: 0.01, edges: [{ to: "end", role: "normal" }] },
+          { id: "end", kind: "end", statement: "", guidance: "The explicit none is recorded — tick once more to return to the walk.", evidence_form: [], priority: 0.01, edges: [] },
+        ],
+      };
+      validateMachine(decl);
+      return { decl, canvas: pinnedCanvas(decl), expByState: {} };
+    }
+    throw new Rejection({
+      clause: CLAUSES.CONDITION_UNMET,
+      expected: 'at least one step in the drawing, or an explicit none: "<why nothing runs>"',
+      got: `${kind}.md carries an empty steps list with no reason`,
+      remedy: { tool: "se_file_patch", args: { ops: [{ path: itSeededRel(it.id, kind), old_string: "steps:", new_string: "steps:\n  - id: <step>" }] }, note: "a run without visible steps is a defect — absence must say why" },
+      source: SRC,
+    });
+  }
+  const ids = new Set(chunks.map((c) => c.id));
+  const start: StateDecl = {
+    id: "start",
+    kind: "start",
+    statement: "",
+    guidance: "The seeded chunk machine — the build plan as states, parallel where independent.",
+    evidence_form: [],
+    priority: 0.01,
+    edges: [],
+  };
+  const states: StateDecl[] = [start];
+  const dependents = new Set(chunks.flatMap((c) => c.depends_on));
+  for (const c of chunks) {
+    for (const d of c.depends_on) {
+      if (!ids.has(d)) {
+        throw new Rejection({
+          clause: CLAUSES.CONDITION_UNMET,
+          expected: `chunk ${c.id} depends on a declared chunk`,
+          got: d,
+          remedy: { tool: "se_file_read", args: { path: itChunksRel(it.id) }, note: "dependencies name chunk ids from the same drawing" },
+          source: SRC,
+        });
+      }
+    }
+    if (c.depends_on.length === 0) start.edges.push({ to: c.id, role: "normal" });
+    states.push({
+      id: c.id,
+      kind: "work",
+      statement: c.statement,
+      guidance: `A build chunk — realization: ${c.realization}. The tag pulls the discipline's guidance.`,
+      evidence_form: [{ name: "built", description: "what was built and where — the commit or artifact", required: true }],
+      priority: 0.2,
+      tags: [`realization-${c.realization}`],
+      edges: [
+        ...chunks.filter((o) => o.depends_on.includes(c.id)).map((o) => ({ to: o.id, role: "normal" as const })),
+        ...(dependents.has(c.id) ? [] : [{ to: "all-built", role: "normal" as const }]),
+      ],
+    });
+  }
+  // The JOIN: a build is done when EVERY leaf chunk is — plain fan-in
+  // would be an OR, and one finished chunk is not a finished build.
+  states.push({
+    id: "all-built",
+    kind: "join",
+    statement: "",
+    guidance: "Every chunk is built — the join releases the walk.",
+    evidence_form: [],
+    priority: 0.01,
+    edges: [{ to: "end", role: "normal" }],
+  });
+  states.push({
+    id: "end",
+    kind: "end",
+    statement: "",
+    guidance: "The chunk machine is complete — tick once more to return to the walk.",
+    evidence_form: [],
+    priority: 0.01,
+    edges: [],
+  });
+  const decl: MachineDecl = { id: machineId, reentry: "resume", initial: "start", states };
+  validateMachine(decl);
+  return { decl, canvas: pinnedCanvas(decl), expByState: {} };
+}
+
+/** The escalation ladder IS the column list — one source, so the two cannot
+ *  drift apart. */
+const SIZE_ORDER = CHANGE_COLUMNS as readonly string[];
+
+/** THE PIN (owner verdicts 2026-07-30): the kickoff bless compiles the
+ *  blessed change size from the LIVE rigor matrix and pins the machine into
+ *  the record with its content hash. Rigor matrix edits reach the NEXT
+ *  kickoff, never a running walk; drift stays silent until asked.
+ *  Escalation = re-pinning with a LARGER size — monotonicity guarantees
+ *  every filled state survives. De-escalation is refused: a prediction
+ *  that proved too big is finished at its size. */
+export function pinIteration(root: string, it: Iteration, changeSize: string): Record<string, unknown> {
+  if (!(CHANGE_COLUMNS as readonly string[]).includes(changeSize)) {
+    throw new Rejection({
+      clause: CLAUSES.REQUIRED_ARGS,
+      expected: `a change size: ${CHANGE_COLUMNS.join(" | ")}`,
+      got: changeSize,
+      remedy: { tool: "se_tick", args: {}, note: "the kickoff's change_size field carries the choice" },
+      source: SRC,
+    });
+  }
+  const pinAbs = join(it.path, itPinRel(it.id));
+  let prev: ParsedPin | undefined;
+  if (existsSync(pinAbs)) {
+    prev = parsePin(readFileSync(pinAbs, "utf8"));
+    const from = SIZE_ORDER.indexOf(String(prev.change_size));
+    const to = SIZE_ORDER.indexOf(changeSize);
+    if (to <= from) {
+      throw new Rejection({
+        clause: CLAUSES.CONDITION_UNMET,
+        expected: `an ESCALATION — the pin stands at ${String(prev.change_size)}, and only a larger size re-opens it; a prediction that proved too big is finished at its size`,
+        got: changeSize,
+        remedy: { tool: "se_tick", args: {}, note: "walk the pinned machine as it stands" },
+        source: SRC,
+      });
+    }
+  }
+  const rigorMatrix = readRigorMatrix(root);
+  const machine = compileColumn(rigorMatrix, changeSize as ChangeColumn);
+  // THE DEMANDS LEDGER: what each applied step asks at this pin — the
+  // ordinal applies plus the evidence spec. The next escalation compares
+  // against it.
+  const demands: Record<string, StepDemand> = {};
+  for (const row of rigorMatrix.rows) {
+    const cell = rigorMatrix.cells.get(row.name)!.get(changeSize as ChangeColumn)!;
+    if (cell.applies === "none") continue;
+    demands[row.name] = { applies: cell.applies, evidence: JSON.stringify(row.evidence_form) };
+  }
+  // REOPEN (owner verdict 2026-07-30): a filled step survives the
+  // escalation only while its demand stands. applies stepped up, or the
+  // evidence spec changed — the step reopens and its evidence is
+  // re-earned. Guidance-only wording never reopens.
+  const reopened = Object.keys(prev?.demands ?? {})
+    .filter((id) => {
+      const o = prev!.demands![id];
+      const n = demands[id];
+      return n !== undefined && ((APPLIES_RANK[n.applies] ?? 0) > (APPLIES_RANK[o.applies] ?? 0) || n.evidence !== o.evidence);
+    })
+    .sort();
+  const pin = {
+    change_size: changeSize,
+    rigor_matrix_hash: rigorMatrixContentHash(root),
+    pinned_at: new Date().toISOString(),
+    ...(reopened.length > 0 ? { reopened } : {}),
+    demands,
+    machine,
+  };
+  mkdirSync(dirname(pinAbs), { recursive: true });
+  writeFileSync(pinAbs, JSON.stringify(pin, null, 2), "utf8");
+  git(it.path, ["add", "-A"], "add");
+  git(it.path, ["commit", "-q", "-m", `iteration ${it.id}: pin ${changeSize}`], "commit");
+  return {
+    pinned: changeSize,
+    rigor_matrix_hash: pin.rigor_matrix_hash,
+    states: machine.states.length,
+    ...(reopened.length > 0 ? { reopened } : {}),
+  };
+}
+
+interface StepDemand {
+  applies: string;
+  evidence: string;
+}
+
+/** tailored is always tailored DOWN (owner ruling 2026-07-30); inherit
+ *  defers to the fuller content, so it ranks with full. */
+const APPLIES_RANK: Record<string, number> = { none: 0, tailored: 1, inherit: 2, full: 2 };
+
+interface ParsedPin {
+  change_size?: string;
+  demands?: Record<string, StepDemand>;
+}
+
+function parsePin(raw: string): ParsedPin {
+  try {
+    return JSON.parse(raw) as ParsedPin;
+  } catch {
+    return {};
+  }
+}
+
 export function itShortId(itId: string): string {
   const m = itId.match(/^(i\d+)-/);
   return m ? m[1] : itId;
@@ -175,7 +426,7 @@ export function generateIterations(root: string): GeneratedMachine {
   const start: StateDecl = {
     id: "start",
     kind: "start",
-    statement: "Start",
+    statement: "",
     guidance: "The seeded container: every open iteration stands as its KICKOFF. Entering one binds its worktree and stamps it started.",
     evidence_form: [],
     priority: 0.01,
@@ -183,6 +434,35 @@ export function generateIterations(root: string): GeneratedMachine {
   };
   const states: StateDecl[] = [start];
   const expByState: Record<string, string> = {};
+  const subGen: Record<string, () => GeneratedMachine> = {};
+  // The kickoff's evidence form is the rigor matrix's OWN gate-kickoff row,
+  // read live (seed-from-source). An unreadable rigor matrix never takes the
+  // container down — the kickoff then serves without a form.
+  // THE MATRIX IS READ ONLY IF SOMETHING ACTUALLY STANDS HERE, and it used to
+  // be read on every render regardless. The container wants exactly ONE row
+  // out of fifty rows and two hundred and fifty cells - gate-kickoff, for its
+  // form and its tools - and it wants that only while an iteration is open.
+  // With nothing open this never runs, and the whole read disappears.
+  //
+  // ITS TOOLS COME FROM THAT SAME ROW. The container's kickoff is the matrix's
+  // gate-kickoff standing one machine higher, so it may call exactly what the
+  // row declares. Taking the form and leaving the tools behind is what left a
+  // seeded iteration unable to read the record it is about to fill in.
+  let kickoffRow: { evidence_form: EvidenceField[]; legal_tools?: string[] } | undefined;
+  let kickoffLooked = false;
+  const kickoff = (): { evidence_form: EvidenceField[]; legal_tools?: string[] } | undefined => {
+    if (!kickoffLooked) {
+      kickoffLooked = true;
+      // An unreadable matrix never takes the container down; the kickoff then
+      // serves without a form.
+      try {
+        kickoffRow = readRigorMatrix(root).rows.find((r) => r.name === "gate-kickoff");
+      } catch {
+        kickoffRow = undefined;
+      }
+    }
+    return kickoffRow;
+  };
   type GenNode = CanvasElement & { styleAttributes?: Record<string, unknown> };
   const nodes: GenNode[] = [];
   const edges: CanvasEdge[] = [];
@@ -195,23 +475,64 @@ export function generateIterations(root: string): GeneratedMachine {
     const goal = typeof fm?.goal === "string" ? fm.goal : it.id;
     const started = typeof fm?.started === "string";
     expByState[sid] = it.id;
+    // A PINNED iteration expands: the kickoff leads into the pinned machine
+    // (a generated sub the reader clicks into), not straight to end.
+    let pinned: { change_size?: string; machine?: MachineDecl } | undefined;
+    try {
+      pinned = JSON.parse(readFileSync(join(it.path, itPinRel(it.id)), "utf8")) as { change_size?: string; machine?: MachineDecl };
+    } catch {
+      pinned = undefined;
+    }
+    const walkId = `${sid}-walk`;
+    const hasWalk = pinned?.machine !== undefined;
     states.push({
       id: sid,
       kind: "work",
       statement: goal,
       guidance:
-        "KICKOFF — one brief carries plan and rigor; the owner blesses, and past it the iteration is set. Its outcome seeds the REST of this machine (the iteration lane builds that next). Goal, vision and inputs live in the record.",
-      evidence_form: [],
+        "KICKOFF — one brief carries plan and rigor; the owner blesses, and past it the iteration is set. THE CHANGE SIZE IS NOT YOURS TO PICK. You PROPOSE one with your reasoning; the person decides, and their bless is the decision. Seeding never asked for a size and never needed to — every iteration reaches this state the same way, and the size is chosen here or nowhere. The bless SEEDS the rest: the engine compiles the blessed change_size from the live rigor matrix and pins the machine into the record. Goal, vision and inputs live in the record.",
+      evidence_form: kickoff()?.evidence_form ?? [],
+      ...(kickoff()?.legal_tools !== undefined ? { legal_tools: kickoff()!.legal_tools } : {}),
       priority: 0.6,
       ...(started ? {} : { entry: { no_pending_note: ["needs retro"] } }),
       tags: ["iteration-kickoff"],
-      edges: [{ to: "end", role: "alternative" }],
+      edges: [hasWalk ? { to: walkId, role: "normal" as const } : { to: "end", role: "alternative" as const }],
     });
+    if (hasWalk) {
+      const m = pinned!.machine!;
+      expByState[walkId] = it.id;
+      states.push({
+        id: walkId,
+        kind: "work",
+        statement: `the pinned ${String(pinned!.change_size)} walk (${m.states.length} states)`,
+        guidance: "The pinned machine — compiled from the rigor matrix at the kickoff bless, pinned to the record. Click in; the walk continues inside. Rigor matrix edits reach the NEXT kickoff, never this walk.",
+        evidence_form: [],
+        priority: 0.2,
+        submachine: "generated",
+        edges: [{ to: "end", role: "alternative" }],
+      });
+      subGen[walkId] = () => ({
+        decl: { ...m, id: walkId },
+        canvas: pinnedCanvas(m),
+        expByState: {},
+        // The walk's own seed points: a state that RUNS a seeded machine
+        // descends into it here — or refuses typed when nothing was seeded.
+        subGen: Object.fromEntries(
+          m.states.filter((s) => s.submachine !== undefined).map((s) => [s.id, () => generateSeeded(root, it, s.id, s.submachine!)]),
+        ),
+      });
+    }
     start.edges.push({ to: sid, role: "normal" });
     const y = i * 420;
-    nodes.push({ id: `n-${sid}`, type: "file", file: `${sid}.md`, x: -1100, y, width: 620, height: 360 });
+    nodes.push({ id: `n-${sid}`, type: "file", file: `${sid}.md`, x: -1100, y, ...nodeSize(sid, goal) });
     edges.push({ id: `e-start-${sid}`, fromNode: "n-start", toNode: `n-${sid}` });
-    edges.push({ id: `e-${sid}-end`, fromNode: `n-${sid}`, toNode: "n-end" });
+    if (hasWalk) {
+      nodes.push({ id: `n-${walkId}`, type: "file", file: `${walkId}.md`, x: -560, y, ...nodeSize(walkId) });
+      edges.push({ id: `e-${sid}-${walkId}`, fromNode: `n-${sid}`, toNode: `n-${walkId}` });
+      edges.push({ id: `e-${walkId}-end`, fromNode: `n-${walkId}`, toNode: "n-end" });
+    } else {
+      edges.push({ id: `e-${sid}-end`, fromNode: `n-${sid}`, toNode: "n-end" });
+    }
   });
   if (open.length === 0) {
     start.edges.push({ to: "end", role: "normal" });
@@ -220,7 +541,7 @@ export function generateIterations(root: string): GeneratedMachine {
   states.push({
     id: "end",
     kind: "end",
-    statement: "End",
+    statement: "",
     guidance: "Left the iterations container — running work parks where it stands; a seeded one waits for its first start.",
     evidence_form: [],
     priority: 0.01,
@@ -233,7 +554,33 @@ export function generateIterations(root: string): GeneratedMachine {
     edges,
     metadata: { frontmatter: { reentry: "restart", priority: 0.4 } },
   };
-  return { decl, canvas, expByState };
+  return { decl, canvas, expByState, ...(Object.keys(subGen).length > 0 ? { subGen } : {}) };
+}
+
+/** A drawn view of a pinned machine: milestone columns, states stacked in
+ *  reading order — generated, like every container view. */
+function pinnedCanvas(m: MachineDecl): CanvasData {
+  const cols: string[] = [];
+  for (const s of m.states) {
+    const g = s.kind === "start" ? "" : (s.group ?? "?");
+    if (!cols.includes(g)) cols.push(g);
+  }
+  const nodes: CanvasElement[] = [];
+  const edges: CanvasEdge[] = [];
+  const rows: Record<string, number> = {};
+  for (const s of m.states) {
+    const g = s.kind === "start" ? "" : (s.group ?? "?");
+    const col = cols.indexOf(g);
+    const row = rows[g] ?? 0;
+    rows[g] = row + 1;
+    nodes.push({ id: `n-${s.id}`, type: "file", file: `${s.id}.md`, x: col * 560, y: row * 260, ...nodeSize(s.id, s.statement) });
+  }
+  for (const s of m.states) {
+    for (const e of s.edges) {
+      edges.push({ id: `e-${s.id}-${e.to}`, fromNode: `n-${s.id}`, toNode: `n-${e.to}` });
+    }
+  }
+  return { nodes, edges, metadata: { frontmatter: { reentry: "resume", priority: 0.2 } } };
 }
 
 /** THE ITERATION ARCHIVE, generated like the expedition archive — the

@@ -25,6 +25,59 @@ One tool drives everything: `se_tick`. It is legal in every state.
 - `state: <id>`: peek at any state without moving.
 - `back: <state>`: return to an earlier filled state. Everything downstream
   is superseded; its evidence is invalidated and earned again.
+- `target: <state>`: set the destination the route line tracks. The session
+  already has one at engine start, pointing at the front desk.
+
+Default movement rule:
+
+- If a target is set, keep walking toward it.
+- Prefer any `enter_met` edge that advances toward that target.
+- Stop at idle only when no reachable in-threshold step advances toward target.
+- A refusal still stops the walk. Follow its remedy.
+- SE-C-113 means user handoff. Report and wait for a message.
+
+Read-ahead discipline (every state):
+
+- Treat `pulled` and `lookahead_read` as pre-read work. Read new paths as soon as they appear.
+- Keep a session cache of path -> hash from `se_file_read`.
+- Reuse cached hashes in every moving `se_tick` through `read_hashes`.
+- Re-read only when a refusal says the hash is missing or stale, or when the path appears for the first time.
+- If a target is set, run `se_tick {route: "<target>"}` and pre-read every path in `reads` before the walk.
+- If a state allows no tools, do not read there. Tick only.
+
+Two more arguments go with `target`, and only make sense beside it — they
+are how you walk a KNOWN way without one round trip per hop:
+
+- `route: <state>`: the way from here to there — every hop, its priority, and
+  what each will ask for. It MOVES NOTHING. Read it to answer every judgment
+  on the way at once, before committing to the walk.
+- `sweep: true` with `to:`: WALK THAT ROUTE IN ONE CALL instead of one tick
+  per hop. It collapses round trips and nothing else — every hop still weighs
+  the slider, proves its reads and runs its scripts, and it stops at the
+  first hop that will not pass, saying which and why.
+
+A WORD OF WARNING ON "SWEEP", because this page uses it three other ways:
+the desk sweeps the machinery before advising, the overhaul sweeps what is
+active, and you sweep the pending notes before building. Those are all the
+ordinary English word. Only `sweep: true` on a tick is the verb.
+
+READ SERIALLY FOR NOW. Send `se_file_read` calls one after another, not as a
+parallel batch. This is a RETREAT, not a preference, and it is written down
+so nobody re-optimises it back by accident.
+
+WHY, and be precise about where the fault is. Parallel reads work: the lane
+serves them, and they work on Claude Code today. A COPILOT HARNESS appears
+to cancel itself when calls go out in parallel — observed on 2026-07-31, not
+yet proven to the mechanism. Nothing about the MCP server or the lane is
+implicated.
+
+So the cost is real and accepted. Boot demands seven or eight documents and
+serial reads pay a round trip for each. A boot that COMPLETES on every host
+beats a faster one that dies on one of them.
+
+WHEN THIS LIFTS: when the harness bug is understood and fixed, or when the
+host can be detected reliably enough to batch only where it is safe. Until
+then the slow way is the only way that works everywhere.
 
 Narration rides the walk (the unified log + the decision graph):
 
@@ -37,6 +90,14 @@ Narration rides the walk (the unified log + the decision graph):
     panel's checklist IS this graph, and a visit without a plan shows
     the reader nothing to follow. Check items off with done AS each one
     lands, never in bulk at the end.
+    WHY, because the rule keeps getting broken: the checklist is a
+    PROGRESS view, not a completion record. A reader watching it wants
+    to know where you are while you are still there. Fourteen items
+    ticked in the last minute of an hour's work tell them nothing they
+    could not have read from the commit. If an item is genuinely done,
+    close it in the same breath as the work — the next call, not the
+    last one. Only genuinely simultaneous work closes together.
+    The engine nudges when updates keep landing and nothing closes.
   - fork `{brief, items?}` opens an unplanned branch where you are — a
     BLOCKING detour: the current item cannot continue until this is fixed;
     resolve it and return. Extra work that merely grows the scope is not a
@@ -45,11 +106,24 @@ Narration rides the walk (the unified log + the decision graph):
   - defer `{node, to}` parks a point for the state that can do it —
     entering that state materializes it as an open to-do. A point that
     cannot be done HERE is deferred, never claimed or ignored.
-  - update `{brief, node?}` says what you are doing. An update is never
-    called a note — notes are the retro's strays (se_note). Every update
-    CHANGES THE RENDER: the engine lands it as a checked point under the
-    node you are on — clicking the log line always shows what changed.
-    Work that should stay open gets plan or fork instead.
+  - update `{node, brief}` says what you are doing, ON a checklist item.
+    An update is never called a note — notes are the retro's strays
+    (se_note). Every update CHANGES THE RENDER: the engine lands it as a
+    checked point under that node — clicking the log line always shows
+    what changed. Work that should stay open gets plan or fork instead.
+    THE NODE IS REQUIRED WHILE A CHECKLIST STANDS. An update floating
+    free of every item is narration wearing progress's clothes: the board
+    fills with checked leaves while the items it should be moving stay
+    open. With nothing open there is nothing to attach to, and a bare
+    update is exactly right. The open node map rides home on every call,
+    so naming one costs a glance.
+- THE BRIEF IS ONE SHORT LINE. Ninety characters at most. It may not
+  chain three or more separator-joined parts, because a chain is an
+  unrendered list. The engine refuses one (SE-C-120). The rule binds
+  PLAN ITEMS exactly as it binds briefs.
+  THIS IS THE LANE'S MOST-HIT REFUSAL. Ten of the thirteen update
+  failures on 2026-07-29 were this one, across two different sessions.
+  If a brief wants commas, it wanted to be a plan.
 - Everything started gets resolved. Abandoning is legal. Abandoning
   silently is not — the graph shows the drop.
 - The TOLL: after five silent minutes the next call carries a warning.

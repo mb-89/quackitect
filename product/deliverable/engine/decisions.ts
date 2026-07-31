@@ -196,12 +196,25 @@ export function parseUpdate(v: unknown): DecisionOp {
   // THE RENDER LINT (owner ruling 2026-07-27): the lane refuses what would
   // render weird — mechanically, at the boundary.
   const lintLine = (text: string, what: string): void => {
-    if (/[\r\n]/.test(text)) throw malformed(`${what} carries line breaks — one line only`);
-    if (text.length > 90) throw malformed(`${what} is ${text.length} chars — the feed renders 90; tighten it`);
-    if (text.split(/[,;]/).length >= 3) throw malformed(`${what} chains 3+ separator-joined parts — an unrendered list; use plan {items} or split`);
+    if (/[\r\n]/.test(text)) throw malformed(`${what} carries line breaks — one line only. Got ${JSON.stringify(text)}`);
+    if (text.length > 90) throw malformed(`${what} is ${text.length} chars — the feed renders 90; tighten it. Got ${JSON.stringify(text)}`);
+    // THE LANE'S MOST-HIT REFUSAL. Ten of thirteen update failures in one
+    // day were this one, across two sessions. It refused correctly and named
+    // neither the text nor the parts, so the caller guessed — and guessed
+    // wrong often enough to hit it again on the very next call.
+    //
+    // The parts ARE the remedy, so they are written out. A chain that wanted
+    // to be a list is handed back as that list.
+    const raw = text.split(/[,;]/);
+    if (raw.length >= 3) {
+      const parts = raw.map((p) => p.trim()).filter((p) => p !== "");
+      throw malformed(`${what} chains ${raw.length} separator-joined parts — an unrendered list. Got ${JSON.stringify(text)} — as a plan that is items: [${parts.map((p) => JSON.stringify(p)).join(", ")}]`);
+    }
   };
   if (brief !== undefined) lintLine(brief, "brief");
-  for (const it of items ?? []) lintLine(it, "item");
+  // WHICH item, not just "an item". A five-item plan refused on "item" left
+  // the caller re-reading all five to find the one that tripped.
+  (items ?? []).forEach((it, i) => lintLine(it, `item ${i + 1}`));
   return { op: op as DecisionOp["op"], ...(brief !== undefined ? { brief } : {}), ...(items !== undefined ? { items } : {}), ...(node !== undefined ? { node } : {}), ...(to !== undefined ? { to } : {}) };
 }
 
@@ -307,19 +320,41 @@ export class Decisions {
   }
 
   private readonly parked: { state: string; brief: string; hops?: number; trail?: string[] }[] = [];
+  /** Updates landed since anything last CLOSED. The checklist is a progress
+   *  view, so a run of narration over a checklist that never moves is the
+   *  thing worth saying out loud (owner 2026-07-29). Prose said this
+   *  already and prose lost, which is the case for a mechanical nudge.
+   *  High enough that ordinary narration passes untouched. */
+  private sinceResolve = 0;
+  private static readonly NUDGE_AFTER = 5;
 
   apply(visit: string, u: DecisionOp): Record<string, unknown> {
     this.materialize(visit);
     switch (u.op) {
       case "plan": {
         const parent = u.node === undefined ? null : this.openNode(u.node).id;
-        const added = (u.items ?? []).map((b) => this.add(visit, parent, b, "planned"));
+        // IDEMPOTENT. The update rides BEFORE the call's verdict (tools.ts),
+        // and every refusal's remedy says to repeat the call — so a
+        // refused-then-retried plan arrives again. An item already standing
+        // open under this parent in this visit IS that item, not a second one.
+        const standing = (b: string) =>
+          [...this.nodes.values()].some((n) => n.visit === visit && n.parent === parent && n.brief === b && n.status === "open");
+        const added = (u.items ?? []).filter((b) => !standing(b)).map((b) => this.add(visit, parent, b, "planned"));
         if (this.activeId === undefined) this.activeId = added[0]?.id;
         this.record({ op: "plan", visit, parent, nodes: added.map((n) => ({ id: n.id, brief: n.brief })) });
         break;
       }
       case "fork": {
         const parent = u.node !== undefined ? this.openNode(u.node).id : (this.activeId !== undefined && this.nodes.get(this.activeId)?.status === "open" ? this.activeId : null);
+        // Idempotent for the same reason a plan is — a retried call must not
+        // open the same branch twice; it re-enters the one already standing.
+        const standingFork = [...this.nodes.values()].find(
+          (n) => n.visit === visit && n.parent === parent && n.brief === u.brief && n.status === "open" && n.origin === "fork",
+        );
+        if (standingFork !== undefined) {
+          this.activeId = standingFork.id;
+          break;
+        }
         const fork = this.add(visit, parent, u.brief!, "fork");
         const added = (u.items ?? []).map((b) => this.add(visit, fork.id, b, "planned"));
         this.activeId = fork.id;
@@ -329,6 +364,15 @@ export class Decisions {
       case "done":
       case "obsolete":
       case "revert": {
+        // IDEMPOTENT, for the reason plan and fork already are: the update
+        // rides BEFORE the call's verdict, and every refusal's remedy says to
+        // repeat the call. So a call refused for some UNRELATED reason comes
+        // back with its resolution already applied, and the retry used to be
+        // refused for a second, more confusing reason. Re-resolving a node the
+        // SAME way is the state we were asked for; only a CONFLICTING
+        // re-resolution is a real disagreement worth refusing.
+        const already = this.nodes.get(u.node!);
+        if (already !== undefined && already.status === CLOSES[u.op]) break;
         const n = this.openNode(u.node!);
         if (u.op === "done") {
           const open = this.openChildren(n.id);
@@ -378,6 +422,26 @@ export class Decisions {
         break;
       }
       case "update": {
+        // AN UPDATE THAT MOVES NOTHING ON THE CHECKLIST IS NARRATION WEARING
+        // progress's clothes (owner, 2026-07-29, watching a board of thirteen
+        // yellow items collect a pile of checked leaves underneath).
+        //
+        // So when a checklist STANDS, an update says which item it is about.
+        // With none open there is nothing to attach to and a bare update is
+        // exactly right. This is only affordable because the open node map
+        // now rides home on every call - naming one costs a glance.
+        // SCOPED TO THIS VISIT. Another state's open checklist is not this
+        // state's business, and a walk that had moved on would be refused
+        // over items it can no longer reach.
+        if (u.node === undefined && [...this.nodes.values()].some((n) => n.visit === visit && n.status === "open")) {
+          throw new Rejection({
+            clause: CLAUSES.DECISION_NODE,
+            expected: `update {node, brief} - which item is this about? ${this.openBriefs()}`,
+            got: "an update naming no node, with a checklist standing open",
+            remedy: { tool: "(the same call)", args: { update: { op: "update", node: "<an open node id>", brief: "..." } }, note: "or resolve one instead - done | obsolete | revert. A fork opens a new branch where you are" },
+            source: "engine/decisions.ts update",
+          });
+        }
         if (u.node !== undefined) this.activeId = this.openNode(u.node).id;
         // EVERY update changes the RENDER (owner ruling 2026-07-27): the
         // brief lands as a checked point under the active node — the log
@@ -388,8 +452,22 @@ export class Decisions {
         break;
       }
     }
-    const open = [...this.nodes.values()].filter((n) => n.status === "open").length;
-    return { update: u.op, active: this.activeId ?? null, open };
+    if (u.op === "update") this.sinceResolve++;
+    else if (u.op === "done" || u.op === "obsolete" || u.op === "revert" || u.op === "defer") this.sinceResolve = 0;
+    // THE MAP RIDES EVERY UPDATE (note-792c32b5425e item 5). Resolving a
+    // node needs its id, and the id was only ever printed by a REFUSAL. So
+    // the way to see the checklist was to name a node that does not exist
+    // and read the rejection - done four times in e22 alone. The answer
+    // carries the map, so the next call can be right.
+    const openNodes = [...this.nodes.values()].filter((n) => n.status === "open").map((n) => ({ id: n.id, brief: n.brief }));
+    const open = openNodes.length;
+    // A NUDGE, never a refusal. Narration that outruns the checklist is bad
+    // rhythm, not a broken call, and refusing the work over its commentary
+    // is the mistake the update field already learned once.
+    const nudge = this.sinceResolve >= Decisions.NUDGE_AFTER && open > 0
+      ? `${this.sinceResolve} updates since anything closed, with ${open} still open — the checklist is a PROGRESS view. Close what is genuinely done on the NEXT call, not at the end.`
+      : undefined;
+    return { update: u.op, active: this.activeId ?? null, open, open_nodes: openNodes, ...(nudge !== undefined ? { nudge } : {}) };
   }
 
   /** One state visit's tree, insertion-ordered — the mirror renders this.
