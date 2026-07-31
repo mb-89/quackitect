@@ -13,6 +13,8 @@
 //   - geometry-true SVG, wheel-zoom, drag-pan; JSON as key/value tables
 // One source, two projections: the packet JSON shown here IS what the
 // agent receives.
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { bindings, loadCards } from "./cards.ts";
 import { loadCanvas, subLabel, type CanvasData, type CanvasElement } from "./canvas.ts";
 import { CallLog, type CallRecord } from "./calllog.ts";
@@ -411,23 +413,25 @@ export const SHUTDOWN_LEVELS = [
 // rather than a webview asset URI — no bundler and no build step.
 const ELEMENTS = '<script type="module" src="/vendor/vscode-elements.js"></script>';
 
+// THE PALETTE IS CONFIGURATION, NEVER CODE (owner ruling 2026-07-30). Every
+// colour the product chooses lives in palette.css at the project root, where
+// a person edits it without touching code. It is read on EVERY render, so an
+// edit shows on the next page load and the engine never restarts for a colour.
+//
+// The fallback is a safety net for a tree that lost the file, nothing more.
+// palette.css is the truth, and preflight says so when it is gone.
+const PALETTE_FALLBACK =
+  ":root{--se-bg:#14171a;--se-bg-side:#191d21;--se-raised:#22272c;--se-border:#2a2f34;--se-border-strong:#3a4147;--se-fg:#d8dde2;--se-muted:#7f8b96;--se-dim:#5b6772;--se-accent:#e8b339;--se-accent-bg:#3a2f14;--se-ok:#4a7a55;--se-ok-bg:#1d2b20;--se-warn:#e8b339;--se-walk:#4a90d9;--se-walk-bg:#1b2a3a}";
+
+export function palette(root: string): string {
+  try {
+    return readFileSync(join(root, "palette.css"), "utf8");
+  } catch {
+    return PALETTE_FALLBACK;
+  }
+}
+
 const STYLE = `
-  /* THE CHROME PALETTE — one place. A hosting webview (the VS Code
-     extension) overrides these from the editor theme; semantic colors
-     (green pass, red fail, yellow attention) are meaning, not chrome,
-     and stay fixed. */
-  :root { --se-bg:#14171a; --se-bg-side:#191d21; --se-raised:#22272c; --se-border:#2a2f34; --se-border-strong:#3a4147; --se-fg:#d8dde2; --se-muted:#7f8b96; --se-dim:#5b6772; }
-  /* THE MEANINGS. Named once here and overridden by a host that has its own
-     colour for the same meaning (see NATIVE). Standalone, these are ours.
-     THE ROUTE IS NOT AMONG THEM and stays a literal blue: it is the declared
-     exception, the one colour no host gets to reinterpret. A test pins it. */
-  :root { --se-accent:#e8b339; --se-accent-bg:#3a2f14; --se-ok:#4a7a55; --se-ok-bg:#1d2b20; --se-warn:#e8b339; }
-  /* THE WALK'S OWN COLOUR (owner ruling 2026-07-30). Where the walk stands
-     and where it has BEEN are blue, on the same map convention the route
-     line rests on. Having been somewhere is not a verdict, so it never
-     wears green. The fill mixes into the surface behind it and never into
-     transparent: a translucent fill over a dark pane reads as black. */
-  :root { --se-walk:#4a90d9; --se-walk-bg:#1b2a3a; --se-walk-soft:#161f28; }
   * { scrollbar-color: var(--se-border-strong) var(--se-bg); }
   ::-webkit-scrollbar { width: 10px; height: 10px; background: var(--se-bg); }
   ::-webkit-scrollbar-thumb { background: var(--se-border-strong); border-radius: 5px; }
@@ -461,10 +465,10 @@ const STYLE = `
   .no-host { display: none !important; }
   .crumbs { font-size: 13px; color: var(--se-muted); display: flex; align-items: center; gap: 4px; text-transform: none; letter-spacing: 0; }
   .crumbs a { color: var(--se-fg); text-decoration: none; }
-  .crumbs a:hover { color: #e8b339; }
-  .crumbs .here { color: #e8b339; }
+  .crumbs a:hover { color: var(--se-accent); }
+  .crumbs .here { color: var(--se-accent); }
   .crumb-arrow { position: relative; cursor: pointer; color: var(--se-muted); padding: 0 3px; }
-  .crumb-arrow:hover { color: #e8b339; }
+  .crumb-arrow:hover { color: var(--se-accent); }
   .crumb-menu { display: none; position: absolute; top: 18px; left: 0; z-index: 10; background: var(--se-raised); border: 1px solid var(--se-border-strong); border-radius: 8px; min-width: 160px; padding: 4px; }
   .crumb-arrow.open .crumb-menu { display: block; }
   .crumb-menu a { display: block; padding: 6px 10px; border-radius: 6px; }
@@ -473,7 +477,7 @@ const STYLE = `
   .widget-head { display: flex; align-items: center; justify-content: space-between; padding: 6px 12px; border-bottom: 1px solid var(--se-border); color: var(--se-muted); font-size: 12px; text-transform: uppercase; letter-spacing: .08em; }
   .widget-body { flex: 1; min-height: 0; overflow: auto; }
   .expand { background: none; border: 1px solid var(--se-border-strong); color: var(--se-muted); border-radius: 6px; cursor: pointer; font: inherit; padding: 2px 8px; }
-  .expand:hover { color: #e8b339; border-color: #e8b339; }
+  .expand:hover { color: var(--se-accent); border-color: var(--se-accent); }
   /* THE CARD MATRIX (owner design 2026-07-29). One BIG card beside a two-wide
      grid of the rest. It is ONE grid across the whole viewport, so promoting a
      card is a class change and nothing ever moves in the DOM — a moved widget
@@ -486,20 +490,21 @@ const STYLE = `
   /* The head reserves room so the number never lands on the title. */
   .card > .widget > .widget-head { padding-left: 34px; }
   .cardnum { position: absolute; top: 7px; left: 10px; z-index: 2; display: inline-flex; align-items: center; justify-content: center; width: 17px; height: 17px; border: 1px solid var(--se-border-strong); border-radius: 4px; font-size: 11px; color: var(--se-muted); cursor: pointer; }
-  .cardnum:hover { color: #e8b339; border-color: #e8b339; }
-  .card.main .cardnum { color: #e8b339; border-color: #e8b339; }
+  .cardnum:hover { color: var(--se-accent); border-color: var(--se-accent); }
+  .card.main .cardnum { color: var(--se-accent); border-color: var(--se-accent); }
   .legend-row { display: flex; gap: 10px; padding: 3px 12px; font-size: 12px; }
-  .legend-key { color: #e8b339; min-width: 92px; flex: none; }
+  .legend-key { color: var(--se-accent); min-width: 92px; flex: none; }
   .legend-what { color: var(--se-fg); }
   #w-machine { flex: 1; }
   #w-machine .widget-body { display: flex; }
   svg { width: 100%; height: 100%; cursor: grab; }
   svg.panning { cursor: grabbing; }
   .state { fill: var(--se-raised); stroke: var(--se-border-strong); stroke-width: 2; }
+  /* ONLY WHERE THE WALK STANDS IS COLOURED (owner ruling 2026-07-31). Where
+     it has BEEN keeps the ordinary state colour: two shades of one blue asked
+     the reader to compare hues, and the eye does not read that difference
+     reliably. There is no .state.done rule, on purpose. */
   .state.active { fill: var(--se-walk-bg); stroke: var(--se-walk); stroke-width: 3.5; }
-  /* Been there, not here: the same blue, quieter. The reader tells the two
-     apart by weight, never by hue. */
-  .state.done { fill: var(--se-walk-soft); stroke: var(--se-walk); stroke-width: 2; }
   .state.inner { fill: none; }
   .clickable { cursor: pointer; }
   .clickable:hover .state, .clickable:hover .comment { stroke: var(--se-fg); }
@@ -522,21 +527,21 @@ const STYLE = `
   .route-stop { fill: #4a90d9; stroke: #9ecbf2; stroke-width: 2; }
   .route-stop.shut { opacity: .28; }
   .route-here { fill: #4a90d9; stroke: #9ecbf2; stroke-width: 2; }
-  .guard { fill: #e8b339; font-size: 20px; text-anchor: middle; }
+  .guard { fill: var(--se-accent); font-size: 20px; text-anchor: middle; }
   .comment { fill: var(--se-bg-side); stroke: var(--se-border); }
   .group { fill: var(--se-bg-side); stroke: var(--se-border); stroke-dasharray: 10 6; stroke-width: 2; }
   .group-label { fill: var(--se-dim); font-size: 24px; font-family: inherit; letter-spacing: .06em; }
   .comment-text { color: var(--se-muted); font-size: 13px; line-height: 1.35; }
   .comment-detail { font-size: 15px; line-height: 1.55; color: var(--se-fg); padding: 2px 0 10px; }
-  .replink { color: #e8b339; cursor: pointer; text-decoration: underline dotted; }
+  .replink { color: var(--se-accent); cursor: pointer; text-decoration: underline dotted; }
   .bar { display: flex; gap: 10px; padding: 12px; }
-  button.primary { background: #e8b339; color: var(--se-bg); border: 0; border-radius: 8px; padding: 8px 14px; font: inherit; font-weight: 700; cursor: pointer; margin: 2px 4px 2px 0; }
+  button.primary { background: var(--se-accent); color: var(--se-bg); border: 0; border-radius: 8px; padding: 8px 14px; font: inherit; font-weight: 700; cursor: pointer; margin: 2px 4px 2px 0; }
   .panel { padding: 0 12px 12px; overflow: auto; }
   .meta { color: var(--se-muted); font-size: 12px; padding: 8px 12px; }
   .todo-origin { color: var(--se-muted); font-size: 11px; }
   table.kv { border-collapse: collapse; width: 100%; font-size: 12.5px; }
   table.kv td { border: 1px solid var(--se-border); padding: 2px 6px; line-height: 1.35; vertical-align: top; }
-  table.kv td.k { color: #e8b339; white-space: nowrap; width: 1%; }
+  table.kv td.k { color: var(--se-accent); white-space: nowrap; width: 1%; }
   table.kv td.v { color: var(--se-fg); word-break: break-word; }
   table.kv table.kv { margin: 2px 0; }
   .vnull { color: var(--se-muted); } .vnum { color: #7cc4e8; } .vbool { color: #c58fe8; } .vstr { color: #a8c88f; }
@@ -544,19 +549,19 @@ const STYLE = `
   td.btncell { text-align: center; vertical-align: middle !important; width: 1%; }
   button.go.locked { background: var(--se-border); color: var(--se-dim); cursor: not-allowed; }
   .cond circle { stroke-width: 2.5; }
-  .cond.unmet circle { fill: #3a2f14; stroke: #e8b339; }
-  .cond.met circle { fill: #1d2b20; stroke: #4a7a55; }
+  .cond.unmet circle { fill: var(--se-accent-bg); stroke: var(--se-accent); }
+  .cond.met circle { fill: var(--se-ok-bg); stroke: var(--se-ok); }
   .cond-label { font-size: 20px; text-anchor: middle; fill: var(--se-fg); pointer-events: none; }
   .doclist a { display: block; padding: 4px 0; }
   a.doclink { color: #7cc4e8; cursor: pointer; text-decoration: underline; }
   .docview { font-size: 13.5px; line-height: 1.55; }
-  .docview h1, .docview h2, .docview h3 { color: #e8b339; }
+  .docview h1, .docview h2, .docview h3 { color: var(--se-accent); }
   .docview code { background: var(--se-raised); padding: 1px 5px; border-radius: 4px; }
   .docview pre { background: var(--se-bg); border: 1px solid var(--se-border); border-radius: 8px; padding: 10px; overflow: auto; }
   .docview a { color: #7cc4e8; }
   button.ghost { background: var(--se-raised); color: var(--se-fg); border: 1px solid var(--se-border-strong); border-radius: 8px; padding: 6px 12px; font: inherit; cursor: pointer; }
   #w-details { flex: 1; border-radius: 0; border: 0; }
-  .docheck { accent-color: #e8b339; cursor: pointer; }
+  .docheck { accent-color: var(--se-accent); cursor: pointer; }
   .docline { display: flex; align-items: center; gap: 6px; padding: 3px 0; }
   .collbody { padding: 4px 10px 8px; }
   .fval { min-width: 0; overflow-wrap: anywhere; line-height: 1.35; }
@@ -573,14 +578,14 @@ const STYLE = `
   vscode-icon.ok { color: var(--vscode-testing-iconPassed, #4a7a55); }
   vscode-icon.no { color: var(--se-muted); }
   .threshold { display: flex; align-items: center; gap: 8px; color: var(--se-muted); font-size: 12px; text-transform: none; letter-spacing: 0; }
-  .threshold input { accent-color: #e8b339; width: 140px; }
-  #thr-val { color: #e8b339; min-width: 4ch; }
+  .threshold input { accent-color: var(--se-accent); width: 140px; }
+  #thr-val { color: var(--se-accent); min-width: 4ch; }
   .thr-help { cursor: pointer; }
-  .thr-help:hover { color: #e8b339; }
+  .thr-help:hover { color: var(--se-accent); }
   .thr-track { display: inline-flex; flex-direction: column; align-items: stretch; }
   .thr-notches { position: relative; height: 11px; margin-top: -3px; }
   .thr-notch { position: absolute; transform: translateX(-50%); font-size: 9px; line-height: 1; color: var(--se-muted); cursor: pointer; padding: 1px 3px; }
-  .thr-notch:hover { color: #e8b339; }
+  .thr-notch:hover { color: var(--se-accent); }
   /* The log used to be the top 42% of a shared column, borderless so it read
      as one surface with the terminal below it. As a card of its own it takes
      the whole card and wears the normal widget border. */
@@ -599,7 +604,7 @@ const STYLE = `
   .logrow .lkind.k-aq { font-weight: 700; color: ${FEED_COLOURS["kind-aq"]}; }
   .aq-q { font-weight: 700; color: ${FEED_COLOURS["kind-aq"]}; padding: 6px 0; white-space: pre-wrap; }
   #loadbar { position: fixed; top: 0; left: 0; right: 0; height: 3px; background: var(--se-raised); z-index: 99; }
-  #loadbar .fill { height: 100%; width: 30%; background: #e8b339; animation: loadslide 1s linear infinite; }
+  #loadbar .fill { height: 100%; width: 30%; background: var(--se-accent); animation: loadslide 1s linear infinite; }
   @keyframes loadslide { 0% { margin-left: -30%; } 100% { margin-left: 100%; } }
   /* A BAR THAT MEASURES SOMETHING (owner ruling, 2026-07-30). Work that can
      count its steps says so, and the fill shows how far it has got. The
@@ -608,11 +613,11 @@ const STYLE = `
   /* THE PING — the agent's pointing finger (owner, 2026-07-30): v2's pulse,
      made yellow. A card blinks its outline; an SVG node blinks its opacity.
      It PULSES ON, and stays lit while the guide talks about it. */
-  .se-ping { outline: 3px solid #e8b339; outline-offset: 2px; animation: se-ping-blink 1.6s ease-in-out infinite; }
+  .se-ping { outline: 3px solid var(--se-accent); outline-offset: 2px; animation: se-ping-blink 1.6s ease-in-out infinite; }
   .se-ping-svg { animation: se-ping-fade 1.6s ease-in-out infinite; }
   @keyframes se-ping-blink { 50% { outline-color: transparent; } }
   @keyframes se-ping-fade { 50% { opacity: .25; } }
-  #loadbar .lmsg { position: fixed; top: 8px; right: 12px; color: #e8b339; font-size: 12px; }
+  #loadbar .lmsg { position: fixed; top: 8px; right: 12px; color: var(--se-accent); font-size: 12px; }
   /* A load that never answered is a FAILURE, and the voice paints those red. */
   #loadbar.stalled { cursor: pointer; }
   #loadbar.stalled .fill { background: #e86a5f; animation: none; width: 100%; }
@@ -624,25 +629,25 @@ const STYLE = `
   .dnode { cursor: pointer; padding: 2px 0; font-size: 13px; }
   .dnode:hover { background: var(--se-raised); }
   .dnode.s-done { color: #4a7a55; }
-  .dnode.s-open { color: #e8b339; }
+  .dnode.s-open { color: var(--se-accent); }
   .dnode.s-obsolete { color: var(--se-dim); text-decoration: line-through; }
   .dnode.s-reverted { color: #e86a5f; text-decoration: line-through; }
   /* DEFERRED IS NOT KILLED. It is still owed, so it keeps the open colour;
      it is owed SOMEWHERE ELSE, so it leans. Never struck through - the
      strike is what says a point died, and this one did not. */
-  .dnode.s-deferred { color: #e8b339; font-style: italic; text-decoration: none; }
+  .dnode.s-deferred { color: var(--se-accent); font-style: italic; text-decoration: none; }
   .dnode.dactive { font-weight: 700; }
   .dnode.dsel { background: var(--se-raised); }
   .dinfo { margin-top: 10px; border-top: 1px solid var(--se-border); padding-top: 8px; }
   .formfield { width: 100%; min-height: 70px; background: var(--se-bg); border: 1px solid var(--se-border); border-radius: 6px; color: var(--se-fg); font: inherit; font-size: 12.5px; padding: 6px; box-sizing: border-box; margin-top: 4px; }
-  .prefill { border: 1px dashed #e8b339; border-radius: 6px; padding: 6px 8px; margin: 4px 0; }
+  .prefill { border: 1px dashed var(--se-accent); border-radius: 6px; padding: 6px 8px; margin: 4px 0; }
   .prefill button { margin-top: 4px; }
   #modal { display: none; position: fixed; inset: 0; background: rgba(20,23,26,.8); z-index: 50; align-items: center; justify-content: center; }
   .modal-box { width: min(760px, 92vw); max-height: 86vh; display: flex; flex-direction: column; background: var(--se-bg-side); border: 1px solid var(--se-border-strong); border-radius: 12px; }
   .modal-body { padding: 12px 16px; overflow: auto; font-size: 13px; }
   a.toollink { color: #7cc4e8; text-decoration: underline; cursor: pointer; margin-right: 10px; }
   #toast { position: fixed; left: 14px; bottom: 14px; background: var(--se-raised); border: 1px solid var(--se-border-strong); border-radius: 8px; padding: 8px 14px; color: var(--se-fg); font-size: 12.5px; z-index: 90; display: none; }
-  #link-lost { position: fixed; left: 0; right: 0; top: 0; z-index: 99; background: #4a3a14; color: #e8b339; text-align: center; padding: 7px; font-size: 13px; letter-spacing: .04em; }
+  #link-lost { position: fixed; left: 0; right: 0; top: 0; z-index: 99; background: #4a3a14; color: var(--se-accent); text-align: center; padding: 7px; font-size: 13px; letter-spacing: .04em; }
   #over { position: fixed; inset: 0; background: rgba(20,23,26,.94); z-index: 100; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; }
   #over .over-box { color: #e8332a; font-size: 62px; font-weight: 800; letter-spacing: .12em; border: 6px solid #e8332a; border-radius: 18px; padding: 26px 52px; }
   #over .over-sub { color: #e86a5f; font-size: 15px; }
@@ -1253,7 +1258,7 @@ document.addEventListener("click", async (ev) => {
 function condRows(id, dict, standing) {
   return Object.entries(dict).map(([key, c]) => {
     let row = '<div style="padding:6px 0 2px"><a class="doclink" data-path="' + c.note + '">' + key + "</a> ";
-    row += c.met ? '<span style="color:#4a7a55">✓ met</span>' : '<span style="color:#e8b339">! unmet</span>';
+    row += c.met ? '<span style="color:var(--se-ok)">✓ met</span>' : '<span style="color:var(--se-accent)">! unmet</span>';
     row += "</div>";
     if (key === "script") {
       if (c.args.length > 0) row += jsonTable(c.args);
@@ -1267,7 +1272,7 @@ function condRows(id, dict, standing) {
       else if (sc.ran && sc.ok) btn = '<button class="primary go locked" disabled title="exit 0 — the condition is met">✓ ran</button>';
       else btn = '<button class="primary runpre" data-state="' + id + '">' + (sc.ran ? "re-run" : "run") + "</button>";
       row += '<div style="padding:6px 0">' + btn + "</div>";
-      if (sc.running) row += '<div style="color:#e8b339">running — the page follows; the result lands here</div>';
+      if (sc.running) row += '<div style="color:var(--se-accent)">running — the page follows; the result lands here</div>';
       else if (sc.ran) row += '<div style="color:' + (sc.ok ? "#4a7a55" : "#e86a5f") + ';white-space:pre-wrap;font-size:12px">' + sc.output.replace(/&/g,"&amp;").replace(/</g,"&lt;") + "</div>";
       else row += '<div style="color:var(--se-muted)">not run yet</div>';
     } else if (key === "evidence_form") {
@@ -1315,9 +1320,9 @@ async function showForm(name) {
   // The GRAPH-IS-EVIDENCE gate, visible to the human: the page cannot
   // pass over open decision points — they surface under problems below.
   html += '<div class="meta">gate: every open decision point of this record must be resolved (done · obsolete · revert · defer) before this page passes</div>';
-  html += '<div class="meta">' + escText(f.instance) + (ro ? " · template preview — filling happens inside an expedition" : " · status: " + escText(f.status) + (f.met ? ' · <span style="color:#4a7a55">✓ passes</span>' : "")) + "</div>";
+  html += '<div class="meta">' + escText(f.instance) + (ro ? " · template preview — filling happens inside an expedition" : " · status: " + escText(f.status) + (f.met ? ' · <span style="color:var(--se-ok)">✓ passes</span>' : "")) + "</div>";
   (f.fields || []).forEach((fl) => {
-    html += '<div style="padding:8px 0 2px"><b>' + escText(fl.name) + "</b>" + (fl.required ? ' <span style="color:#e8b339">required</span>' : "") + "</div>";
+    html += '<div style="padding:8px 0 2px"><b>' + escText(fl.name) + "</b>" + (fl.required ? ' <span style="color:var(--se-accent)">required</span>' : "") + "</div>";
     html += '<div class="comment-text">' + escText(fl.description) + "</div>";
     if (ro) return;
     (fl.prefills || []).forEach((p, i) => {
@@ -1328,7 +1333,7 @@ async function showForm(name) {
   if (!ro) {
     html += '<div class="meta" style="padding:6px 0 2px">files — <a class="doclink openfolder" data-form="' + name + '">open ' + escText(f.evidence_dir) + "</a></div>";
     (f.files || []).forEach((fi) => { html += "<div>" + (fi.present ? "✓ " : '<span style="color:#e86a5f">✗ </span>') + escText(fi.name) + "</div>"; });
-    if (f.problems && f.problems.length) html += '<div style="color:#e8b339;padding:6px 0">' + f.problems.map(escText).join("<br>") + "</div>";
+    if (f.problems && f.problems.length) html += '<div style="color:var(--se-accent);padding:6px 0">' + f.problems.map(escText).join("<br>") + "</div>";
     html += '<div style="padding:10px 0"><button class="primary saveform" data-form="' + name + '">save</button> <button class="primary doneform" data-form="' + name + '" title="sets status done and runs the lint">done</button></div>';
   }
   openModal("form · " + name, html);
@@ -2233,7 +2238,7 @@ const NATIVE = `
      --vscode-* variable exists; --se-bg carries the forwarded editor
      background, so it is what a translucent fill has to blend with. */
   body.embed { --se-accent: var(--vscode-button-background); --se-accent-bg: color-mix(in srgb, var(--vscode-button-background) 22%, var(--se-bg)); --se-ok: var(--vscode-testing-iconPassed); --se-ok-bg: color-mix(in srgb, var(--vscode-testing-iconPassed) 20%, var(--se-bg)); --se-warn: var(--vscode-editorWarning-foreground); }
-  body.embed { --se-walk: var(--vscode-charts-blue, #4a90d9); --se-walk-bg: color-mix(in srgb, var(--se-walk) 30%, var(--se-bg)); --se-walk-soft: color-mix(in srgb, var(--se-walk) 14%, var(--se-bg)); }
+  body.embed { --se-walk: var(--vscode-charts-blue, #4a90d9); --se-walk-bg: color-mix(in srgb, var(--se-walk) 30%, var(--se-bg)); }
   * { border-radius: 0 !important; }
   .label, .sublabel, .group-label, .cond-label, pre, code, table.kv, .logrow, .legend-key { font-family: var(--vscode-editor-font-family, ui-monospace, Consolas, monospace); }
   body.solo .widget { border: 0; }
@@ -2442,24 +2447,26 @@ export function renderMirror(m: MirrorState, widget?: "machine" | "details" | "l
   // or drop MID-SESSION, and a card that vanishes renumbers every card after
   // it — under the reader's hand, while they are using the numbers.
   const terminalWidget = termWidget(true);
+  // Read per render, so editing palette.css needs no restart.
+  const pal = palette(m.root);
 
   if (widget === "terminal") {
-    return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>se · terminal</title><style>${STYLE} #w-terminal{flex:1;height:auto;border-bottom:0}${skin}</style>${ELEMENTS}</head>
+    return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>se · terminal</title><style>${pal}${STYLE} #w-terminal{flex:1;height:auto;border-bottom:0}${skin}</style>${ELEMENTS}</head>
 <body${bodyClass}><div class="cols"><aside id="left" style="width:100vw;max-width:100vw">${termWidget(true)}</aside></div>${MODAL}${data}<script>${SCRIPT}</script></body></html>`;
   }
   if (widget === "log") {
     // The widget asks for flex:1, so its parent has to BE a column with a
     // height — without that the panel collapses and the page reads as blank.
-    return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>se · log</title><style>${STYLE} #w-log{flex:1;border-bottom:0;min-height:0} body.solo #sidebar{display:flex;flex-direction:column;height:100vh} #log-rows{flex:1;min-height:0}${skin}</style>${ELEMENTS}</head>
+    return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>se · log</title><style>${pal}${STYLE} #w-log{flex:1;border-bottom:0;min-height:0} body.solo #sidebar{display:flex;flex-direction:column;height:100vh} #log-rows{flex:1;min-height:0}${skin}</style>${ELEMENTS}</head>
 <body${bodyClass}><div class="cols"><aside id="sidebar" style="width:100vw;max-width:100vw">${logWidget}</aside></div>${MODAL}${data}<script>${SCRIPT}</script></body></html>`;
   }
 
   if (widget === "machine") {
-    return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>se · machine</title><style>${STYLE} main{padding:10px}${skin}</style>${ELEMENTS}</head>
+    return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>se · machine</title><style>${pal}${STYLE} main{padding:10px}${skin}</style>${ELEMENTS}</head>
 <body${bodyClass}><div class="cols"><main>${machineWidget}</main></div>${MODAL}${data}<script>${SCRIPT}</script></body></html>`;
   }
   if (widget === "details") {
-    return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>se · details</title><style>${STYLE}${skin}</style>${ELEMENTS}</head>
+    return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>se · details</title><style>${pal}${STYLE}${skin}</style>${ELEMENTS}</head>
 <body${bodyClass}><div class="cols"><aside id="sidebar" style="width:100vw;max-width:100vw">${detailsWidget}</aside></div>${MODAL}${data}<script>${SCRIPT}</script></body></html>`;
   }
   // THE CARD MATRIX (owner design 2026-07-29). The card list and its ORDER are
@@ -2507,7 +2514,7 @@ export function renderMirror(m: MirrorState, widget?: "machine" | "details" | "l
   const nowAt = Math.max(0, cardList.findIndex((c) => c.id === now));
   const legendHtml = `<div class="card" id="card-legend" style="${cellAt(nowAt)}"><div class="widget" id="w-legend"><div class="widget-head"><span>keys</span></div><div class="widget-body">${legendRows}</div></div></div>`;
   const cardData = `<script type="application/json" id="se-cards">${JSON.stringify({ list: cardList.map((c) => ({ n: c.n, id: c.id, title: c.title })), now })}</script>`;
-  return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>se mirror</title><style>${STYLE}${skin}</style>${ELEMENTS}</head>
+  return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>se mirror</title><style>${pal}${STYLE}${skin}</style>${ELEMENTS}</head>
 <body${bodyClass}>
 <div class="cards" data-keep-style style="grid-template-rows:repeat(${rows},1fr)">
   ${cardsHtml}
