@@ -10,6 +10,12 @@ machine directs — advance state by state until you reach idle or a refusal
 stops you. How walking works: product/guidance/walking.md — it is pulled
 into every state's packet.
 
+You do not have to walk a known way one hop at a time. `se_tick {route: X}`
+draws the way to X without moving, and `se_tick {to: X, sweep: true}` walks
+it in one call — every hop still weighs the slider and proves its reads.
+And send your `se_file_read` calls for a state's documents in ONE message:
+the reads do not collapse, but the waiting does.
+
 Do this AT THE START OF EVERY SESSION, unasked. Whatever the user's first
 message says — even if it says nothing about the machine — your first tool
 call is `se_tick`. Walk as far as the autonomy allows, then report in ONE
