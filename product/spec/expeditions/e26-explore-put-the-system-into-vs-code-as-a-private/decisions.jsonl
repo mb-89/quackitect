@@ -519,3 +519,10 @@
 {"ts":"2026-07-31T17:37:31.128Z","op":"update","visit":"expeditions/e26@0","node":"d114","brief":"running the condensed graph"}
 {"ts":"2026-07-31T17:38:10.792Z","op":"done","visit":"expeditions/e26@0","node":"d111","brief":"condensed, and the dot carries the verdict"}
 {"ts":"2026-07-31T17:38:29.895Z","op":"plan","visit":"expeditions/e26@0","parent":null,"nodes":[{"id":"d115","brief":"land the graph condensing"}]}
+{"ts":"2026-07-31T17:38:37.201Z","op":"done","visit":"expeditions/e26@0","node":"d115","brief":"landed"}
+{"ts":"2026-07-31T17:43:35.409Z","op":"plan","visit":"expeditions/e26@0","parent":null,"nodes":[{"id":"d116","brief":"build a render check for mermaid"},{"id":"d117","brief":"look at the result in a browser"},{"id":"d118","brief":"write the learning note"}]}
+{"ts":"2026-07-31T17:43:50.358Z","op":"done","visit":"expeditions/e26@0","node":"d116","brief":"check page written"}
+{"ts":"2026-07-31T17:45:06.324Z","op":"done","visit":"expeditions/e26@0","node":"d118","brief":"the mermaid verdict is captured"}
+{"ts":"2026-07-31T17:45:26.659Z","op":"done","visit":"expeditions/e26@0","node":"d117","brief":"the browser lane is not connected here"}
+{"ts":"2026-07-31T17:50:40.346Z","op":"plan","visit":"expeditions/e26@0","parent":null,"nodes":[{"id":"d119","brief":"keep the unproven checker off trunk"},{"id":"d120","brief":"confirm trunk carries the sidebar change"}]}
+{"ts":"2026-07-31T17:50:48.061Z","op":"update","visit":"expeditions/e26@0","node":"d121","brief":"staging only the decision trail"}
