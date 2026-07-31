@@ -80,6 +80,20 @@ if (existsSync(shell)) {
     failures.push(`the VS Code shell does not parse: ${line ?? "run node --check on it"}`);
   }
 }
+// THE PRODUCT'S CONFIGURATION. Both are read live, and both fall back
+// SILENTLY on purpose — a missing brand.json must never leak the name of
+// whichever product the source last belonged to, and a missing palette.css
+// must not take every surface down over a colour.
+//
+// Silent is right at render time and wrong at boot. A product running under
+// the fallback name in fallback colours is a broken install, not a choice,
+// and preflight is where that gets said out loud.
+if (!existsSync(join(root, "product", "brand.json"))) {
+  failures.push("product/brand.json is missing — the product would run unnamed, under the lane's own fallback");
+}
+if (!existsSync(join(root, "product", "palette.css"))) {
+  failures.push("product/palette.css is missing — every surface would render from the baked fallback palette");
+}
 try {
   mkdirSync(seDir(root), { recursive: true });
   accessSync(dirname(join(seDir(root), "calls.jsonl")), constants.W_OK);
