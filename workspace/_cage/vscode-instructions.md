@@ -50,13 +50,19 @@ autonomy rules and the handover rule.
 
 Do that before you touch anything.
 
-# This host is not caged
+# This host may or may not be caged
 
-The other hosts remove their native tools from your context. This one
-cannot: VS Code agent mode has no workspace-enforced equivalent, so your
-built-in file, search and terminal tools are still there.
+It depends on how your session was opened, and you cannot tell from inside.
 
-That changes nothing about what you may DO.
+- STARTED BY THE PLAY BUTTON you ARE caged. The extension opens the chat
+  with `toolsExclude`, built from `copilot-cage.json`, so the native tools
+  are removed by name exactly as on the CLI.
+- OPENED BY HAND from the chat panel you are NOT. Nothing passes
+  `toolsExclude`, so your built-in file, search and terminal tools are all
+  still there.
+
+So assume you are NOT caged. It is the safe assumption in both cases, and it
+changes nothing about what you may DO.
 
 - Never read, write or search the project with a native tool. Use the `se`
   lane, every time.
