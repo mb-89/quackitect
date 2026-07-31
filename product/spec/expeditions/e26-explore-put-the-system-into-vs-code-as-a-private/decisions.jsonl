@@ -552,3 +552,17 @@
 {"ts":"2026-07-31T18:11:52.484Z","op":"done","visit":"expeditions/e26@0","node":"d11","brief":"Packet, guidance and tool description all hand the list over"}
 {"ts":"2026-07-31T18:11:56.664Z","op":"update","visit":"expeditions/e26@0","node":"d18","brief":"Full suite before landing"}
 {"ts":"2026-07-31T18:12:53.324Z","op":"update","visit":"expeditions/e26@0","node":"d19","brief":"Voice lint over the edited guidance"}
+{"ts":"2026-07-31T18:13:41.657Z","op":"update","visit":"expeditions/e26@0","node":"d20","brief":"Landing the read handover onto trunk"}
+{"ts":"2026-07-31T18:14:13.405Z","op":"done","visit":"expeditions/e26@0","node":"d13","brief":"Landed on v3; main checkout carries both fixes"}
+{"ts":"2026-07-31T18:30:29.503Z","op":"plan","visit":"expeditions/e26@0","parent":null,"nodes":[{"id":"d9","brief":"Raise the MCP output limit in the Claude settings"},{"id":"d10","brief":"Make sure the raised limit reaches every launch path"},{"id":"d11","brief":"Send the kickoff to Claude from the start button"},{"id":"d12","brief":"Correct the wrong comment about Claude commands"},{"id":"d13","brief":"Sweep for small mechanical leftovers and fix them"}]}
+{"ts":"2026-07-31T18:31:36.121Z","op":"update","visit":"expeditions/e26@0","node":"d14","brief":"env block added and the Claude launch rewired to carry the kickoff"}
+{"ts":"2026-07-31T18:32:09.513Z","op":"fork","visit":"expeditions/e26@0","parent":"d9","node":"d15","brief":"the cage file is missing from the worktree, so the edit has no home","nodes":[]}
+{"ts":"2026-07-31T18:32:35.126Z","op":"done","visit":"expeditions/e26@0","node":"d15","brief":"the real source is _cage/claude-settings.json, and it is tracked"}
+{"ts":"2026-07-31T18:32:56.307Z","op":"update","visit":"expeditions/e26@0","node":"d16","brief":"cage source raised to 100k and the Claude launch now carries the kickoff"}
+{"ts":"2026-07-31T18:33:09.484Z","op":"done","visit":"expeditions/e26@0","node":"d9","brief":"MAX_MCP_OUTPUT_TOKENS raised to 100000 in the cage source"}
+{"ts":"2026-07-31T18:33:40.414Z","op":"done","visit":"expeditions/e26@0","node":"d10","brief":"one source feeds all three launch paths, so nothing else needs the value"}
+{"ts":"2026-07-31T18:34:03.044Z","op":"done","visit":"expeditions/e26@0","node":"d12","brief":"the manifest-reasoning comment is replaced with what is true"}
+{"ts":"2026-07-31T18:34:20.934Z","op":"update","visit":"expeditions/e26@0","node":"d17","brief":"amending e26's goal so the bundle matches what it holds"}
+{"ts":"2026-07-31T18:35:05.479Z","op":"done","visit":"expeditions/e26@0","node":"d11","brief":"the start button now hands Claude its kickoff through the editor door"}
+{"ts":"2026-07-31T18:35:19.924Z","op":"update","visit":"expeditions/e26@0","node":"d18","brief":"running the engine checks over the day's edits"}
+{"ts":"2026-07-31T18:36:26.535Z","op":"done","visit":"expeditions/e26@0","node":"d13","brief":"goal amended, and the verification gap is captured"}

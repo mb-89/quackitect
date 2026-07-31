@@ -1220,26 +1220,38 @@ async function openCopilotInChat(kickoff, cage) {
   }
 }
 
-// Claude Code's own id for its side-bar view. It takes no arguments.
+// Claude Code's own command ids. The side-bar one takes no arguments. The
+// editor one takes (sessionId, prompt, viewColumn), and is the only door the
+// kickoff fits through.
 const CLAUDE_SIDEBAR_COMMAND = "claude-vscode.sidebar.open";
+const CLAUDE_EDITOR_COMMAND = "claude-vscode.editor.open";
 
 /**
- * Start Claude in the SIDE BAR rather than a terminal.
+ * Start Claude in the SIDE BAR rather than a terminal, kickoff included.
  *
- * No Claude Code command carries a prompt. Its manifest contributes none that
- * take one, and its URI handler serves plugin installs only. So the kickoff
- * cannot ride in, and it does not need to: workspace/AGENTS.md makes ticking
- * the agent's first act unasked, so a launch with no prompt boots the same.
+ * The session is STARTED through the editor door, because that is the command
+ * carrying a prompt, and then moved left. Opening the side bar first leaves
+ * nothing to pass the kickoff to.
+ *
+ * A VS Code manifest never declares command arguments. This function used to
+ * claim no Claude command took a prompt, reasoning from the manifest, and the
+ * kickoff was pasted by hand every launch.
  */
-async function openClaudeInSideBar() {
+async function openClaudeInSideBar(kickoff) {
   const all = await vscode.commands.getCommands(true);
   if (!all.includes(CLAUDE_SIDEBAR_COMMAND)) {
     trace(CLAUDE_SIDEBAR_COMMAND + " is not registered — the Claude Code extension is absent or inactive");
     return false;
   }
   try {
+    if (all.includes(CLAUDE_EDITOR_COMMAND)) {
+      await vscode.commands.executeCommand(CLAUDE_EDITOR_COMMAND, undefined, kickoff);
+      await vscode.commands.executeCommand(CLAUDE_SIDEBAR_COMMAND);
+      trace("claude started with the kickoff, then moved to the side bar");
+      return true;
+    }
     await vscode.commands.executeCommand(CLAUDE_SIDEBAR_COMMAND);
-    trace("claude opened in the side bar; no kickoff is sent, AGENTS.md carries the opening");
+    trace("claude opened in the side bar with no kickoff — " + CLAUDE_EDITOR_COMMAND + " is absent");
     return true;
   } catch (err) {
     trace(CLAUDE_SIDEBAR_COMMAND + " failed: " + String(err));
@@ -1298,7 +1310,7 @@ async function startAgent() {
         progress.report({ message: "Opening terminals and launching agent..." });
         if (command.host === "claude") {
           progress.report({ message: "Opening Claude in the side bar..." });
-          if (await openClaudeInSideBar()) {
+          if (await openClaudeInSideBar(command.kickoff)) {
             agentTerm = null;
             await showLog(false);
             return true;
