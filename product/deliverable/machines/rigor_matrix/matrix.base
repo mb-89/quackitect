@@ -25,7 +25,42 @@ properties:
     displayName: Column
   applies:
     displayName: Applies
+  patch:
+    displayName: Patch
+  minor:
+    displayName: Minor
+  major:
+    displayName: Major
+  product:
+    displayName: Product
+  specification:
+    displayName: Specification
+  patch_note:
+    displayName: Patch note
+  minor_note:
+    displayName: Minor note
+  major_note:
+    displayName: Major note
+  product_note:
+    displayName: Product note
+  specification_note:
+    displayName: Specification note
 views:
+  - type: table
+    name: TRIAL - cells as frontmatter
+    filters:
+      and:
+        - kind == "matrix-row"
+        - patch
+    order:
+      - file.name
+      - patch
+      - minor
+      - major
+      - product
+      - specification
+      - patch_note
+      - minor_note
   - type: table
     name: The matrix
     filters:

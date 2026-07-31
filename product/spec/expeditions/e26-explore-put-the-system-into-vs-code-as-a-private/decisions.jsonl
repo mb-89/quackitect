@@ -426,3 +426,12 @@
 {"ts":"2026-07-31T16:17:00.423Z","op":"done","visit":"expeditions/e26@0","node":"d19","brief":"cell is how-hard at when, reusing MoSCoW"}
 {"ts":"2026-07-31T16:17:06.045Z","op":"update","visit":"expeditions/e26@0","node":"d37","brief":"matrix lints clean"}
 {"ts":"2026-07-31T16:17:10.122Z","op":"done","visit":"expeditions/e26@0","node":"d24","brief":"rigor matrix stays as it is, and the README says why"}
+{"ts":"2026-07-31T16:17:50.099Z","op":"plan","visit":"expeditions/e26@0","parent":null,"nodes":[{"id":"d38","brief":"measure the real rigor cell files"},{"id":"d39","brief":"check whether Bases renders nested YAML"},{"id":"d40","brief":"research mechanical prose checkers in TypeScript"}]}
+{"ts":"2026-07-31T16:17:59.284Z","op":"update","visit":"expeditions/e26@0","node":"d41","brief":"reading the largest and smallest cells"}
+{"ts":"2026-07-31T16:19:22.891Z","op":"done","visit":"expeditions/e26@0","node":"d38","brief":"the data backs the owner: three of four keys are echo"}
+{"ts":"2026-07-31T16:22:07.089Z","op":"plan","visit":"expeditions/e26@0","parent":null,"nodes":[{"id":"d42","brief":"convert write-requirements to one file per row"},{"id":"d43","brief":"keep the old files until the owner checks Bases"}]}
+{"ts":"2026-07-31T16:22:16.943Z","op":"update","visit":"expeditions/e26@0","node":"d44","brief":"reading the row and its five cells"}
+{"ts":"2026-07-31T16:22:55.182Z","op":"update","visit":"expeditions/e26@0","node":"d45","brief":"row carries its five cells as frontmatter"}
+{"ts":"2026-07-31T16:23:14.478Z","op":"done","visit":"expeditions/e26@0","node":"d42","brief":"trial view added to the base"}
+{"ts":"2026-07-31T16:23:18.221Z","op":"done","visit":"expeditions/e26@0","node":"d43","brief":"old cell files untouched, nothing lost"}
+{"ts":"2026-07-31T16:24:06.095Z","op":"done","visit":"expeditions/e26@0","node":"d39","brief":"nested lists already survive; scalars are the real need"}
