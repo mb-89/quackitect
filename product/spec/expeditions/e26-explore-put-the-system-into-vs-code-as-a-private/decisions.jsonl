@@ -358,3 +358,15 @@
 {"ts":"2026-07-31T08:55:52.463Z","op":"done","visit":"expeditions/e26@0","node":"d221","brief":"route, sweep and target documented where agents read"}
 {"ts":"2026-07-31T08:55:56.358Z","op":"update","visit":"expeditions/e26@0","node":"d226","brief":"running the suite after the guidance change"}
 {"ts":"2026-07-31T08:56:44.061Z","op":"update","visit":"expeditions/e26@0","node":"d227","brief":"committing the walk documentation"}
+{"ts":"2026-07-31T08:56:48.577Z","op":"update","visit":"expeditions/e26@0","node":"d228","brief":"landing the walk documentation"}
+{"ts":"2026-07-31T08:57:01.897Z","op":"update","visit":"expeditions/e26@0","node":"d229","brief":"handover carries the lane-friction batch"}
+{"ts":"2026-07-31T08:57:06.998Z","op":"update","visit":"expeditions/e26@0","node":"d230","brief":"counting what waits to be pushed"}
+{"ts":"2026-07-31T09:01:06.938Z","op":"plan","visit":"expeditions/e26@0","parent":null,"nodes":[{"id":"d231","brief":"Let se_file_read take many paths"},{"id":"d232","brief":"Report a bad path without losing the good ones"},{"id":"d233","brief":"Fence it with tests"}]}
+{"ts":"2026-07-31T09:01:48.560Z","op":"done","visit":"expeditions/e26@0","node":"d231","brief":"se_file_read takes a set of paths in one envelope"}
+{"ts":"2026-07-31T09:02:10.688Z","op":"done","visit":"expeditions/e26@0","node":"d232","brief":"a refused entry rides beside the good reads"}
+{"ts":"2026-07-31T09:02:15.087Z","op":"update","visit":"expeditions/e26@0","node":"d234","brief":"running the multi-read tests"}
+{"ts":"2026-07-31T09:02:22.571Z","op":"done","visit":"expeditions/e26@0","node":"d233","brief":"four multi-read tests green"}
+{"ts":"2026-07-31T09:03:10.100Z","op":"update","visit":"expeditions/e26@0","node":"d235","brief":"reading the dispatch guard test"}
+{"ts":"2026-07-31T09:03:20.392Z","op":"update","visit":"expeditions/e26@0","node":"d236","brief":"repointing the dispatch test and covering the either-or refusal"}
+{"ts":"2026-07-31T09:03:27.358Z","op":"update","visit":"expeditions/e26@0","node":"d237","brief":"re-running the suite after the dispatch test fix"}
+{"ts":"2026-07-31T09:04:16.108Z","op":"update","visit":"expeditions/e26@0","node":"d238","brief":"committing the set read"}
