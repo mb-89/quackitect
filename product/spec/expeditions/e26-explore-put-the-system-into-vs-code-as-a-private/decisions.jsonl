@@ -370,3 +370,9 @@
 {"ts":"2026-07-31T09:03:20.392Z","op":"update","visit":"expeditions/e26@0","node":"d236","brief":"repointing the dispatch test and covering the either-or refusal"}
 {"ts":"2026-07-31T09:03:27.358Z","op":"update","visit":"expeditions/e26@0","node":"d237","brief":"re-running the suite after the dispatch test fix"}
 {"ts":"2026-07-31T09:04:16.108Z","op":"update","visit":"expeditions/e26@0","node":"d238","brief":"committing the set read"}
+{"ts":"2026-07-31T09:04:21.257Z","op":"update","visit":"expeditions/e26@0","node":"d239","brief":"landing the set read"}
+{"ts":"2026-07-31T09:04:42.955Z","op":"update","visit":"expeditions/e26@0","node":"d240","brief":"checking whether the survey description tells the truth"}
+{"ts":"2026-07-31T09:04:49.674Z","op":"update","visit":"expeditions/e26@0","node":"d241","brief":"confirming the survey reaches a person's screen"}
+{"ts":"2026-07-31T09:05:15.603Z","op":"update","visit":"expeditions/e26@0","node":"d242","brief":"the palette fallback stops being a second copy"}
+{"ts":"2026-07-31T09:05:23.787Z","op":"update","visit":"expeditions/e26@0","node":"d243","brief":"running the suite after trimming the fallback"}
+{"ts":"2026-07-31T09:06:46.953Z","op":"update","visit":"expeditions/e26@0","node":"d244","brief":"committing the fallback trim"}

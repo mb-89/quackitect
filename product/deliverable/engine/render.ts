@@ -419,10 +419,16 @@ const ELEMENTS = '<script type="module" src="/vendor/vscode-elements.js"></scrip
 // read on EVERY render, so an edit shows on the next page load and the engine
 // never restarts for a colour.
 //
-// The fallback is a safety net for a tree that lost the file, nothing more.
-// palette.css is the truth, and preflight says so when it is gone.
-const PALETTE_FALLBACK =
-  ":root{--se-bg:#14171a;--se-bg-side:#191d21;--se-raised:#22272c;--se-border:#2a2f34;--se-border-strong:#3a4147;--se-fg:#d8dde2;--se-muted:#7f8b96;--se-dim:#5b6772;--se-accent:#e8b339;--se-accent-bg:#3a2f14;--se-ok:#4a7a55;--se-ok-bg:#1d2b20;--se-warn:#e8b339;--se-walk:#4a90d9;--se-walk-bg:#1b2a3a}";
+// THE FALLBACK IS A LEGIBILITY FLOOR, NOT A SECOND PALETTE. It carries only
+// what keeps a page readable when the file is gone — something to draw on,
+// something to draw with. Copying all fifteen values here would put every
+// colour in two places, and the copy would go stale the first time somebody
+// edited the real one.
+//
+// Nothing renders from this in a working install: preflight refuses to go
+// green without product/palette.css, so a tree reaching here is already
+// known-broken and only has to stay readable enough to say so.
+const PALETTE_FALLBACK = ":root{--se-bg:#14171a;--se-fg:#d8dde2}";
 
 export function palette(root: string): string {
   try {
