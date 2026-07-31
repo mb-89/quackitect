@@ -99,6 +99,22 @@ And the suite is not one thing. BOOT runs a SMOKE test — seconds, proving
 the engine loads and answers. The full battery proves behaviour, and that
 question belongs to validation, at the end of a piece of work.
 
+## Where things live
+
+A directory listing is a MENU, not an index. The reader is choosing, and a
+level that shows twenty things has stopped helping them choose.
+
+- ABOUT FIVE ENTRIES PER LEVEL. It is a shape to aim at, not a count to
+  enforce. Well past it, the level wants splitting.
+- EVERY ENTRY MEANS SOMETHING AT ITS OWN LEVEL. A reader looking at this
+  level should expect to find it here. If they would not, it belongs
+  further down, with the thing it serves.
+- THE FRONT DOOR IS THE STRICTEST LEVEL. The project root is what a
+  stranger sees first, and it carries only what a stranger needs: how to
+  start the thing, and the folders the work lives in.
+- CONFIGURATION LIVES WITH WHAT IT CONFIGURES. The product's name and the
+  product's colours are the product's, not the repository's.
+
 ## Sizing and records
 
 - Size work by its CONTENT, never by an agent's time estimate. Those estimates overshoot wildly and have done so repeatedly — a day claimed, an hour spent. Do not parrot an inherited size claim either.

@@ -282,3 +282,5 @@
 {"ts":"2026-07-31T08:22:46.870Z","op":"update","visit":"expeditions/e26@0","node":"d158","brief":"checking the engine finds both files at their new homes"}
 {"ts":"2026-07-31T08:22:57.129Z","op":"update","visit":"expeditions/e26@0","node":"d159","brief":"exporting to prove the rename still lands in the new home"}
 {"ts":"2026-07-31T08:23:06.413Z","op":"update","visit":"expeditions/e26@0","node":"d160","brief":"running the suite after the move"}
+{"ts":"2026-07-31T08:24:15.398Z","op":"update","visit":"expeditions/e26@0","node":"d161","brief":"writing the level rule into software guidance"}
+{"ts":"2026-07-31T08:24:21.014Z","op":"done","visit":"expeditions/e26@0","node":"d155","brief":"the level rule now stands in software guidance"}
