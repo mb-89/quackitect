@@ -439,6 +439,24 @@ try {
   Pop-Location
 }
 
+# Extension dependencies. koffi is how the extension presses a key: VS Code
+# will not synthesise one for an extension, and Claude's chat box belongs to
+# another extension, so the kickoff has to be sent through the operating
+# system. A FAILURE HERE IS NOT FATAL - the launcher falls back to leaving the
+# kickoff in the box for the reader to send by hand.
+Write-Host "$P - installing extension dependencies" -ForegroundColor Cyan
+Push-Location (Join-Path $root "product\deliverable\vscode")
+try {
+  npm install --no-audit --no-fund --loglevel=error
+  if ($LASTEXITCODE -ne 0) {
+    Write-Host "  koffi did not install - the agent still starts, but you press Enter yourself." -ForegroundColor Yellow
+  } else {
+    Write-Host "  koffi (key sender)  OK"
+  }
+} finally {
+  Pop-Location
+}
+
 # Install the cage. .mcp.json and .claude\settings.json cannot be written by
 # remote tools (desktop security rule), so they ship as templates in
 # workspace\_cage and are placed locally here - declaratively, every run.

@@ -9,6 +9,9 @@
     "vscode": "^1.90.0"
   },
   "main": "./extension.js",
+  "dependencies": {
+    "koffi": "^3.1.4"
+  },
   "extensionKind": ["workspace"],
   "contributes": {
     "viewsContainers": {

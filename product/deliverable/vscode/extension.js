@@ -23,6 +23,7 @@
 // our own around a window VS Code already frames.
 const vscode = require("vscode");
 const { spawn, spawnSync } = require("node:child_process");
+const keys = require("./keys.js");
 const { appendFileSync, copyFileSync, existsSync, mkdirSync, readFileSync, statSync } = require("node:fs");
 const path = require("node:path");
 
@@ -1263,7 +1264,9 @@ async function openClaudeInSideBar(kickoff) {
     if (all.includes(CLAUDE_EDITOR_COMMAND)) {
       await vscode.commands.executeCommand(CLAUDE_EDITOR_COMMAND, undefined, kickoff);
       await vscode.commands.executeCommand("workbench.action.focusActiveEditorGroup");
-      pressEnterInClaude(false);
+      // The prompt rode in as a command argument here, so only the send is
+      // owed — no paste, and nothing borrowed from the clipboard.
+      setTimeout(() => void sendEnterOnly(), 600);
       trace("claude opened in one editor tab with the kickoff; Enter follows");
       return true;
     }
@@ -1301,92 +1304,73 @@ async function sendKickoffToClaude(kickoff) {
   setTimeout(() => void focus(), 800);
   setTimeout(() => {
     void focus();
-    pressEnterInClaude(true);
+    void sendPasteAndEnter();
   }, 1100);
   setTimeout(() => void vscode.env.clipboard.writeText(previous), 6000);
 }
 
 /**
- * PRESS ENTER FOR THE READER — the last inch, and it is a HACK.
+ * Paste the kickoff and send it.
  *
- * The Claude Code extension prefills its input box and stops there. No
- * command submits a prompt, and one extension cannot type into another
- * extension's webview, so nothing inside VS Code can finish the job. The
- * owner ruled that a hack beats two clicks, so this goes out through the
- * operating system: SendKeys to whatever window is in front.
+ * THE GUARD IS VS CODE'S OWN. window.state.focused says whether this window
+ * has the keyboard, which is the question the whole hack turns on, and it is
+ * a supported API rather than a reading of the title bar. Keys go out only
+ * while it holds.
  *
- * IT ONLY FIRES INTO OUR OWN WINDOW. The foreground process is checked before
- * every key, and a stray keystroke in someone else's application is worse
- * than none at all.
+ * WHAT AIMS THEM INSIDE THE WINDOW is Claude, through its Focus-input
+ * command, called just before this. Nothing here has to guess.
  *
- * WHAT THE PROCESS CHECK CANNOT SEE is which control holds the focus. Nothing
- * outside can: VS Code exposes no named accessibility tree, so every pane
- * under the window reads as an unnamed Chromium pane. Probed and confirmed.
- * So the caller asks CLAUDE to place the focus first, through its own
- * Focus-input command, instead of trusting a delay. In the editor case the
- * window title carries the active tab's name, and the keys are aimed by that
- * as well.
+ * THE ENTER IS TRIED A FEW TIMES because the paste has to land first and
+ * nothing reports when it has. Extra Enters are harmless: an empty input
+ * ignores them, so the burst has one effect whichever key wins.
  *
- * PASTE MODE sends one Ctrl+V before the Enter burst. The side bar has no way
- * to be handed a prompt, so the text goes in as a keystroke or not at all.
- *
- * WHAT WOULD RETIRE THIS: an initialPrompt argument that submits, upstream.
+ * THE CLIPBOARD CARRIES THE TEXT rather than typing it out. Typing would
+ * submit at the kickoff's first line break, since that is what Enter does in
+ * that box.
  */
-function pressEnterInClaude(paste) {
-  if (process.platform !== "win32") {
-    trace("the auto-send is Windows-only so far — the kickoff is on the clipboard, paste it and press Enter");
+async function sendPasteAndEnter() {
+  if (!keys.available()) {
+    trace("no key sender on this platform — the kickoff is on the clipboard, paste it and press Enter");
     return;
   }
-  // A BURST, NOT ONE LONG WAIT. Nothing outside the webview can see when its
-  // input is ready, so a single delay is a guess, and a long guess is dead
-  // time on every launch. Short repeats cover the same uncertainty in a
-  // fraction of the time.
-  //
-  // THE REPEATS ARE SAFE BECAUSE AN EMPTY BOX IGNORES ENTER. Early keys land
-  // before the kickoff is inserted and do nothing. One key sends it. Later
-  // keys land in a box that is empty again and do nothing. The whole burst
-  // has exactly one effect whichever key wins.
-  //
-  // AND EVERY KEY IS AIMED, not just timed. Before each one it asks Windows
-  // which window is in front and what it is called. VS Code puts the active
-  // editor's name in the title bar, so a title starting with Claude means
-  // the Claude tab is the one with the keyboard. Click away and the title
-  // changes and the burst goes quiet. That is the whole guard, and it is why
-  // firing several times costs nothing.
-  const script = [
-    "Add-Type -AssemblyName System.Windows.Forms",
-    "Add-Type -Namespace Se -Name Fg -MemberDefinition '[DllImport(\"user32.dll\")] public static extern System.IntPtr GetForegroundWindow(); [DllImport(\"user32.dll\")] public static extern int GetWindowThreadProcessId(System.IntPtr h, out int pid); [DllImport(\"user32.dll\", CharSet = System.Runtime.InteropServices.CharSet.Unicode)] public static extern int GetWindowTextW(System.IntPtr h, System.Text.StringBuilder s, int n);'",
-    "function Test-Ours {",
-    "  $h = [Se.Fg]::GetForegroundWindow()",
-    "  $pid2 = 0",
-    "  [void][Se.Fg]::GetWindowThreadProcessId($h, [ref]$pid2)",
-    "  $name = (Get-Process -Id $pid2 -ErrorAction SilentlyContinue).ProcessName",
-    "  $sb = New-Object System.Text.StringBuilder 512",
-    "  [void][Se.Fg]::GetWindowTextW($h, $sb, 512)",
-    "  return @($name -like 'Code*', $sb.ToString())",
-    "}",
-    "Start-Sleep -Milliseconds 150",
-    // ONE PASTE ONLY. A second would append rather than replace, and the
-    // select-all that would fix that is the one keystroke we must never send
-    // blind — in an editor it would put the whole file under the paste.
-    paste === true ? "$ours = Test-Ours; if ($ours[0]) { [System.Windows.Forms.SendKeys]::SendWait('^v'); Start-Sleep -Milliseconds 250 }" : "",
-    "for ($i = 0; $i -lt 8; $i++) {",
-    "  $ours = Test-Ours",
-    paste === true
-      ? "  if ($ours[0]) { [System.Windows.Forms.SendKeys]::SendWait('{ENTER}'); Start-Sleep -Milliseconds 60; break }"
-      : "  if ($ours[0] -and $ours[1] -like 'Claude*') { [System.Windows.Forms.SendKeys]::SendWait('{ENTER}'); Start-Sleep -Milliseconds 60; break }",
-    "  Start-Sleep -Milliseconds 70",
-    "}",
-  ].filter((l) => l !== "").join("\n");
-  const child = spawn("powershell.exe", ["-NoProfile", "-NonInteractive", "-WindowStyle", "Hidden", "-Command", script], {
-    detached: true,
-    stdio: "ignore",
-    windowsHide: true,
-  });
-  child.on("error", (err) => trace("auto-Enter could not start: " + String(err)));
-  child.unref();
-  trace("auto-Enter: 8 keys over ~1s, each checked against the foreground window");
+  if (!vscode.window.state.focused) {
+    trace("window not focused — keys withheld; the kickoff is on the clipboard");
+    return;
+  }
+  if (keys.paste() === 0) {
+    trace("paste could not be sent");
+    return;
+  }
+  for (let i = 0; i < 6; i++) {
+    await new Promise((r) => setTimeout(r, 120));
+    if (!vscode.window.state.focused) {
+      trace("focus left mid-send — the rest of the keys are withheld");
+      return;
+    }
+    if (keys.enter() > 0) {
+      trace("kickoff pasted and sent");
+      return;
+    }
+  }
+  trace("paste landed but Enter never went — press it yourself");
 }
+
+/** The editor door's half: the prompt is already in the box, so only send. */
+async function sendEnterOnly() {
+  if (!keys.available()) {
+    trace("no key sender on this platform — the kickoff is in the box, press Enter");
+    return;
+  }
+  for (let i = 0; i < 6; i++) {
+    if (vscode.window.state.focused && keys.enter() > 0) {
+      trace("kickoff sent");
+      return;
+    }
+    await new Promise((r) => setTimeout(r, 120));
+  }
+  trace("Enter never went — press it yourself");
+}
+
 
 /**
  * NAME THE SESSION IN ITS FIRST LINE.
