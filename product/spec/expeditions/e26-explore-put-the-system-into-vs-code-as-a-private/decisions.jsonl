@@ -284,3 +284,15 @@
 {"ts":"2026-07-31T08:23:06.413Z","op":"update","visit":"expeditions/e26@0","node":"d160","brief":"running the suite after the move"}
 {"ts":"2026-07-31T08:24:15.398Z","op":"update","visit":"expeditions/e26@0","node":"d161","brief":"writing the level rule into software guidance"}
 {"ts":"2026-07-31T08:24:21.014Z","op":"done","visit":"expeditions/e26@0","node":"d155","brief":"the level rule now stands in software guidance"}
+{"ts":"2026-07-31T08:24:25.698Z","op":"done","visit":"expeditions/e26@0","node":"d154","brief":"suite and export both verified after the move"}
+{"ts":"2026-07-31T08:25:06.784Z","op":"update","visit":"expeditions/e26@0","node":"d162","brief":"consolidating the mover note with the owner's ruling"}
+{"ts":"2026-07-31T08:25:50.613Z","op":"plan","visit":"expeditions/e26@0","parent":null,"nodes":[{"id":"d163","brief":"Allow taking one side of a conflict"},{"id":"d164","brief":"Fence it with a test"},{"id":"d165","brief":"Say so in the tool description"}]}
+{"ts":"2026-07-31T08:25:54.960Z","op":"done","visit":"expeditions/e26@0","node":"d163","brief":"checkout --ours/--theirs allowed mid-merge on a named path"}
+{"ts":"2026-07-31T08:25:59.890Z","op":"done","visit":"expeditions/e26@0","node":"d165","brief":"the tool description names the new form"}
+{"ts":"2026-07-31T08:26:06.050Z","op":"update","visit":"expeditions/e26@0","node":"d166","brief":"reading the git lane tests to match their shape"}
+{"ts":"2026-07-31T08:26:27.529Z","op":"update","visit":"expeditions/e26@0","node":"d167","brief":"finding the tail to append the conflict test"}
+{"ts":"2026-07-31T08:26:42.855Z","op":"update","visit":"expeditions/e26@0","node":"d168","brief":"adding the conflict-resolution test"}
+{"ts":"2026-07-31T08:26:49.808Z","op":"update","visit":"expeditions/e26@0","node":"d169","brief":"running the suite with the conflict test"}
+{"ts":"2026-07-31T08:27:36.689Z","op":"update","visit":"expeditions/e26@0","node":"d170","brief":"making the assertion line-ending agnostic"}
+{"ts":"2026-07-31T08:27:39.430Z","op":"update","visit":"expeditions/e26@0","node":"d171","brief":"re-running the suite"}
+{"ts":"2026-07-31T08:28:24.298Z","op":"done","visit":"expeditions/e26@0","node":"d164","brief":"239 green; the conflict lane is fenced"}

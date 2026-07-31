@@ -27,7 +27,13 @@ export function git(cwd: string, ...args: string[]): GitResult {
 // is history: a rebase rewrites it, a merge only adds a commit that can be
 // reverted. The rebase refusal below already named merge as its remedy while
 // the allowlist forbade it, so the lane pointed at a door it had locked.
-const ALLOWED = new Set(["status", "log", "diff", "show", "add", "commit", "fetch", "branch", "rev-parse", "restore", "merge"]);
+// TAKING ONE SIDE OF A CONFLICT (gap hit live 2026-07-30, e26). Merging was
+// allowed but RESOLVING it was not, so seventeen conflict blocks across four
+// files had to be hand-edited through the agent's context. checkout joins the
+// list in ONE form: --ours or --theirs, on a named path, while a merge is
+// actually in progress. That rewrites a file the merge has already broken,
+// and nothing else.
+const ALLOWED = new Set(["status", "log", "diff", "show", "add", "commit", "fetch", "branch", "rev-parse", "restore", "merge", "checkout"]);
 
 export function gitLane(cwd: string, rawArgs: unknown[]): Record<string, unknown> {
   const args = rawArgs.map(String);
@@ -67,6 +73,30 @@ export function gitLane(cwd: string, rawArgs: unknown[]): Record<string, unknown
       remedy: { tool: "se_git", args: { args: ["restore", "--staged", "<path>"] }, note: "worktree restores discard human edits; only unstaging is lane-legal" },
       source: "engine/gitlane.ts",
     });
+  }
+  if (args[0] === "checkout") {
+    const side = args.includes("--ours") || args.includes("--theirs");
+    const paths = args.slice(1).filter((a) => !a.startsWith("-"));
+    if (!side || paths.length === 0) {
+      throw new Rejection({
+        clause: CLAUSES.GIT_NOT_ALLOWLISTED,
+        expected: "checkout --ours <path> or checkout --theirs <path> — the only lane-legal checkout",
+        got: `git ${args.join(" ")}`,
+        remedy: { tool: "se_git", args: { args: ["checkout", "--theirs", "<path>"] }, note: "a bare checkout switches branches or discards edits; only taking one side of a CONFLICTED file is legal" },
+        source: "engine/gitlane.ts",
+      });
+    }
+    // Outside a merge there are no sides, and the same command would throw
+    // away working-tree edits instead. The lane never does that.
+    if (!git(cwd, "rev-parse", "-q", "--verify", "MERGE_HEAD").ok) {
+      throw new Rejection({
+        clause: CLAUSES.GIT_NOT_ALLOWLISTED,
+        expected: "a merge in progress — taking a side only means something mid-conflict",
+        got: "no MERGE_HEAD",
+        remedy: { tool: "se_git", args: { args: ["status"] }, note: "outside a merge this discards working-tree edits, which the lane never does" },
+        source: "engine/gitlane.ts",
+      });
+    }
   }
   const r = git(cwd, ...args);
   return { ok: r.ok, code: r.code, stdout: r.stdout.slice(-20_000), stderr: r.stderr.slice(-20_000) };
