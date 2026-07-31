@@ -8,6 +8,13 @@ depends_on:
   - scope-non-goals
   - log-risks
   - pressure-test
+legal_tools:
+  - se_file_read
+  - se_file_search
+  - se_file_glob
+  - se_file_list
+  - se_log_query
+  - se_answer
 evidence:
   - name: vision_scope_stated
     description: "the packet is complete: idea, to-be world, goals, pitch, scope, non-goals"

@@ -7,6 +7,13 @@ filled_by: agent
 depends_on:
   - record-adrs
   - evaluate-baseline
+legal_tools:
+  - se_file_read
+  - se_file_search
+  - se_file_glob
+  - se_file_list
+  - se_log_query
+  - se_answer
 evidence:
   - name: choice_traced
     description: "the winner traced to the weighted criteria; both Pugh runs recorded where status-quo was used"

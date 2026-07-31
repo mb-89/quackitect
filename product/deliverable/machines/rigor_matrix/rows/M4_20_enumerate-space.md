@@ -7,6 +7,17 @@ filled_by: agent
 depends_on:
   - partition-functions
 seeds: candidates
+legal_tools:
+  - se_file_read
+  - se_file_write
+  - se_file_patch
+  - se_file_search
+  - se_file_glob
+  - se_file_list
+  - se_log_query
+  - se_answer
+  - se_web_search
+  - se_web_fetch
 evidence:
   - name: chart
     description: "the morphological chart: rows, options, pruned cells with reasons"

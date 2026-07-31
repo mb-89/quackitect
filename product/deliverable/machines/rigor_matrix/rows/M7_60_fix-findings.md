@@ -8,6 +8,18 @@ depends_on:
   - verification
 edge_role: fallback
 guard: "verification_attempts < 3"
+legal_tools:
+  - se_file_read
+  - se_file_write
+  - se_file_patch
+  - se_file_search
+  - se_file_glob
+  - se_file_list
+  - se_log_query
+  - se_answer
+  - se_run
+  - se_lint
+  - se_git
 evidence:
   - name: findings_fixed
     description: "every finding and its fix, one pass"

@@ -6,6 +6,16 @@ state_kind: work
 filled_by: agent
 depends_on:
   - gate-validation
+legal_tools:
+  - se_file_read
+  - se_file_write
+  - se_file_patch
+  - se_file_search
+  - se_file_glob
+  - se_file_list
+  - se_log_query
+  - se_answer
+  - se_lint
 evidence:
   - name: docs
     description: "the emitted set and the match against the surface"

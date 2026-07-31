@@ -5,6 +5,17 @@ statement: "Onboarding opens with the retro: the field-feedback question first, 
 state_kind: work
 filled_by: agent
 depends_on: []
+legal_tools:
+  - se_file_read
+  - se_file_write
+  - se_file_patch
+  - se_file_search
+  - se_file_glob
+  - se_file_list
+  - se_log_query
+  - se_answer
+  - se_survey
+  - se_note_drain
 evidence:
   - name: field_feedback
     description: "what came back from the field, or an explicit \"nothing yet\""

@@ -6,6 +6,15 @@ state_kind: work
 filled_by: agent
 depends_on:
   - write-requirements
+legal_tools:
+  - se_file_read
+  - se_file_write
+  - se_file_patch
+  - se_file_search
+  - se_file_glob
+  - se_file_list
+  - se_log_query
+  - se_answer
 evidence:
   - name: function_structure
     description: "overall function and sub-functions, solution-neutral"

@@ -7,6 +7,15 @@ filled_by: agent
 depends_on:
   - gate-implementation
 seeds: demos
+legal_tools:
+  - se_file_read
+  - se_file_write
+  - se_file_patch
+  - se_file_search
+  - se_file_glob
+  - se_file_list
+  - se_log_query
+  - se_answer
 evidence:
   - name: slides_filled
     description: "the stories walked, evidence refs in place or findings named"

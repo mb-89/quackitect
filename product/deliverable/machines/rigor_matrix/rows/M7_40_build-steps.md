@@ -7,6 +7,18 @@ filled_by: agent
 depends_on:
   - observe-red
 runs: build-chunks
+legal_tools:
+  - se_file_read
+  - se_file_write
+  - se_file_patch
+  - se_file_search
+  - se_file_glob
+  - se_file_list
+  - se_log_query
+  - se_answer
+  - se_run
+  - se_lint
+  - se_git
 evidence:
   - name: build_record
     description: "the chunk machine's run: chunks filled, actors, the sub-record file"

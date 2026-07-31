@@ -6,6 +6,13 @@ state_kind: gate
 filled_by: agent
 depends_on:
   - evaluate-set
+legal_tools:
+  - se_file_read
+  - se_file_search
+  - se_file_glob
+  - se_file_list
+  - se_log_query
+  - se_answer
 evidence:
   - name: viable_set
     description: "at least two viable candidates survive, or the no-real-alternatives case is argued and recorded"

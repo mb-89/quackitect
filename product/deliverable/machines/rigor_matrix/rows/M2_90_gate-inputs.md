@@ -8,6 +8,13 @@ depends_on:
   - draw-context
   - map-stakeholders
   - generalize-use-cases
+legal_tools:
+  - se_file_read
+  - se_file_search
+  - se_file_glob
+  - se_file_list
+  - se_log_query
+  - se_answer
 evidence:
   - name: props_realized
     description: "every value prop realized by at least one story"

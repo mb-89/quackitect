@@ -7,7 +7,7 @@ import { test } from "node:test";
 import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { readRigorMatrix, compileColumn } from "../engine/rigor-matrix.ts";
+import { readRigorMatrix, compileColumn, ALL_COLUMNS, CHANGE_COLUMNS } from "../engine/rigor-matrix.ts";
 import { validateMachine } from "../engine/machine.ts";
 
 const ROOT = join(import.meta.dirname, "..", "..", "..");
@@ -16,7 +16,7 @@ test("readMatrix: the real matrix is complete", () => {
   const m = readRigorMatrix(ROOT);
   assert.equal(m.rows.length, 50);
   for (const row of m.rows) {
-    for (const col of ["patch", "minor", "major", "product", "specification"]) {
+    for (const col of ALL_COLUMNS) {
       const cell = m.cells.get(row.name)?.get(col);
       assert.ok(cell, `${row.name} is missing its ${col} cell`);
     }
@@ -82,7 +82,7 @@ test("compileColumn patch: struck states vanish and dependencies contract", () =
 
 test("compileColumn: the verification loop compiles as fallback and recovery", () => {
   const m = readRigorMatrix(ROOT);
-  for (const col of ["patch", "minor", "major"] as const) {
+  for (const col of CHANGE_COLUMNS) {
     const decl = compileColumn(m, col);
     const verification = decl.states.find((s) => s.id === "verification");
     assert.ok(verification, `${col}: verification missing`);

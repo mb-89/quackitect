@@ -7,6 +7,13 @@ filled_by: agent
 depends_on:
   - derive-functions
   - probe-assumptions
+legal_tools:
+  - se_file_read
+  - se_file_search
+  - se_file_glob
+  - se_file_list
+  - se_log_query
+  - se_answer
 evidence:
   - name: verifiable
     description: "every requirement carries its named verify_method"

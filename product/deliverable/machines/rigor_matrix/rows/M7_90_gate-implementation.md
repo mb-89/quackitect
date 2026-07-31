@@ -6,6 +6,14 @@ state_kind: gate
 filled_by: agent
 depends_on:
   - verification
+legal_tools:
+  - se_file_read
+  - se_file_search
+  - se_file_glob
+  - se_file_list
+  - se_log_query
+  - se_answer
+  - se_test
 evidence:
   - name: build_planned
     description: "the seeded chunk machine exists and was walked"

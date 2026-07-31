@@ -8,6 +8,14 @@ depends_on:
   - fill-story-evidence
   - sweep-consistency
   - log-gaps
+legal_tools:
+  - se_file_read
+  - se_file_search
+  - se_file_glob
+  - se_file_list
+  - se_log_query
+  - se_answer
+  - se_test
 evidence:
   - name: meets_need
     description: "every need's pass lines demonstrated, all iterations"

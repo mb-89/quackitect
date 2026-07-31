@@ -7,6 +7,14 @@ filled_by: agent
 depends_on:
   - ship-review
 floor: true
+legal_tools:
+  - se_file_read
+  - se_file_search
+  - se_file_glob
+  - se_file_list
+  - se_log_query
+  - se_answer
+  - se_git
 evidence:
   - name: docs_match
     description: "docs complete and matching the actual surface"
