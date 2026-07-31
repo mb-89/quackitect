@@ -882,10 +882,21 @@ export class Session {
   }
 
   /** A one-shot target clears itself the moment the walk stands on it. */
+  /** ARRIVAL IS A COMPARISON, NEVER A SEARCH. This once asked route() whether
+   *  the way here was empty, and route() expands the drawing — which for a
+   *  generated container means WRITING it, against the project root, on every
+   *  packet the engine builds. A bound worktree then walked a container that
+   *  was being regenerated underneath it. Reading where you stand must never
+   *  change where you stand. */
   private clearTargetIfArrived(): void {
     if (this._target === "") return;
-    const r = this.route(this._target);
-    if (r.found && r.steps.length === 0) this._target = "";
+    const here = this.active()[0];
+    if (here === undefined) return;
+    // A submachine is aimed at by its container name; route() lands on its
+    // start, so arrival compares against the same normalised id.
+    const decl = this.machine.states.find((s) => s.id === this._target);
+    const aim = decl?.submachine !== undefined ? `${this._target}/start` : this._target;
+    if (here === aim) this._target = "";
   }
 
   /** Aim the walk somewhere else. Setting a target moves nothing — it says
