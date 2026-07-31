@@ -3,7 +3,7 @@
 // restore unstages only.
 import { strict as assert } from "node:assert";
 import { spawnSync } from "node:child_process";
-import { writeFileSync } from "node:fs";
+import { readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { test } from "node:test";
 import { bootedServer, call, freshRoot } from "./helpers.ts";
@@ -105,4 +105,43 @@ test("se_git: merge is lane work, and it reconciles a diverged branch", async ()
   // rewriting being legal.
   const rebase = await call(server, "se_git", { args: ["rebase", trunk] });
   assert.equal(rebase.body.clause, "SE-C-002", "rebase stays refused");
+});
+
+// TAKING A SIDE (gap hit live 2026-07-30, e26): merging was lane-legal and
+// RESOLVING was not, so seventeen conflict blocks went through the agent's
+// context by hand. The form is narrow on purpose — a side, a named path, and
+// a merge actually in progress.
+test("se_git: one side of a conflict can be taken, and only mid-merge", async () => {
+  const root = freshRoot();
+  gitInit(root);
+  const g = (...a: string[]): void => {
+    const r = spawnSync("git", a, { cwd: root, encoding: "utf8", windowsHide: true });
+    // The merge is MEANT to conflict, so only that one may fail.
+    if (r.status !== 0 && a[0] !== "merge") throw new Error(`git ${a.join(" ")} failed: ${r.stderr}`);
+  };
+  writeFileSync(join(root, "c.md"), "base\n");
+  g("add", "-A"); g("commit", "-q", "-m", "base");
+  const trunk = spawnSync("git", ["rev-parse", "--abbrev-ref", "HEAD"], { cwd: root, encoding: "utf8", windowsHide: true }).stdout.trim();
+  g("checkout", "-q", "-b", "other");
+  writeFileSync(join(root, "c.md"), "theirs\n");
+  g("add", "-A"); g("commit", "-q", "-m", "theirs");
+  g("checkout", "-q", trunk);
+  writeFileSync(join(root, "c.md"), "ours\n");
+  g("add", "-A"); g("commit", "-q", "-m", "ours");
+
+  const server = await bootedServer(root);
+  // A bare checkout switches branches or discards edits. Never legal.
+  const bare = await call(server, "se_git", { args: ["checkout", "other"] });
+  assert.equal(bare.isError, true);
+  assert.match(String(bare.body.expected), /--ours/);
+  // With no merge running there are no sides, and this would throw away work.
+  const early = await call(server, "se_git", { args: ["checkout", "--theirs", "c.md"] });
+  assert.equal(early.isError, true);
+  assert.match(String(early.body.got), /no MERGE_HEAD/);
+
+  g("merge", "other"); // conflicts, on purpose
+  const take = await call(server, "se_git", { args: ["checkout", "--theirs", "c.md"] });
+  assert.equal(take.isError, false, JSON.stringify(take.body));
+  // Line endings are git's business on Windows, not this test's.
+  assert.equal(readFileSync(join(root, "c.md"), "utf8").trim(), "theirs", "the other side won, with no conflict block hand-edited");
 });
