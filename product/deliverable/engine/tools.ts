@@ -179,6 +179,48 @@ export function expeditionTools(session: Session): ToolDef[] {
 // judgmentDrainAllowed answers ONE question for se_note_drain: may this
 // caller park a note or carry it, or only record the mechanical verdicts.
 // It is a thunk because the walk moves under a built tool list.
+/** A cheap multi-read makes it easy to pull documents nobody needed, which
+ *  wastes context quietly. Twenty is far above any real reading list — boot's
+ *  is eight — and well below a sweep of the tree. */
+const MAX_READ_PATHS = 20;
+
+/** MANY PATHS, ONE CALL. Read-proof is a SET, not a sequence: leaving boot
+ *  demands eight hashes TOGETHER, and asking one at a time pays a round trip
+ *  per document for nothing. The reads themselves do not collapse and should
+ *  not — proving you read is the point. The waiting collapses.
+ *
+ *  EACH ENTRY ANSWERS FOR ITSELF. An oversize or missing path returns its own
+ *  typed refusal in place of its content and the rest still come back. Losing
+ *  seven good reads because the eighth is large would make the cheap call
+ *  useless exactly where it is worth most. */
+function readMany(rootOf: (rel?: string) => string, entries: unknown[], ref: string | undefined): Record<string, unknown> {
+  if (entries.length > MAX_READ_PATHS) {
+    throw new Rejection({
+      clause: CLAUSES.REQUIRED_ARGS,
+      expected: `at most ${MAX_READ_PATHS} paths in one call`,
+      got: `${entries.length} paths`,
+      remedy: { tool: "se_file_read", args: { paths: ["<first>", "<second>"] }, note: "ask for the set you will actually read; a wide multi-read spends context on documents nobody wanted" },
+      source: "engine/tools.ts se_file_read",
+    });
+  }
+  const files = entries.map((e) => {
+    const spec = typeof e === "string" ? { path: e } : (e as { path?: unknown; offset?: unknown; limit?: unknown });
+    const path = String(spec.path ?? "");
+    try {
+      return fileRead(rootOf(path), path, {
+        ...(spec.offset !== undefined ? { offset: Number(spec.offset) } : {}),
+        ...(spec.limit !== undefined ? { limit: Number(spec.limit) } : {}),
+        ...(ref !== undefined ? { ref } : {}),
+      }) as Record<string, unknown>;
+    } catch (err) {
+      const r = err as { clause?: string; expected?: string; got?: string; remedy?: unknown; message?: string };
+      return { path, refused: { clause: r.clause, expected: r.expected ?? r.message, got: r.got, remedy: r.remedy } };
+    }
+  });
+  const failed = files.filter((f) => f.refused !== undefined).length;
+  return { files, ...(failed > 0 ? { failed } : {}) };
+}
+
 export function coreTools(rootOf: (rel?: string) => string, projectRoot: string, judgmentDrainAllowed: () => boolean = () => true): ToolDef[] {
   return [
     {
@@ -190,18 +232,45 @@ export function coreTools(rootOf: (rel?: string) => string, projectRoot: string,
         type: "object",
         properties: {
           path: { type: "string" },
+          paths: {
+            type: "array",
+            description: "read MANY in ONE call — a list of paths, or of {path, offset?, limit?} for per-file windows. Read-proof is a SET, so a state's whole reading list comes back in one envelope, each entry with its own hash. An unreadable path returns its refusal in place of its content and the others still arrive.",
+            items: { type: ["string", "object"] },
+          },
           offset: { type: "number", description: "1-based first line" },
           limit: { type: "number", description: "how many lines" },
           ref: { type: "string", description: "read from this committed git ref instead of the working tree" },
         },
-        required: ["path"],
       },
-      handler: (args) =>
-        fileRead(rootOf(String(args.path)), String(args.path), {
+      handler: (args) => {
+        const ref = args.ref !== undefined ? String(args.ref) : undefined;
+        if (args.paths !== undefined) {
+          if (!Array.isArray(args.paths)) {
+            throw new Rejection({
+              clause: CLAUSES.REQUIRED_ARGS,
+              expected: "paths as an array of paths, or of {path, offset?, limit?}",
+              got: typeof args.paths,
+              remedy: { tool: "se_file_read", args: { paths: ["<path>"] }, note: "one path uses `path`; a set uses `paths`" },
+              source: "engine/tools.ts se_file_read",
+            });
+          }
+          return readMany(rootOf, args.paths, ref);
+        }
+        if (args.path === undefined) {
+          throw new Rejection({
+            clause: CLAUSES.REQUIRED_ARGS,
+            expected: "path (one file) or paths (a set)",
+            got: "neither",
+            remedy: { tool: "se_file_read", args: { path: "<root-relative path>" }, note: "name what to read" },
+            source: "engine/tools.ts se_file_read",
+          });
+        }
+        return fileRead(rootOf(String(args.path)), String(args.path), {
           ...(args.offset !== undefined ? { offset: Number(args.offset) } : {}),
           ...(args.limit !== undefined ? { limit: Number(args.limit) } : {}),
-          ...(args.ref !== undefined ? { ref: String(args.ref) } : {}),
-        }),
+          ...(ref !== undefined ? { ref } : {}),
+        });
+      },
     },
     {
       name: "se_file_write",

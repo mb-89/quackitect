@@ -34,10 +34,21 @@ test("initialize and tools/list serve the full lane", async () => {
 
 test("required args enforced at dispatch (R8) — missing arg refused with remedy", async () => {
   const server = await bootedServer(fresh());
-  const r = await call(server, "se_file_read", {});
+  // se_note is the example because its `text` is genuinely required.
+  // se_file_read used to be, and stopped when it learned to take a SET:
+  // either `path` or `paths` satisfies it, which no `required` list can say.
+  const r = await call(server, "se_note", {});
   assert.equal(r.isError, true);
   assert.equal(r.body.clause, "SE-C-046");
-  assert.ok(String(r.body.got).includes("missing: path"));
+  assert.ok(String(r.body.got).includes("missing: text"), String(r.body.got));
+});
+
+test("a tool with ALTERNATIVE required args refuses in its handler, and says both", async () => {
+  const server = await bootedServer(fresh());
+  const r = await call(server, "se_file_read", {});
+  assert.equal(r.isError, true);
+  assert.match(String(r.body.expected), /path .*or paths/, "the refusal names both ways to satisfy it");
+  assert.ok(r.body.remedy, "and carries a remedy like every other refusal");
 });
 
 test("unknown arg NAME refused — the String(undefined) incident cannot recur", async () => {
