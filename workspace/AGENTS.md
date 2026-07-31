@@ -60,6 +60,9 @@ BOOT STABILITY FOR THIS HOST:
 - Re-read only when a refusal names missing/current hashes, or when a path
   appears for the first time.
 - If a state allows no tools, do not call read/search there. Tick only.
+- A document that is ALLOWED to be missing is read with `optional: true`.
+  Absence answers `exists: false` rather than refusing. The handover is the
+  case this exists for. Boot should produce no errors at all.
 
 THE HANDOVER RULE: the packet's `human_checked` list is what the user
 checked as read while driving the mirror themselves. Your advances must

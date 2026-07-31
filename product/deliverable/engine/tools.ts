@@ -205,7 +205,7 @@ const MAX_READ_PATHS = 20;
  *  typed refusal in place of its content and the rest still come back. Losing
  *  seven good reads because the eighth is large would make the cheap call
  *  useless exactly where it is worth most. */
-function readMany(rootOf: (rel?: string) => string, entries: unknown[], ref: string | undefined): Record<string, unknown> {
+function readMany(rootOf: (rel?: string) => string, entries: unknown[], ref: string | undefined, optional: boolean): Record<string, unknown> {
   if (entries.length > MAX_READ_PATHS) {
     throw new Rejection({
       clause: CLAUSES.REQUIRED_ARGS,
@@ -216,13 +216,14 @@ function readMany(rootOf: (rel?: string) => string, entries: unknown[], ref: str
     });
   }
   const files = entries.map((e) => {
-    const spec = typeof e === "string" ? { path: e } : (e as { path?: unknown; offset?: unknown; limit?: unknown });
+    const spec = typeof e === "string" ? { path: e } : (e as { path?: unknown; offset?: unknown; limit?: unknown; optional?: unknown });
     const path = String(spec.path ?? "");
     try {
       return fileRead(rootOf(path), path, {
         ...(spec.offset !== undefined ? { offset: Number(spec.offset) } : {}),
         ...(spec.limit !== undefined ? { limit: Number(spec.limit) } : {}),
         ...(ref !== undefined ? { ref } : {}),
+        ...(spec.optional === true || optional ? { optional: true } : {}),
       }) as Record<string, unknown>;
     } catch (err) {
       const r = err as { clause?: string; expected?: string; got?: string; remedy?: unknown; message?: string };
@@ -239,7 +240,7 @@ export function coreTools(rootOf: (rel?: string) => string, projectRoot: string,
       name: "se_file_read",
       title: "se.file.read",
       description:
-        "Read a project file (root-relative path) — TEXT OR IMAGE. Returns the CAS hash writes will demand. Text comes back as numbered lines; pass offset (1-based line) / limit to read a large file in PARTS — an oversize whole-file read is refused with the remedy, never silently truncated. An IMAGE (png, jpg, gif, webp) comes back as the picture itself, so a sketch can be LOOKED AT rather than described to you. Any other binary is refused. A DECLARED ROOT is reachable as '@name/rest' (the owner declares roots in .se/roots.json; they are read-only). Pass ref to read AT A COMMITTED REF ('main' reaches v1, 'v2' reaches v2) — pair with se_file_search/se_file_glob at the same ref.",
+        "Read a project file (root-relative path) — TEXT OR IMAGE. Returns the CAS hash writes will demand. Text comes back as numbered lines; pass offset (1-based line) / limit to read a large file in PARTS — an oversize whole-file read is refused with the remedy, never silently truncated. An IMAGE (png, jpg, gif, webp) comes back as the picture itself, so a sketch can be LOOKED AT rather than described to you. Any other binary is refused. A DECLARED ROOT is reachable as '@name/rest' (the owner declares roots in .se/roots.json; they are read-only). Pass ref to read AT A COMMITTED REF ('main' reaches v1, 'v2' reaches v2) — pair with se_file_search/se_file_glob at the same ref. Pass optional: true for a file that is ALLOWED to be missing (the handover): absence answers exists: false rather than refusing.",
       inputSchema: {
         type: "object",
         properties: {
@@ -252,10 +253,12 @@ export function coreTools(rootOf: (rel?: string) => string, projectRoot: string,
           offset: { type: "number", description: "1-based first line" },
           limit: { type: "number", description: "how many lines" },
           ref: { type: "string", description: "read from this committed git ref instead of the working tree" },
+          optional: { type: "boolean", description: "the file is ALLOWED not to exist — absence comes back as exists: false instead of a refusal. Only absence is forgiven; a path outside the root still refuses. Per-entry in `paths` too." },
         },
       },
       handler: (args) => {
         const ref = args.ref !== undefined ? String(args.ref) : undefined;
+        const optional = args.optional === true;
         if (args.paths !== undefined) {
           if (!Array.isArray(args.paths)) {
             throw new Rejection({
@@ -266,7 +269,7 @@ export function coreTools(rootOf: (rel?: string) => string, projectRoot: string,
               source: "engine/tools.ts se_file_read",
             });
           }
-          return readMany(rootOf, args.paths, ref);
+          return readMany(rootOf, args.paths, ref, optional);
         }
         if (args.path === undefined) {
           throw new Rejection({
@@ -281,6 +284,7 @@ export function coreTools(rootOf: (rel?: string) => string, projectRoot: string,
           ...(args.offset !== undefined ? { offset: Number(args.offset) } : {}),
           ...(args.limit !== undefined ? { limit: Number(args.limit) } : {}),
           ...(ref !== undefined ? { ref } : {}),
+          ...(optional ? { optional: true } : {}),
         });
       },
     },

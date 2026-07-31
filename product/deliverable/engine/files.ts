@@ -53,6 +53,9 @@ function mustExist(root: string, path: string, source: string, allowDeclared = f
 export interface ReadResult {
   path: string;
   hash: string;
+  /** Only ever false, and only when an OPTIONAL read found nothing. A read
+   *  that succeeded does not carry it. */
+  exists?: boolean;
   /** Text reads only — an image has no lines. */
   total_lines?: number;
   /** Present on range reads: which slice this is. */
@@ -117,7 +120,22 @@ function imageRead(path: string, bytes: Buffer, mimeType: string, ref?: string):
   return res;
 }
 
-export function fileRead(root: string, path: string, opts: { offset?: number; limit?: number; ref?: string } = {}): ReadResult {
+export function fileRead(root: string, path: string, opts: { offset?: number; limit?: number; ref?: string; optional?: boolean } = {}): ReadResult {
+  // AN OPTIONAL READ FORGIVES ABSENCE AND NOTHING ELSE. Some documents are
+  // allowed not to exist — the handover is why this exists, and a boot that
+  // refuses over a file nobody promised is a boot that looks broken. The path
+  // still goes through resolveForRead, so escaping the root still refuses.
+  if (opts.optional === true && opts.ref === undefined && !existsSync(resolveForRead(root, path, SRC))) {
+    return {
+      path,
+      // Empty, because there is no content to prove. It matches no real
+      // document, so it cannot satisfy a read-proof by accident.
+      hash: "",
+      exists: false,
+      bytes: 0,
+      content: `${path} does not exist. The read asked for it as optional, so this is not a failure.`,
+    };
+  }
   let bytes: Buffer;
   if (opts.ref !== undefined) {
     bytes = gitShow(root, opts.ref, path);
