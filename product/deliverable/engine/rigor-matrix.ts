@@ -42,6 +42,8 @@ export interface RigorRigorMatrixRow {
   guard?: string;
   guidance: string;
   evidence_form: EvidenceField[];
+  /** Narrows what the compiled state may call. Absent means every lane tool. */
+  legal_tools?: string[];
 }
 
 export interface RigorRigorMatrixCell {
@@ -135,6 +137,7 @@ export function readRigorMatrix(root: string): Matrix {
       guard: typeof fm.guard === "string" ? fm.guard : undefined,
       guidance: section(note.body, "Guidance"),
       evidence_form: parseEvidence(fm, file, note.body),
+      legal_tools: fm.legal_tools === undefined ? undefined : asList(fm.legal_tools),
     };
     if (row.state_kind !== "terminal" && row.evidence_form.length === 0) {
       throw new Error(`matrix row ${row.name} carries no evidence — leaving a state demands evidence; only a terminal is exempt`);
@@ -246,6 +249,12 @@ export function compileColumn(matrix: Matrix, column: ChangeColumn): MachineDecl
       evidence_form: row.evidence_form,
       ...(row.runs ? { submachine: row.runs } : {}),
       priority: priorityOf(row),
+      // A state with no declared tools gets only the always-legal three, so a
+      // compiled row could not read or write anything — the kickoff could not
+      // even edit the record it demands. The matrix says WHAT each step does;
+      // caging the lane is not its job, so the default opens and a row that
+      // wants less says so.
+      legal_tools: row.legal_tools ?? ["all"],
       edges: edgesFrom.get(row.name) ?? [],
     });
   }
