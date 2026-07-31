@@ -38,6 +38,38 @@ product/
 .\RUNME.ps1 -Manual   # ...or open the MIRROR and walk the machines yourself, tick by tick
 ```
 
+## Give it to someone else
+
+The export makes a fresh copy under a new name, carrying no history.
+
+```powershell
+.\RUNME.ps1 --export C:\path\to\empty "Blue Heron" BH
+```
+
+All three arguments are required. There is no default, because a forgotten
+argument would ship this project's own name to somebody else.
+
+- The folder must be empty, or not exist yet.
+- The name is what a person reads on every surface.
+- The abbreviation is two or three letters. It becomes the button in the editor.
+
+The copy carries the engine, the machines, the guidance and the workspace.
+It starts as a fresh git repository with one commit on `main`.
+
+Four things stay home:
+
+- the git history
+- this project's own records in `product/spec`
+- the session state in `.se/`
+- everything the ignore file already excludes
+
+Then, on the other machine:
+
+```powershell
+cd C:\path\to\empty
+.\RUNME.ps1
+```
+
 **The tick** is the universal walk operation and `se_tick` the machinery's
 ONE tool, legal in every state: without arguments it reports where the
 machine is; with arguments it advances (`to:` picks the edge, `confirm:`
