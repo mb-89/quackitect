@@ -1,0 +1,14 @@
+{"ts":"2026-07-31T14:46:58.990Z","op":"plan","visit":"expeditions/e17@0","parent":null,"nodes":[{"id":"d16","brief":"record the Obsidian-to-VS-Code pivot in e17"},{"id":"d17","brief":"delete the fabricated ruling comment in survey.ts"},{"id":"d18","brief":"give notes a title and a MoSCoW priority"},{"id":"d19","brief":"shrink the survey payload"},{"id":"d20","brief":"capture the frame buffer design for e26"}]}
+{"ts":"2026-07-31T14:47:05.251Z","op":"update","visit":"expeditions/e17@0","node":"d21","brief":"reading survey.ts in the bound worktree"}
+{"ts":"2026-07-31T14:47:24.652Z","op":"update","visit":"expeditions/e17@0","node":"d22","brief":"checking how far the e17 worktree has fallen behind"}
+{"ts":"2026-07-31T14:47:40.194Z","op":"update","visit":"expeditions/e17@0","node":"d23","brief":"reading e17 record before writing the pivot"}
+{"ts":"2026-07-31T14:48:10.273Z","op":"done","visit":"expeditions/e17@0","node":"d16","brief":"pivot written into the e17 record"}
+{"ts":"2026-07-31T14:48:24.426Z","op":"defer","visit":"expeditions/e17@0","node":"d17","brief":"delete the fabricated ruling comment in survey.ts","to":"e26","hops":1,"trail":["expeditions/e17","e26"]}
+{"ts":"2026-07-31T14:48:31.850Z","op":"defer","visit":"expeditions/e17@0","node":"d18","brief":"give notes a title and a MoSCoW priority","to":"e26","hops":1,"trail":["expeditions/e17","e26"]}
+{"ts":"2026-07-31T14:48:54.495Z","op":"defer","visit":"expeditions/e17@0","node":"d19","brief":"shrink the survey payload","to":"e26","hops":1,"trail":["expeditions/e17","e26"]}
+{"ts":"2026-07-31T14:49:08.678Z","op":"defer","visit":"expeditions/e17@0","node":"d20","brief":"capture the frame buffer design for e26","to":"e26","hops":1,"trail":["expeditions/e17","e26"]}
+{"ts":"2026-07-31T14:49:54.629Z","op":"update","visit":"expeditions/e17@0","node":"d24","brief":"answered format, concurrency and asset location"}
+{"ts":"2026-07-31T14:55:40.951Z","op":"update","visit":"expeditions/e17@0","node":"d25","brief":"checking what the overhaul actually sweeps"}
+{"ts":"2026-07-31T14:59:47.343Z","op":"update","visit":"expeditions/e17@0","node":"d26","brief":"re-reading the slider before continuing"}
+{"ts":"2026-07-31T15:00:03.169Z","op":"plan","visit":"expeditions/e17@0","parent":null,"nodes":[{"id":"d27","brief":"sync the e17 worktree to trunk"},{"id":"d28","brief":"delete the fabricated ruling comment in survey.ts"},{"id":"d29","brief":"give notes a title and a MoSCoW priority"},{"id":"d30","brief":"shrink the survey payload"},{"id":"d31","brief":"record the possible Obsidian exit"}]}
+{"ts":"2026-07-31T15:00:14.690Z","op":"plan","visit":"expeditions/e17@0","parent":null,"nodes":[]}
