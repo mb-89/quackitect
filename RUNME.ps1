@@ -136,12 +136,19 @@ if ($exportIx -ge 0) {
 $newName runs inside VS Code. You walk a state machine with an AI agent, and
 a mirror beside your editor shows where the walk stands.
 
-## Start it
+## Install it, once
 
     .\RUNME.ps1
 
-That installs whatever is missing, places the extension, and opens VS Code.
+Run that ONE time. It installs whatever is missing, places the VS Code
+extension, and opens VS Code.
+
+## Then work in VS Code
+
+After that first run, open this folder in VS Code like any other project.
 The $($newAbbr.ToUpper()) button in the left bar opens the mirror.
+
+You do not run RUNME.ps1 again. It is the installer, not the way in.
 
 ## What is in here
 
