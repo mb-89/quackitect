@@ -1047,7 +1047,7 @@ let navigatingAway = false;
 // beside it, nor about which card they had promoted. A view URL carrying only
 // the view throws both away.
 //
-// The card half was missed because the matrix landed after this rule did: the
+// The card half was missed because the card matrix landed after this rule did: the
 // detail param was carried, the card param did not exist yet, and nobody came
 // back. Entering a sub-state demoted the machine out of the main slot under
 // the reader's hand.
