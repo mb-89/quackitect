@@ -145,7 +145,16 @@ export function replayVisitsText(text: string): { visit: string; nodes: ReplayNo
     } else if (op === "done" || op === "obsolete" || op === "revert") {
       setStatus(String(rec.node ?? ""), op === "revert" ? "reverted" : op, ts, String(rec.brief ?? ""));
     } else if (op === "update") {
+      // AN UPDATE REPORTS ON A NODE. It never closes one, and it never
+      // replaces one. Overwriting the target here marked every touched item
+      // done and dropped its parent, so a replayed visit showed finished
+      // work that was still open and a flat list where nesting stood.
       const id = String(rec.node ?? "");
+      if (id === "") continue;
+      const known = byVisit.get(home.get(id) ?? visit)?.get(id);
+      if (known !== undefined) continue;
+      // An update naming a node this log never opened still deserves a line,
+      // because the point is real and lives in another visit.
       touch(visit).set(id, { id, parent: null, brief: String(rec.brief ?? ""), status: "done", at: ts, closed_at: ts });
       home.set(id, visit);
     } else if (op === "defer") {

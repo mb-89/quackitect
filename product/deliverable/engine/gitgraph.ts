@@ -12,8 +12,28 @@ import type { DecisionNode } from "./decisions.ts";
  *  something else is a detour and gets a branch of its own, named for it. */
 const branchOf = (n: DecisionNode): string => (n.parent === null ? "main" : n.id);
 
+/** How long a point's line may be. The graph is read as a checklist, and a
+ *  full brief pushes the column so wide the shape stops being visible. */
+const LABEL_CAP = 52;
+
 /** Mermaid takes a quoted string, so a quote inside a brief would end it. */
-const label = (text: string): string => text.replace(/"/g, "'").trim();
+const label = (text: string): string => {
+  const flat = text.replace(/"/g, "'").replace(/\s+/g, " ").trim();
+  if (flat.length <= LABEL_CAP) return flat;
+  const cut = flat.slice(0, LABEL_CAP);
+  const space = cut.lastIndexOf(" ");
+  return `${(space > LABEL_CAP * 0.6 ? cut.slice(0, space) : cut).trimEnd()}…`;
+};
+
+/** A tick for what landed, and a distinct mark for what did not. An open
+ *  point carries nothing, so the eye finds it by the absence. */
+const MARK: Record<string, string | undefined> = {
+  open: undefined,
+  done: "✓",
+  obsolete: "✗",
+  reverted: "↩",
+  deferred: "→",
+};
 
 interface Event {
   at: string;
@@ -28,7 +48,10 @@ const RETURNS = new Set(["done"]);
 
 export function decisionsAsGitGraph(nodes: readonly DecisionNode[]): string {
   const byId = new Map(nodes.map((n) => [n.id, n]));
-  const out: string[] = ["gitGraph"];
+  // TB reads as a CHECKLIST — top to bottom, one line per point, with the
+  // text horizontal beside its dot. Left-to-right turns the labels on their
+  // side and stops being readable past a handful of points.
+  const out: string[] = ["%%{init: {'gitGraph': {'rotateCommitLabel': false}}}%%", "gitGraph TB:"];
   if (nodes.length === 0) {
     out.push(`  commit id: "nothing decided yet"`);
     return out.join("\n");
@@ -72,7 +95,8 @@ export function decisionsAsGitGraph(nodes: readonly DecisionNode[]): string {
         current = branch;
         opened.add(branch);
       }
-      const tag = n.status === "open" ? "" : ` tag: "${n.status}"`;
+      const mark = MARK[n.status];
+      const tag = mark === undefined ? "" : ` tag: "${mark}"`;
       out.push(`  commit id: "${label(`${n.id} ${n.brief}`)}"${tag}`);
     } else {
       // A detour that came home. Merging from the parent's branch is what

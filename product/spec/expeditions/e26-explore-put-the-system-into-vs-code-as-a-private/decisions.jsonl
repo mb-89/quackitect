@@ -474,3 +474,12 @@
 {"ts":"2026-07-31T16:57:11.824Z","op":"update","visit":"expeditions/e26@0","node":"d77","brief":"showing the rendered graph"}
 {"ts":"2026-07-31T16:57:21.042Z","op":"update","visit":"expeditions/e26@0","node":"d78","brief":"checking the real graph for branches"}
 {"ts":"2026-07-31T16:57:38.830Z","op":"done","visit":"expeditions/e26@0","node":"d70","brief":"emitter, renderer and tests all land"}
+{"ts":"2026-07-31T17:03:49.483Z","op":"plan","visit":"expeditions/e26@0","parent":null,"nodes":[{"id":"d79","brief":"find out why the render shows no nesting"},{"id":"d80","brief":"turn the graph top to bottom and condense it"}]}
+{"ts":"2026-07-31T17:04:12.706Z","op":"update","visit":"expeditions/e26@0","node":"d81","brief":"445 node refs, zero parents: the replay reads the wrong key"}
+{"ts":"2026-07-31T17:05:20.555Z","op":"update","visit":"expeditions/e26@0","node":"d82","brief":"an update no longer closes the node it reports on"}
+{"ts":"2026-07-31T17:05:51.054Z","op":"done","visit":"expeditions/e26@0","node":"d80","brief":"the graph now reads as a vertical checklist"}
+{"ts":"2026-07-31T17:06:29.276Z","op":"update","visit":"expeditions/e26@0","node":"d83","brief":"fixing the fence assertion"}
+{"ts":"2026-07-31T17:06:36.252Z","op":"update","visit":"expeditions/e26@0","node":"d84","brief":"re-running after the fence fix"}
+{"ts":"2026-07-31T17:07:13.409Z","op":"update","visit":"expeditions/e26@0","node":"d85","brief":"re-rendering the same file to look at"}
+{"ts":"2026-07-31T17:07:32.059Z","op":"update","visit":"expeditions/e26@0","node":"d86","brief":"checking encoding and the branch count"}
+{"ts":"2026-07-31T17:07:55.026Z","op":"done","visit":"expeditions/e26@0","node":"d79","brief":"the replay bug is found and fixed"}
