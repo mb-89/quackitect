@@ -13,6 +13,7 @@ import { dirname, extname, join, relative, sep } from "node:path";
 import { CLAUSES, Rejection } from "./errors.ts";
 import { contentHash } from "./hash.ts";
 import { isExcluded, isRootRef, resolveDeclaredRoot, resolveForRead, resolveInRoot } from "./paths.ts";
+import { parseStateNote } from "./notes.ts";
 
 /** Whole-file read budget (chars). Beyond this, offset/limit is required. */
 export const READ_BUDGET = 50_000;
@@ -203,6 +204,37 @@ export function fileRead(root: string, path: string, opts: { offset?: number; li
   return res;
 }
 
+/** A MACHINE NOTE THAT WILL NOT PARSE IS NEVER SAVED.
+ *
+ *  A ": " inside an unquoted frontmatter scalar starts a nested mapping, so
+ *  one sentence of prose in a `guidance:` line stops a canvas compiling.
+ *  When that canvas is boot's, NOTHING repairs it from inside the lane: boot
+ *  allows no tools, start allows only reading, and every state that can write
+ *  sits behind boot. A person with an editor is the only way back.
+ *
+ *  So the guard sits at the WRITE, the last moment anything can still act.
+ *  This happened for real and took the mirror black; the compiler caught it
+ *  only once the walk was already trapped behind it. */
+function guardMachineNote(path: string, content: string): void {
+  const p = path.replace(/\\/g, "/");
+  if (!p.includes("deliverable/machines/") || !p.endsWith(".md")) return;
+  try {
+    parseStateNote(content);
+  } catch (e) {
+    throw new Rejection({
+      clause: CLAUSES.CANVAS_BROKEN,
+      expected: "frontmatter that parses as YAML — nothing was written",
+      got: `${path}: ${String((e as Error).message).split("\n")[0]}`,
+      remedy: {
+        tool: "se_file_read",
+        args: { path },
+        note: "a ': ' inside an unquoted scalar starts a nested mapping. Quote the whole value, or move the prose into the body under '## Guidance', where a colon is harmless.",
+      },
+      source: SRC,
+    });
+  }
+}
+
 export interface WriteResult {
   path: string;
   hash: string;
@@ -243,6 +275,7 @@ export function fileWrite(root: string, path: string, content: string, baseHash:
       });
     }
   }
+  guardMachineNote(path, content);
   mkdirSync(dirname(abs), { recursive: true });
   writeFileSync(abs, content, "utf8");
   return { path, hash: contentHash(content), bytes: Buffer.byteLength(content, "utf8"), created: !exists };
@@ -320,6 +353,9 @@ export function filePatch(root: string, ops: PatchOp[]): PatchResult {
     const prev = byFile.get(s.abs);
     byFile.set(s.abs, { path: s.path, next: s.next, replacements: (prev?.replacements ?? 0) + s.replacements });
   }
+  // This one belongs with the other guards: every file in the batch, before
+  // the first byte of any of them lands.
+  for (const f of byFile.values()) guardMachineNote(f.path, f.next);
   const applied = [...byFile.values()].map((f) => {
     const abs = resolveInRoot(root, f.path, SRC);
     writeFileSync(abs, f.next, "utf8");
