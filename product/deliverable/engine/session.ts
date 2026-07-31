@@ -1653,9 +1653,21 @@ export class Session {
     });
   }
 
-  /** What entering `t` demands proven: its entry read list plus its pull —
-   *  minus its own exit read list (that is the state's assignment, read
-   *  INSIDE it, not before). */
+  /** ONE READING LIST (owner ruling 2026-07-31). A document a state NAMES
+   *  and a document a tag BINDS to it are not two kinds of thing: both are
+   *  read, both are proven by the same hash or the same checkbox, both are
+   *  refused the same way. Only the PROVENANCE differs, and that rides in
+   *  each document's `sources`.
+   *
+   *  What genuinely differs is WHEN, so that is the only axis left here. */
+  private reading(m: MachineDecl, s: StateDecl, which: "enter" | "leave"): string[] {
+    if (which === "leave") return [...(s.exit?.read ?? []), ...this.consumeDemand(s)];
+    return this.entryRequirements(m, s);
+  }
+
+  /** The enter half: the state's own entry list plus everything bound to it —
+   *  minus its exit list, which is the state's assignment, read INSIDE it
+   *  rather than before it. */
   private entryRequirements(m: MachineDecl, t: StateDecl): string[] {
     const req = new Set<string>(t.entry?.read ?? []);
     if (!this.pullGateExempt(m, t)) {
@@ -1681,13 +1693,13 @@ export class Session {
   /** THE READ GATE, both directions: the current state's exit read list,
    *  and the target's entry requirements (explicit reads + the pull). */
   private assertReads(m: MachineDecl, from: StateDecl, targetIds: string[], channel: Channel, supplied: Record<string, string>): void {
-    const exitReads = [...(from.exit?.read ?? []), ...this.consumeDemand(from)];
+    const exitReads = this.reading(m, from, "leave");
     const missingExit = exitReads.filter((p) => !this.readProven(channel, p, supplied));
     if (missingExit.length > 0) this.refuseReads("exit", from.id, missingExit, channel);
     for (const id of targetIds) {
       const t = m.states.find((s) => s.id === id);
       if (t === undefined) continue;
-      const missing = this.entryRequirements(m, t).filter((p) => !this.readProven(channel, p, supplied));
+      const missing = this.reading(m, t, "enter").filter((p) => !this.readProven(channel, p, supplied));
       if (missing.length > 0) this.refuseReads("entry", t.id, missing, channel);
     }
     // THE HANDOVER RULE (owner ruling 2026-07-26): what the human checked

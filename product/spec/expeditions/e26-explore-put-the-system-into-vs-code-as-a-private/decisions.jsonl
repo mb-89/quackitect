@@ -268,3 +268,6 @@
 {"ts":"2026-07-31T08:14:49.369Z","op":"update","visit":"expeditions/e26@0","node":"d145","brief":"documenting the export in the exported README"}
 {"ts":"2026-07-31T08:15:02.366Z","op":"update","visit":"expeditions/e26@0","node":"d146","brief":"re-proving the export after the README and palette changes"}
 {"ts":"2026-07-31T08:15:38.927Z","op":"done","visit":"expeditions/e26@0","node":"d119","brief":"export self-documents; stale drawing comment corrected"}
+{"ts":"2026-07-31T08:16:30.772Z","op":"update","visit":"expeditions/e26@0","node":"d147","brief":"finding callers of the entry requirement computation"}
+{"ts":"2026-07-31T08:17:04.406Z","op":"update","visit":"expeditions/e26@0","node":"d148","brief":"one accessor answers what a state demands read, both directions"}
+{"ts":"2026-07-31T08:17:08.288Z","op":"update","visit":"expeditions/e26@0","node":"d149","brief":"verifying the unified reading list changed no behaviour"}
