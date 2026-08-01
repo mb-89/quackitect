@@ -5,6 +5,8 @@
 // both times. A spec that only admits declared types cannot make that
 // mistake — the drawing decides, and an unlisted widget refuses.
 import { strict as assert } from "node:assert";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { describe, test } from "node:test";
 import { fileURLToPath } from "node:url";
 import { Rejection } from "../engine/errors.ts";
@@ -24,6 +26,17 @@ const VALUES = {
 };
 
 describe("parameter panels", { concurrency: true }, () => {
+  // THE GUARD WAS POINTED AT THE WRONG ARTIFACT. Three assertions already
+  // said no slider may survive, and every one of them read the ENGINE's
+  // html — while the bar the owner actually touches is the extension's. So
+  // a struck slider stayed on screen for a whole expedition, and restarting
+  // could never have helped. This reads the surface a person looks at.
+  test("the VS Code host draws no control of its own — the bar is the engine's", () => {
+    const src = readFileSync(join(REPO_ROOT, "product", "deliverable", "vscode", "extension.js"), "utf8");
+    assert.doesNotMatch(src, /type="range"/, "a slider in the host is a second control bar, and it will drift");
+    assert.ok(src.includes("/widget/controls"), "the host reads the bar from the engine rather than drawing one");
+  });
+
   test("the shipped control bar is read from its spec, not from code", () => {
     const params = loadPanel(REPO_ROOT, "controls");
     assert.ok(params.length >= 4, "the panel declares its parameters");
