@@ -41,3 +41,8 @@
 {"ts":"2026-08-01T14:08:44.842Z","op":"update","visit":"expeditions/e29@0","node":"d19","brief":"measuring the warm start against the cold one"}
 {"ts":"2026-08-01T14:11:13.233Z","op":"done","visit":"expeditions/e29@0","node":"d7","brief":"filters and sort now run the language; 468 tests green"}
 {"ts":"2026-08-01T14:11:19.266Z","op":"done","visit":"expeditions/e29@0","node":"d9","brief":"warm index with incremental add and remove plus a saved cache"}
+{"ts":"2026-08-01T14:11:24.465Z","op":"done","visit":"expeditions/e29@0","node":"d10","brief":"30k builds in 5.4s cold and 442ms warm; filters run in single-digit ms"}
+{"ts":"2026-08-01T14:15:37.275Z","op":"plan","visit":"expeditions/e29@0","parent":null,"nodes":[{"id":"d20","brief":"A .base writer that re-serialises canonically"},{"id":"d21","brief":"Properties control writing the view's order"},{"id":"d22","brief":"Sort control writing sort and groupBy"},{"id":"d23","brief":"Filter control writing the filter tree with a raw escape"},{"id":"d24","brief":"View switcher with add, rename and layout"},{"id":"d25","brief":"Tests proving each control lands on disk"}]}
+{"ts":"2026-08-01T14:17:15.185Z","op":"update","visit":"expeditions/e29@0","node":"d26","brief":"the writer round-trips the whole document"}
+{"ts":"2026-08-01T14:18:27.790Z","op":"done","visit":"expeditions/e29@0","node":"d20","brief":"editBase mutates the full document, so unmodelled keys travel through"}
+{"ts":"2026-08-01T14:19:12.893Z","op":"done","visit":"expeditions/e29@0","node":"d21","brief":"ticking a column lands in the view's order on disk"}
