@@ -909,11 +909,14 @@ class Controls {
   /* THE ENGINE'S CLASSES, dressed in the HOST'S COLOURS. params.ts decides
      WHICH controls exist and what they are; this decides only how they look
      in VS Code, from the theme's own variables. */
-  .threshold { display: block; }
-  .rungbar { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; margin-top: 4px; }
-  .param-label { color: var(--vscode-descriptionForeground); text-transform: uppercase; letter-spacing: .07em; font-size: .8em; cursor: pointer; width: 100%; }
+  /* ONE ROW PER CONTROL, LABEL FIRST. params.ts emits the rows; this only
+     sizes them, so a new control needs no edit here. */
+  .threshold { display: flex; flex-direction: column; gap: 6px; }
+  .rungbar { margin-top: 4px; }
+  .param-row { display: flex; align-items: center; gap: 6px; }
+  .param-label { flex: 0 0 6.2em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--vscode-descriptionForeground); text-transform: uppercase; letter-spacing: .07em; font-size: .8em; cursor: pointer; }
   .param-label:hover { color: var(--vscode-foreground); }
-  .rungs { display: flex; gap: 4px; width: 100%; }
+  .rungs { display: flex; gap: 4px; flex: 1 1 auto; }
   .rung { flex: 1 1 auto; padding: 3px 4px; font: inherit; font-size: .85em; cursor: pointer; background: var(--vscode-button-secondaryBackground); color: var(--vscode-button-secondaryForeground); border: 1px solid var(--vscode-panel-border); border-radius: 4px; }
   .rung:hover { background: var(--vscode-button-secondaryHoverBackground); }
   .rung.on { background: var(--vscode-button-background); color: var(--vscode-button-foreground); border-color: var(--vscode-focusBorder); }
@@ -924,39 +927,33 @@ class Controls {
   .cadence { width: 3.4em; font: inherit; font-size: .9em; padding: 2px 4px; text-align: right; background: var(--vscode-input-background); color: var(--vscode-input-foreground); border: 1px solid var(--vscode-input-border, transparent); }
   .cadence-unit { color: var(--vscode-descriptionForeground); font-size: .8em; margin-right: 6px; }
   .param-action { flex: 0 0 auto; margin-left: auto; }
+  .param-choice { flex: 0 0 auto; font: inherit; font-size: .85em; padding: 2px 4px; background: var(--vscode-dropdown-background); color: var(--vscode-dropdown-foreground); border: 1px solid var(--vscode-dropdown-border, transparent); }
   .sep { height: 1px; background: var(--vscode-panel-border); margin: 10px 0 2px; }
-  input[type=text] { width: 100%; box-sizing: border-box; margin-top: 6px; padding: 3px 6px; background: var(--vscode-input-background); color: var(--vscode-input-foreground); border: 1px solid var(--vscode-input-border, transparent); font: inherit; }
+  input[type=text] { flex: 1 1 auto; min-width: 0; box-sizing: border-box; padding: 3px 6px; background: var(--vscode-input-background); color: var(--vscode-input-foreground); border: 1px solid var(--vscode-input-border, transparent); font: inherit; }
   input[type=text]::placeholder { color: var(--vscode-input-placeholderForeground); }
   input[type=text]:focus { outline: 1px solid var(--vscode-focusBorder); outline-offset: -1px; }
 </style></head><body>
 <div class="box">
-  <div class="row"><span class="name" id="a-name" title="click: the scale, explained in details">Autonomy</span></div>
-  <!-- THE ENGINE'S BAR LANDS HERE, whole. The shutdown control is not in it:
-       the owner struck it on 2026-08-01, and the spec is what draws. -->
+  <!-- THE ENGINE'S BAR LANDS HERE, WHOLE — every row, every label, the two
+       line edits and the note's priority. The shutdown control is not in it:
+       the owner struck it on 2026-08-01, and the spec is what draws.
+       NOTHING IS WRITTEN HERE. A label written here is what put "Autonomy"
+       on screen twice, and hand-written fields are how the struck sliders
+       survived a whole expedition. -->
   <div id="bar"></div>
-
-  <div class="sep"></div>
-  <input id="filter" type="text" placeholder="filter the logs">
-  <input id="note" type="text" placeholder="drop a note — Enter captures it">
 </div>
 <script>
   const vsapi = acquireVsCodeApi();
   const $ = (id) => document.getElementById(id);
-  // A FIELD BEING TYPED IN IS NEVER REWRITTEN BY THE POLL. The slider needed
-  // this while the thumb was held; a number box needs it while focused.
-  const held = () => document.activeElement;
-  $("a-name").addEventListener("click", () => vsapi.postMessage({ se: "scale-help", which: "autonomy" }));
-  // THE LOG'S TWO LINE EDITS LIVE HERE (owner ruling 2026-07-30). The log is a
-  // terminal now, and a terminal has nowhere to put a field, so they moved to
-  // the nearest surface that does.
-  $("filter").addEventListener("input", () => vsapi.postMessage({ se: "log-filter", text: $("filter").value }));
-  $("filter").addEventListener("focus", () => vsapi.postMessage({ se: "field-help", which: "filter" }));
-  $("note").addEventListener("focus", () => vsapi.postMessage({ se: "field-help", which: "note" }));
-  $("note").addEventListener("keydown", (ev) => {
-    if (ev.key !== "Enter" || $("note").value.trim() === "") return;
-    vsapi.postMessage({ se: "note", text: $("note").value });
-    $("note").value = "";
-  });
+  // A FIELD BEING TYPED IN IS NEVER REWRITTEN BY THE POLL — but only a FIELD.
+  // Guarding on focus alone froze the whole bar after every click, because the
+  // button just pressed still held it, so the poll skipped the redraw and the
+  // control sat unchanged until focus moved.
+  const typing = () => {
+    const a = document.activeElement;
+    if (a === null || a === undefined) return false;
+    return a.tagName === "INPUT" || a.tagName === "TEXTAREA" || a.tagName === "SELECT";
+  };
   // THE BAR IS THE ENGINE'S, injected whole. Nothing here decides what a
   // control looks like — params.ts drew it from the panel spec, and this
   // webview only carries the clicks back. Two drawings of one bar is what
@@ -968,9 +965,33 @@ class Controls {
   function applyBar(html) {
     const el = $("bar");
     if (el === null || typeof html !== "string" || html === "") return;
-    if (el.contains(held())) return;
+    if (typing() && el.contains(document.activeElement)) return;
     if (el.innerHTML === html) return;
     el.innerHTML = html;
+    // THE CLICK OUTRANKS AN IN-FLIGHT POLL. A poll that started before the
+    // POST landed carries the OLD position, and letting it win made the
+    // button flip back and then forward again — which is the "sometimes fast,
+    // sometimes three seconds" the reader was seeing. The painted position
+    // is held until the engine's own html agrees with it.
+    if (pendingLevel === null) return;
+    const hidden = el.querySelector("#thr");
+    if (hidden !== null && Number(hidden.value) === pendingLevel) pendingLevel = null;
+    else paintRungs(pendingLevel);
+  }
+
+  // THE CLICK PAINTS ITSELF, THEN TELLS THE ENGINE. The round trip is a POST
+  // plus a full re-render of the bar, and on this poll that is seconds. A
+  // button that waits for it reads as broken, so the bank is repainted from
+  // the click and the next poll only confirms what is already on screen.
+  let pendingLevel = null;
+  function paintRungs(level) {
+    const el = $("bar");
+    if (el === null) return;
+    for (const b of el.querySelectorAll("button.rung[data-rung]")) {
+      b.classList.toggle("on", Number(b.dataset.rung) <= level);
+    }
+    const hidden = el.querySelector("#thr");
+    if (hidden !== null) hidden.value = String(level);
   }
 
   // ONE DELEGATED LISTENER, because the markup is replaced wholesale and
@@ -982,13 +1003,54 @@ class Controls {
     if (rung !== null) {
       if (rung.classList.contains("locked")) return;
       const level = Number(rung.dataset.level);
+      pendingLevel = level;
+      paintRungs(level);
       vsapi.postMessage({ se: "autonomy", value: level });
-      vsapi.postMessage({ se: "scale-help", which: "autonomy", level });
+      // THE HELP FOLLOWS THE RUNG PRESSED, never where the walk lands.
+      // Releasing the lowest rung lands on 0, and explaining "blocked" to
+      // someone who just clicked the mechanical rung is the wrong mapping.
+      vsapi.postMessage({ se: "scale-help", which: "autonomy", level: Number(rung.dataset.rung) });
       return;
     }
     const act = t.closest(".param-action[data-post]");
-    if (act !== null) { vsapi.postMessage({ se: "post", path: act.dataset.post }); return; }
+    if (act !== null) {
+      // THE NOTE'S BUTTON CARRIES THE LINE. Every other action posts an empty
+      // body; this one would drop a blank note without the field beside it.
+      if (act.dataset.post === "/note") { captureNote(); return; }
+      vsapi.postMessage({ se: "post", path: act.dataset.post });
+      return;
+    }
+    if (t.closest(".thr-help") !== null) { vsapi.postMessage({ se: "scale-help", which: "autonomy" }); return; }
     if (t.closest(".nr-help") !== null) vsapi.postMessage({ se: "scale-help", which: "narration" });
+  });
+
+  // THE LOG'S TWO LINE EDITS ARE PANEL PARAMETERS NOW, so they arrive inside
+  // the bar and are reached the same delegated way as every other control.
+  $("bar").addEventListener("input", (ev) => {
+    const t = ev.target;
+    if (!t || !t.closest || t.closest('.param-text[data-key="log_filter"]') === null) return;
+    vsapi.postMessage({ se: "log-filter", text: t.value });
+  });
+  $("bar").addEventListener("focusin", (ev) => {
+    const t = ev.target;
+    if (!t || !t.closest || t.closest(".param-text") === null) return;
+    if (t.dataset.key === "log_filter") vsapi.postMessage({ se: "field-help", which: "filter" });
+    else if (t.dataset.key === "note_body") vsapi.postMessage({ se: "field-help", which: "note" });
+  });
+  // THE NOTE CARRIES ITS MoSCoW. The choice sits on the same row, so the
+  // weight is picked where the stray is written rather than at a retro.
+  function captureNote() {
+    const field = $("bar").querySelector('.param-text[data-key="note_body"]');
+    if (field === null || field.value.trim() === "") return;
+    const pri = $("bar").querySelector('.param-choice[data-key="note_priority"]');
+    vsapi.postMessage({ se: "note", text: field.value, priority: pri === null ? "could" : pri.value });
+    field.value = "";
+  }
+  $("bar").addEventListener("keydown", (ev) => {
+    const t = ev.target;
+    if (!t || !t.closest || t.closest('.param-text[data-key="note_body"]') === null) return;
+    if (ev.key !== "Enter") return;
+    captureNote();
   });
 
   // THE CADENCE GOES OVER AS A PAIR, because POST /narration reads
@@ -1020,7 +1082,7 @@ class Controls {
     view.webview.onDidReceiveMessage(async (m) => {
       if (!m) return;
       if (m.se === "log-filter") { logFilter = String(m.text ?? ""); redrawLog(); return; }
-      if (m.se === "note") { await post("/note", { text: m.text }); await pollLog(); return; }
+      if (m.se === "note") { await post("/note", { text: m.text, priority: m.priority }); await pollLog(); return; }
       if (m.se === "field-help") { await showFieldHelp(m.which); return; }
       if (m.se === "scale-help") { await showScaleHelp(m.which, m.level); return; }
       if (m.se === "autonomy") await post("/autonomy", { value: m.value });

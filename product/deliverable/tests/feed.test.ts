@@ -272,7 +272,10 @@ test("the unified feed derives src, type and brief — and the mirror carries th
   assert.ok(!withLog.includes('id="sd"'), "the shutdown control is gone");
   // Parity surfaces: the modal, the human note input.
   assert.ok(withLog.includes('id="modal"'));
-  assert.ok(withLog.includes('id="log-note"'));
+  // The note row is its own panel now (note-entry.md), so its field carries
+  // the spec's key rather than a hand-written id.
+  assert.ok(withLog.includes('id="note-body"'));
+  assert.ok(withLog.includes('id="note-priority"'), "the stray's MoSCoW sits beside it");
   const bare = renderMirror({ session, root, lastPacket: undefined, mode: "manual" });
   assert.ok(!bare.includes('id="w-log"'));
   // The client script must PARSE — a syntax error would kill the whole

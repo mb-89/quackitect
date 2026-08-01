@@ -538,9 +538,13 @@ const STYLE = `
   /* Line edits, integers only. Narrow on purpose — the row is dense and a
      cadence is never more than a few digits. */
   .cadence { width: 3.2em; flex: 0 0 auto; box-sizing: content-box; font: inherit; font-size: 11px; padding: 2px 4px; margin-left: 6px; background: var(--se-bg); border: 1px solid var(--se-border); border-radius: 4px; color: var(--se-fg); text-align: right; }
-  .rungbar { display: inline-flex; align-items: center; flex: 0 0 auto; gap: 0; }
-  .param-label { color: var(--se-muted); font-size: 12px; margin-left: 12px; margin-right: 2px; cursor: pointer; }
-  .param-label:first-child { margin-left: 0; }
+  /* ONE ROW PER CONTROL, LABEL FIRST. params.ts groups the rows from the
+     panel spec; this only sizes them. */
+  .rungbar { display: inline-flex; flex-direction: column; align-items: stretch; flex: 0 0 auto; gap: 4px; }
+  .param-row { display: flex; align-items: center; gap: 0; }
+  .param-label { flex: 0 0 5.4em; color: var(--se-muted); font-size: 12px; margin-right: 6px; cursor: pointer; }
+  .param-choice { font: inherit; font-size: 11px; margin-left: 6px; padding: 2px 4px; background: var(--se-bg); border: 1px solid var(--se-border); border-radius: 4px; color: var(--se-fg); }
+  .param-text { flex: 1 1 auto; min-width: 0; box-sizing: border-box; background: var(--se-bg); border: 1px solid var(--se-border); border-radius: 6px; color: var(--se-fg); font: inherit; font-size: 12px; padding: 4px 8px; }
   .param-action { margin-left: 10px; border-radius: 4px; }
   .cadence-unit { font-size: 10px; color: var(--se-dim); margin-left: 3px; }
   .nr-now { margin-left: 8px; border-radius: 4px; }
@@ -1787,12 +1791,15 @@ if (logPanel) {
     '<div style="padding:2px 0 2px 14px"><code>SE-C-113</code> — refusals by clause</div>' +
     '<div style="padding:2px 0 2px 14px"><code>15:2</code> — a time window (hh:mm prefix)</div>' +
     '<div style="padding:2px 0 2px 14px"><code>tick</code> — any word in the brief</div>'));
-  const nEl = document.getElementById("log-note");
+  // THE TWO LINE EDITS ARE PANEL PARAMETERS NOW, so they arrive with the bar
+  // and the log widget no longer writes a second pair of its own.
+  const nEl = document.getElementById("note-body");
   if (nEl) {
     nEl.addEventListener("focus", () => showDetails("drop a note", '<div class="comment-detail">A stray — an idea, a bug, a better way. Enter captures it to the inbox with your hand stamped; a retro drains it later.</div>'));
     nEl.addEventListener("keydown", async (ev2) => {
       if (ev2.key !== "Enter" || nEl.value.trim() === "") return;
-      await fetch("/note", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ text: nEl.value }) });
+      const pri = document.querySelector('.param-choice[data-key="note_priority"]');
+      await fetch("/note", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ text: nEl.value, priority: pri === null ? "could" : pri.value }) });
       nEl.value = "";
       refreshLog();
     });
@@ -2053,23 +2060,43 @@ document.addEventListener("click", (ev) => {
   // button does and this handler never learns a second one.
   const act = ev.target.closest ? ev.target.closest(".param-action") : null;
   if (act) {
+    // THE NOTE'S BUTTON CARRIES THE LINE BESIDE IT. Every other action posts
+    // an empty body; this one would drop a blank note without the field.
+    if (act.dataset.post === "/note") {
+      const f = document.getElementById("note-body");
+      if (f && f.value.trim() !== "") {
+        const pr = document.querySelector('.param-choice[data-key="note_priority"]');
+        void fetch("/note", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ text: f.value, priority: pr === null ? "could" : pr.value }) }).then(() => { f.value = ""; refreshLog(); });
+      }
+      return;
+    }
     void fetch(act.dataset.post, { method: "POST", headers: { "content-type": "application/json" }, body: "{}" });
     return;
   }
 
   const nh = ev.target.closest ? ev.target.closest(".nr-help") : null;
   if (nh) { nrHelp(); return; }
-  const n = ev.target.closest ? ev.target.closest(".rung") : null;
-  if (n && thr) {
-    const v = Number(n.dataset.level);
+  const th = ev.target.closest ? ev.target.closest(".thr-help") : null;
+  if (th) { levelHelp(Number((document.getElementById("thr") || {}).value)); return; }
+  const n = ev.target.closest ? ev.target.closest(".rung[data-level]") : null;
+  if (n) {
+    // THE HELP FOLLOWS THE RUNG PRESSED. data-level is only where the click
+    // LANDS, and on a release the two differ — explaining "blocked" to
+    // someone who clicked the mechanical rung is the wrong mapping.
+    const rung = Number(n.dataset.rung);
     // A locked rung still ANSWERS — it explains itself in details rather
     // than doing nothing, because a dead click reads as a broken button.
-    if (n.classList.contains("locked")) { levelHelp(v); return; }
-    thr.value = v;
-    const lbl = document.getElementById("thr-val");
-    if (lbl) lbl.textContent = v.toFixed(2);
+    if (n.classList.contains("locked")) { levelHelp(rung); return; }
+    const v = Number(n.dataset.level);
+    // PAINT FIRST, THEN TELL THE ENGINE. The bar redraws on the next poll,
+    // and waiting for that is seconds of a button that looks dead.
+    for (const b of document.querySelectorAll("button.rung[data-rung]")) {
+      b.classList.toggle("on", Number(b.dataset.rung) <= v);
+    }
+    const live = document.getElementById("thr");
+    if (live) live.value = v;
     void fetch("/autonomy", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ value: v }) });
-    levelHelp(v);
+    levelHelp(rung);
     return;
   }
   const h = ev.target.closest ? ev.target.closest(".thr-help") : null;
@@ -2537,11 +2564,14 @@ export function renderMirror(m: MirrorState, widget?: "machine" | "details" | "l
   // and params.ts draws the types it knows. A type it does not know refuses,
   // so a control cannot appear that the drawing never asked for.
   const thr = m.session.autonomy;
-  const slider = renderPanel(loadPanel(m.root, "controls"), {
+  const panelValues = {
     rungs: levels,
     autonomy: thr,
     ints: { narration_minutes: m.session.narrationMinutes, narration_calls: m.session.narrationCalls },
-  });
+  };
+  // THE NOTE ROW IS ITS OWN PANEL, drawn right after the controls. Both
+  // surfaces read the same two specs, so neither can drift from the other.
+  const slider = renderPanel(loadPanel(m.root, "controls"), panelValues) + renderPanel(loadPanel(m.root, "note-entry"), panelValues);
   // THE SHUTDOWN CONTROL IS GONE (owner sketch, 2026-08-01). It was redundant:
   // the only setting anyone wanted is "do not shut down while work is running",
   // and that is not a preference. The MACHINE decides it, from whether the walk
@@ -2571,7 +2601,6 @@ export function renderMirror(m: MirrorState, widget?: "machine" | "details" | "l
   // The unified feed sits ABOVE details (owner ruling 2026-07-26) — rows
   // load and refresh client-side off /api/log; only present with a log.
   const logWidget = m.log === undefined ? "" : `<div class="widget" id="w-log">${widgetHead("log", "w-log", "/widget/log")}
-    <div class="log-filter-row"><input id="log-filter" placeholder="filter the feed"><input id="log-note" placeholder="drop a note — Enter captures it"></div>
     <div class="panel log-panel" id="log-rows" data-morph-ignore><div class="meta">loading…</div></div>
   </div>`;
   // THE AGENT'S TERMINAL. The whole widget is morph-ignored: a morph that
