@@ -23,14 +23,14 @@ async function booted(): Promise<{ server: ReturnType<typeof buildServer>; sessi
 
 test("the cadence rides every packet, so both hands see the same setting", async () => {
   const { server, session } = await booted();
-  assert.equal((await call(server, "se_tick", {})).body.narration, 3, "normal until somebody moves it");
-  session.setNarration(5);
-  assert.equal((await call(server, "se_tick", {})).body.narration, 5);
+  assert.deepEqual((await call(server, "se_tick", {})).body.narration, { minutes: 5, calls: 20 }, "the default until somebody types over it");
+  session.setNarration(2, 8);
+  assert.deepEqual((await call(server, "se_tick", {})).body.narration, { minutes: 2, calls: 8 });
 });
 
 test("turned off, nothing is ever owed however long the silence runs", async () => {
   const { server, session } = await booted();
-  session.setNarration(5);
+  session.setNarration(0, 0); // both clocks stopped — nothing is ever owed
   for (let i = 0; i < 30; i++) {
     const r = await call(server, "se_file_read", { path: "product/guidance/contract.md", offset: 1, limit: 1 });
     assert.equal(r.isError, false, JSON.stringify(r.body));
@@ -40,7 +40,7 @@ test("turned off, nothing is ever owed however long the silence runs", async () 
 
 test("at the tightest notch the calls themselves fall due, warning first", async () => {
   const { server, session } = await booted();
-  session.setNarration(1); // every minute, or every 5 calls
+  session.setNarration(1, 5); // every minute, or every 5 calls
   const read = () => call(server, "se_file_read", { path: "product/guidance/contract.md", offset: 1, limit: 1 });
   let warning: string | undefined;
   let refusal: Record<string, unknown> | undefined;
@@ -55,9 +55,9 @@ test("at the tightest notch the calls themselves fall due, warning first", async
   assert.match(String(refusal.expected), /5 calls/, "the refusal states the budget the reader chose");
 });
 
-test("an update pays, whatever the notch, and the count starts over", async () => {
+test("an update pays, whatever the cadence, and the count starts over", async () => {
   const { server, session } = await booted();
-  session.setNarration(1);
+  session.setNarration(1, 5);
   for (let i = 0; i < 20; i++) {
     const r = await call(server, "se_file_read", {
       path: "product/guidance/contract.md",
@@ -71,7 +71,14 @@ test("an update pays, whatever the notch, and the count starts over", async () =
 
 test("the control refuses a value outside its notches", async () => {
   const { session } = await booted();
-  assert.throws(() => session.setNarration(0));
-  assert.throws(() => session.setNarration(6));
-  assert.throws(() => session.setNarration(2.5));
+  // Integers only, and no negatives — the row is two line edits now, and a
+  // typed value is the one thing a person can get wrong there.
+  assert.throws(() => session.setNarration(-1, 5));
+  assert.throws(() => session.setNarration(5, -1));
+  assert.throws(() => session.setNarration(2.5, 5));
+  assert.throws(() => session.setNarration(5, 2.5));
+  assert.throws(() => session.setNarration(99999, 5));
+  // Zero is LEGAL on either — it stops that clock rather than being invalid.
+  session.setNarration(0, 20);
+  session.setNarration(5, 0);
 });

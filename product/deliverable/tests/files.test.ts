@@ -271,6 +271,63 @@ test("move fixes every reference form: root-relative, vault-relative, wiki link"
   assert.throws(() => fileMove(root, "product/guidance/other.md", "product/guidance/new/doc.md"), (e) => (e as Rejection).clause === "SE-C-104");
 });
 
+// The mover was a markdown tool wearing a general file tool's name. Moving
+// brand.json and palette.css out of the project root rewrote NOTHING, answered
+// `rewritten: []`, and reported success while nine references dangled across
+// four files. Trusted, it would have shipped a product with no name and no
+// colours. Source is in the whitelist now, and what the whitelist cannot reach
+// is reported rather than passed over.
+test("move rewrites source references and reports the ones it could not", async () => {
+  const { fileMove } = await import("../engine/move.ts");
+  const root = fresh();
+  fileWrite(root, "brand.json", '{"name":"quackitect"}', null);
+  fileWrite(root, "engine/brand.ts", 'const p = join(root, "brand.json");', null);
+  fileWrite(root, "RUNME.ps1", '$b = Join-Path $root "brand.json"', null);
+  fileWrite(root, "notes/uses.md", "see brand.json", null);
+  // Not in the whitelist — the tool cannot understand every language, so this
+  // one has to come back as work the caller still owes.
+  fileWrite(root, "deploy/stack.yml", "  config: brand.json", null);
+
+  const r = fileMove(root, "brand.json", "product/brand.json");
+
+  const paths = r.rewritten.map((x) => x.path);
+  assert.ok(paths.includes("engine/brand.ts"), ".ts is rewritten");
+  assert.ok(paths.includes("RUNME.ps1"), ".ps1 is rewritten");
+  assert.ok(paths.includes("notes/uses.md"), "prose still works");
+  assert.ok(readFileSync(join(root, "engine/brand.ts"), "utf8").includes('"product/brand.json"'));
+
+  // THE TRAP: the new path CONTAINS the old one, so a naive residual scan
+  // would report every reference it had just fixed.
+  assert.deepEqual(
+    r.unrewritten.map((u) => u.path),
+    ["deploy/stack.yml"],
+    "only the unreachable format is owed",
+  );
+  assert.equal(r.unrewritten_total, 1);
+  assert.equal(r.unrewritten[0].line, 1);
+});
+
+// Source takes the root-relative form ONLY. The vault-relative and wiki forms
+// are markdown conventions, and a bare substring of one would maul unrelated
+// code — here, an identifier that merely ends with the moved file's name.
+test("move leaves markdown reference forms out of source, and spares longer names", async () => {
+  const { fileMove } = await import("../engine/move.ts");
+  const root = fresh();
+  fileWrite(root, "product/guidance/old.md", "# Doc", null);
+  fileWrite(root, "engine/x.ts", 'const a = "product/guidance/old.md";\nconst b = "guidance/old.md";\nconst c = "my-old.md";', null);
+
+  const r = fileMove(root, "product/guidance/old.md", "product/guidance/new.md");
+  const after = readFileSync(join(root, "engine/x.ts"), "utf8");
+
+  assert.ok(after.includes('"product/guidance/new.md"'), "root-relative is rewritten");
+  assert.ok(after.includes('"guidance/old.md"'), "vault-relative is left alone in source");
+  assert.ok(after.includes('"my-old.md"'), "a longer name is not a reference");
+  // The sweep is root-relative too, so the surviving vault-relative mention is
+  // NOT reported. That is the deliberate edge of the guard, pinned here so a
+  // later reader meets it as a choice rather than as a surprise.
+  assert.deepEqual(r.unrewritten, [], "nothing root-relative survives");
+});
+
 // A SKETCH IS A CONTRACT (ux.md) and the reader could not open one. It read
 // every file as utf8, so the owner had to describe a drawing the agent was
 // holding the path to. Nothing ever ruled the reader text-only; it was only

@@ -20,36 +20,28 @@
 // Armed only after boot — the reading room pays no toll.
 import { CLAUSES, Rejection } from "./errors.ts";
 
-/** The UPDATE CADENCE control's five notches. Low narrates hardest; the top
- *  notch owes nothing at all. `ms: 0` is off; `calls: 0` is no call limit. */
-export const NARRATION_LEVELS = [
-  { value: 1, abbr: "1m", name: "constant — an update every minute, or every 5 calls", ms: 60_000, calls: 5 },
-  { value: 2, abbr: "2m", name: "close — an update every 2 minutes, or every 10 calls", ms: 120_000, calls: 10 },
-  { value: 3, abbr: "5m", name: "normal — an update every 5 minutes, or every 20 calls", ms: 300_000, calls: 20 },
-  { value: 4, abbr: "15m", name: "loose — an update every 15 minutes, or every 60 calls", ms: 900_000, calls: 60 },
-  { value: 5, abbr: "off", name: "off — nothing is ever owed; the agent narrates when it chooses", ms: 0, calls: 0 },
-];
-
-export const NARRATION_DEFAULT = 3;
-
-export function narrationLevel(value: number): (typeof NARRATION_LEVELS)[number] {
-  return NARRATION_LEVELS.find((l) => l.value === value) ?? NARRATION_LEVELS[NARRATION_DEFAULT - 1];
-}
+/** THE UPDATE CADENCE, as TWO NUMBERS the reader types (owner sketch,
+ *  2026-08-01): an update every n minutes at least, or every n calls at
+ *  least, whichever falls due first since the last one.
+ *
+ *  Zero stops that clock. Both zero owes nothing. */
+export const NARRATION_DEFAULT_MINUTES = 5;
+export const NARRATION_DEFAULT_CALLS = 20;
 
 export class Toll {
   private readonly fixedWindowMs?: number;
   private readonly now: () => number;
-  private readonly level: () => number;
+  private readonly cadence: () => { minutes: number; calls: number };
   private armed = false;
   private lastTs = 0;
   private calls = 0;
   private warned = false;
   private pending?: string;
 
-  constructor(opts: { windowMs?: number; now?: () => number; level?: () => number } = {}) {
+  constructor(opts: { windowMs?: number; now?: () => number; cadence?: () => { minutes: number; calls: number } } = {}) {
     if (opts.windowMs !== undefined) this.fixedWindowMs = opts.windowMs;
     this.now = opts.now ?? Date.now;
-    this.level = opts.level ?? (() => NARRATION_DEFAULT);
+    this.cadence = opts.cadence ?? (() => ({ minutes: NARRATION_DEFAULT_MINUTES, calls: NARRATION_DEFAULT_CALLS }));
   }
 
   private minutes(ms: number): number {
@@ -60,8 +52,8 @@ export class Toll {
    *  and drops the call limit, so a fixed-window test stays about time. */
   private budget(): { ms: number; calls: number } {
     if (this.fixedWindowMs !== undefined) return { ms: this.fixedWindowMs, calls: 0 };
-    const l = narrationLevel(this.level());
-    return { ms: l.ms, calls: l.calls };
+    const c = this.cadence();
+    return { ms: c.minutes * 60_000, calls: c.calls };
   }
 
   /** The dispatch guard. Arms itself on the first call after boot. */

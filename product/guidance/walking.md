@@ -52,6 +52,12 @@ THE READING — a loop, not a list:
 - ONE DOCUMENT PER CALL, and that is the point. A host that moves a large tool result to disk hands you a PREVIEW instead of the text — and the engine has already credited it, so you stand proven to have read what you never saw. A single document cannot be eaten.
 - `.se/reading.md` is the same thing as a file, for a person to open. Agents use the tool.
 
+A WORD ON WHY THIS PARAGRAPH IS WORDED CAREFULLY. It was briefly rewritten to
+describe one concatenated read with no second call, which contradicted the
+shipped tool: `se_reading` loops, answers with a `remaining` count, and its own
+description says to call it again. Three documents disagreed with running code
+for an afternoon. The ENGINE is the truth; prose follows it.
+
 Read-ahead discipline (every state):
 
 - `route_reads` and `lookahead_read` NAME what is owed. `reading` HANDS IT OVER. Prefer the reading.
@@ -105,14 +111,18 @@ Narration rides the walk (the unified log + the decision graph):
     panel's checklist IS this graph, and a visit without a plan shows
     the reader nothing to follow. Check items off with done AS each one
     lands, never in bulk at the end.
+
     WHY, because the rule keeps getting broken: the checklist is a
     PROGRESS view, not a completion record. A reader watching it wants
-    to know where you are while you are still there. Fourteen items
-    ticked in the last minute of an hour's work tell them nothing they
-    could not have read from the commit. If an item is genuinely done,
-    close it in the same breath as the work — the next call, not the
-    last one. Only genuinely simultaneous work closes together.
-    The engine nudges when updates keep landing and nothing closes.
+    to know where you are while you are still there.
+
+    Fourteen items ticked in the last minute of an hour's work tell
+    them nothing they could not have read from the commit. If an item
+    is genuinely done, close it in the same breath as the work — the
+    next call, not the last one.
+
+    Only genuinely simultaneous work closes together. The engine nudges
+    when updates keep landing and nothing closes.
   - fork `{brief, items?}` opens an unplanned branch where you are — a
     BLOCKING detour: the current item cannot continue until this is fixed;
     resolve it and return. Extra work that merely grows the scope is not a
@@ -123,15 +133,20 @@ Narration rides the walk (the unified log + the decision graph):
     cannot be done HERE is deferred, never claimed or ignored.
   - update `{node, brief}` says what you are doing, ON a checklist item.
     An update is never called a note — notes are the retro's strays
-    (se_note). Every update CHANGES THE RENDER: the engine lands it as a
-    checked point under that node — clicking the log line always shows
-    what changed. Work that should stay open gets plan or fork instead.
+    (se_note).
+
+    Every update CHANGES THE RENDER: the engine lands it as a checked
+    point under that node — clicking the log line always shows what
+    changed. Work that should stay open gets plan or fork instead.
+
     THE NODE IS REQUIRED WHILE A CHECKLIST STANDS. An update floating
-    free of every item is narration wearing progress's clothes: the board
-    fills with checked leaves while the items it should be moving stay
-    open. With nothing open there is nothing to attach to, and a bare
-    update is exactly right. The open node map rides home on every call,
-    so naming one costs a glance.
+    free of every item is narration wearing progress's clothes: the
+    board fills with checked leaves while the items it should be moving
+    stay open.
+
+    With nothing open there is nothing to attach to, and a bare update
+    is exactly right. The open node map rides home on every call, so
+    naming one costs a glance.
 - THE BRIEF IS ONE SHORT LINE. Ninety characters at most. It may not
   chain three or more separator-joined parts, because a chain is an
   unrendered list. The engine refuses one (SE-C-120). The rule binds
@@ -156,7 +171,17 @@ Narration rides the walk (the unified log + the decision graph):
   person asking to see the work, not a tax to pay with filler: say what
   you are actually doing, on the item you are actually on.
 - `se_note {text}`: capture a stray anywhere, keep walking (contract
-  rule 4). Notes join the log feed; they drain at a retro, later.
+  rule 4). Notes join the log feed.
+- `se_note_drain {ref, disposition}`: take one back OUT, anywhere (owner
+  ruling 2026-08-01). An inbox you may only add to is not an inbox.
+  - `done` and `obsolete` are CHECKS ANYONE CAN RUN. The note says the code
+    lacks something; look, and if it is there, drain it. Say where in
+    `where:`, so the next reader does not re-check.
+  - `carried` and `backlog` still belong to the RETRO. Those decide what
+    the work MEANS and when it comes back, and that wants the whole
+    picture. The engine refuses them elsewhere.
+  - Drain as you go. A note you have just disproved is noise from that
+    moment on, and leaving it standing makes every later survey lie.
   In a LIVE discussion with the owner, do not note every exchange —
   discuss first, write ONE consolidated note when the point settles.
   BEFORE building in an area, sweep the pending notes touching it —

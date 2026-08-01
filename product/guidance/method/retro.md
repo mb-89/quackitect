@@ -28,31 +28,40 @@ The trigger is a NOTE carrying "needs retro":
 1. MARK THE BOUNDARY, before anything else. Run se_log_query with
    filter {since: "last_retro"} and keep the newest timestamp it
    returns. Write it down; every later query uses THAT timestamp.
+
    Why first: "last_retro" means the newest drain call, and step 3
    drains. Once you have drained, the phrase points at your own retro
    and the window is empty. The boundary must be taken while it still
    names the PREVIOUS retro.
+
    THE DESK'S OWN DRAINS NO LONGER POISON IT. Since e22 the front desk
-   drains too, and a desk drain from an hour ago used to hand the retro a
-   window far too short. The engine settles this now: "last_retro" means
-   the newest CARRIED or BACKLOG drain, and those are judgment
-   dispositions the desk is refused, so only a retro can set the mark
-   (engine/calllog.ts). Any drain is still the fallback for logs written
-   before the fix.
+   drains too, and a desk drain from an hour ago used to hand the retro
+   a window far too short.
+
+   The engine settles this now: "last_retro" means the newest CARRIED or
+   BACKLOG drain, and those are judgment dispositions the desk is
+   refused, so only a retro can set the mark (engine/calllog.ts). Any
+   drain is still the fallback for logs written before the fix.
+
    Take the timestamp and use it. Checking it by hand is no longer work
    this step owes.
 2. Field feedback. Ask the owner what came back from the
    field since the last look. Capture every answer as a note.
 3. Drain the notes inbox. Walk EVERY pending note once. Disposition each
    with se_note_drain — route it to exactly ONE home.
+
    CHECK BEFORE YOU JUDGE, and check CHEAPLY. Most of what pends is often
-   ALREADY BUILT — on 2026-07-31 the twelve smallest notes were sampled and
-   most had shipped, some days earlier. A note describing a gap is a claim
-   about the code, and the code answers in seconds: call the tool, grep the
-   fix, read the state. Record the check beside the disposition, so the
-   next retro re-runs it instead of re-reading the note.
+   ALREADY BUILT — on 2026-07-31 the twelve smallest notes were sampled
+   and most had shipped, some days earlier.
+
+   A note describing a gap is a claim about the code, and the code
+   answers in seconds: call the tool, grep the fix, read the state.
+   Record the check beside the disposition, so the next retro re-runs it
+   instead of re-reading the note.
+
    THE INBOX IS NOT A BACKLOG. Left undrained it becomes history, and the
    desk and the retro both weigh it as if it were work.
+
    The homes:
    - done — shipped or handled; say where.
    - obsolete — overtaken, wrong, or durably rejected; say why, so it is
@@ -75,17 +84,25 @@ The trigger is a NOTE carrying "needs retro":
    reinventing instead of reusing. Each one is a lead.
 7. Mine the record, using the timestamp step 1 stored — never the whole
    log, and never "last_retro" again by this point.
-   Rank refusal clauses by frequency; top tools; failure rates; slow calls.
-   A command that keeps failing or
-   a refusal that keeps firing is a lead — the fix may be a tool, a
-   refusal, or better guidance. Walk the period's se_run commands too
-   (v1 law): every shell command is a candidate sign of a MISSING piece
-   — a determinizer tool, a guidance page, a prompt. Repeated or
-   process-relevant commands especially. The raw log is KEPT (owner ruling:
-   forever-until-1GB; a garbage collector may harvest it later).
-   THEN MINE THE TEST TIMINGS (owner ruling 2026-07-31). Every run records
-   every test's duration to .se/test-timings.jsonl — file, name, ms, pass.
-   Rank them, and rank the files by their summed cost.
+
+   Rank four things:
+   - refusal clauses by frequency
+   - top tools
+   - failure rates
+   - slow calls
+
+   A command that keeps failing or a refusal that keeps firing is a lead.
+   The fix may be a tool, a refusal, or better guidance.
+
+   Walk the period's se_run commands too (v1 law): every shell command is
+   a candidate sign of a MISSING piece — a determinizer tool, a guidance
+   page, a prompt. Repeated or process-relevant commands especially. The
+   raw log is KEPT (owner ruling: forever-until-1GB; a garbage collector
+   may harvest it later).
+
+   THEN MINE THE TEST TIMINGS (owner ruling 2026-07-31). Every run
+   records every test's duration to .se/test-timings.jsonl — file, name,
+   ms, pass. Rank them, and rank the files by their summed cost.
    A TEST FAR ABOVE ITS SIBLINGS OWES AN EXPLANATION. Sometimes there is a
    good one: it drives a real server, or it walks a whole machine end to
    end. Sometimes there is not, and then it is a lead like any other. The

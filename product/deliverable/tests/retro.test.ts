@@ -18,7 +18,7 @@ import { Session } from "../engine/session.ts";
 import { buildServer } from "../engine/tools.ts";
 import { call, freshRoot, readHashesFor } from "./helpers.ts";
 
-test("draining is retro-scoped: refused under 'all', legal in the retro state — and the drain works", async () => {
+test("draining splits: done and obsolete anywhere, carried and backlog only in the retro", async () => {
   const root = freshRoot();
   const session = new Session(root);
   session.setAutonomy(1); // the retro weighs 1.0 - lift the slider clear
@@ -30,19 +30,28 @@ test("draining is retro-scoped: refused under 'all', legal in the retro state �
   }
   const minted = await call(server, "se_note", { text: "a stray to drain" });
   const ref = String(minted.body.captured);
-  // At idle the lane is open ("all") — the RESTRICTED drain still refuses.
-  const refused = await call(server, "se_note_drain", { ref, disposition: "done" });
-  assert.equal(refused.isError, true);
-  assert.equal(refused.body.clause, "SE-C-110");
+  // AN INBOX YOU MAY ONLY ADD TO IS NOT AN INBOX (owner ruling 2026-08-01).
+  // done and obsolete are checks anyone can run, so they drain anywhere the
+  // walk happens to stand — here, at idle.
+  const drained = await call(server, "se_note_drain", { ref, disposition: "done", where: "checked the code, it is there" });
+  assert.equal(drained.isError, false, JSON.stringify(drained.body));
+  assert.equal(drained.body.disposition, "done");
+
+  // The JUDGMENT half did not move. carried and backlog decide what the work
+  // MEANS and when it returns, which still wants the whole picture.
+  const second = await call(server, "se_note", { text: "a stray for the retro" });
+  const judged = await call(server, "se_note_drain", { ref: String(second.body.captured), disposition: "backlog", where: "ready when someone cares" });
+  assert.equal(judged.isError, true, "backlog outside the retro is still refused");
+  const ref2 = String(second.body.captured);
   // Enter the retro — one plain state; entering demands the METHOD read.
   const method = "product/guidance/method/retro.md";
   const withMethod = { ...hashes, [method]: contentHash(readFileSync(join(root, ...method.split("/")))) };
   const intoRetro = await call(server, "se_tick", { to: "retro", read_hashes: withMethod });
   assert.equal(intoRetro.isError, false, JSON.stringify(intoRetro.body));
-  // Here — and only here — the drain works; the note leaves the inbox.
-  const drained = await call(server, "se_note_drain", { ref, disposition: "done", where: "test" });
-  assert.equal(drained.isError, false, JSON.stringify(drained.body));
-  assert.equal(drained.body.inbox, 0);
+  // Here, and ONLY here, the judgment dispositions work.
+  const parked = await call(server, "se_note_drain", { ref: ref2, disposition: "backlog", where: "ready when someone cares" });
+  assert.equal(parked.isError, false, JSON.stringify(parked.body));
+  assert.equal(parked.body.inbox, 0, "both notes have now left the inbox");
   // An unknown ref refuses with v2's carried clause.
   const missing = await call(server, "se_note_drain", { ref: "note-nope", disposition: "done" });
   assert.equal(missing.isError, true);

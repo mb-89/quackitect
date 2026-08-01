@@ -1,12 +1,17 @@
-// The full engine suite as a boot condition — an ordinary SCRIPT condition
-// (exit 0 = green), named by prepare_idle next to the preflight:
-//   exit_script:
-//     - product/deliverable/engine/bin/preflight.ts
-//     - product/deliverable/engine/bin/selftest.ts
-// RUNME runs only the sub-second preflight at startup (owner ruling
-// 2026-07-26: launch must not wait five seconds); the SUITE runs here,
-// inside boot, engine-observed — the agent cannot claim a green engine,
-// only trigger the run.
+// The full engine suite — an ordinary SCRIPT condition (exit 0 = green).
+//
+// BOOT DOES NOT RUN THIS. Boot runs the PREFLIGHT and the SMOKE test, and
+// nothing else: machines/states/prepare_idle.md names those two, and together
+// they cost about half a second. This file is the full battery, ~74s over 359
+// tests, and it is run deliberately — by se_test, or by hand before landing.
+//
+// THIS COMMENT USED TO SAY THE OPPOSITE, claiming prepare_idle listed it here
+// beside the preflight. It does not, and has not: the owner's rule is that
+// only smoke tests gate boot. A stale comment about what boot costs is worth
+// correcting, because it is what anyone reads before deciding to restart.
+//
+// The agent cannot claim a green engine either way — only trigger the run.
+// The ENGINE observes the result.
 //
 //   node engine/bin/selftest.ts --root <project root>
 import { existsSync, readdirSync } from "node:fs";
