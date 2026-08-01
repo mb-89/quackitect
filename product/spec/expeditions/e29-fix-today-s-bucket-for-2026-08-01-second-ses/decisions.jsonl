@@ -46,3 +46,6 @@
 {"ts":"2026-08-01T14:17:15.185Z","op":"update","visit":"expeditions/e29@0","node":"d26","brief":"the writer round-trips the whole document"}
 {"ts":"2026-08-01T14:18:27.790Z","op":"done","visit":"expeditions/e29@0","node":"d20","brief":"editBase mutates the full document, so unmodelled keys travel through"}
 {"ts":"2026-08-01T14:19:12.893Z","op":"done","visit":"expeditions/e29@0","node":"d21","brief":"ticking a column lands in the view's order on disk"}
+{"ts":"2026-08-01T14:19:23.625Z","op":"done","visit":"expeditions/e29@0","node":"d22","brief":"sort clauses and the single group-by both write"}
+{"ts":"2026-08-01T14:20:50.384Z","op":"done","visit":"expeditions/e29@0","node":"d23","brief":"the builder compiles to expressions and reads them back"}
+{"ts":"2026-08-01T14:21:01.002Z","op":"done","visit":"expeditions/e29@0","node":"d24","brief":"the view switcher writes every operation it offers"}
