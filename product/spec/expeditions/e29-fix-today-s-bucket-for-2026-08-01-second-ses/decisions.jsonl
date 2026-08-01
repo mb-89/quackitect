@@ -1,0 +1,20 @@
+{"ts":"2026-08-01T13:03:44.112Z","op":"plan","visit":"expeditions/e29@0","parent":null,"nodes":[{"id":"d23","brief":"read the extension's bar and how it posts"},{"id":"d24","brief":"serve the engine's rendered panel to the extension"},{"id":"d25","brief":"delete the hand-written slider markup"},{"id":"d26","brief":"add a test that reads what the extension serves"},{"id":"d27","brief":"correct ATTACH.md"},{"id":"d28","brief":"land it on trunk"}]}
+{"ts":"2026-08-01T13:04:13.098Z","op":"done","visit":"expeditions/e29@0","node":"d23","brief":"the bar is a self-contained webview with three range inputs"}
+{"ts":"2026-08-01T13:04:30.090Z","op":"update","visit":"expeditions/e29@0","node":"d29","brief":"reading the engine's panel renderer to match its markup"}
+{"ts":"2026-08-01T13:06:08.719Z","op":"update","visit":"expeditions/e29@0","node":"d30","brief":"owner ruled out the endpoint; drawing the rungs in the extension"}
+{"ts":"2026-08-01T13:08:15.324Z","op":"done","visit":"expeditions/e29@0","node":"d25","brief":"slider markup and its scale map deleted from the webview"}
+{"ts":"2026-08-01T13:08:44.496Z","op":"update","visit":"expeditions/e29@0","node":"d31","brief":"finding the existing widget route so the bar has one definition"}
+{"ts":"2026-08-01T13:10:15.536Z","op":"update","visit":"expeditions/e29@0","node":"d32","brief":"engine serves the one bar; extension injects it and carries clicks"}
+{"ts":"2026-08-01T13:11:15.258Z","op":"done","visit":"expeditions/e29@0","node":"d24","brief":"one definition: engine draws the bar, extension injects it"}
+{"ts":"2026-08-01T13:11:23.295Z","op":"update","visit":"expeditions/e29@0","node":"d33","brief":"running preflight and the suite against the rewired bar"}
+{"ts":"2026-08-01T13:12:51.478Z","op":"update","visit":"expeditions/e29@0","node":"d34","brief":"running the control-bar tests before the full suite"}
+{"ts":"2026-08-01T13:13:16.579Z","op":"update","visit":"expeditions/e29@0","node":"d35","brief":"collecting the control-bar test results"}
+{"ts":"2026-08-01T13:13:25.926Z","op":"update","visit":"expeditions/e29@0","node":"d36","brief":"waiting on the control-bar test results"}
+{"ts":"2026-08-01T13:13:49.783Z","op":"update","visit":"expeditions/e29@0","node":"d37","brief":"full suite running in the background"}
+{"ts":"2026-08-01T13:14:23.511Z","op":"done","visit":"expeditions/e29@0","node":"d26","brief":"guard added: the host may not draw its own control"}
+{"ts":"2026-08-01T13:14:32.175Z","op":"update","visit":"expeditions/e29@0","node":"d38","brief":"checking the full suite before landing on trunk"}
+{"ts":"2026-08-01T13:14:53.353Z","op":"done","visit":"expeditions/e29@0","node":"d27","brief":"ATTACH.md now describes rungs and the cadence pair"}
+{"ts":"2026-08-01T13:15:00.600Z","op":"update","visit":"expeditions/e29@0","node":"d39","brief":"reading the full suite result"}
+{"ts":"2026-08-01T13:15:08.357Z","op":"update","visit":"expeditions/e29@0","node":"d40","brief":"waiting for the suite to finish before landing"}
+{"ts":"2026-08-01T13:15:17.043Z","op":"update","visit":"expeditions/e29@0","node":"d41","brief":"verifying the new host-bar guard actually runs"}
+{"ts":"2026-08-01T13:15:28.037Z","op":"update","visit":"expeditions/e29@0","node":"d42","brief":"staging the control-bar fix"}

@@ -21,14 +21,19 @@ Change any shortcut in the Keyboard Shortcuts editor.
 This is where you steer the walk.
 
 - **Autonomy** — how much the agent does on its own. It enters only steps
-  at or below this level. At 0 nothing moves without you.
-- **Shutdown** — what happens once there is nothing left to do.
+  at or below this level.
+- **Updates** — how often the agent owes a line about what it is doing.
 
-The short words under each slider are the named levels, each sitting at the
-place it actually means. Click one to jump there.
+The autonomy is a bank of switches, one per kind of work. Each rung carries
+every rung below it, so climbing goes one rung at a time. Releasing a rung
+drops everything above it as well. With no rung pressed nothing moves
+without you.
 
-Clicking a slider's name, or any level, explains the whole scale in the
-details group.
+The cadence is two clocks, in minutes and in calls. Whichever falls due
+first is what the agent owes. Setting a clock to 0 stops it. **NOW** makes
+an update due at the next possibility.
+
+Clicking a control's name explains the whole scale in the details group.
 
 Under them, one line says where the walk stands and which record is open.
 
@@ -73,7 +78,7 @@ walk.
 standing and returns to idle, asks why, and records the reason. It acts on
 the walk the drawing shows, so it belongs with the drawing.
 
-The sliders are not there. They steer the whole walk rather than that one
+The controls are not there. They steer the whole walk rather than that one
 card, so they live in the sidebar where they are always reachable.
 
 ## What is running

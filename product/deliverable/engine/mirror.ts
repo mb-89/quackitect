@@ -16,6 +16,7 @@ import { appendNote, pendingNotes, readNotes } from "./inbox.ts";
 import { loadCards } from "./cards.ts";
 import { handleHttp, type McpServer } from "./mcp.ts";
 import { feedRows, renderMirror, SHUTDOWN_LEVELS, type MirrorState } from "./render.ts";
+import { loadPanel, renderPanel } from "./params.ts";
 import { resolveInRoot, seDir } from "./paths.ts";
 import { loadLevels } from "./scale.ts";
 import { Session } from "./session.ts";
@@ -441,6 +442,20 @@ export function startMirror(o: MirrorOptions): Server {
         // the server never leaves localhost.
         res.writeHead(200, { "content-type": "application/json; charset=utf-8", "access-control-allow-origin": "*" });
         res.end(JSON.stringify(aliveState()));
+        return;
+      }
+      if (url.pathname === "/widget/controls") {
+        // THE BAR HAS EXACTLY ONE DEFINITION, and this is where every host
+        // reads it. params.ts draws it from machines/panels/controls.md; a
+        // host that drew its own drifted the moment the spec changed, and
+        // that is precisely what happened to the VS Code bar.
+        const bar = renderPanel(loadPanel(state.root, "controls"), {
+          rungs: loadLevels(state.root),
+          autonomy: state.session.autonomy,
+          ints: { narration_minutes: state.session.narrationMinutes, narration_calls: state.session.narrationCalls },
+        });
+        res.writeHead(200, { "content-type": "text/html; charset=utf-8", "access-control-allow-origin": "*" });
+        res.end(bar);
         return;
       }
       if (url.pathname === "/widget/machine" || url.pathname === "/widget/details" || url.pathname === "/widget/log" || url.pathname === "/widget/terminal" || url.pathname === "/widget/table") {

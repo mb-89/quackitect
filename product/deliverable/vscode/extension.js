@@ -297,6 +297,19 @@ async function ensureServer() {
 // ── THE CARDS ────────────────────────────────────────────────────────────
 // Read from the engine, never listed here: product/cards.md is the truth,
 // so a card added there grows a row here without an extension edit.
+// THE BAR ARRIVES AS MARKUP, never as data to re-draw. params.ts already
+// drew it from the panel spec; deriving a second picture here is exactly how
+// the struck sliders stayed on screen for a whole expedition.
+let bar = "";
+async function fetchBar() {
+  try {
+    const r = await fetch(SERVER + "/widget/controls");
+    return r.ok === true ? await r.text() : "";
+  } catch {
+    return "";
+  }
+}
+
 async function fetchCards() {
   const body = await api("/api/cards");
   return body !== null && Array.isArray(body.cards) ? body.cards : [];
@@ -336,6 +349,7 @@ async function pollWalk() {
   const moved = JSON.stringify(p.active ?? null) + "|" + String(p.status) !== lastWalk;
   lastWalk = JSON.stringify(p.active ?? null) + "|" + String(p.status);
   packet = p;
+  bar = await fetchBar();
   if (controls !== null) controls.send();
   if (logTerm !== null) await pollLog();
   // THE CARDS ARE WOKEN FROM HERE, because they no longer hold a stream of
@@ -892,27 +906,34 @@ class Controls {
   .name { color: var(--vscode-descriptionForeground); text-transform: uppercase; letter-spacing: .07em; font-size: .85em; cursor: pointer; }
   .name:hover { color: var(--vscode-foreground); }
   .val { font-family: var(--vscode-editor-font-family); }
-  input[type=range] { width: 100%; margin: 2px 0 0; accent-color: var(--vscode-focusBorder); }
-  .notches { position: relative; height: 2.7em; color: var(--vscode-descriptionForeground); font-size: .8em; }
-  .notch { position: absolute; transform: translateX(-50%); cursor: pointer; white-space: nowrap; }
-  .notch:hover { color: var(--vscode-foreground); }
+  /* THE ENGINE'S CLASSES, dressed in the HOST'S COLOURS. params.ts decides
+     WHICH controls exist and what they are; this decides only how they look
+     in VS Code, from the theme's own variables. */
+  .threshold { display: block; }
+  .rungbar { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; margin-top: 4px; }
+  .param-label { color: var(--vscode-descriptionForeground); text-transform: uppercase; letter-spacing: .07em; font-size: .8em; cursor: pointer; width: 100%; }
+  .param-label:hover { color: var(--vscode-foreground); }
+  .rungs { display: flex; gap: 4px; width: 100%; }
+  .rung { flex: 1 1 auto; padding: 3px 4px; font: inherit; font-size: .85em; cursor: pointer; background: var(--vscode-button-secondaryBackground); color: var(--vscode-button-secondaryForeground); border: 1px solid var(--vscode-panel-border); border-radius: 4px; }
+  .rung:hover { background: var(--vscode-button-secondaryHoverBackground); }
+  .rung.on { background: var(--vscode-button-background); color: var(--vscode-button-foreground); border-color: var(--vscode-focusBorder); }
+  /* Ideation delegates the CREATION of work, so its rung is drawn as a
+     hazard rather than as a setting. */
+  .rung.on.danger { border-color: var(--vscode-inputValidation-warningBorder); border-width: 2px; }
+  .rung.locked { opacity: .4; cursor: not-allowed; }
+  .cadence { width: 3.4em; font: inherit; font-size: .9em; padding: 2px 4px; text-align: right; background: var(--vscode-input-background); color: var(--vscode-input-foreground); border: 1px solid var(--vscode-input-border, transparent); }
+  .cadence-unit { color: var(--vscode-descriptionForeground); font-size: .8em; margin-right: 6px; }
+  .param-action { flex: 0 0 auto; margin-left: auto; }
   .sep { height: 1px; background: var(--vscode-panel-border); margin: 10px 0 2px; }
   input[type=text] { width: 100%; box-sizing: border-box; margin-top: 6px; padding: 3px 6px; background: var(--vscode-input-background); color: var(--vscode-input-foreground); border: 1px solid var(--vscode-input-border, transparent); font: inherit; }
   input[type=text]::placeholder { color: var(--vscode-input-placeholderForeground); }
   input[type=text]:focus { outline: 1px solid var(--vscode-focusBorder); outline-offset: -1px; }
 </style></head><body>
 <div class="box">
-  <div class="row"><span class="name" id="a-name" title="click: the scale, explained in details">Autonomy</span><span class="val" id="a-val">—</span></div>
-  <input type="range" id="a" min="0" max="1" step="0.01" value="0">
-  <div class="notches" id="a-notches"></div>
-
-  <div class="row"><span class="name" id="s-name" title="click: the levels, explained in details">Shutdown</span><span class="val" id="s-val">—</span></div>
-  <input type="range" id="s" min="1" max="5" step="1" value="1">
-  <div class="notches" id="s-notches"></div>
-
-  <div class="row"><span class="name" id="n-name" title="click: the levels, explained in details">Updates</span><span class="val" id="n-val">—</span></div>
-  <input type="range" id="n" min="1" max="5" step="1" value="3">
-  <div class="notches" id="n-notches"></div>
+  <div class="row"><span class="name" id="a-name" title="click: the scale, explained in details">Autonomy</span></div>
+  <!-- THE ENGINE'S BAR LANDS HERE, whole. The shutdown control is not in it:
+       the owner struck it on 2026-08-01, and the spec is what draws. -->
+  <div id="bar"></div>
 
   <div class="sep"></div>
   <input id="filter" type="text" placeholder="filter the logs">
@@ -921,22 +942,10 @@ class Controls {
 <script>
   const vsapi = acquireVsCodeApi();
   const $ = (id) => document.getElementById(id);
-  let lv = null;
-  // A drag must not fight the poll: while the thumb is held, incoming state
-  // never rewrites the slider under the hand.
-  let holding = null;
-  // ONE MAP, THREE BARS. The slider's id and the engine's name for it were a
-  // ternary in four places; a third bar would have made them eight.
-  const SCALE = { a: "autonomy", s: "shutdown", n: "narration" };
-  for (const id of ["a", "s", "n"]) {
-    $(id).addEventListener("pointerdown", () => { holding = id; });
-    $(id).addEventListener("input", () => { paint(); });
-    $(id).addEventListener("change", () => {
-      holding = null;
-      vsapi.postMessage({ se: SCALE[id], value: Number($(id).value) });
-    });
-    $(id + "-name").addEventListener("click", () => vsapi.postMessage({ se: "scale-help", which: SCALE[id] }));
-  }
+  // A FIELD BEING TYPED IN IS NEVER REWRITTEN BY THE POLL. The slider needed
+  // this while the thumb was held; a number box needs it while focused.
+  const held = () => document.activeElement;
+  $("a-name").addEventListener("click", () => vsapi.postMessage({ se: "scale-help", which: "autonomy" }));
   // THE LOG'S TWO LINE EDITS LIVE HERE (owner ruling 2026-07-30). The log is a
   // terminal now, and a terminal has nowhere to put a field, so they moved to
   // the nearest surface that does.
@@ -948,72 +957,59 @@ class Controls {
     vsapi.postMessage({ se: "note", text: $("note").value });
     $("note").value = "";
   });
-  function abbr(which, v) {
-    const list = lv === null ? null : lv[SCALE[which]];
-    if (!Array.isArray(list)) return String(v);
-    const l = list.find((x) => Number(x.value) === Number(v));
-    return l ? l.abbr : String(v);
+  // THE BAR IS THE ENGINE'S, injected whole. Nothing here decides what a
+  // control looks like — params.ts drew it from the panel spec, and this
+  // webview only carries the clicks back. Two drawings of one bar is what
+  // put the old sliders on screen for a whole expedition after they were
+  // struck from the spec.
+  //
+  // A BAR BEING TOUCHED IS NOT REDRAWN. Replacing the markup under a
+  // pointer swallows the click and resets a half-typed number.
+  function applyBar(html) {
+    const el = $("bar");
+    if (el === null || typeof html !== "string" || html === "") return;
+    if (el.contains(held())) return;
+    if (el.innerHTML === html) return;
+    el.innerHTML = html;
   }
-  function paint() {
-    $("a-val").textContent = Number($("a").value).toFixed(2);
-    $("s-val").textContent = abbr("s", $("s").value);
-    $("n-val").textContent = abbr("n", $("n").value);
-  }
-  // A NOTCH SITS AT ITS VALUE, never at an even share of the width. Spacing
-  // them evenly put every label somewhere the thumb would never land, so
-  // clicking one looked like the slider jumped to the wrong place.
-  function pctOf(which, v) { return which === "a" ? Number(v) * 100 : ((Number(v) - 1) / 4) * 100; }
-  function notches(which, list) {
-    const el = $(which + "-notches");
-    el.innerHTML = "";
-    let last = -99, row = 0;
-    for (const l of list) {
-      // The blocked notch is not drawn (owner ruling): the slider still drags
-      // to 0.00, and a label at the very edge only crowded the one beside it.
-      if (which === "a" && Number(l.value) === 0) continue;
-      const pct = pctOf(which, l.value);
-      // Two levels a hair apart would print on top of each other, so the
-      // second drops to a line below rather than becoming unreadable.
-      row = pct - last < 8 ? 1 - row : 0;
-      last = pct;
-      const s = document.createElement("span");
-      s.className = "notch";
-      s.textContent = l.abbr;
-      s.title = l.name + " — " + l.value;
-      s.style.left = pct + "%";
-      s.style.top = row * 1.3 + "em";
-      if (pct <= 2) s.style.transform = "translateX(0)";
-      else if (pct >= 98) s.style.transform = "translateX(-100%)";
-      s.addEventListener("click", () => {
-        $(which).value = l.value;
-        paint();
-        vsapi.postMessage({ se: SCALE[which], value: Number(l.value) });
-        vsapi.postMessage({ se: "scale-help", which: SCALE[which], level: l.value });
-      });
-      el.appendChild(s);
+
+  // ONE DELEGATED LISTENER, because the markup is replaced wholesale and
+  // anything bound to an element inside it dies with the next poll.
+  $("bar").addEventListener("click", (ev) => {
+    const t = ev.target;
+    if (!t || !t.closest) return;
+    const rung = t.closest("button.rung[data-level]");
+    if (rung !== null) {
+      if (rung.classList.contains("locked")) return;
+      const level = Number(rung.dataset.level);
+      vsapi.postMessage({ se: "autonomy", value: level });
+      vsapi.postMessage({ se: "scale-help", which: "autonomy", level });
+      return;
     }
-  }
+    const act = t.closest(".param-action[data-post]");
+    if (act !== null) { vsapi.postMessage({ se: "post", path: act.dataset.post }); return; }
+    if (t.closest(".nr-help") !== null) vsapi.postMessage({ se: "scale-help", which: "narration" });
+  });
+
+  // THE CADENCE GOES OVER AS A PAIR, because POST /narration reads
+  // {minutes, calls} and a missing half arrives as NaN.
+  $("bar").addEventListener("change", (ev) => {
+    if (!ev.target || !ev.target.closest || ev.target.closest(".cadence") === null) return;
+    const box = (key) => $("bar").querySelector('.cadence[data-key="' + key + '"]');
+    const min = box("narration_minutes"), calls = box("narration_calls");
+    vsapi.postMessage({ se: "narration", minutes: min === null ? 0 : Number(min.value), calls: calls === null ? 0 : Number(calls.value) });
+  });
+
   window.addEventListener("message", (ev) => {
     const d = ev.data;
     if (!d || d.se !== "state") return;
-    if (d.levels && lv === null) {
-      lv = d.levels;
-      if (Array.isArray(lv.autonomy)) notches("a", lv.autonomy);
-      if (Array.isArray(lv.shutdown)) notches("s", lv.shutdown);
-      if (Array.isArray(lv.narration)) notches("n", lv.narration);
-    }
-    const p = d.packet;
-    if (!p) return;
-    if (holding !== "a") { $("a").value = p.autonomy; }
-    if (holding !== "s") { $("s").value = p.shutdown; }
-    if (holding !== "n") { $("n").value = p.narration; }
-    paint();
+    applyBar(d.bar);
   });
 </script></body></html>`;
   }
   send() {
     if (this.view === null) return;
-    void this.view.webview.postMessage({ se: "state", packet, levels });
+    void this.view.webview.postMessage({ se: "state", packet, levels, bar });
   }
   resolveWebviewView(view) {
     this.view = view;
@@ -1028,8 +1024,12 @@ class Controls {
       if (m.se === "field-help") { await showFieldHelp(m.which); return; }
       if (m.se === "scale-help") { await showScaleHelp(m.which, m.level); return; }
       if (m.se === "autonomy") await post("/autonomy", { value: m.value });
-      else if (m.se === "shutdown") await post("/shutdown", { value: m.value });
-      else if (m.se === "narration") await post("/narration", { value: m.value });
+      // THE CADENCE IS A PAIR. POST /narration reads {minutes, calls}, so the
+      // old single value left both halves NaN.
+      else if (m.se === "narration") await post("/narration", { minutes: m.minutes, calls: m.calls });
+      // AN ACTION CARRIES ITS OWN ROUTE, declared in the panel spec. A new
+      // action button works with no edit here.
+      else if (m.se === "post" && typeof m.path === "string" && m.path.startsWith("/")) await post(m.path, {});
       await pollWalk();
     });
     this.render();
