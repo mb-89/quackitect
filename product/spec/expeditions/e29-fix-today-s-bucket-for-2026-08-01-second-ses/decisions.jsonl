@@ -99,3 +99,6 @@
 {"ts":"2026-08-01T15:43:18.819Z","op":"obsolete","visit":"expeditions/e29@0","node":"d15","brief":"duplicate of d6"}
 {"ts":"2026-08-01T15:44:13.036Z","op":"obsolete","visit":"expeditions/e29@0","node":"d16","brief":"duplicate of d7"}
 {"ts":"2026-08-01T15:44:21.028Z","op":"obsolete","visit":"expeditions/e29@0","node":"d17","brief":"duplicate of d8"}
+{"ts":"2026-08-01T15:47:40.048Z","op":"plan","visit":"expeditions/e29@0","parent":null,"nodes":[{"id":"d18","brief":"Write the leave report"},{"id":"d19","brief":"Close the expedition"},{"id":"d20","brief":"Return to the front desk"},{"id":"d21","brief":"Dig the plan out of the session transcripts"}]}
+{"ts":"2026-08-01T15:48:07.933Z","op":"done","visit":"expeditions/e29@0","node":"d18","brief":"report.md written and marked done"}
+{"ts":"2026-08-01T15:49:27.498Z","op":"done","visit":"expeditions/e29@0","node":"d19","brief":"closed with apply; the override names the owner's word"}
