@@ -921,8 +921,15 @@ class Controls {
   .rung:hover { background: var(--vscode-button-secondaryHoverBackground); }
   .rung.on { background: var(--vscode-button-background); color: var(--vscode-button-foreground); border-color: var(--vscode-focusBorder); }
   /* Ideation delegates the CREATION of work, so its rung is drawn as a
-     hazard rather than as a setting. */
-  .rung.on.danger { border-color: var(--vscode-inputValidation-warningBorder); border-width: 2px; }
+     hazard rather than as a setting. RED, not a bordered blue: it was
+     wearing the host's ordinary button background with a warning outline,
+     which reads as any other pressed button. */
+  .rung.on.danger { background: var(--vscode-charts-red); color: var(--vscode-button-foreground); border-color: var(--vscode-charts-red); border-width: 2px; }
+  /* THE HIDDEN RUNG. Red and pulsing, so an armed engine cannot be mistaken
+     for a merely delegated one. */
+  .rung.emergency, .rung.on.danger.emergency { background: var(--vscode-charts-red); border-color: var(--vscode-charts-red); color: var(--vscode-button-foreground); animation: se-emergency 1.1s ease-in-out infinite; }
+  @keyframes se-emergency { 0%, 100% { opacity: 1; } 50% { opacity: .45; } }
+  @media (prefers-reduced-motion: reduce) { .rung.emergency { animation: none; outline: 2px solid var(--vscode-charts-red); outline-offset: 1px; } }
   .rung.locked { opacity: .4; cursor: not-allowed; }
   .cadence { width: 3.4em; font: inherit; font-size: .9em; padding: 2px 4px; text-align: right; background: var(--vscode-input-background); color: var(--vscode-input-foreground); border: 1px solid var(--vscode-input-border, transparent); }
   .cadence-unit { color: var(--vscode-descriptionForeground); font-size: .8em; margin-right: 6px; }
@@ -984,6 +991,10 @@ class Controls {
   // button that waits for it reads as broken, so the bank is repainted from
   // the click and the next poll only confirms what is already on screen.
   let pendingLevel = null;
+  // The drumroll's memory outlives the bar, which is replaced wholesale on
+  // every poll — anything stored on the button itself dies with it.
+  let topPresses = 0;
+  let topPressAt = 0;
   function paintRungs(level) {
     const el = $("bar");
     if (el === null) return;
@@ -1001,6 +1012,32 @@ class Controls {
     if (!t || !t.closest) return;
     const rung = t.closest("button.rung[data-level]");
     if (rung !== null) {
+      // THE HIDDEN RUNG, COUNTED BEFORE EVERY GUARD. The contract, in the
+      // owner's words: five clicks on the top rung in a row go to emergency,
+      // whatever rung the autonomy sits at, and it does not matter whether
+      // the button is lit, dark or locked.
+      //
+      // Nothing may stand in front of this. The locked check below returns
+      // silently, so from mechanical every click died there and no number of
+      // presses could ever arm it.
+      if (Number(rung.dataset.rung) >= 1) {
+        const now = Date.now();
+        if (now - topPressAt > 5000) topPresses = 0;
+        topPressAt = now;
+        topPresses += 1;
+        if (topPresses >= 5) {
+          topPresses = 0;
+          // Emergency is refused below the top rung, so CLIMB first and arm
+          // second. A refused arm is indistinguishable from a dead button.
+          rung.classList.remove("locked");
+          rung.classList.add("emergency");
+          rung.textContent = "E";
+          paintRungs(1);
+          pendingLevel = 1;
+          vsapi.postMessage({ se: "emergency" });
+          return;
+        }
+      }
       if (rung.classList.contains("locked")) return;
       const level = Number(rung.dataset.level);
       pendingLevel = level;
@@ -1086,6 +1123,9 @@ class Controls {
       if (m.se === "field-help") { await showFieldHelp(m.which); return; }
       if (m.se === "scale-help") { await showScaleHelp(m.which, m.level); return; }
       if (m.se === "autonomy") await post("/autonomy", { value: m.value });
+      // THE DRUMROLL ARMED. Climb to the top rung first: the engine refuses
+      // emergency below it, and the presses may have started anywhere.
+      else if (m.se === "emergency") { await post("/autonomy", { value: 1 }); await post("/emergency", { on: true }); }
       // THE CADENCE IS A PAIR. POST /narration reads {minutes, calls}, so the
       // old single value left both halves NaN.
       else if (m.se === "narration") await post("/narration", { minutes: m.minutes, calls: m.calls });
