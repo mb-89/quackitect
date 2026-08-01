@@ -42,3 +42,8 @@
 {"ts":"2026-08-01T17:25:12.413Z","op":"update","visit":"expeditions/e30@0","node":"d77","brief":"the parser reads type and guidance, refusing an unknown type"}
 {"ts":"2026-08-01T17:26:40.804Z","op":"update","visit":"expeditions/e30@0","node":"d78","brief":"the front already outranks major; locking it with a test"}
 {"ts":"2026-08-01T17:27:13.063Z","op":"done","visit":"expeditions/e30@0","node":"d44","brief":"one re-walk joins the demand diff to reopenStates"}
+{"ts":"2026-08-01T17:27:24.695Z","op":"done","visit":"expeditions/e30@0","node":"d48","brief":"the front already outranks major, and a test holds it there"}
+{"ts":"2026-08-01T17:31:18.377Z","op":"plan","visit":"expeditions/e30@0","parent":null,"nodes":[{"id":"d79","brief":"Drain the notes the code now carries"},{"id":"d80","brief":"The colour sweep: no hex at a use site"}]}
+{"ts":"2026-08-01T17:33:15.547Z","op":"done","visit":"expeditions/e30@0","node":"d79","brief":"eight notes drained against verified code"}
+{"ts":"2026-08-01T17:37:26.956Z","op":"done","visit":"expeditions/e30@0","node":"d46","brief":"122 fields prefilled, verified against the matrix"}
+{"ts":"2026-08-01T17:37:41.134Z","op":"obsolete","visit":"expeditions/e30@0","node":"d80","brief":"the colour sweep is mostly already done; the rest is a legibility floor"}
