@@ -2079,20 +2079,18 @@ document.addEventListener("click", (ev) => {
     // LANDS, and on a release the two differ — explaining "blocked" to
     // someone who clicked the mechanical rung is the wrong mapping.
     const rung = Number(n.dataset.rung);
-    // A locked rung still ANSWERS — it explains itself in details rather
-    // than doing nothing, because a dead click reads as a broken button.
-    if (n.classList.contains("locked")) { levelHelp(rung); return; }
-    // THE HIDDEN RUNG. Five presses on the lit top rung inside three seconds
-    // arm emergency. A drumroll rather than a button, because it is for
-    // repair and nothing should reach it by accident. A single press still
-    // releases the rung exactly as before, so the ordinary affordance is
-    // untouched and nothing on screen says this exists.
-    // COUNT EVERY PRESS, lit or not. Gating the count on the rung being ON
-    // made the drumroll UNREACHABLE AT ANY NUMBER OF PRESSES, which is what
-    // the owner hit: data-level is baked into the markup, so after press one
-    // releases the rung the button still says "go to 0.6" until a poll
-    // redraws it. Every further press re-sent 0.6, the rung never relit, and
-    // the counter stuck at one no matter how long anybody hammered it.
+    // THE HIDDEN RUNG, COUNTED BEFORE EVERYTHING ELSE. The contract, in the
+    // owner's words: five clicks on the top rung in a row go to emergency,
+    // and it does not matter which rung the autonomy sits at, nor whether the
+    // button is lit, dark or locked.
+    //
+    // Two earlier versions failed it by placing the counter behind a guard.
+    // Behind the LIT check, press one released the rung and every later press
+    // landed on a dark button, because data-level is baked into the markup and
+    // stays stale until a poll redraws it. Behind the LOCKED check, no click
+    // from a low rung ever reached the counter at all, since the top rung is
+    // locked from down there. Both read as a dead button, and both were
+    // reported as one. Nothing may stand in front of this.
     if (rung >= 1) {
       const now = Date.now();
       if (now - (window.__seTopPressAt || 0) > 5000) window.__seTopPresses = 0;
@@ -2100,12 +2098,14 @@ document.addEventListener("click", (ev) => {
       window.__seTopPresses = (window.__seTopPresses || 0) + 1;
       if (window.__seTopPresses >= 5) {
         window.__seTopPresses = 0;
-        // The drumroll toggled the autonomy on its way here, so put it back at
-        // the top BEFORE arming — the engine refuses emergency below the top
-        // rung, and a refused arm would look exactly like a dead button.
+        // The autonomy may be anywhere — the owner may have started at
+        // mechanical. Emergency is refused below the top rung, so CLIMB first
+        // and arm second. A refused arm looks exactly like a dead button.
+        n.classList.remove("locked");
         n.classList.add("on");
         n.classList.add("emergency");
         n.textContent = "E";
+        for (const b of document.querySelectorAll("button.rung[data-rung]")) b.classList.add("on");
         const bar = document.getElementById("thr");
         if (bar) bar.value = 1;
         void fetch("/autonomy", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ value: 1 }) })
@@ -2113,6 +2113,9 @@ document.addEventListener("click", (ev) => {
         return;
       }
     }
+    // A locked rung still ANSWERS — it explains itself in details rather
+    // than doing nothing, because a dead click reads as a broken button.
+    if (n.classList.contains("locked")) { levelHelp(rung); return; }
     const v = Number(n.dataset.level);
     // PAINT FIRST, THEN TELL THE ENGINE. The bar redraws on the next poll,
     // and waiting for that is seconds of a button that looks dead.

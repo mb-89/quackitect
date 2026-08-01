@@ -156,6 +156,18 @@ describe("the emergency drumroll", () => {
     assert.ok(!h.posts.some((p) => p.url === "/emergency"), "a slow drumroll must not arm");
   });
 
+  test("five presses arm it from a LOCKED rung", async () => {
+    // THE CONTRACT, in the owner's words: five clicks on I go to emergency,
+    // whatever rung the autonomy sits at. From mechanical the top rung is
+    // locked, and the locked guard used to swallow every click before the
+    // counter saw it — so no number of presses could ever arm it.
+    const h = harness();
+    h.button.classes.delete("on");
+    h.button.classes.add("locked");
+    await h.press(5);
+    assert.ok(h.posts.some((p) => p.url === "/emergency"), "a locked rung swallowed the drumroll");
+  });
+
   test("the count survives a press that lands while the rung is dark", async () => {
     // THE BUG THIS FILE WAS WRITTEN FOR. The rung goes dark on press one and
     // the stale data-level keeps it dark, so counting only while lit could
