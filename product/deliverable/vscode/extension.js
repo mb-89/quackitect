@@ -994,7 +994,19 @@ class Controls {
   // The drumroll's memory outlives the bar, which is replaced wholesale on
   // every poll — anything stored on the button itself dies with it.
   let topPresses = 0;
-  let topPressAt = 0;
+  // WHEN THE RUN STARTED, not when the last click landed. The contract is
+  // "five clicks in a second and a half", which is a property of the whole
+  // run — a click-to-click timer would accept a slow, deliberate tapping
+  // that never felt like a drumroll at all.
+  let runStartedAt = 0;
+  const DRUMROLL_MS = 1500;
+  // WHEN IT ARMED. Nobody stops their hand exactly on the fifth click, and
+  // the sixth would land on the armed button, release the rung and disarm
+  // emergency instantly — the engine drops it the moment the autonomy falls
+  // below the top. So the button goes deaf for a moment and lets the hand
+  // finish.
+  let armedAt = 0;
+  const ARM_DEAF_MS = 2000;
   function paintRungs(level) {
     const el = $("bar");
     if (el === null) return;
@@ -1022,11 +1034,17 @@ class Controls {
       // presses could ever arm it.
       if (Number(rung.dataset.rung) >= 1) {
         const now = Date.now();
-        if (now - topPressAt > 5000) topPresses = 0;
-        topPressAt = now;
+        // Deaf for two seconds after arming, so the tail of the drumroll
+        // cannot undo it.
+        if (now - armedAt < ARM_DEAF_MS) return;
+        if (topPresses === 0 || now - runStartedAt > DRUMROLL_MS) {
+          topPresses = 0;
+          runStartedAt = now;
+        }
         topPresses += 1;
         if (topPresses >= 5) {
           topPresses = 0;
+          armedAt = now;
           // Emergency is refused below the top rung, so CLIMB first and arm
           // second. A refused arm is indistinguishable from a dead button.
           rung.classList.remove("locked");
