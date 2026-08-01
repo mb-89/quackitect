@@ -270,7 +270,7 @@ export class Vault {
     if (this.watcher !== null) return;
     const pending = new Set<string>();
     let timer: NodeJS.Timeout | null = null;
-    this.watcher = watch(this.dir, { recursive: true }, (_event, name) => {
+    const w = watch(this.dir, { recursive: true }, (_event, name) => {
       if (name === null) return;
       const rel = String(name).split(sep).join("/");
       if (!rel.endsWith(".md")) return;
@@ -291,6 +291,9 @@ export class Vault {
         for (const fn of this.listeners) fn();
       }, 50);
     });
+    // A watcher must never be the reason a process will not exit.
+    w.unref?.();
+    this.watcher = w;
   }
 
   stop(): void {

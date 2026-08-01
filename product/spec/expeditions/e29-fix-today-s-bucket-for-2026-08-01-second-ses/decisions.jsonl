@@ -49,3 +49,15 @@
 {"ts":"2026-08-01T14:19:23.625Z","op":"done","visit":"expeditions/e29@0","node":"d22","brief":"sort clauses and the single group-by both write"}
 {"ts":"2026-08-01T14:20:50.384Z","op":"done","visit":"expeditions/e29@0","node":"d23","brief":"the builder compiles to expressions and reads them back"}
 {"ts":"2026-08-01T14:21:01.002Z","op":"done","visit":"expeditions/e29@0","node":"d24","brief":"the view switcher writes every operation it offers"}
+{"ts":"2026-08-01T14:21:14.445Z","op":"done","visit":"expeditions/e29@0","node":"d25","brief":"54 control tests green inside a battery of 522"}
+{"ts":"2026-08-01T14:25:31.013Z","op":"plan","visit":"expeditions/e29@0","parent":null,"nodes":[{"id":"d27","brief":"One posted door for every control operation"},{"id":"d28","brief":"The toolbar and popovers drawn from the screenshots"},{"id":"d29","brief":"Property inventory with a type icon per column"},{"id":"d30","brief":"Help on click, generated from the live registry"},{"id":"d31","brief":"The route and the card wiring"},{"id":"d32","brief":"Tell the owner how to open it"}]}
+{"ts":"2026-08-01T14:27:34.495Z","op":"done","visit":"expeditions/e29@0","node":"d27","brief":"applyBaseOp is the single posted door"}
+{"ts":"2026-08-01T14:28:34.504Z","op":"done","visit":"expeditions/e29@0","node":"d29","brief":"the inventory types each column from the data itself"}
+{"ts":"2026-08-01T14:31:07.000Z","op":"done","visit":"expeditions/e29@0","node":"d28","brief":"toolbar and four popovers follow the screenshots"}
+{"ts":"2026-08-01T14:31:48.202Z","op":"update","visit":"expeditions/e29@0","node":"d33","brief":"wiring the card into the renderer"}
+{"ts":"2026-08-01T14:32:46.773Z","op":"done","visit":"expeditions/e29@0","node":"d30","brief":"help topics served from the live function registry"}
+{"ts":"2026-08-01T14:34:42.429Z","op":"done","visit":"expeditions/e29@0","node":"d31","brief":"routes land and the card renders in 25 ms"}
+{"ts":"2026-08-01T14:35:24.935Z","op":"update","visit":"expeditions/e29@0","node":"d34","brief":"the card now reads the warm model rather than re-reading"}
+{"ts":"2026-08-01T14:37:52.710Z","op":"update","visit":"expeditions/e29@0","node":"d35","brief":"waiting on the battery before writing the how-to-open note"}
+{"ts":"2026-08-01T14:40:26.332Z","op":"update","visit":"expeditions/e29@0","node":"d36","brief":"confirming the battery is clean after the reload fix"}
+{"ts":"2026-08-01T14:40:53.071Z","op":"update","visit":"expeditions/e29@0","node":"d37","brief":"battery green at 542; committing the instrument"}

@@ -22,6 +22,8 @@ import { loadLevels } from "./scale.ts";
 import { Session } from "./session.ts";
 import { survey } from "./survey.ts";
 import { editCell } from "./tables.ts";
+import { applyBaseOp, type BaseOp } from "./bases.ts";
+import { helpFor } from "./baseui.ts";
 
 export interface MirrorOptions {
   session: Session;
@@ -391,6 +393,40 @@ export function startMirror(o: MirrorOptions): Server {
         });
         return;
       }
+      if (url.pathname === "/base/help") {
+        // HELP IS A DETAIL. The card asks for a topic and puts the answer in
+        // the details pane; there is no help button anywhere on it.
+        res.writeHead(200, { "content-type": "application/json; charset=utf-8" });
+        res.end(JSON.stringify(helpFor(url.searchParams.get("topic") ?? "")));
+        return;
+      }
+      if (req.method === "POST" && url.pathname === "/base/edit") {
+        // A CONTROL IS A WRITE, so it joins the feed like every other one. It
+        // answers JSON and the card redraws itself from disk afterwards, which
+        // is what makes the file rather than the surface the state.
+        const chunks: Buffer[] = [];
+        req.on("data", (c: Buffer) => chunks.push(c));
+        req.on("end", () => {
+          const started = Date.now();
+          let args: Record<string, unknown> = {};
+          const answer = (payload: Record<string, unknown>): void => {
+            res.writeHead(200, { "content-type": "application/json; charset=utf-8" });
+            res.end(JSON.stringify(payload));
+          };
+          try {
+            const body = JSON.parse(Buffer.concat(chunks).toString("utf8") || "{}") as unknown as BaseOp;
+            args = { op: body.op, file: body.file, view: body.view };
+            applyBaseOp(o.root, body);
+            o.log.append({ tool: "mirror_base_edit", args, ok: true, outcome: "result", duration_ms: Date.now() - started, response: { written: body.file } });
+            answer({ ok: true });
+          } catch (e) {
+            const why = e instanceof Rejection ? `${e.expected} — got ${e.got}` : String((e as Error).message ?? e);
+            o.log.append({ tool: "mirror_base_edit", args, ok: false, outcome: "rejected", duration_ms: Date.now() - started, response: e instanceof Rejection ? e.toJSON() : { error: why } });
+            answer({ ok: false, error: why });
+          }
+        });
+        return;
+      }
       if (url.pathname === "/api/tick") {
         res.writeHead(200, { "content-type": "application/json; charset=utf-8" });
         res.end(JSON.stringify(state.session.tickInfo(), null, 2));
@@ -473,7 +509,7 @@ export function startMirror(o: MirrorOptions): Server {
       }
       if (url.pathname === "/widget/machine" || url.pathname === "/widget/details" || url.pathname === "/widget/log" || url.pathname === "/widget/terminal" || url.pathname === "/widget/table") {
         // RENDER FIRST, THEN WRITE THE HEAD. See the note at the catch below.
-        const widget = renderMirror(state, url.pathname.slice("/widget/".length) as "machine" | "details" | "log" | "terminal" | "table", url.searchParams.get("view") ?? undefined, undefined, url.searchParams.get("embed") === "1");
+        const widget = renderMirror(state, url.pathname.slice("/widget/".length) as "machine" | "details" | "log" | "terminal" | "table", url.searchParams.get("view") ?? undefined, undefined, url.searchParams.get("embed") === "1", url.searchParams.get("tv") ?? undefined);
         res.writeHead(200, { "content-type": "text/html; charset=utf-8" });
         res.end(widget);
         return;

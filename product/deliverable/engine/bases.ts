@@ -334,6 +334,34 @@ function matchRow(node: Node): FilterRow | null {
   return null;
 }
 
+/**
+ * What the surface posts: the same tree shape, but a leaf may still be a
+ * BUILDER ROW rather than an expression.
+ *
+ * The templates that turn a row into an expression live in OPERATORS and stay
+ * there. A client that built its own expressions would be a second copy of
+ * that vocabulary, drifting the first time an operator is added.
+ */
+export type PostedTree = string | { r: FilterRow } | { and: PostedTree[] } | { or: PostedTree[] } | { not: PostedTree };
+
+/** Compile a posted tree to expressions. An empty group answers null. */
+export function compileTree(t: PostedTree | null | undefined): FilterTree | null {
+  if (t === null || t === undefined) return null;
+  if (typeof t === "string") return t.trim() === "" ? null : t;
+  if ("r" in t) {
+    const expr = toExpression(t.r);
+    return expr.trim() === "" ? null : expr;
+  }
+  if ("not" in t) {
+    const inner = compileTree(t.not);
+    return inner === null ? null : { not: inner };
+  }
+  const key = "and" in t ? "and" : "or";
+  const kids = ((key === "and" ? t.and : (t as { or: PostedTree[] }).or) ?? []).map(compileTree).filter((k): k is FilterTree => k !== null);
+  if (kids.length === 0) return null;
+  return key === "and" ? { and: kids } : { or: kids };
+}
+
 /** The whole tree for one view, as the popover's "This view" half writes it. */
 export function setViewFilters(root: string, rel: string, view: string, tree: FilterTree | null): string {
   return editBase(root, rel, (doc) => {
@@ -448,4 +476,68 @@ export function createBase(root: string, rel: string, view = "Table"): string {
 
 export function basePath(root: string, rel: string): string {
   return join(vaultDir(root), rel);
+}
+
+// ---------------------------------------------------------------------------
+// ONE DOOR FOR EVERY CONTROL
+//
+// The surface posts {op, ...} and this decides what it meant. Keeping the
+// dispatch here rather than in the HTTP layer means the route stays four lines
+// and an unknown op is refused by the module that owns the vocabulary.
+// ---------------------------------------------------------------------------
+
+export interface BaseOp {
+  op: string;
+  file: string;
+  view?: string;
+  property?: string;
+  on?: boolean;
+  order?: string[];
+  name?: string | null;
+  sort?: SortClause[];
+  direction?: "ASC" | "DESC";
+  filters?: FilterTree | null;
+  /** A tree whose leaves may still be builder rows. Compiled here, not there. */
+  posted?: PostedTree | null;
+  type?: Layout;
+  to?: string;
+}
+
+const NEEDS_VIEW = new Set(["toggleProperty", "setOrder", "hideAll", "setSort", "setGroupBy", "setViewFilters", "renameView", "setLayout", "removeView", "duplicateView"]);
+
+export function applyBaseOp(root: string, o: BaseOp): string {
+  if (NEEDS_VIEW.has(o.op) && (o.view === undefined || o.view === "")) {
+    throw new Rejection({
+      clause: CLAUSES.REQUIRED_ARGS,
+      expected: `a view name, which ${o.op} acts on`,
+      got: "no view",
+      remedy: { tool: "se_file_read", args: { path: "product/deliverable/engine/bases.ts" }, note: "the surface sends the view it is showing" },
+      source: SRC,
+    });
+  }
+  const v = String(o.view ?? "");
+  switch (o.op) {
+    case "toggleProperty": return toggleProperty(root, o.file, v, String(o.property), o.on === true);
+    case "setOrder": return setOrder(root, o.file, v, o.order ?? []);
+    case "hideAll": return hideAll(root, o.file, v);
+    case "setDisplayName": return setDisplayName(root, o.file, String(o.property), o.name ?? null);
+    case "setSort": return setSort(root, o.file, v, o.sort ?? []);
+    case "setGroupBy": return setGroupBy(root, o.file, v, o.property ?? null, o.direction ?? "ASC");
+    case "setViewFilters": return setViewFilters(root, o.file, v, o.posted !== undefined ? compileTree(o.posted) : (o.filters ?? null));
+    case "setGlobalFilters": return setGlobalFilters(root, o.file, o.posted !== undefined ? compileTree(o.posted) : (o.filters ?? null));
+    case "addView": return addView(root, o.file, String(o.name ?? ""), o.type ?? "table");
+    case "renameView": return renameView(root, o.file, v, String(o.to ?? ""));
+    case "setLayout": return setLayout(root, o.file, v, o.type ?? "table");
+    case "removeView": return removeView(root, o.file, v);
+    case "duplicateView": return duplicateView(root, o.file, v, String(o.to ?? ""));
+    case "createBase": return createBase(root, o.file, String(o.name ?? "Table"));
+    default:
+      throw new Rejection({
+        clause: CLAUSES.REQUIRED_ARGS,
+        expected: `a control operation: ${[...NEEDS_VIEW, "setDisplayName", "setGlobalFilters", "addView", "createBase"].sort().join(", ")}`,
+        got: o.op,
+        remedy: { tool: "se_file_read", args: { path: "product/deliverable/engine/bases.ts" }, note: "applyBaseOp is the whole vocabulary the surface may post" },
+        source: SRC,
+      });
+  }
 }

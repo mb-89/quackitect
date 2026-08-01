@@ -22,7 +22,9 @@ import { type StrayNote } from "./inbox.ts";
 import { loadLevels } from "./scale.ts";
 import { loadPanel, renderPanel } from "./params.ts";
 import { mainMachinePath, Session } from "./session.ts";
-import { TABLE_SCRIPT, TABLE_STYLE, tableWidget } from "./tables.ts";
+import { TABLE_SCRIPT, TABLE_STYLE } from "./tables.ts";
+import { basesCard } from "./baseui.ts";
+import { BASES_SCRIPT, BASES_STYLE } from "./basesclient.ts";
 import { compileMachineCached, resolveRef } from "./machines/compile.ts";
 import { type MachineDecl } from "./machine.ts";
 
@@ -2409,7 +2411,7 @@ const NATIVE = `
   body.solo aside, body.solo main { background: transparent; }
 `;
 
-export function renderMirror(m: MirrorState, widget?: "machine" | "details" | "log" | "terminal" | "table", view?: string, card?: string, embed?: boolean): string {
+export function renderMirror(m: MirrorState, widget?: "machine" | "details" | "log" | "terminal" | "table", view?: string, card?: string, embed?: boolean, tableView?: string): string {
   const skin = embed === true ? NATIVE : "";
   const bodyClass = embed === true ? ` class="embed${widget === undefined ? "" : " solo"}"` : "";
   const info = m.session.describe() as { active: string[]; status: string };
@@ -2631,13 +2633,13 @@ export function renderMirror(m: MirrorState, widget?: "machine" | "details" | "l
   // computing it eagerly would have put a 60% tax on the machine page, the
   // log page and the details page, none of which ever show a table.
   const tblWidget = (): string =>
-    tableWidget(m.root, `<button class="expand" data-widget="w-table" data-url="/widget/table" title="expand · ctrl-click: new tab · shift-click: new window — both open frozen on what this card is showing">⛶</button>`);
+    basesCard(m.root, `<button class="expand" data-widget="w-table" data-url="/widget/table" title="expand · ctrl-click: new tab · shift-click: new window — both open frozen on what this card is showing">⛶</button>`, tableView);
   // Read per render, so editing palette.css needs no restart.
   const pal = palette(m.root);
 
   if (widget === "table") {
-    return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>se · table</title><style>${pal}${STYLE}${TABLE_STYLE} #w-table{flex:1;border-bottom:0;min-height:0} body.solo #sidebar{display:flex;flex-direction:column;height:100vh} .tbl-body{flex:1;min-height:0}${skin}</style>${ELEMENTS}</head>
-<body${bodyClass}><div class="cols"><aside id="sidebar" style="width:100vw;max-width:100vw">${tblWidget()}</aside></div>${MODAL}${data}<script>${SCRIPT}</script><script>${TABLE_SCRIPT}</script></body></html>`;
+    return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>se · table</title><style>${pal}${STYLE}${TABLE_STYLE}${BASES_STYLE} #w-table{flex:1;border-bottom:0;min-height:0} body.solo #sidebar{display:flex;flex-direction:column;height:100vh} .tbl-body{flex:1;min-height:0}${skin}</style>${ELEMENTS}</head>
+<body${bodyClass}><div class="cols"><aside id="sidebar" style="width:100vw;max-width:100vw">${tblWidget()}</aside></div>${MODAL}${data}<script>${SCRIPT}</script><script>${TABLE_SCRIPT}</script><script>${BASES_SCRIPT}</script></body></html>`;
   }
 
   if (widget === "terminal") {
@@ -2707,13 +2709,13 @@ export function renderMirror(m: MirrorState, widget?: "machine" | "details" | "l
   const nowAt = Math.max(0, cardList.findIndex((c) => c.id === now));
   const legendHtml = `<div class="card" id="card-legend" style="${cellAt(nowAt)}"><div class="widget" id="w-legend"><div class="widget-head"><span>keys</span></div><div class="widget-body">${legendRows}</div></div></div>`;
   const cardData = `<script type="application/json" id="se-cards">${JSON.stringify({ list: cardList.map((c) => ({ n: c.n, id: c.id, title: c.title })), now })}</script>`;
-  return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>se mirror</title><style>${pal}${STYLE}${TABLE_STYLE}${skin}</style>${ELEMENTS}</head>
+  return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>se mirror</title><style>${pal}${STYLE}${TABLE_STYLE}${BASES_STYLE}${skin}</style>${ELEMENTS}</head>
 <body${bodyClass}>
 <div class="cards" data-keep-style style="grid-template-rows:repeat(${rows},1fr)">
   ${cardsHtml}
   ${legendHtml}
   <div class="divider" id="div-cards"></div>
 </div>
-${MODAL}${data}${cardData}<script>${SCRIPT}</script><script>${TABLE_SCRIPT}</script>
+${MODAL}${data}${cardData}<script>${SCRIPT}</script><script>${TABLE_SCRIPT}</script><script>${BASES_SCRIPT}</script>
 </body></html>`;
 }
