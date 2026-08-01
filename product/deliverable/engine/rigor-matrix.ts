@@ -11,7 +11,7 @@ import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { CLAUSES, Rejection } from "./errors.ts";
 import { parseStateNote, section } from "./notes.ts";
-import { validateMachine, type EdgeDecl, type EvidenceField, type EvidenceType, type MachineDecl, type StateDecl } from "./machine.ts";
+import { STANDARD_ROUNDS, validateMachine, type EdgeDecl, type EvidenceField, type EvidenceType, type MachineDecl, type StateDecl } from "./machine.ts";
 
 const SRC = "engine/rigor-matrix.ts";
 
@@ -311,7 +311,13 @@ export function compileColumn(matrix: RigorMatrix, column: ChangeColumn): Machin
       filled_by: row.filled_by,
       ...(row.command ? { command: row.command } : {}),
       guidance: [cell.body, row.guidance].filter(Boolean).join("\n\n"),
-      evidence_form: row.evidence_form,
+      // EVERY GATE CARRIES THE FOUR ROUNDS, and the compiler adds them so that
+      // no row author can forget one. v2 recorded what happens otherwise: the
+      // rounds were doctrine since meth-gate-review was written, no evidence
+      // form ever collected them, and consequently NOT ONE was filled in any
+      // gate of any iteration. The canvas compiler already did this; THIS one
+      // did not, so the ten gates a real iteration walks carried none of them.
+      evidence_form: row.state_kind === "gate" ? [...row.evidence_form, ...STANDARD_ROUNDS] : row.evidence_form,
       ...(row.runs ? { submachine: row.runs } : {}),
       priority: priorityOf(row),
       // Absent stays minimal — the always-legal three and nothing else. The

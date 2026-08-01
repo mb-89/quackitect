@@ -48,6 +48,7 @@ export function startMirror(o: MirrorOptions): Server {
     // The server is going away with the walk unfinished — a quit, not an end.
     gone: state.session.serverGone,
     autonomy: state.session.autonomy,
+    emergency: state.session.emergency,
     power: state.session.power,
     active: state.session.active(),
     busy: state.session.busy(),
@@ -130,6 +131,13 @@ export function startMirror(o: MirrorOptions): Server {
         post(req, res, "mirror_script", (body) => ({
           args: { state: body.state ?? "" },
           result: state.session.scriptRun(String(body.state ?? "")),
+        }));
+        return;
+      }
+      if (req.method === "POST" && url.pathname === "/emergency") {
+        post(req, res, "mirror_emergency", (body) => ({
+          args: { on: body.on === true },
+          result: state.session.setEmergency(body.on === true),
         }));
         return;
       }

@@ -37,37 +37,9 @@ export class MachineCompileError extends Error {
   }
 }
 
-/**
- * THE STANDARD REVIEW ROUNDS — ported from v2 (which ported them from v1's
- * milestone-review guide). Every gate carries these in addition to its own
- * acceptance items. They are REQUIRED: a review that nothing asks for is a
- * review that never happens — i12 found that three separate times.
- */
-export const STANDARD_ROUNDS: EvidenceField[] = [
-  {
-    name: "verify_round",
-    description:
-      "BUILT IT RIGHT: every input state since the last gate, its evidence read against its claim. Open what the evidence points at rather than trusting its description of itself — a bless is not proof.",
-    required: true,
-  },
-  {
-    name: "validate_round",
-    description:
-      "BUILT THE RIGHT THING: against the frame and the goal, not merely this step's own plan. List what is missing, wrong or out of scope.",
-    required: true,
-  },
-  {
-    name: "redteam_round",
-    description:
-      "ARGUE THE OPPOSING CASE BEFORE ENDORSING. Cite a rubric, never vibes. Name the KILL-CRITERION: what would have to be true for this to be the wrong call, then look for it. An override is logged WITH its dissent, never as a clean pass.",
-    required: true,
-  },
-  {
-    name: "verdict",
-    description: "PASS, PASS WITH NOTED OVERRIDES, or REOPEN with the named states and reasons. No silent pass.",
-    required: true,
-  },
-];
+// THE STANDARD REVIEW ROUNDS moved to machine.ts, where BOTH compilers can
+// reach one copy. Re-exported so existing importers keep working.
+export { STANDARD_ROUNDS } from "../machine.ts";
 
 function evidenceForm(machineId: string, noteName: string, body: string): EvidenceField[] {
   const text = section(body, "Evidence form");

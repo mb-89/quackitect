@@ -47,3 +47,145 @@
 {"ts":"2026-08-01T17:33:15.547Z","op":"done","visit":"expeditions/e30@0","node":"d79","brief":"eight notes drained against verified code"}
 {"ts":"2026-08-01T17:37:26.956Z","op":"done","visit":"expeditions/e30@0","node":"d46","brief":"122 fields prefilled, verified against the matrix"}
 {"ts":"2026-08-01T17:37:41.134Z","op":"obsolete","visit":"expeditions/e30@0","node":"d80","brief":"the colour sweep is mostly already done; the rest is a legibility floor"}
+{"ts":"2026-08-01T17:44:34.968Z","op":"plan","visit":"expeditions/e30@0","parent":null,"nodes":[{"id":"d81","brief":"Answer whether a verbal overruling can work at all"},{"id":"d82","brief":"Design the force switch, scoped and recorded"},{"id":"d83","brief":"Note the owner's aversion to markdown tables"}]}
+{"ts":"2026-08-01T17:45:37.804Z","op":"done","visit":"expeditions/e30@0","node":"d83","brief":"tables are for comparing, blocks are for deciding"}
+{"ts":"2026-08-01T17:45:48.315Z","op":"done","visit":"expeditions/e30@0","node":"d81","brief":"the gate is code; chat cannot lift it"}
+{"ts":"2026-08-01T17:51:08.101Z","op":"plan","visit":"expeditions/e30@0","parent":null,"nodes":[{"id":"d84","brief":"Strip the NUL bytes out of the sizes test"},{"id":"d85","brief":"Teach the panel test about the toggles row"}]}
+{"ts":"2026-08-01T17:51:30.503Z","op":"done","visit":"expeditions/e30@0","node":"d84","brief":"zero NUL bytes, and the lane reads it again"}
+{"ts":"2026-08-01T17:51:41.850Z","op":"done","visit":"expeditions/e30@0","node":"d85","brief":"the panel test knows the toggles row"}
+{"ts":"2026-08-01T18:01:03.077Z","op":"plan","visit":"expeditions/e30@0","parent":null,"nodes":[{"id":"d86","brief":"Emergency lifts the tool gate in every state"},{"id":"d87","brief":"It arms only from the top rung, and drops with it"},{"id":"d88","brief":"Five rapid presses on ideation, nothing advertised"},{"id":"d89","brief":"Red and pulsing, so it is never mistaken for normal"}]}
+{"ts":"2026-08-01T18:01:27.562Z","op":"done","visit":"expeditions/e30@0","node":"d86","brief":"the gate returns early under emergency"}
+{"ts":"2026-08-01T18:02:17.949Z","op":"done","visit":"expeditions/e30@0","node":"d87","brief":"arms only at the top rung, drops when it falls"}
+{"ts":"2026-08-01T18:02:48.731Z","op":"update","visit":"expeditions/e30@0","node":"d90","brief":"wiring the drumroll into the rung handler"}
+{"ts":"2026-08-01T18:03:34.461Z","op":"done","visit":"expeditions/e30@0","node":"d88","brief":"five presses in three seconds, and nothing says so"}
+{"ts":"2026-08-01T18:04:08.262Z","op":"done","visit":"expeditions/e30@0","node":"d89","brief":"red and pulsing, with a still outline for reduced motion"}
+{"ts":"2026-08-01T18:04:41.105Z","op":"done","visit":"expeditions/e30@0","node":"d82","brief":"the force switch is the hidden rung past ideation"}
+{"ts":"2026-08-01T18:11:21.309Z","op":"plan","visit":"expeditions/e30@0","parent":null,"nodes":[{"id":"d91","brief":"Check whether the typing saw v1 and v2 prior art"},{"id":"d92","brief":"Read what v1 and v2 actually shipped for typed evidence"}]}
+{"ts":"2026-08-01T18:15:26.379Z","op":"fork","visit":"expeditions/e30@0","parent":"d91","node":"d93","brief":"Mine the static board export for missed guidance","nodes":[]}
+{"ts":"2026-08-01T18:15:35.760Z","op":"update","visit":"expeditions/e30@0","node":"d94","brief":"Dumping the board's embedded data blobs"}
+{"ts":"2026-08-01T18:15:53.221Z","op":"update","visit":"expeditions/e30@0","node":"d95","brief":"Checking if the board holds a baked payload or only chrome"}
+{"ts":"2026-08-01T18:16:04.375Z","op":"update","visit":"expeditions/e30@0","node":"d96","brief":"Extracting the baked machine from the board"}
+{"ts":"2026-08-01T18:16:21.186Z","op":"update","visit":"expeditions/e30@0","node":"d97","brief":"Parsing v2's frozen machine stack"}
+{"ts":"2026-08-01T18:16:31.886Z","op":"update","visit":"expeditions/e30@0","node":"d98","brief":"Listing v2's 48 systematic states against our 50 rows"}
+{"ts":"2026-08-01T18:16:58.418Z","op":"update","visit":"expeditions/e30@0","node":"d99","brief":"Diffing v2's 48 states against our rigor-matrix rows"}
+{"ts":"2026-08-01T18:17:16.479Z","op":"update","visit":"expeditions/e30@0","node":"d100","brief":"Dumping v2's per-state guidance to compare"}
+{"ts":"2026-08-01T18:17:34.294Z","op":"update","visit":"expeditions/e30@0","node":"d101","brief":"Checking if v3 gates kept v2's four standard rounds"}
+{"ts":"2026-08-01T18:17:48.555Z","op":"update","visit":"expeditions/e30@0","node":"d102","brief":"Verifying v3 has no gate-review rounds anywhere"}
+{"ts":"2026-08-01T18:18:17.933Z","op":"done","visit":"expeditions/e30@0","node":"d93","brief":"Board is v2 frozen; the gap is gate rounds never collected"}
+{"ts":"2026-08-01T18:18:34.214Z","op":"update","visit":"expeditions/e30@0","node":"d103","brief":"Checking if v3's ported STANDARD_ROUNDS is live or dead"}
+{"ts":"2026-08-01T18:18:45.525Z","op":"update","visit":"expeditions/e30@0","node":"d104","brief":"Reading the wiring at compile.ts:453 before claiming a gap"}
+{"ts":"2026-08-01T18:19:16.345Z","op":"done","visit":"expeditions/e30@0","node":"d92","brief":"v2's EvidenceField and rounds both survive in v3"}
+{"ts":"2026-08-01T18:23:15.721Z","op":"update","visit":"expeditions/e30@0","node":"d105","brief":"Checking what e30 still holds unlanded"}
+{"ts":"2026-08-01T18:23:26.326Z","op":"update","visit":"expeditions/e30@0","node":"d106","brief":"Battery run before landing the emergency work"}
+{"ts":"2026-08-01T18:24:21.424Z","op":"plan","visit":"expeditions/e30@0","parent":null,"nodes":[{"id":"d107","brief":"find where a gate review report is written"},{"id":"d108","brief":"find whether any surface renders it"},{"id":"d109","brief":"read the closest rendered sibling (expedition report.md)"},{"id":"d110","brief":"pull the voice.md rules that bind such a document"}]}
+{"ts":"2026-08-01T18:24:28.329Z","op":"update","visit":"expeditions/e30@0","node":"d111","brief":"reading the prep spec's account of assertGateReport and its single call site"}
+{"ts":"2026-08-01T18:24:58.705Z","op":"update","visit":"expeditions/e30@0","node":"d112","brief":"tracing v1's report verdict link to its milestone review doc"}
+{"ts":"2026-08-01T18:24:58.747Z","op":"update","visit":"expeditions/e30@0","node":"d113","brief":"reading cards.md for the surface list, plus the two review method cards"}
+{"ts":"2026-08-01T18:25:04.716Z","op":"update","visit":"expeditions/e30@0","node":"d114","brief":"reading v1 report.go where the milestone evidence doc renders"}
+{"ts":"2026-08-01T18:25:06.610Z","op":"done","visit":"expeditions/e30@0","node":"d107","brief":"session.ts:363-436 writes it; single call site session.ts:2538-2540"}
+{"ts":"2026-08-01T18:25:09.797Z","op":"done","visit":"expeditions/e30@0","node":"d108","brief":"No surface renders it: mirror has no reviews/ route"}
+{"ts":"2026-08-01T18:25:12.142Z","op":"update","visit":"expeditions/e30@0","node":"d115","brief":"hunting v1 evidence docs that actually carry review rounds"}
+{"ts":"2026-08-01T18:25:17.367Z","op":"update","visit":"expeditions/e30@0","node":"d116","brief":"hunting v1 evidence docs that actually carry review rounds"}
+{"ts":"2026-08-01T18:25:18.189Z","op":"update","visit":"expeditions/e30@0","node":"d117","brief":"no report.md in the tree; looking for a real one on an exp/ branch"}
+{"ts":"2026-08-01T18:25:25.755Z","op":"update","visit":"expeditions/e30@0","node":"d118","brief":"reading two whole v1 milestone review docs end to end"}
+{"ts":"2026-08-01T18:25:34.510Z","op":"update","visit":"expeditions/e30@0","node":"d119","brief":"reading the e29 leave report - the closest existing narrative artifact"}
+{"ts":"2026-08-01T18:25:36.307Z","op":"update","visit":"expeditions/e30@0","node":"d120","brief":"finding who reads v1 review docs and when"}
+{"ts":"2026-08-01T18:25:43.983Z","op":"update","visit":"expeditions/e30@0","node":"d121","brief":"finding the v1 handover pager shown at a gate"}
+{"ts":"2026-08-01T18:25:50.837Z","op":"update","visit":"expeditions/e30@0","node":"d122","brief":"Battery in the background while v1 is mined"}
+{"ts":"2026-08-01T18:25:54.157Z","op":"update","visit":"expeditions/e30@0","node":"d123","brief":"reading v1 engage/contract adjudicate rules verbatim"}
+{"ts":"2026-08-01T18:26:05.189Z","op":"update","visit":"expeditions/e30@0","node":"d124","brief":"checking whether v2 ever named a review report"}
+{"ts":"2026-08-01T18:26:12.508Z","op":"update","visit":"expeditions/e30@0","node":"d125","brief":"finding what v2 showed the owner at a gate offer"}
+{"ts":"2026-08-01T18:26:18.441Z","op":"update","visit":"expeditions/e30@0","node":"d126","brief":"reading v2 loop.ts where the gate brief is composed"}
+{"ts":"2026-08-01T18:26:18.706Z","op":"update","visit":"expeditions/e30@0","node":"d127","brief":"checking whether v3 kept v1's phone hand-off lane for a gate"}
+{"ts":"2026-08-01T18:26:29.082Z","op":"update","visit":"expeditions/e30@0","node":"d128","brief":"locating v2 gate brief composition"}
+{"ts":"2026-08-01T18:26:35.472Z","op":"update","visit":"expeditions/e30@0","node":"d129","brief":"reading the v2 gate brief lines the owner actually saw"}
+{"ts":"2026-08-01T18:26:35.510Z","op":"update","visit":"expeditions/e30@0","node":"d130","brief":"confirming the mirror form surface never reaches the gate review file"}
+{"ts":"2026-08-01T18:26:39.821Z","op":"fork","visit":"expeditions/e30@0","parent":"d110","node":"d131","brief":"Work out which decision record the report links into","nodes":[]}
+{"ts":"2026-08-01T18:26:44.010Z","op":"done","visit":"expeditions/e30@0","node":"d91","brief":"v1 and v2 prior art dug out: v1's M<n>-*.md review doc + pager; v2 never carried one"}
+{"ts":"2026-08-01T18:26:47.561Z","op":"update","visit":"expeditions/e30@0","node":"d132","brief":"reading the tick packet to see what a gate hands the agent"}
+{"ts":"2026-08-01T18:26:59.119Z","op":"update","visit":"expeditions/e30@0","node":"d133","brief":"confirming gate states carry a field list, not a form-template condition"}
+{"ts":"2026-08-01T18:27:17.137Z","op":"update","visit":"expeditions/e30@0","node":"d134","brief":"checking whether describe hands the mirror the gate field list"}
+{"ts":"2026-08-01T18:27:27.195Z","op":"update","visit":"expeditions/e30@0","node":"d135","brief":"Re-running the battery through bin/selftest.ts"}
+{"ts":"2026-08-01T18:27:27.500Z","op":"update","visit":"expeditions/e30@0","node":"d136","brief":"reading stateDetail whole to confirm no widget draws the gate field list"}
+{"ts":"2026-08-01T18:27:46.503Z","op":"done","visit":"expeditions/e30@0","node":"d109","brief":"the e29 leave report is the closest existing narrative sibling"}
+{"ts":"2026-08-01T18:28:03.186Z","op":"update","visit":"expeditions/e30@0","node":"d137","brief":"reading the voice matrix surfaces list for the record surface"}
+{"ts":"2026-08-01T18:28:13.909Z","op":"update","visit":"expeditions/e30@0","node":"d138","brief":"listing voice matrix rows to read the record column"}
+{"ts":"2026-08-01T18:28:19.458Z","op":"update","visit":"expeditions/e30@0","node":"d139","brief":"reading the five voice rows whose record cell binds a report"}
+{"ts":"2026-08-01T18:28:37.839Z","op":"done","visit":"expeditions/e30@0","node":"d131","brief":"the report has no link into any decision record today"}
+{"ts":"2026-08-01T18:29:29.909Z","op":"fork","visit":"expeditions/e30@0","parent":"d110","node":"d140","brief":"MODALITY 1 search: milestone-review doctrine across v1 and ancestors","nodes":[{"id":"d141","brief":"sample sebot_v1 gate plan files"}]}
+{"ts":"2026-08-01T18:29:35.926Z","op":"plan","visit":"expeditions/e30@0","parent":null,"nodes":[{"id":"d142","brief":"trace v1's milestone-review generator in engine-go"},{"id":"d143","brief":"report machine vs human split with file:line quotes"}]}
+{"ts":"2026-08-01T18:29:37.838Z","op":"fork","visit":"expeditions/e30@0","parent":"d140","node":"d144","brief":"read-only forensics of v1's milestone review link graph (modality 4)","nodes":[{"id":"d145","brief":"read v1 M-docs and report linking"},{"id":"d146","brief":"map v1 entities to v3 entities"}]}
+{"ts":"2026-08-01T18:29:49.520Z","op":"done","visit":"expeditions/e30@0","node":"d142","brief":"traced: renderHandoffHTML + handoffCone + evidence docs"}
+{"ts":"2026-08-01T18:29:51.355Z","op":"done","visit":"expeditions/e30@0","node":"d141","brief":"sebot_v1 gate plans are thin stubs; doctrine sits in v0 protocol + v1 guide"}
+{"ts":"2026-08-01T18:29:51.370Z","op":"update","visit":"expeditions/e30@0","node":"d147","brief":"turning to v3: inventory its linkable entities"}
+{"ts":"2026-08-01T18:30:01.961Z","op":"update","visit":"expeditions/e30@0","node":"d148","brief":"reading v3 rigor-matrix row + gate row shape"}
+{"ts":"2026-08-01T18:30:16.344Z","op":"update","visit":"expeditions/e30@0","node":"d149","brief":"confirming sebot_v1 has plans not produced gate records"}
+{"ts":"2026-08-01T18:30:21.990Z","op":"update","visit":"expeditions/e30@0","node":"d150","brief":"reading v3 decision and note record shapes"}
+{"ts":"2026-08-01T18:30:34.927Z","op":"update","visit":"expeditions/e30@0","node":"d151","brief":"reading v3 database.base and locating where filled evidence is persisted"}
+{"ts":"2026-08-01T18:30:45.722Z","op":"update","visit":"expeditions/e30@0","node":"d152","brief":"reading v3 paths.ts for the on-disk state and evidence layout"}
+{"ts":"2026-08-01T18:30:58.217Z","op":"done","visit":"expeditions/e30@0","node":"d145","brief":"v1 M-docs and report link mechanism read end to end"}
+{"ts":"2026-08-01T18:31:12.596Z","op":"update","visit":"expeditions/e30@0","node":"d153","brief":"checking where v1 surfaced coverage holes and its base-view queries"}
+{"ts":"2026-08-01T18:31:24.201Z","op":"update","visit":"expeditions/e30@0","node":"d154","brief":"reading v1 readout.go, the generated human readout that lists holes"}
+{"ts":"2026-08-01T18:31:35.424Z","op":"update","visit":"expeditions/e30@0","node":"d155","brief":"reading v1's handoff page render, the gate document the owner blessed from"}
+{"ts":"2026-08-01T18:31:51.233Z","op":"update","visit":"expeditions/e30@0","node":"d156","brief":"confirming how evidence prose becomes clickable on v1's handoff card"}
+{"ts":"2026-08-01T18:32:02.176Z","op":"update","visit":"expeditions/e30@0","node":"d157","brief":"reading mdLite, the markdown-to-node-link renderer"}
+{"ts":"2026-08-01T18:32:45.061Z","op":"done","visit":"expeditions/e30@0","node":"d146","brief":"v1 to v3 entity mapping established from the real files"}
+{"ts":"2026-08-01T18:32:58.706Z","op":"fork","visit":"expeditions/e30@0","parent":"d144","node":"d158","brief":"design a tenth evidence type for the human-facing review report","nodes":[]}
+{"ts":"2026-08-01T18:33:08.128Z","op":"update","visit":"expeditions/e30@0","node":"d159","brief":"verifying the auto-doclink rule that would render a report path with no new code"}
+{"ts":"2026-08-01T18:34:40.112Z","op":"update","visit":"expeditions/e30@0","node":"d160","brief":"checking the pin-hash and the kickoff state kind before proposing where the field sits"}
+{"ts":"2026-08-01T18:36:57.838Z","op":"fork","visit":"expeditions/e30@0","parent":"d158","node":"d161","brief":"verify v3's existing milestone-review form machinery before reporting gaps","nodes":[]}
+{"ts":"2026-08-01T18:37:05.596Z","op":"plan","visit":"expeditions/e30@0","parent":null,"nodes":[{"id":"d162","brief":"Verify compile.ts STANDARD_ROUNDS injection path"},{"id":"d163","brief":"Verify compileColumn ignores STANDARD_ROUNDS"},{"id":"d164","brief":"Check session.ts scaffold/REVIEW_TAIL and assertGateReport"},{"id":"d165","brief":"Check overlap with verdict and rounds"},{"id":"d166","brief":"Write refutation verdict"}]}
+{"ts":"2026-08-01T18:37:08.080Z","op":"update","visit":"expeditions/e30@0","node":"d167","brief":"checking whether STANDARD_ROUNDS is still injected, since session.ts adds its own tail"}
+{"ts":"2026-08-01T18:37:10.565Z","op":"update","visit":"expeditions/e30@0","node":"d168","brief":"reading compile.ts tail where STANDARD_ROUNDS is injected"}
+{"ts":"2026-08-01T18:37:12.659Z","op":"update","visit":"expeditions/e30@0","node":"d169","brief":"reading compile.ts STANDARD_ROUNDS and its gate branch"}
+{"ts":"2026-08-01T18:37:17.441Z","op":"update","visit":"expeditions/e30@0","node":"d170","brief":"checking whether any v3 milestone review report has actually been produced yet"}
+{"ts":"2026-08-01T18:37:19.018Z","op":"done","visit":"expeditions/e30@0","node":"d163","brief":"confirmed: compileColumn:314 is verbatim row.evidence_form, no gate branch"}
+{"ts":"2026-08-01T18:37:28.565Z","op":"update","visit":"expeditions/e30@0","node":"d171","brief":"reading session.ts REVIEW_TAIL, scaffold and assertGateReport"}
+{"ts":"2026-08-01T18:37:37.988Z","op":"update","visit":"expeditions/e30@0","node":"d172","brief":"checking whether the compiled column machine id ever ends with -walk"}
+{"ts":"2026-08-01T18:37:42.841Z","op":"update","visit":"expeditions/e30@0","node":"d173","brief":"checking whether the compiled column machine id ever ends with -walk"}
+{"ts":"2026-08-01T18:37:44.040Z","op":"update","visit":"expeditions/e30@0","node":"d174","brief":"found REVIEW_TAIL already collects three rounds"}
+{"ts":"2026-08-01T18:37:53.393Z","op":"update","visit":"expeditions/e30@0","node":"d175","brief":"verifying the self-scan reference-resolution block before writing link rules"}
+{"ts":"2026-08-01T18:37:55.141Z","op":"update","visit":"expeditions/e30@0","node":"d176","brief":"reading the pin demand ledger and the walk rename"}
+{"ts":"2026-08-01T18:37:55.448Z","op":"update","visit":"expeditions/e30@0","node":"d177","brief":"checking whether assertGateReport fires for iteration-<column> machines"}
+{"ts":"2026-08-01T18:38:01.604Z","op":"update","visit":"expeditions/e30@0","node":"d178","brief":"Reading the owner's review diff on the prefill"}
+{"ts":"2026-08-01T18:38:03.925Z","op":"done","visit":"expeditions/e30@0","node":"d162","brief":"compile.ts:453 injects STANDARD_ROUNDS only for canvas-drawn gates"}
+{"ts":"2026-08-01T18:38:11.209Z","op":"update","visit":"expeditions/e30@0","node":"d179","brief":"checking the demands ledger and walk id"}
+{"ts":"2026-08-01T18:38:14.234Z","op":"update","visit":"expeditions/e30@0","node":"d180","brief":"Pulling the remaining review comments"}
+{"ts":"2026-08-01T18:38:18.676Z","op":"update","visit":"expeditions/e30@0","node":"d181","brief":"reading gate-review doctrine and one gate row"}
+{"ts":"2026-08-01T18:38:27.395Z","op":"update","visit":"expeditions/e30@0","node":"d182","brief":"checking whether any surface opens the review report"}
+{"ts":"2026-08-01T18:38:35.649Z","op":"update","visit":"expeditions/e30@0","node":"d183","brief":"Collating every review comment before answering"}
+{"ts":"2026-08-01T18:38:37.836Z","op":"update","visit":"expeditions/e30@0","node":"d184","brief":"listing the ten gate rows to check for existing report-shaped fields"}
+{"ts":"2026-08-01T18:38:44.089Z","op":"update","visit":"expeditions/e30@0","node":"d185","brief":"reading two gate rows to see what fields already stand there"}
+{"ts":"2026-08-01T18:38:48.675Z","op":"update","visit":"expeditions/e30@0","node":"d186","brief":"checking bluf/pyramid rules the proposal cites for ordering"}
+{"ts":"2026-08-01T18:38:58.445Z","op":"update","visit":"expeditions/e30@0","node":"d187","brief":"Checking whether subagents write into the decision graph"}
+{"ts":"2026-08-01T18:39:00.226Z","op":"update","visit":"expeditions/e30@0","node":"d188","brief":"reading the review-rounds doctrine and the owner's typing prefill"}
+{"ts":"2026-08-01T18:39:25.729Z","op":"update","visit":"expeditions/e30@0","node":"d189","brief":"Captured the workflow-visibility gap as a note"}
+{"ts":"2026-08-01T18:39:30.867Z","op":"update","visit":"expeditions/e30@0","node":"d190","brief":"checking whether any mirror surface renders the review report"}
+{"ts":"2026-08-01T18:39:40.490Z","op":"update","visit":"expeditions/e30@0","node":"d191","brief":"finding every consumer of the evidence type to see what a tenth type buys"}
+{"ts":"2026-08-01T18:40:03.296Z","op":"update","visit":"expeditions/e30@0","node":"d192","brief":"spot-checking the existsSync evidence check and the gate-report test contract"}
+{"ts":"2026-08-01T18:41:11.768Z","op":"update","visit":"expeditions/e30@0","node":"d193","brief":"Reading v1's link rules and the gap list"}
+{"ts":"2026-08-01T18:41:28.787Z","op":"update","visit":"expeditions/e30@0","node":"d194","brief":"Verifying the duplicated rounds in the report scaffold"}
+{"ts":"2026-08-01T18:46:32.667Z","op":"done","visit":"expeditions/e30@0","node":"d161","brief":"assertGateReport verified at session.ts:367"}
+{"ts":"2026-08-01T18:46:56.024Z","op":"fork","visit":"expeditions/e30@0","parent":"d164","node":"d195","brief":"Delete the duplicated review rounds from the gate report","nodes":[]}
+{"ts":"2026-08-01T18:47:03.992Z","op":"update","visit":"expeditions/e30@0","node":"d196","brief":"Matching the house test style before writing the lock"}
+{"ts":"2026-08-01T18:47:17.361Z","op":"update","visit":"expeditions/e30@0","node":"d197","brief":"Tracing which compile path builds the gate evidence form"}
+{"ts":"2026-08-01T18:47:38.109Z","op":"update","visit":"expeditions/e30@0","node":"d198","brief":"Probing whether matrix gates actually carry the rounds"}
+{"ts":"2026-08-01T18:47:58.185Z","op":"update","visit":"expeditions/e30@0","node":"d199","brief":"Reading compileColumn to inject the rounds at the real path"}
+{"ts":"2026-08-01T18:48:10.862Z","op":"update","visit":"expeditions/e30@0","node":"d200","brief":"Injecting the rounds where iteration gates are actually built"}
+{"ts":"2026-08-01T18:48:21.345Z","op":"update","visit":"expeditions/e30@0","node":"d201","brief":"Checking for an import cycle before wiring the constant"}
+{"ts":"2026-08-01T18:48:30.004Z","op":"update","visit":"expeditions/e30@0","node":"d202","brief":"Reading STANDARD_ROUNDS to move it to the shared schema"}
+{"ts":"2026-08-01T18:48:38.356Z","op":"update","visit":"expeditions/e30@0","node":"d203","brief":"Placing the shared rounds beside EvidenceField"}
+{"ts":"2026-08-01T18:48:58.840Z","op":"update","visit":"expeditions/e30@0","node":"d204","brief":"One copy of the rounds, reachable by both compilers"}
+{"ts":"2026-08-01T18:49:08.427Z","op":"update","visit":"expeditions/e30@0","node":"d205","brief":"Wiring the import, then re-probing the gates"}
+{"ts":"2026-08-01T18:49:19.803Z","op":"update","visit":"expeditions/e30@0","node":"d206","brief":"Re-probing all four sizes for rounds and duplicates"}
+{"ts":"2026-08-01T18:49:36.905Z","op":"update","visit":"expeditions/e30@0","node":"d207","brief":"Locating which tree the patch landed in"}
+{"ts":"2026-08-01T18:49:51.503Z","op":"update","visit":"expeditions/e30@0","node":"d208","brief":"Probing the real worktree for the injected rounds"}
+{"ts":"2026-08-01T18:50:15.739Z","op":"update","visit":"expeditions/e30@0","node":"d209","brief":"Recording why v1 and v2 stay in the mine"}
+{"ts":"2026-08-01T18:50:44.000Z","op":"update","visit":"expeditions/e30@0","node":"d210","brief":"Writing the test that locks the rounds onto every gate"}
+{"ts":"2026-08-01T18:50:51.403Z","op":"update","visit":"expeditions/e30@0","node":"d211","brief":"Running the new rounds test"}
+{"ts":"2026-08-01T18:50:56.775Z","op":"update","visit":"expeditions/e30@0","node":"d212","brief":"Reading the rounds test result"}
+{"ts":"2026-08-01T18:51:09.424Z","op":"update","visit":"expeditions/e30@0","node":"d213","brief":"Asserting the declaration rather than the word"}
+{"ts":"2026-08-01T18:51:21.445Z","op":"update","visit":"expeditions/e30@0","node":"d214","brief":"Full battery on the corrected worktree"}
+{"ts":"2026-08-01T18:53:34.324Z","op":"update","visit":"expeditions/e30@0","node":"d215","brief":"Checking how long the battery has actually run"}
+{"ts":"2026-08-01T18:53:43.194Z","op":"update","visit":"expeditions/e30@0","node":"d216","brief":"Polling the battery job directly"}
+{"ts":"2026-08-01T18:54:05.964Z","op":"update","visit":"expeditions/e30@0","node":"d217","brief":"Battery green at 654; staging e30 to land"}
