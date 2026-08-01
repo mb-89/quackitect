@@ -30,7 +30,7 @@ const ROWS: Row[] = [
   { kind: "something-else", state_kind: "work", patch: "full", file: { name: "four" } },
 ];
 
-const view = (over: Partial<BaseView>): BaseView => ({ type: "table", name: "t", order: [], sort: [], ...over });
+const view = (over: Partial<BaseView>): BaseView => ({ type: "table", name: "t", order: [], sort: [], groupBy: [], columnSize: {}, ...over });
 const pivot = (over: Partial<BaseView>): BaseView => view({ type: "pivot", filters: 'kind == "matrix-row"', ...over });
 
 /** assert.throws cannot hand the error back, and these refusals say things worth reading. */
@@ -49,13 +49,13 @@ const SPEC = parseBase("properties:\n  file.name:\n    displayName: Step\nviews:
 describe("the base format", { concurrency: true }, () => {
   test("a displayName becomes the column heading", () => {
     const r = renderView(SPEC, view({ order: ["file.name"] }), ROWS);
-    assert.match(r.html, /<th>Step<\/th>/);
-    assert.doesNotMatch(r.html, /<th>file\.name<\/th>/);
+    assert.match(r.html, /<th data-col="file\.name"[^>]*>[\s\S]*?>Step</);
+    assert.doesNotMatch(r.html, />file\.name<\/span>/);
   });
 
   test("file.name reaches into the nested field", () => {
     const r = renderView(SPEC, view({ order: ["file.name"], filters: 'kind == "matrix-row"' }), ROWS);
-    assert.match(r.html, /<td>one<\/td>/);
+    assert.match(r.html, />one</);
     assert.equal(r.rows, 3);
   });
 

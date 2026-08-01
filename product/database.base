@@ -2,5 +2,6 @@ views:
   - type: table
     name: All notes
     order:
+      - file.path
       - file.name
       - file.folder

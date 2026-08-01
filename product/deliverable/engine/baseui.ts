@@ -1,23 +1,24 @@
 // THE VIEW AS THE INSTRUMENT.
 //
-// tables.ts draws the DATA. This draws the thing you operate it with: the view
-// switcher, the results count, and the Sort, Filter, Properties and Search
-// controls. Every one of them writes the .base file and the file is what
-// re-renders, so nothing here holds state that the disk does not.
+// tables.ts draws the DATA. This draws the thing you operate it with.
 //
-// THE LAYOUT FOLLOWS THE OWNER'S SCREENSHOTS of Obsidian, because that is the
-// contract we were given. Where a control is not drawn there, it is not here.
+// ONLY WHAT WORKS IS ON THE CARD. A control that looks like it does something
+// and does not is worse than a missing one: the reader trusts it, acts on it,
+// and learns later that nothing happened. Filter, Search and the view switcher
+// were all in that state and are gone until they are built.
 //
-// HELP IS A DETAIL, NEVER A BUTTON. There is no question mark anywhere on this
-// card. Clicking a control's LABEL puts its help in the details pane, which is
-// the one place the reader already looks for meaning.
+// THE TOOLBAR IS NOT IN THE SCROLLING AREA. It sits above a pane that scrolls
+// on its own, so it stays put while rows go past. The header row is sticky
+// inside that pane for the same reason.
 //
-// THE FUNCTION HELP IS GENERATED FROM THE LIVE REGISTRY. A hand-written list
-// would drift from what the evaluator actually accepts within a week, and the
-// reader would be told about a function that refuses.
+// HELP IS A DETAIL, NEVER A BUTTON. There is no question mark anywhere here.
+// Clicking a control's LABEL puts its help in the details pane.
+//
+// THE FUNCTION HELP IS GENERATED FROM THE LIVE REGISTRY, so it can never
+// describe a function the evaluator would refuse.
 import { basename, dirname, join } from "node:path";
 import { GLOBALS, METHODS, typeOf, type TypeName } from "./expr.ts";
-import { baseSource, fromExpression, LAYOUTS, OPERATORS, type FilterRow, type FilterTree } from "./bases.ts";
+import { baseSource, LAYOUTS } from "./bases.ts";
 import { listBases, loadBase, renderView, selectRows, unreadableRows, vaultDir, type BaseSpec, type BaseView, type Row } from "./tables.ts";
 import { vaultFor } from "./vault.ts";
 
@@ -35,7 +36,7 @@ export interface PropertyInfo {
   synthetic: boolean;
 }
 
-const FILE_FIELDS = ["name", "basename", "path", "folder", "ext", "size", "mtime", "ctime", "tags", "links"];
+const FILE_FIELDS = ["path", "name", "basename", "folder", "ext", "size", "mtime", "ctime", "tags", "links"];
 
 const ICON: Record<string, string> = {
   file: "ⓘ",
@@ -56,8 +57,8 @@ const ICON: Record<string, string> = {
  *
  * The type is READ FROM THE DATA rather than declared anywhere, because
  * nothing in this repo declares it. The first value that is not empty decides,
- * which is wrong only for a property that holds two different types — and that
- * is a defect in the notes worth seeing rather than smoothing over.
+ * which is wrong only for a property holding two different types — and that is
+ * a defect in the notes worth seeing rather than smoothing over.
  */
 export function propertyInventory(rows: Row[]): PropertyInfo[] {
   const seen = new Map<string, TypeName>();
@@ -90,11 +91,17 @@ function functionHelp(): string {
     .filter(([, names]) => names.length > 0)
     .sort((a, b) => a[0].localeCompare(b[0]));
   const rows: [string, string][] = [["global", globals.map((g) => `<code>${esc(g)}()</code>`).join(" ")]];
-  for (const [type, names] of byType) {
-    rows.push([type, names.map((n) => `<code>.${esc(n)}()</code>`).join(" ")]);
-  }
+  for (const [type, names] of byType) rows.push([type, names.map((n) => `<code>.${esc(n)}()</code>`).join(" ")]);
   return kv(rows);
 }
+
+const NAMESPACE_HELP = kv([
+  ["<code>note.</code>", "a key in the note's own frontmatter"],
+  ["<code>file.</code>", "path, name, folder, ext, size, tags, links, and the timestamps"],
+  ["<code>formula.</code>", "a computed column this base declares"],
+  ["<code>this.</code>", "the note the view is embedded in"],
+  ["a bare name", "means <code>note.</code>, which is why <code>status</code> works on its own"],
+]);
 
 const OPERATOR_HELP = kv([
   ["arithmetic", "<code>+</code> <code>-</code> <code>*</code> <code>/</code> <code>%</code> <code>( )</code>"],
@@ -102,14 +109,6 @@ const OPERATOR_HELP = kv([
   ["boolean", "<code>!</code> <code>&amp;&amp;</code> <code>||</code>"],
   ["dates", "<code>date + &quot;1d&quot;</code> shifts it. One date minus another gives milliseconds."],
   ["durations", "<code>y M w d h m s</code>. The duration goes on the left: <code>duration('5h') * 2</code>."],
-]);
-
-const NAMESPACE_HELP = kv([
-  ["<code>note.</code>", "a key in the note's own frontmatter"],
-  ["<code>file.</code>", "name, path, folder, ext, size, tags, links, and the timestamps"],
-  ["<code>formula.</code>", "a computed column this base declares"],
-  ["<code>this.</code>", "the note the view is embedded in"],
-  ["a bare name", "means <code>note.</code>, which is why <code>status</code> works on its own"],
 ]);
 
 const P = (s: string): string => `<p style="margin:0 0 8px">${s}</p>`;
@@ -120,38 +119,20 @@ export interface Help {
 }
 
 const TOPICS: Record<string, () => Help> = {
-  views: () => ({
-    title: "views",
-    html: P("One <code>.base</code> file holds many views. A view has a name and a layout, and the switcher at the top left moves between them.")
-      + P("Adding a view writes it into the file. So does renaming one, or changing its layout.")
-      + P("The layouts that exist:")
-      + kv(LAYOUTS.map((l) => [l, l === "table" ? "rows and columns" : l === "pivot" ? "ours, not Obsidian's — one property crossed with another" : "declared by the format, not drawn yet"] as [string, string])),
-  }),
   properties: () => ({
     title: "properties — the columns",
-    html: P("Ticking a property adds it as a column, and the tick is a WRITE: it lands in this view's <code>order</code> in the <code>.base</code> file.")
-      + P("The list is every key any note in the vault carries, with the type its values actually hold. The <code>file.</code> entries at the top are synthesised rather than written in frontmatter.")
+    html: P("Ticking a property adds it as a column, and the tick is a WRITE: it lands in this view's <code>order</code> in the query.")
+      + P("The list is every key any note carries, with the type its values actually hold. The <code>file.</code> entries at the top are synthesised rather than written in frontmatter.")
+      + P("Drag a column heading to reorder. Drag its right edge to resize. Both are writes, so they survive a reload.")
       + P("Editing a cell writes the note the row came from. The view stores nothing."),
   }),
   sort: () => ({
     title: "sort and group by",
-    html: P("Sort clauses apply in order: the first one decides, and later ones settle ties.")
+    html: P("<b>Sort by</b> takes several levels. The first decides, and each later one settles the ties the ones above it left.")
       + P("A column sorts by its own type. Numbers and dates order properly rather than as text, and empty cells go last.")
-      + P("Group by takes ONE property. Obsidian supports one, so a second is refused rather than quietly ignored."),
-  }),
-  filter: () => ({
-    title: "filter",
-    html: P("Filters narrow the whole vault down. There is no <code>from</code> clause anywhere in this format — a base starts with every note and the filters cut it back.")
-      + P("<b>All views</b> applies to every view in the file. <b>This view</b> applies to this one. The two are combined with AND.")
-      + P("Each row is a builder over the expression language. The <code>&lt;/&gt;</code> button shows the expression the row compiles to, and lets you write one the builder has no form for.")
-      + P("A filter the builder cannot read back shows as raw. That is honest rather than a form that would misrepresent it.")
-      + P("The operators the builder offers:")
-      + kv(OPERATORS.map((o) => [o.label, `<code>${esc(o.build("property", "value"))}</code>`] as [string, string])),
-  }),
-  search: () => ({
-    title: "search",
-    html: P("Search hides rows that do not contain the text, in the table as drawn. It does not touch the file.")
-      + P("To narrow the view permanently, use a filter instead. That is a write and it persists."),
+      + P("<b>Group by</b> also takes several levels, and this is where we go past Obsidian, which allows one.")
+      + P("Each group level SUBDIVIDES the one above it. Group by extension and you get one section per extension. Add folder underneath and every extension is then split by folder.")
+      + P("Sorting applies inside the groups, so the two work together rather than against each other."),
   }),
   expression: () => ({
     title: "the expression language",
@@ -169,6 +150,7 @@ const TOPICS: Record<string, () => Help> = {
     title: "editing a cell",
     html: P("Double-click or press Enter to edit. Enter commits, Escape discards. Nothing is written while you type.")
       + P("The value that was there decides the type. A key that held a list reads your text as a list; a key that held a number refuses prose rather than turning into one.")
+      + P("A cell that will not take an editor is a nested value, and it says so when you hover it.")
       + P("The write goes to the note the row came from, never to the view."),
   }),
 };
@@ -181,23 +163,6 @@ export function helpFor(topic: string): Help {
 
 export const HELP_TOPICS = Object.keys(TOPICS);
 
-/**
- * THE QUERY, SHOWN AND EDITABLE.
- *
- * A base IS its query, and every control on this card is an editor over that
- * text. So the text sits ON the card rather than behind a route: it is
- * rendered fresh with every redraw, and a redraw follows every control, which
- * is what makes a tick and its line of YAML visibly the same act.
- *
- * Typing here writes the same file the controls write. There is one door.
- */
-function codePanel(root: string, rel: string): string {
-  return `<div class="bs-codepanel" hidden>
-    <div class="bs-code-head"><span class="bs-code-path">${esc(rel)}</span><button type="button" class="bs-add bs-code-save">Save the query</button><span class="bs-code-msg"></span></div>
-    <textarea class="bs-code-text" spellcheck="false">${esc(baseSource(root, rel))}</textarea>
-  </div>`;
-}
-
 // ---------------------------------------------------------------------------
 // THE CHROME
 // ---------------------------------------------------------------------------
@@ -205,104 +170,46 @@ function codePanel(root: string, rel: string): string {
 interface Declared {
   id: string;
   file: string;
-  label: string;
-  owner: string;
   spec: BaseSpec;
   view: BaseView;
 }
 
-function propOptions(props: PropertyInfo[], selected: string, placeholder: string): string {
+function propOptions(props: PropertyInfo[], selected: string): string {
   const opts = props.map((p) => `<option value="${esc(p.name)}"${p.name === selected ? " selected" : ""}>${esc(p.name)}</option>`).join("");
-  return `<option value=""${selected === "" ? " selected" : ""}>${esc(placeholder)}</option>${opts}`;
+  return `<option value=""${selected === "" ? " selected" : ""}>Property</option>${opts}`;
 }
 
 function dirOptions(selected: string): string {
   return ["ASC", "DESC"]
-    .map((d) => `<option value="${d}"${d === selected ? " selected" : ""}>${d === "ASC" ? "A → Z" : "Z → A"}</option>`)
+    .map((d) => `<option value="${d}"${d === selected.toUpperCase() ? " selected" : ""}>${d === "ASC" ? "A → Z" : "Z → A"}</option>`)
     .join("");
 }
 
-/** The Sort popover, which carries group-by because the screenshot does. */
-function sortPop(d: Declared, props: PropertyInfo[]): string {
-  const group = (d.view as unknown as { groupBy?: { property?: string; direction?: string } }).groupBy ?? {};
-  const groupRow = `<div class="bs-row" data-kind="group">
-    <select class="bs-prop">${propOptions(props, String(group.property ?? ""), "Property")}</select>
-    <select class="bs-dir">${dirOptions(String(group.direction ?? "ASC"))}</select>
-    <button type="button" class="bs-icon bs-clear-group" title="clear the grouping">\u{1F5D1}</button>
+function level(kind: "group" | "sort", property: string, direction: string, props: PropertyInfo[]): string {
+  return `<div class="bs-row bs-level" data-kind="${kind}">
+    <select class="bs-prop">${propOptions(props, property)}</select>
+    <select class="bs-dir">${dirOptions(direction)}</select>
+    <button type="button" class="bs-icon bs-drop" title="remove this level">✕</button>
   </div>`;
-  const sorts = (d.view.sort ?? [])
-    .map((s) => `<div class="bs-row bs-sort" data-kind="sort">
-      <select class="bs-prop">${propOptions(props, String(s.property ?? ""), "Property")}</select>
-      <select class="bs-dir">${dirOptions(String(s.direction ?? "ASC"))}</select>
-      <button type="button" class="bs-icon bs-drop" title="remove this sort">\u{1F5D1}</button>
-    </div>`)
-    .join("");
+}
+
+/**
+ * Sort and group by, both as LISTS.
+ *
+ * An empty list still draws one blank row. Without it there was nothing to
+ * clone and "Add" did nothing at all — which is exactly what a control that
+ * lies looks like.
+ */
+function sortPop(d: Declared, props: PropertyInfo[]): string {
+  const groups = d.view.groupBy.length > 0 ? d.view.groupBy : [{ property: "", direction: "ASC" }];
+  const sorts = d.view.sort.length > 0 ? d.view.sort : [{ property: "", direction: "ASC" }];
   return `<div class="bs-pop" data-pop="sort" hidden>
     <div class="bs-pop-title bs-helpable" data-help="sort">Group by</div>
-    ${groupRow}
+    <div class="bs-levels" data-kind="group">${groups.map((g) => level("group", g.property, g.direction, props)).join("")}</div>
+    <button type="button" class="bs-add bs-add-level" data-kind="group">+ Add group</button>
     <div class="bs-pop-title bs-helpable" data-help="sort">Sort by</div>
-    <div class="bs-sorts">${sorts}</div>
-    <button type="button" class="bs-add bs-add-sort">+ Add sort</button>
-  </div>`;
-}
-
-function filterRowHtml(expr: string, props: PropertyInfo[]): string {
-  const row: FilterRow | null = fromExpression(expr);
-  const raw = row === null;
-  const opts = OPERATORS.map((o) => `<option value="${esc(o.id)}"${row !== null && row.operator === o.id ? " selected" : ""}>${esc(o.label)}</option>`).join("");
-  const builder = `<span class="bs-built"${raw ? " hidden" : ""}>
-      <span class="bs-where">where</span>
-      <select class="bs-prop">${propOptions(props, row?.property ?? "", "Property")}</select>
-      <select class="bs-op">${opts}</select>
-      <input class="bs-val" type="text" placeholder="Empty" value="${esc(row?.value ?? "")}">
-    </span>`;
-  const rawBox = `<input class="bs-raw" type="text" spellcheck="false" value="${esc(expr)}"${raw ? "" : " hidden"}>`;
-  return `<div class="bs-row bs-filter" data-raw="${raw ? "1" : "0"}">
-    ${builder}${rawBox}
-    <button type="button" class="bs-icon bs-toggle-raw bs-helpable" data-help="expression" title="the expression this row writes">&lt;/&gt;</button>
-    <button type="button" class="bs-icon bs-drop" title="remove this filter">\u{1F5D1}</button>
-  </div>`;
-}
-
-function conjOptions(selected: string): string {
-  return [["and", "All the following are true"], ["or", "Any of the following are true"], ["not", "None of the following are true"]]
-    .map(([v, l]) => `<option value="${v}"${v === selected ? " selected" : ""}>${esc(l)}</option>`)
-    .join("");
-}
-
-/** A filter tree renders as nested groups, which is what "Add filter group" makes. */
-function groupHtml(tree: FilterTree | undefined, props: PropertyInfo[], depth: number): string {
-  let conj = "and";
-  let kids: FilterTree[] = [];
-  if (tree !== undefined && tree !== null && typeof tree === "object") {
-    if ("and" in tree) { conj = "and"; kids = tree.and; }
-    else if ("or" in tree) { conj = "or"; kids = tree.or; }
-    else if ("not" in tree) { conj = "not"; kids = [tree.not]; }
-  } else if (typeof tree === "string") {
-    kids = [tree];
-  }
-  const body = kids
-    .map((k) => (typeof k === "string" ? filterRowHtml(k, props) : groupHtml(k, props, depth + 1)))
-    .join("");
-  return `<div class="bs-group" data-depth="${depth}">
-    <select class="bs-conj">${conjOptions(conj)}</select>
-    <div class="bs-kids">${body}</div>
-    <div class="bs-adds">
-      <button type="button" class="bs-add bs-add-filter">+ Add filter</button>
-      <button type="button" class="bs-add bs-add-group">+ Add filter group</button>
-    </div>
-  </div>`;
-}
-
-function filterPop(d: Declared, props: PropertyInfo[]): string {
-  const global = (d.spec as unknown as { filters?: FilterTree }).filters;
-  return `<div class="bs-pop bs-pop-wide" data-pop="filter" hidden>
-    <details class="bs-fold"><summary class="bs-helpable" data-help="filter">All views</summary>
-      <div class="bs-scope" data-scope="global">${groupHtml(global, props, 0)}</div>
-    </details>
-    <details class="bs-fold" open><summary class="bs-helpable" data-help="filter">This view</summary>
-      <div class="bs-scope" data-scope="view">${groupHtml(d.view.filters as FilterTree | undefined, props, 0)}</div>
-    </details>
+    <div class="bs-levels" data-kind="sort">${sorts.map((s) => level("sort", s.property, s.direction, props)).join("")}</div>
+    <button type="button" class="bs-add bs-add-level" data-kind="sort">+ Add sort</button>
   </div>`;
 }
 
@@ -311,74 +218,53 @@ function propsPop(d: Declared, props: PropertyInfo[]): string {
   const items = props
     .map((p) => {
       const on = order.includes(p.name);
-      const display = d.spec.properties[p.name]?.displayName ?? "";
       return `<label class="bs-prop-item${on ? " on" : ""}">
         <input type="checkbox" class="bs-tick" data-property="${esc(p.name)}"${on ? " checked" : ""}>
         <span class="bs-type" title="${esc(p.type)}">${ICON[p.type] ?? "·"}</span>
         <span class="bs-prop-name">${esc(p.name)}</span>
-        <input class="bs-rename" type="text" placeholder="${esc(p.name)}" value="${esc(display)}" data-property="${esc(p.name)}" title="the heading this column shows">
       </label>`;
     })
     .join("");
   return `<div class="bs-pop bs-pop-tall" data-pop="props" hidden>
     <input class="bs-find" type="text" placeholder="Find a property…">
     <div class="bs-prop-list">${items}</div>
-    <div class="bs-pop-foot">
-      <button type="button" class="bs-add bs-hide-all">\u{1F441} Hide all</button>
-    </div>
+    <div class="bs-pop-foot"><button type="button" class="bs-add bs-hide-all">Hide all</button></div>
   </div>`;
 }
 
-function viewsPop(d: Declared, all: Declared[]): string {
-  const mine = all.filter((x) => x.file === d.file);
-  const items = mine
-    .map((x) => `<button type="button" class="bs-view-item${x.id === d.id ? " on" : ""}" data-goto="${esc(x.id)}">
-      <span class="bs-type">▦</span><span class="bs-prop-name">${esc(x.view.name)}</span>
-      <span class="bs-chev" data-configure="${esc(x.id)}" title="configure this view">›</span>
-    </button>`)
-    .join("");
-  const layouts = LAYOUTS.map((l) => `<option value="${l}"${l === d.view.type ? " selected" : ""}>${esc(l)}</option>`).join("");
-  return `<div class="bs-pop" data-pop="views" hidden>
-    <div class="bs-view-list">${items}</div>
-    <button type="button" class="bs-add bs-add-view">+ Add view</button>
-    <div class="bs-configure" hidden>
-      <div class="bs-pop-title bs-conf-head">
-        <button type="button" class="bs-back" title="back to the view list">‹</button>
-        <span class="bs-conf-name">Configure view</span>
-        <button type="button" class="bs-vmenu" title="more">⋮</button>
-      </div>
-      <div class="bs-vmenu-items" hidden>
-        <button type="button" class="bs-add bs-show-code">Show the code</button>
-        <button type="button" class="bs-add bs-drop-view">Delete this view</button>
-      </div>
-      <input class="bs-view-name" type="text" value="${esc(d.view.name)}">
-      <div class="bs-pop-title bs-helpable" data-help="views">Layout</div>
-      <select class="bs-layout">${layouts}</select>
-    </div>
-  </div>`;
-}
+// The markdown-preview icon VS Code puts in an editor's title bar: a page with
+// one half turned over. It means the same thing here — the other rendering of
+// what is already open.
+const CODE_ICON = `<svg viewBox="0 0 16 16" width="15" height="15" aria-hidden="true"><path fill="currentColor" d="M1.5 2h5.2c.5 0 .9.2 1.3.5.4-.3.8-.5 1.3-.5h5.2c.3 0 .5.2.5.5v10c0 .3-.2.5-.5.5H9.4c-.4 0-.8.2-1.1.4a.5.5 0 0 1-.6 0c-.3-.2-.7-.4-1.1-.4H1.5a.5.5 0 0 1-.5-.5v-10c0-.3.2-.5.5-.5Zm.5 1v9h4.6c.4 0 .8.1 1.1.3V3.8c-.2-.5-.6-.8-1-.8H2Zm6.7.8v8.5c.3-.2.7-.3 1.1-.3H14V3H9.7c-.4 0-.8.3-1 .8Z"/></svg>`;
 
-function toolbar(d: Declared, all: Declared[], props: PropertyInfo[], count: number): string {
+function toolbar(d: Declared, count: number): string {
   const ctx = attr({ file: d.file, view: d.view.name, id: d.id });
   return `<div class="bs-bar" data-ctx="${ctx}">
-    <button type="button" class="bs-view-btn bs-tool" data-pop="views" data-help="views"><span class="bs-type">▦</span> ${esc(d.view.name)} <span class="bs-caret">⌄</span></button>
+    <span class="bs-view-name">${esc(d.view.name)}</span>
     <span class="bs-count">${count} result${count === 1 ? "" : "s"}</span>
     <span class="bs-gap"></span>
     <button type="button" class="bs-tool" data-pop="sort" data-help="sort">⇅ Sort</button>
-    <button type="button" class="bs-tool" data-pop="filter" data-help="filter">⨍ Filter</button>
     <button type="button" class="bs-tool" data-pop="props" data-help="properties">≡ Properties</button>
-    <button type="button" class="bs-tool bs-search-btn" data-help="search">⌕ Search</button>
-  </div>
-  <div class="bs-searchbar" hidden><input class="bs-search" type="text" placeholder="Search these rows…"></div>`;
+    <button type="button" class="bs-tool bs-code-toggle" title="show the query">${CODE_ICON}</button>
+  </div>`;
 }
 
 /**
- * The whole card: one block per declared view, only one shown.
+ * THE QUERY, SHOWN AND EDITABLE.
  *
- * Each block carries its OWN toolbar and popovers, so switching view swaps the
- * instrument with the data and never leaves a control pointing at a view it is
- * not editing.
+ * It replaces the table rather than sitting beside it, because the two are the
+ * same thing rendered twice and nobody needs both at once.
  */
+function codePanel(root: string, rel: string): string {
+  return `<div class="bs-pane bs-pane-code" hidden>
+    <div class="bs-code-head">
+      <span class="bs-code-path bs-helpable" data-help="expression">${esc(rel)}</span>
+      <button type="button" class="bs-add bs-code-save">Save the query</button>
+    </div>
+    <textarea class="bs-code-text" spellcheck="false">${esc(baseSource(root, rel))}</textarea>
+  </div>`;
+}
+
 export function basesCard(root: string, head: string, selected?: string, rowsIn?: Row[]): string {
   // THE WARM MODEL, not a fresh read. Re-reading the vault on every render is
   // the thing this replaced: the index is built once, kept current by the
@@ -389,21 +275,19 @@ export function basesCard(root: string, head: string, selected?: string, rowsIn?
   const declared: Declared[] = [];
   for (const rel of listBases(root)) {
     const spec = loadBase(join(vaultDir(root), rel));
-    const stem = basename(rel, ".base");
-    const owner = stem === "matrix" ? basename(dirname(rel)) : stem;
-    for (const view of spec.views) {
-      declared.push({ id: `${rel}#${view.name}`, file: rel, label: `${owner} · ${view.name}`, owner, spec, view });
-    }
+    for (const view of spec.views) declared.push({ id: `${rel}#${view.name}`, file: rel, spec, view });
   }
   if (declared.length === 0) {
     return `<div class="widget" id="w-table"><div class="widget-head"><span>database</span>${head}</div>
-      <div class="widget-body tbl-body"><div class="bs-empty">No <code>.base</code> file in the vault yet.
+      <div class="widget-body bs-body"><div class="bs-empty">No <code>.base</code> file in the vault yet.
       <button type="button" class="bs-add bs-create">Create one</button></div></div></div>`;
   }
   const want = declared.find((x) => x.id === selected)?.id ?? declared[0].id;
 
   const blocks = declared
     .map((d) => {
+      const shown = d.id === want;
+      if (!shown) return "";
       let body: string;
       let count = 0;
       try {
@@ -412,22 +296,17 @@ export function basesCard(root: string, head: string, selected?: string, rowsIn?
       } catch (err) {
         body = `<div class="tbl-refused">this view cannot be drawn — ${esc(String((err as Error).message).split("\n")[0])}</div>`;
       }
-      // THE CHROME IS DRAWN ONLY FOR THE VIEW ON SCREEN. Every popover lists
-      // every property, so drawing all of them for nine views was most of a
-      // megabyte of HTML the reader could never see. Switching view reloads
-      // the card, which costs one round trip and keeps the poll cheap.
-      const shown = d.id === want;
-      const chrome = shown
-        ? `${toolbar(d, declared, props, count)}${viewsPop(d, declared)}${sortPop(d, props)}${filterPop(d, props)}${propsPop(d, props)}${codePanel(root, d.file)}`
-        : "";
-      return `<div class="bs-block" data-view="${esc(d.id)}"${shown ? "" : " hidden"}>
-        ${chrome}
-        <div class="bs-data">${body}</div>
+      return `<div class="bs-block" data-view="${esc(d.id)}">
+        <div class="bs-chrome">${toolbar(d, count)}${sortPop(d, props)}${propsPop(d, props)}</div>
+        <div class="bs-pane bs-pane-table"><div class="bs-data">${body}</div></div>
+        ${codePanel(root, d.file)}
       </div>`;
     })
     .join("");
 
   const damage = damaged.length === 0 ? "" : `<div class="tbl-damage">${damaged.length} note${damaged.length === 1 ? "" : "s"} in the vault do not parse — ${esc(damaged[0])}</div>`;
   return `<div class="widget" id="w-table"><div class="widget-head"><span>database</span>${head}</div>
-    <div class="widget-body tbl-body">${damage}${blocks}</div></div>`;
+    <div class="widget-body bs-body">${damage}${blocks}</div></div>`;
 }
+
+export { LAYOUTS };

@@ -33,6 +33,15 @@ export interface BaseView {
   /** Column order. Each entry is a property name. */
   order: string[];
   sort: { property: string; direction: string }[];
+  /**
+   * Obsidian groups by ONE property and says so. Ours takes a LIST, and each
+   * level subdivides the one above it, so grouping by extension and then by
+   * folder gives every extension its own set of folders. A single object
+   * still parses, because that is what Obsidian writes.
+   */
+  groupBy: { property: string; direction: string }[];
+  /** Column widths in pixels, by property. A dragged edge lands here. */
+  columnSize: Record<string, number>;
   filters?: unknown;
   /** pivot only: the property whose values become rows. */
   rows?: string;
@@ -52,6 +61,21 @@ export interface BaseSpec {
 
 export type Row = Record<string, unknown>;
 
+/** One object, a bare name, or a list of either. All three appear in the wild. */
+function groupLevels(v: unknown): { property: string; direction: string }[] {
+  const one = (x: unknown): { property: string; direction: string } | null => {
+    if (typeof x === "string") return x.trim() === "" ? null : { property: x, direction: "ASC" };
+    if (x !== null && typeof x === "object") {
+      const o = x as { property?: unknown; direction?: unknown };
+      const p = String(o.property ?? "").trim();
+      return p === "" ? null : { property: p, direction: String(o.direction ?? "ASC") };
+    }
+    return null;
+  };
+  if (v === undefined || v === null) return [];
+  return (Array.isArray(v) ? v : [v]).map(one).filter((x): x is { property: string; direction: string } => x !== null);
+}
+
 export function parseBase(text: string): BaseSpec {
   const doc = parse(text) as { properties?: Record<string, { displayName?: string }>; views?: BaseView[] };
   return {
@@ -60,7 +84,9 @@ export function parseBase(text: string): BaseSpec {
       type: String(v.type ?? "table"),
       name: String(v.name ?? "untitled"),
       order: Array.isArray(v.order) ? v.order.map(String) : [],
-      sort: Array.isArray(v.sort) ? v.sort : [],
+      sort: Array.isArray(v.sort) ? v.sort.filter((s) => String(s?.property ?? "") !== "") : [],
+      groupBy: groupLevels((v as { groupBy?: unknown }).groupBy),
+      columnSize: ((v as { columnSize?: Record<string, number> }).columnSize ?? {}) as Record<string, number>,
       ...(v.filters !== undefined ? { filters: v.filters } : {}),
       ...(v.rows !== undefined ? { rows: String(v.rows) } : {}),
       ...(v.columns !== undefined ? { columns: String(v.columns) } : {}),
@@ -272,26 +298,85 @@ export function renderView(spec: BaseSpec, view: BaseView, rows: Row[]): TableRe
   }
   const kept = selectRows(spec, view, rows);
   const cols = view.order.length > 0 ? view.order : [...new Set(kept.flatMap((r) => Object.keys(r)))];
-  const head = cols.map((c) => `<th>${esc(heading(spec, c))}</th>`).join("");
-  const cell = (r: Row, c: string): string => `<td${cellAttrs(r, c)}>${esc(cellText(field(r, c)))}</td>`;
+  const head = cols
+    .map((c, i) => {
+      // The LAST column takes whatever is left, so the table always fills its
+      // pane. Giving it a width too would leave a dead strip on the right.
+      const w = i === cols.length - 1 ? "" : ` style="width:${Math.max(40, Math.round((view.columnSize ?? {})[c] ?? 160))}px"`;
+      return `<th data-col="${esc(c)}" draggable="true"${w}><span class="th-label">${esc(heading(spec, c))}</span><span class="th-grip" title="drag to resize"></span></th>`;
+    })
+    .join("");
+  const cell = (r: Row, c: string): string => `<td${cellAttrs(r, c)}>${cellHtml(r, c)}</td>`;
+  const line = (r: Row): string => `<tr>${cols.map((c) => cell(r, c)).join("")}</tr>`;
+
   // AN EMPTY TABLE SAYS SO. A heading row over nothing reads as a rendering
   // fault; naming the filter that emptied it reads as an answer.
-  const body =
-    kept.length === 0
-      ? `<tr><td class="tbl-empty" colspan="${cols.length}">no rows match this view's filter</td></tr>`
-      : kept.map((r) => `<tr>${cols.map((c) => cell(r, c)).join("")}</tr>`).join("");
+  let body: string;
+  if (kept.length === 0) {
+    body = `<tr><td class="tbl-empty" colspan="${cols.length}">no rows match this view's filter</td></tr>`;
+  } else if ((view.groupBy ?? []).length === 0) {
+    body = kept.map(line).join("");
+  } else {
+    body = groupRows(spec, view, kept, cols, line, 0);
+  }
   return {
     name: view.name,
     columns: cols,
     rows: kept.length,
-    html: `<table class="tbl"><caption>${esc(view.name)} — ${kept.length} row${kept.length === 1 ? "" : "s"}</caption><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table>`,
+    html: `<table class="tbl"><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table>`,
   };
+}
+
+/**
+ * A cell's HTML. Everything is plain text except the two file references,
+ * which are the way to open the note a row stands for.
+ */
+function cellHtml(r: Row, c: string): string {
+  const text = cellText(field(r, c));
+  if (c !== "file.path" && c !== "file.name") return esc(text);
+  const path = String((r.file as Row | undefined)?.path ?? "");
+  if (path === "") return esc(text);
+  return `<a class="doclink tbl-link" data-path="product/${esc(path)}">${esc(text)}</a>`;
+}
+
+/**
+ * Grouping, one level per `groupBy` entry.
+ *
+ * Each level subdivides the level above it rather than replacing it, so three
+ * levels give three nested headers over one set of rows. That is the whole
+ * difference from Obsidian, which groups by one property only.
+ */
+function groupRows(spec: BaseSpec, view: BaseView, rows: Row[], cols: string[], line: (r: Row) => string, depth: number): string {
+  const level = (view.groupBy ?? [])[depth];
+  if (level === undefined) return rows.map(line).join("");
+  const buckets = new Map<string, Row[]>();
+  for (const r of rows) {
+    const key = cellText(field(r, level.property)).trim() || EMPTY_KEY;
+    const at = buckets.get(key);
+    if (at === undefined) buckets.set(key, [r]);
+    else at.push(r);
+  }
+  // The empty group goes LAST whichever way the level is sorted, the same way
+  // an empty cell sorts last. A leading group of blanks is nobody's answer.
+  const dir = level.direction.toUpperCase() === "DESC" ? -1 : 1;
+  const keys = [...buckets.keys()].sort((a, b) => {
+    if (a === EMPTY_KEY) return 1;
+    if (b === EMPTY_KEY) return -1;
+    return a.localeCompare(b, undefined, { numeric: true }) * dir;
+  });
+  return keys
+    .map((k) => {
+      const kids = buckets.get(k)!;
+      const header = `<tr class="tbl-group" data-depth="${depth}"><td colspan="${cols.length}"><span class="grp-pad" style="width:${depth * 14}px"></span><span class="grp-prop">${esc(heading(spec, level.property))}</span> <span class="grp-val">${esc(k)}</span> <span class="grp-count">${kids.length}</span></td></tr>`;
+      return header + groupRows(spec, view, kids, cols, line, depth + 1);
+    })
+    .join("");
 }
 
 // A dimension value that is absent gets its own bucket rather than dropping
 // the row. Losing rows to a blank field is the same silent-wrong-answer this
 // file refuses everywhere else.
-const EMPTY_KEY = "—";
+export const EMPTY_KEY = "—";
 
 /** The keys one row contributes along a dimension. A list contributes ALL of them. */
 function keysOf(v: unknown): string[] {

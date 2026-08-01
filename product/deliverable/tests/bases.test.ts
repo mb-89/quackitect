@@ -185,15 +185,15 @@ describe("sort, and the group-by that shares its popover", () => {
     assert.equal("sort" in view(v.doc()), false);
   });
 
-  test("group-by writes the documented object form", () => {
+  test("one group level writes the documented object form", () => {
     const v = root();
-    setGroupBy(v.root, v.rel, "The matrix", "patch", "ASC");
+    setGroupBy(v.root, v.rel, "The matrix", [{ property: "patch", direction: "ASC" }]);
     assert.deepEqual(view(v.doc()).groupBy, { property: "patch", direction: "ASC" });
   });
 
   test("clearing group-by removes it", () => {
     const v = root();
-    setGroupBy(v.root, v.rel, "The matrix", null);
+    setGroupBy(v.root, v.rel, "The matrix", []);
     assert.equal("groupBy" in view(v.doc()), false);
   });
 });

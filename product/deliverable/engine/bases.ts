@@ -169,17 +169,29 @@ export function setSort(root: string, rel: string, view: string, sort: SortClaus
 }
 
 /**
- * Group by one property. Obsidian supports exactly one, and says so, so a
- * second is refused rather than quietly dropped.
+ * Group by one property or several, each level subdividing the one above it.
+ *
+ * Obsidian supports exactly one and says so. Taking a list is OURS, the same
+ * kind of deliberate widening as the pivot view. One level still writes the
+ * single object Obsidian expects, so a base with one grouping stays readable
+ * by both.
  */
-export function setGroupBy(root: string, rel: string, view: string, property: string | null, direction: "ASC" | "DESC" = "ASC"): string {
+export function setGroupBy(root: string, rel: string, view: string, levels: SortClause[]): string {
   return editBase(root, rel, (doc) => {
     const v = findView(doc, view);
-    if (property === null || property.trim() === "") {
-      delete v.groupBy;
-      return;
-    }
-    v.groupBy = { property, direction };
+    const kept = levels.filter((l) => l.property.trim() !== "").map((l) => ({ property: l.property, direction: l.direction }));
+    if (kept.length === 0) delete v.groupBy;
+    else v.groupBy = kept.length === 1 ? kept[0] : kept;
+  });
+}
+
+/** A dragged column edge. Widths are the view's, so they travel with it. */
+export function setColumnSize(root: string, rel: string, view: string, property: string, px: number): string {
+  return editBase(root, rel, (doc) => {
+    const v = findView(doc, view);
+    const sizes = (v.columnSize ?? {}) as Record<string, number>;
+    sizes[property] = Math.max(40, Math.round(px));
+    v.columnSize = sizes;
   });
 }
 
@@ -538,6 +550,8 @@ export interface BaseOp {
   order?: string[];
   name?: string | null;
   sort?: SortClause[];
+  levels?: SortClause[];
+  px?: number;
   direction?: "ASC" | "DESC";
   filters?: FilterTree | null;
   /** A tree whose leaves may still be builder rows. Compiled here, not there. */
@@ -548,7 +562,7 @@ export interface BaseOp {
   to?: string;
 }
 
-const NEEDS_VIEW = new Set(["toggleProperty", "setOrder", "hideAll", "setSort", "setGroupBy", "setViewFilters", "renameView", "setLayout", "removeView", "duplicateView"]);
+const NEEDS_VIEW = new Set(["toggleProperty", "setOrder", "hideAll", "setSort", "setGroupBy", "setColumnSize", "setViewFilters", "renameView", "setLayout", "removeView", "duplicateView"]);
 
 export function applyBaseOp(root: string, o: BaseOp): string {
   if (NEEDS_VIEW.has(o.op) && (o.view === undefined || o.view === "")) {
@@ -567,7 +581,8 @@ export function applyBaseOp(root: string, o: BaseOp): string {
     case "hideAll": return hideAll(root, o.file, v);
     case "setDisplayName": return setDisplayName(root, o.file, String(o.property), o.name ?? null);
     case "setSort": return setSort(root, o.file, v, o.sort ?? []);
-    case "setGroupBy": return setGroupBy(root, o.file, v, o.property ?? null, o.direction ?? "ASC");
+    case "setGroupBy": return setGroupBy(root, o.file, v, o.levels ?? []);
+    case "setColumnSize": return setColumnSize(root, o.file, v, String(o.property), Number(o.px ?? 160));
     case "setViewFilters": return setViewFilters(root, o.file, v, o.posted !== undefined ? compileTree(o.posted) : (o.filters ?? null));
     case "setGlobalFilters": return setGlobalFilters(root, o.file, o.posted !== undefined ? compileTree(o.posted) : (o.filters ?? null));
     case "addView": return addView(root, o.file, String(o.name ?? ""), o.type ?? "table");

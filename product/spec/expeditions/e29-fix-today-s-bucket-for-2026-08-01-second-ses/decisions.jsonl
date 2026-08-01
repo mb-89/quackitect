@@ -81,3 +81,16 @@
 {"ts":"2026-08-01T15:03:34.139Z","op":"done","visit":"expeditions/e29@0","node":"d10","brief":"the query panel lives on the card and stays open across redraws"}
 {"ts":"2026-08-01T15:05:42.517Z","op":"update","visit":"expeditions/e29@0","node":"d15","brief":"removing the superseded table widget"}
 {"ts":"2026-08-01T15:08:03.010Z","op":"update","visit":"expeditions/e29@0","node":"d16","brief":"landing the database card on trunk"}
+{"ts":"2026-08-01T15:09:37.456Z","op":"update","visit":"expeditions/e29@0","node":"d17","brief":"landing after the sync"}
+{"ts":"2026-08-01T15:30:31.191Z","op":"plan","visit":"expeditions/e29@0","parent":null,"nodes":[{"id":"d10","brief":"Throw out Filter, Search and the view switcher"},{"id":"d11","brief":"Sort levels that actually apply, and add from empty"},{"id":"d12","brief":"Group by that groups, and nests as levels are added"},{"id":"d13","brief":"The code icon top right, flipping table and YAML"},{"id":"d14","brief":"White text, with file.path as a clickable first column"},{"id":"d15","brief":"Frozen toolbar and header while rows scroll"},{"id":"d16","brief":"Columns that resize and reorder by dragging"},{"id":"d17","brief":"Properties stays open while ticking, without its right field"}]}
+{"ts":"2026-08-01T15:31:04.931Z","op":"obsolete","visit":"expeditions/e29@0","node":"d10","brief":"duplicate of d1"}
+{"ts":"2026-08-01T15:31:25.575Z","op":"done","visit":"start@0","node":"d3","brief":"grouping nests one level per groupBy entry"}
+{"ts":"2026-08-01T15:32:51.886Z","op":"done","visit":"start@0","node":"d1","brief":"Filter, Search and the switcher are gone from the card"}
+{"ts":"2026-08-01T15:34:12.016Z","op":"done","visit":"start@0","node":"d8","brief":"a tick redraws only the rows, so the list stays open"}
+{"ts":"2026-08-01T15:34:25.867Z","op":"done","visit":"start@0","node":"d5","brief":"table text is full strength and the path column links"}
+{"ts":"2026-08-01T15:35:30.546Z","op":"done","visit":"start@0","node":"d4","brief":"the code icon flips the table and the query"}
+{"ts":"2026-08-01T15:36:19.516Z","op":"done","visit":"start@0","node":"d2","brief":"sort levels apply and can be added from empty"}
+{"ts":"2026-08-01T15:38:25.611Z","op":"obsolete","visit":"expeditions/e29@0","node":"d11","brief":"duplicate of d2"}
+{"ts":"2026-08-01T15:40:27.852Z","op":"done","visit":"start@0","node":"d7","brief":"headings drag to reorder and their edges resize"}
+{"ts":"2026-08-01T15:40:38.939Z","op":"obsolete","visit":"expeditions/e29@0","node":"d12","brief":"duplicate of d3"}
+{"ts":"2026-08-01T15:42:11.648Z","op":"done","visit":"start@0","node":"d6","brief":"the toolbar sits outside the scroll and the header is sticky"}

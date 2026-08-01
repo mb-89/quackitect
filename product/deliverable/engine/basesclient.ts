@@ -1,78 +1,85 @@
 // THE INSTRUMENT, CLIENT SIDE — the style and the one script.
 //
-// Split from baseui.ts because that file builds MARKUP and this one is an
-// asset. Keeping a few hundred lines of CSS and browser JavaScript out of the
-// renderer keeps both readable.
-//
 // THE SCRIPT LISTENS ON THE DOCUMENT, never on the controls. The mirror morphs
 // its cards in place, so a listener bound to a button stops working the moment
 // the card redraws. The document survives every morph.
 //
-// EVERY CONTROL POSTS AND THEN RELOADS THE CARD. There is no local state to
-// keep in step, because the file is the state. A tick that failed to write
-// therefore cannot leave a ticked box behind.
+// A CONTROL REDRAWS THE DATA, NOT THE CARD. Replacing the whole card closed
+// whatever popover was open, so ticking three columns meant opening the same
+// list three times. Only the rows and the count come back now, and the reader
+// keeps their place.
 
 export const BASES_STYLE = `
-.bs-bar{display:flex;align-items:center;gap:6px;padding:6px 2px;flex-wrap:wrap}
+.bs-body{display:flex;flex-direction:column;height:100%;overflow:hidden;padding:0}
+.bs-block{display:flex;flex-direction:column;flex:1;min-height:0}
+.bs-chrome{flex:0 0 auto;padding:0 10px}
+.bs-pane{flex:1;min-height:0;overflow:auto;padding:0 10px 10px}
+.bs-bar{display:flex;align-items:center;gap:8px;padding:6px 0}
 .bs-gap{flex:1}
+.bs-view-name{font-weight:600;color:var(--se-fg)}
 .bs-count{color:var(--se-muted);font-size:11px;white-space:nowrap}
-.bs-tool{background:transparent;color:var(--se-fg);border:1px solid transparent;border-radius:4px;font:inherit;font-size:11px;padding:3px 7px;cursor:pointer;white-space:nowrap}
+.bs-tool{background:transparent;color:var(--se-fg);border:1px solid transparent;border-radius:4px;font:inherit;font-size:11px;padding:3px 7px;cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;gap:4px}
 .bs-tool:hover{background:var(--se-hover)}
 .bs-tool.open{background:var(--se-raised);border-color:var(--se-border-strong)}
-.bs-view-btn{font-weight:600}
-.bs-caret{color:var(--se-muted)}
+.bs-code-toggle{color:var(--se-muted);padding:3px 5px}
+.bs-code-toggle:hover,.bs-code-toggle.open{color:var(--se-fg)}
 .bs-type{color:var(--se-muted);display:inline-block;width:1.3em;text-align:center}
-.bs-searchbar{padding:0 2px 6px}
-.bs-search{width:100%;box-sizing:border-box;background:var(--se-bg);color:var(--se-fg);border:1px solid var(--se-border-strong);border-radius:4px;font:inherit;font-size:12px;padding:4px 7px}
-.bs-pop{position:relative;margin:0 2px 8px;padding:8px;background:var(--se-raised);border:1px solid var(--se-border-strong);border-radius:6px;font-size:11px;max-width:520px}
-.bs-pop-wide{max-width:640px}
-.bs-pop-tall .bs-prop-list{max-height:320px;overflow:auto}
+.bs-pop{margin:0 0 8px;padding:8px;background:var(--se-raised);border:1px solid var(--se-border-strong);border-radius:6px;font-size:11px;max-width:520px}
+.bs-pop-tall .bs-prop-list{max-height:300px;overflow:auto}
 .bs-pop-title{color:var(--se-fg);font-weight:600;margin:2px 0 6px}
 .bs-helpable{cursor:pointer}
 .bs-helpable:hover{color:var(--se-accent)}
-.bs-row{display:flex;align-items:center;gap:5px;margin:0 0 5px;flex-wrap:wrap}
-.bs-where{color:var(--se-muted)}
-.bs-row select,.bs-row input,.bs-configure select,.bs-configure input,.bs-find{background:var(--se-bg);color:var(--se-fg);border:1px solid var(--se-border);border-radius:4px;font:inherit;font-size:11px;padding:2px 5px}
-.bs-val,.bs-raw{flex:1;min-width:110px}
-.bs-raw{font-family:ui-monospace,Consolas,monospace}
-.bs-icon{background:transparent;border:0;color:var(--se-muted);cursor:pointer;font:inherit;font-size:11px;padding:2px 4px;border-radius:3px}
+.bs-row{display:flex;align-items:center;gap:5px;margin:0 0 5px}
+.bs-row select,.bs-find{background:var(--se-bg);color:var(--se-fg);border:1px solid var(--se-border);border-radius:4px;font:inherit;font-size:11px;padding:2px 5px}
+.bs-icon{background:transparent;border:0;color:var(--se-muted);cursor:pointer;font:inherit;font-size:11px;padding:2px 5px;border-radius:3px}
 .bs-icon:hover{background:var(--se-hover);color:var(--se-fg)}
 .bs-add{background:transparent;border:0;color:var(--se-muted);cursor:pointer;font:inherit;font-size:11px;padding:3px 4px;border-radius:3px;text-align:left}
 .bs-add:hover{background:var(--se-hover);color:var(--se-fg)}
-.bs-adds{display:flex;gap:8px}
-.bs-group{border-left:2px solid var(--se-border);padding:4px 0 4px 8px;margin:0 0 4px}
-.bs-conj{margin:0 0 6px}
-.bs-fold summary{cursor:pointer;color:var(--se-fg);padding:3px 0;font-weight:600}
-.bs-scope{padding:4px 0 0 4px}
 .bs-find{width:100%;box-sizing:border-box;margin:0 0 6px}
 .bs-prop-item{display:flex;align-items:center;gap:6px;padding:3px 4px;border-radius:4px;cursor:pointer}
 .bs-prop-item:hover{background:var(--se-hover)}
-.bs-prop-item.on .bs-prop-name{color:var(--se-fg);font-weight:600}
-.bs-prop-name{flex:1;color:var(--se-muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.bs-rename{width:110px;opacity:.55}
-.bs-rename:focus{opacity:1}
-.bs-pop-foot{display:flex;gap:8px;border-top:1px solid var(--se-border);margin:6px 0 0;padding:6px 0 0}
-.bs-view-item{display:flex;align-items:center;gap:6px;width:100%;background:transparent;border:0;color:var(--se-fg);font:inherit;font-size:11px;padding:4px;border-radius:4px;cursor:pointer;text-align:left}
-.bs-view-item:hover{background:var(--se-hover)}
-.bs-view-item.on{background:var(--se-walk-bg)}
-.bs-chev{color:var(--se-muted);padding:0 3px}
-.bs-chev:hover{color:var(--se-fg)}
-.bs-back{background:transparent;border:0;color:var(--se-muted);cursor:pointer;font:inherit}
-.bs-configure{border-top:1px solid var(--se-border);margin:6px 0 0;padding:8px 0 0;display:flex;flex-direction:column;gap:6px}
-.bs-conf-head{display:flex;align-items:center;gap:6px;margin:0}
-.bs-conf-name{flex:1}
-.bs-vmenu{background:transparent;border:0;color:var(--se-muted);cursor:pointer;font:inherit;padding:0 5px;border-radius:3px}
-.bs-vmenu:hover{background:var(--se-hover);color:var(--se-fg)}
-.bs-vmenu-items{display:flex;flex-direction:column;background:var(--se-bg);border:1px solid var(--se-border-strong);border-radius:4px;padding:3px}
-.bs-codepanel{margin:0 2px 8px;padding:8px;background:var(--se-raised);border:1px solid var(--se-border-strong);border-radius:6px}
-.bs-code-head{display:flex;align-items:center;gap:8px;margin:0 0 6px;font-size:11px}
+.bs-prop-item.on .bs-prop-name{font-weight:600}
+.bs-prop-name{flex:1;color:var(--se-fg);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bs-pop-foot{border-top:1px solid var(--se-border);margin:6px 0 0;padding:6px 0 0}
+.bs-empty{color:var(--se-muted);padding:10px;font-size:12px}
+.bs-busy{opacity:.55}
+.bs-code-head{display:flex;align-items:center;gap:8px;padding:6px 0;font-size:11px}
 .bs-code-path{flex:1;color:var(--se-muted);font-family:ui-monospace,Consolas,monospace}
-.bs-code-msg{color:var(--se-muted);font-size:11px}
-.bs-code-msg.bad{color:var(--se-fail)}
-.bs-code-text{width:100%;box-sizing:border-box;min-height:220px;background:var(--se-bg);color:var(--se-fg);border:1px solid var(--se-border);border-radius:4px;padding:8px;font-family:ui-monospace,Consolas,monospace;font-size:11px;line-height:1.45;white-space:pre;overflow:auto;resize:vertical}
-.bs-empty{color:var(--se-muted);padding:10px 2px;font-size:12px}
-.bs-busy{opacity:.5;pointer-events:none}
-.bs-hit{display:none}
+.bs-code-text{width:100%;box-sizing:border-box;min-height:60vh;background:var(--se-bg);color:var(--se-fg);border:1px solid var(--se-border);border-radius:4px;padding:8px;font-family:ui-monospace,Consolas,monospace;font-size:11px;line-height:1.5;white-space:pre;overflow:auto;resize:vertical}
+`;
+
+// The table's own look. Everything readable is FULL STRENGTH: the muted grey
+// was meant to mark uneditable cells and only made the table hard to read.
+// Whether a cell takes an editor is discovered by clicking it, which is what
+// people do anyway.
+export const BASES_TABLE_STYLE = `
+.tbl{border-collapse:separate;border-spacing:0;font-size:12px;width:100%;table-layout:fixed}
+.tbl th,.tbl td{border-bottom:1px solid var(--se-border);border-right:1px solid var(--se-border);padding:4px 8px;text-align:left;vertical-align:top;color:var(--se-fg);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tbl th:last-child,.tbl td:last-child{border-right:0}
+.tbl thead th{position:sticky;top:0;z-index:2;background:var(--se-raised);font-weight:600;cursor:grab;user-select:none}
+.tbl thead th.drag-over{background:var(--se-walk-bg)}
+.th-label{pointer-events:none}
+.th-grip{position:absolute;right:0;top:0;bottom:0;width:6px;cursor:col-resize}
+.tbl thead th{position:sticky;position:-webkit-sticky}
+.tbl thead th{padding-right:12px}
+.tbl thead th{position:sticky}
+.tbl th{position:relative}
+.tbl tbody tr:hover td{background:var(--se-hover)}
+.tbl-link{color:var(--se-accent);text-decoration:none;cursor:pointer}
+.tbl-link:hover{text-decoration:underline}
+.tbl-group td{background:var(--se-raised);font-size:11px;border-bottom:1px solid var(--se-border-strong)}
+.grp-pad{display:inline-block}
+.grp-prop{color:var(--se-muted)}
+.grp-val{font-weight:600;color:var(--se-fg)}
+.grp-count{color:var(--se-muted);margin-left:6px}
+.tbl-empty{color:var(--se-muted);font-style:italic}
+.tbl-cell{cursor:text}
+.tbl-cell:focus{outline:2px solid var(--se-walk);outline-offset:-2px}
+.tbl-locked{color:var(--se-fg)}
+.tbl-bad{outline:2px solid var(--se-fail);outline-offset:-2px}
+.tbl-edit{width:100%;box-sizing:border-box;background:var(--se-bg);color:var(--se-fg);border:1px solid var(--se-walk);border-radius:2px;font:inherit;padding:1px 4px}
+.tbl-damage{color:var(--se-fail);padding:6px 10px;font-size:12px}
+.tbl-refused{color:var(--se-fail);padding:10px;font-size:12px;white-space:pre-wrap}
 `;
 
 export const BASES_SCRIPT = `
@@ -81,7 +88,7 @@ export const BASES_SCRIPT = `
   window.__seBases = true;
 
   function ctxOf(node) {
-    var block = node && node.closest ? node.closest(".bs-block") : null;
+    var block = node && node.closest ? node.closest(".bs-block") : document.querySelector(".bs-block");
     if (block === null) return null;
     var bar = block.querySelector(".bs-bar");
     if (bar === null) return null;
@@ -100,127 +107,85 @@ export const BASES_SCRIPT = `
       .catch(function () {});
   }
 
-  // A WRITE, THEN A REDRAW FROM DISK. Nothing is assumed to have worked.
+  // ONLY THE ROWS COME BACK. The chrome stays exactly as it was, so a popover
+  // the reader opened is still open and still scrolled where they left it.
+  function refresh(node) {
+    var ctx = ctxOf(node);
+    if (ctx === null) return Promise.resolve();
+    var pane = document.querySelector(".bs-pane-table");
+    if (pane !== null) pane.classList.add("bs-busy");
+    return fetch("/widget/table?tv=" + encodeURIComponent(ctx.id))
+      .then(function (r) { return r.text(); })
+      .then(function (text) {
+        var doc = new DOMParser().parseFromString(text, "text/html");
+        var freshData = doc.querySelector(".bs-data");
+        var here = document.querySelector(".bs-data");
+        if (freshData !== null && here !== null) here.replaceWith(freshData);
+        var freshCount = doc.querySelector(".bs-count");
+        var count = document.querySelector(".bs-count");
+        if (freshCount !== null && count !== null) count.textContent = freshCount.textContent;
+        var freshCode = doc.querySelector(".bs-code-text");
+        var code = document.querySelector(".bs-code-text");
+        // The query is the same act seen twice, so it follows every control.
+        if (freshCode !== null && code !== null && document.activeElement !== code) code.value = freshCode.value;
+        if (pane !== null) pane.classList.remove("bs-busy");
+      })
+      .catch(function (e) {
+        if (pane !== null) pane.classList.remove("bs-busy");
+        showHelp("the table could not be redrawn", "<p>The write went through. Reopening the card will show it.</p><p>" + String(e) + "</p>");
+      });
+  }
+
   function post(node, op, extra) {
     var ctx = ctxOf(node);
-    if (ctx === null) return;
+    if (ctx === null) return Promise.resolve();
     var body = { op: op, file: ctx.file, view: ctx.view };
     if (extra) for (var k in extra) body[k] = extra[k];
-    var card = document.getElementById("w-table");
-    if (card !== null) card.classList.add("bs-busy");
-    fetch("/base/edit", {
+    return fetch("/base/edit", {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify(body)
     }).then(function (r) { return r.json(); }).then(function (answer) {
       if (answer === null || answer.ok !== true) {
-        if (card !== null) card.classList.remove("bs-busy");
         showHelp("the control was refused", "<p>" + String((answer && answer.error) || "the write was refused") + "</p>");
         return;
       }
-      reload(ctx.id);
+      return refresh(node);
     }).catch(function (e) {
-      if (card !== null) card.classList.remove("bs-busy");
       showHelp("the control could not reach the engine", "<p>" + String(e) + "</p>");
     });
-  }
-
-  // THE CARD REDRAWS, THE PAGE DOES NOT. A full reload would throw the reader
-  // out of whatever else they had open, which is the one thing the surfaces
-  // are not allowed to do. A redraw that fails says so and leaves the card
-  // standing, because a stale card the reader can see beats a blank one.
-  function reload(id) {
-    var url = id === null || id === undefined ? "/widget/table" : "/widget/table?tv=" + encodeURIComponent(id);
-    // The query panel stays open across a redraw. That is the whole point of
-    // it: a control writes, the card comes back, and the YAML that changed is
-    // still on screen beside the control that changed it.
-    var open = document.querySelector(".bs-codepanel");
-    var wasOpen = open !== null && open.hidden === false;
-    return fetch(url)
-      .then(function (r) { return r.text(); })
-      .then(function (text) {
-        var doc = new DOMParser().parseFromString(text, "text/html");
-        var fresh = doc.getElementById("w-table");
-        var here = document.getElementById("w-table");
-        if (fresh !== null && here !== null) here.replaceWith(fresh);
-        if (wasOpen) {
-          var again = document.querySelector(".bs-codepanel");
-          if (again !== null) again.hidden = false;
-        }
-      })
-      .catch(function (e) {
-        var card = document.getElementById("w-table");
-        if (card !== null) card.classList.remove("bs-busy");
-        showHelp("the table could not be redrawn", "<p>The write went through. Reopening the card will show it.</p><p>" + String(e) + "</p>");
-      });
   }
 
   function closePops(except) {
     var pops = document.querySelectorAll(".bs-pop");
     for (var i = 0; i < pops.length; i++) if (pops[i] !== except) pops[i].hidden = true;
-    var tools = document.querySelectorAll(".bs-tool");
+    var tools = document.querySelectorAll(".bs-tool[data-pop]");
     for (var j = 0; j < tools.length; j++) tools[j].classList.remove("open");
   }
 
-  // --- reading the filter tree back out of the DOM -------------------------
-
-  function rowValue(row) {
-    if (row.getAttribute("data-raw") === "1") {
-      var raw = row.querySelector(".bs-raw");
-      var text = raw === null ? "" : raw.value.trim();
-      return text === "" ? null : text;
-    }
-    var prop = row.querySelector(".bs-prop");
-    var op = row.querySelector(".bs-op");
-    var val = row.querySelector(".bs-val");
-    if (prop === null || op === null || prop.value === "") return null;
-    return { r: { property: prop.value, operator: op.value, value: val === null ? "" : val.value } };
-  }
-
-  function groupValue(group) {
-    var conj = group.querySelector(":scope > .bs-conj");
-    var kidsBox = group.querySelector(":scope > .bs-kids");
-    if (kidsBox === null) return null;
-    var kids = [];
-    for (var i = 0; i < kidsBox.children.length; i++) {
-      var kid = kidsBox.children[i];
-      var v = kid.classList.contains("bs-group") ? groupValue(kid) : rowValue(kid);
-      if (v !== null) kids.push(v);
-    }
-    if (kids.length === 0) return null;
-    var which = conj === null ? "and" : conj.value;
-    if (which === "not") return { not: kids.length === 1 ? kids[0] : { and: kids } };
-    return which === "or" ? { or: kids } : { and: kids };
-  }
-
-  function saveFilters(node) {
-    var scope = node.closest(".bs-scope");
-    if (scope === null) return;
-    var group = scope.querySelector(":scope > .bs-group");
-    var tree = group === null ? null : groupValue(group);
-    post(node, scope.getAttribute("data-scope") === "global" ? "setGlobalFilters" : "setViewFilters", { posted: tree });
-  }
-
-  function saveSorts(node) {
-    var pop = node.closest(".bs-pop");
-    if (pop === null) return;
-    var rows = pop.querySelectorAll(".bs-sort");
-    var sort = [];
+  function levels(kind) {
+    var box = document.querySelector('.bs-levels[data-kind="' + kind + '"]');
+    var out = [];
+    if (box === null) return out;
+    var rows = box.querySelectorAll(".bs-level");
     for (var i = 0; i < rows.length; i++) {
       var p = rows[i].querySelector(".bs-prop");
       var d = rows[i].querySelector(".bs-dir");
-      if (p !== null && p.value !== "") sort.push({ property: p.value, direction: d === null ? "ASC" : d.value });
+      if (p !== null && p.value !== "") out.push({ property: p.value, direction: d === null ? "ASC" : d.value });
     }
-    post(node, "setSort", { sort: sort });
+    return out;
   }
 
-  // --- clicks --------------------------------------------------------------
+  function saveLevels(node, kind) {
+    if (kind === "group") return post(node, "setGroupBy", { levels: levels("group") });
+    return post(node, "setSort", { sort: levels("sort") });
+  }
 
   document.addEventListener("click", function (ev) {
     var t = ev.target;
     if (t === null || !t.closest) return;
 
-    var helpable = t.closest(".bs-helpable, .bs-tool");
+    var helpable = t.closest(".bs-helpable, .bs-tool[data-help]");
     if (helpable !== null && helpable.hasAttribute("data-help")) help(helpable.getAttribute("data-help"));
 
     var tool = t.closest(".bs-tool[data-pop]");
@@ -234,136 +199,55 @@ export const BASES_SCRIPT = `
       return;
     }
 
-    if (t.closest(".bs-search-btn") !== null) {
+    // THE FLIP. One thing on screen at a time, because the table and the query
+    // are the same view rendered twice.
+    if (t.closest(".bs-code-toggle") !== null) {
       var blk = t.closest(".bs-block");
-      var bar = blk === null ? null : blk.querySelector(".bs-searchbar");
-      if (bar !== null) { bar.hidden = !bar.hidden; if (!bar.hidden) bar.querySelector(".bs-search").focus(); }
-      return;
-    }
-
-    if (t.closest(".bs-hide-all") !== null) { post(t, "hideAll", {}); return; }
-    if (t.closest(".bs-clear-group") !== null) { post(t, "setGroupBy", { property: null }); return; }
-
-    var drop = t.closest(".bs-drop");
-    if (drop !== null) {
-      var row = drop.closest(".bs-row");
-      var inFilter = drop.closest(".bs-scope") !== null;
-      var anchor = row.parentElement;
-      row.remove();
-      if (inFilter) saveFilters(anchor); else saveSorts(anchor);
-      return;
-    }
-
-    if (t.closest(".bs-add-sort") !== null) {
-      var sp = t.closest(".bs-pop").querySelector(".bs-sorts");
-      var first = sp.querySelector(".bs-sort");
-      if (first !== null) { var copy = first.cloneNode(true); sp.appendChild(copy); }
-      else help("sort");
-      return;
-    }
-
-    var addFilter = t.closest(".bs-add-filter");
-    if (addFilter !== null) {
-      var kids = addFilter.closest(".bs-group").querySelector(":scope > .bs-kids");
-      var sample = document.querySelector(".bs-filter");
-      if (sample !== null) {
-        var fresh = sample.cloneNode(true);
-        fresh.setAttribute("data-raw", "0");
-        var v = fresh.querySelector(".bs-val"); if (v !== null) v.value = "";
-        var r = fresh.querySelector(".bs-raw"); if (r !== null) { r.value = ""; r.hidden = true; }
-        var b = fresh.querySelector(".bs-built"); if (b !== null) b.hidden = false;
-        kids.appendChild(fresh);
-      }
-      return;
-    }
-
-    var addGroup = t.closest(".bs-add-group");
-    if (addGroup !== null) {
-      var into = addGroup.closest(".bs-group").querySelector(":scope > .bs-kids");
-      var g = document.createElement("div");
-      g.className = "bs-group";
-      g.innerHTML = '<select class="bs-conj"><option value="and">All the following are true</option><option value="or">Any of the following are true</option><option value="not">None of the following are true</option></select><div class="bs-kids"></div><div class="bs-adds"><button type="button" class="bs-add bs-add-filter">+ Add filter</button><button type="button" class="bs-add bs-add-group">+ Add filter group</button></div>';
-      into.appendChild(g);
-      return;
-    }
-
-    var rawBtn = t.closest(".bs-toggle-raw");
-    if (rawBtn !== null) {
-      var frow = rawBtn.closest(".bs-filter");
-      var isRaw = frow.getAttribute("data-raw") === "1";
-      var built = frow.querySelector(".bs-built");
-      var rawIn = frow.querySelector(".bs-raw");
-      if (isRaw) {
-        frow.setAttribute("data-raw", "0");
-        built.hidden = false; rawIn.hidden = true;
-      } else {
-        frow.setAttribute("data-raw", "1");
-        built.hidden = true; rawIn.hidden = false;
-        rawIn.focus();
-      }
-      return;
-    }
-
-    var goto = t.closest("[data-goto]");
-    if (goto !== null && t.closest("[data-configure]") === null) {
-      // A reload rather than a toggle: only the shown view carries its chrome,
-      // so the controls have to be redrawn for the one being switched to.
-      closePops(null);
-      reload(goto.getAttribute("data-goto"));
-      return;
-    }
-
-    var conf = t.closest("[data-configure]");
-    if (conf !== null) {
-      var panel = conf.closest(".bs-pop").querySelector(".bs-configure");
-      if (panel !== null) panel.hidden = false;
-      ev.stopPropagation();
-      return;
-    }
-
-    if (t.closest(".bs-back") !== null) {
-      var pnl = t.closest(".bs-configure");
-      if (pnl !== null) pnl.hidden = true;
-      return;
-    }
-
-    if (t.closest(".bs-vmenu") !== null) {
-      var menu = t.closest(".bs-configure").querySelector(".bs-vmenu-items");
-      if (menu !== null) menu.hidden = !menu.hidden;
-      return;
-    }
-
-    if (t.closest(".bs-show-code") !== null) {
-      var panel = t.closest(".bs-block").querySelector(".bs-codepanel");
-      if (panel !== null) panel.hidden = !panel.hidden;
+      var table = blk.querySelector(".bs-pane-table");
+      var code = blk.querySelector(".bs-pane-code");
+      var btn = t.closest(".bs-code-toggle");
+      var toCode = code.hidden;
+      code.hidden = !toCode;
+      table.hidden = toCode;
+      btn.classList.toggle("open", toCode);
+      btn.title = toCode ? "show the table" : "show the query";
       closePops(null);
       return;
     }
 
     if (t.closest(".bs-code-save") !== null) {
-      var box = t.closest(".bs-codepanel").querySelector(".bs-code-text");
-      var c2 = ctxOf(t);
-      if (box !== null && c2 !== null) post(t, "setSource", { text: box.value });
+      var box = document.querySelector(".bs-code-text");
+      if (box !== null) post(t, "setSource", { text: box.value });
       return;
     }
 
-    if (t.closest(".bs-add-view") !== null) {
-      var name = window.prompt("Name the new view");
-      if (name !== null && name.trim() !== "") post(t, "addView", { name: name.trim(), type: "table" });
+    if (t.closest(".bs-hide-all") !== null) { post(t, "hideAll", {}); return; }
+
+    var drop = t.closest(".bs-drop");
+    if (drop !== null) {
+      var row = drop.closest(".bs-level");
+      var kind = row.getAttribute("data-kind");
+      var holder = row.parentElement;
+      row.remove();
+      // An empty list still needs one blank row, or Add has nothing to clone.
+      if (holder.querySelectorAll(".bs-level").length === 0) holder.appendChild(blankLevel(kind));
+      saveLevels(holder, kind);
       return;
     }
 
-    if (t.closest(".bs-drop-view") !== null) {
-      var c = ctxOf(t);
-      if (c !== null && window.confirm('Delete the view "' + c.view + '" from ' + c.file + "?")) post(t, "removeView", {});
+    var add = t.closest(".bs-add-level");
+    if (add !== null) {
+      var which = add.getAttribute("data-kind");
+      var into = document.querySelector('.bs-levels[data-kind="' + which + '"]');
+      if (into !== null) into.appendChild(blankLevel(which));
       return;
     }
 
     if (t.closest(".bs-create") !== null) {
-      var f = window.prompt("Name the new base file", "views.base");
+      var f = window.prompt("Name the new base file", "database.base");
       if (f !== null && f.trim() !== "") {
-        fetch("/base/edit", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ op: "createBase", file: f.trim(), name: "Table" }) })
-          .then(function () { reload(null); });
+        fetch("/base/edit", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ op: "createBase", file: f.trim(), name: "All notes" }) })
+          .then(function () { refresh(t); });
       }
       return;
     }
@@ -371,77 +255,107 @@ export const BASES_SCRIPT = `
     if (t.closest(".bs-pop") === null && t.closest(".bs-tool") === null) closePops(null);
   });
 
-  // --- changes -------------------------------------------------------------
+  function blankLevel(kind) {
+    var sample = document.querySelector('.bs-levels[data-kind="' + kind + '"] .bs-level');
+    var row;
+    if (sample !== null) {
+      row = sample.cloneNode(true);
+    } else {
+      row = document.createElement("div");
+      row.className = "bs-row bs-level";
+      row.innerHTML = '<select class="bs-prop"></select><select class="bs-dir"><option value="ASC">A → Z</option><option value="DESC">Z → A</option></select><button type="button" class="bs-icon bs-drop">✕</button>';
+    }
+    row.setAttribute("data-kind", kind);
+    var p = row.querySelector(".bs-prop");
+    if (p !== null) p.value = "";
+    return row;
+  }
 
   document.addEventListener("change", function (ev) {
     var t = ev.target;
     if (t === null || !t.closest) return;
-
     if (t.classList.contains("bs-tick")) {
       post(t, "toggleProperty", { property: t.getAttribute("data-property"), on: t.checked });
+      var item = t.closest(".bs-prop-item");
+      if (item !== null) item.classList.toggle("on", t.checked);
       return;
     }
-    if (t.classList.contains("bs-layout")) { post(t, "setLayout", { type: t.value }); return; }
-    if (t.closest(".bs-scope") !== null) { saveFilters(t); return; }
-    if (t.closest('[data-kind="group"]') !== null) {
-      var row = t.closest('[data-kind="group"]');
-      var p = row.querySelector(".bs-prop");
-      var d = row.querySelector(".bs-dir");
-      post(t, "setGroupBy", { property: p.value === "" ? null : p.value, direction: d.value });
-      return;
-    }
-    if (t.closest(".bs-sort") !== null) { saveSorts(t); return; }
+    var lvl = t.closest(".bs-level");
+    if (lvl !== null) { saveLevels(lvl, lvl.getAttribute("data-kind")); return; }
   });
-
-  // --- typing --------------------------------------------------------------
 
   document.addEventListener("input", function (ev) {
     var t = ev.target;
-    if (t === null || !t.classList) return;
-
-    if (t.classList.contains("bs-search")) {
-      var needle = t.value.toLowerCase();
-      var block = t.closest(".bs-block");
-      var body = block === null ? null : block.querySelector(".bs-data tbody");
-      if (body === null) return;
-      var shown = 0;
-      for (var i = 0; i < body.rows.length; i++) {
-        var hit = needle === "" || body.rows[i].textContent.toLowerCase().indexOf(needle) !== -1;
-        body.rows[i].hidden = !hit;
-        if (hit) shown++;
-      }
-      var count = block.querySelector(".bs-count");
-      if (count !== null) count.textContent = shown + (shown === 1 ? " result" : " results");
-      return;
-    }
-
-    if (t.classList.contains("bs-find")) {
-      var want = t.value.toLowerCase();
-      var items = t.closest(".bs-pop").querySelectorAll(".bs-prop-item");
-      for (var j = 0; j < items.length; j++) {
-        items[j].style.display = items[j].textContent.toLowerCase().indexOf(want) === -1 ? "none" : "";
-      }
-      return;
+    if (t === null || !t.classList || !t.classList.contains("bs-find")) return;
+    var want = t.value.toLowerCase();
+    var items = t.closest(".bs-pop").querySelectorAll(".bs-prop-item");
+    for (var j = 0; j < items.length; j++) {
+      items[j].style.display = items[j].textContent.toLowerCase().indexOf(want) === -1 ? "none" : "";
     }
   });
 
-  // Commit on Enter, the same contract the cell editor already uses.
-  document.addEventListener("keydown", function (ev) {
-    if (ev.key !== "Enter") return;
-    var t = ev.target;
-    if (t === null || !t.classList) return;
-    if (t.classList.contains("bs-raw")) { ev.preventDefault(); saveFilters(t); return; }
-    if (t.classList.contains("bs-val")) { ev.preventDefault(); saveFilters(t); return; }
-    if (t.classList.contains("bs-rename")) {
-      ev.preventDefault();
-      post(t, "setDisplayName", { property: t.getAttribute("data-property"), name: t.value });
-      return;
-    }
-    if (t.classList.contains("bs-view-name")) {
-      ev.preventDefault();
-      post(t, "renameView", { to: t.value });
-      return;
-    }
+  // --- columns: drag to reorder, drag the edge to resize --------------------
+
+  var dragCol = null;
+
+  document.addEventListener("dragstart", function (ev) {
+    var th = ev.target.closest ? ev.target.closest("th[data-col]") : null;
+    if (th === null) return;
+    dragCol = th.getAttribute("data-col");
+    ev.dataTransfer.effectAllowed = "move";
+    try { ev.dataTransfer.setData("text/plain", dragCol); } catch (e) {}
+  });
+
+  document.addEventListener("dragover", function (ev) {
+    var th = ev.target.closest ? ev.target.closest("th[data-col]") : null;
+    if (th === null || dragCol === null) return;
+    ev.preventDefault();
+    th.classList.add("drag-over");
+  });
+
+  document.addEventListener("dragleave", function (ev) {
+    var th = ev.target.closest ? ev.target.closest("th[data-col]") : null;
+    if (th !== null) th.classList.remove("drag-over");
+  });
+
+  document.addEventListener("drop", function (ev) {
+    var th = ev.target.closest ? ev.target.closest("th[data-col]") : null;
+    if (th === null || dragCol === null) return;
+    ev.preventDefault();
+    th.classList.remove("drag-over");
+    var onto = th.getAttribute("data-col");
+    if (onto === dragCol) { dragCol = null; return; }
+    var cols = [];
+    var heads = document.querySelectorAll("th[data-col]");
+    for (var i = 0; i < heads.length; i++) cols.push(heads[i].getAttribute("data-col"));
+    var from = cols.indexOf(dragCol);
+    cols.splice(from, 1);
+    cols.splice(cols.indexOf(onto), 0, dragCol);
+    dragCol = null;
+    post(th, "setOrder", { order: cols });
+  });
+
+  var sizing = null;
+
+  document.addEventListener("mousedown", function (ev) {
+    var grip = ev.target.closest ? ev.target.closest(".th-grip") : null;
+    if (grip === null) return;
+    var th = grip.closest("th[data-col]");
+    sizing = { col: th.getAttribute("data-col"), th: th, x: ev.clientX, w: th.offsetWidth };
+    ev.preventDefault();
+  });
+
+  document.addEventListener("mousemove", function (ev) {
+    if (sizing === null) return;
+    var w = Math.max(40, sizing.w + (ev.clientX - sizing.x));
+    sizing.th.style.width = w + "px";
+  });
+
+  document.addEventListener("mouseup", function () {
+    if (sizing === null) return;
+    var done = sizing;
+    sizing = null;
+    post(done.th, "setColumnSize", { property: done.col, px: done.th.offsetWidth });
   });
 }());
 `;
