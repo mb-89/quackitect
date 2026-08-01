@@ -18,3 +18,11 @@
 {"ts":"2026-08-01T13:15:08.357Z","op":"update","visit":"expeditions/e29@0","node":"d40","brief":"waiting for the suite to finish before landing"}
 {"ts":"2026-08-01T13:15:17.043Z","op":"update","visit":"expeditions/e29@0","node":"d41","brief":"verifying the new host-bar guard actually runs"}
 {"ts":"2026-08-01T13:15:28.037Z","op":"update","visit":"expeditions/e29@0","node":"d42","brief":"staging the control-bar fix"}
+{"ts":"2026-08-01T13:15:38.872Z","op":"update","visit":"expeditions/e29@0","node":"d43","brief":"committing the fix in e29's worktree"}
+{"ts":"2026-08-01T13:15:44.372Z","op":"done","visit":"expeditions/e29@0","node":"d28","brief":"landing the control-bar fix on trunk"}
+{"ts":"2026-08-01T13:16:21.653Z","op":"update","visit":"expeditions/e29@0","node":"d44","brief":"finding the main tree to clear the strays blocking the land"}
+{"ts":"2026-08-01T13:16:35.385Z","op":"update","visit":"expeditions/e29@0","node":"d45","brief":"committing trunk strays so the land can proceed"}
+{"ts":"2026-08-01T13:16:41.150Z","op":"update","visit":"expeditions/e29@0","node":"d46","brief":"landing e29's control-bar fix on v3"}
+{"ts":"2026-08-01T13:52:51.319Z","op":"plan","visit":"expeditions/e29@0","parent":null,"nodes":[{"id":"d3","brief":"Amend e29's goal to admit the Bases table work"},{"id":"d4","brief":"Typed value model replacing v1's string-only evaluator"},{"id":"d5","brief":"Lexer and recursive-descent parser with call-by-name arguments"},{"id":"d6","brief":"Extensible function registry seeded from the reference"},{"id":"d7","brief":"Evaluator running filters over vault rows"},{"id":"d8","brief":"Tests from the reference's own worked examples"},{"id":"d9","brief":"Warm model that indexes the vault once and holds it"},{"id":"d10","brief":"Measure build and filter time at 30k nodes"}]}
+{"ts":"2026-08-01T13:53:04.145Z","op":"done","visit":"expeditions/e29@0","node":"d3","brief":"goal now admits the Bases table and records the no-iteration ruling"}
+{"ts":"2026-08-01T13:54:45.595Z","op":"fork","visit":"expeditions/e29@0","parent":null,"node":"d11","brief":"worktree is behind trunk and lacks the Bases spec","nodes":[]}
