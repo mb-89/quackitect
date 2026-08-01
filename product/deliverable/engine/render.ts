@@ -525,7 +525,7 @@ const STYLE = `
   .rung.locked { color: var(--se-border-strong); cursor: default; }
   /* Ideation is the one rung that delegates the CREATION of work, so it is
      the one rung drawn as a hazard rather than as a setting. */
-  .rung.danger.on { background: var(--se-over); border-color: var(--se-over); color: var(--se-bg); }
+  .rung.danger.on { background: var(--se-fail); border-color: var(--se-fail); color: var(--se-bg); }
   .rung.danger:not(.locked):not(.on) { color: var(--se-fail); border-color: var(--se-fail); }
 .rung.emergency, .rung.danger.on.emergency { background: var(--se-fail); border-color: var(--se-fail); color: var(--se-bg); animation: se-emergency 1.1s ease-in-out infinite; }
 @keyframes se-emergency { 0%, 100% { opacity: 1; } 50% { opacity: 0.45; } }
@@ -723,7 +723,11 @@ const STYLE = `
   #over .over-sub { color: var(--se-fail); font-size: 15px; }
 `;
 
-const SCRIPT = `
+// EXPORTED so a test can RUN it. This is the mirror's whole client-side
+// behaviour and until now nothing executed a line of it: the battery imports
+// modules and asserts on strings, so anything that only happens in a browser
+// shipped unverified. The reader was the test suite, twice over.
+export const SCRIPT = `
 // Re-read after every morph — a morph never re-runs a script tag.
 let D = JSON.parse(document.getElementById("se-data").textContent);
 
@@ -2083,16 +2087,29 @@ document.addEventListener("click", (ev) => {
     // repair and nothing should reach it by accident. A single press still
     // releases the rung exactly as before, so the ordinary affordance is
     // untouched and nothing on screen says this exists.
-    if (rung >= 1 && n.classList.contains("on")) {
+    // COUNT EVERY PRESS, lit or not. Gating the count on the rung being ON
+    // made the drumroll UNREACHABLE AT ANY NUMBER OF PRESSES, which is what
+    // the owner hit: data-level is baked into the markup, so after press one
+    // releases the rung the button still says "go to 0.6" until a poll
+    // redraws it. Every further press re-sent 0.6, the rung never relit, and
+    // the counter stuck at one no matter how long anybody hammered it.
+    if (rung >= 1) {
       const now = Date.now();
-      if (now - (window.__seTopPressAt || 0) > 3000) window.__seTopPresses = 0;
+      if (now - (window.__seTopPressAt || 0) > 5000) window.__seTopPresses = 0;
       window.__seTopPressAt = now;
       window.__seTopPresses = (window.__seTopPresses || 0) + 1;
       if (window.__seTopPresses >= 5) {
         window.__seTopPresses = 0;
+        // The drumroll toggled the autonomy on its way here, so put it back at
+        // the top BEFORE arming — the engine refuses emergency below the top
+        // rung, and a refused arm would look exactly like a dead button.
+        n.classList.add("on");
         n.classList.add("emergency");
         n.textContent = "E";
-        void fetch("/emergency", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ on: true }) });
+        const bar = document.getElementById("thr");
+        if (bar) bar.value = 1;
+        void fetch("/autonomy", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ value: 1 }) })
+          .then(function () { return fetch("/emergency", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ on: true }) }); });
         return;
       }
     }
