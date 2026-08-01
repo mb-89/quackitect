@@ -38,46 +38,53 @@ These are the consequential ones. A derived field is NOT shown to the agent at
 all: the engine computes it and speaks only if it fails. Get one wrong and you
 block work that is legitimately manual.
 
-| row | field | what the engine would read |
-| --- | --- | --- |
-| onboard-retro | `notes_drained` | the notes store (.se/notes.jsonl) plus the se_note_drain calls: pending count at state entry, pending count at exit, and each note's recorded disposition |
-| gate-kickoff | `retro_drained` | the notes store (.se/notes.jsonl): the count of notes still pending when the gate is judged, and whether any "needs retro" note is undrained. Zero pending passes. |
-| gate-motivation | `vision_scope_stated` | the fill state of big_idea, to_be_world, goal_system and moore_pitch on draft-vision, plus scope and non_goals on scope-non-goals |
-| gate-motivation | `success_measurable` | the value_props table on frame-delta: every need row carrying a non-empty pass line |
-| gate-motivation | `risks_logged` | the raid_opened table on log-risks: the register non-empty and every entry carrying kind, owner and trigger |
-| gate-inputs | `props_realized` | the prop column of frame-delta's value_props table, joined against the prop each story names in write-stories' stories table |
-| gate-inputs | `stories_generalized` | write-stories' story names, joined against the covered-stories column of generalize-use-cases' use_cases table |
-| gate-inputs | `excluded_stated` | presence and non-emptiness of draw-context's excluded_use list |
-| derive-functions | `coverage` | the requirement column of function_structure joined against write-requirements' register, and the steps column of generalize-use-cases' use_cases joined against the same function rows - the engine lists requirements with no function and steps no function covers |
-| gate-requirements | `verifiable` | the verify_method column on every row of write-requirements' register - empty, TBD, or outside test / analysis / inspection / demonstration counts as failing |
-| gate-requirements | `traced` | each register row's source column, resolved against the roles list, the stories table and the recorded norms - unresolved ones are the empty rows |
-| gate-requirements | `functions_cover` | the same computation as derive-functions' coverage - function_structure's requirement links and use_cases' steps - recomputed at gate time rather than inherited from the earlier step's result |
-| gate-requirements | `breaks_if_removed` | the breaks_if_removed column on every row of write-requirements' register - empty or TBD counts as unfilled |
-| derive-criteria | `criteria` | write-requirements' register: every row carrying a high weight and a non-empty scoring definition, collected with its weight, its definition and its requirement id |
-| run-candidates | `candidate_records` | the machine this row declares `runs: candidates`: one compose sub-state per shortlisted combination, each sub-state's own record carrying its allocation, interfaces, metrics and rationale |
-| evaluate-set | `front` | the scores table: the candidates no other candidate beats on every criterion and metric, using the better-is direction carried on each register row's scoring definition |
-| gate-candidates | `complete_allocation` | the partitioned function set against each candidate's allocation in its compose sub-record: every function allocated exactly once per candidate, plus the presence of that candidate's interfaces and rationale |
-| gate-candidates | `criteria_traced` | each criterion's requirement id from derive-criteria, the weight and scoring definition read off that register row, and the requirements column on map-stakeholders' tensions table |
-| gate-candidates | `front_recorded` | the candidate set checked against evaluate-set's front and eliminations: every candidate is either on the front or eliminated with a non-empty reason |
-| consolidate-baseline | `allocation_exact` | the allocation grid named in baseline (originating from the winning candidate's compose record): count element assignments per function row and refuse any count other than one |
-| consolidate-baseline | `interfaces_both_ends` | the element grid and interface set named in baseline: every declared interface must have its reciprocal entry at the far element |
-| gate-architecture | `sensitivity_ruled` | the sensitivity verdict and the tripwires rows from reverse-sensitivity, each tripwire's RAID link resolved against log-risks' raid_opened register |
-| gate-architecture | `evaluation_recorded` | the register rows of kind quality (each carrying its six-part scenario), joined to the scenario column of evaluate-baseline's walk table: every scenario must carry a verdict |
-| gate-architecture | `adrs_traced` | the addresses key in the frontmatter of each file cited by record-adrs' adrs list: every deciding ADR must resolve to a requirement or risk entry |
-| rank-unknowns | `seeded` | the spike drawing this row declares `seeds: spikes` - the iteration record's machines/spikes.md: one state per spike with its id, question and timebox, or the drawing's explicit none and its reason |
-| run-spikes | `spike_records` | the machine this row declares `runs: spikes` - each spike's question and timebox from the drawing, its verdict and evidence from that spike sub-state's own record; or the drawing's explicit none when nothing ran |
-| gate-prototype | `results_recorded` | the spikes machine - every spike sub-state closed with its own evidence recorded, or the drawing's explicit none - together with fold-back's promotions field being filled or explicitly none |
-| plan-build | `build_machine` | the sub-machine this row declares `seeds: build-chunks`: its chunk states, its dependency edges, and the realization kind declared on each chunk |
-| build-steps | `build_record` | the walked sub-machine this row declares `runs: build-chunks`: per-chunk fill status, the actor recorded on each fill, and the path of the sub-record file |
-| verification | `battery` | the engine's own execution of the command declared on this row (`npm --prefix product/deliverable test`): the captured run and its exit code, across all iterations |
-| gate-implementation | `build_planned` | the build-chunks sub-machine: that it was seeded at plan-build and that its walk completed at build-steps |
-| gate-implementation | `red_observed` | the per-check failures recorded in observe-red's red_observed table, joined to the checks authored in author-tests' checks table |
-| gate-implementation | `verification_green` | the verification row's engine-filled battery run: its captured exit code, across all iterations |
-| fill-story-evidence | `slides_filled` | the deck manifests named in write-stories' stories table, across all iterations: which slides carry an evidence_ref into the shipped system and which are still empty |
-| fill-story-evidence | `demos_seeded` | the drawing this row declares `seeds: demos`, its states matched against the killer use cases - the use_cases rows covering a story marked killer in write-stories' stories table |
-| gate-validation | `gaps_logged` | the entries opened by this iteration in log-gaps' gaps table, cross-checked against the slides left empty at fill-story-evidence: every unfilled slide must have an entry |
-| gate-release | `packaged` | the paths cited by package's package and entry_script fields resolving in the evidence directory, plus the recorded skip where the realization kind has no entry script |
-| gate-release | `dependencies_ruled` | the ruling column on every row of ship-review's review table being non-empty, checked against the standing sticky ruling record for divergence |
+REVIEW Abbreviations
+[1] OK, implement if missing
+[2] can be mechanical as cheap first check, but review team review also
+[3] dont understand, lets discuss
+[4] not sure, i think we can let the engine do very much here (compute the whole table)
+[5] i dont think its stricly "exactly once". lets discuss. for software yes, but what does state of the art say about others? (open question)
+
+|REVIEW | row | field | what the engine would read |
+| --- | --- | --- | --- |
+|1| onboard-retro | `notes_drained` | the notes store (.se/notes.jsonl) plus the se_note_drain calls: pending count at state entry, pending count at exit, and each note's recorded disposition |
+|1| gate-kickoff | `retro_drained` | the notes store (.se/notes.jsonl): the count of notes still pending when the gate is judged, and whether any "needs retro" note is undrained. Zero pending passes. |
+|2| gate-motivation | `vision_scope_stated` | the fill state of big_idea, to_be_world, goal_system and moore_pitch on draft-vision, plus scope and non_goals on scope-non-goals |
+|2| gate-motivation | `success_measurable` | the value_props table on frame-delta: every need row carrying a non-empty pass line |
+|non-empty might be acceptable, but risks can be linted. also: risks are still reviewed at review gate| gate-motivation | `risks_logged` | the raid_opened table on log-risks: the register non-empty and every entry carrying kind, owner and trigger |
+|2| gate-inputs | `props_realized` | the prop column of frame-delta's value_props table, joined against the prop each story names in write-stories' stories table |
+|2| gate-inputs | `stories_generalized` | write-stories' story names, joined against the covered-stories column of generalize-use-cases' use_cases table |
+|2| gate-inputs | `excluded_stated` | presence and non-emptiness of draw-context's excluded_use list |
+|2| derive-functions | `coverage` | the requirement column of function_structure joined against write-requirements' register, and the steps column of generalize-use-cases' use_cases joined against the same function rows - the engine lists requirements with no function and steps no function covers |
+|2| gate-requirements | `verifiable` | the verify_method column on every row of write-requirements' register - empty, TBD, or outside test / analysis / inspection / demonstration counts as failing |
+|2| gate-requirements | `traced` | each register row's source column, resolved against the roles list, the stories table and the recorded norms - unresolved ones are the empty rows |
+|2| gate-requirements | `functions_cover` | the same computation as derive-functions' coverage - function_structure's requirement links and use_cases' steps - recomputed at gate time rather than inherited from the earlier step's result |
+|2| gate-requirements | `breaks_if_removed` | the breaks_if_removed column on every row of write-requirements' register - empty or TBD counts as unfilled |
+|2| derive-criteria | `criteria` | write-requirements' register: every row carrying a high weight and a non-empty scoring definition, collected with its weight, its definition and its requirement id |
+|3| run-candidates | `candidate_records` | the machine this row declares `runs: candidates`: one compose sub-state per shortlisted combination, each sub-state's own record carrying its allocation, interfaces, metrics and rationale |
+|4| evaluate-set | `front` | the scores table: the candidates no other candidate beats on every criterion and metric, using the better-is direction carried on each register row's scoring definition |
+|5| gate-candidates | `complete_allocation` | the partitioned function set against each candidate's allocation in its compose sub-record: every function allocated exactly once per candidate, plus the presence of that candidate's interfaces and rationale |
+|2| gate-candidates | `criteria_traced` | each criterion's requirement id from derive-criteria, the weight and scoring definition read off that register row, and the requirements column on map-stakeholders' tensions table |
+|2| gate-candidates | `front_recorded` | the candidate set checked against evaluate-set's front and eliminations: every candidate is either on the front or eliminated with a non-empty reason |
+|2| consolidate-baseline | `allocation_exact` | the allocation grid named in baseline (originating from the winning candidate's compose record): count element assignments per function row and refuse any count other than one |
+|2| consolidate-baseline | `interfaces_both_ends` | the element grid and interface set named in baseline: every declared interface must have its reciprocal entry at the far element |
+|2| gate-architecture | `sensitivity_ruled` | the sensitivity verdict and the tripwires rows from reverse-sensitivity, each tripwire's RAID link resolved against log-risks' raid_opened register |
+|2| gate-architecture | `evaluation_recorded` | the register rows of kind quality (each carrying its six-part scenario), joined to the scenario column of evaluate-baseline's walk table: every scenario must carry a verdict |
+|2| gate-architecture | `adrs_traced` | the addresses key in the frontmatter of each file cited by record-adrs' adrs list: every deciding ADR must resolve to a requirement or risk entry |
+|2| rank-unknowns | `seeded` | the spike drawing this row declares `seeds: spikes` - the iteration record's machines/spikes.md: one state per spike with its id, question and timebox, or the drawing's explicit none and its reason |
+|2| run-spikes | `spike_records` | the machine this row declares `runs: spikes` - each spike's question and timebox from the drawing, its verdict and evidence from that spike sub-state's own record; or the drawing's explicit none when nothing ran |
+|2| gate-prototype | `results_recorded` | the spikes machine - every spike sub-state closed with its own evidence recorded, or the drawing's explicit none - together with fold-back's promotions field being filled or explicitly none |
+|2| plan-build | `build_machine` | the sub-machine this row declares `seeds: build-chunks`: its chunk states, its dependency edges, and the realization kind declared on each chunk |
+|2| build-steps | `build_record` | the walked sub-machine this row declares `runs: build-chunks`: per-chunk fill status, the actor recorded on each fill, and the path of the sub-record file |
+|2| verification | `battery` | the engine's own execution of the command declared on this row (`npm --prefix product/deliverable test`): the captured run and its exit code, across all iterations |
+|2| gate-implementation | `build_planned` | the build-chunks sub-machine: that it was seeded at plan-build and that its walk completed at build-steps |
+|2| gate-implementation | `red_observed` | the per-check failures recorded in observe-red's red_observed table, joined to the checks authored in author-tests' checks table |
+|2| gate-implementation | `verification_green` | the verification row's engine-filled battery run: its captured exit code, across all iterations |
+|2| fill-story-evidence | `slides_filled` | the deck manifests named in write-stories' stories table, across all iterations: which slides carry an evidence_ref into the shipped system and which are still empty |
+|2| fill-story-evidence | `demos_seeded` | the drawing this row declares `seeds: demos`, its states matched against the killer use cases - the use_cases rows covering a story marked killer in write-stories' stories table |
+|2| gate-validation | `gaps_logged` | the entries opened by this iteration in log-gaps' gaps table, cross-checked against the slides left empty at fill-story-evidence: every unfilled slide must have an entry |
+|2| gate-release | `packaged` | the paths cited by package's package and entry_script fields resolving in the evidence directory, plus the recorded skip where the realization kind has no entry script |
+|2| gate-release | `dependencies_ruled` | the ruling column on every row of ship-review's review table being non-empty, checked against the standing sticky ruling record for divergence |
 
 ### Thirty-eight is more than I expected, and here is the catch
 
@@ -96,6 +103,8 @@ Those tables are prose today. So a derived field is a TARGET, not a switch:
 
 Turning one on before both exist would refuse a hand-written answer and offer
 no computed one — a gate with no way through.
+REVIEW: We will fix this in iter 1 when it happens. still build in the mechanical check. 
+REVIEW: but i agree, if the agent doesnt know he needs to fill, it wont be filled. so contrary to what I said earlier, we still must pass this to the agent, but tell him that its evaluated mechanically and he just needs to do it without additional evidence
 
 SO THE ORDER MATTERS. Type the tables first and let them fill for a while.
 Promote a field to derived only when its inputs are structured and its
@@ -107,53 +116,91 @@ was told that heavy prose meant lazy typing, and it may have pushed too far the
 other way. If a field genuinely wants a paragraph, say so — prose is a real
 answer, not a failure.
 
+REVIEW: Prose is still reviewed in the review gates
+
 ## Where the proposal argues with itself, or with the code
 
 Each of these carries a reason worth your eye before you accept the type.
 
-- **onboard-retro.waste_leads** — `list`. CHANGED: kept the proposal's promotion from optional to required-with-none, but flagged that the row declares required:false today - the owner must ratify the tightening, because an empty optional field currently cannot be distinguished from nobody looking.
-- **gate-kickoff.retro_drained** — `derived`. CHANGED: added `when`. onboard-retro is struck at patch and this gate's patch note says "No retro rides in" - without the condition the derived field hard-refuses and deadlocks the patch lane.
-- **gate-kickoff.change_size** — `verdict`. A closed four-value set with mandatory reasoning. Note this field is never checked today: iterations.ts:490 builds the kickoff as kind `work`, so the gate-report check at session.ts:2297 never fires on it.
-- **frame-delta.why_now** — `claim`. An assertion with an argument; as prose the "what changed" half quietly goes unsaid.
-- **frame-delta.value_props** — `table`. CHANGED: rows are needs, not props. Two gate fields count pass lines per need (success_measurable) and join props to stories (props_realized); with needs nested inside a prop row neither count is computable and both derived fields become fiction.
-- **frame-delta.business_case** — `claim`. CHANGED: dropped `when`. The description says "skip with a recorded reason where no acquirer exists" - that is an explicit none, not a condition. The spec is explicit that both genuine `when` fields are market-related (market_tier, market_block); this is not one of them.
-- **map-stakeholders.tensions** — `table`. CHANGED: added the requirements column. gate-candidates.criteria_traced derives weights from "requirements and tensions"; without a requirement reference on the tension row that half of the trace is not computable and the derived field is unsatisfiable.
-- **generalize-use-cases.use_cases** — `table`. CHANGED: added the steps column. Two derived fields (derive-functions.coverage, gate-requirements.functions_cover) claim to check that every use-case step is covered by a function; with steps living only in prose neither can compute and both would refuse forever.
-- **write-requirements.register** — `table`. CHANGED: added the scoring definition and its better-is direction as columns. derive-criteria.criteria filters on "high weight plus filled scoring definition" and evaluate-set.front needs a direction to compute non-domination - neither is derivable if those live nowhere.
-- **derive-functions.coverage** — `derived`. CHANGED: derived_from now names both typed sources explicitly. It stays derived because the spec_note already calls the coverage matrix a derived table, but it is only computable once use_cases carries its steps column.
-- **gate-requirements.functions_cover** — `derived`. CHANGED: derived_from made word-for-word parallel with coverage. The two fields are the same check under two names, which is the matrix's own convention for a gate re-running a work row's computation.
-- **partition-functions.partitioning** — `table`. CHANGED: derived to table. Nothing in the engine parses function nodes or their edges, so the derived_from named a source that does not exist and would block M4 outright. The clustering is a human judgement authored HERE and nowhere else; the spec_note's ban is on the hand-drawn figure, not on the edge data. This is the strongest genuine `matrix` candidate for when that deferral lifts.
-- **gate-candidates.viable_set** — `claim`. CHANGED: dropped none_ok. The description's "or the no-real-alternatives case is argued and recorded" is a second branch of the same claim, not an empty answer; none_ok would let the gate be passed with the word "none" and no argument at all.
-- **gate-candidates.criteria_traced** — `derived`. CHANGED: derived_from now names the tensions table's requirements column as the second source - the half of "weights derived from requirements and tensions" that the original proposal left with nowhere to read from.
-- **gate-candidates.feasibility_checked** — `table`. Several rough checks per survivor, and a table makes a survivor that was never checked obvious.
-- **converge-pugh.matrix_runs** — `table`. CHANGED: bound the columns to the existing decision-matrix form the row already mandates, so the type and the template cannot drift apart. Runs, datums and weighted criteria are columns; a run column keeps table lossless while matrix is deferred.
-- **record-adrs.adrs** — `files`. CHANGED: made the addresses key in frontmatter mandatory in the guidance. gate-architecture.adrs_traced derives from that edge, and a file list whose shape is undeclared gives the engine nothing to resolve.
-- **consolidate-baseline.baseline** — `files`. CHANGED: required the grids to be machine-readable. The row forbids redrawing so files is right, but allocation_exact and interfaces_both_ends compute over data inside these paths, and an opaque file list makes both of them underivable.
-- **consolidate-baseline.allocation_exact** — `derived`. CHANGED: derived_from now points at the grid as an addressable artifact rather than at "the baseline". The row's own guidance says this column property is "review-class now, engine-computed later", so the owner has already ruled the direction.
-- **consolidate-baseline.interfaces_both_ends** — `derived`. CHANGED: derived_from now names the grid artifact. A symmetry property the row's guidance already calls engine-computed later.
-- **gate-architecture.sensitivity_ruled** — `derived`. CHANGED: added `when`. reverse-sensitivity is struck at minor and patch while this gate still runs at minor, so without the condition the derived field refuses on a row that never executed.
-- **gate-architecture.evaluation_recorded** — `derived`. CHANGED: derived_from now names where the scenario set actually lives - register rows of kind quality - rather than an undeclared "quality-scenario set".
-- **observe-red.red_observed** — `table`. CHANGED: kept as table but flagged the name collision - gate-implementation carries a field of the SAME NAME typed derived. That is a naming defect, not a typing one: every other gate re-check in the matrix uses a distinct name (coverage/functions_cover, allocation_exact/complete_allocation, front/front_recorded), and this pair should follow suit. The command column is also the matrix's truest run_ref candidate for when that deferral lifts, as the row's own guidance anticipates.
-- **build-steps.build_record** — `derived`. CHANGED: added `when`. plan-build is struck at patch while this row survives as tailored and its note says "no sub-machine runs" - the derived field would refuse on a machine that was never seeded.
-- **gate-implementation.build_planned** — `derived`. CHANGED: added `when`. plan-build is struck at patch while this gate still runs tailored; the patch_note says so explicitly, and a derived field with no condition would refuse every patch at the delivery gate.
-- **gate-implementation.red_observed** — `derived`. CHANGED: kept derived but flagged the collision - this is the only field name in the matrix used at both a work row and its gate. The typing is right on both sides (one authors, one joins); the NAME is the defect, and the owner should rename this one, e.g. red_confirmed.
-- **fill-story-evidence.slides_filled** — `derived`. CHANGED: guidance now says an empty slide passes as a finding. The description says "or findings named", so a derived that refused on any empty slide would block work the row explicitly allows; routing the finding to log-gaps keeps the count honest without deadlocking.
-- **fill-story-evidence.demos_seeded** — `derived`. CHANGED: added `when`, and named the two-hop join. The description says one demo per killer USE CASE while the killer flag is marked on STORIES - the engine has to go stories(killer) then use_cases(covers) to get there, and that hop was unstated.
-- **gate-validation.killers_demonstrated** — `claim`. CHANGED: derived to claim, and this is the most consequential change in the list. No row anywhere declares `runs: demos` - fill-story-evidence seeds the machine and nothing walks it. A derived field reading "each demonstration's terminal outcome" reads a machine that never runs, so it can never be satisfied and would block the validation gate permanently. It becomes derived the day the missing runner row exists (spec open question 9).
-- **finalize-docs.docs** — `claim`. CHANGED: added - this row and the whole of M9 were missing from the proposals (10 of the matrix's 122 fields had no agent). The emitted set is deterministic but the match against the actual surface is the judgement the row exists for, so it is an assertion with an argument.
+- **onboard-retro.waste_leads** — `list`. CHANGED: kept the proposal's promotion from optional to required-with-none, but flagged that the row declares required:false today - the owner must ratify the tightening, because an empty optional field currently cannot be distinguished from nobody looking. REVIEW: required with none is ok
+- **gate-kickoff.retro_drained** — `derived`. CHANGED: added `when`. onboard-retro is struck at patch and this gate's patch note says "No retro rides in" - without the condition the derived field hard-refuses and deadlocks the patch lane. REVIEW: agreed: patch needs no retro
+- **gate-kickoff.change_size** — `verdict`. A closed four-value set with mandatory reasoning. Note this field is never checked today: iterations.ts:490 builds the kickoff as kind `work`, so the gate-report check at session.ts:2297 never fires on it. REVIEW: Id rather call it "set_size". the iter doesnt have a size before kickoff. until kickoff, all iters look the same, they get seeded once the decision is made. so id also say its a "work"
+- **frame-delta.why_now** — `claim`. An assertion with an argument; as prose the "what changed" half quietly goes unsaid. REVIEW:agreed
+- **frame-delta.value_props** — `table`. CHANGED: rows are needs, not props. Two gate fields count pass lines per need (success_measurable) and join props to stories (props_realized); with needs nested inside a prop row neither count is computable and both derived fields become fiction. REVIEW: dont understand: i thought props are items and needs live in them, is then not the prop the row?
+- **frame-delta.business_case** — `claim`. CHANGED: dropped `when`. The description says "skip with a recorded reason where no acquirer exists" - that is an explicit none, not a condition. The spec is explicit that both genuine `when` fields are market-related (market_tier, market_block); this is not one of them. REVIEW: dont understand, to me "when" can stay
+
+- **map-stakeholders.tensions** — `table`. CHANGED: added the requirements column. gate-candidates.criteria_traced derives weights from "requirements and tensions"; without a requirement reference on the tension row that half of the trace is not computable and the derived field is unsatisfiable. REVIEW: agreed
+
+- **generalize-use-cases.use_cases** — `table`. CHANGED: added the steps column. Two derived fields (derive-functions.coverage, gate-requirements.functions_cover) claim to check that every use-case step is covered by a function; with steps living only in prose neither can compute and both would refuse forever. REVIEW: lets discuss. every use-case-step? sounds too much
+
+
+
+
+- **write-requirements.register** — `table`. CHANGED: added the scoring definition and its better-is direction as columns. derive-criteria.criteria filters on "high weight plus filled scoring definition" and evaluate-set.front needs a direction to compute non-domination - neither is derivable if those live nowhere. REVIEW: dont understand
+
+- **derive-functions.coverage** — `derived`. CHANGED: derived_from now names both typed sources explicitly. It stays derived because the spec_note already calls the coverage matrix a derived table, but it is only computable once use_cases carries its steps column.REVIEW: agreed
+
+- **gate-requirements.functions_cover** — `derived`. CHANGED: derived_from made word-for-word parallel with coverage. The two fields are the same check under two names, which is the matrix's own convention for a gate re-running a work row's computation. REVIEW: agreed
+
+- **partition-functions.partitioning** — `table`. CHANGED: derived to table. Nothing in the engine parses function nodes or their edges, so the derived_from named a source that does not exist and would block M4 outright. The clustering is a human judgement authored HERE and nowhere else; the spec_note's ban is on the hand-drawn figure, not on the edge data. This is the strongest genuine `matrix` candidate for when that deferral lifts. REVIEW: i guess that is correct, but clustering will be algorithmically derived (at least first draft) via algorithms over the matrix, so it is at least derived with additioan judgement. we need a way to make sure the algos ge used.
+
+- **gate-candidates.viable_set** — `claim`. CHANGED: dropped none_ok. The description's "or the no-real-alternatives case is argued and recorded" is a second branch of the same claim, not an empty answer; none_ok would let the gate be passed with the word "none" and no argument at all. REVIEW: but maybe there is no viable candidate? in that case the gate is not passed i guess
+
+
+- **gate-candidates.criteria_traced** — `derived`. CHANGED: derived_from now names the tensions table's requirements column as the second source - the half of "weights derived from requirements and tensions" that the original proposal left with nowhere to read from. REVIEW: so now its derived? or not? dont understand
+
+- **gate-candidates.feasibility_checked** — `table`. Several rough checks per survivor, and a table makes a survivor that was never checked obvious. REVIEW: agreed
+
+- **converge-pugh.matrix_runs** — `table`. CHANGED: bound the columns to the existing decision-matrix form the row already mandates, so the type and the template cannot drift apart. Runs, datums and weighted criteria are columns; a run column keeps table lossless while matrix is deferred. REVIEW: dont understand, but i think matrix fits more and its partly derived. lets discuss
+
+- **record-adrs.adrs** — `files`. CHANGED: made the addresses key in frontmatter mandatory in the guidance. gate-architecture.adrs_traced derives from that edge, and a file list whose shape is undeclared gives the engine nothing to resolve. EVIEW: agreed
+
+- **consolidate-baseline.baseline** — `files`. CHANGED: required the grids to be machine-readable. The row forbids redrawing so files is right, but allocation_exact and interfaces_both_ends compute over data inside these paths, and an opaque file list makes both of them underivable. EVIEW: agreed
+
+
+- **consolidate-baseline.allocation_exact** — `derived`. CHANGED: derived_from now points at the grid as an addressable artifact rather than at "the baseline". The row's own guidance says this column property is "review-class now, engine-computed later", so the owner has already ruled the direction. REVIEW: agreed
+
+- **consolidate-baseline.interfaces_both_ends** — `derived`. CHANGED: derived_from now names the grid artifact. A symmetry property the row's guidance already calls engine-computed later. EVIEW: agreed
+- **gate-architecture.sensitivity_ruled** — `derived`. CHANGED: added `when`. reverse-sensitivity is struck at minor and patch while this gate still runs at minor, so without the condition the derived field refuses on a row that never executed. REVIEW: agreed
+
+- **gate-architecture.evaluation_recorded** — `derived`. CHANGED: derived_from now names where the scenario set actually lives - register rows of kind quality - rather than an undeclared "quality-scenario set". REVIEW: agreed
+
+- **observe-red.red_observed** — `table`. CHANGED: kept as table but flagged the name collision - gate-implementation carries a field of the SAME NAME typed derived. That is a naming defect, not a typing one: every other gate re-check in the matrix uses a distinct name (coverage/functions_cover, allocation_exact/complete_allocation, front/front_recorded), and this pair should follow suit. The command column is also the matrix's truest run_ref candidate for when that deferral lifts, as the row's own guidance anticipates. REVIEW: so we change the name? thats fine
+
+- **build-steps.build_record** — `derived`. CHANGED: added `when`. plan-build is struck at patch while this row survives as tailored and its note says "no sub-machine runs" - the derived field would refuse on a machine that was never seeded. REVIEW: agreed 
+- **gate-implementation.build_planned** — `derived`. CHANGED: added `when`. plan-build is struck at patch while this gate still runs tailored; the patch_note says so explicitly, and a derived field with no condition would refuse every patch at the delivery gate. REVIEW: agreed
+- **gate-implementation.red_observed** — `derived`. CHANGED: kept derived but flagged the collision - this is the only field name in the matrix used at both a work row and its gate. The typing is right on both sides (one authors, one joins); the NAME is the defect, and the owner should rename this one, e.g. red_confirmed. REVIEW: so we change the name? thats ok (then we keep the name higher up?)
+- **fill-story-evidence.slides_filled** — `derived`. CHANGED: guidance now says an empty slide passes as a finding. The description says "or findings named", so a derived that refused on any empty slide would block work the row explicitly allows; routing the finding to log-gaps keeps the count honest without deadlocking. REVIEW: ok. we might not have story evidence
+- **fill-story-evidence.demos_seeded** — `derived`. CHANGED: added `when`, and named the two-hop join. The description says one demo per killer USE CASE while the killer flag is marked on STORIES - the engine has to go stories(killer) then use_cases(covers) to get there, and that hop was unstated. REVIEW: not sure I understand.
+
+
+
+
+
+
+- **gate-validation.killers_demonstrated** — `claim`. CHANGED: derived to claim, and this is the most consequential change in the list. No row anywhere declares `runs: demos` - fill-story-evidence seeds the machine and nothing walks it. A derived field reading "each demonstration's terminal outcome" reads a machine that never runs, so it can never be satisfied and would block the validation gate permanently. It becomes derived the day the missing runner row exists (spec open question 9). REVIEW: we will add the derivation test at i1. stays as derived
+
+- **finalize-docs.docs** — `claim`. CHANGED: added - this row and the whole of M9 were missing from the proposals (10 of the matrix's 122 fields had no agent). The emitted set is deterministic but the match against the actual surface is the judgement the row exists for, so it is an assertion with an argument. REVIEW:agreed
+
 - **package.package** — `files`. CHANGED: added - missing from the proposals. A package is a path that either exists or does not, which is the one check files buys and nothing else does.
+REVIEW:agreed
 - **package.entry_script** — `files`. CHANGED: added - missing from the proposals. A path that must exist, with the description's "or the recorded skip" as the none_ok modifier.
-- **ship-review.review** — `table`. CHANGED: added - missing from the proposals. "the dependency list with rulings; new asks answered" names its own columns, and the release gate's check reads the ruling column.
-- **ship-review.upstream** — `list`. CHANGED: added - missing from the proposals. A plural with no columns and the description's own explicit none.
+REVIEW:agreed
+- **ship-review.review** — `table`. CHANGED: added - missing from the proposals. "the dependency list with rulings; new asks answered" names its own columns, and the release gate's check reads the ruling column. REVIEW:agreed (as in: the shipped package should be reviewed. If its done in the gate, thats enough)
+
+- **ship-review.upstream** — `list`. CHANGED: added - missing from the proposals. A plural with no columns and the description's own explicit none. REVIEW: Dont understand
 - **gate-release.docs_match** — `claim`. CHANGED: added - missing from the proposals. A judgement whose input is itself a judgement (finalize-docs' docs), so nothing here is computable.
-- **gate-release.packaged** — `derived`. CHANGED: added - missing from the proposals. An existence check over two files fields. Note a real inconsistency in the source data: this gate's patch_note says the packaging line falls away "with its row", but M9_20_package is patch: tailored, not none - the owner should settle which is right.
-- **gate-release.dependencies_ruled** — `derived`. CHANGED: added - missing from the proposals. A completeness count over a typed table plus a link against the standing rulings; `when` because ship-review is struck at patch while this gate survives tailored.
-- **gate-release.handover_accepted** — `verdict`. CHANGED: added - missing from the proposals. The description says "the bless is the acceptance": a gate outcome from a closed set with a mandatory reason, which is the definition of verdict.
-- **gate-release.market_block** — `claim`. CHANGED: added - missing from the proposals. The second of the two genuine `when` fields the spec identifies. Kept a claim rather than derived over market_tier: whether the real-world results are good enough to ship is the judgement, not the count.
+REVIEW: Dont understand. i think it belongs in, if it was not, adding was right
+
+- **gate-release.packaged** — `derived`. CHANGED: added - missing from the proposals. An existence check over two files fields. Note a real inconsistency in the source data: this gate's patch_note says the packaging line falls away "with its row", but M9_20_package is patch: tailored, not none - the owner should settle which is right. REVIEW:agreed
+- **gate-release.dependencies_ruled** — `derived`. CHANGED: added - missing from the proposals. A completeness count over a typed table plus a link against the standing rulings; `when` because ship-review is struck at patch while this gate survives tailored. 
+- **gate-release.handover_accepted** — `verdict`. CHANGED: added - missing from the proposals. The description says "the bless is the acceptance": a gate outcome from a closed set with a mandatory reason, which is the definition of verdict. REVIEW:agreed
+- **gate-release.market_block** — `claim`. CHANGED: added - missing from the proposals. The second of the two genuine `when` fields the spec identifies. Kept a claim rather than derived over market_tier: whether the real-world results are good enough to ship is the judgement, not the count. REVIEW: dont understand what this is for
 
 ## Every field
 
 
+REVIEW: not gonna check them all here, well do it live in I1
 ### M0
 
 | row | field | type | guidance for whoever fills it | why not prose |
