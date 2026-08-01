@@ -63,7 +63,12 @@ export interface PanelValues {
   ints: Record<string, number>;
   texts?: Record<string, string>;
   choices?: Record<string, string>;
+  /** Which independent toggles are on, by slug. */
+  toggles?: Record<string, boolean>;
 }
+
+/** A toggle's key is its label, mechanically. The spec stays readable prose. */
+export const toggleKey = (label: string): string => label.trim().toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 
 const esc = (s: string): string => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 
@@ -120,6 +125,26 @@ function renderText(p: Param, v: PanelValues): string {
   return `<input id="${esc(key).replace(/_/g, "-")}" class="param-text" data-key="${esc(key)}" type="text" placeholder="${esc(placeholder ?? "")}"${sep} value="${esc(v.texts?.[key] ?? "")}" title="${esc(p.help)}">`;
 }
 
+/**
+ * INDEPENDENT ON/OFF BUTTONS. Any combination, including none.
+ *
+ * Deliberately not a `choice`: a choice is one of a set and excludes the
+ * others, and these do not exclude each other. Drawing two of them as a
+ * choice would have said, wrongly, that you cannot hold the machine awake and
+ * shut it down at idle at the same time — which is the normal case.
+ */
+function renderToggles(p: Param, v: PanelValues): string {
+  const buttons = p.fields
+    .filter((label) => label !== "")
+    .map((label) => {
+      const key = toggleKey(label);
+      const on = v.toggles?.[key] === true;
+      return `<button type="button" class="rung param-toggle${on ? " on" : ""}" data-toggle="${esc(key)}" aria-pressed="${on ? "true" : "false"}" title="${esc(label)} — click to turn ${on ? "off" : "on"}">${esc(label)}</button>`;
+    })
+    .join("");
+  return `<span class="toggles">${buttons}</span>`;
+}
+
 /** ONE OF A NAMED SET. The set is in the spec, so adding a choice is an edit
  *  to the drawing rather than to a renderer. */
 function renderChoice(p: Param, v: PanelValues): string {
@@ -159,10 +184,12 @@ export function renderPanel(params: Param[], v: PanelValues): string {
         return renderText(p, v);
       case "choice":
         return renderChoice(p, v);
+      case "toggles":
+        return renderToggles(p, v);
       default:
         throw new Rejection({
           clause: CLAUSES.REQUIRED_ARGS,
-          expected: "a parameter type the renderer knows: rungs, int, action, text, choice",
+          expected: "a parameter type the renderer knows: rungs, int, action, text, choice, toggles",
           got: `${p.type} (parameter "${p.name}")`,
           remedy: { tool: "se_file_read", args: { path: "product/deliverable/machines/panels/controls.md" }, note: "the Types section lists what a panel may declare" },
           source: SRC,

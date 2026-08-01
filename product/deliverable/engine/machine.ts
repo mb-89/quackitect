@@ -19,8 +19,6 @@ export interface EvidenceField {
   name: string;
   description: string;
   required: boolean;
-  /** A killer field: leaving it unmet alone fails the gate's review. */
-  killer?: boolean;
 }
 
 export interface EdgeDecl {

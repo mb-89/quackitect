@@ -20,7 +20,6 @@ evidence:
     description: "the packet is complete: idea, to-be world, goals, pitch, scope, non-goals"
   - name: problem_agreed
     description: "the delta is real and the goal is worth having - argue it here"
-    killer: true
   - name: prior_art_positioned
     description: "the idea positioned against what exists and what failed"
   - name: success_measurable

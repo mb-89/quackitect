@@ -16,7 +16,6 @@ legal_tools:
 evidence:
   - name: viable_set
     description: "at least two viable candidates survive, or the no-real-alternatives case is argued and recorded"
-    killer: true
   - name: complete_allocation
     description: "every candidate allocates ALL functions; interfaces and rationale recorded"
   - name: criteria_traced

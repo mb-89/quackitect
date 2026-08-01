@@ -16,7 +16,6 @@ legal_tools:
 evidence:
   - name: assumptions_validated
     description: "the ranked riskiest assumptions hold or the design changed"
-    killer: true
   - name: buildable
     description: "the design is buildable as evidenced"
   - name: results_recorded

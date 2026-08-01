@@ -443,16 +443,6 @@ function viewedMachine(m: MirrorState, view: string | undefined): { decl: Machin
   return { decl: compileMachineCached(m.root, path), canvas: loadCanvas(path) };
 }
 
-/** The SHUTDOWN CONTROL's five notches (owner design): what happens
- *  around "done". Abbreviations on the bar; click for the explanations. */
-export const SHUTDOWN_LEVELS = [
-  { value: 1, abbr: "N", name: "no shutdown control" },
-  { value: 2, abbr: "P", name: "shutdown prevention — the machine is kept awake while the walk runs" },
-  { value: 3, abbr: "PI", name: "prevention + idle-on-done — done with everything, stay at idle" },
-  { value: 4, abbr: "PE", name: "prevention + end-on-done — done → idle → end (session over; prevention ends with it)" },
-  { value: 5, abbr: "PS", name: "prevention + power-off-on-done — done → end → the machine powers off one minute later" },
-];
-
 // THE COMPONENT LIBRARY, on every page the mirror serves. The engine serves
 // the bundle itself (mirror.ts, /vendor), so this is an ordinary script tag
 // rather than a webview asset URI — no bundler and no build step.
@@ -2041,22 +2031,16 @@ function sendCadence() {
 }
 if (nrMinEl) nrMinEl.addEventListener("change", sendCadence);
 if (nrCallsEl) nrCallsEl.addEventListener("change", sendCadence);
-// THE SHUTDOWN CONTROL — five notches; same grammar as the autonomy bar.
-const SD_LEVELS = ${JSON.stringify(SHUTDOWN_LEVELS)};
-const sdEl = document.getElementById("sd");
-function sdAbbr(v) { const l = SD_LEVELS.find((x) => x.value === Number(v)); return l ? l.abbr : String(v); }
-function sdHelp(sel) {
-  const rows = SD_LEVELS.map((l) =>
-    '<tr' + (sel === l.value ? ' style="background:var(--se-raised)"' : "") + '><td class="k">' + l.abbr + " · " + l.value + '</td><td class="v">' + escText(l.name) + "</td></tr>").join("");
-  showDetails("the shutdown control", '<table class="kv">' + rows + "</table>");
-}
-if (sdEl) {
-  const lbl2 = document.getElementById("sd-val");
-  sdEl.addEventListener("input", () => { if (lbl2) lbl2.textContent = sdAbbr(sdEl.value); });
-  sdEl.addEventListener("change", async () => {
-    await fetch("/shutdown", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ value: Number(sdEl.value) }) });
-  });
-}
+// THE POWER TOGGLES — independent buttons, either or both. A toggle carries
+// its own key, so this handler never learns which toggles exist.
+document.addEventListener("click", async (ev) => {
+  const t = ev.target && ev.target.closest ? ev.target.closest(".param-toggle") : null;
+  if (!t) return;
+  const on = t.getAttribute("aria-pressed") !== "true";
+  t.classList.toggle("on", on);
+  t.setAttribute("aria-pressed", on ? "true" : "false");
+  await fetch("/power", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ key: t.getAttribute("data-toggle"), on: on }) });
+});
 document.addEventListener("click", (ev) => {
   // An action parameter carries its endpoint, so the panel decides what the
   // button does and this handler never learns a second one.
@@ -2213,10 +2197,12 @@ es.addEventListener("message", (ev) => {
     const lbl = document.getElementById("thr-val");
     if (lbl) lbl.textContent = Number(a.autonomy).toFixed(2);
   }
-  if (sdEl && document.activeElement !== sdEl && Number(sdEl.value) !== a.shutdown) {
-    sdEl.value = a.shutdown;
-    const lbl2 = document.getElementById("sd-val");
-    if (lbl2) lbl2.textContent = sdAbbr(a.shutdown);
+  if (a.power) {
+    for (const b of document.querySelectorAll(".param-toggle")) {
+      const on = a.power[b.getAttribute("data-toggle").replace(/-/g, "_")] === true;
+      b.classList.toggle("on", on);
+      b.setAttribute("aria-pressed", on ? "true" : "false");
+    }
   }
   if (a.ping && a.ping.seq !== lastPingSeq) { lastPingSeq = a.ping.seq; pingSurface(a.ping.target); }
   // A re-render drops the class. Put the light back rather than losing it

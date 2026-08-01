@@ -23,6 +23,9 @@ a person edits it in the real world, and Obsidian reads it.
 - `action` — a button that posts and does nothing else. Fields: post.
 - `text` — a line edit for free text. Fields: key, placeholder, separator.
 - `choice` — one of a named set. Fields: key, then one field per option.
+- `toggles` — independent on/off buttons, any combination on at once. Fields:
+  one per button, each the button's label. Not a `choice`: a choice is one of
+  a set, and these do not exclude each other.
 
 A type this renderer does not know is a REFUSAL, not a guess. That is the
 whole point: the drawing decides, and an unlisted widget cannot appear by
@@ -48,7 +51,35 @@ screen twice, which is the same two-drawings fault the sliders had.
 - | int | narration_calls | calls | 0 | 1440 | an update every n calls at least — 0 stops this clock
 - NOW | action | /narration-now | force an update at the next possibility
 - log filter | text | log_filter | filter the logs | | narrow the feed to the lines that match
+- shutdown | toggles | block auto-sleep | shutdown at idle | what the machine does about power — neither pressed means it does nothing
 
 THE NOTE ROW IS ITS OWN PANEL (note-entry.md) and the sidebar draws it under
 this one. It is a separate control with a separate spec, so it is not
 restated here.
+
+## The shutdown row
+
+Two buttons, either or both.
+
+- BLOCK AUTO-SLEEP holds the machine awake, so it does not sleep under a
+  running walk.
+- SHUTDOWN AT IDLE holds it awake while anything is happening, then shuts the
+  machine down once nothing is.
+
+THE ENGINE IS THIS SERVER AND THE MACHINE IS THE COMPUTER. Both buttons act on
+the machine; the engine is only what watches.
+
+WHAT IT IS FOR: tell the agent to do its work and return to the front desk,
+flip shutdown at idle, and leave. Five quiet minutes later the machine is off.
+
+Neither pressed means nothing is done about power at all. That is the resting
+state and what a fresh session starts in.
+
+THE ENGINE DOES THIS, NOT THE AGENT. It is a timer the engine owns. The
+language model neither decides it nor triggers it, which is the point: a
+shutdown that waited for an agent to notice would never fire, because an agent
+that has stopped is exactly what idle means.
+
+IDLE IS THREE CONDITIONS, all of them. The walk stands at a resting place —
+idle or the front desk. Nothing has reached the log for five minutes, by any
+hand. And nothing this session started is still running.

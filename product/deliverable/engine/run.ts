@@ -112,6 +112,18 @@ function knownJob(id: string): Job {
 }
 
 /** START a command in the background. Returns at once with a handle. */
+/**
+ * Is anything still running that this session started?
+ *
+ * The idle shutdown asks this, and it is the question that keeps it honest: a
+ * long build with nobody watching is not idle, and shutting the computer down
+ * under it would throw the work away.
+ */
+export function anyJobRunning(): boolean {
+  for (const j of jobs.values()) if (j.running) return true;
+  return false;
+}
+
 export function runBackground(root: string, command: string, opts: { cwd?: string } = {}): JobView {
   const id = `job-${Date.now().toString(36)}-${++jobSeq}`;
   let settle = (): void => {};

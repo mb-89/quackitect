@@ -1,0 +1,22 @@
+{"ts":"2026-08-01T16:35:51.541Z","op":"plan","visit":"expeditions/e30@0","parent":null,"nodes":[{"id":"d26","brief":"A toggles type, for buttons that do not exclude each other"},{"id":"d27","brief":"The shutdown row in the controls spec"},{"id":"d28","brief":"The machine holds the two flags and serves them"},{"id":"d29","brief":"Block auto-sleep keeps the computer awake"},{"id":"d30","brief":"Shutdown at idle, on a timer the machine owns"},{"id":"d31","brief":"Idle means the person is gone, not just the agent"}]}
+{"ts":"2026-08-01T16:36:15.328Z","op":"done","visit":"expeditions/e30@0","node":"d26","brief":"toggles renders independent buttons, unlike choice"}
+{"ts":"2026-08-01T16:38:07.675Z","op":"done","visit":"expeditions/e30@0","node":"d27","brief":"the shutdown row is in the controls spec"}
+{"ts":"2026-08-01T16:39:08.339Z","op":"done","visit":"expeditions/e30@0","node":"d28","brief":"two flags replace the five-notch level"}
+{"ts":"2026-08-01T16:40:18.871Z","op":"done","visit":"expeditions/e30@0","node":"d29","brief":"either flag holds the computer awake"}
+{"ts":"2026-08-01T16:41:50.003Z","op":"update","visit":"expeditions/e30@0","node":"d32","brief":"every hand resets the idle clock"}
+{"ts":"2026-08-01T16:45:45.075Z","op":"done","visit":"expeditions/e30@0","node":"d31","brief":"every hand resets the idle clock, not just the agent"}
+{"ts":"2026-08-01T16:47:43.295Z","op":"update","visit":"expeditions/e30@0","node":"d33","brief":"the /power route replaces /shutdown"}
+{"ts":"2026-08-01T16:51:10.060Z","op":"done","visit":"expeditions/e30@0","node":"d30","brief":"the machine's own timer powers off after five silent minutes"}
+{"ts":"2026-08-01T16:54:28.162Z","op":"plan","visit":"expeditions/e30@0","parent":null,"nodes":[{"id":"d34","brief":"Tests for the toggles type and the power flags"},{"id":"d35","brief":"The battery green, and the shutdown row landed"}]}
+{"ts":"2026-08-01T16:55:13.662Z","op":"update","visit":"expeditions/e30@0","node":"d36","brief":"tests for the toggles type and the power flags"}
+{"ts":"2026-08-01T16:56:02.633Z","op":"update","visit":"expeditions/e30@0","node":"d37","brief":"idle stops the server, not the computer"}
+{"ts":"2026-08-01T16:59:30.479Z","op":"update","visit":"expeditions/e30@0","node":"d38","brief":"the engine watches and the machine shuts down"}
+{"ts":"2026-08-01T17:00:45.165Z","op":"plan","visit":"expeditions/e30@0","parent":null,"nodes":[{"id":"d39","brief":"Shutdown row: the toggles type and the two flags"},{"id":"d40","brief":"Shutdown row: the engine's idle timer"},{"id":"d41","brief":"Floor law enforced in the compiler as a refusal"},{"id":"d42","brief":"A lint catching a struck floor step at edit time"},{"id":"d43","brief":"Delete the killer flag, which has never done anything"},{"id":"d44","brief":"The re-walk: join the demand diff to reopenStates"},{"id":"d45","brief":"The evidence form reaches the agent in the packet"},{"id":"d46","brief":"Typed evidence fields with per-field guidance"},{"id":"d47","brief":"Derived evidence computed, never asked of the agent"},{"id":"d48","brief":"The product size front-loads vision and stakeholders"},{"id":"d49","brief":"The battery green and the whole lot landed"}]}
+{"ts":"2026-08-01T17:01:22.523Z","op":"done","visit":"expeditions/e30@0","node":"d39","brief":"toggles type and both flags, replacing the five notches"}
+{"ts":"2026-08-01T17:01:56.966Z","op":"done","visit":"expeditions/e30@0","node":"d40","brief":"the engine's timer fires only when armed and parked"}
+{"ts":"2026-08-01T17:02:49.301Z","op":"done","visit":"expeditions/e30@0","node":"d34","brief":"18 power tests green, nesting still green"}
+{"ts":"2026-08-01T17:03:41.480Z","op":"update","visit":"expeditions/e30@0","node":"d50","brief":"assertFloor refuses a struck floor step"}
+{"ts":"2026-08-01T17:07:14.691Z","op":"done","visit":"expeditions/e30@0","node":"d41","brief":"the compiler refuses a struck floor step at every size"}
+{"ts":"2026-08-01T17:08:47.131Z","op":"update","visit":"expeditions/e30@0","node":"d51","brief":"the shared matrix must not be mutated by a test"}
+{"ts":"2026-08-01T17:11:00.894Z","op":"done","visit":"expeditions/e30@0","node":"d43","brief":"the killer flag is deleted everywhere it was read"}
+{"ts":"2026-08-01T17:14:38.211Z","op":"obsolete","visit":"expeditions/e30@0","node":"d42","brief":"you ruled refusal only; the lint was my addition"}

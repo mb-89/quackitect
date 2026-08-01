@@ -42,6 +42,7 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 import { resolveInRoot, seDir } from "./paths.ts";
 import { Decisions, replayFile } from "./decisions.ts";
 import { generateIterationArchive, generateIterations, itFind, itPinRel, itRecordRel, itSeed, markStarted, pinIteration, readItRecord } from "./iterations.ts";
+import { anyJobRunning } from "./run.ts";
 import { CHANGE_COLUMNS } from "./rigor-matrix.ts";
 import { parseStateNote, section } from "./notes.ts";
 import { NARRATION_DEFAULT_CALLS, NARRATION_DEFAULT_MINUTES } from "./toll.ts";
@@ -149,22 +150,24 @@ export class Session {
     // to forget, so a crash or a power cut cannot leave the last session's
     // sliders standing either.
     try {
-      const s = JSON.parse(readFileSync(join(seDir(root), "settings.json"), "utf8")) as { autonomy?: number; shutdown?: number; narration_minutes?: number; narration_calls?: number; session?: string };
+      const s = JSON.parse(readFileSync(join(seDir(root), "settings.json"), "utf8")) as { autonomy?: number; block_sleep?: boolean; shutdown_at_idle?: boolean; narration_minutes?: number; narration_calls?: number; session?: string };
       const mine = process.env.SE_SESSION;
       if (mine !== undefined && mine !== "" && s.session === mine) {
         if (typeof s.autonomy === "number" && s.autonomy >= 0 && s.autonomy <= 1) this._autonomy = s.autonomy;
-        if (typeof s.shutdown === "number" && Number.isInteger(s.shutdown) && s.shutdown >= 1 && s.shutdown <= 5) this._shutdown = s.shutdown;
+        if (typeof s.block_sleep === "boolean") this._blockSleep = s.block_sleep;
+    if (typeof s.shutdown_at_idle === "boolean") this._shutdownAtIdle = s.shutdown_at_idle;
         if (typeof s.narration_minutes === "number" && Number.isInteger(s.narration_minutes) && s.narration_minutes >= 0) this._narrationMinutes = s.narration_minutes;
         if (typeof s.narration_calls === "number" && Number.isInteger(s.narration_calls) && s.narration_calls >= 0) this._narrationCalls = s.narration_calls;
       }
     } catch { /* no store yet — the defaults stand */ }
     this.syncKeepAwake();
+    this.armIdleTimer();
   }
 
   private persistSettings(): void {
     try {
       mkdirSync(seDir(this.root), { recursive: true });
-      writeFileSync(join(seDir(this.root), "settings.json"), JSON.stringify({ session: process.env.SE_SESSION ?? null, autonomy: this._autonomy, shutdown: this._shutdown, narration_minutes: this._narrationMinutes, narration_calls: this._narrationCalls }) + "\n", "utf8");
+      writeFileSync(join(seDir(this.root), "settings.json"), JSON.stringify({ session: process.env.SE_SESSION ?? null, autonomy: this._autonomy, block_sleep: this._blockSleep, shutdown_at_idle: this._shutdownAtIdle, narration_minutes: this._narrationMinutes, narration_calls: this._narrationCalls }) + "\n", "utf8");
     } catch { /* a failed save never blocks the slider */ }
   }
 
@@ -185,37 +188,111 @@ export class Session {
     return this._autonomy;
   }
 
-  /** SHUTDOWN CONTROL (owner design, five notches): 1 none · 2 keep-awake ·
-   *  3 keep-awake + idle-on-done · 4 + end-on-done · 5 + power-off-on-done.
-   *  Keep-awake holds the OS awake while the walk runs; level 5 arms a
-   *  one-minute OS shutdown when the machine reaches end. */
-  private _shutdown = 1;
+  /**
+   * THE POWER CONTROL — two independent flags, neither implying the other.
+   *
+   * It was five notches on a slider, which said the settings were a scale.
+   * They are not: holding the computer awake and shutting it down when work
+   * stops are separate wants, and wanting both at once is the normal case.
+   *
+   * THE ENGINE IS THIS SERVER. THE MACHINE IS THE COMPUTER. Both flags act on
+   * the machine; the engine is only what watches.
+   *
+   * BLOCK AUTO-SLEEP holds the machine awake, so it does not sleep under a
+   * running walk.
+   *
+   * SHUTDOWN AT IDLE holds it awake while anything is happening, then shuts
+   * the machine down once nothing is. The use it exists for: tell the agent
+   * to do its work and return to the front desk, flip this, and leave.
+   *
+   * Neither set means nothing is done about power at all, which is the
+   * resting state and where a fresh session starts.
+   *
+   * THE MACHINE OWNS THE TIMER. The agent neither decides this nor triggers
+   * it, and it could not: an agent that has stopped is precisely what idle
+   * means, so a shutdown waiting for one to notice would never fire.
+   */
+  private _blockSleep = false;
+  private _shutdownAtIdle = false;
   private keepAwake?: ReturnType<typeof spawn>;
+  private idleTimer?: ReturnType<typeof setInterval>;
+  /** Any act at all, by any hand. The idle clock measures from here. */
+  private lastActivity = Date.now();
+
+  /** How long nothing may happen before an armed idle shutdown fires. */
+  static IDLE_MINUTES = 5;
+
+  get power(): { block_sleep: boolean; shutdown_at_idle: boolean } {
+    return { block_sleep: this._blockSleep, shutdown_at_idle: this._shutdownAtIdle };
+  }
+
+  setPower(key: string, on: boolean): Record<string, unknown> {
+    if (key === "block-auto-sleep") this._blockSleep = on;
+    else if (key === "shutdown-at-idle") this._shutdownAtIdle = on;
+    else {
+      throw new Rejection({
+        clause: CLAUSES.REQUIRED_ARGS,
+        expected: "a power toggle: block-auto-sleep or shutdown-at-idle",
+        got: key,
+        remedy: { tool: "se_file_read", args: { path: "product/deliverable/machines/panels/controls.md" }, note: "the shutdown row names both" },
+        source: "engine/session.ts power",
+      });
+    }
+    this.persistSettings();
+    this.syncKeepAwake();
+    this.armIdleTimer();
+    this.notifyChange();
+    return this.power;
+  }
+
+  /**
+   * RESTING PLACES. The walk standing at either of these means the agent has
+   * finished and parked, which is what the person means by "when you're done".
+   * A walk standing anywhere else is work in progress, and shutting the
+   * machine down under it would strand that work.
+   */
+  private static readonly RESTING = new Set(["idle", "front_desk"]);
+
+  /** All three must hold: parked, quiet, and nothing of ours still running. */
+  idleFor(ms: number): boolean {
+    if (Date.now() - this.lastActivity < ms) return false;
+    if (anyJobRunning()) return false;
+    const active = this.describe().active;
+    return active.length > 0 && active.every((a) => Session.RESTING.has(a.split("/").pop()!));
+  }
+
+  /**
+   * The timer only exists while the flag is set, so an unarmed machine has no
+   * clock running at all and cannot power anything off by accident.
+   */
+  private armIdleTimer(): void {
+    if (this._shutdownAtIdle && this.idleTimer === undefined) {
+      this.idleTimer = setInterval(() => this.checkIdle(), 30_000);
+      this.idleTimer.unref?.();
+    } else if (!this._shutdownAtIdle && this.idleTimer !== undefined) {
+      clearInterval(this.idleTimer);
+      this.idleTimer = undefined;
+    }
+  }
+
+  private checkIdle(): void {
+    if (!this._shutdownAtIdle) return;
+    if (!this.idleFor(Session.IDLE_MINUTES * 60_000)) {
+      // Something is still happening, so hold the computer awake for it.
+      this.syncKeepAwake();
+      return;
+    }
+    if (process.platform !== "win32" || process.env.SE_POWEROFF_DISABLE === "1") return;
+    // Disarm before firing, so a shutdown that the person cancels at the
+    // warning does not immediately arm another one behind them.
+    this._shutdownAtIdle = false;
+    this.armIdleTimer();
+    spawn("shutdown.exe", ["/s", "/t", "60", "/c", "se: idle for five minutes"], { stdio: "ignore", windowsHide: true, detached: true }).unref();
+  }
 
   /** The mirror's URL when one is listening — the panel se_panel opens. */
   mirrorUrl?: string;
 
-  get shutdown(): number {
-    return this._shutdown;
-  }
-
-  setShutdown(value: number): Record<string, unknown> {
-    if (!Number.isInteger(value) || value < 1 || value > 5) {
-      throw new Rejection({
-        clause: CLAUSES.REQUIRED_ARGS,
-        expected: "a shutdown level 1..5 (none · keep-awake · +idle-on-done · +end-on-done · +power-off-on-done)",
-        got: String(value),
-        remedy: { tool: "se_tick", args: {}, note: "the mirror's shutdown bar sets it" },
-        source: "engine/session.ts shutdown",
-      });
-    }
-    const was = this._shutdown;
-    this._shutdown = value;
-    this.persistSettings();
-    this.syncKeepAwake();
-    this.notifyChange();
-    return { shutdown: value, was };
-  }
 
   /** THE UPDATE CADENCE (owner design 2026-07-31, redrawn 2026-08-01): how
    *  often narration is OWED. TWO NUMBERS, not a level — an update every n
@@ -307,7 +384,7 @@ export class Session {
         "",
         `# ${gateId} — milestone review`,
         "",
-        ...s.evidence_form.flatMap((f) => [`## ${f.name}`, "", `<!-- ${f.description}${f.required ? "" : " (optional)"}${f.killer === true ? " (KILLER: unmet alone fails the gate)" : ""} -->`, ""]),
+        ...s.evidence_form.flatMap((f) => [`## ${f.name}`, "", `<!-- ${f.description}${f.required ? "" : " (optional)"} -->`, ""]),
         ...REVIEW_TAIL.flatMap((t) => [`## ${t.name}`, "", `<!-- ${t.hint} -->`, ""]),
       ].join("\n");
       throw new Rejection({
@@ -383,7 +460,9 @@ export class Session {
   }
 
   private syncKeepAwake(): void {
-    const want = this._shutdown >= 2 && process.platform === "win32" && process.env.SE_KEEPAWAKE_DISABLE !== "1";
+    // Either flag wants the computer awake. Shutdown-at-idle wants it awake
+    // while work is happening; once it is not, powering off is the point.
+    const want = (this._blockSleep || this._shutdownAtIdle) && process.platform === "win32" && process.env.SE_KEEPAWAKE_DISABLE !== "1";
     if (want && this.keepAwake === undefined) {
       const src = "Add-Type -TypeDefinition 'using System.Runtime.InteropServices; public class KA { [DllImport(\"kernel32.dll\")] public static extern uint SetThreadExecutionState(uint f); }'; while ($true) { [KA]::SetThreadExecutionState(2147483651) | Out-Null; Start-Sleep -Seconds 30 }";
       this.keepAwake = spawn("powershell.exe", ["-NoProfile", "-NonInteractive", "-Command", src], { stdio: "ignore", windowsHide: true });
@@ -413,6 +492,10 @@ export class Session {
 
   /** Wake every held wait — called on every successful change of the walk. */
   private notifyChange(): void {
+    // EVERY HAND RESETS THE IDLE CLOCK. A tick, a mirror click, a note, an
+    // evidence write — they all pass through here, so the clock measures
+    // silence rather than only the agent's silence.
+    this.lastActivity = Date.now();
     const held = this.waiters;
     this.waiters = [];
     for (const wake of held) wake();
@@ -2264,7 +2347,7 @@ export class Session {
       ...(this.bound !== undefined ? { expedition: this.bound.id } : {}),
       status: this.instance.status,
       autonomy: this._autonomy,
-      shutdown: this._shutdown,
+      power: this.power,
       narration: { minutes: this._narrationMinutes, calls: this._narrationCalls },
       // WHERE THIS IS HEADED. Carried on every packet so neither hand has
       // to ask, and so a walk that drifts off the way is visibly off it.
@@ -2514,11 +2597,11 @@ export class Session {
       this.closedFired = true;
       // Shutdown control at END: the keep-awake dies with the session; at
       // level 5 the machine powers off one minute later.
+      // REACHING END IS NOT IDLE. Powering off here would fire the moment a
+      // walk completed, with the person still at the keyboard. The idle timer
+      // owns that decision and it measures silence, not completion.
       this.keepAwake?.kill();
       this.keepAwake = undefined;
-      if (this._shutdown === 5 && process.platform === "win32" && process.env.SE_KEEPAWAKE_DISABLE !== "1") {
-        spawn("shutdown", ["/s", "/t", "60"], { stdio: "ignore", windowsHide: true, detached: true }).unref();
-      }
       const info = this.tickInfo();
       this.onClosed?.();
       return {
@@ -2615,7 +2698,7 @@ export class Session {
       ...(this.inSub() ? { submachine: { id: this.top()!.decl.id, active: activeStates(this.top()!.instance) } } : {}),
       status: this.instance.status,
       autonomy: this._autonomy,
-      shutdown: this._shutdown,
+      power: this.power,
       narration: { minutes: this._narrationMinutes, calls: this._narrationCalls },
       legal_tools: all ? "all" : [...ALWAYS_LEGAL, ...tools],
       history: this.instance.history.slice(-10),

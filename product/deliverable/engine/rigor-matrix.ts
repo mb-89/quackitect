@@ -9,8 +9,11 @@
 import { createHash } from "node:crypto";
 import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
+import { CLAUSES, Rejection } from "./errors.ts";
 import { parseStateNote, section } from "./notes.ts";
 import { validateMachine, type EdgeDecl, type EvidenceField, type MachineDecl, type StateDecl } from "./machine.ts";
+
+const SRC = "engine/rigor-matrix.ts";
 
 // specification is not a rigor level: it says how a step's output becomes
 // documentation. It is read and validated like any column, never pinned.
@@ -87,7 +90,6 @@ function parseEvidence(fm: Record<string, unknown>, file: string, body: string):
       name: f.name,
       description: typeof f.description === "string" ? f.description : "",
       required: f.required !== false,
-      ...(f.killer === true ? { killer: true } : {}),
     };
   });
 }
@@ -211,7 +213,34 @@ function priorityOf(row: RigorMatrixRow): number {
 /** Compile one change-size column into an iteration machine. Struck rows
  *  vanish; each surviving row's dependencies contract transitively through
  *  the struck ones, so the walk stays connected without them. */
+/**
+ * THE FLOOR LAW. Four rows carry `floor: true` and may never be tailored
+ * away, whatever the change size: the deliberate start, the full battery,
+ * re-documenting what changed, and the release gate. Everything above that
+ * line is negotiable by size. These are not.
+ *
+ * The flag was parsed and read by nobody, so a cell edit could strike the
+ * release gate and the whole suite would stay green.
+ *
+ * IT REFUSES RATHER THAN REPAIRING. Quietly keeping a struck floor step would
+ * leave the matrix saying one thing and the machine doing another, which is
+ * the same class of failure as a filter that ignores a clause. Striking one
+ * on purpose means removing the flag, which is a visible, reviewable edit.
+ */
+export function assertFloor(matrix: RigorMatrix, column: ChangeColumn): void {
+  const struck = matrix.rows.filter((r) => r.floor && matrix.cells.get(r.name)?.get(column)?.applies === "none");
+  if (struck.length === 0) return;
+  throw new Rejection({
+    clause: CLAUSES.REQUIRED_ARGS,
+    expected: `every floor step to apply at ${column} — the floor is ${matrix.rows.filter((r) => r.floor).map((r) => r.name).join(", ")}`,
+    got: `${struck.map((r) => r.name).join(", ")} struck at ${column}`,
+    remedy: { tool: "se_file_glob", args: { glob: `product/deliverable/machines/rigor_matrix/rows/*${struck[0].name}.md` }, note: "give the cell a value, or drop `floor: true` if it is genuinely no longer a floor" },
+    source: SRC,
+  });
+}
+
 export function compileColumn(matrix: RigorMatrix, column: ChangeColumn): MachineDecl {
+  assertFloor(matrix, column);
   const byName = new Map(matrix.rows.map((r) => [r.name, r]));
   const applied = new Set(
     matrix.rows.filter((r) => matrix.cells.get(r.name)?.get(column)?.applies !== "none").map((r) => r.name),

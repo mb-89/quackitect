@@ -254,7 +254,7 @@ test("the kickoff serves the rigor matrix's live evidence form", () => {
   const gen = generateIterations(root);
   const kick = gen.decl.states.find((s) => s.id === "i1")!;
   assert.ok(kick.evidence_form.some((f) => f.name === "change_size" && f.required));
-  assert.ok(kick.evidence_form.some((f) => f.name === "retro_drained" && f.killer === true));
+  assert.ok(kick.evidence_form.some((f) => f.name === "retro_drained" && f.required !== false));
 });
 
 test("the seed refuses a missing vision — the seed is a small form", () => {

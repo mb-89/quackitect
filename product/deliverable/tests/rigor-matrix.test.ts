@@ -65,7 +65,8 @@ test("compileColumn patch: struck states vanish and dependencies contract", () =
   assert.ok(!ids.has("gate-motivation"));
   assert.ok(!ids.has("enumerate-space"));
   assert.ok(!ids.has("onboard-retro"));
-  // The floor holds.
+  // The floor holds. Every size is checked below; this is the patch case,
+  // which is the one that strikes the most.
   assert.ok(ids.has("gate-kickoff"));
   assert.ok(ids.has("verification"));
   assert.ok(ids.has("sweep-consistency"));
@@ -129,17 +130,21 @@ test("the columns are monotone: what a smaller column walks, every larger column
   for (const name of minor) assert.ok(major.has(name), `${name} applies at minor but not at major`);
 });
 
-test("evidence is frontmatter data: every non-terminal row carries fields, killers are flags", () => {
+test("evidence is frontmatter data: every non-terminal row carries fields", () => {
   const m = readRigorMatrix(ROOT);
   for (const row of m.rows) {
     if (row.state_kind === "terminal") continue;
     assert.ok(row.evidence_form.length > 0, `${row.name} carries no evidence fields`);
     for (const f of row.evidence_form) {
-      assert.ok(!f.description.includes("(killer)"), `${row.name}.${f.name} smuggles the killer mark in prose`);
+      assert.ok(!f.description.includes("(killer)"), `${row.name}.${f.name} smuggles a killer mark in prose`);
+      // THE KILLER FLAG IS GONE. It reached the author inside an HTML comment
+      // the checker stripped before looking, so it never did anything, and
+      // `required` already defaults true. The fields survive; the flag does not.
+      assert.ok(!("killer" in f), `${row.name}.${f.name} still carries the deleted killer flag`);
     }
   }
   const kickoff = m.rows.find((r) => r.name === "gate-kickoff");
-  assert.ok(kickoff?.evidence_form.some((f) => f.name === "retro_drained" && f.killer === true));
+  assert.ok(kickoff?.evidence_form.some((f) => f.name === "retro_drained" && f.required !== false));
   assert.ok(kickoff?.evidence_form.some((f) => f.name === "change_size" && f.required));
 });
 

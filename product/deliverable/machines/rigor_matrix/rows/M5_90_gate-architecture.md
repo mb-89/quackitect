@@ -21,7 +21,6 @@ evidence:
     description: "the verdict with tripwires in RAID"
   - name: matrix_review
     description: "the baseline matrices reviewed: decomposition, clustering, allocation, interfaces"
-    killer: true
   - name: evaluation_recorded
     description: "every quality scenario addressed or flagged"
   - name: adrs_traced

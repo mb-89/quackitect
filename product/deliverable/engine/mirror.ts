@@ -15,7 +15,7 @@ import { Rejection } from "./errors.ts";
 import { appendNote, pendingNotes, readNotes } from "./inbox.ts";
 import { loadCards } from "./cards.ts";
 import { handleHttp, type McpServer } from "./mcp.ts";
-import { feedRows, renderMirror, SHUTDOWN_LEVELS, type MirrorState } from "./render.ts";
+import { feedRows, renderMirror, type MirrorState } from "./render.ts";
 import { loadPanel, renderPanel } from "./params.ts";
 import { resolveInRoot, seDir } from "./paths.ts";
 import { loadLevels } from "./scale.ts";
@@ -48,7 +48,7 @@ export function startMirror(o: MirrorOptions): Server {
     // The server is going away with the walk unfinished — a quit, not an end.
     gone: state.session.serverGone,
     autonomy: state.session.autonomy,
-    shutdown: state.session.shutdown,
+    power: state.session.power,
     active: state.session.active(),
     busy: state.session.busy(),
     ...(state.session.progress() === undefined ? {} : { progress: state.session.progress() }),
@@ -133,10 +133,10 @@ export function startMirror(o: MirrorOptions): Server {
         }));
         return;
       }
-      if (req.method === "POST" && url.pathname === "/shutdown") {
-        post(req, res, "mirror_shutdown", (body) => ({
+      if (req.method === "POST" && url.pathname === "/power") {
+        post(req, res, "mirror_power", (body) => ({
           args: { value: body.value },
-          result: state.session.setShutdown(Number(body.value)),
+          result: state.session.setPower(String(body.key), body.on === true),
         }));
         return;
       }
@@ -437,7 +437,7 @@ export function startMirror(o: MirrorOptions): Server {
         // The autonomy scale is authored in machines/scale.md, so a host that
         // kept its own copy of the notches would drift the moment it is edited.
         res.writeHead(200, { "content-type": "application/json; charset=utf-8", "access-control-allow-origin": "*" });
-        res.end(JSON.stringify({ autonomy: loadLevels(state.root), shutdown: SHUTDOWN_LEVELS, narration: { minutes: state.session.narrationMinutes, calls: state.session.narrationCalls } }));
+        res.end(JSON.stringify({ autonomy: loadLevels(state.root), power: state.session.power, narration: { minutes: state.session.narrationMinutes, calls: state.session.narrationCalls } }));
         return;
       }
       if (url.pathname === "/api/cards") {

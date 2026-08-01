@@ -805,7 +805,7 @@ const SCALE_HELP = {
     title: "the autonomy scale",
     lead: "<p>The agent enters a step only when that step weighs no more than this. At 0 nothing moves without you.</p>",
   },
-  shutdown: { title: "the shutdown scale", lead: "<p>What happens once there is nothing left to do.</p>" },
+  shutdown: { title: "the shutdown row", lead: "<p>Two buttons, either or both. Block auto-sleep holds the machine awake. Shutdown at idle shuts the machine down once the walk is parked and nothing has happened for five minutes.</p>" },
   narration: {
     title: "the update cadence",
     lead: "<p>How often the agent owes a line about what it is doing. Whichever falls due first counts, minutes or calls. A volunteered update always pays, and always resets both.</p>",

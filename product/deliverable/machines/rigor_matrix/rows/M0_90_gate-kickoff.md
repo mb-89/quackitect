@@ -21,7 +21,6 @@ legal_tools:
 evidence:
   - name: retro_drained
     description: "every inbox note has a recorded disposition"
-    killer: true
   - name: goal
     description: "the confirmed one-line iteration goal"
   - name: pulled_in

@@ -19,7 +19,6 @@ legal_tools:
 evidence:
   - name: meets_need
     description: "every need's pass lines demonstrated, all iterations"
-    killer: true
   - name: killers_demonstrated
     description: "each killer use case exercised end to end"
   - name: acceptance_converted

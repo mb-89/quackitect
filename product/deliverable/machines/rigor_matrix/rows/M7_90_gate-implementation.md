@@ -17,7 +17,6 @@ legal_tools:
 evidence:
   - name: build_planned
     description: "the seeded chunk machine exists and was walked"
-    killer: true
   - name: models_adhered
     description: "the build fills the allocated elements - no unsanctioned element"
   - name: red_observed
