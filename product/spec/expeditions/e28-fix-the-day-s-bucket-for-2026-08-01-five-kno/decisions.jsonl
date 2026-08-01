@@ -534,3 +534,5 @@
 {"ts":"2026-08-01T12:13:34.297Z","op":"update","visit":"expeditions/e28@0","node":"d599","brief":"finding which mirror is live so the table can be reached"}
 {"ts":"2026-08-01T12:16:42.528Z","op":"update","visit":"expeditions/e28@0","node":"d600","brief":"handover written for the restart"}
 {"ts":"2026-08-01T12:20:10.351Z","op":"done","visit":"expeditions/e28@0","node":"d592","brief":"landing e28 so the table reaches the engine"}
+{"ts":"2026-08-01T12:21:55.773Z","op":"fork","visit":"expeditions/e28@2","parent":null,"node":"d601","brief":"trunk moved under the branch and two files conflicted","nodes":[]}
+{"ts":"2026-08-01T12:23:28.454Z","op":"done","visit":"expeditions/e28@2","node":"d601","brief":"both conflicts resolved keeping each side's real change"}

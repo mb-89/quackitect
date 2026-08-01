@@ -18,11 +18,10 @@ Boot exists to reach idle fast and clean.
 
 - Keep boot calls serial.
 - Avoid parallel search and read batches in boot.
-- BOOT READS ONCE. The packet carries `reading`, naming `.se/reading.md`. Read that one file.
-- It holds every document the way demands, and reading it credits them all.
-- Do not split it into several calls. "Keep reads small" is about `offset`/`limit` inside a big file, never about how many documents ride in one envelope.
-- Do not send `read_hashes` for what the reading credited. There is nothing left to prove.
-- Page it with `offset`/`limit` only when a read is refused as oversize. Use generous limits: a document split across two pages is credited by neither.
+- BOOT PULLS THE READING. Call `se_reading`, read what it hands back, call it again. Stop when it answers `done: true`.
+- Each call carries one document and credits it. Boot's reading is a handful of calls, and none of them can be truncated.
+- Do not read the guidance files yourself. The loop knows what you owe.
+- Do not send `read_hashes` for what the loop credited. There is nothing left to prove.
 
 ## Re-read rules
 

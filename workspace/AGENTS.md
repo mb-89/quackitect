@@ -51,15 +51,16 @@ parking loop.)
 
 BOOT STABILITY FOR THIS HOST:
 - Keep boot calls serial. Do not run parallel search/read batches.
-- ONE READ IS THE WHOLE READING. The packet carries `reading`, naming
-  `.se/reading.md`. That file holds every document the way ahead demands,
-  concatenated by the engine. Read it, and every document in it is credited.
-- Do not split it across calls. Do not send `read_hashes` for what it
-  credited. The proof is already recorded.
-- "Keep reads small" means `offset`/`limit` INSIDE one large file. It has
-  never meant fewer documents per call.
-- Page the reading only if a read is refused as oversize, and page it with
-  generous limits: a document split across two pages is credited by neither.
+- THE READING IS A LOOP. The packet carries `reading`; call `se_reading`,
+  read the text it hands back, and call it again. Stop when it answers
+  `done: true`. Pull until it gives you nothing and you have everything.
+- Each call carries ONE document and credits it as it serves it. Do not send
+  `read_hashes` for what the loop credited; the proof is already recorded.
+- Do not read the guidance files yourself. The loop knows what you owe,
+  including everything on the way to a target.
+- One document per call is deliberate. A host that moves a big tool result
+  to disk hands you a preview instead of the text, and you would stand
+  credited for guidance you never saw. That is what the loop prevents.
 - Re-read only when a refusal names missing or stale hashes.
 - If a state allows no tools, do not call read/search there. Tick only.
 - A document that is ALLOWED to be missing is read with `optional: true`.

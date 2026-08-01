@@ -49,9 +49,11 @@ import { NARRATION_DEFAULT_CALLS, NARRATION_DEFAULT_MINUTES } from "./toll.ts";
 /** THE TICK is the machinery — one tool, legal in EVERY state. Without
  *  arguments it reports (observability is never gated); with arguments it
  *  advances. se_note is legal everywhere too: a stray is captured where it
- *  strikes, never chased (contract rule 4). se_note_drain joins them by the
- *  same logic: an inbox you may only add to is not an inbox. */
-const ALWAYS_LEGAL: ReadonlySet<string> = new Set(["se_tick", "se_note", "se_panel", "se_note_drain"]);
+ *  strikes, never chased (contract rule 4). se_reading joins them because a
+ *  state that gates the reading gates its own entry — the way out of a state
+ *  is to read what it demands. se_note_drain joins them by the same logic as
+ *  se_note: an inbox you may only add to is not an inbox. */
+const ALWAYS_LEGAL: ReadonlySet<string> = new Set(["se_tick", "se_note", "se_panel", "se_reading", "se_note_drain"]);
 /** RESTRICTED tools: "all" does NOT grant these — a state must name them.
  *  Nothing is restricted today.
  *
@@ -63,7 +65,7 @@ const ALWAYS_LEGAL: ReadonlySet<string> = new Set(["se_tick", "se_note", "se_pan
  *  what work MEANS and when it returns, and engine/inbox.ts still refuses
  *  those outside the retro. done and obsolete are checks anyone can run. */
 const RESTRICTED: ReadonlySet<string> = new Set<string>();
-const MACHINERY: readonly string[] = ["se_tick", "se_file_read"];
+const MACHINERY: readonly string[] = ["se_tick", "se_reading", "se_file_read"];
 
 export function mainMachinePath(root: string): string {
   return join(root, "product", "deliverable", "machines", "main.canvas");
@@ -1167,6 +1169,57 @@ export class Session {
     return credited;
   }
 
+  /** THE PULL — the reading as a LOOP. One call hands over the next guidance
+   *  the way ahead demands, as text, already credited; call it again until it
+   *  answers done.
+   *
+   *  WHY A LOOP AND NOT ONE BIG READ. The whole reading is fifty thousand
+   *  bytes of guidance. A host that moves a large tool result to disk hands
+   *  the agent a PREVIEW instead of the text — and the engine has already
+   *  credited it, so the agent stands proven to have read what it never saw.
+   *  A page the ENGINE bounds cannot be eaten downstream, and the caller does
+   *  no arithmetic: it asks again until told to stop.
+   *
+   *  ONE DOCUMENT PER CALL (owner ruling). A page bounded by a byte budget
+   *  needs a constant nobody can calibrate — the threshold belongs to the
+   *  host and is not published. A document is a natural page, it is always
+   *  whole, and the largest guidance file is a tenth of what got eaten.
+   *
+   *  UNREADABLE IS REPORTED, NOT SKIPPED FOREVER. A path that cannot be read
+   *  from here is named and left out of the remainder, so the loop still ends
+   *  and the refusal that follows can say what is missing. */
+  pullReading(): Record<string, unknown> {
+    const paths = this.readingList();
+    const unreadable: string[] = [];
+    const flag = (): Record<string, unknown> =>
+      unreadable.length > 0 ? { unreadable, warning: "demanded, but not readable from here. The gate that wants them will say so." } : {};
+    for (const rel of paths) {
+      let body: string;
+      try {
+        body = readFileSync(resolveInRoot(this.laneRoot(rel), rel, "engine/session.ts reading")).toString("utf8");
+      } catch {
+        unreadable.push(rel);
+        continue;
+      }
+      const hash = contentHash(body);
+      this.readBuffer.set(rel, hash);
+      const remaining = paths.length - unreadable.length - 1;
+      return {
+        document: { path: rel, hash, content: body },
+        remaining,
+        done: false,
+        ...flag(),
+        note: `read it, then call se_reading again — ${remaining} more owed after this one`,
+      };
+    }
+    return {
+      remaining: 0,
+      done: true,
+      ...flag(),
+      note: "nothing is owed — every document the way ahead demands is already in your head. Carry on.",
+    };
+  }
+
   /** THE SWEEP — the route, walked. It collapses ROUND TRIPS and nothing
    *  else: every hop still enters its state, still weighs the slider, still
    *  proves its reads, still runs its scripts, still writes its own line to
@@ -2226,9 +2279,10 @@ export class Session {
       ...(reading.length > 0
         ? {
             reading: {
+              tool: "se_reading",
               path: Session.READING_PATH,
               documents: reading.length,
-              note: "read THIS ONE FILE. It holds every document still owed, and reading it credits them all — no second call, no read_hashes to carry.",
+              note: "call se_reading. It hands you the text and credits it; call it again until it answers done. No paths to name, no hashes to carry.",
             },
           }
         : {}),

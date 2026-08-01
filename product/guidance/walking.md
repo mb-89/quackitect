@@ -22,7 +22,9 @@ One tool drives everything: `se_tick`. It is legal in every state.
   longer: STOP, telling the user plainly that the slider alone cannot
   wake you — they must message you (continue is enough) after changing
   it, and you resume from wherever the machine stands.
-- `state: <id>`: peek at any state without moving.
+- `state: <id>`: peek at any state without moving. A LIST of ids peeks them
+  all in ONE call, answering with `states`. Peeking every door before you
+  choose is the normal case, so it should cost one round trip, not one each.
 - `back: <state>`: return to an earlier filled state. Everything downstream
   is superseded; its evidence is invalidated and earned again.
 - `target: <state>`: set the destination the route line tracks. The session
@@ -36,22 +38,19 @@ Default movement rule:
 - A refusal still stops the walk. Follow its remedy.
 - SE-C-113 means user handoff. Report and wait for a message.
 
-THE READING — a LOOP, one document per call:
+THE READING — a loop, not a list:
 
 - Whenever anything is owed, the packet carries `reading`. Call `se_reading`.
 - It hands back ONE document: the next guidance the way ahead demands, as text.
 - Read it. Call `se_reading` again. Stop when it answers `done: true`.
 - Pull until it gives you nothing. Then you have everything, by construction.
-- Reading CREDITS each document as it is served. You never name a path, you
-  never carry a hash, and `read_hashes` has nothing left to prove.
+- You never name a path. You never carry a hash. The engine credits what it served.
+- You never work out what you owe either. The machine knows:
+  - A TARGET is set — every document the whole way there, plus what the target's neighbours demand at entry.
+  - NO target — where you stand is the target: what this state pulls, plus what its neighbours demand.
 - What you have already read is never served twice, so the loop always drains.
-- ONE DOCUMENT PER CALL IS THE POINT, and it is a safety property rather than
-  a limitation. A host that moves a large tool result to disk hands back a
-  PREVIEW instead of the text, and the engine has already credited it — so you
-  would stand proven to have read what you never saw. A single document cannot
-  be eaten that way.
-- `.se/reading.md` is the same thing as a FILE, for a person to open. Agents
-  use the tool.
+- ONE DOCUMENT PER CALL, and that is the point. A host that moves a large tool result to disk hands you a PREVIEW instead of the text — and the engine has already credited it, so you stand proven to have read what you never saw. A single document cannot be eaten.
+- `.se/reading.md` is the same thing as a file, for a person to open. Agents use the tool.
 
 A WORD ON WHY THIS PARAGRAPH IS WORDED CAREFULLY. It was briefly rewritten to
 describe one concatenated read with no second call, which contradicted the

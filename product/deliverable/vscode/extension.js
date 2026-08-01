@@ -786,6 +786,18 @@ async function showFieldHelp(which) {
  * The scale is authored in machines/scale.md and fetched, never copied — a
  * host holding its own list of levels drifts the moment that file is edited.
  */
+const SCALE_HELP = {
+  autonomy: {
+    title: "the autonomy scale",
+    lead: "<p>The agent enters a step only when that step weighs no more than this. At 0 nothing moves without you.</p>",
+  },
+  shutdown: { title: "the shutdown scale", lead: "<p>What happens once there is nothing left to do.</p>" },
+  narration: {
+    title: "the update cadence",
+    lead: "<p>How often the agent owes a line about what it is doing. Whichever falls due first counts, minutes or calls. A volunteered update always pays, and always resets both.</p>",
+  },
+};
+
 async function showScaleHelp(which, level) {
   if (levels === null) levels = await api("/api/levels");
   const list = (levels === null ? null : levels[which]) ?? [];
@@ -795,12 +807,8 @@ async function showScaleHelp(which, level) {
       return `<tr${here ? ' style="font-weight:600"' : ""}><td>${escapeHtml(l.abbr)} · ${escapeHtml(String(l.value))}</td><td>${escapeHtml(l.name)}</td></tr>`;
     })
     .join("");
-  const lead =
-    which === "autonomy"
-      ? "<p>The agent enters a step only when that step weighs no more than this. At 0 nothing moves without you.</p>"
-      : "<p>What happens once there is nothing left to do.</p>";
-  const title = which === "autonomy" ? "the autonomy scale" : "the shutdown scale";
-  await showHelp(title, lead + '<table class="kv">' + rows + "</table>", false);
+  const h = SCALE_HELP[which] ?? SCALE_HELP.autonomy;
+  await showHelp(h.title, h.lead + '<table class="kv">' + rows + "</table>", false);
 }
 
 // ── THE SIDEBAR GROUPS ───────────────────────────────────────────────────
@@ -902,6 +910,10 @@ class Controls {
   <input type="range" id="s" min="1" max="5" step="1" value="1">
   <div class="notches" id="s-notches"></div>
 
+  <div class="row"><span class="name" id="n-name" title="click: the levels, explained in details">Updates</span><span class="val" id="n-val">—</span></div>
+  <input type="range" id="n" min="1" max="5" step="1" value="3">
+  <div class="notches" id="n-notches"></div>
+
   <div class="sep"></div>
   <input id="filter" type="text" placeholder="filter the logs">
   <input id="note" type="text" placeholder="drop a note — Enter captures it">
@@ -913,16 +925,18 @@ class Controls {
   // A drag must not fight the poll: while the thumb is held, incoming state
   // never rewrites the slider under the hand.
   let holding = null;
-  for (const id of ["a", "s"]) {
+  // ONE MAP, THREE BARS. The slider's id and the engine's name for it were a
+  // ternary in four places; a third bar would have made them eight.
+  const SCALE = { a: "autonomy", s: "shutdown", n: "narration" };
+  for (const id of ["a", "s", "n"]) {
     $(id).addEventListener("pointerdown", () => { holding = id; });
-    $(id).addEventListener("input", () => { paint(id); });
+    $(id).addEventListener("input", () => { paint(); });
     $(id).addEventListener("change", () => {
       holding = null;
-      vsapi.postMessage({ se: id === "a" ? "autonomy" : "shutdown", value: Number($(id).value) });
+      vsapi.postMessage({ se: SCALE[id], value: Number($(id).value) });
     });
+    $(id + "-name").addEventListener("click", () => vsapi.postMessage({ se: "scale-help", which: SCALE[id] }));
   }
-  $("a-name").addEventListener("click", () => vsapi.postMessage({ se: "scale-help", which: "autonomy" }));
-  $("s-name").addEventListener("click", () => vsapi.postMessage({ se: "scale-help", which: "shutdown" }));
   // THE LOG'S TWO LINE EDITS LIVE HERE (owner ruling 2026-07-30). The log is a
   // terminal now, and a terminal has nowhere to put a field, so they moved to
   // the nearest surface that does.
@@ -934,14 +948,16 @@ class Controls {
     vsapi.postMessage({ se: "note", text: $("note").value });
     $("note").value = "";
   });
-  function sdAbbr(v) {
-    if (lv === null || !Array.isArray(lv.shutdown)) return String(v);
-    const l = lv.shutdown.find((x) => Number(x.value) === Number(v));
+  function abbr(which, v) {
+    const list = lv === null ? null : lv[SCALE[which]];
+    if (!Array.isArray(list)) return String(v);
+    const l = list.find((x) => Number(x.value) === Number(v));
     return l ? l.abbr : String(v);
   }
-  function paint(which) {
-    if (which !== "s") $("a-val").textContent = Number($("a").value).toFixed(2);
-    if (which !== "a") $("s-val").textContent = sdAbbr($("s").value);
+  function paint() {
+    $("a-val").textContent = Number($("a").value).toFixed(2);
+    $("s-val").textContent = abbr("s", $("s").value);
+    $("n-val").textContent = abbr("n", $("n").value);
   }
   // A NOTCH SITS AT ITS VALUE, never at an even share of the width. Spacing
   // them evenly put every label somewhere the thumb would never land, so
@@ -971,8 +987,8 @@ class Controls {
       s.addEventListener("click", () => {
         $(which).value = l.value;
         paint();
-        vsapi.postMessage({ se: which === "a" ? "autonomy" : "shutdown", value: Number(l.value) });
-        vsapi.postMessage({ se: "scale-help", which: which === "a" ? "autonomy" : "shutdown", level: l.value });
+        vsapi.postMessage({ se: SCALE[which], value: Number(l.value) });
+        vsapi.postMessage({ se: "scale-help", which: SCALE[which], level: l.value });
       });
       el.appendChild(s);
     }
@@ -984,11 +1000,13 @@ class Controls {
       lv = d.levels;
       if (Array.isArray(lv.autonomy)) notches("a", lv.autonomy);
       if (Array.isArray(lv.shutdown)) notches("s", lv.shutdown);
+      if (Array.isArray(lv.narration)) notches("n", lv.narration);
     }
     const p = d.packet;
     if (!p) return;
     if (holding !== "a") { $("a").value = p.autonomy; }
     if (holding !== "s") { $("s").value = p.shutdown; }
+    if (holding !== "n") { $("n").value = p.narration; }
     paint();
   });
 </script></body></html>`;
@@ -1011,6 +1029,7 @@ class Controls {
       if (m.se === "scale-help") { await showScaleHelp(m.which, m.level); return; }
       if (m.se === "autonomy") await post("/autonomy", { value: m.value });
       else if (m.se === "shutdown") await post("/shutdown", { value: m.value });
+      else if (m.se === "narration") await post("/narration", { value: m.value });
       await pollWalk();
     });
     this.render();

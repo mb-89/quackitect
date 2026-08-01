@@ -37,8 +37,9 @@ sections below say — sweep, advise, execute.
 
 Read the LIVE machinery, in this order. Never answer from memory.
 
-- The doors: peek every next state at idle (`se_tick {state: …}`).
-  Their statements and priorities are the current vocabulary.
+- The doors: peek every next state at idle, in ONE call
+  (`se_tick {state: […, …]}`). Their statements and priorities are the
+  current vocabulary.
 - The open work: peek the expeditions and iterations containers —
   what stands, what is bound, what waits at its kickoff.
 - The pending notes: the inbox is the backlog of settled-but-unbuilt
