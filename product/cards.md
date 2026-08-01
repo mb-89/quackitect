@@ -13,7 +13,7 @@ cards:
     shows: log
   - card: details
     shows: details
-  - card: table
+  - card: database
     shows: table
 ---
 

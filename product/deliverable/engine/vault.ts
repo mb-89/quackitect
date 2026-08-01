@@ -23,7 +23,7 @@ import { parseStateNote } from "./notes.ts";
 
 export type Row = Record<string, unknown>;
 
-const SKIP_DIRS = new Set(["node_modules", ".git", ".obsidian", ".se", ".worktrees"]);
+const SKIP_DIRS = new Set(["node_modules", ".git", ".obsidian", ".se", ".worktrees", "tests"]);
 
 /**
  * What a progress bar draws. A build of a large vault takes seconds, and the

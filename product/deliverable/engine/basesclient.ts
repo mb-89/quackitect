@@ -31,7 +31,6 @@ export const BASES_STYLE = `
 .bs-helpable{cursor:pointer}
 .bs-helpable:hover{color:var(--se-accent)}
 .bs-row{display:flex;align-items:center;gap:5px;margin:0 0 5px;flex-wrap:wrap}
-.bs-grip{color:var(--se-muted);cursor:grab}
 .bs-where{color:var(--se-muted)}
 .bs-row select,.bs-row input,.bs-configure select,.bs-configure input,.bs-find{background:var(--se-bg);color:var(--se-fg);border:1px solid var(--se-border);border-radius:4px;font:inherit;font-size:11px;padding:2px 5px}
 .bs-val,.bs-raw{flex:1;min-width:110px}
@@ -60,6 +59,17 @@ export const BASES_STYLE = `
 .bs-chev:hover{color:var(--se-fg)}
 .bs-back{background:transparent;border:0;color:var(--se-muted);cursor:pointer;font:inherit}
 .bs-configure{border-top:1px solid var(--se-border);margin:6px 0 0;padding:8px 0 0;display:flex;flex-direction:column;gap:6px}
+.bs-conf-head{display:flex;align-items:center;gap:6px;margin:0}
+.bs-conf-name{flex:1}
+.bs-vmenu{background:transparent;border:0;color:var(--se-muted);cursor:pointer;font:inherit;padding:0 5px;border-radius:3px}
+.bs-vmenu:hover{background:var(--se-hover);color:var(--se-fg)}
+.bs-vmenu-items{display:flex;flex-direction:column;background:var(--se-bg);border:1px solid var(--se-border-strong);border-radius:4px;padding:3px}
+.bs-codepanel{margin:0 2px 8px;padding:8px;background:var(--se-raised);border:1px solid var(--se-border-strong);border-radius:6px}
+.bs-code-head{display:flex;align-items:center;gap:8px;margin:0 0 6px;font-size:11px}
+.bs-code-path{flex:1;color:var(--se-muted);font-family:ui-monospace,Consolas,monospace}
+.bs-code-msg{color:var(--se-muted);font-size:11px}
+.bs-code-msg.bad{color:var(--se-fail)}
+.bs-code-text{width:100%;box-sizing:border-box;min-height:220px;background:var(--se-bg);color:var(--se-fg);border:1px solid var(--se-border);border-radius:4px;padding:8px;font-family:ui-monospace,Consolas,monospace;font-size:11px;line-height:1.45;white-space:pre;overflow:auto;resize:vertical}
 .bs-empty{color:var(--se-muted);padding:10px 2px;font-size:12px}
 .bs-busy{opacity:.5;pointer-events:none}
 .bs-hit{display:none}
@@ -121,6 +131,11 @@ export const BASES_SCRIPT = `
   // standing, because a stale card the reader can see beats a blank one.
   function reload(id) {
     var url = id === null || id === undefined ? "/widget/table" : "/widget/table?tv=" + encodeURIComponent(id);
+    // The query panel stays open across a redraw. That is the whole point of
+    // it: a control writes, the card comes back, and the YAML that changed is
+    // still on screen beside the control that changed it.
+    var open = document.querySelector(".bs-codepanel");
+    var wasOpen = open !== null && open.hidden === false;
     return fetch(url)
       .then(function (r) { return r.text(); })
       .then(function (text) {
@@ -128,6 +143,10 @@ export const BASES_SCRIPT = `
         var fresh = doc.getElementById("w-table");
         var here = document.getElementById("w-table");
         if (fresh !== null && here !== null) here.replaceWith(fresh);
+        if (wasOpen) {
+          var again = document.querySelector(".bs-codepanel");
+          if (again !== null) again.hidden = false;
+        }
       })
       .catch(function (e) {
         var card = document.getElementById("w-table");
@@ -308,7 +327,27 @@ export const BASES_SCRIPT = `
       return;
     }
 
-    if (t.closest(".bs-add-view") !== null || t.closest(".bs-new") !== null) {
+    if (t.closest(".bs-vmenu") !== null) {
+      var menu = t.closest(".bs-configure").querySelector(".bs-vmenu-items");
+      if (menu !== null) menu.hidden = !menu.hidden;
+      return;
+    }
+
+    if (t.closest(".bs-show-code") !== null) {
+      var panel = t.closest(".bs-block").querySelector(".bs-codepanel");
+      if (panel !== null) panel.hidden = !panel.hidden;
+      closePops(null);
+      return;
+    }
+
+    if (t.closest(".bs-code-save") !== null) {
+      var box = t.closest(".bs-codepanel").querySelector(".bs-code-text");
+      var c2 = ctxOf(t);
+      if (box !== null && c2 !== null) post(t, "setSource", { text: box.value });
+      return;
+    }
+
+    if (t.closest(".bs-add-view") !== null) {
       var name = window.prompt("Name the new view");
       if (name !== null && name.trim() !== "") post(t, "addView", { name: name.trim(), type: "table" });
       return;

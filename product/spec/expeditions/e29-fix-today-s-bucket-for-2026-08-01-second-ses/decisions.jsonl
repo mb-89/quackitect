@@ -61,3 +61,23 @@
 {"ts":"2026-08-01T14:37:52.710Z","op":"update","visit":"expeditions/e29@0","node":"d35","brief":"waiting on the battery before writing the how-to-open note"}
 {"ts":"2026-08-01T14:40:26.332Z","op":"update","visit":"expeditions/e29@0","node":"d36","brief":"confirming the battery is clean after the reload fix"}
 {"ts":"2026-08-01T14:40:53.071Z","op":"update","visit":"expeditions/e29@0","node":"d37","brief":"battery green at 542; committing the instrument"}
+{"ts":"2026-08-01T14:40:58.842Z","op":"done","visit":"expeditions/e29@0","node":"d32","brief":"the card is card 7 in the mirror"}
+{"ts":"2026-08-01T14:47:04.839Z","op":"update","visit":"expeditions/e29@0","node":"d1","brief":"landing the Bases table on trunk so the engine actually serves it"}
+{"ts":"2026-08-01T14:56:48.521Z","op":"plan","visit":"expeditions/e29@0","parent":null,"nodes":[{"id":"d6","brief":"A base showing every note, as the simple starting point"},{"id":"d7","brief":"Delete the New button, which does nothing here"},{"id":"d8","brief":"Delete the formula button, because formulas do not render yet"},{"id":"d9","brief":"Delete the drag grip, because reordering is not built"},{"id":"d10","brief":"Show the code behind the menu in Configure view"}]}
+{"ts":"2026-08-01T14:57:31.267Z","op":"obsolete","visit":"expeditions/e29@0","node":"d6","brief":"duplicate of d1 from the refused write"}
+{"ts":"2026-08-01T14:57:47.528Z","op":"done","visit":"start@0","node":"d2","brief":"the New button is gone"}
+{"ts":"2026-08-01T14:58:05.948Z","op":"done","visit":"start@0","node":"d5","brief":"Show the code sits behind the menu in Configure view"}
+{"ts":"2026-08-01T14:58:44.693Z","op":"done","visit":"start@0","node":"d3","brief":"the formula button and its topic are gone"}
+{"ts":"2026-08-01T14:59:51.143Z","op":"done","visit":"start@0","node":"d1","brief":"product/all.base shows every note"}
+{"ts":"2026-08-01T15:00:09.864Z","op":"obsolete","visit":"expeditions/e29@0","node":"d7","brief":"duplicate of d2"}
+{"ts":"2026-08-01T15:00:31.922Z","op":"done","visit":"start@0","node":"d4","brief":"the drag grip is gone"}
+{"ts":"2026-08-01T15:01:49.846Z","op":"plan","visit":"expeditions/e29@0","parent":null,"nodes":[{"id":"d11","brief":"One database file next to cards.md, holding every view"},{"id":"d12","brief":"The matrix bases leave the vault and become test fixtures"},{"id":"d13","brief":"Rename the card from table to database"},{"id":"d14","brief":"Editing the query by hand, from the menu or the file"}]}
+{"ts":"2026-08-01T15:02:00.213Z","op":"done","visit":"expeditions/e29@0","node":"d11","brief":"product/database.base sits beside cards.md"}
+{"ts":"2026-08-01T15:02:15.021Z","op":"done","visit":"expeditions/e29@0","node":"d12","brief":"three matrix bases are now test fixtures"}
+{"ts":"2026-08-01T15:02:35.653Z","op":"done","visit":"expeditions/e29@0","node":"d13","brief":"the card is called database now"}
+{"ts":"2026-08-01T15:03:04.219Z","op":"done","visit":"expeditions/e29@0","node":"d14","brief":"the query panel edits and saves the YAML"}
+{"ts":"2026-08-01T15:03:10.786Z","op":"obsolete","visit":"expeditions/e29@0","node":"d8","brief":"duplicate of d3"}
+{"ts":"2026-08-01T15:03:26.199Z","op":"obsolete","visit":"expeditions/e29@0","node":"d9","brief":"duplicate of d4"}
+{"ts":"2026-08-01T15:03:34.139Z","op":"done","visit":"expeditions/e29@0","node":"d10","brief":"the query panel lives on the card and stays open across redraws"}
+{"ts":"2026-08-01T15:05:42.517Z","op":"update","visit":"expeditions/e29@0","node":"d15","brief":"removing the superseded table widget"}
+{"ts":"2026-08-01T15:08:03.010Z","op":"update","visit":"expeditions/e29@0","node":"d16","brief":"landing the database card on trunk"}

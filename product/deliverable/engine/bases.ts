@@ -478,6 +478,49 @@ export function basePath(root: string, rel: string): string {
   return join(vaultDir(root), rel);
 }
 
+/** The query, as text. What the controls write and what a person may rewrite. */
+export function baseSource(root: string, rel: string): string {
+  try {
+    return readFileSync(baseFile(root, rel), "utf8");
+  } catch {
+    return "";
+  }
+}
+
+/**
+ * Write the query BY HAND.
+ *
+ * The controls and this are the same door: both end as YAML in the file. What
+ * is typed here is parsed before it is written, so a base that does not parse
+ * never reaches disk — the reader gets the refusal while their text is still
+ * in front of them.
+ */
+export function setSource(root: string, rel: string, text: string): string {
+  let doc: unknown;
+  try {
+    doc = parse(text);
+  } catch (e) {
+    throw new Rejection({
+      clause: CLAUSES.REQUIRED_ARGS,
+      expected: "a base that parses as YAML",
+      got: String((e as Error).message).split("\n")[0],
+      remedy: { tool: "se_file_read", args: { path: "product/spec/bases-syntax.md" }, note: "section 1 gives the five top-level keys" },
+      source: SRC,
+    });
+  }
+  if (doc === null || typeof doc !== "object" || Array.isArray(doc)) {
+    throw new Rejection({
+      clause: CLAUSES.REQUIRED_ARGS,
+      expected: "a base whose top level is a mapping",
+      got: doc === null ? "nothing" : Array.isArray(doc) ? "a list" : typeof doc,
+      remedy: { tool: "se_file_read", args: { path: "product/spec/bases-syntax.md" }, note: "section 1 gives the five top-level keys" },
+      source: SRC,
+    });
+  }
+  writeFileSync(baseFile(root, rel), text);
+  return text;
+}
+
 // ---------------------------------------------------------------------------
 // ONE DOOR FOR EVERY CONTROL
 //
@@ -499,6 +542,8 @@ export interface BaseOp {
   filters?: FilterTree | null;
   /** A tree whose leaves may still be builder rows. Compiled here, not there. */
   posted?: PostedTree | null;
+  /** The whole query, typed by hand. */
+  text?: string;
   type?: Layout;
   to?: string;
 }
@@ -530,6 +575,7 @@ export function applyBaseOp(root: string, o: BaseOp): string {
     case "setLayout": return setLayout(root, o.file, v, o.type ?? "table");
     case "removeView": return removeView(root, o.file, v);
     case "duplicateView": return duplicateView(root, o.file, v, String(o.to ?? ""));
+    case "setSource": return setSource(root, o.file, String(o.text ?? ""));
     case "createBase": return createBase(root, o.file, String(o.name ?? "Table"));
     default:
       throw new Rejection({

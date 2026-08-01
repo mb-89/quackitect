@@ -17,7 +17,7 @@
 // reader would be told about a function that refuses.
 import { basename, dirname, join } from "node:path";
 import { GLOBALS, METHODS, typeOf, type TypeName } from "./expr.ts";
-import { fromExpression, LAYOUTS, OPERATORS, type FilterRow, type FilterTree } from "./bases.ts";
+import { baseSource, fromExpression, LAYOUTS, OPERATORS, type FilterRow, type FilterTree } from "./bases.ts";
 import { listBases, loadBase, renderView, selectRows, unreadableRows, vaultDir, type BaseSpec, type BaseView, type Row } from "./tables.ts";
 import { vaultFor } from "./vault.ts";
 
@@ -165,13 +165,6 @@ const TOPICS: Record<string, () => Help> = {
       + P("Three functions take an expression rather than a value, and bind <code>value</code> per element: <code>filter</code>, <code>map</code> and <code>reduce</code>. So <code>[1,2,3,4].filter(value &gt; 2)</code> gives <code>[3, 4]</code>.")
       + P("Anything the language does not know is REFUSED by name. A query that ignored a clause would return a table that looks complete and is wrong."),
   }),
-  formulas: () => ({
-    title: "formulas",
-    html: P("A formula is a named expression that becomes a column. It is declared once for the file and used as <code>formula.<i>name</i></code>.")
-      + P("The reference's own example is <code>ppu: (price / age).toFixed(2)</code>.")
-      + P("A formula may use another formula. One that refers to itself is refused rather than hanging.")
-      + P("The language is the same one the filters use — see the expression language."),
-  }),
   cell: () => ({
     title: "editing a cell",
     html: P("Double-click or press Enter to edit. Enter commits, Escape discards. Nothing is written while you type.")
@@ -187,6 +180,23 @@ export function helpFor(topic: string): Help {
 }
 
 export const HELP_TOPICS = Object.keys(TOPICS);
+
+/**
+ * THE QUERY, SHOWN AND EDITABLE.
+ *
+ * A base IS its query, and every control on this card is an editor over that
+ * text. So the text sits ON the card rather than behind a route: it is
+ * rendered fresh with every redraw, and a redraw follows every control, which
+ * is what makes a tick and its line of YAML visibly the same act.
+ *
+ * Typing here writes the same file the controls write. There is one door.
+ */
+function codePanel(root: string, rel: string): string {
+  return `<div class="bs-codepanel" hidden>
+    <div class="bs-code-head"><span class="bs-code-path">${esc(rel)}</span><button type="button" class="bs-add bs-code-save">Save the query</button><span class="bs-code-msg"></span></div>
+    <textarea class="bs-code-text" spellcheck="false">${esc(baseSource(root, rel))}</textarea>
+  </div>`;
+}
 
 // ---------------------------------------------------------------------------
 // THE CHROME
@@ -222,7 +232,6 @@ function sortPop(d: Declared, props: PropertyInfo[]): string {
   </div>`;
   const sorts = (d.view.sort ?? [])
     .map((s) => `<div class="bs-row bs-sort" data-kind="sort">
-      <span class="bs-grip" title="drag to reorder">∷</span>
       <select class="bs-prop">${propOptions(props, String(s.property ?? ""), "Property")}</select>
       <select class="bs-dir">${dirOptions(String(s.direction ?? "ASC"))}</select>
       <button type="button" class="bs-icon bs-drop" title="remove this sort">\u{1F5D1}</button>
@@ -315,7 +324,6 @@ function propsPop(d: Declared, props: PropertyInfo[]): string {
     <input class="bs-find" type="text" placeholder="Find a property…">
     <div class="bs-prop-list">${items}</div>
     <div class="bs-pop-foot">
-      <button type="button" class="bs-add bs-helpable" data-help="formulas">ƒ Formulas</button>
       <button type="button" class="bs-add bs-hide-all">\u{1F441} Hide all</button>
     </div>
   </div>`;
@@ -334,11 +342,18 @@ function viewsPop(d: Declared, all: Declared[]): string {
     <div class="bs-view-list">${items}</div>
     <button type="button" class="bs-add bs-add-view">+ Add view</button>
     <div class="bs-configure" hidden>
-      <div class="bs-pop-title"><button type="button" class="bs-back">‹</button> Configure view</div>
+      <div class="bs-pop-title bs-conf-head">
+        <button type="button" class="bs-back" title="back to the view list">‹</button>
+        <span class="bs-conf-name">Configure view</span>
+        <button type="button" class="bs-vmenu" title="more">⋮</button>
+      </div>
+      <div class="bs-vmenu-items" hidden>
+        <button type="button" class="bs-add bs-show-code">Show the code</button>
+        <button type="button" class="bs-add bs-drop-view">Delete this view</button>
+      </div>
       <input class="bs-view-name" type="text" value="${esc(d.view.name)}">
       <div class="bs-pop-title bs-helpable" data-help="views">Layout</div>
       <select class="bs-layout">${layouts}</select>
-      <button type="button" class="bs-add bs-drop-view">Delete this view</button>
     </div>
   </div>`;
 }
@@ -353,7 +368,6 @@ function toolbar(d: Declared, all: Declared[], props: PropertyInfo[], count: num
     <button type="button" class="bs-tool" data-pop="filter" data-help="filter">⨍ Filter</button>
     <button type="button" class="bs-tool" data-pop="props" data-help="properties">≡ Properties</button>
     <button type="button" class="bs-tool bs-search-btn" data-help="search">⌕ Search</button>
-    <button type="button" class="bs-tool bs-new" data-help="views">+ New</button>
   </div>
   <div class="bs-searchbar" hidden><input class="bs-search" type="text" placeholder="Search these rows…"></div>`;
 }
@@ -382,7 +396,7 @@ export function basesCard(root: string, head: string, selected?: string, rowsIn?
     }
   }
   if (declared.length === 0) {
-    return `<div class="widget" id="w-table"><div class="widget-head"><span>table</span>${head}</div>
+    return `<div class="widget" id="w-table"><div class="widget-head"><span>database</span>${head}</div>
       <div class="widget-body tbl-body"><div class="bs-empty">No <code>.base</code> file in the vault yet.
       <button type="button" class="bs-add bs-create">Create one</button></div></div></div>`;
   }
@@ -404,7 +418,7 @@ export function basesCard(root: string, head: string, selected?: string, rowsIn?
       // the card, which costs one round trip and keeps the poll cheap.
       const shown = d.id === want;
       const chrome = shown
-        ? `${toolbar(d, declared, props, count)}${viewsPop(d, declared)}${sortPop(d, props)}${filterPop(d, props)}${propsPop(d, props)}`
+        ? `${toolbar(d, declared, props, count)}${viewsPop(d, declared)}${sortPop(d, props)}${filterPop(d, props)}${propsPop(d, props)}${codePanel(root, d.file)}`
         : "";
       return `<div class="bs-block" data-view="${esc(d.id)}"${shown ? "" : " hidden"}>
         ${chrome}
@@ -414,6 +428,6 @@ export function basesCard(root: string, head: string, selected?: string, rowsIn?
     .join("");
 
   const damage = damaged.length === 0 ? "" : `<div class="tbl-damage">${damaged.length} note${damaged.length === 1 ? "" : "s"} in the vault do not parse — ${esc(damaged[0])}</div>`;
-  return `<div class="widget" id="w-table"><div class="widget-head"><span>table</span>${head}</div>
+  return `<div class="widget" id="w-table"><div class="widget-head"><span>database</span>${head}</div>
     <div class="widget-body tbl-body">${damage}${blocks}</div></div>`;
 }

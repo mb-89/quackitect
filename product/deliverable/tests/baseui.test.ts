@@ -10,8 +10,22 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, test } from "node:test";
 import { basesCard, HELP_TOPICS, helpFor, propertyInventory } from "../engine/baseui.ts";
+import { setSource } from "../engine/bases.ts";
 import { GLOBALS } from "../engine/expr.ts";
+import { toggleProperty } from "../engine/bases.ts";
+import { Rejection } from "../engine/errors.ts";
 import { Vault, type Row } from "../engine/vault.ts";
+
+/** assert.throws cannot hand the error back, and these refusals say things worth reading. */
+function refusal(fn: () => unknown): Rejection {
+  try {
+    fn();
+  } catch (e) {
+    if (e instanceof Rejection) return e;
+    throw e;
+  }
+  throw new Error("expected a refusal, got a value");
+}
 
 const BASE = `views:
   - type: table
@@ -71,9 +85,32 @@ describe("the card", () => {
   test("the toolbar carries the controls the screenshots show", () => {
     const v = vault();
     const html = basesCard(v.root, "", undefined, v.rows);
-    for (const label of ["Sort", "Filter", "Properties", "Search", "New"]) {
+    for (const label of ["Sort", "Filter", "Properties", "Search"]) {
       assert.ok(html.includes(`>${label}<`) || html.includes(`${label}</button>`), label);
     }
+  });
+
+  // THREE CONTROLS WERE COPIED OFF THE SCREENSHOTS WITHOUT UNDERSTANDING THEM,
+  // and each one promised something this card does not do. A control that lies
+  // about what it can do is worse than a missing one, so their absence is
+  // asserted rather than left to whoever edits the toolbar next.
+  test("no New button, because there is nothing here for it to create", () => {
+    const v = vault();
+    const html = basesCard(v.root, "", undefined, v.rows);
+    assert.ok(!html.includes("bs-new"), "the New button creates a note in Obsidian and nothing here");
+    assert.ok(!/\+ New/.test(html));
+  });
+
+  test("no formula button, because the renderer does not do formulas", () => {
+    const v = vault();
+    const html = basesCard(v.root, "", undefined, v.rows);
+    assert.ok(!/Formula/i.test(html), "offering formulas the renderer ignores would be a lie");
+  });
+
+  test("no drag grip, because sort rows do not reorder by dragging", () => {
+    const v = vault();
+    const html = basesCard(v.root, "", undefined, v.rows);
+    assert.ok(!html.includes("bs-grip"), "a grip that does not drag is a promise the card cannot keep");
   });
 
   test("the result count is the rows the view actually keeps", () => {
@@ -146,6 +183,59 @@ describe("the card", () => {
   });
 });
 
+describe("the code under a view", () => {
+  test("Configure view offers it, behind the menu the screenshot draws", () => {
+    const v = vault();
+    const html = basesCard(v.root, "", undefined, v.rows);
+    assert.ok(html.includes("bs-vmenu"), "the menu exists");
+    assert.ok(html.includes("Show the code"));
+  });
+
+  test("the query on the card is the file on disk, verbatim", () => {
+    const v = vault();
+    const html = basesCard(v.root, "", undefined, v.rows);
+    assert.ok(html.includes("bs-code-text"), "the query is editable");
+    assert.ok(html.includes("Everything"), "the view name is in it");
+    assert.ok(html.includes("price / age &gt; 2"), "the raw filter is in it, escaped");
+  });
+
+  test("it names the file it is editing", () => {
+    const v = vault();
+    assert.match(basesCard(v.root, "", undefined, v.rows), /bs-code-path">v\.base</);
+  });
+
+  // The point of the panel: a control writes YAML, and the YAML is on screen.
+  test("a control's write shows in the query text on the next draw", () => {
+    const v = vault();
+    const before = basesCard(v.root, "", undefined, v.rows);
+    assert.ok(!/- price\n/.test(before));
+    toggleProperty(v.root, "v.base", "Everything", "price", true);
+    assert.match(basesCard(v.root, "", undefined, v.rows), /- price/);
+  });
+});
+
+describe("writing the query by hand", () => {
+  test("valid YAML replaces the file and the card renders it", () => {
+    const v = vault();
+    setSource(v.root, "v.base", "views:\n  - type: table\n    name: Mine\n    order:\n      - file.name\n");
+    const html = basesCard(v.root, "", undefined, v.rows);
+    assert.ok(html.includes("Mine"), "the hand-written view is the one drawn");
+    assert.ok(!html.includes("Everything"), "the old view is gone");
+  });
+
+  test("YAML that does not parse refuses and leaves the file alone", () => {
+    const v = vault();
+    const r = refusal(() => setSource(v.root, "v.base", "views:\n  - [unclosed\n"));
+    assert.match(r.expected, /parses as YAML/);
+    assert.ok(basesCard(v.root, "", undefined, v.rows).includes("Everything"), "the file is untouched");
+  });
+
+  test("a top level that is not a mapping refuses", () => {
+    const v = vault();
+    refusal(() => setSource(v.root, "v.base", "- one\n- two\n"));
+  });
+});
+
 describe("help is a detail, and the function list is generated", () => {
   test("no help button exists anywhere on the card", () => {
     const v = vault();
@@ -157,7 +247,7 @@ describe("help is a detail, and the function list is generated", () => {
   test("controls carry the topic they explain", () => {
     const v = vault();
     const html = basesCard(v.root, "", undefined, v.rows);
-    for (const topic of ["sort", "filter", "properties", "search", "views", "expression", "formulas"]) {
+    for (const topic of ["sort", "filter", "properties", "search", "views", "expression"]) {
       assert.ok(html.includes(`data-help="${topic}"`), topic);
     }
   });

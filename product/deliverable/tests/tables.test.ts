@@ -17,11 +17,11 @@ import { Rejection } from "../engine/errors.ts";
 import { readKeys } from "../engine/frontmatter.ts";
 import { seDir } from "../engine/paths.ts";
 import { Session } from "../engine/session.ts";
-import { editCell, listBases, loadBase, matches, parseBase, readVault, renderView, selectRows, TABLE_SCRIPT, tableWidget, unreadableRows, type BaseView, type Row } from "../engine/tables.ts";
+import { editCell, listBases, loadBase, matches, parseBase, readVault, renderView, selectRows, TABLE_SCRIPT, unreadableRows, type BaseView, type Row } from "../engine/tables.ts";
 import { freshRoot } from "./helpers.ts";
 
 const REPO_ROOT = fileURLToPath(new URL("../../..", import.meta.url));
-const RIGOR = `${REPO_ROOT}/product/deliverable/machines/rigor_matrix/matrix.base`;
+const RIGOR = `${REPO_ROOT}/product/deliverable/tests/fixtures/rigor-matrix.base`;
 
 const ROWS: Row[] = [
   { kind: "matrix-row", state_kind: "work", patch: "none", depends_on: ["a", "b"], file: { name: "one" } },
@@ -171,7 +171,7 @@ describe("the vault", { concurrency: true }, () => {
   // labels, so a 50x49 grid was drawn with no diagonal anywhere in it.
   test("the dependency pivot crosses ONE vocabulary with itself", () => {
     const rows = readVault(REPO_ROOT);
-    const spec = loadBase(`${REPO_ROOT}/product/deliverable/machines/rigor_matrix/depends.base`);
+    const spec = loadBase(`${REPO_ROOT}/product/deliverable/tests/fixtures/depends.base`);
     const waits = spec.views[0];
     const r = renderView(spec, waits, rows);
     const labels = [...r.html.matchAll(/pv-row">([^<]+)</g)].map((m) => m[1]);
@@ -186,7 +186,7 @@ describe("the vault", { concurrency: true }, () => {
   // cycles at all. The view declares the order; the renderer obeys it.
   test("the authored order is kept, so the matrix stays triangular", () => {
     const rows = readVault(REPO_ROOT);
-    const spec = loadBase(`${REPO_ROOT}/product/deliverable/machines/rigor_matrix/depends.base`);
+    const spec = loadBase(`${REPO_ROOT}/product/deliverable/tests/fixtures/depends.base`);
     const r = renderView(spec, spec.views[0], rows);
     const labels = [...r.html.matchAll(/pv-row">([^<]+)</g)].map((m) => m[1]);
     const at = new Map(labels.map((k, i) => [k, i]));
@@ -211,26 +211,22 @@ describe("the vault", { concurrency: true }, () => {
   test("every declared view in the vault draws", () => {
     const rows = readVault(REPO_ROOT);
     const bases = listBases(REPO_ROOT);
-    assert.ok(bases.length >= 2, "the vault ships more than one base file");
+    assert.ok(bases.length >= 1, "the vault ships a base file");
     for (const rel of bases) {
       const spec = loadBase(`${REPO_ROOT}/product/${rel}`);
       for (const v of spec.views) renderView(spec, v, rows);
     }
   });
 
-  test("the widget offers every view and shows exactly one", () => {
-    const html = tableWidget(REPO_ROOT, "");
-    const shown = [...html.matchAll(/<div class="tbl-view" data-view="([^"]+)"(?! hidden)/g)];
-    assert.equal(shown.length, 1, "one pane is visible and the rest are hidden");
-    const options = [...html.matchAll(/<option value=/g)];
-    assert.ok(options.length >= 9, `the picker lists every declared view — got ${options.length}`);
-  });
-
-  // Every pane renders on its own, so one view this renderer cannot draw shows
-  // its refusal in place instead of throwing the widget away. Today nothing in
-  // the vault refuses, and this is what says so out loud.
+  // One view this renderer cannot draw must show its refusal in place rather
+  // than taking the card down. Today nothing in the vault refuses, and this is
+  // what says so out loud. The card itself is covered in baseui.test.ts.
   test("no view the vault ships is beyond the renderer", () => {
-    assert.doesNotMatch(tableWidget(REPO_ROOT, ""), /tbl-refused/);
+    const rows = readVault(REPO_ROOT);
+    for (const rel of listBases(REPO_ROOT)) {
+      const spec = loadBase(`${REPO_ROOT}/product/${rel}`);
+      for (const v of spec.views) assert.doesNotMatch(renderView(spec, v, rows).html, /tbl-refused/);
+    }
   });
 });
 

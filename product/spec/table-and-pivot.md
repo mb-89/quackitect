@@ -63,7 +63,7 @@ None of the shipped views use them.
 
 ### The rigor matrix already renders
 
-`product/deliverable/machines/rigor_matrix/matrix.base` declares fourteen
+`product/deliverable/tests/fixtures/rigor-matrix.base` declares fourteen
 properties and five table views. All five draw. The first view returns all fifty
 rigor rows through the engine, verified by test today. Nothing needs writing for
 the rigor matrix. It needs only to be looked at.
@@ -465,7 +465,7 @@ only on the dominator tree".
 
 Fix the dependency matrix's axes. Three changes, one file each, useful alone.
 
-1. In `product/deliverable/machines/rigor_matrix/depends.base`, change
+1. In `product/deliverable/tests/fixtures/depends.base`, change
    `rows: file.name` to `rows: name`. The matrix gains a diagonal. Measured: 48
    shared labels instead of 0.
 2. In `product/deliverable/engine/tables.ts`, add an optional `order` to a pivot

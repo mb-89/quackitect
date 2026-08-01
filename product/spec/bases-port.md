@@ -299,7 +299,7 @@ Counts I verified myself with `git ls-tree`:
 
 ### matrix.base exists, and nothing reads it
 
-`product/deliverable/machines/rigor_matrix/matrix.base` is a real 95-line Bases file. I read it in full. It declares 14 properties with display names and five views, all of type `table`, all filtering `kind == "matrix-row"`. There is a second one for the voice matrix.
+`product/deliverable/tests/fixtures/rigor-matrix.base` is a real 95-line Bases file. I read it in full. It declares 14 properties with display names and five views, all of type `table`, all filtering `kind == "matrix-row"`. There is a second one for the voice matrix.
 
 Obsidian's Bases plugin is switched on in this repo's vault, at `product/.obsidian/core-plugins.json`.
 
@@ -313,7 +313,7 @@ Version 1's evaluator would refuse today's file as out-of-subset. The port start
 
 ### Two defects to fix while we are here
 
-- `product/deliverable/machines/voice_matrix/matrix.base` line 39 lists `- COMMENT` in its `order:` block. The property is declared and filtered as lowercase `comment` in the same file. The column will render empty. Both matrices' "Open review comments" views are currently dead anyway, because no row carries a `comment:` key yet. The bug is latent and will surface at the next review round.
+- `product/deliverable/tests/fixtures/voice-matrix.base` line 39 lists `- COMMENT` in its `order:` block. The property is declared and filtered as lowercase `comment` in the same file. The column will render empty. Both matrices' "Open review comments" views are currently dead anyway, because no row carries a `comment:` key yet. The bug is latent and will surface at the next review round.
 - `product/deliverable/machines/panels/controls.md` documents only three parameter types under its Types heading. The renderer handles five. The refusal message names five, and its remedy points the author at the section that names three.
 
 ### Is a Bases layer and the panel spec one idea or two

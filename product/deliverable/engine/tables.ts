@@ -87,7 +87,10 @@ export function loadBase(path: string): BaseSpec {
 // the same rule the palette follows.
 // ---------------------------------------------------------------------------
 
-const SKIP_DIRS = new Set(["node_modules", ".git", ".obsidian", ".se", ".worktrees"]);
+// `tests` holds fixture bases and fixture notes. They are inputs to the suite,
+// not vault content, and a fixture showing up as a view somebody can open is
+// the surface lying about what the vault contains.
+const SKIP_DIRS = new Set(["node_modules", ".git", ".obsidian", ".se", ".worktrees", "tests"]);
 
 export function vaultDir(root: string): string {
   return join(root, "product");
@@ -191,7 +194,7 @@ export function matches(filter: unknown, row: Row): boolean {
       clause: CLAUSES.REQUIRED_ARGS,
       expected: "a filter node the renderer knows: and, or, not, or an expression string",
       got: `keys ${Object.keys(o).join(", ")}`,
-      remedy: { tool: "se_file_read", args: { path: "product/deliverable/machines/rigor_matrix/matrix.base" }, note: "the implemented subset is documented at the head of engine/tables.ts" },
+      remedy: { tool: "se_file_read", args: { path: "product/deliverable/tests/fixtures/rigor-matrix.base" }, note: "the implemented subset is documented at the head of engine/tables.ts" },
       source: SRC,
     });
   }
@@ -518,53 +521,6 @@ export function editCell(root: string, edit: CellEdit): CellWritten {
   const value = coerce(readKeys(raw, edit.path)[edit.key], edit.text);
   writeFileSync(abs, setKeys(raw, { [edit.key]: value }, edit.path), "utf8");
   return { path: edit.path, key: edit.key, display: cellText(value), removed: value === undefined };
-}
-
-/** One declared view, rendered — or its refusal, shown rather than thrown. */
-function viewPane(spec: BaseSpec, view: BaseView, rows: Row[], id: string, shown: boolean): string {
-  let inner: string;
-  try {
-    inner = renderView(spec, view, rows).html;
-  } catch (err) {
-    // A REFUSAL IS THE ANSWER HERE, not a dead pane. One view this renderer
-    // cannot draw must not take the other eight down with it.
-    inner = `<div class="tbl-refused">this view cannot be drawn — ${esc(String((err as Error).message).split("\n")[0])}</div>`;
-  }
-  return `<div class="tbl-view" data-view="${esc(id)}"${shown ? "" : " hidden"}>${inner}</div>`;
-}
-
-/**
- * The table card: every view of every `.base` in the vault, with a picker.
- *
- * All of them render server-side and one is shown, rather than one rendering
- * per request. Nine views over 169 notes is a few milliseconds, and switching
- * with no round trip is what makes the picker worth having.
- */
-export function tableWidget(root: string, head: string, selected?: string): string {
-  const rows = readVault(root);
-  const damaged = unreadableRows(rows);
-  const declared: { id: string; label: string; spec: BaseSpec; view: BaseView }[] = [];
-  for (const rel of listBases(root)) {
-    const spec = loadBase(join(vaultDir(root), rel));
-    // A base named matrix.base is named by its FOLDER — there are two of
-    // them, and "matrix · The matrix" twice in a picker names nothing.
-    const stem = basename(rel, ".base");
-    const owner = stem === "matrix" ? basename(dirname(rel)) : stem;
-    for (const view of spec.views) {
-      declared.push({ id: `${rel}#${view.name}`, label: `${owner} · ${view.name}`, spec, view });
-    }
-  }
-  const want = declared.find((d) => d.id === selected)?.id ?? declared[0]?.id;
-  const opts = declared
-    .map((d) => `<option value="${esc(d.id)}"${d.id === want ? " selected" : ""}>${esc(d.label)}</option>`)
-    .join("");
-  const swap = "for (const v of this.closest('.widget').querySelectorAll('.tbl-view')) v.hidden = v.dataset.view !== this.value;";
-  const pick = declared.length === 0
-    ? '<span class="meta">no .base file in the vault</span>'
-    : `<select class="tbl-pick" onchange="${esc(swap)}">${opts}</select>`;
-  const bodies = declared.map((d) => viewPane(d.spec, d.view, rows, d.id, d.id === want)).join("");
-  const damage = damaged.length === 0 ? "" : `<div class="tbl-damage">${damaged.length} note${damaged.length === 1 ? "" : "s"} in the vault do not parse — ${esc(damaged[0])}</div>`;
-  return `<div class="widget" id="w-table"><div class="widget-head"><span>table</span>${pick}${head}</div><div class="widget-body tbl-body">${damage}${bodies}</div></div>`;
 }
 
 /**
