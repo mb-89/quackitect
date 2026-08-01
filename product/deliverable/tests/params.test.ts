@@ -40,13 +40,17 @@ describe("parameter panels", { concurrency: true }, () => {
   test("the shipped control bar is read from its spec, not from code", () => {
     const params = loadPanel(REPO_ROOT, "controls");
     assert.ok(params.length >= 4, "the panel declares its parameters");
-    assert.deepEqual(params.map((p) => p.type), ["rungs", "int", "int", "action", "text"]);
+    assert.deepEqual(params.map((p) => p.type), ["rungs", "int", "int", "action", "text", "toggles"]);
     const html = renderPanel(params, VALUES);
     assert.match(html, /class="rung on" data-level="0"/, "the lowest lit rung releases to blocked");
     assert.match(html, /id="narration-minutes"[^>]*value="5"/);
     assert.match(html, /id="narration-calls"[^>]*value="20"/);
     assert.match(html, /class="rung param-action" data-post="\/narration-now"/);
     assert.doesNotMatch(html, /type="range"/, "a spec cannot produce a slider");
+    // The shutdown row: two buttons that do not exclude each other, which is
+    // why it is `toggles` and not `choice`.
+    assert.match(html, /data-toggle="block-auto-sleep"/);
+    assert.match(html, /data-toggle="shutdown-at-idle"/);
   });
 
   // THE LOAD-BEARING GUARANTEE. Skipping an unknown type quietly would let a

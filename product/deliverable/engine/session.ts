@@ -367,11 +367,14 @@ export class Session {
   private assertGateReport(gateId: string, s: StateDecl, channel: Channel): void {
     const rel = this.gateReportRel(gateId);
     const abs = join(this.bound!.path, rel);
-    const REVIEW_TAIL: readonly { name: string; hint: string }[] = [
-      { name: "verify", hint: "did each input deliver against its referent?" },
-      { name: "validate", hint: "does the milestone meet the frame and the vision?" },
-      { name: "red_team", hint: "argue the opposing case; a significant decision carries a kill criterion" },
-    ];
+    // THE ROUNDS ARE NOT WRITTEN TWICE. compileMachine appends STANDARD_ROUNDS
+    // (verify_round, validate_round, redteam_round, verdict) to every gate's
+    // evidence_form — machines/compile.ts, the `kind === "gate"` clause — so
+    // the scaffold below already emits them once, with the fuller v1-derived
+    // wording. A second REVIEW_TAIL stood here and emitted verify/validate/
+    // red_team AGAIN: seven round sections, three of them the same round under
+    // a shorter name, every one of them required non-empty. Nobody ever hit it
+    // because no gate report has ever been written.
     if (!existsSync(abs)) {
       const scaffold = [
         "---",
@@ -385,7 +388,6 @@ export class Session {
         `# ${gateId} — milestone review`,
         "",
         ...s.evidence_form.flatMap((f) => [`## ${f.name}`, "", `<!-- ${f.description}${f.required ? "" : " (optional)"} -->`, ""]),
-        ...REVIEW_TAIL.flatMap((t) => [`## ${t.name}`, "", `<!-- ${t.hint} -->`, ""]),
       ].join("\n");
       throw new Rejection({
         clause: CLAUSES.CONDITION_UNMET,
@@ -413,9 +415,6 @@ export class Session {
     const filledText = (name: string): string => section(note.body, name).replace(/<!--[\s\S]*?-->/g, "").trim();
     for (const f of s.evidence_form) {
       if (f.required && filledText(f.name) === "") problems.push(`${f.name} is empty`);
-    }
-    for (const t of REVIEW_TAIL) {
-      if (filledText(t.name) === "") problems.push(`${t.name} is empty`);
     }
     if (note.frontmatter.status !== "done") problems.push("status is not done");
     const verdict = typeof note.frontmatter.verdict === "string" ? note.frontmatter.verdict.trim().toUpperCase() : "";
@@ -516,6 +515,52 @@ export class Session {
     });
   }
 
+  /**
+   * EMERGENCY — the tool gate lifted, everywhere.
+   *
+   * The gate exists so a state holds the tools its work needs and no more.
+   * That is right while the machine is sound, and exactly wrong in the two
+   * cases this is for:
+   *
+   * - REPAIR. When the engine is broken, the gate stands between you and the
+   *   fix. The guard becomes the fault.
+   * - BUILDING THE LANE WHILE WALKING IT. The first product iteration writes
+   *   the machinery it is walking through, in states whose tool lists were
+   *   authored before that machinery existed.
+   *
+   * IT ARMS ONLY FROM THE TOP RUNG, and it drops the moment the rung does.
+   * That is the whole safety story: emergency cannot outlive the delegation
+   * it was granted under, and the person lowering the autonomy is the same
+   * gesture as revoking it.
+   *
+   * IT IS NOT ADVERTISED. It rides the packet only when it is ON, so nothing
+   * about the resting state hints that it exists.
+   *
+   * IT DOES NOT PERSIST. A new engine life starts without it. An emergency
+   * that survives a restart unannounced is a gate quietly missing.
+   */
+  private _emergency = false;
+
+  get emergency(): boolean {
+    return this._emergency;
+  }
+
+  setEmergency(on: boolean): Record<string, unknown> {
+    if (on && this._autonomy < 1) {
+      throw new Rejection({
+        clause: CLAUSES.ABOVE_THRESHOLD,
+        expected: "the autonomy at its top rung before emergency arms — it is a step past full delegation, never a way around it",
+        got: `autonomy ${this._autonomy}`,
+        remedy: { tool: "se_tick", args: {}, note: "raise the autonomy to the top rung first" },
+        source: "engine/session.ts emergency",
+      });
+    }
+    const was = this._emergency;
+    this._emergency = on;
+    this.notifyChange();
+    return { emergency: on, was };
+  }
+
   setAutonomy(value: number): Record<string, unknown> {
     if (typeof value !== "number" || Number.isNaN(value) || value < 0 || value > 1) {
       throw new Rejection({
@@ -528,9 +573,12 @@ export class Session {
     }
     const was = this._autonomy;
     this._autonomy = value;
+    // Emergency cannot outlive the rung it was granted under. Lowering the
+    // autonomy IS revoking it, so there is no second control to remember.
+    if (value < 1) this._emergency = false;
     this.persistSettings();
     this.notifyChange(); // a holding agent wakes and re-reads the packet
-    return { autonomy: value, was };
+    return { autonomy: value, was, ...(this._emergency ? { emergency: true } : {}) };
   }
 
   /** The autonomy gate: an AGENT tick may enter a state only when its
@@ -1500,6 +1548,9 @@ export class Session {
   /** THE STATE GATE — a dispatch guard, throws the typed refusal. */
   gate(tool: string): void {
     if (ALWAYS_LEGAL.has(tool)) return;
+    // EMERGENCY OPENS EVERY DOOR, including on a closed machine — a machine
+    // that will not move is precisely when the repair is needed.
+    if (this._emergency) return;
     if (this.instance.status === "closed") {
       throw new Rejection({
         clause: CLAUSES.NOT_LEGAL_IN_STATE,
@@ -2390,6 +2441,8 @@ export class Session {
       ...(this.bound !== undefined ? { expedition: this.bound.id } : {}),
       status: this.instance.status,
       autonomy: this._autonomy,
+      // Only when ON. Nothing about the resting packet hints that it exists.
+      ...(this._emergency ? { emergency: true } : {}),
       power: this.power,
       narration: { minutes: this._narrationMinutes, calls: this._narrationCalls },
       // WHERE THIS IS HEADED. Carried on every packet so neither hand has
@@ -2742,9 +2795,10 @@ export class Session {
       ...(this.inSub() ? { submachine: { id: this.top()!.decl.id, active: activeStates(this.top()!.instance) } } : {}),
       status: this.instance.status,
       autonomy: this._autonomy,
+      ...(this._emergency ? { emergency: true } : {}),
       power: this.power,
       narration: { minutes: this._narrationMinutes, calls: this._narrationCalls },
-      legal_tools: all ? "all" : [...ALWAYS_LEGAL, ...tools],
+      legal_tools: this._emergency ? "all" : all ? "all" : [...ALWAYS_LEGAL, ...tools],
       history: this.instance.history.slice(-10),
     };
   }

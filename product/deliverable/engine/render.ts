@@ -527,6 +527,9 @@ const STYLE = `
      the one rung drawn as a hazard rather than as a setting. */
   .rung.danger.on { background: var(--se-over); border-color: var(--se-over); color: var(--se-bg); }
   .rung.danger:not(.locked):not(.on) { color: var(--se-fail); border-color: var(--se-fail); }
+.rung.emergency, .rung.danger.on.emergency { background: var(--se-fail); border-color: var(--se-fail); color: var(--se-bg); animation: se-emergency 1.1s ease-in-out infinite; }
+@keyframes se-emergency { 0%, 100% { opacity: 1; } 50% { opacity: 0.45; } }
+@media (prefers-reduced-motion: reduce) { .rung.emergency { animation: none; outline: 2px solid var(--se-fail); outline-offset: 1px; } }
   /* Line edits, integers only. Narrow on purpose — the row is dense and a
      cadence is never more than a few digits. */
   .cadence { width: 3.2em; flex: 0 0 auto; box-sizing: content-box; font: inherit; font-size: 11px; padding: 2px 4px; margin-left: 6px; background: var(--se-bg); border: 1px solid var(--se-border); border-radius: 4px; color: var(--se-fg); text-align: right; }
@@ -2064,6 +2067,8 @@ document.addEventListener("click", (ev) => {
   if (nh) { nrHelp(); return; }
   const th = ev.target.closest ? ev.target.closest(".thr-help") : null;
   if (th) { levelHelp(Number((document.getElementById("thr") || {}).value)); return; }
+  // The drumroll's memory lives on window, because the bar it is counting
+  // clicks on is replaced by every poll.
   const n = ev.target.closest ? ev.target.closest(".rung[data-level]") : null;
   if (n) {
     // THE HELP FOLLOWS THE RUNG PRESSED. data-level is only where the click
@@ -2073,6 +2078,24 @@ document.addEventListener("click", (ev) => {
     // A locked rung still ANSWERS — it explains itself in details rather
     // than doing nothing, because a dead click reads as a broken button.
     if (n.classList.contains("locked")) { levelHelp(rung); return; }
+    // THE HIDDEN RUNG. Five presses on the lit top rung inside three seconds
+    // arm emergency. A drumroll rather than a button, because it is for
+    // repair and nothing should reach it by accident. A single press still
+    // releases the rung exactly as before, so the ordinary affordance is
+    // untouched and nothing on screen says this exists.
+    if (rung >= 1 && n.classList.contains("on")) {
+      const now = Date.now();
+      if (now - (window.__seTopPressAt || 0) > 3000) window.__seTopPresses = 0;
+      window.__seTopPressAt = now;
+      window.__seTopPresses = (window.__seTopPresses || 0) + 1;
+      if (window.__seTopPresses >= 5) {
+        window.__seTopPresses = 0;
+        n.classList.add("emergency");
+        n.textContent = "E";
+        void fetch("/emergency", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ on: true }) });
+        return;
+      }
+    }
     const v = Number(n.dataset.level);
     // PAINT FIRST, THEN TELL THE ENGINE. The bar redraws on the next poll,
     // and waiting for that is seconds of a button that looks dead.
@@ -2192,6 +2215,15 @@ es.addEventListener("message", (ev) => {
   try { a = JSON.parse(ev.data); } catch (e) { return; }
   if (a.status === "closed") { sessionOver("the machine reached end — the walk is complete"); return; }
   if (a.gone) { sessionOver("the console quit — the server has stopped, the walk was left standing"); return; }
+  // Emergency is drawn from the engine, so a second surface cannot disagree
+  // with it about whether the gate is lifted.
+  for (const b of document.querySelectorAll("button.rung[data-rung]")) {
+    if (Number(b.dataset.rung) < 1) continue;
+    const armed = a.emergency === true;
+    b.classList.toggle("emergency", armed);
+    if (armed) b.textContent = "E";
+    else if (b.textContent === "E") b.textContent = "I";
+  }
   if (thr && document.activeElement !== thr && Number(thr.value) !== a.autonomy) {
     thr.value = a.autonomy;
     const lbl = document.getElementById("thr-val");

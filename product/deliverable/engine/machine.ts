@@ -38,6 +38,46 @@ export interface EvidenceField {
   guidance?: string;
 }
 
+/**
+ * THE STANDARD REVIEW ROUNDS — ported from v2, which ported them from v1's
+ * milestone-review guide. Every gate carries these in addition to its own
+ * acceptance items, and THE COMPILER adds them so that no row author can
+ * forget one.
+ *
+ * They live HERE, in the schema, because there are TWO compilers and a
+ * constant owned by one of them reaches only half the gates. That is not
+ * hypothetical: this list sat in machines/compile.ts and was appended on the
+ * canvas path alone, so the ten gates a real iteration walks carried none of
+ * it — the same shape as the failure v2 recorded, where the rounds were
+ * doctrine from the day they were written, no evidence form ever collected
+ * them, and consequently NOT ONE was filled in any gate of any iteration.
+ */
+export const STANDARD_ROUNDS: EvidenceField[] = [
+  {
+    name: "verify_round",
+    description:
+      "BUILT IT RIGHT: every input state since the last gate, its evidence read against its claim. Open what the evidence points at rather than trusting its description of itself — a bless is not proof.",
+    required: true,
+  },
+  {
+    name: "validate_round",
+    description:
+      "BUILT THE RIGHT THING: against the frame and the goal, not merely this step's own plan. List what is missing, wrong or out of scope.",
+    required: true,
+  },
+  {
+    name: "redteam_round",
+    description:
+      "ARGUE THE OPPOSING CASE BEFORE ENDORSING. Cite a rubric, never vibes. Name the KILL-CRITERION: what would have to be true for this to be the wrong call, then look for it. An override is logged WITH its dissent, never as a clean pass.",
+    required: true,
+  },
+  {
+    name: "verdict",
+    description: "PASS, PASS WITH NOTED OVERRIDES, or REOPEN with the named states and reasons. No silent pass.",
+    required: true,
+  },
+];
+
 export interface EdgeDecl {
   to: string;
   role: EdgeRole;
