@@ -15,10 +15,27 @@
 
 export type EdgeRole = "normal" | "alternative" | "fallback" | "recovery" | "approval" | "error";
 
+/**
+ * WHAT A FIELD IS, not only what it is called.
+ *
+ * Every field was prose, and "filled" meant the text was not empty, so a
+ * single full stop satisfied every required field in the system. A type lets
+ * the engine check the SHAPE rather than the length.
+ *
+ * `derived` is the one that changes who answers: the engine computes it and
+ * refuses a hand-written value, because those are exactly the claims an agent
+ * would fabricate — they sound like work and cost nothing to assert.
+ */
+export type EvidenceType = "claim" | "table" | "prose" | "list" | "verdict" | "files" | "derived" | "matrix" | "run_ref";
+
 export interface EvidenceField {
   name: string;
   description: string;
   required: boolean;
+  /** What shape the answer takes. Absent means prose, where every field began. */
+  type?: EvidenceType;
+  /** One or two lines telling whoever fills it what belongs in it. */
+  guidance?: string;
 }
 
 export interface EdgeDecl {

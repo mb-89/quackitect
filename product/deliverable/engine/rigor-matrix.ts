@@ -11,9 +11,11 @@ import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { CLAUSES, Rejection } from "./errors.ts";
 import { parseStateNote, section } from "./notes.ts";
-import { validateMachine, type EdgeDecl, type EvidenceField, type MachineDecl, type StateDecl } from "./machine.ts";
+import { validateMachine, type EdgeDecl, type EvidenceField, type EvidenceType, type MachineDecl, type StateDecl } from "./machine.ts";
 
 const SRC = "engine/rigor-matrix.ts";
+
+export const EVIDENCE_TYPES: EvidenceType[] = ["claim", "table", "prose", "list", "verdict", "files", "derived", "matrix", "run_ref"];
 
 // specification is not a rigor level: it says how a step's output becomes
 // documentation. It is read and validated like any column, never pinned.
@@ -86,10 +88,18 @@ function parseEvidence(fm: Record<string, unknown>, file: string, body: string):
     if (typeof f.name !== "string" || f.name.trim() === "") {
       throw new Error(`matrix row ${file} evidence entry ${i + 1} declares no name`);
     }
+    // An UNKNOWN type refuses rather than falling back to prose. A row that
+    // says `type: tabel` would otherwise be checked as free text forever,
+    // which is the quiet-divergence failure this repository refuses everywhere.
+    if (f.type !== undefined && !EVIDENCE_TYPES.includes(String(f.type) as EvidenceType)) {
+      throw new Error(`matrix row ${file} field ${f.name}: unknown evidence type "${String(f.type)}" — one of ${EVIDENCE_TYPES.join(", ")}`);
+    }
     return {
       name: f.name,
       description: typeof f.description === "string" ? f.description : "",
       required: f.required !== false,
+      ...(f.type !== undefined ? { type: String(f.type) as EvidenceType } : {}),
+      ...(typeof f.guidance === "string" && f.guidance.trim() !== "" ? { guidance: f.guidance } : {}),
     };
   });
 }

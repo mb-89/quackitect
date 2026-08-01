@@ -20,3 +20,25 @@
 {"ts":"2026-08-01T17:08:47.131Z","op":"update","visit":"expeditions/e30@0","node":"d51","brief":"the shared matrix must not be mutated by a test"}
 {"ts":"2026-08-01T17:11:00.894Z","op":"done","visit":"expeditions/e30@0","node":"d43","brief":"the killer flag is deleted everywhere it was read"}
 {"ts":"2026-08-01T17:14:38.211Z","op":"obsolete","visit":"expeditions/e30@0","node":"d42","brief":"you ruled refusal only; the lint was my addition"}
+{"ts":"2026-08-01T17:14:48.336Z","op":"done","visit":"expeditions/e30@0","node":"d35","brief":"shutdown row committed with 18 tests behind it"}
+{"ts":"2026-08-01T17:19:16.321Z","op":"plan","visit":"expeditions/e30@0","parent":null,"nodes":[{"id":"d52","brief":"read all seven M7 rigor-matrix rows whole"},{"id":"d53","brief":"type every evidence field and write per-field guidance"},{"id":"d54","brief":"return the proposal via StructuredOutput"}]}
+{"ts":"2026-08-01T17:19:16.701Z","op":"plan","visit":"expeditions/e30@0","parent":null,"nodes":[{"id":"d55","brief":"Read all seven M1 rows in full"},{"id":"d56","brief":"Assign a type per evidence field, flagging derived candidates"},{"id":"d57","brief":"Write per-field filler guidance and return the proposal"}]}
+{"ts":"2026-08-01T17:19:27.836Z","op":"plan","visit":"expeditions/e30@0","parent":null,"nodes":[{"id":"d58","brief":"read the two M0 rows"},{"id":"d59","brief":"read the retro method and the type-vocabulary spec"},{"id":"d60","brief":"propose a type and guidance per evidence field"}]}
+{"ts":"2026-08-01T17:19:48.411Z","op":"plan","visit":"expeditions/e30@0","parent":null,"nodes":[{"id":"d61","brief":"read the four M6 rows"},{"id":"d62","brief":"check what the engine can compute for spike fields"},{"id":"d63","brief":"propose a type + guidance per evidence field"}]}
+{"ts":"2026-08-01T17:19:48.900Z","op":"plan","visit":"expeditions/e30@0","parent":null,"nodes":[{"id":"d64","brief":"read all five M9 rigor-matrix rows"},{"id":"d65","brief":"propose a type and guidance for every evidence field"}]}
+{"ts":"2026-08-01T17:19:49.292Z","op":"update","visit":"expeditions/e30@0","node":"d66","brief":"All seven M1 rows read whole; checking for a resident typed-evidence vocabulary"}
+{"ts":"2026-08-01T17:19:54.630Z","op":"update","visit":"expeditions/e30@0","node":"d67","brief":"Reading the resident type-vocabulary spec section before assigning types"}
+{"ts":"2026-08-01T17:19:58.376Z","op":"fork","visit":"expeditions/e30@0","parent":"d56","node":"d68","brief":"M5 rows: type + guidance per evidence field","nodes":[{"id":"d69","brief":"read the six M5 rows"},{"id":"d70","brief":"read the decision-matrix form"},{"id":"d71","brief":"propose type + guidance per field"}]}
+{"ts":"2026-08-01T17:20:06.174Z","op":"update","visit":"expeditions/e30@0","node":"d72","brief":"checking if the dependency list is an engine-known database"}
+{"ts":"2026-08-01T17:20:23.491Z","op":"done","visit":"expeditions/e30@0","node":"d70","brief":"decision-matrix form read; found the type-vocabulary spec"}
+{"ts":"2026-08-01T17:20:34.276Z","op":"update","visit":"expeditions/e30@0","node":"d73","brief":"checking for an existing typed-evidence convention before proposing types"}
+{"ts":"2026-08-01T17:20:44.932Z","op":"update","visit":"expeditions/e30@0","node":"d74","brief":"reading the evidence-type spec section to align the vocabulary"}
+{"ts":"2026-08-01T17:21:17.855Z","op":"update","visit":"expeditions/e30@0","node":"d75","brief":"one re-walk joins the demand diff to reopenStates"}
+{"ts":"2026-08-01T17:21:54.477Z","op":"update","visit":"expeditions/e30@0","node":"d76","brief":"the packet carries what the step will ask for"}
+{"ts":"2026-08-01T17:22:04.523Z","op":"done","visit":"expeditions/e30@0","node":"d59","brief":"background reading finished"}
+{"ts":"2026-08-01T17:22:41.556Z","op":"done","visit":"expeditions/e30@0","node":"d69","brief":"all six M5 rows read whole, frontmatter and body"}
+{"ts":"2026-08-01T17:22:57.898Z","op":"done","visit":"expeditions/e30@0","node":"d45","brief":"the packet carries what the step will ask for"}
+{"ts":"2026-08-01T17:23:03.968Z","op":"done","visit":"expeditions/e30@0","node":"d71","brief":"all fourteen M5 evidence fields typed with per-field guidance written"}
+{"ts":"2026-08-01T17:25:12.413Z","op":"update","visit":"expeditions/e30@0","node":"d77","brief":"the parser reads type and guidance, refusing an unknown type"}
+{"ts":"2026-08-01T17:26:40.804Z","op":"update","visit":"expeditions/e30@0","node":"d78","brief":"the front already outranks major; locking it with a test"}
+{"ts":"2026-08-01T17:27:13.063Z","op":"done","visit":"expeditions/e30@0","node":"d44","brief":"one re-walk joins the demand diff to reopenStates"}

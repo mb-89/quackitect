@@ -676,7 +676,41 @@ export class Session {
         // an unreadable pin falls through and is re-pinned
       }
     }
-    pinIteration(this.root, it, size);
+    const pin = pinIteration(this.root, it, size);
+    this.rewalk(pin, `escalated to ${size}`);
+  }
+
+  /**
+   * THE RE-WALK. One mechanism, several triggers.
+   *
+   * Escalating an iteration, leaving it and coming back, and reworking it
+   * after the matrix changed are the SAME act: walk it again and check whether
+   * any evidence still answers what is now asked. So there is no
+   * escalation-specific ledger — there is a demand diff, and this.
+   *
+   * A demand is what a step ASKS FOR: how far it applies, plus its evidence
+   * spec. pinIteration computes which steps' demands moved; reopenStates is
+   * what acts on that. The two existed and nothing joined them, so the list
+   * was written into the pin and read by nobody, and an escalation kept every
+   * step it had already passed.
+   *
+   * PRIOR FILLS ARE SUPERSEDED, NEVER DELETED. reopenStates keeps them on
+   * disk and in the history, so a reader sees what was claimed the first time
+   * and that it was re-earned.
+   */
+  private rewalk(pin: Record<string, unknown>, reason: string): { reopened: string[]; cone: string[] } | undefined {
+    const owed = Array.isArray(pin.reopened) ? (pin.reopened as unknown[]).map(String) : [];
+    if (owed.length === 0) return undefined;
+    const run = this.top();
+    if (run === undefined) return undefined;
+    // A step whose demand moved but which this column does not declare has
+    // nothing to reopen. Filtering beats refusing: the pin spans sizes, the
+    // compiled machine is one of them.
+    const known = owed.filter((id) => run.decl.states.some((s) => s.id === id));
+    if (known.length === 0) return undefined;
+    const { reopened, cone } = reopenStates(run.decl, run.instance, known, reason, new Date().toISOString());
+    this.notifyChange();
+    return { reopened, cone };
   }
 
   expeditionList(): Record<string, unknown> {
@@ -2312,6 +2346,15 @@ export class Session {
         ...(s.entry !== undefined ? { entry: this.conditionStatus(machine, s, "enter") } : {}),
         ...(s.exit !== undefined ? { exit: this.conditionStatus(machine, s, "leave") } : {}),
         exit_met: this.conditionMet(machine, s, "leave"),
+        // WHAT THIS STEP WILL ASK FOR. Without it an agent walked a step
+        // never having been told what evidence it wanted, and found out only
+        // when a gate refused. Seventy of the hundred and twenty-two fields
+        // reached nobody at all, because only gate rows were ever checked.
+        //
+        // A DERIVED FIELD IS NOT IN THE FORM. The engine computes those and
+        // speaks only if they fail, so asking for one would be asking for an
+        // answer that is not the agent's to give.
+        ...(s.evidence_form.length > 0 ? { evidence_form: s.evidence_form.filter((f) => f.type !== "derived") } : {}),
         // The agent's packet names the pulled docs but NEVER their hashes —
         // the hash is the proof-of-read, obtainable only via se_file_read.
         pulled: this.pulled(machine, s).map((p) => ({ path: p.path, sources: p.sources })),
@@ -2499,6 +2542,7 @@ export class Session {
       ...(s.entry !== undefined ? { entry: this.conditionStatus(home, s, "enter") } : {}),
       ...(s.exit !== undefined ? { exit: this.conditionStatus(home, s, "leave") } : {}),
       exit_met: this.conditionMet(home, s, "leave"),
+      ...(s.evidence_form.length > 0 ? { evidence_form: s.evidence_form.filter((f) => f.type !== "derived") } : {}),
       pulled: this.pulled(home, s).map((p) => ({ path: p.path, sources: p.sources })),
       lookahead_read: this.lookaheadRequirements(home, s),
       ...(s.submachine !== undefined ? { submachine: s.submachine } : {}),
