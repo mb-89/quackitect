@@ -20,10 +20,11 @@ import { loadCanvas, subLabel, type CanvasData, type CanvasElement } from "./can
 import { CallLog, type CallRecord } from "./calllog.ts";
 import { type StrayNote } from "./inbox.ts";
 import { loadLevels } from "./scale.ts";
+import { loadPanel, renderPanel } from "./params.ts";
 import { mainMachinePath, Session } from "./session.ts";
+import { TABLE_SCRIPT, TABLE_STYLE, tableWidget } from "./tables.ts";
 import { compileMachineCached, resolveRef } from "./machines/compile.ts";
 import { type MachineDecl } from "./machine.ts";
-import { NARRATION_LEVELS } from "./toll.ts";
 
 function esc(s: string): string {
   return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
@@ -52,25 +53,33 @@ function sidePoint(el: CanvasElement, side: string | undefined, other: CanvasEle
   }
 }
 
-/** THE FEED PALETTE — one colour per role, none shared (owner ruling
- *  2026-07-28). The aq kind wore the agent's blue and the update kind wore
- *  the human's amber, so two of the three columns said the same thing twice.
+/** THE FEED ROLES — one colour per role, none shared. The aq kind wore the
+ *  agent's blue and the update kind wore the human's amber, so two of the
+ *  three columns said the same thing twice.
  *
- *  Green, red and amber are RESERVED by the voice for pass, failure and
- *  attention, so no role may take them — a kind painted amber reads as a
- *  verdict. Data, not scattered literals, and a test holds it true. */
-export const FEED_COLOURS: Record<string, string> = {
-  time: "#566068",
-  "src-agent": "#6fb3a8",
-  "src-human": "#e0834a",
-  "kind-call": "#8a97a3",
-  "kind-update": "#7cc4e8",
-  "kind-note": "#c58fe8",
-  "kind-aq": "#f0879a",
-};
+ *  The NAMES live here because the code asks for them. The VALUES live in
+ *  product/palette.css, because a colour is configuration. */
+export const FEED_ROLES = ["time", "src-agent", "src-human", "kind-call", "kind-update", "kind-note", "kind-aq"] as const;
 
 /** What the voice already spent: pass, failure, attention. */
-export const RESERVED_COLOURS: string[] = ["#4a7a55", "#e86a5f", "#e8b339"];
+export const RESERVED_ROLES = ["ok", "fail", "warn"] as const;
+
+/** Every `--name: value` pair declared in the palette, read live. */
+export function paletteVars(root: string): Record<string, string> {
+  const out: Record<string, string> = {};
+  for (const m of palette(root).matchAll(/(--[a-z0-9-]+)\s*:\s*([^;}]+)/gi)) out[m[1].trim()] = m[2].trim();
+  return out;
+}
+
+export function feedColours(root: string): Record<string, string> {
+  const vars = paletteVars(root);
+  return Object.fromEntries(FEED_ROLES.map((r) => [r, vars[`--se-feed-${r}`] ?? ""]));
+}
+
+export function reservedColours(root: string): string[] {
+  const vars = paletteVars(root);
+  return RESERVED_ROLES.map((r) => vars[`--se-${r}`] ?? "");
+}
 
 export interface StateMeta {
   has_exit: boolean;
@@ -513,7 +522,28 @@ const STYLE = `
   .crumb-menu { display: none; position: absolute; top: 18px; left: 0; z-index: 10; background: var(--se-raised); border: 1px solid var(--se-border-strong); border-radius: 8px; min-width: 160px; padding: 4px; }
   .crumb-arrow.open .crumb-menu { display: block; }
   .crumb-menu a { display: block; padding: 6px 10px; border-radius: 6px; }
-  .crumb-menu a:hover { background: #2a3138; }
+  .crumb-menu a:hover { background: var(--se-hover); }
+  /* THE RUNGS. Dense on purpose (owner sketch): the row reads as one control,
+     so the buttons touch and only the lit ones carry weight. */
+  .rungbar .rungs { display: inline-flex; gap: 1px; margin: 0 6px; }
+  .rung { font: inherit; font-size: 11px; line-height: 1; padding: 3px 7px; border: 1px solid var(--se-border); background: var(--se-bg); color: var(--se-dim); cursor: pointer; }
+  .rung:first-child { border-radius: 4px 0 0 4px; }
+  .rung:last-child { border-radius: 0 4px 4px 0; }
+  .rung.on { background: var(--se-accent-bg); color: var(--se-accent); border-color: var(--se-accent); font-weight: 700; }
+  .rung.locked { color: var(--se-border-strong); cursor: default; }
+  /* Ideation is the one rung that delegates the CREATION of work, so it is
+     the one rung drawn as a hazard rather than as a setting. */
+  .rung.danger.on { background: var(--se-over); border-color: var(--se-over); color: var(--se-bg); }
+  .rung.danger:not(.locked):not(.on) { color: var(--se-fail); border-color: var(--se-fail); }
+  /* Line edits, integers only. Narrow on purpose — the row is dense and a
+     cadence is never more than a few digits. */
+  .cadence { width: 3.2em; flex: 0 0 auto; box-sizing: content-box; font: inherit; font-size: 11px; padding: 2px 4px; margin-left: 6px; background: var(--se-bg); border: 1px solid var(--se-border); border-radius: 4px; color: var(--se-fg); text-align: right; }
+  .rungbar { display: inline-flex; align-items: center; flex: 0 0 auto; gap: 0; }
+  .param-label { color: var(--se-muted); font-size: 12px; margin-left: 12px; margin-right: 2px; cursor: pointer; }
+  .param-label:first-child { margin-left: 0; }
+  .param-action { margin-left: 10px; border-radius: 4px; }
+  .cadence-unit { font-size: 10px; color: var(--se-dim); margin-left: 3px; }
+  .nr-now { margin-left: 8px; border-radius: 4px; }
   .widget { display: flex; flex-direction: column; border: 1px solid var(--se-border); border-radius: 10px; background: var(--se-bg-side); min-height: 0; }
   .widget-head { display: flex; align-items: center; justify-content: space-between; padding: 6px 12px; border-bottom: 1px solid var(--se-border); color: var(--se-muted); font-size: 12px; text-transform: uppercase; letter-spacing: .08em; }
   .widget-body { flex: 1; min-height: 0; overflow: auto; }
@@ -556,7 +586,7 @@ const STYLE = `
   button.ghost:disabled { opacity: .45; cursor: default; }
   /* THE BLUE LINE. Blue on purpose: the voice reserves green, red and
      yellow for verdicts, and a route is not a verdict. It is a way. */
-  .route-line { fill: none; stroke: #4a90d9; stroke-width: 6; stroke-linecap: round; stroke-linejoin: round; }
+  .route-line { fill: none; stroke: var(--se-walk); stroke-width: 6; stroke-linecap: round; stroke-linejoin: round; }
   /* Past a closure the way is FADED, never hidden: it exists, it is shut.
      The barrier itself is yellow, because yellow is attention and a shut
      road wants the reader's hand on the slider. */
@@ -565,9 +595,9 @@ const STYLE = `
   .route-shut .shut-ring { fill: var(--se-bg); }
   .route-shut .shut-bang { stroke-width: 3; stroke-linecap: round; }
   .route-shut .shut-dot { fill: var(--se-warn); stroke: none; }
-  .route-stop { fill: #4a90d9; stroke: #9ecbf2; stroke-width: 2; }
+  .route-stop { fill: var(--se-walk); stroke: var(--se-walk-ring); stroke-width: 2; }
   .route-stop.shut { opacity: .28; }
-  .route-here { fill: #4a90d9; stroke: #9ecbf2; stroke-width: 2; }
+  .route-here { fill: var(--se-walk); stroke: var(--se-walk-ring); stroke-width: 2; }
   .guard { fill: var(--se-accent); font-size: 20px; text-anchor: middle; }
   .comment { fill: var(--se-bg-side); stroke: var(--se-border); }
   .group { fill: var(--se-bg-side); stroke: var(--se-border); stroke-dasharray: 10 6; stroke-width: 2; }
@@ -585,7 +615,7 @@ const STYLE = `
   table.kv td.k { color: var(--se-accent); white-space: nowrap; width: 1%; }
   table.kv td.v { color: var(--se-fg); word-break: break-word; }
   table.kv table.kv { margin: 2px 0; }
-  .vnull { color: var(--se-muted); } .vnum { color: #7cc4e8; } .vbool { color: #c58fe8; } .vstr { color: #a8c88f; }
+  .vnull { color: var(--se-muted); } .vnum { color: var(--se-val-num); } .vbool { color: var(--se-val-bool); } .vstr { color: var(--se-val-str); }
   .prewrap { white-space: pre-wrap; }
   td.btncell { text-align: center; vertical-align: middle !important; width: 1%; }
   button.go.locked { background: var(--se-border); color: var(--se-dim); cursor: not-allowed; }
@@ -594,12 +624,12 @@ const STYLE = `
   .cond.met circle { fill: var(--se-ok-bg); stroke: var(--se-ok); }
   .cond-label { font-size: 20px; text-anchor: middle; fill: var(--se-fg); pointer-events: none; }
   .doclist a { display: block; padding: 4px 0; }
-  a.doclink { color: #7cc4e8; cursor: pointer; text-decoration: underline; }
+  a.doclink { color: var(--se-link); cursor: pointer; text-decoration: underline; }
   .docview { font-size: 13.5px; line-height: 1.55; }
   .docview h1, .docview h2, .docview h3 { color: var(--se-accent); }
   .docview code { background: var(--se-raised); padding: 1px 5px; border-radius: 4px; }
   .docview pre { background: var(--se-bg); border: 1px solid var(--se-border); border-radius: 8px; padding: 10px; overflow: auto; }
-  .docview a { color: #7cc4e8; }
+  .docview a { color: var(--se-link); }
   button.ghost { background: var(--se-raised); color: var(--se-fg); border: 1px solid var(--se-border-strong); border-radius: 8px; padding: 6px 12px; font: inherit; cursor: pointer; }
   #w-details { flex: 1; border-radius: 0; border: 0; }
   .docheck { accent-color: var(--se-accent); cursor: pointer; }
@@ -619,7 +649,7 @@ const STYLE = `
   vscode-icon.ok { color: var(--vscode-testing-iconPassed, #4a7a55); }
   vscode-icon.no { color: var(--se-muted); }
   .threshold { display: flex; align-items: center; gap: 8px; color: var(--se-muted); font-size: 12px; text-transform: none; letter-spacing: 0; }
-  .threshold input { accent-color: var(--se-accent); width: 140px; }
+
   #thr-val { color: var(--se-accent); min-width: 4ch; }
   .thr-help { cursor: pointer; }
   .thr-help:hover { color: var(--se-accent); }
@@ -635,15 +665,15 @@ const STYLE = `
   .log-panel { font-size: 12px; margin-top: 6px; }
   .logrow { display: flex; gap: 8px; padding: 2px 0; cursor: pointer; border-bottom: 1px dotted var(--se-raised); align-items: baseline; }
   .logrow:hover { background: var(--se-raised); }
-  .logrow .lt { color: ${FEED_COLOURS.time}; flex: 0 0 auto; }
-  .logrow .lsrc { flex: 0 0 5.5ch; color: ${FEED_COLOURS["src-agent"]}; }
-  .logrow .lsrc.human { color: ${FEED_COLOURS["src-human"]}; }
+  .logrow .lt { color: var(--se-feed-time); flex: 0 0 auto; }
+  .logrow .lsrc { flex: 0 0 5.5ch; color: var(--se-feed-src-agent); }
+  .logrow .lsrc.human { color: var(--se-feed-src-human); }
   .logrow .lkind { flex: 0 0 6.5ch; }
-  .logrow .lkind.k-call { color: ${FEED_COLOURS["kind-call"]}; }
-  .logrow .lkind.k-update { font-weight: 700; color: ${FEED_COLOURS["kind-update"]}; }
-  .logrow .lkind.k-note { font-style: italic; color: ${FEED_COLOURS["kind-note"]}; }
-  .logrow .lkind.k-aq { font-weight: 700; color: ${FEED_COLOURS["kind-aq"]}; }
-  .aq-q { font-weight: 700; color: ${FEED_COLOURS["kind-aq"]}; padding: 6px 0; white-space: pre-wrap; }
+  .logrow .lkind.k-call { color: var(--se-feed-kind-call); }
+  .logrow .lkind.k-update { font-weight: 700; color: var(--se-feed-kind-update); }
+  .logrow .lkind.k-note { font-style: italic; color: var(--se-feed-kind-note); }
+  .logrow .lkind.k-aq { font-weight: 700; color: var(--se-feed-kind-aq); }
+  .aq-q { font-weight: 700; color: var(--se-feed-kind-aq); padding: 6px 0; white-space: pre-wrap; }
   #loadbar { position: fixed; top: 0; left: 0; right: 0; height: 3px; background: var(--se-raised); z-index: 99; }
   #loadbar .fill { height: 100%; width: 30%; background: var(--se-accent); animation: loadslide 1s linear infinite; }
   @keyframes loadslide { 0% { margin-left: -30%; } 100% { margin-left: 100%; } }
@@ -661,18 +691,18 @@ const STYLE = `
   #loadbar .lmsg { position: fixed; top: 8px; right: 12px; color: var(--se-accent); font-size: 12px; }
   /* A load that never answered is a FAILURE, and the voice paints those red. */
   #loadbar.stalled { cursor: pointer; }
-  #loadbar.stalled .fill { background: #e86a5f; animation: none; width: 100%; }
-  #loadbar.stalled .lmsg { color: #e86a5f; }
-  .aq-a { color: #cfd8dc; line-height: 1.5; padding: 4px 0; }
+  #loadbar.stalled .fill { background: var(--se-fail); animation: none; width: 100%; }
+  #loadbar.stalled .lmsg { color: var(--se-fail); }
+  .aq-a { color: var(--se-aq-answer); line-height: 1.5; padding: 4px 0; }
   .logrow .lbrief { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .logrow .lok { flex: 0 0 auto; color: #4a7a55; }
-  .logrow.failed .lok { color: #e86a5f; }
+  .logrow .lok { flex: 0 0 auto; color: var(--se-ok); }
+  .logrow.failed .lok { color: var(--se-fail); }
   .dnode { cursor: pointer; padding: 2px 0; font-size: 13px; }
   .dnode:hover { background: var(--se-raised); }
-  .dnode.s-done { color: #4a7a55; }
+  .dnode.s-done { color: var(--se-ok); }
   .dnode.s-open { color: var(--se-accent); }
   .dnode.s-obsolete { color: var(--se-dim); text-decoration: line-through; }
-  .dnode.s-reverted { color: #e86a5f; text-decoration: line-through; }
+  .dnode.s-reverted { color: var(--se-fail); text-decoration: line-through; }
   /* DEFERRED IS NOT KILLED. It is still owed, so it keeps the open colour;
      it is owed SOMEWHERE ELSE, so it leans. Never struck through - the
      strike is what says a point died, and this one did not. */
@@ -686,12 +716,12 @@ const STYLE = `
   #modal { display: none; position: fixed; inset: 0; background: rgba(20,23,26,.8); z-index: 50; align-items: center; justify-content: center; }
   .modal-box { width: min(760px, 92vw); max-height: 86vh; display: flex; flex-direction: column; background: var(--se-bg-side); border: 1px solid var(--se-border-strong); border-radius: 12px; }
   .modal-body { padding: 12px 16px; overflow: auto; font-size: 13px; }
-  a.toollink { color: #7cc4e8; text-decoration: underline; cursor: pointer; margin-right: 10px; }
+  a.toollink { color: var(--se-link); text-decoration: underline; cursor: pointer; margin-right: 10px; }
   #toast { position: fixed; left: 14px; bottom: 14px; background: var(--se-raised); border: 1px solid var(--se-border-strong); border-radius: 8px; padding: 8px 14px; color: var(--se-fg); font-size: 12.5px; z-index: 90; display: none; }
-  #link-lost { position: fixed; left: 0; right: 0; top: 0; z-index: 99; background: #4a3a14; color: var(--se-accent); text-align: center; padding: 7px; font-size: 13px; letter-spacing: .04em; }
+  #link-lost { position: fixed; left: 0; right: 0; top: 0; z-index: 99; background: var(--se-lost-bg); color: var(--se-accent); text-align: center; padding: 7px; font-size: 13px; letter-spacing: .04em; }
   #over { position: fixed; inset: 0; background: rgba(20,23,26,.94); z-index: 100; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; }
-  #over .over-box { color: #e8332a; font-size: 62px; font-weight: 800; letter-spacing: .12em; border: 6px solid #e8332a; border-radius: 18px; padding: 26px 52px; }
-  #over .over-sub { color: #e86a5f; font-size: 15px; }
+  #over .over-box { color: var(--se-over); font-size: 62px; font-weight: 800; letter-spacing: .12em; border: 6px solid var(--se-over); border-radius: 18px; padding: 26px 52px; }
+  #over .over-sub { color: var(--se-fail); font-size: 15px; }
 `;
 
 const SCRIPT = `
@@ -1314,7 +1344,7 @@ function condRows(id, dict, standing) {
       else btn = '<button class="primary runpre" data-state="' + id + '">' + (sc.ran ? "re-run" : "run") + "</button>";
       row += '<div style="padding:6px 0">' + btn + "</div>";
       if (sc.running) row += '<div style="color:var(--se-accent)">running — the page follows; the result lands here</div>';
-      else if (sc.ran) row += '<div style="color:' + (sc.ok ? "#4a7a55" : "#e86a5f") + ';white-space:pre-wrap;font-size:12px">' + sc.output.replace(/&/g,"&amp;").replace(/</g,"&lt;") + "</div>";
+      else if (sc.ran) row += '<div style="color:' + (sc.ok ? "var(--se-ok)" : "var(--se-fail)") + ';white-space:pre-wrap;font-size:12px">' + sc.output.replace(/&/g,"&amp;").replace(/</g,"&lt;") + "</div>";
       else row += '<div style="color:var(--se-muted)">not run yet</div>';
     } else if (key === "evidence_form") {
       // The A3 page: open it in the details pane — fill, confirm prefills,
@@ -1373,7 +1403,7 @@ async function showForm(name) {
   });
   if (!ro) {
     html += '<div class="meta" style="padding:6px 0 2px">files — <a class="doclink openfolder" data-form="' + name + '">open ' + escText(f.evidence_dir) + "</a></div>";
-    (f.files || []).forEach((fi) => { html += "<div>" + (fi.present ? "✓ " : '<span style="color:#e86a5f">✗ </span>') + escText(fi.name) + "</div>"; });
+    (f.files || []).forEach((fi) => { html += "<div>" + (fi.present ? "✓ " : '<span style="color:var(--se-fail)">✗ </span>') + escText(fi.name) + "</div>"; });
     if (f.problems && f.problems.length) html += '<div style="color:var(--se-accent);padding:6px 0">' + f.problems.map(escText).join("<br>") + "</div>";
     html += '<div style="padding:10px 0"><button class="primary saveform" data-form="' + name + '">save</button> <button class="primary doneform" data-form="' + name + '" title="sets status done and runs the lint">done</button></div>';
   }
@@ -1468,8 +1498,14 @@ document.addEventListener("click", (ev) => {
   const url = btn.dataset.url;
   // A NEW window every time, never a named one. The whole point is several
   // standing side by side, and a shared name reuses the first one forever.
-  if (ev.ctrlKey || ev.metaKey) { window.open(frozenUrl(url), "_blank"); return; }
-  if (ev.shiftKey) { window.open(frozenUrl(url), "_blank", "popup,width=1100,height=800"); return; }
+  //
+  // NOT INSIDE THE EDITOR. VS Code sandboxes its webview without allow-popups,
+  // and a nested frame can only NARROW a sandbox, never widen one — so
+  // window.open there does nothing at all. Branching on the modifier anyway
+  // made ctrl-click and shift-click dead keys on this button. Falling through
+  // to fullscreen is the in-place equivalent, and it already works.
+  if (!EMBED && (ev.ctrlKey || ev.metaKey)) { window.open(frozenUrl(url), "_blank"); return; }
+  if (!EMBED && ev.shiftKey) { window.open(frozenUrl(url), "_blank", "popup,width=1100,height=800"); return; }
   const w = document.getElementById(btn.dataset.widget);
   if (w) { if (document.fullscreenElement === w) document.exitFullscreen(); else w.requestFullscreen(); }
 });
@@ -1983,23 +2019,19 @@ function levelHelp(sel) {
     '<tr' + (sel === l.value ? ' style="background:var(--se-raised)"' : "") + '><td class="k">' + l.abbr + " · " + l.value + '</td><td class="v">' + l.name + "</td></tr>").join("");
   showDetails("the autonomy scale", '<table class="kv">' + rows + '</table><div style="padding:8px 0 0"><a class="doclink" data-path="product/guidance/authoring/machines.md">the full scale — machines.md · Priority</a></div>');
 }
-// THE UPDATE CADENCE — five notches; same grammar again. The top notch owes
-// nothing at all, and a volunteered update still lands there.
-const NR_LEVELS = ${JSON.stringify(NARRATION_LEVELS)};
-const nrEl = document.getElementById("nr");
-function nrAbbr(v) { const l = NR_LEVELS.find((x) => x.value === Number(v)); return l ? l.abbr : String(v); }
-function nrHelp(sel) {
-  const rows = NR_LEVELS.map((l) =>
-    '<tr' + (sel === l.value ? ' style="background:var(--se-raised)"' : "") + '><td class="k">' + l.abbr + " · " + l.value + '</td><td class="v">' + escText(l.name) + "</td></tr>").join("");
-  showDetails("how often updates are owed", '<table class="kv">' + rows + '</table><div class="meta" style="padding:8px 0 0">Whichever comes first falls due, minutes or calls. A volunteered update always pays and always resets both.</div>');
+// THE UPDATE CADENCE — two numbers the reader types. Both clocks run;
+// whichever falls due first is owed. Zero stops that clock.
+const nrMinEl = document.getElementById("narration-minutes");
+const nrCallsEl = document.getElementById("narration-calls");
+function nrHelp() {
+  showDetails("how often updates are owed", '<div class="meta">An update every n MINUTES at least, or every n CALLS at least — whichever falls due first since the last one.<br><br>Zero stops that clock. Both zero owes nothing.<br><br>A volunteered update always pays, and always resets both.<br><br>NOW makes an update due immediately, so the next call has to carry one.</div>');
 }
-if (nrEl) {
-  const lbl3 = document.getElementById("nr-val");
-  nrEl.addEventListener("input", () => { if (lbl3) lbl3.textContent = nrAbbr(nrEl.value); });
-  nrEl.addEventListener("change", async () => {
-    await fetch("/narration", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ value: Number(nrEl.value) }) });
-  });
+function sendCadence() {
+  if (!nrMinEl || !nrCallsEl) return;
+  void fetch("/narration", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ minutes: Number(nrMinEl.value), calls: Number(nrCallsEl.value) }) });
 }
+if (nrMinEl) nrMinEl.addEventListener("change", sendCadence);
+if (nrCallsEl) nrCallsEl.addEventListener("change", sendCadence);
 // THE SHUTDOWN CONTROL — five notches; same grammar as the autonomy bar.
 const SD_LEVELS = ${JSON.stringify(SHUTDOWN_LEVELS)};
 const sdEl = document.getElementById("sd");
@@ -2017,33 +2049,22 @@ if (sdEl) {
   });
 }
 document.addEventListener("click", (ev) => {
-  const nn = ev.target.closest ? ev.target.closest(".nr-notch") : null;
-  if (nn && nrEl) {
-    const v = Number(nn.dataset.level);
-    nrEl.value = v;
-    const lbl3 = document.getElementById("nr-val");
-    if (lbl3) lbl3.textContent = nrAbbr(v);
-    void fetch("/narration", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ value: v }) });
-    nrHelp(v);
+  // An action parameter carries its endpoint, so the panel decides what the
+  // button does and this handler never learns a second one.
+  const act = ev.target.closest ? ev.target.closest(".param-action") : null;
+  if (act) {
+    void fetch(act.dataset.post, { method: "POST", headers: { "content-type": "application/json" }, body: "{}" });
     return;
   }
+
   const nh = ev.target.closest ? ev.target.closest(".nr-help") : null;
-  if (nh) { nrHelp(null); return; }
-  const sn = ev.target.closest ? ev.target.closest(".sd-notch") : null;
-  if (sn && sdEl) {
-    const v = Number(sn.dataset.level);
-    sdEl.value = v;
-    const lbl2 = document.getElementById("sd-val");
-    if (lbl2) lbl2.textContent = sdAbbr(v);
-    void fetch("/shutdown", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ value: v }) });
-    sdHelp(v);
-    return;
-  }
-  const sh = ev.target.closest ? ev.target.closest(".sd-help") : null;
-  if (sh) { sdHelp(null); return; }
-  const n = ev.target.closest ? ev.target.closest(".thr-notch") : null;
+  if (nh) { nrHelp(); return; }
+  const n = ev.target.closest ? ev.target.closest(".rung") : null;
   if (n && thr) {
     const v = Number(n.dataset.level);
+    // A locked rung still ANSWERS — it explains itself in details rather
+    // than doing nothing, because a dead click reads as a broken button.
+    if (n.classList.contains("locked")) { levelHelp(v); return; }
     thr.value = v;
     const lbl = document.getElementById("thr-val");
     if (lbl) lbl.textContent = v.toFixed(2);
@@ -2361,7 +2382,7 @@ const NATIVE = `
   body.solo aside, body.solo main { background: transparent; }
 `;
 
-export function renderMirror(m: MirrorState, widget?: "machine" | "details" | "log" | "terminal", view?: string, card?: string, embed?: boolean): string {
+export function renderMirror(m: MirrorState, widget?: "machine" | "details" | "log" | "terminal" | "table", view?: string, card?: string, embed?: boolean): string {
   const skin = embed === true ? NATIVE : "";
   const bodyClass = embed === true ? ` class="embed${widget === undefined ? "" : " solo"}"` : "";
   const info = m.session.describe() as { active: string[]; status: string };
@@ -2511,19 +2532,24 @@ export function renderMirror(m: MirrorState, widget?: "machine" | "details" | "l
   // (priority <= autonomy). 0 = the human clicks through everything
   // (manual mode is just this); 1 = fully autonomous. Live: changes take
   // effect on the agent's next tick.
+  // THE BAR IS A PANEL, and the panel is a SPEC (machines/panels/controls.md).
+  // Nothing here decides how a control looks; the spec names the parameters
+  // and params.ts draws the types it knows. A type it does not know refuses,
+  // so a control cannot appear that the drawing never asked for.
   const thr = m.session.autonomy;
-  const notches = levels.map((l) => `<span class="thr-notch" data-level="${l.value}" style="left:${l.value * 100}%" title="${esc(l.name)} — click: autonomy ${l.value}">${l.abbr}</span>`).join("");
-  const slider = `<span class="threshold" title="the agent enters only states with priority ≤ autonomy — the notches are the authored levels, click one to jump there"><span class="thr-help" title="click: the scale, explained in details">autonomy</span><span class="thr-track"><input id="thr" type="range" min="0" max="1" step="0.01" value="${thr}" list="thr-ticks"><datalist id="thr-ticks">${levels.map((l) => `<option value="${l.value}"></option>`).join("")}</datalist><span class="thr-notches">${notches}</span></span><span id="thr-val">${thr.toFixed(2)}</span></span>`;
-  const sd = m.session.shutdown;
-  const sdNotches = SHUTDOWN_LEVELS.map((l) => `<span class="sd-notch thr-notch" data-level="${l.value}" style="left:${((l.value - 1) / 4) * 100}%" title="${esc(l.name)}">${l.abbr}</span>`).join("");
-  const sdAbbrNow = SHUTDOWN_LEVELS.find((l) => l.value === sd)?.abbr ?? String(sd);
-  const sdBar = `<span class="threshold" title="shutdown control — what happens around done"><span class="sd-help thr-help" title="click: the levels, explained in details">shutdown</span><span class="thr-track"><input id="sd" type="range" min="1" max="5" step="1" value="${sd}" list="sd-ticks"><datalist id="sd-ticks">${SHUTDOWN_LEVELS.map((l) => `<option value="${l.value}"></option>`).join("")}</datalist><span class="thr-notches">${sdNotches}</span></span><span id="sd-val">${esc(sdAbbrNow)}</span></span>`;
+  const slider = renderPanel(loadPanel(m.root, "controls"), {
+    rungs: levels,
+    autonomy: thr,
+    ints: { narration_minutes: m.session.narrationMinutes, narration_calls: m.session.narrationCalls },
+  });
+  // THE SHUTDOWN CONTROL IS GONE (owner sketch, 2026-08-01). It was redundant:
+  // the only setting anyone wanted is "do not shut down while work is running",
+  // and that is not a preference. The MACHINE decides it, from whether the walk
+  // is idle at the front desk — not the agent, and not a slider.
   // THE UPDATE CADENCE — how often the agent OWES a line about what it is
   // doing. Same grammar as the other two bars; the top notch owes nothing.
-  const nr = m.session.narration;
-  const nrNotches = NARRATION_LEVELS.map((l) => `<span class="nr-notch thr-notch" data-level="${l.value}" style="left:${((l.value - 1) / 4) * 100}%" title="${esc(l.name)}">${l.abbr}</span>`).join("");
-  const nrAbbrNow = NARRATION_LEVELS.find((l) => l.value === nr)?.abbr ?? String(nr);
-  const nrBar = `<span class="threshold" title="how often the agent owes an update — whichever comes first, minutes or calls"><span class="nr-help thr-help" title="click: the levels, explained in details">updates</span><span class="thr-track"><input id="nr" type="range" min="1" max="5" step="1" value="${nr}" list="nr-ticks"><datalist id="nr-ticks">${NARRATION_LEVELS.map((l) => `<option value="${l.value}"></option>`).join("")}</datalist><span class="thr-notches">${nrNotches}</span></span><span id="nr-val">${esc(nrAbbrNow)}</span></span>`;
+
+  const nrBar = "";
   // Escape has a hand-side affordance too (parity law): only while a
   // sub-machine other than boot is being walked.
   const crumbTrail = m.session.breadcrumb();
@@ -2536,9 +2562,9 @@ export function renderMirror(m: MirrorState, widget?: "machine" | "details" | "l
   // the walk's position; clicking it jumps the view there.
   const curLeaf = info.active[0] ?? "";
   const curBtn = curLeaf === "" ? "" : `<button class="ghost" id="cur-state" data-machine="${esc(walkMachine.id)}" title="the walk stands here — click: jump the view to it">☉ ${esc(curLeaf)}</button>`;
-  const machineWidget = `<div class="widget" id="w-machine"><div class="widget-head"><span class="crumbs">${crumbs}</span><span class="head-controls" style="display:flex;align-items:center;gap:10px">${curBtn}<span class="head-sliders" style="display:flex;align-items:center;gap:10px">${slider}${sdBar}${nrBar}</span>${escapeBtn}<button class="expand" data-widget="w-machine" data-url="/widget/machine?view=${encodeURIComponent(decl.id)}" title="expand · ctrl-click: new tab · shift-click: new window — both open frozen on what this card is showing">⛶</button></span></div><div class="widget-body">${svg}</div></div>`;
+  const machineWidget = `<div class="widget" id="w-machine"><div class="widget-head"><span class="crumbs">${crumbs}</span><span class="head-controls" style="display:flex;align-items:center;gap:10px">${curBtn}<span class="head-sliders" style="display:flex;align-items:center;gap:10px">${slider}${nrBar}</span>${escapeBtn}<button class="expand" data-widget="w-machine" data-url="/widget/machine?view=${encodeURIComponent(decl.id)}" title="expand · ctrl-click: new tab · shift-click: new window — both open frozen on what this card is showing">⛶</button></span></div><div class="widget-body">${svg}</div></div>`;
   const detailsWidget = `<div class="widget" id="w-details">${widgetHead("details", "w-details", "/widget/details")}
-    ${info.status === "closed" ? '<div class="meta" style="color:#e86a5f">machine closed</div>' : ""}
+    ${info.status === "closed" ? '<div class="meta" style="color:var(--se-fail)">machine closed</div>' : ""}
     <div class="meta" id="details-title" data-morph-ignore>—</div>
     <div class="panel" id="details" data-morph-ignore></div>
   </div>`;
@@ -2568,8 +2594,22 @@ export function renderMirror(m: MirrorState, widget?: "machine" | "details" | "l
   // or drop MID-SESSION, and a card that vanishes renumbers every card after
   // it — under the reader's hand, while they are using the numbers.
   const terminalWidget = termWidget(true);
+  // THE TABLE (owner ask 2026-08-01) — every view every .base in the vault
+  // declares, drawn here so Obsidian is not the only thing that can read
+  // them. The vault is re-read per render for the same reason the palette is.
+  // A FUNCTION, NOT A VALUE, and that is the whole point: building it reads
+  // all 169 notes off disk. Measured at 60ms, against a 96ms render — so
+  // computing it eagerly would have put a 60% tax on the machine page, the
+  // log page and the details page, none of which ever show a table.
+  const tblWidget = (): string =>
+    tableWidget(m.root, `<button class="expand" data-widget="w-table" data-url="/widget/table" title="expand · ctrl-click: new tab · shift-click: new window — both open frozen on what this card is showing">⛶</button>`);
   // Read per render, so editing palette.css needs no restart.
   const pal = palette(m.root);
+
+  if (widget === "table") {
+    return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>se · table</title><style>${pal}${STYLE}${TABLE_STYLE} #w-table{flex:1;border-bottom:0;min-height:0} body.solo #sidebar{display:flex;flex-direction:column;height:100vh} .tbl-body{flex:1;min-height:0}${skin}</style>${ELEMENTS}</head>
+<body${bodyClass}><div class="cols"><aside id="sidebar" style="width:100vw;max-width:100vw">${tblWidget()}</aside></div>${MODAL}${data}<script>${SCRIPT}</script><script>${TABLE_SCRIPT}</script></body></html>`;
+  }
 
   if (widget === "terminal") {
     return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>se · terminal</title><style>${pal}${STYLE} #w-terminal{flex:1;height:auto;border-bottom:0}${skin}</style>${ELEMENTS}</head>
@@ -2603,6 +2643,9 @@ export function renderMirror(m: MirrorState, widget?: "machine" | "details" | "l
     machine: machineWidget,
     log: logWidget,
     details: detailsWidget,
+    // Only when a card actually asks for it. A product that declares no table
+    // card never pays for one.
+    ...(cardList.some((c) => c.widget === "table") ? { table: tblWidget() } : {}),
   };
   const filled = (c: { widget?: string }): boolean => c.widget !== undefined && (byWidget[c.widget] ?? "") !== "";
   // THE DEFAULT MAIN CARD IS THE FIRST AVAILABLE ONE — one rule instead of a
@@ -2635,13 +2678,13 @@ export function renderMirror(m: MirrorState, widget?: "machine" | "details" | "l
   const nowAt = Math.max(0, cardList.findIndex((c) => c.id === now));
   const legendHtml = `<div class="card" id="card-legend" style="${cellAt(nowAt)}"><div class="widget" id="w-legend"><div class="widget-head"><span>keys</span></div><div class="widget-body">${legendRows}</div></div></div>`;
   const cardData = `<script type="application/json" id="se-cards">${JSON.stringify({ list: cardList.map((c) => ({ n: c.n, id: c.id, title: c.title })), now })}</script>`;
-  return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>se mirror</title><style>${pal}${STYLE}${skin}</style>${ELEMENTS}</head>
+  return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>se mirror</title><style>${pal}${STYLE}${TABLE_STYLE}${skin}</style>${ELEMENTS}</head>
 <body${bodyClass}>
 <div class="cards" data-keep-style style="grid-template-rows:repeat(${rows},1fr)">
   ${cardsHtml}
   ${legendHtml}
   <div class="divider" id="div-cards"></div>
 </div>
-${MODAL}${data}${cardData}<script>${SCRIPT}</script>
+${MODAL}${data}${cardData}<script>${SCRIPT}</script><script>${TABLE_SCRIPT}</script>
 </body></html>`;
 }

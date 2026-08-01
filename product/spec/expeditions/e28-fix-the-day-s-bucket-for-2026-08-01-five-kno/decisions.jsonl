@@ -1,0 +1,536 @@
+{"ts":"2026-08-01T07:48:33.906Z","op":"plan","visit":"expeditions/e28@0","parent":null,"nodes":[{"id":"d18","brief":"se_file_move must rewrite source references"},{"id":"d19","brief":"Preflight must parse the webview scripts"},{"id":"d20","brief":"The palette remainder reads palette.css"},{"id":"d21","brief":"One guidance snapshot threaded through render"},{"id":"d22","brief":"The voice-lint prose sweep, all 26"}]}
+{"ts":"2026-08-01T07:48:54.914Z","op":"update","visit":"expeditions/e28@0","node":"d23","brief":"Locating se_file_move's implementation"}
+{"ts":"2026-08-01T07:50:51.499Z","op":"update","visit":"expeditions/e28@0","node":"d24","brief":"Whitelist plus residual sweep written into move.ts"}
+{"ts":"2026-08-01T07:51:55.454Z","op":"update","visit":"expeditions/e28@0","node":"d25","brief":"Tool description now states the whitelist and the report"}
+{"ts":"2026-08-01T07:52:26.807Z","op":"update","visit":"expeditions/e28@0","node":"d26","brief":"Two tests written, including the contains-substring trap"}
+{"ts":"2026-08-01T07:53:24.304Z","op":"update","visit":"expeditions/e28@0","node":"d27","brief":"Fixed the separator regression I introduced"}
+{"ts":"2026-08-01T07:54:38.996Z","op":"update","visit":"expeditions/e28@0","node":"d28","brief":"Running the file-lane tests"}
+{"ts":"2026-08-01T07:54:47.673Z","op":"done","visit":"expeditions/e28@0","node":"d18","brief":"Mover rewrites source and reports residue; 26/26 green"}
+{"ts":"2026-08-01T07:55:05.741Z","op":"update","visit":"expeditions/e28@0","node":"d29","brief":"Preflight now parses each webview script body"}
+{"ts":"2026-08-01T07:55:28.411Z","op":"update","visit":"expeditions/e28@0","node":"d30","brief":"Running preflight against the real extension.js"}
+{"ts":"2026-08-01T07:57:13.465Z","op":"update","visit":"expeditions/e28@0","node":"d31","brief":"Test pins the broken case beside the sound one"}
+{"ts":"2026-08-01T07:57:30.109Z","op":"done","visit":"expeditions/e28@0","node":"d19","brief":"Webview scripts parsed; broken case pinned by test"}
+{"ts":"2026-08-01T07:58:34.806Z","op":"update","visit":"expeditions/e28@0","node":"d32","brief":"palette.css now names the feed, walk ring and values"}
+{"ts":"2026-08-01T08:01:04.069Z","op":"update","visit":"expeditions/e28@0","node":"d33","brief":"Drawing captured; answering the owner before they leave"}
+{"ts":"2026-08-01T08:02:37.861Z","op":"update","visit":"expeditions/e28@0","node":"d34","brief":"Roots defect captured; returning to the palette"}
+{"ts":"2026-08-01T08:03:06.566Z","op":"update","visit":"expeditions/e28@0","node":"d35","brief":"Hex out of render.ts; the feed reads palette vars"}
+{"ts":"2026-08-01T08:03:37.090Z","op":"update","visit":"expeditions/e28@0","node":"d36","brief":"Test now lints palette.css and bans hex in render.ts"}
+{"ts":"2026-08-01T08:04:38.599Z","op":"update","visit":"expeditions/e28@0","node":"d37","brief":"Swept the CSS literals the new lint surfaced"}
+{"ts":"2026-08-01T08:04:59.018Z","op":"update","visit":"expeditions/e28@0","node":"d38","brief":"Inline-style hex swapped for vars; page check corrected"}
+{"ts":"2026-08-01T08:05:31.167Z","op":"update","visit":"expeditions/e28@0","node":"d39","brief":"Route test follows the colour into the palette"}
+{"ts":"2026-08-01T08:06:13.945Z","op":"update","visit":"expeditions/e28@0","node":"d40","brief":"Running the render-adjacent tests"}
+{"ts":"2026-08-01T08:07:48.180Z","op":"done","visit":"expeditions/e28@0","node":"d20","brief":"Palette done and green; hex now banned by lint"}
+{"ts":"2026-08-01T08:08:57.066Z","op":"update","visit":"expeditions/e28@0","node":"d41","brief":"Measuring where a render's time actually goes"}
+{"ts":"2026-08-01T08:10:39.871Z","op":"obsolete","visit":"expeditions/e28@0","node":"d21","brief":"Premise measured false; change not worth 3%"}
+{"ts":"2026-08-01T08:12:16.550Z","op":"update","visit":"expeditions/e28@0","node":"d42","brief":"Comma-chain now counts substance, not commas"}
+{"ts":"2026-08-01T08:13:33.000Z","op":"update","visit":"expeditions/e28@0","node":"d43","brief":"Noise down from 23 to 9; sizing the real ones"}
+{"ts":"2026-08-01T08:14:09.166Z","op":"update","visit":"expeditions/e28@0","node":"d44","brief":"walking.md's two walls split into thought groups"}
+{"ts":"2026-08-01T08:14:29.799Z","op":"update","visit":"expeditions/e28@0","node":"d45","brief":"retro.md step 1 split into paragraphs"}
+{"ts":"2026-08-01T08:14:47.927Z","op":"update","visit":"expeditions/e28@0","node":"d46","brief":"retro.md step 3 split into thought groups"}
+{"ts":"2026-08-01T08:15:07.355Z","op":"update","visit":"expeditions/e28@0","node":"d47","brief":"retro.md step 7 split; its chain is now a real list"}
+{"ts":"2026-08-01T08:15:23.401Z","op":"update","visit":"expeditions/e28@0","node":"d48","brief":"machines.md start/end wall split"}
+{"ts":"2026-08-01T08:15:42.018Z","op":"update","visit":"expeditions/e28@0","node":"d49","brief":"machines.md conditions wall became a real list"}
+{"ts":"2026-08-01T08:16:17.770Z","op":"update","visit":"expeditions/e28@0","node":"d50","brief":"idle.md guidance sentences split, meaning intact"}
+{"ts":"2026-08-01T08:16:38.286Z","op":"update","visit":"expeditions/e28@0","node":"d51","brief":"front_desk.md guidance split into single thoughts"}
+{"ts":"2026-08-01T08:16:57.554Z","op":"update","visit":"expeditions/e28@0","node":"d52","brief":"route, diverge and overhaul guidance unchained"}
+{"ts":"2026-08-01T08:17:16.221Z","op":"update","visit":"expeditions/e28@0","node":"d53","brief":"read_contract.md: duplicate sentence removed"}
+{"ts":"2026-08-01T08:17:52.474Z","op":"update","visit":"expeditions/e28@0","node":"d54","brief":"Full suite started; prose sweep at 4 from 37"}
+{"ts":"2026-08-01T08:20:07.838Z","op":"update","visit":"expeditions/e28@0","node":"d55","brief":"Scale relabelled to the sketch's five rungs"}
+{"ts":"2026-08-01T08:20:58.043Z","op":"update","visit":"expeditions/e28@0","node":"d56","brief":"Rule now excludes literals, not short words"}
+{"ts":"2026-08-01T08:23:03.692Z","op":"done","visit":"expeditions/e28@0","node":"d22","brief":"Prose sweep closed at 4 noise findings"}
+{"ts":"2026-08-01T08:23:13.214Z","op":"plan","visit":"expeditions/e28@0","parent":null,"nodes":[{"id":"d57","brief":"Read the v2 design document"},{"id":"d58","brief":"Check the v3 plan and v1 lineage"},{"id":"d59","brief":"Report what already exists"}]}
+{"ts":"2026-08-01T08:23:52.469Z","op":"update","visit":"expeditions/e28@0","node":"d60","brief":"Reading v2's policies, speed and two-agent case"}
+{"ts":"2026-08-01T08:25:02.860Z","op":"done","visit":"expeditions/e28@0","node":"d57","brief":"v2 design and v3 plan read; convergences recorded"}
+{"ts":"2026-08-01T08:26:32.452Z","op":"done","visit":"expeditions/e28@0","node":"d58","brief":"Render-shoot-look loop built and proven"}
+{"ts":"2026-08-01T08:27:39.888Z","op":"plan","visit":"expeditions/e28@0","parent":null,"nodes":[{"id":"d61","brief":"Autonomy becomes five cumulative buttons"},{"id":"d62","brief":"Style the rungs and mark ideation red"},{"id":"d63","brief":"Verify by screenshot"}]}
+{"ts":"2026-08-01T08:27:51.827Z","op":"done","visit":"expeditions/e28@0","node":"d61","brief":"Rungs render as cumulative buttons"}
+{"ts":"2026-08-01T08:28:00.971Z","op":"done","visit":"expeditions/e28@0","node":"d62","brief":"Rung styling in; ideation drawn as a hazard"}
+{"ts":"2026-08-01T08:28:56.369Z","op":"plan","visit":"expeditions/e28@0","parent":null,"nodes":[{"id":"d64","brief":"Shutdown slider removed from the bar"},{"id":"d65","brief":"Narration becomes buttons plus NOW"}]}
+{"ts":"2026-08-01T08:29:35.409Z","op":"update","visit":"expeditions/e28@0","node":"d66","brief":"B dropped; blocked is now absence of a press"}
+{"ts":"2026-08-01T08:29:52.857Z","op":"done","visit":"expeditions/e28@0","node":"d65","brief":"Narration is buttons plus a NOW button"}
+{"ts":"2026-08-01T08:30:46.886Z","op":"done","visit":"expeditions/e28@0","node":"d64","brief":"Both sliders gone; the bar is switches only"}
+{"ts":"2026-08-01T08:31:18.068Z","op":"plan","visit":"expeditions/e28@0","parent":null,"nodes":[{"id":"d67","brief":"Write the sketch-fidelity rule into ux.md"},{"id":"d68","brief":"Verify the bar renders as drawn"},{"id":"d69","brief":"Run the suite over the render change"}]}
+{"ts":"2026-08-01T08:31:34.986Z","op":"done","visit":"expeditions/e28@0","node":"d68","brief":"Bar renders exactly as drawn"}
+{"ts":"2026-08-01T08:33:47.494Z","op":"plan","visit":"expeditions/e28@0","parent":null,"nodes":[{"id":"d70","brief":"Narration becomes two integers in the session"},{"id":"d71","brief":"The toll reads minutes and calls"},{"id":"d72","brief":"The row draws two line edits and NOW"}]}
+{"ts":"2026-08-01T08:34:21.143Z","op":"done","visit":"expeditions/e28@0","node":"d71","brief":"Toll now reads two typed numbers"}
+{"ts":"2026-08-01T08:34:43.418Z","op":"done","visit":"expeditions/e28@0","node":"d72","brief":"Updates row is two line edits plus NOW"}
+{"ts":"2026-08-01T08:35:25.921Z","op":"update","visit":"expeditions/e28@0","node":"d73","brief":"Mirror endpoints take minutes and calls"}
+{"ts":"2026-08-01T08:35:37.933Z","op":"done","visit":"expeditions/e28@0","node":"d70","brief":"Session stores two integers and a due flag"}
+{"ts":"2026-08-01T08:36:15.434Z","op":"update","visit":"expeditions/e28@0","node":"d74","brief":"Cadence script rewritten for two line edits"}
+{"ts":"2026-08-01T08:36:51.819Z","op":"update","visit":"expeditions/e28@0","node":"d75","brief":"Line edits pinned so the row stops stretching"}
+{"ts":"2026-08-01T08:38:12.728Z","op":"update","visit":"expeditions/e28@0","node":"d76","brief":"Removed the dead slider width rule"}
+{"ts":"2026-08-01T08:38:41.016Z","op":"done","visit":"expeditions/e28@0","node":"d63","brief":"Bar verified against the sketch by screenshot"}
+{"ts":"2026-08-01T08:41:55.774Z","op":"update","visit":"expeditions/e28@0","node":"d77","brief":"Tests follow the switches, not the sliders"}
+{"ts":"2026-08-01T08:42:54.794Z","op":"update","visit":"expeditions/e28@0","node":"d78","brief":"Packet and settings carry minutes and calls"}
+{"ts":"2026-08-01T08:43:14.967Z","op":"update","visit":"expeditions/e28@0","node":"d79","brief":"Packet and settings carry minutes and calls"}
+{"ts":"2026-08-01T08:43:54.362Z","op":"done","visit":"expeditions/e28@0","node":"d67","brief":"Sketch-fidelity rule written into ux.md"}
+{"ts":"2026-08-01T08:49:09.548Z","op":"update","visit":"expeditions/e28@0","node":"d80","brief":"Chasing the last suite failure to a file"}
+{"ts":"2026-08-01T08:50:49.627Z","op":"update","visit":"expeditions/e28@0","node":"d81","brief":"Feed test follows the switches too"}
+{"ts":"2026-08-01T08:52:47.538Z","op":"plan","visit":"expeditions/e28@0","parent":null,"nodes":[{"id":"d82","brief":"A panel spec in markdown, beside the existing config"},{"id":"d83","brief":"A renderer that only knows declared types"},{"id":"d84","brief":"Draw the control bar from the spec and shoot it"}]}
+{"ts":"2026-08-01T08:53:18.722Z","op":"done","visit":"expeditions/e28@0","node":"d82","brief":"Panel spec written as markdown, beside scale.md"}
+{"ts":"2026-08-01T08:53:40.480Z","op":"done","visit":"expeditions/e28@0","node":"d83","brief":"Renderer knows three types and refuses the rest"}
+{"ts":"2026-08-01T08:53:52.206Z","op":"update","visit":"expeditions/e28@0","node":"d85","brief":"Panel wired; action buttons carry their endpoint"}
+{"ts":"2026-08-01T08:54:10.488Z","op":"update","visit":"expeditions/e28@0","node":"d86","brief":"Panel wired; action buttons carry their endpoint"}
+{"ts":"2026-08-01T08:55:04.479Z","op":"done","visit":"expeditions/e28@0","node":"d84","brief":"Bar draws from the spec; verified by screenshot"}
+{"ts":"2026-08-01T08:57:18.753Z","op":"update","visit":"expeditions/e28@0","node":"d87","brief":"Feed test reads the spec's ids"}
+{"ts":"2026-08-01T08:58:49.377Z","op":"done","visit":"expeditions/e28@0","node":"d69","brief":"Full suite green at 294 of 294"}
+{"ts":"2026-08-01T08:59:04.742Z","op":"done","visit":"expeditions/e28@0","node":"d59","brief":"Prior-art report delivered as an aq"}
+{"ts":"2026-08-01T09:08:19.557Z","op":"plan","visit":"expeditions/e28@0","parent":null,"nodes":[{"id":"d88","brief":"Read rigor_matrix README.md + matrix.base"},{"id":"d89","brief":"Sample 5+ rows to establish row SHAPE and Evidence form"},{"id":"d90","brief":"Find compileColumn / gate_ / build-steps in engine"},{"id":"d91","brief":"Trace iterations.canvas stub -> generated states"},{"id":"d92","brief":"Read product/spec/v3-plan.md and judge milestones against code"}]}
+{"ts":"2026-08-01T09:08:32.400Z","op":"update","visit":"expeditions/e28@0","node":"d93","brief":"Reading the five sample rows to establish row shape"}
+{"ts":"2026-08-01T09:08:33.460Z","op":"fork","visit":"expeditions/e28@0","parent":"d89","node":"d94","brief":"side-strand: research how v1/v2 rendered state machines as HTML (read-only)","nodes":[]}
+{"ts":"2026-08-01T09:08:38.406Z","op":"fork","visit":"expeditions/e28@0","parent":"d94","node":"d95","brief":"strand: evidence forms as a parameter spec","nodes":[{"id":"d96","brief":"how forms are specified today"},{"id":"d97","brief":"field types the rigor rows need"},{"id":"d98","brief":"AI vs human rendering"},{"id":"d99","brief":"the type list"}]}
+{"ts":"2026-08-01T09:08:40.277Z","op":"update","visit":"expeditions/e28@0","node":"d100","brief":"listing v1 tree for mirror/board/render/html files"}
+{"ts":"2026-08-01T09:08:40.932Z","op":"update","visit":"expeditions/e28@0","node":"d101","brief":"Searching the engine for the column compiler"}
+{"ts":"2026-08-01T09:08:47.149Z","op":"update","visit":"expeditions/e28@0","node":"d102","brief":"engine side: EvidenceField shape and the scaffold"}
+{"ts":"2026-08-01T09:08:49.614Z","op":"update","visit":"expeditions/e28@0","node":"d103","brief":"Reading rigor-matrix.ts in full"}
+{"ts":"2026-08-01T09:08:52.682Z","op":"update","visit":"expeditions/e28@0","node":"d104","brief":"sizing v2 board.ts / se-board.ts and v1 board.go"}
+{"ts":"2026-08-01T09:08:57.278Z","op":"done","visit":"expeditions/e28@0","node":"d88","brief":"README + matrix.base read: cells are frontmatter, five columns plus notes"}
+{"ts":"2026-08-01T09:09:00.429Z","op":"update","visit":"expeditions/e28@0","node":"d105","brief":"reading rigor matrix rows M0-M3 for evidence field kinds"}
+{"ts":"2026-08-01T09:09:06.456Z","op":"update","visit":"expeditions/e28@0","node":"d106","brief":"outside prior art: what @ai already holds on state machines"}
+{"ts":"2026-08-01T09:09:07.744Z","op":"update","visit":"expeditions/e28@0","node":"d107","brief":"reading v2 se-board.ts state machine renderer (smNode/smRows/groups)"}
+{"ts":"2026-08-01T09:09:08.391Z","op":"plan","visit":"expeditions/e28@0","parent":null,"nodes":[{"id":"d108","brief":"Fix declared roots for glob and search"},{"id":"d109","brief":"Pin it with a test"},{"id":"d110","brief":"Sweep the notes that are now stale"}]}
+{"ts":"2026-08-01T09:09:17.767Z","op":"update","visit":"expeditions/e28@0","node":"d111","brief":"reading M7 to M9 rows for build and verification evidence kinds"}
+{"ts":"2026-08-01T09:09:17.873Z","op":"update","visit":"expeditions/e28@0","node":"d112","brief":"pulling the CSS that styles the v2 machine nodes/connectors"}
+{"ts":"2026-08-01T09:09:20.622Z","op":"update","visit":"expeditions/e28@0","node":"d113","brief":"Reading v3-plan.md to judge milestones against the code"}
+{"ts":"2026-08-01T09:09:27.249Z","op":"update","visit":"expeditions/e28@0","node":"d114","brief":"comparing the mirror render path against the packet remedy path"}
+{"ts":"2026-08-01T09:09:27.256Z","op":"update","visit":"expeditions/e28@0","node":"d115","brief":"reading owner's own v2 state-machine design section"}
+{"ts":"2026-08-01T09:09:32.202Z","op":"update","visit":"expeditions/e28@0","node":"d116","brief":"tracing where machine_stack states get row/group in v2"}
+{"ts":"2026-08-01T09:09:33.645Z","op":"update","visit":"expeditions/e28@0","node":"d117","brief":"Checking which tool names and compilers actually exist"}
+{"ts":"2026-08-01T09:09:37.725Z","op":"done","visit":"expeditions/e28@0","node":"d96","brief":"forms today: template md + engine/forms.ts lint, no types at all"}
+{"ts":"2026-08-01T09:09:40.350Z","op":"update","visit":"expeditions/e28@0","node":"d118","brief":"reading v2 compileMachine to see if layout is authored (canvas x/y) or computed"}
+{"ts":"2026-08-01T09:09:47.189Z","op":"update","visit":"expeditions/e28@0","node":"d119","brief":"Listing tests and checking the cage deny list"}
+{"ts":"2026-08-01T09:09:49.071Z","op":"update","visit":"expeditions/e28@0","node":"d120","brief":"tracing how evidence fields reach the agent packet"}
+{"ts":"2026-08-01T09:09:56.549Z","op":"update","visit":"expeditions/e28@0","node":"d121","brief":"Reading the kickoff-bless-to-pin path in session.ts"}
+{"ts":"2026-08-01T09:09:57.054Z","op":"update","visit":"expeditions/e28@0","node":"d122","brief":"confirming stateRows feeds MachineFrame; then turning to v1"}
+{"ts":"2026-08-01T09:09:58.160Z","op":"update","visit":"expeditions/e28@0","node":"d123","brief":"reading STANDARD_ROUNDS and the body evidence grammar"}
+{"ts":"2026-08-01T09:10:06.113Z","op":"update","visit":"expeditions/e28@0","node":"d124","brief":"Reading the generated-machine dispatch in session.ts"}
+{"ts":"2026-08-01T09:10:10.314Z","op":"update","visit":"expeditions/e28@0","node":"d125","brief":"enumerating every evidence field across all 50 rows"}
+{"ts":"2026-08-01T09:10:16.703Z","op":"update","visit":"expeditions/e28@0","node":"d126","brief":"v1: locating the Go SVG figure renderer with arrow markers"}
+{"ts":"2026-08-01T09:10:16.855Z","op":"update","visit":"expeditions/e28@0","node":"d127","brief":"Reading the pin trigger and the rigor-matrix test coverage"}
+{"ts":"2026-08-01T09:10:24.414Z","op":"done","visit":"expeditions/e28@0","node":"d97","brief":"all 110 evidence fields across 50 rows enumerated"}
+{"ts":"2026-08-01T09:10:29.049Z","op":"done","visit":"expeditions/e28@0","node":"d108","brief":"Glob and search now route on their selector"}
+{"ts":"2026-08-01T09:10:29.377Z","op":"update","visit":"expeditions/e28@0","node":"d128","brief":"Checking gate report forms and the demos seed consumer"}
+{"ts":"2026-08-01T09:10:32.301Z","op":"update","visit":"expeditions/e28@0","node":"d129","brief":"v1: identifying the ranked SVG graph renderer (structural model / block tree)"}
+{"ts":"2026-08-01T09:10:32.424Z","op":"update","visit":"expeditions/e28@0","node":"d130","brief":"reading the tick schema the agent sees for evidence"}
+{"ts":"2026-08-01T09:10:34.044Z","op":"update","visit":"expeditions/e28@0","node":"d131","brief":"checking v3 tree for any existing diagram renderer"}
+{"ts":"2026-08-01T09:10:39.762Z","op":"update","visit":"expeditions/e28@0","node":"d132","brief":"Checking the demos seed for a consumer"}
+{"ts":"2026-08-01T09:10:41.442Z","op":"update","visit":"expeditions/e28@0","node":"d133","brief":"checking whether the packet lists form fields to the agent"}
+{"ts":"2026-08-01T09:10:41.844Z","op":"update","visit":"expeditions/e28@0","node":"d134","brief":"found hand-rolled machine SVG in render.ts; reading its layout"}
+{"ts":"2026-08-01T09:10:42.454Z","op":"update","visit":"expeditions/e28@0","node":"d135","brief":"v1: finding svg* renderer funcs and the structural-model graph"}
+{"ts":"2026-08-01T09:10:50.897Z","op":"done","visit":"expeditions/e28@0","node":"d98","brief":"AI path is se_file_write on the instance; human path is the mirror widget"}
+{"ts":"2026-08-01T09:10:53.032Z","op":"update","visit":"expeditions/e28@0","node":"d136","brief":"v1 models.go is a pinned Mermaid-subset -> hand-rolled SVG; reading it"}
+{"ts":"2026-08-01T09:11:05.633Z","op":"update","visit":"expeditions/e28@0","node":"d137","brief":"confirming layout is authored x/y from .canvas, not computed"}
+{"ts":"2026-08-01T09:11:09.425Z","op":"done","visit":"expeditions/e28@0","node":"d109","brief":"Roots fix pinned by four green cases"}
+{"ts":"2026-08-01T09:11:11.981Z","op":"update","visit":"expeditions/e28@0","node":"d138","brief":"v1 stateDiagram-v2 extractor + v3 render.ts comparison"}
+{"ts":"2026-08-01T09:11:21.011Z","op":"update","visit":"expeditions/e28@0","node":"d139","brief":"v3: what render.ts draws for machines"}
+{"ts":"2026-08-01T09:11:25.918Z","op":"update","visit":"expeditions/e28@0","node":"d140","brief":"Checking whether rigor rows can express entry conditions or guidance tags"}
+{"ts":"2026-08-01T09:11:29.737Z","op":"update","visit":"expeditions/e28@0","node":"d141","brief":"reading v3 machineSvg to settle authored-coords vs computed layout"}
+{"ts":"2026-08-01T09:11:39.036Z","op":"update","visit":"expeditions/e28@0","node":"d142","brief":"Reading main.canvas to place the iterations lane among the top-level machines"}
+{"ts":"2026-08-01T09:11:44.595Z","op":"update","visit":"expeditions/e28@0","node":"d143","brief":"locating sections 6 and 10 in @ai/se-v2-design.md"}
+{"ts":"2026-08-01T09:11:49.071Z","op":"update","visit":"expeditions/e28@0","node":"d144","brief":"Checking whether any iteration has ever actually been walked"}
+{"ts":"2026-08-01T09:11:55.364Z","op":"update","visit":"expeditions/e28@0","node":"d145","brief":"reading v2 design doc section 10 (The board)"}
+{"ts":"2026-08-01T09:11:57.711Z","op":"plan","visit":"expeditions/e28@0","parent":null,"nodes":[{"id":"d146","brief":"Add text and choice parameter types"},{"id":"d147","brief":"Declare the note entry as a panel"},{"id":"d148","brief":"Prove the panel refuses an undeclared type"}]}
+{"ts":"2026-08-01T09:11:59.044Z","op":"update","visit":"expeditions/e28@0","node":"d149","brief":"checking the repo's claim that VS Code renders mermaid fences natively"}
+{"ts":"2026-08-01T09:12:05.129Z","op":"update","visit":"expeditions/e28@0","node":"d150","brief":"reading section 6's machine-walkthrough update for any rendering ruling"}
+{"ts":"2026-08-01T09:12:11.568Z","op":"done","visit":"expeditions/e28@0","node":"d146","brief":"text and choice types added to the renderer"}
+{"ts":"2026-08-01T09:12:14.093Z","op":"update","visit":"expeditions/e28@0","node":"d151","brief":"outside prior art: what @ai holds on schemas and declarative forms"}
+{"ts":"2026-08-01T09:12:16.044Z","op":"update","visit":"expeditions/e28@0","node":"d152","brief":"checking design-doc lines 616-632 and the Pictures section"}
+{"ts":"2026-08-01T09:12:24.725Z","op":"update","visit":"expeditions/e28@0","node":"d153","brief":"checking v2 handover render for any machine drawing"}
+{"ts":"2026-08-01T09:12:28.578Z","op":"done","visit":"expeditions/e28@0","node":"d147","brief":"Note entry declared as the second panel"}
+{"ts":"2026-08-01T09:12:34.315Z","op":"update","visit":"expeditions/e28@0","node":"d154","brief":"reading owner's JSON-Schema-to-MCP-tools passage in se-v2-design"}
+{"ts":"2026-08-01T09:12:36.608Z","op":"update","visit":"expeditions/e28@0","node":"d155","brief":"checking whether v1 actually authored stateDiagram-v2 models"}
+{"ts":"2026-08-01T09:12:47.878Z","op":"update","visit":"expeditions/e28@0","node":"d156","brief":"reading v3 render.ts header + routeOverlay: how the walk's position is shown"}
+{"ts":"2026-08-01T09:12:50.609Z","op":"update","visit":"expeditions/e28@0","node":"d157","brief":"verifying gate rows do not inherit the standard review rounds"}
+{"ts":"2026-08-01T09:13:00.028Z","op":"update","visit":"expeditions/e28@0","node":"d158","brief":"locating machineSvg call site and active/done sets in v3"}
+{"ts":"2026-08-01T09:13:01.065Z","op":"done","visit":"expeditions/e28@0","node":"d148","brief":"Two panels and five types, all six cases green"}
+{"ts":"2026-08-01T09:13:29.729Z","op":"done","visit":"expeditions/e28@0","node":"d99","brief":"type list derived from 122 evidence fields across 49 rows"}
+{"ts":"2026-08-01T09:14:14.183Z","op":"update","visit":"expeditions/e28@0","node":"d159","brief":"reading forms.ts and params.ts to ground the outside-prior-art call"}
+{"ts":"2026-08-01T09:15:35.896Z","op":"plan","visit":"expeditions/e28@0","parent":null,"nodes":[{"id":"d160","brief":"A photographer that renders HTML to a picture"},{"id":"d161","brief":"Wire it as se_shoot over the mirror"},{"id":"d162","brief":"Prove it shoots and refuses honestly"}]}
+{"ts":"2026-08-01T09:16:00.961Z","op":"done","visit":"expeditions/e28@0","node":"d160","brief":"Photographer written; shots land under .se"}
+{"ts":"2026-08-01T09:16:25.049Z","op":"done","visit":"expeditions/e28@0","node":"d161","brief":"se_shoot wired to the mirror's own renderer"}
+{"ts":"2026-08-01T09:16:47.782Z","op":"update","visit":"expeditions/e28@0","node":"d163","brief":"Shoot tests written, including the honest refusal"}
+{"ts":"2026-08-01T09:17:09.795Z","op":"done","visit":"expeditions/e28@0","node":"d162","brief":"se_shoot proven by three green cases"}
+{"ts":"2026-08-01T09:17:58.136Z","op":"plan","visit":"expeditions/e28@0","parent":null,"nodes":[{"id":"d164","brief":"Check the largest authored v2 machine for canvas-order vs flow-order divergence"},{"id":"d165","brief":"Close the gap on whether the no-arrows choice was ever recorded"}]}
+{"ts":"2026-08-01T09:18:24.463Z","op":"update","visit":"expeditions/e28@0","node":"d166","brief":"verified 122 fields/52 gate fields; now tracing evidence_form consumers in v3"}
+{"ts":"2026-08-01T09:18:35.248Z","op":"update","visit":"expeditions/e28@0","node":"d167","brief":"tracing who consumes the 122 fields vs the form-name condition"}
+{"ts":"2026-08-01T09:18:44.512Z","op":"update","visit":"expeditions/e28@0","node":"d168","brief":"repo has 4 hand-rolled layout paths; now checking v1/v2 for earlier layout code"}
+{"ts":"2026-08-01T09:18:46.271Z","op":"update","visit":"expeditions/e28@0","node":"d169","brief":"confirming gate-only consumption of the 122 fields"}
+{"ts":"2026-08-01T09:18:56.138Z","op":"update","visit":"expeditions/e28@0","node":"d170","brief":"found a v2 ADR recording deterministic graph layout as an infra grave"}
+{"ts":"2026-08-01T09:18:59.171Z","op":"update","visit":"expeditions/e28@0","node":"d171","brief":"checking whether the tick packet ever carries the field list"}
+{"ts":"2026-08-01T09:19:05.153Z","op":"update","visit":"expeditions/e28@0","node":"d172","brief":"reading the peek packet shape"}
+{"ts":"2026-08-01T09:19:12.725Z","op":"update","visit":"expeditions/e28@0","node":"d173","brief":"checking whether the view-time-rendering ruling survived into v3"}
+{"ts":"2026-08-01T09:19:19.485Z","op":"update","visit":"expeditions/e28@0","node":"d174","brief":"checking if the compiled machine id ends with -walk"}
+{"ts":"2026-08-01T09:19:20.240Z","op":"update","visit":"expeditions/e28@0","node":"d175","brief":"Found the field feedback and chunk guidance behind stateRows"}
+{"ts":"2026-08-01T09:19:24.808Z","op":"update","visit":"expeditions/e28@0","node":"d176","brief":"v3 tree has no ledger copy of the ADR; now pinning the local VS Code version"}
+{"ts":"2026-08-01T09:19:25.771Z","op":"update","visit":"expeditions/e28@0","node":"d177","brief":"reading how the compiled column becomes the -walk sub-machine"}
+{"ts":"2026-08-01T09:19:38.750Z","op":"update","visit":"expeditions/e28@0","node":"d178","brief":"last attempt at the local VS Code layout to read its bundled mermaid"}
+{"ts":"2026-08-01T09:19:43.678Z","op":"done","visit":"expeditions/e28@0","node":"d165","brief":"req-board-parallel is the only ruling and it never mentions arrows"}
+{"ts":"2026-08-01T09:19:46.786Z","op":"update","visit":"expeditions/e28@0","node":"d179","brief":"reading VS Code built-in mermaid extension version from the local install"}
+{"ts":"2026-08-01T09:19:53.988Z","op":"done","visit":"expeditions/e28@0","node":"d164","brief":"M1 Frame proves canvas order diverges from rank order in the largest machine"}
+{"ts":"2026-08-01T09:19:54.963Z","op":"update","visit":"expeditions/e28@0","node":"d180","brief":"listing the built-in mermaid extension files to find the bundled library version"}
+{"ts":"2026-08-01T09:20:02.617Z","op":"update","visit":"expeditions/e28@0","node":"d181","brief":"reading ThirdPartyNotices to pin the bundled mermaid and layout libs"}
+{"ts":"2026-08-01T09:20:12.930Z","op":"update","visit":"expeditions/e28@0","node":"d182","brief":"grepping the bundle for the mermaid version and elk layered algorithm"}
+{"ts":"2026-08-01T09:20:14.445Z","op":"update","visit":"expeditions/e28@0","node":"d183","brief":"se_shoot wrote where the reader cannot look"}
+{"ts":"2026-08-01T09:20:24.097Z","op":"update","visit":"expeditions/e28@0","node":"d184","brief":"fingerprinting the bundled mermaid major version by diagram-type markers"}
+{"ts":"2026-08-01T09:27:50.043Z","op":"update","visit":"expeditions/e28@0","node":"d185","brief":"Verifying the claim that top-to-bottom is ten lines"}
+{"ts":"2026-08-01T09:28:19.102Z","op":"update","visit":"expeditions/e28@0","node":"d186","brief":"Checking the claim that evidence never reaches the agent"}
+{"ts":"2026-08-01T09:54:08.052Z","op":"plan","visit":"expeditions/e28@0","parent":null,"nodes":[{"id":"d187","brief":"read machine.ts + compile.ts field inventory"},{"id":"d188","brief":"verify token sets/joins in code and shipped machines"},{"id":"d189","brief":"establish submachine nesting depth"},{"id":"d190","brief":"trace group boxes to geometry or declaration"},{"id":"d191","brief":"count authored vs generated machines"}]}
+{"ts":"2026-08-01T09:54:08.413Z","op":"plan","visit":"expeditions/e28@0","parent":null,"nodes":[{"id":"d192","brief":"read this repo's extension.js to see how the mirror is hosted today"},{"id":"d193","brief":"establish what VS Code renders natively (markdown preview + Mermaid version/types)"},{"id":"d194","brief":"establish custom editor + webview API control surface"},{"id":"d195","brief":"survey the big diagram extensions for offline behaviour"},{"id":"d196","brief":"check for any editor-area (non-webview) diagram rendering"},{"id":"d197","brief":"judge adoptable format vs own webview against the five hard constraints"}]}
+{"ts":"2026-08-01T09:54:13.495Z","op":"update","visit":"expeditions/e28@0","node":"d198","brief":"reading compile.ts for canvas->machine field mapping"}
+{"ts":"2026-08-01T09:54:17.663Z","op":"fork","visit":"expeditions/e28@0","parent":"d187","node":"d199","brief":"strand: showing a live walk - many positions, many agents","nodes":[{"id":"d200","brief":"read how render.ts marks position today"},{"id":"d201","brief":"check if the whole active array is honoured"},{"id":"d202","brief":"survey xstate/stately/scxml position vocabulary"},{"id":"d203","brief":"find multi-agent marking prior art"},{"id":"d204","brief":"check layout stability under highlight-only change"}]}
+{"ts":"2026-08-01T09:54:21.592Z","op":"plan","visit":"expeditions/e28@0","parent":null,"nodes":[{"id":"d205","brief":"read the v2 figures-derived ADR in full"},{"id":"d206","brief":"establish ELK.js size licence and pinning options"},{"id":"d207","brief":"establish dagre facts and maintenance status"},{"id":"d208","brief":"establish Graphviz-WASM facts and pinning"},{"id":"d209","brief":"establish d3-force and Mermaid internal layout"},{"id":"d210","brief":"establish hand-rolled Sugiyama cost"},{"id":"d211","brief":"weigh the v2 counter-argument against 2026 reality"}]}
+{"ts":"2026-08-01T09:54:26.273Z","op":"update","visit":"expeditions/e28@0","node":"d212","brief":"reading the machineSvg call site to see how activeIds is built"}
+{"ts":"2026-08-01T09:54:29.118Z","op":"update","visit":"expeditions/e28@0","node":"d213","brief":"canvas element shape read; now hunting shipped join states"}
+{"ts":"2026-08-01T09:54:38.092Z","op":"update","visit":"expeditions/e28@0","node":"d214","brief":"reading the active/route CSS vocabulary"}
+{"ts":"2026-08-01T09:54:38.314Z","op":"update","visit":"expeditions/e28@0","node":"d215","brief":"no authored join in state notes; checking generators for join states"}
+{"ts":"2026-08-01T09:54:48.018Z","op":"update","visit":"expeditions/e28@0","node":"d216","brief":"iterations.ts:289 builds a join state - reading the generator"}
+{"ts":"2026-08-01T09:54:48.266Z","op":"done","visit":"expeditions/e28@0","node":"d205","brief":"grave = layout of ARBITRARY graphs; rejection rests on script-created visuals"}
+{"ts":"2026-08-01T09:54:49.060Z","op":"update","visit":"expeditions/e28@0","node":"d217","brief":"tracing active() and route() to judge single vs multi position"}
+{"ts":"2026-08-01T09:54:55.761Z","op":"fork","visit":"expeditions/e28@0","parent":"d201","node":"d218","brief":"strand: what VS Code can SHOW in 2026","nodes":[{"id":"d219","brief":"pin built-in Mermaid version from local install"},{"id":"d220","brief":"does markdown-preview Mermaid reach a webview"},{"id":"d221","brief":"custom editor + webview API surface"},{"id":"d222","brief":"offline behaviour of the big diagram extensions"},{"id":"d223","brief":"editor-area non-webview rendering"},{"id":"d224","brief":"verdict: adopt a format or keep our webview"}]}
+{"ts":"2026-08-01T09:55:00.306Z","op":"update","visit":"expeditions/e28@0","node":"d225","brief":"checking inst.claims - a per-state owner would be the multi-agent hook"}
+{"ts":"2026-08-01T09:55:03.633Z","op":"fork","visit":"expeditions/e28@0","parent":"d203","node":"d226","brief":"STRAND on candidate FORMATS for the drawn state machine","nodes":[{"id":"d227","brief":"establish what the current Obsidian canvas carries"},{"id":"d228","brief":"establish how active states are marked today"},{"id":"d229","brief":"judge SCXML as an authoring format"},{"id":"d230","brief":"judge Mermaid stateDiagram-v2 and flowchart"},{"id":"d231","brief":"judge PlantUML state diagrams"},{"id":"d232","brief":"judge Graphviz DOT"},{"id":"d233","brief":"judge ELK JSON"},{"id":"d234","brief":"judge xstate statechart JSON"},{"id":"d235","brief":"judge draw.io XML"}]}
+{"ts":"2026-08-01T09:55:05.558Z","op":"update","visit":"expeditions/e28@0","node":"d236","brief":"probing the local VS Code app folder for the built-in mermaid extension"}
+{"ts":"2026-08-01T09:55:11.091Z","op":"update","visit":"expeditions/e28@0","node":"d237","brief":"reading the claims field declaration and hunting for any writer"}
+{"ts":"2026-08-01T09:55:11.507Z","op":"update","visit":"expeditions/e28@0","node":"d238","brief":"groups: geometric in authored, declared in generated"}
+{"ts":"2026-08-01T09:55:12.620Z","op":"update","visit":"expeditions/e28@0","node":"d239","brief":"hunting SCXML prior art across the owner's ai folder"}
+{"ts":"2026-08-01T09:55:19.635Z","op":"update","visit":"expeditions/e28@0","node":"d240","brief":"reading main.canvas to count authored states and generator stubs"}
+{"ts":"2026-08-01T09:55:24.219Z","op":"update","visit":"expeditions/e28@0","node":"d241","brief":"VS Code 1.131.0 confirmed locally; listing built-in markdown/mermaid extensions"}
+{"ts":"2026-08-01T09:55:26.681Z","op":"update","visit":"expeditions/e28@0","node":"d242","brief":"checking morph + pan/zoom preservation for layout stability"}
+{"ts":"2026-08-01T09:55:27.949Z","op":"update","visit":"expeditions/e28@0","node":"d243","brief":"reading generatedView registry"}
+{"ts":"2026-08-01T09:55:32.682Z","op":"update","visit":"expeditions/e28@0","node":"d244","brief":"measuring real shipped artifact byte sizes over HTTP HEAD"}
+{"ts":"2026-08-01T09:55:36.992Z","op":"update","visit":"expeditions/e28@0","node":"d245","brief":"render takes activeIds as a Set - checking claims"}
+{"ts":"2026-08-01T09:55:55.729Z","op":"update","visit":"expeditions/e28@0","node":"d246","brief":"reading the refresh/morph path to see what survives an update"}
+{"ts":"2026-08-01T09:55:57.730Z","op":"update","visit":"expeditions/e28@0","node":"d247","brief":"listing real file sizes from the jsdelivr data API"}
+{"ts":"2026-08-01T09:56:07.341Z","op":"done","visit":"expeditions/e28@0","node":"d200","brief":"render marks position with .state.active fill plus a single route arrow at stops[0]"}
+{"ts":"2026-08-01T09:56:08.434Z","op":"update","visit":"expeditions/e28@0","node":"d248","brief":"fingerprinting the bundle for ELK and mermaid diagram types"}
+{"ts":"2026-08-01T09:56:17.024Z","op":"update","visit":"expeditions/e28@0","node":"d249","brief":"chasing whether ELK layered can pin one node while the rest lays out"}
+{"ts":"2026-08-01T09:56:17.314Z","op":"update","visit":"expeditions/e28@0","node":"d250","brief":"counting live expeditions and iterations on disk"}
+{"ts":"2026-08-01T09:56:22.875Z","op":"update","visit":"expeditions/e28@0","node":"d251","brief":"reading the viewBox persistence that keeps the picture from jumping"}
+{"ts":"2026-08-01T09:56:27.933Z","op":"update","visit":"expeditions/e28@0","node":"d252","brief":"locating the machineSvg call sites"}
+{"ts":"2026-08-01T09:56:36.392Z","op":"update","visit":"expeditions/e28@0","node":"d253","brief":"reading the render pipeline that marks the walk position"}
+{"ts":"2026-08-01T09:56:36.863Z","op":"update","visit":"expeditions/e28@0","node":"d254","brief":"confirming Graphviz pos/pin work only in neato and fdp, never in dot"}
+{"ts":"2026-08-01T09:56:37.932Z","op":"update","visit":"expeditions/e28@0","node":"d255","brief":"all 24 mermaid diagram types present incl radar-beta and treemap-beta"}
+{"ts":"2026-08-01T09:56:43.801Z","op":"update","visit":"expeditions/e28@0","node":"d256","brief":"checking tests and other active[0] uses"}
+{"ts":"2026-08-01T09:56:47.251Z","op":"update","visit":"expeditions/e28@0","node":"d257","brief":"checking whether killer and condition types are live fields"}
+{"ts":"2026-08-01T09:56:51.548Z","op":"done","visit":"expeditions/e28@0","node":"d220","brief":"no contribution point exposes mermaid to a third-party webview"}
+{"ts":"2026-08-01T09:56:52.521Z","op":"update","visit":"expeditions/e28@0","node":"d258","brief":"collecting the SCXML prior-art grep results"}
+{"ts":"2026-08-01T09:56:58.672Z","op":"update","visit":"expeditions/e28@0","node":"d259","brief":"grepping the real elk.bundled.js for the interactive constraint machinery"}
+{"ts":"2026-08-01T09:57:00.409Z","op":"update","visit":"expeditions/e28@0","node":"d260","brief":"checking authored canvases for declared edge roles and guards"}
+{"ts":"2026-08-01T09:57:02.664Z","op":"update","visit":"expeditions/e28@0","node":"d261","brief":"confirming the route is computed from active()[0] alone"}
+{"ts":"2026-08-01T09:57:06.511Z","op":"update","visit":"expeditions/e28@0","node":"d262","brief":"no SCXML prior art outside this repo; widening to statechart and diagram tooling"}
+{"ts":"2026-08-01T09:57:12.600Z","op":"update","visit":"expeditions/e28@0","node":"d263","brief":"reading the rigor matrix row shape for the generated field set"}
+{"ts":"2026-08-01T09:57:22.777Z","op":"update","visit":"expeditions/e28@0","node":"d264","brief":"pulling context to prove ELK interactive options are registered not dead"}
+{"ts":"2026-08-01T09:57:23.346Z","op":"update","visit":"expeditions/e28@0","node":"d265","brief":"reading render.ts machineSvg - the engine emits finished SVG server-side"}
+{"ts":"2026-08-01T09:57:23.350Z","op":"update","visit":"expeditions/e28@0","node":"d266","brief":"hunting a test that proves two tokens active at once"}
+{"ts":"2026-08-01T09:57:29.119Z","op":"update","visit":"expeditions/e28@0","node":"d267","brief":"reading the OR/AND fan-in test"}
+{"ts":"2026-08-01T09:57:37.301Z","op":"update","visit":"expeditions/e28@0","node":"d268","brief":"enumerating every ELK constraint option id actually present in the JS bundle"}
+{"ts":"2026-08-01T09:57:41.149Z","op":"update","visit":"expeditions/e28@0","node":"d269","brief":"chasing the join wedge guard SE-C-123"}
+{"ts":"2026-08-01T09:57:46.377Z","op":"update","visit":"expeditions/e28@0","node":"d270","brief":"reading the wedge guard implementation"}
+{"ts":"2026-08-01T09:57:49.615Z","op":"done","visit":"expeditions/e28@0","node":"d192","brief":"mirror = engine HTTP server on localhost:7333, framed by a webview iframe"}
+{"ts":"2026-08-01T09:57:52.203Z","op":"done","visit":"expeditions/e28@0","node":"d202","brief":"Stately fades the inactive and splits regions by a dashed line"}
+{"ts":"2026-08-01T09:57:55.480Z","op":"done","visit":"expeditions/e28@0","node":"d188","brief":"joins confirmed: generated only, one shipped join (all-built)"}
+{"ts":"2026-08-01T09:58:09.207Z","op":"update","visit":"expeditions/e28@0","node":"d271","brief":"found a VS Code visual SCXML editor storing geometry in a viz: namespace"}
+{"ts":"2026-08-01T09:58:09.209Z","op":"done","visit":"expeditions/e28@0","node":"d207","brief":"dagre 0.8.5 dead 3+yr; @dagrejs/dagre 3.0.0 MIT is the live fork"}
+{"ts":"2026-08-01T09:58:09.539Z","op":"done","visit":"expeditions/e28@0","node":"d204","brief":"authored coordinates make the layout incapable of jumping"}
+{"ts":"2026-08-01T09:58:49.841Z","op":"update","visit":"expeditions/e28@0","node":"d272","brief":"found /vendor/vscode-elements.js - the engine already serves a vendored JS bundle"}
+{"ts":"2026-08-01T09:58:56.719Z","op":"update","visit":"expeditions/e28@0","node":"d273","brief":"reading the v1 structural-models decision for prior art on diagram formats"}
+{"ts":"2026-08-01T09:59:06.263Z","op":"update","visit":"expeditions/e28@0","node":"d274","brief":"checking how the Graphviz wasm is embedded and which Graphviz version it is"}
+{"ts":"2026-08-01T09:59:11.260Z","op":"update","visit":"expeditions/e28@0","node":"d275","brief":"reading v1 M3 candidates to see which diagram formats were weighed"}
+{"ts":"2026-08-01T09:59:16.357Z","op":"update","visit":"expeditions/e28@0","node":"d276","brief":"final check: is join fuel ever rendered"}
+{"ts":"2026-08-01T09:59:25.593Z","op":"update","visit":"expeditions/e28@0","node":"d277","brief":"determining whether the Graphviz wasm binary is inlined or fetched at runtime"}
+{"ts":"2026-08-01T09:59:26.159Z","op":"update","visit":"expeditions/e28@0","node":"d278","brief":"confirming how the current SVG marks active and whether claims are distinguished"}
+{"ts":"2026-08-01T09:59:42.909Z","op":"update","visit":"expeditions/e28@0","node":"d279","brief":"reading render.ts to size the hand-rolled layout baseline already in the repo"}
+{"ts":"2026-08-01T09:59:52.056Z","op":"update","visit":"expeditions/e28@0","node":"d280","brief":"checking mermaid bundle for stateDiagram fork/join and classDef support"}
+{"ts":"2026-08-01T10:00:07.973Z","op":"update","visit":"expeditions/e28@0","node":"d281","brief":"checking d3-force initial placement determinism and every package release date"}
+{"ts":"2026-08-01T10:00:16.559Z","op":"done","visit":"expeditions/e28@0","node":"d230","brief":"mermaid has fork/join and classDef, but no node pinning"}
+{"ts":"2026-08-01T10:00:44.247Z","op":"done","visit":"expeditions/e28@0","node":"d223","brief":"editorInsets exists but is proposal-gated and still a webview; decorations are static only"}
+{"ts":"2026-08-01T10:00:44.538Z","op":"done","visit":"expeditions/e28@0","node":"d210","brief":"v3 has zero auto-layout today and every coordinate comes hand-placed from the canvas"}
+{"ts":"2026-08-01T10:01:00.679Z","op":"update","visit":"expeditions/e28@0","node":"d282","brief":"reading ELK's own guide on constraining layered layout to settle pinning"}
+{"ts":"2026-08-01T10:01:05.392Z","op":"update","visit":"expeditions/e28@0","node":"d283","brief":"checking how the current SVG marks active states before writing the verdict"}
+{"ts":"2026-08-01T10:01:17.684Z","op":"done","visit":"expeditions/e28@0","node":"d224","brief":"verdict: no adoptable format clears all five; our own webview stays"}
+{"ts":"2026-08-01T10:01:27.568Z","op":"done","visit":"expeditions/e28@0","node":"d219","brief":"mermaid 11.15.0 pinned from DEFAULT_INFO_DB in the shipped bundle"}
+{"ts":"2026-08-01T10:01:32.566Z","op":"done","visit":"expeditions/e28@0","node":"d221","brief":"custom editors own a file type but are webviews in an editor tab"}
+{"ts":"2026-08-01T10:01:34.574Z","op":"update","visit":"expeditions/e28@0","node":"d284","brief":"checking whether the wasm API exposes neato minus-n or only an engine name"}
+{"ts":"2026-08-01T10:01:43.919Z","op":"done","visit":"expeditions/e28@0","node":"d222","brief":"drawio and plantuml both render offline when locally configured"}
+{"ts":"2026-08-01T10:01:50.663Z","op":"done","visit":"expeditions/e28@0","node":"d218","brief":"answered: everything worth having still means our own webview"}
+{"ts":"2026-08-01T10:01:51.825Z","op":"done","visit":"expeditions/e28@0","node":"d227","brief":"JSON Canvas carries x and y per node so layout is fully authored today"}
+{"ts":"2026-08-01T10:01:55.352Z","op":"update","visit":"expeditions/e28@0","node":"d285","brief":"reading the nop option doc since it looks like the neato minus-n escape hatch"}
+{"ts":"2026-08-01T10:02:26.394Z","op":"done","visit":"expeditions/e28@0","node":"d208","brief":"wasm graphviz inlines its binary and exposes nop for the neato re-route pass"}
+{"ts":"2026-08-01T10:02:44.345Z","op":"done","visit":"expeditions/e28@0","node":"d211","brief":"the ADR bans writing a layout engine and its own parenthetical points at adoption"}
+{"ts":"2026-08-01T10:04:22.024Z","op":"plan","visit":"expeditions/e28@0","parent":null,"nodes":[{"id":"d286","brief":"Verify constraint 1: CSP vs local-HTTP iframe"},{"id":"d287","brief":"Check dependency set and no-build-step law"},{"id":"d288","brief":"Close the strand's render.ts gap"}]}
+{"ts":"2026-08-01T10:04:35.064Z","op":"update","visit":"expeditions/e28@0","node":"d289","brief":"grepping for the no-build-step law across the repo"}
+{"ts":"2026-08-01T10:04:36.736Z","op":"update","visit":"expeditions/e28@0","node":"d290","brief":"enumerating all position indicators in render.ts"}
+{"ts":"2026-08-01T10:04:59.278Z","op":"update","visit":"expeditions/e28@0","node":"d291","brief":"reading main.canvas to test the double-arrow claim R4"}
+{"ts":"2026-08-01T10:05:13.426Z","op":"update","visit":"expeditions/e28@0","node":"d292","brief":"rendering a forced two-token walk to see how many boxes actually light"}
+{"ts":"2026-08-01T10:05:31.979Z","op":"update","visit":"expeditions/e28@0","node":"d293","brief":"checking the CURRENT gate and whether the you-are-here arrow vanishes on arrival"}
+{"ts":"2026-08-01T10:05:34.723Z","op":"update","visit":"expeditions/e28@0","node":"d294","brief":"nailing the arrowhead and group-geometry compile rules"}
+{"ts":"2026-08-01T10:05:57.633Z","op":"update","visit":"expeditions/e28@0","node":"d295","brief":"hunting the one reachable producer of a two-token active array"}
+{"ts":"2026-08-01T10:06:24.686Z","op":"update","visit":"expeditions/e28@0","node":"d296","brief":"testing whether a two-chunk parallel build machine can be walked at all"}
+{"ts":"2026-08-01T10:06:40.922Z","op":"update","visit":"expeditions/e28@0","node":"d297","brief":"walking a two-chunk parallel build to see if it wedges"}
+{"ts":"2026-08-01T10:07:02.582Z","op":"update","visit":"expeditions/e28@0","node":"d298","brief":"counting authored canvases against generated ones"}
+{"ts":"2026-08-01T10:07:18.139Z","op":"update","visit":"expeditions/e28@0","node":"d299","brief":"the drawing lives in a localhost iframe, so the webview CSP may not bind it"}
+{"ts":"2026-08-01T10:07:44.126Z","op":"update","visit":"expeditions/e28@0","node":"d300","brief":"checking the bpmn.io licence and the repo law on new dependencies"}
+{"ts":"2026-08-01T10:08:07.686Z","op":"update","visit":"expeditions/e28@0","node":"d301","brief":"confirming the pinned walk machine's drawing is generated, not authored"}
+{"ts":"2026-08-01T10:08:18.609Z","op":"done","visit":"expeditions/e28@0","node":"d288","brief":"gap closed: multi-active is UNREACHABLE via the tick, and the chunk machine deadlocks"}
+{"ts":"2026-08-01T10:09:45.686Z","op":"plan","visit":"expeditions/e28@0","parent":null,"nodes":[{"id":"d302","brief":"establish the markdown-it contribution point and its limits"},{"id":"d303","brief":"compare custom editor / notebook renderer / webview panel"},{"id":"d304","brief":"price a markdown-it plugin on the repo's own extension"}]}
+{"ts":"2026-08-01T10:11:36.722Z","op":"update","visit":"expeditions/e28@0","node":"d305","brief":"elkjs per-node pinning failed in test; now probing mermaid offline"}
+{"ts":"2026-08-01T10:11:46.737Z","op":"plan","visit":"expeditions/e28@0","parent":null,"nodes":[{"id":"d306","brief":"Refute central pinning claim empirically (ELK, Graphviz)"},{"id":"d307","brief":"Test omitted engines WebCola and d3-dag"},{"id":"d308","brief":"Verify repo scale + render.ts + ADR claims"},{"id":"d309","brief":"Close one listed gap"}]}
+{"ts":"2026-08-01T10:12:07.750Z","op":"update","visit":"expeditions/e28@0","node":"d310","brief":"confirming the iframe origin and checking JSON Canvas spec 1.0 fields"}
+{"ts":"2026-08-01T10:12:31.464Z","op":"update","visit":"expeditions/e28@0","node":"d311","brief":"checking whether a dependency law would disqualify every vendored engine"}
+{"ts":"2026-08-01T10:12:52.269Z","op":"fork","visit":"expeditions/e28@0","parent":"d287","node":"d312","brief":"adversarial verify of Obsidian Bases strand","nodes":[{"id":"d313","brief":"confirm QueryController empty body + registerBasesView in typings"},{"id":"d314","brief":"audit function list against docs"},{"id":"d315","brief":"find parser hazards the strand missed"},{"id":"d316","brief":"audit mdbasequery real coverage"},{"id":"d317","brief":"re-run vault scans"},{"id":"d318","brief":"close the embedded-fence custom-view gap"}]}
+{"ts":"2026-08-01T10:12:59.114Z","op":"update","visit":"expeditions/e28@0","node":"d319","brief":"testing whether mermaid can render headless in Node like the repo does"}
+{"ts":"2026-08-01T10:13:16.093Z","op":"update","visit":"expeditions/e28@0","node":"d320","brief":"checking ErrorValue and ViewOption actually exist in typings"}
+{"ts":"2026-08-01T10:13:41.431Z","op":"update","visit":"expeditions/e28@0","node":"d321","brief":"found ViewOption does not exist and groupBy body is empty in typings"}
+{"ts":"2026-08-01T10:13:58.911Z","op":"done","visit":"expeditions/e28@0","node":"d313","brief":"QueryController empty CONFIRMED; but ViewOption and ErrorValue do NOT exist in typings"}
+{"ts":"2026-08-01T10:14:23.812Z","op":"update","visit":"expeditions/e28@0","node":"d322","brief":"cloning mdbasequery to audit real coverage rather than trust file sizes"}
+{"ts":"2026-08-01T10:14:46.177Z","op":"update","visit":"expeditions/e28@0","node":"d323","brief":"mdbasequery clone confirmed real MIT v0.0.1; now diffing its function coverage"}
+{"ts":"2026-08-01T10:15:03.266Z","op":"update","visit":"expeditions/e28@0","node":"d324","brief":"order: IS supported by mdbasequery - strand caveat looks wrong"}
+{"ts":"2026-08-01T10:15:19.137Z","op":"update","visit":"expeditions/e28@0","node":"d325","brief":"found argNodes signature = lazy AST args, confirming call-by-name hazard"}
+{"ts":"2026-08-01T10:15:50.003Z","op":"update","visit":"expeditions/e28@0","node":"d326","brief":"diffing 62 implemented names against the 58 documented distinct names"}
+{"ts":"2026-08-01T10:16:47.390Z","op":"update","visit":"expeditions/e28@0","node":"d327","brief":"225/47 confirmed but my type: scan conflated frontmatter with view types - refining"}
+{"ts":"2026-08-01T10:17:41.805Z","op":"update","visit":"expeditions/e28@0","node":"d328","brief":"checking mdbasequery parser for regex-literal and numeric-dot lexing hazards"}
+{"ts":"2026-08-01T10:18:02.183Z","op":"update","visit":"expeditions/e28@0","node":"d329","brief":"built mdbasequery, about to run it against the owner's real base files"}
+{"ts":"2026-08-01T10:18:25.196Z","op":"update","visit":"expeditions/e28@0","node":"d330","brief":"running all 225 real base files through mdbasequery in strict mode"}
+{"ts":"2026-08-01T10:19:03.814Z","op":"update","visit":"expeditions/e28@0","node":"d331","brief":"docs examples like 5.isEmpty() fail to parse in an independent reimplementation"}
+{"ts":"2026-08-01T10:19:21.610Z","op":"update","visit":"expeditions/e28@0","node":"d332","brief":"fetching forum thread on base code blocks for embed semantics"}
+{"ts":"2026-08-01T10:19:37.745Z","op":"update","visit":"expeditions/e28@0","node":"d333","brief":"fetching Create a base.md for official code-block embed wording"}
+{"ts":"2026-08-01T10:19:50.628Z","op":"done","visit":"expeditions/e28@0","node":"d318","brief":"base fence is officially documented in Create a base.md, upgrading that claim"}
+{"ts":"2026-08-01T10:20:01.352Z","op":"update","visit":"expeditions/e28@0","node":"d334","brief":"waiting on the 225-file conformance batch to finish"}
+{"ts":"2026-08-01T10:20:28.241Z","op":"update","visit":"expeditions/e28@0","node":"d335","brief":"polling the conformance batch again"}
+{"ts":"2026-08-01T10:20:47.112Z","op":"done","visit":"expeditions/e28@0","node":"d315","brief":"lexer hazards found: regex-division ambiguity plus numeric-dot, both real"}
+{"ts":"2026-08-01T10:20:53.616Z","op":"plan","visit":"expeditions/e28@0","parent":null,"nodes":[{"id":"d336","brief":"Make draining an obsolete note legal anywhere"},{"id":"d337","brief":"Follow the rule into the guidance"},{"id":"d338","brief":"Sweep the inbox and drain what is done"}]}
+{"ts":"2026-08-01T10:21:08.182Z","op":"done","visit":"expeditions/e28@0","node":"d314","brief":"owner corpus exercises only 5 of 58 functions, so 225/225 tests schema not language"}
+{"ts":"2026-08-01T10:21:14.650Z","op":"done","visit":"expeditions/e28@0","node":"d337","brief":"walking.md carries the new drain rule"}
+{"ts":"2026-08-01T10:21:45.975Z","op":"update","visit":"expeditions/e28@0","node":"d339","brief":"testing whether the strand's quoted home.md formulas exist anywhere in the vault"}
+{"ts":"2026-08-01T10:22:10.878Z","op":"update","visit":"expeditions/e28@0","node":"d340","brief":"polling the quoted-example authenticity check"}
+{"ts":"2026-08-01T10:22:16.820Z","op":"update","visit":"expeditions/e28@0","node":"d341","brief":"Test now pins both halves of the new rule"}
+{"ts":"2026-08-01T10:22:35.796Z","op":"update","visit":"expeditions/e28@0","node":"d342","brief":"Retro keeps the judgment half exclusively"}
+{"ts":"2026-08-01T10:23:08.641Z","op":"done","visit":"expeditions/e28@0","node":"d336","brief":"Drain rule changed and pinned; retro suite green"}
+{"ts":"2026-08-01T10:29:13.690Z","op":"update","visit":"expeditions/e28@0","node":"d343","brief":"Checking whether the Bases research has landed"}
+{"ts":"2026-08-01T10:29:16.415Z","op":"plan","visit":"expeditions/e28@0","parent":null,"nodes":[{"id":"d344","brief":"verify matrix.base and the v1 base.go prior art"},{"id":"d345","brief":"write product/spec/bases-port.md"}]}
+{"ts":"2026-08-01T10:29:22.439Z","op":"update","visit":"expeditions/e28@0","node":"d346","brief":"reading v1 base.go header at ref main to confirm the pinned-subset evaluator exists"}
+{"ts":"2026-08-01T10:29:39.043Z","op":"update","visit":"expeditions/e28@0","node":"d347","brief":"confirming the v1 markdown-embed regexes for base fences and wikilink embeds"}
+{"ts":"2026-08-01T10:29:46.763Z","op":"update","visit":"expeditions/e28@0","node":"d348","brief":"confirming the panel type switch that a Bases cell editor would have to reuse"}
+{"ts":"2026-08-01T10:32:47.528Z","op":"done","visit":"expeditions/e28@0","node":"d345","brief":"wrote the Bases port answer to product/spec/bases-port.md"}
+{"ts":"2026-08-01T10:33:17.843Z","op":"update","visit":"expeditions/e28@0","node":"d349","brief":"fixing the voice lint findings in the Bases port answer"}
+{"ts":"2026-08-01T10:33:23.322Z","op":"done","visit":"expeditions/e28@0","node":"d344","brief":"verified v1 base.go, matrix.base and the .base counts myself"}
+{"ts":"2026-08-01T10:33:39.997Z","op":"update","visit":"expeditions/e28@0","node":"d350","brief":"Checking whether the Bases document landed"}
+{"ts":"2026-08-01T10:34:26.706Z","op":"update","visit":"expeditions/e28@0","node":"d351","brief":"Verifying that v1 already shipped a Bases evaluator"}
+{"ts":"2026-08-01T10:40:37.837Z","op":"update","visit":"expeditions/e28@0","node":"d352","brief":"Reading the machine-format document myself"}
+{"ts":"2026-08-01T10:41:55.505Z","op":"plan","visit":"expeditions/e28@0","parent":null,"nodes":[{"id":"d353","brief":"Ghoniem density definition and thresholds from primary source"},{"id":"d354","brief":"Okoe/Jianu/Kobourov result at density 0.016"},{"id":"d355","brief":"NodeTrix mechanism and open implementations"},{"id":"d356","brief":"Other hybrids for sparse directed graphs"},{"id":"d357","brief":"Aggregation and what happens to collapsed marks"},{"id":"d358","brief":"Prior art for hiding empty rows/columns"},{"id":"d359","brief":"Check repo own numbers"}]}
+{"ts":"2026-08-01T10:42:14.005Z","op":"plan","visit":"expeditions/e28@0","parent":null,"nodes":[{"id":"d360","brief":"measure our own sparsity"},{"id":"d361","brief":"DSM tools at low density"},{"id":"d362","brief":"scientific sparse-matrix viewers"},{"id":"d363","brief":"focus and context prior art"},{"id":"d364","brief":"off-screen indicators prior art"},{"id":"d365","brief":"write the sparse-mode rule set"}]}
+{"ts":"2026-08-01T10:42:27.291Z","op":"update","visit":"expeditions/e28@0","node":"d366","brief":"hunting a text-extractable source that states Ghoniem's density formula"}
+{"ts":"2026-08-01T10:42:45.963Z","op":"update","visit":"expeditions/e28@0","node":"d367","brief":"checking for local PDF text extraction tooling"}
+{"ts":"2026-08-01T10:42:56.336Z","op":"update","visit":"expeditions/e28@0","node":"d368","brief":"installing pypdf so the Ghoniem PDFs can be read as text"}
+{"ts":"2026-08-01T10:42:59.758Z","op":"update","visit":"expeditions/e28@0","node":"d369","brief":"pulling the Ghoniem primary source for density thresholds"}
+{"ts":"2026-08-01T10:43:11.607Z","op":"update","visit":"expeditions/e28@0","node":"d370","brief":"downloading Ghoniem 2004/2005 and Ren 2019 PDFs and extracting text with pypdf"}
+{"ts":"2026-08-01T10:43:16.725Z","op":"update","visit":"expeditions/e28@0","node":"d371","brief":"Fetching Ghoniem 2005 to verify the tested density range"}
+{"ts":"2026-08-01T10:43:27.952Z","op":"update","visit":"expeditions/e28@0","node":"d372","brief":"Ghoniem PDF came back binary; cross-checking density params via survey"}
+{"ts":"2026-08-01T10:43:31.431Z","op":"update","visit":"expeditions/e28@0","node":"d373","brief":"grepping Ren 2019 for its density conditions"}
+{"ts":"2026-08-01T10:43:40.203Z","op":"done","visit":"expeditions/e28@0","node":"d360","brief":"our matrix measured as strictly lower-triangular with bandwidth 4"}
+{"ts":"2026-08-01T10:43:58.404Z","op":"update","visit":"expeditions/e28@0","node":"d374","brief":"trying six mirrors for the Ghoniem PDFs"}
+{"ts":"2026-08-01T10:44:04.594Z","op":"update","visit":"expeditions/e28@0","node":"d375","brief":"trying a direct PDF host for the Ghoniem InfoVis 2004 paper"}
+{"ts":"2026-08-01T10:44:11.967Z","op":"update","visit":"expeditions/e28@0","node":"d376","brief":"fetching the Okoe study PDF to read its density figures"}
+{"ts":"2026-08-01T10:44:13.072Z","op":"update","visit":"expeditions/e28@0","node":"d377","brief":"Verified Ghoniem tested only 20/40/60 percent density via the Okoe primary source"}
+{"ts":"2026-08-01T10:44:23.679Z","op":"update","visit":"expeditions/e28@0","node":"d378","brief":"asking Semantic Scholar API for an open-access Ghoniem PDF"}
+{"ts":"2026-08-01T10:44:28.528Z","op":"update","visit":"expeditions/e28@0","node":"d379","brief":"reading the Graph Drawing 2017 revisit for its density figures"}
+{"ts":"2026-08-01T10:44:34.530Z","op":"update","visit":"expeditions/e28@0","node":"d380","brief":"Checking quilts as the layered-DAG alternative to a plain matrix"}
+{"ts":"2026-08-01T10:44:47.890Z","op":"done","visit":"expeditions/e28@0","node":"d353","brief":"Ghoniem tested densities 0.2 to 0.6 only — it does not cover our 2.3 percent regime"}
+{"ts":"2026-08-01T10:45:00.811Z","op":"update","visit":"expeditions/e28@0","node":"d381","brief":"Testing whether the rendered matrix is the sparse graph or a dense attribute table"}
+{"ts":"2026-08-01T10:45:07.482Z","op":"update","visit":"expeditions/e28@0","node":"d382","brief":"last attempt at an open Ghoniem copy via the 2004 InfoVis DOI"}
+{"ts":"2026-08-01T10:45:17.556Z","op":"update","visit":"expeditions/e28@0","node":"d383","brief":"checking the open-source DSMEditor for its default view behaviour"}
+{"ts":"2026-08-01T10:45:21.282Z","op":"done","visit":"expeditions/e28@0","node":"d359","brief":"The rendered rigor matrix is 250 of 250 cells filled - it is fully dense, not sparse"}
+{"ts":"2026-08-01T10:45:30.801Z","op":"update","visit":"expeditions/e28@0","node":"d384","brief":"reading the DSMEditor manual for cross-highlight and fast-render detail"}
+{"ts":"2026-08-01T10:45:30.870Z","op":"update","visit":"expeditions/e28@0","node":"d385","brief":"Reading rigor-matrix.ts to see what the engine already derives from depends_on"}
+{"ts":"2026-08-01T10:45:39.470Z","op":"update","visit":"expeditions/e28@0","node":"d386","brief":"reading DSM banding and tearing definitions"}
+{"ts":"2026-08-01T10:45:46.836Z","op":"update","visit":"expeditions/e28@0","node":"d387","brief":"Computing the five per-column compiled graphs to price the strike question"}
+{"ts":"2026-08-01T10:45:56.233Z","op":"update","visit":"expeditions/e28@0","node":"d388","brief":"surveying npm for seriation packages"}
+{"ts":"2026-08-01T10:46:07.566Z","op":"update","visit":"expeditions/e28@0","node":"d389","brief":"reading the matplotlib spy reference for its two plotting styles"}
+{"ts":"2026-08-01T10:46:30.802Z","op":"update","visit":"expeditions/e28@0","node":"d390","brief":"Final count of the hub shape in main.canvas and total authored states"}
+{"ts":"2026-08-01T10:46:37.295Z","op":"update","visit":"expeditions/e28@0","node":"d391","brief":"reading the BioFabric motifs paper"}
+{"ts":"2026-08-01T10:46:42.301Z","op":"update","visit":"expeditions/e28@0","node":"d392","brief":"reading a rigor row to learn the depends_on shape"}
+{"ts":"2026-08-01T10:46:43.176Z","op":"done","visit":"expeditions/e28@0","node":"d362","brief":"spy draws one marker per nonzero and states the nonzero count as text"}
+{"ts":"2026-08-01T10:46:47.521Z","op":"update","visit":"expeditions/e28@0","node":"d393","brief":"reading the quilts evaluation paper"}
+{"ts":"2026-08-01T10:46:58.791Z","op":"update","visit":"expeditions/e28@0","node":"d394","brief":"checking what the owner already settled about a margin indicator"}
+{"ts":"2026-08-01T10:47:01.618Z","op":"update","visit":"expeditions/e28@0","node":"d395","brief":"reading how the quilts authors summarise Ghoniem and Keller"}
+{"ts":"2026-08-01T10:47:10.240Z","op":"update","visit":"expeditions/e28@0","node":"d396","brief":"measuring the repo 50x50 matrix directly"}
+{"ts":"2026-08-01T10:47:29.151Z","op":"update","visit":"expeditions/e28@0","node":"d397","brief":"recomputing our own graph's density and degree distribution from the row frontmatter"}
+{"ts":"2026-08-01T10:47:30.393Z","op":"update","visit":"expeditions/e28@0","node":"d398","brief":"confirming the attribute table has five always-filled columns"}
+{"ts":"2026-08-01T10:47:36.571Z","op":"update","visit":"expeditions/e28@0","node":"d399","brief":"checking the real frontmatter shape after my parser under-counted"}
+{"ts":"2026-08-01T10:47:49.410Z","op":"done","visit":"expeditions/e28@0","node":"d358","brief":"Excel PivotTables hide empty rows by default behind a Show items with no data toggle"}
+{"ts":"2026-08-01T10:48:07.352Z","op":"update","visit":"expeditions/e28@0","node":"d400","brief":"reparsing the rigor matrix with a real YAML parser"}
+{"ts":"2026-08-01T10:48:15.850Z","op":"update","visit":"expeditions/e28@0","node":"d401","brief":"measuring what each candidate rule buys on our own matrix"}
+{"ts":"2026-08-01T10:48:39.422Z","op":"update","visit":"expeditions/e28@0","node":"d402","brief":"locating state-machine transition data to test cyclic reordering"}
+{"ts":"2026-08-01T10:48:41.207Z","op":"update","visit":"expeditions/e28@0","node":"d403","brief":"testing acyclicity and layering of the rigor matrix graph"}
+{"ts":"2026-08-01T10:48:47.731Z","op":"update","visit":"expeditions/e28@0","node":"d404","brief":"reading the repo's own DSM method cards"}
+{"ts":"2026-08-01T10:48:52.604Z","op":"update","visit":"expeditions/e28@0","node":"d405","brief":"confirming reorder.js carries Cuthill-McKee for the banding rule"}
+{"ts":"2026-08-01T10:48:58.582Z","op":"update","visit":"expeditions/e28@0","node":"d406","brief":"identifying the DSM reference the repo cites"}
+{"ts":"2026-08-01T10:49:01.300Z","op":"plan","visit":"expeditions/e28@0","parent":null,"nodes":[{"id":"d407","brief":"Restore popups so the pop-out buttons work"},{"id":"d408","brief":"Honour the whole active set in every surface"},{"id":"d409","brief":"Resolve the dead per-agent claims field"}]}
+{"ts":"2026-08-01T10:49:17.265Z","op":"update","visit":"expeditions/e28@0","node":"d410","brief":"pulling the Abdelaal bipartite/node-link/matrix comparison for its density conditions"}
+{"ts":"2026-08-01T10:49:39.073Z","op":"update","visit":"expeditions/e28@0","node":"d411","brief":"reading ReorderBench for which algorithm makes which pattern"}
+{"ts":"2026-08-01T10:49:43.658Z","op":"update","visit":"expeditions/e28@0","node":"d412","brief":"reading Abdelaal's density definition and headline results"}
+{"ts":"2026-08-01T10:49:52.804Z","op":"update","visit":"expeditions/e28@0","node":"d413","brief":"pulling the per-algorithm band-pattern scores"}
+{"ts":"2026-08-01T10:50:01.510Z","op":"update","visit":"expeditions/e28@0","node":"d414","brief":"reading the algorithm comparison table"}
+{"ts":"2026-08-01T10:50:25.003Z","op":"update","visit":"expeditions/e28@0","node":"d415","brief":"pulling MatLink, Responsive Matrix Cells and ZAME for the aggregation question"}
+{"ts":"2026-08-01T10:50:36.852Z","op":"update","visit":"expeditions/e28@0","node":"d416","brief":"checking licences of candidate graph libraries"}
+{"ts":"2026-08-01T10:50:41.294Z","op":"update","visit":"expeditions/e28@0","node":"d417","brief":"Pinning the sandbox guard so it cannot regress"}
+{"ts":"2026-08-01T10:50:48.961Z","op":"update","visit":"expeditions/e28@0","node":"d418","brief":"checking Responsive Matrix Cells aggregation and the repo's state machines"}
+{"ts":"2026-08-01T10:50:58.624Z","op":"update","visit":"expeditions/e28@0","node":"d419","brief":"locating a real state machine to measure its edge count"}
+{"ts":"2026-08-01T10:50:59.448Z","op":"done","visit":"expeditions/e28@0","node":"d407","brief":"Dead modifier keys fixed and pinned by lint"}
+{"ts":"2026-08-01T10:51:10.953Z","op":"update","visit":"expeditions/e28@0","node":"d420","brief":"measuring edges per state across the repo's seven canvas machines"}
+{"ts":"2026-08-01T10:51:28.464Z","op":"update","visit":"expeditions/e28@0","node":"d421","brief":"checking licences and liveness of the NodeTrix and BioFabric implementations"}
+{"ts":"2026-08-01T10:51:48.960Z","op":"update","visit":"expeditions/e28@0","node":"d422","brief":"confirming the BioFabric licence and what reorder.js actually ships"}
+{"ts":"2026-08-01T10:51:55.785Z","op":"update","visit":"expeditions/e28@0","node":"d423","brief":"Guard makes the latent collapse loud when it arrives"}
+{"ts":"2026-08-01T10:52:15.739Z","op":"done","visit":"expeditions/e28@0","node":"d408","brief":"Latent collapse guarded; three cases green"}
+{"ts":"2026-08-01T10:52:20.847Z","op":"update","visit":"expeditions/e28@0","node":"d424","brief":"measuring the bandwidth of our matrix under topological seriation"}
+{"ts":"2026-08-01T10:52:51.683Z","op":"update","visit":"expeditions/e28@0","node":"d425","brief":"verifying BioFabric from the BMC Bioinformatics primary text"}
+{"ts":"2026-08-01T10:53:02.239Z","op":"update","visit":"expeditions/e28@0","node":"d426","brief":"Claims is the multi-agent hook, half built"}
+{"ts":"2026-08-01T10:53:04.640Z","op":"update","visit":"expeditions/e28@0","node":"d427","brief":"getting the BioFabric abstract from Europe PMC instead"}
+{"ts":"2026-08-01T10:54:16.443Z","op":"done","visit":"expeditions/e28@0","node":"d409","brief":"Claims hook pinned; four token cases green"}
+{"ts":"2026-08-01T10:54:18.770Z","op":"plan","visit":"expeditions/e28@0","parent":null,"nodes":[{"id":"d428","brief":"measure the repo graph independently"},{"id":"d429","brief":"verify every paper citation"},{"id":"d430","brief":"verify library licences"},{"id":"d431","brief":"attack the recommendation"},{"id":"d432","brief":"close one gap"}]}
+{"ts":"2026-08-01T10:54:26.031Z","op":"plan","visit":"expeditions/e28@0","parent":null,"nodes":[{"id":"d433","brief":"confirm Monaco identity and the inline-widget refusal"},{"id":"d434","brief":"map decorations / CodeLens / inlay hints / editor insets and issue 85682"},{"id":"d435","brief":"map CustomTextEditorProvider and Microsoft's own sample"},{"id":"d436","brief":"enumerate the real costs of owning the editor surface"},{"id":"d437","brief":"settle custom editor beside plain text editor on one document"},{"id":"d438","brief":"read what our extension.js already registers"}]}
+{"ts":"2026-08-01T10:54:30.562Z","op":"plan","visit":"expeditions/e28@0","parent":null,"nodes":[{"id":"d439","brief":"Re-measure the rigor matrix independently"},{"id":"d440","brief":"Verify every paper citation for authors and year and finding"},{"id":"d441","brief":"Verify every library for existence and licence"},{"id":"d442","brief":"Attack the recommendation"},{"id":"d443","brief":"Close the state-machine matrix gap"}]}
+{"ts":"2026-08-01T10:54:31.886Z","op":"fork","visit":"expeditions/e28@0","parent":"d365","node":"d444","brief":"STRAND: how Obsidian Live Preview works mechanically","nodes":[{"id":"d445","brief":"confirm Obsidian = CM6, pin the version"},{"id":"d446","brief":"decoration mechanism + real plugin code"},{"id":"d447","brief":"how Bases views write back"},{"id":"d448","brief":"Reading / Live Preview / Source precisely"},{"id":"d449","brief":"survey OSS Live Preview reproductions"},{"id":"d450","brief":"test no-build-step against CM6 dists"}]}
+{"ts":"2026-08-01T10:54:40.306Z","op":"update","visit":"expeditions/e28@0","node":"d451","brief":"pulling the cursor-reveals-source predicate from a real CM6 live-preview lib"}
+{"ts":"2026-08-01T10:54:52.113Z","op":"update","visit":"expeditions/e28@0","node":"d452","brief":"pulling the customEditor* proposal d.ts files that ship in the owner's 1.131 build"}
+{"ts":"2026-08-01T10:55:06.472Z","op":"update","visit":"expeditions/e28@0","node":"d453","brief":"licence/language/liveness sweep across the OSS live-preview candidates"}
+{"ts":"2026-08-01T10:55:18.663Z","op":"update","visit":"expeditions/e28@0","node":"d454","brief":"re-running the licence sweep after a formatting fault"}
+{"ts":"2026-08-01T10:55:35.626Z","op":"update","visit":"expeditions/e28@0","node":"d455","brief":"checking SilverBullet and Zettlr for the same decoration technique"}
+{"ts":"2026-08-01T10:55:37.882Z","op":"update","visit":"expeditions/e28@0","node":"d456","brief":"Amending e28 goal to name what it actually holds"}
+{"ts":"2026-08-01T10:55:44.286Z","op":"done","visit":"expeditions/e28@0","node":"d445","brief":"obsidian npm 1.13.2 pins @codemirror/view 6.43.5 + state 6.7.0 as peerDeps"}
+{"ts":"2026-08-01T10:55:47.916Z","op":"update","visit":"expeditions/e28@0","node":"d457","brief":"measuring the states x legal_tools DMM the strand never tested"}
+{"ts":"2026-08-01T10:56:14.211Z","op":"update","visit":"expeditions/e28@0","node":"d458","brief":"reading the dagre LICENSE file directly"}
+{"ts":"2026-08-01T10:56:15.292Z","op":"done","visit":"expeditions/e28@0","node":"d110","brief":"e28 goal amended to name the whole bundle"}
+{"ts":"2026-08-01T10:56:16.136Z","op":"update","visit":"expeditions/e28@0","node":"d459","brief":"closed: all 7 canvas machines are acyclic; main.canvas bandwidth 9 of 13"}
+{"ts":"2026-08-01T10:56:38.737Z","op":"update","visit":"expeditions/e28@0","node":"d460","brief":"testing the pivot claim that nothing renders depends_on as a matrix"}
+{"ts":"2026-08-01T10:56:55.488Z","op":"update","visit":"expeditions/e28@0","node":"d461","brief":"verifying the 2026 arXiv id the strand cites for cross-highlighting"}
+{"ts":"2026-08-01T10:57:14.175Z","op":"update","visit":"expeditions/e28@0","node":"d462","brief":"arXiv 2604.14791 id confirmed; checking if it really tested cross-highlight"}
+{"ts":"2026-08-01T10:57:15.568Z","op":"update","visit":"expeditions/e28@0","node":"d463","brief":"all 7 canvases parse as DAGs; main is a star centred on idle"}
+{"ts":"2026-08-01T10:58:15.223Z","op":"update","visit":"expeditions/e28@0","node":"d464","brief":"found 2021/2022 focus+context matrix work that counters Rule 5"}
+{"ts":"2026-08-01T10:59:59.497Z","op":"done","visit":"expeditions/e28@0","node":"d443","brief":"canvas machines all acyclic; main.canvas bandwidth 9 of 13"}
+{"ts":"2026-08-01T11:00:15.990Z","op":"update","visit":"expeditions/e28@0","node":"d465","brief":"trying a direct read of matplotlib spy docstring locally"}
+{"ts":"2026-08-01T11:01:26.165Z","op":"plan","visit":"expeditions/e28@0","parent":null,"nodes":[{"id":"d466","brief":"Refute the CM6 version pin claim"},{"id":"d467","brief":"Verify the four OSS reproductions and licences"},{"id":"d468","brief":"Verify BasesEntry read-only and processFrontMatter"},{"id":"d469","brief":"Re-run the no-build-step ESM experiment"},{"id":"d470","brief":"Close the gzip gap"},{"id":"d471","brief":"Attack buildable: widget-internal editing and webview keyboard"}]}
+{"ts":"2026-08-01T11:01:28.566Z","op":"plan","visit":"expeditions/e28@0","parent":null,"nodes":[{"id":"d472","brief":"re-measure the rigor matrix graph independently"},{"id":"d473","brief":"verify every paper citation against primary text"},{"id":"d474","brief":"verify every library licence via the GitHub API"},{"id":"d475","brief":"attack the layered-node-link recommendation"},{"id":"d476","brief":"close the Ghoniem density-formula gap"}]}
+{"ts":"2026-08-01T11:01:34.235Z","op":"update","visit":"expeditions/e28@0","node":"d477","brief":"shouldShowSource.ts 404 at claimed path - locating real repo tree"}
+{"ts":"2026-08-01T11:01:48.723Z","op":"update","visit":"expeditions/e28@0","node":"d478","brief":"ReorderBench v2 table read: strand band numbers exact but count and deep-model row wrong"}
+{"ts":"2026-08-01T11:01:51.179Z","op":"update","visit":"expeditions/e28@0","node":"d479","brief":"cloning the MIT reproductions to read their real source"}
+{"ts":"2026-08-01T11:02:04.585Z","op":"update","visit":"expeditions/e28@0","node":"d480","brief":"buildable attacked on 129 real notes: 150/1219 edits refused, all sequences"}
+{"ts":"2026-08-01T11:02:09.720Z","op":"update","visit":"expeditions/e28@0","node":"d481","brief":"reading the real shouldShowSource.ts predicate"}
+{"ts":"2026-08-01T11:02:31.823Z","op":"fork","visit":"expeditions/e28@0","parent":"d467","node":"d482","brief":"adversarial verify: VS Code editor-surface strand","nodes":[{"id":"d483","brief":"verify d.ts + source citations"},{"id":"d484","brief":"verify GitHub issues"},{"id":"d485","brief":"verify local extension claims"},{"id":"d486","brief":"attack buildable"},{"id":"d487","brief":"close a gap"}]}
+{"ts":"2026-08-01T11:02:39.124Z","op":"update","visit":"expeditions/e28@0","node":"d488","brief":"checking the mark-vs-replace variant claim in livePreview.ts"}
+{"ts":"2026-08-01T11:02:57.591Z","op":"update","visit":"expeditions/e28@0","node":"d489","brief":"hunting ignoreEvent/atomicRanges - the widget interaction APIs"}
+{"ts":"2026-08-01T11:03:03.105Z","op":"update","visit":"expeditions/e28@0","node":"d490","brief":"the claimed resources/app/out path does not exist; finding the real install layout"}
+{"ts":"2026-08-01T11:03:05.335Z","op":"update","visit":"expeditions/e28@0","node":"d491","brief":"reading Ghoniem's own density definition out of the extracted PDF text"}
+{"ts":"2026-08-01T11:03:10.832Z","op":"update","visit":"expeditions/e28@0","node":"d492","brief":"locating org repo layout and widget interaction APIs"}
+{"ts":"2026-08-01T11:03:22.744Z","op":"update","visit":"expeditions/e28@0","node":"d493","brief":"reading contentEditable table cell write-back path"}
+{"ts":"2026-08-01T11:03:35.804Z","op":"update","visit":"expeditions/e28@0","node":"d494","brief":"reading the proposed-API gate and outline pane source at 1.131.0"}
+{"ts":"2026-08-01T11:03:36.379Z","op":"done","visit":"expeditions/e28@0","node":"d441","brief":"all seven npm licences reproduced exactly; reorder.js API confirmed from Fekete wiki"}
+{"ts":"2026-08-01T11:03:43.513Z","op":"update","visit":"expeditions/e28@0","node":"d495","brief":"collecting npm install result for the CM6 ESM probe"}
+{"ts":"2026-08-01T11:04:00.310Z","op":"update","visit":"expeditions/e28@0","node":"d496","brief":"running the markdown parse under plain node ESM"}
+{"ts":"2026-08-01T11:04:00.735Z","op":"update","visit":"expeditions/e28@0","node":"d497","brief":"reading the full proposed-API gate to see if anything else blocks stable"}
+{"ts":"2026-08-01T11:04:27.348Z","op":"update","visit":"expeditions/e28@0","node":"d498","brief":"measuring raw+gzip bytes and extracting every bare specifier"}
+{"ts":"2026-08-01T11:05:08.014Z","op":"update","visit":"expeditions/e28@0","node":"d499","brief":"resolving the true runtime module graph and emitting the import map"}
+{"ts":"2026-08-01T11:05:27.394Z","op":"update","visit":"expeditions/e28@0","node":"d500","brief":"downloading obsidian.d.ts to check BasesEntry and processFrontMatter"}
+{"ts":"2026-08-01T11:05:37.172Z","op":"update","visit":"expeditions/e28@0","node":"d501","brief":"checking react ESM claim and atomic-editor package facts"}
+{"ts":"2026-08-01T11:05:41.615Z","op":"done","visit":"expeditions/e28@0","node":"d483","brief":"every d.ts line number and source quote checked out; only the line-count claim was wrong"}
+{"ts":"2026-08-01T11:06:13.564Z","op":"update","visit":"expeditions/e28@0","node":"d502","brief":"verifying VS Code issue 65333 - iframe swallows keybindings"}
+{"ts":"2026-08-01T11:06:17.841Z","op":"update","visit":"expeditions/e28@0","node":"d503","brief":"Checking whether the last two runs have landed"}
+{"ts":"2026-08-01T11:06:22.455Z","op":"update","visit":"expeditions/e28@0","node":"d504","brief":"verifying the views-vs-modes vocabulary from obsidian-help source"}
+{"ts":"2026-08-01T11:06:29.215Z","op":"update","visit":"expeditions/e28@0","node":"d505","brief":"checking Microsoft's own custom-editor sample for the write-back pattern"}
+{"ts":"2026-08-01T11:06:45.281Z","op":"update","visit":"expeditions/e28@0","node":"d506","brief":"cloning GoodBases to check the writeProperty citation"}
+{"ts":"2026-08-01T11:06:59.016Z","op":"update","visit":"expeditions/e28@0","node":"d507","brief":"closing the editorAssociations gap from the 1.131 editor resolver source"}
+{"ts":"2026-08-01T11:07:02.547Z","op":"update","visit":"expeditions/e28@0","node":"d508","brief":"Sweeping the inbox to classify every pending note"}
+{"ts":"2026-08-01T11:07:05.372Z","op":"update","visit":"expeditions/e28@0","node":"d509","brief":"reading GoodBases write path and org-live-preview decorations"}
+{"ts":"2026-08-01T11:07:21.499Z","op":"update","visit":"expeditions/e28@0","node":"d510","brief":"reading the association settings and the custom-editor diff factory in full"}
+{"ts":"2026-08-01T11:07:36.531Z","op":"update","visit":"expeditions/e28@0","node":"d511","brief":"Checking notes against the code before judging"}
+{"ts":"2026-08-01T11:07:53.988Z","op":"update","visit":"expeditions/e28@0","node":"d512","brief":"checking whether a custom TEXT editor can be split at all"}
+{"ts":"2026-08-01T11:08:14.525Z","op":"done","visit":"expeditions/e28@0","node":"d487","brief":"gap closed: workbench.diffEditorAssociations exists and overrides diffs independently"}
+{"ts":"2026-08-01T11:08:42.414Z","op":"update","visit":"expeditions/e28@0","node":"d513","brief":"confirming that diff and merge now default to never for custom editors"}
+{"ts":"2026-08-01T11:09:51.578Z","op":"plan","visit":"expeditions/e28@0","parent":null,"nodes":[{"id":"d514","brief":"Run mermaid-check, which nobody ever has"},{"id":"d515","brief":"Make walking.md match se_reading"},{"id":"d516","brief":"Guard se_web_fetch against an oversize fetch"},{"id":"d517","brief":"Check whether boot still reads in three waves"}]}
+{"ts":"2026-08-01T11:11:13.188Z","op":"done","visit":"expeditions/e28@0","node":"d514","brief":"mermaid-check ran; it needs the network and now says so"}
+{"ts":"2026-08-01T11:11:40.373Z","op":"done","visit":"expeditions/e28@0","node":"d515","brief":"walking.md now matches the shipped se_reading"}
+{"ts":"2026-08-01T11:13:59.536Z","op":"update","visit":"expeditions/e28@0","node":"d518","brief":"web fetch bounds what it decodes, not just what returns"}
+{"ts":"2026-08-01T11:15:31.322Z","op":"update","visit":"expeditions/e28@0","node":"d519","brief":"Waiting on the suite over the web-fetch guard"}
+{"ts":"2026-08-01T11:18:41.661Z","op":"update","visit":"expeditions/e28@0","node":"d520","brief":"Finding what opened a VS Code window"}
+{"ts":"2026-08-01T11:25:17.573Z","op":"plan","visit":"expeditions/e28@0","parent":null,"nodes":[{"id":"d521","brief":"read compile.ts and establish edge shape"},{"id":"d522","brief":"compile main machine and print the real transition pivot"},{"id":"d523","brief":"measure density of filtered pivots on the machine"},{"id":"d524","brief":"measure filtered pivot on the rigor dependency graph"},{"id":"d525","brief":"count distinct frontmatter keys across product/**/*.md"}]}
+{"ts":"2026-08-01T11:25:19.698Z","op":"plan","visit":"expeditions/e28@0","parent":null,"nodes":[{"id":"d526","brief":"read voice.md"},{"id":"d527","brief":"write product/spec/live-editor.md"}]}
+{"ts":"2026-08-01T11:25:22.031Z","op":"update","visit":"expeditions/e28@0","node":"d528","brief":"reading compile.ts to establish exactly what an edge carries"}
+{"ts":"2026-08-01T11:25:25.324Z","op":"plan","visit":"expeditions/e28@0","parent":null,"nodes":[{"id":"d529","brief":"read the panel specs and render.ts"},{"id":"d530","brief":"inventory reusable table machinery in the engine"},{"id":"d531","brief":"quote matrix.base in full"},{"id":"d532","brief":"draft the smallest table spec example"},{"id":"d533","brief":"pick the smallest shippable first step"}]}
+{"ts":"2026-08-01T11:25:28.850Z","op":"update","visit":"expeditions/e28@0","node":"d534","brief":"pinning EdgeDecl/StateDecl field lists from machine.ts"}
+{"ts":"2026-08-01T11:25:31.366Z","op":"update","visit":"expeditions/e28@0","node":"d535","brief":"reading the two panel specs and the rigor matrix reader"}
+{"ts":"2026-08-01T11:25:39.514Z","op":"done","visit":"expeditions/e28@0","node":"d529","brief":"read both panel specs and params.ts; render.ts is 156KB so searching it instead"}
+{"ts":"2026-08-01T11:25:40.279Z","op":"done","visit":"expeditions/e28@0","node":"d521","brief":"EdgeDecl carries exactly to/role/guard"}
+{"ts":"2026-08-01T11:25:48.873Z","op":"update","visit":"expeditions/e28@0","node":"d536","brief":"hunting for existing table markup and grid renderers"}
+{"ts":"2026-08-01T11:25:59.646Z","op":"update","visit":"expeditions/e28@0","node":"d537","brief":"compiling main.canvas with node to print the real state and edge table"}
+{"ts":"2026-08-01T11:26:00.150Z","op":"update","visit":"expeditions/e28@0","node":"d538","brief":"reading the three table-markup regions of render.ts"}
+{"ts":"2026-08-01T11:26:11.333Z","op":"update","visit":"expeditions/e28@0","node":"d539","brief":"reading feedRows, renderLog and nextTable - the existing row renderers"}
+{"ts":"2026-08-01T11:26:13.558Z","op":"update","visit":"expeditions/e28@0","node":"d540","brief":"checking spec file frontmatter convention before writing"}
+{"ts":"2026-08-01T11:26:26.073Z","op":"update","visit":"expeditions/e28@0","node":"d541","brief":"locating the rigor dependency graph source notes"}
+{"ts":"2026-08-01T11:26:34.998Z","op":"update","visit":"expeditions/e28@0","node":"d542","brief":"reading two rigor rows to learn the depends_on and milestone shape"}
+{"ts":"2026-08-01T11:26:39.903Z","op":"update","visit":"expeditions/e28@0","node":"d543","brief":"found TWO .base files, not one - reading the voice matrix base too"}
+{"ts":"2026-08-01T11:27:03.447Z","op":"update","visit":"expeditions/e28@0","node":"d544","brief":"reading the prior bases-port findings so this strand builds on them rather than repeating"}
+{"ts":"2026-08-01T11:27:16.284Z","op":"done","visit":"expeditions/e28@0","node":"d522","brief":"main compiled and printed with its 12x12 pivot"}
+{"ts":"2026-08-01T11:27:39.483Z","op":"plan","visit":"expeditions/e28@0","parent":null,"nodes":[{"id":"d545","brief":"Read what the rigor matrix reader already returns"},{"id":"d546","brief":"Declare a table spec beside the panel specs"},{"id":"d547","brief":"Render it and shoot it"}]}
+{"ts":"2026-08-01T11:27:42.590Z","op":"update","visit":"expeditions/e28@0","node":"d548","brief":"re-measuring the rigor edge count after a regex bug"}
+{"ts":"2026-08-01T11:28:01.182Z","op":"update","visit":"expeditions/e28@0","node":"d549","brief":"chasing the one-edge gap between my 59 and the brief's 58"}
+{"ts":"2026-08-01T11:28:12.007Z","op":"done","visit":"expeditions/e28@0","node":"d523","brief":"filtered pivots measured on main and the group filter collapses to zero edges"}
+{"ts":"2026-08-01T11:28:12.444Z","op":"update","visit":"expeditions/e28@0","node":"d550","brief":"mapping the mirror routes to size the smallest shippable step"}
+{"ts":"2026-08-01T11:28:24.021Z","op":"update","visit":"expeditions/e28@0","node":"d551","brief":"reading cards.ts and params.test.ts to size the first step exactly"}
+{"ts":"2026-08-01T11:28:29.021Z","op":"done","visit":"expeditions/e28@0","node":"d546","brief":"Table renderer reads the owner's own .base format"}
+{"ts":"2026-08-01T11:29:01.400Z","op":"update","visit":"expeditions/e28@0","node":"d552","brief":"testing the owner claim that a filtered pivot is dense by construction"}
+{"ts":"2026-08-01T11:29:13.077Z","op":"done","visit":"expeditions/e28@0","node":"d524","brief":"rigor filtered pivots measured per milestone"}
+{"ts":"2026-08-01T11:29:16.686Z","op":"update","visit":"expeditions/e28@0","node":"d553","brief":"Rendering matrix.base through our own renderer"}
+{"ts":"2026-08-01T11:29:50.211Z","op":"done","visit":"expeditions/e28@0","node":"d525","brief":"57 distinct frontmatter keys counted across 146 notes"}
+{"ts":"2026-08-01T11:30:03.062Z","op":"update","visit":"expeditions/e28@0","node":"d554","brief":"writing the eight-section live-editor answer"}
+{"ts":"2026-08-01T11:30:05.249Z","op":"done","visit":"expeditions/e28@0","node":"d532","brief":"spec drafted; filtered-pivot claim measured and it does not hold as stated"}
+{"ts":"2026-08-01T11:30:08.691Z","op":"done","visit":"expeditions/e28@0","node":"d527","brief":"live-editor.md written at 28,265 bytes in eight sections"}
+{"ts":"2026-08-01T11:30:50.743Z","op":"done","visit":"expeditions/e28@0","node":"d547","brief":"Rigor matrix rendered from its own base file"}
+{"ts":"2026-08-01T11:30:59.057Z","op":"update","visit":"expeditions/e28@0","node":"d555","brief":"reading base.go groupBy to see if it is one axis or two"}
+{"ts":"2026-08-01T11:33:54.239Z","op":"plan","visit":"expeditions/e28@0","parent":null,"nodes":[{"id":"d556","brief":"Re-derive main machine pivot density"},{"id":"d557","brief":"Re-derive rigor DAG density and orderings"},{"id":"d558","brief":"Verify citations Kahn/Tarjan/Steward/Cuthill-McKee"},{"id":"d559","brief":"Close the gap on the existing v3 table+matrix renderer"},{"id":"d560","brief":"Attack the buildable claim"}]}
+{"ts":"2026-08-01T11:34:26.889Z","op":"update","visit":"expeditions/e28@0","node":"d561","brief":"tables.ts has no groupBy; rigor-matrix.ts derives milestone from filename"}
+{"ts":"2026-08-01T11:34:33.336Z","op":"update","visit":"expeditions/e28@0","node":"d562","brief":"reading base.go groupBy internals to test the 80%-present claim"}
+{"ts":"2026-08-01T11:34:48.409Z","op":"update","visit":"expeditions/e28@0","node":"d563","brief":"compile.ts citations confirmed; writing the measurement harness"}
+{"ts":"2026-08-01T11:35:04.278Z","op":"update","visit":"expeditions/e28@0","node":"d564","brief":"reading matrix.base in full to test the port-vs-build delta"}
+{"ts":"2026-08-01T11:35:20.948Z","op":"update","visit":"expeditions/e28@0","node":"d565","brief":"reading the tables module that already exists"}
+{"ts":"2026-08-01T11:35:24.198Z","op":"update","visit":"expeditions/e28@0","node":"d566","brief":"checking for a Go toolchain to run the v1 evaluator on matrix.base"}
+{"ts":"2026-08-01T11:35:45.047Z","op":"done","visit":"expeditions/e28@0","node":"d559","brief":"engine/tables.ts already exists and renders Bases views"}
+{"ts":"2026-08-01T11:35:51.127Z","op":"update","visit":"expeditions/e28@0","node":"d567","brief":"re-deriving rigor DAG node and edge counts from the row frontmatter"}
+{"ts":"2026-08-01T11:36:13.679Z","op":"update","visit":"expeditions/e28@0","node":"d568","brief":"verifying every line citation in the strand against the files"}
+{"ts":"2026-08-01T11:36:41.036Z","op":"update","visit":"expeditions/e28@0","node":"d569","brief":"testing whether filtering really makes the rigor pivot dense"}
+{"ts":"2026-08-01T11:36:42.490Z","op":"update","visit":"expeditions/e28@0","node":"d570","brief":"Main machine numbers all reproduce; now re-deriving the rigor DAG"}
+{"ts":"2026-08-01T11:37:05.953Z","op":"update","visit":"expeditions/e28@0","node":"d571","brief":"recounting the main machine states and edges from the canvas"}
+{"ts":"2026-08-01T11:37:36.828Z","op":"done","visit":"expeditions/e28@0","node":"d556","brief":"12 states confirmed from canvas and 19 edges reconstruct as 11 drawn plus 8 returns"}
+{"ts":"2026-08-01T11:37:47.409Z","op":"update","visit":"expeditions/e28@0","node":"d572","brief":"reading tables.ts renderView and checking what wires it"}
+{"ts":"2026-08-01T11:37:54.588Z","op":"done","visit":"expeditions/e28@0","node":"d560","brief":"buildable refuted because the owner's table spec is already the base format"}
+{"ts":"2026-08-01T11:38:20.982Z","op":"plan","visit":"expeditions/e28@0","parent":null,"nodes":[{"id":"d573","brief":"a note-folder reader turning markdown frontmatter into table rows"},{"id":"d574","brief":"pivot: a row property crossed with a column property and a cell aggregate"},{"id":"d575","brief":"serve the table on the mirror so it draws outside Obsidian"},{"id":"d576","brief":"screenshot it and check the result against the Bases view"}]}
+{"ts":"2026-08-01T11:38:36.122Z","op":"update","visit":"expeditions/e28@0","node":"d577","brief":"Kahn order IS the authored order; compiled machines carry guards and cycles"}
+{"ts":"2026-08-01T11:38:53.602Z","op":"update","visit":"expeditions/e28@0","node":"d578","brief":"verifying the Browning 2001 DSM citation"}
+{"ts":"2026-08-01T11:39:24.575Z","op":"update","visit":"expeditions/e28@0","node":"d579","brief":"sizing the vault scan before writing the reader"}
+{"ts":"2026-08-01T11:39:34.028Z","op":"update","visit":"expeditions/e28@0","node":"d580","brief":"fetching the Obsidian Bases syntax primary source to test the groupBy claim"}
+{"ts":"2026-08-01T11:40:38.245Z","op":"update","visit":"expeditions/e28@0","node":"d581","brief":"verifying pivot library licences and sizes from the npm registry"}
+{"ts":"2026-08-01T11:40:56.117Z","op":"update","visit":"expeditions/e28@0","node":"d582","brief":"owner retires the splice blocker: write-back formats instead"}
+{"ts":"2026-08-01T11:41:09.389Z","op":"update","visit":"expeditions/e28@0","node":"d583","brief":"All four algorithm citations confirmed against primary bibliographic records"}
+{"ts":"2026-08-01T11:41:39.223Z","op":"update","visit":"expeditions/e28@0","node":"d584","brief":"emitting the 50x50 DSM to close the untested-render gap"}
+{"ts":"2026-08-01T11:42:12.549Z","op":"done","visit":"expeditions/e28@0","node":"d573","brief":"readVault turns all 169 notes into rows with file.name and file.path"}
+{"ts":"2026-08-01T11:42:39.140Z","op":"update","visit":"expeditions/e28@0","node":"d585","brief":"probing the vault reader and the depends_on pivot on real notes"}
+{"ts":"2026-08-01T11:44:36.798Z","op":"done","visit":"expeditions/e28@0","node":"d574","brief":"pivot renders; the depends_on matrix is 50x49 at 2.4 percent"}
+{"ts":"2026-08-01T11:45:26.377Z","op":"update","visit":"expeditions/e28@0","node":"d586","brief":"wiring the table into the mirror as a card and a standalone widget"}
+{"ts":"2026-08-01T11:47:09.064Z","op":"update","visit":"expeditions/e28@0","node":"d587","brief":"looking at the rendered table widget"}
+{"ts":"2026-08-01T11:47:55.773Z","op":"update","visit":"expeditions/e28@0","node":"d588","brief":"looking at the dependency pivot"}
+{"ts":"2026-08-01T11:48:49.714Z","op":"done","visit":"expeditions/e28@0","node":"d575","brief":"table is a mirror card and a standalone widget; DSM verified by shot"}
+{"ts":"2026-08-01T11:50:05.618Z","op":"done","visit":"expeditions/e28@0","node":"d576","brief":"flat view and DSM both seen and checked; 20 new tests green"}
+{"ts":"2026-08-01T11:51:09.059Z","op":"plan","visit":"expeditions/e28@0","parent":null,"nodes":[{"id":"d589","brief":"a canonical frontmatter writer that formats rather than splices"},{"id":"d590","brief":"one editor per metadata type taken from the note's own frontmatter"},{"id":"d591","brief":"commit on Enter and discard on Escape"},{"id":"d592","brief":"the frontmatter shown as a properties panel"}]}
+{"ts":"2026-08-01T11:52:22.888Z","op":"update","visit":"expeditions/e28@0","node":"d593","brief":"formatter written; body carried across byte for byte"}
+{"ts":"2026-08-01T11:53:42.299Z","op":"fork","visit":"expeditions/e28@0","parent":"d589","node":"d594","brief":"a literal NUL byte got written into tables.ts again","nodes":[]}
+{"ts":"2026-08-01T11:55:18.227Z","op":"update","visit":"expeditions/e28@0","node":"d595","brief":"the fence line's own terminator belongs to the body"}
+{"ts":"2026-08-01T11:56:26.313Z","op":"done","visit":"expeditions/e28@0","node":"d594","brief":"nested maps replace the joined key; the guard test proves it gone"}
+{"ts":"2026-08-01T12:00:05.731Z","op":"fork","visit":"expeditions/e28@0","parent":"d589","node":"d596","brief":"the preflight test fails only under a loaded suite","nodes":[]}
+{"ts":"2026-08-01T12:01:14.426Z","op":"done","visit":"expeditions/e28@0","node":"d591","brief":"commit and discard wired; refused writes leave the note untouched"}
+{"ts":"2026-08-01T12:03:44.530Z","op":"fork","visit":"expeditions/e28@0","parent":"d596","node":"d597","brief":"the shipped dependency pivot crossed two different label spaces","nodes":[]}
+{"ts":"2026-08-01T12:04:59.893Z","op":"done","visit":"expeditions/e28@0","node":"d597","brief":"rows now cross name with depends_on in authored order"}
+{"ts":"2026-08-01T12:06:21.143Z","op":"done","visit":"expeditions/e28@0","node":"d590","brief":"the delegate picks its editor from the value's own type"}
+{"ts":"2026-08-01T12:07:40.283Z","op":"update","visit":"expeditions/e28@0","node":"d598","brief":"the suite set the recursion guard, so preflight skipped every check"}
+{"ts":"2026-08-01T12:11:07.184Z","op":"done","visit":"expeditions/e28@0","node":"d596","brief":"suite green at 359 of 359 with preflight actually running"}
+{"ts":"2026-08-01T12:13:34.297Z","op":"update","visit":"expeditions/e28@0","node":"d599","brief":"finding which mirror is live so the table can be reached"}
+{"ts":"2026-08-01T12:16:42.528Z","op":"update","visit":"expeditions/e28@0","node":"d600","brief":"handover written for the restart"}
+{"ts":"2026-08-01T12:20:10.351Z","op":"done","visit":"expeditions/e28@0","node":"d592","brief":"landing e28 so the table reaches the engine"}

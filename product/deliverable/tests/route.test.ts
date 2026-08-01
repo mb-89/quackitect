@@ -161,7 +161,7 @@ test("the drawing carries the route: a spline OVER the nodes, its stops, an arro
   assert.match(html, /class="route-here" transform="translate\(-?[\d.]+ -?[\d.]+\) rotate\(-?[\d.]+\)"/, "and it faces the way the line goes");
 
   // Blue, because the voice keeps green, red and yellow for verdicts.
-  assert.match(html, /\.route-line \{ fill: none; stroke: #4a90d9/);
+  assert.match(html, /\.route-line \{ fill: none; stroke: var\(--se-walk\)/);
 });
 
 // THE ONE MOMENT THE MAP LIES (owner ruling 2026-07-29). An unbroken blue

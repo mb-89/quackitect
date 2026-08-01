@@ -28,11 +28,15 @@ test("the scale offers a notch at zero, so a full block is one click away", () =
   assert.equal(Math.min(...levels.map((l) => l.value)), 0, "nothing sits below it");
 });
 
-test("the mirror draws the zero notch on the slider", () => {
+// BLOCKED IS NOT A BUTTON (owner, 2026-08-01). It is what no rung being
+// pressed MEANS, so it is reachable by RELEASING the lowest rung rather than
+// by a switch of its own. The control is switches, never a slider.
+test("the mirror reaches blocked by releasing the lowest rung", () => {
   const root = freshRoot();
   const html = renderMirror({ session: new Session(root), root, lastPacket: undefined, mode: "manual" });
-  assert.match(html, /class="thr-notch" data-level="0"/, "the blocked notch is on the track");
-  assert.match(html, /<input id="thr" type="range" min="0"/, "and the track itself reaches 0");
+  assert.doesNotMatch(html, /id="thr" type="range"/, "the autonomy slider is gone");
+  assert.doesNotMatch(html, />B</, "blocked has no button of its own");
+  assert.match(html, /class="rung on" data-level="0"/, "pressing the lit lowest rung drops to blocked");
 });
 
 // THIS IS THE ONE THAT MATTERS. The gate is `priority > autonomy`, so a state

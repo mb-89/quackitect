@@ -30,7 +30,13 @@ function loadCfg(root: string): Cfg {
   try {
     const fm = parseStateNote(readFileSync(join(root, ...LINT_CONFIG.split("/")), "utf8")).frontmatter;
     const num = (k: keyof Cfg): number => (typeof fm[k] === "number" && (fm[k] as number) > 0 ? (fm[k] as number) : DEFAULTS[k]);
-    return { long_sentence_words: num("long_sentence_words"), wall_paragraph_lines: num("wall_paragraph_lines"), comma_chain_items: num("comma_chain_items"), dash_chain_items: num("dash_chain_items"), pyramid_paragraphs: num("pyramid_paragraphs") };
+    return {
+      long_sentence_words: num("long_sentence_words"),
+      wall_paragraph_lines: num("wall_paragraph_lines"),
+      comma_chain_items: num("comma_chain_items"),
+      dash_chain_items: num("dash_chain_items"),
+      pyramid_paragraphs: num("pyramid_paragraphs"),
+    };
   } catch {
     return { ...DEFAULTS };
   }
@@ -72,7 +78,15 @@ export function lintProse(root: string, text: string): LintFinding[] {
       if (words > cfg.long_sentence_words) {
         findings.push({ rule: "long-sentence", line: i + 1, excerpt: s.slice(0, 60), hint: `${words} words — one thought per sentence, split it` });
       }
-      if (s.split(/[,;]/).length > cfg.comma_chain_items) {
+      // A SET OF LITERALS IS NOT AN UNRENDERED LIST. Naming the shapes a
+      // canvas accepts (`pill`, `diamond`) or quoting example statements is
+      // reference, not prose — nobody wants `pill` on its own bullet. A part
+      // that is ENTIRELY a code span or a quoted string does not count.
+      // Bare words still do: "alpha, beta, gamma, delta and epsilon" is the
+      // list this rule exists to catch.
+      const isLiteral = (part: string): boolean => /^`[^`]*`$/.test(part.trim()) || /^"[^"]*"$/.test(part.trim()) || /^'[^']*'$/.test(part.trim());
+      const items = s.split(/[,;]/).filter((part) => part.trim() !== "" && !isLiteral(part));
+      if (items.length > cfg.comma_chain_items) {
         findings.push({ rule: "comma-chain", line: i + 1, excerpt: s.slice(0, 60), hint: "chained items are an unrendered list — render a list" });
       }
       // DASH CHAINS, not dashes. A single dash sets off an aside and is

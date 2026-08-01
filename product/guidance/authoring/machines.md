@@ -25,14 +25,18 @@ always.
 
 ## start and end are MECHANICAL
 
-Every machine has exactly ONE start and ONE end state — they are machinery,
-not content: the machine enters at start (the machinery walks out of it on
-the first tick) and is done when everything before end has transitioned
-into it. ALL machines share the SAME two notes
+Every machine has exactly ONE start and ONE end state. They are machinery,
+not content: the machine enters at start, the machinery walks out of it on
+the first tick, and the machine is done when everything before end has
+transitioned into it.
+
+ALL machines share the SAME two notes
 (`deliverable/machines/states/start.md` / `end.md`, `state_kind: start` /
-`end`) — never write machine-specific content into them, and never create
-per-machine start/end notes. Draw both as pills. The end state is called
-END (that is its state-machine name), not "done".
+`end`). Never write machine-specific content into them, and never create
+per-machine start/end notes.
+
+Draw both as pills. The end state is called END — that is its state-machine
+name, not "done".
 
 ## The drawn form
 
@@ -88,16 +92,21 @@ Optionally `## Evidence form` with lines "- name | description | required".
 Keep `guidance` short and imperative; it is served verbatim in packets.
 
 Conditions: every `entry_<type>`/`exit_<type>` key names a condition TYPE,
-defined by its note in `deliverable/machines/conditions/<type>.md` — the
+defined by its note in `deliverable/machines/conditions/<type>.md`. The
 compiler refuses a type without a note and an engine evaluator, and refuses
-a nested `entry:`/`exit:` dictionary (Obsidian renders those as JSON
-blobs). All of a state's conditions must hold (SCXML: the edge's effective
-cond is exit of its source AND entry of its target). Types today: `read`
-(args: documents whose PROVEN reading is the evidence — the agent sends
-each doc's current hash on the tick, the human checks each doc once per
-version in the mirror; see the condition note) and `script` (args: scripts
-the engine runs; exit 0 is the evidence — the STATE names what runs, e.g.
-boot's preflight and selftest scripts).
+a nested `entry:`/`exit:` dictionary, because Obsidian renders those as
+JSON blobs.
+
+All of a state's conditions must hold. In SCXML terms the edge's effective
+cond is exit of its source AND entry of its target.
+
+Two types exist today:
+
+- `read` — args are documents whose PROVEN reading is the evidence. The
+  agent sends each doc's current hash on the tick. The human checks each
+  doc once per version in the mirror. See the condition note.
+- `script` — args are scripts the engine runs, and exit 0 is the evidence.
+  The STATE names what runs, as boot does with its preflight and selftest.
 
 THE PULL GATES ENTRY (owner ruling 2026-07-26): outside boot, entering a
 state also demands its pulled guidance proven read, the same way — hashes

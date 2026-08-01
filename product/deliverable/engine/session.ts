@@ -44,18 +44,25 @@ import { Decisions, replayFile } from "./decisions.ts";
 import { generateIterationArchive, generateIterations, itFind, itPinRel, itRecordRel, itSeed, markStarted, pinIteration, readItRecord } from "./iterations.ts";
 import { CHANGE_COLUMNS } from "./rigor-matrix.ts";
 import { parseStateNote, section } from "./notes.ts";
-import { NARRATION_DEFAULT, narrationLevel } from "./toll.ts";
+import { NARRATION_DEFAULT_CALLS, NARRATION_DEFAULT_MINUTES } from "./toll.ts";
 
 /** THE TICK is the machinery — one tool, legal in EVERY state. Without
  *  arguments it reports (observability is never gated); with arguments it
  *  advances. se_note is legal everywhere too: a stray is captured where it
- *  strikes, never chased (contract rule 4). */
-const ALWAYS_LEGAL: ReadonlySet<string> = new Set(["se_tick", "se_note", "se_panel"]);
+ *  strikes, never chased (contract rule 4). se_note_drain joins them by the
+ *  same logic: an inbox you may only add to is not an inbox. */
+const ALWAYS_LEGAL: ReadonlySet<string> = new Set(["se_tick", "se_note", "se_panel", "se_note_drain"]);
 /** RESTRICTED tools: "all" does NOT grant these — a state must name them.
- *  se_note_drain stays restricted, so a state earns it by saying so. The
- *  retro and the front desk both name it; what they may DO with it differs,
- *  and that split lives in engine/inbox.ts, not here. */
-const RESTRICTED: ReadonlySet<string> = new Set(["se_note_drain"]);
+ *  Nothing is restricted today.
+ *
+ *  se_note_drain used to be, so that only the desk and the retro could take
+ *  anything OUT of the inbox. The owner struck that (2026-08-01): an obsolete
+ *  note is deleted where it is found, and does not wait for a ceremony.
+ *
+ *  The half that mattered was never here anyway. carried and backlog decide
+ *  what work MEANS and when it returns, and engine/inbox.ts still refuses
+ *  those outside the retro. done and obsolete are checks anyone can run. */
+const RESTRICTED: ReadonlySet<string> = new Set<string>();
 const MACHINERY: readonly string[] = ["se_tick", "se_file_read"];
 
 export function mainMachinePath(root: string): string {
@@ -140,12 +147,13 @@ export class Session {
     // to forget, so a crash or a power cut cannot leave the last session's
     // sliders standing either.
     try {
-      const s = JSON.parse(readFileSync(join(seDir(root), "settings.json"), "utf8")) as { autonomy?: number; shutdown?: number; narration?: number; session?: string };
+      const s = JSON.parse(readFileSync(join(seDir(root), "settings.json"), "utf8")) as { autonomy?: number; shutdown?: number; narration_minutes?: number; narration_calls?: number; session?: string };
       const mine = process.env.SE_SESSION;
       if (mine !== undefined && mine !== "" && s.session === mine) {
         if (typeof s.autonomy === "number" && s.autonomy >= 0 && s.autonomy <= 1) this._autonomy = s.autonomy;
         if (typeof s.shutdown === "number" && Number.isInteger(s.shutdown) && s.shutdown >= 1 && s.shutdown <= 5) this._shutdown = s.shutdown;
-        if (typeof s.narration === "number" && Number.isInteger(s.narration) && s.narration >= 1 && s.narration <= 5) this._narration = s.narration;
+        if (typeof s.narration_minutes === "number" && Number.isInteger(s.narration_minutes) && s.narration_minutes >= 0) this._narrationMinutes = s.narration_minutes;
+        if (typeof s.narration_calls === "number" && Number.isInteger(s.narration_calls) && s.narration_calls >= 0) this._narrationCalls = s.narration_calls;
       }
     } catch { /* no store yet — the defaults stand */ }
     this.syncKeepAwake();
@@ -154,7 +162,7 @@ export class Session {
   private persistSettings(): void {
     try {
       mkdirSync(seDir(this.root), { recursive: true });
-      writeFileSync(join(seDir(this.root), "settings.json"), JSON.stringify({ session: process.env.SE_SESSION ?? null, autonomy: this._autonomy, shutdown: this._shutdown, narration: this._narration }) + "\n", "utf8");
+      writeFileSync(join(seDir(this.root), "settings.json"), JSON.stringify({ session: process.env.SE_SESSION ?? null, autonomy: this._autonomy, shutdown: this._shutdown, narration_minutes: this._narrationMinutes, narration_calls: this._narrationCalls }) + "\n", "utf8");
     } catch { /* a failed save never blocks the slider */ }
   }
 
@@ -207,31 +215,58 @@ export class Session {
     return { shutdown: value, was };
   }
 
-  /** THE UPDATE CADENCE (owner design 2026-07-31): how often narration is
-   *  OWED, on the same bar as the other two controls. The reader watches
-   *  from a different surface on every host, so they set the rhythm rather
-   *  than living with one number baked into the engine. 5 owes nothing. */
-  private _narration = NARRATION_DEFAULT;
+  /** THE UPDATE CADENCE (owner design 2026-07-31, redrawn 2026-08-01): how
+   *  often narration is OWED. TWO NUMBERS, not a level — an update every n
+   *  minutes at least, or every n calls at least, whichever falls due first.
+   *  The reader types them, because a preset list is someone else guessing
+   *  which rhythm suits the surface they are watching from.
+   *
+   *  Zero on either means that clock does not run. Both zero owes nothing. */
+  private _narrationMinutes = NARRATION_DEFAULT_MINUTES;
+  private _narrationCalls = NARRATION_DEFAULT_CALLS;
 
-  get narration(): number {
-    return this._narration;
+  get narrationMinutes(): number {
+    return this._narrationMinutes;
   }
 
-  setNarration(value: number): Record<string, unknown> {
-    if (!Number.isInteger(value) || value < 1 || value > 5) {
+  get narrationCalls(): number {
+    return this._narrationCalls;
+  }
+
+  private static cadence(label: string, value: number): number {
+    if (!Number.isInteger(value) || value < 0 || value > 1440) {
       throw new Rejection({
         clause: CLAUSES.REQUIRED_ARGS,
-        expected: "an update-cadence level 1..5 (1 constant · 3 normal · 5 off)",
+        expected: `${label}: a whole number from 0 to 1440 — 0 stops that clock`,
         got: String(value),
-        remedy: { tool: "se_tick", args: {}, note: "the mirror's updates bar sets it" },
+        remedy: { tool: "se_tick", args: {}, note: "the mirror's updates row sets both" },
         source: "engine/session.ts narration",
       });
     }
-    const was = this._narration;
-    this._narration = value;
+    return value;
+  }
+
+  /** The NOW button: make an update DUE, rather than narrating for the agent. */
+  narrationDueNow(): Record<string, unknown> {
+    this._narrationDueAt = Date.now();
+    this.notifyChange();
+    return { due: true };
+  }
+
+  private _narrationDueAt = 0;
+
+  get narrationDueAt(): number {
+    return this._narrationDueAt;
+  }
+
+  setNarration(minutes: number, calls: number): Record<string, unknown> {
+    const wasMinutes = this._narrationMinutes;
+    const wasCalls = this._narrationCalls;
+    this._narrationMinutes = Session.cadence("minutes", minutes);
+    this._narrationCalls = Session.cadence("calls", calls);
     this.persistSettings();
     this.notifyChange();
-    return { narration: value, was, means: narrationLevel(value).name };
+    return { minutes, calls, was: { minutes: wasMinutes, calls: wasCalls } };
   }
 
   /** THE MILESTONE REVIEW REPORT (owner rulings 2026-07-30): the one thing
@@ -2177,7 +2212,7 @@ export class Session {
       status: this.instance.status,
       autonomy: this._autonomy,
       shutdown: this._shutdown,
-      narration: this._narration,
+      narration: { minutes: this._narrationMinutes, calls: this._narrationCalls },
       // WHERE THIS IS HEADED. Carried on every packet so neither hand has
       // to ask, and so a walk that drifts off the way is visibly off it.
       target: this._target,
@@ -2527,7 +2562,7 @@ export class Session {
       status: this.instance.status,
       autonomy: this._autonomy,
       shutdown: this._shutdown,
-      narration: this._narration,
+      narration: { minutes: this._narrationMinutes, calls: this._narrationCalls },
       legal_tools: all ? "all" : [...ALWAYS_LEGAL, ...tools],
       history: this.instance.history.slice(-10),
     };

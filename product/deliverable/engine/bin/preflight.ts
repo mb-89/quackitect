@@ -5,7 +5,7 @@
 // The state declares WHAT runs; the engine only knows HOW to run scripts.
 //
 //   node engine/bin/preflight.ts --root <project root>
-import { accessSync, constants, existsSync, mkdirSync, readdirSync } from "node:fs";
+import { accessSync, constants, existsSync, mkdirSync, readdirSync, readFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { spawnSync } from "node:child_process";
 import { compileMachine } from "../machines/compile.ts";
@@ -77,14 +77,33 @@ if (spawnSync("git", ["--version"], { stdio: "ignore" }).status !== 0) failures.
 // THE SHELL IS NOT COVERED BY THE SUITE. Nothing imports extension.js, so a
 // syntax error in it ships GREEN and VS Code then loads no extension at all,
 // silently. That happened on 2026-07-30: a backtick inside a comment ended
-// the template literal the webview's script lives in. Parsing the file is the
-// whole guard, and it costs one spawn.
+// the template literal the webview's script lives in.
+//
+// Parsing the file is only HALF the guard. The webview's own scripts live
+// inside template literals, so to the outer parser they are just text: a
+// syntax error in one ships green, the pane renders, its script throws, and
+// the pane is silently dead. Each script body is therefore parsed on its own.
 const shell = join(root, "product", "deliverable", "vscode", "extension.js");
 if (existsSync(shell)) {
   const parsed = spawnSync(process.execPath, ["--check", shell], { encoding: "utf8" });
   if (parsed.status !== 0) {
     const line = String(parsed.stderr ?? "").split("\n").map((l) => l.trim()).find((l) => l.includes("Error"));
     failures.push(`the VS Code shell does not parse: ${line ?? "run node --check on it"}`);
+  } else {
+    const source = readFileSync(shell, "utf8");
+    const blocks = [...source.matchAll(/<script\b[^>]*>([\s\S]*?)<\/script>/gi)];
+    blocks.forEach((m, i) => {
+      // ${...} is host-side interpolation, not part of the script's grammar.
+      // Blanking it leaves the structure a parser can judge.
+      const body = m[1].replace(/\$\{[\s\S]*?\}/g, '""');
+      try {
+        new Function(body);
+      } catch (e) {
+        const before = source.slice(0, m.index ?? 0);
+        const line = before.split("\n").length;
+        failures.push(`the VS Code webview script #${i + 1} (near line ${line}) does not parse: ${String((e as Error).message)}`);
+      }
+    });
   }
 }
 // THE PRODUCT'S CONFIGURATION. Both are read live, and both fall back

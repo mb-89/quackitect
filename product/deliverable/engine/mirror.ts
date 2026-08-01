@@ -16,11 +16,11 @@ import { appendNote, pendingNotes, readNotes } from "./inbox.ts";
 import { loadCards } from "./cards.ts";
 import { handleHttp, type McpServer } from "./mcp.ts";
 import { feedRows, renderMirror, SHUTDOWN_LEVELS, type MirrorState } from "./render.ts";
-import { NARRATION_LEVELS } from "./toll.ts";
 import { resolveInRoot, seDir } from "./paths.ts";
 import { loadLevels } from "./scale.ts";
 import { Session } from "./session.ts";
 import { survey } from "./survey.ts";
+import { editCell } from "./tables.ts";
 
 export interface MirrorOptions {
   session: Session;
@@ -140,9 +140,15 @@ export function startMirror(o: MirrorOptions): Server {
       if (req.method === "POST" && url.pathname === "/narration") {
         // How often narration is OWED. The reader's hand, logged like the rest.
         post(req, res, "mirror_narration", (body) => ({
-          args: { value: body.value },
-          result: state.session.setNarration(Number(body.value)),
+          args: { minutes: body.minutes, calls: body.calls },
+          result: state.session.setNarration(Number(body.minutes), Number(body.calls)),
         }));
+        return;
+      }
+      if (req.method === "POST" && url.pathname === "/narration-now") {
+        // THE NOW BUTTON. It does not narrate for the agent — it makes an
+        // update DUE, so the next call has to carry one.
+        post(req, res, "mirror_narration_now", () => ({ args: {}, result: state.session.narrationDueNow() }));
         return;
       }
       if (req.method === "POST" && url.pathname === "/autonomy") {
@@ -347,6 +353,34 @@ export function startMirror(o: MirrorOptions): Server {
         }));
         return;
       }
+      if (req.method === "POST" && url.pathname === "/table/edit") {
+        // A CELL EDIT IS A WRITE, so it joins the feed like every other one.
+        // It answers JSON instead of redirecting the way the form posts do:
+        // the table replaces the one cell in place, and reloading the whole
+        // page under somebody who is still editing is not an answer.
+        const chunks: Buffer[] = [];
+        req.on("data", (c: Buffer) => chunks.push(c));
+        req.on("end", () => {
+          const started = Date.now();
+          let args: Record<string, unknown> = {};
+          const answer = (payload: Record<string, unknown>): void => {
+            res.writeHead(200, { "content-type": "application/json; charset=utf-8" });
+            res.end(JSON.stringify(payload));
+          };
+          try {
+            const body = JSON.parse(Buffer.concat(chunks).toString("utf8") || "{}") as Record<string, unknown>;
+            args = { path: String(body.path ?? ""), key: String(body.key ?? ""), text: String(body.text ?? "") };
+            const written = editCell(o.root, { path: String(body.path ?? ""), key: String(body.key ?? ""), text: String(body.text ?? "") });
+            o.log.append({ tool: "mirror_cell_edit", args, ok: true, outcome: "result", duration_ms: Date.now() - started, response: written });
+            answer({ ok: true, ...written });
+          } catch (e) {
+            const why = e instanceof Rejection ? `${e.expected} — got ${e.got}` : String((e as Error).message ?? e);
+            o.log.append({ tool: "mirror_cell_edit", args, ok: false, outcome: "rejected", duration_ms: Date.now() - started, response: e instanceof Rejection ? e.toJSON() : { error: why } });
+            answer({ ok: false, error: why });
+          }
+        });
+        return;
+      }
       if (url.pathname === "/api/tick") {
         res.writeHead(200, { "content-type": "application/json; charset=utf-8" });
         res.end(JSON.stringify(state.session.tickInfo(), null, 2));
@@ -357,7 +391,7 @@ export function startMirror(o: MirrorOptions): Server {
         // The autonomy scale is authored in machines/scale.md, so a host that
         // kept its own copy of the notches would drift the moment it is edited.
         res.writeHead(200, { "content-type": "application/json; charset=utf-8", "access-control-allow-origin": "*" });
-        res.end(JSON.stringify({ autonomy: loadLevels(state.root), shutdown: SHUTDOWN_LEVELS, narration: NARRATION_LEVELS }));
+        res.end(JSON.stringify({ autonomy: loadLevels(state.root), shutdown: SHUTDOWN_LEVELS, narration: { minutes: state.session.narrationMinutes, calls: state.session.narrationCalls } }));
         return;
       }
       if (url.pathname === "/api/cards") {
@@ -409,9 +443,9 @@ export function startMirror(o: MirrorOptions): Server {
         res.end(JSON.stringify(aliveState()));
         return;
       }
-      if (url.pathname === "/widget/machine" || url.pathname === "/widget/details" || url.pathname === "/widget/log" || url.pathname === "/widget/terminal") {
+      if (url.pathname === "/widget/machine" || url.pathname === "/widget/details" || url.pathname === "/widget/log" || url.pathname === "/widget/terminal" || url.pathname === "/widget/table") {
         // RENDER FIRST, THEN WRITE THE HEAD. See the note at the catch below.
-        const widget = renderMirror(state, url.pathname.slice("/widget/".length) as "machine" | "details" | "log" | "terminal", url.searchParams.get("view") ?? undefined, undefined, url.searchParams.get("embed") === "1");
+        const widget = renderMirror(state, url.pathname.slice("/widget/".length) as "machine" | "details" | "log" | "terminal" | "table", url.searchParams.get("view") ?? undefined, undefined, url.searchParams.get("embed") === "1");
         res.writeHead(200, { "content-type": "text/html; charset=utf-8" });
         res.end(widget);
         return;

@@ -259,13 +259,17 @@ test("the unified feed derives src, type and brief — and the mirror carries th
   const withLog = renderMirror({ session, root, lastPacket: undefined, mode: "manual", log });
   assert.ok(withLog.includes('id="w-log"'));
   assert.ok(withLog.includes('id="log-filter"'));
-  // The slider carries the authored levels as notches (shortcuts + help);
-  // uniform 0.2 bands: the killer anchor sits at 0.8, ideation at 1.
-  assert.ok(withLog.includes("thr-notch"));
-  assert.ok(withLog.includes('id="thr-ticks"'));
-  assert.ok(withLog.includes('data-level="0.8"'));
-  // The shutdown control rides beside it.
-  assert.ok(withLog.includes('id="sd"'));
+  // THE CONTROLS ARE SWITCHES, NEVER SLIDERS (owner sketch, 2026-08-01).
+  // The rungs carry the authored levels, the cadence is two typed integers,
+  // and the shutdown control is gone — it was a preference for something
+  // that should never have been one.
+  assert.ok(withLog.includes('class="rung'));
+  assert.ok(withLog.includes('data-level="0.6"'), "the strategic rung is drawn");
+  // The ids come from the panel spec's keys, not from this file's memory.
+  assert.ok(withLog.includes('id="narration-minutes"') && withLog.includes('id="narration-calls"'), "the cadence is two line edits");
+  assert.ok(withLog.includes('data-post="/narration-now"'), "NOW forces an update");
+  assert.ok(!withLog.includes('type="range"'), "no slider survives anywhere on the bar");
+  assert.ok(!withLog.includes('id="sd"'), "the shutdown control is gone");
   // Parity surfaces: the modal, the human note input.
   assert.ok(withLog.includes('id="modal"'));
   assert.ok(withLog.includes('id="log-note"'));

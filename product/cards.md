@@ -13,6 +13,8 @@ cards:
     shows: log
   - card: details
     shows: details
+  - card: table
+    shows: table
 ---
 
 # Cards

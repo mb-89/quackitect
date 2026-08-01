@@ -25,6 +25,9 @@ bug somewhere else.
 
 - A sketch is a contract: render exactly what it shows.
 - Never add a visual element the sketch does not show. A missing affordance becomes a question to the owner, never a silent addition.
+- A SKETCH ALSO SAYS WHAT IS NOT THERE. An element missing from it is STRUCK, not kept because it happened to exist first. Redrawing a screen without a control the old screen had is the sketch doing its job, and "it was already there" is not a reason to leave it.
+- STAY VERY CLOSE TO THE DRAWING. This is not a style preference, it is a known weakness: the assistant's visual judgment under this harness is not good enough to improvise with, and every departure from the sketch has been a step backwards. When the drawing and your taste disagree, the drawing wins.
+- NO SLIDERS UNLESS THE SKETCH DRAWS ONE (owner, 2026-08-01). A slider implies a continuum and a total order. Most of what has been built with one was really a set of named CATEGORIES, and it wanted buttons and line edits instead. The autonomy, shutdown and narration controls were all this mistake.
 - A prefill is a suggestion, never content. Anything the AI prefills for a person stays inert (commented out) until that person confirms it — one confirmation per prefill, never in bulk.
 - INPUT IS NOT EVIDENCE, and only evidence is guarded. Prefill hard at the ENTRY of work — a seed's goal, an iteration's vision, a kickoff brief. A wrong value there goes visibly wrong at once, with the person right beside it. The guard belongs at the EXIT, where a report CLAIMS work was done and checked, because that is where an agent would be signing its own homework.
 - A PREFILL IS NOT A LAW. The secretary fills the form to the best of their knowledge and sends you on your way; whoever receives it still checks whether the prefilling was right. A prefilled value carries where it came from, and the state that receives it JUDGES it. It is never obeyed because it was already written down.

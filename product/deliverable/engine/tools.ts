@@ -25,6 +25,8 @@ import { capJson } from "./jsonio.ts";
 import { McpServer, type ToolDef } from "./mcp.ts";
 import { gitLand, gitLane, gitSync } from "./gitlane.ts";
 import { fileMove } from "./move.ts";
+import { renderMirror } from "./render.ts";
+import { shoot } from "./shoot.ts";
 import { spawn } from "node:child_process";
 import { openPanel } from "./panel.ts";
 import { resolveInRoot, seDir } from "./paths.ts";
@@ -395,7 +397,7 @@ export function coreTools(rootOf: (rel?: string) => string, projectRoot: string,
       name: "se_file_move",
       title: "se.file.move",
       description:
-        "Move or rename a file and fix EVERY reference in one pass: root-relative paths, vault-relative canvas refs, and wiki links across all .md and .canvas files. Reports what was rewritten. Refuses to overwrite.",
+        "Move or rename a file and fix EVERY reference in one pass. PROSE (.md, .canvas) takes all three reference forms: root-relative paths, vault-relative canvas refs, and wiki links. SOURCE (.ts, .ps1, .json) takes the root-relative form only, because the other two are markdown conventions. Reports what was rewritten AND what it could not: `unrewritten` lists every surviving mention of the old path, with file and line, as work you still owe. A quiet `rewritten: []` never again means the move was clean. Refuses to overwrite.",
       inputSchema: {
         type: "object",
         properties: {
@@ -436,7 +438,11 @@ export function coreTools(rootOf: (rel?: string) => string, projectRoot: string,
         properties: { glob: { type: "string" }, ref: { type: "string", description: "glob this committed git ref's tree instead of the working tree" } },
         required: ["glob"],
       },
-      handler: (args) => fileGlob(rootOf(), String(args.glob), { ...(args.ref !== undefined ? { ref: String(args.ref) } : {}) }),
+      // The GLOB carries the root selector, so it decides which tree answers.
+      // Called with no argument, a bound worktree answered instead — and the
+      // worktree has no .se/roots.json, so every declared root read as
+      // undeclared while the READER resolved the same name fine.
+      handler: (args) => fileGlob(rootOf(String(args.glob)), String(args.glob), { ...(args.ref !== undefined ? { ref: String(args.ref) } : {}) }),
     },
     {
       name: "se_file_search",
@@ -455,13 +461,44 @@ export function coreTools(rootOf: (rel?: string) => string, projectRoot: string,
         },
         required: ["query", "intent"],
       },
+      // The PATH scope carries the root selector here, for the same reason.
       handler: (args) =>
-        search(rootOf(), String(args.query), {
+        search(rootOf(args.path === undefined ? undefined : String(args.path)), String(args.query), {
           ...(args.path !== undefined ? { path: String(args.path) } : {}),
           ...(args.ref !== undefined ? { ref: String(args.ref) } : {}),
           ...(args.ignore_case === true ? { ignore_case: true } : {}),
           ...(args.limit !== undefined ? { limit: Number(args.limit) } : {}),
         }),
+    },
+    {
+      name: "se_shoot",
+      title: "se.shoot",
+      description:
+        "LOOK AT THE MIRROR. Renders the surface to an image and hands back the PICTURE, so a change to a pane can be judged by seeing it rather than by reading its HTML. Shoot the whole page, or one widget with widget: 'machine' | 'details' | 'log' | 'terminal'. view: names a machine to draw instead of the one being walked. Nothing is served over HTTP and no browser window opens.",
+      inputSchema: {
+        type: "object",
+        properties: {
+          widget: { type: "string", description: "machine | details | log | terminal — omit for the whole page" },
+          view: { type: "string", description: "draw this machine instead of the one the walk stands in" },
+          width: { type: "number", description: "viewport width, default 1600" },
+          height: { type: "number", description: "viewport height, default 1000" },
+        },
+      },
+      handler: (args) => {
+        const w = args.widget === undefined ? undefined : (String(args.widget) as "machine" | "details" | "log" | "terminal" | "table");
+        // The same renderer the owner's mirror uses, so the picture is the
+        // surface itself rather than a second drawing of it.
+        const html = renderMirror({ root: rootOf(), session }, w, args.view === undefined ? undefined : String(args.view));
+        // .se IS SESSION STATE, so a shot belongs to the PROJECT root however
+        // deep in a worktree the walk stands — exactly as the handover, the
+        // notes and the call log do. Passing rootOf() with no address would
+        // write the shot where the reader never looks.
+        return shoot(rootOf(".se"), html, {
+          ...(args.width !== undefined ? { width: Number(args.width) } : {}),
+          ...(args.height !== undefined ? { height: Number(args.height) } : {}),
+          name: w ?? "page",
+        });
+      },
     },
     {
       name: "se_run",
@@ -831,7 +868,7 @@ export function buildServer(root: string, session = new Session(root), tollOpts:
   for (const t of tools) (t.inputSchema.properties as Record<string, unknown>).update = UPDATE_PROP;
   const server = new McpServer({ name: "se-mcp", version: "3.0.0-bootstrap" }, tools);
   const log = new CallLog(seDir(root));
-  const toll = new Toll({ ...tollOpts, level: () => session.narration });
+  const toll = new Toll({ ...tollOpts, cadence: () => ({ minutes: session.narrationMinutes, calls: session.narrationCalls }) });
 
   // Session read buffer: live se_file_read results feed later tick proofs.
   // Reads at a git ref are intentionally excluded.

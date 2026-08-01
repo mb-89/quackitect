@@ -20,16 +20,22 @@
   --se-fg: #d8dde2;
   --se-muted: #7f8b96;
   --se-dim: #5b6772;
+  --se-hover: #2a3138;
 }
 
 /* THE MEANINGS. Green passes, red fails, yellow wants attention. A host
- * that names the same meaning overrides these; standalone they are ours. */
+ * that names the same meaning overrides these; standalone they are ours.
+ *
+ * These three are RESERVED. No other role may take them, because a role
+ * painted in a verdict colour reads as a verdict. A test holds that true. */
 :root {
   --se-accent: #e8b339;
   --se-accent-bg: #3a2f14;
   --se-ok: #4a7a55;
   --se-ok-bg: #1d2b20;
+  --se-fail: #e86a5f;
   --se-warn: #e8b339;
+  --se-lost-bg: #4a3a14;
 }
 
 /* THE WALK. Only where the walk STANDS is coloured (owner ruling
@@ -42,4 +48,34 @@
 :root {
   --se-walk: #4a90d9;
   --se-walk-bg: #1b2a3a;
+  --se-walk-ring: #9ecbf2;
+}
+
+/* THE FEED. One colour per role, none shared, and none of them may be a
+ * reserved meaning above. The aq kind once wore the agent's blue and the
+ * update kind wore the human's amber, so two of the three columns said the
+ * same thing twice. */
+:root {
+  --se-feed-time: #566068;
+  --se-feed-src-agent: #6fb3a8;
+  --se-feed-src-human: #e0834a;
+  --se-feed-kind-call: #8a97a3;
+  --se-feed-kind-update: #7cc4e8;
+  --se-feed-kind-note: #c58fe8;
+  --se-feed-kind-aq: #f0879a;
+}
+
+/* RENDERED DATA. JSON values in the details pane, and links. */
+:root {
+  --se-link: #7cc4e8;
+  --se-val-num: #7cc4e8;
+  --se-val-bool: #c58fe8;
+  --se-val-str: #a8c88f;
+  --se-aq-answer: #cfd8dc;
+}
+
+/* THE STOP. A stronger red than a failure, and it is meant to be: this is
+ * the machine refusing to go on, drawn over everything else. */
+:root {
+  --se-over: #e8332a;
 }
