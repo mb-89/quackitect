@@ -94,3 +94,6 @@
 {"ts":"2026-08-01T15:40:27.852Z","op":"done","visit":"start@0","node":"d7","brief":"headings drag to reorder and their edges resize"}
 {"ts":"2026-08-01T15:40:38.939Z","op":"obsolete","visit":"expeditions/e29@0","node":"d12","brief":"duplicate of d3"}
 {"ts":"2026-08-01T15:42:11.648Z","op":"done","visit":"start@0","node":"d6","brief":"the toolbar sits outside the scroll and the header is sticky"}
+{"ts":"2026-08-01T15:42:21.903Z","op":"obsolete","visit":"expeditions/e29@0","node":"d13","brief":"duplicate of d4"}
+{"ts":"2026-08-01T15:42:33.057Z","op":"obsolete","visit":"expeditions/e29@0","node":"d14","brief":"duplicate of d5"}
+{"ts":"2026-08-01T15:43:18.819Z","op":"obsolete","visit":"expeditions/e29@0","node":"d15","brief":"duplicate of d6"}
