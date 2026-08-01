@@ -931,6 +931,9 @@ class Controls {
   @keyframes se-emergency { 0%, 100% { opacity: 1; } 50% { opacity: .45; } }
   @media (prefers-reduced-motion: reduce) { .rung.emergency { animation: none; outline: 2px solid var(--vscode-charts-red); outline-offset: 1px; } }
   .rung.locked { opacity: .4; cursor: not-allowed; }
+  /* A pressed toggle lights like a pressed rung — it is the same kind of
+     switch, and it was drawing itself unlit whatever its state. */
+  .rung.param-toggle.on { background: var(--vscode-button-background); color: var(--vscode-button-foreground); border-color: var(--vscode-focusBorder); }
   .cadence { width: 3.4em; font: inherit; font-size: .9em; padding: 2px 4px; text-align: right; background: var(--vscode-input-background); color: var(--vscode-input-foreground); border: 1px solid var(--vscode-input-border, transparent); }
   .cadence-unit { color: var(--vscode-descriptionForeground); font-size: .8em; margin-right: 6px; }
   .param-action { flex: 0 0 auto; margin-left: auto; }
@@ -1067,6 +1070,19 @@ class Controls {
       vsapi.postMessage({ se: "scale-help", which: "autonomy", level: Number(rung.dataset.rung) });
       return;
     }
+    // THE SHUTDOWN ROW. Independent on/off buttons, any combination lit at
+    // once. The host had NO branch for these at all: the buttons rendered,
+    // and a click did nothing whatever — no light, no behaviour, no post.
+    const tog = t.closest(".param-toggle[data-toggle]");
+    if (tog !== null) {
+      const on = tog.getAttribute("aria-pressed") !== "true";
+      // Paint first. The bar redraws on the next poll and waiting for that is
+      // a second of a button that looks dead.
+      tog.classList.toggle("on", on);
+      tog.setAttribute("aria-pressed", on ? "true" : "false");
+      vsapi.postMessage({ se: "power", key: tog.dataset.toggle, on });
+      return;
+    }
     const act = t.closest(".param-action[data-post]");
     if (act !== null) {
       // THE NOTE'S BUTTON CARRIES THE LINE. Every other action posts an empty
@@ -1144,6 +1160,7 @@ class Controls {
       // THE DRUMROLL ARMED. Climb to the top rung first: the engine refuses
       // emergency below it, and the presses may have started anywhere.
       else if (m.se === "emergency") { await post("/autonomy", { value: 1 }); await post("/emergency", { on: true }); }
+      else if (m.se === "power") await post("/power", { key: m.key, on: m.on });
       // THE CADENCE IS A PAIR. POST /narration reads {minutes, calls}, so the
       // old single value left both halves NaN.
       else if (m.se === "narration") await post("/narration", { minutes: m.minutes, calls: m.calls });

@@ -502,10 +502,20 @@ export function startMirror(o: MirrorOptions): Server {
         // reads it. params.ts draws it from machines/panels/controls.md; a
         // host that drew its own drifted the moment the spec changed, and
         // that is precisely what happened to the VS Code bar.
+        // EVERY STATE THE PANEL CAN DRAW HAS TO BE HANDED IN. What is missing
+        // here does not fail loudly — renderPanel reads it as absent and draws
+        // the OFF state, so the control looks like it never took the click.
+        // Emergency was missing, so an armed engine kept drawing the top rung
+        // as a plain ideation button; the owner clicked again to check, and
+        // that click released the rung and disarmed it. The shutdown row had
+        // the same hole and could never show a pressed button at all.
+        const power = state.session.power;
         const values = {
           rungs: loadLevels(state.root),
           autonomy: state.session.autonomy,
+          emergency: state.session.emergency,
           ints: { narration_minutes: state.session.narrationMinutes, narration_calls: state.session.narrationCalls },
+          toggles: { "block-auto-sleep": power.block_sleep, "shutdown-at-idle": power.shutdown_at_idle },
         };
         // THE NOTE ROW RIDES ALONG. It is its own panel with its own spec
         // (note-entry.md), and serving it here means the sidebar needs one

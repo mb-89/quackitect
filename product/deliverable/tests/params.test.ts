@@ -37,6 +37,43 @@ describe("parameter panels", { concurrency: true }, () => {
     assert.ok(src.includes("/widget/controls"), "the host reads the bar from the engine rather than drawing one");
   });
 
+  // THE ENDPOINT HAS TO HAND IN EVERY STATE THE PANEL CAN DRAW, and a missing
+  // one fails SILENTLY: renderPanel reads it as absent and draws the OFF
+  // state, so a control that took the click looks like it never did.
+  //
+  // Both halves of this happened. Emergency was missing, so an armed engine
+  // kept drawing the top rung as a plain ideation button - the owner clicked
+  // again to check, and that click released the rung and disarmed it. The
+  // shutdown toggles had the same hole and could never show a pressed state
+  // at all, which nobody noticed because nobody had tried them.
+  test("the controls endpoint hands the panel every state it can draw", () => {
+    const src = readFileSync(join(REPO_ROOT, "product", "deliverable", "engine", "mirror.ts"), "utf8");
+    const at = src.indexOf('"/widget/controls"');
+    assert.ok(at > 0, "the controls endpoint is gone");
+    // Anchor on the object itself. Slicing to the first "renderPanel" after
+    // the route stopped inside a COMMENT that happens to name it.
+    const from = src.indexOf("const values = {", at);
+    assert.ok(from > at, "the endpoint no longer builds a values object");
+    const body = src.slice(from, src.indexOf("};", from));
+    for (const key of ["rungs", "autonomy", "emergency", "ints", "toggles"]) {
+      assert.ok(new RegExp(`\\b${key}\\s*:`).test(body), `/widget/controls never passes ${key}, so the panel draws it as off`);
+    }
+  });
+
+  test("an armed engine draws E, and a pressed toggle draws pressed", () => {
+    const params = loadPanel(REPO_ROOT, "controls");
+    const armed = renderPanel(params, {
+      ...VALUES,
+      autonomy: 1,
+      emergency: true,
+      toggles: { "block-auto-sleep": true, "shutdown-at-idle": false },
+    });
+    assert.match(armed, />E</, "the armed top rung says so on itself");
+    assert.match(armed, /class="rung on danger emergency"/);
+    assert.match(armed, /data-toggle="block-auto-sleep"[^>]*aria-pressed="true"/);
+    assert.match(armed, /data-toggle="shutdown-at-idle"[^>]*aria-pressed="false"/);
+  });
+
   test("the shipped control bar is read from its spec, not from code", () => {
     const params = loadPanel(REPO_ROOT, "controls");
     assert.ok(params.length >= 4, "the panel declares its parameters");
