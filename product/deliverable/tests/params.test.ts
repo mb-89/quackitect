@@ -40,7 +40,7 @@ describe("parameter panels", { concurrency: true }, () => {
   test("the shipped control bar is read from its spec, not from code", () => {
     const params = loadPanel(REPO_ROOT, "controls");
     assert.ok(params.length >= 4, "the panel declares its parameters");
-    assert.deepEqual(params.map((p) => p.type), ["rungs", "int", "int", "action"]);
+    assert.deepEqual(params.map((p) => p.type), ["rungs", "int", "int", "action", "text"]);
     const html = renderPanel(params, VALUES);
     assert.match(html, /class="rung on" data-level="0"/, "the lowest lit rung releases to blocked");
     assert.match(html, /id="narration-minutes"[^>]*value="5"/);

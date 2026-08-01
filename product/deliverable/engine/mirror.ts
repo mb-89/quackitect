@@ -327,9 +327,18 @@ export function startMirror(o: MirrorOptions): Server {
         return;
       }
       if (req.method === "POST" && url.pathname === "/note") {
+        // THE PRIORITY RIDES THE NOTE (owner, 2026-08-01). The note row draws
+        // a MoSCoW choice, and a capture that dropped it made every stray a
+        // "could" whatever the reader picked.
         post(req, res, "mirror_note", (body) => ({
-          args: { text: body.text },
-          result: appendNote(seDir(o.root), String(body.text ?? ""), "human"),
+          args: { text: body.text, priority: body.priority },
+          result: appendNote(
+            seDir(o.root),
+            String(body.text ?? ""),
+            "human",
+            undefined,
+            body.priority === "must" || body.priority === "should" ? body.priority : "could",
+          ),
         }));
         return;
       }
@@ -449,11 +458,15 @@ export function startMirror(o: MirrorOptions): Server {
         // reads it. params.ts draws it from machines/panels/controls.md; a
         // host that drew its own drifted the moment the spec changed, and
         // that is precisely what happened to the VS Code bar.
-        const bar = renderPanel(loadPanel(state.root, "controls"), {
+        const values = {
           rungs: loadLevels(state.root),
           autonomy: state.session.autonomy,
           ints: { narration_minutes: state.session.narrationMinutes, narration_calls: state.session.narrationCalls },
-        });
+        };
+        // THE NOTE ROW RIDES ALONG. It is its own panel with its own spec
+        // (note-entry.md), and serving it here means the sidebar needs one
+        // fetch rather than two, with neither surface writing markup.
+        const bar = renderPanel(loadPanel(state.root, "controls"), values) + renderPanel(loadPanel(state.root, "note-entry"), values);
         res.writeHead(200, { "content-type": "text/html; charset=utf-8", "access-control-allow-origin": "*" });
         res.end(bar);
         return;
