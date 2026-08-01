@@ -21,6 +21,7 @@ import { readFileSync, readdirSync, writeFileSync } from "node:fs";
 import { basename, dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
 import { parse } from "yaml";
 import { CLAUSES, Rejection } from "./errors.ts";
+import { compare, evalExpr, passes } from "./expr.ts";
 import { coerce, kindOf, readKeys, setKeys } from "./frontmatter.ts";
 import { parseStateNote } from "./notes.ts";
 
@@ -170,12 +171,13 @@ function field(row: Row, name: string): unknown {
 }
 
 /**
- * The filter subset the shipped .base actually uses: and, or, not, equality,
- * inequality, and a bare property meaning "has a value".
+ * `and`, `or` and `not` are FILE STRUCTURE — a nested tree in the YAML. A leaf
+ * is an EXPRESSION, and the expression language owns it, so a filter here can
+ * say anything a formula can.
  *
- * An expression outside that set is a REFUSAL rather than a false. A filter
- * silently treated as unsatisfied hides rows, and a table missing rows for a
- * reason nobody can see is the worst failure this can have.
+ * An expression the language cannot read is a REFUSAL rather than a false. A
+ * filter silently treated as unsatisfied hides rows, and a table missing rows
+ * for a reason nobody can see is the worst failure this can have.
  */
 export function matches(filter: unknown, row: Row): boolean {
   if (filter === undefined || filter === null) return true;
@@ -193,37 +195,15 @@ export function matches(filter: unknown, row: Row): boolean {
       source: SRC,
     });
   }
-  const expr = String(filter).trim();
-
-  const cmp = expr.match(/^([A-Za-z0-9_.]+)\s*(==|!=)\s*(.+)$/);
-  if (cmp !== null) {
-    const [, name, op, rawValue] = cmp;
-    const want = rawValue.trim().replace(/^["']|["']$/g, "");
-    const got = field(row, name);
-    const equal = String(got ?? "") === want;
-    return op === "==" ? equal : !equal;
-  }
-
-  // A bare property name: true when it carries something.
-  if (/^[A-Za-z0-9_.]+$/.test(expr)) {
-    const got = field(row, expr);
-    return got !== undefined && got !== null && String(got).trim() !== "";
-  }
-
-  throw new Rejection({
-    clause: CLAUSES.REQUIRED_ARGS,
-    expected: 'an expression this renderer knows: `prop == "value"`, `prop != "value"`, or a bare `prop`',
-    got: expr,
-    remedy: { tool: "se_file_read", args: { path: "product/deliverable/engine/tables.ts" }, note: "widen the subset deliberately rather than letting a clause pass unevaluated" },
-    source: SRC,
-  });
+  return passes(String(filter).trim(), { row });
 }
 
 export function selectRows(spec: BaseSpec, view: BaseView, rows: Row[]): Row[] {
   const kept = rows.filter((r) => matches(view.filters, r));
+  // Applied back to front, so the first clause is the one that decides ties.
   for (const s of [...view.sort].reverse()) {
     const dir = String(s.direction ?? "ASC").toUpperCase() === "DESC" ? -1 : 1;
-    kept.sort((a, b) => String(field(a, s.property) ?? "").localeCompare(String(field(b, s.property) ?? "")) * dir);
+    kept.sort((a, b) => compare(evalExpr(s.property, { row: a }), evalExpr(s.property, { row: b })) * dir);
   }
   return kept;
 }

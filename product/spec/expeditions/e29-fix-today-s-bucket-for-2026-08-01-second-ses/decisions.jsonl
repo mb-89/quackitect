@@ -26,3 +26,18 @@
 {"ts":"2026-08-01T13:52:51.319Z","op":"plan","visit":"expeditions/e29@0","parent":null,"nodes":[{"id":"d3","brief":"Amend e29's goal to admit the Bases table work"},{"id":"d4","brief":"Typed value model replacing v1's string-only evaluator"},{"id":"d5","brief":"Lexer and recursive-descent parser with call-by-name arguments"},{"id":"d6","brief":"Extensible function registry seeded from the reference"},{"id":"d7","brief":"Evaluator running filters over vault rows"},{"id":"d8","brief":"Tests from the reference's own worked examples"},{"id":"d9","brief":"Warm model that indexes the vault once and holds it"},{"id":"d10","brief":"Measure build and filter time at 30k nodes"}]}
 {"ts":"2026-08-01T13:53:04.145Z","op":"done","visit":"expeditions/e29@0","node":"d3","brief":"goal now admits the Bases table and records the no-iteration ruling"}
 {"ts":"2026-08-01T13:54:45.595Z","op":"fork","visit":"expeditions/e29@0","parent":null,"node":"d11","brief":"worktree is behind trunk and lacks the Bases spec","nodes":[]}
+{"ts":"2026-08-01T13:55:15.149Z","op":"update","visit":"expeditions/e29@0","node":"d12","brief":"worktree synced; reading operator and type semantics"}
+{"ts":"2026-08-01T13:58:35.649Z","op":"done","visit":"expeditions/e29@0","node":"d11","brief":"sync brought in trunk's four commits and the spec"}
+{"ts":"2026-08-01T14:00:18.465Z","op":"done","visit":"expeditions/e29@0","node":"d4","brief":"typed value model with date and duration semantics"}
+{"ts":"2026-08-01T14:00:34.822Z","op":"update","visit":"expeditions/e29@0","node":"d13","brief":"strip-only mode forbids parameter properties"}
+{"ts":"2026-08-01T14:01:31.287Z","op":"done","visit":"expeditions/e29@0","node":"d5","brief":"lexer and parser green over 104 reference cases"}
+{"ts":"2026-08-01T14:02:04.266Z","op":"done","visit":"expeditions/e29@0","node":"d6","brief":"registry is two open maps with register hooks"}
+{"ts":"2026-08-01T14:02:10.805Z","op":"update","visit":"expeditions/e29@0","node":"d14","brief":"running the scale bench"}
+{"ts":"2026-08-01T14:03:07.966Z","op":"update","visit":"expeditions/e29@0","node":"d15","brief":"date typing at index time and one syscall less per note"}
+{"ts":"2026-08-01T14:04:52.757Z","op":"update","visit":"expeditions/e29@0","node":"d16","brief":"pooled async build so a large vault never blocks the drawing process"}
+{"ts":"2026-08-01T14:06:05.934Z","op":"done","visit":"expeditions/e29@0","node":"d8","brief":"104 cases from the reference, all green"}
+{"ts":"2026-08-01T14:06:40.765Z","op":"update","visit":"expeditions/e29@0","node":"d17","brief":"measuring add and remove, not just a full build"}
+{"ts":"2026-08-01T14:08:13.436Z","op":"update","visit":"expeditions/e29@0","node":"d18","brief":"progress reporting and a saved index in .se"}
+{"ts":"2026-08-01T14:08:44.842Z","op":"update","visit":"expeditions/e29@0","node":"d19","brief":"measuring the warm start against the cold one"}
+{"ts":"2026-08-01T14:11:13.233Z","op":"done","visit":"expeditions/e29@0","node":"d7","brief":"filters and sort now run the language; 468 tests green"}
+{"ts":"2026-08-01T14:11:19.266Z","op":"done","visit":"expeditions/e29@0","node":"d9","brief":"warm index with incremental add and remove plus a saved cache"}
