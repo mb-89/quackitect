@@ -17,15 +17,23 @@ Evidence forms are untyped. Worse, 70 of their 122 fields never reach the agent,
 
 ## 1. The decisions
 
-1. **Layout source for machine pictures.** Pick one: keep authored drawings only; rotate the existing generated layout so milestones become rows; or lift version 2's dependency ranker. Recommendation below is the rotation.
-2. **Does the version 2 figures decision still bind?** A human-adjudicated architecture decision record in version 2 rejects view-time diagram rendering and names deterministic graph layout an infrastructure grave. It did not carry into version 3. Yes it binds, or no it is retired.
-3. **Enforce the floor law in the compiler.** Four steps are marked as never-struck. Nothing checks it. Yes or no.
+1. **Layout source for machine pictures.** Pick one: keep authored drawings only; rotate the existing generated layout so milestones become rows; or lift version 2's dependency ranker. Recommendation below is the rotation. ==> Lift from V2, but render it better
+
+2. **Does the version 2 figures decision still bind?** A human-adjudicated architecture decision record in version 2 rejects view-time diagram rendering and names deterministic graph layout an infrastructure grave. It did not carry into version 3. Yes it binds, or no it is retired. ==> yes, no figures for now. will do later
+
+3. **Enforce the floor law in the compiler.** Four steps are marked as never-struck. Nothing checks it. Yes or no. ==> yes, as refusal
+
 4. **Wire the escalation reopen ledger.** The list of steps that must be re-earned is computed, written into the pin, and then discarded. Yes wire it, or no delete it.
+
 5. **What is the `product` change size for?** It compiles to a machine identical to `major` — same 51 states, same identifiers. Give it steps, merge it into `major`, or leave it as posture-only.
-6. **Deliver evidence fields to the agent.** The tick packet omits them. Yes add them to the packet, or no keep evidence a person-only surface.
+
+6. **Deliver evidence fields to the agent.** The tick packet omits them. Yes add them to the packet, or no keep evidence a person-only surface. ==> yes
+
 7. **Type the evidence fields.** Pick a scope: none; the six core types; or the six plus `matrix`, `run_ref` and `derived`.
-8. **Restore the agent submit path.** Version 2 had a tool that took a field-name-keyed object of evidence. Version 3 has nothing. Yes restore it, or no keep file writes as the only route.
-9. **Size the first iteration.** The matrix instructs that a product's first iteration is `product`, which is the top size and cannot escalate. Follow it, or seed a `patch` to retire integration risk first.
+
+8. **Restore the agent submit path.** Version 2 had a tool that took a field-name-keyed object of evidence. Version 3 has nothing. Yes restore it, or no keep file writes as the only route. ==> yes, merge into 6
+
+9. **Size the first iteration.** The matrix instructs that a product's first iteration is `product`, which is the top size and cannot escalate. Follow it, or seed a `patch` to retire integration risk first. ==> first iteration is always product, since it is where we desribe in details what we do (at least thats the proposal the agent makes. user can override)
 
 ---
 
