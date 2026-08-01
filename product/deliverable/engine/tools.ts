@@ -40,7 +40,7 @@ export function sessionTools(session: Session): ToolDef[] {
       name: "se_tick",
       title: "se.tick",
       description:
-        "THE TICK — the universal walk operation, legal in EVERY state. Without arguments: where the machine is (state, guidance, what to read, legal tools, next states). With arguments: advance — to: <state> picks the edge (optional when there is only one), advance: true advances when no other argument applies, back: <state> returns to an earlier filled state (downstream is superseded, evidence invalidated), state: <state> PEEKS at any state without moving — use it to choose among several ways forward, wait: true is a SHORT in-turn hold: it blocks until the human moves something (slider, tick, check) and returns the fresh packet (changed: false on timeout) — use it only when you expect the change within seconds; otherwise STOP, telling the user plainly that they must message you (e.g. 'continue') after changing the slider, because the slider alone cannot wake a stopped agent. READ PROOF: entering a state (and leaving one with a read condition) demands read_hashes: {\"<path>\": \"<hash>\", ...} covering the listed docs — the hash rides every se_file_read result and must match the doc AS IT STANDS; it proves YOUR reading, every tick, so after a compaction re-read before advancing. THE READING IS HANDED TO YOU: whenever a target is set, the packet carries route_reads — every document the whole way there demands, gathered once. Read that entire list in ONE se_file_read and keep the hashes. You never have to ask for it, and no route syntax needs remembering. ATOMIC MOVES: send from: <your assumed current state> on every moving tick — the engine refuses (SE-C-114) when the walk stands elsewhere; the human's hand moves the walk too. When a result carries a banner, show it to the user VERBATIM.",
+        "THE TICK — the universal walk operation, legal in EVERY state. Without arguments: where the machine is (state, guidance, what to read, legal tools, next states). With arguments: advance — to: <state> picks the edge (optional when there is only one), advance: true advances when no other argument applies, back: <state> returns to an earlier filled state (downstream is superseded, evidence invalidated), state: <state> PEEKS at any state without moving — use it to choose among several ways forward, and a LIST of states peeks them ALL in one call, wait: true is a SHORT in-turn hold: it blocks until the human moves something (slider, tick, check) and returns the fresh packet (changed: false on timeout) — use it only when you expect the change within seconds; otherwise STOP, telling the user plainly that they must message you (e.g. 'continue') after changing the slider, because the slider alone cannot wake a stopped agent. READ PROOF: entering a state (and leaving one with a read condition) demands read_hashes: {\"<path>\": \"<hash>\", ...} covering the listed docs — the hash rides every se_file_read result and must match the doc AS IT STANDS; it proves YOUR reading, every tick, so after a compaction re-read before advancing. THE READING IS HANDED TO YOU: whenever a target is set, the packet carries route_reads — every document the whole way there demands, gathered once. Read that entire list in ONE se_file_read and keep the hashes. You never have to ask for it, and no route syntax needs remembering. ATOMIC MOVES: send from: <your assumed current state> on every moving tick — the engine refuses (SE-C-114) when the walk stands elsewhere; the human's hand moves the walk too. When a result carries a banner, show it to the user VERBATIM.",
       inputSchema: {
         type: "object",
         properties: {
@@ -48,7 +48,7 @@ export function sessionTools(session: Session): ToolDef[] {
           from: { type: "string", description: "your assumed CURRENT state — send it on every moving tick; the engine refuses the move (SE-C-114) when the walk stands elsewhere (the human's hand moves it too)" },
           advance: { type: "boolean", description: "advance along the single drawn edge" },
           back: { type: "string", description: "jump BACK to an earlier filled state — everything downstream is superseded and its evidence invalidated" },
-          state: { type: "string", description: "PEEK at a named state (full info: statement, guidance, conditions, next) — looking never moves" },
+          state: { type: ["string", "array"], items: { type: "string" }, description: "PEEK at a named state (full info: statement, guidance, conditions, next) — looking never moves. Pass a LIST to peek several in one call: the answer carries `states`, one entry each, and an unknown id refuses for itself while the rest still arrive" },
           wait: { type: "boolean", description: "short in-turn HOLD: blocks until the human's hand moves the walk or the slider, then returns the fresh packet (changed: false on timeout). For longer waits STOP instead and ask the user to message you" },
           escape: { type: "string", description: "ESCAPE to idle with this reason — the STUCK sub-machine walk is left standing (a later continue re-enters it); the escape is a recorded FAILURE. Stepping out of healthy work is `pause`, not this. Boot cannot be escaped" },
           pause: { type: "string", description: "PAUSE to idle with this reason — the same move as escape, recorded as ordinary work. The machine is left standing and a later continue re-enters it. Use this to step out of an expedition or iteration you mean to pick up later: an expedition is a day's bucket and is MEANT to stay open, so leaving one is not a failure. Boot cannot be paused" },
@@ -96,12 +96,20 @@ export function sessionTools(session: Session): ToolDef[] {
         if (args.from !== undefined && args.state === undefined) session.assertFrom(String(args.from));
         if (args.escape !== undefined) return session.escape(String(args.escape), "agent", hashes);
         if (args.pause !== undefined) return session.pause(String(args.pause), "agent", hashes);
-        if (args.state !== undefined) return session.stateInfo(String(args.state));
+        if (args.state !== undefined) return peekMany(session, args.state);
         if (args.back !== undefined) return session.jumpBack(String(args.back), "agent", hashes);
         const wantsAdvance = args.to !== undefined || args.advance === true || Object.keys(hashes).length > 0;
         if (!wantsAdvance) return session.tickInfo();
         return session.tickAdvance(args.to === undefined ? undefined : String(args.to), "agent", hashes);
       },
+    },
+    {
+      name: "se_reading",
+      title: "se.reading",
+      description:
+        "THE READING, PULLED — call it, read what comes back, call it AGAIN, until it answers done: true. Each call hands over ONE document: the next guidance the way ahead demands, as text, already credited. You never name a path, you never carry a hash, and you never work out what you owe. WHAT IT GIVES YOU: with a target set, every document the whole way there, plus what the target's neighbours demand at entry. With NO target, where you stand IS the target — what this state pulls, plus what its neighbours demand. What you have already read is never served twice, so the loop always drains. WHY ONE AT A TIME: a host that moves a large tool result to disk hands you a PREVIEW instead of the text, and the engine has already credited it — you would stand proven to have read what you never saw. One document cannot be eaten. Legal in every state.",
+      inputSchema: { type: "object", properties: {} },
+      handler: () => session.pullReading(),
     },
     {
       name: "se_panel",
@@ -191,6 +199,43 @@ export function expeditionTools(session: Session): ToolDef[] {
 // judgmentDrainAllowed answers ONE question for se_note_drain: may this
 // caller park a note or carry it, or only record the mechanical verdicts.
 // It is a thunk because the walk moves under a built tool list.
+/** The same guard as MAX_READ_PATHS, on the same reasoning: peeking every
+ *  state of a machine is a sweep, not a choice. No machine offers this many
+ *  doors at once. */
+const MAX_PEEK_STATES = 20;
+
+/** MANY DOORS, ONE CALL. Choosing where to go means reading several states,
+ *  and the front desk reads EVERY door before it advises — that paid a round
+ *  trip per door for nothing.
+ *
+ *  A single id keeps its flat answer, so nothing that peeks one state changes.
+ *  A list answers with `states`, and EACH ENTRY ANSWERS FOR ITSELF as in
+ *  readMany: an unknown id carries its own typed refusal and the rest still
+ *  come back. */
+function peekMany(session: Session, state: unknown): Record<string, unknown> {
+  if (!Array.isArray(state)) return session.stateInfo(String(state));
+  if (state.length > MAX_PEEK_STATES) {
+    throw new Rejection({
+      clause: CLAUSES.REQUIRED_ARGS,
+      expected: `at most ${MAX_PEEK_STATES} states in one call`,
+      got: `${state.length} states`,
+      remedy: { tool: "se_tick", args: { state: ["<first>", "<second>"] }, note: "peek the doors you are choosing between; se_tick with no arguments already lists them all" },
+      source: "engine/tools.ts se_tick peek",
+    });
+  }
+  const states = state.map((id) => {
+    const wanted = String(id);
+    try {
+      return session.stateInfo(wanted);
+    } catch (err) {
+      const r = err as { clause?: string; expected?: string; got?: string; remedy?: unknown; message?: string };
+      return { id: wanted, refused: { clause: r.clause, expected: r.expected ?? r.message, got: r.got, remedy: r.remedy } };
+    }
+  });
+  const failed = states.filter((s) => s.refused !== undefined).length;
+  return { states, ...(failed > 0 ? { failed } : {}) };
+}
+
 /** A cheap multi-read makes it easy to pull documents nobody needed, which
  *  wastes context quietly. Twenty is far above any real reading list — boot's
  *  is eight — and well below a sweep of the tree. */

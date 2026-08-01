@@ -20,8 +20,21 @@
               "icon": "lucide-file",
               "title": "M3_10_write-requirements"
             }
+          },
+          {
+            "id": "a86029eb24d12f2f",
+            "type": "leaf",
+            "state": {
+              "type": "release-notes",
+              "state": {
+                "currentVersion": "1.13.4"
+              },
+              "icon": "lucide-book-up",
+              "title": "Release Notes 1.13.4"
+            }
           }
-        ]
+        ],
+        "currentTab": 1
       }
     ],
     "direction": "vertical"
@@ -41,7 +54,9 @@
               "type": "file-explorer",
               "state": {
                 "sortOrder": "alphabetical",
-                "autoReveal": false
+                "autoReveal": false,
+                "showSearch": false,
+                "searchQuery": ""
               },
               "icon": "lucide-folder-closed",
               "title": "Files"
@@ -183,7 +198,7 @@
       "bases:Create new base": false
     }
   },
-  "active": "c07847f318fa619a",
+  "active": "a86029eb24d12f2f",
   "lastOpenFiles": [
     "deliverable/machines/rigor_matrix/matrix.base",
     "deliverable/machines/rigor_matrix/rows/M3_10_write-requirements.md",

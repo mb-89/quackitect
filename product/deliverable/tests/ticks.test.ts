@@ -117,4 +117,36 @@ test("the agent can peek at any state without moving — the click, as a tool", 
   assert.equal(unknown.isError, true);
 });
 
+test("peeking takes a SET: every door in one call, in the order asked", async () => {
+  const server = buildServer(freshRoot());
+  const many = await call(server, "se_tick", { state: ["idle", "front_desk", "start"] });
+  assert.equal(many.isError, false, JSON.stringify(many.body));
+  const states = many.body.states as { id: string; guidance?: string }[];
+  assert.deepEqual(states.map((s) => s.id), ["idle", "front_desk", "start"]);
+  assert.equal(many.body.failed, undefined, "nothing failed, so nothing is reported failed");
+
+  // A set peek is not a thinner peek: an entry is the SAME answer one id gives.
+  const single = await call(server, "se_tick", { state: "front_desk" });
+  assert.deepEqual(states[1], single.body);
+
+  // Looking never moves, however many doors are looked at.
+  const still = await call(server, "se_tick");
+  assert.deepEqual(still.body.active, ["start"]);
+});
+
+test("one unknown door refuses for itself, and the real ones still arrive", async () => {
+  const server = buildServer(freshRoot());
+  const r = await call(server, "se_tick", { state: ["idle", "nope"] });
+  assert.equal(r.isError, false, "a set peek does not fail whole because one entry did");
+  const states = r.body.states as { guidance?: string; refused?: { remedy?: unknown } }[];
+  assert.equal(r.body.failed, 1);
+  assert.ok(states[0].guidance, "the real door still came back");
+  assert.ok(states[1].refused?.remedy, "the unknown one carries its own refusal, with a remedy");
+
+  // Peeking every id there could be is a sweep, not a choice.
+  const greedy = await call(server, "se_tick", { state: Array.from({ length: 21 }, (_, i) => `s${i}`) });
+  assert.equal(greedy.isError, true);
+  assert.match(String(greedy.body.expected), /at most 20/);
+});
+
 });
