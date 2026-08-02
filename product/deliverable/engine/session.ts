@@ -1184,7 +1184,7 @@ export class Session {
     // misses the memo, and the truth stays read live. `generation` covers what
     // no file content can: a record seeded or a worktree bound changes what a
     // generated container expands to.
-    const memoKey = `${from} ${target} ${this._autonomy} ${this.subs.map((s) => s.decl.id).join("/")} ${this.generation}`;
+    const memoKey = [from, target, this._autonomy, this.subs.map((s) => s.decl.id).join("/"), this.generation].join("::");
     const machineNow = this.machine;
     if (this.routeMemo !== undefined && this.routeMemo.key === memoKey && this.routeMemo.machine === machineNow) {
       return this.routeMemo.value;

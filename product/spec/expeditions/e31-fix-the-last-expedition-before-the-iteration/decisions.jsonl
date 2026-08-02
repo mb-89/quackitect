@@ -98,3 +98,8 @@
 {"ts":"2026-08-02T15:18:36.602Z","op":"update","visit":"expeditions/e31@1","node":"d100","brief":"pullTo checks the position, not the messenger"}
 {"ts":"2026-08-02T15:18:45.066Z","op":"update","visit":"expeditions/e31@1","node":"d101","brief":"re-running the walk suites with boot included"}
 {"ts":"2026-08-02T15:19:16.270Z","op":"done","visit":"expeditions/e31@1","node":"d81","brief":"worktree passes; the two left are the baseline's"}
+{"ts":"2026-08-02T15:19:58.242Z","op":"done","visit":"expeditions/e31@1","node":"d80","brief":"the route was the cost, and it is memoised now"}
+{"ts":"2026-08-02T15:20:35.515Z","op":"update","visit":"expeditions/e31@1","node":"d102","brief":"removing the raw NULs I just wrote into session.ts"}
+{"ts":"2026-08-02T15:21:01.212Z","op":"update","visit":"expeditions/e31@1","node":"d103","brief":"a separator that needs no escape at all"}
+{"ts":"2026-08-02T15:21:11.681Z","op":"update","visit":"expeditions/e31@1","node":"d104","brief":"proving the file is searchable again"}
+{"ts":"2026-08-02T15:21:52.862Z","op":"update","visit":"expeditions/e31@1","node":"d105","brief":"measuring the machine-only boot path next"}
