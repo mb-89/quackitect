@@ -123,10 +123,10 @@ duplicate copy in session.ts removed. Held by tests/rounds.test.ts.
 
 <!--
 THE BATTERY. 654 tests in 73 suites before the pull lane; 672 in 79 after the
-retirement, zero failures. The wall clock sits near 110 seconds — the pull
-cases each pay a real boot walk.
+retirement, zero failures, exit 0. The wall clock measured 209 seconds on a
+machine also running this session — the pull cases each pay a real boot walk.
 
-THE MIGRATION FOUND FOUR REAL DEFECTS, which is what it was for.
+THE MIGRATION FOUND FIVE REAL DEFECTS, which is what it was for.
 
 - The reading loop did not serve the human-checked handover demand, so a
   pull could say read for a list that could not satisfy the walk it feeds.
@@ -138,6 +138,9 @@ THE MIGRATION FOUND FOUR REAL DEFECTS, which is what it was for.
   walk moved; it now greens on a current credit.
 - The old needs-retro test silently swallowed a refused hop for weeks —
   a call whose result nobody asserted. The rewrite drives the drawn edge.
+- The suite outgrew selftest's own 110-second kill: spawnSync truncated
+  the run mid-stream and the exit read as ordinary failure, with no word
+  that a cap was hit. The cap is 300 seconds now and SAYS so when hit.
 
 THAT COST WAS PAID DELIBERATELY. A pull case needs a session standing at idle
 and that means a real boot walk, about eight seconds each. All of them in one

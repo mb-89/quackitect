@@ -322,3 +322,13 @@
 {"ts":"2026-08-02T11:18:05.453Z","op":"update","visit":"expeditions/e30@0","node":"d124","brief":"The suite cap rises to 300s and confesses when hit"}
 {"ts":"2026-08-02T11:18:15.931Z","op":"update","visit":"expeditions/e30@0","node":"d125","brief":"Battery eight under the honest cap"}
 {"ts":"2026-08-02T11:18:23.863Z","op":"done","visit":"expeditions/e30@0","node":"d47","brief":"Every tick-driving test now pulls or drives the session"}
+{"ts":"2026-08-02T11:19:03.760Z","op":"update","visit":"expeditions/e30@0","node":"d126","brief":"Waiting out battery eight"}
+{"ts":"2026-08-02T11:19:26.566Z","op":"update","visit":"expeditions/e30@0","node":"d127","brief":"Battery eight past the minute"}
+{"ts":"2026-08-02T11:19:48.142Z","op":"update","visit":"expeditions/e30@0","node":"d128","brief":"Battery eight still under its new cap"}
+{"ts":"2026-08-02T11:20:09.374Z","op":"update","visit":"expeditions/e30@0","node":"d129","brief":"Battery eight nearing two minutes"}
+{"ts":"2026-08-02T11:20:34.990Z","op":"update","visit":"expeditions/e30@0","node":"d130","brief":"Battery eight in overtime, cap holds to 300s"}
+{"ts":"2026-08-02T11:20:55.559Z","op":"update","visit":"expeditions/e30@0","node":"d131","brief":"Battery eight at two and a half minutes"}
+{"ts":"2026-08-02T11:21:21.674Z","op":"update","visit":"expeditions/e30@0","node":"d132","brief":"Battery eight approaching three minutes"}
+{"ts":"2026-08-02T11:21:40.737Z","op":"update","visit":"expeditions/e30@0","node":"d133","brief":"Battery eight past three minutes under load"}
+{"ts":"2026-08-02T11:22:00.884Z","op":"update","visit":"expeditions/e30@0","node":"d134","brief":"Exit zero — reading the tallies"}
+{"ts":"2026-08-02T11:22:21.049Z","op":"update","visit":"expeditions/e30@0","node":"d135","brief":"The report carries the real tallies and the fifth defect"}
