@@ -206,3 +206,5 @@
 {"ts":"2026-08-02T09:44:48.096Z","op":"update","visit":"expeditions/e30@0","node":"d9","brief":"Running the form lint directly to prove the report parses as intended"}
 {"ts":"2026-08-02T09:47:24.152Z","op":"plan","visit":"expeditions/e30@0","parent":null,"nodes":[{"id":"d10","brief":"Sync trunk into the expedition worktree"},{"id":"d11","brief":"Read v2 sections 5, 6 and 12 plus v3-plan.md M1b"},{"id":"d12","brief":"Design the pull lane against that prior art"},{"id":"d13","brief":"Build the pull verb"},{"id":"d14","brief":"Amend the leave report"}]}
 {"ts":"2026-08-02T09:47:31.027Z","op":"plan","visit":"expeditions/e30@0","parent":null,"nodes":[]}
+{"ts":"2026-08-02T09:47:39.837Z","op":"update","visit":"expeditions/e30@0","node":"d15","brief":"Committing the report so the sync has a clean tree"}
+{"ts":"2026-08-02T09:47:44.411Z","op":"update","visit":"expeditions/e30@0","node":"d16","brief":"Syncing trunk in now that the tree is clean"}
