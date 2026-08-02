@@ -97,7 +97,7 @@ The Mirror's buttons drive the same core by the person's hand.
 
 ## The cage (how it blocks)
 
-`workspace/.claude/settings.json` **denies the current native tools by
+`project/.claude/settings.json` **denies the current native tools by
 name** — Bash, BashOutput, KillShell, Read, Write, Edit, NotebookEdit,
 Glob, Grep, WebSearch, WebFetch, Skill (an explicit blacklist by owner
 ruling: a tool added in the future is NOT blocked automatically; blocking it
@@ -106,7 +106,7 @@ model's context entirely. `mcp__se__*` is allowlisted. Subagents (Task)
 stay available and inherit the same denies — they are caged too.
 
 The settings file and `.mcp.json` are GENERATED: edit the templates in
-`workspace/_cage/`; the RUNME copies them into place on every run (the
+`project/_cage/`; the extension places them when the window opens (the
 generated copies are gitignored).
 
 **Hard dependencies (owner ruling 2026-07-26): ripgrep and git.** The RUNME

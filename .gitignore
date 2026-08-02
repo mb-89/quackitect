@@ -14,12 +14,9 @@ Thumbs.db
 # worktrees (later milestone)
 .worktrees/
 
-# placed by the extension into the OPENED folder from product/_cage/ — never committed
-product/.mcp.json
-product/.claude/settings.json
-product/.claude/output-styles/
-product/.copilot/
-product/.github/
-product/.claude/output-styles/voice.md
-# the temporary product -> project junction, alive only until the engine reloads
-/product
+# placed by the extension into the OPENED folder from project/_cage/ — never committed
+project/.mcp.json
+project/.claude/settings.json
+project/.claude/output-styles/
+project/.copilot/
+project/.github/copilot-instructions.md

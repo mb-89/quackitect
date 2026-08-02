@@ -249,3 +249,17 @@
 {"ts":"2026-08-02T16:31:27.669Z","op":"done","visit":"expeditions/e31@1","node":"d163","brief":"the suite is green at 716 of 716"}
 {"ts":"2026-08-02T16:31:39.454Z","op":"done","visit":"expeditions/e31@1","node":"d164","brief":"landed as a fast-forward onto v3"}
 {"ts":"2026-08-02T16:31:46.263Z","op":"done","visit":"expeditions/e31@1","node":"d174","brief":"prompt layer placed and preflight green under the new name"}
+{"ts":"2026-08-02T16:31:53.221Z","op":"done","visit":"expeditions/e31@1","node":"d175","brief":"trunk carries everything e31 built"}
+{"ts":"2026-08-02T16:44:47.293Z","op":"plan","visit":"expeditions/e31@0","parent":null,"nodes":[{"id":"d3","brief":"verify what the last session left on disk"},{"id":"d4","brief":"remove the product junction and the workspace folder"},{"id":"d5","brief":"retarget the cage ignore lines to the opened folder"},{"id":"d6","brief":"verify the tree and the suite"},{"id":"d7","brief":"close the expedition"}]}
+{"ts":"2026-08-02T16:45:11.888Z","op":"update","visit":"expeditions/e31@0","node":"d8","brief":"checking whether the running engine is launched through the junction"}
+{"ts":"2026-08-02T16:45:54.985Z","op":"done","visit":"expeditions/e31@0","node":"d3","brief":"three leftovers confirmed and the engine proven independent of the junction"}
+{"ts":"2026-08-02T16:46:15.280Z","op":"update","visit":"expeditions/e31@0","node":"d9","brief":"workspace folder and the junction are gone; product still holds a deliverable folder"}
+{"ts":"2026-08-02T16:47:41.067Z","op":"done","visit":"expeditions/e31@0","node":"d4","brief":"product and workspace are gone from the root and the junction with them"}
+{"ts":"2026-08-02T16:48:10.630Z","op":"fork","visit":"expeditions/e31@0","parent":null,"node":"d10","brief":"a stuck process holds product\\deliverable so the folder will not go","nodes":[]}
+{"ts":"2026-08-02T16:48:43.795Z","op":"update","visit":"expeditions/e31@0","node":"d11","brief":"killing a battery run hung since 14:55 that held the folder open"}
+{"ts":"2026-08-02T16:49:26.797Z","op":"done","visit":"expeditions/e31@0","node":"d10","brief":"the hung battery is killed and the folder is gone"}
+{"ts":"2026-08-02T16:50:33.682Z","op":"update","visit":"expeditions/e31@0","node":"d12","brief":"ignore rules and the README now name the opened folder"}
+{"ts":"2026-08-02T16:51:05.907Z","op":"update","visit":"expeditions/e31@0","node":"d13","brief":"ignore rules and the README now name the opened folder"}
+{"ts":"2026-08-02T16:51:45.638Z","op":"done","visit":"expeditions/e31@0","node":"d5","brief":"the cage ignore rules name project and the stray carriage return is gone"}
+{"ts":"2026-08-02T16:52:08.939Z","op":"update","visit":"expeditions/e31@0","node":"d14","brief":"running the one test file that names the README and the ignore rules"}
+{"ts":"2026-08-02T16:52:47.333Z","op":"update","visit":"expeditions/e31@0","node":"d15","brief":"editsafety green at 14 of 14 so the change goes to trunk"}
