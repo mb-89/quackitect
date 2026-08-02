@@ -1,0 +1,518 @@
+// The discipline round (owner ruling 2026-08-02), tested against the harvest
+// that ruled it: 2,589 logged se_run calls, 46% of them improvised text tools
+// — Select-String for the searcher, Get-Content for the reader, Set-/Add-
+// Content for the writer, every one uninstrumented. The lane grows the
+// missing verbs here, and se_run learns to say no to the jobs it now covers.
+import { strict as assert } from "node:assert";
+import { spawnSync } from "node:child_process";
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import { test } from "node:test";
+import { classifyCommand, laneVerdict, testFingerprint, testGate, testRecord } from "../engine/discipline.ts";
+import { Rejection } from "../engine/errors.ts";
+import { filePatch, fileRead } from "../engine/files.ts";
+import { contentHash } from "../engine/hash.ts";
+import { search } from "../engine/search.ts";
+
+function fresh(): string {
+  return mkdtempSync(join(tmpdir(), "se-v3-disc-"));
+}
+
+// ── the patch verbs ────────────────────────────────────────────────────────
+
+// THE APPEND WENT THROUGH THE SHELL, 285 TIMES. The handover's addenda were
+// Add-Content heredocs because the lane demanded either a full rewrite with
+// hash or an exact anchor — for "add to the end", both are the wrong shape.
+test("append is a patch op: no anchor, no full rewrite, seam handled and NAMED", () => {
+  const root = fresh();
+  writeFileSync(join(root, "h.md"), "# Handover\nbody"); // no trailing newline — the common fumble
+  const r = filePatch(root, [{ path: "h.md", append: true, new_string: "## Addendum\nmore" }]);
+  assert.equal(readFileSync(join(root, "h.md"), "utf8"), "# Handover\nbody\n## Addendum\nmore");
+  assert.ok((r.corrected ?? []).some((c) => c.includes("newline")), "the mechanical seam fix is announced, not silent");
+  rmSync(root, { recursive: true, force: true });
+});
+
+test("prepend joins at the file's start", () => {
+  const root = fresh();
+  writeFileSync(join(root, "h.md"), "body\n");
+  filePatch(root, [{ path: "h.md", prepend: true, new_string: "# Title" }]);
+  assert.equal(readFileSync(join(root, "h.md"), "utf8"), "# Title\nbody\n");
+  rmSync(root, { recursive: true, force: true });
+});
+
+// SED, KEPT INSIDE THE LANE. The regex verb is what -replace was reaching
+// for, minus the quoting arms race and plus the guards: always global, count
+// reported, and expect_count turns "hope it hit once" into a checked claim.
+test("regex substitution reports its count and honours expect_count", () => {
+  const root = fresh();
+  writeFileSync(join(root, "a.ts"), "const aq = 1; use(aq); log(aq);\n");
+  const r = filePatch(root, [{ path: "a.ts", pattern: "\\baq\\b", replacement: "survey", expect_count: 3 }]);
+  assert.equal(r.applied[0].replacements, 3);
+  assert.equal(readFileSync(join(root, "a.ts"), "utf8"), "const survey = 1; use(survey); log(survey);\n");
+  rmSync(root, { recursive: true, force: true });
+});
+
+test("a wrong expect_count refuses and NOTHING is written", () => {
+  const root = fresh();
+  const before = "x y x\n";
+  writeFileSync(join(root, "a.md"), before);
+  assert.throws(
+    () => filePatch(root, [{ path: "a.md", pattern: "x", replacement: "z", expect_count: 3 }]),
+    (e: unknown) => e instanceof Rejection && e.clause === "SE-C-105",
+  );
+  assert.equal(readFileSync(join(root, "a.md"), "utf8"), before, "a refused batch leaves the tree untouched");
+  rmSync(root, { recursive: true, force: true });
+});
+
+test("a zero-match pattern refuses — a substitution that hit nothing is not a success", () => {
+  const root = fresh();
+  writeFileSync(join(root, "a.md"), "plain\n");
+  assert.throws(
+    () => filePatch(root, [{ path: "a.md", pattern: "absent_\\d+", replacement: "x" }]),
+    (e: unknown) => e instanceof Rejection && e.clause === "SE-C-105",
+  );
+  rmSync(root, { recursive: true, force: true });
+});
+
+// A LINE NUMBER ONLY MEANS SOMETHING AGAINST THE VERSION YOU READ — so the
+// range verb demands the hash that read handed over, mechanically.
+test("line-range replace works from a read's hash and refuses without one", () => {
+  const root = fresh();
+  writeFileSync(join(root, "a.ts"), "one\ntwo\nthree\nfour\n");
+  const hash = fileRead(root, "a.ts").hash;
+  assert.throws(
+    () => filePatch(root, [{ path: "a.ts", at: { from_line: 2, to_line: 3 }, new_string: "TWO" }]),
+    (e: unknown) => e instanceof Rejection && e.clause === "SE-C-046",
+    "a range op without base_hash refuses by name",
+  );
+  filePatch(root, [{ path: "a.ts", at: { from_line: 2, to_line: 3 }, new_string: "TWO\nTHREE", base_hash: hash }]);
+  assert.equal(readFileSync(join(root, "a.ts"), "utf8"), "one\nTWO\nTHREE\nfour\n");
+  rmSync(root, { recursive: true, force: true });
+});
+
+test("a range beyond the file refuses with the file's real extent", () => {
+  const root = fresh();
+  writeFileSync(join(root, "a.ts"), "one\ntwo\n");
+  const hash = fileRead(root, "a.ts").hash;
+  assert.throws(
+    () => filePatch(root, [{ path: "a.ts", at: { from_line: 2, to_line: 99 }, new_string: "x", base_hash: hash }]),
+    (e: unknown) => e instanceof Rejection && e.clause === "SE-C-105",
+  );
+  rmSync(root, { recursive: true, force: true });
+});
+
+// THE ENGINE CORRECTS WHAT IS MECHANICAL AND SAYS SO. The commonest patch
+// refusal (12 in one period) was a CRLF file against an LF old_string — a
+// difference no model can see. The old lane diagnosed it and refused anyway;
+// the round-trip that followed re-copied text that differed in nothing
+// visible. Now the patch lands in the file's own endings and the correction
+// is named on the result.
+test("a CRLF/LF mismatch is auto-corrected and ANNOUNCED, not refused", () => {
+  const root = fresh();
+  writeFileSync(join(root, "w.ts"), "const a = 1;\r\nconst b = 2;\r\n");
+  const r = filePatch(root, [{ path: "w.ts", old_string: "const a = 1;\nconst b = 2;", new_string: "const a = 1;\nconst b = 3;" }]);
+  assert.equal(readFileSync(join(root, "w.ts"), "utf8"), "const a = 1;\r\nconst b = 3;\r\n", "applied in the FILE's endings — CRLF stays CRLF");
+  assert.ok((r.corrected ?? []).some((c) => c.includes("CRLF")), "the correction is named on the result");
+  rmSync(root, { recursive: true, force: true });
+});
+
+test("a real whitespace difference still refuses — indentation is a difference, not an encoding", () => {
+  const root = fresh();
+  writeFileSync(join(root, "w.ts"), "    indented\n");
+  assert.throws(
+    () => filePatch(root, [{ path: "w.ts", old_string: "\tindented", new_string: "x" }]),
+    (e: unknown) => e instanceof Rejection && e.clause === "SE-C-105" && e.got.includes("collapsed"),
+  );
+  rmSync(root, { recursive: true, force: true });
+});
+
+test("an op that mixes verbs refuses by name — nothing guesses", () => {
+  const root = fresh();
+  writeFileSync(join(root, "a.md"), "x\n");
+  assert.throws(
+    () => filePatch(root, [{ path: "a.md", old_string: "x", new_string: "y", append: true }]),
+    (e: unknown) => e instanceof Rejection && e.clause === "SE-C-046" && e.got.includes("mixes"),
+  );
+  rmSync(root, { recursive: true, force: true });
+});
+
+// ── the search options ─────────────────────────────────────────────────────
+
+// EVERY HIT USED TO COST A SECOND CALL: the tool's own description said
+// "read around a hit with se_file_read". 1,051 searches, and the follow-up
+// read was the two-call pattern the lane itself taught.
+test("context rides the hit, marked so a neighbour is never mistaken for a match", () => {
+  const root = fresh();
+  writeFileSync(join(root, "a.ts"), "before\nneedle here\nafter\n");
+  const r = search(root, "needle", { context: 1 });
+  const hit = r.matches.find((m) => m.context === undefined);
+  const around = r.matches.filter((m) => m.context === true);
+  assert.ok(hit !== undefined && hit.line === 2);
+  assert.deepEqual(around.map((m) => m.line).sort(), [1, 3], "one line each side, both marked context");
+  rmSync(root, { recursive: true, force: true });
+});
+
+// THE COMMONEST SHELL SEARCH SHAPE was Get-ChildItem -Include *.ts piped to
+// Select-String — a file filter the lane simply did not have.
+test("include filters by filename inside the search call", () => {
+  const root = fresh();
+  writeFileSync(join(root, "a.ts"), "marker\n");
+  writeFileSync(join(root, "a.md"), "marker\n");
+  const r = search(root, "marker", { include: "**/*.ts" });
+  assert.deepEqual(r.matches.map((m) => m.path), ["a.ts"]);
+  rmSync(root, { recursive: true, force: true });
+});
+
+test("count_only answers 'how many, where' without a single match line", () => {
+  const root = fresh();
+  writeFileSync(join(root, "a.ts"), "x\nx\nx\n");
+  writeFileSync(join(root, "b.ts"), "x\n");
+  const r = search(root, "x", { count_only: true });
+  assert.equal(r.total, 4);
+  assert.deepEqual(r.counts, [{ path: "a.ts", count: 3 }, { path: "b.ts", count: 1 }]);
+  assert.equal(r.matches.length, 0);
+  rmSync(root, { recursive: true, force: true });
+});
+
+// ── the ladder ─────────────────────────────────────────────────────────────
+
+// THE CLASSIFIER IS A TABLE, NOT A MODEL. A rule fired or it did not.
+test("the classifier names the lane tool for each harvested shell shape", () => {
+  assert.equal(classifyCommand("Select-String -Pattern 'survey' -Path a.ts")?.tool, "se_file_search");
+  assert.equal(classifyCommand("Get-Content project/engine/toll.ts")?.tool, "se_file_read");
+  assert.equal(classifyCommand("Add-Content -Path .se/HANDOVER.md -Value 'x'")?.tool, "se_file_patch");
+  assert.equal(classifyCommand("$x -replace 'a','b' | Set-Content out.md")?.tool, "se_file_patch");
+  assert.equal(classifyCommand("npm test")?.tool, "se_test");
+  assert.equal(classifyCommand("git status --porcelain")?.tool, "se_git");
+  assert.equal(classifyCommand("node engine/bin/render-decisions.ts"), undefined, "a plain node run is se_run's own job");
+  assert.equal(classifyCommand("npm install --no-audit"), undefined);
+});
+
+test("first offence runs WITH a warning; the second refuses with the lane call as remedy", () => {
+  const se = fresh();
+  const cmd = "Select-String -Pattern 'x' -Path a.ts";
+  const w = laneVerdict(se, cmd);
+  assert.ok(w !== undefined && w.lane_tool === "se_file_search", "the first run carries the teaching");
+  assert.throws(
+    () => laneVerdict(se, cmd),
+    (e: unknown) => e instanceof Rejection && e.clause === "SE-C-129" && e.remedy.tool === "se_file_search",
+    "the grace is one run, then the category refuses",
+  );
+  rmSync(se, { recursive: true, force: true });
+});
+
+test("the grace is PER CATEGORY and persists on disk — no per-session amnesia", () => {
+  const se = fresh();
+  laneVerdict(se, "Select-String -Pattern 'x' a.ts");
+  const w = laneVerdict(se, "Get-Content a.ts");
+  assert.ok(w !== undefined && w.category === "file reads", "a different category still has its own grace");
+  const state = JSON.parse(readFileSync(join(se, "discipline.json"), "utf8")) as { counts: Record<string, number> };
+  assert.equal(state.counts["text searches"], 1);
+  assert.equal(state.counts["file reads"], 1);
+  rmSync(se, { recursive: true, force: true });
+});
+
+// THE VALVE. A mechanical classifier will sometimes be wrong, and a false
+// positive with no exit teaches obfuscation, not discipline. no_tool_reason
+// runs the command once and files the reason — the gap documents itself.
+test("no_tool_reason runs a blocked category once and files the reason as evidence", () => {
+  const se = fresh();
+  const cmd = "Select-String -Pattern 'x' a.ts";
+  laneVerdict(se, cmd); // grace spent
+  const w = laneVerdict(se, cmd, "needs -Context 40, beyond the lane's cap");
+  assert.ok(w !== undefined && w.note.includes("logged"), "the valve run still carries the lane's answer");
+  const state = JSON.parse(readFileSync(join(se, "discipline.json"), "utf8")) as { reasons: { category: string; reason: string }[] };
+  assert.equal(state.reasons.length, 1);
+  assert.ok(state.reasons[0].reason.includes("-Context 40"));
+  assert.throws(() => laneVerdict(se, cmd), "the valve is per-call, never a standing exemption");
+  rmSync(se, { recursive: true, force: true });
+});
+
+test("a clean command passes without a mark", () => {
+  const se = fresh();
+  assert.equal(laneVerdict(se, "node engine/bin/render-decisions.ts --root ."), undefined);
+  rmSync(se, { recursive: true, force: true });
+});
+
+// ── the test gate ──────────────────────────────────────────────────────────
+
+function gitRoot(): string {
+  const root = fresh();
+  const g = (...a: string[]): void => {
+    const r = spawnSync("git", a, { cwd: root, encoding: "utf8" });
+    assert.equal(r.status, 0, `git ${a.join(" ")}: ${r.stderr}`);
+  };
+  g("init", "-q");
+  g("config", "user.email", "t@t");
+  g("config", "user.name", "t");
+  writeFileSync(join(root, "a.ts"), "one\n");
+  g("add", "-A");
+  g("commit", "-qm", "seed");
+  return root;
+}
+
+// A RE-RUN OVER AN UNCHANGED TREE PROVES NOTHING NEW. se_test held 5,706
+// seconds of one build's wall clock; a share of those runs asked a question
+// the previous run had already answered.
+test("an unchanged tree refuses a re-run; any tracked change opens the gate again", () => {
+  const root = gitRoot();
+  const se = join(root, ".se");
+  testRecord(se, root, true);
+  assert.throws(
+    () => testGate(se, root, false),
+    (e: unknown) => e instanceof Rejection && e.clause === "SE-C-130" && e.got.includes("GREEN"),
+    "the standing verdict is quoted back, colour and all",
+  );
+  assert.doesNotThrow(() => testGate(se, root, true), "force is the flake-hunt door");
+  writeFileSync(join(root, "a.ts"), "two\n");
+  assert.doesNotThrow(() => testGate(se, root, false), "a dirty file moves the fingerprint");
+  rmSync(root, { recursive: true, force: true });
+});
+
+test("outside a git repo the gate stands aside — it never blocks what it cannot fingerprint", () => {
+  const root = fresh();
+  const se = join(root, ".se");
+  testRecord(se, root, true);
+  assert.doesNotThrow(() => testGate(se, root, false));
+  assert.equal(testFingerprint(root), "");
+  rmSync(root, { recursive: true, force: true });
+});
+
+// The fingerprint must move when a DIRTY file changes between runs — HEAD
+// alone would call two different working trees "the same tree".
+test("the fingerprint tracks dirty content, not just HEAD", () => {
+  const root = gitRoot();
+  writeFileSync(join(root, "a.ts"), "dirty-one\n");
+  const fp1 = testFingerprint(root);
+  writeFileSync(join(root, "b.ts"), "untracked\n");
+  const fp2 = testFingerprint(root);
+  assert.notEqual(fp1, fp2, "an appearing untracked file is a change");
+  rmSync(root, { recursive: true, force: true });
+});
+
+// The corrected field must survive the whole batch path — a correction in op
+// 1 is not erased by a clean op 2 (regression guard for the plumbing).
+test("corrections from mixed batches all arrive on one result", () => {
+  const root = fresh();
+  writeFileSync(join(root, "w.md"), "alpha\r\nbeta\r\n");
+  writeFileSync(join(root, "x.md"), "gamma\n");
+  const r = filePatch(root, [
+    { path: "w.md", old_string: "alpha\nbeta", new_string: "alpha\nBETA" },
+    { path: "x.md", old_string: "gamma", new_string: "GAMMA" },
+  ]);
+  assert.equal(r.applied.length, 2);
+  assert.equal((r.corrected ?? []).length, 1);
+  assert.equal(contentHash(readFileSync(join(root, "w.md"), "utf8")), r.applied[0].hash);
+  rmSync(root, { recursive: true, force: true });
+});
+
+// ── the scope economy ──────────────────────────────────────────────────────
+// Imported here, after the first cut shipped: one session ran the full
+// battery ~60 times in two hours, mostly to answer single-test questions,
+// then grepped a temp file for the one failure it cared about. The battery
+// is the exception now; the scoped run is the default; and gaming the rule
+// is unprofitable by construction.
+import { batteryGate, flipThreshold, mapChangedToTests, parseTap, scopedGate, suiteFiles } from "../engine/discipline.ts";
+
+function productRoot(): string {
+  // A root that LOOKS like the product: engine modules and their tests.
+  const root = gitRoot();
+  mkdirSync(join(root, "project", "deliverable", "engine"), { recursive: true });
+  mkdirSync(join(root, "project", "deliverable", "tests"), { recursive: true });
+  for (const m of ["pull", "files", "search"]) {
+    writeFileSync(join(root, "project", "deliverable", "engine", `${m}.ts`), `// ${m}\n`);
+    writeFileSync(join(root, "project", "deliverable", "tests", `${m}.test.ts`), `// ${m} test\n`);
+  }
+  const g = (...a: string[]): void => { spawnSync("git", a, { cwd: root }); };
+  g("add", "-A");
+  g("commit", "-qm", "project");
+  return root;
+}
+
+// THE REFUSAL HANDS OVER THE SCOPED CALL, COMPUTED FROM THE DIFF. The gate
+// does not just say no to the battery — it names the cheaper question.
+test("the battery refuses while every change maps to a test file, and names the scope", () => {
+  const root = productRoot();
+  const se = join(root, ".se");
+  testRecord(se, root, true); // a green battery stands
+  writeFileSync(join(root, "project", "deliverable", "engine", "pull.ts"), "// changed\n");
+  try {
+    batteryGate(se, root, false);
+    assert.fail("expected the scope refusal");
+  } catch (e) {
+    assert.ok(e instanceof Rejection && e.clause === "SE-C-131");
+    assert.deepEqual((e as Rejection).remedy.args, { files: ["project/deliverable/tests/pull.test.ts"] }, "the remedy IS the scoped call");
+  }
+  rmSync(root, { recursive: true, force: true });
+});
+
+test("an unmapped change buys the battery — no scoped run answers for it", () => {
+  const root = productRoot();
+  const se = join(root, ".se");
+  testRecord(se, root, true);
+  writeFileSync(join(root, "project", "deliverable", "engine", "render.ts"), "// no test file exists for render\n");
+  assert.doesNotThrow(() => batteryGate(se, root, false));
+  rmSync(root, { recursive: true, force: true });
+});
+
+test("with no battery memory the battery runs — a first run cannot be refused toward history", () => {
+  const root = productRoot();
+  assert.doesNotThrow(() => batteryGate(join(root, ".se"), root, false));
+  rmSync(root, { recursive: true, force: true });
+});
+
+test("a RED battery re-runs freely — a standing failure is never fenced off", () => {
+  const root = productRoot();
+  const se = join(root, ".se");
+  testRecord(se, root, false);
+  writeFileSync(join(root, "project", "deliverable", "engine", "pull.ts"), "// changed\n");
+  assert.doesNotThrow(() => batteryGate(se, root, false));
+  rmSync(root, { recursive: true, force: true });
+});
+
+// THE FLIP: past a third of the suite piecemeal, the battery is GRANTED and
+// scoped runs refuse toward it. Gaming the scope rule is never profitable —
+// approximating the battery one file at a time makes the battery legal.
+test("piecemeal past the threshold flips: scoped refuses toward the battery, the battery is granted", () => {
+  const root = productRoot();
+  const se = join(root, ".se");
+  testRecord(se, root, true);
+  const threshold = flipThreshold(root);
+  // Walk the odometer up to one below the flip, as distinct scoped records.
+  for (let i = 0; i < threshold - 1; i++) {
+    testRecord(se, root, true, `scope-${i}`, [`project/deliverable/tests/f${i}.test.ts`]);
+  }
+  assert.doesNotThrow(() => scopedGate(se, root, ["project/deliverable/tests/f0.test.ts"], false), "already-seen files do not advance the odometer");
+  try {
+    scopedGate(se, root, ["project/deliverable/tests/fresh.test.ts"], false);
+    assert.fail("expected the flip");
+  } catch (e) {
+    assert.ok(e instanceof Rejection && e.clause === "SE-C-131" && e.remedy.tool === "se_test");
+  }
+  writeFileSync(join(root, "project", "deliverable", "engine", "pull.ts"), "// changed\n");
+  // The same odometer that refuses piecemeal GRANTS the battery, even though
+  // the diff maps — the two gates pivot together or the agent is wedged.
+  testRecord(se, root, true, "scope-x", [`project/deliverable/tests/fresh.test.ts`]);
+  assert.doesNotThrow(() => batteryGate(se, root, false));
+  // And a battery run resets the odometer.
+  testRecord(se, root, true);
+  assert.doesNotThrow(() => scopedGate(se, root, ["project/deliverable/tests/f0.test.ts"], false));
+  rmSync(root, { recursive: true, force: true });
+});
+
+test("the unchanged gate is PER SCOPE — pull's green does not fence files' run", () => {
+  const root = productRoot();
+  const se = join(root, ".se");
+  testRecord(se, root, true, "pull-scope", ["project/deliverable/tests/pull.test.ts"]);
+  assert.throws(() => testGate(se, root, false, "pull-scope"), (e: unknown) => e instanceof Rejection && e.clause === "SE-C-130");
+  assert.doesNotThrow(() => testGate(se, root, false, "files-scope"), "a scope never run is never fenced");
+  rmSync(root, { recursive: true, force: true });
+});
+
+// The map: a test file answers for itself; an engine module for its named
+// test; anything else is honest about having no scoped answer.
+test("the change-to-test map is by name and refuses to guess", () => {
+  const root = productRoot();
+  const r = mapChangedToTests(root, [
+    "project/deliverable/engine/pull.ts",
+    "project/deliverable/tests/files.test.ts",
+    "project/guidance/voice.md",
+  ]);
+  assert.deepEqual(r.mapped, ["project/deliverable/tests/files.test.ts", "project/deliverable/tests/pull.test.ts"]);
+  assert.deepEqual(r.unmapped, ["project/guidance/voice.md"]);
+  assert.equal(suiteFiles(root).length, 3);
+  rmSync(root, { recursive: true, force: true });
+});
+
+// TAP, structured: counts plus ONLY the failures' detail — the slice every
+// temp-file grep was after. Subtests report through their parent.
+test("parseTap keeps the counts and only the failures' detail", () => {
+  const tap = [
+    "TAP version 13",
+    "ok 1 - the first law holds",
+    "not ok 2 - the second law breaks",
+    "  ---",
+    "  duration_ms: 4.2",
+    "  error: 'expected 1, got 2'",
+    "  code: 'ERR_ASSERTION'",
+    "  ...",
+    "ok 3 - the third law holds",
+    "# tests 3",
+    "# pass 2",
+    "# fail 1",
+  ].join("\n");
+  const r = parseTap(tap);
+  assert.deepEqual({ total: r.total, pass: r.pass, fail: r.fail }, { total: 3, pass: 2, fail: 1 });
+  assert.equal(r.failures.length, 1);
+  assert.equal(r.failures[0].name, "the second law breaks");
+  assert.ok(r.failures[0].detail.includes("expected 1, got 2"));
+});
+
+// ── waiting, and the streak ────────────────────────────────────────────────
+// Found live 2026-08-02: an agent burned ~15 minutes of one hour in
+// 100-second Start-Sleep calls, hand-polling a background job the lane gave
+// it no way to wait on. The wait verb is the lane's answer; the rule makes
+// the sleep a named lane job; the streak carries the 95% law back on every
+// green result.
+import { runBackground, jobWait } from "../engine/run.ts";
+import { streakNudge } from "../engine/discipline.ts";
+
+test("the sleep classifies as a lane job pointing at the wait verb", () => {
+  assert.equal(classifyCommand("Start-Sleep -Seconds 100; Write-Output ok")?.category, "waiting");
+  assert.equal(classifyCommand("sleep 5 && echo done")?.category, "waiting");
+  assert.equal(classifyCommand("node --test x.test.ts")?.category, "tests", "tests still classify first");
+});
+
+test("jobWait returns the MOMENT the job exits, not at the bound", async () => {
+  const root = fresh();
+  const cmd = process.platform === "win32" ? "Start-Sleep -Milliseconds 300" : "sleep 0.3";
+  const j = runBackground(root, cmd, {});
+  const t0 = Date.now();
+  const v = await jobWait(j.job, 10_000);
+  const waited = Date.now() - t0;
+  assert.equal(v.running, false, "the job completed inside the wait");
+  assert.ok(waited < 5_000, `returned on completion (${waited}ms), nowhere near the 10s bound`);
+  rmSync(root, { recursive: true, force: true });
+});
+
+test("the streak counts consecutive greens per scope and a red resets it", () => {
+  const root = gitRoot();
+  const se = join(root, ".se");
+  assert.equal(testRecord(se, root, true, "s1", ["f1"]), 1);
+  writeFileSync(join(root, "a.ts"), "two\n");
+  assert.equal(testRecord(se, root, true, "s1", ["f1"]), 2);
+  writeFileSync(join(root, "a.ts"), "three\n");
+  assert.equal(testRecord(se, root, true, "s1", ["f1"]), 3);
+  assert.ok(streakNudge(3) !== undefined && (streakNudge(3) as string).includes("95%"), "the nudge carries the owner's law");
+  assert.equal(streakNudge(2), undefined, "below the bar, silence");
+  writeFileSync(join(root, "a.ts"), "four\n");
+  assert.equal(testRecord(se, root, false, "s1", ["f1"]), 0, "a red resets");
+  writeFileSync(join(root, "a.ts"), "five\n");
+  assert.equal(testRecord(se, root, true, "s1", ["f1"]), 1);
+  rmSync(root, { recursive: true, force: true });
+});
+
+// ── the cut law ────────────────────────────────────────────────────────────
+// CUT THE MIDDLE, NEVER THE END (owner law 2026-08-02). Incident: a
+// head-only cap turned "(425.501917ms)" into "(425.501", the unit died with
+// the tail, and milliseconds were diagnosed as seconds — three documents
+// carried the wrong number before the owner caught it. The end of an output
+// is where verdicts live: exit codes, totals, closing units.
+import { capMiddle } from "../engine/jsonio.ts";
+
+test("capMiddle keeps both ends — the tail's unit survives any cap", () => {
+  const out = "x".repeat(9000) + " tests 425 pass 424 fail 1 duration (425.501917ms)";
+  const capped = capMiddle(out, 1000);
+  assert.ok(capped.length < 1300, "capped near the budget");
+  assert.ok(capped.includes("(425.501917ms)"), "the END survives — the unit cannot be eaten");
+  assert.ok(capped.includes("chars cut"), "the cut names itself");
+  assert.equal(capMiddle("short", 1000), "short", "under budget passes untouched");
+});
+
+test("capMiddle backs off to whitespace — no token is ever split", () => {
+  const words = Array.from({ length: 800 }, (_, i) => `word${i}`).join(" ");
+  const capped = capMiddle(words, 500);
+  const head = capped.split("\n")[0];
+  assert.ok(/word\d+$/.test(head.trim()), `the head ends on a whole token: …${head.slice(-20)}`);
+});

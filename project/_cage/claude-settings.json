@@ -1,0 +1,60 @@
+{
+  "permissions": {
+    "deny": [
+      "Bash",
+      "BashOutput",
+      "KillShell",
+      "Read",
+      "Write",
+      "Edit",
+      "NotebookEdit",
+      "Glob",
+      "Grep",
+      "WebFetch",
+      "Skill"
+    ],
+    "allow": [
+      "mcp__se__*"
+    ]
+  },
+  "env": {
+    "MAX_MCP_OUTPUT_TOKENS": "100000",
+    "MAX_THINKING_TOKENS": "31999"
+  },
+  "alwaysThinkingEnabled": true,
+  "outputStyle": "voice",
+  "enableAllProjectMcpServers": true,
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "WebSearch",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"../project/deliverable/engine/bin/se-hook-websearch.ts\""
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "matcher": "startup|resume|clear",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node -e \"console.log('[se] PULL: your FIRST action is the se_pull tool with no payload - the machine answers with an instruction: read (the document rides along and prove names its last words - read it, then pull again with form:{read:...}), fill (return the form on the next pull as form:{...}), choose (answer as form:{choice:...} - a choice exists only where one was offered), do (do what the guidance asks, then pull), or wait (STOP and tell the user plainly which step waits - the slider alone cannot wake you, they must send you a message, e.g. continue, after adjusting it). You carry no hashes and choose nothing unasked; pull, do, pull again. When a result carries a banner, show it to the user VERBATIM and proceed with their request. The lane is locked until the machine reaches idle.')\""
+          }
+        ]
+      },
+      {
+        "matcher": "compact|clear",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node -e \"console.log('[se] context was compacted - what you remember reading is gone from your head, and the machine knows it. Call se_pull to reorient: it will answer read for whatever must be read again, handing the documents over one at a time. The one rule is unchanged: you work through the se MCP server, and you do what it tells you.')\""
+          }
+        ]
+      }
+    ]
+  }
+}

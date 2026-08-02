@@ -1,0 +1,175 @@
+{"ts":"2026-08-02T14:07:09.316Z","op":"plan","visit":"expeditions/e31@0","parent":null,"nodes":[{"id":"d1","brief":"check what the bound worktree actually holds"},{"id":"d2","brief":"carry the engine fix onto the expedition branch"},{"id":"d3","brief":"land the lane-verbs patch"},{"id":"d4","brief":"kill the workspace folder and the RUNME copy dance"},{"id":"d5","brief":"sweep the note inbox"},{"id":"d6","brief":"fold the rulings into guidance and clear _incoming"}]}
+{"ts":"2026-08-02T14:07:35.552Z","op":"update","visit":"expeditions/e31@0","node":"d7","brief":"reading the worktree's branch and dirt"}
+{"ts":"2026-08-02T14:08:19.458Z","op":"update","visit":"expeditions/e31@0","node":"d8","brief":"does the worktree even carry the incoming patch"}
+{"ts":"2026-08-02T14:09:01.162Z","op":"done","visit":"expeditions/e31@0","node":"d1","brief":"worktree is at HEAD and clean; the inputs are not in it"}
+{"ts":"2026-08-02T14:10:45.786Z","op":"update","visit":"expeditions/e31@1","node":"d13","brief":"pulling trunk into the expedition branch"}
+{"ts":"2026-08-02T14:10:53.009Z","op":"update","visit":"expeditions/e31@1","node":"d14","brief":"the record's own decision trail wants committing first"}
+{"ts":"2026-08-02T14:11:02.110Z","op":"update","visit":"expeditions/e31@1","node":"d15","brief":"syncing trunk into the expedition"}
+{"ts":"2026-08-02T14:11:55.460Z","op":"done","visit":"expeditions/e31@0","node":"d2","brief":"engine fix is on the branch via the sync"}
+{"ts":"2026-08-02T14:12:03.752Z","op":"update","visit":"expeditions/e31@1","node":"d16","brief":"applying the patch to the expedition branch"}
+{"ts":"2026-08-02T14:12:20.666Z","op":"update","visit":"expeditions/e31@1","node":"d17","brief":"running the patch's 33 new tests on Windows"}
+{"ts":"2026-08-02T14:12:47.548Z","op":"update","visit":"expeditions/e31@1","node":"d18","brief":"typecheck plus the file lane the patch rewrote"}
+{"ts":"2026-08-02T14:13:27.450Z","op":"update","visit":"expeditions/e31@1","node":"d19","brief":"locating the raw NUL the patch shipped"}
+{"ts":"2026-08-02T14:13:41.039Z","op":"update","visit":"expeditions/e31@1","node":"d20","brief":"the separator becomes an escape, as worktree.ts already did"}
+{"ts":"2026-08-02T14:13:59.915Z","op":"update","visit":"expeditions/e31@1","node":"d21","brief":"re-running the file lane and the new suite"}
+{"ts":"2026-08-02T14:15:09.099Z","op":"done","visit":"expeditions/e31@0","node":"d3","brief":"the lane-verbs patch is landed and green on Windows"}
+{"ts":"2026-08-02T14:18:16.135Z","op":"plan","visit":"expeditions/e31@1","parent":null,"nodes":[{"id":"d22","brief":"auto-correct a raw NUL in source, and announce it"},{"id":"d23","brief":"move the workspace files into product"},{"id":"d24","brief":"make RUNME an install-once script"},{"id":"d25","brief":"write down the restart rule"}]}
+{"ts":"2026-08-02T14:19:36.703Z","op":"plan","visit":"expeditions/e31@1","parent":null,"nodes":[{"id":"d26","brief":"fold the six owner rulings into guidance"},{"id":"d27","brief":"generate the voice output style from voice.md"},{"id":"d28","brief":"adopt always-thinking and the thinking budget in the cage"},{"id":"d29","brief":"mine se-terse for the two mechanical lines"},{"id":"d30","brief":"make path-escape remedies name roots.json and ref reads"},{"id":"d31","brief":"decide whether count_only still owes an intent"},{"id":"d32","brief":"add a size row to the voice matrix"},{"id":"d33","brief":"bind the STE rows hardest on the guidance column"},{"id":"d34","brief":"boot once per suite run and read fixture guidance"},{"id":"d35","brief":"carry the stance ruling into the output style"},{"id":"d36","brief":"move i1-prep where the iteration can find it"},{"id":"d37","brief":"fix se_git_sync refusing itself over the decision trail"},{"id":"d38","brief":"note the engine-to-test map as a retro trigger"},{"id":"d39","brief":"note the broad catch that swallowed a missing import"},{"id":"d40","brief":"delete _incoming once its contents are worked in"}]}
+{"ts":"2026-08-02T14:19:58.050Z","op":"update","visit":"expeditions/e31@1","node":"d41","brief":"finding every door that writes bytes"}
+{"ts":"2026-08-02T14:20:35.194Z","op":"update","visit":"expeditions/e31@1","node":"d42","brief":"wiring the guard into the move rewriter too"}
+{"ts":"2026-08-02T14:21:55.218Z","op":"plan","visit":"expeditions/e31@1","parent":"d22","nodes":[{"id":"d43","brief":"add a search and replace that spans files"},{"id":"d44","brief":"report every place a wide replace touched"}]}
+{"ts":"2026-08-02T14:23:46.882Z","op":"update","visit":"expeditions/e31@1","node":"d45","brief":"the move sweep now reports what it repaired"}
+{"ts":"2026-08-02T14:23:57.581Z","op":"update","visit":"expeditions/e31@1","node":"d46","brief":"typechecking the three doors"}
+{"ts":"2026-08-02T14:24:59.798Z","op":"update","visit":"expeditions/e31@1","node":"d47","brief":"tests for all three doors, plus the move repair"}
+{"ts":"2026-08-02T14:25:15.353Z","op":"update","visit":"expeditions/e31@1","node":"d48","brief":"running the four new guard cases"}
+{"ts":"2026-08-02T14:26:09.836Z","op":"update","visit":"expeditions/e31@1","node":"d49","brief":"reading the single-file regex op to widen it"}
+{"ts":"2026-08-02T14:27:40.732Z","op":"update","visit":"expeditions/e31@1","node":"d50","brief":"the style is a projection; voice.md stays the truth"}
+{"ts":"2026-08-02T14:28:17.969Z","op":"update","visit":"expeditions/e31@1","node":"d51","brief":"every place comes back with its line before and after"}
+{"ts":"2026-08-02T14:29:40.912Z","op":"done","visit":"expeditions/e31@1","node":"d44","brief":"every place rides the result with its before and after"}
+{"ts":"2026-08-02T14:29:51.978Z","op":"update","visit":"expeditions/e31@1","node":"d52","brief":"typechecking and running the sweep"}
+{"ts":"2026-08-02T14:30:30.913Z","op":"done","visit":"expeditions/e31@1","node":"d43","brief":"se_file_replace lands with its places report"}
+{"ts":"2026-08-02T14:31:20.589Z","op":"update","visit":"expeditions/e31@1","node":"d53","brief":"reading the git lane tests for their idiom"}
+{"ts":"2026-08-02T14:31:52.678Z","op":"update","visit":"expeditions/e31@1","node":"d54","brief":"the trail is excused from the dirty gate"}
+{"ts":"2026-08-02T14:32:01.947Z","op":"update","visit":"expeditions/e31@1","node":"d55","brief":"running the git lane suite"}
+{"ts":"2026-08-02T14:33:06.798Z","op":"done","visit":"expeditions/e31@1","node":"d37","brief":"sync no longer refuses itself"}
+{"ts":"2026-08-02T14:33:41.973Z","op":"done","visit":"expeditions/e31@1","node":"d22","brief":"the NUL work is complete at every door"}
+{"ts":"2026-08-02T14:34:18.218Z","op":"update","visit":"expeditions/e31@1","node":"d56","brief":"moving the workspace files into product"}
+{"ts":"2026-08-02T14:35:35.161Z","op":"update","visit":"expeditions/e31@1","node":"d57","brief":"the opened folder is product now, everywhere"}
+{"ts":"2026-08-02T14:36:08.257Z","op":"update","visit":"expeditions/e31@1","node":"d58","brief":"mapping RUNME before cutting it down"}
+{"ts":"2026-08-02T14:37:27.531Z","op":"update","visit":"expeditions/e31@1","node":"d59","brief":"RUNME opens product and says it is install-once"}
+{"ts":"2026-08-02T14:38:11.219Z","op":"done","visit":"expeditions/e31@1","node":"d25","brief":"the restart rule is written where a person reads it"}
+{"ts":"2026-08-02T14:38:24.394Z","op":"done","visit":"expeditions/e31@1","node":"d24","brief":"RUNME is the install, run once"}
+{"ts":"2026-08-02T14:38:37.848Z","op":"update","visit":"expeditions/e31@1","node":"d60","brief":"testing the move against the read list"}
+{"ts":"2026-08-02T14:39:47.762Z","op":"update","visit":"expeditions/e31@1","node":"d61","brief":"a test the incoming patch obsoleted, brought up to date"}
+{"ts":"2026-08-02T14:39:57.695Z","op":"update","visit":"expeditions/e31@1","node":"d62","brief":"re-running the patch guards"}
+{"ts":"2026-08-02T14:41:17.524Z","op":"update","visit":"expeditions/e31@1","node":"d63","brief":"the test needed the reader it uses"}
+{"ts":"2026-08-02T14:41:45.140Z","op":"update","visit":"expeditions/e31@1","node":"d64","brief":"patch guards again"}
+{"ts":"2026-08-02T14:43:33.407Z","op":"done","visit":"expeditions/e31@1","node":"d23","brief":"product is the opened folder now"}
+{"ts":"2026-08-02T14:44:54.267Z","op":"update","visit":"expeditions/e31@1","node":"d65","brief":"the engine-design rulings land in software.md"}
+{"ts":"2026-08-02T14:46:09.789Z","op":"update","visit":"expeditions/e31@1","node":"d66","brief":"the rulings land in software, voice and the contract"}
+{"ts":"2026-08-02T14:46:37.115Z","op":"done","visit":"expeditions/e31@1","node":"d26","brief":"five rulings into guidance, the sixth into a note"}
+{"ts":"2026-08-02T14:47:08.430Z","op":"done","visit":"expeditions/e31@1","node":"d38","brief":"the map leak is a retro measurement, not a guess"}
+{"ts":"2026-08-02T14:47:35.751Z","op":"done","visit":"expeditions/e31@1","node":"d39","brief":"carried in the same note as the map leak"}
+{"ts":"2026-08-02T14:48:00.625Z","op":"update","visit":"expeditions/e31@1","node":"d67","brief":"the style is generated from voice.md at activation"}
+{"ts":"2026-08-02T14:48:18.161Z","op":"update","visit":"expeditions/e31@1","node":"d68","brief":"syntax-checking the extension and the cage json"}
+{"ts":"2026-08-02T14:50:48.827Z","op":"done","visit":"expeditions/e31@1","node":"d30","brief":"the path refusal names both doors out"}
+{"ts":"2026-08-02T14:50:56.669Z","op":"update","visit":"expeditions/e31@1","node":"d69","brief":"finding where i1's record keeps its inputs"}
+{"ts":"2026-08-02T14:51:26.854Z","op":"done","visit":"expeditions/e31@1","node":"d36","brief":"i1-prep sits in the spec where it is findable"}
+{"ts":"2026-08-02T14:51:42.199Z","op":"done","visit":"expeditions/e31@1","node":"d28","brief":"the two settings are in the cage, the model pin is not"}
+{"ts":"2026-08-02T14:52:02.673Z","op":"done","visit":"expeditions/e31@1","node":"d35","brief":"the stance rule rides voice.md into the style"}
+{"ts":"2026-08-02T14:52:10.443Z","op":"done","visit":"expeditions/e31@1","node":"d29","brief":"se-terse is mined into voice.md and gone"}
+{"ts":"2026-08-02T14:52:34.386Z","op":"done","visit":"expeditions/e31@1","node":"d40","brief":"_incoming is unpacked and deleted"}
+{"ts":"2026-08-02T14:53:27.972Z","op":"done","visit":"expeditions/e31@1","node":"d27","brief":"voice projects into Claude and Copilot alike"}
+{"ts":"2026-08-02T14:53:57.749Z","op":"update","visit":"expeditions/e31@1","node":"d70","brief":"checking the extension, then the intent question"}
+{"ts":"2026-08-02T14:54:07.868Z","op":"obsolete","visit":"expeditions/e31@1","node":"d31","brief":"intent stays required; counting is still a search with a why"}
+{"ts":"2026-08-02T14:55:01.044Z","op":"done","visit":"expeditions/e31@1","node":"d32","brief":"the size row carries the budgets per kind"}
+{"ts":"2026-08-02T14:55:26.950Z","op":"done","visit":"expeditions/e31@1","node":"d33","brief":"the guidance cell is bound hardest, and says why"}
+{"ts":"2026-08-02T14:56:20.191Z","op":"update","visit":"expeditions/e31@1","node":"d71","brief":"starting the inbox sweep"}
+{"ts":"2026-08-02T14:58:03.820Z","op":"update","visit":"expeditions/e31@1","node":"d72","brief":"eleven notes drained against what the code carries"}
+{"ts":"2026-08-02T14:58:47.677Z","op":"update","visit":"expeditions/e31@1","node":"d73","brief":"the graph-is-evidence check can see the graph now"}
+{"ts":"2026-08-02T14:59:09.365Z","op":"update","visit":"expeditions/e31@1","node":"d74","brief":"a test holds the visit parsing"}
+{"ts":"2026-08-02T14:59:25.905Z","op":"update","visit":"expeditions/e31@1","node":"d75","brief":"visitState is defined and exported"}
+{"ts":"2026-08-02T14:59:33.233Z","op":"update","visit":"expeditions/e31@1","node":"d76","brief":"running the visit-state and dirty-gate cases"}
+{"ts":"2026-08-02T15:00:32.918Z","op":"done","visit":"expeditions/e31@0","node":"d4","brief":"the workspace is gone and RUNME installs once"}
+{"ts":"2026-08-02T15:00:53.144Z","op":"update","visit":"expeditions/e31@1","node":"d77","brief":"reading what a test root borrows"}
+{"ts":"2026-08-02T15:01:26.489Z","op":"defer","visit":"expeditions/e31@1","node":"d34","brief":"boot once per suite run and read fixture guidance","to":"retro","hops":1,"trail":["expeditions/e31","retro"]}
+{"ts":"2026-08-02T15:01:40.424Z","op":"done","visit":"expeditions/e31@0","node":"d6","brief":"the rulings are folded and the parcel is gone"}
+{"ts":"2026-08-02T15:01:58.311Z","op":"done","visit":"expeditions/e31@0","node":"d5","brief":"twelve drained; the rest is judgment the retro owns"}
+{"ts":"2026-08-02T15:02:54.331Z","op":"update","visit":"expeditions/e31@1","node":"d78","brief":"the env-guard trap becomes a rule, not one note"}
+{"ts":"2026-08-02T15:08:34.050Z","op":"plan","visit":"expeditions/e31@1","parent":null,"nodes":[{"id":"d79","brief":"measure the real boot cost instead of quoting one"},{"id":"d80","brief":"find what the time is actually spent on"},{"id":"d81","brief":"check whether I broke worktree.test.ts"},{"id":"d82","brief":"make a booted session reusable"}]}
+{"ts":"2026-08-02T15:09:49.077Z","op":"update","visit":"expeditions/e31@1","node":"d83","brief":"building a bench that can be re-run"}
+{"ts":"2026-08-02T15:10:09.767Z","op":"update","visit":"expeditions/e31@1","node":"d84","brief":"the bench times each stage of a boot walk"}
+{"ts":"2026-08-02T15:10:17.048Z","op":"update","visit":"expeditions/e31@1","node":"d85","brief":"running the bench"}
+{"ts":"2026-08-02T15:10:34.825Z","op":"update","visit":"expeditions/e31@1","node":"d86","brief":"a failed git spawn is itself part of the cost"}
+{"ts":"2026-08-02T15:10:42.068Z","op":"done","visit":"expeditions/e31@1","node":"d79","brief":"battery 130s and boot.test 50s, both measured here"}
+{"ts":"2026-08-02T15:11:22.750Z","op":"update","visit":"expeditions/e31@1","node":"d87","brief":"reading and walking are different costs"}
+{"ts":"2026-08-02T15:11:39.533Z","op":"update","visit":"expeditions/e31@1","node":"d88","brief":"the decisive comparison: smoke test on and off"}
+{"ts":"2026-08-02T15:12:18.492Z","op":"update","visit":"expeditions/e31@1","node":"d89","brief":"the pull is 9ms; the reading is 5.4s"}
+{"ts":"2026-08-02T15:12:44.704Z","op":"update","visit":"expeditions/e31@1","node":"d90","brief":"isolating the route from the rest of the pull"}
+{"ts":"2026-08-02T15:12:56.319Z","op":"update","visit":"expeditions/e31@1","node":"d91","brief":"timing the route in isolation"}
+{"ts":"2026-08-02T15:13:36.731Z","op":"update","visit":"expeditions/e31@1","node":"d92","brief":"route is 200ms and never cached"}
+{"ts":"2026-08-02T15:14:36.262Z","op":"update","visit":"expeditions/e31@1","node":"d93","brief":"memoising the route on everything the search can see"}
+{"ts":"2026-08-02T15:15:13.140Z","op":"update","visit":"expeditions/e31@1","node":"d94","brief":"storing the memo at the route's return"}
+{"ts":"2026-08-02T15:15:28.423Z","op":"update","visit":"expeditions/e31@1","node":"d95","brief":"the memo is stored and invalidated on a seed"}
+{"ts":"2026-08-02T15:15:40.290Z","op":"update","visit":"expeditions/e31@1","node":"d96","brief":"measuring the memo"}
+{"ts":"2026-08-02T15:16:12.465Z","op":"update","visit":"expeditions/e31@1","node":"d97","brief":"regression check across the walk suites"}
+{"ts":"2026-08-02T15:16:43.159Z","op":"update","visit":"expeditions/e31@1","node":"d98","brief":"reading the regression output plainly"}
+{"ts":"2026-08-02T15:17:25.733Z","op":"update","visit":"expeditions/e31@1","node":"d99","brief":"reading the escape test to place the blame honestly"}
+{"ts":"2026-08-02T15:18:36.602Z","op":"update","visit":"expeditions/e31@1","node":"d100","brief":"pullTo checks the position, not the messenger"}
+{"ts":"2026-08-02T15:18:45.066Z","op":"update","visit":"expeditions/e31@1","node":"d101","brief":"re-running the walk suites with boot included"}
+{"ts":"2026-08-02T15:19:16.270Z","op":"done","visit":"expeditions/e31@1","node":"d81","brief":"worktree passes; the two left are the baseline's"}
+{"ts":"2026-08-02T15:19:58.242Z","op":"done","visit":"expeditions/e31@1","node":"d80","brief":"the route was the cost, and it is memoised now"}
+{"ts":"2026-08-02T15:20:35.515Z","op":"update","visit":"expeditions/e31@1","node":"d102","brief":"removing the raw NULs I just wrote into session.ts"}
+{"ts":"2026-08-02T15:21:01.212Z","op":"update","visit":"expeditions/e31@1","node":"d103","brief":"a separator that needs no escape at all"}
+{"ts":"2026-08-02T15:21:11.681Z","op":"update","visit":"expeditions/e31@1","node":"d104","brief":"proving the file is searchable again"}
+{"ts":"2026-08-02T15:21:52.862Z","op":"update","visit":"expeditions/e31@1","node":"d105","brief":"measuring the machine-only boot path next"}
+{"ts":"2026-08-02T15:22:25.885Z","op":"update","visit":"expeditions/e31@1","node":"d106","brief":"closing the git-apply hole at preflight"}
+{"ts":"2026-08-02T15:22:59.558Z","op":"update","visit":"expeditions/e31@1","node":"d107","brief":"preflight scans the engine for a raw NUL"}
+{"ts":"2026-08-02T15:23:09.682Z","op":"update","visit":"expeditions/e31@1","node":"d108","brief":"running preflight to see it green and cheap"}
+{"ts":"2026-08-02T15:23:21.760Z","op":"update","visit":"expeditions/e31@1","node":"d109","brief":"planting a canary to prove the check fires"}
+{"ts":"2026-08-02T15:23:48.187Z","op":"update","visit":"expeditions/e31@1","node":"d110","brief":"looking for the new design input in the main tree"}
+{"ts":"2026-08-02T15:24:01.574Z","op":"update","visit":"expeditions/e31@1","node":"d111","brief":"inventorying the new parcel and the prompt layer"}
+{"ts":"2026-08-02T15:24:52.790Z","op":"update","visit":"expeditions/e31@1","node":"d112","brief":"bringing the new parcel in and diffing the patch"}
+{"ts":"2026-08-02T15:25:19.170Z","op":"update","visit":"expeditions/e31@1","node":"d113","brief":"reading the prompt layer first"}
+{"ts":"2026-08-02T15:25:36.759Z","op":"update","visit":"expeditions/e31@1","node":"d114","brief":"reading the updated handover for the patch delta"}
+{"ts":"2026-08-02T15:25:53.510Z","op":"update","visit":"expeditions/e31@1","node":"d115","brief":"reading the new addenda"}
+{"ts":"2026-08-02T15:26:48.761Z","op":"update","visit":"expeditions/e31@1","node":"d116","brief":"what v4 touches, and whether it can three-way"}
+{"ts":"2026-08-02T15:27:18.474Z","op":"update","visit":"expeditions/e31@1","node":"d117","brief":"applying v4 three-way and counting conflicts"}
+{"ts":"2026-08-02T15:27:44.194Z","op":"update","visit":"expeditions/e31@1","node":"d118","brief":"confirming the cut law landed"}
+{"ts":"2026-08-02T15:28:04.361Z","op":"plan","visit":"expeditions/e31@1","parent":null,"nodes":[{"id":"d119","brief":"merge the v4 patch conflicts by hand"},{"id":"d120","brief":"verify the cut law with tests"},{"id":"d121","brief":"prove the preflight NUL check fires"},{"id":"d122","brief":"put the prompt layer into the plan"}]}
+{"ts":"2026-08-02T15:30:20.225Z","op":"update","visit":"expeditions/e31@1","node":"d123","brief":"locating every conflict region"}
+{"ts":"2026-08-02T15:30:43.043Z","op":"update","visit":"expeditions/e31@1","node":"d124","brief":"reading the small conflicts"}
+{"ts":"2026-08-02T15:31:22.827Z","op":"update","visit":"expeditions/e31@1","node":"d125","brief":"seven conflicts resolved; the raw NUL stays an escape"}
+{"ts":"2026-08-02T15:31:58.830Z","op":"update","visit":"expeditions/e31@1","node":"d126","brief":"seven conflicts resolved; the separator stays an escape"}
+{"ts":"2026-08-02T15:32:12.439Z","op":"update","visit":"expeditions/e31@1","node":"d127","brief":"reading the two large conflicts"}
+{"ts":"2026-08-02T15:32:31.042Z","op":"update","visit":"expeditions/e31@1","node":"d128","brief":"both large conflicts keep both sides"}
+{"ts":"2026-08-02T15:32:51.768Z","op":"done","visit":"expeditions/e31@1","node":"d119","brief":"the v4 merge is resolved"}
+{"ts":"2026-08-02T15:33:14.354Z","op":"update","visit":"expeditions/e31@1","node":"d129","brief":"planting the canary with raw bytes this time"}
+{"ts":"2026-08-02T15:33:41.845Z","op":"update","visit":"expeditions/e31@1","node":"d130","brief":"planting the canary from the worktree root"}
+{"ts":"2026-08-02T15:34:15.825Z","op":"done","visit":"expeditions/e31@1","node":"d121","brief":"the preflight NUL check fires, proven by canary"}
+{"ts":"2026-08-02T15:35:03.538Z","op":"update","visit":"expeditions/e31@1","node":"d131","brief":"running the cut-law cases"}
+{"ts":"2026-08-02T15:35:37.190Z","op":"done","visit":"expeditions/e31@1","node":"d120","brief":"the cut law is in and green"}
+{"ts":"2026-08-02T15:37:05.441Z","op":"plan","visit":"expeditions/e31@1","parent":null,"nodes":[{"id":"d132","brief":"rewrite contract.md terse"},{"id":"d133","brief":"rewrite walking.md terse"},{"id":"d134","brief":"generate the protocol from both"},{"id":"d135","brief":"place it at agent start and verify it in preflight"},{"id":"d136","brief":"shrink boot's reading to what is not in the prompt"}]}
+{"ts":"2026-08-02T15:37:22.421Z","op":"done","visit":"expeditions/e31@1","node":"d132","brief":"contract.md is terse and keeps every rule"}
+{"ts":"2026-08-02T15:38:02.330Z","op":"done","visit":"expeditions/e31@1","node":"d133","brief":"walking.md is terse and keeps every mechanism"}
+{"ts":"2026-08-02T15:39:03.434Z","op":"update","visit":"expeditions/e31@1","node":"d137","brief":"the lane table becomes a source of its own"}
+{"ts":"2026-08-02T15:39:45.050Z","op":"done","visit":"expeditions/e31@1","node":"d134","brief":"the protocol assembles from three terse sources"}
+{"ts":"2026-08-02T15:40:09.847Z","op":"update","visit":"expeditions/e31@1","node":"d138","brief":"a bin entry the start step can call"}
+{"ts":"2026-08-02T15:40:33.044Z","op":"update","visit":"expeditions/e31@1","node":"d139","brief":"preflight verifies it and the extension places it"}
+{"ts":"2026-08-02T15:40:56.177Z","op":"update","visit":"expeditions/e31@1","node":"d140","brief":"placing the layer and verifying it"}
+{"ts":"2026-08-02T15:41:13.735Z","op":"update","visit":"expeditions/e31@1","node":"d141","brief":"canarying stale and missing"}
+{"ts":"2026-08-02T15:41:40.763Z","op":"done","visit":"expeditions/e31@1","node":"d135","brief":"placement and verification both proven by canary"}
+{"ts":"2026-08-02T15:42:20.847Z","op":"update","visit":"expeditions/e31@1","node":"d142","brief":"voice joins the projection; the duplicate file goes"}
+{"ts":"2026-08-02T15:42:47.956Z","op":"update","visit":"expeditions/e31@1","node":"d143","brief":"boot reads only the handover now"}
+{"ts":"2026-08-02T15:43:01.247Z","op":"update","visit":"expeditions/e31@1","node":"d144","brief":"measuring boot with the prompt layer carrying the rules"}
+{"ts":"2026-08-02T15:43:28.561Z","op":"update","visit":"expeditions/e31@1","node":"d145","brief":"boot.test against the shrunken read list"}
+{"ts":"2026-08-02T15:43:58.689Z","op":"update","visit":"expeditions/e31@1","node":"d146","brief":"reading boot.test to bring it to the new shape"}
+{"ts":"2026-08-02T15:44:18.477Z","op":"update","visit":"expeditions/e31@1","node":"d147","brief":"reading the other failing cases"}
+{"ts":"2026-08-02T15:45:07.454Z","op":"update","visit":"expeditions/e31@1","node":"d148","brief":"boot.test brought to the promoted shape"}
+{"ts":"2026-08-02T15:45:17.511Z","op":"update","visit":"expeditions/e31@1","node":"d149","brief":"boot.test against the promoted shape"}
+{"ts":"2026-08-02T15:45:46.243Z","op":"update","visit":"expeditions/e31@1","node":"d150","brief":"finding what pulls root guidance"}
+{"ts":"2026-08-02T15:46:16.460Z","op":"update","visit":"expeditions/e31@1","node":"d151","brief":"lane.md leaves the always-pulled root"}
+{"ts":"2026-08-02T15:46:30.349Z","op":"update","visit":"expeditions/e31@1","node":"d152","brief":"re-running boot.test after the move"}
+{"ts":"2026-08-02T15:47:06.997Z","op":"update","visit":"expeditions/e31@1","node":"d153","brief":"boot owes nothing when no handover stands"}
+{"ts":"2026-08-02T15:47:16.392Z","op":"update","visit":"expeditions/e31@1","node":"d154","brief":"boot.test, whole file"}
+{"ts":"2026-08-02T15:47:42.783Z","op":"update","visit":"expeditions/e31@1","node":"d155","brief":"the packet asserts boot's one remaining demand"}
+{"ts":"2026-08-02T15:47:54.210Z","op":"update","visit":"expeditions/e31@1","node":"d156","brief":"boot.test again"}
+{"ts":"2026-08-02T15:48:20.286Z","op":"update","visit":"expeditions/e31@1","node":"d157","brief":"naming the remaining failure"}
+{"ts":"2026-08-02T15:48:46.004Z","op":"update","visit":"expeditions/e31@1","node":"d158","brief":"tap reporter to name the failing case"}
+{"ts":"2026-08-02T15:49:08.504Z","op":"update","visit":"expeditions/e31@1","node":"d159","brief":"reading the fresh-session case"}
+{"ts":"2026-08-02T15:49:28.383Z","op":"update","visit":"expeditions/e31@1","node":"d160","brief":"the count field is remaining, not documents"}
+{"ts":"2026-08-02T15:49:38.140Z","op":"done","visit":"expeditions/e31@1","node":"d136","brief":"boot reads only the handover now"}
+{"ts":"2026-08-02T15:50:30.927Z","op":"done","visit":"expeditions/e31@1","node":"d122","brief":"the prompt layer is built, placed and guarded"}
+{"ts":"2026-08-02T15:53:30.673Z","op":"plan","visit":"expeditions/e31@1","parent":null,"nodes":[{"id":"d161","brief":"delete the incoming parcels"},{"id":"d162","brief":"list every red test in the battery"},{"id":"d163","brief":"fix the tick retirement's leftovers"},{"id":"d164","brief":"land the expedition on trunk"}]}
+{"ts":"2026-08-02T15:53:40.908Z","op":"done","visit":"expeditions/e31@1","node":"d161","brief":"the parcels are gone; _cage stays"}
+{"ts":"2026-08-02T15:54:58.826Z","op":"done","visit":"expeditions/e31@1","node":"d162","brief":"23 red, and a third are one helper bug"}
+{"ts":"2026-08-02T15:55:21.064Z","op":"update","visit":"expeditions/e31@1","node":"d165","brief":"answering what _cage is before continuing"}
+{"ts":"2026-08-02T15:55:38.833Z","op":"update","visit":"expeditions/e31@1","node":"d166","brief":"readEverything hands back the answer that walked"}
+{"ts":"2026-08-02T15:55:53.588Z","op":"update","visit":"expeditions/e31@1","node":"d167","brief":"reading the call sites that re-pull"}
+{"ts":"2026-08-02T15:56:24.028Z","op":"update","visit":"expeditions/e31@1","node":"d168","brief":"the callers use the answer instead of re-pulling"}
+{"ts":"2026-08-02T15:56:35.795Z","op":"update","visit":"expeditions/e31@1","node":"d169","brief":"battery after the helper fix"}
+{"ts":"2026-08-02T15:57:45.836Z","op":"update","visit":"expeditions/e31@1","node":"d170","brief":"finding the successors of the tick methods"}
+{"ts":"2026-08-02T15:58:05.778Z","op":"update","visit":"expeditions/e31@1","node":"d171","brief":"reading the reads.test cluster"}
+{"ts":"2026-08-02T15:58:55.642Z","op":"plan","visit":"expeditions/e31@1","parent":null,"nodes":[{"id":"d172","brief":"clear the four loose files off the top level"},{"id":"d173","brief":"rename product to project everywhere"},{"id":"d174","brief":"re-verify and place the prompt layer"},{"id":"d175","brief":"merge the expedition to trunk"}]}
+{"ts":"2026-08-02T15:59:28.470Z","op":"done","visit":"expeditions/e31@1","node":"d172","brief":"the top level is five folders"}
+{"ts":"2026-08-02T15:59:35.258Z","op":"update","visit":"expeditions/e31@1","node":"d176","brief":"renaming the folder and sweeping every reference"}

@@ -11,13 +11,13 @@ action it may take is decided by the state machine.
 
 v3 inverts v2's build order: **channel and visibility first, guidance early,
 ledger late.** v2's post-mortem in one line: enforcement without guidance
-regresses below convention. See `product/spec/v3-plan.md`.
+regresses below convention. See `project/spec/v3-plan.md`.
 
 ## Layout
 
 ```
 RUNME.ps1              the install. Run it once.
-product/               THE FOLDER YOU OPEN. Everything being built lives here.
+project/               THE FOLDER YOU OPEN. Everything being built lives here.
   AGENTS.md            the one rule + the lane table
   .mcp.json            registers the se server
   .claude/settings.json  the cage: explicit deny list of native tools
@@ -37,7 +37,7 @@ product/               THE FOLDER YOU OPEN. Everything being built lives here.
 .\RUNME.ps1           # once: installs the extension and opens the editor
 ```
 
-After that, open `product/` in VS Code. The extension starts the server, places
+After that, open `project/` in VS Code. The extension starts the server, places
 the attach configs and installs the engine's dependencies by itself.
 
 ## What a change needs before you see it
@@ -47,10 +47,10 @@ which edit. Here is the whole rule.
 
 | you changed | you need |
 | --- | --- |
-| `product/palette.css` | nothing. It is read on every render. |
+| `project/brand/palette.css` | nothing. It is read on every render. |
 | a machine drawing, guidance, a rigor-matrix row | nothing. They are read live. |
-| `product/deliverable/engine/**.ts` | restart the se server. Node caches modules at import, so a correct file on disk means nothing to a process already running. |
-| `product/deliverable/vscode/extension.js` | re-run `RUNME.ps1`. |
+| `project/deliverable/engine/**.ts` | restart the se server. Node caches modules at import, so a correct file on disk means nothing to a process already running. |
+| `project/deliverable/vscode/extension.js` | re-run `RUNME.ps1`. |
 
 The last row is the trap. VS Code loads the extension **copy** under
 `~/.vscode/extensions`, so reloading the window re-reads that copy and not your
@@ -78,7 +78,7 @@ It starts as a fresh git repository with one commit on `main`.
 Four things stay home:
 
 - the git history
-- this project's own records in `product/spec`
+- this project's own records in `project/spec`
 - the session state in `.se/`
 - everything the ignore file already excludes
 
@@ -140,10 +140,10 @@ raw to `.se/calls.jsonl`.
 
 Machines are DRAWN — Advanced Canvas files, compiled at load, refused with
 the offending element named on any misparse. Engine-owned machines live in
-`product/deliverable/machines/`; owner-authored process machines will live
-in `product/spec/` later. **Authoring rules: `product/guidance/authoring/machines.md`** —
+`project/deliverable/machines/`; owner-authored process machines will live
+in `project/spec/` later. **Authoring rules: `project/guidance/authoring/machines.md`** —
 notably: file refs are VAULT-relative (the Obsidian vault root is
-`product/`), agent-facing fields (`state`, `state_kind`, `legal_tools`,
+`project/`), agent-facing fields (`state`, `state_kind`, `legal_tools`,
 `guidance`) live in the state note's FRONTMATTER while the body is prose
 for humans, and start/terminal states are drawn as pills.
 
