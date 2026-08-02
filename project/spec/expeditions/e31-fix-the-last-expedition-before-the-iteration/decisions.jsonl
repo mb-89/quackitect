@@ -263,3 +263,15 @@
 {"ts":"2026-08-02T16:51:45.638Z","op":"done","visit":"expeditions/e31@0","node":"d5","brief":"the cage ignore rules name project and the stray carriage return is gone"}
 {"ts":"2026-08-02T16:52:08.939Z","op":"update","visit":"expeditions/e31@0","node":"d14","brief":"running the one test file that names the README and the ignore rules"}
 {"ts":"2026-08-02T16:52:47.333Z","op":"update","visit":"expeditions/e31@0","node":"d15","brief":"editsafety green at 14 of 14 so the change goes to trunk"}
+{"ts":"2026-08-02T16:52:54.436Z","op":"done","visit":"expeditions/e31@0","node":"d6","brief":"the cleanup commit is on trunk"}
+{"ts":"2026-08-02T16:53:36.055Z","op":"fork","visit":"expeditions/e31@0","parent":null,"node":"d16","brief":"the land gate sees the generated cage files trunk cannot ignore yet","nodes":[]}
+{"ts":"2026-08-02T16:54:08.313Z","op":"update","visit":"expeditions/e31@0","node":"d17","brief":"writing a local exclude so trunk reads clean for the land"}
+{"ts":"2026-08-02T16:54:42.768Z","op":"update","visit":"expeditions/e31@0","node":"d18","brief":"confirming the root git pointer survived the failed write"}
+{"ts":"2026-08-02T16:55:04.765Z","op":"update","visit":"expeditions/e31@0","node":"d19","brief":"the shared exclude takes the four generated paths for one merge"}
+{"ts":"2026-08-02T16:55:11.363Z","op":"done","visit":"expeditions/e31@0","node":"d16","brief":"trunk reads clean so the land can run"}
+{"ts":"2026-08-02T16:57:37.893Z","op":"done","visit":"expeditions/e31@0","node":"d7","brief":"the leave report is written from what was verified"}
+{"ts":"2026-08-02T16:58:01.904Z","op":"update","visit":"expeditions/e31@0","node":"d20","brief":"the leave report stands, so the record can close"}
+{"ts":"2026-08-02T17:00:25.982Z","op":"update","visit":"expeditions/e31@0","node":"d21","brief":"the leave gate counts a node the live graph cannot resolve"}
+{"ts":"2026-08-02T17:00:40.264Z","op":"update","visit":"expeditions/e31@0","node":"d22","brief":"writing the missing resolution so the record can leave"}
+{"ts":"2026-08-02T17:00:26.190Z","op":"done","visit":"expeditions/e31@1","node":"d173","brief":"the rename is finished and the ignore rules now name project"}
+{"ts":"2026-08-02T17:00:55.314Z","op":"update","visit":"expeditions/e31-leave@0","node":"d23","brief":"closing e31 on the owner's word"}
