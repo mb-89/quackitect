@@ -7,6 +7,22 @@ import { readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { test } from "node:test";
 import { dirtyLines } from "../engine/gitlane.ts";
+import { visitState } from "../engine/session.ts";
+
+// A VISIT IS RECORDED QUALIFIED, and the graph-is-evidence check compared it
+// against the bare state name. It matched nothing, so the check passed
+// vacuously: every expedition closed so far was never looked at, and one of
+// them had nineteen open points standing when that was measured.
+//
+// A flag computed and never compared is this codebase's recurring defect. It
+// hides because a check that SEES nothing reports exactly like a check that
+// FINDS nothing.
+test("a recorded visit yields its state, however deep the container", () => {
+  assert.equal(visitState("expeditions/e30@0"), "e30", "the container prefix is not part of the name");
+  assert.equal(visitState("expeditions/e30-leave@2"), "e30-leave");
+  assert.equal(visitState("e30"), "e30", "an unqualified visit still works");
+  assert.equal(visitState("iterations/i1/walk@7"), "walk", "and it reaches the innermost state at any depth");
+});
 import { bootedServer, call, freshRoot } from "./helpers.ts";
 
 // A narrated call writes the record's decision trail INTO the bound worktree,

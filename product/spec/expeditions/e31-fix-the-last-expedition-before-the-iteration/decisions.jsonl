@@ -64,3 +64,9 @@
 {"ts":"2026-08-02T14:54:07.868Z","op":"obsolete","visit":"expeditions/e31@1","node":"d31","brief":"intent stays required; counting is still a search with a why"}
 {"ts":"2026-08-02T14:55:01.044Z","op":"done","visit":"expeditions/e31@1","node":"d32","brief":"the size row carries the budgets per kind"}
 {"ts":"2026-08-02T14:55:26.950Z","op":"done","visit":"expeditions/e31@1","node":"d33","brief":"the guidance cell is bound hardest, and says why"}
+{"ts":"2026-08-02T14:56:20.191Z","op":"update","visit":"expeditions/e31@1","node":"d71","brief":"starting the inbox sweep"}
+{"ts":"2026-08-02T14:58:03.820Z","op":"update","visit":"expeditions/e31@1","node":"d72","brief":"eleven notes drained against what the code carries"}
+{"ts":"2026-08-02T14:58:47.677Z","op":"update","visit":"expeditions/e31@1","node":"d73","brief":"the graph-is-evidence check can see the graph now"}
+{"ts":"2026-08-02T14:59:09.365Z","op":"update","visit":"expeditions/e31@1","node":"d74","brief":"a test holds the visit parsing"}
+{"ts":"2026-08-02T14:59:25.905Z","op":"update","visit":"expeditions/e31@1","node":"d75","brief":"visitState is defined and exported"}
+{"ts":"2026-08-02T14:59:33.233Z","op":"update","visit":"expeditions/e31@1","node":"d76","brief":"running the visit-state and dirty-gate cases"}

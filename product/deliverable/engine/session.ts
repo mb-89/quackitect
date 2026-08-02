@@ -23,6 +23,19 @@ import {
 } from "./machine.ts";
 import { compileMachine, compileMachineCached, resolveRef } from "./machines/compile.ts";
 import { computeRoute, type RouteNode, type RouteResult } from "./route.ts";
+
+/** THE STATE A RECORDED VISIT NAMES. A visit is stored qualified and
+ *  occurrence-stamped ("expeditions/e30@0"), and the graph-is-evidence check
+ *  compared it against the bare state name. It matched nothing, so the check
+ *  passed vacuously: every expedition closed so far went unlooked-at, one of
+ *  them with nineteen open points standing (measured 2026-08-02).
+ *
+ *  A flag computed and never compared is this codebase's recurring defect,
+ *  and it hides because a check that SEES nothing reports exactly like a
+ *  check that FINDS nothing. */
+export function visitState(visit: string): string {
+  return visit.split("@")[0].split("/").pop() ?? "";
+}
 import { conditionNotePath } from "./conditions.ts";
 import { drainNote, pendingNotes } from "./inbox.ts";
 import { confirmPrefill, formTemplatePath, lintForm, parseFormTemplate, scaffoldInstance, withFieldContent, withStatus, type FormLint, type FormTemplate } from "./forms.ts";
@@ -2012,7 +2025,15 @@ export class Session {
   private openRecordPoints(): { id: string; visit: string; brief: string }[] {
     const sid = shortId(this.bound!.id);
     const recorded = replayFile(join(this.bound!.path, "product", "spec", "expeditions", this.bound!.id, "decisions.jsonl"));
-    return recorded.open.filter((n) => [sid, `${sid}-leave`].some((p) => n.visit === p || n.visit.startsWith(`${p}@`)));
+    // A VISIT IS RECORDED QUALIFIED ("expeditions/e30@0"), and this compared
+    // it against the bare state name. It matched nothing, so the check passed
+    // vacuously and every expedition closed so far was never actually looked
+    // at — one of them with nineteen open points standing (measured 2026-08-02).
+    //
+    // A flag computed and never compared is this codebase's recurring defect,
+    // and it is invisible precisely because a check that sees nothing reports
+    // the same as a check that finds nothing wrong.
+    return recorded.open.filter((n) => visitState(n.visit) === sid || visitState(n.visit) === `${sid}-leave`);
   }
 
   /** Pending notes whose text carries one of the markers — what a
