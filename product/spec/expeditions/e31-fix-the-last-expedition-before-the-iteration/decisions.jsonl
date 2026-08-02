@@ -22,3 +22,8 @@
 {"ts":"2026-08-02T14:23:57.581Z","op":"update","visit":"expeditions/e31@1","node":"d46","brief":"typechecking the three doors"}
 {"ts":"2026-08-02T14:24:59.798Z","op":"update","visit":"expeditions/e31@1","node":"d47","brief":"tests for all three doors, plus the move repair"}
 {"ts":"2026-08-02T14:25:15.353Z","op":"update","visit":"expeditions/e31@1","node":"d48","brief":"running the four new guard cases"}
+{"ts":"2026-08-02T14:26:09.836Z","op":"update","visit":"expeditions/e31@1","node":"d49","brief":"reading the single-file regex op to widen it"}
+{"ts":"2026-08-02T14:27:40.732Z","op":"update","visit":"expeditions/e31@1","node":"d50","brief":"the style is a projection; voice.md stays the truth"}
+{"ts":"2026-08-02T14:28:17.969Z","op":"update","visit":"expeditions/e31@1","node":"d51","brief":"every place comes back with its line before and after"}
+{"ts":"2026-08-02T14:29:40.912Z","op":"done","visit":"expeditions/e31@1","node":"d44","brief":"every place rides the result with its before and after"}
+{"ts":"2026-08-02T14:29:51.978Z","op":"update","visit":"expeditions/e31@1","node":"d52","brief":"typechecking and running the sweep"}

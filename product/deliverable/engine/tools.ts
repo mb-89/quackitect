@@ -16,7 +16,7 @@ import { contentHash } from "./hash.ts";
 import { parseUpdate } from "./decisions.ts";
 import { Toll } from "./toll.ts";
 import { readFileSync } from "node:fs";
-import { fileDelete, fileGlob, fileList, filePatch, fileRead, fileWrite, type PatchOp } from "./files.ts";
+import { fileDelete, fileGlob, fileList, filePatch, fileRead, fileReplace, fileWrite, type PatchOp } from "./files.ts";
 import { LINT_CONFIG, lintProse } from "./lint.ts";
 import { appendNote, backlogNotes, drainNote, pendingNotes, readNotes, type Priority } from "./inbox.ts";
 import { parseStateNote } from "./notes.ts";
@@ -365,6 +365,28 @@ export function coreTools(rootOf: (rel?: string) => string, projectRoot: string,
         }
         return filePatch(rootOf(ops.length > 0 ? String(ops[0].path) : undefined), ops);
       },
+    },
+    {
+      name: "se_file_replace",
+      title: "se.file.replace",
+      description:
+        "SEARCH AND REPLACE ACROSS FILES — one regex, every file a glob reaches, one atomic call. se_file_patch's regex verb is the scalpel for a path you already hold; this is the sweep for a rename that runs through the tree.\n\nIT HANDS BACK EVERY PLACE IT LANDED: path, line, and the line BEFORE and AFTER, so you judge the replace instead of trusting it. Read that list. A wide edit whose result is only a number is the one nobody can check, and undoing it costs more than reading it.\n\nA pattern matching NOTHING is refused, never a quiet success. expect_count refuses unless the total is exactly that — use it when you already know how many places there are. Nothing is written unless every file passes every guard.",
+      inputSchema: {
+        type: "object",
+        properties: {
+          glob: { type: "string", description: "which files to sweep, e.g. **/*.ts or product/guidance/**/*.md" },
+          pattern: { type: "string", description: "JS regex, always global; $1 backrefs work in replacement" },
+          replacement: { type: "string" },
+          flags: { type: "string", description: "flags from i m s — g is implied" },
+          expect_count: { type: "number", description: "refuse unless the total match count across all files is exactly this" },
+        },
+        required: ["glob", "pattern", "replacement"],
+      },
+      handler: (args) =>
+        fileReplace(rootOf(String(args.glob)), String(args.glob), String(args.pattern), String(args.replacement), {
+          ...(args.flags !== undefined ? { flags: String(args.flags) } : {}),
+          ...(args.expect_count !== undefined ? { expect_count: Number(args.expect_count) } : {}),
+        }),
     },
     {
       name: "se_file_move",

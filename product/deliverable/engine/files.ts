@@ -360,6 +360,123 @@ export interface PatchResult {
   corrected?: string[];
 }
 
+export interface ReplaceResult {
+  changed: { path: string; hash: string; replacements: number }[];
+  /** EVERY place it landed, with the line before and after. This is the
+   *  whole reason a wide replace is safe to offer. */
+  places: { path: string; line: number; before: string; after: string }[];
+  places_total: number;
+  files_scanned: number;
+  truncated: boolean;
+  corrected?: string[];
+}
+
+/** How many places travel back before the report starts counting only. */
+const PLACES_LIMIT = 200;
+
+/** SEARCH AND REPLACE ACROSS FILES. The per-file regex op is a scalpel; this
+ *  is the sweep.
+ *
+ *  What makes a sweep safe to offer is not a smarter pattern, it is the
+ *  REPORT: every place it landed comes back with the line before and after,
+ *  so the caller JUDGES the replace instead of trusting it. A wide edit whose
+ *  result is a number is the one nobody can check.
+ *
+ *  Atomic like the patch: every file is read and every guard is run before
+ *  the first byte of any of them lands. A pattern that matches nothing is a
+ *  refusal, never a quiet success — the same law the per-file op holds. */
+export function fileReplace(
+  root: string,
+  glob: string,
+  pattern: string,
+  replacement: string,
+  opts: { flags?: string; expect_count?: number } = {},
+): ReplaceResult {
+  const flags = opts.flags ?? "";
+  const bad = [...flags].filter((f) => !"ims".includes(f));
+  if (bad.length > 0) {
+    throw new Rejection({
+      clause: CLAUSES.REQUIRED_ARGS,
+      expected: "flags from: i (ignore case), m (multiline anchors), s (dot matches newline) — g is always on",
+      got: `flag(s) ${bad.join(", ")}`,
+      remedy: { tool: "se_file_replace", args: { glob, pattern, replacement, flags: "im" } },
+      source: SRC,
+    });
+  }
+  let rx: RegExp;
+  try {
+    rx = new RegExp(pattern, `g${flags}`);
+  } catch (e) {
+    throw new Rejection({
+      clause: CLAUSES.REQUIRED_ARGS,
+      expected: "a pattern that compiles as a JS regex",
+      got: String((e as Error).message),
+      remedy: { tool: "se_file_replace", args: { glob, pattern: "<fixed pattern>", replacement } },
+      source: SRC,
+    });
+  }
+  const found = fileGlob(root, glob, { limit: 10000 });
+  const staged: { path: string; abs: string; next: string; replacements: number }[] = [];
+  const places: ReplaceResult["places"] = [];
+  const corrected: string[] = [];
+  let total = 0;
+  let scanned = 0;
+  for (const rel of found.files) {
+    const abs = resolveInRoot(root, rel, SRC);
+    let current: string;
+    try {
+      current = readFileSync(abs, "utf8");
+    } catch {
+      continue; // a directory entry or an unreadable file is not a match
+    }
+    scanned++;
+    rx.lastIndex = 0;
+    const hits = [...current.matchAll(rx)];
+    if (hits.length === 0) continue;
+    const eol = eolOf(current);
+    const before = current.split(eol);
+    const next = current.replace(rx, replacement);
+    const after = next.split(eol);
+    // The line a match sits on, from its offset — so a report names the place
+    // a reader can open, not just the file.
+    for (const h of hits) {
+      const line = current.slice(0, h.index ?? 0).split(eol).length;
+      total++;
+      if (places.length < PLACES_LIMIT) {
+        places.push({ path: rel, line, before: (before[line - 1] ?? "").trim(), after: (after[line - 1] ?? "").trim() });
+      }
+    }
+    staged.push({ path: rel, abs, next, replacements: hits.length });
+  }
+  if (total === 0 || (opts.expect_count !== undefined && total !== opts.expect_count)) {
+    throw new Rejection({
+      clause: CLAUSES.PATCH_AMBIGUOUS,
+      expected: opts.expect_count !== undefined ? `the pattern to match exactly ${opts.expect_count} time(s) under ${glob}` : `the pattern to match somewhere under ${glob}`,
+      got: `${total} match(es) across ${scanned} file(s) — nothing was written`,
+      remedy: { tool: "se_file_search", args: { query: pattern, intent: "see what the pattern really hits before replacing" } },
+      source: SRC,
+    });
+  }
+  for (const s of staged) {
+    guardMachineNote(s.path, s.next);
+    const nul = guardRawNul(s.path, s.next);
+    s.next = nul.content;
+    if (nul.corrected !== undefined) corrected.push(nul.corrected);
+  }
+  const changed = staged.map((s) => {
+    writeFileSync(s.abs, s.next, "utf8");
+    return { path: s.path, hash: contentHash(s.next), replacements: s.replacements };
+  });
+  return {
+    changed,
+    places,
+    places_total: total,
+    files_scanned: scanned,
+    truncated: total > places.length,
+    ...(corrected.length > 0 ? { corrected } : {}),
+  };
+}
+
 // One patch call, several verbs. Which verb an op is, read from its fields —
 // exactly one of these shapes, anything mixed or partial refused BY NAME:
 //   exact:   old_string + new_string          (the original verb)

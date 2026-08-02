@@ -6,7 +6,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { test } from "node:test";
 import { Rejection } from "../engine/errors.ts";
-import { fileDelete, fileGlob, fileList, filePatch, fileRead, fileWrite, globToRegExp, IMAGE_BUDGET, READ_BUDGET } from "../engine/files.ts";
+import { fileDelete, fileGlob, fileList, filePatch, fileRead, fileReplace, fileWrite, globToRegExp, IMAGE_BUDGET, READ_BUDGET } from "../engine/files.ts";
 import { contentHash } from "../engine/hash.ts";
 import { search } from "../engine/search.ts";
 import { run } from "../engine/run.ts";
@@ -97,6 +97,42 @@ test("the patch door closes the same way, and names it on the result", () => {
   const r = filePatch(root, [{ path: "engine/y.ts", old_string: "HERE", new_string: String.fromCharCode(0) }]);
   assert.ok((r.corrected ?? []).some((c) => c.includes("engine/y.ts")), "the correction rides the result");
   assert.equal(readFileSync(join(root, "engine", "y.ts"), "utf8").includes(String.fromCharCode(0)), false);
+  rmSync(root, { recursive: true, force: true });
+});
+
+// SEARCH AND REPLACE ACROSS FILES (owner, 2026-08-02). The per-file regex op
+// is the scalpel; this is the sweep. What makes a sweep safe to offer is the
+// REPORT rather than a cleverer pattern: a wide edit whose result is only a
+// number is the one nobody can check.
+test("a wide replace sweeps every file the glob reaches, and names every place", () => {
+  const root = fresh();
+  fileWrite(root, "a/one.ts", 'const p = "old/path";\nconst q = 1;\n', null);
+  fileWrite(root, "a/b/two.ts", 'import x from "old/path";\n', null);
+  fileWrite(root, "a/prose.md", "old/path is prose here\n", null);
+  const r = fileReplace(root, "**/*.ts", "old/path", "new/path");
+  assert.equal(r.places_total, 2, "both code hits");
+  assert.equal(r.changed.length, 2);
+  const one = r.places.find((p) => p.path.endsWith("one.ts"));
+  assert.ok(one !== undefined, "every place is reported, not just a count");
+  assert.equal(one.line, 1, "a place names the line a reader can open");
+  assert.match(one.before, /old\/path/, "what stood there");
+  assert.match(one.after, /new\/path/, "and what stands there now");
+  assert.ok(readFileSync(join(root, "a", "prose.md"), "utf8").includes("old/path"), "outside the glob is untouched");
+  rmSync(root, { recursive: true, force: true });
+});
+
+test("a pattern that matches nothing REFUSES — a sweep that hit nothing is not a success", () => {
+  const root = fresh();
+  fileWrite(root, "a/one.ts", "const q = 1;\n", null);
+  assert.throws(() => fileReplace(root, "**/*.ts", "nowhere", "x"), (e: unknown) => e instanceof Rejection);
+  rmSync(root, { recursive: true, force: true });
+});
+
+test("expect_count guards a sweep whose size you already know, and writes nothing when it is wrong", () => {
+  const root = fresh();
+  fileWrite(root, "a/one.ts", 'const p = "old";\nconst r = "old";\n', null);
+  assert.throws(() => fileReplace(root, "**/*.ts", "old", "new", { expect_count: 1 }), (e: unknown) => e instanceof Rejection);
+  assert.ok(readFileSync(join(root, "a", "one.ts"), "utf8").includes('"old"'), "a refused sweep leaves the tree untouched");
   rmSync(root, { recursive: true, force: true });
 });
 
