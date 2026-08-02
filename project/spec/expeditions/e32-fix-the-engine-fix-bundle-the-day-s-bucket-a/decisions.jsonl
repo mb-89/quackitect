@@ -81,3 +81,19 @@
 {"ts":"2026-08-02T18:29:20.677Z","op":"update","visit":"expeditions/e32@0","node":"d116","brief":"second poll for the battery verdict"}
 {"ts":"2026-08-02T18:33:25.703Z","op":"done","visit":"expeditions/e32@0","node":"d41","brief":"verified by the earned battery at 724 green"}
 {"ts":"2026-08-02T19:09:14.202Z","op":"update","visit":"expeditions/e32@1","node":"d184","brief":"pulling trunk into the branch"}
+{"ts":"2026-08-02T19:09:31.085Z","op":"update","visit":"expeditions/e32@1","node":"d185","brief":"the report commits so the sync can run"}
+{"ts":"2026-08-02T19:09:39.669Z","op":"update","visit":"expeditions/e32@1","node":"d186","brief":"the sync proper"}
+{"ts":"2026-08-02T19:09:56.015Z","op":"update","visit":"expeditions/e32@1","node":"d187","brief":"proving the two change sets compose"}
+{"ts":"2026-08-02T19:10:38.541Z","op":"update","visit":"expeditions/e32@1","node":"d188","brief":"the resume probe"}
+{"ts":"2026-08-02T19:10:48.503Z","op":"done","visit":"expeditions/start@1","node":"d179","brief":"the sync composed at 88 green"}
+{"ts":"2026-08-02T19:11:04.926Z","op":"update","visit":"expeditions/e32@1","node":"d189","brief":"the probe by absolute path"}
+{"ts":"2026-08-02T19:11:42.705Z","op":"update","visit":"expeditions/e32@1","node":"d190","brief":"the template note dies of a refuted premise, on evidence"}
+{"ts":"2026-08-02T19:11:58.769Z","op":"done","visit":"expeditions/start@1","node":"d181","brief":"one template repo per process, copied per case"}
+{"ts":"2026-08-02T19:12:10.372Z","op":"obsolete","visit":"expeditions/start@1","node":"d180","brief":"refuted on evidence — no position persistence, and the premise fell"}
+{"ts":"2026-08-02T19:12:19.915Z","op":"update","visit":"expeditions/e32@1","node":"d191","brief":"hunting the column generator"}
+{"ts":"2026-08-02T19:12:29.169Z","op":"update","visit":"expeditions/e32@1","node":"d192","brief":"the generator head and the matrix load"}
+{"ts":"2026-08-02T19:12:39.743Z","op":"update","visit":"expeditions/e32@1","node":"d193","brief":"reading the container generator"}
+{"ts":"2026-08-02T19:12:59.197Z","op":"done","visit":"expeditions/start@1","node":"d182","brief":"already cached where legal; the rest is real git the tests prove"}
+{"ts":"2026-08-02T19:14:11.647Z","op":"update","visit":"expeditions/e32@1","node":"d194","brief":"waiting out the worktree battery"}
+{"ts":"2026-08-02T19:14:20.020Z","op":"update","visit":"expeditions/e32@1","node":"d195","brief":"blocking on the timer"}
+{"ts":"2026-08-02T19:15:15.591Z","op":"update","visit":"expeditions/e32@1","node":"d196","brief":"the worktree battery's verdict"}
