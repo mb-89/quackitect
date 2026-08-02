@@ -106,6 +106,34 @@ export function sessionTools(session: Session): ToolDef[] {
       },
     },
     {
+      name: "se_pull",
+      title: "se.pull",
+      description:
+        "THE PULL — your one verb. Say pull, do what comes back, pull again. The machine owns every decision; you decide nothing about the walk. You never name a target, never carry read hashes, never ask which state you are in, and never ask which tools are legal. BLOCKING IS AN INSTRUCTION, NOT AN ERROR — a pull does not refuse a walk that cannot move yet, it tells you what to do about it. FIVE ANSWERS, and `pull` names which one you got. `read` — documents are owed: call se_reading until it answers done, then pull. `fill` — the next step wants evidence: the machine BUILT the form and handed it to you, so fill it and return it ON THE NEXT PULL as form: {\"<section>\": \"<text>\"}. THERE IS NO SUBMIT VERB; pulling without it hands back the same form. `choose` — the road splits: the options ride along, and you return choice: \"<to>\" on the next pull (a LIST is legal where the work fans out to several agents). `do` — the happy path was WALKED for you, every hop to the next branching point in one call: `here` is where you landed, with its guidance. `wait` — the machine is out of work, or the next step weighs more than the session autonomy: say plainly which step waits and STOP, because the slider alone cannot wake you and the person must message you after moving it. A genuinely illegal call still refuses typed — an unreachable choice, a form nothing asked for.",
+      inputSchema: {
+        type: "object",
+        properties: {
+          form: {
+            type: "object",
+            description: "the filled form the LAST pull handed you, section name to text. This is the submit that has no verb of its own.",
+          },
+          choice: {
+            type: ["string", "array"],
+            items: { type: "string" },
+            description: "the option you picked, from the last pull's `options`. A LIST is legal where the work fans out — one agent walks the first, the rest come back as not_walked for you to hand out.",
+          },
+        },
+      },
+      handler: async (args) =>
+        session.pull(
+          {
+            ...(typeof args.form === "object" && args.form !== null ? { form: args.form as Record<string, string> } : {}),
+            ...(args.choice !== undefined ? { choice: args.choice as string | string[] } : {}),
+          },
+          "agent",
+        ),
+    },
+    {
       name: "se_reading",
       title: "se.reading",
       description:

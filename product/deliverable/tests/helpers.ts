@@ -8,6 +8,7 @@ import { tmpdir } from "node:os";
 import { join, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 import { contentHash } from "../engine/hash.ts";
+import { Session } from "../engine/session.ts";
 import { buildServer } from "../engine/tools.ts";
 
 const REPO_ROOT = fileURLToPath(new URL("../../..", import.meta.url));
@@ -227,6 +228,35 @@ export function gitInit(root: string): void {
 export function handOver(root: string): void {
   mkdirSync(join(root, ".se"), { recursive: true });
   writeFileSync(join(root, ".se", "HANDOVER.md"), "# Handover\n\nNothing outstanding.\n", "utf8");
+}
+
+/** Drain the reading the way an agent does: call, read, call again, until
+ *  it answers done. The pull lane needs no read hashes because of this. */
+export function readEverything(s: Session): void {
+  for (let i = 0; i < 40; i++) {
+    if ((s.pullReading() as { done?: boolean }).done === true) return;
+  }
+  throw new Error("the reading never drained");
+}
+
+/** A SESSION standing at idle, reached by pulling rather than ticking.
+ *  Idle is where most pull questions are actually asked, because it is the
+ *  switchboard: several doors, and one of them heavier than any slider a
+ *  test would set.
+ *
+ *  IT COSTS A FULL BOOT WALK (about eight seconds), so a file that builds
+ *  several of these dominates the suite's wall clock and wants splitting
+ *  by theme — see guidance/software.md. */
+export async function sessionAtIdle(root: string): Promise<Session> {
+  const s = new Session(root);
+  s.setAutonomy(1);
+  s.setTarget("idle");
+  for (let i = 0; i < 8; i++) {
+    readEverything(s);
+    await s.pull();
+    if (s.active()[0] === "idle") return s;
+  }
+  throw new Error(`the pull did not reach idle: ${JSON.stringify(s.active())}`);
 }
 
 /** A server ticked through the whole boot walk into idle — supplying the

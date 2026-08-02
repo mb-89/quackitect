@@ -208,3 +208,34 @@
 {"ts":"2026-08-02T09:47:31.027Z","op":"plan","visit":"expeditions/e30@0","parent":null,"nodes":[]}
 {"ts":"2026-08-02T09:47:39.837Z","op":"update","visit":"expeditions/e30@0","node":"d15","brief":"Committing the report so the sync has a clean tree"}
 {"ts":"2026-08-02T09:47:44.411Z","op":"update","visit":"expeditions/e30@0","node":"d16","brief":"Syncing trunk in now that the tree is clean"}
+{"ts":"2026-08-02T09:48:08.800Z","op":"done","visit":"expeditions/e30@0","node":"d10","brief":"8 commits in from v3, no conflict"}
+{"ts":"2026-08-02T09:50:27.372Z","op":"update","visit":"expeditions/e30@0","node":"d17","brief":"Reading v2 section 5, the tool surface"}
+{"ts":"2026-08-02T09:50:44.417Z","op":"update","visit":"expeditions/e30@0","node":"d18","brief":"Section 6 read: blocking is an instruction returned, never an error"}
+{"ts":"2026-08-02T09:51:14.102Z","op":"done","visit":"expeditions/e30@0","node":"d11","brief":"Prior art read across v2 and the v3 plan"}
+{"ts":"2026-08-02T09:51:19.303Z","op":"update","visit":"expeditions/e30@0","node":"d19","brief":"Reading the pull-lane notes that hold the settled design"}
+{"ts":"2026-08-02T09:51:30.499Z","op":"update","visit":"expeditions/e30@0","node":"d20","brief":"Reading what a pull returns: the happy path to the next branch"}
+{"ts":"2026-08-02T09:51:36.839Z","op":"update","visit":"expeditions/e30@0","node":"d21","brief":"Reading the last pull note: evidence rides the pull"}
+{"ts":"2026-08-02T09:55:10.094Z","op":"update","visit":"expeditions/e30@0","node":"d22","brief":"The pull method lands on the session"}
+{"ts":"2026-08-02T09:55:34.346Z","op":"update","visit":"expeditions/e30@0","node":"d23","brief":"se_pull registered in the lane"}
+{"ts":"2026-08-02T09:55:44.568Z","op":"done","visit":"expeditions/e30@0","node":"d12","brief":"Design settled and written into the code as its own rationale"}
+{"ts":"2026-08-02T09:57:46.823Z","op":"update","visit":"expeditions/e30@0","node":"d24","brief":"Tests written for the pull lane"}
+{"ts":"2026-08-02T09:57:54.420Z","op":"update","visit":"expeditions/e30@0","node":"d25","brief":"Running the pull tests"}
+{"ts":"2026-08-02T09:58:30.084Z","op":"update","visit":"expeditions/e30@0","node":"d26","brief":"Waiting on the pull test run"}
+{"ts":"2026-08-02T09:58:55.531Z","op":"update","visit":"expeditions/e30@0","node":"d27","brief":"Still waiting on the pull test run"}
+{"ts":"2026-08-02T09:59:35.186Z","op":"update","visit":"expeditions/e30@0","node":"d28","brief":"Killing the run to isolate which case hangs"}
+{"ts":"2026-08-02T10:01:34.398Z","op":"update","visit":"expeditions/e30@0","node":"d29","brief":"Running the whole pull file to a temp file so output survives"}
+{"ts":"2026-08-02T10:02:02.384Z","op":"update","visit":"expeditions/e30@0","node":"d30","brief":"Waiting on the full pull file"}
+{"ts":"2026-08-02T10:03:11.315Z","op":"update","visit":"expeditions/e30@0","node":"d31","brief":"Threshold now weighed before the reading, and mid-sweep too"}
+{"ts":"2026-08-02T10:03:56.052Z","op":"update","visit":"expeditions/e30@0","node":"d32","brief":"Shared pull fixture moved into helpers so the files can split"}
+{"ts":"2026-08-02T10:04:16.875Z","op":"update","visit":"expeditions/e30@0","node":"d33","brief":"First pull file rewritten around the law"}
+{"ts":"2026-08-02T10:04:35.956Z","op":"update","visit":"expeditions/e30@0","node":"d34","brief":"Second pull file covers the batch and the offer"}
+{"ts":"2026-08-02T10:04:53.828Z","op":"update","visit":"expeditions/e30@0","node":"d35","brief":"Third pull file covers the seam and the illegal boundary"}
+{"ts":"2026-08-02T10:05:22.806Z","op":"update","visit":"expeditions/e30@0","node":"d36","brief":"Seam file rebuilt: own session per case, no boot needed"}
+{"ts":"2026-08-02T10:05:42.466Z","op":"update","visit":"expeditions/e30@0","node":"d37","brief":"Running the two boot-heavy pull files"}
+{"ts":"2026-08-02T10:06:13.655Z","op":"update","visit":"expeditions/e30@0","node":"d38","brief":"walking.md now documents the pull beside the tick"}
+{"ts":"2026-08-02T10:06:35.186Z","op":"done","visit":"expeditions/e30@0","node":"d13","brief":"The pull verb is built and its 13 tests pass"}
+{"ts":"2026-08-02T10:07:25.868Z","op":"update","visit":"expeditions/e30@0","node":"d39","brief":"Report amended for the pull lane and the second goal drift"}
+{"ts":"2026-08-02T10:07:38.459Z","op":"update","visit":"expeditions/e30@0","node":"d40","brief":"Waiting on the full battery before claiming green"}
+{"ts":"2026-08-02T10:07:56.692Z","op":"update","visit":"expeditions/e30@0","node":"d41","brief":"Battery still running past the previous 73 seconds"}
+{"ts":"2026-08-02T10:08:11.070Z","op":"update","visit":"expeditions/e30@0","node":"d42","brief":"Reading the battery result"}
+{"ts":"2026-08-02T10:08:27.542Z","op":"done","visit":"expeditions/e30@0","node":"d14","brief":"Report amended and corrected to the measured battery"}

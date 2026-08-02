@@ -1,6 +1,51 @@
 # walking — how the machine is driven
 
-One tool drives everything: `se_tick`. It is legal in every state.
+Two tools drive the walk, and they are not alternatives — they are two
+different ideas about who decides.
+
+- `se_pull` is THE PULL. You say pull, the machine says what to do, you do
+  it, you pull again. The machine owns every decision.
+- `se_tick` is THE TICK. You name the state, you carry the proof, you
+  handle the refusal. You own the decisions.
+
+THE PULL IS THE ONE THE DESIGN INTENDS (owner, 2026-08-01). The tick is
+still here, still legal in every state, and still what the mirror and the
+boot walk use. Retiring it is a separate decision, not a side effect.
+
+## The pull
+
+One verb, one optional payload. It answers with an INSTRUCTION, and the
+`pull` key names which of five you got.
+
+- `read` — documents are owed. Call `se_reading` until it answers done,
+  then pull. You carry no hashes; reading credits itself.
+- `fill` — the next step wants evidence. THE MACHINE BUILT THE FORM and
+  handed it over, so you never look one up. Fill it and return it on the
+  next pull as `form`.
+- `choose` — the road splits. The options ride along with their weight.
+  Return `choice` on the next pull.
+- `do` — the happy path was WALKED for you, every hop to the next
+  branching point in one call. `here` is where you landed.
+- `wait` — the machine is out of work, or the next step weighs more than
+  the session autonomy. Say which step waits, and stop.
+
+THERE IS NO SUBMIT VERB. A pull carrying a filled form IS the submit.
+Pulling again without it hands back the same form, so there is no way
+forward except filling it.
+
+BLOCKING IS AN INSTRUCTION, NOT AN ERROR. This is the whole point, and it
+is v2's law (§6). A threshold, an unmet condition and an undrawn route are
+the machine knowing what should happen next — a pull says it instead of
+throwing it. What stays a refusal is what is genuinely ILLEGAL: a choice no
+edge reaches, a form nothing asked for.
+
+A `choice` may be a LIST. One agent walks the first and the rest come back
+as `not_walked`. Multi-agent is not built, and the seam is deliberately not
+designed shut.
+
+## The tick
+
+`se_tick` is legal in every state.
 
 - No arguments: where you are — state, guidance, conditions, pulled
   documents, next states.

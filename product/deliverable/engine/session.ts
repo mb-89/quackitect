@@ -1419,6 +1419,235 @@ export class Session {
     return { ...this.tickInfo(), swept: walked, arrived: false, note: "64 hops without arriving — the sweep stops rather than looping" };
   }
 
+  // ── THE PULL (owner design 2026-08-01) — the agent's ONE verb ───────
+  //
+  // THE LAW IT KEEPS is v2 §6's, and it is the whole point: BLOCKING IS
+  // AN INSTRUCTION RETURNED, NOT AN ERROR. The tick refuses. A threshold,
+  // an unmet condition and a stale `from` all arrive as rejections the
+  // agent has to decode and recover from. Every one of them is really the
+  // machine knowing what should happen next, thrown instead of said.
+  //
+  // So the agent names no target, carries no read hashes, asks for no
+  // state and asks for no tool list. It pulls, does what came back, and
+  // pulls again. Options appear ONLY where the machine offers them.
+  //
+  // THERE IS NO SUBMIT VERB. A pull carrying a filled form IS the submit
+  // (owner, 2026-08-01). Pulling again without it returns the same form,
+  // so there is no way forward except filling it.
+
+  /** The form names the very NEXT hop demands. The machine looks this up
+   *  so the agent never goes hunting for which form applies. */
+  private pullFormsOwed(): string[] {
+    if (this._target === "") return [];
+    try {
+      const r = this.route(this._target);
+      return r.steps.length === 0 ? [] : (r.steps[0].demands.evidence_form ?? []);
+    } catch {
+      return [];
+    }
+  }
+
+  /** The ways out of where the walk stands — the machine's own offer at a
+   *  branching point. Weight and openness ride along, so choosing costs
+   *  no second call. */
+  private pullOptions(): Record<string, unknown>[] {
+    const { machine, ids } = this.leaves();
+    const out: Record<string, unknown>[] = [];
+    for (const id of ids) {
+      for (const e of this.state(machine, id).edges) {
+        const t = machine.states.find((x) => x.id === e.to);
+        if (t === undefined) continue;
+        const open = this.conditionMet(machine, t, "enter");
+        const overWeight = t.priority > this._autonomy;
+        out.push({
+          to: e.to,
+          role: e.role,
+          ...(t.statement !== "" ? { statement: t.statement } : {}),
+          priority: t.priority,
+          open: open && !overWeight,
+          ...(overWeight ? { needs: `the person — ${t.priority} is above the session autonomy ${this._autonomy}` } : {}),
+          ...(open ? {} : { blocked_by: Object.keys(this.conditionStatus(machine, t, "enter")) }),
+        });
+      }
+    }
+    return out;
+  }
+
+  /** WHAT THE MACHINE WANTS NEXT. One of five instructions, and never a
+   *  refusal for a walk that simply cannot move yet:
+   *
+   *  - `read`   documents are owed; nothing walks over unread guidance.
+   *  - `fill`   the next step wants a form. Built HERE and handed over.
+   *  - `choose` the road splits. The options ride along.
+   *  - `do`     the happy path, already walked, up to the next branch.
+   *  - `wait`   out of work, or the next step is the person's.
+   *
+   *  A genuinely ILLEGAL call still throws (v2's Rejected kind): an
+   *  unreachable choice, a form nothing asked for. Those are contract
+   *  violations, not a machine with nowhere to go. */
+  async pull(payload: { form?: Record<string, string>; choice?: string | string[] } = {}, channel: Channel = "agent"): Promise<Record<string, unknown>> {
+    const head = (): Record<string, unknown> => ({
+      where: this.active(),
+      ...(this.bound !== undefined ? { expedition: this.bound.id } : {}),
+      target: this._target,
+      autonomy: this._autonomy,
+    });
+
+    // THE PAYLOAD IS THE SUBMIT THAT HAS NO VERB — evidence for the LAST
+    // thing the machine asked, riding the next pull.
+    let saved: Record<string, unknown> | undefined;
+    if (payload.form !== undefined) {
+      const owed = this.pullFormsOwed();
+      if (owed.length === 0) {
+        throw new Rejection({
+          clause: CLAUSES.NOT_LEGAL_IN_STATE,
+          expected: "a step that asked for a form",
+          got: "a filled form, but nothing on the way wants one",
+          remedy: { tool: "se_pull", args: {}, note: "pull with no payload — the machine says what it wants before you fill anything" },
+          source: "engine/session.ts pull",
+        });
+      }
+      saved = this.formSave(owed[0], payload.form);
+    }
+
+    // A CHOICE AIMS THE WALK. A LIST is legal on purpose: the seam for
+    // "send three agents, one per lane" must not be designed shut (owner,
+    // 2026-08-01). Only the first is walked, because one agent is walking.
+    let fanOut: string[] = [];
+    if (payload.choice !== undefined) {
+      const picks = (Array.isArray(payload.choice) ? payload.choice : [payload.choice]).map(String).filter((x) => x !== "");
+      if (picks.length === 0) {
+        throw new Rejection({
+          clause: CLAUSES.REQUIRED_ARGS,
+          expected: "a state id to choose, or a list of them",
+          got: "an empty choice",
+          remedy: { tool: "se_pull", args: {}, note: "pull with no payload to see the options again" },
+          source: "engine/session.ts pull",
+        });
+      }
+      this.setTarget(picks[0]); // an unreachable pick refuses — that is illegal, not blocked
+      fanOut = picks.slice(1);
+    }
+
+    const extra = (): Record<string, unknown> => ({
+      ...(saved !== undefined ? { form_saved: saved } : {}),
+      ...(fanOut.length > 0 ? { not_walked: fanOut, note: "one agent is walking, so only the first choice was taken — the others are yours to hand out" } : {}),
+    });
+
+    // 1. NO TARGET means the machine is not trying to get anywhere. The
+    //    doors are the offer; with none open, the work is the person's.
+    if (this._target === "") {
+      const options = this.pullOptions();
+      if (options.length > 0) {
+        return { pull: "choose", ...head(), options, do: "pick one and return it on the next pull as choice: \"<to>\" — a LIST is legal where the work fans out", ...extra() };
+      }
+      return { pull: "wait", ...head(), waiting_for: "the person", do: "say plainly that nothing is owed and STOP — the slider alone cannot wake you, so ask them to message you", ...extra() };
+    }
+
+    let r: ReturnType<Session["route"]>;
+    try {
+      r = this.route(this._target);
+    } catch (e) {
+      if (!(e instanceof Rejection)) throw e;
+      return { pull: "wait", ...head(), waiting_for: "the person", why: "the way there cannot be drawn from here", refusal: e.toJSON(), ...extra() };
+    }
+
+    if (r.steps.length === 0) {
+      return { pull: "wait", ...head(), waiting_for: "the person", why: r.found ? "the target is where the walk already stands" : (r.note ?? "no way there"), ...extra() };
+    }
+
+    const first = r.steps[0];
+
+    // 2. THE SLIDER, WEIGHED BEFORE THE READING. Order matters here and it
+    //    was wrong once: reading first sent the agent through several
+    //    documents to prepare for a step it was never allowed to take, and
+    //    only then told it to stop. Nothing is owed for a step that is not
+    //    the agent's.
+    if (first.priority > this._autonomy) {
+      return {
+        pull: "wait",
+        ...head(),
+        waiting_for: "the person",
+        at: first.to,
+        why: `entering ${first.to} weighs ${first.priority}, above the session autonomy ${this._autonomy}`,
+        do: "tell them plainly WHICH step waits and STOP — the slider alone cannot wake you, so they must send a message after moving it",
+        ...extra(),
+      };
+    }
+
+    // 3. THE READING. It is credited by se_reading, so the walk below needs
+    //    no hashes from the agent at all.
+    const owedDocs = this.readingList();
+    if (owedDocs.length > 0) {
+      return {
+        pull: "read",
+        ...head(),
+        documents: owedDocs.length,
+        do: "call se_reading, read what it hands back, and call it again until it answers done — then pull",
+        ...extra(),
+      };
+    }
+
+    // 4. THE FORM, BUILT AND HANDED OVER. The agent never looks one up.
+    const unmet = (first.demands.evidence_form ?? []).filter((n) => !this.formsMet([n]));
+    if (unmet.length > 0) {
+      return {
+        pull: "fill",
+        ...head(),
+        for: first.to,
+        forms: unmet.map((n) => this.formGet(n)),
+        do: "fill every required section, then return it on the next pull as form: {\"<section>\": \"<text>\"} — there is no submit verb, and pulling without it hands back this same form",
+        ...extra(),
+      };
+    }
+
+    // 5. THE HAPPY PATH, WALKED. Not one hop — every hop to the next
+    //    branching point, because start-to-front-desk has no branch in it
+    //    and should never cost a round trip per hop.
+    const swept = await this.sweep(this._target, channel, {});
+    // A WALL FURTHER ALONG THE WAY IS THE SAME LAW. The route is weighed
+    // hop by hop, so a heavy step three hops out only refuses once the
+    // sweep reaches it — and it must arrive as the same instruction the
+    // first hop would have given, not as a rejection wearing a walk.
+    const ref = swept.refusal as { clause?: string; got?: string } | undefined;
+    if (ref?.clause === CLAUSES.ABOVE_THRESHOLD) {
+      return {
+        pull: "wait",
+        ...head(),
+        walked: swept.swept ?? [],
+        waiting_for: "the person",
+        at: swept.stopped_at,
+        why: ref.got ?? "the next step weighs more than the session autonomy",
+        do: "tell them plainly WHICH step waits and STOP — the slider alone cannot wake you, so they must send a message after moving it",
+        ...extra(),
+      };
+    }
+    const { machine, ids } = this.leaves();
+    const landed = ids.map((id) => {
+      const s = this.state(machine, id);
+      return {
+        id: this.inSub() ? `${machine.id}/${s.id}` : s.id,
+        ...(s.statement !== "" ? { statement: s.statement } : {}),
+        guidance: s.guidance,
+        legal_tools: s.kind === "start" || s.kind === "end" || s.kind === "join" ? [...MACHINERY] : (s.legal_tools ?? []),
+        // WHAT THIS STEP WILL ASK, by name and type. The per-field
+        // guidance arrives with the form itself — steps in full, detail
+        // on demand, so a long batch cannot overflow the answer.
+        ...(s.evidence_form.length > 0 ? { asks: s.evidence_form.filter((f) => f.type !== "derived").map((f) => ({ name: f.name, ...(f.type !== undefined ? { type: f.type } : {}), required: f.required !== false })) } : {}),
+      };
+    });
+    return {
+      pull: "do",
+      ...head(),
+      walked: swept.swept ?? [],
+      arrived: swept.arrived === true,
+      here: landed,
+      ...(swept.refusal !== undefined ? { stopped_at: swept.stopped_at, refusal: swept.refusal } : {}),
+      do: "do what the guidance asks, then pull again",
+      ...extra(),
+    };
+  }
+
   /** Where the walk is, machine-wise: ["main"] or ["main", "boot", …]. */
   breadcrumb(): string[] {
     return [this.machine.id, ...this.subs.map((s) => s.decl.id)];
