@@ -73,3 +73,6 @@
 {"ts":"2026-08-02T15:00:32.918Z","op":"done","visit":"expeditions/e31@0","node":"d4","brief":"the workspace is gone and RUNME installs once"}
 {"ts":"2026-08-02T15:00:53.144Z","op":"update","visit":"expeditions/e31@1","node":"d77","brief":"reading what a test root borrows"}
 {"ts":"2026-08-02T15:01:26.489Z","op":"defer","visit":"expeditions/e31@1","node":"d34","brief":"boot once per suite run and read fixture guidance","to":"retro","hops":1,"trail":["expeditions/e31","retro"]}
+{"ts":"2026-08-02T15:01:40.424Z","op":"done","visit":"expeditions/e31@0","node":"d6","brief":"the rulings are folded and the parcel is gone"}
+{"ts":"2026-08-02T15:01:58.311Z","op":"done","visit":"expeditions/e31@0","node":"d5","brief":"twelve drained; the rest is judgment the retro owns"}
+{"ts":"2026-08-02T15:02:54.331Z","op":"update","visit":"expeditions/e31@1","node":"d78","brief":"the env-guard trap becomes a rule, not one note"}

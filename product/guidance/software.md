@@ -119,6 +119,13 @@ So the rules:
   is what makes the parallelism legal, and setup is cheap.
 - MEASURE before and after. A concurrent file that is no faster was
   CPU-bound, and wanted splitting instead.
+- A GUARD THAT MAKES A TOOL DO NOTHING IS INVISIBLE to a test that only
+  reads that tool's output. The suite sets SE_SELFTEST_SKIP,
+  SE_KEEPAWAKE_DISABLE and SE_RELOAD_DRY, and any of them can turn a
+  spawned script into one line of nothing. A test that spawns a lane script
+  clears the guard it needs cleared, and ASSERTS THE WORK RAN — never just
+  that the output looked sound. The tell is a case that passes alone and
+  fails in the suite.
 
 And the suite is not one thing. BOOT runs a SMOKE test — seconds, proving
 the engine loads and answers. The full battery proves behaviour, and that
