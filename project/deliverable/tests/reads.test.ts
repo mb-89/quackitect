@@ -196,16 +196,19 @@ test("the mirror renders per-doc checkboxes and never locks reading itself", asy
 
 test("the pill turns green from the machine: the agent's reading records its proof — checkboxes stay human-only", async () => {
   const root = freshRoot();
+  // A HANDOVER IS WHAT read_contract STILL OWES. The contract, the walk, the
+  // lane and the voice went to the prompt layer, so without one left behind
+  // this gate has nothing to be unmet about — and a pill that is green before
+  // anything happened reports nothing.
+  mkdirSync(join(root, ".se"), { recursive: true });
+  writeFileSync(join(root, ".se", "HANDOVER.md"), "# Handover\n\nsomething the next session must read.\n", "utf8");
   const session = new Session(root);
   const server = buildServer(root, session);
   // Stand INSIDE boot so read_contract is peekable — the mirror peeks the
   // machine on screen, and that is boot while the walk is in it.
   await session.advance(); await session.advance();
-  // THE DEMAND MOVED WITH THE PROMOTION. read_contract's own read list went
-  // to the prompt layer, so what is still owed is the root guidance every
-  // packet pulls — asked for on ENTERING prepare_idle.
-  const beforeState = session.stateInfo("prepare_idle") as { entry: { read: { met: boolean } } };
-  assert.equal(beforeState.entry.read.met, false, "no reading earned yet");
+  const beforeState = session.stateInfo("read_contract") as { exit: { read_consume: { met: boolean } } };
+  assert.equal(beforeState.exit.read_consume.met, false, "the handover is owed and unread");
   for (let j = 0; j < 40; j++) {
     if ((await readOne(server)) === null) break;
   }
@@ -214,10 +217,9 @@ test("the pill turns green from the machine: the agent's reading records its pro
   assert.ok(!session.active().includes("read_contract"), `the agent's reading is the pill's green: ${JSON.stringify(session.active())}`);
   // The human ledger is untouched: nothing checked, boxes stay empty.
   assert.deepEqual((session.packet() as { human_checked: string[] }).human_checked, []);
-  // A version pins the proof: editing a doc drops it, the pill asks again.
-  appendFileSync(join(root, "project", "guidance", "voice.md"), "\nEdited mid-session.\n");
-  const edited = session.stateInfo("prepare_idle") as { entry: { read: { met: boolean } } };
-  assert.equal(edited.entry.read.met, false, "an edited doc drops the agent's proof too");
+  // The version-pinning half moved out rather than away: "an edited doc drops
+  // the agent's credit" still guards it, against the root guidance the pull
+  // demands. Asserting it here as well would be the same check twice.
 });
 
 test("THE HANDOVER RULE: the human walks boot on checkboxes, raises the slider — the agent owes the same reading", async () => {

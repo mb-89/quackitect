@@ -99,7 +99,7 @@ test("the pin: the bless compiles the change size live; escalation only grows it
   assert.equal(pin3.change_size, "product");
   validateMachine(pin3.machine);
   // specification is read and validated as a column, never pinned as a walk.
-  assert.throws(() => pinIteration(root, it, "specification"), /patch \| minor \| major \| project/);
+  assert.throws(() => pinIteration(root, it, "specification"), /patch \| minor \| major \| product/);
 });
 
 test("the chunk machine: refused when unseeded, compiled with realization tags and the join", () => {

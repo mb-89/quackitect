@@ -200,3 +200,12 @@
 {"ts":"2026-08-02T16:15:24.309Z","op":"update","visit":"expeditions/e31@1","node":"d208","brief":"the router gap is filed, not half-fixed"}
 {"ts":"2026-08-02T16:15:32.041Z","op":"update","visit":"expeditions/e31@1","node":"d209","brief":"the whole battery"}
 {"ts":"2026-08-02T16:16:43.241Z","op":"update","visit":"expeditions/e31@1","node":"d210","brief":"battery in the background"}
+{"ts":"2026-08-02T16:17:11.491Z","op":"update","visit":"expeditions/e31@1","node":"d211","brief":"the tick leftovers and the vocabulary are fixed"}
+{"ts":"2026-08-02T16:17:26.776Z","op":"update","visit":"expeditions/e31@1","node":"d212","brief":"unstaging the junction duplicate and ignoring it"}
+{"ts":"2026-08-02T16:17:37.597Z","op":"update","visit":"expeditions/e31@1","node":"d213","brief":"reading the battery result"}
+{"ts":"2026-08-02T16:17:47.708Z","op":"update","visit":"expeditions/e31@1","node":"d214","brief":"waiting on the battery"}
+{"ts":"2026-08-02T16:17:56.299Z","op":"update","visit":"expeditions/e31@1","node":"d215","brief":"final battery count"}
+{"ts":"2026-08-02T16:20:03.977Z","op":"update","visit":"expeditions/e31@1","node":"d216","brief":"detail on the last four"}
+{"ts":"2026-08-02T16:20:47.913Z","op":"update","visit":"expeditions/e31@1","node":"d217","brief":"probing what stateInfo actually returns"}
+{"ts":"2026-08-02T16:21:29.534Z","op":"update","visit":"expeditions/e31@1","node":"d218","brief":"the pill gates on the handover it still owes"}
+{"ts":"2026-08-02T16:21:38.350Z","op":"update","visit":"expeditions/e31@1","node":"d219","brief":"re-running the last three files"}
