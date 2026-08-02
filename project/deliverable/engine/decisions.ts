@@ -415,6 +415,25 @@ export class Decisions {
         // re-resolution is a real disagreement worth refusing.
         const already = this.nodes.get(u.node!);
         if (already !== undefined && already.status === CLOSES[u.op]) break;
+        // A NODE FROM AN EARLIER SESSION'S VISIT. The live graph replays
+        // only this session's trail, but the RECORD keeps every visit — and
+        // the leave gate counts the record. A resolution must reach what the
+        // gate counts, or a record whose walk spanned sessions can never
+        // close (found live 2026-08-02, closing e31).
+        if (already === undefined && this.extraPath !== undefined) {
+          let visits: { visit: string; nodes: ReplayNode[] }[] = [];
+          try {
+            visits = replayVisitsText(readFileSync(this.extraPath, "utf8"));
+          } catch { /* no record yet — the ordinary refusal below says so */ }
+          const known = visits.find((v) => v.nodes.some((x) => x.id === u.node));
+          if (known !== undefined) {
+            const past = known.nodes.find((x) => x.id === u.node)!;
+            if (past.status !== "open") break; // settled already — a repeat is a no-op across sessions too
+            this.record({ op: u.op, visit: known.visit, node: u.node, ...(u.brief !== undefined ? { brief: u.brief } : {}) });
+            this.sinceResolve = 0;
+            break;
+          }
+        }
         const n = this.openNode(u.node!);
         if (u.op === "done") {
           const open = this.openChildren(n.id);

@@ -142,6 +142,12 @@ export function dirtyLines(porcelain: string): string[] {
   return porcelain
     .split("\n")
     .filter((l) => l !== "")
+    // UNTRACKED FILES DO NOT BLOCK A RECONCILE. A merge cannot silently
+    // bury one — git itself aborts when an incoming file would overwrite
+    // it, and that abort already refuses typed. Counting them deadlocked
+    // once: the ignore rule for four generated files sat on the very
+    // branch the gate was refusing to land (found live 2026-08-02, e31).
+    .filter((l) => !l.startsWith("??"))
     .filter((l) => !ENGINE_TRAIL.test(l.slice(2).trim().replace(/\\/g, "/").replace(/^"|"$/g, "")));
 }
 

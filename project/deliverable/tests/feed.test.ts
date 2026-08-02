@@ -3,7 +3,7 @@
 // per-state decision tree; the toll forces narration only after a lapse and
 // one ignored warning. No ETA anywhere — timestamps are the engine's.
 import { strict as assert } from "node:assert";
-import { mkdirSync, mkdtempSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { test } from "node:test";
@@ -154,6 +154,25 @@ test("the render lint still quotes what it refuses", () => {
   // The other two lints quote the text too.
   assert.match(got(() => parseUpdate({ op: "update", brief: "a\nb" })), /\\n/, "the line break is shown, escaped");
   assert.match(got(() => parseUpdate({ op: "update", brief: "y".repeat(91) })), /91 chars/);
+});
+
+// THE LEAVE GATE COUNTS THE RECORD; the live graph replays one session's
+// trail. e31's close was blocked by a node an earlier session left open,
+// and no call could reach it — the record had to be repaired by hand.
+test("a resolution reaches a node an earlier session's visit left open", () => {
+  const root = freshRoot();
+  const dir = seDir(root);
+  mkdirSync(dir, { recursive: true });
+  const rec = join(dir, "record-decisions.jsonl");
+  writeFileSync(rec, JSON.stringify({ op: "plan", visit: "expeditions/e9@1", nodes: [{ id: "d173", brief: "rename product to project everywhere" }] }) + "\n", "utf8");
+  const d = new Decisions(dir);
+  d.setExtraSink(rec);
+  d.apply("expeditions/e9@0", { op: "done", node: "d173", brief: "the rename is finished" });
+  const after = replayVisitsText(readFileSync(rec, "utf8"));
+  const v = after.find((x) => x.visit === "expeditions/e9@1");
+  assert.equal(v?.nodes.find((n) => n.id === "d173")?.status, "done", "the record shows the earlier visit's node resolved");
+  // A repeat stays a no-op across sessions, exactly as within one.
+  d.apply("expeditions/e9@0", { op: "done", node: "d173", brief: "the rename is finished" });
 });
 
 test("replay: parked defers and open points survive an engine life", () => {
