@@ -51,16 +51,24 @@ test("the reader's check is read from the session, not from one state's pull", (
 test("checking a document does not rebuild the pane the reader is in", () => {
   // One surface never resets another. The old handler forced a full refresh
   // on every check, which threw the reader out of whatever they had open.
+  // The handler used to be bounded by the .jump control, which RETIRED with
+  // the tick. The property did not: checking a box must not rebuild the pane.
+  // It is bounded by the next handler instead, which is what it always meant.
   const src = renderSrc();
   const handler = src.slice(src.indexOf('closest(".docheck")'));
-  const end = handler.indexOf('closest(".jump")');
+  const end = handler.indexOf('closest(".runpre")');
   assert.ok(end > 0, "the docheck handler was not found where expected");
   assert.doesNotMatch(handler.slice(0, end), /refresh\(\)/, "checking a doc must not force a refresh");
 });
 
-test("a locked edge is guarded in the handler, not only by the component", () => {
+test("a disabled control is guarded in the handler, not only by the component", () => {
   // A native button swallows its own click when disabled. A component decides
-  // that for itself, so the walk refuses a locked edge explicitly rather than
-  // trusting the library's pointer-event behaviour.
-  assert.match(renderSrc(), /if \(go\.hasAttribute\("disabled"\)\) return;/, "the go handler must refuse a disabled edge");
+  // that for itself, so the handler refuses explicitly rather than trusting
+  // the library's pointer-event behaviour.
+  //
+  // This used to name the `go` button — the tick's advance control, retired
+  // with the tick. The rule outlived the button: the checkbox that carries a
+  // proof is the disabled control that remains, and it is guarded the same
+  // way. A test naming a control that no longer exists proves nothing.
+  assert.match(renderSrc(), /if \(c\.hasAttribute\("disabled"\)\) return;/, "the handler must refuse a disabled control");
 });

@@ -209,3 +209,23 @@
 {"ts":"2026-08-02T16:20:47.913Z","op":"update","visit":"expeditions/e31@1","node":"d217","brief":"probing what stateInfo actually returns"}
 {"ts":"2026-08-02T16:21:29.534Z","op":"update","visit":"expeditions/e31@1","node":"d218","brief":"the pill gates on the handover it still owes"}
 {"ts":"2026-08-02T16:21:38.350Z","op":"update","visit":"expeditions/e31@1","node":"d219","brief":"re-running the last three files"}
+{"ts":"2026-08-02T16:22:30.765Z","op":"update","visit":"expeditions/e31@1","node":"d220","brief":"the last four are fixed"}
+{"ts":"2026-08-02T16:22:38.685Z","op":"update","visit":"expeditions/e31@1","node":"d221","brief":"full battery to confirm"}
+{"ts":"2026-08-02T16:22:51.141Z","op":"update","visit":"expeditions/e31@1","node":"d222","brief":"hunting other swept expectations"}
+{"ts":"2026-08-02T16:23:01.898Z","op":"update","visit":"expeditions/e31@1","node":"d223","brief":"reading the battery"}
+{"ts":"2026-08-02T16:23:15.061Z","op":"update","visit":"expeditions/e31@1","node":"d224","brief":"waiting on the battery"}
+{"ts":"2026-08-02T16:23:24.442Z","op":"update","visit":"expeditions/e31@1","node":"d225","brief":"waiting on the battery"}
+{"ts":"2026-08-02T16:23:32.668Z","op":"update","visit":"expeditions/e31@1","node":"d226","brief":"waiting on the battery"}
+{"ts":"2026-08-02T16:23:39.274Z","op":"update","visit":"expeditions/e31@1","node":"d227","brief":"waiting on the battery"}
+{"ts":"2026-08-02T16:23:49.160Z","op":"update","visit":"expeditions/e31@1","node":"d228","brief":"final count"}
+{"ts":"2026-08-02T16:24:07.787Z","op":"update","visit":"expeditions/e31@1","node":"d229","brief":"finding which file owns those two cases"}
+{"ts":"2026-08-02T16:24:16.349Z","op":"update","visit":"expeditions/e31@1","node":"d230","brief":"reading the two elements cases"}
+{"ts":"2026-08-02T16:24:28.943Z","op":"update","visit":"expeditions/e31@1","node":"d231","brief":"reading how the source is fetched"}
+{"ts":"2026-08-02T16:24:40.257Z","op":"update","visit":"expeditions/e31@1","node":"d232","brief":"running elements.test.ts properly"}
+{"ts":"2026-08-02T16:25:03.258Z","op":"update","visit":"expeditions/e31@1","node":"d233","brief":"looking at what the client script still has"}
+{"ts":"2026-08-02T16:25:11.457Z","op":"update","visit":"expeditions/e31@1","node":"d234","brief":"checking the client script through the lane instead"}
+{"ts":"2026-08-02T16:25:24.471Z","op":"update","visit":"expeditions/e31@1","node":"d235","brief":"reading the docheck handler for an anchor"}
+{"ts":"2026-08-02T16:25:43.160Z","op":"update","visit":"expeditions/e31@1","node":"d236","brief":"the two element cases point at live controls"}
+{"ts":"2026-08-02T16:25:50.949Z","op":"update","visit":"expeditions/e31@1","node":"d237","brief":"the battery, hopefully green"}
+{"ts":"2026-08-02T16:25:57.414Z","op":"update","visit":"expeditions/e31@1","node":"d238","brief":"waiting on the battery"}
+{"ts":"2026-08-02T16:26:08.421Z","op":"update","visit":"expeditions/e31@1","node":"d239","brief":"committing the element re-anchoring"}
