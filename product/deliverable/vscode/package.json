@@ -9,6 +9,7 @@
     "vscode": "^1.90.0"
   },
   "main": "./extension.js",
+  "activationEvents": ["onStartupFinished"],
   "dependencies": {
     "koffi": "^3.1.4"
   },

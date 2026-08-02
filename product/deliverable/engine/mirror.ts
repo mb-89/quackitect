@@ -1,9 +1,7 @@
 // The mirror's HTTP server — ONE module, two mounts: se-manual runs it
-// alone (walk the machines with no agent attached), se-mcp embeds it next
-// to the MCP lane (the SAME Session — the human's hand on the agent's
-// walk). THE CHANNEL RULE (owner ruling 2026-07-26): HTTP is the human,
-// MCP is the agent. The threshold gates only the agent; every route here
-// ticks with the human's hand, and POST /threshold moves the gate live.
+// alone, se-mcp embeds it beside the MCP lane on the SAME Session.
+// HTTP is the person, MCP is the agent, and the threshold gates only the
+// agent — so every route here moves the walk by the person's hand.
 import { createServer, type Server } from "node:http";
 import { spawnSync } from "node:child_process";
 import { existsSync, readFileSync, statSync } from "node:fs";
@@ -103,19 +101,6 @@ export function startMirror(o: MirrorOptions): Server {
         // stdio, so a harness inside VS Code and a CLI in the terminal
         // attach to the ONE walk instead of spawning private engines.
         handleHttp(o.mcp, req, res);
-        return;
-      }
-      if (req.method === "POST" && url.pathname === "/tick") {
-        post(req, res, "mirror_tick", (body) => {
-          if (body.back !== undefined) {
-            return { args: { back: body.back }, result: state.session.jumpBack(String(body.back), "human") };
-          }
-          const to = typeof body.to === "string" ? body.to : undefined;
-          return {
-            args: { advance: true, ...(to !== undefined ? { to } : {}) },
-            result: state.session.tickAdvance(to, "human"),
-          };
-        });
         return;
       }
       if (req.method === "POST" && url.pathname === "/check") {
@@ -435,9 +420,9 @@ export function startMirror(o: MirrorOptions): Server {
         });
         return;
       }
-      if (url.pathname === "/api/tick") {
+      if (url.pathname === "/api/packet") {
         res.writeHead(200, { "content-type": "application/json; charset=utf-8" });
-        res.end(JSON.stringify(state.session.tickInfo(), null, 2));
+        res.end(JSON.stringify(state.session.packet(), null, 2));
         return;
       }
       if (url.pathname === "/api/levels") {
@@ -534,7 +519,7 @@ export function startMirror(o: MirrorOptions): Server {
       }
       // GET / — tick without arguments: information about where we are.
       // ?view=<machine> browses a machine without moving the walk.
-      state.lastPacket = state.session.tickInfo();
+      state.lastPacket = state.session.packet();
       const page = renderMirror(state, undefined, url.searchParams.get("view") ?? undefined, url.searchParams.get("card") ?? undefined, url.searchParams.get("embed") === "1");
       res.writeHead(200, { "content-type": "text/html; charset=utf-8" });
       res.end(page);

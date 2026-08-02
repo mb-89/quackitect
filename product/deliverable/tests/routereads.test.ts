@@ -2,7 +2,7 @@
 //
 // The target is known before the first step, so the reading it takes to
 // reach it is known with it. The agent's half of this is the pull: it
-// answers `read` and se_reading serves the whole way's documents, one a
+// answers `read` and serves the whole way's documents, one a
 // call. The PACKET half (route_reads) still serves the mirror — the
 // person sees what the way demands — and one multi-read of that list
 // still credits the lot, so a single lane read can carry a whole walk.

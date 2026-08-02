@@ -189,7 +189,7 @@ export function generateSeeded(root: string, it: Iteration, machineId: string, k
       clause: CLAUSES.CONDITION_UNMET,
       expected: `a seeded drawing — the authoring state writes ${itSeededRel(it.id, kind)} (frontmatter steps: id, statement, depends_on, realization — or none: "<why nothing runs>")`,
       got: `no ${kind}.md in the iteration record — a run without visible steps is a defect`,
-      remedy: { tool: "se_file_write", args: { path: itSeededRel(it.id, kind), content: scaffold, base_hash: null }, note: "seed the drawing at the authoring state, then tick again" },
+      remedy: { tool: "se_file_write", args: { path: itSeededRel(it.id, kind), content: scaffold, base_hash: null }, note: "seed the drawing at the authoring state, then pull again" },
       source: SRC,
     });
   }
@@ -229,7 +229,7 @@ export function generateSeeded(root: string, it: Iteration, machineId: string, k
         initial: "start",
         states: [
           { id: "start", kind: "start", statement: "", guidance: `Nothing was seeded, explicitly: ${fm.none}`, evidence_form: [], priority: 0.01, edges: [{ to: "end", role: "normal" }] },
-          { id: "end", kind: "end", statement: "", guidance: "The explicit none is recorded — tick once more to return to the walk.", evidence_form: [], priority: 0.01, edges: [] },
+          { id: "end", kind: "end", statement: "", guidance: "The explicit none is recorded — pull once more to return to the walk.", evidence_form: [], priority: 0.01, edges: [] },
         ],
       };
       validateMachine(decl);
@@ -297,7 +297,7 @@ export function generateSeeded(root: string, it: Iteration, machineId: string, k
     id: "end",
     kind: "end",
     statement: "",
-    guidance: "The chunk machine is complete — tick once more to return to the walk.",
+    guidance: "The chunk machine is complete — pull once more to return to the walk.",
     evidence_form: [],
     priority: 0.01,
     edges: [],

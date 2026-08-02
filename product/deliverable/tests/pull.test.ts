@@ -1,10 +1,8 @@
 // THE PULL — the law it exists to keep.
 //
-// v2 §6 wrote it down and v3 shipped the opposite: BLOCKING IS AN
-// INSTRUCTION RETURNED, NOT AN ERROR. se_tick refuses. The threshold, the
-// unmet condition and the stale `from` all arrive as rejections the agent
-// has to decode — every one of them really the machine knowing what should
-// happen next, thrown instead of said.
+// BLOCKING IS AN INSTRUCTION RETURNED, NOT AN ERROR (v2 §6). A threshold or
+// an unmet condition is the machine knowing what should happen next, and it
+// is said rather than thrown.
 //
 // So these cases are about what does NOT throw. A pull that refuses where
 // it should instruct is the whole bug class coming back, and it would come
@@ -24,13 +22,14 @@ import { freshRoot, readEverything, sessionAtIdle } from "./helpers.ts";
 
 const root = (): string => freshRoot(mkdtempSync(join(tmpdir(), "se-pull-")));
 
-describe("the pull instructs where the tick refuses", { concurrency: true }, () => {
+describe("the pull instructs where a refusal would have thrown", { concurrency: true }, () => {
   test("unread guidance comes back as `read`, not as a rejection", async () => {
     const s = new Session(root());
     const r = (await s.pull()) as Record<string, unknown>;
     assert.equal(r.pull, "read");
     assert.ok((r.documents as number) > 0, "boot owes documents, and the pull must say how many");
-    assert.match(String(r.do), /se_reading/, "the instruction names the tool that discharges it");
+    assert.ok(r.document !== undefined, "the document rides the answer");
+    assert.match(String(r.do), /form/, "and the instruction says how to prove it");
   });
 
   test("a step above the slider comes back as `wait`, naming the step and the person", async () => {
@@ -61,7 +60,7 @@ describe("the pull instructs where the tick refuses", { concurrency: true }, () 
     const s = new Session(root());
     s.setAutonomy(1);
     s.setTarget("front_desk");
-    readEverything(s);
+    await readEverything(s);
     const r = (await s.pull()) as Record<string, unknown>;
     assert.equal(r.pull, "do");
     assert.deepEqual(s.active(), ["front_desk"]);

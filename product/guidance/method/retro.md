@@ -135,7 +135,7 @@ state-of-the-art method (product/deliverable/machines/methods/meth-state-of-the-
 - se_note_drain marks a note drained with its disposition; drained notes
   leave the inbox count and the pending feed. Draining is legal only in
   the retro's drain state — entering it is free from idle, so "drain
-  whenever" is one tick away, inside the machine's discipline.
+  whenever" is one pull away, inside the machine's discipline.
 - backlog notes stay on file (.se/notes.jsonl, disposition backlog) —
   the migration step re-drains them when their "ready when" comes true.
 - Expedition reports are ruled AT CLOSE (applied | dismissed), not here —

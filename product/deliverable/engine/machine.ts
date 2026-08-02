@@ -322,7 +322,7 @@ export function completeState(
   stateId: string,
   outcome: StepOutcome,
   now: string,
-  /** Fire only the edge to this state — the tick's chosen way out. */
+  /** Fire only the edge to this state. */
   only?: string,
 ): { activated: string[] } {
   const state = m.states.find((s) => s.id === stateId);

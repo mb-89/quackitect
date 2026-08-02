@@ -53,7 +53,7 @@ export const CLAUSES = {
   NOT_LEGAL_IN_STATE: "SE-C-110", // the state gate: tool not legal in the active state
   CONDITION_UNMET: "SE-C-112", // enter/leave condition not met — evidence required
   ABOVE_THRESHOLD: "SE-C-113", // the state's priority exceeds the session threshold — the human advances
-  STALE_POSITION: "SE-C-114", // RETIRED with the tick (2026-08-02): the pull recomputes from where the walk stands, so there is no planned move to go stale. The number stays reserved — old logs carry it
+  STALE_POSITION: "SE-C-114", // reserved, never issued — old logs carry it
   GIT_REWRITE: "SE-C-002", // carried from v2 — no rebase; superseded content lives in history
   GIT_PUSH: "SE-C-003", // carried from v2 — the agent never pushes; the owner does
   GIT_NOT_ALLOWLISTED: "SE-C-004", // carried from v2 — git beyond the allowlist stays engine-internal

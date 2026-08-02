@@ -38,7 +38,7 @@ describe("it is off, and invisible, until somebody arms it", () => {
   });
 
   test("the resting packet says nothing about it at all", () => {
-    const packet = new Session(root()).tickInfo() as Record<string, unknown>;
+    const packet = new Session(root()).packet() as Record<string, unknown>;
     assert.equal("emergency" in packet, false, "an absent key is how a hidden thing stays hidden");
   });
 
@@ -77,7 +77,7 @@ describe("arming it", () => {
     const s = new Session(root());
     s.setAutonomy(1);
     s.setEmergency(true);
-    const packet = s.tickInfo() as { emergency?: boolean };
+    const packet = s.packet() as { emergency?: boolean };
     assert.equal(packet.emergency, true);
   });
 });

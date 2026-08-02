@@ -46,7 +46,7 @@ test("the mirror renders ONLY the current machine, with breadcrumbs", async () =
   assert.ok(html.includes(`>idle</text>`));
   assert.ok(!html.includes(`>read_contract</text>`), "sub-machine states are NOT drawn while in main");
   // Step into boot: the boot canvas only, breadcrumb main › boot.
-  await s.tickAdvance();
+  await s.advance();
   html = renderMirror({ session: s, root, lastPacket: undefined, mode: "manual" });
   assert.ok(html.includes(`>read_contract</text>`));
   assert.ok(!html.includes(`>idle</text>`), "main states are NOT drawn while in the sub");

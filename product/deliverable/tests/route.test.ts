@@ -101,7 +101,7 @@ test("the sweep walks the whole way in one call, and every guard still fires", a
   assert.ok((short.swept as string[]).length > 0, "and the hops it DID make stand");
   assert.deepEqual(s.active(), ["boot/read_contract"], "the walk stands where it got to, never rolled back");
   // WITH the reading earned through the loop, the same call arrives.
-  readEverything(s);
+  await readEverything(s);
   const done = await s.sweep("front_desk", "agent");
   assert.equal(done.arrived, true, JSON.stringify(done.refusal ?? done.note));
   assert.deepEqual(s.active(), ["front_desk"]);
@@ -112,7 +112,7 @@ test("the sweep stops at the slider, and the target defaults to the front desk",
   const s = new Session(root);
   assert.equal(s.target, "front_desk", "every engine start aims at the desk");
   s.setAutonomy(0.1);
-  readEverything(s);
+  await readEverything(s);
   const out = await s.sweep("front_desk", "agent");
   assert.equal(out.arrived, false, "a sweep never walks past the slider");
   assert.deepEqual(s.active(), ["idle"], "it goes as far as it may and stops there");
@@ -188,7 +188,7 @@ test("a target clears itself once reached", async () => {
   const root = freshRoot();
   const s = new Session(root);
   s.setAutonomy(1);
-  readEverything(s);
+  await readEverything(s);
   const out = await s.sweep("front_desk", "agent");
   assert.equal(out.arrived, true, JSON.stringify(out.refusal ?? out.note));
   assert.deepEqual(s.active(), ["front_desk"]);

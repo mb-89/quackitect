@@ -6,7 +6,7 @@ Boot stability rules:
 - On GitHub Copilot CLI that means calling activate_file_navigation_and_search_tools.
 - On every other host, load the se tools the normal way. No activation tool is not an error.
 - Keep boot calls serial. Do not run parallel read/search batches.
-- When the pull answers read, call se_reading one call at a time until it answers done, then pull. No hashes to carry.
+- When the pull answers read, the document rides in the answer and prove names its last words. Read it, then pull again with form: {"read": "<those words>"}.
 - Keep any direct reads small with offset/limit.
 - If a state allows no tools, do not read/search there. Pull only.
 

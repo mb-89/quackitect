@@ -2,17 +2,16 @@
 
 One verb drives the walk: `se_pull`. You say pull, the machine says what
 to do, you do it, you pull again. The machine owns every decision about
-the walk — the route, the hop, the proof, the position. THE TICK IS
-RETIRED (owner ruling 2026-08-02): the machinery it drove lives on inside
-the engine, reached through the pull and the mirror, and is no tool.
+the walk — the route, the hop, the proof, the position.
 
 ## The pull
 
 One call, one optional payload. It answers with an INSTRUCTION, and the
 `pull` key names which of five you got.
 
-- `read` — documents are owed. Call `se_reading` until it answers done,
-  then pull. You carry no hashes; reading credits itself.
+- `read` — a document rides along, and `prove` names its last words. Read
+  it, then pull again with `form: {"read": "<those words>"}`. The next
+  document arrives when this one is proven.
 - `fill` — the next step wants evidence. THE MACHINE BUILT THE FORM and
   handed it over, so you never look one up. Fill it and return it on the
   next pull as `form`.
@@ -67,35 +66,35 @@ stuck: when you already know that no answer could let it continue from
 here. Escaping to ask routine questions abandons work that was fine.
 
 REDOING EARLIER WORK is not a payload field. Escape to the desk and say
-what no longer stands; the person invalidates from the mirror (the back
-button), and the walk re-earns the evidence on its way through.
+what no longer stands, and the person routes it from there.
 
-Everything else the tick used to ask of you — `advance`, `from`,
-`read_hashes`, `route`, `sweep`, `state` peeks, `wait` holds, the
-free-aimed target — is the engine's or the person's now. There is no
-position to assert (the pull recomputes from wherever the walk stands,
-so the human's hand can never race you), no proof to carry (reading
-credits itself), and no route to draw (the mirror draws it; the pull
-walks it).
+Those two fields are the whole payload. There is no position to assert —
+the pull recomputes from wherever the walk stands, so the person's hand
+can never race you. There is no route to draw either: the mirror draws
+it, and the pull walks it.
 
 ## The person's hand
 
-The person drives through the MIRROR, never through the lane: the
-slider, the target, the checkboxes, advancing or jumping back by hand.
-The engine recomputes on every pull, so a target set in the mirror
-steers the agent's very next pull — the person aims, the machine pulls
-the agent along the drawn line.
+The person AIMS; they never walk. Their controls are the slider, the
+target and the checkboxes — and that is the whole list. Nothing they can
+press moves the machine a state forward or a state back.
 
-THE READING — a loop, not a list:
+The walk advances on the agent's pull, and on nothing else. The engine
+recomputes on every pull, so a target the person sets steers the agent's
+very next one: they draw the line, and the pull walks it.
 
-- Whenever anything is owed, the pull answers `read`. Call `se_reading`.
-- It hands back ONE document: the next guidance the way ahead demands, as text.
-- Read it. Call `se_reading` again. Stop when it answers `done: true`.
-- Pull until it gives you nothing. Then you have everything, by construction.
-- You never name a path. You never carry a hash. The engine credits what it served.
-- What you have already read is never served twice, so the loop always drains.
-- ONE DOCUMENT PER CALL, and that is the point. A host that moves a large tool result to disk hands you a PREVIEW instead of the text — and the engine has already credited it, so you stand proven to have read what you never saw. A single document cannot be eaten.
-- `.se/reading.md` is the same thing as a file, for a person to open. Agents use the tool.
+THE READING — the pull's own answer, not a second tool:
+
+- Whenever anything is owed, the pull answers `read` and the document rides in `document`.
+- `prove` names what to hand back: the document's LAST WORDS.
+- Read it, then pull again with `form: {"read": "<those words>"}`. The next document arrives with that same answer.
+- Keep going until the pull stops answering `read`. Then you have everything, by construction.
+- You never name a path and you never work out what you owe.
+- What you have already read is never served twice, so it always drains.
+- ONE DOCUMENT AT A TIME, and that is the point. A host that moves a large tool result to disk hands you a PREVIEW instead of the text. A single document cannot be eaten.
+- WHY THE TAIL. Truncation drops the END, so the end is precisely what a host that ate the text cannot give back. It is also the only proof you can actually produce: you cannot compute a hash, and a hash the engine handed you would prove only that a message arrived.
+- A wrong answer credits nothing and the same document comes again.
+- `.se/reading.md` is the same thing as a file, for a person to open.
 
 READ SERIALLY FOR NOW. Send `se_file_read` calls one after another, not as a
 parallel batch. This is a RETREAT, not a preference, and it is written down

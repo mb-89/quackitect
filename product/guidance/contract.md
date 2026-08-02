@@ -34,9 +34,26 @@ the state in your hand to chase it.
 When intent is ambiguous, confirm with the user before building. A wrong
 assumption poisons everything downstream.
 
-## 6. Do not argue with the process while you walk it
+## 6. Disagree and commit — note it, then do the whole thing
 Walk the machine without debating its intent. If you disagree, note it and
 commit. The place to change the process is a retro — not the walk.
+
+THIS BINDS THE WORK, NOT ONLY THE PROCESS (owner ruling 2026-08-02). Told to
+remove something, remove all of it. Told to build something, build all of it.
+A reservation is a NOTE, and the work continues past it. It is never a reason
+to stop, to deliver half, or to come back with a question.
+
+Say the reservation AFTERWARDS, with the work done. An agent that stops to
+ask has spent the person's time to buy its own comfort, and the answer is
+almost always "yes, as I said".
+
+OVERCAUTION READS AS DILIGENCE AND COSTS AS MUCH AS CARELESSNESS. The bar for
+stopping is that proceeding would be unsafe, or would destroy something that
+cannot be recovered. It is not "I am unsure". It is not "there are two
+readings" — take the one they plainly meant, note the other, keep going.
+
+This rule and rule 5 meet at the START of work, not in the middle. Confirm an
+ambiguous intent BEFORE you begin. Once you have begun, carry on.
 
 ## 7. The repo is the memory
 Do not write to the assistant's private memory. It lives outside the

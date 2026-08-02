@@ -15,8 +15,8 @@ How to satisfy it:
   mirror. A form never passes on unconfirmed prefills.
 - List evidence files in the frontmatter `files:`; each must exist in the
   record's evidence/ folder.
-- Set `status: done`. The mechanical lint runs on the tick — either hand,
-  the same checks.
+- Set `status: done`. The mechanical lint runs on the transition — either
+  hand, the same checks.
 
 The lint checks shape, never quality. Quality is reviewed where the walk
 reviews (the report's adjudication), not here.

@@ -27,7 +27,7 @@ always.
 
 Every machine has exactly ONE start and ONE end state. They are machinery,
 not content: the machine enters at start, the machinery walks out of it on
-the first tick, and the machine is done when everything before end has
+the first pull, and the machine is done when everything before end has
 transitioned into it.
 
 ALL machines share the SAME two notes
@@ -103,8 +103,8 @@ cond is exit of its source AND entry of its target.
 Two types exist today:
 
 - `read` — args are documents whose PROVEN reading is the evidence. The
-  agent sends each doc's current hash on the tick. The human checks each
-  doc once per version in the mirror. See the condition note.
+  pull serves them to the agent and credits what it served. The human
+  checks each doc once per version in the mirror. See the condition note.
 - `script` — args are scripts the engine runs, and exit 0 is the evidence.
   The STATE names what runs, as boot does with its preflight and selftest.
 

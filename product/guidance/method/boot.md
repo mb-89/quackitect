@@ -18,7 +18,7 @@ Boot exists to reach idle fast and clean.
 
 - Keep boot calls serial.
 - Avoid parallel search and read batches in boot.
-- BOOT IS TWO INSTRUCTIONS. The pull answers `read`; call `se_reading`, read what it hands back, call it again until it answers `done: true`. Then pull — the machine walks boot itself and lands you at the target.
+- BOOT IS ONE INSTRUCTION, REPEATED. The pull answers `read` and carries the document; read it and pull again with `form: {"read": "<its last words>"}`. Keep pulling — the machine walks boot itself and lands you at the target.
 - Each reading call carries one document and credits it. Boot's reading is a handful of calls, and none of them can be truncated.
 - Do not read the guidance files yourself. The loop knows what you owe.
 - There are no hashes to carry, ever. The reading is the proof.

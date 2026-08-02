@@ -553,7 +553,7 @@ try {
     #
     # THE KICKOFF IS A BELT, NOT THE TROUSERS. workspace/AGENTS.md carries
     # the same first action, and Copilot reads it from the cwd - so an agent
-    # started by hand, with no flags at all, still knows to tick.
+    # started by hand, with no flags at all, still knows to pull.
     #
     # The cage is read from data - see copilot-cage.json, verified against a
     # live CLI and carrying the record of what was wrong before.

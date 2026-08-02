@@ -3,7 +3,7 @@ state: work
 state_kind: work
 priority: 0.2
 legal_tools: all
-guidance: Freeform territory — the whole lane is legal, and it works in the bound worktree. Tick onward when the session's work here is done.
+guidance: Freeform territory — the whole lane is legal, and it works in the bound worktree. Pull onward when the session's work here is done.
 ---
 
 # Work
