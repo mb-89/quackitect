@@ -56,7 +56,7 @@ export function sessionTools(session: Session): ToolDef[] {
           },
           escape: {
             type: "string",
-            description: "step OUT with this reason — the ONE hatch for every kind of stepping out: the person said stop, the road is blocked, earlier work no longer stands (say so — the person invalidates from the mirror, and the walk re-earns it). Lands at the FRONT DESK, where the person routes; recorded with its reason. Boot cannot be escaped.",
+            description: "step OUT with this reason — the ONE hatch for every kind of stepping out: the person said stop, the walk is MECHANICALLY stuck, earlier work no longer stands (say so — the person invalidates it, and the walk re-earns it). Lands at the FRONT DESK, where the person routes; recorded with its reason. A QUESTION IS NOT AN ESCAPE: waiting on an answer, stay where you stand, ask, and stop — escape only when you already know no answer could let the walk continue from here. Boot cannot be escaped.",
           },
         },
       },

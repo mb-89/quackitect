@@ -373,3 +373,6 @@
 {"ts":"2026-08-02T11:53:21.130Z","op":"update","visit":"expeditions/e30@0","node":"d173","brief":"Confirming battery in its last leg"}
 {"ts":"2026-08-02T11:53:43.597Z","op":"update","visit":"expeditions/e30@0","node":"d174","brief":"Exit zero, reading the tallies"}
 {"ts":"2026-08-02T11:53:51.810Z","op":"done","visit":"expeditions/e30@0","node":"d139","brief":"672 green at exit 0 on the reworked payload"}
+{"ts":"2026-08-02T11:58:21.820Z","op":"plan","visit":"expeditions/e30@0","parent":null,"nodes":[{"id":"d175","brief":"The question-is-not-an-escape rule lands in guidance"},{"id":"d176","brief":"Sign the report and close e30 on the owner's word"},{"id":"d177","brief":"Hand over and end the session"}]}
+{"ts":"2026-08-02T11:59:12.631Z","op":"update","visit":"expeditions/e30@0","node":"d178","brief":"The report stands signed with visible content"}
+{"ts":"2026-08-02T11:59:19.644Z","op":"done","visit":"expeditions/e30@0","node":"d175","brief":"Guidance, schema and code comment carry the rule"}

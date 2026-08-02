@@ -814,11 +814,16 @@ export class Session {
   /** ESCAPE (owner ruling 2026-08-02): ONE hatch, and it lands at the
    *  FRONT DESK — where the person is. Every kind of stepping out is this
    *  same move, told apart only by its reason: the person said stop, the
-   *  road is blocked, earlier work no longer stands. (pause and the
-   *  agent-side back retired with this ruling; the mirror's back button
-   *  remains the person's invalidating hand.) The walk that was left is
+   *  walk is mechanically stuck, earlier work no longer stands. (pause
+   *  and the agent-side back retired with this ruling; the person's back
+   *  button remains the invalidating hand.) The walk that was left is
    *  LEFT STANDING; a later walk re-enters it, fast-forwarding on stored
    *  evidence. Boot is the one exception — it must complete.
+   *
+   *  A QUESTION IS NOT AN ESCAPE (owner, same day): an agent waiting on
+   *  an answer stays in its state, asks, and stops — the state holds and
+   *  the reply resumes it there. Escaping is for when NO answer could
+   *  let the walk continue from here.
    *
    *  THE HATCH IS NEVER GATED: no slider weighing, no read demand. Going
    *  to the desk IS going to ask the person — the andon cord — and a cord

@@ -1,20 +1,17 @@
 ---
 form: expedition-leave
-status: draft
+status: done
 by: agent
 files:
 ---
 
 # e30 — make the iteration lane actually walkable
 
-<!-- PREFILL, amended a second time on 2026-08-02 after the tick retired.
-Every section below is a suggestion and counts as EMPTY until confirmed.
-Confirm each one in the mirror, or uncomment it here. Then set status: done.
-The close itself weighs 0.6 and is the owner's hand. -->
+Signed by the agent on the owner's word in chat, 2026-08-02: "you can sign
+the report, close the expedition."
 
 ## What was the goal
 
-<!--
 Make the iteration lane actually walkable, so the product iteration can be
 opened. The owner chose an expedition over an iteration on 2026-08-01,
 because no iteration had ever been walked.
@@ -41,11 +38,9 @@ ask of the agent moves into the engine. So the pull lane and the retirement
 are now the biggest things in this expedition and neither is in the goal.
 software.md says to amend the goal when the bundle grows past it. Amending it
 is owed.
--->
 
 ## What was done
 
-<!--
 THE PULL LANE (2026-08-02). The agent's one verb, se_pull. It answers with an
 INSTRUCTION rather than a refusal, which is the whole point.
 
@@ -61,10 +56,6 @@ INSTRUCTION rather than a refusal, which is the whole point.
   trip per hop.
 - `wait` — out of work, or the next step weighs more than the session
   autonomy. It names which step waits and that a message is what resumes.
-
-A choice may be a LIST: one agent walks the first and the rest come back as
-not_walked. Multi-agent is not built and the seam is deliberately not designed
-shut, which was the owner's instruction.
 
 THE TICK RETIRED (owner ruling 2026-08-02, same day). se_tick is out of the
 tool list; se_pull is the agent's one verb. What each side owns now:
@@ -91,18 +82,18 @@ three of them.
   offers its doors where the road splits, the agent answers form
   {choice: "<to>"}, and only a door from the offer is legal. The
   free-aimed choice is gone — you never choose unasked. Long-range
-  aiming is the person's, through the mirror's target, and the pull
-  follows it.
+  aiming is the person's, through the target, and the pull follows it.
 - `escape` is the ONE hatch. back and pause are deleted: every kind of
-  stepping out — the person said stop, the road is blocked, earlier work
-  no longer stands — is an escape, told apart by its reason alone. It
-  lands at the FRONT DESK, where the person routes, and it is never
-  gated: no slider weighing, no read demand — the andon cord. Redoing
-  earlier work is escape-and-say-so; the person invalidates from the
-  mirror's back button, and the walk re-earns the evidence.
-
-The full audit — what moved, what stayed, with reasons — is
-note-c812ee64df45, and the payload cut is recorded on top of it.
+  stepping out — the person said stop, the walk is mechanically stuck,
+  earlier work no longer stands — is an escape, told apart by its reason
+  alone. It lands at the FRONT DESK, where the person routes, and it is
+  never gated: no slider weighing, no read demand — the andon cord.
+  Redoing earlier work is escape-and-say-so; the person invalidates from
+  their back button, and the walk re-earns the evidence.
+- A QUESTION IS NOT AN ESCAPE (owner clarification, same day, now in
+  guidance and on the tool): waiting on an answer, the agent stays in
+  its state, asks, and stops. Escape is for a walk no answer could
+  unblock from here.
 
 THE SHUTDOWN ROW. A new toggles parameter type, for buttons that do not
 exclude each other. The machine holds the two flags and serves them. Block
@@ -133,14 +124,23 @@ lines, and the owner reviewed it in their own hand.
 
 THE ROUNDS EVERY GATE WAS MISSING, injected by the compiler, and the older
 duplicate copy in session.ts removed. Held by tests/rounds.test.ts.
--->
 
 ## What settled it
 
-<!--
 THE BATTERY. 654 tests in 73 suites before the pull lane; 672 in 79 after the
-retirement, zero failures, exit 0. The wall clock measured 209 seconds on a
-machine also running this session — the pull cases each pay a real boot walk.
+retirement and the payload cut, zero failures, exit 0, run after each of the
+three rework waves.
+
+A TEST CAUGHT A REAL ORDERING BUG, which is the best evidence here. The pull
+originally checked the reading before the slider, so an agent aimed at a step
+it was not allowed to take was sent through several documents first and only
+then told to stop. The case asserting that a threshold arrives as `wait`
+failed with `read`, and the order was corrected. Nothing but a test would
+have found that — both orders look right in the code.
+
+THE LAW IS PINNED IN THREE PLACES, because it is the thing that will regress.
+A threshold on the first hop, a threshold reached mid-sweep, and the boundary
+where illegal stays illegal are all separately asserted.
 
 THE MIGRATION FOUND FIVE REAL DEFECTS, which is what it was for.
 
@@ -158,24 +158,6 @@ THE MIGRATION FOUND FIVE REAL DEFECTS, which is what it was for.
   the run mid-stream and the exit read as ordinary failure, with no word
   that a cap was hit. The cap is 300 seconds now and SAYS so when hit.
 
-THAT COST WAS PAID DELIBERATELY. A pull case needs a session standing at idle
-and that means a real boot walk, about eight seconds each. All of them in one
-file made that file the slowest thing in the suite, at over a hundred seconds
-alone — worse than the whole battery. They are split across three files by
-theme so they reach three cores, and the cases that need no walk at all were
-gathered into the third, which finishes in four seconds.
-
-A TEST CAUGHT A REAL ORDERING BUG, which is the best evidence here. The pull
-originally checked the reading before the slider, so an agent aimed at a step
-it was not allowed to take was sent through several documents first and only
-then told to stop. The case asserting that a threshold arrives as `wait` failed
-with `read`, and the order was corrected. Nothing but a test would have found
-that — both orders look right in the code.
-
-THE LAW IS PINNED IN THREE PLACES, because it is the thing that will regress.
-A threshold on the first hop, a threshold reached mid-sweep, and the boundary
-where illegal stays illegal are all separately asserted.
-
 THE TWO DEAD FLAGS WERE THE SAME BUG TWICE. The floor law was parsed and read
 by nothing. The killer flag reached the checker inside a stripped comment.
 Neither had a test that could fail. Both do now.
@@ -185,11 +167,9 @@ type derived out of the packet in both places that build one.
 
 THE OWNER'S OWN HAND. Commit e659fe6 is the owner's review of the evidence
 typing, written by them rather than by an agent.
--->
 
 ## What was not done
 
-<!--
 THIS SESSION STILL DROVE THE TICK. The MCP tool list is fixed at connect
 time and se_reload swaps the engine but not the list, so the session that
 retired the tick could not itself pull. The FIRST session on the new code is
@@ -236,8 +216,7 @@ noted here so the next retro knows to.
 
 PARKED DELIBERATELY, not dropped. Machine-picture layout waits, and lifts v2's
 ranker when it returns. The specification column waits until a consumer exists.
--->
 
 ## Files
 
-<!-- None. Nothing was written to the record's evidence/ folder. -->
+None. Nothing was written to the record's evidence/ folder.

@@ -10,7 +10,9 @@ is an instruction: `read`, `fill`, `choose`, `do`, or `wait`. Do what it
 says, then pull again. Keep pulling until the answer is `wait`. Everything
 you hand back rides `form` — evidence sections, or `{"choice": "<to>"}`
 where the machine offered doors; you never choose unasked. Stepping out is
-`escape`, one hatch, landing at the front desk. How walking works:
+`escape`, one hatch, landing at the front desk — but a QUESTION is not an
+escape: waiting on an answer, stay where you stand, ask, and stop; escape
+only when no answer could unblock the walk from here. How walking works:
 product/guidance/walking.md — it is pulled into every state's packet.
 
 Do this AT THE START OF EVERY SESSION, unasked. Whatever the user's first

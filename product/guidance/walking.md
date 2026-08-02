@@ -56,9 +56,15 @@ The payload is the whole list, and it is TWO fields (owner ruling
   come back as `not_walked`. You never choose unasked: a choice is a
   form, and the machine builds every form.
 - `escape` — stepping out, with the reason. ONE hatch for every kind:
-  the person said stop, the road is blocked, earlier work no longer
-  stands. It lands at the FRONT DESK, where the person routes, and the
-  reason is the whole record.
+  the person said stop, the walk is mechanically stuck, earlier work no
+  longer stands. It lands at the FRONT DESK, where the person routes,
+  and the reason is the whole record.
+
+A QUESTION IS NOT AN ESCAPE. Waiting on an answer, STAY where you stand:
+say the question plainly and stop — the state holds, and the person's
+reply resumes you right there. Escape only when the walk is MECHANICALLY
+stuck: when you already know that no answer could let it continue from
+here. Escaping to ask routine questions abandons work that was fine.
 
 REDOING EARLIER WORK is not a payload field. Escape to the desk and say
 what no longer stands; the person invalidates from the mirror (the back
