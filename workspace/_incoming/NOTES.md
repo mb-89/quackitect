@@ -63,14 +63,25 @@ The verbs the shell fallback was standing in for, grounded in the harvest of
   from 3 up, the result carries green_streak + the owner's law: in ~95% of
   cases the change broke nothing; test to answer a question, not to
   reassure. A red resets the streak.
-- **Battery timeout** — 150s killed the battery mid-run now that boot walks
-  read real guidance (boot.test alone measured 425s). SE_TEST_TIMEOUT_MS
-  (default 600s) for battery scripts, SE_TEST_SCOPED_TIMEOUT_MS (default
-  150s) for scoped runs.
+- **Battery timeout** — the fixed 150s was a guess about someone else's
+  machine; now SE_TEST_TIMEOUT_MS (default 600s) for battery scripts,
+  SE_TEST_SCOPED_TIMEOUT_MS (default 150s) for scoped runs. (An earlier
+  note here cited boot.test at 425s — that was milliseconds misread as
+  seconds; retracted.)
 - **engine/tools.ts** — schemas + front-loaded descriptions for
   se_file_patch / se_file_search / se_run / se_test; se_run handler judges
   before spawning; se_test records its verdict.
-- **tests/discipline.test.ts** (new) — 33 tests, incident-style. All green
+- **THE CUT LAW (engine/jsonio.ts capMiddle)** — cut the middle, never the
+  end; back off to whitespace; the marker names the drop. Adopted by
+  se_run's OUT_CAP (both sites), the log's capJson (log miners read capped
+  responses — that is where the next mis-read was waiting), se_test output
+  slices, and TAP failure details. Motivating incident: a head-only cap
+  turned "(425.501917ms)" into "(425.501" and ms was diagnosed as seconds.
+  Plus: se_run results carry `output_shaped` when the command itself piped
+  through a truncating shape (Select-Object -First, head, cut -c) — what
+  such a pipe dropped exists nowhere, and the note says so at the moment
+  of risk.
+- **tests/discipline.test.ts** (new) — 35 tests, incident-style. All green
   on Linux/node 22. files.test.ts still 25/25 of its real checks.
 
 ## Verification status (cloud Linux, node 22.22, tsc 5.x)

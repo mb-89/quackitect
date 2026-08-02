@@ -172,10 +172,16 @@ boot.test.ts at 425 seconds because suite boot walks read the REAL
 guidance corpus, so the battery grows with every guidance file. The patch
 now answers the first two mechanically: se_run {job, wait_ms} (the wait
 returns the moment the job exits), a 'waiting' lane rule, the green-streak
-nudge on se_test results, and battery timeout raised to a configurable
-600s. The third is yours to fix in the suite: boot ONCE per suite run and
-share the template, and let test boots read FIXTURE guidance, not the
-production corpus — otherwise the battery's cost scales with the book.
+nudge on se_test results, and the battery timeout made configurable
+(SE_TEST_TIMEOUT_MS, default 600s — the fixed 150s was somebody's guess).
+
+RETRACTION (2026-08-02, owner caught it): an earlier version of this
+addendum claimed boot.test.ts ran 425 SECONDS. The source was a truncated
+log snippet — "✖ tests\boot.test.ts (425.501" — which is node's reporter
+printing MILLISECONDS with the unit cut off. boot.test is fine. The
+'battery got slower / boots five times' complaint is the walking agent's
+own report and still wants a look, but it has NO measured number yet —
+rank test-timings.jsonl before believing any figure, including mine.
 
 THE STANCE RULING (owner, 2026-08-02, verbatim intent): overcautiousness
 costs more than wrong guesses. If told to remove everything, remove
@@ -189,3 +195,76 @@ layer carries the rule on every turn, and (b) the retro measures it: walk
 stalls in calls.jsonl (long gaps in an open work state with no note filed)
 are countable. Add the rule to the voice output style when it lands; count
 stalls at the next retro before tightening further.
+
+## Addendum 3: the prompt layer, and the boot-cost question
+
+THE PROMPT LAYER (owner-approved direction; draft in workspace/_promptlayer/
+— NOT in this folder because you are working here). Three tiers, one
+criterion: always-true → prompt layer; here-true → packet; sometimes-true →
+read. The packet and read layers DO NOT CHANGE — the pull keeps serving
+state guidance and situational documents exactly as today. Only the
+constant tier leaves the wire.
+
+What that means for each of boot's 8 reading documents (~13.4k tokens
+today, re-earned after every compaction):
+
+- contract.md + walking.md → PROTOCOL.md (drafted, ~1,240 tokens) →
+  generated AGENTS.md / .github instructions / CLAUDE.md at agent start.
+- voice.md → the output style (Claude) / inside the instructions text
+  (Copilot).
+- method/boot.md → mostly DISSOLVES: it documents the reading loop that
+  the promotion empties. What survives (stability rules) is in PROTOCOL.md.
+- method/front-desk.md → READ LAYER: pulled on entering front_desk, as
+  state guidance. Every session passes the desk, but it is still
+  state-scoped, not always-true.
+- software.md + ux.md → READ LAYER: pulled by the work states that bind
+  them (the pull config by root/tag, note-f568ad9cd8a4).
+- .se/HANDOVER.md → stays a READ: per-session by definition, and
+  read_consume is correct for it.
+
+Boot after adoption: consume HANDOVER, confirm contract, done. The
+authored-terse principle holds: the terse register IS the source; no LLM
+in any boot path; promotion/demotion/tighten are retro questions.
+
+BOOT COST IN THE SUITE — the 425s figure earlier versions of this file
+carried was WRONG (milliseconds misread as seconds; see the retraction in
+addendum 2). What remains worth checking, if — and only if — the ranked
+test-timings show boot-flavoured cases near the top:
+
+- the reading drain per booted case (8 docs, ~54KB, ~16 pulls — cheap per
+  call, but the prompt-layer promotion shrinks it in production and
+  fixture stubs would shrink it in tests);
+- prepare_idle exit scripts spawning cold node processes per booted case;
+- Defender scanning fresh %TEMP% template trees (Windows-only silent tax);
+- fingerprint() cadence (once per run, not once per fresh()).
+
+All of these are HYPOTHESES. The method is the point: rank the measured
+per-case timings first; touch nothing that is not near the top.
+
+## Addendum 4: the truncation round, and a seed the owner is still growing
+
+BUILT INTO THE PATCH (v4 — same file, re-cut): the cut law. CUT THE
+MIDDLE, NEVER THE END — ends carry verdicts: exit codes, totals, units.
+capMiddle (jsonio.ts) backs off to whitespace, names the drop, and is
+adopted by se_run's caps, the log's capJson (LOG MINERS READ CAPPED
+RESPONSES — the 500-char head-cut there was where the next mis-read
+waited), se_test's output slices and TAP failure details. se_run results
+now also carry `output_shaped` when the command itself piped through a
+truncating shape — what Select-Object -First dropped exists nowhere, and
+the note says so at the moment of risk. Motivating incident: this very
+handover carried 425 SECONDS for two addenda because a head-cut ate "ms".
+
+NOT built, and explicitly not build-ready — A SEED NOTE from the owner
+(2026-08-02, thoughts still forming; file as a stray for a future design
+discussion, do NOT act on it):
+
+  EVERY LOAD-BEARING STATEMENT WANTS ITS EVIDENCE AND ITS RATIONALE — and
+  rationales CHAIN. A claim rests on evidence plus a rationale; if the
+  rationale was inherited from an earlier decision, it points there, and
+  so on back to the ORIGINAL rationale. Then two checks become possible:
+  does the rationale still apply (its premises may have expired), and
+  does the chain reach ground (or dangle from an assumption nobody ever
+  made explicit). The decisions graph, ADRs, evidence refs and the future
+  QA congruence check all look like partial views of this one structure.
+  Adjacent prior art when the discussion happens: assurance cases (GSN),
+  Toulmin's claim/ground/warrant. For now: a note, a name, nothing more.

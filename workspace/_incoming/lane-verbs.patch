@@ -1,29 +1,34 @@
-From 5246afbaa641da3230fce0dd657b533b43835783 Mon Sep 17 00:00:00 2001
+From 169d5cd194b1312d0ad85fb15ebfc5f97a647fe3 Mon Sep 17 00:00:00 2001
 From: "claude (cowork)" <claude@cowork>
 Date: Sun, 2 Aug 2026 10:54:32 +0000
-Subject: [PATCH] lane verbs + discipline: patch append/prepend/regex/range +
- EOL auto-correct; search context/before/after/include/count_only; se_run rule
- ladder (SE-C-129) + job wait_ms; se_test scoped runs + battery economics
- (SE-C-130/131) + green-streak nudge
+Subject: [PATCH] =?UTF-8?q?lane=20verbs=20+=20discipline:=20patch/search/r?=
+ =?UTF-8?q?un/test=20verbs=20and=20gates=20(SE-C-129/130/131),=20job=20wai?=
+ =?UTF-8?q?t=5Fms,=20green-streak=20nudge,=20and=20the=20cut=20law:=20capM?=
+ =?UTF-8?q?iddle=20everywhere=20=E2=80=94=20cut=20the=20middle,=20never=20?=
+ =?UTF-8?q?the=20end?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
 ---
- product/deliverable/engine/discipline.ts     | 480 ++++++++++++++++++
+ product/deliverable/engine/discipline.ts     | 481 +++++++++++++++++
  product/deliverable/engine/errors.ts         |   3 +
- product/deliverable/engine/files.ts          | 228 +++++++--
- product/deliverable/engine/run.ts            |  12 +
+ product/deliverable/engine/files.ts          | 228 ++++++--
+ product/deliverable/engine/jsonio.ts         |  25 +-
+ product/deliverable/engine/run.ts            |  17 +-
  product/deliverable/engine/search.ts         | 161 +++++-
- product/deliverable/engine/tools.ts          | 144 ++++--
- product/deliverable/tests/discipline.test.ts | 494 +++++++++++++++++++
- 7 files changed, 1448 insertions(+), 74 deletions(-)
+ product/deliverable/engine/tools.ts          | 158 ++++--
+ product/deliverable/tests/discipline.test.ts | 518 +++++++++++++++++++
+ 8 files changed, 1511 insertions(+), 80 deletions(-)
  create mode 100644 product/deliverable/engine/discipline.ts
  create mode 100644 product/deliverable/tests/discipline.test.ts
 
 diff --git a/product/deliverable/engine/discipline.ts b/product/deliverable/engine/discipline.ts
 new file mode 100644
-index 0000000..6aa9994
+index 0000000..c8818a3
 --- /dev/null
 +++ b/product/deliverable/engine/discipline.ts
-@@ -0,0 +1,480 @@
+@@ -0,0 +1,481 @@
 +// THE DISCIPLINE LANE — rule-based, no second model (owner ruling 2026-08-02).
 +//
 +// Harvested from 2,589 logged se_run calls: 46% were improvised text tools —
@@ -50,6 +55,7 @@ index 0000000..6aa9994
 +import { join } from "node:path";
 +import { CLAUSES, Rejection } from "./errors.ts";
 +import { contentHash } from "./hash.ts";
++import { capMiddle } from "./jsonio.ts";
 +
 +const SRC = "engine/discipline.ts";
 +
@@ -500,7 +506,7 @@ index 0000000..6aa9994
 +      if (/^(not )?ok \d+ - /.test(l) || /^# /.test(l)) break;
 +      detail.push(l);
 +    }
-+    res.failures.push({ name: notOk[1], detail: detail.join("\n").slice(0, 2000) });
++    res.failures.push({ name: notOk[1], detail: capMiddle(detail.join("\n"), 2000) });
 +  }
 +  return res;
 +}
@@ -789,11 +795,65 @@ index 95b2925..48a673f 100644
  }
  
  export function fileDelete(root: string, path: string, baseHash: string): { deleted: string } {
+diff --git a/product/deliverable/engine/jsonio.ts b/product/deliverable/engine/jsonio.ts
+index 3f58f95..b47a7bb 100644
+--- a/product/deliverable/engine/jsonio.ts
++++ b/product/deliverable/engine/jsonio.ts
+@@ -3,9 +3,30 @@ export function stripBom(s: string): string {
+   return s.charCodeAt(0) === 0xfeff ? s.slice(1) : s;
+ }
+ 
+-/** Cap a value's JSON form for logging — raw payloads live with their tool. */
++/** CUT THE MIDDLE, NEVER THE END (owner law 2026-08-02). The end of an
++ *  output is where verdicts live — exit codes, error totals, closing
++ *  units. A head-only cap once turned "(425.501917ms)" into "(425.501",
++ *  and a confident wrong diagnosis was built on the missing "ms". So a
++ *  cap keeps BOTH ends, backs off to whitespace so no token is ever
++ *  split, and the marker states exactly what was dropped. */
++export function capMiddle(s: string, max: number): string {
++  if (s.length <= max) return s;
++  const headBudget = Math.floor(max * 0.8);
++  const tailBudget = max - headBudget;
++  let headEnd = headBudget;
++  const ws = s.lastIndexOf(" ", headBudget);
++  if (ws > headBudget - 80) headEnd = ws; // back off, but never far
++  let tailStart = s.length - tailBudget;
++  const tws = s.indexOf(" ", tailStart);
++  if (tws !== -1 && tws < tailStart + 80) tailStart = tws + 1;
++  return `${s.slice(0, headEnd)}\n…[${tailStart - headEnd} chars cut — the whole lives in the call log]…\n${s.slice(tailStart)}`;
++}
++
++/** Cap a value's JSON form for logging — raw payloads live with their tool.
++ *  Middle-cut, so a log miner reading capped responses still sees how the
++ *  payload ENDED. */
+ export function capJson(v: unknown, max = 500): string {
+   const s = typeof v === "string" ? v : JSON.stringify(v);
+   if (s === undefined) return "";
+-  return s.length <= max ? s : `${s.slice(0, max)}…[+${s.length - max} chars]`;
++  return capMiddle(s, max);
+ }
 diff --git a/product/deliverable/engine/run.ts b/product/deliverable/engine/run.ts
-index 88cbdf0..f94b96b 100644
+index 88cbdf0..b266098 100644
 --- a/product/deliverable/engine/run.ts
 +++ b/product/deliverable/engine/run.ts
-@@ -111,6 +111,18 @@ function knownJob(id: string): Job {
+@@ -4,6 +4,7 @@
+ // state machine lands, run legality becomes a per-state decision.
+ import { spawn, type ChildProcess } from "node:child_process";
+ import { CLAUSES, Rejection } from "./errors.ts";
++import { capMiddle } from "./jsonio.ts";
+ import { resolveInRoot } from "./paths.ts";
+ 
+ export interface RunResult {
+@@ -86,7 +87,7 @@ const jobs = new Map<string, Job>();
+ let jobSeq = 0;
+ 
+ function view(j: Job): JobView {
+-  const cap = (s: string): string => (s.length > OUT_CAP ? `${s.slice(0, OUT_CAP)}…[+${s.length - OUT_CAP} chars]` : s);
++  const cap = (s: string): string => capMiddle(s, OUT_CAP);
+   return {
+     job: j.id,
+     command: j.command,
+@@ -111,6 +112,18 @@ function knownJob(id: string): Job {
    });
  }
  
@@ -812,6 +872,15 @@ index 88cbdf0..f94b96b 100644
  /** START a command in the background. Returns at once with a handle. */
  /**
   * Is anything still running that this session started?
+@@ -266,7 +279,7 @@ export async function run(root: string, command: string, opts: { timeout_ms?: nu
+       source: "engine/run.ts",
+     });
+   }
+-  const cap = (s: string): string => (s.length > OUT_CAP ? `${s.slice(0, OUT_CAP)}…[+${s.length - OUT_CAP} chars — full output in the call log]` : s);
++  const cap = (s: string): string => capMiddle(s, OUT_CAP);
+   return {
+     command,
+     exit: r.status,
 diff --git a/product/deliverable/engine/search.ts b/product/deliverable/engine/search.ts
 index 82b8a6d..6a2b5e0 100644
 --- a/product/deliverable/engine/search.ts
@@ -1047,7 +1116,7 @@ index 82b8a6d..6a2b5e0 100644
    return out;
  }
 diff --git a/product/deliverable/engine/tools.ts b/product/deliverable/engine/tools.ts
-index cb7f5b4..83757bc 100644
+index cb7f5b4..4435088 100644
 --- a/product/deliverable/engine/tools.ts
 +++ b/product/deliverable/engine/tools.ts
 @@ -10,6 +10,8 @@
@@ -1059,6 +1128,15 @@ index cb7f5b4..83757bc 100644
  import { contentHash } from "./hash.ts";
  import { parseUpdate } from "./decisions.ts";
  import { Toll } from "./toll.ts";
+@@ -21,7 +23,7 @@ import { parseStateNote } from "./notes.ts";
+ import { expList, readRecord } from "./worktree.ts";
+ import { survey } from "./survey.ts";
+ import { itList, readItRecord } from "./iterations.ts";
+-import { capJson } from "./jsonio.ts";
++import { capJson, capMiddle } from "./jsonio.ts";
+ import { McpServer, type ToolDef } from "./mcp.ts";
+ import { gitLand, gitLane, gitSync } from "./gitlane.ts";
+ import { fileMove } from "./move.ts";
 @@ -30,7 +32,7 @@ import { shoot } from "./shoot.ts";
  import { spawn } from "node:child_process";
  import { openPanel } from "./panel.ts";
@@ -1182,7 +1260,7 @@ index cb7f5b4..83757bc 100644
          if (args.command === undefined) {
            throw new Rejection({
              clause: CLAUSES.REQUIRED_ARGS,
-@@ -575,38 +602,99 @@ export function coreTools(rootOf: (rel?: string) => string, projectRoot: string,
+@@ -575,38 +602,109 @@ export function coreTools(rootOf: (rel?: string) => string, projectRoot: string,
              source: "engine/tools.ts se_run",
            });
          }
@@ -1202,7 +1280,17 @@ index cb7f5b4..83757bc 100644
 +              ...cwd,
 +              ...(args.handoff_ms !== undefined ? { handoff_ms: Number(args.handoff_ms) } : {}),
 +            });
-+        return laneWarning === undefined ? res : { ...(res as unknown as Record<string, unknown>), lane_warning: laneWarning };
++        // A TRUNCATING PIPE CUTS BEFORE THE ENGINE SEES. What Select-Object
++        // -First dropped exists NOWHERE — not here, not in the log. The note
++        // rides at the moment of risk; a marker after the fact costs nothing
++        // and once turned "(425.501917ms)" read from a shaped slice into a
++        // confidently wrong 425 SECONDS.
++        const shaped = /select-object\s+-(first|last|skip)|(^|[;|&(\s])(head|tail)\s+-|\bcut\s+-c|\bmeasure-object\b/i.test(String(args.command));
++        const extra = {
++          ...(laneWarning !== undefined ? { lane_warning: laneWarning } : {}),
++          ...(shaped ? { output_shaped: "a truncating pipe shaped this output BEFORE capture — what it dropped exists nowhere. Trust ends and totals only from unshaped output (se_test is structured; se_log_query serves full se_run output by ref)." } : {}),
++        };
++        return Object.keys(extra).length === 0 ? res : { ...(res as unknown as Record<string, unknown>), ...extra };
        },
      },
      {
@@ -1242,6 +1330,7 @@ index cb7f5b4..83757bc 100644
              child.on("error", (e) => { clearTimeout(timer); resolve({ status: null, out: String(e) }); });
              child.on("close", (code) => { clearTimeout(timer); resolve({ status: code, out }); });
            });
+-          results.push({ script: rel, ok: r.status === 0, exit: r.status, output: r.out.trim().slice(0, 4000) });
 +        const wantsScope = args.files !== undefined || args.name_pattern !== undefined;
 +        if (wantsScope) {
 +          // 'pull', 'pull.test.ts', 'tests/pull.test.ts', full path — one file.
@@ -1274,7 +1363,7 @@ index cb7f5b4..83757bc 100644
 +          // A long green streak carries the owner's law back with the result:
 +          // in ~95% of cases the change broke nothing; test to answer a
 +          // question, not to reassure.
-+          return { ok, scope: { files, ...(args.name_pattern !== undefined ? { name_pattern: String(args.name_pattern) } : {}) }, tests: { total: tap.total, pass: tap.pass, fail: tap.fail }, ...(tap.failures.length > 0 ? { failures: tap.failures } : {}), ...(nudge !== undefined ? { green_streak: streak, nudge } : {}), ...(r.status !== 0 && tap.total === 0 ? { output: r.out.trim().slice(0, 4000) } : {}) };
++          return { ok, scope: { files, ...(args.name_pattern !== undefined ? { name_pattern: String(args.name_pattern) } : {}) }, tests: { total: tap.total, pass: tap.pass, fail: tap.fail }, ...(tap.failures.length > 0 ? { failures: tap.failures } : {}), ...(nudge !== undefined ? { green_streak: streak, nudge } : {}), ...(r.status !== 0 && tap.total === 0 ? { output: capMiddle(r.out.trim(), 4000) } : {}) };
 +        }
 +        // The battery: EARNED, not habitual. The gate computes the scoped
 +        // remedy from the diff since the last green battery.
@@ -1287,7 +1376,7 @@ index cb7f5b4..83757bc 100644
 +          // The battery is long BY DESIGN now that boot walks read real
 +          // guidance — 150s killed it mid-run. Configurable, generous default.
 +          const r = await spawnNode([abs, "--root", root], Number(process.env.SE_TEST_TIMEOUT_MS ?? 600_000));
-           results.push({ script: rel, ok: r.status === 0, exit: r.status, output: r.out.trim().slice(0, 4000) });
++          results.push({ script: rel, ok: r.status === 0, exit: r.status, output: capMiddle(r.out.trim(), 4000) });
          }
 -        return { ok: results.every((x) => x.ok), results };
 +        const ok = results.every((x) => x.ok);
@@ -1300,10 +1389,10 @@ index cb7f5b4..83757bc 100644
      {
 diff --git a/product/deliverable/tests/discipline.test.ts b/product/deliverable/tests/discipline.test.ts
 new file mode 100644
-index 0000000..19410e8
+index 0000000..e59f990
 --- /dev/null
 +++ b/product/deliverable/tests/discipline.test.ts
-@@ -0,0 +1,494 @@
+@@ -0,0 +1,518 @@
 +// The discipline round (owner ruling 2026-08-02), tested against the harvest
 +// that ruled it: 2,589 logged se_run calls, 46% of them improvised text tools
 +// — Select-String for the searcher, Get-Content for the reader, Set-/Add-
@@ -1797,6 +1886,30 @@ index 0000000..19410e8
 +  writeFileSync(join(root, "a.ts"), "five\n");
 +  assert.equal(testRecord(se, root, true, "s1", ["f1"]), 1);
 +  rmSync(root, { recursive: true, force: true });
++});
++
++// ── the cut law ────────────────────────────────────────────────────────────
++// CUT THE MIDDLE, NEVER THE END (owner law 2026-08-02). Incident: a
++// head-only cap turned "(425.501917ms)" into "(425.501", the unit died with
++// the tail, and milliseconds were diagnosed as seconds — three documents
++// carried the wrong number before the owner caught it. The end of an output
++// is where verdicts live: exit codes, totals, closing units.
++import { capMiddle } from "../engine/jsonio.ts";
++
++test("capMiddle keeps both ends — the tail's unit survives any cap", () => {
++  const out = "x".repeat(9000) + " tests 425 pass 424 fail 1 duration (425.501917ms)";
++  const capped = capMiddle(out, 1000);
++  assert.ok(capped.length < 1300, "capped near the budget");
++  assert.ok(capped.includes("(425.501917ms)"), "the END survives — the unit cannot be eaten");
++  assert.ok(capped.includes("chars cut"), "the cut names itself");
++  assert.equal(capMiddle("short", 1000), "short", "under budget passes untouched");
++});
++
++test("capMiddle backs off to whitespace — no token is ever split", () => {
++  const words = Array.from({ length: 800 }, (_, i) => `word${i}`).join(" ");
++  const capped = capMiddle(words, 500);
++  const head = capped.split("\n")[0];
++  assert.ok(/word\d+$/.test(head.trim()), `the head ends on a whole token: …${head.slice(-20)}`);
 +});
 -- 
 2.43.0
