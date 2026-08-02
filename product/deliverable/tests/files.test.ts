@@ -58,14 +58,61 @@ test("a file too binary to search is REPORTED, never silently empty", () => {
   rmSync(root, { recursive: true, force: true });
 });
 
-// The separator that caused it stays an ESCAPE in the source. Written as a raw
-// byte it costs the whole file its searchability, for no runtime difference.
-test("no engine source carries a raw NUL byte", () => {
-  const here = new URL("../engine/", import.meta.url);
-  for (const f of ["worktree.ts", "search.ts", "session.ts", "render.ts"]) {
-    const buf = readFileSync(new URL(f, here));
-    assert.equal(buf.includes(0), false, f + " carries a raw NUL and would be invisible to search");
-  }
+// CORRECT WHAT IS MECHANICAL, ANNOUNCE WHAT YOU CORRECTED, REFUSE ONLY THE
+// AMBIGUOUS (owner ruling 2026-08-02). The walking test above catches a raw
+// NUL after it has landed. These catch it at the write, which is the last
+// moment it is still cheap.
+//
+// It has been written twice by two authors, both times as a hash separator:
+// worktree.ts in 2026-07-29, discipline.ts in a patch that arrived today. A
+// third time is a matter of when, so the guard sits on every door that
+// writes bytes rather than on the one that happened to be used.
+//
+// The named per-file list that used to stand here is gone. A new engine file
+// joined it only by an edit nobody remembers to make, and the walking test
+// already covers every file under product/.
+test("a raw NUL written into code becomes the escape, and the write SAYS so", () => {
+  const root = fresh();
+  const r = fileWrite(root, "engine/x.ts", `const sep = "${String.fromCharCode(0)}";\n`, null);
+  assert.match(String(r.corrected), /unsearchable/, "a silent correction teaches nothing");
+  const disk = readFileSync(join(root, "engine", "x.ts"), "utf8");
+  assert.equal(disk.includes(String.fromCharCode(0)), false, "no raw byte survives the write");
+  assert.ok(disk.includes("\\0"), "and the escape means exactly what the byte meant");
+  rmSync(root, { recursive: true, force: true });
+});
+
+test("a raw NUL in prose REFUSES — there the intent is not knowable", () => {
+  const root = fresh();
+  assert.throws(
+    () => fileWrite(root, "notes.md", `a${String.fromCharCode(0)}b`, null),
+    (e: unknown) => e instanceof Rejection,
+  );
+  assert.deepEqual(readdirSync(root), [], "a refused write leaves the tree untouched");
+  rmSync(root, { recursive: true, force: true });
+});
+
+test("the patch door closes the same way, and names it on the result", () => {
+  const root = fresh();
+  fileWrite(root, "engine/y.ts", 'const sep = "HERE";\n', null);
+  const r = filePatch(root, [{ path: "engine/y.ts", old_string: "HERE", new_string: String.fromCharCode(0) }]);
+  assert.ok((r.corrected ?? []).some((c) => c.includes("engine/y.ts")), "the correction rides the result");
+  assert.equal(readFileSync(join(root, "engine", "y.ts"), "utf8").includes(String.fromCharCode(0)), false);
+  rmSync(root, { recursive: true, force: true });
+});
+
+// The move sweep SKIPPED a file holding a NUL. Its references stayed
+// dangling, and the report named neither the file nor the reason.
+test("the move sweep repairs a NUL file instead of skipping it in silence", async () => {
+  const { fileMove } = await import("../engine/move.ts");
+  const root = fresh();
+  fileWrite(root, "product/guidance/old.md", "# old\n", null);
+  fileWrite(root, "engine/keep.ts", "const a = 1;\n", null);
+  writeFileSync(join(root, "engine", "ref.ts"), `const p = "product/guidance/old.md";\nconst sep = "${String.fromCharCode(0)}";\n`);
+  const r = fileMove(root, "product/guidance/old.md", "product/guidance/new.md");
+  assert.ok((r.corrected ?? []).some((c) => c.includes("ref.ts")), "the repair is named");
+  const after = readFileSync(join(root, "engine", "ref.ts"), "utf8");
+  assert.ok(after.includes("product/guidance/new.md"), "and the reference is rewritten, which the skip prevented");
+  rmSync(root, { recursive: true, force: true });
 });
 
 // THE SERVER IS THE MIRROR (owner, 2026-07-29: "it takes forever to render,

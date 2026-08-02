@@ -13,6 +13,7 @@
 import { existsSync, mkdirSync, readdirSync, readFileSync, renameSync, writeFileSync } from "node:fs";
 import { dirname, join, relative, sep } from "node:path";
 import { CLAUSES, Rejection } from "./errors.ts";
+import { guardRawNul } from "./files.ts";
 import { isExcluded, resolveInRoot } from "./paths.ts";
 
 const SRC = "engine/move.ts";
@@ -87,6 +88,8 @@ export interface MoveResult {
   /** References the whitelist could not rewrite. Work the caller still owes. */
   unrewritten: { path: string; line: number; text: string }[];
   unrewritten_total: number;
+  /** Files the sweep repaired on its way through, named so nothing is silent. */
+  corrected?: string[];
 }
 
 export function fileMove(root: string, from: string, to: string): MoveResult {
@@ -120,6 +123,7 @@ export function fileMove(root: string, from: string, to: string): MoveResult {
 
   const rewritten: MoveResult["rewritten"] = [];
   const unrewritten: MoveResult["unrewritten"] = [];
+  const corrected: string[] = [];
   let unrewrittenTotal = 0;
 
   const walk = (dir: string): void => {
@@ -141,7 +145,15 @@ export function fileMove(root: string, from: string, to: string): MoveResult {
       } catch {
         continue;
       }
-      if (content.includes(NUL)) continue;
+      // A raw NUL used to end the sweep for this file in silence: its
+      // references stayed dangling and the report never said so.
+      if (content.includes(NUL)) {
+        const fixed = guardRawNul(rel, content, false);
+        if (fixed.corrected === undefined) continue;
+        writeFileSync(abs, fixed.content, "utf8");
+        corrected.push(fixed.corrected);
+        content = fixed.content;
+      }
 
       if (prose || source) {
         let after = content;
@@ -170,5 +182,5 @@ export function fileMove(root: string, from: string, to: string): MoveResult {
   walk(root);
   rewritten.sort((a, b) => a.path.localeCompare(b.path));
   unrewritten.sort((a, b) => a.path.localeCompare(b.path) || a.line - b.line);
-  return { moved: { from: fromRel, to: toRel }, rewritten, unrewritten, unrewritten_total: unrewrittenTotal };
+  return { moved: { from: fromRel, to: toRel }, rewritten, unrewritten, unrewritten_total: unrewrittenTotal, ...(corrected.length > 0 ? { corrected } : {}) };
 }

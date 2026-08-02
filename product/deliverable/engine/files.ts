@@ -238,11 +238,48 @@ function guardMachineNote(path: string, content: string): void {
   }
 }
 
+/** A RAW NUL COSTS A FILE ITS SEARCHABILITY, and says nothing. ripgrep calls
+ *  any file holding one binary, so every search over it answers a confident
+ *  nothing, and se_file_move skips it outright — its references left dangling
+ *  while the report stays quiet. It has now been written twice, by two
+ *  authors, both times as a hash separator.
+ *
+ *  In code the escape means exactly what the raw byte meant, so it is
+ *  corrected and NAMED. In prose the intent is not knowable, so it refuses.
+ *  A sweep passes strict: false — it must never fail over a byte it did not
+ *  write. */
+const CODE_FILE = /\.(?:ts|tsx|js|jsx|mjs|cjs)$/;
+
+export function guardRawNul(path: string, content: string, strict = true): { content: string; corrected?: string } {
+  if (!content.includes("\0")) return { content };
+  const n = content.split("\0").length - 1;
+  const many = n === 1 ? "a raw NUL byte" : `${n} raw NUL bytes`;
+  if (!CODE_FILE.test(path.replace(/\\/g, "/"))) {
+    if (!strict) return { content };
+    throw new Rejection({
+      clause: CLAUSES.RAW_NUL,
+      expected: "text carrying no raw NUL byte — nothing was written",
+      got: `${path} carries ${many}`,
+      remedy: {
+        tool: "se_file_write",
+        args: { path, content: "<the same text, with the NUL written another way>" },
+        note: "a raw NUL makes the whole file unsearchable: ripgrep calls it binary and every search over it answers nothing. In code it is corrected to the escape automatically; in prose only you know what it was for.",
+      },
+      source: SRC,
+    });
+  }
+  return {
+    content: content.split("\0").join("\\0"),
+    corrected: `${path}: ${many} written as the escape instead — a raw one makes the whole file unsearchable`,
+  };
+}
+
 export interface WriteResult {
   path: string;
   hash: string;
   bytes: number;
   created: boolean;
+  corrected?: string;
 }
 
 export function fileWrite(root: string, path: string, content: string, baseHash: string | null): WriteResult {
@@ -279,9 +316,16 @@ export function fileWrite(root: string, path: string, content: string, baseHash:
     }
   }
   guardMachineNote(path, content);
+  const nul = guardRawNul(path, content);
   mkdirSync(dirname(abs), { recursive: true });
-  writeFileSync(abs, content, "utf8");
-  return { path, hash: contentHash(content), bytes: Buffer.byteLength(content, "utf8"), created: !exists };
+  writeFileSync(abs, nul.content, "utf8");
+  return {
+    path,
+    hash: contentHash(nul.content),
+    bytes: Buffer.byteLength(nul.content, "utf8"),
+    created: !exists,
+    ...(nul.corrected !== undefined ? { corrected: nul.corrected } : {}),
+  };
 }
 
 export interface PatchOp {
@@ -526,7 +570,12 @@ export function filePatch(root: string, ops: PatchOp[]): PatchResult {
   }
   // This one belongs with the other guards: every file in the batch, before
   // the first byte of any of them lands.
-  for (const f of byFile.values()) guardMachineNote(f.path, f.next);
+  for (const f of byFile.values()) {
+    guardMachineNote(f.path, f.next);
+    const nul = guardRawNul(f.path, f.next);
+    f.next = nul.content;
+    if (nul.corrected !== undefined) corrected.push(nul.corrected);
+  }
   const applied = [...byFile.values()].map((f) => {
     const abs = resolveInRoot(root, f.path, SRC);
     writeFileSync(abs, f.next, "utf8");
