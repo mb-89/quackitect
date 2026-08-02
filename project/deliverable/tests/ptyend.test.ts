@@ -1,3 +1,7 @@
+// THIS FILE PROVES THE SCRIPTS RUN, so the suite's spawn-skip is cleared
+// here — a guard that makes a tool do nothing is invisible to a test that
+// only reads its output (software.md).
+delete process.env.SE_SCRIPT_SKIP;
 // THE SESSION CLEANS UP AFTER ITSELF (owner, 2026-07-30): when the machine
 // reaches end, the server posts /pty/end and the terminal host ends its
 // agent — politely first (/exit after the output settles), then by force.

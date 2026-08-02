@@ -1,3 +1,7 @@
+// THIS FILE PROVES THE SCRIPTS RUN, so the suite's spawn-skip is cleared
+// here — a guard that makes a tool do nothing is invisible to a test that
+// only reads its output (software.md).
+delete process.env.SE_SCRIPT_SKIP;
 // e14 — the pre-iteration bundle: arbitrary-depth nesting (the walk is a
 // stack), archive decades as real sub-machines, the open-map "…and N
 // more", state to-do lists, and the se_test tool.

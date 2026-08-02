@@ -102,7 +102,9 @@ The trigger is a NOTE carrying "needs retro":
 
    THEN MINE THE TEST TIMINGS (owner ruling 2026-07-31). Every run
    records every test's duration to .se/test-timings.jsonl — file, name,
-   ms, pass. Rank them, and rank the files by their summed cost.
+   ms, pass — and the LAST run stands summarized in .se/test-last-run.json,
+   files ranked by summed cost. Read the summary first; the append log is
+   for comparing across runs.
    A TEST FAR ABOVE ITS SIBLINGS OWES AN EXPLANATION. Sometimes there is a
    good one: it drives a real server, or it walks a whole machine end to
    end. Sometimes there is not, and then it is a lead like any other. The

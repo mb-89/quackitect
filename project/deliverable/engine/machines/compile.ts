@@ -82,7 +82,20 @@ export function resolveRef(root: string, canvasPath: string, ref: string): strin
 // the compile touched is watched; a changed size or mtime rebuilds. The
 // canvas is always among them, so a state ADDED to the drawing invalidates
 // too — which a watch on the notes alone would miss.
-const CACHE = new Map<string, { decl: MachineDecl; sources: string[]; stamp: string }>();
+const CACHE = new Map<string, { decl: MachineDecl; sources: string[]; stamp: string; epoch: number; at: number }>();
+
+// ONE VALIDATION PER WALK STEP. The stamp stays CONTENT (the law above),
+// but one pull validates the same machine dozens of times while routing,
+// and re-hashing a dozen notes each time was ~1.5s of every booted walk
+// (profiled 2026-08-02). pull and advance bump the epoch, so "the next
+// call" still re-verifies; the time window is the backstop for surfaces
+// that poll between walk steps — the mirror re-verifies at most once a
+// second.
+let EPOCH = 1;
+export function bumpDrawingEpoch(): void {
+  EPOCH++;
+}
+const TRUST_MS = 1000;
 
 // STAMPED BY CONTENT, not by size and mtime. Those two are the usual cheap
 // answer and they are wrong here: a priority edited from 0.01 to 0.75 keeps
@@ -106,10 +119,18 @@ function stampOf(paths: readonly string[]): string {
 export function compileMachineCached(root: string, canvasPath: string): MachineDecl {
   const key = `${resolve(root)}::${canvasPath}`;
   const hit = CACHE.get(key);
-  if (hit !== undefined && stampOf(hit.sources) === hit.stamp) return hit.decl;
+  const now = Date.now();
+  if (hit !== undefined) {
+    if (hit.epoch === EPOCH && now - hit.at < TRUST_MS) return hit.decl;
+    if (stampOf(hit.sources) === hit.stamp) {
+      hit.epoch = EPOCH;
+      hit.at = now;
+      return hit.decl;
+    }
+  }
   const sources: string[] = [];
   const decl = compileMachine(root, canvasPath, sources);
-  CACHE.set(key, { decl, sources, stamp: stampOf(sources) });
+  CACHE.set(key, { decl, sources, stamp: stampOf(sources), epoch: EPOCH, at: now });
   return decl;
 }
 

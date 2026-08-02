@@ -112,3 +112,14 @@ in the repo.
 
 The tell that the rule is being broken: a shell command doing what a
 lane tool should do. Treat it as a missing tool, not a solved problem.
+
+## Library capabilities are read, not guessed (owner correction 2026-07-31)
+
+A claim about what a library can do comes from its documentation or its
+source. Never from recall.
+
+Recall answered wrong twice in one day. It said PlantUML needs Java; the
+core package is pure JavaScript. A wrong capability claim steers a whole
+design before anyone checks it.
+
+Cite where the capability is documented when a decision rests on it.

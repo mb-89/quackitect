@@ -110,7 +110,7 @@ export function readRecord(root: string, e: Expedition): Record<string, unknown>
  *  Anything in the lane that moves a ref calls bustBranchList and the window
  *  never applies. */
 const BRANCH_TTL_MS = 1000;
-const branchList = new Map<string, { at: number; branches: string[] }>();
+const branchList = new Map<string, { at: number; branches?: string[]; failure?: Rejection }>();
 
 export function bustBranchList(): void {
   branchList.clear();
@@ -120,13 +120,25 @@ export function listBranches(root: string, glob: string): string[] {
   const key = `${root} :: ${glob}`;
   const hit = branchList.get(key);
   const now = Date.now();
-  if (hit !== undefined && now - hit.at < BRANCH_TTL_MS) return hit.branches;
-  const branches = git(root, ["branch", "--list", glob, "--format=%(refname:short)"], "branch --list")
-    .split("\n")
-    .map((b) => b.trim())
-    .filter((b) => b !== "");
-  branchList.set(key, { at: now, branches });
-  return branches;
+  if (hit !== undefined && now - hit.at < BRANCH_TTL_MS) {
+    if (hit.branches !== undefined) return hit.branches;
+    // A FAILURE IS CACHED TOO (profiled 2026-08-02): a root with no
+    // repository failed this spawn dozens of times per walk — half a
+    // second of every booted suite walk — because only successes were
+    // remembered.
+    throw hit.failure;
+  }
+  try {
+    const branches = git(root, ["branch", "--list", glob, "--format=%(refname:short)"], "branch --list")
+      .split("\n")
+      .map((b) => b.trim())
+      .filter((b) => b !== "");
+    branchList.set(key, { at: now, branches });
+    return branches;
+  } catch (e) {
+    if (e instanceof Rejection) branchList.set(key, { at: now, failure: e });
+    throw e;
+  }
 }
 
 /** Open = the worktree exists. Closed (archive) = branch exp/* without one. */
