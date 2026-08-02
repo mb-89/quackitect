@@ -237,3 +237,5 @@
 {"ts":"2026-08-02T16:26:50.553Z","op":"update","visit":"expeditions/e31@1","node":"d245","brief":"waiting on the battery"}
 {"ts":"2026-08-02T16:26:57.019Z","op":"update","visit":"expeditions/e31@1","node":"d246","brief":"waiting on the battery"}
 {"ts":"2026-08-02T16:27:03.868Z","op":"update","visit":"expeditions/e31@1","node":"d247","brief":"waiting on the battery"}
+{"ts":"2026-08-02T16:27:48.733Z","op":"update","visit":"expeditions/e31@1","node":"d248","brief":"seeing what stands uncommitted on trunk"}
+{"ts":"2026-08-02T16:28:08.535Z","op":"update","visit":"expeditions/e31@1","node":"d249","brief":"the other agent's parcel is committed on trunk"}
