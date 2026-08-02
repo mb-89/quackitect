@@ -18,8 +18,11 @@
     ]
   },
   "env": {
-    "MAX_MCP_OUTPUT_TOKENS": "100000"
+    "MAX_MCP_OUTPUT_TOKENS": "100000",
+    "MAX_THINKING_TOKENS": "31999"
   },
+  "alwaysThinkingEnabled": true,
+  "outputStyle": "voice",
   "enableAllProjectMcpServers": true,
   "hooks": {
     "PostToolUse": [

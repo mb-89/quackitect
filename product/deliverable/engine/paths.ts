@@ -98,11 +98,18 @@ export function resolveInRoot(root: string, p: string, source: string): string {
   const abs = isAbsolute(p) ? p : resolve(root, p);
   const rel = relative(resolve(root), abs);
   if (rel === "" || (!rel.startsWith("..") && !isAbsolute(rel))) return abs;
+  // A REFUSAL NAMES THE DOOR. The measured driver for reaching outside the
+  // root is the v1/v2 sibling checkout, and both ways in already exist — the
+  // caller just has no reason to know them at the moment they are refused.
   throw new Rejection({
     clause: CLAUSES.PATH_ESCAPE,
     expected: "a path inside the project root (root-relative, e.g. product/spec/x.md)",
     got: p,
-    remedy: { tool: "se_file_list", args: { dir: "." }, note: "list the root to see what exists" },
+    remedy: {
+      tool: "se_file_list",
+      args: { dir: "." },
+      note: "two doors lead outside, and neither is a path. PAST VERSIONS of this repo are read at a committed ref: se_file_read / se_file_search / se_file_glob all take ref (main reaches v1, v2 reaches v2). ANOTHER FOLDER entirely belongs in .se/roots.json as a declared, read-only root, reachable as @name/rest — ask the owner before declaring one.",
+    },
     source,
   });
 }

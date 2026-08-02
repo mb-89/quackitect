@@ -35,6 +35,28 @@ that one when you touch what it covers.
 - REFERENCE, NEVER COPY. Point at the one place the fact lives: a path, a condition note, a guidance file. A comment that restates what another file says has FORKED the truth, and only one fork ever gets updated.
 - The test of a comment is whether it can go stale. If the code changing would make it wrong, and nothing would fail, delete it or turn it into a check.
 
+## Guards that teach
+
+A guard exists to move the work on, never to prove a rule. These four came
+out of one day of measuring what the lane actually cost its callers.
+
+- CORRECT WHAT IS MECHANICAL. ANNOUNCE WHAT YOU CORRECTED. REFUSE ONLY THE
+  AMBIGUOUS (owner ruling 2026-08-02). A refusal over a difference nobody
+  can see on screen spends a round and teaches nothing. A silent correction
+  teaches nothing either. Do it, and say what you did.
+- ONE TABLE, THREE OUTPUTS. Where a rule is enforced, the warning it prints
+  and the tool description that announces it all generate from ONE table.
+  Feed-forward and feedback cannot drift apart if there is nothing to drift
+  between.
+- SHIP AT WARN, BLOCK ON EVIDENCE. A new guard warns first. It only starts
+  refusing once the log shows its warn rate near zero AND the lane
+  demonstrably serves the job it is fencing off. A guard that blocks work
+  the lane cannot yet do is a trap.
+- THE AGENT THINKS ABOUT THE WORK. THE ENGINE THINKS ABOUT THE BOOKKEEPING.
+  Every protocol element that spends the agent's attention on something the
+  engine could carry is a defect with a deadline. The reading loop, the
+  update ruling and the auto-corrections are all this law being applied.
+
 ## Dated guidance
 
 This applies to every citation, and to your own instincts.
@@ -101,6 +123,22 @@ So the rules:
 And the suite is not one thing. BOOT runs a SMOKE test — seconds, proving
 the engine loads and answers. The full battery proves behaviour, and that
 question belongs to validation, at the end of a piece of work.
+
+THE BATTERY IS THE EXCEPTION, NOT THE HABIT (owner ruling 2026-08-02).
+Measured: about sixty full runs in one two-hour session, each piped to a temp
+file and grepped for a single failure.
+
+- SCOPED IS THE DEFAULT. Name the files the change touches. The result
+  carries the counts and only the failures' detail.
+- THE BATTERY IS EARNED. It runs when a change maps to no test file, when
+  the last one was red, when there is no memory of one, or on demand for a
+  flake hunt.
+- PAST ROUGHLY A THIRD OF THE SUITE PIECEMEAL, THE ECONOMICS FLIP and the
+  battery becomes the cheaper, sanctioned call. Approximating the battery
+  is what makes the battery legal, so gaming the scope never pays.
+- TEST TO ANSWER A QUESTION, NOT TO REASSURE YOURSELF. In most cases the
+  change broke nothing, and a green run you already expected bought you
+  nothing but the wall clock.
 
 ## Where things live
 

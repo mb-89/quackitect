@@ -44,3 +44,17 @@
 {"ts":"2026-08-02T14:39:57.695Z","op":"update","visit":"expeditions/e31@1","node":"d62","brief":"re-running the patch guards"}
 {"ts":"2026-08-02T14:41:17.524Z","op":"update","visit":"expeditions/e31@1","node":"d63","brief":"the test needed the reader it uses"}
 {"ts":"2026-08-02T14:41:45.140Z","op":"update","visit":"expeditions/e31@1","node":"d64","brief":"patch guards again"}
+{"ts":"2026-08-02T14:43:33.407Z","op":"done","visit":"expeditions/e31@1","node":"d23","brief":"product is the opened folder now"}
+{"ts":"2026-08-02T14:44:54.267Z","op":"update","visit":"expeditions/e31@1","node":"d65","brief":"the engine-design rulings land in software.md"}
+{"ts":"2026-08-02T14:46:09.789Z","op":"update","visit":"expeditions/e31@1","node":"d66","brief":"the rulings land in software, voice and the contract"}
+{"ts":"2026-08-02T14:46:37.115Z","op":"done","visit":"expeditions/e31@1","node":"d26","brief":"five rulings into guidance, the sixth into a note"}
+{"ts":"2026-08-02T14:47:08.430Z","op":"done","visit":"expeditions/e31@1","node":"d38","brief":"the map leak is a retro measurement, not a guess"}
+{"ts":"2026-08-02T14:47:35.751Z","op":"done","visit":"expeditions/e31@1","node":"d39","brief":"carried in the same note as the map leak"}
+{"ts":"2026-08-02T14:48:00.625Z","op":"update","visit":"expeditions/e31@1","node":"d67","brief":"the style is generated from voice.md at activation"}
+{"ts":"2026-08-02T14:48:18.161Z","op":"update","visit":"expeditions/e31@1","node":"d68","brief":"syntax-checking the extension and the cage json"}
+{"ts":"2026-08-02T14:50:48.827Z","op":"done","visit":"expeditions/e31@1","node":"d30","brief":"the path refusal names both doors out"}
+{"ts":"2026-08-02T14:50:56.669Z","op":"update","visit":"expeditions/e31@1","node":"d69","brief":"finding where i1's record keeps its inputs"}
+{"ts":"2026-08-02T14:51:26.854Z","op":"done","visit":"expeditions/e31@1","node":"d36","brief":"i1-prep sits in the spec where it is findable"}
+{"ts":"2026-08-02T14:51:42.199Z","op":"done","visit":"expeditions/e31@1","node":"d28","brief":"the two settings are in the cage, the model pin is not"}
+{"ts":"2026-08-02T14:52:02.673Z","op":"done","visit":"expeditions/e31@1","node":"d35","brief":"the stance rule rides voice.md into the style"}
+{"ts":"2026-08-02T14:52:10.443Z","op":"done","visit":"expeditions/e31@1","node":"d29","brief":"se-terse is mined into voice.md and gone"}

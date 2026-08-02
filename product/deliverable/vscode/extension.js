@@ -24,7 +24,7 @@
 const vscode = require("vscode");
 const { spawn, spawnSync } = require("node:child_process");
 const keys = require("./keys.js");
-const { appendFileSync, copyFileSync, existsSync, mkdirSync, readFileSync, statSync } = require("node:fs");
+const { appendFileSync, copyFileSync, existsSync, mkdirSync, readFileSync, statSync, writeFileSync } = require("node:fs");
 const path = require("node:path");
 
 const PORT = 7333;
@@ -180,8 +180,31 @@ function placeConfigs(root) {
   // AGENT MODE READS ITS ORDERS FROM .github. Without this the VS Code agent
   // gets no first action, no tool activation and no serial-read rule — which
   // is exactly how a fresh machine looks like it is broken.
-  place("vscode-instructions.md", path.join(ws, ".github"), "copilot-instructions.md");
-  place("claude-settings.json", path.join(ws, ".claude"), "settings.json"); // the cage
+  place("vscode-instructions.md", path.join(opened, ".github"), "copilot-instructions.md");
+  place("claude-settings.json", path.join(opened, ".claude"), "settings.json"); // the cage
+  placeVoiceStyle(root, opened);
+}
+
+// VOICE IS ONE FILE, AND THE OUTPUT STYLE IS A PROJECTION OF IT (owner ruling
+// 2026-08-02). Nothing is authored here. The style is rewritten from
+// guidance/voice.md on every activation, so it cannot drift, and a rule that
+// exists only in the style file is a defect.
+//
+// It is an EXTRA door for one host, never a replacement for the one every host
+// uses: Copilot and anything else read voice.md through the lane, because the
+// pull hands it over during boot and demands the reading proof.
+function placeVoiceStyle(root, opened) {
+  try {
+    const voice = readFileSync(path.join(root, "product", "guidance", "voice.md"), "utf8");
+    const dir = path.join(opened, ".claude", "output-styles");
+    mkdirSync(dir, { recursive: true });
+    const head = ["---", "name: voice", "description: Generated from product/guidance/voice.md. Edit that file, never this one.", "---", ""].join("\n");
+    writeFileSync(path.join(dir, "voice.md"), head + "\n" + voice, "utf8");
+  } catch (e) {
+    // The style is a convenience. A missing or unreadable voice.md must never
+    // stop the cage itself from being placed.
+    trace("voice style not placed: " + String(e && e.message));
+  }
 }
 
 /**

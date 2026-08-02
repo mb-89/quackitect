@@ -55,6 +55,14 @@ readings" — take the one they plainly meant, note the other, keep going.
 This rule and rule 5 meet at the START of work, not in the middle. Confirm an
 ambiguous intent BEFORE you begin. Once you have begun, carry on.
 
+THE ONLY SANCTIONED STOP IS THE MACHINE'S OWN (owner ruling 2026-08-02). A
+threshold above the slider, a gate, or idle. Stopping anywhere else to ask is
+an unsanctioned stop, and the engine cannot see it — it happens in chat, where
+nothing counts it.
+
+Unsure mid-walk? File a note and KEEP WALKING. The retro and the front desk are
+where a doubt gets discussed. The middle of the work is not.
+
 ## 7. The repo is the memory
 Do not write to the assistant's private memory. It lives outside the
 system; nothing here reads or checks it. Durable knowledge goes where the
