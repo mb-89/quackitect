@@ -182,28 +182,37 @@ function placeConfigs(root) {
   // is exactly how a fresh machine looks like it is broken.
   place("vscode-instructions.md", path.join(opened, ".github"), "copilot-instructions.md");
   place("claude-settings.json", path.join(opened, ".claude"), "settings.json"); // the cage
-  placeVoiceStyle(root, opened);
+  placeVoiceProjections(root, opened);
 }
 
-// VOICE IS ONE FILE, AND THE OUTPUT STYLE IS A PROJECTION OF IT (owner ruling
-// 2026-08-02). Nothing is authored here. The style is rewritten from
-// guidance/voice.md on every activation, so it cannot drift, and a rule that
-// exists only in the style file is a defect.
+// VOICE IS ONE FILE, AND EVERY PROMPT LAYER IS A PROJECTION OF IT (owner
+// ruling 2026-08-02). Nothing is authored in a projection. They are rewritten
+// from guidance/voice.md on every activation, so they cannot drift, and a rule
+// that exists only in a projection is a defect.
 //
-// It is an EXTRA door for one host, never a replacement for the one every host
-// uses: Copilot and anything else read voice.md through the lane, because the
-// pull hands it over during boot and demands the reading proof.
-function placeVoiceStyle(root, opened) {
+// TWO HOSTS, TWO SHAPES, ONE SOURCE. Claude Code takes an output style, which
+// replaces part of its system prompt. Copilot takes an instructions file, and
+// applyTo: '**' is what makes it apply to everything rather than to a file
+// type. The owner's colleagues use Copilot, so leaving it out would make the
+// voice a Claude-only rule.
+//
+// These are EXTRA doors, never a replacement for the one every host uses: the
+// pull hands voice.md over during boot and demands the reading proof, whatever
+// is driving.
+function placeVoiceProjections(root, opened) {
+  const write = (dir, name, head, body) => {
+    mkdirSync(dir, { recursive: true });
+    writeFileSync(path.join(dir, name), head.join("\n") + "\n\n" + body, "utf8");
+  };
+  const GENERATED = "description: Generated from product/guidance/voice.md. Edit that file, never this one.";
   try {
     const voice = readFileSync(path.join(root, "product", "guidance", "voice.md"), "utf8");
-    const dir = path.join(opened, ".claude", "output-styles");
-    mkdirSync(dir, { recursive: true });
-    const head = ["---", "name: voice", "description: Generated from product/guidance/voice.md. Edit that file, never this one.", "---", ""].join("\n");
-    writeFileSync(path.join(dir, "voice.md"), head + "\n" + voice, "utf8");
+    write(path.join(opened, ".claude", "output-styles"), "voice.md", ["---", "name: voice", GENERATED, "---"], voice);
+    write(path.join(opened, ".github", "instructions"), "voice.instructions.md", ["---", "name: voice", GENERATED, "applyTo: '**'", "---"], voice);
   } catch (e) {
-    // The style is a convenience. A missing or unreadable voice.md must never
-    // stop the cage itself from being placed.
-    trace("voice style not placed: " + String(e && e.message));
+    // A projection is a convenience. A missing or unreadable voice.md must
+    // never stop the cage itself from being placed.
+    trace("voice projections not placed: " + String(e && e.message));
   }
 }
 

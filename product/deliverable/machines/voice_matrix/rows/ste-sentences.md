@@ -33,3 +33,18 @@ fragment rather than a sentence.
 A refusal is read under load by someone whose walk just stopped. It is the
 strongest case for active voice and a simple tense in the whole system.
 `review` rather than `write` only because tense detection needs a tagger.
+
+## guidance
+
+THE HARDEST BINDING IN THE ROW, deliberately. State guidance and tool
+descriptions are read on every visit, by every agent, forever. A tense that
+makes a reader pause here is paid for thousands of times.
+
+It stays at `review` rather than `write` for one mechanical reason. This row
+is tier two, so the cell waits on a part-of-speech tagger. The word cap is
+tier one and could refuse at the write today, but a cell carries ONE word, so
+moving it would drag the tagger checks to the write with it.
+
+SPLITTING THE COUNTABLE HALF into its own tier-one row is what would let the
+cap refuse immediately. Worth doing when the cap is what keeps being broken.
+Not worth a second row before then.
