@@ -805,9 +805,39 @@ export class Session {
     }
     const result = expClose(this.root, this.bound, merge, override);
     this.unbind();
+    // THE CLOSE DELETES THE STATE THE WALK STANDS ON. Archiving the record
+    // takes its states out of the drawing, and a walk left on one can route
+    // nowhere: its only exit is the escape hatch, which records a step-out
+    // the walk never earned. Whoever removes the ground says where the walk
+    // goes, so the close moves it to the hop the leave state's own edge
+    // names — the container's end.
+    const top = this.top();
+    let moved: string | undefined;
+    if (top !== undefined) {
+      // WALK IT OUT, never assign the position. The drawing counts fired
+      // edges, so an end arrived at without them is a join still waiting.
+      // The sub holds the drawing the walk entered with, which is the one
+      // that still knows the way out of the record being archived.
+      const end = top.decl.states.find((s) => s.kind === "end");
+      const now = new Date().toISOString();
+      try {
+        for (let hop = 0; end !== undefined && hop < 4; hop++) {
+          const at = activeStates(top.instance)[0];
+          if (at === undefined || at === end.id) break;
+          this.completeGuarded(top.decl, top.instance, at, "filled", now);
+        }
+        const landed = activeStates(top.instance)[0];
+        if (landed !== undefined && landed === end?.id) moved = this.qualHere(landed);
+      } catch {
+        // The close stands whatever the walk does. A record that archived and
+        // then reported a failure would read as one that did not archive.
+      }
+      this.notifyChange();
+    }
     return {
       ...result,
       note: merge ? "applied — merged to trunk, archived" : "dismissed — archived unmerged",
+      ...(moved === undefined ? {} : { moved_to: moved, moved_note: "the record's states are archived, so the walk stands at the container's end" }),
       ...(result.override === undefined ? {} : { override_note: "the report was NOT confirmed by a person — this close is recorded as an override on the record" }),
     };
   }
@@ -1496,21 +1526,49 @@ export class Session {
   private pullOptions(): Record<string, unknown>[] {
     const { machine, ids } = this.leaves();
     const out: Record<string, unknown>[] = [];
+    const door = (decl: MachineDecl, t: StateDecl, to: string, role: string): Record<string, unknown> => {
+      const open = this.conditionMet(decl, t, "enter");
+      const overWeight = t.priority > this._autonomy;
+      return {
+        to,
+        role,
+        ...(t.statement !== "" ? { statement: t.statement } : {}),
+        priority: t.priority,
+        open: open && !overWeight,
+        ...(overWeight ? { needs: `the person — ${t.priority} is above the session autonomy ${this._autonomy}` } : {}),
+        ...(open ? {} : { blocked_by: Object.keys(this.conditionStatus(decl, t, "enter")) }),
+      };
+    };
     for (const id of ids) {
+      // THE OFFER AND THE CHECK READ ONE GRAPH. A sub holds the drawing the
+      // walk entered with; the router re-derives it live. Archiving a record
+      // takes its states out of the live one, so an offer built from the held
+      // copy names doors the router then refuses, and the walk is stranded
+      // with no legal move left (found live 2026-08-02, closing e31).
+      const node = this.expandNode(this.qualHere(id));
+      if (node === undefined) continue;
+      const walkable = new Set<string>();
+      const pops: string[] = [];
+      for (const n of node.nexts) {
+        const tick = n.tick as { to?: unknown; advance?: unknown };
+        if (typeof tick.to === "string") walkable.add(tick.to);
+        else if (tick.advance === true) pops.push(n.to);
+      }
       for (const e of this.state(machine, id).edges) {
+        if (!walkable.has(e.to)) continue;
         const t = machine.states.find((x) => x.id === e.to);
         if (t === undefined) continue;
-        const open = this.conditionMet(machine, t, "enter");
-        const overWeight = t.priority > this._autonomy;
-        out.push({
-          to: this.qualHere(e.to),
-          role: e.role,
-          ...(t.statement !== "" ? { statement: t.statement } : {}),
-          priority: t.priority,
-          open: open && !overWeight,
-          ...(overWeight ? { needs: `the person — ${t.priority} is above the session autonomy ${this._autonomy}` } : {}),
-          ...(open ? {} : { blocked_by: Object.keys(this.conditionStatus(machine, t, "enter")) }),
-        });
+        out.push(door(machine, t, this.qualHere(e.to), e.role));
+      }
+      // STANDING ON A SUB'S END, the way on is OUT of it, and the router
+      // walks exactly that. Left out of the offer it reads as no work left,
+      // when the container has merely finished.
+      for (const q of pops) {
+        const cut = q.lastIndexOf("/");
+        const decl = this.declForPrefix(cut < 0 ? "" : q.slice(0, cut));
+        const t = decl?.states.find((s) => s.id === (cut < 0 ? q : q.slice(cut + 1)));
+        if (decl === undefined || t === undefined) continue;
+        out.push(door(decl, t, q, "return"));
       }
     }
     return out;

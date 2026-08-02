@@ -142,8 +142,10 @@ test("seeded container: expeditions are the states, entering BINDS, one ending c
   // itself is tested in editsafety.test.ts — this one is about the archive.
   s.formDone("expedition-leave", "human");
   await s.advance(`${sidB}-leave`);
-  s.expeditionClose(true);
-  await s.advance();
+  // THE CLOSE MOVES THE WALK ITSELF. Archiving takes the record's states out
+  // of the drawing, so whoever removes the ground says where the walk goes.
+  const closed = s.expeditionClose(true);
+  assert.equal(closed.moved_to, "expeditions/end", "the close says where it put the walk");
   assert.deepEqual(s.active(), ["expeditions/end"]);
   await s.advance();
   assert.deepEqual(s.active(), ["idle"], "one expedition coming home completes the container");
@@ -153,6 +155,37 @@ test("seeded container: expeditions are the states, entering BINDS, one ending c
   assert.deepEqual(s.viewRun("expeditions").done, []);
   const again = s.generatedView("expeditions")!;
   assert.deepEqual(again.decl.states.map((x) => x.id), ["start", sidA, `${sidA}-leave`, "end"]);
+});
+
+// THE OFFER AND THE CHECK READ ONE GRAPH. The pull built its doors from the
+// drawing the walk entered with, while the router re-derives it live. Closing
+// a record made the two disagree: the pull kept offering a door, and every
+// answer to it came back refused as undrawn, with the escape hatch the only
+// way out (found live 2026-08-02, closing e31).
+test("a closed record leaves no phantom door: what the pull offers, the walk can take", async () => {
+  const root = freshRoot();
+  gitSeed(root);
+  const s = new Session(root);
+  await bootHuman(s);
+  const e = s.expeditionNew("fix", "Only Thing") as { created: string };
+  const sid = shortId(e.created);
+  await s.advance("expeditions");
+  await s.advance(sid);
+  s.formSave("expedition-leave", { "What was the goal": "one thing", "What was done": "it", "What settled it": "this test", "What was not done": "nothing" });
+  s.formDone("expedition-leave", "human");
+  await s.advance(`${sid}-leave`);
+  s.expeditionClose(true);
+
+  s.setAutonomy(1);
+  s.setTarget("");
+  const r = (await s.pull()) as Record<string, unknown>;
+  assert.equal(r.pull, "choose", "the container's end is a door, not a dead end");
+  const options = r.options as Record<string, unknown>[];
+  assert.ok(options.length > 0, "an end inside a container can always be left");
+  assert.equal(options.some((o) => String(o.to).includes(sid)), false, "the archived record is gone from the offer");
+  // The proof of the law: taking an offered door is never refused.
+  const pick = options.find((o) => o.open === true) ?? options[0];
+  await s.pull({ form: { choice: String(pick.to) } });
 });
 
 test("the archive: start reaches every closed expedition, each runs to end, browsing is human-only", async () => {
