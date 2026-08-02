@@ -189,3 +189,20 @@
 {"ts":"2026-08-01T18:53:34.324Z","op":"update","visit":"expeditions/e30@0","node":"d215","brief":"Checking how long the battery has actually run"}
 {"ts":"2026-08-01T18:53:43.194Z","op":"update","visit":"expeditions/e30@0","node":"d216","brief":"Polling the battery job directly"}
 {"ts":"2026-08-01T18:54:05.964Z","op":"update","visit":"expeditions/e30@0","node":"d217","brief":"Battery green at 654; staging e30 to land"}
+{"ts":"2026-08-01T18:54:37.157Z","op":"update","visit":"expeditions/e30@0","node":"d218","brief":"Committing e30 with the mirror fix"}
+{"ts":"2026-08-01T18:54:44.658Z","op":"update","visit":"expeditions/e30@0","node":"d219","brief":"Landing e30 to repair the mirror on trunk"}
+{"ts":"2026-08-01T18:54:59.493Z","op":"update","visit":"expeditions/e30@0","node":"d220","brief":"Committing the owner's review before the merge"}
+{"ts":"2026-08-01T18:55:05.611Z","op":"update","visit":"expeditions/e30@0","node":"d221","brief":"Landing e30 now that trunk is clean"}
+{"ts":"2026-08-01T18:55:29.843Z","op":"update","visit":"expeditions/e30@0","node":"d222","brief":"Verifying the mirror fix reached trunk"}
+{"ts":"2026-08-01T18:55:40.966Z","op":"done","visit":"expeditions/e30@0","node":"d49","brief":"e30 landed on trunk, battery green at 654"}
+{"ts":"2026-08-02T09:38:40.909Z","op":"update","visit":"expeditions/e30@0","node":"d2","brief":"Probing what the close still demands before writing the leave report"}
+{"ts":"2026-08-02T09:38:59.872Z","op":"plan","visit":"expeditions/e30@0","parent":null,"nodes":[{"id":"d3","brief":"Resolve the open decision points the leave lint will hold against"},{"id":"d4","brief":"Write the leave report prefill for the owner to confirm"}]}
+{"ts":"2026-08-02T09:39:23.064Z","op":"update","visit":"expeditions/e30@0","node":"d5","brief":"d47 confirmed built: derived fields are filtered out of the packet"}
+{"ts":"2026-08-02T09:40:15.794Z","op":"update","visit":"expeditions/e30@0","node":"d6","brief":"The leave lint cannot see these points — visit prefix mismatch, noted"}
+{"ts":"2026-08-02T09:40:37.550Z","op":"done","visit":"expeditions/e30@0","node":"d3","brief":"Cannot be resolved from this session: prior visits' nodes are not in the live graph"}
+{"ts":"2026-08-02T09:41:48.174Z","op":"update","visit":"expeditions/e30@0","node":"d7","brief":"se_test timed out inline; running the battery in the background instead"}
+{"ts":"2026-08-02T09:42:08.910Z","op":"update","visit":"expeditions/e30@0","node":"d8","brief":"Battery started in the background so the report can cite a real number"}
+{"ts":"2026-08-02T09:44:28.089Z","op":"done","visit":"expeditions/e30@0","node":"d4","brief":"report.md written as an inert prefill, five sections for the owner to confirm"}
+{"ts":"2026-08-02T09:44:48.096Z","op":"update","visit":"expeditions/e30@0","node":"d9","brief":"Running the form lint directly to prove the report parses as intended"}
+{"ts":"2026-08-02T09:47:24.152Z","op":"plan","visit":"expeditions/e30@0","parent":null,"nodes":[{"id":"d10","brief":"Sync trunk into the expedition worktree"},{"id":"d11","brief":"Read v2 sections 5, 6 and 12 plus v3-plan.md M1b"},{"id":"d12","brief":"Design the pull lane against that prior art"},{"id":"d13","brief":"Build the pull verb"},{"id":"d14","brief":"Amend the leave report"}]}
+{"ts":"2026-08-02T09:47:31.027Z","op":"plan","visit":"expeditions/e30@0","parent":null,"nodes":[]}
