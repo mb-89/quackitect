@@ -173,3 +173,30 @@
 {"ts":"2026-08-02T15:58:55.642Z","op":"plan","visit":"expeditions/e31@1","parent":null,"nodes":[{"id":"d172","brief":"clear the four loose files off the top level"},{"id":"d173","brief":"rename product to project everywhere"},{"id":"d174","brief":"re-verify and place the prompt layer"},{"id":"d175","brief":"merge the expedition to trunk"}]}
 {"ts":"2026-08-02T15:59:28.470Z","op":"done","visit":"expeditions/e31@1","node":"d172","brief":"the top level is five folders"}
 {"ts":"2026-08-02T15:59:35.258Z","op":"update","visit":"expeditions/e31@1","node":"d176","brief":"renaming the folder and sweeping every reference"}
+{"ts":"2026-08-02T16:03:18.697Z","op":"update","visit":"expeditions/e31@1","node":"d184","brief":"polling the battery again"}
+{"ts":"2026-08-02T16:03:37.914Z","op":"update","visit":"expeditions/e31@1","node":"d185","brief":"killing the buffered run for a plain one"}
+{"ts":"2026-08-02T16:03:48.643Z","op":"update","visit":"expeditions/e31@1","node":"d186","brief":"plain battery in the background"}
+{"ts":"2026-08-02T16:06:31.261Z","op":"update","visit":"expeditions/e31@1","node":"d187","brief":"getting the current red list"}
+{"ts":"2026-08-02T16:06:51.687Z","op":"update","visit":"expeditions/e31@1","node":"d188","brief":"the sweep renamed the change size, not just the folder"}
+{"ts":"2026-08-02T16:07:30.187Z","op":"update","visit":"expeditions/e31@1","node":"d189","brief":"the largest change size is product, not project"}
+{"ts":"2026-08-02T16:07:39.344Z","op":"update","visit":"expeditions/e31@1","node":"d190","brief":"re-running the matrix suites"}
+{"ts":"2026-08-02T16:08:19.058Z","op":"update","visit":"expeditions/e31@1","node":"d191","brief":"finding project used as a size in tests"}
+{"ts":"2026-08-02T16:08:32.855Z","op":"update","visit":"expeditions/e31@1","node":"d192","brief":"the size is product in the tests too"}
+{"ts":"2026-08-02T16:08:40.451Z","op":"update","visit":"expeditions/e31@1","node":"d193","brief":"full battery after the size repair"}
+{"ts":"2026-08-02T16:09:30.460Z","op":"update","visit":"expeditions/e31@1","node":"d194","brief":"tickAdvance becomes advance, tickInfo becomes packet"}
+{"ts":"2026-08-02T16:09:41.100Z","op":"update","visit":"expeditions/e31@1","node":"d195","brief":"tickAdvance becomes advance, tickInfo becomes packet"}
+{"ts":"2026-08-02T16:10:07.610Z","op":"update","visit":"expeditions/e31@1","node":"d196","brief":"the retired jump-back case guards what survives"}
+{"ts":"2026-08-02T16:10:16.446Z","op":"update","visit":"expeditions/e31@1","node":"d197","brief":"the six suites that carried the tick leftovers"}
+{"ts":"2026-08-02T16:11:03.926Z","op":"update","visit":"expeditions/e31@1","node":"d198","brief":"locating the promoted-doc assertions"}
+{"ts":"2026-08-02T16:11:17.689Z","op":"update","visit":"expeditions/e31@1","node":"d199","brief":"reading the test suite's boot-core list"}
+{"ts":"2026-08-02T16:11:33.061Z","op":"update","visit":"expeditions/e31@1","node":"d200","brief":"AGENTS.md leaves the suite's read list too"}
+{"ts":"2026-08-02T16:11:43.162Z","op":"update","visit":"expeditions/e31@1","node":"d201","brief":"the six suites again"}
+{"ts":"2026-08-02T16:12:23.562Z","op":"update","visit":"expeditions/e31@1","node":"d202","brief":"getting the four failures' detail"}
+{"ts":"2026-08-02T16:13:07.286Z","op":"update","visit":"expeditions/e31@1","node":"d203","brief":"reading the two remaining reads cases"}
+{"ts":"2026-08-02T16:13:38.557Z","op":"update","visit":"expeditions/e31@1","node":"d204","brief":"reading the pill case's second half"}
+{"ts":"2026-08-02T16:14:05.102Z","op":"update","visit":"expeditions/e31@1","node":"d205","brief":"the answer rides back from readOne too"}
+{"ts":"2026-08-02T16:14:22.647Z","op":"update","visit":"expeditions/e31@1","node":"d206","brief":"seeing what the tick-route test actually calls"}
+{"ts":"2026-08-02T16:15:08.952Z","op":"update","visit":"expeditions/e31@1","node":"d207","brief":"the tick route proves what it can prove"}
+{"ts":"2026-08-02T16:15:24.309Z","op":"update","visit":"expeditions/e31@1","node":"d208","brief":"the router gap is filed, not half-fixed"}
+{"ts":"2026-08-02T16:15:32.041Z","op":"update","visit":"expeditions/e31@1","node":"d209","brief":"the whole battery"}
+{"ts":"2026-08-02T16:16:43.241Z","op":"update","visit":"expeditions/e31@1","node":"d210","brief":"battery in the background"}

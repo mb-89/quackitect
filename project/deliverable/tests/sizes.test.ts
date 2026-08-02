@@ -34,7 +34,7 @@ describe("the sizes are not the same walk", () => {
   // The one the prep document got wrong.
   test("product and major share a state set and share no guidance", () => {
     const major = compiled.get("major")!;
-    const product = compiled.get("project")!;
+    const product = compiled.get("product")!;
     assert.deepEqual(major.states.map((s) => s.id), product.states.map((s) => s.id), "the same steps");
     const differing = major.states.filter((s, i) => s.guidance !== product.states[i].guidance);
     assert.equal(differing.length, major.states.length, "and every one of them instructs differently");
@@ -60,7 +60,7 @@ describe("the front is heavier at product, and that is the whole difference", ()
     test(`${step} applies in full at product and is tailored or inherited below it`, () => {
       const cells = mx.cells.get(step);
       assert.ok(cells !== undefined, `${step} is a row`);
-      assert.equal(cells.get("project")?.applies, "full", "product authors it for the whole product");
+      assert.equal(cells.get("product")?.applies, "full", "product authors it for the whole product");
       assert.notEqual(cells.get("major")?.applies, "full", "major does not re-author the product's vision");
       assert.equal(cells.get("minor")?.applies, "inherit", "minor takes it by pointer");
       assert.equal(cells.get("patch")?.applies, "none", "a patch never touches it");
@@ -70,7 +70,7 @@ describe("the front is heavier at product, and that is the whole difference", ()
   test("product outranks major only on front steps", () => {
     const rank: Record<string, number> = { none: 0, inherit: 1, tailored: 2, full: 3 };
     const outranks = mx.rows
-      .filter((r) => (rank[mx.cells.get(r.name)?.get("project")?.applies ?? ""] ?? 0) > (rank[mx.cells.get(r.name)?.get("major")?.applies ?? ""] ?? 0))
+      .filter((r) => (rank[mx.cells.get(r.name)?.get("product")?.applies ?? ""] ?? 0) > (rank[mx.cells.get(r.name)?.get("major")?.applies ?? ""] ?? 0))
       .map((r) => r.name);
     assert.ok(outranks.length > 0, "product outranks major somewhere, or the size means nothing");
     const FRONT_PREFIXES = ["draft-", "define-", "map-", "write-", "frame-", "scope-", "pressure-", "log-risks", "generalize-", "draw-", "gate-motivation", "gate-inputs"];

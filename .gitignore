@@ -21,3 +21,5 @@ product/.claude/output-styles/
 product/.copilot/
 product/.github/
 product/.claude/output-styles/voice.md
+# the temporary product -> project junction, alive only until the engine reloads
+/product

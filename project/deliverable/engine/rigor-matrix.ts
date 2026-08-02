@@ -19,7 +19,10 @@ export const EVIDENCE_TYPES: EvidenceType[] = ["claim", "table", "prose", "list"
 
 // specification is not a rigor level: it says how a step's output becomes
 // documentation. It is read and validated like any column, never pinned.
-export const CHANGE_COLUMNS = ["patch", "minor", "major", "project"] as const;
+// THE LARGEST CHANGE SIZE IS "product", and it is a VOCABULARY word, not the
+// folder. The folder rename swept it by accident and took 54 tests with it:
+// the columns stopped matching the frontmatter keys the rows actually carry.
+export const CHANGE_COLUMNS = ["patch", "minor", "major", "product"] as const;
 export const ALL_COLUMNS = [...CHANGE_COLUMNS, "specification"] as const;
 export type ChangeColumn = (typeof CHANGE_COLUMNS)[number];
 export type RigorMatrixColumn = (typeof ALL_COLUMNS)[number];

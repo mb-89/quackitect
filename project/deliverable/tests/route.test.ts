@@ -80,7 +80,9 @@ test("the route collects every judgment and every document up front", () => {
   // EVERY doc the whole way demands, gathered once - this is what lets a
   // sweep be one call. Exit conditions count: most of the boot lane's
   // reads are demanded on the way OUT of a state, not into it.
-  assert.ok(clear.reads.includes("project/AGENTS.md"), "an exit-condition read is collected");
+  // AGENTS.md was an exit-condition read until it was promoted. What the
+  // route still collects is the root guidance every packet pulls.
+  assert.ok(clear.reads.includes("project/guidance/contract.md"), "a pulled guidance read is collected");
   assert.ok(clear.reads.includes("project/guidance/method/front-desk.md"), "and guidance the target PULLS, which no condition names");
   // Lowered, every hop needing a person is listed - not just the first, so
   // they can all be answered in one sitting.
@@ -99,7 +101,11 @@ test("the sweep walks the whole way in one call, and every guard still fires", a
   assert.equal(short.arrived, false, "the read proof is not waived by sweeping");
   assert.equal((short.refusal as { clause: string }).clause, "SE-C-112");
   assert.ok((short.swept as string[]).length > 0, "and the hops it DID make stand");
-  assert.deepEqual(s.active(), ["boot/read_contract"], "the walk stands where it got to, never rolled back");
+  // It reaches boot/end now: read_contract owes nothing since the promotion,
+  // so the gate that stops the sweep is the root guidance prepare_idle pulls.
+  // The stop moved one state on; that it STOPS, and stands where it got to,
+  // is what this guards.
+  assert.deepEqual(s.active(), ["boot/end"], "the walk stands where it got to, never rolled back");
   // WITH the reading earned through the loop, the same call arrives.
   await readEverything(s);
   const done = await s.sweep("front_desk", "agent");

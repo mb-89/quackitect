@@ -186,11 +186,14 @@ export async function call(server: Server, name: string, args: Record<string, un
   return { isError: r.isError, body: JSON.parse(r.content[0].text) as Record<string, unknown> };
 }
 
-/** The boot read list + the root guidance the pull demands at entry.
- *  Anything sitting directly in project/guidance/ is pulled ALWAYS, so a
- *  new document there joins this list or every walk in the suite stalls. */
+/** The root guidance the pull demands at entry. Anything sitting DIRECTLY in
+ *  project/guidance/ is pulled ALWAYS, so a new document there joins this
+ *  list or every walk in the suite stalls. That is also why a promoted file
+ *  moves to a subfolder rather than staying at the root.
+ *
+ *  AGENTS.md LEFT THIS LIST when it was promoted to the prompt layer: it is
+ *  generated now, present on every turn, and boot no longer reads it. */
 export const READ_DOCS = [
-  "project/AGENTS.md",
   "project/guidance/contract.md",
   "project/guidance/software.md",
   "project/guidance/ux.md",
@@ -239,12 +242,15 @@ export function proofFor(body: string): string {
 
 /** Serve ONE document through the pull and prove it, handing back what the
  *  pull answered with. */
-export async function readOne(server: Server): Promise<{ path: string; content: string } | null> {
+export async function readOne(server: Server): Promise<{ path: string; content: string; after: Record<string, unknown> } | null> {
   const r = await call(server, "se_pull");
   const doc = r.body.document as { path: string; content: string } | undefined;
   if (doc === undefined) return null;
-  await call(server, "se_pull", { form: { read: proofFor(doc.content) } });
-  return doc;
+  // THE PROOF CALL'S ANSWER RIDES BACK. Proving the LAST document is the call
+  // that walks, and a caller that discards it and pulls again finds the target
+  // already cleared — then reads its own success as a failure.
+  const after = await call(server, "se_pull", { form: { read: proofFor(doc.content) } });
+  return { ...doc, after: after.body };
 }
 
 /** Drain the reading the way an agent does: pull, take the document it

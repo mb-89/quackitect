@@ -51,19 +51,19 @@ test("the guidance splits three ways, and every home is pulled", () => {
 test("a check pins the VERSION: editing the doc unchecks it and the gate asks again", async () => {
   const root = freshRoot();
   const s = new Session(root);
-  await s.tickAdvance(); await s.tickAdvance();
+  await s.advance(); await s.advance();
   checkDocs(s);
-  await s.tickAdvance(); await s.tickAdvance(); await s.tickAdvance();
+  await s.advance(); await s.advance(); await s.advance();
   assert.deepEqual(s.active(), ["idle"]);
   const idle = s.machine.states.find((x) => x.id === "expeditions")!;
   assert.equal(s.entryReadyHuman(s.machine, idle), true, "all pulled docs checked — entry ready");
   // The owner edits voice.md mid-session: the pinned hash no longer matches.
   appendFileSync(join(root, "project", "guidance", "voice.md"), "\nEdited mid-session.\n");
   assert.equal(s.entryReadyHuman(s.machine, idle), false, "the edited doc unchecked itself");
-  await assert.rejects(() => s.tickAdvance("expeditions"), (e) => (e as { clause?: string }).clause === "SE-C-112");
+  await assert.rejects(() => s.advance("expeditions"), (e) => (e as { clause?: string }).clause === "SE-C-112");
   // One fresh check of the NEW version and the walk flows again.
   s.humanCheck("project/guidance/voice.md");
-  await s.tickAdvance("expeditions");
+  await s.advance("expeditions");
   assert.deepEqual(s.active(), ["expeditions/start"]);
 });
 
@@ -76,14 +76,17 @@ test("THE HANDOVER: a left-behind .se/HANDOVER.md joins the reading, and is cons
   assert.equal(owed.body.pull, "read", "the way in demands reading");
   // Drain the reading, collecting what the loop actually serves.
   const served: string[] = [];
+  let last: Record<string, unknown> | undefined;
   for (let j = 0; j < 40; j++) {
     const doc = await readOne(server);
     if (doc === null) break;
     served.push(doc.path);
+    last = doc.after;
   }
   assert.ok(served.includes(".se/HANDOVER.md"), `the handover rode the reading: ${served.join(", ")}`);
-  const walked = await call(server, "se_pull");
-  assert.equal(walked.body.pull, "do", JSON.stringify(walked.body));
+  // Proving the LAST document is the call that walked. Pulling again would
+  // find the target cleared and offer doors instead.
+  assert.equal(last?.pull, "do", JSON.stringify(last));
   // CONSUMED, NOT KEPT (owner ruling 2026-07-31): being read is what
   // destroys it. A handover that survives gets believed a second time.
   assert.equal(existsSync(join(root, ".se", "HANDOVER.md")), false, "the handover did not survive the reading room");
@@ -134,7 +137,7 @@ test("se_file_read credits too: reading the docs by hand carries the walk unaide
   // a windowed read still carries the whole file's CAS hash, so one line
   // is enough. (READ_DOCS is only the boot core; the way also pulls the
   // method cards, and the engine knows that better than any constant.)
-  for (const path of (session.tickInfo() as { route_reads: string[] }).route_reads) {
+  for (const path of (session.packet() as { route_reads: string[] }).route_reads) {
     const rr = await call(server, "se_file_read", { path, offset: 1, limit: 1 });
     assert.equal(rr.isError, false, JSON.stringify(rr.body));
   }
@@ -149,7 +152,7 @@ test("se_file_read credits too: reading the docs by hand carries the walk unaide
 // the reading is handed over at start, so wiping it there made a single-call
 // boot impossible. A first entry now keeps what start earned. Going BACK and
 // walking boot again still earns its tokens afresh.
-test("re-entering boot clears the buffer, so a second walk earns its reading again", async () => {
+test("the reading buffer is per session: a second session earns it afresh", async () => {
   const root = freshRoot();
   const session = new Session(root);
   const server = buildServer(root, session);
@@ -161,18 +164,26 @@ test("re-entering boot clears the buffer, so a second walk earns its reading aga
   assert.equal(first.body.pull, "do", JSON.stringify(first.body));
   assert.deepEqual(session.active(), ["front_desk"]);
 
-  // Back to the beginning — the PERSON's move, from the mirror: the walk
-  // starts over, and so does the reading.
-  session.jumpBack("start");
-  session.setTarget("idle");
-  const owed = await call(server, "se_pull");
-  assert.equal(owed.body.pull, "read", "a second pass through boot proves its reading again");
+  // A NEW SESSION over the SAME root. The files on disk are unchanged and
+  // were read once already, and it still owes every one of them.
+  //
+  // THIS USED TO RE-ENTER BOOT, driven by the person jumping the walk back to
+  // start from the mirror. That move retired with the tick, so re-entry is no
+  // longer reachable at all — and a test whose driver is gone proves nothing.
+  // What survives is the property that mattered: a proof belongs to the
+  // session that earned it. If a backwards move ever returns, re-entry is the
+  // case to guard again.
+  const second = new Session(root);
+  const secondServer = buildServer(root, second);
+  second.setTarget("idle");
+  const owed = await call(secondServer, "se_pull");
+  assert.equal(owed.body.pull, "read", "a fresh session proves the reading itself, inheriting nothing");
 });
 
 test("the mirror renders per-doc checkboxes and never locks reading itself", async () => {
   const root = freshRoot();
   const s = new Session(root);
-  await s.tickAdvance(); await s.tickAdvance(); // at boot/read_contract
+  await s.advance(); await s.advance(); // at boot/read_contract
   const html = renderMirror({ session: s, root, lastPacket: undefined, mode: "manual" });
   assert.ok(html.includes("docheck"), "checkboxes are served");
   assert.ok(!html.includes('class="primary confirm"'), "the old one-click confirm is gone");
@@ -189,9 +200,12 @@ test("the pill turns green from the machine: the agent's reading records its pro
   const server = buildServer(root, session);
   // Stand INSIDE boot so read_contract is peekable — the mirror peeks the
   // machine on screen, and that is boot while the walk is in it.
-  await session.tickAdvance(); await session.tickAdvance();
-  const beforeState = session.stateInfo("read_contract") as { exit: { read: { met: boolean } } };
-  assert.equal(beforeState.exit.read.met, false, "no reading earned yet");
+  await session.advance(); await session.advance();
+  // THE DEMAND MOVED WITH THE PROMOTION. read_contract's own read list went
+  // to the prompt layer, so what is still owed is the root guidance every
+  // packet pulls — asked for on ENTERING prepare_idle.
+  const beforeState = session.stateInfo("prepare_idle") as { entry: { read: { met: boolean } } };
+  assert.equal(beforeState.entry.read.met, false, "no reading earned yet");
   for (let j = 0; j < 40; j++) {
     if ((await readOne(server)) === null) break;
   }
@@ -199,11 +213,11 @@ test("the pill turns green from the machine: the agent's reading records its pro
   // green is read from the gate having let it through.
   assert.ok(!session.active().includes("read_contract"), `the agent's reading is the pill's green: ${JSON.stringify(session.active())}`);
   // The human ledger is untouched: nothing checked, boxes stay empty.
-  assert.deepEqual((session.tickInfo() as { human_checked: string[] }).human_checked, []);
+  assert.deepEqual((session.packet() as { human_checked: string[] }).human_checked, []);
   // A version pins the proof: editing a doc drops it, the pill asks again.
   appendFileSync(join(root, "project", "guidance", "voice.md"), "\nEdited mid-session.\n");
-  const edited = session.stateInfo("read_contract") as { exit: { read: { met: boolean } } };
-  assert.equal(edited.exit.read.met, false, "an edited doc drops the agent's proof too");
+  const edited = session.stateInfo("prepare_idle") as { entry: { read: { met: boolean } } };
+  assert.equal(edited.entry.read.met, false, "an edited doc drops the agent's proof too");
 });
 
 test("THE HANDOVER RULE: the human walks boot on checkboxes, raises the slider — the agent owes the same reading", async () => {
@@ -212,13 +226,13 @@ test("THE HANDOVER RULE: the human walks boot on checkboxes, raises the slider �
   session.setAutonomy(0); // manual start
   const server = buildServer(root, session);
   // The human drives: checks the boot docs, walks through read_contract.
-  await session.tickAdvance(); await session.tickAdvance();
+  await session.advance(); await session.advance();
   checkDocs(session);
-  await session.tickAdvance();
+  await session.advance();
   assert.deepEqual(session.active(), ["boot/prepare_idle"]);
   // The packet tells the agent what the session has checked.
-  const info = session.tickInfo() as { human_checked: string[] };
-  assert.ok(info.human_checked.includes("project/AGENTS.md"));
+  const info = session.packet() as { human_checked: string[] };
+  assert.ok(info.human_checked.includes("project/guidance/contract.md"));
   // The slider rises; the agent pulls — but its head holds none of it, so
   // the machine demands the same reading before it walks anywhere.
   session.setAutonomy(0.6);
@@ -231,7 +245,7 @@ test("THE HANDOVER RULE: the human walks boot on checkboxes, raises the slider �
     if (doc === null) break;
     served.push(doc.path);
   }
-  assert.ok(served.includes("project/AGENTS.md"), `the same list is owed: ${served.join(", ")}`);
+  assert.ok(served.includes("project/guidance/contract.md"), `the same list is owed: ${served.join(", ")}`);
   // Proving the last document already moves the walk, so what matters here
   // is that the reading gate is discharged — not which door comes next.
   const landed = await call(server, "se_pull");

@@ -94,9 +94,9 @@ test("the pin: the bless compiles the change size live; escalation only grows it
   assert.throws(() => pinIteration(root, it, "minor"), /ESCALATION/);
   // product SITS ABOVE major: the first iteration of a product authors the
   // vision, the stakeholders and the actual state every later one inherits.
-  pinIteration(root, it, "project");
+  pinIteration(root, it, "product");
   const pin3 = JSON.parse(readFileSync(join(it.path, itPinRel(it.id)), "utf8")) as { change_size: string; machine: MachineDecl };
-  assert.equal(pin3.change_size, "project");
+  assert.equal(pin3.change_size, "product");
   validateMachine(pin3.machine);
   // specification is read and validated as a column, never pinned as a walk.
   assert.throws(() => pinIteration(root, it, "specification"), /patch \| minor \| major \| project/);
