@@ -32,7 +32,7 @@ import { shoot } from "./shoot.ts";
 import { spawn } from "node:child_process";
 import { openPanel } from "./panel.ts";
 import { resolveInRoot, seDir } from "./paths.ts";
-import { jobList, jobStatus, jobStop, jobWait, run, runBackground, runOrHandoff } from "./run.ts";
+import { jobList, jobStatus, jobStop, jobWait, run, runBackground, runOrHandoff, startJob } from "./run.ts";
 import { search } from "./search.ts";
 import { Session } from "./session.ts";
 import { webFetch, webSearch } from "./web.ts";
@@ -578,22 +578,63 @@ export function coreTools(rootOf: (rel?: string) => string, projectRoot: string,
           files: { type: "array", items: { type: "string" }, description: "test files to run scoped — 'pull', 'pull.test.ts' and the full path all name the same file" },
           name_pattern: { type: "string", description: "--test-name-pattern: run only tests whose name matches" },
           force: { type: "boolean", description: "override both gates: unchanged tree, and battery/scope economics — for flake hunts" },
+          job: { type: "string", description: "fetch a handed-off run's verdict by its handle — the counts are recorded even when the original call timed out" },
+          wait_ms: { type: "number", description: "with job: block up to this long (capped at 120000) for the verdict" },
         },
       },
       handler: async (args) => {
         const root = rootOf();
         const se = seDir(projectRoot);
         const force = args.force === true;
-        const spawnNode = (argv: string[], timeout: number): Promise<{ status: number | null; out: string }> =>
-          new Promise((resolve) => {
-            const child = spawn("node", argv, { cwd: root });
-            let out = "";
-            child.stdout.on("data", (d: Buffer) => { out += d; });
-            child.stderr.on("data", (d: Buffer) => { out += d; });
-            const timer = setTimeout(() => child.kill(), timeout);
-            child.on("error", (e) => { clearTimeout(timer); resolve({ status: null, out: String(e) }); });
-            child.on("close", (code) => { clearTimeout(timer); resolve({ status: code, out }); });
+        // THE VERDICT OUTLIVES THE CALL (found 2026-08-02: the battery outran
+        // the MCP client's timeout and the counts were lost). Past the
+        // handoff budget the caller gets a handle; the run carries on, the
+        // verdict is recorded, and {job} serves it.
+        if (args.job !== undefined) {
+          const id = String(args.job);
+          const t = testVerdicts.get(id);
+          if (t === undefined) {
+            throw new Rejection({
+              clause: CLAUSES.JOB_UNKNOWN,
+              expected: "a test run started in this session",
+              got: `${id} (unknown)`,
+              remedy: { tool: "se_run", args: { jobs: true }, note: "list the session's jobs" },
+              source: "engine/tools.ts se_test",
+            });
+          }
+          if (args.wait_ms !== undefined) {
+            await Promise.race([t.done, new Promise((r) => setTimeout(r, Math.max(0, Math.min(Number(args.wait_ms), 120_000))))]);
+          }
+          return t.verdict ?? { job: id, running: true, note: "still running — ask again with {job}, or add wait_ms to block on it" };
+        }
+        // A TEST RUN NEVER OUTLIVES ITS SESSION (found 2026-08-02: two
+        // orphaned workers held a folder lock for four hours). Children run
+        // in the job registry — whole-tree killed on timeout, reaped at
+        // shutdown, visible to se_run {jobs: true}.
+        const spawnNode = async (argv: string[], timeout: number): Promise<{ status: number | null; out: string }> => {
+          let out = "";
+          const started = startJob(`node --test (${argv.length} args)`, () => {
+            const child = spawn("node", argv, { cwd: root, windowsHide: true, detached: process.platform !== "win32" });
+            child.stdout?.setEncoding("utf8");
+            child.stderr?.setEncoding("utf8");
+            child.stdout?.on("data", (c: string) => { out += c; });
+            child.stderr?.on("data", (c: string) => { out += c; });
+            return child;
           });
+          let v = jobStatus(started.job);
+          let waited = 0;
+          while (v.running && waited < timeout) {
+            const step = Math.min(60_000, timeout - waited);
+            v = await jobWait(started.job, step);
+            waited += step;
+          }
+          if (v.running) {
+            jobStop(started.job);
+            return { status: null, out };
+          }
+          return { status: v.exit, out };
+        };
+        const work = (async (): Promise<Record<string, unknown>> => {
         const wantsScope = args.files !== undefined || args.name_pattern !== undefined;
         if (wantsScope) {
           // 'pull', 'pull.test.ts', 'tests/pull.test.ts', full path — one file.
@@ -646,6 +687,25 @@ export function coreTools(rootOf: (rel?: string) => string, projectRoot: string,
         // tree can be answered from the record instead of another 90 seconds.
         testRecord(se, root, ok);
         return { ok, results };
+        })();
+        const id = `test-${Date.now().toString(36)}-${++testSeq}`;
+        const entry: { done: Promise<void>; verdict?: Record<string, unknown> } = { done: undefined as unknown as Promise<void> };
+        entry.done = work.then(
+          (v) => { entry.verdict = { job: id, running: false, ...v }; },
+          (e) => { entry.verdict = { job: id, running: false, refused: e instanceof Rejection ? e.toJSON() : String(e) }; },
+        );
+        testVerdicts.set(id, entry);
+        let timer: NodeJS.Timeout | undefined;
+        const winner = await Promise.race<{ v: Record<string, unknown> } | { e: unknown } | "handoff">([
+          work.then((v) => ({ v }), (e) => ({ e })),
+          new Promise<"handoff">((r) => { timer = setTimeout(() => r("handoff"), Number(process.env.SE_TEST_HANDOFF_MS ?? 45_000)); }),
+        ]);
+        if (timer !== undefined) clearTimeout(timer);
+        if (winner === "handoff") {
+          return { handed_off: true, job: id, note: `still running — it moved to the background rather than hold you. The verdict is recorded regardless; fetch it with se_test {job: "${id}"} (add wait_ms to block up to two minutes).` };
+        }
+        if ("e" in (winner as object)) throw (winner as { e: unknown }).e;
+        return (winner as { v: Record<string, unknown> }).v;
       },
     },
     {
@@ -935,6 +995,11 @@ function refuseProseWall(tool: string, field: string, text: string): void {
     source: "engine/tools.ts prose-wall",
   });
 }
+
+// se_test's handed-off runs: the verdict outlives the CALL — recorded here,
+// served by se_test {job}, whatever the client's timeout did.
+const testVerdicts = new Map<string, { done: Promise<void>; verdict?: Record<string, unknown> }>();
+let testSeq = 0;
 
 export function buildServer(root: string, session = new Session(root), tollOpts: { windowMs?: number; now?: () => number } = {}): McpServer {
   // (a fresh Session fails fast on a misdrawn machine)

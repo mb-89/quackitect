@@ -16,7 +16,8 @@
 //   node engine/bin/selftest.ts --root <project root>
 import { existsSync, readdirSync } from "node:fs";
 import { join, resolve } from "node:path";
-import { spawnSync } from "node:child_process";
+import { spawn } from "node:child_process";
+import { killTree } from "../run.ts";
 import { pathToFileURL } from "node:url";
 
 function argValue(flag: string): string | undefined {
@@ -68,17 +69,30 @@ const REPORTERS = [
 // KILLED the run mid-stream — truncated output, no summary, an exit code
 // that read as ordinary failure. A cap that is hit must SAY so.
 const CAP_MS = 300_000;
-const r = spawnSync(process.execPath, ["--test", ...REPORTERS, ...files], {
-  cwd: dir,
-  encoding: "utf8",
-  timeout: CAP_MS,
-  maxBuffer: 32 * 1024 * 1024,
-  env: { ...process.env, SE_SELFTEST_SKIP: "1" },
+// The cap kills the WHOLE TREE — spawnSync killed only the runner and left
+// its per-file workers orphaned (two held a folder lock for four hours,
+// 2026-08-02).
+const r = await new Promise<{ status: number | null; killed: boolean; out: string }>((resolveRun) => {
+  const child = spawn(process.execPath, ["--test", ...REPORTERS, ...files], {
+    cwd: dir,
+    windowsHide: true,
+    detached: process.platform !== "win32",
+    env: { ...process.env, SE_SELFTEST_SKIP: "1" },
+  });
+  let acc = "";
+  let killed = false;
+  const timer = setTimeout(() => { killed = true; killTree(child.pid); }, CAP_MS);
+  child.stdout?.setEncoding("utf8");
+  child.stderr?.setEncoding("utf8");
+  child.stdout?.on("data", (c: string) => { acc += c; });
+  child.stderr?.on("data", (c: string) => { acc += c; });
+  child.on("error", (e) => { clearTimeout(timer); resolveRun({ status: null, killed, out: acc + String(e) }); });
+  child.on("close", (code) => { clearTimeout(timer); resolveRun({ status: code, killed, out: acc }); });
 });
-if (r.signal !== null) {
+if (r.killed) {
   process.stdout.write(`selftest: KILLED at its ${CAP_MS / 1000}s cap — the run is TRUNCATED, the tallies below are not a verdict\n`);
 }
-const out = `${r.stdout ?? ""}${r.stderr ?? ""}`;
+const out = r.out;
 // The condition's evidence is the verdict, not the firehose: failures by
 // name plus the tallies. (scriptRun caps output anyway — cap honestly.)
 // BOTH REPORTER DIALECTS. TAP writes "not ok" and "# pass"; the spec

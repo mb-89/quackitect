@@ -31,10 +31,12 @@ const DEFAULT_HANDOFF_MS = Number(process.env.SE_RUN_HANDOFF_MS ?? 20_000);
 // client gave up on kept a test runner and four descendants alive for
 // minutes, competing with everything measured after it). The shell we spawn
 // is a parent; killing it leaves its children parented to init and running.
-function killTree(pid: number | undefined): void {
+export function killTree(pid: number | undefined): void {
   if (pid === undefined) return;
   if (process.platform === "win32") {
-    try { spawn("taskkill", ["/PID", String(pid), "/T", "/F"], { windowsHide: true, stdio: "ignore" }); } catch { /* already gone */ }
+    // Detached and unref'd, so a reap fired on the way OUT of the process
+    // still completes after we are gone.
+    try { spawn("taskkill", ["/PID", String(pid), "/T", "/F"], { windowsHide: true, stdio: "ignore", detached: true }).unref(); } catch { /* already gone */ }
     return;
   }
   // POSIX: the shell is spawned detached, so it leads its own process group
@@ -138,6 +140,12 @@ export function anyJobRunning(): boolean {
 }
 
 export function runBackground(root: string, command: string, opts: { cwd?: string } = {}): JobView {
+  return startJob(command, () => spawnShell(root, command, opts.cwd));
+}
+
+/** REGISTER any child in the one job registry — se_test's runs live here
+ *  too, so the shutdown reap and {jobs: true} see every spawned process. */
+export function startJob(command: string, spawnFn: () => ChildProcess): JobView {
   const id = `job-${Date.now().toString(36)}-${++jobSeq}`;
   let settle = (): void => {};
   const done = new Promise<void>((res) => { settle = res; });
@@ -145,7 +153,7 @@ export function runBackground(root: string, command: string, opts: { cwd?: strin
   jobs.set(id, j);
   let child: ChildProcess;
   try {
-    child = spawnShell(root, command, opts.cwd);
+    child = spawnFn();
   } catch (e) {
     j.running = false;
     j.ended = Date.now();

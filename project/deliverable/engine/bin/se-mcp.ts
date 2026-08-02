@@ -179,11 +179,12 @@ if (argv.includes("--child") || process.env.SE_HOT_DISABLE === "1") {
   const parentPid = Number(process.env.SE_PARENT_PID ?? 0);
   if (Number.isInteger(parentPid) && parentPid > 0) {
     // Signal 0 delivers nothing; it only asks whether the process is there.
-    const watch = setInterval(() => {
+    const watch = setInterval(async () => {
       try {
         process.kill(parentPid, 0);
       } catch {
         process.stderr.write("se-mcp: the window that started this server is gone — exiting\n");
+        try { (await import("../run.ts")).jobStopAll(); } catch { /* the reap is best effort */ }
         process.exit(0);
       }
     }, 5_000);
@@ -197,6 +198,18 @@ if (argv.includes("--child") || process.env.SE_HOT_DISABLE === "1") {
   const { seDir } = await import("../paths.ts");
   const { Session } = await import("../session.ts");
   const { buildServer } = await import("../tools.ts");
+  const { jobStopAll } = await import("../run.ts");
+
+  // CHILDREN NEVER OUTLIVE THE ENGINE (found 2026-08-02: two orphaned test
+  // workers held a folder lock for four hours after their session died).
+  // Every deliberate exit reaps the job registry — the registry is where
+  // every spawned child now lives.
+  for (const sig of ["SIGTERM", "SIGINT"] as const) {
+    process.on(sig, () => {
+      try { jobStopAll(); } catch { /* best effort */ }
+      process.exit(0);
+    });
+  }
 
   const autonomyRaw =
     argValue("--autonomy") ?? argValue("--threshold") ?? process.env.SE_AUTONOMY ?? process.env.SE_THRESHOLD;
@@ -217,7 +230,10 @@ if (argv.includes("--child") || process.env.SE_HOT_DISABLE === "1") {
       headers: { "content-type": "application/json" },
       body: JSON.stringify({ reason: "the machine reached end" }),
     }).catch(() => {});
-    setTimeout(() => process.exit(0), 1500);
+    setTimeout(() => {
+      try { jobStopAll(); } catch { /* best effort */ }
+      process.exit(0);
+    }, 1500);
   };
 
   const headless = argv.includes("--headless");
