@@ -241,3 +241,11 @@
 {"ts":"2026-08-02T16:28:08.535Z","op":"update","visit":"expeditions/e31@1","node":"d249","brief":"the other agent's parcel is committed on trunk"}
 {"ts":"2026-08-02T16:28:51.608Z","op":"update","visit":"expeditions/e31@1","node":"d250","brief":"merging trunk in to settle the overlap"}
 {"ts":"2026-08-02T16:29:03.124Z","op":"update","visit":"expeditions/e31@1","node":"d251","brief":"the deletion wins; its content is worked in"}
+{"ts":"2026-08-02T16:29:13.856Z","op":"update","visit":"expeditions/e31@1","node":"d252","brief":"the merge is settled"}
+{"ts":"2026-08-02T16:30:04.465Z","op":"update","visit":"expeditions/e31@1","node":"d253","brief":"looking at the two leftovers on trunk"}
+{"ts":"2026-08-02T16:30:23.427Z","op":"update","visit":"expeditions/e31@1","node":"d254","brief":"checking where the installed dependencies live"}
+{"ts":"2026-08-02T16:30:47.392Z","op":"update","visit":"expeditions/e31@1","node":"d255","brief":"moving the deps and clearing the old names"}
+{"ts":"2026-08-02T16:31:10.272Z","op":"obsolete","visit":"expeditions/e31@1","node":"d82","brief":"the route memo answered it; the owner ruled the rest fine"}
+{"ts":"2026-08-02T16:31:27.669Z","op":"done","visit":"expeditions/e31@1","node":"d163","brief":"the suite is green at 716 of 716"}
+{"ts":"2026-08-02T16:31:39.454Z","op":"done","visit":"expeditions/e31@1","node":"d164","brief":"landed as a fast-forward onto v3"}
+{"ts":"2026-08-02T16:31:46.263Z","op":"done","visit":"expeditions/e31@1","node":"d174","brief":"prompt layer placed and preflight green under the new name"}
