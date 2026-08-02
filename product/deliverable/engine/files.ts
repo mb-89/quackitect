@@ -286,23 +286,123 @@ export function fileWrite(root: string, path: string, content: string, baseHash:
 
 export interface PatchOp {
   path: string;
-  old_string: string;
-  new_string: string;
+  /** Exact-match op (the original verb): both strings, old must be unique. */
+  old_string?: string;
+  new_string?: string;
   /** Optional per-op CAS pin; when present it must match disk. */
   base_hash?: string;
   /** Replace every occurrence instead of demanding uniqueness. */
   replace_all?: boolean;
+  /** Regex op: pattern + replacement (JS regex, always global; $1 backrefs work). */
+  pattern?: string;
+  replacement?: string;
+  /** Regex flags — a subset on purpose: i, m, s. g is implied. */
+  flags?: string;
+  /** Regex op only: refuse unless the match count is exactly this. */
+  expect_count?: number;
+  /** Append/prepend op: new_string joins the end/start of the file. */
+  append?: boolean;
+  prepend?: boolean;
+  /** Line-range op: replace lines from..to (1-based, inclusive) with new_string.
+   *  DEMANDS base_hash — a line number only means something against the
+   *  version you read. */
+  at?: { from_line: number; to_line: number };
 }
 
 export interface PatchResult {
   applied: { path: string; hash: string; replacements: number }[];
+  /** Mechanical fixes the engine applied FOR the agent, each named. An
+   *  auto-correction that is not announced teaches nothing. */
+  corrected?: string[];
+}
+
+// One patch call, several verbs. Which verb an op is, read from its fields —
+// exactly one of these shapes, anything mixed or partial refused BY NAME:
+//   exact:   old_string + new_string          (the original verb)
+//   regex:   pattern + replacement            (sed, kept inside the lane)
+//   append:  append: true + new_string        (harvested: 285 Set-/Add-Content
+//   prepend: prepend: true + new_string        shell writes did this job)
+//   range:   at: {from_line, to_line} + new_string + base_hash
+type OpKind = "exact" | "regex" | "append" | "prepend" | "range";
+
+function opKind(op: PatchOp, i: number, n: number): OpKind {
+  const marks: OpKind[] = [];
+  if (op.old_string !== undefined) marks.push("exact");
+  if (op.pattern !== undefined) marks.push("regex");
+  if (op.append === true) marks.push("append");
+  if (op.prepend === true) marks.push("prepend");
+  if (op.at !== undefined) marks.push("range");
+  if (marks.length === 1) return marks[0];
+  throw new Rejection({
+    clause: CLAUSES.REQUIRED_ARGS,
+    expected: "ONE verb per op: old_string+new_string | pattern+replacement | append+new_string | prepend+new_string | at+new_string+base_hash",
+    got: marks.length === 0 ? `op ${i + 1}/${n} names no verb` : `op ${i + 1}/${n} mixes ${marks.join(" and ")} — nothing was written`,
+    remedy: { tool: "se_file_patch", args: { ops: [{ path: "<path>", old_string: "<exact text>", new_string: "<replacement>" }] }, note: "split it into one op per verb" },
+    source: SRC,
+  });
+}
+
+/** The file's own line-ending convention — what every verb writes in. */
+function eolOf(s: string): "\r\n" | "\n" {
+  return s.includes("\r\n") ? "\r\n" : "\n";
+}
+function toEol(s: string, eol: string): string {
+  return s.replace(/\r\n/g, "\n").replace(/\n/g, eol);
+}
+
+/** Regex flags are a SUBSET on purpose: i, m, s. g is implied (a substitution
+ *  that silently stops at the first hit is the sed trap this op exists to
+ *  avoid); anything else is refused rather than passed through blind. */
+function opRegExp(op: PatchOp, i: number, n: number): RegExp {
+  const flags = op.flags ?? "";
+  const bad = [...flags].filter((f) => !"ims".includes(f));
+  if (bad.length > 0) {
+    throw new Rejection({
+      clause: CLAUSES.REQUIRED_ARGS,
+      expected: "flags from: i (ignore case), m (multiline anchors), s (dot matches newline) — g is always on",
+      got: `flag(s) ${bad.join(", ")} (op ${i + 1}/${n})`,
+      remedy: { tool: "se_file_patch", args: { ops: [{ path: op.path, pattern: op.pattern, replacement: op.replacement, flags: "im" }] } },
+      source: SRC,
+    });
+  }
+  try {
+    return new RegExp(op.pattern as string, `g${flags}`);
+  } catch (e) {
+    throw new Rejection({
+      clause: CLAUSES.REQUIRED_ARGS,
+      expected: "a pattern that compiles as a JS regex",
+      got: `${String((e as Error).message)} (op ${i + 1}/${n})`,
+      remedy: { tool: "se_file_patch", args: { ops: [{ path: op.path, pattern: "<fixed pattern>", replacement: op.replacement }] } },
+      source: SRC,
+    });
+  }
 }
 
 /** Every guard is checked before anything is written — a failure leaves the tree untouched. */
 export function filePatch(root: string, ops: PatchOp[]): PatchResult {
   const staged: { abs: string; path: string; next: string; replacements: number }[] = [];
   const contents = new Map<string, string>(); // carries earlier ops' effects within the batch
+  const corrected: string[] = [];
   for (const [i, op] of ops.entries()) {
+    const kind = opKind(op, i, ops.length);
+    const needs: Record<OpKind, [keyof PatchOp, string][]> = {
+      exact: [["new_string", "the replacement text"]],
+      regex: [["replacement", "the substitution text ($1 backrefs work)"]],
+      append: [["new_string", "the text to append"]],
+      prepend: [["new_string", "the text to prepend"]],
+      range: [["new_string", "the replacement lines"], ["base_hash", "the hash from se_file_read — a line number only means something against the version you read"]],
+    };
+    for (const [field, why] of needs[kind]) {
+      if (op[field] === undefined) {
+        throw new Rejection({
+          clause: CLAUSES.REQUIRED_ARGS,
+          expected: `${field} on a ${kind} op — ${why}`,
+          got: `op ${i + 1}/${ops.length} without it — nothing was written`,
+          remedy: { tool: "se_file_patch", args: { ops: [{ path: op.path, [field]: "<value>" }] } },
+          source: SRC,
+        });
+      }
+    }
     const abs = mustExist(root, op.path, SRC);
     const current = contents.get(abs) ?? readFileSync(abs, "utf8");
     if (op.base_hash !== undefined && contents.get(abs) === undefined) {
@@ -317,38 +417,106 @@ export function filePatch(root: string, ops: PatchOp[]): PatchResult {
         });
       }
     }
-    const count = current.split(op.old_string).length - 1;
-    if (count === 0 || (count > 1 && op.replace_all !== true)) {
-      // WHY it did not match, not merely that it did not. This refusal fired
-      // twelve times in one period, and its commonest cause is INVISIBLE: a
-      // CRLF file against an old_string written with LF. "Copy the exact
-      // text" is useless advice when the difference cannot be seen, so the
-      // engine looks for the near-miss and names it.
-      let why = "";
+    const eol = eolOf(current);
+    let next: string;
+    let replacements: number;
+    if (kind === "regex") {
+      const rx = opRegExp(op, i, ops.length);
+      const count = [...current.matchAll(rx)].length;
+      if (count === 0 || (op.expect_count !== undefined && count !== op.expect_count)) {
+        throw new Rejection({
+          clause: CLAUSES.PATCH_AMBIGUOUS,
+          expected: op.expect_count !== undefined ? `pattern to match exactly ${op.expect_count} time(s) in ${op.path}` : `pattern to match in ${op.path}`,
+          got: `${count} matches (op ${i + 1}/${ops.length}) — nothing was written`,
+          remedy: { tool: "se_file_search", args: { query: op.pattern, path: op.path }, note: "see what the pattern really hits, then patch again" },
+          source: SRC,
+        });
+      }
+      next = current.replace(rx, op.replacement as string);
+      replacements = count;
+    } else if (kind === "append" || kind === "prepend") {
+      // The joined text arrives in the FILE's line endings, and the seam gets
+      // exactly one newline — both corrected mechanically and both NAMED,
+      // because these two fumbles are why appends went through the shell.
+      const piece = toEol(op.new_string as string, eol);
+      if (kind === "append") {
+        const seam = current === "" || current.endsWith("\n") || piece.startsWith("\n") ? "" : eol;
+        if (seam !== "") corrected.push(`op ${i + 1}: a newline was added between the file's last line and the appended text`);
+        next = current + seam + piece;
+      } else {
+        const seam = piece === "" || piece.endsWith("\n") || current.startsWith("\n") || current === "" ? "" : eol;
+        if (seam !== "") corrected.push(`op ${i + 1}: a newline was added between the prepended text and the file's first line`);
+        next = piece + seam + current;
+      }
+      if (eol === "\r\n" && (op.new_string as string) !== piece) corrected.push(`op ${i + 1}: the text was converted to CRLF — this file's convention`);
+      replacements = 1;
+    } else if (kind === "range") {
+      const lines = current.split(eol);
+      const { from_line: from, to_line: to } = op.at as { from_line: number; to_line: number };
+      if (!(Number.isInteger(from) && Number.isInteger(to) && from >= 1 && to >= from && to <= lines.length)) {
+        throw new Rejection({
+          clause: CLAUSES.PATCH_AMBIGUOUS,
+          expected: `1 <= from_line <= to_line <= ${lines.length} for ${op.path}`,
+          got: `from_line ${from}, to_line ${to} (op ${i + 1}/${ops.length}) — nothing was written`,
+          remedy: { tool: "se_file_read", args: { path: op.path, offset: Math.max(1, Number(from) || 1), limit: 40 }, note: "re-read the range you mean; line numbers ride every read" },
+          source: SRC,
+        });
+      }
+      lines.splice(from - 1, to - from + 1, ...toEol(op.new_string as string, eol).split(eol));
+      next = lines.join(eol);
+      replacements = 1;
+    } else {
+      let oldStr = op.old_string as string;
+      let newStr = op.new_string as string;
+      let count = current.split(oldStr).length - 1;
+      // THE ENGINE CORRECTS WHAT IS MECHANICAL AND SAYS SO (owner ruling
+      // 2026-08-02). The commonest 0-match cause is INVISIBLE: a CRLF file
+      // against an old_string written with LF. The old behaviour diagnosed it
+      // and refused anyway — one round-trip spent re-copying text that differs
+      // in nothing a model can see. Now: when the strings match under the
+      // file's own line endings, the patch is applied in those endings and the
+      // correction is NAMED on the result. Whitespace near-misses still refuse
+      // — collapsed indentation is a real difference, not an encoding one.
       if (count === 0) {
-        const lf = (s: string): string => s.replace(/\r\n/g, "\n");
-        const flat = (s: string): string => lf(s).replace(/[ \t]+/g, " ");
-        if (lf(current).includes(lf(op.old_string))) {
-          why = " — but it MATCHES with line endings normalised: this file is CRLF and your old_string is LF";
-        } else if (flat(current).includes(flat(op.old_string))) {
-          why = " — but it MATCHES with runs of spaces and tabs collapsed: the indentation differs";
+        const reOld = toEol(oldStr, eol);
+        const reCount = current.split(reOld).length - 1;
+        if (reOld !== oldStr && reCount > 0) {
+          oldStr = reOld;
+          newStr = toEol(newStr, eol);
+          count = reCount;
+          corrected.push(`op ${i + 1}: old_string matched after line-ending normalisation — this file is ${eol === "\r\n" ? "CRLF" : "LF"}; the patch was applied in the file's own endings`);
         }
       }
-      throw new Rejection({
-        clause: CLAUSES.PATCH_AMBIGUOUS,
-        expected: count === 0 ? `old_string to occur in ${op.path}` : `old_string to occur exactly once in ${op.path} (or pass replace_all: true)`,
-        got: `${count} occurrences (op ${i + 1}/${ops.length}) — nothing was written${why}`,
-        remedy: {
-          tool: "se_file_read",
-          args: { path: op.path },
-          note: count === 0 ? "re-read and copy the exact text, whitespace included" : "widen old_string until unique, or set replace_all",
-        },
-        source: SRC,
-      });
+      if (count === 0 || (count > 1 && op.replace_all !== true)) {
+        // WHY it did not match, not merely that it did not. This refusal fired
+        // twelve times in one period; the whitespace near-miss is still named,
+        // because "copy the exact text" is useless advice when the difference
+        // cannot be seen.
+        let why = "";
+        if (count === 0) {
+          const lf = (s: string): string => s.replace(/\r\n/g, "\n");
+          const flat = (s: string): string => lf(s).replace(/[ \t]+/g, " ");
+          if (flat(current).includes(flat(oldStr))) {
+            why = " — but it MATCHES with runs of spaces and tabs collapsed: the indentation differs";
+          }
+        }
+        throw new Rejection({
+          clause: CLAUSES.PATCH_AMBIGUOUS,
+          expected: count === 0 ? `old_string to occur in ${op.path}` : `old_string to occur exactly once in ${op.path} (or pass replace_all: true)`,
+          got: `${count} occurrences (op ${i + 1}/${ops.length}) — nothing was written${why}`,
+          remedy: {
+            tool: "se_file_read",
+            args: { path: op.path },
+            note: count === 0 ? "re-read and copy the exact text, whitespace included" : "widen old_string until unique, or set replace_all",
+          },
+          source: SRC,
+        });
+      }
+      next = op.replace_all === true ? current.split(oldStr).join(newStr) : current.replace(oldStr, newStr);
+      replacements = op.replace_all === true ? count : 1;
     }
-    const next = op.replace_all === true ? current.split(op.old_string).join(op.new_string) : current.replace(op.old_string, op.new_string);
     contents.set(abs, next);
-    staged.push({ abs, path: op.path, next, replacements: op.replace_all === true ? count : 1 });
+    staged.push({ abs, path: op.path, next, replacements });
   }
   // All guards passed — write.
   const byFile = new Map<string, { path: string; next: string; replacements: number }>();
@@ -364,7 +532,7 @@ export function filePatch(root: string, ops: PatchOp[]): PatchResult {
     writeFileSync(abs, f.next, "utf8");
     return { path: f.path, hash: contentHash(f.next), replacements: f.replacements };
   });
-  return { applied };
+  return { applied, ...(corrected.length > 0 ? { corrected } : {}) };
 }
 
 export function fileDelete(root: string, path: string, baseHash: string): { deleted: string } {

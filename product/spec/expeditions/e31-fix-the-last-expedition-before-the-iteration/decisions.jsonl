@@ -5,3 +5,10 @@
 {"ts":"2026-08-02T14:10:45.786Z","op":"update","visit":"expeditions/e31@1","node":"d13","brief":"pulling trunk into the expedition branch"}
 {"ts":"2026-08-02T14:10:53.009Z","op":"update","visit":"expeditions/e31@1","node":"d14","brief":"the record's own decision trail wants committing first"}
 {"ts":"2026-08-02T14:11:02.110Z","op":"update","visit":"expeditions/e31@1","node":"d15","brief":"syncing trunk into the expedition"}
+{"ts":"2026-08-02T14:11:55.460Z","op":"done","visit":"expeditions/e31@0","node":"d2","brief":"engine fix is on the branch via the sync"}
+{"ts":"2026-08-02T14:12:03.752Z","op":"update","visit":"expeditions/e31@1","node":"d16","brief":"applying the patch to the expedition branch"}
+{"ts":"2026-08-02T14:12:20.666Z","op":"update","visit":"expeditions/e31@1","node":"d17","brief":"running the patch's 33 new tests on Windows"}
+{"ts":"2026-08-02T14:12:47.548Z","op":"update","visit":"expeditions/e31@1","node":"d18","brief":"typecheck plus the file lane the patch rewrote"}
+{"ts":"2026-08-02T14:13:27.450Z","op":"update","visit":"expeditions/e31@1","node":"d19","brief":"locating the raw NUL the patch shipped"}
+{"ts":"2026-08-02T14:13:41.039Z","op":"update","visit":"expeditions/e31@1","node":"d20","brief":"the separator becomes an escape, as worktree.ts already did"}
+{"ts":"2026-08-02T14:13:59.915Z","op":"update","visit":"expeditions/e31@1","node":"d21","brief":"re-running the file lane and the new suite"}

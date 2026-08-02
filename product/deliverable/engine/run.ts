@@ -111,6 +111,18 @@ function knownJob(id: string): Job {
   });
 }
 
+/** WAIT ON A JOB, bounded. The honest replacement for Start-Sleep polling:
+ *  the job's own done-promise is the wake path, so the wait returns the
+ *  MOMENT the command exits — or at the bound, with the job still running.
+ *  Found 2026-08-02: an agent burned ~15 min of one hour in 100-second
+ *  Start-Sleep calls, hand-rolling exactly this. */
+export async function jobWait(id: string, waitMs: number): Promise<JobView> {
+  const j = knownJob(id);
+  const bound = Math.max(0, Math.min(waitMs, 120_000));
+  await Promise.race([j.done, new Promise((r) => setTimeout(r, bound))]);
+  return view(j);
+}
+
 /** START a command in the background. Returns at once with a handle. */
 /**
  * Is anything still running that this session started?

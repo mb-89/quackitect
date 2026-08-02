@@ -68,4 +68,7 @@ export const CLAUSES = {
   UNREADABLE_BYTES: "SE-C-126", // a binary the lane cannot show a model — images travel, arbitrary bytes do not
   UNDECLARED_ROOT: "SE-C-127", // @name addresses a root the owner has not declared — declared, never arbitrary
   JOB_UNKNOWN: "SE-C-128", // a background job ref this session never started
+  RUN_LANE_JOB: "SE-C-129", // se_run asked to do a lane tool's job — the lane covers it; the ladder blocks after one warned run
+  TEST_UNCHANGED: "SE-C-130", // se_test over an unchanged tree — the last verdict still stands
+  TEST_SCOPE: "SE-C-131", // the wrong test scope: a battery when scoped runs answer the diff, or piecemeal past where the battery is cheaper
 } as const;

@@ -10,6 +10,8 @@
 //   §5  — honest truncation everywhere; results carry the remedy inline.
 import { CLAUSES, Rejection, type RejectionPayload } from "./errors.ts";
 import { CallLog } from "./calllog.ts";
+import { batteryGate, laneSummary, laneVerdict, parseTap, scopedGate, streakNudge, suiteFiles, testGate, testRecord } from "./discipline.ts";
+import { existsSync } from "node:fs";
 import { contentHash } from "./hash.ts";
 import { parseUpdate } from "./decisions.ts";
 import { Toll } from "./toll.ts";
@@ -30,7 +32,7 @@ import { shoot } from "./shoot.ts";
 import { spawn } from "node:child_process";
 import { openPanel } from "./panel.ts";
 import { resolveInRoot, seDir } from "./paths.ts";
-import { jobList, jobStatus, jobStop, run, runBackground, runOrHandoff } from "./run.ts";
+import { jobList, jobStatus, jobStop, jobWait, run, runBackground, runOrHandoff } from "./run.ts";
 import { search } from "./search.ts";
 import { Session } from "./session.ts";
 import { webFetch, webSearch } from "./web.ts";
@@ -301,23 +303,30 @@ export function coreTools(rootOf: (rel?: string) => string, projectRoot: string,
       name: "se_file_patch",
       title: "se.file.patch",
       description:
-        "Exact-match edit: old_string must occur exactly once (or pass replace_all). Pass ops:[{path, old_string, new_string}] to apply MANY edits across MANY files in ONE atomic call — every guard is checked before anything is written. Batch related edits; do not loop single calls.",
+        "EDIT FILES — five verbs, one atomic batch. Each op is ONE of: {path, old_string, new_string} exact match (unique, or replace_all) · {path, pattern, replacement, flags?, expect_count?} regex substitution, always global, count reported · {path, append: true, new_string} append (prepend: true likewise) — never rebuild a file to add to its end · {path, at: {from_line, to_line}, new_string, base_hash} replace a line range from a read you hold. MANY edits, MANY files, ONE call — every guard checked before anything is written. TRIVIAL MISMATCHES ARE CORRECTED, NOT REFUSED: a CRLF/LF difference is applied in the file's own endings and named on the result (`corrected`).",
       inputSchema: {
         type: "object",
         properties: {
           ops: {
             type: "array",
-            description: "[{path, old_string, new_string, base_hash?, replace_all?}, ...] — atomic",
+            description: "[{path, + one verb's fields}, ...] — atomic across the batch",
             items: {
               type: "object",
               properties: {
                 path: { type: "string" },
-                old_string: { type: "string" },
-                new_string: { type: "string" },
-                base_hash: { type: "string" },
+                old_string: { type: "string", description: "exact verb: the text to find (unique unless replace_all)" },
+                new_string: { type: "string", description: "the replacement / appended / prepended / range text" },
+                base_hash: { type: "string", description: "CAS pin from se_file_read — REQUIRED on a range op" },
                 replace_all: { type: "boolean" },
+                pattern: { type: "string", description: "regex verb: JS regex, always global; $1 backrefs work in replacement" },
+                replacement: { type: "string" },
+                flags: { type: "string", description: "regex flags from i m s — g is implied" },
+                expect_count: { type: "number", description: "regex verb: refuse unless the match count is exactly this" },
+                append: { type: "boolean", description: "append new_string to the file's end (newline seam handled and named)" },
+                prepend: { type: "boolean", description: "prepend new_string to the file's start" },
+                at: { type: "object", description: "{from_line, to_line} 1-based inclusive — replace these lines with new_string" },
               },
-              required: ["path", "old_string", "new_string"],
+              required: ["path"],
             },
           },
         },
@@ -326,7 +335,7 @@ export function coreTools(rootOf: (rel?: string) => string, projectRoot: string,
       handler: (args) => {
         // Unknown op fields refuse BY NAME — a mistyped find/replace once
         // read as "0 occurrences" and cost a round of misdiagnosis.
-        const KNOWN = new Set(["path", "old_string", "new_string", "base_hash", "replace_all"]);
+        const KNOWN = new Set(["path", "old_string", "new_string", "base_hash", "replace_all", "pattern", "replacement", "flags", "expect_count", "append", "prepend", "at"]);
         const ALIAS: Record<string, string> = { find: "old_string", replace: "new_string", search: "old_string", old: "old_string", new: "new_string" };
         (Array.isArray(args.ops) ? (args.ops as Record<string, unknown>[]) : []).forEach((op, i) => {
           const unknown = Object.keys(op).filter((k) => !KNOWN.has(k));
@@ -412,7 +421,7 @@ export function coreTools(rootOf: (rel?: string) => string, projectRoot: string,
       name: "se_file_search",
       title: "se.file.search",
       description:
-        "Regex search across the working tree (ripgrep) OR any git ref (pass ref — a branch or tag; this repo is a branch of quack, so 'main' reaches v1 and 'v2' reaches v2). Scope it to a DECLARED ROOT with path: '@name'; hits come back as '@name/...', the same address the reader takes. Returns match LOCATIONS with an intent trail; read around a hit with se_file_read offset/limit.",
+        "Regex search (ripgrep). context: N brings N lines around every hit — usually saves the follow-up read; include: '**/*.ts' filters by filename in the same call; count_only: true answers 'how many, where' for a fraction of the tokens. Search any git ref with ref (a branch or tag; this repo is a branch of quack, so 'main' reaches v1 and 'v2' reaches v2). Scope to a DECLARED ROOT with path: '@name'; hits come back as '@name/...', the same address the reader takes. For more than context can carry, read around a hit with se_file_read offset/limit.",
       inputSchema: {
         type: "object",
         properties: {
@@ -422,6 +431,11 @@ export function coreTools(rootOf: (rel?: string) => string, projectRoot: string,
           ref: { type: "string", description: "search this committed ref instead of the tree" },
           ignore_case: { type: "boolean" },
           limit: { type: "number", default: 100 },
+          context: { type: "number", description: "lines around each hit (capped at 10) — context lines carry context: true, so a neighbour is never mistaken for a match" },
+          before: { type: "number", description: "asymmetric context: lines BEFORE each hit (wins over context)" },
+          after: { type: "number", description: "asymmetric context: lines AFTER each hit (wins over context)" },
+          include: { type: "string", description: "filename glob, e.g. **/*.ts — the search filters files itself; no listing pipe needed" },
+          count_only: { type: "boolean", description: "per-file match counts instead of match lines" },
         },
         required: ["query", "intent"],
       },
@@ -432,6 +446,11 @@ export function coreTools(rootOf: (rel?: string) => string, projectRoot: string,
           ...(args.ref !== undefined ? { ref: String(args.ref) } : {}),
           ...(args.ignore_case === true ? { ignore_case: true } : {}),
           ...(args.limit !== undefined ? { limit: Number(args.limit) } : {}),
+          ...(args.context !== undefined ? { context: Number(args.context) } : {}),
+          ...(args.before !== undefined ? { before: Number(args.before) } : {}),
+          ...(args.after !== undefined ? { after: Number(args.after) } : {}),
+          ...(args.include !== undefined ? { include: String(args.include) } : {}),
+          ...(args.count_only === true ? { count_only: true } : {}),
         }),
     },
     {
@@ -468,13 +487,15 @@ export function coreTools(rootOf: (rel?: string) => string, projectRoot: string,
       name: "se_run",
       title: "se.run",
       description:
-        "Run a shell command from the project root (bash on POSIX, PowerShell on Windows). Output is engine-captured and logged IN FULL under the returned call ref — a run is citable evidence.\n\nNOBODY WAITS. A command still running after 20s is HANDED OFF to the background and you get a job handle at once; ask again with {job} for its output so far, and {job, stop: true} to kill it and everything it spawned. Start long work in the background yourself with {background: true}. {jobs: true} lists this session's jobs.\n\nNEVER call this session's own mirror over HTTP from here — the run blocks the server's event loop, so the mirror cannot answer itself.",
+        `Run a shell command from the project root (bash on POSIX, PowerShell on Windows) — for what ONLY a shell does: node, npm, builds, processes. THE LANE'S JOBS ARE REFUSED HERE: ${laneSummary()}. A first offence per category runs once with a warning; after that the category refuses (SE-C-129) with the lane call as the remedy. If the lane truly cannot do the job, pass no_tool_reason — the command runs once and your reason is logged for the retro.\n\nOutput is engine-captured and logged IN FULL under the returned call ref — a run is citable evidence.\n\nNOBODY WAITS. A command still running after 20s is HANDED OFF to the background and you get a job handle at once; ask again with {job} for its output so far, and {job, stop: true} to kill it and everything it spawned. Start long work in the background yourself with {background: true}. {jobs: true} lists this session's jobs.\n\nNEVER call this session's own mirror over HTTP from here — the run blocks the server's event loop, so the mirror cannot answer itself.`,
       inputSchema: {
         type: "object",
         properties: {
           command: { type: "string" },
+          no_tool_reason: { type: "string", description: "why the lane cannot do this job — runs a lane-covered command ONCE and files the reason for the retro; a frequent reason is the lane's next verb" },
           background: { type: "boolean", description: "start it detached and return a job handle IMMEDIATELY — for work you know is long" },
           job: { type: "string", description: "ask an existing job how it is doing: its output so far, whether it still runs" },
+          wait_ms: { type: "number", description: "with job: BLOCK up to this long on the job's completion — returns the moment it exits. The replacement for every Start-Sleep. Capped at 120000." },
           stop: { type: "boolean", description: "with job: kill it and every process it spawned" },
           jobs: { type: "boolean", description: "list every job this session started, newest first" },
           handoff_ms: { type: "number", description: "how long to wait inline before handing off to the background (default 20000)" },
@@ -482,9 +503,15 @@ export function coreTools(rootOf: (rel?: string) => string, projectRoot: string,
           cwd: { type: "string", description: "root-relative working directory" },
         },
       },
-      handler: (args) => {
+      handler: async (args) => {
         if (args.jobs === true) return { jobs: jobList() };
-        if (args.job !== undefined) return args.stop === true ? jobStop(String(args.job)) : jobStatus(String(args.job));
+        if (args.job !== undefined) {
+          if (args.stop === true) return jobStop(String(args.job));
+          // THE WAIT RIDES THE JOB'S OWN DONE-PROMISE — it returns the moment
+          // the command exits, where a sleep always serves its full sentence.
+          if (args.wait_ms !== undefined) return jobWait(String(args.job), Number(args.wait_ms));
+          return jobStatus(String(args.job));
+        }
         if (args.command === undefined) {
           throw new Rejection({
             clause: CLAUSES.REQUIRED_ARGS,
@@ -494,38 +521,99 @@ export function coreTools(rootOf: (rel?: string) => string, projectRoot: string,
             source: "engine/tools.ts se_run",
           });
         }
+        // THE DISCIPLINE LADDER (engine/discipline.ts): a command doing a lane
+        // tool's job runs once with a warning, then refuses. Judged BEFORE the
+        // spawn, so a blocked category costs nothing to block.
+        const laneWarning = laneVerdict(seDir(projectRoot), String(args.command), args.no_tool_reason === undefined ? undefined : String(args.no_tool_reason));
         const cwd = args.cwd !== undefined ? { cwd: String(args.cwd) } : {};
-        if (args.background === true) return runBackground(rootOf(), String(args.command), cwd);
-        return runOrHandoff(rootOf(), String(args.command), {
-          ...cwd,
-          ...(args.handoff_ms !== undefined ? { handoff_ms: Number(args.handoff_ms) } : {}),
-        });
+        const res = args.background === true
+          ? runBackground(rootOf(), String(args.command), cwd)
+          : await runOrHandoff(rootOf(), String(args.command), {
+              ...cwd,
+              ...(args.handoff_ms !== undefined ? { handoff_ms: Number(args.handoff_ms) } : {}),
+            });
+        return laneWarning === undefined ? res : { ...(res as unknown as Record<string, unknown>), lane_warning: laneWarning };
       },
     },
     {
       name: "se_test",
       title: "se.test",
       description:
-        "Run the engine's own checks in ONE call: the preflight and the full selftest suite, each with structured pass/fail and captured output. Runs in the bound worktree when one is open. Replaces the free-form se_run pair.",
-      inputSchema: { type: "object", properties: {} },
-      handler: async () => {
+        "Run tests STRUCTURED — scoped by default, the battery when you earn it. {files: ['pull']} runs pull.test.ts (add name_pattern to narrow further) and returns counts plus ONLY the failures' detail, so nothing needs a temp file or a grep. NO ARGUMENTS runs the battery (preflight + full selftest) — and REFUSES (SE-C-131) while every change since the last green battery maps to a named test file: the refusal hands you that exact scoped call. Piecemeal past a third of the suite flips the other way: the battery becomes the sanctioned, cheaper call. AN UNCHANGED TREE REFUSES its scope (SE-C-130) — that verdict still stands; force: true is the flake door for both gates.",
+      inputSchema: {
+        type: "object",
+        properties: {
+          files: { type: "array", items: { type: "string" }, description: "test files to run scoped — 'pull', 'pull.test.ts' and the full path all name the same file" },
+          name_pattern: { type: "string", description: "--test-name-pattern: run only tests whose name matches" },
+          force: { type: "boolean", description: "override both gates: unchanged tree, and battery/scope economics — for flake hunts" },
+        },
+      },
+      handler: async (args) => {
         const root = rootOf();
+        const se = seDir(projectRoot);
+        const force = args.force === true;
+        const spawnNode = (argv: string[], timeout: number): Promise<{ status: number | null; out: string }> =>
+          new Promise((resolve) => {
+            const child = spawn("node", argv, { cwd: root });
+            let out = "";
+            child.stdout.on("data", (d: Buffer) => { out += d; });
+            child.stderr.on("data", (d: Buffer) => { out += d; });
+            const timer = setTimeout(() => child.kill(), timeout);
+            child.on("error", (e) => { clearTimeout(timer); resolve({ status: null, out: String(e) }); });
+            child.on("close", (code) => { clearTimeout(timer); resolve({ status: code, out }); });
+          });
+        const wantsScope = args.files !== undefined || args.name_pattern !== undefined;
+        if (wantsScope) {
+          // 'pull', 'pull.test.ts', 'tests/pull.test.ts', full path — one file.
+          const named = (Array.isArray(args.files) ? (args.files as unknown[]).map(String) : []).map((f) => {
+            const base = f.split("/").pop() as string;
+            const file = base.endsWith(".test.ts") ? base : `${base}.test.ts`;
+            return `product/deliverable/tests/${file}`;
+          });
+          const files = named.length > 0 ? [...new Set(named)].sort() : suiteFiles(root);
+          const missing = files.filter((f) => !existsSync(resolveInRoot(root, f, "engine/tools.ts se_test")));
+          if (missing.length > 0) {
+            throw new Rejection({
+              clause: CLAUSES.REQUIRED_ARGS,
+              expected: "test files that exist under product/deliverable/tests/",
+              got: `unknown: ${missing.join(", ")}`,
+              remedy: { tool: "se_file_glob", args: { glob: "product/deliverable/tests/*.test.ts" }, note: "list the suite, then name your scope" },
+              source: "engine/tools.ts se_test",
+            });
+          }
+          const scope = `${files.join(",")}${args.name_pattern !== undefined ? `#${String(args.name_pattern)}` : ""}`;
+          testGate(se, root, force, scope);
+          if (named.length > 0) scopedGate(se, root, files, force);
+          const argv = ["--test", "--test-reporter=tap", ...(args.name_pattern !== undefined ? [`--test-name-pattern=${String(args.name_pattern)}`] : []), ...files.map((f) => resolveInRoot(root, f, "engine/tools.ts se_test"))];
+          const r = await spawnNode(argv, Number(process.env.SE_TEST_SCOPED_TIMEOUT_MS ?? 150_000));
+          const tap = parseTap(r.out);
+          const ok = r.status === 0 && tap.fail === 0;
+          const streak = testRecord(se, root, ok, scope, files);
+          const nudge = streakNudge(streak);
+          // Counts plus failures — the slice every temp-file grep was after.
+          // A long green streak carries the owner's law back with the result:
+          // in ~95% of cases the change broke nothing; test to answer a
+          // question, not to reassure.
+          return { ok, scope: { files, ...(args.name_pattern !== undefined ? { name_pattern: String(args.name_pattern) } : {}) }, tests: { total: tap.total, pass: tap.pass, fail: tap.fail }, ...(tap.failures.length > 0 ? { failures: tap.failures } : {}), ...(nudge !== undefined ? { green_streak: streak, nudge } : {}), ...(r.status !== 0 && tap.total === 0 ? { output: r.out.trim().slice(0, 4000) } : {}) };
+        }
+        // The battery: EARNED, not habitual. The gate computes the scoped
+        // remedy from the diff since the last green battery.
+        batteryGate(se, root, force);
+        testGate(se, root, force);
         const scripts = ["product/deliverable/engine/bin/preflight.ts", "product/deliverable/engine/bin/selftest.ts"];
         const results: { script: string; ok: boolean; exit: number | null; output: string }[] = [];
         for (const rel of scripts) {
           const abs = resolveInRoot(root, rel, "engine/tools.ts se_test");
-          const r = await new Promise<{ status: number | null; out: string }>((resolve) => {
-            const child = spawn("node", [abs, "--root", root], { cwd: root });
-            let out = "";
-            child.stdout.on("data", (d: Buffer) => { out += d; });
-            child.stderr.on("data", (d: Buffer) => { out += d; });
-            const timer = setTimeout(() => child.kill(), 150_000);
-            child.on("error", (e) => { clearTimeout(timer); resolve({ status: null, out: String(e) }); });
-            child.on("close", (code) => { clearTimeout(timer); resolve({ status: code, out }); });
-          });
+          // The battery is long BY DESIGN now that boot walks read real
+          // guidance — 150s killed it mid-run. Configurable, generous default.
+          const r = await spawnNode([abs, "--root", root], Number(process.env.SE_TEST_TIMEOUT_MS ?? 600_000));
           results.push({ script: rel, ok: r.status === 0, exit: r.status, output: r.out.trim().slice(0, 4000) });
         }
-        return { ok: results.every((x) => x.ok), results };
+        const ok = results.every((x) => x.ok);
+        // The verdict is REMEMBERED with the tree it judged, so an identical
+        // tree can be answered from the record instead of another 90 seconds.
+        testRecord(se, root, ok);
+        return { ok, results };
       },
     },
     {
