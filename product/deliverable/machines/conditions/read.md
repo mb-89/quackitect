@@ -21,28 +21,29 @@ main machine refuses to reach `end` without a handover written that session.
 
 The proof is per hand:
 
-- **The agent sends hashes.** A doc's hash is a token you can only hold by
-  reading through the lane — `se_file_read` returns it; packets never
-  print it. Tick with `read_hashes: {"<path>": "<hash>", ...}`; every hash
-  must match the doc AS IT STANDS, and it is demanded fresh on every tick.
-  After a compaction the tokens are gone from your head — re-read, that is
-  the point.
+- **The agent reads, and reading IS the proof.** `se_reading` and
+  `se_file_read` credit each document as they serve it, at the version
+  they served. Nothing is handed in — the hash-supplying lane retired
+  with the tick (2026-08-02), because a proof you can type is a proof
+  you can fake. An EDITED document drops its credit and is asked again;
+  after a compaction the pull simply answers `read` and the loop
+  re-serves what must be read — that is the point.
 - **The human checks the box.** In the mirror, each doc carries a
   checkbox: one check per VERSION of the file. The check pins the doc's
   current hash; an edited doc unchecks itself and asks again.
 
 The condition's status shows met when EITHER hand has proven every listed
-doc at its current version — the agent's passing tick turns the mirror's
+doc at its current version — the agent's passing walk turns the mirror's
 pill green too. The checkbox stays the human's alone: a green pill with
 empty boxes means the agent read, the human did not. An edited doc drops
 both proofs and asks again.
 
 THE HANDOVER RULE: the human's checked docs are the SESSION's reading
 list (`human_checked` in every packet). When the agent takes over — the
-slider rises mid-walk — its advances must prove that same list by hash,
-even past transitions the human already walked: their checkmark is not
-the agent's reading.
+slider rises mid-walk — its walk must earn that same reading through the
+lane, even past transitions the human already walked: their checkmark is
+not the agent's reading.
 
-Sending a hash without reading defeats the machine's whole purpose — the
-hash proves the doc passed through your hands, not your head. Reading is
-what the machine is FOR.
+Reading is what the machine is FOR — the credit proves the doc passed
+through the agent's hands at its current version, and the engine will
+not walk over a document that has not.

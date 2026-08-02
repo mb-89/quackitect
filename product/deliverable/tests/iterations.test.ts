@@ -12,7 +12,7 @@ import { validateMachine, type MachineDecl } from "../engine/machine.ts";
 import { readRigorMatrix } from "../engine/rigor-matrix.ts";
 import { Session } from "../engine/session.ts";
 import { buildServer } from "../engine/tools.ts";
-import { call, freshRoot, readHashesFor } from "./helpers.ts";
+import { call, checkDocs, freshRoot } from "./helpers.ts";
 
 function gitInit(root: string): void {
   for (const a of [["init"], ["config", "user.email", "se@test.local"], ["config", "user.name", "se test"], ["add", "-A"], ["commit", "-q", "-m", "seed"]]) {
@@ -186,49 +186,41 @@ test("escalation reopens exactly the grown steps", () => {
 });
 
 test("the bless pins the machine and the container expands to the pinned walk", async () => {
+  // The WALK here is the human's hand (session-level, hash-free) — the
+  // agent's read proofs are the reading buffer now, covered in
+  // reads.test.ts, so this test drives the mechanics it is actually
+  // about: the bless, the pin, and the gate report.
   const root = freshRoot();
   gitInit(root);
   const session = new Session(root);
-  const server = buildServer(root, session);
-  const hashes = readHashesFor(root);
-  for (let i = 0; i < 8; i++) {
-    const step = await call(server, "se_tick", { advance: true, read_hashes: hashes });
-    if (step.body.booted === true) break;
-  }
+  await session.tickAdvance(); await session.tickAdvance();
+  checkDocs(session);
+  await session.tickAdvance(); await session.tickAdvance(); await session.tickAdvance();
   session.setAutonomy(1);
   const seeded = session.iterationSeed("walk the pinned machine", "the bless compiles and pins");
   const id = String(seeded.seeded);
   const sid = id.match(/^(i\d+)-/)![1];
-  // While BOUND, the lane serves the WORKTREE — the agent's proof must hash
-  // that copy (on Windows the two differ by line endings after checkout).
-  const wtHashes = readHashesFor(join(root, ".worktrees", id));
-  await call(server, "se_tick", { to: "iterations", read_hashes: hashes });
-  await call(server, "se_tick", { to: sid, read_hashes: hashes });
+  await session.tickAdvance("iterations");
+  await session.tickAdvance(sid);
   // No change_size in the record: the bless refuses, mechanically.
-  const refused = await call(server, "se_tick", { advance: true, read_hashes: wtHashes });
-  assert.equal(refused.isError, true, JSON.stringify(refused.body));
-  assert.match(JSON.stringify(refused.body), /change_size/);
-  // The prefill lands in the record; the tick is the bless.
+  await assert.rejects(() => session.tickAdvance(), (e) => /change_size/.test(JSON.stringify(e)));
+  // The prefill lands in the record; the advance is the bless.
   const rec = join(root, ".worktrees", id, "product", "spec", "iterations", id, "record.md");
   writeFileSync(rec, readFileSync(rec, "utf8").replace(/^status: /m, "change_size: patch\nstatus: "), "utf8");
-  const blessed = await call(server, "se_tick", { advance: true, read_hashes: wtHashes });
-  assert.equal(blessed.isError, false, JSON.stringify(blessed.body));
+  await session.tickAdvance();
   assert.ok(existsSync(join(root, ".worktrees", id, itPinRel(id))), "the pin exists");
   // Re-entering the container serves the walk: kickoff → the pinned machine.
-  await call(server, "se_tick", { advance: true, read_hashes: wtHashes });
-  await call(server, "se_tick", { to: "iterations", read_hashes: hashes });
-  await call(server, "se_tick", { to: sid, read_hashes: hashes });
-  const walk = await call(server, "se_tick", { advance: true, read_hashes: wtHashes });
-  assert.equal(walk.isError, false, JSON.stringify(walk.body));
-  assert.deepEqual(walk.body.breadcrumb, ["main", "iterations", `${sid}-walk`], "the walk descended into the pinned machine");
+  await session.tickAdvance();
+  await session.tickAdvance("iterations");
+  await session.tickAdvance(sid);
+  await session.tickAdvance();
+  assert.deepEqual(session.breadcrumb(), ["main", "iterations", `${sid}-walk`], "the walk descended into the pinned machine");
   // NO GATE PASSES WITHOUT A REVIEW REPORT (owner ruling): walk to the
   // first gate and try to leave — held until the report stands, then quick.
   const pin2 = JSON.parse(readFileSync(join(root, ".worktrees", id, itPinRel(id)), "utf8")) as { machine: MachineDecl };
   const gate = pin2.machine.states.find((s) => s.id === "gate-kickoff")!;
-  await call(server, "se_tick", { to: "gate-kickoff", read_hashes: wtHashes });
-  const held = await call(server, "se_tick", { to: gate.edges[0].to, read_hashes: wtHashes });
-  assert.equal(held.isError, true, JSON.stringify(held.body));
-  assert.match(String(held.body.expected), /review report/);
+  await session.tickAdvance("gate-kickoff");
+  await assert.rejects(() => session.tickAdvance(gate.edges[0].to), (e) => /review report/.test(String((e as { expected?: string }).expected)));
   const review = join(root, ".worktrees", id, "product", "spec", "iterations", id, "reviews", "gate-kickoff.md");
   mkdirSync(dirname(review), { recursive: true });
   const sections = [
@@ -238,12 +230,11 @@ test("the bless pins the machine and the container expands to the pinned walk", 
     "## red_team\n\nthe opposing case was argued\n",
   ].join("\n");
   writeFileSync(review, `---\nform: milestone-review\ngate: gate-kickoff\nstatus: done\nby: test\nverdict: PASS\n---\n\n# gate-kickoff — milestone review\n\n${sections}`, "utf8");
-  const passedGate = await call(server, "se_tick", { to: gate.edges[0].to, read_hashes: wtHashes });
-  assert.equal(passedGate.isError, false, JSON.stringify(passedGate.body));
-  // THE BLESS IS SEPARATE AND DURABLE: the passing tick stamped the
+  await session.tickAdvance(gate.edges[0].to);
+  // THE BLESS IS SEPARATE AND DURABLE: the passing step stamped the
   // sidecar with the report's version and whose hand it was.
   const bless = JSON.parse(readFileSync(review.replace(/\.md$/, ".bless.json"), "utf8")) as { hash: string; by: string };
-  assert.equal(bless.by, "agent");
+  assert.equal(bless.by, "human");
   assert.match(bless.hash, /^[0-9a-f]+$/);
 });
 
@@ -268,36 +259,27 @@ test("needs-retro holds the FIRST start; draining opens it; a started iteration 
   gitInit(root);
   const session = new Session(root);
   const server = buildServer(root, session);
-  const hashes = readHashesFor(root);
-  for (let i = 0; i < 8; i++) {
-    const step = await call(server, "se_tick", { advance: true, read_hashes: hashes });
-    if (step.body.booted === true) break;
-  }
+  await session.tickAdvance(); await session.tickAdvance();
+  checkDocs(session);
+  await session.tickAdvance(); await session.tickAdvance(); await session.tickAdvance();
   session.setAutonomy(1); // the kickoff weighs 0.6 — lift the slider clear
   const seeded = session.iterationSeed("prove the gate", "the first start waits on the retro");
   const sid = String(seeded.seeded).match(/^(i\d+)-/)![1];
   await call(server, "se_note", { text: "needs retro — iteration wrapped" });
-  await call(server, "se_tick", { to: "iterations", read_hashes: hashes });
-  const refused = await call(server, "se_tick", { to: sid, read_hashes: hashes });
-  assert.equal(refused.isError, true);
-  assert.equal(refused.body.clause, "SE-C-112");
-  assert.match(JSON.stringify(refused.body), /needs retro/);
-  // Escape out, drain at the retro, come back — the first start opens.
-  await call(server, "se_tick", { escape: "gated by needs-retro", read_hashes: hashes });
-  const { contentHash } = await import("../engine/hash.ts");
-  const method = "product/guidance/method/retro.md";
-  const withMethod = { ...hashes, [method]: contentHash(readFileSync(join(root, ...method.split("/")))) };
-  await call(server, "se_tick", { to: "retro", read_hashes: withMethod });
-  const pending = (await call(server, "se_tick", {})).body; // position read; the note ref rides the notes file
-  void pending;
+  await session.tickAdvance("iterations");
+  await assert.rejects(() => session.tickAdvance(sid), (e) => (e as { clause?: string }).clause === "SE-C-112" && /needs retro/.test(JSON.stringify(e)));
+  // Escape out — to the DESK now — then to the retro via idle; drain
+  // there, come back, and the first start opens.
+  session.escape("gated by needs-retro", "human");
+  await session.tickAdvance(); // the desk's one edge returns to idle
+  session.humanCheck("product/guidance/method/retro.md");
+  await session.tickAdvance("retro");
   const notesRaw = readFileSync(join(root, ".se", "notes.jsonl"), "utf8");
   const ref = JSON.parse(notesRaw.trim().split("\n").filter((l) => l.includes("needs retro"))[0]).ref as string;
   await call(server, "se_note_drain", { ref, disposition: "done", where: "retro ran" });
-  await call(server, "se_tick", { to: "end", read_hashes: withMethod });
-  await call(server, "se_tick", { advance: true, read_hashes: hashes });
-  await call(server, "se_tick", { to: "iterations", read_hashes: hashes });
-  const open = await call(server, "se_tick", { to: sid, read_hashes: hashes });
-  assert.equal(open.isError, false, JSON.stringify(open.body));
+  await session.tickAdvance(); // the retro's one edge returns to idle
+  await session.tickAdvance("iterations");
+  await session.tickAdvance(sid);
   // Entering bound the worktree and stamped `started:` — from now on a
   // fresh needs-retro note gates only NEW iterations, never this one.
   const rec = readFileSync(join(root, ".worktrees", String(seeded.seeded), "product", "spec", "iterations", String(seeded.seeded), "record.md"), "utf8");

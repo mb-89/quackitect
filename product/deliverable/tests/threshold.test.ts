@@ -3,84 +3,80 @@
 // when priority <= the session autonomy. The human always may — HTTP is
 // the human's hand, MCP is the agent's. Reaching end ends the SESSION:
 // onClosed fires, the server shuts down, the mirror turns red.
+//
+// THE AGENT'S SIDE SPEAKS PULL: a step above the slider arrives as the
+// instruction `wait`, never as a refusal (v2 §6's law). The human's side
+// and the mirror are unchanged — they were never gated.
 import { strict as assert } from "node:assert";
+import { mkdtempSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { test } from "node:test";
 import { Session } from "../engine/session.ts";
 import { buildServer } from "../engine/tools.ts";
-import { readFileSync } from "node:fs";
-import { join } from "node:path";
-import { contentHash } from "../engine/hash.ts";
-import { call, checkDocs, freshRoot, handOver, readHashesFor } from "./helpers.ts";
+import { call, checkDocs, freshRoot, handOver, readEverything, sessionAtIdle } from "./helpers.ts";
 
-/** The desk pulls its method doc by tag — entering demands its hash too. */
-function deskHashes(root: string): Record<string, string> {
-  const p = "product/guidance/method/front-desk.md";
-  return { ...readHashesFor(root), [p]: contentHash(readFileSync(join(root, ...p.split("/")))) };
-}
+const root = (): string => freshRoot(mkdtempSync(join(tmpdir(), "se-thr-")));
 
-test("autonomy 0 is manual mode: the agent's every step is refused, the human walks freely", async () => {
-  const root = freshRoot();
-  const session = new Session(root);
+test("autonomy 0 is manual mode: the agent's pull waits, the human walks freely", async () => {
+  const r = root();
+  const session = new Session(r);
   session.setAutonomy(0);
-  const server = buildServer(root, session);
+  const server = buildServer(r, session);
   // The agent's hand (MCP): even the mechanical first step outweighs 0 —
-  // the 0.01 floor exists exactly for this.
-  const r = await call(server, "se_tick", { advance: true });
-  assert.equal(r.isError, true);
-  assert.equal(r.body.clause, "SE-C-113");
-  assert.match(String(r.body.got), /boot/);
-  assert.match(String((r.body.remedy as { note: string }).note), /SEND YOU A MESSAGE/);
-  // Looking is never gated — tick-info still answers the agent.
-  const look = await call(server, "se_tick");
-  assert.equal(look.isError, false);
-  assert.equal(look.body.autonomy, 0);
+  // the 0.01 floor exists exactly for this. The pull SAYS so instead of
+  // refusing, and the saying is the look: where, autonomy, and the step.
+  const w = await call(server, "se_pull");
+  assert.equal(w.isError, false, "a wall is an instruction, never an error");
+  assert.equal(w.body.pull, "wait");
+  assert.equal(w.body.autonomy, 0);
+  assert.match(String(w.body.why), /above the session autonomy 0/);
+  assert.match(String(w.body.do), /slider alone cannot wake you/);
   // The human's hand (default channel): the same step just goes.
   await session.tickAdvance();
   assert.deepEqual(session.active(), ["boot/start"]);
 });
 
-test("the slider takes effect live: raise the autonomy and the agent's next tick passes", async () => {
-  const root = freshRoot();
-  const session = new Session(root);
-  const server = buildServer(root, session);
-  const hashes = readHashesFor(root);
-  for (let i = 0; i < 8; i++) {
-    const step = await call(server, "se_tick", { advance: true, read_hashes: hashes });
-    if (step.body.booted === true) break;
-  }
+test("the slider takes effect live: raise the autonomy and the agent's next pull passes", async () => {
+  const r = root();
+  const session = await sessionAtIdle(r);
+  const server = buildServer(r, session);
   session.setAutonomy(0.2);
-  assert.equal((await call(server, "se_tick", { to: "expeditions", read_hashes: hashes })).isError, true);
+  const held = await call(server, "se_pull", { form: { choice: "expeditions" } });
+  assert.equal(held.body.pull, "wait");
+  assert.match(String(held.body.at), /expeditions/, "the wait names the step that waits");
   session.setAutonomy(0.4); // the slider's POST lands here
-  const r = await call(server, "se_tick", { to: "expeditions", read_hashes: hashes });
-  assert.equal(r.isError, false);
-  assert.deepEqual(r.body.active, ["expeditions/start"]);
+  const r2 = await call(server, "se_pull");
+  assert.equal(r2.body.pull, "do", JSON.stringify(r2.body));
+  assert.deepEqual(session.active(), ["expeditions/start"]);
 });
 
-test("the gate weighs the TARGET: a 0.4 state refuses the agent at 0.2, the human may anyway", async () => {
-  const root = freshRoot();
-  const session = new Session(root);
-  const server = buildServer(root, session);
-  // Walk to idle on the human's hand.
-  await session.tickAdvance(); await session.tickAdvance();
-  checkDocs(session);
-  await session.tickAdvance(); await session.tickAdvance(); await session.tickAdvance();
-  assert.deepEqual(session.active(), ["idle"]);
+test("the gate weighs the TARGET: a 0.4 state waits at 0.2, the archives wait at ANY slider, the human may anyway", async () => {
+  const r = root();
+  const session = await sessionAtIdle(r);
+  const server = buildServer(r, session);
   session.setAutonomy(0.2);
-  // expeditions weighs 0.4 — above the agent's reach.
-  const r = await call(server, "se_tick", { to: "expeditions" });
-  assert.equal(r.isError, true);
-  assert.equal(r.body.clause, "SE-C-113");
-  // The archives sit ABOVE the whole slider (1.5, human-only browsing) —
-  // the agent is refused at ANY autonomy.
-  const arch = await call(server, "se_tick", { to: "expedition_archive", read_hashes: readHashesFor(root) });
-  assert.equal(arch.isError, true);
-  assert.equal(arch.body.clause, "SE-C-113");
-  // The front desk weighs 0.2 — exactly at the autonomy, the agent may
-  // (with its read proof: entering demands the pull's hashes).
-  session.humanCheck("product/guidance/method/front-desk.md");
-  const ok = await call(server, "se_tick", { to: "front_desk", read_hashes: deskHashes(root) });
-  assert.equal(ok.isError, false);
-  // Walk the desk back to idle on the human's hand …
+  // expeditions weighs 0.4 — above the agent's reach. It IS one of idle's
+  // offered doors, so answering it is legal; walking it is not.
+  const held = await call(server, "se_pull", { form: { choice: "expeditions" } });
+  assert.equal(held.body.pull, "wait");
+  // The archives sit ABOVE the whole slider (1.5, human-only browsing).
+  session.setAutonomy(1);
+  session.setTarget(""); // drop the held aim so the doors are offered again
+  const arch = await call(server, "se_pull", { form: { choice: "expedition_archive" } });
+  assert.equal(arch.body.pull, "wait", "1.5 outweighs even the top rung");
+  session.setAutonomy(0.2);
+  session.setTarget("");
+  // The front desk weighs 0.2 — exactly at the autonomy, the agent may.
+  // Its method doc is owed first; the pull says read, the loop drains it.
+  const aim = await call(server, "se_pull", { form: { choice: "front_desk" } });
+  if (aim.body.pull === "read") readEverything(session);
+  const desk = await call(server, "se_pull");
+  assert.equal(desk.body.pull, "do", JSON.stringify(desk.body));
+  assert.deepEqual(session.active(), ["front_desk"]);
+  // Walk the desk back to idle on the human's hand — the HUMAN proves by
+  // checkboxes, and this session booted on the agent's reading alone.
+  checkDocs(session);
   await session.tickAdvance();
   assert.deepEqual(session.active(), ["idle"]);
   // … and the human enters the 0.4 state the agent was refused.
@@ -88,26 +84,19 @@ test("the gate weighs the TARGET: a 0.4 state refuses the agent at 0.2, the huma
   assert.deepEqual(session.active(), ["expeditions/start"]);
 });
 
-test("jump back is entering too: the agent's back-jump is weighed against the autonomy", async () => {
-  const root = freshRoot();
-  const session = new Session(root);
-  const server = buildServer(root, session);
-  await session.tickAdvance(); await session.tickAdvance();
-  checkDocs(session);
-  await session.tickAdvance(); await session.tickAdvance(); await session.tickAdvance();
-  // Walk a JUDGMENT state (the desk, 0.2) so there is something above
-  // autonomy 0 to jump back to — mechanical states pass at 0 by design.
-  session.humanCheck("product/guidance/method/front-desk.md");
-  await session.tickAdvance("front_desk");
-  await session.tickAdvance();
-  assert.deepEqual(session.active(), ["idle"]);
+test("the hatch is never gated: an escape at autonomy 0 still reaches the desk", async () => {
+  // The threshold guards what the agent ENTERS on its own judgment. The
+  // escape is the andon cord — going to the desk IS going to ask the
+  // person — and a cord that can refuse to be pulled is no cord.
+  const r = root();
+  const session = await sessionAtIdle(r);
   session.setAutonomy(0);
-  const r = await call(server, "se_tick", { back: "front_desk" });
-  assert.equal(r.isError, true);
-  assert.equal(r.body.clause, "SE-C-113");
+  const out = (await session.pull({ escape: "the road is blocked, and the person must rule" })) as Record<string, unknown>;
+  assert.equal(out.pull, "wait");
+  assert.deepEqual(session.active(), ["front_desk"], "the desk weighs 0.2 and the hatch lands there anyway");
 });
 
-test("priority and autonomy ride every packet — the agent can weigh its next states", async () => {
+test("priority and autonomy ride every packet — the agent can weigh its next states", () => {
   const session = new Session(freshRoot());
   const info = session.tickInfo() as { autonomy: number; states: { priority: number; next: { to: string; priority?: number }[] }[] };
   assert.equal(info.autonomy, 0.4);
@@ -127,82 +116,39 @@ test("the autonomy refuses garbage: out-of-range values are typed rejections", (
 });
 
 test("reaching end fires onClosed once and the closing packet says session over", async () => {
-  const root = freshRoot();
-  const session = new Session(root);
+  const r = root();
+  const session = new Session(r);
   let fired = 0;
   session.onClosed = () => fired++;
   await session.tickAdvance(); await session.tickAdvance();
   checkDocs(session);
   await session.tickAdvance(); await session.tickAdvance(); await session.tickAdvance();
-  handOver(root); // the way out writes the next session's briefing
+  handOver(r); // the way out writes the next session's briefing
   const over = (await session.tickAdvance("end")) as { session_over?: boolean; banner?: string };
   assert.equal(over.session_over, true);
   assert.match(String(over.banner), /session over/i);
   assert.equal(fired, 1);
 });
 
-test("the hold: se_tick {wait} blocks until the slider moves, then the agent walks on", async () => {
-  process.env.SE_WAIT_MS = "3000";
-  try {
-    const root = freshRoot();
-    const session = new Session(root);
-    const server = buildServer(root, session);
-    await session.tickAdvance(); await session.tickAdvance();
-    checkDocs(session);
-    await session.tickAdvance(); await session.tickAdvance(); await session.tickAdvance();
-    session.setAutonomy(0);
-    // The agent is refused on a judgment state (0.4 > 0); the remedy says
-    // stop and ask the user to message you.
-    const refused = await call(server, "se_tick", { to: "expeditions", read_hashes: readHashesFor(root) });
-    assert.equal(refused.body.clause, "SE-C-113");
-    assert.match(String((refused.body.remedy as { note: string }).note), /slider alone cannot wake you/);
-    // The agent holds; the human slides 120ms later; the hold wakes changed.
-    const held = call(server, "se_tick", { wait: true });
-    setTimeout(() => session.setAutonomy(0.4), 120);
-    const woke = await held;
-    assert.equal(woke.isError, false);
-    assert.equal(woke.body.changed, true);
-    assert.equal(woke.body.autonomy, 0.4);
-    // And now the same advance just goes.
-    const r = await call(server, "se_tick", { to: "expeditions", read_hashes: readHashesFor(root) });
-    assert.equal(r.isError, false);
-    assert.deepEqual(r.body.active, ["expeditions/start"]);
-  } finally {
-    delete process.env.SE_WAIT_MS;
-  }
-});
-
-test("the hold wakes on the human's tick too, and times out honestly", async () => {
-  process.env.SE_WAIT_MS = "150";
-  try {
-    const root = freshRoot();
-    const session = new Session(root);
-    session.setAutonomy(0);
-    const server = buildServer(root, session);
-    // Timeout: nothing moves — changed false, note says hold again.
-    const idle = await call(server, "se_tick", { wait: true });
-    assert.equal(idle.body.changed, false);
-    assert.match(String(idle.body.note), /wait: true/);
-    // The human's tick wakes a fresh hold.
-    process.env.SE_WAIT_MS = "3000";
-    const held = call(server, "se_tick", { wait: true });
-    setTimeout(() => { void session.tickAdvance(); }, 120); // human hand
-    const woke = await held;
-    assert.equal(woke.body.changed, true);
-    assert.deepEqual(woke.body.active, ["boot/start"]);
-  } finally {
-    delete process.env.SE_WAIT_MS;
-  }
+test("the mirror's long-poll: waitForChange wakes on the slider and times out honestly", async () => {
+  // The agent-facing hold retired with the tick — an agent told `wait`
+  // STOPS, and the person's message resumes it. The mirror still long-polls
+  // the same primitive to repaint live, so it keeps its own test.
+  const session = new Session(root());
+  const held = session.waitForChange(3000);
+  setTimeout(() => session.setAutonomy(0.75), 120);
+  assert.equal(await held, true, "the slider's move wakes the poll");
+  assert.equal(await session.waitForChange(120), false, "nothing moved — timed out honestly");
 });
 
 test("the mirror over HTTP: slider served, POST /autonomy moves the gate, /api/alive reports, end turns it red", async () => {
   const { startMirror } = await import("../engine/mirror.ts");
   const { CallLog } = await import("../engine/calllog.ts");
   const { seDir } = await import("../engine/paths.ts");
-  const root = freshRoot();
-  const session = new Session(root);
-  const server = startMirror({ session, root, port: 0, log: new CallLog(seDir(root)), mode: "agent" });
-  await new Promise((r) => server.on("listening", r));
+  const r = root();
+  const session = new Session(r);
+  const server = startMirror({ session, root: r, port: 0, log: new CallLog(seDir(r)), mode: "agent" });
+  await new Promise((rs) => server.on("listening", rs));
   const port = (server.address() as { port: number }).port;
   const base = `http://localhost:${port}`;
   try {
@@ -226,7 +172,7 @@ test("the mirror over HTTP: slider served, POST /autonomy moves the gate, /api/a
     const noted = await fetch(base + "/note", { method: "POST", redirect: "manual", headers: { "content-type": "application/json" }, body: JSON.stringify({ text: "a human stray" }) });
     assert.equal(noted.status, 303);
     const feed = await (await fetch(base + "/api/log")).json() as { rows: { type: string; src: string; brief: string }[] };
-    assert.ok(feed.rows.some((r) => r.type === "note" && r.src === "human" && r.brief.includes("a human stray")));
+    assert.ok(feed.rows.some((x) => x.type === "note" && x.src === "human" && x.brief.includes("a human stray")));
     const tool = await (await fetch(base + "/tool", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ name: "se_seed_expedition", args: {} }) })).json() as { clause?: string };
     assert.equal(tool.clause, "SE-C-110", "the parity lane obeys the state gate");
   } finally {

@@ -73,7 +73,7 @@ test("/api/decisions serves the panel's whole contract over HTTP", async () => {
 test("feed rows carry the click keys the panel needs", () => {
   const root = freshRoot();
   const log = new CallLog(seDir(root));
-  log.append({ tool: "se_update", args: { via: "se_tick", visit: "idle@0", op: "update", brief: "x" }, ok: true, outcome: "result", duration_ms: 0 });
+  log.append({ tool: "se_update", args: { via: "se_pull", visit: "idle@0", op: "update", brief: "x" }, ok: true, outcome: "result", duration_ms: 0 });
   const { rows } = feedRows(log, "1970-01-01T00:00:00.000Z");
   assert.equal(rows[0].type, "update", "narration types as update (bold), never note");
   assert.equal(rows[0].visit, "idle@0", "the click opens this visit's tree");

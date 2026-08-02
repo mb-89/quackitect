@@ -1,15 +1,17 @@
-// THE READ PROOF (owner ruling 2026-07-26): hashes are the agent's proof,
-// checkboxes the human's — one check per doc VERSION. An edited doc
-// unchecks itself; a stale hash proves a stale read.
+// THE READ PROOF (owner ruling 2026-07-26, reworked 2026-08-02): the
+// agent's proofs are EARNED BY READING — se_reading and se_file_read
+// credit each document as they serve it; the hash-supplying lane retired
+// with the tick. Checkboxes stay the human's — one check per doc VERSION.
+// An edited doc unchecks itself and drops the agent's credit alike.
 import { strict as assert } from "node:assert";
-import { appendFileSync, mkdirSync, writeFileSync } from "node:fs";
+import { appendFileSync, existsSync, mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { test } from "node:test";
 import { renderMirror } from "../engine/render.ts";
 import { Session } from "../engine/session.ts";
 import { buildServer } from "../engine/tools.ts";
 import { readFileSync } from "node:fs";
-import { call, checkDocs, freshRoot, READ_DOCS, readHashesFor } from "./helpers.ts";
+import { bootedServer, call, checkDocs, freshRoot, READ_DOCS } from "./helpers.ts";
 
 // THREE HOMES, NOT ONE (owner ruling 2026-07-29). voice.md is about HOW YOU
 // TALK. It had accumulated rules about writing SOFTWARE and building
@@ -66,99 +68,81 @@ test("a check pins the VERSION: editing the doc unchecks it and the gate asks ag
   assert.deepEqual(s.active(), ["expeditions/start"]);
 });
 
-test("THE HANDOVER: a left-behind .se/HANDOVER.md is demanded leaving boot's reading room — absent, nothing is", async () => {
+test("THE HANDOVER: a left-behind .se/HANDOVER.md joins the reading, and is consumed by the walk", async () => {
   const root = freshRoot();
   mkdirSync(join(root, ".se"), { recursive: true });
   writeFileSync(join(root, ".se", "HANDOVER.md"), "# Handover\n\nOpen threads for the next session.\n", "utf8");
   const server = buildServer(root);
-  const hashes = readHashesFor(root);
-  let last: Awaited<ReturnType<typeof call>> | undefined;
-  for (let i = 0; i < 8; i++) {
-    last = await call(server, "se_tick", { advance: true, read_hashes: hashes });
-    if (last.isError === true || last.body.booted === true) break;
+  const owed = await call(server, "se_pull");
+  assert.equal(owed.body.pull, "read", "the way in demands reading");
+  // Drain the reading, collecting what the loop actually serves.
+  const served: string[] = [];
+  for (let j = 0; j < 40; j++) {
+    const doc = await call(server, "se_reading");
+    if (doc.body.done === true) break;
+    served.push((doc.body.document as { path: string }).path);
   }
-  // The walk stops LEAVING read_contract — the handover is a boot exit read.
-  assert.equal(last!.isError, true);
-  assert.equal(last!.body.clause, "SE-C-112");
-  assert.match(String(last!.body.expected), /read_contract/);
-  assert.match(String(last!.body.expected), /HANDOVER/);
-  // The reading room offers it: pulled with source "consume" — the mirror's checkbox home.
-  const at = await call(server, "se_tick", {});
-  const state = (at.body.states as { pulled: { path: string; sources: string[] }[] }[])[0];
-  assert.ok(state.pulled.some((p) => p.path === ".se/HANDOVER.md" && p.sources.includes("consume")));
-  const { contentHash } = await import("../engine/hash.ts");
-  const { readFileSync } = await import("node:fs");
-  const withHandover = { ...hashes, ".se/HANDOVER.md": contentHash(readFileSync(join(root, ".se", "HANDOVER.md"))) };
-  for (let i = 0; i < 8; i++) {
-    last = await call(server, "se_tick", { advance: true, read_hashes: withHandover });
-    if (last.isError === true || last.body.booted === true) break;
-  }
-  // Idle entry no longer demands it — boot already proved the reading.
-  assert.equal(last!.isError, false, JSON.stringify(last!.body));
-  assert.equal(last!.body.booted, true);
-  // CONSUMED, NOT KEPT (owner ruling 2026-07-31): being read is what destroys
-  // it. A handover that survives gets believed a second time, unmeasured.
-  const { existsSync } = await import("node:fs");
+  assert.ok(served.includes(".se/HANDOVER.md"), `the handover rode the reading: ${served.join(", ")}`);
+  const walked = await call(server, "se_pull");
+  assert.equal(walked.body.pull, "do", JSON.stringify(walked.body));
+  // CONSUMED, NOT KEPT (owner ruling 2026-07-31): being read is what
+  // destroys it. A handover that survives gets believed a second time.
   assert.equal(existsSync(join(root, ".se", "HANDOVER.md")), false, "the handover did not survive the reading room");
 });
 
-test("THE HANDOVER: the way out writes the next one — end is refused without one from this session", async () => {
+test("THE HANDOVER: the way out writes the next one — end waits without one from this session", async () => {
   const root = freshRoot();
-  const server = buildServer(root);
-  const hashes = readHashesFor(root);
-  let last: Awaited<ReturnType<typeof call>> | undefined;
-  for (let i = 0; i < 8; i++) {
-    last = await call(server, "se_tick", { advance: true, read_hashes: hashes });
-    if (last.isError === true || last.body.booted === true) break;
-  }
-  assert.equal(last!.body.booted, true, JSON.stringify(last!.body));
-  // Nothing was written for whoever comes next, so the door does not open.
-  const refused = await call(server, "se_tick", { from: "idle", to: "end", read_hashes: hashes });
-  assert.equal(refused.isError, true);
-  assert.match(String(refused.body.expected), /handover written THIS session/);
-  assert.match(String(refused.body.got), /no \.se\/HANDOVER\.md/);
+  const server = await bootedServer(root);
+  // Nothing was written for whoever comes next, so the door does not open —
+  // and the pull SAYS so, refusal riding the answer with the remedy. end is
+  // one of idle's offered doors, so the choice form answers it.
+  const refused = await call(server, "se_pull", { form: { choice: "end" } });
+  assert.equal(refused.isError, false, "a blocked walk is an instruction, not an error");
+  const ref = refused.body.refusal as { expected?: string; got?: string } | undefined;
+  assert.ok(ref !== undefined, JSON.stringify(refused.body));
+  assert.match(String(ref.expected), /handover written THIS session/);
+  assert.match(String(ref.got), /no \.se\/HANDOVER\.md/);
   // Write one and the way out opens.
-  const { writeFileSync: write, mkdirSync: mkdir } = await import("node:fs");
-  mkdir(join(root, ".se"), { recursive: true });
-  write(join(root, ".se", "HANDOVER.md"), "# Handover\n\nWhat the next session cannot read from the repo.\n", "utf8");
-  const ok = await call(server, "se_tick", { from: "idle", to: "end", read_hashes: hashes });
+  mkdirSync(join(root, ".se"), { recursive: true });
+  writeFileSync(join(root, ".se", "HANDOVER.md"), "# Handover\n\nWhat the next session cannot read from the repo.\n", "utf8");
+  const ok = await call(server, "se_pull");
   assert.equal(ok.isError, false, JSON.stringify(ok.body));
+  assert.deepEqual(ok.body.where, ["end"]);
 });
 
-test("a stale agent hash proves a stale read: the edited doc must be re-read for a fresh token", async () => {
+test("an edited doc drops the agent's credit: the pull asks for the reading again", async () => {
   const root = freshRoot();
-  const server = buildServer(root);
-  const hashes = readHashesFor(root); // earned before the edit
-  for (let i = 0; i < 5; i++) await call(server, "se_tick", { advance: true, read_hashes: hashes });
+  const server = await bootedServer(root);
+  // The boot reading stands credited; the owner edits a pulled doc.
   appendFileSync(join(root, "product", "guidance", "contract.md"), "\nEdited mid-session.\n");
-  const refused = await call(server, "se_tick", { to: "expeditions", read_hashes: hashes });
-  assert.equal(refused.isError, true);
-  assert.equal(refused.body.clause, "SE-C-112");
-  assert.match(String(refused.body.expected), /contract\.md/);
-  // Re-earn the one token that went stale; the rest still stand.
-  const fresh = { ...hashes, ...{ "product/guidance/contract.md": readHashesFor(root)["product/guidance/contract.md"] } };
-  const ok = await call(server, "se_tick", { to: "expeditions", read_hashes: fresh });
-  assert.equal(ok.isError, false);
+  const again = await call(server, "se_pull", { form: { choice: "expeditions" } });
+  assert.equal(again.body.pull, "read", "a stale credit is no credit — the doc is owed again");
+  for (let j = 0; j < 40; j++) {
+    const doc = await call(server, "se_reading");
+    if (doc.body.done === true) break;
+  }
+  const ok = await call(server, "se_pull");
+  assert.equal(ok.body.pull, "do", JSON.stringify(ok.body));
+  assert.deepEqual(ok.body.where, ["expeditions/start"]);
 });
 
-test("the read buffer auto-fills tick proofs from prior lane reads", async () => {
+test("se_file_read credits too: reading the docs by hand carries the walk without se_reading", async () => {
   const root = freshRoot();
-  const server = buildServer(root);
-  // Walk into boot/read_contract where the read gate starts applying.
-  await call(server, "se_tick", { advance: true });
-  await call(server, "se_tick", { advance: true });
-  // Earn proofs through the lane once; later ticks send no read_hashes.
-  for (const path of READ_DOCS) {
+  const session = new Session(root);
+  const server = buildServer(root, session);
+  session.setTarget("idle"); // the person's aim
+  assert.equal((await call(server, "se_pull")).body.pull, "read");
+  // Earn the credits through plain lane reads of the engine's OWN list —
+  // a windowed read still carries the whole file's CAS hash, so one line
+  // is enough. (READ_DOCS is only the boot core; the way also pulls the
+  // method cards, and the engine knows that better than any constant.)
+  for (const path of (session.tickInfo() as { route_reads: string[] }).route_reads) {
     const rr = await call(server, "se_file_read", { path, offset: 1, limit: 1 });
     assert.equal(rr.isError, false, JSON.stringify(rr.body));
   }
-  let last: Awaited<ReturnType<typeof call>> | undefined;
-  for (let i = 0; i < 8; i++) {
-    last = await call(server, "se_tick", { advance: true });
-    if (last.isError || last.body.booted === true) break;
-  }
-  assert.equal(last?.isError, false, JSON.stringify(last?.body));
-  assert.equal(last?.body.booted, true, "buffered proofs should carry the boot walk to idle");
+  const walked = await call(server, "se_pull");
+  assert.equal(walked.body.pull, "do", JSON.stringify(walked.body));
+  assert.ok((walked.body.where as string[]).includes("idle"), "buffered credits carried the boot walk to idle");
 });
 
 // BOOT IS THE READING ROOM, AND IT CLEARS THE BUFFER ON THE WAY BACK IN.
@@ -172,20 +156,19 @@ test("re-entering boot clears the buffer, so a second walk earns its reading aga
   const session = new Session(root);
   const server = buildServer(root, session);
 
-  // First entry: what start earned through the lane carries the boot walk.
+  // First entry: one read of the reading file carries the whole boot walk
+  // to the session's default target, the desk.
   await call(server, "se_file_read", { path: ".se/reading.md" });
-  const first = await call(server, "se_tick", { to: "front_desk", sweep: true });
-  assert.deepEqual(first.body.active, ["front_desk"], JSON.stringify(first.body.refusal));
+  const first = await call(server, "se_pull");
+  assert.equal(first.body.pull, "do", JSON.stringify(first.body));
+  assert.deepEqual(session.active(), ["front_desk"]);
 
-  // Back to the beginning: the walk starts over, and so does the reading.
-  const back = await call(server, "se_tick", { back: "start" });
-  assert.equal(back.isError, false, JSON.stringify(back.body));
-  await call(server, "se_tick", { advance: true }); // start -> boot/start
-  await call(server, "se_tick", { advance: true }); // boot/start -> read_contract
-  const refused = await call(server, "se_tick", { advance: true });
-  assert.equal(refused.isError, true, "a second pass through boot proves its reading again");
-  assert.equal(refused.body.clause, "SE-C-112");
-  assert.match(String(refused.body.expected), /read_contract/);
+  // Back to the beginning — the PERSON's move, from the mirror: the walk
+  // starts over, and so does the reading.
+  session.jumpBack("start");
+  session.setTarget("idle");
+  const owed = await call(server, "se_pull");
+  assert.equal(owed.body.pull, "read", "a second pass through boot proves its reading again");
 });
 
 test("the mirror renders per-doc checkboxes and never locks reading itself", async () => {
@@ -202,32 +185,31 @@ test("the mirror renders per-doc checkboxes and never locks reading itself", asy
   assert.match(after, /"checked":\s*true/);
 });
 
-test("the pill turns green from the machine: a passing agent tick records its proof — checkboxes stay human-only", async () => {
+test("the pill turns green from the machine: the agent's reading records its proof — checkboxes stay human-only", async () => {
   const root = freshRoot();
-  const server = buildServer(root);
-  // The agent walks into boot/read_contract; the exit read stands unmet.
-  await call(server, "se_tick", { advance: true });
-  await call(server, "se_tick", { advance: true });
-  const before = await call(server, "se_tick", {});
-  const beforeState = (before.body.states as { exit: { read: { met: boolean } } }[])[0];
-  assert.equal(beforeState.exit.read.met, false, "no proof presented yet");
-  // The tick that presents the hashes passes — and the proof STANDS.
-  const hashes = readHashesFor(root);
-  await call(server, "se_tick", { advance: true, read_hashes: hashes });
-  const after = await call(server, "se_tick", { state: "read_contract" });
-  const afterState = after.body as { exit: { read: { met: boolean } } };
-  assert.equal(afterState.exit.read.met, true, "the agent's presented proof is the pill's green");
+  const session = new Session(root);
+  const server = buildServer(root, session);
+  // Stand INSIDE boot so read_contract is peekable — the mirror peeks the
+  // machine on screen, and that is boot while the walk is in it.
+  await session.tickAdvance(); await session.tickAdvance();
+  const beforeState = session.stateInfo("read_contract") as { exit: { read: { met: boolean } } };
+  assert.equal(beforeState.exit.read.met, false, "no reading earned yet");
+  for (let j = 0; j < 40; j++) {
+    const doc = await call(server, "se_reading");
+    if (doc.body.done === true) break;
+  }
+  const afterState = session.stateInfo("read_contract") as { exit: { read: { met: boolean } } };
+  assert.equal(afterState.exit.read.met, true, "the agent's reading is the pill's green");
   // The human ledger is untouched: nothing checked, boxes stay empty.
-  assert.deepEqual(after.body.human_checked ?? (await call(server, "se_tick", {})).body.human_checked, []);
+  assert.deepEqual((session.tickInfo() as { human_checked: string[] }).human_checked, []);
   // A version pins the proof: editing a doc drops it, the pill asks again.
   appendFileSync(join(root, "product", "guidance", "voice.md"), "\nEdited mid-session.\n");
-  const edited = await call(server, "se_tick", { state: "read_contract" });
-  assert.equal((edited.body as { exit: { read: { met: boolean } } }).exit.read.met, false, "an edited doc drops the agent's proof too");
+  const edited = session.stateInfo("read_contract") as { exit: { read: { met: boolean } } };
+  assert.equal(edited.exit.read.met, false, "an edited doc drops the agent's proof too");
 });
 
-test("THE HANDOVER: the human walks boot on checkboxes, raises the slider — the agent owes the same reading", async () => {
+test("THE HANDOVER RULE: the human walks boot on checkboxes, raises the slider — the agent owes the same reading", async () => {
   const root = freshRoot();
-  const { Session } = await import("../engine/session.ts");
   const session = new Session(root);
   session.setAutonomy(0); // manual start
   const server = buildServer(root, session);
@@ -239,16 +221,20 @@ test("THE HANDOVER: the human walks boot on checkboxes, raises the slider — th
   // The packet tells the agent what the session has checked.
   const info = session.tickInfo() as { human_checked: string[] };
   assert.ok(info.human_checked.includes("workspace/AGENTS.md"));
-  // The slider rises; the agent advances — but its head holds none of it.
+  // The slider rises; the agent pulls — but its head holds none of it, so
+  // the machine demands the same reading before it walks anywhere.
   session.setAutonomy(0.6);
-  const owed = await call(server, "se_tick", { advance: true });
-  assert.equal(owed.isError, true);
-  assert.equal(owed.body.clause, "SE-C-112");
-  assert.match(String(owed.body.expected), /match the human's checked list/);
-  assert.match(String(owed.body.expected), /AGENTS\.md/);
-  // Reading it all makes the advance flow — through to idle.
-  const hashes = readHashesFor(root);
-  await call(server, "se_tick", { advance: true, read_hashes: hashes }); // -> boot/end
-  const landed = await call(server, "se_tick", { advance: true, read_hashes: hashes }); // pop -> idle
-  assert.equal(landed.body.booted, true);
+  session.setTarget("idle"); // the person's aim
+  const owed = await call(server, "se_pull");
+  assert.equal(owed.body.pull, "read", "their checkmark is not the agent's reading");
+  const served: string[] = [];
+  for (let j = 0; j < 40; j++) {
+    const doc = await call(server, "se_reading");
+    if (doc.body.done === true) break;
+    served.push((doc.body.document as { path: string }).path);
+  }
+  assert.ok(served.includes("workspace/AGENTS.md"), `the same list is owed: ${served.join(", ")}`);
+  const landed = await call(server, "se_pull");
+  assert.equal(landed.body.pull, "do", JSON.stringify(landed.body));
+  assert.ok((landed.body.where as string[]).includes("idle"));
 });

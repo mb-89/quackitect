@@ -19,7 +19,7 @@ import { compileMachine } from "../engine/machines/compile.ts";
 import { parseStateNote } from "../engine/notes.ts";
 import { Session, mainMachinePath } from "../engine/session.ts";
 import { buildServer } from "../engine/tools.ts";
-import { call, checkDocs, freshRoot, readHashesFor } from "./helpers.ts";
+import { call, checkDocs, freshRoot, pullBoot } from "./helpers.ts";
 
 interface RawEdge { id: string; styleAttributes?: Record<string, unknown>; fromNode: string; fromSide?: string; toNode: string; toSide?: string }
 interface RawCanvas { nodes: { type: string; file?: string }[]; edges: RawEdge[] }
@@ -28,11 +28,7 @@ test("the drawing is data: a state note edited on disk binds the next call, no r
   const root = freshRoot();
   const session = new Session(root);
   const server = buildServer(root, session);
-  const hashes = readHashesFor(root);
-  for (let i = 0; i < 8; i++) {
-    const step = await call(server, "se_tick", { advance: true, read_hashes: hashes });
-    if (step.body.booted === true) break;
-  }
+  await pullBoot(server, session);
   const notePath = join(root, "product", "deliverable", "machines", "states", "idle.md");
   const before = readFileSync(notePath, "utf8");
   assert.match(before, /^priority: 0\.01$/m, "idle costs nothing to enter");
@@ -41,9 +37,7 @@ test("the drawing is data: a state note edited on disk binds the next call, no r
   const after = before.replace(/^priority: 0\.01$/m, "priority: 0.75");
   assert.equal(after.length, before.length, "the edit changes no byte count");
   writeFileSync(notePath, after);
-  const seen = await call(server, "se_tick", {});
-  assert.equal(seen.isError, false, JSON.stringify(seen.body));
-  const idle = (seen.body.states as { id: string; priority: number }[]).find((s) => s.id === "idle");
+  const idle = (session.tickInfo() as { states: { id: string; priority: number }[] }).states.find((s) => s.id === "idle");
   assert.equal(idle?.priority, 0.75, "the running lane reads the edited note");
 });
 
@@ -51,34 +45,26 @@ test("a drawing that will not compile leaves the last good one standing", async 
   const root = freshRoot();
   const session = new Session(root);
   const server = buildServer(root, session);
-  const hashes = readHashesFor(root);
-  for (let i = 0; i < 8; i++) {
-    const step = await call(server, "se_tick", { advance: true, read_hashes: hashes });
-    if (step.body.booted === true) break;
-  }
+  await pullBoot(server, session);
   writeFileSync(mainMachinePath(root), "{ this is not a canvas");
-  const survived = await call(server, "se_tick", {});
+  const survived = await call(server, "se_pull", {});
   assert.equal(survived.isError, false, "a broken drawing never stops the walk");
-  assert.deepEqual(survived.body.active, ["idle"], "and the walk stands where it stood");
+  assert.deepEqual(survived.body.where, ["idle"], "and the walk stands where it stood");
 });
 
 test("an edit that deletes the state the walk stands in waits until it has moved on", async () => {
   const root = freshRoot();
   const session = new Session(root);
   const server = buildServer(root, session);
-  const hashes = readHashesFor(root);
-  for (let i = 0; i < 8; i++) {
-    const step = await call(server, "se_tick", { advance: true, read_hashes: hashes });
-    if (step.body.booted === true) break;
-  }
+  await pullBoot(server, session);
   // Drop idle out of the drawing while the walk is standing in it.
   const canvasPath = mainMachinePath(root);
   const raw = JSON.parse(readFileSync(canvasPath, "utf8")) as RawCanvas;
   raw.nodes = raw.nodes.filter((n) => n.file === undefined || !n.file.endsWith("idle.md"));
   writeFileSync(canvasPath, JSON.stringify(raw, null, "\t"));
-  const stood = await call(server, "se_tick", {});
+  const stood = await call(server, "se_pull", {});
   assert.equal(stood.isError, false, "the walk is not stranded");
-  assert.deepEqual(stood.body.active, ["idle"], "idle still holds it, because it still holds the walk");
+  assert.deepEqual(stood.body.where, ["idle"], "idle still holds it, because it still holds the walk");
 });
 
 /** Redraw main.canvas the way the owner's Obsidian hand did on 2026-07-28:
@@ -114,15 +100,7 @@ test("the owner's redraw no longer strands the walk: boot completes into idle", 
   const root = freshRoot();
   redrawLikeObsidian(root);
   const server = buildServer(root);
-  const read_hashes = readHashesFor(root);
-  let landed: Record<string, unknown> = {};
-  for (let i = 0; i < 8; i++) {
-    const step = await call(server, "se_tick", { advance: true, read_hashes });
-    assert.equal(step.isError, false, JSON.stringify(step.body));
-    landed = step.body;
-    if (step.body.booted === true) break;
-  }
-  assert.deepEqual(landed.active, ["idle"], "the walk stands at idle, not on no state");
+  await pullBoot(server); // throws if the walk strands anywhere short of idle
 });
 
 test("a drawn JOIN synchronizes: a starving join refuses the tick, the walk stands", async () => {
@@ -188,11 +166,10 @@ test("plain fan-in is an OR; only a drawn join is the AND", () => {
   assert.ok(activeStates(ai).includes("m"), "all inbound fired — the join opens");
 });
 
-test("the hatch always works: a booted main-machine walk escapes to idle", async () => {
+test("the hatch always works: a booted walk escapes to the DESK, ungated, from anywhere", async () => {
   const root = freshRoot();
   const session = new Session(root);
   const server = buildServer(root, session);
-  const hashes = readHashesFor(root);
   await session.tickAdvance();
   await session.tickAdvance();
   checkDocs(session);
@@ -200,22 +177,25 @@ test("the hatch always works: a booted main-machine walk escapes to idle", async
   await session.tickAdvance();
   await session.tickAdvance();
   assert.deepEqual(session.active(), ["idle"]);
-  // At idle the hatch has nowhere to go.
-  const atIdle = await call(server, "se_tick", { escape: "nothing is broken" });
-  assert.equal(atIdle.isError, true);
-  assert.equal(atIdle.body.clause, "SE-C-110");
-  // A legacy strand (empty token set) escapes home.
+  // A legacy strand (empty token set) escapes home — to the desk, with no
+  // gate on the way: no slider weighing, no read demand. The reading the
+  // desk wants arrives on the NEXT pull, as an instruction.
   session.instance.active = [];
-  const out = await call(server, "se_tick", { escape: "stranded by an old engine", read_hashes: hashes });
+  const out = await call(server, "se_pull", { escape: "stranded by an old engine" });
   assert.equal(out.isError, false, JSON.stringify(out.body));
-  assert.deepEqual(out.body.active, ["idle"]);
+  assert.equal(out.body.pull, "wait");
+  assert.deepEqual(session.active(), ["front_desk"]);
   assert.equal(session.instance.escapes.length, 1);
+  // At the desk itself there is nowhere further out.
+  const atDesk = await call(server, "se_pull", { escape: "nothing is broken" });
+  assert.equal(atDesk.isError, true);
+  assert.equal(atDesk.body.clause, "SE-C-110");
 });
 
 test("escape before boot completes still refuses", async () => {
   const root = freshRoot();
   const server = buildServer(root);
-  const r = await call(server, "se_tick", { escape: "too early" });
+  const r = await call(server, "se_pull", { escape: "too early" });
   assert.equal(r.isError, true);
   assert.equal(r.body.clause, "SE-C-110");
   assert.match(String(r.body.got), /before boot/);
@@ -377,27 +357,30 @@ test("a broken sub-canvas refuses typed at entry; fixing it heals on the next ti
   const root = freshRoot();
   const session = new Session(root);
   const server = buildServer(root, session);
-  const hashes = readHashesFor(root);
-  await session.tickAdvance();
-  await session.tickAdvance();
-  checkDocs(session);
-  await session.tickAdvance();
-  await session.tickAdvance();
-  await session.tickAdvance();
+  await pullBoot(server, session);
   session.setAutonomy(1);
-  // Break the ideation canvas: a dangling state reference.
+  // Aim while the drawing is sound — then it breaks under the walk.
+  session.setTarget("ideation");
   const p = join(root, "product", "deliverable", "machines", "ideation.canvas");
   const original = readFileSync(p, "utf8");
   const canvas = JSON.parse(original) as RawCanvas;
   const node = canvas.nodes.find((n) => n.type === "file" && String(n.file).endsWith(".md"))!;
   node.file = "deliverable/machines/states/does-not-exist.md";
   writeFileSync(p, JSON.stringify(canvas));
-  const broken = await call(server, "se_tick", { to: "ideation", read_hashes: hashes });
-  assert.equal(broken.isError, true);
-  assert.equal(broken.body.clause, "SE-C-124");
-  // Fix the drawing; the next tick retries the entry as its one step.
+  // The pull cannot DRAW a way into a broken sub-machine, and says so as
+  // an instruction: the fix is the person's, so the answer is wait.
+  const broken = await call(server, "se_pull", {});
+  assert.equal(broken.isError, false, JSON.stringify(broken.body));
+  assert.equal(broken.body.pull, "wait", JSON.stringify(broken.body));
+  assert.match(String(broken.body.why), /no drawn path/);
+  // The ENTRY itself still refuses typed — the mirror's hand meets the
+  // exact canvas error, with the offending element named. (The human's
+  // read gate stands before it, so the boxes are checked first.)
+  checkDocs(session);
+  await assert.rejects(() => session.tickAdvance("ideation"), (e) => (e as { clause?: string }).clause === "SE-C-124");
+  // Fix the drawing; the next pull draws the way again and walks in.
   writeFileSync(p, original);
-  const healed = await call(server, "se_tick", { advance: true, read_hashes: hashes });
+  const healed = await call(server, "se_pull", {});
   assert.equal(healed.isError, false, JSON.stringify(healed.body));
-  assert.deepEqual(healed.body.active, ["ideation/start"], "the healed entry is the tick's one step");
+  assert.deepEqual(session.active(), ["ideation/start"], "the healed entry is the pull's one step");
 });

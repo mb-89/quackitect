@@ -39,7 +39,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node -e \"console.log('[se] WALK THE MACHINE: your FIRST action is the se_tick tool with no arguments - it shows where you are, its guidance, and what to do. Advance with se_tick {advance:true} (or {to:...}); to walk a known way, se_tick {route:X} draws it without moving and se_tick {to:X, sweep:true} walks it in ONE call. READ PROOF: transitions demand read_hashes: an object of path-to-hash covering the listed and pulled docs - each hash rides a se_file_read result and must match the doc as it stands; reading is the point, the hash only proves it. If an advance is refused as above the threshold (SE-C-113), STOP and tell the user PLAINLY: which step is waiting, and that changing the slider alone cannot wake you - they must send you a message (e.g. continue) after adjusting it. When a result carries a banner, show it to the user VERBATIM and proceed with their request. The lane is locked until the machine reaches idle.')\""
+            "command": "node -e \"console.log('[se] PULL: your FIRST action is the se_pull tool with no payload - the machine answers with an instruction: read (call se_reading until done, then pull), fill (return the form on the next pull as form:{...}), choose (answer as form:{choice:...} - a choice exists only where one was offered), do (do what the guidance asks, then pull), or wait (STOP and tell the user plainly which step waits - the slider alone cannot wake you, they must send you a message, e.g. continue, after adjusting it). You carry no hashes and choose nothing unasked; pull, do, pull again. When a result carries a banner, show it to the user VERBATIM and proceed with their request. The lane is locked until the machine reaches idle.')\""
           }
         ]
       },
@@ -48,7 +48,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node -e \"console.log('[se] context was compacted - DROP every doc hash you remember: they no longer prove anything, because the reading they proved is gone from your head. Re-read what your state pulls through se_file_read (fresh hashes ride the results) before advancing anywhere. Call se_tick with no arguments to reorient. The one rule is unchanged: you work through the se MCP server, and you do what it tells you.')\""
+            "command": "node -e \"console.log('[se] context was compacted - what you remember reading is gone from your head, and the machine knows it. Call se_pull to reorient: it will answer read for whatever must be read again, and se_reading hands the documents over one by one. The one rule is unchanged: you work through the se MCP server, and you do what it tells you.')\""
           }
         ]
       }

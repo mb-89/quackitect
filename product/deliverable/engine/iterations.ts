@@ -324,7 +324,7 @@ export function pinIteration(root: string, it: Iteration, changeSize: string): R
       clause: CLAUSES.REQUIRED_ARGS,
       expected: `a change size: ${CHANGE_COLUMNS.join(" | ")}`,
       got: changeSize,
-      remedy: { tool: "se_tick", args: {}, note: "the kickoff's change_size field carries the choice" },
+      remedy: { tool: "se_pull", args: {}, note: "the kickoff's change_size field carries the choice" },
       source: SRC,
     });
   }
@@ -339,7 +339,7 @@ export function pinIteration(root: string, it: Iteration, changeSize: string): R
         clause: CLAUSES.CONDITION_UNMET,
         expected: `an ESCALATION — the pin stands at ${String(prev.change_size)}, and only a larger size re-opens it; a prediction that proved too big is finished at its size`,
         got: changeSize,
-        remedy: { tool: "se_tick", args: {}, note: "walk the pinned machine as it stands" },
+        remedy: { tool: "se_pull", args: {}, note: "walk the pinned machine as it stands" },
         source: SRC,
       });
     }

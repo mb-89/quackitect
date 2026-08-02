@@ -6,16 +6,13 @@ import { Session } from "../engine/session.ts";
 import { buildServer } from "../engine/tools.ts";
 import { writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { bootedServer, call, freshRoot, readHashesFor } from "./helpers.ts";
+import { bootedServer, call, freshRoot, pullBoot } from "./helpers.ts";
 
 test("se_file_patch refuses unknown op fields by name, mapping the common aliases", async () => {
   const root = freshRoot();
-  const server = buildServer(root, new Session(root));
-  const hashes = readHashesFor(root);
-  for (let i = 0; i < 8; i++) {
-    const step = await call(server, "se_tick", { advance: true, read_hashes: hashes });
-    if (step.body.booted === true) break;
-  }
+  const session = new Session(root);
+  const server = buildServer(root, session);
+  await pullBoot(server, session);
   const r = await call(server, "se_file_patch", { ops: [{ path: "workspace/AGENTS.md", find: "x", replace: "y" }] });
   assert.equal(r.isError, true);
   assert.match(String(r.body.got), /find \(use old_string\)/);

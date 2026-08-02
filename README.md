@@ -70,11 +70,12 @@ cd C:\path\to\empty
 .\RUNME.ps1
 ```
 
-**The tick** is the universal walk operation and `se_tick` the machinery's
-ONE tool, legal in every state: without arguments it reports where the
-machine is; with arguments it advances (`to:` picks the edge, `confirm:`
-confirms the state's `read` list was read). The agent, the Mirror's
-buttons, and `POST /tick` all drive the same core.
+**The pull** is the walk operation and `se_pull` the machinery's ONE
+verb, legal in every state: the agent says pull and the machine answers
+with an instruction — `read`, `fill`, `choose`, `do`, or `wait` — walking
+the happy path itself and offering options only where the road splits.
+The Mirror's buttons and `POST /tick` drive the same core by the
+person's hand; the tick retired as an agent tool on 2026-08-02.
 
 ## The cage (how it blocks)
 
@@ -133,14 +134,13 @@ sharing the same two notes; the machinery walks out of start and the
 machine is done when end activates. **The MAIN machine** (`main.canvas`)
 runs every session: `start → boot → idle → end`, where **boot is a
 sub-machine** (`boot.canvas`: `start → read_contract → prepare_idle → end`)
-and future work states branch from idle. `se_tick` walks it one state per call; the
-SessionStart hook makes the agent tick immediately and show the landing
-banner verbatim; THE STATE GATE makes the walk inevitable anyway — any
-pre-idle lane call is refused with `se_tick` as the remedy (SE-C-110).
-States carry `legal_tools` (enforced at dispatch), SCXML-style
-`enter_when`/`leave_when` conditions (SE-C-112 when unmet — `read_guidance`
-demands a logged confirmation of the state's `read` list), and the tick is
-never gated.
+and future work states branch from idle. `se_pull` walks it — the whole
+happy path per call; the SessionStart hook makes the agent pull
+immediately and show the landing banner verbatim; THE STATE GATE makes
+the walk inevitable anyway — any pre-idle lane call is refused with
+`se_pull` as the remedy (SE-C-110). States carry `legal_tools` (enforced
+at dispatch) and SCXML-style enter/leave conditions (SE-C-112 when
+unmet), and the pull is never gated.
 
 ## Status
 

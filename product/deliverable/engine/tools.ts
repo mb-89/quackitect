@@ -38,72 +38,36 @@ import { webFetch, webSearch } from "./web.ts";
 /** THE TICK — the machinery's one tool, legal in every state. */
 export function sessionTools(session: Session): ToolDef[] {
   return [
+    // THE TICK IS RETIRED (owner ruling 2026-08-02). The walk verb is
+    // se_pull; the machinery it drove — tickAdvance, sweep, jumpBack —
+    // lives on inside the session, reached through the pull and the
+    // mirror. The person's hand is the mirror, never a tool.
     {
-      name: "se_tick",
-      title: "se.tick",
+      name: "se_pull",
+      title: "se.pull",
       description:
-        "THE TICK — the universal walk operation, legal in EVERY state. Without arguments: where the machine is (state, guidance, what to read, legal tools, next states). With arguments: advance — to: <state> picks the edge (optional when there is only one), advance: true advances when no other argument applies, back: <state> returns to an earlier filled state (downstream is superseded, evidence invalidated), state: <state> PEEKS at any state without moving — use it to choose among several ways forward, and a LIST of states peeks them ALL in one call, wait: true is a SHORT in-turn hold: it blocks until the human moves something (slider, tick, check) and returns the fresh packet (changed: false on timeout) — use it only when you expect the change within seconds; otherwise STOP, telling the user plainly that they must message you (e.g. 'continue') after changing the slider, because the slider alone cannot wake a stopped agent. READ PROOF: entering a state (and leaving one with a read condition) demands read_hashes: {\"<path>\": \"<hash>\", ...} covering the listed docs — the hash rides every se_file_read result and must match the doc AS IT STANDS; it proves YOUR reading, every tick, so after a compaction re-read before advancing. THE READING IS HANDED TO YOU: whenever a target is set, the packet carries route_reads — every document the whole way there demands, gathered once. Read that entire list in ONE se_file_read and keep the hashes. You never have to ask for it, and no route syntax needs remembering. ATOMIC MOVES: send from: <your assumed current state> on every moving tick — the engine refuses (SE-C-114) when the walk stands elsewhere; the human's hand moves the walk too. When a result carries a banner, show it to the user VERBATIM.",
+        "THE PULL — your one verb. Say pull, do what comes back, pull again. The machine owns every decision; you decide nothing about the walk unless it ASKS you to. You never name a target, never carry read hashes, never ask which state you are in, and never ask which tools are legal. BLOCKING IS AN INSTRUCTION, NOT AN ERROR — a pull does not refuse a walk that cannot move yet, it tells you what to do about it. FIVE ANSWERS, and `pull` names which one you got. `read` — documents are owed: call se_reading until it answers done, then pull. `fill` — the next step wants evidence: the machine BUILT the form and handed it to you, so fill it and return it ON THE NEXT PULL as form: {\"<section>\": \"<text>\"}. THERE IS NO SUBMIT VERB; pulling without it hands back the same form. `choose` — the road splits: the machine offers its doors, and you answer ON THE NEXT PULL as form: {\"choice\": \"<to>\"} (a LIST is legal where the work fans out to several agents — the first is walked, the rest come back as not_walked). A choice exists ONLY where one was offered. `do` — the happy path was WALKED for you, every hop to the next branching point in one call: `here` is where you landed, with its guidance. `wait` — the machine is out of work, or the next step weighs more than the session autonomy: say plainly which step waits and STOP, because the slider alone cannot wake you and the person must message you after moving it. A genuinely illegal call still refuses typed — a choice outside the offer, a form nothing asked for.",
       inputSchema: {
         type: "object",
         properties: {
-          to: { type: "string", description: "the next state to enter (one of the drawn edges)" },
-          from: { type: "string", description: "your assumed CURRENT state — send it on every moving tick; the engine refuses the move (SE-C-114) when the walk stands elsewhere (the human's hand moves it too)" },
-          advance: { type: "boolean", description: "advance along the single drawn edge" },
-          back: { type: "string", description: "jump BACK to an earlier filled state — everything downstream is superseded and its evidence invalidated" },
-          state: { type: ["string", "array"], items: { type: "string" }, description: "PEEK at a named state (full info: statement, guidance, conditions, next) — looking never moves. Pass a LIST to peek several in one call: the answer carries `states`, one entry each, and an unknown id refuses for itself while the rest still arrive" },
-          wait: { type: "boolean", description: "short in-turn HOLD: blocks until the human's hand moves the walk or the slider, then returns the fresh packet (changed: false on timeout). For longer waits STOP instead and ask the user to message you" },
-          escape: { type: "string", description: "ESCAPE to idle with this reason — the STUCK sub-machine walk is left standing (a later continue re-enters it); the escape is a recorded FAILURE. Stepping out of healthy work is `pause`, not this. Boot cannot be escaped" },
-          pause: { type: "string", description: "PAUSE to idle with this reason — the same move as escape, recorded as ordinary work. The machine is left standing and a later continue re-enters it. Use this to step out of an expedition or iteration you mean to pick up later: an expedition is a day's bucket and is MEANT to stay open, so leaving one is not a failure. Boot cannot be paused" },
-          read_hashes: { type: "object", description: "proof-of-read for this tick: {\"<root-relative path>\": \"<hash from se_file_read>\", ...} — must cover the docs the transition demands, each hash matching the doc as it stands now" },
-          route: { type: "string", description: "THE BLUE LINE — the way from here to this target state: every hop, its priority, and what it will ask for. Moves NOTHING. Lists EVERY judgment on the way, so a person can answer them all at once and leave the walk to run" },
-          sweep: { type: "boolean", description: "WALK the route to `to` in one call rather than one tick per hop. Collapses round trips ONLY - every hop still weighs the slider, proves its reads and runs its scripts. Stops at the first hop that will not pass and says which and why; the route recomputes after each hop, so a detour is followed rather than fallen off" },
-          target: { type: "string", description: "Set the session's TARGET state - the blue line the mirror draws. Defaults to the front desk at every engine start, then clears itself once reached" },
+          form: {
+            type: "object",
+            description: "the filled form the LAST pull handed you. Evidence: {\"<section>\": \"<text>\", ...}. An offered choice: {\"choice\": \"<to>\"} — or a list, where the work fans out. Which one is never your call: evidence while a step demands it, a choice only where one was offered; evidence wins when both could read.",
+          },
+          escape: {
+            type: "string",
+            description: "step OUT with this reason — the ONE hatch for every kind of stepping out: the person said stop, the walk is MECHANICALLY stuck, earlier work no longer stands (say so — the person invalidates it, and the walk re-earns it). Lands at the FRONT DESK, where the person routes; recorded with its reason. A QUESTION IS NOT AN ESCAPE: waiting on an answer, stay where you stand, ask, and stop — escape only when you already know no answer could let the walk continue from here. Boot cannot be escaped.",
+          },
         },
       },
-      handler: async (args) => {
-        // THE CHANNEL RULE: MCP is the agent's hand — the threshold gates it.
-        // (HTTP, the mirror, is the human's; the human always may.)
-        if (args.wait === true) {
-          // THE HOLD — the machine's push channel, inverted: the agent
-          // parks this call and the human's next move answers it.
-          const ms = Number(process.env.SE_WAIT_MS ?? 20_000);
-          const changed = await session.waitForChange(ms);
-          return {
-            ...session.tickInfo(),
-            changed,
-            note: changed
-              ? "something moved — read this packet and continue"
-              : `nothing moved in ${ms}ms — call se_tick {wait: true} again to keep holding`,
-          };
-        }
-        // Looking never moves, so the route answers before anything else.
-        if (args.route !== undefined) return session.route(String(args.route));
-        if (args.target !== undefined) return session.setTarget(String(args.target));
-        const hashes = (typeof args.read_hashes === "object" && args.read_hashes !== null ? args.read_hashes : {}) as Record<string, string>;
-        if (args.sweep === true) {
-          const aimed = args.to === undefined ? session.target : String(args.to);
-          if (aimed === "") {
-            throw new Rejection({
-              clause: CLAUSES.REQUIRED_ARGS,
-              expected: "a non-empty sweep target (set one with se_tick {target: ...}, or pass to)",
-              got: "no current target",
-              remedy: { tool: "se_tick", args: { to: "front_desk", sweep: true }, note: "or aim first: se_tick { target: \"front_desk\" }" },
-              source: "engine/tools.ts se_tick sweep",
-            });
-          }
-          return session.sweep(aimed, "agent", hashes);
-        }
-        // ATOMIC: a moving tick declares where it was planned — stale plans
-        // are refused before anything moves (peeking never needs it).
-        if (args.from !== undefined && args.state === undefined) session.assertFrom(String(args.from));
-        if (args.escape !== undefined) return session.escape(String(args.escape), "agent", hashes);
-        if (args.pause !== undefined) return session.pause(String(args.pause), "agent", hashes);
-        if (args.state !== undefined) return peekMany(session, args.state);
-        if (args.back !== undefined) return session.jumpBack(String(args.back), "agent", hashes);
-        const wantsAdvance = args.to !== undefined || args.advance === true || Object.keys(hashes).length > 0;
-        if (!wantsAdvance) return session.tickInfo();
-        return session.tickAdvance(args.to === undefined ? undefined : String(args.to), "agent", hashes);
-      },
+      handler: async (args) =>
+        session.pull(
+          {
+            ...(typeof args.form === "object" && args.form !== null ? { form: args.form as Record<string, unknown> } : {}),
+            ...(args.escape !== undefined ? { escape: String(args.escape) } : {}),
+          },
+          "agent",
+        ),
     },
     {
       name: "se_reading",
@@ -130,7 +94,7 @@ export function sessionTools(session: Session): ToolDef[] {
             clause: CLAUSES.NOT_CONFIGURED,
             expected: "a listening mirror (the panel)",
             got: "no mirror on this session (port 0, or the bind failed)",
-            remedy: { tool: "se_tick", args: {}, note: "start the server with a mirror port (default 7333); the URL also prints on the server's stderr" },
+            remedy: { tool: "se_pull", args: {}, note: "start the server with a mirror port (default 7333); the URL also prints on the server's stderr" },
             source: "engine/tools.ts panel",
           });
         }
@@ -201,42 +165,9 @@ export function expeditionTools(session: Session): ToolDef[] {
 // judgmentDrainAllowed answers ONE question for se_note_drain: may this
 // caller park a note or carry it, or only record the mechanical verdicts.
 // It is a thunk because the walk moves under a built tool list.
-/** The same guard as MAX_READ_PATHS, on the same reasoning: peeking every
- *  state of a machine is a sweep, not a choice. No machine offers this many
- *  doors at once. */
-const MAX_PEEK_STATES = 20;
-
-/** MANY DOORS, ONE CALL. Choosing where to go means reading several states,
- *  and the front desk reads EVERY door before it advises — that paid a round
- *  trip per door for nothing.
- *
- *  A single id keeps its flat answer, so nothing that peeks one state changes.
- *  A list answers with `states`, and EACH ENTRY ANSWERS FOR ITSELF as in
- *  readMany: an unknown id carries its own typed refusal and the rest still
- *  come back. */
-function peekMany(session: Session, state: unknown): Record<string, unknown> {
-  if (!Array.isArray(state)) return session.stateInfo(String(state));
-  if (state.length > MAX_PEEK_STATES) {
-    throw new Rejection({
-      clause: CLAUSES.REQUIRED_ARGS,
-      expected: `at most ${MAX_PEEK_STATES} states in one call`,
-      got: `${state.length} states`,
-      remedy: { tool: "se_tick", args: { state: ["<first>", "<second>"] }, note: "peek the doors you are choosing between; se_tick with no arguments already lists them all" },
-      source: "engine/tools.ts se_tick peek",
-    });
-  }
-  const states = state.map((id) => {
-    const wanted = String(id);
-    try {
-      return session.stateInfo(wanted);
-    } catch (err) {
-      const r = err as { clause?: string; expected?: string; got?: string; remedy?: unknown; message?: string };
-      return { id: wanted, refused: { clause: r.clause, expected: r.expected ?? r.message, got: r.got, remedy: r.remedy } };
-    }
-  });
-  const failed = states.filter((s) => s.refused !== undefined).length;
-  return { states, ...(failed > 0 ? { failed } : {}) };
-}
+// THE PEEK RETIRED WITH THE TICK: an agent choosing among doors gets them
+// from the pull's own offer, statements and weights riding along. The
+// mirror still reads any state through stateInfo.
 
 /** A cheap multi-read makes it easy to pull documents nobody needed, which
  *  wastes context quietly. Twenty is far above any real reading list — boot's
@@ -292,7 +223,7 @@ export interface ReadingHook {
   credit(offset: number, lines: number): string[];
 }
 
-export function coreTools(rootOf: (rel?: string) => string, projectRoot: string, judgmentDrainAllowed: () => boolean = () => true, reading?: ReadingHook): ToolDef[] {
+export function coreTools(rootOf: (rel?: string) => string, projectRoot: string, judgmentDrainAllowed: () => boolean = () => true, reading?: ReadingHook, doors: () => Record<string, unknown>[] = () => []): ToolDef[] {
   return [
     {
       name: "se_file_read",
@@ -819,12 +750,18 @@ export function coreTools(rootOf: (rel?: string) => string, projectRoot: string,
           offset: { type: "number", description: "how many notes to skip — 0 is the oldest" },
         },
       },
-      handler: (args) =>
-        survey(projectRoot, {
+      handler: (args) => ({
+        ...survey(projectRoot, {
           ...(args.detail !== undefined ? { detail: String(args.detail) as "full" | "brief" } : {}),
           ...(args.limit !== undefined ? { limit: Number(args.limit) } : {}),
           ...(args.offset !== undefined ? { offset: Number(args.offset) } : {}),
         }),
+        // THE DOORS RIDE THE SURVEY. The desk used to peek every idle door
+        // in one tick call; the peek retired with the tick, and the survey
+        // is where the desk already looks first — so the vocabulary the
+        // advice needs arrives with the same call that lists the work.
+        doors: doors(),
+      }),
     },
     {
       name: "se_log_query",
@@ -896,11 +833,17 @@ export function buildServer(root: string, session = new Session(root), tollOpts:
   const tools = [
     ...sessionTools(session),
     ...expeditionTools(session),
-    ...coreTools((rel) => session.laneRoot(rel), root, () => session.inRetro(), {
-      path: Session.READING_PATH,
-      build: () => session.buildReading(),
-      credit: (offset, lines) => session.creditReading(offset, lines),
-    }),
+    ...coreTools(
+      (rel) => session.laneRoot(rel),
+      root,
+      () => session.inRetro(),
+      {
+        path: Session.READING_PATH,
+        build: () => session.buildReading(),
+        credit: (offset, lines) => session.creditReading(offset, lines),
+      },
+      () => session.doors(),
+    ),
   ];
   // THE UPDATE FIELD — every lane tool accepts it: a decision-graph op
   // riding the call. Declared on every schema so harnesses send it as an

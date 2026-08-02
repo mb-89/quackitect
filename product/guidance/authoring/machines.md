@@ -70,7 +70,7 @@ Agent-facing lives in FRONTMATTER; the body is prose for humans. First
 state: idle                  # the state's id (required)
 state_kind: work             # work | gate | terminal | start | end (required)
 legal_tools: all             # THE STATE GATE: tools legal here (`all` opens the lane;
-                             # se_tick is ALWAYS legal — it is the machinery)
+                             # se_pull is ALWAYS legal — it is the machinery)
 guidance: One or two short sentences the agent gets in its packet. Never empty.
 priority: 0.25               # HUMAN INVOLVEMENT: the weight of ENTERING this
                              # state, 0.01 .. 1 (required — see the scale below)

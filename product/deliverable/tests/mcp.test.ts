@@ -14,7 +14,7 @@ test("initialize and tools/list serve the full lane", async () => {
   const list = await server.handle({ jsonrpc: "2.0", id: 2, method: "tools/list" });
   const names = (list?.result as { tools: { name: string }[] }).tools.map((t) => t.name);
   for (const expected of [
-    "se_tick",
+    "se_pull",
     "se_file_read",
     "se_file_write",
     "se_file_patch",
@@ -30,6 +30,7 @@ test("initialize and tools/list serve the full lane", async () => {
   ]) {
     assert.ok(names.includes(expected), `missing ${expected}`);
   }
+  assert.ok(!names.includes("se_tick"), "the tick retired 2026-08-02 — its return would mean two walk verbs again");
 });
 
 // A RELOAD CAN CHANGE BEHAVIOUR BUT NOT SURFACE, unless the client is told.
@@ -96,11 +97,13 @@ test("a full read-edit-verify round trip over the wire, and every call logged", 
 
   const logPath = join(root, ".se", "calls.jsonl");
   assert.ok(existsSync(logPath));
-  const lines = readFileSync(logPath, "utf8").trim().split("\n");
-  assert.equal(lines.length, 8); // 5 walk ticks + the three lane calls
-  const first = JSON.parse(lines[5]) as { tool: string; ok: boolean };
-  assert.equal(first.tool, "se_file_read");
-  assert.equal(first.ok, true);
+  // Every call is on the log — the boot pulls and readings, then exactly
+  // the three lane calls of this round trip at the tail. The boot's own
+  // call count is the machine's business, so only the tail is pinned.
+  const records = readFileSync(logPath, "utf8").trim().split("\n").map((l) => JSON.parse(l) as { tool: string; ok: boolean });
+  assert.deepEqual(records.slice(-3).map((r) => r.tool), ["se_file_read", "se_file_patch", "se_file_read"]);
+  assert.ok(records.length > 3, "the boot walk is on the log too");
+  assert.ok(records.slice(-3).every((r) => r.ok), "the round trip's calls all passed");
 });
 
 test("se_run captures output and the log keeps it in full; se_log_query fetches by ref", async () => {
@@ -173,7 +176,7 @@ test("last_retro means the previous RETRO, not the last desk drain", async () =>
     log.append({ tool: "se_note_drain", args: { disposition }, ok: true, outcome: "result", duration_ms: 1 });
 
   drain("backlog"); // a RETRO: the desk is refused this disposition
-  log.append({ tool: "se_tick", args: {}, ok: true, outcome: "result", duration_ms: 1 });
+  log.append({ tool: "se_pull", args: {}, ok: true, outcome: "result", duration_ms: 1 });
   drain("obsolete"); // the front desk may do this one
   log.append({ tool: "se_run", args: {}, ok: true, outcome: "result", duration_ms: 1 });
 

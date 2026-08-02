@@ -5,73 +5,59 @@ the whole rule.
 
 # First action
 
-Tick. `se_tick` with no arguments shows where you are. Keep walking as the
-machine directs. If a target is set, keep moving toward it as walking.md
-specifies. Stop only on refusal, condition, or no reachable in-threshold
-progress toward target. How walking works: product/guidance/walking.md — it
-is pulled into every state's packet.
-
-You do not have to walk a known way one hop at a time. `se_tick {route: X}`
-draws the way to X without moving, and `se_tick {to: X, sweep: true}` walks
-it in one call — every hop still weighs the slider and proves its reads.
-Read SERIALLY though, never as a parallel batch — see the boot-stability
-rules below. The lane serves parallel reads fine; a Copilot harness appears
-to cancel itself on them, so serial is what works everywhere.
+Pull. `se_pull` with no payload asks the machine what to do, and its answer
+is an instruction: `read`, `fill`, `choose`, `do`, or `wait`. Do what it
+says, then pull again. Keep pulling until the answer is `wait`. Everything
+you hand back rides `form` — evidence sections, or `{"choice": "<to>"}`
+where the machine offered doors; you never choose unasked. Stepping out is
+`escape`, one hatch, landing at the front desk — but a QUESTION is not an
+escape: waiting on an answer, stay where you stand, ask, and stop; escape
+only when no answer could unblock the walk from here. How walking works:
+product/guidance/walking.md — it is pulled into every state's packet.
 
 Do this AT THE START OF EVERY SESSION, unasked. Whatever the user's first
 message says — even if it says nothing about the machine — your first tool
-call is `se_tick`. Immediately after that first tick, make the `se`
-file/search lane callable. Boot's read gates need it. HOW depends on the
+call is `se_pull`. Immediately after that first pull, make the `se`
+file/search lane callable. The reading needs it. HOW depends on the
 host, so do whichever applies:
 
 - GITHUB COPILOT CLI hides the lane behind an activation tool. Call
-  `activate_file_navigation_and_search_tools` right after the first tick.
+  `activate_file_navigation_and_search_tools` right after the first pull.
 - EVERY OTHER HOST offers the `se` tools directly, or defers them by name.
   Load them the way that host loads deferred tools.
 - NO ACTIVATION TOOL IS NOT A BOOT FAILURE. Do not hunt for it. Its absence
   means the host is not Copilot.
 
-Walk as far as the autonomy allows, then
-report in ONE short message: where you stand, and why you stopped (autonomy,
-condition, or idle). The launcher may also send you an opening prompt saying
-exactly this; the two agree on purpose, so that an agent started by hand,
-with no prompt at all, still boots the same way.
+Pull as far as the machine allows, then report in ONE short message: where
+you stand, and why you stopped (the pull's `wait` says which). The launcher
+may also send you an opening prompt saying exactly this; the two agree on
+purpose, so that an agent started by hand, with no prompt at all, still
+boots the same way.
 
-The session runs an AUTONOMY (the user's slider in the mirror). When an
-advance is refused with SE-C-113, that step is the user's - STOP, and
-tell them PLAINLY, in words like these: "I'm at start - entering boot is
-above the threshold. I'm stopping here. Changing the slider alone cannot
-wake me: after you adjust it (or advance the machine in the mirror), send
-me a message - 'continue' is enough - and I pick up from wherever the
-machine stands." Then end your turn. The same message is how you rest at
-idle with nothing to do — meaning no reachable in-threshold step that
-advances toward target. (`se_tick {wait: true}` exists for SHORT in-turn
-holds when you expect the user's change within seconds - never as a
-parking loop.)
+The session runs an AUTONOMY (the user's slider in the mirror). A step
+that weighs more than the slider is the user's: the pull answers `wait`
+and names it. STOP, and tell them PLAINLY, in words like these: "The next
+step is <step>, and it waits for your hand. Changing the slider alone
+cannot wake me: after you adjust it (or advance the machine in the
+mirror), send me a message - 'continue' is enough - and I pick up from
+wherever the machine stands." Then end your turn. The same message is how
+you rest at `wait` with nothing to do.
 
 BOOT STABILITY FOR THIS HOST:
 - Keep boot calls serial. Do not run parallel search/read batches.
-- THE READING IS A LOOP. The packet carries `reading`; call `se_reading`,
+- THE READING IS A LOOP. When the pull answers `read`, call `se_reading`,
   read the text it hands back, and call it again. Stop when it answers
-  `done: true`. Pull until it gives you nothing and you have everything.
-- Each call carries ONE document and credits it as it serves it. Do not send
-  `read_hashes` for what the loop credited; the proof is already recorded.
+  `done: true`. Then pull.
+- Each call carries ONE document and credits it as it serves it. There are
+  no hashes to carry — the reading is the proof.
 - Do not read the guidance files yourself. The loop knows what you owe,
-  including everything on the way to a target.
+  including everything on the way to the target.
 - One document per call is deliberate. A host that moves a big tool result
   to disk hands you a preview instead of the text, and you would stand
   credited for guidance you never saw. That is what the loop prevents.
-- Re-read only when a refusal names missing or stale hashes.
-- If a state allows no tools, do not call read/search there. Tick only.
 - A document that is ALLOWED to be missing is read with `optional: true`.
   Absence answers `exists: false` rather than refusing. The handover is the
   case this exists for. Boot should produce no errors at all.
-
-THE HANDOVER RULE: the packet's `human_checked` list is what the user
-checked as read while driving the mirror themselves. Your advances must
-prove the SAME reading — read every listed doc through the lane and carry
-its hash in `read_hashes`, or the tick refuses. Their checkmark is not
-your reading.
 
 Your native tools (Read, Write, Edit, Bash, Glob, Grep, web) are blocked in
 this workspace — tool by tool, by an explicit list. Which file holds that

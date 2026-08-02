@@ -6,17 +6,18 @@
 // concatenates everything still owed into ONE file, serves it like any other,
 // and credits every document it showed.
 //
-// The proof that matters is the LAST one here: after reading that single
-// file, a walk to the target passes every read gate with NO read_hashes at
-// all. If crediting were cosmetic, that sweep would refuse.
+// The proof that matters is the walk after each case: having read, a pull
+// carries the whole way with nothing handed in. If crediting were cosmetic,
+// that walk would stop at the first read gate.
 //
-// THE PULL came after, and it is now how an agent reads: one call, one
-// document, until the loop answers done. The concatenated file survives as
-// the PERSON's view of the same list. A single document cannot be truncated
-// by a host that moves large tool results to disk — which is exactly how a
-// credited reading once went unread.
+// THE PULL is how an agent reads: se_reading, one call, one document, until
+// the loop answers done. The concatenated file survives as the PERSON's view
+// of the same list. A single document cannot be truncated by a host that
+// moves large tool results to disk — which is exactly how a credited reading
+// once went unread.
 import { strict as assert } from "node:assert";
 import { test } from "node:test";
+import { Session } from "../engine/session.ts";
 import { buildServer } from "../engine/tools.ts";
 import { call, freshRoot, READ_DOCS } from "./helpers.ts";
 
@@ -26,19 +27,23 @@ interface Reading {
   note: string;
 }
 
-test("the first packet hands over one file, not a list of chores", async () => {
-  const server = buildServer(freshRoot());
-  const first = await call(server, "se_tick", {});
-  const reading = first.body.reading as unknown as Reading;
-  assert.ok(reading !== undefined, "anything owed means a reading is offered");
-  assert.equal(reading.path, ".se/reading.md", "one known path, so nothing has to be remembered");
-  assert.equal(reading.documents, (first.body.route_reads as string[]).length, "it holds exactly what the way demands");
+function pair(): { session: Session; server: ReturnType<typeof buildServer> } {
+  const root = freshRoot();
+  const session = new Session(root);
+  return { session, server: buildServer(root, session) };
+}
+
+test("the first packet hands over one file, not a list of chores", () => {
+  const { session } = pair();
+  const first = session.tickInfo() as { reading?: Reading; route_reads: string[] };
+  assert.ok(first.reading !== undefined, "anything owed means a reading is offered");
+  assert.equal(first.reading.path, ".se/reading.md", "one known path, so nothing has to be remembered");
+  assert.equal(first.reading.documents, first.route_reads.length, "it holds exactly what the way demands");
 });
 
-test("one read of the reading carries the whole walk, with no hashes to send", async () => {
-  const server = buildServer(freshRoot());
-  const first = await call(server, "se_tick", {});
-  const owed = (first.body.route_reads as string[]).length;
+test("one read of the reading carries the whole walk, with nothing handed in", async () => {
+  const { session, server } = pair();
+  const owed = (session.tickInfo() as { route_reads: string[] }).route_reads.length;
 
   const got = await call(server, "se_file_read", { path: ".se/reading.md" });
   assert.equal(got.isError, false, JSON.stringify(got.body));
@@ -53,15 +58,15 @@ test("one read of the reading carries the whole walk, with no hashes to send", a
     assert.ok(content.includes(`## ${p}`), `${p} is headed by its own path, so a reader can tell the parts apart`);
   }
 
-  // THE POINT: no read_hashes. The engine credited what it served.
-  const swept = await call(server, "se_tick", { to: "front_desk", sweep: true });
-  assert.equal(swept.isError, false, JSON.stringify(swept.body));
-  assert.deepEqual(swept.body.active, ["front_desk"], `every read gate on the way was already satisfied: ${JSON.stringify(swept.body.refusal ?? swept.body.note)}`);
+  // THE POINT: nothing handed in. The engine credited what it served,
+  // and a bare pull walks the default target (the desk).
+  const walked = await call(server, "se_pull");
+  assert.equal(walked.body.pull, "do", JSON.stringify(walked.body));
+  assert.equal(walked.body.arrived, true, "every read gate on the way was already satisfied");
 });
 
 test("the reading holds only what is still owed", async () => {
-  const server = buildServer(freshRoot());
-  await call(server, "se_tick", {});
+  const { server } = pair();
   await call(server, "se_file_read", { path: ".se/reading.md" });
   const again = await call(server, "se_file_read", { path: ".se/reading.md" });
   assert.deepEqual(again.body.credited, [], "nothing is credited twice");
@@ -69,19 +74,18 @@ test("the reading holds only what is still owed", async () => {
 });
 
 test("a page credits only the documents it showed whole", async () => {
-  const server = buildServer(freshRoot());
-  const first = await call(server, "se_tick", {});
-  const owed = (first.body.route_reads as string[]).length;
+  const { session, server } = pair();
+  const owed = (session.tickInfo() as { route_reads: string[] }).route_reads.length;
   // Four lines is the reading's own preamble and nothing else.
   const page = await call(server, "se_file_read", { path: ".se/reading.md", offset: 1, limit: 4 });
   assert.deepEqual(page.body.credited, [], "half a document is not a read, and no document fits in four lines");
-  const still = await call(server, "se_tick", {});
-  assert.equal((still.body.reading as unknown as Reading).documents, owed, "nothing was waved through, so everything is still owed");
+  const still = session.tickInfo() as { reading: Reading };
+  assert.equal(still.reading.documents, owed, "nothing was waved through, so everything is still owed");
 });
 
 test("the reading PULLS: one document a call, until it answers done", async () => {
-  const server = buildServer(freshRoot());
-  const owed = ((await call(server, "se_tick", {})).body.route_reads as string[]).length;
+  const { session, server } = pair();
+  const owed = (session.tickInfo() as { route_reads: string[] }).route_reads.length;
 
   const seen: string[] = [];
   let done = false;
@@ -103,25 +107,27 @@ test("the reading PULLS: one document a call, until it answers done", async () =
   assert.equal(new Set(seen).size, seen.length, "what is read is never served twice");
   for (const p of READ_DOCS) assert.ok(seen.includes(p), `${p} was handed over by the loop`);
 
-  // THE POINT, as above: no read_hashes. The engine credited what it served.
-  const swept = await call(server, "se_tick", { to: "front_desk", sweep: true });
-  assert.deepEqual(swept.body.active, ["front_desk"], `every read gate on the way was already satisfied: ${JSON.stringify(swept.body.refusal ?? swept.body.note)}`);
+  // THE POINT, as above: the engine credited what it served.
+  const walked = await call(server, "se_pull");
+  assert.equal(walked.body.pull, "do", JSON.stringify(walked.body));
+  assert.equal(walked.body.arrived, true);
 });
 
-test("the pull is machinery: no state can gate the reading it demands", async () => {
-  const server = buildServer(freshRoot());
-  const first = await call(server, "se_tick", {});
-  assert.ok((first.body.legal_tools as string[]).includes("se_reading"), "legal in every state, like the tick");
-  assert.equal((first.body.reading as { tool?: string }).tool, "se_reading", "and the packet says so where anything is owed");
+test("the reading is machinery: no state can gate it", () => {
+  const { session } = pair();
+  const first = session.tickInfo() as { legal_tools: string[]; reading: { tool?: string } };
+  assert.ok(first.legal_tools.includes("se_reading"), "legal in every state, like the pull");
+  assert.equal(first.reading.tool, "se_reading", "and the packet says so where anything is owed");
 });
 
-test("a multi-read is remembered too, so its hashes never have to be carried", async () => {
-  const server = buildServer(freshRoot());
-  const reads = (await call(server, "se_tick", {})).body.route_reads as string[];
+test("a multi-read is remembered too, so nothing ever has to be carried", async () => {
+  const { session, server } = pair();
+  const reads = (session.tickInfo() as { route_reads: string[] }).route_reads;
   const got = await call(server, "se_file_read", { paths: reads });
   assert.equal(got.isError, false, JSON.stringify(got.body));
-  // No read_hashes: the buffer filled itself from the set, as it always did
-  // for a single path. Only the multi shape was ever forgotten.
-  const swept = await call(server, "se_tick", { to: "front_desk", sweep: true });
-  assert.deepEqual(swept.body.active, ["front_desk"], `a set read in one call proves as much as one read at a time: ${JSON.stringify(swept.body.refusal ?? swept.body.note)}`);
+  // The buffer filled itself from the set, as it always did for a single
+  // path. Only the multi shape was ever forgotten.
+  const walked = await call(server, "se_pull");
+  assert.equal(walked.body.pull, "do", JSON.stringify(walked.body));
+  assert.equal(walked.body.arrived, true, "a set read in one call proves as much as one read at a time");
 });

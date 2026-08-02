@@ -19,11 +19,12 @@ what the state did not name. The engine does the checking.
 
 ## 3. Adjudication follows the session's autonomy
 States carry a priority. The session sets the highest priority you may pass
-alone; a tick above it is refused (SE-C-113) — you present, you WAIT, you
-never retry your way past it. The autonomy can change during the session
-(the user's slider); the refusal is the signal to tell the user a step is
-waiting for their hand — then stop, saying plainly that their message
-(continue is enough) resumes you; the slider alone cannot wake you.
+alone; a step above it is the person's, and the pull says so — it answers
+`wait` and names the step. You present, you WAIT, you never try to get
+past it. The autonomy can change during the session (the user's slider);
+the `wait` is the signal to tell the user a step is waiting for their
+hand — then stop, saying plainly that their message (continue is enough)
+resumes you; the slider alone cannot wake you.
 
 ## 4. Capture strays, do not chase them
 An idea, a bug, a better way — note it and keep walking. You do not leave

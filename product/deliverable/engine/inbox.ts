@@ -119,7 +119,7 @@ export function drainNote(seDirPath: string, ref: string, disposition: string, w
       expected: "disposition: done | obsolete — the mechanical ones",
       got: `${disposition} outside the retro`,
       remedy: {
-        tool: "se_tick",
+        tool: "se_pull",
         args: { to: "retro" },
         note: "carried and backlog decide what the work MEANS and when it returns, which wants the whole picture. done and obsolete are checks anyone can run, so they drain wherever the tool is legal",
       },

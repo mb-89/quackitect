@@ -7,7 +7,7 @@ import { strict as assert } from "node:assert";
 import { describe, test } from "node:test";
 import { Session } from "../engine/session.ts";
 import { buildServer } from "../engine/tools.ts";
-import { call, freshRoot, readHashesFor } from "./helpers.ts";
+import { call, freshRoot, pullBoot, pullTo } from "./helpers.ts";
 
 // Concurrent: every case builds its own root and touches no global.
 describe("worktree", { concurrency: true }, () => {
@@ -93,76 +93,43 @@ test("expeditions: worktree lifecycle — new, bind, work lands in the worktree,
   assert.equal(arch[0].ruling, "applied");
 });
 
-test("escape goes to idle and only to idle: the walk is left standing, the reason is recorded, boot is exempt", async () => {
+// ONE HATCH (owner ruling 2026-08-02): every kind of stepping out is an
+// escape, told apart only by its reason — the person said stop, the road
+// is blocked, earlier work no longer stands. It lands at the FRONT DESK,
+// where the person routes. pause retired with the ruling; the reason
+// carries what its flag used to.
+test("escape goes to the desk: the walk is left standing, the reason is recorded, boot is exempt", async () => {
   const { Session } = await import("../engine/session.ts");
   const { buildServer } = await import("../engine/tools.ts");
   const root = freshRoot();
   const session = new Session(root);
   const server = buildServer(root, session);
-  const hashes = readHashesFor(root);
-  // Into boot: escape is refused — boot must complete.
-  await call(server, "se_tick", { advance: true, read_hashes: hashes });
-  const noBoot = await call(server, "se_tick", { escape: "stuck" });
+  // Into boot: escape is refused — boot must complete. (The human walks
+  // the hop; the agent's escape rides the pull.)
+  await session.tickAdvance();
+  const noBoot = await call(server, "se_pull", { escape: "stuck" });
   assert.equal(noBoot.isError, true);
   assert.equal(noBoot.body.clause, "SE-C-110");
   // Boot to idle, then enter a sub-machine and escape from inside it.
-  for (let i = 0; i < 8; i++) {
-    const step = await call(server, "se_tick", { advance: true, read_hashes: hashes });
-    if (step.body.booted === true) break;
-  }
+  await pullBoot(server, session);
   session.setAutonomy(1);
-  await call(server, "se_tick", { to: "expeditions", read_hashes: hashes });
+  await pullTo(session, "expeditions");
   assert.deepEqual(session.active(), ["expeditions/start"]);
-  const esc = await call(server, "se_tick", { escape: "cannot continue: test blockage", read_hashes: hashes });
+  const esc = await call(server, "se_pull", { escape: "cannot continue: test blockage" });
   assert.equal(esc.isError, false, JSON.stringify(esc.body));
-  assert.deepEqual(session.active(), ["idle"], "escape lands at idle");
+  assert.equal(esc.body.pull, "wait", "stepping out ends in waiting for the person");
+  assert.deepEqual(session.active(), ["front_desk"], "escape lands at the desk, where the person is");
   assert.equal(session.instance.escapes.length, 1);
   assert.match(session.instance.escapes[0].exhausted_guard, /test blockage/);
-  assert.ok(session.instance.history.some((h) => h.outcome === "escaped"), "the escape is a recorded failure");
+  assert.ok(session.instance.history.some((h) => h.outcome === "escaped"), "the escape is recorded with its reason");
   // The machine was LEFT STANDING — re-entering starts it over, gray.
   assert.deepEqual(session.viewRun("expeditions").done, []);
-  // An empty reason is refused; at the main machine there is nothing to escape.
-  const empty = await call(server, "se_tick", { escape: "  " });
+  // An empty reason is refused; the desk itself has nowhere further out.
+  const empty = await call(server, "se_pull", { escape: "  " });
   assert.equal(empty.isError, true);
   assert.equal(empty.body.clause, "SE-C-046");
-  const atMain = await call(server, "se_tick", { escape: "nope" });
-  assert.equal(atMain.isError, true);
-  assert.equal(atMain.body.clause, "SE-C-110");
-});
-
-// PAUSE IS NOT ESCAPE (owner ruling 2026-07-29). An expedition is a day's
-// bucket and is MEANT to stay open, so stepping out of one is ordinary work.
-// Escape's MOVE was already right; its RECORD was wrong. It files an
-// exhausted_guard, and the retro mines those for genuine blockages — so
-// routine stepping-out would have drowned the signal it depends on.
-test("pause leaves the machine standing like escape, but records no failure", async () => {
-  const { Session } = await import("../engine/session.ts");
-  const { buildServer } = await import("../engine/tools.ts");
-  const root = freshRoot();
-  const session = new Session(root);
-  const server = buildServer(root, session);
-  const hashes = readHashesFor(root);
-  for (let i = 0; i < 9; i++) {
-    const step = await call(server, "se_tick", { advance: true, read_hashes: hashes });
-    if (step.body.booted === true) break;
-  }
-  session.setAutonomy(1);
-  await call(server, "se_tick", { to: "expeditions", read_hashes: hashes });
-  assert.deepEqual(session.active(), ["expeditions/start"]);
-
-  const p = await call(server, "se_tick", { pause: "stepping out to reload the engine, picking this up later", read_hashes: hashes });
-  assert.equal(p.isError, false, JSON.stringify(p.body));
-  assert.deepEqual(session.active(), ["idle"], "pause lands at idle, exactly like escape");
-  // The MOVE is identical — the machine is left standing, nothing filled.
-  assert.deepEqual(session.viewRun("expeditions").done, []);
-  // The RECORD is not. This is the entire point of the op.
-  assert.equal(session.instance.escapes.length, 0, "a pause is not an exhausted guard");
-  assert.ok(session.instance.history.some((h) => h.outcome === "paused"));
-  assert.equal(session.instance.history.some((h) => h.outcome === "escaped"), false);
-
-  // Same discipline as escape: never a silent exit.
-  const empty = await call(server, "se_tick", { pause: "   " });
-  assert.equal(empty.isError, true);
-  assert.equal(empty.body.clause, "SE-C-046");
+  const atDesk = await call(server, "se_pull", { escape: "nope" });
+  assert.equal(atDesk.isError, true);
+  assert.equal(atDesk.body.clause, "SE-C-110");
 });
 });

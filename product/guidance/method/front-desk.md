@@ -37,11 +37,11 @@ sections below say — sweep, advise, execute.
 
 Read the LIVE machinery, in this order. Never answer from memory.
 
-- The doors: peek every next state at idle, in ONE call
-  (`se_tick {state: […, …]}`). Their statements and priorities are the
-  current vocabulary.
-- The open work: peek the expeditions and iterations containers —
-  what stands, what is bound, what waits at its kickoff.
+- The doors: `se_survey` carries them as `doors` — idle's live offer,
+  statement and weight each. That list is the current vocabulary, and it
+  arrives with the same call that lists the work.
+- The open work: the survey's expeditions and iterations — what stands,
+  what is bound, what waits at its kickoff.
 - The pending notes: the inbox is the backlog of settled-but-unbuilt
   designs and strays. Weigh their count and their age.
 - The recent trail: `se_log_query` when "what happened lately" matters.
