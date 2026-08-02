@@ -31,12 +31,16 @@ test("the boot sub-machine compiles with its own mechanical start/end", () => {
   assert.equal(m.initial, "start");
   assert.equal(m.states.find((s) => s.id === "end")!.kind, "end");
   const rc = m.states.find((s) => s.id === "read_contract")!;
-  assert.deepEqual(rc.exit, {
-    read: ["product/AGENTS.md", "product/guidance/contract.md", "product/guidance/voice.md", "product/guidance/walking.md"],
-    // The handover is DECLARED here, not known by the engine: read on the
-    // way out, and destroyed by the same move.
-    read_consume: [".se/HANDOVER.md"],
-  });
+  // BOOT READS ONE THING NOW. The contract, the walk, the lane and the voice
+  // were PROMOTED to the prompt layer, where they are present every turn and
+  // no compaction can erase them. Preflight refuses to boot when what was
+  // placed is not the projection of product/guidance/, so the promotion is
+  // guarded mechanically rather than by trust.
+  //
+  // The handover cannot be promoted: it CHANGES every session, and the prompt
+  // layer is for constants. It is DECLARED here, not known by the engine:
+  // read on the way out, and destroyed by the same move.
+  assert.deepEqual(rc.exit, { read_consume: [".se/HANDOVER.md"] });
 });
 
 test("at start the lane beyond reading is refused with se_pull as the remedy", async () => {
@@ -60,7 +64,7 @@ test("se_pull answers an instruction — legal everywhere, and a fresh session o
   assert.equal(r.isError, false);
   assert.equal(r.body.pull, "read", "boot's guidance is owed before anything walks");
   assert.deepEqual(r.body.where, ["start"]);
-  assert.ok((r.body.documents as number) > 0);
+  assert.ok((r.body.remaining as number) > 0, "the answer says how many documents still stand behind this one");
 });
 
 test("the agent's pulls walk boot: the reading gates, the machine walks, the banner survives the sweep", async () => {
@@ -76,15 +80,22 @@ test("the agent's pulls walk boot: the reading gates, the machine walks, the ban
   const shut = await call(server, "se_run", { command: "echo nope" });
   assert.equal(shut.body.clause, "SE-C-110");
   // Drain the reading the honest way — one document per pull, tail proven.
+  //
+  // THE ANSWER IS THREADED, never re-pulled. The call that stops answering
+  // `read` is the one that WALKS, and pulling again to look at it throws that
+  // walk away: the target clears itself on arrival, so the extra pull
+  // correctly offers doors and the test reads a success as a failure. With
+  // the contract promoted there may be nothing owed at all, which makes the
+  // very first answer the whole walk.
+  let r = await call(server, "se_pull");
   for (let j = 0; j < 40; j++) {
-    const r = await call(server, "se_pull");
     const doc = r.body.document as { content?: string } | undefined;
     if (doc?.content === undefined) break;
-    await call(server, "se_pull", { form: { read: proofFor(doc.content) } });
+    r = await call(server, "se_pull", { form: { read: proofFor(doc.content) } });
   }
-  // Now the pull WALKS: boot runs its scripts, idle is crossed, and the
-  // session's default target (the front desk) is reached in ONE call.
-  const walked = await call(server, "se_pull");
+  // That answer WALKED: boot ran its scripts, idle was crossed, and the
+  // session's default target (the front desk) was reached in ONE call.
+  const walked = r;
   assert.equal(walked.body.pull, "do", JSON.stringify(walked.body));
   assert.equal(walked.body.arrived, true);
   assert.ok((walked.body.walked as string[]).length > 3, "the whole branchless way in one pull");
@@ -137,9 +148,11 @@ test("manual mode: tick info at start, the human's steps walk the whole machine 
   assert.deepEqual(s.active(), ["boot/start"]);
   await s.advance();
   assert.deepEqual(s.active(), ["boot/read_contract"]);
-  // the read gate holds the manual walk too — until the docs are CHECKED
-  await assert.rejects(() => s.advance(), (e) => (e as { clause?: string }).clause === "SE-C-112");
-  checkDocs(s); // the mirror's checkboxes — one per doc version
+  // THE READ GATE NO LONGER HOLDS BOOT, because boot no longer owes the
+  // contract — the prompt layer carries it, and preflight guards that. The
+  // person's checkbox path is unchanged and still legal; with nothing owed it
+  // simply has nothing to check.
+  checkDocs(s);
   await s.advance();
   assert.deepEqual(s.active(), ["boot/prepare_idle"]);
   await s.advance(); // prepare_idle -> boot's visible end position
@@ -168,12 +181,18 @@ test("the mirror's packet: exit dictionary, pulled docs WITHOUT hashes, preread 
   const s = new Session(freshRoot());
   await s.advance(); await s.advance();
   const state = (s.packet() as { states: {
-    exit?: Record<string, { args: string[] }>;
+    exit?: Record<string, { args: string[]; met?: boolean }>;
     pulled?: Record<string, unknown>[];
     lookahead_read?: string[];
     next?: { to: string; entry_read?: string[] }[];
   }[] }).states[0];
-  assert.ok(state.exit !== undefined && state.exit.read.args.length === 4, "the exit dictionary rides the packet");
+  // WITH NO HANDOVER LEFT BEHIND, boot owes NOTHING on the way out. The
+  // contract, the walk, the lane and the voice were promoted to the prompt
+  // layer, and the handover is dropped from the demand when it is not there.
+  // An absent dictionary is the shape of a boot that owes nothing — which is
+  // the whole point of the promotion.
+  assert.deepEqual(Object.keys(state.exit ?? {}), ["read_consume"], "boot's only remaining exit demand is the handover");
+  assert.deepEqual(state.exit!.read_consume.args, [], "and with none left behind it asks for nothing");
   assert.ok(state.pulled !== undefined && state.pulled.length >= 2, "the pulled guidance rides the packet");
   // The hash IS the proof — packets must never print it.
   assert.ok(state.pulled!.every((p) => !("hash" in p)), "packets never hand out the hashes");

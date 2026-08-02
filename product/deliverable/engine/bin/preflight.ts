@@ -11,6 +11,7 @@ import { spawnSync } from "node:child_process";
 import { compileMachine } from "../machines/compile.ts";
 import { rgPath } from "../search.ts";
 import { resolveInRoot, seDir } from "../paths.ts";
+import { assembleProtocol, protocolTargets, textFor } from "../promptlayer.ts";
 import { type MachineDecl } from "../machine.ts";
 
 function argValue(flag: string): string | undefined {
@@ -63,6 +64,28 @@ const scanForNul = (dir: string): void => {
 };
 scanForNul(join(root, "product", "deliverable", "engine"));
 scanForNul(join(root, "product", "deliverable", "vscode"));
+
+// THE PLACED PROMPT LAYER MUST BE THE PROJECTION OF ITS SOURCE. Boot no
+// longer reads the contract, so the prompt layer IS how an agent receives it.
+// A stale placement would mean an agent walking under yesterday's rules; a
+// missing one would mean an agent walking under none. Neither says anything
+// on its own, which is exactly why this check exists.
+try {
+  const projection = assembleProtocol(root);
+  for (const t of protocolTargets(join(root, "product"))) {
+    if (!existsSync(t.path)) {
+      // AGENTS.md is the door every host reads. The other two are per-host
+      // conveniences, and a host that is not installed leaves none behind.
+      if (t.path.endsWith("AGENTS.md")) failures.push(`${t.path} is MISSING — the prompt layer was never placed, so nothing carries the contract. Run engine/bin/place-prompt-layer.ts.`);
+      continue;
+    }
+    if (readFileSync(t.path, "utf8") !== textFor(t, projection)) {
+      failures.push(`${t.path} is STALE — it is not the projection of product/guidance/. Run engine/bin/place-prompt-layer.ts.`);
+    }
+  }
+} catch (e) {
+  failures.push(`the prompt layer could not be assembled: ${String((e as Error).message)}`);
+}
 
 const machinesDir = join(root, "product", "deliverable", "machines");
 const decls: MachineDecl[] = [];

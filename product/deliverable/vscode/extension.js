@@ -183,6 +183,20 @@ function placeConfigs(root) {
   place("vscode-instructions.md", path.join(opened, ".github"), "copilot-instructions.md");
   place("claude-settings.json", path.join(opened, ".claude"), "settings.json"); // the cage
   placeVoiceProjections(root, opened);
+  placePromptLayer(root, opened);
+}
+
+// THE PROMPT LAYER is assembled by the ENGINE, not here. One assembler, so a
+// placement and the preflight check that verifies it cannot disagree about
+// what the projection is.
+function placePromptLayer(root, opened) {
+  const script = path.join(root, "product", "deliverable", "engine", "bin", "place-prompt-layer.ts");
+  const r = spawnSync("node", [script, "--root", root, "--opened", opened], {
+    encoding: "utf8",
+    shell: process.platform === "win32",
+    windowsHide: true,
+  });
+  if (r.status !== 0) trace("prompt layer not placed: " + String(r.stderr || r.stdout).trim());
 }
 
 // VOICE IS ONE FILE, AND EVERY PROMPT LAYER IS A PROJECTION OF IT (owner
@@ -207,8 +221,10 @@ function placeVoiceProjections(root, opened) {
   const GENERATED = "description: Generated from product/guidance/voice.md. Edit that file, never this one.";
   try {
     const voice = readFileSync(path.join(root, "product", "guidance", "voice.md"), "utf8");
+    // Only the Claude output style is voice-only. Copilot gets voice inside
+    // the protocol instructions, because voice is one of its sources — a
+    // second file would be the same text twice.
     write(path.join(opened, ".claude", "output-styles"), "voice.md", ["---", "name: voice", GENERATED, "---"], voice);
-    write(path.join(opened, ".github", "instructions"), "voice.instructions.md", ["---", "name: voice", GENERATED, "applyTo: '**'", "---"], voice);
   } catch (e) {
     // A projection is a convenience. A missing or unreadable voice.md must
     // never stop the cage itself from being placed.
