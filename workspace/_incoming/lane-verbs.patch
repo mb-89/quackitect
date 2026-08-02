@@ -1,0 +1,1803 @@
+From 5246afbaa641da3230fce0dd657b533b43835783 Mon Sep 17 00:00:00 2001
+From: "claude (cowork)" <claude@cowork>
+Date: Sun, 2 Aug 2026 10:54:32 +0000
+Subject: [PATCH] lane verbs + discipline: patch append/prepend/regex/range +
+ EOL auto-correct; search context/before/after/include/count_only; se_run rule
+ ladder (SE-C-129) + job wait_ms; se_test scoped runs + battery economics
+ (SE-C-130/131) + green-streak nudge
+
+---
+ product/deliverable/engine/discipline.ts     | 480 ++++++++++++++++++
+ product/deliverable/engine/errors.ts         |   3 +
+ product/deliverable/engine/files.ts          | 228 +++++++--
+ product/deliverable/engine/run.ts            |  12 +
+ product/deliverable/engine/search.ts         | 161 +++++-
+ product/deliverable/engine/tools.ts          | 144 ++++--
+ product/deliverable/tests/discipline.test.ts | 494 +++++++++++++++++++
+ 7 files changed, 1448 insertions(+), 74 deletions(-)
+ create mode 100644 product/deliverable/engine/discipline.ts
+ create mode 100644 product/deliverable/tests/discipline.test.ts
+
+diff --git a/product/deliverable/engine/discipline.ts b/product/deliverable/engine/discipline.ts
+new file mode 100644
+index 0000000..6aa9994
+--- /dev/null
++++ b/product/deliverable/engine/discipline.ts
+@@ -0,0 +1,480 @@
++// THE DISCIPLINE LANE — rule-based, no second model (owner ruling 2026-08-02).
++//
++// Harvested from 2,589 logged se_run calls: 46% were improvised text tools —
++// Select-String standing in for the searcher, Get-Content for the reader,
++// Set-/Add-Content for the writer — every one uninstrumented, un-CAS'd, and
++// invisible to the guards the lane exists to provide. The lane now covers
++// those jobs, so doing them through the shell stops being a gap and starts
++// being a choice.
++//
++// The ladder: first classified run GOES THROUGH, carrying a named warning —
++// that warning is the feed-forward for the second attempt. From then on the
++// category refuses (SE-C-129), remedy naming the lane tool. The valve:
++// no_tool_reason runs it once and LOGS THE REASON — when the classifier is
++// wrong or a verb is truly missing, the agent documents the gap at the moment
++// it hits it, and the reasons pile up where the retro reads. A frequent
++// reason IS the next verb.
++//
++// ONE TABLE, THREE OUTPUTS. The rules below drive (a) the classifier, (b)
++// the warning/refusal text, and (c) the se_run description (laneSummary) —
++// feed-forward and feedback generated from the same source, so they cannot
++// drift apart.
++import { spawnSync } from "node:child_process";
++import { existsSync, mkdirSync, readdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
++import { join } from "node:path";
++import { CLAUSES, Rejection } from "./errors.ts";
++import { contentHash } from "./hash.ts";
++
++const SRC = "engine/discipline.ts";
++
++export interface LaneRule {
++  id: string;
++  category: string;
++  /** The lane tool that does this job. */
++  tool: string;
++  /** One line: how the lane covers it. Rides warnings, refusals, and the se_run description. */
++  hint: string;
++  /** Warned runs allowed before the category refuses. */
++  threshold: number;
++  rx: RegExp;
++}
++
++// Order is precedence: first match names the category. Tests before search,
++// because a test invocation often greps its own output; edit before write,
++// because -replace next to Set-Content is an EDIT that deserves the sharper
++// hint. Patterns cover both shells se_run spawns (PowerShell and bash).
++export const LANE_RULES: LaneRule[] = [
++  {
++    id: "run-tests",
++    category: "tests",
++    tool: "se_test",
++    hint: "se_test runs SCOPED ({files: ['pull'], name_pattern?}) with structured counts and only the failures' detail — no temp file, no grep; no arguments is the battery, which must be earned",
++    threshold: 1,
++    rx: /\b(npm|npx)\s+(run\s+)?test\b|\bnode\s+(-[^\s]+\s+)*--test\b|selftest\.ts|preflight\.ts|smoketest\.ts/i,
++  },
++  {
++    id: "run-edit",
++    category: "file edits",
++    tool: "se_file_patch",
++    hint: "se_file_patch does regex substitution now: {pattern, replacement, flags?, expect_count?} — atomic, CAS-guarded, and it reports the replacement count",
++    threshold: 1,
++    rx: /\s-replace\s|\bsed\s+(-\S+\s+)*-i\b|\bperl\s+(-\S+\s+)*-[a-z]*i[a-z]*\b/i,
++  },
++  {
++    id: "run-write",
++    category: "file writes",
++    tool: "se_file_patch",
++    hint: "appends and prepends are se_file_patch ops now ({append: true, new_string}); whole files are se_file_write — both CAS-guarded, both logged as WHAT changed, not just what ran",
++    threshold: 1,
++    rx: /\bset-content\b|\badd-content\b|\bout-file\b|\[io\.file\]::write\w*|\btee\s|>{1,2}\s*["']?[\w.$@{}~-]*[\w-]\.(md|ts|tsx|js|mjs|cjs|json|jsonl|canvas|css|html|ps1|txt|ya?ml)\b/i,
++  },
++  {
++    id: "run-search",
++    category: "text searches",
++    tool: "se_file_search",
++    hint: "se_file_search takes context: N (lines around each hit), include: '**/*.ts' (the Get-ChildItem pipe, in one call) and count_only: true",
++    threshold: 1,
++    rx: /\bselect-string\b|(^|[;|&(\s])rg(\.exe)?\s|(^|[;|&(\s])e?grep\s/i,
++  },
++  {
++    id: "run-read",
++    category: "file reads",
++    tool: "se_file_read",
++    hint: "se_file_read pages any file with offset/limit and returns the CAS hash later writes will demand — a shell read proves nothing to the walk",
++    threshold: 1,
++    rx: /\bget-content\b|(^|[;|&(\s])cat\s|(^|[;|&(\s])head\s|(^|[;|&(\s])tail\s|\bsed\s+-n\b/i,
++  },
++  {
++    id: "run-list",
++    category: "listing and stat",
++    tool: "se_file_list",
++    hint: "se_file_list lists a directory; se_file_glob finds files by pattern (se_file_read {optional: true} answers does-it-exist)",
++    threshold: 1,
++    rx: /\bget-childitem\b|\btest-path\b|(^|[;|&(\s])ls\s|(^|[;|&(\s])find\s+\S+\s+-(name|type)\b/i,
++  },
++  {
++    id: "run-wait",
++    category: "waiting",
++    tool: "se_run",
++    hint: "se_run {job, wait_ms: N} BLOCKS on the job's own completion and returns the moment it exits — a sleeping shell holds the lane for the full N seconds and learns nothing",
++    threshold: 1,
++    rx: /\bstart-sleep\b|(^|[;|&(\s])sleep\s+\d/i,
++  },
++  {
++    id: "run-git",
++    category: "git",
++    tool: "se_git",
++    hint: "se_git runs the allowlisted set in the right tree (the bound worktree when one is open) — shell git silently works on whatever the cwd happens to be",
++    threshold: 1,
++    rx: /(^|[;|&(\s])git(\.exe)?\s/i,
++  },
++];
++
++/** The generated feed-forward line for se_run's description — same table, so
++ *  the description can never promise something the classifier won't enforce. */
++export function laneSummary(): string {
++  return LANE_RULES.map((r) => `${r.category} → ${r.tool}`).join("; ");
++}
++
++export function classifyCommand(command: string): LaneRule | undefined {
++  return LANE_RULES.find((r) => r.rx.test(command));
++}
++
++// ── ladder state ───────────────────────────────────────────────────────────
++// Counts persist in .se — the machine gets stricter ACROSS sessions, never
++// amnesiac per session. Reasons pile up next to them for the retro.
++interface DisciplineState {
++  counts: Record<string, number>;
++  reasons: { ts: string; category: string; reason: string; command: string }[];
++}
++
++function statePath(seDir: string): string {
++  return join(seDir, "discipline.json");
++}
++
++function loadState(seDir: string): DisciplineState {
++  try {
++    const raw = JSON.parse(readFileSync(statePath(seDir), "utf8")) as Partial<DisciplineState>;
++    return { counts: raw.counts ?? {}, reasons: raw.reasons ?? [] };
++  } catch {
++    return { counts: {}, reasons: [] };
++  }
++}
++
++function saveState(seDir: string, s: DisciplineState): void {
++  mkdirSync(seDir, { recursive: true });
++  writeFileSync(statePath(seDir), JSON.stringify(s, null, 1), "utf8");
++}
++
++export interface LaneWarning {
++  rule: string;
++  category: string;
++  lane_tool: string;
++  note: string;
++}
++
++/** The verdict for one command. Returns undefined (clean) or a warning to
++ *  ride the result; THROWS the refusal once the category's grace is spent.
++ *  Entirely mechanical — a rule fired or it did not, a counter stands where
++ *  it stands. */
++export function laneVerdict(seDir: string, command: string, noToolReason?: string): LaneWarning | undefined {
++  const rule = classifyCommand(command);
++  if (rule === undefined) return undefined;
++  const state = loadState(seDir);
++  if (noToolReason !== undefined && noToolReason.trim() !== "") {
++    // The valve. The run happens, the reason is EVIDENCE — filed for the
++    // retro, not counted against the grace. Abuse is visible in the same file.
++    state.reasons.push({ ts: new Date().toISOString(), category: rule.category, reason: noToolReason.trim(), command: command.slice(0, 200) });
++    saveState(seDir, state);
++    return {
++      rule: rule.id,
++      category: rule.category,
++      lane_tool: rule.tool,
++      note: `ran under no_tool_reason — the reason is logged for the retro. The lane's answer to this category: ${rule.hint}`,
++    };
++  }
++  const used = state.counts[rule.category] ?? 0;
++  if (used >= rule.threshold) {
++    throw new Rejection({
++      clause: CLAUSES.RUN_LANE_JOB,
++      expected: `${rule.tool} for ${rule.category} — the lane covers this`,
++      got: `a shell command doing a lane tool's job (rule ${rule.id}; this category's ${rule.threshold} warned run${rule.threshold === 1 ? "" : "s"} spent)`,
++      remedy: {
++        tool: rule.tool,
++        args: {},
++        note: `${rule.hint}. If the lane truly cannot do this one, resend with no_tool_reason: "<why>" — it runs once and the reason is logged.`,
++      },
++      source: SRC,
++    });
++  }
++  state.counts[rule.category] = used + 1;
++  saveState(seDir, state);
++  return {
++    rule: rule.id,
++    category: rule.category,
++    lane_tool: rule.tool,
++    note: `RAN, this time. This is a lane job: ${rule.hint}. The next ${rule.category} command through se_run refuses (${CLAUSES.RUN_LANE_JOB}).`,
++  };
++}
++
++// ── the test gate ──────────────────────────────────────────────────────────
++// A RE-RUN OVER AN UNCHANGED TREE PROVES NOTHING NEW. Measured: se_test held
++// 5,706 seconds of one build's wall clock, and a share of those runs asked a
++// question the previous run had already answered. The fingerprint is HEAD
++// plus the dirty list plus each dirty file's size and mtime — cheap, and it
++// moves the moment any tracked thing does.
++export function testFingerprint(root: string): string {
++  const head = spawnSync("git", ["rev-parse", "HEAD"], { cwd: root, encoding: "utf8" });
++  const status = spawnSync("git", ["status", "--porcelain"], { cwd: root, encoding: "utf8" });
++  if (head.status !== 0 || status.status !== 0) return ""; // no repo — the gate stands aside
++  const parts = [head.stdout.trim()];
++  for (const line of status.stdout.split("\n")) {
++    if (line.trim() === "") continue;
++    // SESSION STATE IS NOT THE TREE UNDER TEST. .se moves on every call —
++    // the call log grows with the very se_test invocation being judged — so
++    // counting it would mean no two moments ever fingerprint alike and the
++    // gate never fires. Same for .worktrees: a sibling expedition's motion
++    // is not a change to THIS tree.
++    const rel = line.slice(3).replace(/^"|"$/g, "");
++    if (rel.startsWith(".se") || rel.startsWith(".worktrees")) continue;
++    parts.push(line);
++    try {
++      const s = statSync(join(root, rel));
++      parts.push(`${s.size}:${s.mtimeMs}`);
++    } catch {
++      parts.push("gone");
++    }
++  }
++  return contentHash(parts.join(" "));
++}
++
++interface ScopeVerdict {
++  fingerprint: string;
++  ok: boolean;
++  ts: string;
++  /** Consecutive green runs of this scope, this one included. The nudge
++   *  rides the result: a long streak means the caller keeps re-proving the
++   *  proven — test on change, not on anxiety (owner ruling 2026-08-02). */
++  streak?: number;
++}
++
++interface TestState {
++  /** The full battery's last verdict, with the HEAD it judged. */
++  battery?: ScopeVerdict & { head?: string };
++  /** Scoped runs, keyed by their scope (sorted files + name pattern). */
++  scoped?: Record<string, ScopeVerdict>;
++  /** DISTINCT test files run scoped since the last battery — the piecemeal
++   *  odometer. When it crosses the flip threshold, the battery becomes the
++   *  sanctioned, cheaper call and scoped runs refuse toward it. */
++  scoped_since_battery?: string[];
++}
++
++function testStatePath(seDir: string): string {
++  return join(seDir, "test-state.json");
++}
++
++function loadTestState(seDir: string): TestState {
++  try {
++    const raw = JSON.parse(readFileSync(testStatePath(seDir), "utf8")) as TestState & ScopeVerdict;
++    // The first cut stored a bare {fingerprint, ok, ts} — that was the battery.
++    if (raw.battery === undefined && raw.scoped === undefined && typeof raw.fingerprint === "string") {
++      return { battery: { fingerprint: raw.fingerprint, ok: raw.ok, ts: raw.ts } };
++    }
++    return raw;
++  } catch {
++    return {};
++  }
++}
++
++function saveTestState(seDir: string, s: TestState): void {
++  mkdirSync(seDir, { recursive: true });
++  writeFileSync(testStatePath(seDir), JSON.stringify(s, null, 1), "utf8");
++}
++
++/** One scope, one memory. The battery and every scoped set each remember the
++ *  tree they judged; an identical tree refuses (SE-C-130) — force is the
++ *  flake door. */
++export function testGate(seDir: string, root: string, force: boolean, scope = "battery"): void {
++  if (force) return;
++  const fp = testFingerprint(root);
++  if (fp === "") return;
++  const state = loadTestState(seDir);
++  const last = scope === "battery" ? state.battery : state.scoped?.[scope];
++  if (last === undefined || last.fingerprint !== fp) return;
++  throw new Rejection({
++    clause: CLAUSES.TEST_UNCHANGED,
++    expected: "a tracked change since the last run of this scope — nothing moved, so its verdict still stands",
++    got: `an identical tree (${scope === "battery" ? "battery" : scope} was ${last.ok ? "GREEN" : "RED"} at ${last.ts})`,
++    remedy: {
++      tool: "se_test",
++      args: { force: true },
++      note: last.ok ? "that green still stands — force repeats it anyway (flake hunt is the one honest reason)" : "that red still stands: the same tree fails the same way — change something, then run",
++    },
++    source: SRC,
++  });
++}
++
++export function testRecord(seDir: string, root: string, ok: boolean, scope = "battery", files: string[] = []): number {
++  const fp = testFingerprint(root);
++  if (fp === "") return 0;
++  const state = loadTestState(seDir);
++  const prior = scope === "battery" ? state.battery : state.scoped?.[scope];
++  const streak = ok ? (prior?.ok === true ? (prior.streak ?? 1) + 1 : 1) : 0;
++  const verdict: ScopeVerdict = { fingerprint: fp, ok, ts: new Date().toISOString(), ...(streak > 0 ? { streak } : {}) };
++  if (scope === "battery") {
++    const head = spawnSync("git", ["rev-parse", "HEAD"], { cwd: root, encoding: "utf8" });
++    state.battery = { ...verdict, ...(head.status === 0 ? { head: head.stdout.trim() } : {}) };
++    // A battery covers everything — the piecemeal odometer resets.
++    state.scoped_since_battery = [];
++  } else {
++    state.scoped = { ...(state.scoped ?? {}), [scope]: verdict };
++    const seen = new Set(state.scoped_since_battery ?? []);
++    for (const f of files) seen.add(f);
++    state.scoped_since_battery = [...seen].sort();
++  }
++  saveTestState(seDir, state);
++  return streak;
++}
++
++/** The nudge line a long streak earns, or undefined below the bar. */
++export function streakNudge(streak: number): string | undefined {
++  if (streak < 3) return undefined;
++  return `${streak} green runs of this scope in a row. In ~95% of cases the change you just made broke nothing — run a test to answer a QUESTION (did THIS change break THAT), not to reassure. The unchanged-tree gate would have refused the truly redundant ones; the rest is judgment.`;
++}
++
++// ── the scope economy ──────────────────────────────────────────────────────
++// THE BATTERY IS THE EXCEPTION, NOT THE HABIT (owner ruling 2026-08-02).
++// Measured live: one session ran the full battery ~60 times in two hours,
++// mostly to answer single-test questions — then grepped a temp file for the
++// one failure it cared about. The rules below make the scoped run the cheap
++// default and the battery the call you EARN — and they make gaming the rule
++// unprofitable, because piecemeal coverage past a threshold GRANTS the
++// battery instead of policing it.
++
++/** Every test file the suite holds, root-relative. */
++export function suiteFiles(root: string): string[] {
++  const dir = join(root, "product", "deliverable", "tests");
++  try {
++    return readdirSync(dir)
++      .filter((f) => f.endsWith(".test.ts"))
++      .map((f) => `product/deliverable/tests/${f}`)
++      .sort();
++  } catch {
++    return [];
++  }
++}
++
++/** Piecemeal flip threshold: a third of the suite, floor 6. */
++export function flipThreshold(root: string): number {
++  return Math.max(6, Math.ceil(suiteFiles(root).length / 3));
++}
++
++/** What changed since the last green battery: committed since its HEAD plus
++ *  everything dirty now. undefined when there is no battery memory or no git
++ *  — in both cases the gates stand aside. */
++export function changedSinceBattery(root: string, seDir: string): string[] | undefined {
++  const state = loadTestState(seDir);
++  const head = state.battery?.head;
++  if (head === undefined) return undefined;
++  const committed = spawnSync("git", ["diff", "--name-only", `${head}..HEAD`], { cwd: root, encoding: "utf8" });
++  const status = spawnSync("git", ["status", "--porcelain"], { cwd: root, encoding: "utf8" });
++  if (committed.status !== 0 || status.status !== 0) return undefined;
++  const out = new Set<string>();
++  for (const line of committed.stdout.split("\n")) {
++    const rel = line.trim();
++    if (rel !== "" && !rel.startsWith(".se") && !rel.startsWith(".worktrees")) out.add(rel);
++  }
++  for (const line of status.stdout.split("\n")) {
++    if (line.trim() === "") continue;
++    const rel = line.slice(3).replace(/^"|"$/g, "");
++    if (!rel.startsWith(".se") && !rel.startsWith(".worktrees")) out.add(rel);
++  }
++  return [...out].sort();
++}
++
++/** The change-to-test map, by NAME — tests here are per-module (files.test.ts
++ *  answers for files.ts). A test file maps to itself; an engine module maps
++ *  to its test when one exists; anything else is UNMAPPED and buys the
++ *  battery, because no scoped run answers for it. */
++export function mapChangedToTests(root: string, changed: string[]): { mapped: string[]; unmapped: string[] } {
++  const suite = new Set(suiteFiles(root));
++  const mapped = new Set<string>();
++  const unmapped: string[] = [];
++  for (const rel of changed) {
++    const p = rel.replace(/\\/g, "/");
++    if (suite.has(p)) {
++      mapped.add(p);
++      continue;
++    }
++    const m = p.match(/^product\/deliverable\/engine\/([\w-]+)\.ts$/);
++    const candidate = m !== null ? `product/deliverable/tests/${m[1]}.test.ts` : undefined;
++    if (candidate !== undefined && suite.has(candidate)) mapped.add(candidate);
++    else unmapped.push(p);
++  }
++  return { mapped: [...mapped].sort(), unmapped };
++}
++
++/** THE BATTERY GATE. Refuses (SE-C-131) when every change since the last
++ *  green battery maps to a scoped run — and the refusal HANDS OVER that
++ *  scoped call, computed from the diff. The battery is granted when: force,
++ *  no battery memory yet, an unmapped change exists, the last battery was
++ *  red, or the piecemeal odometer crossed the flip. */
++export function batteryGate(seDir: string, root: string, force: boolean): void {
++  if (force) return;
++  const state = loadTestState(seDir);
++  if (state.battery === undefined || state.battery.ok === false) return;
++  if ((state.scoped_since_battery ?? []).length >= flipThreshold(root)) return; // the flip GRANTS it
++  const changed = changedSinceBattery(root, seDir);
++  if (changed === undefined || changed.length === 0) return; // no git / nothing changed: SE-C-130's business
++  const { mapped, unmapped } = mapChangedToTests(root, changed);
++  if (unmapped.length > 0 || mapped.length === 0) return;
++  throw new Rejection({
++    clause: CLAUSES.TEST_SCOPE,
++    expected: "a scoped run — every change since the last green battery has a named test file",
++    got: `a full battery over changes covered by: ${mapped.join(", ")}`,
++    remedy: {
++      tool: "se_test",
++      args: { files: mapped },
++      note: "the scoped run answers this diff in seconds; the battery re-earns its place when a change has no mapped test, or piecemeal coverage crosses the flip",
++    },
++    source: SRC,
++  });
++}
++
++/** THE FLIP. Once distinct scoped files since the last battery cross the
++ *  threshold, further piecemeal runs refuse TOWARD the battery — running the
++ *  suite one file at a time is never cheaper than running the suite. */
++export function scopedGate(seDir: string, root: string, files: string[], force: boolean): void {
++  if (force) return;
++  const seen = new Set(loadTestState(seDir).scoped_since_battery ?? []);
++  for (const f of files) seen.add(f);
++  const threshold = flipThreshold(root);
++  if (seen.size < threshold) return;
++  throw new Rejection({
++    clause: CLAUSES.TEST_SCOPE,
++    expected: `scoped runs below the flip (${threshold} distinct files since the last battery)`,
++    got: `${seen.size} distinct files piecemeal — the battery is now the cheaper call`,
++    remedy: { tool: "se_test", args: {}, note: "run the battery; it resets the odometer and covers everything at once" },
++    source: SRC,
++  });
++}
++
++// ── TAP, structured ────────────────────────────────────────────────────────
++// The temp-file workflow existed because a battery's output overflows the
++// run cap and a failure's stack lives somewhere in the flood. A structured
++// verdict carries the counts and ONLY the failures' detail — the slice the
++// greps were always after.
++export interface TapResult {
++  total: number;
++  pass: number;
++  fail: number;
++  failures: { name: string; detail: string }[];
++}
++
++export function parseTap(out: string): TapResult {
++  const res: TapResult = { total: 0, pass: 0, fail: 0, failures: [] };
++  const lines = out.split(/\r?\n/);
++  for (let i = 0; i < lines.length; i++) {
++    const line = lines[i];
++    const counts = line.match(/^# (tests|pass|fail) (\d+)$/);
++    if (counts !== null) {
++      if (counts[1] === "tests") res.total = Number(counts[2]);
++      if (counts[1] === "pass") res.pass = Number(counts[2]);
++      if (counts[1] === "fail") res.fail = Number(counts[2]);
++      continue;
++    }
++    // TOP-LEVEL failures only — a failing subtest reports through its parent,
++    // and counting both would double every incident.
++    const notOk = line.match(/^not ok \d+ - (.*)$/);
++    if (notOk === null) continue;
++    if (res.failures.length >= 10) continue;
++    const detail: string[] = [];
++    for (let j = i + 1; j < lines.length && detail.length < 30; j++) {
++      const l = lines[j];
++      if (/^(not )?ok \d+ - /.test(l) || /^# /.test(l)) break;
++      detail.push(l);
++    }
++    res.failures.push({ name: notOk[1], detail: detail.join("\n").slice(0, 2000) });
++  }
++  return res;
++}
+diff --git a/product/deliverable/engine/errors.ts b/product/deliverable/engine/errors.ts
+index 1dc0f98..fe5f515 100644
+--- a/product/deliverable/engine/errors.ts
++++ b/product/deliverable/engine/errors.ts
+@@ -68,4 +68,7 @@ export const CLAUSES = {
+   UNREADABLE_BYTES: "SE-C-126", // a binary the lane cannot show a model — images travel, arbitrary bytes do not
+   UNDECLARED_ROOT: "SE-C-127", // @name addresses a root the owner has not declared — declared, never arbitrary
+   JOB_UNKNOWN: "SE-C-128", // a background job ref this session never started
++  RUN_LANE_JOB: "SE-C-129", // se_run asked to do a lane tool's job — the lane covers it; the ladder blocks after one warned run
++  TEST_UNCHANGED: "SE-C-130", // se_test over an unchanged tree — the last verdict still stands
++  TEST_SCOPE: "SE-C-131", // the wrong test scope: a battery when scoped runs answer the diff, or piecemeal past where the battery is cheaper
+ } as const;
+diff --git a/product/deliverable/engine/files.ts b/product/deliverable/engine/files.ts
+index 95b2925..48a673f 100644
+--- a/product/deliverable/engine/files.ts
++++ b/product/deliverable/engine/files.ts
+@@ -286,23 +286,123 @@ export function fileWrite(root: string, path: string, content: string, baseHash:
+ 
+ export interface PatchOp {
+   path: string;
+-  old_string: string;
+-  new_string: string;
++  /** Exact-match op (the original verb): both strings, old must be unique. */
++  old_string?: string;
++  new_string?: string;
+   /** Optional per-op CAS pin; when present it must match disk. */
+   base_hash?: string;
+   /** Replace every occurrence instead of demanding uniqueness. */
+   replace_all?: boolean;
++  /** Regex op: pattern + replacement (JS regex, always global; $1 backrefs work). */
++  pattern?: string;
++  replacement?: string;
++  /** Regex flags — a subset on purpose: i, m, s. g is implied. */
++  flags?: string;
++  /** Regex op only: refuse unless the match count is exactly this. */
++  expect_count?: number;
++  /** Append/prepend op: new_string joins the end/start of the file. */
++  append?: boolean;
++  prepend?: boolean;
++  /** Line-range op: replace lines from..to (1-based, inclusive) with new_string.
++   *  DEMANDS base_hash — a line number only means something against the
++   *  version you read. */
++  at?: { from_line: number; to_line: number };
+ }
+ 
+ export interface PatchResult {
+   applied: { path: string; hash: string; replacements: number }[];
++  /** Mechanical fixes the engine applied FOR the agent, each named. An
++   *  auto-correction that is not announced teaches nothing. */
++  corrected?: string[];
++}
++
++// One patch call, several verbs. Which verb an op is, read from its fields —
++// exactly one of these shapes, anything mixed or partial refused BY NAME:
++//   exact:   old_string + new_string          (the original verb)
++//   regex:   pattern + replacement            (sed, kept inside the lane)
++//   append:  append: true + new_string        (harvested: 285 Set-/Add-Content
++//   prepend: prepend: true + new_string        shell writes did this job)
++//   range:   at: {from_line, to_line} + new_string + base_hash
++type OpKind = "exact" | "regex" | "append" | "prepend" | "range";
++
++function opKind(op: PatchOp, i: number, n: number): OpKind {
++  const marks: OpKind[] = [];
++  if (op.old_string !== undefined) marks.push("exact");
++  if (op.pattern !== undefined) marks.push("regex");
++  if (op.append === true) marks.push("append");
++  if (op.prepend === true) marks.push("prepend");
++  if (op.at !== undefined) marks.push("range");
++  if (marks.length === 1) return marks[0];
++  throw new Rejection({
++    clause: CLAUSES.REQUIRED_ARGS,
++    expected: "ONE verb per op: old_string+new_string | pattern+replacement | append+new_string | prepend+new_string | at+new_string+base_hash",
++    got: marks.length === 0 ? `op ${i + 1}/${n} names no verb` : `op ${i + 1}/${n} mixes ${marks.join(" and ")} — nothing was written`,
++    remedy: { tool: "se_file_patch", args: { ops: [{ path: "<path>", old_string: "<exact text>", new_string: "<replacement>" }] }, note: "split it into one op per verb" },
++    source: SRC,
++  });
++}
++
++/** The file's own line-ending convention — what every verb writes in. */
++function eolOf(s: string): "\r\n" | "\n" {
++  return s.includes("\r\n") ? "\r\n" : "\n";
++}
++function toEol(s: string, eol: string): string {
++  return s.replace(/\r\n/g, "\n").replace(/\n/g, eol);
++}
++
++/** Regex flags are a SUBSET on purpose: i, m, s. g is implied (a substitution
++ *  that silently stops at the first hit is the sed trap this op exists to
++ *  avoid); anything else is refused rather than passed through blind. */
++function opRegExp(op: PatchOp, i: number, n: number): RegExp {
++  const flags = op.flags ?? "";
++  const bad = [...flags].filter((f) => !"ims".includes(f));
++  if (bad.length > 0) {
++    throw new Rejection({
++      clause: CLAUSES.REQUIRED_ARGS,
++      expected: "flags from: i (ignore case), m (multiline anchors), s (dot matches newline) — g is always on",
++      got: `flag(s) ${bad.join(", ")} (op ${i + 1}/${n})`,
++      remedy: { tool: "se_file_patch", args: { ops: [{ path: op.path, pattern: op.pattern, replacement: op.replacement, flags: "im" }] } },
++      source: SRC,
++    });
++  }
++  try {
++    return new RegExp(op.pattern as string, `g${flags}`);
++  } catch (e) {
++    throw new Rejection({
++      clause: CLAUSES.REQUIRED_ARGS,
++      expected: "a pattern that compiles as a JS regex",
++      got: `${String((e as Error).message)} (op ${i + 1}/${n})`,
++      remedy: { tool: "se_file_patch", args: { ops: [{ path: op.path, pattern: "<fixed pattern>", replacement: op.replacement }] } },
++      source: SRC,
++    });
++  }
+ }
+ 
+ /** Every guard is checked before anything is written — a failure leaves the tree untouched. */
+ export function filePatch(root: string, ops: PatchOp[]): PatchResult {
+   const staged: { abs: string; path: string; next: string; replacements: number }[] = [];
+   const contents = new Map<string, string>(); // carries earlier ops' effects within the batch
++  const corrected: string[] = [];
+   for (const [i, op] of ops.entries()) {
++    const kind = opKind(op, i, ops.length);
++    const needs: Record<OpKind, [keyof PatchOp, string][]> = {
++      exact: [["new_string", "the replacement text"]],
++      regex: [["replacement", "the substitution text ($1 backrefs work)"]],
++      append: [["new_string", "the text to append"]],
++      prepend: [["new_string", "the text to prepend"]],
++      range: [["new_string", "the replacement lines"], ["base_hash", "the hash from se_file_read — a line number only means something against the version you read"]],
++    };
++    for (const [field, why] of needs[kind]) {
++      if (op[field] === undefined) {
++        throw new Rejection({
++          clause: CLAUSES.REQUIRED_ARGS,
++          expected: `${field} on a ${kind} op — ${why}`,
++          got: `op ${i + 1}/${ops.length} without it — nothing was written`,
++          remedy: { tool: "se_file_patch", args: { ops: [{ path: op.path, [field]: "<value>" }] } },
++          source: SRC,
++        });
++      }
++    }
+     const abs = mustExist(root, op.path, SRC);
+     const current = contents.get(abs) ?? readFileSync(abs, "utf8");
+     if (op.base_hash !== undefined && contents.get(abs) === undefined) {
+@@ -317,38 +417,106 @@ export function filePatch(root: string, ops: PatchOp[]): PatchResult {
+         });
+       }
+     }
+-    const count = current.split(op.old_string).length - 1;
+-    if (count === 0 || (count > 1 && op.replace_all !== true)) {
+-      // WHY it did not match, not merely that it did not. This refusal fired
+-      // twelve times in one period, and its commonest cause is INVISIBLE: a
+-      // CRLF file against an old_string written with LF. "Copy the exact
+-      // text" is useless advice when the difference cannot be seen, so the
+-      // engine looks for the near-miss and names it.
+-      let why = "";
++    const eol = eolOf(current);
++    let next: string;
++    let replacements: number;
++    if (kind === "regex") {
++      const rx = opRegExp(op, i, ops.length);
++      const count = [...current.matchAll(rx)].length;
++      if (count === 0 || (op.expect_count !== undefined && count !== op.expect_count)) {
++        throw new Rejection({
++          clause: CLAUSES.PATCH_AMBIGUOUS,
++          expected: op.expect_count !== undefined ? `pattern to match exactly ${op.expect_count} time(s) in ${op.path}` : `pattern to match in ${op.path}`,
++          got: `${count} matches (op ${i + 1}/${ops.length}) — nothing was written`,
++          remedy: { tool: "se_file_search", args: { query: op.pattern, path: op.path }, note: "see what the pattern really hits, then patch again" },
++          source: SRC,
++        });
++      }
++      next = current.replace(rx, op.replacement as string);
++      replacements = count;
++    } else if (kind === "append" || kind === "prepend") {
++      // The joined text arrives in the FILE's line endings, and the seam gets
++      // exactly one newline — both corrected mechanically and both NAMED,
++      // because these two fumbles are why appends went through the shell.
++      const piece = toEol(op.new_string as string, eol);
++      if (kind === "append") {
++        const seam = current === "" || current.endsWith("\n") || piece.startsWith("\n") ? "" : eol;
++        if (seam !== "") corrected.push(`op ${i + 1}: a newline was added between the file's last line and the appended text`);
++        next = current + seam + piece;
++      } else {
++        const seam = piece === "" || piece.endsWith("\n") || current.startsWith("\n") || current === "" ? "" : eol;
++        if (seam !== "") corrected.push(`op ${i + 1}: a newline was added between the prepended text and the file's first line`);
++        next = piece + seam + current;
++      }
++      if (eol === "\r\n" && (op.new_string as string) !== piece) corrected.push(`op ${i + 1}: the text was converted to CRLF — this file's convention`);
++      replacements = 1;
++    } else if (kind === "range") {
++      const lines = current.split(eol);
++      const { from_line: from, to_line: to } = op.at as { from_line: number; to_line: number };
++      if (!(Number.isInteger(from) && Number.isInteger(to) && from >= 1 && to >= from && to <= lines.length)) {
++        throw new Rejection({
++          clause: CLAUSES.PATCH_AMBIGUOUS,
++          expected: `1 <= from_line <= to_line <= ${lines.length} for ${op.path}`,
++          got: `from_line ${from}, to_line ${to} (op ${i + 1}/${ops.length}) — nothing was written`,
++          remedy: { tool: "se_file_read", args: { path: op.path, offset: Math.max(1, Number(from) || 1), limit: 40 }, note: "re-read the range you mean; line numbers ride every read" },
++          source: SRC,
++        });
++      }
++      lines.splice(from - 1, to - from + 1, ...toEol(op.new_string as string, eol).split(eol));
++      next = lines.join(eol);
++      replacements = 1;
++    } else {
++      let oldStr = op.old_string as string;
++      let newStr = op.new_string as string;
++      let count = current.split(oldStr).length - 1;
++      // THE ENGINE CORRECTS WHAT IS MECHANICAL AND SAYS SO (owner ruling
++      // 2026-08-02). The commonest 0-match cause is INVISIBLE: a CRLF file
++      // against an old_string written with LF. The old behaviour diagnosed it
++      // and refused anyway — one round-trip spent re-copying text that differs
++      // in nothing a model can see. Now: when the strings match under the
++      // file's own line endings, the patch is applied in those endings and the
++      // correction is NAMED on the result. Whitespace near-misses still refuse
++      // — collapsed indentation is a real difference, not an encoding one.
+       if (count === 0) {
+-        const lf = (s: string): string => s.replace(/\r\n/g, "\n");
+-        const flat = (s: string): string => lf(s).replace(/[ \t]+/g, " ");
+-        if (lf(current).includes(lf(op.old_string))) {
+-          why = " — but it MATCHES with line endings normalised: this file is CRLF and your old_string is LF";
+-        } else if (flat(current).includes(flat(op.old_string))) {
+-          why = " — but it MATCHES with runs of spaces and tabs collapsed: the indentation differs";
++        const reOld = toEol(oldStr, eol);
++        const reCount = current.split(reOld).length - 1;
++        if (reOld !== oldStr && reCount > 0) {
++          oldStr = reOld;
++          newStr = toEol(newStr, eol);
++          count = reCount;
++          corrected.push(`op ${i + 1}: old_string matched after line-ending normalisation — this file is ${eol === "\r\n" ? "CRLF" : "LF"}; the patch was applied in the file's own endings`);
+         }
+       }
+-      throw new Rejection({
+-        clause: CLAUSES.PATCH_AMBIGUOUS,
+-        expected: count === 0 ? `old_string to occur in ${op.path}` : `old_string to occur exactly once in ${op.path} (or pass replace_all: true)`,
+-        got: `${count} occurrences (op ${i + 1}/${ops.length}) — nothing was written${why}`,
+-        remedy: {
+-          tool: "se_file_read",
+-          args: { path: op.path },
+-          note: count === 0 ? "re-read and copy the exact text, whitespace included" : "widen old_string until unique, or set replace_all",
+-        },
+-        source: SRC,
+-      });
++      if (count === 0 || (count > 1 && op.replace_all !== true)) {
++        // WHY it did not match, not merely that it did not. This refusal fired
++        // twelve times in one period; the whitespace near-miss is still named,
++        // because "copy the exact text" is useless advice when the difference
++        // cannot be seen.
++        let why = "";
++        if (count === 0) {
++          const lf = (s: string): string => s.replace(/\r\n/g, "\n");
++          const flat = (s: string): string => lf(s).replace(/[ \t]+/g, " ");
++          if (flat(current).includes(flat(oldStr))) {
++            why = " — but it MATCHES with runs of spaces and tabs collapsed: the indentation differs";
++          }
++        }
++        throw new Rejection({
++          clause: CLAUSES.PATCH_AMBIGUOUS,
++          expected: count === 0 ? `old_string to occur in ${op.path}` : `old_string to occur exactly once in ${op.path} (or pass replace_all: true)`,
++          got: `${count} occurrences (op ${i + 1}/${ops.length}) — nothing was written${why}`,
++          remedy: {
++            tool: "se_file_read",
++            args: { path: op.path },
++            note: count === 0 ? "re-read and copy the exact text, whitespace included" : "widen old_string until unique, or set replace_all",
++          },
++          source: SRC,
++        });
++      }
++      next = op.replace_all === true ? current.split(oldStr).join(newStr) : current.replace(oldStr, newStr);
++      replacements = op.replace_all === true ? count : 1;
+     }
+-    const next = op.replace_all === true ? current.split(op.old_string).join(op.new_string) : current.replace(op.old_string, op.new_string);
+     contents.set(abs, next);
+-    staged.push({ abs, path: op.path, next, replacements: op.replace_all === true ? count : 1 });
++    staged.push({ abs, path: op.path, next, replacements });
+   }
+   // All guards passed — write.
+   const byFile = new Map<string, { path: string; next: string; replacements: number }>();
+@@ -364,7 +532,7 @@ export function filePatch(root: string, ops: PatchOp[]): PatchResult {
+     writeFileSync(abs, f.next, "utf8");
+     return { path: f.path, hash: contentHash(f.next), replacements: f.replacements };
+   });
+-  return { applied };
++  return { applied, ...(corrected.length > 0 ? { corrected } : {}) };
+ }
+ 
+ export function fileDelete(root: string, path: string, baseHash: string): { deleted: string } {
+diff --git a/product/deliverable/engine/run.ts b/product/deliverable/engine/run.ts
+index 88cbdf0..f94b96b 100644
+--- a/product/deliverable/engine/run.ts
++++ b/product/deliverable/engine/run.ts
+@@ -111,6 +111,18 @@ function knownJob(id: string): Job {
+   });
+ }
+ 
++/** WAIT ON A JOB, bounded. The honest replacement for Start-Sleep polling:
++ *  the job's own done-promise is the wake path, so the wait returns the
++ *  MOMENT the command exits — or at the bound, with the job still running.
++ *  Found 2026-08-02: an agent burned ~15 min of one hour in 100-second
++ *  Start-Sleep calls, hand-rolling exactly this. */
++export async function jobWait(id: string, waitMs: number): Promise<JobView> {
++  const j = knownJob(id);
++  const bound = Math.max(0, Math.min(waitMs, 120_000));
++  await Promise.race([j.done, new Promise((r) => setTimeout(r, bound))]);
++  return view(j);
++}
++
+ /** START a command in the background. Returns at once with a handle. */
+ /**
+  * Is anything still running that this session started?
+diff --git a/product/deliverable/engine/search.ts b/product/deliverable/engine/search.ts
+index 82b8a6d..6a2b5e0 100644
+--- a/product/deliverable/engine/search.ts
++++ b/product/deliverable/engine/search.ts
+@@ -19,6 +19,9 @@ export interface Match {
+   path: string;
+   line: number;
+   text: string;
++  /** Present on lines that RIDE ALONG a hit (the context option), so a
++   *  neighbour is never mistaken for a match. */
++  context?: true;
+ }
+ 
+ export interface SearchResult {
+@@ -28,6 +31,9 @@ export interface SearchResult {
+   matches: Match[];
+   total: number;
+   truncated: boolean;
++  /** count_only: per-file match counts instead of matches — the answer to
++   *  "how many / where roughly", at a fraction of the tokens. */
++  counts?: { path: string; count: number }[];
+   /** Files ripgrep refused to read as text. Present only when non-empty:
+    *  an unreadable file must never be indistinguishable from no matches. */
+   unreadable?: string[];
+@@ -36,6 +42,9 @@ export interface SearchResult {
+ const LINE_CAP = 300;
+ const PER_FILE_CAP = 50;
+ const UNBOUNDED_FILE_CAP = 1_000_000;
++// Context is capped, because context lines multiply: 100 hits at -C 10 is
++// 2100 lines of result. Beyond the cap the remedy is a range read.
++const CONTEXT_CAP = 10;
+ 
+ function normalizeLimit(limit: number | undefined): number {
+   if (limit === undefined || Number.isFinite(limit) === false) return 100;
+@@ -79,12 +88,40 @@ export function rgPath(): string {
+   throw new Error("ripgrep is a hard dependency and was not found — run RUNME.ps1 (npm install provides @vscode/ripgrep)");
+ }
+ 
++export interface SearchOpts {
++  path?: string;
++  ref?: string;
++  ignore_case?: boolean;
++  limit?: number;
++  /** Lines around each hit (rg -C). Capped at CONTEXT_CAP; deeper wants a range read. */
++  context?: number;
++  /** Asymmetric context (rg -B / -A) — the Select-String -Context 1,6 shape. Wins over context. */
++  before?: number;
++  after?: number;
++  /** Filename glob filter, e.g. **\/*.ts — the Get-ChildItem-then-pipe shape, in one call. */
++  include?: string;
++  /** Per-file counts instead of matches — "how many / where roughly" for a fraction of the tokens. */
++  count_only?: boolean;
++}
++
+ export function search(
+   root: string,
+   query: string,
+-  opts: { path?: string; ref?: string; ignore_case?: boolean; limit?: number } = {},
++  opts: SearchOpts = {},
+ ): SearchResult {
+   const limit = normalizeLimit(opts.limit);
++  if (opts.count_only === true) {
++    const counts = opts.ref === undefined ? rgCount(root, query, opts) : gitGrepCount(root, query, opts.ref, opts);
++    return {
++      query,
++      engine: opts.ref === undefined ? "ripgrep" : "git-grep",
++      ...(opts.ref !== undefined ? { ref: opts.ref } : {}),
++      matches: [],
++      total: counts.reduce((n, c) => n + c.count, 0),
++      truncated: counts.length > limit,
++      counts: counts.slice(0, limit),
++    };
++  }
+   const unreadable: string[] = [];
+   const matches = opts.ref === undefined ? rgSearch(root, query, opts, unreadable) : gitGrepSearch(root, query, opts.ref, opts);
+   return {
+@@ -106,10 +143,11 @@ export function search(
+   };
+ }
+ 
+-function rgSearch(root: string, query: string, opts: { path?: string; ignore_case?: boolean; limit?: number }, unreadable: string[] = []): Match[] {
++/** Scope resolution shared by every rg mode: where to search, and how a hit
++ *  inside a declared root reports — as "@name/rel", never as a pile of ../..
++ *  What the search returns, the reader accepts unchanged. */
++function rgScope(root: string, opts: { path?: string }): { scope: string; base: string; show: (abs: string) => string } {
+   const scope = opts.path === undefined ? resolve(root) : resolveForRead(root, opts.path, "engine/search.ts");
+-  // A hit inside a declared root reports as "@name/rel", never as a pile of
+-  // ../.. — what the search returns, the reader accepts unchanged.
+   const rootRef = opts.path !== undefined && isRootRef(opts.path);
+   const rootName = rootRef ? opts.path!.slice(1).split(/[\\/]+/)[0] : "";
+   const base = rootRef ? resolveDeclaredRoot(root, `@${rootName}`, "engine/search.ts") : resolve(root);
+@@ -118,6 +156,69 @@ function rgSearch(root: string, query: string, opts: { path?: string; ignore_cas
+     const rel = relative(base, abs).split(sep).join("/");
+     return rel === "" ? abs : prefix + rel;
+   };
++  return { scope, base, show };
++}
++
++function rgCommonArgs(opts: SearchOpts): string[] {
++  const args: string[] = [];
++  for (const d of [".se", "node_modules", ".worktrees"]) args.push("--glob", `!${d}/**`);
++  if (opts.include !== undefined) args.push("--glob", opts.include);
++  if (opts.ignore_case === true) args.push("--ignore-case");
++  return args;
++}
++
++/** count_only: rg --count. One line per file, no match text at all. */
++function rgCount(root: string, query: string, opts: SearchOpts): { path: string; count: number }[] {
++  const { scope, base, show } = rgScope(root, opts);
++  const args = ["--count", "--no-heading", "--with-filename", ...rgCommonArgs(opts), "--regexp", query, scope];
++  const r = spawnSync(rgPath(), args, { cwd: base, encoding: "utf8", maxBuffer: 16 * 1024 * 1024 });
++  if (r.status !== 0 && r.status !== 1) throw new Error(`ripgrep failed: ${r.stderr}`);
++  const out: { path: string; count: number }[] = [];
++  for (const line of (r.stdout ?? "").split("\n")) {
++    const m = line.match(/^(.+?):(\d+)$/);
++    if (m !== null) out.push({ path: show(m[1]), count: Number(m[2]) });
++  }
++  out.sort((a, b) => b.count - a.count);
++  return out;
++}
++
++/** context / before / after, capped, as rg flags. before/after win over context. */
++function contextFlags(opts: SearchOpts): string[] {
++  const cap = (n: number | undefined): number => (n !== undefined && n > 0 ? Math.min(Math.floor(n), CONTEXT_CAP) : 0);
++  const b = cap(opts.before);
++  const a = cap(opts.after);
++  if (b > 0 || a > 0) return [...(b > 0 ? ["--before-context", String(b)] : []), ...(a > 0 ? ["--after-context", String(a)] : [])];
++  const c = cap(opts.context);
++  return c > 0 ? ["--context", String(c)] : [];
++}
++
++function rgSearch(root: string, query: string, opts: SearchOpts, unreadable: string[] = []): Match[] {
++  const { scope, base, show } = rgScope(root, opts);
++  const ctx = contextFlags(opts);
++  // CONTEXT RIDES AS JSON. rg's plain output separates a context line from a
++  // match line by ':' versus '-' — inside a path full of dashes that parse is
++  // a guess. --json names every event, so a neighbour can never be mistaken
++  // for a hit.
++  if (ctx.length > 0) {
++    const args = ["--json", ...ctx, "--max-count", String(perFileCap(opts.limit)), ...rgCommonArgs(opts), "--regexp", query, scope];
++    const r = spawnSync(rgPath(), args, { cwd: base, encoding: "utf8", maxBuffer: 16 * 1024 * 1024 });
++    if (r.status !== 0 && r.status !== 1) throw new Error(`ripgrep failed: ${r.stderr}`);
++    const out: Match[] = [];
++    for (const line of (r.stdout ?? "").split("\n")) {
++      if (line.trim() === "") continue;
++      let ev: { type?: string; data?: { path?: { text?: string }; line_number?: number; lines?: { text?: string }; binary_offset?: number | null } };
++      try { ev = JSON.parse(line); } catch { continue; }
++      const p = ev.data?.path?.text;
++      if (ev.type === "end" && typeof ev.data?.binary_offset === "number" && p !== undefined) {
++        unreadable.push(show(p));
++        continue;
++      }
++      if ((ev.type !== "match" && ev.type !== "context") || p === undefined || ev.data?.line_number === undefined) continue;
++      const text = (ev.data.lines?.text ?? "").replace(/\r?\n$/, "").slice(0, LINE_CAP);
++      out.push({ path: show(p), line: ev.data.line_number, text, ...(ev.type === "context" ? { context: true as const } : {}) });
++    }
++    return out;
++  }
+   // --with-filename: rg drops the filename for a single-file scope, which
+   // starved the path:line:text parser — every match silently vanished.
+   // --binary: without it ripgrep skips a binary file in a DIRECTORY search
+@@ -125,10 +226,7 @@ function rgSearch(root: string, query: string, opts: { path?: string; ignore_cas
+   // the file is named on a "binary file matches" line, which the loop below
+   // turns into `unreadable`. --text was the alternative and was rejected: it
+   // would search real binaries as text and spray them through the results.
+-  const args = ["--line-number", "--no-heading", "--with-filename", "--binary", "--max-count", String(perFileCap(opts.limit)), "--max-columns", String(LINE_CAP)];
+-  for (const d of [".se", "node_modules", ".worktrees"]) args.push("--glob", `!${d}/**`);
+-  if (opts.ignore_case === true) args.push("--ignore-case");
+-  args.push("--regexp", query, scope);
++  const args = ["--line-number", "--no-heading", "--with-filename", "--binary", "--max-count", String(perFileCap(opts.limit)), "--max-columns", String(LINE_CAP), ...rgCommonArgs(opts), "--regexp", query, scope];
+   // THE EXCLUSION GLOBS ARE RELATIVE TO THE WORKING DIRECTORY, never to the
+   // search target. Without a cwd of its own, ripgrep resolved them against
+   // the SERVER's cwd — and a bound expedition worktree lives under
+@@ -157,21 +255,52 @@ function rgSearch(root: string, query: string, opts: { path?: string; ignore_cas
+   return out;
+ }
+ 
++/** The include glob as a git pathspec, ANDed with the path scope when both
++ *  are given (two bare pathspecs would union, which is the wrong answer to
++ *  "these files under this directory"). */
++function gitPathspec(opts: { path?: string; include?: string }): string[] {
++  if (opts.include === undefined) return opts.path === undefined ? [] : ["--", opts.path];
++  const inc = opts.include.replace(/^\.?\//, "");
++  return ["--", opts.path === undefined ? `:(glob)${inc}` : `:(glob)${opts.path.replace(/\/+$/, "")}/${inc}`];
++}
++
++/** count_only at a ref: git grep -c. */
++function gitGrepCount(root: string, query: string, ref: string, opts: SearchOpts): { path: string; count: number }[] {
++  const args = ["grep", "-c", "-I", "-E"];
++  if (opts.ignore_case === true) args.push("-i");
++  args.push(query, ref, ...gitPathspec(opts));
++  const r = spawnSync("git", args, { cwd: root, encoding: "utf8", maxBuffer: 16 * 1024 * 1024 });
++  if (r.status !== 0 && r.status !== 1) throw new Error(`git grep failed: ${(r.stderr ?? "").trim() || `exit ${r.status}`}`);
++  const out: { path: string; count: number }[] = [];
++  for (const line of (r.stdout ?? "").split("\n")) {
++    const m = line.match(/^(.+?):(.+?):(\d+)$/);
++    if (m !== null) out.push({ path: m[2], count: Number(m[3]) });
++  }
++  out.sort((a, b) => b.count - a.count);
++  return out;
++}
++
+ /** Search a committed state: git grep at a ref. Path scope is a pathspec. */
+-function gitGrepSearch(root: string, query: string, ref: string, opts: { path?: string; ignore_case?: boolean; limit?: number }): Match[] {
+-  const args = ["grep", "-n", "-I", "-E", "--max-count", String(perFileCap(opts.limit))];
++function gitGrepSearch(root: string, query: string, ref: string, opts: SearchOpts): Match[] {
++  const ctx = contextFlags(opts).map((f) => f.replace("--before-context", "-B").replace("--after-context", "-A").replace("--context", "-C"));
++  const args = ["grep", "-n", "-I", "-E", "--max-count", String(perFileCap(opts.limit)), ...ctx];
+   if (opts.ignore_case === true) args.push("-i");
+-  args.push(query, ref);
+-  if (opts.path !== undefined) args.push("--", opts.path);
++  args.push(query, ref, ...gitPathspec(opts));
+   const r = spawnSync("git", args, { cwd: root, encoding: "utf8", maxBuffer: 16 * 1024 * 1024 });
+   if (r.status !== 0 && r.status !== 1) throw new Error(`git grep failed: ${(r.stderr ?? "").trim() || `exit ${r.status}`}`);
+   const out: Match[] = [];
+   for (const line of (r.stdout ?? "").split("\n")) {
+-    if (line.trim() === "") continue;
+-    // <ref>:<path>:<line>:<text>
++    if (line.trim() === "" || line === "--") continue;
++    // <ref>:<path>:<line>:<text> — a context line separates with '-' instead.
++    // git grep has no --json; inside a dashed path this parse is best-effort,
++    // which is why the tree-side search (the common case) went to rg --json.
+     const m = line.match(/^(.+?):(.+?):(\d+):(.*)$/s);
+-    if (m === null) continue;
+-    out.push({ path: m[2], line: Number(m[3]), text: m[4].slice(0, LINE_CAP) });
++    if (m !== null) {
++      out.push({ path: m[2], line: Number(m[3]), text: m[4].slice(0, LINE_CAP) });
++      continue;
++    }
++    const c = line.match(/^(.+?):(.+?)-(\d+)-(.*)$/s);
++    if (c !== null) out.push({ path: c[2], line: Number(c[3]), text: c[4].slice(0, LINE_CAP), context: true });
+   }
+   return out;
+ }
+diff --git a/product/deliverable/engine/tools.ts b/product/deliverable/engine/tools.ts
+index cb7f5b4..83757bc 100644
+--- a/product/deliverable/engine/tools.ts
++++ b/product/deliverable/engine/tools.ts
+@@ -10,6 +10,8 @@
+ //   §5  — honest truncation everywhere; results carry the remedy inline.
+ import { CLAUSES, Rejection, type RejectionPayload } from "./errors.ts";
+ import { CallLog } from "./calllog.ts";
++import { batteryGate, laneSummary, laneVerdict, parseTap, scopedGate, streakNudge, suiteFiles, testGate, testRecord } from "./discipline.ts";
++import { existsSync } from "node:fs";
+ import { contentHash } from "./hash.ts";
+ import { parseUpdate } from "./decisions.ts";
+ import { Toll } from "./toll.ts";
+@@ -30,7 +32,7 @@ import { shoot } from "./shoot.ts";
+ import { spawn } from "node:child_process";
+ import { openPanel } from "./panel.ts";
+ import { resolveInRoot, seDir } from "./paths.ts";
+-import { jobList, jobStatus, jobStop, run, runBackground, runOrHandoff } from "./run.ts";
++import { jobList, jobStatus, jobStop, jobWait, run, runBackground, runOrHandoff } from "./run.ts";
+ import { search } from "./search.ts";
+ import { Session } from "./session.ts";
+ import { webFetch, webSearch } from "./web.ts";
+@@ -382,23 +384,30 @@ export function coreTools(rootOf: (rel?: string) => string, projectRoot: string,
+       name: "se_file_patch",
+       title: "se.file.patch",
+       description:
+-        "Exact-match edit: old_string must occur exactly once (or pass replace_all). Pass ops:[{path, old_string, new_string}] to apply MANY edits across MANY files in ONE atomic call — every guard is checked before anything is written. Batch related edits; do not loop single calls.",
++        "EDIT FILES — five verbs, one atomic batch. Each op is ONE of: {path, old_string, new_string} exact match (unique, or replace_all) · {path, pattern, replacement, flags?, expect_count?} regex substitution, always global, count reported · {path, append: true, new_string} append (prepend: true likewise) — never rebuild a file to add to its end · {path, at: {from_line, to_line}, new_string, base_hash} replace a line range from a read you hold. MANY edits, MANY files, ONE call — every guard checked before anything is written. TRIVIAL MISMATCHES ARE CORRECTED, NOT REFUSED: a CRLF/LF difference is applied in the file's own endings and named on the result (`corrected`).",
+       inputSchema: {
+         type: "object",
+         properties: {
+           ops: {
+             type: "array",
+-            description: "[{path, old_string, new_string, base_hash?, replace_all?}, ...] — atomic",
++            description: "[{path, + one verb's fields}, ...] — atomic across the batch",
+             items: {
+               type: "object",
+               properties: {
+                 path: { type: "string" },
+-                old_string: { type: "string" },
+-                new_string: { type: "string" },
+-                base_hash: { type: "string" },
++                old_string: { type: "string", description: "exact verb: the text to find (unique unless replace_all)" },
++                new_string: { type: "string", description: "the replacement / appended / prepended / range text" },
++                base_hash: { type: "string", description: "CAS pin from se_file_read — REQUIRED on a range op" },
+                 replace_all: { type: "boolean" },
++                pattern: { type: "string", description: "regex verb: JS regex, always global; $1 backrefs work in replacement" },
++                replacement: { type: "string" },
++                flags: { type: "string", description: "regex flags from i m s — g is implied" },
++                expect_count: { type: "number", description: "regex verb: refuse unless the match count is exactly this" },
++                append: { type: "boolean", description: "append new_string to the file's end (newline seam handled and named)" },
++                prepend: { type: "boolean", description: "prepend new_string to the file's start" },
++                at: { type: "object", description: "{from_line, to_line} 1-based inclusive — replace these lines with new_string" },
+               },
+-              required: ["path", "old_string", "new_string"],
++              required: ["path"],
+             },
+           },
+         },
+@@ -407,7 +416,7 @@ export function coreTools(rootOf: (rel?: string) => string, projectRoot: string,
+       handler: (args) => {
+         // Unknown op fields refuse BY NAME — a mistyped find/replace once
+         // read as "0 occurrences" and cost a round of misdiagnosis.
+-        const KNOWN = new Set(["path", "old_string", "new_string", "base_hash", "replace_all"]);
++        const KNOWN = new Set(["path", "old_string", "new_string", "base_hash", "replace_all", "pattern", "replacement", "flags", "expect_count", "append", "prepend", "at"]);
+         const ALIAS: Record<string, string> = { find: "old_string", replace: "new_string", search: "old_string", old: "old_string", new: "new_string" };
+         (Array.isArray(args.ops) ? (args.ops as Record<string, unknown>[]) : []).forEach((op, i) => {
+           const unknown = Object.keys(op).filter((k) => !KNOWN.has(k));
+@@ -493,7 +502,7 @@ export function coreTools(rootOf: (rel?: string) => string, projectRoot: string,
+       name: "se_file_search",
+       title: "se.file.search",
+       description:
+-        "Regex search across the working tree (ripgrep) OR any git ref (pass ref — a branch or tag; this repo is a branch of quack, so 'main' reaches v1 and 'v2' reaches v2). Scope it to a DECLARED ROOT with path: '@name'; hits come back as '@name/...', the same address the reader takes. Returns match LOCATIONS with an intent trail; read around a hit with se_file_read offset/limit.",
++        "Regex search (ripgrep). context: N brings N lines around every hit — usually saves the follow-up read; include: '**/*.ts' filters by filename in the same call; count_only: true answers 'how many, where' for a fraction of the tokens. Search any git ref with ref (a branch or tag; this repo is a branch of quack, so 'main' reaches v1 and 'v2' reaches v2). Scope to a DECLARED ROOT with path: '@name'; hits come back as '@name/...', the same address the reader takes. For more than context can carry, read around a hit with se_file_read offset/limit.",
+       inputSchema: {
+         type: "object",
+         properties: {
+@@ -503,6 +512,11 @@ export function coreTools(rootOf: (rel?: string) => string, projectRoot: string,
+           ref: { type: "string", description: "search this committed ref instead of the tree" },
+           ignore_case: { type: "boolean" },
+           limit: { type: "number", default: 100 },
++          context: { type: "number", description: "lines around each hit (capped at 10) — context lines carry context: true, so a neighbour is never mistaken for a match" },
++          before: { type: "number", description: "asymmetric context: lines BEFORE each hit (wins over context)" },
++          after: { type: "number", description: "asymmetric context: lines AFTER each hit (wins over context)" },
++          include: { type: "string", description: "filename glob, e.g. **/*.ts — the search filters files itself; no listing pipe needed" },
++          count_only: { type: "boolean", description: "per-file match counts instead of match lines" },
+         },
+         required: ["query", "intent"],
+       },
+@@ -513,6 +527,11 @@ export function coreTools(rootOf: (rel?: string) => string, projectRoot: string,
+           ...(args.ref !== undefined ? { ref: String(args.ref) } : {}),
+           ...(args.ignore_case === true ? { ignore_case: true } : {}),
+           ...(args.limit !== undefined ? { limit: Number(args.limit) } : {}),
++          ...(args.context !== undefined ? { context: Number(args.context) } : {}),
++          ...(args.before !== undefined ? { before: Number(args.before) } : {}),
++          ...(args.after !== undefined ? { after: Number(args.after) } : {}),
++          ...(args.include !== undefined ? { include: String(args.include) } : {}),
++          ...(args.count_only === true ? { count_only: true } : {}),
+         }),
+     },
+     {
+@@ -549,13 +568,15 @@ export function coreTools(rootOf: (rel?: string) => string, projectRoot: string,
+       name: "se_run",
+       title: "se.run",
+       description:
+-        "Run a shell command from the project root (bash on POSIX, PowerShell on Windows). Output is engine-captured and logged IN FULL under the returned call ref — a run is citable evidence.\n\nNOBODY WAITS. A command still running after 20s is HANDED OFF to the background and you get a job handle at once; ask again with {job} for its output so far, and {job, stop: true} to kill it and everything it spawned. Start long work in the background yourself with {background: true}. {jobs: true} lists this session's jobs.\n\nNEVER call this session's own mirror over HTTP from here — the run blocks the server's event loop, so the mirror cannot answer itself.",
++        `Run a shell command from the project root (bash on POSIX, PowerShell on Windows) — for what ONLY a shell does: node, npm, builds, processes. THE LANE'S JOBS ARE REFUSED HERE: ${laneSummary()}. A first offence per category runs once with a warning; after that the category refuses (SE-C-129) with the lane call as the remedy. If the lane truly cannot do the job, pass no_tool_reason — the command runs once and your reason is logged for the retro.\n\nOutput is engine-captured and logged IN FULL under the returned call ref — a run is citable evidence.\n\nNOBODY WAITS. A command still running after 20s is HANDED OFF to the background and you get a job handle at once; ask again with {job} for its output so far, and {job, stop: true} to kill it and everything it spawned. Start long work in the background yourself with {background: true}. {jobs: true} lists this session's jobs.\n\nNEVER call this session's own mirror over HTTP from here — the run blocks the server's event loop, so the mirror cannot answer itself.`,
+       inputSchema: {
+         type: "object",
+         properties: {
+           command: { type: "string" },
++          no_tool_reason: { type: "string", description: "why the lane cannot do this job — runs a lane-covered command ONCE and files the reason for the retro; a frequent reason is the lane's next verb" },
+           background: { type: "boolean", description: "start it detached and return a job handle IMMEDIATELY — for work you know is long" },
+           job: { type: "string", description: "ask an existing job how it is doing: its output so far, whether it still runs" },
++          wait_ms: { type: "number", description: "with job: BLOCK up to this long on the job's completion — returns the moment it exits. The replacement for every Start-Sleep. Capped at 120000." },
+           stop: { type: "boolean", description: "with job: kill it and every process it spawned" },
+           jobs: { type: "boolean", description: "list every job this session started, newest first" },
+           handoff_ms: { type: "number", description: "how long to wait inline before handing off to the background (default 20000)" },
+@@ -563,9 +584,15 @@ export function coreTools(rootOf: (rel?: string) => string, projectRoot: string,
+           cwd: { type: "string", description: "root-relative working directory" },
+         },
+       },
+-      handler: (args) => {
++      handler: async (args) => {
+         if (args.jobs === true) return { jobs: jobList() };
+-        if (args.job !== undefined) return args.stop === true ? jobStop(String(args.job)) : jobStatus(String(args.job));
++        if (args.job !== undefined) {
++          if (args.stop === true) return jobStop(String(args.job));
++          // THE WAIT RIDES THE JOB'S OWN DONE-PROMISE — it returns the moment
++          // the command exits, where a sleep always serves its full sentence.
++          if (args.wait_ms !== undefined) return jobWait(String(args.job), Number(args.wait_ms));
++          return jobStatus(String(args.job));
++        }
+         if (args.command === undefined) {
+           throw new Rejection({
+             clause: CLAUSES.REQUIRED_ARGS,
+@@ -575,38 +602,99 @@ export function coreTools(rootOf: (rel?: string) => string, projectRoot: string,
+             source: "engine/tools.ts se_run",
+           });
+         }
++        // THE DISCIPLINE LADDER (engine/discipline.ts): a command doing a lane
++        // tool's job runs once with a warning, then refuses. Judged BEFORE the
++        // spawn, so a blocked category costs nothing to block.
++        const laneWarning = laneVerdict(seDir(projectRoot), String(args.command), args.no_tool_reason === undefined ? undefined : String(args.no_tool_reason));
+         const cwd = args.cwd !== undefined ? { cwd: String(args.cwd) } : {};
+-        if (args.background === true) return runBackground(rootOf(), String(args.command), cwd);
+-        return runOrHandoff(rootOf(), String(args.command), {
+-          ...cwd,
+-          ...(args.handoff_ms !== undefined ? { handoff_ms: Number(args.handoff_ms) } : {}),
+-        });
++        const res = args.background === true
++          ? runBackground(rootOf(), String(args.command), cwd)
++          : await runOrHandoff(rootOf(), String(args.command), {
++              ...cwd,
++              ...(args.handoff_ms !== undefined ? { handoff_ms: Number(args.handoff_ms) } : {}),
++            });
++        return laneWarning === undefined ? res : { ...(res as unknown as Record<string, unknown>), lane_warning: laneWarning };
+       },
+     },
+     {
+       name: "se_test",
+       title: "se.test",
+       description:
+-        "Run the engine's own checks in ONE call: the preflight and the full selftest suite, each with structured pass/fail and captured output. Runs in the bound worktree when one is open. Replaces the free-form se_run pair.",
+-      inputSchema: { type: "object", properties: {} },
+-      handler: async () => {
++        "Run tests STRUCTURED — scoped by default, the battery when you earn it. {files: ['pull']} runs pull.test.ts (add name_pattern to narrow further) and returns counts plus ONLY the failures' detail, so nothing needs a temp file or a grep. NO ARGUMENTS runs the battery (preflight + full selftest) — and REFUSES (SE-C-131) while every change since the last green battery maps to a named test file: the refusal hands you that exact scoped call. Piecemeal past a third of the suite flips the other way: the battery becomes the sanctioned, cheaper call. AN UNCHANGED TREE REFUSES its scope (SE-C-130) — that verdict still stands; force: true is the flake door for both gates.",
++      inputSchema: {
++        type: "object",
++        properties: {
++          files: { type: "array", items: { type: "string" }, description: "test files to run scoped — 'pull', 'pull.test.ts' and the full path all name the same file" },
++          name_pattern: { type: "string", description: "--test-name-pattern: run only tests whose name matches" },
++          force: { type: "boolean", description: "override both gates: unchanged tree, and battery/scope economics — for flake hunts" },
++        },
++      },
++      handler: async (args) => {
+         const root = rootOf();
+-        const scripts = ["product/deliverable/engine/bin/preflight.ts", "product/deliverable/engine/bin/selftest.ts"];
+-        const results: { script: string; ok: boolean; exit: number | null; output: string }[] = [];
+-        for (const rel of scripts) {
+-          const abs = resolveInRoot(root, rel, "engine/tools.ts se_test");
+-          const r = await new Promise<{ status: number | null; out: string }>((resolve) => {
+-            const child = spawn("node", [abs, "--root", root], { cwd: root });
++        const se = seDir(projectRoot);
++        const force = args.force === true;
++        const spawnNode = (argv: string[], timeout: number): Promise<{ status: number | null; out: string }> =>
++          new Promise((resolve) => {
++            const child = spawn("node", argv, { cwd: root });
+             let out = "";
+             child.stdout.on("data", (d: Buffer) => { out += d; });
+             child.stderr.on("data", (d: Buffer) => { out += d; });
+-            const timer = setTimeout(() => child.kill(), 150_000);
++            const timer = setTimeout(() => child.kill(), timeout);
+             child.on("error", (e) => { clearTimeout(timer); resolve({ status: null, out: String(e) }); });
+             child.on("close", (code) => { clearTimeout(timer); resolve({ status: code, out }); });
+           });
++        const wantsScope = args.files !== undefined || args.name_pattern !== undefined;
++        if (wantsScope) {
++          // 'pull', 'pull.test.ts', 'tests/pull.test.ts', full path — one file.
++          const named = (Array.isArray(args.files) ? (args.files as unknown[]).map(String) : []).map((f) => {
++            const base = f.split("/").pop() as string;
++            const file = base.endsWith(".test.ts") ? base : `${base}.test.ts`;
++            return `product/deliverable/tests/${file}`;
++          });
++          const files = named.length > 0 ? [...new Set(named)].sort() : suiteFiles(root);
++          const missing = files.filter((f) => !existsSync(resolveInRoot(root, f, "engine/tools.ts se_test")));
++          if (missing.length > 0) {
++            throw new Rejection({
++              clause: CLAUSES.REQUIRED_ARGS,
++              expected: "test files that exist under product/deliverable/tests/",
++              got: `unknown: ${missing.join(", ")}`,
++              remedy: { tool: "se_file_glob", args: { glob: "product/deliverable/tests/*.test.ts" }, note: "list the suite, then name your scope" },
++              source: "engine/tools.ts se_test",
++            });
++          }
++          const scope = `${files.join(",")}${args.name_pattern !== undefined ? `#${String(args.name_pattern)}` : ""}`;
++          testGate(se, root, force, scope);
++          if (named.length > 0) scopedGate(se, root, files, force);
++          const argv = ["--test", "--test-reporter=tap", ...(args.name_pattern !== undefined ? [`--test-name-pattern=${String(args.name_pattern)}`] : []), ...files.map((f) => resolveInRoot(root, f, "engine/tools.ts se_test"))];
++          const r = await spawnNode(argv, Number(process.env.SE_TEST_SCOPED_TIMEOUT_MS ?? 150_000));
++          const tap = parseTap(r.out);
++          const ok = r.status === 0 && tap.fail === 0;
++          const streak = testRecord(se, root, ok, scope, files);
++          const nudge = streakNudge(streak);
++          // Counts plus failures — the slice every temp-file grep was after.
++          // A long green streak carries the owner's law back with the result:
++          // in ~95% of cases the change broke nothing; test to answer a
++          // question, not to reassure.
++          return { ok, scope: { files, ...(args.name_pattern !== undefined ? { name_pattern: String(args.name_pattern) } : {}) }, tests: { total: tap.total, pass: tap.pass, fail: tap.fail }, ...(tap.failures.length > 0 ? { failures: tap.failures } : {}), ...(nudge !== undefined ? { green_streak: streak, nudge } : {}), ...(r.status !== 0 && tap.total === 0 ? { output: r.out.trim().slice(0, 4000) } : {}) };
++        }
++        // The battery: EARNED, not habitual. The gate computes the scoped
++        // remedy from the diff since the last green battery.
++        batteryGate(se, root, force);
++        testGate(se, root, force);
++        const scripts = ["product/deliverable/engine/bin/preflight.ts", "product/deliverable/engine/bin/selftest.ts"];
++        const results: { script: string; ok: boolean; exit: number | null; output: string }[] = [];
++        for (const rel of scripts) {
++          const abs = resolveInRoot(root, rel, "engine/tools.ts se_test");
++          // The battery is long BY DESIGN now that boot walks read real
++          // guidance — 150s killed it mid-run. Configurable, generous default.
++          const r = await spawnNode([abs, "--root", root], Number(process.env.SE_TEST_TIMEOUT_MS ?? 600_000));
+           results.push({ script: rel, ok: r.status === 0, exit: r.status, output: r.out.trim().slice(0, 4000) });
+         }
+-        return { ok: results.every((x) => x.ok), results };
++        const ok = results.every((x) => x.ok);
++        // The verdict is REMEMBERED with the tree it judged, so an identical
++        // tree can be answered from the record instead of another 90 seconds.
++        testRecord(se, root, ok);
++        return { ok, results };
+       },
+     },
+     {
+diff --git a/product/deliverable/tests/discipline.test.ts b/product/deliverable/tests/discipline.test.ts
+new file mode 100644
+index 0000000..19410e8
+--- /dev/null
++++ b/product/deliverable/tests/discipline.test.ts
+@@ -0,0 +1,494 @@
++// The discipline round (owner ruling 2026-08-02), tested against the harvest
++// that ruled it: 2,589 logged se_run calls, 46% of them improvised text tools
++// — Select-String for the searcher, Get-Content for the reader, Set-/Add-
++// Content for the writer, every one uninstrumented. The lane grows the
++// missing verbs here, and se_run learns to say no to the jobs it now covers.
++import { strict as assert } from "node:assert";
++import { spawnSync } from "node:child_process";
++import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
++import { tmpdir } from "node:os";
++import { join } from "node:path";
++import { test } from "node:test";
++import { classifyCommand, laneVerdict, testFingerprint, testGate, testRecord } from "../engine/discipline.ts";
++import { Rejection } from "../engine/errors.ts";
++import { filePatch, fileRead } from "../engine/files.ts";
++import { contentHash } from "../engine/hash.ts";
++import { search } from "../engine/search.ts";
++
++function fresh(): string {
++  return mkdtempSync(join(tmpdir(), "se-v3-disc-"));
++}
++
++// ── the patch verbs ────────────────────────────────────────────────────────
++
++// THE APPEND WENT THROUGH THE SHELL, 285 TIMES. The handover's addenda were
++// Add-Content heredocs because the lane demanded either a full rewrite with
++// hash or an exact anchor — for "add to the end", both are the wrong shape.
++test("append is a patch op: no anchor, no full rewrite, seam handled and NAMED", () => {
++  const root = fresh();
++  writeFileSync(join(root, "h.md"), "# Handover\nbody"); // no trailing newline — the common fumble
++  const r = filePatch(root, [{ path: "h.md", append: true, new_string: "## Addendum\nmore" }]);
++  assert.equal(readFileSync(join(root, "h.md"), "utf8"), "# Handover\nbody\n## Addendum\nmore");
++  assert.ok((r.corrected ?? []).some((c) => c.includes("newline")), "the mechanical seam fix is announced, not silent");
++  rmSync(root, { recursive: true, force: true });
++});
++
++test("prepend joins at the file's start", () => {
++  const root = fresh();
++  writeFileSync(join(root, "h.md"), "body\n");
++  filePatch(root, [{ path: "h.md", prepend: true, new_string: "# Title" }]);
++  assert.equal(readFileSync(join(root, "h.md"), "utf8"), "# Title\nbody\n");
++  rmSync(root, { recursive: true, force: true });
++});
++
++// SED, KEPT INSIDE THE LANE. The regex verb is what -replace was reaching
++// for, minus the quoting arms race and plus the guards: always global, count
++// reported, and expect_count turns "hope it hit once" into a checked claim.
++test("regex substitution reports its count and honours expect_count", () => {
++  const root = fresh();
++  writeFileSync(join(root, "a.ts"), "const aq = 1; use(aq); log(aq);\n");
++  const r = filePatch(root, [{ path: "a.ts", pattern: "\\baq\\b", replacement: "survey", expect_count: 3 }]);
++  assert.equal(r.applied[0].replacements, 3);
++  assert.equal(readFileSync(join(root, "a.ts"), "utf8"), "const survey = 1; use(survey); log(survey);\n");
++  rmSync(root, { recursive: true, force: true });
++});
++
++test("a wrong expect_count refuses and NOTHING is written", () => {
++  const root = fresh();
++  const before = "x y x\n";
++  writeFileSync(join(root, "a.md"), before);
++  assert.throws(
++    () => filePatch(root, [{ path: "a.md", pattern: "x", replacement: "z", expect_count: 3 }]),
++    (e: unknown) => e instanceof Rejection && e.clause === "SE-C-105",
++  );
++  assert.equal(readFileSync(join(root, "a.md"), "utf8"), before, "a refused batch leaves the tree untouched");
++  rmSync(root, { recursive: true, force: true });
++});
++
++test("a zero-match pattern refuses — a substitution that hit nothing is not a success", () => {
++  const root = fresh();
++  writeFileSync(join(root, "a.md"), "plain\n");
++  assert.throws(
++    () => filePatch(root, [{ path: "a.md", pattern: "absent_\\d+", replacement: "x" }]),
++    (e: unknown) => e instanceof Rejection && e.clause === "SE-C-105",
++  );
++  rmSync(root, { recursive: true, force: true });
++});
++
++// A LINE NUMBER ONLY MEANS SOMETHING AGAINST THE VERSION YOU READ — so the
++// range verb demands the hash that read handed over, mechanically.
++test("line-range replace works from a read's hash and refuses without one", () => {
++  const root = fresh();
++  writeFileSync(join(root, "a.ts"), "one\ntwo\nthree\nfour\n");
++  const hash = fileRead(root, "a.ts").hash;
++  assert.throws(
++    () => filePatch(root, [{ path: "a.ts", at: { from_line: 2, to_line: 3 }, new_string: "TWO" }]),
++    (e: unknown) => e instanceof Rejection && e.clause === "SE-C-046",
++    "a range op without base_hash refuses by name",
++  );
++  filePatch(root, [{ path: "a.ts", at: { from_line: 2, to_line: 3 }, new_string: "TWO\nTHREE", base_hash: hash }]);
++  assert.equal(readFileSync(join(root, "a.ts"), "utf8"), "one\nTWO\nTHREE\nfour\n");
++  rmSync(root, { recursive: true, force: true });
++});
++
++test("a range beyond the file refuses with the file's real extent", () => {
++  const root = fresh();
++  writeFileSync(join(root, "a.ts"), "one\ntwo\n");
++  const hash = fileRead(root, "a.ts").hash;
++  assert.throws(
++    () => filePatch(root, [{ path: "a.ts", at: { from_line: 2, to_line: 99 }, new_string: "x", base_hash: hash }]),
++    (e: unknown) => e instanceof Rejection && e.clause === "SE-C-105",
++  );
++  rmSync(root, { recursive: true, force: true });
++});
++
++// THE ENGINE CORRECTS WHAT IS MECHANICAL AND SAYS SO. The commonest patch
++// refusal (12 in one period) was a CRLF file against an LF old_string — a
++// difference no model can see. The old lane diagnosed it and refused anyway;
++// the round-trip that followed re-copied text that differed in nothing
++// visible. Now the patch lands in the file's own endings and the correction
++// is named on the result.
++test("a CRLF/LF mismatch is auto-corrected and ANNOUNCED, not refused", () => {
++  const root = fresh();
++  writeFileSync(join(root, "w.ts"), "const a = 1;\r\nconst b = 2;\r\n");
++  const r = filePatch(root, [{ path: "w.ts", old_string: "const a = 1;\nconst b = 2;", new_string: "const a = 1;\nconst b = 3;" }]);
++  assert.equal(readFileSync(join(root, "w.ts"), "utf8"), "const a = 1;\r\nconst b = 3;\r\n", "applied in the FILE's endings — CRLF stays CRLF");
++  assert.ok((r.corrected ?? []).some((c) => c.includes("CRLF")), "the correction is named on the result");
++  rmSync(root, { recursive: true, force: true });
++});
++
++test("a real whitespace difference still refuses — indentation is a difference, not an encoding", () => {
++  const root = fresh();
++  writeFileSync(join(root, "w.ts"), "    indented\n");
++  assert.throws(
++    () => filePatch(root, [{ path: "w.ts", old_string: "\tindented", new_string: "x" }]),
++    (e: unknown) => e instanceof Rejection && e.clause === "SE-C-105" && e.got.includes("collapsed"),
++  );
++  rmSync(root, { recursive: true, force: true });
++});
++
++test("an op that mixes verbs refuses by name — nothing guesses", () => {
++  const root = fresh();
++  writeFileSync(join(root, "a.md"), "x\n");
++  assert.throws(
++    () => filePatch(root, [{ path: "a.md", old_string: "x", new_string: "y", append: true }]),
++    (e: unknown) => e instanceof Rejection && e.clause === "SE-C-046" && e.got.includes("mixes"),
++  );
++  rmSync(root, { recursive: true, force: true });
++});
++
++// ── the search options ─────────────────────────────────────────────────────
++
++// EVERY HIT USED TO COST A SECOND CALL: the tool's own description said
++// "read around a hit with se_file_read". 1,051 searches, and the follow-up
++// read was the two-call pattern the lane itself taught.
++test("context rides the hit, marked so a neighbour is never mistaken for a match", () => {
++  const root = fresh();
++  writeFileSync(join(root, "a.ts"), "before\nneedle here\nafter\n");
++  const r = search(root, "needle", { context: 1 });
++  const hit = r.matches.find((m) => m.context === undefined);
++  const around = r.matches.filter((m) => m.context === true);
++  assert.ok(hit !== undefined && hit.line === 2);
++  assert.deepEqual(around.map((m) => m.line).sort(), [1, 3], "one line each side, both marked context");
++  rmSync(root, { recursive: true, force: true });
++});
++
++// THE COMMONEST SHELL SEARCH SHAPE was Get-ChildItem -Include *.ts piped to
++// Select-String — a file filter the lane simply did not have.
++test("include filters by filename inside the search call", () => {
++  const root = fresh();
++  writeFileSync(join(root, "a.ts"), "marker\n");
++  writeFileSync(join(root, "a.md"), "marker\n");
++  const r = search(root, "marker", { include: "**/*.ts" });
++  assert.deepEqual(r.matches.map((m) => m.path), ["a.ts"]);
++  rmSync(root, { recursive: true, force: true });
++});
++
++test("count_only answers 'how many, where' without a single match line", () => {
++  const root = fresh();
++  writeFileSync(join(root, "a.ts"), "x\nx\nx\n");
++  writeFileSync(join(root, "b.ts"), "x\n");
++  const r = search(root, "x", { count_only: true });
++  assert.equal(r.total, 4);
++  assert.deepEqual(r.counts, [{ path: "a.ts", count: 3 }, { path: "b.ts", count: 1 }]);
++  assert.equal(r.matches.length, 0);
++  rmSync(root, { recursive: true, force: true });
++});
++
++// ── the ladder ─────────────────────────────────────────────────────────────
++
++// THE CLASSIFIER IS A TABLE, NOT A MODEL. A rule fired or it did not.
++test("the classifier names the lane tool for each harvested shell shape", () => {
++  assert.equal(classifyCommand("Select-String -Pattern 'survey' -Path a.ts")?.tool, "se_file_search");
++  assert.equal(classifyCommand("Get-Content product/engine/toll.ts")?.tool, "se_file_read");
++  assert.equal(classifyCommand("Add-Content -Path .se/HANDOVER.md -Value 'x'")?.tool, "se_file_patch");
++  assert.equal(classifyCommand("$x -replace 'a','b' | Set-Content out.md")?.tool, "se_file_patch");
++  assert.equal(classifyCommand("npm test")?.tool, "se_test");
++  assert.equal(classifyCommand("git status --porcelain")?.tool, "se_git");
++  assert.equal(classifyCommand("node engine/bin/render-decisions.ts"), undefined, "a plain node run is se_run's own job");
++  assert.equal(classifyCommand("npm install --no-audit"), undefined);
++});
++
++test("first offence runs WITH a warning; the second refuses with the lane call as remedy", () => {
++  const se = fresh();
++  const cmd = "Select-String -Pattern 'x' -Path a.ts";
++  const w = laneVerdict(se, cmd);
++  assert.ok(w !== undefined && w.lane_tool === "se_file_search", "the first run carries the teaching");
++  assert.throws(
++    () => laneVerdict(se, cmd),
++    (e: unknown) => e instanceof Rejection && e.clause === "SE-C-129" && e.remedy.tool === "se_file_search",
++    "the grace is one run, then the category refuses",
++  );
++  rmSync(se, { recursive: true, force: true });
++});
++
++test("the grace is PER CATEGORY and persists on disk — no per-session amnesia", () => {
++  const se = fresh();
++  laneVerdict(se, "Select-String -Pattern 'x' a.ts");
++  const w = laneVerdict(se, "Get-Content a.ts");
++  assert.ok(w !== undefined && w.category === "file reads", "a different category still has its own grace");
++  const state = JSON.parse(readFileSync(join(se, "discipline.json"), "utf8")) as { counts: Record<string, number> };
++  assert.equal(state.counts["text searches"], 1);
++  assert.equal(state.counts["file reads"], 1);
++  rmSync(se, { recursive: true, force: true });
++});
++
++// THE VALVE. A mechanical classifier will sometimes be wrong, and a false
++// positive with no exit teaches obfuscation, not discipline. no_tool_reason
++// runs the command once and files the reason — the gap documents itself.
++test("no_tool_reason runs a blocked category once and files the reason as evidence", () => {
++  const se = fresh();
++  const cmd = "Select-String -Pattern 'x' a.ts";
++  laneVerdict(se, cmd); // grace spent
++  const w = laneVerdict(se, cmd, "needs -Context 40, beyond the lane's cap");
++  assert.ok(w !== undefined && w.note.includes("logged"), "the valve run still carries the lane's answer");
++  const state = JSON.parse(readFileSync(join(se, "discipline.json"), "utf8")) as { reasons: { category: string; reason: string }[] };
++  assert.equal(state.reasons.length, 1);
++  assert.ok(state.reasons[0].reason.includes("-Context 40"));
++  assert.throws(() => laneVerdict(se, cmd), "the valve is per-call, never a standing exemption");
++  rmSync(se, { recursive: true, force: true });
++});
++
++test("a clean command passes without a mark", () => {
++  const se = fresh();
++  assert.equal(laneVerdict(se, "node engine/bin/render-decisions.ts --root ."), undefined);
++  rmSync(se, { recursive: true, force: true });
++});
++
++// ── the test gate ──────────────────────────────────────────────────────────
++
++function gitRoot(): string {
++  const root = fresh();
++  const g = (...a: string[]): void => {
++    const r = spawnSync("git", a, { cwd: root, encoding: "utf8" });
++    assert.equal(r.status, 0, `git ${a.join(" ")}: ${r.stderr}`);
++  };
++  g("init", "-q");
++  g("config", "user.email", "t@t");
++  g("config", "user.name", "t");
++  writeFileSync(join(root, "a.ts"), "one\n");
++  g("add", "-A");
++  g("commit", "-qm", "seed");
++  return root;
++}
++
++// A RE-RUN OVER AN UNCHANGED TREE PROVES NOTHING NEW. se_test held 5,706
++// seconds of one build's wall clock; a share of those runs asked a question
++// the previous run had already answered.
++test("an unchanged tree refuses a re-run; any tracked change opens the gate again", () => {
++  const root = gitRoot();
++  const se = join(root, ".se");
++  testRecord(se, root, true);
++  assert.throws(
++    () => testGate(se, root, false),
++    (e: unknown) => e instanceof Rejection && e.clause === "SE-C-130" && e.got.includes("GREEN"),
++    "the standing verdict is quoted back, colour and all",
++  );
++  assert.doesNotThrow(() => testGate(se, root, true), "force is the flake-hunt door");
++  writeFileSync(join(root, "a.ts"), "two\n");
++  assert.doesNotThrow(() => testGate(se, root, false), "a dirty file moves the fingerprint");
++  rmSync(root, { recursive: true, force: true });
++});
++
++test("outside a git repo the gate stands aside — it never blocks what it cannot fingerprint", () => {
++  const root = fresh();
++  const se = join(root, ".se");
++  testRecord(se, root, true);
++  assert.doesNotThrow(() => testGate(se, root, false));
++  assert.equal(testFingerprint(root), "");
++  rmSync(root, { recursive: true, force: true });
++});
++
++// The fingerprint must move when a DIRTY file changes between runs — HEAD
++// alone would call two different working trees "the same tree".
++test("the fingerprint tracks dirty content, not just HEAD", () => {
++  const root = gitRoot();
++  writeFileSync(join(root, "a.ts"), "dirty-one\n");
++  const fp1 = testFingerprint(root);
++  writeFileSync(join(root, "b.ts"), "untracked\n");
++  const fp2 = testFingerprint(root);
++  assert.notEqual(fp1, fp2, "an appearing untracked file is a change");
++  rmSync(root, { recursive: true, force: true });
++});
++
++// The corrected field must survive the whole batch path — a correction in op
++// 1 is not erased by a clean op 2 (regression guard for the plumbing).
++test("corrections from mixed batches all arrive on one result", () => {
++  const root = fresh();
++  writeFileSync(join(root, "w.md"), "alpha\r\nbeta\r\n");
++  writeFileSync(join(root, "x.md"), "gamma\n");
++  const r = filePatch(root, [
++    { path: "w.md", old_string: "alpha\nbeta", new_string: "alpha\nBETA" },
++    { path: "x.md", old_string: "gamma", new_string: "GAMMA" },
++  ]);
++  assert.equal(r.applied.length, 2);
++  assert.equal((r.corrected ?? []).length, 1);
++  assert.equal(contentHash(readFileSync(join(root, "w.md"), "utf8")), r.applied[0].hash);
++  rmSync(root, { recursive: true, force: true });
++});
++
++// ── the scope economy ──────────────────────────────────────────────────────
++// Imported here, after the first cut shipped: one session ran the full
++// battery ~60 times in two hours, mostly to answer single-test questions,
++// then grepped a temp file for the one failure it cared about. The battery
++// is the exception now; the scoped run is the default; and gaming the rule
++// is unprofitable by construction.
++import { batteryGate, flipThreshold, mapChangedToTests, parseTap, scopedGate, suiteFiles } from "../engine/discipline.ts";
++
++function productRoot(): string {
++  // A root that LOOKS like the product: engine modules and their tests.
++  const root = gitRoot();
++  mkdirSync(join(root, "product", "deliverable", "engine"), { recursive: true });
++  mkdirSync(join(root, "product", "deliverable", "tests"), { recursive: true });
++  for (const m of ["pull", "files", "search"]) {
++    writeFileSync(join(root, "product", "deliverable", "engine", `${m}.ts`), `// ${m}\n`);
++    writeFileSync(join(root, "product", "deliverable", "tests", `${m}.test.ts`), `// ${m} test\n`);
++  }
++  const g = (...a: string[]): void => { spawnSync("git", a, { cwd: root }); };
++  g("add", "-A");
++  g("commit", "-qm", "product");
++  return root;
++}
++
++// THE REFUSAL HANDS OVER THE SCOPED CALL, COMPUTED FROM THE DIFF. The gate
++// does not just say no to the battery — it names the cheaper question.
++test("the battery refuses while every change maps to a test file, and names the scope", () => {
++  const root = productRoot();
++  const se = join(root, ".se");
++  testRecord(se, root, true); // a green battery stands
++  writeFileSync(join(root, "product", "deliverable", "engine", "pull.ts"), "// changed\n");
++  try {
++    batteryGate(se, root, false);
++    assert.fail("expected the scope refusal");
++  } catch (e) {
++    assert.ok(e instanceof Rejection && e.clause === "SE-C-131");
++    assert.deepEqual((e as Rejection).remedy.args, { files: ["product/deliverable/tests/pull.test.ts"] }, "the remedy IS the scoped call");
++  }
++  rmSync(root, { recursive: true, force: true });
++});
++
++test("an unmapped change buys the battery — no scoped run answers for it", () => {
++  const root = productRoot();
++  const se = join(root, ".se");
++  testRecord(se, root, true);
++  writeFileSync(join(root, "product", "deliverable", "engine", "render.ts"), "// no test file exists for render\n");
++  assert.doesNotThrow(() => batteryGate(se, root, false));
++  rmSync(root, { recursive: true, force: true });
++});
++
++test("with no battery memory the battery runs — a first run cannot be refused toward history", () => {
++  const root = productRoot();
++  assert.doesNotThrow(() => batteryGate(join(root, ".se"), root, false));
++  rmSync(root, { recursive: true, force: true });
++});
++
++test("a RED battery re-runs freely — a standing failure is never fenced off", () => {
++  const root = productRoot();
++  const se = join(root, ".se");
++  testRecord(se, root, false);
++  writeFileSync(join(root, "product", "deliverable", "engine", "pull.ts"), "// changed\n");
++  assert.doesNotThrow(() => batteryGate(se, root, false));
++  rmSync(root, { recursive: true, force: true });
++});
++
++// THE FLIP: past a third of the suite piecemeal, the battery is GRANTED and
++// scoped runs refuse toward it. Gaming the scope rule is never profitable —
++// approximating the battery one file at a time makes the battery legal.
++test("piecemeal past the threshold flips: scoped refuses toward the battery, the battery is granted", () => {
++  const root = productRoot();
++  const se = join(root, ".se");
++  testRecord(se, root, true);
++  const threshold = flipThreshold(root);
++  // Walk the odometer up to one below the flip, as distinct scoped records.
++  for (let i = 0; i < threshold - 1; i++) {
++    testRecord(se, root, true, `scope-${i}`, [`product/deliverable/tests/f${i}.test.ts`]);
++  }
++  assert.doesNotThrow(() => scopedGate(se, root, ["product/deliverable/tests/f0.test.ts"], false), "already-seen files do not advance the odometer");
++  try {
++    scopedGate(se, root, ["product/deliverable/tests/fresh.test.ts"], false);
++    assert.fail("expected the flip");
++  } catch (e) {
++    assert.ok(e instanceof Rejection && e.clause === "SE-C-131" && e.remedy.tool === "se_test");
++  }
++  writeFileSync(join(root, "product", "deliverable", "engine", "pull.ts"), "// changed\n");
++  // The same odometer that refuses piecemeal GRANTS the battery, even though
++  // the diff maps — the two gates pivot together or the agent is wedged.
++  testRecord(se, root, true, "scope-x", [`product/deliverable/tests/fresh.test.ts`]);
++  assert.doesNotThrow(() => batteryGate(se, root, false));
++  // And a battery run resets the odometer.
++  testRecord(se, root, true);
++  assert.doesNotThrow(() => scopedGate(se, root, ["product/deliverable/tests/f0.test.ts"], false));
++  rmSync(root, { recursive: true, force: true });
++});
++
++test("the unchanged gate is PER SCOPE — pull's green does not fence files' run", () => {
++  const root = productRoot();
++  const se = join(root, ".se");
++  testRecord(se, root, true, "pull-scope", ["product/deliverable/tests/pull.test.ts"]);
++  assert.throws(() => testGate(se, root, false, "pull-scope"), (e: unknown) => e instanceof Rejection && e.clause === "SE-C-130");
++  assert.doesNotThrow(() => testGate(se, root, false, "files-scope"), "a scope never run is never fenced");
++  rmSync(root, { recursive: true, force: true });
++});
++
++// The map: a test file answers for itself; an engine module for its named
++// test; anything else is honest about having no scoped answer.
++test("the change-to-test map is by name and refuses to guess", () => {
++  const root = productRoot();
++  const r = mapChangedToTests(root, [
++    "product/deliverable/engine/pull.ts",
++    "product/deliverable/tests/files.test.ts",
++    "product/guidance/voice.md",
++  ]);
++  assert.deepEqual(r.mapped, ["product/deliverable/tests/files.test.ts", "product/deliverable/tests/pull.test.ts"]);
++  assert.deepEqual(r.unmapped, ["product/guidance/voice.md"]);
++  assert.equal(suiteFiles(root).length, 3);
++  rmSync(root, { recursive: true, force: true });
++});
++
++// TAP, structured: counts plus ONLY the failures' detail — the slice every
++// temp-file grep was after. Subtests report through their parent.
++test("parseTap keeps the counts and only the failures' detail", () => {
++  const tap = [
++    "TAP version 13",
++    "ok 1 - the first law holds",
++    "not ok 2 - the second law breaks",
++    "  ---",
++    "  duration_ms: 4.2",
++    "  error: 'expected 1, got 2'",
++    "  code: 'ERR_ASSERTION'",
++    "  ...",
++    "ok 3 - the third law holds",
++    "# tests 3",
++    "# pass 2",
++    "# fail 1",
++  ].join("\n");
++  const r = parseTap(tap);
++  assert.deepEqual({ total: r.total, pass: r.pass, fail: r.fail }, { total: 3, pass: 2, fail: 1 });
++  assert.equal(r.failures.length, 1);
++  assert.equal(r.failures[0].name, "the second law breaks");
++  assert.ok(r.failures[0].detail.includes("expected 1, got 2"));
++});
++
++// ── waiting, and the streak ────────────────────────────────────────────────
++// Found live 2026-08-02: an agent burned ~15 minutes of one hour in
++// 100-second Start-Sleep calls, hand-polling a background job the lane gave
++// it no way to wait on. The wait verb is the lane's answer; the rule makes
++// the sleep a named lane job; the streak carries the 95% law back on every
++// green result.
++import { runBackground, jobWait } from "../engine/run.ts";
++import { streakNudge } from "../engine/discipline.ts";
++
++test("the sleep classifies as a lane job pointing at the wait verb", () => {
++  assert.equal(classifyCommand("Start-Sleep -Seconds 100; Write-Output ok")?.category, "waiting");
++  assert.equal(classifyCommand("sleep 5 && echo done")?.category, "waiting");
++  assert.equal(classifyCommand("node --test x.test.ts")?.category, "tests", "tests still classify first");
++});
++
++test("jobWait returns the MOMENT the job exits, not at the bound", async () => {
++  const root = fresh();
++  const cmd = process.platform === "win32" ? "Start-Sleep -Milliseconds 300" : "sleep 0.3";
++  const j = runBackground(root, cmd, {});
++  const t0 = Date.now();
++  const v = await jobWait(j.job, 10_000);
++  const waited = Date.now() - t0;
++  assert.equal(v.running, false, "the job completed inside the wait");
++  assert.ok(waited < 5_000, `returned on completion (${waited}ms), nowhere near the 10s bound`);
++  rmSync(root, { recursive: true, force: true });
++});
++
++test("the streak counts consecutive greens per scope and a red resets it", () => {
++  const root = gitRoot();
++  const se = join(root, ".se");
++  assert.equal(testRecord(se, root, true, "s1", ["f1"]), 1);
++  writeFileSync(join(root, "a.ts"), "two\n");
++  assert.equal(testRecord(se, root, true, "s1", ["f1"]), 2);
++  writeFileSync(join(root, "a.ts"), "three\n");
++  assert.equal(testRecord(se, root, true, "s1", ["f1"]), 3);
++  assert.ok(streakNudge(3) !== undefined && (streakNudge(3) as string).includes("95%"), "the nudge carries the owner's law");
++  assert.equal(streakNudge(2), undefined, "below the bar, silence");
++  writeFileSync(join(root, "a.ts"), "four\n");
++  assert.equal(testRecord(se, root, false, "s1", ["f1"]), 0, "a red resets");
++  writeFileSync(join(root, "a.ts"), "five\n");
++  assert.equal(testRecord(se, root, true, "s1", ["f1"]), 1);
++  rmSync(root, { recursive: true, force: true });
++});
+-- 
+2.43.0
+
