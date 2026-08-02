@@ -376,3 +376,5 @@
 {"ts":"2026-08-02T11:58:21.820Z","op":"plan","visit":"expeditions/e30@0","parent":null,"nodes":[{"id":"d175","brief":"The question-is-not-an-escape rule lands in guidance"},{"id":"d176","brief":"Sign the report and close e30 on the owner's word"},{"id":"d177","brief":"Hand over and end the session"}]}
 {"ts":"2026-08-02T11:59:12.631Z","op":"update","visit":"expeditions/e30@0","node":"d178","brief":"The report stands signed with visible content"}
 {"ts":"2026-08-02T11:59:19.644Z","op":"done","visit":"expeditions/e30@0","node":"d175","brief":"Guidance, schema and code comment carry the rule"}
+{"ts":"2026-08-02T11:59:46.809Z","op":"update","visit":"expeditions/e30@0","node":"d179","brief":"Entering the leave with the signed report"}
+{"ts":"2026-08-02T12:00:27.746Z","op":"update","visit":"expeditions/e30-leave@0","node":"d180","brief":"Closing with the owner's recorded authorization"}
