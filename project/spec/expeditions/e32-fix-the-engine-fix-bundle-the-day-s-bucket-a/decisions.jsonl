@@ -100,3 +100,5 @@
 {"ts":"2026-08-02T19:15:52.898Z","op":"update","visit":"expeditions/e32@1","node":"d197","brief":"the fixture commits on the branch"}
 {"ts":"2026-08-02T19:16:12.135Z","op":"update","visit":"expeditions/e32@1","node":"d198","brief":"the report tells tonight's ending"}
 {"ts":"2026-08-02T19:16:19.730Z","op":"update","visit":"expeditions/e32@1","node":"d199","brief":"the amended report commits"}
+{"ts":"2026-08-02T19:16:30.815Z","op":"update","visit":"expeditions/e32@1","node":"d200","brief":"walking to the gate"}
+{"ts":"2026-08-02T19:16:54.070Z","op":"done","visit":"expeditions/start@1","node":"d183","brief":"closing e32 on the owner's word with the battery green"}
