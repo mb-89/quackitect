@@ -1,20 +1,14 @@
 # walking — how the machine is driven
 
-Two tools drive the walk, and they are not alternatives — they are two
-different ideas about who decides.
-
-- `se_pull` is THE PULL. You say pull, the machine says what to do, you do
-  it, you pull again. The machine owns every decision.
-- `se_tick` is THE TICK. You name the state, you carry the proof, you
-  handle the refusal. You own the decisions.
-
-THE PULL IS THE ONE THE DESIGN INTENDS (owner, 2026-08-01). The tick is
-still here, still legal in every state, and still what the mirror and the
-boot walk use. Retiring it is a separate decision, not a side effect.
+One verb drives the walk: `se_pull`. You say pull, the machine says what
+to do, you do it, you pull again. The machine owns every decision about
+the walk — the route, the hop, the proof, the position. THE TICK IS
+RETIRED (owner ruling 2026-08-02): the machinery it drove lives on inside
+the engine, reached through the pull and the mirror, and is no tool.
 
 ## The pull
 
-One verb, one optional payload. It answers with an INSTRUCTION, and the
+One call, one optional payload. It answers with an INSTRUCTION, and the
 `pull` key names which of five you got.
 
 - `read` — documents are owed. Call `se_reading` until it answers done,
@@ -22,110 +16,72 @@ One verb, one optional payload. It answers with an INSTRUCTION, and the
 - `fill` — the next step wants evidence. THE MACHINE BUILT THE FORM and
   handed it over, so you never look one up. Fill it and return it on the
   next pull as `form`.
-- `choose` — the road splits. The options ride along with their weight.
-  Return `choice` on the next pull.
+- `choose` — the road splits. The options ride along with their statement,
+  weight and whether they are open. Return `choice` on the next pull.
 - `do` — the happy path was WALKED for you, every hop to the next
-  branching point in one call. `here` is where you landed.
+  branching point in one call. `here` is where you landed, with its
+  guidance and what it will ask. Do the work, then pull again.
 - `wait` — the machine is out of work, or the next step weighs more than
-  the session autonomy. Say which step waits, and stop.
+  the session autonomy. Say plainly WHICH step waits, then STOP: the
+  slider alone cannot wake you, a message resumes you.
 
 THERE IS NO SUBMIT VERB. A pull carrying a filled form IS the submit.
 Pulling again without it hands back the same form, so there is no way
 forward except filling it.
 
-BLOCKING IS AN INSTRUCTION, NOT AN ERROR. This is the whole point, and it
-is v2's law (§6). A threshold, an unmet condition and an undrawn route are
-the machine knowing what should happen next — a pull says it instead of
-throwing it. What stays a refusal is what is genuinely ILLEGAL: a choice no
-edge reaches, a form nothing asked for.
+BLOCKING IS AN INSTRUCTION, NOT AN ERROR. This is the point, and it is
+v2's law (§6). A threshold, an unmet condition and an undrawn route are
+the machine knowing what should happen next — the pull says it instead of
+throwing it. What stays a refusal is what is genuinely ILLEGAL: a choice
+no edge reaches, a form nothing asked for. A refusal is typed — clause,
+expected, got, and an executable remedy. Follow the remedy; recover in
+one turn. When a result carries a banner, show it to the user VERBATIM.
 
-A `choice` may be a LIST. One agent walks the first and the rest come back
-as `not_walked`. Multi-agent is not built, and the seam is deliberately not
-designed shut.
+A PULL MAY MOVE THE WALK. There is no passive position query for the
+agent — the answer to "where am I" is the pull's `where`, and the answer
+to "what now" is the rest of it. The walk only advances through states
+whose conditions pass and whose weight fits the slider, so following the
+pull is safe by construction.
 
-## The tick
+## What the agent still decides
 
-`se_tick` is legal in every state.
+The payload is the whole list, and it is short on purpose.
 
-- No arguments: where you are — state, guidance, conditions, pulled
-  documents, next states.
-- `to: <state>`: complete the current state, enter that one. Required when
-  several edges leave a state.
-- `from: <state>`: your assumed CURRENT state — send it on EVERY moving
-  tick. The human's hand moves the walk too; when `from` is not where the
-  machine stands, the move is refused (SE-C-114) and the refusal names
-  the real position. Continue from there — never replay the stale move.
-- `advance: true`: advance along a single drawn edge.
-- `read_hashes: {"<path>": "<hash>", ...}`: your proof-of-read for this
-  tick. A transition demands it for the current state's read list and for
-  everything the TARGET pulls; each hash rides a `se_file_read` result and
-  must match the doc as it stands now. Fresh every tick — after a
-  compaction, re-read before advancing.
-- `wait: true`: the short in-turn hold — blocks until something moves
-  (slider, tick, check), returns the fresh packet (changed: false on
-  timeout). Only when you expect the change within seconds. For anything
-  longer: STOP, telling the user plainly that the slider alone cannot
-  wake you — they must message you (continue is enough) after changing
-  it, and you resume from wherever the machine stands.
-- `state: <id>`: peek at any state without moving. A LIST of ids peeks them
-  all in ONE call, answering with `states`. Peeking every door before you
-  choose is the normal case, so it should cost one round trip, not one each.
-- `back: <state>`: return to an earlier filled state. Everything downstream
-  is superseded; its evidence is invalidated and earned again.
-- `target: <state>`: set the destination the route line tracks. The session
-  already has one at engine start, pointing at the front desk.
+- `choice` — where to head: an offered option, or any drawn state. This
+  is the blue line: you set the target, the engine pulls you there. A
+  LIST is legal where the work fans out; one agent walks the first and
+  the rest come back as `not_walked`.
+- `form` — what you wrote into the form the machine handed you.
+- `back` — earlier work no longer stands. The walk reopens that state
+  and STOPS ON IT for the redo; downstream evidence is invalidated.
+- `pause` / `escape` — stepping out to idle, with the reason. Pause is
+  ordinary work; escape is a recorded failure.
 
-Default movement rule:
+Everything else the tick used to ask of you — `advance`, `from`,
+`read_hashes`, `route`, `sweep`, `state` peeks, `wait` holds — is the
+engine's now. There is no position to assert (the pull recomputes from
+wherever the walk stands, so the human's hand can never race you), no
+proof to carry (reading credits itself), and no route to draw (the
+mirror draws it; the pull walks it).
 
-- If a target is set, keep walking toward it.
-- Prefer any `enter_met` edge that advances toward that target.
-- Stop at idle only when no reachable in-threshold step advances toward target.
-- A refusal still stops the walk. Follow its remedy.
-- SE-C-113 means user handoff. Report and wait for a message.
+## The person's hand
+
+The person drives through the MIRROR, never through the lane: the
+slider, the target, the checkboxes, advancing or jumping back by hand.
+The engine recomputes on every pull, so a target set in the mirror
+steers the agent's very next pull — the person aims, the machine pulls
+the agent along the drawn line.
 
 THE READING — a loop, not a list:
 
-- Whenever anything is owed, the packet carries `reading`. Call `se_reading`.
+- Whenever anything is owed, the pull answers `read`. Call `se_reading`.
 - It hands back ONE document: the next guidance the way ahead demands, as text.
 - Read it. Call `se_reading` again. Stop when it answers `done: true`.
 - Pull until it gives you nothing. Then you have everything, by construction.
 - You never name a path. You never carry a hash. The engine credits what it served.
-- You never work out what you owe either. The machine knows:
-  - A TARGET is set — every document the whole way there, plus what the target's neighbours demand at entry.
-  - NO target — where you stand is the target: what this state pulls, plus what its neighbours demand.
 - What you have already read is never served twice, so the loop always drains.
 - ONE DOCUMENT PER CALL, and that is the point. A host that moves a large tool result to disk hands you a PREVIEW instead of the text — and the engine has already credited it, so you stand proven to have read what you never saw. A single document cannot be eaten.
 - `.se/reading.md` is the same thing as a file, for a person to open. Agents use the tool.
-
-A WORD ON WHY THIS PARAGRAPH IS WORDED CAREFULLY. It was briefly rewritten to
-describe one concatenated read with no second call, which contradicted the
-shipped tool: `se_reading` loops, answers with a `remaining` count, and its own
-description says to call it again. Three documents disagreed with running code
-for an afternoon. The ENGINE is the truth; prose follows it.
-
-Read-ahead discipline (every state):
-
-- `route_reads` and `lookahead_read` NAME what is owed. `reading` HANDS IT OVER. Prefer the reading.
-- Read a named path directly only when you want that one document for its own sake.
-- Keep a session cache of path -> hash from `se_file_read`.
-- Re-read only when a refusal says the hash is missing or stale.
-- If a state allows no tools, do not read there. Tick only.
-
-Two more arguments go with `target`, and only make sense beside it — they
-are how you walk a KNOWN way without one round trip per hop:
-
-- `route: <state>`: the way from here to there — every hop, its priority, and
-  what each will ask for. It MOVES NOTHING. Read it to answer every judgment
-  on the way at once, before committing to the walk.
-- `sweep: true` with `to:`: WALK THAT ROUTE IN ONE CALL instead of one tick
-  per hop. It collapses round trips and nothing else — every hop still weighs
-  the slider, proves its reads and runs its scripts, and it stops at the
-  first hop that will not pass, saying which and why.
-
-A WORD OF WARNING ON "SWEEP", because this page uses it three other ways:
-the desk sweeps the machinery before advising, the overhaul sweeps what is
-active, and you sweep the pending notes before building. Those are all the
-ordinary English word. Only `sweep: true` on a tick is the verb.
 
 READ SERIALLY FOR NOW. Send `se_file_read` calls one after another, not as a
 parallel batch. This is a RETREAT, not a preference, and it is written down
@@ -136,10 +92,6 @@ serves them, and they work on Claude Code today. A COPILOT HARNESS appears
 to cancel itself when calls go out in parallel — observed on 2026-07-31, not
 yet proven to the mechanism. Nothing about the MCP server or the lane is
 implicated.
-
-So the cost is real and accepted. Boot demands seven or eight documents and
-serial reads pay a round trip for each. A boot that COMPLETES on every host
-beats a faster one that dies on one of them.
 
 WHEN THIS LIFTS: when the harness bug is understood and fixed, or when the
 host can be detected reliably enough to batch only where it is safe. Until
@@ -212,7 +164,7 @@ Narration rides the walk (the unified log + the decision graph):
   - `5m` — every 5 minutes, or every 20 calls. The default.
   - `15m` — every 15 minutes, or every 60 calls.
   - `off` — nothing is ever owed.
-  The setting rides every packet as `narration`. A low notch is the
+  The setting rides every pull as `narration`. A low notch is the
   person asking to see the work, not a tax to pay with filler: say what
   you are actually doing, on the item you are actually on.
 - `se_note {text}`: capture a stray anywhere, keep walking (contract
@@ -247,8 +199,5 @@ THE MACHINE COMMITS, NOT YOU (owner ruling):
 
 Conditions gate movement. Every `entry`/`exit` key is a condition type; its
 note (linked in every refusal) says what it wants. A condition is worked
-only from inside its state.
-
-Refusals are typed: clause, expected, got, and an executable remedy. Follow
-the remedy — recover in one turn. When a tick result carries a banner, show
-it to the user verbatim.
+only from inside its state — and the pull TELLS you when one stands in the
+way, as `read`, `fill`, or the stopped step's own remedy.

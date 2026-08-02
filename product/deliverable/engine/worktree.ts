@@ -208,7 +208,7 @@ export function expFind(root: string, id: string): Expedition {
       clause: CLAUSES.PATH_ESCAPE,
       expected: `an OPEN expedition: ${open.join(", ") || "(none — start one first)"}`,
       got: id,
-      remedy: { tool: "se_tick", args: {}, note: "continue_expedition lists the open expeditions — entering one binds it" },
+      remedy: { tool: "se_pull", args: {}, note: "continue_expedition lists the open expeditions — entering one binds it" },
       source: SRC,
     });
   }

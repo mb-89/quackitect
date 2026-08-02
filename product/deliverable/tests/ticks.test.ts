@@ -1,4 +1,11 @@
-// tick mechanics: atomicity, peeking, jumping back, repair, reload
+// walk mechanics: reload gating, repair mode, conditions, jumping back.
+//
+// The engine's own step (tickAdvance) is driven at SESSION level here —
+// the human's hand, exactly as the mirror drives it. The agent's verb is
+// the pull, tested in the pull*.test.ts files. The atomic-`from` and the
+// peek died with the tick tool (owner ruling 2026-08-02): the pull
+// recomputes from wherever the walk stands, so there is no planned move
+// to go stale and no door the offer does not carry.
 //
 // SMALL FILES ON PURPOSE (owner ruling, 2026-07-30). A test file is the
 // only unit that reaches a second core, so themes get their own file and
@@ -7,31 +14,10 @@ import { strict as assert } from "node:assert";
 import { describe, test } from "node:test";
 import { Session } from "../engine/session.ts";
 import { buildServer } from "../engine/tools.ts";
-import { bootedServer, call, checkDocs, freshRoot, readHashesFor } from "./helpers.ts";
+import { bootedServer, call, checkDocs, freshRoot } from "./helpers.ts";
 
 // Concurrent: every case builds its own root and touches no global.
-describe("ticks", { concurrency: true }, () => {
-test("ticks are ATOMIC: a stale `from` is refused, the matching one moves", async () => {
-  const root = freshRoot();
-  const session = new Session(root);
-  const server = buildServer(root, session);
-  const hashes = readHashesFor(root);
-  for (let i = 0; i < 8; i++) {
-    const step = await call(server, "se_tick", { advance: true, read_hashes: hashes });
-    if (step.body.booted === true) break;
-  }
-  // The agent plans a move from idle; the human walks into the archive meanwhile.
-  checkDocs(session);
-  await session.tickAdvance("expedition_archive");
-  const stale = await call(server, "se_tick", { from: "idle", to: "end", read_hashes: hashes });
-  assert.equal(stale.isError, true);
-  assert.equal(stale.body.clause, "SE-C-114");
-  assert.match(String(stale.body.expected), /expedition_archive/);
-  // From the real position the move flows (bare sub-state ids match too).
-  const onward = await call(server, "se_tick", { from: "expedition_archive/start", advance: true, read_hashes: hashes });
-  assert.equal(onward.isError, false, JSON.stringify(onward.body));
-});
-
+describe("walk mechanics", { concurrency: true }, () => {
 test("se_reload: refused off-idle, dry-runs its canary at idle", async () => {
   const server = buildServer(freshRoot());
   const early = await call(server, "se_reload", {});
@@ -103,50 +89,6 @@ test("jump back leaves nothing green: the nested walk's record is superseded too
   s.jumpBack("boot");
   const filled = s.instance.history.filter((h) => h.outcome === "filled").map((h) => h.state);
   assert.ok(!filled.some((f) => f.startsWith("boot/")), `boot walk entries still filled: ${filled}`);
-});
-
-test("the agent can peek at any state without moving — the click, as a tool", async () => {
-  const server = buildServer(freshRoot());
-  const peek = await call(server, "se_tick", { state: "idle" });
-  assert.equal(peek.isError, false);
-  assert.equal(peek.body.id, "idle");
-  assert.ok(String(peek.body.guidance).length > 0);
-  const still = await call(server, "se_tick");
-  assert.deepEqual(still.body.active, ["start"]);
-  const unknown = await call(server, "se_tick", { state: "nope" });
-  assert.equal(unknown.isError, true);
-});
-
-test("peeking takes a SET: every door in one call, in the order asked", async () => {
-  const server = buildServer(freshRoot());
-  const many = await call(server, "se_tick", { state: ["idle", "front_desk", "start"] });
-  assert.equal(many.isError, false, JSON.stringify(many.body));
-  const states = many.body.states as { id: string; guidance?: string }[];
-  assert.deepEqual(states.map((s) => s.id), ["idle", "front_desk", "start"]);
-  assert.equal(many.body.failed, undefined, "nothing failed, so nothing is reported failed");
-
-  // A set peek is not a thinner peek: an entry is the SAME answer one id gives.
-  const single = await call(server, "se_tick", { state: "front_desk" });
-  assert.deepEqual(states[1], single.body);
-
-  // Looking never moves, however many doors are looked at.
-  const still = await call(server, "se_tick");
-  assert.deepEqual(still.body.active, ["start"]);
-});
-
-test("one unknown door refuses for itself, and the real ones still arrive", async () => {
-  const server = buildServer(freshRoot());
-  const r = await call(server, "se_tick", { state: ["idle", "nope"] });
-  assert.equal(r.isError, false, "a set peek does not fail whole because one entry did");
-  const states = r.body.states as { guidance?: string; refused?: { remedy?: unknown } }[];
-  assert.equal(r.body.failed, 1);
-  assert.ok(states[0].guidance, "the real door still came back");
-  assert.ok(states[1].refused?.remedy, "the unknown one carries its own refusal, with a remedy");
-
-  // Peeking every id there could be is a sweep, not a choice.
-  const greedy = await call(server, "se_tick", { state: Array.from({ length: 21 }, (_, i) => `s${i}`) });
-  assert.equal(greedy.isError, true);
-  assert.match(String(greedy.body.expected), /at most 20/);
 });
 
 });

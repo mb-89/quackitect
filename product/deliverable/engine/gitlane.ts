@@ -118,7 +118,7 @@ function twoTrees(root: string, worktree: string, verb: string): { branch: strin
       clause: CLAUSES.GIT_NOT_ALLOWLISTED,
       expected: "a bound expedition — this reconciles a worktree WITH trunk",
       got: `${verb} with nothing bound`,
-      remedy: { tool: "se_tick", args: {}, note: "enter an expedition first; at the root there are not two trees to reconcile" },
+      remedy: { tool: "se_pull", args: {}, note: "enter an expedition first; at the root there are not two trees to reconcile" },
       source: "engine/gitlane.ts",
     });
   }

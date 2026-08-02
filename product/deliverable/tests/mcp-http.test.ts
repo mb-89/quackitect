@@ -9,7 +9,7 @@ import { startMirror } from "../engine/mirror.ts";
 import { seDir } from "../engine/paths.ts";
 import { Session } from "../engine/session.ts";
 import { buildServer } from "../engine/tools.ts";
-import { freshRoot, readHashesFor } from "./helpers.ts";
+import { freshRoot } from "./helpers.ts";
 
 async function listening() {
   const root = freshRoot();
@@ -46,24 +46,25 @@ test("initialize and tools/list answer plain POSTs", async () => {
     assert.ok(initBody.result.protocolVersion, "initialize answers with a protocol version");
     const list = await rpc(port, { jsonrpc: "2.0", id: 2, method: "tools/list" });
     const tools = ((await list.json()) as { result: { tools: { name: string }[] } }).result.tools.map((t) => t.name);
-    assert.ok(tools.includes("se_tick"), `the lane's tools ride the transport: ${tools.join(", ")}`);
+    assert.ok(tools.includes("se_pull"), `the lane's tools ride the transport: ${tools.join(", ")}`);
   } finally {
     mirror.close();
   }
 });
 
-test("a tools/call over HTTP moves the SAME walk the process holds", async () => {
-  const { root, session, mirror, port } = await listening();
+test("a tools/call over HTTP asks the SAME walk the process holds", async () => {
+  const { session, mirror, port } = await listening();
   try {
     const r = await rpc(port, {
       jsonrpc: "2.0",
       id: 3,
       method: "tools/call",
-      params: { name: "se_tick", arguments: { advance: true, read_hashes: readHashesFor(root) } },
+      params: { name: "se_pull", arguments: {} },
     });
     const packet = await toolResult(r);
-    assert.deepEqual(packet.active, ["boot/start"], JSON.stringify(packet));
-    assert.deepEqual(session.active(), ["boot/start"], "the in-process session moved — one walk, not a private engine");
+    assert.equal(packet.pull, "read", JSON.stringify(packet));
+    assert.deepEqual(packet.where, ["start"]);
+    assert.deepEqual(session.active(), ["start"], "one walk, not a private engine — the same session answered");
   } finally {
     mirror.close();
   }

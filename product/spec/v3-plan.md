@@ -29,13 +29,14 @@ Supersedes the first draft where they differ. Owner rulings incorporated:
   11-tool drop-in lane at the i12 standard (offset/limit reads, atomic batch
   patch, CAS everywhere, unknown-arg refusal, honest truncation); raw call
   log; selftests; RUNME.
-- **M1b — machine wired to dispatch.** `se_next` / `se_submit` /
-  `se_abandon`; machine declarations as JSON against the harvested kernel;
-  ONE generic dispatch guard: the active state's legal list decides, the
-  rejection names the state, the legal moves, and the exact next call.
-  Sub-machine seeding included. Exit: a scripted walk end-to-end green; an
-  off-script call in every state refused; a weak model recovers in one turn
-  from any rejection.
+- **M1b — machine wired to dispatch.** Planned as `se_next` / `se_submit` /
+  `se_abandon`; SHIPPED 2026-08-02 as `se_pull` (owner ruling: submit is
+  not a verb — a pull carrying the filled form IS the submit; abandon is
+  the pull's `escape`). One generic dispatch guard stands as planned: the
+  active state's legal list decides, the rejection names the state, the
+  legal moves, and the exact next call. Sub-machine seeding included.
+  The interim `se_tick` (agent names its own hop and carries read hashes)
+  served from M1a until the pull landed, and retired with it.
 - **M2 — the Mirror.** HTML projection of: current machine (drawn), active
   state(s), the packet as served (byte-equal, same renderer), guidance as
   inlined, last N log lines. Regenerated on every state change; no server

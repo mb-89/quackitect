@@ -7,10 +7,10 @@ files:
 
 # e30 — make the iteration lane actually walkable
 
-<!-- PREFILL, amended 2026-08-02 after the pull lane was built. Every section
-below is a suggestion and counts as EMPTY until confirmed. Confirm each one in
-the mirror, or uncomment it here. Then set status: done. The close itself
-weighs 0.6 and is the owner's tick. -->
+<!-- PREFILL, amended a second time on 2026-08-02 after the tick retired.
+Every section below is a suggestion and counts as EMPTY until confirmed.
+Confirm each one in the mirror, or uncomment it here. Then set status: done.
+The close itself weighs 0.6 and is the owner's hand. -->
 
 ## What was the goal
 
@@ -35,9 +35,10 @@ were built after the merge, on trunk directly, and neither is named in the
 minted goal.
 
 Second, and larger: on 2026-08-02 the owner ruled that the pull lane be built
-BEFORE the first iteration is opened. Their words were that this is not a
-return to an old plan, and asked why we keep not building it. So the pull lane
-is now the biggest thing in this expedition and it is not in the goal either.
+BEFORE the first iteration is opened, and then — the same day — that the tick
+RETIRE with it: the agent pulls, always, and every decision the tick used to
+ask of the agent moves into the engine. So the pull lane and the retirement
+are now the biggest things in this expedition and neither is in the goal.
 software.md says to amend the goal when the bundle grows past it. Amending it
 is owed.
 -->
@@ -64,6 +65,28 @@ INSTRUCTION rather than a refusal, which is the whole point.
 A choice may be a LIST: one agent walks the first and the rest come back as
 not_walked. Multi-agent is not built and the seam is deliberately not designed
 shut, which was the owner's instruction.
+
+THE TICK RETIRED (owner ruling 2026-08-02, same day). se_tick is out of the
+tool list; se_pull is the agent's one verb. What each side owns now:
+
+- The ENGINE took the hop, the route, the sweep, the peek, the position
+  (the from-assertion is deleted — the pull recomputes, so the race is
+  gone), and the read proof end to end: read_hashes no longer exists,
+  se_reading and se_file_read credit what they serve, and the reads
+  refusal's remedy speaks the reading loop.
+- The AGENT keeps five decisions, all payload fields on se_pull: choice,
+  form, back, pause, escape. The pull grew back/pause/escape for this.
+- The DESK's door vocabulary rides se_survey as a live doors list derived
+  from idle's edges, replacing the retired peek.
+- The BANNER now survives a sweep — it used to be eaten mid-walk, against
+  the harness rule that banners are shown verbatim.
+- The boot contract, both session hooks, the kickoff prompt, walking.md,
+  boot method, front-desk method, contract rule 3, the README and every
+  machine state card now speak pull. v3-plan.md's M1b entry records what
+  shipped against what was planned.
+
+The full audit — what moved, what stayed, with reasons — is
+note-c812ee64df45.
 
 THE SHUTDOWN ROW. A new toggles parameter type, for buttons that do not
 exclude each other. The machine holds the two flags and serves them. Block
@@ -99,8 +122,22 @@ duplicate copy in session.ts removed. Held by tests/rounds.test.ts.
 ## What settled it
 
 <!--
-THE BATTERY. 654 tests in 73 suites before the pull lane, 676 in 79 after it,
-zero failures either time. The wall clock went from 73 to 87 seconds.
+THE BATTERY. 654 tests in 73 suites before the pull lane; 672 in 79 after the
+retirement, zero failures. The wall clock sits near 110 seconds — the pull
+cases each pay a real boot walk.
+
+THE MIGRATION FOUND FOUR REAL DEFECTS, which is what it was for.
+
+- The reading loop did not serve the human-checked handover demand, so a
+  pull could say read for a list that could not satisfy the walk it feeds.
+  readingList now unions the human's checked docs.
+- The survey's doors landed referencing a session the survey never had —
+  a runtime hole invisible to type-stripping. The doors ride a thunk now,
+  like the reading.
+- The mirror's read pill stayed gray for a credited reading until the
+  walk moved; it now greens on a current credit.
+- The old needs-retro test silently swallowed a refused hop for weeks —
+  a call whose result nobody asserted. The rewrite drives the drawn edge.
 
 THAT COST WAS PAID DELIBERATELY. A pull case needs a session standing at idle
 and that means a real boot walk, about eight seconds each. All of them in one
@@ -134,12 +171,16 @@ typing, written by them rather than by an agent.
 ## What was not done
 
 <!--
-SE_TICK IS NOT RETIRED, so "the agent's only call is pull" is not yet true.
-The pull is built, tested and documented, and it runs on the tick's machinery
-underneath. Retiring the tick means changing what every session's first call
-is, which is the boot contract in workspace/AGENTS.md, plus the mirror and
-roughly 650 tests that drive the tick directly. That is its own decision and
-its own piece of work, not a side effect of this one.
+THIS SESSION STILL DROVE THE TICK. The MCP tool list is fixed at connect
+time and se_reload swaps the engine but not the list, so the session that
+retired the tick could not itself pull. The FIRST session on the new code is
+the first real pull walk; its boot is the dogfood this session could not do.
+
+THE ITERATION WALK IS COVERED ON THE HUMAN HAND. iterations.test drives the
+bless, the pin and the gate report at session level now — the agent-lane
+version of that walk (pull { form } through a kickoff) has no test yet,
+because no iteration has ever been walked by an agent at all. The product
+iteration will be that test.
 
 THE BATCH IS NOT SIZE-CAPPED. The owner asked how a long batch avoids
 overflowing and their hint was "maybe not all the details". The answer taken

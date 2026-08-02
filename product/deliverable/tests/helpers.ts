@@ -198,15 +198,10 @@ export const READ_DOCS = [
   "product/guidance/walking.md",
 ] as const;
 
-/** The agent's proof-of-read, earned the honest way: hash of each doc as
- *  it stands on disk (exactly what se_file_read would have returned). */
-export function readHashesFor(root: string): Record<string, string> {
-  const out: Record<string, string> = {};
-  for (const p of READ_DOCS) out[p] = contentHash(readFileSync(join(root, ...p.split("/"))));
-  return out;
-}
-
-/** The human's side of the same proof: check every boot doc in the mirror. */
+/** The human's side of the read proof: check every boot doc in the mirror.
+ *  (The agent's side has no helper on purpose — its proofs are earned by
+ *  reading through the lane, and the hash-supplying lane retired with the
+ *  tick.) */
 export function checkDocs(session: { humanCheck: (p: string) => unknown }): void {
   for (const p of READ_DOCS) session.humanCheck(p);
 }
@@ -259,15 +254,51 @@ export async function sessionAtIdle(root: string): Promise<Session> {
   throw new Error(`the pull did not reach idle: ${JSON.stringify(s.active())}`);
 }
 
-/** A server ticked through the whole boot walk into idle — supplying the
- *  read hashes on every tick, as the agent's hand must. */
+/** Boot an EXISTING server by pulling, exactly as a real agent does:
+ *  aim at idle, read what the machine serves, pull again. */
+export async function pullBoot(server: Server): Promise<void> {
+  const aim = await call(server, "se_pull", { choice: "idle" });
+  if (aim.isError) throw new Error(`aim failed: ${JSON.stringify(aim.body)}`);
+  for (let i = 0; i < 12; i++) {
+    const r = await call(server, "se_pull");
+    if (r.isError) throw new Error(`boot pull failed: ${JSON.stringify(r.body)}`);
+    if (r.body.pull === "read") {
+      for (let j = 0; j < 40; j++) {
+        const doc = await call(server, "se_reading");
+        if (doc.isError) throw new Error(`reading failed: ${JSON.stringify(doc.body)}`);
+        if (doc.body.done === true) break;
+      }
+      continue;
+    }
+    if ((r.body.where as string[]).includes("idle")) return;
+  }
+  throw new Error("the pull did not reach idle");
+}
+
+/** A fresh server pulled through the whole boot walk into idle. */
 export async function bootedServer(root: string): Promise<Server> {
   const server = buildServer(root);
-  const read_hashes = readHashesFor(root);
-  for (let i = 0; i < 8; i++) {
-    const step = await call(server, "se_tick", { advance: true, read_hashes });
-    if (step.isError) throw new Error(`walk failed: ${JSON.stringify(step.body)}`);
-    if (step.body.booted === true) return server;
+  await pullBoot(server);
+  return server;
+}
+
+/** Pull the walk to a named state: choose it, drain any reading owed on
+ *  the way, and expect the machine to walk. Throws on any other answer,
+ *  so a test that expects a refusal drives the pull itself. */
+export async function pullTo(server: Server, state: string): Promise<void> {
+  let r = await call(server, "se_pull", { choice: state });
+  for (let i = 0; i < 6; i++) {
+    if (r.isError) throw new Error(`pull refused: ${JSON.stringify(r.body)}`);
+    if (r.body.pull === "read") {
+      for (let j = 0; j < 40; j++) {
+        const doc = await call(server, "se_reading");
+        if (doc.body.done === true) break;
+      }
+      r = await call(server, "se_pull");
+      continue;
+    }
+    if (r.body.pull === "do" && r.body.arrived === true) return;
+    throw new Error(`the pull did not walk: ${JSON.stringify(r.body)}`);
   }
-  throw new Error("the walk did not reach idle in 8 ticks");
+  throw new Error("the reading never drained");
 }

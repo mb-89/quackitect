@@ -14,7 +14,7 @@ import { seDir } from "../engine/paths.ts";
 import { feedRows, renderMirror } from "../engine/render.ts";
 import { Session } from "../engine/session.ts";
 import { buildServer } from "../engine/tools.ts";
-import { call, freshRoot, readHashesFor } from "./helpers.ts";
+import { call, freshRoot, pullBoot } from "./helpers.ts";
 
 function clause(e: unknown): string | undefined {
   return (e as { clause?: string }).clause;
@@ -59,34 +59,33 @@ test("the toll: armed after boot, one grace warning, then the refusal — any op
   const root = freshRoot();
   const session = new Session(root);
   const server = buildServer(root, session, { now: () => t });
-  const hashes = readHashesFor(root);
-  for (let i = 0; i < 8; i++) {
-    const step = await call(server, "se_tick", { advance: true, read_hashes: hashes });
-    if (step.isError) throw new Error(JSON.stringify(step.body));
-    if (step.body.booted === true) break;
-  }
+  await pullBoot(server);
+  // A cheap, non-moving lane call carries the toll — the walk stands at
+  // idle with no target, so a bare pull would only offer doors; a windowed
+  // read is the neutral carrier here.
+  const look = () => call(server, "se_file_read", { path: "product/guidance/contract.md", offset: 1, limit: 1 });
   // The first call after boot arms the toll — no warning inside the window.
-  let r = await call(server, "se_tick", {});
+  let r = await look();
   assert.equal(r.body.toll_warning, undefined);
   // Six silent minutes: the next call PASSES, carrying the grace warning.
   t += 6 * 60 * 1000;
-  r = await call(server, "se_tick", {});
+  r = await look();
   assert.equal(r.isError, false);
   assert.match(String(r.body.toll_warning), /update overdue/);
   // Ignoring the warning earns the refusal, with the resend inline.
-  r = await call(server, "se_tick", {});
+  r = await look();
   assert.equal(r.isError, true);
   assert.equal(r.body.clause, "SE-C-040");
   assert.equal((r.body.remedy as { args: { update?: unknown } }).args.update !== undefined, true);
   // Paying on the same call proceeds — and the op lands in graph AND log.
-  r = await call(server, "se_tick", { update: { op: "plan", items: ["wire the pane", "test it"] } });
+  r = await call(server, "se_file_read", { path: "product/guidance/contract.md", offset: 1, limit: 1, update: { op: "plan", items: ["wire the pane", "test it"] } });
   assert.equal(r.isError, false);
   const g = session.decisions.graph(session.currentVisit());
   assert.equal(g.nodes.length, 2);
   const q = await call(server, "se_log_query", { filter: { tool: "se_update" } });
   assert.equal((q.body as { total?: number }).total, 1);
   // The window is reset; the very next call is clean.
-  r = await call(server, "se_tick", {});
+  r = await look();
   assert.equal(r.body.toll_warning, undefined);
 });
 
@@ -227,8 +226,8 @@ test("the unified feed derives src, type and brief — and the mirror carries th
   const log = new CallLog(seDir(root));
   log.append({ tool: "se_file_read", args: { path: "product/x.md" }, ok: true, outcome: "result", duration_ms: 1 });
   log.append({ tool: "mirror_check", args: { path: "product/guidance/voice.md" }, ok: true, outcome: "result", duration_ms: 1 });
-  log.append({ tool: "se_update", args: { via: "se_tick", visit: "idle@0", op: "plan", nodes: [{ id: "d1", brief: "x" }] }, ok: true, outcome: "result", duration_ms: 0 });
-  log.append({ tool: "se_update", args: { via: "se_tick", visit: "idle@0", op: "update", brief: "working" }, ok: true, outcome: "result", duration_ms: 0 });
+  log.append({ tool: "se_update", args: { via: "se_pull", visit: "idle@0", op: "plan", nodes: [{ id: "d1", brief: "x" }] }, ok: true, outcome: "result", duration_ms: 0 });
+  log.append({ tool: "se_update", args: { via: "se_pull", visit: "idle@0", op: "update", brief: "working" }, ok: true, outcome: "result", duration_ms: 0 });
   log.append({ tool: "se_note", args: { text: "stray" }, ok: true, outcome: "result", duration_ms: 0 });
   log.append({ tool: "se_run", args: { command: "boom" }, ok: false, outcome: "rejected", duration_ms: 1, response: { clause: "SE-C-046" } });
   const { rows, capped } = feedRows(log, "1970-01-01T00:00:00.000Z");
@@ -290,11 +289,7 @@ test("the update rides any tool call, is stripped before the handler, and never 
   const session = new Session(root);
   const server = buildServer(root, session);
   // Boot the walk so a work tool is legal, then ride an update on it.
-  const hashes = readHashesFor(root);
-  for (let i = 0; i < 8; i++) {
-    const step = await call(server, "se_tick", { advance: true, read_hashes: hashes });
-    if (step.body.booted === true) break;
-  }
+  await pullBoot(server);
   const r = await call(server, "se_file_list", { dir: ".", update: { op: "fork", brief: "looking around" } });
   assert.equal(r.isError, false, JSON.stringify(r.body));
   assert.equal(session.decisions.graph(session.currentVisit()).nodes.length, 1);

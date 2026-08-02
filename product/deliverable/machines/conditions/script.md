@@ -9,6 +9,6 @@ satisfies the condition; anything else refuses, with the script's output in
 the refusal.
 
 The STATE declares what runs — the engine only knows how to run scripts.
-How to satisfy it: trigger a run (the mirror's run button, or a tick
+How to satisfy it: trigger a run (the mirror's run button, or a pull
 attempt) and fix whatever the output names. The result is engine-observed
 evidence; nobody can claim it.

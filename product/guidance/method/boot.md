@@ -10,29 +10,28 @@ Boot exists to reach idle fast and clean.
 
 ## Startup order
 
-- First call is `se_tick` with no arguments.
+- First call is `se_pull` with no payload.
 - Immediately make the file and search lane callable. How depends on the host — workspace/AGENTS.md says which way per host.
-- Then follow the machine one state at a time.
+- Then do what each pull answers, and pull again.
 
 ## Stability pattern
 
 - Keep boot calls serial.
 - Avoid parallel search and read batches in boot.
-- BOOT PULLS THE READING. Call `se_reading`, read what it hands back, call it again. Stop when it answers `done: true`.
-- Each call carries one document and credits it. Boot's reading is a handful of calls, and none of them can be truncated.
+- BOOT IS TWO INSTRUCTIONS. The pull answers `read`; call `se_reading`, read what it hands back, call it again until it answers `done: true`. Then pull — the machine walks boot itself and lands you at the target.
+- Each reading call carries one document and credits it. Boot's reading is a handful of calls, and none of them can be truncated.
 - Do not read the guidance files yourself. The loop knows what you owe.
-- Do not send `read_hashes` for what the loop credited. There is nothing left to prove.
+- There are no hashes to carry, ever. The reading is the proof.
 
-## Re-read rules
+## After a compaction
 
-- Read a path once when it first appears.
-- Re-read only when a refusal names missing or stale hashes.
-- Re-read after compaction when the state says reading proof is fresh per tick.
+- What you remember reading is gone from your head, and the machine knows.
+- Pull. It answers `read` for whatever must be read again.
 
 ## Refusal-safe walk
 
 - If a state allows no tools, do not read or search there.
-- Tick and let the state scripts run.
+- Pull, and let the state scripts run.
 - On refusal, follow the typed remedy in one turn.
 
 ## Goal

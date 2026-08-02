@@ -63,13 +63,21 @@ const REPORTERS = [
   `--test-reporter=${pathToFileURL(join(dir, "engine", "bin", "test-timings.mjs")).href}`,
   "--test-reporter-destination=stderr",
 ];
+// THE CAP OUTGREW ITS SUITE ONCE (2026-08-02): the pull-lane tests pay a
+// real boot walk each, the wall clock crossed the old 110s, and spawnSync
+// KILLED the run mid-stream — truncated output, no summary, an exit code
+// that read as ordinary failure. A cap that is hit must SAY so.
+const CAP_MS = 300_000;
 const r = spawnSync(process.execPath, ["--test", ...REPORTERS, ...files], {
   cwd: dir,
   encoding: "utf8",
-  timeout: 110_000,
+  timeout: CAP_MS,
   maxBuffer: 32 * 1024 * 1024,
   env: { ...process.env, SE_SELFTEST_SKIP: "1" },
 });
+if (r.signal !== null) {
+  process.stdout.write(`selftest: KILLED at its ${CAP_MS / 1000}s cap — the run is TRUNCATED, the tallies below are not a verdict\n`);
+}
 const out = `${r.stdout ?? ""}${r.stderr ?? ""}`;
 // The condition's evidence is the verdict, not the firehose: failures by
 // name plus the tallies. (scriptRun caps output anyway — cap honestly.)

@@ -16,16 +16,17 @@ async function booted(): Promise<{ server: ReturnType<typeof buildServer>; sessi
   const session = new Session(root);
   const server = buildServer(root, session);
   await call(server, "se_file_read", { path: ".se/reading.md" });
-  const swept = await call(server, "se_tick", { to: "front_desk", sweep: true });
-  assert.deepEqual(swept.body.active, ["front_desk"], JSON.stringify(swept.body.refusal));
+  const walked = await call(server, "se_pull", { choice: "front_desk" });
+  assert.equal(walked.body.pull, "do", JSON.stringify(walked.body));
+  assert.deepEqual(session.active(), ["front_desk"], JSON.stringify(walked.body));
   return { server, session };
 }
 
-test("the cadence rides every packet, so both hands see the same setting", async () => {
+test("the cadence rides every pull, so both hands see the same setting", async () => {
   const { server, session } = await booted();
-  assert.deepEqual((await call(server, "se_tick", {})).body.narration, { minutes: 5, calls: 20 }, "the default until somebody types over it");
+  assert.deepEqual((await call(server, "se_pull", {})).body.narration, { minutes: 5, calls: 20 }, "the default until somebody types over it");
   session.setNarration(2, 8);
-  assert.deepEqual((await call(server, "se_tick", {})).body.narration, { minutes: 2, calls: 8 });
+  assert.deepEqual((await call(server, "se_pull", {})).body.narration, { minutes: 2, calls: 8 });
 });
 
 test("turned off, nothing is ever owed however long the silence runs", async () => {

@@ -2,13 +2,10 @@
 // It is SCHEDULING ONLY: it removes no guard and no autonomy rule, it
 // collapses round trips. The preview moves nothing at all.
 import { strict as assert } from "node:assert";
-import { readFileSync } from "node:fs";
-import { join } from "node:path";
 import { test } from "node:test";
-import { contentHash } from "../engine/hash.ts";
 import { computeRoute, type RouteNode } from "../engine/route.ts";
 import { Session } from "../engine/session.ts";
-import { freshRoot } from "./helpers.ts";
+import { freshRoot, readEverything } from "./helpers.ts";
 
 /** A hand-drawn graph, so the search is tested without booting a machine. */
 function graph(edges: Record<string, string[]>, priority: Record<string, number> = {}) {
@@ -97,20 +94,15 @@ test("the sweep walks the whole way in one call, and every guard still fires", a
   const root = freshRoot();
   const s = new Session(root);
   s.setAutonomy(1);
-  // WITHOUT the reads it stops, typed, exactly where the guard is.
-  const short = await s.sweep("front_desk", "agent", {});
+  // WITHOUT the reading it stops, typed, exactly where the guard is.
+  const short = await s.sweep("front_desk", "agent");
   assert.equal(short.arrived, false, "the read proof is not waived by sweeping");
   assert.equal((short.refusal as { clause: string }).clause, "SE-C-112");
   assert.ok((short.swept as string[]).length > 0, "and the hops it DID make stand");
   assert.deepEqual(s.active(), ["boot/read_contract"], "the walk stands where it got to, never rolled back");
-  // WITH them, the same call arrives.
-  const hashes: Record<string, string> = {};
-  for (const p of s.route("front_desk").reads) {
-    try {
-      hashes[p] = contentHash(readFileSync(join(root, ...p.split("/"))));
-    } catch { /* a listed doc that does not exist is not a read */ }
-  }
-  const done = await s.sweep("front_desk", "agent", hashes);
+  // WITH the reading earned through the loop, the same call arrives.
+  readEverything(s);
+  const done = await s.sweep("front_desk", "agent");
   assert.equal(done.arrived, true, JSON.stringify(done.refusal ?? done.note));
   assert.deepEqual(s.active(), ["front_desk"]);
 });
@@ -120,13 +112,8 @@ test("the sweep stops at the slider, and the target defaults to the front desk",
   const s = new Session(root);
   assert.equal(s.target, "front_desk", "every engine start aims at the desk");
   s.setAutonomy(0.1);
-  const hashes: Record<string, string> = {};
-  for (const p of s.route("front_desk").reads) {
-    try {
-      hashes[p] = contentHash(readFileSync(join(root, ...p.split("/"))));
-    } catch { /* not a read */ }
-  }
-  const out = await s.sweep("front_desk", "agent", hashes);
+  readEverything(s);
+  const out = await s.sweep("front_desk", "agent");
   assert.equal(out.arrived, false, "a sweep never walks past the slider");
   assert.deepEqual(s.active(), ["idle"], "it goes as far as it may and stops there");
   assert.equal((out.refusal as { clause: string }).clause, "SE-C-113");
@@ -201,13 +188,8 @@ test("a target clears itself once reached", async () => {
   const root = freshRoot();
   const s = new Session(root);
   s.setAutonomy(1);
-  const hashes: Record<string, string> = {};
-  for (const p of s.route("front_desk").reads) {
-    try {
-      hashes[p] = contentHash(readFileSync(join(root, ...p.split("/"))));
-    } catch { /* not a read */ }
-  }
-  const out = await s.sweep("front_desk", "agent", hashes);
+  readEverything(s);
+  const out = await s.sweep("front_desk", "agent");
   assert.equal(out.arrived, true, JSON.stringify(out.refusal ?? out.note));
   assert.deepEqual(s.active(), ["front_desk"]);
   assert.equal(s.target, "", "one-shot target should clear after arrival");

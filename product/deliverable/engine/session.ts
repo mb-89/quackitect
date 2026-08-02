@@ -47,14 +47,14 @@ import { CHANGE_COLUMNS } from "./rigor-matrix.ts";
 import { parseStateNote, section } from "./notes.ts";
 import { NARRATION_DEFAULT_CALLS, NARRATION_DEFAULT_MINUTES } from "./toll.ts";
 
-/** THE TICK is the machinery — one tool, legal in EVERY state. Without
- *  arguments it reports (observability is never gated); with arguments it
- *  advances. se_note is legal everywhere too: a stray is captured where it
- *  strikes, never chased (contract rule 4). se_reading joins them because a
- *  state that gates the reading gates its own entry — the way out of a state
- *  is to read what it demands. se_note_drain joins them by the same logic as
- *  se_note: an inbox you may only add to is not an inbox. */
-const ALWAYS_LEGAL: ReadonlySet<string> = new Set(["se_tick", "se_note", "se_panel", "se_reading", "se_note_drain"]);
+/** THE PULL is the machinery — one verb, legal in EVERY state: the agent
+ *  says pull and the machine says what to do. se_note is legal everywhere
+ *  too: a stray is captured where it strikes, never chased (contract rule
+ *  4). se_reading joins them because a state that gates the reading gates
+ *  its own entry — the way out of a state is to read what it demands.
+ *  se_note_drain joins them by the same logic as se_note: an inbox you may
+ *  only add to is not an inbox. */
+const ALWAYS_LEGAL: ReadonlySet<string> = new Set(["se_pull", "se_note", "se_panel", "se_reading", "se_note_drain"]);
 /** RESTRICTED tools: "all" does NOT grant these — a state must name them.
  *  Nothing is restricted today.
  *
@@ -66,7 +66,7 @@ const ALWAYS_LEGAL: ReadonlySet<string> = new Set(["se_tick", "se_note", "se_pan
  *  what work MEANS and when it returns, and engine/inbox.ts still refuses
  *  those outside the retro. done and obsolete are checks anyone can run. */
 const RESTRICTED: ReadonlySet<string> = new Set<string>();
-const MACHINERY: readonly string[] = ["se_tick", "se_reading", "se_file_read"];
+const MACHINERY: readonly string[] = ["se_pull", "se_reading", "se_file_read"];
 
 export function mainMachinePath(root: string): string {
   return join(root, "product", "deliverable", "machines", "main.canvas");
@@ -318,7 +318,7 @@ export class Session {
         clause: CLAUSES.REQUIRED_ARGS,
         expected: `${label}: a whole number from 0 to 1440 — 0 stops that clock`,
         got: String(value),
-        remedy: { tool: "se_tick", args: {}, note: "the mirror's updates row sets both" },
+        remedy: { tool: "se_pull", args: {}, note: "the mirror's updates row sets both" },
         source: "engine/session.ts narration",
       });
     }
@@ -472,7 +472,7 @@ export class Session {
   }
 
   // ── THE WAIT — how the machine reaches a holding agent. MCP cannot push;
-  //    se_tick {wait: true} blocks server-side until the human's hand moves
+  //    the mirror's long-poll blocks server-side until the human's hand moves
   //    something (slider, tick, evidence) and returns the fresh packet — the
   //    nearest thing to "the machine sends an update to the agent". ────────
   private waiters: Array<() => void> = [];
@@ -551,7 +551,7 @@ export class Session {
         clause: CLAUSES.ABOVE_THRESHOLD,
         expected: "the autonomy at its top rung before emergency arms — it is a step past full delegation, never a way around it",
         got: `autonomy ${this._autonomy}`,
-        remedy: { tool: "se_tick", args: {}, note: "raise the autonomy to the top rung first" },
+        remedy: { tool: "se_pull", args: {}, note: "raise the autonomy to the top rung first" },
         source: "engine/session.ts emergency",
       });
     }
@@ -567,7 +567,7 @@ export class Session {
         clause: CLAUSES.REQUIRED_ARGS,
         expected: "an autonomy between 0 (every step is the human's) and 1 (fully autonomous)",
         got: String(value),
-        remedy: { tool: "se_tick", args: {}, note: "the autonomy is set from the mirror's slider or at launch (--autonomy)" },
+        remedy: { tool: "se_pull", args: {}, note: "the autonomy is set from the mirror's slider or at launch (--autonomy)" },
         source: "engine/session.ts autonomy",
       });
     }
@@ -593,30 +593,18 @@ export class Session {
           clause: CLAUSES.ABOVE_THRESHOLD,
           expected: `a state within the session autonomy ${this._autonomy}`,
           got: `${id} weighs ${t.priority} — this step is the human's`,
-          remedy: { tool: "se_tick", args: {}, note: "STOP and tell the human PLAINLY: this step waits for their hand (they advance it in the mirror, or raise the slider), and the slider alone cannot wake you — they must SEND YOU A MESSAGE (e.g. 'continue') after changing it. Then end your turn. Never retry the advance blind." },
+          remedy: { tool: "se_pull", args: {}, note: "STOP and tell the human PLAINLY: this step waits for their hand (they advance it in the mirror, or raise the slider), and the slider alone cannot wake you — they must SEND YOU A MESSAGE (e.g. 'continue') after changing it. Then end your turn. A later pull re-weighs the step." },
           source: "engine/session.ts threshold",
         });
       }
     }
   }
 
-  /** ATOMIC TICKS (owner ruling 2026-07-27): the walk can be moved by the
-   *  human's hand at any moment, so a moving tick carries `from` — the
-   *  position it was planned at. A mismatch refuses the move; the refusal
-   *  names the real position. Bare sub-state ids match their prefixed
-   *  form. */
-  assertFrom(from: string): void {
-    const now = this.active()[0] ?? "";
-    const bare = now.includes("/") ? now.slice(now.lastIndexOf("/") + 1) : now;
-    if (from === now || from === bare) return;
-    throw new Rejection({
-      clause: CLAUSES.STALE_POSITION,
-      expected: `a move from ${now} — where the walk stands`,
-      got: `a tick planned from ${from}`,
-      remedy: { tool: "se_tick", args: {}, note: "the walk moved (the human's hand does too) — read the fresh packet and continue from the real position; never replay a move planned elsewhere" },
-      source: "engine/session.ts atomic",
-    });
-  }
+  // ATOMIC TICKS RETIRED WITH THE TICK (owner ruling 2026-08-02). The
+  // `from` assertion existed because an agent PLANNED a move and the
+  // human's hand could shift the walk under it. The pull plans nothing:
+  // it recomputes from wherever the walk stands, every call, so the race
+  // the assertion guarded against no longer exists to lose.
 
   /** THE ORDERED RELOAD (owner ruling 2026-07-27): engine swaps fire only
    *  on request — never on their own — and only at idle. The canary
@@ -630,7 +618,7 @@ export class Session {
         clause: CLAUSES.NOT_LEGAL_IN_STATE,
         expected: "the walk at idle — a reload reboots it, nothing mid-flight may be lost",
         got: `standing in ${leaf || "(nowhere)"}`,
-        remedy: { tool: "se_tick", args: {}, note: "walk to idle first, then se_reload" },
+        remedy: { tool: "se_pull", args: {}, note: "pull to idle first (choice: \"idle\"), then se_reload" },
         source: "engine/session.ts reload",
       });
     }
@@ -793,7 +781,7 @@ export class Session {
         clause: CLAUSES.NOT_LEGAL_IN_STATE,
         expected: "a bound expedition",
         got: "none open",
-        remedy: { tool: "se_tick", args: {}, note: "enter the expedition via continue_expedition first" },
+        remedy: { tool: "se_pull", args: {}, note: "enter the expedition via continue_expedition first" },
         source: "engine/session.ts expedition",
       });
     }
@@ -805,7 +793,7 @@ export class Session {
         clause: CLAUSES.DECISION_UNRESOLVED,
         expected: "no open decision point on this record — the graph is evidence",
         got: open.slice(0, 8).map((n) => `${n.id}: ${n.brief}`).join(" · ") + (open.length > 8 ? ` · …and ${open.length - 8} more` : ""),
-        remedy: { tool: "se_tick", args: { update: { op: "done", node: open[0].id, brief: "<how it resolved>" } }, note: "resolve every point (done | obsolete | revert | defer), then close" },
+        remedy: { tool: "se_pull", args: { update: { op: "done", node: open[0].id, brief: "<how it resolved>" } }, note: "resolve every point (done | obsolete | revert | defer), then close" },
         source: "engine/session.ts close",
       });
     }
@@ -828,25 +816,20 @@ export class Session {
    *  fills); the escape is a recorded failure with its reason, and a later
    *  continue re-enters from the beginning, fast-forwarding on stored
    *  evidence. Boot is the one exception — it must complete. */
-  escape(reason: string, channel: Channel = "agent", readHashes: Record<string, string> = {}): Record<string, unknown> {
-    return this.exitToIdle(reason, channel, readHashes, "escaped");
+  escape(reason: string, channel: Channel = "agent"): Record<string, unknown> {
+    return this.exitToIdle(reason, channel, "escaped");
   }
 
   /** PAUSE (owner ruling 2026-07-29): escape's move, recorded as ordinary
    *  work. An expedition is a day's bucket and is MEANT to stay open, so
    *  stepping out to pick it up later is normal. Filing that as an escape
    *  writes a false failure — and the retro mines escapes for the real ones. */
-  pause(reason: string, channel: Channel = "agent", readHashes: Record<string, string> = {}): Record<string, unknown> {
-    return this.exitToIdle(reason, channel, readHashes, "paused");
+  pause(reason: string, channel: Channel = "agent"): Record<string, unknown> {
+    return this.exitToIdle(reason, channel, "paused");
   }
 
-  private exitToIdle(
-    reason: string,
-    channel: Channel,
-    readHashes: Record<string, string>,
-    kind: "escaped" | "paused",
-  ): Record<string, unknown> {
-    const supplied = this.readProofs(channel, readHashes);
+  private exitToIdle(reason: string, channel: Channel, kind: "escaped" | "paused"): Record<string, unknown> {
+    const supplied = this.readProofs(channel);
     const verb = kind === "escaped" ? "escape" : "pause";
     if (reason.trim() === "") {
       throw new Rejection({
@@ -857,7 +840,7 @@ export class Session {
             : "a reason — say what you are stepping out of, so the walk reads back",
         got: "an empty reason",
         remedy: {
-          tool: "se_tick",
+          tool: "se_pull",
           args: kind === "escaped" ? { escape: "<why the walk cannot continue>" } : { pause: "<what you are stepping out of>" },
         },
         source: `engine/session.ts ${verb}`,
@@ -872,7 +855,7 @@ export class Session {
           clause: CLAUSES.NOT_LEGAL_IN_STATE,
           expected: "a walk away from idle",
           got: `standing at idle — idle IS the ${verb} target`,
-          remedy: { tool: "se_tick", args: {}, note: `nothing to ${verb}; walk on normally` },
+          remedy: { tool: "se_pull", args: {}, note: `nothing to ${verb}; pull on normally` },
           source: `engine/session.ts ${verb}`,
         });
       }
@@ -881,7 +864,7 @@ export class Session {
           clause: CLAUSES.NOT_LEGAL_IN_STATE,
           expected: "a booted walk",
           got: `a ${verb} before boot completed [${stood.join(", ")}]`,
-          remedy: { tool: "se_tick", args: {}, note: "boot cannot be skipped — it must complete; if it is broken, tell the user" },
+          remedy: { tool: "se_pull", args: {}, note: "boot cannot be skipped — it must complete; if it is broken, tell the user" },
           source: `engine/session.ts ${verb}`,
         });
       }
@@ -912,7 +895,7 @@ export class Session {
         clause: CLAUSES.NOT_LEGAL_IN_STATE,
         expected: "a sub-machine other than boot",
         got: `a ${verb} from boot`,
-        remedy: { tool: "se_tick", args: {}, note: "boot cannot be skipped — it must complete; if it is broken, tell the user" },
+        remedy: { tool: "se_pull", args: {}, note: "boot cannot be skipped — it must complete; if it is broken, tell the user" },
         source: `engine/session.ts ${verb}`,
       });
     }
@@ -970,7 +953,7 @@ export class Session {
       clause: CLAUSES.DEAD_END,
       expected: `completing ${stateId} activates a successor`,
       got: `nothing activates — ${starving.join(", ") || "a join"} still waits for other inbound edges (the drawing makes it an AND-join)`,
-      remedy: { tool: "se_tick", args: {}, note: "every plain edge into the named state must fire before it activates. If those edges are returns, redraw them (a reverse-of-forward edge compiles as a return) — or walk the other branches first. The walk has not moved." },
+      remedy: { tool: "se_pull", args: {}, note: "every plain edge into the named state must fire before it activates. If those edges are returns, redraw them (a reverse-of-forward edge compiles as a return) — or walk the other branches first. The walk has not moved." },
       source: "engine/session.ts wedge-guard",
     });
   }
@@ -1148,7 +1131,7 @@ export class Session {
         clause: CLAUSES.NOT_LEGAL_IN_STATE,
         expected: "a state the drawing can reach from here",
         got: `${wanted} — ${r.note ?? "no path"}`,
-        remedy: { tool: "se_tick", args: { route: "front_desk" }, note: "peek a route before aiming at it; the drawn edges are the only ways" },
+        remedy: { tool: "se_pull", args: {}, note: "aim only at drawn states — pull with no payload and the machine offers the doors it can reach" },
         source: "engine/session.ts target",
       });
     }
@@ -1283,6 +1266,12 @@ export class Session {
         for (const p of this.lookaheadRequirements(machine, s)) add(p);
       }
     }
+    // THE HANDOVER RULE JOINS THE LOOP. When the slider rises mid-walk,
+    // the agent's advances must prove the reading the human checked — even
+    // past transitions the human already walked. The gate has always
+    // demanded it; the loop must therefore SERVE it, or the pull would
+    // say "read" for a list that cannot satisfy the walk it feeds.
+    for (const p of this.humanCheckedPaths()) add(p);
     return want.filter((p) => !this.bufferedCurrent(p));
   }
 
@@ -1393,16 +1382,23 @@ export class Session {
    *  THE ROUTE IS RECOMPUTED AFTER EVERY HOP, which is the detour: if the
    *  ground moved, the way is worked out again FROM WHERE THE WALK NOW
    *  STANDS rather than followed off a cliff. */
-  async sweep(target: string, channel: Channel, readHashes: Record<string, string>): Promise<Record<string, unknown>> {
+  async sweep(target: string, channel: Channel): Promise<Record<string, unknown>> {
     const walked: string[] = [];
+    // A BANNER EARNED MID-SWEEP MUST SURVIVE THE SWEEP. tickAdvance hands
+    // its banner back per hop, and a sweep that swallowed it lost the boot
+    // banner every time — the harness rule says show banners verbatim, and
+    // nobody can show what the machinery ate.
+    const banners: string[] = [];
+    const carry = (): Record<string, unknown> => (banners.length > 0 ? { banners } : {});
     for (let guard = 0; guard < 64; guard++) {
       const r = this.route(target);
       if (r.steps.length === 0) {
-        return { ...this.tickInfo(), swept: walked, arrived: r.found, ...(r.found ? {} : { note: r.note }) };
+        return { ...this.tickInfo(), swept: walked, arrived: r.found, ...carry(), ...(r.found ? {} : { note: r.note }) };
       }
       const step = r.steps[0];
       try {
-        await this.tickAdvance(step.tick.to === undefined ? undefined : String(step.tick.to), channel, readHashes);
+        const one = await this.tickAdvance(step.tick.to === undefined ? undefined : String(step.tick.to), channel);
+        if (typeof one.banner === "string") banners.push(one.banner);
       } catch (e) {
         if (!(e instanceof Rejection)) throw e;
         return {
@@ -1411,12 +1407,13 @@ export class Session {
           arrived: false,
           stopped_at: step.to,
           refusal: e.toJSON(),
+          ...carry(),
           note: `swept ${walked.length} hop(s), then ${step.to} refused — answer it and sweep again; the route recomputes from here`,
         };
       }
       walked.push(step.to);
     }
-    return { ...this.tickInfo(), swept: walked, arrived: false, note: "64 hops without arriving — the sweep stops rather than looping" };
+    return { ...this.tickInfo(), swept: walked, arrived: false, ...carry(), note: "64 hops without arriving — the sweep stops rather than looping" };
   }
 
   // ── THE PULL (owner design 2026-08-01) — the agent's ONE verb ───────
@@ -1473,6 +1470,24 @@ export class Session {
     return out;
   }
 
+  /** The step the walk stands on, said small: id, statement, guidance,
+   *  the legal tools, and WHAT IT WILL ASK by name and type — the detail
+   *  (guidance documents, per-field help) rides se_reading and the form
+   *  itself, so a long batch cannot overflow the answer. */
+  private pullHere(): Record<string, unknown>[] {
+    const { machine, ids } = this.leaves();
+    return ids.map((id) => {
+      const s = this.state(machine, id);
+      return {
+        id: this.inSub() ? `${machine.id}/${s.id}` : s.id,
+        ...(s.statement !== "" ? { statement: s.statement } : {}),
+        guidance: s.guidance,
+        legal_tools: s.kind === "start" || s.kind === "end" || s.kind === "join" ? [...MACHINERY] : (s.legal_tools ?? []),
+        ...(s.evidence_form.length > 0 ? { asks: s.evidence_form.filter((f) => f.type !== "derived").map((f) => ({ name: f.name, ...(f.type !== undefined ? { type: f.type } : {}), required: f.required !== false })) } : {}),
+      };
+    });
+  }
+
   /** WHAT THE MACHINE WANTS NEXT. One of five instructions, and never a
    *  refusal for a walk that simply cannot move yet:
    *
@@ -1482,16 +1497,55 @@ export class Session {
    *  - `do`     the happy path, already walked, up to the next branch.
    *  - `wait`   out of work, or the next step is the person's.
    *
+   *  THE PAYLOAD IS EVERY DECISION THE AGENT STILL OWNS, and nothing else:
+   *  `form` (what it wrote), `choice` (where it heads), `back` (earlier
+   *  work no longer stands), `pause`/`escape` (stepping out, with why).
+   *  Everything that used to ride the tick — the hop, the proof, the
+   *  position, the route — is the machine's now.
+   *
    *  A genuinely ILLEGAL call still throws (v2's Rejected kind): an
    *  unreachable choice, a form nothing asked for. Those are contract
    *  violations, not a machine with nowhere to go. */
-  async pull(payload: { form?: Record<string, string>; choice?: string | string[] } = {}, channel: Channel = "agent"): Promise<Record<string, unknown>> {
+  async pull(
+    payload: { form?: Record<string, string>; choice?: string | string[]; back?: string; pause?: string; escape?: string } = {},
+    channel: Channel = "agent",
+  ): Promise<Record<string, unknown>> {
     const head = (): Record<string, unknown> => ({
       where: this.active(),
       ...(this.bound !== undefined ? { expedition: this.bound.id } : {}),
       target: this._target,
       autonomy: this._autonomy,
+      narration: { minutes: this._narrationMinutes, calls: this._narrationCalls },
     });
+
+    // STEPPING OUT stays the agent's decision — the machine cannot know
+    // the work should stop. The exit itself is the old machinery.
+    if (payload.pause !== undefined || payload.escape !== undefined) {
+      const kind = payload.pause !== undefined ? "paused" : "escaped";
+      const out = kind === "paused" ? this.pause(String(payload.pause), channel) : this.escape(String(payload.escape), channel);
+      return {
+        pull: "wait",
+        ...head(),
+        stepped_out: out[kind],
+        waiting_for: "the person",
+        do: "say plainly why you stepped out and STOP — a message resumes you, and a later pull re-enters what was left standing",
+      };
+    }
+
+    // A JUMP BACK is a recorded decision: earlier work no longer stands.
+    // Deliberately NO walk afterwards — jumping back means the work there
+    // is to be REDONE, and sweeping forward again would walk past it.
+    if (payload.back !== undefined) {
+      this.jumpBack(String(payload.back), channel);
+      return {
+        pull: "do",
+        ...head(),
+        walked: [],
+        arrived: false,
+        here: this.pullHere(),
+        do: "redo what no longer stands, then pull again",
+      };
+    }
 
     // THE PAYLOAD IS THE SUBMIT THAT HAS NO VERB — evidence for the LAST
     // thing the machine asked, riding the next pull.
@@ -1604,7 +1658,7 @@ export class Session {
     // 5. THE HAPPY PATH, WALKED. Not one hop — every hop to the next
     //    branching point, because start-to-front-desk has no branch in it
     //    and should never cost a round trip per hop.
-    const swept = await this.sweep(this._target, channel, {});
+    const swept = await this.sweep(this._target, channel);
     // A WALL FURTHER ALONG THE WAY IS THE SAME LAW. The route is weighed
     // hop by hop, so a heavy step three hops out only refuses once the
     // sweep reaches it — and it must arrive as the same instruction the
@@ -1622,30 +1676,63 @@ export class Session {
         ...extra(),
       };
     }
-    const { machine, ids } = this.leaves();
-    const landed = ids.map((id) => {
-      const s = this.state(machine, id);
-      return {
-        id: this.inSub() ? `${machine.id}/${s.id}` : s.id,
-        ...(s.statement !== "" ? { statement: s.statement } : {}),
-        guidance: s.guidance,
-        legal_tools: s.kind === "start" || s.kind === "end" || s.kind === "join" ? [...MACHINERY] : (s.legal_tools ?? []),
-        // WHAT THIS STEP WILL ASK, by name and type. The per-field
-        // guidance arrives with the form itself — steps in full, detail
-        // on demand, so a long batch cannot overflow the answer.
-        ...(s.evidence_form.length > 0 ? { asks: s.evidence_form.filter((f) => f.type !== "derived").map((f) => ({ name: f.name, ...(f.type !== undefined ? { type: f.type } : {}), required: f.required !== false })) } : {}),
-      };
-    });
+    // AN UNMET CONDITION FURTHER ALONG resolves the way it would have at
+    // the first hop: the position moved, so the same pre-checks are asked
+    // again from where the walk now stands — the answer is read or fill,
+    // never a refusal wearing a walk.
+    if (ref?.clause === CLAUSES.CONDITION_UNMET) {
+      const owedNow = this.readingList();
+      if (owedNow.length > 0) {
+        return {
+          pull: "read",
+          ...head(),
+          walked: swept.swept ?? [],
+          documents: owedNow.length,
+          ...(swept.banners !== undefined ? { banners: swept.banners } : {}),
+          do: "call se_reading, read what it hands back, and call it again until it answers done — then pull",
+          ...extra(),
+        };
+      }
+      const formsNow = this.pullFormsOwed().filter((n) => !this.formsMet([n]));
+      if (formsNow.length > 0) {
+        return {
+          pull: "fill",
+          ...head(),
+          walked: swept.swept ?? [],
+          for: swept.stopped_at,
+          forms: formsNow.map((n) => this.formGet(n)),
+          ...(swept.banners !== undefined ? { banners: swept.banners } : {}),
+          do: "fill every required section, then return it on the next pull as form: {\"<section>\": \"<text>\"} — there is no submit verb, and pulling without it hands back this same form",
+          ...extra(),
+        };
+      }
+    }
     return {
       pull: "do",
       ...head(),
       walked: swept.swept ?? [],
       arrived: swept.arrived === true,
-      here: landed,
+      here: this.pullHere(),
+      ...(swept.banners !== undefined ? { banners: swept.banners } : {}),
       ...(swept.refusal !== undefined ? { stopped_at: swept.stopped_at, refusal: swept.refusal } : {}),
-      do: "do what the guidance asks, then pull again",
+      do: swept.refusal !== undefined ? "the stopped step says what it wants — do that, then pull again" : "do what the guidance asks, then pull again",
       ...extra(),
     };
+  }
+
+  /** THE DOORS — idle's edges of the main machine, with statement, kind
+   *  and weight. The switchboard's offer is the system's live vocabulary:
+   *  the desk advises FROM it (via the survey), so a lane that lands or
+   *  changes shows up without anybody editing a document. */
+  doors(): Record<string, unknown>[] {
+    const idle = this.machine.states.find((s) => s.id === "idle");
+    if (idle === undefined) return [];
+    return idle.edges.map((e) => {
+      const t = this.machine.states.find((x) => x.id === e.to);
+      return t === undefined
+        ? { to: e.to }
+        : { to: e.to, ...(t.statement !== "" ? { statement: t.statement } : {}), kind: t.kind, priority: t.priority };
+    });
   }
 
   /** Where the walk is, machine-wise: ["main"] or ["main", "boot", …]. */
@@ -1785,7 +1872,7 @@ export class Session {
         clause: CLAUSES.NOT_LEGAL_IN_STATE,
         expected: "an open session machine",
         got: `${tool} after the machine closed`,
-        remedy: { tool: "se_tick", args: {}, note: "only the tick answers now; a new session starts at the beginning" },
+        remedy: { tool: "se_pull", args: {}, note: "the machine is done; a new session starts at the beginning" },
         source: "engine/session.ts gate",
       });
     }
@@ -1798,7 +1885,7 @@ export class Session {
       clause: CLAUSES.NOT_LEGAL_IN_STATE,
       expected: `a tool legal in state [${active}]: ${legalList}`,
       got: tool,
-      remedy: { tool: "se_tick", args: {}, note: "walk the machine first — se_tick without arguments shows where you are and what is legal" },
+      remedy: { tool: "se_pull", args: {}, note: "pull first — the machine says what to do next, and the lane opens as the walk reaches the states that allow it" },
       source: "engine/session.ts gate",
     });
   }
@@ -1819,10 +1906,15 @@ export class Session {
   conditionKeyMet(m: MachineDecl, s: StateDecl, key: string, which: "enter" | "leave"): boolean {
     if (key === "read") {
       const docs = (which === "leave" ? s.exit : s.entry)?.read ?? [];
-      return docs.every((p) => this.readProven("human", p, {}) || this.agentProven(p));
+      // The pill greens from EITHER hand: the human's checks, a proof
+      // recorded on a passing step, or a CURRENT credit from the reading —
+      // in pull-world the reading is earned before any step is taken, and
+      // a pill that stayed gray until the walk moved would show the agent
+      // as unread while it was reading.
+      return docs.every((p) => this.readProven("human", p, {}) || this.agentProven(p) || this.bufferedCurrent(p));
     }
     if (key === "read_consume") {
-      return this.consumeDemand(s).every((p) => this.readProven("human", p, {}) || this.agentProven(p));
+      return this.consumeDemand(s).every((p) => this.readProven("human", p, {}) || this.agentProven(p) || this.bufferedCurrent(p));
     }
     if (key === "evidence_form") {
       const names = (which === "leave" ? s.exit : s.entry)?.evidence_form ?? [];
@@ -1863,7 +1955,7 @@ export class Session {
         clause: CLAUSES.CONDITION_UNMET,
         expected: "a bound expedition — evidence forms live in its record",
         got: "no expedition bound",
-        remedy: { tool: "se_tick", args: {}, note: "open the expedition first (continue_expedition binds the lane)" },
+        remedy: { tool: "se_pull", args: {}, note: "open the expedition first (continue_expedition binds the lane)" },
         source: "engine/session.ts forms",
       });
     }
@@ -2045,7 +2137,7 @@ export class Session {
         clause: CLAUSES.CONDITION_UNMET,
         expected: `a script condition on ${stateId}`,
         got: "none declared",
-        remedy: { tool: "se_tick", args: { state: stateId }, note: "the state's conditions are in its packet" },
+        remedy: { tool: "se_pull", args: {}, note: "the pull's answer carries the step's demands" },
         source: "engine/session.ts script",
       });
     }
@@ -2162,13 +2254,15 @@ export class Session {
   /** Whether the walk has passed through boot once already. */
   private bootEntered = false;
 
-  private readProofs(channel: Channel, supplied: Record<string, string>): Record<string, string> {
-    if (channel !== "agent") return supplied;
+  /** The agent's proofs, ALL earned by reading: se_file_read and
+   *  se_reading fill the buffer as they serve documents. Nothing is ever
+   *  handed in — the hash-supplying lane retired with the tick, because a
+   *  proof you can type is a proof you can fake. Stale entries are swept
+   *  here, so an edited doc always asks to be read again. */
+  private readProofs(channel: Channel): Record<string, string> {
+    if (channel !== "agent") return {};
     const merged: Record<string, string> = {};
     for (const [p, h] of this.readBuffer.entries()) merged[p] = h;
-    for (const [p, h] of Object.entries(supplied)) {
-      if (typeof h === "string" && h !== "") merged[p] = h;
-    }
     for (const [p, h] of Object.entries(merged)) {
       const lane = this.diskHash(p);
       if (lane !== "" && h === lane) {
@@ -2234,7 +2328,7 @@ export class Session {
         clause: CLAUSES.REQUIRED_ARGS,
         expected: "a readable project document",
         got: path,
-        remedy: { tool: "se_tick", args: {}, note: "the pulled list names the checkable documents" },
+        remedy: { tool: "se_pull", args: {}, note: "the pulled list names the checkable documents" },
         source: "engine/session.ts reads",
       });
     }
@@ -2387,11 +2481,11 @@ export class Session {
     throw new Rejection({
       clause: CLAUSES.CONDITION_UNMET,
       expected: `${which === "exit" ? "leaving" : "entering"} ${stateId} demands proven reading of: ${missing.join(", ")}`,
-      got: channel === "agent" ? `no current hash supplied for: ${missing.join(", ")}` : `not checked in the mirror: ${missing.join(", ")}`,
+      got: channel === "agent" ? `not read at its current version: ${missing.join(", ")}` : `not checked in the mirror: ${missing.join(", ")}`,
       remedy:
         channel === "agent"
-          ? { tool: "se_file_read", args: { path: missing[0] }, note: "read EVERY missing doc through the lane — each result carries its hash — then repeat the tick with read_hashes: {\"<path>\": \"<hash>\", ...}. The hash is your proof; it must match the doc as it stands NOW, every time." }
-          : { tool: "se_tick", args: {}, note: "check each listed document in the mirror — one check per version; an edited doc asks again" },
+          ? { tool: "se_reading", args: {}, note: "call se_reading until it answers done — each document is credited as it is served — then pull. Reading through se_file_read credits too; there is nothing to hand in." }
+          : { tool: "se_pull", args: {}, note: "check each listed document in the mirror — one check per version; an edited doc asks again" },
       source: "engine/session.ts reads",
     });
   }
@@ -2485,7 +2579,7 @@ export class Session {
           clause: CLAUSES.NOT_LEGAL_IN_STATE,
           expected: "a human-callable tool: se_seed_expedition, se_seed_iteration, se_exp_close, se_note_drain, se_reload",
           got: name,
-          remedy: { tool: "se_tick", args: {}, note: "the state's other tools are the agent's lane" },
+          remedy: { tool: "se_pull", args: {}, note: "the state's other tools are the agent's lane" },
           source: "engine/session.ts parity",
         });
     }
@@ -2515,7 +2609,7 @@ export class Session {
       clause: CLAUSES.CONDITION_UNMET,
       expected: `to be standing in ${stateId} — conditions are worked only from inside the state`,
       got: `standing in [${this.active().join(", ")}]`,
-      remedy: { tool: "se_tick", args: {}, note: "walk to the state first (or jump back to it), then work its conditions" },
+      remedy: { tool: "se_pull", args: {}, note: "walk to the state first (or jump back to it), then work its conditions" },
       source: "engine/session.ts standing",
     });
   }
@@ -2542,7 +2636,7 @@ export class Session {
         clause: CLAUSES.CONDITION_UNMET,
         expected: `${which} condition 'script' of ${stateId} — ${args.join(", ")} exits 0 (see ${note})`,
         got: st.ran ? st.output : "not run yet",
-        remedy: { tool: "se_tick", args: { advance: true }, note: "fix what the output names, then tick again — the script re-runs on every attempt" },
+        remedy: { tool: "se_pull", args: {}, note: "fix what the output names, then pull again — the script re-runs on every attempt" },
         source: "engine/session.ts conditions",
       });
     }
@@ -2552,7 +2646,7 @@ export class Session {
         clause: CLAUSES.CONDITION_UNMET,
         expected: `${which} condition 'no_pending_note' of ${stateId} — no pending note carrying: ${args.join(", ")} (see ${note})`,
         got: blockers.map((b) => `${b.ref}: ${b.text.slice(0, 80)}`).join(" · ") || "unmet",
-        remedy: { tool: "se_tick", args: {}, note: "run the RETRO first (idle → retro): its drain dispositions these notes, then this gate opens" },
+        remedy: { tool: "se_pull", args: {}, note: "run the RETRO first (idle → retro): its drain dispositions these notes, then this gate opens" },
         source: "engine/session.ts conditions",
       });
     }
@@ -2703,20 +2797,21 @@ export class Session {
     };
   }
 
-  /** tick with arguments: complete the current state and move on.
+  /** THE ENGINE'S OWN STEP — complete the current state and move on.
    *  `to` picks the outgoing edge (needed only when there are several);
-   *  `channel` is whose hand this is — the threshold gates only the agent's;
-   *  `readHashes` is the agent's proof-of-read for this tick (path → hash,
-   *  each matching the doc as it stands; the human proves via checkboxes). */
-  async tickAdvance(to?: string, channel: Channel = "human", readHashes: Record<string, string> = {}): Promise<Record<string, unknown>> {
+   *  `channel` is whose hand this is — the threshold gates only the agent's.
+   *  The agent's read proofs come from the reading it pulled (se_reading
+   *  and se_file_read fill the buffer); the human proves via checkboxes.
+   *  Reached through the pull and the mirror — never a tool of its own. */
+  async tickAdvance(to?: string, channel: Channel = "human"): Promise<Record<string, unknown>> {
     const now = new Date().toISOString();
-    const supplied = this.readProofs(channel, readHashes);
+    const supplied = this.readProofs(channel);
     if (this.instance.status === "closed") {
       throw new Rejection({
         clause: CLAUSES.NOT_LEGAL_IN_STATE,
         expected: "an open machine",
         got: "a tick after end",
-        remedy: { tool: "se_tick", args: {}, note: "the machine is done; a new session starts at the beginning" },
+        remedy: { tool: "se_pull", args: {}, note: "the machine is done; a new session starts at the beginning" },
         source: "engine/session.ts tick",
       });
     }
@@ -2809,7 +2904,7 @@ export class Session {
         clause: CLAUSES.NOT_LEGAL_IN_STATE,
         expected: `a state of ${machine.id}${machine.id === this.machine.id ? "" : ` or ${this.machine.id}`}: ${[...new Set([...machine.states, ...this.machine.states].map((st) => st.id))].join(", ")}`,
         got: id,
-        remedy: { tool: "se_tick", args: {}, note: "se_tick without arguments shows where you are" },
+        remedy: { tool: "se_pull", args: {}, note: "the pull's answer says where you stand and what to do" },
         source: "engine/session.ts state-info",
       });
     }
@@ -2847,15 +2942,15 @@ export class Session {
    *  re-walk. Legal for the user and the agent alike, while the machine is
    *  open — the agent's hand is still weighed against the threshold, and
    *  the read gate applies (jumping back ENTERS the target). */
-  jumpBack(target: string, channel: Channel = "human", readHashes: Record<string, string> = {}): Record<string, unknown> {
+  jumpBack(target: string, channel: Channel = "human"): Record<string, unknown> {
     const now = new Date().toISOString();
-    const supplied = this.readProofs(channel, readHashes);
+    const supplied = this.readProofs(channel);
     if (this.instance.status === "closed") {
       throw new Rejection({
         clause: CLAUSES.NOT_LEGAL_IN_STATE,
         expected: "an open machine",
         got: `a jump back after end`,
-        remedy: { tool: "se_tick", args: {}, note: "the machine is done; a new session starts at the beginning" },
+        remedy: { tool: "se_pull", args: {}, note: "the machine is done; a new session starts at the beginning" },
         source: "engine/session.ts jump",
       });
     }
@@ -2866,7 +2961,7 @@ export class Session {
         clause: CLAUSES.NOT_LEGAL_IN_STATE,
         expected: "an EARLIER state",
         got: `${target} is where you are standing`,
-        remedy: { tool: "se_tick", args: {}, note: "se_tick without arguments shows the position" },
+        remedy: { tool: "se_pull", args: {}, note: "the pull's answer says where you stand" },
         source: "engine/session.ts jump",
       });
     }
@@ -2876,7 +2971,7 @@ export class Session {
         clause: CLAUSES.NOT_LEGAL_IN_STATE,
         expected: `a state already walked in ${machine.id}`,
         got: target,
-        remedy: { tool: "se_tick", args: {}, note: "only a filled state can be returned to" },
+        remedy: { tool: "se_pull", args: {}, note: "only a filled state can be returned to" },
         source: "engine/session.ts jump",
       });
     }
@@ -2943,7 +3038,7 @@ export class Session {
       return {
         ...info,
         booted: true,
-        banner: "🦆 SE v3 booted. Main machine is live. All work runs through the se lane; every call is logged. se_tick shows where you are.",
+        banner: "🦆 SE v3 booted. Main machine is live. All work runs through the se lane; every call is logged. se_pull says what to do next.",
         display: "Show the banner above to the user VERBATIM as your first output, then proceed with their request.",
       };
     }
@@ -2961,7 +3056,7 @@ export class Session {
         clause: CLAUSES.NOT_LEGAL_IN_STATE,
         expected: `a named way forward — ${stateId} has several: ${s.edges.map((e) => e.to).join(", ")}`,
         got: "an unnamed advance",
-        remedy: { tool: "se_tick", args: { to: s.edges[0].to }, note: "pick the edge; se_tick without arguments shows each target's statement" },
+        remedy: { tool: "se_pull", args: {}, note: "the pull offers the doors with their statements — answer with choice" },
         source: "engine/session.ts tick",
       });
     }
@@ -2999,7 +3094,7 @@ export class Session {
           clause: CLAUSES.CANVAS_BROKEN,
           expected: `${subState.id}'s canvas compiles`,
           got: String((e as Error).message),
-          remedy: { tool: "se_tick", args: { advance: true }, note: "fix the drawing in Obsidian, then tick again — entering retries; back or escape also work" },
+          remedy: { tool: "se_pull", args: {}, note: "fix the drawing in Obsidian, then pull again — entering retries; back or escape also work" },
           source: "engine/session.ts seed",
         });
       }

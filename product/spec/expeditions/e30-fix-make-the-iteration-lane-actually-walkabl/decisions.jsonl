@@ -239,3 +239,86 @@
 {"ts":"2026-08-02T10:07:56.692Z","op":"update","visit":"expeditions/e30@0","node":"d41","brief":"Battery still running past the previous 73 seconds"}
 {"ts":"2026-08-02T10:08:11.070Z","op":"update","visit":"expeditions/e30@0","node":"d42","brief":"Reading the battery result"}
 {"ts":"2026-08-02T10:08:27.542Z","op":"done","visit":"expeditions/e30@0","node":"d14","brief":"Report amended and corrected to the measured battery"}
+{"ts":"2026-08-02T10:17:08.034Z","op":"plan","visit":"expeditions/e30@0","parent":null,"nodes":[{"id":"d43","brief":"Audit which decisions the agent still makes and move them into the engine"},{"id":"d44","brief":"Extend se_pull to carry the full agent surface"},{"id":"d45","brief":"Retire se_tick from the tool list and the gate constants"},{"id":"d46","brief":"Rewrite the guidance and the boot contract around the pull"},{"id":"d47","brief":"Migrate the tests that drive the tick tool"},{"id":"d48","brief":"Battery green and the report amended"}]}
+{"ts":"2026-08-02T10:20:02.083Z","op":"update","visit":"expeditions/e30@0","node":"d49","brief":"Mapping who besides the tick tool uses each piece of tick machinery"}
+{"ts":"2026-08-02T10:25:58.302Z","op":"update","visit":"expeditions/e30@0","node":"d50","brief":"session.ts remedies and constants moved off the tick"}
+{"ts":"2026-08-02T10:26:35.190Z","op":"update","visit":"expeditions/e30@0","node":"d51","brief":"session.ts remedies and constants moved off the tick"}
+{"ts":"2026-08-02T10:27:09.020Z","op":"update","visit":"expeditions/e30@0","node":"d52","brief":"The hash-supplying lane and the from-assertion are out"}
+{"ts":"2026-08-02T10:31:31.914Z","op":"update","visit":"expeditions/e30@0","node":"d53","brief":"The tick tool and the peek are out of the lane"}
+{"ts":"2026-08-02T10:32:06.926Z","op":"update","visit":"expeditions/e30@0","node":"d54","brief":"Every engine remedy now speaks pull; the feed renders both verbs"}
+{"ts":"2026-08-02T10:32:13.316Z","op":"update","visit":"expeditions/e30@0","node":"d55","brief":"Preflight to catch type breakage from the surgery"}
+{"ts":"2026-08-02T10:32:34.620Z","op":"done","visit":"expeditions/e30@0","node":"d45","brief":"The tick is out of the lane and every remedy speaks pull"}
+{"ts":"2026-08-02T10:33:48.578Z","op":"done","visit":"expeditions/e30@0","node":"d44","brief":"The pull carries every agent decision; walking.md now says so"}
+{"ts":"2026-08-02T10:34:16.720Z","op":"update","visit":"expeditions/e30@0","node":"d56","brief":"AGENTS.md boots on the pull now"}
+{"ts":"2026-08-02T10:34:41.294Z","op":"update","visit":"expeditions/e30@0","node":"d57","brief":"Both session hooks now speak pull"}
+{"ts":"2026-08-02T10:35:13.210Z","op":"update","visit":"expeditions/e30@0","node":"d58","brief":"The VS Code boot card speaks pull"}
+{"ts":"2026-08-02T10:35:36.079Z","op":"update","visit":"expeditions/e30@0","node":"d59","brief":"The kickoff prompt pulls instead of ticking"}
+{"ts":"2026-08-02T10:37:03.668Z","op":"update","visit":"expeditions/e30@0","node":"d60","brief":"Every machine state note and condition card speaks pull"}
+{"ts":"2026-08-02T10:37:58.845Z","op":"done","visit":"expeditions/e30@0","node":"d46","brief":"Guidance and boot contract rewritten around the pull"}
+{"ts":"2026-08-02T10:39:06.910Z","op":"update","visit":"expeditions/e30@0","node":"d61","brief":"Helpers boot by pulling; the hash helper is gone"}
+{"ts":"2026-08-02T10:39:15.615Z","op":"update","visit":"expeditions/e30@0","node":"d62","brief":"Battery running to light up the migration list"}
+{"ts":"2026-08-02T10:39:58.125Z","op":"update","visit":"expeditions/e30@0","node":"d63","brief":"ticks.test keeps the machinery, drops the retired mechanisms"}
+{"ts":"2026-08-02T10:41:01.784Z","op":"update","visit":"expeditions/e30@0","node":"d64","brief":"threshold.test speaks wait instead of SE-C-113 on the agent side"}
+{"ts":"2026-08-02T10:41:20.671Z","op":"update","visit":"expeditions/e30@0","node":"d65","brief":"Reading which files the battery lit up"}
+{"ts":"2026-08-02T10:42:16.454Z","op":"update","visit":"expeditions/e30@0","node":"d66","brief":"Proving the pull-boot helper on the smallest migrated file"}
+{"ts":"2026-08-02T10:43:23.492Z","op":"update","visit":"expeditions/e30@0","node":"d67","brief":"pullBoot split out so tests can boot a server they already hold"}
+{"ts":"2026-08-02T10:44:05.639Z","op":"update","visit":"expeditions/e30@0","node":"d68","brief":"boot.test walks by pulling and pins the banner law"}
+{"ts":"2026-08-02T10:45:38.268Z","op":"update","visit":"expeditions/e30@0","node":"d69","brief":"reads.test now proves credit-by-reading instead of handed hashes"}
+{"ts":"2026-08-02T10:46:01.361Z","op":"update","visit":"expeditions/e30@0","node":"d70","brief":"routereads proves one multi-read still carries a whole walk"}
+{"ts":"2026-08-02T10:46:21.435Z","op":"update","visit":"expeditions/e30@0","node":"d71","brief":"narration boots by pull and reads the cadence off its head"}
+{"ts":"2026-08-02T10:46:54.650Z","op":"update","visit":"expeditions/e30@0","node":"d72","brief":"feed.test pays its toll on lane reads instead of ticks"}
+{"ts":"2026-08-02T10:47:07.694Z","op":"update","visit":"expeditions/e30@0","node":"d73","brief":"feed's import follows its rewrite"}
+{"ts":"2026-08-02T10:47:20.821Z","op":"update","visit":"expeditions/e30@0","node":"d74","brief":"patchguard boots by pulling"}
+{"ts":"2026-08-02T10:48:01.754Z","op":"update","visit":"expeditions/e30@0","node":"d75","brief":"pullTo joins the helpers for choose-read-walk sequences"}
+{"ts":"2026-08-02T10:48:31.291Z","op":"update","visit":"expeditions/e30@0","node":"d76","brief":"retro.test walks its states through pullTo"}
+{"ts":"2026-08-02T10:49:03.166Z","op":"update","visit":"expeditions/e30@0","node":"d77","brief":"retro.test walks its states through pullTo"}
+{"ts":"2026-08-02T10:49:39.896Z","op":"update","visit":"expeditions/e30@0","node":"d78","brief":"worktree's escape and pause ride the pull payload"}
+{"ts":"2026-08-02T10:50:45.251Z","op":"update","visit":"expeditions/e30@0","node":"d79","brief":"editsafety pulls its walks and reads packets at session level"}
+{"ts":"2026-08-02T10:52:20.994Z","op":"update","visit":"expeditions/e30@0","node":"d80","brief":"iterations drives the bless and the gate on the human hand"}
+{"ts":"2026-08-02T10:52:40.567Z","op":"update","visit":"expeditions/e30@0","node":"d81","brief":"The tool list pins the tick OUT and the pull IN"}
+{"ts":"2026-08-02T10:53:10.048Z","op":"update","visit":"expeditions/e30@0","node":"d82","brief":"The HTTP transport case speaks pull"}
+{"ts":"2026-08-02T10:53:56.727Z","op":"update","visit":"expeditions/e30@0","node":"d83","brief":"reading.test proves the credit through the pull's own walk"}
+{"ts":"2026-08-02T10:54:03.783Z","op":"update","visit":"expeditions/e30@0","node":"d84","brief":"Full battery on the migrated suite"}
+{"ts":"2026-08-02T10:54:29.132Z","op":"done","visit":"expeditions/e30@0","node":"d43","brief":"The audit is recorded as a note and built into the code"}
+{"ts":"2026-08-02T10:54:49.258Z","op":"update","visit":"expeditions/e30@0","node":"d85","brief":"Battery still running"}
+{"ts":"2026-08-02T10:55:16.622Z","op":"update","visit":"expeditions/e30@0","node":"d86","brief":"Battery past a minute, waiting for the verdict"}
+{"ts":"2026-08-02T10:55:45.511Z","op":"update","visit":"expeditions/e30@0","node":"d87","brief":"Boot-heavy pull cases stretch the battery; still waiting"}
+{"ts":"2026-08-02T10:56:07.100Z","op":"update","visit":"expeditions/e30@0","node":"d88","brief":"Reading the residue of failures"}
+{"ts":"2026-08-02T10:57:01.198Z","op":"update","visit":"expeditions/e30@0","node":"d89","brief":"Chasing the owed-document residue in reads.test"}
+{"ts":"2026-08-02T10:58:54.690Z","op":"update","visit":"expeditions/e30@0","node":"d90","brief":"The reading loop now serves the human-checked demand too"}
+{"ts":"2026-08-02T10:59:18.829Z","op":"update","visit":"expeditions/e30@0","node":"d91","brief":"reads.test asks the engine for the way's list instead of a constant"}
+{"ts":"2026-08-02T10:59:35.478Z","op":"update","visit":"expeditions/e30@0","node":"d92","brief":"Running the failing files in parallel jobs"}
+{"ts":"2026-08-02T11:00:33.422Z","op":"update","visit":"expeditions/e30@0","node":"d93","brief":"route.test earns its reading through the loop"}
+{"ts":"2026-08-02T11:01:09.621Z","op":"update","visit":"expeditions/e30@0","node":"d94","brief":"threshold's human hops check their boxes first"}
+{"ts":"2026-08-02T11:02:06.894Z","op":"update","visit":"expeditions/e30@0","node":"d95","brief":"The reads refusal now speaks the reading loop"}
+{"ts":"2026-08-02T11:02:33.127Z","op":"update","visit":"expeditions/e30@0","node":"d96","brief":"The reads refusal speaks the loop and the hatch earns its reading"}
+{"ts":"2026-08-02T11:03:17.354Z","op":"update","visit":"expeditions/e30@0","node":"d97","brief":"Isolating the survey failures"}
+{"ts":"2026-08-02T11:04:43.189Z","op":"update","visit":"expeditions/e30@0","node":"d98","brief":"The doors ride coreTools as a thunk, like the reading"}
+{"ts":"2026-08-02T11:05:10.885Z","op":"update","visit":"expeditions/e30@0","node":"d99","brief":"The round trip pins the tail, not the boot's call count"}
+{"ts":"2026-08-02T11:05:17.972Z","op":"update","visit":"expeditions/e30@0","node":"d100","brief":"Battery again after the doors thunk and the residue fixes"}
+{"ts":"2026-08-02T11:05:37.659Z","op":"update","visit":"expeditions/e30@0","node":"d101","brief":"Waiting on the fourth battery run"}
+{"ts":"2026-08-02T11:06:06.003Z","op":"update","visit":"expeditions/e30@0","node":"d102","brief":"Battery run four still going"}
+{"ts":"2026-08-02T11:06:42.566Z","op":"update","visit":"expeditions/e30@0","node":"d103","brief":"Battery near its usual finish line"}
+{"ts":"2026-08-02T11:07:09.354Z","op":"update","visit":"expeditions/e30@0","node":"d104","brief":"Battery run four past 100 seconds"}
+{"ts":"2026-08-02T11:07:44.045Z","op":"update","visit":"expeditions/e30@0","node":"d105","brief":"Three stragglers, pulling each error"}
+{"ts":"2026-08-02T11:08:54.403Z","op":"update","visit":"expeditions/e30@0","node":"d106","brief":"Pill credits current reading; the last two walks corrected"}
+{"ts":"2026-08-02T11:09:04.632Z","op":"update","visit":"expeditions/e30@0","node":"d107","brief":"Battery run five"}
+{"ts":"2026-08-02T11:09:50.262Z","op":"update","visit":"expeditions/e30@0","node":"d108","brief":"Waiting on battery five"}
+{"ts":"2026-08-02T11:10:21.376Z","op":"update","visit":"expeditions/e30@0","node":"d109","brief":"Battery five closing in"}
+{"ts":"2026-08-02T11:10:46.409Z","op":"update","visit":"expeditions/e30@0","node":"d110","brief":"Battery five at the hundred-second mark"}
+{"ts":"2026-08-02T11:11:07.581Z","op":"update","visit":"expeditions/e30@0","node":"d111","brief":"One failure left, isolating it"}
+{"ts":"2026-08-02T11:11:29.097Z","op":"update","visit":"expeditions/e30@0","node":"d112","brief":"The human hand checks its boxes before meeting the canvas error"}
+{"ts":"2026-08-02T11:11:52.428Z","op":"update","visit":"expeditions/e30@0","node":"d113","brief":"The confirming full battery"}
+{"ts":"2026-08-02T11:12:31.009Z","op":"update","visit":"expeditions/e30@0","node":"d114","brief":"Report carries the retirement and the four defects the migration found"}
+{"ts":"2026-08-02T11:12:54.730Z","op":"update","visit":"expeditions/e30@0","node":"d115","brief":"Confirming battery mid-run"}
+{"ts":"2026-08-02T11:13:32.513Z","op":"update","visit":"expeditions/e30@0","node":"d116","brief":"Confirming battery nearly done"}
+{"ts":"2026-08-02T11:14:01.875Z","op":"update","visit":"expeditions/e30@0","node":"d117","brief":"Reading battery six"}
+{"ts":"2026-08-02T11:14:51.247Z","op":"update","visit":"expeditions/e30@0","node":"d118","brief":"Battery six died mid-stream; running seven"}
+{"ts":"2026-08-02T11:15:20.706Z","op":"update","visit":"expeditions/e30@0","node":"d119","brief":"Battery seven running"}
+{"ts":"2026-08-02T11:15:50.382Z","op":"update","visit":"expeditions/e30@0","node":"d120","brief":"Battery seven at the halfway mark"}
+{"ts":"2026-08-02T11:16:10.799Z","op":"update","visit":"expeditions/e30@0","node":"d121","brief":"Battery seven past seventy seconds"}
+{"ts":"2026-08-02T11:16:38.756Z","op":"update","visit":"expeditions/e30@0","node":"d122","brief":"Battery seven in its last stretch"}
+{"ts":"2026-08-02T11:16:56.980Z","op":"update","visit":"expeditions/e30@0","node":"d123","brief":"Reading battery seven"}
+{"ts":"2026-08-02T11:18:05.453Z","op":"update","visit":"expeditions/e30@0","node":"d124","brief":"The suite cap rises to 300s and confesses when hit"}
+{"ts":"2026-08-02T11:18:15.931Z","op":"update","visit":"expeditions/e30@0","node":"d125","brief":"Battery eight under the honest cap"}
+{"ts":"2026-08-02T11:18:23.863Z","op":"done","visit":"expeditions/e30@0","node":"d47","brief":"Every tick-driving test now pulls or drives the session"}

@@ -7,27 +7,20 @@
 // take anything out, while its own method opens by weighing that inbox.
 import { strict as assert } from "node:assert";
 import { spawnSync } from "node:child_process";
-import { readFileSync } from "node:fs";
-import { join } from "node:path";
 import { test } from "node:test";
 import { CallLog } from "../engine/calllog.ts";
-import { contentHash } from "../engine/hash.ts";
 import { backlogNotes } from "../engine/inbox.ts";
 import { seDir } from "../engine/paths.ts";
 import { Session } from "../engine/session.ts";
 import { buildServer } from "../engine/tools.ts";
-import { call, freshRoot, readHashesFor } from "./helpers.ts";
+import { call, freshRoot, pullBoot, pullTo } from "./helpers.ts";
 
 test("draining splits: done and obsolete anywhere, carried and backlog only in the retro", async () => {
   const root = freshRoot();
   const session = new Session(root);
   session.setAutonomy(1); // the retro weighs 1.0 - lift the slider clear
   const server = buildServer(root, session);
-  const hashes = readHashesFor(root);
-  for (let i = 0; i < 8; i++) {
-    const step = await call(server, "se_tick", { advance: true, read_hashes: hashes });
-    if (step.body.booted === true) break;
-  }
+  await pullBoot(server);
   const minted = await call(server, "se_note", { text: "a stray to drain" });
   const ref = String(minted.body.captured);
   // AN INBOX YOU MAY ONLY ADD TO IS NOT AN INBOX (owner ruling 2026-08-01).
@@ -43,11 +36,9 @@ test("draining splits: done and obsolete anywhere, carried and backlog only in t
   const judged = await call(server, "se_note_drain", { ref: String(second.body.captured), disposition: "backlog", where: "ready when someone cares" });
   assert.equal(judged.isError, true, "backlog outside the retro is still refused");
   const ref2 = String(second.body.captured);
-  // Enter the retro — one plain state; entering demands the METHOD read.
-  const method = "product/guidance/method/retro.md";
-  const withMethod = { ...hashes, [method]: contentHash(readFileSync(join(root, ...method.split("/")))) };
-  const intoRetro = await call(server, "se_tick", { to: "retro", read_hashes: withMethod });
-  assert.equal(intoRetro.isError, false, JSON.stringify(intoRetro.body));
+  // Enter the retro — one plain state; the way in owes the METHOD read,
+  // which the pull serves through the reading loop.
+  await pullTo(server, "retro");
   // Here, and ONLY here, the judgment dispositions work.
   const parked = await call(server, "se_note_drain", { ref: ref2, disposition: "backlog", where: "ready when someone cares" });
   assert.equal(parked.isError, false, JSON.stringify(parked.body));
@@ -63,16 +54,10 @@ test("the backlog home (v1 port): backlog demands its ready-when, parks the note
   const session = new Session(root);
   session.setAutonomy(1); // the retro weighs 1.0 - lift the slider clear
   const server = buildServer(root, session);
-  const hashes = readHashesFor(root);
-  for (let i = 0; i < 8; i++) {
-    const step = await call(server, "se_tick", { advance: true, read_hashes: hashes });
-    if (step.body.booted === true) break;
-  }
+  await pullBoot(server);
   const minted = await call(server, "se_note", { text: "future scope" });
   const ref = String(minted.body.captured);
-  const method = "product/guidance/method/retro.md";
-  const withMethod = { ...hashes, [method]: contentHash(readFileSync(join(root, ...method.split("/")))) };
-  await call(server, "se_tick", { to: "retro", read_hashes: withMethod });
+  await pullTo(server, "retro");
   // A made-up disposition refuses; backlog without its ready-when refuses.
   const bad = await call(server, "se_note_drain", { ref, disposition: "later" });
   assert.equal(bad.isError, true);
@@ -95,23 +80,17 @@ test("since last_retro: the log query scopes to the period after the newest drai
   const session = new Session(root);
   session.setAutonomy(1); // the retro weighs 1.0 - lift the slider clear
   const server = buildServer(root, session);
-  const hashes = readHashesFor(root);
-  for (let i = 0; i < 8; i++) {
-    const step = await call(server, "se_tick", { advance: true, read_hashes: hashes });
-    if (step.body.booted === true) break;
-  }
+  await pullBoot(server);
   // No drain yet: last_retro means no floor — everything counts.
   const log = new CallLog(seDir(root));
   const before = log.query({ filter: { since: "last_retro" } }).total;
   assert.ok(before > 0, "boot calls are on the log");
   // Run a drain (the retro marker) …
   const minted = await call(server, "se_note", { text: "marker" });
-  const method = "product/guidance/method/retro.md";
-  const withMethod = { ...hashes, [method]: contentHash(readFileSync(join(root, ...method.split("/")))) };
-  await call(server, "se_tick", { to: "retro", read_hashes: withMethod });
+  await pullTo(server, "retro");
   await call(server, "se_note_drain", { ref: String(minted.body.captured), disposition: "done", where: "test" });
   // … then act once more: the scoped query sees only the tail.
-  await call(server, "se_tick", {});
+  await call(server, "se_file_read", { path: "product/guidance/contract.md", offset: 1, limit: 1 });
   const scoped = log.query({ filter: { since: "last_retro" } });
   assert.ok(scoped.total < log.query({}).total, "the floor cuts the earlier period off");
   assert.ok(scoped.total >= 1, "the tail after the drain is visible");
@@ -121,18 +100,12 @@ test("the desk drains the mechanical verdicts and is refused the judgment ones",
   const root = freshRoot();
   const session = new Session(root);
   const server = buildServer(root, session);
-  const hashes = readHashesFor(root);
-  for (let i = 0; i < 8; i++) {
-    const step = await call(server, "se_tick", { advance: true, read_hashes: hashes });
-    if (step.body.booted === true) break;
-  }
+  await pullBoot(server);
   const stale = String((await call(server, "se_note", { text: "a later note supersedes this one" })).body.captured);
   const judged = String((await call(server, "se_note", { text: "what this means is the retro's call" })).body.captured);
-  // The desk weighs 0.2 — the default slider clears it; entering wants the method.
-  const method = "product/guidance/method/front-desk.md";
-  const withMethod = { ...hashes, [method]: contentHash(readFileSync(join(root, ...method.split("/")))) };
-  const desk = await call(server, "se_tick", { to: "front_desk", read_hashes: withMethod });
-  assert.equal(desk.isError, false, JSON.stringify(desk.body));
+  // The desk weighs 0.2 — the default slider clears it; the way in owes
+  // the method, and the pull's reading loop serves it.
+  await pullTo(server, "front_desk");
   // MECHANICAL — superseded, already built, ruled on since. Anyone may check it.
   const dropped = await call(server, "se_note_drain", { ref: stale, disposition: "obsolete", where: "superseded" });
   assert.equal(dropped.isError, false, JSON.stringify(dropped.body));
@@ -156,11 +129,7 @@ test("the survey lists a note by title — cut at a word, never mid-word, and ne
   }
   const session = new Session(root);
   const server = buildServer(root, session);
-  const hashes = readHashesFor(root);
-  for (let i = 0; i < 8; i++) {
-    const step = await call(server, "se_tick", { advance: true, read_hashes: hashes });
-    if (step.body.booted === true) break;
-  }
+  await pullBoot(server);
   // Every real note opens with a heading and carries its content below it.
   // The old defect took the first line and then 120 characters of it, so the
   // survey showed a title cut mid-word and none of the substance. A listing
