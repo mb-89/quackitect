@@ -22,6 +22,8 @@ JOB 4 — SMALL LANE FIXES (commit 10f7ab1). The land gate stops counting untrac
 
 JOB 5 — THE SHELL. Investigated, not built: the junction premise is refuted by VS Code reading package.json before activation (the copy is load-bearing until the brand splits), and the extension already has its onStartupFinished activation event. The remaining rewires need the owner at the screen.
 
+JOB 6 — THE BATTERY HALVED (owner priority, added mid-day). Profiled, then cut: one drawing validation per external call (the epoch — content stays the stamp, so the read-it-live law holds), git branch-list failures cached beside successes, condition-script spawns skipped where nothing proves them, and the test repository turned into a per-process fixture copied per case. 96.6s fell to 38.4s on a warm tree; summed compute 989 to 412 CPU-seconds. The last run now stands summarized in .se/test-last-run.json, and the retro's timing step reads it first. The booted-template idea was probed and refuted: a Session keeps its walk position in memory by design, so a snapshot cannot resume — recorded on the note as it drained.
+
 ## What settled it
 
 THE FULL BATTERY, EARNED. Changes to se-mcp.ts and run.ts map to no test file. Preflight green; 724 tests, 724 pass, 0 fail — seven new regressions among them. The run itself demonstrated the defect it was fixing: the MCP call timed out, the server-side run carried on, and the counts were fetched from the call log — the last battery that will have to be read that way.
@@ -40,9 +42,7 @@ THE BOOTED TEMPLATE for the suite's per-case boot walk stays parked — its own 
 
 THE ENGINE-TO-TEST MAP stays parked — its own trigger defers to the next retro's measurement of how often the battery was granted for unmapped changes.
 
-THE RETRO'S GUIDANCE EDIT (engineering.md) sits uncommitted on trunk: the bound git lane cannot reach trunk and the harness classifier blocked the shell path. The close commits trunk strays, so closing this record carries it in.
-
-THE RUNNING ENGINE still executes the old code — a reload after the close puts today's fixes live.
+THE RUNNING ENGINE still executes the old code — a reload after the close puts today's fixes live. The retro's engineering.md edit reached trunk in ce35ebf; trunk and the branch reconciled cleanly mid-evening, and the final battery ran the merged set: 724 pass, 0 fail.
 
 ## Files
 

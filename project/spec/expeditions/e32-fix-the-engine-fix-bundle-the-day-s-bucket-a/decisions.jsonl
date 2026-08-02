@@ -97,3 +97,6 @@
 {"ts":"2026-08-02T19:14:11.647Z","op":"update","visit":"expeditions/e32@1","node":"d194","brief":"waiting out the worktree battery"}
 {"ts":"2026-08-02T19:14:20.020Z","op":"update","visit":"expeditions/e32@1","node":"d195","brief":"blocking on the timer"}
 {"ts":"2026-08-02T19:15:15.591Z","op":"update","visit":"expeditions/e32@1","node":"d196","brief":"the worktree battery's verdict"}
+{"ts":"2026-08-02T19:15:52.898Z","op":"update","visit":"expeditions/e32@1","node":"d197","brief":"the fixture commits on the branch"}
+{"ts":"2026-08-02T19:16:12.135Z","op":"update","visit":"expeditions/e32@1","node":"d198","brief":"the report tells tonight's ending"}
+{"ts":"2026-08-02T19:16:19.730Z","op":"update","visit":"expeditions/e32@1","node":"d199","brief":"the amended report commits"}
