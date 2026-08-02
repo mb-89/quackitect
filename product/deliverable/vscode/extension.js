@@ -921,9 +921,19 @@ class Controls {
   .rung:hover { background: var(--vscode-button-secondaryHoverBackground); }
   .rung.on { background: var(--vscode-button-background); color: var(--vscode-button-foreground); border-color: var(--vscode-focusBorder); }
   /* Ideation delegates the CREATION of work, so its rung is drawn as a
-     hazard rather than as a setting. */
-  .rung.on.danger { border-color: var(--vscode-inputValidation-warningBorder); border-width: 2px; }
+     hazard rather than as a setting. RED, not a bordered blue: it was
+     wearing the host's ordinary button background with a warning outline,
+     which reads as any other pressed button. */
+  .rung.on.danger { background: var(--vscode-charts-red); color: var(--vscode-button-foreground); border-color: var(--vscode-charts-red); border-width: 2px; }
+  /* THE HIDDEN RUNG. Red and pulsing, so an armed engine cannot be mistaken
+     for a merely delegated one. */
+  .rung.emergency, .rung.on.danger.emergency { background: var(--vscode-charts-red); border-color: var(--vscode-charts-red); color: var(--vscode-button-foreground); animation: se-emergency 1.1s ease-in-out infinite; }
+  @keyframes se-emergency { 0%, 100% { opacity: 1; } 50% { opacity: .45; } }
+  @media (prefers-reduced-motion: reduce) { .rung.emergency { animation: none; outline: 2px solid var(--vscode-charts-red); outline-offset: 1px; } }
   .rung.locked { opacity: .4; cursor: not-allowed; }
+  /* A pressed toggle lights like a pressed rung — it is the same kind of
+     switch, and it was drawing itself unlit whatever its state. */
+  .rung.param-toggle.on { background: var(--vscode-button-background); color: var(--vscode-button-foreground); border-color: var(--vscode-focusBorder); }
   .cadence { width: 3.4em; font: inherit; font-size: .9em; padding: 2px 4px; text-align: right; background: var(--vscode-input-background); color: var(--vscode-input-foreground); border: 1px solid var(--vscode-input-border, transparent); }
   .cadence-unit { color: var(--vscode-descriptionForeground); font-size: .8em; margin-right: 6px; }
   .param-action { flex: 0 0 auto; margin-left: auto; }
@@ -984,6 +994,22 @@ class Controls {
   // button that waits for it reads as broken, so the bank is repainted from
   // the click and the next poll only confirms what is already on screen.
   let pendingLevel = null;
+  // The drumroll's memory outlives the bar, which is replaced wholesale on
+  // every poll — anything stored on the button itself dies with it.
+  let topPresses = 0;
+  // WHEN THE RUN STARTED, not when the last click landed. The contract is
+  // "five clicks in a second and a half", which is a property of the whole
+  // run — a click-to-click timer would accept a slow, deliberate tapping
+  // that never felt like a drumroll at all.
+  let runStartedAt = 0;
+  const DRUMROLL_MS = 1500;
+  // WHEN IT ARMED. Nobody stops their hand exactly on the fifth click, and
+  // the sixth would land on the armed button, release the rung and disarm
+  // emergency instantly — the engine drops it the moment the autonomy falls
+  // below the top. So the button goes deaf for a moment and lets the hand
+  // finish.
+  let armedAt = 0;
+  const ARM_DEAF_MS = 2000;
   function paintRungs(level) {
     const el = $("bar");
     if (el === null) return;
@@ -1001,6 +1027,38 @@ class Controls {
     if (!t || !t.closest) return;
     const rung = t.closest("button.rung[data-level]");
     if (rung !== null) {
+      // THE HIDDEN RUNG, COUNTED BEFORE EVERY GUARD. The contract, in the
+      // owner's words: five clicks on the top rung in a row go to emergency,
+      // whatever rung the autonomy sits at, and it does not matter whether
+      // the button is lit, dark or locked.
+      //
+      // Nothing may stand in front of this. The locked check below returns
+      // silently, so from mechanical every click died there and no number of
+      // presses could ever arm it.
+      if (Number(rung.dataset.rung) >= 1) {
+        const now = Date.now();
+        // Deaf for two seconds after arming, so the tail of the drumroll
+        // cannot undo it.
+        if (now - armedAt < ARM_DEAF_MS) return;
+        if (topPresses === 0 || now - runStartedAt > DRUMROLL_MS) {
+          topPresses = 0;
+          runStartedAt = now;
+        }
+        topPresses += 1;
+        if (topPresses >= 5) {
+          topPresses = 0;
+          armedAt = now;
+          // Emergency is refused below the top rung, so CLIMB first and arm
+          // second. A refused arm is indistinguishable from a dead button.
+          rung.classList.remove("locked");
+          rung.classList.add("emergency");
+          rung.textContent = "E";
+          paintRungs(1);
+          pendingLevel = 1;
+          vsapi.postMessage({ se: "emergency" });
+          return;
+        }
+      }
       if (rung.classList.contains("locked")) return;
       const level = Number(rung.dataset.level);
       pendingLevel = level;
@@ -1010,6 +1068,19 @@ class Controls {
       // Releasing the lowest rung lands on 0, and explaining "blocked" to
       // someone who just clicked the mechanical rung is the wrong mapping.
       vsapi.postMessage({ se: "scale-help", which: "autonomy", level: Number(rung.dataset.rung) });
+      return;
+    }
+    // THE SHUTDOWN ROW. Independent on/off buttons, any combination lit at
+    // once. The host had NO branch for these at all: the buttons rendered,
+    // and a click did nothing whatever — no light, no behaviour, no post.
+    const tog = t.closest(".param-toggle[data-toggle]");
+    if (tog !== null) {
+      const on = tog.getAttribute("aria-pressed") !== "true";
+      // Paint first. The bar redraws on the next poll and waiting for that is
+      // a second of a button that looks dead.
+      tog.classList.toggle("on", on);
+      tog.setAttribute("aria-pressed", on ? "true" : "false");
+      vsapi.postMessage({ se: "power", key: tog.dataset.toggle, on });
       return;
     }
     const act = t.closest(".param-action[data-post]");
@@ -1086,6 +1157,10 @@ class Controls {
       if (m.se === "field-help") { await showFieldHelp(m.which); return; }
       if (m.se === "scale-help") { await showScaleHelp(m.which, m.level); return; }
       if (m.se === "autonomy") await post("/autonomy", { value: m.value });
+      // THE DRUMROLL ARMED. Climb to the top rung first: the engine refuses
+      // emergency below it, and the presses may have started anywhere.
+      else if (m.se === "emergency") { await post("/autonomy", { value: 1 }); await post("/emergency", { on: true }); }
+      else if (m.se === "power") await post("/power", { key: m.key, on: m.on });
       // THE CADENCE IS A PAIR. POST /narration reads {minutes, calls}, so the
       // old single value left both halves NaN.
       else if (m.se === "narration") await post("/narration", { minutes: m.minutes, calls: m.calls });
