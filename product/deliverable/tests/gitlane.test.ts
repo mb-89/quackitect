@@ -6,7 +6,22 @@ import { spawnSync } from "node:child_process";
 import { readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { test } from "node:test";
+import { dirtyLines } from "../engine/gitlane.ts";
 import { bootedServer, call, freshRoot } from "./helpers.ts";
+
+// A narrated call writes the record's decision trail INTO the bound worktree,
+// so a walk that is narrating can never present a clean tree. A sync is wanted
+// exactly when an expedition is entered, which is when narration is heaviest,
+// and the two refused each other: riding an update on the sync dirtied the
+// tree before the sync checked it.
+test("the dirty gate excuses the engine's own trail, and nothing else", () => {
+  const trail = " M product/spec/expeditions/e31-x/decisions.jsonl";
+  assert.deepEqual(dirtyLines(trail), [], "the engine's own trail is not somebody's uncommitted work");
+  assert.deepEqual(dirtyLines("?? product/spec/iterations/i1-y/decisions.jsonl"), [], "an iteration's trail likewise");
+  const real = `${trail}\n M product/guidance/voice.md`;
+  assert.deepEqual(dirtyLines(real), [" M product/guidance/voice.md"], "real work still blocks a reconcile");
+  assert.deepEqual(dirtyLines(""), [], "a clean tree stays clean");
+});
 
 // LAND and SYNC reconcile a worktree WITH trunk, so both need two trees. At
 // the root there is only one, and a silent no-op there would be worse than a

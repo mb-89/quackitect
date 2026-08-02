@@ -128,13 +128,30 @@ function twoTrees(root: string, worktree: string, verb: string): { branch: strin
   };
 }
 
+/** THE ENGINE'S OWN TRAIL IS NOT SOMEBODY'S UNCOMMITTED WORK. A narrated call
+ *  writes the record's decisions.jsonl into the bound worktree, so a walk can
+ *  never present a clean tree while it is narrating — and a sync is wanted
+ *  exactly when an expedition is entered, which is when narration is heaviest.
+ *  The two mechanisms refused each other: riding an update on the sync dirtied
+ *  the tree before it checked, so it refused itself (found live 2026-08-02).
+ *
+ *  Only the trail is excused. A reconcile must still never bury real work. */
+const ENGINE_TRAIL = /product\/spec\/(?:expeditions|iterations)\/[^/]+\/decisions\.jsonl$/;
+
+export function dirtyLines(porcelain: string): string[] {
+  return porcelain
+    .split("\n")
+    .filter((l) => l !== "")
+    .filter((l) => !ENGINE_TRAIL.test(l.slice(2).trim().replace(/\\/g, "/").replace(/^"|"$/g, "")));
+}
+
 function refuseDirty(where: string, tree: string, what: string): void {
-  const dirty = git(where, "status", "--porcelain").stdout;
-  if (dirty === "") return;
+  const dirty = dirtyLines(git(where, "status", "--porcelain").stdout);
+  if (dirty.length === 0) return;
   throw new Rejection({
     clause: CLAUSES.GIT_NOT_ALLOWLISTED,
     expected: `a clean ${tree} to ${what}`,
-    got: `${dirty.split("\n").length} uncommitted change(s) on ${tree}`,
+    got: `${dirty.length} uncommitted change(s) on ${tree}: ${dirty.slice(0, 5).join(", ")}`,
     remedy: { tool: "se_git", args: { args: ["status", "--porcelain"] }, note: "commit what is there first; reconciling must never bury somebody's uncommitted work" },
     source: "engine/gitlane.ts",
   });

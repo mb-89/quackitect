@@ -27,3 +27,7 @@
 {"ts":"2026-08-02T14:28:17.969Z","op":"update","visit":"expeditions/e31@1","node":"d51","brief":"every place comes back with its line before and after"}
 {"ts":"2026-08-02T14:29:40.912Z","op":"done","visit":"expeditions/e31@1","node":"d44","brief":"every place rides the result with its before and after"}
 {"ts":"2026-08-02T14:29:51.978Z","op":"update","visit":"expeditions/e31@1","node":"d52","brief":"typechecking and running the sweep"}
+{"ts":"2026-08-02T14:30:30.913Z","op":"done","visit":"expeditions/e31@1","node":"d43","brief":"se_file_replace lands with its places report"}
+{"ts":"2026-08-02T14:31:20.589Z","op":"update","visit":"expeditions/e31@1","node":"d53","brief":"reading the git lane tests for their idiom"}
+{"ts":"2026-08-02T14:31:52.678Z","op":"update","visit":"expeditions/e31@1","node":"d54","brief":"the trail is excused from the dirty gate"}
+{"ts":"2026-08-02T14:32:01.947Z","op":"update","visit":"expeditions/e31@1","node":"d55","brief":"running the git lane suite"}
