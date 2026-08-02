@@ -4,3 +4,4 @@
 {"ts":"2026-08-02T14:09:01.162Z","op":"done","visit":"expeditions/e31@0","node":"d1","brief":"worktree is at HEAD and clean; the inputs are not in it"}
 {"ts":"2026-08-02T14:10:45.786Z","op":"update","visit":"expeditions/e31@1","node":"d13","brief":"pulling trunk into the expedition branch"}
 {"ts":"2026-08-02T14:10:53.009Z","op":"update","visit":"expeditions/e31@1","node":"d14","brief":"the record's own decision trail wants committing first"}
+{"ts":"2026-08-02T14:11:02.110Z","op":"update","visit":"expeditions/e31@1","node":"d15","brief":"syncing trunk into the expedition"}
