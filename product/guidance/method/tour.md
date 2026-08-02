@@ -13,7 +13,7 @@ tomorrow; a generated one cannot be.
 ## The two rules
 
 Never describe from memory. Before every stop, LOOK: survey the
-containers, tick-peek the states, read the record you are about to show.
+containers and the doors, read the record you are about to show.
 What you say is what stands, this minute.
 
 Never CHANGE anything. The tour is read-only. It seeds no expedition, no

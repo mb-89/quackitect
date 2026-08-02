@@ -31,6 +31,9 @@ that one when you touch what it covers.
 - Never comment that a rule was followed, who ruled it, or when. No dates. No step numbers. No law citations at application sites.
 - The why lives ONCE, in its designated home: an ADR, a `decided_via`, an evidence doc, a note, the ledger. Everywhere else, the artifact just IS the consequence.
 - A deliberate choice that must survive future edits gets a TEST or a LINT, not a comment. A comment is the weakest guard.
+- PREFER DELETING A COMMENT TO WRITING ONE (owner ruling 2026-08-02). Nobody maintains them. An unmaintained comment goes stale, and a stale comment does not merely age — it lies, and nothing in the build catches it. More of this project's staleness has come from comments than from any other source.
+- REFERENCE, NEVER COPY. Point at the one place the fact lives: a path, a condition note, a guidance file. A comment that restates what another file says has FORKED the truth, and only one fork ever gets updated.
+- The test of a comment is whether it can go stale. If the code changing would make it wrong, and nothing would fail, delete it or turn it into a check.
 
 ## Dated guidance
 

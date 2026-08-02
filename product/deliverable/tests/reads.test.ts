@@ -1,8 +1,7 @@
-// THE READ PROOF (owner ruling 2026-07-26, reworked 2026-08-02): the
-// agent's proofs are EARNED BY READING — se_reading and se_file_read
-// credit each document as they serve it; the hash-supplying lane retired
-// with the tick. Checkboxes stay the human's — one check per doc VERSION.
-// An edited doc unchecks itself and drops the agent's credit alike.
+// THE READ PROOF: the agent's proofs are EARNED BY READING. se_file_read
+// credits as it serves; the pull serves one document and credits it once
+// its tail comes back. Checkboxes stay the person's — one check per doc
+// VERSION. An edited doc unchecks itself and drops the agent's credit alike.
 import { strict as assert } from "node:assert";
 import { appendFileSync, existsSync, mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
@@ -11,7 +10,7 @@ import { renderMirror } from "../engine/render.ts";
 import { Session } from "../engine/session.ts";
 import { buildServer } from "../engine/tools.ts";
 import { readFileSync } from "node:fs";
-import { bootedServer, call, checkDocs, freshRoot, READ_DOCS } from "./helpers.ts";
+import { bootedServer, call, checkDocs, freshRoot, READ_DOCS, readOne } from "./helpers.ts";
 
 // THREE HOMES, NOT ONE (owner ruling 2026-07-29). voice.md is about HOW YOU
 // TALK. It had accumulated rules about writing SOFTWARE and building
@@ -78,9 +77,9 @@ test("THE HANDOVER: a left-behind .se/HANDOVER.md joins the reading, and is cons
   // Drain the reading, collecting what the loop actually serves.
   const served: string[] = [];
   for (let j = 0; j < 40; j++) {
-    const doc = await call(server, "se_reading");
-    if (doc.body.done === true) break;
-    served.push((doc.body.document as { path: string }).path);
+    const doc = await readOne(server);
+    if (doc === null) break;
+    served.push(doc.path);
   }
   assert.ok(served.includes(".se/HANDOVER.md"), `the handover rode the reading: ${served.join(", ")}`);
   const walked = await call(server, "se_pull");
@@ -118,15 +117,14 @@ test("an edited doc drops the agent's credit: the pull asks for the reading agai
   const again = await call(server, "se_pull", { form: { choice: "expeditions" } });
   assert.equal(again.body.pull, "read", "a stale credit is no credit — the doc is owed again");
   for (let j = 0; j < 40; j++) {
-    const doc = await call(server, "se_reading");
-    if (doc.body.done === true) break;
+    if ((await readOne(server)) === null) break;
   }
   const ok = await call(server, "se_pull");
-  assert.equal(ok.body.pull, "do", JSON.stringify(ok.body));
+  assert.notEqual(ok.body.pull, "read", `re-read, so the gate opened: ${JSON.stringify(ok.body)}`);
   assert.deepEqual(ok.body.where, ["expeditions/start"]);
 });
 
-test("se_file_read credits too: reading the docs by hand carries the walk without se_reading", async () => {
+test("se_file_read credits too: reading the docs by hand carries the walk unaided", async () => {
   const root = freshRoot();
   const session = new Session(root);
   const server = buildServer(root, session);
@@ -195,11 +193,11 @@ test("the pill turns green from the machine: the agent's reading records its pro
   const beforeState = session.stateInfo("read_contract") as { exit: { read: { met: boolean } } };
   assert.equal(beforeState.exit.read.met, false, "no reading earned yet");
   for (let j = 0; j < 40; j++) {
-    const doc = await call(server, "se_reading");
-    if (doc.body.done === true) break;
+    if ((await readOne(server)) === null) break;
   }
-  const afterState = session.stateInfo("read_contract") as { exit: { read: { met: boolean } } };
-  assert.equal(afterState.exit.read.met, true, "the agent's reading is the pill's green");
+  // Proving the last document walks the machine OUT of read_contract, so the
+  // green is read from the gate having let it through.
+  assert.ok(!session.active().includes("read_contract"), `the agent's reading is the pill's green: ${JSON.stringify(session.active())}`);
   // The human ledger is untouched: nothing checked, boxes stay empty.
   assert.deepEqual((session.tickInfo() as { human_checked: string[] }).human_checked, []);
   // A version pins the proof: editing a doc drops it, the pill asks again.
@@ -229,12 +227,14 @@ test("THE HANDOVER RULE: the human walks boot on checkboxes, raises the slider �
   assert.equal(owed.body.pull, "read", "their checkmark is not the agent's reading");
   const served: string[] = [];
   for (let j = 0; j < 40; j++) {
-    const doc = await call(server, "se_reading");
-    if (doc.body.done === true) break;
-    served.push((doc.body.document as { path: string }).path);
+    const doc = await readOne(server);
+    if (doc === null) break;
+    served.push(doc.path);
   }
   assert.ok(served.includes("workspace/AGENTS.md"), `the same list is owed: ${served.join(", ")}`);
+  // Proving the last document already moves the walk, so what matters here
+  // is that the reading gate is discharged — not which door comes next.
   const landed = await call(server, "se_pull");
-  assert.equal(landed.body.pull, "do", JSON.stringify(landed.body));
+  assert.notEqual(landed.body.pull, "read", `the agent's own reading discharged it: ${JSON.stringify(landed.body)}`);
   assert.ok((landed.body.where as string[]).includes("idle"));
 });

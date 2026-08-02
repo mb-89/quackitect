@@ -35,7 +35,7 @@ product/
 
 ```powershell
 .\RUNME.ps1           # preflight, deps, cage install, selftests, launch the caged agent
-.\RUNME.ps1 -Manual   # ...or open the MIRROR and walk the machines yourself, tick by tick
+.\RUNME.ps1 -Manual   # ...or open the MIRROR and walk the machines yourself, step by step
 ```
 
 ## Give it to someone else
@@ -74,8 +74,7 @@ cd C:\path\to\empty
 verb, legal in every state: the agent says pull and the machine answers
 with an instruction — `read`, `fill`, `choose`, `do`, or `wait` — walking
 the happy path itself and offering options only where the road splits.
-The Mirror's buttons and `POST /tick` drive the same core by the
-person's hand; the tick retired as an agent tool on 2026-08-02.
+The Mirror's buttons drive the same core by the person's hand.
 
 ## The cage (how it blocks)
 

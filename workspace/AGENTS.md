@@ -45,16 +45,15 @@ you rest at `wait` with nothing to do.
 
 BOOT STABILITY FOR THIS HOST:
 - Keep boot calls serial. Do not run parallel search/read batches.
-- THE READING IS A LOOP. When the pull answers `read`, call `se_reading`,
-  read the text it hands back, and call it again. Stop when it answers
-  `done: true`. Then pull.
-- Each call carries ONE document and credits it as it serves it. There are
-  no hashes to carry — the reading is the proof.
+- THE READING RIDES THE PULL. When it answers `read`, the document is in
+  the answer and `prove` names its last words. Read it, then pull again
+  with `form: {"read": "<those words>"}`.
+- One document at a time, and the next arrives when this one is proven.
 - Do not read the guidance files yourself. The loop knows what you owe,
   including everything on the way to the target.
-- One document per call is deliberate. A host that moves a big tool result
-  to disk hands you a preview instead of the text, and you would stand
-  credited for guidance you never saw. That is what the loop prevents.
+- One document at a time is deliberate, and so is the tail. A host that
+  moves a big tool result to disk hands you a preview instead of the text —
+  and a preview has no end, so it cannot answer.
 - A document that is ALLOWED to be missing is read with `optional: true`.
   Absence answers `exists: false` rather than refusing. The handover is the
   case this exists for. Boot should produce no errors at all.

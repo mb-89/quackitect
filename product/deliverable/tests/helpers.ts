@@ -225,13 +225,38 @@ export function handOver(root: string): void {
   writeFileSync(join(root, ".se", "HANDOVER.md"), "# Handover\n\nNothing outstanding.\n", "utf8");
 }
 
-/** Drain the reading the way an agent does: call, read, call again, until
- *  it answers done. The pull lane needs no read hashes because of this. */
-export function readEverything(s: Session): void {
-  for (let i = 0; i < 40; i++) {
-    if ((s.pullReading() as { done?: boolean }).done === true) return;
+/** The engine's own proof, mirrored: engine/session.ts readingProbes. */
+export function proofFor(body: string): string {
+  const w = body.split(/\s+/).filter((x) => x !== "");
+  if (w.length < 16) return w.join(" ");
+  return [0.3, 0.6, 0.92]
+    .map((at) => {
+      const i = Math.min(Math.floor(w.length * at), w.length - 8);
+      return w.slice(i + 4, i + 8).join(" ");
+    })
+    .join(" ... ");
+}
+
+/** Serve ONE document through the pull and prove it, handing back what the
+ *  pull answered with. */
+export async function readOne(server: Server): Promise<{ path: string; content: string } | null> {
+  const r = await call(server, "se_pull");
+  const doc = r.body.document as { path: string; content: string } | undefined;
+  if (doc === undefined) return null;
+  await call(server, "se_pull", { form: { read: proofFor(doc.content) } });
+  return doc;
+}
+
+/** Drain the reading the way an agent does: pull, take the document it
+ *  serves, hand its tail back, until the pull stops asking. */
+export async function readEverything(s: Session): Promise<void> {
+  let r = await s.pull();
+  for (let i = 0; i < 40 && r.pull === "read"; i++) {
+    const doc = r.document as { content?: string } | undefined;
+    if (doc?.content === undefined) throw new Error(`the pull answered read with no document: ${JSON.stringify(r)}`);
+    r = await s.pull({ form: { read: proofFor(doc.content) } });
   }
-  throw new Error("the reading never drained");
+  if (r.pull === "read") throw new Error("the reading never drained");
 }
 
 /** A SESSION standing at idle, reached by pulling rather than ticking.
@@ -247,7 +272,8 @@ export async function sessionAtIdle(root: string): Promise<Session> {
   s.setAutonomy(1);
   s.setTarget("idle");
   for (let i = 0; i < 8; i++) {
-    readEverything(s);
+    await readEverything(s);
+    if (s.active()[0] === "idle") return s;
     await s.pull();
     if (s.active()[0] === "idle") return s;
   }
@@ -265,11 +291,10 @@ export async function pullBoot(server: Server, session?: Session): Promise<void>
     const r = await call(server, "se_pull");
     if (r.isError) throw new Error(`boot pull failed: ${JSON.stringify(r.body)}`);
     if (r.body.pull === "read") {
-      for (let j = 0; j < 40; j++) {
-        const doc = await call(server, "se_reading");
-        if (doc.isError) throw new Error(`reading failed: ${JSON.stringify(doc.body)}`);
-        if (doc.body.done === true) break;
-      }
+      const doc = r.body.document as { content?: string } | undefined;
+      if (doc?.content === undefined) throw new Error(`read with no document: ${JSON.stringify(r.body)}`);
+      const proof = await call(server, "se_pull", { form: { read: proofFor(doc.content) } });
+      if (proof.isError) throw new Error(`the reading proof failed: ${JSON.stringify(proof.body)}`);
       continue;
     }
     const where = r.body.where as string[];
@@ -293,7 +318,7 @@ export async function bootedServer(root: string): Promise<Server> {
 export async function pullTo(session: Session, state: string): Promise<void> {
   session.setTarget(state);
   for (let i = 0; i < 6; i++) {
-    readEverything(session);
+    await readEverything(session);
     const r = (await session.pull()) as { pull?: string; arrived?: boolean };
     if (r.pull === "read") continue;
     if (r.pull === "do" && r.arrived === true) return;

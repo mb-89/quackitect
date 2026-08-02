@@ -193,34 +193,34 @@ test("the bless pins the machine and the container expands to the pinned walk", 
   const root = freshRoot();
   gitInit(root);
   const session = new Session(root);
-  await session.tickAdvance(); await session.tickAdvance();
+  await session.advance(); await session.advance();
   checkDocs(session);
-  await session.tickAdvance(); await session.tickAdvance(); await session.tickAdvance();
+  await session.advance(); await session.advance(); await session.advance();
   session.setAutonomy(1);
   const seeded = session.iterationSeed("walk the pinned machine", "the bless compiles and pins");
   const id = String(seeded.seeded);
   const sid = id.match(/^(i\d+)-/)![1];
-  await session.tickAdvance("iterations");
-  await session.tickAdvance(sid);
+  await session.advance("iterations");
+  await session.advance(sid);
   // No change_size in the record: the bless refuses, mechanically.
-  await assert.rejects(() => session.tickAdvance(), (e) => /change_size/.test(JSON.stringify(e)));
+  await assert.rejects(() => session.advance(), (e) => /change_size/.test(JSON.stringify(e)));
   // The prefill lands in the record; the advance is the bless.
   const rec = join(root, ".worktrees", id, "product", "spec", "iterations", id, "record.md");
   writeFileSync(rec, readFileSync(rec, "utf8").replace(/^status: /m, "change_size: patch\nstatus: "), "utf8");
-  await session.tickAdvance();
+  await session.advance();
   assert.ok(existsSync(join(root, ".worktrees", id, itPinRel(id))), "the pin exists");
   // Re-entering the container serves the walk: kickoff → the pinned machine.
-  await session.tickAdvance();
-  await session.tickAdvance("iterations");
-  await session.tickAdvance(sid);
-  await session.tickAdvance();
+  await session.advance();
+  await session.advance("iterations");
+  await session.advance(sid);
+  await session.advance();
   assert.deepEqual(session.breadcrumb(), ["main", "iterations", `${sid}-walk`], "the walk descended into the pinned machine");
   // NO GATE PASSES WITHOUT A REVIEW REPORT (owner ruling): walk to the
   // first gate and try to leave — held until the report stands, then quick.
   const pin2 = JSON.parse(readFileSync(join(root, ".worktrees", id, itPinRel(id)), "utf8")) as { machine: MachineDecl };
   const gate = pin2.machine.states.find((s) => s.id === "gate-kickoff")!;
-  await session.tickAdvance("gate-kickoff");
-  await assert.rejects(() => session.tickAdvance(gate.edges[0].to), (e) => /review report/.test(String((e as { expected?: string }).expected)));
+  await session.advance("gate-kickoff");
+  await assert.rejects(() => session.advance(gate.edges[0].to), (e) => /review report/.test(String((e as { expected?: string }).expected)));
   const review = join(root, ".worktrees", id, "product", "spec", "iterations", id, "reviews", "gate-kickoff.md");
   mkdirSync(dirname(review), { recursive: true });
   const sections = [
@@ -230,7 +230,7 @@ test("the bless pins the machine and the container expands to the pinned walk", 
     "## red_team\n\nthe opposing case was argued\n",
   ].join("\n");
   writeFileSync(review, `---\nform: milestone-review\ngate: gate-kickoff\nstatus: done\nby: test\nverdict: PASS\n---\n\n# gate-kickoff — milestone review\n\n${sections}`, "utf8");
-  await session.tickAdvance(gate.edges[0].to);
+  await session.advance(gate.edges[0].to);
   // THE BLESS IS SEPARATE AND DURABLE: the passing step stamped the
   // sidecar with the report's version and whose hand it was.
   const bless = JSON.parse(readFileSync(review.replace(/\.md$/, ".bless.json"), "utf8")) as { hash: string; by: string };
@@ -259,27 +259,27 @@ test("needs-retro holds the FIRST start; draining opens it; a started iteration 
   gitInit(root);
   const session = new Session(root);
   const server = buildServer(root, session);
-  await session.tickAdvance(); await session.tickAdvance();
+  await session.advance(); await session.advance();
   checkDocs(session);
-  await session.tickAdvance(); await session.tickAdvance(); await session.tickAdvance();
+  await session.advance(); await session.advance(); await session.advance();
   session.setAutonomy(1); // the kickoff weighs 0.6 — lift the slider clear
   const seeded = session.iterationSeed("prove the gate", "the first start waits on the retro");
   const sid = String(seeded.seeded).match(/^(i\d+)-/)![1];
   await call(server, "se_note", { text: "needs retro — iteration wrapped" });
-  await session.tickAdvance("iterations");
-  await assert.rejects(() => session.tickAdvance(sid), (e) => (e as { clause?: string }).clause === "SE-C-112" && /needs retro/.test(JSON.stringify(e)));
+  await session.advance("iterations");
+  await assert.rejects(() => session.advance(sid), (e) => (e as { clause?: string }).clause === "SE-C-112" && /needs retro/.test(JSON.stringify(e)));
   // Escape out — to the DESK now — then to the retro via idle; drain
   // there, come back, and the first start opens.
   session.escape("gated by needs-retro", "human");
-  await session.tickAdvance(); // the desk's one edge returns to idle
+  await session.advance(); // the desk's one edge returns to idle
   session.humanCheck("product/guidance/method/retro.md");
-  await session.tickAdvance("retro");
+  await session.advance("retro");
   const notesRaw = readFileSync(join(root, ".se", "notes.jsonl"), "utf8");
   const ref = JSON.parse(notesRaw.trim().split("\n").filter((l) => l.includes("needs retro"))[0]).ref as string;
   await call(server, "se_note_drain", { ref, disposition: "done", where: "retro ran" });
-  await session.tickAdvance(); // the retro's one edge returns to idle
-  await session.tickAdvance("iterations");
-  await session.tickAdvance(sid);
+  await session.advance(); // the retro's one edge returns to idle
+  await session.advance("iterations");
+  await session.advance(sid);
   // Entering bound the worktree and stamped `started:` — from now on a
   // fresh needs-retro note gates only NEW iterations, never this one.
   const rec = readFileSync(join(root, ".worktrees", String(seeded.seeded), "product", "spec", "iterations", String(seeded.seeded), "record.md"), "utf8");

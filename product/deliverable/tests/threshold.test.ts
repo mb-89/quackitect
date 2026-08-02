@@ -33,7 +33,7 @@ test("autonomy 0 is manual mode: the agent's pull waits, the human walks freely"
   assert.match(String(w.body.why), /above the session autonomy 0/);
   assert.match(String(w.body.do), /slider alone cannot wake you/);
   // The human's hand (default channel): the same step just goes.
-  await session.tickAdvance();
+  await session.advance();
   assert.deepEqual(session.active(), ["boot/start"]);
 });
 
@@ -70,17 +70,17 @@ test("the gate weighs the TARGET: a 0.4 state waits at 0.2, the archives wait at
   // The front desk weighs 0.2 — exactly at the autonomy, the agent may.
   // Its method doc is owed first; the pull says read, the loop drains it.
   const aim = await call(server, "se_pull", { form: { choice: "front_desk" } });
-  if (aim.body.pull === "read") readEverything(session);
+  if (aim.body.pull === "read") await readEverything(session);
   const desk = await call(server, "se_pull");
   assert.equal(desk.body.pull, "do", JSON.stringify(desk.body));
   assert.deepEqual(session.active(), ["front_desk"]);
   // Walk the desk back to idle on the human's hand — the HUMAN proves by
   // checkboxes, and this session booted on the agent's reading alone.
   checkDocs(session);
-  await session.tickAdvance();
+  await session.advance();
   assert.deepEqual(session.active(), ["idle"]);
   // … and the human enters the 0.4 state the agent was refused.
-  await session.tickAdvance("expeditions");
+  await session.advance("expeditions");
   assert.deepEqual(session.active(), ["expeditions/start"]);
 });
 
@@ -98,7 +98,7 @@ test("the hatch is never gated: an escape at autonomy 0 still reaches the desk",
 
 test("priority and autonomy ride every packet — the agent can weigh its next states", () => {
   const session = new Session(freshRoot());
-  const info = session.tickInfo() as { autonomy: number; states: { priority: number; next: { to: string; priority?: number }[] }[] };
+  const info = session.packet() as { autonomy: number; states: { priority: number; next: { to: string; priority?: number }[] }[] };
   assert.equal(info.autonomy, 0.4);
   assert.equal(info.states[0].priority, 0.01);
   assert.equal(info.states[0].next[0].priority, 0.01); // boot, from its canvas frontmatter
@@ -120,20 +120,19 @@ test("reaching end fires onClosed once and the closing packet says session over"
   const session = new Session(r);
   let fired = 0;
   session.onClosed = () => fired++;
-  await session.tickAdvance(); await session.tickAdvance();
+  await session.advance(); await session.advance();
   checkDocs(session);
-  await session.tickAdvance(); await session.tickAdvance(); await session.tickAdvance();
+  await session.advance(); await session.advance(); await session.advance();
   handOver(r); // the way out writes the next session's briefing
-  const over = (await session.tickAdvance("end")) as { session_over?: boolean; banner?: string };
+  const over = (await session.advance("end")) as { session_over?: boolean; banner?: string };
   assert.equal(over.session_over, true);
   assert.match(String(over.banner), /session over/i);
   assert.equal(fired, 1);
 });
 
 test("the mirror's long-poll: waitForChange wakes on the slider and times out honestly", async () => {
-  // The agent-facing hold retired with the tick — an agent told `wait`
-  // STOPS, and the person's message resumes it. The mirror still long-polls
-  // the same primitive to repaint live, so it keeps its own test.
+  // An agent told `wait` STOPS, and the person's message resumes it. The
+  // mirror still long-polls the same primitive to repaint live.
   const session = new Session(root());
   const held = session.waitForChange(3000);
   setTimeout(() => session.setAutonomy(0.75), 120);
@@ -162,11 +161,12 @@ test("the mirror over HTTP: slider served, POST /autonomy moves the gate, /api/a
     assert.equal(alive.status, "open");
     assert.equal(alive.autonomy, 0.75);
     assert.deepEqual(alive.active, ["start"]);
-    // HTTP ticks are the HUMAN's hand: at autonomy 0 they still walk.
+    // NOTHING HERE WALKS THE MACHINE. The walk moves on the agent's pull
+    // alone; this surface sets the slider and records, and that is all.
     session.setAutonomy(0);
-    const tick = await fetch(base + "/tick", { method: "POST", redirect: "manual", headers: { "content-type": "application/json" }, body: JSON.stringify({ advance: true }) });
-    assert.equal(tick.status, 303);
-    assert.deepEqual(session.active(), ["boot/start"]);
+    const gone = await fetch(base + "/tick", { method: "POST", redirect: "manual", headers: { "content-type": "application/json" }, body: JSON.stringify({ advance: true }) });
+    assert.equal(gone.status, 404, "the tick route is gone");
+    assert.deepEqual(session.active(), ["start"], "and nothing moved");
     // PARITY: the human's note lands hand-stamped in the feed; a tool
     // click faces the SAME state gate the agent does, answered as JSON.
     const noted = await fetch(base + "/note", { method: "POST", redirect: "manual", headers: { "content-type": "application/json" }, body: JSON.stringify({ text: "a human stray" }) });

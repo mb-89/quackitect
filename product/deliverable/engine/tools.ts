@@ -38,21 +38,17 @@ import { webFetch, webSearch } from "./web.ts";
 /** THE TICK — the machinery's one tool, legal in every state. */
 export function sessionTools(session: Session): ToolDef[] {
   return [
-    // THE TICK IS RETIRED (owner ruling 2026-08-02). The walk verb is
-    // se_pull; the machinery it drove — tickAdvance, sweep, jumpBack —
-    // lives on inside the session, reached through the pull and the
-    // mirror. The person's hand is the mirror, never a tool.
     {
       name: "se_pull",
       title: "se.pull",
       description:
-        "THE PULL — your one verb. Say pull, do what comes back, pull again. The machine owns every decision; you decide nothing about the walk unless it ASKS you to. You never name a target, never carry read hashes, never ask which state you are in, and never ask which tools are legal. BLOCKING IS AN INSTRUCTION, NOT AN ERROR — a pull does not refuse a walk that cannot move yet, it tells you what to do about it. FIVE ANSWERS, and `pull` names which one you got. `read` — documents are owed: call se_reading until it answers done, then pull. `fill` — the next step wants evidence: the machine BUILT the form and handed it to you, so fill it and return it ON THE NEXT PULL as form: {\"<section>\": \"<text>\"}. THERE IS NO SUBMIT VERB; pulling without it hands back the same form. `choose` — the road splits: the machine offers its doors, and you answer ON THE NEXT PULL as form: {\"choice\": \"<to>\"} (a LIST is legal where the work fans out to several agents — the first is walked, the rest come back as not_walked). A choice exists ONLY where one was offered. `do` — the happy path was WALKED for you, every hop to the next branching point in one call: `here` is where you landed, with its guidance. `wait` — the machine is out of work, or the next step weighs more than the session autonomy: say plainly which step waits and STOP, because the slider alone cannot wake you and the person must message you after moving it. A genuinely illegal call still refuses typed — a choice outside the offer, a form nothing asked for.",
+        "THE PULL — your ONLY verb. Say pull, do what comes back, pull again. There is nothing else to learn. The machine owns every decision; you decide nothing about the walk unless it ASKS you to. You never name a target, never name a path, never ask which state you are in, and never ask which tools are legal. BLOCKING IS AN INSTRUCTION, NOT AN ERROR — a pull does not refuse a walk that cannot move yet, it tells you what to do about it. FIVE ANSWERS, and `pull` names which one you got. `read` — a document rides along in `document`, and `prove` names its LAST WORDS: read it, then pull again with form: {\"read\": \"<those words>\"}. One document per pull, and the next arrives when this one is proven. The tail is asked for because a host that truncates a big result drops the END, so quoting it is what shows the text arrived whole. `fill` — the next step wants evidence: the machine BUILT the form and handed it to you, so fill it and return it ON THE NEXT PULL as form: {\"<section>\": \"<text>\"}. THERE IS NO SUBMIT VERB; pulling without it hands back the same form. `choose` — the road splits: the machine offers its doors, and you answer ON THE NEXT PULL as form: {\"choice\": \"<to>\"} (a LIST is legal where the work fans out to several agents — the first is walked, the rest come back as not_walked). A choice exists ONLY where one was offered. `do` — the happy path was WALKED for you, every hop to the next branching point in one call: `here` is where you landed, with its guidance. `wait` — the machine is out of work, or the next step weighs more than the session autonomy: say plainly which step waits and STOP, because the slider alone cannot wake you and the person must message you after moving it. A genuinely illegal call still refuses typed — a choice outside the offer, a form nothing asked for.",
       inputSchema: {
         type: "object",
         properties: {
           form: {
             type: "object",
-            description: "the filled form the LAST pull handed you. Evidence: {\"<section>\": \"<text>\", ...}. An offered choice: {\"choice\": \"<to>\"} — or a list, where the work fans out. Which one is never your call: evidence while a step demands it, a choice only where one was offered; evidence wins when both could read.",
+            description: "the filled form the LAST pull handed you. A reading proof: {\"read\": \"<the document's last words>\"}. Evidence: {\"<section>\": \"<text>\", ...}. An offered choice: {\"choice\": \"<to>\"} — or a list, where the work fans out. Which one is never your call: a proof while a document is owed, evidence while a step demands it, a choice only where one was offered.",
           },
           escape: {
             type: "string",
@@ -68,14 +64,6 @@ export function sessionTools(session: Session): ToolDef[] {
           },
           "agent",
         ),
-    },
-    {
-      name: "se_reading",
-      title: "se.reading",
-      description:
-        "THE READING, PULLED — call it, read what comes back, call it AGAIN, until it answers done: true. Each call hands over ONE document: the next guidance the way ahead demands, as text, already credited. You never name a path, you never carry a hash, and you never work out what you owe. WHAT IT GIVES YOU: with a target set, every document the whole way there, plus what the target's neighbours demand at entry. With NO target, where you stand IS the target — what this state pulls, plus what its neighbours demand. What you have already read is never served twice, so the loop always drains. WHY ONE AT A TIME: a host that moves a large tool result to disk hands you a PREVIEW instead of the text, and the engine has already credited it — you would stand proven to have read what you never saw. One document cannot be eaten. Legal in every state.",
-      inputSchema: { type: "object", properties: {} },
-      handler: () => session.pullReading(),
     },
     {
       name: "se_panel",

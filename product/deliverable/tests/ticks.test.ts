@@ -1,11 +1,8 @@
-// walk mechanics: reload gating, repair mode, conditions, jumping back.
+// walk mechanics: reload gating, repair mode, conditions.
 //
-// The engine's own step (tickAdvance) is driven at SESSION level here —
-// the human's hand, exactly as the mirror drives it. The agent's verb is
-// the pull, tested in the pull*.test.ts files. The atomic-`from` and the
-// peek died with the tick tool (owner ruling 2026-08-02): the pull
-// recomputes from wherever the walk stands, so there is no planned move
-// to go stale and no door the offer does not carry.
+// The engine's own step is driven at SESSION level here — the person's
+// hand, exactly as the mirror drives it. The agent's verb is the pull,
+// tested in the pull*.test.ts files.
 //
 // SMALL FILES ON PURPOSE (owner ruling, 2026-07-30). A test file is the
 // only unit that reaches a second core, so themes get their own file and
@@ -33,9 +30,9 @@ test("repair mode: a RED exit script arms the state's repair tools", async () =>
   const root = freshRoot();
   const session = new Session(root);
   const server = buildServer(root, session);
-  await session.tickAdvance(); await session.tickAdvance();
+  await session.advance(); await session.advance();
   checkDocs(session);
-  await session.tickAdvance();
+  await session.advance();
   assert.deepEqual(session.active(), ["boot/prepare_idle"]);
   // Green or not-yet-run: the file lane stays shut.
   const shut = await call(server, "se_file_write", { path: "x.md", content: "hi", base_hash: null });
@@ -55,40 +52,5 @@ test("conditions are worked only from inside the state — no pre-running", asyn
   assert.throws(() => s.submitEvidence("read_contract", { read_confirmed: true }), (e) => (e as { clause?: string }).clause === "SE-C-112");
 });
 
-test("jump back: downstream superseded, script evidence invalidated; human checks persist per version", async () => {
-  const { Session } = await import("../engine/session.ts");
-  const s = new Session(freshRoot());
-  // walk to idle
-  await s.tickAdvance(); await s.tickAdvance();
-  checkDocs(s);
-  await s.tickAdvance(); await s.tickAdvance(); await s.tickAdvance();
-  assert.deepEqual(s.active(), ["idle"]);
-  // jump back into boot from main: re-enters at the sub's start
-  s.jumpBack("boot");
-  assert.deepEqual(s.active(), ["boot/start"]);
-  // the CHECKS persist (one per doc version — the docs did not change),
-  // so the human re-walk flows; the preflight script must re-earn its 0.
-  await s.tickAdvance();
-  assert.deepEqual(s.active(), ["boot/read_contract"]);
-  await s.tickAdvance();
-  assert.deepEqual(s.active(), ["boot/prepare_idle"]);
-  const prepare = s.currentMachine().states.find((x) => x.id === "prepare_idle")!;
-  assert.equal(s.scriptStatus(s.currentMachine(), prepare).ran, false, "script evidence was invalidated by the jump");
-  // the record survives: superseded entries, never erased
-  assert.ok(s.instance.history.some((h) => h.outcome === "superseded"));
-  // a never-filled state is not a jump target
-  assert.throws(() => s.jumpBack("end"), (e) => (e as { clause?: string }).clause === "SE-C-110");
-});
-
-test("jump back leaves nothing green: the nested walk's record is superseded too", async () => {
-  const { Session } = await import("../engine/session.ts");
-  const s = new Session(freshRoot());
-  await s.tickAdvance(); await s.tickAdvance();
-  checkDocs(s);
-  await s.tickAdvance(); await s.tickAdvance(); await s.tickAdvance();
-  s.jumpBack("boot");
-  const filled = s.instance.history.filter((h) => h.outcome === "filled").map((h) => h.state);
-  assert.ok(!filled.some((f) => f.startsWith("boot/")), `boot walk entries still filled: ${filled}`);
-});
 
 });

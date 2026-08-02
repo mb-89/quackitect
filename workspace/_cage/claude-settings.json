@@ -39,7 +39,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node -e \"console.log('[se] PULL: your FIRST action is the se_pull tool with no payload - the machine answers with an instruction: read (call se_reading until done, then pull), fill (return the form on the next pull as form:{...}), choose (answer as form:{choice:...} - a choice exists only where one was offered), do (do what the guidance asks, then pull), or wait (STOP and tell the user plainly which step waits - the slider alone cannot wake you, they must send you a message, e.g. continue, after adjusting it). You carry no hashes and choose nothing unasked; pull, do, pull again. When a result carries a banner, show it to the user VERBATIM and proceed with their request. The lane is locked until the machine reaches idle.')\""
+            "command": "node -e \"console.log('[se] PULL: your FIRST action is the se_pull tool with no payload - the machine answers with an instruction: read (the document rides along and prove names its last words - read it, then pull again with form:{read:...}), fill (return the form on the next pull as form:{...}), choose (answer as form:{choice:...} - a choice exists only where one was offered), do (do what the guidance asks, then pull), or wait (STOP and tell the user plainly which step waits - the slider alone cannot wake you, they must send you a message, e.g. continue, after adjusting it). You carry no hashes and choose nothing unasked; pull, do, pull again. When a result carries a banner, show it to the user VERBATIM and proceed with their request. The lane is locked until the machine reaches idle.')\""
           }
         ]
       },
@@ -48,7 +48,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node -e \"console.log('[se] context was compacted - what you remember reading is gone from your head, and the machine knows it. Call se_pull to reorient: it will answer read for whatever must be read again, and se_reading hands the documents over one by one. The one rule is unchanged: you work through the se MCP server, and you do what it tells you.')\""
+            "command": "node -e \"console.log('[se] context was compacted - what you remember reading is gone from your head, and the machine knows it. Call se_pull to reorient: it will answer read for whatever must be read again, handing the documents over one at a time. The one rule is unchanged: you work through the se MCP server, and you do what it tells you.')\""
           }
         ]
       }

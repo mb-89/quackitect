@@ -3,13 +3,6 @@
 // states every machine has: the machinery auto-advances out of start, and a
 // machine is done when end activates.
 //
-// THE TICK is the universal walk operation (owner ruling 2026-07-26):
-//   tick(advance=false) → information about where the machine is
-//   tick(advance=true)  → complete the current state, move on (seeding and
-//                         closing sub-machines as the walk crosses them)
-// The agent's se_boot and se_exit, and the manual walker (se-manual), all
-// drive the same tick core — one machinery, several hands.
-//
 // THE STATE GATE lives here too: what is legal now is the active states'
 // `legal_tools` (legal STATES are the machine's edges — the gate is only
 // about tools), enforced at dispatch.
@@ -50,11 +43,9 @@ import { NARRATION_DEFAULT_CALLS, NARRATION_DEFAULT_MINUTES } from "./toll.ts";
 /** THE PULL is the machinery — one verb, legal in EVERY state: the agent
  *  says pull and the machine says what to do. se_note is legal everywhere
  *  too: a stray is captured where it strikes, never chased (contract rule
- *  4). se_reading joins them because a state that gates the reading gates
- *  its own entry — the way out of a state is to read what it demands.
- *  se_note_drain joins them by the same logic as se_note: an inbox you may
- *  only add to is not an inbox. */
-const ALWAYS_LEGAL: ReadonlySet<string> = new Set(["se_pull", "se_note", "se_panel", "se_reading", "se_note_drain"]);
+ *  4). se_note_drain joins them by the same logic: an inbox you may only add
+ *  to is not an inbox. */
+const ALWAYS_LEGAL: ReadonlySet<string> = new Set(["se_pull", "se_note", "se_panel", "se_note_drain"]);
 /** RESTRICTED tools: "all" does NOT grant these — a state must name them.
  *  Nothing is restricted today.
  *
@@ -66,7 +57,7 @@ const ALWAYS_LEGAL: ReadonlySet<string> = new Set(["se_pull", "se_note", "se_pan
  *  what work MEANS and when it returns, and engine/inbox.ts still refuses
  *  those outside the retro. done and obsolete are checks anyone can run. */
 const RESTRICTED: ReadonlySet<string> = new Set<string>();
-const MACHINERY: readonly string[] = ["se_pull", "se_reading", "se_file_read"];
+const MACHINERY: readonly string[] = ["se_pull", "se_file_read"];
 
 export function mainMachinePath(root: string): string {
   return join(root, "product", "deliverable", "machines", "main.canvas");
@@ -878,7 +869,7 @@ export class Session {
       this.unbind();
       this.notifyChange();
       return {
-        ...this.tickInfo(),
+        ...this.packet(),
         escaped: { from: stoodIn, reason },
         note: "escaped to the front desk — the walk was left standing. Tell the person PLAINLY why, then wait for their word.",
       };
@@ -904,7 +895,7 @@ export class Session {
     this.unbind();
     this.notifyChange();
     return {
-      ...this.tickInfo(),
+      ...this.packet(),
       escaped: { from: stoodIn, reason },
       note: "escaped to the front desk — the machine was left standing, and a later walk re-enters it. Tell the person PLAINLY why, then wait for their word.",
     };
@@ -998,10 +989,17 @@ export class Session {
   }
 
   active(): string[] {
-    const { ids } = this.leaves();
-    if (!this.inSub()) return ids;
-    const prefix = this.subs.map((s) => s.decl.id).join("/");
-    return ids.map((s) => `${prefix}/${s}`);
+    return this.leaves().ids.map((id) => this.qualHere(id));
+  }
+
+  /** The qualified name of a state in the machine that governs now. THE
+   *  ROUTE GRAPH SPEAKS QUALIFIED IDS, so everything that hands a state
+   *  name outward has to speak them too. An offer that named a bare one
+   *  was a door nothing could walk: a freshly seeded expedition came back
+   *  as "e31", and every legal answer to it was refused as unreachable
+   *  (found live 2026-08-02, on the ordinary path into an expedition). */
+  private qualHere(id: string): string {
+    return this.inSub() ? `${this.subs.map((s) => s.decl.id).join("/")}/${id}` : id;
   }
 
   /** Standing in the retro — the one place holding the whole picture, so
@@ -1156,8 +1154,13 @@ export class Session {
     // live 2026-07-29, the moment the mirror got a key for setting it).
     // Aim at its start. The render maps that back to the container node, so
     // the destination dot still lands exactly where the reader pointed.
-    const decl = this.machine.states.find((s) => s.id === target);
-    const aim = decl?.submachine !== undefined ? `${target}/start` : target;
+    // The target's OWN machine answers this, never the main one. A door
+    // inside a container is named "expeditions/e31", and looking that up
+    // in main found nothing, so every such door read as not-a-submachine
+    // by accident rather than by test.
+    const cut = target.lastIndexOf("/");
+    const decl = this.declForPrefix(cut < 0 ? "" : target.slice(0, cut))?.states.find((s) => s.id === (cut < 0 ? target : target.slice(cut + 1)));
+    const aim = decl?.submachine !== undefined ? Session.qual(target, this.declForPrefix(target)?.initial ?? "start") : target;
     const r = computeRoute(from, aim, (q) => this.expandNode(q));
     const judgments: { at: string; needs: string; why: string }[] = [];
     for (const s of r.steps) {
@@ -1309,30 +1312,29 @@ export class Session {
     return credited;
   }
 
-  /** THE PULL — the reading as a LOOP. One call hands over the next guidance
-   *  the way ahead demands, as text, already credited; call it again until it
-   *  answers done.
+  /** THE READING, SERVED BY THE PULL ITSELF. One document per answer; the
+   *  next pull proves it before the following one is served.
    *
-   *  WHY A LOOP AND NOT ONE BIG READ. The whole reading is fifty thousand
-   *  bytes of guidance. A host that moves a large tool result to disk hands
-   *  the agent a PREVIEW instead of the text — and the engine has already
-   *  credited it, so the agent stands proven to have read what it never saw.
-   *  A page the ENGINE bounds cannot be eaten downstream, and the caller does
-   *  no arithmetic: it asks again until told to stop.
+   *  ONE DOCUMENT AT A TIME. A host that moves a large tool result to disk
+   *  hands the agent a PREVIEW instead of the text. A document is a natural
+   *  page, always whole, and the largest guidance file is a tenth of what got
+   *  eaten.
    *
-   *  ONE DOCUMENT PER CALL (owner ruling). A page bounded by a byte budget
-   *  needs a constant nobody can calibrate — the threshold belongs to the
-   *  host and is not published. A document is a natural page, it is always
-   *  whole, and the largest guidance file is a tenth of what got eaten.
+   *  THREE PROBES, SPREAD ACROSS THE DOCUMENT. Quoting back what was just
+   *  served is the only proof an agent can actually compute — it cannot hash,
+   *  and a hash the engine handed over would prove only that a message
+   *  arrived. But ONE probe at the end is answerable by reading only the end,
+   *  and a model doing the least it can get away with will do exactly that.
+   *  Anchors at roughly a third, two thirds and the very end mean the whole
+   *  document has to be in hand. The last one still catches a truncating
+   *  host, because truncation is what drops the end.
    *
    *  UNREADABLE IS REPORTED, NOT SKIPPED FOREVER. A path that cannot be read
    *  from here is named and left out of the remainder, so the loop still ends
    *  and the refusal that follows can say what is missing. */
-  pullReading(): Record<string, unknown> {
+  private serveReading(): Record<string, unknown> | null {
     const paths = this.readingList();
     const unreadable: string[] = [];
-    const flag = (): Record<string, unknown> =>
-      unreadable.length > 0 ? { unreadable, warning: "demanded, but not readable from here. The gate that wants them will say so." } : {};
     for (const rel of paths) {
       let body: string;
       try {
@@ -1341,23 +1343,37 @@ export class Session {
         unreadable.push(rel);
         continue;
       }
-      const hash = contentHash(body);
-      this.readBuffer.set(rel, hash);
-      const remaining = paths.length - unreadable.length - 1;
+      const probes = this.readingProbes(body);
+      this.pendingRead = { path: rel, hash: contentHash(body), expect: probes.expect };
       return {
-        document: { path: rel, hash, content: body },
-        remaining,
-        done: false,
-        ...flag(),
-        note: `read it, then call se_reading again — ${remaining} more owed after this one`,
+        document: { path: rel, content: body },
+        remaining: paths.length - unreadable.length - 1,
+        prove: {
+          quote: probes.ask,
+          as: 'form: {"read": "<the answers, in one string, in order>"}',
+          why: "they are spread through the document on purpose — all of it has to be in hand",
+        },
+        ...(unreadable.length > 0 ? { unreadable, warning: "demanded, but not readable from here. The gate that wants them will say so." } : {}),
       };
     }
-    return {
-      remaining: 0,
-      done: true,
-      ...flag(),
-      note: "nothing is owed — every document the way ahead demands is already in your head. Carry on.",
-    };
+    return null;
+  }
+
+  private readingProbes(body: string): { ask: string[]; expect: string[] } {
+    const w = body.split(/\s+/).filter((x) => x !== "");
+    if (w.length < 16) return { ask: ["the whole document, verbatim"], expect: [w.join(" ")] };
+    const ask: string[] = [];
+    const expect: string[] = [];
+    for (const at of [0.3, 0.6, 0.92]) {
+      const i = Math.min(Math.floor(w.length * at), w.length - 8);
+      ask.push(`the 4 words that FOLLOW "${w.slice(i, i + 4).join(" ")}"`);
+      expect.push(w.slice(i + 4, i + 8).join(" "));
+    }
+    return { ask, expect };
+  }
+
+  private normWords(s: string): string {
+    return s.trim().replace(/\s+/g, " ").toLowerCase();
   }
 
   /** THE SWEEP — the route, walked. It collapses ROUND TRIPS and nothing
@@ -1370,7 +1386,7 @@ export class Session {
    *  STANDS rather than followed off a cliff. */
   async sweep(target: string, channel: Channel): Promise<Record<string, unknown>> {
     const walked: string[] = [];
-    // A BANNER EARNED MID-SWEEP MUST SURVIVE THE SWEEP. tickAdvance hands
+    // A BANNER EARNED MID-SWEEP MUST SURVIVE THE SWEEP. advance hands
     // its banner back per hop, and a sweep that swallowed it lost the boot
     // banner every time — the harness rule says show banners verbatim, and
     // nobody can show what the machinery ate.
@@ -1379,16 +1395,16 @@ export class Session {
     for (let guard = 0; guard < 64; guard++) {
       const r = this.route(target);
       if (r.steps.length === 0) {
-        return { ...this.tickInfo(), swept: walked, arrived: r.found, ...carry(), ...(r.found ? {} : { note: r.note }) };
+        return { ...this.packet(), swept: walked, arrived: r.found, ...carry(), ...(r.found ? {} : { note: r.note }) };
       }
       const step = r.steps[0];
       try {
-        const one = await this.tickAdvance(step.tick.to === undefined ? undefined : String(step.tick.to), channel);
+        const one = await this.advance(step.tick.to === undefined ? undefined : String(step.tick.to), channel);
         if (typeof one.banner === "string") banners.push(one.banner);
       } catch (e) {
         if (!(e instanceof Rejection)) throw e;
         return {
-          ...this.tickInfo(),
+          ...this.packet(),
           swept: walked,
           arrived: false,
           stopped_at: step.to,
@@ -1399,7 +1415,7 @@ export class Session {
       }
       walked.push(step.to);
     }
-    return { ...this.tickInfo(), swept: walked, arrived: false, ...carry(), note: "64 hops without arriving — the sweep stops rather than looping" };
+    return { ...this.packet(), swept: walked, arrived: false, ...carry(), note: "64 hops without arriving — the sweep stops rather than looping" };
   }
 
   // ── THE PULL (owner design 2026-08-01) — the agent's ONE verb ───────
@@ -1443,7 +1459,7 @@ export class Session {
         const open = this.conditionMet(machine, t, "enter");
         const overWeight = t.priority > this._autonomy;
         out.push({
-          to: e.to,
+          to: this.qualHere(e.to),
           role: e.role,
           ...(t.statement !== "" ? { statement: t.statement } : {}),
           priority: t.priority,
@@ -1458,7 +1474,7 @@ export class Session {
 
   /** The step the walk stands on, said small: id, statement, guidance,
    *  the legal tools, and WHAT IT WILL ASK by name and type — the detail
-   *  (guidance documents, per-field help) rides se_reading and the form
+   *  (guidance documents, per-field help) rides the pull and the form
    *  itself, so a long batch cannot overflow the answer. */
   private pullHere(): Record<string, unknown>[] {
     const { machine, ids } = this.leaves();
@@ -1524,9 +1540,26 @@ export class Session {
     // only where the machine offered one (the road split, no target).
     // Evidence wins when both could read — deterministic, and documented
     // on the tool.
+    // THE READING PROOF. The last pull served a document and named its tail;
+    // this is the agent handing that tail back. A form carrying `read` is only
+    // ever this, so it never competes with evidence or a choice. A wrong
+    // answer credits nothing and the same document is served again.
+    let readProof: "ok" | "wrong" | null = null;
+    if (payload.form?.read !== undefined && this.pendingRead !== null) {
+      const pending = this.pendingRead;
+      const given = this.normWords(String(payload.form.read));
+      if (pending.expect.every((e) => given.includes(this.normWords(e)))) {
+        this.readBuffer.set(pending.path, pending.hash);
+        this.pendingRead = null;
+        readProof = "ok";
+      } else {
+        readProof = "wrong";
+      }
+    }
+
     let saved: Record<string, unknown> | undefined;
     let fanOut: string[] = [];
-    if (payload.form !== undefined) {
+    if (payload.form !== undefined && readProof === null) {
       const owed = this.pullFormsOwed();
       if (owed.length > 0) {
         saved = this.formSave(owed[0], payload.form as Record<string, string>);
@@ -1616,15 +1649,15 @@ export class Session {
       };
     }
 
-    // 3. THE READING. It is credited by se_reading, so the walk below needs
-    //    no hashes from the agent at all.
-    const owedDocs = this.readingList();
-    if (owedDocs.length > 0) {
+    // 3. THE READING, served here rather than sent somewhere else.
+    const served = this.serveReading();
+    if (served !== null) {
       return {
         pull: "read",
         ...head(),
-        documents: owedDocs.length,
-        do: "call se_reading, read what it hands back, and call it again until it answers done — then pull",
+        ...served,
+        ...(readProof === "wrong" ? { note: "that did not answer every probe — here is the document again" } : {}),
+        do: "read the WHOLE document, then pull again answering every probe in `prove` as form: {\"read\": \"<the answers, in one string>\"}",
         ...extra(),
       };
     }
@@ -1668,15 +1701,15 @@ export class Session {
     // again from where the walk now stands — the answer is read or fill,
     // never a refusal wearing a walk.
     if (ref?.clause === CLAUSES.CONDITION_UNMET) {
-      const owedNow = this.readingList();
-      if (owedNow.length > 0) {
+      const servedNow = this.serveReading();
+      if (servedNow !== null) {
         return {
           pull: "read",
           ...head(),
           walked: swept.swept ?? [],
-          documents: owedNow.length,
+          ...servedNow,
           ...(swept.banners !== undefined ? { banners: swept.banners } : {}),
-          do: "call se_reading, read what it hands back, and call it again until it answers done — then pull",
+          do: "read the document, then pull again returning its proof as form: {\"read\": \"<the last words>\"}",
           ...extra(),
         };
       }
@@ -2227,6 +2260,8 @@ export class Session {
   /** Session-local read buffer: latest lane hash per path, auto-filled by
    *  se_file_read and re-used for later ticks unless stale. */
   private readonly readBuffer = new Map<string, string>();
+  /** The document the last pull served, waiting on its probes. */
+  private pendingRead: { path: string; hash: string; expect: string[] } | null = null;
 
   rememberRead(path: string, hash: string, ref?: string): void {
     if (ref !== undefined || path.trim() === "" || hash.trim() === "" || path.startsWith("@")) return;
@@ -2241,11 +2276,9 @@ export class Session {
   /** Whether the walk has passed through boot once already. */
   private bootEntered = false;
 
-  /** The agent's proofs, ALL earned by reading: se_file_read and
-   *  se_reading fill the buffer as they serve documents. Nothing is ever
-   *  handed in — the hash-supplying lane retired with the tick, because a
-   *  proof you can type is a proof you can fake. Stale entries are swept
-   *  here, so an edited doc always asks to be read again. */
+  /** The agent's proofs, ALL earned by reading: se_file_read credits as it
+   *  serves, and the pull credits once the document's tail comes back. Stale
+   *  entries are swept here, so an edited doc always asks to be read again. */
   private readProofs(channel: Channel): Record<string, string> {
     if (channel !== "agent") return {};
     const merged: Record<string, string> = {};
@@ -2471,7 +2504,7 @@ export class Session {
       got: channel === "agent" ? `not read at its current version: ${missing.join(", ")}` : `not checked in the mirror: ${missing.join(", ")}`,
       remedy:
         channel === "agent"
-          ? { tool: "se_reading", args: {}, note: "call se_reading until it answers done — each document is credited as it is served — then pull. Reading through se_file_read credits too; there is nothing to hand in." }
+          ? { tool: "se_pull", args: {}, note: "pull — it serves each document and names the last words to hand back, one document at a time. Reading through se_file_read credits too." }
           : { tool: "se_pull", args: {}, note: "check each listed document in the mirror — one check per version; an edited doc asks again" },
       source: "engine/session.ts reads",
     });
@@ -2596,7 +2629,7 @@ export class Session {
       clause: CLAUSES.CONDITION_UNMET,
       expected: `to be standing in ${stateId} — conditions are worked only from inside the state`,
       got: `standing in [${this.active().join(", ")}]`,
-      remedy: { tool: "se_pull", args: {}, note: "walk to the state first (or jump back to it), then work its conditions" },
+      remedy: { tool: "se_pull", args: {}, note: "walk to the state first, then work its conditions" },
       source: "engine/session.ts standing",
     });
   }
@@ -2693,7 +2726,7 @@ export class Session {
   // ── THE TICK ────────────────────────────────────────────────────────────
 
   /** tick without arguments: information about where the machine is. */
-  tickInfo(): Record<string, unknown> {
+  packet(): Record<string, unknown> {
     const { machine, ids } = this.leaves();
     const states = ids.map((id) => {
       const s = this.state(machine, id);
@@ -2768,10 +2801,10 @@ export class Session {
       ...(reading.length > 0
         ? {
             reading: {
-              tool: "se_reading",
+              tool: "se_pull",
               path: Session.READING_PATH,
               documents: reading.length,
-              note: "call se_reading. It hands you the text and credits it; call it again until it answers done. No paths to name, no hashes to carry.",
+              note: "pull. It hands you one document and names its last words; return those on the next pull and the following document arrives. No paths to name.",
             },
           }
         : {}),
@@ -2790,7 +2823,7 @@ export class Session {
    *  The agent's read proofs come from the reading it pulled (se_reading
    *  and se_file_read fill the buffer); the human proves via checkboxes.
    *  Reached through the pull and the mirror — never a tool of its own. */
-  async tickAdvance(to?: string, channel: Channel = "human"): Promise<Record<string, unknown>> {
+  async advance(to?: string, channel: Channel = "human"): Promise<Record<string, unknown>> {
     const now = new Date().toISOString();
     const supplied = this.readProofs(channel);
     if (this.instance.status === "closed") {
@@ -2809,7 +2842,7 @@ export class Session {
     this.seedSubs();
     if (this.subs.length > depthBefore) {
       this.notifyChange();
-      return this.tickInfo();
+      return this.packet();
     }
     // ONE VISIBLE STEP PER TICK (owner ruling 2026-07-26): you are only
     // ever in one state, and a tick moves exactly one position — including
@@ -2857,7 +2890,7 @@ export class Session {
       this.seedSubs(); // a sub state may itself host a sub-machine — nesting is arbitrary
       this.autoBind();
       this.notifyChange();
-      return this.tickInfo();
+      return this.packet();
     }
     const cur = activeStates(this.instance)[0];
     this.assertEdge(this.machine, cur, to);
@@ -2923,77 +2956,6 @@ export class Session {
     };
   }
 
-  /** Jump back to an EARLIER state of the machine you are in. Everything
-   *  downstream is superseded (kept in the record, never erased) and its
-   *  evidence and checks are invalidated — they are earned again on the
-   *  re-walk. Legal for the user and the agent alike, while the machine is
-   *  open — the agent's hand is still weighed against the threshold, and
-   *  the read gate applies (jumping back ENTERS the target). */
-  jumpBack(target: string, channel: Channel = "human"): Record<string, unknown> {
-    const now = new Date().toISOString();
-    const supplied = this.readProofs(channel);
-    if (this.instance.status === "closed") {
-      throw new Rejection({
-        clause: CLAUSES.NOT_LEGAL_IN_STATE,
-        expected: "an open machine",
-        got: `a jump back after end`,
-        remedy: { tool: "se_pull", args: {}, note: "the machine is done; a new session starts at the beginning" },
-        source: "engine/session.ts jump",
-      });
-    }
-    const { machine, ids } = this.leaves();
-    const inst = this.top()?.instance ?? this.instance;
-    if (ids.includes(target)) {
-      throw new Rejection({
-        clause: CLAUSES.NOT_LEGAL_IN_STATE,
-        expected: "an EARLIER state",
-        got: `${target} is where you are standing`,
-        remedy: { tool: "se_pull", args: {}, note: "the pull's answer says where you stand" },
-        source: "engine/session.ts jump",
-      });
-    }
-    const wasFilled = inst.history.some((h) => h.outcome === "filled" && h.state === target);
-    if (!wasFilled) {
-      throw new Rejection({
-        clause: CLAUSES.NOT_LEGAL_IN_STATE,
-        expected: `a state already walked in ${machine.id}`,
-        got: target,
-        remedy: { tool: "se_pull", args: {}, note: "only a filled state can be returned to" },
-        source: "engine/session.ts jump",
-      });
-    }
-    this.gatePriority(machine, [target], channel);
-    const back = this.state(machine, target);
-    const missing = this.entryRequirements(machine, back).filter((p) => !this.readProven(channel, p, supplied));
-    if (missing.length > 0) this.refuseReads("entry", target, missing, channel);
-    this.assertHandover(channel, supplied);
-    const { cone } = reopenStates(machine, inst, [target], "jump back", now);
-    // Invalidate the cone's evidence and checks — including a nested
-    // machine's, when a sub-machine state is inside the cone. And supersede
-    // the MAIN record's entries for the cone (the nested walk's included):
-    // a green state after a jump back would claim work that no longer stands.
-    for (const id of cone) {
-      this.evidence.delete(this.evidenceKey(machine, id));
-      for (const key of [...this.evidence.keys()]) {
-        if (key.startsWith(`${id}/`)) this.evidence.delete(key);
-      }
-      for (const h of this.instance.history) {
-        if (h.outcome !== "filled") continue;
-        if (h.state === `${machine.id}/${id}` || h.state.startsWith(`${id}/`)) {
-          (h as { outcome: string }).outcome = "superseded";
-        }
-      }
-    }
-    if (!this.inSub()) {
-      this.subs = [];
-      this.seedSubs(); // a reopened sub-machine state re-enters at its start
-    } else {
-      this.instance.history.push({ state: `${machine.id}/${target}`, outcome: "reopened", at: now });
-    }
-    this.notifyChange();
-    return this.tickInfo();
-  }
-
   private closedFired = false;
 
   /** The tick's result — plus the booted banner the first time idle lands.
@@ -3010,7 +2972,7 @@ export class Session {
       // owns that decision and it measures silence, not completion.
       this.keepAwake?.kill();
       this.keepAwake = undefined;
-      const info = this.tickInfo();
+      const info = this.packet();
       this.onClosed?.();
       return {
         ...info,
@@ -3019,7 +2981,7 @@ export class Session {
         display: "Show the banner above to the user VERBATIM. The session is over; no further calls will answer.",
       };
     }
-    const info = this.tickInfo();
+    const info = this.packet();
     if (!this.bannerShown && !this.inSub() && activeStates(this.instance).includes("idle")) {
       this.bannerShown = true;
       return {

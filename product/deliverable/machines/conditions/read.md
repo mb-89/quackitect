@@ -21,13 +21,13 @@ main machine refuses to reach `end` without a handover written that session.
 
 The proof is per hand:
 
-- **The agent reads, and reading IS the proof.** `se_reading` and
-  `se_file_read` credit each document as they serve it, at the version
-  they served. Nothing is handed in — the hash-supplying lane retired
-  with the tick (2026-08-02), because a proof you can type is a proof
-  you can fake. An EDITED document drops its credit and is asked again;
-  after a compaction the pull simply answers `read` and the loop
-  re-serves what must be read — that is the point.
+- **The agent reads, and reading IS the proof.** `se_file_read` credits a
+  document as it serves it. The pull serves one document and names its
+  LAST WORDS; handing those back credits it, at the version served.
+  The tail is asked for because a host that truncates a large result
+  drops the END — so the tail is what a preview cannot produce. An
+  EDITED document drops its credit and is asked again; after a
+  compaction the pull simply answers `read` again.
 - **The human checks the box.** In the mirror, each doc carries a
   checkbox: one check per VERSION of the file. The check pins the doc's
   current hash; an edited doc unchecks itself and asks again.

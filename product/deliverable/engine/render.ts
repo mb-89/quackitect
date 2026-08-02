@@ -325,7 +325,7 @@ export interface MirrorState {
 function briefFor(rec: CallRecord): string {
   const a = rec.args as Record<string, unknown>;
   switch (rec.tool) {
-    case "se_tick": // old logs only — the tick retired 2026-08-02
+    case "se_tick": // old logs only
       return a.back !== undefined ? `back → ${a.back}` : a.state !== undefined ? `peek ${a.state}` : a.wait === true ? "hold (wait)" : a.to !== undefined ? `tick → ${a.to}` : a.advance === true ? "tick advance" : "tick (look)";
     case "se_pull": {
       const f = a.form as { choice?: unknown } | undefined;
@@ -621,7 +621,6 @@ const STYLE = `
   .vnull { color: var(--se-muted); } .vnum { color: var(--se-val-num); } .vbool { color: var(--se-val-bool); } .vstr { color: var(--se-val-str); }
   .prewrap { white-space: pre-wrap; }
   td.btncell { text-align: center; vertical-align: middle !important; width: 1%; }
-  button.go.locked { background: var(--se-border); color: var(--se-dim); cursor: not-allowed; }
   .cond circle { stroke-width: 2.5; }
   .cond.unmet circle { fill: var(--se-accent-bg); stroke: var(--se-accent); }
   .cond.met circle { fill: var(--se-ok-bg); stroke: var(--se-ok); }
@@ -943,10 +942,8 @@ function nextTable(id, s) {
       : !s.exit_met
         ? "leaving " + id + " waits on:\\n" + (exitMiss.join("\\n") || "its exit conditions")
         : "entering " + n.to + " waits on:\\n" + ((n.missing || []).join("\\n") || "its entry conditions");
-    const btn = here
-      ? '<vscode-button class="go" icon="play" icon-only data-to="' + n.to + '"' + (unlocked ? "" : " disabled") +
-        ' title="' + escText(title) + '"></vscode-button>'
-      : "";
+    // The walk moves on the agent's pull. Nothing here drives it.
+    const btn = here ? '<span class="meta" title="' + escText(title) + '">' + (unlocked ? "open" : "waiting") + "</span>" : "";
     return '<div class="nextitem' + (unlocked ? " open" : "") + '">'
       + '<div class="nexthead"><span class="nextto">' + escText(n.to) + "</span>" + btn + "</div>"
       + field("role", n.role) + field("guard", n.guard) + field("statement", n.statement)
@@ -1051,13 +1048,10 @@ function stateDetail(id) {
   if (s.next && s.next.length > 0) {
     html += '<div class="meta" style="padding:8px 0 4px">next</div>' + nextTable(id, s);
   }
-  if (WALK_HERE && s.was_filled && id !== CURRENT && D.describe.status === "open") {
-    html += '<div style="padding:8px 0"><vscode-button class="jump" secondary icon="discard" data-state="' + id + '" title="everything downstream is superseded; its evidence and checks are invalidated">return to this state</vscode-button></div>';
-  }
   if (WALK_HERE && id === CURRENT && s.kind === "end" && (!s.next || s.next.length === 0) && D.describe.breadcrumb.length > 1) {
     const parent = D.describe.breadcrumb[0];
     html += '<div class="meta" style="padding:8px 0 4px">next</div>' +
-      '<div class="nextitem open"><div class="nexthead"><span class="nextto">return to ' + escText(parent) + '</span><vscode-button class="go" icon="play" icon-only data-to="" title="tick: leave the sub-machine"></vscode-button></div></div>';
+      '<div class="nextitem open"><div class="nexthead"><span class="nextto">return to ' + escText(parent) + "</span></div></div>";
   }
   return html;
 }
@@ -1305,8 +1299,6 @@ document.addEventListener("click", async (ev) => {
     await fetch("/check", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ path: path }) });
     return;
   }
-  const j = ev.target.closest ? ev.target.closest(".jump") : null;
-  if (j) { showLoading("jumping back to " + j.dataset.state); await fetch("/tick", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ back: j.dataset.state }) }); navigateTo("/", "loading the walk"); return; }
   const rp = ev.target.closest ? ev.target.closest(".runpre") : null;
   if (rp) {
     // Grey IMMEDIATELY — no second run behind an unresponsive button; the
@@ -1468,17 +1460,6 @@ document.addEventListener("click", async (ev) => {
     sessionStorage.removeItem("se-vb-" + cs.dataset.machine);
     navigateTo("/?view=" + encodeURIComponent(cs.dataset.machine), "loading " + cs.dataset.machine);
     return;
-  }
-  const go = ev.target.closest ? ev.target.closest(".go") : null;
-  if (go) {
-    // THE GUARD IS EXPLICIT. A native button swallows its own click when
-    // disabled; a component decides that for itself, and a locked edge must
-    // not walk because the library changed its mind about pointer events.
-    if (go.hasAttribute("disabled")) return;
-    const body = go.dataset.to ? { to: go.dataset.to } : { advance: true };
-    showLoading("walking to " + (go.dataset.to || "the next state"));
-    await fetch("/tick", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) });
-    navigateTo("/", "loading the walk");
   }
 });
 let CURRENT_DETAIL = null;
@@ -2585,7 +2566,7 @@ export function renderMirror(m: MirrorState, widget?: "machine" | "details" | "l
   const comment = (canvas.nodes ?? []).find((n) => n.type === "text")?.text ?? "";
   const data = `<script type="application/json" id="se-data">${JSON.stringify({
     describe: m.session.describe(),
-    packet: m.session.tickInfo(),
+    packet: m.session.packet(),
     lastPacket: m.lastPacket ?? null,
     states,
     comment,

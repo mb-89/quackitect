@@ -118,7 +118,7 @@ describe("the power flags on the session", () => {
   test("the packet carries the flags, so a host draws from the machine", () => {
     const s = new Session(root());
     s.setPower("shutdown-at-idle", true);
-    const packet = s.tickInfo() as { power?: { shutdown_at_idle?: boolean } };
+    const packet = s.packet() as { power?: { shutdown_at_idle?: boolean } };
     assert.equal(packet.power?.shutdown_at_idle, true);
   });
 });

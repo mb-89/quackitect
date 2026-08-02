@@ -81,7 +81,7 @@ async function bootHuman(s: Session): Promise<void> {
   checkDocs(s);
   for (let i = 0; i < 10; i++) {
     if (s.active()[0] === "idle") return;
-    await s.tickAdvance();
+    await s.advance();
   }
   throw new Error("boot did not reach idle");
 }
@@ -97,18 +97,18 @@ test("nesting: the walk descends into an archive decade and climbs back out", as
   }
   const s = new Session(root);
   await bootHuman(s);
-  await s.tickAdvance("expedition_archive");
+  await s.advance("expedition_archive");
   assert.deepEqual(s.active(), ["expedition_archive/start"]);
-  await s.tickAdvance("e1-e10");
+  await s.advance("e1-e10");
   assert.deepEqual(s.active(), ["expedition_archive/e1-e10/start"], "entering the decade pushes a second level");
   assert.deepEqual(s.breadcrumb(), ["main", "expedition_archive", "e1-e10"]);
-  await s.tickAdvance("e5");
+  await s.advance("e5");
   assert.deepEqual(s.active(), ["expedition_archive/e1-e10/e5"]);
-  await s.tickAdvance();
+  await s.advance();
   assert.deepEqual(s.active(), ["expedition_archive/e1-e10/end"], "one record visited completes the decade");
-  await s.tickAdvance();
+  await s.advance();
   assert.deepEqual(s.active(), ["expedition_archive/end"], "leaving the decade returns to the archive container");
-  await s.tickAdvance();
+  await s.advance();
   assert.deepEqual(s.active(), ["idle"], "leaving the archive returns to main");
   // The nested machines stay viewable from idle — decl and drawing.
   const dec = s.viewFor("e11-e12");

@@ -43,6 +43,9 @@ let BUILD = "unknown";
 let child = null;
 let output = null;
 let disposed = false;
+// An agent that loaded before the port was up holds no se tools, and only a
+// reload makes it look again — so the launch has to know which case it is in.
+let serverJustStarted = false;
 let cards = [];
 let levels = null;
 let packet = null;
@@ -249,6 +252,7 @@ async function ensureServer() {
     return false;
   }
   placeConfigs(root);
+  serverJustStarted = false;
   // An engine already answering (another window, a terminal launch) is THE
   // engine — attach to it, never raise a second walk beside it. Unless it
   // walks ANOTHER project on our port: that is a loud error, not an attach.
@@ -286,6 +290,7 @@ async function ensureServer() {
     await new Promise((r) => setTimeout(r, 250));
   }
   startServer(root, runner);
+  serverJustStarted = true;
   for (let i = 0; i < 75; i++) {
     if ((await probeServer()).state === "up") return true;
     await new Promise((r) => setTimeout(r, 200));
@@ -344,7 +349,7 @@ function titleOf(card) {
 // ever feel laggy, the stream is the upgrade.
 async function pollWalk() {
   if (levels === null) levels = await api("/api/levels");
-  const p = await api("/api/tick");
+  const p = await api("/api/packet");
   if (p === null) return;
   const moved = JSON.stringify(p.active ?? null) + "|" + String(p.status) !== lastWalk;
   lastWalk = JSON.stringify(p.active ?? null) + "|" + String(p.status);
@@ -1406,6 +1411,30 @@ const CLAUDE_FOCUS_COMMAND = "claude-vscode.focus";
  * going by the extension that owns that box, not by our guess about where
  * focus drifted. That is what makes a blind paste defensible.
  */
+/**
+ * The agent reads .mcp.json when ITS extension loads, which is window open. An
+ * engine that came up after that is invisible to it, and opening a side bar
+ * does not make it look again.
+ */
+async function confirmLaneIsReachable() {
+  const reload = "Reload Window";
+  const anyway = "Start Anyway";
+  const pick = await vscode.window.showWarningMessage(
+    "$PRODUCT$: the engine only came up just now, so an agent already loaded in this window cannot see the se tools.",
+    {
+      modal: true,
+      detail: "Reload the window and the engine starts first, so the agent finds the lane. Start anyway only if no agent has loaded yet.",
+    },
+    reload,
+    anyway,
+  );
+  if (pick === reload) {
+    void vscode.commands.executeCommand("workbench.action.reloadWindow");
+    return false;
+  }
+  return pick === anyway;
+}
+
 async function openClaudeInSideBar(kickoff) {
   const all = await vscode.commands.getCommands(true);
   try {
@@ -1466,23 +1495,12 @@ async function sendKickoffToClaude(kickoff) {
 }
 
 /**
- * Paste the kickoff and send it.
+ * Paste the kickoff and send it. The clipboard carries the text because typing
+ * it would submit at the kickoff's first line break.
  *
- * THE GUARD IS VS CODE'S OWN. window.state.focused says whether this window
- * has the keyboard, which is the question the whole hack turns on, and it is
- * a supported API rather than a reading of the title bar. Keys go out only
- * while it holds.
- *
- * WHAT AIMS THEM INSIDE THE WINDOW is Claude, through its Focus-input
- * command, called just before this. Nothing here has to guess.
- *
- * THE ENTER IS TRIED A FEW TIMES because the paste has to land first and
- * nothing reports when it has. Extra Enters are harmless: an empty input
- * ignores them, so the burst has one effect whichever key wins.
- *
- * THE CLIPBOARD CARRIES THE TEXT rather than typing it out. Typing would
- * submit at the kickoff's first line break, since that is what Enter does in
- * that box.
+ * keys.enter() reports that the key left HERE, never that the box took it, so
+ * there is nothing to stop early on and the budget is spent in full. Extra
+ * Enters are harmless: an empty input ignores them.
  */
 async function sendPasteAndEnter() {
   if (!keys.available()) {
@@ -1497,18 +1515,17 @@ async function sendPasteAndEnter() {
     trace("paste could not be sent");
     return;
   }
-  for (let i = 0; i < 6; i++) {
-    await new Promise((r) => setTimeout(r, 120));
+  await new Promise((r) => setTimeout(r, 250));
+  let sent = 0;
+  for (let i = 0; i < 10; i++) {
     if (!vscode.window.state.focused) {
-      trace("focus left mid-send — the rest of the keys are withheld");
+      trace("focus left mid-send after " + sent + " Enter(s) — the rest are withheld");
       return;
     }
-    if (keys.enter() > 0) {
-      trace("kickoff pasted and sent");
-      return;
-    }
+    if (keys.enter() > 0) sent++;
+    await new Promise((r) => setTimeout(r, 150));
   }
-  trace("paste landed but Enter never went — press it yourself");
+  trace(sent > 0 ? sent + " Enter(s) went — if the kickoff still sits unsent, press it yourself" : "Enter never went — press it yourself");
 }
 
 /** The editor door's half: the prompt is already in the box, so only send. */
@@ -1517,14 +1534,12 @@ async function sendEnterOnly() {
     trace("no key sender on this platform — the kickoff is in the box, press Enter");
     return;
   }
-  for (let i = 0; i < 6; i++) {
-    if (vscode.window.state.focused && keys.enter() > 0) {
-      trace("kickoff sent");
-      return;
-    }
-    await new Promise((r) => setTimeout(r, 120));
+  let sent = 0;
+  for (let i = 0; i < 10; i++) {
+    if (vscode.window.state.focused && keys.enter() > 0) sent++;
+    await new Promise((r) => setTimeout(r, 150));
   }
-  trace("Enter never went — press it yourself");
+  trace(sent > 0 ? sent + " Enter(s) went — if the kickoff still sits unsent, press it yourself" : "Enter never went — press it yourself");
 }
 
 
@@ -1592,6 +1607,7 @@ async function startAgent() {
         progress.report({ message: "Preparing engine and launch command..." });
         const root = projectRoot();
         if (root === null || !(await ensureServer())) return false;
+        if (serverJustStarted && !(await confirmLaneIsReachable())) return false;
         await ensureCards();
         const command = agentLaunch(root);
         if (command === null) {

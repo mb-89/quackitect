@@ -106,7 +106,7 @@ test("escape goes to the desk: the walk is left standing, the reason is recorded
   const server = buildServer(root, session);
   // Into boot: escape is refused — boot must complete. (The human walks
   // the hop; the agent's escape rides the pull.)
-  await session.tickAdvance();
+  await session.advance();
   const noBoot = await call(server, "se_pull", { escape: "stuck" });
   assert.equal(noBoot.isError, true);
   assert.equal(noBoot.body.clause, "SE-C-110");

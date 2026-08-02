@@ -30,10 +30,9 @@ if (process.argv.some((a) => a === "--help" || a === "-h" || a === "-?")) {
                     command line works in both modes. Env: SE_MIRROR_PORT.
   --help            this text (-h, -?)
 
-  GET  /            the mirror (tick · info implied: looking never moves)
-  POST /tick        tick with arguments: complete the current state, move on
+  GET  /            the panel (looking never moves the walk)
   POST /autonomy    move the session autonomy (the slider posts here)
-  GET  /api/tick    the tick info packet as JSON
+  GET  /api/packet  where the walk stands, as JSON
   GET  /api/alive   position + autonomy — the mirror polls this
   GET  /widget/machine | /widget/details    single widgets (tab/window)
 

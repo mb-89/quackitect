@@ -9,7 +9,7 @@ import { fileURLToPath } from "node:url";
 import { compileMachine } from "../engine/machines/compile.ts";
 import { mainMachinePath, Session } from "../engine/session.ts";
 import { buildServer } from "../engine/tools.ts";
-import { bootedServer, call, checkDocs, freshRoot, handOver, pullBoot } from "./helpers.ts";
+import { bootedServer, call, checkDocs, freshRoot, handOver, proofFor, pullBoot } from "./helpers.ts";
 
 const REPO_ROOT = fileURLToPath(new URL("../../..", import.meta.url));
 
@@ -75,10 +75,12 @@ test("the agent's pulls walk boot: the reading gates, the machine walks, the ban
   // The lane beyond reading stays shut while boot stands.
   const shut = await call(server, "se_run", { command: "echo nope" });
   assert.equal(shut.body.clause, "SE-C-110");
-  // Drain the reading the honest way — one document per call.
+  // Drain the reading the honest way — one document per pull, tail proven.
   for (let j = 0; j < 40; j++) {
-    const doc = await call(server, "se_reading");
-    if (doc.body.done === true) break;
+    const r = await call(server, "se_pull");
+    const doc = r.body.document as { content?: string } | undefined;
+    if (doc?.content === undefined) break;
+    await call(server, "se_pull", { form: { read: proofFor(doc.content) } });
   }
   // Now the pull WALKS: boot runs its scripts, idle is crossed, and the
   // session's default target (the front desk) is reached in ONE call.
@@ -128,44 +130,44 @@ test("manual mode: tick info at start, the human's steps walk the whole machine 
   const { Session } = await import("../engine/session.ts");
   const root = freshRoot();
   const s = new Session(root);
-  const info = s.tickInfo() as { active: string[]; states: { kind: string }[] };
+  const info = s.packet() as { active: string[]; states: { kind: string }[] };
   assert.deepEqual(info.active, ["start"]);
   assert.equal(info.states[0].kind, "start");
-  await s.tickAdvance(); // main/start -> boot's mechanical start (one position per step)
+  await s.advance(); // main/start -> boot's mechanical start (one position per step)
   assert.deepEqual(s.active(), ["boot/start"]);
-  await s.tickAdvance();
+  await s.advance();
   assert.deepEqual(s.active(), ["boot/read_contract"]);
   // the read gate holds the manual walk too — until the docs are CHECKED
-  await assert.rejects(() => s.tickAdvance(), (e) => (e as { clause?: string }).clause === "SE-C-112");
+  await assert.rejects(() => s.advance(), (e) => (e as { clause?: string }).clause === "SE-C-112");
   checkDocs(s); // the mirror's checkboxes — one per doc version
-  await s.tickAdvance();
+  await s.advance();
   assert.deepEqual(s.active(), ["boot/prepare_idle"]);
-  await s.tickAdvance(); // prepare_idle -> boot's visible end position
+  await s.advance(); // prepare_idle -> boot's visible end position
   assert.deepEqual(s.active(), ["boot/end"]);
-  await s.tickAdvance(); // pop back to main: boot filled, idle
+  await s.advance(); // pop back to main: boot filled, idle
   assert.deepEqual(s.active(), ["idle"]);
   // idle is a hub now: an unnamed advance is refused, the step must choose
-  await assert.rejects(() => s.tickAdvance(), (e) => (e as { clause?: string }).clause === "SE-C-110");
+  await assert.rejects(() => s.advance(), (e) => (e as { clause?: string }).clause === "SE-C-110");
   // a round trip through an (empty) generated container and back
-  await s.tickAdvance("expeditions");
+  await s.advance("expeditions");
   assert.deepEqual(s.active(), ["expeditions/start"]);
-  await s.tickAdvance(); // nothing open: start runs to end
+  await s.advance(); // nothing open: start runs to end
   assert.deepEqual(s.active(), ["expeditions/end"]);
-  await s.tickAdvance(); // pop: filled, back at idle
+  await s.advance(); // pop: filled, back at idle
   assert.deepEqual(s.active(), ["idle"]);
   handOver(root);
-  await s.tickAdvance("end");
+  await s.advance("end");
   assert.equal((s.describe() as { status: string }).status, "closed");
 });
 
 // The packet-shape guarantees the mirror renders from — the exit
 // dictionary, the pulled list without hashes, the preread hints — moved
-// with the packet itself: tickInfo serves the MIRROR now, so its shape is
+// with the packet itself: packet serves the MIRROR now, so its shape is
 // asserted at session level.
 test("the mirror's packet: exit dictionary, pulled docs WITHOUT hashes, preread hints", async () => {
   const s = new Session(freshRoot());
-  await s.tickAdvance(); await s.tickAdvance();
-  const state = (s.tickInfo() as { states: {
+  await s.advance(); await s.advance();
+  const state = (s.packet() as { states: {
     exit?: Record<string, { args: string[] }>;
     pulled?: Record<string, unknown>[];
     lookahead_read?: string[];

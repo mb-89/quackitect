@@ -9,13 +9,13 @@ import { dirname, join } from "node:path";
 import { test } from "node:test";
 import { generateContinueExpedition, generateExpeditionArchive, shortId } from "../engine/expmachine.ts";
 import { Session } from "../engine/session.ts";
-import { checkDocs, freshRoot } from "./helpers.ts";
+import { checkDocs, freshRoot, readEverything } from "./helpers.ts";
 
 async function bootHuman(s: Session): Promise<void> {
   checkDocs(s);
   for (let i = 0; i < 10; i++) {
     if (s.active()[0] === "idle") return;
-    await s.tickAdvance();
+    await s.advance();
   }
   throw new Error("boot did not reach idle");
 }
@@ -53,6 +53,43 @@ test("a declared root survives a bound worktree", async () => {
   rmSync(outside, { recursive: true, force: true });
 });
 
+// THE OFFER MUST NAME A DOOR THE ROUTER CAN RESOLVE (found live 2026-08-02,
+// on the ordinary path into a freshly seeded expedition).
+//
+// Every container test below drives the walk with advance(bare id) — the
+// MIRROR's path, where the person clicks a drawn node. An agent never has
+// that: it answers the pull's own offer. Those two spoke different
+// languages. The offer named "e31" while the route graph only ever holds
+// "expeditions/e31", so the choice validator accepted exactly the string the
+// router then refused as unreachable, and no answer could move the walk.
+test("a container's offered door is answerable — the agent's own path in", async () => {
+  const root = freshRoot();
+  gitSeed(root);
+  const s = new Session(root);
+  await bootHuman(s);
+  const e = s.expeditionNew("fix", "Answerable Thing") as { created: string };
+  const sid = shortId(e.created);
+  s.setAutonomy(1);
+  await s.advance("expeditions");
+  s.setTarget("");
+  const offer = (await s.pull()) as { pull: string; options: { to: string }[] };
+  assert.equal(offer.pull, "choose");
+  const doors = offer.options.map((o) => o.to);
+  const door = doors.find((to) => to === `expeditions/${sid}`);
+  assert.ok(door !== undefined, `the offer names ${JSON.stringify(doors)} — a door has to be said the way the router reads it`);
+  // EVERY door, not only the seeded one. An offer holding a single
+  // unanswerable option is the whole defect, whatever the option is.
+  for (const to of doors) assert.doesNotThrow(() => s.setTarget(to), `offered ${to}, then refused it`);
+  s.setTarget("");
+  await s.pull({ form: { choice: door } });
+  for (let i = 0; i < 3 && s.active()[0] !== `expeditions/${sid}`; i++) {
+    await readEverything(s);
+    await s.pull();
+  }
+  assert.deepEqual(s.active(), [`expeditions/${sid}`], "answering the offer walks in");
+  assert.ok(s.workRoot().includes(e.created), "and binds the worktree, exactly as the click does");
+});
+
 test("empty container: nothing open → start runs straight to end", async () => {
   const root = freshRoot();
   gitSeed(root);
@@ -61,9 +98,9 @@ test("empty container: nothing open → start runs straight to end", async () =>
   assert.deepEqual(gen.decl.states[0].edges.map((e) => e.to), ["end"]);
   const s = new Session(root);
   await bootHuman(s);
-  await s.tickAdvance("expeditions");
+  await s.advance("expeditions");
   assert.deepEqual(s.active(), ["expeditions/start"]);
-  await s.tickAdvance();
+  await s.advance();
   assert.deepEqual(s.active(), ["expeditions/end"]);
 });
 
@@ -87,8 +124,8 @@ test("seeded container: expeditions are the states, entering BINDS, one ending c
 
   // Walk: enter the container, choose B — the click IS the pick, the
   // worktree binds on entry.
-  await s.tickAdvance("expeditions");
-  await s.tickAdvance(sidB);
+  await s.advance("expeditions");
+  await s.advance(sidB);
   assert.deepEqual(s.active(), [`expeditions/${sidB}`]);
   assert.ok(s.workRoot().includes(b.created), "entering bound the worktree");
   // ONE LANE, TWO TREES (owner ruling 2026-07-28). Project content follows the
@@ -99,20 +136,20 @@ test("seeded container: expeditions are the states, entering BINDS, one ending c
   assert.equal(s.laneRoot(".se/HANDOVER.md"), root, "the handover belongs to the root, whatever branch we stand on");
   assert.equal(s.laneRoot(), s.workRoot(), "no path named — the work root, as before");
   // The leave gate holds until the page passes; then close, end, return.
-  await assert.rejects(() => s.tickAdvance(`${sidB}-leave`), (e) => (e as { clause?: string }).clause === "SE-C-112");
+  await assert.rejects(() => s.advance(`${sidB}-leave`), (e) => (e as { clause?: string }).clause === "SE-C-112");
   s.formSave("expedition-leave", { "What was the goal": "second thing", "What was done": "it", "What settled it": "the container test", "What was not done": "nothing" });
   // A PERSON confirms the report; the close then needs no override. The guard
   // itself is tested in editsafety.test.ts — this one is about the archive.
   s.formDone("expedition-leave", "human");
-  await s.tickAdvance(`${sidB}-leave`);
+  await s.advance(`${sidB}-leave`);
   s.expeditionClose(true);
-  await s.tickAdvance();
+  await s.advance();
   assert.deepEqual(s.active(), ["expeditions/end"]);
-  await s.tickAdvance();
+  await s.advance();
   assert.deepEqual(s.active(), ["idle"], "one expedition coming home completes the container");
 
   // Re-entry REGENERATES: only A remains, the drawing starts gray.
-  await s.tickAdvance("expeditions");
+  await s.advance("expeditions");
   assert.deepEqual(s.viewRun("expeditions").done, []);
   const again = s.generatedView("expeditions")!;
   assert.deepEqual(again.decl.states.map((x) => x.id), ["start", sidA, `${sidA}-leave`, "end"]);

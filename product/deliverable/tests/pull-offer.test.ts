@@ -9,7 +9,7 @@
 //
 // THE SIZE: the owner's own question about that batch was how the answer
 // avoids overflowing, and their hint was "maybe not all the details". So
-// steps arrive in full and DETAIL DOES NOT — guidance text rides se_reading,
+// steps arrive in full and DETAIL DOES NOT — guidance text rides the reading,
 // which credits it, and the per-field guidance rides the form itself.
 //
 // Split from pull.test.ts by theme; each case here costs a boot walk. See
@@ -29,7 +29,7 @@ describe("the batch", { concurrency: true }, () => {
     const s = new Session(root());
     s.setAutonomy(1);
     s.setTarget("front_desk");
-    readEverything(s);
+    await readEverything(s);
     const r = (await s.pull()) as Record<string, unknown>;
     assert.equal(r.pull, "do");
     assert.ok((r.walked as string[]).length > 1, `one call walked ${JSON.stringify(r.walked)} — the batch is the point`);
@@ -40,12 +40,12 @@ describe("the batch", { concurrency: true }, () => {
     const s = await sessionAtIdle(root());
     s.setAutonomy(1);
     s.setTarget("front_desk");
-    readEverything(s);
+    await readEverything(s);
     const r = (await s.pull()) as Record<string, unknown>;
     const here = (r.here as Record<string, unknown>[])[0];
     assert.equal(here.id, "front_desk");
     assert.ok(String(here.guidance).length > 0, "the agent needs the guidance to act");
-    assert.equal("pulled" in here, false, "guidance text rides se_reading, which credits it — never the pull");
+    assert.equal("pulled" in here, false, "guidance text rides the reading, never the offer");
   });
 });
 

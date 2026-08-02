@@ -30,7 +30,7 @@ test("initialize and tools/list serve the full lane", async () => {
   ]) {
     assert.ok(names.includes(expected), `missing ${expected}`);
   }
-  assert.ok(!names.includes("se_tick"), "the tick retired 2026-08-02 — its return would mean two walk verbs again");
+  assert.ok(!names.includes("se_tick"), "one walk verb: the pull");
 });
 
 // A RELOAD CAN CHANGE BEHAVIOUR BUT NOT SURFACE, unless the client is told.

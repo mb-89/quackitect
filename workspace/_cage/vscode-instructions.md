@@ -36,9 +36,9 @@ parallel reads fine. The fault is on this side, so serial is what works.
 Stability pattern for VS Code:
 - Keep calls serial. Do not start parallel search/read batches, ever.
 - Keep reads small (offset/limit) to avoid oversized host payloads.
-- When the pull answers `read`, call `se_reading` one call at a time until
-  it answers done, then pull. There are no hashes to carry — the reading
-  credits itself.
+- When the pull answers `read`, the document rides in the answer and
+  `prove` names its last words. Read it, then pull again with
+  `form: {"read": "<those words>"}` to get the next one.
 - If the current state allows no tools, do not read or search there. Pull.
 
 Then report in ONE short message: where you stand, and why you stopped.

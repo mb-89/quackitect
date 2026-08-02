@@ -37,7 +37,7 @@ test("the drawing is data: a state note edited on disk binds the next call, no r
   const after = before.replace(/^priority: 0\.01$/m, "priority: 0.75");
   assert.equal(after.length, before.length, "the edit changes no byte count");
   writeFileSync(notePath, after);
-  const idle = (session.tickInfo() as { states: { id: string; priority: number }[] }).states.find((s) => s.id === "idle");
+  const idle = (session.packet() as { states: { id: string; priority: number }[] }).states.find((s) => s.id === "idle");
   assert.equal(idle?.priority, 0.75, "the running lane reads the edited note");
 });
 
@@ -124,14 +124,14 @@ test("a drawn JOIN synchronizes: a starving join refuses the tick, the walk stan
   const idleNote = join(root, "product", "deliverable", "machines", "states", "idle.md");
   writeFileSync(idleNote, readFileSync(idleNote, "utf8").replace("state_kind: work", "state_kind: join"));
   const session = new Session(root);
-  await session.tickAdvance();
-  await session.tickAdvance();
+  await session.advance();
+  await session.advance();
   checkDocs(session);
-  await session.tickAdvance();
-  await session.tickAdvance();
+  await session.advance();
+  await session.advance();
   assert.deepEqual(session.active(), ["boot/end"]);
   await assert.rejects(
-    () => session.tickAdvance(),
+    () => session.advance(),
     (e) => (e as { clause?: string }).clause === "SE-C-123" && /idle/.test(String((e as { got?: string }).got)),
   );
   assert.deepEqual(session.active(), ["boot/end"], "the wedge guard leaves the walk standing");
@@ -170,12 +170,12 @@ test("the hatch always works: a booted walk escapes to the DESK, ungated, from a
   const root = freshRoot();
   const session = new Session(root);
   const server = buildServer(root, session);
-  await session.tickAdvance();
-  await session.tickAdvance();
+  await session.advance();
+  await session.advance();
   checkDocs(session);
-  await session.tickAdvance();
-  await session.tickAdvance();
-  await session.tickAdvance();
+  await session.advance();
+  await session.advance();
+  await session.advance();
   assert.deepEqual(session.active(), ["idle"]);
   // A legacy strand (empty token set) escapes home — to the desk, with no
   // gate on the way: no slider weighing, no read demand. The reading the
@@ -377,7 +377,7 @@ test("a broken sub-canvas refuses typed at entry; fixing it heals on the next ti
   // exact canvas error, with the offending element named. (The human's
   // read gate stands before it, so the boxes are checked first.)
   checkDocs(session);
-  await assert.rejects(() => session.tickAdvance("ideation"), (e) => (e as { clause?: string }).clause === "SE-C-124");
+  await assert.rejects(() => session.advance("ideation"), (e) => (e as { clause?: string }).clause === "SE-C-124");
   // Fix the drawing; the next pull draws the way again and walks in.
   writeFileSync(p, original);
   const healed = await call(server, "se_pull", {});
