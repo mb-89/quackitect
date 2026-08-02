@@ -8,3 +8,16 @@
 {"ts":"2026-08-02T18:00:25.836Z","op":"update","visit":"expeditions/e32@0","node":"d48","brief":"four regression cases beside the CRLF one"}
 {"ts":"2026-08-02T18:00:46.591Z","op":"update","visit":"expeditions/e32@0","node":"d49","brief":"regression cases staged as a clean exact op"}
 {"ts":"2026-08-02T18:00:53.936Z","op":"update","visit":"expeditions/e32@0","node":"d50","brief":"scoped run over the three files the change touches"}
+{"ts":"2026-08-02T18:01:28.533Z","op":"done","visit":"expeditions/e32@0","node":"d36","brief":"encoding seams unified and pinned by four regressions"}
+{"ts":"2026-08-02T18:01:37.585Z","op":"update","visit":"expeditions/e32@0","node":"d51","brief":"job 2: reworking the SE-C-120 brief lint to apply its split"}
+{"ts":"2026-08-02T18:02:31.982Z","op":"update","visit":"expeditions/e32@0","node":"d52","brief":"reading the update parser before the conversion"}
+{"ts":"2026-08-02T18:02:42.815Z","op":"update","visit":"expeditions/e32@0","node":"d53","brief":"tracing the op to the update_result"}
+{"ts":"2026-08-02T18:02:54.392Z","op":"update","visit":"expeditions/e32@0","node":"d54","brief":"narrowing to the toll call sites"}
+{"ts":"2026-08-02T18:03:02.372Z","op":"update","visit":"expeditions/e32@0","node":"d55","brief":"the parse call site in tools.ts"}
+{"ts":"2026-08-02T18:03:38.143Z","op":"update","visit":"expeditions/e32@0","node":"d56","brief":"reading the lint tests before flipping the behavior"}
+{"ts":"2026-08-02T18:03:47.159Z","op":"update","visit":"expeditions/e32@0","node":"d57","brief":"hunting the lint cases in the other test files"}
+{"ts":"2026-08-02T18:03:57.584Z","op":"update","visit":"expeditions/e32@0","node":"d58","brief":"reading the two lint cases whole"}
+{"ts":"2026-08-02T18:04:10.101Z","op":"update","visit":"expeditions/e32@0","node":"d59","brief":"the second lint case's tail"}
+{"ts":"2026-08-02T18:05:45.339Z","op":"update","visit":"expeditions/e32@0","node":"d60","brief":"the conversion staged across parser and guard and tests and guidance"}
+{"ts":"2026-08-02T18:05:52.398Z","op":"update","visit":"expeditions/e32@0","node":"d61","brief":"scoped run over the decision-graph files"}
+{"ts":"2026-08-02T18:06:12.749Z","op":"done","visit":"expeditions/e32@0","node":"d37","brief":"the update lane applies its own split now"}

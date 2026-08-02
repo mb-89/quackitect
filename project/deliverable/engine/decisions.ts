@@ -31,6 +31,8 @@ export interface DecisionOp {
   op: "plan" | "fork" | "done" | "obsolete" | "revert" | "update" | "defer";
   brief?: string;
   items?: string[];
+  /** Announce-only: what the parser corrected. Stripped before apply, never persisted. */
+  corrected?: string;
   node?: string;
   /** defer only: the state id that can do the point — it arrives there. */
   to?: string;
@@ -212,27 +214,50 @@ export function parseUpdate(v: unknown): DecisionOp {
   if (op === "update" && (brief === undefined || brief.trim() === "")) throw malformed("update without brief");
   // THE RENDER LINT (owner ruling 2026-07-27): the lane refuses what would
   // render weird — mechanically, at the boundary.
+  //
+  // THE CHAIN IS CORRECTED, NOT REFUSED (owner ruling 2026-08-02: correct
+  // the mechanical, announce it, refuse only the ambiguous). This was the
+  // lane's most-hit refusal — 174 of one window's 505 failures — and the
+  // refusal already computed the split it then threw away. Narration that
+  // chains is APPLIED as the plan it wanted to be; a chained item becomes
+  // the items it listed. A RESOLUTION's brief still refuses: which part
+  // resolved the node is not the engine's to guess.
+  const chainOf = (text: string): string[] | null => {
+    const raw = text.split(/[,;]/);
+    if (raw.length < 3) return null;
+    const parts = raw.map((p) => p.trim()).filter((p) => p !== "");
+    return parts.length >= 2 ? parts : null;
+  };
+  let opOut = op as DecisionOp["op"];
+  let briefOut = brief;
+  let itemsOut = items;
+  let corrected: string | undefined;
+  if (opOut === "update" && briefOut !== undefined) {
+    const parts = chainOf(briefOut);
+    if (parts !== null) {
+      opOut = "plan";
+      itemsOut = parts;
+      briefOut = undefined;
+      corrected = `narration landed as a plan — a chain is a list, and its parts are the items: [${parts.map((p) => JSON.stringify(p)).join(", ")}]`;
+    }
+  }
+  if (itemsOut !== undefined && itemsOut.some((it) => chainOf(it) !== null)) {
+    itemsOut = itemsOut.flatMap((it) => chainOf(it) ?? [it]);
+    corrected = corrected ?? "a chained item was split into the items it listed";
+  }
   const lintLine = (text: string, what: string): void => {
     if (/[\r\n]/.test(text)) throw malformed(`${what} carries line breaks — one line only. Got ${JSON.stringify(text)}`);
     if (text.length > 90) throw malformed(`${what} is ${text.length} chars — the feed renders 90; tighten it. Got ${JSON.stringify(text)}`);
-    // THE LANE'S MOST-HIT REFUSAL. Ten of thirteen update failures in one
-    // day were this one, across two sessions. It refused correctly and named
-    // neither the text nor the parts, so the caller guessed — and guessed
-    // wrong often enough to hit it again on the very next call.
-    //
-    // The parts ARE the remedy, so they are written out. A chain that wanted
-    // to be a list is handed back as that list.
-    const raw = text.split(/[,;]/);
-    if (raw.length >= 3) {
-      const parts = raw.map((p) => p.trim()).filter((p) => p !== "");
-      throw malformed(`${what} chains ${raw.length} separator-joined parts — an unrendered list. Got ${JSON.stringify(text)} — as a plan that is items: [${parts.map((p) => JSON.stringify(p)).join(", ")}]`);
+    const parts = chainOf(text);
+    if (parts !== null) {
+      throw malformed(`${what} chains ${parts.length} separator-joined parts — an unrendered list. Got ${JSON.stringify(text)} — as a plan that is items: [${parts.map((p) => JSON.stringify(p)).join(", ")}]`);
     }
   };
-  if (brief !== undefined) lintLine(brief, "brief");
+  if (briefOut !== undefined) lintLine(briefOut, "brief");
   // WHICH item, not just "an item". A five-item plan refused on "item" left
   // the caller re-reading all five to find the one that tripped.
-  (items ?? []).forEach((it, i) => lintLine(it, `item ${i + 1}`));
-  return { op: op as DecisionOp["op"], ...(brief !== undefined ? { brief } : {}), ...(items !== undefined ? { items } : {}), ...(node !== undefined ? { node } : {}), ...(to !== undefined ? { to } : {}) };
+  (itemsOut ?? []).forEach((it, i) => lintLine(it, `item ${i + 1}`));
+  return { op: opOut, ...(briefOut !== undefined ? { brief: briefOut } : {}), ...(itemsOut !== undefined ? { items: itemsOut } : {}), ...(node !== undefined ? { node } : {}), ...(to !== undefined ? { to } : {}), ...(corrected !== undefined ? { corrected } : {}) };
 }
 
 export class Decisions {

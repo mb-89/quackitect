@@ -1012,10 +1012,10 @@ export function buildServer(root: string, session = new Session(root), tollOpts:
     const raw = args.update;
     delete args.update;
     try {
-      const op = parseUpdate(raw);
+      const { corrected, ...op } = parseUpdate(raw);
       const visit = session.currentVisit();
       const result = session.decisions.apply(visit, op);
-      updateResult = result as unknown as Record<string, unknown>;
+      updateResult = { ...(result as unknown as Record<string, unknown>), ...(corrected !== undefined ? { corrected } : {}) };
       log.append({ tool: "se_update", args: { via: tool, visit, ...op }, ok: true, outcome: "result", duration_ms: 0, response: result });
       toll.paid();
     } catch (e) {

@@ -99,10 +99,11 @@ the rhythm; the log should tell the story without gaps.
   required while a checklist stands — an update floating free of every item is
   narration wearing progress's clothes. With nothing open, a bare update is
   right.
-- THE BRIEF IS ONE LINE, 90 characters, and may not chain three or more
-  separator-joined parts — that is an unrendered list and SE-C-120 refuses it.
-  This is the lane's most-hit refusal. If a brief wants commas, it wanted to
-  be a plan.
+- THE BRIEF IS ONE LINE, 90 characters. A brief that chains three or more
+  separator-joined parts wanted to be a plan, and the engine APPLIES it as
+  one — the parts become the items, and the result names the correction. A
+  RESOLUTION's chained brief still refuses (SE-C-120): which part resolved
+  the node is not the engine's to guess.
 
 HOW OFTEN IS THE PERSON'S CONTROL, on the mirror's bar. Five notches, both
 clocks running — minutes and calls, whichever falls due first. A low notch is
