@@ -23,7 +23,7 @@ import { parseStateNote } from "./notes.ts";
 import { expList, readRecord } from "./worktree.ts";
 import { survey } from "./survey.ts";
 import { itList, readItRecord } from "./iterations.ts";
-import { capJson } from "./jsonio.ts";
+import { capJson, capMiddle } from "./jsonio.ts";
 import { McpServer, type ToolDef } from "./mcp.ts";
 import { gitLand, gitLane, gitSync } from "./gitlane.ts";
 import { fileMove } from "./move.ts";
@@ -554,7 +554,17 @@ export function coreTools(rootOf: (rel?: string) => string, projectRoot: string,
               ...cwd,
               ...(args.handoff_ms !== undefined ? { handoff_ms: Number(args.handoff_ms) } : {}),
             });
-        return laneWarning === undefined ? res : { ...(res as unknown as Record<string, unknown>), lane_warning: laneWarning };
+        // A TRUNCATING PIPE CUTS BEFORE THE ENGINE SEES. What Select-Object
+        // -First dropped exists NOWHERE — not here, not in the log. The note
+        // rides at the moment of risk; a marker after the fact costs nothing
+        // and once turned "(425.501917ms)" read from a shaped slice into a
+        // confidently wrong 425 SECONDS.
+        const shaped = /select-object\s+-(first|last|skip)|(^|[;|&(\s])(head|tail)\s+-|\bcut\s+-c|\bmeasure-object\b/i.test(String(args.command));
+        const extra = {
+          ...(laneWarning !== undefined ? { lane_warning: laneWarning } : {}),
+          ...(shaped ? { output_shaped: "a truncating pipe shaped this output BEFORE capture — what it dropped exists nowhere. Trust ends and totals only from unshaped output (se_test is structured; se_log_query serves full se_run output by ref)." } : {}),
+        };
+        return Object.keys(extra).length === 0 ? res : { ...(res as unknown as Record<string, unknown>), ...extra };
       },
     },
     {
@@ -616,7 +626,7 @@ export function coreTools(rootOf: (rel?: string) => string, projectRoot: string,
           // A long green streak carries the owner's law back with the result:
           // in ~95% of cases the change broke nothing; test to answer a
           // question, not to reassure.
-          return { ok, scope: { files, ...(args.name_pattern !== undefined ? { name_pattern: String(args.name_pattern) } : {}) }, tests: { total: tap.total, pass: tap.pass, fail: tap.fail }, ...(tap.failures.length > 0 ? { failures: tap.failures } : {}), ...(nudge !== undefined ? { green_streak: streak, nudge } : {}), ...(r.status !== 0 && tap.total === 0 ? { output: r.out.trim().slice(0, 4000) } : {}) };
+          return { ok, scope: { files, ...(args.name_pattern !== undefined ? { name_pattern: String(args.name_pattern) } : {}) }, tests: { total: tap.total, pass: tap.pass, fail: tap.fail }, ...(tap.failures.length > 0 ? { failures: tap.failures } : {}), ...(nudge !== undefined ? { green_streak: streak, nudge } : {}), ...(r.status !== 0 && tap.total === 0 ? { output: capMiddle(r.out.trim(), 4000) } : {}) };
         }
         // The battery: EARNED, not habitual. The gate computes the scoped
         // remedy from the diff since the last green battery.
@@ -629,7 +639,7 @@ export function coreTools(rootOf: (rel?: string) => string, projectRoot: string,
           // The battery is long BY DESIGN now that boot walks read real
           // guidance — 150s killed it mid-run. Configurable, generous default.
           const r = await spawnNode([abs, "--root", root], Number(process.env.SE_TEST_TIMEOUT_MS ?? 600_000));
-          results.push({ script: rel, ok: r.status === 0, exit: r.status, output: r.out.trim().slice(0, 4000) });
+          results.push({ script: rel, ok: r.status === 0, exit: r.status, output: capMiddle(r.out.trim(), 4000) });
         }
         const ok = results.every((x) => x.ok);
         // The verdict is REMEMBERED with the tree it judged, so an identical

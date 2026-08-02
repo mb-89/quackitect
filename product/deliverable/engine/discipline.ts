@@ -24,6 +24,7 @@ import { existsSync, mkdirSync, readdirSync, readFileSync, statSync, writeFileSy
 import { join } from "node:path";
 import { CLAUSES, Rejection } from "./errors.ts";
 import { contentHash } from "./hash.ts";
+import { capMiddle } from "./jsonio.ts";
 
 const SRC = "engine/discipline.ts";
 
@@ -225,6 +226,8 @@ export function testFingerprint(root: string): string {
       parts.push("gone");
     }
   }
+  // THE SEPARATOR STAYS AN ESCAPE. Written raw it costs this whole file its
+  // searchability, and the re-cut patch carried the raw byte back in.
   return contentHash(parts.join("\0"));
 }
 
@@ -474,7 +477,7 @@ export function parseTap(out: string): TapResult {
       if (/^(not )?ok \d+ - /.test(l) || /^# /.test(l)) break;
       detail.push(l);
     }
-    res.failures.push({ name: notOk[1], detail: detail.join("\n").slice(0, 2000) });
+    res.failures.push({ name: notOk[1], detail: capMiddle(detail.join("\n"), 2000) });
   }
   return res;
 }

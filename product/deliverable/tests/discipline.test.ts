@@ -492,3 +492,27 @@ test("the streak counts consecutive greens per scope and a red resets it", () =>
   assert.equal(testRecord(se, root, true, "s1", ["f1"]), 1);
   rmSync(root, { recursive: true, force: true });
 });
+
+// ── the cut law ────────────────────────────────────────────────────────────
+// CUT THE MIDDLE, NEVER THE END (owner law 2026-08-02). Incident: a
+// head-only cap turned "(425.501917ms)" into "(425.501", the unit died with
+// the tail, and milliseconds were diagnosed as seconds — three documents
+// carried the wrong number before the owner caught it. The end of an output
+// is where verdicts live: exit codes, totals, closing units.
+import { capMiddle } from "../engine/jsonio.ts";
+
+test("capMiddle keeps both ends — the tail's unit survives any cap", () => {
+  const out = "x".repeat(9000) + " tests 425 pass 424 fail 1 duration (425.501917ms)";
+  const capped = capMiddle(out, 1000);
+  assert.ok(capped.length < 1300, "capped near the budget");
+  assert.ok(capped.includes("(425.501917ms)"), "the END survives — the unit cannot be eaten");
+  assert.ok(capped.includes("chars cut"), "the cut names itself");
+  assert.equal(capMiddle("short", 1000), "short", "under budget passes untouched");
+});
+
+test("capMiddle backs off to whitespace — no token is ever split", () => {
+  const words = Array.from({ length: 800 }, (_, i) => `word${i}`).join(" ");
+  const capped = capMiddle(words, 500);
+  const head = capped.split("\n")[0];
+  assert.ok(/word\d+$/.test(head.trim()), `the head ends on a whole token: …${head.slice(-20)}`);
+});

@@ -38,6 +38,32 @@ if (process.env.SE_SELFTEST_SKIP === "1") {
 const root = resolve(argValue("--root") ?? process.cwd());
 const failures: string[] = [];
 
+// A RAW NUL MAKES A WHOLE FILE INVISIBLE TO SEARCH, and says nothing about
+// it. ripgrep calls the file binary and reports it unreadable, so a searcher
+// reasons from a hole. Twice in four days, both times in engine sources, both
+// times as a hash separator written raw instead of as the escape.
+//
+// The lane's write doors correct it at the source now, so an agent cannot
+// make one. A file can still ARRIVE without passing through them — git apply
+// brought the last one in, and the extension and the generators write
+// directly too. The battery already catches it, but only when someone runs
+// the battery. This speaks at boot, which is the next time anybody looks.
+const scanForNul = (dir: string): void => {
+  for (const e of existsSync(dir) ? readdirSync(dir, { withFileTypes: true }) : []) {
+    const p = join(dir, e.name);
+    if (e.isDirectory()) {
+      if (e.name !== "node_modules") scanForNul(p);
+      continue;
+    }
+    if (!e.name.endsWith(".ts") && !e.name.endsWith(".js")) continue;
+    if (readFileSync(p).includes(0)) {
+      failures.push(`${p} carries a raw NUL byte — every lane search over this file answers nothing. Write the separator as the escape \\0.`);
+    }
+  }
+};
+scanForNul(join(root, "product", "deliverable", "engine"));
+scanForNul(join(root, "product", "deliverable", "vscode"));
+
 const machinesDir = join(root, "product", "deliverable", "machines");
 const decls: MachineDecl[] = [];
 for (const f of existsSync(machinesDir) ? readdirSync(machinesDir) : []) {

@@ -4,6 +4,7 @@
 // state machine lands, run legality becomes a per-state decision.
 import { spawn, type ChildProcess } from "node:child_process";
 import { CLAUSES, Rejection } from "./errors.ts";
+import { capMiddle } from "./jsonio.ts";
 import { resolveInRoot } from "./paths.ts";
 
 export interface RunResult {
@@ -86,7 +87,7 @@ const jobs = new Map<string, Job>();
 let jobSeq = 0;
 
 function view(j: Job): JobView {
-  const cap = (s: string): string => (s.length > OUT_CAP ? `${s.slice(0, OUT_CAP)}…[+${s.length - OUT_CAP} chars]` : s);
+  const cap = (s: string): string => capMiddle(s, OUT_CAP);
   return {
     job: j.id,
     command: j.command,
@@ -278,7 +279,7 @@ export async function run(root: string, command: string, opts: { timeout_ms?: nu
       source: "engine/run.ts",
     });
   }
-  const cap = (s: string): string => (s.length > OUT_CAP ? `${s.slice(0, OUT_CAP)}…[+${s.length - OUT_CAP} chars — full output in the call log]` : s);
+  const cap = (s: string): string => capMiddle(s, OUT_CAP);
   return {
     command,
     exit: r.status,
