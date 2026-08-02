@@ -1,0 +1,10 @@
+{"ts":"2026-08-02T17:56:52.697Z","op":"plan","visit":"expeditions/e32@0","parent":null,"nodes":[{"id":"d36","brief":"job 1: unify the range splitter with the reader and sweep BOM seams"},{"id":"d37","brief":"job 2: the update lane applies its own SE-C-120 split"},{"id":"d38","brief":"job 3: cut the test pain end to end"},{"id":"d39","brief":"job 4: the small lane fixes"},{"id":"d40","brief":"job 5: the VS Code shell fixes"},{"id":"d41","brief":"verify and land and re-drain the parked notes"}]}
+{"ts":"2026-08-02T17:57:01.950Z","op":"update","visit":"expeditions/e32@0","node":"d42","brief":"pinning the reader splitter and the eol helpers"}
+{"ts":"2026-08-02T17:57:09.318Z","op":"update","visit":"expeditions/e32@0","node":"d43","brief":"hunting the helpers with a wider net"}
+{"ts":"2026-08-02T17:57:34.840Z","op":"update","visit":"expeditions/e32@0","node":"d44","brief":"reading the four seams before the unifying patch"}
+{"ts":"2026-08-02T17:59:33.429Z","op":"update","visit":"expeditions/e32@0","node":"d45","brief":"the unifying patch is staged across five seams in files.ts"}
+{"ts":"2026-08-02T17:59:43.211Z","op":"update","visit":"expeditions/e32@0","node":"d46","brief":"locating the patch test harness"}
+{"ts":"2026-08-02T17:59:51.287Z","op":"update","visit":"expeditions/e32@0","node":"d47","brief":"reading the harness to extend it"}
+{"ts":"2026-08-02T18:00:25.836Z","op":"update","visit":"expeditions/e32@0","node":"d48","brief":"four regression cases beside the CRLF one"}
+{"ts":"2026-08-02T18:00:46.591Z","op":"update","visit":"expeditions/e32@0","node":"d49","brief":"regression cases staged as a clean exact op"}
+{"ts":"2026-08-02T18:00:53.936Z","op":"update","visit":"expeditions/e32@0","node":"d50","brief":"scoped run over the three files the change touches"}
