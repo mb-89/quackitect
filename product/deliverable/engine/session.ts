@@ -668,11 +668,13 @@ export class Session {
 
   expeditionNew(kind: string, goal: string): Record<string, unknown> {
     const e = expNew(this.root, kind, goal);
+    this.bumpGeneration(); // a new record changes what the container expands to
     return { created: e.id, branch: e.branch, note: "it stands in the expeditions container — enter there to work" };
   }
 
   iterationSeed(goal: string, vision: string, inputs: string[] = []): Record<string, unknown> {
     const it = itSeed(this.root, goal, vision, inputs);
+    this.bumpGeneration(); // a new record changes what the container expands to
     return { seeded: it.id, branch: it.branch, note: "it stands in the iterations container as its kickoff" };
   }
 
@@ -1111,6 +1113,18 @@ export class Session {
     if (here === aim) this._target = "";
   }
 
+  /** What the route search can see, beyond file content. Bumped wherever the
+   *  walk's shape changes for a reason no drawing records: a record seeded, a
+   *  worktree bound or released. */
+  private generation = 0;
+  private routeMemo?: { key: string; machine: MachineDecl; value: ReturnType<Session["route"]> };
+
+  /** Every door that can change what a generated container expands to. */
+  bumpGeneration(): void {
+    this.generation++;
+    this.routeMemo = undefined;
+  }
+
   /** Aim the walk somewhere else. Setting a target moves nothing — it says
    *  where the way is drawn to. An unreachable one is refused rather than
    *  stored, so the blue line never points at nowhere.
@@ -1160,6 +1174,21 @@ export class Session {
     stops_at?: { at: string; why: string };
   } {
     const from = this.active()[0] ?? this.machine.initial;
+    // THE ROUTE IS RECOMPUTED, NEVER RE-DERIVED (measured 2026-08-02: 200 ms
+    // a call, and readingList asks for it on EVERY pull). Draining eight
+    // documents therefore paid it nine times without one input changing.
+    //
+    // The key is everything the search can see. The machine is compared by
+    // IDENTITY, which is safe because compileMachineCached returns the same
+    // object while the drawing's CONTENT is unchanged — so an edited canvas
+    // misses the memo, and the truth stays read live. `generation` covers what
+    // no file content can: a record seeded or a worktree bound changes what a
+    // generated container expands to.
+    const memoKey = `${from} ${target} ${this._autonomy} ${this.subs.map((s) => s.decl.id).join("/")} ${this.generation}`;
+    const machineNow = this.machine;
+    if (this.routeMemo !== undefined && this.routeMemo.key === memoKey && this.routeMemo.machine === machineNow) {
+      return this.routeMemo.value;
+    }
     // A SUBMACHINE IS NAMED BY ITS CONTAINER, but the search graph never holds
     // that name: expandNode replaces the container with its inner states. So
     // aiming at "expeditions" found no path to a state the reader had just
@@ -1207,7 +1236,7 @@ export class Session {
       // there joins the list — the handover usually is not.
       for (const p of this.consumeDemand(st)) reads.add(p);
     }
-    return {
+    const value = {
       ...r,
       from,
       autonomy: this._autonomy,
@@ -1215,6 +1244,8 @@ export class Session {
       reads: [...reads].sort(),
       ...(judgments.length > 0 ? { stops_at: { at: judgments[0].at, why: judgments[0].why } } : {}),
     };
+    this.routeMemo = { key: memoKey, machine: machineNow, value };
+    return value;
   }
 
   /** The whole way's reading list, for the packet to carry unasked.

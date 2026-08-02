@@ -317,11 +317,25 @@ export async function bootedServer(root: string): Promise<Server> {
  *  expects a refusal drives the pull itself. */
 export async function pullTo(session: Session, state: string): Promise<void> {
   session.setTarget(state);
-  for (let i = 0; i < 6; i++) {
+  // ARRIVAL IS WHERE THE WALK STANDS, never which call happened to carry it.
+  // readEverything pulls until the answer is not `read`, so it SWALLOWS the
+  // `do` that did the walking. Asking the next pull to prove the arrival then
+  // fails on a walk that already succeeded: the target cleared itself on
+  // arrival, so that pull correctly offers doors instead.
+  //
+  // A container is aimed at by its own name and lands on its start, so
+  // standing inside it counts as being there.
+  const arrived = (): boolean => {
+    const here = session.active()[0] ?? "";
+    return here === state || here.startsWith(`${state}/`);
+  };
+  for (let i = 0; i < 8; i++) {
+    if (arrived()) return;
     await readEverything(session);
-    const r = (await session.pull()) as { pull?: string; arrived?: boolean };
+    if (arrived()) return;
+    const r = (await session.pull()) as { pull?: string };
+    if (arrived()) return;
     if (r.pull === "read") continue;
-    if (r.pull === "do" && r.arrived === true) return;
     throw new Error(`the pull did not walk: ${JSON.stringify(r)}`);
   }
   throw new Error("the reading never drained");

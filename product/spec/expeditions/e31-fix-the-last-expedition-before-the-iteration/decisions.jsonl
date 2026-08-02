@@ -76,3 +76,25 @@
 {"ts":"2026-08-02T15:01:40.424Z","op":"done","visit":"expeditions/e31@0","node":"d6","brief":"the rulings are folded and the parcel is gone"}
 {"ts":"2026-08-02T15:01:58.311Z","op":"done","visit":"expeditions/e31@0","node":"d5","brief":"twelve drained; the rest is judgment the retro owns"}
 {"ts":"2026-08-02T15:02:54.331Z","op":"update","visit":"expeditions/e31@1","node":"d78","brief":"the env-guard trap becomes a rule, not one note"}
+{"ts":"2026-08-02T15:08:34.050Z","op":"plan","visit":"expeditions/e31@1","parent":null,"nodes":[{"id":"d79","brief":"measure the real boot cost instead of quoting one"},{"id":"d80","brief":"find what the time is actually spent on"},{"id":"d81","brief":"check whether I broke worktree.test.ts"},{"id":"d82","brief":"make a booted session reusable"}]}
+{"ts":"2026-08-02T15:09:49.077Z","op":"update","visit":"expeditions/e31@1","node":"d83","brief":"building a bench that can be re-run"}
+{"ts":"2026-08-02T15:10:09.767Z","op":"update","visit":"expeditions/e31@1","node":"d84","brief":"the bench times each stage of a boot walk"}
+{"ts":"2026-08-02T15:10:17.048Z","op":"update","visit":"expeditions/e31@1","node":"d85","brief":"running the bench"}
+{"ts":"2026-08-02T15:10:34.825Z","op":"update","visit":"expeditions/e31@1","node":"d86","brief":"a failed git spawn is itself part of the cost"}
+{"ts":"2026-08-02T15:10:42.068Z","op":"done","visit":"expeditions/e31@1","node":"d79","brief":"battery 130s and boot.test 50s, both measured here"}
+{"ts":"2026-08-02T15:11:22.750Z","op":"update","visit":"expeditions/e31@1","node":"d87","brief":"reading and walking are different costs"}
+{"ts":"2026-08-02T15:11:39.533Z","op":"update","visit":"expeditions/e31@1","node":"d88","brief":"the decisive comparison: smoke test on and off"}
+{"ts":"2026-08-02T15:12:18.492Z","op":"update","visit":"expeditions/e31@1","node":"d89","brief":"the pull is 9ms; the reading is 5.4s"}
+{"ts":"2026-08-02T15:12:44.704Z","op":"update","visit":"expeditions/e31@1","node":"d90","brief":"isolating the route from the rest of the pull"}
+{"ts":"2026-08-02T15:12:56.319Z","op":"update","visit":"expeditions/e31@1","node":"d91","brief":"timing the route in isolation"}
+{"ts":"2026-08-02T15:13:36.731Z","op":"update","visit":"expeditions/e31@1","node":"d92","brief":"route is 200ms and never cached"}
+{"ts":"2026-08-02T15:14:36.262Z","op":"update","visit":"expeditions/e31@1","node":"d93","brief":"memoising the route on everything the search can see"}
+{"ts":"2026-08-02T15:15:13.140Z","op":"update","visit":"expeditions/e31@1","node":"d94","brief":"storing the memo at the route's return"}
+{"ts":"2026-08-02T15:15:28.423Z","op":"update","visit":"expeditions/e31@1","node":"d95","brief":"the memo is stored and invalidated on a seed"}
+{"ts":"2026-08-02T15:15:40.290Z","op":"update","visit":"expeditions/e31@1","node":"d96","brief":"measuring the memo"}
+{"ts":"2026-08-02T15:16:12.465Z","op":"update","visit":"expeditions/e31@1","node":"d97","brief":"regression check across the walk suites"}
+{"ts":"2026-08-02T15:16:43.159Z","op":"update","visit":"expeditions/e31@1","node":"d98","brief":"reading the regression output plainly"}
+{"ts":"2026-08-02T15:17:25.733Z","op":"update","visit":"expeditions/e31@1","node":"d99","brief":"reading the escape test to place the blame honestly"}
+{"ts":"2026-08-02T15:18:36.602Z","op":"update","visit":"expeditions/e31@1","node":"d100","brief":"pullTo checks the position, not the messenger"}
+{"ts":"2026-08-02T15:18:45.066Z","op":"update","visit":"expeditions/e31@1","node":"d101","brief":"re-running the walk suites with boot included"}
+{"ts":"2026-08-02T15:19:16.270Z","op":"done","visit":"expeditions/e31@1","node":"d81","brief":"worktree passes; the two left are the baseline's"}
