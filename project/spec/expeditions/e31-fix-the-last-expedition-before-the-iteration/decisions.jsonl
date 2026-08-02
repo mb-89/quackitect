@@ -239,3 +239,5 @@
 {"ts":"2026-08-02T16:27:03.868Z","op":"update","visit":"expeditions/e31@1","node":"d247","brief":"waiting on the battery"}
 {"ts":"2026-08-02T16:27:48.733Z","op":"update","visit":"expeditions/e31@1","node":"d248","brief":"seeing what stands uncommitted on trunk"}
 {"ts":"2026-08-02T16:28:08.535Z","op":"update","visit":"expeditions/e31@1","node":"d249","brief":"the other agent's parcel is committed on trunk"}
+{"ts":"2026-08-02T16:28:51.608Z","op":"update","visit":"expeditions/e31@1","node":"d250","brief":"merging trunk in to settle the overlap"}
+{"ts":"2026-08-02T16:29:03.124Z","op":"update","visit":"expeditions/e31@1","node":"d251","brief":"the deletion wins; its content is worked in"}
