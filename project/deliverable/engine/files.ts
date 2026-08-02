@@ -433,14 +433,13 @@ export function fileReplace(
     rx.lastIndex = 0;
     const hits = [...current.matchAll(rx)];
     if (hits.length === 0) continue;
-    const eol = eolOf(current);
-    const before = current.split(eol);
+    const before = current.split("\n");
     const next = current.replace(rx, replacement);
-    const after = next.split(eol);
+    const after = next.split("\n");
     // The line a match sits on, from its offset — so a report names the place
     // a reader can open, not just the file.
     for (const h of hits) {
-      const line = current.slice(0, h.index ?? 0).split(eol).length;
+      const line = current.slice(0, h.index ?? 0).split("\n").length;
       total++;
       if (places.length < PLACES_LIMIT) {
         places.push({ path: rel, line, before: (before[line - 1] ?? "").trim(), after: (after[line - 1] ?? "").trim() });
@@ -565,9 +564,9 @@ export function filePatch(root: string, ops: PatchOp[]): PatchResult {
       }
     }
     const abs = mustExist(root, op.path, SRC);
-    const current = contents.get(abs) ?? readFileSync(abs, "utf8");
+    const raw = contents.get(abs) ?? readFileSync(abs, "utf8");
     if (op.base_hash !== undefined && contents.get(abs) === undefined) {
-      const disk = contentHash(current);
+      const disk = contentHash(raw);
       if (disk !== op.base_hash) {
         throw new Rejection({
           clause: CLAUSES.CAS_MISMATCH,
@@ -578,6 +577,12 @@ export function filePatch(root: string, ops: PatchOp[]): PatchResult {
         });
       }
     }
+    // AN INVISIBLE BYTE-ORDER MARK IS AN ENCODING FACT, NOT CONTENT. It is
+    // preserved at the front of the file, ignored for matching on both
+    // sides, and a prepend lands after it rather than burying it mid-file.
+    const bom = raw.startsWith("﻿") ? "﻿" : "";
+    const current = bom === "" ? raw : raw.slice(1);
+    if (bom !== "") corrected.push(`op ${i + 1}: ${op.path} carries a UTF-8 byte-order mark — preserved, and ignored for matching`);
     const eol = eolOf(current);
     let next: string;
     let replacements: number;
@@ -612,7 +617,11 @@ export function filePatch(root: string, ops: PatchOp[]): PatchResult {
       if (eol === "\r\n" && (op.new_string as string) !== piece) corrected.push(`op ${i + 1}: the text was converted to CRLF — this file's convention`);
       replacements = 1;
     } else if (kind === "range") {
-      const lines = current.split(eol);
+      // Lines are counted the way the READER numbers them — split on \n,
+      // whatever each line's ending. Splitting on the file's dominant EOL
+      // let one stray CRLF in an LF file collapse the count to 2, and the
+      // refusal then described a file that does not exist.
+      const lines = current.split("\n");
       const { from_line: from, to_line: to } = op.at as { from_line: number; to_line: number };
       if (!(Number.isInteger(from) && Number.isInteger(to) && from >= 1 && to >= from && to <= lines.length)) {
         throw new Rejection({
@@ -623,11 +632,17 @@ export function filePatch(root: string, ops: PatchOp[]): PatchResult {
           source: SRC,
         });
       }
-      lines.splice(from - 1, to - from + 1, ...toEol(op.new_string as string, eol).split(eol));
-      next = lines.join(eol);
+      const newParts = toEol(op.new_string as string, eol).split("\n");
+      // The seam after the range mirrors the replaced last line's own ending.
+      if (lines[to - 1].endsWith("\r")) newParts[newParts.length - 1] += "\r";
+      if (/\r\n/.test(current) && /(^|[^\r])\n/.test(current)) {
+        corrected.push(`op ${i + 1}: ${op.path} mixes CRLF and LF — lines were counted the way the reader numbers them`);
+      }
+      lines.splice(from - 1, to - from + 1, ...newParts);
+      next = lines.join("\n");
       replacements = 1;
     } else {
-      let oldStr = op.old_string as string;
+      let oldStr = (op.old_string as string).replace(/^﻿/, "");
       let newStr = op.new_string as string;
       let count = current.split(oldStr).length - 1;
       // THE ENGINE CORRECTS WHAT IS MECHANICAL AND SAYS SO (owner ruling
@@ -676,8 +691,8 @@ export function filePatch(root: string, ops: PatchOp[]): PatchResult {
       next = op.replace_all === true ? current.split(oldStr).join(newStr) : current.replace(oldStr, newStr);
       replacements = op.replace_all === true ? count : 1;
     }
-    contents.set(abs, next);
-    staged.push({ abs, path: op.path, next, replacements });
+    contents.set(abs, bom + next);
+    staged.push({ abs, path: op.path, next: bom + next, replacements });
   }
   // All guards passed — write.
   const byFile = new Map<string, { path: string; next: string; replacements: number }>();

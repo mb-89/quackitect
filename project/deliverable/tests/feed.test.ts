@@ -3,7 +3,7 @@
 // per-state decision tree; the toll forces narration only after a lapse and
 // one ignored warning. No ETA anywhere — timestamps are the engine's.
 import { strict as assert } from "node:assert";
-import { mkdirSync, mkdtempSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { test } from "node:test";
@@ -103,8 +103,9 @@ test("se_note is legal in EVERY state — a stray is captured where it strikes",
 test("the render lint: the update lane refuses what renders weird", () => {
   assert.throws(() => parseUpdate({ op: "update", brief: "line one\nline two" }), (e) => (e as { clause?: string }).clause === "SE-C-120");
   assert.throws(() => parseUpdate({ op: "update", brief: "x".repeat(91) }), (e) => (e as { clause?: string }).clause === "SE-C-120");
-  assert.throws(() => parseUpdate({ op: "update", brief: "one, two, three" }), (e) => (e as { clause?: string }).clause === "SE-C-120");
-  assert.throws(() => parseUpdate({ op: "plan", items: ["fine", "also fine, still fine, too many"] }), (e) => (e as { clause?: string }).clause === "SE-C-120");
+  // A RESOLUTION'S chain still refuses — which part resolved the node is
+  // not the engine's to guess.
+  assert.throws(() => parseUpdate({ op: "done", node: "d1", brief: "one, two, three" }), (e) => (e as { clause?: string }).clause === "SE-C-120");
   const ok = parseUpdate({ op: "update", brief: "short and clean — two parts, fine" });
   assert.equal(ok.op, "update");
   // defer demands node AND to.
@@ -113,10 +114,24 @@ test("the render lint: the update lane refuses what renders weird", () => {
   assert.equal(d.to, "idle");
 });
 
-// THE MOST-HIT REFUSAL IN THE LANE, so its WORDS are held to account here.
-// Refusing correctly while saying neither which text nor which parts is how
-// a caller hits the same wall twice in a row.
-test("the render lint hands back the list the chain wanted to be", () => {
+// THE MOST-HIT REFUSAL BECAME A CORRECTION (owner ruling 2026-08-02). The
+// engine computed the split and threw it away — 174 refusals in one window.
+// Narration that chains IS the plan it wanted to be, applied and announced.
+test("a chained update brief is applied as the plan it wanted to be", () => {
+  const r = parseUpdate({ op: "update", brief: "one, two, three" });
+  assert.equal(r.op, "plan");
+  assert.deepEqual(r.items, ["one", "two", "three"]);
+  assert.equal(r.brief, undefined);
+  assert.match(String(r.corrected), /landed as a plan/, "the conversion is announced, never silent");
+});
+
+test("a chained plan item is split into the items it listed", () => {
+  const r = parseUpdate({ op: "plan", items: ["fine", "fine too", "a, b, c"] });
+  assert.deepEqual(r.items, ["fine", "fine too", "a", "b", "c"]);
+  assert.match(String(r.corrected), /split/, "announced");
+});
+
+test("the render lint still quotes what it refuses", () => {
   const got = (fn: () => unknown): string => {
     try {
       fn();
@@ -126,21 +141,38 @@ test("the render lint hands back the list the chain wanted to be", () => {
     throw new Error("expected a refusal");
   };
 
-  const chain = got(() => parseUpdate({ op: "update", brief: "one, two, three" }));
+  const chain = got(() => parseUpdate({ op: "done", node: "d1", brief: "one, two, three" }));
   assert.match(chain, /one, two, three/, "the offending text is quoted back");
   assert.match(chain, /items:/, "and the remedy is named");
   for (const part of ["one", "two", "three"]) {
     assert.match(chain, new RegExp(`"${part}"`), `${part} comes back as its own item`);
   }
 
-  // WHICH item. A five-item plan refused on a bare "item" left the caller
-  // re-reading all five to find the one that tripped.
-  const item = got(() => parseUpdate({ op: "plan", items: ["fine", "fine too", "a, b, c"] }));
-  assert.match(item, /item 3/, "the failing item is numbered");
+  // WHICH item, when an item trips a lint the split cannot cure.
+  assert.match(got(() => parseUpdate({ op: "plan", items: ["fine", "fine too", "a\nb"] })), /item 3/, "the failing item is numbered");
 
   // The other two lints quote the text too.
   assert.match(got(() => parseUpdate({ op: "update", brief: "a\nb" })), /\\n/, "the line break is shown, escaped");
   assert.match(got(() => parseUpdate({ op: "update", brief: "y".repeat(91) })), /91 chars/);
+});
+
+// THE LEAVE GATE COUNTS THE RECORD; the live graph replays one session's
+// trail. e31's close was blocked by a node an earlier session left open,
+// and no call could reach it — the record had to be repaired by hand.
+test("a resolution reaches a node an earlier session's visit left open", () => {
+  const root = freshRoot();
+  const dir = seDir(root);
+  mkdirSync(dir, { recursive: true });
+  const rec = join(dir, "record-decisions.jsonl");
+  writeFileSync(rec, JSON.stringify({ op: "plan", visit: "expeditions/e9@1", nodes: [{ id: "d173", brief: "rename product to project everywhere" }] }) + "\n", "utf8");
+  const d = new Decisions(dir);
+  d.setExtraSink(rec);
+  d.apply("expeditions/e9@0", { op: "done", node: "d173", brief: "the rename is finished" });
+  const after = replayVisitsText(readFileSync(rec, "utf8"));
+  const v = after.find((x) => x.visit === "expeditions/e9@1");
+  assert.equal(v?.nodes.find((n) => n.id === "d173")?.status, "done", "the record shows the earlier visit's node resolved");
+  // A repeat stays a no-op across sessions, exactly as within one.
+  d.apply("expeditions/e9@0", { op: "done", node: "d173", brief: "the rename is finished" });
 });
 
 test("replay: parked defers and open points survive an engine life", () => {

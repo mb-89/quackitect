@@ -20,6 +20,10 @@ export interface Survey {
   /** Present whenever the notes list was WINDOWED, so a paged answer can
    *  never be mistaken for the whole inbox. */
   notes_window?: { offset: number; shown: number; remaining: number };
+  /** The backlog windows WITH the notes — one limit, both lists. It once
+   *  rode along whole on every windowed call and overflowed the host
+   *  (2026-08-02, at 44 parked items). */
+  backlog_window?: { offset: number; shown: number; remaining: number };
 }
 
 export interface SurveyOptions {
@@ -52,12 +56,13 @@ export function survey(projectRoot: string, opts: SurveyOptions = {}): Survey {
   const offset = Math.max(0, opts.offset ?? 0);
   const windowed = opts.limit !== undefined || offset > 0;
   const notes = windowed ? allNotes.slice(offset, offset + (opts.limit ?? allNotes.length)) : allNotes;
-  const backlog = backlogNotes(seDir(projectRoot))
+  const allBacklog = backlogNotes(seDir(projectRoot))
     .sort(byPriority)
     .map((n) => ({ ref: n.ref, ready_when: n.drained?.where ?? "", title: titleOf(n), priority: priorityOf(n), ...(withText ? { text: n.text } : {}) }));
+  const backlog = windowed ? allBacklog.slice(offset, offset + (opts.limit ?? allBacklog.length)) : allBacklog;
   return {
-    counts: { expeditions: exps.length, iterations: its.length, notes: allNotes.length, backlog: backlog.length },
-    ...(windowed ? { notes_window: { offset, shown: notes.length, remaining: Math.max(0, allNotes.length - offset - notes.length) } } : {}),
+    counts: { expeditions: exps.length, iterations: its.length, notes: allNotes.length, backlog: allBacklog.length },
+    ...(windowed ? { notes_window: { offset, shown: notes.length, remaining: Math.max(0, allNotes.length - offset - notes.length) }, backlog_window: { offset, shown: backlog.length, remaining: Math.max(0, allBacklog.length - offset - backlog.length) } } : {}),
     expeditions: exps,
     iterations: its,
     notes,

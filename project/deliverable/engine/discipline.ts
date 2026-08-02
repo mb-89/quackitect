@@ -342,8 +342,12 @@ export function suiteFiles(root: string): string[] {
       .filter((f) => f.endsWith(".test.ts"))
       .map((f) => `project/deliverable/tests/${f}`)
       .sort();
-  } catch {
-    return [];
+  } catch (e) {
+    // ONLY a missing directory is an empty suite. This catch once swallowed
+    // a ReferenceError and answered [], and an empty collection is the most
+    // convincing lie a program can tell.
+    if ((e as NodeJS.ErrnoException).code === "ENOENT") return [];
+    throw e;
   }
 }
 

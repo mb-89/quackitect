@@ -520,6 +520,14 @@ export function startMirror(o: MirrorOptions): Server {
         res.end(widget);
         return;
       }
+      // AN UNKNOWN POST ANSWERS 404, NEVER THE PAGE. The fallthrough used to
+      // serve the page to every method, so a retired route kept returning a
+      // 200 full of HTML and its caller kept believing in it.
+      if (req.method !== "GET" && req.method !== "HEAD") {
+        res.writeHead(404, { "content-type": "text/plain; charset=utf-8" });
+        res.end(`no such route: ${req.method} ${url.pathname}`);
+        return;
+      }
       // GET / — tick without arguments: information about where we are.
       // ?view=<machine> browses a machine without moving the walk.
       state.lastPacket = state.session.packet();

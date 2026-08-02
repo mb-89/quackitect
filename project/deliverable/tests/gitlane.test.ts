@@ -37,6 +37,11 @@ test("the dirty gate excuses the engine's own trail, and nothing else", () => {
   const real = `${trail}\n M project/guidance/voice.md`;
   assert.deepEqual(dirtyLines(real), [" M project/guidance/voice.md"], "real work still blocks a reconcile");
   assert.deepEqual(dirtyLines(""), [], "a clean tree stays clean");
+  // A merge cannot silently bury an untracked file — git aborts if one
+  // would be overwritten, and that abort refuses typed. Counting them
+  // deadlocked e31's land behind its own ignore rule.
+  assert.deepEqual(dirtyLines("?? project/.mcp.json\n?? project/.claude/"), [], "untracked files never block a reconcile");
+  assert.deepEqual(dirtyLines("?? new-idea.md\n M engine/run.ts"), [" M engine/run.ts"], "a tracked modification still does");
 });
 
 // LAND and SYNC reconcile a worktree WITH trunk, so both need two trees. At

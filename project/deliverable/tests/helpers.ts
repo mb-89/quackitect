@@ -214,15 +214,27 @@ export function checkDocs(session: { humanCheck: (p: string) => unknown }): void
 }
 
 /** A test root with a real repository in it. Anything that lists
- *  expeditions runs git, and a root without .git refuses before it answers. */
+ *  expeditions runs git, and a root without .git refuses before it answers.
+ *
+ *  THE REPOSITORY IS A FIXTURE (owner direction 2026-08-02, the pytest
+ *  shape): one template repo per process, its .git copied per case. Three
+ *  git spawns per case became one directory copy; every case still owns a
+ *  fresh, isolated repository, so nothing a test proves changes. */
+let gitTemplate: string | undefined;
 export function gitInit(root: string): void {
-  const g = (...a: string[]): void => {
-    const r = spawnSync("git", a, { cwd: root, encoding: "utf8", windowsHide: true });
+  const g = (cwd: string, ...a: string[]): void => {
+    const r = spawnSync("git", a, { cwd, encoding: "utf8", windowsHide: true });
     if (r.status !== 0) throw new Error(`git ${a.join(" ")} failed: ${r.stderr}`);
   };
-  g("init");
-  g("config", "user.email", "se@test.local");
-  g("config", "user.name", "se test");
+  if (gitTemplate === undefined) {
+    const t = mkdtempSync(join(tmpdir(), "se-git-template-"));
+    created.push(t);
+    g(t, "init");
+    g(t, "config", "user.email", "se@test.local");
+    g(t, "config", "user.name", "se test");
+    gitTemplate = t;
+  }
+  cpSync(join(gitTemplate, ".git"), join(root, ".git"), { recursive: true });
 }
 
 /** Leaving through main's end demands a handover written THIS session

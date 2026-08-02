@@ -117,6 +117,47 @@ test("a CRLF/LF mismatch is auto-corrected and ANNOUNCED, not refused", () => {
   rmSync(root, { recursive: true, force: true });
 });
 
+// ONE STRAY CRLF IN AN LF FILE collapsed the range verb's line count to 2,
+// and the refusal described a file that does not exist. Lines are counted
+// the way the reader numbers them, whatever each line's ending.
+test("a mixed-endings file takes a range op at the reader's own line numbers", () => {
+  const root = fresh();
+  writeFileSync(join(root, "m.ts"), "one\ntwo\nthree\r\n");
+  const read = fileRead(root, "m.ts");
+  assert.equal(read.total_lines, 4, "the reader counts by newline alone");
+  const r = filePatch(root, [{ path: "m.ts", at: { from_line: 3, to_line: 3 }, new_string: "THREE", base_hash: read.hash }]);
+  assert.equal(readFileSync(join(root, "m.ts"), "utf8"), "one\ntwo\nTHREE\r\n", "the replaced line keeps its own ending");
+  assert.ok((r.corrected ?? []).some((c) => c.includes("mixes CRLF and LF")), "the mix is announced");
+  rmSync(root, { recursive: true, force: true });
+});
+
+// A BYTE-ORDER MARK IS AN ENCODING FACT, NOT CONTENT. It is invisible in
+// every read, so a first-line old_string differs in nothing a model can see.
+test("a BOM file matches BOM-free, keeps its mark, and says so", () => {
+  const root = fresh();
+  writeFileSync(join(root, "b.ts"), "﻿alpha\nbeta\n");
+  const r = filePatch(root, [{ path: "b.ts", old_string: "alpha", new_string: "ALPHA" }]);
+  assert.equal(readFileSync(join(root, "b.ts"), "utf8"), "﻿ALPHA\nbeta\n", "the mark survives at the front");
+  assert.ok((r.corrected ?? []).some((c) => c.includes("byte-order mark")), "the mark is announced");
+  rmSync(root, { recursive: true, force: true });
+});
+
+test("an old_string that carries the copied BOM still matches, and the mark is not doubled", () => {
+  const root = fresh();
+  writeFileSync(join(root, "b.ts"), "﻿alpha\nbeta\n");
+  filePatch(root, [{ path: "b.ts", old_string: "﻿alpha", new_string: "ALPHA" }]);
+  assert.equal(readFileSync(join(root, "b.ts"), "utf8"), "﻿ALPHA\nbeta\n");
+  rmSync(root, { recursive: true, force: true });
+});
+
+test("a prepend on a BOM file lands after the mark, never mid-file", () => {
+  const root = fresh();
+  writeFileSync(join(root, "b.ts"), "﻿alpha\n");
+  filePatch(root, [{ path: "b.ts", prepend: true, new_string: "top" }]);
+  assert.equal(readFileSync(join(root, "b.ts"), "utf8"), "﻿top\nalpha\n", "the mark stays the first byte");
+  rmSync(root, { recursive: true, force: true });
+});
+
 test("a real whitespace difference still refuses — indentation is a difference, not an encoding", () => {
   const root = fresh();
   writeFileSync(join(root, "w.ts"), "    indented\n");

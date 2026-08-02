@@ -1,0 +1,104 @@
+{"ts":"2026-08-02T17:56:52.697Z","op":"plan","visit":"expeditions/e32@0","parent":null,"nodes":[{"id":"d36","brief":"job 1: unify the range splitter with the reader and sweep BOM seams"},{"id":"d37","brief":"job 2: the update lane applies its own SE-C-120 split"},{"id":"d38","brief":"job 3: cut the test pain end to end"},{"id":"d39","brief":"job 4: the small lane fixes"},{"id":"d40","brief":"job 5: the VS Code shell fixes"},{"id":"d41","brief":"verify and land and re-drain the parked notes"}]}
+{"ts":"2026-08-02T17:57:01.950Z","op":"update","visit":"expeditions/e32@0","node":"d42","brief":"pinning the reader splitter and the eol helpers"}
+{"ts":"2026-08-02T17:57:09.318Z","op":"update","visit":"expeditions/e32@0","node":"d43","brief":"hunting the helpers with a wider net"}
+{"ts":"2026-08-02T17:57:34.840Z","op":"update","visit":"expeditions/e32@0","node":"d44","brief":"reading the four seams before the unifying patch"}
+{"ts":"2026-08-02T17:59:33.429Z","op":"update","visit":"expeditions/e32@0","node":"d45","brief":"the unifying patch is staged across five seams in files.ts"}
+{"ts":"2026-08-02T17:59:43.211Z","op":"update","visit":"expeditions/e32@0","node":"d46","brief":"locating the patch test harness"}
+{"ts":"2026-08-02T17:59:51.287Z","op":"update","visit":"expeditions/e32@0","node":"d47","brief":"reading the harness to extend it"}
+{"ts":"2026-08-02T18:00:25.836Z","op":"update","visit":"expeditions/e32@0","node":"d48","brief":"four regression cases beside the CRLF one"}
+{"ts":"2026-08-02T18:00:46.591Z","op":"update","visit":"expeditions/e32@0","node":"d49","brief":"regression cases staged as a clean exact op"}
+{"ts":"2026-08-02T18:00:53.936Z","op":"update","visit":"expeditions/e32@0","node":"d50","brief":"scoped run over the three files the change touches"}
+{"ts":"2026-08-02T18:01:28.533Z","op":"done","visit":"expeditions/e32@0","node":"d36","brief":"encoding seams unified and pinned by four regressions"}
+{"ts":"2026-08-02T18:01:37.585Z","op":"update","visit":"expeditions/e32@0","node":"d51","brief":"job 2: reworking the SE-C-120 brief lint to apply its split"}
+{"ts":"2026-08-02T18:02:31.982Z","op":"update","visit":"expeditions/e32@0","node":"d52","brief":"reading the update parser before the conversion"}
+{"ts":"2026-08-02T18:02:42.815Z","op":"update","visit":"expeditions/e32@0","node":"d53","brief":"tracing the op to the update_result"}
+{"ts":"2026-08-02T18:02:54.392Z","op":"update","visit":"expeditions/e32@0","node":"d54","brief":"narrowing to the toll call sites"}
+{"ts":"2026-08-02T18:03:02.372Z","op":"update","visit":"expeditions/e32@0","node":"d55","brief":"the parse call site in tools.ts"}
+{"ts":"2026-08-02T18:03:38.143Z","op":"update","visit":"expeditions/e32@0","node":"d56","brief":"reading the lint tests before flipping the behavior"}
+{"ts":"2026-08-02T18:03:47.159Z","op":"update","visit":"expeditions/e32@0","node":"d57","brief":"hunting the lint cases in the other test files"}
+{"ts":"2026-08-02T18:03:57.584Z","op":"update","visit":"expeditions/e32@0","node":"d58","brief":"reading the two lint cases whole"}
+{"ts":"2026-08-02T18:04:10.101Z","op":"update","visit":"expeditions/e32@0","node":"d59","brief":"the second lint case's tail"}
+{"ts":"2026-08-02T18:05:45.339Z","op":"update","visit":"expeditions/e32@0","node":"d60","brief":"the conversion staged across parser and guard and tests and guidance"}
+{"ts":"2026-08-02T18:05:52.398Z","op":"update","visit":"expeditions/e32@0","node":"d61","brief":"scoped run over the decision-graph files"}
+{"ts":"2026-08-02T18:06:12.749Z","op":"done","visit":"expeditions/e32@0","node":"d37","brief":"the update lane applies its own split now"}
+{"ts":"2026-08-02T18:06:20.369Z","op":"update","visit":"expeditions/e32@0","node":"d62","brief":"job 3: the test-run reaper first"}
+{"ts":"2026-08-02T18:06:32.202Z","op":"update","visit":"expeditions/e32@0","node":"d63","brief":"mapping the se_test spawn path"}
+{"ts":"2026-08-02T18:06:40.238Z","op":"update","visit":"expeditions/e32@0","node":"d64","brief":"locating the se_test handler"}
+{"ts":"2026-08-02T18:06:50.958Z","op":"update","visit":"expeditions/e32@0","node":"d65","brief":"reading the handler and the job registry"}
+{"ts":"2026-08-02T18:07:00.556Z","op":"update","visit":"expeditions/e32@0","node":"d66","brief":"pinning the handler line"}
+{"ts":"2026-08-02T18:07:09.360Z","op":"update","visit":"expeditions/e32@0","node":"d67","brief":"reading the whole se_test handler"}
+{"ts":"2026-08-02T18:07:25.923Z","op":"update","visit":"expeditions/e32@0","node":"d68","brief":"reading the run lane's job registry and kill tree"}
+{"ts":"2026-08-02T18:08:54.978Z","op":"update","visit":"expeditions/e32@0","node":"d69","brief":"finding the shutdown reap site"}
+{"ts":"2026-08-02T18:09:02.262Z","op":"update","visit":"expeditions/e32@0","node":"d70","brief":"the reaper call sites"}
+{"ts":"2026-08-02T18:09:11.292Z","op":"update","visit":"expeditions/e32@0","node":"d71","brief":"counting the reaper call sites per file"}
+{"ts":"2026-08-02T18:09:52.789Z","op":"update","visit":"expeditions/e32@0","node":"d72","brief":"finding the exit paths for the reaper"}
+{"ts":"2026-08-02T18:10:00.555Z","op":"update","visit":"expeditions/e32@0","node":"d73","brief":"the shim and child exit paths"}
+{"ts":"2026-08-02T18:10:21.863Z","op":"update","visit":"expeditions/e32@0","node":"d74","brief":"the child startup block"}
+{"ts":"2026-08-02T18:10:29.399Z","op":"update","visit":"expeditions/e32@0","node":"d75","brief":"the engine-proper entry"}
+{"ts":"2026-08-02T18:10:35.896Z","op":"update","visit":"expeditions/e32@0","node":"d76","brief":"reading the entry's routing to place the wiring"}
+{"ts":"2026-08-02T18:11:28.462Z","op":"update","visit":"expeditions/e32@0","node":"d77","brief":"the imports and the selftest spawn block"}
+{"ts":"2026-08-02T18:12:48.193Z","op":"update","visit":"expeditions/e32@0","node":"d78","brief":"the two remaining anchors"}
+{"ts":"2026-08-02T18:14:20.521Z","op":"update","visit":"expeditions/e32@0","node":"d79","brief":"the reaper and the handoff staged across four files"}
+{"ts":"2026-08-02T18:14:40.804Z","op":"update","visit":"expeditions/e32@0","node":"d80","brief":"type-checking the reaper and handoff changes"}
+{"ts":"2026-08-02T18:15:26.688Z","op":"update","visit":"expeditions/e32@0","node":"d81","brief":"preflight over the changed tree"}
+{"ts":"2026-08-02T18:15:38.025Z","op":"update","visit":"expeditions/e32@0","node":"d82","brief":"regenerating the prompt layer after the walking.md edit"}
+{"ts":"2026-08-02T18:15:49.582Z","op":"update","visit":"expeditions/e32@0","node":"d83","brief":"scoped run over the reaper and handoff surface"}
+{"ts":"2026-08-02T18:16:21.293Z","op":"update","visit":"expeditions/e32@0","node":"d84","brief":"committing the reaper and the handoff"}
+{"ts":"2026-08-02T18:16:30.984Z","op":"update","visit":"expeditions/e32@0","node":"d85","brief":"draining the reaper and timeout notes"}
+{"ts":"2026-08-02T18:17:16.855Z","op":"update","visit":"expeditions/e32@0","node":"d86","brief":"job 4: reading the catch and the mirror routing"}
+{"ts":"2026-08-02T18:17:30.425Z","op":"update","visit":"expeditions/e32@0","node":"d87","brief":"the mirror fallthrough"}
+{"ts":"2026-08-02T18:17:40.108Z","op":"update","visit":"expeditions/e32@0","node":"d88","brief":"hunting the final render branch"}
+{"ts":"2026-08-02T18:17:47.882Z","op":"update","visit":"expeditions/e32@0","node":"d89","brief":"reading the handler tail"}
+{"ts":"2026-08-02T18:18:04.311Z","op":"update","visit":"expeditions/e32@0","node":"d90","brief":"reading the survey to window its backlog"}
+{"ts":"2026-08-02T18:18:39.666Z","op":"update","visit":"expeditions/e32@0","node":"d91","brief":"three small fixes staged"}
+{"ts":"2026-08-02T18:18:50.174Z","op":"update","visit":"expeditions/e32@0","node":"d92","brief":"the land gate's dirty check"}
+{"ts":"2026-08-02T18:18:59.113Z","op":"update","visit":"expeditions/e32@0","node":"d93","brief":"the refusal site itself"}
+{"ts":"2026-08-02T18:19:07.158Z","op":"update","visit":"expeditions/e32@0","node":"d94","brief":"reading the dirty check whole"}
+{"ts":"2026-08-02T18:19:21.689Z","op":"update","visit":"expeditions/e32@0","node":"d95","brief":"callers of the dirty check"}
+{"ts":"2026-08-02T18:19:42.875Z","op":"update","visit":"expeditions/e32@0","node":"d96","brief":"counting callers per file"}
+{"ts":"2026-08-02T18:19:56.874Z","op":"update","visit":"expeditions/e32@0","node":"d97","brief":"the gate's test cases"}
+{"ts":"2026-08-02T18:20:08.789Z","op":"update","visit":"expeditions/e32@0","node":"d98","brief":"untracked files leave the blocking set"}
+{"ts":"2026-08-02T18:20:26.681Z","op":"update","visit":"expeditions/e32@0","node":"d99","brief":"untracked files leave the blocking set, pinned by two cases"}
+{"ts":"2026-08-02T18:20:39.828Z","op":"update","visit":"expeditions/e32@0","node":"d100","brief":"reading the decision apply path"}
+{"ts":"2026-08-02T18:21:12.615Z","op":"update","visit":"expeditions/e32@0","node":"d101","brief":"the resolution case body"}
+{"ts":"2026-08-02T18:21:46.613Z","op":"update","visit":"expeditions/e32@0","node":"d102","brief":"the replay export and the class head"}
+{"ts":"2026-08-02T18:22:16.942Z","op":"update","visit":"expeditions/e32@0","node":"d103","brief":"the test file imports"}
+{"ts":"2026-08-02T18:22:41.355Z","op":"update","visit":"expeditions/e32@0","node":"d104","brief":"the cross-visit resolution staged with its regression"}
+{"ts":"2026-08-02T18:22:52.032Z","op":"update","visit":"expeditions/e32@0","node":"d105","brief":"scoped run over job 4's surface"}
+{"ts":"2026-08-02T18:23:20.604Z","op":"update","visit":"expeditions/e32@0","node":"d106","brief":"committing the five small fixes"}
+{"ts":"2026-08-02T18:23:31.754Z","op":"update","visit":"expeditions/e32@0","node":"d107","brief":"draining job 4's landed notes"}
+{"ts":"2026-08-02T18:23:48.314Z","op":"update","visit":"expeditions/e32@0","node":"d108","brief":"the fetch handler"}
+{"ts":"2026-08-02T18:23:56.180Z","op":"update","visit":"expeditions/e32@0","node":"d109","brief":"reading the fetch tool"}
+{"ts":"2026-08-02T18:24:07.040Z","op":"update","visit":"expeditions/e32@0","node":"d110","brief":"the fetch implementation"}
+{"ts":"2026-08-02T18:24:25.875Z","op":"update","visit":"expeditions/e32@0","node":"d111","brief":"the fetch caps"}
+{"ts":"2026-08-02T18:25:06.203Z","op":"done","visit":"expeditions/e32@0","node":"d39","brief":"job 4 complete — five fixes landed and one was already shipped"}
+{"ts":"2026-08-02T18:25:29.992Z","op":"update","visit":"expeditions/e32@0","node":"d112","brief":"job 5: the extension copy block in RUNME"}
+{"ts":"2026-08-02T18:26:20.725Z","op":"done","visit":"expeditions/e32@0","node":"d40","brief":"job 5 resolved — premise corrected and the rewires wait for the owner's screen"}
+{"ts":"2026-08-02T18:26:31.625Z","op":"done","visit":"expeditions/e32@0","node":"d38","brief":"job 3 landed; the booted template and the map stay parked by their own terms"}
+{"ts":"2026-08-02T18:27:44.812Z","op":"update","visit":"expeditions/e32@0","node":"d113","brief":"polling for the battery verdict the server records"}
+{"ts":"2026-08-02T18:28:02.526Z","op":"update","visit":"expeditions/e32@0","node":"d114","brief":"a timed wait while the battery finishes server-side"}
+{"ts":"2026-08-02T18:28:12.975Z","op":"update","visit":"expeditions/e32@0","node":"d115","brief":"blocking on the timer job"}
+{"ts":"2026-08-02T18:29:20.677Z","op":"update","visit":"expeditions/e32@0","node":"d116","brief":"second poll for the battery verdict"}
+{"ts":"2026-08-02T18:33:25.703Z","op":"done","visit":"expeditions/e32@0","node":"d41","brief":"verified by the earned battery at 724 green"}
+{"ts":"2026-08-02T19:09:14.202Z","op":"update","visit":"expeditions/e32@1","node":"d184","brief":"pulling trunk into the branch"}
+{"ts":"2026-08-02T19:09:31.085Z","op":"update","visit":"expeditions/e32@1","node":"d185","brief":"the report commits so the sync can run"}
+{"ts":"2026-08-02T19:09:39.669Z","op":"update","visit":"expeditions/e32@1","node":"d186","brief":"the sync proper"}
+{"ts":"2026-08-02T19:09:56.015Z","op":"update","visit":"expeditions/e32@1","node":"d187","brief":"proving the two change sets compose"}
+{"ts":"2026-08-02T19:10:38.541Z","op":"update","visit":"expeditions/e32@1","node":"d188","brief":"the resume probe"}
+{"ts":"2026-08-02T19:10:48.503Z","op":"done","visit":"expeditions/start@1","node":"d179","brief":"the sync composed at 88 green"}
+{"ts":"2026-08-02T19:11:04.926Z","op":"update","visit":"expeditions/e32@1","node":"d189","brief":"the probe by absolute path"}
+{"ts":"2026-08-02T19:11:42.705Z","op":"update","visit":"expeditions/e32@1","node":"d190","brief":"the template note dies of a refuted premise, on evidence"}
+{"ts":"2026-08-02T19:11:58.769Z","op":"done","visit":"expeditions/start@1","node":"d181","brief":"one template repo per process, copied per case"}
+{"ts":"2026-08-02T19:12:10.372Z","op":"obsolete","visit":"expeditions/start@1","node":"d180","brief":"refuted on evidence — no position persistence, and the premise fell"}
+{"ts":"2026-08-02T19:12:19.915Z","op":"update","visit":"expeditions/e32@1","node":"d191","brief":"hunting the column generator"}
+{"ts":"2026-08-02T19:12:29.169Z","op":"update","visit":"expeditions/e32@1","node":"d192","brief":"the generator head and the matrix load"}
+{"ts":"2026-08-02T19:12:39.743Z","op":"update","visit":"expeditions/e32@1","node":"d193","brief":"reading the container generator"}
+{"ts":"2026-08-02T19:12:59.197Z","op":"done","visit":"expeditions/start@1","node":"d182","brief":"already cached where legal; the rest is real git the tests prove"}
+{"ts":"2026-08-02T19:14:11.647Z","op":"update","visit":"expeditions/e32@1","node":"d194","brief":"waiting out the worktree battery"}
+{"ts":"2026-08-02T19:14:20.020Z","op":"update","visit":"expeditions/e32@1","node":"d195","brief":"blocking on the timer"}
+{"ts":"2026-08-02T19:15:15.591Z","op":"update","visit":"expeditions/e32@1","node":"d196","brief":"the worktree battery's verdict"}
+{"ts":"2026-08-02T19:15:52.898Z","op":"update","visit":"expeditions/e32@1","node":"d197","brief":"the fixture commits on the branch"}
+{"ts":"2026-08-02T19:16:12.135Z","op":"update","visit":"expeditions/e32@1","node":"d198","brief":"the report tells tonight's ending"}
+{"ts":"2026-08-02T19:16:19.730Z","op":"update","visit":"expeditions/e32@1","node":"d199","brief":"the amended report commits"}
+{"ts":"2026-08-02T19:16:30.815Z","op":"update","visit":"expeditions/e32@1","node":"d200","brief":"walking to the gate"}
+{"ts":"2026-08-02T19:16:54.070Z","op":"done","visit":"expeditions/start@1","node":"d183","brief":"closing e32 on the owner's word with the battery green"}
